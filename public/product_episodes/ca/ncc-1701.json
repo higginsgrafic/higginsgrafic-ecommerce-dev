@@ -1,0 +1,115 @@
+{
+  "product": "NCC-1701",
+  "collection": "GRÀFIC E-commerce",
+  "totalEpisodes": 12,
+  "episodes": [
+    {
+      "id": 1,
+      "originalTitle": "The City on the Edge of Forever",
+      "title": "LA CIUTAT A LA FRONTERA DEL FUTUR",
+      "season": 1,
+      "episode": 28,
+      "year": 1967,
+      "text": "Un portal vibra amb ecos del passat quan McCoy desapareix a través del temps tot esborrant la Federació amb ell mentre Kirk troba l'amor en una època perduda. T'atreveixes a ser part d'aquesta història?"
+    },
+    {
+      "id": 2,
+      "originalTitle": "Space Seed",
+      "title": "LA LLAVOR DE L'ESPAI",
+      "season": 1,
+      "episode": 22,
+      "year": 1967,
+      "text": "Dins d'una nau en estasi Khan somia amb grans imperis. Un superhumà del passat es desperta amb fam. Seducció, traïció i ambició. El preu del poder serà car. T'atreveixes a ser part d'aquesta història?"
+    },
+    {
+      "id": 3,
+      "originalTitle": "Amok Time",
+      "title": "L'ÈPOCA DE L'AMOK",
+      "season": 2,
+      "episode": 1,
+      "year": 1967,
+      "text": "El foc ancestral de Vulcà crema dins de Spock. Veus rituals i sang. Es trenca l'amistat quan has de lluitar a mort? L'hora baixa tomba sobre el combat. T'atreveixes a ser part d'aquesta història?"
+    },
+    {
+      "id": 4,
+      "originalTitle": "Mirror, Mirror",
+      "title": "MIRALLET, MIRALLET",
+      "season": 2,
+      "episode": 4,
+      "year": 1967,
+      "text": "Un accident de teletransport llança Kirk a un univers on la Federació és un Imperi brutal que conquereix amb violència. Kirk haurà d'escapar si vol tornar a casa. T'atreveixes a ser part d'aquesta història?"
+    },
+    {
+      "id": 5,
+      "originalTitle": "The Trouble with Tribbles",
+      "title": "EL PROBLEMA DELS TRIBBLES",
+      "season": 2,
+      "episode": 15,
+      "year": 1967,
+      "text": "Misterioses boles de pèl han començat a envair cada racó de la nau i es multipliquen i consumeixen recursos sens fi. L'Enterprise és atacat? T'atreveixes a ser part d'aquesta història?"
+    },
+    {
+      "id": 6,
+      "originalTitle": "Balance of Terror",
+      "title": "L'EQUILIBRI DE LA POR",
+      "season": 1,
+      "episode": 14,
+      "year": 1966,
+      "text": "Una nau fantasma travessa la fosca. Els Romulans tornen després de cent anys de silenci. Dos comandants es cacen mútuament en un ballet mortal. T'atreveixes a ser part d'aquesta història?"
+    },
+    {
+      "id": 7,
+      "originalTitle": "Arena",
+      "title": "ARENA",
+      "season": 1,
+      "episode": 18,
+      "year": 1967,
+      "text": "Kirk enfronta un Gorn en una platja desèrtica. La intel·ligència contra la força bruta. Amb pedres i pólvora, ha de superar el monstre. La supervivència demana enginy. T'atreveixes a ser part d'aquesta história?"
+    },
+    {
+      "id": 8,
+      "originalTitle": "The Doomsday Machine",
+      "title": "LA MÀQUINA DEL JUDICI FINAL",
+      "season": 2,
+      "episode": 6,
+      "year": 1967,
+      "text": "Una arma antiga devora planetes sencers. L'Enterprise troba el capità Decker, obsessionat amb venjança per la seva tripulació que vol destruir la màquina tingui el cost que tingui. T'atreveixes a ser part d'aquesta història?"
+    },
+    {
+      "id": 9,
+      "originalTitle": "Journey to Babel",
+      "title": "VIATGE A BABEL",
+      "season": 2,
+      "episode": 10,
+      "year": 1967,
+      "text": "Sarek i Spock naveguen en silenci tens mentre un assassí camina entre els ambaixadors. El cor de Sarek falla mentre Spock comanda el pont. L'honor contra l'amor filial xoquen. T'atreveixes a ser part d'aquesta història?"
+    },
+    {
+      "id": 10,
+      "originalTitle": "The Devil in the Dark",
+      "title": "EL MONSTRE AMAGAT",
+      "season": 1,
+      "episode": 25,
+      "year": 1967,
+      "text": "A Janus VI, els treballadors moren a causa d'accidents sospitosos. Una criatura ataca des de l'ombra. A l'Enterprise creuen que allà hi ha una forma de vida de silici! T'atreveixes a ser part d'aquesta història?"
+    },
+    {
+      "id": 11,
+      "originalTitle": "Errand of Mercy",
+      "title": "ELS SALVADORS, SALVATS",
+      "season": 1,
+      "episode": 26,
+      "year": 1967,
+      "text": "La guerra esclata entre la Federació i els Klingon. Kirk i els seus arriben a Orgània per defensar el planeta. Els pacífics habitants, però, somriuen davant la batalla. T'atreveixes a ser part d'aquesta història?"
+    },
+    {
+      "id": 12,
+      "originalTitle": "The Menagerie",
+      "title": "EL ZOO",
+      "season": 1,
+      "episode": 11,
+      "year": 1966,
+      "text": "Spock comet traïció per salvar el capità Pike. Navega cap a un món prohibit on la mort és el càstig. La lleialtat supera la lògica. L'amistat crida des del dolor. T'atreveixes a ser part d'aquesta història?"
+    }
+  ]
+}

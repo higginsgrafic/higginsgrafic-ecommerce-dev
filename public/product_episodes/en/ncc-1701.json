@@ -1,0 +1,103 @@
+{
+  "product": "ncc-1701",
+  "collection": "GRÀFIC E-commerce",
+  "totalEpisodes": 12,
+  "episodes": [
+    {
+      "id": 1,
+      "title": "The City on the Edge of Forever",
+      "season": 1,
+      "episode": 28,
+      "year": 1967,
+      "text": "A portal vibrates with echoes of the past when McCoy disappears through time, erasing the Federation with him while Kirk finds love in a lost era. Do you dare to be part of this story?"
+    },
+    {
+      "id": 2,
+      "title": "Space Seed",
+      "season": 1,
+      "episode": 22,
+      "year": 1967,
+      "text": "Inside a ship in stasis, Khan dreams of great empires. A superhuman from the past awakens with hunger. Seduction, betrayal, and ambition. The price of power will be high. Do you dare to be part of this story?"
+    },
+    {
+      "id": 3,
+      "title": "Amok Time",
+      "season": 2,
+      "episode": 1,
+      "year": 1967,
+      "text": "The ancestral fire of Vulcan burns within Spock. Ritual voices and blood. Does friendship break when you must fight to the death? The setting sun falls upon the combat. Do you dare to be part of this story?"
+    },
+    {
+      "id": 4,
+      "title": "Mirror, Mirror",
+      "season": 2,
+      "episode": 4,
+      "year": 1967,
+      "text": "A transporter accident throws Kirk into a universe where the Federation is a brutal Empire that conquers with violence. Kirk must escape if he wants to return home. Do you dare to be part of this story?"
+    },
+    {
+      "id": 5,
+      "title": "The Trouble with Tribbles",
+      "season": 2,
+      "episode": 15,
+      "year": 1967,
+      "text": "Mysterious fur balls have begun to invade every corner of the ship, multiplying and consuming resources endlessly. Is the Enterprise under attack? Do you dare to be part of this story?"
+    },
+    {
+      "id": 6,
+      "title": "Balance of Terror",
+      "season": 1,
+      "episode": 14,
+      "year": 1966,
+      "text": "A ghost ship crosses the darkness. The Romulans return after a hundred years of silence. Two commanders hunt each other in a deadly ballet. Do you dare to be part of this story?"
+    },
+    {
+      "id": 7,
+      "title": "Arena",
+      "season": 1,
+      "episode": 18,
+      "year": 1967,
+      "text": "Kirk faces a Gorn on a desert beach. Intelligence against brute force. With rocks and gunpowder, he must overcome the monster. Survival demands ingenuity. Do you dare to be part of this story?"
+    },
+    {
+      "id": 8,
+      "title": "The Doomsday Machine",
+      "season": 2,
+      "episode": 6,
+      "year": 1967,
+      "text": "An ancient weapon devours entire planets. The Enterprise finds Captain Decker, obsessed with revenge for his crew, who wants to destroy the machine at any cost. Do you dare to be part of this story?"
+    },
+    {
+      "id": 9,
+      "title": "Journey to Babel",
+      "season": 2,
+      "episode": 10,
+      "year": 1967,
+      "text": "Sarek and Spock navigate in tense silence while an assassin walks among the ambassadors. Sarek's heart fails while Spock commands the bridge. Honor against filial love collide. Do you dare to be part of this story?"
+    },
+    {
+      "id": 10,
+      "title": "The Devil in the Dark",
+      "season": 1,
+      "episode": 25,
+      "year": 1967,
+      "text": "On Janus VI, workers die from suspicious accidents. A creature attacks from the shadows. The Enterprise crew believes there is a silicon-based life form there! Do you dare to be part of this story?"
+    },
+    {
+      "id": 11,
+      "title": "Errand of Mercy",
+      "season": 1,
+      "episode": 26,
+      "year": 1967,
+      "text": "War breaks out between the Federation and the Klingons. Kirk and his crew arrive at Organia to defend the planet. The peaceful inhabitants, however, smile at the battle. Do you dare to be part of this story?"
+    },
+    {
+      "id": 12,
+      "title": "The Menagerie",
+      "season": 1,
+      "episode": 11,
+      "year": 1966,
+      "text": "Spock commits treason to save Captain Pike. He navigates toward a forbidden world where death is the punishment. Loyalty surpasses logic. Friendship calls from pain. Do you dare to be part of this story?"
+    }
+  ]
+}

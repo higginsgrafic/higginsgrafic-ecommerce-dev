@@ -1,0 +1,320 @@
+{
+  "version": 1,
+  "slides": {
+    "presets": {
+      "FastViewSlide": {
+        "shell": {
+          "variant": "right-drawer"
+        },
+        "tools": {
+          "catalog": {
+            "logout": {
+              "type": "action",
+              "ref": "ui.regions.helpAndSession.actions.logout"
+            }
+          },
+          "order": ["logout"]
+        },
+        "layout": {
+          "grid": {
+            "cols": 6,
+            "rows": 6,
+            "gap": "md",
+            "templateAreas": [
+              "identity identity identity primaryActions primaryActions primaryActions",
+              "identity identity identity primaryActions primaryActions primaryActions",
+              "ordersSummary ordersSummary ordersSummary helpAndSession helpAndSession helpAndSession",
+              "ordersSummary ordersSummary ordersSummary helpAndSession helpAndSession helpAndSession",
+              "recentlyViewed recentlyViewed recentlyViewed helpAndSession helpAndSession helpAndSession",
+              "recentlyViewed recentlyViewed recentlyViewed helpAndSession helpAndSession helpAndSession"
+            ]
+          },
+          "policy": { "maxHeight": "no-scroll" },
+          "regions": [
+            { "id": "identity", "span": { "colStart": 1, "colEnd": 4, "rowStart": 1, "rowEnd": 2 } },
+            { "id": "primaryActions", "span": { "colStart": 5, "colEnd": 6, "rowStart": 1, "rowEnd": 2 } },
+            { "id": "ordersSummary", "span": { "colStart": 1, "colEnd": 4, "rowStart": 3, "rowEnd": 4 } },
+            { "id": "recentlyViewed", "span": { "colStart": 1, "colEnd": 4, "rowStart": 5, "rowEnd": 6 } },
+            { "id": "helpAndSession", "span": { "colStart": 5, "colEnd": 6, "rowStart": 3, "rowEnd": 6 } }
+          ]
+        },
+        "ui": {
+          "blocks": [
+            { "id": "identity", "type": "region", "regionId": "identity", "gridArea": "identity", "visible": true },
+            { "id": "primaryActions", "type": "region", "regionId": "primaryActions", "gridArea": "primaryActions", "visible": true },
+            { "id": "ordersSummary", "type": "region", "regionId": "ordersSummary", "gridArea": "ordersSummary", "visible": true },
+            { "id": "recentlyViewed", "type": "region", "regionId": "recentlyViewed", "gridArea": "recentlyViewed", "visible": true },
+            { "id": "helpAndSession", "type": "region", "regionId": "helpAndSession", "gridArea": "helpAndSession", "visible": true }
+          ],
+          "regions": [
+            {
+              "id": "identity",
+              "component": "IdentityCard",
+              "variant": "compact"
+            },
+            {
+              "id": "primaryActions",
+              "component": "PrimaryActions",
+              "variant": "compact",
+              "limits": { "maxActions": 3 }
+            },
+            {
+              "id": "ordersSummary",
+              "component": "OrdersSummary",
+              "variant": "micro",
+              "limits": { "maxLines": 2 }
+            },
+            {
+              "id": "recentlyViewed",
+              "component": "RecentlyViewed",
+              "variant": "micro",
+              "limits": { "maxItems": 4 }
+            },
+            {
+              "id": "helpAndSession",
+              "component": "HelpAndSession",
+              "variant": "compact",
+              "limits": { "maxLinks": 4 },
+              "actions": {
+                "logout": {
+                  "style": "secondary",
+                  "confirmModalId": "logoutConfirm"
+                }
+              }
+            }
+          ],
+          "modals": [
+            {
+              "id": "logoutConfirm",
+              "title": "Tancar sessió?",
+              "body": "Perdràs l'accés al teu compte fins que tornis a iniciar sessió.",
+              "actions": [
+                { "id": "confirm", "label": "Tancar sessió", "variant": "destructive" },
+                { "id": "cancel", "label": "Cancel·lar", "variant": "secondary" }
+              ]
+            }
+          ]
+        },
+        "data": {
+          "sources": {
+            "user": "auth.user",
+            "ordersSummary": "orders.summary",
+            "recentlyViewed": "local.recentlyViewed",
+            "helpLinks": "static.helpLinks"
+          },
+          "mapping": {
+            "identity": { "source": "user" },
+            "ordersSummary": { "source": "ordersSummary" },
+            "recentlyViewed": { "source": "recentlyViewed" },
+            "helpAndSession": { "source": "helpLinks" }
+          }
+        }
+      },
+      "FullWideViewSlide": {
+        "shell": {
+          "variant": "full-wide"
+        },
+        "tools": {
+          "catalog": {
+            "logout": {
+              "type": "action",
+              "ref": "ui.regions.helpAndSession.actions.logout"
+            }
+          },
+          "order": ["logout"]
+        },
+        "layout": {
+          "grid": {
+            "cols": 6,
+            "rows": 6,
+            "gap": "md",
+            "templateAreas": [
+              "identity identity identity primaryActions primaryActions primaryActions",
+              "identity identity identity primaryActions primaryActions primaryActions",
+              "ordersSummary ordersSummary ordersSummary helpAndSession helpAndSession helpAndSession",
+              "ordersSummary ordersSummary ordersSummary helpAndSession helpAndSession helpAndSession",
+              "recentlyViewed recentlyViewed recentlyViewed helpAndSession helpAndSession helpAndSession",
+              "recentlyViewed recentlyViewed recentlyViewed helpAndSession helpAndSession helpAndSession"
+            ]
+          },
+          "policy": { "maxHeight": "no-scroll" },
+          "regions": [
+            { "id": "identity", "span": { "colStart": 1, "colEnd": 4, "rowStart": 1, "rowEnd": 2 } },
+            { "id": "primaryActions", "span": { "colStart": 5, "colEnd": 6, "rowStart": 1, "rowEnd": 2 } },
+            { "id": "ordersSummary", "span": { "colStart": 1, "colEnd": 4, "rowStart": 3, "rowEnd": 4 } },
+            { "id": "recentlyViewed", "span": { "colStart": 1, "colEnd": 4, "rowStart": 5, "rowEnd": 6 } },
+            { "id": "helpAndSession", "span": { "colStart": 5, "colEnd": 6, "rowStart": 3, "rowEnd": 6 } }
+          ]
+        },
+        "ui": {
+          "blocks": [
+            { "id": "identity", "type": "region", "regionId": "identity", "gridArea": "identity", "visible": true },
+            { "id": "primaryActions", "type": "region", "regionId": "primaryActions", "gridArea": "primaryActions", "visible": true },
+            { "id": "ordersSummary", "type": "region", "regionId": "ordersSummary", "gridArea": "ordersSummary", "visible": true },
+            { "id": "recentlyViewed", "type": "region", "regionId": "recentlyViewed", "gridArea": "recentlyViewed", "visible": true },
+            { "id": "helpAndSession", "type": "region", "regionId": "helpAndSession", "gridArea": "helpAndSession", "visible": true }
+          ],
+          "regions": [
+            {
+              "id": "identity",
+              "component": "IdentityCard",
+              "variant": "compact"
+            },
+            {
+              "id": "primaryActions",
+              "component": "PrimaryActions",
+              "variant": "compact",
+              "limits": { "maxActions": 3 }
+            },
+            {
+              "id": "ordersSummary",
+              "component": "OrdersSummary",
+              "variant": "micro",
+              "limits": { "maxLines": 2 }
+            },
+            {
+              "id": "recentlyViewed",
+              "component": "RecentlyViewed",
+              "variant": "micro",
+              "limits": { "maxItems": 4 }
+            },
+            {
+              "id": "helpAndSession",
+              "component": "HelpAndSession",
+              "variant": "compact",
+              "limits": { "maxLinks": 4 },
+              "actions": {
+                "logout": {
+                  "style": "secondary",
+                  "confirmModalId": "logoutConfirm"
+                }
+              }
+            }
+          ],
+          "modals": [
+            {
+              "id": "logoutConfirm",
+              "title": "Tancar sessió?",
+              "body": "Perdràs l'accés al teu compte fins que tornis a iniciar sessió.",
+              "actions": [
+                { "id": "confirm", "label": "Tancar sessió", "variant": "destructive" },
+                { "id": "cancel", "label": "Cancel·lar", "variant": "secondary" }
+              ]
+            }
+          ]
+        },
+        "data": {
+          "sources": {
+            "user": "auth.user",
+            "ordersSummary": "orders.summary",
+            "recentlyViewed": "local.recentlyViewed",
+            "helpLinks": "static.helpLinks"
+          },
+          "mapping": {
+            "identity": { "source": "user" },
+            "ordersSummary": { "source": "ordersSummary" },
+            "recentlyViewed": { "source": "recentlyViewed" },
+            "helpAndSession": { "source": "helpLinks" }
+          }
+        }
+      },
+      "FastCartSlide": {
+        "shell": {
+          "variant": "right-drawer"
+        },
+        "tools": {
+          "catalog": {
+            "checkout": {
+              "type": "action",
+              "ref": "ui.regions.cartActions.actions.checkout"
+            },
+            "viewCart": {
+              "type": "action",
+              "ref": "ui.regions.cartActions.actions.viewCart"
+            },
+            "clearCart": {
+              "type": "action",
+              "ref": "ui.regions.cartActions.actions.clearCart",
+              "presentation": { "mode": "icon", "icon": "trash" }
+            }
+          },
+          "order": ["checkout", "viewCart", "clearCart"]
+        },
+        "layout": {
+          "grid": {
+            "cols": 6,
+            "rows": 6,
+            "gap": "md",
+            "templateAreas": [
+              "cartHeader cartHeader cartHeader cartHeader cartHeader cartHeader",
+              "cartSummary cartSummary cartSummary cartSummary cartSummary cartSummary",
+              "cartActions cartActions cartActions cartActions cartActions cartActions",
+              "cartItems cartItems cartItems cartItems cartItems cartItems",
+              "cartItems cartItems cartItems cartItems cartItems cartItems",
+              "cartItems cartItems cartItems cartItems cartItems cartItems"
+            ]
+          },
+          "policy": { "maxHeight": "shell", "focus": "container" },
+          "regions": [
+            { "id": "cartHeader", "span": { "colStart": 1, "colEnd": 6, "rowStart": 1, "rowEnd": 1 } },
+            { "id": "cartSummary", "span": { "colStart": 1, "colEnd": 4, "rowStart": 2, "rowEnd": 2 } },
+            { "id": "cartActions", "span": { "colStart": 5, "colEnd": 6, "rowStart": 2, "rowEnd": 2 } },
+            { "id": "cartItems", "span": { "colStart": 1, "colEnd": 6, "rowStart": 3, "rowEnd": 6 } }
+          ]
+        },
+        "ui": {
+          "blocks": [
+            { "id": "cartHeader", "type": "region", "regionId": "cartHeader", "gridArea": "cartHeader", "visible": true },
+            { "id": "cartSummary", "type": "region", "regionId": "cartSummary", "gridArea": "cartSummary", "visible": true },
+            { "id": "cartActions", "type": "region", "regionId": "cartActions", "gridArea": "cartActions", "visible": true },
+            { "id": "cartItems", "type": "region", "regionId": "cartItems", "gridArea": "cartItems", "visible": true }
+          ],
+          "regions": [
+            { "id": "cartHeader", "component": "CartHeader", "variant": "compact" },
+            { "id": "cartSummary", "component": "CartTotalsCompact", "variant": "compact" },
+            {
+              "id": "cartActions",
+              "component": "CartActionsCompact",
+              "variant": "compact",
+              "actions": {
+                "checkout": { "variant": "primary" },
+                "viewCart": { "variant": "secondary" },
+                "clearCart": { "variant": "secondary", "confirmModalId": "clearCartConfirm" }
+              }
+            },
+            {
+              "id": "cartItems",
+              "component": "CartItemsList",
+              "variant": "compact",
+              "scroll": {
+                "mode": "conditional",
+                "enableWhenCountGreaterThan": 3
+              }
+            }
+          ],
+          "modals": [
+            {
+              "id": "clearCartConfirm",
+              "title": "Buidar cistell?",
+              "body": "S'eliminaran tots els productes del cistell.",
+              "actions": [
+                { "id": "confirm", "label": "Buidar", "variant": "destructive" },
+                { "id": "cancel", "label": "Cancel·lar", "variant": "secondary" }
+              ]
+            }
+          ]
+        },
+        "data": {
+          "sources": {
+            "cart": "cart.context"
+          },
+          "mapping": {
+            "cartHeader": { "source": "cart", "fields": ["count"] },
+            "cartSummary": { "source": "cart", "fields": ["subtotal", "shippingEstimate", "total"] },
+            "cartItems": { "source": "cart", "fields": ["items"] }
+          }
+        }
+      }
+    }
+  }
+}

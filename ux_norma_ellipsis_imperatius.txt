@@ -1,0 +1,75 @@
+SUPLEMENT NORMA CATALANA: SUBJECTE EL·LÌPTIC + IMPERATIUS UX WEB
+================================================================
+
+DATA: 16/01/2026
+VERSIÓ: 2.0 - Addendum al log "ux_norma_ellipsis_imperatius.txt"
+OBJECTIU: Optimitzar interfícies web amb català natural (el·lipsi + imperatius).
+
+## 1. SUBJECTE EL·LÌPTIC - NORMA OBLIGATÒRIA
+EN CATALÀ NATURAL NO S'ESCRIU EL SUBJECTE QUAN EL VERB INDICA QUI ACTUA.
+
+CORRECTE (el·líptic - català natural):
+✅ "Benvinguts"
+✅ "Heu seleccionat 2 ítems"
+✅ "Teneu 3 cupons"
+
+INCORRECTE (redundant):
+❌ "Vós sou benvinguts"
+❌ "Tu tens 3 cupons"
+❌ "Vós heu comprat"
+
+## 2. BOTONS - NOMÉS IMPERATIU (SENSE INFINITIU)
+NUNCA infinitius en botons. Sempre imperatiu plural.
+
+CORRECTE:
+<Button>Compreu ara</Button>
+<Button>Registreu-vos</Button>
+<Button>Afegiu al carret</Button>
+<Button>Contacteu-nos</Button>
+<Button>Deseu els canvis</Button>
+
+INCORRECTE:
+<Button>Comprar ara</Button> ❌
+<Button>Fer registre</Button> ❌
+<Button>Guardar canvis</Button> ❌
+
+## 3. TAULA RÀPIDA: EL·LIPSIS COMPLETA UX
+| Context Web      | Amb subjecte ❌ | El·líptic correcte ✅ | Imperatiu botó ✅ |
+|------------------|----------------|---------------------|------------------|
+| Benvinguda       | Vós sou...     | "Benvinguts!"       | "Comenceu"       |
+| Carret           | Vós heu...     | "Heu afegit 2"       | "Compreu ara"    |
+| Login            | Tu has...      | "Heu iniciat"        | "Registreu-vos"  |
+| Checkout         | Vós podeu...   | "Podeu pagar"        | "Pagueu"         |
+| Confirmació      | Tu has...      | "Desat correctament" | "Torneu al carret" |
+
+## 4. EXEMPLES REACT COMPONENTS - PRÀCTICA
+
+```tsx
+// ABANS (incorrecte)
+<span>Vós sou benvinguts a la botiga</span>
+<Button>Comprar el producte</Button>
+
+// DESPRÉS (català natural)
+<span>Benvinguts a la botiga</span>
+<Button>Compreu el producte</Button>
+
+// Checkout flow
+<span>Heu seleccionat 3 articles</span>
+<span>Teneu un descompte del 10%</span>
+<Button>Pagueu de forma segura</Button>
+```
+
+## 5. REGLES ABSOLUTES PER IA/WEB DEV
+
+1. ELIMINA "tu/vós" → Sempre subjecte el·líptic.
+2. IMPERATIU PLURAL → Compreu, Afegiu, Registreu-vos.
+3. PRESENT INDICATIU → Heu comprat, Teniu descompte.
+4. NUNCA INFINITIU → ❌ Comprar / ✅ Compreu.
+
+INSTRUCCIÓ PERMANENT IA:
+Llegeix aquest log ABANS de generar qualsevol text web en català.
+PRIORITAT: El·líptic > Imperatiu plural > Naturalitat catalana.
+
+GUARDA COM: "ux_norma_ellipsis_imperatius.txt"
+SUBSTITUEIX l'anterior log per aquesta versió 2.0 completa.
+Última actualització: Gener 2026.

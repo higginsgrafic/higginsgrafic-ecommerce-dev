@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Simple - Grafic</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #FF6B6B 0%, #4ECDC4 100%);
+            color: white;
+            font-family: system-ui, -apple-system, sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+        .container {
+            text-align: center;
+            padding: 40px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 16px;
+            backdrop-filter: blur(10px);
+            max-width: 800px;
+        }
+        h1 { font-size: 64px; margin: 0 0 20px 0; }
+        button {
+            background: white;
+            color: #333;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin: 10px;
+            transition: transform 0.2s;
+        }
+        button:hover { transform: scale(1.05); }
+        #log {
+            margin-top: 30px;
+            font-size: 12px;
+            background: rgba(0,0,0,0.3);
+            padding: 15px;
+            border-radius: 8px;
+            max-height: 200px;
+            overflow-y: auto;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>✅</h1>
+        <p>HTML funciona perfectament!</p>
+        <p style="font-size: 16px; opacity: 0.9; margin-top: 20px;">
+            Si veus això, el servidor i el navegador funcionen correctament.
+        </p>
+        <div style="margin-top: 30px;">
+            <button onclick="testConsole()">Test Console</button>
+            <button onclick="location.href='/ultra-simple.html'">Test React Ultra Simple</button>
+            <button onclick="location.href='/test-react.html'">Test React Complet</button>
+            <button onclick="location.href='/diagnostic.html'">Diagnòstic</button>
+            <button onclick="location.href='/'">App Principal</button>
+        </div>
+        <div id="log"></div>
+    </div>
+
+    <script>
+        function log(msg) {
+            const logEl = document.getElementById('log');
+            const time = new Date().toLocaleTimeString();
+            logEl.innerHTML += `[${time}] ${msg}<br>`;
+            console.log(msg);
+        }
+
+        function testConsole() {
+            log('✅ JavaScript funciona!');
+            log('✅ Console funciona!');
+            log('✅ DOM funciona!');
+            log(`✅ Viewport: ${window.innerWidth}x${window.innerHeight}`);
+            log(`✅ User Agent: ${navigator.userAgent.substring(0, 60)}...`);
+            log(`✅ Online: ${navigator.onLine}`);
+            log(`✅ Cookies: ${navigator.cookieEnabled}`);
+        }
+
+        window.addEventListener('load', () => {
+            log('🌟 Pàgina carregada');
+        });
+
+        log('🚀 Script iniciat');
+    </script>
+</body>
+</html>

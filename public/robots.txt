@@ -1,0 +1,18 @@
+# robots.txt per GRÀFIC
+# Permet a tots els crawlers accedir al lloc
+
+User-agent: *
+Allow: /
+
+# Evita indexar editors d'administració
+Disallow: /editor-textos
+Disallow: /editor-estils
+
+# Evita indexar pàgines de comanda (privades)
+Disallow: /order-confirmation
+
+# Sitemap
+Sitemap: https://grafic.cat/sitemap.xml
+
+# Crawl-delay per ser respectuosos
+Crawl-delay: 1

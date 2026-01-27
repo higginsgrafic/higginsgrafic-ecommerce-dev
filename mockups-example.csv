@@ -1,0 +1,17 @@
+collection,subcategory,sub_subcategory,design_name,drawing_color,base_color,product_type,file_path,variant_id,display_order
+first-contact,,,nx-01,black,white,tshirt,/products/first-contact-001.svg,,0
+first-contact,,,nx-01,white,black,tshirt,/products/first-contact-002.svg,,1
+first-contact,,,nx-01,black,navy,tshirt,/products/first-contact-003.svg,,2
+first-contact,,,discovery,black,white,tshirt,/products/first-contact-004.svg,,3
+first-contact,,,discovery,white,black,tshirt,/products/first-contact-005.svg,,4
+austen,frases,quotes,it-is-a-truth,black,white,tshirt,/products/austen-001.svg,,0
+austen,frases,quotes,it-is-a-truth,white,navy,tshirt,/products/austen-002.svg,,1
+austen,frases,quotes,persuasion,black,white,tshirt,/products/austen-003.svg,,2
+austen,encreuats,looking-for,mr-darcy,black,white,tshirt,/products/austen-004.svg,,3
+cube,,,blue-dark-gradient,blue,white,tshirt,/products/cube-001.svg,,0
+cube,,,blue-dark-gradient,blue,black,tshirt,/products/cube-002.svg,,1
+cube,,,red-gradient,red,white,tshirt,/products/cube-003.svg,,2
+outcasted,,,neon-sign,pink,black,tshirt,/products/outcasted-001.svg,,0
+outcasted,,,neon-sign,blue,black,tshirt,/products/outcasted-002.svg,,1
+the-human-inside,,,brain-circuit,black,white,tshirt,/products/the-human-inside-001.svg,,0
+the-human-inside,,,brain-circuit,white,black,tshirt,/products/the-human-inside-002.svg,,1

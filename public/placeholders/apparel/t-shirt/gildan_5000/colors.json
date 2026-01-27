@@ -1,0 +1,150 @@
+{
+  "schema": 1,
+  "source": {
+    "allColorsFrom": "manifest.json",
+    "selectedFrom": "previous_colors.json"
+  },
+  "selected": [
+    "black",
+    "daisy",
+    "forest-green",
+    "gold",
+    "irish-green",
+    "kiwi",
+    "light-blue",
+    "light-pink",
+    "military-green",
+    "navy",
+    "purple",
+    "red",
+    "royal",
+    "white"
+  ],
+  "colors": [
+    {
+      "slug": "ash",
+      "label": "Ash",
+      "selected": false
+    },
+    {
+      "slug": "azalea",
+      "label": "Azalea",
+      "selected": false
+    },
+    {
+      "slug": "black",
+      "label": "Black",
+      "selected": true
+    },
+    {
+      "slug": "cardinal-red",
+      "label": "Cardinal Red",
+      "selected": false
+    },
+    {
+      "slug": "carolina-blue",
+      "label": "Carolina Blue",
+      "selected": false
+    },
+    {
+      "slug": "daisy",
+      "label": "Daisy",
+      "selected": true
+    },
+    {
+      "slug": "dark-heather",
+      "label": "Dark Heather",
+      "selected": false
+    },
+    {
+      "slug": "forest-green",
+      "label": "Forest Green",
+      "selected": true
+    },
+    {
+      "slug": "gold",
+      "label": "Gold",
+      "selected": true
+    },
+    {
+      "slug": "graphite-heather",
+      "label": "Graphite Heather",
+      "selected": false
+    },
+    {
+      "slug": "heliconia",
+      "label": "Heliconia",
+      "selected": false
+    },
+    {
+      "slug": "irish-green",
+      "label": "Irish Green",
+      "selected": true
+    },
+    {
+      "slug": "kiwi",
+      "label": "Kiwi",
+      "selected": true
+    },
+    {
+      "slug": "light-blue",
+      "label": "Light Blue",
+      "selected": true
+    },
+    {
+      "slug": "light-pink",
+      "label": "Light Pink",
+      "selected": true
+    },
+    {
+      "slug": "military-green",
+      "label": "Military Green",
+      "selected": true
+    },
+    {
+      "slug": "natural",
+      "label": "Natural",
+      "selected": false
+    },
+    {
+      "slug": "navy",
+      "label": "Navy",
+      "selected": true
+    },
+    {
+      "slug": "orange",
+      "label": "Orange",
+      "selected": false
+    },
+    {
+      "slug": "purple",
+      "label": "Purple",
+      "selected": true
+    },
+    {
+      "slug": "red",
+      "label": "Red",
+      "selected": true
+    },
+    {
+      "slug": "royal",
+      "label": "Royal",
+      "selected": true
+    },
+    {
+      "slug": "sand",
+      "label": "Sand",
+      "selected": false
+    },
+    {
+      "slug": "sport-grey",
+      "label": "Sport Grey",
+      "selected": false
+    },
+    {
+      "slug": "white",
+      "label": "White",
+      "selected": true
+    }
+  ]
+}

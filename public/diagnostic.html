@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔬 Diagnòstic - Grafic Store</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Monaco', 'Courier New', monospace;
+            background: #0d1117;
+            color: #c9d1d9;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        h1 {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 30px;
+            font-size: 36px;
+        }
+        .test-card {
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 15px 0;
+        }
+        .test-card h2 {
+            color: #58a6ff;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+        .status {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-right: 10px;
+        }
+        .status.pending { background: #1f6feb; color: white; }
+        .status.running { background: #f0883e; color: white; animation: pulse 1s infinite; }
+        .status.success { background: #238636; color: white; }
+        .status.error { background: #da3633; color: white; }
+        .status.warning { background: #9e6a03; color: white; }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        .result {
+            background: #0d1117;
+            padding: 12px;
+            border-radius: 6px;
+            margin-top: 10px;
+            border-left: 3px solid #30363d;
+            font-size: 13px;
+        }
+        .result.success { border-left-color: #238636; }
+        .result.error { border-left-color: #da3633; }
+        .result.warning { border-left-color: #9e6a03; }
+        pre {
+            background: #0d1117;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+            font-size: 11px;
+            margin-top: 8px;
+        }
+        button {
+            background: #238636;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            margin: 5px;
+            font-weight: 600;
+        }
+        button:hover { background: #2ea043; }
+        button.secondary {
+            background: #21262d;
+            border: 1px solid #30363d;
+        }
+        button.secondary:hover { background: #30363d; }
+        .progress {
+            background: #21262d;
+            height: 4px;
+            border-radius: 2px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+        .progress-bar {
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            height: 100%;
+            width: 0%;
+            transition: width 0.3s;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .metric {
+            background: #0d1117;
+            padding: 15px;
+            border-radius: 6px;
+            text-align: center;
+        }
+        .metric-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: #58a6ff;
+        }
+        .metric-label {
+            font-size: 12px;
+            color: #8b949e;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔬 Diagnòstic del Sistema</h1>
+
+        <div style="margin-bottom: 30px;">
+            <button onclick="runAllTests()">▶️ Executar Tots els Tests</button>
+            <button onclick="location.reload()" class="secondary">🔄 Recarregar</button>
+            <button onclick="window.location.href='/'" class="secondary">🏠 App</button>
+            <button onclick="window.location.href='/debug.html'" class="secondary">🔧 Debug</button>
+        </div>
+
+        <div class="progress">
+            <div class="progress-bar" id="progress"></div>
+        </div>
+
+        <div class="grid" id="metrics">
+            <div class="metric">
+                <div class="metric-value" id="passed-count">0</div>
+                <div class="metric-label">✅ Tests Passed</div>
+            </div>
+            <div class="metric">
+                <div class="metric-value" id="failed-count">0</div>
+                <div class="metric-label">❌ Tests Failed</div>
+            </div>
+            <div class="metric">
+                <div class="metric-value" id="warning-count">0</div>
+                <div class="metric-label">⚠️ Warnings</div>
+            </div>
+            <div class="metric">
+                <div class="metric-value" id="total-time">0s</div>
+                <div class="metric-label">⏱️ Total Time</div>
+            </div>
+        </div>
+
+        <div id="tests"></div>
+    </div>
+
+    <script>
+        const SUPABASE_URL = '';
+        const SUPABASE_ANON_KEY = '';
+        const GELATO_STORE_ID = '';
+
+        let passedCount = 0;
+        let failedCount = 0;
+        let warningCount = 0;
+        let startTime = Date.now();
+
+        const tests = [
+            { name: 'Browser Basics', fn: testBrowser },
+            { name: 'Environment Variables', fn: testEnvVars },
+            { name: 'LocalStorage', fn: testLocalStorage },
+            { name: 'Fetch API', fn: testFetchAPI },
+            { name: 'Supabase Connection', fn: testSupabase },
+            { name: 'Supabase Products Table', fn: testSupabaseProducts },
+            { name: 'Gelato Proxy Function', fn: testGelatoProxy },
+            { name: 'Static Assets', fn: testStaticAssets },
+            { name: 'React Loading', fn: testReactLoading }
+        ];
+
+        function updateMetrics() {
+            document.getElementById('passed-count').textContent = passedCount;
+            document.getElementById('failed-count').textContent = failedCount;
+            document.getElementById('warning-count').textContent = warningCount;
+            const elapsed = ((Date.now() - startTime) / 1000).toFixed(2);
+            document.getElementById('total-time').textContent = elapsed + 's';
+        }
+
+        function updateProgress(current, total) {
+            const percent = (current / total) * 100;
+            document.getElementById('progress').style.width = percent + '%';
+        }
+
+        function addTest(name) {
+            const card = document.createElement('div');
+            card.className = 'test-card';
+            card.id = 'test-' + name.toLowerCase().replace(/\s+/g, '-');
+            card.innerHTML = `
+                <h2>
+                    <span class="status pending">PENDING</span>
+                    ${name}
+                </h2>
+                <div class="result"></div>
+            `;
+            document.getElementById('tests').appendChild(card);
+            return card;
+        }
+
+        function updateTest(card, status, message, details = null) {
+            const statusEl = card.querySelector('.status');
+            const resultEl = card.querySelector('.result');
+
+            statusEl.className = 'status ' + status;
+            statusEl.textContent = status.toUpperCase();
+
+            resultEl.className = 'result ' + status;
+            resultEl.innerHTML = message;
+
+            if (details) {
+                resultEl.innerHTML += '<pre>' + JSON.stringify(details, null, 2) + '</pre>';
+            }
+
+            if (status === 'success') passedCount++;
+            if (status === 'error') failedCount++;
+            if (status === 'warning') warningCount++;
+
+            updateMetrics();
+        }
+
+        async function testBrowser() {
+            return {
+                userAgent: navigator.userAgent,
+                language: navigator.language,
+                online: navigator.onLine,
+                cookiesEnabled: navigator.cookieEnabled,
+                viewport: `${window.innerWidth}x${window.innerHeight}`
+            };
+        }
+
+        async function testEnvVars() {
+            const hasSupabase = !!SUPABASE_URL && !!SUPABASE_ANON_KEY;
+            if (!hasSupabase) throw new Error('Missing Supabase config');
+            return {
+                SUPABASE_URL: SUPABASE_URL.substring(0, 30) + '...',
+                SUPABASE_ANON_KEY: SUPABASE_ANON_KEY.substring(0, 30) + '...',
+                GELATO_STORE_ID
+            };
+        }
+
+        async function testLocalStorage() {
+            const testKey = '__test__';
+            const testValue = 'works';
+            localStorage.setItem(testKey, testValue);
+            const result = localStorage.getItem(testKey);
+            localStorage.removeItem(testKey);
+            if (result !== testValue) throw new Error('LocalStorage not working');
+            return { status: 'LocalStorage working correctly' };
+        }
+
+        async function testFetchAPI() {
+            const response = await fetch('/favicon.png');
+            if (!response.ok) throw new Error('Fetch failed');
+            return { status: 'Fetch API working', contentType: response.headers.get('content-type') };
+        }
+
+        async function testSupabase() {
+            const response = await fetch(`${SUPABASE_URL}/rest/v1/`, {
+                headers: { 'apikey': SUPABASE_ANON_KEY }
+            });
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+            return { status: 'Supabase connection OK', statusCode: response.status };
+        }
+
+        async function testSupabaseProducts() {
+            const response = await fetch(`${SUPABASE_URL}/rest/v1/products?limit=1`, {
+                headers: {
+                    'apikey': SUPABASE_ANON_KEY,
+                    'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+                }
+            });
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+            const products = await response.json();
+            return {
+                status: products.length > 0 ? 'Products found' : 'No products (use sync)',
+                count: products.length
+            };
+        }
+
+        async function testGelatoProxy() {
+            const url = `${SUPABASE_URL}/functions/v1/gelato-proxy?action=store-products&storeId=${GELATO_STORE_ID}`;
+            const response = await fetch(url, {
+                headers: {
+                    'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                    'apikey': SUPABASE_ANON_KEY
+                }
+            });
+            if (!response.ok) {
+                const text = await response.text();
+                throw new Error(`HTTP ${response.status}: ${text}`);
+            }
+            const data = await response.json();
+            const products = data.data || data.products || [];
+            return { status: 'Gelato API working', productCount: products.length };
+        }
+
+        async function testStaticAssets() {
+            const assets = ['/favicon.png', '/logo-grafc.png'];
+            const results = await Promise.all(
+                assets.map(async (asset) => {
+                    const res = await fetch(asset);
+                    return { asset, ok: res.ok, status: res.status };
+                })
+            );
+            const allOk = results.every(r => r.ok);
+            if (!allOk) throw new Error('Some assets failed');
+            return { status: 'All assets loading', results };
+        }
+
+        async function testReactLoading() {
+            const response = await fetch('/test-react.html');
+            if (!response.ok) throw new Error('Test page not accessible');
+            return {
+                status: 'React test page available',
+                message: 'Visit /test-react.html to verify React works'
+            };
+        }
+
+        async function runTest(test) {
+            const card = addTest(test.name);
+            updateTest(card, 'running', 'Executant...');
+
+            try {
+                const result = await test.fn();
+                updateTest(card, 'success', '✅ Test passed', result);
+            } catch (error) {
+                updateTest(card, 'error', `❌ ${error.message}`, {
+                    error: error.message,
+                    stack: error.stack
+                });
+            }
+        }
+
+        async function runAllTests() {
+            document.getElementById('tests').innerHTML = '';
+            passedCount = 0;
+            failedCount = 0;
+            warningCount = 0;
+            startTime = Date.now();
+
+            for (let i = 0; i < tests.length; i++) {
+                await runTest(tests[i]);
+                updateProgress(i + 1, tests.length);
+            }
+
+            updateMetrics();
+        }
+
+        // Auto-run on load
+        window.addEventListener('load', () => {
+            setTimeout(runAllTests, 500);
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,91 @@
+NORMA CATALANA: "TU" vs "VÓS" + UX WEB (Botons i Indicacions)
+===========================================================
+
+DATA: 16/01/2026
+OBJECTIU: Aplicar tractaments correctes en interfícies web React/e-commerce.
+FONT: Normativa IEC + Bones pràctiques UX català (AOC, PTC).
+
+## 1. REVISIÓ RÀPIDA NORMA PRÀCTICA
+| Context       | Tractament | Verbs ex.     | Exemple frase      |
+|---------------|------------|---------------|--------------------|
+| **Usuari amic/conegut** | tu (inf.) | ets, tens    | "Tu ets loguejat" |
+| **Client/visitant web** | vós (form.) | sou/esteu, teniu | "Vós sou benvinguts" |
+
+## 2. BOTONS - Normes per React/TS e-commerce
+
+CORRECTE (formal per clients):
+<Button>Vós heu afegit al carret</Button>
+<Button>Registreu-vos gratis</Button>
+<Button>Compreu ara</Button>
+<Button>Vós podeu personalitzar</Button>
+
+INCORRECTE (informal a estrany):
+<Button>Tu has afegit</Button> ❌
+<Button>Registra't</Button> ❌
+
+TIP: Usa sempre imperatiu plural: "Compreu", "Registreu-vos", "Pagueu"
+
+## 3. INDICACIONS/UI TEXT - Contextos típics
+
+CORRECTE per pàgina web:
+✅ "Vós sou benvinguts a la botiga"
+✅ "Vós podeu triar la talla"
+✅ "Heu seleccionat 2 productes"
+✅ "Vós teniu 3 cupons disponibles"
+✅ "Comproveu el vostre carret"
+
+INCORRECTE:
+❌ "Tu ets benvingut" (massa personal)
+❌ "Tens cupons" (no coneguts)
+
+## 4. TOOLTIPS/PLACEHOLDERS/Labels Forms
+
+Input labels/formularios:
+✅ "El vostre nom complet"
+✅ "Vostra adreça de lliurament"
+✅ "El vostre codi postal"
+
+Placeholders:
+✅ "Escriviu el vostre email"
+✅ "Comenteu la vostra experiència"
+
+Tooltips:
+✅ "Feu clic per voreu els detalls"
+✅ "Arrosseguem vós el fitxer"
+
+## 5. LOCALITZACIÓ React - Com implementrar
+
+```tsx
+// norma.ts
+export const UX_TEXT = {
+  informal: { benvingut: "Tu ets benvingut", login: "Entra tu" },
+  formal: {
+    benvingut: "Vós sou benvinguts",
+    login: "Registreu-vos",
+    carret: "Vós heu afegit"
+  }
+} as const;
+
+// Usage en component
+const isFormal = true; // Sempre per clients
+text = isFormal ? UX_TEXT.formal.benvingut : UX_TEXT.informal.benvingut;
+```
+
+## 6. AUDITORIA RÀPIDA PER PÀGINA WEB
+
+[ ] Header: "Vós sou benvinguts" ✓
+[ ] Botó login: "Registreu-vos" ✓
+[ ] Carret: "Vós heu seleccionat X articles" ✓
+[ ] Checkout: "Comproveu les dades" ✓
+[ ] Footer: "Contacteu amb nosaltres" ✓
+
+## 7. INSTRUCCIÓ PERMANENT PER IA/WEB DEV
+
+Sempre usa VÓS en interfícies públiques/e-commerce.
+
+Imperatius plural: "Compreu", "Seleccioneu", "Navegueu".
+
+Possessius: "Vostre", "El vostre carret".
+
+GUARDA COM: "ux_nroma_tu_vos_web.txt"
+Última actualització: Gener 2026 - Per e-commerce POD React/TypeScript

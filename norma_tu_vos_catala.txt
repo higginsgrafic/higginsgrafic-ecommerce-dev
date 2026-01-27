@@ -1,0 +1,48 @@
+NORMA CATALANA: ÚS DE "TU" I "VÓS"
+=====================================
+
+DATA: 16/01/2026
+OBJECTIU: Recordatori permanent per a IA sobre tractaments personals en català normatiu.
+FONT: Normativa IEC (Institut d'Estudis Catalans) i ús estàndard.
+
+## 1. DEFINICIÓ CLARA
+- "TU": Tractament INFORMAL SINGULAR (amics, família, infants).
+  - Pronom: tu
+  - Verbs: 2a persona singular (ets, vas, parles, tens).
+  - Exemples:
+    * Tu ets el meu amic.
+    * Què fas tu avui?
+    * T'estimo molt.
+
+- "VÓS": Tractament FORMAL SINGULAR O PLURAL (clients, desconeguts, grups).
+  - Pronom: vós
+  - Verbs: 2a persona plural (sovieu/esteu, aneu, parleu, teniu).
+  - Exemples:
+    * Vós sou benvolguts aquí. (formal a 1 persona)
+    * Vós heu arribat tard. (formal a 1)
+    * Vós parleu molt bé. (plural)
+
+## 2. REGLES GRAMATICALS FISES
+| Tractament | Verb exemple | Pronom feble | Context          |
+|------------|--------------|--------------|------------------|
+| tu (inf.) | ets, tens   | et (t'estimo) | Amics/família   |
+| vós (form.) | sou/esteu, teniu | us (us estimem) | Clients/grups  |
+
+- No confundre amb espanyol: En català "vós" NO és "vosotros" informal juvenil.
+- Regional: Al valencià "vós" és estàndard formal; central usa més "vostè" però "vós" és normatiu IEC.
+
+## 3. COM PROVAR COMPRENSIÓ
+- Prompt de test: "Escriu 2 frases: 1 informal a un amic, 1 formal a un client."
+- Resposta correcta:
+  1. Informal: "Tu ets genial!"
+  2. Formal: "Vós sou ben rebuts!"
+
+## 4. INSTRUcció PERMANENT
+Quan responguis en català:
+1. Identifica context: informal → "tu"; formal/plural → "vós".
+2. Aplica verbs correctes.
+3. Si dubtes, usa "vós" (més segur).
+4. Logrejar aquesta norma en cada conversa nova.
+
+GUARDA AQUEST FITXER COM A "norma_tu_vos_catala.txt" I CARREGA'L AL INICI DE CADA SESSIÓ.
+Última actualització: Gener 2026.

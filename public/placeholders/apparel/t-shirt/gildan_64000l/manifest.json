@@ -1,0 +1,33 @@
+{
+  "schema": 1,
+  "generatedFrom": "placeholders/apparel/t-shirt/gildan_64000l/*.png",
+  "count": 2,
+  "items": [
+    {
+      "src": "/placeholders/apparel/t-shirt/gildan_64000l/white.png",
+      "filename": "white.png",
+      "brandModel": "gildan-64000l",
+      "productType": "t-shirt",
+      "style": "crewneck",
+      "fit": "women",
+      "quality": "",
+      "size": "xl",
+      "color": "white",
+      "gpr": "",
+      "view": "front"
+    },
+    {
+      "src": "/placeholders/apparel/t-shirt/gildan_64000l/black.png",
+      "filename": "black.png",
+      "brandModel": "gildan-64000l",
+      "productType": "t-shirt",
+      "style": "crewneck",
+      "fit": "women",
+      "quality": "",
+      "size": "xl",
+      "color": "black",
+      "gpr": "",
+      "view": "front"
+    }
+  ]
+}

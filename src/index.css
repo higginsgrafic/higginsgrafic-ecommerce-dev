@@ -1,0 +1,276 @@
+/* Import Google Fonts - només els pesos que utilitzem per optimitzar */
+@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@300;400;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html {
+  scrollbar-gutter: stable;
+}
+
+html.scrollbar-compensate [data-main-header="true"].cart-open,
+html.scrollbar-compensate .offers-header-cart-open {
+  padding-right: var(--scrollbar-width, 0);
+}
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 0 0% 9.02%;
+
+    --white-strong: var(--background);
+    --white-soft: var(--background);
+
+    --muted: 0 0% 96%;
+    --muted-foreground: 0 0% 69.8%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 100% 50%;
+
+    --border: 0 0% 91%;
+    --input: 0 0% 91%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 0 100% 50%;
+
+    --primary: 0 100% 50%;
+    --primary-foreground: 0 0% 98%;
+
+    --secondary: 0 0% 96%;
+    --secondary-foreground: 0 100% 50%;
+
+    --accent: 0 0% 96%;
+    --accent-foreground: 0 100% 50%;
+
+    --destructive: 0 100% 50%;
+    --destructive-foreground: 0 0% 98%;
+
+    --ring: 0 100% 50%;
+
+    --radius: 0.5rem;
+  }
+
+
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+@layer base {
+  :root {
+    --shadow-color: 0 0% 0%;
+    --shadow-strength: 1;
+  }
+}
+
+@layer utilities {
+  .shadow-sm {
+    box-shadow: 0 1px 2px 0 hsl(var(--shadow-color) / calc(0.12 * var(--shadow-strength)));
+  }
+  .shadow {
+    box-shadow:
+      0 1px 3px 0 hsl(var(--shadow-color) / calc(0.14 * var(--shadow-strength))),
+      0 1px 2px -1px hsl(var(--shadow-color) / calc(0.14 * var(--shadow-strength)));
+  }
+  .shadow-md {
+    box-shadow:
+      0 4px 6px -1px hsl(var(--shadow-color) / calc(0.16 * var(--shadow-strength))),
+      0 2px 4px -2px hsl(var(--shadow-color) / calc(0.16 * var(--shadow-strength)));
+  }
+  .shadow-lg {
+    box-shadow:
+      0 10px 15px -3px hsl(var(--shadow-color) / calc(0.18 * var(--shadow-strength))),
+      0 4px 6px -4px hsl(var(--shadow-color) / calc(0.18 * var(--shadow-strength)));
+  }
+}
+
+/* Animacions personalitzades per botons de talla */
+@keyframes pulse-scale {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@layer utilities {
+  .animate-pulse-once {
+    animation: pulse-scale 0.3s ease-out;
+  }
+}
+
+@layer utilities {
+  .fw-no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .fw-no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+body.cart-open {
+  overflow: hidden !important;
+}
+
+.debug-containers * {
+  outline: 1.25px solid rgba(255, 0, 0, 0.65) !important;
+  outline-offset: -0.75px;
+  cursor: pointer !important;
+}
+
+.debug-containers .debug-exempt,
+.debug-containers .debug-exempt *,
+.debug-exempt {
+  outline: none !important;
+  cursor: auto !important;
+  pointer-events: auto !important;
+}
+
+.debug-containers .debug-exempt[data-dev-overlay="true"],
+.debug-exempt[data-dev-overlay="true"] {
+  pointer-events: none !important;
+}
+
+.debug-containers .debug-exempt[data-dev-overlay="true"] [data-dev-overlay-interactive="true"],
+.debug-exempt[data-dev-overlay="true"] [data-dev-overlay-interactive="true"] {
+  pointer-events: auto !important;
+}
+
+.debug-containers .debug-exempt button,
+.debug-exempt button {
+  cursor: pointer !important;
+}
+
+.debug-containers *.debug-selected {
+  outline: 2.5px solid rgba(0, 255, 0, 0.85) !important;
+  outline-offset: 0px;
+  background-color: rgba(0, 255, 0, 0.03) !important;
+  box-shadow: inset 0 0 0 2px rgba(0, 255, 0, 0.95) !important;
+}
+
+.debug-selected {
+  outline: 2.5px solid rgba(0, 255, 0, 0.85) !important;
+  outline-offset: 0px;
+  background-color: rgba(0, 255, 0, 0.03) !important;
+  box-shadow: inset 0 0 0 2px rgba(0, 255, 0, 0.95) !important;
+}
+
+.debug-containers > * {
+  outline: 2px solid rgba(255, 0, 0, 0.7) !important;
+}
+
+.debug-containers header {
+  outline: 2px solid rgba(0, 150, 255, 0.8) !important;
+}
+
+.debug-containers main {
+  outline: 2px solid rgba(0, 255, 0, 0.8) !important;
+}
+
+.debug-containers footer {
+  outline: 2px solid rgba(255, 140, 0, 0.8) !important;
+}
+
+.debug-containers [class*="container"] {
+  outline: 1.25px solid rgba(255, 0, 255, 0.6) !important;
+}
+
+.debug-containers [class*="grid"] {
+  outline: 1.25px solid rgba(0, 255, 255, 0.6) !important;
+}
+
+.debug-containers [class*="flex"] {
+  outline: 1.25px solid rgba(180, 83, 9, 0.7) !important;
+}
+
+.debug-indicator {
+  position: fixed;
+  top: 50%;
+  left: 20px;
+  transform: translateY(-50%);
+  background: rgba(0, 0, 0, 0.9);
+  color: white;
+  padding: 16px;
+  border-radius: 8px;
+  z-index: 99998;
+  font-family: monospace;
+  font-size: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  max-width: 300px;
+  pointer-events: auto;
+}
+
+.debug-indicator h3 {
+  font-weight: bold;
+  margin-bottom: 8px;
+  color: #00ff00;
+}
+
+.debug-indicator ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.debug-indicator li {
+  margin: 4px 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.debug-indicator .color-box {
+  width: 16px;
+  height: 16px;
+  border-radius: 2px;
+}
+
+.debug-indicator .selected-info {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.debug-indicator .selected-info h4 {
+  font-weight: bold;
+  margin-bottom: 8px;
+  color: #ffff00;
+  font-size: 11px;
+  text-transform: uppercase;
+}
+
+.debug-indicator .selected-info p {
+  margin: 4px 0;
+  font-size: 11px;
+  line-height: 1.4;
+}
+
+.debug-indicator .selected-info .tag {
+  color: #00ffff;
+  font-weight: bold;
+}
+
+.debug-indicator .selected-info .class {
+  color: #ff69b4;
+  word-break: break-all;
+}
+
+.debug-indicator .selected-info .hierarchy {
+  color: #90ee90;
+  font-size: 10px;
+}

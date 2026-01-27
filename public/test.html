@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Bàsic</title>
+    <style>
+        body {
+            font-family: monospace;
+            padding: 20px;
+            background: white;
+        }
+        .box {
+            border: 2px solid black;
+            padding: 20px;
+            margin: 10px 0;
+            background: #f0f0f0;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔧 Test Bàsic</h1>
+
+    <div class="box">
+        <h2>1. HTML carrega</h2>
+        <p>Si veus això, el servidor funciona</p>
+    </div>
+
+    <div class="box">
+        <h2>2. JavaScript Test</h2>
+        <p id="js-test">JavaScript NO carrega</p>
+    </div>
+
+    <div class="box">
+        <h2>3. Environment Variables</h2>
+        <pre id="env-vars">Loading...</pre>
+    </div>
+
+    <div class="box">
+        <h2>4. Supabase Test</h2>
+        <pre id="supabase-test">Testing...</pre>
+    </div>
+
+    <script type="module">
+        console.log('🚀 test.html JavaScript is running');
+
+        document.getElementById('js-test').textContent = '✅ JavaScript FUNCIONA!';
+        document.getElementById('js-test').style.color = 'green';
+
+        const envVars = {
+            VITE_USE_MOCK_DATA: import.meta.env.VITE_USE_MOCK_DATA,
+            VITE_SUPABASE_URL: import.meta.env.VITE_SUPABASE_URL,
+            HAS_ANON_KEY: !!import.meta.env.VITE_SUPABASE_ANON_KEY,
+            ANON_KEY_LENGTH: import.meta.env.VITE_SUPABASE_ANON_KEY?.length
+        };
+
+        console.log('📦 Environment:', envVars);
+        document.getElementById('env-vars').textContent = JSON.stringify(envVars, null, 2);
+
+        // Test Supabase
+        (async () => {
+            try {
+                const { createClient } = await import('@supabase/supabase-js');
+                console.log('📦 Supabase client imported');
+
+                const supabase = createClient(
+                    import.meta.env.VITE_SUPABASE_URL,
+                    import.meta.env.VITE_SUPABASE_ANON_KEY
+                );
+
+                console.log('🔧 Supabase client created');
+
+                const { data, error } = await supabase
+                    .from('products')
+                    .select('id, name')
+                    .limit(3);
+
+                if (error) {
+                    console.error('❌ Supabase error:', error);
+                    document.getElementById('supabase-test').textContent =
+                        '❌ Error: ' + error.message;
+                    document.getElementById('supabase-test').style.color = 'red';
+                } else {
+                    console.log('✅ Products:', data);
+                    document.getElementById('supabase-test').textContent =
+                        '✅ Success!\n' + JSON.stringify(data, null, 2);
+                    document.getElementById('supabase-test').style.color = 'green';
+                }
+            } catch (err) {
+                console.error('❌ Exception:', err);
+                document.getElementById('supabase-test').textContent =
+                    '❌ Exception: ' + err.message;
+                document.getElementById('supabase-test').style.color = 'red';
+            }
+        })();
+    </script>
+</body>
+</html>

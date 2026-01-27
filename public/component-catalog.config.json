@@ -1,0 +1,27 @@
+{
+  "version": 1,
+  "components": {
+    "fullWideSlide": {
+      "enabled": true,
+      "iteration": "v1",
+      "updatedAt": "2026-01-22T23:09:38.692Z",
+      "notes": "",
+      "megaMenu": {
+        "megaConfig": {
+          "first_contact": [
+            {
+              "title": "",
+              "items": []
+            }
+          ],
+          "prova-1": [
+            {
+              "title": "",
+              "items": []
+            }
+          ]
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,141 @@
+{
+  "schema": 1,
+  "profiles": {
+    "first_contact/the-phoenix": {
+      "bbox": {
+        "x": 1188,
+        "y": 636,
+        "w": 606,
+        "h": 1386
+      }
+    },
+    "first_contact/nx-01": {
+      "bbox": {
+        "x": 1056,
+        "y": 966,
+        "w": 870,
+        "h": 321
+      }
+    },
+    "first_contact/ncc-1701": {
+      "bbox": {
+        "x": 951,
+        "y": 996,
+        "w": 1080,
+        "h": 252
+      }
+    },
+    "first_contact/ncc-1701-d": {
+      "bbox": {
+        "x": 957,
+        "y": 1068,
+        "w": 1068,
+        "h": 108
+      }
+    },
+    "first_contact/wormhole": {
+      "bbox": {
+        "x": 1086,
+        "y": 738,
+        "w": 810,
+        "h": 810
+      }
+    },
+    "first_contact/plasma-escape": {
+      "bbox": {
+        "x": 1086,
+        "y": 738,
+        "w": 810,
+        "h": 810
+      }
+    },
+    "first_contact/vulcans-end": {
+      "bbox": {
+        "x": 1080,
+        "y": 618,
+        "w": 822,
+        "h": 930
+      }
+    },
+    "cube/afrodita-c": {
+      "bbox": {
+        "x": 990,
+        "y": 720,
+        "w": 1002,
+        "h": 768
+      }
+    },
+    "cube/cyber-cube": {
+      "bbox": {
+        "x": 1026,
+        "y": 615,
+        "w": 933,
+        "h": 864
+      }
+    },
+    "cube/darth-cube": {
+      "bbox": {
+        "x": 1107,
+        "y": 768,
+        "w": 768,
+        "h": 768
+      }
+    },
+    "cube/maschinencube": {
+      "bbox": {
+        "x": 1077,
+        "y": 609,
+        "w": 828,
+        "h": 870
+      }
+    },
+    "cube/mazinger-c": {
+      "bbox": {
+        "x": 966,
+        "y": 759,
+        "w": 1050,
+        "h": 807
+      }
+    },
+    "cube/robocube": {
+      "bbox": {
+        "x": 1170,
+        "y": 777,
+        "w": 639,
+        "h": 699
+      }
+    },
+    "cube/cube-3-p0": {
+      "bbox": {
+        "x": 1101,
+        "y": 651,
+        "w": 777,
+        "h": 831
+      }
+    },
+    "cube/cylon-cube-03": {
+      "bbox": {
+        "x": 1128,
+        "y": 729,
+        "w": 729,
+        "h": 834
+      }
+    },
+    "cube/iron-cube-08-iron-kong": {
+      "bbox": {
+        "x": 1173,
+        "y": 783,
+        "w": 636,
+        "h": 696
+      }
+    },
+    "cube/iron-cube-68": {
+      "bbox": {
+        "x": 1155,
+        "y": 780,
+        "w": 672,
+        "h": 702
+      }
+    }
+  }
+}

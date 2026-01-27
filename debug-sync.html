@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Gelato Sync</title>
+    <style>
+        body {
+            font-family: monospace;
+            padding: 20px;
+            background: #1e1e1e;
+            color: #d4d4d4;
+        }
+        .log {
+            margin: 10px 0;
+            padding: 10px;
+            background: #252526;
+            border-left: 3px solid #007acc;
+        }
+        .error {
+            border-left-color: #f48771;
+        }
+        .success {
+            border-left-color: #4ec9b0;
+        }
+        button {
+            background: #007acc;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 10px 0;
+        }
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        #output {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔍 Debug Sincronització Gelato</h1>
+    <button id="testBtn" onclick="testSync()">Provar Sincronització</button>
+    <div id="output"></div>
+
+    <script type="module">
+        const GELATO_API_KEY = '065e87f5-53b9-462c-9106-c184736ea1e9-bffd61f3-0cd2-485f-a1a3-0e16a0e44b88:c37a7a77-5f60-40db-b835-1e5260525cc7';
+        const output = document.getElementById('output');
+
+        function log(message, type = 'log') {
+            const div = document.createElement('div');
+            div.className = `log ${type}`;
+            div.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            output.appendChild(div);
+            console.log(message);
+        }
+
+        window.testSync = async function() {
+            const btn = document.getElementById('testBtn');
+            btn.disabled = true;
+            output.innerHTML = '';
+
+            try {
+                log('🔍 Iniciant test de sincronització...', 'log');
+
+                // Test 1: Verificar clau API
+                log('1️⃣ Verificant clau API...', 'log');
+                log(`Clau API: ${GELATO_API_KEY.substring(0, 20)}...`, 'log');
+
+                // Test 2: Obtenir productes
+                log('2️⃣ Obtenint productes de Gelato...', 'log');
+                const url = 'https://product.gelatoapis.com/v3/products?limit=10';
+
+                const response = await fetch(url, {
+                    headers: {
+                        'X-API-KEY': GELATO_API_KEY,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                log(`Status: ${response.status} ${response.statusText}`, response.ok ? 'success' : 'error');
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    log(`Error: ${errorText}`, 'error');
+                    return;
+                }
+
+                const data = await response.json();
+                log(`✅ Rebuts ${data.products?.length || 0} productes`, 'success');
+
+                if (!data.products || data.products.length === 0) {
+                    log('⚠️ El catàleg està buit!', 'error');
+                    log('Necessiteu afegir productes al vostre compte Gelato', 'error');
+                    return;
+                }
+
+                // Test 3: Mostrar primers productes
+                log('3️⃣ Primers 3 productes:', 'log');
+                data.products.slice(0, 3).forEach((p, i) => {
+                    log(`   ${i+1}. ${p.productNameUid || p.productTypeUid} (${p.productUid})`, 'log');
+                });
+
+                // Test 4: Mapejar producte
+                log('4️⃣ Mapejant primer producte...', 'log');
+                const firstProduct = data.products[0];
+                const mapped = mapGelatoProduct(firstProduct, 0);
+                log(`Mapejat: ${JSON.stringify(mapped, null, 2)}`, 'success');
+
+                log('✅ Test completat amb èxit!', 'success');
+
+            } catch (error) {
+                log(`❌ Error: ${error.message}`, 'error');
+                log(`Stack: ${error.stack}`, 'error');
+            } finally {
+                btn.disabled = false;
+            }
+        };
+
+        function formatProductName(nameUid) {
+            return nameUid
+                .split('-')
+                .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+                .join(' ');
+        }
+
+        function mapGelatoProductType(productTypeUid) {
+            if (!productTypeUid) return 'first-contact';
+            const collections = ['first-contact', 'the-human-inside', 'austen', 'cube', 'outcasted'];
+            const hash = productTypeUid.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+            return collections[hash % collections.length];
+        }
+
+        function mapGelatoProduct(gelatoProduct, index = 0) {
+            const productName = gelatoProduct.productNameUid || gelatoProduct.productTypeUid || 'product';
+            const productId = gelatoProduct.productUid || gelatoProduct.id;
+
+            const sizes = [];
+            const dimensions = gelatoProduct.dimensions || [];
+            dimensions.forEach(dim => {
+                if (dim.name === 'size' || dim.name === 'GarmentSize') {
+                    sizes.push(dim.value);
+                }
+            });
+
+            return {
+                id: productId,
+                name: formatProductName(productName),
+                description: `${formatProductName(productName)} - Print on Demand`,
+                price: 29.99,
+                currency: 'EUR',
+                images: [gelatoProduct.previewUrl || `/products/gelato-${index + 1}.jpg`],
+                category: 'apparel',
+                collection: mapGelatoProductType(gelatoProduct.productTypeUid),
+                sku: productId,
+                gelatoProductId: productId,
+                sizes: sizes.length > 0 ? sizes : ['S', 'M', 'L', 'XL']
+            };
+        }
+    </script>
+</body>
+</html>

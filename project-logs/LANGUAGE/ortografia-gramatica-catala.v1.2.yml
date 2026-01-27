@@ -1,0 +1,124 @@
+ortografia_gramatica_catala:
+  versio: "1.2"
+  font: "Normes IECC + Parlament de Catalunya + BonCataLà"
+  objectiu: "Memòria operativa per IA - carregar al inici de sessió"
+  ultima_actualitzacio: "2026-01-23"
+
+  ortografia:
+    basics:
+      s_sonora: # /z/ amb vibració
+        - "s entre vocals: casa, rosa"
+        - "z inicial: zero, zebra"
+      s_sorda: # /s/ sense vibració
+        - "s final: bus, fals"
+        - "ss entre vocals: bassa, massa"
+        - "c + e/i: cera, cel"
+        - "ç final: feliç, braç"
+      h_inicial:
+        - "hora, home (h muda)"
+        - "no: herba"
+      duplicacions:
+        rr: "herència, irrigar"
+        ll: "ella, palla"
+
+    accentuacio:
+      agudes: "accent si acaben vocal/n/s: cafè, camió, valencians"
+      esdrujules: "sempre: música, últim"
+      excepcions:
+        - "no accent en h muda: hèlix"
+        - "monosíl·labs tònics excepte hiatos: día, baúl"
+        - "diacrític: únic (no un)"
+
+  gramatica:
+    verbal:
+      temps:
+        present: "canto, cantes"
+        pret_perf_simple: "cantí"
+        imperfecte: "cantava"
+        futur: "cantaré"
+      acords: "subjecte-verbo: ells canten"
+      subjuntiu: "que canti (dubte)"
+      condicional: "cantaria (hipòtesi)"
+      gerundis: "-ant/-ent: cantant, essent"
+      participis: "-at/-it/-ut: cantat"
+      errors_comuns: "era vist (no había vist)"
+
+      seguim_vs_continuem:
+        seguim: "acompanyar externa: seguim el mapa, seguim les notícies"
+        continuem: "prosseguir pròpia: continuem treballant, continuem llegint"
+        regla: "si és acció teva que avança: continuem; si és externa: seguim"
+        perífrasis_gerundi: "preferir continuar + gerundi (continuem estudiant)"
+        exemples:
+          correcte_continuem:
+            - "Continuem la reunió"
+            - "Continuem insistint"
+          incorrecte_seguim:
+            - "*Seguim treballant* → Continuem treballant"
+            - "*Seguim insistint* → Continuem insistint"
+
+    concordancies:
+      genere:
+        masculi: "-e/-o/-s: home, llibre"
+        femeni: "-a: casa (exc: crisi, mà)"
+      plural: "-s/-es: cotxe/cotxes, ciutat/ciutats"
+      preposicions:
+        en: "lloc"
+        a: "direcció"
+        de: "posesió"
+      subordinades: "Penso que vindrà"
+
+  autodeteccio_castellanismes:
+    descripcio: |
+      La IA ha d'escanear el text per patrons de castellanismes freqüents.
+      Passos:
+      1. Buscar paraules/frases en llista (regex o exact match).
+      2. Si detectat, proposar correcció amb explicació.
+      3. Prioritzar: alt (molt comú), mitjà, baix.
+    llista_castellanismes:
+      - patro: "seguim (treball|estud|insist|reun)"
+        correccio: "continuem"
+        prioritat: alt
+        explicacio: "Prosseguir acció pròpia → continuar"
+      - patro: "haber|havia|haver"
+        correccio: "haver (però conjuga correcte: he hagut)"
+        prioritat: alt
+        explicacio: "Auxiliar: he hagut de veure (no había)"
+      - patro: "valen|valen"
+        correccio: "valen (correcte), però evita 'valen por' → valen per"
+        prioritat: mitjà
+        explicacio: "Preposició: valen per (no por)"
+      - patro: "realize|realizar"
+        correccio: "adonar-se|fer"
+        prioritat: alt
+        explicacio: "Adonar-se: No em vaig adonar (no realitzar)"
+      - patro: "cirurgia|quirúrgia"
+        correccio: "cirurgia"
+        prioritat: baix
+        explicacio: "Forma catalana: cirurgia (no quirurgia)"
+      - patro: "lluvia|plou"
+        correccio: "plou"
+        prioritat: mitjà
+        explicacio: "Plou (no llueve/lluvia)"
+    algoritme_autocorreccio:
+      passos:
+        - "Tokenitzar text en paraules/frases."
+        - "Match amb llista (case-insensitive)."
+        - "Si match, reemplaçar i log: 'Corregit: [original] → [nou]'."
+        - "Per context: analitzar verb + gerundi → forçar 'continuar'."
+
+  sintaxi_estil:
+    puntuacio:
+      coma:
+        - "vocatius: amic, vine!"
+        - "incisos: per sort, plou"
+        - "llistes: pa, llet i formatge"
+      punt_sema: "coordinades llargues"
+      dos_punts: "explicacions: Vaig: porto pa"
+    majuscules:
+      - "nom propi: Barcelona"
+      - "inici frase"
+      - "Jo"
+    estil:
+      - "actiu preferit: enviem (no és enviat)"
+      - "evita repeticions i cacofonies: de veritat (no de debò)"
+      - "frases curtes en formal"
