@@ -66,6 +66,26 @@
   status = 200
   force = true
 
+ [[redirects]]
+  from = "/layout-builder"
+  to = "/index.html"
+  status = 200
+
+ [[redirects]]
+  from = "/layout-builder/*"
+  to = "/index.html"
+  status = 200
+
+ [[redirects]]
+  from = "/proves/layout-builder"
+  to = "/index.html"
+  status = 200
+
+ [[redirects]]
+  from = "/proves/layout-builder/*"
+  to = "/index.html"
+  status = 200
+
 [[redirects]]
   from = "/higginsgrafic.com/*"
   to = "/index.html"
