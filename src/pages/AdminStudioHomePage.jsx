@@ -5,6 +5,79 @@ import SEO from '@/components/SEO';
 
 const STORAGE_KEY = 'hg_unitats_canvi_v1';
 
+ function seedUnitats() {
+	return {
+		categories: [
+			{ id: 'git', name: 'Git', slug: 'git' },
+			{ id: 'calibratge', name: 'Calibratge', slug: 'calibratge' },
+			{ id: 'mockups', name: 'Mockups', slug: 'mockups' },
+			{ id: 'ui', name: 'UI', slug: 'ui' },
+			{ id: 'api', name: 'API', slug: 'api' },
+			{ id: 'infra', name: 'Infra', slug: 'infra' },
+			{ id: 'assets', name: 'Assets', slug: 'assets' }
+		],
+		tasks: [
+			{
+				id: 'seed-prod-ec-preview',
+				title: 'Producció (repo 4): /ec-preview estable i deploy Netlify OK',
+				categoryId: 'infra',
+				status: 'done',
+				createdAt: Date.now() - 1000 * 60 * 60 * 24 * 14
+			},
+			{
+				id: 'seed-dev-clean-snapshot',
+				title: 'DEV net: repo higginsgrafic-ecommerce-dev (snapshot net) amb project-logs + català/estil',
+				categoryId: 'git',
+				status: 'done',
+				createdAt: Date.now() - 1000 * 60 * 60 * 24 * 7
+			},
+			{
+				id: 'seed-dev-netlify-dns',
+				title: 'DEV Netlify: site comfy-croquembouche + dev.higginsgrafic.com (DNS NETLIFY/NETLIFYv6)',
+				categoryId: 'infra',
+				status: 'done',
+				createdAt: Date.now() - 1000 * 60 * 60 * 24 * 6
+			},
+			{
+				id: 'seed-dev-supabase-google',
+				title: 'DEV Auth: Supabase Redirect URLs + login Google a dev.higginsgrafic.com/admin-login',
+				categoryId: 'api',
+				status: 'done',
+				createdAt: Date.now() - 1000 * 60 * 60 * 24 * 5
+			},
+			{
+				id: 'seed-dev-publish-script',
+				title: 'Workflow: script per publicar snapshots (1 commit, force push) del WIP al DEV net',
+				categoryId: 'git',
+				status: 'done',
+				createdAt: Date.now() - 1000 * 60 * 60 * 24 * 4
+			},
+			{
+				id: 'seed-localhost-favicon',
+				title: 'Local dev: favicon vermell només a localhost',
+				categoryId: 'ui',
+				status: 'done',
+				createdAt: Date.now() - 1000 * 60 * 60 * 24 * 1
+			},
+			{
+				id: 'seed-decide-fullwide',
+				title: 'Decidir si cal portar FullWideSlide (lab) a repo 4 o mantenir-ho només a DEV/LAB',
+				categoryId: 'git',
+				status: 'pending',
+				createdAt: Date.now()
+			},
+			{
+				id: 'seed-doc-dev-flow',
+				title: 'Documentar el flux dev→snapshot→deploy (mini guia)',
+				categoryId: 'ui',
+				status: 'pending',
+				createdAt: Date.now()
+			}
+		],
+		lastActiveTaskId: null
+	};
+ }
+
 function statusIcon(status) {
   if (status === 'done') return CheckCircle2;
   if (status === 'in_progress') return Play;
@@ -20,9 +93,20 @@ function statusLabel(status) {
 function loadUnitats() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return null;
+    if (!raw) {
+			const seeded = seedUnitats();
+			localStorage.setItem(STORAGE_KEY, JSON.stringify(seeded));
+			return seeded;
+		}
     const parsed = JSON.parse(raw);
     if (!parsed || typeof parsed !== 'object') return null;
+    const tasks = Array.isArray(parsed.tasks) ? parsed.tasks : [];
+		if (tasks.length === 0) {
+			const seeded = seedUnitats();
+			const next = { ...seeded, ...parsed, tasks: seeded.tasks, categories: seeded.categories };
+			localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+			return next;
+		}
     return parsed;
   } catch {
     return null;

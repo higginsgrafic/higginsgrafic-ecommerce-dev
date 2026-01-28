@@ -24,6 +24,10 @@ function loadState() {
     if (!raw) return null;
     const parsed = JSON.parse(raw);
     if (!parsed || typeof parsed !== 'object') return null;
+ 		const tasks = Array.isArray(parsed.tasks) ? parsed.tasks : [];
+ 		if (tasks.length === 0) {
+ 			return { ...defaultState(), ...parsed };
+ 		}
     return parsed;
   } catch {
     return null;
@@ -45,7 +49,80 @@ function defaultState() {
       { id: 'infra', name: 'Infra', slug: 'infra' },
       { id: 'assets', name: 'Assets', slug: 'assets' }
     ],
-    tasks: [],
+    tasks: [
+      {
+        id: 'seed-prod-ec-preview',
+        title: 'Producció (repo 4): /ec-preview estable i deploy Netlify OK',
+        slug: 'prod-ec-preview',
+        categoryId: 'infra',
+        status: 'done',
+        createdAt: Date.now() - 1000 * 60 * 60 * 24 * 14,
+        notes: ''
+      },
+      {
+        id: 'seed-dev-clean-snapshot',
+        title: 'DEV net: repo higginsgrafic-ecommerce-dev (snapshot net) amb project-logs + català/estil',
+        slug: 'dev-clean-snapshot',
+        categoryId: 'git',
+        status: 'done',
+        createdAt: Date.now() - 1000 * 60 * 60 * 24 * 7,
+        notes: ''
+      },
+      {
+        id: 'seed-dev-netlify-dns',
+        title: 'DEV Netlify: site comfy-croquembouche + dev.higginsgrafic.com (DNS NETLIFY/NETLIFYv6)',
+        slug: 'dev-netlify-dns',
+        categoryId: 'infra',
+        status: 'done',
+        createdAt: Date.now() - 1000 * 60 * 60 * 24 * 6,
+        notes: ''
+      },
+      {
+        id: 'seed-dev-supabase-google',
+        title: 'DEV Auth: Supabase Redirect URLs + login Google a dev.higginsgrafic.com/admin-login',
+        slug: 'dev-supabase-google',
+        categoryId: 'api',
+        status: 'done',
+        createdAt: Date.now() - 1000 * 60 * 60 * 24 * 5,
+        notes: ''
+      },
+      {
+        id: 'seed-dev-publish-script',
+        title: 'Workflow: script per publicar snapshots (1 commit, force push) del WIP al DEV net',
+        slug: 'dev-publish-script',
+        categoryId: 'git',
+        status: 'done',
+        createdAt: Date.now() - 1000 * 60 * 60 * 24 * 4,
+        notes: ''
+      },
+      {
+        id: 'seed-localhost-favicon',
+        title: 'Local dev: favicon vermell només a localhost',
+        slug: 'localhost-favicon',
+        categoryId: 'ui',
+        status: 'done',
+        createdAt: Date.now() - 1000 * 60 * 60 * 24 * 1,
+        notes: ''
+      },
+      {
+        id: 'seed-decide-fullwide',
+        title: 'Decidir si cal portar FullWideSlide (lab) a repo 4 o mantenir-ho només a DEV/LAB',
+        slug: 'decide-fullwide',
+        categoryId: 'git',
+        status: 'pending',
+        createdAt: Date.now(),
+        notes: ''
+      },
+      {
+        id: 'seed-doc-dev-flow',
+        title: 'Documentar el flux dev→snapshot→deploy (mini guia)',
+        slug: 'doc-dev-flow',
+        categoryId: 'ui',
+        status: 'pending',
+        createdAt: Date.now(),
+        notes: ''
+      }
+    ],
     lastActiveTaskId: null
   };
 }
