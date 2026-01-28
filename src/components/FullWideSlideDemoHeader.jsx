@@ -2,7 +2,7 @@ import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from 're
 import { Link, useNavigate } from 'react-router-dom';
 import { Menu, X, UserRound, ChevronDown, ChevronLeft, ChevronRight } from 'lucide-react';
 import { createPortal } from 'react-dom';
-import { motion } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 import { getGildan5000Catalog } from '../utils/placeholders.js';
 import { useProductContext } from '@/contexts/ProductContext';
 import AdidasColorStripeButtons from './AdidasColorStripeButtons.jsx';
@@ -57,7 +57,7 @@ const THE_HUMAN_INSIDE_MEDIA_WHITE = {
   'Cylon 78': '/custom_logos/drawings/the_human_inside/blanc/11-cylon-78-w4.webp',
   'Cylon 03': '/custom_logos/drawings/the_human_inside/blanc/12-cylon-03-w3.webp',
   'Iron Man 68': '/custom_logos/drawings/the_human_inside/blanc/13-iron-man-68-w4.webp',
-  'Iron Man 08': '/custom_logos/drawings/the_human_inside/blanc/14-ironman-08-w4.webp',
+  'Iron Man 08': '/custom_logos/drawings/the_human_inside/blanc/14-iron-man-08-w4.webp',
   'Cyberman': '/custom_logos/drawings/the_human_inside/blanc/15-cyberman-w1.webp',
   'Maschinenmensch': '/custom_logos/drawings/the_human_inside/blanc/16-maschinenmensch-w1.webp',
   'Robocop': '/custom_logos/drawings/the_human_inside/blanc/17-robocop-w3.webp',
@@ -193,6 +193,7 @@ function MegaColumn({
   row = false,
   isFirstContact = false,
   isHumanInside = false,
+  collectionId,
   megaTileSize,
   humanInsideVariant = 'black',
   firstContactVariant = 'black',
@@ -206,9 +207,27 @@ function MegaColumn({
 }) {
   const tileSizeRef = useRef(null);
   const [tileSize, setTileSize] = useState(null);
-  const scrollRowRef = useRef(null);
   const humanInsideEnabled = Boolean(isHumanInside);
   const effectiveTileSize = megaTileSize || tileSize;
+
+  const effectiveItems = useMemo(() => {
+    const list = Array.isArray(items) ? items.slice() : [];
+    if (collectionId !== 'outcasted') return list.filter(Boolean);
+    const variant = isHumanInside ? humanInsideVariant : firstContactVariant;
+    const filtered = list.filter((it) => {
+      if (it === CONTROL_TILE_BN || it === CONTROL_TILE_ARROWS) return true;
+      if (typeof it !== 'string') return false;
+      if (it.startsWith('black/')) return variant !== 'white';
+      if (it.startsWith('white/')) return variant === 'white';
+      return true;
+    });
+    const bn = filtered.includes(CONTROL_TILE_BN) ? CONTROL_TILE_BN : null;
+    const arrows = filtered.includes(CONTROL_TILE_ARROWS) ? CONTROL_TILE_ARROWS : null;
+    const drawings = filtered.filter((it) => it && it !== CONTROL_TILE_BN && it !== CONTROL_TILE_ARROWS);
+    const padded = drawings.slice(0, 7);
+    while (padded.length < 7) padded.push(null);
+    return [bn, ...padded, arrows];
+  }, [items, collectionId, isHumanInside, humanInsideVariant, firstContactVariant]);
 
   useLayoutEffect(() => {
     if (!row) return;
@@ -234,11 +253,50 @@ function MegaColumn({
     onTileSize(tileSize);
   }, [row, tileSize, onTileSize]);
 
-  const scrollByTiles = (dir) => {
-    const el = scrollRowRef.current;
-    if (!el) return;
-    const step = (effectiveTileSize || 160) * 3 + 12 * 3;
-    el.scrollBy({ left: dir * step, behavior: 'smooth' });
+  const baseItems = useMemo(() => {
+    return effectiveItems.filter((it) => it && it !== CONTROL_TILE_BN && it !== CONTROL_TILE_ARROWS);
+  }, [effectiveItems]);
+
+  const outcastedStripeTiles = collectionId === 'outcasted' ? Math.max(0, Math.min(7, baseItems.length)) : 7;
+
+  const thinSlideEnabled = row && baseItems.length > 7;
+
+  const isPathItem = (it) => typeof it === 'string' && /\.(png|jpg|jpeg|webp)$/i.test(it);
+
+  const deriveVariantPath = (p, variant) => {
+    if (typeof p !== 'string') return null;
+    if (!isPathItem(p)) return null;
+    let next = p;
+    if (!variant || variant === 'black') {
+      if (next.includes('/white/')) next = next.replace('/white/', '/black/');
+      if (next.includes('/blanc/')) next = next.replace('/blanc/', '/negre/');
+      if (/-w\.(png|jpg|jpeg|webp)$/i.test(next)) next = next.replace(/-w\.(png|jpg|jpeg|webp)$/i, '-b.$1');
+      return next;
+    }
+    if (next.includes('/black/')) next = next.replace('/black/', '/white/');
+    if (next.includes('/negre/')) next = next.replace('/negre/', '/blanc/');
+    if (/-b\.(png|jpg|jpeg|webp)$/i.test(next)) next = next.replace(/-b\.(png|jpg|jpeg|webp)$/i, '-w.$1');
+    return next;
+  };
+
+  const labelForItem = (it) => {
+    if (typeof it !== 'string') return '';
+    if (!isPathItem(it)) return it;
+    const seg = it.split('/').filter(Boolean);
+    const base = seg.length ? seg[seg.length - 1] : it;
+    return base.replace(/\.(png|jpg|jpeg|webp)$/i, '').replace(/[-_]+/g, ' ');
+  };
+
+  const resolveSrc = (it) => {
+    if (!it) return null;
+    const variant = isHumanInside ? humanInsideVariant : firstContactVariant;
+    if (isPathItem(it) && collectionId) {
+      const vPath = deriveVariantPath(it, variant) || it;
+      return `/custom_logos/drawings/${collectionId}/${vPath}`;
+    }
+    if (FIRST_CONTACT_MEDIA[it]) return variant === 'white' ? (FIRST_CONTACT_MEDIA_WHITE[it] || FIRST_CONTACT_MEDIA[it]) : FIRST_CONTACT_MEDIA[it];
+    const humanSrc = (variant === 'white' ? THE_HUMAN_INSIDE_MEDIA_WHITE : THE_HUMAN_INSIDE_MEDIA)[it];
+    return humanSrc || null;
   };
 
   return (
@@ -256,19 +314,29 @@ function MegaColumn({
                       ? 'bg-foreground opacity-100'
                       : 'bg-transparent opacity-100'
                   }`}
-                style={tileSize ? { height: `${tileSize}px` } : undefined}
+                style={
+                  tileSize
+                    ? {
+                        height: `${tileSize}px`,
+                        width:
+                          collectionId === 'outcasted'
+                            ? `${outcastedStripeTiles * tileSize + Math.max(0, outcastedStripeTiles - 1) * 12}px`
+                            : undefined,
+                      }
+                    : undefined
+                }
               />
             </div>
           </div>
 
           <div
-            ref={scrollRowRef}
             className="relative z-10 overflow-hidden"
             style={effectiveTileSize ? { height: `${effectiveTileSize + 24}px` } : undefined}
           >
-            {humanInsideEnabled ? (
+            {thinSlideEnabled ? (
               <FullWideSlideDemoHumanInsideSlider
-                items={items}
+                items={effectiveItems}
+                collectionId={collectionId}
                 megaTileSize={megaTileSize}
                 isFirstContact={isFirstContact}
                 isHumanInside={isHumanInside}
@@ -278,8 +346,8 @@ function MegaColumn({
                 onFirstContactBlack={onFirstContactBlack}
                 onHumanWhite={onHumanWhite}
                 onHumanBlack={onHumanBlack}
-                onHumanPrev={onHumanPrev}
-                onHumanNext={onHumanNext}
+                onHumanPrev={isHumanInside ? onHumanPrev : undefined}
+                onHumanNext={isHumanInside ? onHumanNext : undefined}
                 OptimizedImg={OptimizedImg}
                 FirstContactDibuix00Buttons={FirstContactDibuix00Buttons}
                 FirstContactDibuix09Buttons={FirstContactDibuix09Buttons}
@@ -292,7 +360,7 @@ function MegaColumn({
               />
             ) : (
               <div className="grid w-full grid-cols-9 gap-x-3">
-                {items.map((it, idx) => (
+                {effectiveItems.map((it, idx) => (
                   <div
                     key={`${it}-${idx}`}
                     className="min-w-0 relative z-10"
@@ -301,19 +369,23 @@ function MegaColumn({
                     {!it || it === CONTROL_TILE_ARROWS || it === CONTROL_TILE_BN ? (
                       <div className="h-4" />
                     ) : (
+                      collectionId === 'outcasted' && isPathItem(it) ? (
+                        <div className="h-4" />
+                      ) : (
                       <Link
                         to="#"
                         className="relative z-40 flex h-4 w-full items-center justify-center whitespace-nowrap rounded-none bg-muted px-2 text-xs leading-4 text-muted-foreground hover:text-foreground"
                       >
-                        {it}
+                        {labelForItem(it)}
                       </Link>
+                      )
                     )}
 
-                    {FIRST_CONTACT_MEDIA[it] ? (
+                    {!it ? null : resolveSrc(it) ? (
                       <div className="relative z-10 mt-2 aspect-square w-full overflow-hidden" ref={idx === 1 ? tileSizeRef : undefined}>
                         <OptimizedImg
-                          src={FIRST_CONTACT_MEDIA[it]}
-                          alt={it}
+                          src={resolveSrc(it)}
+                          alt={collectionId === 'outcasted' && isPathItem(it) ? '' : labelForItem(it) || it}
                           className={
                             it === 'The Phoenix'
                               ? 'h-full w-full object-contain scale-[0.825]'
@@ -333,7 +405,7 @@ function MegaColumn({
                           }
                         />
 
-                        {idx >= 1 && idx <= 7 && firstContactVariant === 'white' ? (
+                        {FIRST_CONTACT_MEDIA[it] && idx >= 1 && idx <= 7 && firstContactVariant === 'white' ? (
                           <OptimizedImg
                             src={FIRST_CONTACT_MEDIA_WHITE[it] || FIRST_CONTACT_MEDIA[it]}
                             alt={it}
@@ -359,14 +431,6 @@ function MegaColumn({
                           />
                         ) : null}
                       </div>
-                    ) : (humanInsideVariant === 'white' ? THE_HUMAN_INSIDE_MEDIA_WHITE : THE_HUMAN_INSIDE_MEDIA)[it] ? (
-                      <div className="relative z-10 mt-2 aspect-square w-full overflow-hidden" ref={idx === 1 ? tileSizeRef : undefined}>
-                        <OptimizedImg
-                          src={(humanInsideVariant === 'white' ? THE_HUMAN_INSIDE_MEDIA_WHITE : THE_HUMAN_INSIDE_MEDIA)[it]}
-                          alt={it}
-                          className={`h-full w-full object-contain ${it === 'Mazinger' ? 'scale-[0.64]' : it === 'Maschinenmensch' ? 'scale-[0.65]' : 'scale-[0.6]'}`}
-                        />
-                      </div>
                     ) : it === CONTROL_TILE_BN ? (
                       <div className="relative z-40">
                         {isFirstContact ? (
@@ -376,20 +440,23 @@ function MegaColumn({
                         ) : null}
                       </div>
                     ) : it === CONTROL_TILE_ARROWS ? (
-                      <div className="relative z-40">
+                      <div
+                        className={`relative z-40 ${thinSlideEnabled ? '' : 'opacity-30 pointer-events-none'}`}
+                        aria-hidden={thinSlideEnabled ? undefined : true}
+                      >
                         <FirstContactDibuix09Buttons
                           tileSize={tileSize}
                           onPrev={() => {
+                            if (thinSlideEnabled) return;
                             if (isHumanInside && !humanInsideEnabled && onHumanPrev) return onHumanPrev();
-                            return scrollByTiles(-1);
                           }}
                           onNext={() => {
+                            if (thinSlideEnabled) return;
                             if (isHumanInside && !humanInsideEnabled && onHumanNext) return onHumanNext();
-                            return scrollByTiles(1);
                           }}
                         />
                       </div>
-                    ) : (
+                    ) : collectionId === 'outcasted' ? null : (
                       <div className="mt-2 aspect-square w-full rounded-md bg-muted" ref={idx === 1 ? tileSizeRef : undefined} />
                     )}
                   </div>
@@ -555,6 +622,10 @@ export default function FullWideSlideDemoHeader({
   const ensureMegaOpen = () => {
     setActive((prev) => prev || 'first_contact');
   };
+
+  useEffect(() => {
+    setHumanInsideVariant((prev) => (prev === firstContactVariant ? prev : firstContactVariant));
+  }, [firstContactVariant]);
 
   const scrollSearchGridBy = (deltaPx) => {
     const el = searchGridScrollRef.current;
@@ -1266,6 +1337,7 @@ export default function FullWideSlideDemoHeader({
                           title={col.title}
                           isFirstContact={active === 'first_contact' || active === 'austen' || active === 'cube' || active === 'outcasted'}
                           isHumanInside={active === 'the_human_inside'}
+                          collectionId={active}
                           megaTileSize={megaTileSize}
                           humanInsideVariant={humanInsideVariant}
                           items={col.items}
@@ -1273,8 +1345,8 @@ export default function FullWideSlideDemoHeader({
                           firstContactVariant={firstContactVariant}
                           onFirstContactWhite={() => setFirstContactVariant('white')}
                           onFirstContactBlack={() => setFirstContactVariant('black')}
-                          onHumanWhite={() => setHumanInsideVariant('white')}
-                          onHumanBlack={() => setHumanInsideVariant('black')}
+                          onHumanWhite={() => setFirstContactVariant('white')}
+                          onHumanBlack={() => setFirstContactVariant('black')}
                           onHumanPrev={() => setThinStartIndex((v) => v - 1)}
                           onHumanNext={() => setThinStartIndex((v) => v + 1)}
                         />
@@ -1611,15 +1683,33 @@ export default function FullWideSlideDemoHeader({
                             : undefined
                         }
                       >
-                        {(active === 'the_human_inside' ? col.items : col.items.slice(0, 9)).map((it, idx) => (
+                        {(() => {
+                          const isPath = (v) => typeof v === 'string' && /\.(png|jpg|jpeg|webp)$/i.test(v);
+                          const base = active === 'the_human_inside' ? col.items : col.items.slice(0, 9);
+                          if (active !== 'outcasted') return base;
+                          const variant = firstContactVariant;
+                          return base.filter((it) => {
+                            if (it === CONTROL_TILE_BN || it === CONTROL_TILE_ARROWS) return true;
+                            if (!isPath(it)) return false;
+                            if (it.startsWith('black/')) return variant !== 'white';
+                            if (it.startsWith('white/')) return variant === 'white';
+                            return true;
+                          });
+                        })().map((it, idx) => (
                           <div key={`${it}-${idx}`} className="min-w-0">
                             {!it || it === CONTROL_TILE_ARROWS || it === CONTROL_TILE_BN ? (
                               <div className="h-4" />
+                            ) : active === 'outcasted' && typeof it === 'string' && /\.(png|jpg|jpeg|webp)$/i.test(it) ? (
+                              <div className="h-4" />
                             ) : (
-                              <Link to="#" className="flex h-4 w-full items-center justify-center rounded-none bg-muted px-2 text-xs text-muted-foreground hover:text-foreground">
+                              <Link
+                                to="#"
+                                className="flex h-4 w-full items-center justify-center rounded-none bg-muted px-2 text-xs text-muted-foreground hover:text-foreground"
+                              >
                                 {it}
                               </Link>
                             )}
+
                             {FIRST_CONTACT_MEDIA[it] ? (
                               <div className="relative mt-2 aspect-square w-full overflow-hidden">
                                 {idx >= 1 && idx <= 7 ? (
@@ -1677,6 +1767,14 @@ export default function FullWideSlideDemoHeader({
                                   />
                                 ) : null}
                               </div>
+                            ) : active === 'outcasted' && typeof it === 'string' && /\.(png|jpg|jpeg|webp)$/i.test(it) ? (
+                              <div className="relative mt-2 aspect-square w-full overflow-hidden">
+                                <OptimizedImg
+                                  src={`/custom_logos/drawings/outcasted/${it}`}
+                                  alt=""
+                                  className="relative z-10 h-full w-full object-contain"
+                                />
+                              </div>
                             ) : THE_HUMAN_INSIDE_MEDIA[it] ? (
                               <div className="relative mt-2 aspect-square w-full overflow-hidden">
                                 <OptimizedImg
@@ -1724,15 +1822,17 @@ export default function FullWideSlideDemoHeader({
                       </div>
                     ) : null}
 
-                    <div className="mt-4">
-                      <div className="grid gap-2">
-                        {(col.items || []).filter(Boolean).slice(0, 8).map((it) => (
-                          <Link key={it} to="#" className="text-sm text-muted-foreground hover:text-foreground">
-                            {it}
-                          </Link>
-                        ))}
+                    {active === 'outcasted' ? null : (
+                      <div className="mt-4">
+                        <div className="grid gap-2">
+                          {(col.items || []).filter(Boolean).slice(0, 8).map((it) => (
+                            <Link key={it} to="#" className="text-sm text-muted-foreground hover:text-foreground">
+                              {it}
+                            </Link>
+                          ))}
+                        </div>
                       </div>
-                    </div>
+                    )}
 
                     <div className="mt-6">
                       <div className="h-[1px] w-full bg-border" />

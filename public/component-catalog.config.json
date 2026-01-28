@@ -4,20 +4,145 @@
     "fullWideSlide": {
       "enabled": true,
       "iteration": "v1",
-      "updatedAt": "2026-01-22T23:09:38.692Z",
+      "updatedAt": "2026-01-28T15:50:00.000Z",
       "notes": "",
       "megaMenu": {
         "megaConfig": {
           "first_contact": [
             {
               "title": "",
-              "items": []
+              "items": [
+                "botonera-bn",
+                "NX-01",
+                "NCC-1701",
+                "NCC-1701-D",
+                "Wormhole",
+                "Plasma Escape",
+                "Vulcan's End",
+                "The Phoenix",
+                "botonera-fletxes"
+              ]
             }
           ],
-          "prova-1": [
+          "the_human_inside": [
             {
               "title": "",
-              "items": []
+              "items": [
+                "botonera-bn",
+                "C3P0",
+                "Vader",
+                "Afrodita",
+                "Mazinger",
+                "Cylon 78",
+                "Cylon 03",
+                "Iron Man 68",
+                "Iron Man 08",
+                "Cyberman",
+                "Maschinenmensch",
+                "Robocop",
+                "Terminator",
+                "Robbie the Robot",
+                "botonera-fletxes"
+              ]
+            }
+          ],
+          "austen": [
+            {
+              "title": "",
+              "items": [
+                "botonera-bn",
+                "samarreta/encreuats/persuasion/1 PERSUASION 1.webp",
+                "samarreta/encreuats/persuasion/2 PERSUASION 2.webp",
+                "samarreta/encreuats/persuasion/3 PERSUASION 3.webp",
+                "samarreta/encreuats/persuasion/4 PERSUASION 4.webp",
+                "samarreta/encreuats/pride_and_prejudice/pride-and-prejudice-1.webp",
+                "samarreta/encreuats/pride_and_prejudice/pride-and-prejudice-2.webp",
+                "samarreta/encreuats/pride_and_prejudice/pride-and-prejudice-3.webp",
+                "samarreta/encreuats/pride_and_prejudice/pride-and-prejudice-4.webp",
+                "samarreta/encreuats/sense_and_sensibility/sense-and-sensibility-1.webp",
+                "samarreta/encreuats/sense_and_sensibility/sense-and-sensibility-2.webp",
+                "samarreta/encreuats/sense_and_sensibility/sense-and-sensibility-3.webp",
+                "samarreta/encreuats/sense_and_sensibility/sense-and-sensibility-4.webp",
+                "samarreta/keep_calm/black/keep-calm-tr-b.webp",
+                "samarreta/keep_calm/multi/keep-calm-red-tr.webp",
+                "samarreta/keep_calm/white/keep-calm-tr-w.webp",
+                "samarreta/looking_for_my_darcy/blue-dark-gradient.webp",
+                "samarreta/looking_for_my_darcy/blue-frame.webp",
+                "samarreta/looking_for_my_darcy/blue-light-gradient.webp",
+                "samarreta/looking_for_my_darcy/blue-solid.webp",
+                "samarreta/looking_for_my_darcy/fuchsia-dark-gradient.webp",
+                "samarreta/looking_for_my_darcy/fuchsia-frame.webp",
+                "samarreta/looking_for_my_darcy/fuchsia-light-gradient.webp",
+                "samarreta/looking_for_my_darcy/fuchsia-solid.webp",
+                "samarreta/looking_for_my_darcy/orange-dark-gradient.webp",
+                "samarreta/looking_for_my_darcy/orange-frame.webp",
+                "samarreta/looking_for_my_darcy/orange-light-gradient.webp",
+                "samarreta/looking_for_my_darcy/orange-solid.webp",
+                "samarreta/looking_for_my_darcy/red-dark-gradient.webp",
+                "samarreta/looking_for_my_darcy/red-frame.webp",
+                "samarreta/looking_for_my_darcy/red-light-gradient.webp",
+                "samarreta/looking_for_my_darcy/red-solid.webp",
+                "samarreta/looking_for_my_darcy/yellow-dark-gradient.webp",
+                "samarreta/looking_for_my_darcy/yellow-frame.webp",
+                "samarreta/looking_for_my_darcy/yellow-light-gradient.webp",
+                "samarreta/looking_for_my_darcy/yellow-solid.webp",
+                "samarreta/pemberley_house/black/pemberley-house-tr-b.webp",
+                "samarreta/pemberley_house/white/pemberley-house-tr-w.webp",
+                "samarreta/quotes/black/half-agony-half-hope-b.webp",
+                "samarreta/quotes/black/it-is-a-truth-b.webp",
+                "samarreta/quotes/black/unsociable-and-taciturn-b.webp",
+                "samarreta/quotes/black/you-have-bewiched-me-b.webp",
+                "samarreta/quotes/black/you-must-allow-me-b.webp",
+                "samarreta/quotes/white/half-agony-half-hope-w.webp",
+                "samarreta/quotes/white/it-is-a-truth-w.webp",
+                "samarreta/quotes/white/unsociable-and-taciturn-w.webp",
+                "samarreta/quotes/white/you-have-bewiched-me-w.webp",
+                "samarreta/quotes/white/you-must-allow-me-w.webp",
+                "tassa/half-agony-half-hope.webp",
+                "tassa/it-is-a-truth.webp",
+                "tassa/unsociable-and-taciturn.webp",
+                "tassa/you-have-bewitched-me.webp",
+                "tassa/you-must-allow-me.webp",
+                "botonera-fletxes"
+              ]
+            }
+          ],
+          "cube": [
+            {
+              "title": "",
+              "items": [
+                "botonera-bn",
+                "afrodita-c.webp",
+                "cube-3-p0.webp",
+                "cyber-cube.webp",
+                "cylon-cube-03.webp",
+                "darth-cube.webp",
+                "iron-cube-08-iron-kong.webp",
+                "iron-cube-68.webp",
+                "maschinencube.webp",
+                "mazinger-c.webp",
+                "robocube.webp",
+                "botonera-fletxes"
+              ]
+            }
+          ],
+          "outcasted": [
+            {
+              "title": "",
+              "items": [
+                "botonera-bn",
+                "black/arthur-d-the-second-b.webp",
+                "black/dalek-conquer-b.webp",
+                "black/dalek-destroy-b.webp",
+                "black/death-star2d2-b.webp",
+                "black/dj-vader-b.webp",
+                "white/arthur-d-the-second-w.webp",
+                "white/dalek-conquer-w.webp",
+                "white/dalek-destroy-w.webp",
+                "white/death-star2d2-w.webp",
+                "white/dj-vader-w.webp",
+                "botonera-fletxes"
+              ]
             }
           ]
         }
