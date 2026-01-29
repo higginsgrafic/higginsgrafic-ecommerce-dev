@@ -36,6 +36,12 @@ export default function FullWideSlideDemoHumanInsideSlider({
   const scrollRowRef = useRef(null);
   const [trackIndex, setTrackIndex] = useState(0);
   const [trackInstant, setTrackInstant] = useState(false);
+  const lastDirRef = useRef(0);
+  const wrapRafRef = useRef(null);
+  const isAnimatingRef = useRef(false);
+  const pendingNavDeltaRef = useRef(0);
+  const holdTimeoutRef = useRef(null);
+  const holdIntervalRef = useRef(null);
 
   const isPathItem = (it) => typeof it === 'string' && /\.(png|jpg|jpeg|webp)$/i.test(it);
 
@@ -148,8 +154,41 @@ export default function FullWideSlideDemoHumanInsideSlider({
   }, [humanInsideClones]);
 
   const scrollByTiles = (dir) => {
+    lastDirRef.current = dir;
+    if (wrapRafRef.current) {
+      cancelAnimationFrame(wrapRafRef.current);
+      wrapRafRef.current = null;
+    }
+
+    if (isAnimatingRef.current) {
+      pendingNavDeltaRef.current = Math.max(-2, Math.min(2, pendingNavDeltaRef.current + dir));
+      return;
+    }
+
+    isAnimatingRef.current = true;
     setTrackInstant(false);
     setTrackIndex((prev) => prev + dir);
+  };
+
+  const stopHold = () => {
+    if (holdTimeoutRef.current) {
+      clearTimeout(holdTimeoutRef.current);
+      holdTimeoutRef.current = null;
+    }
+    if (holdIntervalRef.current) {
+      clearInterval(holdIntervalRef.current);
+      holdIntervalRef.current = null;
+    }
+  };
+
+  const startHold = (dir) => {
+    stopHold();
+    scrollByTiles(dir);
+    holdTimeoutRef.current = setTimeout(() => {
+      holdIntervalRef.current = setInterval(() => {
+        scrollByTiles(dir);
+      }, 160);
+    }, 260);
   };
 
   const step = (effectiveTileSize || 160) + 12;
@@ -185,14 +224,13 @@ export default function FullWideSlideDemoHumanInsideSlider({
     if (trackIndex < baseStartLocal || trackIndex >= baseEndLocal) return;
 
     const centerOriginalIndex = ((trackIndex - baseStartLocal) % humanInsideTotal + humanInsideTotal) % humanInsideTotal;
-    const idxs = [
-      centerOriginalIndex - 2,
-      centerOriginalIndex - 1,
-      centerOriginalIndex,
-      centerOriginalIndex + 1,
-      centerOriginalIndex + 2,
-      centerOriginalIndex + 3,
-    ];
+    const dir = lastDirRef.current;
+    const forwardPad = dir > 0 ? 10 : 6;
+    const backwardPad = dir < 0 ? 10 : 6;
+    const idxs = [];
+    for (let i = -backwardPad; i <= humanInsideVisible - 1 + forwardPad; i += 1) {
+      idxs.push(centerOriginalIndex + i);
+    }
 
     idxs.forEach((raw) => {
       const oi = ((raw % humanInsideTotal) + humanInsideTotal) % humanInsideTotal;
@@ -234,15 +272,37 @@ export default function FullWideSlideDemoHumanInsideSlider({
             onAnimationComplete={() => {
               if (trackIndex >= baseEnd) {
                 setTrackInstant(true);
-                setTrackIndex(baseStart);
+                wrapRafRef.current = requestAnimationFrame(() => {
+                  const overflow = trackIndex - baseEnd;
+                  setTrackIndex(baseStart + overflow);
+                  wrapRafRef.current = requestAnimationFrame(() => {
+                    setTrackInstant(false);
+                    wrapRafRef.current = null;
+                  });
+                });
                 return;
               }
               if (trackIndex < baseStart) {
                 setTrackInstant(true);
-                setTrackIndex(baseEnd - 1);
+                wrapRafRef.current = requestAnimationFrame(() => {
+                  const underflow = baseStart - trackIndex;
+                  setTrackIndex(baseEnd - underflow);
+                  wrapRafRef.current = requestAnimationFrame(() => {
+                    setTrackInstant(false);
+                    wrapRafRef.current = null;
+                  });
+                });
                 return;
               }
-              setTrackInstant(false);
+
+              isAnimatingRef.current = false;
+              const queued = pendingNavDeltaRef.current;
+              if (queued !== 0) {
+                pendingNavDeltaRef.current = queued > 0 ? queued - 1 : queued + 1;
+                requestAnimationFrame(() => {
+                  scrollByTiles(queued > 0 ? 1 : -1);
+                });
+              }
             }}
             style={{ display: 'flex', gap: '12px', willChange: 'transform' }}
           >
@@ -293,6 +353,7 @@ export default function FullWideSlideDemoHumanInsideSlider({
             <FirstContactDibuix09Buttons
               tileSize={effectiveTileSize}
               onPrev={() => {
+                stopHold();
                 try {
                   if (isHumanInside && onHumanPrev) onHumanPrev();
                 } catch {
@@ -301,12 +362,49 @@ export default function FullWideSlideDemoHumanInsideSlider({
                 scrollByTiles(-1);
               }}
               onNext={() => {
+                stopHold();
                 try {
                   if (isHumanInside && onHumanNext) onHumanNext();
                 } catch {
                   // ignore
                 }
                 scrollByTiles(1);
+              }}
+              onPrevPointerDown={(e) => {
+                try {
+                  e.preventDefault();
+                  e.stopPropagation();
+                } catch {
+                  // ignore
+                }
+                startHold(-1);
+              }}
+              onPrevPointerUp={(e) => {
+                try {
+                  e.preventDefault();
+                  e.stopPropagation();
+                } catch {
+                  // ignore
+                }
+                stopHold();
+              }}
+              onNextPointerDown={(e) => {
+                try {
+                  e.preventDefault();
+                  e.stopPropagation();
+                } catch {
+                  // ignore
+                }
+                startHold(1);
+              }}
+              onNextPointerUp={(e) => {
+                try {
+                  e.preventDefault();
+                  e.stopPropagation();
+                } catch {
+                  // ignore
+                }
+                stopHold();
               }}
             />
           </div>

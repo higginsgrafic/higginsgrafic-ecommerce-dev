@@ -151,7 +151,15 @@ function FirstContactDibuix00Buttons({ onWhite, onBlack }) {
   );
 }
 
-function FirstContactDibuix09Buttons({ onPrev, onNext, tileSize }) {
+function FirstContactDibuix09Buttons({
+  onPrev,
+  onNext,
+  tileSize,
+  onPrevPointerDown,
+  onPrevPointerUp,
+  onNextPointerDown,
+  onNextPointerUp,
+}) {
   const iconH = tileSize ? Math.round(tileSize * 0.3) : 48;
   const iconW = tileSize ? Math.round(tileSize * 0.15) : 24;
 
@@ -162,6 +170,10 @@ function FirstContactDibuix09Buttons({ onPrev, onNext, tileSize }) {
           type="button"
           aria-label="Anterior"
           onClick={onPrev}
+          onPointerDown={onPrevPointerDown}
+          onPointerUp={onPrevPointerUp}
+          onPointerCancel={onPrevPointerUp}
+          onPointerLeave={onPrevPointerUp}
           className="absolute left-0 top-0 h-full w-1/2 bg-transparent hover:bg-muted focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         >
           <ChevronLeft
@@ -174,6 +186,10 @@ function FirstContactDibuix09Buttons({ onPrev, onNext, tileSize }) {
           type="button"
           aria-label="Següent"
           onClick={onNext}
+          onPointerDown={onNextPointerDown}
+          onPointerUp={onNextPointerUp}
+          onPointerCancel={onNextPointerUp}
+          onPointerLeave={onNextPointerUp}
           className="absolute right-0 top-0 h-full w-1/2 bg-transparent hover:bg-muted focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         >
           <ChevronRight
