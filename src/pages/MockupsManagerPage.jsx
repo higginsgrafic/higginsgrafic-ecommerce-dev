@@ -80,8 +80,8 @@ export default function MockupsManagerPage() {
     const normalizeToStorageColor = (c) => {
       const v = (c || '').toString().trim().toLowerCase();
       if (!v) return null;
-      if (['white', 'blanc', 'blanco'].includes(v)) return 'blanc';
-      if (['black', 'negre', 'negro'].includes(v)) return 'negre';
+      if (['white', 'blanc', 'blanco'].includes(v)) return 'white';
+      if (['black', 'negre', 'negro'].includes(v)) return 'black';
       return null;
     };
 
@@ -91,14 +91,14 @@ export default function MockupsManagerPage() {
     key = key.replace(/^first-contact\//i, 'first_contact/');
     key = key.replace(/^the-human-inside\//i, 'the_human_inside/');
 
-    key = key.replace(/\/(white)\//gi, '/blanc/');
-    key = key.replace(/\/(black)\//gi, '/negre/');
+    key = key.replace(/\/(blanc|white)\//gi, '/white/');
+    key = key.replace(/\/(negre|black)\//gi, '/black/');
 
     const baseFolder = normalizeToStorageColor(colorCtx?.base_color);
     const drawingFolder = normalizeToStorageColor(colorCtx?.drawing_color);
     if (baseFolder && drawingFolder) {
       key = key.replace(
-        /\/(blanc|negre)\/(blanc|negre)\//gi,
+        /\/(white|black)\/(white|black)\//gi,
         `/${baseFolder}/${drawingFolder}/`
       );
     }

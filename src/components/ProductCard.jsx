@@ -20,7 +20,7 @@ function ProductCard({ product, onAddToCart, cartItems = [], variant = 'default'
   })();
 
   const productId = product?.id;
-  const productSlugOrId = product?.slug || productId;
+  const productSlugOrId = product?.slug || productId || product?.gelatoProductId;
   const productUrl = productSlugOrId ? `/product/${productSlugOrId}` : '/';
   const productName = product?.name || 'Producte';
 
@@ -132,8 +132,9 @@ function ProductCard({ product, onAddToCart, cartItems = [], variant = 'default'
       <div
         className="flex flex-row w-full p-3 rounded-sm transition-all duration-300 gap-4 bg-background"
       >
+        <Link to={productUrl} aria-label={productName} className="absolute inset-0 z-10" />
         {/* Imatge petita a l'esquerra */}
-        <Link to={productUrl} className="flex-shrink-0">
+        <Link to={productUrl} className="relative z-20 flex-shrink-0">
           <div
             className="w-20 h-20 md:w-24 md:h-24 bg-background overflow-hidden rounded-sm"
             style={{
@@ -151,7 +152,7 @@ function ProductCard({ product, onAddToCart, cartItems = [], variant = 'default'
         </Link>
 
         {/* Contingut a la dreta */}
-        <div className="flex-1 flex flex-col justify-between gap-2">
+        <div className="relative z-20 flex-1 flex flex-col justify-between gap-2">
           {/* Títol centrat */}
           <div className="text-center">
             <Link to={productUrl} className="block">
@@ -190,8 +191,9 @@ function ProductCard({ product, onAddToCart, cartItems = [], variant = 'default'
       className="flex flex-col w-full rounded-sm transition-all duration-300 relative bg-background"
       style={{ padding: styles.padding }}
     >
+      <Link to={productUrl} aria-label={productName} className="absolute inset-0 z-10" />
       {/* Imatge amb ombra a 45º només en hover */}
-      <Link to={productUrl} className="block group relative" style={{ marginBottom: styles.marginBottom }}>
+      <Link to={productUrl} className="relative z-20 block group" style={{ marginBottom: styles.marginBottom }}>
         <div
           className="aspect-square bg-background overflow-hidden rounded-sm transition-shadow duration-300"
           style={{
@@ -215,7 +217,7 @@ function ProductCard({ product, onAddToCart, cartItems = [], variant = 'default'
       </Link>
 
       {/* Contingut */}
-      <div className="flex flex-col text-center" style={{ gap: styles.gap }}>
+      <div className="relative z-20 flex flex-col text-center" style={{ gap: styles.gap }}>
         {/* Nom del producte - OSWALD Responsive CENTRAT - 1 LÍNIA FIXA */}
         <Link to={productUrl} className="block">
           <h3

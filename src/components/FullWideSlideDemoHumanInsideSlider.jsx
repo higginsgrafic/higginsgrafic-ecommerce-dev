@@ -17,6 +17,7 @@ export default function FullWideSlideDemoHumanInsideSlider({
   onHumanBlack,
   onHumanPrev,
   onHumanNext,
+  onSelectItem,
   OptimizedImg,
   FirstContactDibuix00Buttons,
   FirstContactDibuix09Buttons,
@@ -49,14 +50,19 @@ export default function FullWideSlideDemoHumanInsideSlider({
     if (typeof p !== 'string') return null;
     if (!isPathItem(p)) return null;
     let next = p;
+
+    // Normalize legacy folder names to canonical ones.
+    if (next.includes('/blanc/')) next = next.replace('/blanc/', '/white/');
+    if (next.includes('/negre/')) next = next.replace('/negre/', '/black/');
+    if (next.startsWith('blanc/')) next = `white/${next.slice('blanc/'.length)}`;
+    if (next.startsWith('negre/')) next = `black/${next.slice('negre/'.length)}`;
+
     if (!variant || variant === 'black') {
       if (next.includes('/white/')) next = next.replace('/white/', '/black/');
-      if (next.includes('/blanc/')) next = next.replace('/blanc/', '/negre/');
       if (/-w\.(png|jpg|jpeg|webp)$/i.test(next)) next = next.replace(/-w\.(png|jpg|jpeg|webp)$/i, '-b.$1');
       return next;
     }
     if (next.includes('/black/')) next = next.replace('/black/', '/white/');
-    if (next.includes('/negre/')) next = next.replace('/negre/', '/blanc/');
     if (/-b\.(png|jpg|jpeg|webp)$/i.test(next)) next = next.replace(/-b\.(png|jpg|jpeg|webp)$/i, '-w.$1');
     return next;
   };
@@ -325,13 +331,34 @@ export default function FullWideSlideDemoHumanInsideSlider({
                     <Link
                       to="#"
                       className="relative z-40 flex h-4 w-full items-center justify-center whitespace-nowrap rounded-none bg-muted px-2 text-xs leading-4 text-muted-foreground hover:text-foreground focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                      onClick={(e) => {
+                        if (typeof onSelectItem !== 'function') return;
+                        e.preventDefault();
+                        onSelectItem(it);
+                      }}
                     >
                       {labelForItem(it)}
                     </Link>
                   )}
 
                   {resolveSrc(it) ? (
-                    <div className="relative z-10 mt-2 aspect-square w-full overflow-hidden" ref={shouldMeasure ? tileSizeRef : undefined}>
+                    <div
+                      className="relative z-10 mt-2 aspect-square w-full overflow-hidden"
+                      ref={shouldMeasure ? tileSizeRef : undefined}
+                      onClick={(e) => {
+                        if (typeof onSelectItem !== 'function') return;
+                        e.preventDefault();
+                        onSelectItem(it);
+                      }}
+                      role={typeof onSelectItem === 'function' ? 'button' : undefined}
+                      tabIndex={typeof onSelectItem === 'function' ? 0 : undefined}
+                      onKeyDown={(e) => {
+                        if (typeof onSelectItem !== 'function') return;
+                        if (e.key !== 'Enter' && e.key !== ' ') return;
+                        e.preventDefault();
+                        onSelectItem(it);
+                      }}
+                    >
                       <OptimizedImg
                         src={resolveSrc(it)}
                         alt={collectionId === 'outcasted' && isPathItem(it) ? '' : labelForItem(it) || it}

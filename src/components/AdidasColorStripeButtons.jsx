@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 
 export default function AdidasColorStripeButtons({
   megaTileSize,
@@ -7,6 +8,8 @@ export default function AdidasColorStripeButtons({
   onSelect,
   colorLabelBySlug,
   colorButtonSrcBySlug,
+  overlaySrc,
+  overlayClassName,
   itemLeftOffsetPxByIndex,
   redistributeBetweenFirstAndLast = false,
   firstOffsetPx = -20,
@@ -18,6 +21,9 @@ export default function AdidasColorStripeButtons({
   debugSelectedPanel = '',
 }) {
   const items = useMemo(() => (Array.isArray(selectedColorOrder) ? selectedColorOrder.slice(0, 14) : []), [selectedColorOrder]);
+
+  const stripeRootRef = useRef(null);
+  const [hudFixedPos, setHudFixedPos] = useState(null);
 
   const selectedTileRef = useRef(null);
   const [selectedTileSize, setSelectedTileSize] = useState({ w: 0, h: 0 });
@@ -34,6 +40,10 @@ export default function AdidasColorStripeButtons({
     return Number.isFinite(n) ? n : fallback;
   };
 
+  const stripeOverlayTopPct = parseFloatParam('stripeOverlayTop', 44);
+  const stripeOverlayWPct = parseFloatParam('stripeOverlayW', 72);
+  const stripeOverlayHPct = parseFloatParam('stripeOverlayH', 40);
+
   const parseIntParam = (key, fallback) => {
     const raw = urlParams?.get(key);
     if (raw == null || raw === '') return fallback;
@@ -41,8 +51,301 @@ export default function AdidasColorStripeButtons({
     return Number.isFinite(n) ? n : fallback;
   };
 
+  const parseStringParam = (key, fallback) => {
+    const raw = urlParams?.get(key);
+    if (raw == null || raw === '') return fallback;
+    return raw.toString();
+  };
+
   const stripeDotXPx = parseFloatParam('stripeDotX', 52);
   const stripeDotYPx = parseFloatParam('stripeDotY', -6.5);
+
+  const stripeRefMockupSrc = parseStringParam('stripeRefMockup', '');
+  const stripeRefTargetSlug = parseStringParam('stripeRefTarget', '');
+  const stripeRefTargetIndex = parseIntParam('stripeRefTargetIndex', 0);
+  const stripeRefBlend = parseStringParam('stripeRefBlend', 'multiply');
+  const stripeRefOpacity = parseFloatParam(
+    'stripeRefOpacity',
+    stripeRefBlend === 'average' && !urlParams?.has('stripeRefOpacity') ? 0.5 : 1,
+  );
+  const stripeRefBlendCss = stripeRefBlend === 'average' ? 'normal' : stripeRefBlend;
+  const useFirstContactRed9RefDefaults =
+    stripeRefTargetIndex === 9 &&
+    typeof stripeRefMockupSrc === 'string' &&
+    stripeRefMockupSrc.includes('first-contact-') &&
+    stripeRefMockupSrc.includes('-black-white.png');
+  const stripeRefXParam = parseFloatParam('stripeRefX', useFirstContactRed9RefDefaults ? -46 : 0);
+  const stripeRefYParam = parseFloatParam('stripeRefY', useFirstContactRed9RefDefaults ? 0 : 0);
+  const stripeRefScaleParam = parseFloatParam('stripeRefScale', useFirstContactRed9RefDefaults ? 1.315 : 1);
+
+  const overlayKey = typeof overlaySrc === 'string' ? overlaySrc.toLowerCase() : '';
+  const isOverlayNcc1701D = stripeRefTargetIndex === 9 && overlayKey.includes('ncc-1701-d');
+  const isOverlayNcc1701 = stripeRefTargetIndex === 9 && overlayKey.includes('ncc-1701') && !overlayKey.includes('ncc-1701-d');
+  const isOverlayNx01 = stripeRefTargetIndex === 9 && overlayKey.includes('nx-01');
+  const isOverlayWormhole = stripeRefTargetIndex === 9 && overlayKey.includes('wormhole');
+  const isOverlayPlasmaEscape = stripeRefTargetIndex === 9 && overlayKey.includes('plasma-escape');
+  const isOverlayVulcansEnd = stripeRefTargetIndex === 9 && overlayKey.includes("vulcan") && overlayKey.includes('end');
+  const isOverlayPhoenix = stripeRefTargetIndex === 9 && (overlayKey.includes('the-phoenix') || overlayKey.includes('the_phoenix') || overlayKey.includes('phoenix'));
+  const stripeOverlayXParam = parseFloatParam(
+    'stripeOverlayX',
+    isOverlayVulcansEnd
+      ? -25
+      : isOverlayPlasmaEscape
+        ? -19
+        : isOverlayPhoenix
+          ? -55
+        : isOverlayWormhole
+          ? -17
+          : isOverlayNx01
+            ? -55
+            : isOverlayNcc1701D
+              ? 0
+              : isOverlayNcc1701
+                ? -1
+                : 0,
+  );
+  const stripeOverlayYParam = parseFloatParam(
+    'stripeOverlayY',
+    isOverlayVulcansEnd
+      ? 35
+      : isOverlayPlasmaEscape
+        ? 10
+        : isOverlayPhoenix
+          ? 3
+        : isOverlayWormhole
+          ? 115
+          : isOverlayNx01
+            ? 21
+            : isOverlayNcc1701D
+              ? 18
+              : isOverlayNcc1701
+                ? 18
+                : 0,
+  );
+  const stripeOverlayScaleParam = parseFloatParam(
+    'stripeOverlayScale',
+    isOverlayVulcansEnd
+      ? 1.04
+      : isOverlayPlasmaEscape
+        ? 0.925
+        : isOverlayPhoenix
+          ? 1.59
+        : isOverlayWormhole
+          ? 0.895
+          : isOverlayNx01
+            ? 0.48
+            : isOverlayNcc1701D
+              ? 0.585
+              : isOverlayNcc1701
+                ? 0.595
+                : 1,
+  );
+
+  const stripeCalibModeParam = parseStringParam('stripeCalibMode', 'ref');
+  const stripeHudPos = parseStringParam('stripeHudPos', 'below-deck');
+
+  const geometrySignature = useMemo(() => {
+    const mt = Number.isFinite(megaTileSize) ? Math.round(megaTileSize) : 0;
+    const cf = Number.isFinite(compressFactor) ? Number(compressFactor).toFixed(3) : '0';
+    const fo = Number.isFinite(firstOffsetPx) ? Math.round(firstOffsetPx) : 0;
+    const lo = Number.isFinite(lastOffsetPx) ? Math.round(lastOffsetPx) : 0;
+    const cr = Number.isFinite(cropFirstRightPx) ? Math.round(cropFirstRightPx) : 0;
+    const rb = redistributeBetweenFirstAndLast ? 1 : 0;
+    return `mt${mt}_cf${cf}_fo${fo}_lo${lo}_cr${cr}_rb${rb}`;
+  }, [megaTileSize, compressFactor, firstOffsetPx, lastOffsetPx, cropFirstRightPx, redistributeBetweenFirstAndLast]);
+
+  const calibrationStorageKey = useMemo(() => {
+    const base = 'stripeRefCalib';
+    const t = stripeRefTargetIndex ? `i${stripeRefTargetIndex}` : stripeRefTargetSlug ? `s${stripeRefTargetSlug}` : 'all';
+    const m = stripeRefMockupSrc ? stripeRefMockupSrc.replace(/[^a-z0-9]+/gi, '_').slice(0, 48) : 'none';
+    const g = geometrySignature;
+    return `${base}_${t}_${m}_${g}`;
+  }, [geometrySignature, stripeRefMockupSrc, stripeRefTargetIndex, stripeRefTargetSlug]);
+
+  const overlayCalibrationStorageKey = useMemo(() => {
+    const base = 'stripeOverlayCalib';
+    const t = stripeRefTargetIndex ? `i${stripeRefTargetIndex}` : 'all';
+    const m = overlaySrc ? overlaySrc.replace(/[^a-z0-9]+/gi, '_').slice(0, 48) : 'none';
+    const g = geometrySignature;
+    return `${base}_${t}_${m}_${g}`;
+  }, [geometrySignature, overlaySrc, stripeRefTargetIndex]);
+
+  useEffect(() => {
+    if (stripeHudPos !== 'below-deck') {
+      setHudFixedPos(null);
+      return undefined;
+    }
+    if (!stripeRefMockupSrc && !overlaySrc) {
+      setHudFixedPos(null);
+      return undefined;
+    }
+
+    const update = () => {
+      const el = stripeRootRef.current;
+      if (!el) return;
+      const r = el.getBoundingClientRect();
+      setHudFixedPos((prev) => {
+        const next = { top: Math.round(r.bottom + 8), left: Math.round(r.left + 8) };
+        if (prev && prev.top === next.top && prev.left === next.left) return prev;
+        return next;
+      });
+    };
+
+    update();
+    window.addEventListener('resize', update);
+    window.addEventListener('scroll', update, true);
+    return () => {
+      window.removeEventListener('resize', update);
+      window.removeEventListener('scroll', update, true);
+    };
+  }, [overlaySrc, stripeHudPos, stripeRefMockupSrc]);
+
+  const [stripeRefX, setStripeRefX] = useState(stripeRefXParam);
+  const [stripeRefY, setStripeRefY] = useState(stripeRefYParam);
+  const [stripeRefScale, setStripeRefScale] = useState(stripeRefScaleParam);
+
+  const [stripeOverlayX, setStripeOverlayX] = useState(stripeOverlayXParam);
+  const [stripeOverlayY, setStripeOverlayY] = useState(stripeOverlayYParam);
+  const [stripeOverlayScale, setStripeOverlayScale] = useState(stripeOverlayScaleParam);
+
+  const [stripeCalibMode, setStripeCalibMode] = useState(stripeCalibModeParam === 'overlay' ? 'overlay' : 'ref');
+
+  useEffect(() => {
+    if (!stripeRefMockupSrc) return;
+    try {
+      const raw = window.localStorage.getItem(calibrationStorageKey);
+      if (!raw) {
+        setStripeRefX(stripeRefXParam);
+        setStripeRefY(stripeRefYParam);
+        setStripeRefScale(stripeRefScaleParam);
+        return;
+      }
+      const parsed = JSON.parse(raw);
+      if (typeof parsed?.x === 'number' && Number.isFinite(parsed.x)) setStripeRefX(parsed.x);
+      else setStripeRefX(stripeRefXParam);
+      if (typeof parsed?.y === 'number' && Number.isFinite(parsed.y)) setStripeRefY(parsed.y);
+      else setStripeRefY(stripeRefYParam);
+      if (typeof parsed?.s === 'number' && Number.isFinite(parsed.s)) setStripeRefScale(parsed.s);
+      else setStripeRefScale(stripeRefScaleParam);
+    } catch {
+      setStripeRefX(stripeRefXParam);
+      setStripeRefY(stripeRefYParam);
+      setStripeRefScale(stripeRefScaleParam);
+    }
+  }, [calibrationStorageKey, stripeRefMockupSrc, stripeRefScaleParam, stripeRefXParam, stripeRefYParam]);
+
+  useEffect(() => {
+    if (!overlaySrc) return;
+    try {
+      const raw = window.localStorage.getItem(overlayCalibrationStorageKey);
+      if (!raw) {
+        setStripeOverlayX(stripeOverlayXParam);
+        setStripeOverlayY(stripeOverlayYParam);
+        setStripeOverlayScale(stripeOverlayScaleParam);
+        return;
+      }
+      const parsed = JSON.parse(raw);
+      if (typeof parsed?.x === 'number' && Number.isFinite(parsed.x)) setStripeOverlayX(parsed.x);
+      else setStripeOverlayX(stripeOverlayXParam);
+      if (typeof parsed?.y === 'number' && Number.isFinite(parsed.y)) setStripeOverlayY(parsed.y);
+      else setStripeOverlayY(stripeOverlayYParam);
+      if (typeof parsed?.s === 'number' && Number.isFinite(parsed.s)) setStripeOverlayScale(parsed.s);
+      else setStripeOverlayScale(stripeOverlayScaleParam);
+    } catch {
+      setStripeOverlayX(stripeOverlayXParam);
+      setStripeOverlayY(stripeOverlayYParam);
+      setStripeOverlayScale(stripeOverlayScaleParam);
+    }
+  }, [overlayCalibrationStorageKey, overlaySrc, stripeOverlayScaleParam, stripeOverlayXParam, stripeOverlayYParam]);
+
+  useEffect(() => {
+    if (!stripeRefMockupSrc) return;
+    try {
+      window.localStorage.setItem(calibrationStorageKey, JSON.stringify({ x: stripeRefX, y: stripeRefY, s: stripeRefScale }));
+    } catch {
+      // ignore
+    }
+  }, [calibrationStorageKey, stripeRefMockupSrc, stripeRefScale, stripeRefX, stripeRefY]);
+
+  useEffect(() => {
+    if (!overlaySrc) return;
+    try {
+      window.localStorage.setItem(
+        overlayCalibrationStorageKey,
+        JSON.stringify({ x: stripeOverlayX, y: stripeOverlayY, s: stripeOverlayScale }),
+      );
+    } catch {
+      // ignore
+    }
+  }, [overlayCalibrationStorageKey, overlaySrc, stripeOverlayScale, stripeOverlayX, stripeOverlayY]);
+
+  useEffect(() => {
+    if (!stripeRefMockupSrc && !overlaySrc) return;
+
+    const onKeyDown = (e) => {
+      if (e.metaKey || e.ctrlKey || e.altKey) return;
+      const el = typeof document !== 'undefined' ? document.activeElement : null;
+      const tag = el && typeof el.tagName === 'string' ? el.tagName.toLowerCase() : '';
+      const isTypingTarget =
+        tag === 'input' ||
+        tag === 'textarea' ||
+        tag === 'select' ||
+        (el && typeof el.isContentEditable === 'boolean' && el.isContentEditable);
+      if (isTypingTarget) return;
+
+      if (e.key === 'Tab') {
+        e.preventDefault();
+        setStripeCalibMode((m) => (m === 'ref' ? 'overlay' : 'ref'));
+        return;
+      }
+      if (e.key === 'r' || e.key === 'R') {
+        setStripeCalibMode('ref');
+        return;
+      }
+      if (e.key === 'o' || e.key === 'O') {
+        setStripeCalibMode('overlay');
+        return;
+      }
+
+      const step = e.shiftKey ? 10 : 1;
+      const isOverlay = stripeCalibMode === 'overlay';
+      if (e.key === 'ArrowLeft') {
+        e.preventDefault();
+        if (isOverlay) setStripeOverlayX((v) => v - step);
+        else setStripeRefX((v) => v - step);
+        return;
+      }
+      if (e.key === 'ArrowRight') {
+        e.preventDefault();
+        if (isOverlay) setStripeOverlayX((v) => v + step);
+        else setStripeRefX((v) => v + step);
+        return;
+      }
+      if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        if (isOverlay) setStripeOverlayY((v) => v - step);
+        else setStripeRefY((v) => v - step);
+        return;
+      }
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        if (isOverlay) setStripeOverlayY((v) => v + step);
+        else setStripeRefY((v) => v + step);
+        return;
+      }
+
+      if (e.key === '+' || e.key === '=' || e.key === '-') {
+        e.preventDefault();
+        const delta = e.key === '-' ? -0.005 : 0.005;
+        if (isOverlay) setStripeOverlayScale((v) => Number((v + delta).toFixed(3)));
+        else setStripeRefScale((v) => Number((v + delta).toFixed(3)));
+        return;
+      }
+    };
+
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [overlaySrc, stripeCalibMode, stripeRefMockupSrc]);
 
   useEffect(() => {
     if (!megaTileSize) return;
@@ -63,6 +366,8 @@ export default function AdidasColorStripeButtons({
 
     return () => ro.disconnect();
   }, [items.length, megaTileSize, selectedColorSlug]);
+
+  const containerH = megaTileSize;
 
   useEffect(() => {
     if (!megaTileSize) return;
@@ -122,12 +427,89 @@ export default function AdidasColorStripeButtons({
   };
 
   return (
-    <div
-      className="absolute left-0 top-0 z-[40]"
-      style={{ height: `${megaTileSize}px`, pointerEvents: 'auto' }}
-    >
+    <>
+      {stripeHudPos === 'below-deck' && (stripeRefMockupSrc || overlaySrc) && typeof document !== 'undefined'
+        ? createPortal(
+            <div
+              className="pointer-events-none fixed z-[30000] rounded-md bg-black/70 px-2 py-1 font-mono text-[10px] text-white"
+              style={{
+                top: `${hudFixedPos?.top ?? 0}px`,
+                left: `${hudFixedPos?.left ?? 0}px`,
+                backdropFilter: 'blur(4px)',
+              }}
+            >
+              <div>Calib: Tab toggle, R=ref, O=overlay</div>
+              <div>Arrows (Shift=10px), +/- scale</div>
+              <div>Mode: {stripeCalibMode}</div>
+              {stripeRefMockupSrc ? (
+                <>
+                  <div>
+                    Ref X:{stripeRefX} Y:{stripeRefY} S:{stripeRefScale}
+                  </div>
+                  <div>
+                    stripeRefX={stripeRefX}&amp;stripeRefY={stripeRefY}&amp;stripeRefScale={stripeRefScale}
+                  </div>
+                </>
+              ) : null}
+              {overlaySrc ? (
+                <>
+                  <div>
+                    Overlay X:{stripeOverlayX} Y:{stripeOverlayY} S:{stripeOverlayScale}
+                  </div>
+                  <div>
+                    stripeOverlayX={stripeOverlayX}&amp;stripeOverlayY={stripeOverlayY}&amp;stripeOverlayScale={stripeOverlayScale}
+                  </div>
+                </>
+              ) : null}
+            </div>,
+            document.body
+          )
+        : null}
+
+      <div
+        ref={stripeRootRef}
+        className="absolute left-0 top-0 z-[40] w-full"
+        style={{ height: `${containerH}px`, pointerEvents: 'none' }}
+      >
+        {stripeHudPos !== 'below-deck' && (stripeRefMockupSrc || overlaySrc) ? (
+          <div
+            className={`pointer-events-none absolute z-[999] rounded-md bg-black/70 px-2 py-1 font-mono text-[10px] text-white ${
+              stripeHudPos === 'above-left' || stripeHudPos === 'left' ? 'left-2' : 'right-2'
+            }`}
+            style={{
+              top: stripeHudPos.startsWith('above') ? 0 : 8,
+              transform: stripeHudPos.startsWith('above') ? 'translateY(calc(-100% - 8px))' : undefined,
+              backdropFilter: 'blur(4px)',
+            }}
+          >
+            <div>Calib: Tab toggle, R=ref, O=overlay</div>
+            <div>Arrows (Shift=10px), +/- scale</div>
+            <div>Mode: {stripeCalibMode}</div>
+            {stripeRefMockupSrc ? (
+              <>
+                <div>
+                  Ref X:{stripeRefX} Y:{stripeRefY} S:{stripeRefScale}
+                </div>
+                <div>
+                  stripeRefX={stripeRefX}&amp;stripeRefY={stripeRefY}&amp;stripeRefScale={stripeRefScale}
+                </div>
+              </>
+            ) : null}
+            {overlaySrc ? (
+              <>
+                <div>
+                  Overlay X:{stripeOverlayX} Y:{stripeOverlayY} S:{stripeOverlayScale}
+                </div>
+                <div>
+                  stripeOverlayX={stripeOverlayX}&amp;stripeOverlayY={stripeOverlayY}&amp;stripeOverlayScale={stripeOverlayScale}
+                </div>
+              </>
+            ) : null}
+          </div>
+        ) : null}
       {items.map((slug, idx) => {
         const src = colorButtonSrcBySlug?.[slug];
+        const zLayer = 100 - idx;
         const lastIdx = Math.max(0, items.length - 1);
         const offsetThis = Number.isFinite(itemLeftOffsetPxByIndex?.[idx]) ? itemLeftOffsetPxByIndex[idx] : 0;
         const offsetFirst = Number.isFinite(itemLeftOffsetPxByIndex?.[0]) ? itemLeftOffsetPxByIndex[0] : 0;
@@ -237,10 +619,10 @@ export default function AdidasColorStripeButtons({
             ref={isSelected ? selectedTileRef : null}
             style={{
               width: `${buttonW}px`,
-              height: `${megaTileSize}px`,
+              height: `${containerH}px`,
               left: `${left}px`,
               pointerEvents: 'none',
-              zIndex: 100 - idx,
+              zIndex: zLayer,
             }}
           >
             <div
@@ -255,14 +637,14 @@ export default function AdidasColorStripeButtons({
                   data-slug={slug}
                   style={{
                     left: `${((dotCalibrationRef.current?.rx ?? (stripeDotXPx / buttonW)) * (selectedTileSize.w || buttonW))}px`,
-                    top: `${((dotCalibrationRef.current?.ry ?? (stripeDotYPx / megaTileSize)) * (selectedTileSize.h || megaTileSize))}px`,
+                    top: `${((dotCalibrationRef.current?.ry ?? (stripeDotYPx / containerH)) * (selectedTileSize.h || containerH))}px`,
                     transform: 'translate(-50%, -50%)',
                   }}
                 />
               ) : null}
               {src ? (
                 <span
-                  className="absolute inset-0 overflow-visible"
+                  className="absolute inset-0 overflow-hidden"
                   style={shouldClip ? { clipPath: firstClip, WebkitClipPath: firstClip } : undefined}
                 >
                   <img
@@ -273,6 +655,43 @@ export default function AdidasColorStripeButtons({
                       width: `${buttonW}px`,
                     }}
                   />
+
+                  {stripeRefMockupSrc &&
+                  (stripeRefTargetIndex
+                    ? stripeRefTargetIndex === idx + 1
+                    : stripeRefTargetSlug
+                      ? stripeRefTargetSlug === slug
+                      : true) ? (
+                    <img
+                      src={stripeRefMockupSrc}
+                      alt=""
+                      className="pointer-events-none absolute inset-0 h-full w-full object-contain object-bottom"
+                      style={{
+                        zIndex: 40,
+                        opacity: stripeRefOpacity,
+                        mixBlendMode: stripeRefBlendCss,
+                        transform: `translate(${stripeRefX}px, ${stripeRefY}px) scale(${stripeRefScale})`,
+                        transformOrigin: 'top left',
+                      }}
+                    />
+                  ) : null}
+
+                  {overlaySrc ? (
+                    <img
+                      src={overlaySrc}
+                      alt=""
+                      className={`pointer-events-none absolute left-1/2 object-contain ${overlayClassName || ''}`}
+                      style={{
+                        top: `${stripeOverlayTopPct}%`,
+                        width: `${stripeOverlayWPct}%`,
+                        height: `${stripeOverlayHPct}%`,
+                        transform: `translate(-50%, -50%) translate(${stripeOverlayX}px, ${stripeOverlayY}px) scale(${stripeOverlayScale})`,
+                        transformOrigin: 'top left',
+                        zIndex: 30,
+                        opacity: 1,
+                      }}
+                    />
+                  ) : null}
                 </span>
               ) : null}
             </div>
@@ -284,12 +703,12 @@ export default function AdidasColorStripeButtons({
                   onClick={() => onSelect?.(slug)}
                   aria-label={colorLabelBySlug?.[slug] || slug}
                   aria-pressed={isSelected}
-                  className="absolute bg-transparent focus:outline-none focus-visible:ring-2 focus-visible:ring-black/30"
+                  className="pointer-events-auto absolute bg-transparent focus:outline-none focus-visible:ring-2 focus-visible:ring-black/30"
                   style={{
                     outline: debugStripeHit
-                      ? debugSelectedPanel === '1p1'
-                        ? '1px solid rgba(0,120,255,0.95)'
-                        : '1px solid rgba(255,0,0,0.55)'
+                      ? isSelected
+                        ? '2px solid #22c55e'
+                        : '1px solid rgba(0,0,0,0.15)'
                       : undefined,
                     left: `${Math.round((s1X / sectorBaseW) * buttonW) + s1OffsetXPx + p1OffsetXPx + globalOffsetXPx}px`,
                     top: `${Math.round((s1Y / sectorBaseH) * megaTileSize) + p1OffsetYPx + globalOffsetYPx}px`,
@@ -529,6 +948,7 @@ export default function AdidasColorStripeButtons({
           </div>
         );
       })}
-    </div>
+      </div>
+    </>
   );
 }

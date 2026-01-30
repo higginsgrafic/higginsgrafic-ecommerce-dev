@@ -11,59 +11,113 @@ import MegaStripeCatalogPanel from './MegaStripeCatalogPanel.jsx';
 import FullWideSlideDemoHumanInsideSlider from './FullWideSlideDemoHumanInsideSlider.jsx';
 
 const FIRST_CONTACT_MEDIA = {
-  'NX-01': '/custom_logos/drawings/first_contact/negre/1-nx-01-b.webp',
-  'NCC-1701': '/custom_logos/drawings/first_contact/negre/2-ncc-1701-b.webp',
-  'NCC-1701-D': '/custom_logos/drawings/first_contact/negre/3-ncc-1701-d-b.webp',
-  'Wormhole': '/custom_logos/drawings/first_contact/negre/4-wormhole-b.webp',
-  'Plasma Escape': '/custom_logos/drawings/first_contact/negre/5-plasma-escape-b.webp',
-  "Vulcan's End": '/custom_logos/drawings/first_contact/negre/6-vulcans-end-b.webp',
-  'The Phoenix': '/custom_logos/drawings/first_contact/negre/7-the-phoenix-b.webp',
+  'NX-01': '/custom_logos/drawings/first_contact/black/1-nx-01-b.webp',
+  'NCC-1701': '/custom_logos/drawings/first_contact/black/2-ncc-1701-b.webp',
+  'NCC-1701-D': '/custom_logos/drawings/first_contact/black/3-ncc-1701-d-b.webp',
+  'Wormhole': '/custom_logos/drawings/first_contact/black/4-wormhole-b.webp',
+  'Plasma Escape': '/custom_logos/drawings/first_contact/black/5-plasma-escape-b.webp',
+  "Vulcan's End": '/custom_logos/drawings/first_contact/black/6-vulcans-end-b.webp',
+  'The Phoenix': '/custom_logos/drawings/first_contact/black/7-the-phoenix-b.webp',
 };
 
 const CONTROL_TILE_BN = 'botonera-bn';
 const CONTROL_TILE_ARROWS = 'botonera-fletxes';
 
 const FIRST_CONTACT_MEDIA_WHITE = {
-  'NX-01': '/custom_logos/drawings/first_contact/blanc/1-nx-01-w.webp',
-  'NCC-1701': '/custom_logos/drawings/first_contact/blanc/2-ncc-1701-w.webp',
-  'NCC-1701-D': '/custom_logos/drawings/first_contact/blanc/3-ncc-1701-d-w.webp',
-  'Wormhole': '/custom_logos/drawings/first_contact/blanc/4-wormhole-w.webp',
-  'Plasma Escape': '/custom_logos/drawings/first_contact/blanc/5-plasma-escape-w.webp',
-  "Vulcan's End": '/custom_logos/drawings/first_contact/blanc/6-vulcans-end-w.webp',
-  'The Phoenix': '/custom_logos/drawings/first_contact/blanc/7-the-phoenix-w.webp',
+  'NX-01': '/custom_logos/drawings/first_contact/white/1-nx-01-w.webp',
+  'NCC-1701': '/custom_logos/drawings/first_contact/white/2-ncc-1701-w.webp',
+  'NCC-1701-D': '/custom_logos/drawings/first_contact/white/3-ncc-1701-d-w.webp',
+  'Wormhole': '/custom_logos/drawings/first_contact/white/4-wormhole-w.webp',
+  'Plasma Escape': '/custom_logos/drawings/first_contact/white/5-plasma-escape-w.webp',
+  "Vulcan's End": '/custom_logos/drawings/first_contact/white/6-vulcans-end-w.webp',
+  'The Phoenix': '/custom_logos/drawings/first_contact/white/7-the-phoenix-w.webp',
 };
 
 const THE_HUMAN_INSIDE_MEDIA = {
-  'C3P0': '/custom_logos/drawings/the_human_inside/negre/7-c3p0-b4.webp',
-  'Vader': '/custom_logos/drawings/the_human_inside/negre/8-vader-b4.webp',
-  'Afrodita': '/custom_logos/drawings/the_human_inside/negre/9-afrodita-a-b3.webp',
-  'Mazinger': '/custom_logos/drawings/the_human_inside/negre/10-mazinger-b4.webp',
-  'Cylon 78': '/custom_logos/drawings/the_human_inside/negre/11-cylon-78-b4.webp',
-  'Cylon 03': '/custom_logos/drawings/the_human_inside/negre/12-cylon-03-b1.webp',
-  'Iron Man 68': '/custom_logos/drawings/the_human_inside/negre/13-iron-man-68-b1.webp',
-  'Iron Man 08': '/custom_logos/drawings/the_human_inside/negre/14-ironman-08-b4.webp',
-  'Cyberman': '/custom_logos/drawings/the_human_inside/negre/15-cyberman-b4.webp',
-  'Maschinenmensch': '/custom_logos/drawings/the_human_inside/negre/16-maschinenmensch-b1.webp',
-  'Robocop': '/custom_logos/drawings/the_human_inside/negre/17-robocop-b4.webp',
-  'Terminator': '/custom_logos/drawings/the_human_inside/negre/18-terminator-b4.webp',
-  'Robbie the Robot': '/custom_logos/drawings/the_human_inside/negre/19-robbie-the-robot-b1.webp',
+  'C3P0': '/custom_logos/drawings/the_human_inside/black/7-c3p0-b4.webp',
+  'Vader': '/custom_logos/drawings/the_human_inside/black/8-vader-b4.webp',
+  'Afrodita': '/custom_logos/drawings/the_human_inside/black/9-afrodita-a-b3.webp',
+  'Mazinger': '/custom_logos/drawings/the_human_inside/black/10-mazinger-b4.webp',
+  'Cylon 78': '/custom_logos/drawings/the_human_inside/black/11-cylon-78-b4.webp',
+  'Cylon 03': '/custom_logos/drawings/the_human_inside/black/12-cylon-03-b1.webp',
+  'Iron Man 68': '/custom_logos/drawings/the_human_inside/black/13-iron-man-68-b1.webp',
+  'Iron Man 08': '/custom_logos/drawings/the_human_inside/black/14-ironman-08-b4.webp',
+  'Cyberman': '/custom_logos/drawings/the_human_inside/black/15-cyberman-b4.webp',
+  'Maschinenmensch': '/custom_logos/drawings/the_human_inside/black/16-maschinenmensch-b1.webp',
+  'Robocop': '/custom_logos/drawings/the_human_inside/black/17-robocop-b4.webp',
+  'Terminator': '/custom_logos/drawings/the_human_inside/black/18-terminator-b4.webp',
+  'Robbie the Robot': '/custom_logos/drawings/the_human_inside/black/19-robbie-the-robot-b1.webp',
 };
 
 const THE_HUMAN_INSIDE_MEDIA_WHITE = {
-  'C3P0': '/custom_logos/drawings/the_human_inside/blanc/7-c3p0-w1.webp',
-  'Vader': '/custom_logos/drawings/the_human_inside/blanc/8-vader-w4.webp',
-  'Afrodita': '/custom_logos/drawings/the_human_inside/blanc/9-afrodita-w4.webp',
-  'Mazinger': '/custom_logos/drawings/the_human_inside/blanc/10-mazinger-w1.webp',
-  'Cylon 78': '/custom_logos/drawings/the_human_inside/blanc/11-cylon-78-w4.webp',
-  'Cylon 03': '/custom_logos/drawings/the_human_inside/blanc/12-cylon-03-w3.webp',
-  'Iron Man 68': '/custom_logos/drawings/the_human_inside/blanc/13-iron-man-68-w4.webp',
-  'Iron Man 08': '/custom_logos/drawings/the_human_inside/blanc/14-iron-man-08-w4.webp',
-  'Cyberman': '/custom_logos/drawings/the_human_inside/blanc/15-cyberman-w1.webp',
-  'Maschinenmensch': '/custom_logos/drawings/the_human_inside/blanc/16-maschinenmensch-w1.webp',
-  'Robocop': '/custom_logos/drawings/the_human_inside/blanc/17-robocop-w3.webp',
-  'Terminator': '/custom_logos/drawings/the_human_inside/blanc/18-terminator-w1.webp',
-  'Robbie the Robot': '/custom_logos/drawings/the_human_inside/blanc/19-robbie-the-robot-w2.webp',
+  'C3P0': '/custom_logos/drawings/the_human_inside/white/7-c3p0-w1.webp',
+  'Vader': '/custom_logos/drawings/the_human_inside/white/8-vader-w4.webp',
+  'Afrodita': '/custom_logos/drawings/the_human_inside/white/9-afrodita-w4.webp',
+  'Mazinger': '/custom_logos/drawings/the_human_inside/white/10-mazinger-w1.webp',
+  'Cylon 78': '/custom_logos/drawings/the_human_inside/white/11-cylon-78-w4.webp',
+  'Cylon 03': '/custom_logos/drawings/the_human_inside/white/12-cylon-03-w3.webp',
+  'Iron Man 68': '/custom_logos/drawings/the_human_inside/white/13-iron-man-68-w4.webp',
+  'Iron Man 08': '/custom_logos/drawings/the_human_inside/white/14-iron-man-08-w4.webp',
+  'Cyberman': '/custom_logos/drawings/the_human_inside/white/15-cyberman-w1.webp',
+  'Maschinenmensch': '/custom_logos/drawings/the_human_inside/white/16-maschinenmensch-w1.webp',
+  'Robocop': '/custom_logos/drawings/the_human_inside/white/17-robocop-w3.webp',
+  'Terminator': '/custom_logos/drawings/the_human_inside/white/18-terminator-w1.webp',
+  'Robbie the Robot': '/custom_logos/drawings/the_human_inside/white/19-robbie-the-robot-w2.webp',
 };
+
+function FirstContactStripeMockupPanel({ megaTileSize, selectedItem, variant, resolveSrc, OptimizedImg }) {
+  if (!megaTileSize) return null;
+  if (!selectedItem) return null;
+  if (!resolveSrc) return null;
+  if (!OptimizedImg) return null;
+
+  const inkSrc = resolveSrc(selectedItem);
+  if (!inkSrc) return null;
+
+  const shirtSrc =
+    variant === 'white'
+      ? '/placeholders/apparel/t-shirt/gildan_5000/gildan-5000_t-shirt_crewneck_unisex_heavyWeight_xl_black_gpr-4-0_front.png'
+      : '/placeholders/apparel/t-shirt/gildan_5000/gildan-5000_t-shirt_crewneck_unisex_heavyWeight_xl_white_gpr-4-0_front.png';
+
+  const overlayClass =
+    selectedItem === 'The Phoenix'
+      ? 'scale-[0.43]'
+      : selectedItem === 'NX-01'
+        ? 'scale-[0.26]'
+        : selectedItem === 'NCC-1701'
+          ? 'scale-[0.41]'
+          : selectedItem === 'NCC-1701-D'
+            ? 'scale-[0.54]'
+            : selectedItem === 'Wormhole'
+              ? 'scale-[0.30]'
+              : selectedItem === 'Plasma Escape'
+                ? 'scale-[0.30]'
+                : selectedItem === "Vulcan's End"
+                  ? 'scale-[0.36]'
+                  : 'scale-[0.34]';
+
+  return (
+    <div
+      className="absolute top-0 z-[20]"
+      style={{
+        width: `${Math.round(megaTileSize * (4 / 3))}px`,
+        height: `${megaTileSize}px`,
+        right: 0,
+      }}
+    >
+      <div className="relative h-full w-full overflow-hidden rounded-md bg-muted">
+        <div className="relative h-full w-full">
+          <OptimizedImg src={shirtSrc} alt="" className="absolute inset-0 h-full w-full object-contain" />
+          <OptimizedImg
+            src={inkSrc}
+            alt=""
+            className={`absolute left-1/2 top-1/2 h-full w-full -translate-x-1/2 -translate-y-1/2 object-contain ${overlayClass}`}
+          />
+        </div>
+      </div>
+    </div>
+  );
+}
 
 const OptimizedImg = React.forwardRef(function OptimizedImg({ src, alt, className, style, ...rest }, ref) {
   const normalizeSrc = (value) => {
@@ -160,8 +214,8 @@ function FirstContactDibuix09Buttons({
   onNextPointerDown,
   onNextPointerUp,
 }) {
-  const iconH = tileSize ? Math.round(tileSize * 0.3) : 48;
-  const iconW = tileSize ? Math.round(tileSize * 0.15) : 24;
+  const hasPrevPointerHandlers = Boolean(onPrevPointerDown || onPrevPointerUp);
+  const hasNextPointerHandlers = Boolean(onNextPointerDown || onNextPointerUp);
 
   return (
     <div className="relative mt-2 aspect-square w-full">
@@ -169,7 +223,7 @@ function FirstContactDibuix09Buttons({
         <button
           type="button"
           aria-label="Anterior"
-          onClick={onPrev}
+          onClick={hasPrevPointerHandlers ? undefined : onPrev}
           onPointerDown={onPrevPointerDown}
           onPointerUp={onPrevPointerUp}
           onPointerCancel={onPrevPointerUp}
@@ -177,15 +231,15 @@ function FirstContactDibuix09Buttons({
           className="absolute left-0 top-0 h-full w-1/2 bg-transparent hover:bg-muted focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         >
           <ChevronLeft
-            className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-foreground"
-            style={{ height: `${iconH}px`, width: `${iconW}px` }}
-            strokeWidth={1.5}
+            className="pointer-events-none absolute left-1/2 top-1/2 h-5 w-5 -translate-x-1/2 -translate-y-1/2 text-foreground/80"
+            strokeWidth={1.75}
+            aria-hidden="true"
           />
         </button>
         <button
           type="button"
           aria-label="Següent"
-          onClick={onNext}
+          onClick={hasNextPointerHandlers ? undefined : onNext}
           onPointerDown={onNextPointerDown}
           onPointerUp={onNextPointerUp}
           onPointerCancel={onNextPointerUp}
@@ -193,9 +247,9 @@ function FirstContactDibuix09Buttons({
           className="absolute right-0 top-0 h-full w-1/2 bg-transparent hover:bg-muted focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         >
           <ChevronRight
-            className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-foreground"
-            style={{ height: `${iconH}px`, width: `${iconW}px` }}
-            strokeWidth={1.5}
+            className="pointer-events-none absolute left-1/2 top-1/2 h-5 w-5 -translate-x-1/2 -translate-y-1/2 text-foreground/80"
+            strokeWidth={1.75}
+            aria-hidden="true"
           />
         </button>
       </div>
@@ -207,24 +261,26 @@ function MegaColumn({
   title,
   items,
   row = false,
-  isFirstContact = false,
-  isHumanInside = false,
-  collectionId,
   megaTileSize,
-  humanInsideVariant = 'black',
-  firstContactVariant = 'black',
+  isFirstContact,
+  isHumanInside,
+  collectionId,
+  firstContactVariant,
+  humanInsideVariant,
   onFirstContactWhite,
   onFirstContactBlack,
   onHumanWhite,
   onHumanBlack,
   onHumanPrev,
   onHumanNext,
+  onSelectItem,
   onTileSize,
 }) {
   const tileSizeRef = useRef(null);
   const [tileSize, setTileSize] = useState(null);
   const humanInsideEnabled = Boolean(isHumanInside);
   const effectiveTileSize = megaTileSize || tileSize;
+  const [selectedItem, setSelectedItem] = useState(null);
 
   const effectiveItems = useMemo(() => {
     const list = Array.isArray(items) ? items.slice() : [];
@@ -283,14 +339,19 @@ function MegaColumn({
     if (typeof p !== 'string') return null;
     if (!isPathItem(p)) return null;
     let next = p;
+
+    // Normalize legacy folder names to canonical ones.
+    if (next.includes('/blanc/')) next = next.replace('/blanc/', '/white/');
+    if (next.includes('/negre/')) next = next.replace('/negre/', '/black/');
+    if (next.startsWith('blanc/')) next = `white/${next.slice('blanc/'.length)}`;
+    if (next.startsWith('negre/')) next = `black/${next.slice('negre/'.length)}`;
+
     if (!variant || variant === 'black') {
       if (next.includes('/white/')) next = next.replace('/white/', '/black/');
-      if (next.includes('/blanc/')) next = next.replace('/blanc/', '/negre/');
       if (/-w\.(png|jpg|jpeg|webp)$/i.test(next)) next = next.replace(/-w\.(png|jpg|jpeg|webp)$/i, '-b.$1');
       return next;
     }
     if (next.includes('/black/')) next = next.replace('/black/', '/white/');
-    if (next.includes('/negre/')) next = next.replace('/negre/', '/blanc/');
     if (/-b\.(png|jpg|jpeg|webp)$/i.test(next)) next = next.replace(/-b\.(png|jpg|jpeg|webp)$/i, '-w.$1');
     return next;
   };
@@ -364,6 +425,7 @@ function MegaColumn({
                 onHumanBlack={onHumanBlack}
                 onHumanPrev={isHumanInside ? onHumanPrev : undefined}
                 onHumanNext={isHumanInside ? onHumanNext : undefined}
+                onSelectItem={onSelectItem}
                 OptimizedImg={OptimizedImg}
                 FirstContactDibuix00Buttons={FirstContactDibuix00Buttons}
                 FirstContactDibuix09Buttons={FirstContactDibuix09Buttons}
@@ -391,6 +453,11 @@ function MegaColumn({
                       <Link
                         to="#"
                         className="relative z-40 flex h-4 w-full items-center justify-center whitespace-nowrap rounded-none bg-muted px-2 text-xs leading-4 text-muted-foreground hover:text-foreground"
+                        onClick={(e) => {
+                          if (typeof onSelectItem !== 'function') return;
+                          e.preventDefault();
+                          onSelectItem(it);
+                        }}
                       >
                         {labelForItem(it)}
                       </Link>
@@ -398,7 +465,23 @@ function MegaColumn({
                     )}
 
                     {!it ? null : resolveSrc(it) ? (
-                      <div className="relative z-10 mt-2 aspect-square w-full overflow-hidden" ref={idx === 1 ? tileSizeRef : undefined}>
+                      <div
+                        className="relative z-10 mt-2 aspect-square w-full overflow-hidden"
+                        ref={idx === 1 ? tileSizeRef : undefined}
+                        onClick={(e) => {
+                          if (typeof onSelectItem !== 'function') return;
+                          e.preventDefault();
+                          onSelectItem(it);
+                        }}
+                        role={typeof onSelectItem === 'function' ? 'button' : undefined}
+                        tabIndex={typeof onSelectItem === 'function' ? 0 : undefined}
+                        onKeyDown={(e) => {
+                          if (typeof onSelectItem !== 'function') return;
+                          if (e.key !== 'Enter' && e.key !== ' ') return;
+                          e.preventDefault();
+                          onSelectItem(it);
+                        }}
+                      >
                         <OptimizedImg
                           src={resolveSrc(it)}
                           alt={collectionId === 'outcasted' && isPathItem(it) ? '' : labelForItem(it) || it}
@@ -598,6 +681,9 @@ export default function FullWideSlideDemoHeader({
   const [searchGridScale, setSearchGridScale] = useState(1);
   const [searchCaretVisible, setSearchCaretVisible] = useState(true);
   const [megaPage, setMegaPage] = useState(1);
+  const [firstContactSelectedItem, setFirstContactSelectedItem] = useState(null);
+  const [humanInsideSelectedItem, setHumanInsideSelectedItem] = useState(null);
+  const [selectedItemByCollection, setSelectedItemByCollection] = useState({});
   const megaSliderIndex = Math.max(0, Math.min(MEGA_SLIDES_COUNT - 1, (megaPage || 1) - 1));
   const [active, setActive] = useState(() => {
     if (contained) return initialActiveId || 'first_contact';
@@ -723,32 +809,34 @@ export default function FullWideSlideDemoHeader({
 
   const selectedColorHex = useMemo(
     () => ({
-      white: '#ffffff',
-      'light-pink': '#f6c6d0',
-      'light-blue': '#a9c9e8',
-      daisy: '#f6d54a',
-      gold: '#d4a62a',
-      red: '#c8102e',
-      purple: '#5a2a82',
-      royal: '#1f3fbf',
-      navy: '#13294b',
-      'military-green': '#4b5320',
-      'forest-green': '#0b3d2e',
-      'irish-green': '#1f8a3b',
-      kiwi: '#7bbf2a',
-      black: '#111111',
+      c0: '#ffffff',
+      c1: '#ffffff',
+      c2: '#ffffff',
+      c3: '#ffffff',
+      c4: '#ffffff',
+      c5: '#ffffff',
+      c6: '#ffffff',
+      c7: '#ffffff',
+      c8: '#ffffff',
+      c9: '#ffffff',
+      c10: '#ffffff',
+      c11: '#ffffff',
+      c12: '#ffffff',
+      c13: '#ffffff',
+      c14: '#ffffff',
     }),
     []
   );
 
   const getSlugLuminance = useMemo(() => {
     const hexToRgb = (hex) => {
-      const clean = String(hex || '').replace('#', '').trim();
-      if (clean.length !== 6) return null;
-      const r = parseInt(clean.slice(0, 2), 16);
-      const g = parseInt(clean.slice(2, 4), 16);
-      const b = parseInt(clean.slice(4, 6), 16);
-      if (![r, g, b].every((v) => Number.isFinite(v))) return null;
+      if (!hex || typeof hex !== 'string') return null;
+      const m = hex.trim().match(/^#?([0-9a-f]{6})$/i);
+      if (!m) return null;
+      const v = m[1];
+      const r = Number.parseInt(v.slice(0, 2), 16);
+      const g = Number.parseInt(v.slice(2, 4), 16);
+      const b = Number.parseInt(v.slice(4, 6), 16);
       return { r, g, b };
     };
 
@@ -781,18 +869,18 @@ export default function FullWideSlideDemoHeader({
   const selectedColorOrder = useMemo(
     () => [
       'white',
-      'light-pink',
-      'kiwi',
       'light-blue',
+      'royal',
+      'purple',
+      'navy',
       'daisy',
       'gold',
-      'irish-green',
-      'royal',
+      'light-pink',
       'red',
-      'purple',
+      'kiwi',
+      'irish-green',
       'military-green',
       'forest-green',
-      'navy',
       'black',
     ],
     []
@@ -1334,7 +1422,7 @@ export default function FullWideSlideDemoHeader({
               className="mx-auto max-w-[1400px] overflow-x-hidden px-4 sm:px-6 lg:px-10 py-8"
             >
               <div
-                className="overflow-hidden"
+                className="overflow-x-hidden overflow-y-visible"
                 style={megaTileSize ? { height: `${Math.round(megaTileSize * 2 + 37)}px` } : undefined}
               >
                 <div
@@ -1365,6 +1453,14 @@ export default function FullWideSlideDemoHeader({
                           onHumanBlack={() => setFirstContactVariant('black')}
                           onHumanPrev={() => setThinStartIndex((v) => v - 1)}
                           onHumanNext={() => setThinStartIndex((v) => v + 1)}
+                          onSelectItem={
+                            (it) => {
+                              if (!it || it === CONTROL_TILE_BN || it === CONTROL_TILE_ARROWS) return;
+                              if (active === 'first_contact') setFirstContactSelectedItem(it);
+                              else if (active === 'the_human_inside') setHumanInsideSelectedItem(it);
+                              else setSelectedItemByCollection((prev) => ({ ...prev, [active]: it }));
+                            }
+                          }
                         />
                       ))}
                     </div>
@@ -1378,6 +1474,23 @@ export default function FullWideSlideDemoHeader({
                         onSelect: setSelectedColorSlug,
                         colorLabelBySlug,
                         colorButtonSrcBySlug,
+                        overlaySrc:
+                          active === 'first_contact' && firstContactSelectedItem
+                            ? (firstContactVariant === 'white'
+                                ? (FIRST_CONTACT_MEDIA_WHITE[firstContactSelectedItem] || FIRST_CONTACT_MEDIA[firstContactSelectedItem] || null)
+                                : (FIRST_CONTACT_MEDIA[firstContactSelectedItem] || null))
+                            : active === 'the_human_inside' && humanInsideSelectedItem
+                              ? (humanInsideVariant === 'white'
+                                  ? (THE_HUMAN_INSIDE_MEDIA_WHITE[humanInsideSelectedItem] || THE_HUMAN_INSIDE_MEDIA[humanInsideSelectedItem] || null)
+                                  : (THE_HUMAN_INSIDE_MEDIA[humanInsideSelectedItem] || null))
+                            : active && selectedItemByCollection?.[active]
+                              ? (FIRST_CONTACT_MEDIA[selectedItemByCollection[active]]
+                                  ? (firstContactVariant === 'white'
+                                      ? (FIRST_CONTACT_MEDIA_WHITE[selectedItemByCollection[active]] || FIRST_CONTACT_MEDIA[selectedItemByCollection[active]] || null)
+                                      : (FIRST_CONTACT_MEDIA[selectedItemByCollection[active]] || null))
+                                  : null)
+                            : null,
+                        overlayClassName: undefined,
                         itemLeftOffsetPxByIndex: stripeItemLeftOffsetPxByIndex,
                         redistributeBetweenFirstAndLast: redistributeStripeBetweenFirstAndLast,
                         firstOffsetPx: -20,

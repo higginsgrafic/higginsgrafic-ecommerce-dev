@@ -10,58 +10,58 @@ import MegaStripeCatalogPanel from './MegaStripeCatalogPanel.jsx';
 import AdidasHumanInsideSlider from './AdidasHumanInsideSlider.jsx';
 
 const FIRST_CONTACT_MEDIA = {
-  'NX-01': '/custom_logos/drawings/first_contact/negre/1-nx-01-b.webp',
-  'NCC-1701': '/custom_logos/drawings/first_contact/negre/2-ncc-1701-b.webp',
-  'NCC-1701-D': '/custom_logos/drawings/first_contact/negre/3-ncc-1701-d-b.webp',
-  'Wormhole': '/custom_logos/drawings/first_contact/negre/4-wormhole-b.webp',
-  'Plasma Escape': '/custom_logos/drawings/first_contact/negre/5-plasma-escape-b.webp',
-  "Vulcan's End": '/custom_logos/drawings/first_contact/negre/6-vulcans-end-b.webp',
-  'The Phoenix': '/custom_logos/drawings/first_contact/negre/7-the-phoenix-b.webp',
+  'NX-01': '/custom_logos/drawings/first_contact/black/1-nx-01-b.webp',
+  'NCC-1701': '/custom_logos/drawings/first_contact/black/2-ncc-1701-b.webp',
+  'NCC-1701-D': '/custom_logos/drawings/first_contact/black/3-ncc-1701-d-b.webp',
+  'Wormhole': '/custom_logos/drawings/first_contact/black/4-wormhole-b.webp',
+  'Plasma Escape': '/custom_logos/drawings/first_contact/black/5-plasma-escape-b.webp',
+  "Vulcan's End": '/custom_logos/drawings/first_contact/black/6-vulcans-end-b.webp',
+  'The Phoenix': '/custom_logos/drawings/first_contact/black/7-the-phoenix-b.webp',
 };
 
 const CONTROL_TILE_BN = 'botonera-bn';
 const CONTROL_TILE_ARROWS = 'botonera-fletxes';
 
 const FIRST_CONTACT_MEDIA_WHITE = {
-  'NX-01': '/custom_logos/drawings/first_contact/blanc/1-nx-01-w.webp',
-  'NCC-1701': '/custom_logos/drawings/first_contact/blanc/2-ncc-1701-w.webp',
-  'NCC-1701-D': '/custom_logos/drawings/first_contact/blanc/3-ncc-1701-d-w.webp',
-  'Wormhole': '/custom_logos/drawings/first_contact/blanc/4-wormhole-w.webp',
-  'Plasma Escape': '/custom_logos/drawings/first_contact/blanc/5-plasma-escape-w.webp',
-  "Vulcan's End": '/custom_logos/drawings/first_contact/blanc/6-vulcans-end-w.webp',
-  'The Phoenix': '/custom_logos/drawings/first_contact/blanc/7-the-phoenix-w.webp',
+  'NX-01': '/custom_logos/drawings/first_contact/white/1-nx-01-w.webp',
+  'NCC-1701': '/custom_logos/drawings/first_contact/white/2-ncc-1701-w.webp',
+  'NCC-1701-D': '/custom_logos/drawings/first_contact/white/3-ncc-1701-d-w.webp',
+  'Wormhole': '/custom_logos/drawings/first_contact/white/4-wormhole-w.webp',
+  'Plasma Escape': '/custom_logos/drawings/first_contact/white/5-plasma-escape-w.webp',
+  "Vulcan's End": '/custom_logos/drawings/first_contact/white/6-vulcans-end-w.webp',
+  'The Phoenix': '/custom_logos/drawings/first_contact/white/7-the-phoenix-w.webp',
 };
 
 const THE_HUMAN_INSIDE_MEDIA = {
-  'C3P0': '/custom_logos/drawings/the_human_inside/negre/7-c3p0-b4.webp',
-  'Vader': '/custom_logos/drawings/the_human_inside/negre/8-vader-b4.webp',
-  'Afrodita': '/custom_logos/drawings/the_human_inside/negre/9-afrodita-a-b3.webp',
-  'Mazinger': '/custom_logos/drawings/the_human_inside/negre/10-mazinger-b4.webp',
-  'Cylon 78': '/custom_logos/drawings/the_human_inside/negre/11-cylon-78-b4.webp',
-  'Cylon 03': '/custom_logos/drawings/the_human_inside/negre/12-cylon-03-b1.webp',
-  'Iron Man 68': '/custom_logos/drawings/the_human_inside/negre/13-iron-man-68-b1.webp',
-  'Iron Man 08': '/custom_logos/drawings/the_human_inside/negre/14-ironman-08-b4.webp',
-  'Cyberman': '/custom_logos/drawings/the_human_inside/negre/15-cyberman-b4.webp',
-  'Maschinenmensch': '/custom_logos/drawings/the_human_inside/negre/16-maschinenmensch-b1.webp',
-  'Robocop': '/custom_logos/drawings/the_human_inside/negre/17-robocop-b4.webp',
-  'Terminator': '/custom_logos/drawings/the_human_inside/negre/18-terminator-b4.webp',
-  'Robbie the Robot': '/custom_logos/drawings/the_human_inside/negre/19-robbie-the-robot-b1.webp',
+  'C3P0': '/custom_logos/drawings/the_human_inside/black/7-c3p0-b4.webp',
+  'Vader': '/custom_logos/drawings/the_human_inside/black/8-vader-b4.webp',
+  'Afrodita': '/custom_logos/drawings/the_human_inside/black/9-afrodita-a-b3.webp',
+  'Mazinger': '/custom_logos/drawings/the_human_inside/black/10-mazinger-b4.webp',
+  'Cylon 78': '/custom_logos/drawings/the_human_inside/black/11-cylon-78-b4.webp',
+  'Cylon 03': '/custom_logos/drawings/the_human_inside/black/12-cylon-03-b1.webp',
+  'Iron Man 68': '/custom_logos/drawings/the_human_inside/black/13-iron-man-68-b1.webp',
+  'Iron Man 08': '/custom_logos/drawings/the_human_inside/black/14-ironman-08-b4.webp',
+  'Cyberman': '/custom_logos/drawings/the_human_inside/black/15-cyberman-b4.webp',
+  'Maschinenmensch': '/custom_logos/drawings/the_human_inside/black/16-maschinenmensch-b1.webp',
+  'Robocop': '/custom_logos/drawings/the_human_inside/black/17-robocop-b4.webp',
+  'Terminator': '/custom_logos/drawings/the_human_inside/black/18-terminator-b4.webp',
+  'Robbie the Robot': '/custom_logos/drawings/the_human_inside/black/19-robbie-the-robot-b1.webp',
 };
 
 const THE_HUMAN_INSIDE_MEDIA_WHITE = {
-  'C3P0': '/custom_logos/drawings/the_human_inside/blanc/7-c3p0-w1.webp',
-  'Vader': '/custom_logos/drawings/the_human_inside/blanc/8-vader-w4.webp',
-  'Afrodita': '/custom_logos/drawings/the_human_inside/blanc/9-afrodita-w4.webp',
-  'Mazinger': '/custom_logos/drawings/the_human_inside/blanc/10-mazinger-w1.webp',
-  'Cylon 78': '/custom_logos/drawings/the_human_inside/blanc/11-cylon-78-w4.webp',
-  'Cylon 03': '/custom_logos/drawings/the_human_inside/blanc/12-cylon-03-w3.webp',
-  'Iron Man 68': '/custom_logos/drawings/the_human_inside/blanc/13-iron-man-68-w4.webp',
-  'Iron Man 08': '/custom_logos/drawings/the_human_inside/blanc/14-iron-man-08-w4.webp',
-  'Cyberman': '/custom_logos/drawings/the_human_inside/blanc/15-cyberman-w1.webp',
-  'Maschinenmensch': '/custom_logos/drawings/the_human_inside/blanc/16-maschinenmensch-w1.webp',
-  'Robocop': '/custom_logos/drawings/the_human_inside/blanc/17-robocop-w3.webp',
-  'Terminator': '/custom_logos/drawings/the_human_inside/blanc/18-terminator-w1.webp',
-  'Robbie the Robot': '/custom_logos/drawings/the_human_inside/blanc/19-robbie-the-robot-w2.webp',
+  'C3P0': '/custom_logos/drawings/the_human_inside/white/7-c3p0-w1.webp',
+  'Vader': '/custom_logos/drawings/the_human_inside/white/8-vader-w4.webp',
+  'Afrodita': '/custom_logos/drawings/the_human_inside/white/9-afrodita-w4.webp',
+  'Mazinger': '/custom_logos/drawings/the_human_inside/white/10-mazinger-w1.webp',
+  'Cylon 78': '/custom_logos/drawings/the_human_inside/white/11-cylon-78-w4.webp',
+  'Cylon 03': '/custom_logos/drawings/the_human_inside/white/12-cylon-03-w3.webp',
+  'Iron Man 68': '/custom_logos/drawings/the_human_inside/white/13-iron-man-68-w4.webp',
+  'Iron Man 08': '/custom_logos/drawings/the_human_inside/white/14-iron-man-08-w4.webp',
+  'Cyberman': '/custom_logos/drawings/the_human_inside/white/15-cyberman-w1.webp',
+  'Maschinenmensch': '/custom_logos/drawings/the_human_inside/white/16-maschinenmensch-w1.webp',
+  'Robocop': '/custom_logos/drawings/the_human_inside/white/17-robocop-w3.webp',
+  'Terminator': '/custom_logos/drawings/the_human_inside/white/18-terminator-w1.webp',
+  'Robbie the Robot': '/custom_logos/drawings/the_human_inside/white/19-robbie-the-robot-w2.webp',
 };
 
 const OptimizedImg = React.forwardRef(function OptimizedImg({ src, alt, className, style, ...rest }, ref) {
@@ -156,9 +156,6 @@ function FirstContactDibuix09Buttons({
   onNextPointerDown,
   onNextPointerUp,
 }) {
-  const iconH = tileSize ? Math.round(tileSize * 0.3) : 48;
-  const iconW = tileSize ? Math.round(tileSize * 0.15) : 24;
-
   return (
     <div className="relative mt-2 aspect-square w-full">
       <div className="absolute inset-0 overflow-hidden rounded-md bg-muted">
@@ -173,9 +170,9 @@ function FirstContactDibuix09Buttons({
           className="absolute left-0 top-0 h-full w-1/2 bg-transparent hover:bg-muted focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         >
           <ChevronLeft
-            className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-foreground"
-            style={{ height: `${iconH}px`, width: `${iconW}px` }}
-            strokeWidth={1.5}
+            className="pointer-events-none absolute left-1/2 top-1/2 h-5 w-5 -translate-x-1/2 -translate-y-1/2 text-foreground/80"
+            strokeWidth={1.75}
+            aria-hidden="true"
           />
         </button>
         <button
@@ -189,9 +186,9 @@ function FirstContactDibuix09Buttons({
           className="absolute right-0 top-0 h-full w-1/2 bg-transparent hover:bg-muted focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         >
           <ChevronRight
-            className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-foreground"
-            style={{ height: `${iconH}px`, width: `${iconW}px` }}
-            strokeWidth={1.5}
+            className="pointer-events-none absolute left-1/2 top-1/2 h-5 w-5 -translate-x-1/2 -translate-y-1/2 text-foreground/80"
+            strokeWidth={1.75}
+            aria-hidden="true"
           />
         </button>
       </div>
