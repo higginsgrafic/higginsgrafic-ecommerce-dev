@@ -8,12 +8,18 @@ export default function AdidasColorStripeButtons({
   onSelect,
   colorLabelBySlug,
   colorButtonSrcBySlug,
+  stripeV2 = false,
+  stripeV2Defaults,
+  allowStripeV2UrlParams,
   overlaySrc,
   overlayClassName,
   itemLeftOffsetPxByIndex,
   redistributeBetweenFirstAndLast = false,
   firstOffsetPx = -20,
+  firstTileExtraOffsetPx = 0,
   lastOffsetPx = 50,
+  autoAlignLastToRight = false,
+  lastTileExtraOffsetPx = 0,
   cropFirstRightPx = 20,
   compressFactor = 0.79,
   forceDebugStripeHit = false,
@@ -21,17 +27,28 @@ export default function AdidasColorStripeButtons({
   debugSelectedPanel = '',
 }) {
   const items = useMemo(() => (Array.isArray(selectedColorOrder) ? selectedColorOrder.slice(0, 14) : []), [selectedColorOrder]);
+  const effectiveItems = useMemo(() => {
+    if (!stripeV2) return items;
+    return Array.from({ length: 14 }, (_, i) => `t${i + 1}`);
+  }, [items, stripeV2]);
 
   const stripeRootRef = useRef(null);
   const [hudFixedPos, setHudFixedPos] = useState(null);
+  const [stripeW, setStripeW] = useState(0);
+  const [lastClickedV2Slug, setLastClickedV2Slug] = useState(null);
 
   const selectedTileRef = useRef(null);
   const [selectedTileSize, setSelectedTileSize] = useState({ w: 0, h: 0 });
   const dotCalibrationRef = useRef(null);
 
   const urlParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
-  const debugStripeHit = forceDebugStripeHit || (!ignoreUrlDebugStripeHit && !!urlParams?.has('debugStripeHit'));
+  const wsEnabled = !!(import.meta.env.DEV && urlParams?.has('ws'));
+  const stripeV2AllowUrlParams = !!(allowStripeV2UrlParams ?? wsEnabled);
+  const debugStripeHitFromUrl = !!urlParams?.has('debugStripeHit');
+  const debugStripeHit = wsEnabled || forceDebugStripeHit || (!ignoreUrlDebugStripeHit && debugStripeHitFromUrl);
+  const showStripeClickDebug = wsEnabled || forceDebugStripeHit || debugStripeHitFromUrl;
   const stripeRecalibrate = !!urlParams?.has('stripeRecalibrate');
+  const mirror1p5 = wsEnabled || !!urlParams?.has('mirror1p5');
 
   const parseFloatParam = (key, fallback) => {
     const raw = urlParams?.get(key);
@@ -39,6 +56,9 @@ export default function AdidasColorStripeButtons({
     const n = Number.parseFloat(raw);
     return Number.isFinite(n) ? n : fallback;
   };
+
+  const mirror1p5OffsetYPx = parseFloatParam('mirror1p5y', 0);
+  const mirror1p5BaseOffsetYPx = 0;
 
   const stripeOverlayTopPct = parseFloatParam('stripeOverlayTop', 44);
   const stripeOverlayWPct = parseFloatParam('stripeOverlayW', 72);
@@ -50,6 +70,52 @@ export default function AdidasColorStripeButtons({
     const n = Number.parseInt(raw, 10);
     return Number.isFinite(n) ? n : fallback;
   };
+
+  const stripeClampLevel = parseIntParam('stripeClamp', 0);
+
+  const stripeV2DefaultInsetLeftPx = stripeV2 ? stripeV2Defaults?.v2L : undefined;
+  const stripeV2DefaultInsetRightPx = stripeV2 ? stripeV2Defaults?.v2R : undefined;
+  const stripeV2DefaultScale = stripeV2 ? stripeV2Defaults?.v2S : undefined;
+  const stripeV2DefaultPivotOffsetXPx = stripeV2 ? stripeV2Defaults?.v2PX : undefined;
+  const stripeV2DefaultViewportExtendLeftPx = stripeV2 ? stripeV2Defaults?.v2VL : undefined;
+  const stripeV2DefaultViewportTrimRightPx = stripeV2 ? stripeV2Defaults?.v2VR : undefined;
+
+  const parseFloatParamV2 = (key, fallback) => {
+    if (!stripeV2AllowUrlParams) return fallback;
+    return parseFloatParam(key, fallback);
+  };
+
+  const parseIntParamV2 = (key, fallback) => {
+    if (!stripeV2AllowUrlParams) return fallback;
+    return parseIntParam(key, fallback);
+  };
+
+  const stripeV2InsetLeftPx = parseIntParamV2(
+    'v2L',
+    Number.isFinite(stripeV2DefaultInsetLeftPx) ? stripeV2DefaultInsetLeftPx : 0,
+  );
+  const stripeV2InsetRightPx = parseIntParamV2(
+    'v2R',
+    Number.isFinite(stripeV2DefaultInsetRightPx) ? stripeV2DefaultInsetRightPx : 0,
+  );
+  const stripeV2Scale = parseFloatParamV2('v2S', Number.isFinite(stripeV2DefaultScale) ? stripeV2DefaultScale : 1);
+  const stripeV2PivotOffsetXPx = parseIntParamV2(
+    'v2PX',
+    Number.isFinite(stripeV2DefaultPivotOffsetXPx) ? stripeV2DefaultPivotOffsetXPx : 0,
+  );
+  const stripeV2ViewportExtendLeftPx = stripeV2
+    ? parseIntParamV2(
+        'v2VL',
+        Number.isFinite(stripeV2DefaultViewportExtendLeftPx) ? stripeV2DefaultViewportExtendLeftPx : 50,
+      )
+    : 0;
+  const stripeV2ViewportTrimRightPx = stripeV2
+    ? parseIntParamV2(
+        'v2VR',
+        Number.isFinite(stripeV2DefaultViewportTrimRightPx) ? stripeV2DefaultViewportTrimRightPx : 0,
+      )
+    : 0;
+  const blueViewport = stripeV2AllowUrlParams && typeof urlParams?.has === 'function' ? urlParams.has('blueViewport') : false;
 
   const parseStringParam = (key, fallback) => {
     const raw = urlParams?.get(key);
@@ -367,6 +433,21 @@ export default function AdidasColorStripeButtons({
     return () => ro.disconnect();
   }, [items.length, megaTileSize, selectedColorSlug]);
 
+  useEffect(() => {
+    if (!stripeRootRef.current) return;
+    const el = stripeRootRef.current;
+    const update = () => {
+      const w = el.clientWidth || 0;
+      setStripeW(w);
+    };
+
+    update();
+
+    const ro = new ResizeObserver(() => update());
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [megaTileSize, items.length]);
+
   const containerH = megaTileSize;
 
   useEffect(() => {
@@ -383,16 +464,29 @@ export default function AdidasColorStripeButtons({
   }, [items.length, megaTileSize, selectedTileSize.w, selectedTileSize.h, stripeDotXPx, stripeDotYPx, stripeRecalibrate]);
 
   if (!megaTileSize) return null;
-  if (items.length === 0) return null;
+  if (effectiveItems.length === 0) return null;
 
   const imageAspect = 161 / 145;
   const refMegaTileSize = 360;
   const refButtonW = Math.round(refMegaTileSize * imageAspect);
   const buttonW = Math.round(megaTileSize * imageAspect);
+  const stripeWVirtual = Math.max(
+    0,
+    stripeW - (stripeV2 ? stripeV2ViewportExtendLeftPx : 0) + (stripeV2 ? stripeV2ViewportTrimRightPx : 0)
+  );
   const baseOverlap = Math.round(megaTileSize * 0.36);
   const baseStep = Math.max(0, buttonW - baseOverlap);
   const step = Math.round(baseStep * compressFactor);
-  const stepEq = step + lastOffsetPx / 13;
+  const lastIdx = 13;
+  const offsetLast = Number.isFinite(itemLeftOffsetPxByIndex?.[lastIdx]) ? itemLeftOffsetPxByIndex[lastIdx] : 0;
+  const computedLastOffsetPx =
+    autoAlignLastToRight && stripeWVirtual > 0
+      ? Math.round(stripeWVirtual - (firstOffsetPx + lastIdx * step + offsetLast + buttonW))
+      : lastOffsetPx;
+  const stripeV2AnchorXPx = stripeWVirtual > 0
+    ? (stripeWVirtual - stripeV2InsetRightPx) - computedLastOffsetPx + lastTileExtraOffsetPx + stripeV2PivotOffsetXPx
+    : null;
+  const stepEq = step + computedLastOffsetPx / 13;
   const hitW = Math.max(1, Math.round(stepEq));
   const cropRightPx = Math.max(0, Math.round(cropFirstRightPx));
 
@@ -441,6 +535,7 @@ export default function AdidasColorStripeButtons({
               <div>Calib: Tab toggle, R=ref, O=overlay</div>
               <div>Arrows (Shift=10px), +/- scale</div>
               <div>Mode: {stripeCalibMode}</div>
+              <div>Clamp: {stripeClampLevel}</div>
               {stripeRefMockupSrc ? (
                 <>
                   <div>
@@ -469,7 +564,19 @@ export default function AdidasColorStripeButtons({
       <div
         ref={stripeRootRef}
         className="absolute left-0 top-0 z-[40] w-full"
-        style={{ height: `${containerH}px`, pointerEvents: 'none' }}
+        style={{
+          height: `${containerH}px`,
+          pointerEvents: 'none',
+          overflowX: stripeV2 ? 'hidden' : (stripeClampLevel >= 1 ? 'hidden' : 'visible'),
+          overflowY: 'visible',
+          left: stripeV2ViewportExtendLeftPx ? `${-stripeV2ViewportExtendLeftPx}px` : undefined,
+          width: (stripeV2ViewportExtendLeftPx || stripeV2ViewportTrimRightPx)
+            ? `calc(100% + ${stripeV2ViewportExtendLeftPx}px - ${stripeV2ViewportTrimRightPx}px)`
+            : undefined,
+          backgroundColor: blueViewport ? 'rgba(0, 90, 255, 0.08)' : undefined,
+          outline: blueViewport ? '2px solid rgba(0, 90, 255, 0.9)' : undefined,
+          outlineOffset: blueViewport ? '-2px' : undefined,
+        }}
       >
         {stripeHudPos !== 'below-deck' && (stripeRefMockupSrc || overlaySrc) ? (
           <div
@@ -485,6 +592,7 @@ export default function AdidasColorStripeButtons({
             <div>Calib: Tab toggle, R=ref, O=overlay</div>
             <div>Arrows (Shift=10px), +/- scale</div>
             <div>Mode: {stripeCalibMode}</div>
+            <div>Clamp: {stripeClampLevel}</div>
             {stripeRefMockupSrc ? (
               <>
                 <div>
@@ -507,196 +615,336 @@ export default function AdidasColorStripeButtons({
             ) : null}
           </div>
         ) : null}
-      {items.map((slug, idx) => {
-        const src = colorButtonSrcBySlug?.[slug];
-        const zLayer = 100 - idx;
-        const lastIdx = Math.max(0, items.length - 1);
-        const offsetThis = Number.isFinite(itemLeftOffsetPxByIndex?.[idx]) ? itemLeftOffsetPxByIndex[idx] : 0;
-        const offsetFirst = Number.isFinite(itemLeftOffsetPxByIndex?.[0]) ? itemLeftOffsetPxByIndex[0] : 0;
-        const offsetLast = Number.isFinite(itemLeftOffsetPxByIndex?.[lastIdx]) ? itemLeftOffsetPxByIndex[lastIdx] : 0;
+        <div
+          className="absolute left-0 top-0 w-full"
+          style={{
+            height: `${containerH}px`,
+            pointerEvents: 'none',
+            transform: stripeV2
+              ? `translateX(${stripeV2ViewportExtendLeftPx}px) scale(${stripeV2Scale})`
+              : undefined,
+            transformOrigin: stripeV2 ? (stripeV2AnchorXPx != null ? `${stripeV2AnchorXPx}px ${containerH}px` : '100% 100%') : undefined,
+          }}
+        >
+          {effectiveItems.map((slug, idx) => {
+            const src =
+              stripeV2
+                ? `/placeholders/t-shirt_buttons/${idx + 1}.png`
+                : colorButtonSrcBySlug?.[slug];
+            const zLayer = 100 - idx;
+            const lastIdx = Math.max(0, effectiveItems.length - 1);
+            const offsetThis = Number.isFinite(itemLeftOffsetPxByIndex?.[idx]) ? itemLeftOffsetPxByIndex[idx] : 0;
+            const offsetFirst = Number.isFinite(itemLeftOffsetPxByIndex?.[0]) ? itemLeftOffsetPxByIndex[0] : 0;
+            const offsetLast = Number.isFinite(itemLeftOffsetPxByIndex?.[lastIdx]) ? itemLeftOffsetPxByIndex[lastIdx] : 0;
 
-        const baseLeft = firstOffsetPx + idx * stepEq;
-        const left0 = firstOffsetPx + offsetFirst;
-        const leftLast = firstOffsetPx + lastIdx * stepEq + offsetLast;
+            const baseLeft = firstOffsetPx + idx * stepEq;
+            const stripeV2Left0 = stripeV2InsetLeftPx + firstOffsetPx + firstTileExtraOffsetPx;
+            const stripeV2LeftLast =
+              stripeWVirtual > 0
+                ? (stripeWVirtual - stripeV2InsetRightPx) - buttonW - computedLastOffsetPx + lastTileExtraOffsetPx
+                : null;
 
-        const left = redistributeBetweenFirstAndLast && lastIdx > 0 && idx !== 0 && idx !== lastIdx
-          ? left0 + (idx / lastIdx) * (leftLast - left0)
-          : baseLeft + offsetThis;
-        const firstClip = `inset(0 0 0 ${cropRightPx}px)`;
-        const shouldClip = idx === 0 && cropRightPx > 0;
-        const isSelected = selectedColorSlug === slug;
-        const isFirst = idx === 0;
-        const isLast = idx === items.length - 1;
-        const thisHitW = isLast ? buttonW : hitW;
+            const left =
+              stripeV2 && lastIdx > 0 && stripeV2LeftLast != null
+                ? stripeV2Left0 + (idx / lastIdx) * (stripeV2LeftLast - stripeV2Left0)
+                : redistributeBetweenFirstAndLast && lastIdx > 0 && idx !== 0 && idx !== lastIdx
+                  ? (firstOffsetPx + offsetFirst) + (idx / lastIdx) * ((firstOffsetPx + lastIdx * stepEq + offsetLast) - (firstOffsetPx + offsetFirst))
+                  : baseLeft + offsetThis;
+            const firstClip = `inset(0 0 0 ${cropRightPx}px)`;
+            const isWhiteTile = !stripeV2 && idx === 0 && slug === 'white';
+            const whiteOverhangPx = isWhiteTile ? Math.max(0, Math.round(buttonW * 0.28)) : 0;
+            const shouldClip = idx === 0 && cropRightPx > 0 && !isWhiteTile;
+            const isSelected = stripeV2 ? false : selectedColorSlug === slug;
+            const isFirst = idx === 0;
+            const isLast = idx === effectiveItems.length - 1;
+            const thisHitW = isLast ? buttonW : hitW;
 
-        const globalOffsetXPx = parseIntParam('allx', 0);
-        const globalOffsetYPx = parseIntParam('ally', 0);
+            const stripeV2Tile1ExtendLeftPx = stripeV2 && idx === 0 ? 20 : 0;
 
-        const sectorBaseW = 323;
-        const sectorBaseH = 290;
-        const s1W = 207.42;
-        const s1H = 248;
-        const s1X = 0;
-        const s1Y = sectorBaseH - s1H;
-        const s1OffsetXPx = parseIntParam('s1p1x', 5);
+            const tileWPx = buttonW + stripeV2Tile1ExtendLeftPx;
+            const tileLeftPx = left - stripeV2Tile1ExtendLeftPx;
 
-        const sx = buttonW / sectorBaseW;
-        const sy = megaTileSize / sectorBaseH;
+            const globalOffsetXPx = parseIntParam('allx', 0);
+            const globalOffsetYPx = parseIntParam('ally', 0);
+            const whiteHitOffsetYPx = isWhiteTile ? 2 : 0;
 
-        const s2W = 82.896;
-        const s2H = 32.731;
-        const s2X = s1X + (s1W - s2W) / 2;
-        const s2Y = s1Y - s2H;
+            const sectorBaseW = 323;
+            const sectorBaseH = 290;
+            const s1W = 207.42;
+            const s1H = 248;
+            const s1X = 0;
+            const s1Y = sectorBaseH - s1H;
+            const s1OffsetXPx = parseIntParam('s1p1x', 5);
 
-        const s34W = 79.353;
-        const s34H = 64;
-        const s34RotDeg = 24.56;
+            const sx = buttonW / sectorBaseW;
+            const sy = megaTileSize / sectorBaseH;
 
-        const s234OffsetXPx = parseIntParam('s1p234x', -1);
-        const s234OffsetYPx = parseIntParam('s1p234y', 0);
+            const s2W = 82.896;
+            const s2H = 32.731;
+            const s2X = s1X + (s1W - s2W) / 2;
+            const s2Y = s1Y - s2H;
 
-        const p1OffsetXPx = parseIntParam('1p1x', 0);
-        const p1OffsetYPx = parseIntParam('1p1y', 0);
-        const p1RotDeg = parseFloatParam('1p1deg', 0);
-        const p1WPx = parseIntParam('1p1w', 0);
-        const p1HPx = parseIntParam('1p1h', 0);
+            const s34W = 79.353;
+            const s34H = 64;
+            const s34RotDeg = 24.56;
 
-        const p2OffsetXPx = parseIntParam('1p2x', 0);
-        const p2OffsetYPx = parseIntParam('1p2y', 0);
-        const p2RotDeg = parseFloatParam('1p2deg', 0);
-        const p2WPx = parseIntParam('1p2w', 0);
-        const p2HPx = parseIntParam('1p2h', 0);
+            const s234OffsetXPx = parseIntParam('s1p234x', -1);
+            const s234OffsetYPx = parseIntParam('s1p234y', 0);
 
-        const p3OffsetXPx = parseIntParam('1p3x', 0);
-        const p3OffsetYPx = parseIntParam('1p3y', 0);
-        const p3RotDeg = parseFloatParam('1p3deg', 0);
-        const p3WPx = parseIntParam('1p3w', 0);
-        const p3HPx = parseIntParam('1p3h', 0);
+            const p1OffsetXPx = parseIntParam('1p1x', 0);
+            const p1OffsetYPx = parseIntParam('1p1y', 0);
+            const p1RotDeg = parseFloatParam('1p1deg', 0);
+            const p1WPx = parseIntParam('1p1w', 0);
+            const p1HPx = parseIntParam('1p1h', 0);
 
-        const p4OffsetXPx = parseIntParam('1p4x', 0);
-        const p4OffsetYPx = parseIntParam('1p4y', 0);
-        const p4RotDeg = parseFloatParam('1p4deg', 0);
-        const p4WPx = parseIntParam('1p4w', 0);
-        const p4HPx = parseIntParam('1p4h', 0);
+            const p2OffsetXPx = parseIntParam('1p2x', 0);
+            const p2OffsetYPx = parseIntParam('1p2y', 0);
+            const p2RotDeg = parseFloatParam('1p2deg', 0);
+            const p2WPx = parseIntParam('1p2w', 0);
+            const p2HPx = parseIntParam('1p2h', 0);
 
-        const p5Enabled = parseIntParam('1p5on', 1) === 1;
-        const p5W = 83;
-        const p5H = 109;
-        const p5RotDeg = parseFloatParam('1p5deg', 41.0);
-        const p5OffsetXPx = parseIntParam('1p5x', 0);
-        const p5OffsetYPx = parseIntParam('1p5y', 0);
-        const p5WPxOverride = parseIntParam('1p5w', 0);
-        const p5HPxOverride = parseIntParam('1p5h', 0);
-        const p5FromVertex = parseIntParam('1p5from', 2);
-        const p5ToVertex = parseIntParam('1p5to', 1);
-        const p5SwapWH = parseIntParam('1p5swap', 0) === 1;
+            const p3OffsetXPx = parseIntParam('1p3x', 0);
+            const p3OffsetYPx = parseIntParam('1p3y', 0);
+            const p3RotDeg = parseFloatParam('1p3deg', 0);
+            const p3WPx = parseIntParam('1p3w', 0);
+            const p3HPx = parseIntParam('1p3h', 0);
 
-        const p2TLx = s2X * sx + s1OffsetXPx + s234OffsetXPx;
-        const p2TLy = s2Y * sy + s234OffsetYPx;
-        const p2TRx = (s2X + s2W) * sx + s1OffsetXPx + s234OffsetXPx;
-        const p2TRy = s2Y * sy + s234OffsetYPx;
+            const p4OffsetXPx = parseIntParam('1p4x', 0);
+            const p4OffsetYPx = parseIntParam('1p4y', 0);
+            const p4RotDeg = parseFloatParam('1p4deg', 0);
+            const p4WPx = parseIntParam('1p4w', 0);
+            const p4HPx = parseIntParam('1p4h', 0);
 
-        const s34Wp = s34W * sx;
-        const s34Hp = s34H * sy;
+            const p5Enabled = parseIntParam('1p5on', 1) === 1;
+            const p5W = 83;
+            const p5H = 109;
+            const p5RotDeg = parseFloatParam('1p5deg', 41.0);
+            const p5OffsetXPx = parseIntParam('1p5x', 0);
+            const p5OffsetYPx = parseIntParam('1p5y', 0);
+            const p5WPxOverride = parseIntParam('1p5w', 0);
+            const p5HPxOverride = parseIntParam('1p5h', 0);
+            const p5FromVertex = parseIntParam('1p5from', 2);
+            const p5ToVertex = parseIntParam('1p5to', 1);
+            const p5SwapWH = parseIntParam('1p5swap', 0) === 1;
 
-        const p5Wp = (p5SwapWH ? p5H : p5W) * sx;
-        const p5Hp = (p5SwapWH ? p5W : p5H) * sy;
+            const p2TLx = s2X * sx + s1OffsetXPx + s234OffsetXPx;
+            const p2TLy = s2Y * sy + s234OffsetYPx;
+            const p2TRx = (s2X + s2W) * sx + s1OffsetXPx + s234OffsetXPx;
+            const p2TRy = s2Y * sy + s234OffsetYPx;
 
-        const notchW = Math.max(8, Math.round(thisHitW * 0.28));
-        const bodyW = Math.max(1, thisHitW - notchW);
-        const bandTop = Math.round(megaTileSize * 0.06);
-        const bandBottom = Math.round(megaTileSize * 0.92);
-        const steps = 4;
-        const stepW = Math.max(1, Math.round(notchW / steps));
-        const sleeveH = Math.round(megaTileSize * 0.26);
+            const s34Wp = s34W * sx;
+            const s34Hp = s34H * sy;
 
-        return (
-          <div
-            key={`${slug}-${idx}`}
-            className="absolute top-0"
-            data-stripe-tile
-            data-slug={slug}
-            ref={isSelected ? selectedTileRef : null}
-            style={{
-              width: `${buttonW}px`,
-              height: `${containerH}px`,
-              left: `${left}px`,
-              pointerEvents: 'none',
-              zIndex: zLayer,
-            }}
-          >
-            <div
-              className="absolute inset-0 transition-shadow duration-150 ease-out"
-              style={{ pointerEvents: 'none' }}
-            >
-              {isSelected ? (
+            const p5Wp = (p5SwapWH ? p5H : p5W) * sx;
+            const p5Hp = (p5SwapWH ? p5W : p5H) * sy;
+
+            const notchW = Math.max(8, Math.round(thisHitW * 0.28));
+            const bodyW = Math.max(1, thisHitW - notchW);
+            const bandTop = Math.round(megaTileSize * 0.06);
+            const bandBottom = Math.round(megaTileSize * 0.92);
+            const steps = 4;
+            const stepW = Math.max(1, Math.round(notchW / steps));
+            const sleeveH = Math.round(megaTileSize * 0.26);
+
+            const stripeV2HitSvg = idx === 0
+              ? {
+                  viewBox: '0 0 328 271',
+                  vw: 328,
+                  vh: 271,
+                  bx: 164,
+                  by: 271,
+                  s: 0.8,
+                  d: 'M326.933263,80.81l-51.624,61.427l-14.746,-10.069l-0.159,137.854l-191.897,0l0,-139.069l-15.227,12.056l-52.406,-62.199l70.231,-55.452l54.701,-24.474c24.563,9.767 50.928,9.631 79.021,-0l59.027,27.094l63.079,52.832Z',
+                }
+              : {
+                  viewBox: '0 0 225 271',
+                  vw: 225,
+                  vh: 271,
+                  bx: 112.5,
+                  by: 271,
+                  s: 0.8,
+                  d: 'M0.5468586,10.95l22.483,-10.059c24.563,9.767 50.928,9.631 79.021,-0l59.027,27.094l63.079,52.832l-51.624,61.427l-14.746,-10.069l-0.159,137.854l-150.223,0l0.119,-103.795l0.087,0.059l73.703,-87.698l-80.767,-67.645Z',
+                };
+
+            return (
+              <div
+                key={`${slug}-${idx}`}
+                className="absolute top-0"
+                data-stripe-tile
+                data-slug={slug}
+                ref={isSelected ? selectedTileRef : null}
+                style={{
+                  width: `${tileWPx}px`,
+                  height: `${containerH}px`,
+                  left: `${tileLeftPx}px`,
+                  overflowX: isWhiteTile ? (stripeClampLevel >= 2 ? 'hidden' : 'visible') : 'hidden',
+                  overflowY: isWhiteTile ? 'visible' : 'hidden',
+                  pointerEvents: 'none',
+                  zIndex: zLayer,
+                }}
+              >
                 <div
-                  aria-hidden="true"
-                  className="pointer-events-none absolute z-20 h-2 w-2 rounded-full bg-foreground"
-                  data-stripe-dot
-                  data-slug={slug}
-                  style={{
-                    left: `${((dotCalibrationRef.current?.rx ?? (stripeDotXPx / buttonW)) * (selectedTileSize.w || buttonW))}px`,
-                    top: `${((dotCalibrationRef.current?.ry ?? (stripeDotYPx / containerH)) * (selectedTileSize.h || containerH))}px`,
-                    transform: 'translate(-50%, -50%)',
-                  }}
-                />
-              ) : null}
-              {src ? (
-                <span
-                  className="absolute inset-0 overflow-hidden"
-                  style={shouldClip ? { clipPath: firstClip, WebkitClipPath: firstClip } : undefined}
+                  className="absolute inset-0 transition-shadow duration-150 ease-out"
+                  style={{ pointerEvents: 'none' }}
                 >
-                  <img
-                    src={src}
-                    alt={slug}
-                    className="pointer-events-none block h-full object-contain object-bottom"
-                    style={{
-                      width: `${buttonW}px`,
-                    }}
+                  {isSelected ? (
+                    <div
+                      aria-hidden="true"
+                      className="pointer-events-none absolute z-20 h-2 w-2 rounded-full bg-foreground"
+                      data-stripe-dot
+                      data-slug={slug}
+                      style={{
+                        left: `${((dotCalibrationRef.current?.rx ?? (stripeDotXPx / buttonW)) * (selectedTileSize.w || buttonW))}px`,
+                        top: `${((dotCalibrationRef.current?.ry ?? (stripeDotYPx / containerH)) * (selectedTileSize.h || containerH))}px`,
+                        transform: 'translate(-50%, -50%)',
+                      }}
+                    />
+                  ) : null}
+                  {src ? (
+                    <span
+                      className={`absolute inset-0 ${isWhiteTile ? 'overflow-visible' : 'overflow-hidden'}`}
+                      style={shouldClip ? { clipPath: firstClip, WebkitClipPath: firstClip } : undefined}
+                    >
+                      {isWhiteTile && whiteOverhangPx ? (
+                        <span
+                          className="absolute left-0 top-0 h-full"
+                          style={{
+                            width: `${buttonW}px`,
+                            transform: stripeClampLevel >= 4 ? 'translateX(0px)' : `translateX(${-whiteOverhangPx}px)`,
+                            overflowX: stripeClampLevel >= 3 ? 'hidden' : 'visible',
+                          }}
+                        >
+                          <img
+                            src={src}
+                            alt={colorLabelBySlug?.[slug] || slug}
+                            className="pointer-events-none block h-full object-contain"
+                            style={{
+                              width: `${buttonW + whiteOverhangPx}px`,
+                              height: '100%',
+                              transform: 'translateY(0px) scale(1)',
+                              transformOrigin: '50% 100%',
+                              objectPosition: 'right bottom',
+                            }}
+                          />
+                        </span>
+                      ) : (
+                        <img
+                          src={src}
+                          alt={slug}
+                          className="pointer-events-none block h-full object-contain object-bottom"
+                          style={{
+                            width: `${buttonW}px`,
+                            position: stripeV2Tile1ExtendLeftPx ? 'absolute' : undefined,
+                            right: stripeV2Tile1ExtendLeftPx ? 0 : undefined,
+                            top: stripeV2Tile1ExtendLeftPx ? 0 : undefined,
+                            transform: idx >= 1 || stripeV2 ? 'translateY(2px)' : undefined,
+                            transformOrigin: idx >= 1 || stripeV2 ? '50% 100%' : undefined,
+                            objectPosition: stripeV2Tile1ExtendLeftPx ? 'right bottom' : undefined,
+                          }}
+                        />
+                      )}
+
+                      {stripeRefMockupSrc &&
+                      (stripeRefTargetIndex
+                        ? stripeRefTargetIndex === idx + 1
+                        : stripeRefTargetSlug
+                          ? stripeRefTargetSlug === slug
+                          : true) ? (
+                        <img
+                          src={stripeRefMockupSrc}
+                          alt=""
+                          className="pointer-events-none absolute inset-0 h-full w-full object-contain object-bottom"
+                          style={{
+                            zIndex: 40,
+                            opacity: stripeRefOpacity,
+                            mixBlendMode: stripeRefBlendCss,
+                            transform: `translate(${stripeRefX}px, ${stripeRefY}px) scale(${stripeRefScale})`,
+                            transformOrigin: 'top left',
+                          }}
+                        />
+                      ) : null}
+
+                      {overlaySrc ? (
+                        <img
+                          src={overlaySrc}
+                          alt=""
+                          className={`pointer-events-none absolute left-1/2 object-contain ${overlayClassName || ''}`}
+                          style={{
+                            top: `${stripeOverlayTopPct}%`,
+                            width: `${stripeOverlayWPct}%`,
+                            height: `${stripeOverlayHPct}%`,
+                            transform: `translate(-50%, -50%) translate(${stripeOverlayX}px, ${stripeOverlayY}px) scale(${stripeOverlayScale})`,
+                            transformOrigin: 'top left',
+                            zIndex: 30,
+                            opacity: 1,
+                          }}
+                        />
+                      ) : null}
+                    </span>
+                  ) : null}
+                </div>
+
+            {stripeV2 ? (
+              <>
+                <svg
+                  role="button"
+                  tabIndex={0}
+                  aria-label={`t${idx + 1}`}
+                  className="absolute"
+                  onClick={() => {
+                    const v2Key = `t${idx + 1}`;
+                    setLastClickedV2Slug(v2Key);
+                    const realSlug = items?.[idx] || slug;
+                    onSelect?.(realSlug);
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key !== 'Enter' && e.key !== ' ') return;
+                    e.preventDefault();
+                    const v2Key = `t${idx + 1}`;
+                    setLastClickedV2Slug(v2Key);
+                    const realSlug = items?.[idx] || slug;
+                    onSelect?.(realSlug);
+                  }}
+                  style={(() => {
+                    const hitHPx = Math.round(containerH * stripeV2HitSvg.s);
+                    const aspect = stripeV2HitSvg.vh ? stripeV2HitSvg.vw / stripeV2HitSvg.vh : 1;
+                    const hitWPx = Math.round(hitHPx * aspect);
+                    const blockOffsetXPx = idx >= 1 ? 20 : 0;
+                    const insetXPx = Math.round(globalOffsetXPx + (buttonW - hitWPx) / 2 + blockOffsetXPx);
+                    const blockOffsetYPx = idx >= 1 ? -1 : 0;
+                    const topPx = Math.round(globalOffsetYPx + 1 + blockOffsetYPx + (containerH - hitHPx));
+                    return {
+                      left: stripeV2Tile1ExtendLeftPx ? undefined : `${insetXPx}px`,
+                      right: stripeV2Tile1ExtendLeftPx ? `${insetXPx}px` : undefined,
+                      top: `${topPx}px`,
+                      width: `${hitWPx}px`,
+                      height: `${hitHPx}px`,
+                      pointerEvents: 'none',
+                    };
+                  })()}
+                  viewBox={stripeV2HitSvg.viewBox}
+                  preserveAspectRatio="xMidYMax meet"
+                >
+                  {debugStripeHit ? (
+                    <rect x="0" y="0" width="100%" height="100%" fill="transparent" stroke="rgba(0,0,0,0.12)" strokeWidth="1" />
+                  ) : null}
+                  <path
+                    d={stripeV2HitSvg.d}
+                    fill={debugStripeHit ? 'rgba(0, 180, 255, 0.14)' : 'rgba(0,0,0,0.001)'}
+                    stroke={
+                      debugStripeHit && lastClickedV2Slug === `t${idx + 1}`
+                        ? 'rgba(255, 0, 0, 0.85)'
+                        : debugStripeHit
+                          ? 'rgba(255, 0, 0, 0.45)'
+                          : 'transparent'
+                    }
+                    strokeWidth={debugStripeHit && lastClickedV2Slug === `t${idx + 1}` ? 2 : 1}
+                    vectorEffect="non-scaling-stroke"
+                    style={{ pointerEvents: 'auto' }}
                   />
-
-                  {stripeRefMockupSrc &&
-                  (stripeRefTargetIndex
-                    ? stripeRefTargetIndex === idx + 1
-                    : stripeRefTargetSlug
-                      ? stripeRefTargetSlug === slug
-                      : true) ? (
-                    <img
-                      src={stripeRefMockupSrc}
-                      alt=""
-                      className="pointer-events-none absolute inset-0 h-full w-full object-contain object-bottom"
-                      style={{
-                        zIndex: 40,
-                        opacity: stripeRefOpacity,
-                        mixBlendMode: stripeRefBlendCss,
-                        transform: `translate(${stripeRefX}px, ${stripeRefY}px) scale(${stripeRefScale})`,
-                        transformOrigin: 'top left',
-                      }}
-                    />
-                  ) : null}
-
-                  {overlaySrc ? (
-                    <img
-                      src={overlaySrc}
-                      alt=""
-                      className={`pointer-events-none absolute left-1/2 object-contain ${overlayClassName || ''}`}
-                      style={{
-                        top: `${stripeOverlayTopPct}%`,
-                        width: `${stripeOverlayWPct}%`,
-                        height: `${stripeOverlayHPct}%`,
-                        transform: `translate(-50%, -50%) translate(${stripeOverlayX}px, ${stripeOverlayY}px) scale(${stripeOverlayScale})`,
-                        transformOrigin: 'top left',
-                        zIndex: 30,
-                        opacity: 1,
-                      }}
-                    />
-                  ) : null}
-                </span>
-              ) : null}
-            </div>
-
-            {isFirst ? (
+                </svg>
+              </>
+            ) : isFirst ? (
               <>
                 <button
                   type="button"
@@ -711,7 +959,7 @@ export default function AdidasColorStripeButtons({
                         : '1px solid rgba(0,0,0,0.15)'
                       : undefined,
                     left: `${Math.round((s1X / sectorBaseW) * buttonW) + s1OffsetXPx + p1OffsetXPx + globalOffsetXPx}px`,
-                    top: `${Math.round((s1Y / sectorBaseH) * megaTileSize) + p1OffsetYPx + globalOffsetYPx}px`,
+                    top: `${Math.round((s1Y / sectorBaseH) * megaTileSize) + p1OffsetYPx + globalOffsetYPx + whiteHitOffsetYPx}px`,
                     width: `${Math.round(p1WPx > 0 ? p1WPx : (s1W / sectorBaseW) * buttonW)}px`,
                     height: `${Math.round(p1HPx > 0 ? p1HPx : (s1H / sectorBaseH) * megaTileSize)}px`,
                     transformOrigin: '0% 0%',
@@ -734,7 +982,7 @@ export default function AdidasColorStripeButtons({
                         : '1px solid rgba(0,128,255,0.55)'
                       : undefined,
                     left: `${Math.round((s2X / sectorBaseW) * buttonW) + s1OffsetXPx + s234OffsetXPx + p2OffsetXPx + globalOffsetXPx}px`,
-                    top: `${Math.round((s2Y / sectorBaseH) * megaTileSize) + s234OffsetYPx + p2OffsetYPx + globalOffsetYPx}px`,
+                    top: `${Math.round((s2Y / sectorBaseH) * megaTileSize) + s234OffsetYPx + p2OffsetYPx + globalOffsetYPx + whiteHitOffsetYPx}px`,
                     width: `${Math.round(p2WPx > 0 ? p2WPx : (s2W / sectorBaseW) * buttonW)}px`,
                     height: `${Math.round(p2HPx > 0 ? p2HPx : (s2H / sectorBaseH) * megaTileSize)}px`,
                     transformOrigin: '0% 0%',
@@ -757,7 +1005,7 @@ export default function AdidasColorStripeButtons({
                         : '1px solid rgba(0,200,80,0.55)'
                       : undefined,
                     left: `${Math.round(p2TLx - s34Wp + p3OffsetXPx) + globalOffsetXPx}px`,
-                    top: `${Math.round(p2TLy + p3OffsetYPx) + globalOffsetYPx}px`,
+                    top: `${Math.round(p2TLy + p3OffsetYPx) + globalOffsetYPx + whiteHitOffsetYPx}px`,
                     width: `${Math.round(p3WPx > 0 ? p3WPx : s34Wp)}px`,
                     height: `${Math.round(p3HPx > 0 ? p3HPx : s34Hp)}px`,
                     transformOrigin: '100% 0%',
@@ -780,7 +1028,7 @@ export default function AdidasColorStripeButtons({
                         : '1px solid rgba(255,200,0,0.55)'
                       : undefined,
                     left: `${Math.round(p2TRx + p4OffsetXPx) + globalOffsetXPx}px`,
-                    top: `${Math.round(p2TRy + p4OffsetYPx) + globalOffsetYPx}px`,
+                    top: `${Math.round(p2TRy + p4OffsetYPx) + globalOffsetYPx + whiteHitOffsetYPx}px`,
                     width: `${Math.round(p4WPx > 0 ? p4WPx : s34Wp)}px`,
                     height: `${Math.round(p4HPx > 0 ? p4HPx : s34Hp)}px`,
                     transformOrigin: '0% 0%',
@@ -809,29 +1057,72 @@ export default function AdidasColorStripeButtons({
                     const p5Left = anchorX - p5VRot.x + p5OffsetXPx;
                     const p5Top = anchorY - p5VRot.y + p5OffsetYPx;
 
+                    const p5WFinal = p5WPxOverride > 0 ? p5WPxOverride : p5Wp;
+                    const p5HFinal = p5HPxOverride > 0 ? p5HPxOverride : p5Hp;
+
+                    const rectMinYAtDeg = (w, h, deg) => {
+                      const rad = (deg * Math.PI) / 180;
+                      const sin = Math.sin(rad);
+                      const cos = Math.cos(rad);
+                      const y0 = 0;
+                      const y1 = w * sin;
+                      const y2 = h * cos;
+                      const y3 = w * sin + h * cos;
+                      return Math.min(y0, y1, y2, y3);
+                    };
+
+                    const p5MinY = rectMinYAtDeg(p5WFinal, p5HFinal, p5RotDeg);
+                    const p5MinYMirror = rectMinYAtDeg(p5WFinal, p5HFinal, -p5RotDeg);
+                    const mirror1p5VisualTopDeltaYPx = p5MinY - p5MinYMirror;
+
                     return (
-                      <button
-                        type="button"
-                        tabIndex={-1}
-                        aria-hidden="true"
-                        onClick={() => onSelect?.(slug)}
-                        className="absolute bg-transparent"
-                        style={{
-                          left: `${p5Left}px`,
-                          top: `${p5Top}px`,
-                          width: `${p5WPxOverride > 0 ? p5WPxOverride : p5Wp}px`,
-                          height: `${p5HPxOverride > 0 ? p5HPxOverride : p5Hp}px`,
-                          transformOrigin: '0% 0%',
-                          transform: `rotate(${p5RotDeg}deg)`,
-                          backgroundColor: debugStripeHit ? 'rgba(180,0,255,0.18)' : 'transparent',
-                          outline: debugStripeHit
-                            ? debugSelectedPanel === '1p5'
-                              ? '1px solid rgba(0,120,255,0.95)'
-                              : '1px solid rgba(180,0,255,0.55)'
-                            : undefined,
-                          pointerEvents: 'auto',
-                        }}
-                      />
+                      <>
+                        <button
+                          type="button"
+                          tabIndex={-1}
+                          aria-hidden="true"
+                          onClick={() => onSelect?.(slug)}
+                          data-hit-id="1p5"
+                          className="absolute bg-transparent"
+                          style={{
+                            left: `${p5Left}px`,
+                            top: `${p5Top + whiteHitOffsetYPx}px`,
+                            width: `${p5WPxOverride > 0 ? p5WPxOverride : p5Wp}px`,
+                            height: `${p5HPxOverride > 0 ? p5HPxOverride : p5Hp}px`,
+                            transformOrigin: '0% 0%',
+                            transform: `rotate(${p5RotDeg}deg)`,
+                            backgroundColor: debugStripeHit ? 'rgba(180,0,255,0.18)' : 'transparent',
+                            outline: debugStripeHit
+                              ? debugSelectedPanel === '1p5'
+                                ? '1px solid rgba(0,120,255,0.95)'
+                                : '1px solid rgba(180,0,255,0.55)'
+                              : undefined,
+                            pointerEvents: 'auto',
+                          }}
+                        />
+
+                        {mirror1p5 ? (
+                          <button
+                            type="button"
+                            tabIndex={-1}
+                            aria-hidden="true"
+                            onClick={() => onSelect?.(slug)}
+                            data-hit-id="1p5-mirror-x"
+                            className="absolute bg-transparent"
+                            style={{
+                              left: `${tileWPx - (p5Left + (p5WPxOverride > 0 ? p5WPxOverride : p5Wp)) - 35}px`,
+                              top: `${p5Top + whiteHitOffsetYPx + mirror1p5BaseOffsetYPx + mirror1p5VisualTopDeltaYPx + mirror1p5OffsetYPx}px`,
+                              width: `${p5WFinal}px`,
+                              height: `${p5HFinal}px`,
+                              transformOrigin: '0% 0%',
+                              transform: `rotate(${-p5RotDeg}deg)`,
+                              backgroundColor: debugStripeHit ? 'rgba(180,0,255,0.18)' : 'transparent',
+                              outline: debugStripeHit ? '1px solid rgba(0,120,255,0.95)' : '1px solid rgba(255,0,255,0.6)',
+                              pointerEvents: 'auto',
+                            }}
+                          />
+                        ) : null}
+                      </>
                     );
                   })()
                 ) : null}
@@ -874,31 +1165,38 @@ export default function AdidasColorStripeButtons({
 
                 return (
                   <>
-                    {pieces.map((p) => (
-                      <button
-                        key={`t2p-${idx}-${p.n}`}
-                        type="button"
-                        onClick={() => onSelect?.(slug)}
-                        aria-label={colorLabelBySlug?.[slug] || slug}
-                        aria-pressed={isSelected}
-                        className="absolute bg-transparent focus:outline-none focus-visible:ring-2 focus-visible:ring-black/30"
-                        style={{
-                          left: `${Math.round(t2OriginX + t2OriginY * 0 + p.x) + globalOffsetXPx}px`,
-                          top: `${Math.round(t2OriginY + p.y) + globalOffsetYPx}px`,
-                          width: `${Math.round(p.w > 0 ? p.w : stdWp)}px`,
-                          height: `${Math.round(p.h > 0 ? p.h : stdHp)}px`,
-                          transformOrigin: '0% 0%',
-                          transform: `rotate(${p.deg}deg)`,
-                          backgroundColor: debugStripeHit ? debugColors[(p.n - 1) % debugColors.length] : 'transparent',
-                          outline: debugStripeHit
-                            ? debugSelectedPanel === `2p${p.n}`
-                              ? '1px solid rgba(0,120,255,0.95)'
-                              : '1px solid rgba(0,0,0,0.35)'
-                            : undefined,
-                          pointerEvents: 'auto',
-                        }}
-                      />
-                    ))}
+                    {pieces.map((p) => {
+                      const leftPx = Math.round(t2OriginX + t2OriginY * 0 + p.x) + globalOffsetXPx;
+                      const topPx = Math.round(t2OriginY + p.y) + globalOffsetYPx;
+                      const wPx = Math.round(p.w > 0 ? p.w : stdWp);
+                      const hPx = Math.round(p.h > 0 ? p.h : stdHp);
+
+                      return (
+                        <button
+                          key={`t2p-${idx}-${p.n}`}
+                          type="button"
+                          onClick={() => onSelect?.(slug)}
+                          aria-label={colorLabelBySlug?.[slug] || slug}
+                          aria-pressed={isSelected}
+                          className="absolute bg-transparent focus:outline-none focus-visible:ring-2 focus-visible:ring-black/30"
+                          style={{
+                            left: `${leftPx}px`,
+                            top: `${topPx}px`,
+                            width: `${wPx}px`,
+                            height: `${hPx}px`,
+                            transformOrigin: '0% 0%',
+                            transform: `rotate(${p.deg}deg)`,
+                            backgroundColor: debugStripeHit ? debugColors[(p.n - 1) % debugColors.length] : 'transparent',
+                            outline: debugStripeHit
+                              ? debugSelectedPanel === `2p${p.n}`
+                                ? '1px solid rgba(0,120,255,0.95)'
+                                : '1px solid rgba(0,0,0,0.35)'
+                              : undefined,
+                            pointerEvents: 'auto',
+                          }}
+                        />
+                      );
+                    })}
                   </>
                 );
               })()
@@ -946,8 +1244,9 @@ export default function AdidasColorStripeButtons({
               </>
             )}
           </div>
-        );
-      })}
+            );
+          })}
+        </div>
       </div>
     </>
   );

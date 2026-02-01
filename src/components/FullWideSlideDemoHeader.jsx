@@ -693,7 +693,15 @@ export default function FullWideSlideDemoHeader({
       return null;
     }
   });
-  const forceStripeDebugHit = false;
+  const forceStripeDebugHit =
+    typeof window !== 'undefined' && new URLSearchParams(window.location.search).has('debugStripeHit');
+  const disableCatalogPanel =
+    typeof window !== 'undefined' && new URLSearchParams(window.location.search).has('noCatalogPanel');
+  const wsEnabled =
+    typeof window !== 'undefined' && import.meta.env.DEV && new URLSearchParams(window.location.search).has('ws');
+  const effectiveForceStripeDebugHit = forceStripeDebugHit || wsEnabled;
+  const effectiveDisableCatalogPanel = disableCatalogPanel || wsEnabled;
+  const disableStripe = typeof window !== 'undefined' && new URLSearchParams(window.location.search).has('noStripe');
   const [mobileOpen, setMobileOpen] = useState(false);
   const [demoManualEnabled, setDemoManualEnabled] = useState(() => {
     if (typeof manualEnabledOverride === 'boolean') return manualEnabledOverride;
@@ -888,7 +896,7 @@ export default function FullWideSlideDemoHeader({
 
   const colorButtonSrcBySlug = useMemo(
     () => ({
-      white: '/placeholders/t-shirt_buttons/selector-color-white.png',
+      white: '/placeholders/t-shirt_buttons/1.png',
       'light-pink': '/placeholders/t-shirt_buttons/selector-color-light-pink.png',
       'light-blue': '/placeholders/t-shirt_buttons/selector-color-light-blue.png',
       daisy: '/placeholders/t-shirt_buttons/selector-color-daisy.png',
@@ -1216,11 +1224,12 @@ export default function FullWideSlideDemoHeader({
   return (
     <header
       ref={headerRef}
-      className={`${contained ? 'relative' : 'fixed'} z-[10000] bg-background`}
+      className={`${contained ? 'relative' : 'fixed'} z-[10000] bg-background ${megaPage === 1 ? 'overflow-x-visible' : 'overflow-x-hidden'}`}
       style={
         contained
           ? { top: 0, left: 0, right: 0 }
-          : { top: 'var(--appHeaderOffset, 0px)', left: 'var(--rulerInset, 0px)', right: 0 }
+          : {
+ top: 'var(--appHeaderOffset, 0px)', left: 'var(--rulerInset, 0px)', right: 0 }
       }
     >
       <div className="border-b border-border">
@@ -1416,14 +1425,23 @@ export default function FullWideSlideDemoHeader({
         }}
       >
         {active ? (
-          <div className="hidden lg:block border-b border-border bg-background">
+          <div className={`hidden lg:block border-b border-border bg-background ${megaPage === 1 ? 'overflow-x-visible' : 'overflow-x-hidden'}`}>
             <div
               ref={megaMenuRef}
-              className="mx-auto max-w-[1400px] overflow-x-hidden px-4 sm:px-6 lg:px-10 py-8"
+              className={`mx-auto max-w-[1400px] px-4 sm:px-6 lg:px-10 py-8 ${megaPage === 1 ? 'overflow-x-visible' : 'overflow-x-hidden'}`}
             >
               <div
-                className="overflow-x-hidden overflow-y-visible"
-                style={megaTileSize ? { height: `${Math.round(megaTileSize * 2 + 37)}px` } : undefined}
+                className={megaPage === 1 ? 'overflow-y-visible' : 'overflow-x-hidden overflow-y-visible'}
+                style={megaTileSize
+                  ? {
+                      height: `${Math.round(megaTileSize * 2 + 37)}px`,
+                      marginLeft: '0px',
+                      paddingLeft: '0px',
+                      width: '100%',
+                      overflowX: megaPage === 1 ? 'visible' : undefined,
+                      clipPath: megaPage === 1 ? 'inset(0px 0px 0px -260px)' : undefined,
+                    }
+                  : undefined}
               >
                 <div
                   className="flex h-full"
@@ -1465,43 +1483,52 @@ export default function FullWideSlideDemoHeader({
                       ))}
                     </div>
 
-                    <MegaStripeCatalogPanel
-                      megaTileSize={megaTileSize}
-                      StripeButtonsComponent={AdidasColorStripeButtons}
-                      stripeProps={{
-                        selectedColorOrder,
-                        selectedColorSlug,
-                        onSelect: setSelectedColorSlug,
-                        colorLabelBySlug,
-                        colorButtonSrcBySlug,
-                        overlaySrc:
-                          active === 'first_contact' && firstContactSelectedItem
-                            ? (firstContactVariant === 'white'
-                                ? (FIRST_CONTACT_MEDIA_WHITE[firstContactSelectedItem] || FIRST_CONTACT_MEDIA[firstContactSelectedItem] || null)
-                                : (FIRST_CONTACT_MEDIA[firstContactSelectedItem] || null))
-                            : active === 'the_human_inside' && humanInsideSelectedItem
-                              ? (humanInsideVariant === 'white'
-                                  ? (THE_HUMAN_INSIDE_MEDIA_WHITE[humanInsideSelectedItem] || THE_HUMAN_INSIDE_MEDIA[humanInsideSelectedItem] || null)
-                                  : (THE_HUMAN_INSIDE_MEDIA[humanInsideSelectedItem] || null))
-                            : active && selectedItemByCollection?.[active]
-                              ? (FIRST_CONTACT_MEDIA[selectedItemByCollection[active]]
-                                  ? (firstContactVariant === 'white'
-                                      ? (FIRST_CONTACT_MEDIA_WHITE[selectedItemByCollection[active]] || FIRST_CONTACT_MEDIA[selectedItemByCollection[active]] || null)
-                                      : (FIRST_CONTACT_MEDIA[selectedItemByCollection[active]] || null))
-                                  : null)
-                            : null,
-                        overlayClassName: undefined,
-                        itemLeftOffsetPxByIndex: stripeItemLeftOffsetPxByIndex,
-                        redistributeBetweenFirstAndLast: redistributeStripeBetweenFirstAndLast,
-                        firstOffsetPx: -20,
-                        lastOffsetPx: 63,
-                        cropFirstRightPx: 20,
-                        compressFactor: 0.79,
-                        forceDebugStripeHit: forceStripeDebugHit,
-                        ignoreUrlDebugStripeHit: ignoreStripeDebugFromUrl,
-                      }}
-                      CatalogPanelComponent={AdidasCatalogPanel}
-                    />
+                    {disableStripe ? null : (
+                      <MegaStripeCatalogPanel
+                        megaTileSize={megaTileSize}
+                        StripeButtonsComponent={AdidasColorStripeButtons}
+                        stripeProps={{
+                          selectedColorOrder,
+                          selectedColorSlug,
+                          onSelect: setSelectedColorSlug,
+                          colorLabelBySlug,
+                          colorButtonSrcBySlug,
+                          stripeV2: true,
+                          stripeV2Defaults: { v2S: 1.25, v2L: 162, v2R: 9, v2PX: 0, v2VL: 50, v2VR: 0 },
+                          placeholderCount: 14,
+                          distribution: 'anchored-even',
+                          autoAlignLastToRight: true,
+                          lastTileExtraOffsetPx: 15,
+                          overlaySrc:
+                            active === 'first_contact' && firstContactSelectedItem
+                              ? (firstContactVariant === 'white'
+                                  ? (FIRST_CONTACT_MEDIA_WHITE[firstContactSelectedItem] || FIRST_CONTACT_MEDIA[firstContactSelectedItem] || null)
+                                  : (FIRST_CONTACT_MEDIA[firstContactSelectedItem] || null))
+                              : active === 'the_human_inside' && humanInsideSelectedItem
+                                ? (humanInsideVariant === 'white'
+                                    ? (THE_HUMAN_INSIDE_MEDIA_WHITE[humanInsideSelectedItem] || THE_HUMAN_INSIDE_MEDIA[humanInsideSelectedItem] || null)
+                                    : (THE_HUMAN_INSIDE_MEDIA[humanInsideSelectedItem] || null))
+                              : active && selectedItemByCollection?.[active]
+                                ? (FIRST_CONTACT_MEDIA[selectedItemByCollection[active]]
+                                    ? (firstContactVariant === 'white'
+                                        ? (FIRST_CONTACT_MEDIA_WHITE[selectedItemByCollection[active]] || FIRST_CONTACT_MEDIA[selectedItemByCollection[active]] || null)
+                                        : (FIRST_CONTACT_MEDIA[selectedItemByCollection[active]] || null))
+                                    : null)
+                              : null,
+                          overlayClassName: undefined,
+                          itemLeftOffsetPxByIndex: stripeItemLeftOffsetPxByIndex,
+                          redistributeBetweenFirstAndLast: redistributeStripeBetweenFirstAndLast,
+                          firstOffsetPx: 20,
+                          firstTileExtraOffsetPx: 25,
+                          lastOffsetPx: 63,
+                          cropFirstRightPx: 20,
+                          compressFactor: 0.79,
+                          forceDebugStripeHit: effectiveForceStripeDebugHit,
+                          ignoreUrlDebugStripeHit: ignoreStripeDebugFromUrl,
+                        }}
+                        CatalogPanelComponent={effectiveDisableCatalogPanel ? null : AdidasCatalogPanel}
+                      />
+                    )}
                   </div>
 
                   <div className="h-full w-full shrink-0" style={{ width: `${100 / MEGA_SLIDES_COUNT}%` }}>
@@ -1517,8 +1544,11 @@ export default function FullWideSlideDemoHeader({
                           style={{ backgroundColor: searchAccent, opacity: searchCaretVisible ? 1 : 0 }}
                           aria-hidden="true"
                         />
-                        <div className="relative z-10 min-w-0">
-                          <div className="flex min-w-0 items-center gap-2">
+                        <div
+                          className="relative z-10 min-w-0 overflow-hidden"
+                          style={{ maxWidth: 'calc(100% - 340px)' }}
+                        >
+                          <div className="flex min-w-0 items-center gap-2 overflow-hidden">
                             {searchTopLinks.map((label, idx) => (
                               <div key={label} className="flex min-w-0 items-center gap-2">
                                 <button
@@ -1586,9 +1616,9 @@ export default function FullWideSlideDemoHeader({
                                     return (
                                       <div
                                         key={item.id}
-                                        className="group w-[220px] shrink-0 overflow-hidden rounded-md bg-transparent snap-start"
+                                        className="group h-full w-[220px] shrink-0 overflow-hidden rounded-md bg-transparent snap-start"
                                       >
-                                        <div className="aspect-square w-full bg-muted">
+                                        <div className="h-full w-full bg-muted">
                                           <OptimizedImg src={placeholderSrc} alt="" className="block h-full w-full object-contain" />
                                         </div>
                                       </div>

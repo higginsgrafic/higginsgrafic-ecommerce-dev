@@ -456,6 +456,12 @@ export default function AdidasInspiredHeader({
 }) {
   const navigate = useNavigate();
   const cartClickTimeoutRef = useRef(null);
+  const disableCatalogPanel =
+    typeof window !== 'undefined' && new URLSearchParams(window.location.search).has('noCatalogPanel');
+  const wsEnabled =
+    typeof window !== 'undefined' && import.meta.env.DEV && new URLSearchParams(window.location.search).has('ws');
+  const effectiveDisableCatalogPanel = disableCatalogPanel || wsEnabled;
+  const disableStripe = typeof window !== 'undefined' && new URLSearchParams(window.location.search).has('noStripe');
 
   const isManualLockEnabled = () => {
     try {
@@ -573,7 +579,7 @@ export default function AdidasInspiredHeader({
 
   const colorButtonSrcBySlug = useMemo(
     () => ({
-      white: '/placeholders/t-shirt_buttons/selector-color-white.png',
+      white: '/placeholders/t-shirt_buttons/1.png',
       'light-pink': '/placeholders/t-shirt_buttons/selector-color-light-pink.png',
       'light-blue': '/placeholders/t-shirt_buttons/selector-color-light-blue.png',
       daisy: '/placeholders/t-shirt_buttons/selector-color-daisy.png',
@@ -805,7 +811,7 @@ export default function AdidasInspiredHeader({
   return (
     <header
       ref={headerRef}
-      className="fixed z-[10000] bg-background"
+      className="fixed z-[10000] bg-background overflow-x-hidden"
       style={{ top: 'var(--appHeaderOffset, 0px)', left: 'var(--rulerInset, 0px)', right: 0 }}
     >
       <div className="border-b border-border">
@@ -939,10 +945,11 @@ export default function AdidasInspiredHeader({
         }}
       >
         {active ? (
-          <div className="hidden lg:block border-b border-border bg-background">
+          <div className="hidden lg:block border-b border-border bg-background overflow-x-hidden">
             <div
               ref={megaMenuRef}
               className="mx-auto max-w-[1400px] overflow-x-hidden px-4 sm:px-6 lg:px-10 py-8"
+              style={{ marginLeft: '0px', paddingLeft: '0px', width: '100%' }}
             >
               <div className="grid grid-cols-1 gap-10">
                 {(mega[active] || []).map((col, idx) => (
@@ -966,26 +973,32 @@ export default function AdidasInspiredHeader({
                 ))}
               </div>
 
-              <MegaStripeCatalogPanel
-                megaTileSize={megaTileSize}
-                StripeButtonsComponent={AdidasColorStripeButtons}
-                stripeProps={{
-                  selectedColorOrder,
-                  selectedColorSlug,
-                  onSelect: setSelectedColorSlug,
-                  colorLabelBySlug,
-                  colorButtonSrcBySlug,
-                  itemLeftOffsetPxByIndex: stripeItemLeftOffsetPxByIndex,
-                  redistributeBetweenFirstAndLast: redistributeStripeBetweenFirstAndLast,
-                  firstOffsetPx: -20,
-                  lastOffsetPx: 63,
-                  cropFirstRightPx: 20,
-                  compressFactor: 0.79,
-                  forceDebugStripeHit: forceStripeDebugHit,
-                  ignoreUrlDebugStripeHit: ignoreStripeDebugFromUrl,
-                }}
-                CatalogPanelComponent={AdidasCatalogPanel}
-              />
+              {disableStripe ? null : (
+                <MegaStripeCatalogPanel
+                  megaTileSize={megaTileSize}
+                  StripeButtonsComponent={AdidasColorStripeButtons}
+                  stripeProps={{
+                    selectedColorOrder,
+                    selectedColorSlug,
+                    onSelect: setSelectedColorSlug,
+                    colorLabelBySlug,
+                    colorButtonSrcBySlug,
+                    stripeV2: true,
+                    autoAlignLastToRight: true,
+                    lastTileExtraOffsetPx: 15,
+                    itemLeftOffsetPxByIndex: stripeItemLeftOffsetPxByIndex,
+                    redistributeBetweenFirstAndLast: redistributeStripeBetweenFirstAndLast,
+                    firstOffsetPx: 20,
+                    firstTileExtraOffsetPx: 25,
+                    lastOffsetPx: 63,
+                    cropFirstRightPx: 20,
+                    compressFactor: 0.79,
+                    forceDebugStripeHit: forceStripeDebugHit,
+                    ignoreUrlDebugStripeHit: ignoreStripeDebugFromUrl,
+                  }}
+                  CatalogPanelComponent={effectiveDisableCatalogPanel ? null : AdidasCatalogPanel}
+                />
+              )}
             </div>
           </div>
         ) : null}
