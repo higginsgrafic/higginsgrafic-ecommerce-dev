@@ -60,10 +60,6 @@ function LabDemosPage() {
                 <div className="text-sm font-semibold text-foreground">Dev links</div>
                 <div className="mt-1 text-xs text-muted-foreground">/proves/dev-links</div>
               </Link>
-              <Link to="/proves/dev-adidas-stripe-zoom" className="rounded-xl border border-border p-4 hover:bg-muted/60">
-                <div className="text-sm font-semibold text-foreground">Adidas stripe zoom dev</div>
-                <div className="mt-1 text-xs text-muted-foreground">/proves/dev-adidas-stripe-zoom</div>
-              </Link>
             </div>
 
             <div className="mt-10 rounded-xl border border-border bg-muted/60 p-4 text-sm text-muted-foreground">

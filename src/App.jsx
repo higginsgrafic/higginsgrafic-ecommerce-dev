@@ -84,7 +84,6 @@ const NikeTambePage = lazy(() => import('@/pages/NikeTambePage.jsx'));
 const AdidasDemoPage = lazy(() => import('@/pages/AdidasDemoPage'));
 const AdidasPdpPage = lazy(() => import('@/pages/AdidasPdpPage.jsx'));
 const AdidasPdpTdpPage = lazy(() => import('@/pages/AdidasPdpTdpPage.jsx'));
-const AdidasStripeZoomDevPage = lazy(() => import('@/pages/AdidasStripeZoomDevPage'));
 const DevLinksPage = lazy(() => import('@/pages/DevLinksPage'));
 const DevComponentsCatalogPage = lazy(() => import('@/pages/DevComponentsCatalogPage'));
  const DevLayoutBuilderPage = lazy(() => import('@/pages/DevLayoutBuilderPage'));
@@ -940,8 +939,7 @@ function App() {
     isDevLinksRoute ||
     isDevComponentsRoute ||
     isDevLayoutBuilderRoute ||
-    location.pathname === '/adidas-stripe-zoom-dev' ||
-    location.pathname.startsWith('/proves/dev-adidas-stripe-zoom');
+    location.pathname === '/adidas-stripe-zoom-dev';
   const isComponentsCatalogTemplateRoute = location.pathname === '/plantilla-cataleg-components';
 
   // DEV layout routes: hide offers/footer, show AdminBanner, etc.
@@ -1160,7 +1158,6 @@ function App() {
                 <Route path="/proves/dev-links" element={<DevLinksPage />} />
                 <Route path="/proves/dev-components" element={<DevComponentsCatalogPage />} />
                 <Route path="/proves/layout-builder" element={<DevLayoutBuilderPage />} />
-                <Route path="/proves/dev-adidas-stripe-zoom" element={<AdidasStripeZoomDevPage />} />
 
                 <Route
                   path="/proves/product/:id"
@@ -1281,7 +1278,7 @@ function App() {
                 <Route path="/adidas-demo" element={<Navigate to="/proves/demo-adidas" replace />} />
                 <Route path="/adidas-pdp" element={<Navigate to="/proves/demo-adidas-pdp" replace />} />
                 <Route path="/adidas-pdp-tdp" element={<Navigate to="/proves/demo-adidas-pdp-tdp" replace />} />
-                <Route path="/adidas-stripe-zoom-dev" element={<Navigate to="/proves/dev-adidas-stripe-zoom" replace />} />
+                <Route path="/adidas-stripe-zoom-dev" element={<Navigate to="/lab/proves" replace />} />
                 <Route path="/dev-links" element={<Navigate to="/proves/dev-links" replace />} />
                 <Route path="/dev-components" element={<Navigate to="/proves/dev-components" replace />} />
                 <Route path="/layout-builder" element={<Navigate to="/proves/layout-builder" replace />} />
