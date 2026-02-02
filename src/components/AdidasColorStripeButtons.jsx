@@ -49,6 +49,7 @@ export default function AdidasColorStripeButtons({
   const showStripeClickDebug = wsEnabled || forceDebugStripeHit || debugStripeHitFromUrl;
   const stripeRecalibrate = !!urlParams?.has('stripeRecalibrate');
   const mirror1p5 = wsEnabled || !!urlParams?.has('mirror1p5');
+  const stripeBeltGuides = wsEnabled || !!urlParams?.has('stripeBeltGuides');
 
   const parseFloatParam = (key, fallback) => {
     const raw = urlParams?.get(key);
@@ -275,6 +276,82 @@ export default function AdidasColorStripeButtons({
   const [stripeOverlayScale, setStripeOverlayScale] = useState(stripeOverlayScaleParam);
 
   const [stripeCalibMode, setStripeCalibMode] = useState(stripeCalibModeParam === 'overlay' ? 'overlay' : 'ref');
+
+  const [beltGuideXPx, setBeltGuideXPx] = useState(null);
+  useEffect(() => {
+    if (!stripeBeltGuides) {
+      setBeltGuideXPx(null);
+      return undefined;
+    }
+
+    const update = () => {
+      try {
+        const findButtonByText = (re) => {
+          try {
+            const buttons = Array.from(document.querySelectorAll('button'));
+            return buttons.find((b) => re.test(((b.textContent || '') + ' ' + (b.getAttribute('aria-label') || '')).trim())) || null;
+          } catch {
+            return null;
+          }
+        };
+
+        const findBlancNegreGroupRect = () => {
+          const blancBtn = findButtonByText(/\bblanc\b/i);
+          const negreBtn = findButtonByText(/\bnegre\b/i);
+          if (!blancBtn || !negreBtn) return null;
+          let node = blancBtn;
+          while (node && node instanceof Element) {
+            if (node.contains(negreBtn)) {
+              const r = node.getBoundingClientRect?.();
+              return r && r.width ? r : null;
+            }
+            node = node.parentElement;
+          }
+          return null;
+        };
+
+        const leftEl = document.getElementById('stripe-guide-left-anchor');
+        const rightEl = document.getElementById('stripe-guide-right-anchor');
+        const leftRect = leftEl?.getBoundingClientRect?.();
+        const rightRect = rightEl?.getBoundingClientRect?.();
+
+        const blancNegreRect = !leftRect ? findBlancNegreGroupRect() : null;
+        const anteriorBtn = !rightRect ? findButtonByText(/\banterior\b/i) : null;
+        const anteriorRect = anteriorBtn?.getBoundingClientRect?.();
+
+        const tile1El = stripeRootRef.current?.querySelector?.('[data-stripe-tile-idx="0"]');
+        const tile14El = stripeRootRef.current?.querySelector?.('[data-stripe-tile-idx="13"]');
+        const tile1Rect = tile1El?.getBoundingClientRect?.();
+        const tile14Rect = tile14El?.getBoundingClientRect?.();
+
+        const leftX = leftRect
+          ? leftRect.left
+          : (blancNegreRect ? blancNegreRect.left : (tile1Rect ? tile1Rect.left : null));
+        const rightX = rightRect
+          ? rightRect.left
+          : (anteriorRect ? anteriorRect.left : (tile14Rect ? tile14Rect.right : null));
+        setBeltGuideXPx((prev) => {
+          const next = {
+            left: Number.isFinite(leftX) ? leftX : null,
+            right: Number.isFinite(rightX) ? rightX : null,
+          };
+          if (!prev) return next;
+          if (prev.left === next.left && prev.right === next.right) return prev;
+          return next;
+        });
+      } catch {
+        setBeltGuideXPx(null);
+      }
+    };
+
+    update();
+    window.addEventListener('resize', update);
+    window.addEventListener('scroll', update, true);
+    return () => {
+      window.removeEventListener('resize', update);
+      window.removeEventListener('scroll', update, true);
+    };
+  }, [stripeBeltGuides]);
 
   useEffect(() => {
     if (!stripeRefMockupSrc) return;
@@ -522,6 +599,33 @@ export default function AdidasColorStripeButtons({
 
   return (
     <>
+      {stripeBeltGuides && beltGuideXPx && typeof document !== 'undefined'
+        ? createPortal(
+            <div className="pointer-events-none fixed inset-0 z-[32000] debug-exempt" data-dev-overlay="true">
+              {Number.isFinite(beltGuideXPx.left) ? (
+                <div
+                  className="fixed top-0 h-screen"
+                  style={{
+                    left: `${beltGuideXPx.left}px`,
+                    width: '1px',
+                    background: 'rgba(34, 197, 94, 0.55)',
+                  }}
+                />
+              ) : null}
+              {Number.isFinite(beltGuideXPx.right) ? (
+                <div
+                  className="fixed top-0 h-screen"
+                  style={{
+                    left: `${beltGuideXPx.right}px`,
+                    width: '1px',
+                    background: 'rgba(34, 197, 94, 0.55)',
+                  }}
+                />
+              ) : null}
+            </div>,
+            document.body,
+          )
+        : null}
       {stripeHudPos === 'below-deck' && (stripeRefMockupSrc || overlaySrc) && typeof document !== 'undefined'
         ? createPortal(
             <div
@@ -568,7 +672,7 @@ export default function AdidasColorStripeButtons({
           height: `${containerH}px`,
           pointerEvents: 'none',
           overflowX: stripeV2 ? 'hidden' : (stripeClampLevel >= 1 ? 'hidden' : 'visible'),
-          overflowY: 'visible',
+          overflowY: stripeV2 ? 'hidden' : 'visible',
           left: stripeV2ViewportExtendLeftPx ? `${-stripeV2ViewportExtendLeftPx}px` : undefined,
           width: (stripeV2ViewportExtendLeftPx || stripeV2ViewportTrimRightPx)
             ? `calc(100% + ${stripeV2ViewportExtendLeftPx}px - ${stripeV2ViewportTrimRightPx}px)`
@@ -620,6 +724,7 @@ export default function AdidasColorStripeButtons({
           style={{
             height: `${containerH}px`,
             pointerEvents: 'none',
+            overflowY: stripeV2 ? 'hidden' : undefined,
             transform: stripeV2
               ? `translateX(${stripeV2ViewportExtendLeftPx}px) scale(${stripeV2Scale})`
               : undefined,
@@ -644,12 +749,21 @@ export default function AdidasColorStripeButtons({
                 ? (stripeWVirtual - stripeV2InsetRightPx) - buttonW - computedLastOffsetPx + lastTileExtraOffsetPx
                 : null;
 
-            const left =
+            const stripeV2Tile1ExtendLeftPx = stripeV2 && idx === 0 ? 20 : 0;
+
+            const stripeV2Tile1NudgeXPx = stripeV2 ? 2.75 : 0;
+            const stripeV2Left0Effective = stripeV2Left0 + stripeV2Tile1NudgeXPx;
+
+            const leftRaw =
               stripeV2 && lastIdx > 0 && stripeV2LeftLast != null
-                ? stripeV2Left0 + (idx / lastIdx) * (stripeV2LeftLast - stripeV2Left0)
+                ? stripeV2Left0Effective + (idx / lastIdx) * (stripeV2LeftLast - stripeV2Left0Effective)
                 : redistributeBetweenFirstAndLast && lastIdx > 0 && idx !== 0 && idx !== lastIdx
                   ? (firstOffsetPx + offsetFirst) + (idx / lastIdx) * ((firstOffsetPx + lastIdx * stepEq + offsetLast) - (firstOffsetPx + offsetFirst))
                   : baseLeft + offsetThis;
+
+            const left = stripeV2 && stripeV2LeftLast != null && idx >= 1
+              ? stripeV2LeftLast - ((stripeV2LeftLast - leftRaw) * 1)
+              : leftRaw;
             const firstClip = `inset(0 0 0 ${cropRightPx}px)`;
             const isWhiteTile = !stripeV2 && idx === 0 && slug === 'white';
             const whiteOverhangPx = isWhiteTile ? Math.max(0, Math.round(buttonW * 0.28)) : 0;
@@ -658,8 +772,6 @@ export default function AdidasColorStripeButtons({
             const isFirst = idx === 0;
             const isLast = idx === effectiveItems.length - 1;
             const thisHitW = isLast ? buttonW : hitW;
-
-            const stripeV2Tile1ExtendLeftPx = stripeV2 && idx === 0 ? 20 : 0;
 
             const tileWPx = buttonW + stripeV2Tile1ExtendLeftPx;
             const tileLeftPx = left - stripeV2Tile1ExtendLeftPx;
@@ -770,16 +882,11 @@ export default function AdidasColorStripeButtons({
               <div
                 key={`${slug}-${idx}`}
                 className="absolute top-0"
-                data-stripe-tile
-                data-slug={slug}
-                ref={isSelected ? selectedTileRef : null}
+                data-stripe-tile-idx={idx}
                 style={{
+                  left: `${tileLeftPx}px`,
                   width: `${tileWPx}px`,
                   height: `${containerH}px`,
-                  left: `${tileLeftPx}px`,
-                  overflowX: isWhiteTile ? (stripeClampLevel >= 2 ? 'hidden' : 'visible') : 'hidden',
-                  overflowY: isWhiteTile ? 'visible' : 'hidden',
-                  pointerEvents: 'none',
                   zIndex: zLayer,
                 }}
               >
@@ -837,8 +944,14 @@ export default function AdidasColorStripeButtons({
                             position: stripeV2Tile1ExtendLeftPx ? 'absolute' : undefined,
                             right: stripeV2Tile1ExtendLeftPx ? 0 : undefined,
                             top: stripeV2Tile1ExtendLeftPx ? 0 : undefined,
-                            transform: idx >= 1 || stripeV2 ? 'translateY(2px)' : undefined,
-                            transformOrigin: idx >= 1 || stripeV2 ? '50% 100%' : undefined,
+                            transform: stripeV2
+                              ? (idx === 0
+                                  ? 'translateY(2px)'
+                                  : 'translate(1px, 1px) scaleX(1.015)')
+                              : (idx >= 1 ? 'translateY(2px)' : undefined),
+                            transformOrigin: stripeV2
+                              ? (idx === 0 ? '50% 100%' : '100% 100%')
+                              : (idx >= 1 ? '50% 100%' : undefined),
                             objectPosition: stripeV2Tile1ExtendLeftPx ? 'right bottom' : undefined,
                           }}
                         />
