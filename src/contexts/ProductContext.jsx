@@ -682,7 +682,8 @@ export const ProductProvider = ({ children }) => {
 
     // Filtre per col·lecció
     if (filters.collection.length > 0) {
-      filtered = filtered.filter(p => filters.collection.includes(p.collection));
+      const wanted = new Set(filters.collection.map((c) => normalizeCollectionKey(c)));
+      filtered = filtered.filter((p) => wanted.has(normalizeCollectionKey(p.collection)));
     }
 
     // Filtre per preu
