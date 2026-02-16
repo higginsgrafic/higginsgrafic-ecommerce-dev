@@ -129,7 +129,7 @@ const CheckoutPage = ({ cartItems, onClearCart }) => {
         >
           <div className="mb-6">
             <img
-              src="/custom_logos/icons/basket-empty.svg"
+              src="/custom_logos/icons/cistell-buit.svg"
               alt="Cistell buit"
               className="h-24 w-24 mx-auto opacity-20"
             />

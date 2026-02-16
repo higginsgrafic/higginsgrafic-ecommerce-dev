@@ -6,7 +6,9 @@ export default function MegaCatalogPanel({ megaTileSize }) {
 
   return (
     <div
-      className="absolute top-0 z-[20]"
+      id="stripe-guide-right-anchor"
+      data-stripe-buttonbar="cc"
+      className="absolute top-0 z-0"
       style={{
         width: `${Math.round(megaTileSize * (4 / 3))}px`,
         height: `${megaTileSize}px`,

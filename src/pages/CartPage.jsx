@@ -58,8 +58,8 @@ const CartPage = ({ cartItems, onUpdateQuantity, onRemove }) => {
                 style={{
                   display: 'block',
                   backgroundColor: 'hsl(var(--foreground))',
-                  WebkitMaskImage: "url(/custom_logos/icons/basket-empty.svg)",
-                  maskImage: "url(/custom_logos/icons/basket-empty.svg)",
+                  WebkitMaskImage: "url(/custom_logos/icons/cistell-buit.svg)",
+                  maskImage: "url(/custom_logos/icons/cistell-buit.svg)",
                   WebkitMaskRepeat: 'no-repeat',
                   maskRepeat: 'no-repeat',
                   WebkitMaskPosition: 'center',

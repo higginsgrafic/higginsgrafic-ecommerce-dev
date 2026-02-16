@@ -78,7 +78,7 @@ function ProductCard({ product, onAddToCart, cartItems = [], variant = 'default'
   // Estils segons variant
   const variantStyles = {
     default: {
-      padding: 'clamp(0.75rem, 2vw, 1rem)',
+      padding: '0px',
       cardShadow: '4px 4px 12px rgba(0, 0, 0, 0.12)',
       imageShadow: '4px 4px 8px rgba(0, 0, 0, 0.1)',
       titleSize: 'clamp(1.125rem, 2.4vw, 1.5rem)',
@@ -89,7 +89,7 @@ function ProductCard({ product, onAddToCart, cartItems = [], variant = 'default'
       showSizes: true
     },
     compact: {
-      padding: 'clamp(0.5rem, 2vw, 0.75rem)',
+      padding: '0px',
       cardShadow: '3px 3px 8px rgba(0, 0, 0, 0.1)',
       imageShadow: '2px 2px 6px rgba(0, 0, 0, 0.08)',
       titleSize: 'clamp(0.875rem, 2.5vw, 1.125rem)',
@@ -100,7 +100,7 @@ function ProductCard({ product, onAddToCart, cartItems = [], variant = 'default'
       showSizes: false
     },
     expanded: {
-      padding: 'clamp(1rem, 3vw, 1.5rem)',
+      padding: '0px',
       cardShadow: '6px 6px 16px rgba(0, 0, 0, 0.15)',
       imageShadow: '5px 5px 12px rgba(0, 0, 0, 0.12)',
       titleSize: 'clamp(1.25rem, 4vw, 1.875rem)',
@@ -111,7 +111,7 @@ function ProductCard({ product, onAddToCart, cartItems = [], variant = 'default'
       showSizes: true
     },
     featured: {
-      padding: 'clamp(1rem, 3vw, 1.5rem)',
+      padding: '0px',
       cardShadow: '8px 8px 24px rgba(0, 0, 0, 0.18)',
       imageShadow: '6px 6px 16px rgba(0, 0, 0, 0.15)',
       titleSize: 'clamp(1.25rem, 4vw, 1.875rem)',
@@ -130,7 +130,7 @@ function ProductCard({ product, onAddToCart, cartItems = [], variant = 'default'
   if (variant === 'horizontal') {
     return (
       <div
-        className="flex flex-row w-full p-3 rounded-sm transition-all duration-300 gap-4 bg-background"
+        className="flex flex-row w-full p-0 rounded-sm transition-all duration-300 gap-4 bg-background"
       >
         <Link to={productUrl} aria-label={productName} className="absolute inset-0 z-10" />
         {/* Imatge petita a l'esquerra */}
@@ -144,7 +144,7 @@ function ProductCard({ product, onAddToCart, cartItems = [], variant = 'default'
             <img
               src={cardImage}
               alt={productName}
-              className="w-full h-full object-contain transition-transform hover:scale-105 duration-300"
+              className="w-full h-full object-cover transition-transform hover:scale-105 duration-300"
               loading="lazy"
               decoding="async"
             />
@@ -209,7 +209,7 @@ function ProductCard({ product, onAddToCart, cartItems = [], variant = 'default'
           <img
             src={cardImage}
             alt={productName}
-            className="w-full h-full object-contain transition-transform group-hover:scale-105 duration-300"
+            className="w-full h-full object-cover transition-transform group-hover:scale-105 duration-300"
             loading="lazy"
             decoding="async"
           />

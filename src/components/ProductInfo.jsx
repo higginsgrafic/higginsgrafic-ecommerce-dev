@@ -233,6 +233,25 @@ const ProductInfo = ({
             style={{ width: '70px', height: '35px', position: 'relative', top: '0px', left: '-4px', zIndex: 10, display: 'flex', alignItems: 'flex-end', justifyContent: 'center', lineHeight: '0' }}
             aria-label="Afegeix al cistell"
           >
+            <span
+              aria-hidden="true"
+              style={{
+                width: '100%',
+                height: '100%',
+                transform: 'scale(1.27)',
+                transformOrigin: 'center bottom',
+                backgroundColor: 'currentColor',
+                WebkitMaskImage: `url(${cartItems.length > 0 ? '/custom_logos/icons/cistell-ple-1.svg' : '/custom_logos/icons/cistell-buit.svg'})`,
+                maskImage: `url(${cartItems.length > 0 ? '/custom_logos/icons/cistell-ple-1.svg' : '/custom_logos/icons/cistell-buit.svg'})`,
+                WebkitMaskRepeat: 'no-repeat',
+                maskRepeat: 'no-repeat',
+                WebkitMaskPosition: 'center bottom',
+                maskPosition: 'center bottom',
+                WebkitMaskSize: 'contain',
+                maskSize: 'contain'
+              }}
+            />
+
             {cartItems.length > 0 ? (
               <span
                 style={{
@@ -253,25 +272,6 @@ const ProductInfo = ({
                 {cartItems.length}
               </span>
             ) : null}
-            <span
-              aria-hidden="true"
-              style={{
-                height: '35px',
-                width: '70px',
-                display: 'block',
-                transform: 'scale(1.27)',
-                transformOrigin: 'center bottom',
-                backgroundColor: 'currentColor',
-                WebkitMaskImage: `url(${cartItems.length > 0 ? '/custom_logos/icons/basket-full-1.svg' : '/custom_logos/icons/basket-empty.svg'})`,
-                maskImage: `url(${cartItems.length > 0 ? '/custom_logos/icons/basket-full-1.svg' : '/custom_logos/icons/basket-empty.svg'})`,
-                WebkitMaskRepeat: 'no-repeat',
-                maskRepeat: 'no-repeat',
-                WebkitMaskPosition: 'center bottom',
-                maskPosition: 'center bottom',
-                WebkitMaskSize: 'contain',
-                maskSize: 'contain'
-              }}
-            />
           </button>
         </div>
       </>

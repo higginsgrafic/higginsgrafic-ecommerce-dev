@@ -44,9 +44,11 @@ export default function FullWideSlideDemoHumanInsideSlider({
   const holdTimeoutRef = useRef(null);
   const holdIntervalRef = useRef(null);
 
-  const isPathItem = (it) => typeof it === 'string' && /\.(png|jpg|jpeg|webp)$/i.test(it);
+  function isPathItem(it) {
+    return typeof it === 'string' && /\.(png|jpg|jpeg|webp)$/i.test(it);
+  }
 
-  const deriveVariantPath = (p, variant) => {
+  function deriveVariantPath(p, variant) {
     if (typeof p !== 'string') return null;
     if (!isPathItem(p)) return null;
     let next = p;
@@ -65,6 +67,42 @@ export default function FullWideSlideDemoHumanInsideSlider({
     if (next.includes('/black/')) next = next.replace('/black/', '/white/');
     if (/-b\.(png|jpg|jpeg|webp)$/i.test(next)) next = next.replace(/-b\.(png|jpg|jpeg|webp)$/i, '-w.$1');
     return next;
+  }
+
+  const normalizeKey = (value) => {
+    if (typeof value !== 'string') return '';
+    return value
+      .trim()
+      .replace(/[\u2010\u2011\u2012\u2013\u2014\u2212]/g, '-')
+      .replace(/\s+/g, ' ');
+  };
+
+  const resolveThinPlaceholderSrc = (it) => {
+    if (!it || typeof it !== 'string') return null;
+    if (collectionId !== 'the_human_inside') return null;
+
+    const key = normalizeKey(it).toLowerCase();
+    const map = {
+      'r2-d2': 'r2-d2.webp',
+      c3p0: 'c3-p0.webp',
+      vader: 'vader.webp',
+      afrodita: 'afrodita-a.webp',
+      mazinger: 'mazinger-z.webp',
+      'cylon 78': 'cylon-78.webp',
+      'cylon 03': 'cylon-03.webp',
+      'iron man 68': 'iron-man-68.webp',
+      'iron man 08': 'iron-man-08.webp',
+      cyberman: 'cyberman.webp',
+      'the dalek': 'the-dalek.webp',
+      robocop: 'robocop.webp',
+      terminator: 'terminator.webp',
+      maschinenmensch: 'maschinenmensch.webp',
+      'robby the robot': 'robby-the-robot.webp',
+      'robbie the robot': 'robby-the-robot.webp',
+    };
+
+    const file = map[key];
+    return file ? `/placeholders/images_grid/the_human_inside/${file}` : null;
   };
 
   const labelForItem = (it) => {
@@ -241,7 +279,8 @@ export default function FullWideSlideDemoHumanInsideSlider({
     idxs.forEach((raw) => {
       const oi = ((raw % humanInsideTotal) + humanInsideTotal) % humanInsideTotal;
       const it = drawingItems[oi];
-      preloadSrc(resolveSrc(it));
+      const src = resolveThinPlaceholderSrc(it);
+      preloadSrc(src);
     });
   }, [trackIndex, clones, humanInsideTotal, drawingItems, activeVariant]);
 
@@ -341,7 +380,7 @@ export default function FullWideSlideDemoHumanInsideSlider({
                     </Link>
                   )}
 
-                  {resolveSrc(it) ? (
+                  {resolveThinPlaceholderSrc(it) ? (
                     <div
                       className="relative z-10 mt-2 aspect-square w-full overflow-hidden"
                       ref={shouldMeasure ? tileSizeRef : undefined}
@@ -360,9 +399,9 @@ export default function FullWideSlideDemoHumanInsideSlider({
                       }}
                     >
                       <OptimizedImg
-                        src={resolveSrc(it)}
+                        src={resolveThinPlaceholderSrc(it)}
                         alt={collectionId === 'outcasted' && isPathItem(it) ? '' : labelForItem(it) || it}
-                        className={`h-full w-full object-contain ${it === 'Mazinger' ? 'scale-[0.64]' : it === 'Maschinenmensch' ? 'scale-[0.65]' : 'scale-[0.6]'}`}
+                        className="h-full w-full object-cover"
                       />
                     </div>
                   ) : (

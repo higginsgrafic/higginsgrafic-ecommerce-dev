@@ -1,0 +1,357 @@
+{
+  "v": 1,
+  "ts": "2026-02-15T23:23:00.347Z",
+  "source": "calibratge-2026-02-15T23-23-00-349Z.json",
+  "defined_overlays": {
+    "first_contact": {
+      "nx_01": { "x": 105.967, "y": -14.834, "s": 0.555 },
+      "ncc_1701": { "x": 94.386, "y": -53.66, "s": 0.69 },
+      "ncc_1701_d": { "x": 95.384, "y": -59.633, "s": 0.685 },
+      "wormhole": { "x": 110.178, "y": 24.892, "s": 0.51 },
+      "plasma_escape": { "x": 108.18, "y": 21.95, "s": 0.525 },
+      "vulcans_end": { "x": 110.128, "y": 25.049, "s": 0.51 },
+      "the_phoenix": { "x": 103.976, "y": 56.749, "s": 0.585 }
+    },
+    "the_human_inside": {
+      "c3p0": { "x": 106.096, "y": 13.229, "s": 0.57 },
+      "vader": { "x": 106.121, "y": 13.243, "s": 0.57 },
+      "afrodita_a": { "x": 104.109, "y": 13.229, "s": 0.585 },
+      "mazinger_z": { "x": 104.124, "y": 13.243, "s": 0.585 },
+      "iron_man": { "x": 100.145, "y": 9.019, "s": 0.62 },
+      "cyberman": { "x": 100.047, "y": 3.515, "s": 0.63 },
+      "cylon_we": { "x": 104.109, "y": 13.229, "s": 0.585 },
+      "cylon_03": { "x": 104.109, "y": 11.238, "s": 0.585 },
+      "maschinenmensch": { "x": 102.122, "y": 11.238, "s": 0.6 },
+      "robocop": { "x": 104.109, "y": 11.238, "s": 0.58 },
+      "terminator": { "x": 106.091, "y": 13.229, "s": 0.57 },
+      "robbie_the_robot": { "x": 106.091, "y": 23.18, "s": 0.565 },
+      "r2_d2": { "x": 107.306, "y": 18.95, "s": 0.55 },
+      "the_dalek": { "x": 99.356, "y": 3.034, "s": 0.64 }
+    },
+    "cube": {
+      "iron_kong": { "x": 115.983, "y": 36.703, "s": 0.44 },
+      "iron_cube": { "x": 116.101, "y": 35.07, "s": 0.445 },
+      "robocube": { "x": 115.057, "y": 34.937, "s": 0.45 },
+      "cylon_cube": { "x": 108.108, "y": 21.049, "s": 0.53 },
+      "maschinencube": { "x": 106.046, "y": 8.837, "s": 0.555 },
+      "mazinger_c": { "x": 96.151, "y": -20.832, "s": 0.675 },
+      "afrodita_c": { "x": 98.138, "y": -14.855, "s": 0.65 },
+      "3cube_p0": { "x": 108.033, "y": 14.81, "s": 0.53 },
+      "cybercube": { "x": 102.147, "y": -2.839, "s": 0.605 },
+      "darth_cube": { "x": 112.127, "y": 29.111, "s": 0.49 }
+    },
+    "miscel_lania": {
+      "dj_vader": { "x": 108.153, "y": 9.191, "s": 0.54 },
+      "death_star2d2": { "x": 107, "y": 7.6, "s": 0.555 },
+      "pont_del_diable": { "x": 66.117, "y": -76.847, "s": 1.04 }
+    },
+    "austen": {
+      "looking_for_my_darcy__gradient_solid": { "x": 111.282, "y": -0.956, "s": 0.5 },
+      "looking_for_my_darcy__frame": { "x": 105.321, "y": -12.902, "s": 0.575 },
+      "keep_calm__multi_red": { "x": 129.165, "y": 48.799, "s": 0.29 },
+      "crosswords__default": { "x": 121.213, "y": 50.794, "s": 0.39 },
+      "crosswords__pride_and_prejudice_3": { "x": 107.304, "y": 14.956, "s": 0.545 },
+      "pemberley_house": { "x": 107.308, "y": 10.982, "s": 0.545 },
+      "quotes": {
+        "it_is_a_truth": { "x": 119.234, "y": 7, "s": 0.44 },
+        "half_agony_half_hope": { "x": 109.297, "y": -36.794, "s": 0.57 },
+        "unsociable_and_taciturn": { "x": 109.295, "y": -40.776, "s": 0.555 },
+        "you_have_bewitched_me": { "x": 107.306, "y": -54.721, "s": 0.61 },
+        "you_must_allow_me": { "x": 125.195, "y": 22.928, "s": 0.365 },
+        "body_and_soul": { "x": 107.306, "y": -54.721, "s": 0.61 }
+      }
+    }
+  },
+  "items": {
+    "overlayCalib": {
+      "stripeOverlayCalib_all__custom_logos_drawings_the_human_inside_mazinger_cf0.790_fo20_lo63_cr20_rb0": {
+        "x": 104.124,
+        "y": 13.243,
+        "s": 0.585,
+        "u": "svg"
+      },
+      "stripeOverlayCalib_all__custom_logos_drawings_the_human_inside_iron_man_cf0.790_fo20_lo63_cr20_rb0": {
+        "x": 100.145,
+        "y": 9.019,
+        "s": 0.62,
+        "u": "svg"
+      },
+      "stripeOverlayCalib_all__custom_logos_drawings_austen_samarreta_looking__cf0.790_fo20_lo63_cr20_rb0": {
+        "x": 111.282,
+        "y": -0.956,
+        "s": 0.5,
+        "u": "svg"
+      },
+      "stripeOverlayCalib_all__custom_logos_drawings_the_human_inside_cyberman_cf0.790_fo20_lo63_cr20_rb0": {
+        "x": 100.047,
+        "y": 3.515,
+        "s": 0.63,
+        "u": "svg"
+      },
+      "stripeOverlayCalib_all__custom_logos_drawings_the_human_inside_terminat_cf0.790_fo20_lo63_cr20_rb0": {
+        "x": 106.091,
+        "y": 13.229,
+        "s": 0.57,
+        "u": "svg"
+      },
+      "stripeOverlayCalib_all__custom_logos_drawings_austen_samarreta_quotes_u_cf0.790_fo20_lo63_cr20_rb0": {
+        "x": 109.295,
+        "y": -40.776,
+        "s": 0.555,
+        "u": "svg"
+      },
+      "stripeOverlayCalib_all__placeholders_images_grid_austen_looking_for_my__cf0.790_fo20_lo63_cr20_rb0": {
+        "x": 69.551,
+        "y": -72.624,
+        "s": 1,
+        "u": "svg"
+      },
+      "stripeOverlayCalib_all__custom_logos_drawings_the_human_inside_r2_d2_we_cf0.790_fo20_lo63_cr20_rb0": {
+        "x": 107.306,
+        "y": 18.95,
+        "s": 0.55,
+        "u": "svg"
+      },
+      "stripeOverlayCalib_all_austen_quotes_you_must_allow_me_cf0.790_fo20_lo63_cr20_rb0": {
+        "x": 125.195,
+        "y": 22.928,
+        "s": 0.365,
+        "u": "svg"
+      },
+      "stripeOverlayCalib_all__custom_logos_drawings_austen_samarreta_pemberle_cf0.790_fo20_lo63_cr20_rb0": {
+        "x": 107.308,
+        "y": 10.982,
+        "s": 0.545,
+        "u": "svg"
+      },
+      "stripeOverlayCalib_all_austen_looking_for_my_darcy_frame_cf0.790_fo20_lo63_cr20_rb0": {
+        "x": 105.321,
+        "y": -12.902,
+        "s": 0.575,
+        "u": "svg"
+      },
+      "stripeOverlayCalib_all__custom_logos_drawings_austen_samarreta_quotes_h_cf0.790_fo20_lo63_cr20_rb0": {
+        "x": 109.297,
+        "y": -36.794,
+        "s": 0.57,
+        "u": "svg"
+      },
+      "stripeOverlayCalib_all__custom_logos_drawings_the_human_inside_cylon_we_cf0.790_fo20_lo63_cr20_rb0": {
+        "x": 104.109,
+        "y": 13.229,
+        "s": 0.585,
+        "u": "svg"
+      },
+      "stripeOverlayCalib_all__placeholders_images_grid_miscel_lania_pont_del__cf0.790_fo20_lo63_cr20_rb0": {
+        "x": 66.117,
+        "y": -76.847,
+        "s": 1.04,
+        "u": "svg"
+      },
+      "stripeOverlayCalib_all_austen_quotes_body_and_soul_cf0.790_fo20_lo63_cr20_rb0": {
+        "x": 107.306,
+        "y": -54.721,
+        "s": 0.61,
+        "u": "svg"
+      },
+      "stripeOverlayCalib_all__custom_logos_drawings_austen_samarreta_quotes_y_cf0.790_fo20_lo63_cr20_rb0": {
+        "x": 129.169,
+        "y": 26.902,
+        "s": 0.35,
+        "u": "svg"
+      },
+      "stripeOverlayCalib_all__custom_logos_drawings_the_human_inside_vader_we_cf0.790_fo20_lo63_cr20_rb0": {
+        "x": 106.121,
+        "y": 13.243,
+        "s": 0.57,
+        "u": "svg"
+      },
+      "stripeOverlayCalib_all__custom_logos_drawings_the_human_inside_afrodita_cf0.790_fo20_lo63_cr20_rb0": {
+        "x": 104.109,
+        "y": 13.229,
+        "s": 0.585,
+        "u": "svg"
+      },
+      "stripeOverlayCalib_all__custom_logos_drawings_the_human_inside_c3_p0_we_cf0.790_fo20_lo63_cr20_rb0": {
+        "x": 106.096,
+        "y": 13.229,
+        "s": 0.57,
+        "u": "svg"
+      },
+      "stripeOverlayCalib_all__custom_logos_drawings_austen_samarreta_keep_cal_cf0.790_fo20_lo63_cr20_rb0": {
+        "x": 129.165,
+        "y": 48.799,
+        "s": 0.29,
+        "u": "svg"
+      },
+      "stripeOverlayCalib_all__placeholders_images_grid_austen_crosswords_sens_cf0.790_fo20_lo63_cr20_rb0": {
+        "x": 99.36,
+        "y": -52.718,
+        "s": 1,
+        "u": "svg"
+      },
+      "stripeOverlayCalib_all__custom_logos_drawings_the_human_inside_robbie_t_cf0.790_fo20_lo63_cr20_rb0": {
+        "x": 106.091,
+        "y": 23.18,
+        "s": 0.565,
+        "u": "svg"
+      },
+      "stripeOverlayCalib_all__custom_logos_drawings_the_human_inside_cylon_03_cf0.790_fo20_lo63_cr20_rb0": {
+        "x": 104.109,
+        "y": 11.238,
+        "s": 0.585,
+        "u": "svg"
+      },
+      "stripeOverlayCalib_all__custom_logos_drawings_austen_samarreta_encreuat_cf0.790_fo20_lo63_cr20_rb0": {
+        "x": 121.213,
+        "y": 50.794,
+        "s": 0.39,
+        "u": "svg"
+      },
+      "stripeOverlayCalib_all__custom_logos_drawings_the_human_inside_maschine_cf0.790_fo20_lo63_cr20_rb0": {
+        "x": 102.122,
+        "y": 11.238,
+        "s": 0.6,
+        "u": "svg"
+      },
+      "stripeOverlayCalib_all__placeholders_images_grid_austen_crosswords_pers_cf0.790_fo20_lo63_cr20_rb0": {
+        "x": 99.358,
+        "y": 5.009,
+        "s": 0.64,
+        "u": "svg"
+      },
+      "stripeOverlayCalib_all__custom_logos_drawings_the_human_inside_robocop__cf0.790_fo20_lo63_cr20_rb0": {
+        "x": 104.109,
+        "y": 11.238,
+        "s": 0.58,
+        "u": "svg"
+      },
+      "stripeOverlayCalib_all_austen_encreuats_pride_and_prejudice_3_cf0.790_fo20_lo63_cr20_rb0": {
+        "x": 107.304,
+        "y": 14.956,
+        "s": 0.545,
+        "u": "svg"
+      },
+      "stripeOverlayCalib_all__placeholders_images_grid_austen_crosswords_prid_cf0.790_fo20_lo63_cr20_rb0": {
+        "x": 95.384,
+        "y": -0.96,
+        "s": 0.68,
+        "u": "svg"
+      },
+      "stripeOverlayCalib_all__placeholders_images_grid_austen_keep_calm_keep__cf0.790_fo20_lo63_cr20_rb0": {
+        "x": 69.553,
+        "y": -60.682,
+        "s": 1,
+        "u": "svg"
+      },
+      "stripeOverlayCalib_all__custom_logos_drawings_austen_samarreta_quotes_i_cf0.790_fo20_lo63_cr20_rb0": {
+        "x": 119.234,
+        "y": 7,
+        "s": 0.44,
+        "u": "svg"
+      },
+      "stripeOverlayCalib_all__custom_logos_drawings_the_human_inside_the_dale_cf0.790_fo20_lo63_cr20_rb0": {
+        "x": 99.356,
+        "y": 3.034,
+        "s": 0.64,
+        "u": "svg"
+      }
+    },
+    "refCalib": {
+      "stripeRefCalib_all__custom_logos_drawings_austen_samarreta_pemberle_cf0.790_fo20_lo63_cr20_rb0": {
+        "x": 0,
+        "y": 10,
+        "s": 1,
+        "v": 2
+      },
+      "stripeRefCalibFresh_all__tmp_calibrtge_outcasted_outcasted_arthur_d_the__cf0.790_fo20_lo63_cr20_rb0": {
+        "x": -5,
+        "y": -78,
+        "s": 1.78,
+        "v": 2
+      },
+      "stripeRefCalib_all__tmp_calibrtge_austen_quotes_1_jpg_cf0.790_fo20_lo63_cr20_rb0": {
+        "x": -11,
+        "y": -80,
+        "s": 1.875,
+        "v": 2
+      },
+      "stripeRefCalib_all__placeholders_images_grid_the_human_inside_c3_p0_cf0.790_fo20_lo63_cr20_rb0": {
+        "x": 0,
+        "y": 0,
+        "s": 1,
+        "v": 2
+      },
+      "stripeRefCalibFresh_all__tmp_calibrtge_outcasted_outcasted_dead_star2d2__cf0.790_fo20_lo63_cr20_rb0": {
+        "x": -5,
+        "y": -78,
+        "s": 1.78,
+        "v": 2
+      },
+      "stripeRefCalibFresh_all__tmp_calibrtge_outcasted_outcasted_dalek_conquer_cf0.790_fo20_lo63_cr20_rb0": {
+        "x": -5,
+        "y": -78,
+        "s": 1.78,
+        "v": 2
+      },
+      "stripeRefCalib_all__tmp_calibrtge_austen_keepcalm_keep_calm_multi_r_cf0.790_fo20_lo63_cr20_rb0": {
+        "x": 6,
+        "y": -68,
+        "s": 1.54,
+        "v": 2
+      },
+      "stripeRefCalib_all__tmp_calibrtge_austen_pemberley_house_permberley_cf0.790_fo20_lo63_cr20_rb0": {
+        "x": -30,
+        "y": -170,
+        "s": 2.29,
+        "v": 2
+      },
+      "stripeRefCalib_all__tmp_calibrtge_the_human_inside_c3p0_png_cf0.790_fo20_lo63_cr20_rb0": {
+        "x": -4,
+        "y": -76,
+        "s": 1.76,
+        "v": 2
+      },
+      "stripeRefCalibFresh_all__tmp_calibrtge_outcasted_outcasted_dalek_destroy_cf0.790_fo20_lo63_cr20_rb0": {
+        "x": -5,
+        "y": -78,
+        "s": 1.78,
+        "v": 2
+      },
+      "stripeRefCalib_all__tmp_calibrtge_austen_looking_for_my_darcy_looki_cf0.790_fo20_lo63_cr20_rb0": {
+        "x": -5,
+        "y": -77,
+        "s": 1.785,
+        "v": 2
+      },
+      "stripeRefCalib_all__tmp_calibrtge_austen_encreuats_persuasion_1_jpg_cf0.790_fo20_lo63_cr20_rb0": {
+        "x": -10,
+        "y": -79,
+        "s": 1.84,
+        "v": 2
+      },
+      "stripeRefCalib_all__tmp_calibrtge_first_contact_first_contact_nx_01_cf0.790_fo20_lo63_cr20_rb0": {
+        "x": -46,
+        "y": 0,
+        "s": 1.315,
+        "v": 2
+      },
+      "stripeRefCalib_all__tmp_calibrtge_outcasted_outcasted_dead_star2d2__cf0.790_fo20_lo63_cr20_rb0": {
+        "x": 0,
+        "y": 0,
+        "s": 1,
+        "v": 2
+      },
+      "stripeRefCalib_all__tmp_calibrtge_the_human_inside_terminator_png_cf0.790_fo20_lo63_cr20_rb0": {
+        "x": 0,
+        "y": 0,
+        "s": 1,
+        "v": 2
+      }
+    },
+    "v3Tiles": {}
+  },
+  "global": {
+    "HG_GLOBAL_STRIPE_OVERLAY_SRC": "/custom_logos/drawings/austen/samarreta/quotes/black/you-have-bewiched-me-b.webp"
+  }
+}

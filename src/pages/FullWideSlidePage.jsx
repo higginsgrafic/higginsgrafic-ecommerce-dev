@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useLayoutEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import FullWideSlideDemoHeader from '@/components/FullWideSlideDemoHeader';
 import useComponentCatalogConfig from '@/hooks/useComponentCatalogConfig';
@@ -15,18 +15,43 @@ export default function FullWideSlidePage() {
   const resolvedMegaConfig =
     megaMenu?.megaConfig && typeof megaMenu.megaConfig === 'object' && Object.keys(megaMenu.megaConfig).length > 0 ? megaMenu.megaConfig : undefined;
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (typeof document === 'undefined') return undefined;
 
     const prevHtmlOverflow = document.documentElement.style.overflow;
     const prevBodyOverflow = document.body.style.overflow;
+    const prevScrollbarGutter = document.documentElement.style.scrollbarGutter;
+    const prevBodyScrollbarGutter = document.body.style.scrollbarGutter;
+
+    const styleEl = document.createElement('style');
+    styleEl.setAttribute('data-fw-hide-scrollbars', '1');
+    styleEl.textContent = `
+html::-webkit-scrollbar, body::-webkit-scrollbar { width: 0 !important; height: 0 !important; }
+html, body { scrollbar-width: none; }
+`;
 
     document.documentElement.style.overflow = 'hidden';
     document.body.style.overflow = 'hidden';
+    document.documentElement.style.scrollbarGutter = 'auto';
+    document.body.style.scrollbarGutter = 'auto';
+
+    try {
+      document.head.appendChild(styleEl);
+    } catch {
+      // ignore
+    }
 
     return () => {
       document.documentElement.style.overflow = prevHtmlOverflow;
       document.body.style.overflow = prevBodyOverflow;
+      document.documentElement.style.scrollbarGutter = prevScrollbarGutter;
+      document.body.style.scrollbarGutter = prevBodyScrollbarGutter;
+
+      try {
+        styleEl.remove();
+      } catch {
+        // ignore
+      }
     };
   }, []);
 

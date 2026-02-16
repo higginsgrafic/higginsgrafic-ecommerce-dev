@@ -165,12 +165,12 @@ const Cart = ({ isOpen, onClose, items, onUpdateQuantity, onRemove, totalPrice, 
             <div className="h-full flex flex-col items-center justify-center space-y-4">
               <span
                 aria-hidden="true"
-                className="h-16 w-16 opacity-30"
+                className="h-6 w-6"
                 style={{
                   display: 'block',
                   backgroundColor: 'hsl(var(--foreground))',
-                  WebkitMaskImage: "url(/custom_logos/icons/basket-empty.svg)",
-                  maskImage: "url(/custom_logos/icons/basket-empty.svg)",
+                  WebkitMaskImage: "url(/custom_logos/icons/cistell-buit.svg)",
+                  maskImage: "url(/custom_logos/icons/cistell-buit.svg)",
                   WebkitMaskRepeat: 'no-repeat',
                   maskRepeat: 'no-repeat',
                   WebkitMaskPosition: 'center',

@@ -34,35 +34,41 @@ const FIRST_CONTACT_MEDIA_WHITE = {
 };
 
 const THE_HUMAN_INSIDE_MEDIA = {
-  'C3P0': '/custom_logos/drawings/the_human_inside/black/7-c3p0-b4.webp',
-  'Vader': '/custom_logos/drawings/the_human_inside/black/8-vader-b4.webp',
-  'Afrodita': '/custom_logos/drawings/the_human_inside/black/9-afrodita-a-b3.webp',
-  'Mazinger': '/custom_logos/drawings/the_human_inside/black/10-mazinger-b4.webp',
-  'Cylon 78': '/custom_logos/drawings/the_human_inside/black/11-cylon-78-b4.webp',
-  'Cylon 03': '/custom_logos/drawings/the_human_inside/black/12-cylon-03-b1.webp',
-  'Iron Man 68': '/custom_logos/drawings/the_human_inside/black/13-iron-man-68-b1.webp',
-  'Iron Man 08': '/custom_logos/drawings/the_human_inside/black/14-ironman-08-b4.webp',
-  'Cyberman': '/custom_logos/drawings/the_human_inside/black/15-cyberman-b4.webp',
-  'Maschinenmensch': '/custom_logos/drawings/the_human_inside/black/16-maschinenmensch-b1.webp',
-  'Robocop': '/custom_logos/drawings/the_human_inside/black/17-robocop-b4.webp',
-  'Terminator': '/custom_logos/drawings/the_human_inside/black/18-terminator-b4.webp',
-  'Robbie the Robot': '/custom_logos/drawings/the_human_inside/black/19-robbie-the-robot-b1.webp',
+  'R2-D2': '/custom_logos/drawings/the_human_inside/black/r2-d2.webp',
+  'The Dalek': '/custom_logos/drawings/the_human_inside/black/the-dalek.webp',
+  'C3P0': '/custom_logos/drawings/the_human_inside/black/c3-p0.webp',
+  'Vader': '/custom_logos/drawings/the_human_inside/black/vader.webp',
+  'Afrodita': '/custom_logos/drawings/the_human_inside/black/afrodita-a.webp',
+  'Mazinger': '/custom_logos/drawings/the_human_inside/black/mazinger-z.webp',
+  'Cylon 78': '/custom_logos/drawings/the_human_inside/black/cylon.webp',
+  'Cylon 03': '/custom_logos/drawings/the_human_inside/black/cylon-03.webp',
+  'Iron Man 68': '/custom_logos/drawings/the_human_inside/black/iron-man-68.webp',
+  'Iron Man 08': '/custom_logos/drawings/the_human_inside/black/iron-man-08.webp',
+  'Cyberman': '/custom_logos/drawings/the_human_inside/black/cyberman.webp',
+  'Maschinenmensch': '/custom_logos/drawings/the_human_inside/black/maschinenmensch.webp',
+  'Robocop': '/custom_logos/drawings/the_human_inside/black/robocop.webp',
+  'Terminator': '/custom_logos/drawings/the_human_inside/black/terminator.webp',
+  'Robbie the Robot': '/custom_logos/drawings/the_human_inside/black/robbie-the-robot.webp',
 };
 
 const THE_HUMAN_INSIDE_MEDIA_WHITE = {
-  'C3P0': '/custom_logos/drawings/the_human_inside/white/7-c3p0-w1.webp',
-  'Vader': '/custom_logos/drawings/the_human_inside/white/8-vader-w4.webp',
-  'Afrodita': '/custom_logos/drawings/the_human_inside/white/9-afrodita-w4.webp',
-  'Mazinger': '/custom_logos/drawings/the_human_inside/white/10-mazinger-w1.webp',
-  'Cylon 78': '/custom_logos/drawings/the_human_inside/white/11-cylon-78-w4.webp',
-  'Cylon 03': '/custom_logos/drawings/the_human_inside/white/12-cylon-03-w3.webp',
-  'Iron Man 68': '/custom_logos/drawings/the_human_inside/white/13-iron-man-68-w4.webp',
-  'Iron Man 08': '/custom_logos/drawings/the_human_inside/white/14-iron-man-08-w4.webp',
-  'Cyberman': '/custom_logos/drawings/the_human_inside/white/15-cyberman-w1.webp',
-  'Maschinenmensch': '/custom_logos/drawings/the_human_inside/white/16-maschinenmensch-w1.webp',
-  'Robocop': '/custom_logos/drawings/the_human_inside/white/17-robocop-w3.webp',
-  'Terminator': '/custom_logos/drawings/the_human_inside/white/18-terminator-w1.webp',
-  'Robbie the Robot': '/custom_logos/drawings/the_human_inside/white/19-robbie-the-robot-w2.webp',
+  ...THE_HUMAN_INSIDE_MEDIA,
+};
+
+const CUBE_MEDIA = {
+  'Iron Kong': '/custom_logos/drawings/cube/iron-cube-08-iron-kong.webp',
+  'Iron Cube 68': '/custom_logos/drawings/cube/iron-cube-68.webp',
+  RoboCube: '/custom_logos/drawings/cube/robocube.webp',
+  'Cylon Cube': '/custom_logos/drawings/cube/cylon-cube-03.webp',
+  'Cylon Cube 03': '/custom_logos/drawings/cube/cylon-cube-03.webp',
+  MaschinenCube: '/custom_logos/drawings/cube/maschinencube.webp',
+  'Mazinger C': '/custom_logos/drawings/cube/mazinger-c.webp',
+  'Afrodita C': '/custom_logos/drawings/cube/afrodita-c.webp',
+  'Cube 3 P0': '/custom_logos/drawings/cube/cube-3-p0.webp',
+  '3cube p0': '/custom_logos/drawings/cube/cube-3-p0.webp',
+  '3cube-p0': '/custom_logos/drawings/cube/cube-3-p0.webp',
+  'Cyber Cube': '/custom_logos/drawings/cube/cyber-cube.webp',
+  'Darth Cube': '/custom_logos/drawings/cube/darth-cube.webp',
 };
 
 function FirstContactStripeMockupPanel({ megaTileSize, selectedItem, variant, resolveSrc, OptimizedImg }) {
@@ -149,7 +155,19 @@ const OptimizedImg = React.forwardRef(function OptimizedImg({ src, alt, classNam
       onError={() => {
         if (import.meta.env.DEV) {
           // eslint-disable-next-line no-console
-          console.warn('[OptimizedImg] error loading', { src, currentSrc, originalSrc });
+          const s = (currentSrc || originalSrc || src || '').toString();
+          const shouldLog =
+            s.includes('/placeholders/images_grid/cube/')
+            || s.includes('/custom_logos/drawings/cube/')
+            || s.includes('/placeholders/images_grid/the_human_inside/')
+            || s.includes('/custom_logos/drawings/the_human_inside/')
+            || s.includes('/placeholders/images_grid/first_contact/')
+            || s.includes('/custom_logos/drawings/first_contact/')
+            || s.includes('/placeholders/images_grid/miscel');
+          if (shouldLog) {
+            // eslint-disable-next-line no-console
+            console.error('[OptimizedImg] tile error loading', { src, currentSrc, originalSrc });
+          }
         }
         if (triedFallbackRef.current) return;
         triedFallbackRef.current = true;
@@ -178,11 +196,12 @@ function IconButton({ label, onClick, onDoubleClick, onMouseEnter, buttonRef, ch
 
 function FirstContactDibuix00Buttons({ onWhite, onBlack }) {
   return (
-    <div className="relative mt-2 aspect-square w-full">
+    <div className="relative mt-2 aspect-square w-full" data-stripe-buttonbar="bn">
       <div className="absolute inset-0 overflow-hidden rounded-md bg-muted">
         <button
           type="button"
           aria-label="Blanc"
+          id="stripe-guide-left-anchor"
           onClick={onWhite}
           className="absolute left-0 top-0 h-1/2 w-full bg-foreground focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         >
@@ -223,6 +242,7 @@ function FirstContactDibuix09Buttons({
         <button
           type="button"
           aria-label="Anterior"
+          id="stripe-guide-right-anchor"
           onClick={hasPrevPointerHandlers ? undefined : onPrev}
           onPointerDown={onPrevPointerDown}
           onPointerUp={onPrevPointerUp}
@@ -281,6 +301,148 @@ function MegaColumn({
   const humanInsideEnabled = Boolean(isHumanInside);
   const effectiveTileSize = megaTileSize || tileSize;
   const [selectedItem, setSelectedItem] = useState(null);
+  const [pageStart, setPageStart] = useState(0);
+
+  const urlParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
+  const gridCalibEnabled = !!urlParams?.has('gridCalib') || !!urlParams?.has('stripeCalib');
+  const GRID_SCALE_STORAGE_KEY = useMemo(
+    () => `HG_GRID_SCALES_${(collectionId || '').toString()}`,
+    [collectionId]
+  );
+  const GRID_OFFSET_STORAGE_KEY = useMemo(
+    () => `HG_GRID_OFFSETS_${(collectionId || '').toString()}`,
+    [collectionId]
+  );
+
+  const cubeAdjustable = useMemo(
+    () => new Set(['MaschinenCube', 'Mazinger C', 'Afrodita C', 'Cube 3 P0', 'Cyber Cube', 'Darth Cube', '3cube p0', '3cube-p0']),
+    []
+  );
+  const cubeLocked = useMemo(
+    () => new Set(['Iron Kong', 'Iron Cube 68', 'RoboCube', 'Cylon Cube', 'Cylon Cube 03']),
+    []
+  );
+
+  const gridCalibKeyFor = (it) => {
+    if (!it || typeof it !== 'string') return it;
+    if (collectionId !== 'cube') return it;
+
+    const raw = it.trim();
+    const file = raw.split('/').filter(Boolean).pop() || raw;
+    const lower = file.toLowerCase();
+    const map = {
+      'iron-kong.webp': 'Iron Kong',
+      'iron-cube.webp': 'Iron Cube 68',
+      'robocube.webp': 'RoboCube',
+      'cylon-cube.webp': 'Cylon Cube 03',
+      'maschinencube.webp': 'MaschinenCube',
+      'mazinger-c.webp': 'Mazinger C',
+      'afrodita-c.webp': 'Afrodita C',
+      '3cube-p0.webp': 'Cube 3 P0',
+      'cybercube.webp': 'Cyber Cube',
+      'darth-cube.webp': 'Darth Cube',
+    };
+    return map[lower] || it;
+  };
+
+  const [gridScales, setGridScales] = useState(() => {
+    try {
+      if (typeof window === 'undefined') return {};
+      const raw = window.localStorage.getItem(`HG_GRID_SCALES_${(collectionId || '').toString()}`);
+      const parsed = raw ? JSON.parse(raw) : null;
+      return parsed && typeof parsed === 'object' ? parsed : {};
+    } catch {
+      return {};
+    }
+  });
+
+  const [gridOffsets, setGridOffsets] = useState(() => {
+    try {
+      if (typeof window === 'undefined') return {};
+      const raw = window.localStorage.getItem(`HG_GRID_OFFSETS_${(collectionId || '').toString()}`);
+      const parsed = raw ? JSON.parse(raw) : null;
+      return parsed && typeof parsed === 'object' ? parsed : {};
+    } catch {
+      return {};
+    }
+  });
+
+  useEffect(() => {
+    try {
+      if (typeof window === 'undefined') return;
+      window.localStorage.setItem(GRID_SCALE_STORAGE_KEY, JSON.stringify(gridScales || {}));
+    } catch {
+      // ignore
+    }
+  }, [GRID_SCALE_STORAGE_KEY, gridScales]);
+
+  useEffect(() => {
+    try {
+      if (typeof window === 'undefined') return;
+      window.localStorage.setItem(GRID_OFFSET_STORAGE_KEY, JSON.stringify(gridOffsets || {}));
+    } catch {
+      // ignore
+    }
+  }, [GRID_OFFSET_STORAGE_KEY, gridOffsets]);
+
+  useEffect(() => {
+    if (!gridCalibEnabled) return undefined;
+    if (collectionId !== 'cube') return undefined;
+
+    const onKeyDown = (e) => {
+      if (e.metaKey || e.ctrlKey || e.altKey) return;
+      const el = typeof document !== 'undefined' ? document.activeElement : null;
+      const tag = el && typeof el.tagName === 'string' ? el.tagName.toLowerCase() : '';
+      const isTypingTarget =
+        tag === 'input' ||
+        tag === 'textarea' ||
+        tag === 'select' ||
+        (el && typeof el.isContentEditable === 'boolean' && el.isContentEditable);
+      if (isTypingTarget) return;
+
+      const it = selectedItem;
+      if (!it || typeof it !== 'string') return;
+      const calibKey = gridCalibKeyFor(it);
+      if (cubeLocked.has(calibKey)) return;
+      if (!cubeAdjustable.has(calibKey)) return;
+
+      const isScaleKey = e.key === '+' || e.key === '-' || e.key === '=' || e.key === '_';
+      const isArrowKey = e.key === 'ArrowLeft' || e.key === 'ArrowRight' || e.key === 'ArrowUp' || e.key === 'ArrowDown';
+      if (!isScaleKey && !isArrowKey) return;
+      e.preventDefault();
+
+      if (isScaleKey) {
+        const dir = (e.key === '-' || e.key === '_') ? -1 : 1;
+        const delta = (e.shiftKey ? 0.05 : 0.02) * dir;
+
+        setGridScales((prev) => {
+          const base = prev && typeof prev === 'object' ? prev : {};
+          const current = Number.parseFloat(base[calibKey] ?? '');
+          const start = Number.isFinite(current) ? current : 0.6;
+          const next = Math.max(0.2, Math.min(1.5, Number((start + delta).toFixed(3))));
+          return { ...base, [calibKey]: next };
+        });
+        return;
+      }
+
+      const step = e.shiftKey ? 6 : 2;
+      const dx = e.key === 'ArrowLeft' ? -step : e.key === 'ArrowRight' ? step : 0;
+      const dy = e.key === 'ArrowUp' ? -step : e.key === 'ArrowDown' ? step : 0;
+      if (!dx && !dy) return;
+
+      setGridOffsets((prev) => {
+        const base = prev && typeof prev === 'object' ? prev : {};
+        const cur = base[calibKey] && typeof base[calibKey] === 'object' ? base[calibKey] : {};
+        const cx = Number.isFinite(Number(cur.x)) ? Number(cur.x) : 0;
+        const cy = Number.isFinite(Number(cur.y)) ? Number(cur.y) : 0;
+        const next = { x: cx + dx, y: cy + dy };
+        return { ...base, [calibKey]: next };
+      });
+    };
+
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [collectionId, cubeAdjustable, cubeLocked, selectedItem, gridCalibEnabled]);
 
   const effectiveItems = useMemo(() => {
     const list = Array.isArray(items) ? items.slice() : [];
@@ -289,17 +451,44 @@ function MegaColumn({
     const filtered = list.filter((it) => {
       if (it === CONTROL_TILE_BN || it === CONTROL_TILE_ARROWS) return true;
       if (typeof it !== 'string') return false;
-      if (it.startsWith('black/')) return variant !== 'white';
-      if (it.startsWith('white/')) return variant === 'white';
+      if (!isPathItem(it)) return true;
+      if (variant === 'white' && it.includes('/black/')) return false;
+      if (variant === 'black' && it.includes('/white/')) return false;
       return true;
     });
-    const bn = filtered.includes(CONTROL_TILE_BN) ? CONTROL_TILE_BN : null;
-    const arrows = filtered.includes(CONTROL_TILE_ARROWS) ? CONTROL_TILE_ARROWS : null;
-    const drawings = filtered.filter((it) => it && it !== CONTROL_TILE_BN && it !== CONTROL_TILE_ARROWS);
-    const padded = drawings.slice(0, 7);
-    while (padded.length < 7) padded.push(null);
-    return [bn, ...padded, arrows];
+    return filtered.filter(Boolean);
   }, [items, collectionId, isHumanInside, humanInsideVariant, firstContactVariant]);
+
+  const drawableItems = useMemo(() => {
+    const list = Array.isArray(effectiveItems) ? effectiveItems.filter(Boolean) : [];
+    return list.filter((it) => it !== CONTROL_TILE_BN && it !== CONTROL_TILE_ARROWS);
+  }, [CONTROL_TILE_ARROWS, CONTROL_TILE_BN, effectiveItems]);
+
+  useEffect(() => {
+    setPageStart(0);
+  }, [collectionId]);
+
+  const rowItems = useMemo(() => {
+    if (!row) return effectiveItems;
+    const list = Array.isArray(effectiveItems) ? effectiveItems.filter(Boolean) : [];
+    const hasBn = list.includes(CONTROL_TILE_BN);
+    const hasArrows = list.includes(CONTROL_TILE_ARROWS);
+    if (!hasBn || !hasArrows) return list.slice(0, 9);
+
+    if (drawableItems.length <= 7) {
+      const padCount = Math.max(0, 7 - drawableItems.length);
+      const pads = Array.from({ length: padCount }, () => null);
+      return [CONTROL_TILE_BN, ...drawableItems, ...pads, CONTROL_TILE_ARROWS].slice(0, 9);
+    }
+
+    const len = drawableItems.length;
+    const start = ((pageStart % len) + len) % len;
+    const windowed = [];
+    for (let i = 0; i < 7; i += 1) {
+      windowed.push(drawableItems[(start + i) % len]);
+    }
+    return [CONTROL_TILE_BN, ...windowed, CONTROL_TILE_ARROWS];
+  }, [CONTROL_TILE_ARROWS, CONTROL_TILE_BN, drawableItems, effectiveItems, pageStart, row]);
 
   useLayoutEffect(() => {
     if (!row) return;
@@ -326,16 +515,19 @@ function MegaColumn({
   }, [row, tileSize, onTileSize]);
 
   const baseItems = useMemo(() => {
-    return effectiveItems.filter((it) => it && it !== CONTROL_TILE_BN && it !== CONTROL_TILE_ARROWS);
-  }, [effectiveItems]);
+    return rowItems.filter((it) => it && it !== CONTROL_TILE_BN && it !== CONTROL_TILE_ARROWS);
+  }, [rowItems]);
 
   const outcastedStripeTiles = collectionId === 'outcasted' ? Math.max(0, Math.min(7, baseItems.length)) : 7;
 
-  const thinSlideEnabled = row && baseItems.length > 7;
+  const thinSlideEnabled = isHumanInside && row && drawableItems.length > 7;
+  const pagingEnabled = row && !thinSlideEnabled && drawableItems.length > 7;
 
-  const isPathItem = (it) => typeof it === 'string' && /\.(png|jpg|jpeg|webp)$/i.test(it);
+  function isPathItem(it) {
+    return typeof it === 'string' && /\.(png|jpg|jpeg|webp)$/i.test(it);
+  }
 
-  const deriveVariantPath = (p, variant) => {
+  function deriveVariantPath(p, variant) {
     if (typeof p !== 'string') return null;
     if (!isPathItem(p)) return null;
     let next = p;
@@ -354,7 +546,7 @@ function MegaColumn({
     if (next.includes('/black/')) next = next.replace('/black/', '/white/');
     if (/-b\.(png|jpg|jpeg|webp)$/i.test(next)) next = next.replace(/-b\.(png|jpg|jpeg|webp)$/i, '-w.$1');
     return next;
-  };
+  }
 
   const labelForItem = (it) => {
     if (typeof it !== 'string') return '';
@@ -364,16 +556,167 @@ function MegaColumn({
     return base.replace(/\.(png|jpg|jpeg|webp)$/i, '').replace(/[-_]+/g, ' ');
   };
 
+  const normalizeKey = (value) => {
+    if (typeof value !== 'string') return '';
+    return value
+      .trim()
+      .replace(/[\u2010\u2011\u2012\u2013\u2014\u2212]/g, '-')
+      .replace(/\s+/g, ' ');
+  };
+
   const resolveSrc = (it) => {
     if (!it) return null;
+
+    if (typeof it === 'string') {
+      const raw = it.trim();
+      if (raw.startsWith('/custom_logos/') || raw.startsWith('/placeholders/') || raw.startsWith('/tmp/')) {
+        return raw;
+      }
+    }
+
+    const itKey = normalizeKey(it);
     const variant = isHumanInside ? humanInsideVariant : firstContactVariant;
+    if (collectionId === 'cube') {
+      return CUBE_MEDIA[itKey] || CUBE_MEDIA[it] || null;
+    }
     if (isPathItem(it) && collectionId) {
       const vPath = deriveVariantPath(it, variant) || it;
+      if (typeof vPath === 'string' && vPath.startsWith('/')) return vPath;
       return `/custom_logos/drawings/${collectionId}/${vPath}`;
     }
-    if (FIRST_CONTACT_MEDIA[it]) return variant === 'white' ? (FIRST_CONTACT_MEDIA_WHITE[it] || FIRST_CONTACT_MEDIA[it]) : FIRST_CONTACT_MEDIA[it];
-    const humanSrc = (variant === 'white' ? THE_HUMAN_INSIDE_MEDIA_WHITE : THE_HUMAN_INSIDE_MEDIA)[it];
-    return humanSrc || null;
+    if (isHumanInside && (THE_HUMAN_INSIDE_MEDIA[itKey] || THE_HUMAN_INSIDE_MEDIA[it])) {
+      return (humanInsideVariant === 'white' ? THE_HUMAN_INSIDE_MEDIA_WHITE : THE_HUMAN_INSIDE_MEDIA)[itKey]
+        || (humanInsideVariant === 'white' ? THE_HUMAN_INSIDE_MEDIA_WHITE : THE_HUMAN_INSIDE_MEDIA)[it]
+        || null;
+    }
+    if (FIRST_CONTACT_MEDIA[itKey] || FIRST_CONTACT_MEDIA[it]) {
+      const base = FIRST_CONTACT_MEDIA[itKey] || FIRST_CONTACT_MEDIA[it];
+      const white = FIRST_CONTACT_MEDIA_WHITE[itKey] || FIRST_CONTACT_MEDIA_WHITE[it] || base;
+      return (firstContactVariant === 'white' ? white : base) || null;
+    }
+    return null;
+  };
+
+  const resolveGridThumbSrc = (it) => {
+    if (!it || typeof it !== 'string') return resolveSrc(it);
+    const raw = it.trim();
+    if (raw.startsWith('placeholders/images_grid/')) return `/${raw}`;
+    if (raw.startsWith('/placeholders/images_grid/')) return raw;
+    if (collectionId === 'cube' && isPathItem(raw) && !raw.startsWith('/')) {
+      const map = {
+        'iron-cube-68.webp': 'iron-cube.webp',
+        'iron-cube-08-iron-kong.webp': 'iron-kong.webp',
+        'cube-3-p0.webp': '3cube-p0.webp',
+        'cyber-cube.webp': 'cybercube.webp',
+        'cylon-cube-03.webp': 'cylon-cube.webp',
+      };
+      const file = map[raw.toLowerCase()] || raw;
+      return `/placeholders/images_grid/cube/${file}`;
+    }
+    const key = normalizeKey(it).toLowerCase();
+
+    if (collectionId === 'first_contact') {
+      const map = {
+        'nx-01': 'nx-01.webp',
+        'ncc-1701': 'ncc-1701.webp',
+        'ncc-1701-d': 'ncc1701-d.webp',
+        wormhole: 'wormhole.webp',
+        'plasma escape': 'plasma-escape.webp',
+        "vulcan's end": 'vulcans-end.webp',
+        'the phoenix': 'the-phoenix.webp',
+      };
+      const file = map[key];
+      return file ? `/placeholders/images_grid/first_contact/${file}` : resolveSrc(it);
+    }
+
+    if (collectionId === 'the_human_inside') {
+      const map = {
+        'r2-d2': 'r2-d2.webp',
+        c3p0: 'c3-p0.webp',
+        vader: 'vader.webp',
+        afrodita: 'afrodita-a.webp',
+        mazinger: 'mazinger-z.webp',
+        'cylon 78': 'cylon-78.webp',
+        'cylon 03': 'cylon-03.webp',
+        'iron man 68': 'iron-man-68.webp',
+        'iron man 08': 'iron-man-08.webp',
+        cyberman: 'cyberman.webp',
+        'the dalek': 'the-dalek.webp',
+        robocop: 'robocop.webp',
+        terminator: 'terminator.webp',
+        maschinenmensch: 'maschinenmensch.webp',
+        'robby the robot': 'robby-the-robot.webp',
+        'robbie the robot': 'robby-the-robot.webp',
+      };
+      const file = map[key];
+      return file ? `/placeholders/images_grid/the_human_inside/${file}` : null;
+    }
+
+    if (collectionId === 'austen') {
+      if (key.includes('allow me')) return '/placeholders/images_grid/austen/quotes/you-must-allow-me.webp';
+      if (key.includes('half agony') || key.includes('half hope')) return '/placeholders/images_grid/austen/quotes/half-agony-half-hope.webp';
+      if (key.includes('truth')) return '/placeholders/images_grid/austen/quotes/it-is-a-truth.webp';
+      if (key.includes('body and soul')) return '/placeholders/images_grid/austen/quotes/body-and-soul.webp';
+      return '/placeholders/images_grid/austen/quotes/it-is-a-truth.webp';
+    }
+
+    if (collectionId === 'cube') {
+      const map = {
+        'afrodita c': 'afrodita-c.webp',
+        'mazinger c': 'mazinger-c.webp',
+        'iron cube': 'iron-cube.webp',
+        'iron cube 68': 'iron-cube.webp',
+        'iron kong': 'iron-kong.webp',
+        'iron cube 08 iron kong': 'iron-kong.webp',
+        'cube 3 p0': '3cube-p0.webp',
+        'darth cube': 'darth-cube.webp',
+        maschinencube: 'maschinencube.webp',
+        robocube: 'robocube.webp',
+        cybercube: 'cybercube.webp',
+        'cyber cube': 'cybercube.webp',
+        'cylon cube': 'cylon-cube.webp',
+        'cylon cube 03': 'cylon-cube.webp',
+      };
+      const file = map[key];
+      const out = file ? `/placeholders/images_grid/cube/${file}` : null;
+      if (import.meta.env.DEV && !out) {
+        // eslint-disable-next-line no-console
+        console.error('[CUBE grid thumb] unresolved', { it, key, raw });
+      }
+      return out;
+    }
+
+    if (collectionId === 'outcasted') {
+      const s = it.toLowerCase();
+      if (s.includes('pont-del-diable')) return '/placeholders/images_grid/miscel·lania/pont-del-diable.webp';
+      if (s.includes('arthur')) return '/placeholders/images_grid/miscel·lania/pont-del-diable.webp';
+      if (s.includes('dalek')) return '/placeholders/images_grid/miscel·lania/pont-del-diable.webp';
+      if (s.includes('dj-vader')) return '/placeholders/images_grid/miscel·lania/pont-del-diable.webp';
+      if (s.includes('death-star2d2')) return '/placeholders/images_grid/miscel·lania/pont-del-diable.webp';
+      return resolveSrc(it);
+    }
+
+    return resolveSrc(it);
+  };
+
+  const gridScaleFor = (it) => {
+    if (!it || typeof it !== 'string') return 0.6;
+    const k = gridCalibKeyFor(it);
+    const v = Number.parseFloat(gridScales?.[k] ?? '');
+    if (Number.isFinite(v)) return v;
+    if (it === 'Mazinger') return 0.64;
+    if (it === 'Maschinenmensch') return 0.65;
+    return 0.6;
+  };
+
+  const gridOffsetFor = (it) => {
+    if (!it || typeof it !== 'string') return { x: 0, y: 0 };
+    const k = gridCalibKeyFor(it);
+    const raw = gridOffsets?.[k];
+    if (!raw || typeof raw !== 'object') return { x: 0, y: 0 };
+    const x = Number.isFinite(Number(raw.x)) ? Number(raw.x) : 0;
+    const y = Number.isFinite(Number(raw.y)) ? Number(raw.y) : 0;
+    return { x, y };
   };
 
   return (
@@ -438,7 +781,7 @@ function MegaColumn({
               />
             ) : (
               <div className="grid w-full grid-cols-9 gap-x-3">
-                {effectiveItems.map((it, idx) => (
+                {rowItems.map((it, idx) => (
                   <div
                     key={`${it}-${idx}`}
                     className="min-w-0 relative z-10"
@@ -453,6 +796,9 @@ function MegaColumn({
                       <Link
                         to="#"
                         className="relative z-40 flex h-4 w-full items-center justify-center whitespace-nowrap rounded-none bg-muted px-2 text-xs leading-4 text-muted-foreground hover:text-foreground"
+                        data-mega-label="1"
+                        data-mega-collection={collectionId}
+                        data-mega-item={typeof it === 'string' ? it : ''}
                         onClick={(e) => {
                           if (typeof onSelectItem !== 'function') return;
                           e.preventDefault();
@@ -464,73 +810,7 @@ function MegaColumn({
                       )
                     )}
 
-                    {!it ? null : resolveSrc(it) ? (
-                      <div
-                        className="relative z-10 mt-2 aspect-square w-full overflow-hidden"
-                        ref={idx === 1 ? tileSizeRef : undefined}
-                        onClick={(e) => {
-                          if (typeof onSelectItem !== 'function') return;
-                          e.preventDefault();
-                          onSelectItem(it);
-                        }}
-                        role={typeof onSelectItem === 'function' ? 'button' : undefined}
-                        tabIndex={typeof onSelectItem === 'function' ? 0 : undefined}
-                        onKeyDown={(e) => {
-                          if (typeof onSelectItem !== 'function') return;
-                          if (e.key !== 'Enter' && e.key !== ' ') return;
-                          e.preventDefault();
-                          onSelectItem(it);
-                        }}
-                      >
-                        <OptimizedImg
-                          src={resolveSrc(it)}
-                          alt={collectionId === 'outcasted' && isPathItem(it) ? '' : labelForItem(it) || it}
-                          className={
-                            it === 'The Phoenix'
-                              ? 'h-full w-full object-contain scale-[0.825]'
-                              : it === 'NX-01'
-                                ? 'h-full w-full object-contain scale-[0.47]'
-                                : it === 'NCC-1701'
-                                    ? 'h-full w-full object-contain scale-[0.75]'
-                                    : it === 'NCC-1701-D'
-                                      ? 'h-full w-full object-contain scale-100'
-                                      : it === 'Wormhole'
-                                        ? 'h-full w-full object-contain scale-[0.54]'
-                                        : it === 'Plasma Escape'
-                                          ? 'h-full w-full object-contain scale-[0.54]'
-                                          : it === "Vulcan's End"
-                                            ? 'h-full w-full object-contain scale-[0.66]'
-                                            : 'h-full w-full object-contain scale-[0.6]'
-                          }
-                        />
-
-                        {FIRST_CONTACT_MEDIA[it] && idx >= 1 && idx <= 7 && firstContactVariant === 'white' ? (
-                          <OptimizedImg
-                            src={FIRST_CONTACT_MEDIA_WHITE[it] || FIRST_CONTACT_MEDIA[it]}
-                            alt={it}
-                            className={`absolute inset-0 h-full w-full object-contain transition-opacity duration-300 ease-in-out ${
-                              firstContactVariant === 'white' ? 'opacity-100' : 'opacity-0'
-                            } ${
-                              it === 'The Phoenix'
-                                ? 'scale-[0.825]'
-                                : it === 'NX-01'
-                                  ? 'scale-[0.47]'
-                                  : it === 'NCC-1701'
-                                    ? 'scale-[0.75]'
-                                    : it === 'NCC-1701-D'
-                                      ? 'scale-100'
-                                      : it === 'Wormhole'
-                                        ? 'scale-[0.54]'
-                                        : it === 'Plasma Escape'
-                                          ? 'scale-[0.54]'
-                                          : it === "Vulcan's End"
-                                            ? 'scale-[0.66]'
-                                            : 'scale-[0.6]'
-                            }`}
-                          />
-                        ) : null}
-                      </div>
-                    ) : it === CONTROL_TILE_BN ? (
+                    {!it ? null : it === CONTROL_TILE_BN ? (
                       <div className="relative z-40">
                         {isFirstContact ? (
                           <FirstContactDibuix00Buttons onWhite={onFirstContactWhite} onBlack={onFirstContactBlack} />
@@ -540,23 +820,78 @@ function MegaColumn({
                       </div>
                     ) : it === CONTROL_TILE_ARROWS ? (
                       <div
-                        className={`relative z-40 ${thinSlideEnabled ? '' : 'opacity-30 pointer-events-none'}`}
-                        aria-hidden={thinSlideEnabled ? undefined : true}
+                        className={`relative z-40 ${thinSlideEnabled || pagingEnabled ? '' : 'opacity-30 pointer-events-none'}`}
+                        aria-hidden={thinSlideEnabled || pagingEnabled ? undefined : true}
                       >
                         <FirstContactDibuix09Buttons
                           tileSize={tileSize}
                           onPrev={() => {
                             if (thinSlideEnabled) return;
+                            if (pagingEnabled) return setPageStart((v) => v - 1);
                             if (isHumanInside && !humanInsideEnabled && onHumanPrev) return onHumanPrev();
                           }}
                           onNext={() => {
                             if (thinSlideEnabled) return;
+                            if (pagingEnabled) return setPageStart((v) => v + 1);
                             if (isHumanInside && !humanInsideEnabled && onHumanNext) return onHumanNext();
                           }}
                         />
                       </div>
-                    ) : collectionId === 'outcasted' ? null : (
-                      <div className="mt-2 aspect-square w-full rounded-md bg-muted" ref={idx === 1 ? tileSizeRef : undefined} />
+                    ) : (
+                      <button
+                        type="button"
+                        className={`relative z-50 mt-2 aspect-square w-full ${typeof onSelectItem === 'function' ? 'cursor-pointer pointer-events-auto' : 'pointer-events-none'}`}
+                        data-mega-tile="1"
+                        data-mega-collection={collectionId}
+                        data-mega-item={typeof it === 'string' ? it : ''}
+                        ref={idx === 1 ? tileSizeRef : undefined}
+                        style={{
+                          transform: `translate(${gridOffsetFor(it).x}px, ${gridOffsetFor(it).y}px)`,
+                        }}
+                        onClick={(e) => {
+                          if (typeof onSelectItem !== 'function') return;
+                          e.preventDefault();
+                          if (import.meta.env.DEV && collectionId === 'cube') {
+                            // eslint-disable-next-line no-console
+                            console.error('[MEGA cube tile click]', {
+                              it,
+                              thumb: resolveGridThumbSrc(it),
+                            });
+                          }
+                          setSelectedItem(it);
+                          onSelectItem(it);
+                        }}
+                        tabIndex={typeof onSelectItem === 'function' ? 0 : -1}
+                        onKeyDown={(e) => {
+                          if (typeof onSelectItem !== 'function') return;
+                          if (e.key !== 'Enter' && e.key !== ' ') return;
+                          e.preventDefault();
+                          setSelectedItem(it);
+                          onSelectItem(it);
+                        }}
+                      >
+                        <div className="absolute inset-0 overflow-hidden rounded-md bg-transparent">
+                          {resolveGridThumbSrc(it) ? (
+                            <OptimizedImg
+                              src={resolveGridThumbSrc(it)}
+                              alt={collectionId === 'outcasted' && isPathItem(it) ? '' : labelForItem(it) || it}
+                              className="h-full w-full object-cover"
+                            />
+                          ) : (
+                            <div className="h-full w-full bg-black/5" />
+                          )}
+                        </div>
+
+                        {FIRST_CONTACT_MEDIA[it] && idx >= 1 && idx <= 7 && firstContactVariant === 'white' ? (
+                          <OptimizedImg
+                            src={FIRST_CONTACT_MEDIA_WHITE[it] || FIRST_CONTACT_MEDIA[it]}
+                            alt={it}
+                            className={`absolute inset-0 h-full w-full object-contain transition-opacity duration-300 ease-in-out ${
+                              firstContactVariant === 'white' ? 'opacity-100' : 'opacity-0'
+                            }`}
+                          />
+                        ) : null}
+                      </button>
                     )}
                   </div>
                 ))}
@@ -593,6 +928,19 @@ export default function FullWideSlideDemoHeader({
   showStripe = true,
   showCatalogPanel = true,
 }) {
+  useEffect(() => {
+    if (!import.meta.env.DEV) return;
+    try {
+      if (typeof window !== 'undefined') {
+        window.__MEGA_BUILD_MARKER__ = 'FullWideSlideDemoHeader 2026-02-14T02:36';
+      }
+    } catch {
+      // ignore
+    }
+    // eslint-disable-next-line no-console
+    console.error('[MEGA build marker]', 'FullWideSlideDemoHeader 2026-02-14T02:36');
+  }, []);
+
   const navigate = useNavigate();
   const { products: contextProducts } = useProductContext();
   const cartClickTimeoutRef = useRef(null);
@@ -621,7 +969,7 @@ export default function FullWideSlideDemoHeader({
       'the-human-inside': 'The Human Inside',
       'first-contact': 'First Contact',
       austen: 'Austen',
-      outcasted: 'Outcasted',
+      outcasted: 'Miscel·lània',
     };
 
     const isCubeRelated = (p) => {
@@ -688,20 +1036,58 @@ export default function FullWideSlideDemoHeader({
   const [active, setActive] = useState(() => {
     if (contained) return initialActiveId || 'first_contact';
     try {
+      const p = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
+      const fromUrl = p?.get('active') || p?.get('collection') || '';
+      const next = typeof fromUrl === 'string' ? fromUrl.trim() : '';
+      const allowed = new Set(['first_contact', 'the_human_inside', 'austen', 'cube', 'outcasted']);
+      if (next && allowed.has(next)) return next;
       return window.localStorage.getItem('FULL_WIDE_SLIDE_DEMO_MANUAL') === '1' ? 'first_contact' : null;
     } catch {
       return null;
     }
   });
+
+  useEffect(() => {
+    try {
+      if (typeof window === 'undefined') return;
+      const p = new URLSearchParams(window.location.search);
+      const fromUrl = p.get('active') || p.get('collection') || '';
+      const next = typeof fromUrl === 'string' ? fromUrl.trim() : '';
+      const allowed = new Set(['first_contact', 'the_human_inside', 'austen', 'cube', 'outcasted']);
+      if (next && allowed.has(next)) setActive(next);
+    } catch {
+      // ignore
+    }
+  }, []);
+
   const forceStripeDebugHit =
     typeof window !== 'undefined' && new URLSearchParams(window.location.search).has('debugStripeHit');
   const disableCatalogPanel =
     typeof window !== 'undefined' && new URLSearchParams(window.location.search).has('noCatalogPanel');
   const wsEnabled =
     typeof window !== 'undefined' && import.meta.env.DEV && new URLSearchParams(window.location.search).has('ws');
-  const effectiveForceStripeDebugHit = forceStripeDebugHit || wsEnabled;
-  const effectiveDisableCatalogPanel = disableCatalogPanel || wsEnabled;
+  const effectiveForceStripeDebugHit = forceStripeDebugHit;
+  const effectiveDisableCatalogPanel = disableCatalogPanel;
   const disableStripe = typeof window !== 'undefined' && new URLSearchParams(window.location.search).has('noStripe');
+  const gridCalibFromUrl = typeof window !== 'undefined' && new URLSearchParams(window.location.search).has('gridCalib');
+
+  const overlaySrcFromUrl = useMemo(() => {
+    try {
+      if (typeof window === 'undefined') return null;
+      const p = new URLSearchParams(window.location.search);
+      const raw = p.get('stripeOverlay');
+      if (typeof raw !== 'string') return null;
+      const v = raw.trim();
+      return v ? v : null;
+    } catch {
+      return null;
+    }
+  }, []);
+
+  const GLOBAL_OVERLAY_STORAGE_KEY = 'HG_GLOBAL_STRIPE_OVERLAY_SRC';
+  const GLOBAL_OVERLAY_EVENT = 'hg-global-stripe-overlay-changed';
+
+  const [stripeOverlayOverrideActive, setStripeOverlayOverrideActive] = useState(() => Boolean(overlaySrcFromUrl));
   const [mobileOpen, setMobileOpen] = useState(false);
   const [demoManualEnabled, setDemoManualEnabled] = useState(() => {
     if (typeof manualEnabledOverride === 'boolean') return manualEnabledOverride;
@@ -717,6 +1103,218 @@ export default function FullWideSlideDemoHeader({
   const [selectedColorSlug, setSelectedColorSlug] = useState('white');
   const [thinStartIndex, setThinStartIndex] = useState(0);
   const [gildan5000Catalog, setGildan5000Catalog] = useState(null);
+
+  const resolvedOverlaySrc = useMemo(() => {
+    const isPathItem = (it) => typeof it === 'string' && /\.(png|jpg|jpeg|webp)$/i.test(it);
+
+    if (active === 'first_contact' && firstContactSelectedItem) {
+      return firstContactVariant === 'white'
+        ? (FIRST_CONTACT_MEDIA_WHITE[firstContactSelectedItem] || FIRST_CONTACT_MEDIA[firstContactSelectedItem] || null)
+        : (FIRST_CONTACT_MEDIA[firstContactSelectedItem] || null);
+    }
+    if (active === 'the_human_inside' && humanInsideSelectedItem) {
+      const src = humanInsideVariant === 'white'
+        ? (THE_HUMAN_INSIDE_MEDIA_WHITE[humanInsideSelectedItem] || THE_HUMAN_INSIDE_MEDIA[humanInsideSelectedItem] || null)
+        : (THE_HUMAN_INSIDE_MEDIA[humanInsideSelectedItem] || null);
+      return src || '/placeholders/images_grid/the_human_inside/r2-d2.webp';
+    }
+    if (active && selectedItemByCollection?.[active]) {
+      const key = selectedItemByCollection[active];
+
+      // Path-based collections (e.g. outcasted black/xxx.webp) can be resolved directly.
+      if (isPathItem(key)) {
+        if (active === 'cube' && typeof key === 'string' && key.startsWith('/placeholders/images_grid/cube/')) {
+          const file = key.split('/').pop() || '';
+          const map = {
+            'iron-kong.webp': 'iron-cube-08-iron-kong.webp',
+            'iron-cube.webp': 'iron-cube-68.webp',
+            'robocube.webp': 'robocube.webp',
+            'cylon-cube.webp': 'cylon-cube-03.webp',
+            'maschinencube.webp': 'maschinencube.webp',
+            'mazinger-c.webp': 'mazinger-c.webp',
+            'afrodita-c.webp': 'afrodita-c.webp',
+            '3cube-p0.webp': 'cube-3-p0.webp',
+            'cybercube.webp': 'cyber-cube.webp',
+            'darth-cube.webp': 'darth-cube.webp',
+          };
+          const drawingFile = map[file];
+          if (drawingFile) return `/custom_logos/drawings/cube/${drawingFile}`;
+        }
+        if (active === 'outcasted' && typeof key === 'string' && key.startsWith('/placeholders/images_grid/miscel·lania/')) {
+          const file = key.split('/').pop() || '';
+          const map = {
+            'dj-vader.webp': 'dj-vader-b.webp',
+            'death-star2d2.webp': 'death-star2d2-b.webp',
+          };
+          const drawingFile = map[file];
+          if (drawingFile) return `/custom_logos/drawings/miscel·lania/black/${drawingFile}`;
+        }
+        if (active === 'austen' && typeof key === 'string' && key.startsWith('/placeholders/images_grid/austen/keep_calm/')) {
+          const file = key.split('/').pop() || '';
+          if (file === 'keep-calm-multi-red.webp') {
+            return '/custom_logos/drawings/austen/samarreta/keep_calm/multi/keep-calm-multi-red.webp';
+          }
+          if (file === 'keep-calm-black.webp') {
+            return '/custom_logos/drawings/austen/samarreta/keep_calm/black/keep-calm-black.webp';
+          }
+        }
+        if (active === 'austen' && typeof key === 'string' && key.startsWith('/placeholders/images_grid/austen/looking_for_my_darcy/')) {
+          const file = key.split('/').pop() || '';
+          const lower = file.toLowerCase();
+          if (lower.includes('dark-gradient')) return `/custom_logos/drawings/austen/samarreta/looking_for_my_darcy/dark/${file}`;
+          if (lower.includes('light-gradient')) return `/custom_logos/drawings/austen/samarreta/looking_for_my_darcy/light/${file}`;
+          if (lower.includes('-frame')) return `/custom_logos/drawings/austen/samarreta/looking_for_my_darcy/frame/${file}`;
+          if (lower.includes('-solid')) return `/custom_logos/drawings/austen/samarreta/looking_for_my_darcy/solid/${file}`;
+        }
+        if (active === 'austen' && typeof key === 'string' && key.startsWith('/placeholders/images_grid/austen/pemberley_house/')) {
+          const file = key.split('/').pop() || '';
+          if (file === 'pemberley-black.webp') {
+            return '/custom_logos/drawings/austen/samarreta/pemberley_house/black/pemberley-black.webp';
+          }
+        }
+        if (active === 'austen' && typeof key === 'string' && key.startsWith('/placeholders/images_grid/austen/crosswords/')) {
+          const file = key.split('/').pop() || '';
+          const lower = file.toLowerCase();
+          const persuasion = lower.match(/^persuasion-(\d)\.webp$/);
+          if (persuasion) {
+            const n = persuasion[1];
+            return `/custom_logos/drawings/austen/samarreta/encreuats/persuasion/persuasion-${n}.webp`;
+          }
+          const pride = lower.match(/^pride-and-prejudice-(\d)\.webp$/);
+          if (pride) {
+            const n = pride[1];
+            return `/custom_logos/drawings/austen/samarreta/encreuats/pride_and_prejudice/pride-and-prejudice-${n}.webp`;
+          }
+          const sense = lower.match(/^sense-and-sensibility-(\d)\.webp$/);
+          if (sense) {
+            const n = sense[1];
+            return `/custom_logos/drawings/austen/samarreta/encreuats/sense_and_sensibility/sense-and-sensibility-${n}.webp`;
+          }
+        }
+        if (active === 'austen' && typeof key === 'string' && key.startsWith('/placeholders/images_grid/austen/quotes/')) {
+          const file = key.split('/').pop() || '';
+          const map = {
+            'you-must-allow-me.webp': 'you-must-allow-me',
+            'half-agony-half-hope.webp': 'half-agony-half-hope',
+            'it-is-a-truth.webp': 'it-is-a-truth',
+            'body-and-soul.webp': 'you-have-bewiched-me',
+            'i-presfer-to-be.webp': 'unsociable-and-taciturn',
+          };
+          const design = map[file];
+          if (design) {
+            const variant = firstContactVariant === 'white' ? 'white' : 'black';
+            const suffix = firstContactVariant === 'white' ? 'w' : 'b';
+            return `/custom_logos/drawings/austen/samarreta/quotes/${variant}/${design}-${suffix}.webp`;
+          }
+        }
+        return key;
+      }
+
+      if (active === 'austen') {
+        if (typeof key === 'string' && key.startsWith('/placeholders/images_grid/austen/keep_calm/')) {
+          const file = key.split('/').pop() || '';
+          if (file === 'keep-calm-multi-red.webp') {
+            return '/custom_logos/drawings/austen/samarreta/keep_calm/multi/keep-calm-multi-red.webp';
+          }
+          if (file === 'keep-calm-black.webp') {
+            return '/custom_logos/drawings/austen/samarreta/keep_calm/black/keep-calm-black.webp';
+          }
+        }
+        if (typeof key === 'string' && key.startsWith('/placeholders/images_grid/austen/looking_for_my_darcy/')) {
+          const file = key.split('/').pop() || '';
+          const lower = file.toLowerCase();
+          if (lower.includes('dark-gradient')) return `/custom_logos/drawings/austen/samarreta/looking_for_my_darcy/dark/${file}`;
+          if (lower.includes('light-gradient')) return `/custom_logos/drawings/austen/samarreta/looking_for_my_darcy/light/${file}`;
+          if (lower.includes('-frame')) return `/custom_logos/drawings/austen/samarreta/looking_for_my_darcy/frame/${file}`;
+          if (lower.includes('-solid')) return `/custom_logos/drawings/austen/samarreta/looking_for_my_darcy/solid/${file}`;
+        }
+        if (typeof key === 'string' && key.startsWith('/placeholders/images_grid/austen/pemberley_house/')) {
+          const file = key.split('/').pop() || '';
+          if (file === 'pemberley-black.webp') {
+            return '/custom_logos/drawings/austen/samarreta/pemberley_house/black/pemberley-black.webp';
+          }
+        }
+        if (typeof key === 'string' && key.startsWith('/placeholders/images_grid/austen/crosswords/')) {
+          const file = key.split('/').pop() || '';
+          const lower = file.toLowerCase();
+          const persuasion = lower.match(/^persuasion-(\d)\.webp$/);
+          if (persuasion) {
+            const n = persuasion[1];
+            return `/custom_logos/drawings/austen/samarreta/encreuats/persuasion/persuasion-${n}.webp`;
+          }
+          const pride = lower.match(/^pride-and-prejudice-(\d)\.webp$/);
+          if (pride) {
+            const n = pride[1];
+            return `/custom_logos/drawings/austen/samarreta/encreuats/pride_and_prejudice/pride-and-prejudice-${n}.webp`;
+          }
+          const sense = lower.match(/^sense-and-sensibility-(\d)\.webp$/);
+          if (sense) {
+            const n = sense[1];
+            return `/custom_logos/drawings/austen/samarreta/encreuats/sense_and_sensibility/sense-and-sensibility-${n}.webp`;
+          }
+        }
+        if (typeof key === 'string' && key.startsWith('/placeholders/images_grid/austen/quotes/')) {
+          const file = key.split('/').pop() || '';
+          const map = {
+            'you-must-allow-me.webp': 'you-must-allow-me',
+            'half-agony-half-hope.webp': 'half-agony-half-hope',
+            'it-is-a-truth.webp': 'it-is-a-truth',
+            'body-and-soul.webp': 'you-have-bewiched-me',
+            'i-presfer-to-be.webp': 'unsociable-and-taciturn',
+          };
+          const design = map[file];
+          if (design) {
+            const variant = firstContactVariant === 'white' ? 'white' : 'black';
+            const suffix = firstContactVariant === 'white' ? 'w' : 'b';
+            return `/custom_logos/drawings/austen/samarreta/quotes/${variant}/${design}-${suffix}.webp`;
+          }
+        }
+        const k = typeof key === 'string' ? normalizeKey(key).toLowerCase() : '';
+        if (k.includes('allow me')) return '/placeholders/images_grid/austen/quotes/you-must-allow-me.webp';
+        if (k.includes('half agony') || k.includes('half hope')) return '/placeholders/images_grid/austen/quotes/half-agony-half-hope.webp';
+        if (k.includes('body and soul')) return '/placeholders/images_grid/austen/quotes/body-and-soul.webp';
+        return '/placeholders/images_grid/austen/quotes/it-is-a-truth.webp';
+      }
+
+      if (active === 'outcasted') {
+        if (typeof key === 'string' && key.startsWith('/placeholders/images_grid/miscel·lania/')) {
+          const file = key.split('/').pop() || '';
+          const map = {
+            'dj-vader.webp': 'dj-vader-b.webp',
+            'death-star2d2.webp': 'death-star2d2-b.webp',
+          };
+          const drawingFile = map[file];
+          if (drawingFile) return `/custom_logos/drawings/miscel·lania/black/${drawingFile}`;
+        }
+        return '/placeholders/images_grid/miscel·lania/pont-del-diable.webp';
+      }
+
+      if (FIRST_CONTACT_MEDIA[key]) {
+        return firstContactVariant === 'white'
+          ? (FIRST_CONTACT_MEDIA_WHITE[key] || FIRST_CONTACT_MEDIA[key] || null)
+          : (FIRST_CONTACT_MEDIA[key] || null);
+      }
+    }
+    return null;
+  }, [
+    active,
+    firstContactVariant,
+    firstContactSelectedItem,
+    humanInsideSelectedItem,
+    humanInsideVariant,
+    selectedItemByCollection,
+  ]);
+
+  useEffect(() => {
+    if (stripeOverlayOverrideActive) return;
+    if (!resolvedOverlaySrc) return;
+    try {
+      window.localStorage.setItem(GLOBAL_OVERLAY_STORAGE_KEY, resolvedOverlaySrc);
+      window.dispatchEvent(new Event(GLOBAL_OVERLAY_EVENT));
+    } catch {
+      // ignore
+    }
+  }, [GLOBAL_OVERLAY_EVENT, GLOBAL_OVERLAY_STORAGE_KEY, resolvedOverlaySrc, stripeOverlayOverrideActive]);
   const [megaTileSize, setMegaTileSize] = useState(null);
   const [rootRemPx, setRootRemPx] = useState(16);
   const headerRef = useRef(null);
@@ -920,7 +1518,7 @@ export default function FullWideSlideDemoHeader({
       { id: 'the_human_inside', label: 'The Human Inside' },
       { id: 'austen', label: 'Austen' },
       { id: 'cube', label: 'Cube' },
-      { id: 'outcasted', label: 'Outcasted' },
+      { id: 'outcasted', label: 'Miscel·lània' },
     ],
     []
   );
@@ -956,6 +1554,7 @@ export default function FullWideSlideDemoHeader({
 
   const thinDrawings = useMemo(
     () => [
+      'R2-D2',
       'C3P0',
       'Vader',
       'Afrodita',
@@ -965,6 +1564,7 @@ export default function FullWideSlideDemoHeader({
       'Iron Man 68',
       'Iron Man 08',
       'Cyberman',
+      'The Dalek',
       'Maschinenmensch',
       'Robocop',
       'Terminator',
@@ -1005,7 +1605,7 @@ export default function FullWideSlideDemoHeader({
       the_human_inside: [
         {
           title: '',
-          items: [CONTROL_TILE_BN, ...thinWindowItems, CONTROL_TILE_ARROWS],
+          items: [CONTROL_TILE_BN, ...thinDrawings, CONTROL_TILE_ARROWS],
         },
       ],
       austen: [
@@ -1013,13 +1613,13 @@ export default function FullWideSlideDemoHeader({
           title: '',
           items: [
             CONTROL_TILE_BN,
-            'NX-01',
-            'NCC-1701',
-            'NCC-1701-D',
-            'Wormhole',
-            'Plasma Escape',
-            "Vulcan's End",
-            'The Phoenix',
+            '/placeholders/images_grid/austen/looking_for_my_darcy/blue-dark.webp',
+            '/placeholders/images_grid/austen/looking_for_my_darcy/red-frame.webp',
+            '/placeholders/images_grid/austen/looking_for_my_darcy/yellow-solid.webp',
+            '/placeholders/images_grid/austen/keep_calm/keep-calm-multi-red.webp',
+            '/placeholders/images_grid/austen/crosswords/pride-and-prejudice-2.webp',
+            '/placeholders/images_grid/austen/crosswords/sense-and-sensibility-3.webp',
+            '/placeholders/images_grid/austen/crosswords/persuasion-4.webp',
             CONTROL_TILE_ARROWS,
           ],
         },
@@ -1029,13 +1629,17 @@ export default function FullWideSlideDemoHeader({
           title: '',
           items: [
             CONTROL_TILE_BN,
-            'NX-01',
-            'NCC-1701',
-            'NCC-1701-D',
-            'Wormhole',
-            'Plasma Escape',
-            "Vulcan's End",
-            'The Phoenix',
+            'Iron Kong',
+            'Iron Cube 68',
+            'RoboCube',
+            'Cylon Cube',
+            'Cylon Cube 03',
+            'MaschinenCube',
+            'Mazinger C',
+            'Afrodita C',
+            'Cube 3 P0',
+            'Cyber Cube',
+            'Darth Cube',
             CONTROL_TILE_ARROWS,
           ],
         },
@@ -1045,13 +1649,11 @@ export default function FullWideSlideDemoHeader({
           title: '',
           items: [
             CONTROL_TILE_BN,
-            'NX-01',
-            'NCC-1701',
-            'NCC-1701-D',
-            'Wormhole',
-            'Plasma Escape',
-            "Vulcan's End",
-            'The Phoenix',
+            '/placeholders/images_grid/miscel·lania/pont-del-diable.webp',
+            '/placeholders/images_grid/miscel·lania/pont-del-diable.webp',
+            '/placeholders/images_grid/miscel·lania/pont-del-diable.webp',
+            '/placeholders/images_grid/miscel·lania/pont-del-diable.webp',
+            '/placeholders/images_grid/miscel·lania/pont-del-diable.webp',
             CONTROL_TILE_ARROWS,
           ],
         },
@@ -1070,8 +1672,64 @@ export default function FullWideSlideDemoHeader({
       if (!hasAnyItems) continue;
       out[key] = value;
     }
+
+    if (gridCalibFromUrl) {
+      out.cube = defaultMega.cube;
+    }
     return out;
-  }, [defaultMega, megaConfig]);
+  }, [defaultMega, gridCalibFromUrl, megaConfig]);
+
+  useEffect(() => {
+    if (!active) return;
+    if (stripeOverlayOverrideActive) return;
+
+    const pickFirstDrawingItem = (items) => {
+      const list = Array.isArray(items) ? items : [];
+      for (const it of list) {
+        if (!it) continue;
+        if (it === CONTROL_TILE_BN) continue;
+        if (it === CONTROL_TILE_ARROWS) continue;
+        return it;
+      }
+      return null;
+    };
+
+    const col = resolvedMega?.[active];
+    const firstItems = Array.isArray(col) && col.length > 0 ? col[0]?.items : null;
+    const fallbackItem = pickFirstDrawingItem(firstItems);
+    if (!fallbackItem) return;
+
+    if (active === 'first_contact') {
+      if (firstContactSelectedItem) return;
+      setFirstContactSelectedItem(fallbackItem);
+      return;
+    }
+
+    if (active === 'the_human_inside') {
+      if (humanInsideSelectedItem) return;
+      setHumanInsideSelectedItem(fallbackItem);
+      return;
+    }
+
+    if (active === 'cube' || active === 'outcasted') {
+      if (selectedItemByCollection?.[active]) return;
+      setSelectedItemByCollection((prev) => ({ ...prev, [active]: fallbackItem }));
+    }
+
+    if (active === 'austen') {
+      if (selectedItemByCollection?.[active]) return;
+      setSelectedItemByCollection((prev) => ({ ...prev, [active]: fallbackItem }));
+    }
+  }, [
+    active,
+    CONTROL_TILE_ARROWS,
+    CONTROL_TILE_BN,
+    firstContactSelectedItem,
+    humanInsideSelectedItem,
+    resolvedMega,
+    selectedItemByCollection,
+    stripeOverlayOverrideActive,
+  ]);
 
   useEffect(() => {
     if (typeof manualEnabledOverride === 'boolean') return undefined;
@@ -1137,7 +1795,7 @@ export default function FullWideSlideDemoHeader({
       const totalGaps = (COLS - 1) * GAP_PX;
       const colW = (contentW - totalGaps) / COLS;
       if (!Number.isFinite(colW) || colW <= 0) return;
-      setMegaTileSize(Math.round(colW));
+      setMegaTileSize(colW);
     };
 
     recompute();
@@ -1349,8 +2007,8 @@ export default function FullWideSlideDemoHeader({
                   style={{
                     display: 'block',
                     backgroundColor: 'currentColor',
-                    WebkitMaskImage: `url(${cartItemCount > 0 ? '/custom_logos/icons/basket-full-2.svg' : '/custom_logos/icons/basket-empty.svg'})`,
-                    maskImage: `url(${cartItemCount > 0 ? '/custom_logos/icons/basket-full-2.svg' : '/custom_logos/icons/basket-empty.svg'})`,
+                    WebkitMaskImage: `url(${cartItemCount > 0 ? '/custom_logos/icons/cistell-ple-2.svg' : '/custom_logos/icons/cistell-buit.svg'})`,
+                    maskImage: `url(${cartItemCount > 0 ? '/custom_logos/icons/cistell-ple-2.svg' : '/custom_logos/icons/cistell-buit.svg'})`,
                     WebkitMaskRepeat: 'no-repeat',
                     maskRepeat: 'no-repeat',
                     WebkitMaskPosition: 'center',
@@ -1474,6 +2132,7 @@ export default function FullWideSlideDemoHeader({
                           onSelectItem={
                             (it) => {
                               if (!it || it === CONTROL_TILE_BN || it === CONTROL_TILE_ARROWS) return;
+                              setStripeOverlayOverrideActive(false);
                               if (active === 'first_contact') setFirstContactSelectedItem(it);
                               else if (active === 'the_human_inside') setHumanInsideSelectedItem(it);
                               else setSelectedItemByCollection((prev) => ({ ...prev, [active]: it }));
@@ -1494,27 +2153,14 @@ export default function FullWideSlideDemoHeader({
                           colorLabelBySlug,
                           colorButtonSrcBySlug,
                           stripeV2: true,
+                          allowStripeV2UrlParams: true,
+                          forceStripeV3: true,
                           stripeV2Defaults: { v2S: 1.25, v2L: 162, v2R: 9, v2PX: 0, v2VL: 50, v2VR: 0 },
                           placeholderCount: 14,
                           distribution: 'anchored-even',
                           autoAlignLastToRight: true,
                           lastTileExtraOffsetPx: 15,
-                          overlaySrc:
-                            active === 'first_contact' && firstContactSelectedItem
-                              ? (firstContactVariant === 'white'
-                                  ? (FIRST_CONTACT_MEDIA_WHITE[firstContactSelectedItem] || FIRST_CONTACT_MEDIA[firstContactSelectedItem] || null)
-                                  : (FIRST_CONTACT_MEDIA[firstContactSelectedItem] || null))
-                              : active === 'the_human_inside' && humanInsideSelectedItem
-                                ? (humanInsideVariant === 'white'
-                                    ? (THE_HUMAN_INSIDE_MEDIA_WHITE[humanInsideSelectedItem] || THE_HUMAN_INSIDE_MEDIA[humanInsideSelectedItem] || null)
-                                    : (THE_HUMAN_INSIDE_MEDIA[humanInsideSelectedItem] || null))
-                              : active && selectedItemByCollection?.[active]
-                                ? (FIRST_CONTACT_MEDIA[selectedItemByCollection[active]]
-                                    ? (firstContactVariant === 'white'
-                                        ? (FIRST_CONTACT_MEDIA_WHITE[selectedItemByCollection[active]] || FIRST_CONTACT_MEDIA[selectedItemByCollection[active]] || null)
-                                        : (FIRST_CONTACT_MEDIA[selectedItemByCollection[active]] || null))
-                                    : null)
-                              : null,
+                          overlaySrc: (stripeOverlayOverrideActive ? overlaySrcFromUrl : null) || resolvedOverlaySrc,
                           overlayClassName: undefined,
                           itemLeftOffsetPxByIndex: stripeItemLeftOffsetPxByIndex,
                           redistributeBetweenFirstAndLast: redistributeStripeBetweenFirstAndLast,

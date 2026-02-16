@@ -200,8 +200,24 @@ function App() {
     setSlideOpen(true);
   };
   const [selectionStatus, setSelectionStatus] = useState('idle');
-  const [layoutInspectorEnabled, setLayoutInspectorEnabled] = useState(false);
-  const [guidesEnabled, setGuidesEnabled] = useState(false);
+  const layoutInspectorEnabledFromUrl = (() => {
+    try {
+      const sp = new URLSearchParams(window.location.search);
+      return sp.has('layout') && sp.get('layout') !== '0';
+    } catch {
+      return false;
+    }
+  })();
+  const [layoutInspectorEnabled, setLayoutInspectorEnabled] = useState(layoutInspectorEnabledFromUrl);
+  const guidesEnabledFromUrl = (() => {
+    try {
+      const sp = new URLSearchParams(window.location.search);
+      return sp.has('guides') && sp.get('guides') !== '0';
+    } catch {
+      return false;
+    }
+  })();
+  const [guidesEnabled, setGuidesEnabled] = useState(guidesEnabledFromUrl);
   const [clicksEnabled, setClicksEnabled] = useState(false);
   const [clickMarks, setClickMarks] = useState([]);
   const [nikeTambeBgOn, setNikeTambeBgOn] = useState(true);
@@ -216,6 +232,22 @@ function App() {
 
   const location = useLocation();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    try {
+      const sp = new URLSearchParams(location.search);
+
+      if (sp.has('layout')) {
+        setLayoutInspectorEnabled(sp.get('layout') !== '0');
+      }
+
+      if (sp.has('guides')) {
+        setGuidesEnabled(sp.get('guides') !== '0');
+      }
+    } catch {
+      // ignore
+    }
+  }, [location.search]);
 
   const { config: slidesConfig } = useSlidesConfig();
 

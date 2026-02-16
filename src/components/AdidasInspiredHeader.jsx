@@ -1,4 +1,4 @@
-import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState, useLayoutEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Menu, X, UserRound, ChevronDown, ChevronLeft, ChevronRight, Layers, LayoutGrid } from 'lucide-react';
 import { createPortal } from 'react-dom';
@@ -120,11 +120,12 @@ function IconButton({ label, onClick, children }) {
 
 function FirstContactDibuix00Buttons({ onWhite, onBlack }) {
   return (
-    <div className="relative mt-2 aspect-square w-full">
+    <div className="relative mt-2 aspect-square w-full" data-stripe-buttonbar="bn">
       <div className="absolute inset-0 overflow-hidden rounded-md bg-muted">
         <button
           type="button"
           aria-label="Blanc"
+          id="stripe-guide-left-anchor"
           onClick={onWhite}
           className="absolute left-0 top-0 h-1/2 w-full bg-foreground focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         >
@@ -162,6 +163,7 @@ function FirstContactDibuix09Buttons({
         <button
           type="button"
           aria-label="Anterior"
+          id="stripe-guide-right-anchor"
           onClick={onPrev}
           onPointerDown={onPrevPointerDown}
           onPointerUp={onPrevPointerUp}
@@ -734,7 +736,7 @@ export default function AdidasInspiredHeader({
       const totalGaps = (COLS - 1) * GAP_PX;
       const colW = (contentW - totalGaps) / COLS;
       if (!Number.isFinite(colW) || colW <= 0) return;
-      setMegaTileSize(Math.round(colW));
+      setMegaTileSize(colW);
     };
 
     recompute();
@@ -897,8 +899,8 @@ export default function AdidasInspiredHeader({
                   style={{
                     display: 'block',
                     backgroundColor: 'currentColor',
-                    WebkitMaskImage: `url(${cartItemCount > 0 ? '/custom_logos/icons/basket-full-2.svg' : '/custom_logos/icons/basket-empty.svg'})`,
-                    maskImage: `url(${cartItemCount > 0 ? '/custom_logos/icons/basket-full-2.svg' : '/custom_logos/icons/basket-empty.svg'})`,
+                    WebkitMaskImage: `url(${cartItemCount > 0 ? '/custom_logos/icons/cistell-ple-2.svg' : '/custom_logos/icons/cistell-buit.svg'})`,
+                    maskImage: `url(${cartItemCount > 0 ? '/custom_logos/icons/cistell-ple-2.svg' : '/custom_logos/icons/cistell-buit.svg'})`,
                     WebkitMaskRepeat: 'no-repeat',
                     maskRepeat: 'no-repeat',
                     WebkitMaskPosition: 'center',
