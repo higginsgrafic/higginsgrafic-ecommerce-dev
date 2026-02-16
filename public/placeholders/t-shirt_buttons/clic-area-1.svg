@@ -1,16 +1,14 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg width="100%" height="100%" viewBox="0 0 328 271" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:1.5;">
-    <g transform="matrix(1,0,0,1,-651,-992)">
-        <g id="clic-area-1" transform="matrix(1,0,0,1,-0.373977,-0.386723)">
-            <rect x="651.374" y="992.387" width="327.059" height="270.139" style="fill:none;"/>
-            <clipPath id="_clip1">
-                <rect x="651.374" y="992.387" width="327.059" height="270.139"/>
-            </clipPath>
-            <g clip-path="url(#_clip1)">
-                <g id="clic-area-11" serif:id="clic-area-1" transform="matrix(1,0,0,1,1.06024,0.386723)">
-                    <path d="M977.247,1072.81l-51.624,61.427l-14.746,-10.069l-0.159,137.854l-191.897,0l0,-139.069l-15.227,12.056l-52.406,-62.199l70.231,-55.452l54.701,-24.474c24.563,9.767 50.928,9.631 79.021,-0l59.027,27.094l63.079,52.832Z" style="fill:none;stroke:#000;stroke-opacity:0.3;stroke-width:1px;"/>
-                </g>
+<svg width="100%" height="100%" viewBox="0 0 304 259" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+    <g id="clic-area-1" transform="matrix(0.121667,0,0,1,0,436.239)">
+        <rect x="0" y="-436.239" width="2491.66" height="258.283" style="fill:none;"/>
+        <clipPath id="_clip1">
+            <rect x="0" y="-436.239" width="2491.66" height="258.283"/>
+        </clipPath>
+        <g clip-path="url(#_clip1)">
+            <g transform="matrix(8.21912,0,0,1,-2.33602e-13,-450.005)">
+                <path d="M64.395,272.049l-3.526,-135.289l-13.835,8.715l-47.034,-55.965l56.992,-48.167c20.84,-11.371 40.774,-21.067 58.985,-27.577l70.703,0c21.143,8.858 41.965,18.156 62.042,28.613l54.431,45.511l-47.202,55.281l-12.194,-7.953l-0.615,136.831l-178.747,0Z" style="fill:#fff;"/>
             </g>
         </g>
     </g>
