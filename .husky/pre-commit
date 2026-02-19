@@ -1,0 +1,18 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+set -e
+
+ORIG_ROOT="public/custom_logos/drawings/images_originals"
+
+CHANGED="$(git diff --name-only --cached -- "$ORIG_ROOT" || true)"
+
+if [ -z "$CHANGED" ]; then
+  exit 0
+fi
+
+echo "husky: originals changed -> regenerating thumbs"
+
+npm run -s thumbs:all
+
+git add public/custom_logos/drawings/images_grid public/custom_logos/drawings/images_stripe
