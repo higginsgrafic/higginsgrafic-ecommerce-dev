@@ -102,7 +102,9 @@ export default function FullWideSlideDemoHumanInsideSlider({
     };
 
     const file = map[key];
-    return file ? `/placeholders/images_grid/the_human_inside/${file}` : null;
+    if (!file) return null;
+    const gridded = file.replace(/\.(webp|png|jpe?g)$/i, '-grid.$1');
+    return `/custom_logos/drawings/images_grid/the_human_inside/${gridded}`;
   };
 
   const labelForItem = (it) => {
@@ -118,7 +120,7 @@ export default function FullWideSlideDemoHumanInsideSlider({
     const variant = variantOverride || (isHumanInside ? humanInsideVariant : firstContactVariant);
     if (isPathItem(it) && collectionId) {
       const vPath = deriveVariantPath(it, variant) || it;
-      return `/custom_logos/drawings/${collectionId}/${vPath}`;
+      return `/custom_logos/drawings/images_stripe/${collectionId}/${vPath}`;
     }
     if (FIRST_CONTACT_MEDIA[it]) return variant === 'white' ? (FIRST_CONTACT_MEDIA_WHITE[it] || FIRST_CONTACT_MEDIA[it]) : FIRST_CONTACT_MEDIA[it];
     return (variant === 'white' ? THE_HUMAN_INSIDE_MEDIA_WHITE : THE_HUMAN_INSIDE_MEDIA)[it] || null;
@@ -369,7 +371,9 @@ export default function FullWideSlideDemoHumanInsideSlider({
                   ) : (
                     <Link
                       to="#"
-                      className="relative z-40 flex h-4 w-full items-center justify-center whitespace-nowrap rounded-none bg-muted px-2 text-xs leading-4 text-muted-foreground hover:text-foreground focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                      className={`relative z-40 flex h-[20px] w-full items-center justify-center whitespace-nowrap rounded-none bg-muted px-2 font-roboto-condensed text-[11.2px] leading-[20px] uppercase focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ${
+                        'text-foreground hover:text-foreground'
+                      }`}
                       onClick={(e) => {
                         if (typeof onSelectItem !== 'function') return;
                         e.preventDefault();

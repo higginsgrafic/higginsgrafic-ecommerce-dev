@@ -85,6 +85,7 @@ module.exports = {
       fontFamily: {
         oswald: ['Oswald', 'sans-serif'],
         roboto: ['Roboto', 'sans-serif'],
+        'roboto-condensed': ['Roboto Condensed', 'sans-serif'],
         'ibm-plex-sans': ['IBM Plex Sans', 'sans-serif'],
         'ibm-plex-mono': ['IBM Plex Mono', 'monospace'],
         montserrat: ['Montserrat', 'sans-serif'],

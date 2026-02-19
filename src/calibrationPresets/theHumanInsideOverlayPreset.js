@@ -1,7 +1,10 @@
 export const getTheHumanInsideOverlayPreset = (overlaySrc) => {
   try {
     const s = (overlaySrc || '').toString().toLowerCase();
-    if (!s.includes('/custom_logos/drawings/the_human_inside/')) return null;
+    const isMaster = s.includes('/custom_logos/drawings/images_originals/stripe/the_human_inside/');
+    const isGridThumb = s.includes('/custom_logos/drawings/images_grid/the_human_inside/');
+    const isStripeThumb = s.includes('/custom_logos/drawings/images_stripe/the_human_inside/');
+    if (!isMaster && !isGridThumb && !isStripeThumb) return null;
 
     const isR2d2 = s.includes('r2-d2') || s.includes('r2_d2') || (s.includes('r2') && s.includes('d2'));
     const isDalek = s.includes('dalek') || s.includes('the-dalek') || s.includes('the_dalek');
@@ -22,6 +25,8 @@ export const getTheHumanInsideOverlayPreset = (overlaySrc) => {
     const isTerminator = s.includes('terminator');
     const isRobbie = s.includes('robbie') || s.includes('robby');
 
+    if (isDalek) return { x: 110.07, y: 25.175, s: 0.51, u: 'svg' };
+    if (isR2d2) return { x: 110.07, y: 25.175, s: 0.51, u: 'svg' };
     if (isC3p0) return { x: 110.07, y: 25.175, s: 0.51, u: 'svg' };
     if (isVader) return { x: 110.095, y: 25.189, s: 0.515, u: 'svg' };
     if (isAfrodita) return { x: 110.07, y: 25.175, s: 0.51, u: 'svg' };

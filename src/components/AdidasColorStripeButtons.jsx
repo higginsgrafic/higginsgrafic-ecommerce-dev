@@ -59,44 +59,6 @@ export default function AdidasColorStripeButtons({
   const dotCalibrationRef = useRef(null);
   const overlayDirtyRef = useRef(false);
 
-  const GLOBAL_OVERLAY_STORAGE_KEY = 'HG_GLOBAL_STRIPE_OVERLAY_SRC';
-  const GLOBAL_OVERLAY_EVENT = 'hg-global-stripe-overlay-changed';
-
-  const [globalOverlaySrc, setGlobalOverlaySrc] = useState(() => {
-    try {
-      if (typeof window === 'undefined') return null;
-      return window.localStorage.getItem(GLOBAL_OVERLAY_STORAGE_KEY);
-    } catch {
-      return null;
-    }
-  });
-
-  useEffect(() => {
-    const read = () => {
-      try {
-        const v = window.localStorage.getItem(GLOBAL_OVERLAY_STORAGE_KEY);
-        setGlobalOverlaySrc((prev) => (prev === v ? prev : v));
-      } catch {
-        // ignore
-      }
-    };
-
-    const onStorage = (e) => {
-      if (!e || e.key !== GLOBAL_OVERLAY_STORAGE_KEY) return;
-      read();
-    };
-
-    const onGlobal = () => read();
-
-    if (typeof window === 'undefined') return undefined;
-    window.addEventListener('storage', onStorage);
-    window.addEventListener(GLOBAL_OVERLAY_EVENT, onGlobal);
-    return () => {
-      window.removeEventListener('storage', onStorage);
-      window.removeEventListener(GLOBAL_OVERLAY_EVENT, onGlobal);
-    };
-  }, []);
-
   const overlaySrcPropNormalized = (typeof overlaySrcProp === 'string' && overlaySrcProp.trim() === '')
     ? null
     : overlaySrcProp;
@@ -111,9 +73,221 @@ export default function AdidasColorStripeButtons({
     && (typeof urlParams?.has === 'function' ? urlParams.has('stripeCalibMode') : false)
   );
 
-  const overlaySrc = overlaySrcPropNormalized
-    ?? (stripeCalibEnabled ? null : globalOverlaySrc)
-    ?? null;
+  const overlaySrc = overlaySrcPropNormalized ?? null;
+
+  const overlaySrcForPreset = useMemo(() => {
+    if (!overlaySrc || typeof overlaySrc !== 'string') return overlaySrc;
+
+    const ensureThumbSuffix = (src, kind) => {
+      try {
+        if (!src || typeof src !== 'string') return src;
+        const [base, q] = src.split('?');
+        if (!base) return src;
+        const m = base.match(/^(.*)\.(webp|png|jpe?g)$/i);
+        if (!m) return src;
+        const prefix = m[1].replace(/-(grid|stripe)$/i, '');
+        const ext = m[2];
+        const want = `-${kind}`;
+        const outBase = prefix.toLowerCase().endsWith(want) ? `${prefix}.${ext}` : `${prefix}${want}.${ext}`;
+        return q ? `${outBase}?${q}` : outBase;
+      } catch {
+        return src;
+      }
+    };
+
+    const resolveAustenStripeOverlay = (srcPath) => {
+      try {
+        if (!srcPath || typeof srcPath !== 'string') return srcPath;
+        const [base, q] = srcPath.split('?');
+        const file = (base.split('/').pop() || '').toString();
+        if (!file) return srcPath;
+
+        if (base.includes('/austen/quotes/') && !base.includes('/austen/quotes/black/')) {
+          const out = base.replace('/austen/quotes/', '/austen/quotes/black/');
+          return ensureThumbSuffix(q ? `${out}?${q}` : out, 'stripe');
+        }
+        if (base.includes('/austen/keep_calm/')) {
+          const lower = file.toLowerCase();
+          if (lower.startsWith('keep-calm-black')) {
+            const out = base
+              .replace('/austen/keep_calm/', '/austen/keep_calm/black/')
+              .replace(/\/keep-calm-black(?:-(grid|stripe))?\.(webp|png|jpe?g)$/i, '/keep-calm-b-stripe.$2');
+            return q ? `${out}?${q}` : out;
+          }
+          if (lower.includes('multi')) {
+            const out = base.replace('/austen/keep_calm/', '/austen/keep_calm/multi/');
+            return ensureThumbSuffix(q ? `${out}?${q}` : out, 'stripe');
+          }
+        }
+        if (base.includes('/austen/keep_calm/') && !base.includes('/austen/keep_calm/black/') && !base.includes('/austen/keep_calm/multi/')) {
+          const folder = file.toLowerCase().includes('multi') ? 'multi' : 'black';
+          const out = base.replace('/austen/keep_calm/', `/austen/keep_calm/${folder}/`);
+          return ensureThumbSuffix(q ? `${out}?${q}` : out, 'stripe');
+        }
+        if (base.includes('/austen/pemberley_house/') && !base.includes('/austen/pemberley_house/black/')) {
+          const out = base.replace('/austen/pemberley_house/', '/austen/pemberley_house/black/');
+          return ensureThumbSuffix(q ? `${out}?${q}` : out, 'stripe');
+        }
+        if (base.includes('/austen/looking_for_my_darcy/') && !base.includes('/austen/looking_for_my_darcy/dark/') && !base.includes('/austen/looking_for_my_darcy/light/') && !base.includes('/austen/looking_for_my_darcy/frame/') && !base.includes('/austen/looking_for_my_darcy/solid/')) {
+          const lower = file.toLowerCase();
+          let folder = '';
+          if (lower.includes('dark-gradient')) folder = 'dark';
+          else if (lower.includes('light-gradient')) folder = 'light';
+          else if (lower.includes('-frame')) folder = 'frame';
+          else if (lower.includes('-solid')) folder = 'solid';
+          if (folder) {
+            const out = base.replace('/austen/looking_for_my_darcy/', `/austen/looking_for_my_darcy/${folder}/`);
+            return ensureThumbSuffix(q ? `${out}?${q}` : out, 'stripe');
+          }
+        }
+      } catch {
+        // ignore
+      }
+      return ensureThumbSuffix(srcPath, 'stripe');
+    };
+
+    let s = overlaySrc.trim();
+    if (s.includes('/custom_logos/drawings/images_originals/stripe/')) {
+      s = s.replace('/custom_logos/drawings/images_originals/stripe/', '/custom_logos/drawings/images_stripe/');
+    }
+    if (s.includes('/custom_logos/drawings/images_grid/')) {
+      s = s.replace('/custom_logos/drawings/images_grid/', '/custom_logos/drawings/images_stripe/');
+    }
+    if (s.includes('/custom_logos/drawings/images_stripe/austen/')) return resolveAustenStripeOverlay(s);
+
+    const file = s.split('/').pop() || '';
+
+    if (s.includes('/custom_logos/drawings/images_grid/cube/') || s.includes('/custom_logos/drawings/images_stripe/cube/')) {
+      const lower = file.toLowerCase();
+      const lowerNoGrid = lower
+        .replace(/-grid-stripe(?=\.(webp|png|jpe?g)$)/i, '')
+        .replace(/-grid(?=\.(webp|png|jpe?g)$)/i, '');
+      if (lowerNoGrid === 'iron-kong.webp' || lowerNoGrid === 'iron-kong-stripe.webp' || lowerNoGrid === 'iron-cube-08-iron-kong.webp' || lowerNoGrid === 'iron-cube-08-iron-kong-stripe.webp') {
+        return '/custom_logos/drawings/images_stripe/cube/iron-cube-08-iron-kong-stripe.webp';
+      }
+      if (
+        lowerNoGrid === 'iron-cube.webp'
+        || lowerNoGrid === 'iron-cube-stripe.webp'
+        || lowerNoGrid === 'iron-cube-68.webp'
+        || lowerNoGrid === 'iron-cube-68-stripe.webp'
+      ) {
+        return '/custom_logos/drawings/images_stripe/cube/iron-cube-68-stripe.webp';
+      }
+      if (
+        lowerNoGrid === '3cube-p0.webp'
+        || lowerNoGrid === '3cube-p0-stripe.webp'
+        || lowerNoGrid === 'cube-3-p0.webp'
+        || lowerNoGrid === 'cube-3-p0-stripe.webp'
+      ) {
+        return '/custom_logos/drawings/images_stripe/cube/cube-3-p0-stripe.webp';
+      }
+      if (
+        lowerNoGrid === 'cybercube.webp'
+        || lowerNoGrid === 'cybercube-stripe.webp'
+        || lowerNoGrid === 'cyber-cube.webp'
+        || lowerNoGrid === 'cyber-cube-stripe.webp'
+      ) {
+        return '/custom_logos/drawings/images_stripe/cube/cyber-cube-stripe.webp';
+      }
+      if (
+        lowerNoGrid === 'cylon-cube.webp'
+        || lowerNoGrid === 'cylon-cube-stripe.webp'
+        || lowerNoGrid === 'cylon-cube-03.webp'
+        || lowerNoGrid === 'cylon-cube-03-stripe.webp'
+      ) {
+        return '/custom_logos/drawings/images_stripe/cube/cylon-cube-03-stripe.webp';
+      }
+      return ensureThumbSuffix(s, 'stripe');
+    }
+
+    if (s.includes('/custom_logos/drawings/images_grid/miscel·lania/') || s.includes('/custom_logos/drawings/images_stripe/miscel·lania/')) {
+      const lower = file.toLowerCase();
+      const lowerNoGrid = lower
+        .replace(/-grid-stripe(?=\.(webp|png|jpe?g)$)/i, '')
+        .replace(/-grid(?=\.(webp|png|jpe?g)$)/i, '');
+      if (
+        lowerNoGrid === 'dj-vader.webp'
+        || lowerNoGrid === 'dj-vader-stripe.webp'
+        || lowerNoGrid === 'dj-vader-b.webp'
+        || lowerNoGrid === 'dj-vader-b-stripe.webp'
+        || lowerNoGrid === 'dj-vader-multi-1-stripe.webp'
+        || lowerNoGrid === 'dj-vader-multi-2-stripe.webp'
+      ) {
+        return '/custom_logos/drawings/images_stripe/miscel·lania/black/dj-vader-b-stripe.webp';
+      }
+      if (
+        lowerNoGrid === 'death-star2d2.webp'
+        || lowerNoGrid === 'death-star2d2-stripe.webp'
+        || lowerNoGrid === 'death-star2d2-b.webp'
+        || lowerNoGrid === 'death-star2d2-b-stripe.webp'
+      ) {
+        return '/custom_logos/drawings/images_stripe/miscel·lania/black/death-star2d2-b-stripe.webp';
+      }
+      if (
+        lowerNoGrid === 'pont-del-diable.webp'
+        || lowerNoGrid === 'pont-del-diable-stripe.webp'
+        || lowerNoGrid === 'pont-del-diable-b.webp'
+        || lowerNoGrid === 'pont-del-diable-b-stripe.webp'
+      ) {
+        return '/custom_logos/drawings/images_stripe/miscel·lania/black/pont-del-diable-b-stripe.webp';
+      }
+      return null;
+    }
+
+    if (s.includes('/custom_logos/drawings/images_grid/the_human_inside/') || s.includes('/custom_logos/drawings/images_stripe/the_human_inside/')) {
+      return ensureThumbSuffix(`/custom_logos/drawings/images_stripe/the_human_inside/black/${file}`, 'stripe');
+    }
+
+    if (s.includes('/custom_logos/drawings/images_stripe/first_contact/') && /nx-01-multi-(dark|light)-stripe\.(webp|png|jpe?g)$/i.test(file)) {
+      return '/custom_logos/drawings/images_stripe/first_contact/black/1-nx-01-b-stripe.webp';
+    }
+
+    if (s.includes('/custom_logos/drawings/images_stripe/first_contact/') && /vulcans-end-multi-(dark|light)-stripe\.(webp|png|jpe?g)$/i.test(file)) {
+      return '/custom_logos/drawings/images_stripe/first_contact/black/6-vulcans-end-b-stripe.webp';
+    }
+
+    if (s.includes('/custom_logos/drawings/images_stripe/')) return ensureThumbSuffix(s, 'stripe');
+
+    return s;
+  }, [overlaySrc]);
+
+  const overlaySrcForRender = useMemo(() => {
+    if (typeof overlaySrcForPreset === 'string' && overlaySrcForPreset.trim()) return overlaySrcForPreset;
+    return overlaySrc;
+  }, [overlaySrc, overlaySrcForPreset]);
+
+  const overlaySrcForRenderByTileIdx = (idx) => {
+    try {
+      if (!overlaySrcForRender || typeof overlaySrcForRender !== 'string') return overlaySrcForRender;
+      if (!Number.isFinite(idx)) return overlaySrcForRender;
+      const s = overlaySrcForRender.toLowerCase();
+      const isMiscel = s.includes('/miscel·lania/');
+      const isDjVader = s.includes('dj-vader');
+      const isStripe = s.includes('stripe');
+
+      if (isMiscel && isDjVader && isStripe) {
+        const which = idx === 0 ? 1 : 2;
+        return `/custom_logos/drawings/images_originals/stripe/miscel·lania/multi/dj-vader-multi-${which}-stripe.webp`;
+      }
+
+      const isFirstContact = s.includes('/first_contact/');
+      const isNx01 = s.includes('nx-01');
+      if (isFirstContact && isNx01 && isStripe) {
+        const variant = idx === 0 ? 'dark' : 'light';
+        return `/custom_logos/drawings/images_originals/stripe/first_contact/multi/nx-01-multi-${variant}-stripe.webp`;
+      }
+
+      const isVulcansEnd = s.includes('vulcans-end');
+      if (isFirstContact && isVulcansEnd && isStripe) {
+        const variant = idx === 0 ? 'dark' : 'light';
+        return `/custom_logos/drawings/images_originals/stripe/first_contact/multi/vulcans-end-multi-${variant}-stripe.webp`;
+      }
+
+      return overlaySrcForRender;
+    } catch {
+      return overlaySrcForRender;
+    }
+  };
 
   const debugStripeHitFromUrl = !!urlParams?.has('debugStripeHit');
   const debugStripeHit = forceDebugStripeHit || (!ignoreUrlDebugStripeHit && debugStripeHitFromUrl);
@@ -376,11 +550,13 @@ export default function AdidasColorStripeButtons({
 
   const cubeOverlayDesignKey = useMemo(() => {
     try {
-      if (!overlaySrc) return null;
-      const s = (overlaySrc || '').toString().toLowerCase();
-      const isCubeDrawing = s.includes('/custom_logos/drawings/cube/');
-      const isCubePlaceholder = s.includes('/placeholders/images_grid/cube/');
-      if (!isCubeDrawing && !isCubePlaceholder) return null;
+      const baseSrc = overlaySrcForRender || overlaySrc;
+      if (!baseSrc) return null;
+      const s = (baseSrc || '').toString().toLowerCase();
+      const isCubeDrawing = s.includes('/custom_logos/drawings/images_originals/stripe/cube/');
+      const isCubePlaceholder = s.includes('/custom_logos/drawings/images_grid/cube/');
+      const isCubeStripeThumb = s.includes('/custom_logos/drawings/images_stripe/cube/');
+      if (!isCubeDrawing && !isCubePlaceholder && !isCubeStripeThumb) return null;
 
       if (s.includes('cyber')) return 'cube_cyber';
       if (s.includes('cylon')) return 'cube_cylon';
@@ -437,33 +613,70 @@ export default function AdidasColorStripeButtons({
     }
   };
 
+  const normalizeOverlayDesignKeyFromSrc = (src) => {
+    try {
+      if (!src || typeof src !== 'string') return 'none';
+      let s = src.toLowerCase().trim();
+      if (!s) return 'none';
+
+      const drawingsIdx = s.indexOf('/custom_logos/drawings/');
+      if (drawingsIdx >= 0) s = s.slice(drawingsIdx + '/custom_logos/drawings/'.length);
+
+      s = s
+        .replace(/^images_originals\/stripe\//, '')
+        .replace(/^images_grid\//, '')
+        .replace(/^images_stripe\//, '')
+        .replace(/^placeholders\/images_grid\//, '');
+
+      s = s.replace(/\/(black|white)\//g, '/');
+
+      // Unify color variants (black/white, -b/-w) into a stable design key.
+      // Keep `-stripe`/`-grid` because they can be different assets (different transparent frames/bounds).
+      // Handles filenames like `dj-vader-b-stripe.webp` (where -b is NOT right before the extension).
+      s = s
+        .replace(/-(b|w)(?=-(stripe|grid)\.(webp|png)$)/i, '')
+        .replace(/-(b|w)\.(webp|png)$/i, '.$2')
+        .replace(/\.(webp|png)$/i, '');
+
+      return s.replace(/[^a-z0-9]+/gi, '_').slice(0, 48);
+    } catch {
+      return 'none';
+    }
+  };
+
   const overlayCalibDesignKey = useMemo(() => {
-    if (!overlaySrc) return 'none';
+    if (!overlaySrcForPreset) return 'none';
     if (cubeOverlayDesignKey) return cubeOverlayDesignKey;
-    const s = overlaySrc.toLowerCase();
+    const s = overlaySrcForPreset.toLowerCase();
+    if (s.includes('/custom_logos/drawings/images_originals/stripe/the_human_inside/') || s.includes('/custom_logos/drawings/images_grid/the_human_inside/') || s.includes('/custom_logos/drawings/images_stripe/the_human_inside/')) {
+      if (s.includes('cylon-03')) return 'thin_cylon_03';
+      if (s.includes('cylon') && s.includes('stripe')) return 'thin_cylon_78';
+      if (s.includes('robbie-the-robot') || s.includes('robby-the-robot')) return 'thin_robbie_the_robot';
+    }
     if (
-      s.includes('/custom_logos/drawings/austen/samarreta/encreuats/pride_and_prejudice/pride-and-prejudice-3.')
-      || s.includes('/placeholders/images_grid/austen/crosswords/pride-and-prejudice-3.')
+      s.includes('/custom_logos/drawings/images_originals/stripe/austen/crosswords/pride_and_prejudice/pride-and-prejudice-3.')
+      || s.includes('/custom_logos/drawings/images_grid/austen/crosswords/pride-and-prejudice-3.')
+      || s.includes('/custom_logos/drawings/images_stripe/austen/crosswords/pride-and-prejudice-3.')
     ) {
       return 'austen_encreuats_pride_and_prejudice_3';
     }
     if (
-      s.includes('/custom_logos/drawings/austen/samarreta/quotes/')
-      || s.includes('/placeholders/images_grid/austen/quotes/')
+      s.includes('/custom_logos/drawings/images_originals/stripe/austen/quotes/')
+      || s.includes('/custom_logos/drawings/images_grid/austen/quotes/')
+      || s.includes('/custom_logos/drawings/images_stripe/austen/quotes/')
     ) {
       if (s.includes('you-must-allow-me')) return 'austen_quotes_you_must_allow_me';
       if (s.includes('body-and-soul') || s.includes('you-have-bewiched-me')) return 'austen_quotes_body_and_soul';
     }
     if (
-      s.includes('/custom_logos/drawings/austen/samarreta/looking_for_my_darcy/frame/')
-      || s.includes('/placeholders/images_grid/austen/looking_for_my_darcy/')
+      s.includes('/custom_logos/drawings/images_originals/stripe/austen/looking_for_my_darcy/frame/')
+      || s.includes('/custom_logos/drawings/images_grid/austen/looking_for_my_darcy/')
+      || s.includes('/custom_logos/drawings/images_stripe/austen/looking_for_my_darcy/')
     ) {
       if (s.includes('-frame.')) return 'austen_looking_for_my_darcy_frame';
     }
-    const stripVariantFolder = s.replace(/\/(black|white)\//g, '/');
-    const stripVariantSuffix = stripVariantFolder.replace(/-(b|w)\.webp$/i, '.webp');
-    return stripVariantSuffix.replace(/[^a-z0-9]+/gi, '_').slice(0, 48);
-  }, [cubeOverlayDesignKey, overlaySrc]);
+    return normalizeOverlayDesignKeyFromSrc(overlaySrcForPreset);
+  }, [cubeOverlayDesignKey, overlaySrcForPreset]);
 
   const overlayCalibrationStorageKey = useMemo(() => {
     const base = stripeFresh ? 'stripeOverlayCalibFresh' : 'stripeOverlayCalib';
@@ -481,17 +694,40 @@ export default function AdidasColorStripeButtons({
     return `${base}_${t}_${m}_${g}`;
   }, [geometrySignature, overlaySrc]);
 
+  const getOverlayCalibrationStorageKeyLegacyFromSrc = (src) => {
+    try {
+      const base = 'stripeOverlayCalib';
+      const t = 'all';
+      const m = src ? src.toString().replace(/[^a-z0-9]+/gi, '_').slice(0, 48) : 'none';
+      const g = geometrySignature || 'nogeo';
+      return `${base}_${t}_${m}_${g}`;
+    } catch {
+      return null;
+    }
+  };
+
   useEffect(() => {
     if (!import.meta.env.DEV) return;
     try {
       if (typeof window === 'undefined') return;
+      const prev = window.__HG_OVERLAY_DEBUG__ || {};
+      const presetDefault = (
+        getFirstContactOverlayPreset(overlaySrcForPreset)
+        || getTheHumanInsideOverlayPreset(overlaySrcForPreset)
+        || getCubeOverlayPreset(overlaySrcForPreset)
+        || getOutcastedOverlayPreset(overlaySrcForPreset)
+      );
       window.__HG_OVERLAY_DEBUG__ = {
+        ...prev,
         overlaySrc,
+        overlaySrcForPreset,
+        overlaySrcForRender,
         cubeOverlayDesignKey,
         overlayCalibDesignKey,
         overlayCalibrationStorageKey,
         overlayCalibrationStorageKeyLegacy,
         geometrySignature,
+        presetDefault,
       };
     } catch {
       // ignore
@@ -503,6 +739,8 @@ export default function AdidasColorStripeButtons({
     overlayCalibrationStorageKey,
     overlayCalibrationStorageKeyLegacy,
     overlaySrc,
+    overlaySrcForPreset,
+    overlaySrcForRender,
   ]);
 
   const migrateOverlayCalibFromIndexedKeys = (keyToWrite, designKey, geoKey) => {
@@ -647,6 +885,24 @@ export default function AdidasColorStripeButtons({
   const [stripeOverlayX, setStripeOverlayX] = useState(stripeOverlayXParam);
   const [stripeOverlayY, setStripeOverlayY] = useState(stripeOverlayYParam);
   const [stripeOverlayScale, setStripeOverlayScale] = useState(stripeOverlayScaleParam);
+
+  useEffect(() => {
+    if (!import.meta.env.DEV) return;
+    try {
+      if (typeof window === 'undefined') return;
+      const prev = window.__HG_OVERLAY_DEBUG__ || {};
+      window.__HG_OVERLAY_DEBUG__ = {
+        ...prev,
+        live: {
+          x: stripeOverlayX,
+          y: stripeOverlayY,
+          s: stripeOverlayScale,
+        },
+      };
+    } catch {
+      // ignore
+    }
+  }, [stripeOverlayScale, stripeOverlayX, stripeOverlayY]);
 
   const [v3TileStepXLive, setV3TileStepXLive] = useState(stripeV3TileStepX);
   const [v3TileWLive, setV3TileWLive] = useState(stripeV3TileW);
@@ -1116,6 +1372,18 @@ export default function AdidasColorStripeButtons({
       ) : null}
       {overlaySrc ? (
         <>
+          <div className="flex items-center gap-2">
+            <div className="pointer-events-none break-all">
+              Overlay src: {overlaySrcForRender || overlaySrc}
+            </div>
+            <button
+              type="button"
+              className="pointer-events-auto rounded bg-white/15 px-1.5 py-0.5 text-white hover:bg-white/25"
+              onClick={() => copyToClipboard(overlaySrcForRender || overlaySrc)}
+            >
+              copy
+            </button>
+          </div>
           <div>
             Overlay X:{stripeOverlayX} Y:{stripeOverlayY} S:{stripeOverlayScale}
           </div>
@@ -1843,45 +2111,158 @@ export default function AdidasColorStripeButtons({
             overlayDirtyRef.current = false;
             return;
           }
+
+          const legacyCandidates = [];
+          if (overlaySrcForPreset) legacyCandidates.push(overlaySrcForPreset);
+          if (overlaySrc) legacyCandidates.push(overlaySrc);
+          if (typeof overlaySrcForPreset === 'string') {
+            legacyCandidates.push(overlaySrcForPreset.replace('/custom_logos/drawings/images_grid/', '/custom_logos/drawings/images_stripe/'));
+            legacyCandidates.push(overlaySrcForPreset.replace('/custom_logos/drawings/images_grid/', '/custom_logos/drawings/images_originals/stripe/'));
+            legacyCandidates.push(overlaySrcForPreset.replace('/custom_logos/drawings/images_stripe/', '/custom_logos/drawings/images_grid/'));
+            legacyCandidates.push(overlaySrcForPreset.replace('/custom_logos/drawings/images_stripe/', '/custom_logos/drawings/images_originals/stripe/'));
+
+
+
+            const s = overlaySrcForPreset.toLowerCase();
+            if (s.includes('/austen/crosswords/')) {
+              const file = (s.split('/').pop() || '').replace(/\?.*$/, '');
+              const m = file.match(/^(pride-and-prejudice|sense-and-sensibility|emma|persuasion|northanger-abbey|mansfield-park)-\d+\.(webp|png)$/i);
+              if (m) {
+                const folder = m[1].replace(/-/g, '_');
+                const withSubfolder = overlaySrcForPreset
+                  .replace('/custom_logos/drawings/images_grid/austen/crosswords/', `/custom_logos/drawings/images_originals/stripe/austen/crosswords/${folder}/`);
+                legacyCandidates.push(withSubfolder);
+                legacyCandidates.push(withSubfolder.replace('/custom_logos/drawings/images_originals/stripe/', '/custom_logos/drawings/images_stripe/'));
+              }
+            }
+          }
+          if (typeof overlaySrc === 'string') {
+            legacyCandidates.push(overlaySrc.replace('/placeholders/images_grid/', '/custom_logos/drawings/images_grid/'));
+            legacyCandidates.push(overlaySrc.replace('/placeholders/images_grid/', '/custom_logos/drawings/images_stripe/'));
+            legacyCandidates.push(overlaySrc.replace('/placeholders/images_grid/', '/custom_logos/drawings/images_originals/stripe/'));
+          }
+
+          const uniqueCandidates = Array.from(new Set(legacyCandidates.filter(Boolean).map((v) => v.toString())));
+          for (const candidateSrc of uniqueCandidates) {
+            const candidateKey = getOverlayCalibrationStorageKeyLegacyFromSrc(candidateSrc);
+            if (!candidateKey) continue;
+            const candidateRaw = window.localStorage.getItem(candidateKey);
+            if (!candidateRaw) continue;
+            window.localStorage.setItem(overlayCalibrationStorageKey, candidateRaw);
+            const parsedCandidate = JSON.parse(candidateRaw);
+            if (typeof parsedCandidate?.x === 'number' && Number.isFinite(parsedCandidate.x)) setStripeOverlayX(parsedCandidate.x);
+            else setStripeOverlayX(stripeOverlayXParam);
+            if (typeof parsedCandidate?.y === 'number' && Number.isFinite(parsedCandidate.y)) setStripeOverlayY(parsedCandidate.y);
+            else setStripeOverlayY(stripeOverlayYParam);
+            if (typeof parsedCandidate?.s === 'number' && Number.isFinite(parsedCandidate.s)) setStripeOverlayScale(parsedCandidate.s);
+            else setStripeOverlayScale(stripeOverlayScaleParam);
+            overlayDirtyRef.current = false;
+            return;
+          }
         }
 
-        const austenPride3Preset = (() => {
-          const s = typeof overlaySrc === 'string' ? overlaySrc.toLowerCase() : '';
+        const austenCrosswordsPreset = (() => {
+          const s = typeof overlaySrcForPreset === 'string' ? overlaySrcForPreset.toLowerCase() : '';
           if (
-            s.includes('/custom_logos/drawings/austen/samarreta/encreuats/pride_and_prejudice/pride-and-prejudice-3.')
-            || s.includes('/placeholders/images_grid/austen/crosswords/pride-and-prejudice-3.')
+            s.includes('/custom_logos/drawings/images_originals/stripe/austen/crosswords/pride_and_prejudice/pride-and-prejudice-3.')
+            || s.includes('/custom_logos/drawings/images_grid/austen/crosswords/pride-and-prejudice-3.')
+            || s.includes('/custom_logos/drawings/images_stripe/austen/crosswords/pride-and-prejudice-3.')
+            || s.includes('/custom_logos/drawings/images_originals/stripe/austen/crosswords/pride_and_prejudice/pride-and-prejudice-3-')
+            || s.includes('/custom_logos/drawings/images_grid/austen/crosswords/pride-and-prejudice-3-')
+            || s.includes('/custom_logos/drawings/images_stripe/austen/crosswords/pride-and-prejudice-3-')
           ) {
-            return { x: 107.304, y: 14.956, s: 0.545, u: 'svg' };
+            return { x: 105.317, y: 16.951, s: 0.54, u: 'svg' };
+          }
+
+          if (
+            s.includes('/custom_logos/drawings/images_originals/stripe/austen/crosswords/pride_and_prejudice/')
+            || s.includes('/custom_logos/drawings/images_grid/austen/crosswords/pride-and-prejudice-')
+            || s.includes('/custom_logos/drawings/images_stripe/austen/crosswords/pride-and-prejudice-')
+          ) {
+            return { x: 117.241, y: 52.785, s: 0.395, u: 'svg' };
+          }
+
+          if (
+            s.includes('/custom_logos/drawings/images_originals/stripe/austen/crosswords/')
+            || s.includes('/custom_logos/drawings/images_grid/austen/crosswords/')
+            || s.includes('/custom_logos/drawings/images_stripe/austen/crosswords/')
+          ) {
+            return { x: 117.241, y: 48.803, s: 0.395, u: 'svg' };
           }
           return null;
         })();
 
         const austenDarcyFramePreset = (() => {
-          const s = typeof overlaySrc === 'string' ? overlaySrc.toLowerCase() : '';
-          if (s.includes('/custom_logos/drawings/austen/samarreta/looking_for_my_darcy/frame/') || s.includes('/placeholders/images_grid/austen/looking_for_my_darcy/')) {
-            if (s.includes('-frame.')) return { x: 105.321, y: -12.902, s: 0.575, u: 'svg' };
+          const s = typeof overlaySrcForPreset === 'string' ? overlaySrcForPreset.toLowerCase() : '';
+          if (
+            s.includes('/custom_logos/drawings/images_originals/stripe/austen/looking_for_my_darcy/frame/')
+            || s.includes('/custom_logos/drawings/images_grid/austen/looking_for_my_darcy/')
+          ) {
+            if (s.includes('-frame.')) return { x: 105.321, y: -10.919, s: 0.565, u: 'svg' };
           }
+          return null;
+        })();
+
+        const austenDarcyTextPreset = (() => {
+          const s = typeof overlaySrcForPreset === 'string' ? overlaySrcForPreset.toLowerCase() : '';
+          if (
+            s.includes('/custom_logos/drawings/images_originals/stripe/austen/looking_for_my_darcy/')
+            || s.includes('/custom_logos/drawings/images_grid/austen/looking_for_my_darcy/')
+            || s.includes('/custom_logos/drawings/images_stripe/austen/looking_for_my_darcy/')
+          ) {
+            if (!s.includes('-frame.')) return { x: 109.295, y: -0.964, s: 0.51, u: 'svg' };
+          }
+          return null;
+        })();
+
+        const austenQuotesPreset = (() => {
+          const s = typeof overlaySrcForPreset === 'string' ? overlaySrcForPreset.toLowerCase() : '';
+          if (!s.includes('/austen/quotes/')) return null;
+          if (s.includes('it-is-a-truth')) return { x: 125.193, y: 5.009, s: 0.41, u: 'svg' };
+          if (s.includes('you-must-allow-me')) return { x: 125.193, y: 7, s: 0.39, u: 'svg' };
+          if (s.includes('body-and-soul')) return { x: 115.258, y: -52.714, s: 0.58, u: 'svg' };
+          if (s.includes('unsociable-and-taciturn') || s.includes('i-presfer-to-be')) {
+            return { x: 115.258, y: -44.758, s: 0.55, u: 'svg' };
+          }
+          if (s.includes('half-agony-half-hope')) return { x: 117.245, y: -24.844, s: 0.495, u: 'svg' };
           return null;
         })();
 
         const austenPemberleyHousePreset = (() => {
-          const s = typeof overlaySrc === 'string' ? overlaySrc.toLowerCase() : '';
+          const s = typeof overlaySrcForPreset === 'string' ? overlaySrcForPreset.toLowerCase() : '';
           if (
-            s.includes('/custom_logos/drawings/austen/samarreta/pemberley_house/')
-            || s.includes('/placeholders/images_grid/austen/pemberley_house/')
+            s.includes('/custom_logos/drawings/images_originals/stripe/austen/pemberley_house/')
+            || s.includes('/custom_logos/drawings/images_grid/austen/pemberley_house/')
+            || s.includes('/custom_logos/drawings/images_stripe/austen/pemberley_house/')
           ) {
-            return { x: 107.308, y: 10.982, s: 0.545, u: 'svg' };
+            return { x: 107.308, y: 10.982, s: 0.55, u: 'svg' };
           }
           return null;
         })();
 
-        const preset = austenPride3Preset
+        const austenKeepCalmPreset = (() => {
+          const s = typeof overlaySrcForPreset === 'string' ? overlaySrcForPreset.toLowerCase() : '';
+          if (
+            s.includes('/custom_logos/drawings/images_originals/stripe/austen/keep_calm/')
+            || s.includes('/custom_logos/drawings/images_grid/austen/keep_calm/')
+            || s.includes('/custom_logos/drawings/images_stripe/austen/keep_calm/')
+          ) {
+            if (s.includes('/multi/')) return { x: 125.195, y: 56.763, s: 0.35, u: 'svg' };
+            if (s.includes('/black/')) return { x: 125.193, y: 56.767, s: 0.35, u: 'svg' };
+          }
+          return null;
+        })();
+
+        const preset = austenCrosswordsPreset
           || austenDarcyFramePreset
+          || austenDarcyTextPreset
+          || austenQuotesPreset
           || austenPemberleyHousePreset
-          || getFirstContactOverlayPreset(overlaySrc)
-          || getTheHumanInsideOverlayPreset(overlaySrc)
-          || getCubeOverlayPreset(overlaySrc)
-          || getOutcastedOverlayPreset(overlaySrc);
+          || austenKeepCalmPreset
+          || getFirstContactOverlayPreset(overlaySrcForPreset)
+          || getTheHumanInsideOverlayPreset(overlaySrcForPreset)
+          || getCubeOverlayPreset(overlaySrcForPreset)
+          || getOutcastedOverlayPreset(overlaySrcForPreset);
         if (preset && typeof preset === 'object') {
           const x = (typeof preset.x === 'number' && Number.isFinite(preset.x)) ? preset.x : stripeOverlayXParam;
           const y = (typeof preset.y === 'number' && Number.isFinite(preset.y)) ? preset.y : stripeOverlayYParam;
@@ -1898,12 +2279,22 @@ export default function AdidasColorStripeButtons({
         return;
       }
       const parsed = JSON.parse(raw);
+      const presetDefault = (
+        getFirstContactOverlayPreset(overlaySrcForPreset)
+        || getTheHumanInsideOverlayPreset(overlaySrcForPreset)
+        || getCubeOverlayPreset(overlaySrcForPreset)
+        || getOutcastedOverlayPreset(overlaySrcForPreset)
+      );
+      const defaultX = (presetDefault && typeof presetDefault.x === 'number' && Number.isFinite(presetDefault.x)) ? presetDefault.x : stripeOverlayXParam;
+      const defaultY = (presetDefault && typeof presetDefault.y === 'number' && Number.isFinite(presetDefault.y)) ? presetDefault.y : stripeOverlayYParam;
+      const defaultS = (presetDefault && typeof presetDefault.s === 'number' && Number.isFinite(presetDefault.s)) ? presetDefault.s : stripeOverlayScaleParam;
+
       if (typeof parsed?.x === 'number' && Number.isFinite(parsed.x)) setStripeOverlayX(parsed.x);
-      else setStripeOverlayX(stripeOverlayXParam);
+      else setStripeOverlayX(defaultX);
       if (typeof parsed?.y === 'number' && Number.isFinite(parsed.y)) setStripeOverlayY(parsed.y);
-      else setStripeOverlayY(stripeOverlayYParam);
+      else setStripeOverlayY(defaultY);
       if (typeof parsed?.s === 'number' && Number.isFinite(parsed.s)) setStripeOverlayScale(parsed.s);
-      else setStripeOverlayScale(stripeOverlayScaleParam);
+      else setStripeOverlayScale(defaultS);
       overlayDirtyRef.current = false;
     } catch {
       setStripeOverlayX(stripeOverlayXParam);
@@ -2661,16 +3052,18 @@ export default function AdidasColorStripeButtons({
                           </clipPath>
                         </defs>
                         <g clipPath={`url(#${clipId})`}>
-                          <image
-                            href={overlaySrc}
-                            x="0"
-                            y="0"
-                            width={stripeV3HitStepX}
-                            height={stripeV3SvgH}
-                            preserveAspectRatio="xMidYMax meet"
-                            transform={`translate(${stripeOverlayX} ${stripeOverlayY}) scale(${stripeOverlayScale})`}
-                            opacity="1"
-                          />
+                          {overlaySrcForRender ? (
+                            <image
+                              href={encodeURI(overlaySrcForRender)}
+                              x="0"
+                              y="0"
+                              width={stripeV3HitStepX}
+                              height={stripeV3SvgH}
+                              preserveAspectRatio="xMidYMax meet"
+                              transform={`translate(${stripeOverlayX} ${stripeOverlayY}) scale(${stripeOverlayScale})`}
+                              opacity="1"
+                            />
+                          ) : null}
                         </g>
                         {stripeOverlayClipDebug ? (
                           <path
@@ -2685,7 +3078,7 @@ export default function AdidasColorStripeButtons({
                       </svg>
                     ) : (
                       <img
-                        src={overlaySrc}
+                        src={overlaySrcForRender}
                         alt=""
                         className={`pointer-events-none absolute inset-0 h-full w-full object-contain object-bottom ${overlayClassName || ''}`}
                         style={{
@@ -2700,10 +3093,10 @@ export default function AdidasColorStripeButtons({
               })
             ) : null}
 
-            {overlaySrc && !stripeOverlayClip ? (
+            {overlaySrcForRender && !stripeOverlayClip ? (
               <div className="pointer-events-none absolute left-0 top-0 h-full w-full" style={{ zIndex: 35 }}>
                 <img
-                  src={overlaySrc}
+                  src={overlaySrcForRenderByTileIdx(1)}
                   alt=""
                   className={`pointer-events-none absolute inset-0 h-full w-full object-contain object-bottom ${overlayClassName || ''}`}
                   style={{
@@ -2760,6 +3153,7 @@ export default function AdidasColorStripeButtons({
               })()}
               {Array.from({ length: 14 }).map((_, idx) => {
                 const offsetX = stripeV3HitStepX * idx;
+                const tileOverlaySrc = overlaySrcForRenderByTileIdx(idx);
                 const d = idx === 0
                   ? 'M64.395,272.049l-3.526,-135.289l-13.835,8.715l-47.034,-55.965l56.992,-48.167c20.84,-11.371 40.774,-21.067 58.985,-27.577l70.703,0c21.143,8.858 41.965,18.156 62.042,28.613l54.431,45.511l-47.202,55.281l-12.194,-7.953l-0.615,136.831l-178.747,0Z'
                   : 'M86.446,26.217c10.229,-4.863 20.111,-9.083 29.531,-12.451l70.703,0c21.143,8.858 41.965,18.156 62.042,28.613l54.431,45.511l-47.202,55.281l-12.194,-7.953l-0.615,136.831l-151.015,0l0.486,-108.176l66.607,-78.006l-69.024,-57.713c-1.241,-0.647 -2.492,-1.293 -3.75,-1.937Z';
@@ -2772,7 +3166,7 @@ export default function AdidasColorStripeButtons({
 
                 return (
                   <g key={idx} transform={`translate(${offsetX}, 0)`}>
-                    {overlaySrc && stripeOverlayClip ? (
+                    {tileOverlaySrc && stripeOverlayClip ? (
                       <>
                         <defs>
                           <clipPath id={overlayClipId} clipPathUnits="userSpaceOnUse">
@@ -2781,7 +3175,7 @@ export default function AdidasColorStripeButtons({
                         </defs>
                         <g clipPath={`url(#${overlayClipId})`}>
                           <image
-                            href={overlaySrc}
+                            href={tileOverlaySrc ? encodeURI(tileOverlaySrc) : tileOverlaySrc}
                             x={0}
                             y={0}
                             width={stripeV3HitStepX}
@@ -3165,9 +3559,9 @@ export default function AdidasColorStripeButtons({
                         />
                       ) : null}
 
-                      {overlaySrc ? (
+                      {overlaySrcForRender ? (
                         <img
-                          src={overlaySrc}
+                          src={overlaySrcForRenderByTileIdx(idx)}
                           alt=""
                           className={`pointer-events-none absolute left-1/2 object-contain ${overlayClassName || ''}`}
                           style={{

@@ -193,7 +193,7 @@ function NikeInspiredHeader({
         { label: 'Persuasion', items: ['Encreuat 1', 'Encreuat 2', 'Encreuat 3', 'Encreuat 4'] },
         { label: 'Pride & Prejudice', items: ['Encreuat 1', 'Encreuat 2', 'Encreuat 3', 'Encreuat 4'] },
         { label: 'Sense & Sensibility', items: ['Encreuat 1', 'Encreuat 2', 'Encreuat 3', 'Encreuat 4'] },
-        { label: 'Quotes', items: ['It Is A Truth', 'You Must Allow Me', 'Unsociable And Taciturn', 'You Have Bewitched Me', 'Half Agony, Half Hope'] },
+        { label: 'Quotes', items: ['It Is A Truth', 'You Must Allow Me', 'Body And Soul', 'Unsociable And Taciturn', 'Half Agony, Half Hope'] },
         'Looking For My Darcy',
         'Keep Calm',
         'Pemberly House',

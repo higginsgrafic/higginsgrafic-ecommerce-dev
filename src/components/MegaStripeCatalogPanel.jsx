@@ -4,8 +4,10 @@ export default function MegaStripeCatalogPanel({
   megaTileSize,
   StripeButtonsComponent,
   stripeProps,
+  stripeKey,
   CatalogPanelComponent,
   catalogPanelProps,
+  catalogKey,
   marginTopPx = 13,
   extraHeightPx = 0,
   translateYPx = 0,
@@ -23,8 +25,12 @@ export default function MegaStripeCatalogPanel({
         transform: translateYPx ? `translateY(${translateYPx}px)` : undefined,
       }}
     >
-      {StripeButtonsComponent ? <StripeButtonsComponent megaTileSize={megaTileSize} {...(stripeProps || {})} /> : null}
-      {CatalogPanelComponent ? <CatalogPanelComponent megaTileSize={megaTileSize} {...(catalogPanelProps || {})} /> : null}
+      {StripeButtonsComponent ? (
+        <StripeButtonsComponent key={stripeKey || undefined} megaTileSize={megaTileSize} {...(stripeProps || {})} />
+      ) : null}
+      {CatalogPanelComponent ? (
+        <CatalogPanelComponent key={catalogKey || undefined} megaTileSize={megaTileSize} {...(catalogPanelProps || {})} />
+      ) : null}
     </div>
   );
 }

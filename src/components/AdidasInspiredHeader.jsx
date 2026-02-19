@@ -10,58 +10,48 @@ import MegaStripeCatalogPanel from './MegaStripeCatalogPanel.jsx';
 import AdidasHumanInsideSlider from './AdidasHumanInsideSlider.jsx';
 
 const FIRST_CONTACT_MEDIA = {
-  'NX-01': '/custom_logos/drawings/first_contact/black/1-nx-01-b.webp',
-  'NCC-1701': '/custom_logos/drawings/first_contact/black/2-ncc-1701-b.webp',
-  'NCC-1701-D': '/custom_logos/drawings/first_contact/black/3-ncc-1701-d-b.webp',
-  'Wormhole': '/custom_logos/drawings/first_contact/black/4-wormhole-b.webp',
-  'Plasma Escape': '/custom_logos/drawings/first_contact/black/5-plasma-escape-b.webp',
-  "Vulcan's End": '/custom_logos/drawings/first_contact/black/6-vulcans-end-b.webp',
-  'The Phoenix': '/custom_logos/drawings/first_contact/black/7-the-phoenix-b.webp',
+  'NX-01': '/custom_logos/drawings/images_originals/stripe/first_contact/black/1-nx-01-b.webp',
+  'NCC-1701': '/custom_logos/drawings/images_originals/stripe/first_contact/black/2-ncc-1701-b.webp',
+  'NCC-1701-D': '/custom_logos/drawings/images_originals/stripe/first_contact/black/3-ncc-1701-d-b.webp',
+  'Wormhole': '/custom_logos/drawings/images_originals/stripe/first_contact/black/4-wormhole-b.webp',
+  'Plasma Escape': '/custom_logos/drawings/images_originals/stripe/first_contact/black/5-plasma-escape-b.webp',
+  "Vulcan's End": '/custom_logos/drawings/images_originals/stripe/first_contact/black/6-vulcans-end-b.webp',
+  'The Phoenix': '/custom_logos/drawings/images_originals/stripe/first_contact/black/7-the-phoenix-b.webp',
 };
 
 const CONTROL_TILE_BN = 'botonera-bn';
 const CONTROL_TILE_ARROWS = 'botonera-fletxes';
 
 const FIRST_CONTACT_MEDIA_WHITE = {
-  'NX-01': '/custom_logos/drawings/first_contact/white/1-nx-01-w.webp',
-  'NCC-1701': '/custom_logos/drawings/first_contact/white/2-ncc-1701-w.webp',
-  'NCC-1701-D': '/custom_logos/drawings/first_contact/white/3-ncc-1701-d-w.webp',
-  'Wormhole': '/custom_logos/drawings/first_contact/white/4-wormhole-w.webp',
-  'Plasma Escape': '/custom_logos/drawings/first_contact/white/5-plasma-escape-w.webp',
-  "Vulcan's End": '/custom_logos/drawings/first_contact/white/6-vulcans-end-w.webp',
-  'The Phoenix': '/custom_logos/drawings/first_contact/white/7-the-phoenix-w.webp',
+  'NX-01': '/custom_logos/drawings/images_originals/stripe/first_contact/white/1-nx-01-w.webp',
+  'NCC-1701': '/custom_logos/drawings/images_originals/stripe/first_contact/white/2-ncc-1701-w.webp',
+  'NCC-1701-D': '/custom_logos/drawings/images_originals/stripe/first_contact/white/3-ncc-1701-d-w.webp',
+  'Wormhole': '/custom_logos/drawings/images_originals/stripe/first_contact/white/4-wormhole-w.webp',
+  'Plasma Escape': '/custom_logos/drawings/images_originals/stripe/first_contact/white/5-plasma-escape-w.webp',
+  "Vulcan's End": '/custom_logos/drawings/images_originals/stripe/first_contact/white/6-vulcans-end-w.webp',
+  'The Phoenix': '/custom_logos/drawings/images_originals/stripe/first_contact/white/7-the-phoenix-w.webp',
 };
 
 const THE_HUMAN_INSIDE_MEDIA = {
-  'C3P0': '/custom_logos/drawings/the_human_inside/black/7-c3p0-b4.webp',
-  'Vader': '/custom_logos/drawings/the_human_inside/black/8-vader-b4.webp',
-  'Afrodita': '/custom_logos/drawings/the_human_inside/black/9-afrodita-a-b3.webp',
-  'Mazinger': '/custom_logos/drawings/the_human_inside/black/10-mazinger-b4.webp',
-  'Cylon 78': '/custom_logos/drawings/the_human_inside/black/11-cylon-78-b4.webp',
-  'Cylon 03': '/custom_logos/drawings/the_human_inside/black/12-cylon-03-b1.webp',
-  'Iron Man 68': '/custom_logos/drawings/the_human_inside/black/13-iron-man-68-b1.webp',
-  'Iron Man 08': '/custom_logos/drawings/the_human_inside/black/14-ironman-08-b4.webp',
-  'Cyberman': '/custom_logos/drawings/the_human_inside/black/15-cyberman-b4.webp',
-  'Maschinenmensch': '/custom_logos/drawings/the_human_inside/black/16-maschinenmensch-b1.webp',
-  'Robocop': '/custom_logos/drawings/the_human_inside/black/17-robocop-b4.webp',
-  'Terminator': '/custom_logos/drawings/the_human_inside/black/18-terminator-b4.webp',
-  'Robbie the Robot': '/custom_logos/drawings/the_human_inside/black/19-robbie-the-robot-b1.webp',
+  'R2-D2': '/custom_logos/drawings/images_originals/stripe/the_human_inside/black/r2-d2.webp',
+  'The Dalek': '/custom_logos/drawings/images_originals/stripe/the_human_inside/black/the-dalek.webp',
+  'C3P0': '/custom_logos/drawings/images_originals/stripe/the_human_inside/black/c3-p0.webp',
+  'Vader': '/custom_logos/drawings/images_originals/stripe/the_human_inside/black/vader.webp',
+  'Afrodita': '/custom_logos/drawings/images_originals/stripe/the_human_inside/black/afrodita-a.webp',
+  'Mazinger': '/custom_logos/drawings/images_originals/stripe/the_human_inside/black/mazinger-z.webp',
+  'Cylon 78': '/custom_logos/drawings/images_originals/stripe/the_human_inside/black/cylon.webp',
+  'Cylon 03': '/custom_logos/drawings/images_originals/stripe/the_human_inside/black/cylon-03.webp',
+  'Iron Man 68': '/custom_logos/drawings/images_originals/stripe/the_human_inside/black/iron-man-68.webp',
+  'Iron Man 08': '/custom_logos/drawings/images_originals/stripe/the_human_inside/black/iron-man-08.webp',
+  'Cyberman': '/custom_logos/drawings/images_originals/stripe/the_human_inside/black/cyberman.webp',
+  'Maschinenmensch': '/custom_logos/drawings/images_originals/stripe/the_human_inside/black/maschinenmensch.webp',
+  'Robocop': '/custom_logos/drawings/images_originals/stripe/the_human_inside/black/robocop.webp',
+  'Terminator': '/custom_logos/drawings/images_originals/stripe/the_human_inside/black/terminator.webp',
+  'Robbie the Robot': '/custom_logos/drawings/images_originals/stripe/the_human_inside/black/robbie-the-robot.webp',
 };
 
 const THE_HUMAN_INSIDE_MEDIA_WHITE = {
-  'C3P0': '/custom_logos/drawings/the_human_inside/white/7-c3p0-w1.webp',
-  'Vader': '/custom_logos/drawings/the_human_inside/white/8-vader-w4.webp',
-  'Afrodita': '/custom_logos/drawings/the_human_inside/white/9-afrodita-w4.webp',
-  'Mazinger': '/custom_logos/drawings/the_human_inside/white/10-mazinger-w1.webp',
-  'Cylon 78': '/custom_logos/drawings/the_human_inside/white/11-cylon-78-w4.webp',
-  'Cylon 03': '/custom_logos/drawings/the_human_inside/white/12-cylon-03-w3.webp',
-  'Iron Man 68': '/custom_logos/drawings/the_human_inside/white/13-iron-man-68-w4.webp',
-  'Iron Man 08': '/custom_logos/drawings/the_human_inside/white/14-iron-man-08-w4.webp',
-  'Cyberman': '/custom_logos/drawings/the_human_inside/white/15-cyberman-w1.webp',
-  'Maschinenmensch': '/custom_logos/drawings/the_human_inside/white/16-maschinenmensch-w1.webp',
-  'Robocop': '/custom_logos/drawings/the_human_inside/white/17-robocop-w3.webp',
-  'Terminator': '/custom_logos/drawings/the_human_inside/white/18-terminator-w1.webp',
-  'Robbie the Robot': '/custom_logos/drawings/the_human_inside/white/19-robbie-the-robot-w2.webp',
+  ...THE_HUMAN_INSIDE_MEDIA,
 };
 
 const OptimizedImg = React.forwardRef(function OptimizedImg({ src, alt, className, style, ...rest }, ref) {
@@ -326,7 +316,7 @@ function MegaColumn({
                     ) : (
                       <Link
                         to="#"
-                        className="relative z-40 flex h-4 w-full items-center justify-center whitespace-nowrap rounded-none bg-muted px-2 text-xs leading-4 text-muted-foreground hover:text-foreground"
+                        className="relative z-40 flex h-4 w-full items-center justify-center whitespace-nowrap rounded-none bg-muted px-2 text-[10px] uppercase leading-4 text-muted-foreground hover:text-foreground"
                       >
                         {it}
                       </Link>

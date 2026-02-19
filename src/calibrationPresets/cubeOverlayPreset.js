@@ -1,9 +1,10 @@
 export const getCubeOverlayPreset = (overlaySrc) => {
   try {
     const s = (overlaySrc || '').toString().toLowerCase();
-    const isCubeDrawing = s.includes('/custom_logos/drawings/cube/');
-    const isCubePlaceholder = s.includes('/placeholders/images_grid/cube/');
-    if (!isCubeDrawing && !isCubePlaceholder) return null;
+    const isCubeDrawing = s.includes('/custom_logos/drawings/images_originals/stripe/cube/');
+    const isCubePlaceholder = s.includes('/custom_logos/drawings/images_grid/cube/');
+    const isCubeStripeThumb = s.includes('/custom_logos/drawings/images_stripe/cube/');
+    if (!isCubeDrawing && !isCubePlaceholder && !isCubeStripeThumb) return null;
 
     const isCylon = s.includes('cylon');
     const isCyber = s.includes('cyber');

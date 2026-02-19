@@ -5,50 +5,57 @@ import { createPortal } from 'react-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import { getGildan5000Catalog } from '../utils/placeholders.js';
 import { useProductContext } from '@/contexts/ProductContext';
+import {
+  AUSTEN_QUOTES_ASSETS,
+  resolveAustenQuoteAssetId,
+  resolveAustenQuoteThumbFromPath,
+  resolveAustenQuoteOriginalFromPath,
+} from '../utils/austenQuotesAssets.js';
 import AdidasColorStripeButtons from './AdidasColorStripeButtons.jsx';
 import AdidasCatalogPanel from './AdidasCatalogPanel.jsx';
 import MegaStripeCatalogPanel from './MegaStripeCatalogPanel.jsx';
 import FullWideSlideDemoHumanInsideSlider from './FullWideSlideDemoHumanInsideSlider.jsx';
 
 const FIRST_CONTACT_MEDIA = {
-  'NX-01': '/custom_logos/drawings/first_contact/black/1-nx-01-b.webp',
-  'NCC-1701': '/custom_logos/drawings/first_contact/black/2-ncc-1701-b.webp',
-  'NCC-1701-D': '/custom_logos/drawings/first_contact/black/3-ncc-1701-d-b.webp',
-  'Wormhole': '/custom_logos/drawings/first_contact/black/4-wormhole-b.webp',
-  'Plasma Escape': '/custom_logos/drawings/first_contact/black/5-plasma-escape-b.webp',
-  "Vulcan's End": '/custom_logos/drawings/first_contact/black/6-vulcans-end-b.webp',
-  'The Phoenix': '/custom_logos/drawings/first_contact/black/7-the-phoenix-b.webp',
+  'NX-01': '/custom_logos/drawings/images_stripe/first_contact/black/1-nx-01-b-stripe.webp',
+  'NCC-1701': '/custom_logos/drawings/images_stripe/first_contact/black/2-ncc-1701-b-stripe.webp',
+  'NCC-1701-D': '/custom_logos/drawings/images_stripe/first_contact/black/3-ncc-1701-d-b-stripe.webp',
+  'Wormhole': '/custom_logos/drawings/images_stripe/first_contact/black/4-wormhole-b-stripe.webp',
+  'Plasma Escape': '/custom_logos/drawings/images_stripe/first_contact/black/5-plasma-escape-b-stripe.webp',
+  "Vulcan's End": '/custom_logos/drawings/images_stripe/first_contact/black/6-vulcans-end-b-stripe.webp',
+  'The Phoenix': '/custom_logos/drawings/images_stripe/first_contact/black/7-the-phoenix-b-stripe.webp',
 };
 
 const CONTROL_TILE_BN = 'botonera-bn';
 const CONTROL_TILE_ARROWS = 'botonera-fletxes';
 
 const FIRST_CONTACT_MEDIA_WHITE = {
-  'NX-01': '/custom_logos/drawings/first_contact/white/1-nx-01-w.webp',
-  'NCC-1701': '/custom_logos/drawings/first_contact/white/2-ncc-1701-w.webp',
-  'NCC-1701-D': '/custom_logos/drawings/first_contact/white/3-ncc-1701-d-w.webp',
-  'Wormhole': '/custom_logos/drawings/first_contact/white/4-wormhole-w.webp',
-  'Plasma Escape': '/custom_logos/drawings/first_contact/white/5-plasma-escape-w.webp',
-  "Vulcan's End": '/custom_logos/drawings/first_contact/white/6-vulcans-end-w.webp',
-  'The Phoenix': '/custom_logos/drawings/first_contact/white/7-the-phoenix-w.webp',
+  'NX-01': '/custom_logos/drawings/images_stripe/first_contact/white/1-nx-01-w-stripe.webp',
+  'NCC-1701': '/custom_logos/drawings/images_stripe/first_contact/white/2-ncc-1701-w-stripe.webp',
+  'NCC-1701-D': '/custom_logos/drawings/images_stripe/first_contact/white/3-ncc-1701-d-w-stripe.webp',
+  'Wormhole': '/custom_logos/drawings/images_stripe/first_contact/white/4-wormhole-w-stripe.webp',
+  'Plasma Escape': '/custom_logos/drawings/images_stripe/first_contact/white/5-plasma-escape-w-stripe.webp',
+  "Vulcan's End": '/custom_logos/drawings/images_stripe/first_contact/white/6-vulcans-end-w-stripe.webp',
+  'The Phoenix': '/custom_logos/drawings/images_stripe/first_contact/white/7-the-phoenix-w-stripe.webp',
 };
 
 const THE_HUMAN_INSIDE_MEDIA = {
-  'R2-D2': '/custom_logos/drawings/the_human_inside/black/r2-d2.webp',
-  'The Dalek': '/custom_logos/drawings/the_human_inside/black/the-dalek.webp',
-  'C3P0': '/custom_logos/drawings/the_human_inside/black/c3-p0.webp',
-  'Vader': '/custom_logos/drawings/the_human_inside/black/vader.webp',
-  'Afrodita': '/custom_logos/drawings/the_human_inside/black/afrodita-a.webp',
-  'Mazinger': '/custom_logos/drawings/the_human_inside/black/mazinger-z.webp',
-  'Cylon 78': '/custom_logos/drawings/the_human_inside/black/cylon.webp',
-  'Cylon 03': '/custom_logos/drawings/the_human_inside/black/cylon-03.webp',
-  'Iron Man 68': '/custom_logos/drawings/the_human_inside/black/iron-man-68.webp',
-  'Iron Man 08': '/custom_logos/drawings/the_human_inside/black/iron-man-08.webp',
-  'Cyberman': '/custom_logos/drawings/the_human_inside/black/cyberman.webp',
-  'Maschinenmensch': '/custom_logos/drawings/the_human_inside/black/maschinenmensch.webp',
-  'Robocop': '/custom_logos/drawings/the_human_inside/black/robocop.webp',
-  'Terminator': '/custom_logos/drawings/the_human_inside/black/terminator.webp',
-  'Robbie the Robot': '/custom_logos/drawings/the_human_inside/black/robbie-the-robot.webp',
+  'R2-D2': '/custom_logos/drawings/images_grid/the_human_inside/r2-d2-grid.webp',
+  'The Dalek': '/custom_logos/drawings/images_grid/the_human_inside/the-dalek-grid.webp',
+  'C3P0': '/custom_logos/drawings/images_grid/the_human_inside/c3-p0-grid.webp',
+  'Vader': '/custom_logos/drawings/images_grid/the_human_inside/vader-grid.webp',
+  'Afrodita': '/custom_logos/drawings/images_grid/the_human_inside/afrodita-a-grid.webp',
+  'Mazinger': '/custom_logos/drawings/images_grid/the_human_inside/mazinger-z-grid.webp',
+  'Cylon 78': '/custom_logos/drawings/images_grid/the_human_inside/cylon-78-grid.webp',
+  'Cylon 03': '/custom_logos/drawings/images_grid/the_human_inside/cylon-03-grid.webp',
+  'Iron Man 68': '/custom_logos/drawings/images_grid/the_human_inside/iron-man-68-grid.webp',
+  'Iron Man 08': '/custom_logos/drawings/images_grid/the_human_inside/iron-man-08-grid.webp',
+  Cyberman: '/custom_logos/drawings/images_grid/the_human_inside/cyberman-grid.webp',
+  Robocop: '/custom_logos/drawings/images_grid/the_human_inside/robocop-grid.webp',
+  Terminator: '/custom_logos/drawings/images_grid/the_human_inside/terminator-grid.webp',
+  Maschinenmensch: '/custom_logos/drawings/images_grid/the_human_inside/maschinenmensch-grid.webp',
+  'Robby the Robot': '/custom_logos/drawings/images_grid/the_human_inside/robby-the-robot-grid.webp',
+  'Robbie the Robot': '/custom_logos/drawings/images_grid/the_human_inside/robby-the-robot-grid.webp',
 };
 
 const THE_HUMAN_INSIDE_MEDIA_WHITE = {
@@ -56,19 +63,19 @@ const THE_HUMAN_INSIDE_MEDIA_WHITE = {
 };
 
 const CUBE_MEDIA = {
-  'Iron Kong': '/custom_logos/drawings/cube/iron-cube-08-iron-kong.webp',
-  'Iron Cube 68': '/custom_logos/drawings/cube/iron-cube-68.webp',
-  RoboCube: '/custom_logos/drawings/cube/robocube.webp',
-  'Cylon Cube': '/custom_logos/drawings/cube/cylon-cube-03.webp',
-  'Cylon Cube 03': '/custom_logos/drawings/cube/cylon-cube-03.webp',
-  MaschinenCube: '/custom_logos/drawings/cube/maschinencube.webp',
-  'Mazinger C': '/custom_logos/drawings/cube/mazinger-c.webp',
-  'Afrodita C': '/custom_logos/drawings/cube/afrodita-c.webp',
-  'Cube 3 P0': '/custom_logos/drawings/cube/cube-3-p0.webp',
-  '3cube p0': '/custom_logos/drawings/cube/cube-3-p0.webp',
-  '3cube-p0': '/custom_logos/drawings/cube/cube-3-p0.webp',
-  'Cyber Cube': '/custom_logos/drawings/cube/cyber-cube.webp',
-  'Darth Cube': '/custom_logos/drawings/cube/darth-cube.webp',
+  'Iron Kong': '/custom_logos/drawings/images_stripe/cube/iron-cube-08-iron-kong-stripe.webp',
+  'Iron Cube 68': '/custom_logos/drawings/images_stripe/cube/iron-cube-68-stripe.webp',
+  RoboCube: '/custom_logos/drawings/images_stripe/cube/robocube-stripe.webp',
+  'Cylon Cube': '/custom_logos/drawings/images_stripe/cube/cylon-cube-03-stripe.webp',
+  'Cylon Cube 03': '/custom_logos/drawings/images_stripe/cube/cylon-cube-03-stripe.webp',
+  MaschinenCube: '/custom_logos/drawings/images_stripe/cube/maschinencube-stripe.webp',
+  'Mazinger C': '/custom_logos/drawings/images_stripe/cube/mazinger-c-stripe.webp',
+  'Afrodita C': '/custom_logos/drawings/images_stripe/cube/afrodita-c-stripe.webp',
+  'Cube 3 P0': '/custom_logos/drawings/images_stripe/cube/cube-3-p0-stripe.webp',
+  '3cube p0': '/custom_logos/drawings/images_stripe/cube/cube-3-p0-stripe.webp',
+  '3cube-p0': '/custom_logos/drawings/images_stripe/cube/cube-3-p0-stripe.webp',
+  'Cyber Cube': '/custom_logos/drawings/images_stripe/cube/cyber-cube-stripe.webp',
+  'Darth Cube': '/custom_logos/drawings/images_stripe/cube/darth-cube-stripe.webp',
 };
 
 function FirstContactStripeMockupPanel({ megaTileSize, selectedItem, variant, resolveSrc, OptimizedImg }) {
@@ -157,13 +164,13 @@ const OptimizedImg = React.forwardRef(function OptimizedImg({ src, alt, classNam
           // eslint-disable-next-line no-console
           const s = (currentSrc || originalSrc || src || '').toString();
           const shouldLog =
-            s.includes('/placeholders/images_grid/cube/')
-            || s.includes('/custom_logos/drawings/cube/')
-            || s.includes('/placeholders/images_grid/the_human_inside/')
-            || s.includes('/custom_logos/drawings/the_human_inside/')
-            || s.includes('/placeholders/images_grid/first_contact/')
-            || s.includes('/custom_logos/drawings/first_contact/')
-            || s.includes('/placeholders/images_grid/miscel');
+            s.includes('/custom_logos/drawings/images_grid/cube/')
+            || s.includes('/custom_logos/drawings/images_originals/stripe/cube/')
+            || s.includes('/custom_logos/drawings/images_grid/the_human_inside/')
+            || s.includes('/custom_logos/drawings/images_originals/stripe/the_human_inside/')
+            || s.includes('/custom_logos/drawings/images_grid/first_contact/')
+            || s.includes('/custom_logos/drawings/images_originals/stripe/first_contact/')
+            || s.includes('/custom_logos/drawings/images_grid/miscel');
           if (shouldLog) {
             // eslint-disable-next-line no-console
             console.error('[OptimizedImg] tile error loading', { src, currentSrc, originalSrc });
@@ -553,7 +560,28 @@ function MegaColumn({
     if (!isPathItem(it)) return it;
     const seg = it.split('/').filter(Boolean);
     const base = seg.length ? seg[seg.length - 1] : it;
-    return base.replace(/\.(png|jpg|jpeg|webp)$/i, '').replace(/[-_]+/g, ' ');
+    const noExt = base.replace(/\.(png|jpg|jpeg|webp)$/i, '');
+    const noSuffixes = noExt
+      .replace(/-(grid|stripe)$/i, '')
+      .replace(/-(b|w)$/i, '')
+      .replace(/-(b|w)-(grid|stripe)$/i, '')
+      .replace(/-(grid|stripe)-(b|w)$/i, '')
+      .replace(/-(b|w)-stripe$/i, '')
+      .replace(/-stripe-(b|w)$/i, '')
+      .replace(/-(b|w)-grid$/i, '')
+      .replace(/-grid-(b|w)$/i, '')
+      .replace(/-+$/g, '');
+    const baseLabel = noSuffixes.replace(/[-_]+/g, ' ').replace(/\s+/g, ' ').trim();
+    const titleCased = baseLabel
+      .split(' ')
+      .filter(Boolean)
+      .map((w) => {
+        const head = w.slice(0, 1);
+        const tail = w.slice(1);
+        return `${head.toUpperCase()}${tail}`;
+      })
+      .join(' ');
+    return titleCased;
   };
 
   const normalizeKey = (value) => {
@@ -581,8 +609,20 @@ function MegaColumn({
     }
     if (isPathItem(it) && collectionId) {
       const vPath = deriveVariantPath(it, variant) || it;
-      if (typeof vPath === 'string' && vPath.startsWith('/')) return vPath;
-      return `/custom_logos/drawings/${collectionId}/${vPath}`;
+      if (typeof vPath === 'string' && vPath.startsWith('/')) return ensureThumbSuffix(vPath, 'stripe');
+
+      if (collectionId === 'outcasted') {
+        const normalized = typeof vPath === 'string' ? vPath.replace(/^\/?(black|white)\//i, '') : vPath;
+        return ensureThumbSuffix(`/custom_logos/drawings/images_stripe/miscel·lania/black/${normalized}`, 'stripe');
+      }
+
+      if (collectionId === 'the_human_inside') {
+        const normalized = typeof vPath === 'string' ? vPath.replace(/^\/?(black|white)\//i, '') : vPath;
+        return ensureThumbSuffix(`/custom_logos/drawings/images_stripe/the_human_inside/black/${normalized}`, 'stripe');
+      }
+
+      const out = `/custom_logos/drawings/images_stripe/${collectionId}/${vPath}`;
+      return ensureThumbSuffix(out, 'stripe');
     }
     if (isHumanInside && (THE_HUMAN_INSIDE_MEDIA[itKey] || THE_HUMAN_INSIDE_MEDIA[it])) {
       return (humanInsideVariant === 'white' ? THE_HUMAN_INSIDE_MEDIA_WHITE : THE_HUMAN_INSIDE_MEDIA)[itKey]
@@ -597,12 +637,123 @@ function MegaColumn({
     return null;
   };
 
-  const resolveGridThumbSrc = (it) => {
+  const ensureThumbSuffix = (src, kind) => {
+    if (!src || typeof src !== 'string') return src;
+    const [base, q] = src.split('?');
+    if (!base) return src;
+    const m = base.match(/^(.*)\.(webp|png|jpe?g)$/i);
+    if (!m) return src;
+    const prefix = m[1].replace(/-(grid|stripe)$/i, '');
+    const ext = m[2];
+    const want = `-${kind}`;
+    const outBase = prefix.toLowerCase().endsWith(want) ? `${prefix}.${ext}` : `${prefix}${want}.${ext}`;
+    return q ? `${outBase}?${q}` : outBase;
+  };
+
+  const resolveGridThumbSrc = (it, collectionIdOverride) => {
     if (!it || typeof it !== 'string') return resolveSrc(it);
     const raw = it.trim();
-    if (raw.startsWith('placeholders/images_grid/')) return `/${raw}`;
-    if (raw.startsWith('/placeholders/images_grid/')) return raw;
-    if (collectionId === 'cube' && isPathItem(raw) && !raw.startsWith('/')) {
+    const inferred = (() => {
+      const m = raw.match(/\/custom_logos\/drawings\/(?:images_grid|images_stripe|images_originals\/(?:grid|stripe))\/([^/]+)\//i);
+      return m?.[1] || null;
+    })();
+    const cid = collectionIdOverride || collectionId || inferred;
+
+    if (raw.startsWith('/custom_logos/drawings/images_grid/')) {
+      if (cid === 'austen' && raw.includes('/austen/quotes/')) {
+        return resolveAustenQuoteThumbFromPath(raw, 'grid') || ensureThumbSuffix(raw, 'grid');
+      }
+      return ensureThumbSuffix(raw, 'grid');
+    }
+
+    if (
+      raw.startsWith('/custom_logos/drawings/images_stripe/')
+      || raw.startsWith('/custom_logos/drawings/images_originals/stripe/')
+    ) {
+      const file = raw.split('/').pop() || '';
+      const baseFile = file.replace(/-stripe\.(webp|png|jpe?g)$/i, '.$1');
+
+      if (cid === 'first_contact') {
+        const map = {
+          '1-nx-01-b.webp': 'nx-01.webp',
+          '1-nx-01-w.webp': 'nx-01.webp',
+          '2-ncc-1701-b.webp': 'ncc-1701.webp',
+          '2-ncc-1701-w.webp': 'ncc-1701.webp',
+          '3-ncc-1701-d-b.webp': 'ncc1701-d.webp',
+          '3-ncc-1701-d-w.webp': 'ncc1701-d.webp',
+          '4-wormhole-b.webp': 'wormhole.webp',
+          '4-wormhole-w.webp': 'wormhole.webp',
+          '5-plasma-escape-b.webp': 'plasma-escape.webp',
+          '5-plasma-escape-w.webp': 'plasma-escape.webp',
+          '6-vulcans-end-b.webp': 'vulcans-end.webp',
+          '6-vulcans-end-w.webp': 'vulcans-end.webp',
+          '7-the-phoenix-b.webp': 'the-phoenix.webp',
+          '7-the-phoenix-w.webp': 'the-phoenix.webp',
+        };
+        const out = map[baseFile.toLowerCase()];
+        if (out) return ensureThumbSuffix(`/custom_logos/drawings/images_grid/first_contact/${out}`, 'grid');
+      }
+
+      if (cid === 'the_human_inside') {
+        return ensureThumbSuffix(`/custom_logos/drawings/images_grid/the_human_inside/${baseFile}`, 'grid');
+      }
+
+      if (cid === 'cube') {
+        const map = {
+          'iron-cube-68.webp': 'iron-cube.webp',
+          'iron-cube-08-iron-kong.webp': 'iron-kong.webp',
+          'cube-3-p0.webp': '3cube-p0.webp',
+          'cyber-cube.webp': 'cybercube.webp',
+          'cylon-cube-03.webp': 'cylon-cube.webp',
+        };
+        const out = map[baseFile.toLowerCase()] || baseFile;
+        return ensureThumbSuffix(`/custom_logos/drawings/images_grid/cube/${out}`, 'grid');
+      }
+
+      if (cid === 'outcasted') {
+        const lower = baseFile.toLowerCase();
+        if (lower === 'dj-vader-b.webp') return '/custom_logos/drawings/images_grid/miscel·lania/dj-vader-grid.webp';
+        if (lower === 'death-star2d2-b.webp') return '/custom_logos/drawings/images_grid/miscel·lania/death-star2d2-grid.webp';
+        return ensureThumbSuffix(`/custom_logos/drawings/images_grid/miscel·lania/${baseFile.replace(/-b\.webp$/i, '.webp')}`, 'grid');
+      }
+
+      if (cid === 'austen') {
+        if (raw.includes('/austen/quotes/')) {
+          return resolveAustenQuoteThumbFromPath(raw, 'grid') || null;
+        }
+        if (raw.includes('/austen/keep_calm/')) {
+          return ensureThumbSuffix(`/custom_logos/drawings/images_grid/austen/keep_calm/${baseFile}`, 'grid');
+        }
+        if (raw.includes('/austen/looking_for_my_darcy/')) {
+          return ensureThumbSuffix(`/custom_logos/drawings/images_grid/austen/looking_for_my_darcy/${baseFile}`, 'grid');
+        }
+        if (raw.includes('/austen/pemberley_house/')) {
+          return ensureThumbSuffix(`/custom_logos/drawings/images_grid/austen/pemberley_house/${baseFile}`, 'grid');
+        }
+        if (raw.includes('/austen/crosswords/')) {
+          return ensureThumbSuffix(`/custom_logos/drawings/images_grid/austen/crosswords/${baseFile}`, 'grid');
+        }
+      }
+    }
+
+    if (
+      raw.includes('/austen/quotes/')
+      && (
+        raw.startsWith('/placeholders/images_grid/')
+        || raw.startsWith('/custom_logos/drawings/images_grid/')
+        || raw.startsWith('/custom_logos/drawings/images_stripe/')
+        || raw.startsWith('/custom_logos/drawings/images_originals/stripe/')
+      )
+    ) {
+      return resolveAustenQuoteThumbFromPath(raw, 'grid') || resolveSrc(it);
+    }
+    if (raw.startsWith('placeholders/images_grid/')) {
+      return ensureThumbSuffix(`/custom_logos/drawings/images_grid/${raw.replace(/^placeholders\/images_grid\//, '')}`, 'grid');
+    }
+    if (raw.startsWith('/placeholders/images_grid/')) {
+      return ensureThumbSuffix(raw.replace(/^\/placeholders\/images_grid\//, '/custom_logos/drawings/images_grid/'), 'grid');
+    }
+    if (cid === 'cube' && isPathItem(raw) && !raw.startsWith('/')) {
       const map = {
         'iron-cube-68.webp': 'iron-cube.webp',
         'iron-cube-08-iron-kong.webp': 'iron-kong.webp',
@@ -611,11 +762,11 @@ function MegaColumn({
         'cylon-cube-03.webp': 'cylon-cube.webp',
       };
       const file = map[raw.toLowerCase()] || raw;
-      return `/placeholders/images_grid/cube/${file}`;
+      return ensureThumbSuffix(`/custom_logos/drawings/images_grid/cube/${file}`, 'grid');
     }
     const key = normalizeKey(it).toLowerCase();
 
-    if (collectionId === 'first_contact') {
+    if (cid === 'first_contact') {
       const map = {
         'nx-01': 'nx-01.webp',
         'ncc-1701': 'ncc-1701.webp',
@@ -626,10 +777,10 @@ function MegaColumn({
         'the phoenix': 'the-phoenix.webp',
       };
       const file = map[key];
-      return file ? `/placeholders/images_grid/first_contact/${file}` : resolveSrc(it);
+      return file ? ensureThumbSuffix(`/custom_logos/drawings/images_grid/first_contact/${file}`, 'grid') : resolveSrc(it);
     }
 
-    if (collectionId === 'the_human_inside') {
+    if (cid === 'the_human_inside') {
       const map = {
         'r2-d2': 'r2-d2.webp',
         c3p0: 'c3-p0.webp',
@@ -649,18 +800,17 @@ function MegaColumn({
         'robbie the robot': 'robby-the-robot.webp',
       };
       const file = map[key];
-      return file ? `/placeholders/images_grid/the_human_inside/${file}` : null;
+      return file ? ensureThumbSuffix(`/custom_logos/drawings/images_grid/the_human_inside/${file}`, 'grid') : null;
     }
 
-    if (collectionId === 'austen') {
-      if (key.includes('allow me')) return '/placeholders/images_grid/austen/quotes/you-must-allow-me.webp';
-      if (key.includes('half agony') || key.includes('half hope')) return '/placeholders/images_grid/austen/quotes/half-agony-half-hope.webp';
-      if (key.includes('truth')) return '/placeholders/images_grid/austen/quotes/it-is-a-truth.webp';
-      if (key.includes('body and soul')) return '/placeholders/images_grid/austen/quotes/body-and-soul.webp';
-      return '/placeholders/images_grid/austen/quotes/it-is-a-truth.webp';
+    if (cid === 'austen') {
+      const id = resolveAustenQuoteAssetId(key);
+      if (id && AUSTEN_QUOTES_ASSETS[id]?.grid) return AUSTEN_QUOTES_ASSETS[id].grid;
+      if (typeof raw === 'string' && raw.includes('/austen/quotes/')) return AUSTEN_QUOTES_ASSETS.it_is_a_truth.grid;
+      return null;
     }
 
-    if (collectionId === 'cube') {
+    if (cid === 'cube') {
       const map = {
         'afrodita c': 'afrodita-c.webp',
         'mazinger c': 'mazinger-c.webp',
@@ -678,7 +828,7 @@ function MegaColumn({
         'cylon cube 03': 'cylon-cube.webp',
       };
       const file = map[key];
-      const out = file ? `/placeholders/images_grid/cube/${file}` : null;
+      const out = file ? ensureThumbSuffix(`/custom_logos/drawings/images_grid/cube/${file}`, 'grid') : null;
       if (import.meta.env.DEV && !out) {
         // eslint-disable-next-line no-console
         console.error('[CUBE grid thumb] unresolved', { it, key, raw });
@@ -686,17 +836,181 @@ function MegaColumn({
       return out;
     }
 
-    if (collectionId === 'outcasted') {
+    if (cid === 'outcasted') {
       const s = it.toLowerCase();
-      if (s.includes('pont-del-diable')) return '/placeholders/images_grid/miscel·lania/pont-del-diable.webp';
-      if (s.includes('arthur')) return '/placeholders/images_grid/miscel·lania/pont-del-diable.webp';
-      if (s.includes('dalek')) return '/placeholders/images_grid/miscel·lania/pont-del-diable.webp';
-      if (s.includes('dj-vader')) return '/placeholders/images_grid/miscel·lania/pont-del-diable.webp';
-      if (s.includes('death-star2d2')) return '/placeholders/images_grid/miscel·lania/pont-del-diable.webp';
+      if (s.includes('dj-vader')) return '/custom_logos/drawings/images_grid/miscel·lania/dj-vader-grid.webp';
+      if (s.includes('death-star2d2')) return '/custom_logos/drawings/images_grid/miscel·lania/death-star2d2-grid.webp';
+      if (s.includes('pont-del-diable')) return '/custom_logos/drawings/images_grid/miscel·lania/pont-del-diable-grid.webp';
       return resolveSrc(it);
     }
 
     return resolveSrc(it);
+  };
+
+  const resolveStripeThumbSrc = (it) => {
+    if (!it || typeof it !== 'string') return null;
+    const raw = it.trim();
+
+    // Never let STRIPE thumbnails come from GRID or ORIGINALS.
+    if (raw.startsWith('/custom_logos/drawings/images_stripe/')) return ensureThumbSuffix(raw, 'stripe');
+
+    if (raw.startsWith('/custom_logos/drawings/images_originals/stripe/')) {
+      const lower = raw.toLowerCase();
+      if (lower.includes('/austen/crosswords/')) {
+        const file = (lower.split('/').pop() || '').replace(/\?.*$/, '');
+        const m = file.match(/^(persuasion|pride-and-prejudice|sense-and-sensibility)-(\d+)-stripe\.(webp|png)$/i);
+        if (m) {
+          const folder = m[1].replace(/-/g, '_');
+          return ensureThumbSuffix(`/custom_logos/drawings/images_stripe/austen/crosswords/${folder}/${m[1]}-${m[2]}.${m[3]}`, 'stripe');
+        }
+      }
+
+      const mapped = raw.replace(
+        '/custom_logos/drawings/images_originals/stripe/',
+        '/custom_logos/drawings/images_stripe/',
+      );
+      return ensureThumbSuffix(mapped, 'stripe');
+    }
+
+    if (collectionId === 'austen') {
+      const key = normalizeKey(it).toLowerCase();
+      const id = resolveAustenQuoteAssetId(key);
+      if (id && AUSTEN_QUOTES_ASSETS[id]?.stripe) return AUSTEN_QUOTES_ASSETS[id].stripe;
+      if (raw.includes('/austen/quotes/')) {
+        return resolveAustenQuoteThumbFromPath(raw, 'stripe') || null;
+      }
+
+      if (raw.includes('/austen/keep_calm/')) {
+        const file = raw.split('/').pop() || '';
+        if (file === 'keep-calm-multi-red.webp') return '/custom_logos/drawings/images_stripe/austen/keep_calm/multi/keep-calm-multi-red-stripe.webp';
+        if (file === 'keep-calm-black.webp') return '/custom_logos/drawings/images_stripe/austen/keep_calm/black/keep-calm-b-stripe.webp';
+      }
+
+      if (raw.includes('/austen/looking_for_my_darcy/')) {
+        const file = raw.split('/').pop() || '';
+        const lower = file.toLowerCase();
+        if (lower.includes('dark-gradient')) return ensureThumbSuffix(`/custom_logos/drawings/images_stripe/austen/looking_for_my_darcy/dark/${file}`, 'stripe');
+        if (lower.includes('light-gradient')) return ensureThumbSuffix(`/custom_logos/drawings/images_stripe/austen/looking_for_my_darcy/light/${file}`, 'stripe');
+        if (lower.includes('-frame')) return ensureThumbSuffix(`/custom_logos/drawings/images_stripe/austen/looking_for_my_darcy/frame/${file}`, 'stripe');
+        if (lower.includes('-solid')) return ensureThumbSuffix(`/custom_logos/drawings/images_stripe/austen/looking_for_my_darcy/solid/${file}`, 'stripe');
+      }
+
+      if (raw.includes('/austen/pemberley_house/')) {
+        const file = raw.split('/').pop() || '';
+        if (file === 'pemberley-black.webp') return '/custom_logos/drawings/images_stripe/austen/pemberley_house/black/pemberley-black-stripe.webp';
+      }
+
+      if (raw.includes('/austen/crosswords/')) {
+        const file = raw.split('/').pop() || '';
+        const lower = file.toLowerCase();
+        const persuasion = lower.match(/^persuasion-(\d)\.webp$/);
+        if (persuasion) return `/custom_logos/drawings/images_stripe/austen/crosswords/persuasion/persuasion-${persuasion[1]}-stripe.webp`;
+        const pride = lower.match(/^pride-and-prejudice-(\d)\.webp$/);
+        if (pride) return `/custom_logos/drawings/images_stripe/austen/crosswords/pride_and_prejudice/pride-and-prejudice-${pride[1]}-stripe.webp`;
+        const sense = lower.match(/^sense-and-sensibility-(\d)\.webp$/);
+        if (sense) return `/custom_logos/drawings/images_stripe/austen/crosswords/sense_and_sensibility/sense-and-sensibility-${sense[1]}-stripe.webp`;
+      }
+
+      return null;
+    }
+
+    if (collectionId === 'cube') {
+      const file = raw.split('/').pop() || '';
+      const map = {
+        'iron-kong.webp': 'iron-cube-08-iron-kong.webp',
+        'iron-cube.webp': 'iron-cube-68.webp',
+        '3cube-p0.webp': 'cube-3-p0.webp',
+        cybercube: 'cyber-cube.webp',
+        'cylon-cube.webp': 'cylon-cube-03.webp',
+      };
+      const master = map[file.toLowerCase()] || file;
+      return ensureThumbSuffix(`/custom_logos/drawings/images_stripe/cube/${master}`, 'stripe');
+    }
+
+    if (collectionId === 'outcasted') {
+      const file = raw.split('/').pop() || '';
+      const map = {
+        'dj-vader.webp': 'dj-vader-b.webp',
+        'death-star2d2.webp': 'death-star2d2-b.webp',
+      };
+      const master = map[file.toLowerCase()] || file;
+      return ensureThumbSuffix(`/custom_logos/drawings/images_stripe/miscel·lania/black/${master}`, 'stripe');
+    }
+
+    if (collectionId === 'the_human_inside') {
+      const key = normalizeKey(it).toLowerCase();
+      const labelMap = {
+        'r2-d2': 'r2-d2.webp',
+        c3p0: 'c3-p0.webp',
+        vader: 'vader.webp',
+        afrodita: 'afrodita-a.webp',
+        mazinger: 'mazinger-z.webp',
+        'cylon 78': 'cylon-78.webp',
+        'cylon 03': 'cylon-03.webp',
+        'iron man 68': 'iron-man-68.webp',
+        'iron man 08': 'iron-man-08.webp',
+        cyberman: 'cyberman.webp',
+        'the dalek': 'the-dalek.webp',
+        robocop: 'robocop.webp',
+        terminator: 'terminator.webp',
+        maschinenmensch: 'maschinenmensch.webp',
+        'robby the robot': 'robbie-the-robot.webp',
+        'robbie the robot': 'robbie-the-robot.webp',
+      };
+
+      const file = labelMap[key] || (raw.split('/').pop() || '');
+      return ensureThumbSuffix(`/custom_logos/drawings/images_stripe/the_human_inside/black/${file}`, 'stripe');
+    }
+
+    if (collectionId === 'cube') {
+      const key = normalizeKey(it).toLowerCase();
+      const labelMap = {
+        'iron kong': 'iron-cube-08-iron-kong.webp',
+        'iron cube': 'iron-cube-68.webp',
+        'iron cube 68': 'iron-cube-68.webp',
+        robocube: 'robocube.webp',
+        'cylon cube': 'cylon-cube-03.webp',
+        'cylon cube 03': 'cylon-cube-03.webp',
+        maschinencube: 'maschinencube.webp',
+        'mazinger c': 'mazinger-c.webp',
+        'afrodita c': 'afrodita-c.webp',
+        'cube 3 p0': 'cube-3-p0.webp',
+        '3cube p0': 'cube-3-p0.webp',
+        '3cube-p0': 'cube-3-p0.webp',
+        cybercube: 'cyber-cube.webp',
+        'cyber cube': 'cyber-cube.webp',
+        'darth cube': 'darth-cube.webp',
+      };
+
+      const file = raw.split('/').pop() || '';
+      const fileMap = {
+        'iron-kong.webp': 'iron-cube-08-iron-kong.webp',
+        'iron-cube.webp': 'iron-cube-68.webp',
+        '3cube-p0.webp': 'cube-3-p0.webp',
+        cybercube: 'cyber-cube.webp',
+        'cylon-cube.webp': 'cylon-cube-03.webp',
+      };
+
+      const master = labelMap[key] || fileMap[file.toLowerCase()] || file;
+      return master ? ensureThumbSuffix(`/custom_logos/drawings/images_stripe/cube/${master}`, 'stripe') : null;
+    }
+
+    if (collectionId === 'first_contact') {
+      const file = raw.split('/').pop() || '';
+      const map = {
+        'nx-01.webp': '1-nx-01-b.webp',
+        'ncc-1701.webp': '2-ncc-1701-b.webp',
+        'ncc1701-d.webp': '3-ncc-1701-d-b.webp',
+        'wormhole.webp': '4-wormhole-b.webp',
+        'plasma-escape.webp': '5-plasma-escape-b.webp',
+        'vulcans-end.webp': '6-vulcans-end-b.webp',
+        'the-phoenix.webp': '7-the-phoenix-b.webp',
+      };
+      const out = map[file.toLowerCase()];
+      return out ? ensureThumbSuffix(`/custom_logos/drawings/images_stripe/first_contact/black/${out}`, 'stripe') : null;
+    }
+
+    return null;
   };
 
   const gridScaleFor = (it) => {
@@ -790,12 +1104,9 @@ function MegaColumn({
                     {!it || it === CONTROL_TILE_ARROWS || it === CONTROL_TILE_BN ? (
                       <div className="h-4" />
                     ) : (
-                      collectionId === 'outcasted' && isPathItem(it) ? (
-                        <div className="h-4" />
-                      ) : (
                       <Link
                         to="#"
-                        className="relative z-40 flex h-4 w-full items-center justify-center whitespace-nowrap rounded-none bg-muted px-2 text-xs leading-4 text-muted-foreground hover:text-foreground"
+                        className="relative z-40 flex h-[20px] w-full items-center justify-center whitespace-nowrap rounded-none bg-muted px-2 font-roboto-condensed text-[11.2px] leading-[20px] uppercase text-foreground hover:text-foreground"
                         data-mega-label="1"
                         data-mega-collection={collectionId}
                         data-mega-item={typeof it === 'string' ? it : ''}
@@ -807,7 +1118,6 @@ function MegaColumn({
                       >
                         {labelForItem(it)}
                       </Link>
-                      )
                     )}
 
                     {!it ? null : it === CONTROL_TILE_BN ? (
@@ -855,7 +1165,7 @@ function MegaColumn({
                             // eslint-disable-next-line no-console
                             console.error('[MEGA cube tile click]', {
                               it,
-                              thumb: resolveGridThumbSrc(it),
+                              thumb: resolveGridThumbSrc(it, collectionId),
                             });
                           }
                           setSelectedItem(it);
@@ -871,15 +1181,22 @@ function MegaColumn({
                         }}
                       >
                         <div className="absolute inset-0 overflow-hidden rounded-md bg-transparent">
-                          {resolveGridThumbSrc(it) ? (
+                          {(() => {
+                            let thumbSrc = resolveGridThumbSrc(it, collectionId);
+                            const useContain =
+                              collectionId === 'austen'
+                              && typeof it === 'string'
+                              && it.includes('/austen/quotes/');
+                            return thumbSrc ? (
                             <OptimizedImg
-                              src={resolveGridThumbSrc(it)}
-                              alt={collectionId === 'outcasted' && isPathItem(it) ? '' : labelForItem(it) || it}
-                              className="h-full w-full object-cover"
+                              src={thumbSrc}
+                              alt={labelForItem(it) || it}
+                              className={useContain ? 'h-full w-full object-contain' : 'h-full w-full object-cover'}
                             />
                           ) : (
                             <div className="h-full w-full bg-black/5" />
-                          )}
+                            );
+                          })()}
                         </div>
 
                         {FIRST_CONTACT_MEDIA[it] && idx >= 1 && idx <= 7 && firstContactVariant === 'white' ? (
@@ -1084,8 +1401,10 @@ export default function FullWideSlideDemoHeader({
     }
   }, []);
 
-  const GLOBAL_OVERLAY_STORAGE_KEY = 'HG_GLOBAL_STRIPE_OVERLAY_SRC';
-  const GLOBAL_OVERLAY_EVENT = 'hg-global-stripe-overlay-changed';
+  const overlayStorageKey = useMemo(() => {
+    const k = (active || '').toString();
+    return k ? `HG_STRIPE_OVERLAY_SRC_${k}` : 'HG_STRIPE_OVERLAY_SRC';
+  }, [active]);
 
   const [stripeOverlayOverrideActive, setStripeOverlayOverrideActive] = useState(() => Boolean(overlaySrcFromUrl));
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -1104,7 +1423,62 @@ export default function FullWideSlideDemoHeader({
   const [thinStartIndex, setThinStartIndex] = useState(0);
   const [gildan5000Catalog, setGildan5000Catalog] = useState(null);
 
+  const reorderAustenQuotes = (items) => {
+    try {
+      if (!Array.isArray(items) || items.length === 0) return items;
+      const wantOrder = [
+        'it-is-a-truth',
+        'you-must-allow-me',
+        'body-and-soul',
+        'unsociable-and-taciturn',
+        'half-agony-half-hope',
+      ];
+      const rankByNeedle = new Map(wantOrder.map((v, idx) => [v, idx]));
+      const pickRank = (v) => {
+        if (typeof v !== 'string') return null;
+        const s = v.toLowerCase();
+        if (!s.includes('/austen/quotes/')) return null;
+        for (const [needle, idx] of rankByNeedle.entries()) {
+          if (s.includes(needle)) return idx;
+        }
+        return null;
+      };
+
+      let touched = false;
+      const out = items
+        .map((it, idx) => {
+          const r = pickRank(it);
+          if (r !== null) touched = true;
+          return { it, idx, r };
+        })
+        .sort((a, b) => {
+          if (a.r === null && b.r === null) return a.idx - b.idx;
+          if (a.r === null) return 1;
+          if (b.r === null) return -1;
+          if (a.r !== b.r) return a.r - b.r;
+          return a.idx - b.idx;
+        })
+        .map((e) => e.it);
+
+      return touched ? out : items;
+    } catch {
+      return items;
+    }
+  };
+
+  useEffect(() => {
+    if (overlaySrcFromUrl) return;
+    setStripeOverlayOverrideActive(false);
+  }, [active, overlaySrcFromUrl]);
+
   const resolvedOverlaySrc = useMemo(() => {
+    const normalizeKeyLocal = (value) => {
+      if (typeof value !== 'string') return '';
+      return value
+        .trim()
+        .replace(/[\u2010\u2011\u2012\u2013\u2014\u2212]/g, '-')
+        .replace(/\s+/g, ' ');
+    };
     const isPathItem = (it) => typeof it === 'string' && /\.(png|jpg|jpeg|webp)$/i.test(it);
 
     if (active === 'first_contact' && firstContactSelectedItem) {
@@ -1113,18 +1487,83 @@ export default function FullWideSlideDemoHeader({
         : (FIRST_CONTACT_MEDIA[firstContactSelectedItem] || null);
     }
     if (active === 'the_human_inside' && humanInsideSelectedItem) {
-      const src = humanInsideVariant === 'white'
-        ? (THE_HUMAN_INSIDE_MEDIA_WHITE[humanInsideSelectedItem] || THE_HUMAN_INSIDE_MEDIA[humanInsideSelectedItem] || null)
-        : (THE_HUMAN_INSIDE_MEDIA[humanInsideSelectedItem] || null);
-      return src || '/placeholders/images_grid/the_human_inside/r2-d2.webp';
+      const key = normalizeKeyLocal(humanInsideSelectedItem).toLowerCase();
+      const map = {
+        'r2-d2': 'r2-d2-stripe.webp',
+        c3p0: 'c3-p0-stripe.webp',
+        vader: 'vader-stripe.webp',
+        afrodita: 'afrodita-a-stripe.webp',
+        mazinger: 'mazinger-z-stripe.webp',
+        'cylon 78': 'cylon-stripe.webp',
+        'cylon 03': 'cylon-03-stripe.webp',
+        'iron man 68': 'iron-man-68-stripe.webp',
+        'iron man 08': 'iron-man-08-stripe.webp',
+        cyberman: 'cyberman-stripe.webp',
+        'the dalek': 'the-dalek-stripe.webp',
+        robocop: 'robocop-stripe.webp',
+        terminator: 'terminator-stripe.webp',
+        maschinenmensch: 'maschinenmensch-stripe.webp',
+        'robby the robot': 'robbie-the-robot-stripe.webp',
+        'robbie the robot': 'robbie-the-robot-stripe.webp',
+      };
+      const file = map[key] || null;
+      return file ? `/custom_logos/drawings/images_stripe/the_human_inside/black/${file}` : null;
     }
     if (active && selectedItemByCollection?.[active]) {
       const key = selectedItemByCollection[active];
 
+      if (active === 'cube' && typeof key === 'string' && !isPathItem(key)) {
+        const k = normalizeKeyLocal(key).toLowerCase();
+        const map = {
+          'iron kong': 'iron-cube-08-iron-kong-stripe.webp',
+          'iron cube': 'iron-cube-68-stripe.webp',
+          'iron cube 68': 'iron-cube-68-stripe.webp',
+          robocube: 'robocube-stripe.webp',
+          'cylon cube': 'cylon-cube-03-stripe.webp',
+          'cylon cube 03': 'cylon-cube-03-stripe.webp',
+          maschinencube: 'maschinencube-stripe.webp',
+          'mazinger c': 'mazinger-c-stripe.webp',
+          'afrodita c': 'afrodita-c-stripe.webp',
+          'cube 3 p0': 'cube-3-p0-stripe.webp',
+          '3cube p0': 'cube-3-p0-stripe.webp',
+          '3cube-p0': 'cube-3-p0-stripe.webp',
+          '3cube p0': 'cube-3-p0-stripe.webp',
+          '3cube-p0': 'cube-3-p0-stripe.webp',
+          'cyber cube': 'cyber-cube-stripe.webp',
+          cybercube: 'cyber-cube-stripe.webp',
+          'darth cube': 'darth-cube-stripe.webp',
+        };
+        const file = map[k] || null;
+        const out = file ? `/custom_logos/drawings/images_stripe/cube/${file}` : null;
+        if (import.meta.env.DEV && !out) {
+          // eslint-disable-next-line no-console
+          console.error('[CUBE stripe overlay] unresolved label', { key, normalized: k });
+        }
+        return out;
+      }
+
+      if (active === 'outcasted' && typeof key === 'string' && !isPathItem(key)) {
+        const k = normalizeKeyLocal(key).toLowerCase();
+        const map = {
+          'dj vader': '/custom_logos/drawings/images_stripe/miscel·lania/black/dj-vader-b-stripe.webp',
+          'dj-vader': '/custom_logos/drawings/images_stripe/miscel·lania/black/dj-vader-b-stripe.webp',
+          deathstar2d2: '/custom_logos/drawings/images_stripe/miscel·lania/black/death-star2d2-b-stripe.webp',
+          'death star2d2': '/custom_logos/drawings/images_stripe/miscel·lania/black/death-star2d2-b-stripe.webp',
+          'death-star2d2': '/custom_logos/drawings/images_stripe/miscel·lania/black/death-star2d2-b-stripe.webp',
+        };
+        const out = map[k] || null;
+        if (import.meta.env.DEV && !out) {
+          // eslint-disable-next-line no-console
+          console.error('[OUTCASTED stripe overlay] unresolved label', { key, normalized: k });
+        }
+        return out;
+      }
+
       // Path-based collections (e.g. outcasted black/xxx.webp) can be resolved directly.
       if (isPathItem(key)) {
-        if (active === 'cube' && typeof key === 'string' && key.startsWith('/placeholders/images_grid/cube/')) {
+        if (active === 'cube' && typeof key === 'string' && key.startsWith('/custom_logos/drawings/images_grid/cube/')) {
           const file = key.split('/').pop() || '';
+          const fileNormalized = file.replace(/-grid\.(webp|png|jpe?g)$/i, '.$1');
           const map = {
             'iron-kong.webp': 'iron-cube-08-iron-kong.webp',
             'iron-cube.webp': 'iron-cube-68.webp',
@@ -1137,156 +1576,157 @@ export default function FullWideSlideDemoHeader({
             'cybercube.webp': 'cyber-cube.webp',
             'darth-cube.webp': 'darth-cube.webp',
           };
-          const drawingFile = map[file];
-          if (drawingFile) return `/custom_logos/drawings/cube/${drawingFile}`;
+          const drawingFile = map[fileNormalized] || map[file];
+          if (drawingFile) return `/custom_logos/drawings/images_stripe/cube/${drawingFile.replace(/\.(webp|png|jpe?g)$/i, '-stripe.$1')}`;
         }
-        if (active === 'outcasted' && typeof key === 'string' && key.startsWith('/placeholders/images_grid/miscel·lania/')) {
+        if (active === 'outcasted' && typeof key === 'string' && key.startsWith('/custom_logos/drawings/images_grid/miscel·lania/')) {
           const file = key.split('/').pop() || '';
           const map = {
             'dj-vader.webp': 'dj-vader-b.webp',
             'death-star2d2.webp': 'death-star2d2-b.webp',
           };
           const drawingFile = map[file];
-          if (drawingFile) return `/custom_logos/drawings/miscel·lania/black/${drawingFile}`;
+          if (drawingFile) return `/custom_logos/drawings/images_stripe/miscel·lania/black/${drawingFile.replace(/\.(webp|png|jpe?g)$/i, '-stripe.$1')}`;
         }
-        if (active === 'austen' && typeof key === 'string' && key.startsWith('/placeholders/images_grid/austen/keep_calm/')) {
+        if (active === 'austen' && typeof key === 'string' && key.startsWith('/custom_logos/drawings/images_grid/austen/keep_calm/')) {
           const file = key.split('/').pop() || '';
           if (file === 'keep-calm-multi-red.webp') {
-            return '/custom_logos/drawings/austen/samarreta/keep_calm/multi/keep-calm-multi-red.webp';
+            return '/custom_logos/drawings/images_stripe/austen/keep_calm/multi/keep-calm-multi-red.webp';
           }
           if (file === 'keep-calm-black.webp') {
-            return '/custom_logos/drawings/austen/samarreta/keep_calm/black/keep-calm-black.webp';
+            return '/custom_logos/drawings/images_stripe/austen/keep_calm/black/keep-calm-b-stripe.webp';
           }
         }
-        if (active === 'austen' && typeof key === 'string' && key.startsWith('/placeholders/images_grid/austen/looking_for_my_darcy/')) {
+        if (active === 'austen' && typeof key === 'string' && key.startsWith('/custom_logos/drawings/images_grid/austen/looking_for_my_darcy/')) {
           const file = key.split('/').pop() || '';
           const lower = file.toLowerCase();
-          if (lower.includes('dark-gradient')) return `/custom_logos/drawings/austen/samarreta/looking_for_my_darcy/dark/${file}`;
-          if (lower.includes('light-gradient')) return `/custom_logos/drawings/austen/samarreta/looking_for_my_darcy/light/${file}`;
-          if (lower.includes('-frame')) return `/custom_logos/drawings/austen/samarreta/looking_for_my_darcy/frame/${file}`;
-          if (lower.includes('-solid')) return `/custom_logos/drawings/austen/samarreta/looking_for_my_darcy/solid/${file}`;
+          if (lower.includes('dark-gradient')) return `/custom_logos/drawings/images_stripe/austen/looking_for_my_darcy/dark/${file}`;
+          if (lower.includes('light-gradient')) return `/custom_logos/drawings/images_stripe/austen/looking_for_my_darcy/light/${file}`;
+          if (lower.includes('-frame')) return `/custom_logos/drawings/images_stripe/austen/looking_for_my_darcy/frame/${file}`;
+          if (lower.includes('-solid')) return `/custom_logos/drawings/images_stripe/austen/looking_for_my_darcy/solid/${file}`;
         }
-        if (active === 'austen' && typeof key === 'string' && key.startsWith('/placeholders/images_grid/austen/pemberley_house/')) {
+        if (active === 'austen' && typeof key === 'string' && key.startsWith('/custom_logos/drawings/images_grid/austen/pemberley_house/')) {
           const file = key.split('/').pop() || '';
           if (file === 'pemberley-black.webp') {
-            return '/custom_logos/drawings/austen/samarreta/pemberley_house/black/pemberley-black.webp';
+            return '/custom_logos/drawings/images_stripe/austen/pemberley_house/black/pemberley-black.webp';
           }
         }
-        if (active === 'austen' && typeof key === 'string' && key.startsWith('/placeholders/images_grid/austen/crosswords/')) {
+        if (active === 'austen' && typeof key === 'string' && key.startsWith('/custom_logos/drawings/images_stripe/austen/crosswords/')) {
+          const file = (key.split('/').pop() || '').replace(/\?.*$/, '');
+          const m = file.match(/^(persuasion|pride-and-prejudice|sense-and-sensibility)-(\d+)-stripe\.(webp|png)$/i);
+          if (m) {
+            const folder = m[1].replace(/-/g, '_');
+            return `/custom_logos/drawings/images_stripe/austen/crosswords/${folder}/${m[1]}-${m[2]}.${m[3]}`;
+          }
+        }
+        if (active === 'austen' && typeof key === 'string' && key.startsWith('/custom_logos/drawings/images_originals/grid/austen/crosswords/')) {
+          const file = (key.split('/').pop() || '').replace(/\?.*$/, '');
+          const m = file.match(/^(persuasion|pride-and-prejudice|sense-and-sensibility)-(\d+)-grid\.(webp|png)$/i);
+          if (m) {
+            return `/custom_logos/drawings/images_grid/austen/crosswords/${m[1]}-${m[2]}.${m[3]}`;
+          }
+        }
+        if (active === 'austen' && typeof key === 'string' && key.startsWith('/custom_logos/drawings/images_grid/austen/crosswords/')) {
           const file = key.split('/').pop() || '';
           const lower = file.toLowerCase();
           const persuasion = lower.match(/^persuasion-(\d)\.webp$/);
           if (persuasion) {
             const n = persuasion[1];
-            return `/custom_logos/drawings/austen/samarreta/encreuats/persuasion/persuasion-${n}.webp`;
+            return `/custom_logos/drawings/images_stripe/austen/crosswords/persuasion/persuasion-${n}.webp`;
           }
           const pride = lower.match(/^pride-and-prejudice-(\d)\.webp$/);
           if (pride) {
             const n = pride[1];
-            return `/custom_logos/drawings/austen/samarreta/encreuats/pride_and_prejudice/pride-and-prejudice-${n}.webp`;
+            return `/custom_logos/drawings/images_stripe/austen/crosswords/pride_and_prejudice/pride-and-prejudice-${n}.webp`;
           }
           const sense = lower.match(/^sense-and-sensibility-(\d)\.webp$/);
           if (sense) {
             const n = sense[1];
-            return `/custom_logos/drawings/austen/samarreta/encreuats/sense_and_sensibility/sense-and-sensibility-${n}.webp`;
+            return `/custom_logos/drawings/images_stripe/austen/crosswords/sense_and_sensibility/sense-and-sensibility-${n}.webp`;
           }
         }
-        if (active === 'austen' && typeof key === 'string' && key.startsWith('/placeholders/images_grid/austen/quotes/')) {
-          const file = key.split('/').pop() || '';
-          const map = {
-            'you-must-allow-me.webp': 'you-must-allow-me',
-            'half-agony-half-hope.webp': 'half-agony-half-hope',
-            'it-is-a-truth.webp': 'it-is-a-truth',
-            'body-and-soul.webp': 'you-have-bewiched-me',
-            'i-presfer-to-be.webp': 'unsociable-and-taciturn',
-          };
-          const design = map[file];
-          if (design) {
-            const variant = firstContactVariant === 'white' ? 'white' : 'black';
-            const suffix = firstContactVariant === 'white' ? 'w' : 'b';
-            return `/custom_logos/drawings/austen/samarreta/quotes/${variant}/${design}-${suffix}.webp`;
-          }
+        if (
+          active === 'austen'
+          && typeof key === 'string'
+          && (
+            key.startsWith('/custom_logos/drawings/images_grid/austen/quotes/')
+            || key.startsWith('/custom_logos/drawings/images_stripe/austen/quotes/')
+          )
+        ) {
+          return resolveAustenQuoteOriginalFromPath(key) || key;
         }
         return key;
       }
 
       if (active === 'austen') {
-        if (typeof key === 'string' && key.startsWith('/placeholders/images_grid/austen/keep_calm/')) {
+        if (typeof key === 'string' && key.startsWith('/custom_logos/drawings/images_grid/austen/keep_calm/')) {
           const file = key.split('/').pop() || '';
           if (file === 'keep-calm-multi-red.webp') {
-            return '/custom_logos/drawings/austen/samarreta/keep_calm/multi/keep-calm-multi-red.webp';
+            return '/custom_logos/drawings/images_stripe/austen/keep_calm/multi/keep-calm-multi-red.webp';
           }
           if (file === 'keep-calm-black.webp') {
-            return '/custom_logos/drawings/austen/samarreta/keep_calm/black/keep-calm-black.webp';
+            return '/custom_logos/drawings/images_stripe/austen/keep_calm/black/keep-calm-b-stripe.webp';
           }
         }
-        if (typeof key === 'string' && key.startsWith('/placeholders/images_grid/austen/looking_for_my_darcy/')) {
+        if (typeof key === 'string' && key.startsWith('/custom_logos/drawings/images_grid/austen/looking_for_my_darcy/')) {
           const file = key.split('/').pop() || '';
           const lower = file.toLowerCase();
-          if (lower.includes('dark-gradient')) return `/custom_logos/drawings/austen/samarreta/looking_for_my_darcy/dark/${file}`;
-          if (lower.includes('light-gradient')) return `/custom_logos/drawings/austen/samarreta/looking_for_my_darcy/light/${file}`;
-          if (lower.includes('-frame')) return `/custom_logos/drawings/austen/samarreta/looking_for_my_darcy/frame/${file}`;
-          if (lower.includes('-solid')) return `/custom_logos/drawings/austen/samarreta/looking_for_my_darcy/solid/${file}`;
+          if (lower.includes('dark-gradient')) return `/custom_logos/drawings/images_stripe/austen/looking_for_my_darcy/dark/${file}`;
+          if (lower.includes('light-gradient')) return `/custom_logos/drawings/images_stripe/austen/looking_for_my_darcy/light/${file}`;
+          if (lower.includes('-frame')) return `/custom_logos/drawings/images_stripe/austen/looking_for_my_darcy/frame/${file}`;
+          if (lower.includes('-solid')) return `/custom_logos/drawings/images_stripe/austen/looking_for_my_darcy/solid/${file}`;
         }
-        if (typeof key === 'string' && key.startsWith('/placeholders/images_grid/austen/pemberley_house/')) {
+        if (typeof key === 'string' && key.startsWith('/custom_logos/drawings/images_grid/austen/pemberley_house/')) {
           const file = key.split('/').pop() || '';
           if (file === 'pemberley-black.webp') {
-            return '/custom_logos/drawings/austen/samarreta/pemberley_house/black/pemberley-black.webp';
+            return '/custom_logos/drawings/images_stripe/austen/pemberley_house/black/pemberley-black.webp';
           }
         }
-        if (typeof key === 'string' && key.startsWith('/placeholders/images_grid/austen/crosswords/')) {
+        if (typeof key === 'string' && key.startsWith('/custom_logos/drawings/images_grid/austen/crosswords/')) {
           const file = key.split('/').pop() || '';
           const lower = file.toLowerCase();
           const persuasion = lower.match(/^persuasion-(\d)\.webp$/);
           if (persuasion) {
             const n = persuasion[1];
-            return `/custom_logos/drawings/austen/samarreta/encreuats/persuasion/persuasion-${n}.webp`;
+            return `/custom_logos/drawings/images_stripe/austen/crosswords/persuasion/persuasion-${n}.webp`;
           }
           const pride = lower.match(/^pride-and-prejudice-(\d)\.webp$/);
           if (pride) {
             const n = pride[1];
-            return `/custom_logos/drawings/austen/samarreta/encreuats/pride_and_prejudice/pride-and-prejudice-${n}.webp`;
+            return `/custom_logos/drawings/images_stripe/austen/crosswords/pride_and_prejudice/pride-and-prejudice-${n}.webp`;
           }
           const sense = lower.match(/^sense-and-sensibility-(\d)\.webp$/);
           if (sense) {
             const n = sense[1];
-            return `/custom_logos/drawings/austen/samarreta/encreuats/sense_and_sensibility/sense-and-sensibility-${n}.webp`;
+            return `/custom_logos/drawings/images_stripe/austen/crosswords/sense_and_sensibility/sense-and-sensibility-${n}.webp`;
           }
         }
-        if (typeof key === 'string' && key.startsWith('/placeholders/images_grid/austen/quotes/')) {
-          const file = key.split('/').pop() || '';
-          const map = {
-            'you-must-allow-me.webp': 'you-must-allow-me',
-            'half-agony-half-hope.webp': 'half-agony-half-hope',
-            'it-is-a-truth.webp': 'it-is-a-truth',
-            'body-and-soul.webp': 'you-have-bewiched-me',
-            'i-presfer-to-be.webp': 'unsociable-and-taciturn',
-          };
-          const design = map[file];
-          if (design) {
-            const variant = firstContactVariant === 'white' ? 'white' : 'black';
-            const suffix = firstContactVariant === 'white' ? 'w' : 'b';
-            return `/custom_logos/drawings/austen/samarreta/quotes/${variant}/${design}-${suffix}.webp`;
-          }
+        if (
+          typeof key === 'string'
+          && (
+            key.startsWith('/custom_logos/drawings/images_grid/austen/quotes/')
+            || key.startsWith('/custom_logos/drawings/images_stripe/austen/quotes/')
+          )
+        ) {
+          return resolveAustenQuoteOriginalFromPath(key) || key;
         }
-        const k = typeof key === 'string' ? normalizeKey(key).toLowerCase() : '';
-        if (k.includes('allow me')) return '/placeholders/images_grid/austen/quotes/you-must-allow-me.webp';
-        if (k.includes('half agony') || k.includes('half hope')) return '/placeholders/images_grid/austen/quotes/half-agony-half-hope.webp';
-        if (k.includes('body and soul')) return '/placeholders/images_grid/austen/quotes/body-and-soul.webp';
-        return '/placeholders/images_grid/austen/quotes/it-is-a-truth.webp';
+        const k = typeof key === 'string' ? normalizeKeyLocal(key).toLowerCase() : '';
+        const id = resolveAustenQuoteAssetId(k);
+        if (id && AUSTEN_QUOTES_ASSETS[id]?.original) return AUSTEN_QUOTES_ASSETS[id].original;
+        return AUSTEN_QUOTES_ASSETS.it_is_a_truth.original;
       }
 
       if (active === 'outcasted') {
-        if (typeof key === 'string' && key.startsWith('/placeholders/images_grid/miscel·lania/')) {
+        if (typeof key === 'string' && key.startsWith('/custom_logos/drawings/images_grid/miscel·lania/')) {
           const file = key.split('/').pop() || '';
           const map = {
-            'dj-vader.webp': 'dj-vader-b.webp',
-            'death-star2d2.webp': 'death-star2d2-b.webp',
+            'dj-vader.webp': 'dj-vader-b-stripe.webp',
+            'death-star2d2.webp': 'death-star2d2-b-stripe.webp',
           };
           const drawingFile = map[file];
-          if (drawingFile) return `/custom_logos/drawings/miscel·lania/black/${drawingFile}`;
+          if (drawingFile) return `/custom_logos/drawings/images_stripe/miscel·lania/black/${drawingFile}`;
         }
-        return '/placeholders/images_grid/miscel·lania/pont-del-diable.webp';
+        return null;
       }
 
       if (FIRST_CONTACT_MEDIA[key]) {
@@ -1309,12 +1749,11 @@ export default function FullWideSlideDemoHeader({
     if (stripeOverlayOverrideActive) return;
     if (!resolvedOverlaySrc) return;
     try {
-      window.localStorage.setItem(GLOBAL_OVERLAY_STORAGE_KEY, resolvedOverlaySrc);
-      window.dispatchEvent(new Event(GLOBAL_OVERLAY_EVENT));
+      window.localStorage.setItem(overlayStorageKey, resolvedOverlaySrc);
     } catch {
       // ignore
     }
-  }, [GLOBAL_OVERLAY_EVENT, GLOBAL_OVERLAY_STORAGE_KEY, resolvedOverlaySrc, stripeOverlayOverrideActive]);
+  }, [overlayStorageKey, resolvedOverlaySrc, stripeOverlayOverrideActive]);
   const [megaTileSize, setMegaTileSize] = useState(null);
   const [rootRemPx, setRootRemPx] = useState(16);
   const headerRef = useRef(null);
@@ -1613,13 +2052,13 @@ export default function FullWideSlideDemoHeader({
           title: '',
           items: [
             CONTROL_TILE_BN,
-            '/placeholders/images_grid/austen/looking_for_my_darcy/blue-dark.webp',
-            '/placeholders/images_grid/austen/looking_for_my_darcy/red-frame.webp',
-            '/placeholders/images_grid/austen/looking_for_my_darcy/yellow-solid.webp',
-            '/placeholders/images_grid/austen/keep_calm/keep-calm-multi-red.webp',
-            '/placeholders/images_grid/austen/crosswords/pride-and-prejudice-2.webp',
-            '/placeholders/images_grid/austen/crosswords/sense-and-sensibility-3.webp',
-            '/placeholders/images_grid/austen/crosswords/persuasion-4.webp',
+            '/custom_logos/drawings/images_grid/austen/looking_for_my_darcy/blue-dark.webp',
+            '/custom_logos/drawings/images_grid/austen/looking_for_my_darcy/red-frame.webp',
+            '/custom_logos/drawings/images_grid/austen/looking_for_my_darcy/yellow-solid.webp',
+            '/custom_logos/drawings/images_grid/austen/keep_calm/keep-calm-multi-red.webp',
+            '/custom_logos/drawings/images_grid/austen/crosswords/pride-and-prejudice-2.webp',
+            '/custom_logos/drawings/images_grid/austen/crosswords/sense-and-sensibility-3.webp',
+            '/custom_logos/drawings/images_grid/austen/crosswords/persuasion-4.webp',
             CONTROL_TILE_ARROWS,
           ],
         },
@@ -1649,11 +2088,11 @@ export default function FullWideSlideDemoHeader({
           title: '',
           items: [
             CONTROL_TILE_BN,
-            '/placeholders/images_grid/miscel·lania/pont-del-diable.webp',
-            '/placeholders/images_grid/miscel·lania/pont-del-diable.webp',
-            '/placeholders/images_grid/miscel·lania/pont-del-diable.webp',
-            '/placeholders/images_grid/miscel·lania/pont-del-diable.webp',
-            '/placeholders/images_grid/miscel·lania/pont-del-diable.webp',
+            '/custom_logos/drawings/images_grid/miscel·lania/pont-del-diable.webp',
+            '/custom_logos/drawings/images_grid/miscel·lania/pont-del-diable.webp',
+            '/custom_logos/drawings/images_grid/miscel·lania/pont-del-diable.webp',
+            '/custom_logos/drawings/images_grid/miscel·lania/pont-del-diable.webp',
+            '/custom_logos/drawings/images_grid/miscel·lania/pont-del-diable.webp',
             CONTROL_TILE_ARROWS,
           ],
         },
@@ -2120,7 +2559,7 @@ export default function FullWideSlideDemoHeader({
                           collectionId={active}
                           megaTileSize={megaTileSize}
                           humanInsideVariant={humanInsideVariant}
-                          items={col.items}
+                          items={active === 'austen' ? reorderAustenQuotes(col.items) : col.items}
                           row={true}
                           firstContactVariant={firstContactVariant}
                           onFirstContactWhite={() => setFirstContactVariant('white')}
@@ -2146,6 +2585,7 @@ export default function FullWideSlideDemoHeader({
                       <MegaStripeCatalogPanel
                         megaTileSize={megaTileSize}
                         StripeButtonsComponent={AdidasColorStripeButtons}
+                        stripeKey={active}
                         stripeProps={{
                           selectedColorOrder,
                           selectedColorSlug,
@@ -2525,49 +2965,29 @@ export default function FullWideSlideDemoHeader({
                                   />
                                 ) : null}
                                 <OptimizedImg
-                                  src={FIRST_CONTACT_MEDIA[it]}
+                                  src={resolveGridThumbSrc(it, active) || FIRST_CONTACT_MEDIA[it]}
                                   alt={it}
                                   className={
                                     it === 'The Phoenix'
-                                      ? 'relative z-10 h-full w-full object-contain scale-[0.825]'
-                                      : it === 'NX-01'
-                                        ? 'relative z-10 h-full w-full object-contain scale-[0.47]'
-                                        : it === 'NCC-1701'
-                                          ? 'relative z-10 h-full w-full object-contain scale-[0.75]'
-                                          : it === 'NCC-1701-D'
-                                            ? 'relative z-10 h-full w-full object-contain scale-100'
-                                            : it === 'Wormhole'
-                                              ? 'relative z-10 h-full w-full object-contain scale-[0.54]'
-                                              : it === 'Plasma Escape'
-                                                ? 'relative z-10 h-full w-full object-contain scale-[0.54]'
-                                                : it === "Vulcan's End"
-                                                  ? 'relative z-10 h-full w-full object-contain scale-[0.66]'
-                                                  : 'relative z-10 h-full w-full object-contain scale-[0.6]'
+                                      ? 'absolute left-1/2 top-1/2 h-[92%] w-[92%] -translate-x-1/2 -translate-y-1/2 object-contain'
+                                      : 'absolute inset-0 h-full w-full object-contain'
                                   }
                                 />
 
                                 {idx >= 1 && idx <= 7 && firstContactVariant === 'white' ? (
                                   <OptimizedImg
-                                    src={FIRST_CONTACT_MEDIA_WHITE[it] || FIRST_CONTACT_MEDIA[it]}
+                                    src={resolveGridThumbSrc(it, active) || FIRST_CONTACT_MEDIA_WHITE[it] || FIRST_CONTACT_MEDIA[it]}
                                     alt={it}
                                     className={`absolute inset-0 z-20 h-full w-full object-contain transition-opacity duration-300 ease-in-out ${
                                       firstContactVariant === 'white' ? 'opacity-100' : 'opacity-0'
                                     } ${
-                                      it === 'The Phoenix'
-                                        ? 'scale-[0.825]'
-                                        : it === 'NX-01'
-                                          ? 'scale-[0.47]'
-                                          : it === 'NCC-1701'
-                                            ? 'scale-[0.75]'
-                                            : it === 'NCC-1701-D'
-                                              ? 'scale-100'
-                                              : it === 'Wormhole'
-                                                ? 'scale-[0.54]'
-                                                : it === 'Plasma Escape'
-                                                  ? 'scale-[0.54]'
-                                                  : it === "Vulcan's End"
-                                                    ? 'scale-[0.66]'
-                                                    : 'scale-[0.6]'
+                                      it === 'Wormhole'
+                                        ? 'scale-[0.54]'
+                                        : it === 'Plasma Escape'
+                                          ? 'scale-[0.54]'
+                                          : it === "Vulcan's End"
+                                            ? 'scale-[0.66]'
+                                            : 'scale-[0.6]'
                                     }`}
                                   />
                                 ) : null}

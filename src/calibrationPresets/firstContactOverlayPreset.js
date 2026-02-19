@@ -1,7 +1,10 @@
 export const getFirstContactOverlayPreset = (overlaySrc) => {
   try {
     const s = (overlaySrc || '').toString().toLowerCase();
-    if (!s.includes('/custom_logos/drawings/first_contact/')) return null;
+    const isMaster = s.includes('/custom_logos/drawings/images_originals/stripe/first_contact/');
+    const isGridThumb = s.includes('/custom_logos/drawings/images_grid/first_contact/');
+    const isStripeThumb = s.includes('/custom_logos/drawings/images_stripe/first_contact/');
+    if (!isMaster && !isGridThumb && !isStripeThumb) return null;
 
     const isNx01 = s.includes('nx-01') || s.includes('nx_01');
     const isNcc1701D = s.includes('1701-d') || s.includes('1701_d') || s.includes('1701d');
