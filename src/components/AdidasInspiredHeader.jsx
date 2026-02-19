@@ -858,12 +858,18 @@ export default function AdidasInspiredHeader({
             })}
           </nav>
 
-          <div className="ml-auto flex items-center gap-1" data-icons-wrap="true">
-            <IconButton label="Search" onClick={() => {}}>
-              <svg className="h-[25px] w-[25px] text-foreground -translate-x-[1px] lg:h-[29px] lg:w-[29px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
-            </IconButton>
+          <div
+            className="ml-auto grid grid-cols-3 items-center"
+            style={{ width: megaTileSize ? `${Math.round(megaTileSize)}px` : undefined }}
+            data-icons-wrap="true"
+          >
+            <div className="justify-self-start">
+              <IconButton label="Search" onClick={() => {}}>
+                <svg className="h-[25px] w-[25px] text-foreground -translate-x-[1px] lg:h-[29px] lg:w-[29px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+              </IconButton>
+            </div>
             <button
               type="button"
               onClick={(e) => {
@@ -881,7 +887,7 @@ export default function AdidasInspiredHeader({
                 navigate('/cart');
               }}
               aria-label="Cart"
-              className="relative inline-flex h-9 w-9 items-center justify-center rounded-md text-foreground hover:bg-transparent focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 lg:h-10 lg:w-10"
+              className="relative inline-flex h-9 w-9 items-center justify-center justify-self-center rounded-md text-foreground hover:bg-transparent focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 lg:h-10 lg:w-10"
             >
               <span aria-hidden="true" className="relative block h-[27px] w-[27px] transition-all duration-200 lg:h-[31px] lg:w-[31px]">
                 <span
@@ -909,9 +915,11 @@ export default function AdidasInspiredHeader({
                 ) : null}
               </span>
             </button>
-            <IconButton label="Account" onClick={() => onUserClick?.()}>
-              <UserRound className="h-[25px] w-[25px] text-foreground lg:h-[29px] lg:w-[29px]" strokeWidth={1.5} />
-            </IconButton>
+            <div className="justify-self-end">
+              <IconButton label="Account" onClick={() => onUserClick?.()}>
+                <UserRound className="h-[25px] w-[25px] text-foreground lg:h-[29px] lg:w-[29px]" strokeWidth={1.5} />
+              </IconButton>
+            </div>
           </div>
         </div>
       </div>

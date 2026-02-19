@@ -17,45 +17,55 @@ import MegaStripeCatalogPanel from './MegaStripeCatalogPanel.jsx';
 import FullWideSlideDemoHumanInsideSlider from './FullWideSlideDemoHumanInsideSlider.jsx';
 
 const FIRST_CONTACT_MEDIA = {
-  'NX-01': '/custom_logos/drawings/images_stripe/first_contact/black/1-nx-01-b-stripe.webp',
-  'NCC-1701': '/custom_logos/drawings/images_stripe/first_contact/black/2-ncc-1701-b-stripe.webp',
-  'NCC-1701-D': '/custom_logos/drawings/images_stripe/first_contact/black/3-ncc-1701-d-b-stripe.webp',
-  'Wormhole': '/custom_logos/drawings/images_stripe/first_contact/black/4-wormhole-b-stripe.webp',
-  'Plasma Escape': '/custom_logos/drawings/images_stripe/first_contact/black/5-plasma-escape-b-stripe.webp',
-  "Vulcan's End": '/custom_logos/drawings/images_stripe/first_contact/black/6-vulcans-end-b-stripe.webp',
-  'The Phoenix': '/custom_logos/drawings/images_stripe/first_contact/black/7-the-phoenix-b-stripe.webp',
+  'NX-01': '/custom_logos/drawings/images_stripe/first_contact/black/nx-01-b-stripe.webp',
+  'NCC-1701': '/custom_logos/drawings/images_stripe/first_contact/black/ncc-1701-b-stripe.webp',
+  'NCC-1701-D': '/custom_logos/drawings/images_stripe/first_contact/black/ncc-1701-d-b-stripe.webp',
+  'Wormhole': '/custom_logos/drawings/images_stripe/first_contact/black/wormhole-b-stripe.webp',
+  'Plasma Escape': '/custom_logos/drawings/images_stripe/first_contact/black/plasma-escape-b-stripe.webp',
+  "Vulcan's End": '/custom_logos/drawings/images_stripe/first_contact/black/vulcans-end-b-stripe.webp',
+  'The Phoenix': '/custom_logos/drawings/images_stripe/first_contact/black/the-phoenix-b-stripe.webp',
 };
 
 const CONTROL_TILE_BN = 'botonera-bn';
 const CONTROL_TILE_ARROWS = 'botonera-fletxes';
 
 const FIRST_CONTACT_MEDIA_WHITE = {
-  'NX-01': '/custom_logos/drawings/images_stripe/first_contact/white/1-nx-01-w-stripe.webp',
-  'NCC-1701': '/custom_logos/drawings/images_stripe/first_contact/white/2-ncc-1701-w-stripe.webp',
-  'NCC-1701-D': '/custom_logos/drawings/images_stripe/first_contact/white/3-ncc-1701-d-w-stripe.webp',
-  'Wormhole': '/custom_logos/drawings/images_stripe/first_contact/white/4-wormhole-w-stripe.webp',
-  'Plasma Escape': '/custom_logos/drawings/images_stripe/first_contact/white/5-plasma-escape-w-stripe.webp',
-  "Vulcan's End": '/custom_logos/drawings/images_stripe/first_contact/white/6-vulcans-end-w-stripe.webp',
-  'The Phoenix': '/custom_logos/drawings/images_stripe/first_contact/white/7-the-phoenix-w-stripe.webp',
+  'NX-01': '/custom_logos/drawings/images_stripe/first_contact/white/nx-01-w-stripe.webp',
+  'NCC-1701': '/custom_logos/drawings/images_stripe/first_contact/white/ncc-1701-w-stripe.webp',
+  'NCC-1701-D': '/custom_logos/drawings/images_stripe/first_contact/white/ncc-1701-d-w-stripe.webp',
+  'Wormhole': '/custom_logos/drawings/images_stripe/first_contact/white/wormhole-w-stripe.webp',
+  'Plasma Escape': '/custom_logos/drawings/images_stripe/first_contact/white/plasma-escape-w-stripe.webp',
+  "Vulcan's End": '/custom_logos/drawings/images_stripe/first_contact/white/vulcans-end-w-stripe.webp',
+  'The Phoenix': '/custom_logos/drawings/images_stripe/first_contact/white/the-phoenix-w-stripe.webp',
+};
+
+const FIRST_CONTACT_MEDIA_COLOR = {
+  'NX-01': '/custom_logos/drawings/images_stripe/first_contact/multi/nx-01-multi-light-stripe.webp',
+  'NCC-1701': '/custom_logos/drawings/images_stripe/first_contact/multi/ncc-1701-multi-light-stripe.webp',
+  'NCC-1701-D': '/custom_logos/drawings/images_stripe/first_contact/multi/ncc-1701-d-multi-light-stripe.webp',
+  'Wormhole': '/custom_logos/drawings/images_stripe/first_contact/multi/wormhole-multi-light-stripe.webp',
+  'Plasma Escape': '/custom_logos/drawings/images_stripe/first_contact/multi/plasma-escape-multi-light-stripe.webp',
+  "Vulcan's End": '/custom_logos/drawings/images_stripe/first_contact/multi/vulcans-end-multi-light-stripe.webp',
+  'The Phoenix': '/custom_logos/drawings/images_stripe/first_contact/multi/the phoenix-multi-light-stripe.webp',
 };
 
 const THE_HUMAN_INSIDE_MEDIA = {
-  'R2-D2': '/custom_logos/drawings/images_grid/the_human_inside/r2-d2-grid.webp',
-  'The Dalek': '/custom_logos/drawings/images_grid/the_human_inside/the-dalek-grid.webp',
-  'C3P0': '/custom_logos/drawings/images_grid/the_human_inside/c3-p0-grid.webp',
-  'Vader': '/custom_logos/drawings/images_grid/the_human_inside/vader-grid.webp',
-  'Afrodita': '/custom_logos/drawings/images_grid/the_human_inside/afrodita-a-grid.webp',
-  'Mazinger': '/custom_logos/drawings/images_grid/the_human_inside/mazinger-z-grid.webp',
-  'Cylon 78': '/custom_logos/drawings/images_grid/the_human_inside/cylon-78-grid.webp',
-  'Cylon 03': '/custom_logos/drawings/images_grid/the_human_inside/cylon-03-grid.webp',
-  'Iron Man 68': '/custom_logos/drawings/images_grid/the_human_inside/iron-man-68-grid.webp',
-  'Iron Man 08': '/custom_logos/drawings/images_grid/the_human_inside/iron-man-08-grid.webp',
-  Cyberman: '/custom_logos/drawings/images_grid/the_human_inside/cyberman-grid.webp',
-  Robocop: '/custom_logos/drawings/images_grid/the_human_inside/robocop-grid.webp',
-  Terminator: '/custom_logos/drawings/images_grid/the_human_inside/terminator-grid.webp',
-  Maschinenmensch: '/custom_logos/drawings/images_grid/the_human_inside/maschinenmensch-grid.webp',
-  'Robby the Robot': '/custom_logos/drawings/images_grid/the_human_inside/robby-the-robot-grid.webp',
-  'Robbie the Robot': '/custom_logos/drawings/images_grid/the_human_inside/robby-the-robot-grid.webp',
+  'R2-D2': '/custom_logos/drawings/images_grid/the_human_inside/black/r2-d2-b-grid.webp',
+  'The Dalek': '/custom_logos/drawings/images_grid/the_human_inside/black/the-dalek-b-grid.webp',
+  'C3P0': '/custom_logos/drawings/images_grid/the_human_inside/black/c3-p0-b-grid.webp',
+  'Vader': '/custom_logos/drawings/images_grid/the_human_inside/black/vader-b-grid.webp',
+  'Afrodita': '/custom_logos/drawings/images_grid/the_human_inside/black/afrodita-a-b-grid.webp',
+  'Mazinger': '/custom_logos/drawings/images_grid/the_human_inside/black/mazinger-z-b-grid.webp',
+  'Cylon 78': '/custom_logos/drawings/images_grid/the_human_inside/black/cylon-78-b-grid.webp',
+  'Cylon 03': '/custom_logos/drawings/images_grid/the_human_inside/black/cylon-03-b-grid.webp',
+  'Iron Man 68': '/custom_logos/drawings/images_grid/the_human_inside/black/iron-man-68-b-grid.webp',
+  'Iron Man 08': '/custom_logos/drawings/images_grid/the_human_inside/black/iron-man-08-b-grid.webp',
+  Cyberman: '/custom_logos/drawings/images_grid/the_human_inside/black/cyberman-b-grid.webp',
+  Robocop: '/custom_logos/drawings/images_grid/the_human_inside/black/robocop-b-grid.webp',
+  Terminator: '/custom_logos/drawings/images_grid/the_human_inside/black/terminator-b-grid.webp',
+  Maschinenmensch: '/custom_logos/drawings/images_grid/the_human_inside/black/maschinenmensch-b-grid.webp',
+  'Robby the Robot': '/custom_logos/drawings/images_grid/the_human_inside/black/robby-the-robot-b-grid.webp',
+  'Robbie the Robot': '/custom_logos/drawings/images_grid/the_human_inside/black/robby-the-robot-b-grid.webp',
 };
 
 const THE_HUMAN_INSIDE_MEDIA_WHITE = {
@@ -201,7 +211,7 @@ function IconButton({ label, onClick, onDoubleClick, onMouseEnter, buttonRef, ch
   );
 }
 
-function FirstContactDibuix00Buttons({ onWhite, onBlack }) {
+function FirstContactDibuix00Buttons({ onWhite, onBlack, onMulti }) {
   return (
     <div className="relative mt-2 aspect-square w-full" data-stripe-buttonbar="bn">
       <div className="absolute inset-0 overflow-hidden rounded-md bg-muted">
@@ -210,7 +220,7 @@ function FirstContactDibuix00Buttons({ onWhite, onBlack }) {
           aria-label="Blanc"
           id="stripe-guide-left-anchor"
           onClick={onWhite}
-          className="absolute left-0 top-0 h-1/2 w-full bg-foreground focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          className="absolute left-0 top-0 h-1/3 w-full bg-foreground focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         >
           <span className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 font-oswald text-[20px] font-normal uppercase text-whiteStrong">
             Blanc
@@ -220,10 +230,21 @@ function FirstContactDibuix00Buttons({ onWhite, onBlack }) {
           type="button"
           aria-label="Negre"
           onClick={onBlack}
-          className="absolute left-0 bottom-0 h-1/2 w-full bg-background focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          className="absolute left-0 top-1/3 h-1/3 w-full bg-background focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         >
           <span className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 font-oswald text-[20px] font-normal uppercase text-foreground">
             Negre
+          </span>
+        </button>
+
+        <button
+          type="button"
+          aria-label="Color"
+          onClick={onMulti}
+          className="absolute left-0 bottom-0 h-1/3 w-full bg-muted focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        >
+          <span className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 font-oswald text-[20px] font-normal uppercase text-foreground">
+            Color
           </span>
         </button>
       </div>
@@ -296,8 +317,10 @@ function MegaColumn({
   humanInsideVariant,
   onFirstContactWhite,
   onFirstContactBlack,
+  onFirstContactMulti,
   onHumanWhite,
   onHumanBlack,
+  onHumanMulti,
   onHumanPrev,
   onHumanNext,
   onSelectItem,
@@ -545,6 +568,8 @@ function MegaColumn({
     if (next.startsWith('blanc/')) next = `white/${next.slice('blanc/'.length)}`;
     if (next.startsWith('negre/')) next = `black/${next.slice('negre/'.length)}`;
 
+    if (variant === 'color') return next;
+
     if (!variant || variant === 'black') {
       if (next.includes('/white/')) next = next.replace('/white/', '/black/');
       if (/-w\.(png|jpg|jpeg|webp)$/i.test(next)) next = next.replace(/-w\.(png|jpg|jpeg|webp)$/i, '-b.$1');
@@ -629,10 +654,11 @@ function MegaColumn({
         || (humanInsideVariant === 'white' ? THE_HUMAN_INSIDE_MEDIA_WHITE : THE_HUMAN_INSIDE_MEDIA)[it]
         || null;
     }
-    if (FIRST_CONTACT_MEDIA[itKey] || FIRST_CONTACT_MEDIA[it]) {
-      const base = FIRST_CONTACT_MEDIA[itKey] || FIRST_CONTACT_MEDIA[it];
+    if (FIRST_CONTACT_MEDIA[itKey] || FIRST_CONTACT_MEDIA[it] || FIRST_CONTACT_MEDIA_COLOR[itKey] || FIRST_CONTACT_MEDIA_COLOR[it]) {
+      const base = FIRST_CONTACT_MEDIA[itKey] || FIRST_CONTACT_MEDIA[it] || null;
       const white = FIRST_CONTACT_MEDIA_WHITE[itKey] || FIRST_CONTACT_MEDIA_WHITE[it] || base;
-      return (firstContactVariant === 'white' ? white : base) || null;
+      const color = FIRST_CONTACT_MEDIA_COLOR[itKey] || FIRST_CONTACT_MEDIA_COLOR[it] || base;
+      return (firstContactVariant === 'white' ? white : firstContactVariant === 'color' ? color : base) || null;
     }
     return null;
   };
@@ -658,6 +684,25 @@ function MegaColumn({
       return m?.[1] || null;
     })();
     const cid = collectionIdOverride || collectionId || inferred;
+
+    if (cid === 'first_contact' && !isPathItem(raw)) {
+      const key = normalizeKey(raw);
+      const fileByLabel = {
+        'NX-01': 'nx-01',
+        'NCC-1701': 'ncc-1701',
+        'NCC-1701-D': 'ncc1701-d',
+        Wormhole: 'wormhole',
+        'Plasma Escape': 'plasma-escape',
+        "Vulcan's End": 'vulcans-end',
+        'The Phoenix': 'the-phoenix',
+      };
+      const base = fileByLabel[key] || fileByLabel[raw] || null;
+      if (!base) return resolveSrc(it);
+
+      const folder = firstContactVariant === 'white' ? 'white' : 'black';
+      const suffix = firstContactVariant === 'white' ? 'w' : 'b';
+      return ensureThumbSuffix(`/custom_logos/drawings/images_grid/first_contact/${folder}/${base}-${suffix}-grid.webp`, 'grid');
+    }
 
     if (raw.startsWith('/custom_logos/drawings/images_grid/')) {
       if (cid === 'austen' && raw.includes('/austen/quotes/')) {
@@ -1123,9 +1168,9 @@ function MegaColumn({
                     {!it ? null : it === CONTROL_TILE_BN ? (
                       <div className="relative z-40">
                         {isFirstContact ? (
-                          <FirstContactDibuix00Buttons onWhite={onFirstContactWhite} onBlack={onFirstContactBlack} />
+                          <FirstContactDibuix00Buttons onWhite={onFirstContactWhite} onBlack={onFirstContactBlack} onMulti={onFirstContactMulti} />
                         ) : isHumanInside ? (
-                          <FirstContactDibuix00Buttons onWhite={onHumanWhite} onBlack={onHumanBlack} />
+                          <FirstContactDibuix00Buttons onWhite={onHumanWhite} onBlack={onHumanBlack} onMulti={onHumanMulti} />
                         ) : null}
                       </div>
                     ) : it === CONTROL_TILE_ARROWS ? (
@@ -1183,6 +1228,10 @@ function MegaColumn({
                         <div className="absolute inset-0 overflow-hidden rounded-md bg-transparent">
                           {(() => {
                             let thumbSrc = resolveGridThumbSrc(it, collectionId);
+                            const isFirstContactWhiteGridThumb =
+                              collectionId === 'first_contact'
+                              && typeof thumbSrc === 'string'
+                              && thumbSrc.includes('/custom_logos/drawings/images_grid/first_contact/white/');
                             const useContain =
                               collectionId === 'austen'
                               && typeof it === 'string'
@@ -1199,7 +1248,11 @@ function MegaColumn({
                           })()}
                         </div>
 
-                        {FIRST_CONTACT_MEDIA[it] && idx >= 1 && idx <= 7 && firstContactVariant === 'white' ? (
+                        {FIRST_CONTACT_MEDIA[it] && idx >= 1 && idx <= 7 && firstContactVariant === 'white' && !(
+                          collectionId === 'first_contact'
+                          && typeof resolveGridThumbSrc(it, collectionId) === 'string'
+                          && resolveGridThumbSrc(it, collectionId).includes('/custom_logos/drawings/images_grid/first_contact/white/')
+                        ) ? (
                           <OptimizedImg
                             src={FIRST_CONTACT_MEDIA_WHITE[it] || FIRST_CONTACT_MEDIA[it]}
                             alt={it}
@@ -1482,9 +1535,17 @@ export default function FullWideSlideDemoHeader({
     const isPathItem = (it) => typeof it === 'string' && /\.(png|jpg|jpeg|webp)$/i.test(it);
 
     if (active === 'first_contact' && firstContactSelectedItem) {
-      return firstContactVariant === 'white'
-        ? (FIRST_CONTACT_MEDIA_WHITE[firstContactSelectedItem] || FIRST_CONTACT_MEDIA[firstContactSelectedItem] || null)
-        : (FIRST_CONTACT_MEDIA[firstContactSelectedItem] || null);
+      if (firstContactVariant === 'white') {
+        return FIRST_CONTACT_MEDIA_WHITE[firstContactSelectedItem]
+          || FIRST_CONTACT_MEDIA[firstContactSelectedItem]
+          || null;
+      }
+      if (firstContactVariant === 'color') {
+        return FIRST_CONTACT_MEDIA_COLOR[firstContactSelectedItem]
+          || FIRST_CONTACT_MEDIA[firstContactSelectedItem]
+          || null;
+      }
+      return FIRST_CONTACT_MEDIA[firstContactSelectedItem] || null;
     }
     if (active === 'the_human_inside' && humanInsideSelectedItem) {
       const key = normalizeKeyLocal(humanInsideSelectedItem).toLowerCase();
@@ -2391,26 +2452,32 @@ export default function FullWideSlideDemoHeader({
             })}
           </nav>
 
-          <div className="ml-auto flex items-center gap-1" data-icons-wrap="true">
-            <IconButton
-              label="Search"
-              onClick={() => {
-                if (active) {
-                  if (megaPage === 2) {
-                    setActive(null);
+          <div
+            className="ml-auto grid grid-cols-3 items-center"
+            style={{ width: megaTileSize ? `${Math.round(megaTileSize)}px` : undefined }}
+            data-icons-wrap="true"
+          >
+            <div className="justify-self-start">
+              <IconButton
+                label="Search"
+                onClick={() => {
+                  if (active) {
+                    if (megaPage === 2) {
+                      setActive(null);
+                      return;
+                    }
+                    setMegaPage(2);
                     return;
                   }
+                  ensureMegaOpen();
                   setMegaPage(2);
-                  return;
-                }
-                ensureMegaOpen();
-                setMegaPage(2);
-              }}
-            >
-              <svg className="h-[25px] w-[25px] text-foreground -translate-x-[1px] lg:h-[29px] lg:w-[29px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
-            </IconButton>
+                }}
+              >
+                <svg className="h-[25px] w-[25px] text-foreground -translate-x-[1px] lg:h-[29px] lg:w-[29px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+              </IconButton>
+            </div>
             <button
               type="button"
               onClick={(e) => {
@@ -2438,7 +2505,7 @@ export default function FullWideSlideDemoHeader({
                 navigate('/cart');
               }}
               aria-label="Cart"
-              className="relative inline-flex h-9 w-9 items-center justify-center rounded-md text-foreground hover:bg-transparent focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 lg:h-10 lg:w-10"
+              className="relative inline-flex h-9 w-9 items-center justify-center justify-self-center rounded-md text-foreground hover:bg-transparent focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 lg:h-10 lg:w-10"
             >
               <span aria-hidden="true" className="relative block h-[27px] w-[27px] transition-all duration-200 lg:h-[31px] lg:w-[31px]">
                 <span
@@ -2466,36 +2533,38 @@ export default function FullWideSlideDemoHeader({
                 ) : null}
               </span>
             </button>
-            <IconButton
-              label="Account"
-              buttonRef={accountButtonRef}
-              onClick={(e) => {
-                e.preventDefault();
-                if (accountClickTimeoutRef.current) window.clearTimeout(accountClickTimeoutRef.current);
-                accountClickTimeoutRef.current = window.setTimeout(() => {
-                  accountClickTimeoutRef.current = null;
-                  if (active) {
-                    if (megaPage === 4) {
-                      setActive(null);
+            <div className="justify-self-end">
+              <IconButton
+                label="Account"
+                buttonRef={accountButtonRef}
+                onClick={(e) => {
+                  e.preventDefault();
+                  if (accountClickTimeoutRef.current) window.clearTimeout(accountClickTimeoutRef.current);
+                  accountClickTimeoutRef.current = window.setTimeout(() => {
+                    accountClickTimeoutRef.current = null;
+                    if (active) {
+                      if (megaPage === 4) {
+                        setActive(null);
+                        return;
+                      }
+                      setMegaPage(4);
                       return;
                     }
+                    ensureMegaOpen();
                     setMegaPage(4);
-                    return;
-                  }
-                  ensureMegaOpen();
-                  setMegaPage(4);
-                }, dblClickDelayMs);
-              }}
-              onDoubleClick={(e) => {
-                e.preventDefault();
-                if (accountClickTimeoutRef.current) window.clearTimeout(accountClickTimeoutRef.current);
-                accountClickTimeoutRef.current = null;
-                setActive(null);
-                navigate('/profile');
-              }}
-            >
-              <UserRound className="h-[25px] w-[25px] text-foreground lg:h-[29px] lg:w-[29px]" strokeWidth={1.5} />
-            </IconButton>
+                  }, dblClickDelayMs);
+                }}
+                onDoubleClick={(e) => {
+                  e.preventDefault();
+                  if (accountClickTimeoutRef.current) window.clearTimeout(accountClickTimeoutRef.current);
+                  accountClickTimeoutRef.current = null;
+                  setActive(null);
+                  navigate('/profile');
+                }}
+              >
+                <UserRound className="h-[25px] w-[25px] text-foreground lg:h-[29px] lg:w-[29px]" strokeWidth={1.5} />
+              </IconButton>
+            </div>
           </div>
         </div>
       </div>
@@ -2564,8 +2633,10 @@ export default function FullWideSlideDemoHeader({
                           firstContactVariant={firstContactVariant}
                           onFirstContactWhite={() => setFirstContactVariant('white')}
                           onFirstContactBlack={() => setFirstContactVariant('black')}
+                          onFirstContactMulti={() => setFirstContactVariant('color')}
                           onHumanWhite={() => setFirstContactVariant('white')}
                           onHumanBlack={() => setFirstContactVariant('black')}
+                          onHumanMulti={() => setFirstContactVariant('color')}
                           onHumanPrev={() => setThinStartIndex((v) => v - 1)}
                           onHumanNext={() => setThinStartIndex((v) => v + 1)}
                           onSelectItem={
@@ -2974,7 +3045,10 @@ export default function FullWideSlideDemoHeader({
                                   }
                                 />
 
-                                {idx >= 1 && idx <= 7 && firstContactVariant === 'white' ? (
+                                {idx >= 1 && idx <= 7 && firstContactVariant === 'white' && !(
+                                  typeof resolveGridThumbSrc(it, active) === 'string'
+                                  && resolveGridThumbSrc(it, active).includes('/custom_logos/drawings/images_grid/first_contact/white/')
+                                ) ? (
                                   <OptimizedImg
                                     src={resolveGridThumbSrc(it, active) || FIRST_CONTACT_MEDIA_WHITE[it] || FIRST_CONTACT_MEDIA[it]}
                                     alt={it}
@@ -3010,9 +3084,9 @@ export default function FullWideSlideDemoHeader({
                               </div>
                             ) : it === CONTROL_TILE_BN ? (
                               active === 'the_human_inside' ? (
-                                <FirstContactDibuix00Buttons onWhite={() => setHumanInsideVariant('white')} onBlack={() => setHumanInsideVariant('black')} />
+                                <FirstContactDibuix00Buttons onWhite={() => setHumanInsideVariant('white')} onBlack={() => setHumanInsideVariant('black')} onMulti={() => setHumanInsideVariant('color')} />
                               ) : (
-                                <FirstContactDibuix00Buttons onWhite={() => setFirstContactVariant('white')} onBlack={() => setFirstContactVariant('black')} />
+                                <FirstContactDibuix00Buttons onWhite={() => setFirstContactVariant('white')} onBlack={() => setFirstContactVariant('black')} onMulti={() => setFirstContactVariant('color')} />
                               )
                             ) : it === CONTROL_TILE_ARROWS ? (
                               <FirstContactDibuix09Buttons

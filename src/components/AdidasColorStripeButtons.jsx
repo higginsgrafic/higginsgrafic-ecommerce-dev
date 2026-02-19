@@ -239,11 +239,34 @@ export default function AdidasColorStripeButtons({
     }
 
     if (s.includes('/custom_logos/drawings/images_stripe/first_contact/') && /nx-01-multi-(dark|light)-stripe\.(webp|png|jpe?g)$/i.test(file)) {
-      return '/custom_logos/drawings/images_stripe/first_contact/black/1-nx-01-b-stripe.webp';
+      return '/custom_logos/drawings/images_stripe/first_contact/black/nx-01-b-stripe.webp';
+    }
+
+    if (s.includes('/custom_logos/drawings/images_stripe/first_contact/') && /ncc-1701-multi-(dark|light)-stripe\.(webp|png|jpe?g)$/i.test(file)) {
+      return '/custom_logos/drawings/images_stripe/first_contact/black/ncc-1701-b-stripe.webp';
+    }
+
+    if (s.includes('/custom_logos/drawings/images_stripe/first_contact/') && /ncc-1701-d-multi-(dark|light)-stripe\.(webp|png|jpe?g)$/i.test(file)) {
+      return '/custom_logos/drawings/images_stripe/first_contact/black/ncc-1701-d-b-stripe.webp';
+    }
+
+    if (s.includes('/custom_logos/drawings/images_stripe/first_contact/') && /wormhole-multi-(dark|light)-stripe\.(webp|png|jpe?g)$/i.test(file)) {
+      return '/custom_logos/drawings/images_stripe/first_contact/black/wormhole-b-stripe.webp';
+    }
+
+    if (s.includes('/custom_logos/drawings/images_stripe/first_contact/') && /plasma-escape-multi-(dark|light)-stripe\.(webp|png|jpe?g)$/i.test(file)) {
+      return '/custom_logos/drawings/images_stripe/first_contact/black/plasma-escape-b-stripe.webp';
     }
 
     if (s.includes('/custom_logos/drawings/images_stripe/first_contact/') && /vulcans-end-multi-(dark|light)-stripe\.(webp|png|jpe?g)$/i.test(file)) {
-      return '/custom_logos/drawings/images_stripe/first_contact/black/6-vulcans-end-b-stripe.webp';
+      return '/custom_logos/drawings/images_stripe/first_contact/black/vulcans-end-b-stripe.webp';
+    }
+
+    if (
+      s.includes('/custom_logos/drawings/images_stripe/first_contact/')
+      && /(the[- ]phoenix)-multi-(dark|light)-stripe\.(webp|png|jpe?g)$/i.test(file)
+    ) {
+      return '/custom_logos/drawings/images_stripe/first_contact/black/the-phoenix-b-stripe.webp';
     }
 
     if (s.includes('/custom_logos/drawings/images_stripe/')) return ensureThumbSuffix(s, 'stripe');
@@ -252,6 +275,14 @@ export default function AdidasColorStripeButtons({
   }, [overlaySrc]);
 
   const overlaySrcForRender = useMemo(() => {
+    const raw = typeof overlaySrc === 'string' ? overlaySrc.trim() : '';
+    const isMultiRaw = raw.includes('/multi/') || /-multi-(dark|light)-stripe\.(webp|png|jpe?g)([?#]|$)/i.test(raw);
+
+    // For multi/color variants we must keep the original multi src so the per-tile
+    // dark/light override logic can kick in. We still rely on `overlaySrcForPreset`
+    // elsewhere to normalize the calibration key.
+    if (isMultiRaw) return overlaySrc;
+
     if (typeof overlaySrcForPreset === 'string' && overlaySrcForPreset.trim()) return overlaySrcForPreset;
     return overlaySrc;
   }, [overlaySrc, overlaySrcForPreset]);
@@ -260,12 +291,15 @@ export default function AdidasColorStripeButtons({
     try {
       if (!overlaySrcForRender || typeof overlaySrcForRender !== 'string') return overlaySrcForRender;
       if (!Number.isFinite(idx)) return overlaySrcForRender;
-      const s = overlaySrcForRender.toLowerCase();
-      const isMiscel = s.includes('/miscel·lania/');
-      const isDjVader = s.includes('dj-vader');
-      const isStripe = s.includes('stripe');
 
-      if (isMiscel && isDjVader && isStripe) {
+      const s = overlaySrcForRender.toString();
+      const isStripe = s.includes('/stripe/') || s.includes('-stripe');
+      const isMulti = s.includes('/multi/') || /-multi-(dark|light)-stripe\.(webp|png|jpe?g)([?#]|$)/i.test(s);
+
+      if (!isMulti) return overlaySrcForRender;
+      const isDjVader = s.includes('dj-vader');
+
+      if (isDjVader && isStripe) {
         const which = idx === 0 ? 1 : 2;
         return `/custom_logos/drawings/images_originals/stripe/miscel·lania/multi/dj-vader-multi-${which}-stripe.webp`;
       }
@@ -274,13 +308,43 @@ export default function AdidasColorStripeButtons({
       const isNx01 = s.includes('nx-01');
       if (isFirstContact && isNx01 && isStripe) {
         const variant = idx === 0 ? 'dark' : 'light';
-        return `/custom_logos/drawings/images_originals/stripe/first_contact/multi/nx-01-multi-${variant}-stripe.webp`;
+        return `/custom_logos/drawings/images_stripe/first_contact/multi/nx-01-multi-${variant}-stripe.webp`;
+      }
+
+      const isNcc1701d = s.includes('ncc-1701-d');
+      if (isFirstContact && isNcc1701d && isStripe) {
+        const variant = idx === 0 ? 'dark' : 'light';
+        return `/custom_logos/drawings/images_stripe/first_contact/multi/ncc-1701-d-multi-${variant}-stripe.webp`;
+      }
+
+      const isNcc1701 = s.includes('ncc-1701');
+      if (isFirstContact && isNcc1701 && isStripe) {
+        const variant = idx === 0 ? 'dark' : 'light';
+        return `/custom_logos/drawings/images_stripe/first_contact/multi/ncc-1701-multi-${variant}-stripe.webp`;
+      }
+
+      const isWormhole = s.includes('wormhole');
+      if (isFirstContact && isWormhole && isStripe) {
+        const variant = idx === 0 ? 'dark' : 'light';
+        return `/custom_logos/drawings/images_stripe/first_contact/multi/wormhole-multi-${variant}-stripe.webp`;
+      }
+
+      const isPlasmaEscape = s.includes('plasma-escape');
+      if (isFirstContact && isPlasmaEscape && isStripe) {
+        const variant = idx === 0 ? 'dark' : 'light';
+        return `/custom_logos/drawings/images_stripe/first_contact/multi/plasma-escape-multi-${variant}-stripe.webp`;
       }
 
       const isVulcansEnd = s.includes('vulcans-end');
       if (isFirstContact && isVulcansEnd && isStripe) {
         const variant = idx === 0 ? 'dark' : 'light';
-        return `/custom_logos/drawings/images_originals/stripe/first_contact/multi/vulcans-end-multi-${variant}-stripe.webp`;
+        return `/custom_logos/drawings/images_stripe/first_contact/multi/vulcans-end-multi-${variant}-stripe.webp`;
+      }
+
+      const isThePhoenix = s.includes('the-phoenix') || s.includes('the phoenix');
+      if (isFirstContact && isThePhoenix && isStripe) {
+        const variant = idx === 0 ? 'dark' : 'light';
+        return `/custom_logos/drawings/images_stripe/first_contact/multi/the phoenix-multi-${variant}-stripe.webp`;
       }
 
       return overlaySrcForRender;
