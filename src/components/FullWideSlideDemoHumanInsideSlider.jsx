@@ -81,6 +81,10 @@ export default function FullWideSlideDemoHumanInsideSlider({
     if (!it || typeof it !== 'string') return null;
     if (collectionId !== 'the_human_inside') return null;
 
+    const variant = variantOverride || (isHumanInside ? humanInsideVariant : firstContactVariant);
+    const mapped = (variant === 'white' ? THE_HUMAN_INSIDE_MEDIA_WHITE : THE_HUMAN_INSIDE_MEDIA)?.[it] || null;
+    if (mapped) return mapped;
+
     const key = normalizeKey(it).toLowerCase();
     const map = {
       'r2-d2': 'r2-d2.webp',

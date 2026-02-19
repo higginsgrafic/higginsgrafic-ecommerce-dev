@@ -757,9 +757,10 @@ function MegaColumn({
 
       if (cid === 'outcasted') {
         const lower = baseFile.toLowerCase();
-        if (lower === 'dj-vader-b.webp') return '/custom_logos/drawings/images_grid/miscel·lania/dj-vader-grid.webp';
-        if (lower === 'death-star2d2-b.webp') return '/custom_logos/drawings/images_grid/miscel·lania/death-star2d2-grid.webp';
-        return ensureThumbSuffix(`/custom_logos/drawings/images_grid/miscel·lania/${baseFile.replace(/-b\.webp$/i, '.webp')}`, 'grid');
+        if (lower === 'dj-vader-b.webp') return '/custom_logos/drawings/images_grid/miscel·lania/dj-vader-b-grid.webp';
+        if (lower === 'death-star2d2-b.webp') return '/custom_logos/drawings/images_grid/miscel·lania/death-star2d2-b-grid.webp';
+        if (lower === 'pont-del-diable-b.webp') return '/custom_logos/drawings/images_grid/miscel·lania/pont-del-diable-b-grid.webp';
+        return ensureThumbSuffix(`/custom_logos/drawings/images_grid/miscel·lania/${baseFile.replace(/-b\.webp$/i, '-b-grid.webp')}`, 'grid');
       }
 
       if (cid === 'austen') {
@@ -883,9 +884,9 @@ function MegaColumn({
 
     if (cid === 'outcasted') {
       const s = it.toLowerCase();
-      if (s.includes('dj-vader')) return '/custom_logos/drawings/images_grid/miscel·lania/dj-vader-grid.webp';
-      if (s.includes('death-star2d2')) return '/custom_logos/drawings/images_grid/miscel·lania/death-star2d2-grid.webp';
-      if (s.includes('pont-del-diable')) return '/custom_logos/drawings/images_grid/miscel·lania/pont-del-diable-grid.webp';
+      if (s.includes('dj-vader')) return '/custom_logos/drawings/images_grid/miscel·lania/dj-vader-b-grid.webp';
+      if (s.includes('death-star2d2')) return '/custom_logos/drawings/images_grid/miscel·lania/death-star2d2-b-grid.webp';
+      if (s.includes('pont-del-diable')) return '/custom_logos/drawings/images_grid/miscel·lania/pont-del-diable-b-grid.webp';
       return resolveSrc(it);
     }
 
@@ -2149,11 +2150,11 @@ export default function FullWideSlideDemoHeader({
           title: '',
           items: [
             CONTROL_TILE_BN,
-            '/custom_logos/drawings/images_grid/miscel·lania/pont-del-diable.webp',
-            '/custom_logos/drawings/images_grid/miscel·lania/pont-del-diable.webp',
-            '/custom_logos/drawings/images_grid/miscel·lania/pont-del-diable.webp',
-            '/custom_logos/drawings/images_grid/miscel·lania/pont-del-diable.webp',
-            '/custom_logos/drawings/images_grid/miscel·lania/pont-del-diable.webp',
+            '/custom_logos/drawings/images_grid/miscel·lania/pont-del-diable-b-grid.webp',
+            '/custom_logos/drawings/images_grid/miscel·lania/pont-del-diable-b-grid.webp',
+            '/custom_logos/drawings/images_grid/miscel·lania/pont-del-diable-b-grid.webp',
+            '/custom_logos/drawings/images_grid/miscel·lania/pont-del-diable-b-grid.webp',
+            '/custom_logos/drawings/images_grid/miscel·lania/pont-del-diable-b-grid.webp',
             CONTROL_TILE_ARROWS,
           ],
         },
