@@ -15,7 +15,12 @@ export const getTheHumanInsideOverlayPreset = (overlaySrc) => {
     const isCylon03 = s.includes('cylon-03') || s.includes('cylon_03');
     const isCylon78 = (
       (!isCylon03 && (s.includes('cylon-78') || s.includes('cylon_78')))
-      || (!isCylon03 && (s.includes('/cylon.webp') || s.includes('/cylon.png')))
+      || (!isCylon03 && (
+        s.includes('/cylon.webp')
+        || s.includes('/cylon.png')
+        || s.includes('/cylon-stripe.webp')
+        || s.includes('/cylon-b-stripe.webp')
+      ))
     );
     const isIronMan68 = s.includes('iron-man-68') || s.includes('iron_man_68');
     const isIronMan08 = s.includes('ironman-08') || s.includes('iron-man-08') || s.includes('ironman_08') || s.includes('iron_man_08');
