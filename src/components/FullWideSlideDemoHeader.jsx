@@ -705,6 +705,20 @@ function MegaColumn({
     }
 
     if (raw.startsWith('/custom_logos/drawings/images_grid/')) {
+      if (cid === 'outcasted' && raw.startsWith('/custom_logos/drawings/images_grid/miscel·lania/')) {
+        const file = raw.split('/').pop() || '';
+        const lower = file.toLowerCase();
+        const outcastedMap = {
+          'dj-vader-grid.webp': 'dj-vader-b-grid.webp',
+          'dj-vader.webp': 'dj-vader-b-grid.webp',
+          'death-star2d2-grid.webp': 'death-star2d2-b-grid.webp',
+          'death-star2d2.webp': 'death-star2d2-b-grid.webp',
+          'pont-del-diable-grid.webp': 'pont-del-diable-b-grid.webp',
+          'pont-del-diable.webp': 'pont-del-diable-b-grid.webp',
+        };
+        const mapped = outcastedMap[lower];
+        if (mapped) return `/custom_logos/drawings/images_grid/miscel·lania/${mapped}`;
+      }
       if (cid === 'austen' && raw.includes('/austen/quotes/')) {
         return resolveAustenQuoteThumbFromPath(raw, 'grid') || ensureThumbSuffix(raw, 'grid');
       }
@@ -757,8 +771,11 @@ function MegaColumn({
 
       if (cid === 'outcasted') {
         const lower = baseFile.toLowerCase();
+        if (lower === 'dj-vader.webp') return '/custom_logos/drawings/images_grid/miscel·lania/dj-vader-b-grid.webp';
         if (lower === 'dj-vader-b.webp') return '/custom_logos/drawings/images_grid/miscel·lania/dj-vader-b-grid.webp';
+        if (lower === 'death-star2d2.webp') return '/custom_logos/drawings/images_grid/miscel·lania/death-star2d2-b-grid.webp';
         if (lower === 'death-star2d2-b.webp') return '/custom_logos/drawings/images_grid/miscel·lania/death-star2d2-b-grid.webp';
+        if (lower === 'pont-del-diable.webp') return '/custom_logos/drawings/images_grid/miscel·lania/pont-del-diable-b-grid.webp';
         if (lower === 'pont-del-diable-b.webp') return '/custom_logos/drawings/images_grid/miscel·lania/pont-del-diable-b-grid.webp';
         return ensureThumbSuffix(`/custom_logos/drawings/images_grid/miscel·lania/${baseFile.replace(/-b\.webp$/i, '-b-grid.webp')}`, 'grid');
       }
@@ -3070,7 +3087,7 @@ export default function FullWideSlideDemoHeader({
                             ) : active === 'outcasted' && typeof it === 'string' && /\.(png|jpg|jpeg|webp)$/i.test(it) ? (
                               <div className="relative mt-2 aspect-square w-full overflow-hidden">
                                 <OptimizedImg
-                                  src={`/custom_logos/drawings/outcasted/${it}`}
+                                  src={resolveGridThumbSrc(it, active) || it}
                                   alt=""
                                   className="relative z-10 h-full w-full object-contain"
                                 />
