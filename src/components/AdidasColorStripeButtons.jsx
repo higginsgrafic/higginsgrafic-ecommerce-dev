@@ -235,6 +235,23 @@ export default function AdidasColorStripeButtons({
     }
 
     if (s.includes('/custom_logos/drawings/images_grid/the_human_inside/') || s.includes('/custom_logos/drawings/images_stripe/the_human_inside/')) {
+      const lower = file.toLowerCase();
+      const lowerNoGrid = lower
+        .replace(/-grid-stripe(?=\.(webp|png|jpe?g)$)/i, '')
+        .replace(/-grid(?=\.(webp|png|jpe?g)$)/i, '')
+        .replace(/-stripe(?=\.(webp|png|jpe?g)$)/i, '')
+        .replace(/\.(webp|png|jpe?g)$/i, '.webp');
+
+      // Canonicalize Cylon 78 to the existing `cylon(-b)-stripe.webp` asset.
+      if (lowerNoGrid === 'cylon.webp' || lowerNoGrid === 'cylon-78.webp' || lowerNoGrid === 'cylon-78-b.webp' || lowerNoGrid === 'cylon-b.webp') {
+        return '/custom_logos/drawings/images_stripe/the_human_inside/black/cylon-stripe.webp';
+      }
+
+      // Canonicalize Cylon 03.
+      if (lowerNoGrid === 'cylon-03.webp' || lowerNoGrid === 'cylon-03-b.webp') {
+        return '/custom_logos/drawings/images_stripe/the_human_inside/black/cylon-03-stripe.webp';
+      }
+
       return ensureThumbSuffix(`/custom_logos/drawings/images_stripe/the_human_inside/black/${file}`, 'stripe');
     }
 
