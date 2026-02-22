@@ -11,8 +11,10 @@ export default function AdidasHumanInsideSlider({
   firstContactVariant,
   onFirstContactWhite,
   onFirstContactBlack,
+  onFirstContactMulti,
   onHumanWhite,
   onHumanBlack,
+  onHumanMulti,
   onHumanPrev,
   onHumanNext,
   OptimizedImg,
@@ -137,9 +139,9 @@ export default function AdidasHumanInsideSlider({
           <div className="h-4" />
           <div className="relative z-40">
             {isFirstContact ? (
-              <FirstContactDibuix00Buttons onWhite={onFirstContactWhite} onBlack={onFirstContactBlack} />
+              <FirstContactDibuix00Buttons onWhite={onFirstContactWhite} onBlack={onFirstContactBlack} onMulti={onFirstContactMulti} />
             ) : isHumanInside ? (
-              <FirstContactDibuix00Buttons onWhite={onHumanWhite} onBlack={onHumanBlack} />
+              <FirstContactDibuix00Buttons onWhite={onHumanWhite} onBlack={onHumanBlack} onMulti={onHumanMulti} />
             ) : null}
           </div>
         </div>

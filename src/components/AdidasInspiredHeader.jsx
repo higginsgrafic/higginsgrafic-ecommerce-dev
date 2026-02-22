@@ -108,7 +108,7 @@ function IconButton({ label, onClick, children }) {
   );
 }
 
-function FirstContactDibuix00Buttons({ onWhite, onBlack }) {
+function FirstContactDibuix00Buttons({ onWhite, onBlack, onMulti }) {
   return (
     <div className="relative mt-2 aspect-square w-full" data-stripe-buttonbar="bn">
       <div className="absolute inset-0 overflow-hidden rounded-md bg-muted">
@@ -117,7 +117,7 @@ function FirstContactDibuix00Buttons({ onWhite, onBlack }) {
           aria-label="Blanc"
           id="stripe-guide-left-anchor"
           onClick={onWhite}
-          className="absolute left-0 top-0 h-1/2 w-full bg-foreground focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          className="absolute left-0 top-0 h-1/3 w-full bg-foreground focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         >
           <span className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 font-oswald text-[20px] font-normal uppercase text-whiteStrong">
             Blanc
@@ -127,10 +127,21 @@ function FirstContactDibuix00Buttons({ onWhite, onBlack }) {
           type="button"
           aria-label="Negre"
           onClick={onBlack}
-          className="absolute left-0 bottom-0 h-1/2 w-full bg-background focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          className="absolute left-0 top-1/3 h-1/3 w-full bg-background focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         >
           <span className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 font-oswald text-[20px] font-normal uppercase text-foreground">
             Negre
+          </span>
+        </button>
+
+        <button
+          type="button"
+          aria-label="Color"
+          onClick={onMulti}
+          className="absolute left-0 bottom-0 h-1/3 w-full bg-muted focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        >
+          <span className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 font-oswald text-[20px] font-normal uppercase text-foreground">
+            Color
           </span>
         </button>
       </div>
@@ -289,8 +300,10 @@ function MegaColumn({
                 firstContactVariant={firstContactVariant}
                 onFirstContactWhite={onFirstContactWhite}
                 onFirstContactBlack={onFirstContactBlack}
+                onFirstContactMulti={onFirstContactMulti}
                 onHumanWhite={onHumanWhite}
                 onHumanBlack={onHumanBlack}
+                onHumanMulti={onHumanMulti}
                 onHumanPrev={onHumanPrev}
                 onHumanNext={onHumanNext}
                 OptimizedImg={OptimizedImg}
@@ -389,9 +402,9 @@ function MegaColumn({
                     ) : it === CONTROL_TILE_BN ? (
                       <div className="relative z-40">
                         {isFirstContact ? (
-                          <FirstContactDibuix00Buttons onWhite={onFirstContactWhite} onBlack={onFirstContactBlack} />
+                          <FirstContactDibuix00Buttons onWhite={onFirstContactWhite} onBlack={onFirstContactBlack} onMulti={onFirstContactMulti} />
                         ) : isHumanInside ? (
-                          <FirstContactDibuix00Buttons onWhite={onHumanWhite} onBlack={onHumanBlack} />
+                          <FirstContactDibuix00Buttons onWhite={onHumanWhite} onBlack={onHumanBlack} onMulti={onHumanMulti} />
                         ) : null}
                       </div>
                     ) : it === CONTROL_TILE_ARROWS ? (
@@ -491,6 +504,22 @@ export default function AdidasInspiredHeader({
   const headerRef = useRef(null);
   const megaMenuRef = useRef(null);
   const mobileHumanScrollRef = useRef(null);
+
+  useEffect(() => {
+    if (!import.meta.env.DEV) return;
+    try {
+      if (typeof window === 'undefined') return;
+      const prev = window.__HG_OVERLAY_DEBUG__ || {};
+      window.__HG_OVERLAY_DEBUG__ = {
+        ...prev,
+        active,
+        firstContactVariant,
+        humanInsideVariant,
+      };
+    } catch {
+      // ignore
+    }
+  }, [active, firstContactVariant, humanInsideVariant]);
 
   const selectedColorHex = useMemo(
     () => ({
@@ -965,8 +994,10 @@ export default function AdidasInspiredHeader({
                     firstContactVariant={firstContactVariant}
                     onFirstContactWhite={() => setFirstContactVariant('white')}
                     onFirstContactBlack={() => setFirstContactVariant('black')}
+                    onFirstContactMulti={() => setFirstContactVariant('color')}
                     onHumanWhite={() => setHumanInsideVariant('white')}
                     onHumanBlack={() => setHumanInsideVariant('black')}
+                    onHumanMulti={() => setHumanInsideVariant('color')}
                     onHumanPrev={() => setThinStartIndex((v) => v - 1)}
                     onHumanNext={() => setThinStartIndex((v) => v + 1)}
                   />
@@ -1126,9 +1157,9 @@ export default function AdidasInspiredHeader({
                               </div>
                             ) : it === CONTROL_TILE_BN ? (
                               active === 'the_human_inside' ? (
-                                <FirstContactDibuix00Buttons onWhite={() => setHumanInsideVariant('white')} onBlack={() => setHumanInsideVariant('black')} />
+                                <FirstContactDibuix00Buttons onWhite={() => setHumanInsideVariant('white')} onBlack={() => setHumanInsideVariant('black')} onMulti={() => setHumanInsideVariant('color')} />
                               ) : (
-                                <FirstContactDibuix00Buttons onWhite={() => setFirstContactVariant('white')} onBlack={() => setFirstContactVariant('black')} />
+                                <FirstContactDibuix00Buttons onWhite={() => setFirstContactVariant('white')} onBlack={() => setFirstContactVariant('black')} onMulti={() => setFirstContactVariant('color')} />
                               )
                             ) : it === CONTROL_TILE_ARROWS ? (
                               <FirstContactDibuix09Buttons

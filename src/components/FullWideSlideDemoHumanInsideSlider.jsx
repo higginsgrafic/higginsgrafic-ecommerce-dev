@@ -13,8 +13,10 @@ export default function FullWideSlideDemoHumanInsideSlider({
   variantOverride,
   onFirstContactWhite,
   onFirstContactBlack,
+  onFirstContactMulti,
   onHumanWhite,
   onHumanBlack,
+  onHumanMulti,
   onHumanPrev,
   onHumanNext,
   onSelectItem,
@@ -113,7 +115,13 @@ export default function FullWideSlideDemoHumanInsideSlider({
 
   const labelForItem = (it) => {
     if (typeof it !== 'string') return '';
-    if (!isPathItem(it)) return it;
+    if (!isPathItem(it)) {
+      if (collectionId === 'the_human_inside') {
+        if (it === 'Afrodita') return 'Afrodita-A';
+        if (it === 'Mazinger') return 'Mazinger-Z';
+      }
+      return it;
+    }
     const seg = it.split('/').filter(Boolean);
     const base = seg.length ? seg[seg.length - 1] : it;
     return base.replace(/\.(png|jpg|jpeg|webp)$/i, '').replace(/[-_]+/g, ' ');
@@ -301,18 +309,16 @@ export default function FullWideSlideDemoHumanInsideSlider({
           <div className="h-4" />
           <div className="relative z-40">
             {isFirstContact ? (
-              <FirstContactDibuix00Buttons onWhite={onFirstContactWhite} onBlack={onFirstContactBlack} />
+              <FirstContactDibuix00Buttons onWhite={onFirstContactWhite} onBlack={onFirstContactBlack} onMulti={onFirstContactMulti} />
             ) : isHumanInside ? (
-              <FirstContactDibuix00Buttons onWhite={onHumanWhite} onBlack={onHumanBlack} />
+              <FirstContactDibuix00Buttons onWhite={onHumanWhite} onBlack={onHumanBlack} onMulti={onHumanMulti} />
             ) : null}
           </div>
         </div>
 
         <div className="relative min-w-0 overflow-hidden" style={effectiveTileSize ? { width: `${viewportW}px` } : undefined}>
           <div
-            className={`pointer-events-none absolute left-0 right-0 top-6 rounded-md transition-opacity duration-300 ease-in-out ${
-              activeVariant === 'white' ? 'bg-foreground opacity-100' : 'bg-transparent opacity-100'
-            }`}
+            className="pointer-events-none absolute left-0 right-0 top-6 rounded-md transition-opacity duration-300 ease-in-out bg-transparent opacity-100"
             style={effectiveTileSize ? { height: `${effectiveTileSize}px` } : undefined}
             aria-hidden="true"
           />

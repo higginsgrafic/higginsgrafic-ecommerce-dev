@@ -201,15 +201,35 @@ export default function AdidasColorStripeButtons({
     }
 
     if (s.includes('/custom_logos/drawings/images_grid/miscel·lania/') || s.includes('/custom_logos/drawings/images_stripe/miscel·lania/')) {
+      const isMulti = s.includes('/miscel·lania/multi/');
       const lower = file.toLowerCase();
       const lowerNoGrid = lower
         .replace(/-grid-stripe(?=\.(webp|png|jpe?g)$)/i, '')
-        .replace(/-grid(?=\.(webp|png|jpe?g)$)/i, '');
+        .replace(/-grid(?=\.(webp|png|jpe?g)$)/i, '')
+        .replace(/\?.*$/, '');
+      if (isMulti) {
+        if (
+          lowerNoGrid === 'dj-vader-multi-1-stripe.webp'
+          || lowerNoGrid === 'dj-vader-multi-2-stripe.webp'
+          || lowerNoGrid === 'dj-vader-multi-dark-stripe.webp'
+          || lowerNoGrid === 'dj-vader-multi-light-stripe.webp'
+        ) {
+          return '/custom_logos/drawings/images_stripe/miscel·lania/black/dj-vader-b-stripe.webp';
+        }
+        if (lowerNoGrid === 'death-star2d2-multi-dark-stripe.webp' || lowerNoGrid === 'death-star2d2-multi-light-stripe.webp') {
+          return '/custom_logos/drawings/images_stripe/miscel·lania/black/death-star2d2-b-stripe.webp';
+        }
+        if (lowerNoGrid === 'pont-del-diable-multi-dark-stripe.webp' || lowerNoGrid === 'pont-del-diable-multi-light-stripe.webp') {
+          return '/custom_logos/drawings/images_stripe/miscel·lania/black/pont-del-diable-b-stripe.webp';
+        }
+        return ensureThumbSuffix(`/custom_logos/drawings/images_stripe/miscel·lania/multi/${file}`, 'stripe');
+      }
       if (
         lowerNoGrid === 'dj-vader.webp'
-        || lowerNoGrid === 'dj-vader-stripe.webp'
         || lowerNoGrid === 'dj-vader-b.webp'
+        || lowerNoGrid === 'dj-vader-w.webp'
         || lowerNoGrid === 'dj-vader-b-stripe.webp'
+        || lowerNoGrid === 'dj-vader-w-stripe.webp'
         || lowerNoGrid === 'dj-vader-multi-1-stripe.webp'
         || lowerNoGrid === 'dj-vader-multi-2-stripe.webp'
       ) {
@@ -217,17 +237,19 @@ export default function AdidasColorStripeButtons({
       }
       if (
         lowerNoGrid === 'death-star2d2.webp'
-        || lowerNoGrid === 'death-star2d2-stripe.webp'
         || lowerNoGrid === 'death-star2d2-b.webp'
+        || lowerNoGrid === 'death-star2d2-w.webp'
         || lowerNoGrid === 'death-star2d2-b-stripe.webp'
+        || lowerNoGrid === 'death-star2d2-w-stripe.webp'
       ) {
         return '/custom_logos/drawings/images_stripe/miscel·lania/black/death-star2d2-b-stripe.webp';
       }
       if (
         lowerNoGrid === 'pont-del-diable.webp'
-        || lowerNoGrid === 'pont-del-diable-stripe.webp'
         || lowerNoGrid === 'pont-del-diable-b.webp'
+        || lowerNoGrid === 'pont-del-diable-w.webp'
         || lowerNoGrid === 'pont-del-diable-b-stripe.webp'
+        || lowerNoGrid === 'pont-del-diable-w-stripe.webp'
       ) {
         return '/custom_logos/drawings/images_stripe/miscel·lania/black/pont-del-diable-b-stripe.webp';
       }
@@ -235,6 +257,8 @@ export default function AdidasColorStripeButtons({
     }
 
     if (s.includes('/custom_logos/drawings/images_grid/the_human_inside/') || s.includes('/custom_logos/drawings/images_stripe/the_human_inside/')) {
+      const isWhite = s.includes('/the_human_inside/white/');
+      const folder = isWhite ? 'white' : 'black';
       const lower = file.toLowerCase();
       const lowerNoGrid = lower
         .replace(/-grid-stripe(?=\.(webp|png|jpe?g)$)/i, '')
@@ -243,16 +267,18 @@ export default function AdidasColorStripeButtons({
         .replace(/\.(webp|png|jpe?g)$/i, '.webp');
 
       // Canonicalize Cylon 78 to the existing `cylon(-b)-stripe.webp` asset.
-      if (lowerNoGrid === 'cylon.webp' || lowerNoGrid === 'cylon-78.webp' || lowerNoGrid === 'cylon-78-b.webp' || lowerNoGrid === 'cylon-b.webp') {
-        return '/custom_logos/drawings/images_stripe/the_human_inside/black/cylon-stripe.webp';
+      if (lowerNoGrid === 'cylon.webp' || lowerNoGrid === 'cylon-78.webp' || lowerNoGrid === 'cylon-78-stripe.webp' || lowerNoGrid === 'cylon-stripe.webp' || lowerNoGrid === 'cylon-78-b-stripe.webp') {
+        return isWhite
+          ? '/custom_logos/drawings/images_stripe/the_human_inside/white/cylon-78-w-stripe.webp'
+          : '/custom_logos/drawings/images_stripe/the_human_inside/black/cylon-78-b-stripe.webp';
+      }
+      if (lowerNoGrid === 'cylon-03.webp' || lowerNoGrid === 'cylon-03-stripe.webp' || lowerNoGrid === 'cylon-03-b-stripe.webp') {
+        return isWhite
+          ? '/custom_logos/drawings/images_stripe/the_human_inside/white/cylon-03-w-stripe.webp'
+          : '/custom_logos/drawings/images_stripe/the_human_inside/black/cylon-03-b-stripe.webp';
       }
 
-      // Canonicalize Cylon 03.
-      if (lowerNoGrid === 'cylon-03.webp' || lowerNoGrid === 'cylon-03-b.webp') {
-        return '/custom_logos/drawings/images_stripe/the_human_inside/black/cylon-03-stripe.webp';
-      }
-
-      return ensureThumbSuffix(`/custom_logos/drawings/images_stripe/the_human_inside/black/${file}`, 'stripe');
+      return ensureThumbSuffix(`/custom_logos/drawings/images_stripe/the_human_inside/${folder}/${file}`, 'stripe');
     }
 
     if (s.includes('/custom_logos/drawings/images_stripe/first_contact/') && /nx-01-multi-(dark|light)-stripe\.(webp|png|jpe?g)$/i.test(file)) {
@@ -300,7 +326,8 @@ export default function AdidasColorStripeButtons({
     // elsewhere to normalize the calibration key.
     if (isMultiRaw) return overlaySrc;
 
-    if (typeof overlaySrcForPreset === 'string' && overlaySrcForPreset.trim()) return overlaySrcForPreset;
+    // `overlaySrcForPreset` is allowed to canonicalize (e.g. white -> black) to share
+    // calibration keys, but that must never affect the actual rendered overlay.
     return overlaySrc;
   }, [overlaySrc, overlaySrcForPreset]);
 
@@ -313,15 +340,74 @@ export default function AdidasColorStripeButtons({
       const isStripe = s.includes('/stripe/') || s.includes('-stripe');
       const isMulti = s.includes('/multi/') || /-multi-(dark|light)-stripe\.(webp|png|jpe?g)([?#]|$)/i.test(s);
 
-      if (!isMulti) return overlaySrcForRender;
+      if (!isMulti) {
+        // Contrast preview on the stripe:
+        // - t1 (idx 0) sits on a white shirt tile -> show black overlay
+        // - t14 (idx 13) sits on a black shirt tile -> show white overlay
+        const forceBw = (src, want) => {
+          try {
+            if (!src || typeof src !== 'string') return src;
+            const trimmed = src.trim();
+            if (!trimmed) return src;
+            const [base, q] = trimmed.split('?');
+            let out = base;
+
+            if (want === 'black') {
+              out = out
+                .replace(/\/white\//gi, '/black/')
+                .replace(/-w-stripe\.(webp|png|jpe?g)$/i, '-b-stripe.$1')
+                .replace(/-w\.(webp|png|jpe?g)$/i, '-b.$1');
+            } else if (want === 'white') {
+              out = out
+                .replace(/\/black\//gi, '/white/')
+                .replace(/-b-stripe\.(webp|png|jpe?g)$/i, '-w-stripe.$1')
+                .replace(/-b\.(webp|png|jpe?g)$/i, '-w.$1');
+            }
+
+            return q ? `${out}?${q}` : out;
+          } catch {
+            return src;
+          }
+        };
+
+        if (idx === 0) return forceBw(overlaySrcForRender, 'black');
+        if (idx === 13) return forceBw(overlaySrcForRender, 'white');
+        return overlaySrcForRender;
+      }
       const isDjVader = s.includes('dj-vader');
 
       if (isDjVader && isStripe) {
         const which = idx === 0 ? 1 : 2;
-        return `/custom_logos/drawings/images_originals/stripe/miscel·lania/multi/dj-vader-multi-${which}-stripe.webp`;
+        return `/custom_logos/drawings/images_stripe/miscel·lania/multi/dj-vader-multi-${which}-stripe.webp`;
+      }
+
+      const isMiscel = s.includes('/miscel·lania/');
+      if (isMiscel && isStripe) {
+        const isDeathStar = s.includes('death-star2d2');
+        if (isDeathStar) {
+          const variant = idx === 0 ? 'dark' : 'light';
+          return `/custom_logos/drawings/images_stripe/miscel·lania/multi/death-star2d2-multi-${variant}-stripe.webp`;
+        }
+        const isPont = s.includes('pont-del-diable') || s.includes('pont_del_diable');
+        if (isPont) {
+          const variant = idx === 0 ? 'dark' : 'light';
+          return `/custom_logos/drawings/images_stripe/miscel·lania/multi/pont-del-diable-multi-${variant}-stripe.webp`;
+        }
+      }
+
+      const isThin = s.includes('/the_human_inside/');
+      if (isThin && s.includes('/the_human_inside/multi/') && isStripe) {
+        const m = s.match(/\/the_human_inside\/multi\/([^/]+)-multi-(dark|light)-stripe\.(webp|png|jpe?g)([?#]|$)/i);
+        if (m) {
+          const base = m[1];
+          const ext = m[3];
+          const variant = idx === 0 ? 'dark' : 'light';
+          return `/custom_logos/drawings/images_stripe/the_human_inside/multi/${base}-multi-${variant}-stripe.${ext}`;
+        }
       }
 
       const isFirstContact = s.includes('/first_contact/');
+      if (!isFirstContact) return overlaySrcForRender;
       const isNx01 = s.includes('nx-01');
       if (isFirstContact && isNx01 && isStripe) {
         const variant = idx === 0 ? 'dark' : 'light';

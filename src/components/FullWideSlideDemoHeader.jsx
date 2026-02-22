@@ -167,7 +167,7 @@ const OptimizedImg = React.forwardRef(function OptimizedImg({ src, alt, classNam
       alt={alt}
       className={className}
       style={style}
-      loading="lazy"
+      loading={rest?.loading || 'lazy'}
       decoding="async"
       onError={() => {
         if (import.meta.env.DEV) {
@@ -548,6 +548,31 @@ function MegaColumn({
     return rowItems.filter((it) => it && it !== CONTROL_TILE_BN && it !== CONTROL_TILE_ARROWS);
   }, [rowItems]);
 
+  const preloadedThumbsRef = useRef(new Set());
+  const preloadThumbSrc = (src) => {
+    try {
+      if (!src || typeof src !== 'string') return;
+      const normalized = src.trim();
+      if (!normalized) return;
+      if (preloadedThumbsRef.current.has(normalized)) return;
+      preloadedThumbsRef.current.add(normalized);
+      const img = new Image();
+      img.decoding = 'async';
+      img.loading = 'eager';
+      img.src = encodeURI(normalized);
+    } catch {
+      // ignore
+    }
+  };
+
+  useEffect(() => {
+    const limit = collectionId === 'the_human_inside' ? 48 : 24;
+    baseItems.slice(0, limit).forEach((it) => {
+      const src = resolveGridThumbSrc(it, collectionId) || resolveSrc(it);
+      preloadThumbSrc(src);
+    });
+  }, [baseItems, collectionId]);
+
   const outcastedStripeTiles = collectionId === 'outcasted' ? Math.max(0, Math.min(7, baseItems.length)) : 7;
 
   const thinSlideEnabled = isHumanInside && row && drawableItems.length > 7;
@@ -638,6 +663,12 @@ function MegaColumn({
 
       if (collectionId === 'outcasted') {
         const normalized = typeof vPath === 'string' ? vPath.replace(/^\/?(black|white)\//i, '') : vPath;
+        if (variant === 'color') {
+          return ensureThumbSuffix(`/custom_logos/drawings/images_stripe/miscel·lania/multi/${normalized}`, 'stripe');
+        }
+        if (variant === 'white') {
+          return ensureThumbSuffix(`/custom_logos/drawings/images_stripe/miscel·lania/white/${normalized}`, 'stripe');
+        }
         return ensureThumbSuffix(`/custom_logos/drawings/images_stripe/miscel·lania/black/${normalized}`, 'stripe');
       }
 
@@ -699,8 +730,8 @@ function MegaColumn({
       const base = fileByLabel[key] || fileByLabel[raw] || null;
       if (!base) return resolveSrc(it);
 
-      const folder = firstContactVariant === 'white' ? 'white' : 'black';
-      const suffix = firstContactVariant === 'white' ? 'w' : 'b';
+      const folder = 'black';
+      const suffix = 'b';
       return ensureThumbSuffix(`/custom_logos/drawings/images_grid/first_contact/${folder}/${base}-${suffix}-grid.webp`, 'grid');
     }
 
@@ -1105,11 +1136,7 @@ function MegaColumn({
               <div className="h-4" />
               <div
                 className={`mt-2 w-full rounded-md transition-opacity duration-300 ease-in-out ${
-                  isFirstContact && firstContactVariant === 'white'
-                    ? 'bg-foreground opacity-100'
-                    : isHumanInside && humanInsideVariant === 'white'
-                      ? 'bg-foreground opacity-100'
-                      : 'bg-transparent opacity-100'
+                  'bg-transparent opacity-100'
                   }`}
                 style={
                   tileSize
@@ -1141,8 +1168,10 @@ function MegaColumn({
                 firstContactVariant={firstContactVariant}
                 onFirstContactWhite={onFirstContactWhite}
                 onFirstContactBlack={onFirstContactBlack}
+                onFirstContactMulti={onFirstContactMulti}
                 onHumanWhite={onHumanWhite}
                 onHumanBlack={onHumanBlack}
+                onHumanMulti={onHumanMulti}
                 onHumanPrev={isHumanInside ? onHumanPrev : undefined}
                 onHumanNext={isHumanInside ? onHumanNext : undefined}
                 onSelectItem={onSelectItem}
@@ -1265,20 +1294,6 @@ function MegaColumn({
                             );
                           })()}
                         </div>
-
-                        {FIRST_CONTACT_MEDIA[it] && idx >= 1 && idx <= 7 && firstContactVariant === 'white' && !(
-                          collectionId === 'first_contact'
-                          && typeof resolveGridThumbSrc(it, collectionId) === 'string'
-                          && resolveGridThumbSrc(it, collectionId).includes('/custom_logos/drawings/images_grid/first_contact/white/')
-                        ) ? (
-                          <OptimizedImg
-                            src={FIRST_CONTACT_MEDIA_WHITE[it] || FIRST_CONTACT_MEDIA[it]}
-                            alt={it}
-                            className={`absolute inset-0 h-full w-full object-contain transition-opacity duration-300 ease-in-out ${
-                              firstContactVariant === 'white' ? 'opacity-100' : 'opacity-0'
-                            }`}
-                          />
-                        ) : null}
                       </button>
                     )}
                   </div>
@@ -1494,6 +1509,22 @@ export default function FullWideSlideDemoHeader({
   const [thinStartIndex, setThinStartIndex] = useState(0);
   const [gildan5000Catalog, setGildan5000Catalog] = useState(null);
 
+  useEffect(() => {
+    if (!import.meta.env.DEV) return;
+    try {
+      if (typeof window === 'undefined') return;
+      const prev = window.__HG_OVERLAY_DEBUG__ || {};
+      window.__HG_OVERLAY_DEBUG__ = {
+        ...prev,
+        active,
+        firstContactVariant,
+        humanInsideVariant,
+      };
+    } catch {
+      // ignore
+    }
+  }, [active, firstContactVariant, humanInsideVariant]);
+
   const reorderAustenQuotes = (items) => {
     try {
       if (!Array.isArray(items) || items.length === 0) return items;
@@ -1567,26 +1598,95 @@ export default function FullWideSlideDemoHeader({
     }
     if (active === 'the_human_inside' && humanInsideSelectedItem) {
       const key = normalizeKeyLocal(humanInsideSelectedItem).toLowerCase();
-      const map = {
-        'r2-d2': 'r2-d2-stripe.webp',
-        c3p0: 'c3-p0-stripe.webp',
-        vader: 'vader-stripe.webp',
-        afrodita: 'afrodita-a-stripe.webp',
-        mazinger: 'mazinger-z-stripe.webp',
-        'cylon 78': 'cylon-stripe.webp',
-        'cylon 03': 'cylon-03-stripe.webp',
-        'iron man 68': 'iron-man-68-stripe.webp',
-        'iron man 08': 'iron-man-08-stripe.webp',
-        cyberman: 'cyberman-stripe.webp',
-        'the dalek': 'the-dalek-stripe.webp',
-        robocop: 'robocop-stripe.webp',
-        terminator: 'terminator-stripe.webp',
-        maschinenmensch: 'maschinenmensch-stripe.webp',
-        'robby the robot': 'robbie-the-robot-stripe.webp',
-        'robbie the robot': 'robbie-the-robot-stripe.webp',
+      const mapBlack = {
+        'r2-d2': 'r2-d2-b-stripe.webp',
+        c3p0: 'c3-p0-b-stripe.webp',
+        vader: 'vader-b-stripe.webp',
+        afrodita: 'afrodita-a-b-stripe.webp',
+        'afrodita-a': 'afrodita-a-b-stripe.webp',
+        mazinger: 'mazinger-z-b-stripe.webp',
+        'mazinger-z': 'mazinger-z-b-stripe.webp',
+        'cylon 78': 'cylon-78-b-stripe.webp',
+        'cylon 03': 'cylon-03-b-stripe.webp',
+        'iron man 68': 'iron-man-68-b-stripe.webp',
+        'iron man 08': 'iron-man-08-b-stripe.webp',
+        cyberman: 'cyberman-b-stripe.webp',
+        'the dalek': 'the-dalek-b-stripe.webp',
+        robocop: 'robocop-b-stripe.webp',
+        terminator: 'terminator-b-stripe.webp',
+        maschinenmensch: 'maschinenmensch-b-stripe.webp',
+        'robby the robot': 'robbie-the-robot-b-stripe.webp',
+        'robbie the robot': 'robbie-the-robot-b-stripe.webp',
       };
-      const file = map[key] || null;
-      return file ? `/custom_logos/drawings/images_stripe/the_human_inside/black/${file}` : null;
+
+      const mapWhite = {
+        'r2-d2': 'r2-d2-w-stripe.webp',
+        c3p0: 'c3-p0-w-stripe.webp',
+        vader: 'vader-w-stripe.webp',
+        afrodita: 'afrodita-a-w-stripe.webp',
+        'afrodita-a': 'afrodita-a-w-stripe.webp',
+        mazinger: 'mazinger-z-w-stripe.webp',
+        'mazinger-z': 'mazinger-z-w-stripe.webp',
+        'cylon 78': 'cylon-78-w-stripe.webp',
+        'cylon 03': 'cylon-03-w-stripe.webp',
+        'iron man 68': 'iron-man-68-w-stripe.webp',
+        'iron man 08': 'iron-man-08-w-stripe.webp',
+        cyberman: 'cyberman-w-stripe.webp',
+        'the dalek': 'the-dalek-w-stripe.webp',
+        robocop: 'robocop-w-stripe.webp',
+        terminator: 'terminator-w-stripe.webp',
+        maschinenmensch: 'maschinenmensch-w-stripe.webp',
+        'robby the robot': 'robbie-the-robot-w-stripe.webp',
+        'robbie the robot': 'robbie-the-robot-w-stripe.webp',
+      };
+
+      const mapColor = {
+        'r2-d2': 'r2-d2-multi-light-stripe.webp',
+        c3p0: 'c3-p0-multi-light-stripe.webp',
+        vader: 'vader-multi-light-stripe.webp',
+        afrodita: 'afrodita-a-multi-dark-stripe.webp',
+        'afrodita-a': 'afrodita-a-multi-dark-stripe.webp',
+        mazinger: 'mazinger-z-multi-light-stripe.webp',
+        'mazinger-z': 'mazinger-z-multi-light-stripe.webp',
+        'cylon 78': 'cylon-78-multi-light-stripe.webp',
+        'cylon 03': 'cylon-03-multi-light-stripe.webp',
+        'iron man 68': 'iron-man-68-multi-light-stripe.webp',
+        'iron man 08': 'iron-man-08-multi-light-stripe.webp',
+        cyberman: 'cyberman-multi-light-stripe.webp',
+        'the dalek': 'the-dalek-multi-light-stripe.webp',
+        robocop: 'robocop-multi-light-stripe.webp',
+        terminator: 'terminator-multi-light-stripe.webp',
+        maschinenmensch: 'maschinenmensch-multi-light-stripe.webp',
+        'robby the robot': 'robbie-the-robot-multi-light-stripe.webp',
+        'robbie the robot': 'robbie-the-robot-multi-light-stripe.webp',
+      };
+
+      const isWhite = humanInsideVariant === 'white';
+      const isColor = humanInsideVariant === 'color';
+      let file = (isColor ? mapColor : (isWhite ? mapWhite : mapBlack))[key] || null;
+      if (!file) {
+        const k = key;
+        if ((k.includes('robbie') || k.includes('robby')) && k.includes('robot')) {
+          file = isColor
+            ? 'robbie-the-robot-multi-light-stripe.webp'
+            : (isWhite ? 'robbie-the-robot-w-stripe.webp' : 'robbie-the-robot-b-stripe.webp');
+        } else if (k.includes('cylon') && k.includes('78')) {
+          file = isColor
+            ? 'cylon-78-multi-light-stripe.webp'
+            : (isWhite ? 'cylon-78-w-stripe.webp' : 'cylon-78-b-stripe.webp');
+        } else if (k.includes('afrodita')) {
+          file = isColor
+            ? 'afrodita-a-multi-dark-stripe.webp'
+            : (isWhite ? 'afrodita-a-w-stripe.webp' : 'afrodita-a-b-stripe.webp');
+        } else if (k.includes('iron') && k.includes('man') && k.includes('68')) {
+          file = isColor
+            ? 'iron-man-68-multi-light-stripe.webp'
+            : (isWhite ? 'iron-man-68-w-stripe.webp' : 'iron-man-68-b-stripe.webp');
+        }
+      }
+      if (!file) return null;
+      const folder = isColor ? 'multi' : (isWhite ? 'white' : 'black');
+      return `/custom_logos/drawings/images_stripe/the_human_inside/${folder}/${file}`;
     }
     if (active && selectedItemByCollection?.[active]) {
       const key = selectedItemByCollection[active];
@@ -1623,14 +1723,24 @@ export default function FullWideSlideDemoHeader({
 
       if (active === 'outcasted' && typeof key === 'string' && !isPathItem(key)) {
         const k = normalizeKeyLocal(key).toLowerCase();
-        const map = {
-          'dj vader': '/custom_logos/drawings/images_stripe/miscel·lania/black/dj-vader-b-stripe.webp',
-          'dj-vader': '/custom_logos/drawings/images_stripe/miscel·lania/black/dj-vader-b-stripe.webp',
-          deathstar2d2: '/custom_logos/drawings/images_stripe/miscel·lania/black/death-star2d2-b-stripe.webp',
-          'death star2d2': '/custom_logos/drawings/images_stripe/miscel·lania/black/death-star2d2-b-stripe.webp',
-          'death-star2d2': '/custom_logos/drawings/images_stripe/miscel·lania/black/death-star2d2-b-stripe.webp',
-        };
-        const out = map[k] || null;
+        const out = (() => {
+          if (firstContactVariant === 'color') {
+            if (k === 'dj vader' || k === 'dj-vader') return '/custom_logos/drawings/images_stripe/miscel·lania/multi/dj-vader-multi-1-stripe.webp';
+            if (k === 'deathstar2d2' || k === 'death star2d2' || k === 'death-star2d2') return '/custom_logos/drawings/images_stripe/miscel·lania/multi/death-star2d2-multi-light-stripe.webp';
+            if (k === 'pont del diable' || k === 'pont-del-diable') return '/custom_logos/drawings/images_stripe/miscel·lania/multi/pont-del-diable-multi-light-stripe.webp';
+          }
+
+          if (firstContactVariant === 'white') {
+            if (k === 'dj vader' || k === 'dj-vader') return '/custom_logos/drawings/images_stripe/miscel·lania/white/dj-vader-w-stripe.webp';
+            if (k === 'deathstar2d2' || k === 'death star2d2' || k === 'death-star2d2') return '/custom_logos/drawings/images_stripe/miscel·lania/white/death-star2d2-w-stripe.webp';
+            if (k === 'pont del diable' || k === 'pont-del-diable') return '/custom_logos/drawings/images_stripe/miscel·lania/white/pont-del-diable-w-stripe.webp';
+          }
+
+          if (k === 'dj vader' || k === 'dj-vader') return '/custom_logos/drawings/images_stripe/miscel·lania/black/dj-vader-b-stripe.webp';
+          if (k === 'deathstar2d2' || k === 'death star2d2' || k === 'death-star2d2') return '/custom_logos/drawings/images_stripe/miscel·lania/black/death-star2d2-b-stripe.webp';
+          if (k === 'pont del diable' || k === 'pont-del-diable') return '/custom_logos/drawings/images_stripe/miscel·lania/black/pont-del-diable-b-stripe.webp';
+          return null;
+        })();
         if (import.meta.env.DEV && !out) {
           // eslint-disable-next-line no-console
           console.error('[OUTCASTED stripe overlay] unresolved label', { key, normalized: k });
@@ -1660,12 +1770,26 @@ export default function FullWideSlideDemoHeader({
         }
         if (active === 'outcasted' && typeof key === 'string' && key.startsWith('/custom_logos/drawings/images_grid/miscel·lania/')) {
           const file = key.split('/').pop() || '';
-          const map = {
-            'dj-vader.webp': 'dj-vader-b.webp',
-            'death-star2d2.webp': 'death-star2d2-b.webp',
-          };
-          const drawingFile = map[file];
-          if (drawingFile) return `/custom_logos/drawings/images_stripe/miscel·lania/black/${drawingFile.replace(/\.(webp|png|jpe?g)$/i, '-stripe.$1')}`;
+          const lower = file.toLowerCase();
+          if (firstContactVariant === 'color') {
+            if (lower.includes('dj-vader')) return '/custom_logos/drawings/images_stripe/miscel·lania/multi/dj-vader-multi-1-stripe.webp';
+            if (lower.includes('death-star2d2')) return '/custom_logos/drawings/images_stripe/miscel·lania/multi/death-star2d2-multi-light-stripe.webp';
+            if (lower.includes('pont-del-diable') || lower.includes('pont_del_diable')) {
+              return '/custom_logos/drawings/images_stripe/miscel·lania/multi/pont-del-diable-multi-light-stripe.webp';
+            }
+          }
+          if (firstContactVariant === 'white') {
+            if (lower.includes('dj-vader')) return '/custom_logos/drawings/images_stripe/miscel·lania/white/dj-vader-w-stripe.webp';
+            if (lower.includes('death-star2d2')) return '/custom_logos/drawings/images_stripe/miscel·lania/white/death-star2d2-w-stripe.webp';
+            if (lower.includes('pont-del-diable') || lower.includes('pont_del_diable')) {
+              return '/custom_logos/drawings/images_stripe/miscel·lania/white/pont-del-diable-w-stripe.webp';
+            }
+          }
+          if (lower.includes('dj-vader')) return '/custom_logos/drawings/images_stripe/miscel·lania/black/dj-vader-b-stripe.webp';
+          if (lower.includes('death-star2d2')) return '/custom_logos/drawings/images_stripe/miscel·lania/black/death-star2d2-b-stripe.webp';
+          if (lower.includes('pont-del-diable') || lower.includes('pont_del_diable')) {
+            return '/custom_logos/drawings/images_stripe/miscel·lania/black/pont-del-diable-b-stripe.webp';
+          }
         }
         if (active === 'austen' && typeof key === 'string' && key.startsWith('/custom_logos/drawings/images_grid/austen/keep_calm/')) {
           const file = key.split('/').pop() || '';
@@ -1798,9 +1922,25 @@ export default function FullWideSlideDemoHeader({
       if (active === 'outcasted') {
         if (typeof key === 'string' && key.startsWith('/custom_logos/drawings/images_grid/miscel·lania/')) {
           const file = key.split('/').pop() || '';
+          const lower = file.toLowerCase();
+          if (firstContactVariant === 'color') {
+            if (lower.includes('dj-vader')) return '/custom_logos/drawings/images_stripe/miscel·lania/multi/dj-vader-multi-1-stripe.webp';
+            if (lower.includes('death-star2d2')) return '/custom_logos/drawings/images_stripe/miscel·lania/multi/death-star2d2-multi-light-stripe.webp';
+            if (lower.includes('pont-del-diable') || lower.includes('pont_del_diable')) {
+              return '/custom_logos/drawings/images_stripe/miscel·lania/multi/pont-del-diable-multi-light-stripe.webp';
+            }
+          }
+          if (firstContactVariant === 'white') {
+            if (lower.includes('dj-vader')) return '/custom_logos/drawings/images_stripe/miscel·lania/white/dj-vader-w-stripe.webp';
+            if (lower.includes('death-star2d2')) return '/custom_logos/drawings/images_stripe/miscel·lania/white/death-star2d2-w-stripe.webp';
+            if (lower.includes('pont-del-diable') || lower.includes('pont_del_diable')) {
+              return '/custom_logos/drawings/images_stripe/miscel·lania/white/pont-del-diable-w-stripe.webp';
+            }
+          }
           const map = {
             'dj-vader.webp': 'dj-vader-b-stripe.webp',
             'death-star2d2.webp': 'death-star2d2-b-stripe.webp',
+            'pont-del-diable.webp': 'pont-del-diable-b-stripe.webp',
           };
           const drawingFile = map[file];
           if (drawingFile) return `/custom_logos/drawings/images_stripe/miscel·lania/black/${drawingFile}`;
@@ -1823,6 +1963,54 @@ export default function FullWideSlideDemoHeader({
     humanInsideVariant,
     selectedItemByCollection,
   ]);
+
+  const preloadedSrcRef = useRef(new Set());
+  const preloadSrc = (src) => {
+    try {
+      if (!src || typeof src !== 'string') return;
+      const normalized = src.trim();
+      if (!normalized) return;
+      if (preloadedSrcRef.current.has(normalized)) return;
+      preloadedSrcRef.current.add(normalized);
+      const img = new Image();
+      img.decoding = 'async';
+      img.loading = 'eager';
+      img.src = encodeURI(normalized);
+    } catch {
+      // ignore
+    }
+  };
+
+  useEffect(() => {
+    if (!resolvedOverlaySrc) return;
+
+    preloadSrc(resolvedOverlaySrc);
+
+    const s = resolvedOverlaySrc.toLowerCase();
+    const isMulti = s.includes('/multi/') || s.includes('-multi-');
+    if (!isMulti) return;
+
+    // For multi overlays we sometimes swap light/dark per tile. Preload the sibling
+    // to avoid visible pop-in when the variant is 'color'.
+    if (s.includes('-multi-light-')) preloadSrc(resolvedOverlaySrc.replace(/-multi-light-/i, '-multi-dark-'));
+    if (s.includes('-multi-dark-')) preloadSrc(resolvedOverlaySrc.replace(/-multi-dark-/i, '-multi-light-'));
+  }, [resolvedOverlaySrc]);
+
+  useEffect(() => {
+    if (!import.meta.env.DEV) return;
+    try {
+      if (typeof window === 'undefined') return;
+      const prev = window.__HG_OVERLAY_DEBUG__ || {};
+      window.__HG_OVERLAY_DEBUG__ = {
+        ...prev,
+        resolvedOverlaySrc,
+        stripeOverlayOverrideActive,
+        overlaySrcFromUrl,
+      };
+    } catch {
+      // ignore
+    }
+  }, [resolvedOverlaySrc, stripeOverlayOverrideActive, overlaySrcFromUrl]);
 
   useEffect(() => {
     if (stripeOverlayOverrideActive) return;
@@ -1849,9 +2037,6 @@ export default function FullWideSlideDemoHeader({
     setActive((prev) => prev || 'first_contact');
   };
 
-  useEffect(() => {
-    setHumanInsideVariant((prev) => (prev === firstContactVariant ? prev : firstContactVariant));
-  }, [firstContactVariant]);
 
   const scrollSearchGridBy = (deltaPx) => {
     const el = searchGridScrollRef.current;
@@ -2652,9 +2837,9 @@ export default function FullWideSlideDemoHeader({
                           onFirstContactWhite={() => setFirstContactVariant('white')}
                           onFirstContactBlack={() => setFirstContactVariant('black')}
                           onFirstContactMulti={() => setFirstContactVariant('color')}
-                          onHumanWhite={() => setFirstContactVariant('white')}
-                          onHumanBlack={() => setFirstContactVariant('black')}
-                          onHumanMulti={() => setFirstContactVariant('color')}
+                          onHumanWhite={() => setHumanInsideVariant('white')}
+                          onHumanBlack={() => setHumanInsideVariant('black')}
+                          onHumanMulti={() => setHumanInsideVariant('color')}
                           onHumanPrev={() => setThinStartIndex((v) => v - 1)}
                           onHumanNext={() => setThinStartIndex((v) => v + 1)}
                           onSelectItem={
