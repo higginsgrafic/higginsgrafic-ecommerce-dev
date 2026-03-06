@@ -4,9 +4,6 @@ import { Menu, X, UserRound, ChevronDown, ChevronLeft, ChevronRight, Layers, Lay
 import { createPortal } from 'react-dom';
 import { motion } from 'framer-motion';
 import { getGildan5000Catalog } from '../utils/placeholders.js';
-import AdidasColorStripeButtons from './AdidasColorStripeButtons.jsx';
-import AdidasCatalogPanel from './AdidasCatalogPanel.jsx';
-import MegaStripeCatalogPanel from './MegaStripeCatalogPanel.jsx';
 import AdidasHumanInsideSlider from './AdidasHumanInsideSlider.jsx';
 
 const FIRST_CONTACT_MEDIA = {
@@ -454,19 +451,9 @@ export default function AdidasInspiredHeader({
   cartItemCount = 0,
   onCartClick,
   onUserClick,
-  forceStripeDebugHit = false,
-  ignoreStripeDebugFromUrl = false,
-  stripeItemLeftOffsetPxByIndex,
-  redistributeStripeBetweenFirstAndLast = false,
 }) {
   const navigate = useNavigate();
   const cartClickTimeoutRef = useRef(null);
-  const disableCatalogPanel =
-    typeof window !== 'undefined' && new URLSearchParams(window.location.search).has('noCatalogPanel');
-  const wsEnabled =
-    typeof window !== 'undefined' && import.meta.env.DEV && new URLSearchParams(window.location.search).has('ws');
-  const effectiveDisableCatalogPanel = disableCatalogPanel || wsEnabled;
-  const disableStripe = typeof window !== 'undefined' && new URLSearchParams(window.location.search).has('noStripe');
 
   const isManualLockEnabled = () => {
     try {
@@ -1003,33 +990,6 @@ export default function AdidasInspiredHeader({
                   />
                 ))}
               </div>
-
-              {disableStripe ? null : (
-                <MegaStripeCatalogPanel
-                  megaTileSize={megaTileSize}
-                  StripeButtonsComponent={AdidasColorStripeButtons}
-                  stripeProps={{
-                    selectedColorOrder,
-                    selectedColorSlug,
-                    onSelect: setSelectedColorSlug,
-                    colorLabelBySlug,
-                    colorButtonSrcBySlug,
-                    stripeV2: true,
-                    autoAlignLastToRight: true,
-                    lastTileExtraOffsetPx: 15,
-                    itemLeftOffsetPxByIndex: stripeItemLeftOffsetPxByIndex,
-                    redistributeBetweenFirstAndLast: redistributeStripeBetweenFirstAndLast,
-                    firstOffsetPx: 20,
-                    firstTileExtraOffsetPx: 25,
-                    lastOffsetPx: 63,
-                    cropFirstRightPx: 20,
-                    compressFactor: 0.79,
-                    forceDebugStripeHit: forceStripeDebugHit,
-                    ignoreUrlDebugStripeHit: ignoreStripeDebugFromUrl,
-                  }}
-                  CatalogPanelComponent={effectiveDisableCatalogPanel ? null : AdidasCatalogPanel}
-                />
-              )}
             </div>
           </div>
         ) : null}

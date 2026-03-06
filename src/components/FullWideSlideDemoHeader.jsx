@@ -5,15 +5,14 @@ import { createPortal } from 'react-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import { getGildan5000Catalog } from '../utils/placeholders.js';
 import { useProductContext } from '@/contexts/ProductContext';
+import MegaStripeCatalogPanel from './MegaStripeCatalogPanel.jsx';
+import AdidasColorStripeButtons from './AdidasColorStripeButtons.jsx';
 import {
   AUSTEN_QUOTES_ASSETS,
   resolveAustenQuoteAssetId,
   resolveAustenQuoteThumbFromPath,
   resolveAustenQuoteOriginalFromPath,
 } from '../utils/austenQuotesAssets.js';
-import AdidasColorStripeButtons from './AdidasColorStripeButtons.jsx';
-import AdidasCatalogPanel from './AdidasCatalogPanel.jsx';
-import MegaStripeCatalogPanel from './MegaStripeCatalogPanel.jsx';
 import FullWideSlideDemoHumanInsideSlider from './FullWideSlideDemoHumanInsideSlider.jsx';
 
 const FIRST_CONTACT_MEDIA = {
@@ -1438,6 +1437,9 @@ export default function FullWideSlideDemoHeader({
   const megaSliderIndex = Math.max(0, Math.min(MEGA_SLIDES_COUNT - 1, (megaPage || 1) - 1));
   const [active, setActive] = useState(() => {
     if (contained) return initialActiveId || 'first_contact';
+    if (typeof manualEnabledOverride === 'boolean') {
+      return manualEnabledOverride ? (initialActiveId || 'first_contact') : null;
+    }
     try {
       const p = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
       const fromUrl = p?.get('active') || p?.get('collection') || '';
@@ -1463,15 +1465,11 @@ export default function FullWideSlideDemoHeader({
     }
   }, []);
 
-  const forceStripeDebugHit =
-    typeof window !== 'undefined' && new URLSearchParams(window.location.search).has('debugStripeHit');
   const disableCatalogPanel =
     typeof window !== 'undefined' && new URLSearchParams(window.location.search).has('noCatalogPanel');
   const wsEnabled =
     typeof window !== 'undefined' && import.meta.env.DEV && new URLSearchParams(window.location.search).has('ws');
-  const effectiveForceStripeDebugHit = forceStripeDebugHit;
-  const effectiveDisableCatalogPanel = disableCatalogPanel;
-  const disableStripe = typeof window !== 'undefined' && new URLSearchParams(window.location.search).has('noStripe');
+  const effectiveDisableCatalogPanel = disableCatalogPanel || showCatalogPanel === false;
   const gridCalibFromUrl = typeof window !== 'undefined' && new URLSearchParams(window.location.search).has('gridCalib');
 
   const overlaySrcFromUrl = useMemo(() => {
@@ -2022,9 +2020,87 @@ export default function FullWideSlideDemoHeader({
     }
   }, [overlayStorageKey, resolvedOverlaySrc, stripeOverlayOverrideActive]);
   const [megaTileSize, setMegaTileSize] = useState(null);
+  const effectiveMegaTileSize = megaTileSize || 120;
   const [rootRemPx, setRootRemPx] = useState(16);
   const headerRef = useRef(null);
   const megaMenuRef = useRef(null);
+
+  useLayoutEffect(() => {
+    if (!active) return undefined;
+    const el = megaMenuRef.current;
+    if (!el) return undefined;
+
+    const GAP_PX = 12; // gap-x-3
+    const COLS = 9;
+
+    let rafId = null;
+    let retryCount = 0;
+    const MAX_RETRIES = 24;
+    let ro = null;
+
+    const recompute = () => {
+      const w = el.clientWidth;
+      if (!w) {
+        if (retryCount < MAX_RETRIES) {
+          retryCount += 1;
+          if (rafId != null) cancelAnimationFrame(rafId);
+          rafId = requestAnimationFrame(recompute);
+        }
+        return;
+      }
+      const cs = window.getComputedStyle(el);
+      const pl = parseFloat(cs.paddingLeft || '0') || 0;
+      const pr = parseFloat(cs.paddingRight || '0') || 0;
+      const contentW = w - pl - pr;
+      if (!contentW) return;
+      const totalGaps = (COLS - 1) * GAP_PX;
+      const colW = (contentW - totalGaps) / COLS;
+      if (!Number.isFinite(colW) || colW <= 0) return;
+      setMegaTileSize(colW);
+    };
+
+    recompute();
+    rafId = requestAnimationFrame(recompute);
+    window.addEventListener('resize', recompute);
+
+    if (typeof ResizeObserver !== 'undefined') {
+      ro = new ResizeObserver(() => recompute());
+      try {
+        ro.observe(el);
+      } catch {
+        ro = null;
+      }
+    }
+
+    return () => {
+      window.removeEventListener('resize', recompute);
+      if (rafId != null) cancelAnimationFrame(rafId);
+      try {
+        ro?.disconnect?.();
+      } catch {
+        // ignore
+      }
+    };
+  }, [active]);
+
+  useEffect(() => {
+    if (!import.meta.env.DEV) return;
+    try {
+      if (typeof window === 'undefined') return;
+      const prev = window.__HG_OVERLAY_DEBUG__ || {};
+      window.__HG_OVERLAY_DEBUG__ = {
+        ...prev,
+        fullWideSlide: {
+          ...(prev.fullWideSlide || {}),
+          active,
+          megaPage,
+          megaTileSize,
+        },
+      };
+    } catch {
+      // ignore
+    }
+  }, [active, megaPage, megaTileSize]);
   const mobileHumanScrollRef = useRef(null);
   const logoMarkRef = useRef(null);
   const accountButtonRef = useRef(null);
@@ -2474,36 +2550,46 @@ export default function FullWideSlideDemoHeader({
         setActive(null);
         setMobileOpen(false);
       }
-    };
-    window.addEventListener('keydown', onKeyDown);
-    return () => window.removeEventListener('keydown', onKeyDown);
-  }, [demoManualEnabled]);
 
-  useLayoutEffect(() => {
-    if (!active) return;
-    const el = megaMenuRef.current;
-    if (!el) return;
+  recompute();
+  const t1 = window.setTimeout(recompute, 50);
+  const t2 = window.setTimeout(recompute, 250);
+  window.addEventListener('resize', recompute);
 
-    const GAP_PX = 12;
-    const COLS = 9;
+  const ro = new ResizeObserver(() => recompute());
+  ro.observe(el);
 
-    const recompute = () => {
-      const w = el.clientWidth;
-      if (!w) return;
-      const cs = window.getComputedStyle(el);
-      const pl = parseFloat(cs.paddingLeft || '0') || 0;
-      const pr = parseFloat(cs.paddingRight || '0') || 0;
-      const contentW = w - pl - pr;
-      if (!contentW) return;
-      const totalGaps = (COLS - 1) * GAP_PX;
-      const colW = (contentW - totalGaps) / COLS;
-      if (!Number.isFinite(colW) || colW <= 0) return;
-      setMegaTileSize(colW);
-    };
+  return () => {
+    window.clearTimeout(t1);
+    window.clearTimeout(t2);
+    window.removeEventListener('resize', recompute);
+    ro.disconnect();
+  };
+}, [active]);
 
-    recompute();
+useEffect(() => {
+  if (!active) return;
+  if (gildan5000Catalog) return;
+  let cancelled = false;
+  getGildan5000Catalog()
+    .then((data) => {
+      if (cancelled) return;
+      setGildan5000Catalog(data);
+    })
+    .catch(() => {
+      if (cancelled) return;
+      setGildan5000Catalog({ selected: [], selectedSlugs: new Set(), getPlaceholderSrc: () => null });
     window.addEventListener('resize', recompute);
-    return () => window.removeEventListener('resize', recompute);
+
+    const ro = new ResizeObserver(() => recompute());
+    ro.observe(el);
+
+    return () => {
+      window.clearTimeout(t1);
+      window.clearTimeout(t2);
+      window.removeEventListener('resize', recompute);
+      ro.disconnect();
+    };
   }, [active]);
 
   useEffect(() => {
@@ -2535,12 +2621,16 @@ export default function FullWideSlideDemoHeader({
   }, [active, gildan5000Catalog]);
 
   useEffect(() => {
+    if (typeof manualEnabledOverride === 'boolean') {
+      setActive(manualEnabledOverride ? (initialActiveId || 'first_contact') : null);
+      return;
+    }
     if (contained) {
       setActive(initialActiveId || 'first_contact');
       return;
     }
     setActive(demoManualEnabled ? 'first_contact' : null);
-  }, [contained, demoManualEnabled, initialActiveId]);
+  }, [contained, demoManualEnabled, initialActiveId, manualEnabledOverride]);
 
   useEffect(() => {
     if (!active) {
@@ -2657,7 +2747,7 @@ export default function FullWideSlideDemoHeader({
 
           <div
             className="ml-auto grid grid-cols-3 items-center"
-            style={{ width: megaTileSize ? `${Math.round(megaTileSize)}px` : undefined }}
+            style={{ width: megaTileSize ? `${Math.round(megaTileSize)}px` : `${Math.round(effectiveMegaTileSize)}px` }}
             data-icons-wrap="true"
           >
             <div className="justify-self-start">
@@ -2794,16 +2884,16 @@ export default function FullWideSlideDemoHeader({
         }}
       >
         {active ? (
-          <div className={`hidden lg:block border-b border-border bg-background ${megaPage === 1 ? 'overflow-x-visible' : 'overflow-x-hidden'}`}>
+          <div className={`relative z-[10000] block border-b border-border bg-background ${megaPage === 1 ? 'overflow-x-visible' : 'overflow-x-hidden'}`}>
             <div
               ref={megaMenuRef}
               className={`mx-auto max-w-[1400px] px-4 sm:px-6 lg:px-10 py-8 ${megaPage === 1 ? 'overflow-x-visible' : 'overflow-x-hidden'}`}
             >
               <div
                 className={megaPage === 1 ? 'overflow-y-visible' : 'overflow-x-hidden overflow-y-visible'}
-                style={megaTileSize
+                style={effectiveMegaTileSize
                   ? {
-                      height: `${Math.round(megaTileSize * 2 + 37)}px`,
+                      height: `${Math.round(effectiveMegaTileSize * 2 + 37)}px`,
                       marginLeft: '0px',
                       paddingLeft: '0px',
                       width: '100%',
@@ -2821,6 +2911,24 @@ export default function FullWideSlideDemoHeader({
                   }}
                 >
                   <div className="h-full w-full shrink-0" style={{ width: `${100 / MEGA_SLIDES_COUNT}%` }}>
+                    {showStripe ? (
+                      <MegaStripeCatalogPanel
+                        megaTileSize={effectiveMegaTileSize}
+                        StripeButtonsComponent={AdidasColorStripeButtons}
+                        stripeKey={active}
+                        stripeProps={{
+                          selectedColorOrder,
+                          selectedColorSlug,
+                          onSelect: setSelectedColorSlug,
+                          colorLabelBySlug,
+                          colorButtonSrcBySlug,
+                          stripeV4: true,
+                          allowStripeV4UrlParams: true,
+                          stripeV4Defaults: { v2S: 1.25, v2L: 162, v2R: 9, v2PX: 0, v2VL: 50, v2VR: 0 },
+                          overlaySrc: (stripeOverlayOverrideActive ? overlaySrcFromUrl : null) || resolvedOverlaySrc,
+                        }}
+                      />
+                    ) : null}
                     <div className="grid grid-cols-1 gap-10">
                       {(resolvedMega[active] || []).map((col, idx) => (
                         <MegaColumn
@@ -2854,41 +2962,6 @@ export default function FullWideSlideDemoHeader({
                         />
                       ))}
                     </div>
-
-                    {disableStripe ? null : (
-                      <MegaStripeCatalogPanel
-                        megaTileSize={megaTileSize}
-                        StripeButtonsComponent={AdidasColorStripeButtons}
-                        stripeKey={active}
-                        stripeProps={{
-                          selectedColorOrder,
-                          selectedColorSlug,
-                          onSelect: setSelectedColorSlug,
-                          colorLabelBySlug,
-                          colorButtonSrcBySlug,
-                          stripeV2: true,
-                          allowStripeV2UrlParams: true,
-                          forceStripeV3: true,
-                          stripeV2Defaults: { v2S: 1.25, v2L: 162, v2R: 9, v2PX: 0, v2VL: 50, v2VR: 0 },
-                          placeholderCount: 14,
-                          distribution: 'anchored-even',
-                          autoAlignLastToRight: true,
-                          lastTileExtraOffsetPx: 15,
-                          overlaySrc: (stripeOverlayOverrideActive ? overlaySrcFromUrl : null) || resolvedOverlaySrc,
-                          overlayClassName: undefined,
-                          itemLeftOffsetPxByIndex: stripeItemLeftOffsetPxByIndex,
-                          redistributeBetweenFirstAndLast: redistributeStripeBetweenFirstAndLast,
-                          firstOffsetPx: 20,
-                          firstTileExtraOffsetPx: 25,
-                          lastOffsetPx: 63,
-                          cropFirstRightPx: 20,
-                          compressFactor: 0.79,
-                          forceDebugStripeHit: effectiveForceStripeDebugHit,
-                          ignoreUrlDebugStripeHit: ignoreStripeDebugFromUrl,
-                        }}
-                        CatalogPanelComponent={effectiveDisableCatalogPanel ? null : AdidasCatalogPanel}
-                      />
-                    )}
                   </div>
 
                   <div className="h-full w-full shrink-0" style={{ width: `${100 / MEGA_SLIDES_COUNT}%` }}>

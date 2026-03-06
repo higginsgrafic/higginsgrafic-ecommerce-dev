@@ -154,6 +154,7 @@ html, body { scrollbar-width: none; }
         onUserClick={() => {
           navigate('/profile');
         }}
+        manualEnabledOverride
         ignoreStripeDebugFromUrl
         navItems={resolvedNavItems}
         megaConfig={resolvedMegaConfig}
