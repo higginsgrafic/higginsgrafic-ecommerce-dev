@@ -6528,6 +6528,10 @@ export default function AdidasColorStripeButtons({
                       const ds = Array.isArray(stripeV4HitTilePathDs) ? stripeV4HitTilePathDs.slice(0, 14) : [];
                       if (!ds.length || !stripeV4HitPathD) return null;
 
+                      const unionMaskUrl = v4UnionMaskDilate
+                        ? `url(#${stripeV4OverlayClipPathId}-unionmask)`
+                        : '';
+
                       const basePitch = stripeV4HitStepX;
                       const maskPitch = (Number.isFinite(v4MaskPitchXParam) && v4MaskPitchXParam > 0) ? v4MaskPitchXParam : basePitch;
                       const maskX0 = (Number.isFinite(v4MaskX0Param) ? v4MaskX0Param : 0);
@@ -6579,7 +6583,32 @@ export default function AdidasColorStripeButtons({
                         : unionBase;
                       const union = unionAdjustTf ? <g transform={unionAdjustTf}>{unionAligned}</g> : unionAligned;
 
+                      const unionFill = unionMaskUrl ? (
+                        <rect
+                          x={-1000}
+                          y={-1000}
+                          width={stripeV4SvgW + 2000}
+                          height={stripeV4SvgH + 2000}
+                          fill="rgba(217, 70, 239, 0.12)"
+                          mask={unionMaskUrl}
+                          pointerEvents="none"
+                        />
+                      ) : null;
+
                       const tiles = ds.map((d, idx) => {
+                        const tileMaskUrl = `url(#${stripeV4OverlayClipPathId}-tile-${idx})`;
+                        const tileFill = (
+                          <rect
+                            key={`v4-clip-debug-tile-fill-${idx}`}
+                            x={-1000}
+                            y={-1000}
+                            width={stripeV4SvgW + 2000}
+                            height={stripeV4SvgH + 2000}
+                            fill="rgba(34, 211, 238, 0.12)"
+                            mask={tileMaskUrl}
+                            pointerEvents="none"
+                          />
+                        );
                         const tile = (
                           <path
                             key={`v4-clip-debug-tile-${idx}`}
@@ -6592,10 +6621,20 @@ export default function AdidasColorStripeButtons({
                             pointerEvents="none"
                           />
                         );
-                        return unionAdjustTf ? <g key={`v4-clip-debug-tile-wrap-${idx}`} transform={unionAdjustTf}>{tile}</g> : tile;
+
+                        const outlined = unionAdjustTf
+                          ? <g key={`v4-clip-debug-tile-wrap-${idx}`} transform={unionAdjustTf}>{tile}</g>
+                          : tile;
+
+                        return (
+                          <g key={`v4-clip-debug-tile-pack-${idx}`} pointerEvents="none">
+                            {tileFill}
+                            {outlined}
+                          </g>
+                        );
                       });
 
-                      return <g pointerEvents="none">{union}{tiles}</g>;
+                      return <g pointerEvents="none">{unionFill}{union}{tiles}</g>;
                     } catch {
                       return null;
                     }
