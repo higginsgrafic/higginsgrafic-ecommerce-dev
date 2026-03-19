@@ -6314,6 +6314,7 @@ export default function AdidasColorStripeButtons({
                         }
                       };
                       const unionDilateFilterId = `${stripeV4OverlayClipPathId}-dilate`;
+                      const unionMaskId = `${stripeV4OverlayClipPathId}-unionmask`;
 
                       const makeTf = (idx) => {
                         const parts = [];
@@ -6339,6 +6340,40 @@ export default function AdidasColorStripeButtons({
                             >
                               <feMorphology in="SourceGraphic" operator="dilate" radius={v4UnionMaskDilate} />
                             </filter>
+                          ) : null}
+
+                          {v4UnionMaskDilate ? (
+                            <mask
+                              id={unionMaskId}
+                              maskUnits="userSpaceOnUse"
+                              maskContentUnits="userSpaceOnUse"
+                              x={-1000}
+                              y={-1000}
+                              width={stripeV4SvgW + 2000}
+                              height={stripeV4SvgH + 2000}
+                            >
+                              <rect x={-1000} y={-1000} width={stripeV4SvgW + 2000} height={stripeV4SvgH + 2000} fill="black" />
+                              {(() => {
+                                const base = (
+                                  <path
+                                    d={stripeV4HitPathD}
+                                    fill="white"
+                                    fillRule={v4UnionMaskRule}
+                                    clipRule={v4UnionMaskRule}
+                                    filter={`url(#${unionDilateFilterId})`}
+                                  />
+                                );
+
+                                const inner = <g>{base}</g>;
+                                const aligned = applyAlign
+                                  ? (stripeV4HitAlignTopDy
+                                      ? <g transform={`translate(0 ${stripeV4HitAlignTopDy})`}>{inner}</g>
+                                      : inner)
+                                  : inner;
+
+                                return unionAdjustTf ? <g transform={unionAdjustTf}>{aligned}</g> : aligned;
+                              })()}
+                            </mask>
                           ) : null}
 
                           <clipPath
@@ -6391,6 +6426,7 @@ export default function AdidasColorStripeButtons({
                                     fill="white"
                                     fillRule={v4UnionMaskRule}
                                     clipRule={v4UnionMaskRule}
+                                    filter={v4UnionMaskDilate ? `url(#${unionDilateFilterId})` : undefined}
                                   />
                                 );
                                 return unionAdjustTf ? <g transform={unionAdjustTf}>{base}</g> : base;
@@ -6418,6 +6454,7 @@ export default function AdidasColorStripeButtons({
                                     fill="black"
                                     fillRule={v4UnionMaskRule}
                                     clipRule={v4UnionMaskRule}
+                                    filter={v4UnionMaskDilate ? `url(#${unionDilateFilterId})` : undefined}
                                   />
                                 );
                                 return unionAdjustTf ? <g transform={unionAdjustTf}>{base}</g> : base;
@@ -7157,6 +7194,10 @@ export default function AdidasColorStripeButtons({
                             ? `url(#${stripeV4OverlayClipPathId}-clip)`
                             : undefined;
 
+                          const unionMaskUrl = (stripeV4OverlayMaskReady && v4UnionMaskDilate)
+                            ? `url(#${stripeV4OverlayClipPathId}-unionmask)`
+                            : undefined;
+
                           const maskInvUrl = stripeV4OverlayMaskReady
                             ? `url(#${stripeV4OverlayClipPathId}-tileinv-${idx})`
                             : undefined;
@@ -7272,9 +7313,16 @@ export default function AdidasColorStripeButtons({
                               ? <g clipPath={tileClipUrl}>{baseImgInner}</g>
                               : (rectClipUrl ? <g clipPath={rectClipUrl}>{rectTileClip}{baseImgInner}</g> : baseImgInner));
 
-                          const baseImgClipped = (stripeOverlayClip && !v4UseTileClipForFullWidth && !v4UseMaskForFullWidth && unionClipUrl && !(debugNoV4OverlayMask || debugV4LayersOnly === 'raw' || debugV4LayersOnly === 'masked'))
-                            ? <g clipPath={unionClipUrl}>{baseImg}</g>
-                            : baseImg;
+                          const baseImgClipped = (() => {
+                            if (!stripeOverlayClip) return baseImg;
+                            if (v4UseTileClipForFullWidth || v4UseMaskForFullWidth) return baseImg;
+                            if (debugNoV4OverlayMask || debugV4LayersOnly === 'raw' || debugV4LayersOnly === 'masked') return baseImg;
+
+                            // Prefer mask-based union clip when dilate is enabled; filters inside clipPath are unreliable.
+                            if (unionMaskUrl) return <g mask={unionMaskUrl}>{baseImg}</g>;
+                            if (unionClipUrl) return <g clipPath={unionClipUrl}>{baseImg}</g>;
+                            return baseImg;
+                          })();
 
                           const baseBounds = (debugV4ImgBoundsEffective || debugV4LayersOnly === 'bounds') ? (
                             <rect
