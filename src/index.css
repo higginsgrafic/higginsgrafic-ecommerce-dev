@@ -127,9 +127,13 @@ body.cart-open {
   overflow: hidden !important;
 }
 
+.debug-containers {
+  --debug-outline-scale: 0.25;
+}
+
 .debug-containers * {
-  outline: 1.25px solid rgba(255, 0, 0, 0.65) !important;
-  outline-offset: -0.75px;
+  outline: calc(1.25px * var(--debug-outline-scale, 1)) solid rgba(255, 0, 0, 0.65) !important;
+  outline-offset: calc(-0.75px * var(--debug-outline-scale, 1));
   cursor: pointer !important;
 }
 
@@ -157,45 +161,45 @@ body.cart-open {
 }
 
 .debug-containers *.debug-selected {
-  outline: 2.5px solid rgba(0, 255, 0, 0.85) !important;
+  outline: calc(2.5px * var(--debug-outline-scale, 1)) solid rgba(0, 255, 0, 0.85) !important;
   outline-offset: 0px;
   background-color: rgba(0, 255, 0, 0.03) !important;
-  box-shadow: inset 0 0 0 2px rgba(0, 255, 0, 0.95) !important;
+  box-shadow: inset 0 0 0 calc(2px * var(--debug-outline-scale, 1)) rgba(0, 255, 0, 0.95) !important;
 }
 
 .debug-selected {
-  outline: 2.5px solid rgba(0, 255, 0, 0.85) !important;
+  outline: calc(2.5px * var(--debug-outline-scale, 1)) solid rgba(0, 255, 0, 0.85) !important;
   outline-offset: 0px;
   background-color: rgba(0, 255, 0, 0.03) !important;
-  box-shadow: inset 0 0 0 2px rgba(0, 255, 0, 0.95) !important;
+  box-shadow: inset 0 0 0 calc(2px * var(--debug-outline-scale, 1)) rgba(0, 255, 0, 0.95) !important;
 }
 
 .debug-containers > * {
-  outline: 2px solid rgba(255, 0, 0, 0.7) !important;
+  outline: calc(2px * var(--debug-outline-scale, 1)) solid rgba(255, 0, 0, 0.7) !important;
 }
 
 .debug-containers header {
-  outline: 2px solid rgba(0, 150, 255, 0.8) !important;
+  outline: calc(2px * var(--debug-outline-scale, 1)) solid rgba(0, 150, 255, 0.8) !important;
 }
 
 .debug-containers main {
-  outline: 2px solid rgba(0, 255, 0, 0.8) !important;
+  outline: calc(2px * var(--debug-outline-scale, 1)) solid rgba(0, 255, 0, 0.8) !important;
 }
 
 .debug-containers footer {
-  outline: 2px solid rgba(255, 140, 0, 0.8) !important;
+  outline: calc(2px * var(--debug-outline-scale, 1)) solid rgba(255, 140, 0, 0.8) !important;
 }
 
 .debug-containers [class*="container"] {
-  outline: 1.25px solid rgba(255, 0, 255, 0.6) !important;
+  outline: calc(1.25px * var(--debug-outline-scale, 1)) solid rgba(255, 0, 255, 0.6) !important;
 }
 
 .debug-containers [class*="grid"] {
-  outline: 1.25px solid rgba(0, 255, 255, 0.6) !important;
+  outline: calc(1.25px * var(--debug-outline-scale, 1)) solid rgba(0, 255, 255, 0.6) !important;
 }
 
 .debug-containers [class*="flex"] {
-  outline: 1.25px solid rgba(180, 83, 9, 0.7) !important;
+  outline: calc(1.25px * var(--debug-outline-scale, 1)) solid rgba(180, 83, 9, 0.7) !important;
 }
 
 .debug-indicator {

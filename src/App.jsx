@@ -472,7 +472,10 @@ function App() {
   const isFullWideSlideDemoRoute = isFullWideSlideRoute;
   const isAdidasStyleLayoutRoute = isAdidasDemoRoute || isFullWideSlideDemoRoute;
   const isDevDemoRoute = isNikeDemoRoute || isAdidasDemoRoute || isFullWideSlideDemoRoute;
-  const layoutInspectorActive = (isAdmin || isDevDemoRoute) && location.pathname !== '/ec-preview' && location.pathname !== '/ec-preview-lite' && layoutInspectorEnabled;
+  const layoutInspectorActive = (isAdmin || isDevDemoRoute)
+    && location.pathname !== '/ec-preview'
+    && location.pathname !== '/ec-preview-lite'
+    && layoutInspectorEnabled;
 
   useEffect(() => {
     if (layoutInspectorActive) return;
@@ -1102,12 +1105,7 @@ function App() {
           style={!isFullScreenRoute ? (
             isAdminRoute
               ? { paddingTop: adminRouteOffset, paddingLeft: `${rulerInset}px`, '--appHeaderOffset': adminRouteOffset, '--rulerInset': `${rulerInset}px` }
-              : {
-                  paddingTop: isAdidasStyleLayoutRoute ? adidasHeaderOffset : appHeaderOffset,
-                  paddingLeft: `${rulerInset}px`,
-                  '--appHeaderOffset': isAdidasStyleLayoutRoute ? adidasHeaderOffset : appHeaderOffset,
-                  '--rulerInset': `${rulerInset}px`,
-                }
+              : { paddingTop: isAdidasStyleLayoutRoute ? adidasHeaderOffset : appHeaderOffset, paddingLeft: `${rulerInset}px`, '--appHeaderOffset': isAdidasStyleLayoutRoute ? adidasHeaderOffset : appHeaderOffset, '--rulerInset': `${rulerInset}px` }
           ) : {}}
           tabIndex={-1}
         >

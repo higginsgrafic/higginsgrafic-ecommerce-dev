@@ -58,7 +58,40 @@ html, body { scrollbar-width: none; }
   useEffect(() => {
     if (typeof window === 'undefined' || typeof document === 'undefined') return undefined;
     const params = new URLSearchParams(window.location.search);
-    if (!params.has('debugOverflow')) return undefined;
+    if (!params.has('debugOverflow')) {
+      try {
+        const marked = Array.from(document.querySelectorAll('[data-debug-overflow]'));
+        marked.forEach((el) => {
+          try {
+            el.removeAttribute('data-debug-overflow');
+            if (el?.style) {
+              el.style.outline = '';
+              el.style.outlineOffset = '';
+            }
+          } catch {
+            // ignore
+          }
+        });
+
+        const nodes = Array.from(document.querySelectorAll('body *'));
+        nodes.forEach((el) => {
+          try {
+            if (!el?.style) return;
+            const o = (el.style.outline || '').toString();
+            if (!o) return;
+            if (o.includes('rgba(255,0,0,0.65)')) {
+              el.style.outline = '';
+              el.style.outlineOffset = '';
+            }
+          } catch {
+            // ignore
+          }
+        });
+      } catch {
+        // ignore
+      }
+      return undefined;
+    }
 
     const pick = (el) => {
       if (!el || el.nodeType !== 1) return null;
@@ -99,6 +132,38 @@ html, body { scrollbar-width: none; }
 
     const run = () => {
       try {
+        try {
+          const prev = Array.from(document.querySelectorAll('[data-debug-overflow]'));
+          prev.forEach((el) => {
+            try {
+              el.removeAttribute('data-debug-overflow');
+              if (el?.style) {
+                el.style.outline = '';
+                el.style.outlineOffset = '';
+              }
+            } catch {
+              // ignore
+            }
+          });
+
+          const nodes = Array.from(document.querySelectorAll('body *'));
+          nodes.forEach((el) => {
+            try {
+              if (!el?.style) return;
+              const o = (el.style.outline || '').toString();
+              if (!o) return;
+              if (o.includes('rgba(255,0,0,0.65)')) {
+                el.style.outline = '';
+                el.style.outlineOffset = '';
+              }
+            } catch {
+              // ignore
+            }
+          });
+        } catch {
+          // ignore
+        }
+
         const nodes = Array.from(document.querySelectorAll('body *'));
         const matches = nodes.map(pick).filter(Boolean);
 

@@ -1,12 +1,11 @@
-import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { Menu, X, UserRound, ChevronDown, ChevronLeft, ChevronRight } from 'lucide-react';
-import { createPortal } from 'react-dom';
-import { AnimatePresence, motion } from 'framer-motion';
-import { getGildan5000Catalog } from '../utils/placeholders.js';
+import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import * as ReactDOM from 'react-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { ChevronDown, ChevronLeft, ChevronRight, Menu, UserRound, X } from 'lucide-react';
 import { useProductContext } from '@/contexts/ProductContext';
 import MegaStripeCatalogPanel from './MegaStripeCatalogPanel.jsx';
 import AdidasColorStripeButtons from './AdidasColorStripeButtons.jsx';
+import { getGildan5000Catalog } from '../utils/placeholders.js';
 import {
   AUSTEN_QUOTES_ASSETS,
   resolveAustenQuoteAssetId,
@@ -260,16 +259,15 @@ function FirstContactDibuix09Buttons({
   onNextPointerDown,
   onNextPointerUp,
 }) {
-  const hasPrevPointerHandlers = Boolean(onPrevPointerDown || onPrevPointerUp);
-  const hasNextPointerHandlers = Boolean(onNextPointerDown || onNextPointerUp);
+  const hasPrevPointerHandlers = typeof onPrevPointerDown === 'function' || typeof onPrevPointerUp === 'function';
+  const hasNextPointerHandlers = typeof onNextPointerDown === 'function' || typeof onNextPointerUp === 'function';
 
   return (
     <div className="relative mt-2 aspect-square w-full">
-      <div className="absolute inset-0 overflow-hidden rounded-md bg-muted">
+      <div className="absolute inset-0 overflow-hidden rounded-md bg-muted" id="stripe-guide-right-anchor">
         <button
           type="button"
           aria-label="Anterior"
-          id="stripe-guide-right-anchor"
           onClick={hasPrevPointerHandlers ? undefined : onPrev}
           onPointerDown={onPrevPointerDown}
           onPointerUp={onPrevPointerUp}
@@ -638,7 +636,10 @@ function MegaColumn({
     return value
       .trim()
       .replace(/[\u2010\u2011\u2012\u2013\u2014\u2212]/g, '-')
-      .replace(/\s+/g, ' ');
+      .replace(/\s+/g, ' ')
+      .replace(/[^a-z0-9-]+/g, '-')
+      .replace(/-+/g, '-')
+      .replace(/^-+|-+$/g, '');
   };
 
   const resolveSrc = (it) => {
@@ -752,6 +753,11 @@ function MegaColumn({
       if (cid === 'austen' && raw.includes('/austen/quotes/')) {
         return resolveAustenQuoteThumbFromPath(raw, 'grid') || ensureThumbSuffix(raw, 'grid');
       }
+      if (cid === 'austen' && raw.includes('/austen/keep_calm/')) {
+        const file = raw.split('/').pop() || '';
+        const lower = file.toLowerCase();
+        if (lower === 'keep-calm-black.webp') return '/custom_logos/drawings/images_grid/austen/keep_calm/keep-calm-b-grid.webp';
+      }
       return ensureThumbSuffix(raw, 'grid');
     }
 
@@ -815,7 +821,9 @@ function MegaColumn({
           return resolveAustenQuoteThumbFromPath(raw, 'grid') || null;
         }
         if (raw.includes('/austen/keep_calm/')) {
-          return ensureThumbSuffix(`/custom_logos/drawings/images_grid/austen/keep_calm/${baseFile}`, 'grid');
+          const lower = baseFile.toLowerCase();
+          const mapped = lower === 'keep-calm-black.webp' ? 'keep-calm-b.webp' : baseFile;
+          return ensureThumbSuffix(`/custom_logos/drawings/images_grid/austen/keep_calm/${mapped}`, 'grid');
         }
         if (raw.includes('/austen/looking_for_my_darcy/')) {
           return ensureThumbSuffix(`/custom_logos/drawings/images_grid/austen/looking_for_my_darcy/${baseFile}`, 'grid');
@@ -851,8 +859,8 @@ function MegaColumn({
         'iron-cube-68.webp': 'iron-cube.webp',
         'iron-cube-08-iron-kong.webp': 'iron-kong.webp',
         'cube-3-p0.webp': '3cube-p0.webp',
-        'cyber-cube.webp': 'cybercube.webp',
-        'cylon-cube-03.webp': 'cylon-cube.webp',
+        cybercube: 'cyber-cube.webp',
+        'cylon-cube.webp': 'cylon-cube-03.webp',
       };
       const file = map[raw.toLowerCase()] || raw;
       return ensureThumbSuffix(`/custom_logos/drawings/images_grid/cube/${file}`, 'grid');
@@ -889,7 +897,7 @@ function MegaColumn({
         robocop: 'robocop.webp',
         terminator: 'terminator.webp',
         maschinenmensch: 'maschinenmensch.webp',
-        'robby the robot': 'robby-the-robot.webp',
+        'robby the robot': 'robbie-the-robot.webp',
         'robbie the robot': 'robby-the-robot.webp',
       };
       const file = map[key];
@@ -1048,7 +1056,7 @@ function MegaColumn({
         terminator: 'terminator.webp',
         maschinenmensch: 'maschinenmensch.webp',
         'robby the robot': 'robbie-the-robot.webp',
-        'robbie the robot': 'robbie-the-robot.webp',
+        'robbie the robot': 'robby-the-robot.webp',
       };
 
       const file = labelMap[key] || (raw.split('/').pop() || '');
@@ -1313,7 +1321,7 @@ function MegaColumn({
     </div>
   );
 }
- 
+
 export default function FullWideSlideDemoHeader({
   cartItemCount,
   onCartClick,
@@ -1330,25 +1338,13 @@ export default function FullWideSlideDemoHeader({
   showStripe = true,
   showCatalogPanel = true,
 }) {
-  useEffect(() => {
-    if (!import.meta.env.DEV) return;
-    try {
-      if (typeof window !== 'undefined') {
-        window.__MEGA_BUILD_MARKER__ = 'FullWideSlideDemoHeader 2026-02-14T02:36';
-      }
-    } catch {
-      // ignore
-    }
-    // eslint-disable-next-line no-console
-    console.error('[MEGA build marker]', 'FullWideSlideDemoHeader 2026-02-14T02:36');
-  }, []);
-
+  const location = useLocation();
   const navigate = useNavigate();
   const { products: contextProducts } = useProductContext();
   const cartClickTimeoutRef = useRef(null);
   const accountClickTimeoutRef = useRef(null);
   const dblClickDelayMs = 240;
-  const MEGA_SLIDES_COUNT = 4;
+  const MEGA_SLIDES_COUNT = 1;
   const [searchQuery, setSearchQuery] = useState('');
   const searchResults = useMemo(() => {
     const products = Array.isArray(contextProducts) ? contextProducts : [];
@@ -1430,24 +1426,29 @@ export default function FullWideSlideDemoHeader({
   );
   const [searchGridScale, setSearchGridScale] = useState(1);
   const [searchCaretVisible, setSearchCaretVisible] = useState(true);
-  const [megaPage, setMegaPage] = useState(1);
+  const megaPage = 1;
   const [firstContactSelectedItem, setFirstContactSelectedItem] = useState(null);
   const [humanInsideSelectedItem, setHumanInsideSelectedItem] = useState(null);
   const [selectedItemByCollection, setSelectedItemByCollection] = useState({});
-  const megaSliderIndex = Math.max(0, Math.min(MEGA_SLIDES_COUNT - 1, (megaPage || 1) - 1));
+  const megaSliderIndex = 0;
   const [active, setActive] = useState(() => {
-    if (contained) return initialActiveId || 'first_contact';
-    if (typeof manualEnabledOverride === 'boolean') {
-      return manualEnabledOverride ? (initialActiveId || 'first_contact') : null;
-    }
     try {
-      const p = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
-      const fromUrl = p?.get('active') || p?.get('collection') || '';
+      const p = new URLSearchParams(location.search);
+      const fromUrl = p.get('active') || p.get('collection') || '';
       const next = typeof fromUrl === 'string' ? fromUrl.trim() : '';
       const allowed = new Set(['first_contact', 'the_human_inside', 'austen', 'cube', 'outcasted']);
       if (next && allowed.has(next)) return next;
+
+      if (contained) return initialActiveId || 'first_contact';
+      if (typeof manualEnabledOverride === 'boolean') {
+        return manualEnabledOverride ? (initialActiveId || 'first_contact') : null;
+      }
       return window.localStorage.getItem('FULL_WIDE_SLIDE_DEMO_MANUAL') === '1' ? 'first_contact' : null;
     } catch {
+      if (contained) return initialActiveId || 'first_contact';
+      if (typeof manualEnabledOverride === 'boolean') {
+        return manualEnabledOverride ? (initialActiveId || 'first_contact') : null;
+      }
       return null;
     }
   });
@@ -1455,7 +1456,7 @@ export default function FullWideSlideDemoHeader({
   useEffect(() => {
     try {
       if (typeof window === 'undefined') return;
-      const p = new URLSearchParams(window.location.search);
+      const p = new URLSearchParams(location.search);
       const fromUrl = p.get('active') || p.get('collection') || '';
       const next = typeof fromUrl === 'string' ? fromUrl.trim() : '';
       const allowed = new Set(['first_contact', 'the_human_inside', 'austen', 'cube', 'outcasted']);
@@ -1463,7 +1464,7 @@ export default function FullWideSlideDemoHeader({
     } catch {
       // ignore
     }
-  }, []);
+  }, [location.search]);
 
   const disableCatalogPanel =
     typeof window !== 'undefined' && new URLSearchParams(window.location.search).has('noCatalogPanel');
@@ -1475,15 +1476,17 @@ export default function FullWideSlideDemoHeader({
   const overlaySrcFromUrl = useMemo(() => {
     try {
       if (typeof window === 'undefined') return null;
-      const p = new URLSearchParams(window.location.search);
+      const p = new URLSearchParams(location?.search || window.location.search);
       const raw = p.get('stripeOverlay');
       if (typeof raw !== 'string') return null;
-      const v = raw.trim();
+      const v = raw
+        .trim()
+        .replace(/[\s,;]+$/g, '');
       return v ? v : null;
     } catch {
       return null;
     }
-  }, []);
+  }, [location?.search]);
 
   const overlayStorageKey = useMemo(() => {
     const k = (active || '').toString();
@@ -1501,11 +1504,33 @@ export default function FullWideSlideDemoHeader({
       return false;
     }
   });
-  const [firstContactVariant, setFirstContactVariant] = useState('black');
-  const [humanInsideVariant, setHumanInsideVariant] = useState('black');
+  const readStripeVariantFromUrl = () => {
+    try {
+      const p = new URLSearchParams(location.search);
+      const raw = (p.get('stripeVariant') || '').toString().trim().toLowerCase();
+      if (raw === 'white' || raw === 'black' || raw === 'color') return raw;
+      return '';
+    } catch {
+      return '';
+    }
+  };
+
+  const [firstContactVariant, setFirstContactVariant] = useState(() => readStripeVariantFromUrl() || 'black');
+  const [humanInsideVariant, setHumanInsideVariant] = useState(() => readStripeVariantFromUrl() || 'black');
   const [selectedColorSlug, setSelectedColorSlug] = useState('white');
   const [thinStartIndex, setThinStartIndex] = useState(0);
   const [gildan5000Catalog, setGildan5000Catalog] = useState(null);
+
+  useEffect(() => {
+    try {
+      const v = readStripeVariantFromUrl();
+      if (!v) return;
+      setFirstContactVariant(v);
+      setHumanInsideVariant(v);
+    } catch {
+      // ignore
+    }
+  }, [location.search]);
 
   useEffect(() => {
     if (!import.meta.env.DEV) return;
@@ -1567,9 +1592,12 @@ export default function FullWideSlideDemoHeader({
   };
 
   useEffect(() => {
-    if (overlaySrcFromUrl) return;
+    if (overlaySrcFromUrl) {
+      setStripeOverlayOverrideActive(true);
+      return;
+    }
     setStripeOverlayOverrideActive(false);
-  }, [active, overlaySrcFromUrl]);
+  }, [overlaySrcFromUrl]);
 
   const resolvedOverlaySrc = useMemo(() => {
     const normalizeKeyLocal = (value) => {
@@ -1748,6 +1776,29 @@ export default function FullWideSlideDemoHeader({
 
       // Path-based collections (e.g. outcasted black/xxx.webp) can be resolved directly.
       if (isPathItem(key)) {
+        if (
+          active === 'austen'
+          && typeof key === 'string'
+          && key.startsWith('/custom_logos/drawings/images_grid/austen/quotes/')
+        ) {
+          const mapped = resolveAustenQuoteThumbFromPath(key, 'stripe');
+          if (mapped) return mapped;
+
+          // Fallback for the common `...-b-grid.webp` filenames.
+          // Convert GRID quotes to the canonical STRIPE+BLACK folder.
+          const [base, q] = key.split('?');
+          const outBase = base
+            .replace('/custom_logos/drawings/images_grid/austen/quotes/', '/custom_logos/drawings/images_stripe/austen/quotes/black/')
+            .replace(/-grid(?=\.(webp|png|jpe?g)$)/i, '');
+          const out = (() => {
+            const m = outBase.match(/^(.*)\.(webp|png|jpe?g)$/i);
+            if (!m) return outBase;
+            const prefix = m[1].replace(/-(grid|stripe)$/i, '');
+            const ext = m[2];
+            return prefix.toLowerCase().endsWith('-stripe') ? `${prefix}.${ext}` : `${prefix}-stripe.${ext}`;
+          })();
+          return q ? `${out}?${q}` : out;
+        }
         if (active === 'cube' && typeof key === 'string' && key.startsWith('/custom_logos/drawings/images_grid/cube/')) {
           const file = key.split('/').pop() || '';
           const fileNormalized = file.replace(/-grid\.(webp|png|jpe?g)$/i, '.$1');
@@ -1801,10 +1852,23 @@ export default function FullWideSlideDemoHeader({
         if (active === 'austen' && typeof key === 'string' && key.startsWith('/custom_logos/drawings/images_grid/austen/looking_for_my_darcy/')) {
           const file = key.split('/').pop() || '';
           const lower = file.toLowerCase();
-          if (lower.includes('dark-gradient')) return `/custom_logos/drawings/images_stripe/austen/looking_for_my_darcy/dark/${file}`;
-          if (lower.includes('light-gradient')) return `/custom_logos/drawings/images_stripe/austen/looking_for_my_darcy/light/${file}`;
-          if (lower.includes('-frame')) return `/custom_logos/drawings/images_stripe/austen/looking_for_my_darcy/frame/${file}`;
-          if (lower.includes('-solid')) return `/custom_logos/drawings/images_stripe/austen/looking_for_my_darcy/solid/${file}`;
+          const base = lower.replace(/\.(webp|png|jpe?g)$/i, '');
+          if (lower.includes('dark-gradient') || base.endsWith('-dark')) {
+            const c = base.replace(/-dark-gradient$/i, '').replace(/-dark$/i, '');
+            return `/custom_logos/drawings/images_stripe/austen/looking_for_my_darcy/dark/${c}-dark-gradient-stripe.webp`;
+          }
+          if (lower.includes('light-gradient') || base.endsWith('-light')) {
+            const c = base.replace(/-light-gradient$/i, '').replace(/-light$/i, '');
+            return `/custom_logos/drawings/images_stripe/austen/looking_for_my_darcy/light/${c}-light-gradient-stripe.webp`;
+          }
+          if (base.endsWith('-frame') || lower.includes('-frame')) {
+            const c = base.replace(/-frame$/i, '');
+            return `/custom_logos/drawings/images_stripe/austen/looking_for_my_darcy/frame/${c}-frame-stripe.webp`;
+          }
+          if (base.endsWith('-solid') || lower.includes('-solid')) {
+            const c = base.replace(/-solid$/i, '');
+            return `/custom_logos/drawings/images_stripe/austen/looking_for_my_darcy/solid/${c}-solid-stripe.webp`;
+          }
         }
         if (active === 'austen' && typeof key === 'string' && key.startsWith('/custom_logos/drawings/images_grid/austen/pemberley_house/')) {
           const file = key.split('/').pop() || '';
@@ -1872,10 +1936,23 @@ export default function FullWideSlideDemoHeader({
         if (typeof key === 'string' && key.startsWith('/custom_logos/drawings/images_grid/austen/looking_for_my_darcy/')) {
           const file = key.split('/').pop() || '';
           const lower = file.toLowerCase();
-          if (lower.includes('dark-gradient')) return `/custom_logos/drawings/images_stripe/austen/looking_for_my_darcy/dark/${file}`;
-          if (lower.includes('light-gradient')) return `/custom_logos/drawings/images_stripe/austen/looking_for_my_darcy/light/${file}`;
-          if (lower.includes('-frame')) return `/custom_logos/drawings/images_stripe/austen/looking_for_my_darcy/frame/${file}`;
-          if (lower.includes('-solid')) return `/custom_logos/drawings/images_stripe/austen/looking_for_my_darcy/solid/${file}`;
+          const base = lower.replace(/\.(webp|png|jpe?g)$/i, '');
+          if (lower.includes('dark-gradient') || base.endsWith('-dark')) {
+            const c = base.replace(/-dark-gradient$/i, '').replace(/-dark$/i, '');
+            return `/custom_logos/drawings/images_stripe/austen/looking_for_my_darcy/dark/${c}-dark-gradient-stripe.webp`;
+          }
+          if (lower.includes('light-gradient') || base.endsWith('-light')) {
+            const c = base.replace(/-light-gradient$/i, '').replace(/-light$/i, '');
+            return `/custom_logos/drawings/images_stripe/austen/looking_for_my_darcy/light/${c}-light-gradient-stripe.webp`;
+          }
+          if (base.endsWith('-frame') || lower.includes('-frame')) {
+            const c = base.replace(/-frame$/i, '');
+            return `/custom_logos/drawings/images_stripe/austen/looking_for_my_darcy/frame/${c}-frame-stripe.webp`;
+          }
+          if (base.endsWith('-solid') || lower.includes('-solid')) {
+            const c = base.replace(/-solid$/i, '');
+            return `/custom_logos/drawings/images_stripe/austen/looking_for_my_darcy/solid/${c}-solid-stripe.webp`;
+          }
         }
         if (typeof key === 'string' && key.startsWith('/custom_logos/drawings/images_grid/austen/pemberley_house/')) {
           const file = key.split('/').pop() || '';
@@ -2024,6 +2101,46 @@ export default function FullWideSlideDemoHeader({
   const [rootRemPx, setRootRemPx] = useState(16);
   const headerRef = useRef(null);
   const megaMenuRef = useRef(null);
+  const [stripeRowPadPx, setStripeRowPadPx] = useState(32);
+  const [stripeRowPadXPx, setStripeRowPadXPx] = useState({ left: 0, right: 0 });
+
+  useLayoutEffect(() => {
+    try {
+      if (!active) return undefined;
+      const el = megaMenuRef.current;
+      if (!el || typeof window === 'undefined') return undefined;
+
+      const update = () => {
+        try {
+          const cs = window.getComputedStyle(el);
+          const pt = Number.parseFloat(cs?.paddingTop || '0');
+          const pl = Number.parseFloat(cs?.paddingLeft || '0');
+          const pr = Number.parseFloat(cs?.paddingRight || '0');
+          if (Number.isFinite(pt) && pt >= 0) {
+            setStripeRowPadPx((prev) => (prev === pt ? prev : pt));
+          }
+          if (Number.isFinite(pl) && pl >= 0 && Number.isFinite(pr) && pr >= 0) {
+            setStripeRowPadXPx((prev) => {
+              if (!prev) return { left: pl, right: pr };
+              if (prev.left === pl && prev.right === pr) return prev;
+              return { left: pl, right: pr };
+            });
+          }
+        } catch {
+          // ignore
+        }
+      };
+
+      update();
+      window.requestAnimationFrame(() => update());
+      window.addEventListener('resize', update);
+      return () => {
+        window.removeEventListener('resize', update);
+      };
+    } catch {
+      return undefined;
+    }
+  }, [active]);
 
   useLayoutEffect(() => {
     if (!active) return undefined;
@@ -2303,24 +2420,25 @@ export default function FullWideSlideDemoHeader({
   );
 
   const resolvedNav = useMemo(() => {
-    if (!Array.isArray(navItems) || navItems.length === 0) return defaultNav;
-
+    const provided = Array.isArray(navItems) ? navItems : [];
     const byId = new Map();
-    for (const item of defaultNav) {
+
+    for (const item of provided) {
       if (!item?.id) continue;
       byId.set(item.id, item);
     }
-    for (const item of navItems) {
+    for (const item of defaultNav) {
       if (!item?.id) continue;
-      byId.set(item.id, item);
+      if (!byId.has(item.id)) byId.set(item.id, item);
     }
 
     const out = [];
     if (byId.has('first_contact')) out.push(byId.get('first_contact'));
-    for (const item of navItems) {
+
+    for (const item of provided) {
       if (!item?.id) continue;
       if (item.id === 'first_contact') continue;
-      out.push(byId.get(item.id));
+      if (byId.has(item.id)) out.push(byId.get(item.id));
     }
     for (const item of defaultNav) {
       if (!item?.id) continue;
@@ -2328,8 +2446,29 @@ export default function FullWideSlideDemoHeader({
       if (out.some((x) => x?.id === item.id)) continue;
       out.push(item);
     }
+
     return out;
   }, [defaultNav, navItems]);
+
+  const allowStripeV4UrlParams = useMemo(() => {
+    try {
+      if (typeof window === 'undefined') return false;
+      const p = new URLSearchParams(location?.search || window.location.search || '');
+      const wantsStripeDebug = Boolean(
+        p.has('debugStripeHit')
+        || p.has('stripeCalib')
+        || p.has('debugV4OverlayCalib')
+        || Array.from(p.keys()).some((k) => (k || '').toString().startsWith('v4'))
+      );
+      if (!wantsStripeDebug) return false;
+
+      if (import.meta.env.DEV) return true;
+      const host = (window.location?.hostname || '').toLowerCase();
+      return host === 'localhost' || host === '127.0.0.1';
+    } catch {
+      return false;
+    }
+  }, [location?.search]);
 
   const thinDrawings = useMemo(
     () => [
@@ -2545,52 +2684,15 @@ export default function FullWideSlideDemoHeader({
 
   useEffect(() => {
     const onKeyDown = (e) => {
-      if (e.key === 'Escape') {
-        if (demoManualEnabled) return;
-        setActive(null);
-        setMobileOpen(false);
-      }
-
-  recompute();
-  const t1 = window.setTimeout(recompute, 50);
-  const t2 = window.setTimeout(recompute, 250);
-  window.addEventListener('resize', recompute);
-
-  const ro = new ResizeObserver(() => recompute());
-  ro.observe(el);
-
-  return () => {
-    window.clearTimeout(t1);
-    window.clearTimeout(t2);
-    window.removeEventListener('resize', recompute);
-    ro.disconnect();
-  };
-}, [active]);
-
-useEffect(() => {
-  if (!active) return;
-  if (gildan5000Catalog) return;
-  let cancelled = false;
-  getGildan5000Catalog()
-    .then((data) => {
-      if (cancelled) return;
-      setGildan5000Catalog(data);
-    })
-    .catch(() => {
-      if (cancelled) return;
-      setGildan5000Catalog({ selected: [], selectedSlugs: new Set(), getPlaceholderSrc: () => null });
-    window.addEventListener('resize', recompute);
-
-    const ro = new ResizeObserver(() => recompute());
-    ro.observe(el);
-
-    return () => {
-      window.clearTimeout(t1);
-      window.clearTimeout(t2);
-      window.removeEventListener('resize', recompute);
-      ro.disconnect();
+      if (e.key !== 'Escape') return;
+      if (demoManualEnabled) return;
+      setActive(null);
+      setMobileOpen(false);
     };
-  }, [active]);
+
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [demoManualEnabled]);
 
   useEffect(() => {
     let mounted = true;
@@ -2621,6 +2723,19 @@ useEffect(() => {
   }, [active, gildan5000Catalog]);
 
   useEffect(() => {
+    try {
+      const p = new URLSearchParams(location.search);
+      const fromUrl = p.get('active') || p.get('collection') || '';
+      const next = typeof fromUrl === 'string' ? fromUrl.trim() : '';
+      const allowed = new Set(['first_contact', 'the_human_inside', 'austen', 'cube', 'outcasted']);
+      if (next && allowed.has(next)) {
+        setActive(next);
+        return;
+      }
+    } catch {
+      // ignore
+    }
+
     if (typeof manualEnabledOverride === 'boolean') {
       setActive(manualEnabledOverride ? (initialActiveId || 'first_contact') : null);
       return;
@@ -2633,9 +2748,7 @@ useEffect(() => {
   }, [contained, demoManualEnabled, initialActiveId, manualEnabledOverride]);
 
   useEffect(() => {
-    if (!active) {
-      setMegaPage(1);
-    }
+    // keep: previously reset megaPage; mega is now single-page
   }, [active]);
 
   useEffect(() => {
@@ -2726,15 +2839,12 @@ useEffect(() => {
                   className={`inline-flex items-center gap-1 text-xs font-semibold tracking-[0.18em] uppercase ${open ? 'text-foreground' : 'text-muted-foreground hover:text-foreground'}`}
                   aria-expanded={open ? 'true' : 'false'}
                   onMouseEnter={() => {
-                    setMegaPage(1);
                     setActive(item.id);
                   }}
                   onFocus={() => {
-                    setMegaPage(1);
                     setActive(item.id);
                   }}
                   onClick={() => {
-                    setMegaPage(1);
                     setActive((prev) => (prev === item.id ? null : item.id));
                   }}
                 >
@@ -2754,16 +2864,8 @@ useEffect(() => {
               <IconButton
                 label="Search"
                 onClick={() => {
-                  if (active) {
-                    if (megaPage === 2) {
-                      setActive(null);
-                      return;
-                    }
-                    setMegaPage(2);
-                    return;
-                  }
-                  ensureMegaOpen();
-                  setMegaPage(2);
+                  // mega is single-page; keep icon but do not navigate to another slide
+                  if (!active) ensureMegaOpen();
                 }}
               >
                 <svg className="h-[25px] w-[25px] text-foreground -translate-x-[1px] lg:h-[29px] lg:w-[29px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -2778,16 +2880,7 @@ useEffect(() => {
                 if (cartClickTimeoutRef.current) window.clearTimeout(cartClickTimeoutRef.current);
                 cartClickTimeoutRef.current = window.setTimeout(() => {
                   cartClickTimeoutRef.current = null;
-                  if (active) {
-                    if (megaPage === 3) {
-                      setActive(null);
-                      return;
-                    }
-                    setMegaPage(3);
-                    return;
-                  }
-                  ensureMegaOpen();
-                  setMegaPage(3);
+                  if (!active) ensureMegaOpen();
                 }, dblClickDelayMs);
               }}
               onDoubleClick={(e) => {
@@ -2835,16 +2928,7 @@ useEffect(() => {
                   if (accountClickTimeoutRef.current) window.clearTimeout(accountClickTimeoutRef.current);
                   accountClickTimeoutRef.current = window.setTimeout(() => {
                     accountClickTimeoutRef.current = null;
-                    if (active) {
-                      if (megaPage === 4) {
-                        setActive(null);
-                        return;
-                      }
-                      setMegaPage(4);
-                      return;
-                    }
-                    ensureMegaOpen();
-                    setMegaPage(4);
+                    if (!active) ensureMegaOpen();
                   }, dblClickDelayMs);
                 }}
                 onDoubleClick={(e) => {
@@ -2863,10 +2947,12 @@ useEffect(() => {
       </div>
 
       {canUseDom && (!contained || portalContainer) &&
-        createPortal(
+        ReactDOM.createPortal(
           active ? (
             <div
               className={`${contained ? 'absolute' : 'fixed'} inset-0 z-[9990] bg-foreground/25`}
+              role="button"
+              tabIndex={0}
               onClick={() => {
                 if (isManualLockEnabled()) return;
                 setActive(null);
@@ -2884,52 +2970,48 @@ useEffect(() => {
         }}
       >
         {active ? (
-          <div className={`relative z-[10000] block border-b border-border bg-background ${megaPage === 1 ? 'overflow-x-visible' : 'overflow-x-hidden'}`}>
+          <div className="relative z-[10000] block border-b border-border bg-background overflow-x-visible">
             <div
               ref={megaMenuRef}
-              className={`mx-auto max-w-[1400px] px-4 sm:px-6 lg:px-10 py-8 ${megaPage === 1 ? 'overflow-x-visible' : 'overflow-x-hidden'}`}
+              className="mx-auto max-w-[1400px] px-4 sm:px-6 lg:px-10 py-8 overflow-x-visible"
             >
               <div
-                className={megaPage === 1 ? 'overflow-y-visible' : 'overflow-x-hidden overflow-y-visible'}
+                className="overflow-y-visible"
                 style={effectiveMegaTileSize
                   ? {
-                      height: `${Math.round(effectiveMegaTileSize * 2 + 37)}px`,
+                      height: `${Math.round(effectiveMegaTileSize * 2 + 37 + (() => {
+                        try {
+                          const qs = (typeof window !== 'undefined') ? window.location?.search : '';
+                          const p = qs ? new URLSearchParams(qs) : null;
+                          const raw = p?.get('v4SpriteExtraB') ?? p?.get('v2SpriteExtraB');
+                          const n = raw == null ? 0 : Number.parseInt(raw, 10);
+                          const extraB = Number.isFinite(n) ? n : 0;
+                          const y = 20;
+                          const viewportPad = 5;
+                          const bottomPad = stripeRowPadPx;
+                          return Math.max(0, bottomPad);
+                        } catch {
+                          return 0;
+                        }
+                      })())}px`,
                       marginLeft: '0px',
                       paddingLeft: '0px',
                       width: '100%',
-                      overflowX: megaPage === 1 ? 'visible' : undefined,
-                      clipPath: megaPage === 1 ? 'inset(0px 0px 0px -260px)' : undefined,
+                      overflowX: 'visible',
+                      clipPath: 'inset(0px -260px 0px -260px)',
                     }
                   : undefined}
               >
                 <div
-                  className="flex h-full"
+                  className="flex items-start"
                   style={{
                     width: `${MEGA_SLIDES_COUNT * 100}%`,
                     transform: `translateX(-${megaSliderIndex * (100 / MEGA_SLIDES_COUNT)}%)`,
                     transition: 'transform 320ms cubic-bezier(0.32, 0.72, 0, 1)',
                   }}
                 >
-                  <div className="h-full w-full shrink-0" style={{ width: `${100 / MEGA_SLIDES_COUNT}%` }}>
-                    {showStripe ? (
-                      <MegaStripeCatalogPanel
-                        megaTileSize={effectiveMegaTileSize}
-                        StripeButtonsComponent={AdidasColorStripeButtons}
-                        stripeKey={active}
-                        stripeProps={{
-                          selectedColorOrder,
-                          selectedColorSlug,
-                          onSelect: setSelectedColorSlug,
-                          colorLabelBySlug,
-                          colorButtonSrcBySlug,
-                          stripeV4: true,
-                          allowStripeV4UrlParams: true,
-                          stripeV4Defaults: { v2S: 1.25, v2L: 162, v2R: 9, v2PX: 0, v2VL: 50, v2VR: 0 },
-                          overlaySrc: (stripeOverlayOverrideActive ? overlaySrcFromUrl : null) || resolvedOverlaySrc,
-                        }}
-                      />
-                    ) : null}
-                    <div className="grid grid-cols-1 gap-10">
+                  <div className="w-full shrink-0" style={{ width: `${100 / MEGA_SLIDES_COUNT}%` }}>
+                    <div className="relative z-10 grid grid-cols-1 gap-10">
                       {(resolvedMega[active] || []).map((col, idx) => (
                         <MegaColumn
                           key={`${active}-${idx}`}
@@ -2962,268 +3044,46 @@ useEffect(() => {
                         />
                       ))}
                     </div>
-                  </div>
-
-                  <div className="h-full w-full shrink-0" style={{ width: `${100 / MEGA_SLIDES_COUNT}%` }}>
-                    <div className="flex h-full min-h-0 flex-col">
-                      <div className="relative flex items-center justify-between" ref={searchHeaderRowRef}>
-                        <div
-                          className="pointer-events-none absolute left-1/2 right-10 top-1/2 h-7 -translate-y-1/2 rounded-md"
-                          style={{ backgroundColor: 'rgba(0, 0, 0, 0.01)' }}
-                          aria-hidden="true"
+                    {showStripe ? (
+                      <div className="relative z-0">
+                        <MegaStripeCatalogPanel
+                          megaTileSize={effectiveMegaTileSize}
+                          extraHeightPx={(() => {
+                            try {
+                              const qs = (typeof window !== 'undefined') ? window.location?.search : '';
+                              const p = qs ? new URLSearchParams(qs) : null;
+                              const raw = p?.get('v4SpriteExtraB') ?? p?.get('v2SpriteExtraB');
+                              const n = raw == null ? 0 : Number.parseInt(raw, 10);
+                              const extraB = Number.isFinite(n) ? n : 0;
+                              const y = 20;
+                              const viewportPad = 5;
+                              return 0;
+                            } catch {
+                              return 0;
+                            }
+                          })()}
+                          marginTopPx={stripeRowPadPx}
+                          paddingBottomPx={stripeRowPadPx}
+                          bleedLeftPx={stripeRowPadXPx?.left || 0}
+                          bleedRightPx={stripeRowPadXPx?.right || 0}
+                          StripeButtonsComponent={AdidasColorStripeButtons}
+                          stripeKey={active}
+                          stripeProps={{
+                            selectedColorOrder,
+                            selectedColorSlug,
+                            onSelect: setSelectedColorSlug,
+                            colorLabelBySlug,
+                            colorButtonSrcBySlug,
+                            stripeVariant: (active === 'the_human_inside' ? humanInsideVariant : firstContactVariant),
+                            stripeV4: true,
+                            forceStripeV4Sprite: true,
+                            allowStripeV4UrlParams,
+                            stripeV4Defaults: { v2S: 1, v2L: 162, v2R: 9, v2PX: 0, v2VL: 0, v2VR: 0, v2Y: 0 },
+                            overlaySrc: (stripeOverlayOverrideActive ? overlaySrcFromUrl : null) || resolvedOverlaySrc,
+                          }}
                         />
-                        <div
-                          className="pointer-events-none absolute left-1/2 top-1/2 z-20 h-5 w-[2px] -translate-x-1/2 -translate-y-1/2"
-                          style={{ backgroundColor: searchAccent, opacity: searchCaretVisible ? 1 : 0 }}
-                          aria-hidden="true"
-                        />
-                        <div
-                          className="relative z-10 min-w-0 overflow-hidden"
-                          style={{ maxWidth: 'calc(100% - 340px)' }}
-                        >
-                          <div className="flex min-w-0 items-center gap-2 overflow-hidden">
-                            {searchTopLinks.map((label, idx) => (
-                              <div key={label} className="flex min-w-0 items-center gap-2">
-                                <button
-                                  type="button"
-                                  className="truncate text-[10px] font-semibold tracking-[0.22em] uppercase"
-                                  style={{ color: searchAccent }}
-                                >
-                                  {label}
-                                </button>
-                                {idx < searchTopLinks.length - 1 ? (
-                                  <span className="text-[10px] font-normal tracking-[0.22em] opacity-50" style={{ color: searchAccent }}>
-                                    |
-                                  </span>
-                                ) : null}
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-
-                        <div className="relative z-10 flex items-center gap-2">
-                          <input
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                            placeholder="Cerca"
-                            className="h-7 w-[280px] bg-transparent px-2 text-[12px] font-semibold tracking-[0.12em] uppercase text-foreground placeholder:text-foreground/40 focus:outline-none"
-                            style={{ color: searchAccent }}
-                          />
-                          <div className="ml-1" style={{ color: searchAccent }}>
-                            <svg
-                              className="h-[25px] w-[25px] origin-top-right scale-[1.15] text-foreground -translate-x-[1px]"
-                              fill="none"
-                              stroke="currentColor"
-                              viewBox="0 0 24 24"
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={2}
-                                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                              />
-                            </svg>
-                          </div>
-                        </div>
                       </div>
-
-                      <div className="mt-2 h-px w-full" style={{ backgroundColor: 'rgba(239, 68, 68, 0.35)' }} />
-
-                      <div className="mt-3 flex-1 min-h-0">
-                        <div className="relative grid h-full min-h-0 grid-cols-2 gap-6">
-                          <div className="relative h-full min-h-0 overflow-hidden border-r border-foreground">
-                            <div className="h-full fw-no-scrollbar">
-                              <div ref={searchGridScrollRef} className="h-full overflow-x-auto overflow-y-hidden fw-no-scrollbar">
-                                <div
-                                  ref={searchGridRowRef}
-                                  className="flex gap-3 snap-x snap-mandatory"
-                                  style={{ transform: `scale(${searchGridScale})`, transformOrigin: 'top left' }}
-                                >
-                                  {searchResults.map((item, itemIdx) => {
-                                    const officialColorSlugs = selectedColorOrder.filter((slug) => gildan5000Catalog?.selectedSlugs?.has(slug));
-                                    const colorSlug = officialColorSlugs.length ? officialColorSlugs[itemIdx % officialColorSlugs.length] : null;
-                                    const placeholderSrc =
-                                      item.image ||
-                                      (colorSlug ? gildan5000Catalog?.getPlaceholderSrc?.(colorSlug) : null) ||
-                                      '/placeholder-product.svg';
-                                    return (
-                                      <div
-                                        key={item.id}
-                                        className="group h-full w-[220px] shrink-0 overflow-hidden rounded-md bg-transparent snap-start"
-                                      >
-                                        <div className="h-full w-full bg-muted">
-                                          <OptimizedImg src={placeholderSrc} alt="" className="block h-full w-full object-contain" />
-                                        </div>
-                                      </div>
-                                    );
-                                  })}
-                                </div>
-                              </div>
-                            </div>
-                            <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center">
-                              <button
-                                type="button"
-                                className="pointer-events-auto ml-1 inline-flex h-8 w-8 items-center justify-center rounded-full border border-black/10 bg-white/90 text-black/70 shadow-sm"
-                                onClick={() => scrollSearchGridBy(-420)}
-                                aria-label="Desplaçar a l'esquerra"
-                                title="Esquerra"
-                              >
-                                <ChevronLeft className="h-4 w-4" />
-                              </button>
-                            </div>
-                            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center">
-                              <button
-                                type="button"
-                                className="pointer-events-auto mr-1 inline-flex h-8 w-8 items-center justify-center rounded-full border border-black/10 bg-white/90 text-black/70 shadow-sm"
-                                onClick={() => scrollSearchGridBy(420)}
-                                aria-label="Desplaçar a la dreta"
-                                title="Dreta"
-                              >
-                                <ChevronRight className="h-4 w-4" />
-                              </button>
-                            </div>
-                          </div>
-
-                          <div className="relative flex h-full min-h-0 flex-col">
-                            <div className="flex-1 min-h-0 overflow-y-auto fw-no-scrollbar">
-                              <div className="w-full">
-                                {searchResults.map((item, idx) => (
-                                  <div
-                                    key={item.id}
-                                    style={{
-                                      borderBottom: '0.5px solid hsl(var(--foreground))',
-                                    }}
-                                  >
-                                    <button
-                                      type="button"
-                                      className="grid w-full grid-cols-[1fr_auto] gap-6 px-1 py-3 text-left"
-                                      onClick={() => {
-                                        const dest = item.slugOrId ? `/product/${item.slugOrId}` : null;
-                                        if (!dest) return;
-                                        navigate(dest);
-                                        setActive(null);
-                                      }}
-                                    >
-                                      <div className="min-w-0 py-0.5">
-                                        <div className="flex min-w-0 items-center space-x-2 text-sm uppercase" style={{ color: searchAccent }}>
-                                          <span className="text-muted-foreground">Inici</span>
-                                          <ChevronRight className="h-4 w-4 text-muted-foreground" />
-                                          <span className="text-muted-foreground">{item.category}</span>
-                                          <ChevronRight className="h-4 w-4 text-muted-foreground" />
-                                          <span className="min-w-0 truncate text-foreground font-medium">{item.title}</span>
-                                        </div>
-                                      </div>
-                                      <div className="shrink-0 text-[17px] font-normal text-foreground">
-                                        {item.price}
-                                      </div>
-                                    </button>
-                                  </div>
-                                ))}
-                              </div>
-                            </div>
-                            <div className="pointer-events-none absolute inset-x-0 bottom-0 h-px bg-foreground" />
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="h-full w-full shrink-0" style={{ width: `${100 / MEGA_SLIDES_COUNT}%` }}>
-                    <div className="flex h-full min-h-0 flex-col">
-                      <div className="flex items-center justify-between">
-                        <div className="text-xs font-semibold tracking-[0.18em] uppercase text-foreground">Cistell</div>
-                        <button type="button" className="text-[11px] font-semibold tracking-[0.18em] uppercase text-muted-foreground hover:text-foreground">
-                          Veure cistell
-                        </button>
-                      </div>
-
-                      <div className="mt-3 flex-1 min-h-0 overflow-y-auto pb-4">
-                        <div className="grid gap-3">
-                          {[1, 2, 3].map((i) => (
-                            <div key={i} className="grid grid-cols-[56px_1fr_auto] items-center gap-3 rounded-md bg-muted p-3">
-                              <div className="h-14 w-14 rounded-md bg-background" />
-                              <div className="min-w-0">
-                                <div className="truncate text-[12px] font-medium text-foreground">Samarreta Gildan 5000 — Mock {i}</div>
-                                <div className="mt-1 text-[11px] font-medium text-foreground/60">Color: {selectedColorSlug} · Talla: M · QTY: 1</div>
-                              </div>
-                              <div className="text-right">
-                                <div className="text-[12px] font-semibold text-foreground">12,90 €</div>
-                                <button type="button" className="mt-1 text-[11px] font-semibold text-muted-foreground hover:text-foreground">
-                                  Eliminar
-                                </button>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-
-                      <div className="mt-3 grid gap-2 border-t border-border pt-3">
-                        <div className="flex items-center justify-between text-[12px]">
-                          <div className="font-medium text-foreground/70">Subtotal</div>
-                          <div className="font-semibold text-foreground">38,70 €</div>
-                        </div>
-                        <div className="grid grid-cols-2 gap-3">
-                          <button type="button" className="h-9 rounded-md border border-border bg-background text-xs font-semibold tracking-[0.18em] uppercase text-foreground">
-                            Checkout
-                          </button>
-                          <button type="button" className="h-9 rounded-md bg-foreground text-xs font-semibold tracking-[0.18em] uppercase text-background">
-                            Pagar ara
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="h-full w-full shrink-0" style={{ width: `${100 / MEGA_SLIDES_COUNT}%` }}>
-                    <div className="flex h-full min-h-0 flex-col">
-                      <div className="flex items-center justify-between">
-                        <div className="text-xs font-semibold tracking-[0.18em] uppercase text-foreground">Compte</div>
-                        <button type="button" className="text-[11px] font-semibold tracking-[0.18em] uppercase text-muted-foreground hover:text-foreground">
-                          Ajuda
-                        </button>
-                      </div>
-
-                      <div className="mt-3 grid flex-1 min-h-0 gap-3 overflow-y-auto pb-4">
-                        <div className="rounded-md bg-muted p-4">
-                          <div className="text-[12px] font-semibold tracking-[0.18em] uppercase text-foreground/70">Accés</div>
-                          <div className="mt-2 text-[12px] text-foreground">Inicia sessió per veure comandes, adreces i dissenys guardats.</div>
-                          <div className="mt-3 grid grid-cols-2 gap-3">
-                            <button type="button" className="h-9 rounded-md bg-foreground text-xs font-semibold tracking-[0.18em] uppercase text-background">
-                              Iniciar sessió
-                            </button>
-                            <button type="button" className="h-9 rounded-md border border-border bg-background text-xs font-semibold tracking-[0.18em] uppercase text-foreground">
-                              Crear compte
-                            </button>
-                          </div>
-                        </div>
-
-                        <div className="rounded-md bg-muted p-4">
-                          <div className="text-[12px] font-semibold tracking-[0.18em] uppercase text-foreground/70">Comandes recents</div>
-                          <div className="mt-3 grid gap-2">
-                            {['#HG-10284', '#HG-10211'].map((code) => (
-                              <button key={code} type="button" className="flex items-center justify-between rounded-md bg-background px-3 py-2 text-left">
-                                <div className="text-[12px] font-medium text-foreground">{code}</div>
-                                <div className="text-[11px] font-semibold text-foreground/60">Veure</div>
-                              </button>
-                            ))}
-                          </div>
-                        </div>
-
-                        <div className="rounded-md bg-muted p-4">
-                          <div className="text-[12px] font-semibold tracking-[0.18em] uppercase text-foreground/70">Preferències</div>
-                          <div className="mt-3 grid gap-2">
-                            <button type="button" className="flex items-center justify-between rounded-md bg-background px-3 py-2 text-left">
-                              <div className="text-[12px] font-medium text-foreground">Dades i adreces</div>
-                              <div className="text-[11px] font-semibold text-foreground/60">Editar</div>
-                            </button>
-                            <button type="button" className="flex items-center justify-between rounded-md bg-background px-3 py-2 text-left">
-                              <div className="text-[12px] font-medium text-foreground">Notificacions</div>
-                              <div className="text-[11px] font-semibold text-foreground/60">Configurar</div>
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
+                    ) : null}
                   </div>
                 </div>
               </div>
