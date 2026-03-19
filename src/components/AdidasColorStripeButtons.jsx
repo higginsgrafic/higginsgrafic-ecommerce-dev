@@ -1074,8 +1074,9 @@ export default function AdidasColorStripeButtons({
   const stripeRecalibrate = !!urlParams?.has('stripeRecalibrate');
   const mirror1p5 = !!urlParams?.has('mirror1p5');
   const debugStripeHit = urlParams?.get('debugStripeHit') === '1';
+  const debugStripeAreas = (getUrlParam('debugStripeAreas') === '1') || hasUrlParam('debugStripeAreas');
   const debugStripeHitEffective = Boolean(debugStripeHit);
-  const debugStripeHitViz = Boolean(debugStripeHit || stripeCalibEnabled);
+  const debugStripeHitViz = Boolean(debugStripeHit || stripeCalibEnabled || debugStripeAreas);
   const debugStripeTiles = !!urlParams?.has('debugStripeTiles');
   const disableStripeHit = !!urlParams?.has('disableStripeHit');
   const debugStripeOverlaySlots = urlParams?.get('debugStripeOverlaySlots') === '1';
@@ -8092,7 +8093,7 @@ export default function AdidasColorStripeButtons({
                   </g>
                 ) : null}
                 {(() => {
-                  const union = (debugV4UnionMask || debugV4ClipOnly) ? (
+                  const union = (debugStripeAreas || debugV4UnionMask || debugV4ClipOnly) ? (
                     (() => {
                       if (debugV4ClipOnly && stripeOverlayClip) return null;
                       const base = (
