@@ -6687,36 +6687,13 @@ export default function AdidasColorStripeButtons({
 
                     const usePitchTf = !!(stripeV4AllowUrlParams && urlParams?.get('v4MaskUsePitchTf') === '1');
 
-                    const outlineDx = (Number.isFinite(debugV4OverlayOutlineDx) && debugV4OverlayOutlineDx !== 0)
-                      ? debugV4OverlayOutlineDx
-                      : 0;
-                    const outlineDy = (Number.isFinite(debugV4OverlayOutlineDy) && debugV4OverlayOutlineDy !== 0)
-                      ? debugV4OverlayOutlineDy
-                      : 0;
-                    const outlineSy = (Number.isFinite(debugV4OverlayOutlineSy) && debugV4OverlayOutlineSy > 0 && debugV4OverlayOutlineSy !== 1)
-                      ? debugV4OverlayOutlineSy
-                      : 1;
-
-                    const tilePitchTf = (idx) => {
-                      try {
-                        if (!Number.isFinite(idx)) return '';
-                        const dx = (maskX0 || 0) + (idx * (maskPitchDelta || 0));
-                        return dx ? `translate(${dx} 0)` : '';
-                      } catch {
-                        return '';
-                      }
-                    };
-
                     const makeTf = (idx) => {
                       try {
                         if (!Number.isFinite(idx)) return '';
                         const parts = [];
-                        if (outlineSy !== 1) parts.push(`scale(1 ${outlineSy})`);
-                        if (outlineDy) parts.push(`translate(0 ${outlineDy})`);
-                        if (outlineDx) parts.push(`translate(${outlineDx} 0)`);
                         if (usePitchTf) {
-                          const tp = tilePitchTf(idx);
-                          if (tp) parts.push(tp);
+                          const dx = (maskX0 || 0) + (idx * (maskPitchDelta || 0));
+                          if (dx) parts.push(`translate(${dx} 0)`);
                         }
                         if (applyTransforms && transforms.length) parts.push(...transforms);
                         return parts.filter(Boolean).join(' ');
@@ -7846,9 +7823,9 @@ export default function AdidasColorStripeButtons({
                                 const extra = (Number.isFinite(debugBluePathPxDy) ? debugBluePathPxDy : 0);
                                 return (base + extra) * pxToSvgY;
                               })()}
-                              debugV4OverlayOutlineDy={0}
-                              debugV4OverlayOutlineSy={1}
-                              debugV4OverlayOutlineDx={0}
+                              debugV4OverlayOutlineDy={debugV4OverlayOutlineDy}
+                              debugV4OverlayOutlineSy={debugV4OverlayOutlineSy}
+                              debugV4OverlayOutlineDx={debugV4OverlayOutlineDx}
                               applyTransforms={applyTransforms}
                               transforms={transforms}
                               applyAlign={applyAlign}
@@ -8233,23 +8210,6 @@ export default function AdidasColorStripeButtons({
                 {(() => {
                   const makeTilePath = (d, idx) => {
                     const hitExpand = (Number.isFinite(stripeV4HitExpandPx) && stripeV4HitExpandPx > 0) ? stripeV4HitExpandPx : 0;
-
-                    const pitchTf = (() => {
-                      try {
-                        const usePitchTf = !!(stripeV4AllowUrlParams && urlParams?.get('v4MaskUsePitchTf') === '1');
-                        if (!usePitchTf) return '';
-                        if (!Number.isFinite(idx)) return '';
-                        const basePitch = stripeV4HitStepX;
-                        const maskPitch = (Number.isFinite(v4MaskPitchXParam) && v4MaskPitchXParam > 0) ? v4MaskPitchXParam : basePitch;
-                        const maskX0 = (Number.isFinite(v4MaskX0Param) ? v4MaskX0Param : 0);
-                        const maskPitchDelta = (Number.isFinite(maskPitch) && Number.isFinite(basePitch)) ? (maskPitch - basePitch) : 0;
-                        const dx = (maskX0 || 0) + (idx * (maskPitchDelta || 0));
-                        return dx ? `translate(${dx} 0)` : '';
-                      } catch {
-                        return '';
-                      }
-                    })();
-
                     const hitPath = (
                       <path
                         key={`v4-hit-tile-hit-${idx}`}
@@ -8275,7 +8235,6 @@ export default function AdidasColorStripeButtons({
                       <path
                         key={`v4-hit-tile-halo-${idx}`}
                         d={d}
-                        transform={pitchTf || undefined}
                         fill="none"
                         stroke="rgba(0, 180, 255, 0.18)"
                         strokeWidth={hitExpand * 2}
@@ -8288,7 +8247,6 @@ export default function AdidasColorStripeButtons({
                       <path
                         key={`v4-hit-tile-viz-${idx}`}
                         d={d}
-                        transform={pitchTf || undefined}
                         fill="rgba(0, 180, 255, 0.35)"
                         fillOpacity={0.35}
                         stroke={
