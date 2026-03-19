@@ -1954,15 +1954,9 @@ export default function AdidasColorStripeButtons({
       : 1,
   );
   const stripeRefBlendCss = stripeRefBlend === 'average' ? 'normal' : stripeRefBlend;
-  const useFirstContactRed9RefDefaults =
-    !stripeV4Engine &&
-    stripeRefTargetIndex === 1 &&
-    typeof stripeRefMockupSrc === 'string' &&
-    stripeRefMockupSrc.includes('first-contact-') &&
-    stripeRefMockupSrc.includes('-black-white.png');
-  const stripeRefXParam = parseFloatParam('stripeRefX', useFirstContactRed9RefDefaults ? -46 : 0);
-  const stripeRefYParam = parseFloatParam('stripeRefY', useFirstContactRed9RefDefaults ? 0 : 0);
-  const stripeRefScaleParam = parseFloatParam('stripeRefScale', useFirstContactRed9RefDefaults ? 1.315 : 1);
+  const stripeRefXParam = parseFloatParam('stripeRefX', -5);
+  const stripeRefYParam = parseFloatParam('stripeRefY', -4);
+  const stripeRefScaleParam = parseFloatParam('stripeRefScale', 1.125);
 
   const stripeRefRenderYOffsetPx = stripeV2 ? -2 : 0;
 
