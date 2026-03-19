@@ -6687,6 +6687,16 @@ export default function AdidasColorStripeButtons({
 
                     const usePitchTf = !!(stripeV4AllowUrlParams && urlParams?.get('v4MaskUsePitchTf') === '1');
 
+                    const outlineDx = (Number.isFinite(debugV4OverlayOutlineDx) && debugV4OverlayOutlineDx !== 0)
+                      ? debugV4OverlayOutlineDx
+                      : 0;
+                    const outlineDy = (Number.isFinite(debugV4OverlayOutlineDy) && debugV4OverlayOutlineDy !== 0)
+                      ? debugV4OverlayOutlineDy
+                      : 0;
+                    const outlineSy = (Number.isFinite(debugV4OverlayOutlineSy) && debugV4OverlayOutlineSy > 0 && debugV4OverlayOutlineSy !== 1)
+                      ? debugV4OverlayOutlineSy
+                      : 1;
+
                     const tilePitchTf = (idx) => {
                       try {
                         if (!Number.isFinite(idx)) return '';
@@ -6701,6 +6711,9 @@ export default function AdidasColorStripeButtons({
                       try {
                         if (!Number.isFinite(idx)) return '';
                         const parts = [];
+                        if (outlineSy !== 1) parts.push(`scale(1 ${outlineSy})`);
+                        if (outlineDy) parts.push(`translate(0 ${outlineDy})`);
+                        if (outlineDx) parts.push(`translate(${outlineDx} 0)`);
                         if (usePitchTf) {
                           const tp = tilePitchTf(idx);
                           if (tp) parts.push(tp);
@@ -7833,9 +7846,9 @@ export default function AdidasColorStripeButtons({
                                 const extra = (Number.isFinite(debugBluePathPxDy) ? debugBluePathPxDy : 0);
                                 return (base + extra) * pxToSvgY;
                               })()}
-                              debugV4OverlayOutlineDy={debugV4OverlayOutlineDy}
-                              debugV4OverlayOutlineSy={debugV4OverlayOutlineSy}
-                              debugV4OverlayOutlineDx={debugV4OverlayOutlineDx}
+                              debugV4OverlayOutlineDy={0}
+                              debugV4OverlayOutlineSy={1}
+                              debugV4OverlayOutlineDx={0}
                               applyTransforms={applyTransforms}
                               transforms={transforms}
                               applyAlign={applyAlign}
