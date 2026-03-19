@@ -6306,7 +6306,26 @@ export default function AdidasColorStripeButtons({
                       const maskX0 = (Number.isFinite(v4MaskX0Param) ? v4MaskX0Param : 0);
                       const maskPitchDelta = (Number.isFinite(maskPitch) && Number.isFinite(basePitch)) ? (maskPitch - basePitch) : 0;
 
-                      const usePitchTf = !!(stripeV4AllowUrlParams && urlParams?.get('v4MaskUsePitchTf') === '1');
+                      const usePitchTf = Boolean(
+                        urlParams?.get('v4MaskUsePitchTf') === '1'
+                        || urlParams?.has('v4MaskPitchX')
+                        || urlParams?.has('v4MaskX0')
+                      );
+
+                      const pitchScaleX = (() => {
+                        try {
+                          if (!usePitchTf) return 1;
+                          if (!Number.isFinite(maskPitch) || maskPitch <= 0) return 1;
+                          if (!Number.isFinite(basePitch) || basePitch <= 0) return 1;
+                          const s = maskPitch / basePitch;
+                          return (Number.isFinite(s) && s > 0) ? s : 1;
+                        } catch {
+                          return 1;
+                        }
+                      })();
+                      const unionPitchTf = (pitchScaleX !== 1)
+                        ? `translate(${unionCx} ${unionCy}) scale(${pitchScaleX} 1) translate(${-unionCx} ${-unionCy})`
+                        : '';
 
                       const tilePitchTf = (idx) => {
                         try {
@@ -6375,7 +6394,8 @@ export default function AdidasColorStripeButtons({
                                       : inner)
                                   : inner;
 
-                                return unionAdjustTf ? <g transform={unionAdjustTf}>{aligned}</g> : aligned;
+                                const adjusted = unionAdjustTf ? <g transform={unionAdjustTf}>{aligned}</g> : aligned;
+                                return unionPitchTf ? <g transform={unionPitchTf}>{adjusted}</g> : adjusted;
                               })()}
                             </mask>
                           ) : null}
@@ -6406,7 +6426,8 @@ export default function AdidasColorStripeButtons({
                                     ? <g transform={`translate(0 ${stripeV4HitAlignTopDy})`}>{inner}</g>
                                     : inner)
                                 : inner;
-                              return unionAdjustTf ? <g transform={unionAdjustTf}>{aligned}</g> : aligned;
+                              const adjusted = unionAdjustTf ? <g transform={unionAdjustTf}>{aligned}</g> : aligned;
+                              return unionPitchTf ? <g transform={unionPitchTf}>{adjusted}</g> : adjusted;
                             })()}
                           </clipPath>
 
@@ -6540,7 +6561,11 @@ export default function AdidasColorStripeButtons({
                       const maskPitch = (Number.isFinite(v4MaskPitchXParam) && v4MaskPitchXParam > 0) ? v4MaskPitchXParam : basePitch;
                       const maskX0 = (Number.isFinite(v4MaskX0Param) ? v4MaskX0Param : 0);
                       const maskPitchDelta = (Number.isFinite(maskPitch) && Number.isFinite(basePitch)) ? (maskPitch - basePitch) : 0;
-                      const usePitchTf = !!(stripeV4AllowUrlParams && urlParams?.get('v4MaskUsePitchTf') === '1');
+                      const usePitchTf = Boolean(
+                        urlParams?.get('v4MaskUsePitchTf') === '1'
+                        || urlParams?.has('v4MaskPitchX')
+                        || urlParams?.has('v4MaskX0')
+                      );
                       const tilePitchTf = (idx) => {
                         try {
                           const dx = (maskX0 || 0) + (idx * (maskPitchDelta || 0));
@@ -6572,6 +6597,21 @@ export default function AdidasColorStripeButtons({
                       const unionDyTf = unionDy ? `translate(0 ${unionDy})` : '';
                       const unionAdjustTf = [unionScaleTf, unionDyTf].filter(Boolean).join(' ');
 
+                      const pitchScaleX = (() => {
+                        try {
+                          if (!usePitchTf) return 1;
+                          if (!Number.isFinite(maskPitch) || maskPitch <= 0) return 1;
+                          if (!Number.isFinite(basePitch) || basePitch <= 0) return 1;
+                          const s = maskPitch / basePitch;
+                          return (Number.isFinite(s) && s > 0) ? s : 1;
+                        } catch {
+                          return 1;
+                        }
+                      })();
+                      const unionPitchTf = (pitchScaleX !== 1)
+                        ? `translate(${unionCx} ${unionCy}) scale(${pitchScaleX} 1) translate(${-unionCx} ${-unionCy})`
+                        : '';
+
                       const unionBase = (
                         <path
                           d={stripeV4HitPathD}
@@ -6585,7 +6625,8 @@ export default function AdidasColorStripeButtons({
                       const unionAligned = (!v4UnionMaskNoAlign && stripeV4HitAlignTopDy)
                         ? <g transform={`translate(0 ${stripeV4HitAlignTopDy})`}>{unionBase}</g>
                         : unionBase;
-                      const union = unionAdjustTf ? <g transform={unionAdjustTf}>{unionAligned}</g> : unionAligned;
+                      const unionAdjusted = unionAdjustTf ? <g transform={unionAdjustTf}>{unionAligned}</g> : unionAligned;
+                      const union = unionPitchTf ? <g transform={unionPitchTf}>{unionAdjusted}</g> : unionAdjusted;
 
                       const unionFill = unionMaskUrl ? (
                         <rect
