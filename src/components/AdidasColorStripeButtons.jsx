@@ -8227,6 +8227,18 @@ export default function AdidasColorStripeButtons({
                       />
                     );
 
+                    const haloPath = (debugStripeHitViz && hitExpand > 0) ? (
+                      <path
+                        key={`v4-hit-tile-halo-${idx}`}
+                        d={d}
+                        fill="none"
+                        stroke="rgba(0, 180, 255, 0.18)"
+                        strokeWidth={hitExpand * 2}
+                        vectorEffect="non-scaling-stroke"
+                        pointerEvents="none"
+                      />
+                    ) : null;
+
                     const vizPath = debugStripeHitViz ? (
                       <path
                         key={`v4-hit-tile-viz-${idx}`}
@@ -8248,6 +8260,7 @@ export default function AdidasColorStripeButtons({
                     return (
                       <g key={`v4-hit-tile-${idx}`}>
                         {hitPath}
+                        {haloPath}
                         {vizPath}
                       </g>
                     );
