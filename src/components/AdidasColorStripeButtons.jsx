@@ -6685,12 +6685,26 @@ export default function AdidasColorStripeButtons({
                     const maskX0 = (Number.isFinite(v4MaskX0Param) ? v4MaskX0Param : 0);
                     const maskPitchDelta = (Number.isFinite(maskPitch) && Number.isFinite(basePitch)) ? (maskPitch - basePitch) : 0;
 
+                    const usePitchTf = !!(stripeV4AllowUrlParams && urlParams?.get('v4MaskUsePitchTf') === '1');
+
+                    const tilePitchTf = (idx) => {
+                      try {
+                        if (!Number.isFinite(idx)) return '';
+                        const dx = (maskX0 || 0) + (idx * (maskPitchDelta || 0));
+                        return dx ? `translate(${dx} 0)` : '';
+                      } catch {
+                        return '';
+                      }
+                    };
+
                     const makeTf = (idx) => {
                       try {
                         if (!Number.isFinite(idx)) return '';
                         const parts = [];
-                        const dx = (maskX0 || 0) + (idx * (maskPitchDelta || 0));
-                        if (dx) parts.push(`translate(${dx} 0)`);
+                        if (usePitchTf) {
+                          const tp = tilePitchTf(idx);
+                          if (tp) parts.push(tp);
+                        }
                         if (applyTransforms && transforms.length) parts.push(...transforms);
                         return parts.filter(Boolean).join(' ');
                       } catch {
