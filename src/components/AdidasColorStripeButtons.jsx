@@ -6491,6 +6491,86 @@ export default function AdidasColorStripeButtons({
                   />
                 ) : null}
 
+                {(stripeOverlayClip && stripeOverlayClipDebug && stripeV4OverlayMaskReady) ? (
+                  (() => {
+                    try {
+                      const ds = Array.isArray(stripeV4HitTilePathDs) ? stripeV4HitTilePathDs.slice(0, 14) : [];
+                      if (!ds.length || !stripeV4HitPathD) return null;
+
+                      const basePitch = stripeV4HitStepX;
+                      const maskPitch = (Number.isFinite(v4MaskPitchXParam) && v4MaskPitchXParam > 0) ? v4MaskPitchXParam : basePitch;
+                      const maskX0 = (Number.isFinite(v4MaskX0Param) ? v4MaskX0Param : 0);
+                      const maskPitchDelta = (Number.isFinite(maskPitch) && Number.isFinite(basePitch)) ? (maskPitch - basePitch) : 0;
+                      const usePitchTf = !!(stripeV4AllowUrlParams && urlParams?.get('v4MaskUsePitchTf') === '1');
+                      const tilePitchTf = (idx) => {
+                        try {
+                          const dx = (maskX0 || 0) + (idx * (maskPitchDelta || 0));
+                          return dx ? `translate(${dx} 0)` : '';
+                        } catch {
+                          return '';
+                        }
+                      };
+                      const makeTf = (idx) => {
+                        const parts = [];
+                        if (usePitchTf) {
+                          const tp = tilePitchTf(idx);
+                          if (tp) parts.push(tp);
+                        }
+                        if (!v4UnionMaskNoAlign && stripeV4HitAlignTopDy) parts.push(`translate(0 ${stripeV4HitAlignTopDy})`);
+                        return parts.filter(Boolean).join(' ');
+                      };
+
+                      const unionDy = (!v4UnionMaskLegacy && Number.isFinite(v4UnionMaskDy) && v4UnionMaskDy !== 0) ? v4UnionMaskDy : 0;
+                      const unionScaleX = (!v4UnionMaskLegacy && Number.isFinite(v4UnionMaskScaleX) && v4UnionMaskScaleX !== 1) ? v4UnionMaskScaleX : 1;
+                      const unionScaleY = (!v4UnionMaskLegacy && Number.isFinite(v4UnionMaskScaleY) && v4UnionMaskScaleY !== 1) ? v4UnionMaskScaleY : 1;
+                      const unionCx = stripeV4SvgW / 2;
+                      const unionCy = v4UnionMaskAnchor === 'top'
+                        ? 0
+                        : (v4UnionMaskAnchor === 'bottom' ? stripeV4SvgH : (stripeV4SvgH / 2));
+                      const unionScaleTf = (unionScaleX !== 1 || unionScaleY !== 1)
+                        ? `translate(${unionCx} ${unionCy}) scale(${unionScaleX} ${unionScaleY}) translate(${-unionCx} ${-unionCy})`
+                        : '';
+                      const unionDyTf = unionDy ? `translate(0 ${unionDy})` : '';
+                      const unionAdjustTf = [unionScaleTf, unionDyTf].filter(Boolean).join(' ');
+
+                      const unionBase = (
+                        <path
+                          d={stripeV4HitPathD}
+                          fill="none"
+                          stroke="rgba(217, 70, 239, 0.95)"
+                          strokeWidth={2}
+                          vectorEffect="non-scaling-stroke"
+                          pointerEvents="none"
+                        />
+                      );
+                      const unionAligned = (!v4UnionMaskNoAlign && stripeV4HitAlignTopDy)
+                        ? <g transform={`translate(0 ${stripeV4HitAlignTopDy})`}>{unionBase}</g>
+                        : unionBase;
+                      const union = unionAdjustTf ? <g transform={unionAdjustTf}>{unionAligned}</g> : unionAligned;
+
+                      const tiles = ds.map((d, idx) => {
+                        const tile = (
+                          <path
+                            key={`v4-clip-debug-tile-${idx}`}
+                            d={d}
+                            transform={makeTf(idx) || undefined}
+                            fill="none"
+                            stroke="rgba(34, 211, 238, 0.95)"
+                            strokeWidth={1.5}
+                            vectorEffect="non-scaling-stroke"
+                            pointerEvents="none"
+                          />
+                        );
+                        return unionAdjustTf ? <g key={`v4-clip-debug-tile-wrap-${idx}`} transform={unionAdjustTf}>{tile}</g> : tile;
+                      });
+
+                      return <g pointerEvents="none">{union}{tiles}</g>;
+                    } catch {
+                      return null;
+                    }
+                  })()
+                ) : null}
+
                 {(debugV4UnionMask || debugV4ClipOnly) && stripeV4OverlayMaskReady && (!debugV4MaskFill || debugV4ShowUnionWithMask) ? (
                   (() => {
                     const transforms = Array.isArray(stripeV4HitTransforms) ? stripeV4HitTransforms : [];
