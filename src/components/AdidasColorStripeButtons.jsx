@@ -6685,7 +6685,11 @@ export default function AdidasColorStripeButtons({
                     const maskX0 = (Number.isFinite(v4MaskX0Param) ? v4MaskX0Param : 0);
                     const maskPitchDelta = (Number.isFinite(maskPitch) && Number.isFinite(basePitch)) ? (maskPitch - basePitch) : 0;
 
-                    const usePitchTf = urlParams?.get('v4MaskUsePitchTf') === '1';
+                    const usePitchTf = Boolean(
+                      urlParams?.get('v4MaskUsePitchTf') === '1'
+                      || urlParams?.has('v4MaskPitchX')
+                      || urlParams?.has('v4MaskX0')
+                    );
 
                     const makeTf = (idx) => {
                       try {
