@@ -7,48 +7,62 @@ import { getGildan5000Catalog } from '../utils/placeholders.js';
 import AdidasHumanInsideSlider from './AdidasHumanInsideSlider.jsx';
 
 const FIRST_CONTACT_MEDIA = {
-  'NX-01': '/custom_logos/drawings/images_originals/stripe/first_contact/black/1-nx-01-b.webp',
-  'NCC-1701': '/custom_logos/drawings/images_originals/stripe/first_contact/black/2-ncc-1701-b.webp',
-  'NCC-1701-D': '/custom_logos/drawings/images_originals/stripe/first_contact/black/3-ncc-1701-d-b.webp',
-  'Wormhole': '/custom_logos/drawings/images_originals/stripe/first_contact/black/4-wormhole-b.webp',
-  'Plasma Escape': '/custom_logos/drawings/images_originals/stripe/first_contact/black/5-plasma-escape-b.webp',
-  "Vulcan's End": '/custom_logos/drawings/images_originals/stripe/first_contact/black/6-vulcans-end-b.webp',
-  'The Phoenix': '/custom_logos/drawings/images_originals/stripe/first_contact/black/7-the-phoenix-b.webp',
+  'NX-01': '/custom_logos/drawings/images_grid/first_contact/black/nx-01-b-grid.webp',
+  'NCC-1701': '/custom_logos/drawings/images_grid/first_contact/black/ncc-1701-b-grid.webp',
+  'NCC-1701-D': '/custom_logos/drawings/images_grid/first_contact/black/ncc1701-d-b-grid.webp',
+  'Wormhole': '/custom_logos/drawings/images_grid/first_contact/black/wormhole-b-grid.webp',
+  'Plasma Escape': '/custom_logos/drawings/images_grid/first_contact/black/plasma-escape-b-grid.webp',
+  "Vulcan's End": '/custom_logos/drawings/images_grid/first_contact/black/vulcans-end-b-grid.webp',
+  'The Phoenix': '/custom_logos/drawings/images_grid/first_contact/black/the-phoenix-b-grid.webp',
 };
 
 const CONTROL_TILE_BN = 'botonera-bn';
 const CONTROL_TILE_ARROWS = 'botonera-fletxes';
 
 const FIRST_CONTACT_MEDIA_WHITE = {
-  'NX-01': '/custom_logos/drawings/images_originals/stripe/first_contact/white/1-nx-01-w.webp',
-  'NCC-1701': '/custom_logos/drawings/images_originals/stripe/first_contact/white/2-ncc-1701-w.webp',
-  'NCC-1701-D': '/custom_logos/drawings/images_originals/stripe/first_contact/white/3-ncc-1701-d-w.webp',
-  'Wormhole': '/custom_logos/drawings/images_originals/stripe/first_contact/white/4-wormhole-w.webp',
-  'Plasma Escape': '/custom_logos/drawings/images_originals/stripe/first_contact/white/5-plasma-escape-w.webp',
-  "Vulcan's End": '/custom_logos/drawings/images_originals/stripe/first_contact/white/6-vulcans-end-w.webp',
-  'The Phoenix': '/custom_logos/drawings/images_originals/stripe/first_contact/white/7-the-phoenix-w.webp',
+  'NX-01': '/custom_logos/drawings/images_grid/first_contact/white/nx-01-w-grid.webp',
+  'NCC-1701': '/custom_logos/drawings/images_grid/first_contact/white/ncc-1701-w-grid.webp',
+  'NCC-1701-D': '/custom_logos/drawings/images_grid/first_contact/white/ncc1701-d-w-grid.webp',
+  'Wormhole': '/custom_logos/drawings/images_grid/first_contact/white/wormhole-w-grid.webp',
+  'Plasma Escape': '/custom_logos/drawings/images_grid/first_contact/white/plasma-escape-w-grid.webp',
+  "Vulcan's End": '/custom_logos/drawings/images_grid/first_contact/white/vulcans-end-w-grid.webp',
+  'The Phoenix': '/custom_logos/drawings/images_grid/first_contact/white/the-phoenix-w-grid.webp',
 };
 
 const THE_HUMAN_INSIDE_MEDIA = {
-  'R2-D2': '/custom_logos/drawings/images_originals/stripe/the_human_inside/black/r2-d2.webp',
-  'The Dalek': '/custom_logos/drawings/images_originals/stripe/the_human_inside/black/the-dalek.webp',
-  'C3P0': '/custom_logos/drawings/images_originals/stripe/the_human_inside/black/c3-p0.webp',
-  'Vader': '/custom_logos/drawings/images_originals/stripe/the_human_inside/black/vader.webp',
-  'Afrodita': '/custom_logos/drawings/images_originals/stripe/the_human_inside/black/afrodita-a.webp',
-  'Mazinger': '/custom_logos/drawings/images_originals/stripe/the_human_inside/black/mazinger-z.webp',
-  'Cylon 78': '/custom_logos/drawings/images_originals/stripe/the_human_inside/black/cylon.webp',
-  'Cylon 03': '/custom_logos/drawings/images_originals/stripe/the_human_inside/black/cylon-03.webp',
-  'Iron Man 68': '/custom_logos/drawings/images_originals/stripe/the_human_inside/black/iron-man-68.webp',
-  'Iron Man 08': '/custom_logos/drawings/images_originals/stripe/the_human_inside/black/iron-man-08.webp',
-  'Cyberman': '/custom_logos/drawings/images_originals/stripe/the_human_inside/black/cyberman.webp',
-  'Maschinenmensch': '/custom_logos/drawings/images_originals/stripe/the_human_inside/black/maschinenmensch.webp',
-  'Robocop': '/custom_logos/drawings/images_originals/stripe/the_human_inside/black/robocop.webp',
-  'Terminator': '/custom_logos/drawings/images_originals/stripe/the_human_inside/black/terminator.webp',
-  'Robbie the Robot': '/custom_logos/drawings/images_originals/stripe/the_human_inside/black/robbie-the-robot.webp',
+  'R2-D2': '/custom_logos/drawings/images_grid/the_human_inside/black/r2-d2-b-grid.webp',
+  'The Dalek': '/custom_logos/drawings/images_grid/the_human_inside/black/the-dalek-b-grid.webp',
+  'C3P0': '/custom_logos/drawings/images_grid/the_human_inside/black/c3-p0-b-grid.webp',
+  'Vader': '/custom_logos/drawings/images_grid/the_human_inside/black/vader-b-grid.webp',
+  'Afrodita': '/custom_logos/drawings/images_grid/the_human_inside/black/afrodita-a-b-grid.webp',
+  'Mazinger': '/custom_logos/drawings/images_grid/the_human_inside/black/mazinger-z-b-grid.webp',
+  'Cylon 78': '/custom_logos/drawings/images_grid/the_human_inside/black/cylon-78-b-grid.webp',
+  'Cylon 03': '/custom_logos/drawings/images_grid/the_human_inside/black/cylon-03-b-grid.webp',
+  'Iron Man 68': '/custom_logos/drawings/images_grid/the_human_inside/black/iron-man-68-b-grid.webp',
+  'Iron Man 08': '/custom_logos/drawings/images_grid/the_human_inside/black/iron-man-08-b-grid.webp',
+  'Cyberman': '/custom_logos/drawings/images_grid/the_human_inside/black/cyberman-b-grid.webp',
+  'Maschinenmensch': '/custom_logos/drawings/images_grid/the_human_inside/black/maschinenmensch-b-grid.webp',
+  'Robocop': '/custom_logos/drawings/images_grid/the_human_inside/black/robocop-b-grid.webp',
+  'Terminator': '/custom_logos/drawings/images_grid/the_human_inside/black/terminator-b-grid.webp',
+  'Robbie the Robot': '/custom_logos/drawings/images_grid/the_human_inside/black/robby-the-robot-b-grid.webp',
 };
 
 const THE_HUMAN_INSIDE_MEDIA_WHITE = {
-  ...THE_HUMAN_INSIDE_MEDIA,
+  'R2-D2': '/custom_logos/drawings/images_stripe/the_human_inside/white/r2-d2-w-stripe.webp',
+  'The Dalek': '/custom_logos/drawings/images_stripe/the_human_inside/white/the-dalek-w-stripe.webp',
+  'C3P0': '/custom_logos/drawings/images_stripe/the_human_inside/white/c3-p0-w-stripe.webp',
+  'Vader': '/custom_logos/drawings/images_stripe/the_human_inside/white/vader-w-stripe.webp',
+  'Afrodita': '/custom_logos/drawings/images_stripe/the_human_inside/white/afrodita-a-w-stripe.webp',
+  'Mazinger': '/custom_logos/drawings/images_stripe/the_human_inside/white/mazinger-z-w-stripe.webp',
+  'Cylon 78': '/custom_logos/drawings/images_stripe/the_human_inside/white/cylon-78-w-stripe.webp',
+  'Cylon 03': '/custom_logos/drawings/images_stripe/the_human_inside/white/cylon-03-w-stripe.webp',
+  'Iron Man 68': '/custom_logos/drawings/images_stripe/the_human_inside/white/iron-man-68-w-stripe.webp',
+  'Iron Man 08': '/custom_logos/drawings/images_stripe/the_human_inside/white/iron-man-08-w-stripe.webp',
+  'Cyberman': '/custom_logos/drawings/images_stripe/the_human_inside/white/cyberman-w-stripe.webp',
+  'Maschinenmensch': '/custom_logos/drawings/images_stripe/the_human_inside/white/maschinenmensch-w-stripe.webp',
+  'Robocop': '/custom_logos/drawings/images_stripe/the_human_inside/white/robocop-w-stripe.webp',
+  'Terminator': '/custom_logos/drawings/images_stripe/the_human_inside/white/terminator-w-stripe.webp',
+  'Robbie the Robot': '/custom_logos/drawings/images_stripe/the_human_inside/white/robbie-the-robot-w-stripe.webp',
 };
 
 const OptimizedImg = React.forwardRef(function OptimizedImg({ src, alt, className, style, ...rest }, ref) {
@@ -219,8 +233,10 @@ function MegaColumn({
   firstContactVariant = 'black',
   onFirstContactWhite,
   onFirstContactBlack,
+  onFirstContactMulti,
   onHumanWhite,
   onHumanBlack,
+  onHumanMulti,
   onHumanPrev,
   onHumanNext,
   onTileSize,
@@ -454,6 +470,19 @@ export default function AdidasInspiredHeader({
 }) {
   const navigate = useNavigate();
   const cartClickTimeoutRef = useRef(null);
+
+  useEffect(() => {
+    if (!import.meta.env.DEV) return;
+    try {
+      if (typeof window !== 'undefined') {
+        window.__HG_BUILD_MARKER_ADIDAS_INSPIRED_HEADER__ = 'AdidasInspiredHeader 2026-03-08T03:27';
+      }
+    } catch {
+      // ignore
+    }
+    // eslint-disable-next-line no-console
+    console.error('[MEGA build marker]', 'AdidasInspiredHeader 2026-03-08T03:27');
+  }, []);
 
   const isManualLockEnabled = () => {
     try {
