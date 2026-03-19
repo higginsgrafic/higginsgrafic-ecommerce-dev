@@ -1413,6 +1413,10 @@ export default function AdidasColorStripeButtons({
     ? parseFloatParamV4('v4HitDy', 0)
     : 0;
 
+  const stripeV4HitExpandPx = stripeV4Engine
+    ? parseFloatParamV4('v4HitExpandPx', 0)
+    : 0;
+
   const v4MaskPitchXParam = stripeV4Engine
     ? parseFloatParamV4('v4MaskPitchX', 206.4)
     : stripeV4HitStepX;
@@ -8033,13 +8037,18 @@ export default function AdidasColorStripeButtons({
                             ? stripeV4HitTilePathRefs.current.slice(0, 14)
                             : [];
                           if (els.length >= 14) {
+                            const hitExpand = (Number.isFinite(stripeV4HitExpandPx) && stripeV4HitExpandPx > 0) ? stripeV4HitExpandPx : 0;
                             for (let i = 13; i >= 0; i -= 1) {
                               const el = els[i];
                               try {
                                 const elCtm = el?.getScreenCTM?.();
                                 if (!elCtm) continue;
                                 const localEl = pt.matrixTransform(elCtm.inverse());
-                                const hit = (el && typeof el.isPointInFill === 'function') ? el.isPointInFill(localEl) : false;
+                                const hitFill = (el && typeof el.isPointInFill === 'function') ? el.isPointInFill(localEl) : false;
+                                const hitStroke = (!hitFill && hitExpand > 0 && el && typeof el.isPointInStroke === 'function')
+                                  ? el.isPointInStroke(localEl)
+                                  : false;
+                                const hit = hitFill || hitStroke;
                                 if (hit) {
                                   if (debugStripeHitEffective) {
                                     if (localSvg && Number.isFinite(localSvg.x) && Number.isFinite(localSvg.y)) {
@@ -8154,13 +8163,19 @@ export default function AdidasColorStripeButtons({
                       : [];
                     if (els.length < 14) return;
 
+                    const hitExpand = (Number.isFinite(stripeV4HitExpandPx) && stripeV4HitExpandPx > 0) ? stripeV4HitExpandPx : 0;
+
                     for (let i = 13; i >= 0; i -= 1) {
                       const el = els[i];
                       try {
                         const elCtm = el?.getScreenCTM?.();
                         if (!elCtm) continue;
                         const localEl = pt.matrixTransform(elCtm.inverse());
-                        const hit = (el && typeof el.isPointInFill === 'function') ? el.isPointInFill(localEl) : false;
+                        const hitFill = (el && typeof el.isPointInFill === 'function') ? el.isPointInFill(localEl) : false;
+                        const hitStroke = (!hitFill && hitExpand > 0 && el && typeof el.isPointInStroke === 'function')
+                          ? el.isPointInStroke(localEl)
+                          : false;
+                        const hit = hitFill || hitStroke;
                         if (hit) {
                           if (debugStripeHitEffective) {
                             if (localSvg && Number.isFinite(localSvg.x) && Number.isFinite(localSvg.y)) {
@@ -8189,31 +8204,54 @@ export default function AdidasColorStripeButtons({
                 }}
               >
                 {(() => {
-                  const makeTilePath = (d, idx) => (
-                    <path
-                      key={`v4-hit-tile-${idx}`}
-                      ref={(el) => {
-                        try {
-                          if (!stripeV4HitTilePathRefs.current) stripeV4HitTilePathRefs.current = [];
-                          stripeV4HitTilePathRefs.current[idx] = el;
-                        } catch {
-                          // ignore
+                  const makeTilePath = (d, idx) => {
+                    const hitExpand = (Number.isFinite(stripeV4HitExpandPx) && stripeV4HitExpandPx > 0) ? stripeV4HitExpandPx : 0;
+                    const hitPath = (
+                      <path
+                        key={`v4-hit-tile-hit-${idx}`}
+                        ref={(el) => {
+                          try {
+                            if (!stripeV4HitTilePathRefs.current) stripeV4HitTilePathRefs.current = [];
+                            stripeV4HitTilePathRefs.current[idx] = el;
+                          } catch {
+                            // ignore
+                          }
+                        }}
+                        d={d}
+                        fill="black"
+                        fillOpacity={0}
+                        stroke={hitExpand > 0 ? 'transparent' : 'none'}
+                        strokeWidth={hitExpand > 0 ? (hitExpand * 2) : 0}
+                        vectorEffect="non-scaling-stroke"
+                        pointerEvents="none"
+                      />
+                    );
+
+                    const vizPath = debugStripeHitViz ? (
+                      <path
+                        key={`v4-hit-tile-viz-${idx}`}
+                        d={d}
+                        fill="rgba(0, 180, 255, 0.35)"
+                        fillOpacity={0.35}
+                        stroke={
+                          lastClickedSlug === `t${idx + 1}`
+                            ? 'rgba(255, 0, 0, 0.85)'
+                            : 'rgba(0, 0, 0, 0.35)'
                         }
-                      }}
-                      d={d}
-                      fill={debugStripeHitViz ? 'rgba(0, 180, 255, 0.35)' : 'black'}
-                      fillOpacity={debugStripeHitViz ? 0.35 : 0}
-                      stroke={
-                        debugStripeHitViz && lastClickedSlug === `t${idx + 1}`
-                          ? 'rgba(255, 0, 0, 0.85)'
-                          : (debugStripeHitViz ? 'rgba(0, 0, 0, 0.35)' : 'none')
-                      }
-                      strokeWidth={debugStripeHitViz && lastClickedSlug === `t${idx + 1}` ? 2 : (debugStripeHitViz ? 1 : 0)}
-                      vectorEffect="non-scaling-stroke"
-                      pointerEvents="none"
-                      style={{ cursor: 'pointer' }}
-                    />
-                  );
+                        strokeWidth={lastClickedSlug === `t${idx + 1}` ? 2 : 1}
+                        vectorEffect="non-scaling-stroke"
+                        pointerEvents="none"
+                        style={{ cursor: 'pointer' }}
+                      />
+                    ) : null;
+
+                    return (
+                      <g key={`v4-hit-tile-${idx}`}>
+                        {hitPath}
+                        {vizPath}
+                      </g>
+                    );
+                  };
 
                   const paths = stripeV4HitTilePathDs.slice(0, 14).map(makeTilePath);
                   const wrapped = (Array.isArray(stripeV4HitTransforms) ? stripeV4HitTransforms : []).reduce(
