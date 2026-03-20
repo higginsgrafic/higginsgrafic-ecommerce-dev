@@ -6561,8 +6561,8 @@ export default function AdidasColorStripeButtons({
 
                       const pxToSvgX = (() => {
                         try {
-                          const fitScaleForClip = (fit && Number.isFinite(fit.scale) && fit.scale > 0) ? fit.scale : 1;
-                          const trackW = (Number.isFinite(spriteW) ? spriteW : 0) * fitScaleForClip;
+                          const fitScale = (fit && Number.isFinite(fit.scale) && fit.scale > 0) ? fit.scale : 1;
+                          const trackW = (Number.isFinite(spriteW) && spriteW > 0) ? (spriteW * fitScale) : null;
                           return (Number.isFinite(trackW) && trackW > 0) ? (stripeV4SvgW / trackW) : 1;
                         } catch {
                           return 1;
