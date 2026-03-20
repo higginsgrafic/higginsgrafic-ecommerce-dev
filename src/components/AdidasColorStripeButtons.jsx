@@ -1076,7 +1076,7 @@ export default function AdidasColorStripeButtons({
   const debugStripeHit = urlParams?.get('debugStripeHit') === '1';
   const debugStripeAreas = (getUrlParam('debugStripeAreas') === '1') || hasUrlParam('debugStripeAreas');
   const debugStripeHitEffective = Boolean(debugStripeHit);
-  const debugStripeHitViz = Boolean(debugStripeHit || stripeCalibEnabled || debugStripeAreas);
+  const debugStripeHitViz = Boolean(debugStripeHit || debugStripeAreas);
   const debugStripeTiles = !!urlParams?.has('debugStripeTiles');
   const disableStripeHit = !!urlParams?.has('disableStripeHit');
   const debugStripeOverlaySlots = urlParams?.get('debugStripeOverlaySlots') === '1';
