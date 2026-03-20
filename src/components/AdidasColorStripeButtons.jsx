@@ -6188,6 +6188,7 @@ export default function AdidasColorStripeButtons({
                     width: '100%',
                     height: '100%',
                     overflow: 'visible',
+                    zIndex: 10,
                   }}
                 >
                   <g transform={v4RootTf || undefined}>
@@ -6264,7 +6265,7 @@ export default function AdidasColorStripeButtons({
                   height: '100%',
                   opacity: (stripeCalibEnabled ? 1 : (Number.isFinite(stripeRefOpacity) ? stripeRefOpacity : 1)),
                   overflow: 'visible',
-                  zIndex: stripeCalibEnabled ? 6000 : 45,
+                  zIndex: stripeCalibEnabled ? 6000 : 120,
                 }}
               >
                 {stripeV4OverlayMaskReady ? (
