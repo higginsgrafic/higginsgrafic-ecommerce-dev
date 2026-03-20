@@ -6627,7 +6627,7 @@ export default function AdidasColorStripeButtons({
                               transform={makeTf(idx) || undefined}
                               fill="none"
                               stroke="rgba(217, 70, 239, 0.95)"
-                              strokeWidth={2}
+                              strokeWidth={0.6}
                               vectorEffect="non-scaling-stroke"
                               pointerEvents="none"
                               fillRule={v4UnionMaskRule}
@@ -6674,7 +6674,7 @@ export default function AdidasColorStripeButtons({
                             transform={makeTf(idx) || undefined}
                             fill="none"
                             stroke="rgba(34, 211, 238, 0.95)"
-                            strokeWidth={1.5}
+                            strokeWidth={0.6}
                             vectorEffect="non-scaling-stroke"
                             pointerEvents="none"
                           />
