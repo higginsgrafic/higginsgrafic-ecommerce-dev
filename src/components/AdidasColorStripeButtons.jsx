@@ -6305,8 +6305,11 @@ export default function AdidasColorStripeButtons({
                       const unionScaleTf = (unionScaleX !== 1 || unionScaleY !== 1)
                         ? `translate(${unionCx} ${unionCy}) scale(${unionScaleX} ${unionScaleY}) translate(${-unionCx} ${-unionCy})`
                         : '';
-                      const unionDxTf = (!v4UnionMaskLegacy && Number.isFinite(v4UnionMaskDx) && v4UnionMaskDx !== 0)
-                        ? `translate(${v4UnionMaskDx} 0)`
+                      const unionDxSvg = (!v4UnionMaskLegacy && Number.isFinite(v4UnionMaskDx) && v4UnionMaskDx !== 0)
+                        ? (v4UnionMaskDx * pxToSvgX)
+                        : 0;
+                      const unionDxTf = unionDxSvg
+                        ? `translate(${unionDxSvg} 0)`
                         : '';
                       const unionDyTf = unionDy ? `translate(0 ${unionDy})` : '';
                       const unionAdjustTf = [unionScaleTf, unionDxTf, unionDyTf].filter(Boolean).join(' ');
@@ -6555,6 +6558,16 @@ export default function AdidasColorStripeButtons({
                         || urlParams?.has('v4MaskPitchX')
                         || urlParams?.has('v4MaskX0')
                       );
+
+                      const pxToSvgX = (() => {
+                        try {
+                          const fitScaleForClip = (fit && Number.isFinite(fit.scale) && fit.scale > 0) ? fit.scale : 1;
+                          const trackW = (Number.isFinite(spriteW) ? spriteW : 0) * fitScaleForClip;
+                          return (Number.isFinite(trackW) && trackW > 0) ? (stripeV4SvgW / trackW) : 1;
+                        } catch {
+                          return 1;
+                        }
+                      })();
                       const tilePitchTf = (idx) => {
                         try {
                           const dx = (maskX0 || 0) + (idx * (maskPitchDelta || 0));
@@ -6585,8 +6598,11 @@ export default function AdidasColorStripeButtons({
                       const unionScaleTf = (unionScaleX !== 1 || unionScaleY !== 1)
                         ? `translate(${unionCx} ${unionCy}) scale(${unionScaleX} ${unionScaleY}) translate(${-unionCx} ${-unionCy})`
                         : '';
-                      const unionDxTf = (!v4UnionMaskLegacy && Number.isFinite(v4UnionMaskDx) && v4UnionMaskDx !== 0)
-                        ? `translate(${v4UnionMaskDx} 0)`
+                      const unionDxSvg = (!v4UnionMaskLegacy && Number.isFinite(v4UnionMaskDx) && v4UnionMaskDx !== 0)
+                        ? (v4UnionMaskDx * pxToSvgX)
+                        : 0;
+                      const unionDxTf = unionDxSvg
+                        ? `translate(${unionDxSvg} 0)`
                         : '';
                       const unionDyTf = unionDy ? `translate(0 ${unionDy})` : '';
                       const unionAdjustTf = [unionScaleTf, unionDxTf, unionDyTf].filter(Boolean).join(' ');
