@@ -6373,13 +6373,18 @@ export default function AdidasColorStripeButtons({
                               <rect x={-1000} y={-1000} width={stripeV4SvgW + 2000} height={stripeV4SvgH + 2000} fill="black" />
                               {(() => {
                                 const base = (
-                                  <path
-                                    d={stripeV4HitPathD}
-                                    fill="white"
-                                    fillRule={v4UnionMaskRule}
-                                    clipRule={v4UnionMaskRule}
-                                    filter={`url(#${unionDilateFilterId})`}
-                                  />
+                                  <g filter={`url(#${unionDilateFilterId})`}>
+                                    {ds.map((d, idx) => (
+                                      <path
+                                        key={`v4-ov-unionmask-tile-${idx}`}
+                                        d={d}
+                                        transform={makeTf(idx)}
+                                        fill="white"
+                                        fillRule={v4UnionMaskRule}
+                                        clipRule={v4UnionMaskRule}
+                                      />
+                                    ))}
+                                  </g>
                                 );
 
                                 const inner = <g>{base}</g>;
@@ -6400,13 +6405,18 @@ export default function AdidasColorStripeButtons({
                           >
                             {(() => {
                               const base = (
-                                <path
-                                  d={stripeV4HitPathD}
-                                  fill="white"
-                                  fillRule={v4UnionMaskRule}
-                                  clipRule={v4UnionMaskRule}
-                                  filter={v4UnionMaskDilate ? `url(#${unionDilateFilterId})` : undefined}
-                                />
+                                <g filter={v4UnionMaskDilate ? `url(#${unionDilateFilterId})` : undefined}>
+                                  {ds.map((d, idx) => (
+                                    <path
+                                      key={`v4-ov-unionclip-tile-${idx}`}
+                                      d={d}
+                                      transform={makeTf(idx)}
+                                      fill="white"
+                                      fillRule={v4UnionMaskRule}
+                                      clipRule={v4UnionMaskRule}
+                                    />
+                                  ))}
+                                </g>
                               );
                               const wrapped = applyTransforms
                                 ? transforms.reduce(
@@ -6609,14 +6619,22 @@ export default function AdidasColorStripeButtons({
                       const unionAdjustTfUnion = [unionScaleTf, unionDxTf, unionDyTf].filter(Boolean).join(' ');
 
                       const unionBase = (
-                        <path
-                          d={stripeV4HitPathD}
-                          fill="none"
-                          stroke="rgba(217, 70, 239, 0.95)"
-                          strokeWidth={2}
-                          vectorEffect="non-scaling-stroke"
-                          pointerEvents="none"
-                        />
+                        <g>
+                          {ds.map((d, idx) => (
+                            <path
+                              key={`v4-clip-debug-union-tile-${idx}`}
+                              d={d}
+                              transform={makeTf(idx) || undefined}
+                              fill="none"
+                              stroke="rgba(217, 70, 239, 0.95)"
+                              strokeWidth={2}
+                              vectorEffect="non-scaling-stroke"
+                              pointerEvents="none"
+                              fillRule={v4UnionMaskRule}
+                              clipRule={v4UnionMaskRule}
+                            />
+                          ))}
+                        </g>
                       );
                       const unionAligned = (!v4UnionMaskNoAlign && stripeV4HitAlignTopDy)
                         ? <g transform={`translate(0 ${stripeV4HitAlignTopDy})`}>{unionBase}</g>
