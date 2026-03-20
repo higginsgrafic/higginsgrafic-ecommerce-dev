@@ -6606,7 +6606,7 @@ export default function AdidasColorStripeButtons({
                         ? `translate(${unionDxSvg} 0)`
                         : '';
                       const unionDyTf = unionDy ? `translate(0 ${unionDy})` : '';
-                      const unionAdjustTf = [unionScaleTf, unionDxTf, unionDyTf].filter(Boolean).join(' ');
+                      const unionAdjustTfUnion = [unionScaleTf, unionDxTf, unionDyTf].filter(Boolean).join(' ');
 
                       const unionBase = (
                         <path
@@ -6621,7 +6621,7 @@ export default function AdidasColorStripeButtons({
                       const unionAligned = (!v4UnionMaskNoAlign && stripeV4HitAlignTopDy)
                         ? <g transform={`translate(0 ${stripeV4HitAlignTopDy})`}>{unionBase}</g>
                         : unionBase;
-                      const union = unionAdjustTf ? <g transform={unionAdjustTf}>{unionAligned}</g> : unionAligned;
+                      const union = unionAdjustTfUnion ? <g transform={unionAdjustTfUnion}>{unionAligned}</g> : unionAligned;
 
                       const unionFill = unionMaskUrl ? (
                         <rect
@@ -6662,14 +6662,10 @@ export default function AdidasColorStripeButtons({
                           />
                         );
 
-                        const outlined = unionAdjustTf
-                          ? <g key={`v4-clip-debug-tile-wrap-${idx}`} transform={unionAdjustTf}>{tile}</g>
-                          : tile;
-
                         return (
                           <g key={`v4-clip-debug-tile-pack-${idx}`} pointerEvents="none">
                             {tileFill}
-                            {outlined}
+                            {tile}
                           </g>
                         );
                       });
@@ -6771,7 +6767,25 @@ export default function AdidasColorStripeButtons({
 
                     const outlined = unionAdjustTf ? <g transform={unionAdjustTf}>{aligned}</g> : aligned;
 
-                    return outlined;
+                    return (
+                      <g>
+                        {outlined}
+                        {ds.map((d, idx) => (
+                          <path
+                            key={`v4-clip-outline-union-tile-${idx}`}
+                            d={d}
+                            transform={makeTf(idx) || undefined}
+                            fill={debugV4ClipOnly ? 'rgba(236, 72, 153, 0.25)' : 'none'}
+                            stroke={debugV4ClipOnly ? 'none' : 'rgba(236, 72, 153, 0.95)'}
+                            strokeWidth={debugV4ClipOnly ? 0 : 0.4}
+                            vectorEffect="non-scaling-stroke"
+                            fillRule={v4UnionMaskRule}
+                            clipRule={v4UnionMaskRule}
+                            pointerEvents="none"
+                          />
+                        ))}
+                      </g>
+                    );
                   })()
                 ) : null}
 
