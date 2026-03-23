@@ -123,7 +123,7 @@ export default function RulersGuidesOverlay({
     } catch {
       // ignore
     }
-  }, [storageKey]);
+  }, [guidesEnabled, storageKey]);
 
   useEffect(() => {
     if (migratedRef.current) return;

@@ -38,14 +38,6 @@ function LabDemosPage() {
           <section>
             <h2 className="text-[12px] font-semibold tracking-[0.18em] uppercase text-muted-foreground">Demos</h2>
             <div className="mt-4 grid gap-3">
-              <Link to="/proves/demo-adidas" className="rounded-xl border border-border p-4 hover:bg-muted/60">
-                <div className="text-sm font-semibold text-foreground">Adidas demo</div>
-                <div className="mt-1 text-xs text-muted-foreground">/proves/demo-adidas</div>
-              </Link>
-              <Link to="/proves/demo-adidas-pdp" className="rounded-xl border border-border p-4 hover:bg-muted/60">
-                <div className="text-sm font-semibold text-foreground">Adidas PDP demo</div>
-                <div className="mt-1 text-xs text-muted-foreground">/proves/demo-adidas-pdp</div>
-              </Link>
               <Link to="/proves/demo-nike-tambe" className="rounded-xl border border-border p-4 hover:bg-muted/60">
                 <div className="text-sm font-semibold text-foreground">Nike també</div>
                 <div className="mt-1 text-xs text-muted-foreground">/proves/demo-nike-tambe</div>

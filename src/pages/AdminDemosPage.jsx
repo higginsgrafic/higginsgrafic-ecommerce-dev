@@ -5,11 +5,6 @@ import SEO from '@/components/SEO';
 
 const demos = [
   {
-    title: 'Adidas Demo',
-    description: 'Header + mega-menú + layout demo.',
-    path: '/adidas-demo',
-  },
-  {
     title: 'Nike Hero Demo',
     description: 'Hero slider tipus Nike.',
     path: '/nike-hero-demo',

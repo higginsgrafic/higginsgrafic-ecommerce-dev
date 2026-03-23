@@ -5,7 +5,7 @@ import useComponentCatalogConfig from '@/hooks/useComponentCatalogConfig';
 import { useProductContext } from '@/contexts/ProductContext';
 
 export default function FullWideSlidePage() {
-  const { config: componentCatalogConfig, loading: componentCatalogLoading } = useComponentCatalogConfig();
+  const { config: componentCatalogConfig, loading: componentCatalogLoading, error: componentCatalogError } = useComponentCatalogConfig();
   const navigate = useNavigate();
   const { getTotalItems } = useProductContext();
 
@@ -206,8 +206,32 @@ html, body { scrollbar-width: none; }
     return () => window.clearTimeout(t);
   }, []);
 
-  if (componentCatalogLoading && !componentCatalogConfig) return null;
-  if (fullWideSlide && fullWideSlide.enabled === false) return null;
+  if (componentCatalogLoading && !componentCatalogConfig) {
+    return (
+      <div className="min-h-[60vh] flex items-center justify-center bg-background">
+        <div className="text-sm text-muted-foreground">Carregant…</div>
+      </div>
+    );
+  }
+
+  if (!componentCatalogLoading && !componentCatalogConfig) {
+    return (
+      <div className="min-h-[60vh] flex items-center justify-center bg-background">
+        <div className="max-w-lg px-6 text-center">
+          <div className="text-sm font-semibold text-foreground">No s'ha pogut carregar la config</div>
+          <div className="mt-2 text-xs text-muted-foreground break-words">{componentCatalogError || 'Error carregant la config'}</div>
+        </div>
+      </div>
+    );
+  }
+
+  if (fullWideSlide && fullWideSlide.enabled === false) {
+    return (
+      <div className="min-h-[60vh] flex items-center justify-center bg-background">
+        <div className="text-sm text-muted-foreground">FullWideSlide desactivat a la config.</div>
+      </div>
+    );
+  }
 
   return (
     <div className="h-[calc(100vh-var(--appHeaderOffset,0px))] overflow-hidden bg-background">

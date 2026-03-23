@@ -3,8 +3,6 @@ import * as ReactDOM from 'react-dom';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { ChevronDown, ChevronLeft, ChevronRight, Menu, UserRound, X } from 'lucide-react';
 import { useProductContext } from '@/contexts/ProductContext';
-import MegaStripeCatalogPanel from './MegaStripeCatalogPanel.jsx';
-import AdidasColorStripeButtons from './AdidasColorStripeButtons.jsx';
 import { getGildan5000Catalog } from '../utils/placeholders.js';
 import {
   AUSTEN_QUOTES_ASSETS,
@@ -284,6 +282,7 @@ function FirstContactDibuix09Buttons({
         <button
           type="button"
           aria-label="Següent"
+          id="stripe-guide-right-arrow"
           onClick={hasNextPointerHandlers ? undefined : onNext}
           onPointerDown={onNextPointerDown}
           onPointerUp={onNextPointerUp}
@@ -331,7 +330,7 @@ function MegaColumn({
   const [pageStart, setPageStart] = useState(0);
 
   const urlParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
-  const gridCalibEnabled = !!urlParams?.has('gridCalib') || !!urlParams?.has('stripeCalib');
+  const gridCalibEnabled = !!urlParams?.has('gridCalib');
   const GRID_SCALE_STORAGE_KEY = useMemo(
     () => `HG_GRID_SCALES_${(collectionId || '').toString()}`,
     [collectionId]
@@ -1732,8 +1731,6 @@ export default function FullWideSlideDemoHeader({
           'cube 3 p0': 'cube-3-p0-stripe.webp',
           '3cube p0': 'cube-3-p0-stripe.webp',
           '3cube-p0': 'cube-3-p0-stripe.webp',
-          '3cube p0': 'cube-3-p0-stripe.webp',
-          '3cube-p0': 'cube-3-p0-stripe.webp',
           'cyber cube': 'cyber-cube-stripe.webp',
           cybercube: 'cyber-cube-stripe.webp',
           'darth cube': 'darth-cube-stripe.webp',
@@ -2983,11 +2980,6 @@ export default function FullWideSlideDemoHeader({
                         try {
                           const qs = (typeof window !== 'undefined') ? window.location?.search : '';
                           const p = qs ? new URLSearchParams(qs) : null;
-                          const raw = p?.get('v4SpriteExtraB') ?? p?.get('v2SpriteExtraB');
-                          const n = raw == null ? 0 : Number.parseInt(raw, 10);
-                          const extraB = Number.isFinite(n) ? n : 0;
-                          const y = 20;
-                          const viewportPad = 5;
                           const bottomPad = stripeRowPadPx;
                           return Math.max(0, bottomPad);
                         } catch {
@@ -3045,43 +3037,30 @@ export default function FullWideSlideDemoHeader({
                       ))}
                     </div>
                     {showStripe ? (
-                      <div className="relative z-0">
-                        <MegaStripeCatalogPanel
-                          megaTileSize={effectiveMegaTileSize}
-                          extraHeightPx={(() => {
-                            try {
-                              const qs = (typeof window !== 'undefined') ? window.location?.search : '';
-                              const p = qs ? new URLSearchParams(qs) : null;
-                              const raw = p?.get('v4SpriteExtraB') ?? p?.get('v2SpriteExtraB');
-                              const n = raw == null ? 0 : Number.parseInt(raw, 10);
-                              const extraB = Number.isFinite(n) ? n : 0;
-                              const y = 20;
-                              const viewportPad = 5;
-                              return 0;
-                            } catch {
-                              return 0;
-                            }
-                          })()}
-                          marginTopPx={stripeRowPadPx}
-                          paddingBottomPx={stripeRowPadPx}
-                          bleedLeftPx={stripeRowPadXPx?.left || 0}
-                          bleedRightPx={stripeRowPadXPx?.right || 0}
-                          StripeButtonsComponent={AdidasColorStripeButtons}
-                          stripeKey={active}
-                          stripeProps={{
-                            selectedColorOrder,
-                            selectedColorSlug,
-                            onSelect: setSelectedColorSlug,
-                            colorLabelBySlug,
-                            colorButtonSrcBySlug,
-                            stripeVariant: (active === 'the_human_inside' ? humanInsideVariant : firstContactVariant),
-                            stripeV4: true,
-                            forceStripeV4Sprite: true,
-                            allowStripeV4UrlParams,
-                            stripeV4Defaults: { v2S: 1, v2L: 162, v2R: 9, v2PX: 0, v2VL: 0, v2VR: 0, v2Y: 0 },
-                            overlaySrc: (stripeOverlayOverrideActive ? overlaySrcFromUrl : null) || resolvedOverlaySrc,
-                          }}
-                        />
+                      <div
+                        className="relative z-0"
+                        style={{
+                          marginTop: `${stripeRowPadPx}px`,
+                          paddingBottom: `${stripeRowPadPx}px`,
+                          paddingLeft: `${stripeRowPadXPx?.left || 0}px`,
+                          paddingRight: `${stripeRowPadXPx?.right || 0}px`,
+                        }}
+                      >
+                        <div className="w-full rounded-md bg-muted flex justify-center">
+                          <img
+                            src="/placeholders/t-shirt_buttons/v5/full-color-stripe-5.webp"
+                            alt=""
+                            className="block"
+                            style={{
+                              height: `${Math.round((effectiveMegaTileSize || 240) * 0.9)}px`,
+                              width: 'auto',
+                              transformOrigin: 'top center',
+                              transform: 'translate(var(--megaStripeDx, 0px), var(--megaStripeDy, 0px)) scale(1.2125)',
+                            }}
+                            loading="lazy"
+                            decoding="async"
+                          />
+                        </div>
                       </div>
                     ) : null}
                   </div>

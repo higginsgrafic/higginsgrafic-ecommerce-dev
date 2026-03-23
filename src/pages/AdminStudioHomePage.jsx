@@ -202,8 +202,6 @@ export default function AdminStudioHomePage() {
       ],
       dev: [
         { label: 'Dev Links', path: '/dev-links' },
-        { label: 'Adidas Stripe Zoom', path: '/adidas-stripe-zoom-dev' },
-        { label: 'Adidas Demo', path: '/adidas-demo' },
         { label: 'Nike Hero Demo', path: '/nike-hero-demo' },
       ],
       wip: [

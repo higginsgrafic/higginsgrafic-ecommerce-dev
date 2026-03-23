@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useMemo, Suspense, lazy } from 'react';
+import React, { useState, useEffect, useRef, useMemo, useCallback, Suspense, lazy, useLayoutEffect } from 'react';
 import { Routes, Route, useLocation, useNavigate, Navigate } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Helmet } from 'react-helmet';
@@ -14,7 +14,6 @@ import SkipLink from '@/components/SkipLink';
 import OffersHeader from '@/components/OffersHeader';
 import AdminBanner from '@/components/AdminBanner';
 import Header from '@/components/Header';
-import AdidasInspiredHeader from '@/components/AdidasInspiredHeader';
 import NikeInspiredHeader from '@/components/NikeInspiredHeader';
 import DevHeader from '@/components/DevHeader';
 import ScrollToTop from '@/components/ScrollToTop';
@@ -64,35 +63,32 @@ const SystemMessagesPage = lazy(() => import('@/pages/SystemMessagesPage'));
 const AdminMediaPage = lazy(() => import('@/pages/AdminMediaPage'));
 const UserIconPicker = lazy(() => import('@/pages/UserIconPicker'));
 const HeroSettingsPage = lazy(() => import('@/pages/HeroSettingsPage'));
-const AdminLoginPage = lazy(() => import('@/pages/AdminLoginPage'));
-const ColleccioSettingsPage = lazy(() => import('@/pages/ColleccioSettingsPage'));
+const AdminStudioLayout = lazy(() => import('@/components/AdminStudioLayout'));
+const FullWideSlidePage = lazy(() => import('@/pages/FullWideSlidePage'));
 const DocumentationFilesPage = lazy(() => import('@/pages/DocumentationFilesPage'));
-const GelatoTemplatesPage = lazy(() => import('@/pages/GelatoTemplatesPage'));
-const MockupsManagerPage = lazy(() => import('@/pages/MockupsManagerPage'));
-const GelatoProductsManagerPage = lazy(() => import('@/pages/GelatoProductsManagerPage'));
-const ProductsOverviewPage = lazy(() => import('@/pages/ProductsOverviewPage'));
 const GelatoBlankProductsPage = lazy(() => import('@/pages/GelatoBlankProductsPage'));
 const AdminUploadPage = lazy(() => import('@/pages/AdminUploadPage'));
 const UnitatsCanviPage = lazy(() => import('@/pages/UnitatsCanviPage'));
 const RuletaDemoPage = lazy(() => import('@/pages/RuletaDemoPage'));
 const AdminControlsPage = lazy(() => import('@/pages/AdminControlsPage'));
-const AdminStudioLayout = lazy(() => import('@/components/AdminStudioLayout'));
-const FullWideSlidePage = lazy(() => import('@/pages/FullWideSlidePage'));
+const AdminLoginPage = lazy(() => import('@/pages/AdminLoginPage'));
+const ColleccioSettingsPage = lazy(() => import('@/pages/ColleccioSettingsPage'));
+const GelatoTemplatesPage = lazy(() => import('@/pages/GelatoTemplatesPage'));
+const MockupsManagerPage = lazy(() => import('@/pages/MockupsManagerPage'));
+const GelatoProductsManagerPage = lazy(() => import('@/pages/GelatoProductsManagerPage'));
+const ProductsOverviewPage = lazy(() => import('@/pages/ProductsOverviewPage'));
+const AdminPlantillesPage = lazy(() => import('@/pages/AdminPlantillesPage.jsx'));
 const PlantillaCatalegComponentsPage = lazy(() => import('@/pages/PlantillaCatalegComponentsPage'));
 
 const NikeTambePage = lazy(() => import('@/pages/NikeTambePage.jsx'));
-const AdidasDemoPage = lazy(() => import('@/pages/AdidasDemoPage'));
-const AdidasPdpPage = lazy(() => import('@/pages/AdidasPdpPage.jsx'));
-const AdidasPdpTdpPage = lazy(() => import('@/pages/AdidasPdpTdpPage.jsx'));
 const DevLinksPage = lazy(() => import('@/pages/DevLinksPage'));
 const DevComponentsCatalogPage = lazy(() => import('@/pages/DevComponentsCatalogPage'));
- const DevLayoutBuilderPage = lazy(() => import('@/pages/DevLayoutBuilderPage'));
+const DevLayoutBuilderPage = lazy(() => import('@/pages/DevLayoutBuilderPage'));
 const TheHumanInsidePage = lazy(() => import('@/pages/TheHumanInsidePage'));
 const LabDemosPage = lazy(() => import('@/pages/LabDemosPage.jsx'));
 const LabWipPage = lazy(() => import('@/pages/LabWipPage.jsx'));
 const LabHomePage = lazy(() => import('@/pages/LabHomePage.jsx'));
 const AdminWipPage = lazy(() => import('@/pages/AdminWipPage.jsx'));
-const AdminPlantillesPage = lazy(() => import('@/pages/AdminPlantillesPage.jsx'));
 
 // Pàgines administratives
 const AppsPage = lazy(() => import('@/pages/AppsPage'));
@@ -218,6 +214,9 @@ function App() {
     }
   })();
   const [guidesEnabled, setGuidesEnabled] = useState(guidesEnabledFromUrl);
+  const [megaStripeDx, setMegaStripeDx] = useState(0);
+  const [megaStripeDy, setMegaStripeDy] = useState(0);
+  const [megaStripeBeltEnabled, setMegaStripeBeltEnabled] = useState(false);
   const [clicksEnabled, setClicksEnabled] = useState(false);
   const [clickMarks, setClickMarks] = useState([]);
   const [nikeTambeBgOn, setNikeTambeBgOn] = useState(true);
@@ -248,6 +247,123 @@ function App() {
       // ignore
     }
   }, [location.search]);
+
+  useEffect(() => {
+    try {
+      const rawDx = window.localStorage.getItem('MEGA_STRIPE_DX');
+      const rawDy = window.localStorage.getItem('MEGA_STRIPE_DY');
+      const rawBelt = window.localStorage.getItem('MEGA_STRIPE_BELT');
+      const dx = rawDx == null ? 0 : Number.parseInt(rawDx, 10);
+      const dy = rawDy == null ? 0 : Number.parseInt(rawDy, 10);
+      if (Number.isFinite(dx)) setMegaStripeDx(dx);
+      if (Number.isFinite(dy)) setMegaStripeDy(dy);
+      if (rawBelt != null) setMegaStripeBeltEnabled(rawBelt === '1');
+    } catch {
+      // ignore
+    }
+  }, []);
+
+  useEffect(() => {
+    try {
+      document.documentElement.style.setProperty('--megaStripeDx', `${Math.round(megaStripeDx || 0)}px`);
+      document.documentElement.style.setProperty('--megaStripeDy', `${Math.round(megaStripeDy || 0)}px`);
+      window.localStorage.setItem('MEGA_STRIPE_DX', String(Math.round(megaStripeDx || 0)));
+      window.localStorage.setItem('MEGA_STRIPE_DY', String(Math.round(megaStripeDy || 0)));
+    } catch {
+      // ignore
+    }
+  }, [megaStripeDx, megaStripeDy]);
+
+  useEffect(() => {
+    try {
+      window.localStorage.setItem('MEGA_STRIPE_BELT', megaStripeBeltEnabled ? '1' : '0');
+    } catch {
+      // ignore
+    }
+  }, [megaStripeBeltEnabled]);
+
+  const BeltReferenceOverlay = ({ enabled }) => {
+    const [state, setState] = useState({ xL: null, xR: null, yT: null, yB: null });
+
+    useLayoutEffect(() => {
+      if (!enabled) return undefined;
+
+      let raf = 0;
+      let t1 = 0;
+      let t2 = 0;
+      let t3 = 0;
+
+      const read = () => {
+        const resolveX = (el, edge) => {
+          const r = el?.getBoundingClientRect?.();
+          if (!r) return null;
+          const x = edge === 'right' ? r.right : r.left;
+          return Number.isFinite(x) ? Math.round(x) : null;
+        };
+        const resolveY = (el, edge) => {
+          const r = el?.getBoundingClientRect?.();
+          if (!r) return null;
+          const y = edge === 'bottom' ? r.bottom : r.top;
+          return Number.isFinite(y) ? Math.round(y) : null;
+        };
+
+        const leftAnchor = document.getElementById('stripe-guide-left-anchor');
+        const rightArrow = document.getElementById('stripe-guide-right-arrow');
+        const stripeImg = document.querySelector('img[src="/placeholders/t-shirt_buttons/v5/full-color-stripe-5.webp"]');
+
+        const xL = resolveX(leftAnchor, 'left');
+        const xR = resolveX(rightArrow, 'right');
+        const yT = resolveY(stripeImg, 'top');
+        const yB = resolveY(stripeImg, 'bottom');
+
+        setState((prev) => (
+          prev.xL === xL && prev.xR === xR && prev.yT === yT && prev.yB === yB
+            ? prev
+            : { xL, xR, yT, yB }
+        ));
+      };
+
+      const tick = () => {
+        read();
+        raf = window.requestAnimationFrame(tick);
+      };
+
+      read();
+      raf = window.requestAnimationFrame(tick);
+      window.addEventListener('resize', read);
+      window.addEventListener('scroll', read, true);
+
+      t1 = window.setTimeout(read, 50);
+      t2 = window.setTimeout(read, 250);
+      t3 = window.setTimeout(read, 750);
+
+      return () => {
+        window.cancelAnimationFrame(raf);
+        window.removeEventListener('resize', read);
+        window.removeEventListener('scroll', read, true);
+        window.clearTimeout(t1);
+        window.clearTimeout(t2);
+        window.clearTimeout(t3);
+      };
+    }, [enabled]);
+
+    if (!enabled) return null;
+    const color = 'rgba(22, 163, 74, 0.85)';
+
+    return (
+      <div className="fixed inset-0 pointer-events-none debug-exempt" style={{ zIndex: 36000 }} aria-hidden="true" data-dev-overlay="true">
+        {Number.isFinite(state.xL) ? (
+          <div style={{ position: 'fixed', left: state.xL, top: 0, height: '100vh', width: 0, borderLeft: `1px solid ${color}` }} />
+        ) : null}
+        {Number.isFinite(state.xR) ? (
+          <div style={{ position: 'fixed', left: state.xR, top: 0, height: '100vh', width: 0, borderLeft: `1px solid ${color}` }} />
+        ) : null}
+        {Number.isFinite(state.yT) ? (
+          <div style={{ position: 'fixed', left: 0, top: state.yT, width: '100vw', height: 0, borderTop: `1px solid ${color}` }} />
+        ) : null}
+      </div>
+    );
+  };
 
   const { config: slidesConfig } = useSlidesConfig();
 
@@ -463,15 +579,9 @@ function App() {
   const isHomeRoute = location.pathname === '/';
   const isPreview = location.pathname === '/ec-preview' || location.pathname === '/ec-preview-lite';
   const isFullWideSlideRoute = location.pathname === '/full-wide-slide';
-  const isAdidasDemoRoute =
-    location.pathname === '/adidas-demo' ||
-    location.pathname === '/adidas-demo-lite' ||
-    location.pathname === '/adidas-pdp' ||
-    location.pathname.startsWith('/adidas-pdp/') ||
-    location.pathname.startsWith('/proves/demo-adidas');
   const isFullWideSlideDemoRoute = isFullWideSlideRoute;
-  const isAdidasStyleLayoutRoute = isAdidasDemoRoute || isFullWideSlideDemoRoute;
-  const isDevDemoRoute = isNikeDemoRoute || isAdidasDemoRoute || isFullWideSlideDemoRoute;
+  const isDemoStyleLayoutRoute = isFullWideSlideDemoRoute;
+  const isDevDemoRoute = isNikeDemoRoute || isFullWideSlideDemoRoute;
   const layoutInspectorActive = (isAdmin || isDevDemoRoute)
     && location.pathname !== '/ec-preview'
     && location.pathname !== '/ec-preview-lite'
@@ -775,6 +885,7 @@ function App() {
       if (toolbar && toolbar.contains(e.target)) return;
       if (e.target && e.target.closest && e.target.closest('.debug-exempt,[data-debug-exempt="true"]')) return;
       if (isDevOverlay(e.target)) return;
+      if (e.target && e.target.closest && e.target.closest('[data-stripe-calib-hud="1"]')) return;
       const main = document.getElementById('main-content');
       const inMain = main && e.target instanceof Element && main.contains(e.target);
       const inOverlay = e.target instanceof Element && isInLayoutInspectorRoot(e.target);
@@ -967,14 +1078,8 @@ function App() {
   const isFullScreenRoute = location.pathname === '/ec-preview' || location.pathname === '/ec-preview-lite';
   const isAdminRoute = ['/admin', '/index', '/promotions', '/ec-config', '/system-messages', '/fulfillment', '/fulfillment-settings', '/admin/media', '/admin-login', '/colleccio-settings', '/user-icon-picker', '/mockups', '/admin/gelato-sync', '/admin/gelato-blank', '/admin/products-overview', '/admin/draft', '/admin/draft/fulfillment-settings', '/admin/draft/mockup-settings', '/admin/draft/ruleta'].includes(location.pathname) || location.pathname.startsWith('/fulfillment/') || location.pathname.startsWith('/admin');
   const isHeroSettingsDevRoute = location.pathname === '/hero-settings';
-  const isDevLinksRoute = location.pathname === '/dev-links' || location.pathname.startsWith('/proves/dev-links');
+  const isDevToolsRoute = location.pathname === '/dev-tools' || location.pathname.startsWith('/dev-tools/');
   const isDevComponentsRoute = location.pathname === '/dev-components' || location.pathname.startsWith('/proves/dev-components');
-  const isDevLayoutBuilderRoute = location.pathname === '/layout-builder' || location.pathname.startsWith('/proves/layout-builder');
-  const isDevToolsRoute =
-    isDevLinksRoute ||
-    isDevComponentsRoute ||
-    isDevLayoutBuilderRoute ||
-    location.pathname === '/adidas-stripe-zoom-dev';
   const isComponentsCatalogTemplateRoute = location.pathname === '/plantilla-cataleg-components';
 
   // DEV layout routes: hide offers/footer, show AdminBanner, etc.
@@ -1006,18 +1111,18 @@ function App() {
 
   const adminRouteOffset = `${adminBannerHeight + adminRouteDevHeaderHeight + rulerInset}px`;
   const appHeaderOffset = `${(isDevHeaderRoute ? heroSettingsDevHeaderHeight : baseHeaderHeight) + offersHeaderHeight + adminBannerHeight + rulerInset}px`;
-  const adidasHeaderOffset = `${adminBannerHeight + rulerInset}px`;
+  const demoHeaderOffset = `${adminBannerHeight + rulerInset}px`;
 
   useEffect(() => {
     try {
       if (isFullScreenRoute) return;
-      const nextOffset = isAdminRoute ? adminRouteOffset : (isAdidasStyleLayoutRoute ? adidasHeaderOffset : appHeaderOffset);
+      const nextOffset = isAdminRoute ? adminRouteOffset : (isDemoStyleLayoutRoute ? demoHeaderOffset : appHeaderOffset);
       document.documentElement.style.setProperty('--appHeaderOffset', nextOffset);
       document.documentElement.style.setProperty('--rulerInset', `${rulerInset}px`);
     } catch {
       // ignore
     }
-  }, [adminRouteOffset, adidasHeaderOffset, appHeaderOffset, isAdminRoute, isAdidasStyleLayoutRoute, isFullScreenRoute, rulerInset]);
+  }, [adminRouteOffset, demoHeaderOffset, appHeaderOffset, isAdminRoute, isDemoStyleLayoutRoute, isFullScreenRoute, rulerInset]);
 
   return (
   <ErrorBoundary>
@@ -1061,7 +1166,6 @@ function App() {
           isDevDemoRoute={isDevDemoRoute}
           isFullWideSlideRoute={isFullWideSlideRoute}
           isNikeDemoRoute={isNikeDemoRoute}
-          isAdidasDemoRoute={isAdidasDemoRoute}
           adminBannerHeight={adminBannerHeight}
           rulerInset={rulerInset}
           cartItemCount={getTotalItems()}
@@ -1071,7 +1175,7 @@ function App() {
       )}
 
       {/* Main Header - NO mostrar a pàgines full-screen ni admin ni a dev tools */}
-      {!isFullScreenRoute && !isAdminRoute && !isAdidasStyleLayoutRoute && !isDevHeaderRoute && (
+      {!isFullScreenRoute && !isAdminRoute && !isDemoStyleLayoutRoute && !isDevHeaderRoute && (
         isHomeRoute ? null : isNikeDemoRoute ? (
           <NikeInspiredHeader
             cartItemCount={getTotalItems()}
@@ -1105,7 +1209,7 @@ function App() {
           style={!isFullScreenRoute ? (
             isAdminRoute
               ? { paddingTop: adminRouteOffset, paddingLeft: `${rulerInset}px`, '--appHeaderOffset': adminRouteOffset, '--rulerInset': `${rulerInset}px` }
-              : { paddingTop: isAdidasStyleLayoutRoute ? adidasHeaderOffset : appHeaderOffset, paddingLeft: `${rulerInset}px`, '--appHeaderOffset': isAdidasStyleLayoutRoute ? adidasHeaderOffset : appHeaderOffset, '--rulerInset': `${rulerInset}px` }
+              : { paddingTop: isDemoStyleLayoutRoute ? demoHeaderOffset : appHeaderOffset, paddingLeft: `${rulerInset}px`, '--appHeaderOffset': isDemoStyleLayoutRoute ? demoHeaderOffset : appHeaderOffset, '--rulerInset': `${rulerInset}px` }
           ) : {}}
           tabIndex={-1}
         >
@@ -1119,11 +1223,17 @@ function App() {
                     exit={{ opacity: 0, y: -10 }}
                     transition={{ duration: 0.3, ease: "easeInOut" }}
                   >
-                    <div className="w-full max-w-none" style={{ '--appHeaderOffset': adidasHeaderOffset }}>
-                      <AdidasInspiredHeader
+                    <div className="w-full max-w-none" style={{ '--appHeaderOffset': demoHeaderOffset }}>
+                      <Header
                         cartItemCount={getTotalItems()}
                         onCartClick={() => toggleSlidePreset(cartPresetId)}
                         onUserClick={() => toggleSlidePreset(viewPresetId)}
+                        adminBannerVisible={adminBannerVisible}
+                        rulerInset={rulerInset}
+                        offersHeaderVisible={offersHeaderVisible}
+                        offersHeaderHeight={offersHeaderHeight}
+                        offersHeaderTop={offersHeaderTop}
+                        isSearchPage={location.pathname === '/search'}
                       />
                     </div>
                     <Home {...pageProps} />
@@ -1181,9 +1291,6 @@ function App() {
 
                 <Route path="/proves" element={<Navigate to="/lab/proves" replace />} />
 
-                <Route path="/proves/demo-adidas" element={<AdidasDemoPage />} />
-                <Route path="/proves/demo-adidas-pdp" element={<AdidasPdpPage />} />
-                <Route path="/proves/demo-adidas-pdp-tdp" element={<AdidasPdpTdpPage />} />
                 <Route path="/proves/demo-nike-tambe" element={<NikeTambePage />} />
                 <Route path="/proves/dev-links" element={<DevLinksPage />} />
                 <Route path="/proves/dev-components" element={<DevComponentsCatalogPage />} />
@@ -1305,10 +1412,6 @@ function App() {
                 <Route path="/offers" element={<OffersPage />} />
 
                 <Route path="/new" element={<NewPage />} />
-                <Route path="/adidas-demo" element={<Navigate to="/proves/demo-adidas" replace />} />
-                <Route path="/adidas-pdp" element={<Navigate to="/proves/demo-adidas-pdp" replace />} />
-                <Route path="/adidas-pdp-tdp" element={<Navigate to="/proves/demo-adidas-pdp-tdp" replace />} />
-                <Route path="/adidas-stripe-zoom-dev" element={<Navigate to="/lab/proves" replace />} />
                 <Route path="/dev-links" element={<Navigate to="/proves/dev-links" replace />} />
                 <Route path="/dev-components" element={<Navigate to="/proves/dev-components" replace />} />
                 <Route path="/layout-builder" element={<Navigate to="/proves/layout-builder" replace />} />
@@ -1474,7 +1577,7 @@ function App() {
             <div
               ref={debugButtonsWrapRef}
               className="flex items-center gap-2 relative debug-exempt"
-              style={{ position: 'fixed', left: 71, bottom: 16, zIndex: 99999 }}
+              style={{ position: 'fixed', left: 71, bottom: 16, zIndex: 1100000 }}
             >
               <button
                 type="button"
@@ -1580,6 +1683,88 @@ function App() {
                 Guides
               </button>
 
+              <div className="flex items-center gap-2">
+                <label className="flex items-center gap-2 h-12 rounded-full border border-black/15 bg-white px-3 text-[12px] font-semibold text-black/80 shadow-lg debug-exempt">
+                  <span className="text-[11px] font-medium text-black/60">dx</span>
+                  <input
+                    className="w-[58px] bg-transparent text-right outline-none"
+                    inputMode="numeric"
+                    value={String(megaStripeDx)}
+                    onChange={(e) => {
+                      const v = e.target.value;
+                      if (v === '' || v === '-') {
+                        setMegaStripeDx(0);
+                        return;
+                      }
+                      const n = Number.parseInt(v, 10);
+                      if (Number.isFinite(n)) setMegaStripeDx(n);
+                    }}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                    }}
+                    onKeyDown={(e) => {
+                      e.stopPropagation();
+                      if (e.key === 'ArrowUp') {
+                        e.preventDefault();
+                        setMegaStripeDx((v) => (Number.isFinite(v) ? v + 1 : 1));
+                      }
+                      if (e.key === 'ArrowDown') {
+                        e.preventDefault();
+                        setMegaStripeDx((v) => (Number.isFinite(v) ? v - 1 : -1));
+                      }
+                    }}
+                  />
+                </label>
+
+                <label className="flex items-center gap-2 h-12 rounded-full border border-black/15 bg-white px-3 text-[12px] font-semibold text-black/80 shadow-lg debug-exempt">
+                  <span className="text-[11px] font-medium text-black/60">dy</span>
+                  <input
+                    className="w-[58px] bg-transparent text-right outline-none"
+                    inputMode="numeric"
+                    value={String(megaStripeDy)}
+                    onChange={(e) => {
+                      const v = e.target.value;
+                      if (v === '' || v === '-') {
+                        setMegaStripeDy(0);
+                        return;
+                      }
+                      const n = Number.parseInt(v, 10);
+                      if (Number.isFinite(n)) setMegaStripeDy(n);
+                    }}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                    }}
+                    onKeyDown={(e) => {
+                      e.stopPropagation();
+                      if (e.key === 'ArrowUp') {
+                        e.preventDefault();
+                        setMegaStripeDy((v) => (Number.isFinite(v) ? v + 1 : 1));
+                      }
+                      if (e.key === 'ArrowDown') {
+                        e.preventDefault();
+                        setMegaStripeDy((v) => (Number.isFinite(v) ? v - 1 : -1));
+                      }
+                    }}
+                  />
+                </label>
+
+                <button
+                  type="button"
+                  className={`relative z-10 h-12 rounded-full border px-4 text-[12px] font-semibold shadow-lg active:bg-black/10 debug-exempt ${
+                    megaStripeBeltEnabled
+                      ? 'border-[#16a34a]/40 bg-[#16a34a]/10 text-[#0f172a] hover:bg-[#16a34a]/15'
+                      : 'border-black/15 bg-white text-black/80 hover:bg-black/5'
+                  }`}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    setMegaStripeBeltEnabled((prev) => !prev);
+                  }}
+                >
+                  Belt: {megaStripeBeltEnabled ? 'ON' : 'OFF'}
+                </button>
+              </div>
+
               {isFullWideSlideDemoRoute || isHomeRoute ? (
                 <button
                   type="button"
@@ -1647,6 +1832,10 @@ function App() {
         )}
         {rulersOverlayActive && (
           <DevGuidesOverlay guidesEnabled={guidesEnabled} onAutoEnable={() => setGuidesEnabled(true)} />
+        )}
+
+        {rulersOverlayActive && (
+          <BeltReferenceOverlay enabled={megaStripeBeltEnabled} />
         )}
 
         {clicksEnabled && clickMarks.length > 0 && (

@@ -99,7 +99,6 @@ export default function DevHeader({
 
   const demoLinks = [
     { label: 'Nike També', href: '/nike-tambe' },
-    { label: 'Adidas', href: '/adidas-demo' },
     { label: 'Nike Hero', href: '/nike-hero-demo' },
   ];
 
