@@ -287,6 +287,16 @@ function App() {
   const isFullWideSlideDemoRoute = location.pathname === '/full-wide-slide-demo';
   const HUD_DEBUG_BOTTOM_RESERVE_PX = 104;
 
+  const stripeOverlayDebugOn = useMemo(() => {
+    try {
+      const sp = new URLSearchParams(location.search || '');
+      const cur = String(sp.get('stripeOverlayDebug') || '').trim().toLowerCase();
+      return sp.has('stripeOverlayDebug') && (cur === '' || cur === '1' || cur === 'true' || cur === 'on' || cur === 'yes');
+    } catch {
+      return false;
+    }
+  }, [location.search]);
+
   useEffect(() => {
     try {
       const sp = new URLSearchParams(location.search);
@@ -309,13 +319,6 @@ function App() {
     const tick = () => {
       try {
         if (!alive) return;
-        const sp = new URLSearchParams(window.location.search || '');
-        const cur = String(sp.get('stripeOverlayDebug') || '').trim().toLowerCase();
-        const on = sp.has('stripeOverlayDebug') && (cur === '' || cur === '1' || cur === 'true' || cur === 'on' || cur === 'yes');
-        if (!on) {
-          setStripeOverlayDebugSnapshot(null);
-          return;
-        }
         const snap = window.__HG_OVERLAY_DEBUG__ || null;
         setStripeOverlayDebugSnapshot((prev) => {
           if (!snap) return prev;
@@ -323,7 +326,7 @@ function App() {
             stripeOverlayDebug: Boolean(snap.stripeOverlayDebug),
             showStripe: Boolean(snap.showStripe),
             active: String(snap.active || ''),
-            resolvedOverlaySrc: Boolean(snap.resolvedOverlaySrc),
+            resolvedOverlaySrc: String(snap.resolvedOverlaySrc || ''),
             stripeOverlayLoadState: String(snap.stripeOverlayLoadState || ''),
             stripeOverlayIsStripeWide: Boolean(snap.stripeOverlayIsStripeWide),
           };
@@ -2766,8 +2769,46 @@ function App() {
                           DEBUG
                         </div>
 
+                        <div style={{ gridRow: '2', gridColumn: '5', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, padding: '0 6px', paddingLeft: 30, minWidth: 0, overflow: 'hidden', height: 'var(--megaStripeHudCellHPx)' }}>
+                          <div style={{ fontSize: 13, fontWeight: 900, color: 'rgba(0,0,0,0.75)', lineHeight: '16px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0, textAlign: 'left' }}>Ref</div>
+                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, minWidth: 0, flexShrink: 0 }}>
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                setMegaStripeRefEnabled((v) => !v);
+                              }}
+                              style={{ height: 20, display: 'flex', alignItems: 'center', padding: '0 10px', borderRadius: 6, border: '1px solid rgba(0,0,0,0.15)', background: megaStripeRefEnabled ? 'rgba(59,130,246,0.16)' : 'rgba(255,255,255,0.35)', color: megaStripeRefEnabled ? 'rgba(37,99,235,0.95)' : 'rgba(0,0,0,0.70)', fontSize: 12, fontWeight: 900, whiteSpace: 'nowrap' }}
+                            >
+                              {megaStripeRefEnabled ? 'ON' : 'OFF'}
+                            </button>
+                          </div>
+                        </div>
+
+                        <div style={{ gridRow: '2', gridColumn: '4', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, padding: '0 6px', paddingLeft: 30, minWidth: 0, overflow: 'hidden', height: 'var(--megaStripeHudCellHPx)' }}>
+                          <div style={{ fontSize: 13, fontWeight: 900, color: 'rgba(0,0,0,0.75)', lineHeight: '16px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0, textAlign: 'left' }}>overlayMode</div>
+                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, minWidth: 0, flexShrink: 0 }}>
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                try {
+                                  e.preventDefault();
+                                  e.stopPropagation();
+                                  setMegaStripeOverlayMode((prev) => (String(prev || 'off') === 'off' ? 'black' : 'off'));
+                                } catch {
+                                  // ignore
+                                }
+                              }}
+                              style={{ height: 20, display: 'flex', alignItems: 'center', padding: '0 10px', borderRadius: 6, border: '1px solid rgba(0,0,0,0.15)', background: String(megaStripeOverlayMode || 'off') === 'off' ? 'rgba(255,255,255,0.35)' : 'rgba(59,130,246,0.16)', color: String(megaStripeOverlayMode || 'off') === 'off' ? 'rgba(0,0,0,0.70)' : 'rgba(37,99,235,0.95)', fontSize: 12, fontWeight: 900, whiteSpace: 'nowrap' }}
+                            >
+                              {String(megaStripeOverlayMode || 'off') === 'off' ? 'OFF' : 'ON'}
+                            </button>
+                          </div>
+                        </div>
+
                         <div style={{ gridRow: '2', gridColumn: '6', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, padding: '0 6px', paddingLeft: 30, minWidth: 0, overflow: 'hidden', height: 'var(--megaStripeHudCellHPx)' }}>
-                          <div style={{ fontSize: 13, fontWeight: 900, color: 'rgba(0,0,0,0.75)', lineHeight: '16px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0, textAlign: 'left' }}>stripeOverlay</div>
+                          <div style={{ fontSize: 13, fontWeight: 900, color: 'rgba(0,0,0,0.75)', lineHeight: '16px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0, textAlign: 'left' }}>stripeOverlayDebug</div>
                           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, minWidth: 0, flexShrink: 0 }}>
                             <button
                               type="button"
@@ -2794,135 +2835,97 @@ function App() {
                           </div>
                         </div>
 
-                        <div style={{ gridRow: '3', gridColumn: '6', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, padding: '0 6px', paddingLeft: 30, minWidth: 0, overflow: 'hidden', height: 'var(--megaStripeHudCellHPx)' }}>
-                          <div style={{ fontSize: 13, fontWeight: 900, color: 'rgba(0,0,0,0.75)', lineHeight: '16px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0, textAlign: 'left' }}>Ref</div>
-                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, minWidth: 0, flexShrink: 0 }}>
-                            <button
-                              type="button"
-                              onClick={(e) => {
-                                e.preventDefault();
-                                e.stopPropagation();
-                                setMegaStripeRefEnabled((v) => !v);
-                              }}
-                              style={{ height: 20, display: 'flex', alignItems: 'center', padding: '0 10px', borderRadius: 6, border: '1px solid rgba(0,0,0,0.15)', background: megaStripeRefEnabled ? 'rgba(59,130,246,0.16)' : 'rgba(255,255,255,0.35)', color: megaStripeRefEnabled ? 'rgba(37,99,235,0.95)' : 'rgba(0,0,0,0.70)', fontSize: 12, fontWeight: 900, whiteSpace: 'nowrap' }}
-                            >
-                              {megaStripeRefEnabled ? 'ON' : 'OFF'}
-                            </button>
-                          </div>
-                        </div>
+                        {(() => {
+                          const snap = stripeOverlayDebugSnapshot;
+                          const disabled = !stripeOverlayDebugOn;
+                          const debugPairs = [
+                            ['showStripe', snap ? String(Boolean(snap.showStripe)) : '—'],
+                            ['active', snap ? String(snap.active || '') : '—'],
+                            ['loadState', snap ? String(snap.stripeOverlayLoadState || '') : '—'],
+                            ['stripeWide', snap ? String(Boolean(snap.stripeOverlayIsStripeWide)) : '—'],
+                            ['resolvedOverlaySrc', snap ? (snap.resolvedOverlaySrc ? 'yes' : 'no') : '—'],
+                          ];
 
-                        {stripeOverlayDebugSnapshot ? (
-                          <>
-                            {(
-                              [
-                                ['showStripe', String(Boolean(stripeOverlayDebugSnapshot.showStripe))],
-                                ['active', String(stripeOverlayDebugSnapshot.active || '')],
-                              ]
-                            ).map(([k, v], idx) => {
-                              const row = String(2 + idx);
-                              return (
-                                <div
-                                  key={`stripeOverlayDebug-stripe-${k}`}
-                                  style={{
-                                    gridRow: row,
-                                    gridColumn: '5',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'space-between',
-                                    gap: 6,
-                                    padding: '0 6px',
-                                    paddingLeft: 30,
-                                    minWidth: 0,
-                                    height: 'var(--megaStripeHudCellHPx)',
-                                    overflow: 'hidden',
-                                  }}
-                                >
-                                  <div style={{ fontSize: 13, fontWeight: 900, color: 'rgba(0,0,0,0.75)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0, lineHeight: '16px' }} title={String(k)}>
-                                    {String(k)}
+                          return (
+                            <>
+                              {debugPairs.map(([k, v], idx) => {
+                                const row = String(3 + idx);
+                                return (
+                                  <div
+                                    key={`stripeOverlayDebug-${k}`}
+                                    style={{
+                                      gridRow: row,
+                                      gridColumn: '6',
+                                      display: 'flex',
+                                      alignItems: 'center',
+                                      justifyContent: 'space-between',
+                                      gap: 6,
+                                      padding: '0 6px',
+                                      paddingLeft: 30,
+                                      minWidth: 0,
+                                      height: 'var(--megaStripeHudCellHPx)',
+                                      overflow: 'hidden',
+                                      opacity: disabled ? 0.35 : 1,
+                                    }}
+                                  >
+                                    <div style={{ fontSize: 13, fontWeight: 900, color: 'rgba(0,0,0,0.75)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0, lineHeight: '16px' }} title={String(k)}>
+                                      {String(k)}
+                                    </div>
+                                    <div style={{ fontSize: 13, fontWeight: 300, color: 'rgba(0,0,0,0.55)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0, textAlign: 'right', lineHeight: '16px' }} title={String(v)}>
+                                      {String(v)}
+                                    </div>
                                   </div>
-                                  <div style={{ fontSize: 13, fontWeight: 300, color: 'rgba(0,0,0,0.55)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0, textAlign: 'right', lineHeight: '16px' }} title={String(v)}>
-                                    {String(v)}
-                                  </div>
-                                </div>
-                              );
-                            })}
+                                );
+                              })}
+                            </>
+                          );
+                        })()}
 
-                            {(
-                              [
-                                ['resolvedOverlaySrc', stripeOverlayDebugSnapshot.resolvedOverlaySrc ? 'yes' : 'no'],
-                                ['loadState', String(stripeOverlayDebugSnapshot.stripeOverlayLoadState || '')],
-                                ['stripeWide', String(Boolean(stripeOverlayDebugSnapshot.stripeOverlayIsStripeWide))],
-                              ]
-                            ).map(([k, v], idx) => {
-                              const row = String(2 + idx);
-                              return (
-                                <div
-                                  key={`stripeOverlayDebug-overlay-${k}`}
-                                  style={{
-                                    gridRow: row,
-                                    gridColumn: '4',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'space-between',
-                                    gap: 6,
-                                    padding: '0 6px',
-                                    paddingLeft: 30,
-                                    minWidth: 0,
-                                    height: 'var(--megaStripeHudCellHPx)',
-                                    overflow: 'hidden',
-                                  }}
-                                >
-                                  <div style={{ fontSize: 13, fontWeight: 900, color: 'rgba(0,0,0,0.75)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0, lineHeight: '16px' }} title={String(k)}>
-                                    {String(k)}
-                                  </div>
-                                  <div style={{ fontSize: 13, fontWeight: 300, color: 'rgba(0,0,0,0.55)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0, textAlign: 'right', lineHeight: '16px' }} title={String(v)}>
-                                    {String(v)}
-                                  </div>
-                                </div>
-                              );
-                            })}
-                          </>
-                        ) : null}
-
-                        <div style={{ gridRow: '2', gridColumn: '1', display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: '2px 6px', paddingLeft: 30, minWidth: 0, overflow: 'hidden' }}>
-                          <div style={{ fontSize: 13, fontWeight: 900, color: 'rgba(0,0,0,0.65)', lineHeight: 1.05, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>Sprite</div>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: 6, minWidth: 0 }}>
+                        <div style={{ gridRow: '2', gridColumn: '1', display: 'grid', gridTemplateRows: '1fr 1fr', gridTemplateColumns: '60px 1fr', columnGap: 8, alignItems: 'center', padding: '2px 6px', paddingLeft: 30, minWidth: 0, overflow: 'hidden' }}>
+                          <div style={{ gridRow: '1 / span 2', gridColumn: '1', display: 'flex', alignItems: 'center', fontSize: 13, fontWeight: 900, color: 'rgba(0,0,0,0.65)', lineHeight: 1.05, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>Sprite</div>
+                          <div style={{ gridRow: '1', gridColumn: '2', display: 'flex', alignItems: 'center', gap: 6, minWidth: 0 }}>
                             <div style={{ fontSize: 11, fontWeight: 300, color: 'rgba(0,0,0,0.60)' }}>x:</div>
                             <input style={{ width: 40, height: 14, padding: 0, border: 0, borderRadius: 0, background: 'transparent', fontSize: 11, fontWeight: 300, outline: 'none' }} value={String(megaStripeDx)} onChange={(e) => { const v = e.target.value; if (v === '' || v === '-') { setMegaStripeDx(0); return; } const n = Number.parseFloat(v); if (Number.isFinite(n)) setMegaStripeDx(n); }} onClick={(e) => e.stopPropagation()} onKeyDown={(e) => e.stopPropagation()} />
-                            <div style={{ fontSize: 11, fontWeight: 300, color: 'rgba(0,0,0,0.60)' }}>y:</div>
-                            <input style={{ width: 40, height: 14, padding: 0, border: 0, borderRadius: 0, background: 'transparent', fontSize: 11, fontWeight: 300, outline: 'none' }} value={String(megaStripeDy)} onChange={(e) => { const v = e.target.value; if (v === '' || v === '-') { setMegaStripeDy(0); return; } const n = Number.parseFloat(v); if (Number.isFinite(n)) setMegaStripeDy(n); }} onClick={(e) => e.stopPropagation()} onKeyDown={(e) => e.stopPropagation()} />
                             <div style={{ fontSize: 11, fontWeight: 300, color: 'rgba(0,0,0,0.60)' }}>s:</div>
                             <input style={{ width: 60, height: 14, padding: 0, border: 0, borderRadius: 0, background: 'transparent', fontSize: 11, fontWeight: 300, outline: 'none', minWidth: 0 }} value={String(megaStripeScale)} onChange={(e) => { const v = e.target.value; if (v === '' || v === '-') { setMegaStripeScale(1); return; } const n = Number.parseFloat(v); if (Number.isFinite(n) && n > 0) setMegaStripeScale(Math.min(5, Math.max(0.1, n))); }} onClick={(e) => e.stopPropagation()} onKeyDown={(e) => e.stopPropagation()} />
                           </div>
+                          <div style={{ gridRow: '2', gridColumn: '2', display: 'flex', alignItems: 'center', gap: 6, minWidth: 0 }}>
+                            <div style={{ fontSize: 11, fontWeight: 300, color: 'rgba(0,0,0,0.60)' }}>y:</div>
+                            <input style={{ width: 40, height: 14, padding: 0, border: 0, borderRadius: 0, background: 'transparent', fontSize: 11, fontWeight: 300, outline: 'none' }} value={String(megaStripeDy)} onChange={(e) => { const v = e.target.value; if (v === '' || v === '-') { setMegaStripeDy(0); return; } const n = Number.parseFloat(v); if (Number.isFinite(n)) setMegaStripeDy(n); }} onClick={(e) => e.stopPropagation()} onKeyDown={(e) => e.stopPropagation()} />
+                          </div>
                         </div>
 
-                        <div style={{ gridRow: '3', gridColumn: '1', display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: '2px 6px', paddingLeft: 30, minWidth: 0, overflow: 'hidden' }}>
-                          <div style={{ fontSize: 13, fontWeight: 900, color: 'rgba(0,0,0,0.65)', lineHeight: 1.05, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>Overlay</div>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: 6, minWidth: 0 }}>
+                        <div style={{ gridRow: '3', gridColumn: '1', display: 'grid', gridTemplateRows: '1fr 1fr', gridTemplateColumns: '60px 1fr', columnGap: 8, alignItems: 'center', padding: '2px 6px', paddingLeft: 30, minWidth: 0, overflow: 'hidden' }}>
+                          <div style={{ gridRow: '1 / span 2', gridColumn: '1', display: 'flex', alignItems: 'center', fontSize: 13, fontWeight: 900, color: 'rgba(0,0,0,0.65)', lineHeight: 1.05, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>Overlay</div>
+                          <div style={{ gridRow: '1', gridColumn: '2', display: 'flex', alignItems: 'center', gap: 6, minWidth: 0 }}>
                             <div style={{ fontSize: 11, fontWeight: 300, color: 'rgba(0,0,0,0.60)' }}>x:</div>
                             <input style={{ width: 40, height: 14, padding: 0, border: 0, borderRadius: 0, background: 'transparent', fontSize: 11, fontWeight: 300, outline: 'none' }} value={String(megaStripeOverlayDx)} onChange={(e) => { const v = e.target.value; if (v === '' || v === '-') { setMegaStripeOverlayDx(0); return; } const n = Number.parseFloat(v); if (Number.isFinite(n)) setMegaStripeOverlayDx(n); }} onClick={(e) => e.stopPropagation()} onKeyDown={(e) => e.stopPropagation()} />
-                            <div style={{ fontSize: 11, fontWeight: 300, color: 'rgba(0,0,0,0.60)' }}>y:</div>
-                            <input style={{ width: 40, height: 14, padding: 0, border: 0, borderRadius: 0, background: 'transparent', fontSize: 11, fontWeight: 300, outline: 'none' }} value={String(megaStripeOverlayDy)} onChange={(e) => { const v = e.target.value; if (v === '' || v === '-') { setMegaStripeOverlayDy(0); return; } const n = Number.parseFloat(v); if (Number.isFinite(n)) setMegaStripeOverlayDy(n); }} onClick={(e) => e.stopPropagation()} onKeyDown={(e) => e.stopPropagation()} />
                             <div style={{ fontSize: 11, fontWeight: 300, color: 'rgba(0,0,0,0.60)' }}>s:</div>
                             <input value={megaStripeOverlayScaleDraft} onFocus={() => { megaStripeOverlayScaleInputFocusedRef.current = true; setMegaStripeOverlayScaleDraft(String(megaStripeOverlayScale)); }} onBlur={() => { megaStripeOverlayScaleInputFocusedRef.current = false; const v = String(megaStripeOverlayScaleDraft || '').trim(); if (v === '' || v === '-') { setMegaStripeOverlayScaleDraft(String(megaStripeOverlayScale)); return; } const n = Number.parseFloat(v); if (Number.isFinite(n) && n > 0) { const clamped = Math.min(5, Math.max(0.1, n)); setMegaStripeOverlayScale(clamped); setMegaStripeOverlayScaleDraft(String(clamped)); return; } setMegaStripeOverlayScaleDraft(String(megaStripeOverlayScale)); }} onChange={(e) => { setMegaStripeOverlayScaleDraft(e.target.value); }} onClick={(e) => e.stopPropagation()} onKeyDown={(e) => { e.stopPropagation(); if (e.key === 'Enter') { try { e.currentTarget.blur(); } catch { } } }} style={{ width: 60, height: 14, padding: 0, border: 0, borderRadius: 0, background: 'transparent', fontSize: 11, fontWeight: 300, outline: 'none', minWidth: 0 }} />
                           </div>
-                        </div>
-
-                        <div style={{ gridRow: '4', gridColumn: '1', display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: '2px 6px', paddingLeft: 30, minWidth: 0, overflow: 'hidden' }}>
-                          <div style={{ fontSize: 13, fontWeight: 900, color: 'rgba(0,0,0,0.65)', lineHeight: 1.05, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>Ref</div>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: 6, minWidth: 0 }}>
-                            <div style={{ fontSize: 11, fontWeight: 300, color: 'rgba(0,0,0,0.60)' }}>x:</div>
-                            <input style={{ width: 40, height: 14, padding: 0, border: 0, borderRadius: 0, background: 'transparent', fontSize: 11, fontWeight: 300, outline: 'none' }} value={String(megaStripeRefDx)} onChange={(e) => { const v = e.target.value; if (v === '' || v === '-') { setMegaStripeRefDx(0); return; } const n = Number.parseFloat(v); if (Number.isFinite(n)) setMegaStripeRefDx(n); }} onClick={(e) => e.stopPropagation()} onKeyDown={(e) => e.stopPropagation()} />
+                          <div style={{ gridRow: '2', gridColumn: '2', display: 'flex', alignItems: 'center', gap: 6, minWidth: 0 }}>
                             <div style={{ fontSize: 11, fontWeight: 300, color: 'rgba(0,0,0,0.60)' }}>y:</div>
-                            <input style={{ width: 40, height: 14, padding: 0, border: 0, borderRadius: 0, background: 'transparent', fontSize: 11, fontWeight: 300, outline: 'none' }} value={String(megaStripeRefDy)} onChange={(e) => { const v = e.target.value; if (v === '' || v === '-') { setMegaStripeRefDy(0); return; } const n = Number.parseFloat(v); if (Number.isFinite(n)) setMegaStripeRefDy(n); }} onClick={(e) => e.stopPropagation()} onKeyDown={(e) => e.stopPropagation()} />
-                            <div style={{ fontSize: 11, fontWeight: 300, color: 'rgba(0,0,0,0.60)' }}>s:</div>
-                            <input style={{ width: 60, height: 14, padding: 0, border: 0, borderRadius: 0, background: 'transparent', fontSize: 11, fontWeight: 300, outline: 'none', minWidth: 0 }} value={String(megaStripeRefScale)} onChange={(e) => { const v = e.target.value; if (v === '' || v === '-') { setMegaStripeRefScale(1); return; } const n = Number.parseFloat(v); if (Number.isFinite(n) && n > 0) setMegaStripeRefScale(Math.min(5, Math.max(0.1, n))); }} onClick={(e) => e.stopPropagation()} onKeyDown={(e) => e.stopPropagation()} />
+                            <input style={{ width: 40, height: 14, padding: 0, border: 0, borderRadius: 0, background: 'transparent', fontSize: 11, fontWeight: 300, outline: 'none' }} value={String(megaStripeOverlayDy)} onChange={(e) => { const v = e.target.value; if (v === '' || v === '-') { setMegaStripeOverlayDy(0); return; } const n = Number.parseFloat(v); if (Number.isFinite(n)) setMegaStripeOverlayDy(n); }} onClick={(e) => e.stopPropagation()} onKeyDown={(e) => e.stopPropagation()} />
                           </div>
                         </div>
 
-                        <div style={{ gridRow: '5', gridColumn: '1', display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: '2px 6px', paddingLeft: 30, minWidth: 0, overflow: 'hidden' }}>
-                          <div style={{ fontSize: 13, fontWeight: 900, color: 'rgba(0,0,0,0.65)', lineHeight: 1.05, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>Tile</div>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: 6, minWidth: 0 }}>
+                        <div style={{ gridRow: '4', gridColumn: '1', display: 'grid', gridTemplateRows: '1fr 1fr', gridTemplateColumns: '60px 1fr', columnGap: 8, alignItems: 'center', padding: '2px 6px', paddingLeft: 30, minWidth: 0, overflow: 'hidden' }}>
+                          <div style={{ gridRow: '1 / span 2', gridColumn: '1', display: 'flex', alignItems: 'center', fontSize: 13, fontWeight: 900, color: 'rgba(0,0,0,0.65)', lineHeight: 1.05, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>Ref</div>
+                          <div style={{ gridRow: '1', gridColumn: '2', display: 'flex', alignItems: 'center', gap: 6, minWidth: 0 }}>
+                            <div style={{ fontSize: 11, fontWeight: 300, color: 'rgba(0,0,0,0.60)' }}>x:</div>
+                            <input style={{ width: 40, height: 14, padding: 0, border: 0, borderRadius: 0, background: 'transparent', fontSize: 11, fontWeight: 300, outline: 'none' }} value={String(megaStripeRefDx)} onChange={(e) => { const v = e.target.value; if (v === '' || v === '-') { setMegaStripeRefDx(0); return; } const n = Number.parseFloat(v); if (Number.isFinite(n)) setMegaStripeRefDx(n); }} onClick={(e) => e.stopPropagation()} onKeyDown={(e) => e.stopPropagation()} />
+                            <div style={{ fontSize: 11, fontWeight: 300, color: 'rgba(0,0,0,0.60)' }}>s:</div>
+                            <input style={{ width: 60, height: 14, padding: 0, border: 0, borderRadius: 0, background: 'transparent', fontSize: 11, fontWeight: 300, outline: 'none', minWidth: 0 }} value={String(megaStripeRefScale)} onChange={(e) => { const v = e.target.value; if (v === '' || v === '-') { setMegaStripeRefScale(1); return; } const n = Number.parseFloat(v); if (Number.isFinite(n) && n > 0) setMegaStripeRefScale(Math.min(5, Math.max(0.1, n))); }} onClick={(e) => e.stopPropagation()} onKeyDown={(e) => e.stopPropagation()} />
+                          </div>
+                          <div style={{ gridRow: '2', gridColumn: '2', display: 'flex', alignItems: 'center', gap: 6, minWidth: 0 }}>
+                            <div style={{ fontSize: 11, fontWeight: 300, color: 'rgba(0,0,0,0.60)' }}>y:</div>
+                            <input style={{ width: 40, height: 14, padding: 0, border: 0, borderRadius: 0, background: 'transparent', fontSize: 11, fontWeight: 300, outline: 'none' }} value={String(megaStripeRefDy)} onChange={(e) => { const v = e.target.value; if (v === '' || v === '-') { setMegaStripeRefDy(0); return; } const n = Number.parseFloat(v); if (Number.isFinite(n)) setMegaStripeRefDy(n); }} onClick={(e) => e.stopPropagation()} onKeyDown={(e) => e.stopPropagation()} />
+                          </div>
+                        </div>
+
+                        <div style={{ gridRow: '5', gridColumn: '1', display: 'grid', gridTemplateRows: '1fr 1fr', gridTemplateColumns: '60px 1fr', columnGap: 8, alignItems: 'center', padding: '2px 6px', paddingLeft: 30, minWidth: 0, overflow: 'hidden' }}>
+                          <div style={{ gridRow: '1 / span 2', gridColumn: '1', display: 'flex', alignItems: 'center', fontSize: 13, fontWeight: 900, color: 'rgba(0,0,0,0.65)', lineHeight: 1.05, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>Tile</div>
+                          <div style={{ gridRow: '1', gridColumn: '2', display: 'flex', alignItems: 'center', gap: 6, minWidth: 0 }}>
                             <div style={{ fontSize: 11, fontWeight: 300, color: 'rgba(0,0,0,0.60)' }}>g:</div>
                             <input value={String(megaStripeTileGapPx || 0)} onChange={(e) => { const v = e.target.value; if (v === '' || v === '-') { setMegaStripeTileGapPx(0); return; } const n = Number.parseFloat(v); if (Number.isFinite(n)) setMegaStripeTileGapPx(Math.min(200, Math.max(-200, n))); }} onClick={(e) => e.stopPropagation()} onKeyDown={(e) => e.stopPropagation()} style={{ width: 60, height: 14, padding: 0, border: 0, borderRadius: 0, background: 'transparent', fontSize: 11, fontWeight: 300, outline: 'none', minWidth: 0 }} />
                           </div>
@@ -2949,7 +2952,48 @@ function App() {
                                 const ignored = new Set(['layout', 'guides', 'stripeOverlayDebug']);
                                 const allEntries = Array.from(sp.entries())
                                   .filter(([k]) => k && !ignored.has(String(k)))
-                                  .sort((a, b) => String(a[0]).localeCompare(String(b[0])));
+                                  .sort((a, b) => {
+                                    const rank = (key) => {
+                                      const s = String(key || '').toLowerCase();
+                                      if (s.includes('stripe')) return 0;
+                                      if (s.includes('overlay')) return 1;
+                                      if (s.includes('ref')) return 2;
+                                      if (s.includes('grid')) return 3;
+                                      return 9;
+                                    };
+                                    const axisRank = (key) => {
+                                      const s = String(key || '').toLowerCase();
+                                      if (/(^|[-_])(dx|x)$/.test(s)) return 0;
+                                      if (/(^|[-_])(dy|y)$/.test(s)) return 1;
+                                      if (/(^|[-_])(scale|s)$/.test(s)) return 2;
+                                      if (s.includes('dx') && !s.includes('dy')) return 0;
+                                      if (s.includes('dy') && !s.includes('dx')) return 1;
+                                      if (s.includes('scale')) return 2;
+                                      return 9;
+                                    };
+                                    const baseKey = (key) => {
+                                      const s = String(key || '').toLowerCase();
+                                      return s
+                                        .replace(/(^|[-_])(dx|dy|x|y|scale|s)$/i, '')
+                                        .replace(/(dx|dy|scale)\b/gi, '')
+                                        .replace(/\b(x|y|s)\b/gi, '')
+                                        .replace(/[-_]+$/g, '')
+                                        .trim();
+                                    };
+                                    const ra = rank(a[0]);
+                                    const rb = rank(b[0]);
+                                    if (ra !== rb) return ra - rb;
+
+                                    const ba = baseKey(a[0]);
+                                    const bb = baseKey(b[0]);
+                                    if (ba !== bb) return ba.localeCompare(bb);
+
+                                    const aa = axisRank(a[0]);
+                                    const ab = axisRank(b[0]);
+                                    if (aa !== ab) return aa - ab;
+
+                                    return String(a[0]).localeCompare(String(b[0]));
+                                  });
 
                                 const isBoolLike = (v) => {
                                   const s = (v == null) ? '' : String(v).trim().toLowerCase();
@@ -3155,12 +3199,43 @@ function App() {
                             const longDebugEntries = longEntriesAll.filter(([k]) => isDebugEntry(k)).slice(0, 3);
                             const longEntries = longEntriesAll.filter(([k]) => !isDebugEntry(k)).slice(0, 3);
 
+                            const resolvedOverlaySrcValue = (() => {
+                              try {
+                                const v = stripeOverlayDebugSnapshot?.resolvedOverlaySrc;
+                                if (!stripeOverlayDebugSnapshot) return '—';
+                                return v == null ? '—' : String(v);
+                              } catch {
+                                return stripeOverlayDebugSnapshot ? '' : '—';
+                              }
+                            })();
+
                             return (
                               <>
+                                <div style={{ gridRow: '17', gridColumn: '2 / span 5', display: 'flex', alignItems: 'center', gap: 8, padding: 0, minWidth: 0, height: 'var(--megaStripeHudCellHPx)', overflow: 'hidden', position: 'relative', opacity: stripeOverlayDebugOn ? 1 : 0.35 }}>
+                                  <div style={{ padding: '0 6px', paddingLeft: 30, fontSize: 13, fontWeight: 900, lineHeight: 'var(--megaStripeHudCellHPx)', color: 'rgba(0,0,0,0.75)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0, flexShrink: 0 }} title="resolvedOverlaySrc">
+                                    resolvedOverlaySrc
+                                  </div>
+                                  <input
+                                    value={resolvedOverlaySrcValue}
+                                    readOnly
+                                    placeholder="(enable stripeOverlayDebug=1)"
+                                    onClick={(e) => {
+                                      try {
+                                        e.stopPropagation();
+                                        e.currentTarget.select?.();
+                                      } catch {
+                                        // ignore
+                                      }
+                                    }}
+                                    onKeyDown={(e) => e.stopPropagation()}
+                                    style={{ flex: 1, height: 'var(--megaStripeHudCellHPx)', lineHeight: 'var(--megaStripeHudCellHPx)', padding: '0 6px', border: 0, borderRadius: 0, background: 'transparent', fontSize: 13, fontWeight: 300, color: 'rgba(0,0,0,0.55)', outline: 'none', minWidth: 0 }}
+                                  />
+                                </div>
+
                                 {longEntries.map(([k, v], idx) => {
                                   const key = String(k);
                                   const val = (v == null) ? '' : String(v);
-                                  const row = String(17 - idx);
+                                  const row = String(16 - idx);
                                   return (
                                     <div key={key} style={{ gridRow: row, gridColumn: '2 / span 5', display: 'flex', alignItems: 'center', gap: 8, padding: 0, minWidth: 0, height: 'var(--megaStripeHudCellHPx)', overflow: 'hidden', position: 'relative' }}>
                                       <div style={{ padding: '0 6px', paddingLeft: 30, fontSize: 13, fontWeight: 900, lineHeight: 'var(--megaStripeHudCellHPx)', color: 'rgba(0,0,0,0.75)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0, flexShrink: 0 }} title={key}>

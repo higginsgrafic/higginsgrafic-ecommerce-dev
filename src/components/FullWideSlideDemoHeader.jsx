@@ -1554,6 +1554,23 @@ export default function FullWideSlideDemoHeader({
     return () => window.removeEventListener('mega-stripe-ref-changed', readRef);
   }, []);
 
+  const [megaStripeOverlayModeLocal, setMegaStripeOverlayModeLocal] = useState('black');
+  useEffect(() => {
+    const readOverlayMode = () => {
+      try {
+        const raw = window.localStorage.getItem('MEGA_STRIPE_OVERLAY_MODE');
+        const v = String(raw || 'black');
+        const allowed = new Set(['black', 'off']);
+        setMegaStripeOverlayModeLocal(allowed.has(v) ? v : 'black');
+      } catch {
+        setMegaStripeOverlayModeLocal('black');
+      }
+    };
+    readOverlayMode();
+    window.addEventListener('mega-stripe-overlay-mode-changed', readOverlayMode);
+    return () => window.removeEventListener('mega-stripe-overlay-mode-changed', readOverlayMode);
+  }, []);
+
   const resolvedOverlaySrc = useMemo(() => {
     const normalizeKeyLocal = (value) => {
       if (typeof value !== 'string') return '';
@@ -2034,16 +2051,7 @@ export default function FullWideSlideDemoHeader({
       img.onload = () => {
         if (!alive) return;
         setStripeOverlayLoadState('ok');
-        try {
-          const w = img.naturalWidth;
-          const h = img.naturalHeight;
-          if (Number.isFinite(w) && Number.isFinite(h) && h > 0) {
-            const r = w / h;
-            setStripeOverlayIsStripeWide(r >= 6);
-          }
-        } catch {
-          // ignore
-        }
+        setStripeOverlayIsStripeWide(false);
       };
       img.onerror = () => { if (alive) setStripeOverlayLoadState('error'); };
       img.src = resolvedOverlaySrcEncoded || resolvedOverlaySrc;
@@ -2332,21 +2340,20 @@ export default function FullWideSlideDemoHeader({
 
   const selectedColorHex = useMemo(
     () => ({
-      c0: '#ffffff',
-      c1: '#ffffff',
-      c2: '#ffffff',
-      c3: '#ffffff',
-      c4: '#ffffff',
-      c5: '#ffffff',
-      c6: '#ffffff',
-      c7: '#ffffff',
-      c8: '#ffffff',
-      c9: '#ffffff',
-      c10: '#ffffff',
-      c11: '#ffffff',
-      c12: '#ffffff',
-      c13: '#ffffff',
-      c14: '#ffffff',
+      white: '#ffffff',
+      'light-blue': '#1f6feb',
+      royal: '#2d6cff',
+      purple: '#6b21a8',
+      navy: '#1f2a44',
+      daisy: '#facc15',
+      gold: '#caa24d',
+      'light-pink': '#f9a8d4',
+      red: '#d11a2a',
+      kiwi: '#84cc16',
+      'irish-green': '#1f6f3a',
+      'military-green': '#556b2f',
+      'forest-green': '#0b3d2e',
+      black: '#111111',
     }),
     []
   );
@@ -2407,6 +2414,53 @@ export default function FullWideSlideDemoHeader({
       'black',
     ],
     []
+  );
+
+  const resolveStripeOverlaySrcForTile = useCallback(
+    (src, idx) => {
+      try {
+        if (!src || typeof src !== 'string') return src;
+        const lower = src.toLowerCase();
+        const safeIdx = Number.isFinite(Number(idx)) ? Number(idx) : 0;
+        const maxIdx = Array.isArray(selectedColorOrder) && selectedColorOrder.length > 0
+          ? Math.max(0, selectedColorOrder.length - 1)
+          : 13;
+        const isFirst = safeIdx === 0;
+        const isLast = safeIdx === maxIdx;
+
+        const hasMultiLight = lower.includes('-multi-light-');
+        const hasMultiDark = lower.includes('-multi-dark-');
+        if (hasMultiLight || hasMultiDark) {
+          if (isFirst) return hasMultiDark ? src : src.replace(/-multi-light-/i, '-multi-dark-');
+          return hasMultiLight ? src : src.replace(/-multi-dark-/i, '-multi-light-');
+        }
+
+        const hasWhiteInk = /-w(?=[-.])/i.test(src) || lower.includes('/white/');
+        const hasBlackInk = /-b(?=[-.])/i.test(src) || lower.includes('/black/');
+        if (!hasWhiteInk && !hasBlackInk) return src;
+
+        const toBlack = (s) => {
+          let out = s;
+          out = out.replace(/\/white\//i, '/black/');
+          out = out.replace(/-w(?=[-.])/i, '-b');
+          return out;
+        };
+        const toWhite = (s) => {
+          let out = s;
+          out = out.replace(/\/black\//i, '/white/');
+          out = out.replace(/-b(?=[-.])/i, '-w');
+          return out;
+        };
+
+        if (hasWhiteInk) {
+          return isFirst ? toBlack(src) : src;
+        }
+        return isLast ? toWhite(src) : src;
+      } catch {
+        return src;
+      }
+    },
+    [selectedColorOrder]
   );
 
   const colorButtonSrcBySlug = useMemo(
@@ -3150,16 +3204,14 @@ export default function FullWideSlideDemoHeader({
                                 />
                               ) : null}
 
-                              {resolvedOverlaySrc ? (
+                              {resolvedOverlaySrc && megaStripeOverlayModeLocal !== 'off' ? (
                                 <div
                                   className="absolute inset-0 flex"
                                   style={{
                                     pointerEvents: 'none',
                                     zIndex: 10,
                                     transformOrigin: 'top center',
-                                    transform: stripeOverlayIsStripeWide
-                                      ? 'translate(var(--megaStripeOverlayDx, 0px), var(--megaStripeOverlayDy, 0px)) scale(var(--megaStripeOverlayScale, 1))'
-                                      : 'none',
+                                    transform: 'none',
                                     columnGap: 'var(--megaStripeTileGapPx, 0px)',
                                     background: stripeOverlayDebug ? 'rgba(0, 200, 255, 0.10)' : 'transparent',
                                   }}
@@ -3177,20 +3229,27 @@ export default function FullWideSlideDemoHeader({
                                       }}
                                     >
                                       <img
-                                        src={resolvedOverlaySrcEncoded || resolvedOverlaySrc}
+                                        src={(() => {
+                                          try {
+                                            const base = resolvedOverlaySrc;
+                                            if (!base || typeof base !== 'string') return undefined;
+                                            const picked = resolveStripeOverlaySrcForTile(base, idx);
+                                            return picked ? encodeURI(picked) : undefined;
+                                          } catch {
+                                            return resolvedOverlaySrcEncoded || resolvedOverlaySrc;
+                                          }
+                                        })()}
                                         alt=""
                                         className="block absolute top-0"
                                         style={{
                                           height: '100%',
-                                          width: stripeOverlayIsStripeWide ? '1400%' : '100%',
-                                          left: stripeOverlayIsStripeWide ? `${-idx * 100}%` : '0%',
-                                          objectFit: stripeOverlayIsStripeWide ? 'fill' : 'contain',
+                                          width: '100%',
+                                          left: '0%',
+                                          objectFit: 'contain',
                                           opacity: 0.98,
                                           pointerEvents: 'none',
                                           transformOrigin: 'top center',
-                                          transform: stripeOverlayIsStripeWide
-                                            ? 'none'
-                                            : 'translate(var(--megaStripeOverlayDx, 0px), var(--megaStripeOverlayDy, 0px)) scale(var(--megaStripeOverlayScale, 1))',
+                                          transform: 'translate(var(--megaStripeOverlayDx, 0px), var(--megaStripeOverlayDy, 0px)) scale(var(--megaStripeOverlayScale, 1))',
                                           filter: stripeOverlayDebug ? 'drop-shadow(0 0 2px rgba(0,0,0,0.9)) drop-shadow(0 0 6px rgba(255,0,0,0.6))' : 'none',
                                         }}
                                         loading="eager"
