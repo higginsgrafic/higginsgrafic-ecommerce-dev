@@ -234,7 +234,13 @@ html, body { scrollbar-width: none; }
   }
 
   return (
-    <div className="h-[calc(100vh-var(--appHeaderOffset,0px))] overflow-hidden bg-background">
+    <div
+      className="overflow-hidden bg-background"
+      style={{
+        paddingBottom: 'var(--megaStripeHudBottomHPx, 0px)',
+        height: 'calc(100vh - var(--appHeaderOffset, 0px) - var(--megaStripeHudBottomHPx, 0px))',
+      }}
+    >
       <FullWideSlideDemoHeader
         cartItemCount={getTotalItems()}
         onCartClick={() => {

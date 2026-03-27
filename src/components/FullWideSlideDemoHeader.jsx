@@ -1136,177 +1136,114 @@ function MegaColumn({
   return (
     <div className="min-w-0">
       {row ? (
-        <div className="relative w-full">
-          <div className="pointer-events-none absolute inset-0 z-0 grid w-full grid-cols-9 gap-x-3">
-            <div className="col-start-2 col-span-7 min-w-0">
-              <div className="h-4" />
-              <div
-                className={`mt-2 w-full rounded-md transition-opacity duration-300 ease-in-out ${
-                  'bg-transparent opacity-100'
-                  }`}
-                style={
-                  tileSize
-                    ? {
-                        height: `${tileSize}px`,
-                        width:
-                          collectionId === 'outcasted'
-                            ? `${outcastedStripeTiles * tileSize + Math.max(0, outcastedStripeTiles - 1) * 12}px`
-                            : undefined,
-                      }
-                    : undefined
-                }
-              />
-            </div>
-          </div>
+        <div className="grid w-full grid-cols-9 gap-x-3">
+          {rowItems.map((it, idx) => (
+            <div
+              key={`${it}-${idx}`}
+              className="min-w-0 relative z-10"
+              style={humanInsideEnabled && effectiveTileSize ? { width: `${effectiveTileSize}px` } : undefined}
+            >
+              {!it || it === CONTROL_TILE_ARROWS || it === CONTROL_TILE_BN ? (
+                <div className="h-4" />
+              ) : (
+                <Link
+                  to="#"
+                  className="relative z-40 flex h-[20px] w-full items-center justify-center whitespace-nowrap rounded-none bg-muted px-2 font-roboto-condensed text-[11.2px] leading-[20px] uppercase text-foreground hover:text-foreground"
+                  data-mega-label="1"
+                  data-mega-collection={collectionId}
+                  data-mega-item={typeof it === 'string' ? it : ''}
+                  onClick={(e) => {
+                    if (typeof onSelectItem !== 'function') return;
+                    e.preventDefault();
+                    onSelectItem(it);
+                  }}
+                >
+                  {labelForItem(it)}
+                </Link>
+              )}
 
-          <div
-            className="relative z-10 overflow-hidden"
-            style={effectiveTileSize ? { height: `${effectiveTileSize + 24}px` } : undefined}
-          >
-            {thinSlideEnabled ? (
-              <FullWideSlideDemoHumanInsideSlider
-                items={effectiveItems}
-                collectionId={collectionId}
-                megaTileSize={megaTileSize}
-                isFirstContact={isFirstContact}
-                isHumanInside={isHumanInside}
-                humanInsideVariant={humanInsideVariant}
-                firstContactVariant={firstContactVariant}
-                onFirstContactWhite={onFirstContactWhite}
-                onFirstContactBlack={onFirstContactBlack}
-                onFirstContactMulti={onFirstContactMulti}
-                onHumanWhite={onHumanWhite}
-                onHumanBlack={onHumanBlack}
-                onHumanMulti={onHumanMulti}
-                onHumanPrev={isHumanInside ? onHumanPrev : undefined}
-                onHumanNext={isHumanInside ? onHumanNext : undefined}
-                onSelectItem={onSelectItem}
-                OptimizedImg={OptimizedImg}
-                FirstContactDibuix00Buttons={FirstContactDibuix00Buttons}
-                FirstContactDibuix09Buttons={FirstContactDibuix09Buttons}
-                CONTROL_TILE_BN={CONTROL_TILE_BN}
-                CONTROL_TILE_ARROWS={CONTROL_TILE_ARROWS}
-                FIRST_CONTACT_MEDIA={FIRST_CONTACT_MEDIA}
-                FIRST_CONTACT_MEDIA_WHITE={FIRST_CONTACT_MEDIA_WHITE}
-                THE_HUMAN_INSIDE_MEDIA={THE_HUMAN_INSIDE_MEDIA}
-                THE_HUMAN_INSIDE_MEDIA_WHITE={THE_HUMAN_INSIDE_MEDIA_WHITE}
-              />
-            ) : (
-              <div className="grid w-full grid-cols-9 gap-x-3">
-                {rowItems.map((it, idx) => (
-                  <div
-                    key={`${it}-${idx}`}
-                    className="min-w-0 relative z-10"
-                    style={humanInsideEnabled && effectiveTileSize ? { width: `${effectiveTileSize}px` } : undefined}
-                  >
-                    {!it || it === CONTROL_TILE_ARROWS || it === CONTROL_TILE_BN ? (
-                      <div className="h-4" />
-                    ) : (
-                      <Link
-                        to="#"
-                        className="relative z-40 flex h-[20px] w-full items-center justify-center whitespace-nowrap rounded-none bg-muted px-2 font-roboto-condensed text-[11.2px] leading-[20px] uppercase text-foreground hover:text-foreground"
-                        data-mega-label="1"
-                        data-mega-collection={collectionId}
-                        data-mega-item={typeof it === 'string' ? it : ''}
-                        onClick={(e) => {
-                          if (typeof onSelectItem !== 'function') return;
-                          e.preventDefault();
-                          onSelectItem(it);
-                        }}
-                      >
-                        {labelForItem(it)}
-                      </Link>
-                    )}
-
-                    {!it ? null : it === CONTROL_TILE_BN ? (
-                      <div className="relative z-40">
-                        {isFirstContact ? (
-                          <FirstContactDibuix00Buttons onWhite={onFirstContactWhite} onBlack={onFirstContactBlack} onMulti={onFirstContactMulti} />
-                        ) : isHumanInside ? (
-                          <FirstContactDibuix00Buttons onWhite={onHumanWhite} onBlack={onHumanBlack} onMulti={onHumanMulti} />
-                        ) : null}
-                      </div>
-                    ) : it === CONTROL_TILE_ARROWS ? (
-                      <div
-                        className={`relative z-40 ${thinSlideEnabled || pagingEnabled ? '' : 'opacity-30 pointer-events-none'}`}
-                        aria-hidden={thinSlideEnabled || pagingEnabled ? undefined : true}
-                      >
-                        <FirstContactDibuix09Buttons
-                          tileSize={tileSize}
-                          onPrev={() => {
-                            if (thinSlideEnabled) return;
-                            if (pagingEnabled) return setPageStart((v) => v - 1);
-                            if (isHumanInside && !humanInsideEnabled && onHumanPrev) return onHumanPrev();
-                          }}
-                          onNext={() => {
-                            if (thinSlideEnabled) return;
-                            if (pagingEnabled) return setPageStart((v) => v + 1);
-                            if (isHumanInside && !humanInsideEnabled && onHumanNext) return onHumanNext();
-                          }}
+              {!it ? null : it === CONTROL_TILE_BN ? (
+                <div className="relative z-40">
+                  {isFirstContact ? (
+                    <FirstContactDibuix00Buttons onWhite={onFirstContactWhite} onBlack={onFirstContactBlack} onMulti={onFirstContactMulti} />
+                  ) : isHumanInside ? (
+                    <FirstContactDibuix00Buttons onWhite={onHumanWhite} onBlack={onHumanBlack} onMulti={onHumanMulti} />
+                  ) : null}
+                </div>
+              ) : it === CONTROL_TILE_ARROWS ? (
+                <div
+                  className={`relative z-40 ${thinSlideEnabled || pagingEnabled ? '' : 'opacity-30 pointer-events-none'}`}
+                  aria-hidden={thinSlideEnabled || pagingEnabled ? undefined : true}
+                >
+                  <FirstContactDibuix09Buttons
+                    tileSize={tileSize}
+                    onPrev={() => {
+                      if (thinSlideEnabled) return;
+                      if (pagingEnabled) return setPageStart((v) => v - 1);
+                      if (isHumanInside && !humanInsideEnabled && onHumanPrev) return onHumanPrev();
+                    }}
+                    onNext={() => {
+                      if (thinSlideEnabled) return;
+                      if (pagingEnabled) return setPageStart((v) => v + 1);
+                      if (isHumanInside && !humanInsideEnabled && onHumanNext) return onHumanNext();
+                    }}
+                  />
+                </div>
+              ) : (
+                <button
+                  type="button"
+                  className={`relative z-50 mt-2 aspect-square w-full ${typeof onSelectItem === 'function' ? 'cursor-pointer pointer-events-auto' : 'pointer-events-none'}`}
+                  data-mega-tile="1"
+                  data-mega-collection={collectionId}
+                  data-mega-item={typeof it === 'string' ? it : ''}
+                  ref={idx === 1 ? tileSizeRef : undefined}
+                  style={{
+                    transform: `translate(${gridOffsetFor(it).x}px, ${gridOffsetFor(it).y}px)`,
+                  }}
+                  onClick={(e) => {
+                    if (typeof onSelectItem !== 'function') return;
+                    e.preventDefault();
+                    if (import.meta.env.DEV && collectionId === 'cube') {
+                      // eslint-disable-next-line no-console
+                      console.error('[MEGA cube tile click]', {
+                        it,
+                        thumb: resolveGridThumbSrc(it, collectionId),
+                      });
+                    }
+                    setSelectedItem(it);
+                    onSelectItem(it);
+                  }}
+                  tabIndex={typeof onSelectItem === 'function' ? 0 : -1}
+                  onKeyDown={(e) => {
+                    if (typeof onSelectItem !== 'function') return;
+                    if (e.key !== 'Enter' && e.key !== ' ') return;
+                    e.preventDefault();
+                    setSelectedItem(it);
+                    onSelectItem(it);
+                  }}
+                >
+                  <div className="absolute inset-0 overflow-hidden rounded-md bg-transparent">
+                    {(() => {
+                      const thumbSrc = resolveGridThumbSrc(it, collectionId);
+                      const useContain =
+                        collectionId === 'austen'
+                        && typeof it === 'string'
+                        && it.includes('/austen/quotes/');
+                      return thumbSrc ? (
+                        <OptimizedImg
+                          src={thumbSrc}
+                          alt={labelForItem(it) || it}
+                          className={useContain ? 'h-full w-full object-contain' : 'h-full w-full object-cover'}
                         />
-                      </div>
-                    ) : (
-                      <button
-                        type="button"
-                        className={`relative z-50 mt-2 aspect-square w-full ${typeof onSelectItem === 'function' ? 'cursor-pointer pointer-events-auto' : 'pointer-events-none'}`}
-                        data-mega-tile="1"
-                        data-mega-collection={collectionId}
-                        data-mega-item={typeof it === 'string' ? it : ''}
-                        ref={idx === 1 ? tileSizeRef : undefined}
-                        style={{
-                          transform: `translate(${gridOffsetFor(it).x}px, ${gridOffsetFor(it).y}px)`,
-                        }}
-                        onClick={(e) => {
-                          if (typeof onSelectItem !== 'function') return;
-                          e.preventDefault();
-                          if (import.meta.env.DEV && collectionId === 'cube') {
-                            // eslint-disable-next-line no-console
-                            console.error('[MEGA cube tile click]', {
-                              it,
-                              thumb: resolveGridThumbSrc(it, collectionId),
-                            });
-                          }
-                          setSelectedItem(it);
-                          onSelectItem(it);
-                        }}
-                        tabIndex={typeof onSelectItem === 'function' ? 0 : -1}
-                        onKeyDown={(e) => {
-                          if (typeof onSelectItem !== 'function') return;
-                          if (e.key !== 'Enter' && e.key !== ' ') return;
-                          e.preventDefault();
-                          setSelectedItem(it);
-                          onSelectItem(it);
-                        }}
-                      >
-                        <div className="absolute inset-0 overflow-hidden rounded-md bg-transparent">
-                          {(() => {
-                            let thumbSrc = resolveGridThumbSrc(it, collectionId);
-                            const isFirstContactWhiteGridThumb =
-                              collectionId === 'first_contact'
-                              && typeof thumbSrc === 'string'
-                              && thumbSrc.includes('/custom_logos/drawings/images_grid/first_contact/white/');
-                            const useContain =
-                              collectionId === 'austen'
-                              && typeof it === 'string'
-                              && it.includes('/austen/quotes/');
-                            return thumbSrc ? (
-                            <OptimizedImg
-                              src={thumbSrc}
-                              alt={labelForItem(it) || it}
-                              className={useContain ? 'h-full w-full object-contain' : 'h-full w-full object-cover'}
-                            />
-                          ) : (
-                            <div className="h-full w-full bg-black/5" />
-                            );
-                          })()}
-                        </div>
-                      </button>
-                    )}
+                      ) : (
+                        <div className="h-full w-full bg-black/5" />
+                      );
+                    })()}
                   </div>
-                ))}
-              </div>
-            )}
-          </div>
+                </button>
+              )}
+            </div>
+          ))}
         </div>
       ) : (
         <div className="grid gap-2">
@@ -1597,6 +1534,25 @@ export default function FullWideSlideDemoHeader({
     }
     setStripeOverlayOverrideActive(false);
   }, [overlaySrcFromUrl]);
+
+  const [megaStripeRefEnabledLocal, setMegaStripeRefEnabledLocal] = useState(false);
+  const [megaStripeRefSrcLocal, setMegaStripeRefSrcLocal] = useState('');
+
+  useEffect(() => {
+    const readRef = () => {
+      try {
+        const en = window.localStorage.getItem('MEGA_STRIPE_REF_ENABLED') === '1';
+        const src = String(window.localStorage.getItem('MEGA_STRIPE_REF_SRC') || '');
+        setMegaStripeRefEnabledLocal(en);
+        setMegaStripeRefSrcLocal(src);
+      } catch {
+        // ignore
+      }
+    };
+    readRef();
+    window.addEventListener('mega-stripe-ref-changed', readRef);
+    return () => window.removeEventListener('mega-stripe-ref-changed', readRef);
+  }, []);
 
   const resolvedOverlaySrc = useMemo(() => {
     const normalizeKeyLocal = (value) => {
@@ -2029,12 +1985,67 @@ export default function FullWideSlideDemoHeader({
     return null;
   }, [
     active,
-    firstContactVariant,
     firstContactSelectedItem,
+    firstContactVariant,
     humanInsideSelectedItem,
     humanInsideVariant,
     selectedItemByCollection,
   ]);
+
+  const resolvedOverlaySrcEncoded = useMemo(() => {
+    try {
+      if (!resolvedOverlaySrc || typeof resolvedOverlaySrc !== 'string') return '';
+      const s = resolvedOverlaySrc.trim();
+      if (!s) return '';
+      return encodeURI(s);
+    } catch {
+      return resolvedOverlaySrc || '';
+    }
+  }, [resolvedOverlaySrc]);
+
+  const [stripeOverlayLoadState, setStripeOverlayLoadState] = useState('idle');
+  const [stripeOverlayIsStripeWide, setStripeOverlayIsStripeWide] = useState(false);
+  const stripeOverlayDebug = (() => {
+    try {
+      const qs = (typeof window !== 'undefined') ? window.location?.search : '';
+      const p = qs ? new URLSearchParams(qs) : null;
+      return Boolean(p && p.get('stripeOverlayDebug') === '1');
+    } catch {
+      return false;
+    }
+  })();
+  useEffect(() => {
+    if (!resolvedOverlaySrc) {
+      setStripeOverlayLoadState('no-src');
+      setStripeOverlayIsStripeWide(false);
+      return;
+    }
+    let alive = true;
+    setStripeOverlayLoadState('loading');
+    setStripeOverlayIsStripeWide(false);
+    try {
+      const img = new Image();
+      img.onload = () => {
+        if (!alive) return;
+        setStripeOverlayLoadState('ok');
+        try {
+          const w = img.naturalWidth;
+          const h = img.naturalHeight;
+          if (Number.isFinite(w) && Number.isFinite(h) && h > 0) {
+            const r = w / h;
+            setStripeOverlayIsStripeWide(r >= 6);
+          }
+        } catch {
+          // ignore
+        }
+      };
+      img.onerror = () => { if (alive) setStripeOverlayLoadState('error'); };
+      img.src = resolvedOverlaySrcEncoded || resolvedOverlaySrc;
+    } catch {
+      setStripeOverlayLoadState('error');
+    }
+    return () => { alive = false; };
+  }, [resolvedOverlaySrc, resolvedOverlaySrcEncoded]);
 
   const preloadedSrcRef = useRef(new Set());
   const preloadSrc = (src) => {
@@ -2075,14 +2086,19 @@ export default function FullWideSlideDemoHeader({
       const prev = window.__HG_OVERLAY_DEBUG__ || {};
       window.__HG_OVERLAY_DEBUG__ = {
         ...prev,
+        stripeOverlayDebug,
+        showStripe: Boolean(showStripe),
+        active: String(active || ''),
         resolvedOverlaySrc,
+        stripeOverlayLoadState,
+        stripeOverlayIsStripeWide: Boolean(stripeOverlayIsStripeWide),
         stripeOverlayOverrideActive,
         overlaySrcFromUrl,
       };
     } catch {
       // ignore
     }
-  }, [resolvedOverlaySrc, stripeOverlayOverrideActive, overlaySrcFromUrl]);
+  }, [stripeOverlayDebug, showStripe, active, resolvedOverlaySrc, stripeOverlayLoadState, stripeOverlayIsStripeWide, stripeOverlayOverrideActive, overlaySrcFromUrl]);
 
   useEffect(() => {
     if (stripeOverlayOverrideActive) return;
@@ -2100,6 +2116,8 @@ export default function FullWideSlideDemoHeader({
   const megaMenuRef = useRef(null);
   const [stripeRowPadPx, setStripeRowPadPx] = useState(32);
   const [stripeRowPadXPx, setStripeRowPadXPx] = useState({ left: 0, right: 0 });
+
+  const stripePreviewHPx = Math.round((effectiveMegaTileSize || 240) * 0.9);
 
   useLayoutEffect(() => {
     try {
@@ -3047,19 +3065,157 @@ export default function FullWideSlideDemoHeader({
                         }}
                       >
                         <div className="w-full rounded-md bg-muted flex justify-center">
-                          <img
-                            src="/placeholders/t-shirt_buttons/v5/full-color-stripe-5.webp"
-                            alt=""
-                            className="block"
+                          <div
+                            className="relative inline-block"
                             style={{
-                              height: `${Math.round((effectiveMegaTileSize || 240) * 0.9)}px`,
+                              height: `${stripePreviewHPx}px`,
                               width: 'auto',
-                              transformOrigin: 'top center',
-                              transform: 'translate(var(--megaStripeDx, 0px), var(--megaStripeDy, 0px)) scale(1.2125)',
                             }}
-                            loading="lazy"
-                            decoding="async"
-                          />
+                          >
+                            {stripeOverlayLoadState !== 'ok' ? (
+                              <div
+                                className="absolute left-2 top-2"
+                                style={{
+                                  zIndex: 100,
+                                  pointerEvents: 'none',
+                                  fontSize: 11,
+                                  lineHeight: 1.2,
+                                  padding: '6px 8px',
+                                  borderRadius: 8,
+                                  background: 'rgba(255, 80, 80, 0.92)',
+                                  color: '#fff',
+                                  maxWidth: 420,
+                                  wordBreak: 'break-all',
+                                }}
+                              >
+                                {stripeOverlayLoadState === 'no-src'
+                                  ? 'overlay: no src'
+                                  : (stripeOverlayLoadState === 'loading'
+                                      ? 'overlay: loading...'
+                                      : `overlay: failed (${resolvedOverlaySrc || 'empty'})`)}
+                              </div>
+                            ) : null}
+
+                            <div
+                              className="relative"
+                              style={{
+                                height: '100%',
+                                width: 'fit-content',
+                                display: 'inline-block',
+                                transformOrigin: 'top center',
+                                transform: 'translate(var(--megaStripeDx, 0px), var(--megaStripeDy, 0px)) scale(var(--megaStripeScale, 1.2125))',
+                                WebkitMaskImage: 'url(/placeholders/t-shirt_buttons/v5/full-clic-area-5.svg)',
+                                maskImage: 'url(/placeholders/t-shirt_buttons/v5/full-clic-area-5.svg)',
+                                WebkitMaskRepeat: 'no-repeat',
+                                maskRepeat: 'no-repeat',
+                                WebkitMaskSize: '100% 100%',
+                                maskSize: '100% 100%',
+                                WebkitMaskPosition: '0 0',
+                                maskPosition: '0 0',
+                              }}
+                            >
+                              <img
+                                src="/placeholders/t-shirt_buttons/v5/full-color-stripe-5.webp"
+                                alt=""
+                                className="block"
+                                style={{
+                                  height: '100%',
+                                  width: 'auto',
+                                }}
+                                loading="lazy"
+                                decoding="async"
+                              />
+
+                              {megaStripeRefEnabledLocal && megaStripeRefSrcLocal ? (
+                                <img
+                                  src={megaStripeRefSrcLocal}
+                                  alt=""
+                                  className="block absolute inset-0"
+                                  style={{
+                                    pointerEvents: 'none',
+                                    zIndex: 6,
+                                    height: '100%',
+                                    width: 'auto',
+                                    transformOrigin: 'top center',
+                                    transform: 'translate(var(--megaStripeRefDx, 0px), var(--megaStripeRefDy, 0px)) scale(var(--megaStripeRefScale, 1))',
+                                  }}
+                                  loading="lazy"
+                                  decoding="async"
+                                />
+                              ) : null}
+
+                              {resolvedOverlaySrc ? (
+                                <div
+                                  className="absolute inset-0 flex"
+                                  style={{
+                                    pointerEvents: 'none',
+                                    zIndex: 10,
+                                    transformOrigin: 'top center',
+                                    transform: stripeOverlayIsStripeWide
+                                      ? 'translate(var(--megaStripeOverlayDx, 0px), var(--megaStripeOverlayDy, 0px)) scale(var(--megaStripeOverlayScale, 1))'
+                                      : 'none',
+                                    columnGap: 'var(--megaStripeTileGapPx, 0px)',
+                                    background: stripeOverlayDebug ? 'rgba(0, 200, 255, 0.10)' : 'transparent',
+                                  }}
+                                >
+                                  {Array.from({ length: 14 }).map((_, idx) => (
+                                    <div
+                                      key={`stripe-tile-${idx}`}
+                                      className="relative"
+                                      style={{
+                                        height: '100%',
+                                        flex: '1 1 0%',
+                                        overflow: 'hidden',
+                                        zIndex: 10,
+                                        outline: stripeOverlayDebug ? '1px solid rgba(0, 200, 255, 0.35)' : 'none',
+                                      }}
+                                    >
+                                      <img
+                                        src={resolvedOverlaySrcEncoded || resolvedOverlaySrc}
+                                        alt=""
+                                        className="block absolute top-0"
+                                        style={{
+                                          height: '100%',
+                                          width: stripeOverlayIsStripeWide ? '1400%' : '100%',
+                                          left: stripeOverlayIsStripeWide ? `${-idx * 100}%` : '0%',
+                                          objectFit: stripeOverlayIsStripeWide ? 'fill' : 'contain',
+                                          opacity: 0.98,
+                                          pointerEvents: 'none',
+                                          transformOrigin: 'top center',
+                                          transform: stripeOverlayIsStripeWide
+                                            ? 'none'
+                                            : 'translate(var(--megaStripeOverlayDx, 0px), var(--megaStripeOverlayDy, 0px)) scale(var(--megaStripeOverlayScale, 1))',
+                                          filter: stripeOverlayDebug ? 'drop-shadow(0 0 2px rgba(0,0,0,0.9)) drop-shadow(0 0 6px rgba(255,0,0,0.6))' : 'none',
+                                        }}
+                                        loading="eager"
+                                        decoding="async"
+                                      />
+                                    </div>
+                                  ))}
+                                </div>
+                              ) : null}
+
+                              <div
+                                className="absolute inset-0"
+                                style={{
+                                  pointerEvents: 'auto',
+                                  background: 'transparent',
+                                  zIndex: 3,
+                                }}
+                                onPointerDown={(ev) => {
+                                  try {
+                                    const el = ev.currentTarget;
+                                    const r = el.getBoundingClientRect();
+                                    const x = (ev.clientX - r.left) / (r.width || 1);
+                                    const y = (ev.clientY - r.top) / (r.height || 1);
+                                    window.dispatchEvent(new CustomEvent('mega-stripe-full-hit', { detail: { x, y } }));
+                                  } catch {
+                                    // ignore
+                                  }
+                                }}
+                              />
+                            </div>
+                          </div>
                         </div>
                       </div>
                     ) : null}
