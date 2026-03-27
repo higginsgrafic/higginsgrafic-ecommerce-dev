@@ -1564,6 +1564,10 @@ export default function FullWideSlideDemoHeader({
     };
     const isPathItem = (it) => typeof it === 'string' && /\.(png|jpg|jpeg|webp)$/i.test(it);
 
+    if (stripeOverlayOverrideActive && overlaySrcFromUrl) {
+      return overlaySrcFromUrl;
+    }
+
     if (active === 'first_contact' && firstContactSelectedItem) {
       if (firstContactVariant === 'white') {
         return FIRST_CONTACT_MEDIA_WHITE[firstContactSelectedItem]
@@ -1985,11 +1989,13 @@ export default function FullWideSlideDemoHeader({
     return null;
   }, [
     active,
+    overlaySrcFromUrl,
     firstContactSelectedItem,
     firstContactVariant,
     humanInsideSelectedItem,
     humanInsideVariant,
     selectedItemByCollection,
+    stripeOverlayOverrideActive,
   ]);
 
   const resolvedOverlaySrcEncoded = useMemo(() => {

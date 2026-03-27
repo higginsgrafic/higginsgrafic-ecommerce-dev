@@ -2637,6 +2637,8 @@ function App() {
                         style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', pointerEvents: 'none', zIndex: 0, shapeRendering: 'crispEdges' }}
                       >
                         {Array.from({ length: 7 }).map((_, i) => {
+                          // Amaga separadors verticals interns de les cel·les ajuntades (17.2-17.6 i 18.2-18.6)
+                          if (i >= 2 && i <= 5) return null;
                           const x = (i / 6) * 100;
                           return (
                             <line
@@ -2764,35 +2766,48 @@ function App() {
                           DEBUG
                         </div>
 
-                        <div style={{ gridRow: '2', gridColumn: '6', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, padding: '0 6px', paddingLeft: 22, minWidth: 0, overflow: 'hidden', height: 'var(--megaStripeHudCellHPx)' }}>
-                          <div style={{ fontSize: 13, fontWeight: 900, color: 'rgba(0,0,0,0.75)', lineHeight: '16px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0, textAlign: 'left' }}>stripeOverlayDebug</div>
+                        <div style={{ gridRow: '2', gridColumn: '6', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, padding: '0 6px', paddingLeft: 30, minWidth: 0, overflow: 'hidden', height: 'var(--megaStripeHudCellHPx)' }}>
+                          <div style={{ fontSize: 13, fontWeight: 900, color: 'rgba(0,0,0,0.75)', lineHeight: '16px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0, textAlign: 'left' }}>stripeOverlay</div>
                           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, minWidth: 0, flexShrink: 0 }}>
-                            {(() => {
-                              const sp = new URLSearchParams(location.search || '');
-                              const has = sp.has('stripeOverlayDebug');
-                              const cur = String(sp.get('stripeOverlayDebug') || '').trim().toLowerCase();
-                              const on = has && (cur === '' || cur === '1' || cur === 'true' || cur === 'on' || cur === 'yes');
-                              return (
-                                <button
-                                  type="button"
-                                  onClick={(e) => {
-                                    try {
-                                      e.preventDefault();
-                                      e.stopPropagation();
-                                      const next = new URLSearchParams(location.search || '');
-                                      if (on) next.delete('stripeOverlayDebug');
-                                      else next.set('stripeOverlayDebug', '1');
-                                      const qs = next.toString();
-                                      navigate(qs ? `${location.pathname}?${qs}` : location.pathname, { replace: true });
-                                    } catch {
-                                    }
-                                  }}
-                                  style={{ height: 20, display: 'flex', alignItems: 'center', padding: '0 10px', borderRadius: 6, border: '1px solid rgba(0,0,0,0.15)', background: on ? 'rgba(59,130,246,0.16)' : 'rgba(255,255,255,0.35)', color: on ? 'rgba(37,99,235,0.95)' : 'rgba(0,0,0,0.70)', fontSize: 12, fontWeight: 900, whiteSpace: 'nowrap' }}
-                                >
-                                  {on ? 'ON' : 'OFF'}
-                                </button>
-                              );
-                            })()}
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                try {
+                                  e.preventDefault();
+                                  e.stopPropagation();
+                                  const sp = new URLSearchParams(location.search || '');
+                                  const has = sp.has('stripeOverlayDebug');
+                                  const cur = String(sp.get('stripeOverlayDebug') || '').trim().toLowerCase();
+                                  const on = has && (cur === '' || cur === '1' || cur === 'true' || cur === 'on' || cur === 'yes');
+                                  const next = new URLSearchParams(location.search || '');
+                                  if (on) next.delete('stripeOverlayDebug');
+                                  else next.set('stripeOverlayDebug', '1');
+                                  const qs = next.toString();
+                                  navigate(qs ? `${location.pathname}?${qs}` : location.pathname, { replace: true });
+                                } catch {
+                                }
+                              }}
+                              style={{ height: 20, display: 'flex', alignItems: 'center', padding: '0 10px', borderRadius: 6, border: '1px solid rgba(0,0,0,0.15)', background: (() => { const sp = new URLSearchParams(location.search || ''); const has = sp.has('stripeOverlayDebug'); const cur = String(sp.get('stripeOverlayDebug') || '').trim().toLowerCase(); return has && (cur === '' || cur === '1' || cur === 'true' || cur === 'on' || cur === 'yes') ? 'rgba(59,130,246,0.16)' : 'rgba(255,255,255,0.35)'; })(), color: (() => { const sp = new URLSearchParams(location.search || ''); const has = sp.has('stripeOverlayDebug'); const cur = String(sp.get('stripeOverlayDebug') || '').trim().toLowerCase(); return has && (cur === '' || cur === '1' || cur === 'true' || cur === 'on' || cur === 'yes') ? 'rgba(37,99,235,0.95)' : 'rgba(0,0,0,0.70)'; })(), fontSize: 12, fontWeight: 900, whiteSpace: 'nowrap' }}
+                            >
+                              {(() => { const sp = new URLSearchParams(location.search || ''); const has = sp.has('stripeOverlayDebug'); const cur = String(sp.get('stripeOverlayDebug') || '').trim().toLowerCase(); const on = has && (cur === '' || cur === '1' || cur === 'true' || cur === 'on' || cur === 'yes'); return on ? 'ON' : 'OFF'; })()}
+                            </button>
+                          </div>
+                        </div>
+
+                        <div style={{ gridRow: '3', gridColumn: '6', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, padding: '0 6px', paddingLeft: 30, minWidth: 0, overflow: 'hidden', height: 'var(--megaStripeHudCellHPx)' }}>
+                          <div style={{ fontSize: 13, fontWeight: 900, color: 'rgba(0,0,0,0.75)', lineHeight: '16px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0, textAlign: 'left' }}>Ref</div>
+                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, minWidth: 0, flexShrink: 0 }}>
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                setMegaStripeRefEnabled((v) => !v);
+                              }}
+                              style={{ height: 20, display: 'flex', alignItems: 'center', padding: '0 10px', borderRadius: 6, border: '1px solid rgba(0,0,0,0.15)', background: megaStripeRefEnabled ? 'rgba(59,130,246,0.16)' : 'rgba(255,255,255,0.35)', color: megaStripeRefEnabled ? 'rgba(37,99,235,0.95)' : 'rgba(0,0,0,0.70)', fontSize: 12, fontWeight: 900, whiteSpace: 'nowrap' }}
+                            >
+                              {megaStripeRefEnabled ? 'ON' : 'OFF'}
+                            </button>
                           </div>
                         </div>
 
@@ -2816,7 +2831,7 @@ function App() {
                                     justifyContent: 'space-between',
                                     gap: 6,
                                     padding: '0 6px',
-                                    paddingLeft: 22,
+                                    paddingLeft: 30,
                                     minWidth: 0,
                                     height: 'var(--megaStripeHudCellHPx)',
                                     overflow: 'hidden',
@@ -2825,7 +2840,7 @@ function App() {
                                   <div style={{ fontSize: 13, fontWeight: 900, color: 'rgba(0,0,0,0.75)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0, lineHeight: '16px' }} title={String(k)}>
                                     {String(k)}
                                   </div>
-                                  <div style={{ fontSize: 11, fontWeight: 300, color: 'rgba(0,0,0,0.60)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0, textAlign: 'right', lineHeight: '16px' }} title={String(v)}>
+                                  <div style={{ fontSize: 13, fontWeight: 300, color: 'rgba(0,0,0,0.55)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0, textAlign: 'right', lineHeight: '16px' }} title={String(v)}>
                                     {String(v)}
                                   </div>
                                 </div>
@@ -2851,7 +2866,7 @@ function App() {
                                     justifyContent: 'space-between',
                                     gap: 6,
                                     padding: '0 6px',
-                                    paddingLeft: 22,
+                                    paddingLeft: 30,
                                     minWidth: 0,
                                     height: 'var(--megaStripeHudCellHPx)',
                                     overflow: 'hidden',
@@ -2860,7 +2875,7 @@ function App() {
                                   <div style={{ fontSize: 13, fontWeight: 900, color: 'rgba(0,0,0,0.75)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0, lineHeight: '16px' }} title={String(k)}>
                                     {String(k)}
                                   </div>
-                                  <div style={{ fontSize: 11, fontWeight: 300, color: 'rgba(0,0,0,0.60)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0, textAlign: 'right', lineHeight: '16px' }} title={String(v)}>
+                                  <div style={{ fontSize: 13, fontWeight: 300, color: 'rgba(0,0,0,0.55)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0, textAlign: 'right', lineHeight: '16px' }} title={String(v)}>
                                     {String(v)}
                                   </div>
                                 </div>
@@ -3147,8 +3162,8 @@ function App() {
                                   const val = (v == null) ? '' : String(v);
                                   const row = String(17 - idx);
                                   return (
-                                    <div key={key} style={{ gridRow: row, gridColumn: '2 / span 5', display: 'grid', gridTemplateColumns: 'repeat(5, minmax(0, 1fr))', alignItems: 'center', padding: 0, minWidth: 0, height: 'var(--megaStripeHudCellHPx)' }}>
-                                      <div style={{ gridColumn: '1', padding: '0 6px', paddingLeft: 22, fontSize: 11, fontWeight: 900, color: 'rgba(0,0,0,0.75)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0 }} title={key}>
+                                    <div key={key} style={{ gridRow: row, gridColumn: '2 / span 5', display: 'flex', alignItems: 'center', gap: 8, padding: 0, minWidth: 0, height: 'var(--megaStripeHudCellHPx)', overflow: 'hidden', position: 'relative' }}>
+                                      <div style={{ padding: '0 6px', paddingLeft: 30, fontSize: 13, fontWeight: 900, lineHeight: 'var(--megaStripeHudCellHPx)', color: 'rgba(0,0,0,0.75)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0, flexShrink: 0 }} title={key}>
                                         {key}
                                       </div>
                                       <input
@@ -3183,7 +3198,7 @@ function App() {
                                             // ignore
                                           }
                                         }}
-                                        style={{ gridColumn: '2 / span 4', height: 18, padding: '0 6px', paddingLeft: 22, border: 0, borderRadius: 0, background: 'transparent', fontSize: 12, fontWeight: 800, color: 'rgba(0,0,0,0.55)', outline: 'none', minWidth: 0 }}
+                                        style={{ flex: 1, height: 'var(--megaStripeHudCellHPx)', lineHeight: 'var(--megaStripeHudCellHPx)', padding: '0 6px', border: 0, borderRadius: 0, background: 'transparent', fontSize: 13, fontWeight: 300, color: 'rgba(0,0,0,0.55)', outline: 'none', minWidth: 0 }}
                                       />
                                     </div>
                                   );
@@ -3195,7 +3210,7 @@ function App() {
                                   const row = String(17 - idx);
                                   return (
                                     <div key={`debug-${key}`} style={{ gridRow: row, gridColumn: '6', display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 2, padding: '2px 6px', minWidth: 0, height: 'var(--megaStripeHudCellHPx)', overflow: 'hidden' }}>
-                                      <div style={{ fontSize: 10, fontWeight: 900, color: 'rgba(0,0,0,0.75)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0, lineHeight: '12px' }} title={key}>
+                                      <div style={{ fontSize: 13, fontWeight: 900, color: 'rgba(0,0,0,0.75)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0, lineHeight: '12px' }} title={key}>
                                         {key}
                                       </div>
                                       <input
@@ -3230,13 +3245,13 @@ function App() {
                                             // ignore
                                           }
                                         }}
-                                        style={{ height: 14, padding: 0, border: 0, borderRadius: 0, background: 'transparent', fontSize: 11, fontWeight: 800, color: 'rgba(0,0,0,0.55)', outline: 'none', minWidth: 0, lineHeight: '14px' }}
+                                        style={{ height: 14, padding: 0, border: 0, borderRadius: 0, background: 'transparent', fontSize: 13, fontWeight: 300, color: 'rgba(0,0,0,0.55)', outline: 'none', minWidth: 0, lineHeight: '14px' }}
                                       />
                                     </div>
                                   );
                                 })}
 
-                                <div style={{ gridRow: '18', gridColumn: '2 / span 3', display: 'flex', alignItems: 'center', gap: 8, padding: 0, minWidth: 0, height: 'var(--megaStripeHudCellHPx)', overflow: 'hidden', position: 'relative' }}>
+                                <div style={{ gridRow: '18', gridColumn: '2 / span 5', display: 'flex', alignItems: 'center', gap: 8, padding: 0, minWidth: 0, height: 'var(--megaStripeHudCellHPx)', overflow: 'hidden', position: 'relative' }}>
                                   <div style={{ padding: '0 6px', paddingLeft: 30, fontSize: 13, fontWeight: 900, lineHeight: 'var(--megaStripeHudCellHPx)', color: 'rgba(0,0,0,0.75)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0, flexShrink: 0 }}>ref src</div>
                                   <input
                                     value={String(megaStripeRefSrc || '')}
@@ -3248,7 +3263,7 @@ function App() {
                                     }}
                                     onClick={(e) => e.stopPropagation()}
                                     onKeyDown={(e) => e.stopPropagation()}
-                                    style={{ flex: 1, height: 'var(--megaStripeHudCellHPx)', lineHeight: 'var(--megaStripeHudCellHPx)', padding: '0 6px', border: 0, borderRadius: 0, background: 'transparent', fontSize: 13, outline: 'none', minWidth: 0 }}
+                                    style={{ flex: 1, height: 'var(--megaStripeHudCellHPx)', lineHeight: 'var(--megaStripeHudCellHPx)', padding: '0 6px', border: 0, borderRadius: 0, background: 'transparent', fontSize: 13, fontWeight: 300, color: 'rgba(0,0,0,0.55)', outline: 'none', minWidth: 0 }}
                                   />
                                 </div>
                               </>
@@ -3267,7 +3282,7 @@ function App() {
                                   }}
                                   onClick={(e) => e.stopPropagation()}
                                   onKeyDown={(e) => e.stopPropagation()}
-                                  style={{ flex: 1, height: 'var(--megaStripeHudCellHPx)', lineHeight: 'var(--megaStripeHudCellHPx)', padding: '0 6px', border: 0, borderRadius: 0, background: 'transparent', fontSize: 13, outline: 'none', minWidth: 0 }}
+                                  style={{ flex: 1, height: 'var(--megaStripeHudCellHPx)', lineHeight: 'var(--megaStripeHudCellHPx)', padding: '0 6px', border: 0, borderRadius: 0, background: 'transparent', fontSize: 13, fontWeight: 300, color: 'rgba(0,0,0,0.55)', outline: 'none', minWidth: 0 }}
                                 />
                               </div>
                             );
