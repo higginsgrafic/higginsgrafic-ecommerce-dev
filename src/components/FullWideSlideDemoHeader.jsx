@@ -780,7 +780,28 @@ function MegaColumn({
         return `${head.toUpperCase()}${tail}`;
       })
       .join(' ');
+    if (collectionId === 'austen') {
+      const lower = it.toLowerCase();
+      if (lower.includes('/austen/keep_calm/') && titleCased === 'Keep Calm Multi Red') return 'Keep Calm Red';
+      if (lower.includes('/austen/looking_for_my_darcy/')) {
+        return titleCased.replace(/\bGradient\b/gi, '').replace(/\s+/g, ' ').trim();
+      }
+      if (lower.includes('/austen/quotes/')) {
+        if (titleCased === 'Unsociable And Taciturn') return 'Unsociable';
+        if (titleCased === 'Half Agony Half Hope') return 'Half Agony';
+      }
+    }
     return titleCased;
+  };
+
+  const labelForItemWhenSelected = (it) => {
+    const full = labelForItem(it);
+    if (!full) return full;
+    const pp = full.match(/^Pride And Prejudice(?:\s+(\d+))?$/);
+    if (pp) return `P&P ${pp[1] || '1'}`;
+    const ss = full.match(/^Sense And Sensibility(?:\s+(\d+))?$/);
+    if (ss) return `S&S ${ss[1] || '1'}`;
+    return full;
   };
 
   const normalizeKey = (value) => {
@@ -1464,41 +1485,45 @@ function MegaColumn({
               className="min-w-0 relative z-10"
               style={humanInsideEnabled && effectiveTileSize ? { width: `${effectiveTileSize}px` } : undefined}
             >
-              {!it || it === CONTROL_TILE_ARROWS || it === CONTROL_TILE_BN ? (
-                <div className="h-4" />
-              ) : (
-                <Link
-                  to="#"
-                  className={`relative z-[60] flex h-[20px] w-full items-center justify-center whitespace-nowrap rounded-none px-2 font-roboto-condensed leading-[20px] uppercase text-foreground hover:text-foreground ${
-                    megaTileSelectorParams?.enabled
-                    && typeof it === 'string'
-                    && String(it || '').trim().toLowerCase() === String(megaTileSelectorParams?.target || '').trim().toLowerCase()
-                      ? 'text-[12.8px] font-normal tracking-[0.1em] bg-transparent'
-                      : 'text-[11.2px] font-normal bg-muted'
-                  }`}
-                  style={{
-                    color:
-                      megaTileSelectorParams?.enabled
-                      && typeof it === 'string'
-                      && String(it || '').trim().toLowerCase() === String(megaTileSelectorParams?.target || '').trim().toLowerCase()
+              {(() => {
+                const isSelected = Boolean(
+                  megaTileSelectorParams?.enabled
+                  && typeof it === 'string'
+                  && String(it || '').trim().toLowerCase() === String(megaTileSelectorParams?.target || '').trim().toLowerCase(),
+                );
+                const displayLabel = isSelected ? labelForItemWhenSelected(it) : labelForItem(it);
+
+                return !it || it === CONTROL_TILE_ARROWS || it === CONTROL_TILE_BN ? (
+                  <div className="h-4" />
+                ) : (
+                  <Link
+                    to="#"
+                    className={`relative z-[60] flex h-[20px] w-full items-center justify-center whitespace-nowrap rounded-none px-2 font-roboto-condensed leading-[20px] uppercase text-foreground hover:text-foreground ${
+                      isSelected
+                        ? 'text-[12.8px] font-normal tracking-[0.1em] bg-transparent'
+                        : 'text-[11.2px] font-normal bg-muted'
+                    }`}
+                    style={{
+                      color: isSelected
                         ? String(megaTileSelectorParams?.color || '').trim() || undefined
                         : undefined,
-                  }}
-                  data-mega-label="1"
-                  data-mega-collection={collectionId}
-                  data-mega-item={typeof it === 'string' ? it : ''}
-                  onClick={(e) => {
-                    if (typeof onSelectItem !== 'function') return;
-                    e.preventDefault();
-                    onSelectItem(it);
-                  }}
-                >
-                  {labelForItem(it)}
-                </Link>
-              )}
+                    }}
+                    data-mega-label="1"
+                    data-mega-collection={collectionId}
+                    data-mega-item={typeof it === 'string' ? it : ''}
+                    onClick={(e) => {
+                      if (typeof onSelectItem !== 'function') return;
+                      e.preventDefault();
+                      onSelectItem(it);
+                    }}
+                  >
+                    {displayLabel}
+                  </Link>
+                );
+              })()}
 
               {!it ? null : it === CONTROL_TILE_BN ? (
-                <div className="relative z-40">
+                <div className="relative z-40 mt-2">
                   {isFirstContact ? (
                     <FirstContactDibuix00Buttons
                       onWhite={onFirstContactWhite}
@@ -1530,7 +1555,7 @@ function MegaColumn({
                 </div>
               ) : it === CONTROL_TILE_ARROWS ? (
                 <div
-                  className={`relative z-40 ${thinSlideEnabled || pagingEnabled ? '' : 'opacity-30 pointer-events-none'}`}
+                  className={`relative z-40 mt-2 ${thinSlideEnabled || pagingEnabled ? '' : 'opacity-30 pointer-events-none'}`}
                   aria-hidden={thinSlideEnabled || pagingEnabled ? undefined : true}
                 >
                   <FirstContactDibuix09Buttons
@@ -1632,11 +1657,7 @@ function MegaColumn({
                         : collectionId === 'austen'
                           && typeof it === 'string'
                           && it.toLowerCase().includes('/austen/pemberley_house/')
-                          ? 'bg-white p-1 ring-2 ring-yellow-400 ring-inset'
-                        : collectionId === 'austen'
-                          && typeof it === 'string'
-                          && it.toLowerCase().includes('/austen/crosswords/')
-                          ? 'bg-transparent ring-2 ring-white/50 ring-inset'
+                          ? 'bg-transparent'
                         : 'bg-transparent'
                     }`}
                   >
@@ -4501,6 +4522,7 @@ export default function FullWideSlideDemoHeader({
                           paddingBottom: `${stripeRowPadPx}px`,
                           paddingLeft: `${stripeRowPadXPx?.left || 0}px`,
                           paddingRight: `${stripeRowPadXPx?.right || 0}px`,
+                          transform: 'translateY(-10px)',
                         }}
                       >
                         <div className="w-full flex justify-center bg-transparent">
@@ -4625,10 +4647,10 @@ export default function FullWideSlideDemoHeader({
                                   maskImage: 'url(/placeholders/t-shirt_buttons/v5/full-clic-area-5.svg)',
                                   WebkitMaskRepeat: 'no-repeat',
                                   maskRepeat: 'no-repeat',
-                                  WebkitMaskSize: '100% 100%',
-                                  maskSize: '100% 100%',
-                                  WebkitMaskPosition: '0 0',
-                                  maskPosition: '0 0',
+                                  WebkitMaskSize: '103% 100%',
+                                  maskSize: '103% 100%',
+                                  WebkitMaskPosition: '50% 0',
+                                  maskPosition: '50% 0',
                                 }}
                               >
                                 {megaStripeSpriteEnabledLocal ? (
@@ -4737,6 +4759,15 @@ export default function FullWideSlideDemoHeader({
                                             const isFirst = safeIdx === 0;
                                             const isLast = safeIdx === 13;
                                             const isAustenPemberley = active === 'austen' && /\/austen\/pemberley_house\//i.test(src);
+
+                                            if (active === 'cube' && !isFirst) {
+                                              if (/\/cube\/afrodita-c-stripe\.webp$/i.test(src)) {
+                                                return '/custom_logos/drawings/images_originals/stripe/cube/afrodita-cut-c-stripe.webp';
+                                              }
+                                              if (/\/cube\/cyber-cube-stripe\.webp$/i.test(src)) {
+                                                return '/custom_logos/drawings/images_originals/stripe/cube/cyber-cube-cut-stripe.webp';
+                                              }
+                                            }
 
                                             const toBlack = (s) => {
                                               let out = s;
@@ -4973,6 +5004,15 @@ export default function FullWideSlideDemoHeader({
                                             const safeIdx = Number.isFinite(Number(idx)) ? Number(idx) : 0;
                                             const isFirst = safeIdx === 0;
                                             const isLast = safeIdx === 13;
+
+                                            if (active === 'cube' && !isFirst) {
+                                              if (/\/cube\/afrodita-c-stripe\.webp$/i.test(src)) {
+                                                return '/custom_logos/drawings/images_originals/stripe/cube/afrodita-cut-c-stripe.webp';
+                                              }
+                                              if (/\/cube\/cyber-cube-stripe\.webp$/i.test(src)) {
+                                                return '/custom_logos/drawings/images_originals/stripe/cube/cyber-cube-cut-stripe.webp';
+                                              }
+                                            }
 
                                             const toBlack = (s) => {
                                               let out = s;
