@@ -4,6 +4,103 @@ import SEO from '@/components/SEO';
 import Footer from '@/components/Footer';
 
 export default function NikeTambePage() {
+  const normalizeOverlaySrc = (value) => {
+    const s = (value || '').toString().trim();
+    if (!s) return null;
+    if (/^(https?:)?\/\//i.test(s) || /^data:/i.test(s) || /^blob:/i.test(s)) return s;
+    return s.startsWith('/') ? s : `/${s}`;
+  };
+
+  const [shirtDrawingEnabled, setShirtDrawingEnabled] = useState(() => {
+    try {
+      const parseBool = (raw, fallback = true) => {
+        if (raw == null) return fallback;
+        const v = String(raw).trim().toLowerCase();
+        if (v === '') return fallback;
+        return v === '1' || v === 'true' || v === 'on' || v === 'yes';
+      };
+      const rawNew = window.localStorage.getItem('HG_SHIRT_DRAWING_ENABLED');
+      if (rawNew != null) return parseBool(rawNew, true);
+      const rawOld = window.localStorage.getItem('HG_SHIRT_DRAWING_OVERLAY_ENABLED');
+      if (rawOld != null) return parseBool(rawOld, true);
+      return true;
+    } catch {
+      return true;
+    }
+  });
+
+  const readDrawingOverlaySrc = () => {
+    try {
+      const direct = String(window.localStorage.getItem('HG_DRAWING_OVERLAY_SRC') || '').trim();
+      if (direct) return direct;
+
+      // Fallback: if the global key isn't present yet, reuse any per-collection stored overlay.
+      // This allows Nike pages to show overlay even if you haven't visited the mega menu in this tab.
+      const keys = [];
+      for (let i = 0; i < window.localStorage.length; i += 1) {
+        const k = window.localStorage.key(i);
+        if (!k) continue;
+        if (!k.startsWith('HG_STRIPE_OVERLAY_SRC_')) continue;
+        keys.push(k);
+      }
+      keys.sort();
+      for (const k of keys) {
+        const v = String(window.localStorage.getItem(k) || '').trim();
+        if (v) return v;
+      }
+
+      return null;
+    } catch {
+      return null;
+    }
+  };
+
+  const [drawingOverlaySrc, setDrawingOverlaySrc] = useState(() => {
+    return readDrawingOverlaySrc();
+  });
+
+  useEffect(() => {
+    const sync = () => {
+      try {
+        setDrawingOverlaySrc(readDrawingOverlaySrc());
+      } catch {
+        setDrawingOverlaySrc(null);
+      }
+    };
+    sync();
+    window.addEventListener('hg-drawing-overlay-changed', sync);
+    return () => window.removeEventListener('hg-drawing-overlay-changed', sync);
+  }, []);
+
+  useEffect(() => {
+    const sync = () => {
+      try {
+        const rawNew = window.localStorage.getItem('HG_SHIRT_DRAWING_ENABLED');
+        if (rawNew != null) {
+          const v = String(rawNew).trim().toLowerCase();
+          setShirtDrawingEnabled(v === '' || v === '1' || v === 'true' || v === 'on' || v === 'yes');
+          return;
+        }
+        const rawOld = window.localStorage.getItem('HG_SHIRT_DRAWING_OVERLAY_ENABLED');
+        if (rawOld != null) {
+          const v = String(rawOld).trim().toLowerCase();
+          setShirtDrawingEnabled(v === '' || v === '1' || v === 'true' || v === 'on' || v === 'yes');
+          return;
+        }
+        setShirtDrawingEnabled(true);
+      } catch {
+        setShirtDrawingEnabled(true);
+      }
+    };
+    sync();
+    window.addEventListener('hg-shirt-drawing-enabled-changed', sync);
+    window.addEventListener('hg-shirt-drawing-overlay-enabled-changed', sync);
+    return () => {
+      window.removeEventListener('hg-shirt-drawing-enabled-changed', sync);
+      window.removeEventListener('hg-shirt-drawing-overlay-enabled-changed', sync);
+    };
+  }, []);
+
   const [bgMetrics, setBgMetrics] = useState(null);
   const [bgOn, setBgOn] = useState(true);
   const [respescaMinHeightPx, setRespescaMinHeightPx] = useState(null);
@@ -574,26 +671,65 @@ export default function NikeTambePage() {
                     }}
                   >
                     <div style={{ ...textBlockStyle, position: 'relative' }}>
-                      <div className="overflow-hidden flex items-center justify-center" style={tileStyle} data-component="product-tile">
+                      <div className="overflow-hidden flex items-center justify-center" style={{ ...tileStyle, position: 'relative' }} data-component="product-tile">
                         {img ? (
-                          <img
-                            src={img}
-                            alt={imageAlt}
-                            draggable={false}
-                            onDragStart={(e) => {
-                              e.preventDefault();
-                            }}
-                            style={{
-                              width: '100%',
-                              height: '100%',
-                              objectFit: 'contain',
-                              padding: '48px',
-                              userSelect: 'none',
-                              WebkitUserDrag: 'none'
-                            }}
-                            loading="eager"
-                            decoding="async"
-                          />
+                          <>
+                            <img
+                              src={img}
+                              alt={imageAlt}
+                              draggable={false}
+                              onDragStart={(e) => {
+                                e.preventDefault();
+                              }}
+                              style={{
+                                width: '100%',
+                                height: '100%',
+                                objectFit: 'contain',
+                                padding: '48px',
+                                userSelect: 'none',
+                                WebkitUserDrag: 'none'
+                              }}
+                              loading="eager"
+                              decoding="async"
+                            />
+
+                            {shirtDrawingEnabled && drawingOverlaySrc ? (
+                              <img
+                                src={encodeURI(normalizeOverlaySrc(drawingOverlaySrc) || '')}
+                                alt=""
+                                draggable={false}
+                                onDragStart={(e) => {
+                                  e.preventDefault();
+                                }}
+                                onError={() => {
+                                  try {
+                                    // eslint-disable-next-line no-console
+                                    console.error('[NikeTambePage] drawing overlay failed to load', { drawingOverlaySrc });
+                                  } catch {
+                                    // ignore
+                                  }
+                                }}
+                                style={{
+                                  position: 'absolute',
+                                  inset: 0,
+                                  zIndex: 2,
+                                  width: '100%',
+                                  height: '100%',
+                                  objectFit: 'contain',
+                                  padding: 0,
+                                  pointerEvents: 'none',
+                                  userSelect: 'none',
+                                  WebkitUserDrag: 'none',
+                                  opacity: 0.98,
+                                  filter: 'drop-shadow(0 0 2px rgba(0,0,0,0.65))',
+                                  transformOrigin: 'top center',
+                                  transform: 'translate(var(--hgShirtOverlayDx, 0px), var(--hgShirtOverlayDy, 0px)) scale(var(--hgShirtOverlayScale, 1))',
+                                }}
+                                loading="eager"
+                                decoding="async"
+                              />
+                            ) : null}
+                          </>
                         ) : null}
                       </div>
 

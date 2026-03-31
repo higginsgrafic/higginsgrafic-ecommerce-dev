@@ -109,8 +109,8 @@ export default function FullWideSlideDemoHumanInsideSlider({
 
     const file = map[key];
     if (!file) return null;
-    const gridded = file.replace(/\.(webp|png|jpe?g)$/i, '-grid.$1');
-    return `/custom_logos/drawings/images_grid/the_human_inside/${gridded}`;
+    const gridded = file.replace(/\.(webp|png|jpe?g)$/i, '-b-grid.$1');
+    return `/custom_logos/drawings/images_grid/the_human_inside/black/${gridded}`;
   };
 
   const labelForItem = (it) => {

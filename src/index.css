@@ -91,6 +91,10 @@ html.scrollbar-compensate .offers-header-cart-open {
       0 10px 15px -3px hsl(var(--shadow-color) / calc(0.18 * var(--shadow-strength))),
       0 4px 6px -4px hsl(var(--shadow-color) / calc(0.18 * var(--shadow-strength)));
   }
+
+  :where(:not(button):not([role="button"]))[class*="shadow"] {
+    box-shadow: none !important;
+  }
 }
 
 /* Animacions personalitzades per botons de talla */

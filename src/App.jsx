@@ -184,7 +184,26 @@ function App() {
   const [selectedElement, setSelectedElement] = useState(null);
   const [selectedContainerToken, setSelectedContainerToken] = useState('');
   const [copyContainerStatus, setCopyContainerStatus] = useState('idle');
+  const [exportCopyStatus, setExportCopyStatus] = useState('idle');
+  const [exportTab, setExportTab] = useState('all');
+  const [exportModalOpen, setExportModalOpen] = useState(false);
+  const [exportModalTitle, setExportModalTitle] = useState('');
+  const [exportModalText, setExportModalText] = useState('');
   const [stripeOverlayDebugSnapshot, setStripeOverlayDebugSnapshot] = useState(null);
+
+  useEffect(() => {
+    if (!exportModalOpen) return undefined;
+    const onKeyDown = (e) => {
+      try {
+        if (!e) return;
+        if (e.key === 'Escape') setExportModalOpen(false);
+      } catch {
+        // ignore
+      }
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [exportModalOpen]);
 
   const toggleSlidePreset = (nextPresetId) => {
     if (!nextPresetId) return;
@@ -218,14 +237,189 @@ function App() {
   const [guidesEnabled, setGuidesEnabled] = useState(guidesEnabledFromUrl);
   const [megaStripeDx, setMegaStripeDx] = useState(0);
   const [megaStripeDy, setMegaStripeDy] = useState(0);
+  const [megaStripeSpriteEnabled, setMegaStripeSpriteEnabled] = useState(() => {
+    try {
+      const raw = window.localStorage.getItem('MEGA_STRIPE_SPRITE_ENABLED');
+      if (raw == null) return true;
+      const v = String(raw).trim().toLowerCase();
+      if (v === '') return true;
+      return v === '1' || v === 'true' || v === 'on' || v === 'yes';
+    } catch {
+      return true;
+    }
+  });
   const [megaStripeBeltEnabled, setMegaStripeBeltEnabled] = useState(false);
-  const [megaStripeOverlayMode, setMegaStripeOverlayMode] = useState('black');
+  const [megaStripeOverlayMode, setMegaStripeOverlayMode] = useState('off');
+  const [megaShirtDrawingEnabled, setMegaShirtDrawingEnabled] = useState(() => {
+    try {
+      const parseBool = (raw, fallback = true) => {
+        if (raw == null) return fallback;
+        const v = String(raw).trim().toLowerCase();
+        if (v === '') return fallback;
+        return v === '1' || v === 'true' || v === 'on' || v === 'yes';
+      };
+      const rawNew = window.localStorage.getItem('HG_SHIRT_DRAWING_ENABLED');
+      if (rawNew != null) return parseBool(rawNew, true);
+      const rawOld = window.localStorage.getItem('HG_SHIRT_DRAWING_OVERLAY_ENABLED');
+      if (rawOld != null) return parseBool(rawOld, true);
+      return true;
+    } catch {
+      return true;
+    }
+  });
+  const [megaShirtDrawingOverlayDx, setMegaShirtDrawingOverlayDx] = useState(0);
+  const [megaShirtDrawingOverlayDy, setMegaShirtDrawingOverlayDy] = useState(0);
+  const [megaShirtDrawingOverlayScale, setMegaShirtDrawingOverlayScale] = useState(1);
+  const [megaStripeDrawingOverlayDx, setMegaStripeDrawingOverlayDx] = useState(0);
+  const [megaStripeDrawingOverlayDy, setMegaStripeDrawingOverlayDy] = useState(0);
+  const [megaStripeDrawingOverlayScale, setMegaStripeDrawingOverlayScale] = useState(1);
+  const [megaShirtDrawingOverlaySrc, setMegaShirtDrawingOverlaySrc] = useState(() => {
+    try {
+      return String(window.localStorage.getItem('HG_DRAWING_OVERLAY_SRC') || '');
+    } catch {
+      return '';
+    }
+  });
   const [megaStripeOverlayDx, setMegaStripeOverlayDx] = useState(0);
   const [megaStripeOverlayDy, setMegaStripeOverlayDy] = useState(0);
   const [megaStripeOverlayScale, setMegaStripeOverlayScale] = useState(1);
   const [megaStripeScale, setMegaStripeScale] = useState(1.2125);
   const [megaStripeRefEnabled, setMegaStripeRefEnabled] = useState(false);
   const [megaStripeRefSrc, setMegaStripeRefSrc] = useState('');
+  const [megaStripeRef2Enabled, setMegaStripeRef2Enabled] = useState(false);
+  const [megaStripeRef2Src, setMegaStripeRef2Src] = useState('');
+
+  const [megaStripeRefCollection, setMegaStripeRefCollection] = useState('first_contact');
+  const [megaStripeRefDx, setMegaStripeRefDx] = useState(0);
+  const [megaStripeRefDy, setMegaStripeRefDy] = useState(0);
+  const [megaStripeRefScale, setMegaStripeRefScale] = useState(1);
+  const [megaStripeRef2Dx, setMegaStripeRef2Dx] = useState(0);
+  const [megaStripeRef2Dy, setMegaStripeRef2Dy] = useState(0);
+  const [megaStripeRef2Scale, setMegaStripeRef2Scale] = useState(1);
+  const [stripeEditTool, setStripeEditTool] = useState('ref');
+  const [megaStripeNudgeStep, setMegaStripeNudgeStep] = useState(1);
+  const [megaStripeTileGapPx, setMegaStripeTileGapPx] = useState(0);
+
+  const [megaTileSelectorV1Enabled, setMegaTileSelectorV1Enabled] = useState(() => {
+    try {
+      const raw = window.localStorage.getItem('MEGA_TILE_SELECTOR_ENABLED');
+      if (raw == null) return false;
+      const v = String(raw).trim().toLowerCase();
+      if (v === '') return true;
+      return v === '1' || v === 'true' || v === 'on' || v === 'yes';
+    } catch {
+      return false;
+    }
+  });
+
+  const [megaTileSelectorEnabled, setMegaTileSelectorEnabled] = useState(() => {
+    try {
+      const raw = window.localStorage.getItem('MEGA_TILE_SELECTOR_V2_ENABLED');
+      if (raw == null) return true;
+      const v = String(raw).trim().toLowerCase();
+      if (v === '') return true;
+      return v === '1' || v === 'true' || v === 'on' || v === 'yes';
+    } catch {
+      return true;
+    }
+  });
+  const [megaTileSelectorTarget, setMegaTileSelectorTarget] = useState(() => {
+    try {
+      const raw = window.localStorage.getItem('MEGA_TILE_SELECTOR_V2_TARGET');
+      return raw == null ? 'NCC-1701-D' : String(raw);
+    } catch {
+      return 'NCC-1701-D';
+    }
+  });
+  const [megaTileSelectorSizePx, setMegaTileSelectorSizePx] = useState(() => {
+    try {
+      const raw = window.localStorage.getItem('MEGA_TILE_SELECTOR_V2_SIZE_PX');
+      const n = raw == null ? 200 : Number.parseFloat(String(raw));
+      return Number.isFinite(n) && n > 0 ? n : 200;
+    } catch {
+      return 200;
+    }
+  });
+  const [megaTileSelectorStrokePx, setMegaTileSelectorStrokePx] = useState(() => {
+    try {
+      const raw = window.localStorage.getItem('MEGA_TILE_SELECTOR_V2_STROKE_PX');
+      const n = raw == null ? 10 : Number.parseFloat(String(raw));
+      return Number.isFinite(n) && n >= 0 ? n : 10;
+    } catch {
+      return 10;
+    }
+  });
+  const [megaTileSelectorColor, setMegaTileSelectorColor] = useState(() => {
+    try {
+      const raw = window.localStorage.getItem('MEGA_TILE_SELECTOR_V2_COLOR');
+      return raw == null ? 'black' : String(raw);
+    } catch {
+      return 'black';
+    }
+  });
+  const [megaTileSelectorStepX, setMegaTileSelectorStepX] = useState(() => {
+    try {
+      const raw = window.localStorage.getItem('MEGA_TILE_SELECTOR_V2_STEP_X');
+      const n = raw == null ? 0 : Number.parseFloat(String(raw));
+      return Number.isFinite(n) ? Math.min(99, Math.max(-99, n)) : 0;
+    } catch {
+      return 0;
+    }
+  });
+  const [megaTileSelectorStepY, setMegaTileSelectorStepY] = useState(() => {
+    try {
+      const raw = window.localStorage.getItem('MEGA_TILE_SELECTOR_V2_STEP_Y');
+      const n = raw == null ? 0 : Number.parseFloat(String(raw));
+      return Number.isFinite(n) ? Math.min(99, Math.max(-99, n)) : 0;
+    } catch {
+      return 0;
+    }
+  });
+  const [megaTileSelectorRadiusPx, setMegaTileSelectorRadiusPx] = useState(() => {
+    try {
+      const raw = window.localStorage.getItem('MEGA_TILE_SELECTOR_V2_RADIUS_PX');
+      const n = raw == null ? 8 : Number.parseFloat(String(raw));
+      return Number.isFinite(n) ? Math.min(200, Math.max(0, n)) : 8;
+    } catch {
+      return 8;
+    }
+  });
+  const [megaTileSelectorExtendTopPx, setMegaTileSelectorExtendTopPx] = useState(() => {
+    try {
+      const raw = window.localStorage.getItem('MEGA_TILE_SELECTOR_V2_EXTEND_TOP_PX');
+      const n = raw == null ? 30 : Number.parseFloat(String(raw));
+      return Number.isFinite(n) ? Math.min(500, Math.max(-500, n)) : 30;
+    } catch {
+      return 30;
+    }
+  });
+  const [megaTileSelectorExtendRightPx, setMegaTileSelectorExtendRightPx] = useState(() => {
+    try {
+      const raw = window.localStorage.getItem('MEGA_TILE_SELECTOR_V2_EXTEND_RIGHT_PX');
+      const n = raw == null ? 0 : Number.parseFloat(String(raw));
+      return Number.isFinite(n) ? Math.min(500, Math.max(-500, n)) : 0;
+    } catch {
+      return 0;
+    }
+  });
+  const [megaTileSelectorExtendBottomPx, setMegaTileSelectorExtendBottomPx] = useState(() => {
+    try {
+      const raw = window.localStorage.getItem('MEGA_TILE_SELECTOR_V2_EXTEND_BOTTOM_PX');
+      const n = raw == null ? 0 : Number.parseFloat(String(raw));
+      return Number.isFinite(n) ? Math.min(500, Math.max(-500, n)) : 0;
+    } catch {
+      return 0;
+    }
+  });
+  const [megaTileSelectorExtendLeftPx, setMegaTileSelectorExtendLeftPx] = useState(() => {
+    try {
+      const raw = window.localStorage.getItem('MEGA_TILE_SELECTOR_V2_EXTEND_LEFT_PX');
+      const n = raw == null ? 0 : Number.parseFloat(String(raw));
+      return Number.isFinite(n) ? Math.min(500, Math.max(-500, n)) : 0;
+    } catch {
+      return 0;
+    }
+  });
 
   const megaStripeOverlayScaleInputFocusedRef = useRef(false);
   const [megaStripeOverlayScaleDraft, setMegaStripeOverlayScaleDraft] = useState(() => String(megaStripeOverlayScale));
@@ -233,12 +427,191 @@ function App() {
     if (megaStripeOverlayScaleInputFocusedRef.current) return;
     setMegaStripeOverlayScaleDraft(String(megaStripeOverlayScale));
   }, [megaStripeOverlayScale]);
-  const [megaStripeRefCollection, setMegaStripeRefCollection] = useState('first_contact');
-  const [megaStripeRefDx, setMegaStripeRefDx] = useState(0);
-  const [megaStripeRefDy, setMegaStripeRefDy] = useState(0);
-  const [megaStripeRefScale, setMegaStripeRefScale] = useState(1);
-  const [stripeEditTool, setStripeEditTool] = useState('ref');
-  const [megaStripeNudgeStep, setMegaStripeNudgeStep] = useState(1);
+
+  const SCALE_MIN = 0.1;
+  const SCALE_MAX = 50;
+  const clampScale = (n, fallback = 1) => {
+    const v = Number.isFinite(n) ? n : Number.parseFloat(String(n));
+    if (!Number.isFinite(v) || v <= 0) return fallback;
+    return Math.min(SCALE_MAX, Math.max(SCALE_MIN, v));
+  };
+
+  const canonicalStripeDrawingOverlayKey = (rawSrc) => {
+    try {
+      const s = String(rawSrc || '').trim();
+      if (!s) return '';
+      const lower = s.toLowerCase();
+      if (lower.includes('/custom_logos/drawings/images_stripe/austen/keep_calm/')) {
+        return '__HG_CANONICAL_STRIPE_DRAWING_OVERLAY__::austen::keep_calm';
+      }
+      return s;
+    } catch {
+      try {
+        return String(rawSrc || '').trim();
+      } catch {
+        return '';
+      }
+    }
+  };
+
+  const parseFinite = (raw) => {
+    const n = Number.parseFloat(String(raw));
+    return Number.isFinite(n) ? n : null;
+  };
+
+  const megaStripeDrawingOverlayDxInputFocusedRef = useRef(false);
+  const [megaStripeDrawingOverlayDxDraft, setMegaStripeDrawingOverlayDxDraft] = useState(() => String(megaStripeDrawingOverlayDx));
+  useEffect(() => {
+    if (megaStripeDrawingOverlayDxInputFocusedRef.current) return;
+    setMegaStripeDrawingOverlayDxDraft(String(megaStripeDrawingOverlayDx));
+  }, [megaStripeDrawingOverlayDx]);
+
+  const megaStripeDrawingOverlayDyInputFocusedRef = useRef(false);
+  const [megaStripeDrawingOverlayDyDraft, setMegaStripeDrawingOverlayDyDraft] = useState(() => String(megaStripeDrawingOverlayDy));
+  useEffect(() => {
+    if (megaStripeDrawingOverlayDyInputFocusedRef.current) return;
+    setMegaStripeDrawingOverlayDyDraft(String(megaStripeDrawingOverlayDy));
+  }, [megaStripeDrawingOverlayDy]);
+
+  const megaStripeDrawingOverlayScaleInputFocusedRef = useRef(false);
+  const [megaStripeDrawingOverlayScaleDraft, setMegaStripeDrawingOverlayScaleDraft] = useState(() => String(megaStripeDrawingOverlayScale));
+  useEffect(() => {
+    if (megaStripeDrawingOverlayScaleInputFocusedRef.current) return;
+    setMegaStripeDrawingOverlayScaleDraft(String(megaStripeDrawingOverlayScale));
+  }, [megaStripeDrawingOverlayScale]);
+
+  const megaStripeDxInputFocusedRef = useRef(false);
+  const [megaStripeDxDraft, setMegaStripeDxDraft] = useState(() => String(megaStripeDx));
+  useEffect(() => {
+    if (megaStripeDxInputFocusedRef.current) return;
+    setMegaStripeDxDraft(String(megaStripeDx));
+  }, [megaStripeDx]);
+
+  const megaStripeDyInputFocusedRef = useRef(false);
+  const [megaStripeDyDraft, setMegaStripeDyDraft] = useState(() => String(megaStripeDy));
+  useEffect(() => {
+    if (megaStripeDyInputFocusedRef.current) return;
+    setMegaStripeDyDraft(String(megaStripeDy));
+  }, [megaStripeDy]);
+
+  const megaStripeScaleInputFocusedRef = useRef(false);
+  const [megaStripeScaleDraft, setMegaStripeScaleDraft] = useState(() => String(megaStripeScale));
+  useEffect(() => {
+    if (megaStripeScaleInputFocusedRef.current) return;
+    setMegaStripeScaleDraft(String(megaStripeScale));
+  }, [megaStripeScale]);
+
+  const megaStripeRefDxInputFocusedRef = useRef(false);
+  const [megaStripeRefDxDraft, setMegaStripeRefDxDraft] = useState(() => String(megaStripeRefDx));
+  useEffect(() => {
+    if (megaStripeRefDxInputFocusedRef.current) return;
+    setMegaStripeRefDxDraft(String(megaStripeRefDx));
+  }, [megaStripeRefDx]);
+
+  const megaStripeRefDyInputFocusedRef = useRef(false);
+  const [megaStripeRefDyDraft, setMegaStripeRefDyDraft] = useState(() => String(megaStripeRefDy));
+  useEffect(() => {
+    if (megaStripeRefDyInputFocusedRef.current) return;
+    setMegaStripeRefDyDraft(String(megaStripeRefDy));
+  }, [megaStripeRefDy]);
+
+  const megaStripeRefScaleInputFocusedRef = useRef(false);
+  const [megaStripeRefScaleDraft, setMegaStripeRefScaleDraft] = useState(() => String(megaStripeRefScale));
+  useEffect(() => {
+    if (megaStripeRefScaleInputFocusedRef.current) return;
+    setMegaStripeRefScaleDraft(String(megaStripeRefScale));
+  }, [megaStripeRefScale]);
+
+  const megaStripeRef2DxInputFocusedRef = useRef(false);
+  const [megaStripeRef2DxDraft, setMegaStripeRef2DxDraft] = useState(() => String(megaStripeRef2Dx));
+  useEffect(() => {
+    if (megaStripeRef2DxInputFocusedRef.current) return;
+    setMegaStripeRef2DxDraft(String(megaStripeRef2Dx));
+  }, [megaStripeRef2Dx]);
+
+  const megaStripeRef2DyInputFocusedRef = useRef(false);
+  const [megaStripeRef2DyDraft, setMegaStripeRef2DyDraft] = useState(() => String(megaStripeRef2Dy));
+  useEffect(() => {
+    if (megaStripeRef2DyInputFocusedRef.current) return;
+    setMegaStripeRef2DyDraft(String(megaStripeRef2Dy));
+  }, [megaStripeRef2Dy]);
+
+  const megaStripeRef2ScaleInputFocusedRef = useRef(false);
+  const [megaStripeRef2ScaleDraft, setMegaStripeRef2ScaleDraft] = useState(() => String(megaStripeRef2Scale));
+  useEffect(() => {
+    if (megaStripeRef2ScaleInputFocusedRef.current) return;
+    setMegaStripeRef2ScaleDraft(String(megaStripeRef2Scale));
+  }, [megaStripeRef2Scale]);
+
+  const megaStripeTileGapPxInputFocusedRef = useRef(false);
+  const [megaStripeTileGapPxDraft, setMegaStripeTileGapPxDraft] = useState(() => String(megaStripeTileGapPx || 0));
+  useEffect(() => {
+    if (megaStripeTileGapPxInputFocusedRef.current) return;
+    setMegaStripeTileGapPxDraft(String(megaStripeTileGapPx || 0));
+  }, [megaStripeTileGapPx]);
+
+  const megaTileSelectorSizePxInputFocusedRef = useRef(false);
+  const [megaTileSelectorSizePxDraft, setMegaTileSelectorSizePxDraft] = useState(() => String(megaTileSelectorSizePx || 0));
+  useEffect(() => {
+    if (megaTileSelectorSizePxInputFocusedRef.current) return;
+    setMegaTileSelectorSizePxDraft(String(megaTileSelectorSizePx || 0));
+  }, [megaTileSelectorSizePx]);
+
+  const megaTileSelectorStrokePxInputFocusedRef = useRef(false);
+  const [megaTileSelectorStrokePxDraft, setMegaTileSelectorStrokePxDraft] = useState(() => String(megaTileSelectorStrokePx || 0));
+  useEffect(() => {
+    if (megaTileSelectorStrokePxInputFocusedRef.current) return;
+    setMegaTileSelectorStrokePxDraft(String(megaTileSelectorStrokePx || 0));
+  }, [megaTileSelectorStrokePx]);
+
+  const megaTileSelectorStepXInputFocusedRef = useRef(false);
+  const [megaTileSelectorStepXDraft, setMegaTileSelectorStepXDraft] = useState(() => String(megaTileSelectorStepX || 0));
+  useEffect(() => {
+    if (megaTileSelectorStepXInputFocusedRef.current) return;
+    setMegaTileSelectorStepXDraft(String(megaTileSelectorStepX || 0));
+  }, [megaTileSelectorStepX]);
+
+  const megaTileSelectorStepYInputFocusedRef = useRef(false);
+  const [megaTileSelectorStepYDraft, setMegaTileSelectorStepYDraft] = useState(() => String(megaTileSelectorStepY || 0));
+  useEffect(() => {
+    if (megaTileSelectorStepYInputFocusedRef.current) return;
+    setMegaTileSelectorStepYDraft(String(megaTileSelectorStepY || 0));
+  }, [megaTileSelectorStepY]);
+
+  const megaTileSelectorRadiusPxInputFocusedRef = useRef(false);
+  const [megaTileSelectorRadiusPxDraft, setMegaTileSelectorRadiusPxDraft] = useState(() => String(megaTileSelectorRadiusPx || 0));
+  useEffect(() => {
+    if (megaTileSelectorRadiusPxInputFocusedRef.current) return;
+    setMegaTileSelectorRadiusPxDraft(String(megaTileSelectorRadiusPx || 0));
+  }, [megaTileSelectorRadiusPx]);
+
+  const megaTileSelectorExtendTopPxInputFocusedRef = useRef(false);
+  const [megaTileSelectorExtendTopPxDraft, setMegaTileSelectorExtendTopPxDraft] = useState(() => String(megaTileSelectorExtendTopPx || 0));
+  useEffect(() => {
+    if (megaTileSelectorExtendTopPxInputFocusedRef.current) return;
+    setMegaTileSelectorExtendTopPxDraft(String(megaTileSelectorExtendTopPx || 0));
+  }, [megaTileSelectorExtendTopPx]);
+
+  const megaTileSelectorExtendRightPxInputFocusedRef = useRef(false);
+  const [megaTileSelectorExtendRightPxDraft, setMegaTileSelectorExtendRightPxDraft] = useState(() => String(megaTileSelectorExtendRightPx || 0));
+  useEffect(() => {
+    if (megaTileSelectorExtendRightPxInputFocusedRef.current) return;
+    setMegaTileSelectorExtendRightPxDraft(String(megaTileSelectorExtendRightPx || 0));
+  }, [megaTileSelectorExtendRightPx]);
+
+  const megaTileSelectorExtendBottomPxInputFocusedRef = useRef(false);
+  const [megaTileSelectorExtendBottomPxDraft, setMegaTileSelectorExtendBottomPxDraft] = useState(() => String(megaTileSelectorExtendBottomPx || 0));
+  useEffect(() => {
+    if (megaTileSelectorExtendBottomPxInputFocusedRef.current) return;
+    setMegaTileSelectorExtendBottomPxDraft(String(megaTileSelectorExtendBottomPx || 0));
+  }, [megaTileSelectorExtendBottomPx]);
+
+  const megaTileSelectorExtendLeftPxInputFocusedRef = useRef(false);
+  const [megaTileSelectorExtendLeftPxDraft, setMegaTileSelectorExtendLeftPxDraft] = useState(() => String(megaTileSelectorExtendLeftPx || 0));
+  useEffect(() => {
+    if (megaTileSelectorExtendLeftPxInputFocusedRef.current) return;
+    setMegaTileSelectorExtendLeftPxDraft(String(megaTileSelectorExtendLeftPx || 0));
+  }, [megaTileSelectorExtendLeftPx]);
   const [megaStripeHudTopPx, setMegaStripeHudTopPx] = useState(null);
   const [megaStripeHudLockedTopPx, setMegaStripeHudLockedTopPx] = useState(() => {
     try {
@@ -260,7 +633,6 @@ function App() {
     }
   });
   const [megaStripeHudMaxRefPresets, setMegaStripeHudMaxRefPresets] = useState(12);
-  const [megaStripeTileGapPx, setMegaStripeTileGapPx] = useState(0);
   const megaStripeHudWrapRef = useRef(null);
   const megaStripeParamsGridRef = useRef(null);
   const megaStripeLastGoodHudTopPxRef = useRef(null);
@@ -329,6 +701,8 @@ function App() {
             resolvedOverlaySrc: String(snap.resolvedOverlaySrc || ''),
             stripeOverlayLoadState: String(snap.stripeOverlayLoadState || ''),
             stripeOverlayIsStripeWide: Boolean(snap.stripeOverlayIsStripeWide),
+            stripeOverlayIsStripeWideDerived: snap.stripeOverlayIsStripeWideDerived == null ? null : Boolean(snap.stripeOverlayIsStripeWideDerived),
+            stripeOverlayIsStripeWideMeasured: snap.stripeOverlayIsStripeWideMeasured == null ? null : Boolean(snap.stripeOverlayIsStripeWideMeasured),
           };
           const prevJson = prev ? JSON.stringify(prev) : '';
           const nextJson = JSON.stringify(next);
@@ -351,8 +725,19 @@ function App() {
     try {
       const rawDx = window.localStorage.getItem('MEGA_STRIPE_DX');
       const rawDy = window.localStorage.getItem('MEGA_STRIPE_DY');
+      const rawSpriteEnabled = window.localStorage.getItem('MEGA_STRIPE_SPRITE_ENABLED');
       const rawBelt = window.localStorage.getItem('MEGA_STRIPE_BELT');
       const rawOverlayMode = window.localStorage.getItem('MEGA_STRIPE_OVERLAY_MODE');
+      const rawShirtDrawingEnabledNew = window.localStorage.getItem('HG_SHIRT_DRAWING_ENABLED');
+      const rawShirtDrawingEnabledOld = window.localStorage.getItem('HG_SHIRT_DRAWING_OVERLAY_ENABLED');
+      const rawDrawingOverlaySrc = window.localStorage.getItem('HG_DRAWING_OVERLAY_SRC');
+      const rawShirtOverlayDx = window.localStorage.getItem('HG_SHIRT_DRAWING_OVERLAY_DX');
+      const rawShirtOverlayDy = window.localStorage.getItem('HG_SHIRT_DRAWING_OVERLAY_DY');
+      const rawShirtOverlayScale = window.localStorage.getItem('HG_SHIRT_DRAWING_OVERLAY_SCALE');
+      const rawStripeDrawingDx = window.localStorage.getItem('MEGA_STRIPE_DRAWING_OVERLAY_DX');
+      const rawStripeDrawingDy = window.localStorage.getItem('MEGA_STRIPE_DRAWING_OVERLAY_DY');
+      const rawStripeDrawingScale = window.localStorage.getItem('MEGA_STRIPE_DRAWING_OVERLAY_SCALE');
+      const rawStripeDrawingMap = window.localStorage.getItem('MEGA_STRIPE_DRAWING_OVERLAY_TRANSFORMS_BY_SRC');
       const rawOverlayDx = window.localStorage.getItem('MEGA_STRIPE_OVERLAY_DX');
       const rawOverlayDy = window.localStorage.getItem('MEGA_STRIPE_OVERLAY_DY');
       const rawOverlayScale = window.localStorage.getItem('MEGA_STRIPE_OVERLAY_SCALE');
@@ -363,18 +748,86 @@ function App() {
       const rawRefDx = window.localStorage.getItem('MEGA_STRIPE_REF_DX');
       const rawRefDy = window.localStorage.getItem('MEGA_STRIPE_REF_DY');
       const rawRefScale = window.localStorage.getItem('MEGA_STRIPE_REF_SCALE');
+      const rawRef2Enabled = window.localStorage.getItem('MEGA_STRIPE_REF2_ENABLED');
+      const rawRef2Src = window.localStorage.getItem('MEGA_STRIPE_REF2_SRC');
+      const rawRef2Dx = window.localStorage.getItem('MEGA_STRIPE_REF2_DX');
+      const rawRef2Dy = window.localStorage.getItem('MEGA_STRIPE_REF2_DY');
+      const rawRef2Scale = window.localStorage.getItem('MEGA_STRIPE_REF2_SCALE');
       const rawNudge = window.localStorage.getItem('MEGA_STRIPE_NUDGE_STEP');
       const rawTileGap = window.localStorage.getItem('MEGA_STRIPE_TILE_GAP_PX');
+      const rawTileSelectorV1Enabled = window.localStorage.getItem('MEGA_TILE_SELECTOR_ENABLED');
+      const rawTileSelectorEnabled = window.localStorage.getItem('MEGA_TILE_SELECTOR_V2_ENABLED');
+      const rawTileSelectorTarget = window.localStorage.getItem('MEGA_TILE_SELECTOR_V2_TARGET');
+      const rawTileSelectorSize = window.localStorage.getItem('MEGA_TILE_SELECTOR_V2_SIZE_PX');
+      const rawTileSelectorStroke = window.localStorage.getItem('MEGA_TILE_SELECTOR_V2_STROKE_PX');
+      const rawTileSelectorColor = window.localStorage.getItem('MEGA_TILE_SELECTOR_V2_COLOR');
+      const rawTileSelectorStepX = window.localStorage.getItem('MEGA_TILE_SELECTOR_V2_STEP_X');
+      const rawTileSelectorStepY = window.localStorage.getItem('MEGA_TILE_SELECTOR_V2_STEP_Y');
+      const rawTileSelectorRadius = window.localStorage.getItem('MEGA_TILE_SELECTOR_V2_RADIUS_PX');
+      const rawTileSelectorExtTop = window.localStorage.getItem('MEGA_TILE_SELECTOR_V2_EXTEND_TOP_PX');
+      const rawTileSelectorExtRight = window.localStorage.getItem('MEGA_TILE_SELECTOR_V2_EXTEND_RIGHT_PX');
+      const rawTileSelectorExtBottom = window.localStorage.getItem('MEGA_TILE_SELECTOR_V2_EXTEND_BOTTOM_PX');
+      const rawTileSelectorExtLeft = window.localStorage.getItem('MEGA_TILE_SELECTOR_V2_EXTEND_LEFT_PX');
       const dx = rawDx == null ? 0 : Number.parseFloat(String(rawDx));
       const dy = rawDy == null ? 0 : Number.parseFloat(String(rawDy));
       if (Number.isFinite(dx)) setMegaStripeDx(dx);
       if (Number.isFinite(dy)) setMegaStripeDy(dy);
-      if (rawBelt != null) setMegaStripeBeltEnabled(rawBelt === '1');
-      if (rawOverlayMode != null) {
-        const v = String(rawOverlayMode);
-        const allowed = new Set(['black', 'off']);
-        if (allowed.has(v)) setMegaStripeOverlayMode(v);
+      if (rawSpriteEnabled != null) {
+        const v = String(rawSpriteEnabled).trim().toLowerCase();
+        setMegaStripeSpriteEnabled(v === '' || v === '1' || v === 'true' || v === 'on' || v === 'yes');
       }
+      if (rawBelt != null) setMegaStripeBeltEnabled(rawBelt === '1');
+      setMegaStripeOverlayMode('off');
+      if (rawShirtDrawingEnabledNew != null) {
+        const v = String(rawShirtDrawingEnabledNew).trim().toLowerCase();
+        setMegaShirtDrawingEnabled(v === '' || v === '1' || v === 'true' || v === 'on' || v === 'yes');
+      } else if (rawShirtDrawingEnabledOld != null) {
+        const v = String(rawShirtDrawingEnabledOld).trim().toLowerCase();
+        setMegaShirtDrawingEnabled(v === '' || v === '1' || v === 'true' || v === 'on' || v === 'yes');
+      }
+      if (rawShirtOverlayDx != null) {
+        const n = Number.parseFloat(String(rawShirtOverlayDx));
+        if (Number.isFinite(n)) setMegaShirtDrawingOverlayDx(n);
+      }
+      if (rawShirtOverlayDy != null) {
+        const n = Number.parseFloat(String(rawShirtOverlayDy));
+        if (Number.isFinite(n)) setMegaShirtDrawingOverlayDy(n);
+      }
+      if (rawShirtOverlayScale != null) {
+        const n = Number.parseFloat(String(rawShirtOverlayScale));
+        if (Number.isFinite(n) && n > 0) setMegaShirtDrawingOverlayScale(clampScale(n, 1));
+      }
+
+      const overlayKey = String(rawDrawingOverlaySrc || '').trim();
+      const canonicalOverlayKey = canonicalStripeDrawingOverlayKey(overlayKey);
+      let picked = null;
+      try {
+        const parsed = rawStripeDrawingMap ? JSON.parse(String(rawStripeDrawingMap)) : null;
+        if (parsed && typeof parsed === 'object' && (canonicalOverlayKey || overlayKey)) {
+          const v = (canonicalOverlayKey && parsed[canonicalOverlayKey]) || (overlayKey && parsed[overlayKey]);
+          if (v && typeof v === 'object') picked = v;
+        }
+      } catch {
+        picked = null;
+      }
+
+      const stripeDrawingDxFallbackRaw = picked?.dx ?? (rawStripeDrawingDx != null ? rawStripeDrawingDx : rawShirtOverlayDx);
+      const stripeDrawingDyFallbackRaw = picked?.dy ?? (rawStripeDrawingDy != null ? rawStripeDrawingDy : rawShirtOverlayDy);
+      const stripeDrawingScaleFallbackRaw = picked?.scale ?? (rawStripeDrawingScale != null ? rawStripeDrawingScale : rawShirtOverlayScale);
+
+      if (stripeDrawingDxFallbackRaw != null) {
+        const n = Number.parseFloat(String(stripeDrawingDxFallbackRaw));
+        if (Number.isFinite(n)) setMegaStripeDrawingOverlayDx(n);
+      }
+      if (stripeDrawingDyFallbackRaw != null) {
+        const n = Number.parseFloat(String(stripeDrawingDyFallbackRaw));
+        if (Number.isFinite(n)) setMegaStripeDrawingOverlayDy(n);
+      }
+      if (stripeDrawingScaleFallbackRaw != null) {
+        const n = Number.parseFloat(String(stripeDrawingScaleFallbackRaw));
+        if (Number.isFinite(n) && n > 0) setMegaStripeDrawingOverlayScale(clampScale(n, 1));
+      }
+
       if (rawOverlayDx != null) {
         const n = Number.parseFloat(String(rawOverlayDx));
         if (Number.isFinite(n)) setMegaStripeOverlayDx(n);
@@ -385,14 +838,16 @@ function App() {
       }
       if (rawOverlayScale != null) {
         const n = Number.parseFloat(String(rawOverlayScale));
-        if (Number.isFinite(n) && n > 0) setMegaStripeOverlayScale(Math.min(5, Math.max(0.1, n)));
+        if (Number.isFinite(n) && n > 0) setMegaStripeOverlayScale(clampScale(n, 1));
       }
       if (rawScale != null) {
         const n = Number.parseFloat(String(rawScale));
-        if (Number.isFinite(n) && n > 0) setMegaStripeScale(Math.min(5, Math.max(0.1, n)));
+        if (Number.isFinite(n) && n > 0) setMegaStripeScale(clampScale(n, 1.2125));
       }
       if (rawRefEnabled != null) setMegaStripeRefEnabled(rawRefEnabled === '1');
       if (rawRefSrc != null) setMegaStripeRefSrc(String(rawRefSrc));
+      if (rawRef2Enabled != null) setMegaStripeRef2Enabled(rawRef2Enabled === '1');
+      if (rawRef2Src != null) setMegaStripeRef2Src(String(rawRef2Src));
       if (rawRefCol != null) {
         const v = String(rawRefCol);
         const allowed = new Set(['first_contact', 'thin', 'austen', 'cube', 'miscel·lania', 'the_human_inside']);
@@ -410,7 +865,19 @@ function App() {
       }
       if (rawRefScale != null) {
         const n = Number.parseFloat(String(rawRefScale));
-        if (Number.isFinite(n) && n > 0) setMegaStripeRefScale(Math.min(5, Math.max(0.1, n)));
+        if (Number.isFinite(n) && n > 0) setMegaStripeRefScale(clampScale(n, 1));
+      }
+      if (rawRef2Dx != null) {
+        const n = Number.parseFloat(String(rawRef2Dx));
+        if (Number.isFinite(n)) setMegaStripeRef2Dx(n);
+      }
+      if (rawRef2Dy != null) {
+        const n = Number.parseFloat(String(rawRef2Dy));
+        if (Number.isFinite(n)) setMegaStripeRef2Dy(n);
+      }
+      if (rawRef2Scale != null) {
+        const n = Number.parseFloat(String(rawRef2Scale));
+        if (Number.isFinite(n) && n > 0) setMegaStripeRef2Scale(clampScale(n, 1));
       }
       if (rawNudge != null) {
         const n = Number.parseInt(String(rawNudge), 10);
@@ -420,10 +887,87 @@ function App() {
         const n = Number.parseFloat(String(rawTileGap));
         if (Number.isFinite(n)) setMegaStripeTileGapPx(Math.min(200, Math.max(-200, n)));
       }
+
+      if (rawTileSelectorV1Enabled != null) {
+        const v = String(rawTileSelectorV1Enabled).trim().toLowerCase();
+        setMegaTileSelectorV1Enabled(v === '' || v === '1' || v === 'true' || v === 'on' || v === 'yes');
+      }
+
+      if (rawTileSelectorEnabled != null) {
+        const v = String(rawTileSelectorEnabled).trim().toLowerCase();
+        setMegaTileSelectorEnabled(v === '' || v === '1' || v === 'true' || v === 'on' || v === 'yes');
+      }
+      if (rawTileSelectorTarget != null) setMegaTileSelectorTarget(String(rawTileSelectorTarget));
+      if (rawTileSelectorSize != null) {
+        const n = Number.parseFloat(String(rawTileSelectorSize));
+        if (Number.isFinite(n) && n > 0) setMegaTileSelectorSizePx(Math.min(800, Math.max(20, n)));
+      }
+      if (rawTileSelectorStroke != null) {
+        const n = Number.parseFloat(String(rawTileSelectorStroke));
+        if (Number.isFinite(n) && n >= 0) setMegaTileSelectorStrokePx(Math.min(80, Math.max(0, n)));
+      }
+      if (rawTileSelectorColor != null) setMegaTileSelectorColor(String(rawTileSelectorColor));
+      if (rawTileSelectorStepX != null) {
+        const n = Number.parseFloat(String(rawTileSelectorStepX));
+        if (Number.isFinite(n)) setMegaTileSelectorStepX(Math.min(99, Math.max(-99, n)));
+      }
+      if (rawTileSelectorStepY != null) {
+        const n = Number.parseFloat(String(rawTileSelectorStepY));
+        if (Number.isFinite(n)) setMegaTileSelectorStepY(Math.min(99, Math.max(-99, n)));
+      }
+      if (rawTileSelectorRadius != null) {
+        const n = Number.parseFloat(String(rawTileSelectorRadius));
+        if (Number.isFinite(n)) setMegaTileSelectorRadiusPx(Math.min(200, Math.max(0, n)));
+      }
+      if (rawTileSelectorExtTop != null) {
+        const n = Number.parseFloat(String(rawTileSelectorExtTop));
+        if (Number.isFinite(n)) setMegaTileSelectorExtendTopPx(Math.min(500, Math.max(-500, n)));
+      }
+      if (rawTileSelectorExtRight != null) {
+        const n = Number.parseFloat(String(rawTileSelectorExtRight));
+        if (Number.isFinite(n)) setMegaTileSelectorExtendRightPx(Math.min(500, Math.max(-500, n)));
+      }
+      if (rawTileSelectorExtBottom != null) {
+        const n = Number.parseFloat(String(rawTileSelectorExtBottom));
+        if (Number.isFinite(n)) setMegaTileSelectorExtendBottomPx(Math.min(500, Math.max(-500, n)));
+      }
+      if (rawTileSelectorExtLeft != null) {
+        const n = Number.parseFloat(String(rawTileSelectorExtLeft));
+        if (Number.isFinite(n)) setMegaTileSelectorExtendLeftPx(Math.min(500, Math.max(-500, n)));
+      }
     } catch {
       // ignore
     }
   }, []);
+
+  useEffect(() => {
+    try {
+      window.localStorage.setItem('MEGA_TILE_SELECTOR_V2_ENABLED', megaTileSelectorEnabled ? '1' : '0');
+      window.localStorage.setItem('MEGA_TILE_SELECTOR_V2_TARGET', String(megaTileSelectorTarget || ''));
+      window.localStorage.setItem('MEGA_TILE_SELECTOR_V2_SIZE_PX', String(Math.min(800, Math.max(20, Number(megaTileSelectorSizePx) || 200))));
+      window.localStorage.setItem('MEGA_TILE_SELECTOR_V2_STROKE_PX', String(Math.min(80, Math.max(0, Number(megaTileSelectorStrokePx) || 0))));
+      window.localStorage.setItem('MEGA_TILE_SELECTOR_V2_COLOR', String(megaTileSelectorColor || 'black'));
+      window.localStorage.setItem('MEGA_TILE_SELECTOR_V2_STEP_X', String(Math.min(99, Math.max(-99, Number(megaTileSelectorStepX) || 0))));
+      window.localStorage.setItem('MEGA_TILE_SELECTOR_V2_STEP_Y', String(Math.min(99, Math.max(-99, Number(megaTileSelectorStepY) || 0))));
+      window.localStorage.setItem('MEGA_TILE_SELECTOR_V2_RADIUS_PX', String(Math.min(200, Math.max(0, Number(megaTileSelectorRadiusPx) || 0))));
+      window.localStorage.setItem('MEGA_TILE_SELECTOR_V2_EXTEND_TOP_PX', String(Math.min(500, Math.max(-500, Number(megaTileSelectorExtendTopPx) || 0))));
+      window.localStorage.setItem('MEGA_TILE_SELECTOR_V2_EXTEND_RIGHT_PX', String(Math.min(500, Math.max(-500, Number(megaTileSelectorExtendRightPx) || 0))));
+      window.localStorage.setItem('MEGA_TILE_SELECTOR_V2_EXTEND_BOTTOM_PX', String(Math.min(500, Math.max(-500, Number(megaTileSelectorExtendBottomPx) || 0))));
+      window.localStorage.setItem('MEGA_TILE_SELECTOR_V2_EXTEND_LEFT_PX', String(Math.min(500, Math.max(-500, Number(megaTileSelectorExtendLeftPx) || 0))));
+      window.dispatchEvent(new Event('mega-tile-selector-changed'));
+    } catch {
+      // ignore
+    }
+  }, [megaTileSelectorColor, megaTileSelectorEnabled, megaTileSelectorExtendBottomPx, megaTileSelectorExtendLeftPx, megaTileSelectorExtendRightPx, megaTileSelectorExtendTopPx, megaTileSelectorRadiusPx, megaTileSelectorSizePx, megaTileSelectorStepX, megaTileSelectorStepY, megaTileSelectorStrokePx, megaTileSelectorTarget]);
+
+  useEffect(() => {
+    try {
+      window.localStorage.setItem('MEGA_TILE_SELECTOR_ENABLED', megaTileSelectorV1Enabled ? '1' : '0');
+      window.dispatchEvent(new Event('mega-tile-selector-changed'));
+    } catch {
+      // ignore
+    }
+  }, [megaTileSelectorV1Enabled]);
 
   useEffect(() => {
     const path = (location?.pathname || '').toString();
@@ -519,6 +1063,15 @@ function App() {
 
   useEffect(() => {
     try {
+      window.localStorage.setItem('MEGA_STRIPE_SPRITE_ENABLED', megaStripeSpriteEnabled ? '1' : '0');
+      window.dispatchEvent(new Event('mega-stripe-sprite-enabled-changed'));
+    } catch {
+      // ignore
+    }
+  }, [megaStripeSpriteEnabled]);
+
+  useEffect(() => {
+    try {
       const dx = Number.isFinite(megaStripeOverlayDx) ? megaStripeOverlayDx : 0;
       const dy = Number.isFinite(megaStripeOverlayDy) ? megaStripeOverlayDy : 0;
       document.documentElement.style.setProperty('--megaStripeOverlayDx', `${dx}px`);
@@ -534,7 +1087,7 @@ function App() {
   useEffect(() => {
     try {
       const v = Number.isFinite(megaStripeOverlayScale) ? megaStripeOverlayScale : 1;
-      const clamped = Math.min(5, Math.max(0.1, v));
+      const clamped = clampScale(v, 1);
       document.documentElement.style.setProperty('--megaStripeOverlayScale', String(clamped));
       window.localStorage.setItem('MEGA_STRIPE_OVERLAY_SCALE', String(clamped));
       window.dispatchEvent(new Event('mega-stripe-overlay-mode-changed'));
@@ -546,7 +1099,7 @@ function App() {
   useEffect(() => {
     try {
       const s = Number.isFinite(megaStripeScale) ? megaStripeScale : 1.2125;
-      const clamped = Math.min(5, Math.max(0.1, s));
+      const clamped = clampScale(s, 1.2125);
       document.documentElement.style.setProperty('--megaStripeScale', String(clamped));
       window.localStorage.setItem('MEGA_STRIPE_SCALE', String(clamped));
     } catch {
@@ -570,8 +1123,22 @@ function App() {
 
   useEffect(() => {
     try {
+      const dx = Number.isFinite(megaStripeRef2Dx) ? megaStripeRef2Dx : 0;
+      const dy = Number.isFinite(megaStripeRef2Dy) ? megaStripeRef2Dy : 0;
+      document.documentElement.style.setProperty('--megaStripeRef2Dx', `${dx}px`);
+      document.documentElement.style.setProperty('--megaStripeRef2Dy', `${dy}px`);
+      window.localStorage.setItem('MEGA_STRIPE_REF2_DX', String(dx));
+      window.localStorage.setItem('MEGA_STRIPE_REF2_DY', String(dy));
+      window.dispatchEvent(new Event('mega-stripe-ref2-changed'));
+    } catch {
+      // ignore
+    }
+  }, [megaStripeRef2Dx, megaStripeRef2Dy]);
+
+  useEffect(() => {
+    try {
       const v = Number.isFinite(megaStripeRefScale) ? megaStripeRefScale : 1;
-      const clamped = Math.min(5, Math.max(0.1, v));
+      const clamped = clampScale(v, 1);
       document.documentElement.style.setProperty('--megaStripeRefScale', String(clamped));
       window.localStorage.setItem('MEGA_STRIPE_REF_SCALE', String(clamped));
       window.dispatchEvent(new Event('mega-stripe-ref-changed'));
@@ -582,10 +1149,23 @@ function App() {
 
   useEffect(() => {
     try {
+      const v = Number.isFinite(megaStripeRef2Scale) ? megaStripeRef2Scale : 1;
+      const clamped = clampScale(v, 1);
+      document.documentElement.style.setProperty('--megaStripeRef2Scale', String(clamped));
+      window.localStorage.setItem('MEGA_STRIPE_REF2_SCALE', String(clamped));
+      window.dispatchEvent(new Event('mega-stripe-ref2-changed'));
+    } catch {
+      // ignore
+    }
+  }, [megaStripeRef2Scale]);
+
+  useEffect(() => {
+    try {
       const raw = Number.isFinite(megaStripeTileGapPx) ? megaStripeTileGapPx : 0;
       const v = Math.min(200, Math.max(-200, raw));
       document.documentElement.style.setProperty('--megaStripeTileGapPx', `${v}px`);
       window.localStorage.setItem('MEGA_STRIPE_TILE_GAP_PX', String(v));
+      window.dispatchEvent(new Event('mega-stripe-tile-gap-changed'));
     } catch {
       // ignore
     }
@@ -601,12 +1181,156 @@ function App() {
 
   useEffect(() => {
     try {
-      window.localStorage.setItem('MEGA_STRIPE_OVERLAY_MODE', String(megaStripeOverlayMode || 'black'));
+      window.localStorage.setItem('MEGA_STRIPE_OVERLAY_MODE', 'off');
       window.dispatchEvent(new Event('mega-stripe-overlay-mode-changed'));
     } catch {
       // ignore
     }
   }, [megaStripeOverlayMode]);
+
+  useEffect(() => {
+    try {
+      window.localStorage.setItem('HG_SHIRT_DRAWING_ENABLED', megaShirtDrawingEnabled ? '1' : '0');
+      window.dispatchEvent(new Event('hg-shirt-drawing-enabled-changed'));
+    } catch {
+      // ignore
+    }
+  }, [megaShirtDrawingEnabled]);
+
+  useEffect(() => {
+    const sync = () => {
+      try {
+        setMegaShirtDrawingOverlaySrc(String(window.localStorage.getItem('HG_DRAWING_OVERLAY_SRC') || ''));
+      } catch {
+        setMegaShirtDrawingOverlaySrc('');
+      }
+    };
+    sync();
+    window.addEventListener('hg-drawing-overlay-changed', sync);
+    return () => window.removeEventListener('hg-drawing-overlay-changed', sync);
+  }, []);
+
+  useEffect(() => {
+    const path = (location?.pathname || '').toString();
+    const activeRoute = path === '/full-wide-slide' || path === '/full-wide-slide-demo';
+    if (!activeRoute) return;
+
+    const overlayKey = String(megaShirtDrawingOverlaySrc || '').trim();
+    if (!overlayKey) return;
+    const canonicalOverlayKey = canonicalStripeDrawingOverlayKey(overlayKey);
+
+    try {
+      const rawStripeDrawingMap = window.localStorage.getItem('MEGA_STRIPE_DRAWING_OVERLAY_TRANSFORMS_BY_SRC');
+      const parsed = rawStripeDrawingMap ? JSON.parse(String(rawStripeDrawingMap)) : null;
+      const entry = parsed && typeof parsed === 'object'
+        ? ((canonicalOverlayKey && parsed[canonicalOverlayKey]) || parsed[overlayKey])
+        : null;
+      if (entry && typeof entry === 'object') {
+        const dx = Number.parseFloat(String(entry.dx));
+        const dy = Number.parseFloat(String(entry.dy));
+        const scale = Number.parseFloat(String(entry.scale));
+        setMegaStripeDrawingOverlayDx(Number.isFinite(dx) ? dx : 0);
+        setMegaStripeDrawingOverlayDy(Number.isFinite(dy) ? dy : 0);
+        setMegaStripeDrawingOverlayScale(Number.isFinite(scale) && scale > 0 ? clampScale(scale, 1) : 1);
+      } else {
+        setMegaStripeDrawingOverlayDx(0);
+        setMegaStripeDrawingOverlayDy(0);
+        setMegaStripeDrawingOverlayScale(1);
+      }
+    } catch {
+      setMegaStripeDrawingOverlayDx(0);
+      setMegaStripeDrawingOverlayDy(0);
+      setMegaStripeDrawingOverlayScale(1);
+    }
+  }, [location?.pathname, megaShirtDrawingOverlaySrc]);
+
+  useEffect(() => {
+    try {
+      const dx = Number.isFinite(megaShirtDrawingOverlayDx) ? megaShirtDrawingOverlayDx : 0;
+      const dy = Number.isFinite(megaShirtDrawingOverlayDy) ? megaShirtDrawingOverlayDy : 0;
+      document.documentElement.style.setProperty('--hgShirtOverlayDx', `${dx}px`);
+      document.documentElement.style.setProperty('--hgShirtOverlayDy', `${dy}px`);
+      window.localStorage.setItem('HG_SHIRT_DRAWING_OVERLAY_DX', String(dx));
+      window.localStorage.setItem('HG_SHIRT_DRAWING_OVERLAY_DY', String(dy));
+      window.dispatchEvent(new Event('hg-shirt-drawing-overlay-transform-changed'));
+    } catch {
+      // ignore
+    }
+  }, [megaShirtDrawingOverlayDx, megaShirtDrawingOverlayDy]);
+
+  useEffect(() => {
+    try {
+      const dx = Number.isFinite(megaStripeDrawingOverlayDx) ? megaStripeDrawingOverlayDx : 0;
+      const dy = Number.isFinite(megaStripeDrawingOverlayDy) ? megaStripeDrawingOverlayDy : 0;
+      document.documentElement.style.setProperty('--megaStripeDrawingOverlayDx', `${dx}px`);
+      document.documentElement.style.setProperty('--megaStripeDrawingOverlayDy', `${dy}px`);
+      window.localStorage.setItem('MEGA_STRIPE_DRAWING_OVERLAY_DX', String(dx));
+      window.localStorage.setItem('MEGA_STRIPE_DRAWING_OVERLAY_DY', String(dy));
+
+      const overlayKey = String(megaShirtDrawingOverlaySrc || '').trim();
+      if (overlayKey) {
+        const canonicalOverlayKey = canonicalStripeDrawingOverlayKey(overlayKey);
+        const keyToWrite = canonicalOverlayKey || overlayKey;
+        const rawStripeDrawingMap = window.localStorage.getItem('MEGA_STRIPE_DRAWING_OVERLAY_TRANSFORMS_BY_SRC');
+        let parsed = null;
+        try {
+          parsed = rawStripeDrawingMap ? JSON.parse(String(rawStripeDrawingMap)) : null;
+        } catch {
+          parsed = null;
+        }
+        const out = parsed && typeof parsed === 'object' ? { ...parsed } : {};
+        const prev = out[keyToWrite];
+        const next = { ...(prev && typeof prev === 'object' ? prev : {}), dx, dy };
+        out[keyToWrite] = next;
+        if (canonicalOverlayKey && canonicalOverlayKey !== overlayKey) out[overlayKey] = next;
+        window.localStorage.setItem('MEGA_STRIPE_DRAWING_OVERLAY_TRANSFORMS_BY_SRC', JSON.stringify(out));
+      }
+    } catch {
+      // ignore
+    }
+  }, [megaStripeDrawingOverlayDx, megaStripeDrawingOverlayDy, megaShirtDrawingOverlaySrc]);
+
+  useEffect(() => {
+    try {
+      const v = Number.isFinite(megaShirtDrawingOverlayScale) ? megaShirtDrawingOverlayScale : 1;
+      const clamped = clampScale(v, 1);
+      document.documentElement.style.setProperty('--hgShirtOverlayScale', String(clamped));
+      window.localStorage.setItem('HG_SHIRT_DRAWING_OVERLAY_SCALE', String(clamped));
+      window.dispatchEvent(new Event('hg-shirt-drawing-overlay-transform-changed'));
+    } catch {
+      // ignore
+    }
+  }, [megaShirtDrawingOverlayScale]);
+
+  useEffect(() => {
+    try {
+      const v = Number.isFinite(megaStripeDrawingOverlayScale) ? megaStripeDrawingOverlayScale : 1;
+      const clamped = clampScale(v, 1);
+      document.documentElement.style.setProperty('--megaStripeDrawingOverlayScale', String(clamped));
+      window.localStorage.setItem('MEGA_STRIPE_DRAWING_OVERLAY_SCALE', String(clamped));
+
+      const overlayKey = String(megaShirtDrawingOverlaySrc || '').trim();
+      if (overlayKey) {
+        const canonicalOverlayKey = canonicalStripeDrawingOverlayKey(overlayKey);
+        const keyToWrite = canonicalOverlayKey || overlayKey;
+        const rawStripeDrawingMap = window.localStorage.getItem('MEGA_STRIPE_DRAWING_OVERLAY_TRANSFORMS_BY_SRC');
+        let parsed = null;
+        try {
+          parsed = rawStripeDrawingMap ? JSON.parse(String(rawStripeDrawingMap)) : null;
+        } catch {
+          parsed = null;
+        }
+        const out = parsed && typeof parsed === 'object' ? { ...parsed } : {};
+        const prev = out[keyToWrite];
+        const next = { ...(prev && typeof prev === 'object' ? prev : {}), scale: clamped };
+        out[keyToWrite] = next;
+        if (canonicalOverlayKey && canonicalOverlayKey !== overlayKey) out[overlayKey] = next;
+        window.localStorage.setItem('MEGA_STRIPE_DRAWING_OVERLAY_TRANSFORMS_BY_SRC', JSON.stringify(out));
+      }
+    } catch {
+      // ignore
+    }
+  }, [megaStripeDrawingOverlayScale, megaShirtDrawingOverlaySrc]);
 
   useEffect(() => {
     const v = String(megaStripeOverlayMode || 'off');
@@ -616,7 +1340,9 @@ function App() {
   useEffect(() => {
     try {
       const v = String(megaStripeOverlayMode || 'off');
-      if (v !== 'off') setStripeEditTool('overlay');
+      if (v !== 'off') {
+        setStripeEditTool((prev) => (String(prev || 'ref') === 'ref' ? 'overlay' : prev));
+      }
     } catch {
       // ignore
     }
@@ -646,6 +1372,16 @@ function App() {
       // ignore
     }
   }, [megaStripeRefCollection, megaStripeRefEnabled, megaStripeRefSrc]);
+
+  useEffect(() => {
+    try {
+      window.localStorage.setItem('MEGA_STRIPE_REF2_ENABLED', megaStripeRef2Enabled ? '1' : '0');
+      window.localStorage.setItem('MEGA_STRIPE_REF2_SRC', String(megaStripeRef2Src || ''));
+      window.dispatchEvent(new Event('mega-stripe-ref2-changed'));
+    } catch {
+      // ignore
+    }
+  }, [megaStripeRef2Enabled, megaStripeRef2Src]);
 
   useEffect(() => {
     try {
@@ -892,17 +1628,17 @@ function App() {
 
   useEffect(() => {
     const path = (location?.pathname || '').toString();
-    const activeRoute = path === '/full-wide-slide';
+    const activeRoute = path === '/full-wide-slide' || path === '/full-wide-slide-demo';
     if (!activeRoute) return undefined;
 
     const shouldIgnoreEvent = (e) => {
       try {
         if (!e) return true;
         if (e.defaultPrevented) return true;
-        const t = e.target;
-        const tag = (t?.tagName || '').toString().toLowerCase();
+        const el = typeof document !== 'undefined' ? document.activeElement : null;
+        const tag = (el?.tagName || '').toString().toLowerCase();
         if (tag === 'input' || tag === 'textarea' || tag === 'select') return true;
-        if (t?.isContentEditable) return true;
+        if (el?.isContentEditable) return true;
         return false;
       } catch {
         return true;
@@ -914,15 +1650,26 @@ function App() {
 
       const k = (e.key || '').toString();
       const step = e.shiftKey ? 5 : 0.5;
-      const tileStep = e.shiftKey ? 1 : 0.1;
+      const overlayStep = step * 0.5;
+      const tileStep = (e.shiftKey ? 1 : 0.1) * 0.5;
+
+      // Do not block browser zoom shortcuts (Cmd/Ctrl + +/-/0)
+      if ((e.metaKey || e.ctrlKey) && (k === '+' || k === '=' || k === '-' || k === '_' || k === '0')) {
+        return;
+      }
 
       if (!e.altKey && !e.ctrlKey && !e.metaKey) {
         const kc = k.toLowerCase();
         if (kc === 'c') {
           e.preventDefault();
           if (stripeEditTool === 'overlay') {
-            setMegaStripeOverlayDx(0);
-            setMegaStripeOverlayDy(0);
+            setMegaStripeDrawingOverlayDx(0);
+            setMegaStripeDrawingOverlayDy(0);
+            setMegaStripeDrawingOverlayScale(1);
+          } else if (stripeEditTool === 'ref2') {
+            setMegaStripeRef2Dx(0);
+            setMegaStripeRef2Dy(0);
+            setMegaStripeRef2Scale(1);
           } else if (stripeEditTool === 'tile') {
             setMegaStripeTileGapPx(0);
           } else {
@@ -934,12 +1681,6 @@ function App() {
         if (kc === 'o') {
           e.preventDefault();
           setStripeEditTool('overlay');
-          setMegaStripeOverlayMode((prev) => {
-            const cur = String(prev || 'off');
-            if (cur !== 'off') return cur;
-            const last = String(megaStripeLastNonOffOverlayModeRef.current || 'black');
-            return last === 'off' ? 'black' : last;
-          });
           return;
         }
         if (kc === 'r') {
@@ -949,35 +1690,46 @@ function App() {
         }
         if (kc === 't') {
           e.preventDefault();
-          setStripeEditTool((prev) => (String(prev || 'ref') === 'tile' ? 'ref' : 'tile'));
+          setStripeEditTool('tile');
+          return;
+        }
+        if (kc === '2') {
+          e.preventDefault();
+          setMegaStripeRef2Enabled(true);
+          setMegaStripeRef2Src((prev) => (String(prev || '').trim() ? prev : megaStripeRefSrc));
+          setStripeEditTool('ref2');
           return;
         }
       }
 
       if (k === 'ArrowLeft') {
         e.preventDefault();
-        if (stripeEditTool === 'overlay') setMegaStripeOverlayDx((v) => (Number.isFinite(v) ? v - step : -step));
+        if (stripeEditTool === 'ref2') setMegaStripeRef2Dx((v) => (Number.isFinite(v) ? v - step : -step));
+        else if (stripeEditTool === 'overlay') setMegaStripeDrawingOverlayDx((v) => (Number.isFinite(v) ? v - overlayStep : -overlayStep));
         else if (stripeEditTool === 'tile') setMegaStripeTileGapPx((v) => (Number.isFinite(v) ? Math.min(200, Math.max(-200, v - tileStep)) : -tileStep));
         else setMegaStripeRefDx((v) => (Number.isFinite(v) ? v - step : -step));
         return;
       }
       if (k === 'ArrowRight') {
         e.preventDefault();
-        if (stripeEditTool === 'overlay') setMegaStripeOverlayDx((v) => (Number.isFinite(v) ? v + step : step));
+        if (stripeEditTool === 'ref2') setMegaStripeRef2Dx((v) => (Number.isFinite(v) ? v + step : step));
+        else if (stripeEditTool === 'overlay') setMegaStripeDrawingOverlayDx((v) => (Number.isFinite(v) ? v + overlayStep : overlayStep));
         else if (stripeEditTool === 'tile') setMegaStripeTileGapPx((v) => (Number.isFinite(v) ? Math.min(200, Math.max(-200, v + tileStep)) : tileStep));
         else setMegaStripeRefDx((v) => (Number.isFinite(v) ? v + step : step));
         return;
       }
       if (k === 'ArrowUp') {
         e.preventDefault();
-        if (stripeEditTool === 'overlay') setMegaStripeOverlayDy((v) => (Number.isFinite(v) ? v - step : -step));
+        if (stripeEditTool === 'ref2') setMegaStripeRef2Dy((v) => (Number.isFinite(v) ? v - step : -step));
+        else if (stripeEditTool === 'overlay') setMegaStripeDrawingOverlayDy((v) => (Number.isFinite(v) ? v - overlayStep : -overlayStep));
         else if (stripeEditTool === 'tile') setMegaStripeTileGapPx((v) => (Number.isFinite(v) ? Math.min(200, Math.max(-200, v - tileStep)) : -tileStep));
         else setMegaStripeRefDy((v) => (Number.isFinite(v) ? v - step : -step));
         return;
       }
       if (k === 'ArrowDown') {
         e.preventDefault();
-        if (stripeEditTool === 'overlay') setMegaStripeOverlayDy((v) => (Number.isFinite(v) ? v + step : step));
+        if (stripeEditTool === 'ref2') setMegaStripeRef2Dy((v) => (Number.isFinite(v) ? v + step : step));
+        else if (stripeEditTool === 'overlay') setMegaStripeDrawingOverlayDy((v) => (Number.isFinite(v) ? v + overlayStep : overlayStep));
         else if (stripeEditTool === 'tile') setMegaStripeTileGapPx((v) => (Number.isFinite(v) ? Math.min(200, Math.max(-200, v + tileStep)) : tileStep));
         else setMegaStripeRefDy((v) => (Number.isFinite(v) ? v + step : step));
         return;
@@ -1003,53 +1755,73 @@ function App() {
 
       // Scale controls: + / - (no scrolls, no HUD sliders)
       if (k === '+' || k === '=') {
+        if (stripeEditTool === 'tile') return;
         e.preventDefault();
-        const inc = e.shiftKey ? 0.05 : 0.005;
-        if (stripeEditTool === 'ref') {
-          setMegaStripeRefScale((v) => {
+        const inc = e.shiftKey ? 0.1 : 0.01;
+
+        if (stripeEditTool === 'overlay') {
+          setMegaStripeDrawingOverlayScale((v) => {
             const cur = Number.isFinite(v) ? v : 1;
-            const next = Math.min(5, Math.max(0.1, +(cur + inc).toFixed(4)));
+            const next = clampScale(+(cur + inc).toFixed(4), 1);
             return next;
           });
           return;
         }
-        if (stripeEditTool === 'overlay') {
-          setMegaStripeOverlayScale((v) => {
+        if (stripeEditTool === 'ref2') {
+          setMegaStripeRef2Scale((v) => {
             const cur = Number.isFinite(v) ? v : 1;
-            const next = Math.min(5, Math.max(0.1, +(cur + inc).toFixed(4)));
+            const next = clampScale(+(cur + inc).toFixed(4), 1);
+            return next;
+          });
+          return;
+        }
+        if (stripeEditTool === 'ref') {
+          setMegaStripeRefScale((v) => {
+            const cur = Number.isFinite(v) ? v : 1;
+            const next = clampScale(+(cur + inc).toFixed(4), 1);
             return next;
           });
           return;
         }
         setMegaStripeScale((v) => {
           const cur = Number.isFinite(v) ? v : 1.2125;
-          const next = Math.min(5, Math.max(0.1, +(cur + inc).toFixed(4)));
+          const next = clampScale(+(cur + inc).toFixed(4), 1.2125);
           return next;
         });
         return;
       }
       if (k === '-' || k === '_') {
+        if (stripeEditTool === 'tile') return;
         e.preventDefault();
-        const dec = e.shiftKey ? 0.05 : 0.005;
-        if (stripeEditTool === 'ref') {
-          setMegaStripeRefScale((v) => {
+        const dec = e.shiftKey ? 0.1 : 0.01;
+
+        if (stripeEditTool === 'overlay') {
+          setMegaStripeDrawingOverlayScale((v) => {
             const cur = Number.isFinite(v) ? v : 1;
-            const next = Math.min(5, Math.max(0.1, +(cur - dec).toFixed(4)));
+            const next = clampScale(+(cur - dec).toFixed(4), 1);
             return next;
           });
           return;
         }
-        if (stripeEditTool === 'overlay') {
-          setMegaStripeOverlayScale((v) => {
+        if (stripeEditTool === 'ref2') {
+          setMegaStripeRef2Scale((v) => {
             const cur = Number.isFinite(v) ? v : 1;
-            const next = Math.min(5, Math.max(0.1, +(cur - dec).toFixed(4)));
+            const next = clampScale(+(cur - dec).toFixed(4), 1);
+            return next;
+          });
+          return;
+        }
+        if (stripeEditTool === 'ref') {
+          setMegaStripeRefScale((v) => {
+            const cur = Number.isFinite(v) ? v : 1;
+            const next = clampScale(+(cur - dec).toFixed(4), 1);
             return next;
           });
           return;
         }
         setMegaStripeScale((v) => {
           const cur = Number.isFinite(v) ? v : 1.2125;
-          const next = Math.min(5, Math.max(0.1, +(cur - dec).toFixed(4)));
+          const next = clampScale(+(cur - dec).toFixed(4), 1.2125);
           return next;
         });
         return;
@@ -1496,6 +2268,15 @@ function App() {
       return '';
     }
   }, []);
+
+  useEffect(() => {
+    const next = String(megaStripeRefSrc || '');
+    setMegaStripeRef2Src((prev) => {
+      const cur = String(prev || '');
+      if (cur === next) return prev;
+      return next;
+    });
+  }, [megaStripeRefSrc]);
 
   useEffect(() => {
     try {
@@ -2513,19 +3294,18 @@ function App() {
                     alignItems: 'center',
                     justifyContent: 'space-between',
                     borderBottom: '2px solid #7f1d1d',
-                    borderTopLeftRadius: 10,
-                    borderTopRightRadius: 10,
                     maxWidth: '100%',
                     pointerEvents: 'auto',
                   }}
                 >
                   <div style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 14, fontWeight: 700, minWidth: 0 }}>
-                    <span>HUD v20260325</span>
+                    <span>HUD</span>
                     <span style={{ opacity: 0.75, fontWeight: 600 }}>stripe</span>
                   </div>
 
                   {(() => {
                     const refSelected = stripeEditTool === 'ref';
+                    const ref2Selected = stripeEditTool === 'ref2';
                     const overlaySelected = stripeEditTool === 'overlay';
                     const tileSelected = stripeEditTool === 'tile';
                     const beltOn = Boolean(megaStripeBeltEnabled);
@@ -2557,6 +3337,19 @@ function App() {
                         </button>
                         <button
                           type="button"
+                          style={{ ...btnBase, ...(ref2Selected ? onStyle : offStyle) }}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            setMegaStripeRef2Enabled(true);
+                            setMegaStripeRef2Src((prev) => (String(prev || '').trim() ? prev : megaStripeRefSrc));
+                            setStripeEditTool('ref2');
+                          }}
+                        >
+                          REF2
+                        </button>
+                        <button
+                          type="button"
                           style={{
                             ...btnBase,
                             ...(overlaySelected ? onStyle : offStyle),
@@ -2565,12 +3358,6 @@ function App() {
                             e.preventDefault();
                             e.stopPropagation();
                             setStripeEditTool('overlay');
-                            setMegaStripeOverlayMode((prev) => {
-                              const cur = String(prev || 'off');
-                              if (cur !== 'off') return cur;
-                              const last = String(megaStripeLastNonOffOverlayModeRef.current || 'black');
-                              return last === 'off' ? 'black' : last;
-                            });
                           }}
                         >
                           OVERLAY
@@ -2607,9 +3394,9 @@ function App() {
                     background: 'rgba(255,255,255,0.96)',
                     border: '1px solid rgba(0,0,0,0.10)',
                     borderTop: 0,
-                    borderBottomLeftRadius: 10,
-                    borderBottomRightRadius: 10,
-                    boxShadow: '0 10px 30px rgba(0,0,0,0.18)',
+                    borderBottomLeftRadius: 0,
+                    borderBottomRightRadius: 0,
+                    boxShadow: 'none',
                     overflow: 'auto',
                     pointerEvents: 'auto',
                     display: 'grid',
@@ -2656,8 +3443,8 @@ function App() {
                             />
                           );
                         })}
-                        {Array.from({ length: 19 }).map((_, j) => {
-                          const y = (j / 18) * 100;
+                        {Array.from({ length: 21 }).map((_, j) => {
+                          const y = (j / 20) * 100;
                           return (
                             <line
                               key={`hud-grid-h-${j}`}
@@ -2680,9 +3467,9 @@ function App() {
                           zIndex: 30,
                         }}
                       >
-                        {Array.from({ length: 18 }).map((_, rIdx) => (
+                        {Array.from({ length: 20 }).map((_, rIdx) => (
                           Array.from({ length: 6 }).map((__, cIdx) => {
-                            const topPct = (rIdx / 18) * 100;
+                            const topPct = (rIdx / 20) * 100;
                             const leftPct = (cIdx / 6) * 100;
                             return (
                               <div
@@ -2692,7 +3479,7 @@ function App() {
                                   top: `${topPct}%`,
                                   left: `${leftPct}%`,
                                   display: 'flex',
-                                  alignItems: 'flex-start',
+                                  alignItems: 'center',
                                   justifyContent: 'flex-start',
                                   padding: '1px 3px',
                                   fontSize: 8,
@@ -2713,10 +3500,10 @@ function App() {
                       <div
                         style={{
                           position: 'absolute',
-                          top: `${(14 / 18) * 100}%`,
+                          top: `${(16 / 20) * 100}%`,
                           left: '0%',
                           width: `${(1 / 6) * 100}%`,
-                          height: `${(4 / 18) * 100}%`,
+                          height: `${(4 / 20) * 100}%`,
                           background: 'rgba(255,255,255,1)',
                           border: '0.5px solid rgba(148,163,184,0.80)',
                           boxSizing: 'border-box',
@@ -2728,10 +3515,10 @@ function App() {
                       <div
                         style={{
                           position: 'absolute',
-                          top: `${(17 / 18) * 100}%`,
+                          top: `${(19 / 20) * 100}%`,
                           left: `${(1 / 6) * 100}%`,
                           width: `${(3 / 6) * 100}%`,
-                          height: `${(1 / 18) * 100}%`,
+                          height: `${(1 / 20) * 100}%`,
                           background: 'rgba(255,255,255,1)',
                           border: '0.5px solid rgba(148,163,184,0.80)',
                           boxSizing: 'border-box',
@@ -2746,22 +3533,408 @@ function App() {
                           inset: 0,
                           display: 'grid',
                           gridTemplateColumns: 'repeat(6, minmax(0, 1fr))',
-                          gridTemplateRows: 'repeat(18, minmax(0, 1fr))',
+                          gridTemplateRows: 'repeat(20, minmax(0, 1fr))',
                           gap: 0,
                           minWidth: 0,
                           minHeight: 0,
                           zIndex: 1,
                         }}
                       >
-                        <div style={{ gridRow: '1', gridColumn: '1', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 6px', fontSize: 15, fontWeight: 900, color: 'rgba(0,0,0,0.70)', overflow: 'hidden' }}>
-                          PARAMS
-                        </div>
+                        {(() => {
+                            const safeGetLs = (k) => {
+                              try {
+                                return String(window.localStorage.getItem(k) || '');
+                              } catch {
+                                return '';
+                              }
+                            };
 
-                        <div style={{ gridRow: '1', gridColumn: '4', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 6px', fontSize: 15, fontWeight: 900, color: 'rgba(0,0,0,0.70)', overflow: 'hidden' }}>
+                            const safeGetLsJson = (k) => {
+                              try {
+                                const raw = safeGetLs(k);
+                                if (!raw) return null;
+                                const parsed = JSON.parse(raw);
+                                return parsed && typeof parsed === 'object' ? parsed : null;
+                              } catch {
+                                return null;
+                              }
+                            };
+
+                            const readGridCalibFromLocalStorage = () => {
+                              try {
+                                const scalesByCollection = {};
+                                const offsetsByCollection = {};
+                                const ls = window.localStorage;
+                                if (!ls) return { scalesByCollection, offsetsByCollection };
+
+                                for (let i = 0; i < ls.length; i += 1) {
+                                  const key = ls.key(i);
+                                  if (!key) continue;
+                                  if (key.startsWith('HG_GRID_SCALES_')) {
+                                    const collection = key.slice('HG_GRID_SCALES_'.length);
+                                    const parsed = safeGetLsJson(key);
+                                    if (parsed) scalesByCollection[collection] = parsed;
+                                  } else if (key.startsWith('HG_GRID_OFFSETS_')) {
+                                    const collection = key.slice('HG_GRID_OFFSETS_'.length);
+                                    const parsed = safeGetLsJson(key);
+                                    if (parsed) offsetsByCollection[collection] = parsed;
+                                  }
+                                }
+
+                                return { scalesByCollection, offsetsByCollection };
+                              } catch {
+                                return { scalesByCollection: {}, offsetsByCollection: {} };
+                              }
+                            };
+
+                            const gridCalib = readGridCalibFromLocalStorage();
+
+                            const payload = {
+                              shortcuts: {
+                                o: 'overlay (drawingOverlay)',
+                                r: 'ref',
+                                t: 'tile gap',
+                                2: 'ref2',
+                              },
+                              overlay: {
+                                enabled: Boolean(megaShirtDrawingEnabled),
+                                dx: Number.isFinite(megaShirtDrawingOverlayDx) ? megaShirtDrawingOverlayDx : 0,
+                                dy: Number.isFinite(megaShirtDrawingOverlayDy) ? megaShirtDrawingOverlayDy : 0,
+                                scale: Number.isFinite(megaShirtDrawingOverlayScale) ? megaShirtDrawingOverlayScale : 1,
+                                src: safeGetLs('HG_DRAWING_OVERLAY_SRC').trim(),
+                              },
+                              ref: {
+                                enabled: Boolean(megaStripeRefEnabled),
+                                collection: String(megaStripeRefCollection || ''),
+                                src: String(megaStripeRefSrc || ''),
+                                dx: Number.isFinite(megaStripeRefDx) ? megaStripeRefDx : 0,
+                                dy: Number.isFinite(megaStripeRefDy) ? megaStripeRefDy : 0,
+                                scale: Number.isFinite(megaStripeRefScale) ? megaStripeRefScale : 1,
+                              },
+                              tile: {
+                                gapPx: Number.isFinite(megaStripeTileGapPx) ? megaStripeTileGapPx : 0,
+                              },
+                              ref2: {
+                                enabled: Boolean(megaStripeRef2Enabled),
+                                src: String(megaStripeRef2Src || ''),
+                                dx: Number.isFinite(megaStripeRef2Dx) ? megaStripeRef2Dx : 0,
+                                dy: Number.isFinite(megaStripeRef2Dy) ? megaStripeRef2Dy : 0,
+                                scale: Number.isFinite(megaStripeRef2Scale) ? megaStripeRef2Scale : 1,
+                              },
+                              selector: {
+                                enabled: Boolean(megaTileSelectorEnabled),
+                                target: String(megaTileSelectorTarget || ''),
+                                sizePx: Number.isFinite(megaTileSelectorSizePx) ? megaTileSelectorSizePx : 200,
+                                strokePx: Number.isFinite(megaTileSelectorStrokePx) ? megaTileSelectorStrokePx : 10,
+                                color: String(megaTileSelectorColor || 'black'),
+                                stepX: Number.isFinite(megaTileSelectorStepX) ? megaTileSelectorStepX : 0,
+                                stepY: Number.isFinite(megaTileSelectorStepY) ? megaTileSelectorStepY : 0,
+                                radiusPx: Number.isFinite(megaTileSelectorRadiusPx) ? megaTileSelectorRadiusPx : 8,
+                                extendTopPx: Number.isFinite(megaTileSelectorExtendTopPx) ? megaTileSelectorExtendTopPx : 0,
+                                extendRightPx: Number.isFinite(megaTileSelectorExtendRightPx) ? megaTileSelectorExtendRightPx : 0,
+                                extendBottomPx: Number.isFinite(megaTileSelectorExtendBottomPx) ? megaTileSelectorExtendBottomPx : 0,
+                                extendLeftPx: Number.isFinite(megaTileSelectorExtendLeftPx) ? megaTileSelectorExtendLeftPx : 0,
+                              },
+                              gridCalib,
+                              localStorageKeys: {
+                                overlayEnabled: 'HG_SHIRT_DRAWING_ENABLED',
+                                overlaySrc: 'HG_DRAWING_OVERLAY_SRC',
+                                overlayDx: 'HG_SHIRT_DRAWING_OVERLAY_DX',
+                                overlayDy: 'HG_SHIRT_DRAWING_OVERLAY_DY',
+                                overlayScale: 'HG_SHIRT_DRAWING_OVERLAY_SCALE',
+                                refEnabled: 'MEGA_STRIPE_REF_ENABLED',
+                                refSrc: 'MEGA_STRIPE_REF_SRC',
+                                refCollection: 'MEGA_STRIPE_REF_COLLECTION',
+                                refDx: 'MEGA_STRIPE_REF_DX',
+                                refDy: 'MEGA_STRIPE_REF_DY',
+                                refScale: 'MEGA_STRIPE_REF_SCALE',
+                                tileGapPx: 'MEGA_STRIPE_TILE_GAP_PX',
+                                ref2Enabled: 'MEGA_STRIPE_REF2_ENABLED',
+                                ref2Src: 'MEGA_STRIPE_REF2_SRC',
+                                ref2Dx: 'MEGA_STRIPE_REF2_DX',
+                                ref2Dy: 'MEGA_STRIPE_REF2_DY',
+                                ref2Scale: 'MEGA_STRIPE_REF2_SCALE',
+                                selectorEnabled: 'MEGA_TILE_SELECTOR_V2_ENABLED',
+                                selectorTarget: 'MEGA_TILE_SELECTOR_V2_TARGET',
+                                selectorSizePx: 'MEGA_TILE_SELECTOR_V2_SIZE_PX',
+                                selectorStrokePx: 'MEGA_TILE_SELECTOR_V2_STROKE_PX',
+                                selectorColor: 'MEGA_TILE_SELECTOR_V2_COLOR',
+                                selectorStepX: 'MEGA_TILE_SELECTOR_V2_STEP_X',
+                                selectorStepY: 'MEGA_TILE_SELECTOR_V2_STEP_Y',
+                                selectorRadiusPx: 'MEGA_TILE_SELECTOR_V2_RADIUS_PX',
+                                selectorExtendTopPx: 'MEGA_TILE_SELECTOR_V2_EXTEND_TOP_PX',
+                                selectorExtendRightPx: 'MEGA_TILE_SELECTOR_V2_EXTEND_RIGHT_PX',
+                                selectorExtendBottomPx: 'MEGA_TILE_SELECTOR_V2_EXTEND_BOTTOM_PX',
+                                selectorExtendLeftPx: 'MEGA_TILE_SELECTOR_V2_EXTEND_LEFT_PX',
+                                gridScalesPrefix: 'HG_GRID_SCALES_',
+                                gridOffsetsPrefix: 'HG_GRID_OFFSETS_',
+                              },
+                            };
+
+                            const doCopyText = async (value) => {
+                              const text = String(value || '');
+                              const fallbackCopy = () => {
+                                try {
+                                  const ta = document.createElement('textarea');
+                                  ta.value = text;
+                                  ta.setAttribute('readonly', '');
+                                  ta.style.position = 'fixed';
+                                  ta.style.left = '-9999px';
+                                  document.body.appendChild(ta);
+                                  ta.select();
+                                  const ok = document.execCommand('copy');
+                                  document.body.removeChild(ta);
+                                  return ok;
+                                } catch {
+                                  return false;
+                                }
+                              };
+                              try {
+                                if (navigator?.clipboard?.writeText) {
+                                  await navigator.clipboard.writeText(text);
+                                } else {
+                                  const ok = fallbackCopy();
+                                  if (!ok) throw new Error('copy_failed');
+                                }
+                                return true;
+                              } catch {
+                                return false;
+                              }
+                            };
+
+                            const exportTabs = [
+                              { id: 'all', label: 'ALL' },
+                              { id: 'stripe', label: 'STRIPE' },
+                              { id: 'overlay', label: 'OVERLAY' },
+                              { id: 'selector', label: 'SELECTOR' },
+                              { id: 'grid', label: 'GRID' },
+                              { id: 'keys', label: 'KEYS' },
+                            ];
+
+                            const sectionsAll = [
+                              { id: 'overlay', label: 'overlay', data: payload.overlay },
+                              { id: 'ref', label: 'ref', data: payload.ref },
+                              { id: 'ref2', label: 'ref2', data: payload.ref2 },
+                              { id: 'tile', label: 'tile', data: payload.tile },
+                              { id: 'selector', label: 'selector', data: payload.selector },
+                              { id: 'gridCalib', label: 'gridCalib', data: payload.gridCalib },
+                              { id: 'shortcuts', label: 'shortcuts', data: payload.shortcuts },
+                              { id: 'localStorageKeys', label: 'localStorageKeys', data: payload.localStorageKeys },
+                            ];
+
+                            const sections = (() => {
+                              const t = String(exportTab || 'all');
+                              if (t === 'overlay') return sectionsAll.filter((s) => s.id === 'overlay');
+                              if (t === 'selector') return sectionsAll.filter((s) => s.id === 'selector');
+                              if (t === 'grid') return sectionsAll.filter((s) => s.id === 'gridCalib');
+                              if (t === 'stripe') return sectionsAll.filter((s) => s.id === 'ref' || s.id === 'ref2' || s.id === 'tile');
+                              if (t === 'keys') return sectionsAll.filter((s) => s.id === 'shortcuts' || s.id === 'localStorageKeys');
+                              return sectionsAll;
+                            })();
+
+                            const tabPayload = (() => {
+                              const t = String(exportTab || 'all');
+                              if (t === 'overlay') return { overlay: payload.overlay };
+                              if (t === 'selector') return { selector: payload.selector };
+                              if (t === 'grid') return { gridCalib: payload.gridCalib };
+                              if (t === 'stripe') return { ref: payload.ref, tile: payload.tile, ref2: payload.ref2 };
+                              if (t === 'keys') return { shortcuts: payload.shortcuts, localStorageKeys: payload.localStorageKeys };
+                              return payload;
+                            })();
+
+                            const tabText = JSON.stringify(tabPayload, null, 2);
+                            const allText = JSON.stringify(payload, null, 2);
+
+                            return (
+                              <>
+                                <div style={{ gridRow: '1', gridColumn: '1', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 6px', fontSize: 15, fontWeight: 900, color: 'rgba(0,0,0,0.70)', overflow: 'hidden' }}>
+                                  EXPORT
+                                </div>
+
+                                <div style={{ gridRow: '2', gridColumn: '1', display: 'flex', alignItems: 'center', justifyContent: 'flex-start', gap: 6, padding: '0 6px', overflow: 'hidden', minWidth: 0 }}>
+                                  {exportTabs.map((t) => {
+                                    const active = String(exportTab || 'all') === t.id;
+                                    return (
+                                      <button
+                                        key={t.id}
+                                        type="button"
+                                        onClick={(e) => {
+                                          e.preventDefault();
+                                          e.stopPropagation();
+                                          setExportTab(t.id);
+                                        }}
+                                        style={{ height: 18, padding: '0 8px', borderRadius: 999, border: '1px solid rgba(0,0,0,0.15)', background: active ? 'rgba(59,130,246,0.16)' : 'rgba(255,255,255,0.35)', color: active ? 'rgba(37,99,235,0.95)' : 'rgba(0,0,0,0.70)', fontSize: 10, fontWeight: 900, whiteSpace: 'nowrap', flexShrink: 0 }}
+                                      >
+                                        {t.label}
+                                      </button>
+                                    );
+                                  })}
+                                </div>
+
+                                <div style={{ gridRow: '3 / span 12', gridColumn: '1', width: '100%', height: '100%', border: '1px solid rgba(0,0,0,0.12)', borderRadius: 8, padding: 8, background: 'rgba(255,255,255,0.55)', minWidth: 0, overflow: 'auto' }}>
+                                  {sections.map((s) => {
+                                    const sectionText = JSON.stringify(s.data, null, 2);
+                                    return (
+                                      <div key={s.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, padding: '6px 6px', borderRadius: 8, border: '1px solid rgba(0,0,0,0.08)', background: 'rgba(255,255,255,0.25)', marginBottom: 6 }}>
+                                        <div style={{ fontSize: 11, fontWeight: 900, color: 'rgba(2,6,23,0.70)', minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={s.label}>
+                                          {s.label}
+                                        </div>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
+                                          <button
+                                            type="button"
+                                            onClick={(e) => {
+                                              e.preventDefault();
+                                              e.stopPropagation();
+                                              setExportModalTitle(String(s.label || ''));
+                                              setExportModalText(sectionText);
+                                              setExportModalOpen(true);
+                                            }}
+                                            style={{ height: 18, padding: '0 8px', borderRadius: 6, border: '1px solid rgba(0,0,0,0.15)', background: 'rgba(255,255,255,0.35)', color: 'rgba(0,0,0,0.70)', fontSize: 10, fontWeight: 900, whiteSpace: 'nowrap' }}
+                                          >
+                                            VIEW
+                                          </button>
+                                          <button
+                                            type="button"
+                                            onClick={(e) => {
+                                              e.preventDefault();
+                                              e.stopPropagation();
+                                              setExportCopyStatus('copying');
+                                              doCopyText(sectionText).then((ok) => {
+                                                setExportCopyStatus(ok ? 'copied' : 'idle');
+                                                window.setTimeout(() => setExportCopyStatus('idle'), 900);
+                                              });
+                                            }}
+                                            style={{ height: 18, padding: '0 8px', borderRadius: 6, border: '1px solid rgba(0,0,0,0.15)', background: exportCopyStatus === 'copied' ? 'rgba(34,197,94,0.18)' : 'rgba(255,255,255,0.35)', color: exportCopyStatus === 'copied' ? 'rgba(21,128,61,0.95)' : 'rgba(0,0,0,0.70)', fontSize: 10, fontWeight: 900, whiteSpace: 'nowrap', transition: 'background 150ms ease, color 150ms ease' }}
+                                          >
+                                            {exportCopyStatus === 'copied' ? 'COPIED' : 'COPY'}
+                                          </button>
+                                        </div>
+                                      </div>
+                                    );
+                                  })}
+                                  <div style={{ fontSize: 10, fontWeight: 800, color: 'rgba(2,6,23,0.55)', padding: '4px 6px', lineHeight: '12px' }}>
+                                    {sections.length ? `${sections.length} sections` : '—'}
+                                  </div>
+                                </div>
+
+                                <div style={{ gridRow: '15', gridColumn: '1', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', padding: '0 6px', minWidth: 0, overflow: 'hidden' }}>
+                                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, minWidth: 0 }}>
+                                    <button
+                                      type="button"
+                                      onClick={(e) => {
+                                        e.preventDefault();
+                                        e.stopPropagation();
+                                        setExportModalTitle(`tab:${String(exportTab || 'all')}`);
+                                        setExportModalText(tabText);
+                                        setExportModalOpen(true);
+                                      }}
+                                      style={{ height: 18, padding: '0 8px', borderRadius: 6, border: '1px solid rgba(0,0,0,0.15)', background: 'rgba(255,255,255,0.35)', color: 'rgba(0,0,0,0.70)', fontSize: 11, fontWeight: 900, whiteSpace: 'nowrap' }}
+                                    >
+                                      VIEW TAB
+                                    </button>
+                                    <button
+                                      type="button"
+                                      onClick={(e) => {
+                                        e.preventDefault();
+                                        e.stopPropagation();
+                                        setExportCopyStatus('copying');
+                                        doCopyText(tabText).then((ok) => {
+                                          setExportCopyStatus(ok ? 'copied' : 'idle');
+                                          window.setTimeout(() => setExportCopyStatus('idle'), 900);
+                                        });
+                                      }}
+                                      style={{ height: 18, padding: '0 8px', borderRadius: 6, border: '1px solid rgba(0,0,0,0.15)', background: exportCopyStatus === 'copied' ? 'rgba(34,197,94,0.18)' : 'rgba(255,255,255,0.35)', color: exportCopyStatus === 'copied' ? 'rgba(21,128,61,0.95)' : 'rgba(0,0,0,0.70)', fontSize: 11, fontWeight: 900, whiteSpace: 'nowrap', transition: 'background 150ms ease, color 150ms ease' }}
+                                    >
+                                      {exportCopyStatus === 'copied' ? 'COPIED' : 'COPY TAB'}
+                                    </button>
+                                    <button
+                                      type="button"
+                                      onClick={(e) => {
+                                        e.preventDefault();
+                                        e.stopPropagation();
+                                        setExportCopyStatus('copying');
+                                        doCopyText(allText).then((ok) => {
+                                          setExportCopyStatus(ok ? 'copied' : 'idle');
+                                          window.setTimeout(() => setExportCopyStatus('idle'), 900);
+                                        });
+                                      }}
+                                      style={{ height: 18, padding: '0 8px', borderRadius: 6, border: '1px solid rgba(0,0,0,0.15)', background: 'rgba(255,255,255,0.35)', color: 'rgba(0,0,0,0.70)', fontSize: 11, fontWeight: 900, whiteSpace: 'nowrap' }}
+                                    >
+                                      COPY ALL
+                                    </button>
+                                  </div>
+                                </div>
+
+                                {exportModalOpen ? (
+                                  <div
+                                    style={{ position: 'fixed', inset: 0, zIndex: 999999, background: 'rgba(2,6,23,0.45)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 18 }}
+                                    onClick={() => setExportModalOpen(false)}
+                                    role="presentation"
+                                  >
+                                    <div
+                                      style={{ width: 'min(980px, 96vw)', height: 'min(760px, 88vh)', background: 'rgba(255,255,255,0.98)', border: '1px solid rgba(0,0,0,0.14)', borderRadius: 12, boxShadow: '0 30px 70px rgba(0,0,0,0.25)', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}
+                                      onClick={(e) => e.stopPropagation()}
+                                      role="presentation"
+                                    >
+                                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 12px', borderBottom: '1px solid rgba(0,0,0,0.10)' }}>
+                                        <div style={{ fontSize: 12, fontWeight: 900, color: 'rgba(2,6,23,0.75)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0 }}>
+                                          {exportModalTitle || 'EXPORT'}
+                                        </div>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
+                                          <button
+                                            type="button"
+                                            onClick={(e) => {
+                                              e.preventDefault();
+                                              e.stopPropagation();
+                                              setExportCopyStatus('copying');
+                                              doCopyText(exportModalText).then((ok) => {
+                                                setExportCopyStatus(ok ? 'copied' : 'idle');
+                                                window.setTimeout(() => setExportCopyStatus('idle'), 900);
+                                              });
+                                            }}
+                                            style={{ height: 22, padding: '0 10px', borderRadius: 8, border: '1px solid rgba(0,0,0,0.14)', background: exportCopyStatus === 'copied' ? 'rgba(34,197,94,0.18)' : 'rgba(255,255,255,1)', color: exportCopyStatus === 'copied' ? 'rgba(21,128,61,0.95)' : 'rgba(0,0,0,0.75)', fontSize: 11, fontWeight: 900, whiteSpace: 'nowrap' }}
+                                          >
+                                            {exportCopyStatus === 'copied' ? 'COPIED' : 'COPY'}
+                                          </button>
+                                          <button
+                                            type="button"
+                                            onClick={(e) => {
+                                              e.preventDefault();
+                                              e.stopPropagation();
+                                              setExportModalOpen(false);
+                                            }}
+                                            style={{ height: 22, padding: '0 10px', borderRadius: 8, border: '1px solid rgba(0,0,0,0.14)', background: 'rgba(255,255,255,1)', color: 'rgba(0,0,0,0.75)', fontSize: 11, fontWeight: 900, whiteSpace: 'nowrap' }}
+                                          >
+                                            CLOSE
+                                          </button>
+                                        </div>
+                                      </div>
+                                      <textarea
+                                        readOnly
+                                        value={exportModalText}
+                                        onClick={(e) => {
+                                          try {
+                                            e.stopPropagation();
+                                            e.currentTarget.select?.();
+                                          } catch {
+                                            // ignore
+                                          }
+                                        }}
+                                        onKeyDown={(e) => e.stopPropagation()}
+                                        style={{ flex: 1, width: '100%', height: '100%', resize: 'none', border: 0, borderRadius: 0, padding: 12, background: 'transparent', color: 'rgba(2,6,23,0.78)', fontSize: 11, fontWeight: 700, outline: 'none', lineHeight: '14px', fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace' }}
+                                      />
+                                    </div>
+                                  </div>
+                                ) : null}
+                              </>
+                            );
+                          })()}
+
+                        <div style={{ gridRow: '1', gridColumn: '2 / span 2', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 6px', fontSize: 15, fontWeight: 900, color: 'rgba(0,0,0,0.70)', overflow: 'hidden' }}>
                           OVERLAY
                         </div>
 
-                        <div style={{ gridRow: '1', gridColumn: '5', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 6px', fontSize: 15, fontWeight: 900, color: 'rgba(0,0,0,0.70)', overflow: 'hidden' }}>
+                        <div style={{ gridRow: '1', gridColumn: '4 / span 2', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 6px', fontSize: 15, fontWeight: 900, color: 'rgba(0,0,0,0.70)', overflow: 'hidden' }}>
                           STRIPE
                         </div>
 
@@ -2769,46 +3942,276 @@ function App() {
                           DEBUG
                         </div>
 
-                        <div style={{ gridRow: '2', gridColumn: '5', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, padding: '0 6px', paddingLeft: 30, minWidth: 0, overflow: 'hidden', height: 'var(--megaStripeHudCellHPx)' }}>
-                          <div style={{ fontSize: 13, fontWeight: 900, color: 'rgba(0,0,0,0.75)', lineHeight: '16px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0, textAlign: 'left' }}>Ref</div>
-                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, minWidth: 0, flexShrink: 0 }}>
+                        <div style={{ gridRow: '2', gridColumn: '2 / span 2', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10, padding: '0 6px', paddingLeft: 30, minWidth: 0, overflow: 'hidden', height: 'var(--megaStripeHudCellHPx)' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0, overflow: 'hidden' }}>
+                            <div style={{ fontSize: 13, fontWeight: 900, color: 'rgba(0,0,0,0.75)', lineHeight: '16px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0, textAlign: 'left' }}>drawingOverlay</div>
+                            <div style={{ fontSize: 11, fontWeight: 300, color: 'rgba(0,0,0,0.60)' }}>x:</div>
+                            <input
+                              type="text"
+                              style={{ width: 40, height: 14, padding: 0, border: 0, borderRadius: 0, background: 'transparent', fontSize: 11, fontWeight: 300, outline: 'none' }}
+                              value={megaStripeDrawingOverlayDxDraft}
+                              onFocus={() => { megaStripeDrawingOverlayDxInputFocusedRef.current = true; }}
+                              onBlur={() => {
+                                megaStripeDrawingOverlayDxInputFocusedRef.current = false;
+                                const n = parseFinite(megaStripeDrawingOverlayDxDraft);
+                                if (n === null) {
+                                  setMegaStripeDrawingOverlayDxDraft(String(megaStripeDrawingOverlayDx));
+                                  return;
+                                }
+                                setMegaStripeDrawingOverlayDx(n);
+                              }}
+                              onChange={(e) => setMegaStripeDrawingOverlayDxDraft(e.target.value)}
+                              onClick={(e) => e.stopPropagation()}
+                              onKeyDown={(e) => {
+                                e.stopPropagation();
+                                if (e.key === 'Enter') e.currentTarget.blur();
+                              }}
+                            />
+                            <div style={{ fontSize: 11, fontWeight: 300, color: 'rgba(0,0,0,0.60)' }}>y:</div>
+                            <input
+                              type="text"
+                              style={{ width: 40, height: 14, padding: 0, border: 0, borderRadius: 0, background: 'transparent', fontSize: 11, fontWeight: 300, outline: 'none' }}
+                              value={megaStripeDrawingOverlayDyDraft}
+                              onFocus={() => { megaStripeDrawingOverlayDyInputFocusedRef.current = true; }}
+                              onBlur={() => {
+                                megaStripeDrawingOverlayDyInputFocusedRef.current = false;
+                                const n = parseFinite(megaStripeDrawingOverlayDyDraft);
+                                if (n === null) {
+                                  setMegaStripeDrawingOverlayDyDraft(String(megaStripeDrawingOverlayDy));
+                                  return;
+                                }
+                                setMegaStripeDrawingOverlayDy(n);
+                              }}
+                              onChange={(e) => setMegaStripeDrawingOverlayDyDraft(e.target.value)}
+                              onClick={(e) => e.stopPropagation()}
+                              onKeyDown={(e) => {
+                                e.stopPropagation();
+                                if (e.key === 'Enter') e.currentTarget.blur();
+                              }}
+                            />
+                            <div style={{ fontSize: 11, fontWeight: 300, color: 'rgba(0,0,0,0.60)' }}>s:</div>
+                            <input
+                              type="text"
+                              style={{ width: 56, height: 14, padding: 0, border: 0, borderRadius: 0, background: 'transparent', fontSize: 11, fontWeight: 300, outline: 'none', minWidth: 0 }}
+                              value={megaStripeDrawingOverlayScaleDraft}
+                              onFocus={() => { megaStripeDrawingOverlayScaleInputFocusedRef.current = true; }}
+                              onBlur={() => {
+                                megaStripeDrawingOverlayScaleInputFocusedRef.current = false;
+                                const n = parseFinite(megaStripeDrawingOverlayScaleDraft);
+                                if (n === null || n <= 0) {
+                                  setMegaStripeDrawingOverlayScaleDraft(String(megaStripeDrawingOverlayScale));
+                                  return;
+                                }
+                                setMegaStripeDrawingOverlayScale(clampScale(n, 1));
+                              }}
+                              onChange={(e) => setMegaStripeDrawingOverlayScaleDraft(e.target.value)}
+                              onClick={(e) => e.stopPropagation()}
+                              onKeyDown={(e) => {
+                                e.stopPropagation();
+                                if (e.key === 'Enter') e.currentTarget.blur();
+                              }}
+                            />
+                          </div>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
                             <button
                               type="button"
                               onClick={(e) => {
-                                e.preventDefault();
-                                e.stopPropagation();
-                                setMegaStripeRefEnabled((v) => !v);
+                                const fallbackCopy = (value) => {
+                                  try {
+                                    const ta = document.createElement('textarea');
+                                    ta.value = String(value || '');
+                                    ta.setAttribute('readonly', '');
+                                    ta.style.position = 'fixed';
+                                    ta.style.left = '-9999px';
+                                    document.body.appendChild(ta);
+                                    ta.select();
+                                    const ok = document.execCommand('copy');
+                                    document.body.removeChild(ta);
+                                    return ok;
+                                  } catch {
+                                    return false;
+                                  }
+                                };
+                                try {
+                                  e.preventDefault();
+                                  e.stopPropagation();
+                                  const payload = JSON.stringify({
+                                    dx: Number.isFinite(megaStripeDrawingOverlayDx) ? megaStripeDrawingOverlayDx : 0,
+                                    dy: Number.isFinite(megaStripeDrawingOverlayDy) ? megaStripeDrawingOverlayDy : 0,
+                                    scale: Number.isFinite(megaStripeDrawingOverlayScale) && megaStripeDrawingOverlayScale > 0 ? megaStripeDrawingOverlayScale : 1,
+                                  });
+                                  const run = async () => {
+                                    try {
+                                      if (navigator?.clipboard?.writeText) {
+                                        await navigator.clipboard.writeText(payload);
+                                        return true;
+                                      }
+                                      return fallbackCopy(payload);
+                                    } catch {
+                                      return fallbackCopy(payload);
+                                    }
+                                  };
+                                  run();
+                                } catch {
+                                  // ignore
+                                }
                               }}
-                              style={{ height: 20, display: 'flex', alignItems: 'center', padding: '0 10px', borderRadius: 6, border: '1px solid rgba(0,0,0,0.15)', background: megaStripeRefEnabled ? 'rgba(59,130,246,0.16)' : 'rgba(255,255,255,0.35)', color: megaStripeRefEnabled ? 'rgba(37,99,235,0.95)' : 'rgba(0,0,0,0.70)', fontSize: 12, fontWeight: 900, whiteSpace: 'nowrap' }}
+                              style={{ height: 18, display: 'flex', alignItems: 'center', padding: '0 8px', borderRadius: 6, border: '1px solid rgba(0,0,0,0.15)', background: 'rgba(255,255,255,0.35)', color: 'rgba(0,0,0,0.70)', fontSize: 10, fontWeight: 900, whiteSpace: 'nowrap' }}
                             >
-                              {megaStripeRefEnabled ? 'ON' : 'OFF'}
+                              COPY
                             </button>
-                          </div>
-                        </div>
 
-                        <div style={{ gridRow: '2', gridColumn: '4', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, padding: '0 6px', paddingLeft: 30, minWidth: 0, overflow: 'hidden', height: 'var(--megaStripeHudCellHPx)' }}>
-                          <div style={{ fontSize: 13, fontWeight: 900, color: 'rgba(0,0,0,0.75)', lineHeight: '16px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0, textAlign: 'left' }}>overlayMode</div>
-                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, minWidth: 0, flexShrink: 0 }}>
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                const apply = (next) => {
+                                  try {
+                                    const dx = Number.parseFloat(String(next?.dx));
+                                    const dy = Number.parseFloat(String(next?.dy));
+                                    const scale = Number.parseFloat(String(next?.scale));
+                                    const dxOk = Number.isFinite(dx) ? dx : 0;
+                                    const dyOk = Number.isFinite(dy) ? dy : 0;
+                                    const scOk = Number.isFinite(scale) && scale > 0 ? clampScale(scale, 1) : 1;
+                                    setMegaStripeDrawingOverlayDx(dxOk);
+                                    setMegaStripeDrawingOverlayDy(dyOk);
+                                    setMegaStripeDrawingOverlayScale(scOk);
+                                    setMegaStripeDrawingOverlayDxDraft(String(dxOk));
+                                    setMegaStripeDrawingOverlayDyDraft(String(dyOk));
+                                    setMegaStripeDrawingOverlayScaleDraft(String(scOk));
+                                  } catch {
+                                    // ignore
+                                  }
+                                };
+                                const parseText = (raw) => {
+                                  try {
+                                    const s = String(raw || '').trim();
+                                    if (!s) return null;
+                                    if (s.startsWith('{') || s.startsWith('[')) {
+                                      const parsed = JSON.parse(s);
+                                      if (Array.isArray(parsed)) {
+                                        return { dx: parsed[0], dy: parsed[1], scale: parsed[2] };
+                                      }
+                                      if (parsed && typeof parsed === 'object') {
+                                        return { dx: parsed.dx, dy: parsed.dy, scale: parsed.scale };
+                                      }
+                                    }
+                                    const parts = s.split(/[,\s]+/g).filter(Boolean);
+                                    if (parts.length >= 3) {
+                                      return { dx: parts[0], dy: parts[1], scale: parts[2] };
+                                    }
+                                    return null;
+                                  } catch {
+                                    return null;
+                                  }
+                                };
+                                try {
+                                  e.preventDefault();
+                                  e.stopPropagation();
+                                  const run = async () => {
+                                    let text = '';
+                                    try {
+                                      if (navigator?.clipboard?.readText) {
+                                        text = await navigator.clipboard.readText();
+                                      }
+                                    } catch {
+                                      text = '';
+                                    }
+                                    if (!text) {
+                                      try {
+                                        text = String(window.prompt('Paste drawingOverlay as JSON {dx,dy,scale} or "dx dy scale"', '') || '').trim();
+                                      } catch {
+                                        text = '';
+                                      }
+                                    }
+                                    const parsed = parseText(text);
+                                    if (parsed) apply(parsed);
+                                  };
+                                  run();
+                                } catch {
+                                  // ignore
+                                }
+                              }}
+                              style={{ height: 18, display: 'flex', alignItems: 'center', padding: '0 8px', borderRadius: 6, border: '1px solid rgba(0,0,0,0.15)', background: 'rgba(255,255,255,0.35)', color: 'rgba(0,0,0,0.70)', fontSize: 10, fontWeight: 900, whiteSpace: 'nowrap' }}
+                            >
+                              PASTE
+                            </button>
+
                             <button
                               type="button"
                               onClick={(e) => {
                                 try {
                                   e.preventDefault();
                                   e.stopPropagation();
-                                  setMegaStripeOverlayMode((prev) => (String(prev || 'off') === 'off' ? 'black' : 'off'));
+                                  setMegaShirtDrawingEnabled((v) => !v);
                                 } catch {
                                   // ignore
                                 }
                               }}
-                              style={{ height: 20, display: 'flex', alignItems: 'center', padding: '0 10px', borderRadius: 6, border: '1px solid rgba(0,0,0,0.15)', background: String(megaStripeOverlayMode || 'off') === 'off' ? 'rgba(255,255,255,0.35)' : 'rgba(59,130,246,0.16)', color: String(megaStripeOverlayMode || 'off') === 'off' ? 'rgba(0,0,0,0.70)' : 'rgba(37,99,235,0.95)', fontSize: 12, fontWeight: 900, whiteSpace: 'nowrap' }}
+                              style={{ height: 18, display: 'flex', alignItems: 'center', padding: '0 10px', borderRadius: 6, border: '1px solid rgba(0,0,0,0.15)', background: megaShirtDrawingEnabled ? 'rgba(59,130,246,0.16)' : 'rgba(255,255,255,0.35)', color: megaShirtDrawingEnabled ? 'rgba(37,99,235,0.95)' : 'rgba(0,0,0,0.70)', fontSize: 10, fontWeight: 900, whiteSpace: 'nowrap' }}
                             >
-                              {String(megaStripeOverlayMode || 'off') === 'off' ? 'OFF' : 'ON'}
+                              {megaShirtDrawingEnabled ? 'ON' : 'OFF'}
                             </button>
                           </div>
                         </div>
 
+                        <div style={{ gridRow: '20', gridColumn: '2 / span 2', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10, padding: '0 6px', paddingLeft: 30, minWidth: 0, overflow: 'hidden', height: 'var(--megaStripeHudCellHPx)' }}>
+                          <div style={{ fontSize: 11, fontWeight: 900, color: 'rgba(0,0,0,0.70)', flexShrink: 0, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>drawing src</div>
+                          <input
+                            value={megaShirtDrawingOverlaySrc}
+                            placeholder="/custom_logos/..."
+                            onChange={(e) => {
+                              try {
+                                const v = String(e.target.value || '');
+                                const s = v.trim();
+                                const normalized = (() => {
+                                  try {
+                                    const idx = s.lastIndexOf('/public/custom_logos/');
+                                    if (idx >= 0) {
+                                      const suffix = s.slice(idx + '/public'.length);
+                                      if (suffix.startsWith('/custom_logos/')) return suffix;
+                                    }
+                                    const idx2 = s.lastIndexOf('/custom_logos/');
+                                    if (idx2 > 0 && !s.startsWith('/custom_logos/')) {
+                                      const suffix = s.slice(idx2);
+                                      if (suffix.startsWith('/custom_logos/')) return suffix;
+                                    }
+                                    const file = (s.split('/').filter(Boolean).pop() || '').trim();
+                                    const lower = file.toLowerCase();
+                                    const isBare = s === file || s === `/${file}`;
+                                    if (isBare && /^keep-calm-.*-stripe\.webp$/i.test(file)) {
+                                      const folder = lower.includes('-b-stripe')
+                                        ? 'black'
+                                        : lower.includes('-w-stripe')
+                                          ? 'white'
+                                          : (lower.includes('multi') || lower.includes('-multi-'))
+                                            ? 'multi'
+                                            : 'multi';
+                                      return `/custom_logos/drawings/images_stripe/austen/keep_calm/${folder}/${file}`;
+                                    }
+                                    return s;
+                                  } catch {
+                                    return s;
+                                  }
+                                })();
+                                setMegaShirtDrawingOverlaySrc(normalized);
+                                if (!normalized) return;
+                                const sLower = normalized.toLowerCase();
+                                const isStripeSrc = sLower.includes('/custom_logos/drawings/images_stripe/') || sLower.includes('/custom_logos/drawings/images_originals/stripe/');
+                                if (!isStripeSrc) return;
+                                window.localStorage.setItem('HG_DRAWING_OVERLAY_SRC', normalized);
+                                window.dispatchEvent(new Event('hg-drawing-overlay-changed'));
+                              } catch {
+                                // ignore
+                              }
+                            }}
+                            onClick={(e) => e.stopPropagation()}
+                            onKeyDown={(e) => e.stopPropagation()}
+                            style={{ flex: 1, height: 16, padding: '0 6px', border: 0, borderRadius: 0, background: 'transparent', boxShadow: 'none', fontSize: 10, fontWeight: 800, color: 'rgba(0,0,0,0.60)', outline: 'none', minWidth: 0 }}
+                          />
+                        </div>
+
                         <div style={{ gridRow: '2', gridColumn: '6', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, padding: '0 6px', paddingLeft: 30, minWidth: 0, overflow: 'hidden', height: 'var(--megaStripeHudCellHPx)' }}>
-                          <div style={{ fontSize: 13, fontWeight: 900, color: 'rgba(0,0,0,0.75)', lineHeight: '16px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0, textAlign: 'left' }}>stripeOverlayDebug</div>
+                          <div style={{ fontSize: 13, fontWeight: 900, color: 'rgba(0,0,0,0.75)', lineHeight: '16px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0, textAlign: 'left' }}>stripeOverlayDebug(URL)</div>
                           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, minWidth: 0, flexShrink: 0 }}>
                             <button
                               type="button"
@@ -2838,12 +4241,51 @@ function App() {
                         {(() => {
                           const snap = stripeOverlayDebugSnapshot;
                           const disabled = !stripeOverlayDebugOn;
+                          const lsDrawingEnabledRaw = (() => {
+                            try {
+                              const rawNew = window.localStorage.getItem('HG_SHIRT_DRAWING_ENABLED');
+                              if (rawNew != null) return rawNew;
+                              const rawOld = window.localStorage.getItem('HG_SHIRT_DRAWING_OVERLAY_ENABLED');
+                              if (rawOld != null) return rawOld;
+                              return '';
+                            } catch {
+                              return '';
+                            }
+                          })();
+                          const lsDrawingEnabledOn = (() => {
+                            try {
+                              const s = (lsDrawingEnabledRaw == null) ? '' : String(lsDrawingEnabledRaw).trim().toLowerCase();
+                              if (!s) return null;
+                              return s === '1' || s === 'true' || s === 'on' || s === 'yes';
+                            } catch {
+                              return null;
+                            }
+                          })();
+                          const formatActiveLabel = (value) => {
+                            try {
+                              const v = (value == null) ? '' : String(value);
+                              const key = v.trim().toLowerCase();
+                              if (!key) return '—';
+                              if (key === 'outcasted') return 'Miscel·lània';
+                              if (key === 'first_contact') return 'First Contact';
+                              if (key === 'the_human_inside') return 'The Human Inside';
+                              if (key === 'austen') return 'Austen';
+                              if (key === 'cube') return 'Cube';
+                              return v;
+                            } catch {
+                              return String(value || '—');
+                            }
+                          };
                           const debugPairs = [
+                            ['stripeOverlayDebug', snap ? String(Boolean(snap.stripeOverlayDebug)) : '—'],
                             ['showStripe', snap ? String(Boolean(snap.showStripe)) : '—'],
-                            ['active', snap ? String(snap.active || '') : '—'],
+                            ['active', snap ? formatActiveLabel(snap.active || '') : '—'],
                             ['loadState', snap ? String(snap.stripeOverlayLoadState || '') : '—'],
                             ['stripeWide', snap ? String(Boolean(snap.stripeOverlayIsStripeWide)) : '—'],
+                            ['stripeWide(derived)', snap && snap.stripeOverlayIsStripeWideDerived !== null ? String(Boolean(snap.stripeOverlayIsStripeWideDerived)) : '—'],
+                            ['stripeWide(measured)', snap && snap.stripeOverlayIsStripeWideMeasured !== null ? String(Boolean(snap.stripeOverlayIsStripeWideMeasured)) : '—'],
                             ['resolvedOverlaySrc', snap ? (snap.resolvedOverlaySrc ? 'yes' : 'no') : '—'],
+                            ['HG_SHIRT_DRAWING', lsDrawingEnabledOn === null ? '—' : (lsDrawingEnabledOn ? 'ON' : 'OFF')],
                           ];
 
                           return (
@@ -2881,57 +4323,640 @@ function App() {
                           );
                         })()}
 
-                        <div style={{ gridRow: '2', gridColumn: '1', display: 'grid', gridTemplateRows: '1fr 1fr', gridTemplateColumns: '60px 1fr', columnGap: 8, alignItems: 'center', padding: '2px 6px', paddingLeft: 30, minWidth: 0, overflow: 'hidden' }}>
-                          <div style={{ gridRow: '1 / span 2', gridColumn: '1', display: 'flex', alignItems: 'center', fontSize: 13, fontWeight: 900, color: 'rgba(0,0,0,0.65)', lineHeight: 1.05, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>Sprite</div>
-                          <div style={{ gridRow: '1', gridColumn: '2', display: 'flex', alignItems: 'center', gap: 6, minWidth: 0 }}>
+                        <div style={{ gridRow: '2', gridColumn: '4 / span 2', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10, padding: '0 6px', paddingLeft: 30, minWidth: 0, overflow: 'hidden', height: 'var(--megaStripeHudCellHPx)' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0, overflow: 'hidden' }}>
+                            <div style={{ fontSize: 13, fontWeight: 900, color: 'rgba(0,0,0,0.65)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>Sprite</div>
                             <div style={{ fontSize: 11, fontWeight: 300, color: 'rgba(0,0,0,0.60)' }}>x:</div>
-                            <input style={{ width: 40, height: 14, padding: 0, border: 0, borderRadius: 0, background: 'transparent', fontSize: 11, fontWeight: 300, outline: 'none' }} value={String(megaStripeDx)} onChange={(e) => { const v = e.target.value; if (v === '' || v === '-') { setMegaStripeDx(0); return; } const n = Number.parseFloat(v); if (Number.isFinite(n)) setMegaStripeDx(n); }} onClick={(e) => e.stopPropagation()} onKeyDown={(e) => e.stopPropagation()} />
-                            <div style={{ fontSize: 11, fontWeight: 300, color: 'rgba(0,0,0,0.60)' }}>s:</div>
-                            <input style={{ width: 60, height: 14, padding: 0, border: 0, borderRadius: 0, background: 'transparent', fontSize: 11, fontWeight: 300, outline: 'none', minWidth: 0 }} value={String(megaStripeScale)} onChange={(e) => { const v = e.target.value; if (v === '' || v === '-') { setMegaStripeScale(1); return; } const n = Number.parseFloat(v); if (Number.isFinite(n) && n > 0) setMegaStripeScale(Math.min(5, Math.max(0.1, n))); }} onClick={(e) => e.stopPropagation()} onKeyDown={(e) => e.stopPropagation()} />
-                          </div>
-                          <div style={{ gridRow: '2', gridColumn: '2', display: 'flex', alignItems: 'center', gap: 6, minWidth: 0 }}>
+                            <input
+                              type="text"
+                              style={{ width: 40, height: 14, padding: 0, border: 0, borderRadius: 0, background: 'transparent', fontSize: 11, fontWeight: 300, outline: 'none' }}
+                              value={megaStripeDxDraft}
+                              onFocus={() => { megaStripeDxInputFocusedRef.current = true; }}
+                              onBlur={() => {
+                                megaStripeDxInputFocusedRef.current = false;
+                                const n = parseFinite(megaStripeDxDraft);
+                                if (n === null) {
+                                  setMegaStripeDxDraft(String(megaStripeDx));
+                                  return;
+                                }
+                                setMegaStripeDx(n);
+                              }}
+                              onChange={(e) => setMegaStripeDxDraft(e.target.value)}
+                              onClick={(e) => e.stopPropagation()}
+                              onKeyDown={(e) => {
+                                e.stopPropagation();
+                                if (e.key === 'Enter') e.currentTarget.blur();
+                              }}
+                            />
                             <div style={{ fontSize: 11, fontWeight: 300, color: 'rgba(0,0,0,0.60)' }}>y:</div>
-                            <input style={{ width: 40, height: 14, padding: 0, border: 0, borderRadius: 0, background: 'transparent', fontSize: 11, fontWeight: 300, outline: 'none' }} value={String(megaStripeDy)} onChange={(e) => { const v = e.target.value; if (v === '' || v === '-') { setMegaStripeDy(0); return; } const n = Number.parseFloat(v); if (Number.isFinite(n)) setMegaStripeDy(n); }} onClick={(e) => e.stopPropagation()} onKeyDown={(e) => e.stopPropagation()} />
+                            <input
+                              type="text"
+                              style={{ width: 40, height: 14, padding: 0, border: 0, borderRadius: 0, background: 'transparent', fontSize: 11, fontWeight: 300, outline: 'none' }}
+                              value={megaStripeDyDraft}
+                              onFocus={() => { megaStripeDyInputFocusedRef.current = true; }}
+                              onBlur={() => {
+                                megaStripeDyInputFocusedRef.current = false;
+                                const n = parseFinite(megaStripeDyDraft);
+                                if (n === null) {
+                                  setMegaStripeDyDraft(String(megaStripeDy));
+                                  return;
+                                }
+                                setMegaStripeDy(n);
+                              }}
+                              onChange={(e) => setMegaStripeDyDraft(e.target.value)}
+                              onClick={(e) => e.stopPropagation()}
+                              onKeyDown={(e) => {
+                                e.stopPropagation();
+                                if (e.key === 'Enter') e.currentTarget.blur();
+                              }}
+                            />
+                            <div style={{ fontSize: 11, fontWeight: 300, color: 'rgba(0,0,0,0.60)' }}>s:</div>
+                            <input
+                              type="text"
+                              style={{ width: 60, height: 14, padding: 0, border: 0, borderRadius: 0, background: 'transparent', fontSize: 11, fontWeight: 300, outline: 'none', minWidth: 0 }}
+                              value={megaStripeScaleDraft}
+                              onFocus={() => { megaStripeScaleInputFocusedRef.current = true; }}
+                              onBlur={() => {
+                                megaStripeScaleInputFocusedRef.current = false;
+                                const n = parseFinite(megaStripeScaleDraft);
+                                if (n === null || n <= 0) {
+                                  setMegaStripeScaleDraft(String(megaStripeScale));
+                                  return;
+                                }
+                                setMegaStripeScale(clampScale(n, 1.2125));
+                              }}
+                              onChange={(e) => setMegaStripeScaleDraft(e.target.value)}
+                              onClick={(e) => e.stopPropagation()}
+                              onKeyDown={(e) => {
+                                e.stopPropagation();
+                                if (e.key === 'Enter') e.currentTarget.blur();
+                              }}
+                            />
                           </div>
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              setMegaStripeSpriteEnabled((v) => !v);
+                            }}
+                            style={{ height: 18, display: 'flex', alignItems: 'center', padding: '0 8px', borderRadius: 6, border: '1px solid rgba(0,0,0,0.15)', background: megaStripeSpriteEnabled ? 'rgba(59,130,246,0.16)' : 'rgba(255,255,255,0.35)', color: megaStripeSpriteEnabled ? 'rgba(37,99,235,0.95)' : 'rgba(0,0,0,0.70)', fontSize: 10, fontWeight: 900, whiteSpace: 'nowrap', flexShrink: 0 }}
+                          >
+                            {megaStripeSpriteEnabled ? 'ON' : 'OFF'}
+                          </button>
                         </div>
 
-                        <div style={{ gridRow: '3', gridColumn: '1', display: 'grid', gridTemplateRows: '1fr 1fr', gridTemplateColumns: '60px 1fr', columnGap: 8, alignItems: 'center', padding: '2px 6px', paddingLeft: 30, minWidth: 0, overflow: 'hidden' }}>
-                          <div style={{ gridRow: '1 / span 2', gridColumn: '1', display: 'flex', alignItems: 'center', fontSize: 13, fontWeight: 900, color: 'rgba(0,0,0,0.65)', lineHeight: 1.05, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>Overlay</div>
-                          <div style={{ gridRow: '1', gridColumn: '2', display: 'flex', alignItems: 'center', gap: 6, minWidth: 0 }}>
+                        <div style={{ gridRow: '4', gridColumn: '4 / span 2', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10, padding: '0 6px', paddingLeft: 30, minWidth: 0, overflow: 'hidden', height: 'var(--megaStripeHudCellHPx)' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0, overflow: 'hidden' }}>
+                            <div style={{ fontSize: 13, fontWeight: 900, color: 'rgba(0,0,0,0.65)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>REF</div>
+                            <select
+                              value={String(megaStripeRefCollection || 'first_contact')}
+                              onChange={(e) => {
+                                try {
+                                  const k = String(e.target.value || 'first_contact');
+                                  setMegaStripeRefCollection(k);
+                                  setMegaStripeRefEnabled((prev) => (prev ? prev : true));
+                                  setMegaStripeRefSrc((prev) => {
+                                    const cur = (prev == null) ? '' : String(prev);
+                                    if (cur.trim()) return cur;
+                                    const presets = megaStripeRefPresets?.[k] || [];
+                                    const first = Array.isArray(presets) ? presets[0] : null;
+                                    const src = first?.src ? normalizeMegaStripeRefSrc(first.src) : '';
+                                    return src || cur;
+                                  });
+                                } catch {
+                                  // ignore
+                                }
+                              }}
+                              onClick={(e) => e.stopPropagation()}
+                              onKeyDown={(e) => e.stopPropagation()}
+                              style={{ height: 18, flex: '0 0 auto', minWidth: 110, border: '1px solid rgba(0,0,0,0.12)', borderRadius: 6, background: 'rgba(255,255,255,0.50)', fontSize: 10, fontWeight: 900, color: 'rgba(0,0,0,0.70)', padding: '0 6px', outline: 'none' }}
+                            >
+                              {['first_contact', 'thin', 'austen', 'cube', 'miscel·lania'].map((k) => (
+                                <option key={k} value={k}>
+                                  {k}
+                                </option>
+                              ))}
+                            </select>
                             <div style={{ fontSize: 11, fontWeight: 300, color: 'rgba(0,0,0,0.60)' }}>x:</div>
-                            <input style={{ width: 40, height: 14, padding: 0, border: 0, borderRadius: 0, background: 'transparent', fontSize: 11, fontWeight: 300, outline: 'none' }} value={String(megaStripeOverlayDx)} onChange={(e) => { const v = e.target.value; if (v === '' || v === '-') { setMegaStripeOverlayDx(0); return; } const n = Number.parseFloat(v); if (Number.isFinite(n)) setMegaStripeOverlayDx(n); }} onClick={(e) => e.stopPropagation()} onKeyDown={(e) => e.stopPropagation()} />
-                            <div style={{ fontSize: 11, fontWeight: 300, color: 'rgba(0,0,0,0.60)' }}>s:</div>
-                            <input value={megaStripeOverlayScaleDraft} onFocus={() => { megaStripeOverlayScaleInputFocusedRef.current = true; setMegaStripeOverlayScaleDraft(String(megaStripeOverlayScale)); }} onBlur={() => { megaStripeOverlayScaleInputFocusedRef.current = false; const v = String(megaStripeOverlayScaleDraft || '').trim(); if (v === '' || v === '-') { setMegaStripeOverlayScaleDraft(String(megaStripeOverlayScale)); return; } const n = Number.parseFloat(v); if (Number.isFinite(n) && n > 0) { const clamped = Math.min(5, Math.max(0.1, n)); setMegaStripeOverlayScale(clamped); setMegaStripeOverlayScaleDraft(String(clamped)); return; } setMegaStripeOverlayScaleDraft(String(megaStripeOverlayScale)); }} onChange={(e) => { setMegaStripeOverlayScaleDraft(e.target.value); }} onClick={(e) => e.stopPropagation()} onKeyDown={(e) => { e.stopPropagation(); if (e.key === 'Enter') { try { e.currentTarget.blur(); } catch { } } }} style={{ width: 60, height: 14, padding: 0, border: 0, borderRadius: 0, background: 'transparent', fontSize: 11, fontWeight: 300, outline: 'none', minWidth: 0 }} />
-                          </div>
-                          <div style={{ gridRow: '2', gridColumn: '2', display: 'flex', alignItems: 'center', gap: 6, minWidth: 0 }}>
+                            <input
+                              type="text"
+                              style={{ width: 38, height: 14, padding: 0, border: 0, borderRadius: 0, background: 'transparent', fontSize: 11, fontWeight: 300, outline: 'none' }}
+                              value={megaStripeRefDxDraft}
+                              onFocus={() => { megaStripeRefDxInputFocusedRef.current = true; }}
+                              onBlur={() => {
+                                megaStripeRefDxInputFocusedRef.current = false;
+                                const n = parseFinite(megaStripeRefDxDraft);
+                                if (n === null) {
+                                  setMegaStripeRefDxDraft(String(megaStripeRefDx));
+                                  return;
+                                }
+                                setMegaStripeRefDx(n);
+                              }}
+                              onChange={(e) => setMegaStripeRefDxDraft(e.target.value)}
+                              onClick={(e) => e.stopPropagation()}
+                              onKeyDown={(e) => {
+                                e.stopPropagation();
+                                if (e.key === 'Enter') e.currentTarget.blur();
+                              }}
+                            />
                             <div style={{ fontSize: 11, fontWeight: 300, color: 'rgba(0,0,0,0.60)' }}>y:</div>
-                            <input style={{ width: 40, height: 14, padding: 0, border: 0, borderRadius: 0, background: 'transparent', fontSize: 11, fontWeight: 300, outline: 'none' }} value={String(megaStripeOverlayDy)} onChange={(e) => { const v = e.target.value; if (v === '' || v === '-') { setMegaStripeOverlayDy(0); return; } const n = Number.parseFloat(v); if (Number.isFinite(n)) setMegaStripeOverlayDy(n); }} onClick={(e) => e.stopPropagation()} onKeyDown={(e) => e.stopPropagation()} />
+                            <input
+                              type="text"
+                              style={{ width: 38, height: 14, padding: 0, border: 0, borderRadius: 0, background: 'transparent', fontSize: 11, fontWeight: 300, outline: 'none' }}
+                              value={megaStripeRefDyDraft}
+                              onFocus={() => { megaStripeRefDyInputFocusedRef.current = true; }}
+                              onBlur={() => {
+                                megaStripeRefDyInputFocusedRef.current = false;
+                                const n = parseFinite(megaStripeRefDyDraft);
+                                if (n === null) {
+                                  setMegaStripeRefDyDraft(String(megaStripeRefDy));
+                                  return;
+                                }
+                                setMegaStripeRefDy(n);
+                              }}
+                              onChange={(e) => setMegaStripeRefDyDraft(e.target.value)}
+                              onClick={(e) => e.stopPropagation()}
+                              onKeyDown={(e) => {
+                                e.stopPropagation();
+                                if (e.key === 'Enter') e.currentTarget.blur();
+                              }}
+                            />
+                            <div style={{ fontSize: 11, fontWeight: 300, color: 'rgba(0,0,0,0.60)' }}>s:</div>
+                            <input
+                              type="text"
+                              style={{ width: 52, height: 14, padding: 0, border: 0, borderRadius: 0, background: 'transparent', fontSize: 11, fontWeight: 300, outline: 'none', minWidth: 0 }}
+                              value={megaStripeRefScaleDraft}
+                              onFocus={() => { megaStripeRefScaleInputFocusedRef.current = true; }}
+                              onBlur={() => {
+                                megaStripeRefScaleInputFocusedRef.current = false;
+                                const n = parseFinite(megaStripeRefScaleDraft);
+                                if (n === null || n <= 0) {
+                                  setMegaStripeRefScaleDraft(String(megaStripeRefScale));
+                                  return;
+                                }
+                                setMegaStripeRefScale(clampScale(n, 1));
+                              }}
+                              onChange={(e) => setMegaStripeRefScaleDraft(e.target.value)}
+                              onClick={(e) => e.stopPropagation()}
+                              onKeyDown={(e) => {
+                                e.stopPropagation();
+                                if (e.key === 'Enter') e.currentTarget.blur();
+                              }}
+                            />
                           </div>
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              setMegaStripeRefEnabled((v) => !v);
+                            }}
+                            style={{ height: 18, display: 'flex', alignItems: 'center', padding: '0 8px', borderRadius: 6, border: '1px solid rgba(0,0,0,0.15)', background: megaStripeRefEnabled ? 'rgba(59,130,246,0.16)' : 'rgba(255,255,255,0.35)', color: megaStripeRefEnabled ? 'rgba(37,99,235,0.95)' : 'rgba(0,0,0,0.70)', fontSize: 10, fontWeight: 900, whiteSpace: 'nowrap', flexShrink: 0 }}
+                          >
+                            {megaStripeRefEnabled ? 'ON' : 'OFF'}
+                          </button>
                         </div>
 
-                        <div style={{ gridRow: '4', gridColumn: '1', display: 'grid', gridTemplateRows: '1fr 1fr', gridTemplateColumns: '60px 1fr', columnGap: 8, alignItems: 'center', padding: '2px 6px', paddingLeft: 30, minWidth: 0, overflow: 'hidden' }}>
-                          <div style={{ gridRow: '1 / span 2', gridColumn: '1', display: 'flex', alignItems: 'center', fontSize: 13, fontWeight: 900, color: 'rgba(0,0,0,0.65)', lineHeight: 1.05, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>Ref</div>
-                          <div style={{ gridRow: '1', gridColumn: '2', display: 'flex', alignItems: 'center', gap: 6, minWidth: 0 }}>
+                        <div style={{ gridRow: '5', gridColumn: '4 / span 2', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10, padding: '0 6px', paddingLeft: 30, minWidth: 0, overflow: 'hidden', height: 'var(--megaStripeHudCellHPx)' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0, overflow: 'hidden' }}>
+                            <div style={{ fontSize: 13, fontWeight: 900, color: 'rgba(0,0,0,0.65)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>REF2</div>
                             <div style={{ fontSize: 11, fontWeight: 300, color: 'rgba(0,0,0,0.60)' }}>x:</div>
-                            <input style={{ width: 40, height: 14, padding: 0, border: 0, borderRadius: 0, background: 'transparent', fontSize: 11, fontWeight: 300, outline: 'none' }} value={String(megaStripeRefDx)} onChange={(e) => { const v = e.target.value; if (v === '' || v === '-') { setMegaStripeRefDx(0); return; } const n = Number.parseFloat(v); if (Number.isFinite(n)) setMegaStripeRefDx(n); }} onClick={(e) => e.stopPropagation()} onKeyDown={(e) => e.stopPropagation()} />
-                            <div style={{ fontSize: 11, fontWeight: 300, color: 'rgba(0,0,0,0.60)' }}>s:</div>
-                            <input style={{ width: 60, height: 14, padding: 0, border: 0, borderRadius: 0, background: 'transparent', fontSize: 11, fontWeight: 300, outline: 'none', minWidth: 0 }} value={String(megaStripeRefScale)} onChange={(e) => { const v = e.target.value; if (v === '' || v === '-') { setMegaStripeRefScale(1); return; } const n = Number.parseFloat(v); if (Number.isFinite(n) && n > 0) setMegaStripeRefScale(Math.min(5, Math.max(0.1, n))); }} onClick={(e) => e.stopPropagation()} onKeyDown={(e) => e.stopPropagation()} />
-                          </div>
-                          <div style={{ gridRow: '2', gridColumn: '2', display: 'flex', alignItems: 'center', gap: 6, minWidth: 0 }}>
+                            <input
+                              type="text"
+                              style={{ width: 38, height: 14, padding: 0, border: 0, borderRadius: 0, background: 'transparent', fontSize: 11, fontWeight: 300, outline: 'none' }}
+                              value={megaStripeRef2DxDraft}
+                              onFocus={() => { megaStripeRef2DxInputFocusedRef.current = true; }}
+                              onBlur={() => {
+                                megaStripeRef2DxInputFocusedRef.current = false;
+                                const n = parseFinite(megaStripeRef2DxDraft);
+                                if (n === null) {
+                                  setMegaStripeRef2DxDraft(String(megaStripeRef2Dx));
+                                  return;
+                                }
+                                setMegaStripeRef2Dx(n);
+                              }}
+                              onChange={(e) => setMegaStripeRef2DxDraft(e.target.value)}
+                              onClick={(e) => e.stopPropagation()}
+                              onKeyDown={(e) => {
+                                e.stopPropagation();
+                                if (e.key === 'Enter') e.currentTarget.blur();
+                              }}
+                            />
                             <div style={{ fontSize: 11, fontWeight: 300, color: 'rgba(0,0,0,0.60)' }}>y:</div>
-                            <input style={{ width: 40, height: 14, padding: 0, border: 0, borderRadius: 0, background: 'transparent', fontSize: 11, fontWeight: 300, outline: 'none' }} value={String(megaStripeRefDy)} onChange={(e) => { const v = e.target.value; if (v === '' || v === '-') { setMegaStripeRefDy(0); return; } const n = Number.parseFloat(v); if (Number.isFinite(n)) setMegaStripeRefDy(n); }} onClick={(e) => e.stopPropagation()} onKeyDown={(e) => e.stopPropagation()} />
+                            <input
+                              type="text"
+                              style={{ width: 38, height: 14, padding: 0, border: 0, borderRadius: 0, background: 'transparent', fontSize: 11, fontWeight: 300, outline: 'none' }}
+                              value={megaStripeRef2DyDraft}
+                              onFocus={() => { megaStripeRef2DyInputFocusedRef.current = true; }}
+                              onBlur={() => {
+                                megaStripeRef2DyInputFocusedRef.current = false;
+                                const n = parseFinite(megaStripeRef2DyDraft);
+                                if (n === null) {
+                                  setMegaStripeRef2DyDraft(String(megaStripeRef2Dy));
+                                  return;
+                                }
+                                setMegaStripeRef2Dy(n);
+                              }}
+                              onChange={(e) => setMegaStripeRef2DyDraft(e.target.value)}
+                              onClick={(e) => e.stopPropagation()}
+                              onKeyDown={(e) => {
+                                e.stopPropagation();
+                                if (e.key === 'Enter') e.currentTarget.blur();
+                              }}
+                            />
+                            <div style={{ fontSize: 11, fontWeight: 300, color: 'rgba(0,0,0,0.60)' }}>s:</div>
+                            <input
+                              type="text"
+                              style={{ width: 52, height: 14, padding: 0, border: 0, borderRadius: 0, background: 'transparent', fontSize: 11, fontWeight: 300, outline: 'none', minWidth: 0 }}
+                              value={megaStripeRef2ScaleDraft}
+                              onFocus={() => { megaStripeRef2ScaleInputFocusedRef.current = true; }}
+                              onBlur={() => {
+                                megaStripeRef2ScaleInputFocusedRef.current = false;
+                                const n = parseFinite(megaStripeRef2ScaleDraft);
+                                if (n === null || n <= 0) {
+                                  setMegaStripeRef2ScaleDraft(String(megaStripeRef2Scale));
+                                  return;
+                                }
+                                setMegaStripeRef2Scale(clampScale(n, 1));
+                              }}
+                              onChange={(e) => setMegaStripeRef2ScaleDraft(e.target.value)}
+                              onClick={(e) => e.stopPropagation()}
+                              onKeyDown={(e) => {
+                                e.stopPropagation();
+                                if (e.key === 'Enter') e.currentTarget.blur();
+                              }}
+                            />
                           </div>
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              setMegaStripeRef2Enabled((v) => !v);
+                            }}
+                            style={{ height: 18, display: 'flex', alignItems: 'center', padding: '0 8px', borderRadius: 6, border: '1px solid rgba(0,0,0,0.15)', background: megaStripeRef2Enabled ? 'rgba(59,130,246,0.16)' : 'rgba(255,255,255,0.35)', color: megaStripeRef2Enabled ? 'rgba(37,99,235,0.95)' : 'rgba(0,0,0,0.70)', fontSize: 10, fontWeight: 900, whiteSpace: 'nowrap', flexShrink: 0 }}
+                          >
+                            {megaStripeRef2Enabled ? 'ON' : 'OFF'}
+                          </button>
                         </div>
 
-                        <div style={{ gridRow: '5', gridColumn: '1', display: 'grid', gridTemplateRows: '1fr 1fr', gridTemplateColumns: '60px 1fr', columnGap: 8, alignItems: 'center', padding: '2px 6px', paddingLeft: 30, minWidth: 0, overflow: 'hidden' }}>
-                          <div style={{ gridRow: '1 / span 2', gridColumn: '1', display: 'flex', alignItems: 'center', fontSize: 13, fontWeight: 900, color: 'rgba(0,0,0,0.65)', lineHeight: 1.05, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>Tile</div>
-                          <div style={{ gridRow: '1', gridColumn: '2', display: 'flex', alignItems: 'center', gap: 6, minWidth: 0 }}>
+                        <div style={{ gridRow: '15', gridColumn: '4 / span 2', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10, padding: '0 6px', paddingLeft: 30, minWidth: 0, overflow: 'hidden', height: 'var(--megaStripeHudCellHPx)' }}>
+                          <div style={{ fontSize: 11, fontWeight: 900, color: 'rgba(0,0,0,0.70)', flexShrink: 0, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>ref src</div>
+                          <input
+                            value={String(megaStripeRefSrc || '')}
+                            placeholder="/tmp/... o https://..."
+                            onChange={(e) => {
+                              const v = e.target.value;
+                              setMegaStripeRefEnabled(true);
+                              setMegaStripeRefSrc(normalizeMegaStripeRefSrc(v));
+                            }}
+                            onClick={(e) => e.stopPropagation()}
+                            onKeyDown={(e) => e.stopPropagation()}
+                            style={{ flex: 1, height: 16, padding: '0 6px', border: 0, borderRadius: 0, background: 'transparent', boxShadow: 'none', fontSize: 10, fontWeight: 800, color: 'rgba(0,0,0,0.60)', outline: 'none', minWidth: 0 }}
+                          />
+                        </div>
+
+                        <div style={{ gridRow: '16', gridColumn: '4 / span 2', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10, padding: '0 6px', paddingLeft: 30, minWidth: 0, overflow: 'hidden', height: 'var(--megaStripeHudCellHPx)' }}>
+                          <div style={{ fontSize: 11, fontWeight: 900, color: 'rgba(0,0,0,0.70)', flexShrink: 0, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>ref2 src</div>
+                          <input
+                            value={String(megaStripeRef2Src || '')}
+                            placeholder="/tmp/... o https://..."
+                            onChange={(e) => {
+                              const v = e.target.value;
+                              setMegaStripeRef2Enabled(true);
+                              setMegaStripeRef2Src(normalizeMegaStripeRefSrc(v));
+                            }}
+                            onClick={(e) => e.stopPropagation()}
+                            onKeyDown={(e) => e.stopPropagation()}
+                            style={{ flex: 1, height: 16, padding: '0 6px', border: 0, borderRadius: 0, background: 'transparent', boxShadow: 'none', fontSize: 10, fontWeight: 800, color: 'rgba(0,0,0,0.60)', outline: 'none', minWidth: 0 }}
+                          />
+                        </div>
+
+                        <div style={{ gridRow: '6', gridColumn: '4 / span 2', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10, padding: '0 6px', paddingLeft: 30, minWidth: 0, overflow: 'hidden', height: 'var(--megaStripeHudCellHPx)' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0, overflow: 'hidden' }}>
+                            <div style={{ fontSize: 13, fontWeight: 900, color: 'rgba(0,0,0,0.65)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>Tile</div>
                             <div style={{ fontSize: 11, fontWeight: 300, color: 'rgba(0,0,0,0.60)' }}>g:</div>
-                            <input value={String(megaStripeTileGapPx || 0)} onChange={(e) => { const v = e.target.value; if (v === '' || v === '-') { setMegaStripeTileGapPx(0); return; } const n = Number.parseFloat(v); if (Number.isFinite(n)) setMegaStripeTileGapPx(Math.min(200, Math.max(-200, n))); }} onClick={(e) => e.stopPropagation()} onKeyDown={(e) => e.stopPropagation()} style={{ width: 60, height: 14, padding: 0, border: 0, borderRadius: 0, background: 'transparent', fontSize: 11, fontWeight: 300, outline: 'none', minWidth: 0 }} />
+                            <input
+                              type="text"
+                              value={megaStripeTileGapPxDraft}
+                              onFocus={() => { megaStripeTileGapPxInputFocusedRef.current = true; }}
+                              onBlur={() => {
+                                megaStripeTileGapPxInputFocusedRef.current = false;
+                                const n = parseFinite(megaStripeTileGapPxDraft);
+                                if (n === null) {
+                                  setMegaStripeTileGapPxDraft(String(megaStripeTileGapPx || 0));
+                                  return;
+                                }
+                                setMegaStripeTileGapPx(Math.min(200, Math.max(-200, n)));
+                              }}
+                              onChange={(e) => setMegaStripeTileGapPxDraft(e.target.value)}
+                              onClick={(e) => e.stopPropagation()}
+                              onKeyDown={(e) => {
+                                e.stopPropagation();
+                                if (e.key === 'Enter') e.currentTarget.blur();
+                              }}
+                              style={{ width: 60, height: 14, padding: 0, border: 0, borderRadius: 0, background: 'transparent', fontSize: 11, fontWeight: 300, outline: 'none', minWidth: 0 }}
+                            />
+                          </div>
+                          <div />
+                        </div>
+
+                        <div style={{ gridRow: '11', gridColumn: '2 / span 2', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10, padding: '0 6px', paddingLeft: 30, minWidth: 0, overflow: 'hidden', height: 'var(--megaStripeHudCellHPx)', opacity: megaTileSelectorEnabled ? 1 : 0.35 }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0, overflow: 'hidden' }}>
+                            <div style={{ fontSize: 11, fontWeight: 900, color: 'rgba(0,0,0,0.70)' }}>extend</div>
+                            <div style={{ fontSize: 11, fontWeight: 300, color: 'rgba(0,0,0,0.60)' }}>t:</div>
+                            <input
+                              type="text"
+                              value={megaTileSelectorExtendTopPxDraft}
+                              onFocus={() => { megaTileSelectorExtendTopPxInputFocusedRef.current = true; }}
+                              onBlur={() => {
+                                megaTileSelectorExtendTopPxInputFocusedRef.current = false;
+                                const n = parseFinite(megaTileSelectorExtendTopPxDraft);
+                                if (n === null) {
+                                  setMegaTileSelectorExtendTopPxDraft(String(megaTileSelectorExtendTopPx || 0));
+                                  return;
+                                }
+                                setMegaTileSelectorExtendTopPx(Math.min(500, Math.max(-500, n)));
+                              }}
+                              onChange={(e) => setMegaTileSelectorExtendTopPxDraft(e.target.value)}
+                              onClick={(e) => e.stopPropagation()}
+                              onKeyDown={(e) => {
+                                e.stopPropagation();
+                                if (e.key === 'Enter') e.currentTarget.blur();
+                              }}
+                              style={{ width: 46, height: 14, padding: 0, border: 0, borderRadius: 0, background: 'transparent', fontSize: 11, fontWeight: 300, outline: 'none' }}
+                            />
+                            <div style={{ fontSize: 11, fontWeight: 300, color: 'rgba(0,0,0,0.60)' }}>r:</div>
+                            <input
+                              type="text"
+                              value={megaTileSelectorExtendRightPxDraft}
+                              onFocus={() => { megaTileSelectorExtendRightPxInputFocusedRef.current = true; }}
+                              onBlur={() => {
+                                megaTileSelectorExtendRightPxInputFocusedRef.current = false;
+                                const n = parseFinite(megaTileSelectorExtendRightPxDraft);
+                                if (n === null) {
+                                  setMegaTileSelectorExtendRightPxDraft(String(megaTileSelectorExtendRightPx || 0));
+                                  return;
+                                }
+                                setMegaTileSelectorExtendRightPx(Math.min(500, Math.max(-500, n)));
+                              }}
+                              onChange={(e) => setMegaTileSelectorExtendRightPxDraft(e.target.value)}
+                              onClick={(e) => e.stopPropagation()}
+                              onKeyDown={(e) => {
+                                e.stopPropagation();
+                                if (e.key === 'Enter') e.currentTarget.blur();
+                              }}
+                              style={{ width: 46, height: 14, padding: 0, border: 0, borderRadius: 0, background: 'transparent', fontSize: 11, fontWeight: 300, outline: 'none' }}
+                            />
+                            <div style={{ fontSize: 11, fontWeight: 300, color: 'rgba(0,0,0,0.60)' }}>b:</div>
+                            <input
+                              type="text"
+                              value={megaTileSelectorExtendBottomPxDraft}
+                              onFocus={() => { megaTileSelectorExtendBottomPxInputFocusedRef.current = true; }}
+                              onBlur={() => {
+                                megaTileSelectorExtendBottomPxInputFocusedRef.current = false;
+                                const n = parseFinite(megaTileSelectorExtendBottomPxDraft);
+                                if (n === null) {
+                                  setMegaTileSelectorExtendBottomPxDraft(String(megaTileSelectorExtendBottomPx || 0));
+                                  return;
+                                }
+                                setMegaTileSelectorExtendBottomPx(Math.min(500, Math.max(-500, n)));
+                              }}
+                              onChange={(e) => setMegaTileSelectorExtendBottomPxDraft(e.target.value)}
+                              onClick={(e) => e.stopPropagation()}
+                              onKeyDown={(e) => {
+                                e.stopPropagation();
+                                if (e.key === 'Enter') e.currentTarget.blur();
+                              }}
+                              style={{ width: 46, height: 14, padding: 0, border: 0, borderRadius: 0, background: 'transparent', fontSize: 11, fontWeight: 300, outline: 'none' }}
+                            />
+                            <div style={{ fontSize: 11, fontWeight: 300, color: 'rgba(0,0,0,0.60)' }}>l:</div>
+                            <input
+                              type="text"
+                              value={megaTileSelectorExtendLeftPxDraft}
+                              onFocus={() => { megaTileSelectorExtendLeftPxInputFocusedRef.current = true; }}
+                              onBlur={() => {
+                                megaTileSelectorExtendLeftPxInputFocusedRef.current = false;
+                                const n = parseFinite(megaTileSelectorExtendLeftPxDraft);
+                                if (n === null) {
+                                  setMegaTileSelectorExtendLeftPxDraft(String(megaTileSelectorExtendLeftPx || 0));
+                                  return;
+                                }
+                                setMegaTileSelectorExtendLeftPx(Math.min(500, Math.max(-500, n)));
+                              }}
+                              onChange={(e) => setMegaTileSelectorExtendLeftPxDraft(e.target.value)}
+                              onClick={(e) => e.stopPropagation()}
+                              onKeyDown={(e) => {
+                                e.stopPropagation();
+                                if (e.key === 'Enter') e.currentTarget.blur();
+                              }}
+                              style={{ width: 46, height: 14, padding: 0, border: 0, borderRadius: 0, background: 'transparent', fontSize: 11, fontWeight: 300, outline: 'none' }}
+                            />
+                            <div style={{ fontSize: 11, fontWeight: 300, color: 'rgba(0,0,0,0.60)' }}>px</div>
+                          </div>
+                          <div />
+                        </div>
+
+                        <div style={{ gridRow: '10', gridColumn: '2 / span 2', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10, padding: '0 6px', paddingLeft: 30, minWidth: 0, overflow: 'hidden', height: 'var(--megaStripeHudCellHPx)', opacity: megaTileSelectorEnabled ? 1 : 0.35 }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0, overflow: 'hidden' }}>
+                            <div style={{ fontSize: 11, fontWeight: 900, color: 'rgba(0,0,0,0.70)' }}>radius</div>
+                            <input
+                              type="text"
+                              value={megaTileSelectorRadiusPxDraft}
+                              onFocus={() => { megaTileSelectorRadiusPxInputFocusedRef.current = true; }}
+                              onBlur={() => {
+                                megaTileSelectorRadiusPxInputFocusedRef.current = false;
+                                const n = parseFinite(megaTileSelectorRadiusPxDraft);
+                                if (n === null) {
+                                  setMegaTileSelectorRadiusPxDraft(String(megaTileSelectorRadiusPx || 0));
+                                  return;
+                                }
+                                setMegaTileSelectorRadiusPx(Math.min(200, Math.max(0, n)));
+                              }}
+                              onChange={(e) => setMegaTileSelectorRadiusPxDraft(e.target.value)}
+                              onClick={(e) => e.stopPropagation()}
+                              onKeyDown={(e) => {
+                                e.stopPropagation();
+                                if (e.key === 'Enter') e.currentTarget.blur();
+                              }}
+                              style={{ width: 70, height: 14, padding: 0, border: 0, borderRadius: 0, background: 'transparent', fontSize: 11, fontWeight: 300, outline: 'none' }}
+                            />
+                            <div style={{ fontSize: 11, fontWeight: 300, color: 'rgba(0,0,0,0.60)' }}>px</div>
+                          </div>
+                          <div />
+                        </div>
+
+                        <div style={{ gridRow: '4', gridColumn: '2 / span 2', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10, padding: '0 6px', paddingLeft: 30, minWidth: 0, overflow: 'hidden', height: 'var(--megaStripeHudCellHPx)' }}>
+                          <div style={{ fontSize: 13, fontWeight: 900, color: 'rgba(0,0,0,0.65)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>SELECTOR</div>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                setMegaTileSelectorV1Enabled((v) => !v);
+                              }}
+                              style={{ height: 18, display: 'flex', alignItems: 'center', padding: '0 8px', borderRadius: 6, border: '1px solid rgba(0,0,0,0.15)', background: megaTileSelectorV1Enabled ? 'rgba(59,130,246,0.16)' : 'rgba(255,255,255,0.35)', color: megaTileSelectorV1Enabled ? 'rgba(37,99,235,0.95)' : 'rgba(0,0,0,0.70)', fontSize: 10, fontWeight: 900, whiteSpace: 'nowrap' }}
+                            >
+                              v1
+                            </button>
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                setMegaTileSelectorEnabled((v) => !v);
+                              }}
+                              style={{ height: 18, display: 'flex', alignItems: 'center', padding: '0 8px', borderRadius: 6, border: '1px solid rgba(0,0,0,0.15)', background: megaTileSelectorEnabled ? 'rgba(59,130,246,0.16)' : 'rgba(255,255,255,0.35)', color: megaTileSelectorEnabled ? 'rgba(37,99,235,0.95)' : 'rgba(0,0,0,0.70)', fontSize: 10, fontWeight: 900, whiteSpace: 'nowrap' }}
+                            >
+                              v2
+                            </button>
                           </div>
                         </div>
 
-                        <div style={{ gridRow: '2 / span 13', gridColumn: '2 / span 2', padding: 0, minWidth: 0, height: '100%', overflow: 'hidden' }}>
+                        <div style={{ gridRow: '5', gridColumn: '2 / span 2', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10, padding: '0 6px', paddingLeft: 30, minWidth: 0, overflow: 'hidden', height: 'var(--megaStripeHudCellHPx)', opacity: megaTileSelectorEnabled ? 1 : 0.35 }}>
+                          <div style={{ fontSize: 11, fontWeight: 900, color: 'rgba(0,0,0,0.70)', flexShrink: 0, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>target</div>
+                          <input
+                            value={String(megaTileSelectorTarget || '')}
+                            placeholder="NCC-1701-D"
+                            onChange={(e) => setMegaTileSelectorTarget(e.target.value)}
+                            onClick={(e) => e.stopPropagation()}
+                            onKeyDown={(e) => e.stopPropagation()}
+                            style={{ flex: 1, height: 16, padding: '0 6px', border: 0, borderRadius: 0, background: 'transparent', boxShadow: 'none', fontSize: 10, fontWeight: 800, color: 'rgba(0,0,0,0.60)', outline: 'none', minWidth: 0 }}
+                          />
+                        </div>
+
+                        <div style={{ gridRow: '6', gridColumn: '2 / span 2', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10, padding: '0 6px', paddingLeft: 30, minWidth: 0, overflow: 'hidden', height: 'var(--megaStripeHudCellHPx)', opacity: megaTileSelectorEnabled ? 1 : 0.35 }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0, overflow: 'hidden' }}>
+                            <div style={{ fontSize: 11, fontWeight: 900, color: 'rgba(0,0,0,0.70)' }}>size</div>
+                            <input
+                              type="text"
+                              value={megaTileSelectorSizePxDraft}
+                              onFocus={() => { megaTileSelectorSizePxInputFocusedRef.current = true; }}
+                              onBlur={() => {
+                                megaTileSelectorSizePxInputFocusedRef.current = false;
+                                const n = parseFinite(megaTileSelectorSizePxDraft);
+                                if (n === null) {
+                                  setMegaTileSelectorSizePxDraft(String(megaTileSelectorSizePx || 0));
+                                  return;
+                                }
+                                setMegaTileSelectorSizePx(Math.min(800, Math.max(20, n)));
+                              }}
+                              onChange={(e) => setMegaTileSelectorSizePxDraft(e.target.value)}
+                              onClick={(e) => e.stopPropagation()}
+                              onKeyDown={(e) => {
+                                e.stopPropagation();
+                                if (e.key === 'Enter') e.currentTarget.blur();
+                                if (e.key === 'Escape') {
+                                  setMegaTileSelectorSizePxDraft(String(megaTileSelectorSizePx || 0));
+                                  e.currentTarget.blur();
+                                }
+                              }}
+                              style={{ width: 70, height: 14, padding: 0, border: 0, borderRadius: 0, background: 'transparent', fontSize: 11, fontWeight: 300, outline: 'none' }}
+                            />
+                            <div style={{ fontSize: 11, fontWeight: 300, color: 'rgba(0,0,0,0.60)' }}>px</div>
+                          </div>
+                          <div />
+                        </div>
+
+                        <div style={{ gridRow: '7', gridColumn: '2 / span 2', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10, padding: '0 6px', paddingLeft: 30, minWidth: 0, overflow: 'hidden', height: 'var(--megaStripeHudCellHPx)', opacity: megaTileSelectorEnabled ? 1 : 0.35 }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0, overflow: 'hidden' }}>
+                            <div style={{ fontSize: 11, fontWeight: 900, color: 'rgba(0,0,0,0.70)' }}>stroke</div>
+                            <input
+                              type="text"
+                              value={megaTileSelectorStrokePxDraft}
+                              onFocus={() => { megaTileSelectorStrokePxInputFocusedRef.current = true; }}
+                              onBlur={() => {
+                                megaTileSelectorStrokePxInputFocusedRef.current = false;
+                                const n = parseFinite(megaTileSelectorStrokePxDraft);
+                                if (n === null) {
+                                  setMegaTileSelectorStrokePxDraft(String(megaTileSelectorStrokePx || 0));
+                                  return;
+                                }
+                                setMegaTileSelectorStrokePx(Math.min(80, Math.max(0, n)));
+                              }}
+                              onChange={(e) => setMegaTileSelectorStrokePxDraft(e.target.value)}
+                              onClick={(e) => e.stopPropagation()}
+                              onKeyDown={(e) => {
+                                e.stopPropagation();
+                                if (e.key === 'Enter') e.currentTarget.blur();
+                                if (e.key === 'Escape') {
+                                  setMegaTileSelectorStrokePxDraft(String(megaTileSelectorStrokePx || 0));
+                                  e.currentTarget.blur();
+                                }
+                              }}
+                              style={{ width: 70, height: 14, padding: 0, border: 0, borderRadius: 0, background: 'transparent', fontSize: 11, fontWeight: 300, outline: 'none' }}
+                            />
+                            <div style={{ fontSize: 11, fontWeight: 300, color: 'rgba(0,0,0,0.60)' }}>px</div>
+                          </div>
+                          <div />
+                        </div>
+
+                        <div style={{ gridRow: '8', gridColumn: '2 / span 2', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10, padding: '0 6px', paddingLeft: 30, minWidth: 0, overflow: 'hidden', height: 'var(--megaStripeHudCellHPx)', opacity: megaTileSelectorEnabled ? 1 : 0.35 }}>
+                          <div style={{ fontSize: 11, fontWeight: 900, color: 'rgba(0,0,0,0.70)', flexShrink: 0 }}>color</div>
+                          <input
+                            value={String(megaTileSelectorColor || '')}
+                            placeholder="black"
+                            onChange={(e) => setMegaTileSelectorColor(e.target.value)}
+                            onClick={(e) => e.stopPropagation()}
+                            onKeyDown={(e) => e.stopPropagation()}
+                            style={{ flex: 1, height: 16, padding: '0 6px', border: 0, borderRadius: 0, background: 'transparent', boxShadow: 'none', fontSize: 10, fontWeight: 800, color: 'rgba(0,0,0,0.60)', outline: 'none', minWidth: 0 }}
+                          />
+                        </div>
+
+                        <div style={{ gridRow: '9', gridColumn: '2 / span 2', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10, padding: '0 6px', paddingLeft: 30, minWidth: 0, overflow: 'hidden', height: 'var(--megaStripeHudCellHPx)', opacity: megaTileSelectorEnabled ? 1 : 0.35 }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0, overflow: 'hidden' }}>
+                            <div style={{ fontSize: 11, fontWeight: 900, color: 'rgba(0,0,0,0.70)' }}>grid</div>
+                            <div style={{ fontSize: 11, fontWeight: 300, color: 'rgba(0,0,0,0.60)' }}>x:</div>
+                            <input
+                              type="text"
+                              value={megaTileSelectorStepXDraft}
+                              onFocus={() => { megaTileSelectorStepXInputFocusedRef.current = true; }}
+                              onBlur={() => {
+                                megaTileSelectorStepXInputFocusedRef.current = false;
+                                const n = parseFinite(megaTileSelectorStepXDraft);
+                                if (n === null) {
+                                  setMegaTileSelectorStepXDraft(String(megaTileSelectorStepX || 0));
+                                  return;
+                                }
+                                setMegaTileSelectorStepX(Math.min(99, Math.max(-99, n)));
+                              }}
+                              onChange={(e) => setMegaTileSelectorStepXDraft(e.target.value)}
+                              onClick={(e) => e.stopPropagation()}
+                              onKeyDown={(e) => {
+                                e.stopPropagation();
+                                if (e.key === 'Enter') e.currentTarget.blur();
+                              }}
+                              style={{ width: 46, height: 14, padding: 0, border: 0, borderRadius: 0, background: 'transparent', fontSize: 11, fontWeight: 300, outline: 'none' }}
+                            />
+                            <div style={{ fontSize: 11, fontWeight: 300, color: 'rgba(0,0,0,0.60)' }}>y:</div>
+                            <input
+                              type="text"
+                              value={megaTileSelectorStepYDraft}
+                              onFocus={() => { megaTileSelectorStepYInputFocusedRef.current = true; }}
+                              onBlur={() => {
+                                megaTileSelectorStepYInputFocusedRef.current = false;
+                                const n = parseFinite(megaTileSelectorStepYDraft);
+                                if (n === null) {
+                                  setMegaTileSelectorStepYDraft(String(megaTileSelectorStepY || 0));
+                                  return;
+                                }
+                                setMegaTileSelectorStepY(Math.min(99, Math.max(-99, n)));
+                              }}
+                              onChange={(e) => setMegaTileSelectorStepYDraft(e.target.value)}
+                              onClick={(e) => e.stopPropagation()}
+                              onKeyDown={(e) => {
+                                e.stopPropagation();
+                                if (e.key === 'Enter') e.currentTarget.blur();
+                              }}
+                              style={{ width: 46, height: 14, padding: 0, border: 0, borderRadius: 0, background: 'transparent', fontSize: 11, fontWeight: 300, outline: 'none' }}
+                            />
+                          </div>
+                          <div />
+                        </div>
+
+                        <div style={{ gridRow: '3 / span 15', gridColumn: '2 / span 2', padding: 0, minWidth: 0, height: '100%', overflow: 'hidden', display: 'none' }}>
                           <div
                             style={{
                               display: 'grid',
@@ -3163,7 +5188,7 @@ function App() {
                           </div>
                         </div>
 
-                        <div style={{ gridRow: '15 / span 4', gridColumn: '1 / span 1', display: 'grid', gridTemplateRows: 'repeat(4, 1fr)', gap: 6, padding: '6px 6px', background: 'transparent' }} />
+                        {null}
 
                         {(() => {
                           try {
@@ -3172,6 +5197,33 @@ function App() {
                             const entries = Array.from(sp.entries())
                               .filter(([k]) => k && !ignored.has(String(k)))
                               .sort((a, b) => String(a[0]).localeCompare(String(b[0])));
+
+                            const normalizeOverlaySrcLocal = (value) => {
+                              try {
+                                let s = (value || '').toString().trim();
+                                if (!s) return '';
+                                if ((s.startsWith('"') && s.endsWith('"')) || (s.startsWith("'") && s.endsWith("'")) || (s.startsWith('`') && s.endsWith('`'))) {
+                                  s = s.slice(1, -1).trim();
+                                }
+                                if (!s) return '';
+                                if (/^(https?:)?\/\//i.test(s) || /^data:/i.test(s) || /^blob:/i.test(s)) return s;
+                                return s.startsWith('/') ? s : `/${s}`;
+                              } catch {
+                                return '';
+                              }
+                            };
+
+                            const lsDrawingSrc = (() => {
+                              try {
+                                return String(window.localStorage.getItem('HG_DRAWING_OVERLAY_SRC') || '').trim();
+                              } catch {
+                                return '';
+                              }
+                            })();
+                            const lsLongEntries = [
+                              ['HG_DRAWING_OVERLAY_SRC', lsDrawingSrc || '—'],
+                              ['HG_DRAWING_OVERLAY_SRC(norm)', lsDrawingSrc ? normalizeOverlaySrcLocal(lsDrawingSrc) : '—'],
+                            ];
 
                             const isLongish = (key, val) => {
                               try {
@@ -3197,7 +5249,10 @@ function App() {
 
                             const longEntriesAll = entries.filter(([k, v]) => isLongish(k, v));
                             const longDebugEntries = longEntriesAll.filter(([k]) => isDebugEntry(k)).slice(0, 3);
-                            const longEntries = longEntriesAll.filter(([k]) => !isDebugEntry(k)).slice(0, 3);
+                            const longEntries = [
+                              ...lsLongEntries,
+                              ...longEntriesAll.filter(([k]) => !isDebugEntry(k) && !lsLongEntries.some(([lk]) => String(lk) === String(k))),
+                            ].slice(0, 3);
 
                             const resolvedOverlaySrcValue = (() => {
                               try {
@@ -3235,14 +5290,19 @@ function App() {
                                 {longEntries.map(([k, v], idx) => {
                                   const key = String(k);
                                   const val = (v == null) ? '' : String(v);
-                                  const row = String(16 - idx);
+                                  const row = (() => {
+                                    if (key === 'HG_DRAWING_OVERLAY_SRC') return '19';
+                                    if (key === 'HG_DRAWING_OVERLAY_SRC(norm)') return '18';
+                                    return String(16 - idx);
+                                  })();
+                                  const isReadOnly = key === 'HG_DRAWING_OVERLAY_SRC' || key === 'HG_DRAWING_OVERLAY_SRC(norm)';
                                   return (
                                     <div key={key} style={{ gridRow: row, gridColumn: '2 / span 5', display: 'flex', alignItems: 'center', gap: 8, padding: 0, minWidth: 0, height: 'var(--megaStripeHudCellHPx)', overflow: 'hidden', position: 'relative' }}>
                                       <div style={{ padding: '0 6px', paddingLeft: 30, fontSize: 13, fontWeight: 900, lineHeight: 'var(--megaStripeHudCellHPx)', color: 'rgba(0,0,0,0.75)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0, flexShrink: 0 }} title={key}>
                                         {key}
                                       </div>
                                       <input
-                                        defaultValue={val}
+                                        {...(isReadOnly ? { value: val, readOnly: true } : { defaultValue: val })}
                                         onClick={(e) => {
                                           try {
                                             e.stopPropagation();
@@ -3262,6 +5322,7 @@ function App() {
                                           }
                                         }}
                                         onBlur={(e) => {
+                                          if (isReadOnly) return;
                                           try {
                                             const nextVal = String(e.currentTarget.value ?? '').trim();
                                             const next = new URLSearchParams(location.search || '');
@@ -3326,41 +5387,11 @@ function App() {
                                   );
                                 })}
 
-                                <div style={{ gridRow: '18', gridColumn: '2 / span 5', display: 'flex', alignItems: 'center', gap: 8, padding: 0, minWidth: 0, height: 'var(--megaStripeHudCellHPx)', overflow: 'hidden', position: 'relative' }}>
-                                  <div style={{ padding: '0 6px', paddingLeft: 30, fontSize: 13, fontWeight: 900, lineHeight: 'var(--megaStripeHudCellHPx)', color: 'rgba(0,0,0,0.75)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0, flexShrink: 0 }}>ref src</div>
-                                  <input
-                                    value={String(megaStripeRefSrc || '')}
-                                    placeholder="/tmp/... o https://..."
-                                    onChange={(e) => {
-                                      const v = e.target.value;
-                                      setMegaStripeRefEnabled(true);
-                                      setMegaStripeRefSrc(normalizeMegaStripeRefSrc(v));
-                                    }}
-                                    onClick={(e) => e.stopPropagation()}
-                                    onKeyDown={(e) => e.stopPropagation()}
-                                    style={{ flex: 1, height: 'var(--megaStripeHudCellHPx)', lineHeight: 'var(--megaStripeHudCellHPx)', padding: '0 6px', border: 0, borderRadius: 0, background: 'transparent', fontSize: 13, fontWeight: 300, color: 'rgba(0,0,0,0.55)', outline: 'none', minWidth: 0 }}
-                                  />
-                                </div>
+                                {null}
                               </>
                             );
                           } catch {
-                            return (
-                              <div style={{ gridRow: '18', gridColumn: '2 / span 3', display: 'flex', alignItems: 'center', gap: 8, padding: 0, minWidth: 0, height: 'var(--megaStripeHudCellHPx)', overflow: 'hidden', position: 'relative' }}>
-                                <div style={{ padding: '0 6px', paddingLeft: 30, fontSize: 13, fontWeight: 900, lineHeight: 'var(--megaStripeHudCellHPx)', color: 'rgba(0,0,0,0.75)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0, flexShrink: 0 }}>ref src</div>
-                                <input
-                                  value={String(megaStripeRefSrc || '')}
-                                  placeholder="/tmp/... o https://..."
-                                  onChange={(e) => {
-                                    const v = e.target.value;
-                                    setMegaStripeRefEnabled(true);
-                                    setMegaStripeRefSrc(normalizeMegaStripeRefSrc(v));
-                                  }}
-                                  onClick={(e) => e.stopPropagation()}
-                                  onKeyDown={(e) => e.stopPropagation()}
-                                  style={{ flex: 1, height: 'var(--megaStripeHudCellHPx)', lineHeight: 'var(--megaStripeHudCellHPx)', padding: '0 6px', border: 0, borderRadius: 0, background: 'transparent', fontSize: 13, fontWeight: 300, color: 'rgba(0,0,0,0.55)', outline: 'none', minWidth: 0 }}
-                                />
-                              </div>
-                            );
+                            return null;
                           }
                         })()}
                       </div>

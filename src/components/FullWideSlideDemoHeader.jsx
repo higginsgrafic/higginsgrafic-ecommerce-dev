@@ -25,6 +25,96 @@ const FIRST_CONTACT_MEDIA = {
 const CONTROL_TILE_BN = 'botonera-bn';
 const CONTROL_TILE_ARROWS = 'botonera-fletxes';
 
+const MEGA_PUBLIC_IDLE_MS = 60 * 60 * 1000;
+const MEGA_PUBLIC_LAST_ACTIVITY_AT_KEY = 'HG_MEGA_PUBLIC_LAST_ACTIVITY_AT';
+const MEGA_PUBLIC_SELECTOR_STATE_KEY = 'HG_MEGA_PUBLIC_SELECTOR_STATE';
+
+function touchMegaPublicActivity() {
+  try {
+    if (typeof window === 'undefined') return;
+    window.sessionStorage?.setItem(MEGA_PUBLIC_LAST_ACTIVITY_AT_KEY, String(Date.now()));
+    window.dispatchEvent(new Event('hg-mega-public-activity'));
+  } catch {
+    // ignore
+  }
+}
+
+ function resetMegaPublicState() {
+   try {
+     if (typeof window === 'undefined') return;
+     window.sessionStorage?.removeItem(MEGA_PUBLIC_LAST_ACTIVITY_AT_KEY);
+     window.sessionStorage?.removeItem(MEGA_PUBLIC_SELECTOR_STATE_KEY);
+     window.dispatchEvent(new Event('mega-tile-selector-changed'));
+   } catch {
+     // ignore
+   }
+ }
+
+function readMegaPublicLastActivityAt() {
+  try {
+    if (typeof window === 'undefined') return 0;
+    const raw = window.sessionStorage?.getItem(MEGA_PUBLIC_LAST_ACTIVITY_AT_KEY);
+    const n = raw == null ? NaN : Number.parseInt(String(raw), 10);
+    return Number.isFinite(n) && n > 0 ? n : 0;
+  } catch {
+    return 0;
+  }
+}
+
+function readMegaPublicSelectorState() {
+  try {
+    if (typeof window === 'undefined') return {};
+    const raw = window.sessionStorage?.getItem(MEGA_PUBLIC_SELECTOR_STATE_KEY);
+    if (!raw) return {};
+    const parsed = JSON.parse(raw);
+    return parsed && typeof parsed === 'object' ? parsed : {};
+  } catch {
+    return {};
+  }
+}
+
+function writeMegaPublicSelectorState(next) {
+  try {
+    if (typeof window === 'undefined') return;
+    window.sessionStorage?.setItem(MEGA_PUBLIC_SELECTOR_STATE_KEY, JSON.stringify(next || {}));
+  } catch {
+    // ignore
+  }
+}
+
+function getMegaPublicSelectorFor(collectionId, keyset) {
+  try {
+    const cid = (collectionId || '').toString();
+    if (!cid) return null;
+    const ks = String(keyset || 'v1');
+    const root = readMegaPublicSelectorState();
+    const perCollection = root?.[cid];
+    const perKeyset = perCollection?.[ks];
+    if (!perKeyset || typeof perKeyset !== 'object') return null;
+    return perKeyset;
+  } catch {
+    return null;
+  }
+}
+
+function setMegaPublicSelectorFor(collectionId, keyset, value) {
+  try {
+    const cid = (collectionId || '').toString();
+    if (!cid) return;
+    const ks = String(keyset || 'v1');
+    const root = readMegaPublicSelectorState();
+    const baseRoot = root && typeof root === 'object' ? root : {};
+    const baseCollection = baseRoot?.[cid] && typeof baseRoot[cid] === 'object' ? baseRoot[cid] : {};
+    const baseKeyset = baseCollection?.[ks] && typeof baseCollection[ks] === 'object' ? baseCollection[ks] : {};
+    const nextKeyset = { ...baseKeyset, ...(value && typeof value === 'object' ? value : {}) };
+    const nextCollection = { ...baseCollection, [ks]: nextKeyset };
+    const next = { ...baseRoot, [cid]: nextCollection };
+    writeMegaPublicSelectorState(next);
+  } catch {
+    // ignore
+  }
+}
+
 const FIRST_CONTACT_MEDIA_WHITE = {
   'NX-01': '/custom_logos/drawings/images_stripe/first_contact/white/nx-01-w-stripe.webp',
   'NCC-1701': '/custom_logos/drawings/images_stripe/first_contact/white/ncc-1701-w-stripe.webp',
@@ -207,42 +297,46 @@ function IconButton({ label, onClick, onDoubleClick, onMouseEnter, buttonRef, ch
   );
 }
 
-function FirstContactDibuix00Buttons({ onWhite, onBlack, onMulti }) {
+function FirstContactDibuix00Buttons({ onWhite, onBlack, onMulti, showWhite = true, showBlack = true, showMulti = true }) {
+  const buttons = [];
+  if (showWhite) buttons.push({ key: 'white', label: 'Blanc', onClick: onWhite });
+  if (showBlack) buttons.push({ key: 'black', label: 'Negre', onClick: onBlack });
+  if (showMulti) buttons.push({ key: 'color', label: 'Color', onClick: onMulti });
+
+  if (!buttons.length) return null;
+
+  const heightPct = 100 / buttons.length;
+
   return (
     <div className="relative mt-2 aspect-square w-full" data-stripe-buttonbar="bn">
       <div className="absolute inset-0 overflow-hidden rounded-md bg-muted">
-        <button
-          type="button"
-          aria-label="Blanc"
-          id="stripe-guide-left-anchor"
-          onClick={onWhite}
-          className="absolute left-0 top-0 h-1/3 w-full bg-foreground focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-        >
-          <span className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 font-oswald text-[20px] font-normal uppercase text-whiteStrong">
-            Blanc
-          </span>
-        </button>
-        <button
-          type="button"
-          aria-label="Negre"
-          onClick={onBlack}
-          className="absolute left-0 top-1/3 h-1/3 w-full bg-background focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-        >
-          <span className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 font-oswald text-[20px] font-normal uppercase text-foreground">
-            Negre
-          </span>
-        </button>
+        {buttons.map((btn, i) => {
+          const topPct = i * heightPct;
+          const isFirst = i === 0;
+          const className = btn.key === 'white'
+            ? 'bg-foreground'
+            : btn.key === 'black'
+              ? 'bg-background'
+              : 'bg-muted';
+          const textClass = btn.key === 'white' ? 'text-whiteStrong' : 'text-foreground';
 
-        <button
-          type="button"
-          aria-label="Color"
-          onClick={onMulti}
-          className="absolute left-0 bottom-0 h-1/3 w-full bg-muted focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-        >
-          <span className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 font-oswald text-[20px] font-normal uppercase text-foreground">
-            Color
-          </span>
-        </button>
+          return (
+            <button
+              key={btn.key}
+              type="button"
+              aria-label={btn.label}
+              id={isFirst ? 'stripe-guide-left-anchor' : undefined}
+              onClick={btn.onClick}
+              className={`absolute left-0 w-full focus:outline-none focus-visible:ring-2 focus-visible:ring-ring ${className}`}
+              style={{ top: `${topPct}%`, height: `${heightPct}%` }}
+            >
+              <span className={`pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 font-oswald text-[20px] font-normal uppercase ${textClass}`}
+              >
+                {btn.label}
+              </span>
+            </button>
+          );
+        })}
       </div>
     </div>
   );
@@ -321,11 +415,31 @@ function MegaColumn({
   onHumanNext,
   onSelectItem,
   onTileSize,
+  disableMulti = false,
+  stripeVariantVisibility,
+  megaTileSelectorParams,
+  onStartSelectorDrag,
 }) {
   const tileSizeRef = useRef(null);
   const [tileSize, setTileSize] = useState(null);
   const humanInsideEnabled = Boolean(isHumanInside);
   const effectiveTileSize = megaTileSize || tileSize;
+  const selectorTilePitchPx = (Number(effectiveTileSize) || 120) + 12;
+  const selectorSizePx = Math.round(Number(megaTileSelectorParams?.sizePx) || 200);
+  const selectorStrokePx = Math.min(80, Math.max(0, Number(megaTileSelectorParams?.strokePx) || 0));
+  const selectorRadiusPx = Math.round(Math.min(200, Math.max(0, Number(megaTileSelectorParams?.radiusPx) || 0)));
+  const selectorExtendTopPx = Number.isFinite(Number(megaTileSelectorParams?.extendTopPx)) ? Number(megaTileSelectorParams?.extendTopPx) : 0;
+  const selectorExtendRightPx = Number.isFinite(Number(megaTileSelectorParams?.extendRightPx)) ? Number(megaTileSelectorParams?.extendRightPx) : 0;
+  const selectorExtendBottomPx = Number.isFinite(Number(megaTileSelectorParams?.extendBottomPx)) ? Number(megaTileSelectorParams?.extendBottomPx) : 0;
+  const selectorExtendLeftPx = Number.isFinite(Number(megaTileSelectorParams?.extendLeftPx)) ? Number(megaTileSelectorParams?.extendLeftPx) : 0;
+  const selectorStepX = Number.isFinite(Number(megaTileSelectorParams?.stepX)) ? Number(megaTileSelectorParams?.stepX) : 0;
+  const selectorStepY = Number.isFinite(Number(megaTileSelectorParams?.stepY)) ? Number(megaTileSelectorParams?.stepY) : 0;
+  const selectorDxPx = selectorStepX * selectorTilePitchPx;
+  const selectorDyPx = selectorStepY * selectorTilePitchPx;
+  const selectorTranslateX = selectorDxPx + (selectorExtendRightPx - selectorExtendLeftPx) / 2;
+  const selectorTranslateY = selectorDyPx + (selectorExtendBottomPx - selectorExtendTopPx) / 2;
+  const selectorWidthPx = Math.max(1, selectorSizePx + selectorExtendLeftPx + selectorExtendRightPx);
+  const selectorHeightPx = Math.max(1, selectorSizePx + selectorExtendTopPx + selectorExtendBottomPx);
   const [selectedItem, setSelectedItem] = useState(null);
   const [pageStart, setPageStart] = useState(0);
 
@@ -517,6 +631,45 @@ function MegaColumn({
   }, [CONTROL_TILE_ARROWS, CONTROL_TILE_BN, drawableItems, effectiveItems, pageStart, row]);
 
   useLayoutEffect(() => {
+    try {
+      if (!row) return;
+      if (!collectionId) return;
+      if (!megaTileSelectorParams?.enabled) return;
+      const keyset = String(megaTileSelectorParams?.keyset || 'v1');
+      const existing = getMegaPublicSelectorFor(collectionId, keyset);
+      const existingTarget = typeof existing?.target === 'string' ? existing.target.trim() : '';
+      if (existingTarget) return;
+
+      const candidate = rowItems?.[2] || rowItems?.[1] || null;
+      if (typeof candidate !== 'string') return;
+      setMegaPublicSelectorFor(collectionId, keyset, { target: candidate, stepX: 0, stepY: 0 });
+      window.dispatchEvent(new Event('mega-tile-selector-changed'));
+    } catch {
+      // ignore
+    }
+  }, [collectionId, megaTileSelectorParams?.enabled, megaTileSelectorParams?.keyset, row, rowItems]);
+
+  const selectorDragBounds = useMemo(() => {
+    try {
+      if (!row) return null;
+      const targetRaw = String(megaTileSelectorParams?.target || '').trim().toLowerCase();
+      if (!targetRaw) return null;
+      const idx = rowItems.findIndex((it) => typeof it === 'string' && String(it || '').trim().toLowerCase() === targetRaw);
+      if (idx < 0) return null;
+      return { minStepX: 1 - idx, maxStepX: 7 - idx, lockStepY: true };
+    } catch {
+      return null;
+    }
+  }, [megaTileSelectorParams?.target, row, rowItems]);
+
+  const selectorStepXForRender = selectorDragBounds
+    ? Math.min(selectorDragBounds.maxStepX, Math.max(selectorDragBounds.minStepX, selectorStepX))
+    : selectorStepX;
+  const selectorStepYForRender = selectorDragBounds ? 0 : selectorStepY;
+  const selectorTranslateXForRender = (selectorStepXForRender * selectorTilePitchPx) + (selectorExtendRightPx - selectorExtendLeftPx) / 2;
+  const selectorTranslateYForRender = (selectorStepYForRender * selectorTilePitchPx) + (selectorExtendBottomPx - selectorExtendTopPx) / 2;
+
+  useLayoutEffect(() => {
     if (!row) return;
     const el = tileSizeRef.current;
     if (!el) return;
@@ -634,6 +787,7 @@ function MegaColumn({
     if (typeof value !== 'string') return '';
     return value
       .trim()
+      .toLowerCase()
       .replace(/[\u2010\u2011\u2012\u2013\u2014\u2212]/g, '-')
       .replace(/\s+/g, ' ')
       .replace(/[^a-z0-9-]+/g, '-')
@@ -646,6 +800,25 @@ function MegaColumn({
 
     if (typeof it === 'string') {
       const raw = it.trim();
+      const fixedStripeFolder = raw.replace(
+        '/custom_logos/drawings/images_stripe/stripe/',
+        '/custom_logos/drawings/images_stripe/',
+      );
+      if (fixedStripeFolder !== raw && (fixedStripeFolder.startsWith('/custom_logos/') || fixedStripeFolder.includes('/custom_logos/'))) {
+        const customIdx = fixedStripeFolder.indexOf('/custom_logos/');
+        if (customIdx !== -1) return fixedStripeFolder.slice(customIdx);
+      }
+      const publicIdx = raw.indexOf('/public/');
+      if (publicIdx !== -1) {
+        const sub = raw.slice(publicIdx + '/public'.length);
+        if (sub.startsWith('/custom_logos/') || sub.startsWith('/placeholders/') || sub.startsWith('/tmp/')) {
+          return sub;
+        }
+      }
+      const customIdx = raw.indexOf('/custom_logos/');
+      if (customIdx !== -1) return raw.slice(customIdx);
+      const placeholdersIdx = raw.indexOf('/placeholders/');
+      if (placeholdersIdx !== -1) return raw.slice(placeholdersIdx);
       if (raw.startsWith('/custom_logos/') || raw.startsWith('/placeholders/') || raw.startsWith('/tmp/')) {
         return raw;
       }
@@ -673,7 +846,8 @@ function MegaColumn({
 
       if (collectionId === 'the_human_inside') {
         const normalized = typeof vPath === 'string' ? vPath.replace(/^\/?(black|white)\//i, '') : vPath;
-        return ensureThumbSuffix(`/custom_logos/drawings/images_stripe/the_human_inside/black/${normalized}`, 'stripe');
+        const folder = variant === 'white' ? 'white' : 'black';
+        return ensureThumbSuffix(`/custom_logos/drawings/images_stripe/the_human_inside/${folder}/${normalized}`, 'stripe');
       }
 
       const out = `/custom_logos/drawings/images_stripe/${collectionId}/${vPath}`;
@@ -755,7 +929,42 @@ function MegaColumn({
       if (cid === 'austen' && raw.includes('/austen/keep_calm/')) {
         const file = raw.split('/').pop() || '';
         const lower = file.toLowerCase();
-        if (lower === 'keep-calm-black.webp') return '/custom_logos/drawings/images_grid/austen/keep_calm/keep-calm-b-grid.webp';
+        if (
+          lower === 'keep-calm-black.webp'
+          || lower === 'keep-calm-black-grid.webp'
+          || lower === 'keep-calm-b.webp'
+          || lower === 'keep-calm-b-grid.webp'
+        ) {
+          return '/custom_logos/drawings/images_grid/austen/keep_calm/keep-calm-b-grid.webp';
+        }
+        return ensureThumbSuffix(raw, 'grid');
+      }
+      if (cid === 'austen' && raw.includes('/austen/looking_for_my_darcy/')) {
+        const file = raw.split('/').pop() || '';
+        const lower = file.toLowerCase();
+        const base = lower.replace(/\.(webp|png|jpe?g)$/i, '').replace(/-grid$/i, '');
+
+        const mapped = (() => {
+          if (base.endsWith('-dark-gradient') || base.endsWith('-dark')) {
+            const c = base.replace(/-(dark-gradient|dark)$/i, '');
+            return `${c}-dark-gradient-grid.webp`;
+          }
+          if (base.endsWith('-light-gradient') || base.endsWith('-light')) {
+            const c = base.replace(/-(light-gradient|light)$/i, '');
+            return `${c}-light-gradient-grid.webp`;
+          }
+          if (base.endsWith('-frame')) {
+            const c = base.replace(/-frame$/i, '');
+            return `${c}-frame-grid.webp`;
+          }
+          if (base.endsWith('-solid')) {
+            const c = base.replace(/-solid$/i, '');
+            return `${c}-solid-grid.webp`;
+          }
+          return file;
+        })();
+
+        return ensureThumbSuffix(`/custom_logos/drawings/images_grid/austen/looking_for_my_darcy/${mapped}`, 'grid');
       }
       return ensureThumbSuffix(raw, 'grid');
     }
@@ -821,8 +1030,19 @@ function MegaColumn({
         }
         if (raw.includes('/austen/keep_calm/')) {
           const lower = baseFile.toLowerCase();
-          const mapped = lower === 'keep-calm-black.webp' ? 'keep-calm-b.webp' : baseFile;
-          return ensureThumbSuffix(`/custom_logos/drawings/images_grid/austen/keep_calm/${mapped}`, 'grid');
+          if (lower === 'keep-calm-black.webp' || lower === 'keep-calm-b.webp') {
+            return '/custom_logos/drawings/images_grid/austen/keep_calm/keep-calm-b-grid.webp';
+          }
+          if (lower === 'keep-calm-w.webp') {
+            return '/custom_logos/drawings/images_grid/austen/keep_calm/keep-calm-multi-w-red-grid.webp';
+          }
+          if (lower.includes('keep-calm-multi-w-red')) {
+            return '/custom_logos/drawings/images_grid/austen/keep_calm/keep-calm-multi-w-red-grid.webp';
+          }
+          if (lower.includes('keep-calm-multi')) {
+            return '/custom_logos/drawings/images_grid/austen/keep_calm/keep-calm-multi-red-grid.webp';
+          }
+          return ensureThumbSuffix(`/custom_logos/drawings/images_grid/austen/keep_calm/${baseFile}`, 'grid');
         }
         if (raw.includes('/austen/looking_for_my_darcy/')) {
           return ensureThumbSuffix(`/custom_logos/drawings/images_grid/austen/looking_for_my_darcy/${baseFile}`, 'grid');
@@ -881,26 +1101,28 @@ function MegaColumn({
     }
 
     if (cid === 'the_human_inside') {
-      const map = {
-        'r2-d2': 'r2-d2.webp',
-        c3p0: 'c3-p0.webp',
-        vader: 'vader.webp',
-        afrodita: 'afrodita-a.webp',
-        mazinger: 'mazinger-z.webp',
-        'cylon 78': 'cylon-78.webp',
-        'cylon 03': 'cylon-03.webp',
-        'iron man 68': 'iron-man-68.webp',
-        'iron man 08': 'iron-man-08.webp',
-        cyberman: 'cyberman.webp',
-        'the dalek': 'the-dalek.webp',
-        robocop: 'robocop.webp',
-        terminator: 'terminator.webp',
-        maschinenmensch: 'maschinenmensch.webp',
-        'robby the robot': 'robbie-the-robot.webp',
-        'robbie the robot': 'robby-the-robot.webp',
+      const baseByLabel = {
+        'r2-d2': 'r2-d2',
+        c3p0: 'c3-p0',
+        vader: 'vader',
+        afrodita: 'afrodita-a',
+        mazinger: 'mazinger-z',
+        'cylon 78': 'cylon-78',
+        'cylon 03': 'cylon-03',
+        'iron man 68': 'iron-man-68',
+        'iron man 08': 'iron-man-08',
+        cyberman: 'cyberman',
+        'the dalek': 'the-dalek',
+        robocop: 'robocop',
+        terminator: 'terminator',
+        maschinenmensch: 'maschinenmensch',
+        'robby the robot': 'robby-the-robot',
+        'robbie the robot': 'robby-the-robot',
       };
-      const file = map[key];
-      return file ? ensureThumbSuffix(`/custom_logos/drawings/images_grid/the_human_inside/${file}`, 'grid') : null;
+      const keySpaced = key.replace(/-/g, ' ');
+      const base = baseByLabel[key] || baseByLabel[keySpaced];
+      if (!base) return null;
+      return ensureThumbSuffix(`/custom_logos/drawings/images_grid/the_human_inside/black/${base}-b-grid.webp`, 'grid');
     }
 
     if (cid === 'austen') {
@@ -973,17 +1195,103 @@ function MegaColumn({
     }
 
     if (collectionId === 'austen') {
+      const variant = firstContactVariant;
       const key = normalizeKey(it).toLowerCase();
       const id = resolveAustenQuoteAssetId(key);
-      if (id && AUSTEN_QUOTES_ASSETS[id]?.stripe) return AUSTEN_QUOTES_ASSETS[id].stripe;
+      if (id) {
+        const slug = String(id || '').replace(/_/g, '-');
+        const whiteStem = slug === 'unsociable-and-taciturn' ? 'i-prefer-to-be' : slug;
+        const multiStem = slug === 'unsociable-and-taciturn' ? 'i-prefer-to-be' : slug;
+        const out = variant === 'color'
+          ? `/custom_logos/drawings/images_stripe/austen/quotes/multi/${multiStem}-multi-light-stripe.webp`
+          : variant === 'white'
+            ? `/custom_logos/drawings/images_stripe/austen/quotes/white/${whiteStem}-w-stripe.webp`
+            : `/custom_logos/drawings/images_stripe/austen/quotes/black/${slug}-b-stripe.webp`;
+        return ensureThumbSuffix(out, 'stripe');
+      }
       if (raw.includes('/austen/quotes/')) {
-        return resolveAustenQuoteThumbFromPath(raw, 'stripe') || null;
+        try {
+          const file = (raw.split('/').pop() || '').replace(/\?.*$/, '');
+          const slug = file
+            .toLowerCase()
+            .replace(/-(b|w)-stripe(?=\.webp$)/i, '')
+            .replace(/-b-grid(?=\.webp$)/i, '')
+            .replace(/-grid(?=\.webp$)/i, '')
+            .replace(/\.webp$/i, '');
+          const whiteStem = slug === 'unsociable-and-taciturn' ? 'i-prefer-to-be' : slug;
+          const multiStem = slug === 'unsociable-and-taciturn' ? 'i-prefer-to-be' : slug;
+          const out = variant === 'color'
+            ? `/custom_logos/drawings/images_stripe/austen/quotes/multi/${multiStem}-multi-light-stripe.webp`
+            : variant === 'white'
+              ? `/custom_logos/drawings/images_stripe/austen/quotes/white/${whiteStem}-w-stripe.webp`
+              : `/custom_logos/drawings/images_stripe/austen/quotes/black/${slug}-b-stripe.webp`;
+          return ensureThumbSuffix(out, 'stripe');
+        } catch {
+          return resolveAustenQuoteThumbFromPath(raw, 'stripe') || null;
+        }
       }
 
       if (raw.includes('/austen/keep_calm/')) {
+        try {
+          const file = (raw.split('/').pop() || '').toString().trim().toLowerCase();
+          const isKcb = file.includes('keep-calm-b') || file.includes('keep-calm-black');
+          const isKcr = file.includes('keep-calm-multi-red') || file.includes('keep-calm-multi-w-red');
+
+          // Keep Calm Black (KCB): color must be the multi-light/dark pair (NOT thru-red).
+          if (isKcb) {
+            const out = variant === 'color'
+              ? '/custom_logos/drawings/images_stripe/austen/keep_calm/multi/keep-calm-multi-light-stripe.webp'
+              : variant === 'white'
+                ? '/custom_logos/drawings/images_stripe/austen/keep_calm/white/keep-calm-w-stripe.webp'
+                : '/custom_logos/drawings/images_stripe/austen/keep_calm/black/keep-calm-b-stripe.webp';
+            return ensureThumbSuffix(out, 'stripe');
+          }
+
+          // Keep Calm Red (KCR): white/black are the red-background variants.
+          if (isKcr) {
+            const out = variant === 'color'
+              ? '/custom_logos/drawings/images_stripe/austen/keep_calm/multi/keep-calm-multi-thru-light-stripe.webp'
+              : variant === 'white'
+                ? '/custom_logos/drawings/images_stripe/austen/keep_calm/multi/keep-calm-multi-w-red-stripe.webp'
+                : '/custom_logos/drawings/images_stripe/austen/keep_calm/multi/keep-calm-multi-thru-red-stripe.webp';
+            return ensureThumbSuffix(out, 'stripe');
+          }
+
+          // Default fallback: keep previous behavior.
+          const out = variant === 'color'
+            ? '/custom_logos/drawings/images_stripe/austen/keep_calm/multi/keep-calm-multi-thru-red-stripe.webp'
+            : variant === 'white'
+              ? '/custom_logos/drawings/images_stripe/austen/keep_calm/white/keep-calm-w-stripe.webp'
+              : '/custom_logos/drawings/images_stripe/austen/keep_calm/black/keep-calm-b-stripe.webp';
+          return ensureThumbSuffix(out, 'stripe');
+        } catch {
+          const out = variant === 'color'
+            ? '/custom_logos/drawings/images_stripe/austen/keep_calm/multi/keep-calm-multi-thru-red-stripe.webp'
+            : variant === 'white'
+              ? '/custom_logos/drawings/images_stripe/austen/keep_calm/white/keep-calm-w-stripe.webp'
+              : '/custom_logos/drawings/images_stripe/austen/keep_calm/black/keep-calm-b-stripe.webp';
+          return ensureThumbSuffix(out, 'stripe');
+        }
+      }
+
+      if (raw.includes('/austen/pemberley_house/')) {
+        const out = '/custom_logos/drawings/images_stripe/austen/pemberley_house/white/pemberley-house-w-stripe.webp';
+        return ensureThumbSuffix(out, 'stripe');
+      }
+
+      if (raw.includes('/austen/crosswords/')) {
         const file = raw.split('/').pop() || '';
-        if (file === 'keep-calm-multi-red.webp') return '/custom_logos/drawings/images_stripe/austen/keep_calm/multi/keep-calm-multi-red-stripe.webp';
-        if (file === 'keep-calm-black.webp') return '/custom_logos/drawings/images_stripe/austen/keep_calm/black/keep-calm-b-stripe.webp';
+        const lower = file.toLowerCase();
+        const m = lower.replace(/-grid(?=\.webp$)/i, '').match(/^(persuasion|pride-and-prejudice|sense-and-sensibility)-(\d)(?:-stripe)?\.webp$/);
+        if (m) {
+          const book = m[1];
+          const n = m[2];
+          // Crosswords has NO color variant. Treat `color` as `white`.
+          const out = variant === 'black'
+            ? `/custom_logos/drawings/images_stripe/austen/crosswords/black/${book}-${n}-b-stripe.webp`
+            : `/custom_logos/drawings/images_stripe/austen/crosswords/white/${book}-${n}-w-stripe.webp`;
+          return ensureThumbSuffix(out, 'stripe');
+        }
       }
 
       if (raw.includes('/austen/looking_for_my_darcy/')) {
@@ -997,18 +1305,30 @@ function MegaColumn({
 
       if (raw.includes('/austen/pemberley_house/')) {
         const file = raw.split('/').pop() || '';
-        if (file === 'pemberley-black.webp') return '/custom_logos/drawings/images_stripe/austen/pemberley_house/black/pemberley-black-stripe.webp';
+        const lower = file.toLowerCase();
+        if (lower === 'pemberley-house-b-grid.webp' || lower === 'pemberley-house-b.webp' || lower === 'pemberley-house-b-stripe.webp') {
+          return '/custom_logos/drawings/images_stripe/austen/pemberley_house/white/pemberley-house-w-stripe.webp';
+        }
+        if (lower === 'pemberley-house-w-grid.webp' || lower === 'pemberley-house-w.webp' || lower === 'pemberley-house-w-stripe.webp') {
+          return '/custom_logos/drawings/images_stripe/austen/pemberley_house/white/pemberley-house-w-stripe.webp';
+        }
       }
 
       if (raw.includes('/austen/crosswords/')) {
         const file = raw.split('/').pop() || '';
         const lower = file.toLowerCase();
-        const persuasion = lower.match(/^persuasion-(\d)\.webp$/);
-        if (persuasion) return `/custom_logos/drawings/images_stripe/austen/crosswords/persuasion/persuasion-${persuasion[1]}-stripe.webp`;
-        const pride = lower.match(/^pride-and-prejudice-(\d)\.webp$/);
-        if (pride) return `/custom_logos/drawings/images_stripe/austen/crosswords/pride_and_prejudice/pride-and-prejudice-${pride[1]}-stripe.webp`;
-        const sense = lower.match(/^sense-and-sensibility-(\d)\.webp$/);
-        if (sense) return `/custom_logos/drawings/images_stripe/austen/crosswords/sense_and_sensibility/sense-and-sensibility-${sense[1]}-stripe.webp`;
+        const persuasion = lower.match(/^persuasion-(\d)(?:-grid)?\.webp$/);
+        if (persuasion) return variant === 'black'
+          ? `/custom_logos/drawings/images_stripe/austen/crosswords/black/persuasion-${persuasion[1]}-b-stripe.webp`
+          : `/custom_logos/drawings/images_stripe/austen/crosswords/white/persuasion-${persuasion[1]}-w-stripe.webp`;
+        const pride = lower.match(/^pride-and-prejudice-(\d)(?:-grid)?\.webp$/);
+        if (pride) return variant === 'black'
+          ? `/custom_logos/drawings/images_stripe/austen/crosswords/black/pride-and-prejudice-${pride[1]}-b-stripe.webp`
+          : `/custom_logos/drawings/images_stripe/austen/crosswords/white/pride-and-prejudice-${pride[1]}-w-stripe.webp`;
+        const sense = lower.match(/^sense-and-sensibility-(\d)(?:-grid)?\.webp$/);
+        if (sense) return variant === 'black'
+          ? `/custom_logos/drawings/images_stripe/austen/crosswords/black/sense-and-sensibility-${sense[1]}-b-stripe.webp`
+          : `/custom_logos/drawings/images_stripe/austen/crosswords/white/sense-and-sensibility-${sense[1]}-w-stripe.webp`;
       }
 
       return null;
@@ -1039,6 +1359,7 @@ function MegaColumn({
 
     if (collectionId === 'the_human_inside') {
       const key = normalizeKey(it).toLowerCase();
+      const keySpaced = key.replace(/-/g, ' ');
       const labelMap = {
         'r2-d2': 'r2-d2.webp',
         c3p0: 'c3-p0.webp',
@@ -1058,7 +1379,7 @@ function MegaColumn({
         'robbie the robot': 'robby-the-robot.webp',
       };
 
-      const file = labelMap[key] || (raw.split('/').pop() || '');
+      const file = labelMap[key] || labelMap[keySpaced] || (raw.split('/').pop() || '');
       return ensureThumbSuffix(`/custom_logos/drawings/images_stripe/the_human_inside/black/${file}`, 'stripe');
     }
 
@@ -1148,7 +1469,21 @@ function MegaColumn({
               ) : (
                 <Link
                   to="#"
-                  className="relative z-40 flex h-[20px] w-full items-center justify-center whitespace-nowrap rounded-none bg-muted px-2 font-roboto-condensed text-[11.2px] leading-[20px] uppercase text-foreground hover:text-foreground"
+                  className={`relative z-[60] flex h-[20px] w-full items-center justify-center whitespace-nowrap rounded-none px-2 font-roboto-condensed leading-[20px] uppercase text-foreground hover:text-foreground ${
+                    megaTileSelectorParams?.enabled
+                    && typeof it === 'string'
+                    && String(it || '').trim().toLowerCase() === String(megaTileSelectorParams?.target || '').trim().toLowerCase()
+                      ? 'text-[12.8px] font-normal tracking-[0.1em] bg-transparent'
+                      : 'text-[11.2px] font-normal bg-muted'
+                  }`}
+                  style={{
+                    color:
+                      megaTileSelectorParams?.enabled
+                      && typeof it === 'string'
+                      && String(it || '').trim().toLowerCase() === String(megaTileSelectorParams?.target || '').trim().toLowerCase()
+                        ? String(megaTileSelectorParams?.color || '').trim() || undefined
+                        : undefined,
+                  }}
                   data-mega-label="1"
                   data-mega-collection={collectionId}
                   data-mega-item={typeof it === 'string' ? it : ''}
@@ -1165,9 +1500,32 @@ function MegaColumn({
               {!it ? null : it === CONTROL_TILE_BN ? (
                 <div className="relative z-40">
                   {isFirstContact ? (
-                    <FirstContactDibuix00Buttons onWhite={onFirstContactWhite} onBlack={onFirstContactBlack} onMulti={onFirstContactMulti} />
+                    <FirstContactDibuix00Buttons
+                      onWhite={onFirstContactWhite}
+                      onBlack={onFirstContactBlack}
+                      onMulti={onFirstContactMulti}
+                      showWhite={stripeVariantVisibility?.white !== false}
+                      showBlack={stripeVariantVisibility?.black !== false}
+                      showMulti={stripeVariantVisibility?.color !== false}
+                    />
                   ) : isHumanInside ? (
-                    <FirstContactDibuix00Buttons onWhite={onHumanWhite} onBlack={onHumanBlack} onMulti={onHumanMulti} />
+                    <FirstContactDibuix00Buttons
+                      onWhite={onHumanWhite}
+                      onBlack={onHumanBlack}
+                      onMulti={onHumanMulti}
+                      showWhite={stripeVariantVisibility?.white !== false}
+                      showBlack={stripeVariantVisibility?.black !== false}
+                      showMulti={stripeVariantVisibility?.color !== false}
+                    />
+                  ) : collectionId === 'austen' ? (
+                    <FirstContactDibuix00Buttons
+                      onWhite={onFirstContactWhite}
+                      onBlack={onFirstContactBlack}
+                      onMulti={onFirstContactMulti}
+                      showWhite={stripeVariantVisibility?.white !== false}
+                      showBlack={stripeVariantVisibility?.black !== false}
+                      showMulti={stripeVariantVisibility?.color !== false}
+                    />
                   ) : null}
                 </div>
               ) : it === CONTROL_TILE_ARROWS ? (
@@ -1178,12 +1536,22 @@ function MegaColumn({
                   <FirstContactDibuix09Buttons
                     tileSize={tileSize}
                     onPrev={() => {
-                      if (thinSlideEnabled) return;
+                      touchMegaPublicActivity();
+                      if (thinSlideEnabled) {
+                        setPageStart((v) => v - 1);
+                        if (onHumanPrev) return onHumanPrev();
+                        return;
+                      }
                       if (pagingEnabled) return setPageStart((v) => v - 1);
                       if (isHumanInside && !humanInsideEnabled && onHumanPrev) return onHumanPrev();
                     }}
                     onNext={() => {
-                      if (thinSlideEnabled) return;
+                      touchMegaPublicActivity();
+                      if (thinSlideEnabled) {
+                        setPageStart((v) => v + 1);
+                        if (onHumanNext) return onHumanNext();
+                        return;
+                      }
                       if (pagingEnabled) return setPageStart((v) => v + 1);
                       if (isHumanInside && !humanInsideEnabled && onHumanNext) return onHumanNext();
                     }}
@@ -1212,6 +1580,20 @@ function MegaColumn({
                     }
                     setSelectedItem(it);
                     onSelectItem(it);
+
+                    try {
+                      if (!row) return;
+                      if (!megaTileSelectorParams?.enabled) return;
+                      if (idx < 1 || idx > 7) return;
+                      if (typeof window === 'undefined') return;
+                      if (typeof it !== 'string') return;
+                      const keyset = String(megaTileSelectorParams?.keyset || 'v1');
+                      setMegaPublicSelectorFor(collectionId, keyset, { target: String(it), stepX: 0, stepY: 0 });
+                      touchMegaPublicActivity();
+                      window.dispatchEvent(new Event('mega-tile-selector-changed'));
+                    } catch {
+                      // ignore
+                    }
                   }}
                   tabIndex={typeof onSelectItem === 'function' ? 0 : -1}
                   onKeyDown={(e) => {
@@ -1220,15 +1602,50 @@ function MegaColumn({
                     e.preventDefault();
                     setSelectedItem(it);
                     onSelectItem(it);
+
+                    try {
+                      if (!row) return;
+                      if (!megaTileSelectorParams?.enabled) return;
+                      if (idx < 1 || idx > 7) return;
+                      if (typeof window === 'undefined') return;
+                      if (typeof it !== 'string') return;
+                      const keyset = String(megaTileSelectorParams?.keyset || 'v1');
+                      setMegaPublicSelectorFor(collectionId, keyset, { target: String(it), stepX: 0, stepY: 0 });
+                      touchMegaPublicActivity();
+                      window.dispatchEvent(new Event('mega-tile-selector-changed'));
+                    } catch {
+                      // ignore
+                    }
                   }}
                 >
-                  <div className="absolute inset-0 overflow-hidden rounded-md bg-transparent">
+                  <div
+                    className={`absolute inset-0 z-20 overflow-hidden rounded-md ${
+                      collectionId === 'austen'
+                      && typeof it === 'string'
+                      && it.toLowerCase().includes('/austen/keep_calm/')
+                      && (
+                        it.toLowerCase().endsWith('keep-calm-black.webp')
+                        || it.toLowerCase().endsWith('keep-calm-b.webp')
+                        || it.toLowerCase().endsWith('keep-calm-b-grid.webp')
+                      )
+                        ? 'bg-white'
+                        : collectionId === 'austen'
+                          && typeof it === 'string'
+                          && it.toLowerCase().includes('/austen/pemberley_house/')
+                          ? 'bg-white p-1 ring-2 ring-yellow-400 ring-inset'
+                        : collectionId === 'austen'
+                          && typeof it === 'string'
+                          && it.toLowerCase().includes('/austen/crosswords/')
+                          ? 'bg-transparent ring-2 ring-white/50 ring-inset'
+                        : 'bg-transparent'
+                    }`}
+                  >
                     {(() => {
                       const thumbSrc = resolveGridThumbSrc(it, collectionId);
                       const useContain =
                         collectionId === 'austen'
                         && typeof it === 'string'
-                        && it.includes('/austen/quotes/');
+                        && (it.includes('/austen/quotes/') || it.includes('/austen/crosswords/'));
                       return thumbSrc ? (
                         <OptimizedImg
                           src={thumbSrc}
@@ -1240,6 +1657,82 @@ function MegaColumn({
                       );
                     })()}
                   </div>
+
+                  {megaTileSelectorParams?.enabled
+                    && typeof it === 'string'
+                    && String(it || '').trim().toLowerCase() === String(megaTileSelectorParams?.target || '').trim().toLowerCase() ? (
+                    String(megaTileSelectorParams?.keyset || 'v1') === 'v2' ? (
+                      <>
+                        <div
+                          className="absolute left-1/2 top-1/2 z-10 bg-muted"
+                          style={{
+                            transform: `translate(calc(-50% + ${selectorTranslateXForRender}px), calc(-50% + ${selectorTranslateYForRender}px))`,
+                            width: `${selectorWidthPx}px`,
+                            height: `${selectorHeightPx}px`,
+                            borderStyle: 'none',
+                            borderWidth: '0px',
+                            borderColor: 'transparent',
+                            background: 'color-mix(in srgb, color-mix(in srgb, hsl(var(--muted)) 97%, rgb(59 130 246) 3%) 90%, white 10%)',
+                            borderRadius: `${selectorRadiusPx}px`,
+                            boxSizing: 'border-box',
+                            pointerEvents: 'none',
+                          }}
+                          aria-hidden="true"
+                        />
+                        <div
+                          className="absolute left-1/2 top-1/2 z-40"
+                          style={{
+                            transform: `translate(calc(-50% + ${selectorTranslateXForRender}px), calc(-50% + ${selectorTranslateYForRender}px))`,
+                            width: `${selectorWidthPx}px`,
+                            height: `${selectorHeightPx}px`,
+                            borderStyle: 'none',
+                            borderWidth: '0px',
+                            borderColor: 'transparent',
+                            background: 'transparent',
+                            borderRadius: `${selectorRadiusPx}px`,
+                            boxSizing: 'border-box',
+                            cursor: 'grab',
+                            pointerEvents: 'auto',
+                          }}
+                          aria-hidden="true"
+                          data-circle-selector="1"
+                          onPointerDown={(e) => {
+                            if (typeof onStartSelectorDrag !== 'function') return;
+                            e.preventDefault();
+                            e.stopPropagation();
+                            if (!selectorDragBounds) return;
+                            onStartSelectorDrag(e, { ...megaTileSelectorParams, collectionId }, selectorDragBounds);
+                          }}
+                        />
+                      </>
+                    ) : (
+                      <div
+                        className="absolute left-1/2 top-1/2 z-40"
+                        style={{
+                          transform: `translate(calc(-50% + ${selectorTranslateXForRender}px), calc(-50% + ${selectorTranslateYForRender}px))`,
+                          width: `${selectorWidthPx}px`,
+                          height: `${selectorHeightPx}px`,
+                          borderStyle: 'solid',
+                          borderWidth: `${selectorStrokePx}px`,
+                          borderColor: String(megaTileSelectorParams?.color || 'black'),
+                          background: 'transparent',
+                          borderRadius: `${selectorRadiusPx}px`,
+                          boxSizing: 'border-box',
+                          cursor: 'grab',
+                          pointerEvents: 'auto',
+                        }}
+                        aria-hidden="true"
+                        data-circle-selector="1"
+                        onPointerDown={(e) => {
+                          if (typeof onStartSelectorDrag !== 'function') return;
+                          e.preventDefault();
+                          e.stopPropagation();
+                          if (!selectorDragBounds) return;
+                          onStartSelectorDrag(e, { ...megaTileSelectorParams, collectionId }, selectorDragBounds);
+                        }}
+                      />
+                    )
+                  ) : null}
                 </button>
               )}
             </div>
@@ -1389,6 +1882,55 @@ export default function FullWideSlideDemoHeader({
     }
   });
 
+  const activeRef = useRef(active);
+  useEffect(() => {
+    activeRef.current = active;
+  }, [active]);
+
+  useEffect(() => {
+    try {
+      if (typeof window === 'undefined') return;
+      if (!active) return;
+      window.dispatchEvent(new Event('mega-tile-selector-changed'));
+    } catch {
+      // ignore
+    }
+  }, [active]);
+
+  useEffect(() => {
+    try {
+      if (typeof window === 'undefined') return undefined;
+
+      let t = null;
+      const schedule = () => {
+        if (t) window.clearTimeout(t);
+        const last = readMegaPublicLastActivityAt();
+        if (!last) return;
+        const now = Date.now();
+        const elapsed = now - last;
+        if (elapsed >= MEGA_PUBLIC_IDLE_MS) {
+          resetMegaPublicState();
+          return;
+        }
+        const wait = Math.max(250, MEGA_PUBLIC_IDLE_MS - elapsed);
+        t = window.setTimeout(() => {
+          schedule();
+        }, wait);
+      };
+
+      const onActivity = () => schedule();
+      window.addEventListener('hg-mega-public-activity', onActivity);
+
+      schedule();
+      return () => {
+        window.removeEventListener('hg-mega-public-activity', onActivity);
+        if (t) window.clearTimeout(t);
+      };
+    } catch {
+      return undefined;
+    }
+  }, []);
+
   useEffect(() => {
     try {
       if (typeof window === 'undefined') return;
@@ -1396,7 +1938,10 @@ export default function FullWideSlideDemoHeader({
       const fromUrl = p.get('active') || p.get('collection') || '';
       const next = typeof fromUrl === 'string' ? fromUrl.trim() : '';
       const allowed = new Set(['first_contact', 'the_human_inside', 'austen', 'cube', 'outcasted']);
-      if (next && allowed.has(next)) setActive(next);
+      if (next && allowed.has(next)) {
+        setActive(next);
+        touchMegaPublicActivity();
+      }
     } catch {
       // ignore
     }
@@ -1468,6 +2013,73 @@ export default function FullWideSlideDemoHeader({
     }
   }, [location.search]);
 
+  const austenSelectedIsCrosswords = useMemo(() => {
+    try {
+      const key = selectedItemByCollection?.austen;
+      if (typeof key !== 'string') return false;
+      return key.toLowerCase().includes('/austen/crosswords/');
+    } catch {
+      return false;
+    }
+  }, [selectedItemByCollection]);
+
+  const austenSelectedIsPemberley = useMemo(() => {
+    try {
+      const key = selectedItemByCollection?.austen;
+      if (typeof key !== 'string') return false;
+      return key.toLowerCase().includes('/austen/pemberley_house/');
+    } catch {
+      return false;
+    }
+  }, [selectedItemByCollection]);
+
+  const austenSelectedDisableMulti = Boolean(austenSelectedIsCrosswords || austenSelectedIsPemberley);
+
+  const stripeVariantVisibility = useMemo(() => {
+    try {
+      if (!active) return { white: true, black: true, color: true };
+      if (active === 'first_contact') return { white: true, black: true, color: true };
+      if (active === 'the_human_inside') return { white: true, black: true, color: true };
+      if (active === 'outcasted') return { white: true, black: true, color: true };
+      if (active === 'cube') return { white: false, black: false, color: true };
+
+      if (active === 'austen') {
+        const key = selectedItemByCollection?.austen;
+        const s = typeof key === 'string' ? key.toLowerCase() : '';
+        if (s.includes('/austen/crosswords/')) return { white: true, black: true, color: false };
+        if (s.includes('/austen/pemberley_house/')) return { white: true, black: true, color: false };
+        if (s.includes('/austen/looking_for_my_darcy/')) return { white: false, black: false, color: true };
+        return { white: true, black: true, color: true };
+      }
+
+      return { white: true, black: true, color: true };
+    } catch {
+      return { white: true, black: true, color: true };
+    }
+  }, [active, selectedItemByCollection]);
+
+  useEffect(() => {
+    if (active !== 'austen') return;
+    if (!austenSelectedDisableMulti) return;
+    if (firstContactVariant !== 'color') return;
+    setFirstContactVariant('white');
+  }, [active, austenSelectedDisableMulti, firstContactVariant]);
+
+  useEffect(() => {
+    try {
+      if (!active) return;
+      if (active === 'the_human_inside') return;
+      const allowed = stripeVariantVisibility || { white: true, black: true, color: true };
+      const want = firstContactVariant;
+      const ok = (want === 'white' && allowed.white) || (want === 'black' && allowed.black) || (want === 'color' && allowed.color);
+      if (ok) return;
+      if (allowed.white) setFirstContactVariant('white');
+      else if (allowed.black) setFirstContactVariant('black');
+      else if (allowed.color) setFirstContactVariant('color');
+    } catch {
+    }
+  }, [active, stripeVariantVisibility, firstContactVariant]);
+
   useEffect(() => {
     if (!import.meta.env.DEV) return;
     try {
@@ -1505,23 +2117,30 @@ export default function FullWideSlideDemoHeader({
         return null;
       };
 
-      let touched = false;
-      const out = items
-        .map((it, idx) => {
-          const r = pickRank(it);
-          if (r !== null) touched = true;
-          return { it, idx, r };
-        })
+      const quoteSlots = [];
+      for (let i = 0; i < items.length; i += 1) {
+        const it = items[i];
+        const r = pickRank(it);
+        if (r === null) continue;
+        quoteSlots.push({ idx: i, it, r });
+      }
+
+      if (quoteSlots.length === 0) return items;
+
+      const sortedQuotes = quoteSlots
+        .slice()
         .sort((a, b) => {
-          if (a.r === null && b.r === null) return a.idx - b.idx;
-          if (a.r === null) return 1;
-          if (b.r === null) return -1;
           if (a.r !== b.r) return a.r - b.r;
           return a.idx - b.idx;
         })
         .map((e) => e.it);
 
-      return touched ? out : items;
+      const out = items.slice();
+      quoteSlots.forEach((slot, i) => {
+        out[slot.idx] = sortedQuotes[i];
+      });
+
+      return out;
     } catch {
       return items;
     }
@@ -1537,6 +2156,8 @@ export default function FullWideSlideDemoHeader({
 
   const [megaStripeRefEnabledLocal, setMegaStripeRefEnabledLocal] = useState(false);
   const [megaStripeRefSrcLocal, setMegaStripeRefSrcLocal] = useState('');
+  const [megaStripeRef2EnabledLocal, setMegaStripeRef2EnabledLocal] = useState(false);
+  const [megaStripeRef2SrcLocal, setMegaStripeRef2SrcLocal] = useState('');
 
   useEffect(() => {
     const readRef = () => {
@@ -1554,21 +2175,286 @@ export default function FullWideSlideDemoHeader({
     return () => window.removeEventListener('mega-stripe-ref-changed', readRef);
   }, []);
 
-  const [megaStripeOverlayModeLocal, setMegaStripeOverlayModeLocal] = useState('black');
+  const tileSelectorDragRef = useRef({
+    active: false,
+    collectionId: '',
+    startX: 0,
+    startY: 0,
+    startStepX: 0,
+    startStepY: 0,
+  });
+
+  const onStartSelectorDrag = useCallback((e, selectorParams, bounds) => {
+    try {
+      if (!e) return;
+      if (!bounds) return;
+      const minStepX = Number.isFinite(Number(bounds?.minStepX)) ? Number(bounds.minStepX) : -99;
+      const maxStepX = Number.isFinite(Number(bounds?.maxStepX)) ? Number(bounds.maxStepX) : 99;
+      const lockStepY = Boolean(bounds?.lockStepY);
+      tileSelectorDragRef.current.active = true;
+      tileSelectorDragRef.current.collectionId = String(selectorParams?.collectionId || '');
+      tileSelectorDragRef.current.keyset = String(selectorParams?.keyset || 'v1');
+      tileSelectorDragRef.current.bounds = { minStepX, maxStepX, lockStepY };
+      tileSelectorDragRef.current.startX = e.clientX;
+      tileSelectorDragRef.current.startY = e.clientY;
+      const rawStepX = Number.isFinite(Number(selectorParams?.stepX)) ? Number(selectorParams?.stepX) : 0;
+      const rawStepY = Number.isFinite(Number(selectorParams?.stepY)) ? Number(selectorParams?.stepY) : 0;
+      tileSelectorDragRef.current.startStepX = Math.min(maxStepX, Math.max(minStepX, rawStepX));
+      tileSelectorDragRef.current.startStepY = lockStepY ? 0 : rawStepY;
+      e.currentTarget?.setPointerCapture?.(e.pointerId);
+    } catch {
+      // ignore
+    }
+  }, []);
+
   useEffect(() => {
-    const readOverlayMode = () => {
+    if (typeof window === 'undefined') return;
+
+    const getPitchPx = () => {
       try {
-        const raw = window.localStorage.getItem('MEGA_STRIPE_OVERLAY_MODE');
-        const v = String(raw || 'black');
-        const allowed = new Set(['black', 'off']);
-        setMegaStripeOverlayModeLocal(allowed.has(v) ? v : 'black');
+        const gapPx = 12;
+        const el = document.querySelector('[data-mega-tile="1"]');
+        const w = el?.getBoundingClientRect?.().width;
+        const baseTilePx = Number.isFinite(Number(w)) && Number(w) > 0 ? Number(w) : 120;
+        return baseTilePx + gapPx;
       } catch {
-        setMegaStripeOverlayModeLocal('black');
+        return 132;
       }
     };
-    readOverlayMode();
-    window.addEventListener('mega-stripe-overlay-mode-changed', readOverlayMode);
-    return () => window.removeEventListener('mega-stripe-overlay-mode-changed', readOverlayMode);
+
+    const onMove = (e) => {
+      try {
+        if (!tileSelectorDragRef.current?.active) return;
+        const pitchPx = getPitchPx();
+        if (!pitchPx) return;
+
+        const collectionId = String(tileSelectorDragRef.current?.collectionId || '');
+        const keyset = String(tileSelectorDragRef.current?.keyset || 'v1');
+        if (!collectionId) return;
+
+        const minStepX = Number.isFinite(Number(tileSelectorDragRef.current?.bounds?.minStepX))
+          ? Number(tileSelectorDragRef.current.bounds.minStepX)
+          : -99;
+        const maxStepX = Number.isFinite(Number(tileSelectorDragRef.current?.bounds?.maxStepX))
+          ? Number(tileSelectorDragRef.current.bounds.maxStepX)
+          : 99;
+        const lockStepY = Boolean(tileSelectorDragRef.current?.bounds?.lockStepY);
+
+        const dx = e.clientX - tileSelectorDragRef.current.startX;
+        const dy = e.clientY - tileSelectorDragRef.current.startY;
+        const nextStepX = Math.round(tileSelectorDragRef.current.startStepX + dx / pitchPx);
+        const nextStepY = Math.round(tileSelectorDragRef.current.startStepY + dy / pitchPx);
+        const sx = Math.min(maxStepX, Math.max(minStepX, nextStepX));
+        const sy = lockStepY ? 0 : Math.min(99, Math.max(-99, nextStepY));
+        setMegaPublicSelectorFor(collectionId, keyset, { stepX: sx, stepY: sy });
+        touchMegaPublicActivity();
+        window.dispatchEvent(new Event('mega-tile-selector-changed'));
+      } catch {
+        // ignore
+      }
+    };
+
+    const onUp = () => {
+      try {
+        if (!tileSelectorDragRef.current) return;
+        tileSelectorDragRef.current.active = false;
+      } catch {
+        // ignore
+      }
+    };
+
+    window.addEventListener('pointermove', onMove);
+    window.addEventListener('pointerup', onUp);
+    window.addEventListener('pointercancel', onUp);
+    return () => {
+      window.removeEventListener('pointermove', onMove);
+      window.removeEventListener('pointerup', onUp);
+      window.removeEventListener('pointercancel', onUp);
+    };
+  }, []);
+
+  useEffect(() => {
+    const readRef2 = () => {
+      try {
+        const en = window.localStorage.getItem('MEGA_STRIPE_REF2_ENABLED') === '1';
+        const src = String(window.localStorage.getItem('MEGA_STRIPE_REF2_SRC') || '');
+        setMegaStripeRef2EnabledLocal(en);
+        setMegaStripeRef2SrcLocal(src);
+      } catch {
+        // ignore
+      }
+    };
+    readRef2();
+    window.addEventListener('mega-stripe-ref2-changed', readRef2);
+    return () => window.removeEventListener('mega-stripe-ref2-changed', readRef2);
+  }, []);
+
+  const [megaStripeSpriteEnabledLocal, setMegaStripeSpriteEnabledLocal] = useState(true);
+  useEffect(() => {
+    const readSpriteEnabled = () => {
+      try {
+        const raw = window.localStorage.getItem('MEGA_STRIPE_SPRITE_ENABLED');
+        if (raw == null) {
+          setMegaStripeSpriteEnabledLocal(true);
+          return;
+        }
+        const v = String(raw).trim().toLowerCase();
+        setMegaStripeSpriteEnabledLocal(v === '' || v === '1' || v === 'true' || v === 'on' || v === 'yes');
+      } catch {
+        setMegaStripeSpriteEnabledLocal(true);
+      }
+    };
+    readSpriteEnabled();
+    window.addEventListener('mega-stripe-sprite-enabled-changed', readSpriteEnabled);
+    return () => window.removeEventListener('mega-stripe-sprite-enabled-changed', readSpriteEnabled);
+  }, []);
+
+  const normalizeOverlaySrc = useCallback((value) => {
+    let s = (value || '').toString().trim();
+    if (!s) return null;
+    if ((s.startsWith('"') && s.endsWith('"')) || (s.startsWith("'") && s.endsWith("'")) || (s.startsWith('`') && s.endsWith('`'))) {
+      s = s.slice(1, -1).trim();
+    }
+    if (!s) return null;
+    if (/^(https?:)?\/\//i.test(s) || /^data:/i.test(s) || /^blob:/i.test(s)) return s;
+
+    try {
+      // Normalize pasted filesystem paths like:
+      //   /.../higginsgrafic-ecommerce-dev/public/custom_logos/...
+      // into:
+      //   /custom_logos/...
+      const idx = s.lastIndexOf('/public/custom_logos/');
+      if (idx >= 0) {
+        const suffix = s.slice(idx + '/public'.length);
+        if (suffix.startsWith('/custom_logos/')) return suffix;
+      }
+      const idx2 = s.lastIndexOf('/custom_logos/');
+      if (idx2 > 0 && !s.startsWith('/custom_logos/')) {
+        const suffix = s.slice(idx2);
+        if (suffix.startsWith('/custom_logos/')) return suffix;
+      }
+    } catch {
+      // ignore
+    }
+
+    try {
+      // Allow entering just the filename for Keep Calm stripe overlays.
+      const file = (s.split('/').pop() || '').trim();
+      const lower = file.toLowerCase();
+      const isBare = (file === s && !s.startsWith('/')) || (s === `/${file}`);
+      const hasNoFolders = (s === file) || (s === `/${file}`);
+      if (isBare && hasNoFolders && /^keep-calm-.*-stripe\.webp$/i.test(file)) {
+        const folder = lower.includes('-b-stripe')
+          ? 'black'
+          : lower.includes('-w-stripe')
+            ? 'white'
+            : (lower.includes('multi') || lower.includes('-multi-'))
+              ? 'multi'
+              : 'multi';
+        return `/custom_logos/drawings/images_stripe/austen/keep_calm/${folder}/${file}`;
+      }
+    } catch {
+      // ignore
+    }
+
+    const rooted = s.startsWith('/') ? s : `/${s}`;
+    return rooted.replace(
+      '/custom_logos/drawings/images_stripe/stripe/',
+      '/custom_logos/drawings/images_stripe/',
+    );
+  }, []);
+
+  const [megaShirtDrawingEnabledLocal, setMegaShirtDrawingEnabledLocal] = useState(() => {
+    try {
+      const parseBool = (raw, fallback = true) => {
+        if (raw == null) return fallback;
+        const v = String(raw).trim().toLowerCase();
+        if (v === '') return fallback;
+        return v === '1' || v === 'true' || v === 'on' || v === 'yes';
+      };
+      const rawNew = window.localStorage.getItem('HG_SHIRT_DRAWING_ENABLED');
+      if (rawNew != null) return parseBool(rawNew, true);
+      const rawOld = window.localStorage.getItem('HG_SHIRT_DRAWING_OVERLAY_ENABLED');
+      if (rawOld != null) return parseBool(rawOld, true);
+      return true;
+    } catch {
+      return true;
+    }
+  });
+
+  const [drawingOverlaySrcLocal, setDrawingOverlaySrcLocal] = useState(() => {
+    try {
+      const raw = String(window.localStorage.getItem('HG_DRAWING_OVERLAY_SRC') || '').trim();
+      if (!raw) return null;
+      const normalized = normalizeOverlaySrc(raw) || raw;
+      const lower = normalized.toLowerCase();
+      const isUrl = /^(https?:)?\/\//i.test(normalized) || /^data:/i.test(normalized) || /^blob:/i.test(normalized);
+      const isStripeSrc = lower.includes('/custom_logos/drawings/images_stripe/') || lower.includes('/custom_logos/drawings/images_originals/stripe/');
+      return (isUrl || isStripeSrc) ? normalized : null;
+    } catch {
+      return null;
+    }
+  });
+
+  const drawingOverlaySrcEffective = useMemo(() => {
+    try {
+      if (drawingOverlaySrcLocal) return drawingOverlaySrcLocal;
+      if (!import.meta.env.DEV) return null;
+      return '/custom_logos/drawings/images_stripe/first_contact/black/nx-01-b-stripe.webp';
+    } catch {
+      return drawingOverlaySrcLocal;
+    }
+  }, [drawingOverlaySrcLocal]);
+
+  useEffect(() => {
+    const sync = () => {
+      try {
+        const raw = String(window.localStorage.getItem('HG_DRAWING_OVERLAY_SRC') || '').trim();
+        if (!raw) {
+          setDrawingOverlaySrcLocal(null);
+          return;
+        }
+        const normalized = normalizeOverlaySrc(raw) || raw;
+        const lower = normalized.toLowerCase();
+        const isUrl = /^(https?:)?\/\//i.test(normalized) || /^data:/i.test(normalized) || /^blob:/i.test(normalized);
+        const isStripeSrc = lower.includes('/custom_logos/drawings/images_stripe/') || lower.includes('/custom_logos/drawings/images_originals/stripe/');
+        setDrawingOverlaySrcLocal((isUrl || isStripeSrc) ? normalized : null);
+      } catch {
+        setDrawingOverlaySrcLocal(null);
+      }
+    };
+    sync();
+    window.addEventListener('hg-drawing-overlay-changed', sync);
+    return () => window.removeEventListener('hg-drawing-overlay-changed', sync);
+  }, [normalizeOverlaySrc]);
+
+  useEffect(() => {
+    const sync = () => {
+      try {
+        const rawNew = window.localStorage.getItem('HG_SHIRT_DRAWING_ENABLED');
+        if (rawNew != null) {
+          const v = String(rawNew).trim().toLowerCase();
+          setMegaShirtDrawingEnabledLocal(v === '' || v === '1' || v === 'true' || v === 'on' || v === 'yes');
+          return;
+        }
+        const rawOld = window.localStorage.getItem('HG_SHIRT_DRAWING_OVERLAY_ENABLED');
+        if (rawOld != null) {
+          const v = String(rawOld).trim().toLowerCase();
+          setMegaShirtDrawingEnabledLocal(v === '' || v === '1' || v === 'true' || v === 'on' || v === 'yes');
+          return;
+        }
+        setMegaShirtDrawingEnabledLocal(true);
+      } catch {
+        setMegaShirtDrawingEnabledLocal(true);
+      }
+    };
+    sync();
+    window.addEventListener('hg-shirt-drawing-enabled-changed', sync);
+    window.addEventListener('hg-shirt-drawing-overlay-enabled-changed', sync);
+    return () => {
+      window.removeEventListener('hg-shirt-drawing-enabled-changed', sync);
+      window.removeEventListener('hg-shirt-drawing-overlay-enabled-changed', sync);
+    };
   }, []);
 
   const resolvedOverlaySrc = useMemo(() => {
@@ -1725,7 +2611,7 @@ export default function FullWideSlideDemoHeader({
         const k = normalizeKeyLocal(key).toLowerCase();
         const out = (() => {
           if (firstContactVariant === 'color') {
-            if (k === 'dj vader' || k === 'dj-vader') return '/custom_logos/drawings/images_stripe/miscel·lania/multi/dj-vader-multi-1-stripe.webp';
+            if (k === 'dj vader' || k === 'dj-vader') return '/custom_logos/drawings/images_stripe/miscel·lania/multi/dj-vader-multi-light-stripe.webp';
             if (k === 'deathstar2d2' || k === 'death star2d2' || k === 'death-star2d2') return '/custom_logos/drawings/images_stripe/miscel·lania/multi/death-star2d2-multi-light-stripe.webp';
             if (k === 'pont del diable' || k === 'pont-del-diable') return '/custom_logos/drawings/images_stripe/miscel·lania/multi/pont-del-diable-multi-light-stripe.webp';
           }
@@ -1750,13 +2636,27 @@ export default function FullWideSlideDemoHeader({
 
       // Path-based collections (e.g. outcasted black/xxx.webp) can be resolved directly.
       if (isPathItem(key)) {
+        const variant = firstContactVariant;
         if (
           active === 'austen'
           && typeof key === 'string'
           && key.startsWith('/custom_logos/drawings/images_grid/austen/quotes/')
         ) {
-          const mapped = resolveAustenQuoteThumbFromPath(key, 'stripe');
-          if (mapped) return mapped;
+          const file = (key.split('/').pop() || '').replace(/\?.*$/, '');
+          const slug = file
+            .toLowerCase()
+            .replace(/-(b|w)-stripe(?=\.webp$)/i, '')
+            .replace(/-b-grid(?=\.webp$)/i, '')
+            .replace(/-grid(?=\.webp$)/i, '')
+            .replace(/\.webp$/i, '');
+          const whiteStem = slug === 'unsociable-and-taciturn' ? 'i-prefer-to-be' : slug;
+          const multiStem = slug === 'unsociable-and-taciturn' ? 'i-prefer-to-be' : slug;
+          const resolved = variant === 'color'
+            ? `/custom_logos/drawings/images_stripe/austen/quotes/multi/${multiStem}-multi-light-stripe.webp`
+            : variant === 'white'
+              ? `/custom_logos/drawings/images_stripe/austen/quotes/white/${whiteStem}-w-stripe.webp`
+              : `/custom_logos/drawings/images_stripe/austen/quotes/black/${slug}-b-stripe.webp`;
+          if (resolved) return resolved;
 
           // Fallback for the common `...-b-grid.webp` filenames.
           // Convert GRID quotes to the canonical STRIPE+BLACK folder.
@@ -1764,14 +2664,29 @@ export default function FullWideSlideDemoHeader({
           const outBase = base
             .replace('/custom_logos/drawings/images_grid/austen/quotes/', '/custom_logos/drawings/images_stripe/austen/quotes/black/')
             .replace(/-grid(?=\.(webp|png|jpe?g)$)/i, '');
-          const out = (() => {
+          const fallbackResolved = (() => {
             const m = outBase.match(/^(.*)\.(webp|png|jpe?g)$/i);
             if (!m) return outBase;
             const prefix = m[1].replace(/-(grid|stripe)$/i, '');
             const ext = m[2];
             return prefix.toLowerCase().endsWith('-stripe') ? `${prefix}.${ext}` : `${prefix}-stripe.${ext}`;
           })();
-          return q ? `${out}?${q}` : out;
+          return q ? `${fallbackResolved}?${q}` : fallbackResolved;
+        }
+        if (active === 'austen' && typeof key === 'string' && key.startsWith('/custom_logos/drawings/images_grid/austen/crosswords/')) {
+          const file = (key.split('/').pop() || '').replace(/\?.*$/, '');
+          const lower = file.toLowerCase();
+          const m = lower.replace(/-grid(?=\.webp$)/i, '').match(/^(persuasion|pride-and-prejudice|sense-and-sensibility)-(\d)\.webp$/);
+          if (m) {
+            const book = m[1];
+            const n = m[2];
+            // Crosswords has NO color variant. Treat `color` as `white`.
+            if (variant === 'black') return `/custom_logos/drawings/images_stripe/austen/crosswords/black/${book}-${n}-b-stripe.webp`;
+            return `/custom_logos/drawings/images_stripe/austen/crosswords/white/${book}-${n}-w-stripe.webp`;
+          }
+        }
+        if (active === 'austen' && typeof key === 'string' && key.startsWith('/custom_logos/drawings/images_grid/austen/pemberley_house/')) {
+          return '/custom_logos/drawings/images_stripe/austen/pemberley_house/white/pemberley-house-w-stripe.webp';
         }
         if (active === 'cube' && typeof key === 'string' && key.startsWith('/custom_logos/drawings/images_grid/cube/')) {
           const file = key.split('/').pop() || '';
@@ -1795,7 +2710,7 @@ export default function FullWideSlideDemoHeader({
           const file = key.split('/').pop() || '';
           const lower = file.toLowerCase();
           if (firstContactVariant === 'color') {
-            if (lower.includes('dj-vader')) return '/custom_logos/drawings/images_stripe/miscel·lania/multi/dj-vader-multi-1-stripe.webp';
+            if (lower.includes('dj-vader')) return '/custom_logos/drawings/images_stripe/miscel·lania/multi/dj-vader-multi-light-stripe.webp';
             if (lower.includes('death-star2d2')) return '/custom_logos/drawings/images_stripe/miscel·lania/multi/death-star2d2-multi-light-stripe.webp';
             if (lower.includes('pont-del-diable') || lower.includes('pont_del_diable')) {
               return '/custom_logos/drawings/images_stripe/miscel·lania/multi/pont-del-diable-multi-light-stripe.webp';
@@ -1815,18 +2730,48 @@ export default function FullWideSlideDemoHeader({
           }
         }
         if (active === 'austen' && typeof key === 'string' && key.startsWith('/custom_logos/drawings/images_grid/austen/keep_calm/')) {
-          const file = key.split('/').pop() || '';
-          if (file === 'keep-calm-multi-red.webp') {
-            return '/custom_logos/drawings/images_stripe/austen/keep_calm/multi/keep-calm-multi-red.webp';
+          try {
+            const file = (key.split('/').pop() || '').toString().trim().toLowerCase();
+            const isKcb = file.includes('keep-calm-b') || file.includes('keep-calm-black');
+            const isKcr = file.includes('keep-calm-multi-red') || file.includes('keep-calm-multi-w-red');
+
+            if (isKcb) {
+              if (variant === 'color') {
+                return '/custom_logos/drawings/images_stripe/austen/keep_calm/multi/keep-calm-multi-light-stripe.webp';
+              }
+              if (variant === 'white') {
+                return '/custom_logos/drawings/images_stripe/austen/keep_calm/white/keep-calm-w-stripe.webp';
+              }
+              return '/custom_logos/drawings/images_stripe/austen/keep_calm/black/keep-calm-b-stripe.webp';
+            }
+
+            if (isKcr) {
+              if (variant === 'color') {
+                return '/custom_logos/drawings/images_stripe/austen/keep_calm/multi/keep-calm-multi-thru-light-stripe.webp';
+              }
+              if (variant === 'white') {
+                return '/custom_logos/drawings/images_stripe/austen/keep_calm/multi/keep-calm-multi-w-red-stripe.webp';
+              }
+              if (variant === 'black') {
+                return '/custom_logos/drawings/images_stripe/austen/keep_calm/multi/keep-calm-multi-thru-red-stripe.webp';
+              }
+              return '/custom_logos/drawings/images_stripe/austen/keep_calm/multi/keep-calm-multi-thru-light-stripe.webp';
+            }
+          } catch {
+            // ignore
           }
-          if (file === 'keep-calm-black.webp') {
+          if (variant === 'white') {
+            return '/custom_logos/drawings/images_stripe/austen/keep_calm/white/keep-calm-w-stripe.webp';
+          }
+          if (variant === 'black') {
             return '/custom_logos/drawings/images_stripe/austen/keep_calm/black/keep-calm-b-stripe.webp';
           }
+          return '/custom_logos/drawings/images_stripe/austen/keep_calm/multi/keep-calm-multi-thru-red-stripe.webp';
         }
         if (active === 'austen' && typeof key === 'string' && key.startsWith('/custom_logos/drawings/images_grid/austen/looking_for_my_darcy/')) {
           const file = key.split('/').pop() || '';
           const lower = file.toLowerCase();
-          const base = lower.replace(/\.(webp|png|jpe?g)$/i, '');
+          const base = lower.replace(/\.(webp|png|jpe?g)$/i, '').replace(/-grid$/i, '');
           if (lower.includes('dark-gradient') || base.endsWith('-dark')) {
             const c = base.replace(/-dark-gradient$/i, '').replace(/-dark$/i, '');
             return `/custom_logos/drawings/images_stripe/austen/looking_for_my_darcy/dark/${c}-dark-gradient-stripe.webp`;
@@ -1842,12 +2787,6 @@ export default function FullWideSlideDemoHeader({
           if (base.endsWith('-solid') || lower.includes('-solid')) {
             const c = base.replace(/-solid$/i, '');
             return `/custom_logos/drawings/images_stripe/austen/looking_for_my_darcy/solid/${c}-solid-stripe.webp`;
-          }
-        }
-        if (active === 'austen' && typeof key === 'string' && key.startsWith('/custom_logos/drawings/images_grid/austen/pemberley_house/')) {
-          const file = key.split('/').pop() || '';
-          if (file === 'pemberley-black.webp') {
-            return '/custom_logos/drawings/images_stripe/austen/pemberley_house/black/pemberley-black.webp';
           }
         }
         if (active === 'austen' && typeof key === 'string' && key.startsWith('/custom_logos/drawings/images_stripe/austen/crosswords/')) {
@@ -1868,20 +2807,29 @@ export default function FullWideSlideDemoHeader({
         if (active === 'austen' && typeof key === 'string' && key.startsWith('/custom_logos/drawings/images_grid/austen/crosswords/')) {
           const file = key.split('/').pop() || '';
           const lower = file.toLowerCase();
-          const persuasion = lower.match(/^persuasion-(\d)\.webp$/);
+          const persuasion = lower.match(/^persuasion-(\d)(?:-grid)?\.webp$/);
           if (persuasion) {
             const n = persuasion[1];
-            return `/custom_logos/drawings/images_stripe/austen/crosswords/persuasion/persuasion-${n}.webp`;
+            if (variant === 'black') {
+              return `/custom_logos/drawings/images_stripe/austen/crosswords/black/persuasion-${n}-b-stripe.webp`;
+            }
+            return `/custom_logos/drawings/images_stripe/austen/crosswords/white/persuasion-${n}-w-stripe.webp`;
           }
-          const pride = lower.match(/^pride-and-prejudice-(\d)\.webp$/);
+          const pride = lower.match(/^pride-and-prejudice-(\d)(?:-grid)?\.webp$/);
           if (pride) {
             const n = pride[1];
-            return `/custom_logos/drawings/images_stripe/austen/crosswords/pride_and_prejudice/pride-and-prejudice-${n}.webp`;
+            if (variant === 'black') {
+              return `/custom_logos/drawings/images_stripe/austen/crosswords/black/pride-and-prejudice-${n}-b-stripe.webp`;
+            }
+            return `/custom_logos/drawings/images_stripe/austen/crosswords/white/pride-and-prejudice-${n}-w-stripe.webp`;
           }
-          const sense = lower.match(/^sense-and-sensibility-(\d)\.webp$/);
+          const sense = lower.match(/^sense-and-sensibility-(\d)(?:-grid)?\.webp$/);
           if (sense) {
             const n = sense[1];
-            return `/custom_logos/drawings/images_stripe/austen/crosswords/sense_and_sensibility/sense-and-sensibility-${n}.webp`;
+            if (variant === 'black') {
+              return `/custom_logos/drawings/images_stripe/austen/crosswords/black/sense-and-sensibility-${n}-b-stripe.webp`;
+            }
+            return `/custom_logos/drawings/images_stripe/austen/crosswords/white/sense-and-sensibility-${n}-w-stripe.webp`;
           }
         }
         if (
@@ -1894,63 +2842,24 @@ export default function FullWideSlideDemoHeader({
         ) {
           return resolveAustenQuoteOriginalFromPath(key) || key;
         }
-        return key;
-      }
-
-      if (active === 'austen') {
-        if (typeof key === 'string' && key.startsWith('/custom_logos/drawings/images_grid/austen/keep_calm/')) {
-          const file = key.split('/').pop() || '';
-          if (file === 'keep-calm-multi-red.webp') {
-            return '/custom_logos/drawings/images_stripe/austen/keep_calm/multi/keep-calm-multi-red.webp';
+        if (active === 'austen' && typeof key === 'string' && key.startsWith('/custom_logos/drawings/images_grid/austen/pemberley_house/')) {
+          if (variant === 'white') {
+            return '/custom_logos/drawings/images_stripe/austen/pemberley_house/white/pemberley-house-w-stripe.webp';
           }
-          if (file === 'keep-calm-black.webp') {
-            return '/custom_logos/drawings/images_stripe/austen/keep_calm/black/keep-calm-b-stripe.webp';
-          }
+          return '/custom_logos/drawings/images_stripe/austen/pemberley_house/white/pemberley-house-w-stripe.webp';
         }
-        if (typeof key === 'string' && key.startsWith('/custom_logos/drawings/images_grid/austen/looking_for_my_darcy/')) {
+        if (active === 'austen' && typeof key === 'string' && key.startsWith('/custom_logos/drawings/images_grid/austen/crosswords/')) {
           const file = key.split('/').pop() || '';
           const lower = file.toLowerCase();
-          const base = lower.replace(/\.(webp|png|jpe?g)$/i, '');
-          if (lower.includes('dark-gradient') || base.endsWith('-dark')) {
-            const c = base.replace(/-dark-gradient$/i, '').replace(/-dark$/i, '');
-            return `/custom_logos/drawings/images_stripe/austen/looking_for_my_darcy/dark/${c}-dark-gradient-stripe.webp`;
-          }
-          if (lower.includes('light-gradient') || base.endsWith('-light')) {
-            const c = base.replace(/-light-gradient$/i, '').replace(/-light$/i, '');
-            return `/custom_logos/drawings/images_stripe/austen/looking_for_my_darcy/light/${c}-light-gradient-stripe.webp`;
-          }
-          if (base.endsWith('-frame') || lower.includes('-frame')) {
-            const c = base.replace(/-frame$/i, '');
-            return `/custom_logos/drawings/images_stripe/austen/looking_for_my_darcy/frame/${c}-frame-stripe.webp`;
-          }
-          if (base.endsWith('-solid') || lower.includes('-solid')) {
-            const c = base.replace(/-solid$/i, '');
-            return `/custom_logos/drawings/images_stripe/austen/looking_for_my_darcy/solid/${c}-solid-stripe.webp`;
-          }
-        }
-        if (typeof key === 'string' && key.startsWith('/custom_logos/drawings/images_grid/austen/pemberley_house/')) {
-          const file = key.split('/').pop() || '';
-          if (file === 'pemberley-black.webp') {
-            return '/custom_logos/drawings/images_stripe/austen/pemberley_house/black/pemberley-black.webp';
-          }
-        }
-        if (typeof key === 'string' && key.startsWith('/custom_logos/drawings/images_grid/austen/crosswords/')) {
-          const file = key.split('/').pop() || '';
-          const lower = file.toLowerCase();
-          const persuasion = lower.match(/^persuasion-(\d)\.webp$/);
-          if (persuasion) {
-            const n = persuasion[1];
-            return `/custom_logos/drawings/images_stripe/austen/crosswords/persuasion/persuasion-${n}.webp`;
-          }
-          const pride = lower.match(/^pride-and-prejudice-(\d)\.webp$/);
-          if (pride) {
-            const n = pride[1];
-            return `/custom_logos/drawings/images_stripe/austen/crosswords/pride_and_prejudice/pride-and-prejudice-${n}.webp`;
-          }
-          const sense = lower.match(/^sense-and-sensibility-(\d)\.webp$/);
-          if (sense) {
-            const n = sense[1];
-            return `/custom_logos/drawings/images_stripe/austen/crosswords/sense_and_sensibility/sense-and-sensibility-${n}.webp`;
+          const m = lower.replace(/-grid(?=\.webp$)/i, '').match(/^(persuasion|pride-and-prejudice|sense-and-sensibility)-(\d)\.webp$/);
+          if (m) {
+            const book = m[1];
+            const n = m[2];
+            if (variant === 'black') {
+              return `/custom_logos/drawings/images_stripe/austen/crosswords/black/${book}-${n}-b-stripe.webp`;
+            }
+            if (variant === 'black') return `/custom_logos/drawings/images_stripe/austen/crosswords/black/${book}-${n}-b-stripe.webp`;
+            return `/custom_logos/drawings/images_stripe/austen/crosswords/white/${book}-${n}-w-stripe.webp`;
           }
         }
         if (
@@ -1960,7 +2869,18 @@ export default function FullWideSlideDemoHeader({
             || key.startsWith('/custom_logos/drawings/images_stripe/austen/quotes/')
           )
         ) {
-          return resolveAustenQuoteOriginalFromPath(key) || key;
+          const file = (key.split('/').pop() || '').replace(/\?.*$/, '');
+          const slug = file
+            .toLowerCase()
+            .replace(/-(b|w)-stripe(?=\.webp$)/i, '')
+            .replace(/-b-grid(?=\.webp$)/i, '')
+            .replace(/-grid(?=\.webp$)/i, '')
+            .replace(/\.webp$/i, '');
+          const whiteStem = slug === 'unsociable-and-taciturn' ? 'i-prefer-to-be' : slug;
+          const multiStem = slug === 'unsociable-and-taciturn' ? 'i-prefer-to-be' : slug;
+          if (variant === 'color') return `/custom_logos/drawings/images_originals/stripe/austen/quotes/multi/${multiStem}-multi-light-stripe.webp`;
+          if (variant === 'white') return `/custom_logos/drawings/images_originals/stripe/austen/quotes/white/${whiteStem}-w-stripe.webp`;
+          return `/custom_logos/drawings/images_originals/stripe/austen/quotes/black/${slug}-b-stripe.webp`;
         }
         const k = typeof key === 'string' ? normalizeKeyLocal(key).toLowerCase() : '';
         const id = resolveAustenQuoteAssetId(k);
@@ -1973,7 +2893,7 @@ export default function FullWideSlideDemoHeader({
           const file = key.split('/').pop() || '';
           const lower = file.toLowerCase();
           if (firstContactVariant === 'color') {
-            if (lower.includes('dj-vader')) return '/custom_logos/drawings/images_stripe/miscel·lania/multi/dj-vader-multi-1-stripe.webp';
+            if (lower.includes('dj-vader')) return '/custom_logos/drawings/images_stripe/miscel·lania/multi/dj-vader-multi-light-stripe.webp';
             if (lower.includes('death-star2d2')) return '/custom_logos/drawings/images_stripe/miscel·lania/multi/death-star2d2-multi-light-stripe.webp';
             if (lower.includes('pont-del-diable') || lower.includes('pont_del_diable')) {
               return '/custom_logos/drawings/images_stripe/miscel·lania/multi/pont-del-diable-multi-light-stripe.webp';
@@ -2032,26 +2952,242 @@ export default function FullWideSlideDemoHeader({
     try {
       const qs = (typeof window !== 'undefined') ? window.location?.search : '';
       const p = qs ? new URLSearchParams(qs) : null;
-      return Boolean(p && p.get('stripeOverlayDebug') === '1');
+      const raw = p?.get?.('stripeOverlayDebug');
+      if (raw == null && !p?.has?.('stripeOverlayDebug')) return false;
+      const v = String(raw || '').trim().toLowerCase();
+      if (v === '' || v === '1' || v === 'true' || v === 'on' || v === 'yes') return true;
+      return false;
     } catch {
       return false;
     }
   })();
+
+  const drawingOverlayDebug = (() => {
+    try {
+      const qs = (typeof window !== 'undefined') ? window.location?.search : '';
+      const p = qs ? new URLSearchParams(qs) : null;
+      const raw = p?.get?.('drawingOverlayDebug');
+      if (raw == null && !p?.has?.('drawingOverlayDebug')) return false;
+      const v = String(raw || '').trim().toLowerCase();
+      if (v === '' || v === '1' || v === 'true' || v === 'on' || v === 'yes') return true;
+      return false;
+    } catch {
+      return false;
+    }
+  })();
+
+  const guessStripeWideFromSrc = useCallback((src) => {
+    try {
+      const s = String(src || '').toLowerCase();
+      if (!s) return false;
+      if (s.includes('/images_stripe/')) return true;
+      if (/-stripe\.(png|webp|jpg|jpeg)(\?|#|$)/i.test(s)) return true;
+      return false;
+    } catch {
+      return false;
+    }
+  }, []);
+
+  const stripeOverlayIsStripeWideDerived = useMemo(
+    () => guessStripeWideFromSrc(resolvedOverlaySrcEncoded || resolvedOverlaySrc),
+    [guessStripeWideFromSrc, resolvedOverlaySrcEncoded, resolvedOverlaySrc]
+  );
+  const [stripeMaskTileRectsRawPct, setStripeMaskTileRectsRawPct] = useState(null);
+  const [stripeMaskDebugRectsPct, setStripeMaskDebugRectsPct] = useState(null);
+
+  const [tileGapPxLocal, setTileGapPxLocal] = useState(0);
+
+  useEffect(() => {
+    const sync = () => {
+      try {
+        const raw = window.localStorage.getItem('MEGA_STRIPE_TILE_GAP_PX');
+        const n = raw == null ? 0 : Number.parseFloat(String(raw));
+        setTileGapPxLocal(Number.isFinite(n) ? Math.min(200, Math.max(-200, n)) : 0);
+      } catch {
+        setTileGapPxLocal(0);
+      }
+    };
+    sync();
+    window.addEventListener('mega-stripe-tile-gap-changed', sync);
+    return () => {
+      window.removeEventListener('mega-stripe-tile-gap-changed', sync);
+    };
+  }, []);
+
+  useEffect(() => {
+    const wantMaskRects = stripeOverlayDebug || (megaShirtDrawingEnabledLocal && Boolean(drawingOverlaySrcEffective));
+    if (!wantMaskRects) {
+      setStripeMaskTileRectsRawPct(null);
+      setStripeMaskDebugRectsPct(null);
+      return;
+    }
+
+    let alive = true;
+
+    const compute = async () => {
+      let wrap;
+      try {
+        if (typeof document === 'undefined') return;
+        const src = '/placeholders/t-shirt_buttons/v5/full-clic-area-5.svg';
+        const viewW = 2866;
+        const viewH = 307;
+        const res = await fetch(src, { cache: 'force-cache' });
+        const svgText = await res.text();
+        if (!svgText) throw new Error('empty svg');
+
+        wrap = document.createElement('div');
+        wrap.style.position = 'fixed';
+        wrap.style.left = '-99999px';
+        wrap.style.top = '-99999px';
+        wrap.style.width = `${viewW}px`;
+        wrap.style.height = `${viewH}px`;
+        wrap.style.opacity = '0';
+        wrap.style.pointerEvents = 'none';
+        wrap.style.overflow = 'hidden';
+        wrap.innerHTML = svgText;
+
+        const svg = wrap.querySelector('svg');
+        if (!svg) throw new Error('no svg');
+        svg.setAttribute('width', `${viewW}`);
+        svg.setAttribute('height', `${viewH}`);
+        svg.setAttribute('preserveAspectRatio', 'none');
+
+        document.body.appendChild(wrap);
+
+        const paths = Array.from(svg.querySelectorAll('path'));
+        const best = paths
+          .map((p) => ({ p, len: (p.getAttribute('d') || '').length }))
+          .sort((a, b) => b.len - a.len)[0]?.p;
+
+        if (!best) throw new Error('no path');
+        const d = best.getAttribute('d') || '';
+        const parent = best.parentNode;
+        if (!parent) throw new Error('no parent');
+
+        const parts = d.split(/(?=M)/g).map((s) => s.trim()).filter(Boolean);
+        if (!parts.length) throw new Error('no parts');
+
+        parent.removeChild(best);
+
+        const nodes = parts.map((seg) => {
+          const p = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+          p.setAttribute('d', seg);
+          p.setAttribute('fill', '#000');
+          p.setAttribute('stroke', 'none');
+          parent.appendChild(p);
+          return p;
+        });
+
+        const svgRect = svg.getBoundingClientRect();
+        if (!svgRect || !(svgRect.width > 0) || !(svgRect.height > 0)) throw new Error('bad svg rect');
+
+        const bbs = nodes
+          .map((p) => {
+            try {
+              const r = p.getBoundingClientRect();
+              const leftPx = r.left - svgRect.left;
+              const topPx = r.top - svgRect.top;
+              const widthPx = r.width;
+              const heightPx = r.height;
+              if (!(widthPx > 0) || !(heightPx > 0)) return null;
+              const area = widthPx * heightPx;
+              return { leftPx, topPx, widthPx, heightPx, area };
+            } catch {
+              return null;
+            }
+          })
+          .filter(Boolean)
+          .filter((it) => it.widthPx > 3 && it.heightPx > 3);
+
+        const top14 = bbs
+          .sort((a, b) => (b.area - a.area))
+          .slice(0, 14)
+          .sort((a, b) => (a.leftPx - b.leftPx));
+
+        const sortedRaw = top14.map((it) => {
+          const left = (it.leftPx / svgRect.width) * 100;
+          const top = (it.topPx / svgRect.height) * 100;
+          const width = (it.widthPx / svgRect.width) * 100;
+          const height = (it.heightPx / svgRect.height) * 100;
+          return { left, top, width, height };
+        });
+
+        const ref = sortedRaw[0];
+        const sorted = (ref && Number.isFinite(ref.width) && ref.width > 0)
+          ? sortedRaw.map((r, idx) => {
+            if (idx === 0) return r;
+            const right = (r.left || 0) + (r.width || 0);
+            const desiredWidth = ref.width;
+            let nextLeft = right - desiredWidth;
+            let nextWidth = desiredWidth;
+            if (nextLeft < 0) {
+              nextLeft = 0;
+              nextWidth = Math.max(0, right);
+            }
+            return {
+              ...r,
+              left: nextLeft,
+              width: nextWidth,
+            };
+          })
+          : sortedRaw;
+
+        if (!alive) return;
+        if (sortedRaw.length === 14) {
+          setStripeMaskTileRectsRawPct(sorted);
+          setStripeMaskDebugRectsPct(stripeOverlayDebug ? sorted : null);
+        } else {
+          setStripeMaskTileRectsRawPct(null);
+          setStripeMaskDebugRectsPct(null);
+        }
+      } catch {
+        if (!alive) return;
+        setStripeMaskTileRectsRawPct(null);
+        setStripeMaskDebugRectsPct(null);
+      } finally {
+        if (wrap) {
+          try {
+            wrap.parentNode?.removeChild(wrap);
+          } catch {
+            // ignore
+          }
+        }
+      }
+    };
+
+    compute();
+    return () => {
+      alive = false;
+    };
+  }, [stripeOverlayDebug, megaShirtDrawingEnabledLocal, drawingOverlaySrcEffective]);
+
   useEffect(() => {
     if (!resolvedOverlaySrc) {
       setStripeOverlayLoadState('no-src');
       setStripeOverlayIsStripeWide(false);
       return;
     }
+
     let alive = true;
     setStripeOverlayLoadState('loading');
-    setStripeOverlayIsStripeWide(false);
+    setStripeOverlayIsStripeWide(guessStripeWideFromSrc(resolvedOverlaySrcEncoded || resolvedOverlaySrc));
     try {
       const img = new Image();
       img.onload = () => {
         if (!alive) return;
         setStripeOverlayLoadState('ok');
-        setStripeOverlayIsStripeWide(false);
+        try {
+          const w = Number(img.naturalWidth) || 0;
+          const h = Number(img.naturalHeight) || 0;
+          const ratio = h > 0 ? (w / h) : 0;
+          if (ratio > 0) {
+            setStripeOverlayIsStripeWide((ratio > 3) || guessStripeWideFromSrc(resolvedOverlaySrcEncoded || resolvedOverlaySrc));
+          } else {
+            setStripeOverlayIsStripeWide(guessStripeWideFromSrc(resolvedOverlaySrcEncoded || resolvedOverlaySrc));
+          }
+        } catch {
+          setStripeOverlayIsStripeWide(false);
+        }
       };
       img.onerror = () => { if (alive) setStripeOverlayLoadState('error'); };
       img.src = resolvedOverlaySrcEncoded || resolvedOverlaySrc;
@@ -2059,7 +3195,7 @@ export default function FullWideSlideDemoHeader({
       setStripeOverlayLoadState('error');
     }
     return () => { alive = false; };
-  }, [resolvedOverlaySrc, resolvedOverlaySrcEncoded]);
+  }, [resolvedOverlaySrc, resolvedOverlaySrcEncoded, guessStripeWideFromSrc]);
 
   const preloadedSrcRef = useRef(new Set());
   const preloadSrc = (src) => {
@@ -2098,6 +3234,7 @@ export default function FullWideSlideDemoHeader({
     try {
       if (typeof window === 'undefined') return;
       const prev = window.__HG_OVERLAY_DEBUG__ || {};
+      const stripeWideEffective = Boolean(stripeOverlayIsStripeWideDerived || stripeOverlayIsStripeWide);
       window.__HG_OVERLAY_DEBUG__ = {
         ...prev,
         stripeOverlayDebug,
@@ -2105,20 +3242,30 @@ export default function FullWideSlideDemoHeader({
         active: String(active || ''),
         resolvedOverlaySrc,
         stripeOverlayLoadState,
-        stripeOverlayIsStripeWide: Boolean(stripeOverlayIsStripeWide),
+        stripeOverlayIsStripeWide: stripeWideEffective,
+        stripeOverlayIsStripeWideDerived: Boolean(stripeOverlayIsStripeWideDerived),
+        stripeOverlayIsStripeWideMeasured: Boolean(stripeOverlayIsStripeWide),
         stripeOverlayOverrideActive,
         overlaySrcFromUrl,
       };
     } catch {
       // ignore
     }
-  }, [stripeOverlayDebug, showStripe, active, resolvedOverlaySrc, stripeOverlayLoadState, stripeOverlayIsStripeWide, stripeOverlayOverrideActive, overlaySrcFromUrl]);
+  }, [stripeOverlayDebug, showStripe, active, resolvedOverlaySrc, stripeOverlayLoadState, stripeOverlayIsStripeWide, stripeOverlayIsStripeWideDerived, stripeOverlayOverrideActive, overlaySrcFromUrl]);
 
   useEffect(() => {
-    if (stripeOverlayOverrideActive) return;
     if (!resolvedOverlaySrc) return;
     try {
-      window.localStorage.setItem(overlayStorageKey, resolvedOverlaySrc);
+      const s = String(resolvedOverlaySrc || '').trim();
+      const sLower = s.toLowerCase();
+      const isStripeSrc = sLower.includes('/custom_logos/drawings/images_stripe/') || sLower.includes('/custom_logos/drawings/images_originals/stripe/');
+      if (!isStripeSrc) return;
+      window.localStorage.setItem('HG_DRAWING_OVERLAY_SRC', resolvedOverlaySrc);
+      window.localStorage.setItem('HG_DRAWING_OVERLAY_COLLECTION', String(active || ''));
+      window.dispatchEvent(new Event('hg-drawing-overlay-changed'));
+      if (!stripeOverlayOverrideActive) {
+        window.localStorage.setItem(overlayStorageKey, resolvedOverlaySrc);
+      }
     } catch {
       // ignore
     }
@@ -2126,10 +3273,210 @@ export default function FullWideSlideDemoHeader({
   const [megaTileSize, setMegaTileSize] = useState(null);
   const effectiveMegaTileSize = megaTileSize || 120;
   const [rootRemPx, setRootRemPx] = useState(16);
+  const [megaTileSelectorParams, setMegaTileSelectorParams] = useState(() => {
+    try {
+      if (typeof window === 'undefined') {
+        return {
+          keyset: 'v1',
+          enabled: true,
+          target: 'NCC-1701-D',
+          sizePx: 200,
+          strokePx: 10,
+          color: 'black',
+          stepX: 0,
+          stepY: 0,
+          radiusPx: 8,
+          extendTopPx: 30,
+          extendRightPx: 0,
+          extendBottomPx: 0,
+          extendLeftPx: 0,
+        };
+      }
+
+      const hasV2 = (() => {
+        try {
+          const a = window.localStorage.getItem('MEGA_TILE_SELECTOR_V2_ENABLED');
+          const b = window.localStorage.getItem('MEGA_TILE_SELECTOR_V2_TARGET');
+          const c = window.localStorage.getItem('MEGA_TILE_SELECTOR_V2_SIZE_PX');
+          const d = window.localStorage.getItem('MEGA_TILE_SELECTOR_V2_STROKE_PX');
+          const e = window.localStorage.getItem('MEGA_TILE_SELECTOR_V2_COLOR');
+          const f = window.localStorage.getItem('MEGA_TILE_SELECTOR_V2_STEP_X');
+          const g = window.localStorage.getItem('MEGA_TILE_SELECTOR_V2_STEP_Y');
+          return a != null || b != null || c != null || d != null || e != null || f != null || g != null;
+        } catch {
+          return false;
+        }
+      })();
+
+      const readBool = (k, fallback) => {
+        const raw = window.localStorage.getItem(k);
+        if (raw == null) return fallback;
+        const v = String(raw).trim().toLowerCase();
+        if (v === '') return true;
+        return v === '1' || v === 'true' || v === 'on' || v === 'yes';
+      };
+
+      const v1Enabled = readBool('MEGA_TILE_SELECTOR_ENABLED', true);
+      const v2Enabled = readBool('MEGA_TILE_SELECTOR_V2_ENABLED', hasV2 ? false : true);
+      const activeKeyset = v2Enabled ? 'v2' : (v1Enabled ? 'v1' : 'v2');
+      const K = (suffix) => (activeKeyset === 'v2' ? `MEGA_TILE_SELECTOR_V2_${suffix}` : `MEGA_TILE_SELECTOR_${suffix}`);
+
+      const readNum = (k, fallback) => {
+        const raw = window.localStorage.getItem(k);
+        const n = raw == null ? NaN : Number.parseFloat(String(raw));
+        return Number.isFinite(n) ? n : fallback;
+      };
+      return {
+        keyset: activeKeyset,
+        enabled: readBool(K('ENABLED'), activeKeyset === 'v2' ? false : true),
+        target: String(window.localStorage.getItem(K('TARGET')) || 'NCC-1701-D'),
+        sizePx: Math.min(800, Math.max(20, readNum(K('SIZE_PX'), 200))),
+        strokePx: Math.min(80, Math.max(0, readNum(K('STROKE_PX'), 10))),
+        color: String(window.localStorage.getItem(K('COLOR')) || 'black'),
+        stepX: Math.min(99, Math.max(-99, readNum(K('STEP_X'), 0))),
+        stepY: Math.min(99, Math.max(-99, readNum(K('STEP_Y'), 0))),
+        radiusPx: Math.min(200, Math.max(0, readNum(K('RADIUS_PX'), 8))),
+        extendTopPx: Math.min(500, Math.max(-500, readNum(K('EXTEND_TOP_PX'), 30))),
+        extendRightPx: Math.min(500, Math.max(-500, readNum(K('EXTEND_RIGHT_PX'), 0))),
+        extendBottomPx: Math.min(500, Math.max(-500, readNum(K('EXTEND_BOTTOM_PX'), 0))),
+        extendLeftPx: Math.min(500, Math.max(-500, readNum(K('EXTEND_LEFT_PX'), 0))),
+      };
+    } catch {
+      return {
+        keyset: 'v1',
+        enabled: true,
+        target: 'NCC-1701-D',
+        sizePx: 200,
+        strokePx: 10,
+        color: 'black',
+        stepX: 0,
+        stepY: 0,
+        radiusPx: 8,
+        extendTopPx: 30,
+        extendRightPx: 0,
+        extendBottomPx: 0,
+        extendLeftPx: 0,
+      };
+    }
+  });
   const headerRef = useRef(null);
   const megaMenuRef = useRef(null);
   const [stripeRowPadPx, setStripeRowPadPx] = useState(32);
   const [stripeRowPadXPx, setStripeRowPadXPx] = useState({ left: 0, right: 0 });
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const read = () => {
+      try {
+        const activeNow = String(activeRef.current || '');
+        const hasV2 = (() => {
+          try {
+            const a = window.localStorage.getItem('MEGA_TILE_SELECTOR_V2_ENABLED');
+            const b = window.localStorage.getItem('MEGA_TILE_SELECTOR_V2_TARGET');
+            const c = window.localStorage.getItem('MEGA_TILE_SELECTOR_V2_SIZE_PX');
+            const d = window.localStorage.getItem('MEGA_TILE_SELECTOR_V2_STROKE_PX');
+            const e = window.localStorage.getItem('MEGA_TILE_SELECTOR_V2_COLOR');
+            const f = window.localStorage.getItem('MEGA_TILE_SELECTOR_V2_STEP_X');
+            const g = window.localStorage.getItem('MEGA_TILE_SELECTOR_V2_STEP_Y');
+            return a != null || b != null || c != null || d != null || e != null || f != null || g != null;
+          } catch {
+            return false;
+          }
+        })();
+
+        const readBool = (k, fallback) => {
+          const raw = window.localStorage.getItem(k);
+          if (raw == null) return fallback;
+          const v = String(raw).trim().toLowerCase();
+          if (v === '') return true;
+          return v === '1' || v === 'true' || v === 'on' || v === 'yes';
+        };
+
+        const v1Enabled = readBool('MEGA_TILE_SELECTOR_ENABLED', true);
+        const v2Enabled = readBool('MEGA_TILE_SELECTOR_V2_ENABLED', hasV2 ? false : true);
+        const activeKeyset = v2Enabled ? 'v2' : (v1Enabled ? 'v1' : 'v2');
+        const K = (suffix) => (activeKeyset === 'v2' ? `MEGA_TILE_SELECTOR_V2_${suffix}` : `MEGA_TILE_SELECTOR_${suffix}`);
+
+        const readNum = (k, fallback) => {
+          const raw = window.localStorage.getItem(k);
+          const n = raw == null ? NaN : Number.parseFloat(String(raw));
+          return Number.isFinite(n) ? n : fallback;
+        };
+        setMegaTileSelectorParams({
+          keyset: activeKeyset,
+          enabled: readBool(K('ENABLED'), activeKeyset === 'v2' ? false : true),
+          target: (() => {
+            const publicState = getMegaPublicSelectorFor(activeNow, activeKeyset);
+            const t = typeof publicState?.target === 'string' ? publicState.target.trim() : '';
+            return t ? t : String(window.localStorage.getItem(K('TARGET')) || 'NCC-1701-D');
+          })(),
+          sizePx: Math.min(800, Math.max(20, readNum(K('SIZE_PX'), 200))),
+          strokePx: Math.min(80, Math.max(0, readNum(K('STROKE_PX'), 10))),
+          color: String(window.localStorage.getItem(K('COLOR')) || 'black'),
+          stepX: (() => {
+            const publicState = getMegaPublicSelectorFor(activeNow, activeKeyset);
+            const v = Number(publicState?.stepX);
+            if (Number.isFinite(v)) return Math.min(99, Math.max(-99, v));
+            return Math.min(99, Math.max(-99, readNum(K('STEP_X'), 0)));
+          })(),
+          stepY: (() => {
+            const publicState = getMegaPublicSelectorFor(activeNow, activeKeyset);
+            const v = Number(publicState?.stepY);
+            if (Number.isFinite(v)) return Math.min(99, Math.max(-99, v));
+            return Math.min(99, Math.max(-99, readNum(K('STEP_Y'), 0)));
+          })(),
+          radiusPx: Math.min(200, Math.max(0, readNum(K('RADIUS_PX'), 8))),
+          extendTopPx: Math.min(500, Math.max(-500, readNum(K('EXTEND_TOP_PX'), 30))),
+          extendRightPx: Math.min(500, Math.max(-500, readNum(K('EXTEND_RIGHT_PX'), 0))),
+          extendBottomPx: Math.min(500, Math.max(-500, readNum(K('EXTEND_BOTTOM_PX'), 0))),
+          extendLeftPx: Math.min(500, Math.max(-500, readNum(K('EXTEND_LEFT_PX'), 0))),
+        });
+      } catch {
+        // ignore
+      }
+    };
+
+    const onStorage = (e) => {
+      if (!e || !e.key) return;
+      if (
+        e.key === 'MEGA_TILE_SELECTOR_ENABLED'
+        || e.key === 'MEGA_TILE_SELECTOR_TARGET'
+        || e.key === 'MEGA_TILE_SELECTOR_SIZE_PX'
+        || e.key === 'MEGA_TILE_SELECTOR_STROKE_PX'
+        || e.key === 'MEGA_TILE_SELECTOR_COLOR'
+        || e.key === 'MEGA_TILE_SELECTOR_STEP_X'
+        || e.key === 'MEGA_TILE_SELECTOR_STEP_Y'
+        || e.key === 'MEGA_TILE_SELECTOR_RADIUS_PX'
+        || e.key === 'MEGA_TILE_SELECTOR_EXTEND_TOP_PX'
+        || e.key === 'MEGA_TILE_SELECTOR_EXTEND_RIGHT_PX'
+        || e.key === 'MEGA_TILE_SELECTOR_EXTEND_BOTTOM_PX'
+        || e.key === 'MEGA_TILE_SELECTOR_EXTEND_LEFT_PX'
+        || e.key === 'MEGA_TILE_SELECTOR_V2_ENABLED'
+        || e.key === 'MEGA_TILE_SELECTOR_V2_TARGET'
+        || e.key === 'MEGA_TILE_SELECTOR_V2_SIZE_PX'
+        || e.key === 'MEGA_TILE_SELECTOR_V2_STROKE_PX'
+        || e.key === 'MEGA_TILE_SELECTOR_V2_COLOR'
+        || e.key === 'MEGA_TILE_SELECTOR_V2_STEP_X'
+        || e.key === 'MEGA_TILE_SELECTOR_V2_STEP_Y'
+        || e.key === 'MEGA_TILE_SELECTOR_V2_RADIUS_PX'
+        || e.key === 'MEGA_TILE_SELECTOR_V2_EXTEND_TOP_PX'
+        || e.key === 'MEGA_TILE_SELECTOR_V2_EXTEND_RIGHT_PX'
+        || e.key === 'MEGA_TILE_SELECTOR_V2_EXTEND_BOTTOM_PX'
+        || e.key === 'MEGA_TILE_SELECTOR_V2_EXTEND_LEFT_PX'
+      ) {
+        read();
+      }
+    };
+
+    read();
+    window.addEventListener('storage', onStorage);
+    window.addEventListener('mega-tile-selector-changed', read);
+    return () => {
+      window.removeEventListener('storage', onStorage);
+      window.removeEventListener('mega-tile-selector-changed', read);
+    };
+  }, []);
 
   const stripePreviewHPx = Math.round((effectiveMegaTileSize || 240) * 0.9);
 
@@ -2606,13 +3953,21 @@ export default function FullWideSlideDemoHeader({
           title: '',
           items: [
             CONTROL_TILE_BN,
-            '/custom_logos/drawings/images_grid/austen/looking_for_my_darcy/blue-dark.webp',
-            '/custom_logos/drawings/images_grid/austen/looking_for_my_darcy/red-frame.webp',
-            '/custom_logos/drawings/images_grid/austen/looking_for_my_darcy/yellow-solid.webp',
-            '/custom_logos/drawings/images_grid/austen/keep_calm/keep-calm-multi-red.webp',
-            '/custom_logos/drawings/images_grid/austen/crosswords/pride-and-prejudice-2.webp',
-            '/custom_logos/drawings/images_grid/austen/crosswords/sense-and-sensibility-3.webp',
-            '/custom_logos/drawings/images_grid/austen/crosswords/persuasion-4.webp',
+            '/custom_logos/drawings/images_grid/austen/looking_for_my_darcy/blue-dark-gradient-grid.webp',
+            '/custom_logos/drawings/images_grid/austen/looking_for_my_darcy/red-frame-grid.webp',
+            '/custom_logos/drawings/images_grid/austen/looking_for_my_darcy/yellow-solid-grid.webp',
+            '/custom_logos/drawings/images_grid/austen/keep_calm/keep-calm-multi-red-grid.webp',
+            '/custom_logos/drawings/images_grid/austen/keep_calm/keep-calm-multi-w-red-grid.webp',
+            '/custom_logos/drawings/images_grid/austen/keep_calm/keep-calm-b-grid.webp',
+            '/custom_logos/drawings/images_grid/austen/pemberley_house/pemberley-house-b-grid.webp',
+            '/custom_logos/drawings/images_grid/austen/quotes/it-is-a-truth-b-grid.webp',
+            '/custom_logos/drawings/images_grid/austen/quotes/you-must-allow-me-b-grid.webp',
+            '/custom_logos/drawings/images_grid/austen/quotes/body-and-soul-b-grid.webp',
+            '/custom_logos/drawings/images_grid/austen/quotes/unsociable-and-taciturn-b-grid.webp',
+            '/custom_logos/drawings/images_grid/austen/quotes/half-agony-half-hope-b-grid.webp',
+            '/custom_logos/drawings/images_grid/austen/crosswords/pride-and-prejudice-2-grid.webp',
+            '/custom_logos/drawings/images_grid/austen/crosswords/sense-and-sensibility-3-grid.webp',
+            '/custom_logos/drawings/images_grid/austen/crosswords/persuasion-4-grid.webp',
             CONTROL_TILE_ARROWS,
           ],
         },
@@ -2664,6 +4019,23 @@ export default function FullWideSlideDemoHeader({
       const hasAnyItems = value.some((col) => Array.isArray(col?.items) && col.items.length > 0);
       if (!hasAnyItems) continue;
       out[key] = value;
+    }
+
+    try {
+      const pemb = '/custom_logos/drawings/images_grid/austen/pemberley_house/pemberley-house-b-grid.webp';
+      const cols = out.austen;
+      const hasPemb = Array.isArray(cols) && cols.some((col) => Array.isArray(col?.items) && col.items.some((it) => typeof it === 'string' && it.includes('/austen/pemberley_house/')));
+      if (Array.isArray(cols) && cols.length > 0 && !hasPemb) {
+        out.austen = cols.map((col) => {
+          const items = Array.isArray(col?.items) ? col.items.slice() : [];
+          if (items.includes(pemb)) return col;
+          const bnIdx = items.indexOf(CONTROL_TILE_BN);
+          const insertAt = bnIdx >= 0 ? bnIdx + 1 : 0;
+          items.splice(insertAt, 0, pemb);
+          return { ...col, items };
+        });
+      }
+    } catch {
     }
 
     if (gridCalibFromUrl) {
@@ -2915,12 +4287,18 @@ export default function FullWideSlideDemoHeader({
                   aria-expanded={open ? 'true' : 'false'}
                   onMouseEnter={() => {
                     setActive(item.id);
+                    touchMegaPublicActivity();
                   }}
                   onFocus={() => {
                     setActive(item.id);
+                    touchMegaPublicActivity();
                   }}
                   onClick={() => {
-                    setActive((prev) => (prev === item.id ? null : item.id));
+                    setActive((prev) => {
+                      const next = prev === item.id ? null : item.id;
+                      if (next) touchMegaPublicActivity();
+                      return next;
+                    });
                   }}
                 >
                   {item.label}
@@ -3068,7 +4446,7 @@ export default function FullWideSlideDemoHeader({
                       paddingLeft: '0px',
                       width: '100%',
                       overflowX: 'visible',
-                      clipPath: 'inset(0px -260px 0px -260px)',
+                      clipPath: 'inset(-260px -260px -260px -260px)',
                     }
                   : undefined}
               >
@@ -3089,28 +4467,29 @@ export default function FullWideSlideDemoHeader({
                           isFirstContact={active === 'first_contact' || active === 'austen' || active === 'cube' || active === 'outcasted'}
                           isHumanInside={active === 'the_human_inside'}
                           collectionId={active}
+                          disableMulti={active === 'austen' && austenSelectedDisableMulti}
+                          stripeVariantVisibility={stripeVariantVisibility}
+                          megaTileSelectorParams={megaTileSelectorParams}
+                          onStartSelectorDrag={onStartSelectorDrag}
                           megaTileSize={megaTileSize}
                           humanInsideVariant={humanInsideVariant}
                           items={active === 'austen' ? reorderAustenQuotes(col.items) : col.items}
                           row={true}
                           firstContactVariant={firstContactVariant}
-                          onFirstContactWhite={() => setFirstContactVariant('white')}
-                          onFirstContactBlack={() => setFirstContactVariant('black')}
-                          onFirstContactMulti={() => setFirstContactVariant('color')}
-                          onHumanWhite={() => setHumanInsideVariant('white')}
-                          onHumanBlack={() => setHumanInsideVariant('black')}
-                          onHumanMulti={() => setHumanInsideVariant('color')}
+                          onFirstContactWhite={() => { setStripeOverlayOverrideActive(false); setFirstContactVariant('white'); }}
+                          onFirstContactBlack={() => { setStripeOverlayOverrideActive(false); setFirstContactVariant('black'); }}
+                          onFirstContactMulti={() => { setStripeOverlayOverrideActive(false); setFirstContactVariant('color'); }}
+                          onHumanWhite={() => { setStripeOverlayOverrideActive(false); setHumanInsideVariant('white'); }}
+                          onHumanBlack={() => { setStripeOverlayOverrideActive(false); setHumanInsideVariant('black'); }}
+                          onHumanMulti={() => { setStripeOverlayOverrideActive(false); setHumanInsideVariant('color'); }}
                           onHumanPrev={() => setThinStartIndex((v) => v - 1)}
                           onHumanNext={() => setThinStartIndex((v) => v + 1)}
-                          onSelectItem={
-                            (it) => {
-                              if (!it || it === CONTROL_TILE_BN || it === CONTROL_TILE_ARROWS) return;
-                              setStripeOverlayOverrideActive(false);
-                              if (active === 'first_contact') setFirstContactSelectedItem(it);
-                              else if (active === 'the_human_inside') setHumanInsideSelectedItem(it);
-                              else setSelectedItemByCollection((prev) => ({ ...prev, [active]: it }));
-                            }
-                          }
+                          onSelectItem={(it) => {
+                            setStripeOverlayOverrideActive(false);
+                            if (active === 'first_contact') setFirstContactSelectedItem(it);
+                            else if (active === 'the_human_inside') setHumanInsideSelectedItem(it);
+                            else setSelectedItemByCollection((prev) => ({ ...prev, [active]: it }));
+                          }}
                         />
                       ))}
                     </div>
@@ -3124,7 +4503,7 @@ export default function FullWideSlideDemoHeader({
                           paddingRight: `${stripeRowPadXPx?.right || 0}px`,
                         }}
                       >
-                        <div className="w-full rounded-md bg-muted flex justify-center">
+                        <div className="w-full flex justify-center bg-transparent">
                           <div
                             className="relative inline-block"
                             style={{
@@ -3164,121 +4543,601 @@ export default function FullWideSlideDemoHeader({
                                 display: 'inline-block',
                                 transformOrigin: 'top center',
                                 transform: 'translate(var(--megaStripeDx, 0px), var(--megaStripeDy, 0px)) scale(var(--megaStripeScale, 1.2125))',
-                                WebkitMaskImage: 'url(/placeholders/t-shirt_buttons/v5/full-clic-area-5.svg)',
-                                maskImage: 'url(/placeholders/t-shirt_buttons/v5/full-clic-area-5.svg)',
-                                WebkitMaskRepeat: 'no-repeat',
-                                maskRepeat: 'no-repeat',
-                                WebkitMaskSize: '100% 100%',
-                                maskSize: '100% 100%',
-                                WebkitMaskPosition: '0 0',
-                                maskPosition: '0 0',
+                                isolation: 'isolate',
                               }}
                             >
-                              <img
-                                src="/placeholders/t-shirt_buttons/v5/full-color-stripe-5.webp"
-                                alt=""
-                                className="block"
-                                style={{
-                                  height: '100%',
-                                  width: 'auto',
-                                }}
-                                loading="lazy"
-                                decoding="async"
-                              />
-
-                              {megaStripeRefEnabledLocal && megaStripeRefSrcLocal ? (
-                                <img
-                                  src={megaStripeRefSrcLocal}
-                                  alt=""
-                                  className="block absolute inset-0"
-                                  style={{
-                                    pointerEvents: 'none',
-                                    zIndex: 6,
-                                    height: '100%',
-                                    width: 'auto',
-                                    transformOrigin: 'top center',
-                                    transform: 'translate(var(--megaStripeRefDx, 0px), var(--megaStripeRefDy, 0px)) scale(var(--megaStripeRefScale, 1))',
-                                  }}
-                                  loading="lazy"
-                                  decoding="async"
-                                />
-                              ) : null}
-
-                              {resolvedOverlaySrc && megaStripeOverlayModeLocal !== 'off' ? (
+                              {stripeOverlayDebug ? (
                                 <div
                                   className="absolute inset-0 flex"
                                   style={{
                                     pointerEvents: 'none',
-                                    zIndex: 10,
+                                    zIndex: 1000,
                                     transformOrigin: 'top center',
                                     transform: 'none',
-                                    columnGap: 'var(--megaStripeTileGapPx, 0px)',
-                                    background: stripeOverlayDebug ? 'rgba(0, 200, 255, 0.10)' : 'transparent',
+                                    background: 'transparent',
                                   }}
+                                  aria-hidden="true"
                                 >
-                                  {Array.from({ length: 14 }).map((_, idx) => (
-                                    <div
-                                      key={`stripe-tile-${idx}`}
-                                      className="relative"
-                                      style={{
-                                        height: '100%',
-                                        flex: '1 1 0%',
-                                        overflow: 'hidden',
-                                        zIndex: 10,
-                                        outline: stripeOverlayDebug ? '1px solid rgba(0, 200, 255, 0.35)' : 'none',
-                                      }}
-                                    >
-                                      <img
-                                        src={(() => {
-                                          try {
-                                            const base = resolvedOverlaySrc;
-                                            if (!base || typeof base !== 'string') return undefined;
-                                            const picked = resolveStripeOverlaySrcForTile(base, idx);
-                                            return picked ? encodeURI(picked) : undefined;
-                                          } catch {
-                                            return resolvedOverlaySrcEncoded || resolvedOverlaySrc;
-                                          }
-                                        })()}
-                                        alt=""
-                                        className="block absolute top-0"
+                                  {Array.isArray(stripeMaskDebugRectsPct) && stripeMaskDebugRectsPct.length === 14
+                                    ? stripeMaskDebugRectsPct.map((r, idx) => (
+                                      <div
+                                        key={`stripe-tile-debug-abs-${idx}`}
+                                        style={{
+                                          position: 'absolute',
+                                          left: `${r.left}%`,
+                                          top: `${r.top}%`,
+                                          width: `${r.width}%`,
+                                          height: `${r.height}%`,
+                                          boxSizing: 'border-box',
+                                          border: '2px solid rgba(0, 200, 255, 0.82)',
+                                          background: idx % 2 === 0 ? 'rgba(0, 200, 255, 0.18)' : 'rgba(0, 200, 255, 0.1)',
+                                          overflow: 'visible',
+                                        }}
+                                      >
+                                        <div
+                                          style={{
+                                            position: 'absolute',
+                                            left: '50%',
+                                            top: -16,
+                                            transform: 'translateX(-50%)',
+                                            zIndex: 2,
+                                            padding: '2px 6px',
+                                            borderRadius: 6,
+                                            fontSize: 12,
+                                            fontWeight: 900,
+                                            lineHeight: 1,
+                                            color: 'rgba(2,6,23,0.95)',
+                                            background: 'rgba(255, 255, 0, 0.94)',
+                                            boxShadow: '0 6px 18px rgba(0,0,0,0.22)',
+                                            border: '1px solid rgba(0,0,0,0.25)',
+                                            userSelect: 'none',
+                                            whiteSpace: 'nowrap',
+                                          }}
+                                        >
+                                          {idx + 1}
+                                        </div>
+                                      </div>
+                                    ))
+                                    : Array.from({ length: 14 }).map((_, idx) => (
+                                      <div
+                                        key={`stripe-tile-debug-abs-fallback-${idx}`}
                                         style={{
                                           height: '100%',
-                                          width: '100%',
-                                          left: '0%',
-                                          objectFit: 'contain',
-                                          opacity: 0.98,
-                                          pointerEvents: 'none',
-                                          transformOrigin: 'top center',
-                                          transform: 'translate(var(--megaStripeOverlayDx, 0px), var(--megaStripeOverlayDy, 0px)) scale(var(--megaStripeOverlayScale, 1))',
-                                          filter: stripeOverlayDebug ? 'drop-shadow(0 0 2px rgba(0,0,0,0.9)) drop-shadow(0 0 6px rgba(255,0,0,0.6))' : 'none',
+                                          flex: '1 1 0%',
+                                          boxSizing: 'border-box',
+                                          border: '2px solid rgba(0, 200, 255, 0.75)',
+                                          background: idx % 2 === 0 ? 'rgba(0, 200, 255, 0.22)' : 'rgba(0, 200, 255, 0.11)',
                                         }}
-                                        loading="eager"
-                                        decoding="async"
                                       />
-                                    </div>
-                                  ))}
+                                    ))}
                                 </div>
                               ) : null}
 
                               <div
-                                className="absolute inset-0"
+                                className="relative"
                                 style={{
-                                  pointerEvents: 'auto',
-                                  background: 'transparent',
-                                  zIndex: 3,
+                                  height: '100%',
+                                  width: 'fit-content',
+                                  display: 'inline-block',
+                                  position: 'relative',
+                                  zIndex: 1,
+                                  WebkitMaskImage: 'url(/placeholders/t-shirt_buttons/v5/full-clic-area-5.svg)',
+                                  maskImage: 'url(/placeholders/t-shirt_buttons/v5/full-clic-area-5.svg)',
+                                  WebkitMaskRepeat: 'no-repeat',
+                                  maskRepeat: 'no-repeat',
+                                  WebkitMaskSize: '100% 100%',
+                                  maskSize: '100% 100%',
+                                  WebkitMaskPosition: '0 0',
+                                  maskPosition: '0 0',
                                 }}
-                                onPointerDown={(ev) => {
-                                  try {
-                                    const el = ev.currentTarget;
-                                    const r = el.getBoundingClientRect();
-                                    const x = (ev.clientX - r.left) / (r.width || 1);
-                                    const y = (ev.clientY - r.top) / (r.height || 1);
-                                    window.dispatchEvent(new CustomEvent('mega-stripe-full-hit', { detail: { x, y } }));
-                                  } catch {
-                                    // ignore
-                                  }
-                                }}
-                              />
+                              >
+                                {megaStripeSpriteEnabledLocal ? (
+                                  <img
+                                    src="/placeholders/t-shirt_buttons/v5/full-color-stripe-5.webp"
+                                    alt=""
+                                    className="block"
+                                    style={{
+                                      height: '100%',
+                                      width: 'auto',
+                                    }}
+                                    loading="lazy"
+                                    decoding="async"
+                                  />
+                                ) : null}
+
+                                {megaStripeRefEnabledLocal && megaStripeRefSrcLocal ? (
+                                  <img
+                                    src={megaStripeRefSrcLocal}
+                                    alt=""
+                                    className="block absolute inset-0"
+                                    style={{
+                                      pointerEvents: 'none',
+                                      zIndex: 6,
+                                      height: '100%',
+                                      width: 'auto',
+                                      transformOrigin: 'top center',
+                                      transform: 'translate(var(--megaStripeRefDx, 0px), var(--megaStripeRefDy, 0px)) scale(var(--megaStripeRefScale, 1))',
+                                    }}
+                                    loading="lazy"
+                                    decoding="async"
+                                  />
+                                ) : null}
+
+                                {megaStripeRef2EnabledLocal && megaStripeRef2SrcLocal ? (
+                                  <img
+                                    src={megaStripeRef2SrcLocal}
+                                    alt=""
+                                    className="block absolute inset-0"
+                                    style={{
+                                      pointerEvents: 'none',
+                                      zIndex: 7,
+                                      height: '100%',
+                                      width: 'auto',
+                                      transformOrigin: 'top center',
+                                      transform: 'translate(var(--megaStripeRef2Dx, 0px), var(--megaStripeRef2Dy, 0px)) scale(var(--megaStripeRef2Scale, 1))',
+                                    }}
+                                    loading="lazy"
+                                    decoding="async"
+                                  />
+                                ) : null}
+
+                                {megaShirtDrawingEnabledLocal && drawingOverlaySrcEffective ? (
+                                  <div
+                                    className="absolute inset-0"
+                                    style={{
+                                      pointerEvents: 'none',
+                                      zIndex: 12,
+                                      transformOrigin: 'top center',
+                                      transform: 'none',
+                                      background: 'transparent',
+                                    }}
+                                  >
+                                    {Array.isArray(stripeMaskTileRectsRawPct) && stripeMaskTileRectsRawPct.length === 14
+                                      ? stripeMaskTileRectsRawPct.map((r, idx) => {
+                                        const base = (() => {
+                                          try {
+                                            return normalizeOverlaySrc(drawingOverlaySrcEffective);
+                                          } catch {
+                                            return normalizeOverlaySrc(drawingOverlaySrcEffective);
+                                          }
+                                        })();
+
+                                        const resolvePerTileAssetSrc = (src) => {
+                                          try {
+                                            if (!src || typeof src !== 'string') return null;
+                                            const tpl = String(src || '').trim();
+                                            if (!tpl) return null;
+                                            const i1 = idx + 1;
+                                            const hasTpl = tpl.includes('{i}') || tpl.includes('{idx}') || tpl.includes('{n}');
+                                            if (hasTpl) {
+                                              return tpl
+                                                .replace(/\{i\}/g, String(i1))
+                                                .replace(/\{n\}/g, String(i1))
+                                                .replace(/\{idx\}/g, String(idx));
+                                            }
+                                            return null;
+                                          } catch {
+                                            return null;
+                                          }
+                                        };
+
+                                        const isAustenKeepCalm = active === 'austen'
+                                          && typeof resolvedOverlaySrc === 'string'
+                                          && /\/austen\/keep_calm\//i.test(resolvedOverlaySrc);
+                                        const isAustenTileSwapBW = active === 'austen'
+                                          && typeof resolvedOverlaySrc === 'string'
+                                          && /\/austen\/(pemberley_house|crosswords|quotes)\//i.test(resolvedOverlaySrc);
+                                        const shouldApplyRules = active === 'first_contact' || active === 'the_human_inside' || active === 'cube' || active === 'outcasted' || isAustenKeepCalm || isAustenTileSwapBW;
+                                        const mode = active === 'the_human_inside' ? humanInsideVariant : firstContactVariant;
+
+                                        const resolveDrawingOverlaySrcForTile = (src) => {
+                                          try {
+                                            if (!src || typeof src !== 'string') return src;
+                                            const safeIdx = Number.isFinite(Number(idx)) ? Number(idx) : 0;
+                                            const isFirst = safeIdx === 0;
+                                            const isLast = safeIdx === 13;
+                                            const isAustenPemberley = active === 'austen' && /\/austen\/pemberley_house\//i.test(src);
+
+                                            const toBlack = (s) => {
+                                              let out = s;
+                                              out = out.replace(/\/white\//i, '/black/');
+                                              out = out.replace(/-w(?=[-.])/i, '-b');
+                                              return out;
+                                            };
+                                            const toWhite = (s) => {
+                                              let out = s;
+                                              out = out.replace(/\/black\//i, '/white/');
+                                              out = out.replace(/-b(?=[-.])/i, '-w');
+                                              return out;
+                                            };
+
+                                            if (!shouldApplyRules) return src;
+
+                                            if ((active === 'the_human_inside' || isAustenTileSwapBW) && (mode === 'white' || mode === 'black') && !isAustenPemberley) {
+                                              // THIN rule: only t1 and t14 swap ink (no invert filter).
+                                              if (isFirst) return toBlack(src);
+                                              if (isLast) return toWhite(src);
+                                              return src;
+                                            }
+
+                                            if (mode === 'color') {
+                                              const hasMultiLight = src.toLowerCase().includes('-multi-light-');
+                                              const hasMultiDark = src.toLowerCase().includes('-multi-dark-');
+                                              const hasThruLight = src.toLowerCase().includes('-multi-thru-light-');
+                                              const hasThruDark = src.toLowerCase().includes('-multi-thru-dark-');
+                                              const hasThruRed = src.toLowerCase().includes('-multi-thru-red-');
+                                              const hasWRed = src.toLowerCase().includes('-multi-w-red-');
+                                              if (isAustenPemberley) {
+                                                if (hasMultiDark) return src.replace(/-multi-dark-/i, '-multi-light-');
+                                                return src;
+                                              }
+                                              if (isFirst) {
+                                                if (hasMultiDark) return src;
+                                                if (hasMultiLight) return src.replace(/-multi-light-/i, '-multi-dark-');
+                                                if (hasThruDark) return src;
+                                                if (hasThruLight) return src.replace(/-multi-thru-light-/i, '-multi-thru-dark-');
+                                                if (hasThruRed) return src;
+                                                if (hasWRed) return src.replace(/-multi-w-red-/i, '-multi-thru-red-');
+                                                return src;
+                                              }
+                                              if (hasMultiLight) return src;
+                                              if (hasMultiDark) return src.replace(/-multi-dark-/i, '-multi-light-');
+                                              if (hasThruLight) return src;
+                                              if (hasThruDark) return src.replace(/-multi-thru-dark-/i, '-multi-thru-light-');
+                                              if (hasWRed) return src;
+                                              if (hasThruRed) return src.replace(/-multi-thru-red-/i, '-multi-w-red-');
+                                              return src;
+                                            }
+
+                                            if (isAustenPemberley && (mode === 'white' || mode === 'black')) {
+                                              return src;
+                                            }
+
+                                            if (mode === 'white') {
+                                              const hasThruRed = src.toLowerCase().includes('-multi-thru-red-');
+                                              const hasWRed = src.toLowerCase().includes('-multi-w-red-');
+                                              if (hasThruRed || hasWRed) {
+                                                return isFirst
+                                                  ? (hasThruRed ? src : src.replace(/-multi-w-red-/i, '-multi-thru-red-'))
+                                                  : (hasWRed ? src : src.replace(/-multi-thru-red-/i, '-multi-w-red-'));
+                                              }
+                                              return isFirst ? toBlack(src) : toWhite(src);
+                                            }
+                                            if (mode === 'black') {
+                                              return isLast ? toWhite(src) : toBlack(src);
+                                            }
+
+                                            return src;
+                                          } catch {
+                                            return src;
+                                          }
+                                        };
+
+                                        const picked = (() => {
+                                          try {
+                                            if (!base) return null;
+                                            const perTile = resolvePerTileAssetSrc(base);
+                                            const candidate = perTile || base;
+                                            return resolveDrawingOverlaySrcForTile(candidate) || candidate;
+                                          } catch {
+                                            return base;
+                                          }
+                                        })();
+                                        const imgUrl = picked ? encodeURI(picked) : '';
+                                        const perTileRaw = (() => {
+                                          try {
+                                            if (!base) return null;
+                                            return resolvePerTileAssetSrc(base);
+                                          } catch {
+                                            return null;
+                                          }
+                                        })();
+
+                                        const safeW = Number(r?.width) || 0;
+                                        const safeH = Number(r?.height) || 0;
+                                        const safeL = Number(r?.left) || 0;
+                                        const safeT = Number(r?.top) || 0;
+
+                                        const fullW = safeW > 0 ? (10000 / safeW) : 0;
+                                        const fullH = safeH > 0 ? (10000 / safeH) : 0;
+                                        const offL = safeW > 0 ? (-safeL / safeW) * 100 : 0;
+                                        const offT = safeH > 0 ? (-safeT / safeH) * 100 : 0;
+
+                                        return (
+                                          <div
+                                            key={`stripe-tile-drawing-${idx}-${imgUrl || ''}`}
+                                            style={{
+                                              position: 'absolute',
+                                              left: `${safeL}%`,
+                                              top: `${safeT}%`,
+                                              width: `${safeW}%`,
+                                              height: `${safeH}%`,
+                                              overflow: 'hidden',
+                                              boxSizing: 'border-box',
+                                              background: drawingOverlayDebug ? 'rgba(217,70,239,0.06)' : 'transparent',
+                                              border: drawingOverlayDebug ? '1px solid rgba(217,70,239,0.35)' : '0px solid transparent',
+                                              transform: tileGapPxLocal ? `translateX(${idx * tileGapPxLocal}px)` : 'none',
+                                            }}
+                                          >
+                                            {drawingOverlayDebug ? (
+                                              <div
+                                                style={{
+                                                  position: 'absolute',
+                                                  top: 4,
+                                                  left: 6,
+                                                  fontSize: 12,
+                                                  fontWeight: 900,
+                                                  color: 'rgba(88,28,135,0.92)',
+                                                  textShadow: '0 1px 1px rgba(255,255,255,0.85)',
+                                                  userSelect: 'none',
+                                                  zIndex: 13,
+                                                }}
+                                              >
+                                                {`D${idx + 1}`}
+                                              </div>
+                                            ) : null}
+
+                                            <img
+                                              src={imgUrl ? imgUrl : undefined}
+                                              alt=""
+                                              className="block absolute inset-0"
+                                              onError={(e) => {
+                                                try {
+                                                  if (
+                                                    import.meta.env.DEV
+                                                    && active === 'austen'
+                                                    && typeof resolvedOverlaySrc === 'string'
+                                                    && /\/austen\/pemberley_house\//i.test(resolvedOverlaySrc)
+                                                  ) {
+                                                    // eslint-disable-next-line no-console
+                                                    console.error('[MEGA stripe tile img error]', { idx, src: imgUrl, resolvedOverlaySrc });
+                                                  }
+                                                  e.currentTarget.style.display = 'none';
+                                                } catch {
+                                                }
+                                              }}
+                                              style={{
+                                                pointerEvents: 'none',
+                                                height: '100%',
+                                                width: '100%',
+                                                objectFit: 'contain',
+                                                opacity: 0.98,
+                                                transformOrigin: 'top center',
+                                                transform:
+                                                  'translate(var(--megaStripeDrawingOverlayDx, var(--hgShirtOverlayDx, 0px)), var(--megaStripeDrawingOverlayDy, var(--hgShirtOverlayDy, 0px))) scale(var(--megaStripeDrawingOverlayScale, var(--hgShirtOverlayScale, 1)))',
+                                                filter: (() => {
+                                                  const isPemberley = active === 'austen' && typeof resolvedOverlaySrc === 'string' && /\/austen\/pemberley_house\//i.test(resolvedOverlaySrc);
+                                                  const tileIsFirst = Number(idx) === 0;
+                                                  const tileIsLast = Number(idx) === 13;
+                                                  const invertPemb = isPemberley && ((mode === 'white' && tileIsFirst) || (mode === 'black' && !tileIsLast));
+                                                  const base = drawingOverlayDebug
+                                                    ? 'drop-shadow(0 0 2px rgba(0,0,0,0.65))'
+                                                    : active === 'austen'
+                                                          && typeof resolvedOverlaySrc === 'string'
+                                                          && resolvedOverlaySrc.toLowerCase().includes('/austen/keep_calm/')
+                                                          && resolvedOverlaySrc.toLowerCase().endsWith('keep-calm-w-stripe.webp')
+                                                        ? 'drop-shadow(0 0 2px rgba(0,0,0,0.75))'
+                                                      : isPemberley
+                                                        ? 'drop-shadow(0 0 0px rgba(0,0,0,0.85))'
+                                                      : 'none';
+                                                  if (!invertPemb) return base;
+                                                  if (!base || base === 'none') return 'invert(1)';
+                                                  return `${base} invert(1)`;
+                                                })(),
+                                              }}
+                                              loading="eager"
+                                              decoding="async"
+                                            />
+                                          </div>
+                                        );
+                                      })
+                                      : Array.from({ length: 14 }).map((_, idx) => {
+                                        const base = (() => {
+                                          try {
+                                            return normalizeOverlaySrc(drawingOverlaySrcEffective);
+                                          } catch {
+                                            return normalizeOverlaySrc(drawingOverlaySrcEffective);
+                                          }
+                                        })();
+
+                                        const resolvePerTileAssetSrc = (src) => {
+                                          try {
+                                            if (!src || typeof src !== 'string') return null;
+                                            const tpl = String(src || '').trim();
+                                            if (!tpl) return null;
+                                            const i1 = idx + 1;
+                                            const hasTpl = tpl.includes('{i}') || tpl.includes('{idx}') || tpl.includes('{n}');
+                                            if (hasTpl) {
+                                              return tpl
+                                                .replace(/\{i\}/g, String(i1))
+                                                .replace(/\{n\}/g, String(i1))
+                                                .replace(/\{idx\}/g, String(idx));
+                                            }
+                                            return null;
+                                          } catch {
+                                            return null;
+                                          }
+                                        };
+                                        const isAustenKeepCalm = active === 'austen'
+                                          && typeof resolvedOverlaySrc === 'string'
+                                          && /\/austen\/keep_calm\//i.test(resolvedOverlaySrc);
+                                        const isAustenTileSwapBW = active === 'austen'
+                                          && typeof resolvedOverlaySrc === 'string'
+                                          && /\/austen\/(pemberley_house|crosswords|quotes)\//i.test(resolvedOverlaySrc);
+                                        const shouldApplyRules = active === 'first_contact' || active === 'the_human_inside' || active === 'cube' || active === 'outcasted' || isAustenKeepCalm || isAustenTileSwapBW;
+                                        const mode = active === 'the_human_inside' ? humanInsideVariant : firstContactVariant;
+
+                                        const resolveDrawingOverlaySrcForTile = (src) => {
+                                          try {
+                                            if (!src || typeof src !== 'string') return src;
+                                            const safeIdx = Number.isFinite(Number(idx)) ? Number(idx) : 0;
+                                            const isFirst = safeIdx === 0;
+                                            const isLast = safeIdx === 13;
+
+                                            const toBlack = (s) => {
+                                              let out = s;
+                                              out = out.replace(/\/white\//i, '/black/');
+                                              out = out.replace(/-w(?=[-.])/i, '-b');
+                                              return out;
+                                            };
+                                            const toWhite = (s) => {
+                                              let out = s;
+                                              out = out.replace(/\/black\//i, '/white/');
+                                              out = out.replace(/-b(?=[-.])/i, '-w');
+                                              return out;
+                                            };
+
+                                            if (!shouldApplyRules) return src;
+
+                                            if ((active === 'the_human_inside' || isAustenTileSwapBW) && (mode === 'white' || mode === 'black') && !isAustenPemberley) {
+                                              // THIN rule: only t1 and t14 swap ink (no invert filter).
+                                              if (isFirst) return toBlack(src);
+                                              if (isLast) return toWhite(src);
+                                              return src;
+                                            }
+
+                                            if (mode === 'color') {
+                                              const hasMultiLight = src.toLowerCase().includes('-multi-light-');
+                                              const hasMultiDark = src.toLowerCase().includes('-multi-dark-');
+                                              const hasThruLight = src.toLowerCase().includes('-multi-thru-light-');
+                                              const hasThruDark = src.toLowerCase().includes('-multi-thru-dark-');
+                                              const hasThruRed = src.toLowerCase().includes('-multi-thru-red-');
+                                              const hasWRed = src.toLowerCase().includes('-multi-w-red-');
+                                              if (isAustenPemberley) {
+                                                if (hasMultiDark) return src.replace(/-multi-dark-/i, '-multi-light-');
+                                                return src;
+                                              }
+                                              if (isFirst) {
+                                                if (hasMultiDark) return src;
+                                                if (hasMultiLight) return src.replace(/-multi-light-/i, '-multi-dark-');
+                                                if (hasThruDark) return src;
+                                                if (hasThruLight) return src.replace(/-multi-thru-light-/i, '-multi-thru-dark-');
+                                                if (hasThruRed) return src;
+                                                if (hasWRed) return src.replace(/-multi-w-red-/i, '-multi-thru-red-');
+                                                return src;
+                                              }
+                                              if (hasMultiLight) return src;
+                                              if (hasMultiDark) return src.replace(/-multi-dark-/i, '-multi-light-');
+                                              if (hasThruLight) return src;
+                                              if (hasThruDark) return src.replace(/-multi-thru-dark-/i, '-multi-thru-light-');
+                                              if (hasWRed) return src;
+                                              if (hasThruRed) return src.replace(/-multi-thru-red-/i, '-multi-w-red-');
+                                              return src;
+                                            }
+
+                                            if (mode === 'white') {
+                                              const hasThruRed = src.toLowerCase().includes('-multi-thru-red-');
+                                              const hasWRed = src.toLowerCase().includes('-multi-w-red-');
+                                              if (hasThruRed || hasWRed) {
+                                                return isFirst
+                                                  ? (hasThruRed ? src : src.replace(/-multi-w-red-/i, '-multi-thru-red-'))
+                                                  : (hasWRed ? src : src.replace(/-multi-thru-red-/i, '-multi-w-red-'));
+                                              }
+                                              return isFirst ? toBlack(src) : toWhite(src);
+                                            }
+                                            if (mode === 'black') {
+                                              return isLast ? toWhite(src) : toBlack(src);
+                                            }
+
+                                            return src;
+                                          } catch {
+                                            return src;
+                                          }
+                                        };
+
+                                        const perTileRaw = (() => {
+                                          try {
+                                            if (!base) return null;
+                                            return resolvePerTileAssetSrc(base);
+                                          } catch {
+                                            return null;
+                                          }
+                                        })();
+
+                                        const picked = (() => {
+                                          try {
+                                            if (!base) return null;
+                                            const candidate = perTileRaw || base;
+                                            return resolveDrawingOverlaySrcForTile(candidate) || candidate;
+                                          } catch {
+                                            return base;
+                                          }
+                                        })();
+
+                                        const imgUrl = picked ? encodeURI(picked) : '';
+                                        return (
+                                          <div
+                                            key={`stripe-tile-drawing-fallback-${idx}-${imgUrl || ''}`}
+                                            style={{
+                                              position: 'absolute',
+                                              top: '0%',
+                                              height: '100%',
+                                              left: `${(idx / 14) * 100}%`,
+                                              width: `${(1 / 14) * 100}%`,
+                                              overflow: 'hidden',
+                                              boxSizing: 'border-box',
+                                              transform: tileGapPxLocal ? `translateX(${idx * tileGapPxLocal}px)` : 'none',
+                                            }}
+                                          >
+                                            <img
+                                              src={imgUrl ? imgUrl : undefined}
+                                              alt=""
+                                              className="block absolute inset-0"
+                                              onError={(e) => {
+                                                try {
+                                                  e.currentTarget.style.display = 'none';
+                                                } catch {
+                                                }
+                                              }}
+                                              style={{
+                                                pointerEvents: 'none',
+                                                height: '100%',
+                                                width: '100%',
+                                                objectFit: 'contain',
+                                                opacity: 0.98,
+                                                transformOrigin: 'top center',
+                                                transform:
+                                                  'translate(var(--megaStripeDrawingOverlayDx, var(--hgShirtOverlayDx, 0px)), var(--megaStripeDrawingOverlayDy, var(--hgShirtOverlayDy, 0px))) scale(var(--megaStripeDrawingOverlayScale, var(--hgShirtOverlayScale, 1)))',
+                                                filter: (() => {
+                                                  const isPemberley = active === 'austen' && typeof resolvedOverlaySrc === 'string' && /\/austen\/pemberley_house\//i.test(resolvedOverlaySrc);
+                                                  const tileIsFirst = Number(idx) === 0;
+                                                  const tileIsLast = Number(idx) === 13;
+                                                  const invertPemb = isPemberley && ((mode === 'white' && tileIsFirst) || (mode === 'black' && !tileIsLast));
+                                                  const base = isPemberley ? 'drop-shadow(0 0 0px rgba(0,0,0,0.85))' : 'none';
+                                                  if (!invertPemb) return base;
+                                                  if (!base || base === 'none') return 'invert(1)';
+                                                  return `${base} invert(1)`;
+                                                })(),
+                                              }}
+                                              loading="eager"
+                                              decoding="async"
+                                            />
+                                          </div>
+                                        );
+                                      })}
+                                  </div>
+                                ) : null}
+
+                                <div
+                                  className="absolute inset-0"
+                                  style={{
+                                    pointerEvents: 'auto',
+                                    background: 'transparent',
+                                    zIndex: 3,
+                                  }}
+                                  onPointerDown={(ev) => {
+                                    try {
+                                      const el = ev.currentTarget;
+                                      const r = el.getBoundingClientRect();
+                                      const x = (ev.clientX - r.left) / (r.width || 1);
+                                      const y = (ev.clientY - r.top) / (r.height || 1);
+                                      window.dispatchEvent(new CustomEvent('mega-stripe-full-hit', { detail: { x, y } }));
+                                    } catch {
+                                      // ignore
+                                    }
+                                  }}
+                                />
+                              </div>
                             </div>
                           </div>
                         </div>
@@ -3420,9 +5279,16 @@ export default function FullWideSlideDemoHeader({
                               </div>
                             ) : it === CONTROL_TILE_BN ? (
                               active === 'the_human_inside' ? (
-                                <FirstContactDibuix00Buttons onWhite={() => setHumanInsideVariant('white')} onBlack={() => setHumanInsideVariant('black')} onMulti={() => setHumanInsideVariant('color')} />
+                                <FirstContactDibuix00Buttons onWhite={() => { setStripeOverlayOverrideActive(false); setHumanInsideVariant('white'); }} onBlack={() => { setStripeOverlayOverrideActive(false); setHumanInsideVariant('black'); }} onMulti={() => { setStripeOverlayOverrideActive(false); setHumanInsideVariant('color'); }} />
                               ) : (
-                                <FirstContactDibuix00Buttons onWhite={() => setFirstContactVariant('white')} onBlack={() => setFirstContactVariant('black')} onMulti={() => setFirstContactVariant('color')} />
+                                <FirstContactDibuix00Buttons
+                                  onWhite={() => { setStripeOverlayOverrideActive(false); setFirstContactVariant('white'); }}
+                                  onBlack={() => { setStripeOverlayOverrideActive(false); setFirstContactVariant('black'); }}
+                                  onMulti={() => { setStripeOverlayOverrideActive(false); setFirstContactVariant('color'); }}
+                                  showWhite={stripeVariantVisibility?.white !== false}
+                                  showBlack={stripeVariantVisibility?.black !== false}
+                                  showMulti={stripeVariantVisibility?.color !== false}
+                                />
                               )
                             ) : it === CONTROL_TILE_ARROWS ? (
                               <FirstContactDibuix09Buttons

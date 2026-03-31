@@ -144,6 +144,22 @@ export function AdminProvider({ children }) {
     setEditMode(false);
     setBypassUnderConstruction(false);
     setAdminEmail(null);
+    try {
+      sessionStorage.removeItem('HG_MEGA_PUBLIC_LAST_ACTIVITY_AT');
+      sessionStorage.removeItem('HG_MEGA_PUBLIC_SELECTOR_STATE');
+    } catch {
+      // ignore
+    }
+    try {
+      localStorage.removeItem('MEGA_TILE_SELECTOR_STEP_X');
+      localStorage.removeItem('MEGA_TILE_SELECTOR_STEP_Y');
+      localStorage.removeItem('MEGA_TILE_SELECTOR_V2_STEP_X');
+      localStorage.removeItem('MEGA_TILE_SELECTOR_V2_STEP_Y');
+      localStorage.removeItem('MEGA_TILE_SELECTOR_TARGET');
+      localStorage.removeItem('MEGA_TILE_SELECTOR_V2_TARGET');
+    } catch {
+      // ignore
+    }
     if (supabase?.auth) {
       try {
         await supabase.auth.signOut();

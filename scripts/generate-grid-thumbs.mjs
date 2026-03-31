@@ -10,6 +10,8 @@ function parseArgs(argv) {
     width: 320,
     quality: 72,
     overwrite: true,
+    incremental: false,
+    force: false,
     dryRun: false,
     verbose: false,
   }
@@ -42,6 +44,14 @@ function parseArgs(argv) {
     }
     if (a === '--no-overwrite') {
       args.overwrite = false
+      continue
+    }
+    if (a === '--incremental') {
+      args.incremental = true
+      continue
+    }
+    if (a === '--force') {
+      args.force = true
       continue
     }
     if (a === '--dry-run') {
@@ -93,7 +103,43 @@ function fmtBytes(n) {
   return `${mb.toFixed(2)} MB`
 }
 
-async function processOne({ srcPath, dstPath, width, quality, dryRun }) {
+function effectiveWidthFor(relNormalized, kind, baseWidth) {
+  try {
+    if (kind !== 'stripe') return baseWidth
+    const s = String(relNormalized || '').toLowerCase().replace(/\\/g, '/')
+    const file = s.split('/').pop() || ''
+    if (
+      file === 'pemberley-house-multi-light-stripe.webp'
+      || file === 'pemberley-house-multi-dark-stripe.webp'
+      || s.endsWith('/austen/pemberley_house/multi/pemberley-house-multi-light-stripe.webp')
+      || s.endsWith('/austen/pemberley_house/multi/pemberley-house-multi-dark-stripe.webp')
+    ) {
+      const bw = Number(baseWidth) || 0
+      return bw > 0 ? bw * 2 : 1024
+    }
+    return baseWidth
+  } catch {
+    return baseWidth
+  }
+}
+
+function shouldUseLosslessWebp(relNormalized, kind) {
+  try {
+    if (kind !== 'stripe') return false
+    const s = String(relNormalized || '').toLowerCase().replace(/\\/g, '/')
+    const file = s.split('/').pop() || ''
+    return (
+      file === 'pemberley-house-multi-light-stripe.webp'
+      || file === 'pemberley-house-multi-dark-stripe.webp'
+      || s.endsWith('/austen/pemberley_house/multi/pemberley-house-multi-light-stripe.webp')
+      || s.endsWith('/austen/pemberley_house/multi/pemberley-house-multi-dark-stripe.webp')
+    )
+  } catch {
+    return false
+  }
+}
+
+async function processOne({ srcPath, dstPath, width, quality, lossless, dryRun }) {
   const before = fs.statSync(srcPath).size
 
   if (dryRun) {
@@ -108,7 +154,7 @@ async function processOne({ srcPath, dstPath, width, quality, dryRun }) {
     pipeline = pipeline.resize({ width, withoutEnlargement: true })
   }
 
-  const outBuf = await pipeline.webp({ quality, effort: 6 }).toBuffer()
+  const outBuf = await pipeline.webp(lossless ? { lossless: true, effort: 6 } : { quality, effort: 6 }).toBuffer()
   ensureDir(path.dirname(dstPath))
   fs.writeFileSync(dstPath, outBuf)
 
@@ -148,11 +194,15 @@ async function main() {
 
   let totalBefore = 0
   let totalAfter = 0
-  let processed = 0
+  let wrote = 0
+  let skipped = 0
 
   for (const srcPath of candidates) {
     const rel = path.relative(inDirAbs, srcPath)
     const relNormalized = normalizeThumbRelPath(rel, args.kind)
+
+    const width = effectiveWidthFor(relNormalized, args.kind, args.width)
+    const lossless = shouldUseLosslessWebp(relNormalized, args.kind)
 
     const dstPath = outDirAbs
       ? path.join(outDirAbs, relNormalized).replace(/\.(png|jpe?g)$/i, '.webp')
@@ -160,17 +210,47 @@ async function main() {
 
     const tmpPath = dstPath + '.tmp'
 
+    if (outDirAbs && args.incremental && !args.force) {
+      try {
+        if (fs.existsSync(dstPath)) {
+          const srcStat = fs.statSync(srcPath)
+          const dstStat = fs.statSync(dstPath)
+          if (dstStat.mtimeMs >= srcStat.mtimeMs && !lossless) {
+            if (width === args.width) {
+              skipped++
+              if (args.verbose) {
+                console.log(`SKIP\t${rel}`)
+              }
+              continue
+            }
+            const dstMeta = await sharp(dstPath, { failOn: 'none' }).metadata()
+            const dstW = Number(dstMeta?.width) || 0
+            if (dstW >= width) {
+              skipped++
+              if (args.verbose) {
+                console.log(`SKIP\t${rel}`)
+              }
+              continue
+            }
+          }
+        }
+      } catch {
+        // ignore
+      }
+    }
+
     const res = await processOne({
       srcPath,
       dstPath: args.overwrite && !outDirAbs ? tmpPath : dstPath,
-      width: args.width,
+      width,
       quality: args.quality,
+      lossless,
       dryRun: args.dryRun,
     })
 
     totalBefore += res.before
     totalAfter += res.after
-    processed++
+    wrote++
 
     if (!args.dryRun && args.overwrite && !outDirAbs) {
       fs.renameSync(tmpPath, dstPath)
@@ -209,7 +289,9 @@ async function main() {
   const diff = totalBefore - totalAfter
   const sign = diff >= 0 ? '-' : '+'
 
-  console.log(`FILES\t${processed}`)
+  console.log(`FILES\t${candidates.length}`)
+  console.log(`WROTE\t${wrote}`)
+  console.log(`SKIPPED\t${skipped}`)
   console.log(`BEFORE\t${fmtBytes(totalBefore)}`)
   console.log(`AFTER\t${fmtBytes(totalAfter)}`)
   console.log(`DELTA\t${fmtBytes(totalBefore - totalAfter)}`)
