@@ -24,6 +24,7 @@ import SupabaseCollectionRoute from '@/pages/SupabaseCollectionRoute.jsx';
 import DevGuidesOverlay from '@/components/DevGuidesOverlay.jsx';
 import SlideShell from '@/components/SlideShell';
 import useSlidesConfig from '@/hooks/useSlidesConfig';
+import { HUDOverlay } from '@/components/HUD';
 
 const FulfillmentPage = lazy(() => import('@/pages/FulfillmentPage'));
 const FulfillmentSettingsPage = lazy(() => import('@/pages/FulfillmentSettingsPage'));
@@ -5599,6 +5600,8 @@ function App() {
                 ))}
               </div>
             )}
+
+            <HUDOverlay isVisible={true} />
       </>
     )}
     </ErrorBoundary>
