@@ -34,14 +34,11 @@ const ProductPage = lazy(() => import('@/pages/ProductPage'));
 const Home = lazy(() => import('@/pages/Home'));
 const NewPage = lazy(() => import('@/pages/NewPage'));
 const OrderTrackingPage = lazy(() => import('@/pages/OrderTrackingPage'));
-const CartPage = lazy(() => import('@/pages/CartPage'));
 const CheckoutPage = lazy(() => import('@/pages/CheckoutPage'));
 const NotFoundPage = lazy(() => import('@/pages/NotFoundPage'));
 const OffersPage = lazy(() => import('@/pages/OffersPage'));
 const ProductDetailPage = lazy(() => import('@/pages/ProductDetailPage'));
 const OrderConfirmationPage = lazy(() => import('@/pages/OrderConfirmationPage'));
-const SearchPage = lazy(() => import('@/pages/SearchPage'));
-const ProfilePage = lazy(() => import('@/pages/ProfilePage'));
 const AboutPage = lazy(() => import('@/pages/AboutPage'));
 const ContactPage = lazy(() => import('@/pages/ContactPage'));
 const FAQPage = lazy(() => import('@/pages/FAQPage'));
@@ -1922,16 +1919,21 @@ function App() {
 
   const BeltReferenceOverlay = ({ enabled }) => {
     const [state, setState] = useState({ xL: null, xR: null, yT: null, yB: null, spriteXL: null, spriteXR: null });
+    const capturedRef = useRef(false);
 
     useLayoutEffect(() => {
-      if (!enabled) return undefined;
+      if (!enabled) {
+        capturedRef.current = false;
+        return undefined;
+      }
 
-      let raf = 0;
       let t1 = 0;
       let t2 = 0;
       let t3 = 0;
 
       const read = () => {
+        if (capturedRef.current) return;
+
         const resolveX = (el, edge) => {
           const r = el?.getBoundingClientRect?.();
           if (!r) return null;
@@ -1956,31 +1958,18 @@ function App() {
         const yT = resolveY(stripeImg, 'top');
         const yB = resolveY(stripeImg, 'bottom');
 
-        setState((prev) => (
-          prev.xL === xL && prev.xR === xR && prev.yT === yT && prev.yB === yB && prev.spriteXL === spriteXL && prev.spriteXR === spriteXR
-            ? prev
-            : { xL, xR, yT, yB, spriteXL, spriteXR }
-        ));
-      };
-
-      const tick = () => {
-        read();
-        raf = window.requestAnimationFrame(tick);
+        if (Number.isFinite(xL) || Number.isFinite(xR) || Number.isFinite(yT) || Number.isFinite(yB) || Number.isFinite(spriteXL) || Number.isFinite(spriteXR)) {
+          setState({ xL, xR, yT, yB, spriteXL, spriteXR });
+          capturedRef.current = true;
+        }
       };
 
       read();
-      raf = window.requestAnimationFrame(tick);
-      window.addEventListener('resize', read);
-      window.addEventListener('scroll', read, true);
-
       t1 = window.setTimeout(read, 50);
       t2 = window.setTimeout(read, 250);
       t3 = window.setTimeout(read, 750);
 
       return () => {
-        window.cancelAnimationFrame(raf);
-        window.removeEventListener('resize', read);
-        window.removeEventListener('scroll', read, true);
         window.clearTimeout(t1);
         window.clearTimeout(t2);
         window.clearTimeout(t3);
@@ -2006,6 +1995,9 @@ function App() {
         ) : null}
         {Number.isFinite(state.yT) ? (
           <div style={{ position: 'fixed', left: 0, top: state.yT, width: '100vw', height: 0, borderTop: `1px solid ${color}` }} />
+        ) : null}
+        {Number.isFinite(state.yB) ? (
+          <div style={{ position: 'fixed', left: 0, top: state.yB, width: '100vw', height: 0, borderTop: `1px solid ${color}` }} />
         ) : null}
       </div>
     );
@@ -2879,7 +2871,6 @@ function App() {
             offersHeaderVisible={offersHeaderVisible}
             offersHeaderHeight={offersHeaderHeight}
             offersHeaderTop={offersHeaderTop}
-            isSearchPage={location.pathname === '/search'}
           />
         ) : (
           <Header
@@ -2891,7 +2882,6 @@ function App() {
             offersHeaderVisible={offersHeaderVisible}
             offersHeaderHeight={offersHeaderHeight}
             offersHeaderTop={offersHeaderTop}
-            isSearchPage={location.pathname === '/search'}
           />
         )
       )}
@@ -3033,35 +3023,7 @@ function App() {
                   }
                 />
 
-                {/* Search Page */}
-                <Route
-                  path="/search"
-                  element={
-                    <motion.div
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -10 }}
-                      transition={{ duration: 0.3, ease: "easeInOut" }}
-                    >
-                      <SearchPage {...pageProps} />
-                    </motion.div>
-                  }
-                />
-
-                {/* Cart Page */}
-                <Route
-                  path="/cart"
-                  element={
-                    <CartPage
-                      cartItems={cartItems}
-                      onUpdateQuantity={updateQuantity}
-                      onRemove={removeFromCart}
-                    />
-                  }
-                />
-
                 <Route path="/wishlist" element={<Navigate to="/" replace />} />
-                <Route path="/profile" element={<ProfilePage />} />
 
                 <Route path="/full-wide-slide" element={<FullWideSlidePage />} />
 
@@ -3235,7 +3197,6 @@ function App() {
           onRemove={removeFromCart}
           onUpdateSize={updateSize}
           onViewCart={() => {
-            navigate('/cart');
             setSlideOpen(false);
             setSlidePresetId('');
           }}

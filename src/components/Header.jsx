@@ -5,7 +5,6 @@ import { Button } from '@/components/ui/button';
 import { UserRound } from 'lucide-react';
 import { useTexts } from '@/hooks/useTexts';
 import { useGridDebug } from '@/contexts/GridDebugContext';
-import SearchDialog from '@/components/SearchDialog';
 
 function Header({
   cartItemCount,
@@ -15,7 +14,6 @@ function Header({
   adminBannerVisible = false,
   rulerInset = 0
 }) {
-  const [isSearchDialogOpen, setIsSearchDialogOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
   const texts = useTexts();
@@ -91,27 +89,12 @@ function Header({
             transition={{ duration: 0.5, delay: 0.1 }}
             className="flex items-center justify-center flex-1"
           >
-            {/* Mobile: Search Button */}
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setIsSearchDialogOpen(true)}
-              className="h-9 w-9 hover:bg-transparent focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 lg:hidden"
-              aria-label="Obrir cerca"
-            >
-              <svg className="h-5 w-5 text-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
-              <span className="sr-only">Cerca</span>
-            </Button>
-
             {/* Desktop: Navigation */}
             <nav className="hidden lg:flex items-center gap-6 flex-nowrap">
               {navLinks.map((link) => (
-                <Link
+                <span
                   key={link.name}
-                  to={link.href}
-                  className="font-roboto text-sm font-normal text-foreground transition-all inline-block whitespace-nowrap"
+                  className="font-roboto text-sm font-normal text-foreground transition-all inline-block whitespace-nowrap cursor-default"
                   onMouseEnter={(e) => {
                     const color = document.documentElement.classList.contains('dark') ? '#ffffff' : 'hsl(var(--foreground))';
                     e.target.style.textShadow = `0 0 0.55px ${color}, 0 0 0.55px ${color}`;
@@ -119,7 +102,7 @@ function Header({
                   onMouseLeave={(e) => e.target.style.textShadow = 'none'}
                 >
                   {link.name}
-                </Link>
+                </span>
               ))}
             </nav>
           </motion.div>
@@ -131,20 +114,6 @@ function Header({
             transition={{ duration: 0.5, delay: 0.2 }}
             className="flex items-center justify-end gap-2"
           >
-            {/* Search Button (desktop only) */}
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setIsSearchDialogOpen(true)}
-              className="hidden lg:flex h-10 w-10 hover:bg-transparent focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-              aria-label="Obrir cerca"
-            >
-              <svg className="h-6 w-6 translate-y-[3px] text-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
-              <span className="sr-only">Cerca</span>
-            </Button>
-
             {/* Cart */}
             <Button
               variant="ghost"
@@ -156,12 +125,6 @@ function Header({
                   cartClickTimeoutRef.current = null;
                   onCartClick?.();
                 }, 320);
-              }}
-              onDoubleClick={(e) => {
-                e.preventDefault();
-                if (cartClickTimeoutRef.current) window.clearTimeout(cartClickTimeoutRef.current);
-                cartClickTimeoutRef.current = null;
-                navigate('/cart');
               }}
               className="relative h-9 w-9 lg:h-10 lg:w-10 hover:bg-transparent focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 text-foreground"
             >
@@ -202,12 +165,6 @@ function Header({
           </motion.div>
         </div>
       </div>
-
-      {/* Search Dialog */}
-      <SearchDialog
-        isOpen={isSearchDialogOpen}
-        onClose={() => setIsSearchDialogOpen(false)}
-      />
     </motion.header>
   );
 }

@@ -3,7 +3,6 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { UserRound } from 'lucide-react';
-import SearchDialog from '@/components/SearchDialog';
 
 export default function DevHeader({
   adminBannerHeight = 0,
@@ -15,7 +14,6 @@ export default function DevHeader({
   const location = useLocation();
   const navigate = useNavigate();
   const suppressThemeOverrides = location.pathname === '/admin/controls';
-  const [isSearchDialogOpen, setIsSearchDialogOpen] = useState(false);
   const cartClickTimeoutRef = useRef(null);
 
   const [strongHex, setStrongHex] = useState(() => {
@@ -169,10 +167,9 @@ export default function DevHeader({
 
           <div className="absolute left-1/2 -translate-x-1/2 hidden lg:flex items-center gap-6 flex-nowrap">
             {demoLinks.map((link) => (
-              <Link
+              <span
                 key={link.href}
-                to={link.href}
-                className="font-roboto text-sm font-normal text-foreground transition-all inline-block whitespace-nowrap"
+                className="font-roboto text-sm font-normal text-foreground transition-all inline-block whitespace-nowrap cursor-default"
                 onMouseEnter={(e) => {
                   const color = document.documentElement.classList.contains('dark') ? '#ffffff' : 'hsl(var(--foreground))';
                   e.currentTarget.style.textShadow = `0 0 0.55px ${color}, 0 0 0.55px ${color}`;
@@ -182,26 +179,13 @@ export default function DevHeader({
                 }}
               >
                 {link.label}
-              </Link>
+              </span>
             ))}
           </div>
 
           <div className="flex-1" />
 
           <div className="flex items-center justify-end gap-2">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setIsSearchDialogOpen(true)}
-              className="h-9 w-9 lg:h-10 lg:w-10 hover:bg-transparent focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-              aria-label="Obrir cerca"
-            >
-              <svg className="h-6 w-6 translate-y-[5px] text-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
-              <span className="sr-only">Cerca</span>
-            </Button>
-
             <Button
               variant="ghost"
               size="icon"
@@ -212,12 +196,6 @@ export default function DevHeader({
                   cartClickTimeoutRef.current = null;
                   onCartClick?.();
                 }, 320);
-              }}
-              onDoubleClick={(e) => {
-                e.preventDefault();
-                if (cartClickTimeoutRef.current) window.clearTimeout(cartClickTimeoutRef.current);
-                cartClickTimeoutRef.current = null;
-                navigate('/cart');
               }}
               className="relative h-9 w-9 lg:h-10 lg:w-10 hover:bg-transparent focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 text-foreground"
               aria-label="Obrir cistell"
@@ -263,11 +241,6 @@ export default function DevHeader({
           </div>
         </div>
       </div>
-
-      <SearchDialog
-        isOpen={isSearchDialogOpen}
-        onClose={() => setIsSearchDialogOpen(false)}
-      />
     </div>
   );
 }

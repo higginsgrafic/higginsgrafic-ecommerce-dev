@@ -4,7 +4,6 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Search, UserRound, Menu, X } from 'lucide-react';
 import { createPortal } from 'react-dom';
 import { Button } from '@/components/ui/button';
-import SearchDialog from '@/components/SearchDialog';
 import { useTexts } from '@/hooks/useTexts';
 
 function NikeInspiredHeader({
@@ -29,7 +28,6 @@ function NikeInspiredHeader({
   const forceMegaMenuOpen = isNikeDemoRoute && demoManualEnabled;
   const forceMegaMenuOpenRef = useRef(false);
 
-  const [isSearchDialogOpen, setIsSearchDialogOpen] = useState(false);
   const cartClickTimeoutRef = useRef(null);
   const [activeMenu, setActiveMenu] = useState(null);
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -888,8 +886,7 @@ function NikeInspiredHeader({
                     layout={false}
                     className="justify-self-stretch flex items-center"
                   >
-                    <Link
-                      to={link.href}
+                    <span
                       ref={(el) => {
                         if (link.href === '/first-contact') firstContactRef.current = el;
                         if (link.href === '/the-human-inside') theHumanInsideRef.current = el;
@@ -897,7 +894,7 @@ function NikeInspiredHeader({
                         const key = (link.href || '').toString().replace(/^\//, '').trim();
                         if (key) navLinkRefs.current[key] = el;
                       }}
-                      className="font-roboto text-sm font-normal text-gray-900 transition-all block w-full m-0 p-0 leading-none"
+                      className="font-roboto text-sm font-normal text-gray-900 transition-all block w-full m-0 p-0 leading-none cursor-default"
                       onMouseEnter={(e) => {
                         const color = document.documentElement.classList.contains('dark') ? '#ffffff' : 'hsl(var(--foreground))';
                         e.currentTarget.style.textShadow = `0 0 0.55px ${color}, 0 0 0.55px ${color}`;
@@ -909,23 +906,13 @@ function NikeInspiredHeader({
                       onFocus={openCollections}
                     >
                       {link.name}
-                    </Link>
+                    </span>
                   </motion.div>
                 ))}
               </motion.nav>
             </div>
 
             <div className="flex items-center justify-end gap-1">
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setIsSearchDialogOpen(true)}
-                className="h-9 w-9 lg:h-10 lg:w-10 hover:bg-transparent focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-                aria-label="Obrir cerca"
-              >
-                <Search className="h-5 w-5 lg:h-6 lg:w-6" strokeWidth={1.5} />
-              </Button>
-
               <Button
                 variant="ghost"
                 size="icon"
@@ -936,12 +923,6 @@ function NikeInspiredHeader({
                     cartClickTimeoutRef.current = null;
                     onCartClick?.();
                   }, 320);
-                }}
-                onDoubleClick={(e) => {
-                  e.preventDefault();
-                  if (cartClickTimeoutRef.current) window.clearTimeout(cartClickTimeoutRef.current);
-                  cartClickTimeoutRef.current = null;
-                  navigate('/cart');
                 }}
                 className="relative h-9 w-9 lg:h-10 lg:w-10 hover:bg-transparent focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 text-foreground"
                 aria-label={cartItemCount > 0 ? 'Carro (amb productes)' : 'Carro'}
@@ -1244,8 +1225,6 @@ function NikeInspiredHeader({
           )}
         </AnimatePresence>
       </div>
-
-      <SearchDialog isOpen={isSearchDialogOpen} onClose={() => setIsSearchDialogOpen(false)} />
     </motion.header>
   );
 }
