@@ -24,7 +24,6 @@ import SupabaseCollectionRoute from '@/pages/SupabaseCollectionRoute.jsx';
 import DevGuidesOverlay from '@/components/DevGuidesOverlay.jsx';
 import SlideShell from '@/components/SlideShell';
 import useSlidesConfig from '@/hooks/useSlidesConfig';
-import { HUDOverlay } from '@/components/HUD';
 
 const FulfillmentPage = lazy(() => import('@/pages/FulfillmentPage'));
 const FulfillmentSettingsPage = lazy(() => import('@/pages/FulfillmentSettingsPage'));
@@ -635,6 +634,8 @@ function App() {
   const megaStripeParamsGridRef = useRef(null);
   const megaStripeLastGoodHudTopPxRef = useRef(null);
   const [megaStripeHudSnapDyPx, setMegaStripeHudSnapDyPx] = useState(0);
+  const [hudCollapsed, setHudCollapsed] = useState(false);
+  const [hudActiveTab, setHudActiveTab] = useState('stripe');
   const [clicksEnabled, setClicksEnabled] = useState(false);
   const [clickMarks, setClickMarks] = useState([]);
   const [nikeTambeBgOn, setNikeTambeBgOn] = useState(true);
@@ -3243,7 +3244,7 @@ function App() {
                   bottom: 0,
                   left: 0,
                   right: 0,
-                  height: Math.max(160, Math.round(Number.isFinite(megaStripeHudOwnHPx) ? megaStripeHudOwnHPx : 360)),
+                  height: hudCollapsed ? 'auto' : Math.max(160, Math.round(Number.isFinite(megaStripeHudOwnHPx) ? megaStripeHudOwnHPx : 360)),
                   maxHeight: '100vh',
                   paddingLeft: 16,
                   paddingRight: 16,
@@ -3253,6 +3254,8 @@ function App() {
                   display: 'flex',
                   flexDirection: 'column',
                   pointerEvents: 'none',
+                  transition: 'height 300ms ease',
+                  overflow: hudCollapsed ? 'hidden' : 'visible',
                 }}
               >
                 <div
@@ -3268,9 +3271,16 @@ function App() {
                     pointerEvents: 'auto',
                   }}
                 >
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 14, fontWeight: 700, minWidth: 0 }}>
-                    <span>HUD</span>
-                    <span style={{ opacity: 0.75, fontWeight: 600 }}>stripe</span>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 14, fontWeight: 700, minWidth: 0, overflow: 'hidden' }}>
+                    <button type="button" onClick={() => setHudCollapsed(!hudCollapsed)} style={{ background: 'rgba(0,0,0,0.20)', border: '1px solid rgba(255,255,255,0.25)', color: 'inherit', padding: '4px 8px', borderRadius: 4, fontSize: 12, fontWeight: 700, cursor: 'pointer', flexShrink: 0 }} title={hudCollapsed ? 'Desplegar HUD' : 'Plegar HUD'}>{hudCollapsed ? '↓' : '↑'}</button>
+                    <span style={{ flexShrink: 0 }}>HUD</span>
+                    {!hudCollapsed && (
+                      <div style={{ display: 'flex', gap: 4, marginLeft: 10, overflow: 'hidden' }}>
+                        {['Stripe', 'Layout', 'General'].map((tab) => (
+                          <button key={tab} type="button" onClick={() => setHudActiveTab(tab.toLowerCase())} style={{ background: hudActiveTab === tab.toLowerCase() ? 'rgba(255,255,255,0.25)' : 'rgba(0,0,0,0.15)', border: '1px solid rgba(255,255,255,0.20)', color: 'inherit', padding: '3px 10px', borderRadius: 4, fontSize: 12, fontWeight: hudActiveTab === tab.toLowerCase() ? 800 : 600, cursor: 'pointer', opacity: hudActiveTab === tab.toLowerCase() ? 1 : 0.7, flexShrink: 0 }}>{tab}</button>
+                        ))}
+                      </div>
+                    )}
                   </div>
 
                   {(() => {
@@ -5600,8 +5610,6 @@ function App() {
                 ))}
               </div>
             )}
-
-            <HUDOverlay isVisible={true} />
       </>
     )}
     </ErrorBoundary>
