@@ -12,6 +12,48 @@ import {
 } from '../utils/austenQuotesAssets.js';
 import FullWideSlideDemoHumanInsideSlider from './FullWideSlideDemoHumanInsideSlider.jsx';
 
+function MegaStripeBleedGuard({ heightPx, debug, expandLeftPx = 0, expandRightPx = 0, children }) {
+  const l = Math.max(0, Number(expandLeftPx) || 0);
+  const r = Math.max(0, Number(expandRightPx) || 0);
+  return (
+    <div
+      style={{
+        height: heightPx,
+        width: '100%',
+        maxWidth: '100%',
+        position: 'relative',
+        overflowY: 'visible',
+      }}
+    >
+      <div
+        style={{
+          position: 'absolute',
+          top: 0,
+          bottom: 0,
+          left: l ? `-${l}px` : 0,
+          right: r ? `-${r}px` : 0,
+          overflowX: 'clip',
+          overflowY: 'visible',
+          backgroundColor: debug ? 'rgba(59, 130, 246, 0.12)' : 'transparent',
+        }}
+      >
+        <div
+          style={{
+            position: 'absolute',
+            top: 0,
+            bottom: 0,
+            left: l ? `${l}px` : 0,
+            right: r ? `${r}px` : 0,
+            overflow: 'visible',
+          }}
+        >
+          {children}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 const FIRST_CONTACT_MEDIA = {
   'NX-01': '/custom_logos/drawings/images_stripe/first_contact/black/nx-01-b-stripe.webp',
   'NCC-1701': '/custom_logos/drawings/images_stripe/first_contact/black/ncc-1701-b-stripe.webp',
@@ -1975,6 +2017,81 @@ export default function FullWideSlideDemoHeader({
   const effectiveDisableCatalogPanel = disableCatalogPanel || showCatalogPanel === false;
   const gridCalibFromUrl = typeof window !== 'undefined' && new URLSearchParams(window.location.search).has('gridCalib');
 
+  const bleedGuardDebug = typeof window !== 'undefined'
+    && import.meta.env.DEV
+    && new URLSearchParams(window.location.search).has('bleedGuardDebug');
+
+  useLayoutEffect(() => {
+    if (typeof window === 'undefined') return undefined;
+
+    const getTargetEl = () => {
+      try {
+        const main = document.querySelector('main#main-content');
+        if (!main) return null;
+        const exact = main.querySelector(
+          ':scope > div:nth-child(1) > header:nth-of-type(1) > div:nth-child(1) > div:nth-child(1)'
+        );
+        if (exact) return exact;
+        const el = (node, idx) => (node?.children && node.children[idx]) ? node.children[idx] : null;
+        const div0 = el(main, 0);
+        const header0 = div0 ? div0.querySelector('header') : null;
+        if (!header0) return null;
+        const border0 = el(header0, 0);
+        const row0 = border0 ? el(border0, 0) : null;
+        return row0 || null;
+      } catch {
+        return null;
+      }
+    };
+
+    const read = () => {
+      try {
+        const megaEl = megaMenuRef.current;
+        const targetEl = getTargetEl();
+        if (!megaEl || !targetEl) return;
+        const megaRect = megaEl.getBoundingClientRect();
+        const targetRect = targetEl.getBoundingClientRect();
+        const leftRaw = megaRect.left - targetRect.left;
+        const rightRaw = targetRect.right - megaRect.right;
+        const left = Math.max(0, Math.round(leftRaw * 100) / 100) + 40;
+        const right = Math.max(0, Math.round(rightRaw * 100) / 100) + 40;
+        setBleedGuardExpandPx((prev) => (prev.left === left && prev.right === right ? prev : { left, right }));
+
+        if (bleedGuardDebug) {
+          const round2 = (v) => Math.round(v * 100) / 100;
+          window.__HG_BLEED_GUARD_DEBUG__ = {
+            left,
+            right,
+            megaRect: {
+              left: round2(megaRect.left),
+              right: round2(megaRect.right),
+              width: round2(megaRect.width),
+            },
+            targetRect: {
+              left: round2(targetRect.left),
+              right: round2(targetRect.right),
+              width: round2(targetRect.width),
+            },
+          };
+        }
+      } catch {
+        // ignore
+      }
+    };
+
+    read();
+    window.addEventListener('resize', read);
+    window.addEventListener('scroll', read, true);
+    const t1 = window.setTimeout(read, 50);
+    const t2 = window.setTimeout(read, 250);
+    return () => {
+      window.removeEventListener('resize', read);
+      window.removeEventListener('scroll', read, true);
+      window.clearTimeout(t1);
+      window.clearTimeout(t2);
+    };
+  }, [active]);
+
   const overlaySrcFromUrl = useMemo(() => {
     try {
       if (typeof window === 'undefined') return null;
@@ -3622,6 +3739,7 @@ export default function FullWideSlideDemoHeader({
   const searchGridRowRef = useRef(null);
   const searchGridScrollRef = useRef(null);
   const [megaInsetsPx, setMegaInsetsPx] = useState({ left: 0, right: 0 });
+  const [bleedGuardExpandPx, setBleedGuardExpandPx] = useState({ left: 0, right: 0 });
 
   const ensureMegaOpen = () => {
     setActive((prev) => prev || 'first_contact');
@@ -4259,7 +4377,8 @@ export default function FullWideSlideDemoHeader({
       className={`${contained ? 'relative' : 'fixed'} z-[10000] bg-background ${megaPage === 1 ? 'overflow-x-visible' : 'overflow-x-hidden'}`}
       style={
         contained
-          ? { top: 0, left: 0, right: 0 }
+          ? { top: 0,
+                  marginTop: '-25px', left: 0, right: 0 }
           : {
  top: 'var(--appHeaderOffset, 0px)', left: 'var(--rulerInset, 0px)', right: 0 }
       }
@@ -4449,27 +4568,22 @@ export default function FullWideSlideDemoHeader({
               ref={megaMenuRef}
               className="mx-auto max-w-[1400px] px-4 sm:px-6 lg:px-10 py-8 overflow-x-visible"
             >
-              <div
-                className="overflow-y-visible"
-                style={effectiveMegaTileSize
-                  ? {
-                      height: `${Math.round(effectiveMegaTileSize * 2 + 37 + (() => {
-                        try {
-                          const qs = (typeof window !== 'undefined') ? window.location?.search : '';
-                          const p = qs ? new URLSearchParams(qs) : null;
-                          const bottomPad = stripeRowPadPx;
-                          return Math.max(0, bottomPad);
-                        } catch {
-                          return 0;
-                        }
-                      })())}px`,
-                      marginLeft: '0px',
-                      paddingLeft: '0px',
-                      width: '100%',
-                      overflowX: 'visible',
-                      clipPath: 'inset(-260px -260px -260px -260px)',
+              <MegaStripeBleedGuard
+                heightPx={effectiveMegaTileSize
+                  ? `${Math.round(effectiveMegaTileSize * 2 + 37 + (() => {
+                    try {
+                      const qs = (typeof window !== 'undefined') ? window.location?.search : '';
+                      const p = qs ? new URLSearchParams(qs) : null;
+                      const bottomPad = stripeRowPadPx;
+                      return Math.max(0, bottomPad);
+                    } catch {
+                      return 0;
                     }
+                  })())}px`
                   : undefined}
+                debug={bleedGuardDebug}
+                expandLeftPx={bleedGuardExpandPx?.left || 0}
+                expandRightPx={bleedGuardExpandPx?.right || 0}
               >
                 <div
                   className="flex items-start"
@@ -5185,7 +5299,7 @@ export default function FullWideSlideDemoHeader({
                     ) : null}
                   </div>
                 </div>
-              </div>
+              </MegaStripeBleedGuard>
             </div>
           </div>
         ) : null}

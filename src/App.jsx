@@ -1921,7 +1921,7 @@ function App() {
   }, []);
 
   const BeltReferenceOverlay = ({ enabled }) => {
-    const [state, setState] = useState({ xL: null, xR: null, yT: null, yB: null });
+    const [state, setState] = useState({ xL: null, xR: null, yT: null, yB: null, spriteXL: null, spriteXR: null });
 
     useLayoutEffect(() => {
       if (!enabled) return undefined;
@@ -1950,14 +1950,16 @@ function App() {
         const stripeImg = document.querySelector('img[src="/placeholders/t-shirt_buttons/v5/full-color-stripe-5.webp"]');
 
         const xL = resolveX(leftAnchor, 'left');
+        const spriteXL = resolveX(stripeImg, 'left');
+        const spriteXR = resolveX(stripeImg, 'right');
         const xR = resolveX(rightArrow, 'right');
         const yT = resolveY(stripeImg, 'top');
         const yB = resolveY(stripeImg, 'bottom');
 
         setState((prev) => (
-          prev.xL === xL && prev.xR === xR && prev.yT === yT && prev.yB === yB
+          prev.xL === xL && prev.xR === xR && prev.yT === yT && prev.yB === yB && prev.spriteXL === spriteXL && prev.spriteXR === spriteXR
             ? prev
-            : { xL, xR, yT, yB }
+            : { xL, xR, yT, yB, spriteXL, spriteXR }
         ));
       };
 
@@ -1995,6 +1997,12 @@ function App() {
         ) : null}
         {Number.isFinite(state.xR) ? (
           <div style={{ position: 'fixed', left: state.xR, top: 0, height: '100vh', width: 0, borderLeft: `1px solid ${color}` }} />
+        ) : null}
+        {Number.isFinite(state.spriteXL) ? (
+          <div style={{ position: 'fixed', left: state.spriteXL, top: 0, height: '100vh', width: 0, borderLeft: `1px solid ${color}` }} />
+        ) : null}
+        {Number.isFinite(state.spriteXR) ? (
+          <div style={{ position: 'fixed', left: state.spriteXR, top: 0, height: '100vh', width: 0, borderLeft: `1px solid ${color}` }} />
         ) : null}
         {Number.isFinite(state.yT) ? (
           <div style={{ position: 'fixed', left: 0, top: state.yT, width: '100vw', height: 0, borderTop: `1px solid ${color}` }} />
