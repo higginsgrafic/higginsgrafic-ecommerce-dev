@@ -5176,22 +5176,6 @@ export default function FullWideSlideDemoHeader({
                   type="button"
                   className={`inline-flex items-center gap-1 text-xs font-semibold tracking-[0.18em] uppercase ${open ? 'text-foreground' : 'text-muted-foreground hover:text-foreground'}`}
                   aria-expanded={open ? 'true' : 'false'}
-                  onMouseEnter={() => {
-                    if (megaPage === 1 && active === item.id) {
-                      setMegaFullScreen((prev) => !prev);
-                    } else {
-                      setMegaPage(1);
-                      setMegaFullScreen(false);
-                      setActive(item.id);
-                    }
-                    touchMegaPublicActivity();
-                  }}
-                  onFocus={() => {
-                    setMegaPage(1);
-                    setMegaFullScreen(false);
-                    setActive(item.id);
-                    touchMegaPublicActivity();
-                  }}
                   onClick={() => {
                     setMegaPage(1);
                     setMegaFullScreen(false);
@@ -5506,16 +5490,372 @@ export default function FullWideSlideDemoHeader({
                         maxWidth: '100%', 
                         position: 'relative', 
                         height: '100%', 
-                        paddingLeft: '40px', 
+                        paddingLeft: '40px',
                         paddingRight: '40px',
-                        display: 'flex',
-                        flexDirection: 'column',
                       }}>
-                        <div style={{ 
+                        <div 
+                          onWheel={(e) => {
+                            e.preventDefault();
+                            e.currentTarget.scrollLeft += e.deltaY;
+                          }}
+                          style={{
                           width: '100%',
                           height: '100%',
-                          backgroundColor: '#ADD8E6',
-                        }} />
+                          backgroundColor: 'transparent',
+                          padding: 0,
+                          margin: 0,
+                          display: 'flex',
+                          flexDirection: 'row',
+                          gap: '3px',
+                          overflowX: 'auto',
+                          overflowY: 'hidden',
+                          scrollbarWidth: 'none',
+                          msOverflowStyle: 'none',
+                        }}>
+                          {/* Carrusel de productes del cistell */}
+                          {[
+                            // PLANTILLA - first_contact
+                            { img: 'tmp/color-card-PLANTILLA (3).jpg', name: 'SENSE & SENSIBILITY', collection: 'first_contact', drawing: 'first_contact/black/wormhole-b-stripe.webp', price: '19,95€', qty: 1, size: 'L', isTemplate: true },
+                            // the_human_inside - MÉS GROS EN Y
+                            { img: 'color-card-light-blue.webp', name: 'ROBBIE THE ROBOT', collection: 'the_human_inside', drawing: 'the_human_inside/black/robbie-the-robot-b-stripe.webp', price: '19,95€', qty: 1, size: 'L' },
+                            // austen - MÉS AMPLE EN X i MÉS GROS EN Y
+                            { img: 'color-card-royal.webp', name: 'PRIDE & PREJUDICE', collection: 'austen', drawing: 'austen/crosswords/black/pride-and-prejudice-1-b-stripe.webp', price: '19,95€', qty: 1, size: 'M' },
+                            // cube
+                            { img: 'color-card-navy.webp', name: 'ROBOCUBE', collection: 'cube', drawing: 'cube/robocube-stripe.webp', price: '19,95€', qty: 2, size: 'XL' },
+                            // miscel·lania
+                            { img: 'color-card-purple.webp', name: 'PONT DEL DIABLE', collection: 'miscel·lania', drawing: 'miscel·lania/black/pont-del-diable-b-stripe.webp', price: '19,95€', qty: 1, size: 'S' },
+                            // first_contact - MÉS PETIT EN Y
+                            { img: 'color-card-light pink.webp', name: 'NCC-1701-D', collection: 'first_contact', drawing: 'first_contact/black/ncc-1701-d-b-stripe.webp', price: '19,95€', qty: 1, size: 'M' },
+                            // the_human_inside
+                            { img: 'color-card-gold.webp', name: 'MASCHINENMENSCH', collection: 'the_human_inside', drawing: 'the_human_inside/black/maschinenmensch-b-stripe.webp', price: '19,95€', qty: 1, size: 'L' },
+                            // austen
+                            { img: 'color-card-daisy.webp', name: 'PERSUASION', collection: 'austen', drawing: 'austen/crosswords/black/persuasion-1-b-stripe.webp', price: '19,95€', qty: 1, size: 'L' },
+                            // cube
+                            { img: 'color-card-red.webp', name: 'CYBER CUBE', collection: 'cube', drawing: 'cube/cyber-cube-stripe.webp', price: '19,95€', qty: 3, size: 'M' },
+                            // miscel·lania
+                            { img: 'color-card-kiwi.webp', name: 'DJ VADER', collection: 'miscel·lania', drawing: 'miscel·lania/black/dj-vader-b-stripe.webp', price: '19,95€', qty: 1, size: 'L' },
+                            // first_contact
+                            { img: 'color-card-irish-green .webp', name: 'PLASMA ESCAPE', collection: 'first_contact', drawing: 'first_contact/black/plasma-escape-b-stripe.webp', price: '19,95€', qty: 1, size: 'XL' },
+                            // the_human_inside
+                            { img: 'color-card-forest.webp', name: 'VADER', collection: 'the_human_inside', drawing: 'the_human_inside/black/vader-b-stripe.webp', price: '19,95€', qty: 1, size: 'L' },
+                            // austen
+                            { img: 'color-card-military-green.webp', name: 'SENSE & SENSIBILITY', collection: 'austen', drawing: 'austen/crosswords/black/sense-and-sensibility-1-b-stripe.webp', price: '19,95€', qty: 1, size: 'M' },
+                            // cube
+                            { img: 'color-card-black.webp', name: 'MAZINGER C', collection: 'cube', drawing: 'cube/mazinger-c-stripe.webp', price: '19,95€', qty: 1, size: 'L' },
+                          ].map((product, idx) => (
+                            <div key={idx} style={{
+                              position: 'relative',
+                              flexShrink: 0,
+                              overflow: 'visible',
+                              height: '100%',
+                              aspectRatio: '308 / 678',
+                              fontSize: '1vh',
+                            }}>
+                              {/* Capa 1: Color-card de fons */}
+                              <img 
+                                src={`/placeholders/color-cards/${product.img}`}
+                                alt={`${product.name} - ${product.size}`}
+                                style={{
+                                  width: '100%',
+                                  height: '100%',
+                                  objectFit: 'fill',
+                                  display: 'block',
+                                  opacity: 1,
+                                }}
+                              />
+                              
+                              {/* Capa 2: Imatge del producte centrada dins del rectangle verd */}
+                              {product.isTemplate && (
+                              <div style={{
+                                position: 'absolute',
+                                top: '8.222%',
+                                left: '4.87%',
+                                right: '4.87%',
+                                bottom: '62.056%',
+                                display: 'flex',
+                                justifyContent: 'center',
+                                alignItems: 'center',
+                                overflow: 'hidden',
+                                boxSizing: 'border-box',
+                                backgroundColor: 'rgba(0, 255, 0, 0.5)',
+                                zIndex: 5,
+                              }}>
+                                {/* <img
+                                  src={`/placeholders/drawings/${product.drawing}`}
+                                  alt={product.name}
+                                  style={{
+                                    width: 'auto',
+                                    height: 'auto',
+                                    maxWidth: '100%',
+                                    maxHeight: '100%',
+                                    objectFit: 'contain',
+                                  }}
+                                /> */}
+                              </div>
+                              )}
+
+                              {/* Overlay: Graella de referència REIXA */}
+                              {product.isTemplate && false && (
+                              <img 
+                                src="/placeholders/color-cards/tmp/REIXA.png"
+                                alt="Graella de referència"
+                                style={{
+                                  position: 'absolute',
+                                  top: 0,
+                                  left: 0,
+                                  width: '100%',
+                                  height: '100%',
+                                  objectFit: 'fill',
+                                  pointerEvents: 'none',
+                                  zIndex: 100,
+                                }}
+                              />
+                              )}
+
+                              {/* Capa 3: Nom del producte */}
+                              {product.isTemplate && (
+                              <div style={{
+                                  position: 'absolute',
+                                  bottom: 'calc(40.5% + 8px)',
+                                  left: '50%',
+                                  transform: 'translateX(-50%)',
+                                  fontFamily: 'Oswald, sans-serif',
+                                  fontSize: '11.4pt',
+                                  fontWeight: 600,
+                                  color: '#ff0000',
+                                  letterSpacing: '0.0025em',
+                                  textAlign: 'center',
+                                  whiteSpace: 'nowrap',
+                                  zIndex: 10,
+                              }}>
+                                  {product.name}
+                                </div>
+                              )}
+
+                              {/* Capa 4: Selector de quantitat */}
+                              {product.isTemplate && (
+                              <div style={{
+                                  position: 'absolute',
+                                  bottom: 'calc(37.5% - 8.5px)',
+                                  left: '50%',
+                                  transform: 'translateX(-50%)',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  gap: '2.6%',
+                                  zIndex: 10,
+                              }}>
+                                  <button style={{
+                                    width: '20px',
+                                    height: '20px',
+                                    border: 'none',
+                                    background: 'transparent',
+                                    fontFamily: 'Avenir Next, sans-serif',
+                                    fontSize: '15pt',
+                                    fontWeight: 700,
+                                    cursor: 'pointer',
+                                    color: '#ff0000',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    lineHeight: 1,
+                                    padding: 0,
+                                    position: 'relative',
+                                    left: '-8px',
+                                  }}>−</button>
+                                  <div style={{
+                                    fontFamily: 'Avenir Next Condensed, sans-serif',
+                                    fontSize: '9.6pt',
+                                    fontWeight: 400,
+                                    fontStretch: 'condensed',
+                                    color: '#ff0000',
+                                    letterSpacing: '0.08em',
+                                    textAlign: 'center',
+                                    lineHeight: 1,
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    position: 'relative',
+                                    left: '-4px',
+                                  }}>QUANTITAT</div>
+                                  <div style={{
+                                    fontFamily: 'Avenir Next Condensed, sans-serif',
+                                    fontSize: '9.6pt',
+                                    fontWeight: 600,
+                                    fontStretch: 'condensed',
+                                    color: '#ff0000',
+                                    textAlign: 'center',
+                                    lineHeight: 1,
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    position: 'relative',
+                                    left: '3.25px',
+                                  }}>{product.qty}</div>
+                                  <button style={{
+                                    width: '20px',
+                                    height: '20px',
+                                    border: 'none',
+                                    background: 'transparent',
+                                    fontFamily: 'Avenir Next, sans-serif',
+                                    fontSize: '15pt',
+                                    fontWeight: 700,
+                                    cursor: 'pointer',
+                                    color: '#ff0000',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    lineHeight: 1,
+                                    padding: 0,
+                                    position: 'relative',
+                                    left: '8px',
+                                  }}>+</button>
+                                </div>
+                              )}
+
+                              {/* Capa 5: Selector de tallatge */}
+                              {product.isTemplate && (
+                              <div style={{
+                                  position: 'absolute',
+                                  bottom: 'calc(31.6% - 8px)',
+                                  left: '50%',
+                                  transform: 'translateX(-50%)',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  gap: '2.6%',
+                                  zIndex: 10,
+                              }}>
+                                  <button style={{
+                                    width: '20px',
+                                    height: '20px',
+                                    border: 'none',
+                                    background: 'transparent',
+                                    fontFamily: 'Avenir Next, sans-serif',
+                                    fontSize: '15pt',
+                                    fontWeight: 700,
+                                    cursor: 'pointer',
+                                    color: '#ff0000',
+                                    padding: 0,
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    lineHeight: 1,
+                                    position: 'relative',
+                                    left: '4px',
+                                  }}>−</button>
+                                  <div style={{
+                                    fontFamily: 'Roboto Condensed, sans-serif',
+                                    fontSize: '9.6pt',
+                                    fontWeight: 400,
+                                    color: '#ff0000',
+                                    letterSpacing: '0.04em',
+                                    minWidth: '70px',
+                                    textAlign: 'center',
+                                    position: 'relative',
+                                    left: '1px',
+                                  }}>TALLATGE</div>
+                                  <div style={{
+                                    fontFamily: 'Roboto Condensed, sans-serif',
+                                    fontSize: '9.6pt',
+                                    fontWeight: 700,
+                                    color: '#ff0000',
+                                    minWidth: '18px',
+                                    textAlign: 'center',
+                                    position: 'relative',
+                                    left: '-5px',
+                                  }}>{product.size}</div>
+                                  <button style={{
+                                    width: '20px',
+                                    height: '20px',
+                                    border: 'none',
+                                    background: 'transparent',
+                                    fontFamily: 'Avenir Next, sans-serif',
+                                    fontSize: '15pt',
+                                    fontWeight: 700,
+                                    cursor: 'pointer',
+                                    color: '#ff0000',
+                                    padding: 0,
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    lineHeight: 1,
+                                    position: 'relative',
+                                    left: '-4px',
+                                  }}>+</button>
+                                </div>
+                              )}
+
+                              {/* Capa 6: Preu */}
+                              {product.isTemplate && (
+                              <div style={{
+                                  position: 'absolute',
+                                  bottom: 'calc(18.9% - 14.5px)',
+                                  left: '50%',
+                                  transform: 'translateX(-50%)',
+                                  fontFamily: 'Avenir Next Condensed, sans-serif',
+                                  fontSize: '19pt',
+                                  fontWeight: 600,
+                                  fontStretch: 'condensed',
+                                  color: '#ff0000',
+                                  textAlign: 'center',
+                                  zIndex: 10,
+                              }}>
+                                  {product.price}
+                                </div>
+                              )}
+
+                              {/* Capa 7: Botons d'acció */}
+                              {product.isTemplate && (
+                              <div style={{
+                                  position: 'absolute',
+                                  bottom: 'calc(8.6% - 8px)',
+                                  left: '50%',
+                                  transform: 'translateX(-50%)',
+                                  display: 'flex',
+                                  gap: '13%',
+                                  zIndex: 10,
+                              }}>
+                                  <button style={{
+                                    width: '24px',
+                                    height: '24px',
+                                    border: 'none',
+                                    background: 'transparent',
+                                    cursor: 'pointer',
+                                    padding: 0,
+                                    position: 'relative',
+                                    top: '-2px',
+                                    left: '-5.75px',
+                                    transform: 'scale(0.9)',
+                                  }}>
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#272727" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                      <rect x="1" y="4" width="22" height="16" rx="2" ry="2"/>
+                                      <rect x="1" y="8" width="22" height="4" fill="#272727"/>
+                                    </svg>
+                                  </button>
+                                  <button style={{
+                                    width: '24px',
+                                    height: '24px',
+                                    border: 'none',
+                                    background: 'transparent',
+                                    cursor: 'pointer',
+                                    padding: 0,
+                                    position: 'relative',
+                                    top: '-2px',
+                                    left: '-0.5px',
+                                  }}>
+                                    <svg width="23.625" height="23.625" viewBox="0 0 24 24" fill="none" stroke="#ff6b6b" strokeWidth="3">
+                                      <path d="M18 6L6 18M6 6l12 12" />
+                                    </svg>
+                                  </button>
+                                </div>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                        <style>{`
+                          div::-webkit-scrollbar {
+                            display: none;
+                          }
+                        `}</style>
                       </div>
 
                       <div style={{ 

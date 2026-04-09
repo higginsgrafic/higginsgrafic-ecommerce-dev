@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, useMemo, useCallback, Suspense, laz
 import { Routes, Route, useLocation, useNavigate, Navigate } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Helmet } from 'react-helmet';
+import { CistellLayout1, CistellLayout2, CistellLayout3, CistellLayout4 } from './components/CistellLayouts';
 import { useProductContext } from '@/contexts/ProductContext';
 import { useAdmin } from '@/contexts/AdminContext';
 import { useAdminTools } from '@/contexts/AdminToolsContext';
@@ -634,8 +635,10 @@ function App() {
   const megaStripeParamsGridRef = useRef(null);
   const megaStripeLastGoodHudTopPxRef = useRef(null);
   const [megaStripeHudSnapDyPx, setMegaStripeHudSnapDyPx] = useState(0);
-  const [hudCollapsed, setHudCollapsed] = useState(false);
+  const [hudCollapsed, setHudCollapsed] = useState(true);
   const [hudActiveTab, setHudActiveTab] = useState('stripe');
+  const [cistellExpanded, setCistellExpanded] = useState(false);
+  const [cistellLayout, setCistellLayout] = useState(1);
   const [clicksEnabled, setClicksEnabled] = useState(false);
   const [clickMarks, setClickMarks] = useState([]);
   const [nikeTambeBgOn, setNikeTambeBgOn] = useState(true);
@@ -2001,6 +2004,8 @@ function App() {
         {Number.isFinite(state.yB) ? (
           <div style={{ position: 'fixed', left: 0, top: state.yB, width: '100vw', height: 0, borderTop: `1px solid ${color}` }} />
         ) : null}
+        {/* Guia fixa verda a y=330 */}
+        <div style={{ position: 'fixed', left: 0, top: 330, width: '100vw', height: 0, borderTop: `1px solid ${color}` }} />
       </div>
     );
   };
@@ -3251,7 +3256,7 @@ function App() {
                   zIndex: 1000000,
                   fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace',
                   transform: (Number.isFinite(megaStripeHudSnapDyPx) && Math.abs(megaStripeHudSnapDyPx) > 0.001) ? `translateY(${megaStripeHudSnapDyPx}px)` : undefined,
-                  display: 'flex',
+                  display: 'none',
                   flexDirection: 'column',
                   pointerEvents: 'none',
                   transition: 'height 300ms ease',
@@ -3276,7 +3281,7 @@ function App() {
                     <span style={{ flexShrink: 0 }}>HUD</span>
                     {!hudCollapsed && (
                       <div style={{ display: 'flex', gap: 4, marginLeft: 10, overflow: 'hidden' }}>
-                        {['Stripe', 'Layout', 'General'].map((tab) => (
+                        {['Stripe', 'Cercador', 'Cistell', 'Usr'].map((tab) => (
                           <button key={tab} type="button" onClick={() => setHudActiveTab(tab.toLowerCase())} style={{ background: hudActiveTab === tab.toLowerCase() ? 'rgba(255,255,255,0.25)' : 'rgba(0,0,0,0.15)', border: '1px solid rgba(255,255,255,0.20)', color: 'inherit', padding: '3px 10px', borderRadius: 4, fontSize: 12, fontWeight: hudActiveTab === tab.toLowerCase() ? 800 : 600, cursor: 'pointer', opacity: hudActiveTab === tab.toLowerCase() ? 1 : 0.7, flexShrink: 0 }}>{tab}</button>
                         ))}
                       </div>
@@ -3386,8 +3391,122 @@ function App() {
                     padding: 10,
                     flex: 1,
                     minHeight: 0,
+                    position: 'relative',
                   }}
                 >
+                    {hudActiveTab === 'cistell' && !cistellExpanded && (
+                      <div style={{ position: 'absolute', inset: 0, background: 'rgba(255,255,255,0.98)', display: 'flex', flexDirection: 'column', zIndex: 10, pointerEvents: 'auto', overflow: 'auto', padding: '20px 24px' }}>
+                        <div style={{ fontFamily: 'Roboto, sans-serif', color: '#000', maxWidth: 480 }}>
+                          {/* Selector de layout */}
+                          <div style={{ display: 'flex', gap: 6, marginBottom: 12 }}>
+                            <button onClick={() => setCistellLayout(1)} style={{ padding: '4px 10px', fontSize: 10, fontFamily: 'Roboto, sans-serif', fontWeight: cistellLayout === 1 ? 700 : 400, background: cistellLayout === 1 ? '#000' : '#f0f0f0', color: cistellLayout === 1 ? '#fff' : '#666', border: 'none', borderRadius: 2, cursor: 'pointer' }}>Layout 1</button>
+                            <button onClick={() => setCistellLayout(2)} style={{ padding: '4px 10px', fontSize: 10, fontFamily: 'Roboto, sans-serif', fontWeight: cistellLayout === 2 ? 700 : 400, background: cistellLayout === 2 ? '#000' : '#f0f0f0', color: cistellLayout === 2 ? '#fff' : '#666', border: 'none', borderRadius: 2, cursor: 'pointer' }}>Layout 2</button>
+                            <button onClick={() => setCistellLayout(3)} style={{ padding: '4px 10px', fontSize: 10, fontFamily: 'Roboto, sans-serif', fontWeight: cistellLayout === 3 ? 700 : 400, background: cistellLayout === 3 ? '#000' : '#f0f0f0', color: cistellLayout === 3 ? '#fff' : '#666', border: 'none', borderRadius: 2, cursor: 'pointer' }}>Layout 3</button>
+                            <button onClick={() => setCistellLayout(4)} style={{ padding: '4px 10px', fontSize: 10, fontFamily: 'Roboto, sans-serif', fontWeight: cistellLayout === 4 ? 700 : 400, background: cistellLayout === 4 ? '#000' : '#f0f0f0', color: cistellLayout === 4 ? '#fff' : '#666', border: 'none', borderRadius: 2, cursor: 'pointer' }}>Imatge</button>
+                          </div>
+                          
+                          {/* Header compacte */}
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 20, borderBottom: '2px solid #000', paddingBottom: 8 }}>
+                            <h2 style={{ fontFamily: 'Oswald, sans-serif', fontSize: 18, fontWeight: 700, letterSpacing: '0.03em', textTransform: 'uppercase', margin: 0, lineHeight: 1.2 }}>CISTELL (2)</h2>
+                            <div style={{ fontFamily: 'Oswald, sans-serif', fontSize: 18, fontWeight: 700, lineHeight: 1.2 }}>34,90€</div>
+                          </div>
+                          
+                          {/* Renderitzar layout segons selecció */}
+                          {cistellLayout === 1 && <CistellLayout1 onExpand={() => setCistellExpanded(true)} />}
+                          {cistellLayout === 2 && <CistellLayout2 onExpand={() => setCistellExpanded(true)} />}
+                          {cistellLayout === 3 && <CistellLayout3 onExpand={() => setCistellExpanded(true)} />}
+                          {cistellLayout === 4 && <CistellLayout4 onExpand={() => setCistellExpanded(true)} />}
+                        </div>
+                      </div>
+                    )}
+                    {hudActiveTab === 'cistell' && cistellExpanded && (
+                      <div style={{ position: 'absolute', inset: 0, background: 'rgba(255,255,255,0.96)', display: 'flex', flexDirection: 'column', zIndex: 10, pointerEvents: 'auto', overflow: 'auto', padding: 16 }}>
+                        <div style={{ fontFamily: 'ui-sans-serif, system-ui, sans-serif', color: '#000' }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+                            <h2 style={{ fontSize: 28, fontWeight: 900, letterSpacing: '0.02em', textTransform: 'uppercase', margin: 0 }}>LA MEVA COMANDA 🛒</h2>
+                            <button onClick={() => setCistellExpanded(false)} style={{ background: 'rgba(0,0,0,0.1)', border: 'none', padding: '6px 12px', fontSize: 12, fontWeight: 700, cursor: 'pointer', borderRadius: 4 }}>← Tornar</button>
+                          </div>
+                          
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: 16, marginBottom: 20 }}>
+                            {/* Producte 1: WORMHOLE */}
+                            <div style={{ borderBottom: '1px solid rgba(0,0,0,0.1)', paddingBottom: 12 }}>
+                              <div style={{ fontSize: 14, fontWeight: 800, marginBottom: 8 }}>WORMHOLE</div>
+                              <div style={{ fontSize: 12, marginBottom: 4 }}><span style={{ fontWeight: 600 }}>QUANTITAT:</span> 1</div>
+                              <div style={{ fontSize: 12, marginBottom: 4 }}><span style={{ fontWeight: 600 }}>TALLATGE:</span> L</div>
+                              <div style={{ fontSize: 12, marginBottom: 4 }}><span style={{ fontWeight: 600 }}>IMPORT:</span> 15,76€</div>
+                              <div style={{ fontSize: 12, marginBottom: 4 }}><span style={{ fontWeight: 600 }}>IVA 21%:</span> 4,19€</div>
+                              <div style={{ fontSize: 12, fontWeight: 800 }}><span style={{ fontWeight: 800 }}>PVP:</span> 19,95€</div>
+                            </div>
+
+                            {/* Producte 2: MASCHINENMENSCH */}
+                            <div style={{ borderBottom: '1px solid rgba(0,0,0,0.1)', paddingBottom: 12 }}>
+                              <div style={{ fontSize: 14, fontWeight: 800, marginBottom: 8 }}>MASCHINENMENSCH</div>
+                              <div style={{ fontSize: 12, marginBottom: 4 }}><span style={{ fontWeight: 600 }}>QUANTITAT:</span> 1</div>
+                              <div style={{ fontSize: 12, marginBottom: 4 }}><span style={{ fontWeight: 600 }}>TALLATGE:</span> M</div>
+                              <div style={{ fontSize: 12, marginBottom: 4 }}><span style={{ fontWeight: 600 }}>IMPORT:</span> 11,81€</div>
+                              <div style={{ fontSize: 12, marginBottom: 4 }}><span style={{ fontWeight: 600 }}>IVA 21%:</span> 3,14€</div>
+                              <div style={{ fontSize: 12, fontWeight: 800 }}><span style={{ fontWeight: 800 }}>PVP:</span> 14,95€</div>
+                            </div>
+                          </div>
+
+                          {/* Total */}
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: 12, paddingBottom: 16, borderTop: '2px solid #000', marginBottom: 20 }}>
+                            <div style={{ fontSize: 18, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.05em' }}>TOT PLEGAT</div>
+                            <div style={{ fontSize: 28, fontWeight: 900 }}>34,90€</div>
+                          </div>
+
+                          {/* Seccions expandides */}
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: 16, fontSize: 13 }}>
+                            <div style={{ fontWeight: 700, fontSize: 14 }}>Dades d'usuari</div>
+                            <div style={{ fontWeight: 700, fontSize: 14 }}>Classe de gas</div>
+                            
+                            <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
+                              <input type="checkbox" defaultChecked style={{ width: 16, height: 16 }} />
+                              <span>He vist i estic d'acord amb les condicions</span>
+                            </label>
+
+                            <div style={{ fontWeight: 700, fontSize: 14, marginTop: 8 }}>Enviament i facturació</div>
+                            
+                            <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
+                              <input type="checkbox" style={{ width: 16, height: 16 }} />
+                              <span>És igual l'adreça de facturació que la de compra</span>
+                            </label>
+
+                            <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
+                              <input type="checkbox" style={{ width: 16, height: 16 }} />
+                              <span>Ja ho sé i no vull cobrar</span>
+                            </label>
+
+                            <div style={{ fontWeight: 600, marginTop: 8 }}>On vols que ho enviem?</div>
+                            
+                            <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
+                              <input type="checkbox" defaultChecked style={{ width: 16, height: 16 }} />
+                              <span>Adreça que em mostri en el moment de la compra</span>
+                            </label>
+
+                            <div style={{ fontWeight: 600, marginTop: 8 }}>On vols que les facturem?</div>
+
+                            {/* Botó Pagament */}
+                            <button style={{ width: '100%', background: '#000', color: '#fff', border: 'none', padding: '14px', fontSize: 16, fontWeight: 700, cursor: 'pointer', borderRadius: 4, marginTop: 16 }}>Pagament</button>
+
+                            {/* Footer */}
+                            <div style={{ fontSize: 11, color: 'rgba(0,0,0,0.6)', textAlign: 'center', lineHeight: 1.6, marginTop: 16 }}>
+                              <div>Política de reemborsament | Política d'enviament</div>
+                              <div>Política de privacitat | Termes del servei</div>
+                              <div style={{ marginTop: 8 }}>Higgins Gràfic 2026</div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                    {hudActiveTab !== 'stripe' && hudActiveTab !== 'cistell' && (
+                      <div style={{ position: 'absolute', inset: 0, background: 'rgba(255,255,255,0.96)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 10, pointerEvents: 'auto' }}>
+                        <div style={{ textAlign: 'center', color: 'rgba(0,0,0,0.5)' }}>
+                          <div style={{ fontSize: 16, fontWeight: 700, marginBottom: 8, textTransform: 'capitalize' }}>{hudActiveTab}</div>
+                          <div style={{ fontSize: 13 }}>Contingut de la pestanya {hudActiveTab}</div>
+                        </div>
+                      </div>
+                    )}
                     <div
                       ref={megaStripeParamsGridRef}
                       style={{

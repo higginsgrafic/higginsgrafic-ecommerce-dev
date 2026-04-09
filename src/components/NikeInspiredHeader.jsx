@@ -799,13 +799,11 @@ function NikeInspiredHeader({
         ref={headerBarRef}
         className={`relative bg-white ${activeMenu === 'collections' ? '' : 'border-b border-border'}`}
       >
-        {collectionsVisible && expansionPhase === 'expanded' && navHoverBridgeTopPx != null && (
+        {activeMenu === 'collections' && expansionPhase === 'expanded' && (
           <div
             aria-hidden="true"
             className="absolute left-0 right-0 bottom-0 z-[9992]"
             style={{ top: `${navHoverBridgeTopPx}px` }}
-            onMouseEnter={openCollections}
-            onMouseMove={openCollections}
           />
         )}
         <div className="max-w-[1696px] mx-auto px-6 md:px-12">
@@ -847,8 +845,6 @@ function NikeInspiredHeader({
                 data-nike-nav="true"
                 ref={navRef}
                 className="w-full h-full grid grid-flow-col justify-items-stretch items-center"
-                onMouseEnter={(e) => maybeOpenCollectionsFromNavPointer(e.clientX)}
-                onMouseMove={(e) => maybeOpenCollectionsFromNavPointer(e.clientX)}
                 style={
                   (activeMenu === 'collections' && expansionPhase === 'expanded')
                     ? (navActiveColumns
@@ -894,16 +890,15 @@ function NikeInspiredHeader({
                         const key = (link.href || '').toString().replace(/^\//, '').trim();
                         if (key) navLinkRefs.current[key] = el;
                       }}
-                      className="font-roboto text-sm font-normal text-gray-900 transition-all block w-full m-0 p-0 leading-none cursor-default"
+                      className="font-roboto text-sm font-normal text-gray-900 transition-all block w-full m-0 p-0 leading-none cursor-pointer"
+                      onClick={openCollections}
                       onMouseEnter={(e) => {
                         const color = document.documentElement.classList.contains('dark') ? '#ffffff' : 'hsl(var(--foreground))';
                         e.currentTarget.style.textShadow = `0 0 0.55px ${color}, 0 0 0.55px ${color}`;
-                        openCollections();
                       }}
                       onMouseLeave={(e) => {
                         e.currentTarget.style.textShadow = 'none';
                       }}
-                      onFocus={openCollections}
                     >
                       {link.name}
                     </span>
@@ -1030,7 +1025,6 @@ function NikeInspiredHeader({
                   },
                 }}
                 className="relative z-[9991] hidden lg:block bg-white border-b border-border overflow-hidden"
-                onMouseEnter={openCollections}
                 onMouseLeave={() => {
                   closeCollections();
                 }}
