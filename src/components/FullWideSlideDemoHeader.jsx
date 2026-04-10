@@ -2576,6 +2576,49 @@ export default function FullWideSlideDemoHeader({
   const accountClickTimeoutRef = useRef(null);
   const dblClickDelayMs = 0;
   const [searchQuery, setSearchQuery] = useState('');
+  
+  // Estat per als productes del carrusel
+  const [carouselProducts, setCarouselProducts] = useState([
+    { img: 'color-card-white.webp', name: 'SENSE & SENSIBILITY', collection: 'austen', drawing: 'austen/crosswords/sense-and-sensibility-4-stripe.webp', price: '19,95€', qty: 1, size: 'L', isTemplate: true, disabled: false },
+    { img: 'color-card-light-blue.webp', name: 'ROBBIE THE ROBOT', collection: 'the_human_inside', drawing: 'the_human_inside/black/robbie-the-robot-b-stripe.webp', price: '19,95€', qty: 1, size: 'L', isTemplate: true, disabled: false },
+    { img: 'color-card-royal.webp', name: 'PRIDE & PREJUDICE', collection: 'austen', drawing: 'austen/crosswords/pride-and-prejudice-1-stripe.webp', price: '19,95€', qty: 1, size: 'M', isTemplate: true, disabled: false },
+    { img: 'color-card-navy.webp', name: 'ROBOCUBE', collection: 'cube', drawing: 'cube/robocube-stripe.webp', price: '19,95€', qty: 2, size: 'XL', isTemplate: true, disabled: false },
+    { img: 'color-card-purple.webp', name: 'PONT DEL DIABLE', collection: 'miscel·lania', drawing: 'miscel·lania/black/pont-del-diable-b-stripe.webp', price: '19,95€', qty: 1, size: 'S', isTemplate: true, disabled: false },
+    { img: 'color-card-light pink.webp', name: 'NCC-1701-D', collection: 'first_contact', drawing: 'first_contact/black/ncc-1701-d-b-stripe.webp', price: '19,95€', qty: 1, size: 'M', isTemplate: true, disabled: false },
+    { img: 'color-card-daisy.webp', name: 'MASCHINENMENSCH', collection: 'the_human_inside', drawing: 'the_human_inside/black/maschinenmensch-b-stripe.webp', price: '19,95€', qty: 1, size: 'L', isTemplate: true, disabled: false },
+    { img: 'color-card-gold.webp', name: 'PERSUASION', collection: 'austen', drawing: 'austen/crosswords/persuasion-1-stripe.webp', price: '19,95€', qty: 1, size: 'L', isTemplate: true, disabled: false },
+    { img: 'color-card-red.webp', name: 'CYBER CUBE', collection: 'cube', drawing: 'cube/cyber-cube-stripe.webp', price: '19,95€', qty: 3, size: 'M', isTemplate: true, disabled: false },
+    { img: 'color-card-kiwi.webp', name: 'DJ VADER', collection: 'miscel·lania', drawing: 'miscel·lania/black/dj-vader-b-stripe.webp', price: '19,95€', qty: 1, size: 'L', isTemplate: true, disabled: false },
+    { img: 'color-card-irish-green .webp', name: 'PLASMA ESCAPE', collection: 'first_contact', drawing: 'first_contact/black/plasma-escape-b-stripe.webp', price: '19,95€', qty: 1, size: 'XL', isTemplate: true, disabled: false },
+    { img: 'color-card-military-green.webp', name: 'VADER', collection: 'the_human_inside', drawing: 'the_human_inside/black/vader-b-stripe.webp', price: '19,95€', qty: 1, size: 'L', isTemplate: true, disabled: false },
+    { img: 'color-card-forest.webp', name: 'SENSE & SENSIBILITY', collection: 'austen', drawing: 'austen/crosswords/sense-and-sensibility-1-stripe.webp', price: '19,95€', qty: 1, size: 'M', isTemplate: true, disabled: false },
+    { img: 'color-card-black.webp', name: 'MAZINGER C', collection: 'cube', drawing: 'cube/mazinger-c-stripe.webp', price: '19,95€', qty: 1, size: 'L', isTemplate: true, disabled: false },
+  ]);
+
+  // Funcions per modificar quantitat
+  const updateQuantity = (index, delta) => {
+    setCarouselProducts(prev => prev.map((p, i) => 
+      i === index ? { ...p, qty: Math.max(1, p.qty + delta) } : p
+    ));
+  };
+
+  // Funcions per modificar tallatge
+  const sizes = ['S', 'M', 'L', 'XL', 'XXL'];
+  const updateSize = (index, delta) => {
+    setCarouselProducts(prev => prev.map((p, i) => {
+      if (i !== index) return p;
+      const currentIdx = sizes.indexOf(p.size);
+      const newIdx = Math.max(0, Math.min(sizes.length - 1, currentIdx + delta));
+      return { ...p, size: sizes[newIdx] };
+    }));
+  };
+
+  // Funció per desactivar producte (només desactivar, no reactivar)
+  const disableProduct = (index) => {
+    setCarouselProducts(prev => prev.map((p, i) => 
+      i === index ? { ...p, disabled: true } : p
+    ));
+  };
   const searchResults = useMemo(() => {
     const products = Array.isArray(contextProducts) ? contextProducts : [];
     const q = (searchQuery || '').toString().trim().toLowerCase();
@@ -5513,36 +5556,7 @@ export default function FullWideSlideDemoHeader({
                           msOverflowStyle: 'none',
                         }}>
                           {/* Carrusel de productes del cistell */}
-                          {[
-                            // PLANTILLA - first_contact
-                            { img: 'tmp/color-card-PLANTILLA (3).jpg', name: 'SENSE & SENSIBILITY', collection: 'first_contact', drawing: 'first_contact/black/wormhole-b-stripe.webp', price: '19,95€', qty: 1, size: 'L', isTemplate: true },
-                            // the_human_inside - MÉS GROS EN Y
-                            { img: 'color-card-light-blue.webp', name: 'ROBBIE THE ROBOT', collection: 'the_human_inside', drawing: 'the_human_inside/black/robbie-the-robot-b-stripe.webp', price: '19,95€', qty: 1, size: 'L' },
-                            // austen - MÉS AMPLE EN X i MÉS GROS EN Y
-                            { img: 'color-card-royal.webp', name: 'PRIDE & PREJUDICE', collection: 'austen', drawing: 'austen/crosswords/black/pride-and-prejudice-1-b-stripe.webp', price: '19,95€', qty: 1, size: 'M' },
-                            // cube
-                            { img: 'color-card-navy.webp', name: 'ROBOCUBE', collection: 'cube', drawing: 'cube/robocube-stripe.webp', price: '19,95€', qty: 2, size: 'XL' },
-                            // miscel·lania
-                            { img: 'color-card-purple.webp', name: 'PONT DEL DIABLE', collection: 'miscel·lania', drawing: 'miscel·lania/black/pont-del-diable-b-stripe.webp', price: '19,95€', qty: 1, size: 'S' },
-                            // first_contact - MÉS PETIT EN Y
-                            { img: 'color-card-light pink.webp', name: 'NCC-1701-D', collection: 'first_contact', drawing: 'first_contact/black/ncc-1701-d-b-stripe.webp', price: '19,95€', qty: 1, size: 'M' },
-                            // the_human_inside
-                            { img: 'color-card-gold.webp', name: 'MASCHINENMENSCH', collection: 'the_human_inside', drawing: 'the_human_inside/black/maschinenmensch-b-stripe.webp', price: '19,95€', qty: 1, size: 'L' },
-                            // austen
-                            { img: 'color-card-daisy.webp', name: 'PERSUASION', collection: 'austen', drawing: 'austen/crosswords/black/persuasion-1-b-stripe.webp', price: '19,95€', qty: 1, size: 'L' },
-                            // cube
-                            { img: 'color-card-red.webp', name: 'CYBER CUBE', collection: 'cube', drawing: 'cube/cyber-cube-stripe.webp', price: '19,95€', qty: 3, size: 'M' },
-                            // miscel·lania
-                            { img: 'color-card-kiwi.webp', name: 'DJ VADER', collection: 'miscel·lania', drawing: 'miscel·lania/black/dj-vader-b-stripe.webp', price: '19,95€', qty: 1, size: 'L' },
-                            // first_contact
-                            { img: 'color-card-irish-green .webp', name: 'PLASMA ESCAPE', collection: 'first_contact', drawing: 'first_contact/black/plasma-escape-b-stripe.webp', price: '19,95€', qty: 1, size: 'XL' },
-                            // the_human_inside
-                            { img: 'color-card-forest.webp', name: 'VADER', collection: 'the_human_inside', drawing: 'the_human_inside/black/vader-b-stripe.webp', price: '19,95€', qty: 1, size: 'L' },
-                            // austen
-                            { img: 'color-card-military-green.webp', name: 'SENSE & SENSIBILITY', collection: 'austen', drawing: 'austen/crosswords/black/sense-and-sensibility-1-b-stripe.webp', price: '19,95€', qty: 1, size: 'M' },
-                            // cube
-                            { img: 'color-card-black.webp', name: 'MAZINGER C', collection: 'cube', drawing: 'cube/mazinger-c-stripe.webp', price: '19,95€', qty: 1, size: 'L' },
-                          ].map((product, idx) => (
+                          {carouselProducts.map((product, idx) => (
                             <div key={idx} style={{
                               position: 'relative',
                               flexShrink: 0,
@@ -5551,6 +5565,18 @@ export default function FullWideSlideDemoHeader({
                               aspectRatio: '308 / 678',
                               fontSize: '1vh',
                             }}>
+                              {/* Wrapper amb filtre per tot excepte botons */}
+                              <div style={{
+                                position: 'absolute',
+                                top: 0,
+                                left: 0,
+                                width: '100%',
+                                height: '100%',
+                                filter: product.disabled ? 'grayscale(100%)' : 'none',
+                                opacity: product.disabled ? 0.5 : 1,
+                                transition: 'filter 0.3s ease, opacity 0.3s ease',
+                                pointerEvents: 'none',
+                              }}>
                               {/* Capa 1: Color-card de fons */}
                               <img 
                                 src={`/placeholders/color-cards/${product.img}`}
@@ -5577,11 +5603,11 @@ export default function FullWideSlideDemoHeader({
                                 alignItems: 'center',
                                 overflow: 'hidden',
                                 boxSizing: 'border-box',
-                                backgroundColor: 'rgba(0, 255, 0, 0.5)',
+                                backgroundColor: 'transparent',
                                 zIndex: 5,
                               }}>
-                                {/* <img
-                                  src={`/placeholders/drawings/${product.drawing}`}
+                                <img
+                                  src={`/custom_logos/drawings/images_stripe/${product.drawing}`}
                                   alt={product.name}
                                   style={{
                                     width: 'auto',
@@ -5590,7 +5616,7 @@ export default function FullWideSlideDemoHeader({
                                     maxHeight: '100%',
                                     objectFit: 'contain',
                                   }}
-                                /> */}
+                                />
                               </div>
                               )}
 
@@ -5622,7 +5648,7 @@ export default function FullWideSlideDemoHeader({
                                   fontFamily: 'Oswald, sans-serif',
                                   fontSize: '11.4pt',
                                   fontWeight: 600,
-                                  color: '#ff0000',
+                                  color: '#000000',
                                   letterSpacing: '0.0025em',
                                   textAlign: 'center',
                                   whiteSpace: 'nowrap',
@@ -5634,7 +5660,7 @@ export default function FullWideSlideDemoHeader({
 
                               {/* Capa 4: Selector de quantitat */}
                               {product.isTemplate && (
-                              <div style={{
+                              <div className="quantity-row" style={{
                                   position: 'absolute',
                                   bottom: 'calc(37.5% - 8.5px)',
                                   left: '50%',
@@ -5643,8 +5669,9 @@ export default function FullWideSlideDemoHeader({
                                   alignItems: 'center',
                                   gap: '2.6%',
                                   zIndex: 10,
+                                  pointerEvents: 'auto',
                               }}>
-                                  <button style={{
+                                  <button className="qty-btn" onClick={() => updateQuantity(idx, -1)} style={{
                                     width: '20px',
                                     height: '20px',
                                     border: 'none',
@@ -5653,7 +5680,7 @@ export default function FullWideSlideDemoHeader({
                                     fontSize: '15pt',
                                     fontWeight: 700,
                                     cursor: 'pointer',
-                                    color: '#ff0000',
+                                    color: '#000000',
                                     display: 'flex',
                                     alignItems: 'center',
                                     justifyContent: 'center',
@@ -5661,13 +5688,15 @@ export default function FullWideSlideDemoHeader({
                                     padding: 0,
                                     position: 'relative',
                                     left: '-8px',
+                                    opacity: 0,
+                                    transition: 'opacity 0.2s ease',
                                   }}>−</button>
                                   <div style={{
                                     fontFamily: 'Avenir Next Condensed, sans-serif',
                                     fontSize: '9.6pt',
                                     fontWeight: 400,
                                     fontStretch: 'condensed',
-                                    color: '#ff0000',
+                                    color: '#000000',
                                     letterSpacing: '0.08em',
                                     textAlign: 'center',
                                     lineHeight: 1,
@@ -5682,7 +5711,7 @@ export default function FullWideSlideDemoHeader({
                                     fontSize: '9.6pt',
                                     fontWeight: 600,
                                     fontStretch: 'condensed',
-                                    color: '#ff0000',
+                                    color: '#000000',
                                     textAlign: 'center',
                                     lineHeight: 1,
                                     display: 'flex',
@@ -5690,8 +5719,9 @@ export default function FullWideSlideDemoHeader({
                                     justifyContent: 'center',
                                     position: 'relative',
                                     left: '3.25px',
+                                    minWidth: '12px',
                                   }}>{product.qty}</div>
-                                  <button style={{
+                                  <button className="qty-btn" onClick={() => updateQuantity(idx, 1)} style={{
                                     width: '20px',
                                     height: '20px',
                                     border: 'none',
@@ -5700,7 +5730,7 @@ export default function FullWideSlideDemoHeader({
                                     fontSize: '15pt',
                                     fontWeight: 700,
                                     cursor: 'pointer',
-                                    color: '#ff0000',
+                                    color: '#000000',
                                     display: 'flex',
                                     alignItems: 'center',
                                     justifyContent: 'center',
@@ -5708,13 +5738,15 @@ export default function FullWideSlideDemoHeader({
                                     padding: 0,
                                     position: 'relative',
                                     left: '8px',
+                                    opacity: 0,
+                                    transition: 'opacity 0.2s ease',
                                   }}>+</button>
                                 </div>
                               )}
 
                               {/* Capa 5: Selector de tallatge */}
                               {product.isTemplate && (
-                              <div style={{
+                              <div className="size-row" style={{
                                   position: 'absolute',
                                   bottom: 'calc(31.6% - 8px)',
                                   left: '50%',
@@ -5723,8 +5755,9 @@ export default function FullWideSlideDemoHeader({
                                   alignItems: 'center',
                                   gap: '2.6%',
                                   zIndex: 10,
+                                  pointerEvents: 'auto',
                               }}>
-                                  <button style={{
+                                  <button className="size-btn" onClick={() => updateSize(idx, -1)} style={{
                                     width: '20px',
                                     height: '20px',
                                     border: 'none',
@@ -5733,7 +5766,7 @@ export default function FullWideSlideDemoHeader({
                                     fontSize: '15pt',
                                     fontWeight: 700,
                                     cursor: 'pointer',
-                                    color: '#ff0000',
+                                    color: '#000000',
                                     padding: 0,
                                     display: 'flex',
                                     alignItems: 'center',
@@ -5741,12 +5774,14 @@ export default function FullWideSlideDemoHeader({
                                     lineHeight: 1,
                                     position: 'relative',
                                     left: '4px',
+                                    opacity: 0,
+                                    transition: 'opacity 0.2s ease',
                                   }}>−</button>
                                   <div style={{
                                     fontFamily: 'Roboto Condensed, sans-serif',
                                     fontSize: '9.6pt',
                                     fontWeight: 400,
-                                    color: '#ff0000',
+                                    color: '#000000',
                                     letterSpacing: '0.04em',
                                     minWidth: '70px',
                                     textAlign: 'center',
@@ -5757,13 +5792,13 @@ export default function FullWideSlideDemoHeader({
                                     fontFamily: 'Roboto Condensed, sans-serif',
                                     fontSize: '9.6pt',
                                     fontWeight: 700,
-                                    color: '#ff0000',
+                                    color: '#000000',
                                     minWidth: '18px',
                                     textAlign: 'center',
                                     position: 'relative',
                                     left: '-5px',
                                   }}>{product.size}</div>
-                                  <button style={{
+                                  <button className="size-btn" onClick={() => updateSize(idx, 1)} style={{
                                     width: '20px',
                                     height: '20px',
                                     border: 'none',
@@ -5772,7 +5807,7 @@ export default function FullWideSlideDemoHeader({
                                     fontSize: '15pt',
                                     fontWeight: 700,
                                     cursor: 'pointer',
-                                    color: '#ff0000',
+                                    color: '#000000',
                                     padding: 0,
                                     display: 'flex',
                                     alignItems: 'center',
@@ -5780,6 +5815,8 @@ export default function FullWideSlideDemoHeader({
                                     lineHeight: 1,
                                     position: 'relative',
                                     left: '-4px',
+                                    opacity: 0,
+                                    transition: 'opacity 0.2s ease',
                                   }}>+</button>
                                 </div>
                               )}
@@ -5792,16 +5829,17 @@ export default function FullWideSlideDemoHeader({
                                   left: '50%',
                                   transform: 'translateX(-50%)',
                                   fontFamily: 'Avenir Next Condensed, sans-serif',
-                                  fontSize: '19pt',
+                                  fontSize: '18pt',
                                   fontWeight: 600,
                                   fontStretch: 'condensed',
-                                  color: '#ff0000',
+                                  color: '#000000',
                                   textAlign: 'center',
                                   zIndex: 10,
                               }}>
                                   {product.price}
                                 </div>
                               )}
+                              </div>
 
                               {/* Capa 7: Botons d'acció */}
                               {product.isTemplate && (
@@ -5813,8 +5851,17 @@ export default function FullWideSlideDemoHeader({
                                   display: 'flex',
                                   gap: '13%',
                                   zIndex: 10,
+                                  justifyContent: 'center',
                               }}>
-                                  <button style={{
+                                  <button onClick={() => {
+                                    if (megaPage === 3 && active) {
+                                      setMegaFullScreen((prev) => !prev);
+                                    } else {
+                                      setMegaPage(3);
+                                      if (!active) ensureMegaOpen();
+                                    }
+                                    touchMegaPublicActivity();
+                                  }} style={{
                                     width: '24px',
                                     height: '24px',
                                     border: 'none',
@@ -5823,29 +5870,31 @@ export default function FullWideSlideDemoHeader({
                                     padding: 0,
                                     position: 'relative',
                                     top: '-2px',
-                                    left: '-5.75px',
-                                    transform: 'scale(0.9)',
+                                    left: product.disabled ? '0' : '-3px',
+                                    transform: 'scale(0.855)',
                                   }}>
                                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#272727" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                                       <rect x="1" y="4" width="22" height="16" rx="2" ry="2"/>
                                       <rect x="1" y="8" width="22" height="4" fill="#272727"/>
                                     </svg>
                                   </button>
-                                  <button style={{
-                                    width: '24px',
-                                    height: '24px',
-                                    border: 'none',
-                                    background: 'transparent',
-                                    cursor: 'pointer',
-                                    padding: 0,
-                                    position: 'relative',
-                                    top: '-2px',
-                                    left: '-0.5px',
-                                  }}>
-                                    <svg width="23.625" height="23.625" viewBox="0 0 24 24" fill="none" stroke="#ff6b6b" strokeWidth="3">
-                                      <path d="M18 6L6 18M6 6l12 12" />
-                                    </svg>
-                                  </button>
+                                  {!product.disabled && (
+                                    <button onClick={() => disableProduct(idx)} style={{
+                                      width: '24px',
+                                      height: '24px',
+                                      border: 'none',
+                                      background: 'transparent',
+                                      cursor: 'pointer',
+                                      padding: 0,
+                                      position: 'relative',
+                                      top: '-2px',
+                                      left: '3px',
+                                    }}>
+                                      <svg width="23.625" height="23.625" viewBox="0 0 24 24" fill="none" stroke="#FF0000" strokeWidth="3">
+                                        <path d="M18 6L6 18M6 6l12 12" />
+                                      </svg>
+                                    </button>
+                                  )}
                                 </div>
                               )}
                             </div>
@@ -5854,6 +5903,10 @@ export default function FullWideSlideDemoHeader({
                         <style>{`
                           div::-webkit-scrollbar {
                             display: none;
+                          }
+                          .quantity-row:hover .qty-btn,
+                          .size-row:hover .size-btn {
+                            opacity: 1 !important;
                           }
                         `}</style>
                       </div>
