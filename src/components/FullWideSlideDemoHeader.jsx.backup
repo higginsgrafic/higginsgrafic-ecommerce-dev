@@ -11,6 +11,7 @@ import {
   resolveAustenQuoteOriginalFromPath,
 } from '../utils/austenQuotesAssets.js';
 import FullWideSlideDemoHumanInsideSlider from './FullWideSlideDemoHumanInsideSlider.jsx';
+import CartPage from './megaslide/cart';
 
 function MegaStripeBleedGuard({ heightPx, debug, expandLeftPx = 0, expandRightPx = 0, children }) {
   const l = Math.max(0, Number(expandLeftPx) || 0);
@@ -2582,8 +2583,8 @@ export default function FullWideSlideDemoHeader({
     { img: 'color-card-white.webp', name: 'SENSE & SENSIBILITY', collection: 'austen', drawing: 'austen/crosswords/sense-and-sensibility-4-stripe.webp', price: '19,95€', qty: 1, size: 'L', isTemplate: true, disabled: false },
     { img: 'color-card-light-blue.webp', name: 'ROBBIE THE ROBOT', collection: 'the_human_inside', drawing: 'the_human_inside/black/robbie-the-robot-b-stripe.webp', price: '19,95€', qty: 1, size: 'L', isTemplate: true, disabled: false },
     { img: 'color-card-royal.webp', name: 'PRIDE & PREJUDICE', collection: 'austen', drawing: 'austen/crosswords/pride-and-prejudice-1-stripe.webp', price: '19,95€', qty: 1, size: 'M', isTemplate: true, disabled: false },
-    { img: 'color-card-navy.webp', name: 'ROBOCUBE', collection: 'cube', drawing: 'cube/robocube-stripe.webp', price: '19,95€', qty: 2, size: 'XL', isTemplate: true, disabled: false },
-    { img: 'color-card-purple.webp', name: 'PONT DEL DIABLE', collection: 'miscel·lania', drawing: 'miscel·lania/black/pont-del-diable-b-stripe.webp', price: '19,95€', qty: 1, size: 'S', isTemplate: true, disabled: false },
+    { img: 'color-card-navy.webp', name: 'NX-01', collection: 'first_contact', drawing: 'first_contact/black/nx-01-b-stripe.webp', price: '19,95€', qty: 2, size: 'XL', isTemplate: true, disabled: false },
+    { img: 'color-card-purple.webp', name: 'NCC-1701', collection: 'first_contact', drawing: 'first_contact/black/ncc-1701-b-stripe.webp', price: '19,95€', qty: 1, size: 'S', isTemplate: true, disabled: false },
     { img: 'color-card-light pink.webp', name: 'NCC-1701-D', collection: 'first_contact', drawing: 'first_contact/black/ncc-1701-d-b-stripe.webp', price: '19,95€', qty: 1, size: 'M', isTemplate: true, disabled: false },
     { img: 'color-card-daisy.webp', name: 'MASCHINENMENSCH', collection: 'the_human_inside', drawing: 'the_human_inside/black/maschinenmensch-b-stripe.webp', price: '19,95€', qty: 1, size: 'L', isTemplate: true, disabled: false },
     { img: 'color-card-gold.webp', name: 'PERSUASION', collection: 'austen', drawing: 'austen/crosswords/persuasion-1-stripe.webp', price: '19,95€', qty: 1, size: 'L', isTemplate: true, disabled: false },
@@ -2701,7 +2702,6 @@ export default function FullWideSlideDemoHeader({
   const [searchCaretVisible, setSearchCaretVisible] = useState(true);
   const [megaPage, setMegaPage] = useState(1);
   const [megaFullScreen, setMegaFullScreen] = useState(false);
-  const [acordioExpanded, setAcordioExpanded] = useState(false);
   const [firstContactSelectedItem, setFirstContactSelectedItem] = useState(null);
   const [humanInsideSelectedItem, setHumanInsideSelectedItem] = useState(null);
   const [selectedItemByCollection, setSelectedItemByCollection] = useState({});
@@ -5266,18 +5266,9 @@ export default function FullWideSlideDemoHeader({
                 cartClickTimeoutRef.current = window.setTimeout(() => {
                   cartClickTimeoutRef.current = null;
                   if (megaPage === 3 && active) {
-                    // Si ja estem a la pàgina 3 i el mega-menu està obert
-                    if (acordioExpanded) {
-                      // Si l'acordió està obert, només el tanquem (mantenim mega-menu obert)
-                      setAcordioExpanded(false);
-                    } else {
-                      // Si l'acordió està tancat, l'obrim
-                      setAcordioExpanded(true);
-                    }
+                    setMegaFullScreen((prev) => !prev);
                   } else {
-                    // Si no estem a la pàgina 3, hi anem
                     setMegaPage(3);
-                    setAcordioExpanded(false);
                     if (!active) ensureMegaOpen();
                   }
                   touchMegaPublicActivity();
@@ -5537,28 +5528,48 @@ export default function FullWideSlideDemoHeader({
                         flex: '1 1 auto',
                       }} />
 
+                      <CartPage
+                        version="v1"
+                        carouselProducts={carouselProducts}
+                        updateQuantity={updateQuantity}
+                        updateSize={updateSize}
+                        disableProduct={disableProduct}
+                        megaPage={megaPage}
+                        active={active}
+                        setMegaPage={setMegaPage}
+                        setMegaFullScreen={setMegaFullScreen}
+                        ensureMegaOpen={ensureMegaOpen}
+                        touchMegaPublicActivity={touchMegaPublicActivity}
+                      />
+
+                      <div style={{ 
+                        flex: '1 1 auto',
+                      }} />
+                    </div>
+
+                    {/* PÀGINA 3 ORIGINAL - COMENTADA
+                    <div style={{ width: '25%', flexShrink: 0, display: 'flex', height: '100%', position: 'relative', justifyContent: 'center' }}>
+                      <div style={{ 
+                        flex: '1 1 auto',
+                      }} />
+
                       <div style={{ 
                         flex: '0 0 auto', 
                         width: '1400px', 
                         maxWidth: '100%', 
                         position: 'relative', 
-                        height: '100%',
-                        paddingLeft: '40px', 
+                        height: '100%', 
+                        paddingLeft: '40px',
                         paddingRight: '40px',
-                        display: 'flex',
-                        flexDirection: 'column',
                       }}>
                         <div 
                           onWheel={(e) => {
-                            if (!acordioExpanded) {
-                              e.preventDefault();
-                              e.currentTarget.scrollLeft += e.deltaY;
-                            }
+                            e.preventDefault();
+                            e.currentTarget.scrollLeft += e.deltaY;
                           }}
                           style={{
                           width: '100%',
                           height: '100%',
-                          flexShrink: 0,
                           backgroundColor: 'transparent',
                           padding: 0,
                           margin: 0,
@@ -5630,6 +5641,9 @@ export default function FullWideSlideDemoHeader({
                                     maxWidth: '100%',
                                     maxHeight: '100%',
                                     objectFit: 'contain',
+                                    transform: product.name === 'NX-01' ? 'scale(0.466)' : 
+                                               product.name === 'NCC-1701' ? 'scale(0.75)' : 
+                                               'none',
                                   }}
                                 />
                               </div>
@@ -5915,114 +5929,6 @@ export default function FullWideSlideDemoHeader({
                             </div>
                           ))}
                         </div>
-
-                        {/* Contingut de l'acordió - Overlay absolut full-width */}
-                        {acordioExpanded && (
-                          <div style={{
-                            position: 'absolute',
-                            top: '100%',
-                            left: '50%',
-                            transform: 'translateX(-50%)',
-                            width: '100vw',
-                            minHeight: '100vh',
-                            backgroundColor: 'white',
-                            paddingTop: '40px',
-                            paddingBottom: '40px',
-                            zIndex: 10,
-                          }}>
-                            <div style={{
-                              maxWidth: '1400px',
-                              margin: '0 auto',
-                              padding: '0 40px',
-                            }}>
-                              {/* Títol */}
-                              <h2 style={{
-                                fontFamily: 'Oswald, sans-serif',
-                                fontSize: '48px',
-                                fontWeight: 700,
-                                color: '#1E62B8',
-                                marginTop: '10px',
-                                marginBottom: '40px',
-                                textAlign: 'center',
-                              }}>
-                                RESUM DE LA COMANDA
-                              </h2>
-
-                              {/* Contingut de prova */}
-                              <div style={{
-                                backgroundColor: 'white',
-                                borderRadius: '8px',
-                                padding: '30px',
-                                boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-                                marginBottom: '20px',
-                              }}>
-                                <h3 style={{
-                                  fontFamily: 'Oswald, sans-serif',
-                                  fontSize: '24px',
-                                  fontWeight: 600,
-                                  color: '#333',
-                                  marginBottom: '20px',
-                                }}>
-                                  Productes al cistell
-                                </h3>
-                                <p style={{
-                                  fontFamily: 'system-ui, sans-serif',
-                                  fontSize: '16px',
-                                  color: '#666',
-                                  lineHeight: '1.6',
-                                }}>
-                                  Aquí pots afegir el llistat de productes, totals, opcions de pagament, 
-                                  formularis, botons d'acció, o qualsevol altre contingut que necessitis.
-                                </p>
-                              </div>
-
-                              {/* Més contingut de prova */}
-                              <div style={{
-                                backgroundColor: 'white',
-                                borderRadius: '8px',
-                                padding: '30px',
-                                boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-                                marginBottom: '20px',
-                              }}>
-                                <h3 style={{
-                                  fontFamily: 'Oswald, sans-serif',
-                                  fontSize: '24px',
-                                  fontWeight: 600,
-                                  color: '#333',
-                                  marginBottom: '20px',
-                                }}>
-                                  Total
-                                </h3>
-                                <p style={{
-                                  fontFamily: 'Oswald, sans-serif',
-                                  fontSize: '32px',
-                                  fontWeight: 700,
-                                  color: '#1E62B8',
-                                }}>
-                                  123,45 €
-                                </p>
-                              </div>
-
-                              {/* Botó d'exemple */}
-                              <button style={{
-                                width: '100%',
-                                padding: '20px',
-                                backgroundColor: '#1E62B8',
-                                color: 'white',
-                                border: 'none',
-                                borderRadius: '8px',
-                                fontFamily: 'Oswald, sans-serif',
-                                fontSize: '20px',
-                                fontWeight: 600,
-                                cursor: 'pointer',
-                                transition: 'background-color 0.2s',
-                              }}>
-                                FINALITZAR COMANDA
-                              </button>
-                            </div>
-                          </div>
-                        )}
-
                         <style>{`
                           div::-webkit-scrollbar {
                             display: none;
@@ -6038,6 +5944,7 @@ export default function FullWideSlideDemoHeader({
                         flex: '1 1 auto',
                       }} />
                     </div>
+                    */}
 
                     <div style={{ width: '25%', flexShrink: 0, display: 'flex', height: '100%', position: 'relative', justifyContent: 'center' }}>
                       <div style={{ 

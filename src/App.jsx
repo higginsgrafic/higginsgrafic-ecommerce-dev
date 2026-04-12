@@ -2096,23 +2096,10 @@ function App() {
     }
   }, [clicksEnabled]);
 
+  // Rodonetes desactivades
   useEffect(() => {
-    if (!clicksEnabled) return;
-    if (!layoutInspectorEnabled) return;
-
-    const onPointerDown = (e) => {
-      if (typeof e.clientX !== 'number' || typeof e.clientY !== 'number') return;
-      const toolbar = debugButtonsWrapRef.current;
-      if (toolbar && e.target && toolbar.contains(e.target)) return;
-
-      setClickMarks((prev) => {
-        const next = [...prev, { x: e.clientX, y: e.clientY, t: Date.now() }];
-        return next.slice(-40);
-      });
-    };
-
-    window.addEventListener('pointerdown', onPointerDown, { capture: true, passive: true });
-    return () => window.removeEventListener('pointerdown', onPointerDown, { capture: true });
+    // No mostrar rodonetes mai
+    return;
   }, [clicksEnabled, layoutInspectorEnabled]);
 
   useEffect(() => {
@@ -2547,6 +2534,10 @@ function App() {
       const inMain = main && e.target instanceof Element && main.contains(e.target);
       const inOverlay = e.target instanceof Element && isInLayoutInspectorRoot(e.target);
       if (!(inMain || inOverlay)) return;
+      
+      // Només selecciona elements si clicksEnabled està desactivat
+      if (clicksEnabled) return;
+      
       const pickedFromPoint = pickElementInMain(e.clientX, e.clientY);
       const pickedFromTarget = (main && main.contains(e.target) && !isDevOverlay(e.target) && !isFixedElement(e.target)) ? e.target : null;
       const picked = pickedFromPoint || pickedFromTarget;
@@ -2583,10 +2574,12 @@ function App() {
       const inOverlay = e.target instanceof Element && isInLayoutInspectorRoot(e.target);
       if (!(inMain || inOverlay)) return;
 
-      // Blocatge per defecte: evita navegació i handlers de click quan el debug està actiu.
-      if (typeof e.preventDefault === 'function') e.preventDefault();
-      if (typeof e.stopPropagation === 'function') e.stopPropagation();
-      if (typeof e.stopImmediatePropagation === 'function') e.stopImmediatePropagation();
+      // Blocatge només si clicksEnabled està desactivat
+      if (!clicksEnabled) {
+        if (typeof e.preventDefault === 'function') e.preventDefault();
+        if (typeof e.stopPropagation === 'function') e.stopPropagation();
+        if (typeof e.stopImmediatePropagation === 'function') e.stopImmediatePropagation();
+      }
     };
 
     window.addEventListener('pointerdown', onPointerDown, { capture: true, passive: true });
@@ -2599,7 +2592,7 @@ function App() {
       if (selected) selected.classList.remove('debug-selected');
       selectedElementNodeRef.current = null;
     };
-  }, [layoutInspectorActive, layoutInspectorPickEnabled]);
+  }, [layoutInspectorActive, layoutInspectorPickEnabled, clicksEnabled]);
 
   const buildContainerToken = (el) => {
     if (!el || !(el instanceof Element)) return '';
