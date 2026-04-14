@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Perfil d'Usuari - Higgins Gràfic</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        /* Configuració per a PDF DIN A4 */
+        @page {
+            size: A4;
+            margin: 1.5cm;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Roboto Condensed', sans-serif;
+            font-size: 12pt;
+            font-weight: 300;
+            line-height: 1.4;
+            color: #000;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+        
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            padding: 0;
+        }
+        
+        .columns {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0;
+            page-break-inside: avoid;
+        }
+        
+        .column {
+            background: #e8e8e8;
+            padding: 20px;
+            min-height: 400px;
+            page-break-inside: avoid;
+        }
+        
+        .column:nth-child(even) {
+            background: #f5f5f5;
+        }
+        
+        h1 {
+            font-family: 'Roboto Condensed', sans-serif;
+            font-size: 15pt;
+            font-weight: 500;
+            text-transform: uppercase;
+            margin-bottom: 15px;
+            letter-spacing: 0.5px;
+        }
+        
+        h2 {
+            font-family: 'Roboto Condensed', sans-serif;
+            font-size: 15pt;
+            font-weight: 400;
+            margin: 15px 0 10px 0;
+            letter-spacing: 0.3px;
+        }
+        
+        h3 {
+            font-family: 'Roboto Condensed', sans-serif;
+            font-size: 12pt;
+            font-weight: 500;
+            margin: 12px 0 8px 0;
+        }
+        
+        p, li {
+            font-family: 'Roboto Condensed', sans-serif;
+            font-size: 12pt;
+            font-weight: 300;
+            line-height: 1.5;
+            margin-bottom: 6px;
+        }
+        
+        ul {
+            list-style: none;
+            padding-left: 0;
+            margin: 8px 0;
+        }
+        
+        ul li {
+            padding-left: 15px;
+            position: relative;
+            margin-bottom: 4px;
+        }
+        
+        ul li:before {
+            content: "·";
+            position: absolute;
+            left: 0;
+            font-weight: 500;
+        }
+        
+        .field {
+            margin-bottom: 10px;
+        }
+        
+        .field-label {
+            font-weight: 400;
+            margin-bottom: 3px;
+        }
+        
+        .field-type {
+            font-weight: 300;
+            color: #666;
+            font-size: 11pt;
+        }
+        
+        .section-divider {
+            height: 1px;
+            background: #ccc;
+            margin: 15px 0;
+        }
+        
+        .checkbox-item {
+            margin: 6px 0;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 2px 8px;
+            background: #000;
+            color: white;
+            font-size: 10pt;
+            font-weight: 400;
+            margin-left: 8px;
+        }
+        
+        .note {
+            background: #fff;
+            padding: 10px;
+            margin: 10px 0;
+            border-left: 3px solid #000;
+            font-size: 11pt;
+        }
+        
+        @media print {
+            .columns {
+                page-break-inside: auto;
+            }
+            
+            .column {
+                page-break-inside: avoid;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Primera fila de columnes -->
+        <div class="columns">
+            <!-- Columna 1: Informació Sobre -->
+            <div class="column">
+                <h1>1. INFORMACIÓ SOBRE</h1>
+                
+                <h2>1.1. Dades Personals</h2>
+                
+                <div class="field">
+                    <div class="field-label">Nom complet</div>
+                    <div class="field-type">Input text (obligatori)</div>
+                </div>
+                
+                <div class="field">
+                    <div class="field-label">Email</div>
+                    <div class="field-type">Input email (obligatori, identificador)</div>
+                </div>
+                
+                <div class="field">
+                    <div class="field-label">Telèfon</div>
+                    <div class="field-type">Input tel (obligatori)</div>
+                </div>
+                
+                <div class="field">
+                    <div class="field-label">Empresa/Organització</div>
+                    <div class="field-type">Input text (opcional, per B2B)</div>
+                </div>
+                
+                <div class="note">
+                    <strong>Simplificació:</strong><br>
+                    · No cal camp gènere (roba unisex)<br>
+                    · No cal selector idioma (només català)
+                </div>
+                
+                <div class="section-divider"></div>
+                
+                <h2>1.2. Contrasenya</h2>
+                
+                <div class="field">
+                    <div class="field-label">Contrasenya actual</div>
+                    <div class="field-type">Input password</div>
+                </div>
+                
+                <div class="field">
+                    <div class="field-label">Contrasenya nova</div>
+                    <div class="field-type">Input password</div>
+                </div>
+                
+                <div class="field">
+                    <div class="field-label">Confirmar contrasenya</div>
+                    <div class="field-type">Input password</div>
+                </div>
+                
+                <div class="field">
+                    <div class="field-type">Botó "Canvia contrasenya"</div>
+                </div>
+                
+                <h3>Validacions:</h3>
+                <ul>
+                    <li>Mínim 8 caràcters</li>
+                    <li>Almenys 1 majúscula</li>
+                    <li>Almenys 1 número</li>
+                </ul>
+            </div>
+            
+            <!-- Columna 2: Adreces de Lliurament -->
+            <div class="column">
+                <h1>2. ADRECES DE LLIURAMENT (ORDRE DE FACTURACIÓ)</h1>
+                
+                <h2>2.1. Adreça de Lliurament</h2>
+                
+                <div class="field">
+                    <div class="field-label">Nom complet del destinatari</div>
+                    <div class="field-type">Input text</div>
+                </div>
+                
+                <div class="field">
+                    <div class="field-label">Carrer i número</div>
+                    <div class="field-type">Input text</div>
+                </div>
+                
+                <div class="field">
+                    <div class="field-label">Pis/Porta</div>
+                    <div class="field-type">Input text (opcional)</div>
+                </div>
+                
+                <div class="field">
+                    <div class="field-label">Codi postal</div>
+                    <div class="field-type">Input text</div>
+                </div>
+                
+                <div class="field">
+                    <div class="field-label">Ciutat</div>
+                    <div class="field-type">Input text</div>
+                </div>
+                
+                <div class="field">
+                    <div class="field-label">Província/Estat</div>
+                    <div class="field-type">Select o Input</div>
+                </div>
+                
+                <div class="field">
+                    <div class="field-label">País</div>
+                    <div class="field-type">Select</div>
+                </div>
+                
+                <div class="field">
+                    <div class="field-label">Telèfon de contacte</div>
+                    <div class="field-type">Input tel</div>
+                </div>
+                
+                <h3>Funcionalitats:</h3>
+                <ul>
+                    <li>Checkbox "Desar com a adreça per defecte"</li>
+                    <li>Botó "Afegir nova adreça"</li>
+                    <li>Botó "Editar" per cada adreça</li>
+                    <li>Botó "Eliminar" per cada adreça</li>
+                </ul>
+                
+                <div class="section-divider"></div>
+                
+                <h2>2.2. Adreça de Facturació</h2>
+                
+                <div class="checkbox-item">
+                    <div class="field-type">☐ Igual que l'adreça de lliurament</div>
+                </div>
+                
+                <div class="field">
+                    <div class="field-label">NIF/CIF</div>
+                    <div class="field-type">Input text (obligatori per factures)</div>
+                </div>
+                
+                <div class="field">
+                    <div class="field-label">Nom fiscal</div>
+                    <div class="field-type">Input text (si és diferent)</div>
+                </div>
+            </div>
+            
+            <!-- Columna 3: Mètodes de Pagament -->
+            <div class="column">
+                <h1>3. MÈTODES DE PAGAMENT</h1>
+                
+                <h2>3.1. Targetes</h2>
+                
+                <div class="field">
+                    <div class="field-label">Últims 4 dígits</div>
+                    <div class="field-type">•••• •••• •••• 1234 (només visible)</div>
+                </div>
+                
+                <div class="field">
+                    <div class="field-label">Tipus de targeta</div>
+                    <div class="field-type">Visa, Mastercard, Amex (icona)</div>
+                </div>
+                
+                <div class="field">
+                    <div class="field-label">Data de caducitat</div>
+                    <div class="field-type">MM/AA</div>
+                </div>
+                
+                <div class="field">
+                    <div class="field-label">Nom del titular</div>
+                    <div class="field-type">Text</div>
+                </div>
+                
+                <h3>Funcionalitats:</h3>
+                <ul>
+                    <li>Botó "Afegir targeta"</li>
+                    <li>Botó "Eliminar" per cada targeta</li>
+                    <li>Checkbox "Targeta per defecte"</li>
+                </ul>
+                
+                <div class="note">
+                    <strong>Seguretat:</strong><br>
+                    · CVV mai s'emmagatzema<br>
+                    · Dades encriptades<br>
+                    · Tokenització via passarel·la
+                </div>
+                
+                <div class="section-divider"></div>
+                
+                <h2>3.2. Altres Mètodes</h2>
+                
+                <ul>
+                    <li>Transferència bancària</li>
+                    <li>Contra reemborsament</li>
+                    <li>Bizum</li>
+                    <li>PayPal</li>
+                </ul>
+            </div>
+        </div>
+        
+        <!-- Segona fila de columnes -->
+        <div class="columns">
+            <!-- Columna 4: Comandes -->
+            <div class="column">
+                <h1>4. COMANDES</h1>
+                
+                <h2>4.1. Llista de Comandes</h2>
+                
+                <h3>Informació per comanda:</h3>
+                <ul>
+                    <li>Número de comanda (#12345)</li>
+                    <li>Data (DD/MM/AAAA)</li>
+                    <li>Estat (badge visual)</li>
+                    <li>Total (import amb IVA)</li>
+                    <li>Botó "Veure detalls"</li>
+                </ul>
+                
+                <h3>Estats possibles:</h3>
+                <ul>
+                    <li>Pendent de pagament</li>
+                    <li>Pagament confirmat</li>
+                    <li>En preparació</li>
+                    <li>Enviada (amb seguiment)</li>
+                    <li>Lliurada</li>
+                    <li>Cancel·lada</li>
+                    <li>Retornada</li>
+                </ul>
+                
+                <div class="section-divider"></div>
+                
+                <h2>4.2. Detall de Comanda</h2>
+                
+                <h3>Informació:</h3>
+                <ul>
+                    <li>Productes (imatge, nom, quantitat, preu)</li>
+                    <li>Subtotal</li>
+                    <li>Enviament</li>
+                    <li>IVA (desglossament)</li>
+                    <li>Total</li>
+                    <li>Adreça de lliurament</li>
+                    <li>Adreça de facturació</li>
+                    <li>Mètode de pagament</li>
+                    <li>Número de seguiment (si enviada)</li>
+                </ul>
+                
+                <h3>Accions:</h3>
+                <ul>
+                    <li>Botó "Descarregar factura" (PDF)</li>
+                    <li>Botó "Tornar a comprar"</li>
+                    <li>Botó "Sol·licitar devolució"</li>
+                </ul>
+            </div>
+            
+            <!-- Columna 5: Seguretat -->
+            <div class="column">
+                <h1>5. SEGURETAT BOTIGA/PLATAFORMA</h1>
+                
+                <h2>5.1. Autenticació de Dos Factors (2FA)</h2>
+                
+                <h3>Mètodes:</h3>
+                <ul>
+                    <li>SMS al telèfon</li>
+                    <li>App d'autenticació (Google Authenticator, Authy)</li>
+                </ul>
+                
+                <h3>Configuració:</h3>
+                <ul>
+                    <li>Toggle "Activar 2FA"</li>
+                    <li>Selecció de mètode</li>
+                    <li>Verificació inicial</li>
+                </ul>
+                
+                <div class="section-divider"></div>
+                
+                <h2>5.2. Sessions Actives</h2>
+                
+                <h3>Informació per sessió:</h3>
+                <ul>
+                    <li>Dispositiu (navegador i SO)</li>
+                    <li>Ubicació aproximada (ciutat/país)</li>
+                    <li>Última activitat (data i hora)</li>
+                    <li>Botó "Tancar sessió"</li>
+                </ul>
+                
+                <div class="section-divider"></div>
+                
+                <h2>5.3. Historial d'Activitat</h2>
+                
+                <h3>Registre d'accions:</h3>
+                <ul>
+                    <li>Canvis de contrasenya</li>
+                    <li>Adreces afegides/modificades</li>
+                    <li>Targetes afegides/eliminades</li>
+                    <li>Intents de login</li>
+                </ul>
+            </div>
+            
+            <!-- Columna 6: Preferències -->
+            <div class="column">
+                <h1>6. PREFERÈNCIES DEL COMPTE</h1>
+                
+                <h2>6.1. Notificacions per Email</h2>
+                
+                <h3>Transaccionals (sempre actives):</h3>
+                <ul>
+                    <li>Confirmació de comanda</li>
+                    <li>Pagament confirmat</li>
+                    <li>Comanda enviada (amb seguiment)</li>
+                    <li>Comanda lliurada</li>
+                </ul>
+                
+                <h3>Opcionals (configurables):</h3>
+                <div class="checkbox-item">☐ Promocions i ofertes</div>
+                <div class="checkbox-item">☐ Recordatori de carret abandonat</div>
+                <div class="checkbox-item">☐ Novetats i productes nous</div>
+                <div class="checkbox-item">☐ Consells i recomanacions</div>
+                
+                <div class="section-divider"></div>
+                
+                <h2>6.2. Privacitat</h2>
+                
+                <div class="checkbox-item">☐ Accepto rebre comunicacions comercials</div>
+                <div class="checkbox-item">☐ Accepto compartir dades amb transportistes (obligatori)</div>
+                
+                <div class="section-divider"></div>
+                
+                <h2>6.3. Gestió de Dades (GDPR)</h2>
+                
+                <h3>Funcionalitats:</h3>
+                <ul>
+                    <li>Botó "Descarregar les meves dades" (JSON/PDF)</li>
+                    <li>Botó "Eliminar el meu compte" (confirmació doble)</li>
+                </ul>
+                
+                <div class="note">
+                    <strong>Avís legal:</strong><br>
+                    Les comandes completades es conserven segons obligacions legals. Dades personals s'eliminen excepte les requerides per llei.
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

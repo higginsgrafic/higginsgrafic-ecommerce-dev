@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Informe del Perfil d'Usuari - Informació Interna</title>
+    <style>
+        /* Configuració per a PDF DIN A4 */
+        @page {
+            size: A4;
+            margin: 2cm;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            padding: 20px;
+        }
+        
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        
+        header {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+            position: relative;
+        }
+        
+        header::before {
+            content: "🔒";
+            position: absolute;
+            top: 20px;
+            right: 40px;
+            font-size: 3em;
+            opacity: 0.3;
+        }
+        
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+        
+        header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+        
+        .badge {
+            display: inline-block;
+            background: #dc3545;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+            margin-top: 10px;
+        }
+        
+        .content {
+            padding: 40px;
+        }
+        
+        .section {
+            margin-bottom: 50px;
+            border-left: 4px solid #1e3c72;
+            padding-left: 30px;
+            page-break-before: always;
+            page-break-inside: avoid;
+        }
+        
+        .section:first-of-type {
+            page-break-before: avoid;
+        }
+        
+        .subsection {
+            page-break-inside: avoid;
+        }
+        
+        .feature-grid, .feature-card, .info-box, .warning-box, .security-box {
+            page-break-inside: avoid;
+        }
+        
+        h2, h3, h4 {
+            page-break-after: avoid;
+        }
+        
+        .section h2 {
+            color: #1e3c72;
+            font-size: 2em;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .section-number {
+            background: #1e3c72;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+        
+        .subsection {
+            margin-bottom: 30px;
+        }
+        
+        .subsection h3 {
+            color: #2a5298;
+            font-size: 1.4em;
+            margin-bottom: 15px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+        
+        .subsection h4 {
+            color: #555;
+            font-size: 1.1em;
+            margin: 20px 0 10px 0;
+            font-weight: 600;
+        }
+        
+        ul {
+            list-style: none;
+            margin-left: 0;
+        }
+        
+        ul li {
+            padding: 8px 0;
+            padding-left: 25px;
+            position: relative;
+        }
+        
+        ul li:before {
+            content: "▸";
+            position: absolute;
+            left: 0;
+            color: #1e3c72;
+            font-weight: bold;
+        }
+        
+        strong {
+            color: #1e3c72;
+            font-weight: 600;
+        }
+        
+        .info-box {
+            background: #e7f3ff;
+            border-left: 4px solid #0066cc;
+            padding: 15px 20px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+        
+        .warning-box {
+            background: #fff3cd;
+            border-left: 4px solid #dc3545;
+            padding: 15px 20px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+        
+        .security-box {
+            background: #f8f9fa;
+            border: 2px solid #1e3c72;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+        
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .feature-card {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            border: 2px solid #e0e0e0;
+            transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 20px rgba(30, 60, 114, 0.2);
+            border-color: #1e3c72;
+        }
+        
+        .feature-card h4 {
+            color: #1e3c72;
+            margin-top: 0;
+        }
+        
+        footer {
+            background: #1e3c72;
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        footer p {
+            margin: 5px 0;
+            opacity: 0.9;
+        }
+        
+        .toc {
+            background: #e7f3ff;
+            padding: 30px;
+            border-radius: 8px;
+            margin-bottom: 40px;
+            border: 2px solid #1e3c72;
+        }
+        
+        .toc h3 {
+            color: #1e3c72;
+            margin-bottom: 15px;
+        }
+        
+        .toc ul {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+        }
+        
+        .toc ul li {
+            padding: 10px;
+            background: white;
+            border-radius: 4px;
+            transition: background 0.2s;
+            border: 1px solid #1e3c72;
+        }
+        
+        .toc ul li:hover {
+            background: #1e3c72;
+            color: white;
+        }
+        
+        .toc ul li:hover:before {
+            color: white;
+        }
+        
+        .toc a {
+            text-decoration: none;
+            color: inherit;
+        }
+        
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin: 30px 0;
+        }
+        
+        .summary-card {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            padding: 25px;
+            border-radius: 10px;
+            border-left: 5px solid #1e3c72;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        }
+        
+        .summary-card h4 {
+            color: #1e3c72;
+            margin-top: 0;
+            font-size: 1.3em;
+            margin-bottom: 15px;
+        }
+        
+        @media print {
+            body {
+                background: white;
+            }
+            .container {
+                box-shadow: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🔐 Informe del Perfil d'Usuari</h1>
+            <p>Informació Interna - Gestió de Compte i Seguretat</p>
+            <span class="badge">CONFIDENCIAL</span>
+        </header>
+        
+        <div class="content">
+            <div class="toc">
+                <h3>📑 Índex de Continguts</h3>
+                <ul>
+                    <li><a href="#compte">1. Compte</a></li>
+                    <li><a href="#seguretat">2. Seguretat</a></li>
+                    <li><a href="#privacitat">3. Privacitat</a></li>
+                    <li><a href="#adreces">4. Adreces</a></li>
+                    <li><a href="#targetes">5. Targetes de Crèdit</a></li>
+                    <li><a href="#formulari-targeta">6. Formulari d'Edició</a></li>
+                </ul>
+            </div>
+
+            <div id="compte" class="section">
+                <h2><span class="section-number">1</span>Compte</h2>
+                
+                <div class="subsection">
+                    <h3>Informació Personal</h3>
+                    <h4>Camps principals:</h4>
+                    <ul>
+                        <li><strong>Nom complet</strong> (First name + Last name)</li>
+                        <li><strong>Nom d'usuari</strong> (Username)</li>
+                        <li><strong>Membre des de</strong> (Member since) - Data de registre</li>
+                        <li><strong>Botó d'edició de perfil</strong></li>
+                    </ul>
+                </div>
+
+                <div class="subsection">
+                    <h3>Configuració Regional</h3>
+                    <h4>Localització:</h4>
+                    <ul>
+                        <li><strong>Gènere</strong> - Selector desplegable</li>
+                        <li><strong>Idioma</strong> - Selector desplegable amb opcions multilingües</li>
+                        <li><strong>Moneda</strong> - Selector desplegable per a la moneda preferida</li>
+                        <li><strong>Botó "Desa canvis"</strong></li>
+                    </ul>
+                </div>
+
+                <div class="subsection">
+                    <h3>Gestió de Contrasenya</h3>
+                    <div class="security-box">
+                        <h4>Camps de seguretat:</h4>
+                        <ul>
+                            <li><strong>Contrasenya actual</strong> - Camp de text amb màscara</li>
+                            <li><strong>Contrasenya nova</strong> - Camp de text amb màscara + botó "Mostra"</li>
+                            <li><strong>Confirma la contrasenya nova</strong> - Camp de text amb màscara + botó "Mostra"</li>
+                            <li><strong>Botó "Canvia contrasenya"</strong></li>
+                            <li><strong>Enllaç "Has oblidat la contrasenya?"</strong></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="subsection">
+                    <h3>Gestió de Correu Electrònic</h3>
+                    <h4>Secció de canvi d'email:</h4>
+                    <ul>
+                        <li><strong>Correu electrònic actual</strong> - Mostrat amb estat (Confirmat/No confirmat)</li>
+                        <li><strong>Canvia el teu correu electrònic:</strong>
+                            <ul>
+                                <li>Camp "Correu electrònic nou"</li>
+                                <li>Camp "Confirma el correu electrònic nou"</li>
+                                <li>Camp "Contrasenya actual" (per verificació)</li>
+                                <li><strong>Botó "Desa canvis"</strong></li>
+                            </ul>
+                        </li>
+                    </ul>
+                    <div class="info-box">
+                        <strong>Nota:</strong> Necessitaràs confirmar el teu nou correu electrònic abans que es pugui utilitzar
+                    </div>
+                </div>
+
+                <div class="subsection">
+                    <h3>Comunicació de la Plataforma</h3>
+                    <h4>Preferències de comunicació:</h4>
+                    <ul>
+                        <li>Toggle: <strong>Correu postal</strong> - "Envia'm el correu postal"</li>
+                        <li>Toggle: <strong>Trucades telefòniques</strong> - "Truca'm per telèfon"</li>
+                        <li><strong>Botó "Desa preferències de comunicació"</strong></li>
+                    </ul>
+                </div>
+
+                <div class="subsection">
+                    <h3>Tancament de Compte</h3>
+                    <div class="warning-box">
+                        <h4>⚠️ Secció crítica:</h4>
+                        <ul>
+                            <li><strong>Avís informatiu</strong> sobre les conseqüències de tancar el compte</li>
+                            <li><strong>Pregunta:</strong> "Què passa quan tanques el teu compte?"</li>
+                            <li>Llista de conseqüències (pèrdua d'accés, eliminació de dades, etc.)</li>
+                        </ul>
+                    </div>
+                    <div class="info-box">
+                        <strong>Nota:</strong> Pots reobrir el teu compte eliminat durant els primers 30 dies. Després d'aquest termini, les dades del teu compte s'eliminaran permanentment
+                    </div>
+                    <ul>
+                        <li><strong>Botó "Tanca el compte"</strong> (acció destructiva)</li>
+                    </ul>
+                </div>
+
+                <div class="subsection">
+                    <h3>Altres Configuracions</h3>
+                    <h4>Enllaços addicionals:</h4>
+                    <ul>
+                        <li><strong>Ajuda</strong> - Enllaç al centre d'ajuda</li>
+                        <li><strong>Troba'ns</strong> - Enllaç a informació de contacte</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div id="seguretat" class="section">
+                <h2><span class="section-number">2</span>Seguretat</h2>
+                
+                <div class="subsection">
+                    <h3>Número de Telèfon Mòbil</h3>
+                    <div class="security-box">
+                        <h4>Verificació de contacte:</h4>
+                        <ul>
+                            <li><strong>Badge "Verificat"</strong> (quan està confirmat)</li>
+                            <li><strong>Descripció:</strong> "Utilitzem aquest número per verificar la teva identitat i ajudar-te a protegir el teu compte. No compartirem aquest número amb tercers"</li>
+                            <li><strong>Enllaç "Més informació"</strong></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="subsection">
+                    <h3>Autenticació de Dos Factors (2FA)</h3>
+                    <div class="security-box">
+                        <h4>Seguretat avançada:</h4>
+                        <ul>
+                            <li><strong>Estat:</strong> Activat/Desactivat amb badge visual</li>
+                            <li><strong>Toggle principal</strong> amb estat "SMS" o "Trucada"</li>
+                            <li><strong>Descripció:</strong> "Iniciarem sessió amb un codi de verificació que t'enviarem cada vegada que iniciïs sessió al teu compte"</li>
+                            <li><strong>Botó "Edita"</strong> per modificar configuració</li>
+                        </ul>
+                        <h4>Opcions de recepció del codi:</h4>
+                        <ul>
+                            <li>Radio button: "Missatge de text (SMS)"</li>
+                            <li>Radio button: "Trucada telefònica"</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="subsection">
+                    <h3>Comptes de Tercers</h3>
+                    <h4>Integració amb proveïdors externs:</h4>
+                    <div class="feature-grid">
+                        <div class="feature-card">
+                            <h4>🔵 Google</h4>
+                            <p>Estat: Connectat/Desconnectat</p>
+                            <ul>
+                                <li>Botó "Desconnecta" (si està connectat)</li>
+                                <li>Enllaç "Inicia sessió amb el teu compte de Google"</li>
+                            </ul>
+                        </div>
+                        <div class="feature-card">
+                            <h4>🔷 Facebook</h4>
+                            <p>Estat: Connectat/Desconnectat</p>
+                            <ul>
+                                <li>Botó "Connecta" (si no està connectat)</li>
+                            </ul>
+                        </div>
+                        <div class="feature-card">
+                            <h4>⚫ Apple</h4>
+                            <p>Estat: Connectat/Desconnectat</p>
+                            <ul>
+                                <li>Botó "Connecta" (si no està connectat)</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="info-box">
+                        <strong>Descripció:</strong> Connecta els teus comptes de tercers al teu compte per iniciar sessió i marcar favorits. Un cop connectat, pots eliminar-lo en qualsevol moment
+                    </div>
+                </div>
+
+                <div class="subsection">
+                    <h3>Historial d'Inicis de Sessió</h3>
+                    <div class="security-box">
+                        <h4>Monitorització d'activitat:</h4>
+                        <ul>
+                            <li><strong>Botó "Signa i esborra tot"</strong> - Per revisar i netejar l'historial</li>
+                            <li><strong>Descripció:</strong> "Mantenim un registre dels inicis de sessió recents o activitat per al teu compte. Pots iniciar sessió i revisar-los o esborrar-los"</li>
+                        </ul>
+                        <h4>Taula amb columnes:</h4>
+                        <ul>
+                            <li><strong>Data/Hora</strong> (Time) - Format DD/MM/AAAA HH:MM</li>
+                            <li><strong>Navegador/Dispositiu</strong> (Browser/Device)</li>
+                            <li><strong>Adreça IP</strong> (IP Address)</li>
+                            <li><strong>Ubicació</strong> (Location) - Ex: "Barcelona, CT (Spain [Spain])"</li>
+                            <li><strong>Estat</strong> (Status) - "Signed out" / "Signed in"</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div id="privacitat" class="section">
+                <h2><span class="section-number">3</span>Privacitat</h2>
+                
+                <div class="subsection">
+                    <h3>Visualitzacions Recents</h3>
+                    <h4>Historial de navegació:</h4>
+                    <ul>
+                        <li><strong>Descripció:</strong> "Esborra les visualitzacions recents, incloses les idees i els elements que has vist. Les idees i els elements que has vist en el passat no seran recordats"</li>
+                        <li><strong>Botó "Esborra visualitzacions recents"</strong></li>
+                    </ul>
+                </div>
+
+                <div class="subsection">
+                    <h3>Descàrrega de Dades</h3>
+                    <div class="info-box">
+                        <h4>Exportació d'informació personal (GDPR):</h4>
+                        <ul>
+                            <li><strong>Descripció:</strong> "Descarrega una còpia de tota la teva informació personal, incloses les dades que has proporcionat i les que hem recopilat. Troba més informació"</li>
+                            <li><strong>Botó "Sol·licita les teves dades per descarregar"</strong></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="subsection">
+                    <h3>Tancament Permanent del Compte</h3>
+                    <div class="warning-box">
+                        <h4>⚠️ Eliminació definitiva:</h4>
+                        <ul>
+                            <li><strong>Descripció:</strong> "Tanca i elimina permanentment el teu compte. Un cop eliminat, no podràs tornar a connectar-te. Més informació"</li>
+                            <li><strong>Botó "Sol·licita tancament permanent del compte"</strong></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="subsection">
+                    <h3>Configuració de Trobalitat</h3>
+                    <h4>Visibilitat en cercadors:</h4>
+                    <ul>
+                        <li><strong>Toggle switch</strong> - Activat/Desactivat</li>
+                        <li><strong>Descripció:</strong> "Permet que altres et trobin pel teu correu electrònic? El teu correu electrònic no es mostrarà públicament"</li>
+                        <li><strong>Botó "Desa configuració de trobalitat"</strong></li>
+                    </ul>
+                </div>
+
+                <div class="subsection">
+                    <h3>Configuració de Privacitat Avançada</h3>
+                    
+                    <h4>Consentiment</h4>
+                    <div class="info-box">
+                        <ul>
+                            <li><strong>Descripció detallada</strong> sobre l'ús de dades per a publicitat personalitzada, recomanacions i millores del servei</li>
+                            <li><strong>Enllaç a la política de privacitat</strong></li>
+                        </ul>
+                    </div>
+
+                    <h4>No venguis ni comparteixis la meva informació personal (CCPA/CPRA)</h4>
+                    <div class="info-box">
+                        <strong>Descripció:</strong> Si estàs ubicat a Califòrnia o a Utah, o 'Opta per no compartir les meves dades personals' si estàs a Colorado o Connecticut, pots optar per no vendre o compartir les teves dades personals amb tercers per a publicitat dirigida. Això no afectarà la teva experiència de compra.
+                    </div>
+                    <ul>
+                        <li><strong>Botó "Actualitza configuració de privacitat"</strong></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div id="adreces" class="section">
+                <h2><span class="section-number">4</span>Adreces</h2>
+                
+                <div class="subsection">
+                    <h3>Gestió d'Adreces d'Enviament</h3>
+                    
+                    <h4>Adreça Principal (Default)</h4>
+                    <div class="feature-card">
+                        <ul>
+                            <li><strong>Badge "Default"</strong> - Indica l'adreça predeterminada</li>
+                            <li><strong>Nom complet</strong></li>
+                            <li><strong>Adreça completa:</strong>
+                                <ul>
+                                    <li>Carrer i número</li>
+                                    <li>Ciutat</li>
+                                    <li>Codi postal</li>
+                                    <li>País</li>
+                                </ul>
+                            </li>
+                            <li><strong>Accions:</strong>
+                                <ul>
+                                    <li>✏️ <strong>Edita</strong> - Botó per modificar l'adreça</li>
+                                    <li>🗑️ <strong>Elimina</strong> - Botó per esborrar l'adreça</li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <h4>Adreces Secundàries</h4>
+                    <ul>
+                        <li>Mateix format que l'adreça principal</li>
+                        <li>Sense badge "Default"</li>
+                        <li>Mateixes opcions d'edició i eliminació</li>
+                    </ul>
+                </div>
+
+                <div class="subsection">
+                    <h3>Afegir Nova Adreça</h3>
+                    <ul>
+                        <li><strong>"Afegeix una adreça nova"</strong> - Botó destacat per crear noves adreces</li>
+                    </ul>
+                    <div class="info-box">
+                        <strong>Nota:</strong> Es poden tenir múltiples adreces guardades per facilitar els enviaments
+                    </div>
+                </div>
+            </div>
+
+            <div id="targetes" class="section">
+                <h2><span class="section-number">5</span>Targetes de Crèdit</h2>
+                
+                <div class="subsection">
+                    <h3>Llista de Mètodes de Pagament</h3>
+                    
+                    <h4>Targeta Principal</h4>
+                    <div class="security-box">
+                        <ul>
+                            <li><strong>Logo de la marca</strong> (Mastercard, Visa, etc.)</li>
+                            <li><strong>Nom del titular</strong> (Name on card)</li>
+                            <li><strong>Número de targeta</strong> - Últims 4 dígits mostrats (•••• •••• •••• 1234)</li>
+                            <li><strong>Data de caducitat</strong> - Format MM/AA</li>
+                            <li><strong>Accions:</strong>
+                                <ul>
+                                    <li>✏️ <strong>Edita</strong> - Botó per modificar dades</li>
+                                    <li>🗑️ <strong>Elimina</strong> - Botó per esborrar la targeta</li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <h4>Targetes Addicionals</h4>
+                    <ul>
+                        <li>Mateix format que la targeta principal</li>
+                        <li>Suport per a múltiples targetes</li>
+                    </ul>
+                </div>
+
+                <div class="subsection">
+                    <h3>Afegir Nova Targeta</h3>
+                    <ul>
+                        <li><strong>"Afegeix una targeta nova"</strong> - Accés al formulari de nova targeta</li>
+                    </ul>
+                    <div class="warning-box">
+                        <strong>🔒 Nota de seguretat:</strong> Les dades de les targetes es guarden de forma segura i encriptada
+                    </div>
+                </div>
+            </div>
+
+            <div id="formulari-targeta" class="section">
+                <h2><span class="section-number">6</span>Formulari d'Edició de Targeta</h2>
+                
+                <div class="subsection">
+                    <h3>Modal d'Edició/Creació</h3>
+                    <h4>Capçalera:</h4>
+                    <ul>
+                        <li><strong>Títol:</strong> "Edita la teva targeta de crèdit"</li>
+                        <li><strong>Botó de tancament</strong> (X)</li>
+                    </ul>
+                </div>
+
+                <div class="subsection">
+                    <h3>Camps del Formulari</h3>
+                    
+                    <h4>Informació de la Targeta</h4>
+                    <div class="security-box">
+                        <ul>
+                            <li><strong>Data de caducitat (MM/AA)</strong>
+                                <ul>
+                                    <li>Camp dividit: Mes / Any</li>
+                                    <li>Botó "NOTA" per informació addicional</li>
+                                </ul>
+                            </li>
+                            <li><strong>Nom al carnet</strong> (Name on card)
+                                <ul>
+                                    <li>Camp de text lliure</li>
+                                    <li>Exemple: "Marc Francés Casanovas"</li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <h4>Adreça de Facturació</h4>
+                    <div class="feature-grid">
+                        <div class="feature-card">
+                            <h4>Opció 1: Adreça Existent</h4>
+                            <ul>
+                                <li>Selector desplegable amb adreces guardades</li>
+                                <li>Exemple: "Carrer St. Llorenc 34, 08950 ESPLUGUES DE LLOBREGAT, Espanya"</li>
+                            </ul>
+                        </div>
+                        <div class="feature-card">
+                            <h4>Opció 2: Adreça Nova</h4>
+                            <ul>
+                                <li><strong>País</strong> - Selector desplegable</li>
+                                <li><strong>Carrer i número</strong></li>
+                                <li><strong>Ciutat</strong></li>
+                                <li><strong>Codi postal</strong></li>
+                                <li><strong>Província/Estat</strong></li>
+                                <li><strong>Província</strong></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <ul>
+                        <li><strong>Checkbox:</strong> "Fes aquesta l'adreça predeterminada"</li>
+                    </ul>
+                </div>
+
+                <div class="subsection">
+                    <h3>Accions del Formulari</h3>
+                    <ul>
+                        <li><strong>Checkbox:</strong> "Fes-ho per defecte" - Marcar com a targeta predeterminada</li>
+                        <li><strong>Botó "Cancel·la"</strong> - Tancar sense desar</li>
+                        <li><strong>Botó "Desa"</strong> - Guardar els canvis (botó destacat en negre)</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>📊 Resum de Funcionalitats Clau</h2>
+                
+                <div class="summary-grid">
+                    <div class="summary-card">
+                        <h4>🛡️ Seguretat i Autenticació</h4>
+                        <ul>
+                            <li>Autenticació de dos factors (2FA) amb SMS o trucada</li>
+                            <li>Gestió completa d'inicis de sessió amb historial detallat</li>
+                            <li>Integració amb proveïdors OAuth (Google, Facebook, Apple)</li>
+                            <li>Monitorització d'activitat amb IP, ubicació i dispositiu</li>
+                        </ul>
+                    </div>
+
+                    <div class="summary-card">
+                        <h4>🔐 Privacitat i Control de Dades</h4>
+                        <ul>
+                            <li>Control total sobre la visibilitat del perfil</li>
+                            <li>Descàrrega completa de dades personals (GDPR)</li>
+                            <li>Configuració granular de consentiments</li>
+                            <li>Gestió de trobalitat per email</li>
+                            <li>Opcions de no venda de dades personals (CCPA/CPRA)</li>
+                        </ul>
+                    </div>
+
+                    <div class="summary-card">
+                        <h4>💳 Gestió Financera i Logística</h4>
+                        <ul>
+                            <li>Múltiples adreces d'enviament amb adreça predeterminada</li>
+                            <li>Múltiples mètodes de pagament (Visa, Mastercard, etc.)</li>
+                            <li>Emmagatzematge segur i encriptat de dades de targetes</li>
+                            <li>Formularis complets d'edició amb validació</li>
+                        </ul>
+                    </div>
+
+                    <div class="summary-card">
+                        <h4>⚙️ Configuració de Compte</h4>
+                        <ul>
+                            <li>Preferències regionals (idioma, moneda, gènere)</li>
+                            <li>Gestió de contrasenya amb recuperació</li>
+                            <li>Verificació d'email amb confirmació</li>
+                            <li>Preferències de comunicació (postal, telefònica)</li>
+                            <li>Tancament de compte amb període de gràcia de 30 dies</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p><strong>Document generat:</strong> Abril 2026</p>
+            <p><strong>Versió:</strong> 1.0</p>
+            <p><strong>Tipus:</strong> Informació Interna i Privada</p>
+            <p><strong>Propòsit:</strong> Especificacions per al desenvolupament del sistema de gestió de compte i seguretat</p>
+        </footer>
+    </div>
+</body>
+</html>

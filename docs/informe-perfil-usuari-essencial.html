@@ -1,0 +1,1010 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Informe del Perfil d'Usuari - Versió Essencial</title>
+    <style>
+        /* Configuració per a PDF DIN A4 */
+        @page {
+            size: A4;
+            margin: 2cm;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+        }
+        
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+            position: relative;
+        }
+        
+        header::before {
+            content: "🛒";
+            position: absolute;
+            top: 20px;
+            right: 40px;
+            font-size: 3em;
+            opacity: 0.3;
+        }
+        
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+        
+        header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+        
+        .badge {
+            display: inline-block;
+            background: #28a745;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+            margin-top: 10px;
+        }
+        
+        .content {
+            padding: 40px;
+        }
+        
+        .section {
+            margin-bottom: 50px;
+            border-left: 4px solid #667eea;
+            padding-left: 30px;
+            page-break-before: always;
+            page-break-inside: avoid;
+        }
+        
+        .section:first-of-type {
+            page-break-before: avoid;
+        }
+        
+        .subsection {
+            page-break-inside: avoid;
+        }
+        
+        .feature-grid, .feature-card, .info-box, .warning-box, .essential-box {
+            page-break-inside: avoid;
+        }
+        
+        h2, h3, h4 {
+            page-break-after: avoid;
+        }
+        
+        .section h2 {
+            color: #667eea;
+            font-size: 2em;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .section-number {
+            background: #667eea;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+        
+        .subsection {
+            margin-bottom: 30px;
+        }
+        
+        .subsection h3 {
+            color: #764ba2;
+            font-size: 1.4em;
+            margin-bottom: 15px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+        
+        .subsection h4 {
+            color: #555;
+            font-size: 1.1em;
+            margin: 20px 0 10px 0;
+            font-weight: 600;
+        }
+        
+        ul {
+            list-style: none;
+            margin-left: 0;
+        }
+        
+        ul li {
+            padding: 8px 0;
+            padding-left: 25px;
+            position: relative;
+        }
+        
+        ul li:before {
+            content: "▸";
+            position: absolute;
+            left: 0;
+            color: #667eea;
+            font-weight: bold;
+        }
+        
+        strong {
+            color: #667eea;
+            font-weight: 600;
+        }
+        
+        .info-box {
+            background: #e8eaf6;
+            border-left: 4px solid #667eea;
+            padding: 15px 20px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+        
+        .warning-box {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px 20px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+        
+        .essential-box {
+            background: #f8f9fa;
+            border: 2px solid #667eea;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+        
+        .priority-critical {
+            color: #dc3545;
+            font-weight: bold;
+        }
+        
+        .priority-high {
+            color: #fd7e14;
+            font-weight: bold;
+        }
+        
+        .priority-medium {
+            color: #ffc107;
+            font-weight: bold;
+        }
+        
+        .priority-low {
+            color: #28a745;
+            font-weight: bold;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            page-break-inside: avoid;
+        }
+        
+        table th {
+            background: #667eea;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+        }
+        
+        table td {
+            padding: 10px 12px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        table tr:hover {
+            background: #f8f9fa;
+        }
+        
+        .flow-step {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e8eaf6 100%);
+            padding: 15px 20px;
+            margin: 10px 0;
+            border-left: 4px solid #667eea;
+            border-radius: 4px;
+        }
+        
+        .flow-step strong {
+            display: block;
+            margin-bottom: 5px;
+        }
+        
+        footer {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        footer p {
+            margin: 5px 0;
+            opacity: 0.9;
+        }
+        
+        .toc {
+            background: #e8eaf6;
+            padding: 30px;
+            border-radius: 8px;
+            margin-bottom: 40px;
+            border: 2px solid #667eea;
+            page-break-inside: avoid;
+        }
+        
+        .toc h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+        
+        .toc ul {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+        }
+        
+        .toc ul li {
+            padding: 10px;
+            background: white;
+            border-radius: 4px;
+            transition: background 0.2s;
+            border: 1px solid #667eea;
+        }
+        
+        .toc ul li:hover {
+            background: #667eea;
+            color: white;
+        }
+        
+        .toc ul li:hover:before {
+            color: white;
+        }
+        
+        .toc a {
+            text-decoration: none;
+            color: inherit;
+        }
+        
+        code {
+            background: #f8f9fa;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            color: #764ba2;
+        }
+        
+        @media print {
+            .container {
+                box-shadow: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🛒 Informe del Perfil d'Usuari</h1>
+            <p>Versió Essencial - Comunicació Client ↔ Botiga</p>
+            <span class="badge">ESSENCIAL</span>
+        </header>
+        
+        <div class="content">
+            <div class="info-box">
+                <strong>📋 Enfocament:</strong> Aquest document defineix les funcionalitats <strong>estrictament necessàries</strong> per a la comunicació entre client i botiga. Sense xarxa social, sense funcionalitats públiques, només allò imprescindible per gestionar comandes i comunicacions.
+            </div>
+
+            <div class="toc">
+                <h3>📑 Índex de Continguts</h3>
+                <ul>
+                    <li><a href="#compte">1. Compte i Dades Bàsiques</a></li>
+                    <li><a href="#adreces">2. Adreces</a></li>
+                    <li><a href="#pagament">3. Mètodes de Pagament</a></li>
+                    <li><a href="#historial">4. Historial de Comandes</a></li>
+                    <li><a href="#comunicacio">5. Comunicació amb Botiga</a></li>
+                    <li><a href="#preferencies">6. Preferències de Compte</a></li>
+                    <li><a href="#seguretat">7. Seguretat</a></li>
+                    <li><a href="#formulari">8. Formulari d'Edició Ràpida</a></li>
+                </ul>
+            </div>
+
+            <div id="compte" class="section">
+                <h2><span class="section-number">1</span>Compte i Dades Bàsiques</h2>
+                
+                <div class="subsection">
+                    <h3>1.1. Informació Personal</h3>
+                    
+                    <h4>Camps obligatoris:</h4>
+                    <ul>
+                        <li><strong>Nom complet</strong> - Input text</li>
+                        <li><strong>Email</strong> - Input email (identificador principal)</li>
+                        <li><strong>Telèfon</strong> - Input tel (per contacte sobre comandes)</li>
+                    </ul>
+                    
+                    <h4>Camps opcionals:</h4>
+                    <ul>
+                        <li><strong>Empresa/Organització</strong> - Input text (si és client professional)</li>
+                    </ul>
+                    
+                    <div class="info-box">
+                        <strong>✨ Simplificació:</strong>
+                        <ul>
+                            <li>❌ <strong>Gènere:</strong> No cal (roba unisex)</li>
+                            <li>❌ <strong>Idioma:</strong> No cal selector (només català)</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="subsection">
+                    <h3>1.2. Gestió de Contrasenya</h3>
+                    
+                    <h4>Funcionalitats:</h4>
+                    <ul>
+                        <li><strong>Contrasenya actual</strong> - Input password</li>
+                        <li><strong>Contrasenya nova</strong> - Input password</li>
+                        <li><strong>Confirmar contrasenya</strong> - Input password</li>
+                        <li><strong>Botó "Canvia contrasenya"</strong></li>
+                    </ul>
+                    
+                    <div class="warning-box">
+                        <strong>⚠️ Validacions:</strong>
+                        <ul>
+                            <li>Mínim 8 caràcters</li>
+                            <li>Almenys 1 majúscula</li>
+                            <li>Almenys 1 número</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div id="adreces" class="section">
+                <h2><span class="section-number">2</span>Adreces de Lliurament i Facturació</h2>
+                
+                <div class="subsection">
+                    <h3>2.1. Adreça de Lliurament</h3>
+                    
+                    <h4>Camps:</h4>
+                    <ul>
+                        <li><strong>Nom complet del destinatari</strong> - Input text</li>
+                        <li><strong>Carrer i número</strong> - Input text</li>
+                        <li><strong>Pis/Porta</strong> - Input text (opcional)</li>
+                        <li><strong>Codi postal</strong> - Input text</li>
+                        <li><strong>Ciutat</strong> - Input text</li>
+                        <li><strong>Província/Estat</strong> - Select o Input</li>
+                        <li><strong>País</strong> - Select</li>
+                        <li><strong>Telèfon de contacte</strong> - Input tel</li>
+                    </ul>
+                    
+                    <h4>Funcionalitats:</h4>
+                    <ul>
+                        <li>Checkbox "Desar com a adreça per defecte"</li>
+                        <li>Botó "Afegir nova adreça"</li>
+                        <li>Botó "Editar" per cada adreça</li>
+                        <li>Botó "Eliminar" per cada adreça</li>
+                    </ul>
+                </div>
+
+                <div class="subsection">
+                    <h3>2.2. Adreça de Facturació</h3>
+                    
+                    <h4>Opcions:</h4>
+                    <ul>
+                        <li>Checkbox "Igual que l'adreça de lliurament"</li>
+                        <li>Si és diferent, mateixos camps que adreça de lliurament</li>
+                    </ul>
+                    
+                    <h4>Camps addicionals per facturació:</h4>
+                    <ul>
+                        <li><strong>NIF/CIF</strong> - Input text (obligatori per factures)</li>
+                        <li><strong>Nom fiscal</strong> - Input text (si és diferent del nom personal)</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div id="pagament" class="section">
+                <h2><span class="section-number">3</span>Mètodes de Pagament</h2>
+                
+                <div class="subsection">
+                    <h3>3.1. Targetes de Crèdit/Dèbit</h3>
+                    
+                    <h4>Informació emmagatzemada:</h4>
+                    <ul>
+                        <li><strong>Últims 4 dígits</strong> - Només visible (ex: •••• •••• •••• 1234)</li>
+                        <li><strong>Tipus de targeta</strong> - Visa, Mastercard, Amex (icona)</li>
+                        <li><strong>Data de caducitat</strong> - MM/AA</li>
+                        <li><strong>Nom del titular</strong> - Text</li>
+                    </ul>
+                    
+                    <h4>Funcionalitats:</h4>
+                    <ul>
+                        <li>Botó "Afegir targeta"</li>
+                        <li>Botó "Eliminar" per cada targeta</li>
+                        <li>Checkbox "Targeta per defecte"</li>
+                    </ul>
+                    
+                    <div class="warning-box">
+                        <strong>🔒 Seguretat:</strong>
+                        <ul>
+                            <li><strong>CVV mai s'emmagatzema</strong></li>
+                            <li>Dades encriptades</li>
+                            <li>Integració amb passarel·la de pagament (Stripe, Redsys, etc.)</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="subsection">
+                    <h3>3.2. Altres Mètodes</h3>
+                    
+                    <h4>Opcions:</h4>
+                    <ul>
+                        <li>Transferència bancària</li>
+                        <li>Contra reemborsament</li>
+                        <li>Bizum (si aplica)</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div id="historial" class="section">
+                <h2><span class="section-number">4</span>Historial de Comandes</h2>
+                
+                <div class="subsection">
+                    <h3>4.1. Llista de Comandes</h3>
+                    
+                    <h4>Informació per comanda:</h4>
+                    <ul>
+                        <li><strong>Número de comanda</strong> - #12345</li>
+                        <li><strong>Data</strong> - DD/MM/AAAA</li>
+                        <li><strong>Estat</strong> - Badge visual</li>
+                        <li><strong>Total</strong> - Import amb IVA</li>
+                        <li><strong>Botó "Veure detalls"</strong></li>
+                    </ul>
+                    
+                    <h4>Estats possibles:</h4>
+                    <ul>
+                        <li>🟡 <strong>Pendent de pagament</strong></li>
+                        <li>🔵 <strong>Pagament confirmat</strong></li>
+                        <li>🟠 <strong>En preparació</strong></li>
+                        <li>🟣 <strong>Enviada</strong> (amb número de seguiment)</li>
+                        <li>🟢 <strong>Lliurada</strong></li>
+                        <li>🔴 <strong>Cancel·lada</strong></li>
+                        <li>⚪ <strong>Retornada</strong></li>
+                    </ul>
+                </div>
+
+                <div class="subsection">
+                    <h3>4.2. Detall de Comanda</h3>
+                    
+                    <h4>Informació:</h4>
+                    <ul>
+                        <li><strong>Productes</strong> - Llista amb imatge, nom, quantitat, preu</li>
+                        <li><strong>Subtotal</strong> - Suma de productes</li>
+                        <li><strong>Enviament</strong> - Cost d'enviament</li>
+                        <li><strong>IVA</strong> - Desglossament</li>
+                        <li><strong>Total</strong> - Import final</li>
+                        <li><strong>Adreça de lliurament</strong> - Completa</li>
+                        <li><strong>Adreça de facturació</strong> - Completa</li>
+                        <li><strong>Mètode de pagament</strong> - Utilitzat</li>
+                        <li><strong>Número de seguiment</strong> - Si està enviada (enllaç a transportista)</li>
+                    </ul>
+                    
+                    <h4>Accions:</h4>
+                    <ul>
+                        <li>Botó "Descarregar factura" (PDF)</li>
+                        <li>Botó "Tornar a comprar" (afegeix productes al carret)</li>
+                        <li>Botó "Sol·licitar devolució" (si aplica)</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div id="comunicacio" class="section">
+                <h2><span class="section-number">5</span>Comunicació amb la Botiga</h2>
+                
+                <div class="subsection">
+                    <h3>5.1. Missatgeria Interna</h3>
+                    
+                    <div class="essential-box">
+                        <h4>Funcionalitat:</h4>
+                        <ul>
+                            <li>Llista de converses relacionades amb comandes</li>
+                            <li>Cada conversa vinculada a un número de comanda</li>
+                            <li>Notificació quan la botiga respon</li>
+                        </ul>
+                    </div>
+                    
+                    <h4>Estructura del missatge:</h4>
+                    <ul>
+                        <li><strong>Assumpte</strong> - Relacionat amb la comanda</li>
+                        <li><strong>Missatge</strong> - Àrea de text</li>
+                        <li><strong>Fitxers adjunts</strong> - Opcional (imatges, documents)</li>
+                        <li><strong>Data i hora</strong> - Timestamp</li>
+                    </ul>
+                    
+                    <h4>Exemples d'ús:</h4>
+                    <ul>
+                        <li>Consulta sobre estat de comanda</li>
+                        <li>Problema amb producte rebut</li>
+                        <li>Sol·licitud de canvi o devolució</li>
+                        <li>Pregunta sobre producte abans de comprar</li>
+                    </ul>
+                </div>
+
+                <div class="subsection">
+                    <h3>5.2. Notificacions per Email</h3>
+                    
+                    <h4>Tipus de notificacions:</h4>
+                    <ul>
+                        <li>✅ <strong>Confirmació de comanda</strong> - Sempre</li>
+                        <li>✅ <strong>Pagament confirmat</strong> - Sempre</li>
+                        <li>✅ <strong>Comanda enviada</strong> - Sempre (amb seguiment)</li>
+                        <li>✅ <strong>Comanda lliurada</strong> - Sempre</li>
+                        <li>⚙️ <strong>Promocions i ofertes</strong> - Configurable (opt-in)</li>
+                        <li>⚙️ <strong>Recordatori de carret abandonat</strong> - Configurable</li>
+                    </ul>
+                    
+                    <div class="info-box">
+                        <strong>Configuració:</strong>
+                        <ul>
+                            <li>Checkbox per cada tipus de notificació opcional</li>
+                            <li>Email de confirmació sempre actiu (no es pot desactivar)</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div id="preferencies" class="section">
+                <h2><span class="section-number">6</span>Preferències de Compte</h2>
+                
+                <div class="subsection">
+                    <h3>6.1. Configuració de Privacitat</h3>
+                    
+                    <h4>Opcions:</h4>
+                    <ul>
+                        <li>Checkbox "Accepto rebre comunicacions comercials"</li>
+                        <li>Checkbox "Accepto que les meves dades es comparteixin amb transportistes" (obligatori per enviaments)</li>
+                    </ul>
+                </div>
+
+                <div class="subsection">
+                    <h3>6.2. Gestió de Dades</h3>
+                    
+                    <h4>Funcionalitats:</h4>
+                    <ul>
+                        <li>Botó "Descarregar les meves dades" - Exporta tota la informació en format JSON/PDF</li>
+                        <li>Botó "Eliminar el meu compte" - Amb confirmació doble</li>
+                    </ul>
+                    
+                    <div class="warning-box">
+                        <strong>⚖️ Avís legal:</strong>
+                        <ul>
+                            <li>Les comandes completades es conserven segons obligacions legals (facturació)</li>
+                            <li>Dades personals s'eliminen excepte les requerides per llei</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div id="seguretat" class="section">
+                <h2><span class="section-number">7</span>Seguretat</h2>
+                
+                <div class="subsection">
+                    <h3>7.1. Autenticació de Dos Factors (2FA) - Opcional</h3>
+                    
+                    <h4>Mètodes:</h4>
+                    <ul>
+                        <li>SMS al telèfon</li>
+                        <li>App d'autenticació (Google Authenticator, Authy)</li>
+                    </ul>
+                    
+                    <h4>Configuració:</h4>
+                    <ul>
+                        <li>Toggle "Activar 2FA"</li>
+                        <li>Selecció de mètode</li>
+                        <li>Verificació inicial</li>
+                    </ul>
+                </div>
+
+                <div class="subsection">
+                    <h3>7.2. Sessions Actives</h3>
+                    
+                    <h4>Informació:</h4>
+                    <ul>
+                        <li><strong>Dispositiu</strong> - Navegador i sistema operatiu</li>
+                        <li><strong>Ubicació aproximada</strong> - Ciutat/País (per IP)</li>
+                        <li><strong>Última activitat</strong> - Data i hora</li>
+                        <li><strong>Botó "Tancar sessió"</strong> per cada dispositiu</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div id="formulari" class="section">
+                <h2><span class="section-number">8</span>Formulari d'Edició Ràpida</h2>
+                
+                <div class="subsection">
+                    <h3>8.1. Vista Compacta</h3>
+                    
+                    <h4>Camps editables en un sol formulari:</h4>
+                    <ul>
+                        <li>Nom complet</li>
+                        <li>Email</li>
+                        <li>Telèfon</li>
+                        <li>Adreça per defecte (selector)</li>
+                        <li>Targeta per defecte (selector)</li>
+                    </ul>
+                    
+                    <h4>Botons:</h4>
+                    <ul>
+                        <li>"Desa canvis"</li>
+                        <li>"Cancel·la"</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>📊 Resum de Funcionalitats Essencials</h2>
+                
+                <div class="subsection">
+                    <h3>Imprescindibles (MVP)</h3>
+                    
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Funcionalitat</th>
+                                <th>Prioritat</th>
+                                <th>Descripció</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Registre/Login</strong></td>
+                                <td><span class="priority-critical">🔴 Crítica</span></td>
+                                <td>Email + contrasenya</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Dades personals</strong></td>
+                                <td><span class="priority-critical">🔴 Crítica</span></td>
+                                <td>Nom, email, telèfon</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Adreça de lliurament</strong></td>
+                                <td><span class="priority-critical">🔴 Crítica</span></td>
+                                <td>Mínim 1 adreça</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Mètode de pagament</strong></td>
+                                <td><span class="priority-critical">🔴 Crítica</span></td>
+                                <td>Targeta o altre mètode</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Historial de comandes</strong></td>
+                                <td><span class="priority-critical">🔴 Crítica</span></td>
+                                <td>Veure comandes i estat</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Descarregar factura</strong></td>
+                                <td><span class="priority-critical">🔴 Crítica</span></td>
+                                <td>PDF de cada comanda</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="subsection">
+                    <h3>Recomanades (Fase 2)</h3>
+                    
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Funcionalitat</th>
+                                <th>Prioritat</th>
+                                <th>Descripció</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Múltiples adreces</strong></td>
+                                <td><span class="priority-high">🟠 Alta</span></td>
+                                <td>Gestió de diverses adreces</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Missatgeria interna</strong></td>
+                                <td><span class="priority-high">🟠 Alta</span></td>
+                                <td>Comunicació amb botiga</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Notificacions email</strong></td>
+                                <td><span class="priority-high">🟠 Alta</span></td>
+                                <td>Configurables</td>
+                            </tr>
+                            <tr>
+                                <td><strong>2FA</strong></td>
+                                <td><span class="priority-medium">🟡 Mitjana</span></td>
+                                <td>Seguretat addicional</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Sessions actives</strong></td>
+                                <td><span class="priority-medium">🟡 Mitjana</span></td>
+                                <td>Control de dispositius</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="subsection">
+                    <h3>Opcionals (Fase 3)</h3>
+                    
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Funcionalitat</th>
+                                <th>Prioritat</th>
+                                <th>Descripció</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Exportar dades</strong></td>
+                                <td><span class="priority-low">🟢 Baixa</span></td>
+                                <td>GDPR compliance</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Eliminar compte</strong></td>
+                                <td><span class="priority-low">🟢 Baixa</span></td>
+                                <td>GDPR compliance</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Adreça facturació diferent</strong></td>
+                                <td><span class="priority-low">🟢 Baixa</span></td>
+                                <td>Clients professionals</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>🎯 Flux d'Usuari Típic</h2>
+                
+                <div class="subsection">
+                    <h3>1. Registre Inicial</h3>
+                    <div class="flow-step">
+                        <strong>Pas 1:</strong> Usuari crea compte (email + contrasenya)
+                    </div>
+                    <div class="flow-step">
+                        <strong>Pas 2:</strong> Confirma email
+                    </div>
+                    <div class="flow-step">
+                        <strong>Pas 3:</strong> Afegeix nom i telèfon
+                    </div>
+                    <div class="flow-step">
+                        <strong>Pas 4:</strong> Ja pot comprar
+                    </div>
+                </div>
+
+                <div class="subsection">
+                    <h3>2. Primera Compra</h3>
+                    <div class="flow-step">
+                        <strong>Pas 1:</strong> Afegeix productes al carret
+                    </div>
+                    <div class="flow-step">
+                        <strong>Pas 2:</strong> Va a checkout
+                    </div>
+                    <div class="flow-step">
+                        <strong>Pas 3:</strong> Introdueix adreça de lliurament (es desa)
+                    </div>
+                    <div class="flow-step">
+                        <strong>Pas 4:</strong> Introdueix dades de pagament (opcional: desar targeta)
+                    </div>
+                    <div class="flow-step">
+                        <strong>Pas 5:</strong> Confirma comanda
+                    </div>
+                    <div class="flow-step">
+                        <strong>Pas 6:</strong> Rep email de confirmació
+                    </div>
+                </div>
+
+                <div class="subsection">
+                    <h3>3. Compres Posteriors</h3>
+                    <div class="flow-step">
+                        <strong>Pas 1:</strong> Afegeix productes al carret
+                    </div>
+                    <div class="flow-step">
+                        <strong>Pas 2:</strong> Va a checkout
+                    </div>
+                    <div class="flow-step">
+                        <strong>Pas 3:</strong> Selecciona adreça desada
+                    </div>
+                    <div class="flow-step">
+                        <strong>Pas 4:</strong> Selecciona targeta desada (o introdueix CVV)
+                    </div>
+                    <div class="flow-step">
+                        <strong>Pas 5:</strong> Confirma comanda
+                    </div>
+                    <div class="flow-step">
+                        <strong>Pas 6:</strong> Rep email de confirmació
+                    </div>
+                </div>
+
+                <div class="subsection">
+                    <h3>4. Seguiment de Comanda</h3>
+                    <div class="flow-step">
+                        <strong>Pas 1:</strong> Entra al seu compte
+                    </div>
+                    <div class="flow-step">
+                        <strong>Pas 2:</strong> Va a "Les meves comandes"
+                    </div>
+                    <div class="flow-step">
+                        <strong>Pas 3:</strong> Veu l'estat actualitzat
+                    </div>
+                    <div class="flow-step">
+                        <strong>Pas 4:</strong> Pot descarregar factura
+                    </div>
+                    <div class="flow-step">
+                        <strong>Pas 5:</strong> Pot contactar amb la botiga si cal
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>🔒 Consideracions de Seguretat</h2>
+                
+                <div class="subsection">
+                    <h3>Dades Sensibles</h3>
+                    
+                    <div class="essential-box">
+                        <h4>Emmagatzematge:</h4>
+                        <ul>
+                            <li>Contrasenyes: <strong>Hash amb bcrypt</strong> (mai en text pla)</li>
+                            <li>Targetes: <strong>Tokenització</strong> via passarel·la de pagament</li>
+                            <li>CVV: <strong>Mai s'emmagatzema</strong></li>
+                        </ul>
+                    </div>
+                    
+                    <div class="essential-box">
+                        <h4>Transmissió:</h4>
+                        <ul>
+                            <li><strong>HTTPS obligatori</strong> en tot el lloc</li>
+                            <li><strong>Certificat SSL/TLS</strong> vàlid</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="subsection">
+                    <h3>Compliment Legal (GDPR)</h3>
+                    
+                    <h4>Obligacions:</h4>
+                    <ul>
+                        <li>Consentiment explícit per comunicacions comercials</li>
+                        <li>Dret a exportar dades</li>
+                        <li>Dret a eliminar compte</li>
+                        <li>Política de privacitat clara</li>
+                        <li>Avís de cookies</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>🚀 Fases d'Implementació</h2>
+                
+                <div class="subsection">
+                    <h3>Fase 1: MVP (Mínim Viable)</h3>
+                    <p><strong>Durada estimada: 2-3 setmanes</strong></p>
+                    
+                    <ul>
+                        <li>☐ Registre i login</li>
+                        <li>☐ Perfil bàsic (nom, email, telèfon)</li>
+                        <li>☐ 1 adreça de lliurament</li>
+                        <li>☐ Integració amb passarel·la de pagament</li>
+                        <li>☐ Historial de comandes (només lectura)</li>
+                        <li>☐ Descarregar factura</li>
+                    </ul>
+                </div>
+
+                <div class="subsection">
+                    <h3>Fase 2: Funcionalitats Estàndard</h3>
+                    <p><strong>Durada estimada: 2 setmanes</strong></p>
+                    
+                    <ul>
+                        <li>☐ Múltiples adreces</li>
+                        <li>☐ Múltiples targetes (tokenitzades)</li>
+                        <li>☐ Missatgeria interna</li>
+                        <li>☐ Notificacions per email configurables</li>
+                        <li>☐ Edició de perfil complet</li>
+                    </ul>
+                </div>
+
+                <div class="subsection">
+                    <h3>Fase 3: Seguretat i Compliment</h3>
+                    <p><strong>Durada estimada: 1 setmana</strong></p>
+                    
+                    <ul>
+                        <li>☐ 2FA opcional</li>
+                        <li>☐ Sessions actives</li>
+                        <li>☐ Exportar dades (GDPR)</li>
+                        <li>☐ Eliminar compte (GDPR)</li>
+                        <li>☐ Logs d'activitat</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>📝 Diferències amb l'Informe Anterior</h2>
+                
+                <div class="subsection">
+                    <h3>Eliminat</h3>
+                    <ul>
+                        <li>❌ Perfil públic</li>
+                        <li>❌ Foto de perfil</li>
+                        <li>❌ Biografia</li>
+                        <li>❌ Seguidors/Seguint</li>
+                        <li>❌ Materials favorits</li>
+                        <li>❌ Notificacions socials</li>
+                        <li>❌ Interaccions públiques</li>
+                    </ul>
+                </div>
+
+                <div class="subsection">
+                    <h3>Mantingut i Simplificat</h3>
+                    <ul>
+                        <li>✅ Dades personals essencials</li>
+                        <li>✅ Adreces (només funcional, no públic)</li>
+                        <li>✅ Pagament (només funcional)</li>
+                        <li>✅ Historial de comandes</li>
+                        <li>✅ Comunicació directa amb botiga</li>
+                        <li>✅ Notificacions transaccionals</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p><strong>Document generat:</strong> Abril 2026</p>
+            <p><strong>Versió:</strong> 2.0 - Essencial</p>
+            <p><strong>Enfocament:</strong> Comunicació Client ↔ Botiga</p>
+            <p><strong>Propòsit:</strong> Especificacions per al desenvolupament del sistema de perfil d'usuari essencial</p>
+        </footer>
+    </div>
+</body>
+</html>

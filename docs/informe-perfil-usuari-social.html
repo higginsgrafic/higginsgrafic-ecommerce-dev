@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Informe del Perfil d'Usuari - Informació Social</title>
+    <style>
+        /* Configuració per a PDF DIN A4 */
+        @page {
+            size: A4;
+            margin: 2cm;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            padding: 20px;
+        }
+        
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        
+        header {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+            position: relative;
+        }
+        
+        header::before {
+            content: "👥";
+            position: absolute;
+            top: 20px;
+            right: 40px;
+            font-size: 3em;
+            opacity: 0.3;
+        }
+        
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+        
+        header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+        
+        .badge {
+            display: inline-block;
+            background: #28a745;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+            margin-top: 10px;
+        }
+        
+        .content {
+            padding: 40px;
+        }
+        
+        .section {
+            margin-bottom: 50px;
+            border-left: 4px solid #f5576c;
+            padding-left: 30px;
+            page-break-before: always;
+            page-break-inside: avoid;
+        }
+        
+        .section:first-of-type {
+            page-break-before: avoid;
+        }
+        
+        .subsection {
+            page-break-inside: avoid;
+        }
+        
+        .feature-grid, .feature-card, .info-box, .warning-box, .social-box, .use-case-card, .summary-card {
+            page-break-inside: avoid;
+        }
+        
+        h2, h3, h4 {
+            page-break-after: avoid;
+        }
+        
+        .section h2 {
+            color: #f5576c;
+            font-size: 2em;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .section-number {
+            background: #f5576c;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+        
+        .subsection {
+            margin-bottom: 30px;
+        }
+        
+        .subsection h3 {
+            color: #f093fb;
+            font-size: 1.4em;
+            margin-bottom: 15px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+        
+        .subsection h4 {
+            color: #555;
+            font-size: 1.1em;
+            margin: 20px 0 10px 0;
+            font-weight: 600;
+        }
+        
+        ul {
+            list-style: none;
+            margin-left: 0;
+        }
+        
+        ul li {
+            padding: 8px 0;
+            padding-left: 25px;
+            position: relative;
+        }
+        
+        ul li:before {
+            content: "▸";
+            position: absolute;
+            left: 0;
+            color: #f5576c;
+            font-weight: bold;
+        }
+        
+        strong {
+            color: #f5576c;
+            font-weight: 600;
+        }
+        
+        .info-box {
+            background: #fff0f6;
+            border-left: 4px solid #f093fb;
+            padding: 15px 20px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+        
+        .warning-box {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px 20px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+        
+        .social-box {
+            background: #f8f9fa;
+            border: 2px solid #f093fb;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+        
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .feature-card {
+            background: linear-gradient(135deg, #fff 0%, #fff0f6 100%);
+            padding: 20px;
+            border-radius: 8px;
+            border: 2px solid #f093fb;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 20px rgba(245, 87, 108, 0.3);
+        }
+        
+        .feature-card h4 {
+            color: #f5576c;
+            margin-top: 0;
+        }
+        
+        footer {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        footer p {
+            margin: 5px 0;
+            opacity: 0.9;
+        }
+        
+        .toc {
+            background: #fff0f6;
+            padding: 30px;
+            border-radius: 8px;
+            margin-bottom: 40px;
+            border: 2px solid #f093fb;
+        }
+        
+        .toc h3 {
+            color: #f5576c;
+            margin-bottom: 15px;
+        }
+        
+        .toc ul {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+        }
+        
+        .toc ul li {
+            padding: 10px;
+            background: white;
+            border-radius: 4px;
+            transition: background 0.2s;
+            border: 1px solid #f093fb;
+        }
+        
+        .toc ul li:hover {
+            background: #f5576c;
+            color: white;
+        }
+        
+        .toc ul li:hover:before {
+            color: white;
+        }
+        
+        .toc a {
+            text-decoration: none;
+            color: inherit;
+        }
+        
+        .use-case-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin: 30px 0;
+        }
+        
+        .use-case-card {
+            background: linear-gradient(135deg, #fff 0%, #fff0f6 100%);
+            padding: 25px;
+            border-radius: 10px;
+            border-left: 5px solid #f5576c;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        }
+        
+        .use-case-card h4 {
+            color: #f5576c;
+            margin-top: 0;
+            font-size: 1.3em;
+            margin-bottom: 15px;
+        }
+        
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin: 30px 0;
+        }
+        
+        .summary-card {
+            background: linear-gradient(135deg, #f8f9fa 0%, #fff0f6 100%);
+            padding: 25px;
+            border-radius: 10px;
+            border-left: 5px solid #f093fb;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        }
+        
+        .summary-card h4 {
+            color: #f5576c;
+            margin-top: 0;
+            font-size: 1.3em;
+            margin-bottom: 15px;
+        }
+        
+        @media print {
+            body {
+                background: white;
+            }
+            .container {
+                box-shadow: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>👥 Informe del Perfil d'Usuari</h1>
+            <p>Informació Social - Perfil Públic i Notificacions</p>
+            <span class="badge">PÚBLIC</span>
+        </header>
+        
+        <div class="content">
+            <div class="toc">
+                <h3>📑 Índex de Continguts</h3>
+                <ul>
+                    <li><a href="#perfil-public">1. Perfil Públic</a></li>
+                    <li><a href="#notificacions">2. Notificacions</a></li>
+                    <li><a href="#casos-us">3. Casos d'Ús</a></li>
+                    <li><a href="#consideracions">4. Consideracions de Disseny</a></li>
+                </ul>
+            </div>
+
+            <div id="perfil-public" class="section">
+                <h2><span class="section-number">1</span>Perfil Públic</h2>
+                
+                <div class="subsection">
+                    <h3>Imatge de Perfil</h3>
+                    <div class="social-box">
+                        <h4>Avatar personalitzat:</h4>
+                        <ul>
+                            <li><strong>Visualització:</strong> Cercle gran amb la imatge actual</li>
+                            <li><strong>Botó "Canvia foto"</strong> amb opció de càrrega</li>
+                            <li><strong>Nom d'usuari mostrat</strong> sota l'avatar</li>
+                            <li><strong>Enllaç "Canvia el nom d'usuari"</strong></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="subsection">
+                    <h3>Configuració de Visibilitat</h3>
+                    <h4>Opcions de privacitat del perfil:</h4>
+                    <ul>
+                        <li>☐ "Sóc un home" / "Sóc una dona" / "Prefereixo no dir-ho" / "Personalitzat"</li>
+                        <li>☐ "Data de naixement"</li>
+                        <li>☐ "Ubicació"</li>
+                        <li>☐ "Edat"</li>
+                    </ul>
+                    <div class="warning-box">
+                        <strong>⚠️ Avís informatiu:</strong> Alguns elements del teu perfil poden ser visibles per a tothom que visiti el teu perfil. Aprèn més sobre la configuració de privacitat
+                    </div>
+                </div>
+
+                <div class="subsection">
+                    <h3>Informació Biogràfica</h3>
+                    <h4>Camps de text:</h4>
+                    <ul>
+                        <li><strong>Data de naixement</strong> - Selector de data (DD/MM/AAAA)</li>
+                        <li><strong>Sobre mi</strong> - Àrea de text multilínia per descripció personal</li>
+                        <li><strong>Enllaç "Informació addicional sobre mi"</strong></li>
+                    </ul>
+                </div>
+
+                <div class="subsection">
+                    <h3>Materials Favorits</h3>
+                    <div class="info-box">
+                        <strong>Descripció:</strong> Per exemple: Fusta reciclada o ceràmica feta a mà. Aquestes preferències ajudaran a personalitzar les teves recomanacions
+                    </div>
+                    <h4>Opcions amb checkboxes:</h4>
+                    <ul>
+                        <li>☑ "El meu treball" (My work)</li>
+                        <li>☑ "Treball d'altres" (Work by others)</li>
+                        <li>☐ "Articles favorits" (Favorited items)</li>
+                    </ul>
+                    <ul>
+                        <li><strong>Botó "Desa canvis"</strong></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div id="notificacions" class="section">
+                <h2><span class="section-number">2</span>Notificacions</h2>
+                
+                <div class="subsection">
+                    <h3>Alertes de Seguretat</h3>
+                    <div class="social-box">
+                        <h4>Notificacions crítiques:</h4>
+                        <ul>
+                            <li><strong>Toggle "Nou: Activa les alertes de seguretat"</strong> - Badge "Nou"</li>
+                            <li><strong>Descripció:</strong> "T'enviarem un SMS si detectem alguna activitat inusual, perquè puguis protegir el teu compte ràpidament"</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="subsection">
+                    <h3>Configuració de Notificacions per Email</h3>
+                    
+                    <div class="info-box">
+                        <h4>Adreça de correu configurada</h4>
+                        <strong>Email actiu:</strong> higginsgraphic@gmail.com
+                    </div>
+
+                    <h4>Envia'm un correu quan...</h4>
+                    
+                    <div class="feature-grid">
+                        <div class="feature-card">
+                            <h4>💬 Missatges i Comunicacions</h4>
+                            <ul>
+                                <li>☑ <strong>Rebre missatges</strong>
+                                    <ul>
+                                        <li>"Email + Missatge"</li>
+                                        <li>"Missatge només"</li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div class="feature-card">
+                            <h4>👥 Activitat de Seguiment</h4>
+                            <ul>
+                                <li>☑ <strong>Algú em segueix</strong>
+                                    <ul>
+                                        <li>"No rebràs correus electrònics sobre nous seguidors"</li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <h4>Subscripcions de correu electrònic</h4>
+                    
+                    <div class="feature-grid">
+                        <div class="feature-card">
+                            <h4>📰 General</h4>
+                            <ul>
+                                <li>☐ <strong>Novetats</strong></li>
+                                <li>Descobreix les últimes tendències i novetats, consells de compra i recomanacions d'articles únics i especials</li>
+                                <li><em>(enviat diàriament)</em></li>
+                            </ul>
+                        </div>
+
+                        <div class="feature-card">
+                            <h4>❤️ Interaccions</h4>
+                            <ul>
+                                <li>☐ <strong>Interaccions</strong></li>
+                                <li>Nous favorits i activitat en elements que has venut o que t'agraden</li>
+                                <li><em>(enviat ocasionalment)</em></li>
+                            </ul>
+                        </div>
+
+                        <div class="feature-card">
+                            <h4>🎟️ Cupons i Promocions</h4>
+                            <ul>
+                                <li>☐ <strong>Cupons i Promocions</strong></li>
+                                <li>Ofertes especials exclusives de la plataforma, com ara descomptes i ofertes especials</li>
+                            </ul>
+                        </div>
+
+                        <div class="feature-card">
+                            <h4>🎉 Esdeveniments</h4>
+                            <ul>
+                                <li>☐ <strong>Esdeveniments</strong></li>
+                                <li>Descobreix esdeveniments i experiències properes que et poden interessar</li>
+                                <li><em>(enviat ocasionalment)</em></li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <h4>Per a venedors</h4>
+                    
+                    <div class="feature-grid">
+                        <div class="feature-card">
+                            <h4>💡 Consells</h4>
+                            <ul>
+                                <li>☑ <strong>Consells per a venedors</strong></li>
+                                <li>Consells i trucs per ajudar-te a tenir èxit com a venedor</li>
+                                <li><em>(enviat ocasionalment)</em></li>
+                            </ul>
+                        </div>
+
+                        <div class="feature-card">
+                            <h4>📢 Actualitzacions</h4>
+                            <ul>
+                                <li>☑ <strong>Notícies i actualitzacions</strong></li>
+                                <li>Mantén-te informat sobre les novetats de la plataforma i les eines per a venedors</li>
+                            </ul>
+                        </div>
+
+                        <div class="feature-card">
+                            <h4>📈 Millores</h4>
+                            <ul>
+                                <li>☑ <strong>Consells per millorar la botiga</strong></li>
+                                <li>Aprèn com pots millorar la teva botiga i les teves vendes</li>
+                                <li><em>(enviat ocasionalment)</em></li>
+                            </ul>
+                        </div>
+
+                        <div class="feature-card">
+                            <h4>🆕 Productes Nous</h4>
+                            <ul>
+                                <li>☐ <strong>Nous productes de venedors</strong></li>
+                                <li>Descobreix els nous articles dels venedors que segueixes</li>
+                                <li><em>(enviat ocasionalment)</em></li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <ul>
+                        <li><strong>Botó "Desa configuració"</strong></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div id="casos-us" class="section">
+                <h2>🎯 Casos d'Ús Principals</h2>
+                
+                <div class="use-case-grid">
+                    <div class="use-case-card">
+                        <h4>🛍️ Comprador Casual</h4>
+                        <ul>
+                            <li>Perfil públic mínim (només avatar i nom d'usuari)</li>
+                            <li>Notificacions només per missatges i promocions</li>
+                            <li>Sense subscripcions de venedor</li>
+                        </ul>
+                    </div>
+
+                    <div class="use-case-card">
+                        <h4>⭐ Comprador Actiu</h4>
+                        <ul>
+                            <li>Perfil públic amb biografia i preferències</li>
+                            <li>Notificacions de favorits i interaccions</li>
+                            <li>Subscripció a novetats i esdeveniments</li>
+                            <li>Seguiment de venedors preferits</li>
+                        </ul>
+                    </div>
+
+                    <div class="use-case-card">
+                        <h4>🏪 Venedor Professional</h4>
+                        <ul>
+                            <li>Perfil públic complet amb informació detallada</li>
+                            <li>Totes les notificacions de venedor activades</li>
+                            <li>Alertes de seguretat per SMS</li>
+                            <li>Consells i actualitzacions de plataforma</li>
+                        </ul>
+                    </div>
+
+                    <div class="use-case-card">
+                        <h4>🔒 Usuari Privat</h4>
+                        <ul>
+                            <li>Perfil públic amb visibilitat mínima</li>
+                            <li>Notificacions només essencials (missatges)</li>
+                            <li>Sense subscripcions de màrqueting</li>
+                            <li>Control estricte de privacitat</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div id="consideracions" class="section">
+                <h2>🎨 Consideracions de Disseny</h2>
+                
+                <div class="subsection">
+                    <h3>Privacitat per Defecte</h3>
+                    <div class="info-box">
+                        <ul>
+                            <li>Les opcions més privades haurien de ser les predeterminades</li>
+                            <li>Avisos clars quan la informació és pública</li>
+                            <li>Enllaços a política de privacitat sempre visibles</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="subsection">
+                    <h3>Comunicació Respectuosa</h3>
+                    <div class="info-box">
+                        <ul>
+                            <li>Freqüències de correu controlades (evitar spam)</li>
+                            <li>Opcions clares per donar-se de baixa</li>
+                            <li>Separació entre notificacions essencials i promocionals</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="subsection">
+                    <h3>Accessibilitat</h3>
+                    <div class="info-box">
+                        <ul>
+                            <li>Descripcions clares de cada opció</li>
+                            <li>Toggles i checkboxes fàcils d'utilitzar</li>
+                            <li>Confirmacions visuals dels canvis desats</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="subsection">
+                    <h3>Personalització</h3>
+                    <div class="info-box">
+                        <ul>
+                            <li>Recomanacions basades en preferències reals</li>
+                            <li>Sistema de favorits i seguiment</li>
+                            <li>Opcions per a diferents tipus d'usuaris (comprador/venedor)</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>📊 Resum de Funcionalitats Clau</h2>
+                
+                <div class="summary-grid">
+                    <div class="summary-card">
+                        <h4>👤 Perfil Públic i Identitat</h4>
+                        <ul>
+                            <li><strong>Avatar personalitzable</strong> amb càrrega d'imatge</li>
+                            <li><strong>Nom d'usuari editable</strong> visible públicament</li>
+                            <li><strong>Informació biogràfica</strong> amb camp "Sobre mi"</li>
+                            <li><strong>Control de visibilitat</strong> per gènere, edat, ubicació i data de naixement</li>
+                            <li><strong>Preferències de materials</strong> per personalitzar recomanacions</li>
+                        </ul>
+                    </div>
+
+                    <div class="summary-card">
+                        <h4>🔔 Sistema de Notificacions</h4>
+                        <ul>
+                            <li><strong>Missatgeria:</strong> Alertes per missatges rebuts (Email + Missatge o només Missatge)</li>
+                            <li><strong>Seguiment:</strong> Notificacions de nous seguidors</li>
+                            <li><strong>Contingut:</strong> Novetats diàries, interaccions, promocions, esdeveniments</li>
+                            <li><strong>Venedors:</strong> Consells, actualitzacions, millores, productes nous</li>
+                        </ul>
+                    </div>
+
+                    <div class="summary-card">
+                        <h4>🎯 Característiques Socials</h4>
+                        <ul>
+                            <li><strong>Visibilitat controlada</strong> amb avisos clars</li>
+                            <li><strong>Opcions de gènere inclusives</strong> (personalitzat)</li>
+                            <li><strong>Preferències de materials favorits</strong></li>
+                            <li><strong>Sistema de favorits</strong> i seguiment</li>
+                            <li><strong>Recomanacions personalitzades</strong></li>
+                        </ul>
+                    </div>
+
+                    <div class="summary-card">
+                        <h4>✨ Experiència d'Usuari</h4>
+                        <ul>
+                            <li><strong>Toggles i checkboxes</strong> per configuració ràpida</li>
+                            <li><strong>Badges visuals</strong> (Nou, Verificat, etc.)</li>
+                            <li><strong>Descripcions clares</strong> de cada opció</li>
+                            <li><strong>Múltiples canals</strong> (Email, SMS, In-app)</li>
+                            <li><strong>Freqüències configurables</strong> (diàriament, ocasionalment)</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p><strong>Document generat:</strong> Abril 2026</p>
+            <p><strong>Versió:</strong> 1.0</p>
+            <p><strong>Tipus:</strong> Informació Social i Pública</p>
+            <p><strong>Propòsit:</strong> Especificacions per al desenvolupament del sistema de perfil públic i notificacions</p>
+        </footer>
+    </div>
+</body>
+</html>

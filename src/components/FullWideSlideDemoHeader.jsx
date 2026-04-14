@@ -11,6 +11,7 @@ import {
   resolveAustenQuoteOriginalFromPath,
 } from '../utils/austenQuotesAssets.js';
 import FullWideSlideDemoHumanInsideSlider from './FullWideSlideDemoHumanInsideSlider.jsx';
+import { UserProfileTabs, UserProfileContent } from './UserProfileTabs.jsx';
 
 function MegaStripeBleedGuard({ heightPx, debug, expandLeftPx = 0, expandRightPx = 0, children }) {
   const l = Math.max(0, Number(expandLeftPx) || 0);
@@ -872,6 +873,18 @@ function getMegaPublicSelectorFor(collectionId, keyset) {
     const perCollection = root?.[cid];
     const perKeyset = perCollection?.[ks];
     if (!perKeyset || typeof perKeyset !== 'object') return null;
+    
+    // Verificar si ha expirat (15 minuts = 900000 ms)
+    const timestamp = perKeyset.timestamp;
+    if (timestamp && typeof timestamp === 'number') {
+      const elapsed = Date.now() - timestamp;
+      const FIFTEEN_MINUTES = 15 * 60 * 1000;
+      if (elapsed > FIFTEEN_MINUTES) {
+        // Ha expirat, retornar null per forçar reset a t1
+        return null;
+      }
+    }
+    
     return perKeyset;
   } catch {
     return null;
@@ -887,7 +900,11 @@ function setMegaPublicSelectorFor(collectionId, keyset, value) {
     const baseRoot = root && typeof root === 'object' ? root : {};
     const baseCollection = baseRoot?.[cid] && typeof baseRoot[cid] === 'object' ? baseRoot[cid] : {};
     const baseKeyset = baseCollection?.[ks] && typeof baseCollection[ks] === 'object' ? baseCollection[ks] : {};
-    const nextKeyset = { ...baseKeyset, ...(value && typeof value === 'object' ? value : {}) };
+    const nextKeyset = { 
+      ...baseKeyset, 
+      ...(value && typeof value === 'object' ? value : {}),
+      timestamp: Date.now() // Guardar timestamp per expiració de 15 minuts
+    };
     const nextCollection = { ...baseCollection, [ks]: nextKeyset };
     const next = { ...baseRoot, [cid]: nextCollection };
     writeMegaPublicSelectorState(next);
@@ -1421,7 +1438,8 @@ function MegaColumn({
       const existingTarget = typeof existing?.target === 'string' ? existing.target.trim() : '';
       if (existingTarget) return;
 
-      const candidate = rowItems?.[2] || rowItems?.[1] || null;
+      // Sempre usar t1 (índex 1) com a posició per defecte
+      const candidate = rowItems?.[1] || rowItems?.[0] || null;
       if (typeof candidate !== 'string') return;
       setMegaPublicSelectorFor(collectionId, keyset, { target: candidate, stepX: 0, stepY: 0 });
       window.dispatchEvent(new Event('mega-tile-selector-changed'));
@@ -2702,6 +2720,8 @@ export default function FullWideSlideDemoHeader({
   const [megaPage, setMegaPage] = useState(1);
   const [megaFullScreen, setMegaFullScreen] = useState(false);
   const [acordioExpanded, setAcordioExpanded] = useState(false);
+  const [acordioExpandedPage4, setAcordioExpandedPage4] = useState(false);
+  const [activeUserTab, setActiveUserTab] = useState('1');
   const [firstContactSelectedItem, setFirstContactSelectedItem] = useState(null);
   const [humanInsideSelectedItem, setHumanInsideSelectedItem] = useState(null);
   const [selectedItemByCollection, setSelectedItemByCollection] = useState({});
@@ -5030,6 +5050,41 @@ export default function FullWideSlideDemoHeader({
     stripeOverlayOverrideActive,
   ]);
 
+  // Sincronitzar selectedItem amb el target del selector
+  useEffect(() => {
+    if (!active) return;
+    if (!megaTileSelectorParams?.enabled) return;
+    
+    const target = megaTileSelectorParams?.target;
+    if (!target || typeof target !== 'string') return;
+    
+    // Actualitzar el selectedItem segons la col·lecció activa
+    if (active === 'first_contact') {
+      if (firstContactSelectedItem !== target) {
+        setFirstContactSelectedItem(target);
+      }
+    } else if (active === 'the_human_inside') {
+      if (humanInsideSelectedItem !== target) {
+        setHumanInsideSelectedItem(target);
+      }
+    } else {
+      // Per altres col·leccions (cube, austen, outcasted)
+      if (selectedItemByCollection?.[active] !== target) {
+        setSelectedItemByCollection((prev) => ({ ...prev, [active]: target }));
+      }
+    }
+  }, [
+    active,
+    megaTileSelectorParams?.target,
+    megaTileSelectorParams?.enabled,
+    firstContactSelectedItem,
+    humanInsideSelectedItem,
+    selectedItemByCollection,
+    setFirstContactSelectedItem,
+    setHumanInsideSelectedItem,
+    setSelectedItemByCollection,
+  ]);
+
   useEffect(() => {
     if (typeof manualEnabledOverride === 'boolean') return undefined;
     if (contained) return undefined;
@@ -5322,9 +5377,18 @@ export default function FullWideSlideDemoHeader({
                   accountClickTimeoutRef.current = window.setTimeout(() => {
                     accountClickTimeoutRef.current = null;
                     if (megaPage === 4 && active) {
-                      setMegaFullScreen((prev) => !prev);
+                      // Si ja estem a la pàgina 4 i el mega-menu està obert
+                      if (acordioExpandedPage4) {
+                        // Si l'acordió està obert, només el tanquem (mantenim mega-menu obert)
+                        setAcordioExpandedPage4(false);
+                      } else {
+                        // Si l'acordió està tancat, l'obrim
+                        setAcordioExpandedPage4(true);
+                      }
                     } else {
+                      // Si no estem a la pàgina 4, hi anem
                       setMegaPage(4);
+                      setAcordioExpandedPage4(false);
                       if (!active) ensureMegaOpen();
                     }
                     touchMegaPublicActivity();
@@ -6055,11 +6119,355 @@ export default function FullWideSlideDemoHeader({
                         display: 'flex',
                         flexDirection: 'column',
                       }}>
+                        {/* ZONA 1: Slide - Resum del compte amb 4 columnes */}
                         <div style={{ 
                           width: '100%',
                           height: '100%',
                           backgroundColor: '#ADD8E6',
-                        }} />
+                          flexShrink: 0,
+                          padding: '0',
+                          display: 'grid',
+                          gridTemplateColumns: 'repeat(4, 1fr)',
+                          gap: '2px',
+                          alignItems: 'stretch',
+                          border: '1px solid #999',
+                        }}>
+                          {/* Columna 1: Avatar i nom */}
+                          <div style={{
+                            backgroundColor: 'white',
+                            padding: '20px',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            gap: '12px',
+                          }}>
+                            <div style={{
+                              width: '80px',
+                              height: '80px',
+                              borderRadius: '50%',
+                              backgroundColor: '#1E62B8',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              fontSize: '32px',
+                              fontWeight: 700,
+                              color: 'white',
+                              fontFamily: 'Oswald, sans-serif',
+                            }}>
+                              JG
+                            </div>
+                            <div style={{ textAlign: 'center' }}>
+                              <div style={{
+                                fontFamily: 'Roboto Condensed, sans-serif',
+                                fontSize: '15pt',
+                                fontWeight: 500,
+                                color: '#000',
+                                marginBottom: '4px',
+                              }}>
+                                Joan Garcia
+                              </div>
+                              <div style={{
+                                fontFamily: 'Roboto Condensed, sans-serif',
+                                fontSize: '12pt',
+                                fontWeight: 300,
+                                color: '#666',
+                              }}>
+                                joan.garcia@example.com
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Columna 2: Comandes */}
+                          <div style={{
+                            backgroundColor: 'white',
+                            padding: '20px',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                          }}>
+                            <div style={{
+                              fontFamily: 'Roboto Condensed, sans-serif',
+                              fontSize: '15pt',
+                              fontWeight: 500,
+                              color: '#1E62B8',
+                              lineHeight: 1,
+                              marginBottom: '8px',
+                            }}>
+                              12
+                            </div>
+                            <div style={{
+                              fontFamily: 'Roboto Condensed, sans-serif',
+                              fontSize: '12pt',
+                              fontWeight: 300,
+                              color: '#666',
+                            }}>
+                              Comandes
+                            </div>
+                          </div>
+
+                          {/* Columna 3: Favorits */}
+                          <div style={{
+                            backgroundColor: 'white',
+                            padding: '20px',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                          }}>
+                            <div style={{
+                              fontFamily: 'Roboto Condensed, sans-serif',
+                              fontSize: '15pt',
+                              fontWeight: 500,
+                              color: '#1E62B8',
+                              lineHeight: 1,
+                              marginBottom: '8px',
+                            }}>
+                              3
+                            </div>
+                            <div style={{
+                              fontFamily: 'Roboto Condensed, sans-serif',
+                              fontSize: '12pt',
+                              fontWeight: 300,
+                              color: '#666',
+                            }}>
+                              Favorits
+                            </div>
+                          </div>
+
+                          {/* Columna 4: Estat VIP i botó */}
+                          <div style={{
+                            backgroundColor: 'white',
+                            padding: '20px',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            gap: '16px',
+                          }}>
+                            <div style={{ textAlign: 'center' }}>
+                              <div style={{
+                                fontFamily: 'Roboto Condensed, sans-serif',
+                                fontSize: '15pt',
+                                fontWeight: 500,
+                                color: '#1E62B8',
+                                lineHeight: 1,
+                                marginBottom: '8px',
+                              }}>
+                                VIP
+                              </div>
+                              <div style={{
+                                fontFamily: 'Roboto Condensed, sans-serif',
+                                fontSize: '12pt',
+                                fontWeight: 300,
+                                color: '#666',
+                              }}>
+                                Estat
+                              </div>
+                            </div>
+                            <button
+                              onClick={() => setAcordioExpandedPage4(true)}
+                              style={{
+                                width: '100%',
+                                backgroundColor: '#000',
+                                color: 'white',
+                                fontFamily: 'Roboto Condensed, sans-serif',
+                                fontSize: '12pt',
+                                fontWeight: 400,
+                                padding: '10px 16px',
+                                borderRadius: '0',
+                                border: 'none',
+                                cursor: 'pointer',
+                                transition: 'background-color 0.2s',
+                              }}
+                              onMouseEnter={(e) => e.target.style.backgroundColor = '#333'}
+                              onMouseLeave={(e) => e.target.style.backgroundColor = '#000'}
+                            >
+                              Editar
+                            </button>
+                          </div>
+                        </div>
+
+                        {/* Contingut de l'acordió - Overlay absolut full-width */}
+                        {acordioExpandedPage4 && (
+                          <div style={{
+                            position: 'absolute',
+                            top: '100%',
+                            left: '50%',
+                            transform: 'translateX(-50%)',
+                            width: '100vw',
+                            minHeight: '100vh',
+                            backgroundColor: 'white',
+                            paddingTop: '66px',
+                            paddingBottom: '0',
+                            zIndex: 10,
+                            overflowY: 'auto',
+                          }}>
+                            <div style={{
+                              maxWidth: '1400px',
+                              margin: '0 auto',
+                              padding: '0 40px',
+                              position: 'relative',
+                              height: 'calc(100vh - 66px)',
+                              display: 'flex',
+                              flexDirection: 'column',
+                            }}>
+
+                              {/* Rectangle gris de fons */}
+                              <div style={{
+                                position: 'absolute',
+                                top: '0',
+                                left: '40px',
+                                right: '40px',
+                                bottom: '33px',
+                                backgroundColor: '#e5e7eb',
+                                borderRadius: '0',
+                                zIndex: 0,
+                                pointerEvents: 'none',
+                                display: 'none',
+                              }} />
+
+                              {/* Sistema de pestanyes */}
+                              <UserProfileTabs onTabChange={setActiveUserTab} />
+
+                              {/* Contingut de les pestanyes */}
+                              <UserProfileContent activeTab={activeUserTab} />
+
+                              {/* Preferències i botons d'acció */}
+                              {false && <div style={{
+                                marginBottom: '60px',
+                                position: 'relative',
+                                zIndex: 1,
+                              }}>
+                                <h3 style={{
+                                  fontFamily: 'Oswald, sans-serif',
+                                  fontSize: '24px',
+                                  fontWeight: 600,
+                                  color: '#1E62B8',
+                                  marginBottom: '25px',
+                                  textTransform: 'uppercase',
+                                }}>
+                                  Preferències
+                                </h3>
+
+                                {/* Checkbox newsletter */}
+                                <div style={{ marginBottom: '15px', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                  <input
+                                    type="checkbox"
+                                    id="newsletter"
+                                    defaultChecked
+                                    style={{
+                                      width: '20px',
+                                      height: '20px',
+                                      cursor: 'pointer',
+                                      accentColor: '#1E62B8',
+                                    }}
+                                  />
+                                  <label
+                                    htmlFor="newsletter"
+                                    style={{
+                                      fontFamily: 'system-ui, sans-serif',
+                                      fontSize: '16px',
+                                      color: '#333',
+                                      cursor: 'pointer',
+                                    }}
+                                  >
+                                    Vull rebre notícies i ofertes per correu electrònic
+                                  </label>
+                                </div>
+
+                                {/* Checkbox promocions */}
+                                <div style={{ marginBottom: '30px', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                  <input
+                                    type="checkbox"
+                                    id="promos"
+                                    defaultChecked
+                                    style={{
+                                      width: '20px',
+                                      height: '20px',
+                                      cursor: 'pointer',
+                                      accentColor: '#1E62B8',
+                                    }}
+                                  />
+                                  <label
+                                    htmlFor="promos"
+                                    style={{
+                                      fontFamily: 'system-ui, sans-serif',
+                                      fontSize: '16px',
+                                      color: '#333',
+                                      cursor: 'pointer',
+                                    }}
+                                  >
+                                    Accepto rebre promocions exclusives
+                                  </label>
+                                </div>
+
+                                {/* Botons d'acció */}
+                                <div style={{ display: 'flex', gap: '15px' }}>
+                                  <button style={{
+                                    flex: 1,
+                                    backgroundColor: '#1E62B8',
+                                    color: 'white',
+                                    fontFamily: 'Oswald, sans-serif',
+                                    fontSize: '18px',
+                                    fontWeight: 600,
+                                    padding: '16px 32px',
+                                    borderRadius: '8px',
+                                    border: 'none',
+                                    cursor: 'pointer',
+                                    textTransform: 'uppercase',
+                                    letterSpacing: '0.5px',
+                                    transition: 'background-color 0.2s',
+                                  }}
+                                  onMouseEnter={(e) => e.target.style.backgroundColor = '#154a8f'}
+                                  onMouseLeave={(e) => e.target.style.backgroundColor = '#1E62B8'}
+                                  >
+                                    Guardar Canvis
+                                  </button>
+                                  <button style={{
+                                    flex: 1,
+                                    backgroundColor: 'transparent',
+                                    color: '#1E62B8',
+                                    fontFamily: 'Oswald, sans-serif',
+                                    fontSize: '18px',
+                                    fontWeight: 600,
+                                    padding: '16px 32px',
+                                    borderRadius: '8px',
+                                    border: '2px solid #1E62B8',
+                                    cursor: 'pointer',
+                                    textTransform: 'uppercase',
+                                    letterSpacing: '0.5px',
+                                    transition: 'all 0.2s',
+                                  }}
+                                  onMouseEnter={(e) => {
+                                    e.target.style.backgroundColor = '#1E62B8';
+                                    e.target.style.color = 'white';
+                                  }}
+                                  onMouseLeave={(e) => {
+                                    e.target.style.backgroundColor = 'transparent';
+                                    e.target.style.color = '#1E62B8';
+                                  }}
+                                  >
+                                    Cancel·lar
+                                  </button>
+                                </div>
+                              </div>}
+
+                              {/* Espai buit al bottom */}
+                              <div style={{ 
+                                position: 'absolute',
+                                bottom: '0',
+                                left: '0',
+                                right: '0',
+                                height: '33px',
+                                zIndex: 9999,
+                                backgroundColor: 'red',
+                                border: '5px solid yellow'
+                              }} />
+                            </div>
+                          </div>
+                        )}
                       </div>
 
                       <div style={{ 
