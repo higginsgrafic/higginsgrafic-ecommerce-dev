@@ -1,14 +1,67 @@
 import { useState } from 'react';
 import { Plus, X } from 'lucide-react';
 
+// Component de formulari de contacte
+const ContactForm = ({ inputStyle, labelStyle, fieldMargin, titleStyle }) => {
+  const [formData, setFormData] = useState({
+    name: '',
+    orderNumber: '',
+    email: '',
+    subject: '',
+    message: ''
+  });
+  const [status, setStatus] = useState('');
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    setStatus('sending');
+    setTimeout(() => {
+      setStatus('success');
+      setFormData({ name: '', orderNumber: '', email: '', subject: '', message: '' });
+      setTimeout(() => setStatus(''), 5000);
+    }, 1500);
+  };
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  return (
+    <div style={{ maxWidth: '600px', margin: '0 auto', padding: '40px' }}>
+      <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+          <input type="text" name="name" value={formData.name} onChange={handleChange} required style={inputStyle} placeholder="Nom" />
+          <input type="text" name="orderNumber" value={formData.orderNumber} onChange={handleChange} style={inputStyle} placeholder="Número de comanda (opcional)" />
+        </div>
+        <input type="email" name="email" value={formData.email} onChange={handleChange} required style={inputStyle} placeholder="Email" />
+        <select name="subject" value={formData.subject} onChange={handleChange} required style={inputStyle}>
+          <option value="">Assumpte</option>
+          <option value="order">Pregunta sobre comanda</option>
+          <option value="product">Informació de producte</option>
+          <option value="shipping">Enviament i lliurament</option>
+          <option value="return">Devolució o canvi</option>
+          <option value="other">Altres</option>
+        </select>
+        <textarea name="message" value={formData.message} onChange={handleChange} required rows="6" style={{ ...inputStyle, resize: 'none' }} placeholder="Missatge" />
+        <button type="submit" disabled={status === 'sending'} style={{ padding: '8px 16px', fontFamily: 'Roboto Condensed, sans-serif', fontSize: '12pt', fontWeight: 400, backgroundColor: '#000', color: 'white', border: 'none', cursor: status === 'sending' ? 'not-allowed' : 'pointer', opacity: status === 'sending' ? 0.6 : 1 }}>
+          {status === 'sending' ? 'Enviant...' : 'Enviar Missatge'}
+        </button>
+        {status === 'success' && (
+          <div style={{ backgroundColor: '#d4edda', border: '1px solid #c3e6cb', borderRadius: '4px', padding: '12px', fontFamily: 'Roboto Condensed, sans-serif', fontSize: '12pt', color: '#155724' }}>
+            ✓ Missatge enviat correctament! Et respondrem en un màxim de 48 hores.
+          </div>
+        )}
+      </form>
+    </div>
+  );
+};
+
 export function UserProfileTabs({ onTabChange }) {
   const [tabs, setTabs] = useState([
-    { id: '1', name: 'Informació' },
-    { id: '2', name: 'Adreces' },
-    { id: '3', name: 'Pagament' },
-    { id: '4', name: 'Comandes' },
-    { id: '5', name: 'Seguretat' },
-    { id: '6', name: 'Preferències' },
+    { id: '1', name: 'Comandes' },
+    { id: '2', name: 'Missatges' },
+    { id: '3', name: 'Compte' },
+    { id: '4', name: 'Seguretat' },
   ]);
   const [activeTabId, setActiveTabId] = useState('1');
 
@@ -21,21 +74,27 @@ export function UserProfileTabs({ onTabChange }) {
     <div style={{
       position: 'relative',
       zIndex: 2,
-      marginBottom: '30px',
+      marginBottom: '6px',
+      padding: '0',
     }}>
       <div style={{
         display: 'flex',
         alignItems: 'center',
-        gap: '8px',
+        gap: '0',
         borderBottom: '2px solid #e5e7eb',
         paddingBottom: '0',
+        padding: '0',
       }}>
         {tabs.map((tab) => (
           <button
             key={tab.id}
             onClick={() => handleTabClick(tab.id)}
             style={{
-              padding: '12px 24px',
+              flex: '1',
+              paddingTop: '0',
+              paddingRight: '16px',
+              paddingBottom: '0',
+              paddingLeft: '16px',
               fontFamily: 'Oswald, sans-serif',
               fontSize: '16px',
               fontWeight: 500,
@@ -48,6 +107,7 @@ export function UserProfileTabs({ onTabChange }) {
               cursor: 'pointer',
               transition: 'all 0.2s',
               marginBottom: '-2px',
+              lineHeight: '1',
             }}
             onMouseEnter={(e) => {
               if (activeTabId !== tab.id) {
@@ -71,7 +131,7 @@ export function UserProfileTabs({ onTabChange }) {
 export function UserProfileContent({ activeTab }) {
   const inputStyle = {
     width: '100%',
-    padding: '8px 12px',
+    padding: '6px 10px',
     fontFamily: 'Roboto Condensed, sans-serif',
     fontSize: '12pt',
     fontWeight: 300,
@@ -95,300 +155,20 @@ export function UserProfileContent({ activeTab }) {
     fontSize: '15pt',
     fontWeight: 500,
     color: '#000',
-    marginBottom: '20px',
+    marginBottom: '4px',
     marginTop: '0',
+    paddingTop: '0',
   };
 
-  const fieldMargin = { marginBottom: '18px' };
+  const fieldMargin = { marginBottom: '4px' };
 
   // Contingut per cada pestanya segons l'informe
   const renderContent = () => {
     switch (activeTab) {
-      case '1': // Informació
+      case '1': // Comandes
         return (
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '40px' }}>
-            {/* Columna esquerra: Dades personals */}
-            <div>
-              <h3 style={titleStyle}>1.1. Dades Personals</h3>
-
-              <div style={fieldMargin}>
-                <label style={labelStyle}>Nom complet</label>
-                <input
-                  type="text"
-                  defaultValue="Joan Garcia"
-                  style={inputStyle}
-                />
-              </div>
-
-              <div style={fieldMargin}>
-                <label style={labelStyle}>Email</label>
-                <input
-                  type="email"
-                  defaultValue="joan.garcia@example.com"
-                  style={inputStyle}
-                />
-              </div>
-
-              <div style={fieldMargin}>
-                <label style={labelStyle}>Telèfon</label>
-                <input
-                  type="tel"
-                  defaultValue="+34 600 123 456"
-                  style={inputStyle}
-                />
-              </div>
-
-              <div style={fieldMargin}>
-                <label style={labelStyle}>Empresa/Organització</label>
-                <input
-                  type="text"
-                  placeholder="Opcional, per B2B"
-                  style={inputStyle}
-                />
-              </div>
-            </div>
-
-            {/* Columna dreta: Contrasenya */}
-            <div>
-              <h3 style={titleStyle}>1.2. Contrasenya</h3>
-
-              <div style={fieldMargin}>
-                <label style={labelStyle}>Contrasenya actual</label>
-                <input
-                  type="password"
-                  style={inputStyle}
-                />
-              </div>
-
-              <div style={fieldMargin}>
-                <label style={labelStyle}>Contrasenya nova</label>
-                <input
-                  type="password"
-                  style={inputStyle}
-                />
-              </div>
-
-              <div style={fieldMargin}>
-                <label style={labelStyle}>Confirmar contrasenya</label>
-                <input
-                  type="password"
-                  style={inputStyle}
-                />
-              </div>
-
-              <button style={{
-                padding: '10px 24px',
-                fontFamily: 'Roboto Condensed, sans-serif',
-                fontSize: '12pt',
-                fontWeight: 400,
-                backgroundColor: '#000',
-                color: 'white',
-                border: 'none',
-                cursor: 'pointer',
-                marginTop: '10px',
-              }}>
-                Canvia contrasenya
-              </button>
-
-              <div style={{
-                marginTop: '24px',
-                fontFamily: 'Roboto Condensed, sans-serif',
-                fontSize: '12pt',
-                fontWeight: 300,
-                lineHeight: 1.6,
-              }}>
-                <strong style={{ fontWeight: 500 }}>Validacions:</strong>
-                <ul style={{ paddingLeft: '20px', margin: '8px 0 0 0' }}>
-                  <li>Mínim 8 caràcters</li>
-                  <li>Almenys 1 majúscula</li>
-                  <li>Almenys 1 número</li>
-                </ul>
-              </div>
-            </div>
-          </div>
-        );
-
-      case '2': // Adreces
-        return (
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '40px' }}>
-            {/* Columna esquerra: Adreça de Lliurament */}
-            <div>
-              <h3 style={titleStyle}>2.1. Adreça de Lliurament</h3>
-
-              <div style={{ ...fieldMargin, marginBottom: '12px' }}>
-                <label style={labelStyle}>Nom complet del destinatari</label>
-                <input type="text" defaultValue="Joan Garcia" style={inputStyle} />
-              </div>
-
-              <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '12px', marginBottom: '12px' }}>
-                <div>
-                  <label style={labelStyle}>Carrer i número</label>
-                  <input type="text" defaultValue="Carrer Major, 123" style={inputStyle} />
-                </div>
-                <div>
-                  <label style={labelStyle}>Pis/Porta</label>
-                  <input type="text" placeholder="Opcional" style={inputStyle} />
-                </div>
-              </div>
-
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '12px', marginBottom: '12px' }}>
-                <div>
-                  <label style={labelStyle}>Codi postal</label>
-                  <input type="text" defaultValue="08001" style={inputStyle} />
-                </div>
-                <div>
-                  <label style={labelStyle}>Ciutat</label>
-                  <input type="text" defaultValue="Barcelona" style={inputStyle} />
-                </div>
-              </div>
-
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '12px' }}>
-                <div>
-                  <label style={labelStyle}>Província/Estat</label>
-                  <input type="text" defaultValue="Barcelona" style={inputStyle} />
-                </div>
-                <div>
-                  <label style={labelStyle}>País</label>
-                  <select style={inputStyle}>
-                    <option>Espanya</option>
-                    <option>França</option>
-                    <option>Portugal</option>
-                  </select>
-                </div>
-              </div>
-
-              <div style={{ ...fieldMargin, marginBottom: '12px' }}>
-                <label style={labelStyle}>Telèfon de contacte</label>
-                <input type="tel" defaultValue="+34 600 123 456" style={inputStyle} />
-              </div>
-
-              <div style={{ display: 'flex', gap: '10px', alignItems: 'center', marginBottom: '12px' }}>
-                <input type="checkbox" id="defaultAddress" />
-                <label htmlFor="defaultAddress" style={{ ...labelStyle, marginBottom: 0, cursor: 'pointer' }}>
-                  Desar com a adreça per defecte
-                </label>
-              </div>
-
-              <button style={{
-                padding: '8px 20px',
-                fontFamily: 'Roboto Condensed, sans-serif',
-                fontSize: '12pt',
-                fontWeight: 400,
-                backgroundColor: '#000',
-                color: 'white',
-                border: 'none',
-                cursor: 'pointer',
-              }}>
-                Afegir nova adreça
-              </button>
-            </div>
-
-            {/* Columna dreta: Adreça de Facturació */}
-            <div>
-              <h3 style={titleStyle}>2.2. Adreça de Facturació</h3>
-
-              <div style={{ marginBottom: '12px', display: 'flex', gap: '10px', alignItems: 'center' }}>
-                <input type="checkbox" id="sameAddress" defaultChecked />
-                <label htmlFor="sameAddress" style={{ ...labelStyle, marginBottom: 0, cursor: 'pointer' }}>
-                  Igual que l'adreça de lliurament
-                </label>
-              </div>
-
-              <div style={{ ...fieldMargin, marginBottom: '12px' }}>
-                <label style={labelStyle}>NIF/CIF</label>
-                <input type="text" placeholder="Obligatori per factures" style={inputStyle} />
-              </div>
-
-              <div style={{ ...fieldMargin, marginBottom: '12px' }}>
-                <label style={labelStyle}>Nom fiscal</label>
-                <input type="text" placeholder="Si és diferent" style={inputStyle} />
-              </div>
-            </div>
-          </div>
-        );
-
-      case '3': // Pagament
-        return (
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '40px' }}>
-            {/* Columna esquerra: Targetes */}
-            <div>
-              <h3 style={titleStyle}>3.1. Targetes</h3>
-
-              <div style={{ backgroundColor: 'white', border: '1px solid #ccc', padding: '16px', marginBottom: '20px' }}>
-                <div style={{ ...labelStyle, marginBottom: '10px' }}>Targeta guardada</div>
-                <div style={{ fontFamily: 'Roboto Condensed, sans-serif', fontSize: '12pt', fontWeight: 300, marginBottom: '8px' }}>
-                  •••• •••• •••• 1234
-                </div>
-                <div style={{ fontFamily: 'Roboto Condensed, sans-serif', fontSize: '12pt', fontWeight: 300, marginBottom: '8px' }}>
-                  Visa - Caduca: 12/25
-                </div>
-                <div style={{ fontFamily: 'Roboto Condensed, sans-serif', fontSize: '12pt', fontWeight: 300, marginBottom: '12px' }}>
-                  Titular: Joan Garcia
-                </div>
-                <div style={{ display: 'flex', gap: '10px', alignItems: 'center', marginBottom: '10px' }}>
-                  <input type="checkbox" id="defaultCard" defaultChecked />
-                  <label htmlFor="defaultCard" style={{ ...labelStyle, marginBottom: 0, cursor: 'pointer' }}>
-                    Targeta per defecte
-                  </label>
-                </div>
-                <button style={{
-                  padding: '8px 16px',
-                  fontFamily: 'Roboto Condensed, sans-serif',
-                  fontSize: '12pt',
-                  fontWeight: 400,
-                  backgroundColor: '#fff',
-                  color: '#000',
-                  border: '1px solid #000',
-                  cursor: 'pointer',
-                }}>Eliminar</button>
-              </div>
-
-              <button style={{
-                padding: '10px 24px',
-                fontFamily: 'Roboto Condensed, sans-serif',
-                fontSize: '12pt',
-                fontWeight: 400,
-                backgroundColor: '#000',
-                color: 'white',
-                border: 'none',
-                cursor: 'pointer',
-              }}>Afegir targeta</button>
-
-              <div style={{
-                backgroundColor: 'white',
-                border: '1px solid #ccc',
-                padding: '12px',
-                marginTop: '20px',
-                fontFamily: 'Roboto Condensed, sans-serif',
-                fontSize: '12pt',
-                fontWeight: 300,
-                lineHeight: 1.5,
-              }}>
-                <strong style={{ fontWeight: 500 }}>Seguretat:</strong><br />
-                · CVV mai s'emmagatzema<br />
-                · Dades encriptades<br />
-                · Tokenització via passarel·la
-              </div>
-            </div>
-
-            {/* Columna dreta: Altres Mètodes */}
-            <div>
-              <h3 style={titleStyle}>3.2. Altres Mètodes</h3>
-
-              <ul style={{ fontFamily: 'Roboto Condensed, sans-serif', fontSize: '12pt', fontWeight: 300, lineHeight: 1.8, paddingLeft: '20px' }}>
-                <li>Transferència bancària</li>
-                <li>Contra reemborsament</li>
-                <li>Bizum</li>
-                <li>PayPal</li>
-              </ul>
-            </div>
-          </div>
-        );
-
-      case '4': // Comandes
-        return (
-          <div>
-            <h3 style={titleStyle}>4.1. Llista de Comandes</h3>
+          <div style={{ padding: '40px' }}>
+            <h3 style={titleStyle}>Llista de Comandes</h3>
 
             {/* Comanda exemple */}
             <div style={{ backgroundColor: 'white', border: '1px solid #ccc', padding: '16px', marginBottom: '16px' }}>
@@ -410,7 +190,7 @@ export function UserProfileContent({ activeTab }) {
                   <div style={{ fontFamily: 'Roboto Condensed, sans-serif', fontSize: '12pt', fontWeight: 300 }}>45,90 €</div>
                 </div>
                 <button style={{
-                  padding: '8px 16px',
+                  padding: '6px 12px',
                   fontFamily: 'Roboto Condensed, sans-serif',
                   fontSize: '12pt',
                   fontWeight: 400,
@@ -437,12 +217,111 @@ export function UserProfileContent({ activeTab }) {
           </div>
         );
 
-      case '5': // Seguretat
+      case '2': // Missatges
+        return <ContactForm inputStyle={inputStyle} labelStyle={labelStyle} fieldMargin={fieldMargin} titleStyle={titleStyle} />;
+
+      case '3': // Compte
         return (
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '40px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: '12px', padding: '40px' }}>
+            {/* Columna 1: Dades Personals */}
+            <div>
+              <h3 style={titleStyle}>Dades Personals</h3>
+              <div style={fieldMargin}>
+                <label style={labelStyle}>Nom complet</label>
+                <input type="text" defaultValue="Joan Garcia" style={inputStyle} />
+              </div>
+              <div style={fieldMargin}>
+                <label style={labelStyle}>Email</label>
+                <input type="email" defaultValue="joan.garcia@example.com" style={inputStyle} />
+              </div>
+              <div style={fieldMargin}>
+                <label style={labelStyle}>Telèfon</label>
+                <input type="tel" defaultValue="+34 600 123 456" style={inputStyle} />
+              </div>
+              <div style={fieldMargin}>
+                <label style={labelStyle}>Empresa</label>
+                <input type="text" placeholder="Opcional" style={inputStyle} />
+              </div>
+            </div>
+
+            {/* Columna 2: Contrasenya */}
+            <div>
+              <h3 style={titleStyle}>Contrasenya</h3>
+              <div style={fieldMargin}>
+                <label style={labelStyle}>Actual</label>
+                <input type="password" style={inputStyle} />
+              </div>
+              <div style={fieldMargin}>
+                <label style={labelStyle}>Nova</label>
+                <input type="password" style={inputStyle} />
+              </div>
+              <div style={fieldMargin}>
+                <label style={labelStyle}>Confirmar</label>
+                <input type="password" style={inputStyle} />
+              </div>
+              <button style={{ padding: '4px 12px', fontFamily: 'Roboto Condensed, sans-serif', fontSize: '12pt', fontWeight: 400, backgroundColor: '#000', color: 'white', border: 'none', cursor: 'pointer', marginTop: '4px' }}>
+                Canvia
+              </button>
+            </div>
+
+            {/* Columna 3: Adreces */}
+            <div>
+              <h3 style={titleStyle}>Adreça Lliurament</h3>
+              <div style={fieldMargin}>
+                <label style={labelStyle}>Destinatari</label>
+                <input type="text" defaultValue="Joan Garcia" style={inputStyle} />
+              </div>
+              <div style={fieldMargin}>
+                <label style={labelStyle}>Carrer</label>
+                <input type="text" defaultValue="Carrer Major, 123" style={inputStyle} />
+              </div>
+              <div style={fieldMargin}>
+                <label style={labelStyle}>CP - Ciutat</label>
+                <input type="text" defaultValue="08001 Barcelona" style={inputStyle} />
+              </div>
+              <div style={{ display: 'flex', gap: '6px', alignItems: 'center', marginBottom: '4px' }}>
+                <input type="checkbox" id="defaultAddress" />
+                <label htmlFor="defaultAddress" style={{ fontFamily: 'Roboto Condensed, sans-serif', fontSize: '12pt', fontWeight: 300, marginBottom: 0, cursor: 'pointer' }}>Per defecte</label>
+              </div>
+              
+              <h3 style={{ ...titleStyle, marginTop: '8px' }}>Facturació</h3>
+              <div style={fieldMargin}>
+                <label style={labelStyle}>NIF/CIF</label>
+                <input type="text" placeholder="Obligatori" style={inputStyle} />
+              </div>
+            </div>
+
+            {/* Columna 4: Pagament */}
+            <div>
+              <h3 style={titleStyle}>Targetes</h3>
+              <div style={{ backgroundColor: 'white', border: '1px solid #ccc', padding: '6px', marginBottom: '4px' }}>
+                <div style={{ fontFamily: 'Roboto Condensed, sans-serif', fontSize: '12pt', fontWeight: 300, marginBottom: '2px' }}>
+                  •••• 1234 - Visa 12/25
+                </div>
+                <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+                  <input type="checkbox" id="defaultCard" defaultChecked />
+                  <label htmlFor="defaultCard" style={{ fontFamily: 'Roboto Condensed, sans-serif', fontSize: '12pt', fontWeight: 300, marginBottom: 0, cursor: 'pointer' }}>Per defecte</label>
+                </div>
+              </div>
+              <button style={{ padding: '4px 12px', fontFamily: 'Roboto Condensed, sans-serif', fontSize: '12pt', fontWeight: 400, backgroundColor: '#000', color: 'white', border: 'none', cursor: 'pointer' }}>Afegir targeta</button>
+              
+              <h3 style={{ ...titleStyle, marginTop: '8px' }}>Altres Mètodes</h3>
+              <ul style={{ fontFamily: 'Roboto Condensed, sans-serif', fontSize: '12pt', fontWeight: 300, lineHeight: 1.3, paddingLeft: '20px', margin: '0' }}>
+                <li>Transferència</li>
+                <li>Contra reemborsament</li>
+                <li>Bizum</li>
+                <li>PayPal</li>
+              </ul>
+            </div>
+          </div>
+        );
+
+      case '4': // Seguretat
+        return (
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '40px', padding: '40px' }}>
             {/* Columna esquerra: 2FA i Sessions */}
             <div>
-              <h3 style={titleStyle}>5.1. Autenticació de Dos Factors (2FA)</h3>
+              <h3 style={titleStyle}>Autenticació de Dos Factors (2FA)</h3>
 
               <div style={{ marginBottom: '20px', display: 'flex', gap: '10px', alignItems: 'center' }}>
                 <input type="checkbox" id="enable2FA" />
@@ -460,7 +339,7 @@ export function UserProfileContent({ activeTab }) {
               </div>
 
               <div style={{ marginTop: '40px' }}>
-                <h3 style={titleStyle}>5.2. Sessions Actives</h3>
+                <h3 style={titleStyle}>Sessions Actives</h3>
 
                 <div style={{ backgroundColor: 'white', border: '1px solid #ccc', padding: '12px', marginBottom: '12px' }}>
                   <div style={{ fontFamily: 'Roboto Condensed, sans-serif', fontSize: '12pt', fontWeight: 300, marginBottom: '6px' }}>
@@ -469,7 +348,7 @@ export function UserProfileContent({ activeTab }) {
                   <div style={{ fontFamily: 'Roboto Condensed, sans-serif', fontSize: '12pt', fontWeight: 300, marginBottom: '6px' }}>
                     Barcelona, Espanya
                   </div>
-                  <div style={{ fontFamily: 'Roboto Condensed, sans-serif', fontSize: '12pt', fontWeight: 300, marginBottom: '8px' }}>
+                  <div style={{ fontFamily: 'Roboto Condensed, sans-serif', fontSize: '12pt', fontWeight: 300, marginBottom: '4px' }}>
                     Última activitat: Ara mateix
                   </div>
                   <button style={{
@@ -488,7 +367,7 @@ export function UserProfileContent({ activeTab }) {
 
             {/* Columna dreta: Historial d'Activitat */}
             <div>
-              <h3 style={titleStyle}>5.3. Historial d'Activitat</h3>
+              <h3 style={titleStyle}>Historial d'Activitat</h3>
 
               <ul style={{ fontFamily: 'Roboto Condensed, sans-serif', fontSize: '12pt', fontWeight: 300, lineHeight: 1.8, paddingLeft: '20px' }}>
                 <li>Canvis de contrasenya</li>
@@ -518,127 +397,13 @@ export function UserProfileContent({ activeTab }) {
           </div>
         );
 
-      case '6': // Preferències
-        return (
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '40px' }}>
-            {/* Columna esquerra: Notificacions */}
-            <div>
-              <h3 style={titleStyle}>6.1. Notificacions per Email</h3>
-
-              <div style={{ marginBottom: '20px' }}>
-                <div style={{ ...labelStyle, marginBottom: '12px' }}>Transaccionals (sempre actives):</div>
-                <ul style={{ fontFamily: 'Roboto Condensed, sans-serif', fontSize: '12pt', fontWeight: 300, lineHeight: 1.8, paddingLeft: '20px' }}>
-                  <li>Confirmació de comanda</li>
-                  <li>Pagament confirmat</li>
-                  <li>Comanda enviada (amb seguiment)</li>
-                  <li>Comanda lliurada</li>
-                </ul>
-              </div>
-
-              <div style={{ marginTop: '30px' }}>
-                <div style={{ ...labelStyle, marginBottom: '12px' }}>Opcionals (configurables):</div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                  <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-                    <input type="checkbox" id="promo" defaultChecked />
-                    <label htmlFor="promo" style={{ ...labelStyle, marginBottom: 0, cursor: 'pointer' }}>
-                      Promocions i ofertes
-                    </label>
-                  </div>
-                  <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-                    <input type="checkbox" id="cart" />
-                    <label htmlFor="cart" style={{ ...labelStyle, marginBottom: 0, cursor: 'pointer' }}>
-                      Recordatori de carret abandonat
-                    </label>
-                  </div>
-                  <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-                    <input type="checkbox" id="news" defaultChecked />
-                    <label htmlFor="news" style={{ ...labelStyle, marginBottom: 0, cursor: 'pointer' }}>
-                      Novetats i productes nous
-                    </label>
-                  </div>
-                  <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-                    <input type="checkbox" id="tips" />
-                    <label htmlFor="tips" style={{ ...labelStyle, marginBottom: 0, cursor: 'pointer' }}>
-                      Consells i recomanacions
-                    </label>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Columna dreta: Privacitat i GDPR */}
-            <div>
-              <h3 style={titleStyle}>6.2. Privacitat</h3>
-
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '30px' }}>
-                <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-                  <input type="checkbox" id="marketing" defaultChecked />
-                  <label htmlFor="marketing" style={{ ...labelStyle, marginBottom: 0, cursor: 'pointer' }}>
-                    Accepto rebre comunicacions comercials
-                  </label>
-                </div>
-                <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-                  <input type="checkbox" id="shipping" defaultChecked disabled />
-                  <label htmlFor="shipping" style={{ ...labelStyle, marginBottom: 0, cursor: 'pointer' }}>
-                    Accepto compartir dades amb transportistes (obligatori)
-                  </label>
-                </div>
-              </div>
-
-              <h3 style={titleStyle}>6.3. Gestió de Dades (GDPR)</h3>
-
-              <button style={{
-                padding: '10px 24px',
-                fontFamily: 'Roboto Condensed, sans-serif',
-                fontSize: '12pt',
-                fontWeight: 400,
-                backgroundColor: '#000',
-                color: 'white',
-                border: 'none',
-                cursor: 'pointer',
-                marginBottom: '12px',
-                width: '100%',
-              }}>Descarregar les meves dades</button>
-
-              <button style={{
-                padding: '10px 24px',
-                fontFamily: 'Roboto Condensed, sans-serif',
-                fontSize: '12pt',
-                fontWeight: 400,
-                backgroundColor: '#dc3545',
-                color: 'white',
-                border: 'none',
-                cursor: 'pointer',
-                width: '100%',
-              }}>Eliminar el meu compte</button>
-
-              <div style={{
-                backgroundColor: 'white',
-                border: '1px solid #ccc',
-                padding: '12px',
-                marginTop: '20px',
-                fontFamily: 'Roboto Condensed, sans-serif',
-                fontSize: '12pt',
-                fontWeight: 300,
-                lineHeight: 1.5,
-              }}>
-                <strong style={{ fontWeight: 500 }}>Avís legal:</strong><br />
-                Les comandes completades es conserven segons obligacions legals. Dades personals s'eliminen excepte les requerides per llei.
-              </div>
-            </div>
-          </div>
-        );
-
       default:
         return null;
     }
   };
 
   return (
-    <div style={{
-      position: 'relative',
-      zIndex: 1,
-    }}>
+    <div>
       {renderContent()}
     </div>
   );

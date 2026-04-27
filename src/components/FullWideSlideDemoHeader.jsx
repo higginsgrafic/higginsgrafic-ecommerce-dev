@@ -6299,47 +6299,47 @@ export default function FullWideSlideDemoHeader({
                             width: '100vw',
                             minHeight: '100vh',
                             backgroundColor: 'white',
+                            backgroundImage: `url(/tmp/USER/PAUTA.jpg?v=${Date.now()})`,
+                            backgroundRepeat: 'no-repeat',
+                            backgroundPosition: 'calc(50% - 8.5px) -662.5px',
+                            backgroundSize: '2038px 1527px',
                             paddingTop: '66px',
                             paddingBottom: '0',
                             zIndex: 10,
                             overflowY: 'auto',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            marginTop: '-66px',
                           }}>
-                            <div style={{
-                              maxWidth: '1400px',
-                              margin: '0 auto',
-                              padding: '0 40px',
-                              position: 'relative',
-                              height: 'calc(100vh - 66px)',
-                              display: 'flex',
-                              flexDirection: 'column',
-                            }}>
 
-                              {/* Rectangle gris de fons */}
-                              <div style={{
-                                position: 'absolute',
-                                top: '0',
-                                left: '40px',
-                                right: '40px',
-                                bottom: '33px',
-                                backgroundColor: '#e5e7eb',
-                                borderRadius: '0',
-                                zIndex: 0,
-                                pointerEvents: 'none',
-                                display: 'none',
-                              }} />
-
+                            <>
                               {/* Sistema de pestanyes */}
-                              <UserProfileTabs onTabChange={setActiveUserTab} />
+                              <div style={{ paddingTop: '0', paddingBottom: '0', position: 'relative', zIndex: 1, flex: 1, marginTop: '-66px' }}>
+                                {/* PAUTA-VERDA - Línies horitzontals */}
+                                <div style={{
+                                  position: 'absolute',
+                                  top: '0',
+                                  left: '0',
+                                  right: '0',
+                                  bottom: '0',
+                                  backgroundImage: 'url(/tmp/USER/PAUTA-VERDA.svg)',
+                                  backgroundRepeat: 'no-repeat',
+                                  backgroundPosition: '280.5px 0px',
+                                  backgroundSize: '1365.46px 737.015px',
+                                  opacity: 0.3,
+                                  zIndex: -1,
+                                  pointerEvents: 'none',
+                                }} />
 
-                              {/* Contingut de les pestanyes */}
-                              <UserProfileContent activeTab={activeUserTab} />
+                                {/* Àrea de construcció buida */}
+                              </div>
 
                               {/* Preferències i botons d'acció */}
                               {false && <div style={{
-                                marginBottom: '60px',
-                                position: 'relative',
-                                zIndex: 1,
-                              }}>
+                              marginBottom: '60px',
+                              position: 'relative',
+                              zIndex: 1,
+                            }}>
                                 <h3 style={{
                                   fontFamily: 'Oswald, sans-serif',
                                   fontSize: '24px',
@@ -6465,7 +6465,7 @@ export default function FullWideSlideDemoHeader({
                                 backgroundColor: 'red',
                                 border: '5px solid yellow'
                               }} />
-                            </div>
+                            </>
                           </div>
                         )}
                       </div>

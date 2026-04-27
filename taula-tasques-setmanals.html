@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tasques</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        
+        .container {
+            max-width: 100%;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+        }
+        
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 18px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            font-size: 10px;
+        }
+        
+        th, td {
+            border: 1px solid black;
+            padding: 4px;
+            text-align: center;
+            vertical-align: top;
+        }
+        
+        th {
+            background: #d3d3d3;
+            font-weight: bold;
+        }
+        
+        .gray-cell {
+            background: #d3d3d3;
+        }
+        
+        .editable {
+            min-height: 40px;
+            cursor: text;
+        }
+        
+        .editable:hover {
+            background: #fffacd;
+        }
+        
+        .editable:focus {
+            outline: 2px solid #4CAF50;
+            background: white;
+        }
+        
+        .row-header {
+            font-weight: bold;
+            text-align: left;
+            padding-left: 8px;
+        }
+        
+        .buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            font-size: 14px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        
+        .btn-save {
+            background: #4CAF50;
+            color: white;
+        }
+        
+        .btn-print {
+            background: #2196F3;
+            color: white;
+        }
+        
+        .btn-clear {
+            background: #f44336;
+            color: white;
+        }
+        
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+            
+            .buttons {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Tasques</h1>
+        
+        <table id="taskTable">
+            <thead>
+                <tr>
+                    <th rowspan="2">Activitats de la vida diària</th>
+                    <th rowspan="2">Tasques</th>
+                    <th colspan="7">Dies de la setmana</th>
+                    <th rowspan="2">Observacions</th>
+                </tr>
+                <tr>
+                    <th>Dilluns</th>
+                    <th>Dimarts</th>
+                    <th>Dimecres</th>
+                    <th>Dijous</th>
+                    <th>Divendres</th>
+                    <th>Dissabte</th>
+                    <th>Diumenge</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Higiene personal -->
+                <tr>
+                    <td rowspan="5" class="row-header gray-cell">Higiene personal</td>
+                    <td class="row-header">Rentar-se les dents</td>
+                    <td class="editable gray-cell" contenteditable="true"></td>
+                    <td class="editable" contenteditable="true"></td>
+                    <td class="editable gray-cell" contenteditable="true"></td>
+                    <td class="editable" contenteditable="true"></td>
+                    <td class="editable gray-cell" contenteditable="true"></td>
+                    <td class="editable" contenteditable="true"></td>
+                    <td class="editable gray-cell" contenteditable="true"></td>
+                    <td class="editable" contenteditable="true"></td>
+                </tr>
+                <tr>
+                    <td class="row-header">Rentar-se les mans</td>
+                    <td class="editable gray-cell" contenteditable="true"></td>
+                    <td class="editable" contenteditable="true"></td>
+                    <td class="editable gray-cell" contenteditable="true"></td>
+                    <td class="editable" contenteditable="true"></td>
+                    <td class="editable gray-cell" contenteditable="true"></td>
+                    <td class="editable" contenteditable="true"></td>
+                    <td class="editable gray-cell" contenteditable="true"></td>
+                    <td class="editable" contenteditable="true"></td>
+                </tr>
+                <tr>
+                    <td class="row-header">Dutxar-se</td>
+                    <td class="editable gray-cell" contenteditable="true"></td>
+                    <td class="editable" contenteditable="true"></td>
+                    <td class="editable gray-cell" contenteditable="true"></td>
+                    <td class="editable" contenteditable="true"></td>
+                    <td class="editable gray-cell" contenteditable="true"></td>
+                    <td class="editable" contenteditable="true"></td>
+                    <td class="editable gray-cell" contenteditable="true"></td>
+                    <td class="editable" contenteditable="true"></td>
+                </tr>
+                <tr>
+                    <td class="row-header">Pentinar-se</td>
+                    <td class="editable gray-cell" contenteditable="true"></td>
+                    <td class="editable" contenteditable="true"></td>
+                    <td class="editable gray-cell" contenteditable="true"></td>
+                    <td class="editable" contenteditable="true"></td>
+                    <td class="editable gray-cell" contenteditable="true"></td>
+                    <td class="editable" contenteditable="true"></td>
+                    <td class="editable gray-cell" contenteditable="true"></td>
+                    <td class="editable" contenteditable="true"></td>
+                </tr>
+                <tr>
+                    <td class="row-header">Vestir-se</td>
+                    <td class="editable gray-cell" contenteditable="true"></td>
+                    <td class="editable" contenteditable="true"></td>
+                    <td class="editable gray-cell" contenteditable="true"></td>
+                    <td class="editable" contenteditable="true"></td>
+                    <td class="editable gray-cell" contenteditable="true"></td>
+                    <td class="editable" contenteditable="true"></td>
+                    <td class="editable gray-cell" contenteditable="true"></td>
+                    <td class="editable" contenteditable="true"></td>
+                </tr>
+                
+                <!-- Ordre i neteja -->
+                <tr>
+                    <td rowspan="4" class="row-header gray-cell">Ordre i neteja</td>
+                    <td class="row-header">Fer el llit</td>
+                    <td class="editable gray-cell" contenteditable="true"></td>
+                    <td class="editable" contenteditable="true"></td>
+                    <td class="editable gray-cell" contenteditable="true"></td>
+                    <td class="editable" contenteditable="true"></td>
+                    <td class="editable gray-cell" contenteditable="true"></td>
+                    <td class="editable" contenteditable="true"></td>
+                    <td class="editable gray-cell" contenteditable="true"></td>
+                    <td class="editable" contenteditable="true"></td>
+                </tr>
+                <tr>
+                    <td class="row-header">Recollir la roba</td>
+                    <td class="editable gray-cell" contenteditable="true"></td>
+                    <td class="editable" contenteditable="true"></td>
+                    <td class="editable gray-cell" contenteditable="true"></td>
+                    <td class="editable" contenteditable="true"></td>
+                    <td class="editable gray-cell" contenteditable="true"></td>
+                    <td class="editable" contenteditable="true"></td>
+                    <td class="editable gray-cell" contenteditable="true"></td>
+                    <td class="editable" contenteditable="true"></td>
+                </tr>
+                <tr>
+                    <td class="row-header">Endreçar l'habitació</td>
+                    <td class="editable gray-cell" contenteditable="true"></td>
+                    <td class="editable" contenteditable="true"></td>
+                    <td class="editable gray-cell" contenteditable="true"></td>
+                    <td class="editable" contenteditable="true"></td>
+                    <td class="editable gray-cell" contenteditable="true"></td>
+                    <td class="editable" contenteditable="true"></td>
+                    <td class="editable gray-cell" contenteditable="true"></td>
+                    <td class="editable" contenteditable="true"></td>
+                </tr>
+                <tr>
+                    <td class="row-header">Netejar l'habitació</td>
+                    <td class="editable gray-cell" contenteditable="true"></td>
+                    <td class="editable" contenteditable="true"></td>
+                    <td class="editable gray-cell" contenteditable="true"></td>
+                    <td class="editable" contenteditable="true"></td>
+                    <td class="editable gray-cell" contenteditable="true"></td>
+                    <td class="editable" contenteditable="true"></td>
+                    <td class="editable gray-cell" contenteditable="true"></td>
+                    <td class="editable" contenteditable="true"></td>
+                </tr>
+                
+                <!-- Col·laboració a casa -->
+                <tr>
+                    <td rowspan="4" class="row-header gray-cell">Col·laboració a casa</td>
+                    <td class="row-header">Posar la taula</td>
+                    <td class="editable gray-cell" contenteditable="true"></td>
+                    <td class="editable" contenteditable="true"></td>
+                    <td class="editable gray-cell" contenteditable="true"></td>
+                    <td class="editable" contenteditable="true"></td>
+                    <td class="editable gray-cell" contenteditable="true"></td>
+                    <td class="editable" contenteditable="true"></td>
+                    <td class="editable gray-cell" contenteditable="true"></td>
+                    <td class="editable" contenteditable="true"></td>
+                </tr>
+                <tr>
+                    <td class="row-header">Recollir la taula</td>
+                    <td class="editable gray-cell" contenteditable="true"></td>
+                    <td class="editable" contenteditable="true"></td>
+                    <td class="editable gray-cell" contenteditable="true"></td>
+                    <td class="editable" contenteditable="true"></td>
+                    <td class="editable gray-cell" contenteditable="true"></td>
+                    <td class="editable" contenteditable="true"></td>
+                    <td class="editable gray-cell" contenteditable="true"></td>
+                    <td class="editable" contenteditable="true"></td>
+                </tr>
+                <tr>
+                    <td class="row-header">Rentar els plats</td>
+                    <td class="editable gray-cell" contenteditable="true"></td>
+                    <td class="editable" contenteditable="true"></td>
+                    <td class="editable gray-cell" contenteditable="true"></td>
+                    <td class="editable" contenteditable="true"></td>
+                    <td class="editable gray-cell" contenteditable="true"></td>
+                    <td class="editable" contenteditable="true"></td>
+                    <td class="editable gray-cell" contenteditable="true"></td>
+                    <td class="editable" contenteditable="true"></td>
+                </tr>
+                <tr>
+                    <td class="row-header">Treure les escombraries</td>
+                    <td class="editable gray-cell" contenteditable="true"></td>
+                    <td class="editable" contenteditable="true"></td>
+                    <td class="editable gray-cell" contenteditable="true"></td>
+                    <td class="editable" contenteditable="true"></td>
+                    <td class="editable gray-cell" contenteditable="true"></td>
+                    <td class="editable" contenteditable="true"></td>
+                    <td class="editable gray-cell" contenteditable="true"></td>
+                    <td class="editable" contenteditable="true"></td>
+                </tr>
+                
+                <!-- Estudi -->
+                <tr>
+                    <td rowspan="3" class="row-header gray-cell">Estudi</td>
+                    <td class="row-header">Fer els deures</td>
+                    <td class="editable gray-cell" contenteditable="true"></td>
+                    <td class="editable" contenteditable="true"></td>
+                    <td class="editable gray-cell" contenteditable="true"></td>
+                    <td class="editable" contenteditable="true"></td>
+                    <td class="editable gray-cell" contenteditable="true"></td>
+                    <td class="editable" contenteditable="true"></td>
+                    <td class="editable gray-cell" contenteditable="true"></td>
+                    <td class="editable" contenteditable="true"></td>
+                </tr>
+                <tr>
+                    <td class="row-header">Repassar</td>
+                    <td class="editable gray-cell" contenteditable="true"></td>
+                    <td class="editable" contenteditable="true"></td>
+                    <td class="editable gray-cell" contenteditable="true"></td>
+                    <td class="editable" contenteditable="true"></td>
+                    <td class="editable gray-cell" contenteditable="true"></td>
+                    <td class="editable" contenteditable="true"></td>
+                    <td class="editable gray-cell" contenteditable="true"></td>
+                    <td class="editable" contenteditable="true"></td>
+                </tr>
+                <tr>
+                    <td class="row-header">Llegir</td>
+                    <td class="editable gray-cell" contenteditable="true"></td>
+                    <td class="editable" contenteditable="true"></td>
+                    <td class="editable gray-cell" contenteditable="true"></td>
+                    <td class="editable" contenteditable="true"></td>
+                    <td class="editable gray-cell" contenteditable="true"></td>
+                    <td class="editable" contenteditable="true"></td>
+                    <td class="editable gray-cell" contenteditable="true"></td>
+                    <td class="editable" contenteditable="true"></td>
+                </tr>
+                
+                <!-- Oci i temps lliure -->
+                <tr>
+                    <td rowspan="2" class="row-header gray-cell">Oci i temps lliure</td>
+                    <td class="row-header" contenteditable="true"></td>
+                    <td class="editable gray-cell" contenteditable="true"></td>
+                    <td class="editable" contenteditable="true"></td>
+                    <td class="editable gray-cell" contenteditable="true"></td>
+                    <td class="editable" contenteditable="true"></td>
+                    <td class="editable gray-cell" contenteditable="true"></td>
+                    <td class="editable" contenteditable="true"></td>
+                    <td class="editable gray-cell" contenteditable="true"></td>
+                    <td class="editable" contenteditable="true"></td>
+                </tr>
+                <tr>
+                    <td class="row-header" contenteditable="true"></td>
+                    <td class="editable gray-cell" contenteditable="true"></td>
+                    <td class="editable" contenteditable="true"></td>
+                    <td class="editable gray-cell" contenteditable="true"></td>
+                    <td class="editable" contenteditable="true"></td>
+                    <td class="editable gray-cell" contenteditable="true"></td>
+                    <td class="editable" contenteditable="true"></td>
+                    <td class="editable gray-cell" contenteditable="true"></td>
+                    <td class="editable" contenteditable="true"></td>
+                </tr>
+            </tbody>
+        </table>
+        
+        <div class="buttons">
+            <button class="btn-save" onclick="saveTable()">💾 Desar</button>
+            <button class="btn-print" onclick="window.print()">🖨️ Imprimir</button>
+            <button class="btn-clear" onclick="clearTable()">🗑️ Netejar</button>
+        </div>
+    </div>
+    
+    <script>
+        window.addEventListener('load', function() {
+            const saved = localStorage.getItem('taskTable');
+            if (saved) {
+                const cells = document.querySelectorAll('.editable');
+                const data = JSON.parse(saved);
+                cells.forEach((cell, index) => {
+                    if (data[index]) {
+                        cell.textContent = data[index];
+                    }
+                });
+            }
+        });
+        
+        function saveTable() {
+            const cells = document.querySelectorAll('.editable');
+            const data = Array.from(cells).map(cell => cell.textContent);
+            localStorage.setItem('taskTable', JSON.stringify(data));
+            
+            const btn = event.target;
+            const originalText = btn.textContent;
+            btn.textContent = '✅ Desat!';
+            setTimeout(() => {
+                btn.textContent = originalText;
+            }, 2000);
+        }
+        
+        function clearTable() {
+            if (confirm('Segur que vols netejar totes les cel·les?')) {
+                const cells = document.querySelectorAll('.editable');
+                cells.forEach(cell => {
+                    cell.textContent = '';
+                });
+                localStorage.removeItem('taskTable');
+            }
+        }
+        
+        setInterval(() => {
+            const cells = document.querySelectorAll('.editable');
+            const data = Array.from(cells).map(cell => cell.textContent);
+            localStorage.setItem('taskTable', JSON.stringify(data));
+        }, 30000);
+    </script>
+</body>
+</html>

@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Horaris del Centre - Los Olivos</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 20px;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .logo {
+            font-size: 3em;
+            font-weight: 700;
+            color: #f5576c;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        
+        h1 {
+            color: #333;
+            font-size: 2em;
+            margin-bottom: 30px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 30px;
+        }
+        
+        th {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            border: 1px solid #f5576c;
+        }
+        
+        td {
+            padding: 15px;
+            border: 1px solid #ddd;
+        }
+        
+        .editable {
+            cursor: text;
+            min-height: 20px;
+            padding: 8px;
+            border-radius: 4px;
+            transition: background 0.2s;
+        }
+        
+        .editable:hover {
+            background: #fff3cd;
+        }
+        
+        .editable:focus {
+            outline: 2px solid #f5576c;
+            background: white;
+        }
+        
+        tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+        
+        tr:hover {
+            background: #ffe5e9;
+        }
+        
+        .time-cell {
+            font-weight: 600;
+            color: #495057;
+            text-align: center;
+        }
+        
+        .activity-cell {
+            font-weight: 500;
+            color: #212529;
+        }
+        
+        .note {
+            background: #fff3cd;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #ffc107;
+            margin: 20px 0;
+            font-style: italic;
+        }
+        
+        .highlight {
+            background: #f5576c;
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: 600;
+            margin: 20px 0;
+            font-size: 1.1em;
+        }
+        
+        .info-box {
+            background: #e7f3ff;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid #2196F3;
+            margin: 20px 0;
+        }
+        
+        .info-box h2 {
+            color: #2196F3;
+            margin-bottom: 10px;
+        }
+        
+        .info-box ul {
+            margin-left: 20px;
+            color: #495057;
+        }
+        
+        .info-box li {
+            margin: 8px 0;
+        }
+        
+        .buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 30px;
+        }
+        
+        button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+        }
+        
+        .btn-save {
+            background: #28a745;
+            color: white;
+        }
+        
+        .btn-save:hover {
+            background: #218838;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(40, 167, 69, 0.4);
+        }
+        
+        .btn-print {
+            background: #f5576c;
+            color: white;
+        }
+        
+        .btn-print:hover {
+            background: #e04558;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(245, 87, 108, 0.4);
+        }
+        
+        .btn-reset {
+            background: #6c757d;
+            color: white;
+        }
+        
+        .btn-reset:hover {
+            background: #5a6268;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(108, 117, 125, 0.4);
+        }
+        
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+            
+            .container {
+                box-shadow: none;
+                padding: 20px;
+            }
+            
+            .buttons, .info-box {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">Los Olivos</div>
+            <h1>⏰ Horaris del Centre</h1>
+        </div>
+        
+        <table id="scheduleTable">
+            <thead>
+                <tr>
+                    <th>Hora inici</th>
+                    <th>Hora final</th>
+                    <th>Activitat</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="time-cell editable" contenteditable="true">7:00</td>
+                    <td class="time-cell editable" contenteditable="true">10:00</td>
+                    <td class="activity-cell editable" contenteditable="true">AIXECADES</td>
+                </tr>
+                <tr>
+                    <td class="time-cell editable" contenteditable="true">9:00</td>
+                    <td class="time-cell editable" contenteditable="true">10:00</td>
+                    <td class="activity-cell editable" contenteditable="true">ESMORZAR</td>
+                </tr>
+                <tr>
+                    <td class="time-cell editable" contenteditable="true">10:00</td>
+                    <td class="time-cell editable" contenteditable="true">13:00</td>
+                    <td class="activity-cell editable" contenteditable="true">ACTIVITATS (s/calendari)</td>
+                </tr>
+                <tr>
+                    <td class="time-cell editable" contenteditable="true">11:00</td>
+                    <td class="time-cell editable" contenteditable="true">—</td>
+                    <td class="activity-cell editable" contenteditable="true">HIDRATACIÓ **</td>
+                </tr>
+                <tr>
+                    <td class="time-cell editable" contenteditable="true">13:30</td>
+                    <td class="time-cell editable" contenteditable="true">14:30</td>
+                    <td class="activity-cell editable" contenteditable="true">DINAR</td>
+                </tr>
+                <tr>
+                    <td class="time-cell editable" contenteditable="true">14:30</td>
+                    <td class="time-cell editable" contenteditable="true">16:00</td>
+                    <td class="activity-cell editable" contenteditable="true">DESCANS</td>
+                </tr>
+                <tr>
+                    <td class="time-cell editable" contenteditable="true">16:15</td>
+                    <td class="time-cell editable" contenteditable="true">—</td>
+                    <td class="activity-cell editable" contenteditable="true">BERENAR</td>
+                </tr>
+                <tr>
+                    <td class="time-cell editable" contenteditable="true">16:00</td>
+                    <td class="time-cell editable" contenteditable="true">18:00</td>
+                    <td class="activity-cell editable" contenteditable="true">ACTIVITATS (s/calendari)</td>
+                </tr>
+                <tr>
+                    <td class="time-cell editable" contenteditable="true">18:00</td>
+                    <td class="time-cell editable" contenteditable="true">20:00</td>
+                    <td class="activity-cell editable" contenteditable="true">SOPAR</td>
+                </tr>
+                <tr>
+                    <td class="time-cell editable" contenteditable="true">19:45</td>
+                    <td class="time-cell editable" contenteditable="true">22:00</td>
+                    <td class="activity-cell editable" contenteditable="true">ENLLITADES</td>
+                </tr>
+                <tr>
+                    <td class="time-cell editable" contenteditable="true">22:00</td>
+                    <td class="time-cell editable" contenteditable="true">7:00</td>
+                    <td class="activity-cell editable" contenteditable="true">DESCANS NOCTURN</td>
+                </tr>
+            </tbody>
+        </table>
+        
+        <div class="note">
+            <strong>**</strong> Entre el berenar i el sopar es dona una segona hidratació
+        </div>
+        
+        <div class="highlight">
+            CAP DE SETMANA S'OFEREIX UNA SESSIÓ DE<br>
+            MESA TELEVIZADA ELS DIUMENGES
+        </div>
+        
+        <div class="buttons">
+            <button class="btn-save" onclick="saveSchedule()">💾 Desar canvis</button>
+            <button class="btn-print" onclick="window.print()">🖨️ Imprimir</button>
+            <button class="btn-reset" onclick="resetSchedule()">↺ Restaurar original</button>
+        </div>
+        
+        <div class="info-box">
+            <h2>ℹ️ Notes editables:</h2>
+            <ul>
+                <li>Fes clic a qualsevol cel·la per editar horaris o activitats</li>
+                <li>Els canvis es desen automàticament al navegador</li>
+                <li>Horaris subjectes a canvis segons necessitats del centre</li>
+                <li>Les activitats segueixen el calendari establert</li>
+                <li>Hidratació programada dues vegades al dia</li>
+            </ul>
+        </div>
+    </div>
+    
+    <script>
+        const originalData = [
+            ['7:00', '10:00', 'AIXECADES'],
+            ['9:00', '10:00', 'ESMORZAR'],
+            ['10:00', '13:00', 'ACTIVITATS (s/calendari)'],
+            ['11:00', '—', 'HIDRATACIÓ **'],
+            ['13:30', '14:30', 'DINAR'],
+            ['14:30', '16:00', 'DESCANS'],
+            ['16:15', '—', 'BERENAR'],
+            ['16:00', '18:00', 'ACTIVITATS (s/calendari)'],
+            ['18:00', '20:00', 'SOPAR'],
+            ['19:45', '22:00', 'ENLLITADES'],
+            ['22:00', '7:00', 'DESCANS NOCTURN']
+        ];
+        
+        // Carregar dades desades
+        window.addEventListener('load', function() {
+            const saved = localStorage.getItem('scheduleTable');
+            if (saved) {
+                const cells = document.querySelectorAll('.editable');
+                const data = JSON.parse(saved);
+                cells.forEach((cell, index) => {
+                    if (data[index]) {
+                        cell.textContent = data[index];
+                    }
+                });
+            }
+        });
+        
+        // Desar canvis
+        function saveSchedule() {
+            const cells = document.querySelectorAll('.editable');
+            const data = Array.from(cells).map(cell => cell.textContent);
+            localStorage.setItem('scheduleTable', JSON.stringify(data));
+            
+            // Feedback visual
+            const btn = event.target;
+            const originalText = btn.textContent;
+            btn.textContent = '✅ Desat!';
+            btn.style.background = '#20c997';
+            setTimeout(() => {
+                btn.textContent = originalText;
+                btn.style.background = '#28a745';
+            }, 2000);
+        }
+        
+        // Restaurar horaris originals
+        function resetSchedule() {
+            if (confirm('Segur que vols restaurar els horaris originals?')) {
+                const rows = document.querySelectorAll('tbody tr');
+                rows.forEach((row, index) => {
+                    const cells = row.querySelectorAll('.editable');
+                    cells[0].textContent = originalData[index][0];
+                    cells[1].textContent = originalData[index][1];
+                    cells[2].textContent = originalData[index][2];
+                });
+                localStorage.removeItem('scheduleTable');
+            }
+        }
+        
+        // Auto-desar cada 30 segons
+        setInterval(() => {
+            const cells = document.querySelectorAll('.editable');
+            const data = Array.from(cells).map(cell => cell.textContent);
+            localStorage.setItem('scheduleTable', JSON.stringify(data));
+        }, 30000);
+    </script>
+</body>
+</html>
