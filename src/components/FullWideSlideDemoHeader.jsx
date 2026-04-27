@@ -5994,6 +5994,21 @@ export default function FullWideSlideDemoHeader({
                             paddingBottom: '40px',
                             zIndex: 10,
                           }}>
+                            {/* PAUTA-VERDA - Línies horitzontals */}
+                            <div style={{
+                              position: 'absolute',
+                              top: '0',
+                              left: '0',
+                              right: '0',
+                              bottom: '0',
+                              backgroundImage: 'url(/tmp/USER/PAUTA-VERDA.svg)',
+                              backgroundRepeat: 'no-repeat',
+                              backgroundPosition: '280.5px 1px',
+                              backgroundSize: '1365.46px 737.015px',
+                              opacity: 0.3,
+                              zIndex: 9999,
+                              pointerEvents: 'none',
+                            }} />
                             <div style={{
                               maxWidth: '1400px',
                               margin: '0 auto',
@@ -6119,10 +6134,53 @@ export default function FullWideSlideDemoHeader({
                         display: 'flex',
                         flexDirection: 'column',
                       }}>
-                        {/* ZONA 1: Slide - Àrea buida per construir */}
+                        {/* Background PAUTA.jpg - darrere dels rectangles */}
+                        <div style={{
+                          position: 'absolute',
+                          top: '0',
+                          left: '50%',
+                          transform: 'translateX(-50%)',
+                          width: '100vw',
+                          height: '100%',
+                          backgroundImage: `url(/tmp/USER/COMANDES.jpg?v=${Date.now()})`,
+                          backgroundRepeat: 'no-repeat',
+                          backgroundPosition: 'calc(50% - 8.5px) -596.5px',
+                          backgroundSize: '2038px 1527px',
+                          zIndex: 0,
+                          pointerEvents: 'none',
+                        }} />
+
+                        {/* ZONA 1: Slide - 4 rectangles individuals */}
+                        <div style={{
+                          width: '100%',
+                          height: '100%',
+                          flexShrink: 0,
+                          display: 'grid',
+                          gridTemplateColumns: 'repeat(4, 1fr)',
+                          gap: '7.5px',
+                          position: 'relative',
+                          zIndex: 1,
+                        }}>
+                          {['COMANDES', 'MISSATGES', 'COMPTE', 'SEGURETAT'].map((label) => (
+                            <div key={label} style={{
+                              backgroundColor: '#D4D7DC',
+                              border: '1px solid #999',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              fontFamily: 'Oswald, sans-serif',
+                              fontWeight: 400,
+                              fontSize: '25pt',
+                              color: '#fff',
+                            }}>
+                              {label}
+                            </div>
+                          ))}
+                        </div>
 
                         {/* Contingut de l'acordió - Overlay absolut full-width */}
-                        <div style={{
+                        {acordioExpandedPage4 && (
+                          <div style={{
                             position: 'absolute',
                             top: '100%',
                             left: '50%',
@@ -6130,174 +6188,31 @@ export default function FullWideSlideDemoHeader({
                             width: '100vw',
                             minHeight: '100vh',
                             backgroundColor: 'white',
-                            backgroundImage: `url(/tmp/USER/PAUTA.jpg?v=${Date.now()})`,
+                            backgroundImage: `url(/tmp/USER/COMANDES.jpg?v=${Date.now()})`,
                             backgroundRepeat: 'no-repeat',
-                            backgroundPosition: 'calc(50% - 8.5px) -596.5px',
+                            backgroundPosition: 'calc(50% - 8.5px) -662.5px',
                             backgroundSize: '2038px 1527px',
-                            paddingTop: '66px',
-                            paddingBottom: '0',
+                            paddingTop: '40px',
+                            paddingBottom: '40px',
                             zIndex: 10,
-                            overflowY: 'auto',
-                            display: 'flex',
-                            flexDirection: 'column',
-                            marginTop: '-66px',
                           }}>
-
-                            <>
-                              {/* Sistema de pestanyes */}
-                              <div style={{ paddingTop: '0', paddingBottom: '0', position: 'relative', zIndex: 1, flex: 1, marginTop: '-66px' }}>
-                                {/* PAUTA-VERDA - Línies horitzontals */}
-                                <div style={{
-                                  position: 'absolute',
-                                  top: '0',
-                                  left: '0',
-                                  right: '0',
-                                  bottom: '0',
-                                  backgroundImage: 'url(/tmp/USER/PAUTA-VERDA.svg)',
-                                  backgroundRepeat: 'no-repeat',
-                                  backgroundPosition: '280.5px 65.5px',
-                                  backgroundSize: '1365.46px 737.015px',
-                                  opacity: 0.3,
-                                  zIndex: 9999,
-                                  pointerEvents: 'none',
-                                }} />
-
-                                {/* Àrea de construcció buida */}
-                              </div>
-
-                              {/* Preferències i botons d'acció */}
-                              {false && <div style={{
-                              marginBottom: '60px',
-                              position: 'relative',
-                              zIndex: 1,
-                            }}>
-                                <h3 style={{
-                                  fontFamily: 'Oswald, sans-serif',
-                                  fontSize: '24px',
-                                  fontWeight: 600,
-                                  color: '#1E62B8',
-                                  marginBottom: '25px',
-                                  textTransform: 'uppercase',
-                                }}>
-                                  Preferències
-                                </h3>
-
-                                {/* Checkbox newsletter */}
-                                <div style={{ marginBottom: '15px', display: 'flex', alignItems: 'center', gap: '12px' }}>
-                                  <input
-                                    type="checkbox"
-                                    id="newsletter"
-                                    defaultChecked
-                                    style={{
-                                      width: '20px',
-                                      height: '20px',
-                                      cursor: 'pointer',
-                                      accentColor: '#1E62B8',
-                                    }}
-                                  />
-                                  <label
-                                    htmlFor="newsletter"
-                                    style={{
-                                      fontFamily: 'system-ui, sans-serif',
-                                      fontSize: '16px',
-                                      color: '#333',
-                                      cursor: 'pointer',
-                                    }}
-                                  >
-                                    Vull rebre notícies i ofertes per correu electrònic
-                                  </label>
-                                </div>
-
-                                {/* Checkbox promocions */}
-                                <div style={{ marginBottom: '30px', display: 'flex', alignItems: 'center', gap: '12px' }}>
-                                  <input
-                                    type="checkbox"
-                                    id="promos"
-                                    defaultChecked
-                                    style={{
-                                      width: '20px',
-                                      height: '20px',
-                                      cursor: 'pointer',
-                                      accentColor: '#1E62B8',
-                                    }}
-                                  />
-                                  <label
-                                    htmlFor="promos"
-                                    style={{
-                                      fontFamily: 'system-ui, sans-serif',
-                                      fontSize: '16px',
-                                      color: '#333',
-                                      cursor: 'pointer',
-                                    }}
-                                  >
-                                    Accepto rebre promocions exclusives
-                                  </label>
-                                </div>
-
-                                {/* Botons d'acció */}
-                                <div style={{ display: 'flex', gap: '15px' }}>
-                                  <button style={{
-                                    flex: 1,
-                                    backgroundColor: '#1E62B8',
-                                    color: 'white',
-                                    fontFamily: 'Oswald, sans-serif',
-                                    fontSize: '18px',
-                                    fontWeight: 600,
-                                    padding: '16px 32px',
-                                    borderRadius: '8px',
-                                    border: 'none',
-                                    cursor: 'pointer',
-                                    textTransform: 'uppercase',
-                                    letterSpacing: '0.5px',
-                                    transition: 'background-color 0.2s',
-                                  }}
-                                  onMouseEnter={(e) => e.target.style.backgroundColor = '#154a8f'}
-                                  onMouseLeave={(e) => e.target.style.backgroundColor = '#1E62B8'}
-                                  >
-                                    Guardar Canvis
-                                  </button>
-                                  <button style={{
-                                    flex: 1,
-                                    backgroundColor: 'transparent',
-                                    color: '#1E62B8',
-                                    fontFamily: 'Oswald, sans-serif',
-                                    fontSize: '18px',
-                                    fontWeight: 600,
-                                    padding: '16px 32px',
-                                    borderRadius: '8px',
-                                    border: '2px solid #1E62B8',
-                                    cursor: 'pointer',
-                                    textTransform: 'uppercase',
-                                    letterSpacing: '0.5px',
-                                    transition: 'all 0.2s',
-                                  }}
-                                  onMouseEnter={(e) => {
-                                    e.target.style.backgroundColor = '#1E62B8';
-                                    e.target.style.color = 'white';
-                                  }}
-                                  onMouseLeave={(e) => {
-                                    e.target.style.backgroundColor = 'transparent';
-                                    e.target.style.color = '#1E62B8';
-                                  }}
-                                  >
-                                    Cancel·lar
-                                  </button>
-                                </div>
-                              </div>}
-
-                              {/* Espai buit al bottom */}
-                              <div style={{ 
-                                position: 'absolute',
-                                bottom: '0',
-                                left: '0',
-                                right: '0',
-                                height: '33px',
-                                zIndex: 9999,
-                                backgroundColor: 'red',
-                                border: '5px solid yellow'
-                              }} />
-                            </>
+                            {/* PAUTA-VERDA - Línies horitzontals */}
+                            <div style={{
+                              position: 'absolute',
+                              top: '0',
+                              left: '0',
+                              right: '0',
+                              bottom: '0',
+                              backgroundImage: 'url(/tmp/USER/PAUTA-VERDA.svg)',
+                              backgroundRepeat: 'no-repeat',
+                              backgroundPosition: '280.5px 1px',
+                              backgroundSize: '1365.46px 737.015px',
+                              opacity: 0.3,
+                              zIndex: 9999,
+                              pointerEvents: 'none',
+                            }} />
                           </div>
+                        )}
                       </div>
 
                       <div style={{ 
