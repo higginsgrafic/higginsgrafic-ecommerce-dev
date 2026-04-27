@@ -6119,179 +6119,10 @@ export default function FullWideSlideDemoHeader({
                         display: 'flex',
                         flexDirection: 'column',
                       }}>
-                        {/* ZONA 1: Slide - Resum del compte amb 4 columnes */}
-                        <div style={{ 
-                          width: '100%',
-                          height: '100%',
-                          backgroundColor: '#ADD8E6',
-                          flexShrink: 0,
-                          padding: '0',
-                          display: 'grid',
-                          gridTemplateColumns: 'repeat(4, 1fr)',
-                          gap: '2px',
-                          alignItems: 'stretch',
-                          border: '1px solid #999',
-                        }}>
-                          {/* Columna 1: Avatar i nom */}
-                          <div style={{
-                            backgroundColor: 'white',
-                            padding: '20px',
-                            display: 'flex',
-                            flexDirection: 'column',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            gap: '12px',
-                          }}>
-                            <div style={{
-                              width: '80px',
-                              height: '80px',
-                              borderRadius: '50%',
-                              backgroundColor: '#1E62B8',
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                              fontSize: '32px',
-                              fontWeight: 700,
-                              color: 'white',
-                              fontFamily: 'Oswald, sans-serif',
-                            }}>
-                              JG
-                            </div>
-                            <div style={{ textAlign: 'center' }}>
-                              <div style={{
-                                fontFamily: 'Roboto Condensed, sans-serif',
-                                fontSize: '15pt',
-                                fontWeight: 500,
-                                color: '#000',
-                                marginBottom: '4px',
-                              }}>
-                                Joan Garcia
-                              </div>
-                              <div style={{
-                                fontFamily: 'Roboto Condensed, sans-serif',
-                                fontSize: '12pt',
-                                fontWeight: 300,
-                                color: '#666',
-                              }}>
-                                joan.garcia@example.com
-                              </div>
-                            </div>
-                          </div>
-
-                          {/* Columna 2: Comandes */}
-                          <div style={{
-                            backgroundColor: 'white',
-                            padding: '20px',
-                            display: 'flex',
-                            flexDirection: 'column',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                          }}>
-                            <div style={{
-                              fontFamily: 'Roboto Condensed, sans-serif',
-                              fontSize: '15pt',
-                              fontWeight: 500,
-                              color: '#1E62B8',
-                              lineHeight: 1,
-                              marginBottom: '8px',
-                            }}>
-                              12
-                            </div>
-                            <div style={{
-                              fontFamily: 'Roboto Condensed, sans-serif',
-                              fontSize: '12pt',
-                              fontWeight: 300,
-                              color: '#666',
-                            }}>
-                              Comandes
-                            </div>
-                          </div>
-
-                          {/* Columna 3: Favorits */}
-                          <div style={{
-                            backgroundColor: 'white',
-                            padding: '20px',
-                            display: 'flex',
-                            flexDirection: 'column',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                          }}>
-                            <div style={{
-                              fontFamily: 'Roboto Condensed, sans-serif',
-                              fontSize: '15pt',
-                              fontWeight: 500,
-                              color: '#1E62B8',
-                              lineHeight: 1,
-                              marginBottom: '8px',
-                            }}>
-                              3
-                            </div>
-                            <div style={{
-                              fontFamily: 'Roboto Condensed, sans-serif',
-                              fontSize: '12pt',
-                              fontWeight: 300,
-                              color: '#666',
-                            }}>
-                              Favorits
-                            </div>
-                          </div>
-
-                          {/* Columna 4: Estat VIP i botó */}
-                          <div style={{
-                            backgroundColor: 'white',
-                            padding: '20px',
-                            display: 'flex',
-                            flexDirection: 'column',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            gap: '16px',
-                          }}>
-                            <div style={{ textAlign: 'center' }}>
-                              <div style={{
-                                fontFamily: 'Roboto Condensed, sans-serif',
-                                fontSize: '15pt',
-                                fontWeight: 500,
-                                color: '#1E62B8',
-                                lineHeight: 1,
-                                marginBottom: '8px',
-                              }}>
-                                VIP
-                              </div>
-                              <div style={{
-                                fontFamily: 'Roboto Condensed, sans-serif',
-                                fontSize: '12pt',
-                                fontWeight: 300,
-                                color: '#666',
-                              }}>
-                                Estat
-                              </div>
-                            </div>
-                            <button
-                              onClick={() => setAcordioExpandedPage4(true)}
-                              style={{
-                                width: '100%',
-                                backgroundColor: '#000',
-                                color: 'white',
-                                fontFamily: 'Roboto Condensed, sans-serif',
-                                fontSize: '12pt',
-                                fontWeight: 400,
-                                padding: '10px 16px',
-                                borderRadius: '0',
-                                border: 'none',
-                                cursor: 'pointer',
-                                transition: 'background-color 0.2s',
-                              }}
-                              onMouseEnter={(e) => e.target.style.backgroundColor = '#333'}
-                              onMouseLeave={(e) => e.target.style.backgroundColor = '#000'}
-                            >
-                              Editar
-                            </button>
-                          </div>
-                        </div>
+                        {/* ZONA 1: Slide - Àrea buida per construir */}
 
                         {/* Contingut de l'acordió - Overlay absolut full-width */}
-                        {acordioExpandedPage4 && (
-                          <div style={{
+                        <div style={{
                             position: 'absolute',
                             top: '100%',
                             left: '50%',
@@ -6301,7 +6132,7 @@ export default function FullWideSlideDemoHeader({
                             backgroundColor: 'white',
                             backgroundImage: `url(/tmp/USER/PAUTA.jpg?v=${Date.now()})`,
                             backgroundRepeat: 'no-repeat',
-                            backgroundPosition: 'calc(50% - 8.5px) -662.5px',
+                            backgroundPosition: 'calc(50% - 8.5px) -596.5px',
                             backgroundSize: '2038px 1527px',
                             paddingTop: '66px',
                             paddingBottom: '0',
@@ -6324,10 +6155,10 @@ export default function FullWideSlideDemoHeader({
                                   bottom: '0',
                                   backgroundImage: 'url(/tmp/USER/PAUTA-VERDA.svg)',
                                   backgroundRepeat: 'no-repeat',
-                                  backgroundPosition: '280.5px 0px',
+                                  backgroundPosition: '280.5px 65.5px',
                                   backgroundSize: '1365.46px 737.015px',
                                   opacity: 0.3,
-                                  zIndex: -1,
+                                  zIndex: 9999,
                                   pointerEvents: 'none',
                                 }} />
 
@@ -6467,7 +6298,6 @@ export default function FullWideSlideDemoHeader({
                               }} />
                             </>
                           </div>
-                        )}
                       </div>
 
                       <div style={{ 
