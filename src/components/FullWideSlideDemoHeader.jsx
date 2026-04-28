@@ -2575,6 +2575,7 @@ function MegaColumn({
 function UserComandesContent() {
   const [activeTab, setActiveTab] = React.useState('COMANDES');
   const [sortDirs, setSortDirs] = React.useState({ 'NOMBRE': 'desc', 'ESTAT': 'desc', 'DATA': 'desc', 'TOT PLEGAT': 'desc' });
+  const [contactMode, setContactMode] = React.useState('comanda'); // 'comanda' | 'correu'
   const toggleSort = (key) => setSortDirs((prev) => ({ ...prev, [key]: prev[key] === 'desc' ? 'asc' : 'desc' }));
   const ORDERS = [
     { num: '#00000000000000000000027', status: 'PENDENT', icon: MoreHorizontal, date: '27-04-26', total: '15,50€', active: true },
@@ -2591,6 +2592,7 @@ function UserComandesContent() {
     { num: '#00000000000000000000016', status: 'ATURADA', icon: AlertCircle, date: '23-04-26', total: '15,50€', active: false },
     { num: '#00000000000000000000015', status: 'ENTREGADA', icon: Package, date: '23-04-26', total: '15,50€', active: false },
     { num: '#00000000000000000000014', status: 'ENTREGADA', icon: Package, date: '23-04-26', total: '15,50€', active: false },
+    { num: '#00000000000000000000013', status: 'ENTREGADA', icon: Package, date: '23-04-26', total: '15,50€', active: false },
   ];
 
   const LEGEND = [
@@ -2611,8 +2613,8 @@ function UserComandesContent() {
   // Graella de 5 columnes irregulars amb gutter de 7.5px (mesurades del mockup)
   const COL_TEMPLATE = '374px 299px 186px 188px 288px';
   const GUTTER = '7.5px';
-  // Les 1.5 primeres línies de la pauta són espai en blanc (les tabs pugen una fila)
-  const TOP_OFFSET = 1.5 * ROW_H; // 49.2px
+  // Les 1.5 primeres línies de la pauta són espai en blanc (tabs a la posició original)
+  const TOP_OFFSET = 1.5 * ROW_H;
 
   return (
     <div style={{
@@ -2627,6 +2629,22 @@ function UserComandesContent() {
       zIndex: 1,
       ...TEXT,
     }}>
+      {/* Mockup JPG guia (només visible fora de COMANDES) */}
+      {activeTab !== 'COMANDES' && (
+        <div style={{
+          position: 'absolute',
+          top: '-1px',
+          left: '-280.5px',
+          width: '100vw',
+          height: '100vh',
+          backgroundImage: `url("/tmp/USER/MISSATGES%20(AMB).jpg?v=${Date.now()}")`,
+          backgroundRepeat: 'no-repeat',
+          backgroundPosition: 'calc(50% - 7.5px) -663px',
+          backgroundSize: '2038px 1527px',
+          pointerEvents: 'none',
+          zIndex: -2,
+        }} />
+      )}
       {/* 1. TABS — alineades amb els rectangles grisos del slide (1320px = 1400-2*40) */}
       <div style={{
         display: 'grid',
@@ -2672,19 +2690,332 @@ function UserComandesContent() {
         })}
       </div>
 
-      {/* Espai d'una fila entre tabs i secció */}
+      {/* Espai d'una fila entre tabs i secció (el conjunt taula/U-box puja una fila) */}
       <div style={{ height: `${ROW_H}px` }} />
 
+      {(activeTab === 'COMPTE' || activeTab === 'SEGURETAT') && (<>
+        <div style={{
+          width: '1320px',
+          marginLeft: 'auto',
+          marginRight: 'auto',
+          height: `${16 * ROW_H}px`,
+          borderTop: '1px solid #98A2B4',
+          borderLeft: '1px solid #98A2B4',
+          borderRight: '1px solid #98A2B4',
+          borderTopLeftRadius: '3px',
+          borderTopRightRadius: '3px',
+          boxSizing: 'border-box',
+        }} />
+
+        {/* Espai equivalent a llegenda + separador per mantenir alineació amb COMANDES (2 files: la U-box ja ha crescut 1) */}
+        <div style={{ height: `${2 * ROW_H}px` }} />
+        {/* Botonera central (REVERTEIX / CANCEL·LA / DESA) */}
+        <div style={{
+          width: '1320px',
+          marginLeft: 'auto',
+          marginRight: 'auto',
+          display: 'grid',
+          gridTemplateColumns: 'repeat(4, 1fr)',
+          columnGap: '7.5px',
+        }}>
+          <div style={{ height: `${ROW_H - 2}px`, backgroundColor: '#D4D7DC' }} />
+          <div style={{
+            gridColumn: '2 / span 2',
+            height: `${ROW_H - 2}px`,
+            display: 'grid',
+            gridTemplateColumns: 'repeat(3, 1fr)',
+            gap: '7.5px',
+          }}>
+            {['REVERTEIX', 'CANCEL·LA', 'DESA'].map((label) => (
+              <button key={label} style={{
+                ...HEAD,
+                fontFamily: 'Roboto Condensed, sans-serif',
+                fontSize: '11pt',
+                fontWeight: 500,
+                color: '#98A2B4',
+                backgroundColor: '#F4F6F8',
+                border: 'none',
+                borderRadius: '3px',
+                boxSizing: 'border-box',
+                cursor: 'pointer',
+                padding: 0,
+                height: '100%',
+              }}>
+                {label}
+              </button>
+            ))}
+          </div>
+          <div style={{ height: `${ROW_H - 2}px`, backgroundColor: '#D4D7DC' }} />
+        </div>
+      </>)}
+
+      {activeTab === 'MISSATGES' && (<>
+        {/* 3. Taula (còpia de COMANDES) */}
+        <style>{`
+          .missatges-table { box-sizing: border-box; }
+          .missatges-table th, .missatges-table td {
+            overflow: hidden;
+            box-sizing: border-box;
+            outline: 0.5px solid #00C2FF;
+            outline-offset: -0.5px;
+          }
+          .missatges-table th > *, .missatges-table td > * { min-width: 0; max-width: 100%; }
+          .msg-ph-wrap { position: relative; width: 100%; height: 100%; }
+          .msg-ph-wrap .msg-ph {
+            position: absolute; inset: 0;
+            display: flex; align-items: center;
+            padding: 0 10px;
+            pointer-events: none;
+            font-family: 'Roboto Condensed', sans-serif;
+            font-weight: 400;
+            font-size: 12pt;
+            line-height: 1;
+            color: #98A2B4;
+          }
+          .msg-ph-wrap .msg-ph > span { display: inline; }
+          .msg-ph-wrap .msg-ph sup {
+            font-family: 'Oswald', sans-serif;
+            font-weight: 700;
+            font-size: 0.7em;
+            vertical-align: baseline;
+            position: relative;
+            top: -0.35em;
+          }
+          .msg-ph-wrap input:focus ~ .msg-ph,
+          .msg-ph-wrap input:not(:placeholder-shown) ~ .msg-ph,
+          .msg-ph-wrap textarea:focus ~ .msg-ph,
+          .msg-ph-wrap textarea:not(:placeholder-shown) ~ .msg-ph { display: none; }
+          .msg-ph-wrap.msg-ph-top .msg-ph { align-items: flex-start; padding: 8px 10px; }
+        `}</style>
+        <div style={{ width: '1320px', marginLeft: 'auto', marginRight: 'auto', marginTop: '0.5px', overflow: 'hidden', position: 'relative', borderRadius: '3px' }}>
+          <table className="missatges-table" style={{
+            width: '1335px',
+            marginLeft: '-7.5px',
+            marginTop: '-2.8px',
+            tableLayout: 'fixed',
+            borderCollapse: 'separate',
+            borderSpacing: '7.5px 2.8px',
+          }}>
+            <colgroup>
+              <col style={{ width: '324px' }} />
+              <col style={{ width: '324.5px' }} />
+              <col style={{ width: '158.5px' }} />
+              <col style={{ width: '158.5px' }} />
+              <col style={{ width: '324.5px' }} />
+            </colgroup>
+            <thead>
+              <tr style={{ height: '30px' }}>
+                <th colSpan={5} style={{ padding: 0, height: '30px', verticalAlign: 'middle' }}>
+                  <div style={{
+                    display: 'grid',
+                    gridTemplateColumns: '324px 324.5px 1fr',
+                    columnGap: '7.5px',
+                    width: '1320px',
+                  }}>
+                    {[0, 1, 2].map((i) => {
+                      const isToggle = i === 0 || i === 1;
+                      const toggleMode = i === 0 ? 'comanda' : 'correu';
+                      const toggleLabel = i === 0 ? 'AMB COMANDA' : 'SENSE COMANDA';
+                      const isActive = isToggle && contactMode === toggleMode;
+                      return (
+                        <button
+                          key={`bot-row1-${i}`}
+                          onClick={isToggle ? () => setContactMode(toggleMode) : undefined}
+                          style={{
+                            ...HEAD,
+                            fontFamily: 'Roboto Condensed, sans-serif',
+                            fontSize: '11pt',
+                            fontWeight: 500,
+                            color: isToggle ? (isActive ? '#FFFFFF' : '#475059') : '#98A2B4',
+                            backgroundColor: isToggle ? (isActive ? '#1E62B8' : '#F4F6F8') : '#F4F6F8',
+                            border: 'none',
+                            borderRadius: '3px',
+                            boxSizing: 'border-box',
+                            cursor: isToggle ? 'pointer' : 'default',
+                            padding: 0,
+                            height: '30px',
+                            display: 'block',
+                            transition: 'background-color 0.15s, color 0.15s',
+                          }}
+                        >
+                          {isToggle ? toggleLabel : null}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {[...ORDERS, null, null].map((_, idx) => {
+                const inputStyle = {
+                  ...TEXT,
+                  fontFamily: 'Roboto Condensed, sans-serif',
+                  fontSize: '11pt',
+                  color: '#475059',
+                  backgroundColor: '#F4F6F8',
+                  border: 'none',
+                  borderRadius: '3px',
+                  boxSizing: 'border-box',
+                  padding: '0 10px',
+                  width: '100%',
+                  height: '30px',
+                  display: 'block',
+                  outline: 'none',
+                };
+                if (idx === 0) {
+                  return (
+                    <tr key={idx} style={{ height: '30px' }}>
+                      <td style={{ height: '30px', padding: 0 }}>
+                        <div className="msg-ph-wrap">
+                          <input type="text" placeholder=" " style={inputStyle} />
+                          <span className="msg-ph"><span>Nom<sup>1</sup></span></span>
+                        </div>
+                      </td>
+                      <td style={{ height: '30px', padding: 0 }}>
+                        <div className="msg-ph-wrap">
+                          <input type="text" placeholder=" " style={inputStyle} />
+                          <span className="msg-ph"><span>{contactMode === 'comanda' ? <>Nombre de comanda<sup>1</sup></> : <>eCorreu<sup>1</sup></>}</span></span>
+                        </div>
+                      </td>
+                      <td style={{ height: '30px', padding: 0 }} />
+                      <td style={{ height: '30px', padding: 0 }} />
+                      <td style={{ height: '30px', padding: 0 }} />
+                    </tr>
+                  );
+                }
+                if (idx === 1) {
+                  return (
+                    <tr key={idx} style={{ height: '30px' }}>
+                      <td colSpan={2} style={{ height: '30px', padding: 0 }}>
+                        <div className="msg-ph-wrap">
+                          <input type="text" placeholder=" " style={inputStyle} />
+                          <span className="msg-ph"><span>Assumpte<sup>1</sup></span></span>
+                        </div>
+                      </td>
+                      <td style={{ height: '30px', padding: 0 }} />
+                      <td style={{ height: '30px', padding: 0 }} />
+                      <td style={{ height: '30px', padding: 0 }} />
+                    </tr>
+                  );
+                }
+                // Files 4..(N-2): àrea de Missatge (rowSpan), cols 1+2.
+                // Última fila (N-1): reservada per a la llegenda (encara per posar).
+                const totalRows = ORDERS.length + 2; // 14 + 2 nulls = 16
+                const lastIdx = totalRows - 1;
+                const messageStart = 2;
+                const messageEnd = lastIdx - 1; // fila just abans de la llegenda
+                const messageRowSpan = messageEnd - messageStart + 1;
+                if (idx === messageStart) {
+                  return (
+                    <tr key={idx} style={{ height: '30px' }}>
+                      <td colSpan={2} rowSpan={messageRowSpan} style={{ height: `${messageRowSpan * 30 + (messageRowSpan - 1) * 2.8}px`, padding: 0, verticalAlign: 'top' }}>
+                        <div className="msg-ph-wrap msg-ph-top">
+                          <textarea placeholder=" " style={{
+                            ...inputStyle,
+                            backgroundColor: 'transparent',
+                            height: '100%',
+                            padding: '8px 10px',
+                            resize: 'none',
+                            lineHeight: 1.3,
+                          }} />
+                          <span className="msg-ph"><span>Missatge<sup>1</sup></span></span>
+                        </div>
+                      </td>
+                      <td style={{ height: '30px', padding: 0 }} />
+                      <td style={{ height: '30px', padding: 0 }} />
+                      <td style={{ height: '30px', padding: 0 }} />
+                    </tr>
+                  );
+                }
+                if (idx > messageStart && idx <= messageEnd) {
+                  return (
+                    <tr key={idx} style={{ height: '30px' }}>
+                      <td style={{ height: '30px', padding: 0 }} />
+                      <td style={{ height: '30px', padding: 0 }} />
+                      <td style={{ height: '30px', padding: 0 }} />
+                    </tr>
+                  );
+                }
+                if (idx === lastIdx) {
+                  return (
+                    <tr key={idx} style={{ height: '30px' }}>
+                      <td colSpan={2} style={{ height: '30px', padding: 0 }}>
+                        <div style={{
+                          width: '100%',
+                          height: '100%',
+                          boxSizing: 'border-box',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          padding: '0 10px',
+                          fontFamily: 'Oswald, sans-serif',
+                          fontWeight: 300,
+                          fontSize: '7.5pt',
+                          lineHeight: 1,
+                          color: '#474F58',
+                          whiteSpace: 'nowrap',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                        }}>
+                          <span><sup style={{ fontFamily: 'Oswald, sans-serif', fontWeight: 700, fontSize: '0.7em', verticalAlign: 'baseline', position: 'relative', top: '-0.35em' }}>1</sup>Dades obligatòries per a la comunicació.</span>
+                        </div>
+                      </td>
+                      <td style={{ height: '30px', padding: 0 }} />
+                      <td style={{ height: '30px', padding: 0 }} />
+                      <td style={{ height: '30px', padding: 0 }} />
+                    </tr>
+                  );
+                }
+                return (
+                  <tr key={idx} style={{ height: '30px' }}>
+                    <td style={{ height: '30px', padding: 0 }} />
+                    <td style={{ height: '30px', padding: 0 }} />
+                    <td style={{ height: '30px', padding: 0 }} />
+                    <td style={{ height: '30px', padding: 0 }} />
+                    <td style={{ height: '30px', padding: 0 }} />
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+
+        {/* Botonera de 4 botons iguals */}
+        <div style={{
+          width: '1320px',
+          marginLeft: 'auto',
+          marginRight: 'auto',
+          display: 'grid',
+          gridTemplateColumns: 'repeat(4, 1fr)',
+          columnGap: '7.5px',
+        }}>
+          {[0, 1, 2, 3].map((i) => (
+            <button key={`bot-${i}`} style={{
+              ...HEAD,
+              fontFamily: 'Roboto Condensed, sans-serif',
+              fontSize: '11pt',
+              fontWeight: 500,
+              color: '#98A2B4',
+              backgroundColor: '#F4F6F8',
+              border: 'none',
+              borderRadius: '3px',
+              boxSizing: 'border-box',
+              cursor: 'pointer',
+              padding: 0,
+              height: `${ROW_H - 2}px`,
+              visibility: i >= 2 ? 'hidden' : 'visible',
+            }} />
+          ))}
+        </div>
+      </>)}
+
       {activeTab === 'COMANDES' && (<>
-      {/* 2. Capçalera de secció (títols amagats) */}
-      <div style={{ height: `${ROW_H}px` }} />
 
       {/* 3. Taula */}
       <style>{`
         .comandes-table { box-sizing: border-box; }
         .comandes-table th, .comandes-table td {
-          outline: 1px dashed rgba(0,0,0,0.06);
-          outline-offset: -1px;
           overflow: hidden;
           box-sizing: border-box;
         }
@@ -2785,102 +3116,6 @@ function UserComandesContent() {
         </table>
       </div>
 
-      {/* Espai d'una fila abans de la llegenda */}
-      <div style={{ height: `${ROW_H}px` }} />
-
-      {/* 4. Llegenda — ancorada a la dreta de la botonera central, expandible cap a l'esquerra */}
-      <div style={{ width: '1320px', marginLeft: 'auto', marginRight: 'auto' }}>
-      <div style={{
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        height: `${ROW_H}px`,
-        width: '659.25px',
-        marginLeft: 'auto',
-        marginRight: '331.875px',
-        padding: 0,
-      }}>
-        {LEGEND.map(({ label, icon: Icon }) => (
-          <div key={label} style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '6px',
-            ...HEAD,
-            fontFamily: 'Oswald, sans-serif',
-            fontSize: '7.5pt',
-            fontWeight: 300,
-            letterSpacing: '0em',
-            color: '#475059',
-            whiteSpace: 'nowrap',
-          }}>
-            <Icon size={12} strokeWidth={2} style={{ color: '#1E62B8' }} />
-            <span>{label}</span>
-          </div>
-        ))}
-      </div>
-      </div>
-
-      {/* 5. Botons d'acció — fila duplicada (només cel·les del mig) + 4 rectangles estil slide */}
-      <div style={{
-        width: '1320px',
-        marginLeft: 'auto',
-        marginRight: 'auto',
-        display: 'grid',
-        gridTemplateColumns: 'repeat(4, 1fr)',
-        columnGap: '7.5px',
-        rowGap: '2.8px',
-      }}>
-        {/* Fila superior: lateral esq + rectangle del mig fusionat (cols 2-3) + lateral dret */}
-        <div style={{
-          height: `${ROW_H - 2}px`,
-          backgroundColor: '#D4D7DC',
-          border: 'none',
-          boxSizing: 'border-box',
-          visibility: 'hidden',
-        }} />
-        <div style={{
-          gridColumn: '2 / span 2',
-          height: `${ROW_H - 2}px`,
-          display: 'grid',
-          gridTemplateColumns: 'repeat(3, 1fr)',
-          gap: '7.5px',
-        }}>
-          {['REVERTEIX', 'CANCEL·LA', 'DESA'].map((label) => (
-            <button key={label} style={{
-              ...HEAD,
-              fontFamily: 'Roboto Condensed, sans-serif',
-              fontSize: '11pt',
-              fontWeight: 500,
-              color: '#98A2B4',
-              backgroundColor: '#F4F6F8',
-              border: 'none',
-              boxSizing: 'border-box',
-              cursor: 'pointer',
-              padding: 0,
-              height: '100%',
-            }}>
-              {label}
-            </button>
-          ))}
-        </div>
-        <div style={{
-          height: `${ROW_H - 2}px`,
-          backgroundColor: '#D4D7DC',
-          border: 'none',
-          boxSizing: 'border-box',
-          visibility: 'hidden',
-        }} />
-        {/* Fila inferior: amagada en aquesta pàgina (només botons centrals) */}
-        {[0, 1, 2, 3].map((i) => (
-          <div key={`bot-${i}`} style={{
-            height: `${ROW_H}px`,
-            backgroundColor: '#D4D7DC',
-            border: 'none',
-            boxSizing: 'border-box',
-            visibility: 'hidden',
-          }} />
-        ))}
-      </div>
       </>)}
 
       {activeTab !== 'COMANDES' && (
@@ -2894,8 +3129,10 @@ function UserComandesContent() {
           backgroundRepeat: 'no-repeat',
           backgroundPosition: '0 -1px',
           backgroundSize: '1365.46px 737.015px',
-          opacity: 0.15,
+          opacity: 0.05,
+          filter: 'hue-rotate(-120deg) saturate(3)',
           pointerEvents: 'none',
+          zIndex: -1,
         }} />
       )}
     </div>
@@ -6474,7 +6711,7 @@ export default function FullWideSlideDemoHeader({
                           transform: 'translateX(-50%)',
                           width: '100vw',
                           height: '100%',
-                          backgroundImage: `url(/tmp/USER/COMANDES.jpg?v=${Date.now()})`,
+                          backgroundImage: `url("/tmp/USER/MISSATGES%20(AMB).jpg?v=${Date.now()}")`,
                           backgroundRepeat: 'no-repeat',
                           backgroundPosition: 'calc(50% - 8.5px) -596.5px',
                           backgroundSize: '2038px 1527px',
@@ -6502,7 +6739,7 @@ export default function FullWideSlideDemoHeader({
                               justifyContent: 'center',
                               fontFamily: 'Oswald, sans-serif',
                               fontWeight: 400,
-                              fontSize: '25pt',
+                              fontSize: '15pt',
                               color: '#fff',
                             }}>
                               {label}
@@ -6533,7 +6770,7 @@ export default function FullWideSlideDemoHeader({
                               height: '737.015px',
                               overflow: 'hidden',
                             }}>
-                              {/* Mockup JPG (renderitzat com si estigués a tot l'acordió, retallat als límits de la pauta) */}
+                              {/* Mockup JPG: ara es renderitza dins de UserComandesContent perquè depén de la pestanya activa */}
                               <div style={{
                                 display: 'none',
                                 position: 'absolute',
@@ -6541,7 +6778,7 @@ export default function FullWideSlideDemoHeader({
                                 left: '-280.5px',
                                 width: '100vw',
                                 height: '100vh',
-                                backgroundImage: `url(/tmp/USER/COMANDES.jpg?v=${Date.now()})`,
+                                backgroundImage: `url("/tmp/USER/MISSATGES%20(AMB).jpg?v=${Date.now()}")`,
                                 backgroundRepeat: 'no-repeat',
                                 backgroundPosition: 'calc(50% - 8.5px) -661.5px',
                                 backgroundSize: '2038px 1527px',
