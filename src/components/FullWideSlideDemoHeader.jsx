@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import * as ReactDOM from 'react-dom';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { ChevronDown, ChevronLeft, ChevronRight, Menu, UserRound, X } from 'lucide-react';
+import { ChevronDown, ChevronLeft, ChevronRight, Menu, UserRound, X, Check, Clock, Package, Truck, Search, AlertCircle, MoreHorizontal, Loader2 } from 'lucide-react';
 import { useProductContext } from '@/contexts/ProductContext';
 import { getGildan5000Catalog } from '../utils/placeholders.js';
 import {
@@ -2566,6 +2566,337 @@ function MegaColumn({
             </Link>
           ))}
         </div>
+      )}
+    </div>
+  );
+}
+
+// Plantilla de la secció COMANDES del perfil d'usuari — alineada amb la pauta verda
+function UserComandesContent() {
+  const [activeTab, setActiveTab] = React.useState('COMANDES');
+  const [sortDirs, setSortDirs] = React.useState({ 'NOMBRE': 'desc', 'ESTAT': 'desc', 'DATA': 'desc', 'TOT PLEGAT': 'desc' });
+  const toggleSort = (key) => setSortDirs((prev) => ({ ...prev, [key]: prev[key] === 'desc' ? 'asc' : 'desc' }));
+  const ORDERS = [
+    { num: '#00000000000000000000027', status: 'PENDENT', icon: MoreHorizontal, date: '27-04-26', total: '15,50€', active: true },
+    { num: '#00000000000000000000026', status: 'EN PREPARACIÓ', icon: Loader2, date: '27-04-26', total: '15,50€', active: true },
+    { num: '#00000000000000000000025', status: 'SEGUIMENT', icon: Search, date: '27-04-26', total: '15,50€', active: true },
+    { num: '#00000000000000000000024', status: 'CONFIRMADA', icon: Check, date: '23-04-26', total: '15,50€', active: true },
+    { num: '#00000000000000000000023', status: 'PENDENT', icon: MoreHorizontal, date: '23-04-26', total: '15,50€', active: true },
+    { num: '#00000000000000000000022', status: 'EN REPARTIMENT', icon: Truck, date: '23-04-26', total: '15,50€', active: true },
+    { num: '#00000000000000000000021', status: 'ENTREGADA', icon: Package, date: '23-04-26', total: '15,50€', active: true },
+    { num: '#00000000000000000000020', status: 'CANCEL·LADA', icon: X, date: '23-04-26', total: '15,50€', active: false },
+    { num: '#00000000000000000000019', status: 'ENTREGADA', icon: Package, date: '23-04-26', total: '15,50€', active: false },
+    { num: '#00000000000000000000018', status: 'ENTREGADA', icon: Package, date: '23-04-26', total: '15,50€', active: false },
+    { num: '#00000000000000000000017', status: 'CANCEL·LADA', icon: X, date: '23-04-26', total: '15,50€', active: false },
+    { num: '#00000000000000000000016', status: 'ATURADA', icon: AlertCircle, date: '23-04-26', total: '15,50€', active: false },
+    { num: '#00000000000000000000015', status: 'ENTREGADA', icon: Package, date: '23-04-26', total: '15,50€', active: false },
+    { num: '#00000000000000000000014', status: 'ENTREGADA', icon: Package, date: '23-04-26', total: '15,50€', active: false },
+  ];
+
+  const LEGEND = [
+    { label: 'PENDENT', icon: MoreHorizontal },
+    { label: 'CONFIRMADA', icon: Check },
+    { label: 'EN PREPARACIÓ', icon: Loader2 },
+    { label: 'SEGUIMENT', icon: Search },
+    { label: 'EN REPARTIMENT', icon: Truck },
+    { label: 'ATURADA', icon: AlertCircle },
+    { label: 'CANCEL·LADA', icon: X },
+    { label: 'ENTREGADA', icon: Package },
+  ];
+
+  const ROW_H = 32.8;
+  const TEXT = { fontFamily: 'Roboto Condensed, sans-serif', fontWeight: 400, fontSize: '12pt', color: '#475059' };
+  const HEAD = { fontFamily: 'Oswald, sans-serif', fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.4px', color: '#475059' };
+
+  // Graella de 5 columnes irregulars amb gutter de 7.5px (mesurades del mockup)
+  const COL_TEMPLATE = '374px 299px 186px 188px 288px';
+  const GUTTER = '7.5px';
+  // Les 1.5 primeres línies de la pauta són espai en blanc (les tabs pugen una fila)
+  const TOP_OFFSET = 1.5 * ROW_H; // 49.2px
+
+  return (
+    <div style={{
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      width: '100%',
+      height: '100%',
+      paddingTop: `${TOP_OFFSET}px`,
+      boxSizing: 'border-box',
+      overflow: 'hidden',
+      zIndex: 1,
+      ...TEXT,
+    }}>
+      {/* 1. TABS — alineades amb els rectangles grisos del slide (1320px = 1400-2*40) */}
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(4, 1fr)',
+        columnGap: GUTTER,
+        height: `${ROW_H}px`,
+        width: '1320px',
+        marginLeft: 'auto',
+        marginRight: 'auto',
+      }}>
+        {['COMANDES', 'MISSATGES', 'COMPTE', 'SEGURETAT'].map((tab, i) => {
+          const isActive = activeTab === tab;
+          return (
+            <div
+              key={tab}
+              onClick={() => setActiveTab(tab)}
+              style={{
+              ...HEAD,
+              fontSize: isActive ? '15pt' : '12pt',
+              fontWeight: isActive ? 600 : 400,
+              letterSpacing: isActive ? '1.5px' : HEAD.letterSpacing,
+              color: isActive ? '#2F61B2' : '#475059',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              textIndent: isActive ? '1.5px' : '0.4px',
+              position: 'relative',
+              boxSizing: 'border-box',
+              cursor: 'pointer',
+              userSelect: 'none',
+            }}>
+              <span style={{ display: 'inline-block', transform: isActive ? 'translateY(1px)' : 'none' }}>{tab}</span>
+              <div style={{
+                position: 'absolute',
+                left: 0,
+                right: 0,
+                bottom: '2.5px',
+                height: isActive ? '3px' : '1px',
+                backgroundColor: isActive ? '#2F61B2' : '#7D8895',
+              }} />
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Espai d'una fila entre tabs i secció */}
+      <div style={{ height: `${ROW_H}px` }} />
+
+      {activeTab === 'COMANDES' && (<>
+      {/* 2. Capçalera de secció (títols amagats) */}
+      <div style={{ height: `${ROW_H}px` }} />
+
+      {/* 3. Taula */}
+      <style>{`
+        .comandes-table { box-sizing: border-box; }
+        .comandes-table th, .comandes-table td {
+          outline: 1px dashed rgba(0,0,0,0.06);
+          outline-offset: -1px;
+          overflow: hidden;
+          box-sizing: border-box;
+        }
+        .comandes-table th > *, .comandes-table td > * { min-width: 0; max-width: 100%; }
+      `}</style>
+      <div style={{ width: '1320px', marginLeft: 'auto', marginRight: 'auto', marginTop: '-2.5px', overflow: 'hidden', position: 'relative', borderTop: '1px solid #98A2B4', borderLeft: '1px solid #98A2B4', borderRight: '1px solid #98A2B4', borderTopLeftRadius: '3px', borderTopRightRadius: '3px' }}>
+        <table className="comandes-table" style={{
+          width: '1335px',
+          marginLeft: '-7.5px',
+          marginTop: '-2.8px',
+          tableLayout: 'fixed',
+          borderCollapse: 'separate',
+          borderSpacing: '7.5px 2.8px',
+        }}>
+        <colgroup>
+          <col style={{ width: '324px' }} />
+          <col style={{ width: '324.5px' }} />
+          <col style={{ width: '158.5px' }} />
+          <col style={{ width: '158.5px' }} />
+          <col style={{ width: '324.5px' }} />
+        </colgroup>
+        <thead>
+          <tr style={{ height: '30px' }}>
+            {['NOMBRE', 'ESTAT', 'DATA', 'TOT PLEGAT', 'EN DETALL'].map((h, i) => {
+              const sortable = h !== 'EN DETALL';
+              return (
+              <th
+                key={h}
+                onClick={sortable ? () => toggleSort(h) : undefined}
+                onMouseEnter={sortable ? (e) => { e.currentTarget.style.backgroundColor = '#EEF1F5'; } : undefined}
+                onMouseLeave={sortable ? (e) => { e.currentTarget.style.backgroundColor = 'transparent'; } : undefined}
+                style={{
+                  ...HEAD,
+                  fontSize: '11pt',
+                  height: '30px',
+                  textAlign: 'center',
+                  verticalAlign: 'middle',
+                  textIndent: '0.4px',
+                  borderBottom: '1px solid #ccc',
+                  padding: 0,
+                  fontWeight: 500,
+                  position: 'relative',
+                  cursor: sortable ? 'pointer' : 'default',
+                  userSelect: 'none',
+                  transition: 'background-color 120ms ease',
+                }}
+              >
+                {h}
+                {sortable && (
+                  <span style={{ position: 'absolute', right: '1em', top: '50%', transform: 'translateY(-50%)', fontSize: '11pt', color: '#7D8895', lineHeight: 1, pointerEvents: 'none' }}>
+                    {sortDirs[h] === 'asc' ? '▲' : '▼'}
+                  </span>
+                )}
+              </th>
+              );
+            })}
+          </tr>
+        </thead>
+        <tbody>
+          {ORDERS.map((o, idx) => {
+            const Icon = o.icon;
+            const isStruck = o.status === 'CANCEL·LADA' || o.status === 'ATURADA';
+            const opacity = o.active ? 1 : (isStruck ? 0.7 : 0.35);
+            const rowColor = o.active ? '#2F61B2' : '#99A3B5';
+            return (
+              <React.Fragment key={idx}>
+                <tr style={{ height: '30px', ...(rowColor ? { color: rowColor } : null) }}>
+                  <td style={{ height: '30px', padding: '0 8px 0 30px', verticalAlign: 'middle', opacity }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <span style={{
+                        width: '8px',
+                        height: '8px',
+                        borderRadius: '50%',
+                        backgroundColor: rowColor,
+                        flexShrink: 0,
+                      }} />
+                      <span style={{ fontSize: '12pt', marginLeft: '23px', letterSpacing: '1px' }}>{o.num}</span>
+                    </div>
+                  </td>
+                  <td style={{ height: '30px', padding: '0 8px 0 123px', verticalAlign: 'middle', opacity, color: isStruck ? '#475059' : undefined }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <Icon size={21} strokeWidth={2} style={{ color: isStruck ? '#475059' : rowColor, position: 'relative', left: '-25px' }} />
+                      <span style={{ fontSize: '12pt' }}>{o.status}</span>
+                    </div>
+                  </td>
+                  <td style={{ height: '30px', padding: 0, textAlign: 'center', verticalAlign: 'middle', fontSize: '12pt', opacity }}>
+                    {o.date}
+                  </td>
+                  <td style={{ height: '30px', padding: 0, textAlign: 'center', verticalAlign: 'middle', fontSize: '12pt', opacity, textDecoration: isStruck ? 'line-through' : 'none', textDecorationColor: isStruck ? '#475059' : undefined, textDecorationThickness: isStruck ? '1.5px' : undefined }}>
+                    {o.total}
+                  </td>
+                  <td style={{ height: '30px', padding: 0 }} />
+                </tr>
+              </React.Fragment>
+            );
+          })}
+        </tbody>
+        </table>
+      </div>
+
+      {/* Espai d'una fila abans de la llegenda */}
+      <div style={{ height: `${ROW_H}px` }} />
+
+      {/* 4. Llegenda — ancorada a la dreta de la botonera central, expandible cap a l'esquerra */}
+      <div style={{ width: '1320px', marginLeft: 'auto', marginRight: 'auto' }}>
+      <div style={{
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        height: `${ROW_H}px`,
+        width: '659.25px',
+        marginLeft: 'auto',
+        marginRight: '331.875px',
+        padding: 0,
+      }}>
+        {LEGEND.map(({ label, icon: Icon }) => (
+          <div key={label} style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '6px',
+            ...HEAD,
+            fontFamily: 'Oswald, sans-serif',
+            fontSize: '7.5pt',
+            fontWeight: 300,
+            letterSpacing: '0em',
+            color: '#475059',
+            whiteSpace: 'nowrap',
+          }}>
+            <Icon size={12} strokeWidth={2} style={{ color: '#1E62B8' }} />
+            <span>{label}</span>
+          </div>
+        ))}
+      </div>
+      </div>
+
+      {/* 5. Botons d'acció — fila duplicada (només cel·les del mig) + 4 rectangles estil slide */}
+      <div style={{
+        width: '1320px',
+        marginLeft: 'auto',
+        marginRight: 'auto',
+        display: 'grid',
+        gridTemplateColumns: 'repeat(4, 1fr)',
+        columnGap: '7.5px',
+        rowGap: '2.8px',
+      }}>
+        {/* Fila superior: lateral esq + rectangle del mig fusionat (cols 2-3) + lateral dret */}
+        <div style={{
+          height: `${ROW_H - 2}px`,
+          backgroundColor: '#D4D7DC',
+          border: 'none',
+          boxSizing: 'border-box',
+          visibility: 'hidden',
+        }} />
+        <div style={{
+          gridColumn: '2 / span 2',
+          height: `${ROW_H - 2}px`,
+          display: 'grid',
+          gridTemplateColumns: 'repeat(3, 1fr)',
+          gap: '7.5px',
+        }}>
+          {['REVERTEIX', 'CANCEL·LA', 'DESA'].map((label) => (
+            <button key={label} style={{
+              ...HEAD,
+              fontFamily: 'Roboto Condensed, sans-serif',
+              fontSize: '11pt',
+              fontWeight: 500,
+              color: '#98A2B4',
+              backgroundColor: '#F4F6F8',
+              border: 'none',
+              boxSizing: 'border-box',
+              cursor: 'pointer',
+              padding: 0,
+              height: '100%',
+            }}>
+              {label}
+            </button>
+          ))}
+        </div>
+        <div style={{
+          height: `${ROW_H - 2}px`,
+          backgroundColor: '#D4D7DC',
+          border: 'none',
+          boxSizing: 'border-box',
+          visibility: 'hidden',
+        }} />
+        {/* Fila inferior: amagada en aquesta pàgina (només botons centrals) */}
+        {[0, 1, 2, 3].map((i) => (
+          <div key={`bot-${i}`} style={{
+            height: `${ROW_H}px`,
+            backgroundColor: '#D4D7DC',
+            border: 'none',
+            boxSizing: 'border-box',
+            visibility: 'hidden',
+          }} />
+        ))}
+      </div>
+      </>)}
+
+      {activeTab !== 'COMANDES' && (
+        <div style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundImage: 'url(/tmp/USER/PAUTA-VERDA.svg)',
+          backgroundRepeat: 'no-repeat',
+          backgroundPosition: '0 -1px',
+          backgroundSize: '1365.46px 737.015px',
+          opacity: 0.15,
+          pointerEvents: 'none',
+        }} />
       )}
     </div>
   );
@@ -6005,7 +6336,7 @@ export default function FullWideSlideDemoHeader({
                               backgroundRepeat: 'no-repeat',
                               backgroundPosition: '280.5px 1px',
                               backgroundSize: '1365.46px 737.015px',
-                              opacity: 0.3,
+                              opacity: 0.1,
                               zIndex: 9999,
                               pointerEvents: 'none',
                             }} />
@@ -6136,6 +6467,7 @@ export default function FullWideSlideDemoHeader({
                       }}>
                         {/* Background PAUTA.jpg - darrere dels rectangles */}
                         <div style={{
+                          display: 'none',
                           position: 'absolute',
                           top: '0',
                           left: '50%',
@@ -6164,7 +6496,7 @@ export default function FullWideSlideDemoHeader({
                           {['COMANDES', 'MISSATGES', 'COMPTE', 'SEGURETAT'].map((label) => (
                             <div key={label} style={{
                               backgroundColor: '#D4D7DC',
-                              border: '1px solid #999',
+                              border: 'none',
                               display: 'flex',
                               alignItems: 'center',
                               justifyContent: 'center',
@@ -6188,29 +6520,51 @@ export default function FullWideSlideDemoHeader({
                             width: '100vw',
                             minHeight: '100vh',
                             backgroundColor: 'white',
-                            backgroundImage: `url(/tmp/USER/COMANDES.jpg?v=${Date.now()})`,
-                            backgroundRepeat: 'no-repeat',
-                            backgroundPosition: 'calc(50% - 8.5px) -662.5px',
-                            backgroundSize: '2038px 1527px',
                             paddingTop: '40px',
                             paddingBottom: '40px',
                             zIndex: 10,
                           }}>
-                            {/* PAUTA-VERDA - Línies horitzontals */}
+                            {/* Zona de la pauta — tot el contingut queda clippat als límits */}
                             <div style={{
                               position: 'absolute',
-                              top: '0',
-                              left: '0',
-                              right: '0',
-                              bottom: '0',
-                              backgroundImage: 'url(/tmp/USER/PAUTA-VERDA.svg)',
-                              backgroundRepeat: 'no-repeat',
-                              backgroundPosition: '280.5px 1px',
-                              backgroundSize: '1365.46px 737.015px',
-                              opacity: 0.3,
-                              zIndex: 9999,
-                              pointerEvents: 'none',
-                            }} />
+                              top: '1px',
+                              left: '280.5px',
+                              width: '1365.46px',
+                              height: '737.015px',
+                              overflow: 'hidden',
+                            }}>
+                              {/* Mockup JPG (renderitzat com si estigués a tot l'acordió, retallat als límits de la pauta) */}
+                              <div style={{
+                                display: 'none',
+                                position: 'absolute',
+                                top: '-1px',
+                                left: '-280.5px',
+                                width: '100vw',
+                                height: '100vh',
+                                backgroundImage: `url(/tmp/USER/COMANDES.jpg?v=${Date.now()})`,
+                                backgroundRepeat: 'no-repeat',
+                                backgroundPosition: 'calc(50% - 8.5px) -661.5px',
+                                backgroundSize: '2038px 1527px',
+                                pointerEvents: 'none',
+                              }} />
+
+                              {/* Contingut alineat amb la pauta */}
+                              <UserComandesContent />
+
+                              {/* PAUTA-VERDA - Línies horitzontals (referència) */}
+                              <div style={{
+                                display: 'none',
+                                position: 'absolute',
+                                inset: 0,
+                                backgroundImage: 'url(/tmp/USER/PAUTA-VERDA.svg)',
+                                backgroundRepeat: 'no-repeat',
+                                backgroundPosition: '0 -1px',
+                                backgroundSize: '1365.46px 737.015px',
+                                opacity: 0.1,
+                                zIndex: 9999,
+                                pointerEvents: 'none',
+                              }} />
+                            </div>
                           </div>
                         )}
                       </div>
