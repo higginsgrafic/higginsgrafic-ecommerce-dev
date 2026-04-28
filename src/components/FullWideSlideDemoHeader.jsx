@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import * as ReactDOM from 'react-dom';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { ChevronDown, ChevronLeft, ChevronRight, Menu, UserRound, X, Check, Clock, Package, Truck, Search, AlertCircle, MoreHorizontal, Loader2 } from 'lucide-react';
+import { ChevronDown, ChevronLeft, ChevronRight, ChevronUp, Menu, UserRound, X, Check, Clock, Package, Truck, Search, AlertCircle, MoreHorizontal, Loader2 } from 'lucide-react';
 import { useProductContext } from '@/contexts/ProductContext';
 import { getGildan5000Catalog } from '../utils/placeholders.js';
 import {
@@ -2571,11 +2571,42 @@ function MegaColumn({
   );
 }
 
+// Persisteix valors a sessionStorage amb TTL (per defecte 10s). En remuntar, si el TTL no
+// ha expirat des de la darrera interacció, es restaura el valor; si no, s'usa l'inicial.
+function usePersistentState(key, initial, ttlMs = 10000) {
+  const read = () => {
+    try {
+      if (typeof window === 'undefined') return initial;
+      const raw = window.sessionStorage.getItem(key);
+      if (!raw) return initial;
+      const parsed = JSON.parse(raw);
+      if (!parsed || typeof parsed !== 'object') return initial;
+      if (typeof parsed.expiresAt === 'number' && Date.now() > parsed.expiresAt) {
+        window.sessionStorage.removeItem(key);
+        return initial;
+      }
+      return parsed.value;
+    } catch {
+      return initial;
+    }
+  };
+  const [state, setState] = React.useState(read);
+  React.useEffect(() => {
+    try {
+      if (typeof window === 'undefined') return;
+      window.sessionStorage.setItem(key, JSON.stringify({ value: state, expiresAt: Date.now() + ttlMs }));
+    } catch {}
+  }, [key, state, ttlMs]);
+  return [state, setState];
+}
+
 // Plantilla de la secció COMANDES del perfil d'usuari — alineada amb la pauta verda
 function UserComandesContent() {
-  const [activeTab, setActiveTab] = React.useState('COMANDES');
-  const [sortDirs, setSortDirs] = React.useState({ 'NOMBRE': 'desc', 'ESTAT': 'desc', 'DATA': 'desc', 'TOT PLEGAT': 'desc' });
-  const [contactMode, setContactMode] = React.useState('comanda'); // 'comanda' | 'correu'
+  const [activeTab, setActiveTab] = usePersistentState('HG_USER_ACTIVE_TAB', 'COMANDES');
+  const [sortDirs, setSortDirs] = usePersistentState('HG_USER_SORT_DIRS', { 'NOMBRE': 'desc', 'ESTAT': 'desc', 'DATA': 'desc', 'TOT PLEGAT': 'desc' });
+  const [contactMode, setContactMode] = usePersistentState('HG_USER_CONTACT_MODE', 'comanda'); // 'comanda' | 'correu'
+  const [nameSortDir, setNameSortDir] = usePersistentState('HG_USER_NAME_SORT', 'asc'); // 'asc' | 'desc'
+  const [dateSortDir, setDateSortDir] = usePersistentState('HG_USER_DATE_SORT', 'desc'); // 'asc' | 'desc'
   const toggleSort = (key) => setSortDirs((prev) => ({ ...prev, [key]: prev[key] === 'desc' ? 'asc' : 'desc' }));
   const ORDERS = [
     { num: '#00000000000000000000027', status: 'PENDENT', icon: MoreHorizontal, date: '27-04-26', total: '15,50€', active: true },
@@ -2629,8 +2660,8 @@ function UserComandesContent() {
       zIndex: 1,
       ...TEXT,
     }}>
-      {/* Mockup JPG guia (només visible fora de COMANDES) */}
-      {activeTab !== 'COMANDES' && (
+      {/* Mockup JPG guia (només visible fora de COMANDES) — desactivada */}
+      {false && activeTab !== 'COMANDES' && (
         <div style={{
           position: 'absolute',
           top: '-1px',
@@ -2756,8 +2787,16 @@ function UserComandesContent() {
           .missatges-table th, .missatges-table td {
             overflow: hidden;
             box-sizing: border-box;
-            outline: 0.5px solid #00C2FF;
-            outline-offset: -0.5px;
+            position: relative;
+          }
+          .missatges-table th::after, .missatges-table td::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border: 0.5px solid transparent;
+            box-sizing: border-box;
+            pointer-events: none;
+            z-index: 10;
           }
           .missatges-table th > *, .missatges-table td > * { min-width: 0; max-width: 100%; }
           .msg-ph-wrap { position: relative; width: 100%; height: 100%; }
@@ -2787,7 +2826,51 @@ function UserComandesContent() {
           .msg-ph-wrap textarea:not(:placeholder-shown) ~ .msg-ph { display: none; }
           .msg-ph-wrap.msg-ph-top .msg-ph { align-items: flex-start; padding: 8px 10px; }
         `}</style>
-        <div style={{ width: '1320px', marginLeft: 'auto', marginRight: 'auto', marginTop: '0.5px', overflow: 'hidden', position: 'relative', borderRadius: '3px' }}>
+        <div style={{
+          width: '1320px',
+          marginLeft: 'auto',
+          marginRight: 'auto',
+          marginTop: '-2.5px',
+          position: 'relative',
+          boxSizing: 'border-box',
+          backgroundImage: 'url("/tmp/USER/FONS%20MISSATGES.png")',
+          backgroundRepeat: 'no-repeat',
+          backgroundPosition: 'top left',
+          backgroundSize: '1320px 525.2px',
+        }}>
+          {/* Corves vermelles (fora de la taula) */}
+          <div style={{
+            position: 'absolute',
+            top: '32.8px',
+            left: '-1px',
+            width: '1px',
+            height: '492.4px',
+            backgroundColor: '#98A2B4',
+            pointerEvents: 'none',
+            zIndex: 20,
+          }} />
+          {/* Contorn dret: pota esquerra curta (30px) + top + pota dreta llarga (fins bottom textarea), cantonades sup. arrodonides — un sol traç SVG */}
+          <svg
+            width="658"
+            height="527"
+            viewBox="0 0 658 527"
+            style={{
+              position: 'absolute',
+              top: '-1px',
+              left: '662.5px',
+              pointerEvents: 'none',
+              zIndex: 20,
+              overflow: 'visible',
+            }}
+          >
+            <path
+              d="M 0.5 30.5 L 0.5 3.5 Q 0.5 0.5 3.5 0.5 L 654.5 0.5 Q 657.5 0.5 657.5 3.5 L 657.5 526.2"
+              fill="none"
+              stroke="#98A2B4"
+              strokeWidth="1"
+            />
+          </svg>
+          <div style={{ overflow: 'hidden' }}>
           <table className="missatges-table" style={{
             width: '1335px',
             marginLeft: '-7.5px',
@@ -2799,61 +2882,104 @@ function UserComandesContent() {
             <colgroup>
               <col style={{ width: '324px' }} />
               <col style={{ width: '324.5px' }} />
+              <col style={{ width: '490.5px' }} />
               <col style={{ width: '158.5px' }} />
-              <col style={{ width: '158.5px' }} />
-              <col style={{ width: '324.5px' }} />
             </colgroup>
             <thead>
               <tr style={{ height: '30px' }}>
-                <th colSpan={5} style={{ padding: 0, height: '30px', verticalAlign: 'middle' }}>
+                <th colSpan={4} style={{ padding: 0, height: '30px', verticalAlign: 'middle' }}>
                   <div style={{
                     display: 'grid',
-                    gridTemplateColumns: '324px 324.5px 1fr',
+                    gridTemplateColumns: '324px 324.5px 490.5px 158.5px',
                     columnGap: '7.5px',
                     width: '1320px',
                   }}>
-                    {[0, 1, 2].map((i) => {
-                      const isToggle = i === 0 || i === 1;
+                    {[0, 1].map((i) => {
                       const toggleMode = i === 0 ? 'comanda' : 'correu';
                       const toggleLabel = i === 0 ? 'AMB COMANDA' : 'SENSE COMANDA';
-                      const isActive = isToggle && contactMode === toggleMode;
+                      const isActive = contactMode === toggleMode;
                       return (
                         <button
                           key={`bot-row1-${i}`}
-                          onClick={isToggle ? () => setContactMode(toggleMode) : undefined}
+                          onClick={() => setContactMode(toggleMode)}
                           style={{
                             ...HEAD,
                             fontFamily: 'Roboto Condensed, sans-serif',
                             fontSize: '11pt',
-                            fontWeight: 500,
-                            color: isToggle ? (isActive ? '#FFFFFF' : '#475059') : '#98A2B4',
-                            backgroundColor: isToggle ? (isActive ? '#1E62B8' : '#F4F6F8') : '#F4F6F8',
-                            border: 'none',
+                            fontWeight: isActive ? 600 : 300,
+                            color: isActive ? '#3163B2' : '#474F58',
+                            backgroundColor: '#FFFFFF',
+                            border: isActive ? '2px solid #2F61B2' : '1px solid #989898',
                             borderRadius: '3px',
                             boxSizing: 'border-box',
-                            cursor: isToggle ? 'pointer' : 'default',
+                            cursor: 'pointer',
                             padding: 0,
                             height: '30px',
                             display: 'block',
-                            transition: 'background-color 0.15s, color 0.15s',
+                            transition: 'border-color 0.15s, border-width 0.15s, color 0.15s, font-weight 0.15s',
                           }}
                         >
-                          {isToggle ? toggleLabel : null}
+                          {toggleLabel}
                         </button>
                       );
                     })}
+                    {(() => {
+                      const sortBtn = {
+                        ...HEAD,
+                        fontFamily: 'Roboto Condensed, sans-serif',
+                        fontSize: '11pt',
+                        fontWeight: 500,
+                        color: '#475059',
+                        backgroundColor: '#FFFFFF',
+                        border: 'none',
+                        borderBottom: '2px solid #98A2B4',
+                        borderRadius: 0,
+                        boxSizing: 'border-box',
+                        cursor: 'pointer',
+                        padding: '0 10px',
+                        height: '30px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        userSelect: 'none',
+                      };
+                      return (
+                        <>
+                          <button
+                            key="bot-row1-az"
+                            onClick={() => setNameSortDir((d) => (d === 'asc' ? 'desc' : 'asc'))}
+                            style={sortBtn}
+                          >
+                            <span>{nameSortDir === 'asc' ? 'A-Z' : 'Z-A'}</span>
+                            {nameSortDir === 'asc'
+                              ? <ChevronDown size={16} strokeWidth={1.5} style={{ color: '#7D8895' }} />
+                              : <ChevronUp size={16} strokeWidth={1.5} style={{ color: '#7D8895' }} />}
+                          </button>
+                          <button
+                            key="bot-row1-data"
+                            onClick={() => setDateSortDir((d) => (d === 'asc' ? 'desc' : 'asc'))}
+                            style={sortBtn}
+                          >
+                            <span>DATA</span>
+                            {dateSortDir === 'asc'
+                              ? <ChevronDown size={16} strokeWidth={1.5} style={{ color: '#7D8895' }} />
+                              : <ChevronUp size={16} strokeWidth={1.5} style={{ color: '#7D8895' }} />}
+                          </button>
+                        </>
+                      );
+                    })()}
                   </div>
                 </th>
               </tr>
             </thead>
             <tbody>
-              {[...ORDERS, null, null].map((_, idx) => {
+              {[...ORDERS, null, null, null].map((_, idx) => {
                 const inputStyle = {
                   ...TEXT,
                   fontFamily: 'Roboto Condensed, sans-serif',
                   fontSize: '11pt',
                   color: '#475059',
-                  backgroundColor: '#F4F6F8',
+                  backgroundColor: '#F8FAFC',
                   border: 'none',
                   borderRadius: '3px',
                   boxSizing: 'border-box',
@@ -2880,7 +3006,6 @@ function UserComandesContent() {
                       </td>
                       <td style={{ height: '30px', padding: 0 }} />
                       <td style={{ height: '30px', padding: 0 }} />
-                      <td style={{ height: '30px', padding: 0 }} />
                     </tr>
                   );
                 }
@@ -2895,16 +3020,16 @@ function UserComandesContent() {
                       </td>
                       <td style={{ height: '30px', padding: 0 }} />
                       <td style={{ height: '30px', padding: 0 }} />
-                      <td style={{ height: '30px', padding: 0 }} />
                     </tr>
                   );
                 }
                 // Files 4..(N-2): àrea de Missatge (rowSpan), cols 1+2.
                 // Última fila (N-1): reservada per a la llegenda (encara per posar).
-                const totalRows = ORDERS.length + 2; // 14 + 2 nulls = 16
-                const lastIdx = totalRows - 1;
+                const totalRows = ORDERS.length + 3; // 14 + 3 nulls = 17
+                const lastIdx = totalRows - 1; // fila de botons
+                const legendIdx = lastIdx - 1;
                 const messageStart = 2;
-                const messageEnd = lastIdx - 1; // fila just abans de la llegenda
+                const messageEnd = legendIdx - 1; // fila just abans de la llegenda
                 const messageRowSpan = messageEnd - messageStart + 1;
                 if (idx === messageStart) {
                   return (
@@ -2924,7 +3049,6 @@ function UserComandesContent() {
                       </td>
                       <td style={{ height: '30px', padding: 0 }} />
                       <td style={{ height: '30px', padding: 0 }} />
-                      <td style={{ height: '30px', padding: 0 }} />
                     </tr>
                   );
                 }
@@ -2933,11 +3057,10 @@ function UserComandesContent() {
                     <tr key={idx} style={{ height: '30px' }}>
                       <td style={{ height: '30px', padding: 0 }} />
                       <td style={{ height: '30px', padding: 0 }} />
-                      <td style={{ height: '30px', padding: 0 }} />
                     </tr>
                   );
                 }
-                if (idx === lastIdx) {
+                if (idx === legendIdx) {
                   return (
                     <tr key={idx} style={{ height: '30px' }}>
                       <td colSpan={2} style={{ height: '30px', padding: 0 }}>
@@ -2951,7 +3074,8 @@ function UserComandesContent() {
                           padding: '0 10px',
                           fontFamily: 'Oswald, sans-serif',
                           fontWeight: 300,
-                          fontSize: '7.5pt',
+                          fontSize: '10pt',
+                          letterSpacing: '0.05em',
                           lineHeight: 1,
                           color: '#474F58',
                           whiteSpace: 'nowrap',
@@ -2963,6 +3087,45 @@ function UserComandesContent() {
                       </td>
                       <td style={{ height: '30px', padding: 0 }} />
                       <td style={{ height: '30px', padding: 0 }} />
+                    </tr>
+                  );
+                }
+                if (idx === lastIdx) {
+                  const btnBase = {
+                    ...HEAD,
+                    fontFamily: 'Roboto Condensed, sans-serif',
+                    fontSize: '11pt',
+                    borderRadius: '3px',
+                    boxSizing: 'border-box',
+                    cursor: 'pointer',
+                    padding: 0,
+                    width: '100%',
+                    height: '30px',
+                    display: 'block',
+                  };
+                  const attachBtnStyle = {
+                    ...btnBase,
+                    fontWeight: 700,
+                    color: '#2F61B2',
+                    backgroundColor: '#FFFFFF',
+                    border: '1px solid #2F61B2',
+                  };
+                  const sendBtnStyle = {
+                    ...btnBase,
+                    fontWeight: 900,
+                    color: '#FFFFFF',
+                    backgroundColor: '#2F61B2',
+                    border: 'none',
+                  };
+                  return (
+                    <tr key={idx} style={{ height: '30px' }}>
+                      <td style={{ height: '30px', padding: 0 }}>
+                        <button style={attachBtnStyle}>ADJUNTA UN FITXER</button>
+                      </td>
+                      <td style={{ height: '30px', padding: 0 }}>
+                        <button style={sendBtnStyle}>ENVIA EL MISSATGE</button>
+                      </td>
+                      <td style={{ height: '30px', padding: 0 }} />
                       <td style={{ height: '30px', padding: 0 }} />
                     </tr>
                   );
@@ -2973,41 +3136,14 @@ function UserComandesContent() {
                     <td style={{ height: '30px', padding: 0 }} />
                     <td style={{ height: '30px', padding: 0 }} />
                     <td style={{ height: '30px', padding: 0 }} />
-                    <td style={{ height: '30px', padding: 0 }} />
                   </tr>
                 );
               })}
             </tbody>
           </table>
+          </div>
         </div>
 
-        {/* Botonera de 4 botons iguals */}
-        <div style={{
-          width: '1320px',
-          marginLeft: 'auto',
-          marginRight: 'auto',
-          display: 'grid',
-          gridTemplateColumns: 'repeat(4, 1fr)',
-          columnGap: '7.5px',
-        }}>
-          {[0, 1, 2, 3].map((i) => (
-            <button key={`bot-${i}`} style={{
-              ...HEAD,
-              fontFamily: 'Roboto Condensed, sans-serif',
-              fontSize: '11pt',
-              fontWeight: 500,
-              color: '#98A2B4',
-              backgroundColor: '#F4F6F8',
-              border: 'none',
-              borderRadius: '3px',
-              boxSizing: 'border-box',
-              cursor: 'pointer',
-              padding: 0,
-              height: `${ROW_H - 2}px`,
-              visibility: i >= 2 ? 'hidden' : 'visible',
-            }} />
-          ))}
-        </div>
       </>)}
 
       {activeTab === 'COMANDES' && (<>
@@ -3116,9 +3252,81 @@ function UserComandesContent() {
         </table>
       </div>
 
+      {/* Espai d'una fila abans de la llegenda */}
+      <div style={{ height: `${ROW_H}px` }} />
+
+      {/* 4. Llegenda */}
+      <div style={{ width: '1320px', marginLeft: 'auto', marginRight: 'auto' }}>
+      <div style={{
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        height: `${ROW_H}px`,
+        width: '659.25px',
+        marginLeft: 'auto',
+        marginRight: '331.875px',
+        padding: 0,
+      }}>
+        {LEGEND.map(({ label, icon: Icon }) => (
+          <div key={label} style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '6px',
+            ...HEAD,
+            fontFamily: 'Oswald, sans-serif',
+            fontSize: '7.5pt',
+            fontWeight: 300,
+            letterSpacing: '0em',
+            color: '#475059',
+            whiteSpace: 'nowrap',
+          }}>
+            <Icon size={12} strokeWidth={2} style={{ color: '#1E62B8' }} />
+            <span>{label}</span>
+          </div>
+        ))}
+      </div>
+      </div>
+
+      {/* 5. Botonera central (REVERTEIX / CANCEL·LA / DESA) */}
+      <div style={{
+        width: '1320px',
+        marginLeft: 'auto',
+        marginRight: 'auto',
+        display: 'grid',
+        gridTemplateColumns: 'repeat(4, 1fr)',
+        columnGap: '7.5px',
+      }}>
+        <div style={{
+          gridColumn: '2 / span 2',
+          height: `${ROW_H - 2}px`,
+          display: 'grid',
+          gridTemplateColumns: 'repeat(3, 1fr)',
+          gap: '7.5px',
+        }}>
+          {['REVERTEIX', 'CANCEL·LA', 'DESA'].map((label) => (
+            <button key={label} style={{
+              ...HEAD,
+              fontFamily: 'Roboto Condensed, sans-serif',
+              fontSize: '11pt',
+              fontWeight: 500,
+              color: '#98A2B4',
+              backgroundColor: '#F4F6F8',
+              border: 'none',
+              borderRadius: '3px',
+              boxSizing: 'border-box',
+              cursor: 'pointer',
+              padding: 0,
+              height: '100%',
+            }}>
+              {label}
+            </button>
+          ))}
+        </div>
+      </div>
+
       </>)}
 
-      {activeTab !== 'COMANDES' && (
+      {false && activeTab !== 'COMANDES' && (
         <div style={{
           position: 'absolute',
           top: 0,
@@ -3285,11 +3493,11 @@ export default function FullWideSlideDemoHeader({
   );
   const [searchGridScale, setSearchGridScale] = useState(1);
   const [searchCaretVisible, setSearchCaretVisible] = useState(true);
-  const [megaPage, setMegaPage] = useState(1);
+  const [megaPage, setMegaPage] = usePersistentState('HG_MEGA_PAGE', 1);
   const [megaFullScreen, setMegaFullScreen] = useState(false);
-  const [acordioExpanded, setAcordioExpanded] = useState(false);
-  const [acordioExpandedPage4, setAcordioExpandedPage4] = useState(false);
-  const [activeUserTab, setActiveUserTab] = useState('1');
+  const [acordioExpanded, setAcordioExpanded] = usePersistentState('HG_ACORDIO_EXPANDED', false);
+  const [acordioExpandedPage4, setAcordioExpandedPage4] = usePersistentState('HG_ACORDIO_EXPANDED_PAGE4', false);
+  const [activeUserTab, setActiveUserTab] = usePersistentState('HG_ACTIVE_USER_TAB', '1');
   const [firstContactSelectedItem, setFirstContactSelectedItem] = useState(null);
   const [humanInsideSelectedItem, setHumanInsideSelectedItem] = useState(null);
   const [selectedItemByCollection, setSelectedItemByCollection] = useState({});
@@ -6562,8 +6770,8 @@ export default function FullWideSlideDemoHeader({
                             paddingBottom: '40px',
                             zIndex: 10,
                           }}>
-                            {/* PAUTA-VERDA - Línies horitzontals */}
-                            <div style={{
+                            {/* PAUTA-VERDA - Línies horitzontals (desactivada) */}
+                            {false && (<div style={{
                               position: 'absolute',
                               top: '0',
                               left: '0',
@@ -6576,7 +6784,7 @@ export default function FullWideSlideDemoHeader({
                               opacity: 0.1,
                               zIndex: 9999,
                               pointerEvents: 'none',
-                            }} />
+                            }} />)}
                             <div style={{
                               maxWidth: '1400px',
                               margin: '0 auto',
