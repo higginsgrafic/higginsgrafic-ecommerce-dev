@@ -2603,7 +2603,7 @@ function usePersistentState(key, initial, ttlMs = 10000) {
 // Plantilla de la secció COMANDES del perfil d'usuari — alineada amb la pauta verda
 function UserComandesContent() {
   const [activeTab, setActiveTab] = usePersistentState('HG_USER_ACTIVE_TAB', 'COMANDES');
-  const [sortDirs, setSortDirs] = usePersistentState('HG_USER_SORT_DIRS', { 'NOMBRE': 'desc', 'ESTAT': 'desc', 'DATA': 'desc', 'TOT PLEGAT': 'desc' });
+  const [sortDirs, setSortDirs] = usePersistentState('HG_USER_SORT_DIRS', { 'COMANDA': 'desc', 'ESTAT': 'desc', 'DATA': 'desc', 'TOT PLEGAT': 'desc' });
   const [contactMode, setContactMode] = usePersistentState('HG_USER_CONTACT_MODE', 'comanda'); // 'comanda' | 'correu'
   const [nameSortDir, setNameSortDir] = usePersistentState('HG_USER_NAME_SORT', 'asc'); // 'asc' | 'desc'
   const [dateSortDir, setDateSortDir] = usePersistentState('HG_USER_DATE_SORT', 'desc'); // 'asc' | 'desc'
@@ -3157,7 +3157,7 @@ function UserComandesContent() {
         }
         .comandes-table th > *, .comandes-table td > * { min-width: 0; max-width: 100%; }
       `}</style>
-      <div style={{ width: '1320px', marginLeft: 'auto', marginRight: 'auto', marginTop: '-2.5px', overflow: 'hidden', position: 'relative', borderTop: '1px solid #98A2B4', borderLeft: '1px solid #98A2B4', borderRight: '1px solid #98A2B4', borderTopLeftRadius: '3px', borderTopRightRadius: '3px' }}>
+      <div style={{ width: '1320px', marginLeft: 'auto', marginRight: 'auto', marginTop: '-2.5px', overflow: 'hidden', position: 'relative', borderTop: '1px solid #98A2B4', borderLeft: '1px solid #98A2B4', borderRight: '1px solid #98A2B4', borderTopLeftRadius: '3px', borderTopRightRadius: '3px', backgroundImage: 'url("/tmp/USER/FONS%20COMANDES.png")', backgroundRepeat: 'no-repeat', backgroundPosition: 'top left', backgroundSize: '1320px 100%' }}>
         <table className="comandes-table" style={{
           width: '1335px',
           marginLeft: '-7.5px',
@@ -3175,7 +3175,7 @@ function UserComandesContent() {
         </colgroup>
         <thead>
           <tr style={{ height: '30px' }}>
-            {['NOMBRE', 'ESTAT', 'DATA', 'TOT PLEGAT', 'EN DETALL'].map((h, i) => {
+            {['COMANDA', 'ESTAT', 'DATA', 'TOT PLEGAT', 'EN DETALL'].map((h, i) => {
               const sortable = h !== 'EN DETALL';
               return (
               <th
@@ -3201,8 +3201,10 @@ function UserComandesContent() {
               >
                 {h}
                 {sortable && (
-                  <span style={{ position: 'absolute', right: '1em', top: '50%', transform: 'translateY(-50%)', fontSize: '11pt', color: '#7D8895', lineHeight: 1, pointerEvents: 'none' }}>
-                    {sortDirs[h] === 'asc' ? '▲' : '▼'}
+                  <span style={{ position: 'absolute', right: '1em', top: '50%', transform: 'translateY(-50%)', display: 'inline-flex', alignItems: 'center', lineHeight: 1, pointerEvents: 'none' }}>
+                    {sortDirs[h] === 'asc'
+                      ? <ChevronDown size={16} strokeWidth={1.5} style={{ color: '#7D8895' }} />
+                      : <ChevronUp size={16} strokeWidth={1.5} style={{ color: '#7D8895' }} />}
                   </span>
                 )}
               </th>
