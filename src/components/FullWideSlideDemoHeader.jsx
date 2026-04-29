@@ -3346,7 +3346,7 @@ function UserComandesContent() {
           width: '1320px',
           marginLeft: 'auto',
           marginRight: 'auto',
-          marginTop: '-66px',
+          marginTop: '-63.5px',
           position: 'relative',
           zIndex: 5,
           display: 'grid',
@@ -3365,6 +3365,7 @@ function UserComandesContent() {
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
+              transform: 'translateY(5px)',
               padding: '0 10px',
               fontFamily: 'Oswald, sans-serif',
               fontWeight: 300,
@@ -3401,17 +3402,21 @@ function UserComandesContent() {
                   ...HEAD,
                   fontFamily: 'Roboto Condensed, sans-serif',
                   fontSize: '11pt',
+                  lineHeight: 1,
                   fontWeight: 500,
                   color: '#98A2B4',
                   backgroundColor: '#F4F6F8',
                   border: 'none',
                   borderRadius: '3px',
                   boxSizing: 'border-box',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
                   cursor: 'pointer',
                   padding: 0,
                   height: '100%',
                 }}>
-                  {label}
+                  <span style={{ display: 'inline-block', position: 'relative', top: '1.25px' }}>{label}</span>
                 </button>
               ))}
             </div>
@@ -3419,6 +3424,7 @@ function UserComandesContent() {
               ...HEAD,
               fontFamily: 'Roboto Condensed, sans-serif',
               fontSize: '11pt',
+              lineHeight: 1,
               fontWeight: 500,
               color: '#FFFFFF',
               backgroundColor: '#FF0000',
@@ -3426,11 +3432,16 @@ function UserComandesContent() {
               border: 'none',
               borderRadius: '3px',
               boxSizing: 'border-box',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
               cursor: 'pointer',
               padding: 0,
               height: `${ROW_H - 2}px`,
             }}>
-              ESBORRA EL COMPTE<sup style={{ fontFamily: 'Oswald, sans-serif', fontWeight: 700, fontSize: '0.7em', verticalAlign: 'baseline', position: 'relative', top: '-0.35em', marginLeft: '2px' }}>3</sup>
+              <span style={{ display: 'inline-block', transform: 'translateY(0.75px)' }}>
+                ESBORRA EL COMPTE<sup style={{ fontFamily: 'Oswald, sans-serif', fontWeight: 700, fontSize: '0.7em', verticalAlign: 'baseline', position: 'relative', top: '-0.35em', marginLeft: '2px' }}>3</sup>
+              </span>
             </button>
           </div>
         </div>
