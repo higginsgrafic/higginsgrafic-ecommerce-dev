@@ -270,10 +270,15 @@ export default function RulersGuidesOverlay({
       window.__DEV_GUIDES_COPY_COORDS__ = () => {
         copySquare();
       };
+      window.__DEV_GUIDES_CLEAR__ = () => {
+        setVGuides([]);
+        setHGuides([]);
+        try { localStorage.removeItem(storageKey); } catch {}
+      };
     } catch {
       // ignore
     }
-  }, [square]);
+  }, [square, storageKey]);
 
   return (
     <div

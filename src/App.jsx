@@ -5695,6 +5695,23 @@ function App() {
                     >
                       Guides
                     </button>
+
+                    <button
+                      type="button"
+                      className="relative z-10 h-12 rounded-full border border-black/15 bg-white px-4 text-[12px] font-semibold text-black/80 shadow-lg hover:bg-black/5 active:bg-black/10 debug-exempt"
+                      title="Esborra totes les guies"
+                      aria-label="Esborra totes les guies"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        try {
+                          window.__DEV_GUIDES_CLEAR__?.();
+                        } catch {}
+                        try { localStorage.removeItem('devGuidesV2'); } catch {}
+                      }}
+                    >
+                      Clear
+                    </button>
                   </div>
                 ) : null}
 
