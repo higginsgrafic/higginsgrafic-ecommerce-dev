@@ -3222,9 +3222,10 @@ function App() {
                   path="/checkout"
                   element={
                     <CheckoutPage
-                      cartItems={cartItems}
+                      cartItems={[]}
                       onClearCart={clearCart}
                       pautaEnabled={checkoutPautaEnabled}
+                      mockMode="single"
                     />
                   }
                 />

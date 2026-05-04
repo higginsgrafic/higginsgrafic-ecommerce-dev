@@ -31,7 +31,7 @@ const stripeConnectionEnabled = false;
 const inputCell = 'w-full h-full px-2 text-[12pt] border border-border rounded-sm bg-white text-foreground focus:outline-none focus:ring-1 focus:ring-ring';
 const titleCell = 'h-full w-full flex items-center text-[18pt] font-medium font-oswald uppercase tracking-[0.4px] text-foreground';
 
-const CheckoutPage = ({ cartItems, onClearCart, pautaEnabled = true }) => {
+const CheckoutPage = ({ cartItems, onClearCart, pautaEnabled = true, mockMode = 'full' }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const { success, error: showError } = useToast();
@@ -47,6 +47,7 @@ const CheckoutPage = ({ cartItems, onClearCart, pautaEnabled = true }) => {
   const [formErrors, setFormErrors] = useState({});
   const [isProcessing, setIsProcessing] = useState(false);
   const [paymentDetailsOpen, setPaymentDetailsOpen] = useState(false);
+  const [checkoutScrollRow, setCheckoutScrollRow] = useState(0);
   const checkoutPautaRef = useRef(null);
   const [checkoutPautaRowHeight, setCheckoutPautaRowHeight] = useState(null);
 
@@ -95,13 +96,34 @@ const CheckoutPage = ({ cartItems, onClearCart, pautaEnabled = true }) => {
     { id: 'mock-23', name: 'Belt Two', size: 'L', quantity: 1, price: 15.5 },
     { id: 'mock-24', name: 'Tot Plegat', size: 'XL', quantity: 1, price: 15.5 },
   ]), []);
-  const checkoutRenderItems = useMemo(() => (
-    checkoutCartItems.length > 0
+  const checkoutRenderItems = useMemo(() => {
+    if (mockMode === 'single') {
+      return [
+        { ...mockCheckoutItems[0], id: 'mock-single-vader', name: 'VADER' },
+        ...mockCheckoutItems.slice(1, 27),
+      ];
+    }
+    return checkoutCartItems.length > 0
       ? checkoutCartItems
-      : mockCheckoutItems
-  ), [checkoutCartItems, mockCheckoutItems]);
+      : mockCheckoutItems;
+  }, [checkoutCartItems, mockCheckoutItems, mockMode]);
+  const variantNumbersByItemKey = useMemo(() => {
+    const variantTitles = new Set(['SENSE & SENSIBILITY', 'PRIDE & PREJUDICE', 'PERSUASION']);
+    return checkoutRenderItems.reduce((acc, item, index) => {
+      const normalizedName = String(item.name || '').trim().toUpperCase();
+      if (variantTitles.has(normalizedName)) {
+        acc[`${item.id || normalizedName}-${index}`] = Math.floor(Math.random() * 4) + 1;
+      }
+      return acc;
+    }, {});
+  }, [checkoutRenderItems]);
+  const getCheckoutProductDisplayName = (item, index) => {
+    const variantNumber = variantNumbersByItemKey[`${item.id || String(item.name || '').trim().toUpperCase()}-${index}`];
+    return variantNumber ? `${item.name} ${variantNumber}` : item.name;
+  };
 
-  const subtotal = checkoutRenderItems.reduce((total, item) => total + (item.price * item.quantity), 0);
+  const checkoutBillingItems = checkoutRenderItems.slice(0, 19);
+  const subtotal = checkoutBillingItems.reduce((total, item) => total + (item.price * (isMockCheckout ? 1 : item.quantity)), 0);
   const shipping = subtotal > 50 ? 0 : 5.95;
   const total = subtotal + shipping;
   const ivaAmount = subtotal * 0.21;
@@ -116,6 +138,79 @@ const CheckoutPage = ({ cartItems, onClearCart, pautaEnabled = true }) => {
   const transportParts = splitPriceParts(shipping === 0 ? 5.95 : shipping);
   const ivaParts = splitPriceParts(ivaAmount);
   const totalParts = splitPriceParts(total);
+  const visibleCheckoutItems = SHOW_V1_ORDERS_DETAILS ? checkoutRenderItems : [];
+  const checkoutLayoutItemCount = visibleCheckoutItems.length;
+  const checkoutShortTotalsStartRow = 9;
+  const checkoutLongTotalsStartRow = 18;
+  const checkoutFirstOrderRow = 4;
+  const checkoutFreeRowBeforeTotals = 1;
+  const dynamicTotalsStartRow = Math.max(
+    checkoutShortTotalsStartRow,
+    checkoutFirstOrderRow + checkoutLayoutItemCount + checkoutFreeRowBeforeTotals
+  );
+  const totalsStartRow = mockMode === 'single'
+    ? Math.min(
+      checkoutLongTotalsStartRow,
+      dynamicTotalsStartRow
+    )
+    : checkoutLongTotalsStartRow;
+  const checkoutIsLongLayout = totalsStartRow === checkoutLongTotalsStartRow;
+  const checkoutRowsWithBackground = Math.max(visibleCheckoutItems.length, totalsStartRow - 5);
+  const totalsBackgroundRows = 4;
+  const totalsBackgroundGutters = checkoutIsLongLayout ? 3 : 21 - totalsStartRow;
+  const productNameBlockWidthPx = useMemo(() => {
+    if (typeof document === 'undefined') {
+      return 124;
+    }
+    const canvas = document.createElement('canvas');
+    const context = canvas.getContext('2d');
+    if (!context) {
+      return 124;
+    }
+    context.font = '400 12pt "Roboto Condensed", sans-serif';
+    return Math.ceil(Math.max(
+      context.measureText('PRODUCTES').width,
+      ...visibleCheckoutItems.map((item, index) => context.measureText(String(getCheckoutProductDisplayName(item, index) || '')).width)
+    ));
+  }, [visibleCheckoutItems]);
+  const productNameBlockStyle = {
+    display: 'block',
+    width: `${productNameBlockWidthPx}px`,
+    textAlign: 'left',
+    whiteSpace: 'nowrap',
+    transform: 'translateX(-50px)',
+    lineHeight: 1,
+  };
+  const totalsTopRowOffset = totalsStartRow - 2;
+  const totalsTop = `calc(${PAUTA_FIRST_ROW_PERCENT}% + ${PAUTA_FIRST_ROW_EXTRA_PX}px + ${totalsTopRowOffset} * (${PAUTA_OTHER_ROW_PERCENT}% - ${PAUTA_OTHER_ROW_COMP_PX}px) + ${totalsTopRowOffset} * 3px - 0.5 * (${PAUTA_OTHER_ROW_PERCENT}% - ${PAUTA_OTHER_ROW_COMP_PX}px + 3px) - 4px)`;
+  const totalsBlockShiftY = 'translateY(-3px)';
+  const orderTextShiftY = 'translateY(1px)';
+  const checkoutOrderRowGapPx = 3;
+  const checkoutOrderCellHeight = checkoutPautaRowHeight
+    ? `${Math.max(0, checkoutPautaRowHeight - checkoutOrderRowGapPx)}px`
+    : `calc(${PAUTA_OTHER_ROW_PERCENT}% - ${PAUTA_OTHER_ROW_COMP_PX}px - ${checkoutOrderRowGapPx}px)`;
+  const checkoutOrderRowPitch = checkoutPautaRowHeight
+    ? `${checkoutPautaRowHeight}px`
+    : `calc(${PAUTA_OTHER_ROW_PERCENT}% - ${PAUTA_OTHER_ROW_COMP_PX}px)`;
+  const checkoutVisibleOrderRows = checkoutLongTotalsStartRow - checkoutFirstOrderRow;
+  const checkoutVisibleItems = visibleCheckoutItems.slice(
+    checkoutScrollRow,
+    checkoutScrollRow + checkoutVisibleOrderRows
+  );
+  const checkoutMaxScrollRow = Math.max(0, visibleCheckoutItems.length - checkoutVisibleOrderRows);
+  const checkoutBlockBackgroundEndRow = paymentDetailsOpen
+    ? PAUTA_ROWS + 1
+    : totalsStartRow + totalsBackgroundRows;
+  const checkoutGlobalBackgroundRows = Math.max(0, checkoutRowsWithBackground - 10);
+  const handleCheckoutOrdersWheel = (event) => {
+    if (!checkoutIsLongLayout) return;
+    event.preventDefault();
+    const direction = event.deltaY > 0 ? 1 : -1;
+    setCheckoutScrollRow((currentRow) => Math.min(
+      checkoutMaxScrollRow,
+      Math.max(0, currentRow + direction)
+    ));
+  };
 
   // Track begin checkout
   useEffect(() => {
@@ -323,10 +418,11 @@ const CheckoutPage = ({ cartItems, onClearCart, pautaEnabled = true }) => {
         aria-hidden="true"
         style={{
           position: 'absolute',
-          left: `calc(var(--belt2-xL, 0px) + ${CHECKOUT_PAGE_LEFT_OFFSET})`,
+          left: '50%',
           top: CHECKOUT_PAGE_TOP_OFFSET,
           width: 'calc(var(--belt2-xR, 100vw) - var(--belt2-xL, 0px))',
           height: 'calc(var(--belt2-yB, 100vh) - var(--belt2-yT, 0px))',
+          transform: `translateX(calc(-50% + ${CHECKOUT_PAGE_LEFT_OFFSET}))`,
           display: 'grid',
           position: 'absolute',
           gridTemplateColumns: 'calc((100% - 22.5px) / 2 + 11.25px) calc((100% - 22.5px) / 2 - 11.25px)',
@@ -445,10 +541,10 @@ const CheckoutPage = ({ cartItems, onClearCart, pautaEnabled = true }) => {
                 gridColumn: '1 / 5',
                 gridRow: '3 / 4',
                 width: 'calc(100% - 10.25px)',
-                marginLeft: '-1px',
+                justifySelf: 'center',
                 display: 'grid',
-                gridTemplateColumns: 'calc(50% - 3.75px) repeat(3, minmax(0, 1fr))',
-                columnGap: '7.5px',
+                gridTemplateColumns: 'calc(50% - 7.5px) repeat(3, minmax(0, 1fr))',
+                columnGap: '15px',
                 alignSelf: 'end',
                 transform: 'translateY(-12px)',
                 zIndex: 5,
@@ -456,7 +552,7 @@ const CheckoutPage = ({ cartItems, onClearCart, pautaEnabled = true }) => {
             >
               {[
                 ['PRODUCTES', 0],
-                ['TALLATGE', 1],
+                ['TALLA', 1],
                 ['QUANTITAT', 2],
                 ['IMPORT', 3],
               ].map(([label, index]) => (
@@ -466,8 +562,8 @@ const CheckoutPage = ({ cartItems, onClearCart, pautaEnabled = true }) => {
                     gridColumn: `${index + 1} / ${index + 2}`,
                     display: 'flex',
                     alignItems: 'center',
-                    justifyContent: index === 0 ? 'flex-start' : 'center',
-                    transform: label === 'IMPORT' ? 'translateX(5px)' : label === 'QUANTITAT' ? 'translateX(4px)' : 'none',
+                    justifyContent: index === 0 ? 'flex-end' : 'center',
+                    transform: label === 'IMPORT' ? 'translateX(3px)' : label === 'QUANTITAT' ? 'translateX(0px)' : label === 'TALLA' ? 'translateX(-8px)' : 'none',
                     color: '#495058',
                     fontFamily: 'Oswald, sans-serif',
                     fontSize: label === 'TOT PLEGAT FA' ? '15pt' : '12pt',
@@ -476,7 +572,9 @@ const CheckoutPage = ({ cartItems, onClearCart, pautaEnabled = true }) => {
                     textTransform: 'uppercase',
                   }}
                 >
-                  {label}
+                  {index === 0 ? (
+                    <span style={productNameBlockStyle}>{label}</span>
+                  ) : label}
                 </div>
               ))}
             </div>
@@ -503,66 +601,75 @@ const CheckoutPage = ({ cartItems, onClearCart, pautaEnabled = true }) => {
               {rowIndex + 1}
             </div>
           ))}
+          {Array.from({ length: checkoutGlobalBackgroundRows }).map((_, rowIndex) => (
+            <div
+              key={`product-table-global-row-bg-${rowIndex + 1}`}
+              aria-hidden="true"
+              style={{
+                gridColumn: '1 / 5',
+                gridRow: `${checkoutFirstOrderRow + rowIndex} / ${checkoutFirstOrderRow + rowIndex + 1}`,
+                width: 'calc(100% - 10.25px)',
+                justifySelf: 'center',
+                overflow: 'hidden',
+                transform: 'translateY(-5.5px)',
+                zIndex: 1,
+              }}
+            >
+              <div
+                style={{
+                  width: '100%',
+                  height: '100%',
+                  backgroundImage: 'url(/placeholders/fons_acordio/fons-una-fila.png)',
+                  backgroundRepeat: 'no-repeat',
+                  backgroundPosition: 'center center',
+                  backgroundSize: '100% 100%',
+                  transform: (rowIndex + 1) % 2 === 0 ? 'none' : 'scaleX(-1)',
+                  opacity: 1,
+                }}
+              />
+            </div>
+          ))}
           <div
+            onWheel={handleCheckoutOrdersWheel}
             style={{
               gridColumn: '1 / 5',
               gridRow: '4 / 18',
               width: 'calc(100% - 10.25px)',
-              marginLeft: '-1px',
-              height: '100%',
-              display: 'grid',
-              gridTemplateColumns: 'calc(50% - 3.75px) repeat(3, minmax(0, 1fr))',
-              gridAutoRows: checkoutPautaRowHeight ? `${checkoutPautaRowHeight}px` : `calc(${PAUTA_OTHER_ROW_PERCENT}% - ${PAUTA_OTHER_ROW_COMP_PX}px)`,
-              columnGap: '7.5px',
-              rowGap: '3px',
-              overflowY: 'auto',
+              justifySelf: 'center',
+              height: 'calc(100% + 2.5px)',
+              position: 'relative',
+              overflow: 'hidden',
               overscrollBehavior: 'contain',
               scrollbarWidth: 'none',
               pointerEvents: 'auto',
               zIndex: 2,
-              transform: 'translateY(-4px)',
+              transform: 'translateY(-5.5px)',
             }}
           >
-            {(SHOW_V1_ORDERS_DETAILS ? checkoutRenderItems.slice(0, 14) : []).flatMap((item, rowIndex) => (
+            {checkoutVisibleItems.flatMap((item, rowIndex) => (
               [
-                <div
-                  key={`product-table-row-bg-${rowIndex + 1}`}
-                  style={{
-                    gridColumn: '1 / 5',
-                    gridRow: `${rowIndex + 1} / ${rowIndex + 2}`,
-                    overflow: 'hidden',
-                    zIndex: 0,
-                  }}
-                >
-                  <div
-                    style={{
-                      width: '100%',
-                      height: '100%',
-                      backgroundImage: 'url(/placeholders/fons_acordio/fons-una-fila.png)',
-                      backgroundRepeat: 'no-repeat',
-                      backgroundPosition: 'center center',
-                      backgroundSize: '100% 100%',
-                      transform: (rowIndex + 1) % 2 === 0 ? 'scaleX(-1)' : 'none',
-                      opacity: 1,
-                    }}
-                  />
-                </div>,
-                ...[
-                  item.name,
-                  item.size || '—',
-                  String(item.quantity || 1),
-                  displayPrice((item.price || 0) * (item.quantity || 1)),
-                ].map((label, index) => (
+                getCheckoutProductDisplayName(item, rowIndex),
+                item.size || '—',
+                String(item.quantity || 1),
+                displayPrice((item.price || 0) * (item.quantity || 1)),
+              ].map((label, index) => (
                   <div
                     key={`product-table-row-${rowIndex + 1}-${index}`}
                     style={{
                       gridColumn: `${index + 1} / ${index + 2}`,
-                      gridRow: `${rowIndex + 1} / ${rowIndex + 2}`,
+                      position: 'absolute',
+                      top: `calc(${rowIndex} * ${checkoutOrderRowPitch})`,
+                      left: index === 0
+                        ? '0'
+                        : `calc(50% - 7.5px + ${index - 1} * ((50% - 7.5px) / 3 + 15px))`,
+                      width: index === 0 ? 'calc(50% - 7.5px)' : 'calc((50% - 7.5px) / 3)',
                       display: 'flex',
                       height: '100%',
+                      minHeight: checkoutOrderCellHeight,
+                      maxHeight: checkoutOrderCellHeight,
+                      boxSizing: 'border-box',
                       alignItems: 'center',
-                      justifyContent: index === 0 ? 'flex-start' : 'center',
-                      transform: index === 2 ? 'translateX(4px)' : 'none',
+                      justifyContent: index === 0 ? 'flex-end' : index === 3 ? 'center' : 'center',
                       color: '#4A5057',
                       fontFamily: 'Roboto Condensed, sans-serif',
                       fontSize: '12pt',
@@ -571,47 +678,60 @@ const CheckoutPage = ({ cartItems, onClearCart, pautaEnabled = true }) => {
                       zIndex: 2,
                     }}
                   >
+                    <span
+                      style={{
+                        display: index === 3 ? 'flex' : 'inline-block',
+                        justifyContent: index === 3 ? 'center' : undefined,
+                        transform: index === 2 ? `translateX(4px) ${orderTextShiftY}` : index === 3 ? `translateX(-8px) ${orderTextShiftY}` : orderTextShiftY,
+                        width: index === 3 ? '100%' : undefined,
+                      }}
+                    >
                     {index === 3 ? (
                       <span
                         style={{
-                          display: 'grid',
-                          gridTemplateColumns: '1fr auto auto',
-                          width: '54px',
+                          display: 'inline-grid',
+                          gridTemplateColumns: 'auto auto auto',
+                          justifyContent: 'center',
                           fontVariantNumeric: 'tabular-nums',
                         }}
                       >
-                        <span style={{ textAlign: 'right' }}>{label.replace('€', '').split(',')[0]}</span>
+                        <span>{label.replace('€', '').split(',')[0]}</span>
                         <span>,</span>
                         <span>{label.replace('€', '').split(',')[1]}€</span>
                       </span>
+                    ) : index === 0 ? (
+                      <span style={productNameBlockStyle}>{label}</span>
                     ) : label}
+                    </span>
                   </div>
                 ))
-              ]
             ))}
           </div>
           <div
             aria-hidden="true"
             style={{
               position: 'absolute',
-              left: 0,
+              left: '50%',
               top: `calc(${PAUTA_FIRST_ROW_PERCENT}% + ${PAUTA_FIRST_ROW_EXTRA_PX}px + 2 * (${PAUTA_OTHER_ROW_PERCENT}% - ${PAUTA_OTHER_ROW_COMP_PX}px) + 2 * 3px - 14px)`,
               gridColumn: '1 / 5',
               width: 'calc(100% - 11.25px)',
               height: '2px',
               backgroundColor: '#DEDFE1',
+              transform: 'translateX(-50%)',
               zIndex: 3,
             }}
           />
           <div
             aria-hidden="true"
             style={{
-              position: 'absolute',
-              left: 0,
-              top: `calc(${PAUTA_FIRST_ROW_PERCENT}% + ${PAUTA_FIRST_ROW_EXTRA_PX}px + 15 * (${PAUTA_OTHER_ROW_PERCENT}% - ${PAUTA_OTHER_ROW_COMP_PX}px) + 15 * 3px - 12px)`,
+              gridColumn: '1 / 5',
+              gridRow: `${totalsStartRow} / ${totalsStartRow + 1}`,
+              alignSelf: 'start',
               width: 'calc(100% - 11.25px)',
+              justifySelf: 'center',
               height: '2px',
               backgroundColor: '#DEDFE1',
+              transform: totalsBlockShiftY,
               zIndex: 3,
             }}
           />
@@ -619,20 +739,20 @@ const CheckoutPage = ({ cartItems, onClearCart, pautaEnabled = true }) => {
           <div
             aria-hidden="true"
             style={{
-              position: 'absolute',
-              left: 0,
-              top: `calc(${PAUTA_FIRST_ROW_PERCENT}% + ${PAUTA_FIRST_ROW_EXTRA_PX}px + 15 * (${PAUTA_OTHER_ROW_PERCENT}% - ${PAUTA_OTHER_ROW_COMP_PX}px) + 15 * 3px - 12px)`,
-              width: '100%',
-              height: `calc(4 * (${PAUTA_OTHER_ROW_PERCENT}% - ${PAUTA_OTHER_ROW_COMP_PX}px) + 3 * 3px - 8.5px)`,
+              gridColumn: '1 / 5',
+              gridRow: `${totalsStartRow} / ${totalsStartRow + totalsBackgroundRows}`,
+              width: 'calc(100% - 11.25px)',
+              justifySelf: 'center',
+              height: '100%',
               overflow: 'hidden',
+              transform: totalsBlockShiftY,
               zIndex: 1,
             }}
           >
             <div
               style={{
                 display: 'block',
-                marginLeft: 0,
-                width: 'calc(100% - 11.25px)',
+                width: '100%',
                 height: '100%',
                 backgroundImage: 'url(/placeholders/fons_acordio/fons-una-fila.png)',
                 backgroundRepeat: 'no-repeat',
@@ -652,12 +772,12 @@ const CheckoutPage = ({ cartItems, onClearCart, pautaEnabled = true }) => {
               key={`totals-label-${index}`}
               style={{
                 gridColumn: '2 / 4',
-                gridRow: `${18 + index} / ${19 + index}`,
+                gridRow: `${totalsStartRow + index} / ${totalsStartRow + 1 + index}`,
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'flex-end',
                 paddingRight: 'calc((100% - 7.5px) / 2 + 7.5px)',
-                transform: 'translateX(58px)',
+                transform: `translateX(58px) ${totalsBlockShiftY}`,
                 color: '#4A5057',
                 fontFamily: 'Roboto Condensed, sans-serif',
                 fontSize: label === 'TOT PLEGAT FA' ? '15pt' : '12pt',
@@ -673,7 +793,7 @@ const CheckoutPage = ({ cartItems, onClearCart, pautaEnabled = true }) => {
               key={`totals-amount-${index}`}
               style={{
                 gridColumn: '4 / 5',
-                gridRow: `${18 + index} / ${19 + index}`,
+                gridRow: `${totalsStartRow + index} / ${totalsStartRow + 1 + index}`,
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'flex-start',
@@ -683,7 +803,7 @@ const CheckoutPage = ({ cartItems, onClearCart, pautaEnabled = true }) => {
                 fontWeight: label === 'TOT PLEGAT FA' ? 400 : 300,
                 textTransform: 'uppercase',
                 textDecoration: strikeAmount ? 'line-through' : 'none',
-                transform: label === 'TOT PLEGAT FA' ? 'translateX(13px)' : 'translateX(15px)',
+                transform: `${label === 'TOT PLEGAT FA' ? 'translateX(13px)' : 'translateX(15px)'} ${totalsBlockShiftY}`,
                 zIndex: 2,
               }}
             >
@@ -717,9 +837,10 @@ const CheckoutPage = ({ cartItems, onClearCart, pautaEnabled = true }) => {
       <div
         className="absolute z-[3]"
         style={{
-          left: `calc(var(--belt2-xL, 0px) + ${CHECKOUT_PAGE_LEFT_OFFSET})`,
+          left: '50%',
           top: CHECKOUT_PAGE_TOP_OFFSET,
           width: 'calc(var(--belt2-xR, 100vw) - var(--belt2-xL, 0px))',
+          transform: `translateX(calc(-50% + ${CHECKOUT_PAGE_LEFT_OFFSET}))`,
           height: 'calc(var(--belt2-yB, 100vh) - var(--belt2-yT, 0px))',
           display: hideCheckoutText ? 'none' : 'block',
           pointerEvents: 'none',
@@ -739,7 +860,7 @@ const CheckoutPage = ({ cartItems, onClearCart, pautaEnabled = true }) => {
             aria-hidden="true"
             style={{
               gridColumn: '2 / 3',
-              gridRow: '1 / 34',
+              gridRow: `1 / ${checkoutBlockBackgroundEndRow}`,
               overflow: 'hidden',
               zIndex: -1,
             }}
@@ -750,9 +871,7 @@ const CheckoutPage = ({ cartItems, onClearCart, pautaEnabled = true }) => {
               style={{
                 display: 'block',
                 width: '100%',
-                height: paymentDetailsOpen
-                  ? '100%'
-                  : 'calc((100% - 12 * ((100% - 32 * 3px) / 33 + 3px)) + 3px)',
+                height: '100%',
                 objectFit: 'fill',
               }}
             />
@@ -767,7 +886,7 @@ const CheckoutPage = ({ cartItems, onClearCart, pautaEnabled = true }) => {
           <div style={{ display: 'none', gridColumn: '1 / 2', gridRow: '4 / 5' }}>
             <div className="grid h-full items-center text-[11pt] leading-[1] border-b border-border" style={{ ...LEFT_ROW_GRADIENT_STYLE, color: '#4A5057', gridTemplateColumns: 'minmax(0, 1fr) 62px 62px 84px', columnGap: '8px', fontFamily: 'Roboto Condensed, sans-serif' }}>
               <span />
-              <span className="text-right uppercase">Tallatge</span>
+              <span className="text-right uppercase">Talla</span>
               <span className="text-right uppercase">Quantitat</span>
               <span className="text-right uppercase">Import</span>
             </div>

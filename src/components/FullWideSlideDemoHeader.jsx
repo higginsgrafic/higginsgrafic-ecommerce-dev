@@ -4726,6 +4726,7 @@ export default function FullWideSlideDemoHeader({
   const [searchCaretVisible, setSearchCaretVisible] = useState(true);
   const [megaPage, setMegaPage] = usePersistentState('HG_MEGA_PAGE', 1);
   const [megaFullScreen, setMegaFullScreen] = useState(false);
+  const [manualOverrideClosed, setManualOverrideClosed] = useState(false);
   const [acordioExpanded, setAcordioExpanded] = usePersistentState('HG_ACORDIO_EXPANDED', false);
   const [acordioExpandedPage4, setAcordioExpandedPage4] = usePersistentState('HG_ACORDIO_EXPANDED_PAGE4', false);
   const [activeUserTab, setActiveUserTab] = usePersistentState('HG_ACTIVE_USER_TAB', '1');
@@ -6564,7 +6565,15 @@ export default function FullWideSlideDemoHeader({
   const [bleedGuardExpandPx, setBleedGuardExpandPx] = useState({ left: 0, right: 0 });
 
   const ensureMegaOpen = () => {
+    setManualOverrideClosed(false);
     setActive((prev) => prev || 'first_contact');
+  };
+
+  const closeMegaExplicitly = () => {
+    setManualOverrideClosed(true);
+    setMegaPage(1);
+    setActive(null);
+    setMegaFullScreen(false);
   };
 
   useEffect(() => {
@@ -7194,6 +7203,10 @@ export default function FullWideSlideDemoHeader({
     }
 
     if (typeof manualEnabledOverride === 'boolean') {
+      if (manualOverrideClosed) {
+        setActive(null);
+        return;
+      }
       setActive(manualEnabledOverride ? (initialActiveId || 'first_contact') : null);
       return;
     }
@@ -7202,7 +7215,7 @@ export default function FullWideSlideDemoHeader({
       return;
     }
     setActive(demoManualEnabled ? 'first_contact' : null);
-  }, [contained, demoManualEnabled, initialActiveId, manualEnabledOverride]);
+  }, [contained, demoManualEnabled, initialActiveId, manualEnabledOverride, manualOverrideClosed]);
 
   useEffect(() => {
     // keep: previously reset megaPage; mega is now single-page
@@ -7250,9 +7263,7 @@ export default function FullWideSlideDemoHeader({
         if (isManualLockEnabled()) return;
         const nextTarget = e?.relatedTarget;
         if (nextTarget instanceof Node && e.currentTarget.contains(nextTarget)) return;
-        setMegaPage(1);
-        setActive(null);
-        setMegaFullScreen(false);
+        closeMegaExplicitly();
       }}
       style={
         contained
@@ -7314,6 +7325,7 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
                     touchMegaPublicActivity();
                   }}
                   onClick={() => {
+                    setManualOverrideClosed(false);
                     setMegaPage(1);
                     setMegaFullScreen(false);
                     setActive((prev) => {
@@ -7339,6 +7351,7 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
               <IconButton
                 label="Search"
                 onClick={() => {
+                  setManualOverrideClosed(false);
                   // mega is single-page; keep icon but do not navigate to another slide
                   setMegaPage(2);
                   setMegaFullScreen(false);
@@ -7358,6 +7371,7 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
                 if (cartClickTimeoutRef.current) window.clearTimeout(cartClickTimeoutRef.current);
                 cartClickTimeoutRef.current = window.setTimeout(() => {
                   cartClickTimeoutRef.current = null;
+                  setManualOverrideClosed(false);
                   if (megaPage === 3 && active) {
                     // Si ja estem a la pàgina 3 i el mega-menu està obert
                     if (acordioExpanded) {
@@ -7415,6 +7429,7 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
                   if (accountClickTimeoutRef.current) window.clearTimeout(accountClickTimeoutRef.current);
                   accountClickTimeoutRef.current = window.setTimeout(() => {
                     accountClickTimeoutRef.current = null;
+                    setManualOverrideClosed(false);
                     if (megaPage === 4 && active) {
                       // Si ja estem a la pàgina 4 i el mega-menu està obert
                       if (acordioExpandedPage4) {
@@ -7449,10 +7464,7 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
               role="button"
               tabIndex={0}
               onClick={() => {
-                if (isManualLockEnabled()) return;
-                setMegaPage(1);
-                setActive(null);
-                setMegaFullScreen(false);
+                closeMegaExplicitly();
               }}
             />
           ) : null,

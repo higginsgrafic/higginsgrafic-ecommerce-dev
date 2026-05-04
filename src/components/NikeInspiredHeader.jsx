@@ -1025,9 +1025,6 @@ function NikeInspiredHeader({
                   },
                 }}
                 className="relative z-[9991] hidden lg:block bg-white border-b border-border overflow-hidden"
-                onMouseLeave={() => {
-                  closeCollections();
-                }}
               >
                 {/* Close icon option A: panel top-right */}
                 <button
