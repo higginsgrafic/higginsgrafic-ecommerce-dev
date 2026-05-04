@@ -1079,9 +1079,10 @@ const OptimizedImg = React.forwardRef(function OptimizedImg({ src, alt, classNam
   );
 });
 
-function IconButton({ label, onClick, onDoubleClick, onMouseEnter, buttonRef, children }) {
+function IconButton({ id, label, onClick, onDoubleClick, onMouseEnter, buttonRef, children }) {
   return (
     <button
+      id={id}
       ref={buttonRef}
       type="button"
       aria-label={label}
@@ -2602,6 +2603,7 @@ function usePersistentState(key, initial, ttlMs = 10000) {
 
 // Plantilla independent de l'acordió del CISTELL — taula pròpia sobre la pauta
 function CistellComandaContent({ cartItems, setCartItems }) {
+  const navigate = useNavigate();
   const ROW_H = 32.8;          // alçada d'una fila de la pauta
   const GUTTER = 7.5;          // gutter horitzontal entre columnes
   const V_GUTTER = 2.8;        // gutter vertical entre files
@@ -2680,6 +2682,28 @@ function CistellComandaContent({ cartItems, setCartItems }) {
       return next;
     });
   };
+  const handleFinalizeOrder = () => {
+    const checkoutItems = CART_ITEMS
+      .filter((item) => !item.disabled)
+      .map((item, idx) => {
+        const parsedPrice = parseFloat(String(item.price).replace('€', '').replace(/\s/g, '').replace(',', '.'));
+        return {
+          id: `${idx}-${String(item.title || 'item').toLowerCase().replace(/\s+/g, '-')}`,
+          name: item.title || 'Producte',
+          size: item.size || 'L',
+          quantity: item.qty || 1,
+          price: Number.isNaN(parsedPrice) ? 0 : parsedPrice,
+          image: tshirtSrc(item.color || 'white'),
+        };
+      })
+      .filter((item) => item.quantity > 0 && item.price >= 0);
+
+    navigate('/checkout', {
+      state: {
+        cartItems: checkoutItems,
+      },
+    });
+  };
 
   const HEAD = { fontFamily: 'Oswald, sans-serif', fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.4px', color: '#475059' };
   const META = { fontFamily: 'Roboto Condensed, sans-serif', fontWeight: 400, color: '#7D8895' };
@@ -2691,7 +2715,7 @@ function CistellComandaContent({ cartItems, setCartItems }) {
       {false && <div style={{
         position: 'absolute',
         inset: 0,
-        backgroundImage: 'url(/tmp/USER/PAUTA-VERDA.svg)',
+        backgroundImage: 'url(/tmp/PAUTES/PAUTA-GENERAL.png)',
         backgroundRepeat: 'no-repeat',
         backgroundPosition: '0 -1px',
         backgroundSize: '1365.46px 737.015px',
@@ -2741,11 +2765,11 @@ function CistellComandaContent({ cartItems, setCartItems }) {
           <div style={{
             position: 'absolute',
             inset: 0,
-            backgroundImage: `url("${encodeURI("/placeholders/fons de l'acordió/FONS CISTELL.png")}")`,
+            backgroundImage: `url("${encodeURI('/placeholders/fons_acordio/fons-cistell-compra.png')}")`,
             backgroundRepeat: 'no-repeat',
             backgroundPosition: 'center top',
             backgroundSize: `${TABLE_WIDTH + COL4_EXTRA}px auto`,
-            transform: i % 2 === 0 ? 'none' : 'scaleX(-1)',
+            transform: i % 2 === 0 ? 'scaleX(-1)' : 'none',
             pointerEvents: 'none',
             zIndex: 0,
           }} />
@@ -2976,8 +3000,8 @@ function CistellComandaContent({ cartItems, setCartItems }) {
           return acc + unit * (it.qty || 1);
         }, 0);
         const transport = 4.95;
-        const grossTotal = subtotal + transport;
-        const iva = grossTotal - grossTotal / 1.21;
+        const grossTotal = subtotal;
+        const iva = subtotal * 0.21;
         const fmt = (n) => n.toFixed(2).replace('.', ',') + '€';
         const rows = [
           { label: 'SUBTOTAL',      amount: fmt(subtotal),   strong: false },
@@ -2995,11 +3019,11 @@ function CistellComandaContent({ cartItems, setCartItems }) {
               left: `calc(50% - ${TABLE_WIDTH / 2}px + ${SLIDE_OFFSET_X}px)`,
               width: `${TABLE_WIDTH + COL4_EXTRA}px`,
               height: `${rows.length * ROW_H - V_GUTTER}px`,
-              backgroundImage: `url("${encodeURI("/placeholders/fons de l'acordió/FONS CISTELL.png")}")`,
+              backgroundImage: `url("${encodeURI('/placeholders/fons_acordio/fons-cistell-compra.png')}")`,
               backgroundRepeat: 'no-repeat',
               backgroundPosition: 'center top',
               backgroundSize: `${TABLE_WIDTH}px 100%`,
-              transform: 'scaleX(-1)',
+              transform: 'none',
               pointerEvents: 'none',
               zIndex: 1,
             }} />
@@ -3092,7 +3116,7 @@ function CistellComandaContent({ cartItems, setCartItems }) {
           gap: `${GUTTER}px`,
         }}>
           {['FINALITZA LA COMANDA'].map((label) => (
-            <button key={label} style={{
+            <button id="stripe-guide-finalize-order" key={label} onClick={handleFinalizeOrder} style={{
               fontFamily: 'Roboto Condensed, sans-serif',
               fontWeight: 500,
               fontSize: '11pt',
@@ -3198,7 +3222,7 @@ function UserComandesContent() {
       ...TEXT,
     }}>
       {/* Mockup JPG guia per pestanya — desactivada */}
-      {false && activeTab === 'SEGURETAT' && (
+      {true && activeTab === 'SEGURETAT' && (
         <div style={{
           position: 'absolute',
           top: '-1px',
@@ -3303,7 +3327,7 @@ function UserComandesContent() {
             transition: background-color 9999s ease-in-out 0s;
           }
         `}</style>
-        <div style={{ width: '1320px', marginLeft: 'auto', marginRight: 'auto', marginTop: '-0.5px', overflow: 'hidden', position: 'relative', backgroundImage: 'url("/placeholders/fons%20de%20l%27acordio%CC%81/FONS%20COMPTE.png")', backgroundRepeat: 'no-repeat', backgroundPosition: 'top left', backgroundSize: '1320px 100%' }}>
+        <div style={{ width: '1320px', marginLeft: 'auto', marginRight: 'auto', marginTop: '-0.5px', overflow: 'hidden', position: 'relative', backgroundImage: 'url("/placeholders/fons_acordio/fons-usuari-compte.png")', backgroundRepeat: 'no-repeat', backgroundPosition: 'top left', backgroundSize: '1320px 100%' }}>
           <table className="compte-grid" style={{
             width: '1335px',
             marginLeft: '-7.5px',
@@ -3642,7 +3666,7 @@ function UserComandesContent() {
       </>)}
 
       {activeTab === 'SEGURETAT' && (
-        <div style={{ width: '1320px', marginLeft: 'auto', marginRight: 'auto', marginTop: '0px', height: SEG_TABLE_LOCKED_HEIGHT, overflow: 'visible', position: 'relative', zIndex: 2, backgroundColor: 'transparent', backgroundImage: 'url("/placeholders/fons%20de%20l%27acordio%CC%81/FONS%20SEGURETAT.png")', backgroundRepeat: 'no-repeat', backgroundPosition: 'top left', backgroundSize: '1320px 528px', paddingLeft: 0, paddingRight: 0, transform: `translate(${SEG_X_OFFSET}, ${SEG_Y_OFFSET})` }}>
+        <div style={{ width: '1320px', marginLeft: 'auto', marginRight: 'auto', marginTop: '0px', height: SEG_TABLE_LOCKED_HEIGHT, overflow: 'visible', position: 'relative', zIndex: 2, backgroundColor: 'transparent', backgroundImage: 'url("/placeholders/fons_acordio/fons-usuari-seguretat.png")', backgroundRepeat: 'no-repeat', backgroundPosition: 'top left', backgroundSize: '1320px 528px', paddingLeft: 0, paddingRight: 0, transform: `translate(${SEG_X_OFFSET}, ${SEG_Y_OFFSET})` }}>
           <style>{`.seguretat-table td { outline: none; border: none; box-shadow: none; background: transparent; }`}</style>
          <table className="seguretat-table" style={{
             width: '1335.1px',
@@ -4016,7 +4040,7 @@ function UserComandesContent() {
           marginTop: '-0.5px',
           position: 'relative',
           boxSizing: 'border-box',
-          backgroundImage: 'url("/placeholders/fons%20de%20l%27acordio%CC%81/FONS%20MISSATGES.png")',
+          backgroundImage: 'url("/placeholders/fons_acordio/fons-usuari-missatges.png")',
           backgroundRepeat: 'no-repeat',
           backgroundPosition: 'top left',
           backgroundSize: '1320px 525.2px',
@@ -4308,7 +4332,7 @@ function UserComandesContent() {
         }
         .comandes-table th > *, .comandes-table td > * { min-width: 0; max-width: 100%; }
       `}</style>
-      <div style={{ width: '1320px', marginLeft: 'auto', marginRight: 'auto', marginTop: '-0.5px', overflow: 'hidden', position: 'relative', backgroundImage: 'url("/placeholders/fons%20de%20l%27acordio%CC%81/FONS%20COMANDES.png")', backgroundRepeat: 'no-repeat', backgroundPosition: 'top left', backgroundSize: '1320px 100%' }}>
+      <div style={{ width: '1320px', marginLeft: 'auto', marginRight: 'auto', marginTop: '-0.5px', overflow: 'hidden', position: 'relative', backgroundImage: 'url("/placeholders/fons_acordio/fons-usuari-comandes.png")', backgroundRepeat: 'no-repeat', backgroundPosition: 'top left', backgroundSize: '1320px 100%' }}>
         <table className="comandes-table" style={{
           width: '1335px',
           marginLeft: '-7.5px',
@@ -4487,7 +4511,7 @@ function UserComandesContent() {
           left: 0,
           right: 0,
           bottom: 0,
-          backgroundImage: 'url(/tmp/USER/PAUTA-VERDA.svg)',
+          backgroundImage: 'url(/tmp/PAUTES/PAUTA-GENERAL.png)',
           backgroundRepeat: 'no-repeat',
           backgroundPosition: '0 -1px',
           backgroundSize: '1365.46px 737.015px',
@@ -6543,6 +6567,19 @@ export default function FullWideSlideDemoHeader({
     setActive((prev) => prev || 'first_contact');
   };
 
+  useEffect(() => {
+    const openFullWideCart = () => {
+      setMegaPage(3);
+      setAcordioExpanded(true);
+      setMegaFullScreen(false);
+      ensureMegaOpen();
+      touchMegaPublicActivity();
+    };
+
+    window.addEventListener('hg:open-full-wide-cart', openFullWideCart);
+    return () => window.removeEventListener('hg:open-full-wide-cart', openFullWideCart);
+  }, [setMegaPage, setAcordioExpanded]);
+
 
   const scrollSearchGridBy = (deltaPx) => {
     const el = searchGridScrollRef.current;
@@ -6572,6 +6609,7 @@ export default function FullWideSlideDemoHeader({
   }, [active, megaPage, searchResults.length]);
 
   const isManualLockEnabled = () => {
+    if (typeof manualEnabledOverride === 'boolean') return manualEnabledOverride;
     if (demoManualEnabled) return true;
     try {
       return window.localStorage.getItem('FULL_WIDE_SLIDE_DEMO_MANUAL') === '1';
@@ -7208,12 +7246,20 @@ export default function FullWideSlideDemoHeader({
     <header
       ref={headerRef}
       className={`${contained ? 'relative' : 'fixed'} z-[10000] bg-background`}
+      onMouseLeave={(e) => {
+        if (isManualLockEnabled()) return;
+        const nextTarget = e?.relatedTarget;
+        if (nextTarget instanceof Node && e.currentTarget.contains(nextTarget)) return;
+        setMegaPage(1);
+        setActive(null);
+        setMegaFullScreen(false);
+      }}
       style={
         contained
           ? { top: 0,
                   marginTop: '-25px', left: 0, right: 0 }
           : {
- top: 'var(--appHeaderOffset, 0px)', left: 'var(--rulerInset, 0px)', right: 0 }
+top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right: 0 }
       }
     >
       <div className="border-b border-border">
@@ -7228,8 +7274,9 @@ export default function FullWideSlideDemoHeader({
               {mobileOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
             </button>
 
-            <Link to="/" className="relative z-10 pointer-events-auto flex items-center gap-2 font-black tracking-tight text-foreground">
+            <Link id="stripe-guide-header-logo-anchor" to="/" className="relative z-10 pointer-events-auto flex items-center gap-2 font-black tracking-tight text-foreground">
               <span
+                id="stripe-guide-header-logo-mark-anchor"
                 ref={logoMarkRef}
                 aria-hidden="true"
                 data-brand-logo="1"
@@ -7258,6 +7305,14 @@ export default function FullWideSlideDemoHeader({
                   type="button"
                   className={`inline-flex items-center gap-1 text-xs font-semibold tracking-[0.18em] uppercase ${open ? 'text-foreground' : 'text-muted-foreground hover:text-foreground'}`}
                   aria-expanded={open ? 'true' : 'false'}
+                  onMouseEnter={() => {
+                    if (!active) return;
+                    if (active === item.id) return;
+                    setMegaPage(1);
+                    setMegaFullScreen(false);
+                    setActive(item.id);
+                    touchMegaPublicActivity();
+                  }}
                   onClick={() => {
                     setMegaPage(1);
                     setMegaFullScreen(false);
@@ -7352,6 +7407,7 @@ export default function FullWideSlideDemoHeader({
             </button>
             <div className="justify-self-end">
               <IconButton
+                id="stripe-guide-user-icon-anchor"
                 label="Account"
                 buttonRef={accountButtonRef}
                 onClick={(e) => {
@@ -7405,12 +7461,6 @@ export default function FullWideSlideDemoHeader({
 
       <div
         className="relative"
-        onMouseLeave={() => {
-          if (isManualLockEnabled()) return;
-          setMegaPage(1);
-          setActive(null);
-          setMegaFullScreen(false);
-        }}
       >
         {active ? (
           <div 
@@ -7618,6 +7668,7 @@ export default function FullWideSlideDemoHeader({
                           zIndex: 20,
                         }} />
                         <div 
+                          id="stripe-guide-cart-viewport-anchor"
                           onWheel={(e) => {
                             e.preventDefault();
                             e.currentTarget.scrollLeft += e.deltaY;
@@ -7639,7 +7690,7 @@ export default function FullWideSlideDemoHeader({
                         }}>
                           {/* Carrusel de productes del cistell */}
                           {carouselProducts.map((product, idx) => (
-                            <div key={idx} style={{
+                            <div id={idx === 0 ? 'stripe-guide-cart-card-top-anchor' : undefined} key={idx} style={{
                               position: 'relative',
                               flexShrink: 0,
                               overflow: 'visible',
@@ -8139,7 +8190,7 @@ export default function FullWideSlideDemoHeader({
                               {false && <div style={{
                                 position: 'absolute',
                                 inset: 0,
-                                backgroundImage: 'url(/tmp/USER/PAUTA-VERDA.svg)',
+                                backgroundImage: 'url(/tmp/PAUTES/PAUTA-GENERAL.png)',
                                 backgroundRepeat: 'no-repeat',
                                 backgroundPosition: '0 -1px',
                                 backgroundSize: '1365.46px 737.015px',

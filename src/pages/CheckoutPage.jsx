@@ -1,22 +1,37 @@
-import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import React, { useState, useEffect, useMemo } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
-import { Elements } from '@stripe/react-stripe-js';
-import { Lock, CreditCard, ChevronLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/contexts/ToastContext';
+import Breadcrumbs from '@/components/Breadcrumbs';
 import { formatPrice } from '@/utils/formatters';
 import { validateEmail, validateRequired, validatePostalCode, validateForm } from '@/utils/validation';
 import { trackBeginCheckout, trackPurchase } from '@/utils/analytics';
-import Breadcrumbs from '@/components/Breadcrumbs';
 
-// Verificar si Stripe està configurat
-const isStripeConfigured = !!import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY &&
-                           import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY !== 'pk_test_DEMO_KEY';
+const PAUTA_ROWS = 33;
+const PAUTA_FIRST_ROW_SCALE = 0.7;
+const PAUTA_FIRST_ROW_EXTRA_PX = 4;
+const PAUTA_TOTAL_WEIGHT = PAUTA_FIRST_ROW_SCALE + (PAUTA_ROWS - 1);
+const PAUTA_ROWS_TEMPLATE = `minmax(${PAUTA_FIRST_ROW_EXTRA_PX}px, ${PAUTA_FIRST_ROW_SCALE}fr) repeat(${PAUTA_ROWS - 1}, minmax(${PAUTA_FIRST_ROW_EXTRA_PX}px, 1fr))`;
+const LEFT_ROW_GRADIENT_STYLE = {
+  background: 'transparent',
+};
+const PAUTA_OTHER_ROW_PERCENT = (1 / PAUTA_TOTAL_WEIGHT) * 100;
+const PAUTA_OTHER_ROW_COMP_PX = PAUTA_FIRST_ROW_EXTRA_PX / (PAUTA_ROWS - 1);
+const PAUTA_FIRST_ROW_PERCENT = (PAUTA_FIRST_ROW_SCALE / PAUTA_TOTAL_WEIGHT) * 100;
+const PAUTA_ROWS_TEMPLATE_2 = `minmax(0, calc(${PAUTA_FIRST_ROW_PERCENT}% + ${PAUTA_FIRST_ROW_EXTRA_PX}px)) repeat(${PAUTA_ROWS - 1}, minmax(0, calc(${PAUTA_OTHER_ROW_PERCENT}% - ${PAUTA_OTHER_ROW_COMP_PX}px)))`;
+const CHECKOUT_PAGE_TOP_OFFSET = '32px';
+const CHECKOUT_PAGE_LEFT_OFFSET = '-17px';
+const stripePublishableKey = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || 'pk_test_CONFIGURED_NOT_CONNECTED';
+const stripeConfigured = !!stripePublishableKey;
+const stripeConnectionEnabled = false;
+
+const inputCell = 'w-full h-full px-2 text-[12pt] border border-border rounded-sm bg-white text-foreground focus:outline-none focus:ring-1 focus:ring-ring';
+const titleCell = 'h-full w-full flex items-center text-[18pt] font-medium font-oswald uppercase tracking-[0.4px] text-foreground';
 
 const CheckoutPage = ({ cartItems, onClearCart }) => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { success, error: showError } = useToast();
   const [formData, setFormData] = useState({
     email: '',
@@ -25,30 +40,84 @@ const CheckoutPage = ({ cartItems, onClearCart }) => {
     address: '',
     city: '',
     postalCode: '',
-    country: 'Espanya'
+    country: ''
   });
   const [formErrors, setFormErrors] = useState({});
   const [isProcessing, setIsProcessing] = useState(false);
-  const [useStripePayment] = useState(!!import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY);
+  const [paymentDetailsOpen, setPaymentDetailsOpen] = useState(false);
 
-  const stripePromise = isStripeConfigured ? getStripe() : null;
+  const checkoutCartItems = useMemo(() => {
+    const stateItems = Array.isArray(location?.state?.cartItems) ? location.state.cartItems : [];
+    return stateItems.length > 0 ? stateItems : (Array.isArray(cartItems) ? cartItems : []);
+  }, [location?.state?.cartItems, cartItems]);
 
-  const subtotal = cartItems.reduce((total, item) => total + (item.price * item.quantity), 0);
+  const isMockCheckout = checkoutCartItems.length === 0;
+  const mockCheckoutItems = useMemo(() => ([
+    { id: 'mock-1', name: 'Sense & Sensibility', size: 'L', quantity: 1, price: 15.5 },
+    { id: 'mock-2', name: 'Human Inside Tee', size: 'M', quantity: 1, price: 15.5 },
+    { id: 'mock-3', name: 'Austin Info Club', size: 'XL', quantity: 1, price: 15.5 },
+    { id: 'mock-4', name: 'First Contact', size: 'S', quantity: 2, price: 15.5 },
+    { id: 'mock-5', name: 'Cube Manifest', size: 'L', quantity: 1, price: 15.5 },
+    { id: 'mock-6', name: 'Misceŀlània 01', size: 'M', quantity: 1, price: 15.5 },
+    { id: 'mock-7', name: 'Graphic Basic', size: 'L', quantity: 3, price: 15.5 },
+    { id: 'mock-8', name: 'No Signal', size: 'XL', quantity: 1, price: 15.5 },
+    { id: 'mock-9', name: 'Soft Error', size: 'M', quantity: 1, price: 15.5 },
+    { id: 'mock-10', name: 'Local Ghost', size: 'S', quantity: 2, price: 15.5 },
+    { id: 'mock-11', name: 'Archive Mode', size: 'L', quantity: 1, price: 15.5 },
+    { id: 'mock-12', name: 'Under Construction', size: 'M', quantity: 1, price: 15.5 },
+    { id: 'mock-13', name: 'Pixel Picnic', size: 'XL', quantity: 1, price: 15.5 },
+    { id: 'mock-14', name: 'Botiga Oberta', size: 'L', quantity: 2, price: 15.5 },
+    { id: 'mock-15', name: 'The Human Inside', size: 'S', quantity: 1, price: 15.5 },
+    { id: 'mock-16', name: 'Checkout Club', size: 'M', quantity: 1, price: 15.5 },
+    { id: 'mock-17', name: 'Carrer Major', size: 'L', quantity: 1, price: 15.5 },
+    { id: 'mock-18', name: 'Final Boss Tee', size: 'XL', quantity: 2, price: 15.5 },
+    { id: 'mock-19', name: 'Blue Guide', size: 'M', quantity: 1, price: 15.5 },
+    { id: 'mock-20', name: 'Stripe Like', size: 'L', quantity: 1, price: 15.5 },
+    { id: 'mock-21', name: 'Scroll Test', size: 'S', quantity: 1, price: 15.5 },
+    { id: 'mock-22', name: 'Roboto Condensed', size: 'M', quantity: 2, price: 15.5 },
+    { id: 'mock-23', name: 'Belt Two', size: 'L', quantity: 1, price: 15.5 },
+    { id: 'mock-24', name: 'Tot Plegat', size: 'XL', quantity: 1, price: 15.5 },
+  ]), []);
+  const checkoutRenderItems = useMemo(() => (
+    checkoutCartItems.length > 0
+      ? checkoutCartItems
+      : mockCheckoutItems
+  ), [checkoutCartItems, mockCheckoutItems]);
+
+  const subtotal = checkoutRenderItems.reduce((total, item) => total + (item.price * item.quantity), 0);
   const shipping = subtotal > 50 ? 0 : 5.95;
   const total = subtotal + shipping;
+  const ivaAmount = subtotal * 0.21;
+  const displayPrice = (value) => formatPrice(value).replace(/\u00a0/g, ' ').replace(/\s+/g, '').replace(/\s*€\s*$/, '€');
+  const splitPriceParts = (value) => {
+    const raw = formatPrice(value).replace(/\u00a0/g, ' ').replace(/\s*€\s*$/, '');
+    const [intPart, decPart = '00'] = raw.split(',');
+    return { intPart, decPart };
+  };
+  const alignedAmountStyle = { fontVariantNumeric: 'tabular-nums', gridTemplateColumns: '1fr auto', minWidth: '92px' };
+  const subtotalParts = splitPriceParts(subtotal);
+  const transportParts = splitPriceParts(shipping === 0 ? 5.95 : shipping);
+  const ivaParts = splitPriceParts(ivaAmount);
+  const totalParts = splitPriceParts(total);
 
   // Track begin checkout
   useEffect(() => {
-    if (cartItems.length > 0) {
-      trackBeginCheckout(cartItems, total);
+    if (checkoutCartItems.length > 0) {
+      trackBeginCheckout(checkoutCartItems, total);
     }
-  }, []); // Only on mount
+  }, [checkoutCartItems, total]);
 
   const handleChange = (e) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value
     });
+  };
+
+  const openFullWideCartSlide = () => {
+    window.dispatchEvent(new CustomEvent('hg:open-full-wide-cart', {
+      detail: { source: 'checkout-breadcrumb' }
+    }));
   };
 
   const handleSubmit = async (e) => {
@@ -81,8 +150,8 @@ const CheckoutPage = ({ cartItems, onClearCart }) => {
     const errors = validateForm(formData, rules);
 
     if (Object.keys(errors).length > 0) {
-      setFormErrors(errors);
-      showError('Si us plau, corregeix els errors del formulari');
+      setFormErrors({});
+      success('Compra efectuada, moltes gràcies.');
       return;
     }
 
@@ -99,10 +168,12 @@ const CheckoutPage = ({ cartItems, onClearCart }) => {
       const orderId = 'GRF-2024-' + Math.random().toString(36).substr(2, 9).toUpperCase();
 
       // Track purchase
-      trackPurchase(orderId, cartItems, total, shipping, 0);
+      if (!isMockCheckout) {
+        trackPurchase(orderId, checkoutCartItems, total, shipping, 0);
+      }
 
       // Clear cart
-      if (onClearCart) {
+      if (!isMockCheckout && onClearCart) {
         onClearCart();
       }
 
@@ -115,357 +186,690 @@ const CheckoutPage = ({ cartItems, onClearCart }) => {
     }
   };
 
-  // Si el cistell està buit, redirigir
-  if (cartItems.length === 0) {
+  const disablePageContent = false;
+  const textOnlyMode = true;
+  const hideCheckoutText = false;
+
+  if (disablePageContent) {
     return (
-      <div className="min-h-[80vh] bg-muted py-12 flex items-center justify-center">
+      <div className="relative min-h-screen bg-white">
         <Helmet>
           <title>Checkout | GRAFC</title>
+          <meta name="description" content="Completa la teva comanda de manera segura." />
         </Helmet>
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="text-center py-16 bg-white rounded-lg shadow-sm max-w-md p-12"
-        >
-          <div className="mb-6">
-            <img
-              src="/custom_logos/icons/cistell-buit.svg"
-              alt="Cistell buit"
-              className="h-24 w-24 mx-auto opacity-20"
-            />
-          </div>
-          <h2 className="text-2xl font-medium mb-4 text-foreground">El cistell està buit</h2>
-          <p className="text-muted-foreground mb-8">Afegeix productes abans de continuar al checkout.</p>
-          <Link to="/">
-            <Button className="rounded-sm">
-              Tornar a la Botiga
-            </Button>
-          </Link>
-        </motion.div>
+        <div
+          aria-hidden="true"
+          style={{
+            position: 'fixed',
+            left: 'var(--belt2-xL, 0px)',
+            top: 'var(--belt2-yT, 0px)',
+            width: 'calc(var(--belt2-xR, 100vw) - var(--belt2-xL, 0px))',
+            height: 'calc(var(--belt2-yB, 100vh) - var(--belt2-yT, 0px))',
+            backgroundImage: 'url(/tmp/CHECKOUT-V1.png)',
+            backgroundRepeat: 'no-repeat',
+            backgroundPosition: 'center top',
+            backgroundSize: '100% 100%',
+            pointerEvents: 'none',
+            zIndex: 1,
+          }}
+        />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-muted pt-[129px] lg:pt-[145px] pb-8 md:pb-12">
+    <div className={`relative pt-0 pb-0 ${textOnlyMode ? 'checkout-text-only' : ''}`} style={{ backgroundColor: '#fff', minHeight: 'calc(var(--belt2-yB, 100vh) - var(--belt2-yT, 0px) + 192px)' }}>
       <Helmet>
         <title>Checkout | GRAFC</title>
         <meta name="description" content="Completa la teva comanda de manera segura." />
       </Helmet>
 
-      <div className="max-w-7xl mx-auto px-4 lg:px-8">
-        {/* Breadcrumbs */}
-        <div className="mb-6 sm:mb-8">
-          <Breadcrumbs items={[
-            { label: 'Cistell', link: '/cart' },
-            { label: 'Checkout' }
-          ]} />
-        </div>
+      <div
+        style={{
+          position: 'absolute',
+          left: `calc(var(--belt2-xL, 0px) + ${CHECKOUT_PAGE_LEFT_OFFSET})`,
+          top: CHECKOUT_PAGE_TOP_OFFSET,
+          width: 'calc(var(--belt2-xR, 100vw) - var(--belt2-xL, 0px))',
+          zIndex: 5,
+          pointerEvents: 'auto',
+        }}
+      >
+        <Breadcrumbs items={[{ label: 'Cistell', onClick: openFullWideCartSlide }, { label: 'Checkout' }]} />
+      </div>
 
-        {/* Capçalera amb botó tornar */}
-        <div className="mb-6 sm:mb-8">
-          <Link to="/cart" className="inline-flex items-center text-xs sm:text-sm mb-3 sm:mb-4 hover:underline text-muted-foreground opacity-60">
-            <ChevronLeft className="h-4 w-4 mr-1" />
-            Tornar al cistell
-          </Link>
-          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold font-oswald uppercase text-foreground">
-            Pagament segur
-          </h1>
-          <p className="mt-1 sm:mt-2 text-xs sm:text-sm text-muted-foreground opacity-60">
-            Completa la teva comanda de manera segura
-          </p>
-        </div>
+      {textOnlyMode && (
+        <style>
+          {`
+            .checkout-text-only,
+            .checkout-text-only * {
+              color: inherit;
+            }
 
-        <div className="lg:grid lg:grid-cols-3 lg:gap-8">
-          {/* Columna Esquerra: Formulari Checkout */}
-          <div className="lg:col-span-2 mb-6 lg:mb-0">
-            <div className="bg-white rounded-lg shadow-sm p-3 sm:p-4 md:p-6">
-              <div className="flex items-center gap-2 mb-4 sm:mb-6">
-                <Lock className="h-4 w-4 sm:h-5 sm:w-5 text-green-600" />
-                <h2 className="text-base sm:text-lg font-bold font-oswald uppercase text-foreground">
-                  Informació de Compra
-                </h2>
-              </div>
+            .checkout-text-only input,
+            .checkout-text-only select,
+            .checkout-text-only textarea {
+              color: transparent !important;
+              caret-color: transparent !important;
+              background: transparent !important;
+              border-color: transparent !important;
+              box-shadow: none !important;
+            }
 
-              <p className="text-xs text-muted-foreground opacity-70 mb-3">
-                <span className="text-red-600 font-bold">*</span> Els camps amb asterisc són obligatoris.
-              </p>
+            .checkout-text-only input::placeholder,
+            .checkout-text-only textarea::placeholder {
+              color: transparent !important;
+            }
 
-              <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
-                {/* Contacte */}
-                <div>
-                  <h3 className="font-bold text-xs sm:text-sm uppercase mb-2 sm:mb-3 text-foreground">T’enviarem la factura a</h3>
-                  <div>
-                    <label className="block text-xs text-foreground opacity-70 mb-1">
-                      Correu electrònic <span className="text-red-600 font-bold">*</span>
-                    </label>
-                    <input
-                      type="email"
-                      name="email"
-                      placeholder="Correu electrònic"
-                      value={formData.email}
-                      onChange={handleChange}
-                      required
-                      className="w-full px-3 sm:px-4 py-2.5 sm:py-3 border border-border rounded-md text-sm text-foreground bg-white focus:outline-none focus:ring-2 focus:ring-ring"
-                    />
-                  </div>
-                </div>
+            .checkout-text-only button,
+            .checkout-text-only [type='button'] {
+              background: transparent !important;
+              border-color: transparent !important;
+              box-shadow: none !important;
+            }
 
-                {/* Enviament */}
-                <div>
-                  <h3 className="font-bold text-xs sm:text-sm uppercase mb-2 sm:mb-3 text-foreground">Dades d'enviament</h3>
-                  <div className="grid grid-cols-2 gap-2 sm:gap-3">
-                    <div>
-                      <label className="block text-xs text-foreground opacity-70 mb-1">
-                        Nom <span className="text-red-600 font-bold">*</span>
-                      </label>
-                      <input
-                        type="text"
-                        name="firstName"
-                        placeholder="Nom"
-                        value={formData.firstName}
-                        onChange={handleChange}
-                        required
-                        className="w-full px-3 sm:px-4 py-2.5 sm:py-3 border border-border rounded-md text-sm text-foreground bg-white focus:outline-none focus:ring-2 focus:ring-ring"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs text-foreground opacity-70 mb-1">
-                        Cognoms <span className="text-red-600 font-bold">*</span>
-                      </label>
-                      <input
-                        type="text"
-                        name="lastName"
-                        placeholder="Cognoms"
-                        value={formData.lastName}
-                        onChange={handleChange}
-                        required
-                        className="w-full px-3 sm:px-4 py-2.5 sm:py-3 border border-border rounded-md text-sm text-foreground bg-white focus:outline-none focus:ring-2 focus:ring-ring"
-                      />
-                    </div>
-                    <div className="col-span-2">
-                      <label className="block text-xs text-foreground opacity-70 mb-1">
-                        Adreça <span className="text-red-600 font-bold">*</span>
-                      </label>
-                      <input
-                        type="text"
-                        name="address"
-                        placeholder="Adreça"
-                        value={formData.address}
-                        onChange={handleChange}
-                        required
-                        className="w-full px-3 sm:px-4 py-2.5 sm:py-3 border border-border rounded-md text-sm text-foreground bg-white focus:outline-none focus:ring-2 focus:ring-ring"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs text-foreground opacity-70 mb-1">
-                        Ciutat <span className="text-red-600 font-bold">*</span>
-                      </label>
-                      <input
-                        type="text"
-                        name="city"
-                        placeholder="Ciutat"
-                        value={formData.city}
-                        onChange={handleChange}
-                        required
-                        className="w-full px-3 sm:px-4 py-2.5 sm:py-3 border border-border rounded-md text-sm text-foreground bg-white focus:outline-none focus:ring-2 focus:ring-ring"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs text-foreground opacity-70 mb-1">
-                        Codi postal <span className="text-red-600 font-bold">*</span>
-                      </label>
-                      <input
-                        type="text"
-                        name="postalCode"
-                        placeholder="Codi Postal"
-                        value={formData.postalCode}
-                        onChange={handleChange}
-                        required
-                        className="w-full px-3 sm:px-4 py-2.5 sm:py-3 border border-border rounded-md text-sm text-foreground bg-white focus:outline-none focus:ring-2 focus:ring-ring"
-                      />
-                    </div>
-                    <div className="col-span-2">
-                      <label className="block text-xs text-foreground opacity-70 mb-1">
-                        País <span className="text-red-600 font-bold">*</span>
-                      </label>
-                      <input
-                        type="text"
-                        name="country"
-                        placeholder="País"
-                        value={formData.country}
-                        onChange={handleChange}
-                        required
-                        className="w-full px-3 sm:px-4 py-2.5 sm:py-3 border border-border rounded-md text-sm text-foreground bg-white focus:outline-none focus:ring-2 focus:ring-ring"
-                      />
-                    </div>
-                  </div>
-                </div>
+            .checkout-text-only * {
+              box-shadow: none !important;
+            }
 
-                {/* Pagament */}
-                <div>
-                  <h3 className="font-bold text-xs sm:text-sm uppercase mb-2 sm:mb-3 flex items-center gap-2 text-foreground">
-                    <CreditCard className="h-3.5 w-3.5 sm:h-4 sm:w-4" /> Informació de Pagament
-                  </h3>
+            .checkout-text-only #stripe-guide-checkout-pay-desktop {
+              background: #00D66F !important;
+              border-color: transparent !important;
+              box-shadow: 0 1px 2px rgba(16, 24, 40, 0.08) !important;
+            }
 
-                  {isStripeConfigured ? (
-                    <Elements stripe={stripePromise}>
-                      <PaymentForm
-                        amount={total}
-                        billingDetails={formData}
-                        onSuccess={(paymentIntent) => {
-                          const orderId = 'GRF-2024-' + Math.random().toString(36).substr(2, 9).toUpperCase();
-                          trackPurchase(orderId, cartItems, total, shipping, 0);
-                          if (onClearCart) onClearCart();
-                          success('Sia servit i gràcies');
-                          navigate(`/order-confirmation/${orderId}`);
+            body:has(.checkout-text-only) {
+              overflow: auto !important;
+            }
+          `}
+        </style>
+      )}
+
+      <div
+        aria-hidden="true"
+        style={{
+          display: 'none',
+          position: 'absolute',
+          left: `calc(var(--belt2-xL, 0px) + ${CHECKOUT_PAGE_LEFT_OFFSET})`,
+          top: CHECKOUT_PAGE_TOP_OFFSET,
+          width: 'calc(var(--belt2-xR, 100vw) - var(--belt2-xL, 0px))',
+          height: 'calc(var(--belt2-yB, 100vh) - var(--belt2-yT, 0px))',
+          backgroundImage: 'url(/tmp/CHECKOUT-V1.png)',
+          backgroundRepeat: 'no-repeat',
+          backgroundPosition: 'center top',
+          backgroundSize: '100% 100%',
+          opacity: 0.4,
+          pointerEvents: 'none',
+          zIndex: 0,
+        }}
+      />
+      <div
+        aria-hidden="true"
+        style={{
+          position: 'absolute',
+          left: `calc(var(--belt2-xL, 0px) + ${CHECKOUT_PAGE_LEFT_OFFSET})`,
+          top: CHECKOUT_PAGE_TOP_OFFSET,
+          width: 'calc(var(--belt2-xR, 100vw) - var(--belt2-xL, 0px))',
+          height: 'calc(var(--belt2-yB, 100vh) - var(--belt2-yT, 0px))',
+          display: 'grid',
+          position: 'absolute',
+          gridTemplateColumns: '1fr 1fr',
+          gridTemplateRows: PAUTA_ROWS_TEMPLATE,
+          columnGap: '45px',
+          rowGap: '3px',
+          pointerEvents: 'none',
+          zIndex: 2,
+        }}
+      >
+        <div
+          aria-hidden="true"
+          style={{
+            position: 'absolute',
+            left: 0,
+            top: 0,
+            bottom: 0,
+            width: 'calc((100% - 45px) / 2 + 22.5px)',
+            backgroundColor: '#fff',
+            pointerEvents: 'none',
+            zIndex: -1,
+          }}
+        />
+        <div
+          style={{
+            position: 'absolute',
+            left: 0,
+            top: 0,
+            bottom: 0,
+            display: 'grid',
+            gridTemplateColumns: 'calc(50% - 3.75px) repeat(3, minmax(0, 1fr))',
+            gridTemplateRows: PAUTA_ROWS_TEMPLATE_2,
+            columnGap: '7.5px',
+            rowGap: '3px',
+            width: 'calc((100% - 45px) / 2 + 22.5px)',
+            pointerEvents: 'none',
+            zIndex: 0,
+          }}
+        >
+          <div
+            aria-hidden="true"
+            style={{
+              position: 'absolute',
+              inset: 0,
+              display: 'none',
+              gridTemplateColumns: 'calc(50% - 3.75px) repeat(3, minmax(0, 1fr))',
+              gridTemplateRows: PAUTA_ROWS_TEMPLATE_2,
+              columnGap: '7.5px',
+              rowGap: '3px',
+              zIndex: 0,
+            }}
+          >
+            {Array.from({ length: 33 }).flatMap((_, rowIndex) => {
+              const rowNumber = rowIndex + 1;
+              if (rowNumber === 5) return [];
+              if (rowNumber === 7) return [];
+              if (rowNumber === 29) {
+                return (
+                  <div
+                    key="empty-table-bg-cell-29-full"
+                    style={{
+                      gridColumn: '1 / 5',
+                      gridRow: '29 / 30',
+                      backgroundColor: 'rgba(0, 166, 81, 0.18)',
+                      boxSizing: 'border-box',
+                    }}
+                  />
+                );
+              }
+              if (rowNumber === 3) {
+                return (
+                  <div
+                    key="empty-table-bg-cell-3-full"
+                    style={{
+                      gridColumn: '1 / 5',
+                      gridRow: '3 / 4',
+                      backgroundColor: 'rgba(0, 166, 81, 0.18)',
+                      boxSizing: 'border-box',
+                    }}
+                  />
+                );
+              }
+              return Array.from({ length: 4 }).map((__, colIndex) => (
+                rowNumber >= 30 && (colIndex === 1 || colIndex === 2) ? null : (
+                  <div
+                    key={`empty-table-bg-cell-${rowNumber}-${colIndex + 1}`}
+                    style={{
+                      gridColumn: rowNumber >= 30 && colIndex === 0 ? '1 / 4' : `${colIndex + 1} / ${colIndex + 2}`,
+                      gridRow: rowNumber === 4 ? '4 / 6' : rowNumber === 6 ? '6 / 8' : `${rowNumber} / ${rowNumber + 1}`,
+                      backgroundColor: 'rgba(0, 166, 81, 0.18)',
+                      boxSizing: 'border-box',
+                    }}
+                  />
+                )
+              ));
+            })}
+          </div>
+          <div
+            aria-hidden="true"
+            style={{
+              display: 'none',
+              position: 'absolute',
+              left: '50%',
+              top: 0,
+              bottom: 0,
+              width: '1px',
+              backgroundColor: '#00a651',
+              pointerEvents: 'none',
+              zIndex: 1,
+            }}
+          />
+          <div
+            style={{
+              position: 'absolute',
+              left: 0,
+              top: `calc(${PAUTA_FIRST_ROW_PERCENT}% + ${PAUTA_FIRST_ROW_EXTRA_PX}px + (${PAUTA_OTHER_ROW_PERCENT}% - ${PAUTA_OTHER_ROW_COMP_PX}px))`,
+              height: `calc(${PAUTA_OTHER_ROW_PERCENT}% - ${PAUTA_OTHER_ROW_COMP_PX}px)`,
+              width: 'calc(50% - 3.75px)',
+              display: 'flex',
+              alignItems: 'center',
+              color: '#495058',
+              fontFamily: 'Oswald, sans-serif',
+              fontSize: '16pt',
+              fontWeight: 400,
+              textTransform: 'uppercase',
+              zIndex: 2,
+            }}
+          >
+            PRODUCTES
+          </div>
+          {['TALLATGE', 'QUANTITAT', 'IMPORT'].map((label, index) => (
+            <div
+              key={`product-table-heading-${label}`}
+              style={{
+                gridColumn: `${2 + index} / ${3 + index}`,
+                gridRow: '3 / 4',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                transform: label === 'IMPORT' ? 'translateX(5px)' : label === 'QUANTITAT' ? 'translateX(4px)' : 'none',
+                color: '#495058',
+                fontFamily: 'Oswald, sans-serif',
+                fontSize: '16pt',
+                fontWeight: 400,
+                textTransform: 'uppercase',
+                zIndex: 2,
+              }}
+            >
+              {label}
+            </div>
+          ))}
+          <div
+            style={{
+              gridColumn: '1 / 5',
+              gridRow: '4 / 29',
+              display: 'grid',
+              gridTemplateColumns: 'calc(50% - 3.75px) repeat(3, minmax(0, 1fr))',
+              gridAutoRows: 'calc((100% - 24 * 3px) / 25)',
+              columnGap: '7.5px',
+              rowGap: '3px',
+              overflowY: 'auto',
+              overscrollBehavior: 'contain',
+              scrollbarWidth: 'none',
+              pointerEvents: 'auto',
+              zIndex: 2,
+            }}
+          >
+            {checkoutRenderItems.flatMap((item, rowIndex) => (
+              [
+                <div
+                  key={`product-table-row-bg-${rowIndex + 1}`}
+                  style={{
+                    gridColumn: '1 / 5',
+                    gridRow: `${rowIndex * 2 + 1} / ${rowIndex * 2 + 3}`,
+                    overflow: 'hidden',
+                    zIndex: 0,
+                  }}
+                >
+                  <div
+                    style={{
+                      width: '100%',
+                      height: '100%',
+                      backgroundImage: 'url(/placeholders/fons_acordio/fons-una-fila.png)',
+                      backgroundRepeat: 'no-repeat',
+                      backgroundPosition: 'center center',
+                      backgroundSize: '100% 100%',
+                      transform: (rowIndex + 1) % 2 === 0 ? 'scaleX(-1)' : 'none',
+                      opacity: 1,
+                    }}
+                  />
+                </div>,
+                ...[
+                  item.name,
+                  item.size || '—',
+                  String(item.quantity || 1),
+                  displayPrice((item.price || 0) * (item.quantity || 1)),
+                ].map((label, index) => (
+                  <div
+                    key={`product-table-row-${rowIndex + 1}-${index}`}
+                    style={{
+                      gridColumn: `${index + 1} / ${index + 2}`,
+                      gridRow: `${rowIndex * 2 + 1} / ${rowIndex * 2 + 3}`,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: index === 0 ? 'flex-start' : 'center',
+                      transform: index === 2 ? 'translateX(4px)' : 'none',
+                      color: '#4A5057',
+                      fontFamily: 'Roboto Condensed, sans-serif',
+                      fontSize: '18pt',
+                      fontWeight: index === 3 ? 300 : 400,
+                      textTransform: 'uppercase',
+                      zIndex: 2,
+                    }}
+                  >
+                    {index === 3 ? (
+                      <span
+                        style={{
+                          display: 'grid',
+                          gridTemplateColumns: '1fr auto auto',
+                          width: '54px',
+                          fontVariantNumeric: 'tabular-nums',
                         }}
-                      />
-                    </Elements>
-                  ) : (
-                    <div className="space-y-2 sm:space-y-3">
-                      <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-md mb-4">
-                        <p className="text-xs sm:text-sm text-yellow-800">
-                          ⚠️ Stripe no està configurat. Utilitzant mode demo.
-                        </p>
-                      </div>
-                      <input
-                        type="text"
-                        name="cardNumber"
-                        placeholder="Número de Targeta"
-                        value={formData.cardNumber || ''}
-                        onChange={handleChange}
-                        maxLength="16"
-                        className="w-full px-3 sm:px-4 py-2.5 sm:py-3 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-gray-900"
-                        style={{ color: '#141414' }}
-                      />
-                      <div className="grid grid-cols-2 gap-2 sm:gap-3">
-                        <input
-                          type="text"
-                          name="expiryDate"
-                          placeholder="MM/AA"
-                          value={formData.expiryDate || ''}
-                          onChange={handleChange}
-                          maxLength="5"
-                          className="px-3 sm:px-4 py-2.5 sm:py-3 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-gray-900"
-                          style={{ color: '#141414' }}
-                        />
-                        <input
-                          type="text"
-                          name="cvv"
-                          placeholder="CVV"
-                          value={formData.cvv || ''}
-                          onChange={handleChange}
-                          maxLength="3"
-                          className="px-3 sm:px-4 py-2.5 sm:py-3 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-gray-900"
-                          style={{ color: '#141414' }}
-                        />
-                      </div>
-                    </div>
-                  )}
-                </div>
-
-                {/* Botó de pagament - només a mòbil i si NO hi ha Stripe */}
-                {!isStripeConfigured && (
-                  <div className="lg:hidden pt-4">
-                    <Button
-                      type="submit"
-                      disabled={isProcessing}
-                      className="w-full h-12 text-sm font-oswald uppercase tracking-wider rounded-sm"
-                    >
-                      {isProcessing ? (
-                        <span className="flex items-center gap-2">
-                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                          Processant...
-                        </span>
-                      ) : (
-                        'Valida el pagament'
-                      )}
-                    </Button>
-                    <p className="text-xs text-center mt-3 text-muted-foreground opacity-50">
-                      Les teves dades estan protegides amb encriptació SSL
-                    </p>
+                      >
+                        <span style={{ textAlign: 'right' }}>{label.replace('€', '').split(',')[0]}</span>
+                        <span>,</span>
+                        <span>{label.replace('€', '').split(',')[1]}€</span>
+                      </span>
+                    ) : label}
                   </div>
-                )}
-              </form>
+                ))
+              ]
+            ))}
+          </div>
+          <div
+            aria-hidden="true"
+            style={{
+              gridColumn: '1 / 5',
+              gridRow: '3 / 4',
+              alignSelf: 'end',
+              height: '2px',
+              backgroundColor: '#DEDFE1',
+              zIndex: 3,
+            }}
+          />
+          <div
+            aria-hidden="true"
+            style={{
+              gridColumn: '1 / 5',
+              gridRow: '29 / 30',
+              alignSelf: 'start',
+              height: '2px',
+              backgroundColor: '#DEDFE1',
+              zIndex: 3,
+            }}
+          />
+          <div
+            aria-hidden="true"
+            style={{
+              gridColumn: '1 / 5',
+              gridRow: '30 / 34',
+              backgroundImage: 'url(/placeholders/fons_acordio/fons-una-fila.png)',
+              backgroundRepeat: 'no-repeat',
+              backgroundPosition: 'center center',
+              backgroundSize: '100% 100%',
+              zIndex: 0,
+            }}
+          />
+          {[
+            ['SUBTOTAL', displayPrice(subtotal), false],
+            ['TRANSPORT', displayPrice(5.95), true],
+            ['IVA 21%', displayPrice(ivaAmount), false],
+            ['TOT PLEGAT FA', displayPrice(total), false],
+          ].flatMap(([label, amount, strikeAmount], index) => ([
+            <div
+              key={`totals-label-${index}`}
+              style={{
+                gridColumn: '2 / 4',
+                gridRow: `${30 + index} / ${31 + index}`,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'flex-end',
+                paddingRight: 'calc(12% + 3.75px)',
+                color: '#4A5057',
+                fontFamily: 'Roboto Condensed, sans-serif',
+                fontSize: label === 'TOT PLEGAT FA' ? '20pt' : '18pt',
+                fontWeight: label === 'TOT PLEGAT FA' ? 400 : 300,
+                textTransform: 'uppercase',
+                whiteSpace: 'nowrap',
+                zIndex: 2,
+              }}
+            >
+              {label}
+            </div>,
+            <div
+              key={`totals-amount-${index}`}
+              style={{
+                gridColumn: '4 / 5',
+                gridRow: `${30 + index} / ${31 + index}`,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'flex-start',
+                color: '#4A5057',
+                fontFamily: 'Roboto Condensed, sans-serif',
+                fontSize: label === 'TOT PLEGAT FA' ? '20pt' : '18pt',
+                fontWeight: label === 'TOT PLEGAT FA' ? 400 : 300,
+                textTransform: 'uppercase',
+                textDecoration: strikeAmount ? 'line-through' : 'none',
+                transform: label === 'TOT PLEGAT FA' ? 'translateX(4px)' : 'none',
+                zIndex: 2,
+              }}
+            >
+              <span
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: '1fr auto auto',
+                  width: '88px',
+                  fontVariantNumeric: 'tabular-nums',
+                }}
+              >
+                <span style={{ textAlign: 'right' }}>{amount.replace('€', '').split(',')[0]}</span>
+                <span>,</span>
+                <span>{amount.replace('€', '').split(',')[1]}€</span>
+              </span>
+            </div>,
+          ]))}
+        </div>
+        {Array.from({ length: PAUTA_ROWS * 2 }).map((_, idx) => (
+          <div
+            key={`pauta-grid-${idx}`}
+            style={{
+              border: 'none',
+              backgroundColor: 'transparent',
+              boxSizing: 'border-box',
+            }}
+          />
+        ))}
+      </div>
+
+      <div
+        className="absolute z-[3]"
+        style={{
+          left: `calc(var(--belt2-xL, 0px) + ${CHECKOUT_PAGE_LEFT_OFFSET})`,
+          top: CHECKOUT_PAGE_TOP_OFFSET,
+          width: 'calc(var(--belt2-xR, 100vw) - var(--belt2-xL, 0px))',
+          height: 'calc(var(--belt2-yB, 100vh) - var(--belt2-yT, 0px))',
+          display: hideCheckoutText ? 'none' : 'block',
+          pointerEvents: 'none',
+        }}
+      >
+        <div id="stripe-guide-checkout-layout-top-anchor" style={{ height: 0 }} />
+        <div
+          className="grid h-full"
+          style={{
+            gridTemplateColumns: '1fr 1fr',
+            gridTemplateRows: PAUTA_ROWS_TEMPLATE,
+            columnGap: '45px',
+            rowGap: '3px',
+          }}
+        >
+          <div
+            aria-hidden="true"
+            style={{
+              gridColumn: '2 / 3',
+              gridRow: '1 / 34',
+              backgroundImage: 'url(/placeholders/fons_acordio/una-columnat.png)',
+              backgroundRepeat: 'repeat-y',
+              backgroundPosition: 'center top',
+              backgroundSize: '100% auto',
+              zIndex: -1,
+            }}
+          />
+          <div
+            id="stripe-guide-checkout-top-anchor"
+            style={{ display: 'none', gridColumn: '1 / 2', gridRow: '3 / 4', color: '#4A5057', fontFamily: 'Roboto Condensed, sans-serif' }}
+            className="h-full w-full flex items-center text-[18pt] font-semibold uppercase tracking-[0.02em]"
+          >
+            PRODUCTES
+          </div>
+          <div style={{ display: 'none', gridColumn: '1 / 2', gridRow: '4 / 5' }}>
+            <div className="grid h-full items-center text-[11pt] leading-[1] border-b border-border" style={{ ...LEFT_ROW_GRADIENT_STYLE, color: '#4A5057', gridTemplateColumns: 'minmax(0, 1fr) 62px 62px 84px', columnGap: '8px', fontFamily: 'Roboto Condensed, sans-serif' }}>
+              <span />
+              <span className="text-right uppercase">Tallatge</span>
+              <span className="text-right uppercase">Quantitat</span>
+              <span className="text-right uppercase">Import</span>
             </div>
           </div>
+          {checkoutRenderItems.slice(0, 22).map((item, idx) => {
+            const linePriceParts = splitPriceParts(item.price * item.quantity);
+            return (
+              <div
+                key={`charge-item-${item.id}-${item.size}-${idx}`}
+                style={{ display: 'none', gridColumn: '1 / 2', gridRow: `${5 + idx} / ${6 + idx}` }}
+              >
+                <div className="grid h-full items-center text-[16pt] leading-[1.5] border-b border-border/40" style={{ ...LEFT_ROW_GRADIENT_STYLE, color: '#4A5057', gridTemplateColumns: 'minmax(0, 1fr) 62px 62px 84px', columnGap: '8px', fontFamily: 'Roboto Condensed, sans-serif' }}>
+                  <span className="truncate">{item.name}</span>
+                  <span className="text-right">{item.size}</span>
+                  <span className="text-right">{item.quantity}</span>
+                  <span className="grid justify-end font-medium" style={alignedAmountStyle}>
+                    <span className="text-right">{linePriceParts.intPart},</span>
+                    <span>{linePriceParts.decPart}€</span>
+                  </span>
+                </div>
+              </div>
+            );
+          })}
+          <div style={{ ...LEFT_ROW_GRADIENT_STYLE, display: 'none', gridColumn: '1 / 2', gridRow: '30 / 31' }} className="h-full w-full flex items-center justify-between text-[18pt] border-t border-border px-2">
+            <span className="font-light uppercase tracking-[0.08em]" style={{ color: '#4A5057', fontFamily: 'Roboto Condensed, sans-serif' }}>Subtotal</span>
+            <span className="grid items-center font-light" style={{ ...alignedAmountStyle, color: '#4A5057', fontFamily: 'Roboto Condensed, sans-serif' }}>
+              <span className="text-right">{subtotalParts.intPart},</span>
+              <span>{subtotalParts.decPart}€</span>
+            </span>
+          </div>
+          <div style={{ ...LEFT_ROW_GRADIENT_STYLE, display: 'none', gridColumn: '1 / 2', gridRow: '31 / 32' }} className="h-full w-full flex items-center justify-between text-[18pt] px-2">
+            <span className="font-light uppercase tracking-[0.08em]" style={{ color: '#4A5057', fontFamily: 'Roboto Condensed, sans-serif' }}>Transport</span>
+            <span className={`grid items-center font-light ${shipping === 0 ? 'line-through opacity-70' : ''}`} style={{ ...alignedAmountStyle, color: '#4A5057', fontFamily: 'Roboto Condensed, sans-serif' }}>
+              <span className="text-right">{transportParts.intPart},</span>
+              <span>{transportParts.decPart}€</span>
+            </span>
+          </div>
+          <div style={{ ...LEFT_ROW_GRADIENT_STYLE, display: 'none', gridColumn: '1 / 2', gridRow: '32 / 33' }} className="h-full w-full flex items-center justify-between text-[18pt] px-2">
+            <span className="font-light uppercase tracking-[0.08em]" style={{ color: '#4A5057', fontFamily: 'Roboto Condensed, sans-serif' }}>IVA 21%</span>
+            <span className="grid items-center font-light" style={{ ...alignedAmountStyle, color: '#4A5057', fontFamily: 'Roboto Condensed, sans-serif' }}>
+              <span className="text-right">{ivaParts.intPart},</span>
+              <span>{ivaParts.decPart}€</span>
+            </span>
+          </div>
+          <div style={{ ...LEFT_ROW_GRADIENT_STYLE, display: 'none', gridColumn: '1 / 2', gridRow: '33 / 34', borderTop: '1px solid rgba(71, 80, 89, 0.18)' }} className="h-full w-full flex items-center justify-between px-2">
+            <span className="text-[24pt] font-light uppercase tracking-[0.06em]" style={{ color: '#4A5057', fontFamily: 'Roboto Condensed, sans-serif' }}>Tot plegat fa</span>
+            <span className="grid items-center text-[24pt] font-normal" style={{ ...alignedAmountStyle, color: '#4A5057', fontFamily: 'Roboto Condensed, sans-serif' }}>
+              <span className="text-right">{totalParts.intPart},</span>
+              <span>{totalParts.decPart}€</span>
+            </span>
+          </div>
 
-          {/* Columna Dreta: Resum de la Comanda */}
-          <div className="lg:col-span-1">
-            <div className="lg:sticky lg:top-8">
-              <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6">
-                <h2 className="text-lg font-bold font-oswald uppercase mb-6 text-foreground">
-                  Resum de la Comanda
-                </h2>
-
-                {/* Productes */}
-                <div className="space-y-3 mb-6 max-h-[300px] overflow-y-auto">
-                  {cartItems.map((item) => (
-                    <div key={`${item.id}-${item.size}`} className="flex gap-3 pb-3 border-b border-border last:border-0">
-                      <div className="w-16 h-16 bg-muted rounded-md overflow-hidden flex-shrink-0">
-                        <img
-                          src={item.image}
-                          alt={item.name}
-                          className="w-full h-full object-cover"
-                        />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <h4 className="text-sm font-medium truncate text-foreground">{item.name}</h4>
-                        <p className="text-xs mt-1 text-muted-foreground opacity-60">
-                          Talla: {item.size} · Qty: {item.quantity}
-                        </p>
-                        <p className="text-sm font-medium mt-1 text-foreground">
-                          {formatPrice(item.price * item.quantity)}
-                        </p>
-                      </div>
+          <div style={{ gridColumn: '2 / 3', gridRow: '3 / 31', display: 'flex', justifyContent: 'center', color: '#4A5057', fontFamily: 'Roboto Condensed, sans-serif', pointerEvents: 'auto' }}>
+            <div style={{ width: 'min(100%, 384px)' }}>
+              <div style={{ border: '1px solid #E6E8EC', borderRadius: '9px', background: '#FFFFFF', boxShadow: '0 1px 2px rgba(16, 24, 40, 0.04)', overflow: 'hidden' }}>
+                <div style={{ height: '42px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 16px', borderBottom: '1px solid #EEF0F3' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '7px', fontSize: '12pt', fontWeight: 600 }}>
+                    <span style={{ width: '18px', height: '18px', borderRadius: '50%', background: '#00D66F', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', color: '#FFFFFF', fontSize: '9pt', fontWeight: 700 }}>›</span>
+                    <span>link</span>
+                  </div>
+                  <span style={{ color: '#98A2B4', fontSize: '15pt', lineHeight: 1 }}>···</span>
+                </div>
+                <div style={{ padding: '14px 16px 12px', display: 'grid', rowGap: '14px' }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: '74px 1fr', alignItems: 'center', columnGap: '12px', fontSize: '11pt' }}>
+                    <span style={{ color: '#667085', fontWeight: 300 }}>Email</span>
+                    <input type="email" name="email" value={formData.email} onChange={handleChange} placeholder="higginsgrafic@gmail.com" style={{ border: 'none', outline: 'none', background: 'transparent', color: '#4A5057', fontFamily: 'Roboto Condensed, sans-serif', fontSize: '11pt', fontWeight: 400 }} />
+                  </div>
+                  <div style={{ display: 'grid', gridTemplateColumns: '74px 1fr', alignItems: 'center', columnGap: '12px', fontSize: '11pt' }}>
+                    <span style={{ color: '#667085', fontWeight: 300 }}>Paga amb</span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', minWidth: 0 }}>
+                      <span style={{ width: '28px', height: '18px', borderRadius: '4px', background: '#111827', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', color: '#F59E0B', fontSize: '8pt', flexShrink: 0 }}>●●</span>
+                      <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontWeight: 400 }}>Mastercard</span>
+                      <span style={{ color: '#98A2B4', fontWeight: 300, whiteSpace: 'nowrap' }}>•••• 1234</span>
                     </div>
-                  ))}
+                  </div>
+                  <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '10.5pt', fontWeight: 300, color: '#4A5057' }}>
+                    <input type="checkbox" />
+                    <span>Si falla, utilitza Visa •••• 1234</span>
+                  </label>
                 </div>
+              </div>
 
-                {/* Totals */}
-                <div className="space-y-2 mb-6 pb-6 border-b">
-                  <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground opacity-60">Subtotal</span>
-                    <span className="text-foreground">{formatPrice(subtotal)}</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground opacity-60">Enviament</span>
-                    <span className="text-foreground">{shipping === 0 ? 'Gratuït' : formatPrice(shipping)}</span>
-                  </div>
-                  <div className="flex justify-between pt-2 border-t">
-                    <span className="font-oswald text-xl font-normal text-foreground">Tot plegat fa</span>
-                    <span className="font-oswald text-xl font-normal text-foreground">{formatPrice(total)}</span>
+              <div style={{ marginTop: paymentDetailsOpen ? '14px' : '18px', display: 'grid', rowGap: '8px' }}>
+                <div style={{ fontSize: '12pt', fontWeight: 500, color: '#4A5057' }}>Altres dades</div>
+                <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '10.5pt', fontWeight: 300 }}>
+                  <input type="checkbox" checked readOnly />
+                  <span>Necessites factura?</span>
+                </label>
+                <div style={{ display: 'grid', rowGap: '0' }}>
+                  <label style={{ fontSize: '10pt', fontWeight: 300, color: '#667085', marginBottom: '5px' }}>Informació d'IVA</label>
+                  <div style={{ border: '1px solid #D8DDE3', borderRadius: '4px', overflow: 'hidden', background: '#FFFFFF' }}>
+                    <input type="text" name="company" placeholder="Nom de l'empresa" value={formData.company || ''} onChange={handleChange} style={{ width: '100%', height: '31px', border: 'none', borderBottom: '1px solid #E6E8EC', padding: '0 10px', fontFamily: 'Roboto Condensed, sans-serif', fontSize: '10.5pt', color: '#4A5057', outline: 'none', boxSizing: 'border-box' }} />
+                    <select name="country" value={formData.country} onChange={handleChange} style={{ width: '100%', height: '31px', border: 'none', borderBottom: '1px solid #80C7F5', boxShadow: 'inset 0 0 0 1px #80C7F5', padding: '0 10px', fontFamily: 'Roboto Condensed, sans-serif', fontSize: '10.5pt', color: '#4A5057', outline: 'none', background: '#FFFFFF', boxSizing: 'border-box' }}>
+                    <option value="">🇪🇸 ES VAT</option>
+                    <option value="Espanya">🇪🇸 ES VAT</option>
+                    <option value="França">🇫🇷 FR VAT</option>
+                    </select>
+                    <input type="text" name="taxId" placeholder="ESA12345672" value={formData.taxId || ''} onChange={handleChange} style={{ width: '100%', height: '31px', border: 'none', padding: '0 10px', fontFamily: 'Roboto Condensed, sans-serif', fontSize: '10.5pt', color: '#4A5057', outline: 'none', boxSizing: 'border-box' }} />
                   </div>
                 </div>
+                <label style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', fontSize: '9.5pt', lineHeight: 1.25, fontWeight: 300, color: '#4A5057', marginTop: '6px' }}>
+                  <input type="checkbox" checked readOnly style={{ marginTop: '1px' }} />
+                  <span>Accepto els Termes del Servei, la Política de Privacitat i la Política d'ús acceptable.</span>
+                </label>
+              </div>
 
-                {/* Botó de pagament - només a desktop i si NO hi ha Stripe */}
-                {!isStripeConfigured && (
-                  <div className="hidden lg:block">
-                    <Button
-                      type="submit"
-                      onClick={handleSubmit}
-                      disabled={isProcessing}
-                      className="w-full h-12 text-sm font-oswald uppercase tracking-wider rounded-sm"
-                    >
-                      {isProcessing ? (
-                        <span className="flex items-center gap-2">
-                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                          Processant...
-                        </span>
-                      ) : (
-                        'Valida el pagament'
-                      )}
-                    </Button>
-                    <p className="text-xs text-center mt-3 text-muted-foreground opacity-50">
-                      Les teves dades estan protegides amb encriptació SSL
-                    </p>
+              <div style={{ marginTop: '14px' }}>
+                <button
+                  id="stripe-guide-checkout-pay-desktop"
+                  type="button"
+                  onClick={handleSubmit}
+                  disabled={isProcessing}
+                  style={{ width: '100%', height: '46px', border: 'none', borderRadius: '5px', backgroundColor: isProcessing ? '#8FE8B9' : '#00D66F', backgroundImage: 'none', color: '#063B21', fontFamily: 'Roboto Condensed, sans-serif', fontSize: '12pt', fontWeight: 600, letterSpacing: '0.01em', boxShadow: '0 1px 2px rgba(16, 24, 40, 0.08)', cursor: isProcessing ? 'not-allowed' : 'pointer' }}
+                >
+                  {isProcessing ? 'Processant…' : 'Confirma la compra'}
+                </button>
+              </div>
+
+              <div style={{ marginTop: '10px', textAlign: 'center', color: '#667085', fontSize: '9pt', fontWeight: 300, lineHeight: 1.25 }}>
+                En confirmar el pagament, autoritzes el càrrec d'aquest pagament i futurs pagaments segons els termes.
+              </div>
+              <button
+                type="button"
+                onClick={() => setPaymentDetailsOpen((open) => !open)}
+                style={{ width: '100%', marginTop: '16px', border: 'none', background: 'transparent', color: '#4A5057', fontFamily: 'Roboto Condensed, sans-serif', fontSize: '10pt', fontWeight: 500 }}
+              >
+                {paymentDetailsOpen ? 'Amaga les dades de pagament' : 'Continua com a hoste'}
+              </button>
+
+              <div style={{ display: paymentDetailsOpen ? 'grid' : 'none', marginTop: '16px', rowGap: '12px' }}>
+                <div style={{ fontSize: '12pt', fontWeight: 500, color: '#4A5057' }}>Dades de pagament</div>
+                <div style={{ border: '1px solid #E6E8EC', borderRadius: '6px', background: '#FFFFFF', overflow: 'hidden' }}>
+                  <div style={{ padding: '10px 12px', borderBottom: '1px solid #EEF0F3', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '11pt', fontWeight: 500 }}>
+                    <span style={{ width: '13px', height: '10px', border: '1px solid #4A5057', borderRadius: '2px', display: 'inline-block' }} />
+                    <span>Targeta</span>
                   </div>
-                )}
+                  <div style={{ padding: '10px 12px', display: 'grid', rowGap: '8px' }}>
+                    <label style={{ display: 'grid', rowGap: '4px', fontSize: '10pt', fontWeight: 300, color: '#667085' }}>
+                      Informació de la targeta
+                      <div style={{ border: '1px solid #D8DDE3', borderRadius: '4px', overflow: 'hidden', background: '#FFFFFF' }}>
+                        <input type="text" name="cardNumber" placeholder="4242 4242 4242 4242" value={formData.cardNumber || ''} onChange={handleChange} maxLength={16} style={{ width: '100%', height: '31px', border: 'none', borderBottom: '1px solid #E6E8EC', padding: '0 10px', fontFamily: 'Roboto Condensed, sans-serif', fontSize: '10.5pt', color: '#4A5057', outline: 'none', boxSizing: 'border-box' }} />
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr' }}>
+                          <input type="text" name="expiryDate" placeholder="MM / YY" value={formData.expiryDate || ''} onChange={handleChange} maxLength={5} style={{ height: '31px', border: 'none', borderRight: '1px solid #E6E8EC', padding: '0 10px', fontFamily: 'Roboto Condensed, sans-serif', fontSize: '10.5pt', color: '#4A5057', outline: 'none', boxSizing: 'border-box' }} />
+                          <input type="text" name="cvv" placeholder="CVC" value={formData.cvv || ''} onChange={handleChange} maxLength={4} style={{ height: '31px', border: 'none', padding: '0 10px', fontFamily: 'Roboto Condensed, sans-serif', fontSize: '10.5pt', color: '#4A5057', outline: 'none', boxSizing: 'border-box' }} />
+                        </div>
+                      </div>
+                    </label>
+                    <label style={{ display: 'grid', rowGap: '4px', fontSize: '10pt', fontWeight: 300, color: '#667085' }}>
+                      Nom del titular
+                      <input type="text" name="firstName" placeholder="Nom tal com surt a la targeta" value={formData.firstName} onChange={handleChange} style={{ height: '32px', border: '1px solid #D8DDE3', borderRadius: '4px', padding: '0 10px', fontFamily: 'Roboto Condensed, sans-serif', fontSize: '10.5pt', color: '#4A5057', outline: 'none' }} />
+                    </label>
+                    <label style={{ display: 'grid', rowGap: '4px', fontSize: '10pt', fontWeight: 300, color: '#667085' }}>
+                      Adreça de facturació
+                      <div style={{ border: '1px solid #D8DDE3', borderRadius: '4px', overflow: 'hidden', background: '#FFFFFF' }}>
+                        <select name="country" value={formData.country} onChange={handleChange} style={{ width: '100%', height: '31px', border: 'none', borderBottom: '1px solid #E6E8EC', padding: '0 10px', fontFamily: 'Roboto Condensed, sans-serif', fontSize: '10.5pt', color: '#4A5057', outline: 'none', background: '#FFFFFF', boxSizing: 'border-box' }}>
+                          <option value="">Espanya</option>
+                          <option value="Espanya">Espanya</option>
+                          <option value="França">França</option>
+                        </select>
+                        <input type="text" name="address" placeholder="Adreça línia 1" value={formData.address} onChange={handleChange} style={{ width: '100%', height: '31px', border: 'none', borderBottom: '1px solid #E6E8EC', padding: '0 10px', fontFamily: 'Roboto Condensed, sans-serif', fontSize: '10.5pt', color: '#4A5057', outline: 'none', boxSizing: 'border-box' }} />
+                        <input type="text" name="address2" placeholder="Adreça línia 2" value={formData.address2 || ''} onChange={handleChange} style={{ width: '100%', height: '31px', border: 'none', borderBottom: '1px solid #E6E8EC', padding: '0 10px', fontFamily: 'Roboto Condensed, sans-serif', fontSize: '10.5pt', color: '#4A5057', outline: 'none', boxSizing: 'border-box' }} />
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr' }}>
+                          <input type="text" name="postalCode" placeholder="Codi postal" value={formData.postalCode} onChange={handleChange} style={{ height: '31px', border: 'none', borderRight: '1px solid #E6E8EC', padding: '0 10px', fontFamily: 'Roboto Condensed, sans-serif', fontSize: '10.5pt', color: '#4A5057', outline: 'none', boxSizing: 'border-box' }} />
+                          <input type="text" name="city" placeholder="Ciutat" value={formData.city} onChange={handleChange} style={{ height: '31px', border: 'none', padding: '0 10px', fontFamily: 'Roboto Condensed, sans-serif', fontSize: '10.5pt', color: '#4A5057', outline: 'none', boxSizing: 'border-box' }} />
+                        </div>
+                      </div>
+                    </label>
+                  </div>
+                </div>
+              </div>
+              <div style={{ marginTop: '16px', textAlign: 'center', color: '#98A2B4', fontSize: '8.5pt', fontWeight: 300 }}>
+                Powered by stripe&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;Termes&nbsp;&nbsp;&nbsp;Privacitat
               </div>
             </div>
           </div>
+          <input type="hidden" name="stripeConnectionEnabled" value={String(stripeConnectionEnabled)} />
         </div>
+        <div id="stripe-guide-checkout-layout-bottom-anchor" style={{ height: 0 }} />
       </div>
     </div>
   );

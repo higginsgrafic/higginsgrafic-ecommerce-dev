@@ -15,7 +15,7 @@ import LoadingScreen from '@/components/LoadingScreen';
 import SkipLink from '@/components/SkipLink';
 import OffersHeader from '@/components/OffersHeader';
 import AdminBanner from '@/components/AdminBanner';
-import Header from '@/components/Header';
+import FullWideSlideDemoHeader from '@/components/FullWideSlideDemoHeader';
 import NikeInspiredHeader from '@/components/NikeInspiredHeader';
 import DevHeader from '@/components/DevHeader';
 import ScrollToTop from '@/components/ScrollToTop';
@@ -25,6 +25,7 @@ import SupabaseCollectionRoute from '@/pages/SupabaseCollectionRoute.jsx';
 import DevGuidesOverlay from '@/components/DevGuidesOverlay.jsx';
 import SlideShell from '@/components/SlideShell';
 import useSlidesConfig from '@/hooks/useSlidesConfig';
+import useComponentCatalogConfig from '@/hooks/useComponentCatalogConfig';
 
 const FulfillmentPage = lazy(() => import('@/pages/FulfillmentPage'));
 const FulfillmentSettingsPage = lazy(() => import('@/pages/FulfillmentSettingsPage'));
@@ -175,6 +176,7 @@ const applyDevThemeVarsFromStorage = () => {
 };
 
 function App() {
+  const { config: componentCatalogConfig } = useComponentCatalogConfig();
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
   const [isNavigating, setIsNavigating] = useState(false);
   const [slideOpen, setSlideOpen] = useState(false);
@@ -214,6 +216,18 @@ function App() {
     setSlidePresetId(nextPresetId);
     setSlideOpen(true);
   };
+
+  useEffect(() => {
+    const onOpenSlidePreset = (event) => {
+      const presetId = event?.detail?.presetId;
+      if (!presetId || typeof presetId !== 'string') return;
+      setSlidePresetId(presetId);
+      setSlideOpen(true);
+    };
+
+    window.addEventListener('hg:open-slide-preset', onOpenSlidePreset);
+    return () => window.removeEventListener('hg:open-slide-preset', onOpenSlidePreset);
+  }, []);
   const [selectionStatus, setSelectionStatus] = useState('idle');
   const layoutInspectorEnabledFromUrl = (() => {
     try {
@@ -233,6 +247,14 @@ function App() {
     }
   })();
   const [guidesEnabled, setGuidesEnabled] = useState(guidesEnabledFromUrl);
+  const beltEnabledFromUrl = (() => {
+    try {
+      const sp = new URLSearchParams(window.location.search);
+      return sp.has('belt') && sp.get('belt') !== '0';
+    } catch {
+      return false;
+    }
+  })();
   const [megaStripeDx, setMegaStripeDx] = useState(0);
   const [megaStripeDy, setMegaStripeDy] = useState(0);
   const [megaStripeSpriteEnabled, setMegaStripeSpriteEnabled] = useState(() => {
@@ -246,7 +268,7 @@ function App() {
       return true;
     }
   });
-  const [megaStripeBeltEnabled, setMegaStripeBeltEnabled] = useState(false);
+  const [megaStripeBeltEnabled, setMegaStripeBeltEnabled] = useState(beltEnabledFromUrl);
   const [megaStripeOverlayMode, setMegaStripeOverlayMode] = useState('off');
   const [megaShirtDrawingEnabled, setMegaShirtDrawingEnabled] = useState(() => {
     try {
@@ -652,6 +674,21 @@ function App() {
   const [isLargeScreen, setIsLargeScreen] = useState(window.innerWidth >= 1024);
   const [layoutInspectorPickEnabled, setLayoutInspectorPickEnabled] = useState(false);
 
+  const fullWideSlideConfig = componentCatalogConfig?.components?.fullWideSlide;
+  const fullWideMegaMenuConfig = fullWideSlideConfig?.megaMenu;
+  const resolvedFullWideNavItems =
+    Array.isArray(fullWideMegaMenuConfig?.navItems) && fullWideMegaMenuConfig.navItems.length > 0
+      ? fullWideMegaMenuConfig.navItems
+      : undefined;
+  const resolvedFullWideMegaConfig =
+    fullWideMegaMenuConfig?.megaConfig &&
+    typeof fullWideMegaMenuConfig.megaConfig === 'object' &&
+    Object.keys(fullWideMegaMenuConfig.megaConfig).length > 0
+      ? fullWideMegaMenuConfig.megaConfig
+      : undefined;
+  const fullWideShowStripe = fullWideMegaMenuConfig?.showStripe !== false;
+  const fullWideShowCatalogPanel = fullWideMegaMenuConfig?.showCatalogPanel !== false;
+
   const prevMegaStripeOverlayModeRef = useRef('off');
 
   const location = useLocation();
@@ -778,7 +815,11 @@ function App() {
         const v = String(rawSpriteEnabled).trim().toLowerCase();
         setMegaStripeSpriteEnabled(v === '' || v === '1' || v === 'true' || v === 'on' || v === 'yes');
       }
-      if (rawBelt != null) setMegaStripeBeltEnabled(rawBelt === '1');
+      if (beltEnabledFromUrl) {
+        setMegaStripeBeltEnabled(true);
+      } else if (rawBelt != null) {
+        setMegaStripeBeltEnabled(rawBelt === '1');
+      }
       setMegaStripeOverlayMode('off');
       if (rawShirtDrawingEnabledNew != null) {
         const v = String(rawShirtDrawingEnabledNew).trim().toLowerCase();
@@ -1923,22 +1964,77 @@ function App() {
   }, []);
 
   const BeltReferenceOverlay = ({ enabled }) => {
-    const [state, setState] = useState({ xL: null, xR: null, yT: null, yB: null, spriteXL: null, spriteXR: null });
-    const capturedRef = useRef(false);
+    const [state, setState] = useState(() => {
+      try {
+        const rawBelt2 = window.localStorage.getItem('HG_BELT2_GLOBAL_V1');
+        const raw = window.localStorage.getItem('HG_BELT_GUIDES_GLOBAL_V1');
+        const parsedBelt2 = rawBelt2 ? JSON.parse(rawBelt2) : null;
+        if (!raw && !parsedBelt2) return { xL: null, xR: null, yT: null, yB: null, yCarouselTop: null, yFinalizeBottom: null, spriteXL: null, spriteXR: null };
+        const parsed = raw ? JSON.parse(raw) : {};
+        if (!parsed || typeof parsed !== 'object') return { xL: null, xR: null, yT: null, yB: null, yCarouselTop: null, yFinalizeBottom: null, spriteXL: null, spriteXR: null };
+        const toFiniteOrNull = (v) => (Number.isFinite(v) ? v : null);
+        return {
+          xL: toFiniteOrNull(parsedBelt2?.xL ?? parsed.xL),
+          xR: toFiniteOrNull(parsedBelt2?.xR ?? parsed.xR),
+          yT: toFiniteOrNull(parsed.yT),
+          yB: toFiniteOrNull(parsed.yB),
+          yCarouselTop: toFiniteOrNull(parsedBelt2?.yCarouselTop ?? parsed.yCarouselTop),
+          yFinalizeBottom: toFiniteOrNull(parsedBelt2?.yFinalizeBottom ?? parsed.yFinalizeBottom),
+          spriteXL: toFiniteOrNull(parsed.spriteXL),
+          spriteXR: toFiniteOrNull(parsed.spriteXR),
+        };
+      } catch {
+        return { xL: null, xR: null, yT: null, yB: null, yCarouselTop: null, yFinalizeBottom: null, spriteXL: null, spriteXR: null };
+      }
+    });
+
+    useEffect(() => {
+      try {
+        window.localStorage.setItem('HG_BELT_GUIDES_GLOBAL_V1', JSON.stringify(state));
+        window.localStorage.setItem(
+          'HG_BELT2_GLOBAL_V1',
+          JSON.stringify({
+            xL: state.xL,
+            xR: state.xR,
+            yCarouselTop: state.yCarouselTop,
+            yFinalizeBottom: state.yFinalizeBottom,
+          })
+        );
+      } catch {
+        // ignore
+      }
+    }, [state.xL, state.xR, state.yT, state.yB, state.yCarouselTop, state.yFinalizeBottom, state.spriteXL, state.spriteXR]);
+
+    useEffect(() => {
+      try {
+        const root = document.documentElement;
+        const setOrClear = (key, value) => {
+          if (Number.isFinite(value)) {
+            root.style.setProperty(key, `${Math.round(value)}px`);
+          } else {
+            root.style.removeProperty(key);
+          }
+        };
+        setOrClear('--belt2-xL', state.xL);
+        setOrClear('--belt2-xR', state.xR);
+        setOrClear('--belt2-yT', state.yCarouselTop);
+        setOrClear('--belt2-yB', state.yFinalizeBottom);
+      } catch {
+        // ignore
+      }
+    }, [state.xL, state.xR, state.yCarouselTop, state.yFinalizeBottom]);
 
     useLayoutEffect(() => {
       if (!enabled) {
-        capturedRef.current = false;
         return undefined;
       }
 
       let t1 = 0;
       let t2 = 0;
       let t3 = 0;
+      let t4 = 0;
 
       const read = () => {
-        if (capturedRef.current) return;
-
         const resolveX = (el, edge) => {
           const r = el?.getBoundingClientRect?.();
           if (!r) return null;
@@ -1955,29 +2051,83 @@ function App() {
         const leftAnchor = document.getElementById('stripe-guide-left-anchor');
         const rightArrow = document.getElementById('stripe-guide-right-arrow');
         const stripeImg = document.querySelector('img[src="/placeholders/t-shirt_buttons/v5/full-color-stripe-5.webp"]');
+        const cartCardTopAnchor = document.getElementById('stripe-guide-cart-card-top-anchor');
+        const finalizeOrderBtn = document.getElementById('stripe-guide-finalize-order');
+        const cartViewportAnchor = document.getElementById('stripe-guide-cart-viewport-anchor');
+        const headerLogoMarkAnchor = document.getElementById('stripe-guide-header-logo-mark-anchor');
+        const headerLogoAnchor = document.getElementById('stripe-guide-header-logo-anchor');
+        const userIconAnchor = document.getElementById('stripe-guide-user-icon-anchor');
+        const checkoutTopAnchor = document.getElementById('stripe-guide-checkout-top-anchor');
+        const checkoutPayDesktop = document.getElementById('stripe-guide-checkout-pay-desktop');
+        const checkoutPayMobile = document.getElementById('stripe-guide-checkout-pay-mobile');
+        const checkoutBottomAnchor = document.getElementById('stripe-guide-checkout-bottom-anchor');
+        const checkoutInvoiceBottomAnchor = document.getElementById('stripe-guide-checkout-invoice-bottom-anchor');
+        const belt2LeftOffsetPx = -2;
 
-        const xL = resolveX(leftAnchor, 'left');
+        const xLRaw = resolveX(headerLogoMarkAnchor, 'left') ?? resolveX(headerLogoAnchor, 'left') ?? resolveX(leftAnchor, 'left') ?? resolveX(cartViewportAnchor, 'left');
+        const xL = Number.isFinite(xLRaw) ? Math.round(xLRaw + belt2LeftOffsetPx) : xLRaw;
         const spriteXL = resolveX(stripeImg, 'left');
         const spriteXR = resolveX(stripeImg, 'right');
-        const xR = resolveX(rightArrow, 'right');
-        const yT = resolveY(stripeImg, 'top');
-        const yB = resolveY(stripeImg, 'bottom');
+        const xR = resolveX(userIconAnchor, 'right') ?? resolveX(rightArrow, 'right') ?? resolveX(cartViewportAnchor, 'right');
+        const yCarouselTop = resolveY(cartCardTopAnchor, 'top');
+        const yFinalizeBottom = resolveY(finalizeOrderBtn, 'bottom');
+        const fullWideYTop = resolveY(cartCardTopAnchor, 'top') ?? resolveY(stripeImg, 'top');
+        const checkoutYTop = resolveY(checkoutTopAnchor, 'top');
+        const checkoutLayoutYTop = resolveY(document.getElementById('stripe-guide-checkout-layout-top-anchor'), 'top');
+        const yT = Number.isFinite(fullWideYTop)
+          ? fullWideYTop
+          : (Number.isFinite(checkoutLayoutYTop) ? checkoutLayoutYTop : checkoutYTop);
+        const yTWithOffset = Number.isFinite(yT) ? yT + 20 : yT;
 
-        if (Number.isFinite(xL) || Number.isFinite(xR) || Number.isFinite(yT) || Number.isFinite(yB) || Number.isFinite(spriteXL) || Number.isFinite(spriteXR)) {
-          setState({ xL, xR, yT, yB, spriteXL, spriteXR });
-          capturedRef.current = true;
-        }
+        const fullWideYBottom = resolveY(finalizeOrderBtn, 'bottom') ?? resolveY(stripeImg, 'bottom');
+        const checkoutYBottom =
+          resolveY(checkoutPayDesktop, 'bottom') ??
+          resolveY(checkoutPayMobile, 'bottom') ??
+          resolveY(checkoutInvoiceBottomAnchor, 'bottom') ??
+          resolveY(checkoutBottomAnchor, 'bottom');
+        const checkoutLayoutYBottom = resolveY(document.getElementById('stripe-guide-checkout-layout-bottom-anchor'), 'bottom');
+        const yB = Number.isFinite(fullWideYBottom)
+          ? fullWideYBottom
+          : (Number.isFinite(checkoutLayoutYBottom) ? checkoutLayoutYBottom : checkoutYBottom);
+
+        setState((prev) => {
+          const next = {
+            xL: Number.isFinite(xL) ? xL : prev.xL,
+            xR: Number.isFinite(xR) ? xR : prev.xR,
+            yT: Number.isFinite(yTWithOffset) ? yTWithOffset : prev.yT,
+            yB: Number.isFinite(yB) ? yB : prev.yB,
+            yCarouselTop: Number.isFinite(yCarouselTop) ? yCarouselTop : prev.yCarouselTop,
+            yFinalizeBottom: Number.isFinite(yFinalizeBottom) ? yFinalizeBottom : prev.yFinalizeBottom,
+            spriteXL: Number.isFinite(spriteXL) ? spriteXL : prev.spriteXL,
+            spriteXR: Number.isFinite(spriteXR) ? spriteXR : prev.spriteXR,
+          };
+          if (
+            prev.xL === next.xL &&
+            prev.xR === next.xR &&
+            prev.yT === next.yT &&
+            prev.yB === next.yB &&
+            prev.yCarouselTop === next.yCarouselTop &&
+            prev.yFinalizeBottom === next.yFinalizeBottom &&
+            prev.spriteXL === next.spriteXL &&
+            prev.spriteXR === next.spriteXR
+          ) {
+            return prev;
+          }
+          return next;
+        });
       };
 
       read();
       t1 = window.setTimeout(read, 50);
       t2 = window.setTimeout(read, 250);
       t3 = window.setTimeout(read, 750);
+      t4 = window.setInterval(read, 300);
 
       return () => {
         window.clearTimeout(t1);
         window.clearTimeout(t2);
         window.clearTimeout(t3);
+        window.clearInterval(t4);
       };
     }, [enabled]);
 
@@ -1992,20 +2142,15 @@ function App() {
         {Number.isFinite(state.xR) ? (
           <div style={{ position: 'fixed', left: state.xR, top: 0, height: '100vh', width: 0, borderLeft: `1px solid ${color}` }} />
         ) : null}
-        {Number.isFinite(state.spriteXL) ? (
-          <div style={{ position: 'fixed', left: state.spriteXL, top: 0, height: '100vh', width: 0, borderLeft: `1px solid ${color}` }} />
+        {Number.isFinite(state.xL) && Number.isFinite(state.xR) ? (
+          <div style={{ position: 'fixed', left: Math.round((state.xL + state.xR) / 2), top: 0, height: '100vh', width: 0, borderLeft: `1px solid ${color}` }} />
         ) : null}
-        {Number.isFinite(state.spriteXR) ? (
-          <div style={{ position: 'fixed', left: state.spriteXR, top: 0, height: '100vh', width: 0, borderLeft: `1px solid ${color}` }} />
+        {Number.isFinite(state.yCarouselTop) ? (
+          <div style={{ position: 'fixed', left: 0, top: state.yCarouselTop, width: '100vw', height: 0, borderTop: `1px solid ${color}` }} />
         ) : null}
-        {Number.isFinite(state.yT) ? (
-          <div style={{ position: 'fixed', left: 0, top: state.yT, width: '100vw', height: 0, borderTop: `1px solid ${color}` }} />
+        {Number.isFinite(state.yFinalizeBottom) ? (
+          <div style={{ position: 'fixed', left: 0, top: state.yFinalizeBottom, width: '100vw', height: 0, borderTop: `1px solid ${color}` }} />
         ) : null}
-        {Number.isFinite(state.yB) ? (
-          <div style={{ position: 'fixed', left: 0, top: state.yB, width: '100vw', height: 0, borderTop: `1px solid ${color}` }} />
-        ) : null}
-        {/* Guia fixa verda a y=330 */}
-        <div style={{ position: 'fixed', left: 0, top: 330, width: '100vw', height: 0, borderTop: `1px solid ${color}` }} />
       </div>
     );
   };
@@ -2796,6 +2941,7 @@ function App() {
 
   const adminRouteOffset = `${adminBannerHeight + adminRouteDevHeaderHeight + rulerInset}px`;
   const appHeaderOffset = `${(isDevHeaderRoute ? heroSettingsDevHeaderHeight : baseHeaderHeight) + offersHeaderHeight + adminBannerHeight + rulerInset}px`;
+  const globalHeaderTopOffset = `${offersHeaderHeight + adminBannerHeight + rulerInset}px`;
   const demoHeaderOffset = `${adminBannerHeight + rulerInset}px`;
 
   useEffect(() => {
@@ -2803,11 +2949,12 @@ function App() {
       if (isFullScreenRoute) return;
       const nextOffset = isAdminRoute ? adminRouteOffset : (isDemoStyleLayoutRoute ? demoHeaderOffset : appHeaderOffset);
       document.documentElement.style.setProperty('--appHeaderOffset', nextOffset);
+      document.documentElement.style.setProperty('--globalHeaderTopOffset', globalHeaderTopOffset);
       document.documentElement.style.setProperty('--rulerInset', `${rulerInset}px`);
     } catch {
       // ignore
     }
-  }, [adminRouteOffset, demoHeaderOffset, appHeaderOffset, isAdminRoute, isDemoStyleLayoutRoute, isFullScreenRoute, rulerInset]);
+  }, [adminRouteOffset, demoHeaderOffset, appHeaderOffset, globalHeaderTopOffset, isAdminRoute, isDemoStyleLayoutRoute, isFullScreenRoute, rulerInset]);
 
   return (
     <ErrorBoundary>
@@ -2873,15 +3020,20 @@ function App() {
             offersHeaderTop={offersHeaderTop}
           />
         ) : (
-          <Header
+          <FullWideSlideDemoHeader
             cartItemCount={getTotalItems()}
-            onCartClick={() => toggleSlidePreset(cartPresetId)}
-            onUserClick={() => toggleSlidePreset(viewPresetId)}
-            adminBannerVisible={adminBannerVisible}
-            rulerInset={rulerInset}
-            offersHeaderVisible={offersHeaderVisible}
-            offersHeaderHeight={offersHeaderHeight}
-            offersHeaderTop={offersHeaderTop}
+            onCartClick={() => {
+              navigate('/cart');
+            }}
+            onUserClick={() => {
+              navigate('/profile');
+            }}
+            manualEnabledOverride={false}
+            ignoreStripeDebugFromUrl
+            navItems={resolvedFullWideNavItems}
+            megaConfig={resolvedFullWideMegaConfig}
+            showStripe={fullWideShowStripe}
+            showCatalogPanel={fullWideShowCatalogPanel}
           />
         )
       )}
@@ -2907,16 +3059,20 @@ function App() {
                     transition={{ duration: 0.3, ease: "easeInOut" }}
                   >
                     <div className="w-full max-w-none" style={{ '--appHeaderOffset': demoHeaderOffset }}>
-                      <Header
+                      <FullWideSlideDemoHeader
                         cartItemCount={getTotalItems()}
-                        onCartClick={() => toggleSlidePreset(cartPresetId)}
-                        onUserClick={() => toggleSlidePreset(viewPresetId)}
-                        adminBannerVisible={adminBannerVisible}
-                        rulerInset={rulerInset}
-                        offersHeaderVisible={offersHeaderVisible}
-                        offersHeaderHeight={offersHeaderHeight}
-                        offersHeaderTop={offersHeaderTop}
-                        isSearchPage={location.pathname === '/search'}
+                        onCartClick={() => {
+                          navigate('/cart');
+                        }}
+                        onUserClick={() => {
+                          navigate('/profile');
+                        }}
+                        manualEnabledOverride={false}
+                        ignoreStripeDebugFromUrl
+                        navItems={resolvedFullWideNavItems}
+                        megaConfig={resolvedFullWideMegaConfig}
+                        showStripe={fullWideShowStripe}
+                        showCatalogPanel={fullWideShowCatalogPanel}
                       />
                     </div>
                     <Home {...pageProps} />
@@ -5715,7 +5871,7 @@ function App() {
                   </div>
                 ) : null}
 
-            <BeltReferenceOverlay enabled={megaStripeBeltEnabled} />
+            <BeltReferenceOverlay enabled={false} />
 
             {clicksEnabled && clickMarks.length > 0 && (
               <div

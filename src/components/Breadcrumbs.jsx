@@ -19,7 +19,15 @@ const Breadcrumbs = ({ items = [] }) => {
           <React.Fragment key={index}>
             <ChevronRight className="h-4 w-4 text-muted-foreground" />
             <li className={index === items.length - 1 ? "text-foreground font-medium truncate" : ""}>
-              {item.link ? (
+              {item.onClick ? (
+                <button
+                  type="button"
+                  onClick={item.onClick}
+                  className="text-muted-foreground hover:text-foreground transition-colors uppercase"
+                >
+                  {item.label}
+                </button>
+              ) : item.link ? (
                 <Link to={item.link} className="text-muted-foreground hover:text-foreground transition-colors">
                   {item.label}
                 </Link>
