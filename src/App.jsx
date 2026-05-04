@@ -247,6 +247,38 @@ function App() {
     }
   })();
   const [guidesEnabled, setGuidesEnabled] = useState(guidesEnabledFromUrl);
+  const [belt2GuidesEnabled, setBelt2GuidesEnabled] = useState(() => {
+    try {
+      const sp = new URLSearchParams(window.location.search);
+      if (sp.has('belt2')) return sp.get('belt2') !== '0';
+      const raw = window.localStorage.getItem('HG_BELT2_GUIDES_ENABLED_V1');
+      return raw === '1';
+    } catch {
+      return false;
+    }
+  });
+  const [checkoutPautaEnabled, setCheckoutPautaEnabled] = useState(() => {
+    try {
+      const raw = window.localStorage.getItem('HG_CHECKOUT_PAUTA_ENABLED_V1');
+      return raw !== '0';
+    } catch {
+      return true;
+    }
+  });
+  useEffect(() => {
+    try {
+      window.localStorage.setItem('HG_BELT2_GUIDES_ENABLED_V1', belt2GuidesEnabled ? '1' : '0');
+    } catch {
+      // ignore
+    }
+  }, [belt2GuidesEnabled]);
+  useEffect(() => {
+    try {
+      window.localStorage.setItem('HG_CHECKOUT_PAUTA_ENABLED_V1', checkoutPautaEnabled ? '1' : '0');
+    } catch {
+      // ignore
+    }
+  }, [checkoutPautaEnabled]);
   const beltEnabledFromUrl = (() => {
     try {
       const sp = new URLSearchParams(window.location.search);
@@ -3192,6 +3224,7 @@ function App() {
                     <CheckoutPage
                       cartItems={cartItems}
                       onClearCart={clearCart}
+                      pautaEnabled={checkoutPautaEnabled}
                     />
                   }
                 />
@@ -5750,15 +5783,15 @@ function App() {
                 {(isAdmin || isDevDemoRoute || isFullWideSlideRoute) && location.pathname !== '/ec-preview' && location.pathname !== '/ec-preview-lite' ? (
                   <div
                     ref={debugButtonsWrapRef}
-                    className="flex items-center gap-2 relative debug-exempt"
-                    style={{ position: 'fixed', left: 61, bottom: 16, zIndex: 1100000 }}
+                    className="flex items-end gap-2 relative debug-exempt"
+                    style={{ position: 'fixed', left: 31, bottom: 16, zIndex: 1100000 }}
                   >
                     <button
                       type="button"
                       tabIndex={-1}
                       aria-pressed={clicksEnabled ? 'true' : 'false'}
                       aria-label="Clics"
-                      className={`absolute left-0 top-0 z-0 inline-flex h-12 items-center justify-end rounded-full pl-[60px] pr-4 text-[12px] font-semibold shadow-lg ${
+                      className={`absolute left-0 bottom-0 z-0 inline-flex h-12 items-center justify-end rounded-full pl-[60px] pr-4 text-[12px] font-semibold shadow-lg ${
                         !layoutInspectorActive
                           ? 'bg-[#EDEDED] text-black/70'
                           : clicksEnabled
@@ -5836,42 +5869,81 @@ function App() {
                       </button>
                     </div>
 
+                    <div className="relative z-10 flex flex-col items-stretch gap-2 debug-exempt">
+                      <button
+                        type="button"
+                        className="h-12 rounded-full border border-black/15 bg-white px-4 text-[12px] font-semibold text-black/80 shadow-lg hover:bg-black/5 active:bg-black/10 debug-exempt"
+                        title="Esborra totes les guies"
+                        aria-label="Esborra totes les guies"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          try {
+                            window.__DEV_GUIDES_CLEAR__?.();
+                          } catch {}
+                          try { localStorage.removeItem('devGuidesV2'); } catch {}
+                        }}
+                      >
+                        Clear
+                      </button>
+                      <button
+                        type="button"
+                        className={`h-12 rounded-full border px-4 text-[12px] font-semibold shadow-lg active:bg-black/10 debug-exempt ${
+                          guidesEnabled
+                            ? 'border-[#337AC6]/40 bg-[#337AC6]/10 text-[#0f172a] hover:bg-[#337AC6]/15'
+                            : 'border-black/15 bg-white text-black/80 hover:bg-black/5'
+                        }`}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          setGuidesEnabled((v) => !v);
+                        }}
+                      >
+                        Guides
+                      </button>
+                    </div>
+
                     <button
                       type="button"
+                      title="Activa/desactiva la pauta del checkout"
+                      aria-label="Pauta"
+                      aria-pressed={checkoutPautaEnabled ? 'true' : 'false'}
                       className={`relative z-10 h-12 rounded-full border px-4 text-[12px] font-semibold shadow-lg active:bg-black/10 debug-exempt ${
-                        guidesEnabled
-                          ? 'border-[#337AC6]/40 bg-[#337AC6]/10 text-[#0f172a] hover:bg-[#337AC6]/15'
+                        checkoutPautaEnabled
+                          ? 'border-[#F97316]/40 bg-[#F97316]/15 text-[#7C2D12] hover:bg-[#F97316]/20'
                           : 'border-black/15 bg-white text-black/80 hover:bg-black/5'
                       }`}
                       onClick={(e) => {
                         e.preventDefault();
                         e.stopPropagation();
-                        setGuidesEnabled((v) => !v);
+                        setCheckoutPautaEnabled((v) => !v);
                       }}
                     >
-                      Guides
+                      Pauta
                     </button>
 
                     <button
                       type="button"
-                      className="relative z-10 h-12 rounded-full border border-black/15 bg-white px-4 text-[12px] font-semibold text-black/80 shadow-lg hover:bg-black/5 active:bg-black/10 debug-exempt"
-                      title="Esborra totes les guies"
-                      aria-label="Esborra totes les guies"
+                      title="Activa/desactiva les guïes Belt 2"
+                      aria-label="Belt 2"
+                      aria-pressed={belt2GuidesEnabled ? 'true' : 'false'}
+                      className={`relative z-10 h-12 rounded-full border px-4 text-[12px] font-semibold shadow-lg active:bg-black/10 debug-exempt ${
+                        belt2GuidesEnabled
+                          ? 'border-[#10B981]/40 bg-[#10B981]/15 text-[#064E3B] hover:bg-[#10B981]/20'
+                          : 'border-black/15 bg-white text-black/80 hover:bg-black/5'
+                      }`}
                       onClick={(e) => {
                         e.preventDefault();
                         e.stopPropagation();
-                        try {
-                          window.__DEV_GUIDES_CLEAR__?.();
-                        } catch {}
-                        try { localStorage.removeItem('devGuidesV2'); } catch {}
+                        setBelt2GuidesEnabled((v) => !v);
                       }}
                     >
-                      Clear
+                      Belt 2
                     </button>
                   </div>
                 ) : null}
 
-            <BeltReferenceOverlay enabled={false} />
+            <BeltReferenceOverlay enabled={belt2GuidesEnabled} />
 
             {clicksEnabled && clickMarks.length > 0 && (
               <div
