@@ -1,6 +1,3 @@
-#!/usr/bin/env sh
-. "$(dirname -- "$0")/_/husky.sh"
-
 set -e
 
 ORIG_ROOT="public/custom_logos/drawings/images_originals"
