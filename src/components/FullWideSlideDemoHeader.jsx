@@ -2610,7 +2610,7 @@ function CistellComandaContent({ cartItems, setCartItems }) {
   const TOP_OFFSET = 1.5 * ROW_H; // la taula comença a la 2a fila + mitja fila d'ajust
   const COLS = 4;
   const ROWS = 21;
-  const TABLE_WIDTH = 1320;
+  const TABLE_WIDTH = 1365.46;
   const COL_WIDTH = (TABLE_WIDTH - GUTTER * (COLS - 1)) / COLS; // 322.875px
 
   // Pauta del CARRUSEL — VALORS MANUALS EDITABLES:
@@ -3243,7 +3243,7 @@ function UserComandesContent() {
         gridTemplateColumns: 'repeat(4, 1fr)',
         columnGap: GUTTER,
         height: `${ROW_H}px`,
-        width: '1320px',
+        width: '1365.46px',
         marginLeft: 'auto',
         marginRight: 'auto',
       }}>
@@ -3327,9 +3327,9 @@ function UserComandesContent() {
             transition: background-color 9999s ease-in-out 0s;
           }
         `}</style>
-        <div style={{ width: '1320px', marginLeft: 'auto', marginRight: 'auto', marginTop: '-0.5px', overflow: 'hidden', position: 'relative', backgroundImage: 'url("/placeholders/fons_acordio/fons-usuari-compte.png")', backgroundRepeat: 'no-repeat', backgroundPosition: 'top left', backgroundSize: '1320px 100%' }}>
+        <div style={{ width: '1365.46px', marginLeft: 'auto', marginRight: 'auto', marginTop: '-0.5px', overflow: 'hidden', position: 'relative', backgroundImage: 'url("/placeholders/fons_acordio/fons-usuari-compte.png")', backgroundRepeat: 'no-repeat', backgroundPosition: 'top left', backgroundSize: '1365.46px 100%' }}>
           <table className="compte-grid" style={{
-            width: '1335px',
+            width: '1380.46px',
             marginLeft: '-7.5px',
             marginTop: '-2.8px',
             tableLayout: 'fixed',
@@ -3581,7 +3581,7 @@ function UserComandesContent() {
         {activeTab === 'COMPTE' && (<>
         <div style={{ height: `${ROW_H}px` }} />
         <div style={{
-          width: '1320px',
+          width: '1365.46px',
           marginLeft: 'auto',
           marginRight: 'auto',
           height: `${ROW_H}px`,
@@ -3628,7 +3628,7 @@ function UserComandesContent() {
         </div>
         {/* Botonera central (REVERTEIX / CANCEL·LA / DESA) */}
         <div style={{
-          width: '1320px',
+          width: '1365.46px',
           marginLeft: 'auto',
           marginRight: 'auto',
           display: 'grid',
@@ -3666,10 +3666,10 @@ function UserComandesContent() {
       </>)}
 
       {activeTab === 'SEGURETAT' && (
-        <div style={{ width: '1320px', marginLeft: 'auto', marginRight: 'auto', marginTop: '0px', height: SEG_TABLE_LOCKED_HEIGHT, overflow: 'visible', position: 'relative', zIndex: 2, backgroundColor: 'transparent', backgroundImage: 'url("/placeholders/fons_acordio/fons-usuari-seguretat.png")', backgroundRepeat: 'no-repeat', backgroundPosition: 'top left', backgroundSize: '1320px 528px', paddingLeft: 0, paddingRight: 0, transform: `translate(${SEG_X_OFFSET}, ${SEG_Y_OFFSET})` }}>
+        <div style={{ width: '1365.46px', marginLeft: 'auto', marginRight: 'auto', marginTop: '0px', height: SEG_TABLE_LOCKED_HEIGHT, overflow: 'visible', position: 'relative', zIndex: 2, backgroundColor: 'transparent', backgroundImage: 'url("/placeholders/fons_acordio/fons-usuari-seguretat.png")', backgroundRepeat: 'no-repeat', backgroundPosition: 'top left', backgroundSize: '1365.46px 528px', paddingLeft: 0, paddingRight: 0, transform: `translate(${SEG_X_OFFSET}, ${SEG_Y_OFFSET})` }}>
           <style>{`.seguretat-table td { outline: none; border: none; box-shadow: none; background: transparent; }`}</style>
          <table className="seguretat-table" style={{
-            width: '1335.1px',
+            width: '1380.56px',
             marginLeft: '-8.05px',
             marginTop: '-5px',
             color: '#475059',
@@ -3883,7 +3883,7 @@ function UserComandesContent() {
 
       {activeTab === 'SEGURETAT' && (<>
         <div style={{
-          width: '1320px',
+          width: '1365.46px',
           marginLeft: 'auto',
           marginRight: 'auto',
           marginTop: '-63.5px',
@@ -4034,7 +4034,7 @@ function UserComandesContent() {
           .msg-ph-wrap.msg-ph-top .msg-ph { align-items: flex-start; padding: 8px 10px; }
         `}</style>
         <div style={{
-          width: '1320px',
+          width: '1365.46px',
           marginLeft: 'auto',
           marginRight: 'auto',
           marginTop: '-0.5px',
@@ -4043,11 +4043,11 @@ function UserComandesContent() {
           backgroundImage: 'url("/placeholders/fons_acordio/fons-usuari-missatges.png")',
           backgroundRepeat: 'no-repeat',
           backgroundPosition: 'top left',
-          backgroundSize: '1320px 525.2px',
+          backgroundSize: '1365.46px 525.2px',
         }}>
           <div style={{ overflow: 'hidden' }}>
           <table className="missatges-table" style={{
-            width: '1335px',
+            width: '1380.46px',
             marginLeft: '-7.5px',
             marginTop: '-2.8px',
             tableLayout: 'fixed',
@@ -4067,7 +4067,7 @@ function UserComandesContent() {
                     display: 'grid',
                     gridTemplateColumns: '324px 324.5px 490.5px 158.5px',
                     columnGap: '7.5px',
-                    width: '1320px',
+                    width: '1365.46px',
                   }}>
                     {[0, 1].map((i) => {
                       const toggleMode = i === 0 ? 'comanda' : 'correu';
@@ -4332,9 +4332,9 @@ function UserComandesContent() {
         }
         .comandes-table th > *, .comandes-table td > * { min-width: 0; max-width: 100%; }
       `}</style>
-      <div style={{ width: '1320px', marginLeft: 'auto', marginRight: 'auto', marginTop: '-0.5px', overflow: 'hidden', position: 'relative', backgroundImage: 'url("/placeholders/fons_acordio/fons-usuari-comandes.png")', backgroundRepeat: 'no-repeat', backgroundPosition: 'top left', backgroundSize: '1320px 100%' }}>
+      <div style={{ width: '1365.46px', marginLeft: 'auto', marginRight: 'auto', marginTop: '-0.5px', overflow: 'hidden', position: 'relative', backgroundImage: 'url("/placeholders/fons_acordio/fons-usuari-comandes.png")', backgroundRepeat: 'no-repeat', backgroundPosition: 'top left', backgroundSize: '1365.46px 100%' }}>
         <table className="comandes-table" style={{
-          width: '1335px',
+          width: '1380.46px',
           marginLeft: '-7.5px',
           marginTop: '-2.8px',
           tableLayout: 'fixed',
@@ -4433,7 +4433,7 @@ function UserComandesContent() {
       <div style={{ height: `${ROW_H}px` }} />
 
       {/* 4. Llegenda */}
-      <div style={{ width: '1320px', marginLeft: 'auto', marginRight: 'auto', display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', columnGap: '7.5px' }}>
+      <div style={{ width: '1365.46px', marginLeft: 'auto', marginRight: 'auto', display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', columnGap: '7.5px' }}>
       <div style={{
         gridColumn: '2 / span 2',
         display: 'flex',
@@ -4467,7 +4467,7 @@ function UserComandesContent() {
 
       {/* 5. Botonera central (REVERTEIX / CANCEL·LA / DESA) */}
       <div style={{
-        width: '1320px',
+        width: '1365.46px',
         marginLeft: 'auto',
         marginRight: 'auto',
         display: 'grid',
@@ -6648,6 +6648,7 @@ export default function FullWideSlideDemoHeader({
   const searchGridScrollRef = useRef(null);
   const [megaInsetsPx, setMegaInsetsPx] = useState({ left: 0, right: 0 });
   const [bleedGuardExpandPx, setBleedGuardExpandPx] = useState({ left: 0, right: 0 });
+  const [accordionPautaScale, setAccordionPautaScale] = useState(1);
 
   const ensureMegaOpen = () => {
     setManualOverrideClosed(false);
@@ -6701,6 +6702,27 @@ export default function FullWideSlideDemoHeader({
     window.addEventListener('resize', measure);
     return () => window.removeEventListener('resize', measure);
   }, [active, megaPage, searchResults.length]);
+
+  useLayoutEffect(() => {
+    if (typeof window === 'undefined') return undefined;
+
+    const measure = () => {
+      const rootStyle = window.getComputedStyle(document.documentElement);
+      const xL = parseFloat(rootStyle.getPropertyValue('--belt2-xL'));
+      const xR = parseFloat(rootStyle.getPropertyValue('--belt2-xR'));
+      const beltWidth = Number.isFinite(xL) && Number.isFinite(xR) ? xR - xL - 2 : window.innerWidth;
+      const nextScale = Math.max(0.5, Math.min(1, beltWidth / 1365.46));
+      setAccordionPautaScale((prev) => (Math.abs(prev - nextScale) < 0.005 ? prev : nextScale));
+    };
+
+    measure();
+    window.addEventListener('resize', measure);
+    window.addEventListener('scroll', measure, true);
+    return () => {
+      window.removeEventListener('resize', measure);
+      window.removeEventListener('scroll', measure, true);
+    };
+  }, []);
 
   const isManualLockEnabled = () => {
     if (typeof manualEnabledOverride === 'boolean') return manualEnabledOverride;
@@ -8144,19 +8166,32 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
                             top: '100%',
                             left: '50%',
                             transform: 'translateX(-50%)',
-                            width: '100vw',
+                            width: '100%',
                             minHeight: '100vh',
-                            backgroundColor: 'white',
                             paddingTop: '40px',
                             paddingBottom: '40px',
                             zIndex: 10,
                           }}>
+                            <div aria-hidden="true" style={{
+                              position: 'absolute',
+                              top: 0,
+                              left: '50%',
+                              transform: 'translateX(-50%)',
+                              width: '100vw',
+                              height: '100%',
+                              minHeight: '100vh',
+                              backgroundColor: 'white',
+                              pointerEvents: 'none',
+                              zIndex: -1,
+                            }} />
                             {/* Zona de la pauta — tot el contingut queda clippat als límits */}
                             <div style={{
                               position: 'absolute',
                               top: '1px',
-                              left: '280.5px',
-                              width: '1365.46px',
+                              left: '50%',
+                              transform: `translateX(-50%) scale(${accordionPautaScale})`,
+                              transformOrigin: 'top center',
+                              width: `calc(100% / ${accordionPautaScale})`,
                               height: '737.015px',
                               overflow: 'hidden',
                             }}>
@@ -8250,19 +8285,32 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
                             top: '100%',
                             left: '50%',
                             transform: 'translateX(-50%)',
-                            width: '100vw',
+                            width: '100%',
                             minHeight: '100vh',
-                            backgroundColor: 'white',
                             paddingTop: '40px',
                             paddingBottom: '40px',
                             zIndex: 10,
                           }}>
+                            <div aria-hidden="true" style={{
+                              position: 'absolute',
+                              top: 0,
+                              left: '50%',
+                              transform: 'translateX(-50%)',
+                              width: '100vw',
+                              height: '100%',
+                              minHeight: '100vh',
+                              backgroundColor: 'white',
+                              pointerEvents: 'none',
+                              zIndex: -1,
+                            }} />
                             {/* Zona de la pauta — tot el contingut queda clippat als límits */}
                             <div style={{
                               position: 'absolute',
                               top: '1px',
-                              left: '280.5px',
-                              width: '1365.46px',
+                              left: '50%',
+                              transform: `translateX(-50%) scale(${accordionPautaScale})`,
+                              transformOrigin: 'top center',
+                              width: `calc(100% / ${accordionPautaScale})`,
                               height: '737.015px',
                               overflow: 'hidden',
                             }}>
