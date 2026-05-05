@@ -259,10 +259,12 @@ function App() {
   });
   const [checkoutPautaEnabled, setCheckoutPautaEnabled] = useState(() => {
     try {
+      const sp = new URLSearchParams(window.location.search);
+      if (sp.has('pauta')) return sp.get('pauta') === '1';
       const raw = window.localStorage.getItem('HG_CHECKOUT_PAUTA_ENABLED_V1');
-      return raw !== '0';
+      return raw === '1';
     } catch {
-      return true;
+      return false;
     }
   });
   const [megaAccordionLocked, setMegaAccordionLocked] = useState(() => {

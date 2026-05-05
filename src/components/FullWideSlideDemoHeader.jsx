@@ -6710,7 +6710,9 @@ export default function FullWideSlideDemoHeader({
       const rootStyle = window.getComputedStyle(document.documentElement);
       const xL = parseFloat(rootStyle.getPropertyValue('--belt2-xL'));
       const xR = parseFloat(rootStyle.getPropertyValue('--belt2-xR'));
-      const beltWidth = Number.isFinite(xL) && Number.isFinite(xR) ? xR - xL - 2 : window.innerWidth;
+      const safeMegaWidth = Math.max(320, Math.min(1400, window.innerWidth - 152));
+      const beltWidthRaw = Number.isFinite(xL) && Number.isFinite(xR) ? xR - xL - 2 : safeMegaWidth;
+      const beltWidth = beltWidthRaw > 0 && beltWidthRaw <= safeMegaWidth + 2 ? beltWidthRaw : safeMegaWidth;
       const nextScale = Math.max(0.5, Math.min(1, beltWidth / 1365.46));
       setAccordionPautaScale((prev) => (Math.abs(prev - nextScale) < 0.005 ? prev : nextScale));
     };
@@ -7640,7 +7642,7 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
                         flex: '1 1 auto',
                       }} />
                       
-                      <div style={{ flex: '0 0 auto', width: 'min(1400px, calc(var(--belt2-xR, 100vw) - var(--belt2-xL, 0px) - 2px))', maxWidth: 'none', position: 'relative', height: '100%', paddingLeft: '0px', paddingRight: '0px' }}>
+                      <div style={{ flex: '0 0 auto', width: 'min(1400px, calc(100vw - 152px))', maxWidth: 'none', position: 'relative', height: '100%', paddingLeft: '0px', paddingRight: '0px' }}>
                         <MegaStripePanel
                           active={active}
                           resolvedMega={resolvedMega}
@@ -7693,7 +7695,7 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
 
                       <div style={{ 
                         flex: '0 0 auto', 
-                        width: 'min(1400px, calc(var(--belt2-xR, 100vw) - var(--belt2-xL, 0px) - 2px))', 
+                        width: 'min(1400px, calc(100vw - 152px))', 
                         maxWidth: 'none', 
                         position: 'relative', 
                         height: '100%', 
@@ -7755,7 +7757,7 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
 
                       <div style={{ 
                         flex: '0 0 auto', 
-                        width: 'min(1400px, calc(var(--belt2-xR, 100vw) - var(--belt2-xL, 0px) - 2px))', 
+                        width: 'min(1400px, calc(100vw - 152px))', 
                         maxWidth: 'none', 
                         position: 'relative', 
                         height: '100%',
@@ -8224,7 +8226,7 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
 
                       <div style={{ 
                         flex: '0 0 auto', 
-                        width: 'min(1400px, calc(var(--belt2-xR, 100vw) - var(--belt2-xL, 0px) - 2px))', 
+                        width: 'min(1400px, calc(100vw - 152px))', 
                         maxWidth: 'none', 
                         position: 'relative', 
                         height: '100%', 
