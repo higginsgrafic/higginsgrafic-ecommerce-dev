@@ -4729,6 +4729,13 @@ export default function FullWideSlideDemoHeader({
   const [manualOverrideClosed, setManualOverrideClosed] = useState(false);
   const [acordioExpanded, setAcordioExpanded] = usePersistentState('HG_ACORDIO_EXPANDED', false);
   const [acordioExpandedPage4, setAcordioExpandedPage4] = usePersistentState('HG_ACORDIO_EXPANDED_PAGE4', false);
+  const [megaAccordionLocked, setMegaAccordionLocked] = useState(() => {
+    try {
+      return window.localStorage.getItem('HG_MEGA_ACCORDION_LOCKED_V1') === '1';
+    } catch {
+      return false;
+    }
+  });
   const [activeUserTab, setActiveUserTab] = usePersistentState('HG_ACTIVE_USER_TAB', '1');
   const [firstContactSelectedItem, setFirstContactSelectedItem] = useState(null);
   const [humanInsideSelectedItem, setHumanInsideSelectedItem] = useState(null);
@@ -4897,6 +4904,36 @@ export default function FullWideSlideDemoHeader({
             },
           };
         }
+
+        window.__MEASURE_MEGA_BELT2_V2__ = () => {
+          const round2 = (v) => Math.round(v * 100) / 100;
+          const rootStyle = window.getComputedStyle(document.documentElement);
+          const xL = parseFloat(rootStyle.getPropertyValue('--belt2-xL'));
+          const xR = parseFloat(rootStyle.getPropertyValue('--belt2-xR'));
+          const track = [...document.querySelectorAll('div')]
+            .map((el) => ({ el, rect: el.getBoundingClientRect() }))
+            .filter(({ el, rect }) => el.style?.width === '400%' && rect.width > 0 && rect.height > 0)
+            .sort((a, b) => b.rect.width - a.rect.width)[0]?.el || null;
+          const activeSlide = track?.children?.[Math.max(0, Math.min(3, megaPage - 1))] || null;
+          const activeContent = [...(activeSlide?.querySelectorAll?.('div') || [])]
+            .find((el) => el.style?.width === '1400px' || el.style?.width?.includes?.('1400px')) || null;
+          const visibleMega = track?.parentElement?.parentElement?.parentElement || megaEl;
+          const toRect = (el) => {
+            const r = el?.getBoundingClientRect?.();
+            return r ? { left: round2(r.left), right: round2(r.right), width: round2(r.width) } : null;
+          };
+          const result = {
+            viewport: { width: round2(window.innerWidth), visualWidth: round2(window.visualViewport?.width ?? window.innerWidth) },
+            belt2: { xL: round2(xL), xR: round2(xR), width: round2(xR - xL) },
+            track: toRect(track),
+            mega: toRect(visibleMega),
+            target: toRect(targetEl),
+            activeSlide: toRect(activeSlide),
+            activeContent: toRect(activeContent),
+          };
+          console.table(result);
+          return result;
+        };
       } catch {
         // ignore
       }
@@ -4914,6 +4951,54 @@ export default function FullWideSlideDemoHeader({
       window.clearTimeout(t2);
     };
   }, [active]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return undefined;
+    const readLocked = () => {
+      try {
+        setMegaAccordionLocked(window.localStorage.getItem('HG_MEGA_ACCORDION_LOCKED_V1') === '1');
+      } catch {
+        setMegaAccordionLocked(false);
+      }
+    };
+    const onLockChange = (event) => {
+      const locked = event?.detail?.locked;
+      if (typeof locked === 'boolean') {
+        setMegaAccordionLocked(locked);
+      } else {
+        readLocked();
+      }
+    };
+    readLocked();
+    window.addEventListener('hg:mega-accordion-lock-change', onLockChange);
+    window.addEventListener('storage', readLocked);
+    return () => {
+      window.removeEventListener('hg:mega-accordion-lock-change', onLockChange);
+      window.removeEventListener('storage', readLocked);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return undefined;
+    const keepLockedAccordionOpen = () => {
+      if (!megaAccordionLocked) return;
+      if (megaPage === 3) {
+        setAcordioExpanded(true);
+      }
+      if (megaPage === 4) {
+        setAcordioExpandedPage4(true);
+      }
+    };
+    keepLockedAccordionOpen();
+    window.addEventListener('focus', keepLockedAccordionOpen);
+    window.addEventListener('pageshow', keepLockedAccordionOpen);
+    window.addEventListener('visibilitychange', keepLockedAccordionOpen);
+    return () => {
+      window.removeEventListener('focus', keepLockedAccordionOpen);
+      window.removeEventListener('pageshow', keepLockedAccordionOpen);
+      window.removeEventListener('visibilitychange', keepLockedAccordionOpen);
+    };
+  }, [megaAccordionLocked, megaPage, setAcordioExpanded, setAcordioExpandedPage4]);
 
   const overlaySrcFromUrl = useMemo(() => {
     try {
@@ -7261,8 +7346,10 @@ export default function FullWideSlideDemoHeader({
       className={`${contained ? 'relative' : 'fixed'} z-[10000] bg-background`}
       onMouseLeave={(e) => {
         if (isManualLockEnabled()) return;
+        if (megaAccordionLocked) return;
         const nextTarget = e?.relatedTarget;
         if (nextTarget instanceof Node && e.currentTarget.contains(nextTarget)) return;
+        if (nextTarget instanceof Element && nextTarget.closest('.debug-exempt')) return;
         closeMegaExplicitly();
       }}
       style={
@@ -7373,13 +7460,12 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
                   cartClickTimeoutRef.current = null;
                   setManualOverrideClosed(false);
                   if (megaPage === 3 && active) {
-                    // Si ja estem a la pàgina 3 i el mega-menu està obert
-                    if (acordioExpanded) {
-                      // Si l'acordió està obert, només el tanquem (mantenim mega-menu obert)
-                      setAcordioExpanded(false);
-                    } else {
-                      // Si l'acordió està tancat, l'obrim
-                      setAcordioExpanded(true);
+                    if (!megaAccordionLocked) {
+                      if (acordioExpanded) {
+                        setAcordioExpanded(false);
+                      } else {
+                        setAcordioExpanded(true);
+                      }
                     }
                   } else {
                     // Si no estem a la pàgina 3, hi anem.
@@ -7431,13 +7517,12 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
                     accountClickTimeoutRef.current = null;
                     setManualOverrideClosed(false);
                     if (megaPage === 4 && active) {
-                      // Si ja estem a la pàgina 4 i el mega-menu està obert
-                      if (acordioExpandedPage4) {
-                        // Si l'acordió està obert, només el tanquem (mantenim mega-menu obert)
-                        setAcordioExpandedPage4(false);
-                      } else {
-                        // Si l'acordió està tancat, l'obrim
-                        setAcordioExpandedPage4(true);
+                      if (!megaAccordionLocked) {
+                        if (acordioExpandedPage4) {
+                          setAcordioExpandedPage4(false);
+                        } else {
+                          setAcordioExpandedPage4(true);
+                        }
                       }
                     } else {
                       // Si no estem a la pàgina 4, hi anem.
@@ -7533,7 +7618,7 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
                         flex: '1 1 auto',
                       }} />
                       
-                      <div style={{ flex: '0 0 auto', width: '1400px', maxWidth: '100%', position: 'relative', height: '100%', paddingLeft: '40px', paddingRight: '40px' }}>
+                      <div style={{ flex: '0 0 auto', width: 'min(1400px, calc(var(--belt2-xR, 100vw) - var(--belt2-xL, 0px) - 2px))', maxWidth: 'none', position: 'relative', height: '100%', paddingLeft: '0px', paddingRight: '0px' }}>
                         <MegaStripePanel
                           active={active}
                           resolvedMega={resolvedMega}
@@ -7586,12 +7671,12 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
 
                       <div style={{ 
                         flex: '0 0 auto', 
-                        width: '1400px', 
-                        maxWidth: '100%', 
+                        width: 'min(1400px, calc(var(--belt2-xR, 100vw) - var(--belt2-xL, 0px) - 2px))', 
+                        maxWidth: 'none', 
                         position: 'relative', 
                         height: '100%', 
-                        paddingLeft: '40px', 
-                        paddingRight: '40px',
+                        paddingLeft: '0px', 
+                        paddingRight: '0px',
                         display: 'flex',
                         flexDirection: 'column',
                         gap: '16px',
@@ -7648,12 +7733,12 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
 
                       <div style={{ 
                         flex: '0 0 auto', 
-                        width: '1400px', 
-                        maxWidth: '100%', 
+                        width: 'min(1400px, calc(var(--belt2-xR, 100vw) - var(--belt2-xL, 0px) - 2px))', 
+                        maxWidth: 'none', 
                         position: 'relative', 
                         height: '100%',
-                        paddingLeft: '40px', 
-                        paddingRight: '40px',
+                        paddingLeft: '0px', 
+                        paddingRight: '0px',
                         display: 'flex',
                         flexDirection: 'column',
                       }}>
@@ -7661,23 +7746,23 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
                         <div aria-hidden="true" style={{
                           position: 'absolute',
                           top: 0,
-                          left: '40px',
-                          width: '1px',
+                          left: 0,
+                          width: '2px',
                           height: '100%',
-                          background: 'rgba(71, 80, 89, 0.18)',
+                          background: 'rgba(255, 0, 0, 0.9)',
                           pointerEvents: 'none',
-                          zIndex: 20,
+                          zIndex: 90,
                         }} />
                         {/* Ombra dreta del carrusel */}
                         <div aria-hidden="true" style={{
                           position: 'absolute',
                           top: 0,
-                          right: '40px',
-                          width: '1px',
+                          right: 0,
+                          width: '2px',
                           height: '100%',
-                          background: 'rgba(71, 80, 89, 0.18)',
+                          background: 'rgba(255, 0, 0, 0.9)',
                           pointerEvents: 'none',
-                          zIndex: 20,
+                          zIndex: 90,
                         }} />
                         <div 
                           id="stripe-guide-cart-viewport-anchor"
@@ -7697,6 +7782,7 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
                           gap: '3px',
                           overflowX: 'auto',
                           overflowY: 'hidden',
+                          clipPath: 'inset(0)',
                           scrollbarWidth: 'none',
                           msOverflowStyle: 'none',
                         }}>
@@ -8006,7 +8092,7 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
                                       moveProductToCart(idx);
                                     }
                                     if (megaPage === 3 && active) {
-                                      if (!acordioExpanded) setAcordioExpanded(true);
+                                      if (!megaAccordionLocked && !acordioExpanded) setAcordioExpanded(true);
                                     } else {
                                       setMegaPage(3);
                                       if (!active) ensureMegaOpen();
@@ -8103,12 +8189,12 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
 
                       <div style={{ 
                         flex: '0 0 auto', 
-                        width: '1400px', 
-                        maxWidth: '100%', 
+                        width: 'min(1400px, calc(var(--belt2-xR, 100vw) - var(--belt2-xL, 0px) - 2px))', 
+                        maxWidth: 'none', 
                         position: 'relative', 
                         height: '100%', 
-                        paddingLeft: '40px', 
-                        paddingRight: '40px',
+                        paddingLeft: '0px', 
+                        paddingRight: '0px',
                         display: 'flex',
                         flexDirection: 'column',
                       }}>

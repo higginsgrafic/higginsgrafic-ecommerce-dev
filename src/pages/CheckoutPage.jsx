@@ -22,6 +22,7 @@ const PAUTA_FIRST_ROW_PERCENT = (PAUTA_FIRST_ROW_SCALE / PAUTA_TOTAL_WEIGHT) * 1
 const PAUTA_ROWS_TEMPLATE_2 = `minmax(0, calc(${PAUTA_FIRST_ROW_PERCENT}% + ${PAUTA_FIRST_ROW_EXTRA_PX}px)) repeat(${PAUTA_ROWS - 1}, minmax(0, calc(${PAUTA_OTHER_ROW_PERCENT}% - ${PAUTA_OTHER_ROW_COMP_PX}px)))`;
 const CHECKOUT_PAGE_TOP_OFFSET = '33px';
 const CHECKOUT_PAGE_LEFT_OFFSET = '0px';
+const CHECKOUT_BREADCRUMBS_LEFT_OFFSET = '-18px';
 const SHOW_V1_ORDERS_DETAILS = true;
 const CHECKOUT_TABLE_HEADER_SHIFT_Y = -4;
 const stripePublishableKey = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || 'pk_test_CONFIGURED_NOT_CONNECTED';
@@ -339,7 +340,7 @@ const CheckoutPage = ({ cartItems, onClearCart, pautaEnabled = true, mockMode = 
       <div
         style={{
           position: 'absolute',
-          left: `calc(var(--belt2-xL, 0px) + ${CHECKOUT_PAGE_LEFT_OFFSET})`,
+          left: `calc(var(--belt2-xL, 0px) + ${CHECKOUT_BREADCRUMBS_LEFT_OFFSET})`,
           top: CHECKOUT_PAGE_TOP_OFFSET,
           width: 'calc(var(--belt2-xR, 100vw) - var(--belt2-xL, 0px))',
           zIndex: 5,
@@ -541,12 +542,12 @@ const CheckoutPage = ({ cartItems, onClearCart, pautaEnabled = true, mockMode = 
                 gridColumn: '1 / 5',
                 gridRow: '3 / 4',
                 width: 'calc(100% - 10.25px)',
-                justifySelf: 'center',
+                justifySelf: 'start',
                 display: 'grid',
                 gridTemplateColumns: 'calc(50% - 7.5px) repeat(3, minmax(0, 1fr))',
                 columnGap: '15px',
                 alignSelf: 'end',
-                transform: 'translateY(-12px)',
+                transform: 'translate(-0.5px, -12px)',
                 zIndex: 5,
               }}
             >
@@ -609,9 +610,9 @@ const CheckoutPage = ({ cartItems, onClearCart, pautaEnabled = true, mockMode = 
                 gridColumn: '1 / 5',
                 gridRow: `${checkoutFirstOrderRow + rowIndex} / ${checkoutFirstOrderRow + rowIndex + 1}`,
                 width: 'calc(100% - 10.25px)',
-                justifySelf: 'center',
+                justifySelf: 'start',
                 overflow: 'hidden',
-                transform: 'translateY(-5.5px)',
+                transform: 'translate(-0.5px, -5.5px)',
                 zIndex: 1,
               }}
             >
@@ -635,7 +636,7 @@ const CheckoutPage = ({ cartItems, onClearCart, pautaEnabled = true, mockMode = 
               gridColumn: '1 / 5',
               gridRow: '4 / 18',
               width: 'calc(100% - 10.25px)',
-              justifySelf: 'center',
+              justifySelf: 'start',
               height: 'calc(100% + 2.5px)',
               position: 'relative',
               overflow: 'hidden',
@@ -643,7 +644,7 @@ const CheckoutPage = ({ cartItems, onClearCart, pautaEnabled = true, mockMode = 
               scrollbarWidth: 'none',
               pointerEvents: 'auto',
               zIndex: 2,
-              transform: 'translateY(-5.5px)',
+              transform: 'translate(-0.5px, -5.5px)',
             }}
           >
             {checkoutVisibleItems.flatMap((item, rowIndex) => (
@@ -717,7 +718,7 @@ const CheckoutPage = ({ cartItems, onClearCart, pautaEnabled = true, mockMode = 
               width: 'calc(100% - 11.25px)',
               height: '2px',
               backgroundColor: '#DEDFE1',
-              transform: 'translateX(-50%)',
+              transform: 'translateX(calc(-50% - 5px))',
               zIndex: 3,
             }}
           />
@@ -731,7 +732,7 @@ const CheckoutPage = ({ cartItems, onClearCart, pautaEnabled = true, mockMode = 
               justifySelf: 'center',
               height: '2px',
               backgroundColor: '#DEDFE1',
-              transform: totalsBlockShiftY,
+              transform: `translateX(-5px) ${totalsBlockShiftY}`,
               zIndex: 3,
             }}
           />
@@ -742,10 +743,10 @@ const CheckoutPage = ({ cartItems, onClearCart, pautaEnabled = true, mockMode = 
               gridColumn: '1 / 5',
               gridRow: `${totalsStartRow} / ${totalsStartRow + totalsBackgroundRows}`,
               width: 'calc(100% - 11.25px)',
-              justifySelf: 'center',
+              justifySelf: 'start',
               height: '100%',
               overflow: 'hidden',
-              transform: totalsBlockShiftY,
+              transform: `translateX(-0.5px) ${totalsBlockShiftY}`,
               zIndex: 1,
             }}
           >
@@ -777,7 +778,7 @@ const CheckoutPage = ({ cartItems, onClearCart, pautaEnabled = true, mockMode = 
                 alignItems: 'center',
                 justifyContent: 'flex-end',
                 paddingRight: 'calc((100% - 7.5px) / 2 + 7.5px)',
-                transform: `translateX(58px) ${totalsBlockShiftY}`,
+                transform: `translateX(46.5px) ${totalsBlockShiftY}`,
                 color: '#4A5057',
                 fontFamily: 'Roboto Condensed, sans-serif',
                 fontSize: label === 'TOT PLEGAT FA' ? '15pt' : '12pt',
@@ -803,7 +804,7 @@ const CheckoutPage = ({ cartItems, onClearCart, pautaEnabled = true, mockMode = 
                 fontWeight: label === 'TOT PLEGAT FA' ? 400 : 300,
                 textTransform: 'uppercase',
                 textDecoration: strikeAmount ? 'line-through' : 'none',
-                transform: `${label === 'TOT PLEGAT FA' ? 'translateX(13px)' : 'translateX(15px)'} ${totalsBlockShiftY}`,
+                transform: `${label === 'TOT PLEGAT FA' ? 'translateX(1.5px)' : 'translateX(3.5px)'} ${totalsBlockShiftY}`,
                 zIndex: 2,
               }}
             >
@@ -860,7 +861,8 @@ const CheckoutPage = ({ cartItems, onClearCart, pautaEnabled = true, mockMode = 
             aria-hidden="true"
             style={{
               gridColumn: '2 / 3',
-              gridRow: `1 / ${checkoutBlockBackgroundEndRow}`,
+              gridRow: paymentDetailsOpen ? '1 / -1' : `1 / ${checkoutBlockBackgroundEndRow}`,
+              height: 'calc(100% + 50px)',
               overflow: 'hidden',
               zIndex: -1,
             }}

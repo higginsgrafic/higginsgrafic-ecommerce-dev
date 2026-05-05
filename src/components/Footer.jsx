@@ -69,7 +69,10 @@ const Footer = ({ copyrightOnly = false }) => {
     <footer
       ref={copyrightFooterRef}
       className="fixed bottom-0 left-0 right-0 z-[1000] bg-white border-t border-border transition-colors duration-200"
-      style={isSectionEnabled('footer') ? getDebugStyle('footer', 'main') : {}}
+      style={{
+        ...(isSectionEnabled('footer') ? getDebugStyle('footer', 'main') : {}),
+        transform: 'translateY(100px)',
+      }}
     >
       <div className="bg-white px-4 lg:px-8 py-12 lg:py-16 transition-colors duration-200">
         <div className="max-w-7xl mx-auto flex items-center justify-center">
@@ -306,7 +309,10 @@ const Footer = ({ copyrightOnly = false }) => {
   return (
     <footer
       className="bg-white transition-colors duration-200"
-      style={isSectionEnabled('footer') ? getDebugStyle('footer', 'main') : {}}
+      style={{
+        ...(isSectionEnabled('footer') ? getDebugStyle('footer', 'main') : {}),
+        transform: 'translateY(100px)',
+      }}
     >
       {/* Element invisible per mesurar textos */}
       <span

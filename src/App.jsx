@@ -265,6 +265,13 @@ function App() {
       return true;
     }
   });
+  const [megaAccordionLocked, setMegaAccordionLocked] = useState(() => {
+    try {
+      return window.localStorage.getItem('HG_MEGA_ACCORDION_LOCKED_V1') === '1';
+    } catch {
+      return false;
+    }
+  });
   useEffect(() => {
     try {
       window.localStorage.setItem('HG_BELT2_GUIDES_ENABLED_V1', belt2GuidesEnabled ? '1' : '0');
@@ -279,6 +286,14 @@ function App() {
       // ignore
     }
   }, [checkoutPautaEnabled]);
+  useEffect(() => {
+    try {
+      window.localStorage.setItem('HG_MEGA_ACCORDION_LOCKED_V1', megaAccordionLocked ? '1' : '0');
+      window.dispatchEvent(new CustomEvent('hg:mega-accordion-lock-change', { detail: { locked: megaAccordionLocked } }));
+    } catch {
+      // ignore
+    }
+  }, [megaAccordionLocked]);
   const beltEnabledFromUrl = (() => {
     try {
       const sp = new URLSearchParams(window.location.search);
@@ -2983,10 +2998,43 @@ function App() {
       document.documentElement.style.setProperty('--appHeaderOffset', nextOffset);
       document.documentElement.style.setProperty('--globalHeaderTopOffset', globalHeaderTopOffset);
       document.documentElement.style.setProperty('--rulerInset', `${rulerInset}px`);
+      window.__HG_ZOOM_LAYOUT_PROBE__ = () => {
+        const round2 = (v) => Math.round(v * 100) / 100;
+        const rootStyle = window.getComputedStyle(document.documentElement);
+        const xL = parseFloat(rootStyle.getPropertyValue('--belt2-xL'));
+        const xR = parseFloat(rootStyle.getPropertyValue('--belt2-xR'));
+        const result = {
+          viewport: {
+            innerWidth: round2(window.innerWidth),
+            clientWidth: round2(document.documentElement.clientWidth),
+            visualWidth: round2(window.visualViewport?.width ?? window.innerWidth),
+            devicePixelRatio: round2(window.devicePixelRatio || 1),
+            large1024: window.innerWidth >= 1024,
+          },
+          app: {
+            isLargeScreen,
+            baseHeaderHeight,
+            adminBannerHeight,
+            rulerInset,
+            appHeaderOffset,
+            demoHeaderOffset,
+            globalHeaderTopOffset,
+          },
+          belt2: {
+            xL: round2(xL),
+            xR: round2(xR),
+            width: round2(xR - xL),
+          },
+        };
+        console.table(result.viewport);
+        console.table(result.app);
+        console.table(result.belt2);
+        return result;
+      };
     } catch {
       // ignore
     }
-  }, [adminRouteOffset, demoHeaderOffset, appHeaderOffset, globalHeaderTopOffset, isAdminRoute, isDemoStyleLayoutRoute, isFullScreenRoute, rulerInset]);
+  }, [adminBannerHeight, adminRouteOffset, appHeaderOffset, baseHeaderHeight, demoHeaderOffset, globalHeaderTopOffset, isAdminRoute, isDemoStyleLayoutRoute, isFullScreenRoute, isLargeScreen, rulerInset]);
 
   return (
     <ErrorBoundary>
@@ -5940,6 +5988,25 @@ function App() {
                       }}
                     >
                       Belt 2
+                    </button>
+
+                    <button
+                      type="button"
+                      title="Bloca/desbloca l'acordió del mega-slide"
+                      aria-label="Acordió"
+                      aria-pressed={megaAccordionLocked ? 'true' : 'false'}
+                      className={`relative z-10 h-12 rounded-full border px-4 text-[12px] font-semibold shadow-lg active:bg-black/10 debug-exempt ${
+                        megaAccordionLocked
+                          ? 'border-[#6366F1]/40 bg-[#6366F1]/15 text-[#312E81] hover:bg-[#6366F1]/20'
+                          : 'border-black/15 bg-white text-black/80 hover:bg-black/5'
+                      }`}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        setMegaAccordionLocked((v) => !v);
+                      }}
+                    >
+                      Acordió
                     </button>
                   </div>
                 ) : null}
