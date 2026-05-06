@@ -36,6 +36,7 @@ import {
 import MegaStripeBleedGuard from './fullwide/MegaStripeBleedGuard.jsx';
 import OptimizedImg from './fullwide/OptimizedImg.jsx';
 import IconButton from './fullwide/MegaIconButton.jsx';
+import usePersistentState from '@/hooks/usePersistentState';
 
 function MegaStripePanel({
   active,
@@ -2308,34 +2309,6 @@ function MegaColumn({
   );
 }
 
-// Persisteix valors a sessionStorage amb TTL (per defecte 10s). En remuntar, si el TTL no
-// ha expirat des de la darrera interacció, es restaura el valor; si no, s'usa l'inicial.
-function usePersistentState(key, initial, ttlMs = 10000) {
-  const read = () => {
-    try {
-      if (typeof window === 'undefined') return initial;
-      const raw = window.sessionStorage.getItem(key);
-      if (!raw) return initial;
-      const parsed = JSON.parse(raw);
-      if (!parsed || typeof parsed !== 'object') return initial;
-      if (typeof parsed.expiresAt === 'number' && Date.now() > parsed.expiresAt) {
-        window.sessionStorage.removeItem(key);
-        return initial;
-      }
-      return parsed.value;
-    } catch {
-      return initial;
-    }
-  };
-  const [state, setState] = React.useState(read);
-  React.useEffect(() => {
-    try {
-      if (typeof window === 'undefined') return;
-      window.sessionStorage.setItem(key, JSON.stringify({ value: state, expiresAt: Date.now() + ttlMs }));
-    } catch {}
-  }, [key, state, ttlMs]);
-  return [state, setState];
-}
 
 // Plantilla independent de l'acordió del CISTELL — taula pròpia sobre la pauta
 function CistellComandaContent({ cartItems, setCartItems }) {
