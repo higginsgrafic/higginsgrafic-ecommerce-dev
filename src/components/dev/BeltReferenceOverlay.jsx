@@ -44,7 +44,11 @@ const toFiniteOrNull = (v) => (Number.isFinite(v) ? v : null);
 const loadInitialState = () => {
   if (typeof window === 'undefined') return { ...EMPTY_STATE };
   try {
-    // Format V2 (només camps globals: X i sprite). Y mai persistides.
+    // Format V2: persistim X, sprite i les Y de referència visual
+    // (yCarouselTop / yFinalizeBottom). Aquestes Y serveixen per dibuixar les
+    // línies horitzontals de guia a TOTES les rutes com a referència del
+    // posicionament del mega-slide; mai es publiquen com a CSS vars
+    // (per evitar contaminació cross-route a layouts productius).
     const rawV2 = window.localStorage.getItem(STORAGE_KEY_V2);
     if (rawV2) {
       const parsed = JSON.parse(rawV2);
@@ -53,13 +57,15 @@ const loadInitialState = () => {
           ...EMPTY_STATE,
           xL: toFiniteOrNull(parsed.xL),
           xR: toFiniteOrNull(parsed.xR),
+          yCarouselTop: toFiniteOrNull(parsed.yCarouselTop),
+          yFinalizeBottom: toFiniteOrNull(parsed.yFinalizeBottom),
           spriteXL: toFiniteOrNull(parsed.spriteXL),
           spriteXR: toFiniteOrNull(parsed.spriteXR),
         };
       }
     }
 
-    // Migració des dels keys legacy: només recuperem X i sprite.
+    // Migració des dels keys legacy: recuperem X, Y i sprite.
     const rawLegacyGlobal = window.localStorage.getItem(LEGACY_KEY_GLOBAL);
     const rawLegacyGuides = window.localStorage.getItem(LEGACY_KEY_GUIDES);
     if (!rawLegacyGlobal && !rawLegacyGuides) return { ...EMPTY_STATE };
@@ -69,6 +75,12 @@ const loadInitialState = () => {
       ...EMPTY_STATE,
       xL: toFiniteOrNull(parsedGlobal?.xL ?? parsedGuides?.xL),
       xR: toFiniteOrNull(parsedGlobal?.xR ?? parsedGuides?.xR),
+      yCarouselTop: toFiniteOrNull(
+        parsedGlobal?.yCarouselTop ?? parsedGuides?.yCarouselTop
+      ),
+      yFinalizeBottom: toFiniteOrNull(
+        parsedGlobal?.yFinalizeBottom ?? parsedGuides?.yFinalizeBottom
+      ),
       spriteXL: toFiniteOrNull(parsedGuides?.spriteXL),
       spriteXR: toFiniteOrNull(parsedGuides?.spriteXR),
     };
@@ -81,9 +93,11 @@ export default function BeltReferenceOverlay({ enabled }) {
   const location = useLocation();
   const [state, setState] = useState(loadInitialState);
 
-  // Persistència: només camps globals (X i sprite). Les Y depenen de la
-  // pàgina i no s'han de persistir mai (en sessions futures donarien
-  // valors caducs a altres rutes).
+  // Persistència: X, sprite i Y de referència visual (yCarouselTop,
+  // yFinalizeBottom). Les Y es persisteixen perquè la guia visual del
+  // mega-slide ha de ser visible a TOTES les rutes com a referència. Les
+  // CSS vars `--belt2-yT/yB`, en canvi, mai es publiquen (vegeu el següent
+  // useEffect): cap layout productiu hi depèn.
   useEffect(() => {
     if (typeof window === 'undefined') return;
     try {
@@ -92,6 +106,8 @@ export default function BeltReferenceOverlay({ enabled }) {
         JSON.stringify({
           xL: state.xL,
           xR: state.xR,
+          yCarouselTop: state.yCarouselTop,
+          yFinalizeBottom: state.yFinalizeBottom,
           spriteXL: state.spriteXL,
           spriteXR: state.spriteXR,
         })
@@ -99,7 +115,14 @@ export default function BeltReferenceOverlay({ enabled }) {
     } catch {
       // ignore
     }
-  }, [state.xL, state.xR, state.spriteXL, state.spriteXR]);
+  }, [
+    state.xL,
+    state.xR,
+    state.yCarouselTop,
+    state.yFinalizeBottom,
+    state.spriteXL,
+    state.spriteXR,
+  ]);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -147,65 +170,23 @@ export default function BeltReferenceOverlay({ enabled }) {
         }
       }
 
-      // Validació de coherència Y (yCarouselTop, yFinalizeBottom).
-      const yT = state.yCarouselTop;
-      const yB = state.yFinalizeBottom;
-      const yValid =
-        Number.isFinite(yT) &&
-        Number.isFinite(yB) &&
-        yB > yT &&
-        yB - yT >= 50;
-
-      if (yValid) {
-        publish('--belt2-yT', yT);
-        publish('--belt2-yB', yB);
-      } else {
-        clear('--belt2-yT');
-        clear('--belt2-yB');
-        if (
-          import.meta.env?.DEV &&
-          (Number.isFinite(yT) || Number.isFinite(yB))
-        ) {
-          // eslint-disable-next-line no-console
-          console.warn('[BeltReferenceOverlay] Y bounds invalid, not publishing.', {
-            yT,
-            yB,
-          });
-        }
-      }
+      // Y MAI es publiquen com a CSS vars: cap layout productiu hi depèn,
+      // i les guies visuals (línies verdes) es dibuixen directament des de
+      // l'state. Mantenim les vars retirades per garantir que cap consumidor
+      // antic les pugui llegir.
+      clear('--belt2-yT');
+      clear('--belt2-yB');
     } catch {
       // ignore
     }
-  }, [state.xL, state.xR, state.yCarouselTop, state.yFinalizeBottom]);
+  }, [state.xL, state.xR]);
 
-  // Reset Y específiques de pàgina en canviar de ruta.
-  // Les Y `yCarouselTop` (top del card del cistell) i `yFinalizeBottom` (botó
-  // "Finalitza la comanda") són mesurades dins del mega-slide. Si l'usuari
-  // surt del mega-slide, aquests anchors desapareixen i el `setState((prev)
-  // => ...)` mantenia el valor antic, contaminant altres rutes (p.ex. el
-  // checkout llegia uns valors que no eren seus).
-  // Les X (xL/xR) provenen del header i del user icon, presents a totes les
-  // rutes; per això no s'esborren aquí.
+  // En canviar de ruta, retirem qualsevol resta de `--belt2-yT/yB`
+  // (defensa en profunditat per consumidors antics). NO toquem l'state:
+  // les Y de referència visual del mega-slide (yCarouselTop, yFinalizeBottom)
+  // s'han de mantenir perquè les guies horitzontals serveixin com a
+  // referència d'alineament a totes les rutes (checkout, home, etc.).
   useEffect(() => {
-    setState((prev) => {
-      const cleared = {
-        ...prev,
-        yT: null,
-        yB: null,
-        yCarouselTop: null,
-        yFinalizeBottom: null,
-      };
-      if (
-        prev.yT === cleared.yT &&
-        prev.yB === cleared.yB &&
-        prev.yCarouselTop === cleared.yCarouselTop &&
-        prev.yFinalizeBottom === cleared.yFinalizeBottom
-      ) {
-        return prev;
-      }
-      return cleared;
-    });
-
     try {
       const root = document.documentElement;
       root.style.removeProperty('--belt2-yT');
