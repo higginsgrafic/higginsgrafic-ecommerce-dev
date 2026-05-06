@@ -173,6 +173,64 @@ export default function BeltReferenceOverlay({ enabled }) {
     }
   }, [location.pathname]);
 
+  // Probe de diagnòstic: exposa l'estat actual i els valors publicats al
+  // :root via `window.__HG_BELT2_PROBE__()`. Útil per inspeccionar des de
+  // la consola sense React DevTools.
+  useEffect(() => {
+    if (typeof window === 'undefined') return undefined;
+    const ANCHOR_IDS = [
+      'stripe-guide-left-anchor',
+      'stripe-guide-right-arrow',
+      'stripe-guide-header-logo-mark-anchor',
+      'stripe-guide-header-logo-anchor',
+      'stripe-guide-user-icon-anchor',
+      'stripe-guide-cart-viewport-anchor',
+      'stripe-guide-cart-card-top-anchor',
+      'stripe-guide-finalize-order',
+      'stripe-guide-checkout-top-anchor',
+      'stripe-guide-checkout-bottom-anchor',
+      'stripe-guide-checkout-layout-top-anchor',
+      'stripe-guide-checkout-layout-bottom-anchor',
+      'stripe-guide-checkout-pay-desktop',
+      'stripe-guide-checkout-pay-mobile',
+      'stripe-guide-checkout-invoice-bottom-anchor',
+    ];
+
+    window.__HG_BELT2_PROBE__ = () => {
+      const cs = getComputedStyle(document.documentElement);
+      const published = {
+        '--belt2-xL': cs.getPropertyValue('--belt2-xL').trim(),
+        '--belt2-xR': cs.getPropertyValue('--belt2-xR').trim(),
+        '--belt2-yT': cs.getPropertyValue('--belt2-yT').trim(),
+        '--belt2-yB': cs.getPropertyValue('--belt2-yB').trim(),
+      };
+      const anchors = {};
+      for (const id of ANCHOR_IDS) {
+        const el = document.getElementById(id);
+        anchors[id] = el ? 'present' : 'missing';
+      }
+      return {
+        enabled,
+        pathname: location.pathname,
+        state: { ...state },
+        published,
+        anchors,
+        viewport: {
+          width: window.innerWidth,
+          height: window.innerHeight,
+        },
+      };
+    };
+
+    return () => {
+      try {
+        delete window.__HG_BELT2_PROBE__;
+      } catch {
+        // ignore
+      }
+    };
+  }, [enabled, state, location.pathname]);
+
   // Quan les guies belt2 es desactiven, neteja totes les CSS vars perquè cap
   // consumidor (overlays, layouts) llegeixi valors caducs.
   useEffect(() => {
