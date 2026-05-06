@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useRef } from 'react';
+import React, { useState, useEffect, useLayoutEffect, useMemo, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 import { Button } from '@/components/ui/button';
@@ -7,6 +7,7 @@ import Breadcrumbs from '@/components/Breadcrumbs';
 import { formatPrice } from '@/utils/formatters';
 import { validateEmail, validateRequired, validatePostalCode, validateForm } from '@/utils/validation';
 import { trackBeginCheckout, trackPurchase } from '@/utils/analytics';
+import { getSafeBelt, getLayoutViewportHeight } from '@/utils/layoutMetrics';
 
 const PAUTA_ROWS = 33;
 const PAUTA_FIRST_ROW_SCALE = 0.7;
@@ -68,6 +69,44 @@ const CheckoutPage = ({ cartItems, onClearCart, pautaEnabled = true, mockMode = 
     updatePautaRowHeight();
     window.addEventListener('resize', updatePautaRowHeight);
     return () => window.removeEventListener('resize', updatePautaRowHeight);
+  }, []);
+
+  // Belt segur propi del checkout, desacoblat del mega-slide.
+  // Publica --hg-checkout-xL/xR/yT/yB al :root amb fallback robust per als
+  // overlays absolutes i el wrapper. NO depèn de --belt2-* (que pot estar
+  // contaminat per mesures del mega-slide).
+  useLayoutEffect(() => {
+    if (typeof window === 'undefined') return undefined;
+
+    const root = document.documentElement;
+
+    const apply = () => {
+      const belt = getSafeBelt({ maxContent: 1400, sideMargin: 76, minContent: 320 });
+      const vh = getLayoutViewportHeight();
+      root.style.setProperty('--hg-checkout-xL', `${belt.left}px`);
+      root.style.setProperty('--hg-checkout-xR', `${belt.right}px`);
+      root.style.setProperty('--hg-checkout-yT', '0px');
+      root.style.setProperty('--hg-checkout-yB', `${vh}px`);
+    };
+
+    apply();
+
+    let raf = 0;
+    const schedule = () => {
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(apply);
+    };
+
+    window.addEventListener('resize', schedule);
+
+    return () => {
+      window.removeEventListener('resize', schedule);
+      cancelAnimationFrame(raf);
+      root.style.removeProperty('--hg-checkout-xL');
+      root.style.removeProperty('--hg-checkout-xR');
+      root.style.removeProperty('--hg-checkout-yT');
+      root.style.removeProperty('--hg-checkout-yB');
+    };
   }, []);
 
   const isMockCheckout = checkoutCartItems.length === 0;
@@ -314,10 +353,10 @@ const CheckoutPage = ({ cartItems, onClearCart, pautaEnabled = true, mockMode = 
           aria-hidden="true"
           style={{
             position: 'fixed',
-            left: 'var(--belt2-xL, 0px)',
-            top: 'var(--belt2-yT, 0px)',
-            width: 'calc(var(--belt2-xR, 100vw) - var(--belt2-xL, 0px))',
-            height: 'calc(var(--belt2-yB, 100vh) - var(--belt2-yT, 0px))',
+            left: 'var(--hg-checkout-xL, 0px)',
+            top: 'var(--hg-checkout-yT, 0px)',
+            width: 'calc(var(--hg-checkout-xR, 100vw) - var(--hg-checkout-xL, 0px))',
+            height: 'calc(var(--hg-checkout-yB, 100vh) - var(--hg-checkout-yT, 0px))',
             backgroundImage: 'url(/tmp/CHECKOUT-V1.png)',
             backgroundRepeat: 'no-repeat',
             backgroundPosition: 'center top',
@@ -331,7 +370,7 @@ const CheckoutPage = ({ cartItems, onClearCart, pautaEnabled = true, mockMode = 
   }
 
   return (
-    <div className={`relative pt-0 pb-0 ${textOnlyMode ? 'checkout-text-only' : ''}`} style={{ backgroundColor: '#fff', minHeight: 'calc(var(--belt2-yB, 100vh) - var(--belt2-yT, 0px) + 64px)' }}>
+    <div className={`relative pt-0 pb-0 ${textOnlyMode ? 'checkout-text-only' : ''}`} style={{ backgroundColor: '#fff', minHeight: 'calc(var(--hg-checkout-yB, 100vh) - var(--hg-checkout-yT, 0px) + 64px)' }}>
       <Helmet>
         <title>Checkout | GRAFC</title>
         <meta name="description" content="Completa la teva comanda de manera segura." />
@@ -340,9 +379,9 @@ const CheckoutPage = ({ cartItems, onClearCart, pautaEnabled = true, mockMode = 
       <div
         style={{
           position: 'absolute',
-          left: `calc(var(--belt2-xL, 0px) + ${CHECKOUT_BREADCRUMBS_LEFT_OFFSET})`,
+          left: `calc(var(--hg-checkout-xL, 0px) + ${CHECKOUT_BREADCRUMBS_LEFT_OFFSET})`,
           top: CHECKOUT_PAGE_TOP_OFFSET,
-          width: 'calc(var(--belt2-xR, 100vw) - var(--belt2-xL, 0px))',
+          width: 'calc(var(--hg-checkout-xR, 100vw) - var(--hg-checkout-xL, 0px))',
           zIndex: 5,
           pointerEvents: 'auto',
         }}
@@ -402,10 +441,10 @@ const CheckoutPage = ({ cartItems, onClearCart, pautaEnabled = true, mockMode = 
         style={{
           display: 'none',
           position: 'absolute',
-          left: `calc(var(--belt2-xL, 0px) + ${CHECKOUT_PAGE_LEFT_OFFSET})`,
+          left: `calc(var(--hg-checkout-xL, 0px) + ${CHECKOUT_PAGE_LEFT_OFFSET})`,
           top: CHECKOUT_PAGE_TOP_OFFSET,
-          width: 'calc(var(--belt2-xR, 100vw) - var(--belt2-xL, 0px))',
-          height: 'calc(var(--belt2-yB, 100vh) - var(--belt2-yT, 0px))',
+          width: 'calc(var(--hg-checkout-xR, 100vw) - var(--hg-checkout-xL, 0px))',
+          height: 'calc(var(--hg-checkout-yB, 100vh) - var(--hg-checkout-yT, 0px))',
           backgroundImage: 'url(/tmp/CHECKOUT-V1.png)',
           backgroundRepeat: 'no-repeat',
           backgroundPosition: 'center top',
@@ -421,8 +460,8 @@ const CheckoutPage = ({ cartItems, onClearCart, pautaEnabled = true, mockMode = 
           position: 'absolute',
           left: '50%',
           top: CHECKOUT_PAGE_TOP_OFFSET,
-          width: 'calc(var(--belt2-xR, 100vw) - var(--belt2-xL, 0px))',
-          height: 'calc(var(--belt2-yB, 100vh) - var(--belt2-yT, 0px))',
+          width: 'calc(var(--hg-checkout-xR, 100vw) - var(--hg-checkout-xL, 0px))',
+          height: 'calc(var(--hg-checkout-yB, 100vh) - var(--hg-checkout-yT, 0px))',
           transform: `translateX(calc(-50% + ${CHECKOUT_PAGE_LEFT_OFFSET}))`,
           display: 'grid',
           position: 'absolute',
@@ -840,9 +879,9 @@ const CheckoutPage = ({ cartItems, onClearCart, pautaEnabled = true, mockMode = 
         style={{
           left: '50%',
           top: CHECKOUT_PAGE_TOP_OFFSET,
-          width: 'calc(var(--belt2-xR, 100vw) - var(--belt2-xL, 0px))',
+          width: 'calc(var(--hg-checkout-xR, 100vw) - var(--hg-checkout-xL, 0px))',
           transform: `translateX(calc(-50% + ${CHECKOUT_PAGE_LEFT_OFFSET}))`,
-          height: 'calc(var(--belt2-yB, 100vh) - var(--belt2-yT, 0px))',
+          height: 'calc(var(--hg-checkout-yB, 100vh) - var(--hg-checkout-yT, 0px))',
           display: hideCheckoutText ? 'none' : 'block',
           pointerEvents: 'none',
         }}
