@@ -60,19 +60,77 @@ export default function BeltReferenceOverlay({ enabled }) {
   }, [state.xL, state.xR, state.yT, state.yB, state.yCarouselTop, state.yFinalizeBottom, state.spriteXL, state.spriteXR]);
 
   useEffect(() => {
+    if (typeof window === 'undefined') return;
     try {
       const root = document.documentElement;
-      const setOrClear = (key, value) => {
-        if (Number.isFinite(value)) {
-          root.style.setProperty(key, `${Math.round(value)}px`);
-        } else {
-          root.style.removeProperty(key);
-        }
+      const vw = window.innerWidth || document.documentElement.clientWidth || 0;
+
+      const publish = (key, value) => {
+        root.style.setProperty(key, `${Math.round(value)}px`);
       };
-      setOrClear('--belt2-xL', state.xL);
-      setOrClear('--belt2-xR', state.xR);
-      setOrClear('--belt2-yT', state.yCarouselTop);
-      setOrClear('--belt2-yB', state.yFinalizeBottom);
+      const clear = (key) => {
+        root.style.removeProperty(key);
+      };
+
+      // Validació de coherència X (xL, xR): han de ser un parell vàlid abans
+      // de publicar. Si no, retirem ambdós perquè els consumidors caiguin al
+      // seu fallback en lloc de llegir valors corruptes.
+      const xL = state.xL;
+      const xR = state.xR;
+      const xValid =
+        Number.isFinite(xL) &&
+        Number.isFinite(xR) &&
+        xL >= 0 &&
+        xR > xL &&
+        xR - xL >= 320 &&
+        xR - xL <= 1500 &&
+        xR <= vw + 8; // tolerància scrollbar / arrodoniments
+
+      if (xValid) {
+        publish('--belt2-xL', xL);
+        publish('--belt2-xR', xR);
+      } else {
+        clear('--belt2-xL');
+        clear('--belt2-xR');
+        if (
+          import.meta.env?.DEV &&
+          (Number.isFinite(xL) || Number.isFinite(xR))
+        ) {
+          // eslint-disable-next-line no-console
+          console.warn('[BeltReferenceOverlay] X bounds invalid, not publishing.', {
+            xL,
+            xR,
+            vw,
+          });
+        }
+      }
+
+      // Validació de coherència Y (yCarouselTop, yFinalizeBottom).
+      const yT = state.yCarouselTop;
+      const yB = state.yFinalizeBottom;
+      const yValid =
+        Number.isFinite(yT) &&
+        Number.isFinite(yB) &&
+        yB > yT &&
+        yB - yT >= 50;
+
+      if (yValid) {
+        publish('--belt2-yT', yT);
+        publish('--belt2-yB', yB);
+      } else {
+        clear('--belt2-yT');
+        clear('--belt2-yB');
+        if (
+          import.meta.env?.DEV &&
+          (Number.isFinite(yT) || Number.isFinite(yB))
+        ) {
+          // eslint-disable-next-line no-console
+          console.warn('[BeltReferenceOverlay] Y bounds invalid, not publishing.', {
+            yT,
+            yB,
+          });
+        }
+      }
     } catch {
       // ignore
     }
