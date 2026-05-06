@@ -1,4 +1,5 @@
 import React, { useEffect, useLayoutEffect, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 
 /**
  * BeltReferenceOverlay
@@ -16,6 +17,7 @@ import React, { useEffect, useLayoutEffect, useState } from 'react';
  * validació, reset cross-route, listeners explícits i probe de diagnòstic.
  */
 export default function BeltReferenceOverlay({ enabled }) {
+  const location = useLocation();
   const [state, setState] = useState(() => {
     try {
       const rawBelt2 = window.localStorage.getItem('HG_BELT2_GLOBAL_V1');
@@ -75,6 +77,59 @@ export default function BeltReferenceOverlay({ enabled }) {
       // ignore
     }
   }, [state.xL, state.xR, state.yCarouselTop, state.yFinalizeBottom]);
+
+  // Reset Y específiques de pàgina en canviar de ruta.
+  // Les Y `yCarouselTop` (top del card del cistell) i `yFinalizeBottom` (botó
+  // "Finalitza la comanda") són mesurades dins del mega-slide. Si l'usuari
+  // surt del mega-slide, aquests anchors desapareixen i el `setState((prev)
+  // => ...)` mantenia el valor antic, contaminant altres rutes (p.ex. el
+  // checkout llegia uns valors que no eren seus).
+  // Les X (xL/xR) provenen del header i del user icon, presents a totes les
+  // rutes; per això no s'esborren aquí.
+  useEffect(() => {
+    setState((prev) => {
+      const cleared = {
+        ...prev,
+        yT: null,
+        yB: null,
+        yCarouselTop: null,
+        yFinalizeBottom: null,
+      };
+      if (
+        prev.yT === cleared.yT &&
+        prev.yB === cleared.yB &&
+        prev.yCarouselTop === cleared.yCarouselTop &&
+        prev.yFinalizeBottom === cleared.yFinalizeBottom
+      ) {
+        return prev;
+      }
+      return cleared;
+    });
+
+    try {
+      const root = document.documentElement;
+      root.style.removeProperty('--belt2-yT');
+      root.style.removeProperty('--belt2-yB');
+    } catch {
+      // ignore
+    }
+  }, [location.pathname]);
+
+  // Quan les guies belt2 es desactiven, neteja totes les CSS vars perquè cap
+  // consumidor (overlays, layouts) llegeixi valors caducs.
+  useEffect(() => {
+    if (enabled) return undefined;
+    try {
+      const root = document.documentElement;
+      root.style.removeProperty('--belt2-xL');
+      root.style.removeProperty('--belt2-xR');
+      root.style.removeProperty('--belt2-yT');
+      root.style.removeProperty('--belt2-yB');
+    } catch {
+      // ignore
+    }
+    return undefined;
+  }, [enabled]);
 
   useLayoutEffect(() => {
     if (!enabled) {

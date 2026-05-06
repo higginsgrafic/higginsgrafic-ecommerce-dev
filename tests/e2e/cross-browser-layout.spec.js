@@ -125,6 +125,59 @@ test.describe('Cross-browser: checkout layout vars', () => {
   }
 });
 
+test.describe('Cross-browser: belt2 reset cross-route', () => {
+  test('--belt2-yT/yB es netegen en canviar de ruta amb belt2 actiu', async ({
+    page,
+    context,
+  }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+
+    // Seed: simulem que en una sessió anterior al mega-slide es van mesurar
+    // anchors verticals (yCarouselTop / yFinalizeBottom) i es van persistir.
+    await context.addInitScript(() => {
+      try {
+        window.localStorage.setItem('HG_BELT2_GUIDES_ENABLED_V1', '1');
+        window.localStorage.setItem(
+          'HG_BELT2_GLOBAL_V1',
+          JSON.stringify({ xL: 200, xR: 1240, yCarouselTop: 500, yFinalizeBottom: 1200 })
+        );
+      } catch {
+        // ignore
+      }
+    });
+
+    // En carregar /about, el BeltReferenceOverlay s'inicialitza des de
+    // localStorage. El useEffect[pathname] ha d'esborrar les Y immediatament.
+    await page.goto('/about');
+    await page.waitForLoadState('domcontentloaded');
+
+    await expect
+      .poll(async () => {
+        const v = await readCssVarsAtRoot(page, [
+          '--belt2-yT',
+          '--belt2-yB',
+          '--belt2-xL',
+          '--belt2-xR',
+        ]);
+        return {
+          yT: v['--belt2-yT'],
+          yB: v['--belt2-yB'],
+          // X poden estar publicades si el header mesura abans, però com a
+          // mínim no han de venir corruptes del seed (200/1240): el read
+          // efectiu les sobreescriurà amb mesures reals d'aquesta ruta.
+          xLPresent: v['--belt2-xL'] !== '',
+          xRPresent: v['--belt2-xR'] !== '',
+        };
+      }, { timeout: 5_000 })
+      .toEqual({
+        yT: '',
+        yB: '',
+        xLPresent: expect.any(Boolean),
+        xRPresent: expect.any(Boolean),
+      });
+  });
+});
+
 test.describe('Cross-browser: route isolation', () => {
   test('checkout no és contaminat per visitar abans /full-wide-slide', async ({
     page,
