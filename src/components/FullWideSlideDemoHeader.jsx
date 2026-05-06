@@ -48,6 +48,7 @@ import MegaStripePanel from './fullwide/MegaStripePanel.jsx';
 import CistellComandaContent from './fullwide/CistellComandaContent.jsx';
 import useMegaPublicIdleReset from '@/hooks/useMegaPublicIdleReset';
 import useUrlActiveCollection from '@/hooks/useUrlActiveCollection';
+import useMegaStripeDebugVars from '@/hooks/useMegaStripeDebugVars';
 
 
 
@@ -683,27 +684,6 @@ export default function FullWideSlideDemoHeader({
     setStripeOverlayOverrideActive(false);
   }, [overlaySrcFromUrl]);
 
-  const [megaStripeRefEnabledLocal, setMegaStripeRefEnabledLocal] = useState(false);
-  const [megaStripeRefSrcLocal, setMegaStripeRefSrcLocal] = useState('');
-  const [megaStripeRef2EnabledLocal, setMegaStripeRef2EnabledLocal] = useState(false);
-  const [megaStripeRef2SrcLocal, setMegaStripeRef2SrcLocal] = useState('');
-
-  useEffect(() => {
-    const readRef = () => {
-      try {
-        const en = window.localStorage.getItem('MEGA_STRIPE_REF_ENABLED') === '1';
-        const src = String(window.localStorage.getItem('MEGA_STRIPE_REF_SRC') || '');
-        setMegaStripeRefEnabledLocal(en);
-        setMegaStripeRefSrcLocal(src);
-      } catch {
-        // ignore
-      }
-    };
-    readRef();
-    window.addEventListener('mega-stripe-ref-changed', readRef);
-    return () => window.removeEventListener('mega-stripe-ref-changed', readRef);
-  }, []);
-
   const tileSelectorDragRef = useRef({
     active: false,
     collectionId: '',
@@ -802,42 +782,6 @@ export default function FullWideSlideDemoHeader({
     };
   }, []);
 
-  useEffect(() => {
-    const readRef2 = () => {
-      try {
-        const en = window.localStorage.getItem('MEGA_STRIPE_REF2_ENABLED') === '1';
-        const src = String(window.localStorage.getItem('MEGA_STRIPE_REF2_SRC') || '');
-        setMegaStripeRef2EnabledLocal(en);
-        setMegaStripeRef2SrcLocal(src);
-      } catch {
-        // ignore
-      }
-    };
-    readRef2();
-    window.addEventListener('mega-stripe-ref2-changed', readRef2);
-    return () => window.removeEventListener('mega-stripe-ref2-changed', readRef2);
-  }, []);
-
-  const [megaStripeSpriteEnabledLocal, setMegaStripeSpriteEnabledLocal] = useState(true);
-  useEffect(() => {
-    const readSpriteEnabled = () => {
-      try {
-        const raw = window.localStorage.getItem('MEGA_STRIPE_SPRITE_ENABLED');
-        if (raw == null) {
-          setMegaStripeSpriteEnabledLocal(true);
-          return;
-        }
-        const v = String(raw).trim().toLowerCase();
-        setMegaStripeSpriteEnabledLocal(v === '' || v === '1' || v === 'true' || v === 'on' || v === 'yes');
-      } catch {
-        setMegaStripeSpriteEnabledLocal(true);
-      }
-    };
-    readSpriteEnabled();
-    window.addEventListener('mega-stripe-sprite-enabled-changed', readSpriteEnabled);
-    return () => window.removeEventListener('mega-stripe-sprite-enabled-changed', readSpriteEnabled);
-  }, []);
-
   const normalizeOverlaySrc = useCallback((value) => {
     let s = (value || '').toString().trim();
     if (!s) return null;
@@ -893,98 +837,17 @@ export default function FullWideSlideDemoHeader({
     );
   }, []);
 
-  const [megaShirtDrawingEnabledLocal, setMegaShirtDrawingEnabledLocal] = useState(() => {
-    try {
-      const parseBool = (raw, fallback = true) => {
-        if (raw == null) return fallback;
-        const v = String(raw).trim().toLowerCase();
-        if (v === '') return fallback;
-        return v === '1' || v === 'true' || v === 'on' || v === 'yes';
-      };
-      const rawNew = window.localStorage.getItem('HG_SHIRT_DRAWING_ENABLED');
-      if (rawNew != null) return parseBool(rawNew, true);
-      const rawOld = window.localStorage.getItem('HG_SHIRT_DRAWING_OVERLAY_ENABLED');
-      if (rawOld != null) return parseBool(rawOld, true);
-      return true;
-    } catch {
-      return true;
-    }
-  });
-
-  const [drawingOverlaySrcLocal, setDrawingOverlaySrcLocal] = useState(() => {
-    try {
-      const raw = String(window.localStorage.getItem('HG_DRAWING_OVERLAY_SRC') || '').trim();
-      if (!raw) return null;
-      const normalized = normalizeOverlaySrc(raw) || raw;
-      const lower = normalized.toLowerCase();
-      const isUrl = /^(https?:)?\/\//i.test(normalized) || /^data:/i.test(normalized) || /^blob:/i.test(normalized);
-      const isStripeSrc = lower.includes('/custom_logos/drawings/images_stripe/') || lower.includes('/custom_logos/drawings/images_originals/stripe/');
-      return (isUrl || isStripeSrc) ? normalized : null;
-    } catch {
-      return null;
-    }
-  });
-
-  const drawingOverlaySrcEffective = useMemo(() => {
-    try {
-      if (drawingOverlaySrcLocal) return drawingOverlaySrcLocal;
-      if (!import.meta.env.DEV) return null;
-      return '/custom_logos/drawings/images_stripe/first_contact/black/nx-01-b-stripe.webp';
-    } catch {
-      return drawingOverlaySrcLocal;
-    }
-  }, [drawingOverlaySrcLocal]);
-
-  useEffect(() => {
-    const sync = () => {
-      try {
-        const raw = String(window.localStorage.getItem('HG_DRAWING_OVERLAY_SRC') || '').trim();
-        if (!raw) {
-          setDrawingOverlaySrcLocal(null);
-          return;
-        }
-        const normalized = normalizeOverlaySrc(raw) || raw;
-        const lower = normalized.toLowerCase();
-        const isUrl = /^(https?:)?\/\//i.test(normalized) || /^data:/i.test(normalized) || /^blob:/i.test(normalized);
-        const isStripeSrc = lower.includes('/custom_logos/drawings/images_stripe/') || lower.includes('/custom_logos/drawings/images_originals/stripe/');
-        setDrawingOverlaySrcLocal((isUrl || isStripeSrc) ? normalized : null);
-      } catch {
-        setDrawingOverlaySrcLocal(null);
-      }
-    };
-    sync();
-    window.addEventListener('hg-drawing-overlay-changed', sync);
-    return () => window.removeEventListener('hg-drawing-overlay-changed', sync);
-  }, [normalizeOverlaySrc]);
-
-  useEffect(() => {
-    const sync = () => {
-      try {
-        const rawNew = window.localStorage.getItem('HG_SHIRT_DRAWING_ENABLED');
-        if (rawNew != null) {
-          const v = String(rawNew).trim().toLowerCase();
-          setMegaShirtDrawingEnabledLocal(v === '' || v === '1' || v === 'true' || v === 'on' || v === 'yes');
-          return;
-        }
-        const rawOld = window.localStorage.getItem('HG_SHIRT_DRAWING_OVERLAY_ENABLED');
-        if (rawOld != null) {
-          const v = String(rawOld).trim().toLowerCase();
-          setMegaShirtDrawingEnabledLocal(v === '' || v === '1' || v === 'true' || v === 'on' || v === 'yes');
-          return;
-        }
-        setMegaShirtDrawingEnabledLocal(true);
-      } catch {
-        setMegaShirtDrawingEnabledLocal(true);
-      }
-    };
-    sync();
-    window.addEventListener('hg-shirt-drawing-enabled-changed', sync);
-    window.addEventListener('hg-shirt-drawing-overlay-enabled-changed', sync);
-    return () => {
-      window.removeEventListener('hg-shirt-drawing-enabled-changed', sync);
-      window.removeEventListener('hg-shirt-drawing-overlay-enabled-changed', sync);
-    };
-  }, []);
+  const {
+    megaStripeRefEnabledLocal,
+    megaStripeRefSrcLocal,
+    megaStripeRef2EnabledLocal,
+    megaStripeRef2SrcLocal,
+    megaStripeSpriteEnabledLocal,
+    megaShirtDrawingEnabledLocal,
+    drawingOverlaySrcLocal,
+    drawingOverlaySrcEffective,
+    tileGapPxLocal,
+  } = useMegaStripeDebugVars(normalizeOverlaySrc);
 
   const resolvedOverlaySrc = useMemo(() => {
     const normalizeKeyLocal = (value) => {
@@ -1523,25 +1386,6 @@ export default function FullWideSlideDemoHeader({
   );
   const [stripeMaskTileRectsRawPct, setStripeMaskTileRectsRawPct] = useState(null);
   const [stripeMaskDebugRectsPct, setStripeMaskDebugRectsPct] = useState(null);
-
-  const [tileGapPxLocal, setTileGapPxLocal] = useState(0);
-
-  useEffect(() => {
-    const sync = () => {
-      try {
-        const raw = window.localStorage.getItem('MEGA_STRIPE_TILE_GAP_PX');
-        const n = raw == null ? 0 : Number.parseFloat(String(raw));
-        setTileGapPxLocal(Number.isFinite(n) ? Math.min(200, Math.max(-200, n)) : 0);
-      } catch {
-        setTileGapPxLocal(0);
-      }
-    };
-    sync();
-    window.addEventListener('mega-stripe-tile-gap-changed', sync);
-    return () => {
-      window.removeEventListener('mega-stripe-tile-gap-changed', sync);
-    };
-  }, []);
 
   useEffect(() => {
     const wantMaskRects = stripeOverlayDebug || (megaShirtDrawingEnabledLocal && Boolean(drawingOverlaySrcEffective));
