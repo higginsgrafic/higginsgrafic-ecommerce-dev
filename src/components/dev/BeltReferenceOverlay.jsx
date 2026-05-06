@@ -12,52 +12,94 @@ import { useLocation } from 'react-router-dom';
  * productiu del site NO ha de dependre directament d'elles. Per a layout
  * productiu, fer servir `@/utils/layoutMetrics` (`getSafeBelt`, etc.).
  *
- * Aquesta versió és l'extracció directa del component que estava inline a
- * App.jsx, sense canvis funcionals. La fase 2 del refactor anirà afegint
- * validació, reset cross-route, listeners explícits i probe de diagnòstic.
+ * Característiques:
+ *  - Mesurament reactiu via resize/scroll listeners + ResizeObserver (sense
+ *    polling actiu).
+ *  - Reset automàtic de Y específiques de pàgina en canviar de ruta.
+ *  - Validació de coherència abans de publicar (xR>xL, dins viewport, etc.).
+ *    Si els valors són incoherents, retira les vars en lloc de publicar
+ *    valors corruptes; en mode DEV emet console.warn.
+ *  - Probe `window.__HG_BELT2_PROBE__()` per inspeccionar des de la consola.
+ *  - Persistència mínima: només camps globals (X, sprite). Les Y mai es
+ *    persisteixen perquè depenen de la pàgina visible.
  */
+const STORAGE_KEY_V2 = 'HG_DEV_BELT2_STATE_V2';
+// Keys legacy per migració (mai escrits per aquesta versió).
+const LEGACY_KEY_GLOBAL = 'HG_BELT2_GLOBAL_V1';
+const LEGACY_KEY_GUIDES = 'HG_BELT_GUIDES_GLOBAL_V1';
+
+const EMPTY_STATE = {
+  xL: null,
+  xR: null,
+  yT: null,
+  yB: null,
+  yCarouselTop: null,
+  yFinalizeBottom: null,
+  spriteXL: null,
+  spriteXR: null,
+};
+
+const toFiniteOrNull = (v) => (Number.isFinite(v) ? v : null);
+
+const loadInitialState = () => {
+  if (typeof window === 'undefined') return { ...EMPTY_STATE };
+  try {
+    // Format V2 (només camps globals: X i sprite). Y mai persistides.
+    const rawV2 = window.localStorage.getItem(STORAGE_KEY_V2);
+    if (rawV2) {
+      const parsed = JSON.parse(rawV2);
+      if (parsed && typeof parsed === 'object') {
+        return {
+          ...EMPTY_STATE,
+          xL: toFiniteOrNull(parsed.xL),
+          xR: toFiniteOrNull(parsed.xR),
+          spriteXL: toFiniteOrNull(parsed.spriteXL),
+          spriteXR: toFiniteOrNull(parsed.spriteXR),
+        };
+      }
+    }
+
+    // Migració des dels keys legacy: només recuperem X i sprite.
+    const rawLegacyGlobal = window.localStorage.getItem(LEGACY_KEY_GLOBAL);
+    const rawLegacyGuides = window.localStorage.getItem(LEGACY_KEY_GUIDES);
+    if (!rawLegacyGlobal && !rawLegacyGuides) return { ...EMPTY_STATE };
+    const parsedGlobal = rawLegacyGlobal ? JSON.parse(rawLegacyGlobal) : null;
+    const parsedGuides = rawLegacyGuides ? JSON.parse(rawLegacyGuides) : null;
+    return {
+      ...EMPTY_STATE,
+      xL: toFiniteOrNull(parsedGlobal?.xL ?? parsedGuides?.xL),
+      xR: toFiniteOrNull(parsedGlobal?.xR ?? parsedGuides?.xR),
+      spriteXL: toFiniteOrNull(parsedGuides?.spriteXL),
+      spriteXR: toFiniteOrNull(parsedGuides?.spriteXR),
+    };
+  } catch {
+    return { ...EMPTY_STATE };
+  }
+};
+
 export default function BeltReferenceOverlay({ enabled }) {
   const location = useLocation();
-  const [state, setState] = useState(() => {
-    try {
-      const rawBelt2 = window.localStorage.getItem('HG_BELT2_GLOBAL_V1');
-      const raw = window.localStorage.getItem('HG_BELT_GUIDES_GLOBAL_V1');
-      const parsedBelt2 = rawBelt2 ? JSON.parse(rawBelt2) : null;
-      if (!raw && !parsedBelt2) return { xL: null, xR: null, yT: null, yB: null, yCarouselTop: null, yFinalizeBottom: null, spriteXL: null, spriteXR: null };
-      const parsed = raw ? JSON.parse(raw) : {};
-      if (!parsed || typeof parsed !== 'object') return { xL: null, xR: null, yT: null, yB: null, yCarouselTop: null, yFinalizeBottom: null, spriteXL: null, spriteXR: null };
-      const toFiniteOrNull = (v) => (Number.isFinite(v) ? v : null);
-      return {
-        xL: toFiniteOrNull(parsedBelt2?.xL ?? parsed.xL),
-        xR: toFiniteOrNull(parsedBelt2?.xR ?? parsed.xR),
-        yT: toFiniteOrNull(parsed.yT),
-        yB: toFiniteOrNull(parsed.yB),
-        yCarouselTop: toFiniteOrNull(parsedBelt2?.yCarouselTop ?? parsed.yCarouselTop),
-        yFinalizeBottom: toFiniteOrNull(parsedBelt2?.yFinalizeBottom ?? parsed.yFinalizeBottom),
-        spriteXL: toFiniteOrNull(parsed.spriteXL),
-        spriteXR: toFiniteOrNull(parsed.spriteXR),
-      };
-    } catch {
-      return { xL: null, xR: null, yT: null, yB: null, yCarouselTop: null, yFinalizeBottom: null, spriteXL: null, spriteXR: null };
-    }
-  });
+  const [state, setState] = useState(loadInitialState);
 
+  // Persistència: només camps globals (X i sprite). Les Y depenen de la
+  // pàgina i no s'han de persistir mai (en sessions futures donarien
+  // valors caducs a altres rutes).
   useEffect(() => {
+    if (typeof window === 'undefined') return;
     try {
-      window.localStorage.setItem('HG_BELT_GUIDES_GLOBAL_V1', JSON.stringify(state));
       window.localStorage.setItem(
-        'HG_BELT2_GLOBAL_V1',
+        STORAGE_KEY_V2,
         JSON.stringify({
           xL: state.xL,
           xR: state.xR,
-          yCarouselTop: state.yCarouselTop,
-          yFinalizeBottom: state.yFinalizeBottom,
+          spriteXL: state.spriteXL,
+          spriteXR: state.spriteXR,
         })
       );
     } catch {
       // ignore
     }
-  }, [state.xL, state.xR, state.yT, state.yB, state.yCarouselTop, state.yFinalizeBottom, state.spriteXL, state.spriteXR]);
+  }, [state.xL, state.xR, state.spriteXL, state.spriteXR]);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
