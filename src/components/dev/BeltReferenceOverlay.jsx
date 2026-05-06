@@ -81,11 +81,6 @@ export default function BeltReferenceOverlay({ enabled }) {
       return undefined;
     }
 
-    let t1 = 0;
-    let t2 = 0;
-    let t3 = 0;
-    let t4 = 0;
-
     const read = () => {
       const resolveX = (el, edge) => {
         const r = el?.getBoundingClientRect?.();
@@ -169,17 +164,44 @@ export default function BeltReferenceOverlay({ enabled }) {
       });
     };
 
+    // Mesurament inicial + reintents per als anchors que es renderitzen tard
+    // (lazy chunks, fonts, imatges).
     read();
-    t1 = window.setTimeout(read, 50);
-    t2 = window.setTimeout(read, 250);
-    t3 = window.setTimeout(read, 750);
-    t4 = window.setInterval(read, 300);
+    const t1 = window.setTimeout(read, 50);
+    const t2 = window.setTimeout(read, 250);
+    const t3 = window.setTimeout(read, 750);
+
+    // Re-mesura reactiva: en resize/scroll i quan canvia la mida d'algun
+    // descendent del body. RequestAnimationFrame per evitar mesures
+    // duplicades en el mateix frame.
+    let raf = 0;
+    const schedule = () => {
+      if (raf) cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(read);
+    };
+
+    const onScroll = () => schedule();
+    window.addEventListener('resize', schedule);
+    window.addEventListener('scroll', onScroll, { capture: true, passive: true });
+
+    let ro = null;
+    try {
+      if (typeof ResizeObserver !== 'undefined') {
+        ro = new ResizeObserver(schedule);
+        ro.observe(document.body);
+      }
+    } catch {
+      // ignore
+    }
 
     return () => {
       window.clearTimeout(t1);
       window.clearTimeout(t2);
       window.clearTimeout(t3);
-      window.clearInterval(t4);
+      if (raf) cancelAnimationFrame(raf);
+      window.removeEventListener('resize', schedule);
+      window.removeEventListener('scroll', onScroll, { capture: true });
+      if (ro) ro.disconnect();
     };
   }, [enabled]);
 
