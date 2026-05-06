@@ -178,6 +178,95 @@ test.describe('Cross-browser: belt2 reset cross-route', () => {
   });
 });
 
+test.describe('Cross-browser: belt2 sanity validation', () => {
+  test('X incoherent (xR < xL) no es publica al :root', async ({ page, context }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+
+    // Seed amb X incoherent: xL > xR. La validació ha de rebutjar-ho.
+    await context.addInitScript(() => {
+      try {
+        window.localStorage.setItem('HG_BELT2_GUIDES_ENABLED_V1', '1');
+        window.localStorage.setItem(
+          'HG_DEV_BELT2_STATE_V2',
+          JSON.stringify({ xL: 1200, xR: 200, spriteXL: null, spriteXR: null })
+        );
+      } catch {
+        // ignore
+      }
+    });
+
+    await page.goto('/about');
+    await page.waitForLoadState('domcontentloaded');
+
+    // Esperem un moment perquè el component carregui i validi.
+    // Despres que el read efectiu mesuri ancoratges reals d'/about, les vars
+    // poden quedar publicades amb valors correctes; el que comprovem és que
+    // MAI s'hagin publicat els valors absurds del seed.
+    const observed = await page.evaluate(async () => {
+      // Captura immediata abans que listeners reactius mesurin
+      const cs = getComputedStyle(document.documentElement);
+      return {
+        xL: cs.getPropertyValue('--belt2-xL').trim(),
+        xR: cs.getPropertyValue('--belt2-xR').trim(),
+      };
+    });
+
+    // Si les vars existeixen, han de complir xR > xL (no els valors del seed).
+    if (observed.xL && observed.xR) {
+      const xLn = parseFloat(observed.xL);
+      const xRn = parseFloat(observed.xR);
+      expect(xRn).toBeGreaterThan(xLn);
+    }
+    // Cas on no hi ha vars publicades també és vàlid (validació les ha retirat).
+  });
+});
+
+test.describe('Cross-browser: belt2 diagnostic probe', () => {
+  test('window.__HG_BELT2_PROBE__ existeix quan belt2 està actiu', async ({
+    page,
+    context,
+  }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await context.addInitScript(() => {
+      try {
+        window.localStorage.setItem('HG_BELT2_GUIDES_ENABLED_V1', '1');
+      } catch {
+        // ignore
+      }
+    });
+
+    await page.goto('/about');
+    await page.waitForLoadState('domcontentloaded');
+
+    // Esperem que el useEffect del probe s'executi.
+    await expect
+      .poll(
+        () => page.evaluate(() => typeof window.__HG_BELT2_PROBE__),
+        { timeout: 5_000 }
+      )
+      .toBe('function');
+
+    const probe = await page.evaluate(() => {
+      const result = window.__HG_BELT2_PROBE__();
+      return {
+        hasState: typeof result.state === 'object',
+        hasPublished: typeof result.published === 'object',
+        hasAnchors: typeof result.anchors === 'object',
+        hasViewport: typeof result.viewport === 'object',
+        pathname: result.pathname,
+        viewportWidth: result.viewport?.width,
+      };
+    });
+
+    expect(probe.hasState).toBe(true);
+    expect(probe.hasPublished).toBe(true);
+    expect(probe.hasAnchors).toBe(true);
+    expect(probe.hasViewport).toBe(true);
+    expect(probe.pathname).toBe('/about');
+    expect(probe.viewportWidth).toBe(1440);
+  });
+});
+
 test.describe('Cross-browser: route isolation', () => {
   test('checkout no és contaminat per visitar abans /full-wide-slide', async ({
     page,
