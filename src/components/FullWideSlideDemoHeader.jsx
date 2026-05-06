@@ -33,50 +33,9 @@ import {
   getMegaPublicSelectorFor,
   setMegaPublicSelectorFor,
 } from './fullwide/megaPublicSelectorState.js';
-
-function MegaStripeBleedGuard({ heightPx, debug, expandLeftPx = 0, expandRightPx = 0, children }) {
-  const l = Math.max(0, Number(expandLeftPx) || 0);
-  const r = Math.max(0, Number(expandRightPx) || 0);
-  const sum = l + r;
-  return (
-    <div
-      style={{
-        height: heightPx,
-        width: sum ? `calc(100% + ${sum}px)` : '100%',
-        maxWidth: 'none',
-        position: 'relative',
-        left: l ? `-${l}px` : 0,
-        overflowY: 'visible',
-      }}
-    >
-      <div
-        style={{
-          position: 'absolute',
-          top: 0,
-          bottom: 0,
-          left: 0,
-          right: 0,
-          overflowX: 'visible',
-          overflowY: 'visible',
-          backgroundColor: debug ? 'rgba(59, 130, 246, 0.12)' : 'transparent',
-        }}
-      >
-        <div
-          style={{
-            position: 'absolute',
-            top: 0,
-            bottom: 0,
-            left: 0,
-            right: 0,
-            overflow: 'visible',
-          }}
-        >
-          {children}
-        </div>
-      </div>
-    </div>
-  );
-}
+import MegaStripeBleedGuard from './fullwide/MegaStripeBleedGuard.jsx';
+import OptimizedImg from './fullwide/OptimizedImg.jsx';
+import IconButton from './fullwide/MegaIconButton.jsx';
 
 function MegaStripePanel({
   active,
@@ -872,75 +831,6 @@ function FirstContactStripeMockupPanel({ megaTileSize, selectedItem, variant, re
   );
 }
 
-const OptimizedImg = React.forwardRef(function OptimizedImg({ src, alt, className, style, ...rest }, ref) {
-  const normalizeSrc = (value) => {
-    const s = (value || '').toString();
-    if (!s) return '';
-    if (/^(https?:)?\/\//i.test(s) || /^data:/i.test(s) || /^blob:/i.test(s)) return s;
-    return s.startsWith('/') ? s : `/${s}`;
-  };
-
-  const originalSrc = normalizeSrc(src);
-  const webpSrc = originalSrc.replace(/\.(png|jpe?g)(?=([?#]|$))/i, '.webp');
-  const [currentSrc, setCurrentSrc] = useState(webpSrc);
-  const triedFallbackRef = useRef(false);
-
-  useEffect(() => {
-    triedFallbackRef.current = false;
-    setCurrentSrc(webpSrc);
-  }, [webpSrc]);
-
-  return (
-    <img
-      ref={ref}
-      src={currentSrc ? encodeURI(currentSrc) : undefined}
-      alt={alt}
-      className={className}
-      style={style}
-      loading={rest?.loading || 'lazy'}
-      decoding="async"
-      onError={() => {
-        if (import.meta.env.DEV) {
-          // eslint-disable-next-line no-console
-          const s = (currentSrc || originalSrc || src || '').toString();
-          const shouldLog =
-            s.includes('/custom_logos/drawings/images_grid/cube/')
-            || s.includes('/custom_logos/drawings/images_originals/stripe/cube/')
-            || s.includes('/custom_logos/drawings/images_grid/the_human_inside/')
-            || s.includes('/custom_logos/drawings/images_originals/stripe/the_human_inside/')
-            || s.includes('/custom_logos/drawings/images_grid/first_contact/')
-            || s.includes('/custom_logos/drawings/images_originals/stripe/first_contact/')
-            || s.includes('/custom_logos/drawings/images_grid/miscel');
-          if (shouldLog) {
-            // eslint-disable-next-line no-console
-            console.error('[OptimizedImg] tile error loading', { src, currentSrc, originalSrc });
-          }
-        }
-        if (triedFallbackRef.current) return;
-        triedFallbackRef.current = true;
-        if (currentSrc !== originalSrc) setCurrentSrc(originalSrc);
-      }}
-      {...rest}
-    />
-  );
-});
-
-function IconButton({ id, label, onClick, onDoubleClick, onMouseEnter, buttonRef, children }) {
-  return (
-    <button
-      id={id}
-      ref={buttonRef}
-      type="button"
-      aria-label={label}
-      onClick={onClick}
-      onDoubleClick={onDoubleClick}
-      onMouseEnter={onMouseEnter}
-      className="inline-flex h-9 w-9 items-end justify-center pb-[2px] rounded-md text-foreground hover:bg-transparent focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 lg:h-10 lg:w-10 lg:pb-[3px]"
-    >
-      {children}
-    </button>
-  );
-}
 
 function FirstContactDibuix00Buttons({ onWhite, onBlack, onMulti, showWhite = true, showBlack = true, showMulti = true }) {
   const buttons = [];
