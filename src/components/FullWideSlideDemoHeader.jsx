@@ -12,6 +12,7 @@ import {
 } from '../utils/austenQuotesAssets.js';
 import FullWideSlideDemoHumanInsideSlider from './FullWideSlideDemoHumanInsideSlider.jsx';
 import { UserProfileTabs, UserProfileContent } from './UserProfileTabs.jsx';
+import { getSafeBelt, clampNumber } from '@/utils/layoutMetrics';
 
 function MegaStripeBleedGuard({ heightPx, debug, expandLeftPx = 0, expandRightPx = 0, children }) {
   const l = Math.max(0, Number(expandLeftPx) || 0);
@@ -6707,13 +6708,22 @@ export default function FullWideSlideDemoHeader({
     if (typeof window === 'undefined') return undefined;
 
     const measure = () => {
-      const rootStyle = window.getComputedStyle(document.documentElement);
-      const xL = parseFloat(rootStyle.getPropertyValue('--belt2-xL'));
-      const xR = parseFloat(rootStyle.getPropertyValue('--belt2-xR'));
-      const safeMegaWidth = Math.max(320, Math.min(1400, window.innerWidth - 152));
-      const beltWidthRaw = Number.isFinite(xL) && Number.isFinite(xR) ? xR - xL - 2 : safeMegaWidth;
-      const beltWidth = beltWidthRaw > 0 && beltWidthRaw <= safeMegaWidth + 2 ? beltWidthRaw : safeMegaWidth;
-      const nextScale = Math.max(0.5, Math.min(1, beltWidth / 1365.46));
+      // Font segura cross-browser (Chromium, WebKit, Firefox).
+      // getSafeBelt valida belt2 i cau a un belt centrat si està contaminat.
+      const belt = getSafeBelt({ maxContent: 1400, sideMargin: 76, minContent: 320 });
+      const beltWidth = Math.max(0, belt.width - 2);
+
+      // Exposem el belt segur com a CSS vars perquè els panells del mega-slide
+      // s'alineïn amb belt2 quan és vàlid, i caiguin a fallback si està contaminat.
+      try {
+        const root = document.documentElement;
+        root.style.setProperty('--hg-mega-w', `${beltWidth}px`);
+        root.style.setProperty('--hg-mega-x', `${belt.left}px`);
+      } catch {
+        // ignore
+      }
+
+      const nextScale = clampNumber(beltWidth / 1365.46, 0.5, 1, 1);
       setAccordionPautaScale((prev) => (Math.abs(prev - nextScale) < 0.005 ? prev : nextScale));
     };
 
@@ -7642,7 +7652,7 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
                         flex: '1 1 auto',
                       }} />
                       
-                      <div style={{ flex: '0 0 auto', width: 'min(1400px, calc(100vw - 152px))', maxWidth: 'none', position: 'relative', height: '100%', paddingLeft: '0px', paddingRight: '0px' }}>
+                      <div style={{ flex: '0 0 auto', width: 'var(--hg-mega-w, min(1400px, calc(100vw - 152px)))', maxWidth: 'none', position: 'relative', height: '100%', paddingLeft: '0px', paddingRight: '0px' }}>
                         <MegaStripePanel
                           active={active}
                           resolvedMega={resolvedMega}
@@ -7695,7 +7705,7 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
 
                       <div style={{ 
                         flex: '0 0 auto', 
-                        width: 'min(1400px, calc(100vw - 152px))', 
+                        width: 'var(--hg-mega-w, min(1400px, calc(100vw - 152px)))', 
                         maxWidth: 'none', 
                         position: 'relative', 
                         height: '100%', 
@@ -7757,7 +7767,7 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
 
                       <div style={{ 
                         flex: '0 0 auto', 
-                        width: 'min(1400px, calc(100vw - 152px))', 
+                        width: 'var(--hg-mega-w, min(1400px, calc(100vw - 152px)))', 
                         maxWidth: 'none', 
                         position: 'relative', 
                         height: '100%',
@@ -8226,7 +8236,7 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
 
                       <div style={{ 
                         flex: '0 0 auto', 
-                        width: 'min(1400px, calc(100vw - 152px))', 
+                        width: 'var(--hg-mega-w, min(1400px, calc(100vw - 152px)))', 
                         maxWidth: 'none', 
                         position: 'relative', 
                         height: '100%', 

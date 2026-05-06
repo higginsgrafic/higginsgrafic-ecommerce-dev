@@ -7,6 +7,7 @@ import { useProductContext } from '@/contexts/ProductContext';
 import { useAdmin } from '@/contexts/AdminContext';
 import { useAdminTools } from '@/contexts/AdminToolsContext';
 import { initAnalytics, trackPageView } from '@/utils/analytics';
+import { installLayoutMetricsProbe } from '@/utils/layoutMetrics';
 import { AUSTEN_QUOTES_ASSETS } from '@/utils/austenQuotesAssets';
 import { useOffersConfig } from '@/hooks/useOffersConfig';
 import { useGlobalRedirect } from '@/hooks/useGlobalRedirect';
@@ -3000,6 +3001,7 @@ function App() {
       document.documentElement.style.setProperty('--appHeaderOffset', nextOffset);
       document.documentElement.style.setProperty('--globalHeaderTopOffset', globalHeaderTopOffset);
       document.documentElement.style.setProperty('--rulerInset', `${rulerInset}px`);
+      installLayoutMetricsProbe();
       window.__HG_ZOOM_LAYOUT_PROBE__ = () => {
         const round2 = (v) => Math.round(v * 100) / 100;
         const rootStyle = window.getComputedStyle(document.documentElement);
