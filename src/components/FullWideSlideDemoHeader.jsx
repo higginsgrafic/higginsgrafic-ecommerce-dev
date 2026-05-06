@@ -22,12 +22,9 @@ import {
   CUBE_MEDIA,
 } from './fullwide/megaSlideMedia.js';
 import {
-  MEGA_PUBLIC_IDLE_MS,
   MEGA_PUBLIC_LAST_ACTIVITY_AT_KEY,
   MEGA_PUBLIC_SELECTOR_STATE_KEY,
   touchMegaPublicActivity,
-  resetMegaPublicState,
-  readMegaPublicLastActivityAt,
   readMegaPublicSelectorState,
   writeMegaPublicSelectorState,
   getMegaPublicSelectorFor,
@@ -49,6 +46,8 @@ import MegaColumn, {
 import UserComandesContent from './fullwide/UserComandesContent.jsx';
 import MegaStripePanel from './fullwide/MegaStripePanel.jsx';
 import CistellComandaContent from './fullwide/CistellComandaContent.jsx';
+import useMegaPublicIdleReset from '@/hooks/useMegaPublicIdleReset';
+import useUrlActiveCollection from '@/hooks/useUrlActiveCollection';
 
 
 
@@ -308,55 +307,8 @@ export default function FullWideSlideDemoHeader({
     }
   }, [active]);
 
-  useEffect(() => {
-    try {
-      if (typeof window === 'undefined') return undefined;
-
-      let t = null;
-      const schedule = () => {
-        if (t) window.clearTimeout(t);
-        const last = readMegaPublicLastActivityAt();
-        if (!last) return;
-        const now = Date.now();
-        const elapsed = now - last;
-        if (elapsed >= MEGA_PUBLIC_IDLE_MS) {
-          resetMegaPublicState();
-          return;
-        }
-        const wait = Math.max(250, MEGA_PUBLIC_IDLE_MS - elapsed);
-        t = window.setTimeout(() => {
-          schedule();
-        }, wait);
-      };
-
-      const onActivity = () => schedule();
-      window.addEventListener('hg-mega-public-activity', onActivity);
-
-      schedule();
-      return () => {
-        window.removeEventListener('hg-mega-public-activity', onActivity);
-        if (t) window.clearTimeout(t);
-      };
-    } catch {
-      return undefined;
-    }
-  }, []);
-
-  useEffect(() => {
-    try {
-      if (typeof window === 'undefined') return;
-      const p = new URLSearchParams(location.search);
-      const fromUrl = p.get('active') || p.get('collection') || '';
-      const next = typeof fromUrl === 'string' ? fromUrl.trim() : '';
-      const allowed = new Set(['first_contact', 'the_human_inside', 'austen', 'cube', 'outcasted']);
-      if (next && allowed.has(next)) {
-        setActive(next);
-        touchMegaPublicActivity();
-      }
-    } catch {
-      // ignore
-    }
-  }, [location.search]);
+  useMegaPublicIdleReset();
+  useUrlActiveCollection(location.search, setActive);
 
   useEffect(() => {
     const handleEsc = (e) => {
