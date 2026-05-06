@@ -21,6 +21,18 @@ import {
   THE_HUMAN_INSIDE_MEDIA_WHITE,
   CUBE_MEDIA,
 } from './fullwide/megaSlideMedia.js';
+import {
+  MEGA_PUBLIC_IDLE_MS,
+  MEGA_PUBLIC_LAST_ACTIVITY_AT_KEY,
+  MEGA_PUBLIC_SELECTOR_STATE_KEY,
+  touchMegaPublicActivity,
+  resetMegaPublicState,
+  readMegaPublicLastActivityAt,
+  readMegaPublicSelectorState,
+  writeMegaPublicSelectorState,
+  getMegaPublicSelectorFor,
+  setMegaPublicSelectorFor,
+} from './fullwide/megaPublicSelectorState.js';
 
 function MegaStripeBleedGuard({ heightPx, debug, expandLeftPx = 0, expandRightPx = 0, children }) {
   const l = Math.max(0, Number(expandLeftPx) || 0);
@@ -805,112 +817,6 @@ function MegaStripePanel({
 
 const CONTROL_TILE_BN = 'botonera-bn';
 const CONTROL_TILE_ARROWS = 'botonera-fletxes';
-
-const MEGA_PUBLIC_IDLE_MS = 60 * 60 * 1000;
-const MEGA_PUBLIC_LAST_ACTIVITY_AT_KEY = 'HG_MEGA_PUBLIC_LAST_ACTIVITY_AT';
-const MEGA_PUBLIC_SELECTOR_STATE_KEY = 'HG_MEGA_PUBLIC_SELECTOR_STATE';
-
-function touchMegaPublicActivity() {
-  try {
-    if (typeof window === 'undefined') return;
-    window.sessionStorage?.setItem(MEGA_PUBLIC_LAST_ACTIVITY_AT_KEY, String(Date.now()));
-    window.dispatchEvent(new Event('hg-mega-public-activity'));
-  } catch {
-    // ignore
-  }
-}
-
- function resetMegaPublicState() {
-   try {
-     if (typeof window === 'undefined') return;
-     window.sessionStorage?.removeItem(MEGA_PUBLIC_LAST_ACTIVITY_AT_KEY);
-     window.sessionStorage?.removeItem(MEGA_PUBLIC_SELECTOR_STATE_KEY);
-     window.dispatchEvent(new Event('mega-tile-selector-changed'));
-   } catch {
-     // ignore
-   }
- }
-
-function readMegaPublicLastActivityAt() {
-  try {
-    if (typeof window === 'undefined') return 0;
-    const raw = window.sessionStorage?.getItem(MEGA_PUBLIC_LAST_ACTIVITY_AT_KEY);
-    const n = raw == null ? NaN : Number.parseInt(String(raw), 10);
-    return Number.isFinite(n) && n > 0 ? n : 0;
-  } catch {
-    return 0;
-  }
-}
-
-function readMegaPublicSelectorState() {
-  try {
-    if (typeof window === 'undefined') return {};
-    const raw = window.sessionStorage?.getItem(MEGA_PUBLIC_SELECTOR_STATE_KEY);
-    if (!raw) return {};
-    const parsed = JSON.parse(raw);
-    return parsed && typeof parsed === 'object' ? parsed : {};
-  } catch {
-    return {};
-  }
-}
-
-function writeMegaPublicSelectorState(next) {
-  try {
-    if (typeof window === 'undefined') return;
-    window.sessionStorage?.setItem(MEGA_PUBLIC_SELECTOR_STATE_KEY, JSON.stringify(next || {}));
-  } catch {
-    // ignore
-  }
-}
-
-function getMegaPublicSelectorFor(collectionId, keyset) {
-  try {
-    const cid = (collectionId || '').toString();
-    if (!cid) return null;
-    const ks = String(keyset || 'v1');
-    const root = readMegaPublicSelectorState();
-    const perCollection = root?.[cid];
-    const perKeyset = perCollection?.[ks];
-    if (!perKeyset || typeof perKeyset !== 'object') return null;
-    
-    // Verificar si ha expirat (15 minuts = 900000 ms)
-    const timestamp = perKeyset.timestamp;
-    if (timestamp && typeof timestamp === 'number') {
-      const elapsed = Date.now() - timestamp;
-      const FIFTEEN_MINUTES = 15 * 60 * 1000;
-      if (elapsed > FIFTEEN_MINUTES) {
-        // Ha expirat, retornar null per forçar reset a t1
-        return null;
-      }
-    }
-    
-    return perKeyset;
-  } catch {
-    return null;
-  }
-}
-
-function setMegaPublicSelectorFor(collectionId, keyset, value) {
-  try {
-    const cid = (collectionId || '').toString();
-    if (!cid) return;
-    const ks = String(keyset || 'v1');
-    const root = readMegaPublicSelectorState();
-    const baseRoot = root && typeof root === 'object' ? root : {};
-    const baseCollection = baseRoot?.[cid] && typeof baseRoot[cid] === 'object' ? baseRoot[cid] : {};
-    const baseKeyset = baseCollection?.[ks] && typeof baseCollection[ks] === 'object' ? baseCollection[ks] : {};
-    const nextKeyset = { 
-      ...baseKeyset, 
-      ...(value && typeof value === 'object' ? value : {}),
-      timestamp: Date.now() // Guardar timestamp per expiració de 15 minuts
-    };
-    const nextCollection = { ...baseCollection, [ks]: nextKeyset };
-    const next = { ...baseRoot, [cid]: nextCollection };
-    writeMegaPublicSelectorState(next);
-  } catch {
-    // ignore
-  }
-}
 
 function FirstContactStripeMockupPanel({ megaTileSize, selectedItem, variant, resolveSrc, OptimizedImg }) {
   if (!megaTileSize) return null;
