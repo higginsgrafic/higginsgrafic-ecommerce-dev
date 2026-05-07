@@ -1833,7 +1833,10 @@ export default function FullWideSlideDemoHeader({
       const totalGaps = (COLS - 1) * GAP_PX;
       const colW = (contentW - totalGaps) / COLS;
       if (!Number.isFinite(colW) || colW <= 0) return;
-      setMegaTileSize(colW);
+      // Cap màxim per evitar sobreescalat a viewport amples / zoom alts
+      // (1400px max-content design ⇒ tile ≈ 136px). Cap a 144px.
+      const MAX_TILE_PX = 144;
+      setMegaTileSize(Math.min(colW, MAX_TILE_PX));
     };
 
     recompute();
