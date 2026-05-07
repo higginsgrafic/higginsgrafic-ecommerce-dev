@@ -13,6 +13,7 @@ import {
   STRIPE_DRAWING_CALIBRATIONS,
   SHIRT_DRAWING_OVERLAY_DEFAULTS,
   STRIPE_DRAWING_OVERLAY_DEFAULTS,
+  STRIPE_LAYOUT_DEFAULTS,
 } from '@/config/stripeCalibrations';
 import { useOffersConfig } from '@/hooks/useOffersConfig';
 import { useGlobalRedirect } from '@/hooks/useGlobalRedirect';
@@ -358,8 +359,8 @@ function App() {
   });
   const [megaStripeOverlayDx, setMegaStripeOverlayDx] = useState(0);
   const [megaStripeOverlayDy, setMegaStripeOverlayDy] = useState(0);
-  const [megaStripeOverlayScale, setMegaStripeOverlayScale] = useState(1);
-  const [megaStripeScale, setMegaStripeScale] = useState(1.2125);
+  const [megaStripeOverlayScale, setMegaStripeOverlayScale] = useState(STRIPE_LAYOUT_DEFAULTS.overlayScale);
+  const [megaStripeScale, setMegaStripeScale] = useState(STRIPE_LAYOUT_DEFAULTS.stripe.scale);
   const [megaStripeRefEnabled, setMegaStripeRefEnabled] = useState(false);
   const [megaStripeRefSrc, setMegaStripeRefSrc] = useState('');
   const [megaStripeRef2Enabled, setMegaStripeRef2Enabled] = useState(false);
@@ -369,9 +370,9 @@ function App() {
   const [megaStripeRefDx, setMegaStripeRefDx] = useState(0);
   const [megaStripeRefDy, setMegaStripeRefDy] = useState(0);
   const [megaStripeRefScale, setMegaStripeRefScale] = useState(1);
-  const [megaStripeRef2Dx, setMegaStripeRef2Dx] = useState(0);
-  const [megaStripeRef2Dy, setMegaStripeRef2Dy] = useState(0);
-  const [megaStripeRef2Scale, setMegaStripeRef2Scale] = useState(1);
+  const [megaStripeRef2Dx, setMegaStripeRef2Dx] = useState(STRIPE_LAYOUT_DEFAULTS.ref2.dx);
+  const [megaStripeRef2Dy, setMegaStripeRef2Dy] = useState(STRIPE_LAYOUT_DEFAULTS.ref2.dy);
+  const [megaStripeRef2Scale, setMegaStripeRef2Scale] = useState(STRIPE_LAYOUT_DEFAULTS.ref2.scale);
   const [stripeEditTool, setStripeEditTool] = useState('ref');
   const [megaStripeNudgeStep, setMegaStripeNudgeStep] = useState(1);
   const [megaStripeTileGapPx, setMegaStripeTileGapPx] = useState(0);

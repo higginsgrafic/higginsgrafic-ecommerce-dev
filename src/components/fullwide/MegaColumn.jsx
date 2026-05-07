@@ -1117,7 +1117,7 @@ function MegaColumn({
           {rowItems.map((it, idx) => (
             <div
               key={`${it}-${idx}`}
-              className="min-w-0 relative z-10"
+              className="min-w-0 relative z-10 self-start"
               style={humanInsideEnabled && effectiveTileSize ? { width: `${effectiveTileSize}px` } : undefined}
             >
               {(() => {
@@ -1327,7 +1327,7 @@ function MegaColumn({
                       style={{
                         top: '-12px',
                         right: '-6px',
-                        bottom: '0px',
+                        bottom: '-6px',
                         left: '-6px',
                         transform: `translate(${selectorTranslateXForRender}px, ${selectorTranslateYForRender}px)`,
                         borderStyle: 'none',
@@ -1345,7 +1345,7 @@ function MegaColumn({
                       style={{
                         top: '-12px',
                         right: '-6px',
-                        bottom: '0px',
+                        bottom: '-6px',
                         left: '-6px',
                         transform: `translate(${selectorTranslateXForRender}px, ${selectorTranslateYForRender}px)`,
                         borderStyle: 'none',

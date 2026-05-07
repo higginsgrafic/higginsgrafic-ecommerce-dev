@@ -221,6 +221,24 @@ export const SHIRT_DRAWING_OVERLAY_DEFAULTS = { dx: 0.5, dy: 22.5, scale: 0.38 }
 export const STRIPE_DRAWING_OVERLAY_DEFAULTS = { dx: 0.5, dy: 28.75, scale: 0.31 };
 
 /**
+ * Defaults globals del layout del stripe (mega-slide). Calibrats a Firefox.
+ * Apliquen com a useState inicial; el localStorage continua sobreescrivint.
+ *
+ *   - stripe: posicionat global del stripe (--megaStripeDx/Dy/Scale)
+ *   - overlayScale: escala global de l'overlay (--megaStripeOverlayScale)
+ *   - ref2: 2a referència de calibratge (--megaStripeRef2Dx/Dy/Scale)
+ *   - nudgeStep: pas de teclat al HUD
+ *   - tileGapPx: gap entre tiles del stripe
+ */
+export const STRIPE_LAYOUT_DEFAULTS = {
+  stripe: { dx: 0, dy: 0, scale: 1.2125 },
+  overlayScale: 0.97,
+  ref2: { dx: 1018, dy: -3, scale: 1.075 },
+  nudgeStep: 50,
+  tileGapPx: 0,
+};
+
+/**
  * Resol la calibració per a un overlay key, prioritzant: localStorage map →
  * defaults del config → fallback {0,0,1}.
  *
