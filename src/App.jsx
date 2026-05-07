@@ -9,6 +9,11 @@ import { useAdminTools } from '@/contexts/AdminToolsContext';
 import { initAnalytics, trackPageView } from '@/utils/analytics';
 import { installLayoutMetricsProbe } from '@/utils/layoutMetrics';
 import { AUSTEN_QUOTES_ASSETS } from '@/utils/austenQuotesAssets';
+import {
+  STRIPE_DRAWING_CALIBRATIONS,
+  SHIRT_DRAWING_OVERLAY_DEFAULTS,
+  STRIPE_DRAWING_OVERLAY_DEFAULTS,
+} from '@/config/stripeCalibrations';
 import { useOffersConfig } from '@/hooks/useOffersConfig';
 import { useGlobalRedirect } from '@/hooks/useGlobalRedirect';
 import ErrorBoundary from '@/components/ErrorBoundary';
@@ -338,12 +343,12 @@ function App() {
       return true;
     }
   });
-  const [megaShirtDrawingOverlayDx, setMegaShirtDrawingOverlayDx] = useState(0);
-  const [megaShirtDrawingOverlayDy, setMegaShirtDrawingOverlayDy] = useState(0);
-  const [megaShirtDrawingOverlayScale, setMegaShirtDrawingOverlayScale] = useState(1);
-  const [megaStripeDrawingOverlayDx, setMegaStripeDrawingOverlayDx] = useState(0);
-  const [megaStripeDrawingOverlayDy, setMegaStripeDrawingOverlayDy] = useState(0);
-  const [megaStripeDrawingOverlayScale, setMegaStripeDrawingOverlayScale] = useState(1);
+  const [megaShirtDrawingOverlayDx, setMegaShirtDrawingOverlayDx] = useState(SHIRT_DRAWING_OVERLAY_DEFAULTS.dx);
+  const [megaShirtDrawingOverlayDy, setMegaShirtDrawingOverlayDy] = useState(SHIRT_DRAWING_OVERLAY_DEFAULTS.dy);
+  const [megaShirtDrawingOverlayScale, setMegaShirtDrawingOverlayScale] = useState(SHIRT_DRAWING_OVERLAY_DEFAULTS.scale);
+  const [megaStripeDrawingOverlayDx, setMegaStripeDrawingOverlayDx] = useState(STRIPE_DRAWING_OVERLAY_DEFAULTS.dx);
+  const [megaStripeDrawingOverlayDy, setMegaStripeDrawingOverlayDy] = useState(STRIPE_DRAWING_OVERLAY_DEFAULTS.dy);
+  const [megaStripeDrawingOverlayScale, setMegaStripeDrawingOverlayScale] = useState(STRIPE_DRAWING_OVERLAY_DEFAULTS.scale);
   const [megaShirtDrawingOverlaySrc, setMegaShirtDrawingOverlaySrc] = useState(() => {
     try {
       return String(window.localStorage.getItem('HG_DRAWING_OVERLAY_SRC') || '');
@@ -1313,13 +1318,19 @@ function App() {
     if (!overlayKey) return;
     const canonicalOverlayKey = canonicalStripeDrawingOverlayKey(overlayKey);
 
+    // Fallback chain: localStorage (per-browser overrides) → STRIPE_DRAWING_CALIBRATIONS
+    // (font de veritat al codi font, src/config/stripeCalibrations.js) → {0,0,1}.
+    const pickEntry = (map, key, canonical) => {
+      if (!map || typeof map !== 'object') return null;
+      const e = (canonical && map[canonical]) || map[key];
+      return (e && typeof e === 'object') ? e : null;
+    };
     try {
       const rawStripeDrawingMap = window.localStorage.getItem('MEGA_STRIPE_DRAWING_OVERLAY_TRANSFORMS_BY_SRC');
       const parsed = rawStripeDrawingMap ? JSON.parse(String(rawStripeDrawingMap)) : null;
-      const entry = parsed && typeof parsed === 'object'
-        ? ((canonicalOverlayKey && parsed[canonicalOverlayKey]) || parsed[overlayKey])
-        : null;
-      if (entry && typeof entry === 'object') {
+      const entry = pickEntry(parsed, overlayKey, canonicalOverlayKey)
+        || pickEntry(STRIPE_DRAWING_CALIBRATIONS, overlayKey, canonicalOverlayKey);
+      if (entry) {
         const dx = Number.parseFloat(String(entry.dx));
         const dy = Number.parseFloat(String(entry.dy));
         const scale = Number.parseFloat(String(entry.scale));
@@ -1332,9 +1343,19 @@ function App() {
         setMegaStripeDrawingOverlayScale(1);
       }
     } catch {
-      setMegaStripeDrawingOverlayDx(0);
-      setMegaStripeDrawingOverlayDy(0);
-      setMegaStripeDrawingOverlayScale(1);
+      const entry = pickEntry(STRIPE_DRAWING_CALIBRATIONS, overlayKey, canonicalOverlayKey);
+      if (entry) {
+        const dx = Number.parseFloat(String(entry.dx));
+        const dy = Number.parseFloat(String(entry.dy));
+        const scale = Number.parseFloat(String(entry.scale));
+        setMegaStripeDrawingOverlayDx(Number.isFinite(dx) ? dx : 0);
+        setMegaStripeDrawingOverlayDy(Number.isFinite(dy) ? dy : 0);
+        setMegaStripeDrawingOverlayScale(Number.isFinite(scale) && scale > 0 ? clampScale(scale, 1) : 1);
+      } else {
+        setMegaStripeDrawingOverlayDx(0);
+        setMegaStripeDrawingOverlayDy(0);
+        setMegaStripeDrawingOverlayScale(1);
+      }
     }
   }, [location?.pathname, megaShirtDrawingOverlaySrc]);
 

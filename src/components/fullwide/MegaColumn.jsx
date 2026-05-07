@@ -299,8 +299,10 @@ function MegaColumn({
     ? Math.min(selectorDragBounds.maxStepX, Math.max(selectorDragBounds.minStepX, selectorStepX))
     : selectorStepX;
   const selectorStepYForRender = selectorDragBounds ? 0 : selectorStepY;
-  const selectorTranslateXForRender = (selectorStepXForRender * selectorTilePitchPx) + (selectorExtendRightPx - selectorExtendLeftPx) / 2;
-  const selectorTranslateYForRender = (selectorStepYForRender * selectorTilePitchPx) + (selectorExtendBottomPx - selectorExtendTopPx) / 2;
+  // Only keep drag-driven translation. Legacy extend* params are ignored now that
+  // the selector auto-fits the parent column via inset insets.
+  const selectorTranslateXForRender = selectorStepXForRender * selectorTilePitchPx;
+  const selectorTranslateYForRender = selectorStepYForRender * selectorTilePitchPx;
 
   useLayoutEffect(() => {
     if (!row) return;
@@ -1312,83 +1314,90 @@ function MegaColumn({
                     })()}
                   </div>
 
-                  {megaTileSelectorParams?.enabled
-                    && typeof it === 'string'
-                    && String(it || '').trim().toLowerCase() === String(megaTileSelectorParams?.target || '').trim().toLowerCase() ? (
-                    String(megaTileSelectorParams?.keyset || 'v1') === 'v2' ? (
-                      <>
-                        <div
-                          className="absolute left-1/2 top-1/2 z-10 bg-muted"
-                          style={{
-                            transform: `translate(calc(-50% + ${selectorTranslateXForRender}px), calc(-50% + ${selectorTranslateYForRender}px))`,
-                            width: `${selectorWidthPx}px`,
-                            height: `${selectorHeightPx}px`,
-                            borderStyle: 'none',
-                            borderWidth: '0px',
-                            borderColor: 'transparent',
-                            background: 'color-mix(in srgb, color-mix(in srgb, hsl(var(--muted)) 97%, rgb(59 130 246) 3%) 90%, white 10%)',
-                            borderRadius: `${selectorRadiusPx}px`,
-                            boxSizing: 'border-box',
-                            pointerEvents: 'none',
-                          }}
-                          aria-hidden="true"
-                        />
-                        <div
-                          className="absolute left-1/2 top-1/2 z-40"
-                          style={{
-                            transform: `translate(calc(-50% + ${selectorTranslateXForRender}px), calc(-50% + ${selectorTranslateYForRender}px))`,
-                            width: `${selectorWidthPx}px`,
-                            height: `${selectorHeightPx}px`,
-                            borderStyle: 'none',
-                            borderWidth: '0px',
-                            borderColor: 'transparent',
-                            background: 'transparent',
-                            borderRadius: `${selectorRadiusPx}px`,
-                            boxSizing: 'border-box',
-                            cursor: 'grab',
-                            pointerEvents: 'auto',
-                          }}
-                          aria-hidden="true"
-                          data-circle-selector="1"
-                          onPointerDown={(e) => {
-                            if (typeof onStartSelectorDrag !== 'function') return;
-                            e.preventDefault();
-                            e.stopPropagation();
-                            if (!selectorDragBounds) return;
-                            onStartSelectorDrag(e, { ...megaTileSelectorParams, collectionId }, selectorDragBounds);
-                          }}
-                        />
-                      </>
-                    ) : (
-                      <div
-                        className="absolute left-1/2 top-1/2 z-40"
-                        style={{
-                          transform: `translate(calc(-50% + ${selectorTranslateXForRender}px), calc(-50% + ${selectorTranslateYForRender}px))`,
-                          width: `${selectorWidthPx}px`,
-                          height: `${selectorHeightPx}px`,
-                          borderStyle: 'solid',
-                          borderWidth: `${selectorStrokePx}px`,
-                          borderColor: String(megaTileSelectorParams?.color || 'black'),
-                          background: 'transparent',
-                          borderRadius: `${selectorRadiusPx}px`,
-                          boxSizing: 'border-box',
-                          cursor: 'grab',
-                          pointerEvents: 'auto',
-                        }}
-                        aria-hidden="true"
-                        data-circle-selector="1"
-                        onPointerDown={(e) => {
-                          if (typeof onStartSelectorDrag !== 'function') return;
-                          e.preventDefault();
-                          e.stopPropagation();
-                          if (!selectorDragBounds) return;
-                          onStartSelectorDrag(e, { ...megaTileSelectorParams, collectionId }, selectorDragBounds);
-                        }}
-                      />
-                    )
-                  ) : null}
                 </button>
               )}
+
+              {megaTileSelectorParams?.enabled
+                && typeof it === 'string'
+                && String(it || '').trim().toLowerCase() === String(megaTileSelectorParams?.target || '').trim().toLowerCase() ? (
+                String(megaTileSelectorParams?.keyset || 'v1') === 'v2' ? (
+                  <>
+                    <div
+                      className="absolute z-10 bg-muted"
+                      style={{
+                        top: '-12px',
+                        right: '-6px',
+                        bottom: '0px',
+                        left: '-6px',
+                        transform: `translate(${selectorTranslateXForRender}px, ${selectorTranslateYForRender}px)`,
+                        borderStyle: 'none',
+                        borderWidth: '0px',
+                        borderColor: 'transparent',
+                        background: 'color-mix(in srgb, color-mix(in srgb, hsl(var(--muted)) 97%, rgb(59 130 246) 3%) 90%, white 10%)',
+                        borderRadius: `${selectorRadiusPx}px`,
+                        boxSizing: 'border-box',
+                        pointerEvents: 'none',
+                      }}
+                      aria-hidden="true"
+                    />
+                    <div
+                      className="absolute z-[55]"
+                      style={{
+                        top: '-12px',
+                        right: '-6px',
+                        bottom: '0px',
+                        left: '-6px',
+                        transform: `translate(${selectorTranslateXForRender}px, ${selectorTranslateYForRender}px)`,
+                        borderStyle: 'none',
+                        borderWidth: '0px',
+                        borderColor: 'transparent',
+                        background: 'transparent',
+                        borderRadius: `${selectorRadiusPx}px`,
+                        boxSizing: 'border-box',
+                        cursor: 'grab',
+                        pointerEvents: 'auto',
+                      }}
+                      aria-hidden="true"
+                      data-circle-selector="1"
+                      onPointerDown={(e) => {
+                        if (typeof onStartSelectorDrag !== 'function') return;
+                        e.preventDefault();
+                        e.stopPropagation();
+                        if (!selectorDragBounds) return;
+                        onStartSelectorDrag(e, { ...megaTileSelectorParams, collectionId }, selectorDragBounds);
+                      }}
+                    />
+                  </>
+                ) : (
+                  <div
+                    className="absolute z-[55]"
+                    style={{
+                      top: '-12px',
+                      right: '-6px',
+                      bottom: '0px',
+                      left: '-6px',
+                      transform: `translate(${selectorTranslateXForRender}px, ${selectorTranslateYForRender}px)`,
+                      borderStyle: 'solid',
+                      borderWidth: `${selectorStrokePx}px`,
+                      borderColor: String(megaTileSelectorParams?.color || 'black'),
+                      background: 'transparent',
+                      borderRadius: `${selectorRadiusPx}px`,
+                      boxSizing: 'border-box',
+                      cursor: 'grab',
+                      pointerEvents: 'auto',
+                    }}
+                    aria-hidden="true"
+                    data-circle-selector="1"
+                    onPointerDown={(e) => {
+                      if (typeof onStartSelectorDrag !== 'function') return;
+                      e.preventDefault();
+                      e.stopPropagation();
+                      if (!selectorDragBounds) return;
+                      onStartSelectorDrag(e, { ...megaTileSelectorParams, collectionId }, selectorDragBounds);
+                    }}
+                  />
+                )
+              ) : null}
             </div>
           ))}
         </div>
