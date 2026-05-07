@@ -276,15 +276,20 @@ export default function BeltReferenceOverlay({ enabled }) {
     }
 
     const read = () => {
+      // Considera un rect com a "buit" (element no col·locat al layout, p.ex.
+      // `display:none` o encara no muntat) si totes les dimensions són 0.
+      // En aquest cas `getBoundingClientRect()` retorna {top:0, bottom:0, ...}
+      // i no l'hem d'acceptar com a coordenada vàlida.
+      const isLaidOut = (r) => !!r && (r.width > 0 || r.height > 0);
       const resolveX = (el, edge) => {
         const r = el?.getBoundingClientRect?.();
-        if (!r) return null;
+        if (!isLaidOut(r)) return null;
         const x = edge === 'right' ? r.right : r.left;
         return Number.isFinite(x) ? Math.round(x) : null;
       };
       const resolveY = (el, edge) => {
         const r = el?.getBoundingClientRect?.();
-        if (!r) return null;
+        if (!isLaidOut(r)) return null;
         const y = edge === 'bottom' ? r.bottom : r.top;
         return Number.isFinite(y) ? Math.round(y) : null;
       };

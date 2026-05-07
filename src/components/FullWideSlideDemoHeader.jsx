@@ -1,7 +1,8 @@
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import * as ReactDOM from 'react-dom';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { ChevronDown, ChevronLeft, ChevronRight, ChevronUp, Menu, UserRound, X, Check, Clock, Package, Truck, Search, AlertCircle, MoreHorizontal, Loader2, Eye, EyeOff, LayoutGrid } from 'lucide-react';
+import { ChevronDown, ChevronLeft, ChevronRight, ChevronUp, Menu, UserRound, X, Check, Clock, Package, Truck, Search, AlertCircle, MoreHorizontal, Loader2, Eye, EyeOff, LayoutGrid, Layers } from 'lucide-react';
+import { motion } from 'framer-motion';
 import { useProductContext } from '@/contexts/ProductContext';
 import { getGildan5000Catalog } from '../utils/placeholders.js';
 import {
@@ -1550,6 +1551,11 @@ export default function FullWideSlideDemoHeader({
   }, [overlayStorageKey, resolvedOverlaySrc, stripeOverlayOverrideActive]);
   const [megaTileSize, setMegaTileSize] = useState(null);
   const effectiveMegaTileSize = megaTileSize || 120;
+  // Stub local per al menú mobile: la implementació real viu a `MegaColumn`
+  // amb closures sobre el seu estat. Aquí sempre retornem null perquè els
+  // callers facin servir el fallback `|| FIRST_CONTACT_MEDIA[it]`, que era
+  // el comportament efectiu abans de modularitzar.
+  const resolveGridThumbSrc = () => null;
   const [rootRemPx, setRootRemPx] = useState(16);
   const [megaTileSelectorParams, setMegaTileSelectorParams] = useState(() => {
     try {
