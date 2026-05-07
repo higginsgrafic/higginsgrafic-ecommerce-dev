@@ -315,8 +315,19 @@ export default function BeltReferenceOverlay({ enabled }) {
       const spriteXL = resolveX(stripeImg, 'left');
       const spriteXR = resolveX(stripeImg, 'right');
       const xR = resolveX(userIconAnchor, 'right') ?? resolveX(rightArrow, 'right') ?? resolveX(cartViewportAnchor, 'right');
+      // Belt2: el TOP es manté ancorat al cart-card-top-anchor (o al
+      // valor persistit prèviament en rutes que no el rendereixen). El
+      // BOTTOM representa la base de la ZONA PAUTA de l'acordió: si la
+      // pauta està al DOM s'utilitza directament; en cas contrari es
+      // calcula com `top + 737.015 * scale` on `scale =
+      // clamp((xR - xL) / 1365.46, 0.5, 1)` — la mateixa fórmula que
+      // FullWideSlideDemoHeader fa servir per a `accordionPautaScale`.
+      // Així belt2 funciona com a marc de referència del dev a totes les
+      // rutes, fins i tot quan l'acordió no és visible.
+      const accordionPauta = document.querySelector('[data-stripe-guide="accordion-pauta"]');
       const yCarouselTop = resolveY(cartCardTopAnchor, 'top');
-      const yFinalizeBottom = resolveY(finalizeOrderBtn, 'bottom');
+      const pautaBottomFromDom = resolveY(accordionPauta, 'bottom');
+      const finalizeBottomDom = resolveY(finalizeOrderBtn, 'bottom') ?? resolveY(stripeImg, 'bottom');
       const fullWideYTop = resolveY(cartCardTopAnchor, 'top') ?? resolveY(stripeImg, 'top');
       const checkoutYTop = resolveY(checkoutTopAnchor, 'top');
       const checkoutLayoutYTop = resolveY(document.getElementById('stripe-guide-checkout-layout-top-anchor'), 'top');
@@ -337,13 +348,29 @@ export default function BeltReferenceOverlay({ enabled }) {
         : (Number.isFinite(checkoutLayoutYBottom) ? checkoutLayoutYBottom : checkoutYBottom);
 
       setState((prev) => {
+        const nextXL = Number.isFinite(xL) ? xL : prev.xL;
+        const nextXR = Number.isFinite(xR) ? xR : prev.xR;
+        const nextYCarouselTop = Number.isFinite(yCarouselTop) ? yCarouselTop : prev.yCarouselTop;
+        // Belt2 BOTTOM derivat: top + 737.015 * scale, usant els valors
+        // efectius (actuals o persistits) per a top, xL i xR. Així el
+        // marc de referència és visible i correcte a totes les rutes.
+        let derivedPautaBottom = null;
+        if (Number.isFinite(nextYCarouselTop) && Number.isFinite(nextXL) && Number.isFinite(nextXR)) {
+          const beltWidth = Math.max(0, nextXR - nextXL);
+          const pautaScale = Math.max(0.5, Math.min(1, beltWidth / 1365.46));
+          derivedPautaBottom = Math.round(nextYCarouselTop + 737.015 * pautaScale);
+        }
+        const nextYFinalizeBottom = pautaBottomFromDom
+          ?? derivedPautaBottom
+          ?? finalizeBottomDom
+          ?? prev.yFinalizeBottom;
         const next = {
-          xL: Number.isFinite(xL) ? xL : prev.xL,
-          xR: Number.isFinite(xR) ? xR : prev.xR,
+          xL: nextXL,
+          xR: nextXR,
           yT: Number.isFinite(yTWithOffset) ? yTWithOffset : prev.yT,
           yB: Number.isFinite(yB) ? yB : prev.yB,
-          yCarouselTop: Number.isFinite(yCarouselTop) ? yCarouselTop : prev.yCarouselTop,
-          yFinalizeBottom: Number.isFinite(yFinalizeBottom) ? yFinalizeBottom : prev.yFinalizeBottom,
+          yCarouselTop: nextYCarouselTop,
+          yFinalizeBottom: Number.isFinite(nextYFinalizeBottom) ? nextYFinalizeBottom : prev.yFinalizeBottom,
           spriteXL: Number.isFinite(spriteXL) ? spriteXL : prev.spriteXL,
           spriteXR: Number.isFinite(spriteXR) ? spriteXR : prev.spriteXR,
         };

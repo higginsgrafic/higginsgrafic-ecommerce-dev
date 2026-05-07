@@ -89,6 +89,7 @@ function MegaStripePanel({
         >
           <div className="w-full flex justify-center bg-transparent">
             <div
+              id="stripe-guide-stripe-row"
               className="relative inline-block"
               style={{
                 height: `${stripePreviewHPx}px`,

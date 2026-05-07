@@ -3437,7 +3437,7 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
                               zIndex: -1,
                             }} />
                             {/* Zona de la pauta — tot el contingut queda clippat als límits */}
-                            <div style={{
+                            <div data-stripe-guide="accordion-pauta" style={{
                               position: 'absolute',
                               top: '1px',
                               left: '50%',
@@ -3556,7 +3556,7 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
                               zIndex: -1,
                             }} />
                             {/* Zona de la pauta — tot el contingut queda clippat als límits */}
-                            <div style={{
+                            <div data-stripe-guide="accordion-pauta" style={{
                               position: 'absolute',
                               top: '1px',
                               left: '50%',
