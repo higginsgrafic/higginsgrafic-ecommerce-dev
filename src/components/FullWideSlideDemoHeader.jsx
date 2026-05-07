@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import * as ReactDOM from 'react-dom';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { ChevronDown, ChevronLeft, ChevronRight, ChevronUp, Menu, UserRound, X, Check, Clock, Package, Truck, Search, AlertCircle, MoreHorizontal, Loader2, Eye, EyeOff } from 'lucide-react';
+import { ChevronDown, ChevronLeft, ChevronRight, ChevronUp, Menu, UserRound, X, Check, Clock, Package, Truck, Search, AlertCircle, MoreHorizontal, Loader2, Eye, EyeOff, LayoutGrid } from 'lucide-react';
 import { useProductContext } from '@/contexts/ProductContext';
 import { getGildan5000Catalog } from '../utils/placeholders.js';
 import {
