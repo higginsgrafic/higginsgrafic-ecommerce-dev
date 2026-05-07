@@ -2670,7 +2670,11 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
 
           <nav className="hidden lg:flex flex-1 items-center justify-center gap-6">
             {resolvedNav.map((item) => {
-              const open = active === item.id;
+              // L'indicador d'obert (fletxa rotada + color) només s'ha
+              // d'activar quan realment veiem la col·lecció (megaPage=1).
+              // Si l'usuari canvia a cerca/cistell/compte (2/3/4), la
+              // col·lecció deixa de ser "visible" tot i mantenir `active`.
+              const open = active === item.id && megaPage === 1;
               return (
                 <button
                   key={item.id}
@@ -2679,7 +2683,14 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
                   aria-expanded={open ? 'true' : 'false'}
                   onMouseEnter={() => {
                     if (!active) return;
-                    if (active === item.id) return;
+                    // Si la col·lecció ja és l'activa PERÒ el mega està
+                    // mostrant una altra pestanya (cerca/cistell/compte
+                    // = megaPage 2/3/4), tornem a la pàgina 1 perquè el
+                    // hover pugui "re-entrar" a la col·lecció. Sense
+                    // això, l'usuari es queda atrapat: `active` indica
+                    // que ja hi és, però visualment veu una altra
+                    // pestanya i no pot tornar-hi.
+                    if (active === item.id && megaPage === 1) return;
                     setMegaPage(1);
                     setMegaFullScreen(false);
                     setActive(item.id);
@@ -2687,13 +2698,18 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
                   }}
                   onClick={() => {
                     setManualOverrideClosed(false);
-                    setMegaPage(1);
                     setMegaFullScreen(false);
-                    setActive((prev) => {
-                      const next = prev === item.id ? null : item.id;
-                      if (next) touchMegaPublicActivity();
-                      return next;
-                    });
+                    // Toggle només si ja som a la col·lecció i a la
+                    // pàgina 1. Si som a una altra pestanya (2/3/4),
+                    // un click ha d'obrir la col·lecció (page 1) en
+                    // comptes de tancar-la.
+                    if (active === item.id && megaPage === 1) {
+                      setActive(null);
+                    } else {
+                      setMegaPage(1);
+                      setActive(item.id);
+                      touchMegaPublicActivity();
+                    }
                   }}
                 >
                   {item.label}
