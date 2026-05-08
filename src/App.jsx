@@ -41,7 +41,7 @@ const ProductDetailPageEnhanced = lazy(() => import('@/pages/ProductDetailPageEn
 const ProductPage = lazy(() => import('@/pages/ProductPage'));
 
 // Lazy loading de pàgines per millorar performance (code splitting)
-const Home = lazy(() => import('@/pages/Home'));
+const HomeClean = lazy(() => import('@/pages/HomeClean'));
 const NewPage = lazy(() => import('@/pages/NewPage'));
 const OrderTrackingPage = lazy(() => import('@/pages/OrderTrackingPage'));
 const CheckoutPage = lazy(() => import('@/pages/CheckoutPage'));
@@ -2990,7 +2990,7 @@ function App() {
                         showCatalogPanel={fullWideShowCatalogPanel}
                       />
                     </div>
-                    <Home {...pageProps} />
+                    <HomeClean />
                   </motion.div>
                 } />
 
