@@ -1,9 +1,14 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { ChevronLeft, ChevronRight, X } from 'lucide-react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { ChevronLeft, ChevronRight, ArrowLeft, X } from 'lucide-react';
 
-function CistellComandaContent({ cartItems, setCartItems }) {
+function CistellComandaContent({ cartItems, setCartItems, onCloseMegaSlide }) {
   const navigate = useNavigate();
+  const location = useLocation();
+  // Si l'usuari ja es troba a /checkout i obre el cistell del mega-slide,
+  // el botó "FINALITZA LA COMANDA" no té sentit (ja hi és). En el seu lloc
+  // mostrem una fletxa que tanca el mega-slide per tornar al checkout.
+  const isOnCheckoutRoute = location?.pathname === '/checkout';
   const ROW_H = 32.8;          // alçada d'una fila de la pauta
   const GUTTER = 7.5;          // gutter horitzontal entre columnes
   const V_GUTTER = 2.8;        // gutter vertical entre files
@@ -40,21 +45,26 @@ function CistellComandaContent({ cartItems, setCartItems }) {
   const SIZES = ['XS', 'S', 'M', 'L', 'XL', 'XXL'];
   const CART_ITEMS = cartItems;
 
-  // Scroll vertical intern (sense barra)
-  // El viewport comença a la fila `FIRST_VIEWPORT_ROW` (= TOP_OFFSET/ROW_H)
-  // i acaba a la fila `LAST_VIEWPORT_ROW` de la pauta.
+  // Scroll vertical intern (sense barra) — patró del /checkout:
+  // Scroll DISCRET per fila. Les imatges de fons es queden fixes a
+  // rowIndex 0..N i només canvia el contingut (text, samarretes,
+  // dibuixos) que hi apareix a sobre quan l'usuari fa scroll.
   const FIRST_VIEWPORT_ROW = 1.5;
-  const LAST_VIEWPORT_ROW = 15.5;
+  // Històric: 15.5 (7 ítems) → 17.5 (8 ítems, traient
+  // SUBTOTAL/TRANSPORT/IVA) → 19.5 (9 ítems, ocupant la fila
+  // buida que quedava entre la llista i la fila TOT PLEGAT FA).
+  const LAST_VIEWPORT_ROW = 19.5;
   // Cada ítem ocupa 2 files de contingut (sense fila buida de separació).
   const ITEM_STRIDE = 2 * ROW_H;
   const VISIBLE_HEIGHT = (LAST_VIEWPORT_ROW - FIRST_VIEWPORT_ROW) * ROW_H - V_GUTTER;
-  const CONTENT_HEIGHT = CART_ITEMS.length * ITEM_STRIDE - V_GUTTER;
-  const MAX_SCROLL = Math.max(0, CONTENT_HEIGHT - VISIBLE_HEIGHT);
-  const [scrollY, setScrollY] = useState(0);
+  const VISIBLE_ITEMS = Math.max(1, Math.floor((VISIBLE_HEIGHT + V_GUTTER) / ITEM_STRIDE));
+  const [scrollRow, setScrollRow] = useState(0);
+  const maxScrollRow = Math.max(0, CART_ITEMS.length - VISIBLE_ITEMS);
   const handleCartWheel = (e) => {
     e.preventDefault();
     e.stopPropagation();
-    setScrollY(prev => Math.max(0, Math.min(MAX_SCROLL, prev + e.deltaY)));
+    const direction = e.deltaY > 0 ? 1 : -1;
+    setScrollRow(prev => Math.max(0, Math.min(maxScrollRow, prev + direction)));
   };
   const changeQty = (idx, delta) => {
     setCartItems(prev => prev.map((it, j) => j === idx ? { ...it, qty: Math.max(1, it.qty + delta) } : it));
@@ -76,9 +86,8 @@ function CistellComandaContent({ cartItems, setCartItems }) {
         return prev.map((it, j) => j === idx ? { ...it, disabled: true } : it);
       }
       const next = prev.filter((_, j) => j !== idx);
-      const newContent = next.length * ITEM_STRIDE - V_GUTTER;
-      const newMax = Math.max(0, newContent - VISIBLE_HEIGHT);
-      setScrollY(s => Math.min(s, newMax));
+      const newMaxRow = Math.max(0, next.length - VISIBLE_ITEMS);
+      setScrollRow(s => Math.min(s, newMaxRow));
       return next;
     });
   };
@@ -111,19 +120,6 @@ function CistellComandaContent({ cartItems, setCartItems }) {
 
   return (
     <>
-      {/* PAUTA-VERDA — referència (amagada) */}
-      {false && <div style={{
-        position: 'absolute',
-        inset: 0,
-        backgroundImage: 'url(/tmp/PAUTES/PAUTA-GENERAL.png)',
-        backgroundRepeat: 'no-repeat',
-        backgroundPosition: '0 -1px',
-        backgroundSize: '1365.46px 737.015px',
-        opacity: 0.03,
-        zIndex: 1,
-        pointerEvents: 'none',
-      }} />}
-
       {/* Finestra de scroll vertical de les línies del cistell (sense barra) */}
       <div
         onWheel={handleCartWheel}
@@ -140,16 +136,20 @@ function CistellComandaContent({ cartItems, setCartItems }) {
       <div style={{
         position: 'relative',
         width: '100%',
-        height: `${CONTENT_HEIGHT}px`,
-        transform: `translateY(${-scrollY}px)`,
-        transition: 'transform 0.08s linear',
+        height: `${VISIBLE_HEIGHT}px`,
       }}>
-      {CART_ITEMS.map((item, i) => {
+      {CART_ITEMS.slice(scrollRow, scrollRow + VISIBLE_ITEMS).map((item, rowIndex) => {
+        // `i` és l'índex real dins de CART_ITEMS (per a les operacions
+        // d'estat: changeQty/changeSize/removeItem). `rowIndex` és la
+        // posició VISUAL fixa dins del viewport: així les imatges de
+        // fons es queden ancorades a 0..N i només canvia el contingut
+        // que apareix a sobre quan es fa scroll. Patró del /checkout.
+        const i = scrollRow + rowIndex;
         const colBg = { backgroundColor: 'transparent', height: '100%', boxSizing: 'border-box' };
         return (
         <div key={i} style={{
           position: 'absolute',
-          top: `${i * ITEM_STRIDE}px`,
+          top: `${rowIndex * ITEM_STRIDE}px`,
           left: `${SLIDE_OFFSET_X}px`,
           width: `${TABLE_WIDTH + COL4_EXTRA}px`,
           height: `${2 * ROW_H - V_GUTTER}px`,
@@ -169,7 +169,7 @@ function CistellComandaContent({ cartItems, setCartItems }) {
             backgroundRepeat: 'no-repeat',
             backgroundPosition: 'center top',
             backgroundSize: `${TABLE_WIDTH + COL4_EXTRA}px auto`,
-            transform: i % 2 === 0 ? 'scaleX(-1)' : 'none',
+            transform: rowIndex % 2 === 0 ? 'scaleX(-1)' : 'none',
             pointerEvents: 'none',
             zIndex: 0,
           }} />
@@ -403,14 +403,17 @@ function CistellComandaContent({ cartItems, setCartItems }) {
         const grossTotal = subtotal;
         const iva = subtotal * 0.21;
         const fmt = (n) => n.toFixed(2).replace('.', ',') + '€';
+        // Només mostrem TOT PLEGAT FA. SUBTOTAL/TRANSPORT/IVA
+        // s'han eliminat per alliberar 2 files que ara ocupa la
+        // llista d'ítems del cistell.
         const rows = [
-          { label: 'SUBTOTAL',      amount: fmt(subtotal),   strong: false },
-          { label: 'TRANSPORT',     amount: fmt(transport),  strong: false },
-          { label: 'IVA 21%',       amount: fmt(iva),        strong: false },
           { label: 'TOT PLEGAT FA', amount: fmt(grossTotal), strong: true  },
         ];
-        // Files 16-19 de la pauta (1-indexades), contingut només a la col 4.
-        const TOTALS_FIRST_ROW = 16;
+        // Mantenim els valors calculats per si calen més endavant
+        // (lint-friendly: marquem-los com a usats).
+        void subtotal; void transport; void iva;
+        // Fila 19 de la pauta (1-indexada), contingut només a la col 4.
+        const TOTALS_FIRST_ROW = 19;
         return (
           <>
             <div style={{
@@ -469,12 +472,10 @@ function CistellComandaContent({ cartItems, setCartItems }) {
               <div />
               <div />
               <div style={{ display: 'grid', gridTemplateColumns: `${SLOT_W}px ${SLOT_W}px`, columnGap: `${SLIDE_GAP}px`, alignItems: 'center', justifyItems: 'center' }}>
-                {k === 0 && (
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', height: '100%', transform: `translateY(${1.5 * ROW_H}px)` }}>
-                    <span style={{ ...VAL, fontSize: '16pt', fontWeight: 600, color: '#475059', minWidth: '20px', textAlign: 'center', lineHeight: 1 }}>{totalQty}</span>
-                    <span style={{ ...HEAD, fontSize: '14pt', fontWeight: 300, color: '#99A3B5', lineHeight: 1 }}>PRODUCTES</span>
-                  </div>
-                )}
+                {/* L'indicador "N PRODUCTES" s'ha eliminat per
+                    petició de l'usuari: la fila de TOT PLEGAT FA
+                    queda sola al peu de la llista. */}
+                <span />
                 <span />
               </div>
               {/* Col 4: mateix patró que la fila de preu de l'ítem */}
@@ -515,8 +516,13 @@ function CistellComandaContent({ cartItems, setCartItems }) {
           gridTemplateColumns: '1fr',
           gap: `${GUTTER}px`,
         }}>
-          {['FINALITZA LA COMANDA'].map((label) => (
-            <button id="stripe-guide-finalize-order" key={label} onClick={handleFinalizeOrder} style={{
+          <button
+            id="stripe-guide-finalize-order"
+            onClick={isOnCheckoutRoute
+              ? () => { if (typeof onCloseMegaSlide === 'function') onCloseMegaSlide(); }
+              : handleFinalizeOrder}
+            aria-label={isOnCheckoutRoute ? 'Torna al checkout' : 'Finalitza la comanda'}
+            style={{
               fontFamily: 'Roboto Condensed, sans-serif',
               fontWeight: 500,
               fontSize: '11pt',
@@ -530,10 +536,15 @@ function CistellComandaContent({ cartItems, setCartItems }) {
               cursor: 'pointer',
               padding: 0,
               height: '100%',
-            }}>
-              {label}
-            </button>
-          ))}
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            {isOnCheckoutRoute
+              ? <ArrowLeft size={20} strokeWidth={1.75} aria-hidden="true" />
+              : 'FINALITZA LA COMANDA'}
+          </button>
         </div>
       </div>
     </>

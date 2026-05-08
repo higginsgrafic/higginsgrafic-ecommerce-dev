@@ -20,13 +20,26 @@ const Breadcrumbs = ({ items = [] }) => {
             <ChevronRight className="h-4 w-4 text-muted-foreground" />
             <li className={index === items.length - 1 ? "text-foreground font-medium truncate" : ""}>
               {item.onClick ? (
-                <button
-                  type="button"
+                // Usem un <span role="button"> en comptes de <button>
+                // perquè cada navegador (Firefox/Chrome/Safari) aplica
+                // estils UA diferents (line-height, padding, font) als
+                // botons que desalineen el breadcrumb respecte als
+                // altres elements (Link i span). Un span hereta
+                // exactament els mateixos estils que els germans.
+                <span
+                  role="button"
+                  tabIndex={0}
                   onClick={item.onClick}
-                  className="text-muted-foreground hover:text-foreground transition-colors uppercase"
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      item.onClick(e);
+                    }
+                  }}
+                  className="text-muted-foreground hover:text-foreground transition-colors uppercase cursor-pointer"
                 >
                   {item.label}
-                </button>
+                </span>
               ) : item.link ? (
                 <Link to={item.link} className="text-muted-foreground hover:text-foreground transition-colors">
                   {item.label}

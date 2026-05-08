@@ -260,8 +260,12 @@ export default function FullWideSlideDemoHeader({
   const [megaPage, setMegaPage] = usePersistentState('HG_MEGA_PAGE', 1);
   const [megaFullScreen, setMegaFullScreen] = useState(false);
   const [manualOverrideClosed, setManualOverrideClosed] = useState(false);
-  const [acordioExpanded, setAcordioExpanded] = usePersistentState('HG_ACORDIO_EXPANDED', false);
-  const [acordioExpandedPage4, setAcordioExpandedPage4] = usePersistentState('HG_ACORDIO_EXPANDED_PAGE4', false);
+  // TTL de 30 minuts perquè l'estat de l'acordió es mantingui en
+  // canviar entre pestanyes (cistell ↔ compte) i en obrir/tancar el
+  // mega-slide. Després d'aquest temps, torna al valor inicial.
+  const ACORDIO_TTL_MS = 30 * 60 * 1000;
+  const [acordioExpanded, setAcordioExpanded] = usePersistentState('HG_ACORDIO_EXPANDED', false, ACORDIO_TTL_MS);
+  const [acordioExpandedPage4, setAcordioExpandedPage4] = usePersistentState('HG_ACORDIO_EXPANDED_PAGE4', false, ACORDIO_TTL_MS);
   const [megaAccordionLocked, setMegaAccordionLocked] = useState(() => {
     try {
       return window.localStorage.getItem('HG_MEGA_ACCORDION_LOCKED_V1') === '1';
@@ -466,6 +470,12 @@ export default function FullWideSlideDemoHeader({
 
   useEffect(() => {
     if (typeof window === 'undefined') return undefined;
+    // Manté l'acordió obert si el lock està actiu, però NOMÉS quan la
+    // pestanya retorna en primer pla (focus/pageshow/visibilitychange).
+    // No s'executa en cada canvi de `megaPage` perquè trencaria la
+    // seqüència de 3 clics del cistell/compte: el clic 1 posa
+    // `acordioExpanded=false` i, si l'efecte es disparés en el mateix
+    // render, el reobririria immediatament.
     const keepLockedAccordionOpen = () => {
       if (!megaAccordionLocked) return;
       if (megaPage === 3) {
@@ -475,7 +485,6 @@ export default function FullWideSlideDemoHeader({
         setAcordioExpandedPage4(true);
       }
     };
-    keepLockedAccordionOpen();
     window.addEventListener('focus', keepLockedAccordionOpen);
     window.addEventListener('pageshow', keepLockedAccordionOpen);
     window.addEventListener('visibilitychange', keepLockedAccordionOpen);
@@ -2729,10 +2738,16 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
                 label="Search"
                 onClick={() => {
                   setManualOverrideClosed(false);
-                  // mega is single-page; keep icon but do not navigate to another slide
-                  setMegaPage(2);
-                  setMegaFullScreen(false);
-                  if (!active) ensureMegaOpen();
+                  // Cerca: pestanya única (sense acordió secundari).
+                  // Click toggle: si ja som a la pestanya de cerca, la
+                  // tanca; si no, hi anem.
+                  if (megaPage === 2 && active) {
+                    setActive(null);
+                  } else {
+                    setMegaPage(2);
+                    setMegaFullScreen(false);
+                    if (!active) ensureMegaOpen();
+                  }
                   touchMegaPublicActivity();
                 }}
               >
@@ -2749,17 +2764,26 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
                 cartClickTimeoutRef.current = window.setTimeout(() => {
                   cartClickTimeoutRef.current = null;
                   setManualOverrideClosed(false);
+                  // Seqüència de 3 clics al cistell:
+                  //  1r: obre la pestanya (acordió tancat)
+                  //  2n: obre l'acordió
+                  //  3r: tanca tot (acordió i pestanya)
                   if (megaPage === 3 && active) {
-                    if (!megaAccordionLocked) {
-                      if (acordioExpanded) {
-                        setAcordioExpanded(false);
-                      } else {
-                        setAcordioExpanded(true);
-                      }
+                    if (!acordioExpanded) {
+                      setAcordioExpanded(true);
+                    } else {
+                      setAcordioExpanded(false);
+                      setActive(null);
                     }
                   } else {
-                    // Si no estem a la pàgina 3, hi anem.
-                    // No toquem l'estat de l'acordió: cada pestanya recorda el seu (sessionStorage).
+                    // Entrada a la pestanya del cistell: NO reiniciem
+                    // `acordioExpanded` perquè, dins el TTL de 30
+                    // minuts (sessionStorage), volem que l'acordió
+                    // recordi el seu darrer estat quan l'usuari canvia
+                    // de pestanya (cistell ↔ compte) o tanca i torna a
+                    // obrir el mega-slide. Si és la primera obertura
+                    // (o si han passat >30'), el valor inicial és
+                    // false i la seqüència de 3 clics arrenca neta.
                     setMegaPage(3);
                     if (!active) ensureMegaOpen();
                   }
@@ -2806,17 +2830,18 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
                   accountClickTimeoutRef.current = window.setTimeout(() => {
                     accountClickTimeoutRef.current = null;
                     setManualOverrideClosed(false);
+                    // Mateixa seqüència de 3 clics al compte d'usuari
+                    // que al cistell.
                     if (megaPage === 4 && active) {
-                      if (!megaAccordionLocked) {
-                        if (acordioExpandedPage4) {
-                          setAcordioExpandedPage4(false);
-                        } else {
-                          setAcordioExpandedPage4(true);
-                        }
+                      if (!acordioExpandedPage4) {
+                        setAcordioExpandedPage4(true);
+                      } else {
+                        setAcordioExpandedPage4(false);
+                        setActive(null);
                       }
                     } else {
-                      // Si no estem a la pàgina 4, hi anem.
-                      // No toquem l'estat de l'acordió: cada pestanya recorda el seu (sessionStorage).
+                      // Mateixa política que el cistell: l'acordió
+                      // recorda el seu estat dins el TTL de 30 min.
                       setMegaPage(4);
                       if (!active) ensureMegaOpen();
                     }
@@ -3427,6 +3452,31 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
                           ))}
                         </div>
 
+                        {/*
+                          Anchor invisible per a la guia belt2 (DEV).
+                          Sempre renderitzat quan la pestanya cistell és
+                          activa, encara que `acordioExpanded` sigui
+                          false (seqüència 3-clics). Si no fos sempre
+                          present, la guia caigui al fallback
+                          `yCarouselTop + 737*scale` que ignora l'alçada
+                          del carrusel i queda ~775px més amunt.
+                        */}
+                        {!acordioExpanded && (
+                          <div
+                            aria-hidden="true"
+                            data-stripe-guide="accordion-pauta"
+                            style={{
+                              position: 'absolute',
+                              top: 'calc(100% + 1px)',
+                              left: 0,
+                              width: '1px',
+                              height: `${737.015 * accordionPautaScale}px`,
+                              pointerEvents: 'none',
+                              opacity: 0,
+                            }}
+                          />
+                        )}
+
                         {/* Contingut de l'acordió - Overlay absolut full-width */}
                         {acordioExpanded && (
                           <div style={{
@@ -3464,7 +3514,11 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
                               overflow: 'hidden',
                             }}>
                               {/* Contingut independent de CISTELL — buit amb pauta */}
-                              <CistellComandaContent cartItems={cartItems} setCartItems={setCartItems} />
+                              <CistellComandaContent
+                                cartItems={cartItems}
+                                setCartItems={setCartItems}
+                                onCloseMegaSlide={() => setActive(null)}
+                              />
                             </div>
                           </div>
                         )}
@@ -3545,6 +3599,23 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
                             </div>
                           ))}
                         </div>
+
+                        {/* Anchor invisible per a la guia belt2 (DEV) — vegeu pàgina cistell. */}
+                        {!acordioExpandedPage4 && (
+                          <div
+                            aria-hidden="true"
+                            data-stripe-guide="accordion-pauta"
+                            style={{
+                              position: 'absolute',
+                              top: 'calc(100% + 1px)',
+                              left: 0,
+                              width: '1px',
+                              height: `${737.015 * accordionPautaScale}px`,
+                              pointerEvents: 'none',
+                              opacity: 0,
+                            }}
+                          />
+                        )}
 
                         {/* Contingut de l'acordió - Overlay absolut full-width */}
                         {acordioExpandedPage4 && (

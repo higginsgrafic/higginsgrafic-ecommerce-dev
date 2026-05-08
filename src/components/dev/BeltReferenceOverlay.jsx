@@ -34,6 +34,7 @@ const EMPTY_STATE = {
   yT: null,
   yB: null,
   yCarouselTop: null,
+  yCarouselBottom: null,
   yFinalizeBottom: null,
   spriteXL: null,
   spriteXR: null,
@@ -58,6 +59,7 @@ const loadInitialState = () => {
           xL: toFiniteOrNull(parsed.xL),
           xR: toFiniteOrNull(parsed.xR),
           yCarouselTop: toFiniteOrNull(parsed.yCarouselTop),
+          yCarouselBottom: toFiniteOrNull(parsed.yCarouselBottom),
           yFinalizeBottom: toFiniteOrNull(parsed.yFinalizeBottom),
           spriteXL: toFiniteOrNull(parsed.spriteXL),
           spriteXR: toFiniteOrNull(parsed.spriteXR),
@@ -77,6 +79,9 @@ const loadInitialState = () => {
       xR: toFiniteOrNull(parsedGlobal?.xR ?? parsedGuides?.xR),
       yCarouselTop: toFiniteOrNull(
         parsedGlobal?.yCarouselTop ?? parsedGuides?.yCarouselTop
+      ),
+      yCarouselBottom: toFiniteOrNull(
+        parsedGlobal?.yCarouselBottom ?? parsedGuides?.yCarouselBottom
       ),
       yFinalizeBottom: toFiniteOrNull(
         parsedGlobal?.yFinalizeBottom ?? parsedGuides?.yFinalizeBottom
@@ -107,6 +112,7 @@ export default function BeltReferenceOverlay({ enabled }) {
           xL: state.xL,
           xR: state.xR,
           yCarouselTop: state.yCarouselTop,
+          yCarouselBottom: state.yCarouselBottom,
           yFinalizeBottom: state.yFinalizeBottom,
           spriteXL: state.spriteXL,
           spriteXR: state.spriteXR,
@@ -119,6 +125,7 @@ export default function BeltReferenceOverlay({ enabled }) {
     state.xL,
     state.xR,
     state.yCarouselTop,
+    state.yCarouselBottom,
     state.yFinalizeBottom,
     state.spriteXL,
     state.spriteXR,
@@ -326,6 +333,13 @@ export default function BeltReferenceOverlay({ enabled }) {
       // rutes, fins i tot quan l'acordió no és visible.
       const accordionPauta = document.querySelector('[data-stripe-guide="accordion-pauta"]');
       const yCarouselTop = resolveY(cartCardTopAnchor, 'top');
+      // Bottom del carrusel: el cart-card ocupa tota l'alçada del
+      // contenidor del carrusel, així que el seu bottom equival al
+      // bottom de la zona del carrusel. El necessitem per al càlcul
+      // derivat del bottom-belt2 quan l'acordió-pauta no és al DOM
+      // (ruta sense slide obert), perquè el bottom de la pauta = bottom
+      // del carrusel + 1px + 737*scale.
+      const yCarouselBottom = resolveY(cartCardTopAnchor, 'bottom');
       const pautaBottomFromDom = resolveY(accordionPauta, 'bottom');
       const finalizeBottomDom = resolveY(finalizeOrderBtn, 'bottom') ?? resolveY(stripeImg, 'bottom');
       const fullWideYTop = resolveY(cartCardTopAnchor, 'top') ?? resolveY(stripeImg, 'top');
@@ -351,15 +365,23 @@ export default function BeltReferenceOverlay({ enabled }) {
         const nextXL = Number.isFinite(xL) ? xL : prev.xL;
         const nextXR = Number.isFinite(xR) ? xR : prev.xR;
         const nextYCarouselTop = Number.isFinite(yCarouselTop) ? yCarouselTop : prev.yCarouselTop;
-        // Belt2 BOTTOM derivat: top + 737.015 * scale, usant els valors
-        // efectius (actuals o persistits) per a top, xL i xR. Així el
-        // marc de referència és visible i correcte a totes les rutes.
+        const nextYCarouselBottom = Number.isFinite(yCarouselBottom) ? yCarouselBottom : prev.yCarouselBottom;
+        // Belt2 BOTTOM derivat: bottom_carrusel + 1px + 737.015 * scale.
+        // El càlcul antic usava `yCarouselTop + 737*scale` que ignorava
+        // l'alçada del carrusel i deixava la guia ~775px massa amunt.
         let derivedPautaBottom = null;
-        if (Number.isFinite(nextYCarouselTop) && Number.isFinite(nextXL) && Number.isFinite(nextXR)) {
+        if (Number.isFinite(nextYCarouselBottom) && Number.isFinite(nextXL) && Number.isFinite(nextXR)) {
           const beltWidth = Math.max(0, nextXR - nextXL);
           const pautaScale = Math.max(0.5, Math.min(1, beltWidth / 1365.46));
-          derivedPautaBottom = Math.round(nextYCarouselTop + 737.015 * pautaScale);
+          derivedPautaBottom = Math.round(nextYCarouselBottom + 1 + 737.015 * pautaScale);
         }
+        // Prioritat:
+        //  1) Mesura DOM directa de `accordion-pauta` (wrapper real o
+        //     anchor invisible quan l'acordió està tancat).
+        //  2) Càlcul derivat `yCarouselBottom + 1 + 737*scale`
+        //     (correcte ara que comptem l'alçada del carrusel).
+        //  3) Fons del botó FINALITZA (DOM).
+        //  4) Valor previ persistit com a últim recurs.
         const nextYFinalizeBottom = pautaBottomFromDom
           ?? derivedPautaBottom
           ?? finalizeBottomDom
@@ -370,6 +392,7 @@ export default function BeltReferenceOverlay({ enabled }) {
           yT: Number.isFinite(yTWithOffset) ? yTWithOffset : prev.yT,
           yB: Number.isFinite(yB) ? yB : prev.yB,
           yCarouselTop: nextYCarouselTop,
+          yCarouselBottom: nextYCarouselBottom,
           yFinalizeBottom: Number.isFinite(nextYFinalizeBottom) ? nextYFinalizeBottom : prev.yFinalizeBottom,
           spriteXL: Number.isFinite(spriteXL) ? spriteXL : prev.spriteXL,
           spriteXR: Number.isFinite(spriteXR) ? spriteXR : prev.spriteXR,
@@ -380,6 +403,7 @@ export default function BeltReferenceOverlay({ enabled }) {
           prev.yT === next.yT &&
           prev.yB === next.yB &&
           prev.yCarouselTop === next.yCarouselTop &&
+          prev.yCarouselBottom === next.yCarouselBottom &&
           prev.yFinalizeBottom === next.yFinalizeBottom &&
           prev.spriteXL === next.spriteXL &&
           prev.spriteXR === next.spriteXR
