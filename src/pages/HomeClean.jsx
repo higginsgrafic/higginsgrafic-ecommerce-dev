@@ -2,6 +2,24 @@ import React from 'react';
 import { Helmet } from 'react-helmet';
 import { Link } from 'react-router-dom';
 
+const COLLECTIONS = [
+  {
+    title: 'First Contact',
+    href: '/first-contact',
+    description: 'Ciència-ficció, primer contacte i imaginari espacial.',
+  },
+  {
+    title: 'The Human Inside',
+    href: '/thin',
+    description: 'Robots, humans artificials i preguntes sobre identitat.',
+  },
+  {
+    title: 'Outcasted',
+    href: '/outcasted',
+    description: 'Personatges fora de lloc, cultura pop i resistència gràfica.',
+  },
+];
+
 function HomeClean() {
   return (
     <>
@@ -51,6 +69,44 @@ function HomeClean() {
                 Gràfica, roba i cultura visual.
               </p>
             </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="border-t border-border bg-background text-foreground">
+        <div className="mx-auto max-w-[1400px] px-4 py-16 sm:px-6 lg:px-10 lg:py-20">
+          <div className="max-w-2xl">
+            <p className="font-roboto text-xs font-semibold uppercase tracking-[0.24em] text-muted-foreground">
+              Col·leccions
+            </p>
+            <h2 className="mt-4 font-roboto text-3xl font-black tracking-tight text-foreground sm:text-4xl">
+              Tres portes d'entrada al catàleg
+            </h2>
+          </div>
+
+          <div className="mt-10 grid gap-4 md:grid-cols-3">
+            {COLLECTIONS.map((collection) => (
+              <Link
+                key={collection.href}
+                to={collection.href}
+                className="group flex min-h-56 flex-col justify-between rounded-[1.5rem] border border-border bg-muted/40 p-6 transition-colors hover:bg-muted"
+              >
+                <div>
+                  <p className="font-roboto text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                    Col·lecció
+                  </p>
+                  <h3 className="mt-4 font-roboto text-2xl font-black tracking-tight text-foreground">
+                    {collection.title}
+                  </h3>
+                  <p className="mt-4 font-roboto text-sm leading-relaxed text-muted-foreground">
+                    {collection.description}
+                  </p>
+                </div>
+                <span className="mt-8 font-roboto text-sm font-semibold text-foreground underline-offset-4 group-hover:underline">
+                  Entrar
+                </span>
+              </Link>
+            ))}
           </div>
         </div>
       </section>
