@@ -1,0 +1,306 @@
+<!doctype html>
+<html lang="ca">
+<head>
+  <meta charset="utf-8" />
+  <title>Mapa de pàgines objectiu mínimes - Higgins Gràfic Ecommerce</title>
+  <style>
+    @page { size: A4; margin: 16mm 14mm; }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      color: #26313d;
+      font-size: 10.5pt;
+      line-height: 1.36;
+      background: #fff;
+    }
+    h1, h2, h3 { font-family: Arial, Helvetica, sans-serif; color: #111827; margin: 0; }
+    h1 { font-size: 21pt; letter-spacing: -0.02em; margin-bottom: 5mm; }
+    h2 { font-size: 14pt; margin: 9mm 0 3mm; padding-bottom: 1.5mm; border-bottom: 1px solid #d9dde3; }
+    h3 { font-size: 11.5pt; margin: 5mm 0 1.5mm; }
+    p { margin: 0 0 2.8mm; }
+    .meta { color: #687385; font-size: 9pt; margin-bottom: 7mm; }
+    .summary {
+      border: 1px solid #d9dde3;
+      background: #f7f8fa;
+      padding: 4mm;
+      border-radius: 3mm;
+      margin-bottom: 6mm;
+    }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 3mm 6mm; }
+    ul { margin: 1.5mm 0 0 4.5mm; padding: 0; }
+    li { margin: 0.9mm 0; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      table-layout: fixed;
+      margin-top: 3mm;
+      font-size: 8.3pt;
+      page-break-inside: auto;
+    }
+    thead { display: table-header-group; }
+    tr { page-break-inside: avoid; page-break-after: auto; }
+    th, td {
+      border: 1px solid #d9dde3;
+      padding: 2mm;
+      vertical-align: top;
+      word-wrap: break-word;
+    }
+    th {
+      background: #eef1f5;
+      color: #111827;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.02em;
+      font-size: 7.5pt;
+    }
+    .tag {
+      display: inline-block;
+      padding: 0.6mm 1.5mm;
+      border-radius: 99px;
+      background: #e8edf5;
+      color: #2f61b2;
+      font-size: 7.6pt;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .p1 { background: #e9f6ee; color: #17663a; }
+    .p2 { background: #fff3df; color: #8a5200; }
+    .p3 { background: #eef1f5; color: #475059; }
+    .small { font-size: 8.8pt; color: #5d6878; }
+    .page-break { page-break-before: always; }
+    .route { font-family: Menlo, Consolas, monospace; font-size: 8.1pt; color: #111827; }
+    .status-ok { color: #17663a; font-weight: 700; }
+    .status-mid { color: #8a5200; font-weight: 700; }
+    .status-miss { color: #9b1c1c; font-weight: 700; }
+  </style>
+</head>
+<body>
+  <h1>Mapa de pàgines objectiu mínimes</h1>
+  <p class="meta">Higgins Gràfic Ecommerce · Document DIN-A4 · Recapitulació de mínims imprescindibles</p>
+
+  <div class="summary">
+    <p><strong>Objectiu:</strong> definir el conjunt mínim de pàgines i funcionalitats que cal tenir tant sí com no per convertir el projecte en una botiga usable, separant-lo de laboratori, admin avançat i superfícies de prova.</p>
+    <p><strong>Criteri:</strong> prioritzar compra, confiança, compte bàsic i operació mínima. Les eines admin/dev queden fora del mapa públic objectiu.</p>
+  </div>
+
+  <h2>1. Nucli imprescindible</h2>
+  <div class="grid">
+    <div>
+      <h3>Compra</h3>
+      <ul>
+        <li>Inici</li>
+        <li>Col·leccions / catàleg</li>
+        <li>Detall de producte</li>
+        <li>Cistell</li>
+        <li>Checkout</li>
+        <li>Confirmació</li>
+        <li>Seguiment</li>
+      </ul>
+    </div>
+    <div>
+      <h3>Confiança i suport</h3>
+      <ul>
+        <li>Compte d’usuari o estat convidat clar</li>
+        <li>Contacte</li>
+        <li>FAQ</li>
+        <li>Enviaments i devolucions</li>
+        <li>Guia de talles</li>
+        <li>Privacitat</li>
+        <li>Termes i condicions</li>
+        <li>404</li>
+      </ul>
+    </div>
+  </div>
+
+  <h2>2. Taula simplificada de pàgines objectiu</h2>
+  <table>
+    <thead>
+      <tr>
+        <th style="width: 13%;">Prioritat</th>
+        <th style="width: 17%;">Pàgina objectiu</th>
+        <th style="width: 19%;">Ruta final</th>
+        <th style="width: 18%;">Estat actual</th>
+        <th style="width: 33%;">Mínim pendent</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="tag p1">P1</span></td>
+        <td>Inici</td>
+        <td class="route">/</td>
+        <td><span class="status-mid">Existeix, a validar</span></td>
+        <td>Hero/entrada clara, col·leccions destacades, header final, footer, responsive, SEO bàsic.</td>
+      </tr>
+      <tr>
+        <td><span class="tag p1">P1</span></td>
+        <td>Col·leccions</td>
+        <td class="route">/collections/:collection</td>
+        <td><span class="status-mid">Existeixen rutes parcials</span></td>
+        <td>Decidir rutes finals, productes reals, imatges, preus, stock, click a producte, responsive.</td>
+      </tr>
+      <tr>
+        <td><span class="tag p1">P1</span></td>
+        <td>Producte</td>
+        <td class="route">/product/:id</td>
+        <td><span class="status-mid">Existeix</span></td>
+        <td>Variant/talla/color, mockups finals, preu, stock, afegir al cistell, guia de talles, SEO.</td>
+      </tr>
+      <tr>
+        <td><span class="tag p1">P1</span></td>
+        <td>Cistell</td>
+        <td class="route">Mega-slide / CISTELL</td>
+        <td><span class="status-mid">Visual avançat</span></td>
+        <td>Ítems reals, quantitats, eliminar, subtotals, total, estat buit, persistència, anar a checkout.</td>
+      </tr>
+      <tr>
+        <td><span class="tag p1">P1</span></td>
+        <td>Checkout</td>
+        <td class="route">/checkout</td>
+        <td><span class="status-mid">Existeix, mock parcial</span></td>
+        <td>Connectar carret real, dades client, enviament, totals, termes, pagament/comanda, errors.</td>
+      </tr>
+      <tr>
+        <td><span class="tag p1">P1</span></td>
+        <td>Confirmació</td>
+        <td class="route">/order-confirmation/:orderId</td>
+        <td><span class="status-mid">Existeix</span></td>
+        <td>Ordre real, resum, pagament, adreça, missatge, email, enllaç a seguiment.</td>
+      </tr>
+      <tr>
+        <td><span class="tag p1">P1</span></td>
+        <td>Seguiment</td>
+        <td class="route">/track</td>
+        <td><span class="status-mid">Existeix</span></td>
+        <td>Consulta segura, estat actual, historial, tracking transportista, errors, privacitat.</td>
+      </tr>
+      <tr>
+        <td><span class="tag p2">P2</span></td>
+        <td>Compte usuari</td>
+        <td class="route">Mega-slide / USUARI</td>
+        <td><span class="status-mid">Visual/mock</span></td>
+        <td>Estat logat/no logat, dades bàsiques, comandes reals, detall de comanda, missatges, logout.</td>
+      </tr>
+      <tr>
+        <td><span class="tag p2">P2</span></td>
+        <td>Login / registre</td>
+        <td class="route">/login o integrat</td>
+        <td><span class="status-miss">No definit públic</span></td>
+        <td>Login, registre, recuperar contrasenya, errors, sessió. Pot esperar si hi ha compra convidada.</td>
+      </tr>
+      <tr>
+        <td><span class="tag p1">P1</span></td>
+        <td>Contacte</td>
+        <td class="route">/contact</td>
+        <td><span class="status-mid">Existeix</span></td>
+        <td>Formulari o dades clares, confirmació, anti-spam, text privacitat.</td>
+      </tr>
+      <tr>
+        <td><span class="tag p1">P1</span></td>
+        <td>FAQ</td>
+        <td class="route">/faq</td>
+        <td><span class="status-mid">Existeix</span></td>
+        <td>Preguntes reals: talles, enviaments, canvis, pagaments, terminis, cura de la peça.</td>
+      </tr>
+      <tr>
+        <td><span class="tag p1">P1</span></td>
+        <td>Enviaments</td>
+        <td class="route">/shipping</td>
+        <td><span class="status-mid">Existeix</span></td>
+        <td>Zones, terminis, costos, transportista, canvis, devolucions, incidències.</td>
+      </tr>
+      <tr>
+        <td><span class="tag p1">P1</span></td>
+        <td>Guia de talles</td>
+        <td class="route">/sizing</td>
+        <td><span class="status-mid">Existeix</span></td>
+        <td>Taula real, com mesurar, fit unisex, enllaç des de producte.</td>
+      </tr>
+      <tr>
+        <td><span class="tag p1">P1</span></td>
+        <td>Privacitat</td>
+        <td class="route">/privacy</td>
+        <td><span class="status-mid">Existeix</span></td>
+        <td>Text legal final, dades recollides, finalitat, tercers, drets usuari, cookies si aplica.</td>
+      </tr>
+      <tr>
+        <td><span class="tag p1">P1</span></td>
+        <td>Termes</td>
+        <td class="route">/terms</td>
+        <td><span class="status-mid">Existeix</span></td>
+        <td>Condicions de compra, pagament, enviament, devolucions, garanties, identificació venedor.</td>
+      </tr>
+      <tr>
+        <td><span class="tag p2">P2</span></td>
+        <td>404</td>
+        <td class="route">*</td>
+        <td><span class="status-mid">Component existeix</span></td>
+        <td>Confirmar ruta comodí, missatge, enllaç a inici/catàleg, layout estable.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="page-break"></div>
+  <h2>3. Decisions clau pendents</h2>
+  <table>
+    <thead>
+      <tr>
+        <th style="width: 23%;">Àrea</th>
+        <th style="width: 39%;">Decisió pendent</th>
+        <th style="width: 38%;">Impacte</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Compra</td>
+        <td>Checkout només a <span class="route">/checkout</span> o també dins l’acordió del cistell.</td>
+        <td>Defineix navegació, duplicació de UI i connexió del carret.</td>
+      </tr>
+      <tr>
+        <td>Catàleg</td>
+        <td>Rutes finals de col·lecció: actuals o esquema unificat.</td>
+        <td>Afecta SEO, menú, breadcrumbs i manteniment.</td>
+      </tr>
+      <tr>
+        <td>Compte</td>
+        <td>Compra convidada abans de login complet, o compte obligatori.</td>
+        <td>Afecta checkout, historial, comandes i privacitat.</td>
+      </tr>
+      <tr>
+        <td>Pagament</td>
+        <td>Stripe, Redsys, transferència o altre procés inicial.</td>
+        <td>Bloqueja confirmació real de comanda i emails.</td>
+      </tr>
+      <tr>
+        <td>Fulfillment</td>
+        <td>Integració Gelato ara o fase posterior.</td>
+        <td>Afecta stock, variants, comandes i operació.</td>
+      </tr>
+      <tr>
+        <td>Laboratori</td>
+        <td>Quines rutes dev/lab s’amaguen abans de producció.</td>
+        <td>Evita confusió, indexació i exposició d’eines internes.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>4. Fora del mínim públic</h2>
+  <p class="small">Aquestes superfícies no són imprescindibles per vendre i convé deixar-les fora del mapa públic objectiu fins que el nucli estigui tancat:</p>
+  <ul class="small">
+    <li><span class="route">/lab/*</span>, <span class="route">/proves/*</span>, <span class="route">/full-wide-slide</span>, <span class="route">/plantilla-cataleg-components</span></li>
+    <li><span class="route">/wishlist</span>, si no es prioritza compte avançat.</li>
+    <li><span class="route">/offers</span>, si no hi ha promocions actives reals.</li>
+    <li><span class="route">/product-gelato/:id</span>, si no és ruta pública final.</li>
+    <li><span class="route">/admin/*</span>, necessari per operar però no com a pàgina pública objectiu.</li>
+  </ul>
+
+  <h2>5. Ordre de treball recomanat</h2>
+  <ol>
+    <li><strong>Delimitar rutes finals:</strong> decidir què queda públic i què s’amaga.</li>
+    <li><strong>Tancar flux de compra:</strong> producte → cistell → checkout → confirmació.</li>
+    <li><strong>Tancar confiança:</strong> contacte, FAQ, enviaments, talles, privacitat i termes.</li>
+    <li><strong>Tancar compte usuari:</strong> comandes, detall, missatges i estat logat/no logat.</li>
+    <li><strong>Netejar laboratori:</strong> protegir o retirar rutes dev abans de producció.</li>
+  </ol>
+</body>
+</html>

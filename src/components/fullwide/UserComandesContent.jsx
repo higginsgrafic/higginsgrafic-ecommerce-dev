@@ -15,6 +15,7 @@ import {
   X,
 } from 'lucide-react';
 import usePersistentState from '@/hooks/usePersistentState';
+import UserLoyaltyShirtProgress from './UserLoyaltyShirtProgress';
 
 // Plantilla de la secció COMANDES del perfil d'usuari — alineada amb la pauta verda
 function UserComandesContent() {
@@ -1237,6 +1238,17 @@ function UserComandesContent() {
         onWheel={handleOrdersWheel}
         style={{ width: '1365.46px', marginLeft: 'auto', marginRight: 'auto', marginTop: '-0.5px', overflow: 'hidden', overscrollBehavior: 'contain', position: 'relative', backgroundImage: 'url("/placeholders/fons_acordio/fons-usuari-comandes.png")', backgroundRepeat: 'no-repeat', backgroundPosition: 'top left', backgroundSize: '1365.46px 100%' }}
       >
+        <div style={{
+          position: 'absolute',
+          top: '38px',
+          right: '42px',
+          width: '244px',
+          height: '444px',
+          zIndex: 2,
+          pointerEvents: 'none',
+        }}>
+          <UserLoyaltyShirtProgress current={4} threshold={10} rewardsAvailable={0} />
+        </div>
         <table className="comandes-table" style={{
           width: '1380.46px',
           marginLeft: '-7.5px',
