@@ -20,6 +20,24 @@ const COLLECTIONS = [
   },
 ];
 
+const SERVICE_LINKS = [
+  {
+    title: 'Producció sota demanda',
+    description: 'Cada peça es produeix quan es compra, amb proveïdors POD reals.',
+    href: '/shipping',
+  },
+  {
+    title: 'Roba unisex',
+    description: 'Una guia de talles clara per triar la peça sense complicacions.',
+    href: '/sizing',
+  },
+  {
+    title: 'Seguiment de comanda',
+    description: 'Consulta l’estat de la compra i el recorregut de l’enviament.',
+    href: '/track',
+  },
+];
+
 function HomeClean() {
   return (
     <>
@@ -107,6 +125,41 @@ function HomeClean() {
                 </span>
               </Link>
             ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="border-t border-border bg-background text-foreground">
+        <div className="mx-auto max-w-[1400px] px-4 py-16 sm:px-6 lg:px-10 lg:py-20">
+          <div className="grid gap-10 lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)]">
+            <div>
+              <p className="font-roboto text-xs font-semibold uppercase tracking-[0.24em] text-muted-foreground">
+                Servei
+              </p>
+              <h2 className="mt-4 font-roboto text-3xl font-black tracking-tight text-foreground sm:text-4xl">
+                Compra directa, producció responsable i informació clara.
+              </h2>
+            </div>
+
+            <div className="grid gap-4">
+              {SERVICE_LINKS.map((item) => (
+                <Link
+                  key={item.href}
+                  to={item.href}
+                  className="group rounded-[1.25rem] border border-border bg-muted/30 p-5 transition-colors hover:bg-muted"
+                >
+                  <h3 className="font-roboto text-lg font-black tracking-tight text-foreground">
+                    {item.title}
+                  </h3>
+                  <p className="mt-2 font-roboto text-sm leading-relaxed text-muted-foreground">
+                    {item.description}
+                  </p>
+                  <span className="mt-4 inline-flex font-roboto text-sm font-semibold text-foreground underline-offset-4 group-hover:underline">
+                    Saber-ne més
+                  </span>
+                </Link>
+              ))}
+            </div>
           </div>
         </div>
       </section>
