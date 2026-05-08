@@ -34,6 +34,7 @@ function UserComandesContent() {
   const [segVisible, setSegVisible] = useState(false);
   const [nameSortDir, setNameSortDir] = usePersistentState('HG_USER_NAME_SORT', 'asc'); // 'asc' | 'desc'
   const [dateSortDir, setDateSortDir] = usePersistentState('HG_USER_DATE_SORT', 'desc'); // 'asc' | 'desc'
+  const [ordersScrollRow, setOrdersScrollRow] = useState(0);
   const toggleSort = (key) => setSortDirs((prev) => ({ ...prev, [key]: prev[key] === 'desc' ? 'asc' : 'desc' }));
   const ORDERS = [
     { num: '#00000000000000000000027', status: 'PENDENT', icon: MoreHorizontal, date: '27-04-26', total: '15,50€', active: true },
@@ -51,6 +52,18 @@ function UserComandesContent() {
     { num: '#00000000000000000000015', status: 'ENTREGADA', icon: Package, date: '23-04-26', total: '15,50€', active: false },
     { num: '#00000000000000000000014', status: 'ENTREGADA', icon: Package, date: '23-04-26', total: '15,50€', active: false },
     { num: '#00000000000000000000013', status: 'ENTREGADA', icon: Package, date: '23-04-26', total: '15,50€', active: false },
+    { num: '#00000000000000000000012', status: 'ENTREGADA', icon: Package, date: '22-04-26', total: '31,00€', active: false },
+    { num: '#00000000000000000000011', status: 'CANCEL·LADA', icon: X, date: '22-04-26', total: '46,50€', active: false },
+    { num: '#00000000000000000000010', status: 'ENTREGADA', icon: Package, date: '21-04-26', total: '15,50€', active: false },
+    { num: '#00000000000000000000009', status: 'ATURADA', icon: AlertCircle, date: '21-04-26', total: '62,00€', active: false },
+    { num: '#00000000000000000000008', status: 'ENTREGADA', icon: Package, date: '20-04-26', total: '15,50€', active: false },
+    { num: '#00000000000000000000007', status: 'ENTREGADA', icon: Package, date: '20-04-26', total: '31,00€', active: false },
+    { num: '#00000000000000000000006', status: 'CANCEL·LADA', icon: X, date: '19-04-26', total: '15,50€', active: false },
+    { num: '#00000000000000000000005', status: 'ENTREGADA', icon: Package, date: '18-04-26', total: '77,50€', active: false },
+    { num: '#00000000000000000000004', status: 'ENTREGADA', icon: Package, date: '17-04-26', total: '15,50€', active: false },
+    { num: '#00000000000000000000003', status: 'ENTREGADA', icon: Package, date: '16-04-26', total: '31,00€', active: false },
+    { num: '#00000000000000000000002', status: 'CANCEL·LADA', icon: X, date: '15-04-26', total: '15,50€', active: false },
+    { num: '#00000000000000000000001', status: 'ENTREGADA', icon: Package, date: '14-04-26', total: '46,50€', active: false },
   ];
 
   const LEGEND = [
@@ -83,6 +96,18 @@ function UserComandesContent() {
   const GUTTER = '7.5px';
   // Les 1.5 primeres línies de la pauta són espai en blanc (tabs a la posició original)
   const TOP_OFFSET = 1.5 * ROW_H;
+  const VISIBLE_ORDER_ROWS = 14;
+  const visibleOrders = ORDERS.slice(ordersScrollRow, ordersScrollRow + VISIBLE_ORDER_ROWS);
+  const maxOrdersScrollRow = Math.max(0, ORDERS.length - VISIBLE_ORDER_ROWS);
+  const handleOrdersWheel = (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    const direction = event.deltaY > 0 ? 1 : -1;
+    setOrdersScrollRow((currentRow) => Math.min(
+      maxOrdersScrollRow,
+      Math.max(0, currentRow + direction)
+    ));
+  };
 
   return (
     <div style={{
@@ -1208,7 +1233,10 @@ function UserComandesContent() {
         }
         .comandes-table th > *, .comandes-table td > * { min-width: 0; max-width: 100%; }
       `}</style>
-      <div style={{ width: '1365.46px', marginLeft: 'auto', marginRight: 'auto', marginTop: '-0.5px', overflow: 'hidden', position: 'relative', backgroundImage: 'url("/placeholders/fons_acordio/fons-usuari-comandes.png")', backgroundRepeat: 'no-repeat', backgroundPosition: 'top left', backgroundSize: '1365.46px 100%' }}>
+      <div
+        onWheel={handleOrdersWheel}
+        style={{ width: '1365.46px', marginLeft: 'auto', marginRight: 'auto', marginTop: '-0.5px', overflow: 'hidden', overscrollBehavior: 'contain', position: 'relative', backgroundImage: 'url("/placeholders/fons_acordio/fons-usuari-comandes.png")', backgroundRepeat: 'no-repeat', backgroundPosition: 'top left', backgroundSize: '1365.46px 100%' }}
+      >
         <table className="comandes-table" style={{
           width: '1380.46px',
           marginLeft: '-7.5px',
@@ -1264,10 +1292,10 @@ function UserComandesContent() {
           </tr>
         </thead>
         <tbody>
-          {ORDERS.map((o, idx) => {
+          {visibleOrders.map((o, idx) => {
             const Icon = o.icon;
             const isStruck = o.status === 'CANCEL·LADA' || o.status === 'ATURADA';
-            const opacity = o.active ? 1 : (isStruck ? 0.7 : 0.35);
+            const opacity = o.status === 'ENTREGADA' ? 0.5 : 1;
             const rowColor = o.active ? '#2F61B2' : '#99A3B5';
             return (
               <React.Fragment key={idx}>

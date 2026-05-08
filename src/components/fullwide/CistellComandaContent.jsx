@@ -296,7 +296,7 @@ function CistellComandaContent({ cartItems, setCartItems, onCloseMegaSlide }) {
         left: 0,
         right: 0,
         height: '1px',
-        background: 'rgba(71, 80, 89, 0.18)',
+        background: '#DEDFE1',
         pointerEvents: 'none',
         zIndex: 3,
       }} />
@@ -306,7 +306,7 @@ function CistellComandaContent({ cartItems, setCartItems, onCloseMegaSlide }) {
         right: 0,
         bottom: 0,
         height: '1px',
-        background: 'rgba(71, 80, 89, 0.18)',
+        background: '#DEDFE1',
         pointerEvents: 'none',
         zIndex: 3,
       }} />
@@ -343,7 +343,7 @@ function CistellComandaContent({ cartItems, setCartItems, onCloseMegaSlide }) {
                     height: `${ROW_H - V_GUTTER}px`,
                     padding: 0,
                     boxSizing: 'border-box',
-                    backgroundColor: 'rgba(208, 75, 75, 0.08)',
+                    backgroundColor: 'rgba(222, 223, 225, 0.35)',
                   }} />
                 ))}
               </tr>
@@ -381,9 +381,9 @@ function CistellComandaContent({ cartItems, setCartItems, onCloseMegaSlide }) {
                 top: 0,
                 width: `${colWidths[idx]}px`,
                 height: '100%',
-                border: '1px dashed #D04B4B',
+                border: '1px dashed #DEDFE1',
                 boxSizing: 'border-box',
-                backgroundColor: 'rgba(208, 75, 75, 0.06)',
+                backgroundColor: 'rgba(222, 223, 225, 0.25)',
               }} />
             ))}
           </div>

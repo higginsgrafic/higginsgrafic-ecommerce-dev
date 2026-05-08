@@ -2776,15 +2776,8 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
                       setActive(null);
                     }
                   } else {
-                    // Entrada a la pestanya del cistell: NO reiniciem
-                    // `acordioExpanded` perquè, dins el TTL de 30
-                    // minuts (sessionStorage), volem que l'acordió
-                    // recordi el seu darrer estat quan l'usuari canvia
-                    // de pestanya (cistell ↔ compte) o tanca i torna a
-                    // obrir el mega-slide. Si és la primera obertura
-                    // (o si han passat >30'), el valor inicial és
-                    // false i la seqüència de 3 clics arrenca neta.
                     setMegaPage(3);
+                    setAcordioExpanded(false);
                     if (!active) ensureMegaOpen();
                   }
                   touchMegaPublicActivity();
@@ -2840,9 +2833,8 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
                         setActive(null);
                       }
                     } else {
-                      // Mateixa política que el cistell: l'acordió
-                      // recorda el seu estat dins el TTL de 30 min.
                       setMegaPage(4);
+                      setAcordioExpandedPage4(false);
                       if (!active) ensureMegaOpen();
                     }
                     touchMegaPublicActivity();
@@ -3064,7 +3056,7 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
                           left: 0,
                           width: '2px',
                           height: '100%',
-                          background: 'rgba(255, 0, 0, 0.9)',
+                          background: '#DEDFE1',
                           pointerEvents: 'none',
                           zIndex: 90,
                         }} />
@@ -3075,7 +3067,7 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
                           right: 0,
                           width: '2px',
                           height: '100%',
-                          background: 'rgba(255, 0, 0, 0.9)',
+                          background: '#DEDFE1',
                           pointerEvents: 'none',
                           zIndex: 90,
                         }} />
