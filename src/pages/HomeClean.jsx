@@ -91,7 +91,7 @@ function HomeClean() {
       </Helmet>
 
       <section className="bg-background text-foreground">
-        <div className="mx-auto max-w-[1400px] px-4 pb-12 pt-20 sm:px-6 lg:px-10 lg:pb-16 lg:pt-24">
+        <div className="mx-auto max-w-[1400px] px-4 pb-12 pt-8 sm:px-6 lg:px-10 lg:pb-16 lg:pt-10">
           <p className="font-roboto text-xs font-semibold uppercase tracking-[0.24em] text-muted-foreground">
             Inici / Col·leccions pròpies / POD
           </p>
