@@ -32,7 +32,7 @@ function ProductCard({ product, onAddToCart, cartItems = [], variant = 'default'
   const cardImage = product.image || product.images?.[0] || variantImage || '/placeholder-product.svg';
 
   const availableSizes = (() => {
-    const canonicalOrder = ['S', 'M', 'L', 'XL'];
+    const canonicalOrder = ['S', 'M', 'L', 'XL', 'XXL'];
 
     const sortSizes = (sizes) => {
       const uniq = [...new Set((sizes || []).filter(Boolean))];
@@ -81,10 +81,10 @@ function ProductCard({ product, onAddToCart, cartItems = [], variant = 'default'
       padding: '0px',
       cardShadow: '4px 4px 12px rgba(0, 0, 0, 0.12)',
       imageShadow: '4px 4px 8px rgba(0, 0, 0, 0.1)',
-      titleSize: 'clamp(1.125rem, 2.4vw, 1.5rem)',
-      descSize: 'clamp(1rem, 2vw, 1.25rem)',
-      gap: 'clamp(0.75rem, 1.6vw, 1rem)',
-      marginBottom: 'clamp(1rem, 2.4vw, 1.5rem)',
+      titleSize: 'clamp(1.875rem, 4.2vw, 2.5rem)',
+      descSize: 'clamp(1.5rem, 3.9vw, 2rem)',
+      gap: 'clamp(1rem, 2vw, 1.25rem)',
+      marginBottom: 'clamp(0.5rem, 1.2vw, 0.75rem)',
       showDescription: true,
       showSizes: true
     },
@@ -195,7 +195,7 @@ function ProductCard({ product, onAddToCart, cartItems = [], variant = 'default'
       {/* Imatge amb ombra a 45º només en hover */}
       <Link to={productUrl} className="relative z-20 block group" style={{ marginBottom: styles.marginBottom }}>
         <div
-          className="aspect-square bg-background overflow-hidden rounded-sm transition-shadow duration-300"
+          className="aspect-[4/3] bg-background overflow-hidden rounded-sm transition-shadow duration-300"
           style={{
             boxShadow: 'none'
           }}
@@ -209,7 +209,7 @@ function ProductCard({ product, onAddToCart, cartItems = [], variant = 'default'
           <img
             src={cardImage}
             alt={productName}
-            className="w-full h-full object-cover transition-transform group-hover:scale-105 duration-300"
+            className="w-full h-full object-contain transition-transform group-hover:scale-105 duration-300"
             loading="lazy"
             decoding="async"
           />
@@ -224,7 +224,7 @@ function ProductCard({ product, onAddToCart, cartItems = [], variant = 'default'
             className="font-oswald font-medium uppercase hover:opacity-70 transition-opacity text-foreground leading-tight tracking-tight"
             style={{
               fontSize: styles.titleSize,
-              transform: 'translateY(-10px)',
+              transform: 'translateY(-4px)',
               whiteSpace: 'nowrap',
               overflow: 'hidden'
             }}
@@ -254,25 +254,25 @@ function ProductCard({ product, onAddToCart, cartItems = [], variant = 'default'
               }}
             >
               <div className="flex justify-center" style={{ marginLeft: '-5px' }}>
-                <span className="font-oswald font-medium text-foreground" style={{ fontSize: 'clamp(1.25rem, 3vw, 1.40625rem)', whiteSpace: 'nowrap' }}>
+                <span className="font-oswald font-medium text-foreground" style={{ fontSize: 'clamp(2.25rem, 5vw, 3.125rem)', whiteSpace: 'nowrap' }}>
                   {priceLabel}
                 </span>
               </div>
               <div></div>
               <div className="flex justify-center" style={{ marginLeft: '21px', transform: 'translateY(-2px)' }}>
-                <CartIcon count={productQuantityInCart} onClick={handleAddToCart} />
+                <CartIcon count={productQuantityInCart} onClick={handleAddToCart} iconSize="clamp(2.25rem, 5vw, 2.75rem)" />
               </div>
             </div>
 
             {/* FILA 2: Grid de botons de talla */}
             <div
-              className="grid grid-cols-4"
+              className="grid grid-cols-5"
               style={{
                 gap: 'clamp(0.25rem, 0.8vw, 0.5rem)',
                 ...(isSectionEnabled('productCard') ? getDebugStyle('productCard', 'row2') : {})
               }}
             >
-              {availableSizes.slice(0, 4).map((size) => (
+              {availableSizes.slice(0, 5).map((size) => (
                 <SizeButton
                   key={size}
                   size={size}
@@ -288,18 +288,18 @@ function ProductCard({ product, onAddToCart, cartItems = [], variant = 'default'
           </div>
         ) : (
           <div className="flex items-center justify-between">
-            <span className="font-oswald font-medium text-foreground" style={{ fontSize: 'clamp(1.25rem, 3vw, 1.40625rem)', whiteSpace: 'nowrap' }}>
+            <span className="font-oswald font-medium text-foreground" style={{ fontSize: 'clamp(2.25rem, 5vw, 3.125rem)', whiteSpace: 'nowrap' }}>
               {priceLabel}
             </span>
-            <CartIcon count={productQuantityInCart} onClick={handleAddToCart} />
+            <CartIcon count={productQuantityInCart} onClick={handleAddToCart} iconSize="clamp(2.25rem, 5vw, 2.75rem)" />
           </div>
         )}
 
         {/* Descripció del producte - ROBOTO LIGHT - 3 LÍNIES FIXES - ALINEADA A L'ESQUERRA */}
         {styles.showDescription && (
-          <div style={{ minHeight: 'clamp(4.5rem, 9vw, 5.25rem)' }}>
+          <div style={{ minHeight: 'clamp(4.85rem, 10vw, 6rem)' }}>
             <p
-              className="font-roboto font-light text-muted-foreground leading-snug text-left"
+              className="font-roboto font-light text-muted-foreground leading-none text-left"
               style={{
                 fontSize: styles.descSize,
                 display: '-webkit-box',
