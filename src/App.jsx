@@ -57,6 +57,7 @@ const SizeGuidePage = lazy(() => import('@/pages/SizeGuidePage'));
 const PrivacyPage = lazy(() => import('@/pages/PrivacyPage'));
 const TermsPage = lazy(() => import('@/pages/TermsPage'));
 const CreativeCommonsPage = lazy(() => import('@/pages/CreativeCommonsPage'));
+const TdpPage = lazy(() => import('@/pages/TdpPage'));
 
 // Outcasted now uses the config-driven CollectionPage
 
@@ -3138,6 +3139,7 @@ function App() {
                 <Route path="/terms" element={<TermsPage />} />
                 <Route path="/cc" element={<CreativeCommonsPage />} />
                 <Route path="/offers" element={<OffersPage />} />
+                <Route path="/tdp" element={<TdpPage />} />
 
                 <Route path="/new" element={<NewPage />} />
                 <Route path="/dev-links" element={<Navigate to="/proves/dev-links" replace />} />
