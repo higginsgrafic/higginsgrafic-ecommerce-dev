@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import CartIcon from './ui/CartIcon';
 import SizeButtonGroup from './ui/SizeButtonGroup';
+import SizeButton from './ui/SizeButton';
 import { useGridDebug } from '@/contexts/GridDebugContext';
 import { formatPrice } from '@/utils/formatters';
 
@@ -31,7 +32,7 @@ function ProductCard({ product, onAddToCart, cartItems = [], variant = 'default'
   const cardImage = product.image || product.images?.[0] || variantImage || '/placeholder-product.svg';
 
   const availableSizes = (() => {
-    const canonicalOrder = ['S', 'M', 'L', 'XL', 'XXL'];
+    const canonicalOrder = ['S', 'M', 'L', 'XL'];
 
     const sortSizes = (sizes) => {
       const uniq = [...new Set((sizes || []).filter(Boolean))];
@@ -60,7 +61,6 @@ function ProductCard({ product, onAddToCart, cartItems = [], variant = 'default'
   })();
 
   const showSizeButtons = availableSizes.length > 1 || (availableSizes[0] && availableSizes[0] !== 'UNI');
-  const displaySizes = showSizeButtons ? availableSizes.slice(0, 5) : [];
 
   // Calcular quantitat total d'aquest producte al cistell
   const productQuantityInCart = cartItems
@@ -188,21 +188,28 @@ function ProductCard({ product, onAddToCart, cartItems = [], variant = 'default'
   // Variants vertical (default, compact, expanded, featured)
   return (
     <div
-      className="flex flex-col w-full rounded-none transition-all duration-300 relative bg-white px-5 pb-6 pt-4 sm:px-6 sm:pb-7 sm:pt-5"
-      style={{
-        ...(isSectionEnabled('productCard') ? getDebugStyle('productCard', 'main') : {})
-      }}
+      className="flex flex-col w-full rounded-sm transition-all duration-300 relative bg-background"
+      style={{ padding: styles.padding }}
     >
       <Link to={productUrl} aria-label={productName} className="absolute inset-0 z-10" />
       {/* Imatge amb ombra a 45º només en hover */}
-      <Link to={productUrl} className="relative z-20 block group mb-4 sm:mb-5">
+      <Link to={productUrl} className="relative z-20 block group" style={{ marginBottom: styles.marginBottom }}>
         <div
-          className="aspect-[4/3] bg-white overflow-hidden rounded-none transition-transform duration-300"
+          className="aspect-square bg-background overflow-hidden rounded-sm transition-shadow duration-300"
+          style={{
+            boxShadow: 'none'
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.boxShadow = styles.imageShadow;
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.boxShadow = 'none';
+          }}
         >
           <img
             src={cardImage}
             alt={productName}
-            className="w-full h-full object-contain transition-transform group-hover:scale-[1.02] duration-300"
+            className="w-full h-full object-cover transition-transform group-hover:scale-105 duration-300"
             loading="lazy"
             decoding="async"
           />
@@ -210,13 +217,14 @@ function ProductCard({ product, onAddToCart, cartItems = [], variant = 'default'
       </Link>
 
       {/* Contingut */}
-      <div className="relative z-20 flex flex-col">
+      <div className="relative z-20 flex flex-col text-center" style={{ gap: styles.gap }}>
         {/* Nom del producte - OSWALD Responsive CENTRAT - 1 LÍNIA FIXA */}
         <Link to={productUrl} className="block">
           <h3
-            className="font-oswald font-bold uppercase hover:opacity-70 transition-opacity text-foreground leading-none tracking-tight text-center"
+            className="font-oswald font-medium uppercase hover:opacity-70 transition-opacity text-foreground leading-tight tracking-tight"
             style={{
-              fontSize: 'clamp(1.875rem, 5vw, 2.5rem)',
+              fontSize: styles.titleSize,
+              transform: 'translateY(-10px)',
               whiteSpace: 'nowrap',
               overflow: 'hidden'
             }}
@@ -225,13 +233,75 @@ function ProductCard({ product, onAddToCart, cartItems = [], variant = 'default'
           </h3>
         </Link>
 
+        {/* GRID: Cistell + Botons (estructura simple i ajustable) */}
+        {styles.showSizes && showSizeButtons ? (
+          <div
+            className="grid grid-rows-2"
+            style={{
+              gap: 'clamp(0.25rem, 0.8vw, 0.5rem)',
+              marginLeft: 'calc(-1 * clamp(0.75rem, 2vw, 1rem))',
+              marginRight: 'calc(-1 * clamp(0.75rem, 2vw, 1rem))',
+              ...(isSectionEnabled('productCard') ? getDebugStyle('productCard', 'main') : {})
+            }}
+          >
+            {/* FILA 1: Preu i Cistell - Grid 3 columnes */}
+            <div
+              className="grid items-center"
+              style={{
+                gridTemplateColumns: '1fr 1fr 1fr',
+                gap: 'clamp(0.25rem, 0.8vw, 0.5rem)',
+                ...(isSectionEnabled('productCard') ? getDebugStyle('productCard', 'row1') : {})
+              }}
+            >
+              <div className="flex justify-center" style={{ marginLeft: '-5px' }}>
+                <span className="font-oswald font-medium text-foreground" style={{ fontSize: 'clamp(1.25rem, 3vw, 1.40625rem)', whiteSpace: 'nowrap' }}>
+                  {priceLabel}
+                </span>
+              </div>
+              <div></div>
+              <div className="flex justify-center" style={{ marginLeft: '21px', transform: 'translateY(-2px)' }}>
+                <CartIcon count={productQuantityInCart} onClick={handleAddToCart} />
+              </div>
+            </div>
+
+            {/* FILA 2: Grid de botons de talla */}
+            <div
+              className="grid grid-cols-4"
+              style={{
+                gap: 'clamp(0.25rem, 0.8vw, 0.5rem)',
+                ...(isSectionEnabled('productCard') ? getDebugStyle('productCard', 'row2') : {})
+              }}
+            >
+              {availableSizes.slice(0, 4).map((size) => (
+                <SizeButton
+                  key={size}
+                  size={size}
+                  selected={selectedSize === size}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    setSelectedSize(size);
+                  }}
+                />
+              ))}
+            </div>
+          </div>
+        ) : (
+          <div className="flex items-center justify-between">
+            <span className="font-oswald font-medium text-foreground" style={{ fontSize: 'clamp(1.25rem, 3vw, 1.40625rem)', whiteSpace: 'nowrap' }}>
+              {priceLabel}
+            </span>
+            <CartIcon count={productQuantityInCart} onClick={handleAddToCart} />
+          </div>
+        )}
+
         {/* Descripció del producte - ROBOTO LIGHT - 3 LÍNIES FIXES - ALINEADA A L'ESQUERRA */}
         {styles.showDescription && (
-          <div className="mt-3 min-h-[4.35rem] sm:min-h-[4.85rem]">
+          <div style={{ minHeight: 'clamp(4.5rem, 9vw, 5.25rem)' }}>
             <p
-              className="font-roboto font-normal text-foreground leading-[0.95] text-left"
+              className="font-roboto font-light text-muted-foreground leading-snug text-left"
               style={{
-                fontSize: 'clamp(1.5rem, 4.6vw, 2rem)',
+                fontSize: styles.descSize,
                 display: '-webkit-box',
                 WebkitLineClamp: 3,
                 WebkitBoxOrient: 'vertical',
@@ -240,71 +310,6 @@ function ProductCard({ product, onAddToCart, cartItems = [], variant = 'default'
             >
               {descriptionText}
             </p>
-          </div>
-        )}
-
-        {/* GRID: Cistell + Botons (estructura simple i ajustable) */}
-        {styles.showSizes && showSizeButtons ? (
-          <div className="mt-5 flex flex-col gap-5 sm:mt-6">
-            {/* FILA 1: Preu i Cistell - Grid 3 columnes */}
-            <div
-              className="flex items-center justify-between"
-              style={isSectionEnabled('productCard') ? getDebugStyle('productCard', 'row1') : {}}
-            >
-              <div className="flex justify-start">
-                <span className="font-oswald font-medium text-foreground leading-none" style={{ fontSize: 'clamp(2.25rem, 6vw, 3.125rem)', whiteSpace: 'nowrap' }}>
-                  {priceLabel}
-                </span>
-              </div>
-              <div className="flex justify-end">
-                <CartIcon
-                  count={productQuantityInCart}
-                  onClick={handleAddToCart}
-                  iconSize="clamp(2.25rem, 5vw, 2.75rem)"
-                  className="hover:bg-transparent"
-                />
-              </div>
-            </div>
-
-            {/* FILA 2: Grid de botons de talla */}
-            <div
-              className="grid"
-              style={{
-                gridTemplateColumns: `repeat(${displaySizes.length}, minmax(0, 1fr))`,
-                gap: 'clamp(0.35rem, 0.9vw, 0.5rem)',
-                ...(isSectionEnabled('productCard') ? getDebugStyle('productCard', 'row2') : {})
-              }}
-            >
-              {displaySizes.map((size) => (
-                <button
-                  key={size}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    setSelectedSize(size);
-                  }}
-                  className={`flex aspect-[13/6.4] items-center justify-center rounded-md font-oswald text-[clamp(1.5rem,4vw,2.125rem)] font-normal leading-none transition-all duration-200 active:scale-95 ${
-                    selectedSize === size
-                      ? 'bg-foreground text-whiteStrong'
-                      : 'bg-muted text-foreground hover:bg-muted/70'
-                  }`}
-                >
-                  {size}
-                </button>
-              ))}
-            </div>
-          </div>
-        ) : (
-          <div className="mt-5 flex items-center justify-between sm:mt-6">
-            <span className="font-oswald font-medium text-foreground leading-none" style={{ fontSize: 'clamp(2.25rem, 6vw, 3.125rem)', whiteSpace: 'nowrap' }}>
-              {priceLabel}
-            </span>
-            <CartIcon
-              count={productQuantityInCart}
-              onClick={handleAddToCart}
-              iconSize="clamp(2.25rem, 5vw, 2.75rem)"
-              className="hover:bg-transparent"
-            />
           </div>
         )}
       </div>
