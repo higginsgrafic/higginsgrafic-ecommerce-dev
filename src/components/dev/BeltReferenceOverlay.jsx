@@ -417,6 +417,8 @@ export default function BeltReferenceOverlay({ enabled }) {
     // Mesurament inicial + reintents per als anchors que es renderitzen tard
     // (lazy chunks, fonts, imatges).
     read();
+    const r1 = window.requestAnimationFrame(read);
+    const r2 = window.requestAnimationFrame(() => window.requestAnimationFrame(read));
     const t1 = window.setTimeout(read, 50);
     const t2 = window.setTimeout(read, 250);
     const t3 = window.setTimeout(read, 750);
@@ -448,12 +450,14 @@ export default function BeltReferenceOverlay({ enabled }) {
       window.clearTimeout(t1);
       window.clearTimeout(t2);
       window.clearTimeout(t3);
+      window.cancelAnimationFrame(r1);
+      window.cancelAnimationFrame(r2);
       if (raf) cancelAnimationFrame(raf);
       window.removeEventListener('resize', schedule);
       window.removeEventListener('scroll', onScroll, { capture: true });
       if (ro) ro.disconnect();
     };
-  }, [enabled]);
+  }, [enabled, location.pathname]);
 
   if (!enabled) return null;
   const color = 'rgba(22, 163, 74, 0.85)';
