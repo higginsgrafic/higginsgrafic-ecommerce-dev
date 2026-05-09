@@ -5,10 +5,10 @@ import ProductCard from '@/components/ProductCard';
 const tdpProduct = {
   id: 'tdp-demo',
   slug: 'tdp-demo',
-  name: 'Pemberley',
-  description: 'Targeta de producte de prova per ajustar proporcions, imatge, text, preu, cistell i talles.',
+  name: 'NCC-1701',
+  description: 'Lo que per la sua gran saviesa e lo seu alt. De discreció; e per ço ab lo. E la seua felicitat no pot ésser atesa.',
   price: 15.5,
-  image: '/custom_logos/drawings/images_stripe/austen/pemberley_house/multi/pemberley-house-multi-light-stripe.webp',
+  image: '/placeholders/apparel/t-shirt/gildan_64000l/white.png',
   collection: 'tdp',
   variants: [
     { size: 'S' },
