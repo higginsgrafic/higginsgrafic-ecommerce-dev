@@ -92,9 +92,25 @@ function HomeClean() {
 
       <section className="bg-background text-foreground">
         <div className="mx-auto max-w-[1400px] px-4 pb-12 pt-8 sm:px-6 lg:px-10 lg:pb-16 lg:pt-10">
-          <p className="font-roboto text-xs font-semibold uppercase tracking-[0.24em] text-muted-foreground">
-            Inici / Col·leccions pròpies / POD
-          </p>
+          <nav>
+            <ol className="flex items-center space-x-2 font-roboto text-sm uppercase text-foreground">
+              <li>
+                <Link to="/" className="text-foreground transition-colors hover:text-muted-foreground">
+                  Inici
+                </Link>
+              </li>
+              <li className="text-muted-foreground">›</li>
+              <li>
+                <Link to="/first-contact" className="text-foreground transition-colors hover:text-muted-foreground">
+                  Col·leccions
+                </Link>
+              </li>
+              <li className="text-muted-foreground">›</li>
+              <li className="font-medium text-foreground">
+                POD
+              </li>
+            </ol>
+          </nav>
           <h1 className="mt-6 max-w-4xl font-roboto text-5xl font-black tracking-tight text-foreground sm:text-6xl lg:text-7xl">
             HIGGINS GRÀFIC
           </h1>
