@@ -6,17 +6,20 @@ const COLLECTIONS = [
   {
     title: 'First Contact',
     href: '/first-contact',
-    description: 'Ciència-ficció, primer contacte i imaginari espacial.',
+    eyebrow: 'Ciència-ficció',
+    description: 'Una celebració de la curiositat humana, l’exploració i les grans preguntes que miren cap a les estrelles.',
   },
   {
     title: 'The Human Inside',
     href: '/thin',
-    description: 'Robots, humans artificials i preguntes sobre identitat.',
+    eyebrow: 'Identitat artificial',
+    description: 'Robots, humans artificials i personatges que posen en dubte on comença i on acaba allò humà.',
   },
   {
     title: 'Outcasted',
     href: '/outcasted',
-    description: 'Personatges fora de lloc, cultura pop i resistència gràfica.',
+    eyebrow: 'Independència',
+    description: 'Un homenatge a qui tria el seu propi camí, encara que això signifiqui caminar fora del centre.',
   },
 ];
 
@@ -36,6 +39,13 @@ const SERVICE_LINKS = [
     description: 'Consulta l’estat de la compra i el recorregut de l’enviament.',
     href: '/track',
   },
+];
+
+const HOME_VALUES = [
+  'Col·leccions pròpies',
+  'Roba unisex',
+  'Producció sota demanda',
+  'Seguiment de comanda',
 ];
 
 function HomeClean() {
@@ -61,6 +71,16 @@ function HomeClean() {
             <p className="mt-6 max-w-2xl font-roboto text-base leading-relaxed text-muted-foreground sm:text-lg">
               HIGGINS GRÀFIC crea col·leccions pròpies de roba unisex, produïdes sota demanda amb proveïdors POD reals.
             </p>
+            <div className="mt-6 flex flex-wrap gap-2">
+              {HOME_VALUES.map((value) => (
+                <span
+                  key={value}
+                  className="rounded-full border border-border px-3 py-1 font-roboto text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground"
+                >
+                  {value}
+                </span>
+              ))}
+            </div>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <Link
                 to="/first-contact"
@@ -111,7 +131,7 @@ function HomeClean() {
               >
                 <div>
                   <p className="font-roboto text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-                    Col·lecció
+                    {collection.eyebrow}
                   </p>
                   <h3 className="mt-4 font-roboto text-2xl font-black tracking-tight text-foreground">
                     {collection.title}
