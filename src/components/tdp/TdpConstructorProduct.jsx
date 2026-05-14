@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import EditableTextBox from '@/components/dev/EditableTextBox';
 
-export const TDP_TEXT_PRESET_VERSION = 'tdp-layout-2026-05-14-0516';
+const TDP_TEXT_PRESET_VERSION = 'tdp-layout-2026-05-14-0516';
 
-export const TDP_PRODUCT_NAME_SETTINGS = {
+const TDP_PRODUCT_NAME_SETTINGS = {
   x: 0,
   y: 0,
   fontFamily: 'Oswald',
@@ -18,7 +18,7 @@ export const TDP_PRODUCT_NAME_SETTINGS = {
   textTransform: 'uppercase',
 };
 
-export const TDP_PRODUCT_DESCRIPTION_SETTINGS = {
+const TDP_PRODUCT_DESCRIPTION_SETTINGS = {
   x: 0,
   y: 20,
   fontFamily: 'Roboto',
@@ -33,7 +33,7 @@ export const TDP_PRODUCT_DESCRIPTION_SETTINGS = {
   textTransform: 'none',
 };
 
-export const TDP_PRICE_SETTINGS = {
+const TDP_PRICE_SETTINGS = {
   x: 0,
   y: 0,
   fontFamily: 'Oswald',
@@ -48,7 +48,7 @@ export const TDP_PRICE_SETTINGS = {
   textTransform: 'none',
 };
 
-export const TDP_SIZE_BUTTON_TEXT_SETTINGS = {
+const TDP_SIZE_BUTTON_TEXT_SETTINGS = {
   x: 0,
   y: 0,
   fontFamily: 'Oswald',
