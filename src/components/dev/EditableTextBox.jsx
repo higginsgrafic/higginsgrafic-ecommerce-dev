@@ -84,10 +84,12 @@ function EditableTextBox({
   renderText = true,
   renderHandle = false,
   onSettingsChange,
+  presetVersion,
 }) {
   const storedState = useMemo(() => readStoredState(id), [id]);
+  const storedStateMatchesPreset = !presetVersion || storedState?.presetVersion === presetVersion;
   const [selected, setSelected] = useState(false);
-  const [text, setText] = useState(storedState?.text ?? initialText ?? '');
+  const [text, setText] = useState(storedStateMatchesPreset ? storedState?.text ?? initialText ?? '' : initialText ?? '');
   const singleTextRef = useRef(null);
   const lineRefs = useRef([]);
   const [settings, setSettings] = useState({
@@ -104,7 +106,7 @@ function EditableTextBox({
     color: '#475059',
     textTransform: 'none',
     ...initialSettings,
-    ...storedState?.settings,
+    ...(storedStateMatchesPreset ? storedState?.settings : null),
   });
 
   const lines = useMemo(() => {
@@ -131,7 +133,7 @@ function EditableTextBox({
   };
 
   useEffect(() => {
-    writeStoredState(id, { text, settings });
+    writeStoredState(id, { text, settings, presetVersion });
     onSettingsChange?.(settings);
   }, [id, settings, text]);
 
