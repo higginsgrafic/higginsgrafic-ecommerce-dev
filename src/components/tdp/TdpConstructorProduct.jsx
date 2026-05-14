@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import EditableTextBox from '@/components/dev/EditableTextBox';
 
-export const TDP_TEXT_PRESET_VERSION = 'tdp-layout-2026-05-14-0426';
+export const TDP_TEXT_PRESET_VERSION = 'tdp-layout-2026-05-14-0448';
 
 export const TDP_PRODUCT_NAME_SETTINGS = {
   x: 0,
@@ -25,7 +25,7 @@ export const TDP_PRODUCT_DESCRIPTION_SETTINGS = {
   fontSize: 34,
   fontWeight: 300,
   selectedFontWeight: 700,
-  letterSpacing: -0.03,
+  letterSpacing: 0.01,
   lineHeight: 1.15,
   textAlign: 'left',
   verticalAlign: 'center',
