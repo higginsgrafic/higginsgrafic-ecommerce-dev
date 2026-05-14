@@ -82,8 +82,8 @@ const UserSidebar = ({ isOpen, onClose }) => {
     name: texts.header.navigation.cube,
     href: '/cube'
   }, {
-    name: texts.header.navigation.outcasted,
-    href: '/outcasted'
+    name: texts.header.navigation.miscellania,
+    href: '/miscellania'
   }];
 
   if (!isOpen) return null;

@@ -77,7 +77,7 @@ export const mockProductsNegra = [
     "description": "Contempla el món des de fora i descobreix noves perspectives que només la distància atorga.",
     "price": 15.50,
     "image": "/tshirt-white.jpg",
-    "collection": "outcasted"
+    "collection": "miscellania"
   },
   {
     "id": 10,
@@ -85,7 +85,7 @@ export const mockProductsNegra = [
     "description": "La bellesa del llenguatge digital revela patrons ocults que connecten tota la realitat.",
     "price": 15.50,
     "image": "/tshirt-red.jpg",
-    "collection": "outcasted"
+    "collection": "miscellania"
   },
   {
     "id": 11,
@@ -93,7 +93,7 @@ export const mockProductsNegra = [
     "description": "Pau en la foscor, força en la solitud. El silenci ens ensenya el que el soroll amaga.",
     "price": 15.50,
     "image": "/tshirt-green.jpg",
-    "collection": "outcasted"
+    "collection": "miscellania"
   },
   {
     "id": 12,
@@ -101,7 +101,7 @@ export const mockProductsNegra = [
     "description": "El caos amaga l'ordre intern que només els ulls entrenats poden reconèixer i comprendre.",
     "price": 15.50,
     "image": "/tshirt-blue.jpg",
-    "collection": "outcasted"
+    "collection": "miscellania"
   }
 ];
 

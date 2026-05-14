@@ -204,7 +204,7 @@ function NewPage() {
                 Explora Totes les Col·leccions
               </h2>
               <p className="font-roboto text-[14pt] text-gray-700 leading-relaxed mb-8">
-                Descobreix els cinc universos de GRÀFIC: First Contact, The Human Inside, Austen, Cube i Outcasted.
+                Descobreix els cinc universos de GRÀFIC: First Contact, The Human Inside, Austen, Cube i Miscel·lània.
               </p>
               <Link
                 to="/first-contact"

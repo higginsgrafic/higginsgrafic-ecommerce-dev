@@ -89,12 +89,12 @@ export default function FullWideSlideDemoHeader({
     { img: 'color-card-light-blue.webp', name: 'ROBBIE THE ROBOT', collection: 'the_human_inside', drawing: 'the_human_inside/black/robbie-the-robot-b-stripe.webp', price: '19,95€', qty: 1, size: 'L', isTemplate: true, disabled: false },
     { img: 'color-card-royal.webp', name: 'PRIDE & PREJUDICE', collection: 'austen', drawing: 'austen/crosswords/pride-and-prejudice-1-stripe.webp', price: '19,95€', qty: 1, size: 'M', isTemplate: true, disabled: false },
     { img: 'color-card-navy.webp', name: 'ROBOCUBE', collection: 'cube', drawing: 'cube/robocube-stripe.webp', price: '19,95€', qty: 2, size: 'XL', isTemplate: true, disabled: false },
-    { img: 'color-card-purple.webp', name: 'PONT DEL DIABLE', collection: 'miscel·lania', drawing: 'miscel·lania/black/pont-del-diable-b-stripe.webp', price: '19,95€', qty: 1, size: 'S', isTemplate: true, disabled: false },
+    { img: 'color-card-purple.webp', name: 'PONT DEL DIABLE', collection: 'miscellania', drawing: 'miscellania/black/pont-del-diable-b-stripe.webp', price: '19,95€', qty: 1, size: 'S', isTemplate: true, disabled: false },
     { img: 'color-card-light pink.webp', name: 'NCC-1701-D', collection: 'first_contact', drawing: 'first_contact/black/ncc-1701-d-b-stripe.webp', price: '19,95€', qty: 1, size: 'M', isTemplate: true, disabled: false },
     { img: 'color-card-daisy.webp', name: 'MASCHINENMENSCH', collection: 'the_human_inside', drawing: 'the_human_inside/black/maschinenmensch-b-stripe.webp', price: '19,95€', qty: 1, size: 'L', isTemplate: true, disabled: false },
     { img: 'color-card-gold.webp', name: 'PERSUASION', collection: 'austen', drawing: 'austen/crosswords/persuasion-1-stripe.webp', price: '19,95€', qty: 1, size: 'L', isTemplate: true, disabled: false },
     { img: 'color-card-red.webp', name: 'CYBER CUBE', collection: 'cube', drawing: 'cube/cyber-cube-stripe.webp', price: '19,95€', qty: 3, size: 'M', isTemplate: true, disabled: false },
-    { img: 'color-card-kiwi.webp', name: 'DJ VADER', collection: 'miscel·lania', drawing: 'miscel·lania/black/dj-vader-b-stripe.webp', price: '19,95€', qty: 1, size: 'L', isTemplate: true, disabled: false },
+    { img: 'color-card-kiwi.webp', name: 'DJ VADER', collection: 'miscellania', drawing: 'miscellania/black/dj-vader-b-stripe.webp', price: '19,95€', qty: 1, size: 'L', isTemplate: true, disabled: false },
     { img: 'color-card-irish-green .webp', name: 'PLASMA ESCAPE', collection: 'first_contact', drawing: 'first_contact/black/plasma-escape-b-stripe.webp', price: '19,95€', qty: 1, size: 'XL', isTemplate: true, disabled: false },
     { img: 'color-card-military-green.webp', name: 'VADER', collection: 'the_human_inside', drawing: 'the_human_inside/black/vader-b-stripe.webp', price: '19,95€', qty: 1, size: 'L', isTemplate: true, disabled: false },
     { img: 'color-card-forest.webp', name: 'SENSE & SENSIBILITY', collection: 'austen', drawing: 'austen/crosswords/sense-and-sensibility-1-stripe.webp', price: '19,95€', qty: 1, size: 'M', isTemplate: true, disabled: false },
@@ -125,12 +125,12 @@ export default function FullWideSlideDemoHeader({
     { title: 'ROBBIE THE ROBOT', collection: 'THE HUMAN INSIDE', qty: 1, size: 'L', price: '19,95€', color: 'light-blue', drawing: 'the_human_inside/black/robbie-the-robot-b-stripe.webp', disabled: false },
     { title: 'PRIDE & PREJUDICE', collection: 'AUSTEN', qty: 1, size: 'M', price: '19,95€', color: 'royal', drawing: 'austen/crosswords/pride-and-prejudice-1-stripe.webp', disabled: false },
     { title: 'ROBOCUBE', collection: 'CUBE', qty: 2, size: 'XL', price: '19,95€', color: 'navy', drawing: 'cube/robocube-stripe.webp', disabled: false },
-    { title: 'PONT DEL DIABLE', collection: 'MISCEL·LÀNIA', qty: 1, size: 'S', price: '19,95€', color: 'purple', drawing: 'miscel·lania/black/pont-del-diable-b-stripe.webp', disabled: false },
+    { title: 'PONT DEL DIABLE', collection: 'MISCEL·LÀNIA', qty: 1, size: 'S', price: '19,95€', color: 'purple', drawing: 'miscellania/black/pont-del-diable-b-stripe.webp', disabled: false },
     { title: 'NCC-1701-D', collection: 'THE HUMAN INSIDE', qty: 1, size: 'M', price: '19,95€', color: 'light-pink', drawing: 'first_contact/black/ncc-1701-d-b-stripe.webp', disabled: false },
     { title: 'MASCHINENMENSCH', collection: 'THE HUMAN INSIDE', qty: 1, size: 'L', price: '19,95€', color: 'daisy', drawing: 'the_human_inside/black/maschinenmensch-b-stripe.webp', disabled: false },
     { title: 'PERSUASION', collection: 'AUSTEN', qty: 1, size: 'L', price: '19,95€', color: 'gold', drawing: 'austen/crosswords/persuasion-1-stripe.webp', disabled: false },
     { title: 'CYBERMAN', collection: 'THE HUMAN INSIDE', qty: 1, size: 'M', price: '19,95€', color: 'red', drawing: 'cube/cyber-cube-stripe.webp', disabled: false },
-    { title: 'DJ VADER', collection: 'MISCEL·LÀNIA', qty: 1, size: 'L', price: '19,95€', color: 'kiwi', drawing: 'miscel·lania/black/dj-vader-b-stripe.webp', disabled: false },
+    { title: 'DJ VADER', collection: 'MISCEL·LÀNIA', qty: 1, size: 'L', price: '19,95€', color: 'kiwi', drawing: 'miscellania/black/dj-vader-b-stripe.webp', disabled: false },
     { title: 'PLASMA ESCAPE', collection: 'MISCEL·LÀNIA', qty: 1, size: 'M', price: '19,95€', color: 'irish-green', drawing: 'first_contact/black/plasma-escape-b-stripe.webp', disabled: false },
     { title: 'VADER', collection: 'MISCEL·LÀNIA', qty: 1, size: 'L', price: '19,95€', color: 'military-green', drawing: 'the_human_inside/black/vader-b-stripe.webp', disabled: false },
     { title: 'SENSE & SENSIBILITY', collection: 'AUSTEN', qty: 1, size: 'M', price: '19,95€', color: 'forest-green', drawing: 'austen/crosswords/sense-and-sensibility-1-stripe.webp', disabled: false },
@@ -193,12 +193,12 @@ export default function FullWideSlideDemoHeader({
         .replace(/^-+|-+$/g, '');
     };
 
-    const allowedCollectionKeys = new Set(['the-human-inside', 'first-contact', 'austen', 'outcasted']);
+    const allowedCollectionKeys = new Set(['the-human-inside', 'first-contact', 'austen', 'miscellania']);
     const collectionLabelByKey = {
       'the-human-inside': 'The Human Inside',
       'first-contact': 'First Contact',
       austen: 'Austen',
-      outcasted: 'Miscel·lània',
+      miscellania: 'Miscel·lània',
     };
 
     const isCubeRelated = (p) => {
@@ -282,7 +282,7 @@ export default function FullWideSlideDemoHeader({
       const p = new URLSearchParams(location.search);
       const fromUrl = p.get('active') || p.get('collection') || '';
       const next = typeof fromUrl === 'string' ? fromUrl.trim() : '';
-      const allowed = new Set(['first_contact', 'the_human_inside', 'austen', 'cube', 'outcasted']);
+      const allowed = new Set(['first_contact', 'the_human_inside', 'austen', 'cube', 'miscellania']);
       if (next && allowed.has(next)) return next;
 
       if (contained) return initialActiveId || 'first_contact';
@@ -581,7 +581,7 @@ export default function FullWideSlideDemoHeader({
       if (!active) return { white: true, black: true, color: true };
       if (active === 'first_contact') return { white: true, black: true, color: true };
       if (active === 'the_human_inside') return { white: true, black: true, color: true };
-      if (active === 'outcasted') return { white: true, black: true, color: true };
+      if (active === 'miscellania') return { white: true, black: true, color: true };
       if (active === 'cube') return { white: false, black: false, color: true };
 
       if (active === 'austen') {
@@ -914,34 +914,34 @@ export default function FullWideSlideDemoHeader({
         return out;
       }
 
-      if (active === 'outcasted' && typeof key === 'string' && !isPathItem(key)) {
+      if (active === 'miscellania' && typeof key === 'string' && !isPathItem(key)) {
         const k = normalizeKeyLocal(key).toLowerCase();
         const out = (() => {
           if (firstContactVariant === 'color') {
-            if (k === 'dj vader' || k === 'dj-vader') return '/custom_logos/drawings/images_stripe/miscel·lania/multi/dj-vader-multi-light-stripe.webp';
-            if (k === 'deathstar2d2' || k === 'death star2d2' || k === 'death-star2d2') return '/custom_logos/drawings/images_stripe/miscel·lania/multi/death-star2d2-multi-light-stripe.webp';
-            if (k === 'pont del diable' || k === 'pont-del-diable') return '/custom_logos/drawings/images_stripe/miscel·lania/multi/pont-del-diable-multi-light-stripe.webp';
+            if (k === 'dj vader' || k === 'dj-vader') return '/custom_logos/drawings/images_stripe/miscellania/multi/dj-vader-multi-light-stripe.webp';
+            if (k === 'deathstar2d2' || k === 'death star2d2' || k === 'death-star2d2') return '/custom_logos/drawings/images_stripe/miscellania/multi/death-star2d2-multi-light-stripe.webp';
+            if (k === 'pont del diable' || k === 'pont-del-diable') return '/custom_logos/drawings/images_stripe/miscellania/multi/pont-del-diable-multi-light-stripe.webp';
           }
 
           if (firstContactVariant === 'white') {
-            if (k === 'dj vader' || k === 'dj-vader') return '/custom_logos/drawings/images_stripe/miscel·lania/white/dj-vader-w-stripe.webp';
-            if (k === 'deathstar2d2' || k === 'death star2d2' || k === 'death-star2d2') return '/custom_logos/drawings/images_stripe/miscel·lania/white/death-star2d2-w-stripe.webp';
-            if (k === 'pont del diable' || k === 'pont-del-diable') return '/custom_logos/drawings/images_stripe/miscel·lania/white/pont-del-diable-w-stripe.webp';
+            if (k === 'dj vader' || k === 'dj-vader') return '/custom_logos/drawings/images_stripe/miscellania/white/dj-vader-w-stripe.webp';
+            if (k === 'deathstar2d2' || k === 'death star2d2' || k === 'death-star2d2') return '/custom_logos/drawings/images_stripe/miscellania/white/death-star2d2-w-stripe.webp';
+            if (k === 'pont del diable' || k === 'pont-del-diable') return '/custom_logos/drawings/images_stripe/miscellania/white/pont-del-diable-w-stripe.webp';
           }
 
-          if (k === 'dj vader' || k === 'dj-vader') return '/custom_logos/drawings/images_stripe/miscel·lania/black/dj-vader-b-stripe.webp';
-          if (k === 'deathstar2d2' || k === 'death star2d2' || k === 'death-star2d2') return '/custom_logos/drawings/images_stripe/miscel·lania/black/death-star2d2-b-stripe.webp';
-          if (k === 'pont del diable' || k === 'pont-del-diable') return '/custom_logos/drawings/images_stripe/miscel·lania/black/pont-del-diable-b-stripe.webp';
+          if (k === 'dj vader' || k === 'dj-vader') return '/custom_logos/drawings/images_stripe/miscellania/black/dj-vader-b-stripe.webp';
+          if (k === 'deathstar2d2' || k === 'death star2d2' || k === 'death-star2d2') return '/custom_logos/drawings/images_stripe/miscellania/black/death-star2d2-b-stripe.webp';
+          if (k === 'pont del diable' || k === 'pont-del-diable') return '/custom_logos/drawings/images_stripe/miscellania/black/pont-del-diable-b-stripe.webp';
           return null;
         })();
         if (import.meta.env.DEV && !out) {
           // eslint-disable-next-line no-console
-          console.error('[OUTCASTED stripe overlay] unresolved label', { key, normalized: k });
+          console.error('[MISCELLANIA stripe overlay] unresolved label', { key, normalized: k });
         }
         return out;
       }
 
-      // Path-based collections (e.g. outcasted black/xxx.webp) can be resolved directly.
+      // Path-based collections (e.g. miscellania black/xxx.webp) can be resolved directly.
       if (isPathItem(key)) {
         const variant = firstContactVariant;
         if (
@@ -1013,27 +1013,27 @@ export default function FullWideSlideDemoHeader({
           const drawingFile = map[fileNormalized] || map[file];
           if (drawingFile) return `/custom_logos/drawings/images_stripe/cube/${drawingFile.replace(/\.(webp|png|jpe?g)$/i, '-stripe.$1')}`;
         }
-        if (active === 'outcasted' && typeof key === 'string' && key.startsWith('/custom_logos/drawings/images_grid/miscel·lania/')) {
+        if (active === 'miscellania' && typeof key === 'string' && key.startsWith('/custom_logos/drawings/images_grid/miscellania/')) {
           const file = key.split('/').pop() || '';
           const lower = file.toLowerCase();
           if (firstContactVariant === 'color') {
-            if (lower.includes('dj-vader')) return '/custom_logos/drawings/images_stripe/miscel·lania/multi/dj-vader-multi-light-stripe.webp';
-            if (lower.includes('death-star2d2')) return '/custom_logos/drawings/images_stripe/miscel·lania/multi/death-star2d2-multi-light-stripe.webp';
+            if (lower.includes('dj-vader')) return '/custom_logos/drawings/images_stripe/miscellania/multi/dj-vader-multi-light-stripe.webp';
+            if (lower.includes('death-star2d2')) return '/custom_logos/drawings/images_stripe/miscellania/multi/death-star2d2-multi-light-stripe.webp';
             if (lower.includes('pont-del-diable') || lower.includes('pont_del_diable')) {
-              return '/custom_logos/drawings/images_stripe/miscel·lania/multi/pont-del-diable-multi-light-stripe.webp';
+              return '/custom_logos/drawings/images_stripe/miscellania/multi/pont-del-diable-multi-light-stripe.webp';
             }
           }
           if (firstContactVariant === 'white') {
-            if (lower.includes('dj-vader')) return '/custom_logos/drawings/images_stripe/miscel·lania/white/dj-vader-w-stripe.webp';
-            if (lower.includes('death-star2d2')) return '/custom_logos/drawings/images_stripe/miscel·lania/white/death-star2d2-w-stripe.webp';
+            if (lower.includes('dj-vader')) return '/custom_logos/drawings/images_stripe/miscellania/white/dj-vader-w-stripe.webp';
+            if (lower.includes('death-star2d2')) return '/custom_logos/drawings/images_stripe/miscellania/white/death-star2d2-w-stripe.webp';
             if (lower.includes('pont-del-diable') || lower.includes('pont_del_diable')) {
-              return '/custom_logos/drawings/images_stripe/miscel·lania/white/pont-del-diable-w-stripe.webp';
+              return '/custom_logos/drawings/images_stripe/miscellania/white/pont-del-diable-w-stripe.webp';
             }
           }
-          if (lower.includes('dj-vader')) return '/custom_logos/drawings/images_stripe/miscel·lania/black/dj-vader-b-stripe.webp';
-          if (lower.includes('death-star2d2')) return '/custom_logos/drawings/images_stripe/miscel·lania/black/death-star2d2-b-stripe.webp';
+          if (lower.includes('dj-vader')) return '/custom_logos/drawings/images_stripe/miscellania/black/dj-vader-b-stripe.webp';
+          if (lower.includes('death-star2d2')) return '/custom_logos/drawings/images_stripe/miscellania/black/death-star2d2-b-stripe.webp';
           if (lower.includes('pont-del-diable') || lower.includes('pont_del_diable')) {
-            return '/custom_logos/drawings/images_stripe/miscel·lania/black/pont-del-diable-b-stripe.webp';
+            return '/custom_logos/drawings/images_stripe/miscellania/black/pont-del-diable-b-stripe.webp';
           }
         }
         if (active === 'austen' && typeof key === 'string' && key.startsWith('/custom_logos/drawings/images_grid/austen/keep_calm/')) {
@@ -1195,22 +1195,22 @@ export default function FullWideSlideDemoHeader({
         return AUSTEN_QUOTES_ASSETS.it_is_a_truth.original;
       }
 
-      if (active === 'outcasted') {
-        if (typeof key === 'string' && key.startsWith('/custom_logos/drawings/images_grid/miscel·lania/')) {
+      if (active === 'miscellania') {
+        if (typeof key === 'string' && key.startsWith('/custom_logos/drawings/images_grid/miscellania/')) {
           const file = key.split('/').pop() || '';
           const lower = file.toLowerCase();
           if (firstContactVariant === 'color') {
-            if (lower.includes('dj-vader')) return '/custom_logos/drawings/images_stripe/miscel·lania/multi/dj-vader-multi-light-stripe.webp';
-            if (lower.includes('death-star2d2')) return '/custom_logos/drawings/images_stripe/miscel·lania/multi/death-star2d2-multi-light-stripe.webp';
+            if (lower.includes('dj-vader')) return '/custom_logos/drawings/images_stripe/miscellania/multi/dj-vader-multi-light-stripe.webp';
+            if (lower.includes('death-star2d2')) return '/custom_logos/drawings/images_stripe/miscellania/multi/death-star2d2-multi-light-stripe.webp';
             if (lower.includes('pont-del-diable') || lower.includes('pont_del_diable')) {
-              return '/custom_logos/drawings/images_stripe/miscel·lania/multi/pont-del-diable-multi-light-stripe.webp';
+              return '/custom_logos/drawings/images_stripe/miscellania/multi/pont-del-diable-multi-light-stripe.webp';
             }
           }
           if (firstContactVariant === 'white') {
-            if (lower.includes('dj-vader')) return '/custom_logos/drawings/images_stripe/miscel·lania/white/dj-vader-w-stripe.webp';
-            if (lower.includes('death-star2d2')) return '/custom_logos/drawings/images_stripe/miscel·lania/white/death-star2d2-w-stripe.webp';
+            if (lower.includes('dj-vader')) return '/custom_logos/drawings/images_stripe/miscellania/white/dj-vader-w-stripe.webp';
+            if (lower.includes('death-star2d2')) return '/custom_logos/drawings/images_stripe/miscellania/white/death-star2d2-w-stripe.webp';
             if (lower.includes('pont-del-diable') || lower.includes('pont_del_diable')) {
-              return '/custom_logos/drawings/images_stripe/miscel·lania/white/pont-del-diable-w-stripe.webp';
+              return '/custom_logos/drawings/images_stripe/miscellania/white/pont-del-diable-w-stripe.webp';
             }
           }
           const map = {
@@ -1219,7 +1219,7 @@ export default function FullWideSlideDemoHeader({
             'pont-del-diable.webp': 'pont-del-diable-b-stripe.webp',
           };
           const drawingFile = map[file];
-          if (drawingFile) return `/custom_logos/drawings/images_stripe/miscel·lania/black/${drawingFile}`;
+          if (drawingFile) return `/custom_logos/drawings/images_stripe/miscellania/black/${drawingFile}`;
         }
         return null;
       }
@@ -2188,7 +2188,7 @@ export default function FullWideSlideDemoHeader({
       { id: 'the_human_inside', label: 'The Human Inside' },
       { id: 'austen', label: 'Austen' },
       { id: 'cube', label: 'Cube' },
-      { id: 'outcasted', label: 'Miscel·lània' },
+      { id: 'miscellania', label: 'Miscel·lània' },
     ],
     []
   );
@@ -2344,16 +2344,16 @@ export default function FullWideSlideDemoHeader({
           ],
         },
       ],
-      outcasted: [
+      miscellania: [
         {
           title: '',
           items: [
             CONTROL_TILE_BN,
-            '/custom_logos/drawings/images_grid/miscel·lania/pont-del-diable-b-grid.webp',
-            '/custom_logos/drawings/images_grid/miscel·lania/pont-del-diable-b-grid.webp',
-            '/custom_logos/drawings/images_grid/miscel·lania/pont-del-diable-b-grid.webp',
-            '/custom_logos/drawings/images_grid/miscel·lania/pont-del-diable-b-grid.webp',
-            '/custom_logos/drawings/images_grid/miscel·lania/pont-del-diable-b-grid.webp',
+            '/custom_logos/drawings/images_grid/miscellania/pont-del-diable-b-grid.webp',
+            '/custom_logos/drawings/images_grid/miscellania/pont-del-diable-b-grid.webp',
+            '/custom_logos/drawings/images_grid/miscellania/pont-del-diable-b-grid.webp',
+            '/custom_logos/drawings/images_grid/miscellania/pont-del-diable-b-grid.webp',
+            '/custom_logos/drawings/images_grid/miscellania/pont-del-diable-b-grid.webp',
             CONTROL_TILE_ARROWS,
           ],
         },
@@ -2428,7 +2428,7 @@ export default function FullWideSlideDemoHeader({
       return;
     }
 
-    if (active === 'cube' || active === 'outcasted') {
+    if (active === 'cube' || active === 'miscellania') {
       if (selectedItemByCollection?.[active]) return;
       setSelectedItemByCollection((prev) => ({ ...prev, [active]: fallbackItem }));
     }
@@ -2466,7 +2466,7 @@ export default function FullWideSlideDemoHeader({
         setHumanInsideSelectedItem(target);
       }
     } else {
-      // Per altres col·leccions (cube, austen, outcasted)
+      // Per altres col·leccions (cube, austen, miscellania)
       if (selectedItemByCollection?.[active] !== target) {
         setSelectedItemByCollection((prev) => ({ ...prev, [active]: target }));
       }
@@ -2561,7 +2561,7 @@ export default function FullWideSlideDemoHeader({
       const p = new URLSearchParams(location.search);
       const fromUrl = p.get('active') || p.get('collection') || '';
       const next = typeof fromUrl === 'string' ? fromUrl.trim() : '';
-      const allowed = new Set(['first_contact', 'the_human_inside', 'austen', 'cube', 'outcasted']);
+      const allowed = new Set(['first_contact', 'the_human_inside', 'austen', 'cube', 'miscellania']);
       if (next && allowed.has(next)) {
         setActive(next);
         return;
@@ -3738,7 +3738,7 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
                         {(() => {
                           const isPath = (v) => typeof v === 'string' && /\.(png|jpg|jpeg|webp)$/i.test(v);
                           const base = active === 'the_human_inside' ? col.items : col.items.slice(0, 9);
-                          if (active !== 'outcasted') return base;
+                          if (active !== 'miscellania') return base;
                           const variant = firstContactVariant;
                           return base.filter((it) => {
                             if (it === CONTROL_TILE_BN || it === CONTROL_TILE_ARROWS) return true;
@@ -3751,7 +3751,7 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
                           <div key={`${it}-${idx}`} className="min-w-0">
                             {!it || it === CONTROL_TILE_ARROWS || it === CONTROL_TILE_BN ? (
                               <div className="h-4" />
-                            ) : active === 'outcasted' && typeof it === 'string' && /\.(png|jpg|jpeg|webp)$/i.test(it) ? (
+                            ) : active === 'miscellania' && typeof it === 'string' && /\.(png|jpg|jpeg|webp)$/i.test(it) ? (
                               <div className="h-4" />
                             ) : (
                               <Link
@@ -3802,7 +3802,7 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
                                   />
                                 ) : null}
                               </div>
-                            ) : active === 'outcasted' && typeof it === 'string' && /\.(png|jpg|jpeg|webp)$/i.test(it) ? (
+                            ) : active === 'miscellania' && typeof it === 'string' && /\.(png|jpg|jpeg|webp)$/i.test(it) ? (
                               <div className="relative mt-2 aspect-square w-full overflow-hidden">
                                 <OptimizedImg
                                   src={resolveGridThumbSrc(it, active) || it}
@@ -3864,7 +3864,7 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
                       </div>
                     ) : null}
 
-                    {active === 'outcasted' ? null : (
+                    {active === 'miscellania' ? null : (
                       <div className="mt-4">
                         <div className="grid gap-2">
                           {(col.items || []).filter(Boolean).slice(0, 8).map((it) => (

@@ -168,7 +168,7 @@ const AdminUploadPage = () => {
 
     if (tokens.length < 2) return null;
 
-    const knownCollections = new Set(['outcasted', 'first', 'contact', 'first-contact', 'austen', 'cube', 'the', 'human', 'inside', 'the-human-inside', 'grafic']);
+    const knownCollections = new Set(['miscellania', 'first', 'contact', 'first-contact', 'austen', 'cube', 'the', 'human', 'inside', 'the-human-inside', 'grafic']);
 
     let collection = null;
     if (tokens[0] === 'first' && tokens[1] === 'contact') {
@@ -815,8 +815,8 @@ const AdminUploadPage = () => {
     }
   };
 
-  const canonicalCollectionsToPurge = ['first-contact', 'outcasted'];
-  const dbCollectionKeysToMatch = ['first-contact', 'first_contact', 'outcasted'];
+  const canonicalCollectionsToPurge = ['first-contact', 'miscellania'];
+  const dbCollectionKeysToMatch = ['first-contact', 'first_contact', 'miscellania'];
 
   const deriveStoragePathFromPublicUrl = (url) => {
     try {
@@ -903,7 +903,7 @@ const AdminUploadPage = () => {
   };
 
   const runCleanupExecute = async () => {
-    const expected = 'DELETE FIRST-CONTACT OUTCASTED';
+    const expected = 'DELETE FIRST-CONTACT MISCELLANIA';
     if (cleanupConfirmText.trim().toUpperCase() !== expected) {
       setCleanupError(`Escriu exactament: ${expected}`);
       return;
@@ -968,7 +968,7 @@ const AdminUploadPage = () => {
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
             <div className="flex items-start justify-between gap-6 flex-wrap">
               <div className="min-w-[260px]">
-                <h2 className="text-lg font-semibold text-gray-900">Neteja col·leccions (First Contact + Outcasted)</h2>
+                <h2 className="text-lg font-semibold text-gray-900">Neteja col·leccions (First Contact + Miscel·lània)</h2>
                 <p className="text-sm text-gray-600 mt-1">Esborra productes, variants, imatges i fitxers del bucket <span className="font-mono">media</span>. Primer fes dry-run.</p>
               </div>
               <div className="flex items-center gap-3">
@@ -997,7 +997,7 @@ const AdminUploadPage = () => {
                 value={cleanupConfirmText}
                 onChange={(e) => setCleanupConfirmText(e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white text-gray-900 font-mono"
-                placeholder="DELETE FIRST-CONTACT OUTCASTED"
+                placeholder="DELETE FIRST-CONTACT MISCELLANIA"
               />
             </div>
 

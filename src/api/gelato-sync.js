@@ -59,7 +59,7 @@ function transformStoreProductForSupabase(storeProduct) {
     'the-human-inside': 'the-human-inside',
     'human inside': 'the-human-inside',
     'cube': 'cube',
-    'outcasted': 'outcasted',
+    'miscellania': 'miscellania',
     'dj vader': 'first-contact'
   };
 

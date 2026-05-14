@@ -45,7 +45,7 @@ export const ca = {
       theHumanInside: 'The Human Inside',
       austen: 'Austen',
       cube: 'Cube',
-      outcasted: 'Outcasted',
+      miscellania: 'Miscel·lània',
     },
   },
 
@@ -105,7 +105,7 @@ export const ca = {
       theHumanInside: 'THE HUMAN INSIDE',
       austen: 'AUSTEN',
       cube: 'CUBE',
-      outcasted: 'OUTCASTED',
+      miscellania: 'MISCELLANIA',
     },
     services: {
       shop: {
@@ -180,11 +180,11 @@ export const ca = {
         description: 'En el fons tots som uns estranys a ulls nostres.',
       },
     },
-    outcasted: {
-      title: 'OUTCASTED',
+    miscellania: {
+      title: 'MISCELLANIA',
       description: 'Ja se sap, més val sol que mal acompanyat.',
       seo: {
-        title: 'Outcasted - GRÀFIC',
+        title: 'Miscel·lània - GRÀFIC',
         description: 'Ja se sap, més val sol que mal acompanyat.',
       },
     },
@@ -200,7 +200,7 @@ export const ca = {
       theHumanInsideDesc: 'En el racó més profund i fosc hi reposa el vostre heroi.',
       austenDesc: 'Detesto sentir-vos parlar de les dones com si fossin unes pàmfiles irracionals que volen estar en aigües tranquil·les tota la vida.',
       cubeDesc: 'En el fons tots som uns estranys a ulls nostres.',
-      outcastedDesc: 'Ja se sap, més val sol que mal acompanyat.',
+      miscellaniaDesc: 'Ja se sap, més val sol que mal acompanyat.',
     },
   },
 
@@ -222,8 +222,8 @@ export const ca = {
         title: 'CUBE',
         subtitle: 'En el fons tots som uns estranys a ulls nostres.',
       },
-      outcasted: {
-        title: 'OUTCASTED',
+      miscellania: {
+        title: 'MISCELLANIA',
         subtitle: 'Ja se sap, més val sol que mal acompanyat.',
       },
     },

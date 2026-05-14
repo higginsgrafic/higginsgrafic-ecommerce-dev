@@ -59,7 +59,7 @@ const TermsPage = lazy(() => import('@/pages/TermsPage'));
 const CreativeCommonsPage = lazy(() => import('@/pages/CreativeCommonsPage'));
 const TdpPage = lazy(() => import('@/pages/TdpPage'));
 
-// Outcasted now uses the config-driven CollectionPage
+// Miscel·lània now uses the config-driven CollectionPage
 
 const AdminStudioHomePage = lazy(() => import('@/pages/AdminStudioHomePage'));
 const AdminDemosPage = lazy(() => import('@/pages/AdminDemosPage'));
@@ -985,7 +985,7 @@ function App() {
       if (rawRef2Src != null) setMegaStripeRef2Src(String(rawRef2Src));
       if (rawRefCol != null) {
         const v = String(rawRefCol);
-        const allowed = new Set(['first_contact', 'thin', 'austen', 'cube', 'miscel·lania', 'the_human_inside']);
+        const allowed = new Set(['first_contact', 'thin', 'austen', 'cube', 'miscellania', 'the_human_inside']);
         if (allowed.has(v)) {
           setMegaStripeRefCollection(v === 'the_human_inside' ? 'thin' : v);
         }
@@ -2041,8 +2041,8 @@ function App() {
     ];
 
     const miscellania = [
-      { key: 'DJ Vader', src: '/tmp/CALIBRTGE/miscel·lania/outcasted-dj-vader-black-white.png' },
-      { key: 'Deathstar2D2', src: '/tmp/CALIBRTGE/miscel·lania/outcasted-dead-star2d2-black-white.png' },
+      { key: 'DJ Vader', src: '/tmp/CALIBRTGE/miscellania/miscellania-dj-vader-black-white.png' },
+      { key: 'Deathstar2D2', src: '/tmp/CALIBRTGE/miscellania/miscellania-dead-star2d2-black-white.png' },
     ];
 
     const theHumanInside = [
@@ -2066,7 +2066,7 @@ function App() {
       thin: theHumanInside,
       austen,
       cube,
-      'miscel·lania': miscellania,
+      'miscellania': miscellania,
       the_human_inside: theHumanInside,
     };
   }, []);
@@ -3056,14 +3056,14 @@ function App() {
                   </motion.div>
                 } />
 
-                <Route path="/outcasted" element={
+                <Route path="/miscellania" element={
                   <motion.div
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -10 }}
                     transition={{ duration: 0.3, ease: "easeInOut" }}
                   >
-                    <SupabaseCollectionRoute collectionKey="outcasted" {...pageProps} />
+                    <SupabaseCollectionRoute collectionKey="miscellania" {...pageProps} />
                   </motion.div>
                 } />
 
@@ -4472,7 +4472,7 @@ function App() {
                               const v = (value == null) ? '' : String(value);
                               const key = v.trim().toLowerCase();
                               if (!key) return '—';
-                              if (key === 'outcasted') return 'Miscel·lània';
+                              if (key === 'miscellania') return 'Miscel·lània';
                               if (key === 'first_contact') return 'First Contact';
                               if (key === 'the_human_inside') return 'The Human Inside';
                               if (key === 'austen') return 'Austen';
@@ -4638,7 +4638,7 @@ function App() {
                               onKeyDown={(e) => e.stopPropagation()}
                               style={{ height: 18, flex: '0 0 auto', minWidth: 110, border: '1px solid rgba(0,0,0,0.12)', borderRadius: 6, background: 'rgba(255,255,255,0.50)', fontSize: 10, fontWeight: 900, color: 'rgba(0,0,0,0.70)', padding: '0 6px', outline: 'none' }}
                             >
-                              {['first_contact', 'thin', 'austen', 'cube', 'miscel·lania'].map((k) => (
+                              {['first_contact', 'thin', 'austen', 'cube', 'miscellania'].map((k) => (
                                 <option key={k} value={k}>
                                   {k}
                                 </option>
@@ -5610,7 +5610,7 @@ function App() {
 
                       <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: 6, marginBottom: 10 }}>
                         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, minmax(0, 1fr))', gap: 6 }}>
-                          {['first_contact', 'thin', 'austen', 'cube', 'miscel·lania'].map((k) => {
+                          {['first_contact', 'thin', 'austen', 'cube', 'miscellania'].map((k) => {
                             const active = String(megaStripeRefCollection || 'first_contact') === k;
                             return (
                               <button

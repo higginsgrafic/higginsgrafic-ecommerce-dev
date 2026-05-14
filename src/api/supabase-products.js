@@ -29,17 +29,17 @@ export const productsService = {
     return includeInactive ? this.getAllProductsIncludingInactive() : this.getAllProducts();
   },
 
-  async enrichOutcastedImages(products) {
+  async enrichMiscellaniaImages(products) {
     if (!supabase) return Array.isArray(products) ? products : [];
     const items = Array.isArray(products) ? products : [];
-    const outcasted = items.filter((p) => (p?.collection || '').toString().toLowerCase() === 'outcasted');
+    const miscellania = items.filter((p) => (p?.collection || '').toString().toLowerCase() === 'miscellania');
 
-    if (outcasted.length === 0) return items;
+    if (miscellania.length === 0) return items;
 
     const inferNameFromUrl = (url) => {
       try {
         const u = new URL(url);
-        const marker = '/media/outcasted/';
+        const marker = '/media/miscellania/';
         const idx = u.pathname.indexOf(marker);
         if (idx === -1) return null;
         const rest = u.pathname.slice(idx + marker.length);
@@ -116,8 +116,8 @@ export const productsService = {
       const name = p?.name || inferNameFromUrl(existing?.[0]) || null;
       if (!name) return p;
 
-      const basePath = `outcasted/${name}`;
-      console.log('🖼️ [OUTCASTED] Enrich images for:', {
+      const basePath = `miscellania/${name}`;
+      console.log('🖼️ [MISCELLANIA] Enrich images for:', {
         slug: p?.slug,
         name,
         basePath,
@@ -125,7 +125,7 @@ export const productsService = {
         existingSample: existing[0]
       });
       const files = await listAllFilesRecursivelyShallow(basePath);
-      console.log('🖼️ [OUTCASTED] Storage files found:', {
+      console.log('🖼️ [MISCELLANIA] Storage files found:', {
         basePath,
         count: files.length,
         sample: files?.[0]
@@ -138,7 +138,7 @@ export const productsService = {
         })
         .filter(Boolean);
 
-      console.log('🖼️ [OUTCASTED] Public URLs built:', {
+      console.log('🖼️ [MISCELLANIA] Public URLs built:', {
         basePath,
         count: urls.length,
         sample: urls?.[0]
@@ -147,7 +147,7 @@ export const productsService = {
       const deduped = Array.from(new Set([...existing, ...urls]));
       if (deduped.length === 0) return p;
 
-      console.log('🖼️ [OUTCASTED] Final images:', {
+      console.log('🖼️ [MISCELLANIA] Final images:', {
         slug: p?.slug,
         basePath,
         count: deduped.length,
@@ -162,7 +162,7 @@ export const productsService = {
     };
 
     const enriched = await Promise.all(items.map((p) => {
-      if ((p?.collection || '').toString().toLowerCase() !== 'outcasted') return p;
+      if ((p?.collection || '').toString().toLowerCase() !== 'miscellania') return p;
       return enrichOne(p);
     }));
 
@@ -208,7 +208,7 @@ export const productsService = {
       console.log('📦 Sample product:', data?.[0]);
 
       let transformed = data.map(transformProduct);
-      transformed = await this.enrichOutcastedImages(transformed);
+      transformed = await this.enrichMiscellaniaImages(transformed);
       console.log('📦 Sample transformed:', transformed?.[0]);
 
       return transformed;
@@ -256,7 +256,7 @@ export const productsService = {
       console.log('📦 Sample product:', data?.[0]);
 
       let transformed = data.map(transformProduct);
-      transformed = await this.enrichOutcastedImages(transformed);
+      transformed = await this.enrichMiscellaniaImages(transformed);
       console.log('📦 Sample transformed:', transformed?.[0]);
 
       return transformed;

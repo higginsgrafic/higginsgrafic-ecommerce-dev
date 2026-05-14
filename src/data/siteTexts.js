@@ -14,7 +14,7 @@ export const siteTexts = {
       theHumanInside: "The Human Inside",
       austen: "Austen",
       cube: "Cube",
-      outcasted: "Outcasted"
+      miscellania: "Miscel·lània"
     },
     cart: {
       altFull: "Cistell amb productes",
@@ -43,8 +43,8 @@ export const siteTexts = {
         title: "CUBE",
         subtitle: "En el fons, tots som una mica estranys a ulls nostres."
       },
-      outcasted: {
-        title: "OUTCASTED",
+      miscellania: {
+        title: "MISCELLANIA",
         subtitle: "Més val sol que mal acompanyat."
       }
     }
@@ -61,7 +61,7 @@ export const siteTexts = {
       theHumanInsideDesc: "En el racó més profund del vostre ésser hi ha un heroi.",
       austenDesc: "Les coses que s'han de dir, dites amb elegància, sonen més bé.",
       cubeDesc: "En el fons, tots som una mica estranys als nostres ulls.",
-      outcastedDesc: "Més val sol que mal acompanyat."
+      miscellaniaDesc: "Més val sol que mal acompanyat."
     }
   },
 
@@ -204,12 +204,12 @@ export const siteTexts = {
       title: "Cube",
       description: "Quan fa massa temps que els vostres herois són a la capsa..."
     },
-    outcasted: {
+    miscellania: {
       seo: {
-        title: "Outcasted | Expressió lliure",
+        title: "Miscel·lània | Expressió lliure",
         description: "Dibuixos inspirats en les icones més rellevants del segle XX"
       },
-      title: "Outcasted",
+      title: "Miscel·lània",
       description: "La part fosca de la part fosca."
     }
   },
@@ -249,7 +249,7 @@ export const siteTexts = {
       theHumanInside: "The Human Inside",
       austen: "Austen",
       cube: "Cube",
-      outcasted: "Outcasted"
+      miscellania: "Miscel·lània"
     },
     copyright: "GRÀFIC ©2023-2025"
   },

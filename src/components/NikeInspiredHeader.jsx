@@ -46,7 +46,7 @@ function NikeInspiredHeader({
   const [firstColumnWidth, setFirstColumnWidth] = useState(null);
   const [cubeColumnWidth, setCubeColumnWidth] = useState(null);
   const firstContactRef = useRef(null);
-  const outcastedRef = useRef(null);
+  const miscellaniaRef = useRef(null);
   const cubeMaschinenRef = useRef(null);
   const [navTitlesOffsetX, setNavTitlesOffsetX] = useState(0);
   const [alignmentReady, setAlignmentReady] = useState(false);
@@ -113,7 +113,7 @@ function NikeInspiredHeader({
       { name: texts?.header?.navigation?.theHumanInside || 'The Human Inside', href: '/the-human-inside' },
       { name: texts?.header?.navigation?.austen || 'Austen', href: '/austen' },
       { name: texts?.header?.navigation?.cube || 'Cube', href: '/cube' },
-      { name: texts?.header?.navigation?.outcasted || 'Outcasted', href: '/outcasted' },
+      { name: texts?.header?.navigation?.miscellania || 'Miscel·lània', href: '/miscellania' },
     ];
   }, [texts]);
 
@@ -124,7 +124,7 @@ function NikeInspiredHeader({
   const maybeOpenCollectionsFromNavPointer = (clientX) => {
     if (!clientX) return;
     const firstEl = firstContactRef.current;
-    const lastEl = outcastedRef.current;
+    const lastEl = miscellaniaRef.current;
     if (!firstEl || !lastEl) return;
 
     const firstRect = firstEl.getBoundingClientRect();
@@ -208,7 +208,7 @@ function NikeInspiredHeader({
         'Mazinger C',
         'RoboCube',
       ],
-      outcasted: [
+      miscellania: [
         'Arthur D. The Second',
         'Death Star2D2',
         { label: 'Dalek', items: ['Conquer!', 'Destroy!'] },
@@ -886,7 +886,7 @@ function NikeInspiredHeader({
                       ref={(el) => {
                         if (link.href === '/first-contact') firstContactRef.current = el;
                         if (link.href === '/the-human-inside') theHumanInsideRef.current = el;
-                        if (link.href === '/outcasted') outcastedRef.current = el;
+                        if (link.href === '/miscellania') miscellaniaRef.current = el;
                         const key = (link.href || '').toString().replace(/^\//, '').trim();
                         if (key) navLinkRefs.current[key] = el;
                       }}

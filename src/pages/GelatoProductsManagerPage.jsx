@@ -141,7 +141,7 @@ export default function GelatoProductsManagerPage() {
     'the-human-inside',
     'austen',
     'cube',
-    'outcasted'
+    'miscellania'
   ];
 
   if (loading) {

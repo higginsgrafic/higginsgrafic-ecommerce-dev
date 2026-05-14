@@ -503,13 +503,13 @@ const ProductDetailPage = ({ onAddToCart, cartItems = [], onUpdateQuantity, lang
 
     const byDesign = new Map();
 
-    // For Outcasted, we store two ink sets in two folders:
+    // For Miscel·lània, we store two ink sets in two folders:
     // - .../<design>/blanc/<file> => white ink set (files typically start with 'white-...')
     // - .../<design>/negre/<file> => black ink set (files typically start with 'black-...')
     // We group by that folder segment + the *actual* shirt color.
     const byShirtBase = new Map();
 
-    // IMPORTANT: For Outcasted (and similar), the mockup URL often contains the shirt base
+    // IMPORTANT: For Miscel·lània (and similar), the mockup URL often contains the shirt base
     // color as a directory segment (e.g. /negre/) while the *actual* shirt color (Vermell,
     // Forest, etc.) is encoded in the filename. Since we intentionally ignore the filename
     // in extractCanonicalColorFromImageUrl(), we must rely on variant data for color/design.
@@ -547,7 +547,7 @@ const ProductDetailPage = ({ onAddToCart, cartItems = [], onUpdateQuantity, lang
       if (!byColor.has(canonicalColor)) byColor.set(canonicalColor, url);
     }
 
-    const extractOutcastedColorFromFilename = (url) => {
+    const extractMiscellaniaColorFromFilename = (url) => {
       const normalized = (url || '').toString().replace(/\\/g, '/');
       const parts = normalized.split('/').filter(Boolean);
       const file = (parts[parts.length - 1] || '').toLowerCase();
@@ -583,7 +583,7 @@ const ProductDetailPage = ({ onAddToCart, cartItems = [], onUpdateQuantity, lang
       if (!design) continue;
 
       const canonicalColor =
-        extractOutcastedColorFromFilename(imgUrl) ||
+        extractMiscellaniaColorFromFilename(imgUrl) ||
         extractCanonicalColorFromImageUrl(imgUrl) ||
         null;
       if (!canonicalColor) continue;
@@ -598,13 +598,13 @@ const ProductDetailPage = ({ onAddToCart, cartItems = [], onUpdateQuantity, lang
     }
 
     const collectionKey = normalizeSlugKey(product?.collection);
-    const hasOutcastedBases =
-      collectionKey === 'outcasted' &&
+    const hasMiscellaniaBases =
+      collectionKey === 'miscellania' &&
       byShirtBase.has('Negre') &&
       byShirtBase.has('Blanc') &&
       ((byShirtBase.get('Negre') || new Map()).size > 0 || (byShirtBase.get('Blanc') || new Map()).size > 0);
 
-    if (hasOutcastedBases) {
+    if (hasMiscellaniaBases) {
       const buildBaseRow = (baseCanonical, colorOrder, keyPrefix) => {
         const map = byShirtBase.get(baseCanonical) || new Map();
         return colorOrder.map((color) => {
@@ -723,7 +723,7 @@ const ProductDetailPage = ({ onAddToCart, cartItems = [], onUpdateQuantity, lang
 
     if (!whiteDesign || !blackDesign || whiteDesign === blackDesign) {
       // If variants gave us a usable design->color map, build the row from that.
-      // This avoids relying on URL parsing, which can be misleading for Outcasted.
+      // This avoids relying on URL parsing, which can be misleading for Miscel·lània.
       const soleDesignKey = designs.length === 1 ? designs[0] : null;
       const soleMap = soleDesignKey ? (byDesign.get(soleDesignKey) || new Map()) : null;
       const hasVariantMap = soleMap && soleMap.size > 0;
@@ -1025,8 +1025,8 @@ const ProductDetailPage = ({ onAddToCart, cartItems = [], onUpdateQuantity, lang
         return '/custom_logos/collections/collection-cube-logo.svg';
       case 'first-contact':
         return '/custom_logos/collections/collection-first-contact-logo.svg';
-      case 'outcasted':
-        return '/custom_logos/collections/collection-outcasted-logo.svg';
+      case 'miscellania':
+        return '/custom_logos/collections/collection-miscellania-logo.svg';
       default:
         return '/custom_logos/collections/collection-thin-logo.svg';
     }

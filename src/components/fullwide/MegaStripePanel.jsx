@@ -46,7 +46,7 @@ function MegaStripePanel({
           <MegaColumn
             key={`${active}-${idx}`}
             title={col.title}
-            isFirstContact={active === 'first_contact' || active === 'austen' || active === 'cube' || active === 'outcasted'}
+            isFirstContact={active === 'first_contact' || active === 'austen' || active === 'cube' || active === 'miscellania'}
             isHumanInside={active === 'the_human_inside'}
             collectionId={active}
             disableMulti={active === 'austen' && austenSelectedDisableMulti}
@@ -312,7 +312,7 @@ function MegaStripePanel({
                           const isAustenTileSwapBW = active === 'austen'
                             && typeof resolvedOverlaySrc === 'string'
                             && /\/austen\/(pemberley_house|crosswords|quotes)\//i.test(resolvedOverlaySrc);
-                          const shouldApplyRules = active === 'first_contact' || active === 'the_human_inside' || active === 'cube' || active === 'outcasted' || isAustenKeepCalm || isAustenTileSwapBW;
+                          const shouldApplyRules = active === 'first_contact' || active === 'the_human_inside' || active === 'cube' || active === 'miscellania' || isAustenKeepCalm || isAustenTileSwapBW;
                           const mode = active === 'the_human_inside' ? humanInsideVariant : firstContactVariant;
                           const isAustenPemberley = active === 'austen'
                             && typeof resolvedOverlaySrc === 'string'
@@ -546,7 +546,7 @@ function MegaStripePanel({
                           const isAustenTileSwapBW = active === 'austen'
                             && typeof resolvedOverlaySrc === 'string'
                             && /\/austen\/(pemberley_house|crosswords|quotes)\//i.test(resolvedOverlaySrc);
-                          const shouldApplyRules = active === 'first_contact' || active === 'the_human_inside' || active === 'cube' || active === 'outcasted' || isAustenKeepCalm || isAustenTileSwapBW;
+                          const shouldApplyRules = active === 'first_contact' || active === 'the_human_inside' || active === 'cube' || active === 'miscellania' || isAustenKeepCalm || isAustenTileSwapBW;
                           const mode = active === 'the_human_inside' ? humanInsideVariant : firstContactVariant;
                           const isAustenPemberley = active === 'austen'
                             && typeof resolvedOverlaySrc === 'string'

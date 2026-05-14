@@ -5,7 +5,7 @@ import { Package, Image, Database, RefreshCw } from 'lucide-react';
 const COLLECTIONS = {
   'first-contact': { name: 'First Contact', expected: 12 },
   'the-human-inside': { name: 'The Human Inside', expected: 12 },
-  'outcasted': { name: 'Outcasted', expected: 12 },
+  'miscellania': { name: 'Miscel·lània', expected: 12 },
   'austen': { name: 'Austen', expected: 14 },
   'cube': { name: 'Cube', expected: 10 }
 };

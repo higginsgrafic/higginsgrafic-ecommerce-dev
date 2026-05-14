@@ -29,16 +29,16 @@ export const COLLECTIONS = {
     bodyText: 'Col·lecció de proves per validar el flux de productes i la nova estructura canònica de mockups.'
   },
 
-  'outcasted': {
-    collectionSlug: 'outcasted',
-    textsKey: 'outcasted',
-    breadcrumbLabel: 'Outcasted',
+  'miscellania': {
+    collectionSlug: 'miscellania',
+    textsKey: 'miscellania',
+    breadcrumbLabel: 'Miscel·lània',
     useFullBleedUnderHeader: true,
     headerClassName: 'bg-gradient-to-br from-gray-900 via-stone-900 to-neutral-900 text-white py-16 lg:py-24',
-    // TODO: fill with the real curated Outcasted product slugs.
-    // Until then, CollectionPage will fall back to getProductsByCollection('outcasted') in DEV.
+    // TODO: fill with the real curated Miscel·lània product slugs.
+    // Until then, CollectionPage will fall back to getProductsByCollection('miscellania') in DEV.
     productSlugs: [],
-    bodyText: "Outcasted celebra la individualitat i l'autonomia. Per a qui no necessita l'aprovació dels altres per sentir-se complet. Aquesta col·lecció és un homenatge a qui tria el seu propi camí, encara que això signifiqui caminar sol. Inspirada en els que desafien les normes i rebutgen el conformisme, cada peça és una declaració d'independència. És per a qui entén que la solitud pot ser una forma de llibertat, no un càstig. Per a esperits lliures i independents."
+    bodyText: "Miscel·lània celebra la individualitat i l'autonomia. Per a qui no necessita l'aprovació dels altres per sentir-se complet. Aquesta col·lecció és un homenatge a qui tria el seu propi camí, encara que això signifiqui caminar sol. Inspirada en els que desafien les normes i rebutgen el conformisme, cada peça és una declaració d'independència. És per a qui entén que la solitud pot ser una forma de llibertat, no un càstig. Per a esperits lliures i independents."
   },
 };
 

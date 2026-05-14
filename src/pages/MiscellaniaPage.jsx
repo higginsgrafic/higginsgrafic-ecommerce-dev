@@ -7,16 +7,16 @@ import { useTexts } from '@/hooks/useTexts';
 import Breadcrumbs from '@/components/Breadcrumbs';
 import FullBleedUnderHeader from '@/components/FullBleedUnderHeader';
 
-function OutcastedPage({ onAddToCart, cartItems, onUpdateQuantity }) {
+function MiscellaniaPage({ onAddToCart, cartItems, onUpdateQuantity }) {
   const texts = useTexts();
   const { getProductsByCollection } = useProductContext();
-  const collectionProducts = getProductsByCollection('outcasted');
+  const collectionProducts = getProductsByCollection('miscellania');
 
   return (
     <>
       <Helmet>
-        <title>{texts.collections.outcasted.seo.title}</title>
-        <meta name="description" content={texts.collections.outcasted.seo.description} />
+        <title>{texts.collections.miscellania.seo.title}</title>
+        <meta name="description" content={texts.collections.miscellania.seo.description} />
       </Helmet>
 
       <div className="min-h-screen bg-white">
@@ -25,7 +25,7 @@ function OutcastedPage({ onAddToCart, cartItems, onUpdateQuantity }) {
             <div className="mb-8">
               <Breadcrumbs
                 items={[
-                  { label: 'Outcasted' }
+                  { label: 'Miscel·lània' }
                 ]}
                 lightMode={true}
               />
@@ -38,10 +38,10 @@ function OutcastedPage({ onAddToCart, cartItems, onUpdateQuantity }) {
               className="text-center max-w-4xl mx-auto"
             >
               <h1 className="font-oswald text-5xl lg:text-7xl font-bold uppercase mb-6">
-                {texts.collections.outcasted.title}
+                {texts.collections.miscellania.title}
               </h1>
               <p className="font-roboto text-lg lg:text-xl text-gray-200 italic">
-                {texts.collections.outcasted.description}
+                {texts.collections.miscellania.description}
               </p>
             </motion.div>
           </div>
@@ -60,7 +60,7 @@ function OutcastedPage({ onAddToCart, cartItems, onUpdateQuantity }) {
                   La Col·lecció
                 </h2>
                 <p className="font-roboto text-base text-gray-700 leading-relaxed">
-                  Outcasted celebra la individualitat i l'autonomia. Per a qui no necessita l'aprovació
+                  Miscel·lània celebra la individualitat i l'autonomia. Per a qui no necessita l'aprovació
                   dels altres per sentir-se complet. Aquesta col·lecció és un homenatge a qui tria el
                   seu propi camí, encara que això signifiqui caminar sol.
                 </p>
@@ -90,4 +90,4 @@ function OutcastedPage({ onAddToCart, cartItems, onUpdateQuantity }) {
   );
 }
 
-export default OutcastedPage;
+export default MiscellaniaPage;

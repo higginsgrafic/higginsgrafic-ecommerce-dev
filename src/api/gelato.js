@@ -495,7 +495,7 @@ const mapGelatoProductType = (productTypeUid) => {
   const productType = productTypeUid.toLowerCase();
 
   if (productType.includes('t-shirt') || productType.includes('tshirt') || productType.includes('apparel')) {
-    const collections = ['first-contact', 'the-human-inside', 'austen', 'cube', 'outcasted'];
+    const collections = ['first-contact', 'the-human-inside', 'austen', 'cube', 'miscellania'];
     const hash = productTypeUid.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
     return collections[hash % collections.length];
   }

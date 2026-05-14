@@ -27,7 +27,7 @@ function Header({
     { name: texts.header.navigation.theHumanInside, href: '/the-human-inside' },
     { name: texts.header.navigation.austen, href: '/austen' },
     { name: texts.header.navigation.cube, href: '/cube' },
-    { name: texts.header.navigation.outcasted, href: '/outcasted' }
+    { name: texts.header.navigation.miscellania, href: '/miscellania' }
   ];
 
   const topOffsetPx = (adminBannerVisible ? 40 : 0) + (offersHeaderVisible ? 40 : 0) + (Number(rulerInset) || 0);

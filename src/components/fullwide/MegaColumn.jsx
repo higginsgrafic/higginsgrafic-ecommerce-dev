@@ -218,7 +218,7 @@ function MegaColumn({
 
   const effectiveItems = useMemo(() => {
     const list = Array.isArray(items) ? items.slice() : [];
-    if (collectionId !== 'outcasted') return list.filter(Boolean);
+    if (collectionId !== 'miscellania') return list.filter(Boolean);
     const variant = isHumanInside ? humanInsideVariant : firstContactVariant;
     const filtered = list.filter((it) => {
       if (it === CONTROL_TILE_BN || it === CONTROL_TILE_ARROWS) return true;
@@ -357,7 +357,7 @@ function MegaColumn({
     });
   }, [baseItems, collectionId]);
 
-  const outcastedStripeTiles = collectionId === 'outcasted' ? Math.max(0, Math.min(7, baseItems.length)) : 7;
+  const miscellaniaStripeTiles = collectionId === 'miscellania' ? Math.max(0, Math.min(7, baseItems.length)) : 7;
 
   const thinSlideEnabled = isHumanInside && row && drawableItems.length > 7;
   const pagingEnabled = row && !thinSlideEnabled && drawableItems.length > 7;
@@ -489,15 +489,15 @@ function MegaColumn({
       const vPath = deriveVariantPath(it, variant) || it;
       if (typeof vPath === 'string' && vPath.startsWith('/')) return ensureThumbSuffix(vPath, 'stripe');
 
-      if (collectionId === 'outcasted') {
+      if (collectionId === 'miscellania') {
         const normalized = typeof vPath === 'string' ? vPath.replace(/^\/?(black|white)\//i, '') : vPath;
         if (variant === 'color') {
-          return ensureThumbSuffix(`/custom_logos/drawings/images_stripe/miscel·lania/multi/${normalized}`, 'stripe');
+          return ensureThumbSuffix(`/custom_logos/drawings/images_stripe/miscellania/multi/${normalized}`, 'stripe');
         }
         if (variant === 'white') {
-          return ensureThumbSuffix(`/custom_logos/drawings/images_stripe/miscel·lania/white/${normalized}`, 'stripe');
+          return ensureThumbSuffix(`/custom_logos/drawings/images_stripe/miscellania/white/${normalized}`, 'stripe');
         }
-        return ensureThumbSuffix(`/custom_logos/drawings/images_stripe/miscel·lania/black/${normalized}`, 'stripe');
+        return ensureThumbSuffix(`/custom_logos/drawings/images_stripe/miscellania/black/${normalized}`, 'stripe');
       }
 
       if (collectionId === 'the_human_inside') {
@@ -565,10 +565,10 @@ function MegaColumn({
     }
 
     if (raw.startsWith('/custom_logos/drawings/images_grid/')) {
-      if (cid === 'outcasted' && raw.startsWith('/custom_logos/drawings/images_grid/miscel·lania/')) {
+      if (cid === 'miscellania' && raw.startsWith('/custom_logos/drawings/images_grid/miscellania/')) {
         const file = raw.split('/').pop() || '';
         const lower = file.toLowerCase();
-        const outcastedMap = {
+        const miscellaniaMap = {
           'dj-vader-grid.webp': 'dj-vader-b-grid.webp',
           'dj-vader.webp': 'dj-vader-b-grid.webp',
           'death-star2d2-grid.webp': 'death-star2d2-b-grid.webp',
@@ -576,8 +576,8 @@ function MegaColumn({
           'pont-del-diable-grid.webp': 'pont-del-diable-b-grid.webp',
           'pont-del-diable.webp': 'pont-del-diable-b-grid.webp',
         };
-        const mapped = outcastedMap[lower];
-        if (mapped) return `/custom_logos/drawings/images_grid/miscel·lania/${mapped}`;
+        const mapped = miscellaniaMap[lower];
+        if (mapped) return `/custom_logos/drawings/images_grid/miscellania/${mapped}`;
       }
       if (cid === 'austen' && raw.includes('/austen/quotes/')) {
         return resolveAustenQuoteThumbFromPath(raw, 'grid') || ensureThumbSuffix(raw, 'grid');
@@ -669,15 +669,15 @@ function MegaColumn({
         return ensureThumbSuffix(`/custom_logos/drawings/images_grid/cube/${out}`, 'grid');
       }
 
-      if (cid === 'outcasted') {
+      if (cid === 'miscellania') {
         const lower = baseFile.toLowerCase();
-        if (lower === 'dj-vader.webp') return '/custom_logos/drawings/images_grid/miscel·lania/dj-vader-b-grid.webp';
-        if (lower === 'dj-vader-b.webp') return '/custom_logos/drawings/images_grid/miscel·lania/dj-vader-b-grid.webp';
-        if (lower === 'death-star2d2.webp') return '/custom_logos/drawings/images_grid/miscel·lania/death-star2d2-b-grid.webp';
-        if (lower === 'death-star2d2-b.webp') return '/custom_logos/drawings/images_grid/miscel·lania/death-star2d2-b-grid.webp';
-        if (lower === 'pont-del-diable.webp') return '/custom_logos/drawings/images_grid/miscel·lania/pont-del-diable-b-grid.webp';
-        if (lower === 'pont-del-diable-b.webp') return '/custom_logos/drawings/images_grid/miscel·lania/pont-del-diable-b-grid.webp';
-        return ensureThumbSuffix(`/custom_logos/drawings/images_grid/miscel·lania/${baseFile.replace(/-b\.webp$/i, '-b-grid.webp')}`, 'grid');
+        if (lower === 'dj-vader.webp') return '/custom_logos/drawings/images_grid/miscellania/dj-vader-b-grid.webp';
+        if (lower === 'dj-vader-b.webp') return '/custom_logos/drawings/images_grid/miscellania/dj-vader-b-grid.webp';
+        if (lower === 'death-star2d2.webp') return '/custom_logos/drawings/images_grid/miscellania/death-star2d2-b-grid.webp';
+        if (lower === 'death-star2d2-b.webp') return '/custom_logos/drawings/images_grid/miscellania/death-star2d2-b-grid.webp';
+        if (lower === 'pont-del-diable.webp') return '/custom_logos/drawings/images_grid/miscellania/pont-del-diable-b-grid.webp';
+        if (lower === 'pont-del-diable-b.webp') return '/custom_logos/drawings/images_grid/miscellania/pont-del-diable-b-grid.webp';
+        return ensureThumbSuffix(`/custom_logos/drawings/images_grid/miscellania/${baseFile.replace(/-b\.webp$/i, '-b-grid.webp')}`, 'grid');
       }
 
       if (cid === 'austen') {
@@ -814,11 +814,11 @@ function MegaColumn({
       return out;
     }
 
-    if (cid === 'outcasted') {
+    if (cid === 'miscellania') {
       const s = it.toLowerCase();
-      if (s.includes('dj-vader')) return '/custom_logos/drawings/images_grid/miscel·lania/dj-vader-b-grid.webp';
-      if (s.includes('death-star2d2')) return '/custom_logos/drawings/images_grid/miscel·lania/death-star2d2-b-grid.webp';
-      if (s.includes('pont-del-diable')) return '/custom_logos/drawings/images_grid/miscel·lania/pont-del-diable-b-grid.webp';
+      if (s.includes('dj-vader')) return '/custom_logos/drawings/images_grid/miscellania/dj-vader-b-grid.webp';
+      if (s.includes('death-star2d2')) return '/custom_logos/drawings/images_grid/miscellania/death-star2d2-b-grid.webp';
+      if (s.includes('pont-del-diable')) return '/custom_logos/drawings/images_grid/miscellania/pont-del-diable-b-grid.webp';
       return resolveSrc(it);
     }
 
@@ -1003,14 +1003,14 @@ function MegaColumn({
       return ensureThumbSuffix(`/custom_logos/drawings/images_stripe/cube/${master}`, 'stripe');
     }
 
-    if (collectionId === 'outcasted') {
+    if (collectionId === 'miscellania') {
       const file = raw.split('/').pop() || '';
       const map = {
         'dj-vader.webp': 'dj-vader-b.webp',
         'death-star2d2.webp': 'death-star2d2-b.webp',
       };
       const master = map[file.toLowerCase()] || file;
-      return ensureThumbSuffix(`/custom_logos/drawings/images_stripe/miscel·lania/black/${master}`, 'stripe');
+      return ensureThumbSuffix(`/custom_logos/drawings/images_stripe/miscellania/black/${master}`, 'stripe');
     }
 
     if (collectionId === 'the_human_inside') {

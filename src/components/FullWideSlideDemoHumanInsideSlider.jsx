@@ -376,7 +376,7 @@ export default function FullWideSlideDemoHumanInsideSlider({
                 >
                   {!it ? (
                     <div className="h-4" />
-                  ) : collectionId === 'outcasted' && isPathItem(it) ? (
+                  ) : collectionId === 'miscellania' && isPathItem(it) ? (
                     <div className="h-4" />
                   ) : (
                     <Link
@@ -414,7 +414,7 @@ export default function FullWideSlideDemoHumanInsideSlider({
                     >
                       <OptimizedImg
                         src={resolveThinPlaceholderSrc(it)}
-                        alt={collectionId === 'outcasted' && isPathItem(it) ? '' : labelForItem(it) || it}
+                        alt={collectionId === 'miscellania' && isPathItem(it) ? '' : labelForItem(it) || it}
                         className="h-full w-full object-cover"
                       />
                     </div>

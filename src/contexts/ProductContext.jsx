@@ -44,18 +44,18 @@ const isBlackOrWhite = (value) => {
   );
 };
 
-const isOutcastedAllowedColor = (value) => {
-  // Outcasted should show all available colors/variants.
+const isMiscellaniaAllowedColor = (value) => {
+  // Miscel·lània should show all available colors/variants.
   // Any previous restrictions here caused only a subset (e.g. Militar) to be visible.
   return true;
 };
 
-const inferOutcastedColorFromImageUrl = (url) => {
+const inferMiscellaniaColorFromImageUrl = (url) => {
   const key = normalizeColorKey(url);
   if (!key) return null;
 
-  // Outcasted mockup filenames may include multiple color tokens (e.g. ink + garment):
-  // outcasted-xxx-black-green.png
+  // Miscel·lània mockup filenames may include multiple color tokens (e.g. ink + garment):
+  // miscellania-xxx-black-green.png
   // In that case, we want the *last* color token as the best guess for the garment color.
   const tokens = [
     'militar', 'military', 'army', 'olive', 'khaki',
@@ -87,19 +87,19 @@ const inferOutcastedColorFromImageUrl = (url) => {
   return null;
 };
 
-const sanitizeOutcastedProducts = (items) => {
+const sanitizeMiscellaniaProducts = (items) => {
   const safe = Array.isArray(items) ? items : [];
 
   const out = safe.map((p) => {
-    if (!p || (p.collection || '').toString().toLowerCase() !== 'outcasted') return p;
+    if (!p || (p.collection || '').toString().toLowerCase() !== 'miscellania') return p;
 
     const variants = Array.isArray(p.variants) ? p.variants : [];
-    const filteredVariants = variants.filter((v) => isOutcastedAllowedColor(v?.color));
+    const filteredVariants = variants.filter((v) => isMiscellaniaAllowedColor(v?.color));
 
     const pickImageFromList = (list) => {
       const urls = (Array.isArray(list) ? list : []).filter((u) => typeof u === 'string' && u.length > 0);
       if (urls.length === 0) return null;
-      const byColor = (wanted) => urls.find((u) => inferOutcastedColorFromImageUrl(u) === wanted);
+      const byColor = (wanted) => urls.find((u) => inferMiscellaniaColorFromImageUrl(u) === wanted);
       return byColor('black') || byColor('white') || byColor('militar') || urls[0] || null;
     };
 
@@ -126,7 +126,7 @@ const sanitizeOutcastedProducts = (items) => {
       (typeof p?.image === 'string' && p.image.length > 0) ||
       (Array.isArray(p?.images) && p.images.length > 0);
 
-    const inferredColor = inferOutcastedColorFromImageUrl(p?.image || p?.images?.[0] || '');
+    const inferredColor = inferMiscellaniaColorFromImageUrl(p?.image || p?.images?.[0] || '');
 
     const preferredListImage = pickImageFromList(p?.images);
     const nextImage = preferredVariantImage || preferredListImage || (hasAnyImage ? p.image : fallbackImage);
@@ -134,7 +134,7 @@ const sanitizeOutcastedProducts = (items) => {
       const baseImages = (Array.isArray(p?.images) ? p.images : []).filter(Boolean);
 
       // If we have a preferred image (usually from variants), use it as the main one,
-      // but preserve the full image gallery when available (important for Outcasted).
+      // but preserve the full image gallery when available (important for Miscel·lània).
       if (preferredVariantImage) {
         const deduped = [preferredVariantImage, ...baseImages.filter((u) => u !== preferredVariantImage)];
         return deduped.length > 0 ? deduped : [preferredVariantImage];
@@ -145,7 +145,7 @@ const sanitizeOutcastedProducts = (items) => {
     })();
 
     const finalColor =
-      inferOutcastedColorFromImageUrl(nextImage || nextImages?.[0] || '') ||
+      inferMiscellaniaColorFromImageUrl(nextImage || nextImages?.[0] || '') ||
       inferredColor ||
       null;
 
@@ -156,7 +156,7 @@ const sanitizeOutcastedProducts = (items) => {
       variants: nextVariants,
       image: nextImage,
       images: nextImages,
-      outcastedColor: finalColor
+      miscellaniaColor: finalColor
     };
   });
 
@@ -211,7 +211,7 @@ export const ProductProvider = ({ children }) => {
       'the-human-inside': 'the-human-inside',
       'human inside': 'the-human-inside',
       'cube': 'cube',
-      'outcasted': 'outcasted'
+      'miscellania': 'miscellania'
     };
 
     for (const [key, value] of Object.entries(collectionMap)) {
@@ -451,22 +451,22 @@ export const ProductProvider = ({ children }) => {
         if (!merged || merged.length === 0) {
           if (!supabaseProducts || supabaseProducts.length === 0) {
             console.log('⚠️ No hi ha productes (Gelato/Supabase), carregant mock products...');
-            setProducts(sanitizeOutcastedProducts(allMockProducts));
+            setProducts(sanitizeMiscellaniaProducts(allMockProducts));
           } else {
             console.log('⚠️ No hi ha productes de Gelato, fent fallback a Supabase');
-            setProducts(sanitizeOutcastedProducts(supabaseProducts));
+            setProducts(sanitizeMiscellaniaProducts(supabaseProducts));
           }
         } else {
-          setProducts(sanitizeOutcastedProducts(merged));
+          setProducts(sanitizeMiscellaniaProducts(merged));
         }
       } else {
         console.log('📝 Using mock products');
-        setProducts(sanitizeOutcastedProducts(allMockProducts));
+        setProducts(sanitizeMiscellaniaProducts(allMockProducts));
       }
     } catch (err) {
       console.error('❌ Error carregant productes:', err);
       setError(err);
-      setProducts(sanitizeOutcastedProducts(allMockProducts));
+      setProducts(sanitizeMiscellaniaProducts(allMockProducts));
     } finally {
       console.log('✅ Loading complete, setting loading=false');
       setLoading(false);

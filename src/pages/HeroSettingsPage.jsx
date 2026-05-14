@@ -85,7 +85,7 @@ export default function HeroSettingsPage({
     { path: '/the-human-inside', label: 'The Human Inside' },
     { path: '/austen', label: 'Austen' },
     { path: '/cube', label: 'Cube' },
-    { path: '/outcasted', label: 'Outcasted' },
+    { path: '/miscellania', label: 'Miscel·lània' },
     { path: '/grafic', label: 'Gràfic' },
     { path: '/about', label: 'Sobre nosaltres' },
     { path: '/contact', label: 'Contacte' },
@@ -94,7 +94,7 @@ export default function HeroSettingsPage({
   const availableVideos = [
     { id: 'I0VjId1PtNA', label: 'First Contact / The Human Inside / Cube' },
     { id: 'dpAYDELHNR0', label: 'Austen' },
-    { id: '5eOZJ9CTIdY', label: 'Outcasted' },
+    { id: '5eOZJ9CTIdY', label: 'Miscel·lània' },
   ];
 
   const openSearchDialog = (type) => {
@@ -191,10 +191,10 @@ export default function HeroSettingsPage({
     },
     {
       slide_index: 4,
-      title: "Outcasted",
+      title: "Miscel·lània",
       subtitle: "Per als que no encaixen en el motlle",
       video_url: "5eOZJ9CTIdY",
-      path: "/outcasted",
+      path: "/miscellania",
       bg_type: "video",
       bg_value: "5eOZJ9CTIdY",
       bg_opacity: 0.6,

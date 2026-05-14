@@ -61,7 +61,7 @@ export default function IndexPage() {
             { label: 'The Human Inside', path: '/the-human-inside', status: '⚠ Arxiu existeix, ruta NO definida' },
             { label: 'Austen', path: '/austen', status: '⚠ Arxiu existeix, ruta NO definida' },
             { label: 'Cube', path: '/cube', status: '⚠ Arxiu existeix, ruta NO definida' },
-            { label: 'Outcasted', path: '/outcasted', status: '⚠ Arxiu existeix, ruta NO definida' }
+            { label: 'Miscel·lània', path: '/miscellania', status: '⚠ Arxiu existeix, ruta NO definida' }
           ]
         },
         { label: 'Grafic / Higgins Grafic', path: '/higginsgrafic', status: '⚠ Arxiu existeix (GraficPage), ruta NO definida' },
@@ -301,9 +301,9 @@ export default function IndexPage() {
             <TextInput label="Títol" path="hero.slides.cube.title" value={texts.hero.slides.cube.title} />
             <TextInput label="Subtítol" path="hero.slides.cube.subtitle" value={texts.hero.slides.cube.subtitle} />
 
-            <SectionTitle>Outcasted</SectionTitle>
-            <TextInput label="Títol" path="hero.slides.outcasted.title" value={texts.hero.slides.outcasted.title} />
-            <TextInput label="Subtítol" path="hero.slides.outcasted.subtitle" value={texts.hero.slides.outcasted.subtitle} />
+            <SectionTitle>Miscel·lània</SectionTitle>
+            <TextInput label="Títol" path="hero.slides.miscellania.title" value={texts.hero.slides.miscellania.title} />
+            <TextInput label="Subtítol" path="hero.slides.miscellania.subtitle" value={texts.hero.slides.miscellania.subtitle} />
           </Column>
         </div>
       )
@@ -323,7 +323,7 @@ export default function IndexPage() {
             <TextInput label="The Human Inside" path="home.sections.theHumanInsideDesc" value={texts.home.sections.theHumanInsideDesc} />
             <TextInput label="Austen" path="home.sections.austenDesc" value={texts.home.sections.austenDesc} />
             <TextInput label="Cube" path="home.sections.cubeDesc" value={texts.home.sections.cubeDesc} />
-            <TextInput label="Outcasted" path="home.sections.outcastedDesc" value={texts.home.sections.outcastedDesc} />
+            <TextInput label="Miscel·lània" path="home.sections.miscellaniaDesc" value={texts.home.sections.miscellaniaDesc} />
           </Column>
         </div>
       )
@@ -358,11 +358,11 @@ export default function IndexPage() {
             <TextInput label="Títol" path="collections.cube.title" value={texts.collections.cube.title} />
             <TextInput label="Descripció" path="collections.cube.description" value={texts.collections.cube.description} />
 
-            <SectionTitle>Outcasted</SectionTitle>
-            <TextInput label="SEO Títol" path="collections.outcasted.seo.title" value={texts.collections.outcasted.seo.title} />
-            <TextInput label="SEO Desc" path="collections.outcasted.seo.description" value={texts.collections.outcasted.seo.description} />
-            <TextInput label="Títol" path="collections.outcasted.title" value={texts.collections.outcasted.title} />
-            <TextInput label="Descripció" path="collections.outcasted.description" value={texts.collections.outcasted.description} />
+            <SectionTitle>Miscel·lània</SectionTitle>
+            <TextInput label="SEO Títol" path="collections.miscellania.seo.title" value={texts.collections.miscellania.seo.title} />
+            <TextInput label="SEO Desc" path="collections.miscellania.seo.description" value={texts.collections.miscellania.seo.description} />
+            <TextInput label="Títol" path="collections.miscellania.title" value={texts.collections.miscellania.title} />
+            <TextInput label="Descripció" path="collections.miscellania.description" value={texts.collections.miscellania.description} />
           </Column>
         </div>
       )
@@ -525,7 +525,7 @@ export default function IndexPage() {
             <TextInput label="The Human Inside" path="footer.collections.theHumanInside" value={texts.footer.collections.theHumanInside} />
             <TextInput label="Austen" path="footer.collections.austen" value={texts.footer.collections.austen} />
             <TextInput label="Cube" path="footer.collections.cube" value={texts.footer.collections.cube} />
-            <TextInput label="Outcasted" path="footer.collections.outcasted" value={texts.footer.collections.outcasted} />
+            <TextInput label="Miscel·lània" path="footer.collections.miscellania" value={texts.footer.collections.miscellania} />
           </Column>
         </div>
       )

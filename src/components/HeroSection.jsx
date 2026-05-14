@@ -51,9 +51,9 @@ const HeroSection = () => {
     },
     {
       id: 5,
-      title: texts.hero.slides.outcasted.title,
-      subtitle: texts.hero.slides.outcasted.subtitle,
-      path: "/outcasted",
+      title: texts.hero.slides.miscellania.title,
+      subtitle: texts.hero.slides.miscellania.subtitle,
+      path: "/miscellania",
       bg_value: '5eOZJ9CTIdY',
       bg_opacity: 0.6
     }

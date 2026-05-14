@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { touchMegaPublicActivity } from '@/components/fullwide/megaPublicSelectorState.js';
 
-const ALLOWED = new Set(['first_contact', 'the_human_inside', 'austen', 'cube', 'outcasted']);
+const ALLOWED = new Set(['first_contact', 'the_human_inside', 'austen', 'cube', 'miscellania']);
 
 /**
  * Syncs the `active` collection state to the `?active=` or `?collection=` URL

@@ -57,11 +57,11 @@ function ProductGrid({
     : [];
 
   const displayProducts = useMemo(() => {
-    const outcasted = safeProducts.filter((p) => (p?.collection || '').toString().toLowerCase() === 'outcasted');
-    if (outcasted.length === 0) return safeProducts;
+    const miscellania = safeProducts.filter((p) => (p?.collection || '').toString().toLowerCase() === 'miscellania');
+    if (miscellania.length === 0) return safeProducts;
 
     const normalize = (v) => (v || '').toString().trim().toLowerCase();
-    const inferOutcastedColorFromImageUrl = (url) => {
+    const inferMiscellaniaColorFromImageUrl = (url) => {
       const key = normalize(url);
       if (!key) return null;
 
@@ -104,7 +104,7 @@ function ProductGrid({
 
     const getSeed = () => {
       try {
-        const key = 'outcastedGridSeed';
+        const key = 'miscellaniaGridSeed';
         const existing = window.sessionStorage.getItem(key);
         if (existing) return Number(existing) || 1;
         const next = Math.floor(Math.random() * 2147483647) + 1;
@@ -125,14 +125,14 @@ function ProductGrid({
 
     const usedColors = new Set();
     const mapped = safeProducts.map((p) => {
-      if ((p?.collection || '').toString().toLowerCase() !== 'outcasted') return p;
+      if ((p?.collection || '').toString().toLowerCase() !== 'miscellania') return p;
 
       const imgs = (Array.isArray(p?.images) ? p.images : []).filter((u) => typeof u === 'string' && u.length > 0);
       if (imgs.length === 0) return p;
 
       const byColor = new Map();
       for (const u of imgs) {
-        const c = inferOutcastedColorFromImageUrl(u) || 'other';
+        const c = inferMiscellaniaColorFromImageUrl(u) || 'other';
         const list = byColor.get(c) || [];
         list.push(u);
         byColor.set(c, list);

@@ -63,7 +63,7 @@ function AboutPage() {
       description: 'Som éssers complexos, multidimensionals. El que veus a fora no és mai tota la història.'
     },
     {
-      name: 'Outcasted',
+      name: 'Miscel·lània',
       tagline: 'As they say, better alone than in bad company.',
       description: 'Per als qui prefereixen la solitud autèntica abans que la companyia falsa. Per als inadaptats orgullosos.'
     }
