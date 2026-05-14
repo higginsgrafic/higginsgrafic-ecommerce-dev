@@ -197,8 +197,8 @@ function HomeClean() {
         autoplayIntervalMs={8000}
       />
 
-      <section className="border-t border-border bg-background text-foreground">
-        <div className="mx-auto max-w-[1400px] px-4 pt-12 pb-4 sm:px-6 lg:px-10 lg:pt-16 lg:pb-6">
+      <section className="bg-background text-foreground">
+        <div className="mx-auto max-w-[1400px] px-4 pt-[348px] pb-[174px] sm:px-6 lg:px-10">
           <CollectionTitle
             index="01"
             kicker="Col·lecció"
@@ -227,7 +227,7 @@ function HomeClean() {
       </section>
 
       <section className="bg-background text-foreground">
-        <div className="mx-auto max-w-[1400px] px-4 pt-4 pb-12 sm:px-6 lg:px-10 lg:pt-6 lg:pb-16">
+        <div className="mx-auto max-w-[1400px] px-4 py-[174px] sm:px-6 lg:px-10">
           <CollectionTitle
             index="02"
             kicker="Col·lecció"
@@ -276,7 +276,7 @@ function HomeClean() {
       </section>
 
       <section className="bg-background text-foreground">
-        <div className="mx-auto max-w-[1400px] px-4 pt-4 pb-12 sm:px-6 lg:px-10 lg:pt-6 lg:pb-16">
+        <div className="mx-auto max-w-[1400px] px-4 py-[174px] sm:px-6 lg:px-10">
           <CollectionTitle
             index="03"
             kicker="Col·lecció"
@@ -306,6 +306,8 @@ function HomeClean() {
             titleOffsetX={35}
             titleOffsetY={9}
             numberOffsetX={-21}
+            numberOffsetY={30}
+            numberTopPercent={25}
           />
           <TdpVariantsGallery
             variants={[
@@ -320,13 +322,13 @@ function HomeClean() {
       </section>
 
       <section className="bg-background text-foreground">
-        <div className="mx-auto max-w-[1400px] px-4 pt-4 pb-12 sm:px-6 lg:px-10 lg:pt-6 lg:pb-16">
+        <div className="mx-auto max-w-[1400px] px-4 py-[174px] sm:px-6 lg:px-10">
           <CollectionTitle
             index="04"
             kicker="Col·lecció"
             title={(
               <span style={{ display: 'inline-block', textAlign: 'right' }}>
-                <span style={{ display: 'block', transform: 'translateY(-35px)' }}>Cube</span>
+                <span style={{ display: 'block' }}>Cube</span>
                 <span
                   className="text-muted-foreground"
                   style={{
@@ -337,7 +339,7 @@ function HomeClean() {
                     lineHeight: 1.4,
                     letterSpacing: '0.1em',
                     marginTop: '0.75rem',
-                    transform: 'translateY(-26px)',
+                    transform: 'translateY(9px)',
                   }}
                 >
                   UN PUNT DE VITA DIFERENT
@@ -350,6 +352,7 @@ function HomeClean() {
             titleOffsetX={65}
             titleOffsetY={9}
             numberOffsetX={-21}
+            numberOffsetY={36}
             numberTopPercent={25}
           />
           <TdpVariantsGallery
@@ -365,13 +368,13 @@ function HomeClean() {
       </section>
 
       <section className="bg-background text-foreground">
-        <div className="mx-auto max-w-[1400px] px-4 pt-4 pb-12 sm:px-6 lg:px-10 lg:pt-6 lg:pb-16">
+        <div className="mx-auto max-w-[1400px] px-4 py-[174px] sm:px-6 lg:px-10">
           <CollectionTitle
             index="05"
             kicker="Col·lecció"
             title={(
               <span style={{ display: 'inline-block', textAlign: 'right' }}>
-                <span style={{ display: 'block', transform: 'translate(30px, -43px)' }}>Miscel·lània</span>
+                <span style={{ display: 'block', transform: 'translate(24px, -2px)' }}>Miscel·lània</span>
                 <span
                   className="text-muted-foreground"
                   style={{
@@ -380,12 +383,12 @@ function HomeClean() {
                     fontSize: '1.125rem',
                     fontWeight: 400,
                     lineHeight: 1.4,
-                    letterSpacing: '0.1em',
+                    letterSpacing: '0.11em',
                     marginTop: '0.75rem',
-                    transform: 'translate(30px, -31px)',
+                    transform: 'translate(25px, 9px)',
                   }}
                 >
-                  NO HEM TENCAT CAP MOTLLE, ÉS QUE ESTM FETS A MÀ
+                  NO HEM TRENCAT CAP MOTLLE, TAN SOLS ÉS QUE ENS HAN FET A MÀ
                 </span>
               </span>
             )}
@@ -395,7 +398,7 @@ function HomeClean() {
             titleOffsetX={35}
             titleOffsetY={9}
             numberOffsetX={-21}
-            numberOffsetY={-9}
+            numberOffsetY={31}
             numberTopPercent={25}
           />
           <TdpVariantsGallery

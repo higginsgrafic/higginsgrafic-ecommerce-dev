@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import TdpConstructorProduct from '@/components/tdp/TdpConstructorProduct';
 
-const PAUTA_ROWS = 33;
+const PAUTA_ROWS = 21;
 const PAUTA_GUTTER_X = '22.5px';
 const PAUTA_GUTTER_Y = '3px';
 const PAUTA_FIRST_ROW_SCALE = 0.7;
