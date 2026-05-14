@@ -163,7 +163,7 @@ function HomeClean() {
             titleOffsetY={9}
             numberOffsetX={-21}
             subtitleOffsetX={-25}
-            subtitleOffsetY={9}
+            subtitleOffsetY={19}
           />
           <div style={{ marginTop: '150px' }}>
             <TdpVariantsGallery
