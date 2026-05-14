@@ -1,6 +1,6 @@
 import React from 'react';
 
-function SizeButton({ size, selected = false, onClick, className = '' }) {
+function SizeButton({ size, selected = false, onClick, className = '', labelClassName = '' }) {
   return (
     <button
       onClick={onClick}
@@ -16,7 +16,7 @@ function SizeButton({ size, selected = false, onClick, className = '' }) {
         borderRadius: 'clamp(2.81px, 0.8vw, 5.06px)'
       }}
     >
-      <span className="relative z-10">{size}</span>
+      <span className={`relative z-10 ${labelClassName}`}>{size}</span>
     </button>
   );
 }

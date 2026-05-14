@@ -276,6 +276,26 @@ function App() {
       return false;
     }
   });
+  const [tdpPautaEnabled, setTdpPautaEnabled] = useState(() => {
+    try {
+      const sp = new URLSearchParams(window.location.search);
+      if (sp.has('tdpPauta')) return sp.get('tdpPauta') === '1';
+      const raw = window.localStorage.getItem('HG_TDP_PAUTA_ENABLED_V1');
+      return raw === '1';
+    } catch {
+      return false;
+    }
+  });
+  const [tdpTableEnabled, setTdpTableEnabled] = useState(() => {
+    try {
+      const sp = new URLSearchParams(window.location.search);
+      if (sp.has('tdpTable')) return sp.get('tdpTable') === '1';
+      const raw = window.localStorage.getItem('HG_TDP_TABLE_ENABLED_V1');
+      return raw === '1';
+    } catch {
+      return false;
+    }
+  });
   const [megaAccordionLocked, setMegaAccordionLocked] = useState(() => {
     try {
       return window.localStorage.getItem('HG_MEGA_ACCORDION_LOCKED_V1') === '1';
@@ -297,6 +317,20 @@ function App() {
       // ignore
     }
   }, [checkoutPautaEnabled]);
+  useEffect(() => {
+    try {
+      window.localStorage.setItem('HG_TDP_PAUTA_ENABLED_V1', tdpPautaEnabled ? '1' : '0');
+    } catch {
+      // ignore
+    }
+  }, [tdpPautaEnabled]);
+  useEffect(() => {
+    try {
+      window.localStorage.setItem('HG_TDP_TABLE_ENABLED_V1', tdpTableEnabled ? '1' : '0');
+    } catch {
+      // ignore
+    }
+  }, [tdpTableEnabled]);
   useEffect(() => {
     try {
       window.localStorage.setItem('HG_MEGA_ACCORDION_LOCKED_V1', megaAccordionLocked ? '1' : '0');
@@ -752,7 +786,7 @@ function App() {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const isFullWideSlideRoute = location.pathname === '/full-wide-slide';
+  const isFullWideSlideRoute = location.pathname === '/full-wide-slide' || location.pathname === '/constructor/full-wide-slide';
   const isFullWideSlideDemoRoute = location.pathname === '/full-wide-slide-demo';
   const HUD_DEBUG_BOTTOM_RESERVE_PX = 104;
 
@@ -1072,7 +1106,7 @@ function App() {
 
   useEffect(() => {
     const path = (location?.pathname || '').toString();
-    const activeRoute = path === '/full-wide-slide' || path === '/full-wide-slide-demo';
+    const activeRoute = path === '/full-wide-slide' || path === '/constructor/full-wide-slide' || path === '/full-wide-slide-demo';
     if (!activeRoute) {
       window.localStorage.removeItem('MEGA_STRIPE_HUD_LOCKED_TOP');
       return;
@@ -1084,7 +1118,7 @@ function App() {
 
   useEffect(() => {
     const path = (location?.pathname || '').toString();
-    const activeRoute = path === '/full-wide-slide' || path === '/full-wide-slide-demo';
+    const activeRoute = path === '/full-wide-slide' || path === '/constructor/full-wide-slide' || path === '/full-wide-slide-demo';
     if (!activeRoute) return;
     try {
       const flagKey = 'MEGA_STRIPE_HUD_OWN_H_DOUBLED_ONCE';
@@ -1313,7 +1347,7 @@ function App() {
 
   useEffect(() => {
     const path = (location?.pathname || '').toString();
-    const activeRoute = path === '/full-wide-slide' || path === '/full-wide-slide-demo';
+    const activeRoute = path === '/full-wide-slide' || path === '/constructor/full-wide-slide' || path === '/full-wide-slide-demo';
     if (!activeRoute) return;
 
     const overlayKey = String(megaShirtDrawingOverlaySrc || '').trim();
@@ -1510,7 +1544,7 @@ function App() {
 
   useLayoutEffect(() => {
     const path = (location?.pathname || '').toString();
-    const activeRoute = path === '/full-wide-slide' || path === '/full-wide-slide-demo';
+    const activeRoute = path === '/full-wide-slide' || path === '/constructor/full-wide-slide' || path === '/full-wide-slide-demo';
     if (!activeRoute) {
       if (megaStripeHudLockedHPx != null) setMegaStripeHudLockedHPx(null);
       if (megaStripeHudLockedTopPx != null) setMegaStripeHudLockedTopPx(null);
@@ -1526,7 +1560,7 @@ function App() {
 
   useLayoutEffect(() => {
     const path = (location?.pathname || '').toString();
-    const activeRoute = path === '/full-wide-slide' || path === '/full-wide-slide-demo';
+    const activeRoute = path === '/full-wide-slide' || path === '/constructor/full-wide-slide' || path === '/full-wide-slide-demo';
     if (!activeRoute) return undefined;
 
     let raf = null;
@@ -1570,7 +1604,7 @@ function App() {
 
   useLayoutEffect(() => {
     const path = (location?.pathname || '').toString();
-    const activeRoute = path === '/full-wide-slide' || path === '/full-wide-slide-demo';
+    const activeRoute = path === '/full-wide-slide' || path === '/constructor/full-wide-slide' || path === '/full-wide-slide-demo';
     if (!activeRoute) {
       try {
         document.documentElement.style.removeProperty('--megaStripeHudTopPx');
@@ -1632,7 +1666,7 @@ function App() {
 
   useLayoutEffect(() => {
     const path = (location?.pathname || '').toString();
-    const activeRoute = path === '/full-wide-slide' || path === '/full-wide-slide-demo';
+    const activeRoute = path === '/full-wide-slide' || path === '/constructor/full-wide-slide' || path === '/full-wide-slide-demo';
     if (!activeRoute) {
       setMegaStripeHudSnapDyPx(0);
       return undefined;
@@ -1691,7 +1725,7 @@ function App() {
 
   useLayoutEffect(() => {
     const path = (location?.pathname || '').toString();
-    const activeRoute = path === '/full-wide-slide' || path === '/full-wide-slide-demo';
+    const activeRoute = path === '/full-wide-slide' || path === '/constructor/full-wide-slide' || path === '/full-wide-slide-demo';
     if (!activeRoute) return undefined;
 
     let raf = 0;
@@ -1745,7 +1779,7 @@ function App() {
 
   useEffect(() => {
     const path = (location?.pathname || '').toString();
-    const activeRoute = path === '/full-wide-slide' || path === '/full-wide-slide-demo';
+    const activeRoute = path === '/full-wide-slide' || path === '/constructor/full-wide-slide' || path === '/full-wide-slide-demo';
     if (!activeRoute) return undefined;
 
     const shouldIgnoreEvent = (e) => {
@@ -3098,6 +3132,7 @@ function App() {
                 <Route path="/wishlist" element={<Navigate to="/" replace />} />
 
                 <Route path="/full-wide-slide" element={<FullWideSlidePage />} />
+                <Route path="/constructor/full-wide-slide" element={<FullWideSlidePage />} />
 
                 <Route path="/plantilla-cataleg-components" element={<PlantillaCatalegComponentsPage />} />
 
@@ -3139,7 +3174,11 @@ function App() {
                 <Route path="/terms" element={<TermsPage />} />
                 <Route path="/cc" element={<CreativeCommonsPage />} />
                 <Route path="/offers" element={<OffersPage />} />
-                <Route path="/tdp" element={<TdpPage />} />
+                <Route
+                  path="/constructor/tdp"
+                  element={<TdpPage pautaEnabled={tdpPautaEnabled} tableEnabled={tdpTableEnabled} />}
+                />
+                <Route path="/tdp" element={<Navigate to="/constructor/tdp" replace />} />
 
                 <Route path="/new" element={<NewPage />} />
                 <Route path="/dev-links" element={<Navigate to="/proves/dev-links" replace />} />
@@ -5806,6 +5845,44 @@ function App() {
                       }}
                     >
                       Pauta
+                    </button>
+
+                    <button
+                      type="button"
+                      title="Activa/desactiva la pauta del TDP"
+                      aria-label="TDP pauta"
+                      aria-pressed={tdpPautaEnabled ? 'true' : 'false'}
+                      className={`relative z-10 h-12 rounded-full border px-4 text-[12px] font-semibold shadow-lg active:bg-black/10 debug-exempt ${
+                        tdpPautaEnabled
+                          ? 'border-[#0EA5E9]/40 bg-[#0EA5E9]/15 text-[#075985] hover:bg-[#0EA5E9]/20'
+                          : 'border-black/15 bg-white text-black/80 hover:bg-black/5'
+                      }`}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        setTdpPautaEnabled((v) => !v);
+                      }}
+                    >
+                      TDP Pauta
+                    </button>
+
+                    <button
+                      type="button"
+                      title="Activa/desactiva la taula del TDP"
+                      aria-label="TDP taula"
+                      aria-pressed={tdpTableEnabled ? 'true' : 'false'}
+                      className={`relative z-10 h-12 rounded-full border px-4 text-[12px] font-semibold shadow-lg active:bg-black/10 debug-exempt ${
+                        tdpTableEnabled
+                          ? 'border-[#8B5CF6]/40 bg-[#8B5CF6]/15 text-[#4C1D95] hover:bg-[#8B5CF6]/20'
+                          : 'border-black/15 bg-white text-black/80 hover:bg-black/5'
+                      }`}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        setTdpTableEnabled((v) => !v);
+                      }}
+                    >
+                      TDP Taula
                     </button>
 
                     <button

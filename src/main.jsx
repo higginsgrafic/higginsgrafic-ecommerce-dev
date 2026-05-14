@@ -64,6 +64,8 @@ import { GridDebugProvider } from '@/contexts/GridDebugContext';
 import { AdminProvider } from '@/contexts/AdminContext';
 import { AdminToolsProvider } from '@/contexts/AdminToolsContext';
 import App from '@/App';
+import BranchBadge from '@/components/dev/BranchBadge';
+import ActiveWorkOverlay from '@/components/dev/ActiveWorkOverlay';
 import '@/index.css';
 
 console.log('📦 All imports loaded successfully');
@@ -80,6 +82,8 @@ ReactDOM.createRoot(document.getElementById('root')).render(
           <ProductProvider>
             <ToastProvider>
               <App />
+              <BranchBadge />
+              <ActiveWorkOverlay />
             </ToastProvider>
           </ProductProvider>
         </GridDebugProvider>

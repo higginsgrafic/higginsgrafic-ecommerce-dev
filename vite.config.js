@@ -7,6 +7,14 @@ import { execSync } from 'child_process'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
+function readGitBranch() {
+  try {
+    return execSync('git rev-parse --abbrev-ref HEAD', { cwd: __dirname }).toString().trim()
+  } catch {
+    return 'unknown'
+  }
+}
+
 function componentCatalogDevApi() {
   const CONFIG_REL_PATH = 'public/component-catalog.config.json'
 
@@ -86,6 +94,9 @@ function componentCatalogDevApi() {
 
 export default defineConfig({
   plugins: [react(), componentCatalogDevApi()],
+  define: {
+    __HG_GIT_BRANCH__: JSON.stringify(readGitBranch()),
+  },
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
