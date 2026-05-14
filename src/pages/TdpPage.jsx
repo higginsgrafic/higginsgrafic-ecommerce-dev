@@ -1,9 +1,7 @@
 import React, { useLayoutEffect, useMemo, useState } from 'react';
 import { Helmet } from 'react-helmet';
-import ProductTdpCard from '@/components/ProductTdpCard';
 import TdpConstructorProduct from '@/components/tdp/TdpConstructorProduct';
 import { getSafeBelt } from '@/utils/layoutMetrics';
-import { placeholderTruncate, PLACEHOLDER_PARAGRAPHS } from '@/utils/placeholderText';
 
 const PAUTA_ROWS = 33;
 const PAUTA_COLS = 3;
@@ -15,13 +13,18 @@ const PAUTA_ROWS_TEMPLATE = `minmax(${PAUTA_FIRST_ROW_EXTRA_PX}px, ${PAUTA_FIRST
 const PAUTA_COLUMNS_TEMPLATE = 'repeat(3, minmax(0, calc((100% - 45px) / 3)))';
 const TDP_PAGE_TOP_OFFSET = '33px';
 const TDP_PAGE_LEFT_OFFSET = '0px';
-const tdpMockDescription = placeholderTruncate(PLACEHOLDER_PARAGRAPHS[0], 160);
 const tdpEditableDescription = [
-  "Mereixedors són d'honor, glòria e de fama",
-  'e contínua bona memòria los hòmens',
-  'virtuosos, e singularment aquells qui per',
-  'la república lluitaren.',
+  "Mereixedors són d'honor, glòria e de fama e contínua bona memòria los ",
+  'hòmens virtuosos, e singularment aquells qui per la república lluitaren.',
 ].join('\n');
+
+if (typeof window !== 'undefined' && typeof document !== 'undefined') {
+  try {
+    const belt = getSafeBelt({ maxContent: 1400, sideMargin: 76, minContent: 320 });
+    document.documentElement.style.setProperty('--hg-tdp-xL', `${belt.left}px`);
+    document.documentElement.style.setProperty('--hg-tdp-xR', `${belt.right}px`);
+  } catch (_) {}
+}
 
 
 function TdpPage({ pautaEnabled = false, tableEnabled = false }) {
@@ -213,6 +216,24 @@ function TdpPage({ pautaEnabled = false, tableEnabled = false }) {
           ) : null}
 
           <TdpConstructorProduct
+            gridColumn="1 / 2"
+            productName="NOM DE PRODUCTE"
+            description={tdpEditableDescription}
+            price="15,50€"
+            imageSrc="/placeholders/apparel/t-shirt/gildan_5000/gildan-5000_t-shirt_crewneck_unisex_heavyWeight_xl_white_gpr-4-0_front.png"
+            imageAlt="Samarreta blanca Gildan 5000"
+            sizes={sizes}
+            selectedSize={selectedSize}
+            onSizeChange={setSelectedSize}
+            cartCount={0}
+            onAddToCart={() => {}}
+            gutterY={PAUTA_GUTTER_Y}
+            editableIdPrefix="tdp-copy-col1"
+            copyMode
+            variant="v4"
+          />
+
+          <TdpConstructorProduct
             gridColumn="2 / 3"
             productName="NOM DE PRODUCTE"
             description={tdpEditableDescription}
@@ -246,86 +267,6 @@ function TdpPage({ pautaEnabled = false, tableEnabled = false }) {
             variant="v4"
           />
 
-          <div
-            style={{
-              gridColumn: '1 / 4',
-              gridRow: '1 / 2',
-              alignSelf: 'center',
-              zIndex: 5,
-              minWidth: 0,
-            }}
-          >
-            <p className="font-roboto text-sm uppercase tracking-[0.18em] text-muted-foreground">Prova TDP</p>
-          </div>
-
-          <div
-            style={{
-              gridColumn: '1 / 4',
-              gridRow: '2 / 5',
-              alignSelf: 'center',
-              zIndex: 5,
-              minWidth: 0,
-            }}
-          >
-            <h1 className="font-oswald text-4xl font-medium uppercase text-foreground sm:text-5xl">Targeta de producte</h1>
-          </div>
-
-          <div
-            style={{
-              gridColumn: '1 / 2',
-              gridRow: '5 / 18',
-              justifySelf: 'start',
-              alignSelf: 'start',
-              zIndex: 5,
-              width: '100%',
-              maxWidth: '350px',
-              minWidth: 0,
-            }}
-          >
-            <ProductTdpCard
-              title="NCC-1701"
-              description={tdpMockDescription}
-              imageSrc="/placeholders/apparel/t-shirt/gildan_5000/gildan-5000_t-shirt_crewneck_unisex_heavyWeight_xl_white_gpr-4-0_front.png"
-              imageAlt="Samarreta blanca Gildan 5000"
-              frameImageSrc="/placeholders/fons_acordio/una-columna.png"
-              frameImageAlt="Fons una columna"
-              price="15,50"
-              currency="€"
-              sizes={sizes}
-              selectedSize={selectedSize}
-              onSizeChange={setSelectedSize}
-              onAddToCart={() => {}}
-            />
-          </div>
-
-          <div
-            style={{
-              gridColumn: '1 / 2',
-              gridRow: '18 / 31',
-              justifySelf: 'start',
-              alignSelf: 'start',
-              zIndex: 5,
-              width: '100%',
-              maxWidth: '350px',
-              minWidth: 0,
-            }}
-          >
-            <ProductTdpCard
-              title="NCC-1701"
-              description={tdpMockDescription}
-              imageSrc="/placeholders/apparel/t-shirt/gildan_5000/gildan-5000_t-shirt_crewneck_unisex_heavyWeight_xl_white_gpr-4-0_front.png"
-              imageAlt="Samarreta blanca Gildan 5000"
-              frameImageSrc="/placeholders/fons_acordio/una-columna.png"
-              frameImageAlt="Fons una columna"
-              frameImageStyle={{ transform: 'scaleY(-1)' }}
-              price="15,50"
-              currency="€"
-              sizes={sizes}
-              selectedSize={selectedSize}
-              onSizeChange={setSelectedSize}
-              onAddToCart={() => {}}
-            />
-          </div>
         </div>
       </div>
     </main>

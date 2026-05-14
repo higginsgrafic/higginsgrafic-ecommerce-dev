@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
 import EditableTextBox from '@/components/dev/EditableTextBox';
 
-export const TDP_TEXT_PRESET_VERSION = 'tdp-layout-2026-05-14-0450';
+export const TDP_TEXT_PRESET_VERSION = 'tdp-layout-2026-05-14-0516';
 
 export const TDP_PRODUCT_NAME_SETTINGS = {
   x: 0,
   y: 0,
   fontFamily: 'Oswald',
-  fontSize: 30,
-  fontWeight: 700,
+  fontSize: 24,
+  fontWeight: 300,
   selectedFontWeight: 700,
   letterSpacing: 0.04,
   lineHeight: 1,
@@ -20,13 +20,13 @@ export const TDP_PRODUCT_NAME_SETTINGS = {
 
 export const TDP_PRODUCT_DESCRIPTION_SETTINGS = {
   x: 0,
-  y: 0,
+  y: 20,
   fontFamily: 'Roboto',
-  fontSize: 34,
+  fontSize: 19,
   fontWeight: 300,
   selectedFontWeight: 700,
   letterSpacing: 0.03,
-  lineHeight: 1.15,
+  lineHeight: 1.65,
   textAlign: 'left',
   verticalAlign: 'center',
   color: '#111827',
@@ -93,11 +93,12 @@ function TdpConstructorProduct({
     gridColumn,
     gridRow: '19 / 20',
     alignSelf: 'stretch',
-    justifySelf: 'stretch',
+    justifySelf: 'center',
     pointerEvents: 'auto',
     display: 'grid',
     gridTemplateColumns: `repeat(${columnCount}, minmax(0, 1fr))`,
     columnGap: '5px',
+    width: '75%',
     height: '100%',
     transform: 'translateY(calc(-50% - 1.5px))',
     zIndex: 3,
@@ -106,11 +107,12 @@ function TdpConstructorProduct({
     gridColumn,
     gridRow: '20 / 21',
     alignSelf: 'stretch',
-    justifySelf: 'stretch',
+    justifySelf: 'center',
     pointerEvents: 'auto',
     display: 'grid',
     gridTemplateColumns: `repeat(${columnCount}, minmax(0, 1fr))`,
     columnGap: '5px',
+    width: '75%',
     height: `calc(100% + ${gutterY} + ${gutterY})`,
     marginTop: `calc(-1 * ${gutterY})`,
     position: 'relative',
@@ -172,14 +174,16 @@ function TdpConstructorProduct({
       />
 
       <div style={priceCartStyle}>
-        <EditableTextBox
-          id={`${editableIdPrefix}-price-centered-v2`}
-          initialText={price}
-          initialSettings={TDP_PRICE_SETTINGS}
-          presetVersion={presetVersion}
-          style={{ gridColumn: '1 / 2', alignSelf: 'center', justifySelf: 'stretch', zIndex: 1, width: '100%', height: '100%' }}
-        />
-        <div className="col-start-5 flex items-center justify-center" style={{ zIndex: 1, transform: 'translateY(-2.5px)' }}>
+        <div style={{ gridColumn: '2 / 3', position: 'relative', alignSelf: 'center', justifySelf: 'center', width: '95px', height: '100%', overflow: 'visible', zIndex: 1 }}>
+          <EditableTextBox
+            id={`${editableIdPrefix}-price-centered-v2`}
+            initialText={price}
+            initialSettings={TDP_PRICE_SETTINGS}
+            presetVersion={presetVersion}
+            style={{ width: '100%', height: '100%', whiteSpace: 'nowrap', zIndex: 1 }}
+          />
+        </div>
+        <div className="col-start-4 flex items-center justify-center" style={{ zIndex: 1, transform: 'translateY(-2.5px)' }}>
           <button type="button" onClick={onAddToCart} aria-label="Afegir al cistell" className="relative flex items-center justify-center bg-transparent p-0 transition-transform duration-200 active:scale-95" style={{ width: '36.1984px', height: '36.1984px' }}>
             <img src={getTdpCartIconSrc(cartCount)} alt="" aria-hidden="true" draggable="false" style={{ display: 'block', width: '100%', height: '100%', objectFit: 'contain' }} />
           </button>
