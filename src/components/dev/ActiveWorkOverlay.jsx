@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import { useDebugOverlays } from '@/hooks/useDebugOverlays';
 
 // Llista editable de pàgines en les quals estem treballant ara mateix.
 // Afegeix o treu entrades segons el focus actiu.
@@ -30,6 +31,19 @@ function writeCollapsed(value) {
 function ActiveWorkOverlay() {
   const [collapsed, setCollapsed] = useState(readCollapsed());
   const location = useLocation();
+  const { activeWorkEnabled } = useDebugOverlays();
+
+  const isContactSheetRoute = location.pathname === '/dev/contact-sheet';
+  const isSiteMapRoute = location.pathname === '/dev/site-map';
+  const isEmbeddedPreview = (() => {
+    try {
+      return new URLSearchParams(location.search).get('embed') === 'contact-sheet';
+    } catch {
+      return false;
+    }
+  })();
+  if (!activeWorkEnabled) return null;
+  if (isContactSheetRoute || isSiteMapRoute || isEmbeddedPreview) return null;
 
   const toggle = () => {
     const next = !collapsed;

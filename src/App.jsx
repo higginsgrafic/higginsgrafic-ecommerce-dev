@@ -17,6 +17,7 @@ import {
 } from '@/config/stripeCalibrations';
 import { useOffersConfig } from '@/hooks/useOffersConfig';
 import { useGlobalRedirect } from '@/hooks/useGlobalRedirect';
+import { useDebugOverlays } from '@/hooks/useDebugOverlays';
 import ErrorBoundary from '@/components/ErrorBoundary';
 import LoadingScreen from '@/components/LoadingScreen';
 import SkipLink from '@/components/SkipLink';
@@ -91,6 +92,8 @@ const PlantillaCatalegComponentsPage = lazy(() => import('@/pages/PlantillaCatal
 
 const NikeTambePage = lazy(() => import('@/pages/NikeTambePage.jsx'));
 const DevLinksPage = lazy(() => import('@/pages/DevLinksPage'));
+const ContactSheetPage = lazy(() => import('@/pages/dev/ContactSheetPage'));
+const SiteMapPage = lazy(() => import('@/pages/dev/SiteMapPage'));
 const DevComponentsCatalogPage = lazy(() => import('@/pages/DevComponentsCatalogPage'));
 const DevLayoutBuilderPage = lazy(() => import('@/pages/DevLayoutBuilderPage'));
 const TheHumanInsidePage = lazy(() => import('@/pages/TheHumanInsidePage'));
@@ -2093,6 +2096,7 @@ function App() {
   const productContext = useProductContext();
   const { isAdmin, bypassUnderConstruction } = useAdmin();
   const { tools, toggleTool } = useAdminTools();
+  const { debugsEnabled: debugOverlaysEnabled, rulersEnabled: rulersOverlayEnabled } = useDebugOverlays();
   const { enabled: offersEnabled, loading: offersLoading } = useOffersConfig();
   const { shouldRedirect, redirectUrl, loading: redirectLoading } = useGlobalRedirect(bypassUnderConstruction);
 
@@ -2290,7 +2294,15 @@ function App() {
   const isPreview = location.pathname === '/ec-preview' || location.pathname === '/ec-preview-lite';
   const isDemoStyleLayoutRoute = (isFullWideSlideDemoRoute || isFullWideSlideRoute);
   const isDevDemoRoute = isNikeDemoRoute || isFullWideSlideDemoRoute || isFullWideSlideRoute;
-  const layoutInspectorActive = (isAdmin || isDevDemoRoute)
+  const isContactSheetRoute = location.pathname === '/dev/contact-sheet';
+  const isEmbeddedPreview = isContactSheetRoute || (() => {
+    try {
+      return new URLSearchParams(location.search).get('embed') === 'contact-sheet';
+    } catch {
+      return false;
+    }
+  })();
+  const layoutInspectorActive = debugOverlaysEnabled && !isEmbeddedPreview && (isAdmin || isDevDemoRoute)
     ? layoutInspectorEnabled
     : false;
   const layoutInspectorWrap = Boolean(layoutInspectorActive);
@@ -2821,7 +2833,7 @@ function App() {
     onUpdateQuantity: updateQuantity
   };
 
-  const isFullScreenRoute = location.pathname === '/ec-preview' || location.pathname === '/ec-preview-lite';
+  const isFullScreenRoute = location.pathname === '/ec-preview' || location.pathname === '/ec-preview-lite' || location.pathname === '/dev/contact-sheet' || location.pathname === '/dev/site-map' || isEmbeddedPreview;
   const isAdminRoute = ['/admin', '/index', '/promotions', '/ec-config', '/system-messages', '/fulfillment', '/fulfillment-settings', '/admin/media', '/admin-login', '/colleccio-settings', '/user-icon-picker', '/mockups', '/admin/gelato-sync', '/admin/gelato-blank', '/admin/products-overview', '/admin/draft', '/admin/draft/fulfillment-settings', '/admin/draft/mockup-settings', '/admin/draft/ruleta'].includes(location.pathname) || location.pathname.startsWith('/fulfillment/') || location.pathname.startsWith('/admin');
   const isHeroSettingsDevRoute = location.pathname === '/hero-settings';
   const isDevToolsRoute = location.pathname === '/dev-tools' || location.pathname.startsWith('/dev-tools/');
@@ -2847,12 +2859,12 @@ function App() {
   const baseHeaderHeight = isLargeScreen ? 80 : 64;
   const heroSettingsDevHeaderHeight = isDevHeaderRoute ? baseHeaderHeight : 0;
   const offersHeaderHeight = offersHeaderVisible ? 40 : 0;
-  const adminBannerVisible = isAdmin || isDevDemoRoute || isAdminRoute;
+  const adminBannerVisible = (isAdmin || isDevDemoRoute || isAdminRoute) && !isEmbeddedPreview;
   const adminBannerHeight = adminBannerVisible ? 40 : 0;
   const offersHeaderTop = adminBannerVisible ? adminBannerHeight : 0;
   const adminRouteDevHeaderHeight = (isAdminRoute && devHeaderVisible) ? baseHeaderHeight : 0;
 
-  const rulersOverlayActive = (isAdmin || isDevDemoRoute || isFullWideSlideRoute) && location.pathname !== '/ec-preview' && location.pathname !== '/ec-preview-lite';
+  const rulersOverlayActive = rulersOverlayEnabled && (isAdmin || isDevDemoRoute || isFullWideSlideRoute) && location.pathname !== '/ec-preview' && location.pathname !== '/ec-preview-lite' && !isEmbeddedPreview;
   const rulerInset = rulersOverlayActive ? 18 : 0;
 
   const adminRouteOffset = `${adminBannerHeight + adminRouteDevHeaderHeight + rulerInset}px`;
@@ -3181,6 +3193,8 @@ function App() {
                 <Route path="/tdp" element={<Navigate to="/constructor/tdp" replace />} />
 
                 <Route path="/new" element={<NewPage />} />
+                <Route path="/dev/contact-sheet" element={<ContactSheetPage />} />
+                <Route path="/dev/site-map" element={<SiteMapPage />} />
                 <Route path="/dev-links" element={<Navigate to="/proves/dev-links" replace />} />
                 <Route path="/dev-components" element={<Navigate to="/proves/dev-components" replace />} />
                 <Route path="/layout-builder" element={<Navigate to="/proves/layout-builder" replace />} />
@@ -5705,7 +5719,7 @@ function App() {
                 </div>
                 ) : null}
 
-                {(isAdmin || isDevDemoRoute || isFullWideSlideRoute) && location.pathname !== '/ec-preview' && location.pathname !== '/ec-preview-lite' ? (
+                {debugOverlaysEnabled && (isAdmin || isDevDemoRoute || isFullWideSlideRoute) && location.pathname !== '/ec-preview' && location.pathname !== '/ec-preview-lite' && !isEmbeddedPreview ? (
                   <div
                     ref={debugButtonsWrapRef}
                     className="flex items-end gap-2 relative debug-exempt"

@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { CheckCircle2, Circle, Play, ClipboardList } from 'lucide-react';
 import SEO from '@/components/SEO';
+import { useDebugOverlays } from '@/hooks/useDebugOverlays';
 
 const STORAGE_KEY = 'hg_unitats_canvi_v1';
 
@@ -143,6 +144,63 @@ function Region({ title, subtitle, children }) {
       </div>
       <div className="mt-3">{children}</div>
     </section>
+  );
+}
+
+function ToggleRow({ label, hint, checked, onChange }) {
+  return (
+    <label className="flex items-start gap-3 py-2 cursor-pointer select-none">
+      <input
+        type="checkbox"
+        checked={checked}
+        onChange={(e) => onChange(e.target.checked)}
+        className="mt-0.5 h-4 w-4 accent-orange-600"
+      />
+      <div className="min-w-0 flex-1">
+        <div className="text-sm font-medium text-foreground">{label}</div>
+        {hint ? <div className="text-[11px] text-muted-foreground leading-tight">{hint}</div> : null}
+      </div>
+      <span
+        className={`text-[10px] uppercase tracking-wide font-semibold ${
+          checked ? 'text-orange-600' : 'text-muted-foreground'
+        }`}
+      >
+        {checked ? 'ON' : 'OFF'}
+      </span>
+    </label>
+  );
+}
+
+function DebugOverlayToggles() {
+  const {
+    debugsEnabled,
+    setDebugsEnabled,
+    activeWorkEnabled,
+    setActiveWorkEnabled,
+    rulersEnabled,
+    setRulersEnabled,
+  } = useDebugOverlays();
+  return (
+    <div className="border-l border-border pl-3 pr-[28px]">
+      <ToggleRow
+        label="Overlays de debug"
+        hint="Inspector de layout i botons de debug (Clics, Guides, Pauta…)"
+        checked={debugsEnabled}
+        onChange={setDebugsEnabled}
+      />
+      <ToggleRow
+        label="Regle"
+        hint="Regles laterals i guies de mida"
+        checked={rulersEnabled}
+        onChange={setRulersEnabled}
+      />
+      <ToggleRow
+        label="Pàgines actives (WORK)"
+        hint="Caixa flotant amb les pàgines en què s'està treballant"
+        checked={activeWorkEnabled}
+        onChange={setActiveWorkEnabled}
+      />
+    </div>
   );
 }
 
@@ -299,6 +357,19 @@ export default function AdminStudioHomePage() {
           <div className="lg:col-span-1">
             <Region title="Utilitats" subtitle="Debug i suport">
               <Section title="Tools" items={tools.utils} />
+              <div className="mt-8">
+                <div className="pl-0 pr-[28px]">
+                  <div className="text-sm font-semibold text-foreground uppercase tracking-wide">
+                    Overlays
+                  </div>
+                  <div className="mt-1 text-xs text-muted-foreground">
+                    Visualitzacions de desenvolupament
+                  </div>
+                </div>
+                <div className="mt-3">
+                  <DebugOverlayToggles />
+                </div>
+              </div>
               <div className="mt-10">
                 <Section title="Demos" items={tools.dev} />
               </div>

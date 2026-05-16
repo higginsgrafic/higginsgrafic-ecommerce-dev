@@ -2350,10 +2350,8 @@ export default function FullWideSlideDemoHeader({
           items: [
             CONTROL_TILE_BN,
             '/custom_logos/drawings/images_grid/miscellania/pont-del-diable-b-grid.webp',
-            '/custom_logos/drawings/images_grid/miscellania/pont-del-diable-b-grid.webp',
-            '/custom_logos/drawings/images_grid/miscellania/pont-del-diable-b-grid.webp',
-            '/custom_logos/drawings/images_grid/miscellania/pont-del-diable-b-grid.webp',
-            '/custom_logos/drawings/images_grid/miscellania/pont-del-diable-b-grid.webp',
+            '/custom_logos/drawings/images_grid/miscellania/dj-vader-b-grid.webp',
+            '/custom_logos/drawings/images_grid/miscellania/death-star2d2-b-grid.webp',
             CONTROL_TILE_ARROWS,
           ],
         },

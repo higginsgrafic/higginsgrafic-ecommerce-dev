@@ -56,3 +56,6 @@ public/_OLD_/
 
 public/placeholders/t-shirt_buttons/[0-9]*.png
 public/placeholders/t-shirt_buttons/OLD/
+
+# Contact sheet snapshots (generats per `npm run contact-sheet:capture`)
+public/contact-sheet/
