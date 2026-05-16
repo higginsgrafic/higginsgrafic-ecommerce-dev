@@ -94,6 +94,8 @@ const NikeTambePage = lazy(() => import('@/pages/NikeTambePage.jsx'));
 const DevLinksPage = lazy(() => import('@/pages/DevLinksPage'));
 const ContactSheetPage = lazy(() => import('@/pages/dev/ContactSheetPage'));
 const SiteMapPage = lazy(() => import('@/pages/dev/SiteMapPage'));
+const PautaCollectionAlignPage = lazy(() => import('@/pages/dev/PautaCollectionAlignPage'));
+const ColleccioPage = lazy(() => import('@/pages/ColleccioPage'));
 const DevComponentsCatalogPage = lazy(() => import('@/pages/DevComponentsCatalogPage'));
 const DevLayoutBuilderPage = lazy(() => import('@/pages/DevLayoutBuilderPage'));
 const TheHumanInsidePage = lazy(() => import('@/pages/TheHumanInsidePage'));
@@ -3191,10 +3193,15 @@ function App() {
                   element={<TdpPage pautaEnabled={tdpPautaEnabled} tableEnabled={tdpTableEnabled} />}
                 />
                 <Route path="/tdp" element={<Navigate to="/constructor/tdp" replace />} />
+                <Route
+                  path="/constructor/colleccio"
+                  element={<ColleccioPage pautaEnabled={tdpPautaEnabled} tableEnabled={tdpTableEnabled} />}
+                />
 
                 <Route path="/new" element={<NewPage />} />
                 <Route path="/dev/contact-sheet" element={<ContactSheetPage />} />
                 <Route path="/dev/site-map" element={<SiteMapPage />} />
+                <Route path="/dev/pauta/col-leccio" element={<PautaCollectionAlignPage />} />
                 <Route path="/dev-links" element={<Navigate to="/proves/dev-links" replace />} />
                 <Route path="/dev-components" element={<Navigate to="/proves/dev-components" replace />} />
                 <Route path="/layout-builder" element={<Navigate to="/proves/layout-builder" replace />} />

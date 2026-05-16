@@ -29,6 +29,7 @@ export const PAGES_MANIFEST = [
 
   // Constructors (pàgines per construir un component / preset visual)
   { path: '/constructor/tdp', label: 'TDP Constructor', group: 'Constructors', tag: 'keep' },
+  { path: '/constructor/colleccio', label: 'Col·lecció Constructor', group: 'Constructors', tag: 'keep' },
   { path: '/constructor/full-wide-slide', label: 'Full Wide Slide Constructor', group: 'Constructors', tag: 'keep' },
   { path: '/full-wide-slide', label: 'Full Wide Slide (alias)', group: 'Constructors', tag: 'review' },
   { path: '/plantilla-cataleg-components', label: 'Plantilla Catàleg Components', group: 'Constructors', tag: 'review' },
@@ -58,6 +59,7 @@ export const PAGES_MANIFEST = [
   { path: '/proves/dev-components', label: 'Dev Components Catalog', group: 'Lab/Proves', tag: 'dev-only' },
   { path: '/proves/layout-builder', label: 'Layout Builder', group: 'Lab/Proves', tag: 'dev-only' },
   { path: '/new', label: 'New (sandbox)', group: 'Lab/Proves', tag: 'review' },
+  { path: '/dev/pauta/col-leccio', label: 'Dev · Pauta 4 col. + 00 Col·lecció', group: 'Lab/Proves', tag: 'dev-only' },
 
   // Tècnic (visors o pantalles d'eines internes accessibles)
   { path: '/ec-preview', label: 'EC Preview (full)', group: 'Tècnic', tag: 'dev-only' },

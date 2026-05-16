@@ -8,6 +8,8 @@ const ACTIVE_PAGES = [
   { path: '/', label: 'MAIN', note: 'Home' },
   { path: '/constructor/tdp', label: 'TDP', note: 'Pauta + preu/cistell + botonera' },
   { path: '/constructor/full-wide-slide', label: 'FULL-SLIDE', note: 'Full Wide Slide' },
+  { path: '/dev/pauta/col-leccio', label: 'COL·LECCIÓ (ref)', note: 'Pauta 4 col. + 00 Col·lecció' },
+  { path: '/constructor/colleccio', label: 'COL·LECCIÓ', note: 'Constructor pàgina col·lecció (4 col)' },
 ];
 
 const STORAGE_KEY = 'hg.activeWorkOverlay.collapsed';
