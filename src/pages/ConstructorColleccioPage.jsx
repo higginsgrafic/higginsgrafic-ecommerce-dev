@@ -117,7 +117,7 @@ function ConstructorColleccioPage() {
           onSizeChange={setSelectedSize}
           cartCount={0}
           onAddToCart={() => {}}
-          editableIdPrefix="constructor-colleccio-tdp"
+          editableIdPrefix="constructor-colleccio-tdp-col2"
           presetVersion="constructor-colleccio-tdp-cart-34-v8"
         />
       </Pauta4ColsOverlay>
