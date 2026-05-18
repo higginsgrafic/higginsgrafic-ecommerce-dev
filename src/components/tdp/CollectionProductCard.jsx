@@ -2,7 +2,8 @@ import TdpConstructorProduct from '@/components/tdp/TdpConstructorProduct';
 
 function CollectionProductCard({
   gridColumn,
-  slotGridRow = '16 / 31',
+  rowOffset = 10,
+  slotGridRow,
   productName,
   description,
   price,
@@ -15,15 +16,22 @@ function CollectionProductCard({
   onAddToCart,
   editableIdPrefix,
   presetVersion,
+  imageGridRow,
+  imageTranslateY = 'calc(9px + 1lh)',
+  productNameTranslateY = '1lh',
+  descriptionTranslateY = 'calc(2lh - 1px)',
 }) {
+  const resolvedSlotGridRow = slotGridRow ?? `${6 + rowOffset} / ${21 + rowOffset}`;
+  const descriptionGridRow = `${13 + rowOffset} / ${18 + rowOffset}`;
+  const sizeButtonsGridRow = `${20 + rowOffset} / ${21 + rowOffset}`;
   return (
     <>
       <div
         aria-label="TDP rectangle"
         style={{
           gridColumn,
-          gridRow: slotGridRow,
-          backgroundColor: '#ffffff',
+          gridRow: resolvedSlotGridRow,
+          backgroundColor: 'rgba(255, 255, 255, 0.85)',
           boxSizing: 'border-box',
           pointerEvents: 'none',
           zIndex: 2,
@@ -31,30 +39,31 @@ function CollectionProductCard({
       />
       <TdpConstructorProduct
         gridColumn={gridColumn}
-        rowOffset={10}
+        rowOffset={rowOffset}
         productName={productName}
         description={description}
         price={price}
         imageSrc={imageSrc}
         imageAlt={imageAlt}
-        imageTranslateY="calc(9px + 1lh)"
+        imageGridRow={imageGridRow}
+        imageTranslateY={imageTranslateY}
         sizes={sizes}
         selectedSize={selectedSize}
         onSizeChange={onSizeChange}
         cartCount={cartCount}
         onAddToCart={onAddToCart}
         imageNameTranslateY="calc(6px + 2lh)"
-        productNameTranslateY="1lh"
-        descriptionGridRow="23 / 28"
+        productNameTranslateY={productNameTranslateY}
+        descriptionGridRow={descriptionGridRow}
         descriptionHeight="calc(100% - 3px)"
-        sizeButtonsGridRow="30 / 31"
+        sizeButtonsGridRow={sizeButtonsGridRow}
         sizeButtonsHeight="100%"
         sizeButtonsMarginTop="0px"
         sizeButtonsAlignSelf="center"
         editableIdPrefix={editableIdPrefix}
         presetVersion={presetVersion}
         descriptionFontSize={12}
-        descriptionTranslateY="calc(2lh - 1px)"
+        descriptionTranslateY={descriptionTranslateY}
       />
     </>
   );

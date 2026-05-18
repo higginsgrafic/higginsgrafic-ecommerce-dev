@@ -178,9 +178,9 @@ function CalibrationsHud() {
       className="debug-exempt"
       style={{
         position: 'fixed',
-        left: 'calc((var(--belt2-xL, 16px) + var(--belt2-xR, calc(100vw - 16px))) / 2 + 8px)',
-        right: 'calc(100vw - var(--belt2-xR, calc(100vw - 16px)))',
-        bottom: 'calc(100vh - var(--belt2-debug-yB, calc(100vh - 360px)) - 8px - 34px)',
+        left: '50%',
+        bottom: 16,
+        transform: 'translateX(-50%)',
         width: collapsed ? 'auto' : undefined,
         maxWidth: 'calc(100vw - 32px)',
         background: '#fff',

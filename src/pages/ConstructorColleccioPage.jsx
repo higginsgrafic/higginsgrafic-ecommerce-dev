@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet';
 import Pauta4ColsOverlay from '@/components/pauta/Pauta4ColsOverlay';
 import CollectionProductCard from '@/components/tdp/CollectionProductCard';
+import CollectionProductCardV5 from '@/components/tdp/CollectionProductCardV5';
 import CalibrationsHud from '@/components/dev/CalibrationsHud';
 
 const COLLECTION_BG_SRC = '/tmp/PAGINES/PAGINES TIPUS/00 COLLECCIO.png';
@@ -91,35 +92,33 @@ function ConstructorColleccioPage() {
             zIndex: 2,
           }}
         />
-        {[1, 4].map((col) => (
-          <div
-            key={`constructor-colleccio-tdp-slot-${col}`}
-            aria-label={`TDP columna ${col}`}
-            style={{
-              gridColumn: `${col} / ${col + 1}`,
-              gridRow: '16 / 31',
-              backgroundColor: '#ffffff',
-              boxSizing: 'border-box',
-              pointerEvents: 'none',
-              zIndex: 2,
-            }}
-          />
-        ))}
-        <CollectionProductCard
-          gridColumn="2 / 3"
-          productName="NOM DE PRODUCTE"
-          description={TDP_DESCRIPTION}
-          price="15,50€"
-          imageSrc={TDP_IMAGE_SRC}
-          imageAlt="Samarreta blanca Gildan 5000"
-          sizes={sizes}
-          selectedSize={selectedSize}
-          onSizeChange={setSelectedSize}
-          cartCount={0}
-          onAddToCart={() => {}}
-          editableIdPrefix="constructor-colleccio-tdp-col2"
-          presetVersion="constructor-colleccio-tdp-cart-34-v8"
-        />
+        {[0, 1, 2, 3].flatMap((rowIdx) =>
+          [0, 1, 2, 3].map((colIdx) => {
+            const isV5 = (rowIdx + colIdx) % 2 === 1;
+            const Card = isV5 ? CollectionProductCardV5 : CollectionProductCard;
+            const col = colIdx + 1;
+            const rowOffset = 10 + rowIdx * 20;
+            return (
+              <Card
+                key={`tdp-card-r${rowIdx}-c${colIdx}`}
+                gridColumn={`${col} / ${col + 1}`}
+                rowOffset={rowOffset}
+                productName="NOM DE PRODUCTE"
+                description={TDP_DESCRIPTION}
+                price="15,50€"
+                imageSrc={TDP_IMAGE_SRC}
+                imageAlt="Samarreta blanca Gildan 5000"
+                sizes={sizes}
+                selectedSize={selectedSize}
+                onSizeChange={setSelectedSize}
+                cartCount={0}
+                onAddToCart={() => {}}
+                editableIdPrefix="constructor-colleccio-tdp-col2"
+                presetVersion="constructor-colleccio-tdp-cart-34-v8"
+              />
+            );
+          })
+        )}
       </Pauta4ColsOverlay>
       <div
         className="font-mono text-neutral-800"
