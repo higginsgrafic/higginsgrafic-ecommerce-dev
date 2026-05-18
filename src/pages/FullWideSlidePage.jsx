@@ -1,13 +1,16 @@
-import React, { useEffect, useLayoutEffect } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import FullWideSlideDemoHeader from '@/components/FullWideSlideDemoHeader';
+import Pauta4ColsOverlay from '@/components/pauta/Pauta4ColsOverlay';
 import useComponentCatalogConfig from '@/hooks/useComponentCatalogConfig';
 import { useProductContext } from '@/contexts/ProductContext';
 
-export default function FullWideSlidePage() {
+export default function FullWideSlidePage({ pautaEnabled = false, tableEnabled = false }) {
   const { config: componentCatalogConfig, loading: componentCatalogLoading, error: componentCatalogError } = useComponentCatalogConfig();
   const navigate = useNavigate();
   const { getTotalItems } = useProductContext();
+  const pageRef = useRef(null);
+  const [pautaTopOffsetPx, setPautaTopOffsetPx] = useState(0);
 
   const fullWideSlide = componentCatalogConfig?.components?.fullWideSlide;
   const megaMenu = fullWideSlide?.megaMenu;
@@ -52,6 +55,33 @@ html, body { scrollbar-width: none; }
       } catch {
         // ignore
       }
+    };
+  }, []);
+
+  useLayoutEffect(() => {
+    if (typeof window === 'undefined') return undefined;
+
+    const measure = () => {
+      const pageEl = pageRef.current;
+      const headerEl = pageEl?.querySelector?.('header');
+      if (!pageEl || !headerEl) return;
+
+      const pageRect = pageEl.getBoundingClientRect();
+      const headerRect = headerEl.getBoundingClientRect();
+      const nextTop = Math.max(0, Math.round((headerRect.bottom - pageRect.top) * 100) / 100);
+      setPautaTopOffsetPx((prev) => (Math.abs(prev - nextTop) < 0.5 ? prev : nextTop));
+    };
+
+    measure();
+    const t1 = window.setTimeout(measure, 50);
+    const t2 = window.setTimeout(measure, 250);
+    window.addEventListener('resize', measure);
+    window.addEventListener('scroll', measure, true);
+    return () => {
+      window.clearTimeout(t1);
+      window.clearTimeout(t2);
+      window.removeEventListener('resize', measure);
+      window.removeEventListener('scroll', measure, true);
     };
   }, []);
 
@@ -218,7 +248,7 @@ html, body { scrollbar-width: none; }
     return (
       <div className="min-h-[60vh] flex items-center justify-center bg-background">
         <div className="max-w-lg px-6 text-center">
-          <div className="text-sm font-semibold text-foreground">No s'ha pogut carregar la config</div>
+          <div className="text-sm font-semibold text-foreground">{"No s'ha pogut carregar la config"}</div>
           <div className="mt-2 text-xs text-muted-foreground break-words">{componentCatalogError || 'Error carregant la config'}</div>
         </div>
       </div>
@@ -235,6 +265,7 @@ html, body { scrollbar-width: none; }
 
   return (
     <div
+      ref={pageRef}
       className="overflow-hidden bg-background"
       style={{
         paddingBottom: 'var(--megaStripeHudBottomHPx, 0px)',
@@ -256,6 +287,19 @@ html, body { scrollbar-width: none; }
         showStripe={megaMenu?.showStripe !== false}
         showCatalogPanel={megaMenu?.showCatalogPanel !== false}
       />
+
+      {/* Pauta de 4 columnes — overlay no-interactiu, alineat exacte a belt2.
+          Visible quan TDP Pauta o TDP Taula estan actius. Serveix per
+          validar que la pauta encaixa dins els límits del belt en una
+          ruta on el belt2 ja és sòlid. */}
+      {(pautaEnabled || tableEnabled) ? (
+        <Pauta4ColsOverlay
+          overlay
+          pautaEnabled={pautaEnabled}
+          tableEnabled={tableEnabled}
+          topOffset={`${pautaTopOffsetPx}px`}
+        />
+      ) : null}
     </div>
   );
 }

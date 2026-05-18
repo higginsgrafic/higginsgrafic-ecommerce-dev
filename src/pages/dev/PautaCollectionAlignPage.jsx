@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react';
 import { Helmet } from 'react-helmet';
+import TdpConstructorProduct from '@/components/tdp/TdpConstructorProduct';
 import { getSafeBelt } from '@/utils/layoutMetrics';
 
 const PAUTA_SRC = '/tmp/PAUTES/PAUTA-4-COLUMNES.png';
@@ -10,7 +11,7 @@ const POSITION_SRC = '/tmp/PAGINES/PAGINES TIPUS/00 POSICIO COLLECCIO.png';
 // Els mockups comparteixen la mateixa amplada que la pauta (2642 px),
 // així que estan pre-alineats horitzontalment al mateix canvas.
 const PAUTA_W = 2642;
-const PAUTA_H = 8417;
+const PAUTA_H = 6708;
 const MOCKUP_W = 2642;
 const MOCKUP_H = 6708;
 
@@ -19,6 +20,17 @@ const MOCKUP_H = 6708;
 //   TDP_PAGE_TOP_OFFSET = '33px'
 const BELT_OPTS = { maxContent: 1400, sideMargin: 76, minContent: 320 };
 const PAGE_TOP_OFFSET_PX = 33;
+const PAUTA_ROWS = 90;
+const PAUTA_COLS = 4;
+const PAUTA_GUTTER_X = '22.5px';
+const PAUTA_GUTTER_Y = '3px';
+const PAUTA_ROWS_TEMPLATE = `repeat(${PAUTA_ROWS}, minmax(0, 1fr))`;
+const PAUTA_COLUMNS_TEMPLATE = `repeat(${PAUTA_COLS}, minmax(0, calc((100% - 67.5px) / ${PAUTA_COLS})))`;
+const TDP_DESCRIPTION = [
+  "Mereixedors són d'honor, glòria e de fama e contínua bona memòria los ",
+  'hòmens virtuosos, e singularment aquells qui per la república lluitaren.',
+].join('\n');
+const TDP_IMAGE_SRC = '/placeholders/apparel/t-shirt/gildan_5000/gildan-5000_t-shirt_crewneck_unisex_heavyWeight_xl_white_gpr-4-0_front.png';
 
 // Bump the version when the schema changes so old saved state is discarded.
 const LS_KEY = 'hg.devPautaCollectionAlign.v3';
@@ -26,6 +38,7 @@ const LS_KEY = 'hg.devPautaCollectionAlign.v3';
 const DEFAULT_STATE = {
   // Opacitats individuals per a comparar visualment.
   pautaOpacity: 1,
+  tableOpacity: 1,
   mockupOpacity: 1,
   positionOpacity: 0.5,
   positionVisible: false,
@@ -52,6 +65,10 @@ function saveState(state) {
 
 export default function PautaCollectionAlignPage() {
   const [state, setState] = useState(loadState);
+  const [selectedSize, setSelectedSize] = useState('M');
+  const sizes = ['S', 'M', 'L', 'XL', 'XXL'];
+  const pautaRows = useMemo(() => Array.from({ length: PAUTA_ROWS }, (_, index) => index + 1), []);
+  const pautaCols = useMemo(() => Array.from({ length: PAUTA_COLS }, (_, index) => index + 1), []);
   const [beltWidth, setBeltWidth] = useState(() => {
     if (typeof window === 'undefined') return BELT_OPTS.maxContent;
     try {
@@ -181,6 +198,109 @@ export default function PautaCollectionAlignPage() {
                 }}
               />
             ) : null}
+            <div
+              style={{
+                position: 'absolute',
+                inset: 0,
+                display: 'grid',
+                gridTemplateColumns: PAUTA_COLUMNS_TEMPLATE,
+                gridTemplateRows: PAUTA_ROWS_TEMPLATE,
+                columnGap: PAUTA_GUTTER_X,
+                rowGap: PAUTA_GUTTER_Y,
+                pointerEvents: 'auto',
+                zIndex: 3,
+              }}
+            >
+              {pautaRows.flatMap((row) => (
+                pautaCols.map((col) => (
+                  <div
+                    key={`dev-pauta-colleccio-cell-${row}-${col}`}
+                    aria-hidden="true"
+                    style={{
+                      gridColumn: `${col} / ${col + 1}`,
+                      gridRow: `${row} / ${row + 1}`,
+                      border: '1px solid rgba(14, 165, 233, 0.22)',
+                      background: row % 2 === 0 ? 'rgba(14, 165, 233, 0.035)' : '#F1F3F6',
+                      color: 'rgba(15, 23, 42, 0.42)',
+                      fontFamily: 'Roboto Condensed, sans-serif',
+                      fontSize: '8px',
+                      fontWeight: 600,
+                      lineHeight: 1,
+                      display: 'flex',
+                      alignItems: 'flex-start',
+                      justifyContent: 'flex-start',
+                      padding: '2px',
+                      boxSizing: 'border-box',
+                      opacity: state.tableOpacity,
+                      pointerEvents: 'none',
+                      zIndex: 1,
+                    }}
+                  >
+                    {row},{col}
+                  </div>
+                ))
+              ))}
+              {pautaRows.map((row) => (
+                <div
+                  key={`dev-pauta-colleccio-row-${row}`}
+                  aria-hidden="true"
+                  style={{
+                    gridColumn: '1 / 2',
+                    gridRow: `${row} / ${row + 1}`,
+                    alignSelf: 'start',
+                    justifySelf: 'start',
+                    transform: 'translateX(-24px)',
+                    color: '#ef4444',
+                    fontFamily: 'Roboto Condensed, sans-serif',
+                    fontSize: '11px',
+                    fontWeight: 700,
+                    lineHeight: 1,
+                    pointerEvents: 'none',
+                    zIndex: 20,
+                  }}
+                >
+                  {row}
+                </div>
+              ))}
+              {pautaCols.map((col) => (
+                <div
+                  key={`dev-pauta-colleccio-col-${col}`}
+                  aria-hidden="true"
+                  style={{
+                    gridColumn: `${col} / ${col + 1}`,
+                    gridRow: '1 / 2',
+                    alignSelf: 'start',
+                    justifySelf: 'center',
+                    transform: 'translateY(-18px)',
+                    color: '#2563eb',
+                    fontFamily: 'Roboto Condensed, sans-serif',
+                    fontSize: '13px',
+                    fontWeight: 700,
+                    lineHeight: 1,
+                    pointerEvents: 'none',
+                    zIndex: 20,
+                  }}
+                >
+                  C{col}
+                </div>
+              ))}
+              <TdpConstructorProduct
+                gridColumn="3 / 4"
+                rowOffset={-5}
+                productName="NOM DE PRODUCTE"
+                description={TDP_DESCRIPTION}
+                price="15,50€"
+                imageSrc={TDP_IMAGE_SRC}
+                imageAlt="Samarreta blanca Gildan 5000"
+                sizes={sizes}
+                selectedSize={selectedSize}
+                onSizeChange={setSelectedSize}
+                cartCount={0}
+                onAddToCart={() => {}}
+                gutterY={PAUTA_GUTTER_Y}
+                editableIdPrefix="tdp"
+              />
+            </div>
           </div>
         </div>
 
@@ -189,7 +309,7 @@ export default function PautaCollectionAlignPage() {
           style={{
             position: 'fixed',
             right: 16,
-            top: 120,
+            top: 170,
             width: 260,
             zIndex: 60,
             background: 'rgba(255,255,255,0.96)',
@@ -222,7 +342,16 @@ export default function PautaCollectionAlignPage() {
             format={(v) => v.toFixed(2)}
           />
           <Slider
-            label="Opacitat mockup"
+            label="Opacitat taula"
+            min={0}
+            max={1}
+            step={0.05}
+            value={state.tableOpacity}
+            onChange={(v) => update({ tableOpacity: v })}
+            format={(v) => v.toFixed(2)}
+          />
+          <Slider
+            label="Opacitat mockup BG guia"
             min={0}
             max={1}
             step={0.05}

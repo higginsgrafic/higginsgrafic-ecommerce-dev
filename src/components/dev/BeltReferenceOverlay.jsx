@@ -1,5 +1,6 @@
-import React, { useEffect, useLayoutEffect, useState } from 'react';
+import { useEffect, useLayoutEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
+import DevPortal, { DEV_LAYER_Z } from '@/components/dev/DevPortal';
 
 /**
  * BeltReferenceOverlay
@@ -27,6 +28,16 @@ const STORAGE_KEY_V2 = 'HG_DEV_BELT2_STATE_V2';
 // Keys legacy per migració (mai escrits per aquesta versió).
 const LEGACY_KEY_GLOBAL = 'HG_BELT2_GLOBAL_V1';
 const LEGACY_KEY_GUIDES = 'HG_BELT_GUIDES_GLOBAL_V1';
+const PAUTA4_CANVAS_W = 2642;
+const PAUTA4_CANVAS_H = 6708;
+const PAUTA4_ROWS = 90;
+const PAUTA4_ROW_GAP_PX = 3;
+// La guia bottom es dibuixa al límit inferior de la fila `BELT2_BOTTOM_ROW`
+// (i.e., bottom de la fila N = línia de grid N+1). Entre N files hi ha N-1
+// gaps. Per als botons de mides (gridRow 30/31), volem el bottom de la
+// fila 30 ⇒ `BELT2_BOTTOM_ROW = 30`.
+const BELT2_BOTTOM_ROW = 30;
+const BELT2_BOTTOM_OFFSET_PX = 0;
 
 const EMPTY_STATE = {
   xL: null,
@@ -168,7 +179,6 @@ export default function BeltReferenceOverlay({ enabled }) {
           import.meta.env?.DEV &&
           (Number.isFinite(xL) || Number.isFinite(xR))
         ) {
-          // eslint-disable-next-line no-console
           console.warn('[BeltReferenceOverlay] X bounds invalid, not publishing.', {
             xL,
             xR,
@@ -183,10 +193,20 @@ export default function BeltReferenceOverlay({ enabled }) {
       // antic les pugui llegir.
       clear('--belt2-yT');
       clear('--belt2-yB');
+
+      // Variable EXCLUSIVA per a overlays de debug (HUD calibratges, etc.).
+      // Cap layout productiu pot dependre d'ella. Es publica el bottom-guide
+      // del mega-slide (yFinalizeBottom) per permetre ancorar HUDs just a
+      // sota de la guia bottom de belt2.
+      if (Number.isFinite(state.yFinalizeBottom)) {
+        publish('--belt2-debug-yB', state.yFinalizeBottom);
+      } else {
+        clear('--belt2-debug-yB');
+      }
     } catch {
       // ignore
     }
-  }, [state.xL, state.xR]);
+  }, [state.xL, state.xR, state.yFinalizeBottom]);
 
   // En canviar de ruta, retirem qualsevol resta de `--belt2-yT/yB`
   // (defensa en profunditat per consumidors antics). NO toquem l'state:
@@ -271,6 +291,7 @@ export default function BeltReferenceOverlay({ enabled }) {
       root.style.removeProperty('--belt2-xR');
       root.style.removeProperty('--belt2-yT');
       root.style.removeProperty('--belt2-yB');
+      root.style.removeProperty('--belt2-debug-yB');
     } catch {
       // ignore
     }
@@ -365,32 +386,71 @@ export default function BeltReferenceOverlay({ enabled }) {
       setState((prev) => {
         const nextXL = Number.isFinite(xL) ? xL : prev.xL;
         const nextXR = Number.isFinite(xR) ? xR : prev.xR;
-        const nextYCarouselTop = hasMegaSlideReference && Number.isFinite(yCarouselTop) ? yCarouselTop : prev.yCarouselTop;
-        const nextYCarouselBottom = hasMegaSlideReference && Number.isFinite(yCarouselBottom) ? yCarouselBottom : prev.yCarouselBottom;
+        const nextYCarouselTop = Number.isFinite(yCarouselTop) ? yCarouselTop : prev.yCarouselTop;
+        const nextYCarouselBottom = Number.isFinite(yCarouselBottom) ? yCarouselBottom : prev.yCarouselBottom;
         // Belt2 BOTTOM derivat: bottom_carrusel + 1px + 737.015 * scale.
         // El càlcul antic usava `yCarouselTop + 737*scale` que ignorava
         // l'alçada del carrusel i deixava la guia ~775px massa amunt.
         let derivedPautaBottom = null;
-        if (Number.isFinite(nextYCarouselBottom) && Number.isFinite(nextXL) && Number.isFinite(nextXR)) {
-          const beltWidth = Math.max(0, nextXR - nextXL);
-          const pautaScale = Math.max(0.5, Math.min(1, beltWidth / 1365.46));
-          derivedPautaBottom = Math.round(nextYCarouselBottom + 1 + 737.015 * pautaScale);
+        // Prioritzem el grid real `[data-pauta-grid]` si existeix al DOM
+        // (cas del constructor). A la home, on no existeix, retrocedim a
+        // `yCarouselTop` (anchor del mega-slide).
+        const pautaGridEl = typeof document !== 'undefined' ? document.querySelector('[data-pauta-grid]') : null;
+        const pautaGridRect = pautaGridEl ? pautaGridEl.getBoundingClientRect() : null;
+        // Preferim mesurar el bottom REAL del track `BELT2_BOTTOM_ROW` via
+        // un fill del grid amb `grid-row-end === BELT2_BOTTOM_ROW + 1`.
+        // El render del browser amb `1fr` + `aspect-ratio` no coincideix
+        // amb la fórmula tancada per sub-pixel rounding acumulat.
+        let domBottomRow = null;
+        if (pautaGridEl) {
+          const targetEnd = String(BELT2_BOTTOM_ROW + 1);
+          for (const child of pautaGridEl.children) {
+            const cs = window.getComputedStyle(child);
+            if (cs.gridRowEnd === targetEnd) {
+              const r = child.getBoundingClientRect();
+              if (Number.isFinite(r.bottom)) {
+                domBottomRow = r.bottom;
+                break;
+              }
+            }
+          }
         }
-        // Prioritat:
+        if (Number.isFinite(domBottomRow)) {
+          derivedPautaBottom = Math.round(domBottomRow + BELT2_BOTTOM_OFFSET_PX);
+        } else {
+          // Fallback: fórmula tancada (home / sense grid al DOM).
+          const pautaTopForBottomGuide = Number.isFinite(pautaGridRect?.top)
+            ? pautaGridRect.top
+            : (Number.isFinite(nextYCarouselTop) ? nextYCarouselTop : prev.yCarouselTop);
+          const beltWidthForBottomGuide = Number.isFinite(pautaGridRect?.width)
+            ? pautaGridRect.width
+            : Math.max(0, nextXR - nextXL);
+          if (Number.isFinite(pautaTopForBottomGuide) && Number.isFinite(beltWidthForBottomGuide) && beltWidthForBottomGuide > 0) {
+            const pautaHeight = (beltWidthForBottomGuide * PAUTA4_CANVAS_H) / PAUTA4_CANVAS_W;
+            const rowHeight = (pautaHeight - (PAUTA4_ROWS - 1) * PAUTA4_ROW_GAP_PX) / PAUTA4_ROWS;
+            derivedPautaBottom = Math.round(pautaTopForBottomGuide + BELT2_BOTTOM_ROW * rowHeight + (BELT2_BOTTOM_ROW - 1) * PAUTA4_ROW_GAP_PX + BELT2_BOTTOM_OFFSET_PX);
+          }
+        }
+        // Prioritat (només quan hi ha referència real del mega-slide al DOM,
+        // és a dir, a la home). En altres rutes (constructor, etc.) mantenim
+        // el valor persistit per evitar desplaçaments per micro-canvis de
+        // xL/xR (scrollbar, etc.).
         //  1) Mesura DOM directa de `accordion-pauta` (wrapper real o
         //     anchor invisible quan l'acordió està tancat).
         //  2) Càlcul derivat `yCarouselBottom + 1 + 737*scale`
         //     (correcte ara que comptem l'alçada del carrusel).
         //  3) Fons del botó FINALITZA (DOM).
         //  4) Valor previ persistit com a últim recurs.
-        const nextYFinalizeBottom = hasMegaSlideReference
-          ? (
-              pautaBottomFromDom
-              ?? derivedPautaBottom
-              ?? finalizeBottomDom
-              ?? prev.yFinalizeBottom
-            )
-          : prev.yFinalizeBottom;
+        // Recalculem sempre que tinguem tots els inputs (xL, xR, yCarouselTop)
+        // disponibles, ja siguin nous o persistits. La preferència és:
+        //  1) Mesura DOM directa (`accordion-pauta`) quan exists.
+        //  2) Càlcul derivat de la pauta (files/canvas).
+        //  3) Fons del botó FINALITZA (DOM).
+        //  4) Valor persistit com a últim recurs.
+        const nextYFinalizeBottom = pautaBottomFromDom
+          ?? derivedPautaBottom
+          ?? finalizeBottomDom
+          ?? prev.yFinalizeBottom;
         const next = {
           xL: nextXL,
           xR: nextXR,
@@ -468,7 +528,13 @@ export default function BeltReferenceOverlay({ enabled }) {
   const color = 'rgba(22, 163, 74, 0.85)';
 
   return (
-    <div className="fixed inset-0 pointer-events-none debug-exempt" style={{ zIndex: 36000 }} aria-hidden="true" data-dev-overlay="true">
+    <DevPortal
+      zIndex={DEV_LAYER_Z.belt}
+      pointerEvents="none"
+      className="debug-exempt"
+      aria-hidden="true"
+      data-dev-overlay="true"
+    >
       {Number.isFinite(state.xL) ? (
         <div style={{ position: 'fixed', left: state.xL, top: 0, height: '100vh', width: 0, borderLeft: `1px solid ${color}` }} />
       ) : null}
@@ -484,6 +550,6 @@ export default function BeltReferenceOverlay({ enabled }) {
       {Number.isFinite(state.yFinalizeBottom) ? (
         <div style={{ position: 'fixed', left: 0, top: state.yFinalizeBottom, width: '100vw', height: 0, borderTop: `1px solid ${color}` }} />
       ) : null}
-    </div>
+    </DevPortal>
   );
 }

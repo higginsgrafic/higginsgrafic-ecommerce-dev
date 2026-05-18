@@ -1,14 +1,15 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useDebugOverlays } from '@/hooks/useDebugOverlays';
+import DevPortal, { DEV_LAYER_Z } from '@/components/dev/DevPortal';
 
 // Llista editable de pàgines en les quals estem treballant ara mateix.
 // Afegeix o treu entrades segons el focus actiu.
 const ACTIVE_PAGES = [
+  { path: '/constructor/html-base', label: 'HTML BASE', note: 'Header + pauta 4 col. + footers', featured: true },
   { path: '/', label: 'MAIN', note: 'Home' },
   { path: '/constructor/tdp', label: 'TDP', note: 'Pauta + preu/cistell + botonera' },
   { path: '/constructor/full-wide-slide', label: 'FULL-SLIDE', note: 'Full Wide Slide' },
-  { path: '/dev/pauta/col-leccio', label: 'COL·LECCIÓ (ref)', note: 'Pauta 4 col. + 00 Col·lecció' },
   { path: '/constructor/colleccio', label: 'COL·LECCIÓ', note: 'Constructor pàgina col·lecció (4 col)' },
 ];
 
@@ -54,7 +55,8 @@ function ActiveWorkOverlay() {
   };
 
   return (
-    <div
+    <DevPortal zIndex={DEV_LAYER_Z.hud} pointerEvents="none">
+      <div
       style={{
         position: 'fixed',
         left: '28px',
@@ -63,12 +65,12 @@ function ActiveWorkOverlay() {
         maxWidth: '260px',
         maxHeight: 'calc(100vh - 170px)',
         overflow: 'auto',
-        zIndex: 2147483646,
         fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace',
         fontSize: '11px',
         lineHeight: 1.3,
         color: '#fff',
         userSelect: 'none',
+        pointerEvents: 'auto',
       }}
     >
       <button
@@ -119,23 +121,32 @@ function ActiveWorkOverlay() {
           <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: '4px' }}>
             {ACTIVE_PAGES.map((page) => {
               const isCurrent = location.pathname === page.path;
+              const isFeatured = page.featured;
               return (
-                <li key={page.path}>
+                <li
+                  key={page.path}
+                  style={isFeatured ? { marginBottom: '8px', paddingBottom: '8px', borderBottom: '1px solid rgba(251, 191, 36, 0.32)' } : undefined}
+                >
                   <Link
                     to={page.path}
                     style={{
                       display: 'flex',
                       flexDirection: 'column',
                       gap: '2px',
-                      padding: '4px 6px',
+                      padding: isFeatured ? '7px 8px' : '4px 6px',
                       borderRadius: '6px',
-                      backgroundColor: isCurrent ? 'rgba(31, 124, 255, 0.25)' : 'transparent',
-                      border: `1px solid ${isCurrent ? 'rgba(31, 124, 255, 0.65)' : 'rgba(255,255,255,0.08)'}`,
+                      backgroundColor: isFeatured
+                        ? (isCurrent ? 'rgba(251, 191, 36, 0.34)' : 'rgba(251, 191, 36, 0.18)')
+                        : (isCurrent ? 'rgba(31, 124, 255, 0.25)' : 'transparent'),
+                      border: isFeatured
+                        ? `1px solid ${isCurrent ? 'rgba(251, 191, 36, 0.95)' : 'rgba(251, 191, 36, 0.48)'}`
+                        : `1px solid ${isCurrent ? 'rgba(31, 124, 255, 0.65)' : 'rgba(255,255,255,0.08)'}`,
                       color: '#fff',
                       textDecoration: 'none',
+                      boxShadow: isFeatured ? '0 0 0 1px rgba(0,0,0,0.12), 0 4px 12px rgba(251, 191, 36, 0.08)' : undefined,
                     }}
                   >
-                    <span style={{ fontWeight: 700 }}>
+                    <span style={{ fontWeight: 700, color: isFeatured ? '#fef3c7' : '#fff' }}>
                       {page.label}
                       <span style={{ opacity: 0.55, fontWeight: 400, marginLeft: 6 }}>{page.path}</span>
                     </span>
@@ -149,7 +160,8 @@ function ActiveWorkOverlay() {
           </ul>
         </div>
       ) : null}
-    </div>
+      </div>
+    </DevPortal>
   );
 }
 

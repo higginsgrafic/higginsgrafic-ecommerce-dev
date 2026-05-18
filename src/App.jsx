@@ -94,8 +94,8 @@ const NikeTambePage = lazy(() => import('@/pages/NikeTambePage.jsx'));
 const DevLinksPage = lazy(() => import('@/pages/DevLinksPage'));
 const ContactSheetPage = lazy(() => import('@/pages/dev/ContactSheetPage'));
 const SiteMapPage = lazy(() => import('@/pages/dev/SiteMapPage'));
-const PautaCollectionAlignPage = lazy(() => import('@/pages/dev/PautaCollectionAlignPage'));
-const ColleccioPage = lazy(() => import('@/pages/ColleccioPage'));
+const ConstructorColleccioPage = lazy(() => import('@/pages/ConstructorColleccioPage'));
+const HtmlBasePage = lazy(() => import('@/pages/HtmlBasePage'));
 const DevComponentsCatalogPage = lazy(() => import('@/pages/DevComponentsCatalogPage'));
 const DevLayoutBuilderPage = lazy(() => import('@/pages/DevLayoutBuilderPage'));
 const TheHumanInsidePage = lazy(() => import('@/pages/TheHumanInsidePage'));
@@ -3145,8 +3145,14 @@ function App() {
 
                 <Route path="/wishlist" element={<Navigate to="/" replace />} />
 
-                <Route path="/full-wide-slide" element={<FullWideSlidePage />} />
-                <Route path="/constructor/full-wide-slide" element={<FullWideSlidePage />} />
+                <Route
+                  path="/full-wide-slide"
+                  element={<FullWideSlidePage pautaEnabled={tdpPautaEnabled} tableEnabled={tdpTableEnabled} />}
+                />
+                <Route
+                  path="/constructor/full-wide-slide"
+                  element={<FullWideSlidePage pautaEnabled={tdpPautaEnabled} tableEnabled={tdpTableEnabled} />}
+                />
 
                 <Route path="/plantilla-cataleg-components" element={<PlantillaCatalegComponentsPage />} />
 
@@ -3195,13 +3201,16 @@ function App() {
                 <Route path="/tdp" element={<Navigate to="/constructor/tdp" replace />} />
                 <Route
                   path="/constructor/colleccio"
-                  element={<ColleccioPage pautaEnabled={tdpPautaEnabled} tableEnabled={tdpTableEnabled} />}
+                  element={<ConstructorColleccioPage pautaEnabled={tdpPautaEnabled} tableEnabled={tdpTableEnabled} />}
+                />
+                <Route
+                  path="/constructor/html-base"
+                  element={<HtmlBasePage pautaEnabled={tdpPautaEnabled} tableEnabled={tdpTableEnabled} />}
                 />
 
                 <Route path="/new" element={<NewPage />} />
                 <Route path="/dev/contact-sheet" element={<ContactSheetPage />} />
                 <Route path="/dev/site-map" element={<SiteMapPage />} />
-                <Route path="/dev/pauta/col-leccio" element={<PautaCollectionAlignPage />} />
                 <Route path="/dev-links" element={<Navigate to="/proves/dev-links" replace />} />
                 <Route path="/dev-components" element={<Navigate to="/proves/dev-components" replace />} />
                 <Route path="/layout-builder" element={<Navigate to="/proves/layout-builder" replace />} />

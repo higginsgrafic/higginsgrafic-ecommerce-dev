@@ -1,4 +1,5 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 
 const WORK_FONTS = [
   'Oswald',
@@ -37,6 +38,15 @@ function writeStoredState(id, value) {
   } catch {
     // ignore
   }
+}
+
+// Esdeveniment intern per sincronitzar múltiples instàncies amb el mateix `id`
+// dins de la mateixa pestanya. Cada instància emet en escriure i escolta per
+// reflectir canvis en germanes.
+const ETB_UPDATE_EVENT = 'hg-editable-text-box:update';
+function dispatchEtbUpdate(id, sender) {
+  if (typeof window === 'undefined') return;
+  window.dispatchEvent(new CustomEvent(ETB_UPDATE_EVENT, { detail: { id, sender } }));
 }
 
 const controlStyle = {
@@ -83,15 +93,24 @@ function EditableTextBox({
   onColumnSelect,
   renderText = true,
   renderHandle = false,
+  handleRight = '-18px',
+  handleTop = '50%',
   onSettingsChange,
+  onTextChange,
   presetVersion,
+  editorPreview,
 }) {
+  const instanceIdRef = useRef(Symbol('etb-instance'));
   const storedState = useMemo(() => readStoredState(id), [id]);
   const storedStateMatchesPreset = !presetVersion || storedState?.presetVersion === presetVersion;
+  const storedHasUserEdits = storedStateMatchesPreset && storedState && storedState.userEdited !== false;
   const [selected, setSelected] = useState(false);
-  const [text, setText] = useState(storedStateMatchesPreset ? storedState?.text ?? initialText ?? '' : initialText ?? '');
+  const [text, setTextRaw] = useState(storedHasUserEdits ? storedState?.text ?? initialText ?? '' : initialText ?? '');
+  const [userEdited, setUserEdited] = useState(storedHasUserEdits);
   const singleTextRef = useRef(null);
   const lineRefs = useRef([]);
+  const wrapperRef = useRef(null);
+  const [panelAnchor, setPanelAnchor] = useState({ left: 0, top: 0 });
   const [settings, setSettings] = useState({
     x: 0,
     y: 0,
@@ -106,8 +125,12 @@ function EditableTextBox({
     color: '#475059',
     textTransform: 'none',
     ...initialSettings,
-    ...(storedStateMatchesPreset ? storedState?.settings : null),
+    ...(storedHasUserEdits ? storedState?.settings : null),
   });
+  const setText = (value) => {
+    setUserEdited(true);
+    setTextRaw(value);
+  };
 
   const lines = useMemo(() => {
     if (!splitLines) return [text];
@@ -129,13 +152,62 @@ function EditableTextBox({
   }, [columns, text]);
 
   const updateSetting = (key, value) => {
+    setUserEdited(true);
     setSettings((current) => ({ ...current, [key]: value }));
   };
 
   useEffect(() => {
-    writeStoredState(id, { text, settings, presetVersion });
+    writeStoredState(id, { text, settings, presetVersion, userEdited });
     onSettingsChange?.(settings);
-  }, [id, settings, text]);
+    onTextChange?.(text);
+    dispatchEtbUpdate(id, instanceIdRef.current);
+  }, [id, settings, text, userEdited]);
+
+  // Sincronitzem amb altres instàncies del mateix `id` dins la mateixa pestanya.
+  // Important: només actualitzem state si els valors han canviat realment, per
+  // evitar un loop d'esdeveniments entre instàncies (cada `setSettings` amb
+  // spread crea un nou objecte que tornaria a disparar el write effect).
+  useEffect(() => {
+    if (typeof window === 'undefined' || !id) return undefined;
+    const handler = (event) => {
+      const detail = event.detail;
+      if (!detail || detail.id !== id) return;
+      if (detail.sender === instanceIdRef.current) return;
+      const fresh = readStoredState(id);
+      if (!fresh) return;
+      if (typeof fresh.text === 'string') setTextRaw((current) => (current === fresh.text ? current : fresh.text));
+      if (fresh.settings) {
+        setSettings((current) => {
+          const keys = Object.keys(fresh.settings);
+          let changed = false;
+          for (const key of keys) {
+            if (current[key] !== fresh.settings[key]) { changed = true; break; }
+          }
+          return changed ? { ...current, ...fresh.settings } : current;
+        });
+      }
+      if (typeof fresh.userEdited === 'boolean') setUserEdited((current) => (current === fresh.userEdited ? current : fresh.userEdited));
+    };
+    window.addEventListener(ETB_UPDATE_EVENT, handler);
+    return () => window.removeEventListener(ETB_UPDATE_EVENT, handler);
+  }, [id]);
+
+  useLayoutEffect(() => {
+    if (!selected) return undefined;
+    const update = () => {
+      const node = wrapperRef.current;
+      if (!node) return;
+      const rect = node.getBoundingClientRect();
+      setPanelAnchor({ left: rect.left, top: rect.bottom + 11 });
+    };
+    update();
+    window.addEventListener('scroll', update, true);
+    window.addEventListener('resize', update);
+    return () => {
+      window.removeEventListener('scroll', update, true);
+      window.removeEventListener('resize', update);
+    };
+  }, [selected]);
 
   useEffect(() => {
     if (splitLines) {
@@ -190,6 +262,7 @@ function EditableTextBox({
 
   return (
     <div
+      ref={wrapperRef}
       className={className}
       style={{ position: 'relative', ...style, minWidth: 0, minHeight: style?.height ? 0 : `${settings.fontSize}pt`, overflow: 'visible', contain: 'layout', zIndex: selected ? EDITOR_LAYER_Z : style?.zIndex }}
       onFocus={() => setSelected(true)}
@@ -203,8 +276,8 @@ function EditableTextBox({
           aria-label="Obrir editor de text"
           style={{
             position: 'absolute',
-            right: '-18px',
-            top: '50%',
+            right: handleRight,
+            top: handleTop,
             transform: 'translateY(-50%)',
             width: '14px',
             height: '14px',
@@ -294,13 +367,13 @@ function EditableTextBox({
         </div>
       ) : null}
 
-      {selected ? (
+      {selected && typeof document !== 'undefined' ? createPortal(
         <div
           className="debug-exempt"
           style={{
-            position: 'absolute',
-            left: 0,
-            top: 'calc(100% + 11px)',
+            position: 'fixed',
+            left: panelAnchor.left,
+            top: panelAnchor.top,
             zIndex: EDITOR_LAYER_Z + 1,
             display: 'grid',
             gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
@@ -320,6 +393,14 @@ function EditableTextBox({
           onMouseDown={(event) => event.stopPropagation()}
           onClick={(event) => event.stopPropagation()}
         >
+          {editorPreview ? (
+            <div style={{ gridColumn: '1 / 3', display: 'grid', gap: '3px' }}>
+              <span>Vista</span>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '48px', border: '1px solid rgba(71, 80, 89, 0.18)', borderRadius: '6px', background: '#f8fafc', padding: '6px' }}>
+                {editorPreview}
+              </div>
+            </div>
+          ) : (renderText === false && !Array.isArray(columns)) ? null : (
           <label style={{ gridColumn: '1 / 3', display: 'grid', gap: '3px' }}>
             Text
             {Array.isArray(columns) ? (
@@ -360,6 +441,7 @@ function EditableTextBox({
               />
             )}
           </label>
+          )}
 
           <label style={labelStyle}>
             Tipografia
@@ -451,7 +533,8 @@ function EditableTextBox({
           >
             Tancar controls
           </button>
-        </div>
+        </div>,
+        document.body,
       ) : null}
     </div>
   );

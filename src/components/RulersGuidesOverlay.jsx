@@ -1,4 +1,5 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import DevPortal, { DEV_LAYER_Z } from '@/components/dev/DevPortal';
 
 const DEFAULT_STORAGE_KEY = 'devGuidesV2';
 const DEFAULT_RULER_SIZE = 18;
@@ -6,6 +7,22 @@ const HANDLE_THICKNESS = 12;
 const HANDLE_SPAN = 48;
 const RULER_MINOR_STEP = 10;
 const RULER_MAJOR_STEP = 50;
+
+function readStoredGuides(storageKey) {
+  try {
+    const raw = localStorage.getItem(storageKey);
+    if (!raw) return { v: [], h: [] };
+    const parsed = JSON.parse(raw);
+    const vv = Array.isArray(parsed?.v) ? parsed.v : [];
+    const hh = Array.isArray(parsed?.h) ? parsed.h : [];
+    return {
+      v: vv.filter((n) => Number.isFinite(n)),
+      h: hh.filter((n) => Number.isFinite(n)),
+    };
+  } catch {
+    return { v: [], h: [] };
+  }
+}
 
 function clamp(n, min, max) {
   return Math.max(min, Math.min(max, n));
@@ -18,17 +35,14 @@ export default function RulersGuidesOverlay({
   anchorElementId = 'main-content',
   headerOffsetCssVar = '--appHeaderOffset',
   rulerSize = DEFAULT_RULER_SIZE,
-  zIndex = 35000,
+  zIndex = DEV_LAYER_Z.rulers,
 }) {
-  const [vGuides, setVGuides] = useState([]);
-  const [hGuides, setHGuides] = useState([]);
+  const [vGuides, setVGuides] = useState(() => readStoredGuides(storageKey).v);
+  const [hGuides, setHGuides] = useState(() => readStoredGuides(storageKey).h);
   const draggingRef = useRef(null);
   const migratedRef = useRef(false);
   const [anchorRect, setAnchorRect] = useState({ left: 0, top: 0, width: 0, height: 0, padLeft: 0, padTop: 0 });
   const zoom = 1;
-
-  const rulerLeft = Math.max(0, anchorRect.left);
-  const rulerTop = Math.max(0, anchorRect.top);
 
   const interactionLeft = Math.max(0, anchorRect.left + (anchorRect.padLeft || 0));
   const interactionTop = Math.max(0, anchorRect.top + (anchorRect.padTop || 0));
@@ -112,43 +126,32 @@ export default function RulersGuidesOverlay({
   };
 
   useEffect(() => {
-    try {
-      const raw = localStorage.getItem(storageKey);
-      if (!raw) return;
-      const parsed = JSON.parse(raw);
-      const vv = Array.isArray(parsed?.v) ? parsed.v : [];
-      const hh = Array.isArray(parsed?.h) ? parsed.h : [];
-      setVGuides(vv.filter((n) => Number.isFinite(n)));
-      setHGuides(hh.filter((n) => Number.isFinite(n)));
-    } catch {
-      // ignore
-    }
-  }, [guidesEnabled, storageKey]);
-
-  useEffect(() => {
     if (migratedRef.current) return;
     if (!Number.isFinite(interactionTop) || !Number.isFinite(interactionLeft)) return;
     if (interactionTop <= 0 && interactionLeft <= 0) return;
 
-    if (interactionTop > 0) {
-      setHGuides((prev) => {
-        if (!prev.length) return prev;
-        const max = Math.max(...prev);
-        if (!(max <= interactionTop + 2)) return prev;
-        return prev.map((y) => y + interactionTop);
-      });
-    }
+    const raf = requestAnimationFrame(() => {
+      if (interactionTop > 0) {
+        setHGuides((prev) => {
+          if (!prev.length) return prev;
+          const max = Math.max(...prev);
+          if (!(max <= interactionTop + 2)) return prev;
+          return prev.map((y) => y + interactionTop);
+        });
+      }
 
-    if (interactionLeft > 0) {
-      setVGuides((prev) => {
-        if (!prev.length) return prev;
-        const max = Math.max(...prev);
-        if (!(max <= interactionLeft + 2)) return prev;
-        return prev.map((x) => x + interactionLeft);
-      });
-    }
+      if (interactionLeft > 0) {
+        setVGuides((prev) => {
+          if (!prev.length) return prev;
+          const max = Math.max(...prev);
+          if (!(max <= interactionLeft + 2)) return prev;
+          return prev.map((x) => x + interactionLeft);
+        });
+      }
+    });
 
     migratedRef.current = true;
+    return () => cancelAnimationFrame(raf);
   }, [interactionLeft, interactionTop]);
 
   useEffect(() => {
@@ -242,11 +245,11 @@ export default function RulersGuidesOverlay({
     return { xs, ys, vw, vh };
   }, [anchorRect.left, anchorRect.top, zoom]);
 
-  const copySquare = async () => {
+  const copySquare = useCallback(async () => {
     if (!square) return;
     const text = `xL=${square.xL} xR=${square.xR} yT=${square.yT} yB=${square.yB}`;
     try {
-      await navigator.clipboard.writeText(text);
+      await navigator.clipboard?.writeText?.(text);
     } catch {
       try {
         const ta = document.createElement('textarea');
@@ -262,7 +265,7 @@ export default function RulersGuidesOverlay({
         // ignore
       }
     }
-  };
+  }, [square]);
 
   useEffect(() => {
     try {
@@ -273,17 +276,22 @@ export default function RulersGuidesOverlay({
       window.__DEV_GUIDES_CLEAR__ = () => {
         setVGuides([]);
         setHGuides([]);
-        try { localStorage.removeItem(storageKey); } catch {}
+        try {
+          localStorage.removeItem(storageKey);
+        } catch {
+          // ignore
+        }
       };
     } catch {
       // ignore
     }
-  }, [square, storageKey]);
+  }, [copySquare, square, storageKey]);
 
   return (
-    <div
-      className="fixed inset-0 pointer-events-none debug-exempt"
-      style={{ zIndex }}
+    <DevPortal
+      className="debug-exempt"
+      pointerEvents="none"
+      zIndex={zIndex}
       aria-hidden="true"
       data-dev-overlay="true"
     >
@@ -567,6 +575,6 @@ export default function RulersGuidesOverlay({
           </div>
         </div>
       )) : null}
-    </div>
+    </DevPortal>
   );
 }
