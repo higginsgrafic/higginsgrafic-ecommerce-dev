@@ -1,4 +1,4 @@
-import { useLayoutEffect, useMemo } from 'react';
+import { useLayoutEffect, useMemo, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { DEV_LAYER_Z } from '@/components/dev/DevPortal';
 import { getSafeBelt } from '@/utils/layoutMetrics';
@@ -48,15 +48,25 @@ if (typeof window !== 'undefined' && typeof document !== 'undefined') {
   }
 }
 
-function useBeltCssVars() {
+// Mesura reactiva del belt segur. La pauta NO depèn de cap CSS var de belt2;
+// fa la seva pròpia mesura amb getSafeBelt() i la refresca al resize.
+// Continua publicant `--hg-tdp-xL/xR` per compatibilitat amb consumidors externs.
+function useReactiveBelt() {
+  const compute = () => {
+    if (typeof window === 'undefined') return { left: 0, right: 0 };
+    return getSafeBelt({ maxContent: 1400, sideMargin: 76, minContent: 320 });
+  };
+  const [belt, setBelt] = useState(compute);
+
   useLayoutEffect(() => {
     if (typeof window === 'undefined') return undefined;
     const root = document.documentElement;
 
     const apply = () => {
-      const belt = getSafeBelt({ maxContent: 1400, sideMargin: 76, minContent: 320 });
-      root.style.setProperty('--hg-tdp-xL', `${belt.left}px`);
-      root.style.setProperty('--hg-tdp-xR', `${belt.right}px`);
+      const next = getSafeBelt({ maxContent: 1400, sideMargin: 76, minContent: 320 });
+      root.style.setProperty('--hg-tdp-xL', `${next.left}px`);
+      root.style.setProperty('--hg-tdp-xR', `${next.right}px`);
+      setBelt((prev) => (prev.left === next.left && prev.right === next.right ? prev : next));
     };
 
     apply();
@@ -71,6 +81,8 @@ function useBeltCssVars() {
       cancelAnimationFrame(raf);
     };
   }, []);
+
+  return belt;
 }
 
 /**
@@ -107,7 +119,7 @@ export default function Pauta4ColsOverlay({
   style,
   children,
 }) {
-  useBeltCssVars();
+  const belt = useReactiveBelt();
 
   // 3 gutters entre 4 cols. Si numCols canvia, recalculem.
   const gutterCount = numCols - 1;
@@ -127,10 +139,10 @@ export default function Pauta4ColsOverlay({
     }));
   }, [numCols, numRows, tableEnabled]);
 
-  // Belt L/R: belt2 si és vàlid, altrament safe-belt.
-  const beltLeft = 'var(--belt2-xL, var(--hg-tdp-xL, 0px))';
-  const beltRight = 'var(--belt2-xR, var(--hg-tdp-xR, 100vw))';
-  const beltWidth = `calc(${beltRight} - ${beltLeft})`;
+  // Belt L/R: mesura pròpia (independent de belt2). Belt2 segueix existint com a
+  // overlay de debug, però no influeix en aquesta pauta.
+  const beltLeft = `${belt.left}px`;
+  const beltWidth = `${Math.max(0, belt.right - belt.left)}px`;
 
   // Posicionament:
   //   - overlay  → ancorat al viewport (fixed + left/width), independent del

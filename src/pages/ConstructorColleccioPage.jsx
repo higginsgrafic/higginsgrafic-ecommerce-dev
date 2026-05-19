@@ -12,7 +12,17 @@ const TDP_DESCRIPTION = [
   'hòmens virtuosos, e singularment aquells qui per la república lluitaren.',
 ].join('\n');
 
-const TDP_IMAGE_SRC = '/placeholders/apparel/t-shirt/gildan_5000/gildan-5000_t-shirt_crewneck_unisex_heavyWeight_xl_white_gpr-4-0_front.png';
+const tdpImage = (color) =>
+  `/placeholders/apparel/t-shirt/gildan_5000/gildan-5000_t-shirt_crewneck_unisex_heavyWeight_xl_${color}_gpr-4-0_front.png`;
+
+// 14 colors canònics (ordre extret de FullWideSlideDemoHeader.jsx).
+// Repetits cíclicament fins a omplir les 16 cel·les del 4x4.
+const TDP_GRID_COLORS = [
+  ['white',        'light-blue',     'royal',         'purple'],
+  ['navy',         'daisy',          'gold',          'light-pink'],
+  ['red',          'kiwi',           'irish-green',   'military-green'],
+  ['forest-green', 'black',          'white',         'light-blue'],
+];
 const OVERLAY_STATE_STORAGE_KEY = 'hg.constructorColleccio.overlayOpacity.v1';
 
 const DEFAULT_OVERLAY_STATE = {
@@ -82,18 +92,62 @@ function ConstructorColleccioPage() {
           }}
         />
         <div
-          aria-label="TDP espai del títol"
+          aria-hidden="true"
           style={{
             gridColumn: '1 / 5',
             gridRow: '1 / 16',
-            backgroundColor: 'transparent',
-            border: '1px dashed rgba(59, 130, 246, 0.85)',
-            boxSizing: 'border-box',
-            zIndex: 2,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'flex-start',
+            zIndex: 1,
+            pointerEvents: 'none',
           }}
-        />
+        >
+          <span
+            style={{
+              fontFamily: 'Oswald, sans-serif',
+              fontWeight: 700,
+              fontSize: 'clamp(140px, 22vw, 420px)',
+              lineHeight: 0.85,
+              color: 'rgba(180, 188, 196, 0.55)',
+              letterSpacing: '-0.04em',
+              transform: 'translateY(-4%)',
+            }}
+          >
+            00
+          </span>
+        </div>
+        <div
+          aria-label="Títol col·lecció"
+          style={{
+            gridColumn: '1 / 5',
+            gridRow: '1 / 16',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 2,
+            pointerEvents: 'none',
+          }}
+        >
+          <h1
+            style={{
+              margin: 0,
+              fontFamily: 'Oswald, sans-serif',
+              fontWeight: 700,
+              fontSize: 'clamp(64px, 12vw, 200px)',
+              letterSpacing: '-0.01em',
+              lineHeight: 0.9,
+              color: '#0b0d10',
+              textTransform: 'uppercase',
+            }}
+          >
+            COL·LECCIÓ
+          </h1>
+        </div>
         {[0, 1, 2, 3].flatMap((rowIdx) =>
           [0, 1, 2, 3].map((colIdx) => {
+            const color = TDP_GRID_COLORS[rowIdx][colIdx];
+            if (!color) return null;
             const isV5 = (rowIdx + colIdx) % 2 === 1;
             const Card = isV5 ? CollectionProductCardV5 : CollectionProductCard;
             const col = colIdx + 1;
@@ -106,8 +160,8 @@ function ConstructorColleccioPage() {
                 productName="NOM DE PRODUCTE"
                 description={TDP_DESCRIPTION}
                 price="15,50€"
-                imageSrc={TDP_IMAGE_SRC}
-                imageAlt="Samarreta blanca Gildan 5000"
+                imageSrc={tdpImage(color)}
+                imageAlt={`Samarreta Gildan 5000 ${color}`}
                 sizes={sizes}
                 selectedSize={selectedSize}
                 onSizeChange={setSelectedSize}
