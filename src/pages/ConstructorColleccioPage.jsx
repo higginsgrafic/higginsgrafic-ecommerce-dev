@@ -45,6 +45,7 @@ function loadOverlayState() {
 function ConstructorColleccioPage() {
   const [selectedSize, setSelectedSize] = useState('M');
   const [overlayState, setOverlayState] = useState(loadOverlayState);
+  const [zeroLeftOffsetPx, setZeroLeftOffsetPx] = useState(0);
   const sizes = ['S', 'M', 'L', 'XL', 'XXL'];
   const { pautaOpacity, tableOpacity, backgroundOpacity } = overlayState;
 
@@ -55,6 +56,40 @@ function ConstructorColleccioPage() {
       // ignore
     }
   }, [overlayState]);
+
+  // Alinea el "00" amb el left del logo GRAFC del header.
+  useEffect(() => {
+    if (typeof window === 'undefined') return undefined;
+    let raf = 0;
+    let cancelled = false;
+    const measure = () => {
+      if (cancelled) return;
+      const logo = document.querySelector('[data-brand-logo="1"]')
+        || document.getElementById('stripe-guide-header-logo-anchor');
+      const grid = document.querySelector('[data-pauta-grid]');
+      if (!logo || !grid) {
+        raf = requestAnimationFrame(measure);
+        return;
+      }
+      const logoRect = logo.getBoundingClientRect();
+      const gridRect = grid.getBoundingClientRect();
+      const offset = Math.max(0, logoRect.left - gridRect.left);
+      setZeroLeftOffsetPx((prev) => (Math.abs(prev - offset) < 0.5 ? prev : offset));
+    };
+    measure();
+    const onResize = () => {
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(measure);
+    };
+    window.addEventListener('resize', onResize);
+    window.addEventListener('scroll', onResize, { passive: true });
+    return () => {
+      cancelled = true;
+      cancelAnimationFrame(raf);
+      window.removeEventListener('resize', onResize);
+      window.removeEventListener('scroll', onResize);
+    };
+  }, []);
 
   return (
     <section className="bg-background">
@@ -99,6 +134,7 @@ function ConstructorColleccioPage() {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'flex-start',
+            paddingLeft: `${zeroLeftOffsetPx + 7}px`,
             zIndex: 1,
             pointerEvents: 'none',
           }}
@@ -111,6 +147,7 @@ function ConstructorColleccioPage() {
               lineHeight: 0.85,
               color: 'rgba(180, 188, 196, 0.55)',
               letterSpacing: '-0.04em',
+              marginLeft: '-0.07em',
               transform: 'translateY(-4%)',
             }}
           >
@@ -136,9 +173,13 @@ function ConstructorColleccioPage() {
               fontWeight: 700,
               fontSize: 'clamp(64px, 12vw, 200px)',
               letterSpacing: '-0.01em',
-              lineHeight: 0.9,
+              lineHeight: 0.85,
               color: '#0b0d10',
               textTransform: 'uppercase',
+              // -4% per igualar la compensació del 00; +X% addicional per
+              // contrarestar la massa visual de l'accent (que puja el centre
+              // de massa percebut). Resultat net ~+1%, push down lleuger.
+              transform: 'translateY(calc(1% - 5px))',
             }}
           >
             COL·LECCIÓ
@@ -174,6 +215,7 @@ function ConstructorColleccioPage() {
           })
         )}
       </Pauta4ColsOverlay>
+      <CollectionOutroSection />
       <div
         className="font-mono text-neutral-800"
         style={{
@@ -196,6 +238,98 @@ function ConstructorColleccioPage() {
         <OpacitySlider label="Opacitat BG" value={backgroundOpacity} onChange={(value) => setOverlayState((prev) => ({ ...prev, backgroundOpacity: value }))} />
       </div>
       <CalibrationsHud />
+    </section>
+  );
+}
+
+// =============================================================================
+//  Outro: editorial + tagline (entre TDPs i footer)
+// =============================================================================
+function CollectionOutroSection() {
+  const editorialImage = tdpImage('black');
+
+  return (
+    <section
+      aria-label="Tancament de col·lecció"
+      className="mx-auto max-w-[1400px] px-4 sm:px-6 lg:px-10"
+      style={{
+        // Aire entre TDPs i editorial = ½ alçada de la imatge (21:9 → 21.4% width).
+        paddingTop: '21%',
+        paddingBottom: 0,
+      }}
+    >
+      {/* Franja editorial full-width dins el belt */}
+      <div
+        style={{
+          position: 'relative',
+          width: '100%',
+          aspectRatio: '21 / 9',
+          backgroundColor: '#f4f4f1',
+          overflow: 'hidden',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        <img
+          src={editorialImage}
+          alt=""
+          aria-hidden="true"
+          draggable={false}
+          style={{
+            maxHeight: '85%',
+            width: 'auto',
+            objectFit: 'contain',
+            transform: 'translateY(2%)',
+            userSelect: 'none',
+          }}
+        />
+        <span
+          style={{
+            position: 'absolute',
+            left: '6%',
+            bottom: '8%',
+            fontFamily: 'Roboto Condensed, sans-serif',
+            fontSize: 12,
+            letterSpacing: '0.2em',
+            textTransform: 'uppercase',
+            color: 'rgba(11, 13, 16, 0.6)',
+          }}
+        >
+          Lookbook · Tardor 2025
+        </span>
+      </div>
+
+      {/* Tagline tipogràfica, centrada amb molt aire */}
+      <div
+        style={{
+          paddingTop: '14%',
+          paddingBottom: '14%',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}
+      >
+        <p
+          style={{
+            margin: 0,
+            fontFamily: 'Oswald, sans-serif',
+            fontWeight: 700,
+            fontSize: 'clamp(144px, 22vw, 352px)',
+            lineHeight: 1.05,
+            letterSpacing: '-0.01em',
+            textTransform: 'uppercase',
+            textAlign: 'center',
+            color: '#0b0d10',
+            maxWidth: '18ch',
+            // Compensació de centratge òptic: les majúscules d'Oswald viuen a la
+            // meitat superior del line-box → cal empènyer-les avall.
+            transform: 'translateY(3%)',
+          }}
+        >
+          Roba que parla
+        </p>
+      </div>
     </section>
   );
 }
