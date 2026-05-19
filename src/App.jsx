@@ -95,6 +95,7 @@ const DevLinksPage = lazy(() => import('@/pages/DevLinksPage'));
 const ContactSheetPage = lazy(() => import('@/pages/dev/ContactSheetPage'));
 const SiteMapPage = lazy(() => import('@/pages/dev/SiteMapPage'));
 const ConstructorColleccioPage = lazy(() => import('@/pages/ConstructorColleccioPage'));
+const ConstructorPdpPage = lazy(() => import('@/pages/ConstructorPdpPage'));
 const HtmlBasePage = lazy(() => import('@/pages/HtmlBasePage'));
 const DevComponentsCatalogPage = lazy(() => import('@/pages/DevComponentsCatalogPage'));
 const DevLayoutBuilderPage = lazy(() => import('@/pages/DevLayoutBuilderPage'));
@@ -3203,6 +3204,7 @@ function App() {
                   path="/constructor/colleccio"
                   element={<ConstructorColleccioPage pautaEnabled={tdpPautaEnabled} tableEnabled={tdpTableEnabled} />}
                 />
+                <Route path="/constructor/pdp" element={<ConstructorPdpPage />} />
                 <Route
                   path="/constructor/html-base"
                   element={<HtmlBasePage pautaEnabled={tdpPautaEnabled} tableEnabled={tdpTableEnabled} />}

@@ -11,6 +11,7 @@ const ACTIVE_PAGES = [
   { path: '/constructor/tdp', label: 'TDP', note: 'Pauta + preu/cistell + botonera' },
   { path: '/constructor/full-wide-slide', label: 'FULL-SLIDE', note: 'Full Wide Slide' },
   { path: '/constructor/colleccio', label: 'COL·LECCIÓ', note: 'Constructor pàgina col·lecció (4 col)' },
+  { path: '/constructor/pdp', label: 'PDP', note: 'Constructor pàgina de detall de producte' },
 ];
 
 const STORAGE_KEY = 'hg.activeWorkOverlay.collapsed';

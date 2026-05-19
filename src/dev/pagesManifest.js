@@ -30,6 +30,7 @@ export const PAGES_MANIFEST = [
   // Constructors (pàgines per construir un component / preset visual)
   { path: '/constructor/tdp', label: 'TDP Constructor', group: 'Constructors', tag: 'keep' },
   { path: '/constructor/colleccio', label: 'Col·lecció Constructor', group: 'Constructors', tag: 'keep' },
+  { path: '/constructor/pdp', label: 'PDP Constructor', group: 'Constructors', tag: 'keep' },
   { path: '/constructor/html-base', label: 'HTML Base Constructor', group: 'Constructors', tag: 'keep' },
   { path: '/constructor/full-wide-slide', label: 'Full Wide Slide Constructor', group: 'Constructors', tag: 'keep' },
   { path: '/full-wide-slide', label: 'Full Wide Slide (alias)', group: 'Constructors', tag: 'review' },

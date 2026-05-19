@@ -125,7 +125,12 @@ export default function Pauta4ColsOverlay({
   const gutterCount = numCols - 1;
   const totalGutterCalc = `calc(${gutterCount} * ${gutterX})`;
   const columnsTemplate = `repeat(${numCols}, minmax(0, calc((100% - ${totalGutterCalc}) / ${numCols})))`;
-  const rowsTemplate = `${firstRowScale}fr repeat(${numRows - 1}, 1fr)`;
+  // Files estrictament proporcionals al canvas. `minmax(0, 1fr)` elimina el
+  // mínim implícit `auto` de `1fr` que permetria al contingut expandir un
+  // row track i, en conseqüència, deformar la pauta segons el contingut de
+  // cada pàgina. La pauta és una plantilla universal: files i columnes
+  // tenen sempre les mateixes proporcions, independentment del contingut.
+  const rowsTemplate = `minmax(0, ${firstRowScale}fr) repeat(${numRows - 1}, minmax(0, 1fr))`;
 
   const pautaRows = useMemo(
     () => Array.from({ length: numRows }, (_, index) => index + 1),
@@ -151,6 +156,10 @@ export default function Pauta4ColsOverlay({
   //                respecte el centre del pare; si el pare és viewport-wide
   //                queda centrat al viewport. És més robust que `marginLeft`
   //                quan el pare té offsets/padding.
+  // `overflowX: 'clip'` al wrapper extern impedeix qualsevol desbordament
+  // horitzontal lateral (la garantia que abans donava `overflow: hidden` al
+  // grid intern), però NO retalla verticalment: el contingut que sobresurt
+  // d'una cel·la pot mostrar-se sense afectar la pauta.
   const containerStyle = overlay
     ? {
         position: 'fixed',
@@ -162,6 +171,7 @@ export default function Pauta4ColsOverlay({
         zIndex,
         pointerEvents: 'none',
         boxSizing: 'border-box',
+        overflowX: 'clip',
       }
     : {
         position: 'relative',
@@ -172,6 +182,7 @@ export default function Pauta4ColsOverlay({
         paddingBottom: bottomPadding,
         boxSizing: 'border-box',
         zIndex,
+        overflowX: 'clip',
       };
 
   const gridStyle = {
@@ -184,7 +195,12 @@ export default function Pauta4ColsOverlay({
     aspectRatio: `${canvasAspect[0]} / ${canvasAspect[1]}`,
     width: '100%',
     boxSizing: 'border-box',
-    overflow: 'hidden', // garantia que la pauta no desborda lateralment
+    // El contingut que excedeixi la mida d'una cel·la pot sobresortir
+    // visualment sense afectar la pauta (que té files estrictes via
+    // `minmax(0, 1fr)`). Evitem `overflow: hidden` perquè retallaria
+    // contingut que sobresurt verticalment. Per al desbordament horitzontal
+    // (lateral fora del belt), apliquem `overflow-x: clip` al wrapper extern.
+    overflow: 'visible',
   };
 
   // Posició dels números: al centre del primer canal entre col 1 i col 2.
@@ -195,7 +211,7 @@ export default function Pauta4ColsOverlay({
   const markup = (
     <div className={className} style={{ ...containerStyle, ...style }} data-pauta="4-cols">
       <div style={gridStyle} data-pauta-grid>
-        {pautaEnabled ? (
+        {tableEnabled ? (
           <div
             aria-hidden="true"
             style={{
@@ -207,7 +223,7 @@ export default function Pauta4ColsOverlay({
               display: 'grid',
               gridTemplateRows: rowsTemplate,
               rowGap: gutterY,
-              opacity: pautaOpacity,
+              opacity: tableOpacity,
               zIndex: 4,
               pointerEvents: 'none',
             }}

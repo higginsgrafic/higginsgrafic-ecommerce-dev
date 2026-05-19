@@ -281,14 +281,14 @@ export default function BeltReferenceOverlay({ enabled }) {
     };
   }, [enabled, state, location.pathname]);
 
-  // Quan les guies belt2 es desactiven, neteja totes les CSS vars perquè cap
-  // consumidor (overlays, layouts) llegeixi valors caducs.
+  // Quan les guies belt2 es desactiven NOMÉS retirem les vars exclusives de
+  // debug visual (`--belt2-yT/yB/debug-yB`). Mantenim `--belt2-xL/xR`
+  // publicades perquè layouts productius (Pauta4Cols…) hi depenen i el toggle
+  // no ha de canviar l'amplada de la pàgina.
   useEffect(() => {
     if (enabled) return undefined;
     try {
       const root = document.documentElement;
-      root.style.removeProperty('--belt2-xL');
-      root.style.removeProperty('--belt2-xR');
       root.style.removeProperty('--belt2-yT');
       root.style.removeProperty('--belt2-yB');
       root.style.removeProperty('--belt2-debug-yB');
@@ -299,10 +299,9 @@ export default function BeltReferenceOverlay({ enabled }) {
   }, [enabled]);
 
   useLayoutEffect(() => {
-    if (!enabled) {
-      return undefined;
-    }
-
+    // Sempre mesurem i actualitzem state, fins i tot amb el toggle visual
+    // desactivat: les vars `--belt2-xL/xR` són el contracte d'amplada per a
+    // layouts productius (pauta) i no han de depèndre del toggle de debug.
     const read = () => {
       // Considera un rect com a "buit" (element no col·locat al layout, p.ex.
       // `display:none` o encara no muntat) si totes les dimensions són 0.

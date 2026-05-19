@@ -1,7 +1,9 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { Link } from 'react-router-dom';
 import SEO from '@/components/SEO';
 import Footer from '@/components/Footer';
+import RespescaTitle from '@/pages/nikeTambe/RespescaTitle';
+import CarouselArrows from '@/pages/nikeTambe/CarouselArrows';
+import ProductCard from '@/pages/nikeTambe/ProductCard';
 
 export default function NikeTambePage() {
   const normalizeOverlaySrc = (value) => {
@@ -439,31 +441,7 @@ export default function NikeTambePage() {
         data-section="respesca"
         style={respescaMinHeightPx ? { minHeight: `${respescaMinHeightPx}px` } : undefined}
       >
-        <div
-          style={{
-            position: 'absolute',
-            top: '64px',
-            left: `${(bgMetrics ? bgMetrics.devLeft : 0) - 3}px`,
-            fontFamily: 'Roboto, system-ui, -apple-system, Segoe UI, Arial, sans-serif',
-            color: 'hsl(var(--foreground))'
-          }}
-          data-component="respesca-title"
-        >
-          <div style={{ fontSize: '32pt', lineHeight: 1.1, color: 'hsl(var(--foreground))' }}>també et pot interessar</div>
-          <div
-            style={{
-              marginTop: '2px',
-              fontSize: '13pt',
-              fontWeight: 500,
-              lineHeight: 1.2,
-              color: 'hsl(var(--muted-foreground))',
-              fontKerning: 'normal',
-              letterSpacing: '0.08em'
-            }}
-          >
-            COSES DIFERENTS
-          </div>
-        </div>
+        <RespescaTitle leftPx={bgMetrics ? bgMetrics.devLeft : 0} />
 
         <div className="w-full py-10" data-container="cards-row">
           <div style={{ position: 'relative', minHeight: `${viewportHeightPx}px` }}>
@@ -536,84 +514,7 @@ export default function NikeTambePage() {
                 dragRef.current.pointerId = null;
               }}
             >
-              <div
-                style={{
-                  position: 'absolute',
-                  top: '28.5px',
-                  left: `${arrowsLeftPx}px`,
-                  display: 'flex',
-                  gap: '10px',
-                  zIndex: 3
-                }}
-              >
-                <button
-                  type="button"
-                  aria-label="Anterior"
-                  style={{
-                    width: '44px',
-                    height: '44px',
-                    borderRadius: '9999px',
-                    backgroundColor: 'hsl(var(--foreground))',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    boxShadow: 'none'
-                  }}
-                  onPointerDown={(e) => {
-                    e.stopPropagation();
-                  }}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    goPrev();
-                  }}
-                >
-                  <svg
-                    width="18"
-                    height="18"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                    style={{ transform: 'translateX(-2px)' }}
-                  >
-                    <path d="M15 18L9 12L15 6" stroke="#ffffff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
-                </button>
-
-                <button
-                  type="button"
-                  aria-label="Següent"
-                  style={{
-                    width: '44px',
-                    height: '44px',
-                    borderRadius: '9999px',
-                    backgroundColor: 'hsl(var(--foreground))',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    boxShadow: 'none'
-                  }}
-                  onPointerDown={(e) => {
-                    e.stopPropagation();
-                  }}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    goNext();
-                  }}
-                >
-                  <svg
-                    width="18"
-                    height="18"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                    style={{ transform: 'translateX(2px)' }}
-                  >
-                    <path d="M9 6L15 12L9 18" stroke="#ffffff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
-                </button>
-              </div>
+              <CarouselArrows leftPx={arrowsLeftPx} onPrev={goPrev} onNext={goNext} />
 
               <div
                 style={{
@@ -642,112 +543,26 @@ export default function NikeTambePage() {
                 const img = placeholderImages[idx] || null;
 
                 return (
-                  <Link
+                  <ProductCard
                     key={`${pos}-${idx}`}
-                    to={cardHref}
-                    className="block"
-                    data-component="product-card"
-                    data-card-index={idx}
-                    draggable={false}
-                    onDragStart={(e) => {
-                      e.preventDefault();
-                    }}
-                    onDragStartCapture={(e) => {
-                      e.preventDefault();
-                    }}
-                    onClick={(e) => {
+                    positionKey={`${pos}-${idx}`}
+                    href={cardHref}
+                    imageSrc={img}
+                    imageAlt={imageAlt}
+                    leftPx={leftPx}
+                    tileStyle={tileStyle}
+                    textBlockStyle={textBlockStyle}
+                    overlaySrc={drawingOverlaySrc}
+                    overlayEnabled={shirtDrawingEnabled}
+                    cardIndex={idx}
+                    onNavigateBlocked={() => {
                       if (dragRef.current.moved) {
-                        e.preventDefault();
-                        e.stopPropagation();
                         dragRef.current.moved = false;
+                        return true;
                       }
+                      return false;
                     }}
-                    style={{
-                      position: 'absolute',
-                      top: '161px',
-                      left: `${leftPx}px`,
-                      userSelect: 'none',
-                      WebkitUserDrag: 'none'
-                    }}
-                  >
-                    <div style={{ ...textBlockStyle, position: 'relative' }}>
-                      <div className="overflow-hidden flex items-center justify-center" style={{ ...tileStyle, position: 'relative' }} data-component="product-tile">
-                        {img ? (
-                          <>
-                            <img
-                              src={img}
-                              alt={imageAlt}
-                              draggable={false}
-                              onDragStart={(e) => {
-                                e.preventDefault();
-                              }}
-                              style={{
-                                width: '100%',
-                                height: '100%',
-                                objectFit: 'contain',
-                                padding: '48px',
-                                userSelect: 'none',
-                                WebkitUserDrag: 'none'
-                              }}
-                              loading="eager"
-                              decoding="async"
-                            />
-
-                            {shirtDrawingEnabled && drawingOverlaySrc ? (
-                              <img
-                                src={encodeURI(normalizeOverlaySrc(drawingOverlaySrc) || '')}
-                                alt=""
-                                draggable={false}
-                                onDragStart={(e) => {
-                                  e.preventDefault();
-                                }}
-                                onError={() => {
-                                  try {
-                                    // eslint-disable-next-line no-console
-                                    console.error('[NikeTambePage] drawing overlay failed to load', { drawingOverlaySrc });
-                                  } catch {
-                                    // ignore
-                                  }
-                                }}
-                                style={{
-                                  position: 'absolute',
-                                  inset: 0,
-                                  zIndex: 2,
-                                  width: '100%',
-                                  height: '100%',
-                                  objectFit: 'contain',
-                                  padding: 0,
-                                  pointerEvents: 'none',
-                                  userSelect: 'none',
-                                  WebkitUserDrag: 'none',
-                                  opacity: 0.98,
-                                  filter: 'drop-shadow(0 0 2px rgba(0,0,0,0.65))',
-                                  transformOrigin: 'top center',
-                                  transform: 'translate(var(--hgShirtOverlayDx, 0px), var(--hgShirtOverlayDy, 0px)) scale(var(--hgShirtOverlayScale, 1))',
-                                }}
-                                loading="eager"
-                                decoding="async"
-                              />
-                            ) : null}
-                          </>
-                        ) : null}
-                      </div>
-
-                      <div style={{ marginTop: '8px', fontFamily: 'Roboto, system-ui, -apple-system, Segoe UI, Arial, sans-serif' }}>
-                        <div>
-                          <div style={{ position: 'relative', top: '3px', marginTop: '2px', fontSize: '10px', fontWeight: 500, lineHeight: 1.2, color: 'hsl(var(--muted-foreground))', fontKerning: 'normal', letterSpacing: '0.14em' }}>
-                            THE HUMAN INSIDE
-                          </div>
-                          <div style={{ position: 'relative', top: '6px', fontSize: '14px', fontWeight: 500, lineHeight: 1.1, color: 'hsl(var(--foreground))' }}>
-                            IRON KONG
-                          </div>
-                          <div style={{ position: 'relative', top: '7px', left: '-1px', marginTop: '6px', fontSize: '14px', fontWeight: 400, lineHeight: 1.1, color: 'hsl(var(--foreground))' }}>
-                            19,99 €
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </Link>
+                  />
                 );
               })}
               </div>
