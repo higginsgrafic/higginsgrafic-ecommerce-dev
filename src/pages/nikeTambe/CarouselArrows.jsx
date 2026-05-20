@@ -3,8 +3,8 @@ import React from 'react';
 const buttonStyle = {
   width: '44px',
   height: '44px',
-  borderRadius: '9999px',
-  backgroundColor: 'hsl(var(--foreground))',
+  borderRadius: '0',
+  backgroundColor: '#e5e7eb',
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
@@ -50,9 +50,9 @@ export default function CarouselArrows({ leftPx, topPx = 28.5, onPrev, onNext, p
           viewBox="0 0 24 24"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
-          style={{ transform: 'translateX(-2px)' }}
+          style={{ transform: 'translateX(-1px)' }}
         >
-          <path d="M15 18L9 12L15 6" stroke="#ffffff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+          <path d="M15 18L9 12L15 6" stroke="#475059" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
         </svg>
       </ArrowButton>
       <ArrowButton ariaLabel={nextLabel} onClick={onNext}>
@@ -62,9 +62,9 @@ export default function CarouselArrows({ leftPx, topPx = 28.5, onPrev, onNext, p
           viewBox="0 0 24 24"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
-          style={{ transform: 'translateX(2px)' }}
+          style={{ transform: 'translateX(1px)' }}
         >
-          <path d="M9 6L15 12L9 18" stroke="#ffffff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+          <path d="M9 6L15 12L9 18" stroke="#475059" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
         </svg>
       </ArrowButton>
     </div>

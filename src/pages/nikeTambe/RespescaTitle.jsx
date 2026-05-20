@@ -12,16 +12,29 @@ export default function RespescaTitle({ leftPx = 0, title = 'també et pot inter
       }}
       data-component="respesca-title"
     >
-      <div style={{ fontSize: '32pt', lineHeight: 1.1, color: 'hsl(var(--muted-foreground))' }}>{title}</div>
+      <div
+        style={{
+          fontFamily: 'Oswald, sans-serif',
+          fontWeight: 300,
+          fontSize: '24pt',
+          lineHeight: 1,
+          letterSpacing: '0.04em',
+          textTransform: 'uppercase',
+          color: '#475059',
+        }}
+      >
+        {title}
+      </div>
       <div
         style={{
           marginTop: '2px',
-          fontSize: '13pt',
-          fontWeight: 500,
+          fontFamily: 'Roboto Condensed, sans-serif',
+          fontWeight: 400,
+          fontSize: '11px',
           lineHeight: 1.2,
-          color: 'hsl(var(--foreground))',
-          fontKerning: 'normal',
-          letterSpacing: '0.08em',
+          letterSpacing: '0.2em',
+          textTransform: 'uppercase',
+          color: 'rgba(71, 80, 89, 0.7)',
         }}
       >
         {subtitle}

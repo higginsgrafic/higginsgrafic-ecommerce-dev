@@ -4,6 +4,56 @@ import Pauta4ColsOverlay from '@/components/pauta/Pauta4ColsOverlay';
 import CollectionProductCard from '@/components/tdp/CollectionProductCard';
 import TambeRail from '@/pages/nikeTambe/TambeRail';
 import CarouselArrows from '@/pages/nikeTambe/CarouselArrows';
+import Breadcrumbs from '@/components/Breadcrumbs';
+import EditableTextBox from '@/components/dev/EditableTextBox';
+
+const PDP_PRESET_VERSION = 'pdp-layout-2026-05-20-1135';
+
+const PDP_TITLE_SETTINGS = {
+  x: 0, y: 0, fontFamily: 'Oswald', fontSize: 24, fontWeight: 300, selectedFontWeight: 700,
+  letterSpacing: 0.04, lineHeight: 1, textAlign: 'left', verticalAlign: 'bottom',
+  color: '#475059', textTransform: 'uppercase',
+};
+const PDP_COLLECTION_SETTINGS = {
+  x: 0, y: 0, fontFamily: 'Roboto Condensed', fontSize: 8, fontWeight: 400, selectedFontWeight: 700,
+  letterSpacing: 0.2, lineHeight: 1.2, textAlign: 'left', verticalAlign: 'top',
+  color: 'rgba(71, 80, 89, 0.7)', textTransform: 'uppercase',
+};
+const PDP_DESCRIPTION_SETTINGS = {
+  x: 0, y: 0, fontFamily: 'Roboto', fontSize: 16, fontWeight: 300, selectedFontWeight: 700,
+  letterSpacing: 0.03, lineHeight: 1.65, textAlign: 'left', verticalAlign: 'top',
+  color: '#111827', textTransform: 'none',
+};
+const PDP_PRICE_SETTINGS = {
+  x: 0, y: 0, fontFamily: 'Oswald', fontSize: 24, fontWeight: 300, selectedFontWeight: 700,
+  letterSpacing: 0, lineHeight: 1, textAlign: 'left', verticalAlign: 'center',
+  color: '#475059', textTransform: 'none',
+};
+const PDP_CTA_SETTINGS = {
+  x: 0, y: 0, fontFamily: 'Oswald', fontSize: 20, fontWeight: 300, selectedFontWeight: 700,
+  letterSpacing: 0.04, lineHeight: 1, textAlign: 'center', verticalAlign: 'center',
+  color: '#475059', textTransform: 'uppercase',
+};
+const PDP_SIZE_SETTINGS = {
+  x: 0, y: 0, fontFamily: 'Oswald', fontSize: 20, fontWeight: 300, selectedFontWeight: 700,
+  letterSpacing: 0, lineHeight: 1, textAlign: 'center', verticalAlign: 'center',
+  color: '#475059', textTransform: 'none',
+};
+const PDP_SPECS_HEADING_SETTINGS = {
+  x: 0, y: 0, fontFamily: 'Oswald', fontSize: 24, fontWeight: 300, selectedFontWeight: 700,
+  letterSpacing: 0.04, lineHeight: 1, textAlign: 'right', verticalAlign: 'bottom',
+  color: '#475059', textTransform: 'uppercase',
+};
+const PDP_SPEC_LABEL_SETTINGS = {
+  x: 0, y: 0, fontFamily: 'Roboto Condensed', fontSize: 8, fontWeight: 700, selectedFontWeight: 700,
+  letterSpacing: 0.2, lineHeight: 1.2, textAlign: 'right', verticalAlign: 'bottom',
+  color: '#111827', textTransform: 'uppercase',
+};
+const PDP_SPEC_VALUE_SETTINGS = {
+  x: 0, y: 0, fontFamily: 'Roboto', fontSize: 16, fontWeight: 300, selectedFontWeight: 700,
+  letterSpacing: 0.03, lineHeight: 1.2, textAlign: 'right', verticalAlign: 'top',
+  color: 'rgba(71, 80, 89, 0.7)', textTransform: 'none',
+};
 
 const OVERLAY_STATE_STORAGE_KEY = 'hg.constructorPdp.overlayState.v1';
 
@@ -63,6 +113,8 @@ const SIZES = ['S', 'M', 'L', 'XL', 'XXL'];
 
 function ConstructorPdpPage() {
   const [selectedSize, setSelectedSize] = useState('M');
+  const [sizeButtonTextSettings, setSizeButtonTextSettings] = useState(PDP_SIZE_SETTINGS);
+  const [ctaTextSettings, setCtaTextSettings] = useState(PDP_CTA_SETTINGS);
   const [mainVariantIndex, setMainVariantIndex] = useState(0);
   const goPrevVariant = () => setMainVariantIndex((i) => (i - 1 + OFFICIAL_COLORS.length) % OFFICIAL_COLORS.length);
   const goNextVariant = () => setMainVariantIndex((i) => (i + 1) % OFFICIAL_COLORS.length);
@@ -100,83 +152,68 @@ function ConstructorPdpPage() {
         topOffset="0px"
         bottomPadding="0px"
       >
-        {/* ─── Bloc producte: títol + descripció + talles + CTA (col 4 — dreta) ─── */}
-        <h1
-          style={{
-            gridColumn: '4 / 5',
-            gridRow: '6 / 7',
-            margin: 0,
-            minHeight: 0,
-            fontFamily: 'Oswald, sans-serif',
-            fontWeight: 300,
-            fontSize: '24pt',
-            lineHeight: 1,
-            letterSpacing: '0.04em',
-            textTransform: 'uppercase',
-            color: '#475059',
-            alignSelf: 'end',
-            textAlign: 'left',
-          }}
-        >
-          NOM DE PRODUCTE
-        </h1>
-
+        {/* ─── Breadcrumbs (col 1, fila 1 — cantonada superior esquerra del belt2) ─── */}
         <div
+          className="[&_ol]:pl-0 [&_nav]:p-0"
           style={{
-            gridColumn: '4 / 5',
-            gridRow: '7 / 8',
-            margin: 0,
+            gridColumn: '1 / 5',
+            gridRow: '2 / 3',
             minHeight: 0,
             alignSelf: 'start',
-            textAlign: 'left',
-            fontFamily: 'Roboto Condensed, sans-serif',
-            fontWeight: 400,
-            fontSize: 11,
-            letterSpacing: '0.2em',
-            textTransform: 'uppercase',
-            color: 'rgba(71, 80, 89, 0.7)',
-          }}
-        >
-          NOM DE COL·LECCIÓ
-        </div>
-
-        <p
-          style={{
-            gridColumn: '4 / 5',
-            gridRow: '9 / 16',
-            margin: 0,
-            minHeight: 0,
-            fontFamily: 'Roboto, sans-serif',
-            fontWeight: 300,
-            fontSize: '16pt',
-            lineHeight: 1.65,
-            letterSpacing: '0.03em',
-            color: '#111827',
-            textAlign: 'left',
-          }}
-        >
-          {PRODUCT_DESCRIPTION}
-        </p>
-
-        <div
-          style={{
-            gridColumn: '4 / 5',
-            gridRow: '16 / 17',
-            margin: 0,
-            minHeight: 0,
-            alignSelf: 'center',
             justifySelf: 'start',
-            fontFamily: 'Oswald, sans-serif',
-            fontWeight: 300,
-            fontSize: '24pt',
-            lineHeight: 1,
-            letterSpacing: 0,
-            color: '#475059',
-            whiteSpace: 'nowrap',
+            padding: 0,
+            margin: 0,
           }}
         >
-          15,50€
+          <Breadcrumbs
+            items={[
+              { label: 'Col·lecció', link: '/constructor/colleccio' },
+              { label: 'Nom de producte' },
+            ]}
+          />
         </div>
+
+        {/* ─── Bloc producte: títol + descripció + talles + CTA (col 4 — dreta) ─── */}
+        <EditableTextBox
+          id="pdp-product-name"
+          initialText="NOM DE PRODUCTE"
+          initialSettings={PDP_TITLE_SETTINGS}
+          presetVersion={PDP_PRESET_VERSION}
+          renderHandle
+          handleRight="4px"
+          style={{ gridColumn: '4 / 5', gridRow: '6 / 7', alignSelf: 'end' }}
+        />
+
+        <EditableTextBox
+          id="pdp-collection-name"
+          initialText="NOM DE COL·LECCIÓ"
+          initialSettings={PDP_COLLECTION_SETTINGS}
+          presetVersion={PDP_PRESET_VERSION}
+          renderHandle
+          handleRight="4px"
+          style={{ gridColumn: '4 / 5', gridRow: '7 / 8', alignSelf: 'start' }}
+        />
+
+        <EditableTextBox
+          id="pdp-product-description"
+          initialText={PRODUCT_DESCRIPTION}
+          initialSettings={PDP_DESCRIPTION_SETTINGS}
+          presetVersion={PDP_PRESET_VERSION}
+          multiline
+          renderHandle
+          handleRight="4px"
+          style={{ gridColumn: '4 / 5', gridRow: '9 / 16' }}
+        />
+
+        <EditableTextBox
+          id="pdp-price"
+          initialText="15,50€"
+          initialSettings={PDP_PRICE_SETTINGS}
+          presetVersion={PDP_PRESET_VERSION}
+          renderHandle
+          handleRight="4px"
+          style={{ gridColumn: '4 / 5', gridRow: '16 / 17', alignSelf: 'center' }}
+        />
 
         <div
           style={{
@@ -185,7 +222,7 @@ function ConstructorPdpPage() {
             minHeight: 0,
             display: 'grid',
             gridTemplateColumns: `repeat(${SIZES.length}, minmax(0, 1fr))`,
-            columnGap: 5,
+            columnGap: 10,
             alignSelf: 'center',
             justifySelf: 'start',
             width: '75%',
@@ -202,11 +239,12 @@ function ConstructorPdpPage() {
                 className={`relative flex h-full w-full items-center justify-center transition-all duration-200 active:scale-95 ${isSelected ? 'bg-[#475059] text-whiteStrong' : 'bg-muted text-[#475059] hover:text-muted-foreground'}`}
                 style={{
                   borderRadius: 'clamp(2.81px, 0.8vw, 5.06px)',
-                  fontFamily: 'Oswald, sans-serif',
-                  fontSize: '20pt',
-                  fontWeight: isSelected ? 700 : 300,
-                  letterSpacing: 0,
-                  lineHeight: 1,
+                  fontFamily: `${sizeButtonTextSettings.fontFamily}, sans-serif`,
+                  fontSize: `${sizeButtonTextSettings.fontSize}pt`,
+                  fontWeight: isSelected ? sizeButtonTextSettings.selectedFontWeight : sizeButtonTextSettings.fontWeight,
+                  letterSpacing: `${sizeButtonTextSettings.letterSpacing}em`,
+                  lineHeight: sizeButtonTextSettings.lineHeight,
+                  textTransform: sizeButtonTextSettings.textTransform,
                   cursor: 'pointer',
                   border: 'none',
                   padding: 0,
@@ -217,6 +255,22 @@ function ConstructorPdpPage() {
             );
           })}
         </div>
+
+        {/* Handle d'edició per als botons de talles (mode columns) */}
+        <EditableTextBox
+          id="pdp-size-buttons"
+          initialText={SIZES.join(' ')}
+          columns={SIZES}
+          selectedColumn={selectedSize}
+          onColumnSelect={setSelectedSize}
+          renderText={false}
+          renderHandle
+          onSettingsChange={setSizeButtonTextSettings}
+          initialSettings={PDP_SIZE_SETTINGS}
+          presetVersion={PDP_PRESET_VERSION}
+          handleRight="4px"
+          style={{ gridColumn: '4 / 5', gridRow: '17 / 18', zIndex: 10, pointerEvents: 'none' }}
+        />
 
         <button
           type="button"
@@ -233,19 +287,41 @@ function ConstructorPdpPage() {
             borderRadius: 'clamp(2.81px, 0.8vw, 5.06px)',
             padding: 0,
             cursor: 'pointer',
-            fontFamily: 'Oswald, sans-serif',
-            fontSize: '20pt',
-            fontWeight: 300,
-            letterSpacing: '0.04em',
-            lineHeight: 1,
-            textTransform: 'uppercase',
+            fontFamily: `${ctaTextSettings.fontFamily}, sans-serif`,
+            fontSize: `${ctaTextSettings.fontSize}pt`,
+            fontWeight: ctaTextSettings.fontWeight,
+            letterSpacing: `${ctaTextSettings.letterSpacing}em`,
+            lineHeight: ctaTextSettings.lineHeight,
+            textTransform: ctaTextSettings.textTransform,
+            color: ctaTextSettings.color,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
+            gap: 12,
           }}
         >
+          <img
+            src="/custom_logos/icons/v3-buit.svg"
+            alt=""
+            aria-hidden="true"
+            draggable="false"
+            style={{ width: 'calc(1.2em - 1px)', height: 'calc(1.2em - 1px)', objectFit: 'contain', display: 'block', transform: 'translateY(-2px)' }}
+          />
           AFEGEIX AL CISTELL
         </button>
+
+        {/* Handle d'edició per al CTA (no renderitza text, només handle) */}
+        <EditableTextBox
+          id="pdp-cta"
+          initialText="AFEGEIX AL CISTELL"
+          initialSettings={PDP_CTA_SETTINGS}
+          presetVersion={PDP_PRESET_VERSION}
+          renderText={false}
+          renderHandle
+          onSettingsChange={setCtaTextSettings}
+          handleRight="4px"
+          style={{ gridColumn: '4 / 5', gridRow: '19 / 20', zIndex: 10, pointerEvents: 'none' }}
+        />
 
         {/* ─── Carrusel: imatge gran (col 2-3, centre) + thumbs (col 3 dreta de la imatge) ─── */}
         <div
@@ -278,11 +354,12 @@ function ConstructorPdpPage() {
                   aria-pressed={isActive}
                   onClick={() => setMainVariantIndex(idx)}
                   style={{
+                    position: 'relative',
                     gridColumn: '2 / 3',
                     gridRow: `${vIdx * 2 + 1} / ${vIdx * 2 + 3}`,
                     minHeight: 0,
-                    border: isActive ? '1px solid #0b0d10' : '1px solid rgba(11,13,16,0.12)',
-                    background: '#f1f3f5',
+                    border: 'none',
+                    background: '#fbfcfd',
                     cursor: 'pointer',
                     display: 'flex',
                     alignItems: 'center',
@@ -290,6 +367,19 @@ function ConstructorPdpPage() {
                     padding: 0,
                   }}
                 >
+                  {isActive && (
+                    <span
+                      aria-hidden="true"
+                      style={{
+                        position: 'absolute',
+                        left: 0,
+                        top: 0,
+                        bottom: 0,
+                        width: '3px',
+                        background: '#0b0d10',
+                      }}
+                    />
+                  )}
                   <img
                     src={TDP_IMAGE(color)}
                     alt=""
@@ -315,7 +405,7 @@ function ConstructorPdpPage() {
               gridRow: `1 / ${THUMB_COUNT + 1}`,
               minWidth: 0,
               minHeight: 0,
-              background: '#f1f3f5',
+              background: '#fbfcfd',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -334,7 +424,7 @@ function ConstructorPdpPage() {
               }}
             />
             {/* Fletxes carrusel a la cantonada inferior esquerra */}
-            <div style={{ position: 'absolute', left: 16, bottom: 16, width: 0, height: 0 }}>
+            <div style={{ position: 'absolute', left: 0, bottom: 0, width: 0, height: 0 }}>
               <CarouselArrows
                 leftPx={0}
                 topPx={-44}
@@ -357,7 +447,7 @@ function ConstructorPdpPage() {
             alignSelf: 'end',
             fontFamily: 'Oswald, sans-serif',
             fontWeight: 300,
-            fontSize: '24pt',
+            fontSize: '20pt',
             lineHeight: 1,
             letterSpacing: '0.04em',
             textTransform: 'uppercase',
@@ -380,9 +470,9 @@ function ConstructorPdpPage() {
               alignItems: 'flex-end',
               justifyContent: 'center',
               rowGap: 2,
-              fontFamily: 'Roboto, sans-serif',
+              fontFamily: 'Roboto Condensed, sans-serif',
               fontWeight: 300,
-              fontSize: '16pt',
+              fontSize: '14pt',
               lineHeight: 1.2,
               letterSpacing: '0.03em',
               color: 'rgba(71, 80, 89, 0.7)',
