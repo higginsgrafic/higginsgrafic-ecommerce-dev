@@ -58,6 +58,7 @@ export default function TambeRail({
   title = 'també et pot interessar',
   subtitle = 'COSES DIFERENTS',
   initialIndex = 3,
+  visibleCards = 4,
 }) {
   const [shirtDrawingEnabled, setShirtDrawingEnabled] = useState(() => {
     try {
@@ -111,15 +112,42 @@ export default function TambeRail({
   useEffect(() => {
     let raf = null;
     let ro = null;
+    let mo = null;
+    const readCssNumber = (name) => {
+      try {
+        const raw = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+        if (!raw) return null;
+        const n = parseFloat(raw);
+        return Number.isFinite(n) ? n : null;
+      } catch { return null; }
+    };
     const read = () => {
-      const left = document.getElementById('dev-header-left');
-      const user = document.getElementById('dev-header-user');
       const pageEl = containerRef.current;
-      if (!left || !user || !pageEl) { setBgMetrics(null); return; }
-      const lr = left.getBoundingClientRect();
-      const ur = user.getBoundingClientRect();
+      if (!pageEl) { setBgMetrics(null); return; }
       const pr = pageEl.getBoundingClientRect();
       const pageWidth = Math.max(0, Math.round(pr.width));
+
+      // 1) Prioritzem belt2 (CSS vars `--belt2-xL/xR`, coords de viewport).
+      const beltXL = readCssNumber('--belt2-xL');
+      const beltXR = readCssNumber('--belt2-xR');
+      const beltOk = Number.isFinite(beltXL) && Number.isFinite(beltXR) && beltXR > beltXL;
+
+      if (beltOk) {
+        const devLeftRaw = Math.max(0, beltXL - pr.left);
+        const userRightRaw = Math.max(0, beltXR - pr.left);
+        const devLeft = Math.min(devLeftRaw, Math.max(0, pageWidth - CARD_W));
+        const userRight = Math.min(userRightRaw, pageWidth);
+        const width = Math.max(0, beltXR - beltXL);
+        setBgMetrics({ x: devLeft, width, devLeft, userRight, pageWidth });
+        return;
+      }
+
+      // 2) Fallback: ancoratges del header (compatibilitat amb pàgines sense belt2).
+      const left = document.getElementById('dev-header-left');
+      const user = document.getElementById('dev-header-user');
+      if (!left || !user) { setBgMetrics(null); return; }
+      const lr = left.getBoundingClientRect();
+      const ur = user.getBoundingClientRect();
       const x = Math.max(0, lr.right - pr.left);
       const width = Math.max(0, ur.left - lr.right);
       const devLeftRaw = Math.max(0, lr.left - pr.left);
@@ -139,10 +167,17 @@ export default function TambeRail({
       if (user) ro.observe(user);
       if (containerRef.current) ro.observe(containerRef.current);
     } catch { /* ignore */ }
+    // Observa canvis a les CSS vars `--belt2-xL/xR` al :root (publish dinàmic
+    // des de BeltReferenceOverlay) per a recomputar l'ancoratge.
+    try {
+      mo = new MutationObserver(schedule);
+      mo.observe(document.documentElement, { attributes: true, attributeFilter: ['style'] });
+    } catch { /* ignore */ }
     return () => {
       window.removeEventListener('resize', schedule);
       if (raf) cancelAnimationFrame(raf);
       if (ro) ro.disconnect();
+      if (mo) mo.disconnect();
     };
   }, []);
 
@@ -195,16 +230,30 @@ export default function TambeRail({
   }, [totalCards]);
 
   const left1 = bgMetrics ? bgMetrics.devLeft : 0;
-  const left3 = bgMetrics ? Math.max(0, bgMetrics.userRight - CARD_W) : 0;
-  const stepPx = bgMetrics ? ((left3 - left1) / 2) + 14.5 : (CARD_W + 36 + 14.5);
-  const viewportWidthPx = useMemo(() => Math.max(0, (2 * stepPx) + CARD_W), [stepPx]);
+  const beltWidth = bgMetrics ? bgMetrics.width : CARD_W * visibleCards;
+  // Card width = 1 columna de la pauta amb gutter `PAUTA_GUTTER_X` entre cols.
+  //   cardW = (belt2Width - (visibleCards - 1) * gutterX) / visibleCards
+  //   stepPx = cardW + gutterX
+  const PAUTA_GUTTER_X = 22.5;
+  const cardW = Math.max(80, (beltWidth - (visibleCards - 1) * PAUTA_GUTTER_X) / visibleCards);
+  const stepPx = cardW + PAUTA_GUTTER_X;
+  const viewportWidthPx = useMemo(() => Math.max(0, beltWidth), [beltWidth]);
   const arrowsLeftPx = useMemo(() => {
     const buttonsW = (44 * 2) + 10;
     const inset = 20;
-    const tileRightEdge = (2 * stepPx) + CARD_W;
-    return Math.max(0, tileRightEdge - inset - buttonsW);
-  }, [stepPx]);
-  const viewportHeightPx = useMemo(() => 161 + Math.round(450 * 0.8822222222) + 140, []);
+    return Math.max(0, viewportWidthPx - inset - buttonsW);
+  }, [viewportWidthPx]);
+  const cardImgTopPx = 161;
+  const cardTextBlockHeightPx = 140;
+  const viewportHeightPx = useMemo(() => cardImgTopPx + Math.round(cardW) + cardTextBlockHeightPx, [cardW]);
+  const dynamicTileStyle = useMemo(() => ({
+    width: `${Math.round(cardW)}px`,
+    height: `${Math.round(cardW)}px`,
+    backgroundColor: '#f5f5f5',
+    position: 'relative',
+    boxShadow: 'none',
+  }), [cardW]);
+  const dynamicTextBlockStyle = useMemo(() => ({ width: `${Math.round(cardW)}px` }), [cardW]);
 
   const settleQueuedNav = () => {
     isAnimRef.current = false;
@@ -355,8 +404,8 @@ export default function TambeRail({
                       href={cardHref}
                       imageSrc={img}
                       leftPx={leftPx}
-                      tileStyle={TILE_STYLE}
-                      textBlockStyle={TEXT_BLOCK_STYLE}
+                      tileStyle={dynamicTileStyle}
+                      textBlockStyle={dynamicTextBlockStyle}
                       overlaySrc={drawingOverlaySrc}
                       overlayEnabled={shirtDrawingEnabled}
                       cardIndex={idx}

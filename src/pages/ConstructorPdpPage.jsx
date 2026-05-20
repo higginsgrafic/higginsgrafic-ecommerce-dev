@@ -3,6 +3,7 @@ import { Helmet } from 'react-helmet';
 import Pauta4ColsOverlay from '@/components/pauta/Pauta4ColsOverlay';
 import CollectionProductCard from '@/components/tdp/CollectionProductCard';
 import TambeRail from '@/pages/nikeTambe/TambeRail';
+import CarouselArrows from '@/pages/nikeTambe/CarouselArrows';
 
 const OVERLAY_STATE_STORAGE_KEY = 'hg.constructorPdp.overlayState.v1';
 
@@ -41,22 +42,31 @@ const PRODUCT_DESCRIPTION = [
   'hòmens virtuosos, e singularment aquells qui per la república lluitaren.',
 ].join(' ');
 
-const THUMB_COUNT = 7;
-const THUMB_COLOR = 'black';
+// 14 colors oficials Gildan 5000 (ordre alfabètic dels seleccionats a colors.json).
+const OFFICIAL_COLORS = [
+  'black', 'daisy', 'forest-green', 'gold', 'irish-green', 'kiwi',
+  'light-blue', 'light-pink', 'military-green', 'navy', 'purple', 'red',
+  'royal', 'white',
+];
+const THUMB_COUNT = OFFICIAL_COLORS.length;
 
 const SPECS = [
-  { label: 'Material', value: '100 cotó pentinat 180/gm2', row: 6 },
-  { label: 'Tall', value: 'Crew unisex regular', row: 8 },
-  { label: 'Procedència', value: 'Bangladesh certificat', row: 10 },
-  { label: 'Estampació', value: 'Serigrafia manual aigua', row: 12 },
-  { label: 'Cura', value: 'Rentar del revés a 30°C', row: 14 },
-  { label: 'Garantia', value: 'Devolució 30 dies', row: 16 },
+  { label: 'Material', value: '100 cotó pentinat 180/gm2', row: 9 },
+  { label: 'Tall', value: 'Crew unisex regular', row: 11 },
+  { label: 'Procedència', value: 'Bangladesh certificat', row: 13 },
+  { label: 'Estampació', value: 'Serigrafia manual aigua', row: 15 },
+  { label: 'Cura', value: 'Rentar del revés a 30°C', row: 17 },
+  { label: 'Garantia', value: 'Devolució 30 dies', row: 19 },
 ];
 
 const SIZES = ['S', 'M', 'L', 'XL', 'XXL'];
 
 function ConstructorPdpPage() {
   const [selectedSize, setSelectedSize] = useState('M');
+  const [mainVariantIndex, setMainVariantIndex] = useState(0);
+  const goPrevVariant = () => setMainVariantIndex((i) => (i - 1 + OFFICIAL_COLORS.length) % OFFICIAL_COLORS.length);
+  const goNextVariant = () => setMainVariantIndex((i) => (i + 1) % OFFICIAL_COLORS.length);
+  const mainVariantColor = OFFICIAL_COLORS[mainVariantIndex];
   const [overlayState, setOverlayState] = useState(loadOverlayState);
   const { pautaEnabled, tableEnabled, pautaOpacity, tableOpacity } = overlayState;
 
@@ -81,6 +91,8 @@ function ConstructorPdpPage() {
       </Helmet>
 
       <Pauta4ColsOverlay
+        numRows={30}
+        canvasAspect={[2642, 2236]}
         pautaEnabled={pautaEnabled}
         tableEnabled={tableEnabled}
         pautaOpacity={pautaOpacity}
@@ -92,7 +104,7 @@ function ConstructorPdpPage() {
         <h1
           style={{
             gridColumn: '4 / 5',
-            gridRow: '3 / 4',
+            gridRow: '6 / 7',
             margin: 0,
             minHeight: 0,
             fontFamily: 'Oswald, sans-serif',
@@ -112,7 +124,7 @@ function ConstructorPdpPage() {
         <div
           style={{
             gridColumn: '4 / 5',
-            gridRow: '4 / 5',
+            gridRow: '7 / 8',
             margin: 0,
             minHeight: 0,
             alignSelf: 'start',
@@ -131,7 +143,7 @@ function ConstructorPdpPage() {
         <p
           style={{
             gridColumn: '4 / 5',
-            gridRow: '6 / 13',
+            gridRow: '9 / 16',
             margin: 0,
             minHeight: 0,
             fontFamily: 'Roboto, sans-serif',
@@ -149,7 +161,7 @@ function ConstructorPdpPage() {
         <div
           style={{
             gridColumn: '4 / 5',
-            gridRow: '13 / 14',
+            gridRow: '16 / 17',
             margin: 0,
             minHeight: 0,
             alignSelf: 'center',
@@ -169,7 +181,7 @@ function ConstructorPdpPage() {
         <div
           style={{
             gridColumn: '4 / 5',
-            gridRow: '14 / 15',
+            gridRow: '17 / 18',
             minHeight: 0,
             display: 'grid',
             gridTemplateColumns: `repeat(${SIZES.length}, minmax(0, 1fr))`,
@@ -212,7 +224,7 @@ function ConstructorPdpPage() {
           className="bg-muted text-[#475059] transition-all duration-200 hover:bg-[#475059] hover:text-whiteStrong active:scale-95"
           style={{
             gridColumn: '4 / 5',
-            gridRow: '16 / 17',
+            gridRow: '19 / 20',
             width: '100%',
             height: '100%',
             minWidth: 0,
@@ -239,7 +251,7 @@ function ConstructorPdpPage() {
         <div
           style={{
             gridColumn: '2 / 4',
-            gridRow: '3 / 17',
+            gridRow: '6 / 20',
             minHeight: 0,
             display: 'grid',
             gridTemplateColumns: '1fr 72px',
@@ -247,45 +259,60 @@ function ConstructorPdpPage() {
             gap: 8,
           }}
         >
-          {/* Thumbs (col 2 del subgrid — a la dreta de la imatge) */}
-          {Array.from({ length: THUMB_COUNT }, (_, idx) => (
-            <button
-              key={`thumb-${idx}`}
-              type="button"
-              aria-label={`Variant ${idx + 1}`}
-              style={{
-                gridColumn: '2 / 3',
-                gridRow: `${idx * 2 + 1} / ${idx * 2 + 3}`,
-                minHeight: 0,
-                border: '1px solid rgba(11,13,16,0.12)',
-                background: '#f1f3f5',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                padding: 0,
-              }}
-            >
-              <img
-                src={TDP_IMAGE(THUMB_COLOR)}
-                alt=""
-                aria-hidden="true"
-                draggable={false}
-                style={{
-                  maxWidth: '85%',
-                  maxHeight: '85%',
-                  objectFit: 'contain',
-                  userSelect: 'none',
-                }}
-              />
-            </button>
-          ))}
+          {/* Thumbs (col 2 del subgrid — a la dreta de la imatge).
+              Es mostren `THUMB_VISIBLE` thumbs alhora; els altres viuen al
+              carrusel i s'amaguen fins que arribin a la finestra visible. */}
+          {(() => {
+            const THUMB_VISIBLE = 7;
+            const maxStart = Math.max(0, OFFICIAL_COLORS.length - THUMB_VISIBLE);
+            const startIdx = Math.min(maxStart, Math.max(0, mainVariantIndex - Math.floor(THUMB_VISIBLE / 2)));
+            const visible = OFFICIAL_COLORS.slice(startIdx, startIdx + THUMB_VISIBLE);
+            return visible.map((color, vIdx) => {
+              const idx = startIdx + vIdx;
+              const isActive = idx === mainVariantIndex;
+              return (
+                <button
+                  key={`thumb-${color}`}
+                  type="button"
+                  aria-label={`Variant ${color}`}
+                  aria-pressed={isActive}
+                  onClick={() => setMainVariantIndex(idx)}
+                  style={{
+                    gridColumn: '2 / 3',
+                    gridRow: `${vIdx * 2 + 1} / ${vIdx * 2 + 3}`,
+                    minHeight: 0,
+                    border: isActive ? '1px solid #0b0d10' : '1px solid rgba(11,13,16,0.12)',
+                    background: '#f1f3f5',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    padding: 0,
+                  }}
+                >
+                  <img
+                    src={TDP_IMAGE(color)}
+                    alt=""
+                    aria-hidden="true"
+                    draggable={false}
+                    style={{
+                      maxWidth: '85%',
+                      maxHeight: '85%',
+                      objectFit: 'contain',
+                      userSelect: 'none',
+                    }}
+                  />
+                </button>
+              );
+            });
+          })()}
 
           {/* Imatge principal (col 1 del subgrid — ocupa l'amplada principal centrada) */}
           <div
             style={{
+              position: 'relative',
               gridColumn: '1 / 2',
-              gridRow: `1 / ${THUMB_COUNT * 2 + 1}`,
+              gridRow: `1 / ${THUMB_COUNT + 1}`,
               minWidth: 0,
               minHeight: 0,
               background: '#f1f3f5',
@@ -296,8 +323,8 @@ function ConstructorPdpPage() {
             }}
           >
             <img
-              src={TDP_IMAGE(THUMB_COLOR)}
-              alt="Producte principal"
+              src={TDP_IMAGE(mainVariantColor)}
+              alt={`Producte principal ${mainVariantColor}`}
               draggable={false}
               style={{
                 maxWidth: '90%',
@@ -306,6 +333,17 @@ function ConstructorPdpPage() {
                 userSelect: 'none',
               }}
             />
+            {/* Fletxes carrusel a la cantonada inferior esquerra */}
+            <div style={{ position: 'absolute', left: 16, bottom: 16, width: 0, height: 0 }}>
+              <CarouselArrows
+                leftPx={0}
+                topPx={-44}
+                onPrev={goPrevVariant}
+                onNext={goNextVariant}
+                prevLabel="Variant anterior"
+                nextLabel="Variant següent"
+              />
+            </div>
           </div>
         </div>
 
@@ -313,7 +351,7 @@ function ConstructorPdpPage() {
         <h2
           style={{
             gridColumn: '1 / 2',
-            gridRow: '3 / 4',
+            gridRow: '6 / 7',
             margin: 0,
             minHeight: 0,
             alignSelf: 'end',
@@ -368,38 +406,12 @@ function ConstructorPdpPage() {
           </div>
         ))}
 
-        {/* ─── Outro: tagline gran "UNA PEÇA, UNA HISTÒRIA" (rows 50–62) ─── */}
-        <div
-          style={{
-            gridColumn: '1 / 5',
-            gridRow: '50 / 62',
-            minHeight: 0,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'flex-start',
-          }}
-        >
-          <h2
-            style={{
-              margin: 0,
-              fontFamily: 'Oswald, sans-serif',
-              fontWeight: 700,
-              fontSize: 'clamp(48px, 7vw, 96px)',
-              lineHeight: 1.05,
-              letterSpacing: '-0.01em',
-              textTransform: 'uppercase',
-              color: '#0b0d10',
-              maxWidth: '14ch',
-            }}
-          >
-            Una peça, una història
-          </h2>
-        </div>
-
       </Pauta4ColsOverlay>
 
       {/* ─── Bloc "També et pot interessar" (rail Nike) ─── */}
-      <TambeRail cardHref="/constructor/pdp" />
+      <div style={{ marginTop: '-102px' }}>
+        <TambeRail cardHref="/constructor/pdp" title="cada peça té una història" />
+      </div>
 
 
       <div
