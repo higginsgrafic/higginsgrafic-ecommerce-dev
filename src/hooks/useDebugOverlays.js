@@ -9,8 +9,52 @@ const KEY_RULERS = 'hg.rulersOverlay.enabled';
 const KEY_PDP_CONTROLS = 'hg.pdpControlsOverlay.enabled';
 const EVT_PREFIX = 'hg:debug-overlays-changed';
 
+function getQueryParam(key) {
+  if (typeof window === 'undefined') return null;
+  try {
+    const params = new URLSearchParams(window.location.search);
+    if (key === KEY_DEBUGS) {
+      if (params.has('debugs')) return params.get('debugs');
+      if (params.has('debug')) return params.get('debug');
+    }
+    if (key === KEY_ACTIVE_WORK) {
+      if (params.has('activework')) return params.get('activework');
+    }
+    if (key === KEY_RULERS) {
+      if (params.has('rulers')) return params.get('rulers');
+      if (params.has('ruler')) return params.get('ruler');
+    }
+    if (key === KEY_PDP_CONTROLS) {
+      if (params.has('controls')) return params.get('controls');
+      if (params.has('pdpcontrols')) return params.get('pdpcontrols');
+    }
+  } catch {
+    // ignore
+  }
+  return null;
+}
+
+function parseQueryVal(val) {
+  if (val === null) return null;
+  const s = String(val).trim().toLowerCase();
+  if (s === '1' || s === 'true' || s === 'on' || s === 'yes') return true;
+  if (s === '0' || s === 'false' || s === 'off' || s === 'no') return false;
+  return null;
+}
+
 function readBool(key, defaultValue) {
   try {
+    const qVal = getQueryParam(key);
+    const parsedQ = parseQueryVal(qVal);
+    if (parsedQ !== null) {
+      try {
+        localStorage.setItem(key, parsedQ ? '1' : '0');
+      } catch {
+        // ignore
+      }
+      return parsedQ;
+    }
+
     const v = localStorage.getItem(key);
     if (v === null) return defaultValue;
     return v === '1' || v === 'true';
