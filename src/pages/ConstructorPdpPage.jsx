@@ -236,7 +236,7 @@ function ConstructorPdpPage() {
           multiline
           renderHandle={pdpControlsEnabled}
           handleRight="-22px"
-          style={{ gridColumn: '4 / 5', gridRow: '9 / 16' }}
+          style={{ gridColumn: '4 / 5', gridRow: '9 / 14' }}
         />
 
         <EditableTextBox
@@ -246,7 +246,7 @@ function ConstructorPdpPage() {
           presetVersion={PDP_PRESET_VERSION}
           renderHandle={pdpControlsEnabled}
           handleRight="-22px"
-          style={{ gridColumn: '4 / 5', gridRow: '15 / 16', alignSelf: 'center' }}
+          style={{ gridColumn: '4 / 5', gridRow: '14 / 15', alignSelf: 'center' }}
         />
 
         <div
