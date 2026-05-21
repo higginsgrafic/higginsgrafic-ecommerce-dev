@@ -15,7 +15,7 @@ function CistellComandaContent({ cartItems, setCartItems, onCloseMegaSlide }) {
   const TOP_OFFSET = 1.5 * ROW_H; // la taula comença a la 2a fila + mitja fila d'ajust
   const COLS = 4;
   const ROWS = 21;
-  const TABLE_WIDTH = 1365.46;
+  const TABLE_WIDTH = 1350;
   const COL_WIDTH = (TABLE_WIDTH - GUTTER * (COLS - 1)) / COLS; // 322.875px
 
   // Pauta del CARRUSEL — VALORS MANUALS EDITABLES:

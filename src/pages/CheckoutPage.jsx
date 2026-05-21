@@ -81,7 +81,7 @@ const CheckoutPage = ({ cartItems, onClearCart, pautaEnabled = true, mockMode = 
     const root = document.documentElement;
 
     const apply = () => {
-      const belt = getSafeBelt({ maxContent: 1400, sideMargin: 76, minContent: 320 });
+      const belt = getSafeBelt({ maxContent: 1350, sideMargin: 16, minContent: 320 });
       const vh = getLayoutViewportHeight();
       root.style.setProperty('--hg-checkout-xL', `${belt.left}px`);
       root.style.setProperty('--hg-checkout-xR', `${belt.right}px`);

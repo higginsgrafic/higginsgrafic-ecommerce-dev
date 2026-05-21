@@ -24,16 +24,53 @@
 
 const isBrowser = () => typeof window !== 'undefined' && typeof document !== 'undefined';
 
+let cachedScrollbarWidth = null;
+
+/**
+ * Mesura l'amplada real física de la scrollbar del sistema.
+ * Utilitza un element temporal i en fa memòria per a màxim rendiment.
+ * És independent de l'estat d'overflow de la pàgina actual.
+ */
+export function getNativeScrollbarWidth() {
+  if (!isBrowser()) return 0;
+  if (cachedScrollbarWidth !== null) return cachedScrollbarWidth;
+
+  try {
+    const outer = document.createElement('div');
+    outer.style.visibility = 'hidden';
+    outer.style.overflow = 'scroll';
+    outer.style.width = '100px';
+    outer.style.position = 'absolute';
+    outer.style.top = '-9999px';
+    document.body.appendChild(outer);
+
+    const inner = document.createElement('div');
+    inner.style.width = '100%';
+    outer.appendChild(inner);
+
+    const width = 100 - inner.offsetWidth;
+    outer.parentNode.removeChild(outer);
+
+    cachedScrollbarWidth = width;
+    return width;
+  } catch {
+    return 0;
+  }
+}
+
 /**
  * Amplada del layout viewport (sense scrollbar vertical).
- * És el valor que millor representa l'espai disponible per al CSS.
+ * Per garantir que no hi ha "salts" de centratge horitzontal entre rutes
+ * amb scrollbar i rutes sense (com full-wide-slide amb overflow: hidden),
+ * usem `window.innerWidth` menys l'amplada física de la scrollbar del sistema.
+ * Així el viewport virtual de treball és completament consistent.
  */
 export function getLayoutViewportWidth() {
   if (!isBrowser()) return 0;
-  const docW = document.documentElement?.clientWidth;
-  if (Number.isFinite(docW) && docW > 0) return docW;
   const winW = window.innerWidth;
-  return Number.isFinite(winW) && winW > 0 ? winW : 0;
+  if (!Number.isFinite(winW) || winW <= 0) return 0;
+  const sbW = getNativeScrollbarWidth();
+  return Math.max(0, winW - sbW);
 }
 
 /**
@@ -100,14 +137,14 @@ export function clampNumber(value, min, max, fallback = min) {
  * però amb clamps per evitar valors absurds.
  *
  * @param {object} [opts]
- * @param {number} [opts.maxContent=1400] amplada màxima del contingut.
+ * @param {number} [opts.maxContent=1350] amplada màxima del contingut.
  * @param {number} [opts.sideMargin=76]   marge mínim a cada costat.
  * @param {number} [opts.minContent=320]  amplada mínima útil.
  * @returns {number}
  */
 export function getSafeContentWidth({
-  maxContent = 1400,
-  sideMargin = 76,
+  maxContent = 1350,
+  sideMargin = 16,
   minContent = 320,
 } = {}) {
   const vw = getLayoutViewportWidth();
@@ -152,8 +189,8 @@ export function readRootCssNumber(varName, fallback = NaN) {
  * Mai retorna valors absurds: és segur fer-lo servir per layouts productius.
  */
 export function getSafeBelt({
-  maxContent = 1400,
-  sideMargin = 76,
+  maxContent = 1350,
+  sideMargin = 16,
   minContent = 320,
   varLeft = '--belt2-xL',
   varRight = '--belt2-xR',

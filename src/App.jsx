@@ -32,6 +32,7 @@ import Checkout from '@/components/Checkout';
 import SupabaseCollectionRoute from '@/pages/SupabaseCollectionRoute.jsx';
 import DevGuidesOverlay from '@/components/DevGuidesOverlay.jsx';
 import BeltReferenceOverlay from '@/components/dev/BeltReferenceOverlay.jsx';
+import SiteFrame from '@/components/layout/SiteFrame.jsx';
 import SlideShell from '@/components/SlideShell';
 import useSlidesConfig from '@/hooks/useSlidesConfig';
 import useComponentCatalogConfig from '@/hooks/useComponentCatalogConfig';
@@ -5957,6 +5958,7 @@ function App() {
                   </div>
                 ) : null}
 
+            <SiteFrame />
             <BeltReferenceOverlay enabled={belt2GuidesEnabled} />
 
             {clicksEnabled && clickMarks.length > 0 && (

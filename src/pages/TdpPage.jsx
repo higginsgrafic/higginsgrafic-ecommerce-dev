@@ -20,7 +20,7 @@ const tdpEditableDescription = [
 
 if (typeof window !== 'undefined' && typeof document !== 'undefined') {
   try {
-    const belt = getSafeBelt({ maxContent: 1400, sideMargin: 76, minContent: 320 });
+    const belt = getSafeBelt({ maxContent: 1350, sideMargin: 16, minContent: 320 });
     document.documentElement.style.setProperty('--hg-tdp-xL', `${belt.left}px`);
     document.documentElement.style.setProperty('--hg-tdp-xR', `${belt.right}px`);
   } catch (_) {}
@@ -80,7 +80,7 @@ function TdpPage({ pautaEnabled = false, tableEnabled = false }) {
     const root = document.documentElement;
 
     const apply = () => {
-      const belt = getSafeBelt({ maxContent: 1400, sideMargin: 76, minContent: 320 });
+      const belt = getSafeBelt({ maxContent: 1350, sideMargin: 16, minContent: 320 });
       root.style.setProperty('--hg-tdp-xL', `${belt.left}px`);
       root.style.setProperty('--hg-tdp-xR', `${belt.right}px`);
     };

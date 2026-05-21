@@ -145,7 +145,7 @@ function UserComandesContent() {
         gridTemplateColumns: 'repeat(4, 1fr)',
         columnGap: GUTTER,
         height: `${ROW_H}px`,
-        width: '1365.46px',
+        width: '1350px',
         marginLeft: 'auto',
         marginRight: 'auto',
       }}>
@@ -229,9 +229,9 @@ function UserComandesContent() {
             transition: background-color 9999s ease-in-out 0s;
           }
         `}</style>
-        <div style={{ width: '1365.46px', marginLeft: 'auto', marginRight: 'auto', marginTop: '-0.5px', overflow: 'hidden', position: 'relative', backgroundImage: 'url("/placeholders/fons_acordio/fons-usuari-compte.png")', backgroundRepeat: 'no-repeat', backgroundPosition: 'top left', backgroundSize: '1365.46px 100%' }}>
+        <div style={{ width: '1350px', marginLeft: 'auto', marginRight: 'auto', marginTop: '-0.5px', overflow: 'hidden', position: 'relative', backgroundImage: 'url("/placeholders/fons_acordio/fons-usuari-compte.png")', backgroundRepeat: 'no-repeat', backgroundPosition: 'top left', backgroundSize: '1350px 100%' }}>
           <table className="compte-grid" style={{
-            width: '1380.46px',
+            width: '1365px',
             marginLeft: '-7.5px',
             marginTop: '-2.8px',
             tableLayout: 'fixed',
@@ -483,7 +483,7 @@ function UserComandesContent() {
         {activeTab === 'COMPTE' && (<>
         <div style={{ height: `${ROW_H}px` }} />
         <div style={{
-          width: '1365.46px',
+          width: '1350px',
           marginLeft: 'auto',
           marginRight: 'auto',
           height: `${ROW_H}px`,
@@ -530,7 +530,7 @@ function UserComandesContent() {
         </div>
         {/* Botonera central (REVERTEIX / CANCEL·LA / DESA) */}
         <div style={{
-          width: '1365.46px',
+          width: '1350px',
           marginLeft: 'auto',
           marginRight: 'auto',
           display: 'grid',
@@ -568,10 +568,10 @@ function UserComandesContent() {
       </>)}
 
       {activeTab === 'SEGURETAT' && (
-        <div style={{ width: '1365.46px', marginLeft: 'auto', marginRight: 'auto', marginTop: '0px', height: SEG_TABLE_LOCKED_HEIGHT, overflow: 'visible', position: 'relative', zIndex: 2, backgroundColor: 'transparent', backgroundImage: 'url("/placeholders/fons_acordio/fons-usuari-seguretat.png")', backgroundRepeat: 'no-repeat', backgroundPosition: 'top left', backgroundSize: '1365.46px 528px', paddingLeft: 0, paddingRight: 0, transform: `translate(${SEG_X_OFFSET}, ${SEG_Y_OFFSET})` }}>
+        <div style={{ width: '1350px', marginLeft: 'auto', marginRight: 'auto', marginTop: '0px', height: SEG_TABLE_LOCKED_HEIGHT, overflow: 'visible', position: 'relative', zIndex: 2, backgroundColor: 'transparent', backgroundImage: 'url("/placeholders/fons_acordio/fons-usuari-seguretat.png")', backgroundRepeat: 'no-repeat', backgroundPosition: 'top left', backgroundSize: '1350px 528px', paddingLeft: 0, paddingRight: 0, transform: `translate(${SEG_X_OFFSET}, ${SEG_Y_OFFSET})` }}>
           <style>{`.seguretat-table td { outline: none; border: none; box-shadow: none; background: transparent; }`}</style>
          <table className="seguretat-table" style={{
-            width: '1380.56px',
+            width: '1365.1px',
             marginLeft: '-8.05px',
             marginTop: '-5px',
             color: '#475059',
@@ -785,7 +785,7 @@ function UserComandesContent() {
 
       {activeTab === 'SEGURETAT' && (<>
         <div style={{
-          width: '1365.46px',
+          width: '1350px',
           marginLeft: 'auto',
           marginRight: 'auto',
           marginTop: '-63.5px',
@@ -936,7 +936,7 @@ function UserComandesContent() {
           .msg-ph-wrap.msg-ph-top .msg-ph { align-items: flex-start; padding: 8px 10px; }
         `}</style>
         <div style={{
-          width: '1365.46px',
+          width: '1350px',
           marginLeft: 'auto',
           marginRight: 'auto',
           marginTop: '-0.5px',
@@ -945,11 +945,11 @@ function UserComandesContent() {
           backgroundImage: 'url("/placeholders/fons_acordio/fons-usuari-missatges.png")',
           backgroundRepeat: 'no-repeat',
           backgroundPosition: 'top left',
-          backgroundSize: '1365.46px 525.2px',
+          backgroundSize: '1350px 525.2px',
         }}>
           <div style={{ overflow: 'hidden' }}>
           <table className="missatges-table" style={{
-            width: '1380.46px',
+            width: '1365px',
             marginLeft: '-7.5px',
             marginTop: '-2.8px',
             tableLayout: 'fixed',
@@ -969,7 +969,7 @@ function UserComandesContent() {
                     display: 'grid',
                     gridTemplateColumns: '324px 324.5px 490.5px 158.5px',
                     columnGap: '7.5px',
-                    width: '1365.46px',
+                    width: '1350px',
                   }}>
                     {[0, 1].map((i) => {
                       const toggleMode = i === 0 ? 'comanda' : 'correu';
@@ -1236,7 +1236,7 @@ function UserComandesContent() {
       `}</style>
       <div
         onWheel={handleOrdersWheel}
-        style={{ width: '1365.46px', marginLeft: 'auto', marginRight: 'auto', marginTop: '-0.5px', overflow: 'hidden', overscrollBehavior: 'contain', position: 'relative', backgroundImage: 'url("/placeholders/fons_acordio/fons-usuari-comandes.png")', backgroundRepeat: 'no-repeat', backgroundPosition: 'top left', backgroundSize: '1365.46px 100%' }}
+        style={{ width: '1350px', marginLeft: 'auto', marginRight: 'auto', marginTop: '-0.5px', overflow: 'hidden', overscrollBehavior: 'contain', position: 'relative', backgroundImage: 'url("/placeholders/fons_acordio/fons-usuari-comandes.png")', backgroundRepeat: 'no-repeat', backgroundPosition: 'top left', backgroundSize: '1350px 100%' }}
       >
         <div style={{
           position: 'absolute',
@@ -1250,7 +1250,7 @@ function UserComandesContent() {
           <UserLoyaltyShirtProgress current={4} threshold={10} rewardsAvailable={0} />
         </div>
         <table className="comandes-table" style={{
-          width: '1380.46px',
+          width: '1365px',
           marginLeft: '-7.5px',
           marginTop: '-2.8px',
           tableLayout: 'fixed',
@@ -1349,7 +1349,7 @@ function UserComandesContent() {
       <div style={{ height: `${ROW_H}px` }} />
 
       {/* 4. Llegenda */}
-      <div style={{ width: '1365.46px', marginLeft: 'auto', marginRight: 'auto', display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', columnGap: '7.5px' }}>
+      <div style={{ width: '1350px', marginLeft: 'auto', marginRight: 'auto', display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', columnGap: '7.5px' }}>
       <div style={{
         gridColumn: '2 / span 2',
         display: 'flex',
@@ -1383,7 +1383,7 @@ function UserComandesContent() {
 
       {/* 5. Botonera central (REVERTEIX / CANCEL·LA / DESA) */}
       <div style={{
-        width: '1365.46px',
+        width: '1350px',
         marginLeft: 'auto',
         marginRight: 'auto',
         display: 'grid',
@@ -1430,7 +1430,7 @@ function UserComandesContent() {
           backgroundImage: 'url(/tmp/PAUTES/PAUTA-GENERAL.png)',
           backgroundRepeat: 'no-repeat',
           backgroundPosition: '0 -1px',
-          backgroundSize: '1365.46px 737.015px',
+          backgroundSize: '1350px 737.015px',
           opacity: 0.05,
           filter: 'hue-rotate(-120deg) saturate(3)',
           pointerEvents: 'none',

@@ -25,7 +25,7 @@ const Breadcrumbs = ({ items = [] }) => {
                 // estils UA diferents (line-height, padding, font) als
                 // botons que desalineen el breadcrumb respecte als
                 // altres elements (Link i span). Un span hereta
-                // exactament els mateixos estils que els germans.
+                // exactament els matesixos estils que els germans.
                 <span
                   role="button"
                   tabIndex={0}

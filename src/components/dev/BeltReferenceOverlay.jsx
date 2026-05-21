@@ -338,18 +338,40 @@ export default function BeltReferenceOverlay({ enabled }) {
       const accordionPauta = document.querySelector('[data-stripe-guide="accordion-pauta"]');
       const belt2LeftOffsetPx = -2;
 
-      const xLRaw = resolveX(headerLogoMarkAnchor, 'left') ?? resolveX(headerLogoAnchor, 'left') ?? resolveX(leftAnchor, 'left') ?? resolveX(cartViewportAnchor, 'left');
-      const xL = Number.isFinite(xLRaw) ? Math.round(xLRaw + belt2LeftOffsetPx) : xLRaw;
+      // SiteFrame: referència transversal canonical. Llegim les CSS vars
+      // `--site-xL/xR` que SiteFrame publica via JS (basades en
+      // clientWidth, no 100vw, per coincidir amb la Pauta). La cascada
+      // d'anchors antics queda com a fallback si SiteFrame no s'ha
+      // muntat encara.
+      const readVar = (name) => {
+        try {
+          const raw = getComputedStyle(document.documentElement).getPropertyValue(name);
+          const n = parseFloat(raw);
+          return Number.isFinite(n) ? n : null;
+        } catch {
+          return null;
+        }
+      };
+      const siteFrameXL = readVar('--site-xL');
+      const siteFrameXR = readVar('--site-xR');
+      const xLRaw = Number.isFinite(siteFrameXL)
+        ? siteFrameXL
+        : (resolveX(headerLogoMarkAnchor, 'left') ?? resolveX(headerLogoAnchor, 'left') ?? resolveX(leftAnchor, 'left') ?? resolveX(cartViewportAnchor, 'left'));
+      const xL = Number.isFinite(siteFrameXL)
+        ? xLRaw // SiteFrame ja és canonical, no apliquem l'offset legacy
+        : (Number.isFinite(xLRaw) ? Math.round(xLRaw + belt2LeftOffsetPx) : xLRaw);
       const spriteXL = resolveX(stripeImg, 'left');
       const spriteXR = resolveX(stripeImg, 'right');
-      const xR = resolveX(userIconAnchor, 'right') ?? resolveX(rightArrow, 'right') ?? resolveX(cartViewportAnchor, 'right');
+      const xR = Number.isFinite(siteFrameXR)
+        ? siteFrameXR
+        : (resolveX(userIconAnchor, 'right') ?? resolveX(rightArrow, 'right') ?? resolveX(cartViewportAnchor, 'right'));
       const hasMegaSlideReference = !!(cartCardTopAnchor || stripeImg || accordionPauta || finalizeOrderBtn);
       // Belt2: el TOP es manté ancorat al cart-card-top-anchor (o al
       // valor persistit prèviament en rutes que no el rendereixen). El
       // BOTTOM representa la base de la ZONA PAUTA de l'acordió: si la
       // pauta està al DOM s'utilitza directament; en cas contrari es
       // calcula com `top + 737.015 * scale` on `scale =
-      // clamp((xR - xL) / 1365.46, 0.5, 1)` — la mateixa fórmula que
+      // clamp((xR - xL) / 1350, 0.5, 1)` — la mateixa fórmula que
       // FullWideSlideDemoHeader fa servir per a `accordionPautaScale`.
       // Així belt2 funciona com a marc de referència del dev a totes les
       // rutes, fins i tot quan l'acordió no és visible.

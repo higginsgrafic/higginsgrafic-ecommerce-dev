@@ -1959,7 +1959,7 @@ export default function FullWideSlideDemoHeader({
     const measure = () => {
       // Font segura cross-browser (Chromium, WebKit, Firefox).
       // getSafeBelt valida belt2 i cau a un belt centrat si està contaminat.
-      const belt = getSafeBelt({ maxContent: 1400, sideMargin: 76, minContent: 320 });
+      const belt = getSafeBelt({ maxContent: 1350, sideMargin: 16, minContent: 320 });
       const beltWidth = Math.max(0, belt.width - 2);
 
       // Exposem el belt segur com a CSS vars perquè els panells del mega-slide
@@ -1972,7 +1972,7 @@ export default function FullWideSlideDemoHeader({
         // ignore
       }
 
-      const nextScale = clampNumber(beltWidth / 1365.46, 0.5, 1, 1);
+      const nextScale = clampNumber(beltWidth / 1350, 0.5, 1, 1);
       setAccordionPautaScale((prev) => (Math.abs(prev - nextScale) < 0.005 ? prev : nextScale));
     };
 
@@ -2642,7 +2642,16 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
       }
     >
       <div className="border-b border-border">
-        <div className="mx-auto flex h-16 max-w-[1400px] items-center gap-3 px-4 sm:px-6 lg:h-20 lg:px-10">
+        <div
+          className="flex h-16 items-center gap-3 px-4 sm:px-6 lg:h-20 lg:px-10"
+          style={{
+            // Ancorat exactament a SiteFrame (=belt2) per evitar discrepàncies
+            // de centratge causades per scrollbar-gutter, rulerInset i el fet
+            // que el `<header>` és `position: fixed` (`right: 0` viewport).
+            width: 'var(--site-w, 100%)',
+            marginLeft: 'calc(var(--site-xL, 0px) - var(--rulerInset, 0px))',
+          }}
+        >
           <div className="flex items-center gap-2">
             <button
               type="button"
@@ -2876,7 +2885,7 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
           >
             <div
               ref={megaMenuRef}
-              className="mx-auto max-w-[1400px] px-4 sm:px-6 lg:px-10 py-8"
+              className="mx-auto max-w-[1350px] px-4 sm:px-6 lg:px-10 py-8"
               style={{ 
                 overflow: 'visible',
                 ...(megaFullScreen ? {
@@ -2923,7 +2932,7 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
                         flex: '1 1 auto',
                       }} />
                       
-                      <div style={{ flex: '0 0 auto', width: 'var(--hg-mega-w, min(1400px, calc(100vw - 152px)))', maxWidth: 'none', position: 'relative', height: '100%', paddingLeft: '0px', paddingRight: '0px' }}>
+                      <div style={{ flex: '0 0 auto', width: 'var(--hg-mega-w, min(1350px, calc(100vw - 32px)))', maxWidth: 'none', position: 'relative', height: '100%', paddingLeft: '0px', paddingRight: '0px' }}>
                         <MegaStripePanel
                           active={active}
                           resolvedMega={resolvedMega}
@@ -2976,7 +2985,7 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
 
                       <div style={{ 
                         flex: '0 0 auto', 
-                        width: 'var(--hg-mega-w, min(1400px, calc(100vw - 152px)))', 
+                        width: 'var(--hg-mega-w, min(1350px, calc(100vw - 32px)))', 
                         maxWidth: 'none', 
                         position: 'relative', 
                         height: '100%', 
@@ -3038,7 +3047,7 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
 
                       <div style={{ 
                         flex: '0 0 auto', 
-                        width: 'var(--hg-mega-w, min(1400px, calc(100vw - 152px)))', 
+                        width: 'var(--hg-mega-w, min(1350px, calc(100vw - 32px)))', 
                         maxWidth: 'none', 
                         position: 'relative', 
                         height: '100%',
@@ -3536,7 +3545,7 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
 
                       <div style={{ 
                         flex: '0 0 auto', 
-                        width: 'var(--hg-mega-w, min(1400px, calc(100vw - 152px)))', 
+                        width: 'var(--hg-mega-w, min(1350px, calc(100vw - 32px)))', 
                         maxWidth: 'none', 
                         position: 'relative', 
                         height: '100%', 
@@ -3668,7 +3677,7 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
                                 backgroundImage: 'url(/tmp/PAUTES/PAUTA-GENERAL.png)',
                                 backgroundRepeat: 'no-repeat',
                                 backgroundPosition: '0 -1px',
-                                backgroundSize: '1365.46px 737.015px',
+                                backgroundSize: '1350px 737.015px',
                                 opacity: 0.02,
                                 zIndex: 9999,
                                 pointerEvents: 'none',

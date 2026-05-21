@@ -16,9 +16,9 @@ const MOCKUP_W = 2642;
 const MOCKUP_H = 6708;
 
 // Mateixos paràmetres que /constructor/tdp (TdpPage):
-//   getSafeBelt({ maxContent: 1400, sideMargin: 76, minContent: 320 })
+//   getSafeBelt({ maxContent: 1350, sideMargin: 16, minContent: 320 })
 //   TDP_PAGE_TOP_OFFSET = '33px'
-const BELT_OPTS = { maxContent: 1400, sideMargin: 76, minContent: 320 };
+const BELT_OPTS = { maxContent: 1350, sideMargin: 16, minContent: 320 };
 const PAGE_TOP_OFFSET_PX = 33;
 const PAUTA_ROWS = 90;
 const PAUTA_COLS = 4;

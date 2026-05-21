@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState, useImperativeHandle, forwardRef } from 'react';
 import RespescaTitle from '@/pages/nikeTambe/RespescaTitle';
 import CarouselArrows from '@/pages/nikeTambe/CarouselArrows';
 import ProductCard from '@/pages/nikeTambe/ProductCard';
@@ -25,23 +25,19 @@ const TEXT_BLOCK_STYLE = { width: '397px' };
 const CARD_W = 397;
 const CLONE_COUNT = 3;
 
-const parseBool = (raw, fb = true) => {
-  if (raw == null) return fb;
-  const v = String(raw).trim().toLowerCase();
-  if (v === '') return fb;
-  return v === '1' || v === 'true' || v === 'on' || v === 'yes';
-};
+function parseBool(val, fallback = false) {
+  try {
+    if (val === true || val === 'true' || val === '1') return true;
+    if (val === false || val === 'false' || val === '0') return false;
+    return fallback;
+  } catch {
+    return fallback;
+  }
+}
 
 const readDrawingOverlaySrc = () => {
   try {
-    const direct = String(window.localStorage.getItem('HG_DRAWING_OVERLAY_SRC') || '').trim();
-    if (direct) return direct;
-    const keys = [];
-    for (let i = 0; i < window.localStorage.length; i += 1) {
-      const k = window.localStorage.key(i);
-      if (k && k.startsWith('HG_STRIPE_OVERLAY_SRC_')) keys.push(k);
-    }
-    keys.sort();
+    const keys = ['HG_SHIRT_DRAWING_OVERLAY_SRC', 'HG_SHIRT_DRAWING_SRC'];
     for (const k of keys) {
       const v = String(window.localStorage.getItem(k) || '').trim();
       if (v) return v;
@@ -59,6 +55,8 @@ export default function TambeRail({
   subtitle = 'COSES DIFERENTS',
   initialIndex = 3,
   visibleCards = 4,
+  showInternalArrows = true,
+  showTitle = true,
 }) {
   const [shirtDrawingEnabled, setShirtDrawingEnabled] = useState(() => {
     try {
@@ -316,6 +314,23 @@ export default function TambeRail({
     setCarouselStartIndex((v) => v + 1);
   };
 
+  useEffect(() => {
+    const handleNext = () => {
+      console.log('tambe-rail received next event, triggering goNext()');
+      goNext();
+    };
+    const handlePrev = () => {
+      console.log('tambe-rail received prev event, triggering goPrev()');
+      goPrev();
+    };
+    window.addEventListener('tambe-rail:next', handleNext);
+    window.addEventListener('tambe-rail:prev', handlePrev);
+    return () => {
+      window.removeEventListener('tambe-rail:next', handleNext);
+      window.removeEventListener('tambe-rail:prev', handlePrev);
+    };
+  }, [carouselStartIndex, upper]);
+
   return (
     <div ref={containerRef} data-component="tambe-rail" style={{ position: 'relative', width: '100%' }}>
       <div
@@ -324,7 +339,9 @@ export default function TambeRail({
         data-section="respesca"
         style={respescaMinHeightPx ? { minHeight: `${respescaMinHeightPx}px` } : undefined}
       >
-        <RespescaTitle leftPx={left1} title={title} subtitle={subtitle} />
+        {showTitle && (
+          <RespescaTitle leftPx={left1} title={title} subtitle={subtitle} />
+        )}
 
         <div className="w-full py-10" data-container="cards-row">
           <div style={{ position: 'relative', minHeight: `${viewportHeightPx}px` }}>
@@ -377,7 +394,9 @@ export default function TambeRail({
               }}
               onPointerCancel={() => { dragRef.current.active = false; dragRef.current.pointerId = null; }}
             >
-              <CarouselArrows leftPx={arrowsLeftPx} onPrev={goPrev} onNext={goNext} />
+              {showInternalArrows && (
+                <CarouselArrows leftPx={arrowsLeftPx} onPrev={goPrev} onNext={goNext} />
+              )}
 
               <div
                 style={{

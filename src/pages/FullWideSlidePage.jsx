@@ -23,8 +23,7 @@ export default function FullWideSlidePage({ pautaEnabled = false, tableEnabled =
 
     const prevHtmlOverflow = document.documentElement.style.overflow;
     const prevBodyOverflow = document.body.style.overflow;
-    const prevScrollbarGutter = document.documentElement.style.scrollbarGutter;
-    const prevBodyScrollbarGutter = document.body.style.scrollbarGutter;
+    const prevHtmlPaddingRight = document.documentElement.style.paddingRight;
 
     const styleEl = document.createElement('style');
     styleEl.setAttribute('data-fw-hide-scrollbars', '1');
@@ -33,10 +32,17 @@ html::-webkit-scrollbar, body::-webkit-scrollbar { width: 0 !important; height: 
 html, body { scrollbar-width: none; }
 `;
 
+    // Mesurem l'amplada del scrollbar abans d'amagar-lo per poder compensar-la
+    // com a paddingRight manual. Així `clientWidth` de fws queda igual que la
+    // resta de pàgines (que tenen `scrollbar-gutter: stable`) i evitem un
+    // desplaçament visual de ~15px en navegar entre rutes.
+    const scrollbarW = Math.max(0, window.innerWidth - document.documentElement.clientWidth);
+
     document.documentElement.style.overflow = 'hidden';
     document.body.style.overflow = 'hidden';
-    document.documentElement.style.scrollbarGutter = 'auto';
-    document.body.style.scrollbarGutter = 'auto';
+    if (scrollbarW > 0) {
+      document.documentElement.style.paddingRight = `${scrollbarW}px`;
+    }
 
     try {
       document.head.appendChild(styleEl);
@@ -47,8 +53,7 @@ html, body { scrollbar-width: none; }
     return () => {
       document.documentElement.style.overflow = prevHtmlOverflow;
       document.body.style.overflow = prevBodyOverflow;
-      document.documentElement.style.scrollbarGutter = prevScrollbarGutter;
-      document.body.style.scrollbarGutter = prevBodyScrollbarGutter;
+      document.documentElement.style.paddingRight = prevHtmlPaddingRight;
 
       try {
         styleEl.remove();

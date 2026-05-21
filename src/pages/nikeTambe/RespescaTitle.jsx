@@ -1,14 +1,18 @@
 import React from 'react';
 
-export default function RespescaTitle({ leftPx = 0, title = 'també et pot interessar', subtitle = 'COSES DIFERENTS' }) {
+export default function RespescaTitle({ leftPx = 0, title = 'també et pot interessar', subtitle = 'COSES DIFERENTS', style }) {
+  const finalStyle = style || {
+    position: 'absolute',
+    top: '64px',
+    left: `${leftPx - 3}px`,
+  };
+
   return (
     <div
       style={{
-        position: 'absolute',
-        top: '64px',
-        left: `${leftPx - 3}px`,
         fontFamily: 'Roboto, system-ui, -apple-system, Segoe UI, Arial, sans-serif',
         color: 'hsl(var(--foreground))',
+        ...finalStyle,
       }}
       data-component="respesca-title"
     >
@@ -16,7 +20,7 @@ export default function RespescaTitle({ leftPx = 0, title = 'també et pot inter
         style={{
           fontFamily: 'Oswald, sans-serif',
           fontWeight: 300,
-          fontSize: '24pt',
+          fontSize: '20pt',
           lineHeight: 1,
           letterSpacing: '0.04em',
           textTransform: 'uppercase',
