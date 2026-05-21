@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 
 // Persistent UI flags that control developer debug overlays on the live site.
 // Each flag defaults to ON to preserve previous behaviour for current users.
@@ -77,7 +78,21 @@ function writeBool(key, value) {
 }
 
 function useBoolFlag(key, defaultValue) {
+  let location;
+  try {
+    location = useLocation();
+  } catch {
+    location = { search: '' };
+  }
+
   const [value, setValue] = useState(() => readBool(key, defaultValue));
+
+  useEffect(() => {
+    const nextVal = readBool(key, defaultValue);
+    if (nextVal !== value) {
+      setValue(nextVal);
+    }
+  }, [location.search, key, defaultValue, value]);
 
   useEffect(() => {
     const onStorage = (e) => {
