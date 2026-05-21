@@ -27,7 +27,7 @@ const PDP_DESCRIPTION_SETTINGS = {
   color: '#111827', textTransform: 'none',
 };
 const PDP_PRICE_SETTINGS = {
-  x: 0, y: 0, fontFamily: 'Oswald', fontSize: 24, fontWeight: 300, selectedFontWeight: 700,
+  x: 0, y: 0, fontFamily: 'Oswald', fontSize: 24, fontWeight: 200, selectedFontWeight: 700,
   letterSpacing: 0, lineHeight: 1, textAlign: 'left', verticalAlign: 'center',
   color: '#475059', textTransform: 'none',
 };
