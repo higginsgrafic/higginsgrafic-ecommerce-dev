@@ -179,6 +179,8 @@ function DebugOverlayToggles() {
     setActiveWorkEnabled,
     rulersEnabled,
     setRulersEnabled,
+    pdpControlsEnabled,
+    setPdpControlsEnabled,
   } = useDebugOverlays();
   return (
     <div className="border-l border-border pl-3 pr-[28px]">
@@ -199,6 +201,12 @@ function DebugOverlayToggles() {
         hint="Caixa flotant amb les pàgines en què s'està treballant"
         checked={activeWorkEnabled}
         onChange={setActiveWorkEnabled}
+      />
+      <ToggleRow
+        label="Controls PDP"
+        hint="Botons de calibratge dels elements editables de la PDP"
+        checked={pdpControlsEnabled}
+        onChange={setPdpControlsEnabled}
       />
     </div>
   );

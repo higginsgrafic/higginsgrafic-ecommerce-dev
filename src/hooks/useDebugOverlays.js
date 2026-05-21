@@ -6,6 +6,7 @@ import { useCallback, useEffect, useState } from 'react';
 const KEY_DEBUGS = 'hg.debugOverlays.enabled';
 const KEY_ACTIVE_WORK = 'hg.activeWorkOverlay.enabled';
 const KEY_RULERS = 'hg.rulersOverlay.enabled';
+const KEY_PDP_CONTROLS = 'hg.pdpControlsOverlay.enabled';
 const EVT_PREFIX = 'hg:debug-overlays-changed';
 
 function readBool(key, defaultValue) {
@@ -65,6 +66,7 @@ export function useDebugOverlays() {
   const [debugsEnabled, setDebugsEnabled] = useBoolFlag(KEY_DEBUGS, true);
   const [activeWorkEnabled, setActiveWorkEnabled] = useBoolFlag(KEY_ACTIVE_WORK, true);
   const [rulersEnabled, setRulersEnabled] = useBoolFlag(KEY_RULERS, true);
+  const [pdpControlsEnabled, setPdpControlsEnabled] = useBoolFlag(KEY_PDP_CONTROLS, true);
   return {
     debugsEnabled,
     setDebugsEnabled,
@@ -72,7 +74,9 @@ export function useDebugOverlays() {
     setActiveWorkEnabled,
     rulersEnabled,
     setRulersEnabled,
+    pdpControlsEnabled,
+    setPdpControlsEnabled,
   };
 }
 
-export { KEY_DEBUGS, KEY_ACTIVE_WORK, KEY_RULERS };
+export { KEY_DEBUGS, KEY_ACTIVE_WORK, KEY_RULERS, KEY_PDP_CONTROLS };

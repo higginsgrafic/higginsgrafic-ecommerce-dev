@@ -7,6 +7,7 @@ import RespescaTitle from '@/pages/nikeTambe/RespescaTitle';
 import CarouselArrows from '@/pages/nikeTambe/CarouselArrows';
 import Breadcrumbs from '@/components/Breadcrumbs';
 import EditableTextBox from '@/components/dev/EditableTextBox';
+import { useDebugOverlays } from '@/hooks/useDebugOverlays';
 
 const PDP_PRESET_VERSION = 'pdp-layout-2026-05-20-1135';
 
@@ -114,6 +115,7 @@ const SIZES = ['S', 'M', 'L', 'XL', 'XXL'];
 const FINISHES = ['BLANC', 'COLOR', 'NEGRE'];
 
 function ConstructorPdpPage() {
+  const { pdpControlsEnabled } = useDebugOverlays();
   const [selectedFinish, setSelectedFinish] = useState('COLOR');
   const [finishButtonTextSettings, setFinishButtonTextSettings] = useState(PDP_SIZE_SETTINGS);
 
@@ -211,7 +213,7 @@ function ConstructorPdpPage() {
           initialText="NOM DE PRODUCTE"
           initialSettings={PDP_TITLE_SETTINGS}
           presetVersion={PDP_PRESET_VERSION}
-          renderHandle
+          renderHandle={pdpControlsEnabled}
           handleRight="-22px"
           style={{ gridColumn: '4 / 5', gridRow: '6 / 7', alignSelf: 'end' }}
         />
@@ -221,7 +223,7 @@ function ConstructorPdpPage() {
           initialText="NOM DE COL·LECCIÓ"
           initialSettings={PDP_COLLECTION_SETTINGS}
           presetVersion={PDP_PRESET_VERSION}
-          renderHandle
+          renderHandle={pdpControlsEnabled}
           handleRight="-22px"
           style={{ gridColumn: '4 / 5', gridRow: '7 / 8', alignSelf: 'start' }}
         />
@@ -232,7 +234,7 @@ function ConstructorPdpPage() {
           initialSettings={PDP_DESCRIPTION_SETTINGS}
           presetVersion={PDP_PRESET_VERSION}
           multiline
-          renderHandle
+          renderHandle={pdpControlsEnabled}
           handleRight="-22px"
           style={{ gridColumn: '4 / 5', gridRow: '9 / 16' }}
         />
@@ -242,7 +244,7 @@ function ConstructorPdpPage() {
           initialText="15,50€"
           initialSettings={PDP_PRICE_SETTINGS}
           presetVersion={PDP_PRESET_VERSION}
-          renderHandle
+          renderHandle={pdpControlsEnabled}
           handleRight="-22px"
           style={{ gridColumn: '4 / 5', gridRow: '15 / 16', alignSelf: 'center' }}
         />
@@ -312,7 +314,7 @@ function ConstructorPdpPage() {
           selectedColumn={selectedSize}
           onColumnSelect={setSelectedSize}
           renderText={false}
-          renderHandle
+          renderHandle={pdpControlsEnabled}
           onSettingsChange={setSizeButtonTextSettings}
           initialSettings={PDP_SIZE_SETTINGS}
           presetVersion={PDP_PRESET_VERSION}
@@ -381,10 +383,10 @@ function ConstructorPdpPage() {
           initialSettings={PDP_CTA_SETTINGS}
           presetVersion={PDP_PRESET_VERSION}
           renderText={false}
-          renderHandle
+          renderHandle={pdpControlsEnabled}
           onSettingsChange={setCtaTextSettings}
           handleRight="-22px"
-          style={{ gridColumn: '4 / 5', gridRow: '19 / 20', zIndex: 10, pointerEvents: 'none' }}
+          style={{ gridColumn: '4 / 5', gridRow: '19 / 20', zIndex: 100005, width: 0, height: 0, justifySelf: 'end' }}
         />
 
         {/* ─── Carrusel: imatge gran (col 2-3, centre) + thumbs (col 3 dreta de la imatge) ─── */}
@@ -715,7 +717,7 @@ function ConstructorPdpPage() {
           selectedColumn={selectedFinish}
           onColumnSelect={setSelectedFinish}
           renderText={false}
-          renderHandle
+          renderHandle={pdpControlsEnabled}
           onSettingsChange={setFinishButtonTextSettings}
           initialSettings={PDP_SIZE_SETTINGS}
           presetVersion={PDP_PRESET_VERSION}
