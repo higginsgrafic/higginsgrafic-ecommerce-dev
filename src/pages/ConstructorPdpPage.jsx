@@ -741,46 +741,48 @@ function ConstructorPdpPage() {
       </Pauta4ColsOverlay>
 
 
-      <div
-        className="font-mono text-neutral-800 debug-exempt"
-        style={{
-          position: 'fixed',
-          right: 16,
-          top: 170,
-          width: 260,
-          zIndex: 100000,
-          background: 'rgba(255,255,255,0.96)',
-          border: '1px solid rgba(0,0,0,0.10)',
-          borderRadius: 10,
-          padding: 12,
-          fontSize: 12,
-          boxShadow: '0 6px 24px rgba(0,0,0,0.12)',
-        }}
-      >
-        <strong className="mb-2 block">Controls PDP</strong>
-        <ToggleRow
-          label="Pauta"
-          checked={pautaEnabled}
-          onChange={(v) => updateState({ pautaEnabled: v })}
-        />
-        <OpacitySlider
-          label="Opacitat pauta"
-          value={pautaOpacity}
-          onChange={(v) => updateState({ pautaOpacity: v })}
-          disabled={!pautaEnabled}
-        />
-        <ToggleRow
-          label="Taula + numeració"
-          checked={tableEnabled}
-          onChange={(v) => updateState({ tableEnabled: v })}
-        />
-        <OpacitySlider
-          label="Opacitat taula"
-          value={tableOpacity}
-          onChange={(v) => updateState({ tableOpacity: v })}
-          disabled={!tableEnabled}
-        />
-      </div>
+      {pdpControlsEnabled && (
+        <div
+          className="font-mono text-neutral-800 debug-exempt"
+          style={{
+            position: 'fixed',
+            right: 16,
+            top: 170,
+            width: 260,
+            zIndex: 100000,
+            background: 'rgba(255,255,255,0.96)',
+            border: '1px solid rgba(0,0,0,0.10)',
+            borderRadius: 10,
+            padding: 12,
+            fontSize: 12,
+            boxShadow: '0 6px 24px rgba(0,0,0,0.12)',
+          }}
+        >
+          <strong className="mb-2 block">Controls PDP</strong>
+          <ToggleRow
+            label="Pauta"
+            checked={pautaEnabled}
+            onChange={(v) => updateState({ pautaEnabled: v })}
+          />
+          <OpacitySlider
+            label="Opacitat pauta"
+            value={pautaOpacity}
+            onChange={(v) => updateState({ pautaOpacity: v })}
+            disabled={!pautaEnabled}
+          />
+          <ToggleRow
+            label="Taula + numeració"
+            checked={tableEnabled}
+            onChange={(v) => updateState({ tableEnabled: v })}
+          />
+          <OpacitySlider
+            label="Opacitat taula"
+            value={tableOpacity}
+            onChange={(v) => updateState({ tableOpacity: v })}
+            disabled={!tableEnabled}
+          />
+        </div>
+      )}
     </section>
   );
 }
