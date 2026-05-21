@@ -69,12 +69,93 @@ const DEFAULT_OVERLAY_STATE = {
 
 function loadOverlayState() {
   try {
+    let baseState = { ...DEFAULT_OVERLAY_STATE };
     const raw = window.localStorage.getItem(OVERLAY_STATE_STORAGE_KEY);
-    if (!raw) return DEFAULT_OVERLAY_STATE;
-    const parsed = JSON.parse(raw);
-    return { ...DEFAULT_OVERLAY_STATE, ...(parsed && typeof parsed === 'object' ? parsed : {}) };
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (parsed && typeof parsed === 'object') {
+        baseState = { ...baseState, ...parsed };
+      }
+    }
+
+    if (typeof window !== 'undefined' && window.location.search) {
+      const params = new URLSearchParams(window.location.search);
+      let changed = false;
+      if (params.has('pauta')) {
+        baseState.pautaEnabled = params.get('pauta') === '1' || params.get('pauta') === 'true';
+        changed = true;
+      }
+      if (params.has('table')) {
+        baseState.tableEnabled = params.get('table') === '1' || params.get('table') === 'true';
+        changed = true;
+      }
+      if (params.has('pautaOpacity')) {
+        const val = parseFloat(params.get('pautaOpacity'));
+        if (!isNaN(val)) {
+          baseState.pautaOpacity = val;
+          changed = true;
+        }
+      }
+      if (params.has('tableOpacity')) {
+        const val = parseFloat(params.get('tableOpacity'));
+        if (!isNaN(val)) {
+          baseState.tableOpacity = val;
+          changed = true;
+        }
+      }
+
+      if (changed) {
+        window.localStorage.setItem(OVERLAY_STATE_STORAGE_KEY, JSON.stringify(baseState));
+      }
+    }
+
+    return baseState;
   } catch {
     return DEFAULT_OVERLAY_STATE;
+  }
+}
+
+function getPdpDesignPackage() {
+  const data = {};
+  try {
+    for (let i = 0; i < window.localStorage.length; i++) {
+      const key = window.localStorage.key(i);
+      if (key && (key.startsWith('HG_EDITABLE_TEXT_BOX_V1:pdp-') || key === 'hg.constructorPdp.overlayState.v1')) {
+        data[key] = window.localStorage.getItem(key);
+      }
+    }
+    const json = JSON.stringify(data);
+    const base64 = btoa(encodeURIComponent(json).replace(/%([0-9A-F]{2})/g, (match, p1) => {
+      return String.fromCharCode(parseInt(p1, 16));
+    }));
+    return base64;
+  } catch (e) {
+    console.error('Error empaquetant disseny:', e);
+    return null;
+  }
+}
+
+function applyPdpDesignPackage(base64) {
+  if (!base64) return false;
+  try {
+    const json = decodeURIComponent(Array.prototype.map.call(atob(base64), (c) => {
+      return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+    }).join(''));
+    const data = JSON.parse(json);
+    let changed = false;
+    for (const key in data) {
+      if (key.startsWith('HG_EDITABLE_TEXT_BOX_V1:pdp-') || key === 'hg.constructorPdp.overlayState.v1') {
+        const current = window.localStorage.getItem(key);
+        if (current !== data[key]) {
+          window.localStorage.setItem(key, data[key]);
+          changed = true;
+        }
+      }
+    }
+    return changed;
+  } catch (e) {
+    console.error('Error desempaquetant disseny:', e);
+    return false;
   }
 }
 
@@ -132,6 +213,7 @@ function ConstructorPdpPage() {
 
   const pautaGridRef = useRef(null);
   const [rowHeight, setRowHeight] = useState(38);
+  const [copiedDesign, setCopiedDesign] = useState(false);
 
   useLayoutEffect(() => {
     if (typeof window === 'undefined') return undefined;
@@ -846,6 +928,47 @@ function ConstructorPdpPage() {
             onChange={(v) => updateState({ tableOpacity: v })}
             disabled={!tableEnabled}
           />
+          <div className="mt-4 border-t border-neutral-200 pt-3 flex flex-col gap-2">
+            <button
+              type="button"
+              onClick={() => {
+                const pkg = getPdpDesignPackage();
+                if (pkg) {
+                  navigator.clipboard.writeText(pkg)
+                    .then(() => {
+                      setCopiedDesign(true);
+                      setTimeout(() => setCopiedDesign(false), 2000);
+                    })
+                    .catch((err) => console.error('Error copiant el disseny:', err));
+                }
+              }}
+              className={`w-full py-2 px-3 rounded text-center text-[11px] font-semibold transition-all duration-200 ${
+                copiedDesign 
+                  ? 'bg-green-600 text-white' 
+                  : 'bg-orange-600 hover:bg-orange-700 text-white shadow-sm active:scale-[0.98]'
+              }`}
+            >
+              {copiedDesign ? 'Codi copiat! 📋' : 'Copiar codi disseny'}
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                const code = window.prompt("Enganxa el codi de disseny copiat d'un altre navegador:");
+                if (code) {
+                  const applied = applyPdpDesignPackage(code.trim());
+                  if (applied) {
+                    window.location.reload();
+                  } else {
+                    window.alert("El codi és invàlid o no s'ha pogut importar.");
+                  }
+                }
+              }}
+              className="w-full py-2 px-3 rounded text-center text-[11px] font-semibold bg-neutral-100 hover:bg-neutral-200 text-neutral-800 border border-neutral-300 shadow-sm active:scale-[0.98] transition-all duration-200"
+            >
+              Enganxar codi disseny
+            </button>
+          </div>
         </div>
       )}
     </section>
