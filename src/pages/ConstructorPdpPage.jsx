@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useLayoutEffect, useRef } from 'react';
+import { useLocation } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 import Pauta4ColsOverlay from '@/components/pauta/Pauta4ColsOverlay';
 import CollectionProductCard from '@/components/tdp/CollectionProductCard';
@@ -153,13 +154,77 @@ function ConstructorPdpPage() {
     };
   }, []);
 
+  const location = useLocation();
+
+  // 1. Sincronització entrant: de la URL cap a l'estat local (en carregar o rebre enllaç)
   useEffect(() => {
     try {
-      window.localStorage.setItem(OVERLAY_STATE_STORAGE_KEY, JSON.stringify(overlayState));
-    } catch {
-      // ignore
+      const params = new URLSearchParams(location.search);
+      let changed = false;
+      const nextState = { ...overlayState };
+
+      if (params.has('pauta')) {
+        const v = params.get('pauta');
+        const bool = v === '1' || v === 'true';
+        if (nextState.pautaEnabled !== bool) {
+          nextState.pautaEnabled = bool;
+          changed = true;
+        }
+      }
+      if (params.has('table')) {
+        const v = params.get('table');
+        const bool = v === '1' || v === 'true';
+        if (nextState.tableEnabled !== bool) {
+          nextState.tableEnabled = bool;
+          changed = true;
+        }
+      }
+      if (params.has('pautaOpacity')) {
+        const val = parseFloat(params.get('pautaOpacity'));
+        if (!isNaN(val) && nextState.pautaOpacity !== val) {
+          nextState.pautaOpacity = val;
+          changed = true;
+        }
+      }
+      if (params.has('tableOpacity')) {
+        const val = parseFloat(params.get('tableOpacity'));
+        if (!isNaN(val) && nextState.tableOpacity !== val) {
+          nextState.tableOpacity = val;
+          changed = true;
+        }
+      }
+
+      if (changed) {
+        setOverlayState(nextState);
+        window.localStorage.setItem(OVERLAY_STATE_STORAGE_KEY, JSON.stringify(nextState));
+      }
+    } catch (e) {
+      console.error('Error parsing URL overlays:', e);
     }
-  }, [overlayState]);
+  }, [location.search]);
+
+  // 2. Sincronització sortint: de l'estat local cap a la URL (perquè copiar l'enllaç funcioni al vol)
+  useEffect(() => {
+    try {
+      const params = new URLSearchParams(window.location.search);
+      
+      params.set('controls', pdpControlsEnabled ? '1' : '0');
+      params.set('pauta', pautaEnabled ? '1' : '0');
+      params.set('table', tableEnabled ? '1' : '0');
+      params.set('pautaOpacity', pautaOpacity.toString());
+      params.set('tableOpacity', tableOpacity.toString());
+
+      const newSearch = '?' + params.toString();
+      if (window.location.search !== newSearch) {
+        window.history.replaceState(null, '', window.location.pathname + newSearch);
+      }
+      
+      // Sempre guardem també a localStorage
+      window.localStorage.setItem(OVERLAY_STATE_STORAGE_KEY, JSON.stringify(overlayState));
+    } catch (e) {
+      console.error('Error writing URL overlays:', e);
+    }
+  }, [pdpControlsEnabled, pautaEnabled, tableEnabled, pautaOpacity, tableOpacity, overlayState]);
 
   const updateState = (patch) => setOverlayState((prev) => ({ ...prev, ...patch }));
 
