@@ -40,7 +40,7 @@ const PAUTA4_DEFAULTS = {
 // `--belt2-xL/xR` no estan publicades.
 if (typeof window !== 'undefined' && typeof document !== 'undefined') {
   try {
-    const belt = getSafeBelt({ maxContent: 1400, sideMargin: 76, minContent: 320 });
+    const belt = getSafeBelt({ maxContent: 1350, sideMargin: 16, minContent: 320 });
     document.documentElement.style.setProperty('--hg-tdp-xL', `${belt.left}px`);
     document.documentElement.style.setProperty('--hg-tdp-xR', `${belt.right}px`);
   } catch {
@@ -54,7 +54,7 @@ if (typeof window !== 'undefined' && typeof document !== 'undefined') {
 function useReactiveBelt() {
   const compute = () => {
     if (typeof window === 'undefined') return { left: 0, right: 0 };
-    return getSafeBelt({ maxContent: 1400, sideMargin: 76, minContent: 320 });
+    return getSafeBelt({ maxContent: 1350, sideMargin: 16, minContent: 320 });
   };
   const [belt, setBelt] = useState(compute);
 
@@ -63,7 +63,7 @@ function useReactiveBelt() {
     const root = document.documentElement;
 
     const apply = () => {
-      const next = getSafeBelt({ maxContent: 1400, sideMargin: 76, minContent: 320 });
+      const next = getSafeBelt({ maxContent: 1350, sideMargin: 16, minContent: 320 });
       root.style.setProperty('--hg-tdp-xL', `${next.left}px`);
       root.style.setProperty('--hg-tdp-xR', `${next.right}px`);
       setBelt((prev) => (prev.left === next.left && prev.right === next.right ? prev : next));
@@ -118,6 +118,7 @@ export default function Pauta4ColsOverlay({
   className,
   style,
   children,
+  innerRef, // Ref per exposar el contenidor del grid
 }) {
   const belt = useReactiveBelt();
 
@@ -171,7 +172,7 @@ export default function Pauta4ColsOverlay({
         zIndex,
         pointerEvents: 'none',
         boxSizing: 'border-box',
-        overflowX: 'clip',
+        overflowX: 'visible',
       }
     : {
         position: 'relative',
@@ -182,7 +183,7 @@ export default function Pauta4ColsOverlay({
         paddingBottom: bottomPadding,
         boxSizing: 'border-box',
         zIndex,
-        overflowX: 'clip',
+        overflowX: 'visible',
       };
 
   const gridStyle = {
@@ -210,28 +211,20 @@ export default function Pauta4ColsOverlay({
 
   const markup = (
     <div className={className} style={{ ...containerStyle, ...style }} data-pauta="4-cols">
-      <div style={gridStyle} data-pauta-grid>
-        {tableEnabled ? (
-          <div
-            aria-hidden="true"
-            style={{
-              position: 'absolute',
-              left: numbersLeft,
-              top: 0,
-              bottom: 0,
-              width: '24px',
-              display: 'grid',
-              gridTemplateRows: rowsTemplate,
-              rowGap: gutterY,
-              opacity: tableOpacity,
-              zIndex: 4,
-              pointerEvents: 'none',
-            }}
-          >
-            {pautaRows.map((rowNumber) => (
+      <div ref={innerRef} style={gridStyle} data-pauta-grid>
+        {/* Números de fila (ara renderitzats directament dins de la graella principal per a un centrat vertical en Y perfecte) */}
+        {tableEnabled
+          ? pautaRows.map((rowNumber) => (
               <div
                 key={`p4-row-${rowNumber}`}
                 style={{
+                  gridColumn: '1 / 2',
+                  gridRow: `${rowNumber} / ${rowNumber + 1}`,
+                  position: 'absolute',
+                  left: `calc(100% + (${gutterX}) / 2 - 12px)`,
+                  top: 0,
+                  bottom: 0,
+                  width: '24px',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
@@ -239,13 +232,15 @@ export default function Pauta4ColsOverlay({
                   fontFamily: 'Roboto Condensed, sans-serif',
                   fontSize: '10px',
                   lineHeight: 1,
+                  pointerEvents: 'none',
+                  zIndex: 4,
+                  opacity: tableOpacity,
                 }}
               >
                 {rowNumber}
               </div>
-            ))}
-          </div>
-        ) : null}
+            ))
+          : null}
 
         {tableEnabled
           ? pautaCells.map(({ row, col }) => (
@@ -259,6 +254,7 @@ export default function Pauta4ColsOverlay({
                   boxSizing: 'border-box',
                   opacity: tableOpacity,
                   zIndex: 1,
+                  pointerEvents: 'none',
                 }}
               />
             ))

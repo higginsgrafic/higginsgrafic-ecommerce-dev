@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useLayoutEffect, useRef } from 'react';
 import { Helmet } from 'react-helmet';
 import Pauta4ColsOverlay from '@/components/pauta/Pauta4ColsOverlay';
 import CollectionProductCard from '@/components/tdp/CollectionProductCard';
 import TambeRail from '@/pages/nikeTambe/TambeRail';
+import RespescaTitle from '@/pages/nikeTambe/RespescaTitle';
 import CarouselArrows from '@/pages/nikeTambe/CarouselArrows';
 import Breadcrumbs from '@/components/Breadcrumbs';
 import EditableTextBox from '@/components/dev/EditableTextBox';
@@ -110,8 +111,12 @@ const SPECS = [
 ];
 
 const SIZES = ['S', 'M', 'L', 'XL', 'XXL'];
+const FINISHES = ['BLANC', 'COLOR', 'NEGRE'];
 
 function ConstructorPdpPage() {
+  const [selectedFinish, setSelectedFinish] = useState('COLOR');
+  const [finishButtonTextSettings, setFinishButtonTextSettings] = useState(PDP_SIZE_SETTINGS);
+
   const [selectedSize, setSelectedSize] = useState('M');
   const [sizeButtonTextSettings, setSizeButtonTextSettings] = useState(PDP_SIZE_SETTINGS);
   const [ctaTextSettings, setCtaTextSettings] = useState(PDP_CTA_SETTINGS);
@@ -121,6 +126,30 @@ function ConstructorPdpPage() {
   const mainVariantColor = OFFICIAL_COLORS[mainVariantIndex];
   const [overlayState, setOverlayState] = useState(loadOverlayState);
   const { pautaEnabled, tableEnabled, pautaOpacity, tableOpacity } = overlayState;
+
+  const pautaGridRef = useRef(null);
+  const [rowHeight, setRowHeight] = useState(38);
+
+  useLayoutEffect(() => {
+    if (typeof window === 'undefined') return undefined;
+    const measure = () => {
+      const gridEl = pautaGridRef.current;
+      if (!gridEl) return;
+      const rect = gridEl.getBoundingClientRect();
+      const numRows = 65; // Nombre canònic de files de la PDP
+      const singleRowH = rect.height / numRows;
+      setRowHeight((prev) => (Math.abs(prev - singleRowH) < 0.1 ? prev : singleRowH));
+    };
+
+    measure();
+    window.addEventListener('resize', measure);
+    // També mesurem una miqueta després perquè s'hagin carregat imatges o layouts inicials
+    const t = setTimeout(measure, 100);
+    return () => {
+      window.removeEventListener('resize', measure);
+      clearTimeout(t);
+    };
+  }, []);
 
   useEffect(() => {
     try {
@@ -143,14 +172,16 @@ function ConstructorPdpPage() {
       </Helmet>
 
       <Pauta4ColsOverlay
-        numRows={30}
-        canvasAspect={[2642, 2236]}
+        numRows={65}
+        canvasAspect={[2642, 4845]}
         pautaEnabled={pautaEnabled}
         tableEnabled={tableEnabled}
         pautaOpacity={pautaOpacity}
         tableOpacity={tableOpacity}
         topOffset="0px"
         bottomPadding="0px"
+        innerRef={pautaGridRef}
+        style={{ zIndex: 5, position: 'relative' }}
       >
         {/* ─── Breadcrumbs (col 1, fila 1 — cantonada superior esquerra del belt2) ─── */}
         <div
@@ -163,6 +194,7 @@ function ConstructorPdpPage() {
             justifySelf: 'start',
             padding: 0,
             margin: 0,
+            transform: 'translateY(-10px)',
           }}
         >
           <Breadcrumbs
@@ -180,7 +212,7 @@ function ConstructorPdpPage() {
           initialSettings={PDP_TITLE_SETTINGS}
           presetVersion={PDP_PRESET_VERSION}
           renderHandle
-          handleRight="4px"
+          handleRight="-22px"
           style={{ gridColumn: '4 / 5', gridRow: '6 / 7', alignSelf: 'end' }}
         />
 
@@ -190,7 +222,7 @@ function ConstructorPdpPage() {
           initialSettings={PDP_COLLECTION_SETTINGS}
           presetVersion={PDP_PRESET_VERSION}
           renderHandle
-          handleRight="4px"
+          handleRight="-22px"
           style={{ gridColumn: '4 / 5', gridRow: '7 / 8', alignSelf: 'start' }}
         />
 
@@ -201,7 +233,7 @@ function ConstructorPdpPage() {
           presetVersion={PDP_PRESET_VERSION}
           multiline
           renderHandle
-          handleRight="4px"
+          handleRight="-22px"
           style={{ gridColumn: '4 / 5', gridRow: '9 / 16' }}
         />
 
@@ -211,49 +243,65 @@ function ConstructorPdpPage() {
           initialSettings={PDP_PRICE_SETTINGS}
           presetVersion={PDP_PRESET_VERSION}
           renderHandle
-          handleRight="4px"
-          style={{ gridColumn: '4 / 5', gridRow: '16 / 17', alignSelf: 'center' }}
+          handleRight="-22px"
+          style={{ gridColumn: '4 / 5', gridRow: '15 / 16', alignSelf: 'center' }}
         />
 
         <div
           style={{
             gridColumn: '4 / 5',
-            gridRow: '17 / 18',
+            gridRow: '16 / 17',
             minHeight: 0,
-            display: 'grid',
-            gridTemplateColumns: `repeat(${SIZES.length}, minmax(0, 1fr))`,
-            columnGap: 10,
             alignSelf: 'center',
-            justifySelf: 'start',
-            width: '75%',
             height: '100%',
+            display: 'flex',
+            alignItems: 'center',
           }}
         >
-          {SIZES.map((size) => {
-            const isSelected = size === selectedSize;
-            return (
-              <button
-                key={`size-${size}`}
-                type="button"
-                onClick={() => setSelectedSize(size)}
-                className={`relative flex h-full w-full items-center justify-center transition-all duration-200 active:scale-95 ${isSelected ? 'bg-[#475059] text-whiteStrong' : 'bg-muted text-[#475059] hover:text-muted-foreground'}`}
-                style={{
-                  borderRadius: 'clamp(2.81px, 0.8vw, 5.06px)',
-                  fontFamily: `${sizeButtonTextSettings.fontFamily}, sans-serif`,
-                  fontSize: `${sizeButtonTextSettings.fontSize}pt`,
-                  fontWeight: isSelected ? sizeButtonTextSettings.selectedFontWeight : sizeButtonTextSettings.fontWeight,
-                  letterSpacing: `${sizeButtonTextSettings.letterSpacing}em`,
-                  lineHeight: sizeButtonTextSettings.lineHeight,
-                  textTransform: sizeButtonTextSettings.textTransform,
-                  cursor: 'pointer',
-                  border: 'none',
-                  padding: 0,
-                }}
-              >
-                {size}
-              </button>
-            );
-          })}
+          <div
+            style={{
+              display: 'flex',
+              backgroundColor: '#f3f4f6',
+              padding: '2px',
+              borderRadius: 'clamp(2.81px, 0.8vw, 5.06px)',
+              border: '1px solid #e5e7eb',
+              width: '100%',
+              height: '100%',
+              boxSizing: 'border-box',
+            }}
+          >
+            {SIZES.map((size) => {
+              const isSelected = size === selectedSize;
+              return (
+                <button
+                  key={`size-${size}`}
+                  type="button"
+                  onClick={() => setSelectedSize(size)}
+                  style={{
+                    flex: 1,
+                    fontFamily: `${sizeButtonTextSettings.fontFamily}, sans-serif`,
+                    fontSize: `${sizeButtonTextSettings.fontSize}pt`,
+                    fontWeight: isSelected ? sizeButtonTextSettings.selectedFontWeight : sizeButtonTextSettings.fontWeight,
+                    letterSpacing: `${sizeButtonTextSettings.letterSpacing}em`,
+                    lineHeight: sizeButtonTextSettings.lineHeight,
+                    textTransform: sizeButtonTextSettings.textTransform,
+                    color: isSelected ? '#111827' : '#9ca3af',
+                    backgroundColor: isSelected ? '#ffffff' : 'transparent',
+                    border: 'none',
+                    borderRadius: 'clamp(2.11px, 0.6vw, 3.8px)',
+                    cursor: 'pointer',
+                    transition: 'all 150ms ease',
+                    boxShadow: isSelected ? '0 1px 2px rgba(0,0,0,0.05)' : 'none',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                >
+                  {size}
+                </button>
+              );
+            })}
+          </div>
         </div>
 
         {/* Handle d'edició per als botons de talles (mode columns) */}
@@ -268,14 +316,14 @@ function ConstructorPdpPage() {
           onSettingsChange={setSizeButtonTextSettings}
           initialSettings={PDP_SIZE_SETTINGS}
           presetVersion={PDP_PRESET_VERSION}
-          handleRight="4px"
-          style={{ gridColumn: '4 / 5', gridRow: '17 / 18', zIndex: 10, pointerEvents: 'none' }}
+          handleRight="-22px"
+          style={{ gridColumn: '4 / 5', gridRow: '16 / 17', zIndex: 100005, width: 0, height: 0, justifySelf: 'end' }}
         />
 
         <button
           type="button"
           aria-label="Afegeix al cistell"
-          className="bg-muted text-[#475059] transition-all duration-200 hover:bg-[#475059] hover:text-whiteStrong active:scale-95"
+          className="bg-muted text-[#475059] transition-all duration-200 hover:bg-white hover:text-[#111827] hover:shadow-sm active:scale-95"
           style={{
             gridColumn: '4 / 5',
             gridRow: '19 / 20',
@@ -283,7 +331,7 @@ function ConstructorPdpPage() {
             height: '100%',
             minWidth: 0,
             minHeight: 0,
-            border: 'none',
+            border: '1px solid #e5e7eb',
             borderRadius: 'clamp(2.81px, 0.8vw, 5.06px)',
             padding: 0,
             cursor: 'pointer',
@@ -300,13 +348,29 @@ function ConstructorPdpPage() {
             gap: 12,
           }}
         >
-          <img
-            src="/custom_logos/icons/v3-buit.svg"
-            alt=""
-            aria-hidden="true"
-            draggable="false"
-            style={{ width: 'calc(1.2em - 1px)', height: 'calc(1.2em - 1px)', objectFit: 'contain', display: 'block', transform: 'translateY(-2px)' }}
-          />
+          <svg
+            width="calc(1.2em - 1px)"
+            height="calc(1.2em - 1px)"
+            viewBox="0 0 70 69"
+            style={{
+              fillRule: 'evenodd',
+              clipRule: 'evenodd',
+              strokeLinejoin: 'round',
+              strokeMiterlimit: 2,
+              display: 'block',
+              transform: 'translateY(-2px)',
+              fill: 'currentColor',
+            }}
+          >
+            <rect id="v3-buit" x="0" y="0.852" width="70" height="68" style={{ fill: 'none' }} />
+            <g clipPath="url(#_clip1_cta)">
+              <clipPath id="_clip1_cta">
+                <rect x="0" y="0.852" width="70" height="68" />
+              </clipPath>
+              <path d="M-0.004,16.609l70.007,0l-5.013,39.965c-1.062,8.376 -5.433,12.278 -13.816,12.278l-32.337,0c-8.384,0 -12.754,-3.902 -13.804,-12.278l-5.038,-39.965Zm64.335,5.034l-58.664,0l4.321,34.299c0.343,2.734 1.031,4.826 2.499,6.146l0.004,0.004c1.483,1.318 3.625,1.739 6.346,1.739l32.337,0c2.721,0 4.863,-0.422 6.342,-1.736c1.486,-1.322 2.164,-3.416 2.508,-6.154l4.308,-34.298Z" />
+              <path d="M24.674,26.676c0.512,5.307 4.943,9.468 10.338,9.468c5.384,0 9.814,-4.161 10.326,-9.468l-3.265,0c-0.496,3.493 -3.478,6.183 -7.06,6.183c-3.594,0 -6.577,-2.69 -7.073,-6.183l-3.265,0Z" />
+            </g>
+          </svg>
           AFEGEIX AL CISTELL
         </button>
 
@@ -319,7 +383,7 @@ function ConstructorPdpPage() {
           renderText={false}
           renderHandle
           onSettingsChange={setCtaTextSettings}
-          handleRight="4px"
+          handleRight="-22px"
           style={{ gridColumn: '4 / 5', gridRow: '19 / 20', zIndex: 10, pointerEvents: 'none' }}
         />
 
@@ -423,17 +487,106 @@ function ConstructorPdpPage() {
                 userSelect: 'none',
               }}
             />
-            {/* Fletxes carrusel a la cantonada inferior esquerra */}
-            <div style={{ position: 'absolute', left: 0, bottom: 0, width: 0, height: 0 }}>
-              <CarouselArrows
-                leftPx={0}
-                topPx={-44}
-                onPrev={goPrevVariant}
-                onNext={goNextVariant}
-                prevLabel="Variant anterior"
-                nextLabel="Variant següent"
-              />
-            </div>
+          </div>
+        </div>
+
+        {/* Fletxes carrusel: directament al grid principal a la fila 19, columna 2 */}
+        <div
+          style={{
+            gridColumn: '2 / 3',
+            gridRow: '19 / 20',
+            position: 'relative',
+            width: '100%',
+            height: '100%',
+            minHeight: 0,
+          }}
+        >
+          <CarouselArrows
+            leftPx={0}
+            topPx={0}
+            onPrev={goPrevVariant}
+            onNext={goNextVariant}
+            prevLabel="Variant anterior"
+            nextLabel="Variant següent"
+            rowHeight={rowHeight - 3}
+          />
+        </div>
+
+        {/* Subtítol "ALTRES HISTÒRIES" - Alineat en Y amb les fletxes (fila 50) i en X a l'esquerra de la col 1 */}
+        <div
+          style={{
+            gridColumn: '1 / 3',
+            gridRow: '50 / 51',
+            alignSelf: 'center',
+            fontFamily: 'Roboto Condensed, sans-serif',
+            fontWeight: 400,
+            fontSize: '15pt',
+            lineHeight: 1.2,
+            letterSpacing: '0.2em',
+            textTransform: 'uppercase',
+            color: 'rgba(71, 80, 89, 0.7)',
+            textAlign: 'left',
+          }}
+        >
+          ALTRES HISTÒRIES
+        </div>
+
+        {/* Fletxes També et pot interessar: directament al grid a la fila 50, columna 4 (alineat a la dreta) */}
+        <div
+          style={{
+            gridColumn: '4 / 5',
+            gridRow: '50 / 51',
+            position: 'relative',
+            width: '100%',
+            height: '100%',
+            minHeight: 0,
+          }}
+        >
+          <CarouselArrows
+            rightPx={0}
+            topPx={0}
+            onPrev={() => {
+              console.log('Dispatching tambe-rail:prev');
+              window.dispatchEvent(new CustomEvent('tambe-rail:prev'));
+            }}
+            onNext={() => {
+              console.log('Dispatching tambe-rail:next');
+              window.dispatchEvent(new CustomEvent('tambe-rail:next'));
+            }}
+            rowHeight={rowHeight - 3}
+          />
+        </div>
+
+        {/* TEXT POSTER GRAN (Fila 32 / 38) - Centrat a la pàgina amb un padding top de 50px respecte la PDP */}
+        <div
+          style={{
+            gridColumn: '1 / 5',
+            gridRow: '32 / 38',
+            paddingTop: '50px',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          <div
+            style={{
+              textAlign: 'left',
+              fontFamily: 'Oswald, sans-serif',
+              fontSize: '60pt',
+              fontWeight: 300,
+              lineHeight: 1.1,
+              letterSpacing: '0.04em',
+              textTransform: 'uppercase',
+              color: '#111827',
+            }}
+          >
+            <div>CADA</div>
+            <div>PERSONA TÉ</div>
+            <div>UNA HISTÒRIA,</div>
+            <div style={{ marginTop: '0.4em' }}>CADA</div>
+            <div>HISTÒRIA TÉ</div>
+            <div>UN DIBUIX</div>
           </div>
         </div>
 
@@ -496,12 +649,94 @@ function ConstructorPdpPage() {
           </div>
         ))}
 
-      </Pauta4ColsOverlay>
+        {/* PASTILLA SEGMENTADA (Fila 17, Columna 4) */}
+        <div
+          style={{
+            gridColumn: '4 / 5',
+            gridRow: '17 / 18',
+            alignSelf: 'center',
+            height: '100%',
+            display: 'flex',
+            alignItems: 'center',
+            minHeight: 0,
+          }}
+        >
+          <div
+            style={{
+              display: 'flex',
+              backgroundColor: '#f3f4f6',
+              padding: '2px',
+              borderRadius: 'clamp(2.81px, 0.8vw, 5.06px)',
+              border: '1px solid #e5e7eb',
+              width: '100%',
+              height: '100%',
+              boxSizing: 'border-box',
+            }}
+          >
+            {['BLANC', 'COLOR', 'NEGRE'].map((opt) => {
+              const isActive = selectedFinish === opt;
+              return (
+                <button
+                  key={opt}
+                  type="button"
+                  onClick={() => setSelectedFinish(opt)}
+                  style={{
+                    flex: 1,
+                    fontFamily: `${finishButtonTextSettings.fontFamily}, sans-serif`,
+                    fontSize: `${finishButtonTextSettings.fontSize}pt`,
+                    fontWeight: isActive ? finishButtonTextSettings.selectedFontWeight : finishButtonTextSettings.fontWeight,
+                    letterSpacing: `${finishButtonTextSettings.letterSpacing}em`,
+                    lineHeight: finishButtonTextSettings.lineHeight,
+                    textTransform: finishButtonTextSettings.textTransform,
+                    color: isActive ? '#111827' : '#9ca3af',
+                    backgroundColor: isActive ? '#ffffff' : 'transparent',
+                    border: 'none',
+                    borderRadius: 'clamp(2.11px, 0.6vw, 3.8px)',
+                    cursor: 'pointer',
+                    transition: 'all 150ms ease',
+                    boxShadow: isActive ? '0 1px 2px rgba(0,0,0,0.05)' : 'none',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                >
+                  {opt}
+                </button>
+              );
+            })}
+          </div>
+        </div>
 
-      {/* ─── Bloc "També et pot interessar" (rail Nike) ─── */}
-      <div style={{ marginTop: '-102px' }}>
-        <TambeRail cardHref="/constructor/pdp" title="cada peça té una història" />
-      </div>
+        {/* Handle d'edició per al selector d'acabats/colors (Declarat desprès per z-index / ordre DOM) */}
+        <EditableTextBox
+          id="pdp-finish-buttons"
+          initialText="BLANC COLOR NEGRE"
+          columns={FINISHES}
+          selectedColumn={selectedFinish}
+          onColumnSelect={setSelectedFinish}
+          renderText={false}
+          renderHandle
+          onSettingsChange={setFinishButtonTextSettings}
+          initialSettings={PDP_SIZE_SETTINGS}
+          presetVersion={PDP_PRESET_VERSION}
+          handleRight="-22px"
+          style={{ gridColumn: '4 / 5', gridRow: '17 / 18', zIndex: 100005, width: 0, height: 0, justifySelf: 'end' }}
+        />
+
+        {/* ─── Bloc "També et pot interessar" (rail Nike) - Dins de la graella de la pauta alineat al top de la fila 48 ─── */}
+        <div
+          style={{
+            gridColumn: '1 / 5',
+            gridRow: '48 / 65',
+            alignSelf: 'start',
+            width: '100%',
+            marginTop: '-48px', // Ajustat 3px addicionals cap amunt per a una alineació visual mil·limètrica
+          }}
+        >
+          <TambeRail cardHref="/constructor/pdp" title="cada dibuix té una història" showInternalArrows={false} showTitle={false} />
+        </div>
+
+      </Pauta4ColsOverlay>
 
 
       <div
