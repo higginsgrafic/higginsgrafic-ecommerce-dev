@@ -78,13 +78,7 @@ function writeBool(key, value) {
 }
 
 function useBoolFlag(key, defaultValue) {
-  let location;
-  try {
-    location = useLocation();
-  } catch {
-    location = { search: '' };
-  }
-
+  const location = useLocation();
   const [value, setValue] = useState(() => readBool(key, defaultValue));
 
   useEffect(() => {
