@@ -2,6 +2,8 @@ import { Helmet } from 'react-helmet';
 import { Link } from 'react-router-dom';
 import NikeHeroSlider from '@/components/NikeHeroSlider';
 import TdpVariantsGallery from '@/components/tdp/TdpVariantsGallery';
+import Pauta4ColsOverlay from '@/components/pauta/Pauta4ColsOverlay';
+import Breadcrumbs from '@/components/Breadcrumbs';
 
 const HERO_SLIDES = [
   {
@@ -114,41 +116,85 @@ function HomeClean() {
         />
       </Helmet>
 
-      <section className="bg-background text-foreground">
-        <div className="mx-auto max-w-[1400px] px-4 pb-12 pt-8 sm:px-6 lg:px-10 lg:pb-16 lg:pt-10">
-          <nav>
-            <ol className="flex items-center space-x-2 font-roboto text-sm uppercase text-foreground">
-              <li>
-                <Link to="/" className="text-foreground transition-colors hover:text-muted-foreground">
-                  Inici
-                </Link>
-              </li>
-              <li className="text-muted-foreground">›</li>
-              <li>
-                <Link to="/first-contact" className="text-foreground transition-colors hover:text-muted-foreground">
-                  Col·leccions
-                </Link>
-              </li>
-              <li className="text-muted-foreground">›</li>
-              <li className="font-medium text-foreground">
-                POD
-              </li>
-            </ol>
-          </nav>
-          <h1 className="mt-6 max-w-4xl font-roboto text-5xl font-black tracking-tight text-foreground sm:text-6xl lg:text-7xl">
-            HIGGINS GRÀFIC
-          </h1>
-          <p className="mt-6 max-w-2xl font-roboto text-base leading-relaxed text-muted-foreground sm:text-lg">
-            Samarretes gràfiques d'autor, roba unisex i col·leccions pròpies produïdes sota demanda.
-          </p>
+      <Pauta4ColsOverlay
+        pautaEnabled={false}
+        tableEnabled={false}
+        numCols={3}
+        numRows={24}
+        canvasAspect={[2642, 1780]}
+        topOffset="0px"
+        bottomPadding="0px"
+      >
+        {/* Breadcrumbs (fila 2 / 3) */}
+        <div
+          style={{
+            gridColumn: '1 / 4',
+            gridRow: '2 / 3',
+            alignSelf: 'center',
+          }}
+        >
+          <Breadcrumbs
+            items={[
+              { label: 'Col·leccions', link: '/first-contact' },
+              { label: 'POD' },
+            ]}
+          />
         </div>
-      </section>
 
-      <NikeHeroSlider
-        slides={HERO_SLIDES}
-        autoplay
-        autoplayIntervalMs={8000}
-      />
+        {/* Títol (fila 3 / 6) */}
+        <h1
+          style={{
+            gridColumn: '1 / 4',
+            gridRow: '3 / 6',
+            alignSelf: 'center',
+            fontFamily: 'Roboto, sans-serif',
+            fontSize: 'clamp(3rem, 6.5vw, 4.5rem)',
+            fontWeight: 900,
+            letterSpacing: '-0.02em',
+            lineHeight: 1,
+            textTransform: 'uppercase',
+            margin: 0,
+          }}
+        >
+          HIGGINS GRÀFIC
+        </h1>
+
+        {/* Subtítol descripció (fila 6 / 8) */}
+        <p
+          style={{
+            gridColumn: '1 / 4',
+            gridRow: '6 / 8',
+            alignSelf: 'start',
+            fontFamily: 'Roboto, sans-serif',
+            fontSize: 'clamp(1rem, 1.5vw, 1.125rem)',
+            color: 'rgb(115, 115, 115)',
+            lineHeight: 1.5,
+            margin: 0,
+          }}
+        >
+          Samarretes gràfiques d'autor, roba unisex i col·leccions pròpies produïdes sota demanda.
+        </p>
+
+        {/* Hero Slider Carrussel (fila 9 / 24 — amplada total de col 1 a col 5) */}
+        <div
+          style={{
+            gridColumn: '1 / 4',
+            gridRow: '9 / 24',
+            position: 'relative',
+            top: '1px',
+            width: 'calc(100% + 1px)',
+            height: 'calc(100% + 2px)',
+          }}
+        >
+          <NikeHeroSlider
+            slides={HERO_SLIDES}
+            autoplay
+            autoplayIntervalMs={8000}
+            className="h-full"
+            flush
+          />
+        </div>
+      </Pauta4ColsOverlay>
 
       <section className="bg-background text-foreground">
         <div className="mx-auto max-w-[1400px] px-4 pt-[348px] pb-[174px] sm:px-6 lg:px-10">

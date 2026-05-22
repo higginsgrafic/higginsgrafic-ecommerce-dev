@@ -102,10 +102,8 @@ function ConstructorColleccioPage() {
       </Helmet>
 
       <Pauta4ColsOverlay
-        pautaEnabled
-        tableEnabled
-        pautaOpacity={pautaOpacity}
-        tableOpacity={tableOpacity}
+        pautaEnabled={false}
+        tableEnabled={false}
         topOffset="0px"
         bottomPadding="0px"
       >

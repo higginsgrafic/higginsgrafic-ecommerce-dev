@@ -13,8 +13,8 @@ function HtmlBasePage({ pautaEnabled = false, tableEnabled = false }) {
       </Helmet>
 
       <Pauta4ColsOverlay
-        pautaEnabled={pautaEnabled || true}
-        tableEnabled={tableEnabled || true}
+        pautaEnabled={false}
+        tableEnabled={false}
         topOffset="0px"
         bottomPadding="0px"
       />

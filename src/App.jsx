@@ -33,6 +33,7 @@ import SupabaseCollectionRoute from '@/pages/SupabaseCollectionRoute.jsx';
 import DevGuidesOverlay from '@/components/DevGuidesOverlay.jsx';
 import BeltReferenceOverlay from '@/components/dev/BeltReferenceOverlay.jsx';
 import SiteFrame from '@/components/layout/SiteFrame.jsx';
+import Pauta4ColsOverlay from '@/components/pauta/Pauta4ColsOverlay';
 import SlideShell from '@/components/SlideShell';
 import useSlidesConfig from '@/hooks/useSlidesConfig';
 import useComponentCatalogConfig from '@/hooks/useComponentCatalogConfig';
@@ -263,41 +264,12 @@ function App() {
     }
   })();
   const [guidesEnabled, setGuidesEnabled] = useState(guidesEnabledFromUrl);
+  const [copiedDesign, setCopiedDesign] = useState(false);
   const [belt2GuidesEnabled, setBelt2GuidesEnabled] = useState(() => {
     try {
       const sp = new URLSearchParams(window.location.search);
       if (sp.has('belt2')) return sp.get('belt2') !== '0';
       const raw = window.localStorage.getItem('HG_BELT2_GUIDES_ENABLED_V1');
-      return raw === '1';
-    } catch {
-      return false;
-    }
-  });
-  const [checkoutPautaEnabled, setCheckoutPautaEnabled] = useState(() => {
-    try {
-      const sp = new URLSearchParams(window.location.search);
-      if (sp.has('pauta')) return sp.get('pauta') === '1';
-      const raw = window.localStorage.getItem('HG_CHECKOUT_PAUTA_ENABLED_V1');
-      return raw === '1';
-    } catch {
-      return false;
-    }
-  });
-  const [tdpPautaEnabled, setTdpPautaEnabled] = useState(() => {
-    try {
-      const sp = new URLSearchParams(window.location.search);
-      if (sp.has('tdpPauta')) return sp.get('tdpPauta') === '1';
-      const raw = window.localStorage.getItem('HG_TDP_PAUTA_ENABLED_V1');
-      return raw === '1';
-    } catch {
-      return false;
-    }
-  });
-  const [tdpTableEnabled, setTdpTableEnabled] = useState(() => {
-    try {
-      const sp = new URLSearchParams(window.location.search);
-      if (sp.has('tdpTable')) return sp.get('tdpTable') === '1';
-      const raw = window.localStorage.getItem('HG_TDP_TABLE_ENABLED_V1');
       return raw === '1';
     } catch {
       return false;
@@ -317,27 +289,6 @@ function App() {
       // ignore
     }
   }, [belt2GuidesEnabled]);
-  useEffect(() => {
-    try {
-      window.localStorage.setItem('HG_CHECKOUT_PAUTA_ENABLED_V1', checkoutPautaEnabled ? '1' : '0');
-    } catch {
-      // ignore
-    }
-  }, [checkoutPautaEnabled]);
-  useEffect(() => {
-    try {
-      window.localStorage.setItem('HG_TDP_PAUTA_ENABLED_V1', tdpPautaEnabled ? '1' : '0');
-    } catch {
-      // ignore
-    }
-  }, [tdpPautaEnabled]);
-  useEffect(() => {
-    try {
-      window.localStorage.setItem('HG_TDP_TABLE_ENABLED_V1', tdpTableEnabled ? '1' : '0');
-    } catch {
-      // ignore
-    }
-  }, [tdpTableEnabled]);
   useEffect(() => {
     try {
       window.localStorage.setItem('HG_MEGA_ACCORDION_LOCKED_V1', megaAccordionLocked ? '1' : '0');
@@ -2100,7 +2051,19 @@ function App() {
   const productContext = useProductContext();
   const { isAdmin, bypassUnderConstruction } = useAdmin();
   const { tools, toggleTool } = useAdminTools();
-  const { debugsEnabled: debugOverlaysEnabled, rulersEnabled: rulersOverlayEnabled } = useDebugOverlays();
+  const {
+    debugsEnabled: debugOverlaysEnabled,
+    rulersEnabled: rulersOverlayEnabled,
+    pdpControlsEnabled,
+    pautaEnabled,
+    setPautaEnabled,
+    tableEnabled,
+    setTableEnabled,
+    pautaOpacity,
+    setPautaOpacity,
+    tableOpacity,
+    setTableOpacity,
+  } = useDebugOverlays();
   const { enabled: offersEnabled, loading: offersLoading } = useOffersConfig();
   const { shouldRedirect, redirectUrl, loading: redirectLoading } = useGlobalRedirect(bypassUnderConstruction);
 
@@ -3149,11 +3112,11 @@ function App() {
 
                 <Route
                   path="/full-wide-slide"
-                  element={<FullWideSlidePage pautaEnabled={tdpPautaEnabled} tableEnabled={tdpTableEnabled} />}
+                  element={<FullWideSlidePage pautaEnabled={false} tableEnabled={false} />}
                 />
                 <Route
                   path="/constructor/full-wide-slide"
-                  element={<FullWideSlidePage pautaEnabled={tdpPautaEnabled} tableEnabled={tdpTableEnabled} />}
+                  element={<FullWideSlidePage pautaEnabled={false} tableEnabled={false} />}
                 />
 
                 <Route path="/plantilla-cataleg-components" element={<PlantillaCatalegComponentsPage />} />
@@ -3165,7 +3128,7 @@ function App() {
                     <CheckoutPage
                       cartItems={[]}
                       onClearCart={clearCart}
-                      pautaEnabled={checkoutPautaEnabled}
+                      pautaEnabled={pautaEnabled}
                       mockMode="single"
                     />
                   }
@@ -3198,17 +3161,17 @@ function App() {
                 <Route path="/offers" element={<OffersPage />} />
                 <Route
                   path="/constructor/tdp"
-                  element={<TdpPage pautaEnabled={tdpPautaEnabled} tableEnabled={tdpTableEnabled} />}
+                  element={<TdpPage pautaEnabled={false} tableEnabled={false} />}
                 />
                 <Route path="/tdp" element={<Navigate to="/constructor/tdp" replace />} />
                 <Route
                   path="/constructor/colleccio"
-                  element={<ConstructorColleccioPage pautaEnabled={tdpPautaEnabled} tableEnabled={tdpTableEnabled} />}
+                  element={<ConstructorColleccioPage pautaEnabled={false} tableEnabled={false} />}
                 />
                 <Route path="/constructor/pdp" element={<ConstructorPdpPage />} />
                 <Route
                   path="/constructor/html-base"
-                  element={<HtmlBasePage pautaEnabled={tdpPautaEnabled} tableEnabled={tdpTableEnabled} />}
+                  element={<HtmlBasePage pautaEnabled={false} tableEnabled={false} />}
                 />
 
                 <Route path="/new" element={<NewPage />} />
@@ -5861,62 +5824,6 @@ function App() {
                       </button>
                     </div>
 
-                    <button
-                      type="button"
-                      title="Activa/desactiva la pauta del checkout"
-                      aria-label="Pauta"
-                      aria-pressed={checkoutPautaEnabled ? 'true' : 'false'}
-                      className={`relative z-10 h-12 rounded-full border px-4 text-[12px] font-semibold shadow-lg active:bg-black/10 debug-exempt ${
-                        checkoutPautaEnabled
-                          ? 'border-[#F97316]/40 bg-[#F97316]/15 text-[#7C2D12] hover:bg-[#F97316]/20'
-                          : 'border-black/15 bg-white text-black/80 hover:bg-black/5'
-                      }`}
-                      onClick={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        setCheckoutPautaEnabled((v) => !v);
-                      }}
-                    >
-                      Pauta
-                    </button>
-
-                    <button
-                      type="button"
-                      title="Activa/desactiva la pauta del TDP"
-                      aria-label="TDP pauta"
-                      aria-pressed={tdpPautaEnabled ? 'true' : 'false'}
-                      className={`relative z-10 h-12 rounded-full border px-4 text-[12px] font-semibold shadow-lg active:bg-black/10 debug-exempt ${
-                        tdpPautaEnabled
-                          ? 'border-[#0EA5E9]/40 bg-[#0EA5E9]/15 text-[#075985] hover:bg-[#0EA5E9]/20'
-                          : 'border-black/15 bg-white text-black/80 hover:bg-black/5'
-                      }`}
-                      onClick={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        setTdpPautaEnabled((v) => !v);
-                      }}
-                    >
-                      TDP Pauta
-                    </button>
-
-                    <button
-                      type="button"
-                      title="Activa/desactiva la taula del TDP"
-                      aria-label="TDP taula"
-                      aria-pressed={tdpTableEnabled ? 'true' : 'false'}
-                      className={`relative z-10 h-12 rounded-full border px-4 text-[12px] font-semibold shadow-lg active:bg-black/10 debug-exempt ${
-                        tdpTableEnabled
-                          ? 'border-[#8B5CF6]/40 bg-[#8B5CF6]/15 text-[#4C1D95] hover:bg-[#8B5CF6]/20'
-                          : 'border-black/15 bg-white text-black/80 hover:bg-black/5'
-                      }`}
-                      onClick={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        setTdpTableEnabled((v) => !v);
-                      }}
-                    >
-                      TDP Taula
-                    </button>
 
                     <button
                       type="button"
@@ -5961,6 +5868,18 @@ function App() {
             <SiteFrame />
             <BeltReferenceOverlay enabled={belt2GuidesEnabled} />
 
+            {(pautaEnabled || tableEnabled) && (
+              <Pauta4ColsOverlay
+                overlay
+                pautaEnabled={pautaEnabled}
+                tableEnabled={tableEnabled}
+                pautaOpacity={pautaOpacity}
+                tableOpacity={tableOpacity}
+                topOffset={isFullScreenRoute ? '0px' : appHeaderOffset}
+                numCols={isHomeRoute ? 3 : 4}
+              />
+            )}
+
             {clicksEnabled && clickMarks.length > 0 && (
               <div
                 className="fixed inset-0 z-[99998] pointer-events-none debug-exempt"
@@ -5983,10 +5902,176 @@ function App() {
                 ))}
               </div>
             )}
+
+            {pdpControlsEnabled && (
+              <div
+                className="font-mono text-neutral-800 debug-exempt"
+                style={{
+                  position: 'fixed',
+                  right: 16,
+                  top: 170,
+                  width: 260,
+                  zIndex: 100000,
+                  background: 'rgba(255,255,255,0.96)',
+                  border: '1px solid rgba(0,0,0,0.10)',
+                  borderRadius: 10,
+                  padding: 12,
+                  fontSize: 12,
+                  boxShadow: '0 6px 24px rgba(0,0,0,0.12)',
+                }}
+              >
+                <strong className="mb-2 block">Controls Guies</strong>
+                <ToggleRow
+                  label="Pauta"
+                  checked={pautaEnabled}
+                  onChange={(v) => setPautaEnabled(v)}
+                />
+                <OpacitySlider
+                  label="Opacitat pauta"
+                  value={pautaOpacity}
+                  onChange={(v) => setPautaOpacity(v)}
+                  disabled={!pautaEnabled}
+                />
+                <ToggleRow
+                  label="Taula + numeració"
+                  checked={tableEnabled}
+                  onChange={(v) => setTableEnabled(v)}
+                />
+                <OpacitySlider
+                  label="Opacitat taula"
+                  value={tableOpacity}
+                  onChange={(v) => setTableOpacity(v)}
+                  disabled={!tableEnabled}
+                />
+                
+                {location.pathname === '/constructor/pdp' && (
+                  <div className="mt-4 border-t border-neutral-200 pt-3 flex flex-col gap-2">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const pkg = getPdpDesignPackage();
+                        if (pkg) {
+                          navigator.clipboard.writeText(pkg)
+                            .then(() => {
+                              setCopiedDesign(true);
+                              setTimeout(() => setCopiedDesign(false), 2000);
+                            })
+                            .catch((err) => console.error('Error copiant el disseny:', err));
+                        }
+                      }}
+                      className={`w-full py-2 px-3 rounded text-center text-[11px] font-semibold transition-all duration-200 ${
+                        copiedDesign 
+                          ? 'bg-green-600 text-white' 
+                          : 'bg-orange-600 hover:bg-orange-700 text-white shadow-sm active:scale-[0.98]'
+                      }`}
+                    >
+                      {copiedDesign ? 'Codi copiat! 📋' : 'Copiar codi disseny'}
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const code = window.prompt("Enganxa el codi de disseny copiat d'un altre navegador:");
+                        if (code) {
+                          const applied = applyPdpDesignPackage(code.trim());
+                          if (applied) {
+                            window.location.reload();
+                          } else {
+                            window.alert("El codi és invàlid o no s'ha pogut importar.");
+                          }
+                        }
+                      }}
+                      className="w-full py-2 px-3 rounded text-center text-[11px] font-semibold bg-neutral-100 hover:bg-neutral-200 text-neutral-800 border border-neutral-300 shadow-sm active:scale-[0.98] transition-all duration-200"
+                    >
+                      Enganxar codi disseny
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
       </>
     )}
     </ErrorBoundary>
   );
+}
+
+function ToggleRow({ label, checked, onChange }) {
+  return (
+    <label className="mb-2 flex items-center justify-between gap-3 text-[12px] text-neutral-800">
+      <span>{label}</span>
+      <input
+        type="checkbox"
+        checked={checked}
+        onChange={(event) => onChange(event.target.checked)}
+        className="h-4 w-4 accent-orange-600"
+      />
+    </label>
+  );
+}
+
+function OpacitySlider({ label, value, onChange, disabled = false }) {
+  return (
+    <label className={`mb-2 block ${disabled ? 'opacity-50' : ''}`}>
+      <div className="flex items-center justify-between text-[11px] text-neutral-700">
+        <span>{label}</span>
+        <span className="tabular-nums text-neutral-900">{value.toFixed(2)}</span>
+      </div>
+      <input
+        type="range"
+        min={0}
+        max={1}
+        step={0.05}
+        value={value}
+        disabled={disabled}
+        onChange={(event) => onChange(parseFloat(event.target.value))}
+        className="w-full accent-orange-600"
+      />
+    </label>
+  );
+}
+
+function getPdpDesignPackage() {
+  const data = {};
+  try {
+    for (let i = 0; i < window.localStorage.length; i++) {
+      const key = window.localStorage.key(i);
+      if (key && (key.startsWith('HG_EDITABLE_TEXT_BOX_V1:pdp-') || key.startsWith('hg.globalOverlays.'))) {
+        data[key] = window.localStorage.getItem(key);
+      }
+    }
+    const json = JSON.stringify(data);
+    const base64 = btoa(encodeURIComponent(json).replace(/%([0-9A-F]{2})/g, (match, p1) => {
+      return String.fromCharCode(parseInt(p1, 16));
+    }));
+    return base64;
+  } catch (e) {
+    console.error('Error empaquetant disseny:', e);
+    return null;
+  }
+}
+
+function applyPdpDesignPackage(base64) {
+  if (!base64) return false;
+  try {
+    const json = decodeURIComponent(Array.prototype.map.call(atob(base64), (c) => {
+      return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+    }).join(''));
+    const data = JSON.parse(json);
+    let changed = false;
+    for (const key in data) {
+      if (key.startsWith('HG_EDITABLE_TEXT_BOX_V1:pdp-') || key.startsWith('hg.globalOverlays.')) {
+        const current = window.localStorage.getItem(key);
+        if (current !== data[key]) {
+          window.localStorage.setItem(key, data[key]);
+          changed = true;
+        }
+      }
+    }
+    return changed;
+  } catch (e) {
+    console.error('Error desempaquetant disseny:', e);
+    return false;
+  }
 }
 
 export default App;

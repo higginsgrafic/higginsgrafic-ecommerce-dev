@@ -76,9 +76,14 @@ function useReactiveBelt() {
       raf = requestAnimationFrame(apply);
     };
     window.addEventListener('resize', schedule);
+
+    const mo = new MutationObserver(schedule);
+    mo.observe(root, { attributes: true, attributeFilter: ['style'] });
+
     return () => {
       window.removeEventListener('resize', schedule);
       cancelAnimationFrame(raf);
+      mo.disconnect();
     };
   }, []);
 
@@ -163,7 +168,7 @@ export default function Pauta4ColsOverlay({
   // d'una cel·la pot mostrar-se sense afectar la pauta.
   const containerStyle = overlay
     ? {
-        position: 'fixed',
+        position: 'absolute',
         top: 0,
         left: beltLeft,
         width: beltWidth,
@@ -210,8 +215,8 @@ export default function Pauta4ColsOverlay({
   const numbersLeft = `calc((100% - ${totalGutterCalc}) / ${numCols} + (${gutterX}) / 2 - 12px)`;
 
   const markup = (
-    <div className={className} style={{ ...containerStyle, ...style }} data-pauta="4-cols">
-      <div ref={innerRef} style={gridStyle} data-pauta-grid>
+    <div className={className} style={{ ...containerStyle, ...style }} data-pauta="4-cols" data-is-overlay={overlay ? "true" : undefined}>
+      <div ref={innerRef} style={gridStyle} data-pauta-grid data-is-overlay-grid={overlay ? "true" : undefined}>
         {/* Números de fila (ara renderitzats directament dins de la graella principal per a un centrat vertical en Y perfecte) */}
         {tableEnabled
           ? pautaRows.map((rowNumber) => (

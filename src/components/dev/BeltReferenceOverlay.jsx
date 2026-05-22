@@ -28,6 +28,10 @@ const STORAGE_KEY_V2 = 'HG_DEV_BELT2_STATE_V2';
 // Keys legacy per migració (mai escrits per aquesta versió).
 const LEGACY_KEY_GLOBAL = 'HG_BELT2_GLOBAL_V1';
 const LEGACY_KEY_GUIDES = 'HG_BELT_GUIDES_GLOBAL_V1';
+// Constants del canvas de la Pauta4Cols (sincronitzades amb
+// `Pauta4ColsOverlay.jsx`): aspect 2642:6708, 90 files, gap 3px.
+// La guia bottom de belt2 = bottom de la fila `BELT2_BOTTOM_ROW`
+// d'aquesta pauta.
 const PAUTA4_CANVAS_W = 2642;
 const PAUTA4_CANVAS_H = 6708;
 const PAUTA4_ROWS = 90;
@@ -37,7 +41,7 @@ const PAUTA4_ROW_GAP_PX = 3;
 // gaps. Per als botons de mides (gridRow 30/31), volem el bottom de la
 // fila 30 ⇒ `BELT2_BOTTOM_ROW = 30`.
 const BELT2_BOTTOM_ROW = 30;
-const BELT2_BOTTOM_OFFSET_PX = 0;
+const BELT2_BOTTOM_OFFSET_PX = -2;
 
 const EMPTY_STATE = {
   xL: null,
@@ -108,7 +112,6 @@ const loadInitialState = () => {
 export default function BeltReferenceOverlay({ enabled }) {
   const location = useLocation();
   const [state, setState] = useState(loadInitialState);
-
   // Persistència: X, sprite i Y de referència visual (yCarouselTop,
   // yFinalizeBottom). Les Y es persisteixen perquè la guia visual del
   // mega-slide ha de ser visible a TOTES les rutes com a referència. Les
@@ -318,7 +321,7 @@ export default function BeltReferenceOverlay({ enabled }) {
         const r = el?.getBoundingClientRect?.();
         if (!isLaidOut(r)) return null;
         const y = edge === 'bottom' ? r.bottom : r.top;
-        return Number.isFinite(y) ? Math.round(y) : null;
+        return Number.isFinite(y) ? Math.round(y + window.scrollY) : null;
       };
 
       const leftAnchor = document.getElementById('stripe-guide-left-anchor');
@@ -345,6 +348,7 @@ export default function BeltReferenceOverlay({ enabled }) {
       // muntat encara.
       const readVar = (name) => {
         try {
+          if (typeof document === 'undefined') return null;
           const raw = getComputedStyle(document.documentElement).getPropertyValue(name);
           const n = parseFloat(raw);
           return Number.isFinite(n) ? n : null;
@@ -352,8 +356,14 @@ export default function BeltReferenceOverlay({ enabled }) {
           return null;
         }
       };
-      const siteFrameXL = readVar('--site-xL');
-      const siteFrameXR = readVar('--site-xR');
+      const vw = typeof window !== 'undefined' ? window.innerWidth : 0;
+      const computedBeltW = Math.max(320, Math.min(1350, vw - 32));
+      const mathXL = Math.round((vw - computedBeltW) / 2);
+      const mathXR = Math.round(mathXL + computedBeltW);
+
+      const siteFrameXL = readVar('--site-xL') ?? mathXL;
+      const siteFrameXR = readVar('--site-xR') ?? mathXR;
+      const appHeaderOffsetPx = readVar('--appHeaderOffset') ?? 120;
       const xLRaw = Number.isFinite(siteFrameXL)
         ? siteFrameXL
         : (resolveX(headerLogoMarkAnchor, 'left') ?? resolveX(headerLogoAnchor, 'left') ?? resolveX(leftAnchor, 'left') ?? resolveX(cartViewportAnchor, 'left'));
@@ -407,45 +417,54 @@ export default function BeltReferenceOverlay({ enabled }) {
       setState((prev) => {
         const nextXL = Number.isFinite(xL) ? xL : prev.xL;
         const nextXR = Number.isFinite(xR) ? xR : prev.xR;
-        const nextYCarouselTop = Number.isFinite(yCarouselTop) ? yCarouselTop : prev.yCarouselTop;
+        // yCarouselTop és sempre `appHeaderOffsetPx + 33` (TDP_PAGE_TOP_OFFSET).
+        // Això fa que la guia top sigui IDENTICA a totes les rutes i no
+        // depengui de cap anchor del DOM.
+        const nextYCarouselTop = Number.isFinite(appHeaderOffsetPx)
+          ? appHeaderOffsetPx + 33
+          : prev.yCarouselTop;
         const nextYCarouselBottom = Number.isFinite(yCarouselBottom) ? yCarouselBottom : prev.yCarouselBottom;
         // Belt2 BOTTOM derivat: bottom_carrusel + 1px + 737.015 * scale.
         // El càlcul antic usava `yCarouselTop + 737*scale` que ignorava
         // l'alçada del carrusel i deixava la guia ~775px massa amunt.
+        // Bottom de la fila 30: lectura DIRECTA de la graella renderitzada
+        // (`[data-pauta-grid]`). El CSS Grid del component `Pauta4ColsOverlay`
+        // té N tracks de fila; `getComputedStyle(grid).gridTemplateRows`
+        // retorna les N alçades resoltes en píxels. Sumant les primeres 30 +
+        // 29·gap obtenim el bottom de la fila 30 EXACTAMENT al lloc on la
+        // pauta s'ha renderitzat. No hi ha aproximacions ni canvas teòric.
         let derivedPautaBottom = null;
-        // Prioritzem el grid real `[data-pauta-grid]` si existeix al DOM
-        // (cas del constructor). A la home, on no existeix, retrocedim a
-        // `yCarouselTop` (anchor del mega-slide).
-        const pautaGridEl = typeof document !== 'undefined' ? document.querySelector('[data-pauta-grid]') : null;
-        const pautaGridRect = pautaGridEl ? pautaGridEl.getBoundingClientRect() : null;
-        // Preferim mesurar el bottom REAL del track `BELT2_BOTTOM_ROW` via
-        // un fill del grid amb `grid-row-end === BELT2_BOTTOM_ROW + 1`.
-        // El render del browser amb `1fr` + `aspect-ratio` no coincideix
-        // amb la fórmula tancada per sub-pixel rounding acumulat.
-        let domBottomRow = null;
-        if (pautaGridEl) {
-          const targetEnd = String(BELT2_BOTTOM_ROW + 1);
-          for (const child of pautaGridEl.children) {
-            const cs = window.getComputedStyle(child);
-            if (cs.gridRowEnd === targetEnd) {
-              const r = child.getBoundingClientRect();
-              if (Number.isFinite(r.bottom)) {
-                domBottomRow = r.bottom;
-                break;
-              }
+        try {
+          // IMPORTANT: agafem NOMÉS el grid global (overlay canonical de 90
+          // files), no qualsevol `[data-pauta-grid]`. A pàgines com la home
+          // (`/`) hi ha pautes locals (p.ex. `numRows=24` a HomeClean) que
+          // apareixen abans en el DOM i confondrien la lectura: si la primera
+          // que trobéssim no té 30 files, saltaríem al fallback matemàtic
+          // amb un baseline incorrecte i la guia podria quedar fora del
+          // viewport. El grid global té sempre `data-is-overlay-grid="true"`.
+          const grid = document.querySelector('[data-pauta-grid][data-is-overlay-grid="true"]')
+            || document.querySelector('[data-pauta-grid]');
+          const gridRect = grid?.getBoundingClientRect?.();
+          if (grid && gridRect && gridRect.height > 0) {
+            const cs = getComputedStyle(grid);
+            const tracks = cs.gridTemplateRows.split(' ').map(parseFloat).filter(Number.isFinite);
+            const rowGapPx = parseFloat(cs.rowGap) || PAUTA4_ROW_GAP_PX;
+            if (tracks.length >= BELT2_BOTTOM_ROW) {
+              const sumFirstN = tracks.slice(0, BELT2_BOTTOM_ROW).reduce((a, b) => a + b, 0);
+              const gridTopDoc = gridRect.top + window.scrollY;
+              derivedPautaBottom = Math.round(
+                gridTopDoc + sumFirstN + (BELT2_BOTTOM_ROW - 1) * rowGapPx + BELT2_BOTTOM_OFFSET_PX
+              );
             }
           }
+        } catch {
+          // ignore
         }
-        if (Number.isFinite(domBottomRow)) {
-          derivedPautaBottom = Math.round(domBottomRow + BELT2_BOTTOM_OFFSET_PX);
-        } else {
-          // Fallback: fórmula tancada (home / sense grid al DOM).
-          const pautaTopForBottomGuide = Number.isFinite(pautaGridRect?.top)
-            ? pautaGridRect.top
-            : (Number.isFinite(nextYCarouselTop) ? nextYCarouselTop : prev.yCarouselTop);
-          const beltWidthForBottomGuide = Number.isFinite(pautaGridRect?.width)
-            ? pautaGridRect.width
-            : Math.max(0, nextXR - nextXL);
+        // Fallback matemàtic si no hi ha pauta renderitzada: extrapolem
+        // a partir de l'amplada del belt i el canvas teòric (2642x6708).
+        if (!Number.isFinite(derivedPautaBottom)) {
+          const pautaTopForBottomGuide = Number.isFinite(nextYCarouselTop) ? nextYCarouselTop : prev.yCarouselTop;
+          const beltWidthForBottomGuide = Math.max(0, nextXR - nextXL);
           if (Number.isFinite(pautaTopForBottomGuide) && Number.isFinite(beltWidthForBottomGuide) && beltWidthForBottomGuide > 0) {
             const pautaHeight = (beltWidthForBottomGuide * PAUTA4_CANVAS_H) / PAUTA4_CANVAS_W;
             const rowHeight = (pautaHeight - (PAUTA4_ROWS - 1) * PAUTA4_ROW_GAP_PX) / PAUTA4_ROWS;
@@ -468,10 +487,13 @@ export default function BeltReferenceOverlay({ enabled }) {
         //  2) Càlcul derivat de la pauta (files/canvas).
         //  3) Fons del botó FINALITZA (DOM).
         //  4) Valor persistit com a últim recurs.
-        const nextYFinalizeBottom = pautaBottomFromDom
-          ?? derivedPautaBottom
-          ?? finalizeBottomDom
-          ?? prev.yFinalizeBottom;
+        // yFinalizeBottom és **purament derivat** de les altres guies
+        // (xL, xR, yCarouselTop). No depen de cap anchor del DOM:
+        //   yFinalizeBottom = yCarouselTop
+        //                   + 30 · rowHeight
+        //                   + 29 · gap
+        //   on rowHeight = (beltW · 6708/2642 − 89·3) / 90.
+        const nextYFinalizeBottom = derivedPautaBottom ?? prev.yFinalizeBottom;
         const next = {
           xL: nextXL,
           xR: nextXR,
@@ -518,9 +540,7 @@ export default function BeltReferenceOverlay({ enabled }) {
       raf = requestAnimationFrame(read);
     };
 
-    const onScroll = () => schedule();
     window.addEventListener('resize', schedule);
-    window.addEventListener('scroll', onScroll, { capture: true, passive: true });
 
     let ro = null;
     try {
@@ -540,7 +560,6 @@ export default function BeltReferenceOverlay({ enabled }) {
       window.cancelAnimationFrame(r2);
       if (raf) cancelAnimationFrame(raf);
       window.removeEventListener('resize', schedule);
-      window.removeEventListener('scroll', onScroll, { capture: true });
       if (ro) ro.disconnect();
     };
   }, [enabled, location.pathname]);

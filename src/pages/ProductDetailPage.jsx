@@ -10,6 +10,7 @@ import EpisodeDisplay from '@/components/EpisodeDisplay';
 import SEOProductSchema from '@/components/SEOProductSchema';
 import ProductTeaserCard from '@/components/ProductTeaserCard';
 import TEPASection from '@/components/TEPASection';
+import Breadcrumbs from '@/components/Breadcrumbs';
 import { trackProductView, trackAddToCart, trackAddToWishlist, trackShare } from '@/utils/analytics';
 import { useProductContext } from '@/contexts/ProductContext';
 import { useToast } from '@/contexts/ToastContext';
@@ -1110,13 +1111,12 @@ const ProductDetailPage = ({ onAddToCart, cartItems = [], onUpdateQuantity, lang
       <div className="min-h-screen bg-white">
         <div className="max-w-7xl mx-auto px-4 lg:px-8">
           <nav className="pt-[8px] lg:pt-[10px] pb-4 ml-[5px] -mt-[25px]">
-            <ol className="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm uppercase">
-              <li><Link to="/" className="text-gray-500 hover:text-gray-900 transition-colors">Inici</Link></li>
-              <ChevronRight className="h-4 w-4 text-gray-400" />
-              <li><Link to={`/${product.collection}`} className="text-gray-500 hover:text-gray-900 transition-colors">{humanizeLabel(product.collection)}</Link></li>
-              <ChevronRight className="h-4 w-4 text-gray-400" />
-              <li className="text-gray-900 font-medium break-words">{formatProductName(product.name)}</li>
-            </ol>
+            <Breadcrumbs
+              items={[
+                { label: humanizeLabel(product.collection), link: `/${product.collection}` },
+                { label: formatProductName(product.name) },
+              ]}
+            />
           </nav>
         </div>
 

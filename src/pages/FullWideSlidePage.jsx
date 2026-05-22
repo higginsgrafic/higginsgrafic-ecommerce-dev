@@ -1,7 +1,6 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import FullWideSlideDemoHeader from '@/components/FullWideSlideDemoHeader';
-import Pauta4ColsOverlay from '@/components/pauta/Pauta4ColsOverlay';
 import useComponentCatalogConfig from '@/hooks/useComponentCatalogConfig';
 import { useProductContext } from '@/contexts/ProductContext';
 
@@ -292,19 +291,6 @@ html, body { scrollbar-width: none; }
         showStripe={megaMenu?.showStripe !== false}
         showCatalogPanel={megaMenu?.showCatalogPanel !== false}
       />
-
-      {/* Pauta de 4 columnes — overlay no-interactiu, alineat exacte a belt2.
-          Visible quan TDP Pauta o TDP Taula estan actius. Serveix per
-          validar que la pauta encaixa dins els límits del belt en una
-          ruta on el belt2 ja és sòlid. */}
-      {(pautaEnabled || tableEnabled) ? (
-        <Pauta4ColsOverlay
-          overlay
-          pautaEnabled={pautaEnabled}
-          tableEnabled={tableEnabled}
-          topOffset={`${pautaTopOffsetPx}px`}
-        />
-      ) : null}
     </div>
   );
 }

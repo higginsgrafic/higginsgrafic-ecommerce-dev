@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { Sparkles, Bell, TrendingUp } from 'lucide-react';
 import SEO from '@/components/SEO';
 import ProductGrid from '@/components/ProductGrid';
+import Breadcrumbs from '@/components/Breadcrumbs';
 import { useProductContext } from '@/contexts/ProductContext';
 
 function NewPage() {
@@ -32,17 +33,11 @@ function NewPage() {
           <div className="max-w-7xl mx-auto px-4 lg:px-8">
             {/* Breadcrumbs - en blanc sobre fons gradient */}
             <div className="mb-8">
-              <nav className="mb-0">
-                <ol className="flex items-center space-x-2 text-sm uppercase">
-                  <li>
-                    <Link to="/" className="text-white/70 hover:text-white transition-colors">
-                      Inici
-                    </Link>
-                  </li>
-                  <span className="text-white/50">›</span>
-                  <li className="text-white font-medium">Novetats</li>
-                </ol>
-              </nav>
+              <Breadcrumbs
+                items={[
+                  { label: 'Novetats' }
+                ]}
+              />
             </div>
 
             <motion.div

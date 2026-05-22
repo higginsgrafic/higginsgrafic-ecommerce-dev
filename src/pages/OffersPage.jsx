@@ -2,6 +2,7 @@ import React from 'react';
 import { Helmet } from 'react-helmet';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import Breadcrumbs from '@/components/Breadcrumbs';
 
 function OffersPage() {
   return (
@@ -18,17 +19,11 @@ function OffersPage() {
           <div className="relative max-w-7xl mx-auto px-4 lg:px-8 pt-[129px] lg:pt-[145px] pb-16 sm:pb-20 md:pb-24">
             {/* Breadcrumbs - en blanc sobre fons gradient */}
             <div className="mb-8">
-              <nav className="mb-0">
-                <ol className="flex items-center space-x-2 text-sm uppercase">
-                  <li>
-                    <Link to="/" className="text-white/70 hover:text-white transition-colors">
-                      Inici
-                    </Link>
-                  </li>
-                  <span className="text-white/50">›</span>
-                  <li className="text-white font-medium">Ofertes</li>
-                </ol>
-              </nav>
+              <Breadcrumbs
+                items={[
+                  { label: 'Ofertes' }
+                ]}
+              />
             </div>
 
             <motion.div

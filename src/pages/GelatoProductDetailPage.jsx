@@ -21,6 +21,7 @@ import { Button } from '@/components/ui/button';
 import { useToast } from '@/contexts/ToastContext';
 import { useProductContext } from '@/contexts/ProductContext';
 import { formatPrice } from '@/utils/formatters';
+import Breadcrumbs from '@/components/Breadcrumbs';
 
 export default function GelatoProductDetailPage() {
   const { id } = useParams();
@@ -214,13 +215,12 @@ export default function GelatoProductDetailPage() {
       <div className="min-h-screen bg-white">
         <div className="max-w-7xl mx-auto px-4 lg:px-8">
           <nav className="pt-[17px] lg:pt-[25px] pb-4 ml-[5px]">
-            <ol className="flex items-center space-x-2 text-sm uppercase">
-              <li><Link to="/" className="text-gray-500 hover:text-gray-900 transition-colors">Inici</Link></li>
-              <ChevronRight className="h-4 w-4 text-gray-400" />
-              <li><Link to="/fulfillment" className="text-gray-500 hover:text-gray-900 transition-colors">Catàleg</Link></li>
-              <ChevronRight className="h-4 w-4 text-gray-400" />
-              <li className="text-gray-900 font-medium truncate">{product.name}</li>
-            </ol>
+            <Breadcrumbs
+              items={[
+                { label: 'Catàleg', link: '/fulfillment' },
+                { label: product.name },
+              ]}
+            />
           </nav>
         </div>
 
