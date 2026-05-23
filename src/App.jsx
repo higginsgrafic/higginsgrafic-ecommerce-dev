@@ -3287,7 +3287,11 @@ function App() {
           isComponentsCatalogTemplateRoute ? (
             null
           ) : (
-            !isDevLayoutRoute && <Footer />
+            !isDevLayoutRoute && (
+              <div style={isHomeRoute ? { marginTop: '-532px', position: 'relative', zIndex: 50 } : undefined}>
+                <Footer />
+              </div>
+            )
           )
         )}
 
@@ -5876,7 +5880,9 @@ function App() {
                 pautaOpacity={pautaOpacity}
                 tableOpacity={tableOpacity}
                 topOffset={isFullScreenRoute ? '0px' : appHeaderOffset}
-                numCols={isHomeRoute ? 3 : 4}
+                numCols={(isHomeRoute || location.pathname === '/constructor/tdp' || location.pathname === '/tdp') ? 3 : 4}
+                numRows={isHomeRoute ? 280 : 90}
+                canvasAspect={isHomeRoute ? [2642, 20869] : [2642, 6708]}
               />
             )}
 

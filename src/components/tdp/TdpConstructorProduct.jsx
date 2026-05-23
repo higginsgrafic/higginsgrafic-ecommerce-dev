@@ -116,13 +116,18 @@ function TdpConstructorProduct({
   sizeButtonsMarginTop,
   sizeButtonsAlignSelf,
   productNamePlain = false,
+  priceTranslateY = '0px',
+  imageBorder,
+  imageWidth = 'auto',
+  imageMaxHeight = '100%',
+  imageScale = 1,
 }) {
   const [sizeButtonTextSettings, setSizeButtonTextSettings] = useState(TDP_SIZE_BUTTON_TEXT_SETTINGS);
   const [cartSizeSettings, setCartSizeSettings] = useState(TDP_CART_SIZE_SETTINGS);
   const columnCount = sizes.length;
   const priceCartStyle = {
     gridColumn,
-    gridRow: `${19 + rowOffset} / ${20 + rowOffset}`,
+    gridRow: variant === 'v4' ? `${18 + rowOffset} / ${19 + rowOffset}` : `${19 + rowOffset} / ${20 + rowOffset}`,
     alignSelf: 'stretch',
     justifySelf: 'center',
     pointerEvents: 'auto',
@@ -131,12 +136,12 @@ function TdpConstructorProduct({
     columnGap: '5px',
     width: '75%',
     height: '100%',
-    transform: 'translateY(calc(-50% - 1.5px))',
+    transform: `translateY(calc(-50% - 1.5px + ${priceTranslateY} + ${variant === 'v4' ? '10px' : '0px'}))`,
     zIndex: 3,
   };
   const buttonGroupStyle = {
     gridColumn,
-    gridRow: sizeButtonsGridRow ?? `${20 + rowOffset} / ${21 + rowOffset}`,
+    gridRow: sizeButtonsGridRow ?? (variant === 'v4' ? `${19 + rowOffset} / ${20 + rowOffset}` : `${20 + rowOffset} / ${21 + rowOffset}`),
     alignSelf: sizeButtonsAlignSelf ?? 'stretch',
     justifySelf: 'center',
     pointerEvents: 'auto',
@@ -149,6 +154,7 @@ function TdpConstructorProduct({
     position: 'relative',
     overflow: 'visible',
     zIndex: 2,
+    transform: variant === 'v4' ? 'translateY(10px)' : undefined,
   };
   const handleSizeFromEvent = (event) => {
     const rect = event.currentTarget.getBoundingClientRect();
@@ -163,28 +169,42 @@ function TdpConstructorProduct({
         style={{
           gridColumn,
           gridRow: imageGridRow ?? (variant === 'v4' ? `${8 + rowOffset} / ${18 + rowOffset}` : `${1 + rowOffset} / ${12 + rowOffset}`),
-          justifySelf: 'center',
+          justifySelf: 'stretch',
           alignSelf: 'stretch',
           zIndex: 5,
-          width: '100%',
-          height: '100%',
-          minWidth: 0,
-          display: 'flex',
+          width: variant === 'v4' ? 'calc(100% + 11px)' : '100%',
+          minWidth: variant === 'v4' ? 'calc(100% + 11px)' : '100%',
+          maxWidth: variant === 'v4' ? 'calc(100% + 11px)' : '100%',
+          height: variant === 'v4' ? 'auto' : '100%',
+          display: variant === 'v4' ? 'block' : 'flex',
+          textAlign: 'center',
           alignItems: variant === 'v4' ? 'center' : 'flex-end',
           justifyContent: 'center',
-          overflow: 'hidden',
+          overflow: 'visible',
           transform: imageTranslateY === '0px' && imageNameTranslateY === '0px' ? undefined : `translateY(calc(${imageTranslateY} + ${imageNameTranslateY}))`,
+          padding: 0,
+          margin: variant === 'v4' ? '0 -5.5px' : 0,
         }}
       >
         <img
           src={imageSrc}
           alt={imageAlt}
           style={{
+            display: 'block',
+            width: variant === 'v4' ? '100%' : imageWidth,
+            minWidth: variant === 'v4' ? '100%' : undefined,
             maxWidth: '100%',
-            maxHeight: '100%',
-            width: 'auto',
+            maxHeight: variant === 'v4' ? 'none' : imageMaxHeight,
             height: 'auto',
-            objectFit: 'contain',
+            objectFit: (imageWidth === '100%' || variant === 'v4') ? undefined : 'contain',
+            border: imageBorder,
+            transform: [
+              variant === 'v4' ? 'translateX(0.5px) translateY(3px)' : '',
+              imageScale !== 1 ? `scale(${imageScale})` : ''
+            ].filter(Boolean).join(' ') || undefined,
+            flexShrink: 0,
+            padding: 0,
+            margin: '0 auto',
           }}
         />
       </div>
@@ -241,13 +261,15 @@ function TdpConstructorProduct({
         initialText={description}
         initialSettings={{
           ...TDP_PRODUCT_DESCRIPTION_SETTINGS,
+          y: presetVersion === 'tdp-home-v4-clean' ? 0 : TDP_PRODUCT_DESCRIPTION_SETTINGS.y,
+          lineHeight: presetVersion === 'tdp-home-v4-clean' ? 1.5 : TDP_PRODUCT_DESCRIPTION_SETTINGS.lineHeight,
           fontSize: descriptionFontSize ?? TDP_PRODUCT_DESCRIPTION_SETTINGS.fontSize,
         }}
         presetVersion={presetVersion}
         multiline
         renderHandle={!copyMode}
         handleRight="-18px"
-        style={{ gridColumn, gridRow: descriptionGridRow ?? (variant === 'v4' ? `${3 + rowOffset} / ${8 + rowOffset}` : `${13 + rowOffset} / ${18 + rowOffset}`), zIndex: 5, width: '100%', height: descriptionHeight ?? '100%', transform: descriptionTranslateY ? `translateY(${descriptionTranslateY})` : (variant === 'v4' ? 'translateY(-19px)' : undefined) }}
+        style={{ gridColumn, gridRow: descriptionGridRow ?? (variant === 'v4' ? `${3 + rowOffset} / ${8 + rowOffset}` : `${13 + rowOffset} / ${18 + rowOffset}`), zIndex: 5, width: '100%', height: descriptionHeight ?? '100%', transform: descriptionTranslateY ? `translateY(calc(${descriptionTranslateY} + ${variant === 'v4' ? '2px' : '0px'}))` : (variant === 'v4' ? 'translateY(-17px)' : undefined) }}
       />
 
       <div style={priceCartStyle}>
@@ -276,7 +298,7 @@ function TdpConstructorProduct({
         initialSettings={TDP_PRICE_SETTINGS}
         presetVersion={presetVersion}
         handleRight="-18px"
-        style={{ gridColumn, gridRow: `${19 + rowOffset} / ${20 + rowOffset}`, alignSelf: 'start', transform: 'translateY(-14px)', zIndex: 10, pointerEvents: 'none' }}
+        style={{ gridColumn, gridRow: variant === 'v4' ? `${18 + rowOffset} / ${19 + rowOffset}` : `${19 + rowOffset} / ${20 + rowOffset}`, alignSelf: 'start', transform: `translateY(calc(-14px + ${priceTranslateY} + ${variant === 'v4' ? '10px' : '0px'}))`, zIndex: 10, pointerEvents: 'none' }}
       />
 
       <EditableTextBox
@@ -297,7 +319,7 @@ function TdpConstructorProduct({
             style={{ width: `${cartSizeSettings.fontSize}px`, height: `${cartSizeSettings.fontSize}px`, objectFit: 'contain' }}
           />
         )}
-        style={{ gridColumn, gridRow: `${19 + rowOffset} / ${20 + rowOffset}`, zIndex: 10, pointerEvents: 'none' }}
+        style={{ gridColumn, gridRow: variant === 'v4' ? `${18 + rowOffset} / ${19 + rowOffset}` : `${19 + rowOffset} / ${20 + rowOffset}`, transform: variant === 'v4' ? 'translateY(10px)' : undefined, zIndex: 10, pointerEvents: 'none' }}
       />
 
       <div style={{ ...buttonGroupStyle, isolation: 'isolate' }}>
@@ -336,7 +358,7 @@ function TdpConstructorProduct({
         initialSettings={TDP_SIZE_BUTTON_TEXT_SETTINGS}
         presetVersion={presetVersion}
         handleRight="-18px"
-        style={{ gridColumn, gridRow: sizeButtonsGridRow ?? `${20 + rowOffset} / ${21 + rowOffset}`, zIndex: 10, pointerEvents: 'none' }}
+        style={{ gridColumn, gridRow: sizeButtonsGridRow ?? (variant === 'v4' ? `${19 + rowOffset} / ${20 + rowOffset}` : `${20 + rowOffset} / ${21 + rowOffset}`), transform: variant === 'v4' ? 'translateY(10px)' : undefined, zIndex: 10, pointerEvents: 'none' }}
       />
     </>
   );

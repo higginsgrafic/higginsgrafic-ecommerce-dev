@@ -1,12 +1,10 @@
 import React, { useState } from 'react';
 import TdpConstructorProduct from '@/components/tdp/TdpConstructorProduct';
 
-const PAUTA_ROWS = 21;
 const PAUTA_GUTTER_X = '22.5px';
 const PAUTA_GUTTER_Y = '3px';
 const PAUTA_FIRST_ROW_SCALE = 0.7;
 const PAUTA_FIRST_ROW_EXTRA_PX = 4;
-const PAUTA_ROWS_TEMPLATE = `minmax(${PAUTA_FIRST_ROW_EXTRA_PX}px, ${PAUTA_FIRST_ROW_SCALE}fr) repeat(${PAUTA_ROWS - 1}, minmax(${PAUTA_FIRST_ROW_EXTRA_PX}px, 1fr))`;
 
 const DEFAULT_DESCRIPTION = [
   "Mereixedors són d'honor, glòria e de fama e contínua bona memòria los ",
@@ -31,6 +29,7 @@ function TdpVariantsGallery({
   sizes = ['S', 'M', 'L', 'XL', 'XXL'],
   showLabels = true,
   copyMode = true,
+  numRows = 21,
 }) {
   const [selectedSize, setSelectedSize] = useState('M');
   const columnCount = Math.max(variants.length, 1);
@@ -38,26 +37,77 @@ function TdpVariantsGallery({
     (columnCount - 1) * 22.5
   }px) / ${columnCount})))`;
 
+  const rowsTemplate = `minmax(${PAUTA_FIRST_ROW_EXTRA_PX}px, ${PAUTA_FIRST_ROW_SCALE}fr) repeat(${numRows - 1}, minmax(${PAUTA_FIRST_ROW_EXTRA_PX}px, 1fr))`;
+
   return (
     <div
       style={{
         position: 'relative',
+        left: '50%',
+        top: '25px',
+        transform: 'translateX(-50%)',
+        width: 'calc(var(--hg-tdp-xR) - var(--hg-tdp-xL))',
+        height: 'calc(calc(calc(var(--hg-tdp-xR) - var(--hg-tdp-xL)) * 0.84632) - 231px)',
         display: 'grid',
         gridTemplateColumns: columnsTemplate,
-        gridTemplateRows: PAUTA_ROWS_TEMPLATE,
         columnGap: PAUTA_GUTTER_X,
-        rowGap: PAUTA_GUTTER_Y,
+        border: '2px solid #3b82f6', // BLAU: Límit de la galeria de targetes
       }}
     >
       {variants.map((entry, index) => {
-        const gridColumn = `${index + 1} / ${index + 2}`;
+        const parentGridColumn = `${index + 1} / ${index + 2}`;
+        if (!entry || entry.empty) {
+          return (
+            <div
+              key={`empty-${index}`}
+              style={{
+                gridColumn: parentGridColumn,
+                width: '100%',
+                border: '2px dashed #cbd5e1', // GRIS: Columna buida
+              }}
+            />
+          );
+        }
         const idPrefix = entry.editableIdPrefix || `tdp-gallery-${entry.variant || index}`;
         return (
-          <React.Fragment key={idPrefix}>
+          <div
+            key={idPrefix}
+            style={{
+              gridColumn: parentGridColumn,
+              display: 'grid',
+              gridTemplateColumns: '100%',
+              gridTemplateRows: rowsTemplate,
+              rowGap: PAUTA_GUTTER_Y,
+              position: 'relative',
+              width: '100%',
+              height: '100%', // Fes que s'adapti verticalment al 100% de l'alçada del pare blau
+              overflow: 'hidden', // Restringeix sempre el contingut a l'interior del pare blau
+              boxSizing: 'border-box',
+              border: '2px dashed #f97316', // TARONJA: Límit del grid de 24 files d'aquesta targeta
+            }}
+          >
+            {entry.cardBg ? (
+              <div
+                style={{
+                  gridColumn: '1 / -1',
+                  gridRow: entry.cardBgGridRow || '1 / -1',
+                  backgroundColor: entry.cardBg,
+                  zIndex: 1,
+                  pointerEvents: 'none',
+                  width: '100%',
+                  marginLeft: '0px',
+                  marginRight: '0px',
+                  marginTop: entry.cardBgMarginTop || '0px',
+                  marginBottom: '0px',
+                  height: entry.cardBgHeight || '100%',
+                  alignSelf: 'start',
+                }}
+              />
+            ) : null}
             {showLabels && entry.label ? (
               <div
                 style={{
-                  gridColumn,
+                  gridColumn: '1 / -1',
                   gridRow: '1 / 2',
                   alignSelf: 'center',
                   justifySelf: 'center',
@@ -73,7 +123,7 @@ function TdpVariantsGallery({
               </div>
             ) : null}
             <TdpConstructorProduct
-              gridColumn={gridColumn}
+              gridColumn="1 / 2"
               productName={entry.productName ?? productName}
               description={entry.description ?? description}
               price={entry.price ?? price}
@@ -88,8 +138,9 @@ function TdpVariantsGallery({
               editableIdPrefix={idPrefix}
               copyMode={entry.copyMode ?? copyMode}
               variant={entry.variant ?? 'v3'}
+              {...entry}
             />
-          </React.Fragment>
+          </div>
         );
       })}
     </div>
