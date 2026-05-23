@@ -2388,11 +2388,25 @@ export default function FullWideSlideDemoHeader({
     } catch {
     }
 
+    // Garantir que the_human_inside sempre utilitza la finestra lliscant (thinWindowItems) per evitar desbordaments
+    try {
+      const cols = out.the_human_inside;
+      if (Array.isArray(cols) && cols.length > 0) {
+        out.the_human_inside = cols.map((col) => {
+          return {
+            ...col,
+            items: [CONTROL_TILE_BN, ...thinWindowItems, CONTROL_TILE_ARROWS],
+          };
+        });
+      }
+    } catch {
+    }
+
     if (gridCalibFromUrl) {
       out.cube = defaultMega.cube;
     }
     return out;
-  }, [defaultMega, gridCalibFromUrl, megaConfig]);
+  }, [defaultMega, gridCalibFromUrl, megaConfig, thinWindowItems]);
 
   useEffect(() => {
     if (!active) return;
