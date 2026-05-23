@@ -27,7 +27,7 @@ function TDP1({
   cartCount = 0,
   editableIdPrefix,
   copyMode = true,
-  cardBg = '#fafafa',
+  cardBg = '#fbfcfd',
   cardBgGridRow = '1 / -1',
   cardBgMarginTop = '0px',
   cardBgHeight = '100%',
