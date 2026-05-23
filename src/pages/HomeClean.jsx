@@ -364,8 +364,8 @@ function HomeClean() {
                   columnGap: '22.5px',
                 }}
               >
-                {/* Columna 1: TDP2 */}
-                <TDP2
+                {/* Columna 1: TDP1 */}
+                <TDP1
                   gridColumn="1 / 2"
                   editableIdPrefix="home-row2-tdp-1"
                   selectedSize={selectedSize}
@@ -377,8 +377,8 @@ function HomeClean() {
                   }}
                 />
 
-                {/* Columna 2: TDP1 */}
-                <TDP1
+                {/* Columna 2: TDP2 */}
+                <TDP2
                   gridColumn="2 / 3"
                   editableIdPrefix="home-row2-tdp-2"
                   selectedSize={selectedSize}
@@ -390,8 +390,8 @@ function HomeClean() {
                   }}
                 />
 
-                {/* Columna 3: TDP2 */}
-                <TDP2
+                {/* Columna 3: TDP1 */}
+                <TDP1
                   gridColumn="3 / 4"
                   editableIdPrefix="home-row2-tdp-3"
                   selectedSize={selectedSize}
@@ -504,8 +504,8 @@ function HomeClean() {
                   columnGap: '22.5px',
                 }}
               >
-                {/* Columna 1: TDP2 */}
-                <TDP2
+                {/* Columna 1: TDP1 */}
+                <TDP1
                   gridColumn="1 / 2"
                   editableIdPrefix="home-row4-tdp-1"
                   selectedSize={selectedSize}
@@ -517,8 +517,8 @@ function HomeClean() {
                   }}
                 />
 
-                {/* Columna 2: TDP1 */}
-                <TDP1
+                {/* Columna 2: TDP2 */}
+                <TDP2
                   gridColumn="2 / 3"
                   editableIdPrefix="home-row4-tdp-2"
                   selectedSize={selectedSize}
@@ -530,8 +530,8 @@ function HomeClean() {
                   }}
                 />
 
-                {/* Columna 3: TDP2 */}
-                <TDP2
+                {/* Columna 3: TDP1 */}
+                <TDP1
                   gridColumn="3 / 4"
                   editableIdPrefix="home-row4-tdp-3"
                   selectedSize={selectedSize}
