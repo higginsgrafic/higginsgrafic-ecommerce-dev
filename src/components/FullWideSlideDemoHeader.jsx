@@ -2297,7 +2297,7 @@ export default function FullWideSlideDemoHeader({
       the_human_inside: [
         {
           title: '',
-          items: [CONTROL_TILE_BN, ...thinDrawings, CONTROL_TILE_ARROWS],
+          items: [CONTROL_TILE_BN, ...thinWindowItems, CONTROL_TILE_ARROWS],
         },
       ],
       austen: [
