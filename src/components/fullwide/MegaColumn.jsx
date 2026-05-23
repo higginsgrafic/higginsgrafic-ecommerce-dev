@@ -1118,7 +1118,6 @@ function MegaColumn({
             <div
               key={`${it}-${idx}`}
               className="min-w-0 relative z-10 self-start"
-              style={humanInsideEnabled && effectiveTileSize ? { width: `${effectiveTileSize}px` } : undefined}
             >
               {(() => {
                 const isSelected = Boolean(
