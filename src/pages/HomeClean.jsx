@@ -7,6 +7,7 @@ import TDP2 from '@/components/tdp/TDP2';
 import EditableTextBox from '@/components/dev/EditableTextBox';
 import Pauta4ColsOverlay from '@/components/pauta/Pauta4ColsOverlay';
 import Breadcrumbs from '@/components/Breadcrumbs';
+import TramFinal from '@/components/home/TramFinal';
 import TambeRail from '@/pages/nikeTambe/TambeRail';
 import CarouselArrows from '@/pages/nikeTambe/CarouselArrows';
 
@@ -54,11 +55,9 @@ function CollectionTitle({ index, kicker, title, subtitle, align = 'left', numbe
       : { left: `${numberOffsetX}px`, transform: `translateY(calc(-50% + ${numberOffsetY}px))` }),
   };
   return (
-    <div className={`relative mb-10 mt-[27px] lg:mb-14 ${isRight ? 'text-right' : 'text-left'}`}>
+    <div className={`relative mb-10 mt-[27px] lg:mb-14 w-full ${isRight ? 'text-right' : 'text-left'}`}>
       <div
-        className={`relative flex flex-col gap-3 ${
-          isRight ? 'items-end' : 'items-start'
-        }`}
+        className="relative flex flex-col gap-3 w-full"
       >
         <h2
           className="relative font-black uppercase leading-[0.85] tracking-[-0.02em] text-foreground"
@@ -82,7 +81,7 @@ function CollectionTitle({ index, kicker, title, subtitle, align = 'left', numbe
               titleOffsetX || titleOffsetY
                 ? {
                     display: 'inline-block',
-                    transform: `translate(${titleOffsetX}px, ${titleOffsetY}px)`,
+                    transform: `translate(${typeof titleOffsetX === 'string' ? titleOffsetX : `${titleOffsetX}px`}, ${typeof titleOffsetY === 'string' ? titleOffsetY : `${titleOffsetY}px`})`,
                   }
                 : undefined
             }
@@ -93,17 +92,32 @@ function CollectionTitle({ index, kicker, title, subtitle, align = 'left', numbe
 
         {subtitle ? (
           <p
-            className={`max-w-2xl font-roboto text-base leading-snug text-muted-foreground sm:text-lg ${
-              isRight ? 'ml-auto text-right' : 'text-left'
-            }`}
+            className="font-roboto text-[1.125rem] text-muted-foreground uppercase"
             style={{
               letterSpacing: '0.1em',
-              ...(subtitleOffsetX || subtitleOffsetY
-                ? { transform: `translate(${subtitleOffsetX}px, ${subtitleOffsetY}px)` }
-                : {}),
+              margin: 0,
+              whiteSpace: 'nowrap',
+              display: 'inline-block',
+              width: '100%',
+              textAlign: titleTextAlign || (isRight ? 'right' : 'left'),
             }}
           >
-            {subtitle}
+            <span
+              className="relative"
+              style={
+                (titleOffsetX || titleOffsetY || subtitleOffsetX || subtitleOffsetY)
+                  ? {
+                      display: 'inline-block',
+                      transform: `translate(
+                        calc(${typeof titleOffsetX === 'string' ? titleOffsetX : `${titleOffsetX}px`} + ${typeof subtitleOffsetX === 'string' ? subtitleOffsetX : `${subtitleOffsetX}px`}),
+                        calc(${typeof titleOffsetY === 'string' ? titleOffsetY : `${titleOffsetY}px`} + ${typeof subtitleOffsetY === 'string' ? subtitleOffsetY : `${subtitleOffsetY}px`})
+                      )`,
+                    }
+                  : undefined
+              }
+            >
+              {subtitle}
+            </span>
           </p>
         ) : null}
       </div>
@@ -327,29 +341,78 @@ function HomeClean() {
                   boxSizing: 'border-box',
                 }}
               />
+
+              {/* Indicador de més productes (Cercle discret + sota el producte de la tercera columna) */}
+              <Link
+                to="/first-contact"
+                style={{
+                  position: 'absolute',
+                  right: 'calc((100% - 2 * 22.5px) / 6 - 18px)',
+                  bottom: '-54px',
+                  width: '36px',
+                  height: '36px',
+                  borderRadius: '50%',
+                  backgroundColor: '#ffffff',
+                  border: '1px solid #e5e7eb',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
+                  cursor: 'pointer',
+                  zIndex: 20,
+                  transition: 'all 200ms ease',
+                  textDecoration: 'none',
+                }}
+                className="hover:scale-110 hover:shadow-md hover:border-neutral-400 active:scale-95 group"
+                title="Veure tota la col·lecció"
+              >
+                <span 
+                  style={{ 
+                    fontFamily: 'Oswald, sans-serif',
+                    fontWeight: 300,
+                    fontSize: '18px',
+                    color: '#475059',
+                    lineHeight: 1,
+                    transform: 'translateY(-1px)',
+                  }}
+                  className="group-hover:text-neutral-900"
+                >
+                  +
+                </span>
+              </Link>
             </div>
           </div>
 
           {/* Col·lecció 02: The Human Inside (Distància de 5 files / 190px + 15px avall - 1 fila amunt) */}
           <div style={{ marginTop: '167px' }}>
-            <CollectionTitle
-              index="02"
-              kicker="Col·lecció"
-              title={
-                <>
-                  THE HUMAN<br />
-                  <span style={{ display: 'inline-block', transform: 'translateX(-9px)' }}>INSIDE</span>
-                </>
-              }
-              subtitle={null}
-              align="left"
-              numberAlign="right"
-              titleOffsetX={-244.5} // Mogut 350px a l'esquerra (abans 105.5)
-              titleOffsetY={9}
-              numberOffsetX={15} // Mogut 4px a la dreta (abans 11)
-              numberOffsetY={-4}
-              titleTextAlign="right"
-            />
+            <div
+              style={{
+                position: 'relative',
+                left: '50%',
+                transform: 'translateX(-50%)',
+                width: 'calc(var(--hg-tdp-xR) - var(--hg-tdp-xL))',
+              }}
+            >
+              <CollectionTitle
+                index="02"
+                kicker="Col·lecció"
+                title={
+                  <div className="flex flex-col items-end">
+                    <span>THE HUMAN</span>
+                    <span style={{ transform: 'translateX(-3px)' }}>INSID<span style={{ display: 'inline-block', transform: 'translateX(-4px)' }}>E</span></span>
+                  </div>
+                }
+                subtitle="EN EL TEU RACÓ MÉS PROFUND HI HA UN HEROI"
+                align="left"
+                numberAlign="right"
+                titleTextAlign="left"
+                titleOffsetY={9}
+                numberOffsetX={1} // Mogut 4px més a l'esquerra (abans 5)
+                numberOffsetY={-4}
+                subtitleOffsetX="calc((var(--hg-tdp-xR) - var(--hg-tdp-xL)) / 3 + 7.5px)" // Desplaçat de la col 1 a la col 2 (⅓) neutralitzant el titleOffsetX
+                subtitleOffsetY={18} // Mogut 18px avall
+              />
+            </div>
             <div style={{ marginTop: '150px' }}>
               <div
                 style={{
@@ -402,24 +465,74 @@ function HomeClean() {
                     boxSizing: 'border-box',
                   }}
                 />
+
+                {/* Indicador de més productes (Cercle discret + sota el producte de la tercera columna) */}
+                <Link
+                  to="/thin"
+                  style={{
+                    position: 'absolute',
+                    right: 'calc((100% - 2 * 22.5px) / 6 - 18px)',
+                    bottom: '-54px',
+                    width: '36px',
+                    height: '36px',
+                    borderRadius: '50%',
+                    backgroundColor: '#ffffff',
+                    border: '1px solid #e5e7eb',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
+                    cursor: 'pointer',
+                    zIndex: 20,
+                    transition: 'all 200ms ease',
+                    textDecoration: 'none',
+                  }}
+                  className="hover:scale-110 hover:shadow-md hover:border-neutral-400 active:scale-95 group"
+                  title="Veure tota la col·lecció"
+                >
+                  <span 
+                    style={{ 
+                      fontFamily: 'Oswald, sans-serif',
+                      fontWeight: 300,
+                      fontSize: '18px',
+                      color: '#475059',
+                      lineHeight: 1,
+                      transform: 'translateY(-1px)',
+                    }}
+                    className="group-hover:text-neutral-900"
+                  >
+                    +
+                  </span>
+                </Link>
               </div>
             </div>
           </div>
 
           {/* Col·lecció 03: Austen (Distància de 5 files / 190px) */}
           <div style={{ marginTop: '190px' }}>
-            <CollectionTitle
-              index="03"
-              kicker="Col·lecció"
-              title="Austen"
-              subtitle={null}
-              align="right"
-              numberAlign="left"
-              titleOffsetX={23.5} // Mogut 10px a la dreta (abans 13.5)
-              titleOffsetY={-4} // Mogut 13px cap amunt (abans 9)
-              numberOffsetX={-36}
-              numberOffsetY={-17} // Mogut 13px cap amunt per alinear en Y amb el títol Austen (abans -4)
-            />
+            <div
+              style={{
+                position: 'relative',
+                left: '50%',
+                transform: 'translateX(-50%)',
+                width: 'calc(var(--hg-tdp-xR) - var(--hg-tdp-xL))',
+              }}
+            >
+              <CollectionTitle
+                index="03"
+                kicker="Col·lecció"
+                title="Austen"
+                subtitle="DIGUIS EL QUE DIGUIS, FES-HO AMB ELEGÀNCIA"
+                align="right"
+                numberAlign="left"
+                titleTextAlign="center"
+                titleOffsetX="calc((var(--hg-tdp-xR) - var(--hg-tdp-xL)) / 6 + 3.75px)" // Centrat entre les columnes 2 i 3
+                titleOffsetY={-4}
+                numberOffsetX={-22} // Mogut 14px a la dreta (abans -36)
+                numberOffsetY={-17}
+                subtitleOffsetY={5}
+              />
+            </div>
             <div style={{ marginTop: '150px' }}>
               <div
                 style={{
@@ -472,24 +585,74 @@ function HomeClean() {
                     boxSizing: 'border-box',
                   }}
                 />
+
+                {/* Indicador de més productes (Cercle discret + sota el producte de la tercera columna) */}
+                <Link
+                  to="/austen"
+                  style={{
+                    position: 'absolute',
+                    right: 'calc((100% - 2 * 22.5px) / 6 - 18px)',
+                    bottom: '-54px',
+                    width: '36px',
+                    height: '36px',
+                    borderRadius: '50%',
+                    backgroundColor: '#ffffff',
+                    border: '1px solid #e5e7eb',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
+                    cursor: 'pointer',
+                    zIndex: 20,
+                    transition: 'all 200ms ease',
+                    textDecoration: 'none',
+                  }}
+                  className="hover:scale-110 hover:shadow-md hover:border-neutral-400 active:scale-95 group"
+                  title="Veure tota la col·lecció"
+                >
+                  <span 
+                    style={{ 
+                      fontFamily: 'Oswald, sans-serif',
+                      fontWeight: 300,
+                      fontSize: '18px',
+                      color: '#475059',
+                      lineHeight: 1,
+                      transform: 'translateY(-1px)',
+                    }}
+                    className="group-hover:text-neutral-900"
+                  >
+                    +
+                  </span>
+                </Link>
               </div>
             </div>
           </div>
 
           {/* Col·lecció 04: Cube (Distància de 5 files / 190px - 1 fila amunt) */}
           <div style={{ marginTop: '152px' }}>
-            <CollectionTitle
-              index="04"
-              kicker="Col·lecció"
-              title="Cube"
-              subtitle={null}
-              align="left"
-              numberAlign="right"
-              titleOffsetX={-23.5} // Mogut 10px a l'esquerra (abans -13.5)
-              titleOffsetY={13} // Mogut 4px avall (abans 9)
-              numberOffsetX={33} // Mogut 3px a l'esquerra (abans 36)
-              numberOffsetY={0} // Mogut 4px avall per mantenir l'alineació (abans -4)
-            />
+            <div
+              style={{
+                position: 'relative',
+                left: '50%',
+                transform: 'translateX(-50%)',
+                width: 'calc(var(--hg-tdp-xR) - var(--hg-tdp-xL))',
+              }}
+            >
+              <CollectionTitle
+                index="04"
+                kicker="Col·lecció"
+                title="Cube"
+                subtitle="TOTS SOM ESTRANYS A ULLS NOSTRES"
+                align="left"
+                numberAlign="right"
+                titleTextAlign="center"
+                titleOffsetX="calc((var(--hg-tdp-xR) - var(--hg-tdp-xL)) / -6 - 3.75px)" // Centrat entre les columnes 1 i 2
+                titleOffsetY={13}
+                numberOffsetX={19} // Mogut 4px més a l'esquerra (abans 23)
+                numberOffsetY={0}
+                subtitleOffsetY={6}
+              />
+            </div>
             <div style={{ marginTop: '150px' }}>
               <div
                 style={{
@@ -542,24 +705,74 @@ function HomeClean() {
                     boxSizing: 'border-box',
                   }}
                 />
+
+                {/* Indicador de més productes (Cercle discret + sota el producte de la tercera columna) */}
+                <Link
+                  to="/cube"
+                  style={{
+                    position: 'absolute',
+                    right: 'calc((100% - 2 * 22.5px) / 6 - 18px)',
+                    bottom: '-54px',
+                    width: '36px',
+                    height: '36px',
+                    borderRadius: '50%',
+                    backgroundColor: '#ffffff',
+                    border: '1px solid #e5e7eb',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
+                    cursor: 'pointer',
+                    zIndex: 20,
+                    transition: 'all 200ms ease',
+                    textDecoration: 'none',
+                  }}
+                  className="hover:scale-110 hover:shadow-md hover:border-neutral-400 active:scale-95 group"
+                  title="Veure tota la col·lecció"
+                >
+                  <span 
+                    style={{ 
+                      fontFamily: 'Oswald, sans-serif',
+                      fontWeight: 300,
+                      fontSize: '18px',
+                      color: '#475059',
+                      lineHeight: 1,
+                      transform: 'translateY(-1px)',
+                    }}
+                    className="group-hover:text-neutral-900"
+                  >
+                    +
+                  </span>
+                </Link>
               </div>
             </div>
           </div>
 
-          {/* Col·lecció 05: Miscel·lània (Distància de 5 files / 190px - 1 fila amunt + 20px avall) */}
-          <div style={{ marginTop: '172px' }}>
-            <CollectionTitle
-              index="05"
-              kicker="Col·lecció"
-              title="Miscel·lània"
-              subtitle={null}
-              align="right"
-              numberAlign="left"
-              titleOffsetX={47.5} // Mogut 34px a la dreta (abans 13.5)
-              titleOffsetY={9}
-              numberOffsetX={-36}
-              numberOffsetY={-4}
-            />
+          {/* Col·lecció 05: MISC (Distància de 5 files / 190px - 1 fila amunt + 20px avall) */}
+          <div style={{ marginTop: '172px', position: 'relative', zIndex: 30 }}>
+            <div
+              style={{
+                position: 'relative',
+                left: '50%',
+                transform: 'translateX(-50%)',
+                width: 'calc(var(--hg-tdp-xR) - var(--hg-tdp-xL))',
+              }}
+            >
+              <CollectionTitle
+                index="05"
+                kicker="Col·lecció"
+                title="MISC"
+                subtitle="MÉS VAL SOL QUE MAL ACOMPANYAT"
+                align="right"
+                numberAlign="left"
+                titleTextAlign="center"
+                titleOffsetX="calc((var(--hg-tdp-xR) - var(--hg-tdp-xL)) / 6 + 3.75px)" // Centrat entre les columnes 2 i 3
+                titleOffsetY={9}
+                numberOffsetX={-22} // Mogut 14px a la dreta (abans -36)
+                numberOffsetY={-4}
+                subtitleOffsetY={6}
+              />
+            </div>
             <div style={{ marginTop: '150px' }}>
               <div
                 style={{
@@ -612,6 +825,45 @@ function HomeClean() {
                     boxSizing: 'border-box',
                   }}
                 />
+
+                {/* Indicador de més productes (Cercle discret + sota el producte de la tercera columna) */}
+                <Link
+                  to="/miscellania"
+                  style={{
+                    position: 'absolute',
+                    right: 'calc((100% - 2 * 22.5px) / 6 - 18px)',
+                    bottom: '-54px',
+                    width: '36px',
+                    height: '36px',
+                    borderRadius: '50%',
+                    backgroundColor: '#ffffff',
+                    border: '1px solid #e5e7eb',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
+                    cursor: 'pointer',
+                    zIndex: 20,
+                    transition: 'all 200ms ease',
+                    textDecoration: 'none',
+                  }}
+                  className="hover:scale-110 hover:shadow-md hover:border-neutral-400 active:scale-95 group"
+                  title="Veure toda la col·lecció"
+                >
+                  <span 
+                    style={{ 
+                      fontFamily: 'Oswald, sans-serif',
+                      fontWeight: 300,
+                      fontSize: '18px',
+                      color: '#475059',
+                      lineHeight: 1,
+                      transform: 'translateY(-1px)',
+                    }}
+                    className="group-hover:text-neutral-900"
+                  >
+                    +
+                  </span>
+                </Link>
               </div>
             </div>
           </div>
@@ -622,8 +874,8 @@ function HomeClean() {
               pautaEnabled={false}
               tableEnabled={false}
               numCols={4}
-              numRows={70}
-              canvasAspect={[2642, 5217]}
+              numRows={73}
+              canvasAspect={[2642, 5441]}
               topOffset="0px"
               bottomPadding="0px"
               innerRef={pautaGridRef}
@@ -678,7 +930,7 @@ function HomeClean() {
                   color: 'rgba(71, 80, 89, 0.7)',
                   textAlign: 'left',
                   pointerEvents: 'auto',
-                  transform: 'translateY(9px)', // Mogut 9px avall
+                  transform: 'translateX(2px)', // Mogut 1px amunt (ara translateY és 0px) i 2px dreta
                 }}
               >
                 ALTRES HISTÒRIES
@@ -694,7 +946,7 @@ function HomeClean() {
                   height: '100%',
                   minHeight: 0,
                   pointerEvents: 'auto',
-                  transform: 'translateY(9px)', // Mogut 9px avall
+                  transform: 'translateX(2px)', // Mogut 1px amunt (ara translateY és 0px) i 2px dreta
                 }}
               >
                 <CarouselArrows
@@ -719,7 +971,7 @@ function HomeClean() {
                   gridRow: '43 / 60',
                   alignSelf: 'start',
                   width: '100%',
-                  marginTop: '-39px', // Mogut 9px avall (abans -48px)
+                  marginTop: '-41px', // Mogut 2px amunt (abans -39px)
                   pointerEvents: 'auto',
                 }}
               >

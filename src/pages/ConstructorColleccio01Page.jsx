@@ -43,7 +43,7 @@ function loadOverlayState() {
   }
 }
 
-function ConstructorColleccioPage() {
+function ConstructorColleccio01Page() {
   const [selectedSize, setSelectedSize] = useState('M');
   const [overlayState, setOverlayState] = useState(loadOverlayState);
   const [zeroLeftOffsetPx, setZeroLeftOffsetPx] = useState(0);
@@ -111,23 +111,6 @@ function ConstructorColleccioPage() {
         topOffset="0px"
         bottomPadding="0px"
       >
-        <img
-          src={COLLECTION_BG_SRC}
-          alt=""
-          aria-hidden="true"
-          draggable={false}
-          style={{
-            position: 'absolute',
-            inset: 0,
-            width: '100%',
-            height: '100%',
-            objectFit: 'fill',
-            opacity: backgroundOpacity,
-            pointerEvents: 'none',
-            userSelect: 'none',
-            zIndex: 0,
-          }}
-        />
         <div
           aria-hidden="true"
           style={{
@@ -136,7 +119,7 @@ function ConstructorColleccioPage() {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'flex-start',
-            paddingLeft: `${zeroLeftOffsetPx + 7}px`,
+            paddingLeft: '8px',
             zIndex: 1,
             pointerEvents: 'none',
           }}
@@ -153,7 +136,7 @@ function ConstructorColleccioPage() {
               transform: 'translateY(-4%)',
             }}
           >
-            00
+            01
           </span>
         </div>
         <div
@@ -163,7 +146,7 @@ function ConstructorColleccioPage() {
             gridRow: '1 / 16',
             display: 'flex',
             alignItems: 'center',
-            justifyContent: 'center',
+            justifyContent: 'flex-end',
             zIndex: 2,
             pointerEvents: 'none',
           }}
@@ -184,7 +167,7 @@ function ConstructorColleccioPage() {
               transform: 'translateY(calc(1% - 5px))',
             }}
           >
-            COL·LECCIÓ
+            FIRST CONTACT
           </h1>
         </div>
         {[0, 1, 2, 3].flatMap((rowIdx) =>
@@ -246,8 +229,6 @@ function ConstructorColleccioPage() {
   );
 }
 
-// El component anterior CollectionOutroSection ha estat eliminat per utilitzar el component global TramFinal.
-
 function OpacitySlider({ label, value, onChange }) {
   return (
     <label className="mb-2 block">
@@ -268,4 +249,4 @@ function OpacitySlider({ label, value, onChange }) {
   );
 }
 
-export default ConstructorColleccioPage;
+export default ConstructorColleccio01Page;

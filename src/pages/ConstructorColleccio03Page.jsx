@@ -24,7 +24,7 @@ const TDP_GRID_COLORS = [
   ['red',          'kiwi',           'irish-green',   'military-green'],
   ['forest-green', 'black',          'white',         'light-blue'],
 ];
-const OVERLAY_STATE_STORAGE_KEY = 'hg.constructorColleccio.overlayOpacity.v1';
+const OVERLAY_STATE_STORAGE_KEY = 'hg.constructorColleccio03.overlayOpacity.v1';
 
 const DEFAULT_OVERLAY_STATE = {
   pautaOpacity: 1,
@@ -43,7 +43,7 @@ function loadOverlayState() {
   }
 }
 
-function ConstructorColleccioPage() {
+function ConstructorColleccio03Page() {
   const [selectedSize, setSelectedSize] = useState('M');
   const [overlayState, setOverlayState] = useState(loadOverlayState);
   const [zeroLeftOffsetPx, setZeroLeftOffsetPx] = useState(0);
@@ -59,7 +59,7 @@ function ConstructorColleccioPage() {
     }
   }, [overlayState]);
 
-  // Alinea el "00" amb el left del logo GRAFC del header.
+  // Alinea el "03" amb el left del logo GRAFC del header.
   useEffect(() => {
     if (typeof window === 'undefined') return undefined;
     let raf = 0;
@@ -96,7 +96,7 @@ function ConstructorColleccioPage() {
   return (
     <section className="bg-background">
       <Helmet>
-        <title>Col·lecció · Constructor | Higgins Gràfic</title>
+        <title>Col·lecció 03 · Constructor | Higgins Gràfic</title>
         <meta
           name="description"
           content="Plantilla de construcció de col·lecció amb header global, pauta de 4 columnes i footers globals."
@@ -111,23 +111,6 @@ function ConstructorColleccioPage() {
         topOffset="0px"
         bottomPadding="0px"
       >
-        <img
-          src={COLLECTION_BG_SRC}
-          alt=""
-          aria-hidden="true"
-          draggable={false}
-          style={{
-            position: 'absolute',
-            inset: 0,
-            width: '100%',
-            height: '100%',
-            objectFit: 'fill',
-            opacity: backgroundOpacity,
-            pointerEvents: 'none',
-            userSelect: 'none',
-            zIndex: 0,
-          }}
-        />
         <div
           aria-hidden="true"
           style={{
@@ -136,7 +119,7 @@ function ConstructorColleccioPage() {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'flex-start',
-            paddingLeft: `${zeroLeftOffsetPx + 7}px`,
+            paddingLeft: '8px',
             zIndex: 1,
             pointerEvents: 'none',
           }}
@@ -153,7 +136,7 @@ function ConstructorColleccioPage() {
               transform: 'translateY(-4%)',
             }}
           >
-            00
+            03
           </span>
         </div>
         <div
@@ -163,7 +146,7 @@ function ConstructorColleccioPage() {
             gridRow: '1 / 16',
             display: 'flex',
             alignItems: 'center',
-            justifyContent: 'center',
+            justifyContent: 'flex-end',
             zIndex: 2,
             pointerEvents: 'none',
           }}
@@ -178,13 +161,10 @@ function ConstructorColleccioPage() {
               lineHeight: 0.85,
               color: '#0b0d10',
               textTransform: 'uppercase',
-              // -4% per igualar la compensació del 00; +X% addicional per
-              // contrarestar la massa visual de l'accent (que puja el centre
-              // de massa percebut). Resultat net ~+1%, push down lleuger.
               transform: 'translateY(calc(1% - 5px))',
             }}
           >
-            COL·LECCIÓ
+            <span style={{ display: 'block', transform: 'translateX(8px)' }}>AUSTEN</span>
           </h1>
         </div>
         {[0, 1, 2, 3].flatMap((rowIdx) =>
@@ -210,7 +190,7 @@ function ConstructorColleccioPage() {
                 onSizeChange={setSelectedSize}
                 cartCount={0}
                 onAddToCart={() => {}}
-                editableIdPrefix="constructor-colleccio-tdp-col2"
+                editableIdPrefix="constructor-colleccio03-tdp"
                 presetVersion="constructor-colleccio-tdp-cart-34-v8"
               />
             );
@@ -236,7 +216,7 @@ function ConstructorColleccioPage() {
           boxShadow: '0 6px 24px rgba(0,0,0,0.12)',
         }}
       >
-        <strong className="mb-2 block">Controls col·lecció</strong>
+        <strong className="mb-2 block">Controls col·lecció 03</strong>
         <OpacitySlider label="Opacitat pauta" value={pautaOpacity} onChange={(value) => setOverlayState((prev) => ({ ...prev, pautaOpacity: value }))} />
         <OpacitySlider label="Opacitat taula" value={tableOpacity} onChange={(value) => setOverlayState((prev) => ({ ...prev, tableOpacity: value }))} />
         <OpacitySlider label="Opacitat BG" value={backgroundOpacity} onChange={(value) => setOverlayState((prev) => ({ ...prev, backgroundOpacity: value }))} />
@@ -245,8 +225,6 @@ function ConstructorColleccioPage() {
     </section>
   );
 }
-
-// El component anterior CollectionOutroSection ha estat eliminat per utilitzar el component global TramFinal.
 
 function OpacitySlider({ label, value, onChange }) {
   return (
@@ -268,4 +246,4 @@ function OpacitySlider({ label, value, onChange }) {
   );
 }
 
-export default ConstructorColleccioPage;
+export default ConstructorColleccio03Page;

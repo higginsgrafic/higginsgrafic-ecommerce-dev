@@ -97,6 +97,11 @@ const DevLinksPage = lazy(() => import('@/pages/DevLinksPage'));
 const ContactSheetPage = lazy(() => import('@/pages/dev/ContactSheetPage'));
 const SiteMapPage = lazy(() => import('@/pages/dev/SiteMapPage'));
 const ConstructorColleccioPage = lazy(() => import('@/pages/ConstructorColleccioPage'));
+const ConstructorColleccio01Page = lazy(() => import('@/pages/ConstructorColleccio01Page'));
+const ConstructorColleccio02Page = lazy(() => import('@/pages/ConstructorColleccio02Page'));
+const ConstructorColleccio03Page = lazy(() => import('@/pages/ConstructorColleccio03Page'));
+const ConstructorColleccio04Page = lazy(() => import('@/pages/ConstructorColleccio04Page'));
+const ConstructorColleccio05Page = lazy(() => import('@/pages/ConstructorColleccio05Page'));
 const ConstructorPdpPage = lazy(() => import('@/pages/ConstructorPdpPage'));
 const HtmlBasePage = lazy(() => import('@/pages/HtmlBasePage'));
 const DevComponentsCatalogPage = lazy(() => import('@/pages/DevComponentsCatalogPage'));
@@ -3011,18 +3016,13 @@ function App() {
                 <Route path="/lab" element={<LabHomePage />} />
                 <Route path="/lab/demos" element={<LabDemosPage />} />
                 <Route path="/lab/wip" element={<LabWipPage />} />
-                <Route path="/first-contact" element={
-                  <motion.div
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -10 }}
-                    transition={{ duration: 0.3, ease: "easeInOut" }}
-                  >
-                    <SupabaseCollectionRoute collectionKey="first-contact" {...pageProps} />
-                  </motion.div>
-                } />
+                <Route path="/first-contact" element={<ConstructorColleccio01Page />} />
 
-                <Route path="/the-human-inside" element={<Navigate to="/thin" replace />} />
+                <Route path="/the-human-inside" element={<ConstructorColleccio02Page />} />
+
+                <Route path="/austen" element={<ConstructorColleccio03Page />} />
+
+                <Route path="/cube" element={<ConstructorColleccio04Page />} />
 
                 <Route path="/thin" element={
                   <motion.div
@@ -3035,16 +3035,7 @@ function App() {
                   </motion.div>
                 } />
 
-                <Route path="/miscellania" element={
-                  <motion.div
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -10 }}
-                    transition={{ duration: 0.3, ease: "easeInOut" }}
-                  >
-                    <SupabaseCollectionRoute collectionKey="miscellania" {...pageProps} />
-                  </motion.div>
-                } />
+                <Route path="/miscellania" element={<ConstructorColleccio05Page />} />
 
                 <Route path="/lab/proves" element={
                   <motion.div
@@ -3167,6 +3158,26 @@ function App() {
                 <Route
                   path="/constructor/colleccio"
                   element={<ConstructorColleccioPage pautaEnabled={false} tableEnabled={false} />}
+                />
+                <Route
+                  path="/constructor/colleccio01"
+                  element={<ConstructorColleccio01Page />}
+                />
+                <Route
+                  path="/constructor/colleccio02"
+                  element={<ConstructorColleccio02Page />}
+                />
+                <Route
+                  path="/constructor/colleccio03"
+                  element={<ConstructorColleccio03Page />}
+                />
+                <Route
+                  path="/constructor/colleccio04"
+                  element={<ConstructorColleccio04Page />}
+                />
+                <Route
+                  path="/constructor/colleccio05"
+                  element={<ConstructorColleccio05Page />}
                 />
                 <Route path="/constructor/pdp" element={<ConstructorPdpPage />} />
                 <Route
@@ -5881,8 +5892,8 @@ function App() {
                 tableOpacity={tableOpacity}
                 topOffset={isFullScreenRoute ? '0px' : appHeaderOffset}
                 numCols={(isHomeRoute || location.pathname === '/constructor/tdp' || location.pathname === '/tdp') ? 3 : 4}
-                numRows={isHomeRoute ? 280 : 90}
-                canvasAspect={isHomeRoute ? [2642, 20869] : [2642, 6708]}
+                numRows={isHomeRoute ? 280 : (location.pathname.startsWith('/constructor/colleccio') ? 160 : (location.pathname.includes('pdp') ? 70 : 90))}
+                canvasAspect={isHomeRoute ? [2642, 20869] : (location.pathname.startsWith('/constructor/colleccio') ? [2642, 11928] : (location.pathname.includes('pdp') ? [2642, 5217] : [2642, 6708]))}
               />
             )}
 

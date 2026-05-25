@@ -258,7 +258,6 @@ export default function Pauta4ColsOverlay({
                   backgroundColor: 'rgba(31, 124, 255, 0.03)',
                   boxSizing: 'border-box',
                   opacity: tableOpacity,
-                  zIndex: 1,
                   pointerEvents: 'none',
                 }}
               />

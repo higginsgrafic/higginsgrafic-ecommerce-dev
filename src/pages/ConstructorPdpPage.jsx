@@ -163,14 +163,18 @@ function ConstructorPdpPage() {
       </Helmet>
 
       <Pauta4ColsOverlay
-        numRows={65}
-        canvasAspect={[2642, 4845]}
+        numRows={70}
+        canvasAspect={[2642, 5217]}
         pautaEnabled={false}
         tableEnabled={false}
         topOffset="0px"
         bottomPadding="0px"
         innerRef={pautaGridRef}
-        style={{ zIndex: 5, position: 'relative' }}
+        style={{
+          zIndex: 5,
+          position: 'relative',
+          marginBottom: 'calc(-2 * (var(--hg-tdp-xR) - var(--hg-tdp-xL)) * 5217 / 2642 / 70 - 23px)',
+        }}
       >
         {/* ─── Breadcrumbs (col 1, fila 1 — cantonada superior esquerra del belt2) ─── */}
         <div
