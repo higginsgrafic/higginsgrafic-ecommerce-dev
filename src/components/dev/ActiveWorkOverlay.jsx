@@ -8,6 +8,12 @@ import DevPortal, { DEV_LAYER_Z } from '@/components/dev/DevPortal';
 const ACTIVE_PAGES = [
   { path: '/constructor/html-base', label: 'HTML BASE', note: 'Header + pauta 4 col. + footers', featured: true },
   { path: '/', label: 'MAIN', note: 'Home' },
+  { path: '/first-contact', label: '01 · FIRST CONTACT', note: 'Col·lecció 01' },
+  { path: '/the-human-inside', label: '02 · THE HUMAN INSIDE', note: 'Col·lecció 02' },
+  { path: '/austen', label: '03 · AUSTEN', note: 'Col·lecció 03' },
+  { path: '/cube', label: '04 · CUBE', note: 'Col·lecció 04' },
+  { path: '/miscellania', label: '05 · MISCEL·LÀNIA', note: 'Col·lecció 05' },
+  { separator: true },
   { path: '/constructor/tdp', label: 'TDP', note: 'Pauta + preu/cistell + botonera' },
   { path: '/constructor/full-wide-slide', label: 'FULL-SLIDE', note: 'Full Wide Slide' },
   { path: '/constructor/colleccio', label: 'COL·LECCIÓ', note: 'Constructor pàgina col·lecció (4 col)' },
@@ -120,7 +126,20 @@ function ActiveWorkOverlay() {
             PÀGINES ACTIVES
           </div>
           <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: '4px' }}>
-            {ACTIVE_PAGES.map((page) => {
+            {ACTIVE_PAGES.map((page, idx) => {
+              if (page.separator) {
+                return (
+                  <li
+                    key={`separator-${idx}`}
+                    aria-hidden="true"
+                    style={{
+                      height: '1px',
+                      margin: '4px 2px',
+                      backgroundColor: 'rgba(255,255,255,0.18)',
+                    }}
+                  />
+                );
+              }
               const isCurrent = location.pathname === page.path;
               const isFeatured = page.featured;
               return (
@@ -141,7 +160,7 @@ function ActiveWorkOverlay() {
                         : (isCurrent ? 'rgba(31, 124, 255, 0.25)' : 'transparent'),
                       border: isFeatured
                         ? `1px solid ${isCurrent ? 'rgba(251, 191, 36, 0.95)' : 'rgba(251, 191, 36, 0.48)'}`
-                        : `1px solid ${isCurrent ? 'rgba(31, 124, 255, 0.65)' : 'rgba(255,255,255,0.08)'}`,
+                        : 'none',
                       color: '#fff',
                       textDecoration: 'none',
                       boxShadow: isFeatured ? '0 0 0 1px rgba(0,0,0,0.12), 0 4px 12px rgba(251, 191, 36, 0.08)' : undefined,

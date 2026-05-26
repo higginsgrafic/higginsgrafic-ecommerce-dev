@@ -417,12 +417,11 @@ export default function BeltReferenceOverlay({ enabled }) {
       setState((prev) => {
         const nextXL = Number.isFinite(xL) ? xL : prev.xL;
         const nextXR = Number.isFinite(xR) ? xR : prev.xR;
-        // yCarouselTop és sempre `appHeaderOffsetPx + 33` (TDP_PAGE_TOP_OFFSET).
-        // Això fa que la guia top sigui IDENTICA a totes les rutes i no
-        // depengui de cap anchor del DOM.
-        const nextYCarouselTop = Number.isFinite(appHeaderOffsetPx)
-          ? appHeaderOffsetPx + 33
-          : prev.yCarouselTop;
+        // yCarouselTop: mesura DOM real del `cart-card-top-anchor` (o
+        // fallback a `stripe-img`). Si no hi ha referència, mantenim el
+        // valor previ persistit perquè la guia es mostri estable a rutes
+        // sense mega-slide.
+        const nextYCarouselTop = Number.isFinite(yCarouselTop) ? yCarouselTop : prev.yCarouselTop;
         const nextYCarouselBottom = Number.isFinite(yCarouselBottom) ? yCarouselBottom : prev.yCarouselBottom;
         // Belt2 BOTTOM derivat: bottom_carrusel + 1px + 737.015 * scale.
         // El càlcul antic usava `yCarouselTop + 737*scale` que ignorava

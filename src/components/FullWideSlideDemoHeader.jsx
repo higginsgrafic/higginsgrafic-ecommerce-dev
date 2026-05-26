@@ -1960,7 +1960,7 @@ export default function FullWideSlideDemoHeader({
       // Font segura cross-browser (Chromium, WebKit, Firefox).
       // getSafeBelt valida belt2 i cau a un belt centrat si està contaminat.
       const belt = getSafeBelt({ maxContent: 1350, sideMargin: 16, minContent: 320 });
-      const beltWidth = Math.max(0, belt.width - 2);
+      const beltWidth = Math.max(0, belt.width);
 
       // Exposem el belt segur com a CSS vars perquè els panells del mega-slide
       // s'alineïn amb belt2 quan és vàlid, i caiguin a fallback si està contaminat.
@@ -3595,6 +3595,7 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
                           gap: '7.5px',
                           position: 'relative',
                           zIndex: 1,
+                          transform: 'translateX(-4px)',
                         }}>
                           {['COMANDES', 'MISSATGES', 'COMPTE', 'SEGURETAT'].map((label) => (
                             <div key={label} style={{
@@ -3660,9 +3661,9 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
                               position: 'absolute',
                               top: '1px',
                               left: '50%',
-                              transform: `translateX(-50%) scale(${accordionPautaScale})`,
+                              transform: `translateX(calc(-50% - 2px)) scale(${accordionPautaScale})`,
                               transformOrigin: 'top center',
-                              width: `calc(100% / ${accordionPautaScale})`,
+                              width: `calc(100% / ${accordionPautaScale} + 4px)`,
                               height: '737.015px',
                               overflow: 'hidden',
                             }}>

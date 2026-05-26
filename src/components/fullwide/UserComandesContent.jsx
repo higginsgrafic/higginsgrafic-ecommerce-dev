@@ -15,7 +15,6 @@ import {
   X,
 } from 'lucide-react';
 import usePersistentState from '@/hooks/usePersistentState';
-import UserLoyaltyShirtProgress from './UserLoyaltyShirtProgress';
 
 // Plantilla de la secció COMANDES del perfil d'usuari — alineada amb la pauta verda
 function UserComandesContent() {
@@ -35,7 +34,6 @@ function UserComandesContent() {
   const [segVisible, setSegVisible] = useState(false);
   const [nameSortDir, setNameSortDir] = usePersistentState('HG_USER_NAME_SORT', 'asc'); // 'asc' | 'desc'
   const [dateSortDir, setDateSortDir] = usePersistentState('HG_USER_DATE_SORT', 'desc'); // 'asc' | 'desc'
-  const [ordersScrollRow, setOrdersScrollRow] = useState(0);
   const toggleSort = (key) => setSortDirs((prev) => ({ ...prev, [key]: prev[key] === 'desc' ? 'asc' : 'desc' }));
   const ORDERS = [
     { num: '#00000000000000000000027', status: 'PENDENT', icon: MoreHorizontal, date: '27-04-26', total: '15,50€', active: true },
@@ -53,18 +51,6 @@ function UserComandesContent() {
     { num: '#00000000000000000000015', status: 'ENTREGADA', icon: Package, date: '23-04-26', total: '15,50€', active: false },
     { num: '#00000000000000000000014', status: 'ENTREGADA', icon: Package, date: '23-04-26', total: '15,50€', active: false },
     { num: '#00000000000000000000013', status: 'ENTREGADA', icon: Package, date: '23-04-26', total: '15,50€', active: false },
-    { num: '#00000000000000000000012', status: 'ENTREGADA', icon: Package, date: '22-04-26', total: '31,00€', active: false },
-    { num: '#00000000000000000000011', status: 'CANCEL·LADA', icon: X, date: '22-04-26', total: '46,50€', active: false },
-    { num: '#00000000000000000000010', status: 'ENTREGADA', icon: Package, date: '21-04-26', total: '15,50€', active: false },
-    { num: '#00000000000000000000009', status: 'ATURADA', icon: AlertCircle, date: '21-04-26', total: '62,00€', active: false },
-    { num: '#00000000000000000000008', status: 'ENTREGADA', icon: Package, date: '20-04-26', total: '15,50€', active: false },
-    { num: '#00000000000000000000007', status: 'ENTREGADA', icon: Package, date: '20-04-26', total: '31,00€', active: false },
-    { num: '#00000000000000000000006', status: 'CANCEL·LADA', icon: X, date: '19-04-26', total: '15,50€', active: false },
-    { num: '#00000000000000000000005', status: 'ENTREGADA', icon: Package, date: '18-04-26', total: '77,50€', active: false },
-    { num: '#00000000000000000000004', status: 'ENTREGADA', icon: Package, date: '17-04-26', total: '15,50€', active: false },
-    { num: '#00000000000000000000003', status: 'ENTREGADA', icon: Package, date: '16-04-26', total: '31,00€', active: false },
-    { num: '#00000000000000000000002', status: 'CANCEL·LADA', icon: X, date: '15-04-26', total: '15,50€', active: false },
-    { num: '#00000000000000000000001', status: 'ENTREGADA', icon: Package, date: '14-04-26', total: '46,50€', active: false },
   ];
 
   const LEGEND = [
@@ -79,7 +65,7 @@ function UserComandesContent() {
   ];
 
   const ROW_H = 32.8;
-  const SEG_X_OFFSET = '0.5px';
+  const SEG_X_OFFSET = '-2.5px';
   const SEG_Y_OFFSET = '1.75px';
   const SEG_TABLE_LOCKED_HEIGHT = '621.25px';
   const SEG_LEGEND_ITEMS = [
@@ -97,18 +83,6 @@ function UserComandesContent() {
   const GUTTER = '7.5px';
   // Les 1.5 primeres línies de la pauta són espai en blanc (tabs a la posició original)
   const TOP_OFFSET = 1.5 * ROW_H;
-  const VISIBLE_ORDER_ROWS = 14;
-  const visibleOrders = ORDERS.slice(ordersScrollRow, ordersScrollRow + VISIBLE_ORDER_ROWS);
-  const maxOrdersScrollRow = Math.max(0, ORDERS.length - VISIBLE_ORDER_ROWS);
-  const handleOrdersWheel = (event) => {
-    event.preventDefault();
-    event.stopPropagation();
-    const direction = event.deltaY > 0 ? 1 : -1;
-    setOrdersScrollRow((currentRow) => Math.min(
-      maxOrdersScrollRow,
-      Math.max(0, currentRow + direction)
-    ));
-  };
 
   return (
     <div style={{
@@ -139,7 +113,7 @@ function UserComandesContent() {
           zIndex: -2,
         }} />
       )}
-      {/* 1. TABS — alineades amb els rectangles grisos del slide (1320px = 1400-2*40) */}
+      {/* 1. TABS — alineades amb els rectangles grisos del slide (belt 1350, gutter 7.5 → 4 cols de 331.875px) */}
       <div style={{
         display: 'grid',
         gridTemplateColumns: 'repeat(4, 1fr)',
@@ -148,6 +122,7 @@ function UserComandesContent() {
         width: '1350px',
         marginLeft: 'auto',
         marginRight: 'auto',
+        transform: 'translateX(-4px)',
       }}>
         {['COMANDES', 'MISSATGES', 'COMPTE', 'SEGURETAT'].map((tab, i) => {
           const isActive = activeTab === tab;
@@ -169,6 +144,7 @@ function UserComandesContent() {
               boxSizing: 'border-box',
               cursor: 'pointer',
               userSelect: 'none',
+              transform: tab !== 'COMANDES' ? 'translateX(1px)' : undefined,
             }}>
               <span style={{ display: 'inline-block', transform: isActive ? 'translateY(1px)' : 'none' }}>{tab}</span>
               <div style={{
@@ -229,7 +205,7 @@ function UserComandesContent() {
             transition: background-color 9999s ease-in-out 0s;
           }
         `}</style>
-        <div style={{ width: '1350px', marginLeft: 'auto', marginRight: 'auto', marginTop: '-0.5px', overflow: 'hidden', position: 'relative', backgroundImage: 'url("/placeholders/fons_acordio/fons-usuari-compte.png")', backgroundRepeat: 'no-repeat', backgroundPosition: 'top left', backgroundSize: '1350px 100%' }}>
+        <div style={{ width: '1350px', marginLeft: 'auto', marginRight: 'auto', marginTop: '-0.5px', overflow: 'hidden', position: 'relative', backgroundImage: 'url("/placeholders/fons_acordio/fons-usuari-compte.png")', backgroundRepeat: 'no-repeat', backgroundPosition: 'top left', backgroundSize: '1350px 100%', transform: 'translateX(-3px)' }}>
           <table className="compte-grid" style={{
             width: '1365px',
             marginLeft: '-7.5px',
@@ -239,11 +215,11 @@ function UserComandesContent() {
             borderSpacing: '7.5px 2.8px',
           }}>
             <colgroup>
-              <col style={{ width: '324px' }} />
-              <col style={{ width: '324.5px' }} />
-              <col style={{ width: '158.5px' }} />
-              <col style={{ width: '158.5px' }} />
-              <col style={{ width: '324.5px' }} />
+              <col style={{ width: '331.875px' }} />
+              <col style={{ width: '331.875px' }} />
+              <col style={{ width: '162.1875px' }} />
+              <col style={{ width: '162.1875px' }} />
+              <col style={{ width: '331.875px' }} />
             </colgroup>
             <tbody>
               {(() => {
@@ -490,6 +466,7 @@ function UserComandesContent() {
           display: 'grid',
           gridTemplateColumns: 'repeat(4, 1fr)',
           columnGap: '7.5px',
+          transform: 'translateY(-5px)',
         }}>
         <div style={{
           gridColumn: '1 / span 4',
@@ -536,6 +513,7 @@ function UserComandesContent() {
           display: 'grid',
           gridTemplateColumns: 'repeat(4, 1fr)',
           columnGap: '7.5px',
+          transform: 'translate(-2px, 2px)',
         }}>
           <div style={{
             gridColumn: '2 / span 2',
@@ -571,13 +549,13 @@ function UserComandesContent() {
         <div style={{ width: '1350px', marginLeft: 'auto', marginRight: 'auto', marginTop: '0px', height: SEG_TABLE_LOCKED_HEIGHT, overflow: 'visible', position: 'relative', zIndex: 2, backgroundColor: 'transparent', backgroundImage: 'url("/placeholders/fons_acordio/fons-usuari-seguretat.png")', backgroundRepeat: 'no-repeat', backgroundPosition: 'top left', backgroundSize: '1350px 528px', paddingLeft: 0, paddingRight: 0, transform: `translate(${SEG_X_OFFSET}, ${SEG_Y_OFFSET})` }}>
           <style>{`.seguretat-table td { outline: none; border: none; box-shadow: none; background: transparent; }`}</style>
          <table className="seguretat-table" style={{
-            width: '1365.1px',
-            marginLeft: '-8.05px',
+            width: '1365px',
+            marginLeft: '-7.5px',
             marginTop: '-5px',
             color: '#475059',
             tableLayout: 'fixed',
             borderCollapse: 'separate',
-            borderSpacing: '7.55px 3.05px',
+            borderSpacing: '7.5px 3.05px',
           }}>
             <colgroup>
               <col style={{ width: '59.54px' }} />
@@ -750,7 +728,7 @@ function UserComandesContent() {
                   if (r === 10) {
                     return (
                       <tr key={r} style={{ height: '29.75px' }}>
-                        <td colSpan={4} style={{ height: '29.75px', padding: 0 }}>{headerNode('FORMATS', formatsOpen, () => setFormatsOpen(v => !v))}</td>
+                        <td colSpan={4} style={{ height: '29.75px', padding: 0 }}><div style={{ width: 'calc(100% - 3px)' }}>{headerNode('FORMATS', formatsOpen, () => setFormatsOpen(v => !v))}</div></td>
                         <td colSpan={2} style={{ height: '29.75px', padding: 0 }} />
                         <td colSpan={3} style={{ height: '29.75px', padding: 0 }}>{headerNode('MAILING', mailingOpen, () => setMailingOpen(v => !v))}</td>
                         <td colSpan={3} style={{ height: '29.75px', padding: 0 }}>{headerNode('DOBLE FACTOR', factorOpen, () => setFactorOpen(v => !v))}</td>
@@ -807,7 +785,7 @@ function UserComandesContent() {
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              transform: 'translateY(5px)',
+              transform: 'translateY(0px)',
               padding: '0 10px',
               fontFamily: 'Oswald, sans-serif',
               fontWeight: 300,
@@ -830,7 +808,7 @@ function UserComandesContent() {
             display: 'grid',
             gridTemplateColumns: 'repeat(4, 1fr)',
             columnGap: '7.5px',
-            transform: 'translateY(-0.5px)',
+            transform: 'translate(-2px, 1.5px)',
           }}>
             <div style={{
               gridColumn: '2 / span 2',
@@ -947,7 +925,7 @@ function UserComandesContent() {
           backgroundPosition: 'top left',
           backgroundSize: '1350px 525.2px',
         }}>
-          <div style={{ overflow: 'hidden' }}>
+          <div style={{ overflow: 'visible' }}>
           <table className="missatges-table" style={{
             width: '1365px',
             marginLeft: '-7.5px',
@@ -957,19 +935,20 @@ function UserComandesContent() {
             borderSpacing: '7.5px 2.8px',
           }}>
             <colgroup>
-              <col style={{ width: '324px' }} />
-              <col style={{ width: '324.5px' }} />
-              <col style={{ width: '490.5px' }} />
-              <col style={{ width: '158.5px' }} />
+              <col style={{ width: '331.875px' }} />
+              <col style={{ width: '331.875px' }} />
+              <col style={{ width: '501.5625px' }} />
+              <col style={{ width: '162.1875px' }} />
             </colgroup>
             <thead>
               <tr style={{ height: '30px' }}>
-                <th colSpan={4} style={{ padding: 0, height: '30px', verticalAlign: 'middle' }}>
+                <th colSpan={4} style={{ padding: 0, height: '30px', verticalAlign: 'middle', overflow: 'visible' }}>
                   <div style={{
                     display: 'grid',
-                    gridTemplateColumns: '324px 324.5px 490.5px 158.5px',
+                    gridTemplateColumns: '331.875px 331.875px 501.5625px 162.1875px',
                     columnGap: '7.5px',
                     width: '1350px',
+                    transform: 'translateX(-3px)',
                   }}>
                     {[0, 1].map((i) => {
                       const toggleMode = i === 0 ? 'comanda' : 'correu';
@@ -994,6 +973,7 @@ function UserComandesContent() {
                             height: '30px',
                             display: 'block',
                             transition: 'border-color 0.15s, border-width 0.15s, color 0.15s, font-weight 0.15s',
+                            ...(i === 0 ? { width: 'calc(100% - 1px)', marginLeft: '1px' } : null),
                           }}
                         >
                           {toggleLabel}
@@ -1158,6 +1138,7 @@ function UserComandesContent() {
                           whiteSpace: 'nowrap',
                           overflow: 'hidden',
                           textOverflow: 'ellipsis',
+                          transform: 'translateY(-5px)',
                         }}>
                           <span><sup style={{ fontFamily: 'Oswald, sans-serif', fontWeight: 700, fontSize: '0.7em', verticalAlign: 'baseline' }}>1</sup>Dades obligatòries per a la comunicació.</span>
                         </div>
@@ -1179,6 +1160,7 @@ function UserComandesContent() {
                     width: '100%',
                     height: '30px',
                     display: 'block',
+                    transform: 'translateX(-3px)',
                   };
                   const attachBtnStyle = {
                     ...btnBase,
@@ -1186,6 +1168,8 @@ function UserComandesContent() {
                     color: '#2F61B2',
                     backgroundColor: '#FFFFFF',
                     border: '1px solid #2F61B2',
+                    width: 'calc(100% - 1px)',
+                    marginLeft: '1px',
                   };
                   const sendBtnStyle = {
                     ...btnBase,
@@ -1196,7 +1180,7 @@ function UserComandesContent() {
                   };
                   return (
                     <tr key={idx} style={{ height: '30px' }}>
-                      <td style={{ height: '30px', padding: 0 }}>
+                      <td style={{ height: '30px', padding: 0, overflow: 'visible' }}>
                         <button style={attachBtnStyle}>ADJUNTA UN FITXER</button>
                       </td>
                       <td style={{ height: '30px', padding: 0 }}>
@@ -1234,21 +1218,7 @@ function UserComandesContent() {
         }
         .comandes-table th > *, .comandes-table td > * { min-width: 0; max-width: 100%; }
       `}</style>
-      <div
-        onWheel={handleOrdersWheel}
-        style={{ width: '1350px', marginLeft: 'auto', marginRight: 'auto', marginTop: '-0.5px', overflow: 'hidden', overscrollBehavior: 'contain', position: 'relative', backgroundImage: 'url("/placeholders/fons_acordio/fons-usuari-comandes.png")', backgroundRepeat: 'no-repeat', backgroundPosition: 'top left', backgroundSize: '1350px 100%' }}
-      >
-        <div style={{
-          position: 'absolute',
-          top: '38px',
-          right: '42px',
-          width: '244px',
-          height: '444px',
-          zIndex: 2,
-          pointerEvents: 'none',
-        }}>
-          <UserLoyaltyShirtProgress current={4} threshold={10} rewardsAvailable={0} />
-        </div>
+      <div style={{ width: '1350px', marginLeft: 'auto', marginRight: 'auto', marginTop: '-0.5px', overflow: 'hidden', position: 'relative', backgroundImage: 'url("/placeholders/fons_acordio/fons-usuari-comandes.png")', backgroundRepeat: 'no-repeat', backgroundPosition: 'top left', backgroundSize: '1350px 100%' }}>
         <table className="comandes-table" style={{
           width: '1365px',
           marginLeft: '-7.5px',
@@ -1258,11 +1228,11 @@ function UserComandesContent() {
           borderSpacing: '7.5px 2.8px',
         }}>
         <colgroup>
-          <col style={{ width: '324px' }} />
-          <col style={{ width: '324.5px' }} />
-          <col style={{ width: '158.5px' }} />
-          <col style={{ width: '158.5px' }} />
-          <col style={{ width: '324.5px' }} />
+          <col style={{ width: '331.875px' }} />
+          <col style={{ width: '331.875px' }} />
+          <col style={{ width: '162.1875px' }} />
+          <col style={{ width: '162.1875px' }} />
+          <col style={{ width: '331.875px' }} />
         </colgroup>
         <thead>
           <tr style={{ height: '30px' }}>
@@ -1304,10 +1274,10 @@ function UserComandesContent() {
           </tr>
         </thead>
         <tbody>
-          {visibleOrders.map((o, idx) => {
+          {ORDERS.map((o, idx) => {
             const Icon = o.icon;
             const isStruck = o.status === 'CANCEL·LADA' || o.status === 'ATURADA';
-            const opacity = o.status === 'ENTREGADA' ? 0.5 : 1;
+            const opacity = o.active ? 1 : (isStruck ? 0.7 : 0.35);
             const rowColor = o.active ? '#2F61B2' : '#99A3B5';
             return (
               <React.Fragment key={idx}>
@@ -1356,10 +1326,12 @@ function UserComandesContent() {
         justifyContent: 'space-between',
         alignItems: 'center',
         height: `${ROW_H}px`,
-        width: '640px',
+        width: '671.25px',
         marginLeft: 'auto',
         marginRight: 'auto',
         padding: 0,
+        transform: 'translateY(-5px) scaleX(0.95)',
+        transformOrigin: 'center',
       }}>
         {LEGEND.map(({ label, icon: Icon }) => (
           <div key={label} style={{
@@ -1389,6 +1361,7 @@ function UserComandesContent() {
         display: 'grid',
         gridTemplateColumns: 'repeat(4, 1fr)',
         columnGap: '7.5px',
+        transform: 'translate(-2px, 2px)',
       }}>
         <div style={{
           gridColumn: '2 / span 2',

@@ -5890,6 +5890,7 @@ function App() {
                 tableEnabled={tableEnabled}
                 pautaOpacity={pautaOpacity}
                 tableOpacity={tableOpacity}
+                gutterX="7.5px"
                 topOffset={isFullScreenRoute ? '0px' : appHeaderOffset}
                 numCols={(isHomeRoute || location.pathname === '/constructor/tdp' || location.pathname === '/tdp') ? 3 : 4}
                 numRows={isHomeRoute ? 280 : (location.pathname.startsWith('/constructor/colleccio') ? 160 : (location.pathname.includes('pdp') ? 70 : 90))}

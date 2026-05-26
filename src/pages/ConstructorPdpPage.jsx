@@ -316,6 +316,15 @@ function ConstructorPdpPage() {
         <button
           type="button"
           aria-label="Afegeix al cistell"
+          onClick={() => {
+            try {
+              window.dispatchEvent(new CustomEvent('hg:open-full-wide-cart', {
+                detail: { source: 'constructor-pdp-cta', firstPartOnly: true },
+              }));
+            } catch {
+              // ignore
+            }
+          }}
           className="bg-muted text-[#475059] transition-all duration-200 hover:bg-white hover:text-[#111827] hover:shadow-sm active:scale-95"
           style={{
             gridColumn: '4 / 5',
@@ -480,29 +489,17 @@ function ConstructorPdpPage() {
                 userSelect: 'none',
               }}
             />
+            <CarouselArrows
+              leftPx={0}
+              bottomPx={0}
+              onPrev={goPrevVariant}
+              onNext={goNextVariant}
+              prevLabel="Variant anterior"
+              nextLabel="Variant següent"
+              rowHeight={rowHeight - 3}
+              vertical
+            />
           </div>
-        </div>
-
-        {/* Fletxes carrusel: directament al grid principal a la fila 19, columna 2 */}
-        <div
-          style={{
-            gridColumn: '2 / 3',
-            gridRow: '19 / 20',
-            position: 'relative',
-            width: '100%',
-            height: '100%',
-            minHeight: 0,
-          }}
-        >
-          <CarouselArrows
-            leftPx={0}
-            topPx={0}
-            onPrev={goPrevVariant}
-            onNext={goNextVariant}
-            prevLabel="Variant anterior"
-            nextLabel="Variant següent"
-            rowHeight={rowHeight - 3}
-          />
         </div>
 
         {/* Subtítol "ALTRES HISTÒRIES" - Alineat en Y amb les fletxes (fila 50) i en X a l'esquerra de la col 1 */}

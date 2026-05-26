@@ -35,31 +35,36 @@ export default function CarouselArrows({
   leftPx,
   rightPx,
   topPx,
+  bottomPx,
   onPrev,
   onNext,
   prevLabel = 'Anterior',
   nextLabel = 'Següent',
   rowHeight, // Alçada estricta de la fila per dimensionar el botó
+  vertical = false,
 }) {
   const finalRowHeight = Number.isFinite(rowHeight) && rowHeight > 0 ? rowHeight : 44;
-  const finalTopPx = Number.isFinite(topPx) ? topPx : 28.5;
 
   // Escalem la mida de la icona de fletxa segons l'alçada del botó (aprox 40%)
   const svgSize = Math.max(12, Math.round(finalRowHeight * 0.41));
 
   const hasLeft = Number.isFinite(leftPx);
   const hasRight = Number.isFinite(rightPx);
+  const hasBottom = Number.isFinite(bottomPx);
+  const hasTop = Number.isFinite(topPx);
+  const finalTopPx = hasTop || hasBottom ? topPx : 28.5;
 
   return (
     <div
       style={{
         position: 'absolute',
-        top: `${finalTopPx}px`,
+        ...(hasBottom ? { bottom: `${bottomPx}px` } : { top: `${finalTopPx}px` }),
         ...(hasRight ? { right: `${rightPx}px` } : { left: `${hasLeft ? leftPx : 0}px` }),
         display: 'flex',
+        flexDirection: vertical ? 'column' : 'row',
         gap: '10px',
         zIndex: 3,
-        height: `${finalRowHeight}px`,
+        ...(vertical ? { width: `${finalRowHeight}px` } : { height: `${finalRowHeight}px` }),
       }}
     >
       <ArrowButton ariaLabel={prevLabel} onClick={onPrev} rowHeight={finalRowHeight}>
@@ -69,9 +74,13 @@ export default function CarouselArrows({
           viewBox="0 0 24 24"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
-          style={{ transform: 'translateX(-1px)' }}
+          style={{ transform: vertical ? 'translateY(-1px)' : 'translateX(-1px)' }}
         >
-          <path d="M15 18L9 12L15 6" stroke="#475059" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+          {vertical ? (
+            <path d="M6 15L12 9L18 15" stroke="#475059" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+          ) : (
+            <path d="M15 18L9 12L15 6" stroke="#475059" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+          )}
         </svg>
       </ArrowButton>
       <ArrowButton ariaLabel={nextLabel} onClick={onNext} rowHeight={finalRowHeight}>
@@ -81,9 +90,13 @@ export default function CarouselArrows({
           viewBox="0 0 24 24"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
-          style={{ transform: 'translateX(1px)' }}
+          style={{ transform: vertical ? 'translateY(1px)' : 'translateX(1px)' }}
         >
-          <path d="M9 6L15 12L9 18" stroke="#475059" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+          {vertical ? (
+            <path d="M6 9L12 15L18 9" stroke="#475059" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+          ) : (
+            <path d="M9 6L15 12L9 18" stroke="#475059" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+          )}
         </svg>
       </ArrowButton>
     </div>

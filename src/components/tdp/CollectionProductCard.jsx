@@ -31,12 +31,24 @@ function CollectionProductCard({
         style={{
           gridColumn,
           gridRow: resolvedSlotGridRow,
-          backgroundColor: 'rgba(255, 255, 255, 0.85)',
+          position: 'relative',
           boxSizing: 'border-box',
           pointerEvents: 'none',
           zIndex: 2,
         }}
-      />
+      >
+        <div
+          aria-hidden="true"
+          style={{
+            position: 'absolute',
+            left: 0,
+            right: 0,
+            top: 'calc(-100% / 15)',
+            bottom: 'calc(-100% / 15)',
+            backgroundColor: '#fbfcfd',
+          }}
+        />
+      </div>
       <TdpConstructorProduct
         gridColumn={gridColumn}
         rowOffset={rowOffset}

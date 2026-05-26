@@ -232,16 +232,16 @@ const CheckoutPage = ({ cartItems, onClearCart, pautaEnabled = true, mockMode = 
   };
   const totalsTopRowOffset = totalsStartRow - 2;
   const totalsTop = `calc(${PAUTA_FIRST_ROW_PERCENT}% + ${PAUTA_FIRST_ROW_EXTRA_PX}px + ${totalsTopRowOffset} * (${PAUTA_OTHER_ROW_PERCENT}% - ${PAUTA_OTHER_ROW_COMP_PX}px) + ${totalsTopRowOffset} * 3px - 0.5 * (${PAUTA_OTHER_ROW_PERCENT}% - ${PAUTA_OTHER_ROW_COMP_PX}px + 3px) - 4px)`;
-  const totalsBlockShiftY = 'translateY(-3px)';
+  const totalsBlockShiftY = `translateY(${checkoutPautaRowHeight ? (-checkoutPautaRowHeight / 2 - 3) : -3}px)`;
   const orderTextShiftY = 'translateY(1px)';
   const checkoutOrderRowGapPx = 3;
+  const checkoutVisibleOrderRows = checkoutLongTotalsStartRow - checkoutFirstOrderRow;
   const checkoutOrderCellHeight = checkoutPautaRowHeight
     ? `${Math.max(0, checkoutPautaRowHeight - checkoutOrderRowGapPx)}px`
     : `calc(${PAUTA_OTHER_ROW_PERCENT}% - ${PAUTA_OTHER_ROW_COMP_PX}px - ${checkoutOrderRowGapPx}px)`;
   const checkoutOrderRowPitch = checkoutPautaRowHeight
     ? `${checkoutPautaRowHeight}px`
     : `calc(${PAUTA_OTHER_ROW_PERCENT}% - ${PAUTA_OTHER_ROW_COMP_PX}px)`;
-  const checkoutVisibleOrderRows = checkoutLongTotalsStartRow - checkoutFirstOrderRow;
   const checkoutVisibleItems = visibleCheckoutItems.slice(
     checkoutScrollRow,
     checkoutScrollRow + checkoutVisibleOrderRows
@@ -519,6 +519,7 @@ const CheckoutPage = ({ cartItems, onClearCart, pautaEnabled = true, mockMode = 
             columnGap: '7.5px',
             rowGap: '3px',
             width: 'calc(50% + 11.25px)',
+            transform: 'translateY(13px)',
             pointerEvents: 'none',
             zIndex: 0,
           }}
@@ -667,11 +668,11 @@ const CheckoutPage = ({ cartItems, onClearCart, pautaEnabled = true, mockMode = 
               aria-hidden="true"
               style={{
                 gridColumn: '1 / 5',
-                gridRow: `${checkoutFirstOrderRow + rowIndex} / ${checkoutFirstOrderRow + rowIndex + 1}`,
-                width: 'calc(100% - 10.25px)',
+                gridRow: `${checkoutFirstOrderRow + 1 + rowIndex} / ${checkoutFirstOrderRow + 2 + rowIndex}`,
+                width: 'calc(100% - 21.25px)',
                 justifySelf: 'start',
                 overflow: 'hidden',
-                transform: 'translate(-0.5px, -5.5px)',
+                transform: `translate(-0.5px, ${(-10 - rowIndex * 12 / 13).toFixed(2)}px)`,
                 zIndex: 1,
               }}
             >
@@ -696,14 +697,14 @@ const CheckoutPage = ({ cartItems, onClearCart, pautaEnabled = true, mockMode = 
               gridRow: '4 / 18',
               width: 'calc(100% - 10.25px)',
               justifySelf: 'start',
-              height: 'calc(100% + 2.5px)',
+              height: '100%',
               position: 'relative',
               overflow: 'hidden',
               overscrollBehavior: 'contain',
               scrollbarWidth: 'none',
               pointerEvents: 'auto',
               zIndex: 2,
-              transform: 'translate(-0.5px, -5.5px)',
+              transform: 'translate(-0.5px, -10px)',
             }}
           >
             {checkoutVisibleItems.flatMap((item, rowIndex) => (
@@ -718,7 +719,7 @@ const CheckoutPage = ({ cartItems, onClearCart, pautaEnabled = true, mockMode = 
                     style={{
                       gridColumn: `${index + 1} / ${index + 2}`,
                       position: 'absolute',
-                      top: `calc(${rowIndex} * ${checkoutOrderRowPitch})`,
+                      top: `calc(${rowIndex} * ${checkoutOrderRowPitch} + ${checkoutOrderRowGapPx / 2}px - ${checkoutVisibleItems.length > 1 ? (rowIndex / (checkoutVisibleItems.length - 1)) * 12 : 0}px)`,
                       left: index === 0
                         ? '0'
                         : `calc(50% - 7.5px + ${index - 1} * ((50% - 7.5px) / 3 + 15px)${index === 3 ? ` + ${checkoutAmountContentShiftX}` : ''})`,
@@ -774,10 +775,10 @@ const CheckoutPage = ({ cartItems, onClearCart, pautaEnabled = true, mockMode = 
               left: '50%',
               top: `calc(${PAUTA_FIRST_ROW_PERCENT}% + ${PAUTA_FIRST_ROW_EXTRA_PX}px + 2 * (${PAUTA_OTHER_ROW_PERCENT}% - ${PAUTA_OTHER_ROW_COMP_PX}px) + 2 * 3px - 14px)`,
               gridColumn: '1 / 5',
-              width: 'calc(100% - 11.25px)',
+              width: 'calc(100% - 22.75px)',
               height: '2px',
               backgroundColor: '#DEDFE1',
-              transform: 'translateX(calc(-50% - 5px))',
+              transform: 'translateX(calc(-50% - 10.75px))',
               zIndex: 3,
             }}
           />
@@ -787,11 +788,11 @@ const CheckoutPage = ({ cartItems, onClearCart, pautaEnabled = true, mockMode = 
               gridColumn: '1 / 5',
               gridRow: `${totalsStartRow} / ${totalsStartRow + 1}`,
               alignSelf: 'start',
-              width: 'calc(100% - 11.25px)',
+              width: 'calc(100% - 22.75px)',
               justifySelf: 'center',
               height: '2px',
               backgroundColor: '#DEDFE1',
-              transform: `translateX(-5px) ${totalsBlockShiftY}`,
+              transform: `translateX(-10.75px) ${totalsBlockShiftY}`,
               zIndex: 3,
             }}
           />
@@ -801,7 +802,7 @@ const CheckoutPage = ({ cartItems, onClearCart, pautaEnabled = true, mockMode = 
             style={{
               gridColumn: '1 / 5',
               gridRow: `${totalsStartRow} / ${totalsStartRow + totalsBackgroundRows}`,
-              width: 'calc(100% - 11.25px)',
+              width: 'calc(100% - 22.25px)',
               justifySelf: 'start',
               height: '100%',
               overflow: 'hidden',
@@ -862,7 +863,7 @@ const CheckoutPage = ({ cartItems, onClearCart, pautaEnabled = true, mockMode = 
                 alignItems: 'center',
                 justifyContent: 'flex-end',
                 paddingRight: 'calc((100% - 7.5px) / 2 + 7.5px)',
-                transform: `translateX(46.5px) ${totalsBlockShiftY}`,
+                transform: `translateX(46.5px) ${totalsBlockShiftY}${label === 'TOT PLEGAT FA' || label === 'IVA 21%' ? ' translateY(-4px)' : ''}`,
                 ...labelStyle,
                 whiteSpace: 'nowrap',
                 zIndex: 2,
@@ -878,7 +879,7 @@ const CheckoutPage = ({ cartItems, onClearCart, pautaEnabled = true, mockMode = 
                 display: 'grid',
                 alignItems: 'center',
                 justifyContent: 'start',
-                transform: `translateX(${checkoutAmountContentShiftX}) ${totalsBlockShiftY}`,
+                transform: `translateX(${checkoutAmountContentShiftX}) ${totalsBlockShiftY}${label === 'TOT PLEGAT FA' || label === 'IVA 21%' ? ' translateY(-4px)' : ''}`,
                 zIndex: 2,
               }}
             >
@@ -898,16 +899,6 @@ const CheckoutPage = ({ cartItems, onClearCart, pautaEnabled = true, mockMode = 
           ];
           })}
         </div>
-        {(pautaEnabled ? Array.from({ length: PAUTA_ROWS * 2 }) : []).map((_, idx) => (
-          <div
-            key={`pauta-grid-${idx}`}
-            style={{
-              border: '1px solid rgba(31, 124, 255, 0.35)',
-              backgroundColor: 'rgba(31, 124, 255, 0.06)',
-              boxSizing: 'border-box',
-            }}
-          />
-        ))}
       </div>
 
       <div
@@ -937,10 +928,11 @@ const CheckoutPage = ({ cartItems, onClearCart, pautaEnabled = true, mockMode = 
             style={{
               gridColumn: '2 / 3',
               gridRow: paymentDetailsOpen ? '1 / -1' : `1 / ${checkoutBlockBackgroundEndRow}`,
-              width: '100%',
-              justifySelf: 'stretch',
+              width: 'calc(100% + 11px)',
+              justifySelf: 'start',
               height: '100%',
               overflow: 'hidden',
+              transform: `translate(-11px, ${checkoutPautaRowHeight ? (8 - checkoutPautaRowHeight / 2) : 8}px)`,
               zIndex: -1,
             }}
           >
@@ -1018,7 +1010,7 @@ const CheckoutPage = ({ cartItems, onClearCart, pautaEnabled = true, mockMode = 
             </span>
           </div>
 
-          <div style={{ gridColumn: '2 / 3', gridRow: '3 / 22', display: 'flex', justifyContent: 'center', color: '#4A5057', fontFamily: 'Roboto Condensed, sans-serif', pointerEvents: 'auto' }}>
+          <div style={{ gridColumn: '2 / 3', gridRow: '3 / 22', display: 'flex', justifyContent: 'center', color: '#4A5057', fontFamily: 'Roboto Condensed, sans-serif', pointerEvents: 'auto', transform: 'translateY(14px)' }}>
             <div style={{ width: 'min(100%, 384px)' }}>
               <div style={{ border: '1px solid #E6E8EC', borderRadius: '9px', background: '#FFFFFF', boxShadow: '0 1px 2px rgba(16, 24, 40, 0.04)', overflow: 'hidden' }}>
                 <div style={{ height: '42px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 16px', borderBottom: '1px solid #EEF0F3' }}>
