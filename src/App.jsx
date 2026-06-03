@@ -22,7 +22,6 @@ import LoadingScreen from '@/components/LoadingScreen';
 import SkipLink from '@/components/SkipLink';
 import OffersHeader from '@/components/OffersHeader';
 import AdminBanner from '@/components/AdminBanner';
-import FullWideSlideDemoHeader from '@/components/FullWideSlideDemoHeader';
 import NikeInspiredHeader from '@/components/NikeInspiredHeader';
 import DevHeader from '@/components/DevHeader';
 import ScrollToTop from '@/components/ScrollToTop';
@@ -30,10 +29,7 @@ import ProtectedRoute from '@/components/ProtectedRoute';
 import Footer from '@/components/Footer';
 import Checkout from '@/components/Checkout';
 import SupabaseCollectionRoute from '@/pages/SupabaseCollectionRoute.jsx';
-import DevGuidesOverlay from '@/components/DevGuidesOverlay.jsx';
-import BeltReferenceOverlay from '@/components/dev/BeltReferenceOverlay.jsx';
 import SiteFrame from '@/components/layout/SiteFrame.jsx';
-import Pauta4ColsOverlay from '@/components/pauta/Pauta4ColsOverlay';
 import SlideShell from '@/components/SlideShell';
 import useSlidesConfig from '@/hooks/useSlidesConfig';
 import useComponentCatalogConfig from '@/hooks/useComponentCatalogConfig';
@@ -111,6 +107,12 @@ const LabDemosPage = lazy(() => import('@/pages/LabDemosPage.jsx'));
 const LabWipPage = lazy(() => import('@/pages/LabWipPage.jsx'));
 const LabHomePage = lazy(() => import('@/pages/LabHomePage.jsx'));
 const AdminWipPage = lazy(() => import('@/pages/AdminWipPage.jsx'));
+
+// Overlays i components condicionals (només en DEV o mode demo)
+const FullWideSlideDemoHeader = lazy(() => import('@/components/FullWideSlideDemoHeader'));
+const DevGuidesOverlay = lazy(() => import('@/components/DevGuidesOverlay.jsx'));
+const BeltReferenceOverlay = lazy(() => import('@/components/dev/BeltReferenceOverlay.jsx'));
+const Pauta4ColsOverlay = lazy(() => import('@/components/pauta/Pauta4ColsOverlay'));
 
 // Pàgines administratives
 const AppsPage = lazy(() => import('@/pages/AppsPage'));
@@ -3280,10 +3282,10 @@ function App() {
                 } />
 
                 {/* User Icon Picker - Temporal */}
-                <Route path="/user-icon-picker" element={<UserIconPicker />} />
+                <Route path="/user-icon-picker" element={<ProtectedRoute><UserIconPicker /></ProtectedRoute>} />
 
                 {/* Documentation Files - Temporal */}
-                <Route path="/documentation-files" element={<DocumentationFilesPage />} />
+                <Route path="/documentation-files" element={<ProtectedRoute><DocumentationFilesPage /></ProtectedRoute>} />
 
                 {/* 404 Page - Must be last */}
                 <Route path="*" element={<NotFoundPage />} />
