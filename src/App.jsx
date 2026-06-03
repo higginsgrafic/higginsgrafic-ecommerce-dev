@@ -8,7 +8,6 @@ import { useAdmin } from '@/contexts/AdminContext';
 import { useAdminTools } from '@/contexts/AdminToolsContext';
 import { initAnalytics, trackPageView } from '@/utils/analytics';
 import { installLayoutMetricsProbe } from '@/utils/layoutMetrics';
-import { AUSTEN_QUOTES_ASSETS } from '@/utils/austenQuotesAssets';
 import {
   STRIPE_DRAWING_CALIBRATIONS,
   SHIRT_DRAWING_OVERLAY_DEFAULTS,
@@ -27,6 +26,7 @@ import FullWideSlideDemoHeader from '@/components/FullWideSlideDemoHeader';
 import NikeInspiredHeader from '@/components/NikeInspiredHeader';
 import DevHeader from '@/components/DevHeader';
 import ScrollToTop from '@/components/ScrollToTop';
+import ProtectedRoute from '@/components/ProtectedRoute';
 import Footer from '@/components/Footer';
 import Checkout from '@/components/Checkout';
 import SupabaseCollectionRoute from '@/pages/SupabaseCollectionRoute.jsx';
@@ -2851,7 +2851,7 @@ function App() {
       document.documentElement.style.setProperty('--appHeaderOffset', nextOffset);
       document.documentElement.style.setProperty('--globalHeaderTopOffset', globalHeaderTopOffset);
       document.documentElement.style.setProperty('--rulerInset', `${rulerInset}px`);
-      installLayoutMetricsProbe();
+      if (import.meta.env.DEV) installLayoutMetricsProbe();
       window.__HG_ZOOM_LAYOUT_PROBE__ = () => {
         const round2 = (v) => Math.round(v * 100) / 100;
         const rootStyle = window.getComputedStyle(document.documentElement);
@@ -2925,7 +2925,7 @@ function App() {
             <OffersHeader adminBannerVisible={adminBannerVisible} />
           )}
 
-          {devHeaderVisible && (
+          {import.meta.env.DEV && devHeaderVisible && (
             <DevHeader
               isPreview={isPreview}
               isAdmin={isAdmin}
@@ -2942,7 +2942,7 @@ function App() {
 
       {/* Main Header - NO mostrar a pàgines full-screen ni admin ni a dev tools */}
       {!isFullScreenRoute && !isAdminRoute && !isDemoStyleLayoutRoute && !isDevHeaderRoute && (
-        isHomeRoute ? null : isNikeDemoRoute ? (
+        isHomeRoute ? null : import.meta.env.DEV && isNikeDemoRoute ? (
           <NikeInspiredHeader
             cartItemCount={getTotalItems()}
             onCartClick={() => toggleSlidePreset(cartPresetId)}
@@ -3013,9 +3013,9 @@ function App() {
                   </motion.div>
                 } />
 
-                <Route path="/lab" element={<LabHomePage />} />
-                <Route path="/lab/demos" element={<LabDemosPage />} />
-                <Route path="/lab/wip" element={<LabWipPage />} />
+                <Route path="/lab" element={<ProtectedRoute><LabHomePage /></ProtectedRoute>} />
+                <Route path="/lab/demos" element={<ProtectedRoute><LabDemosPage /></ProtectedRoute>} />
+                <Route path="/lab/wip" element={<ProtectedRoute><LabWipPage /></ProtectedRoute>} />
                 <Route path="/first-contact" element={<ConstructorColleccio01Page />} />
 
                 <Route path="/the-human-inside" element={<ConstructorColleccio02Page />} />
@@ -3048,12 +3048,12 @@ function App() {
                   </motion.div>
                 } />
 
-                <Route path="/proves" element={<Navigate to="/lab/proves" replace />} />
+                <Route path="/proves" element={<ProtectedRoute><Navigate to="/lab/proves" replace /></ProtectedRoute>} />
 
-                <Route path="/proves/demo-nike-tambe" element={<NikeTambePage />} />
-                <Route path="/proves/dev-links" element={<DevLinksPage />} />
-                <Route path="/proves/dev-components" element={<DevComponentsCatalogPage />} />
-                <Route path="/proves/layout-builder" element={<DevLayoutBuilderPage />} />
+                <Route path="/proves/demo-nike-tambe" element={<ProtectedRoute><NikeTambePage /></ProtectedRoute>} />
+                <Route path="/proves/dev-links" element={<ProtectedRoute><DevLinksPage /></ProtectedRoute>} />
+                <Route path="/proves/dev-components" element={<ProtectedRoute><DevComponentsCatalogPage /></ProtectedRoute>} />
+                <Route path="/proves/layout-builder" element={<ProtectedRoute><DevLayoutBuilderPage /></ProtectedRoute>} />
 
                 <Route
                   path="/proves/product/:id"
@@ -3110,7 +3110,7 @@ function App() {
                   element={<FullWideSlidePage pautaEnabled={false} tableEnabled={false} />}
                 />
 
-                <Route path="/plantilla-cataleg-components" element={<PlantillaCatalegComponentsPage />} />
+                <Route path="/plantilla-cataleg-components" element={<ProtectedRoute><PlantillaCatalegComponentsPage /></ProtectedRoute>} />
 
                 {/* Checkout Page */}
                 <Route
@@ -3186,12 +3186,12 @@ function App() {
                 />
 
                 <Route path="/new" element={<NewPage />} />
-                <Route path="/dev/contact-sheet" element={<ContactSheetPage />} />
-                <Route path="/dev/site-map" element={<SiteMapPage />} />
-                <Route path="/dev-links" element={<Navigate to="/proves/dev-links" replace />} />
-                <Route path="/dev-components" element={<Navigate to="/proves/dev-components" replace />} />
-                <Route path="/layout-builder" element={<Navigate to="/proves/layout-builder" replace />} />
-                <Route path="/nike-tambe" element={<Navigate to="/proves/demo-nike-tambe" replace />} />
+                <Route path="/dev/contact-sheet" element={<ProtectedRoute><ContactSheetPage /></ProtectedRoute>} />
+                <Route path="/dev/site-map" element={<ProtectedRoute><SiteMapPage /></ProtectedRoute>} />
+                <Route path="/dev-links" element={<ProtectedRoute><Navigate to="/proves/dev-links" replace /></ProtectedRoute>} />
+                <Route path="/dev-components" element={<ProtectedRoute><Navigate to="/proves/dev-components" replace /></ProtectedRoute>} />
+                <Route path="/layout-builder" element={<ProtectedRoute><Navigate to="/proves/layout-builder" replace /></ProtectedRoute>} />
+                <Route path="/nike-tambe" element={<ProtectedRoute><Navigate to="/proves/demo-nike-tambe" replace /></ProtectedRoute>} />
                 <Route path="/status" element={<Navigate to="/track" replace />} />
                 <Route path="/track" element={<OrderTrackingPage />} />
 
@@ -3350,7 +3350,7 @@ function App() {
           }}
         />
 
-        {rulersOverlayActive && (
+        {import.meta.env.DEV && rulersOverlayActive && (
           <DevGuidesOverlay
             guidesEnabled={guidesEnabled}
             zIndex={1300000}
@@ -5881,9 +5881,9 @@ function App() {
                 ) : null}
 
             <SiteFrame />
-            <BeltReferenceOverlay enabled={belt2GuidesEnabled} />
+            {import.meta.env.DEV && <BeltReferenceOverlay enabled={belt2GuidesEnabled} />}
 
-            {(pautaEnabled || tableEnabled) && (
+            {import.meta.env.DEV && (pautaEnabled || tableEnabled) && (
               <Pauta4ColsOverlay
                 overlay
                 pautaEnabled={pautaEnabled}

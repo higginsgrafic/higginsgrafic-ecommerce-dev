@@ -242,7 +242,7 @@ function CistellComandaContent({ cartItems, setCartItems, onCloseMegaSlide }) {
           </div>
 
           {/* Col 3: QUANTITAT + TALLATGE (cadascun centrat amb el slot del carrusel del damunt) */}
-          <div style={{ ...colBg, display: 'grid', gridTemplateColumns: `${SLOT_W}px ${SLOT_W}px`, gridTemplateRows: `${ROW_H - V_GUTTER}px ${ROW_H - V_GUTTER}px`, columnGap: `${SLIDE_GAP}px`, rowGap: `${V_GUTTER}px`, alignItems: 'center', justifyItems: 'center' }}>
+          <div style={{ ...colBg, display: 'grid', gridTemplateColumns: `${SLOT_W}px ${SLOT_W}px`, gridTemplateRows: `${ROW_H - V_GUTTER}px ${ROW_H - V_GUTTER}px`, columnGap: `${SLIDE_GAP}px`, rowGap: `${V_GUTTER}px`, alignItems: 'center', justifyItems: 'center', transform: 'translateX(-30px)' }}>
             <div style={{ gridRow: 2, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '4px', transform: `translateY(${-0.5 * ROW_H}px)` }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '14px', ...VAL, fontSize: '16pt' }}>
                 <button onClick={() => changeQty(i, -1)} style={{ width: `${ROW_H - V_GUTTER}px`, height: `${ROW_H - V_GUTTER}px`, border: '1px solid #C9D0D9', backgroundColor: 'transparent', color: '#475059', cursor: 'pointer', fontSize: '12pt', lineHeight: 1, padding: 0 }}>−</button>
@@ -260,7 +260,7 @@ function CistellComandaContent({ cartItems, setCartItems, onCloseMegaSlide }) {
           </div>
 
           {/* Col 4: fila 1 buida · fila 2 = "TOT PLEGAT FA" + X + preu (flush dret) */}
-          <div style={{ ...colBg, display: 'grid', gridTemplateRows: `${ROW_H - V_GUTTER}px ${ROW_H - V_GUTTER}px`, rowGap: `${V_GUTTER}px`, padding: 0 }}>
+          <div style={{ ...colBg, display: 'grid', gridTemplateRows: `${ROW_H - V_GUTTER}px ${ROW_H - V_GUTTER}px`, rowGap: `${V_GUTTER}px`, padding: 0, transform: 'translateX(80px)' }}>
             <div />
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', transform: `translateY(${-0.5 * ROW_H}px)` }}>
               <div style={{ display: 'grid', gridTemplateColumns: 'auto 40px 70px 70px', alignItems: 'center', columnGap: '8px' }}>
@@ -479,7 +479,7 @@ function CistellComandaContent({ cartItems, setCartItems, onCloseMegaSlide }) {
                 <span />
               </div>
               {/* Col 4: mateix patró que la fila de preu de l'ítem */}
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', transform: 'translateX(80px)' }}>
                 <div style={{ display: 'grid', gridTemplateColumns: 'auto 40px 70px 70px', alignItems: 'center', columnGap: '8px' }}>
                   <span style={{ position: 'relative', marginRight: '24px' }}>
                     <span style={{ ...HEAD, fontSize: '14pt', fontWeight: 400, color: '#7D8895', visibility: 'hidden' }}>TOT PLEGAT FA</span>
@@ -502,7 +502,7 @@ function CistellComandaContent({ cartItems, setCartItems, onCloseMegaSlide }) {
         position: 'absolute',
         top: `${TOP_OFFSET + (ROWS - 1) * ROW_H}px`,
         left: '50%',
-        transform: 'translateX(-50%)',
+        transform: 'translate(-50%, 2px)',
         width: `${TABLE_WIDTH}px`,
         display: 'grid',
         gridTemplateColumns: 'repeat(4, 1fr)',

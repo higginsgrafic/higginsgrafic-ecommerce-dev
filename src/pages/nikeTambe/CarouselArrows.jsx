@@ -42,6 +42,8 @@ export default function CarouselArrows({
   nextLabel = 'Següent',
   rowHeight, // Alçada estricta de la fila per dimensionar el botó
   vertical = false,
+  centerVertically = false, // Centra verticalment dins del contenidor posicionat
+  gapPx = 10, // Separació entre les dues fletxes
 }) {
   const finalRowHeight = Number.isFinite(rowHeight) && rowHeight > 0 ? rowHeight : 44;
 
@@ -58,11 +60,13 @@ export default function CarouselArrows({
     <div
       style={{
         position: 'absolute',
-        ...(hasBottom ? { bottom: `${bottomPx}px` } : { top: `${finalTopPx}px` }),
+        ...(centerVertically
+          ? { top: '50%', transform: 'translateY(-50%)' }
+          : (hasBottom ? { bottom: `${bottomPx}px` } : { top: `${finalTopPx}px` })),
         ...(hasRight ? { right: `${rightPx}px` } : { left: `${hasLeft ? leftPx : 0}px` }),
         display: 'flex',
         flexDirection: vertical ? 'column' : 'row',
-        gap: '10px',
+        gap: `${gapPx}px`,
         zIndex: 3,
         ...(vertical ? { width: `${finalRowHeight}px` } : { height: `${finalRowHeight}px` }),
       }}

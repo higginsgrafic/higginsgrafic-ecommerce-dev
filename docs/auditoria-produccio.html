@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Auditoria de Producció — Higgins Gràfic Ecommerce</title>
+<style>
+  :root {
+    --bg: #0f1117;
+    --surface: #1a1d27;
+    --surface2: #222533;
+    --text: #e1e4ea;
+    --muted: #9ca3af;
+    --green: #10b981;
+    --amber: #f59e0b;
+    --red: #ef4444;
+    --blue: #3b82f6;
+    --purple: #8b5cf6;
+    --border: #2a2d3a;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: system-ui, -apple-system, sans-serif;
+    line-height: 1.6;
+    padding: 2rem;
+  }
+  .container { max-width: 900px; margin:0 auto; }
+  h1 { font-size: 2rem; margin-bottom: 0.25rem; color: #fff; }
+  h2 { font-size: 1.25rem; margin: 2rem 0 1rem; color: #fff; border-bottom: 1px solid var(--border); padding-bottom: 0.5rem; }
+  h3 { font-size: 1rem; margin: 1.5rem 0 0.75rem; color: #d1d5db; }
+  .meta { color: var(--muted); font-size: 0.85rem; margin-bottom: 2rem; }
+  .badge { display:inline-block; padding:2px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: 600; }
+  .badge--ok { background: #065f46; color: #6ee7b7; }
+  .badge--warn { background: #78350f; color: #fcd34d; }
+  .badge--err { background: #7f1d1d; color: #fca5a5; }
+  .badge--info { background: #1e3a5f; color: #93c5fd; }
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1.25rem;
+    margin-bottom: 1rem;
+  }
+  .card h3 { margin-top: 0; }
+  table { width: 100%; border-collapse: collapse; margin: 0.75rem 0; }
+  th, td { text-align: left; padding: 0.5rem 0.75rem; border-bottom: 1px solid var(--border); font-size: 0.875rem; }
+  th { color: var(--muted); font-weight: 500; }
+  .num { text-align: right; font-variant-numeric: tabular-nums; }
+  ul { list-style: none; padding: 0; }
+  li { padding: 0.3rem 0; font-size: 0.875rem; position: relative; padding-left: 1.5rem; }
+  li::before { position: absolute; left: 0; }
+  li.ok::before { content: "✅"; }
+  li.warn::before { content: "⚠️"; }
+  li.err::before { content: "❌"; }
+  li.info::before { content: "ℹ️"; }
+  .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
+  .summary-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1.25rem;
+    text-align: center;
+  }
+  .summary-card .value { font-size: 2rem; font-weight: 700; color: #fff; }
+  .summary-card .label { font-size: 0.8rem; color: var(--muted); margin-top: 0.25rem; }
+  .summary-card.green .value { color: var(--green); }
+  .summary-card.amber .value { color: var(--amber); }
+  .summary-card.red .value { color: var(--red); }
+  .summary-card.blue .value { color: var(--blue); }
+  code {
+    background: var(--surface2);
+    padding: 1px 5px;
+    border-radius: 4px;
+    font-size: 0.85em;
+    font-family: 'SF Mono', 'Fira Code', monospace;
+  }
+  pre {
+    background: var(--surface2);
+    padding: 1rem;
+    border-radius: 8px;
+    overflow-x: auto;
+    font-size: 0.8rem;
+    line-height: 1.5;
+  }
+  .section-tag {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 6px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-right: 0.5rem;
+    vertical-align: middle;
+  }
+  .tag-pass { background: #065f46; color: #6ee7b7; }
+  .tag-warn { background: #78350f; color: #fcd34d; }
+  .tag-fail { background: #7f1d1d; color: #fca5a5; }
+  .tag-fix { background: #1e3a5f; color: #93c5fd; }
+</style>
+</head>
+<body>
+<div class="container">
+
+<h1>🧪 Auditoria de Producció</h1>
+<p class="meta">
+  <strong>Projecte:</strong> higginsgrafic-ecommerce-dev<br>
+  <strong>Data:</strong> 2 de juny de 2026<br>
+  <strong>Build:</strong> <code>npm run build</code> · Vite 7.3.1 · React 18.3.1<br>
+  <strong>Commit:</strong> <code>1dbef35</code>
+</p>
+
+<!-- ===== RESUM ===== -->
+<div class="summary-grid">
+  <div class="summary-card green"><div class="value">✅</div><div class="label">Build OK</div></div>
+  <div class="summary-card amber"><div class="value">433 MB</div><div class="label">Mida dist/</div></div>
+  <div class="summary-card amber"><div class="value">1.04 MB</div><div class="label">Chunk principal (JS)</div></div>
+  <div class="summary-card red"><div class="value">9</div><div class="label">Vulnerabilitats npm</div></div>
+  <div class="summary-card blue"><div class="value">127</div><div class="label">Chunks JS</div></div>
+  <div class="summary-card blue"><div class="value">2.525</div><div class="label">Mòduls</div></div>
+</div>
+
+<!-- ===== 1. VEREDICTE ===== -->
+<h2><span class="section-tag tag-pass">OK</span> 1. Veredicte de Build</h2>
+<div class="card">
+  <p>La build de producció <strong>compila sense errors</strong>. El projecte es pot desplegar tècnicament. Tanmateix, hi ha diversos aspectes que cal corregir abans d'un llançament a producció real. La puntuació global és <strong>⚠️ 6.5/10 — Aprovat amb condicions</strong>.</p>
+</div>
+
+<!-- ===== 2. MIDA DEL BUNDLE ===== -->
+<h2><span class="section-tag tag-warn">WARN</span> 2. Anàlisi de Bundle</h2>
+
+<div class="card">
+  <h3>2.1. Chunks principals</h3>
+  <table>
+    <tr><th>Chunk</th><th class="num">Mida</th><th class="num">Gzip</th><th>Nota</th></tr>
+    <tr><td><code>index-BHqIhwgB.js</code> (principal)</td><td class="num">1,035 KB</td><td class="num">280 KB</td><td><span class="badge badge--warn">⚠️ Gran</span></td></tr>
+    <tr><td><code>toaster-KcIAPjmM.js</code></td><td class="num">626 KB</td><td class="num">164 KB</td><td><span class="badge badge--warn">⚠️ Gran</span></td></tr>
+    <tr><td><code>AdminUploadPage-BT7ioRHf.js</code></td><td class="num">183 KB</td><td class="num">54 KB</td><td></td></tr>
+    <tr><td><code>MarkdownViewer-D2kX9H30.js</code></td><td class="num">162 KB</td><td class="num">49 KB</td><td></td></tr>
+    <tr><td><code>index-CIuFYNlP.css</code></td><td class="num">102 KB</td><td class="num">17 KB</td><td></td></tr>
+    <tr><td><code>ProductDetailPageEnhanced-Da1W1B0L.js</code></td><td class="num">36 KB</td><td class="num">10 KB</td><td></td></tr>
+  </table>
+  <p style="margin-top:0.75rem; color:var(--muted); font-size:0.85rem;">
+    ⚠️ Dos chunks superen el llindar de 500 KB. El chunk principal (1 MB) conté probablement React, React Router, Supabase, Stripe, Framer Motion, i Three.js. Caldria fer code-splitting.
+  </p>
+</div>
+
+<div class="card">
+  <h3>2.2. Mida total del directori <code>dist/</code></h3>
+  <table>
+    <tr><th>Categoria</th><th class="num">Pes estimat</th><th>Problema</th></tr>
+    <tr><td>Assets JS/CSS</td><td class="num">~4 MB</td><td></td></tr>
+    <tr><td>Imatges (<code>custom_logos/</code>)</td><td class="num">~425 MB</td><td><span class="badge badge--err">Crític</span></td></tr>
+    <tr><td>Fitxers de debug (<code>debug.html</code>, <code>test*.html</code>, etc.)</td><td class="num">~30 KB</td><td><span class="badge badge--warn">Innecessari</span></td></tr>
+    <tr><td>Altres (<code>placeholders/</code>, <code>video/</code>, <code>tmp/</code>)</td><td class="num">~4 MB</td><td><span class="badge badge--warn">Revisar</span></td></tr>
+  </table>
+  <p style="margin-top:0.75rem; color:var(--muted); font-size:0.85rem;">
+    ❌ El 98% del pes de <code>dist/</code> (433 MB) són imatges de <code>custom_logos/</code>. Cal implementar compressió d'imatges, WebP, lazy-loading, o un CDN separat per a imatges. La carpeta <code>tmp/</code> i els fitxers de debug no haurien d'anar a producció.
+  </p>
+</div>
+
+<!-- ===== 3. DEPENDÈNCIES ===== -->
+<h2><span class="section-tag tag-warn">WARN</span> 3. Dependències</h2>
+
+<div class="card">
+  <h3>3.1. Dependències crítiques en producció</h3>
+  <table>
+    <tr><th>Dependència</th><th>Pes</th><th>Estat</th><th>Recomanació</th></tr>
+    <tr><td><code>three</code> (0.169.0)</td><td>~600 KB</td><td><span class="badge badge--info">Mogut a devDeps</span></td><td>✅ Ja mogut — només s'usa a DevComponentsCatalog</td></tr>
+    <tr><td><code>jszip</code> (3.10.1)</td><td>~100 KB</td><td><span class="badge badge--info">Mogut a devDeps</span></td><td>✅ Ja mogut — només s'usa a AdminUploadPage</td></tr>
+    <tr><td><code>sharp</code> (0.34.5)</td><td>~25 MB (nadiu)</td><td><span class="badge badge--warn">Innecessari al client</span></td><td>⚠️ És un mòdul Node.js. No s'hauria d'incloure al bundle del client. Verificar si s'importa al client o només a scripts.</td></tr>
+    <tr><td><code>speakeasy</code> (2.0.0)</td><td>~30 KB</td><td><span class="badge badge--info">OK</span></td><td>Usat per 2FA (AdminLogin). Correcte.</td></tr>
+    <tr><td><code>qrcode</code> (1.5.4)</td><td>~60 KB</td><td><span class="badge badge--info">OK</span></td><td>Usat per 2FA. Correcte.</td></tr>
+    <tr><td><code>framer-motion</code> (11.15.0)</td><td>~140 KB</td><td><span class="badge badge--info">OK</span></td><td>Usat àmpliament al frontend.</td></tr>
+    <tr><td><code>react-markdown</code> + <code>remark-gfm</code></td><td>~250 KB</td><td><span class="badge badge--info">OK</span></td><td>Usat a DocumentationPage.</td></tr>
+  </table>
+</div>
+
+<div class="card">
+  <h3>3.2. Vulnerabilitats npm</h3>
+  <table>
+    <tr><th>Severitat</th><th class="num">Quantitat</th></tr>
+    <tr><td>Moderate</td><td class="num">4</td></tr>
+    <tr><td>High</td><td class="num">4</td></tr>
+    <tr><td>Critical</td><td class="num">1</td></tr>
+  </table>
+  <p style="margin-top:0.75rem; color:var(--muted); font-size:0.85rem;">
+    ⚠️ Cal executar <code>npm audit fix</code> i revisar les vulnerabilitats crítiques abans del desplegament.
+  </p>
+</div>
+
+<!-- ===== 4. PÀGINES ===== -->
+<h2><span class="section-tag tag-pass">OK</span> 4. Inventari de Pàgines</h2>
+
+<div class="card">
+  <h3>4.1. Pàgines de cara al client (<code>src/pages/</code>)</h3>
+  <table>
+    <tr><th>Pàgina</th><th class="num">Pes (gzip)</th><th>Funció</th></tr>
+    <tr><td><code>IndexPage</code></td><td class="num">5.1 KB</td><td>Home</td></tr>
+    <tr><td><code>ProductPage</code></td><td class="num">2.5 KB</td><td>PDP genèrica</td></tr>
+    <tr><td><code>ProductDetailPage</code></td><td class="num">8.1 KB</td><td>PDP millorada</td></tr>
+    <tr><td><code>ProductDetailPageEnhanced</code></td><td class="num">10.2 KB</td><td>PDP amb més funcionalitats</td></tr>
+    <tr><td><code>CheckoutPage</code></td><td class="num">8.1 KB</td><td>Checkout / Cistell</td></tr>
+    <tr><td><code>OrderConfirmationPage</code></td><td class="num">2.4 KB</td><td>Confirmació de comanda</td></tr>
+    <tr><td><code>OrderTrackingPage</code></td><td class="num">2.8 KB</td><td>Seguiment de comanda</td></tr>
+    <tr><td><code>ContactPage</code></td><td class="num">1.6 KB</td><td>Contacte</td></tr>
+    <tr><td><code>AboutPage</code></td><td class="num">3.2 KB</td><td>Sobre nosaltres</td></tr>
+    <tr><td><code>FAQPage</code></td><td class="num">4.5 KB</td><td>FAQ</td></tr>
+    <tr><td><code>PrivacyPage</code></td><td class="num">3.3 KB</td><td>Privacitat</td></tr>
+    <tr><td><code>TermsPage</code></td><td class="num">4.7 KB</td><td>Termes i condicions</td></tr>
+    <tr><td><code>ShippingPage</code></td><td class="num">3.1 KB</td><td>Enviaments</td></tr>
+    <tr><td><code>SizeGuidePage</code></td><td class="num">3.0 KB</td><td>Guia de talles</td></tr>
+    <tr><td><code>HomeClean</code></td><td class="num">4.1 KB</td><td>Home alternativa</td></tr>
+    <tr><td><code>OffersPage</code></td><td class="num">2.2 KB</td><td>Ofertes</td></tr>
+    <tr><td><code>NewPage</code></td><td class="num">2.2 KB</td><td>Novetats</td></tr>
+    <tr><td><code>SiteMapPage</code></td><td class="num">8.5 KB</td><td>Mapa del lloc</td></tr>
+    <tr><td><code>CreativeCommonsPage</code></td><td class="num">1.0 KB</td><td>Creative Commons</td></tr>
+    <tr><td><code>ConstructorPdpPage</code></td><td class="num">4.6 KB</td><td>PDP constructor</td></tr>
+    <tr><td><code>ConstructorColleccioPage</code> (+ 5 variants)</td><td class="num">~12 KB</td><td>Col·leccions constructor</td></tr>
+    <tr><td><code>NikeTambePage</code></td><td class="num">3.3 KB</td><td>PDP Nike/Tambe</td></tr>
+    <tr><td><code>AppsPage</code></td><td class="num">4.8 KB</td><td>Aplicacions</td></tr>
+    <tr><td><code>UnitatsCanviPage</code></td><td class="num">3.9 KB</td><td>Conversor d'unitats</td></tr>
+    <tr><td><code>FulfillmentPage</code></td><td class="num">2.0 KB</td><td>Fulfillment</td></tr>
+    <tr><td><code>TdpPage</code></td><td class="num">2.0 KB</td><td>TDP</td></tr>
+    <tr><td><code>ECPreviewPage</code></td><td class="num">3.1 KB</td><td>Previsualització EC</td></tr>
+    <tr><td><code>ECPreviewLitePage</code></td><td class="num">2.4 KB</td><td>Previsualització EC Lite</td></tr>
+  </table>
+  <p style="margin-top:0.75rem; color:var(--muted); font-size:0.85rem;">
+    Total: <strong>28 pàgines</strong> de cara al client. Algunes són variacions (PDP amb/sense enhanced, diverses col·leccions constructor). Cal verificar quines són necessàries per al llançament.
+  </p>
+</div>
+
+<div class="card">
+  <h3>4.2. Pàgines d'administració / DEV (haurien d'estar darrere auth o eliminar-se)</h3>
+  <table>
+    <tr><th>Pàgina</th><th class="num">Pes (gzip)</th><th>Risc</th></tr>
+    <tr><td><code>AdminStudioHomePage</code></td><td class="num">3.3 KB</td><td><span class="badge badge--warn">Requereix auth</span></td></tr>
+    <tr><td><code>AdminLoginPage</code></td><td class="num">1.5 KB</td><td><span class="badge badge--info">OK (login)</span></td></tr>
+    <tr><td><code>AdminUploadPage</code></td><td class="num">54.4 KB</td><td><span class="badge badge--err">Pes enorme</span></td></tr>
+    <tr><td><code>AdminMediaPage</code></td><td class="num">3.3 KB</td><td><span class="badge badge--warn">Requereix auth</span></td></tr>
+    <tr><td><code>AdminControlsPage</code></td><td class="num">0.9 KB</td><td><span class="badge badge--warn">Requereix auth</span></td></tr>
+    <tr><td><code>AdminDemosPage</code></td><td class="num">1.2 KB</td><td><span class="badge badge--warn">Requereix auth</span></td></tr>
+    <tr><td><code>AdminWipPage</code></td><td class="num">0.6 KB</td><td><span class="badge badge--warn">Requereix auth</span></td></tr>
+    <tr><td><code>AdminPlantillesPage</code></td><td class="num">0.5 KB</td><td><span class="badge badge--warn">Requereix auth</span></td></tr>
+    <tr><td><code>DevLinksPage</code></td><td class="num">2.4 KB</td><td><span class="badge badge--err">Exposa eines dev</span></td></tr>
+    <tr><td><code>DevLayoutBuilderPage</code></td><td class="num">4.5 KB</td><td><span class="badge badge--err">Eina de dev</span></td></tr>
+    <tr><td><code>DevComponentsCatalogPage</code></td><td class="num">4.4 KB</td><td><span class="badge badge--err">Eina de dev</span></td></tr>
+    <tr><td><code>LabHomePage</code></td><td class="num">0.6 KB</td><td><span class="badge badge--err">Laboratori</span></td></tr>
+    <tr><td><code>LabDemosPage</code></td><td class="num">0.8 KB</td><td><span class="badge badge--err">Laboratori</span></td></tr>
+    <tr><td><code>LabWipPage</code></td><td class="num">0.6 KB</td><td><span class="badge badge--err">Laboratori</span></td></tr>
+    <tr><td><code>DocumentationPage</code></td><td class="num">4.8 KB</td><td><span class="badge badge--err">Documentació pública?</span></td></tr>
+    <tr><td><code>DocumentationFilesPage</code></td><td class="num">2.7 KB</td><td><span class="badge badge--err">Documentació pública?</span></td></tr>
+    <tr><td><code>ContactSheetPage</code></td><td class="num">4.0 KB</td><td><span class="badge badge--err">Eina interna</span></td></tr>
+    <tr><td><code>ECConfigPage</code></td><td class="num">0.5 KB</td><td><span class="badge badge--err">Configuració</span></td></tr>
+    <tr><td><code>HeroSettingsPage</code></td><td class="num">5.4 KB</td><td><span class="badge badge--err">Configuració hero</span></td></tr>
+    <tr><td><code>FulfillmentSettingsPage</code></td><td class="num">5.8 KB</td><td><span class="badge badge--err">Configuració</span></td></tr>
+    <tr><td><code>ColleccioSettingsPage</code></td><td class="num">3.2 KB</td><td><span class="badge badge--err">Configuració</span></td></tr>
+    <tr><td><code>MockupsManagerPage</code></td><td class="num">6.9 KB</td><td><span class="badge badge--err">Gestió mockups</span></td></tr>
+    <tr><td><code>GelatoProductsManagerPage</code></td><td class="num">2.2 KB</td><td><span class="badge badge--err">Gestió Gelato</span></td></tr>
+    <tr><td><code>GelatoBlankProductsPage</code></td><td class="num">2.4 KB</td><td><span class="badge badge--err">Gestió Gelato</span></td></tr>
+    <tr><td><code>GelatoTemplatesPage</code></td><td class="num">1.7 KB</td><td><span class="badge badge--err">Gestió Gelato</span></td></tr>
+    <tr><td><code>PromotionsManagerPage</code></td><td class="num">2.9 KB</td><td><span class="badge badge--err">Gestió promocions</span></td></tr>
+    <tr><td><code>ProductsOverviewPage</code></td><td class="num">2.3 KB</td><td><span class="badge badge--err">Gestió productes</span></td></tr>
+    <tr><td><code>SystemMessagesPage</code></td><td class="num">2.5 KB</td><td><span class="badge badge--err">Sistema</span></td></tr>
+    <tr><td><code>FullWideSlidePage</code></td><td class="num">2.1 KB</td><td><span class="badge badge--err">Demo</span></td></tr>
+    <tr><td><code>RuletaDemoPage</code></td><td class="num">4.2 KB</td><td><span class="badge badge--err">Demo</span></td></tr>
+    <tr><td><code>PlantillaCatalegComponentsPage</code></td><td class="num">5.0 KB</td><td><span class="badge badge--err">Catàleg intern</span></td></tr>
+    <tr><td><code>NotFoundPage</code></td><td class="num">0.8 KB</td><td><span class="badge badge--info">OK (404)</span></td></tr>
+  </table>
+  <p style="margin-top:0.75rem; color:var(--muted); font-size:0.85rem;">
+    ❌ <strong>32 pàgines</strong> que no són de cara al client. Cal protegir-les amb autenticació o eliminar-les del bundle de producció amb <code>import.meta.env.DEV</code>.
+  </p>
+</div>
+
+<!-- ===== 5. FITXERS A dist/ ===== -->
+<h2><span class="section-tag tag-fail">FAIL</span> 5. Fitxers no desitjats a <code>dist/</code></h2>
+
+<div class="card">
+  <table>
+    <tr><th>Fitxer</th><th>Problema</th></tr>
+    <tr><td><code>debug.html</code></td><td>HTML de debug — no ha d'anar a producció</td></tr>
+    <tr><td><code>diagnostic.html</code></td><td>HTML de diagnòstic — no ha d'anar a producció</td></tr>
+    <tr><td><code>test.html</code></td><td>HTML de test — no ha d'anar a producció</td></tr>
+    <tr><td><code>test-react.html</code></td><td>HTML de test React — no ha d'anar a producció</td></tr>
+    <tr><td><code>test-simple.html</code></td><td>HTML de test — no ha d'anar a producció</td></tr>
+    <tr><td><code>ultra-simple.html</code></td><td>HTML de test — no ha d'anar a producció</td></tr>
+    <tr><td><code>tmp/</code></td><td>Carpeta temporal — no ha d'anar a producció</td></tr>
+    <tr><td><code>public.code-workspace</code></td><td>Fitxer de VS Code — no ha d'anar a producció</td></tr>
+    <tr><td><code>component-catalog.config.json</code></td><td>Configuració de dev — no ha d'anar a producció</td></tr>
+    <tr><td><code>slides.config.json</code></td><td>Configuració de dev — no ha d'anar a producció</td></tr>
+    <tr><td><code>calibration-freeze-2026-02-16.json</code></td><td>Dades de calibració — revisar si és necessari</td></tr>
+    <tr><td><code>credit-card-icons.html</code></td><td>Pàgina auxiliar — revisar si és necessària</td></tr>
+    <tr><td><code>site-map.json</code> (89 KB)</td><td>JSON del sitemap — ja existeix <code>sitemap.xml</code></td></tr>
+  </table>
+</div>
+
+<!-- ===== 6. CONFIGURACIÓ ===== -->
+<h2><span class="section-tag tag-pass">OK</span> 6. Configuració de Build</h2>
+
+<div class="card">
+  <h3>6.1. <code>vite.config.js</code></h3>
+  <table>
+    <tr><th>Paràmetre</th><th>Valor</th><th>Estat</th></tr>
+    <tr><td><code>build.target</code></td><td><code>es2020</code></td><td><span class="badge badge--ok">✅ Corregit</span></td></tr>
+    <tr><td><code>build.sourcemap</code></td><td><code>false</code></td><td><span class="badge badge--ok">✅ Correcte per prod</span></td></tr>
+    <tr><td><code>build.outDir</code></td><td><code>dist</code></td><td><span class="badge badge--ok">✅ Estàndard</span></td></tr>
+    <tr><td><code>server.port</code></td><td><code>3003</code></td><td><span class="badge badge--info">OK</span></td></tr>
+    <tr><td><code>server.headers.Cache-Control</code></td><td><code>no-store</code></td><td><span class="badge badge--warn">⚠️ Desactivar en prod</span></td></tr>
+  </table>
+</div>
+
+<div class="card">
+  <h3>6.2. Variables d'entorn</h3>
+  <table>
+    <tr><th>Variable</th><th>Estat</th></tr>
+    <tr><td><code>VITE_GELATO_API_KEY</code></td><td><span class="badge badge--warn">⚠️ Cal configurar</span></td></tr>
+    <tr><td><code>VITE_GELATO_STORE_ID</code></td><td><span class="badge badge--warn">⚠️ Cal configurar</span></td></tr>
+    <tr><td><code>VITE_SUPABASE_URL</code></td><td><span class="badge badge--warn">⚠️ Cal configurar</span></td></tr>
+    <tr><td><code>VITE_SUPABASE_ANON_KEY</code></td><td><span class="badge badge--warn">⚠️ Cal configurar</span></td></tr>
+    <tr><td><code>SUPABASE_SERVICE_ROLE_KEY</code></td><td><span class="badge badge--err">❌ Secret! No exposar al client</span></td></tr>
+    <tr><td><code>VITE_USE_MOCK_DATA</code></td><td><span class="badge badge--info">false (correcte)</span></td></tr>
+    <tr><td><code>VITE_ADMIN_EMAILS</code></td><td><span class="badge badge--warn">⚠️ Cal configurar</span></td></tr>
+  </table>
+  <p style="margin-top:0.75rem; color:var(--muted); font-size:0.85rem;">
+    ✅ S'ha creat <code>.env.example</code>. ⚠️ <code>SUPABASE_SERVICE_ROLE_KEY</code> apareix al <code>.env.example</code> com a variable sense prefix <code>VITE_</code> (segura), però cal verificar que no s'importi al client.
+  </p>
+</div>
+
+<!-- ===== 7. CACHÉ I HEADERS ===== -->
+<h2><span class="section-tag tag-warn">WARN</span> 7. HTTP Headers i Cache</h2>
+
+<div class="card">
+  <p>El fitxer <code>public/_headers</code> (Netlify) i <code>netlify.toml</code> existeixen. Cal revisar les regles de cache per a producció. Actualment el servidor de Vite envia <code>Cache-Control: no-store</code>, que és correcte per a dev però <strong>desastrós per a producció</strong>. Cal assegurar-se que el desplegament de producció tingui polítiques de cache agressives per a assets amb hash (JS, CSS, fonts, imatges).</p>
+</div>
+
+<!-- ===== ACCIONS RECOMANADES ===== -->
+<h2><span class="section-tag tag-fix">FIX</span> 8. Checklist d'Accions Abans del Llançament</h2>
+
+<div class="card">
+  <h3>🔴 Crítiques (bloquejants)</h3>
+  <ul>
+    <li class="err">Eliminar fitxers de debug/test del directori <code>public/</code>: <code>debug.html</code>, <code>diagnostic.html</code>, <code>test*.html</code>, <code>ultra-simple.html</code>, <code>tmp/</code></li>
+    <li class="err">Eliminar <code>public.code-workspace</code> de <code>public/</code></li>
+    <li class="err">Protegir TOTES les rutes d'administració/dev/lab amb autenticació real (no només al client)</li>
+    <li class="err">Verificar que <code>SUPABASE_SERVICE_ROLE_KEY</code> no s'importa MAI al client (és un secret de servidor)</li>
+    <li class="err">Configurar variables d'entorn de producció a l'entorn de desplegament (Netlify/Vercel)</li>
+    <li class="err">Executar <code>npm audit fix</code> i resoldre la vulnerabilitat crítica</li>
+  </ul>
+
+  <h3>🟡 Importants (no bloquejants però necessàries)</h3>
+  <ul>
+    <li class="warn">Implementar code-splitting: <code>React.lazy()</code> per a rutes poc freqüents (admin, lab, eines)</li>
+    <li class="warn">Moure pàgines admin/lab a un subdirectori i usar <code>import.meta.env.DEV</code> o rutes protegides</li>
+    <li class="warn">Optimitzar imatges: usar WebP/AVIF, lazy loading, i dimensions responsives. Les imatges de <code>custom_logos/</code> ocupen 425 MB</li>
+    <li class="warn">Revisar polítiques de cache per a producció (el <code>Cache-Control: no-store</code> és només per a dev)</li>
+    <li class="warn">Verificar que <code>sharp</code> no s'inclou al bundle del client (és un mòdul Node.js)</li>
+    <li class="warn">Eliminar <code>component-catalog.config.json</code> i <code>slides.config.json</code> de <code>public/</code> (eines de dev)</li>
+  </ul>
+
+  <h3>🟢 Recomanacions (millora contínua)</h3>
+  <ul>
+    <li class="info">Afegir <code>robots.txt</code> per restringir rutes admin/lab als cercadors</li>
+    <li class="info">Configurar CSP (Content Security Policy) headers</li>
+    <li class="info">Implementar analytics (respectant GDPR)</li>
+    <li class="info">Afegir <code>preconnect</code> / <code>dns-prefetch</code> per a dominis externs (Supabase, Stripe, Gelato)</li>
+    <li class="info">Configurar monitoring d'errors (Sentry, LogRocket) al frontend</li>
+    <li class="info">Fer tests de lighthouse/PageSpeed per verificar performance</li>
+    <li class="info">Verificar compatibilitat amb navegadors antics (es2020 exclou IE11, però cobreix ~95% del mercat)</li>
+  </ul>
+</div>
+
+<!-- ===== RESUM FINAL ===== -->
+<h2><span class="section-tag tag-warn">SUMMARY</span> 9. Resum Final</h2>
+
+<div class="card" style="background: var(--surface2);">
+  <table>
+    <tr><td><strong>Build</strong></td><td>✅ Compila sense errors</td></tr>
+    <tr><td><strong>Mida bundle JS</strong></td><td>⚠️ 1 MB (principal) — code-splitting pendent</td></tr>
+    <tr><td><strong>Mida dist/</strong></td><td>❌ 433 MB (98% imatges sense optimitzar)</td></tr>
+    <tr><td><strong>Pàgines client</strong></td><td>✅ 28 pàgines funcionals</td></tr>
+    <tr><td><strong>Pàgines admin/dev exposades</strong></td><td>❌ 32 pàgines sense protecció adequada</td></tr>
+    <tr><td><strong>Fitxers no desitjats a dist/</strong></td><td>❌ 10+ fitxers de debug/test/config</td></tr>
+    <tr><td><strong>Variables d'entorn</strong></td><td>⚠️ Sense configurar per a producció</td></tr>
+    <tr><td><strong>Seguretat (npm)</strong></td><td>⚠️ 9 vulnerabilitats (1 crítica)</td></tr>
+    <tr><td><strong>Headers/Cache</strong></td><td>⚠️ Cal revisar polítiques de producció</td></tr>
+    <tr><td><strong>Dependències optimitzades</strong></td><td>✅ Three.js i JSZip moguts a devDeps</td></tr>
+    <tr><td><strong>build.target</strong></td><td>✅ es2020 (corregit des de l'auditoria prèvia)</td></tr>
+  </table>
+</div>
+
+<p style="margin-top: 2rem; color: var(--muted); font-size: 0.85rem; text-align: center;">
+  Auditoria generada automàticament · Higgins Gràfic Ecommerce · Juny 2026
+</p>
+
+</div>
+</body>
+</html>

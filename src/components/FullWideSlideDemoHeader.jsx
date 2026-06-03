@@ -2750,11 +2750,11 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
           </nav>
 
           <div
-            className="ml-auto grid grid-cols-3 items-center"
-            style={{ width: megaTileSize ? `${Math.round(megaTileSize)}px` : `${Math.round(effectiveMegaTileSize)}px` }}
+            className="ml-auto flex items-center"
+            style={{ gap: '0px' }}
             data-icons-wrap="true"
           >
-            <div className="justify-self-start">
+            <div>
               <IconButton
                 label="Search"
                 onClick={() => {
@@ -2805,7 +2805,7 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
                 }, dblClickDelayMs);
               }}
               aria-label="Cart"
-              className="relative inline-flex h-9 w-9 items-center justify-center justify-self-center rounded-md text-foreground hover:bg-transparent focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 lg:h-10 lg:w-10"
+              className="relative inline-flex h-9 w-9 items-center justify-center rounded-md text-foreground hover:bg-transparent focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 lg:h-10 lg:w-10"
             >
               <span aria-hidden="true" className="relative block h-[27px] w-[27px] transition-all duration-200 lg:h-[31px] lg:w-[31px]">
                 <span
@@ -2833,7 +2833,7 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
                 ) : null}
               </span>
             </button>
-            <div className="justify-self-end">
+            <div>
               <IconButton
                 id="stripe-guide-user-icon-anchor"
                 label="Account"

@@ -76,11 +76,10 @@ const PRODUCT_DESCRIPTION = [
   'hòmens virtuosos, e singularment aquells qui per la república lluitaren.',
 ].join(' ');
 
-// 14 colors oficials Gildan 5000 (ordre alfabètic dels seleccionats a colors.json).
+// 14 colors oficials Gildan 5000 en l'ordre de la stripe (MegaStripe).
 const OFFICIAL_COLORS = [
-  'black', 'daisy', 'forest-green', 'gold', 'irish-green', 'kiwi',
-  'light-blue', 'light-pink', 'military-green', 'navy', 'purple', 'red',
-  'royal', 'white',
+  'white', 'light-blue', 'royal', 'navy', 'purple', 'light-pink', 'daisy',
+  'gold', 'red', 'kiwi', 'irish-green', 'military-green', 'forest-green', 'black',
 ];
 const THUMB_COUNT = OFFICIAL_COLORS.length;
 
@@ -122,6 +121,9 @@ function ConstructorPdpPage() {
 
   const pautaGridRef = useRef(null);
   const [rowHeight, setRowHeight] = useState(38);
+  // Alçada EXACTA d'una fila de la pauta real (70 files) per dimensionar les
+  // fletxes "També et pot interessar" exactament com l'alçada d'una fila.
+  const [exactRowHeight, setExactRowHeight] = useState(38);
   const [copiedDesign, setCopiedDesign] = useState(false);
 
   useLayoutEffect(() => {
@@ -133,6 +135,11 @@ function ConstructorPdpPage() {
       const numRows = 65; // Nombre canònic de files de la PDP
       const singleRowH = rect.height / numRows;
       setRowHeight((prev) => (Math.abs(prev - singleRowH) < 0.1 ? prev : singleRowH));
+      // Alçada exacta d'una fila del grid real (numRows={70}, gutterY=3px)
+      const gridRows = 70;
+      const rowGap = 3;
+      const exactRowH = (rect.height - (gridRows - 1) * rowGap) / gridRows;
+      setExactRowHeight((prev) => (Math.abs(prev - exactRowH) < 0.1 ? prev : exactRowH));
     };
 
     measure();
@@ -393,7 +400,7 @@ function ConstructorPdpPage() {
         <div
           style={{
             gridColumn: '2 / 4',
-            gridRow: '9 / 20',
+            gridRow: '8 / 20',
             minHeight: 0,
             display: 'grid',
             gridTemplateColumns: '1fr 72px',
@@ -401,20 +408,59 @@ function ConstructorPdpPage() {
             gap: 8,
           }}
         >
+          {/* Miniatura petita d'una fila a dalt (la primera de totes) — crea
+              la sensació de profunditat, mirall de la de sota/última. */}
+          {(() => {
+            // Miniatura peek superior: el color immediatament anterior a la
+            // finestra centrada (amb wrap), per continuar la sensació de profunditat.
+            const N = OFFICIAL_COLORS.length;
+            const topIdx = ((mainVariantIndex - 3) % N + N) % N;
+            const topColor = OFFICIAL_COLORS[topIdx];
+            return (
+              <button
+                type="button"
+                aria-label={`Variant ${topColor}`}
+                onClick={() => setMainVariantIndex(topIdx)}
+                style={{
+                  position: 'relative',
+                  gridColumn: '2 / 3',
+                  gridRow: '1 / 2',
+                  minHeight: 0,
+                  border: 'none',
+                  background: '#fbfcfd',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  padding: 0,
+                  overflow: 'hidden',
+                }}
+              >
+                <img
+                  src={TDP_IMAGE(topColor)}
+                  alt=""
+                  aria-hidden="true"
+                  draggable={false}
+                  style={{ maxWidth: '85%', maxHeight: '85%', objectFit: 'contain', userSelect: 'none' }}
+                />
+              </button>
+            );
+          })()}
           {/* Thumbs (col 2 del subgrid — a la dreta de la imatge).
               Es mostren `THUMB_VISIBLE` thumbs alhora; els altres viuen al
               carrusel i s'amaguen fins que arribin a la finestra visible. */}
           {(() => {
             const THUMB_VISIBLE = 7;
-            const maxStart = Math.max(0, OFFICIAL_COLORS.length - THUMB_VISIBLE);
-            const startIdx = Math.min(maxStart, Math.max(0, mainVariantIndex - Math.floor(THUMB_VISIBLE / 2)));
-            const visible = OFFICIAL_COLORS.slice(startIdx, startIdx + THUMB_VISIBLE);
-            return visible.map((color, vIdx) => {
-              const idx = startIdx + vIdx;
-              const isActive = idx === mainVariantIndex;
+            const N = OFFICIAL_COLORS.length;
+            const center = Math.floor(THUMB_VISIBLE / 2) - 1; // slot FIX del selector (pujat 1 posició)
+            const wrap = (i) => ((i % N) + N) % N;
+            return Array.from({ length: THUMB_VISIBLE }).map((_, vIdx) => {
+              const idx = wrap(mainVariantIndex - center + vIdx);
+              const color = OFFICIAL_COLORS[idx];
+              const isActive = vIdx === center; // l'actiu sempre al centre
               return (
                 <button
-                  key={`thumb-${color}`}
+                  key={`thumb-slot-${vIdx}`}
                   type="button"
                   aria-label={`Variant ${color}`}
                   aria-pressed={isActive}
@@ -422,7 +468,7 @@ function ConstructorPdpPage() {
                   style={{
                     position: 'relative',
                     gridColumn: '2 / 3',
-                    gridRow: `${vIdx * 2 + 1} / ${vIdx * 2 + 3}`,
+                    gridRow: `${vIdx * 2 + 2} / ${vIdx * 2 + 4}`,
                     minHeight: 0,
                     border: 'none',
                     background: '#fbfcfd',
@@ -496,7 +542,7 @@ function ConstructorPdpPage() {
               onNext={goNextVariant}
               prevLabel="Variant anterior"
               nextLabel="Variant següent"
-              rowHeight={rowHeight - 3}
+              rowHeight={exactRowHeight}
               vertical
             />
           </div>
@@ -516,6 +562,8 @@ function ConstructorPdpPage() {
             textTransform: 'uppercase',
             color: 'rgba(71, 80, 89, 0.7)',
             textAlign: 'left',
+            pointerEvents: 'auto',
+            transform: 'translateX(2px)', // Sense desplaçament vertical (Y = 0)
           }}
         >
           ALTRES HISTÒRIES
@@ -530,11 +578,12 @@ function ConstructorPdpPage() {
             width: '100%',
             height: '100%',
             minHeight: 0,
+            pointerEvents: 'auto',
           }}
         >
           <CarouselArrows
             rightPx={0}
-            topPx={0}
+            centerVertically
             onPrev={() => {
               console.log('Dispatching tambe-rail:prev');
               window.dispatchEvent(new CustomEvent('tambe-rail:prev'));
@@ -543,7 +592,7 @@ function ConstructorPdpPage() {
               console.log('Dispatching tambe-rail:next');
               window.dispatchEvent(new CustomEvent('tambe-rail:next'));
             }}
-            rowHeight={rowHeight - 3}
+            rowHeight={exactRowHeight}
           />
         </div>
 

@@ -385,7 +385,14 @@ export default function BeltReferenceOverlay({ enabled }) {
       // FullWideSlideDemoHeader fa servir per a `accordionPautaScale`.
       // Així belt2 funciona com a marc de referència del dev a totes les
       // rutes, fins i tot quan l'acordió no és visible.
-      const yCarouselTop = resolveY(cartCardTopAnchor, 'top');
+      // yCarouselTop: AUTO-REFERENCIAL (calibrat i CONFIRMAT). La guia TOP de
+      // belt2 NO depèn d'anchors del DOM (cart-card-top-anchor / stripe-img),
+      // que es desplacen amb paddings, gaps de la targeta i el banner d'admin.
+      // És sempre `appHeaderOffset + 33`, que tracta capçalera/banner de forma
+      // consistent a totes les rutes. Fallback a DOM només si la var no existeix.
+      const yCarouselTop = Number.isFinite(appHeaderOffsetPx)
+        ? appHeaderOffsetPx + 33
+        : (resolveY(stripeImg, 'top') ?? resolveY(cartCardTopAnchor, 'top'));
       // Bottom del carrusel: el cart-card ocupa tota l'alçada del
       // contenidor del carrusel, així que el seu bottom equival al
       // bottom de la zona del carrusel. El necessitem per al càlcul
@@ -584,10 +591,10 @@ export default function BeltReferenceOverlay({ enabled }) {
         <div style={{ position: 'fixed', left: Math.round((state.xL + state.xR) / 2), top: 0, height: '100vh', width: 0, borderLeft: `1px solid ${color}` }} />
       ) : null}
       {Number.isFinite(state.yCarouselTop) ? (
-        <div style={{ position: 'fixed', left: 0, top: state.yCarouselTop, width: '100vw', height: 0, borderTop: `1px solid ${color}` }} />
+        <div style={{ position: 'fixed', left: 0, top: state.yCarouselTop, width: '100%', height: 0, borderTop: `1px solid ${color}` }} />
       ) : null}
       {Number.isFinite(state.yFinalizeBottom) ? (
-        <div style={{ position: 'fixed', left: 0, top: state.yFinalizeBottom, width: '100vw', height: 0, borderTop: `1px solid ${color}` }} />
+        <div style={{ position: 'fixed', left: 0, top: state.yFinalizeBottom, width: '100%', height: 0, borderTop: `1px solid ${color}` }} />
       ) : null}
     </DevPortal>
   );

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useLayoutEffect, useMemo, useRef } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 import { Button } from '@/components/ui/button';
@@ -7,7 +7,6 @@ import Breadcrumbs from '@/components/Breadcrumbs';
 import { formatPrice } from '@/utils/formatters';
 import { validateEmail, validateRequired, validatePostalCode, validateForm } from '@/utils/validation';
 import { trackBeginCheckout, trackPurchase } from '@/utils/analytics';
-import { getSafeBelt, getLayoutViewportHeight } from '@/utils/layoutMetrics';
 
 const PAUTA_ROWS = 33;
 const PAUTA_FIRST_ROW_SCALE = 0.7;
@@ -21,11 +20,8 @@ const PAUTA_OTHER_ROW_PERCENT = (1 / PAUTA_TOTAL_WEIGHT) * 100;
 const PAUTA_OTHER_ROW_COMP_PX = PAUTA_FIRST_ROW_EXTRA_PX / (PAUTA_ROWS - 1);
 const PAUTA_FIRST_ROW_PERCENT = (PAUTA_FIRST_ROW_SCALE / PAUTA_TOTAL_WEIGHT) * 100;
 const PAUTA_ROWS_TEMPLATE_2 = `minmax(0, calc(${PAUTA_FIRST_ROW_PERCENT}% + ${PAUTA_FIRST_ROW_EXTRA_PX}px)) repeat(${PAUTA_ROWS - 1}, minmax(0, calc(${PAUTA_OTHER_ROW_PERCENT}% - ${PAUTA_OTHER_ROW_COMP_PX}px)))`;
-const CHECKOUT_PAGE_TOP_OFFSET = '33px';
-const CHECKOUT_PAGE_LEFT_OFFSET = '0px';
-const CHECKOUT_BREADCRUMBS_LEFT_OFFSET = '-18px';
-const SHOW_V1_ORDERS_DETAILS = true;
-const CHECKOUT_TABLE_HEADER_SHIFT_Y = -4;
+const CHECKOUT_PAGE_TOP_OFFSET = '32px';
+const CHECKOUT_PAGE_LEFT_OFFSET = '-17px';
 const stripePublishableKey = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || 'pk_test_CONFIGURED_NOT_CONNECTED';
 const stripeConfigured = !!stripePublishableKey;
 const stripeConnectionEnabled = false;
@@ -33,7 +29,7 @@ const stripeConnectionEnabled = false;
 const inputCell = 'w-full h-full px-2 text-[12pt] border border-border rounded-sm bg-white text-foreground focus:outline-none focus:ring-1 focus:ring-ring';
 const titleCell = 'h-full w-full flex items-center text-[18pt] font-medium font-oswald uppercase tracking-[0.4px] text-foreground';
 
-const CheckoutPage = ({ cartItems, onClearCart, pautaEnabled = true, mockMode = 'full' }) => {
+const CheckoutPage = ({ cartItems, onClearCart }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const { success, error: showError } = useToast();
@@ -49,65 +45,11 @@ const CheckoutPage = ({ cartItems, onClearCart, pautaEnabled = true, mockMode = 
   const [formErrors, setFormErrors] = useState({});
   const [isProcessing, setIsProcessing] = useState(false);
   const [paymentDetailsOpen, setPaymentDetailsOpen] = useState(false);
-  const [checkoutScrollRow, setCheckoutScrollRow] = useState(0);
-  const checkoutPautaRef = useRef(null);
-  const [checkoutPautaRowHeight, setCheckoutPautaRowHeight] = useState(null);
 
   const checkoutCartItems = useMemo(() => {
     const stateItems = Array.isArray(location?.state?.cartItems) ? location.state.cartItems : [];
     return stateItems.length > 0 ? stateItems : (Array.isArray(cartItems) ? cartItems : []);
   }, [location?.state?.cartItems, cartItems]);
-
-  useEffect(() => {
-    const updatePautaRowHeight = () => {
-      const pautaEl = checkoutPautaRef.current;
-      if (!pautaEl) return;
-      const height = pautaEl.getBoundingClientRect().height;
-      setCheckoutPautaRowHeight((height * PAUTA_OTHER_ROW_PERCENT) / 100 - PAUTA_OTHER_ROW_COMP_PX);
-    };
-
-    updatePautaRowHeight();
-    window.addEventListener('resize', updatePautaRowHeight);
-    return () => window.removeEventListener('resize', updatePautaRowHeight);
-  }, []);
-
-  // Belt segur propi del checkout, desacoblat del mega-slide.
-  // Publica --hg-checkout-xL/xR/yT/yB al :root amb fallback robust per als
-  // overlays absolutes i el wrapper. NO depèn de --belt2-* (que pot estar
-  // contaminat per mesures del mega-slide).
-  useLayoutEffect(() => {
-    if (typeof window === 'undefined') return undefined;
-
-    const root = document.documentElement;
-
-    const apply = () => {
-      const belt = getSafeBelt({ maxContent: 1350, sideMargin: 16, minContent: 320 });
-      const vh = getLayoutViewportHeight();
-      root.style.setProperty('--hg-checkout-xL', `${belt.left}px`);
-      root.style.setProperty('--hg-checkout-xR', `${belt.right}px`);
-      root.style.setProperty('--hg-checkout-yT', '0px');
-      root.style.setProperty('--hg-checkout-yB', `${vh}px`);
-    };
-
-    apply();
-
-    let raf = 0;
-    const schedule = () => {
-      cancelAnimationFrame(raf);
-      raf = requestAnimationFrame(apply);
-    };
-
-    window.addEventListener('resize', schedule);
-
-    return () => {
-      window.removeEventListener('resize', schedule);
-      cancelAnimationFrame(raf);
-      root.style.removeProperty('--hg-checkout-xL');
-      root.style.removeProperty('--hg-checkout-xR');
-      root.style.removeProperty('--hg-checkout-yT');
-      root.style.removeProperty('--hg-checkout-yB');
-    };
-  }, []);
 
   const isMockCheckout = checkoutCartItems.length === 0;
   const mockCheckoutItems = useMemo(() => ([
@@ -136,33 +78,13 @@ const CheckoutPage = ({ cartItems, onClearCart, pautaEnabled = true, mockMode = 
     { id: 'mock-23', name: 'Belt Two', size: 'L', quantity: 1, price: 15.5 },
     { id: 'mock-24', name: 'Tot Plegat', size: 'XL', quantity: 1, price: 15.5 },
   ]), []);
-  const checkoutRenderItems = useMemo(() => {
-    if (mockMode === 'single') {
-      return [
-        { ...mockCheckoutItems[0], id: 'mock-single-vader', name: 'VADER' },
-        ...mockCheckoutItems.slice(1, 27),
-      ];
-    }
-    return checkoutCartItems.length > 0
+  const checkoutRenderItems = useMemo(() => (
+    checkoutCartItems.length > 0
       ? checkoutCartItems
-      : mockCheckoutItems;
-  }, [checkoutCartItems, mockCheckoutItems, mockMode]);
-  const variantNumbersByItemKey = useMemo(() => {
-    const variantTitles = new Set(['SENSE & SENSIBILITY', 'PRIDE & PREJUDICE', 'PERSUASION']);
-    return checkoutRenderItems.reduce((acc, item, index) => {
-      const normalizedName = String(item.name || '').trim().toUpperCase();
-      if (variantTitles.has(normalizedName)) {
-        acc[`${item.id || normalizedName}-${index}`] = Math.floor(Math.random() * 4) + 1;
-      }
-      return acc;
-    }, {});
-  }, [checkoutRenderItems]);
-  const getCheckoutProductDisplayName = (item, index) => {
-    const variantNumber = variantNumbersByItemKey[`${item.id || String(item.name || '').trim().toUpperCase()}-${index}`];
-    return variantNumber ? `${item.name} ${variantNumber}` : item.name;
-  };
+      : mockCheckoutItems
+  ), [checkoutCartItems, mockCheckoutItems]);
 
-  const subtotal = checkoutRenderItems.reduce((total, item) => total + ((item.price || 0) * (isMockCheckout ? 1 : (item.quantity || 1))), 0);
+  const subtotal = checkoutRenderItems.reduce((total, item) => total + (item.price * item.quantity), 0);
   const shipping = subtotal > 50 ? 0 : 5.95;
   const total = subtotal + shipping;
   const ivaAmount = subtotal * 0.21;
@@ -177,89 +99,6 @@ const CheckoutPage = ({ cartItems, onClearCart, pautaEnabled = true, mockMode = 
   const transportParts = splitPriceParts(shipping === 0 ? 5.95 : shipping);
   const ivaParts = splitPriceParts(ivaAmount);
   const totalParts = splitPriceParts(total);
-  const checkoutAmountBoxWidth = 88;
-  const checkoutAmountGridTemplate = '1fr auto auto';
-  const checkoutAmountColumnShiftX = '-12px';
-  const checkoutAmountContentShiftX = '-20px';
-  const checkoutOrderAmountShiftX = '-26px';
-  const checkoutHeaderTransforms = {
-    TALLA: 'translateX(-11px)',
-    QUANTITAT: 'translateX(-15px)',
-    IMPORT: `translateX(${checkoutAmountColumnShiftX})`,
-  };
-  const visibleCheckoutItems = SHOW_V1_ORDERS_DETAILS ? checkoutRenderItems : [];
-  const checkoutLayoutItemCount = visibleCheckoutItems.length;
-  const checkoutShortTotalsStartRow = 9;
-  const checkoutLongTotalsStartRow = 18;
-  const checkoutFirstOrderRow = 4;
-  const checkoutFreeRowBeforeTotals = 1;
-  const dynamicTotalsStartRow = Math.max(
-    checkoutShortTotalsStartRow,
-    checkoutFirstOrderRow + checkoutLayoutItemCount + checkoutFreeRowBeforeTotals
-  );
-  const totalsStartRow = mockMode === 'single'
-    ? Math.min(
-      checkoutLongTotalsStartRow,
-      dynamicTotalsStartRow
-    )
-    : checkoutLongTotalsStartRow;
-  const checkoutIsLongLayout = totalsStartRow === checkoutLongTotalsStartRow;
-  const checkoutRowsWithBackground = Math.max(visibleCheckoutItems.length, totalsStartRow - 5);
-  const totalsBackgroundRows = 4;
-  const totalsBackgroundGutters = checkoutIsLongLayout ? 3 : 21 - totalsStartRow;
-  const productNameBlockWidthPx = useMemo(() => {
-    if (typeof document === 'undefined') {
-      return 124;
-    }
-    const canvas = document.createElement('canvas');
-    const context = canvas.getContext('2d');
-    if (!context) {
-      return 124;
-    }
-    context.font = '400 12pt "Roboto Condensed", sans-serif';
-    return Math.ceil(Math.max(
-      context.measureText('PRODUCTES').width,
-      ...visibleCheckoutItems.map((item, index) => context.measureText(String(getCheckoutProductDisplayName(item, index) || '')).width)
-    ));
-  }, [visibleCheckoutItems]);
-  const productNameBlockStyle = {
-    display: 'block',
-    width: `${productNameBlockWidthPx}px`,
-    textAlign: 'left',
-    whiteSpace: 'nowrap',
-    transform: 'translateX(-50px)',
-    lineHeight: 1,
-  };
-  const totalsTopRowOffset = totalsStartRow - 2;
-  const totalsTop = `calc(${PAUTA_FIRST_ROW_PERCENT}% + ${PAUTA_FIRST_ROW_EXTRA_PX}px + ${totalsTopRowOffset} * (${PAUTA_OTHER_ROW_PERCENT}% - ${PAUTA_OTHER_ROW_COMP_PX}px) + ${totalsTopRowOffset} * 3px - 0.5 * (${PAUTA_OTHER_ROW_PERCENT}% - ${PAUTA_OTHER_ROW_COMP_PX}px + 3px) - 4px)`;
-  const totalsBlockShiftY = `translateY(${checkoutPautaRowHeight ? (-checkoutPautaRowHeight / 2 - 3) : -3}px)`;
-  const orderTextShiftY = 'translateY(1px)';
-  const checkoutOrderRowGapPx = 3;
-  const checkoutVisibleOrderRows = checkoutLongTotalsStartRow - checkoutFirstOrderRow;
-  const checkoutOrderCellHeight = checkoutPautaRowHeight
-    ? `${Math.max(0, checkoutPautaRowHeight - checkoutOrderRowGapPx)}px`
-    : `calc(${PAUTA_OTHER_ROW_PERCENT}% - ${PAUTA_OTHER_ROW_COMP_PX}px - ${checkoutOrderRowGapPx}px)`;
-  const checkoutOrderRowPitch = checkoutPautaRowHeight
-    ? `${checkoutPautaRowHeight}px`
-    : `calc(${PAUTA_OTHER_ROW_PERCENT}% - ${PAUTA_OTHER_ROW_COMP_PX}px)`;
-  const checkoutVisibleItems = visibleCheckoutItems.slice(
-    checkoutScrollRow,
-    checkoutScrollRow + checkoutVisibleOrderRows
-  );
-  const checkoutMaxScrollRow = Math.max(0, visibleCheckoutItems.length - checkoutVisibleOrderRows);
-  const checkoutBlockBackgroundEndRow = paymentDetailsOpen
-    ? PAUTA_ROWS + 1
-    : totalsStartRow + totalsBackgroundRows;
-  const checkoutGlobalBackgroundRows = Math.max(0, checkoutRowsWithBackground - 10);
-  const handleCheckoutOrdersWheel = (event) => {
-    if (!checkoutIsLongLayout) return;
-    event.preventDefault();
-    const direction = event.deltaY > 0 ? 1 : -1;
-    setCheckoutScrollRow((currentRow) => Math.min(
-      checkoutMaxScrollRow,
-      Math.max(0, currentRow + direction)
-    ));
-  };
 
   // Track begin checkout
   useEffect(() => {
@@ -362,10 +201,10 @@ const CheckoutPage = ({ cartItems, onClearCart, pautaEnabled = true, mockMode = 
           aria-hidden="true"
           style={{
             position: 'fixed',
-            left: 'var(--hg-checkout-xL, 0px)',
-            top: 'var(--hg-checkout-yT, 0px)',
-            width: 'calc(var(--hg-checkout-xR, 100vw) - var(--hg-checkout-xL, 0px))',
-            height: 'calc(var(--hg-checkout-yB, 100vh) - var(--hg-checkout-yT, 0px))',
+            left: 'var(--belt2-xL, 0px)',
+            top: 'var(--belt2-yT, 0px)',
+            width: 'calc(var(--belt2-xR, 100vw) - var(--belt2-xL, 0px))',
+            height: 'calc(var(--belt2-yB, 100vh) - var(--belt2-yT, 0px))',
             backgroundImage: 'url(/tmp/CHECKOUT-V1.png)',
             backgroundRepeat: 'no-repeat',
             backgroundPosition: 'center top',
@@ -379,34 +218,23 @@ const CheckoutPage = ({ cartItems, onClearCart, pautaEnabled = true, mockMode = 
   }
 
   return (
-    <div className={`relative pt-0 pb-0 ${textOnlyMode ? 'checkout-text-only' : ''}`} style={{ backgroundColor: '#fff', minHeight: 'calc(var(--hg-checkout-yB, 100vh) - var(--hg-checkout-yT, 0px) + 64px)' }}>
+    <div className={`relative pt-0 pb-0 ${textOnlyMode ? 'checkout-text-only' : ''}`} style={{ backgroundColor: '#fff', minHeight: 'calc(var(--belt2-yB, 100vh) - var(--belt2-yT, 0px) + 192px)' }}>
       <Helmet>
         <title>Checkout | GRAFC</title>
         <meta name="description" content="Completa la teva comanda de manera segura." />
       </Helmet>
 
-      {/*
-        Per garantir que "INICI" quedi alineat verticalment amb el logo
-        GRAFC del header en tots els navegadors (Chrome, Safari,
-        Firefox), reutilitzem aquí EXACTAMENT la mateixa caixa que el
-        header (`mx-auto max-w-[1400px] px-4 sm:px-6 lg:px-10`). Així
-        eliminem qualsevol divergència entre el càlcul JS de
-        `--hg-checkout-xL` (que depèn de `clientWidth`, sensible a la
-        scrollbar reservada/overlay) i el layout CSS pur del header.
-      */}
       <div
         style={{
           position: 'absolute',
-          left: 0,
-          right: 0,
+          left: `calc(var(--belt2-xL, 0px) + ${CHECKOUT_PAGE_LEFT_OFFSET})`,
           top: CHECKOUT_PAGE_TOP_OFFSET,
+          width: 'calc(var(--belt2-xR, 100vw) - var(--belt2-xL, 0px))',
           zIndex: 5,
           pointerEvents: 'auto',
         }}
       >
-        <div className="mx-auto max-w-[1400px] px-4 sm:px-6 lg:px-10">
-          <Breadcrumbs items={[{ label: 'Cistell', onClick: openFullWideCartSlide }, { label: 'Checkout' }]} />
-        </div>
+        <Breadcrumbs items={[{ label: 'Cistell', onClick: openFullWideCartSlide }, { label: 'Checkout' }]} />
       </div>
 
       {textOnlyMode && (
@@ -461,10 +289,10 @@ const CheckoutPage = ({ cartItems, onClearCart, pautaEnabled = true, mockMode = 
         style={{
           display: 'none',
           position: 'absolute',
-          left: `calc(var(--hg-checkout-xL, 0px) + ${CHECKOUT_PAGE_LEFT_OFFSET})`,
+          left: `calc(var(--belt2-xL, 0px) + ${CHECKOUT_PAGE_LEFT_OFFSET})`,
           top: CHECKOUT_PAGE_TOP_OFFSET,
-          width: 'calc(var(--hg-checkout-xR, 100vw) - var(--hg-checkout-xL, 0px))',
-          height: 'calc(var(--hg-checkout-yB, 100vh) - var(--hg-checkout-yT, 0px))',
+          width: 'calc(var(--belt2-xR, 100vw) - var(--belt2-xL, 0px))',
+          height: 'calc(var(--belt2-yB, 100vh) - var(--belt2-yT, 0px))',
           backgroundImage: 'url(/tmp/CHECKOUT-V1.png)',
           backgroundRepeat: 'no-repeat',
           backgroundPosition: 'center top',
@@ -478,16 +306,15 @@ const CheckoutPage = ({ cartItems, onClearCart, pautaEnabled = true, mockMode = 
         aria-hidden="true"
         style={{
           position: 'absolute',
-          left: '50%',
+          left: `calc(var(--belt2-xL, 0px) + ${CHECKOUT_PAGE_LEFT_OFFSET})`,
           top: CHECKOUT_PAGE_TOP_OFFSET,
-          width: 'calc(var(--hg-checkout-xR, 100vw) - var(--hg-checkout-xL, 0px))',
-          height: 'calc(var(--hg-checkout-yB, 100vh) - var(--hg-checkout-yT, 0px))',
-          transform: `translateX(calc(-50% + ${CHECKOUT_PAGE_LEFT_OFFSET}))`,
+          width: 'calc(var(--belt2-xR, 100vw) - var(--belt2-xL, 0px))',
+          height: 'calc(var(--belt2-yB, 100vh) - var(--belt2-yT, 0px))',
           display: 'grid',
           position: 'absolute',
-          gridTemplateColumns: 'calc((100% - 22.5px) / 2 + 11.25px) calc((100% - 22.5px) / 2 - 11.25px)',
+          gridTemplateColumns: '1fr 1fr',
           gridTemplateRows: PAUTA_ROWS_TEMPLATE,
-          columnGap: '22.5px',
+          columnGap: '45px',
           rowGap: '3px',
           pointerEvents: 'none',
           zIndex: 2,
@@ -500,14 +327,13 @@ const CheckoutPage = ({ cartItems, onClearCart, pautaEnabled = true, mockMode = 
             left: 0,
             top: 0,
             bottom: 0,
-            width: 'calc(50% + 11.25px)',
+            width: 'calc((100% - 45px) / 2 + 22.5px)',
             backgroundColor: '#fff',
             pointerEvents: 'none',
             zIndex: -1,
           }}
         />
         <div
-          ref={checkoutPautaRef}
           style={{
             position: 'absolute',
             left: 0,
@@ -518,8 +344,7 @@ const CheckoutPage = ({ cartItems, onClearCart, pautaEnabled = true, mockMode = 
             gridTemplateRows: PAUTA_ROWS_TEMPLATE_2,
             columnGap: '7.5px',
             rowGap: '3px',
-            width: 'calc(50% + 11.25px)',
-            transform: 'translateY(13px)',
+            width: 'calc((100% - 45px) / 2 + 22.5px)',
             pointerEvents: 'none',
             zIndex: 0,
           }}
@@ -537,7 +362,7 @@ const CheckoutPage = ({ cartItems, onClearCart, pautaEnabled = true, mockMode = 
               zIndex: 0,
             }}
           >
-            {(pautaEnabled ? Array.from({ length: 33 }) : []).flatMap((_, rowIndex) => {
+            {Array.from({ length: 33 }).flatMap((_, rowIndex) => {
               const rowNumber = rowIndex + 1;
               if (rowNumber === 5) return [];
               if (rowNumber === 7) return [];
@@ -596,163 +421,115 @@ const CheckoutPage = ({ cartItems, onClearCart, pautaEnabled = true, mockMode = 
               zIndex: 1,
             }}
           />
-          {SHOW_V1_ORDERS_DETAILS && (
+          <div
+            style={{
+              position: 'absolute',
+              left: 0,
+              top: `calc(${PAUTA_FIRST_ROW_PERCENT}% + ${PAUTA_FIRST_ROW_EXTRA_PX}px + (${PAUTA_OTHER_ROW_PERCENT}% - ${PAUTA_OTHER_ROW_COMP_PX}px))`,
+              height: `calc(${PAUTA_OTHER_ROW_PERCENT}% - ${PAUTA_OTHER_ROW_COMP_PX}px)`,
+              width: 'calc(50% - 3.75px)',
+              display: 'flex',
+              alignItems: 'center',
+              color: '#495058',
+              fontFamily: 'Oswald, sans-serif',
+              fontSize: '16pt',
+              fontWeight: 400,
+              textTransform: 'uppercase',
+              zIndex: 2,
+            }}
+          >
+            PRODUCTES
+          </div>
+          {['TALLATGE', 'QUANTITAT', 'IMPORT'].map((label, index) => (
             <div
+              key={`product-table-heading-${label}`}
               style={{
-                gridColumn: '1 / 5',
+                gridColumn: `${2 + index} / ${3 + index}`,
                 gridRow: '3 / 4',
-                width: 'calc(100% - 10.25px)',
-                justifySelf: 'start',
-                display: 'grid',
-                gridTemplateColumns: 'calc(50% - 7.5px) repeat(3, minmax(0, 1fr))',
-                columnGap: '15px',
-                alignSelf: 'end',
-                transform: 'translate(-0.5px, -12px)',
-                zIndex: 5,
-              }}
-            >
-              {[
-                ['PRODUCTES', 0],
-                ['TALLA', 1],
-                ['QUANTITAT', 2],
-                ['IMPORT', 3],
-              ].map(([label, index]) => (
-                <div
-                  key={`product-table-heading-fixed-${label}`}
-                  style={{
-                    gridColumn: `${index + 1} / ${index + 2}`,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: index === 0 ? 'flex-end' : 'center',
-                    transform: checkoutHeaderTransforms[label] || 'none',
-                    color: '#495058',
-                    fontFamily: 'Oswald, sans-serif',
-                    fontSize: label === 'TOT PLEGAT FA' ? '15pt' : '12pt',
-                    fontWeight: 400,
-                    lineHeight: 1,
-                    textTransform: 'uppercase',
-                  }}
-                >
-                  {index === 0 ? (
-                    <span style={productNameBlockStyle}>{label}</span>
-                  ) : label}
-                </div>
-              ))}
-            </div>
-          )}
-          {pautaEnabled && Array.from({ length: PAUTA_ROWS }).map((_, rowIndex) => (
-            <div
-              key={`checkout-row-debug-number-${rowIndex + 1}`}
-              aria-hidden="true"
-              style={{
-                gridColumn: '1 / 5',
-                gridRow: `${rowIndex + 1} / ${rowIndex + 2}`,
-                justifySelf: 'center',
-                alignSelf: 'center',
-                transform: 'translateX(3.75px)',
-                color: 'rgba(47, 97, 178, 0.65)',
-                fontFamily: 'Roboto Condensed, sans-serif',
-                fontSize: '7pt',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                transform: label === 'IMPORT' ? 'translateX(5px)' : label === 'QUANTITAT' ? 'translateX(4px)' : 'none',
+                color: '#495058',
+                fontFamily: 'Oswald, sans-serif',
+                fontSize: '16pt',
                 fontWeight: 400,
-                lineHeight: 1,
-                pointerEvents: 'none',
-                zIndex: 6,
+                textTransform: 'uppercase',
+                zIndex: 2,
               }}
             >
-              {rowIndex + 1}
-            </div>
-          ))}
-          {Array.from({ length: checkoutGlobalBackgroundRows }).map((_, rowIndex) => (
-            <div
-              key={`product-table-global-row-bg-${rowIndex + 1}`}
-              aria-hidden="true"
-              style={{
-                gridColumn: '1 / 5',
-                gridRow: `${checkoutFirstOrderRow + 1 + rowIndex} / ${checkoutFirstOrderRow + 2 + rowIndex}`,
-                width: 'calc(100% - 21.25px)',
-                justifySelf: 'start',
-                overflow: 'hidden',
-                transform: `translate(-0.5px, ${(-10 - rowIndex * 12 / 13).toFixed(2)}px)`,
-                zIndex: 1,
-              }}
-            >
-              <div
-                style={{
-                  width: '100%',
-                  height: '100%',
-                  backgroundImage: 'url(/placeholders/fons_acordio/fons-una-fila.png)',
-                  backgroundRepeat: 'no-repeat',
-                  backgroundPosition: 'center center',
-                  backgroundSize: '100% 100%',
-                  transform: (rowIndex + 1) % 2 === 0 ? 'none' : 'scaleX(-1)',
-                  opacity: 1,
-                }}
-              />
+              {label}
             </div>
           ))}
           <div
-            onWheel={handleCheckoutOrdersWheel}
             style={{
               gridColumn: '1 / 5',
-              gridRow: '4 / 18',
-              width: 'calc(100% - 10.25px)',
-              justifySelf: 'start',
-              height: '100%',
-              position: 'relative',
-              overflow: 'hidden',
+              gridRow: '4 / 29',
+              display: 'grid',
+              gridTemplateColumns: 'calc(50% - 3.75px) repeat(3, minmax(0, 1fr))',
+              gridAutoRows: 'calc((100% - 24 * 3px) / 25)',
+              columnGap: '7.5px',
+              rowGap: '3px',
+              overflowY: 'auto',
               overscrollBehavior: 'contain',
               scrollbarWidth: 'none',
               pointerEvents: 'auto',
               zIndex: 2,
-              transform: 'translate(-0.5px, -10px)',
             }}
           >
-            {checkoutVisibleItems.flatMap((item, rowIndex) => (
+            {checkoutRenderItems.flatMap((item, rowIndex) => (
               [
-                getCheckoutProductDisplayName(item, rowIndex),
-                item.size || '—',
-                String(item.quantity || 1),
-                displayPrice((item.price || 0) * (item.quantity || 1)),
-              ].map((label, index) => (
+                <div
+                  key={`product-table-row-bg-${rowIndex + 1}`}
+                  style={{
+                    gridColumn: '1 / 5',
+                    gridRow: `${rowIndex * 2 + 1} / ${rowIndex * 2 + 3}`,
+                    overflow: 'hidden',
+                    zIndex: 0,
+                  }}
+                >
+                  <div
+                    style={{
+                      width: '100%',
+                      height: '100%',
+                      backgroundImage: 'url(/placeholders/fons_acordio/fons-una-fila.png)',
+                      backgroundRepeat: 'no-repeat',
+                      backgroundPosition: 'center center',
+                      backgroundSize: '100% 100%',
+                      transform: (rowIndex + 1) % 2 === 0 ? 'scaleX(-1)' : 'none',
+                      opacity: 1,
+                    }}
+                  />
+                </div>,
+                ...[
+                  item.name,
+                  item.size || '—',
+                  String(item.quantity || 1),
+                  displayPrice((item.price || 0) * (item.quantity || 1)),
+                ].map((label, index) => (
                   <div
                     key={`product-table-row-${rowIndex + 1}-${index}`}
                     style={{
                       gridColumn: `${index + 1} / ${index + 2}`,
-                      position: 'absolute',
-                      top: `calc(${rowIndex} * ${checkoutOrderRowPitch} + ${checkoutOrderRowGapPx / 2}px - ${checkoutVisibleItems.length > 1 ? (rowIndex / (checkoutVisibleItems.length - 1)) * 12 : 0}px)`,
-                      left: index === 0
-                        ? '0'
-                        : `calc(50% - 7.5px + ${index - 1} * ((50% - 7.5px) / 3 + 15px)${index === 3 ? ` + ${checkoutAmountContentShiftX}` : ''})`,
-                      width: index === 0 ? 'calc(50% - 7.5px)' : 'calc((50% - 7.5px) / 3)',
+                      gridRow: `${rowIndex * 2 + 1} / ${rowIndex * 2 + 3}`,
                       display: 'flex',
-                      height: '100%',
-                      minHeight: checkoutOrderCellHeight,
-                      maxHeight: checkoutOrderCellHeight,
-                      boxSizing: 'border-box',
                       alignItems: 'center',
-                      justifyContent: index === 0 ? 'flex-end' : 'center',
+                      justifyContent: index === 0 ? 'flex-start' : 'center',
+                      transform: index === 2 ? 'translateX(4px)' : 'none',
                       color: '#4A5057',
                       fontFamily: 'Roboto Condensed, sans-serif',
-                      fontSize: '12pt',
+                      fontSize: '18pt',
                       fontWeight: index === 3 ? 300 : 400,
                       textTransform: 'uppercase',
                       zIndex: 2,
                     }}
                   >
-                    <span
-                      style={{
-                        display: index === 3 ? 'grid' : 'inline-block',
-                        justifyContent: index === 3 ? 'center' : undefined,
-                        transform: index === 2 ? `${checkoutHeaderTransforms.QUANTITAT} ${orderTextShiftY}` : index === 3 ? `translateX(${checkoutOrderAmountShiftX}) ${orderTextShiftY}` : orderTextShiftY,
-                        width: index === 3 ? `${checkoutAmountBoxWidth}px` : undefined,
-                      }}
-                    >
                     {index === 3 ? (
                       <span
                         style={{
-                          display: 'inline-grid',
-                          gridTemplateColumns: checkoutAmountGridTemplate,
-                          width: `${checkoutAmountBoxWidth}px`,
+                          display: 'grid',
+                          gridTemplateColumns: '1fr auto auto',
+                          width: '54px',
                           fontVariantNumeric: 'tabular-nums',
                         }}
                       >
@@ -760,25 +537,20 @@ const CheckoutPage = ({ cartItems, onClearCart, pautaEnabled = true, mockMode = 
                         <span>,</span>
                         <span>{label.replace('€', '').split(',')[1]}€</span>
                       </span>
-                    ) : index === 0 ? (
-                      <span style={productNameBlockStyle}>{label}</span>
                     ) : label}
-                    </span>
                   </div>
                 ))
+              ]
             ))}
           </div>
           <div
             aria-hidden="true"
             style={{
-              position: 'absolute',
-              left: '50%',
-              top: `calc(${PAUTA_FIRST_ROW_PERCENT}% + ${PAUTA_FIRST_ROW_EXTRA_PX}px + 2 * (${PAUTA_OTHER_ROW_PERCENT}% - ${PAUTA_OTHER_ROW_COMP_PX}px) + 2 * 3px - 14px)`,
               gridColumn: '1 / 5',
-              width: 'calc(100% - 22.75px)',
+              gridRow: '3 / 4',
+              alignSelf: 'end',
               height: '2px',
               backgroundColor: '#DEDFE1',
-              transform: 'translateX(calc(-50% - 10.75px))',
               zIndex: 3,
             }}
           />
@@ -786,85 +558,45 @@ const CheckoutPage = ({ cartItems, onClearCart, pautaEnabled = true, mockMode = 
             aria-hidden="true"
             style={{
               gridColumn: '1 / 5',
-              gridRow: `${totalsStartRow} / ${totalsStartRow + 1}`,
+              gridRow: '29 / 30',
               alignSelf: 'start',
-              width: 'calc(100% - 22.75px)',
-              justifySelf: 'center',
               height: '2px',
               backgroundColor: '#DEDFE1',
-              transform: `translateX(-10.75px) ${totalsBlockShiftY}`,
               zIndex: 3,
             }}
           />
-          {SHOW_V1_ORDERS_DETAILS && (
           <div
             aria-hidden="true"
             style={{
               gridColumn: '1 / 5',
-              gridRow: `${totalsStartRow} / ${totalsStartRow + totalsBackgroundRows}`,
-              width: 'calc(100% - 22.25px)',
-              justifySelf: 'start',
-              height: '100%',
-              overflow: 'hidden',
-              transform: `translateX(-0.5px) ${totalsBlockShiftY}`,
-              zIndex: 1,
+              gridRow: '30 / 34',
+              backgroundImage: 'url(/placeholders/fons_acordio/fons-una-fila.png)',
+              backgroundRepeat: 'no-repeat',
+              backgroundPosition: 'center center',
+              backgroundSize: '100% 100%',
+              zIndex: 0,
             }}
-          >
-            <div
-              style={{
-                display: 'block',
-                width: '100%',
-                height: '100%',
-                backgroundImage: 'url(/placeholders/fons_acordio/fons-una-fila.png)',
-                backgroundRepeat: 'no-repeat',
-                backgroundPosition: 'center center',
-                backgroundSize: '100% 100%',
-              }}
-            />
-          </div>
-          )}
-          {SHOW_V1_ORDERS_DETAILS && [
-            { label: 'SUBTOTAL', amount: displayPrice(subtotal), strong: false },
-            { label: 'TRANSPORT', amount: displayPrice(5.95), strong: false },
-            { label: 'IVA 21%', amount: displayPrice(ivaAmount), strong: false },
-            { label: 'TOT PLEGAT FA', amount: displayPrice(total), strong: true },
-          ].flatMap(({ label, amount, strong }, index) => {
-            const labelStyle = {
-              fontFamily: 'Oswald, sans-serif',
-              fontWeight: strong ? 200 : 300,
-              fontSize: strong ? '20pt' : '18pt',
-              color: strong ? '#474F59' : '#99A3B5',
-              letterSpacing: '0.4px',
-              textTransform: 'uppercase',
-              lineHeight: 1,
-            };
-            const amountStyle = {
-              fontFamily: 'Oswald, sans-serif',
-              fontWeight: strong ? 400 : 200,
-              fontSize: strong ? '22pt' : '18pt',
-              color: strong ? '#474F59' : '#99A3B5',
-              letterSpacing: '0.6px',
-              whiteSpace: 'nowrap',
-              fontVariantNumeric: 'tabular-nums',
-              fontFeatureSettings: '"tnum" 1',
-              lineHeight: 1,
-              textDecoration: label === 'TRANSPORT' ? 'line-through' : 'none',
-              textDecorationColor: label === 'TRANSPORT' ? '#475059' : undefined,
-              textDecorationThickness: label === 'TRANSPORT' ? '1.5px' : undefined,
-            };
-            const [intPart, decPart = '00'] = amount.replace('€', '').split(',');
-            return [
+          />
+          {[
+            ['SUBTOTAL', displayPrice(subtotal), false],
+            ['TRANSPORT', displayPrice(5.95), true],
+            ['IVA 21%', displayPrice(ivaAmount), false],
+            ['TOT PLEGAT FA', displayPrice(total), false],
+          ].flatMap(([label, amount, strikeAmount], index) => ([
             <div
               key={`totals-label-${index}`}
               style={{
                 gridColumn: '2 / 4',
-                gridRow: `${totalsStartRow + index} / ${totalsStartRow + 1 + index}`,
+                gridRow: `${30 + index} / ${31 + index}`,
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'flex-end',
-                paddingRight: 'calc((100% - 7.5px) / 2 + 7.5px)',
-                transform: `translateX(46.5px) ${totalsBlockShiftY}${label === 'TOT PLEGAT FA' || label === 'IVA 21%' ? ' translateY(-4px)' : ''}`,
-                ...labelStyle,
+                paddingRight: 'calc(12% + 3.75px)',
+                color: '#4A5057',
+                fontFamily: 'Roboto Condensed, sans-serif',
+                fontSize: label === 'TOT PLEGAT FA' ? '20pt' : '18pt',
+                fontWeight: label === 'TOT PLEGAT FA' ? 400 : 300,
+                textTransform: 'uppercase',
                 whiteSpace: 'nowrap',
                 zIndex: 2,
               }}
@@ -875,40 +607,54 @@ const CheckoutPage = ({ cartItems, onClearCart, pautaEnabled = true, mockMode = 
               key={`totals-amount-${index}`}
               style={{
                 gridColumn: '4 / 5',
-                gridRow: `${totalsStartRow + index} / ${totalsStartRow + 1 + index}`,
-                display: 'grid',
+                gridRow: `${30 + index} / ${31 + index}`,
+                display: 'flex',
                 alignItems: 'center',
-                justifyContent: 'start',
-                transform: `translateX(${checkoutAmountContentShiftX}) ${totalsBlockShiftY}${label === 'TOT PLEGAT FA' || label === 'IVA 21%' ? ' translateY(-4px)' : ''}`,
+                justifyContent: 'flex-start',
+                color: '#4A5057',
+                fontFamily: 'Roboto Condensed, sans-serif',
+                fontSize: label === 'TOT PLEGAT FA' ? '20pt' : '18pt',
+                fontWeight: label === 'TOT PLEGAT FA' ? 400 : 300,
+                textTransform: 'uppercase',
+                textDecoration: strikeAmount ? 'line-through' : 'none',
+                transform: label === 'TOT PLEGAT FA' ? 'translateX(4px)' : 'none',
                 zIndex: 2,
               }}
             >
               <span
                 style={{
                   display: 'grid',
-                  gridTemplateColumns: checkoutAmountGridTemplate,
-                  width: `${checkoutAmountBoxWidth}px`,
-                  ...amountStyle,
+                  gridTemplateColumns: '1fr auto auto',
+                  width: '88px',
+                  fontVariantNumeric: 'tabular-nums',
                 }}
               >
-                <span style={{ textAlign: 'right' }}>{intPart}</span>
+                <span style={{ textAlign: 'right' }}>{amount.replace('€', '').split(',')[0]}</span>
                 <span>,</span>
-                <span>{decPart}€</span>
+                <span>{amount.replace('€', '').split(',')[1]}€</span>
               </span>
             </div>,
-          ];
-          })}
+          ]))}
         </div>
+        {Array.from({ length: PAUTA_ROWS * 2 }).map((_, idx) => (
+          <div
+            key={`pauta-grid-${idx}`}
+            style={{
+              border: 'none',
+              backgroundColor: 'transparent',
+              boxSizing: 'border-box',
+            }}
+          />
+        ))}
       </div>
 
       <div
         className="absolute z-[3]"
         style={{
-          left: '50%',
+          left: `calc(var(--belt2-xL, 0px) + ${CHECKOUT_PAGE_LEFT_OFFSET})`,
           top: CHECKOUT_PAGE_TOP_OFFSET,
-          width: 'calc(var(--hg-checkout-xR, 100vw) - var(--hg-checkout-xL, 0px))',
-          transform: `translateX(calc(-50% + ${CHECKOUT_PAGE_LEFT_OFFSET}))`,
-          height: 'calc(var(--hg-checkout-yB, 100vh) - var(--hg-checkout-yT, 0px))',
+          width: 'calc(var(--belt2-xR, 100vw) - var(--belt2-xL, 0px))',
+          height: 'calc(var(--belt2-yB, 100vh) - var(--belt2-yT, 0px))',
           display: hideCheckoutText ? 'none' : 'block',
           pointerEvents: 'none',
         }}
@@ -917,9 +663,9 @@ const CheckoutPage = ({ cartItems, onClearCart, pautaEnabled = true, mockMode = 
         <div
           className="grid h-full"
           style={{
-            gridTemplateColumns: 'calc((100% - 22.5px) / 2 + 11.25px) calc((100% - 22.5px) / 2 - 11.25px)',
+            gridTemplateColumns: '1fr 1fr',
             gridTemplateRows: PAUTA_ROWS_TEMPLATE,
-            columnGap: '22.5px',
+            columnGap: '45px',
             rowGap: '3px',
           }}
         >
@@ -927,26 +673,14 @@ const CheckoutPage = ({ cartItems, onClearCart, pautaEnabled = true, mockMode = 
             aria-hidden="true"
             style={{
               gridColumn: '2 / 3',
-              gridRow: paymentDetailsOpen ? '1 / -1' : `1 / ${checkoutBlockBackgroundEndRow}`,
-              width: 'calc(100% + 11px)',
-              justifySelf: 'start',
-              height: '100%',
-              overflow: 'hidden',
-              transform: `translate(-11px, ${checkoutPautaRowHeight ? (8 - checkoutPautaRowHeight / 2) : 8}px)`,
+              gridRow: '1 / 34',
+              backgroundImage: 'url(/placeholders/fons_acordio/una-columnat.png)',
+              backgroundRepeat: 'repeat-y',
+              backgroundPosition: 'center top',
+              backgroundSize: '100% auto',
               zIndex: -1,
             }}
-          >
-            <img
-              src="/placeholders/fons_acordio/una-columna.png"
-              alt=""
-              style={{
-                display: 'block',
-                width: '100%',
-                height: '100%',
-                objectFit: 'fill',
-              }}
-            />
-          </div>
+          />
           <div
             id="stripe-guide-checkout-top-anchor"
             style={{ display: 'none', gridColumn: '1 / 2', gridRow: '3 / 4', color: '#4A5057', fontFamily: 'Roboto Condensed, sans-serif' }}
@@ -957,7 +691,7 @@ const CheckoutPage = ({ cartItems, onClearCart, pautaEnabled = true, mockMode = 
           <div style={{ display: 'none', gridColumn: '1 / 2', gridRow: '4 / 5' }}>
             <div className="grid h-full items-center text-[11pt] leading-[1] border-b border-border" style={{ ...LEFT_ROW_GRADIENT_STYLE, color: '#4A5057', gridTemplateColumns: 'minmax(0, 1fr) 62px 62px 84px', columnGap: '8px', fontFamily: 'Roboto Condensed, sans-serif' }}>
               <span />
-              <span className="text-right uppercase">Talla</span>
+              <span className="text-right uppercase">Tallatge</span>
               <span className="text-right uppercase">Quantitat</span>
               <span className="text-right uppercase">Import</span>
             </div>
@@ -1010,7 +744,7 @@ const CheckoutPage = ({ cartItems, onClearCart, pautaEnabled = true, mockMode = 
             </span>
           </div>
 
-          <div style={{ gridColumn: '2 / 3', gridRow: '3 / 22', display: 'flex', justifyContent: 'center', color: '#4A5057', fontFamily: 'Roboto Condensed, sans-serif', pointerEvents: 'auto', transform: 'translateY(14px)' }}>
+          <div style={{ gridColumn: '2 / 3', gridRow: '3 / 31', display: 'flex', justifyContent: 'center', color: '#4A5057', fontFamily: 'Roboto Condensed, sans-serif', pointerEvents: 'auto' }}>
             <div style={{ width: 'min(100%, 384px)' }}>
               <div style={{ border: '1px solid #E6E8EC', borderRadius: '9px', background: '#FFFFFF', boxShadow: '0 1px 2px rgba(16, 24, 40, 0.04)', overflow: 'hidden' }}>
                 <div style={{ height: '42px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 16px', borderBottom: '1px solid #EEF0F3' }}>
@@ -1040,7 +774,7 @@ const CheckoutPage = ({ cartItems, onClearCart, pautaEnabled = true, mockMode = 
                 </div>
               </div>
 
-              <div style={{ marginTop: '14px', display: 'grid', rowGap: '8px' }}>
+              <div style={{ marginTop: paymentDetailsOpen ? '14px' : '18px', display: 'grid', rowGap: '8px' }}>
                 <div style={{ fontSize: '12pt', fontWeight: 500, color: '#4A5057' }}>Altres dades</div>
                 <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '10.5pt', fontWeight: 300 }}>
                   <input type="checkbox" checked readOnly />

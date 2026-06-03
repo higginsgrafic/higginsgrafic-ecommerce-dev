@@ -136,8 +136,11 @@ function HomeClean() {
       const gridEl = pautaGridRef.current;
       if (!gridEl) return;
       const rect = gridEl.getBoundingClientRect();
-      const numRows = 70; // Nombre de files per aquest segment
-      const singleRowH = rect.height / numRows;
+      const numRows = 73; // Nombre de files per aquest segment (ha de coincidir amb la pauta numRows={73})
+      const rowGap = 3; // gutterY per defecte de Pauta4ColsOverlay
+      // Alçada EXACTA d'una fila (descomptant els gaps entre files), perquè
+      // les fletxes quadrades càpiguen exactament dins d'una sola fila.
+      const singleRowH = (rect.height - (numRows - 1) * rowGap) / numRows;
       setRowHeight((prev) => (Math.abs(prev - singleRowH) < 0.1 ? prev : singleRowH));
     };
 
@@ -166,7 +169,7 @@ function HomeClean() {
         numCols={3}
         numRows={24}
         canvasAspect={[2642, 1780]}
-        topOffset="0px"
+        topOffset="76px"
         bottomPadding="0px"
       >
         {/* Breadcrumbs (fila 2 / 3) */}
@@ -175,7 +178,7 @@ function HomeClean() {
             gridColumn: '1 / 4',
             gridRow: '2 / 3',
             alignSelf: 'start',
-            transform: 'translateY(-10px)',
+            transform: 'translateY(-86px)', // -10 original -76 per revertir el moviment del topOffset
           }}
         >
           <Breadcrumbs
@@ -200,6 +203,7 @@ function HomeClean() {
             alignItems: 'center',
             justifyContent: 'center',
             pointerEvents: 'auto',
+            transform: 'translateY(-38px)', // Pujat 1 fila
           }}
         >
           <EditableTextBox
@@ -259,7 +263,7 @@ function HomeClean() {
         <div
           style={{
             gridColumn: '3 / 4',
-            gridRow: '35 / 36', // Mogut 5 files cap amunt (abans 40 / 41)
+            gridRow: '37 / 38', // +2 files per acompanyar el contingut baixat (abans 35 / 36)
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -930,7 +934,7 @@ function HomeClean() {
                   color: 'rgba(71, 80, 89, 0.7)',
                   textAlign: 'left',
                   pointerEvents: 'auto',
-                  transform: 'translateX(2px)', // Mogut 1px amunt (ara translateY és 0px) i 2px dreta
+                  transform: 'translate(2px, 5px)', // Baixat 5px per alinear amb la fila (2px dreta)
                 }}
               >
                 ALTRES HISTÒRIES
@@ -946,12 +950,12 @@ function HomeClean() {
                   height: '100%',
                   minHeight: 0,
                   pointerEvents: 'auto',
-                  transform: 'translateX(2px)', // Mogut 1px amunt (ara translateY és 0px) i 2px dreta
+                  transform: 'translateY(6px)', // Baixat 6px (només vertical)
                 }}
               >
                 <CarouselArrows
                   rightPx={0}
-                  topPx={0}
+                  centerVertically
                   onPrev={() => {
                     console.log('Dispatching tambe-rail:prev');
                     window.dispatchEvent(new CustomEvent('tambe-rail:prev'));
@@ -960,7 +964,7 @@ function HomeClean() {
                     console.log('Dispatching tambe-rail:next');
                     window.dispatchEvent(new CustomEvent('tambe-rail:next'));
                   }}
-                  rowHeight={rowHeight - 3}
+                  rowHeight={rowHeight}
                 />
               </div>
 
