@@ -7,6 +7,8 @@ import { execSync } from 'child_process'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
+const IS_PROD_BUILD = process.env.VITE_PROD_MODE === 'true'
+
 function readGitBranch() {
   try {
     return execSync('git rev-parse --abbrev-ref HEAD', { cwd: __dirname }).toString().trim()
@@ -92,8 +94,32 @@ function componentCatalogDevApi() {
   }
 }
 
+function prodDevHtml() {
+  if (!IS_PROD_BUILD) return { name: 'prod-dev-html-noop' }
+
+  return {
+    name: 'prod-dev-html',
+    apply: 'serve',
+    configureServer(server) {
+      server.middlewares.use(async (req, res, next) => {
+        if (req.url !== '/' || req.method !== 'GET') return next()
+
+        const htmlPath = path.resolve(__dirname, 'index-prod.html')
+        let html = fs.readFileSync(htmlPath, 'utf-8')
+
+        // Injecta el client HMR de Vite i converteix l'HTML per Vite
+        html = await server.transformIndexHtml('/', html, req.originalUrl)
+
+        res.statusCode = 200
+        res.setHeader('Content-Type', 'text/html; charset=utf-8')
+        res.end(html)
+      })
+    },
+  }
+}
+
 export default defineConfig({
-  plugins: [react(), componentCatalogDevApi()],
+  plugins: [react(), componentCatalogDevApi(), prodDevHtml()],
   define: {
     __HG_GIT_BRANCH__: JSON.stringify(readGitBranch()),
   },
@@ -127,6 +153,11 @@ export default defineConfig({
     assetsDir: 'assets',
     sourcemap: false,
     copyPublicDir: true,
+    ...(IS_PROD_BUILD && {
+      rollupOptions: {
+        input: path.resolve(__dirname, 'index-prod.html'),
+      },
+    }),
   },
   assetsInclude: ['**/*.zip', '**/*.tar.gz'],
 })

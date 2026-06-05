@@ -1,0 +1,788 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tauler d'Auditoria — Higgins Gràfic</title>
+<style>
+  :root {
+    --bg: #0f1117;
+    --surface: #1a1d27;
+    --surface2: #222533;
+    --text: #e1e4ea;
+    --muted: #9ca3af;
+    --critical: #ef4444;
+    --critical-bg: #1c1017;
+    --important: #f59e0b;
+    --important-bg: #1c170e;
+    --recommendation: #3b82f6;
+    --recommendation-bg: #0f172a;
+    --green: #10b981;
+    --amber: #f59e0b;
+    --red: #ef4444;
+    --blue: #3b82f6;
+    --border: #2a2d3a;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: system-ui, -apple-system, sans-serif;
+    line-height: 1.5;
+    padding: 1.5rem;
+  }
+
+  /* Header */
+  header {
+    text-align: center;
+    margin-bottom: 1.5rem;
+  }
+  header h1 {
+    font-size: 1.75rem;
+    color: #fff;
+    margin-bottom: 0.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+  }
+  header .meta {
+    color: var(--muted);
+    font-size: 0.8rem;
+  }
+
+  /* Progress */
+  .progress-wrap {
+    margin-bottom: 1.5rem;
+    max-width: 700px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .progress-bar {
+    height: 8px;
+    background: var(--surface2);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 0.4rem;
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--red), var(--amber), var(--green));
+    border-radius: 4px;
+    transition: width 0.5s ease;
+  }
+  .progress-stats {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.78rem;
+    color: var(--muted);
+  }
+
+  /* Board grid */
+  .board {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    max-width: 1300px;
+    margin: 0 auto;
+  }
+  @media (max-width: 900px) {
+    .board {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  /* Column */
+  .column {
+    background: var(--surface);
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    min-height: 300px;
+  }
+  .column-header {
+    padding: 0.85rem 1rem;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-radius: 12px 12px 0 0;
+  }
+  .column-header.critical { background: var(--critical-bg); }
+  .column-header.important { background: var(--important-bg); }
+  .column-header.recommendation { background: var(--recommendation-bg); }
+
+  .column-header .col-title {
+    font-weight: 700;
+    font-size: 0.95rem;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+  .column-header .col-count {
+    font-size: 0.75rem;
+    color: var(--muted);
+    background: var(--surface2);
+    padding: 2px 10px;
+    border-radius: 10px;
+  }
+
+  /* Cards */
+  .column-body {
+    padding: 0.5rem;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    overflow-y: auto;
+    max-height: 70vh;
+  }
+  .card {
+    padding: 0.7rem 0.85rem;
+    border-radius: 8px;
+    cursor: pointer;
+    user-select: none;
+    transition: all 0.2s ease;
+    position: relative;
+    border-left: 3px solid transparent;
+    font-size: 0.82rem;
+    line-height: 1.4;
+  }
+  .card:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  }
+  .card:active {
+    transform: scale(0.98);
+  }
+
+  /* Sub-estats: Pendent (vermell) */
+  .card.state-pending {
+    background: #1c1017;
+    border-color: var(--red);
+  }
+  .card.state-pending .card-dot {
+    background: var(--red);
+    box-shadow: 0 0 6px var(--red);
+  }
+
+  /* Sub-estats: Activa (àmbre) */
+  .card.state-active {
+    background: #1c170e;
+    border-color: var(--amber);
+    animation: pulse-amber 2s infinite;
+  }
+  .card.state-active .card-dot {
+    background: var(--amber);
+    box-shadow: 0 0 6px var(--amber);
+  }
+
+  /* Sub-estats: Completada (verd) */
+  .card.state-done {
+    background: #0c1a16;
+    border-color: var(--green);
+    opacity: 0.7;
+  }
+  .card.state-done .card-dot {
+    background: var(--green);
+    box-shadow: 0 0 6px var(--green);
+  }
+  .card.state-done .card-text {
+    text-decoration: line-through;
+    color: var(--muted);
+  }
+
+  @keyframes pulse-amber {
+    0%, 100% { border-color: var(--amber); }
+    50% { border-color: #d97706; box-shadow: 0 0 8px rgba(245, 158, 11, 0.3); }
+  }
+
+  .card-header-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.3rem;
+  }
+  .card-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .card-id {
+    font-size: 0.7rem;
+    color: var(--muted);
+    font-weight: 600;
+    opacity: 0.7;
+  }
+  .card-status {
+    font-size: 0.65rem;
+    font-weight: 600;
+    padding: 1px 8px;
+    border-radius: 8px;
+    letter-spacing: 0.3px;
+  }
+  .status-pending {
+    background: #7f1d1d;
+    color: #fca5a5;
+  }
+  .status-active {
+    background: #78350f;
+    color: #fcd34d;
+  }
+  .status-done {
+    background: #065f46;
+    color: #6ee7b7;
+  }
+  .card-text {
+    font-size: 0.8rem;
+    margin-bottom: 0.25rem;
+  }
+  .card-text code {
+    background: var(--surface2);
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-size: 0.72rem;
+  }
+
+  /* Footer summary */
+  .summary {
+    text-align: center;
+    margin-top: 2rem;
+    padding: 1rem;
+    border-top: 1px solid var(--border);
+    max-width: 700px;
+    margin-left: auto;
+    margin-right: auto;
+    font-size: 0.85rem;
+    color: var(--muted);
+  }
+  .summary .dots { display: flex; align-items: center; justify-content: center; gap: 0.5rem; margin-bottom: 0.35rem; }
+  .summary-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+  .dot-pending { background: var(--red); }
+  .dot-active { background: var(--amber); }
+  .dot-done { background: var(--green); }
+  .summary .target {
+    margin-top: 0.5rem;
+    font-size: 0.82rem;
+    color: #fcd34d;
+  }
+
+  /* Filters */
+  .filter-bar {
+    display: flex;
+    gap: 0.35rem;
+    justify-content: center;
+    margin-bottom: 1.25rem;
+    flex-wrap: wrap;
+  }
+  .filter-btn {
+    padding: 0.35rem 0.9rem;
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    background: var(--surface);
+    color: var(--text);
+    font-size: 0.75rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: inherit;
+  }
+  .filter-btn:hover { border-color: var(--blue); }
+  .filter-btn.active { background: var(--blue); border-color: var(--blue); color: #fff; }
+
+  .hidden { display: none !important; }
+
+  /* Scrollbar */
+  .column-body::-webkit-scrollbar { width: 4px; }
+  .column-body::-webkit-scrollbar-track { background: transparent; }
+  .column-body::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+  /* Legend */
+  .legend {
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+    margin-bottom: 1rem;
+    font-size: 0.75rem;
+    color: var(--muted);
+  }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+  }
+  .legend-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+  }
+  .legend-dot.pending { background: var(--red); }
+  .legend-dot.active { background: var(--amber); }
+  .legend-dot.done { background: var(--green); }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>📋 Tauler d'Auditoria de Producció</h1>
+  <p class="meta">Basat en docs/auditoria-produccio.html · Darrera actualització: 6 juny 2026</p>
+</header>
+
+<!-- Progress bar -->
+<div class="progress-wrap">
+  <div class="progress-bar">
+    <div class="progress-fill" id="progressFill" style="width:100%"></div>
+  </div>
+  <div class="progress-stats">
+    <span id="progressLabel">19 / 19 completades (100%)</span>
+    <span>🎯 Objectiu llançament: 19/19 (100%) ✅</span>
+  </div>
+</div>
+
+<!-- Legend -->
+<div class="legend">
+  <div class="legend-item"><span class="legend-dot pending"></span> Pendent</div>
+  <div class="legend-item"><span class="legend-dot active"></span> Activa</div>
+  <div class="legend-item"><span class="legend-dot done"></span> Completada</div>
+</div>
+
+<!-- Filter buttons -->
+<div class="filter-bar">
+  <button class="filter-btn active" data-filter="all">Totes</button>
+  <button class="filter-btn" data-filter="pending">⚠️ Pendents</button>
+  <button class="filter-btn" data-filter="active">🧐 Actives</button>
+  <button class="filter-btn" data-filter="done">✅ Completades</button>
+</div>
+
+<!-- Board -->
+<div class="board">
+
+  <!-- ===== CRÍTICA ===== -->
+  <div class="column" id="col-critical">
+    <div class="column-header critical">
+      <span class="col-title">🔴 Crítica</span>
+      <span class="col-count" id="count-critical">6/6</span>
+    </div>
+    <div class="column-body">
+      <!-- #1 -->
+      <div class="card state-done" data-id="1" data-priority="critical" data-state="done">
+        <div class="card-header-row">
+          <span class="card-dot"></span>
+          <span class="card-id">#1</span>
+          <span class="card-status status-done">FET</span>
+        </div>
+        <div class="card-text">Eliminar fitxers de debug/test de <code>public/</code></div>
+      </div>
+      <!-- #2 -->
+      <div class="card state-done" data-id="2" data-priority="critical" data-state="done">
+        <div class="card-header-row">
+          <span class="card-dot"></span>
+          <span class="card-id">#2</span>
+          <span class="card-status status-done">FET</span>
+        </div>
+        <div class="card-text">Eliminar <code>public.code-workspace</code></div>
+      </div>
+      <!-- #3 -->
+      <div class="card state-done" data-id="3" data-priority="critical" data-state="done">
+        <div class="card-header-row">
+          <span class="card-dot"></span>
+          <span class="card-id">#3</span>
+          <span class="card-status status-done">FET</span>
+        </div>
+        <div class="card-text">Protegir TOTES les rutes admin/dev/lab amb autenticació</div>
+      </div>
+      <!-- #4 -->
+      <div class="card state-done" data-id="4" data-priority="critical" data-state="done">
+        <div class="card-header-row">
+          <span class="card-dot"></span>
+          <span class="card-id">#4</span>
+          <span class="card-status status-done">FET</span>
+        </div>
+        <div class="card-text">Verificar <code>SUPABASE_SERVICE_ROLE_KEY</code> no exposat al client</div>
+      </div>
+      <!-- #5 -->
+      <div class="card state-done" data-id="5" data-priority="critical" data-state="done">
+        <div class="card-header-row">
+          <span class="card-dot"></span>
+          <span class="card-id">#5</span>
+          <span class="card-status status-done">FET</span>
+        </div>
+        <div class="card-text">Configurar variables d'entorn de producció a Netlify — docs a <code>docs/netlify-env-setup.md</code>, valors al <code>.env</code> local<br>✅ Configurat a dev + prod via CLI (7 vars crítiques + 2 opcionals)</div>
+      </div>
+      <!-- #6 -->
+      <div class="card state-done" data-id="6" data-priority="critical" data-state="done">
+        <div class="card-header-row">
+          <span class="card-dot"></span>
+          <span class="card-id">#6</span>
+          <span class="card-status status-done">FET</span>
+        </div>
+        <div class="card-text"><code>npm audit fix</code> — 0 vulnerabilitats</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== IMPORTANT ===== -->
+  <div class="column" id="col-important">
+    <div class="column-header important">
+      <span class="col-title">🟡 Important</span>
+      <span class="col-count" id="count-important">6/6</span>
+    </div>
+    <div class="column-body">
+      <!-- #7 -->
+      <div class="card state-done" data-id="7" data-priority="important" data-state="done">
+        <div class="card-header-row">
+          <span class="card-dot"></span>
+          <span class="card-id">#7</span>
+          <span class="card-status status-done">FET</span>
+        </div>
+        <div class="card-text">Code-splitting: <code>React.lazy()</code> a totes les rutes</div>
+      </div>
+      <!-- #8 -->
+      <div class="card state-done" data-id="8" data-priority="important" data-state="done">
+        <div class="card-header-row">
+          <span class="card-dot"></span>
+          <span class="card-id">#8</span>
+          <span class="card-status status-done">FET</span>
+        </div>
+        <div class="card-text">Moure/admin/lab a subdirectori + <code>ProtectedRoute</code></div>
+      </div>
+      <!-- #9 -->
+      <div class="card state-done" data-id="9" data-priority="important" data-state="done">
+        <div class="card-header-row">
+          <span class="card-dot"></span>
+          <span class="card-id">#9</span>
+          <span class="card-status status-done">FET</span>
+        </div>
+        <div class="card-text">Optimitzar imatges WebP/AVIF — 42 img convertides, 71,38 MB estalvi</div>
+      </div>
+      <!-- #10 -->
+      <div class="card state-done" data-id="10" data-priority="important" data-state="done">
+        <div class="card-header-row">
+          <span class="card-dot"></span>
+          <span class="card-id">#10</span>
+          <span class="card-status status-done">FET</span>
+        </div>
+        <div class="card-text">Revisar polítiques de cache a <code>netlify.toml</code></div>
+      </div>
+      <!-- #11 -->
+      <div class="card state-done" data-id="11" data-priority="important" data-state="done">
+        <div class="card-header-row">
+          <span class="card-dot"></span>
+          <span class="card-id">#11</span>
+          <span class="card-status status-done">FET</span>
+        </div>
+        <div class="card-text"><code>sharp</code> → <code>devDependencies</code></div>
+      </div>
+      <!-- #12 -->
+      <div class="card state-done" data-id="12" data-priority="important" data-state="done">
+        <div class="card-header-row">
+          <span class="card-dot"></span>
+          <span class="card-id">#12</span>
+          <span class="card-status status-done">FET</span>
+        </div>
+        <div class="card-text">Eliminar configs de dev de <code>public/</code></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== RECOMANAT ===== -->
+  <div class="column" id="col-recommendation">
+    <div class="column-header recommendation">
+      <span class="col-title">🟢 Recomanat</span>
+      <span class="col-count" id="count-recommendation">7/7</span>
+    </div>
+    <div class="column-body">
+      <!-- #13 -->
+      <div class="card state-done" data-id="13" data-priority="recommendation" data-state="done">
+        <div class="card-header-row">
+          <span class="card-dot"></span>
+          <span class="card-id">#13</span>
+          <span class="card-status status-done">FET</span>
+        </div>
+        <div class="card-text"><code>robots.txt</code> restringeix rutes admin/lab</div>
+      </div>
+      <!-- #14 -->
+      <div class="card state-done" data-id="14" data-priority="recommendation" data-state="done">
+        <div class="card-header-row">
+          <span class="card-dot"></span>
+          <span class="card-id">#14</span>
+          <span class="card-status status-done">FET</span>
+        </div>
+        <div class="card-text">Configurar CSP (Content Security Policy) headers — endurit amb dominis concrets a <code>netlify.toml</code></div>
+      </div>
+      <!-- #15 -->
+      <div class="card state-done" data-id="15" data-priority="recommendation" data-state="done">
+        <div class="card-header-row">
+          <span class="card-dot"></span>
+          <span class="card-id">#15</span>
+          <span class="card-status status-done">FET</span>
+        </div>
+        <div class="card-text">Implementar analytics (respectant GDPR) — <code>src/lib/analytics.js</code> amb consentiment cookie + anonimització IP + <code>navigator.doNotTrack</code></div>
+      </div>
+      <!-- #16 -->
+      <div class="card state-done" data-id="16" data-priority="recommendation" data-state="done">
+        <div class="card-header-row">
+          <span class="card-dot"></span>
+          <span class="card-id">#16</span>
+          <span class="card-status status-done">FET</span>
+        </div>
+        <div class="card-text"><code>preconnect</code> / <code>dns-prefetch</code> dominis externs — afegits Supabase, Stripe, Gelato a <code>index.html</code></div>
+      </div>
+      <!-- #17 -->
+      <div class="card state-done" data-id="17" data-priority="recommendation" data-state="done">
+        <div class="card-header-row">
+          <span class="card-dot"></span>
+          <span class="card-id">#17</span>
+          <span class="card-status status-done">FET</span>
+        </div>
+        <div class="card-text">Configurar monitoring d'errors (Sentry) — <code>@sentry/react</code> instal·lat, <code>src/lib/sentry.js</code>, integrat a <code>main.jsx</code> + <code>App.prod.jsx</code>, CSP actualitzada</div>
+      </div>
+      <!-- #18 -->
+      <div class="card state-done" data-id="18" data-priority="recommendation" data-state="done">
+        <div class="card-header-row">
+          <span class="card-dot"></span>
+          <span class="card-id">#18</span>
+          <span class="card-status status-done">FET</span>
+        </div>
+        <div class="card-text">Tests Lighthouse/PageSpeed per verificar performance<br>📊 Home: Perf <b>74</b> · A11y <b>86</b> · Best <b>100</b> · SEO <b>100</b><br>📊 Productes: Perf <b>71</b> · A11y <b>93</b> · Best <b>100</b> · SEO <b>100</b></div>
+      </div>
+      <!-- #19 -->
+      <div class="card state-done" data-id="19" data-priority="recommendation" data-state="done">
+        <div class="card-header-row">
+          <span class="card-dot"></span>
+          <span class="card-id">#19</span>
+          <span class="card-status status-done">FET</span>
+        </div>
+        <div class="card-text">Verificar compatibilitat amb navegadors antics — <code>.browserslistrc</code> configurat (defaults, >0.2%, not dead), polyfills via Vite legacy plugin</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Summary -->
+<div class="summary">
+  <div class="dots">
+    <span class="summary-dot dot-done"></span> <span id="totalDone">19</span> completades
+    <span style="margin:0 0.5rem">·</span>
+    <span class="summary-dot dot-active"></span> <span id="totalActive">0</span> activa
+    <span style="margin:0 0.5rem">·</span>
+    <span class="summary-dot dot-pending"></span> <span id="totalPending">0</span> pendents
+  </div>
+  <div class="target">🎯 Objectiu llançament: COMPLETAT ✅ — Totes les tasques resoltes (19/19)</div>
+</div>
+
+<script>
+(function() {
+  const CARDS = document.querySelectorAll('.card');
+  const FILTER_BTNS = document.querySelectorAll('.filter-btn');
+  const PROGRESS_FILL = document.getElementById('progressFill');
+  const PROGRESS_LABEL = document.getElementById('progressLabel');
+  const TOTAL_DONE = document.getElementById('totalDone');
+  const TOTAL_ACTIVE = document.getElementById('totalActive');
+  const TOTAL_PENDING = document.getElementById('totalPending');
+  const COUNT_CRITICAL = document.getElementById('count-critical');
+  const COUNT_IMPORTANT = document.getElementById('count-important');
+  const COUNT_RECOMMENDATION = document.getElementById('count-recommendation');
+
+  const stateOrder = ['pending', 'active', 'done'];
+  const stateLabels = {
+    pending: 'PENDENT',
+    active: 'ACTIVA',
+    done: 'FET'
+  };
+  const stateClasses = {
+    pending: 'status-pending',
+    active: 'status-active',
+    done: 'status-done'
+  };
+
+  let currentFilter = 'all';
+
+  function getCounts() {
+    let done = 0, active = 0, pending = 0;
+    const byPriority = { critical: { total: 0, done: 0 }, important: { total: 0, done: 0 }, recommendation: { total: 0, done: 0 } };
+
+    CARDS.forEach(card => {
+      const state = card.dataset.state;
+      const priority = card.dataset.priority;
+      if (state === 'done') done++;
+      else if (state === 'active') active++;
+      else pending++;
+
+      if (byPriority[priority]) {
+        byPriority[priority].total++;
+        if (state === 'done') byPriority[priority].done++;
+      }
+    });
+
+    return { done, active, pending, byPriority, total: CARDS.length };
+  }
+
+  function updateUI() {
+    const { done, active, pending, byPriority, total } = getCounts();
+    const pct = Math.round((done / total) * 100);
+
+    PROGRESS_FILL.style.width = pct + '%';
+    PROGRESS_LABEL.textContent = done + ' / ' + total + ' completades (' + pct + '%)';
+    TOTAL_DONE.textContent = done;
+    TOTAL_ACTIVE.textContent = active;
+    TOTAL_PENDING.textContent = pending;
+
+    COUNT_CRITICAL.textContent = byPriority.critical.done + '/' + byPriority.critical.total;
+    COUNT_IMPORTANT.textContent = byPriority.important.done + '/' + byPriority.important.total;
+    COUNT_RECOMMENDATION.textContent = byPriority.recommendation.done + '/' + byPriority.recommendation.total;
+
+    // Update column header border colors based on completion
+    const critHdr = document.querySelector('#col-critical .column-header');
+    const impHdr = document.querySelector('#col-important .column-header');
+    const recHdr = document.querySelector('#col-recommendation .column-header');
+
+    updateColumnColor(critHdr, byPriority.critical);
+    updateColumnColor(impHdr, byPriority.important);
+    updateColumnColor(recHdr, byPriority.recommendation);
+  }
+
+  function updateColumnColor(header, stats) {
+    if (stats.total === 0) return;
+    if (stats.done === stats.total) {
+      header.style.borderBottomColor = '#10b981';
+    } else if (stats.done > 0) {
+      header.style.borderBottomColor = '#f59e0b';
+    } else {
+      header.style.borderBottomColor = '#ef4444';
+    }
+  }
+
+  function setCardState(card, newState) {
+    card.dataset.state = newState;
+    card.className = 'card state-' + newState;
+
+    const statusEl = card.querySelector('.card-status');
+    if (statusEl) {
+      statusEl.className = 'card-status ' + stateClasses[newState];
+      statusEl.textContent = stateLabels[newState];
+    }
+  }
+
+  function cycleState(card) {
+    const current = card.dataset.state;
+    const idx = stateOrder.indexOf(current);
+    const nextIdx = (idx + 1) % stateOrder.length;
+    setCardState(card, stateOrder[nextIdx]);
+  }
+
+  function applyFilter(filter) {
+    currentFilter = filter;
+    FILTER_BTNS.forEach(b => b.classList.toggle('active', b.dataset.filter === filter));
+
+    CARDS.forEach(card => {
+      const state = card.dataset.state;
+      let show = true;
+      switch (filter) {
+        case 'all': show = true; break;
+        case 'pending': show = state === 'pending'; break;
+        case 'active': show = state === 'active'; break;
+        case 'done': show = state === 'done'; break;
+      }
+      card.classList.toggle('hidden', !show);
+    });
+
+    // Hide empty column sections
+    filterEmptyColumns();
+  }
+
+  function filterEmptyColumns() {
+    const columns = document.querySelectorAll('.column');
+    columns.forEach(col => {
+      const visibleCards = col.querySelectorAll('.card:not(.hidden)');
+      const header = col.querySelector('.column-header');
+      const body = col.querySelector('.column-body');
+
+      if (visibleCards.length === 0) {
+        col.style.opacity = '0.4';
+        col.style.pointerEvents = 'none';
+      } else {
+        col.style.opacity = '1';
+        col.style.pointerEvents = 'auto';
+      }
+    });
+  }
+
+  function saveState() {
+    const state = {};
+    CARDS.forEach(card => {
+      state[card.dataset.id] = card.dataset.state;
+    });
+    localStorage.setItem('kanban-auditoria-state', JSON.stringify(state));
+  }
+
+  function loadState() {
+    try {
+      const raw = localStorage.getItem('kanban-auditoria-state');
+      if (!raw) return;
+      const state = JSON.parse(raw);
+      CARDS.forEach(card => {
+        const id = card.dataset.id;
+        if (state[id]) {
+          setCardState(card, state[id]);
+        }
+      });
+    } catch (e) { /* ignore */ }
+  }
+
+  // Card click: cycle state
+  CARDS.forEach(card => {
+    card.addEventListener('click', () => {
+      cycleState(card);
+      updateUI();
+      filterEmptyColumns();
+      saveState();
+    });
+  });
+
+  // Filter buttons
+  FILTER_BTNS.forEach(btn => {
+    btn.addEventListener('click', () => {
+      applyFilter(btn.dataset.filter);
+    });
+  });
+
+  // Shift+click column header to set all cards in column to same state
+  document.querySelectorAll('.column-header').forEach(header => {
+    header.addEventListener('click', (e) => {
+      if (!e.shiftKey) return;
+      const col = header.closest('.column');
+      const cards = col.querySelectorAll('.card');
+      if (cards.length === 0) return;
+
+      const allDone = Array.from(cards).every(c => c.dataset.state === 'done');
+      cards.forEach(c => {
+        setCardState(c, allDone ? 'pending' : 'done');
+      });
+      updateUI();
+      saveState();
+    });
+    header.title = 'Shift+clic per marcar/desmarcar totes';
+  });
+
+  // Keyboard shortcut: 'a' = show all, 'p' = pending, 'c' = active, 'd' = done
+  document.addEventListener('keydown', (e) => {
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+    switch (e.key.toLowerCase()) {
+      case 'a': applyFilter('all'); break;
+      case 'p': applyFilter('pending'); break;
+      case 'c': applyFilter('active'); break;
+      case 'd': applyFilter('done'); break;
+    }
+  });
+
+  // Init
+  loadState();
+  updateUI();
+  applyFilter('all');
+})();
+</script>
+
+</body>
+</html>

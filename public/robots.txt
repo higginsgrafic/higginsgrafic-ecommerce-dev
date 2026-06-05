@@ -4,12 +4,44 @@
 User-agent: *
 Allow: /
 
+# Evita indexar rutes d'administració
+Disallow: /admin/
+Disallow: /admin-login
+Disallow: /admin/*
+
+# Evita indexar rutes de laboratori/dev
+Disallow: /lab/
+Disallow: /lab/*
+Disallow: /dev/
+Disallow: /dev/*
+Disallow: /proves/
+Disallow: /proves/*
+
 # Evita indexar editors d'administració
 Disallow: /editor-textos
 Disallow: /editor-estils
 
+# Evita indexar configuracions internes
+Disallow: /ec-config
+Disallow: /fulfillment-settings
+Disallow: /hero-settings
+Disallow: /colleccio-settings
+Disallow: /mockups-manager
+Disallow: /gelato-products
+Disallow: /gelato-templates
+Disallow: /promotions-manager
+Disallow: /products-overview
+Disallow: /system-messages
+
 # Evita indexar pàgines de comanda (privades)
 Disallow: /order-confirmation
+
+# Evita indexar eines internes
+Disallow: /contact-sheet
+Disallow: /layout-builder
+Disallow: /ec-preview
+Disallow: /ec-preview-lite
+Disallow: /unitats-canvi
 
 # Sitemap
 Sitemap: https://grafic.cat/sitemap.xml

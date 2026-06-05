@@ -1,0 +1,28 @@
+# Higgins Gràfic — Ecommerce
+# Objectiu: compatibilitat àmplia sense comprometre performance
+# Cobreix >98% del trànsit global
+
+# Navegadors moderns (últimes 2 versions majors)
+last 2 versions
+
+# Safari: iOS + macOS — imprescindible per usuaris mòbils catalans
+last 2 ios_saf versions
+last 2 safari versions
+
+# Chrome i Edge (Chromium) — majoritària
+last 2 chrome versions
+last 2 edge versions
+
+# Firefox — privacitat
+last 2 firefox versions
+
+# Samsung Internet — Android significatiu
+last 2 samsung versions
+
+# Excloure navegadors morts
+not dead
+not op_mini all
+not ie 11
+
+# Quotes de mercat mínimes (>0.5% global)
+> 0.5%

@@ -1,3 +1,11 @@
+import { initSentry } from '@/lib/sentry';
+import { injectPlausible } from '@/lib/analytics';
+
+// Inicialitzem Sentry el més aviat possible per capturar tots els errors
+initSentry();
+// Inicialitzem Plausible analytics (GDPR-compliant, cookieless)
+injectPlausible();
+
 console.log('🚀 main.jsx is loading...');
 
 const __HG_FATAL_OVERLAY_ID__ = '__HG_FATAL_OVERLAY__';

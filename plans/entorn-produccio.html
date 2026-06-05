@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pla: Entorn de Producció — Higgins Gràfic Ecommerce</title>
+  <style>
+    :root {
+      --bg: #f8f9fa;
+      --surface: #ffffff;
+      --text: #1a1a2e;
+      --muted: #6b7280;
+      --border: #e5e7eb;
+      --green: #059669;
+      --red: #dc2626;
+      --blue: #2563eb;
+      --orange: #d97706;
+      --radius: 12px;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      padding: 2rem;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    h1 { font-size: 2rem; margin-bottom: 0.25rem; }
+    h2 { font-size: 1.25rem; margin: 2rem 0 1rem; padding-bottom: 0.5rem; border-bottom: 2px solid var(--border); }
+    h3 { font-size: 1rem; margin: 1.5rem 0 0.75rem; color: var(--blue); }
+    .subtitle { color: var(--muted); margin-bottom: 2rem; font-size: 0.95rem; }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 1rem;
+      margin: 1.5rem 0;
+    }
+    .summary-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.25rem;
+      text-align: center;
+    }
+    .summary-card .number { font-size: 2.5rem; font-weight: 800; }
+    .summary-card .label { color: var(--muted); font-size: 0.85rem; margin-top: 0.25rem; }
+    .green .number { color: var(--green); }
+    .red .number { color: var(--red); }
+    .orange .number { color: var(--orange); }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: var(--surface);
+      border-radius: var(--radius);
+      overflow: hidden;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+      margin: 1rem 0 2rem;
+    }
+    thead { background: #f1f5f9; }
+    th { text-align: left; padding: 0.75rem 1rem; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); font-weight: 600; }
+    td { padding: 0.6rem 1rem; font-size: 0.9rem; border-top: 1px solid var(--border); }
+    td:first-child { font-weight: 500; }
+    .badge {
+      display: inline-block;
+      padding: 0.15rem 0.6rem;
+      border-radius: 100px;
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .badge-prod { background: #d1fae5; color: #065f46; }
+    .badge-dev { background: #fee2e2; color: #991b1b; }
+
+    .code-block {
+      background: #1e293b;
+      color: #e2e8f0;
+      border-radius: var(--radius);
+      padding: 1.25rem;
+      overflow-x: auto;
+      font-family: 'SF Mono', 'Fira Code', monospace;
+      font-size: 0.82rem;
+      line-height: 1.7;
+      margin: 0.75rem 0 1.5rem;
+    }
+    .code-block pre { margin: 0; white-space: pre; }
+    .code-inline {
+      background: #e5e7eb;
+      padding: 0.15rem 0.4rem;
+      border-radius: 4px;
+      font-family: 'SF Mono', monospace;
+      font-size: 0.85rem;
+    }
+
+    .step {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.25rem 1.5rem;
+      margin: 1rem 0;
+    }
+    .step h4 { margin-bottom: 0.5rem; }
+    .step p { color: var(--muted); font-size: 0.9rem; }
+
+    .tabs {
+      display: flex;
+      gap: 0;
+      margin-bottom: 0;
+    }
+    .tab {
+      padding: 0.5rem 1.25rem;
+      cursor: pointer;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      font-size: 0.85rem;
+      font-weight: 500;
+      border-bottom: none;
+      border-radius: var(--radius) var(--radius) 0 0;
+      margin-right: -1px;
+      color: var(--muted);
+    }
+    .tab.active { background: var(--surface); color: var(--text); font-weight: 600; border-bottom: 2px solid var(--surface); margin-bottom: -1px; }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
+    footer { text-align: center; color: var(--muted); font-size: 0.8rem; margin-top: 3rem; }
+  </style>
+</head>
+<body>
+
+<h1>🧹 Entorn de Producció</h1>
+<p class="subtitle">Pla per crear un entorn net amb només les pàgines de la botiga pública · Higgins Gràfic Ecommerce</p>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<h2>📊 Resum de l'estat actual</h2>
+
+<div class="summary-grid">
+  <div class="summary-card green">
+    <div class="number">16</div>
+    <div class="label">Rutes PROD (botiga)</div>
+  </div>
+  <div class="summary-card red">
+    <div class="number">25+</div>
+    <div class="label">Rutes ADMIN</div>
+  </div>
+  <div class="summary-card orange">
+    <div class="number">35+</div>
+    <div class="label">Rutes DEV / LAB / Prototips</div>
+  </div>
+  <div class="summary-card">
+    <div class="number">~6000</div>
+    <div class="label">Línies d'App.jsx actual</div>
+  </div>
+</div>
+
+<p>L'<span class="code-inline">App.jsx</span> actual barreja indiscriminadament pàgines de botiga, panell admin, prototips, experiments de col·lecció, i eines de desenvolupament. A més, conté centenars de línies de lògica de dev: overlays de debug, temes experimentals, inspectors de layout, guies visuals, etc.</p>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<h2>✅ Llista de rutes PROD</h2>
+<p>Aquestes són les úniques rutes que aniran a l'<span class="code-inline">App.prod.jsx</span>:</p>
+
+<table>
+  <thead>
+    <tr><th>Ruta</th><th>Component</th><th>Funció</th><th>Tipus</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><code>/</code></td><td>HomeClean</td><td>Pàgina d'inici principal</td><td><span class="badge badge-prod">PROD</span></td></tr>
+    <tr><td><code>/product/:id</code></td><td>ProductDetailPage</td><td>Fitxa de producte</td><td><span class="badge badge-prod">PROD</span></td></tr>
+    <tr><td><code>/checkout</code></td><td>CheckoutPage</td><td>Procés de compra</td><td><span class="badge badge-prod">PROD</span></td></tr>
+    <tr><td><code>/order-confirmation/:orderId</code></td><td>OrderConfirmationPage</td><td>Confirmació comanda</td><td><span class="badge badge-prod">PROD</span></td></tr>
+    <tr><td><code>/track</code></td><td>OrderTrackingPage</td><td>Seguiment comanda</td><td><span class="badge badge-prod">PROD</span></td></tr>
+    <tr><td><code>/offers</code></td><td>OffersPage</td><td>Pàgina d'ofertes</td><td><span class="badge badge-prod">PROD</span></td></tr>
+    <tr><td><code>/contact</code></td><td>ContactPage</td><td>Contacte</td><td><span class="badge badge-prod">PROD</span></td></tr>
+    <tr><td><code>/about</code></td><td>AboutPage</td><td>Sobre nosaltres</td><td><span class="badge badge-prod">PROD</span></td></tr>
+    <tr><td><code>/faq</code></td><td>FAQPage</td><td>Preguntes freqüents</td><td><span class="badge badge-prod">PROD</span></td></tr>
+    <tr><td><code>/shipping</code></td><td>ShippingPage</td><td>Informació enviament</td><td><span class="badge badge-prod">PROD</span></td></tr>
+    <tr><td><code>/sizing</code></td><td>SizeGuidePage</td><td>Guia de talles</td><td><span class="badge badge-prod">PROD</span></td></tr>
+    <tr><td><code>/privacy</code></td><td>PrivacyPage</td><td>Política de privacitat</td><td><span class="badge badge-prod">PROD</span></td></tr>
+    <tr><td><code>/terms</code></td><td>TermsPage</td><td>Termes i condicions</td><td><span class="badge badge-prod">PROD</span></td></tr>
+    <tr><td><code>/cc</code></td><td>CreativeCommonsPage</td><td>Llicències CC</td><td><span class="badge badge-prod">PROD</span></td></tr>
+    <tr><td><code>/collection/:slug</code></td><td>SupabaseCollectionRoute</td><td>Col·leccions reals</td><td><span class="badge badge-prod">PROD</span></td></tr>
+    <tr><td><code>/new</code></td><td>NewPage</td><td>Novetats</td><td><span class="badge badge-prod">PROD</span></td></tr>
+    <tr><td><code>/status</code></td><td>→ /track</td><td>Redirecció</td><td><span class="badge badge-prod">PROD</span></td></tr>
+    <tr><td><code>*</code></td><td>NotFoundPage</td><td>Pàgina 404</td><td><span class="badge badge-prod">PROD</span></td></tr>
+  </tbody>
+</table>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<h2>🗑️ Què s'elimina</h2>
+
+<h3>Rutes Admin</h3>
+<table>
+  <thead><tr><th>Ruta</th><th>Component</th></tr></thead>
+  <tbody>
+    <tr><td><code>/admin</code></td><td>AdminStudioLayout (tot el panell)</td></tr>
+    <tr><td><code>/admin-login</code></td><td>AdminLoginPage</td></tr>
+    <tr><td><code>/apps</code></td><td>AppsPage</td></tr>
+    <tr><td><code>/docs</code></td><td>DocumentationPage</td></tr>
+    <tr><td><code>/documentation-files</code></td><td>DocumentationFilesPage</td></tr>
+    <tr><td><code>/user-icon-picker</code></td><td>UserIconPicker</td></tr>
+  </tbody>
+</table>
+
+<h3>Rutes DEV / LAB / Prototips</h3>
+<table>
+  <thead><tr><th>Ruta</th><th>Component</th></tr></thead>
+  <tbody>
+    <tr><td><code>/lab</code>, <code>/lab/*</code></td><td>LabHomePage, LabDemosPage, LabWipPage</td></tr>
+    <tr><td><code>/proves/*</code></td><td>DevComponentsCatalogPage, DevLayoutBuilderPage, DevLinksPage, NikeTambePage</td></tr>
+    <tr><td><code>/dev/*</code></td><td>ContactSheetPage, SiteMapPage</td></tr>
+    <tr><td><code>/constructor/*</code></td><td>ConstructorColleccioPage, ConstructorPdpPage, HtmlBasePage, TdpPage</td></tr>
+    <tr><td><code>/ec-preview</code>, <code>/ec-preview-lite</code></td><td>ECPreviewPage, ECPreviewLitePage</td></tr>
+    <tr><td><code>/full-wide-slide</code></td><td>FullWideSlidePage</td></tr>
+    <tr><td><code>/first-contact</code>, <code>/the-human-inside</code>, <code>/austen</code>, <code>/cube</code>, <code>/miscellania</code>, <code>/thin</code></td><td>Prototips de col·lecció</td></tr>
+    <tr><td><code>/plantilla-cataleg-components</code></td><td>PlantillaCatalegComponentsPage</td></tr>
+    <tr><td><code>/ruleta-demo</code></td><td>RuletaDemoPage</td></tr>
+    <tr><td><code>/product-gelato/:id</code></td><td>ProductDetailPage (ruta dev)</td></tr>
+    <tr><td><code>/wishlist</code></td><td>Redirecció dev</td></tr>
+  </tbody>
+</table>
+
+<h3>Lògica de dev eliminada</h3>
+<p>Totes aquestes variables d'estat, hooks i imports desapareixen de l'App de producció:</p>
+
+<div class="code-block"><pre>// 🗑️ Ja no existeixen a App.prod.jsx
+import DevHeader from '@/components/DevHeader';
+import FullWideSlideDemoHeader from '@/components/FullWideSlideDemoHeader';
+import { useDebugOverlays } from '@/hooks/useDebugOverlays';
+import useSlidesConfig from '@/hooks/useSlidesConfig';
+import useComponentCatalogConfig from '@/hooks/useComponentCatalogConfig';
+import { STRIPE_DRAWING_CALIBRATIONS, STRIPE_LAYOUT_DEFAULTS, ... } from '@/config/...';
+import { installLayoutMetricsProbe } from '@/utils/layoutMetrics';
+
+const beltEnabledFromUrl = ...;        // ❌
+const guidesEnabledFromUrl = ...;       // ❌
+const layoutInspectorEnabledFromUrl = ...;  // ❌
+const megaStripeDx = ...;              // ❌
+const megaShirtDrawingEnabled = ...;   // ❌
+const applyDevThemeVarsFromStorage = ...;  // ❌
+const devHexToHslTriplet = ...;        // ❌</pre></div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<h2>🏗️ Arquitectura de producció</h2>
+
+<div class="tabs">
+  <div class="tab active" onclick="switchTab('arch')">Diagrama</div>
+  <div class="tab" onclick="switchTab('arches')">Arbre de fitxers</div>
+</div>
+
+<div id="tab-arch" class="tab-content active" style="margin-top:0; padding:1rem 0;">
+  <div class="code-block"><pre>
+┌──────────────────────────────────────────────┐
+│                  App.prod.jsx                 │
+│  (~200-300 línies — net i sense dev tools)   │
+│                                               │
+│  ┌─────────────────────────────────────────┐ │
+│  │ Shared Components                       │ │
+│  │  • NikeInspiredHeader (header PROD)     │ │
+│  │  • Footer                               │ │
+│  │  • ErrorBoundary                        │ │
+│  │  • LoadingScreen                        │ │
+│  │  • SkipLink / ScrollToTop               │ │
+│  │  • Breadcrumbs                          │ │
+│  │  • OffersHeader                         │ │
+│  └─────────────────────────────────────────┘ │
+│                                               │
+│  ┌─────────────────────────────────────────┐ │
+│  │ Context Providers                       │ │
+│  │  • ProductContext                       │ │
+│  │  • CartContext                          │ │
+│  └─────────────────────────────────────────┘ │
+│                                               │
+│  ┌─────────────────────────────────────────┐ │
+│  │ Pàgines PROD (lazy-loaded)              │ │
+│  │  HomeClean, ProductDetailPage,          │ │
+│  │  CheckoutPage, OrderConfirmationPage,   │ │
+│  │  OrderTrackingPage, OffersPage,         │ │
+│  │  AboutPage, ContactPage, FAQPage,       │ │
+│  │  ShippingPage, SizeGuidePage,           │ │
+│  │  PrivacyPage, TermsPage,                │ │
+│  │  CreativeCommonsPage, NewPage,          │ │
+│  │  NotFoundPage, SupabaseCollectionRoute  │ │
+│  └─────────────────────────────────────────┘ │
+│                                               │
+│  ┌─────────────────────────────────────────┐ │
+│  │ Routing (React Router)                  │ │
+│  │  AnimatePresence + framer-motion        │ │
+│  │  Analytics (initAnalytics, trackPageView)│ │
+│  │  Helmet (meta tags)                     │ │
+│  └─────────────────────────────────────────┘ │
+└──────────────────────────────────────────────┘</pre></div>
+</div>
+
+<div id="tab-arches" class="tab-content" style="margin-top:0; padding:1rem 0;">
+  <div class="code-block"><pre>
+src/
+├── App.jsx              ← App DEV (centenars pàgines + admin + lab)
+├── App.prod.jsx         ← 🆕 App PROD (només botiga pública)
+├── main.jsx             ← Entry point (importa App segons env)
+├── main-prod.jsx        ← 🆕 Entry point PROD (importa App.prod)
+└── ...
+
+plans/
+└── entorn-produccio.html   ← Aquesta documentació
+
+vite.config.js           ← Build condicional per prod
+index.html               ← Entry HTML (compartit)
+index-prod.html          ← 🆕 Entry HTML PROD (opcional)</pre></div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<h2>⚙️ Com funciona el build condicional</h2>
+
+<div class="step">
+  <h4>1. <code>src/main-prod.jsx</code></h4>
+  <p>Entry point de producció que importa <code>App.prod</code> en lloc d'<code>App</code>.</p>
+  <div class="code-block"><pre>// src/main-prod.jsx
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import { BrowserRouter } from 'react-router-dom';
+import { ProductProvider } from '@/contexts/ProductContext';
+import { CartProvider } from '@/contexts/CartContext';
+import App from '@/App.prod';
+import '@/index.css';
+
+ReactDOM.createRoot(document.getElementById('root')).render(
+  <React.StrictMode>
+    <CartProvider>
+      <ProductProvider>
+        <BrowserRouter>
+          <App />
+        </BrowserRouter>
+      </ProductProvider>
+    </CartProvider>
+  </React.StrictMode>
+);</pre></div>
+</div>
+
+<div class="step">
+  <h4>2. <code>scripts/build-prod.sh</code></h4>
+  <p>Script que sobreescriu temporalment l'entry point i compila.</p>
+  <div class="code-block"><pre>#!/bin/bash
+# scripts/build-prod.sh
+set -e
+
+echo "🏭 Compilant bundle de producció..."
+
+# Sobreescriu temporalment el main.jsx amb el de producció
+cp src/main.jsx src/main.jsx.bak
+cp src/main-prod.jsx src/main.jsx
+
+# Build
+npm run build
+
+# Restaura
+mv src/main.jsx.bak src/main.jsx
+echo "✅ Bundle PROD generat a dist/"</pre></div>
+</div>
+
+<div class="step">
+  <h4>3. <code>package.json</code> — script nou</h4>
+  <p>Afegir <code>"build:prod"</code> al package.json.</p>
+  <div class="code-block"><pre>{
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "build:prod": "VITE_PROD_MODE=true vite build",
+    "preview": "vite preview"
+  }
+}</pre></div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<h2>🧪 Abans / Després</h2>
+
+<table>
+  <thead><tr><th>Mètrica</th><th>Abans (App.jsx)</th><th>Després (App.prod.jsx)</th></tr></thead>
+  <tbody>
+    <tr><td>Línies de codi</td><td>~6.097</td><td>~200-300</td></tr>
+    <tr><td>Imports de pàgines</td><td>~55</td><td>~18</td></tr>
+    <tr><td>Rutes</td><td>~70</td><td>~18</td></tr>
+    <tr><td>Variables d'estat dev</td><td>~80</td><td>0</td></tr>
+    <tr><td>Hooks dev/debug</td><td>~10</td><td>0</td></tr>
+    <tr><td>Configs de dev importades</td><td>~6</td><td>0</td></tr>
+  </tbody>
+</table>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<h2>📋 Checklist d'implementació</h2>
+
+<table>
+  <thead><tr><th>#</th><th>Tasca</th><th>Fitxer</th></tr></thead>
+  <tbody>
+    <tr><td>1</td><td>Crear <code>src/App.prod.jsx</code></td><td>App de producció neta</td></tr>
+    <tr><td>2</td><td>Crear <code>src/main-prod.jsx</code></td><td>Entry point PROD</td></tr>
+    <tr><td>3</td><td>Crear <code>plans/entorn-produccio.html</code></td><td>Documentació (aquesta pàgina)</td></tr>
+    <tr><td>4</td><td>Afegir <code>build:prod</code> al <code>package.json</code></td><td>Script de build</td></tr>
+    <tr><td>5</td><td>Verificar build</td><td><code>npm run build:prod</code></td></tr>
+  </tbody>
+</table>
+
+<hr>
+<footer>Generat: Juny 2026 · Higgins Gràfic Ecommerce · Pla d'entorn de producció</footer>
+
+<script>
+  function switchTab(tabId) {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    event.target.classList.add('active');
+    document.getElementById('tab-' + tabId).classList.add('active');
+  }
+</script>
+</body>
+</html>

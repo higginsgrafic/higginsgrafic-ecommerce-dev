@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tasques Pendents — Auditoria de Producció</title>
+<style>
+  :root {
+    --bg: #0f1117;
+    --surface: #1a1d27;
+    --surface2: #222533;
+    --text: #e1e4ea;
+    --muted: #9ca3af;
+    --green: #10b981;
+    --amber: #f59e0b;
+    --red: #ef4444;
+    --blue: #3b82f6;
+    --purple: #8b5cf6;
+    --border: #2a2d3a;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: system-ui, -apple-system, sans-serif;
+    line-height: 1.6;
+    padding: 2rem;
+  }
+  .container { max-width: 950px; margin:0 auto; }
+  h1 { font-size: 2rem; margin-bottom: 0.25rem; color: #fff; display: flex; align-items: center; gap: 0.5rem; }
+  h2 { font-size: 1.2rem; margin: 2rem 0 1rem; color: #fff; border-bottom: 1px solid var(--border); padding-bottom: 0.5rem; display: flex; align-items: center; justify-content: space-between; }
+  .meta { color: var(--muted); font-size: 0.85rem; margin-bottom: 1.5rem; }
+
+  /* Progress bar */
+  .progress-wrap { margin-bottom: 2rem; }
+  .progress-bar {
+    height: 8px;
+    background: var(--surface2);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 0.5rem;
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--red), var(--amber), var(--green));
+    border-radius: 4px;
+    transition: width 0.5s ease;
+  }
+  .progress-stats {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.8rem;
+    color: var(--muted);
+  }
+
+  /* Stats cards */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+  }
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1rem;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color 0.2s, transform 0.15s;
+    user-select: none;
+  }
+  .stat-card:hover { border-color: var(--blue); transform: translateY(-2px); }
+  .stat-card.active { border-color: var(--blue); box-shadow: 0 0 0 1px var(--blue); }
+  .stat-card .value { font-size: 1.8rem; font-weight: 700; color: #fff; }
+  .stat-card .label { font-size: 0.75rem; color: var(--muted); margin-top: 0.2rem; }
+  .stat-card.red .value { color: var(--red); }
+  .stat-card.amber .value { color: var(--amber); }
+  .stat-card.green .value { color: var(--green); }
+  .stat-card.blue .value { color: var(--blue); }
+
+  /* Task item */
+  .task-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 0.85rem 1rem;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    margin-bottom: 0.5rem;
+    background: var(--surface);
+    transition: background 0.2s, border-color 0.2s;
+    cursor: pointer;
+    user-select: none;
+  }
+  .task-item:hover { border-color: #3d4060; }
+  .task-item.completed { opacity: 0.55; }
+  .task-item.completed .task-text { text-decoration: line-through; color: var(--muted); }
+  .task-checkbox {
+    width: 22px; height: 22px;
+    border: 2px solid var(--border);
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 1px;
+    transition: all 0.2s;
+  }
+  .task-item.completed .task-checkbox {
+    background: var(--green);
+    border-color: var(--green);
+  }
+  .task-checkbox svg { width: 12px; height: 12px; opacity: 0; transition: opacity 0.2s; }
+  .task-item.completed .task-checkbox svg { opacity: 1; }
+  .task-content { flex: 1; min-width: 0; }
+  .task-text { font-size: 0.9rem; line-height: 1.4; }
+  .task-meta { font-size: 0.75rem; color: var(--muted); margin-top: 0.2rem; display: flex; gap: 1rem; flex-wrap: wrap; }
+  .task-tag {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 0.7rem;
+    font-weight: 600;
+  }
+  .tag-crit { background: #7f1d1d; color: #fca5a5; }
+  .tag-imp { background: #78350f; color: #fcd34d; }
+  .tag-rec { background: #1e3a5f; color: #93c5fd; }
+  .tag-done { background: #065f46; color: #6ee7b7; }
+  .tag-prog { background: #713f12; color: #fde68a; }
+  .tag-pend { background: #374151; color: #9ca3af; }
+
+  /* Commands */
+  .task-cmd {
+    display: inline-block;
+    background: var(--surface2);
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    font-size: 0.78rem;
+    margin-top: 0.35rem;
+    color: var(--blue);
+  }
+
+  /* Filters */
+  .filter-bar {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1.25rem;
+    flex-wrap: wrap;
+  }
+  .filter-btn {
+    padding: 0.4rem 1rem;
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    background: var(--surface);
+    color: var(--text);
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: inherit;
+  }
+  .filter-btn:hover { border-color: var(--blue); }
+  .filter-btn.active { background: var(--blue); border-color: var(--blue); color: #fff; }
+
+  /* Summary line */
+  .summary-line {
+    text-align: center;
+    font-size: 0.85rem;
+    color: var(--muted);
+    margin: 1.5rem 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+  }
+  .summary-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+  }
+  .dot-green { background: var(--green); }
+  .dot-amber { background: var(--amber); }
+  .dot-red { background: var(--red); }
+
+  .hidden { display: none !important; }
+  .section-hidden { display: none; }
+
+  /* Pulse animation for in-progress items */
+  @keyframes pulse {
+    0%, 100% { border-color: var(--border); }
+    50% { border-color: #b45309; }
+  }
+  .task-item.in-progress { animation: pulse 2s infinite; }
+
+  /* Priority colors on left border */
+  .task-item.priority-critical { border-left: 3px solid var(--red); }
+  .task-item.priority-important { border-left: 3px solid var(--amber); }
+  .task-item.priority-recommendation { border-left: 3px solid var(--blue); }
+  .task-item.completed { border-left-color: var(--green) !important; }
+</style>
+</head>
+<body>
+<div class="container">
+
+<h1>📋 Tasques Pendents — Auditoria de Producció</h1>
+<p class="meta">
+   Basat en <code>docs/auditoria-produccio.html</code> (2 juny 2026) · Commit auditoria: <code>1dbef35</code> · HEAD: <code>fdb11bf</code> · Darrera verificació: 3 juny 2026 (actualitzat amb #11 sharp + #12 configs dev)
+</p>
+
+<!-- Progress -->
+<div class="progress-wrap">
+  <div class="progress-bar">
+     <div class="progress-fill" id="progressFill" style="width: 42%"></div>
+  </div>
+  <div class="progress-stats">
+     <span id="progressLabel">8 / 19 completades (42%)</span>
+    <span id="progressTarget">Objectiu llançament: 11/19 (58%)</span>
+  </div>
+</div>
+
+<!-- Stats -->
+<div class="stats-grid">
+  <div class="stat-card blue" data-filter="all">
+    <div class="value">19</div>
+    <div class="label">Total tasques</div>
+  </div>
+  <div class="stat-card green" data-filter="done">
+     <div class="value" id="countDone">8</div>
+    <div class="label">✅ Fetes</div>
+  </div>
+  <div class="stat-card amber" data-filter="progress">
+     <div class="value" id="countProgress">1</div>
+    <div class="label">🧐 En progrés</div>
+  </div>
+  <div class="stat-card red" data-filter="pending">
+     <div class="value" id="countPending">10</div>
+    <div class="label">⚠️ Pendents</div>
+  </div>
+</div>
+
+<!-- Filter buttons -->
+<div class="filter-bar">
+  <button class="filter-btn active" data-filter="all">Totes</button>
+  <button class="filter-btn" data-filter="pending">Pendents</button>
+  <button class="filter-btn" data-filter="progress">En progrés</button>
+  <button class="filter-btn" data-filter="done">Fetes</button>
+  <button class="filter-btn" data-filter="critical">🔴 Crítiques</button>
+  <button class="filter-btn" data-filter="important">🟡 Importants</button>
+  <button class="filter-btn" data-filter="recommendation">🟢 Recomanacions</button>
+</div>
+
+<!-- ===== TASKS ===== -->
+
+<section id="section-critical" data-priority="critical">
+<h2>🔴 Crítiques (bloquejants) <span style="font-weight:400;font-size:0.85rem;color:var(--muted)">5/6 completades</span></h2>
+
+<div class="task-item completed priority-critical" data-status="done" data-priority="critical" data-id="1">
+  <div class="task-checkbox"><svg viewBox="0 0 16 16" fill="none" stroke="white" stroke-width="2.5"><polyline points="3,8 6.5,12 13,4"/></svg></div>
+  <div class="task-content">
+    <div class="task-text">Eliminar fitxers de debug/test de <code>public/</code>: <code>debug.html</code>, <code>diagnostic.html</code>, <code>test*.html</code>, <code>ultra-simple.html</code>, <code>tmp/</code></div>
+    <div class="task-meta"><span class="task-tag tag-done">✅ FET</span><span>Commit <code>65788cd</code></span></div>
+  </div>
+</div>
+
+<div class="task-item completed priority-critical" data-status="done" data-priority="critical" data-id="2">
+  <div class="task-checkbox"><svg viewBox="0 0 16 16" fill="none" stroke="white" stroke-width="2.5"><polyline points="3,8 6.5,12 13,4"/></svg></div>
+  <div class="task-content">
+    <div class="task-text">Eliminar <code>public.code-workspace</code> de <code>public/</code></div>
+    <div class="task-meta"><span class="task-tag tag-done">✅ FET</span><span>Commit <code>65788cd</code></span></div>
+  </div>
+</div>
+
+<div class="task-item completed priority-critical" data-status="done" data-priority="critical" data-id="3">
+  <div class="task-checkbox"><svg viewBox="0 0 16 16" fill="none" stroke="white" stroke-width="2.5"><polyline points="3,8 6.5,12 13,4"/></svg></div>
+  <div class="task-content">
+    <div class="task-text">Protegir TOTES les rutes d'administració/dev/lab amb autenticació real (no només al client)</div>
+    <div class="task-meta"><span class="task-tag tag-done">✅ FET</span><span>Totes verificades: <code>/lab/*</code>, <code>/proves/*</code>, <code>/dev/*</code> → <code>ProtectedRoute</code>; <code>/admin/*</code> → <code>AdminStudioLayout</code> (<code>isAdmin</code>). Zero forats.</span></div>
+  </div>
+</div>
+
+<div class="task-item completed priority-critical" data-status="done" data-priority="critical" data-id="4">
+  <div class="task-checkbox"><svg viewBox="0 0 16 16" fill="none" stroke="white" stroke-width="2.5"><polyline points="3,8 6.5,12 13,4"/></svg></div>
+  <div class="task-content">
+    <div class="task-text">Verificar que <code>SUPABASE_SERVICE_ROLE_KEY</code> no s'importa MAI al client (és un secret de servidor)</div>
+    <div class="task-meta"><span class="task-tag tag-done">✅ FET</span><span><code>grep -r "SUPABASE_SERVICE_ROLE_KEY" src/</code> → zero resultats. Només es referència a <code>.env.example</code> i <code>supabase/functions/</code> (servidor). Segura.</span></div>
+  </div>
+</div>
+
+<div class="task-item priority-critical" data-status="pending" data-priority="critical" data-id="5">
+  <div class="task-checkbox"><svg viewBox="0 0 16 16" fill="none" stroke="white" stroke-width="2.5"><polyline points="3,8 6.5,12 13,4"/></svg></div>
+  <div class="task-content">
+    <div class="task-text">Configurar variables d'entorn de producció a l'entorn de desplegament (Netlify)</div>
+    <div class="task-meta"><span class="task-tag tag-pend">⚠️ PENDENT — acció externa</span><span><code>.env.example</code> documentat. Cal configurar: <code>VITE_GELATO_API_KEY</code>, <code>VITE_GELATO_STORE_ID</code>, <code>VITE_SUPABASE_URL</code>, <code>VITE_SUPABASE_ANON_KEY</code>, <code>VITE_ADMIN_EMAILS</code>, <code>SUPABASE_SERVICE_ROLE_KEY</code></span></div>
+    <div class="task-cmd">netlify env:import .env  # des del dashboard o CLI</div>
+  </div>
+</div>
+
+<div class="task-item completed priority-critical" data-status="done" data-priority="critical" data-id="6">
+  <div class="task-checkbox"><svg viewBox="0 0 16 16" fill="none" stroke="white" stroke-width="2.5"><polyline points="3,8 6.5,12 13,4"/></svg></div>
+  <div class="task-content">
+    <div class="task-text">Executar <code>npm audit fix</code> i resoldre la vulnerabilitat crítica</div>
+    <div class="task-meta"><span class="task-tag tag-done">✅ FET</span><span><code>npm audit</code> → 0 vulnerabilitats. Ja està net.</span></div>
+  </div>
+</div>
+</section>
+
+<section id="section-important" data-priority="important">
+<h2>🟡 Importants (no bloquejants però necessàries) <span style="font-weight:400;font-size:0.85rem;color:var(--muted)">3/6 completades</span></h2>
+
+<div class="task-item in-progress priority-important" data-status="progress" data-priority="important" data-id="7">
+  <div class="task-checkbox"><svg viewBox="0 0 16 16" fill="none" stroke="white" stroke-width="2.5"><polyline points="3,8 6.5,12 13,4"/></svg></div>
+  <div class="task-content">
+    <div class="task-text">Implementar code-splitting: <code>React.lazy()</code> per a rutes poc freqüents (admin, lab, eines)</div>
+    <div class="task-meta"><span class="task-tag tag-prog">🧐 EN PROGRÉS</span><span>Commit <code>ce4fbd4</code> — "lazy-load overlays condicionals". Falta estendre a totes les rutes admin/lab</span></div>
+  </div>
+</div>
+
+<div class="task-item priority-important" data-status="pending" data-priority="important" data-id="8">
+  <div class="task-checkbox"><svg viewBox="0 0 16 16" fill="none" stroke="white" stroke-width="2.5"><polyline points="3,8 6.5,12 13,4"/></svg></div>
+  <div class="task-content">
+    <div class="task-text">Moure pàgines admin/lab a un subdirectori i usar <code>import.meta.env.DEV</code> o rutes protegides</div>
+    <div class="task-meta"><span class="task-tag tag-pend">⚠️ PENDENT</span></div>
+  </div>
+</div>
+
+<div class="task-item priority-important" data-status="pending" data-priority="important" data-id="9">
+  <div class="task-checkbox"><svg viewBox="0 0 16 16" fill="none" stroke="white" stroke-width="2.5"><polyline points="3,8 6.5,12 13,4"/></svg></div>
+  <div class="task-content">
+    <div class="task-text">Optimitzar imatges: usar WebP/AVIF, lazy loading, i dimensions responsives. <strong>Les imatges de <code>custom_logos/</code> ocupen 425 MB (98% de dist/)</strong></div>
+    <div class="task-meta"><span class="task-tag tag-pend">⚠️ PENDENT</span><span class="task-tag tag-crit">Impacte CRÍTIC en rendiment</span></div>
+  </div>
+</div>
+
+<div class="task-item priority-important" data-status="pending" data-priority="important" data-id="10">
+  <div class="task-checkbox"><svg viewBox="0 0 16 16" fill="none" stroke="white" stroke-width="2.5"><polyline points="3,8 6.5,12 13,4"/></svg></div>
+  <div class="task-content">
+    <div class="task-text">Revisar polítiques de cache per a producció. El <code>Cache-Control: no-store</code> del servidor Vite és desastrós en prod</div>
+    <div class="task-meta"><span class="task-tag tag-pend">⚠️ PENDENT</span><span>Assegurar cache agressiva per assets amb hash al desplegament (Netlify)</span></div>
+  </div>
+</div>
+
+<div class="task-item completed priority-important" data-status="done" data-priority="important" data-id="11">
+  <div class="task-checkbox"><svg viewBox="0 0 16 16" fill="none" stroke="white" stroke-width="2.5"><polyline points="3,8 6.5,12 13,4"/></svg></div>
+  <div class="task-content">
+    <div class="task-text">Verificar que <code>sharp</code> no s'inclou al bundle del client (és un mòdul Node.js de ~25 MB). Moure a <code>devDependencies</code></div>
+    <div class="task-meta"><span class="task-tag tag-done">✅ FET</span><span><code>grep -r "sharp" src/</code> → 0 resultats (només a <code>scripts/</code>). Mogut de <code>dependencies</code> → <code>devDependencies</code>.</span></div>
+  </div>
+</div>
+
+<div class="task-item completed priority-important" data-status="done" data-priority="important" data-id="12">
+  <div class="task-checkbox"><svg viewBox="0 0 16 16" fill="none" stroke="white" stroke-width="2.5"><polyline points="3,8 6.5,12 13,4"/></svg></div>
+  <div class="task-content">
+    <div class="task-text">Eliminar <code>component-catalog.config.json</code> i <code>slides.config.json</code> de <code>public/</code> (eines de dev)</div>
+    <div class="task-meta"><span class="task-tag tag-done">✅ FET</span><span>Ja no existeixen (eliminats prèviament, probablement al commit <code>65788cd</code>).</span></div>
+  </div>
+</div>
+</section>
+
+<section id="section-recommendation" data-priority="recommendation">
+<h2>🟢 Recomanacions (millora contínua) <span style="font-weight:400;font-size:0.85rem;color:var(--muted)">0/7 completades</span></h2>
+
+<div class="task-item priority-recommendation" data-status="pending" data-priority="recommendation" data-id="13">
+  <div class="task-checkbox"><svg viewBox="0 0 16 16" fill="none" stroke="white" stroke-width="2.5"><polyline points="3,8 6.5,12 13,4"/></svg></div>
+  <div class="task-content">
+    <div class="task-text">Verificar que <code>robots.txt</code> restringeix rutes admin/lab als cercadors (ja existeix)</div>
+    <div class="task-meta"><span class="task-tag tag-prog">🧐 A REVISAR</span><span>Fitxer present a <code>public/robots.txt</code>. Confirmar contingut correcte</span></div>
+  </div>
+</div>
+
+<div class="task-item priority-recommendation" data-status="pending" data-priority="recommendation" data-id="14">
+  <div class="task-checkbox"><svg viewBox="0 0 16 16" fill="none" stroke="white" stroke-width="2.5"><polyline points="3,8 6.5,12 13,4"/></svg></div>
+  <div class="task-content">
+    <div class="task-text">Configurar CSP (Content Security Policy) headers</div>
+    <div class="task-meta"><span class="task-tag tag-pend">⚠️ PENDENT</span></div>
+  </div>
+</div>
+
+<div class="task-item completed priority-recommendation" data-status="done" data-priority="recommendation" data-id="15">
+  <div class="task-checkbox"><svg viewBox="0 0 16 16" fill="none" stroke="white" stroke-width="2.5"><polyline points="3,8 6.5,12 13,4"/></svg></div>
+  <div class="task-content">
+    <div class="task-text">Implementar analytics (respectant GDPR)</div>
+    <div class="task-meta"><span class="task-tag tag-done">✅ FET</span><span>Plausible via <code>src/lib/analytics.js</code> (cookieless, GDPR natiu). CSP al <code>netlify.toml</code>.</span></div>
+  </div>
+</div>
+
+<div class="task-item priority-recommendation" data-status="pending" data-priority="recommendation" data-id="16">
+  <div class="task-checkbox"><svg viewBox="0 0 16 16" fill="none" stroke="white" stroke-width="2.5"><polyline points="3,8 6.5,12 13,4"/></svg></div>
+  <div class="task-content">
+    <div class="task-text">Afegir <code>preconnect</code> / <code>dns-prefetch</code> per a dominis externs (Supabase, Stripe, Gelato)</div>
+    <div class="task-meta"><span class="task-tag tag-pend">⚠️ PENDENT</span></div>
+  </div>
+</div>
+
+<div class="task-item priority-recommendation" data-status="pending" data-priority="recommendation" data-id="17">
+  <div class="task-checkbox"><svg viewBox="0 0 16 16" fill="none" stroke="white" stroke-width="2.5"><polyline points="3,8 6.5,12 13,4"/></svg></div>
+  <div class="task-content">
+    <div class="task-text">Configurar monitoring d'errors (Sentry, LogRocket) al frontend</div>
+    <div class="task-meta"><span class="task-tag tag-pend">⚠️ PENDENT</span></div>
+  </div>
+</div>
+
+<div class="task-item completed priority-recommendation" data-status="done" data-priority="recommendation" data-id="18">
+  <div class="task-checkbox"><svg viewBox="0 0 16 16" fill="none" stroke="white" stroke-width="2.5"><polyline points="3,8 6.5,12 13,4"/></svg></div>
+  <div class="task-content">
+    <div class="task-text">Fer tests de lighthouse/PageSpeed per verificar performance</div>
+    <div class="task-meta"><span class="task-tag tag-done">✅ FET (3 juny 2026)</span><span>Home: Perf 43 · A11y 86 · BP 96 · SEO 92. Productes: error (SPA routing).</span></div>
+  </div>
+</div>
+
+<div class="task-item completed priority-recommendation" data-status="done" data-priority="recommendation" data-id="19">
+  <div class="task-checkbox"><svg viewBox="0 0 16 16" fill="none" stroke="white" stroke-width="2.5"><polyline points="3,8 6.5,12 13,4"/></svg></div>
+  <div class="task-content">
+    <div class="task-text">Verificar compatibilitat amb navegadors antics (es2020 exclou IE11, però cobreix ~95% del mercat)</div>
+    <div class="task-meta"><span class="task-tag tag-done">✅ FET</span><span><code>.browserslistrc</code>: last 2 versions Chrome, Edge, Firefox, Safari, iOS Safari, Samsung. Build target es2020.</span></div>
+  </div>
+</div>
+</section>
+
+<!-- Summary line -->
+<div class="summary-line">
+  <span class="summary-dot dot-green"></span> 8 fetes
+  <span style="margin:0 0.5rem">·</span>
+  <span class="summary-dot dot-amber"></span> 1 en progrés
+  <span style="margin:0 0.5rem">·</span>
+  <span class="summary-dot dot-red"></span> 10 pendents
+  <span style="margin:0 0.5rem">·</span>
+  🎯 Objectiu llançament: resoldre totes les 🔴 crítiques + 🟡 importants
+</div>
+
+</div>
+
+<script>
+(function() {
+  const tasks = document.querySelectorAll('.task-item');
+  const filterBtns = document.querySelectorAll('.filter-btn');
+  const sections = document.querySelectorAll('section[id]');
+  const progressFill = document.getElementById('progressFill');
+  const progressLabel = document.getElementById('progressLabel');
+  const countDone = document.getElementById('countDone');
+  const countProgress = document.getElementById('countProgress');
+  const countPending = document.getElementById('countPending');
+
+  let currentFilter = 'all'; // Default filter: show all
+
+  // Calculate counts
+  function getCounts() {
+    const all = document.querySelectorAll('.task-item');
+    let done = 0, prog = 0, pend = 0;
+    all.forEach(t => {
+      const s = t.dataset.status;
+      if (s === 'done') done++;
+      else if (s === 'progress') prog++;
+      else pend++;
+    });
+    return { done, prog, pend, total: all.length };
+  }
+
+  function updateUI() {
+    const { done, prog, pend, total } = getCounts();
+    const pct = Math.round((done / total) * 100);
+    progressFill.style.width = pct + '%';
+    progressLabel.textContent = done + ' / ' + total + ' completades (' + pct + '%)';
+    countDone.textContent = done;
+    countProgress.textContent = prog;
+    countPending.textContent = pend;
+  }
+
+  // Filter logic
+  function applyFilter(filter) {
+    currentFilter = filter;
+    filterBtns.forEach(b => b.classList.toggle('active', b.dataset.filter === filter));
+
+    let visibleTasks = 0;
+    tasks.forEach(t => {
+      const status = t.dataset.status;
+      const priority = t.dataset.priority;
+
+      let show = true;
+      switch (filter) {
+        case 'all': show = true; break;
+        case 'done': show = status === 'done'; break;
+        case 'progress': show = status === 'progress'; break;
+        case 'pending': show = status === 'pending'; break;
+        case 'critical': show = priority === 'critical'; break;
+        case 'important': show = priority === 'important'; break;
+        case 'recommendation': show = priority === 'recommendation'; break;
+      }
+
+      t.classList.toggle('hidden', !show);
+      if (show) visibleTasks++;
+    });
+
+    // Hide empty sections
+    sections.forEach(section => {
+      const visibleItems = section.querySelectorAll('.task-item:not(.hidden)');
+      section.classList.toggle('section-hidden', visibleItems.length === 0);
+    });
+  }
+
+  // Click on task to toggle
+  tasks.forEach(task => {
+    task.addEventListener('click', (e) => {
+      // Don't toggle if clicking on a command or code element
+      if (e.target.closest('.task-cmd') || e.target.closest('code')) return;
+
+      const current = task.dataset.status;
+      let next;
+      if (current === 'pending') next = 'progress';
+      else if (current === 'progress') next = 'done';
+      else next = 'pending'; // done -> pending (uncheck)
+
+      task.dataset.status = next;
+      task.classList.remove('completed', 'in-progress');
+      if (next === 'done') task.classList.add('completed');
+      if (next === 'progress') task.classList.add('in-progress');
+
+      // Update tag
+      const tag = task.querySelector('.task-tag');
+      if (tag) {
+        tag.className = 'task-tag';
+        if (next === 'done') { tag.classList.add('tag-done'); tag.textContent = '✅ FET'; }
+        else if (next === 'progress') { tag.classList.add('tag-prog'); tag.textContent = '🧐 EN PROGRÉS'; }
+        else { tag.classList.add('tag-pend'); tag.textContent = '⚠️ PENDENT'; }
+      }
+
+      // Update section headers
+      updateSectionHeaders();
+      updateUI();
+
+      // Save to localStorage
+      saveState();
+    });
+  });
+
+  // Update section header counts
+  function updateSectionHeaders() {
+    sections.forEach(section => {
+      const total = section.querySelectorAll('.task-item').length;
+      const done = section.querySelectorAll('.task-item[data-status="done"]').length;
+      const h2 = section.querySelector('h2 span');
+      if (h2) h2.textContent = done + '/' + total + ' completades';
+    });
+  }
+
+  // Filter button clicks
+  filterBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      applyFilter(btn.dataset.filter);
+    });
+  });
+
+  // Save/load state to localStorage
+  function saveState() {
+    const state = {};
+    tasks.forEach((t, i) => {
+      state[t.dataset.id || i] = t.dataset.status;
+    });
+    localStorage.setItem('auditoria-task-state', JSON.stringify(state));
+  }
+
+  function loadState() {
+    try {
+      const raw = localStorage.getItem('auditoria-task-state');
+      if (!raw) return;
+      const state = JSON.parse(raw);
+      tasks.forEach((t, i) => {
+        const id = t.dataset.id || i;
+        if (state[id]) {
+          t.dataset.status = state[id];
+          t.classList.remove('completed', 'in-progress');
+          if (state[id] === 'done') t.classList.add('completed');
+          if (state[id] === 'progress') t.classList.add('in-progress');
+          // Update tag
+          const tag = t.querySelector('.task-tag');
+          if (tag) {
+            tag.className = 'task-tag';
+            if (state[id] === 'done') { tag.classList.add('tag-done'); tag.textContent = '✅ FET'; }
+            else if (state[id] === 'progress') { tag.classList.add('tag-prog'); tag.textContent = '🧐 EN PROGRÉS'; }
+            else { tag.classList.add('tag-pend'); tag.textContent = '⚠️ PENDENT'; }
+          }
+        }
+      });
+    } catch (e) {
+      // Ignore parse errors
+    }
+  }
+
+  // Keyboard shortcut: Shift+click on section header toggles all tasks in section
+  sections.forEach(section => {
+    const h2 = section.querySelector('h2');
+    if (!h2) return;
+    h2.addEventListener('click', (e) => {
+      if (!e.shiftKey) return;
+      const sectionTasks = section.querySelectorAll('.task-item');
+      const allDone = Array.from(sectionTasks).every(t => t.dataset.status === 'done');
+      sectionTasks.forEach(t => {
+        t.dataset.status = allDone ? 'pending' : 'done';
+        t.classList.toggle('completed', !allDone);
+        t.classList.remove('in-progress');
+        const tag = t.querySelector('.task-tag');
+        if (tag) {
+          tag.className = 'task-tag';
+          if (allDone) { tag.classList.add('tag-pend'); tag.textContent = '⚠️ PENDENT'; }
+          else { tag.classList.add('tag-done'); tag.textContent = '✅ FET'; }
+        }
+      });
+      updateSectionHeaders();
+      updateUI();
+      saveState();
+    });
+    h2.title = 'Shift+clic per marcar/desmarcar totes les tasques de la secció';
+  });
+
+  // Init
+  loadState();
+  updateSectionHeaders();
+  updateUI();
+  // Show all by default
+  applyFilter('all');
+})();
+</script>
+
+</body>
+</html>
