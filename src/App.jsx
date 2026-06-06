@@ -22,7 +22,7 @@ import LoadingScreen from '@/components/LoadingScreen';
 import SkipLink from '@/components/SkipLink';
 import OffersHeader from '@/components/OffersHeader';
 import AdminBanner from '@/components/AdminBanner';
-import NikeInspiredHeader from '@/components/NikeInspiredHeader';
+import MainHeader from '@/components/MainHeader';
 import DevHeader from '@/components/DevHeader';
 import ScrollToTop from '@/components/ScrollToTop';
 import ProtectedRoute from '@/components/ProtectedRoute';
@@ -93,6 +93,11 @@ const DevLinksPage = lazy(() => import('@/pages/DevLinksPage'));
 const ContactSheetPage = lazy(() => import('@/pages/dev/ContactSheetPage'));
 const SiteMapPage = lazy(() => import('@/pages/dev/SiteMapPage'));
 const ConstructorColleccioPage = lazy(() => import('@/pages/ConstructorColleccioPage'));
+const ConstructorColleccioPageCopy2 = lazy(() => import('@/pages/ConstructorColleccioPageCopy2'));
+const ConstructorColleccioPageCopy3 = lazy(() => import('@/pages/ConstructorColleccioPageCopy3'));
+const ConstructorColleccioPageCopy4 = lazy(() => import('@/pages/ConstructorColleccioPageCopy4'));
+const ConstructorColleccioPageCopy5 = lazy(() => import('@/pages/ConstructorColleccioPageCopy5'));
+const ConstructorColleccioPageCopy6 = lazy(() => import('@/pages/ConstructorColleccioPageCopy6'));
 const ConstructorColleccio01Page = lazy(() => import('@/pages/ConstructorColleccio01Page'));
 const ConstructorColleccio02Page = lazy(() => import('@/pages/ConstructorColleccio02Page'));
 const ConstructorColleccio03Page = lazy(() => import('@/pages/ConstructorColleccio03Page'));
@@ -2945,7 +2950,7 @@ function App() {
       {/* Main Header - NO mostrar a pàgines full-screen ni admin ni a dev tools */}
       {!isFullScreenRoute && !isAdminRoute && !isDemoStyleLayoutRoute && !isDevHeaderRoute && (
         isHomeRoute ? null : import.meta.env.DEV && isNikeDemoRoute ? (
-          <NikeInspiredHeader
+          <MainHeader
             cartItemCount={getTotalItems()}
             onCartClick={() => toggleSlidePreset(cartPresetId)}
             onUserClick={() => toggleSlidePreset(viewPresetId)}
@@ -3018,26 +3023,60 @@ function App() {
                 <Route path="/lab" element={<ProtectedRoute><LabHomePage /></ProtectedRoute>} />
                 <Route path="/lab/demos" element={<ProtectedRoute><LabDemosPage /></ProtectedRoute>} />
                 <Route path="/lab/wip" element={<ProtectedRoute><LabWipPage /></ProtectedRoute>} />
-                <Route path="/first-contact" element={<ConstructorColleccio01Page />} />
-
-                <Route path="/the-human-inside" element={<ConstructorColleccio02Page />} />
-
-                <Route path="/austen" element={<ConstructorColleccio03Page />} />
-
-                <Route path="/cube" element={<ConstructorColleccio04Page />} />
-
-                <Route path="/thin" element={
+                <Route path="/first-contact" element={
                   <motion.div
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -10 }}
                     transition={{ duration: 0.3, ease: "easeInOut" }}
                   >
-                    <TheHumanInsidePage {...pageProps} />
+                    <ConstructorColleccioPageCopy2 pautaEnabled={false} tableEnabled={false} {...pageProps} />
                   </motion.div>
                 } />
 
-                <Route path="/miscellania" element={<ConstructorColleccio05Page />} />
+                <Route path="/the-human-inside" element={
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    transition={{ duration: 0.3, ease: "easeInOut" }}
+                  >
+                    <ConstructorColleccioPageCopy3 pautaEnabled={false} tableEnabled={false} {...pageProps} />
+                  </motion.div>
+                } />
+
+                <Route path="/austen" element={
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    transition={{ duration: 0.3, ease: "easeInOut" }}
+                  >
+                    <ConstructorColleccioPageCopy4 pautaEnabled={false} tableEnabled={false} {...pageProps} />
+                  </motion.div>
+                } />
+
+                <Route path="/cube" element={
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    transition={{ duration: 0.3, ease: "easeInOut" }}
+                  >
+                    <ConstructorColleccioPageCopy5 pautaEnabled={false} tableEnabled={false} {...pageProps} />
+                  </motion.div>
+                } />
+
+                <Route path="/miscellania" element={
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    transition={{ duration: 0.3, ease: "easeInOut" }}
+                  >
+                    <ConstructorColleccioPageCopy6 pautaEnabled={false} tableEnabled={false} {...pageProps} />
+                  </motion.div>
+                } />
 
                 <Route path="/lab/proves" element={
                   <motion.div
@@ -3160,6 +3199,26 @@ function App() {
                 <Route
                   path="/constructor/colleccio"
                   element={<ConstructorColleccioPage pautaEnabled={false} tableEnabled={false} />}
+                />
+                <Route
+                  path="/constructor/first-contact"
+                  element={<ConstructorColleccioPageCopy2 pautaEnabled={false} tableEnabled={false} />}
+                />
+                <Route
+                  path="/constructor/the-human-inside"
+                  element={<ConstructorColleccioPageCopy3 pautaEnabled={false} tableEnabled={false} />}
+                />
+                <Route
+                  path="/constructor/austen"
+                  element={<ConstructorColleccioPageCopy4 pautaEnabled={false} tableEnabled={false} />}
+                />
+                <Route
+                  path="/constructor/cube"
+                  element={<ConstructorColleccioPageCopy5 pautaEnabled={false} tableEnabled={false} />}
+                />
+                <Route
+                  path="/constructor/miscellania"
+                  element={<ConstructorColleccioPageCopy6 pautaEnabled={false} tableEnabled={false} />}
                 />
                 <Route
                   path="/constructor/colleccio01"

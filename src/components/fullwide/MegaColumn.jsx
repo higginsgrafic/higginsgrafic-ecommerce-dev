@@ -805,7 +805,8 @@ function MegaColumn({
         'cylon cube': 'cylon-cube.webp',
         'cylon cube 03': 'cylon-cube.webp',
       };
-      const file = map[key];
+      const keySpaced = key.replace(/-/g, ' ');
+      const file = map[key] || map[keySpaced];
       const out = file ? ensureThumbSuffix(`/custom_logos/drawings/images_grid/cube/${file}`, 'grid') : null;
       if (import.meta.env.DEV && !out) {
         // eslint-disable-next-line no-console

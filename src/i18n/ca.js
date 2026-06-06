@@ -160,7 +160,7 @@ export const ca = {
       title: 'THE HUMAN INSIDE',
       description: 'En el racó més profund i fosc hi reposa el vostre heroi.',
       seo: {
-        title: 'The Human Inside - GRÀFIC',
+        title: 'FIRST CONTACT',
         description: 'En el racó més profund i fosc hi reposa el vostre heroi.',
       },
     },

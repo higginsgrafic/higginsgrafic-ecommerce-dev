@@ -1271,6 +1271,7 @@ export default function FullWideSlideDemoHeader({
 
   const drawingOverlayDebug = (() => {
     try {
+      if (!import.meta.env.DEV) return false;
       const qs = (typeof window !== 'undefined') ? window.location?.search : '';
       const p = qs ? new URLSearchParams(qs) : null;
       const raw = p?.get?.('drawingOverlayDebug');
@@ -2332,7 +2333,6 @@ export default function FullWideSlideDemoHeader({
             'Iron Kong',
             'Iron Cube 68',
             'RoboCube',
-            'Cylon Cube',
             'Cylon Cube 03',
             'MaschinenCube',
             'Mazinger C',

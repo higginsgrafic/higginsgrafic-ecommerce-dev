@@ -182,7 +182,7 @@ export const siteTexts = {
     },
     theHumanInside: {
       seo: {
-        title: "The Human Inside | Expressió lliure",
+        title: "FIRST CONTACT",
         description: "Dibuixos inspirats en les icones més rellevants del segle XX"
       },
       title: "The Human Inside",

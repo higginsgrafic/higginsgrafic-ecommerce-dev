@@ -10,7 +10,7 @@ import Breadcrumbs from '@/components/Breadcrumbs';
 import EditableTextBox from '@/components/dev/EditableTextBox';
 import { useDebugOverlays } from '@/hooks/useDebugOverlays';
 
-const PDP_PRESET_VERSION = 'pdp-layout-2026-05-20-1135';
+const PDP_PRESET_VERSION = 'pdp-layout-2026-06-06-1953';
 
 const PDP_TITLE_SETTINGS = {
   x: 0, y: 0, fontFamily: 'Oswald', fontSize: 24, fontWeight: 300, selectedFontWeight: 700,
@@ -33,12 +33,12 @@ const PDP_PRICE_SETTINGS = {
   color: '#475059', textTransform: 'none',
 };
 const PDP_CTA_SETTINGS = {
-  x: 0, y: 0, fontFamily: 'Oswald', fontSize: 20, fontWeight: 300, selectedFontWeight: 700,
+  x: 0, y: 0, fontFamily: 'Oswald', fontSize: 12, fontWeight: 300, selectedFontWeight: 400,
   letterSpacing: 0.04, lineHeight: 1, textAlign: 'center', verticalAlign: 'center',
   color: '#475059', textTransform: 'uppercase',
 };
 const PDP_SIZE_SETTINGS = {
-  x: 0, y: 0, fontFamily: 'Oswald', fontSize: 20, fontWeight: 300, selectedFontWeight: 700,
+  x: 0, y: 0, fontFamily: 'Oswald', fontSize: 12, fontWeight: 300, selectedFontWeight: 400,
   letterSpacing: 0, lineHeight: 1, textAlign: 'center', verticalAlign: 'center',
   color: '#475059', textTransform: 'none',
 };

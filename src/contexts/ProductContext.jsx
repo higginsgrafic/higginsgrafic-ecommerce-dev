@@ -703,9 +703,12 @@ export const ProductProvider = ({ children }) => {
     return filtered;
   };
 
+  const isProductReady = !loading;
+
   const value = {
     products,
     loading,
+    isProductReady,
     error,
     loadProducts,
     syncGelatoProducts,

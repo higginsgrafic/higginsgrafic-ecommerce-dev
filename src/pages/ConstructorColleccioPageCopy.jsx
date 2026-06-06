@@ -55,7 +55,7 @@ const HERO_SLIDES = [
   },
 ];
 
-const OVERLAY_STATE_STORAGE_KEY = 'hg.constructorColleccio.overlayOpacity.v1';
+const OVERLAY_STATE_STORAGE_KEY = 'hg.constructorColleccioCopy.overlayOpacity.v1';
 
 const DEFAULT_OVERLAY_STATE = {
   pautaOpacity: 1,
@@ -74,7 +74,7 @@ function loadOverlayState() {
   }
 }
 
-function ConstructorColleccioPage() {
+function ConstructorColleccioPageCopy() {
   const [selectedSize, setSelectedSize] = useState('M');
   const [overlayState, setOverlayState] = useState(loadOverlayState);
   const [zeroLeftOffsetPx, setZeroLeftOffsetPx] = useState(0);
@@ -127,7 +127,7 @@ function ConstructorColleccioPage() {
   return (
     <section className="bg-background">
       <Helmet>
-        <title>Col·lecció · Constructor | Higgins Gràfic</title>
+        <title>Col·lecció (còpia) · Constructor | Higgins Gràfic</title>
         <meta
           name="description"
           content="Plantilla de construcció de col·lecció amb header global, pauta de 4 columnes i footers globals."
@@ -147,7 +147,7 @@ function ConstructorColleccioPage() {
           aria-label="Títol col·lecció"
           style={{
             gridColumn: '1 / 4',
-            gridRow: '1 / 7',
+            gridRow: '1 / 10',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -165,9 +165,16 @@ function ConstructorColleccioPage() {
               lineHeight: 0.85,
               color: '#0b0d10',
               textTransform: 'uppercase',
-              transform: 'translateY(calc(1% + 10px))',
+              transform: 'translateY(calc(1% - 5px))',
             }}
           >
+            <span
+              style={{
+                color: 'rgba(180, 188, 196, 0.55)',
+              }}
+            >
+              00
+            </span>
             COL·LECCIÓ
           </h1>
         </div>
@@ -303,4 +310,4 @@ function OpacitySlider({ label, value, onChange }) {
   );
 }
 
-export default ConstructorColleccioPage;
+export default ConstructorColleccioPageCopy;

@@ -6,7 +6,7 @@ import { createPortal } from 'react-dom';
 import { Button } from '@/components/ui/button';
 import { useTexts } from '@/hooks/useTexts';
 
-function NikeInspiredHeader({
+function MainHeader({
   cartItemCount,
   onCartClick,
   onUserClick,
@@ -1220,4 +1220,4 @@ function NikeInspiredHeader({
   );
 }
 
-export default NikeInspiredHeader;
+export default MainHeader;

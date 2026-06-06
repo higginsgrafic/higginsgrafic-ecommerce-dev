@@ -41,7 +41,13 @@ function MegaStripePanel({
 }) {
   return (
     <div className="w-full shrink-0">
-      <div className="relative z-10 grid grid-cols-1 gap-10">
+      <div
+        className="relative z-10 grid grid-cols-1 gap-10"
+        style={{
+          transform: 'scale(var(--hgGridFitScale, 0.94))',
+          transformOrigin: 'top center',
+        }}
+      >
         {(resolvedMega[active] || []).map((col, idx) => (
           <MegaColumn
             key={`${active}-${idx}`}
@@ -486,7 +492,7 @@ function MegaStripePanel({
                                   opacity: 0.98,
                                   transformOrigin: 'top center',
                                   transform:
-                                    'translate(var(--megaStripeDrawingOverlayDx, var(--hgShirtOverlayDx, 0px)), var(--megaStripeDrawingOverlayDy, var(--hgShirtOverlayDy, 0px))) scale(var(--megaStripeDrawingOverlayScale, var(--hgShirtOverlayScale, 1)))',
+                                    'translate(var(--megaStripeDrawingOverlayDx, var(--hgShirtOverlayDx, 0px)), calc(var(--megaStripeDrawingOverlayDy, var(--hgShirtOverlayDy, 0px)) + var(--hgStripeDrawingExtraDy, -5px))) scale(calc(var(--megaStripeDrawingOverlayScale, var(--hgShirtOverlayScale, 1)) * var(--hgStripeDrawingExtraScale, 1)))',
                                   filter: (() => {
                                     const isPemberley = active === 'austen' && typeof resolvedOverlaySrc === 'string' && /\/austen\/pemberley_house\//i.test(resolvedOverlaySrc);
                                     const tileIsFirst = Number(idx) === 0;
@@ -690,7 +696,7 @@ function MegaStripePanel({
                                   opacity: 0.98,
                                   transformOrigin: 'top center',
                                   transform:
-                                    'translate(var(--megaStripeDrawingOverlayDx, var(--hgShirtOverlayDx, 0px)), var(--megaStripeDrawingOverlayDy, var(--hgShirtOverlayDy, 0px))) scale(var(--megaStripeDrawingOverlayScale, var(--hgShirtOverlayScale, 1)))',
+                                    'translate(var(--megaStripeDrawingOverlayDx, var(--hgShirtOverlayDx, 0px)), calc(var(--megaStripeDrawingOverlayDy, var(--hgShirtOverlayDy, 0px)) + var(--hgStripeDrawingExtraDy, -5px))) scale(calc(var(--megaStripeDrawingOverlayScale, var(--hgShirtOverlayScale, 1)) * var(--hgStripeDrawingExtraScale, 1)))',
                                   filter: (() => {
                                     const isPemberley = active === 'austen' && typeof resolvedOverlaySrc === 'string' && /\/austen\/pemberley_house\//i.test(resolvedOverlaySrc);
                                     const tileIsFirst = Number(idx) === 0;
