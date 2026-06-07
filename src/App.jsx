@@ -3205,10 +3205,6 @@ function App() {
                   element={<ConstructorColleccioPageCopy2 pautaEnabled={false} tableEnabled={false} />}
                 />
                 <Route
-                  path="/constructor/the-human-inside"
-                  element={<ConstructorColleccioPageCopy3 pautaEnabled={false} tableEnabled={false} />}
-                />
-                <Route
                   path="/constructor/austen"
                   element={<ConstructorColleccioPageCopy4 pautaEnabled={false} tableEnabled={false} />}
                 />
