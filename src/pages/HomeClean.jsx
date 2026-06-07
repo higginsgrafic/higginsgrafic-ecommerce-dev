@@ -63,7 +63,7 @@ function CollectionTitle({ index, kicker, title, subtitle, align = 'left', numbe
           className="relative font-black uppercase leading-[0.85] tracking-[-0.02em] text-foreground"
           style={{
             fontFamily: 'Oswald, sans-serif',
-            fontSize: 'clamp(4.572rem, 15.24vw, 13.208rem)',
+            fontSize: '4.4vw',
             width: '100%',
             textAlign: titleTextAlign || (isRight ? 'right' : 'left'),
           }}
@@ -262,8 +262,8 @@ function HomeClean() {
       >
         <div
           style={{
-            gridColumn: '3 / 4',
-            gridRow: '37 / 38', // +2 files per acompanyar el contingut baixat (abans 35 / 36)
+            gridColumn: '1 / 4',
+            gridRow: '33 / 34', // Pujat 4 files (abans 37 / 38)
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -280,16 +280,17 @@ function HomeClean() {
       </Pauta4ColsOverlay>
 
       <section className="bg-background text-foreground">
-        <div className="mx-auto max-w-[1400px] px-4 pt-[158px] pb-[174px] sm:px-6 lg:px-10">
+        <div className="mx-auto max-w-[1400px] px-4 pt-[120px] pb-[174px] sm:px-6 lg:px-10">
           <CollectionTitle
-            index="01"
+            index=""
             kicker="Col·lecció"
             title="First Contact"
             subtitle={null}
-            align="right"
+            align="center"
+            titleTextAlign="center"
             numberAlign="left"
-            titleOffsetX={13.5}
-            titleOffsetY={9}
+            titleOffsetX={0}
+            titleOffsetY={5}
             numberOffsetX={-36}
             numberOffsetY={-4}
           />
@@ -346,49 +347,53 @@ function HomeClean() {
                 }}
               />
 
-              {/* Indicador de més productes (Cercle discret + sota el producte de la tercera columna) */}
+              {/* Indicador de més productes (Pill amb text sota el producte de la tercera columna) */}
               <Link
                 to="/first-contact"
                 style={{
                   position: 'absolute',
-                  right: 'calc((100% - 2 * 22.5px) / 6 - 18px)',
+                  left: '50%',
                   bottom: '-54px',
-                  width: '36px',
-                  height: '36px',
-                  borderRadius: '50%',
+                  height: 'auto',
+                  width: 'auto',
+                  borderRadius: '9999px',
                   backgroundColor: '#ffffff',
                   border: '1px solid #e5e7eb',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
+                  padding: '6px 14px',
                   boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
                   cursor: 'pointer',
                   zIndex: 20,
                   transition: 'all 200ms ease',
                   textDecoration: 'none',
+                  transform: 'translateX(-50%)',
                 }}
-                className="hover:scale-110 hover:shadow-md hover:border-neutral-400 active:scale-95 group"
+                className="hover:shadow-md hover:border-neutral-400 active:scale-95 group"
                 title="Veure tota la col·lecció"
               >
-                <span 
+                <span
                   style={{ 
                     fontFamily: 'Oswald, sans-serif',
                     fontWeight: 300,
-                    fontSize: '18px',
+                    fontSize: '12px',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.05em',
                     color: '#475059',
                     lineHeight: 1,
-                    transform: 'translateY(-1px)',
                   }}
                   className="group-hover:text-neutral-900"
                 >
-                  +
+                  <span style={{ display: 'inline-block', transform: 'translateY(3px)' }}>SI EN VOLS SABER</span>{' '}
+                  <span style={{ display: 'inline-block', fontSize: '25px', fontWeight: 100, lineHeight: 1, verticalAlign: 'middle', transform: 'translateY(1px)' }}>+</span>
                 </span>
               </Link>
             </div>
           </div>
 
           {/* Col·lecció 02: The Human Inside (Distància de 5 files / 190px + 15px avall - 1 fila amunt) */}
-          <div style={{ marginTop: '167px' }}>
+          <div style={{ marginTop: '129px' }}>
             <div
               style={{
                 position: 'relative',
@@ -398,23 +403,18 @@ function HomeClean() {
               }}
             >
               <CollectionTitle
-                index="02"
+                index=""
                 kicker="Col·lecció"
-                title={
-                  <div className="flex flex-col items-end">
-                    <span>THE HUMAN</span>
-                    <span style={{ transform: 'translateX(-3px)' }}>INSID<span style={{ display: 'inline-block', transform: 'translateX(-4px)' }}>E</span></span>
-                  </div>
-                }
+                title="THE HUMAN INSIDE"
                 subtitle="EN EL TEU RACÓ MÉS PROFUND HI HA UN HEROI"
-                align="left"
+                align="center"
                 numberAlign="right"
-                titleTextAlign="left"
-                titleOffsetY={9}
+                titleTextAlign="center"
+                titleOffsetY={-1}
                 numberOffsetX={1} // Mogut 4px més a l'esquerra (abans 5)
                 numberOffsetY={-4}
-                subtitleOffsetX="calc((var(--hg-tdp-xR) - var(--hg-tdp-xL)) / 3 + 7.5px)" // Desplaçat de la col 1 a la col 2 (⅓) neutralitzant el titleOffsetX
-                subtitleOffsetY={18} // Mogut 18px avall
+                subtitleOffsetX={0} // Centrat en X
+                subtitleOffsetY={0} // Pujat 18px (abans 18)
               />
             </div>
             <div style={{ marginTop: '150px' }}>
@@ -470,50 +470,54 @@ function HomeClean() {
                   }}
                 />
 
-                {/* Indicador de més productes (Cercle discret + sota el producte de la tercera columna) */}
-                <Link
-                  to="/thin"
-                  style={{
-                    position: 'absolute',
-                    right: 'calc((100% - 2 * 22.5px) / 6 - 18px)',
-                    bottom: '-54px',
-                    width: '36px',
-                    height: '36px',
-                    borderRadius: '50%',
-                    backgroundColor: '#ffffff',
-                    border: '1px solid #e5e7eb',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
-                    cursor: 'pointer',
-                    zIndex: 20,
-                    transition: 'all 200ms ease',
-                    textDecoration: 'none',
+              {/* Indicador de més productes (Pill amb text sota el producte de la tercera columna) */}
+              <Link
+                to="/thin"
+                style={{
+                  position: 'absolute',
+                  left: '50%',
+                  bottom: '-54px',
+                  height: 'auto',
+                  width: 'auto',
+                  borderRadius: '9999px',
+                  backgroundColor: '#ffffff',
+                  border: '1px solid #e5e7eb',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  padding: '6px 14px',
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
+                  cursor: 'pointer',
+                  zIndex: 20,
+                  transition: 'all 200ms ease',
+                  textDecoration: 'none',
+                  transform: 'translateX(-50%)',
+                }}
+                className="hover:shadow-md hover:border-neutral-400 active:scale-95 group"
+                title="Veure tota la col·lecció"
+              >
+                <span
+                  style={{ 
+                    fontFamily: 'Oswald, sans-serif',
+                    fontWeight: 300,
+                    fontSize: '12px',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.05em',
+                    color: '#475059',
+                    lineHeight: 1,
                   }}
-                  className="hover:scale-110 hover:shadow-md hover:border-neutral-400 active:scale-95 group"
-                  title="Veure tota la col·lecció"
+                  className="group-hover:text-neutral-900"
                 >
-                  <span 
-                    style={{ 
-                      fontFamily: 'Oswald, sans-serif',
-                      fontWeight: 300,
-                      fontSize: '18px',
-                      color: '#475059',
-                      lineHeight: 1,
-                      transform: 'translateY(-1px)',
-                    }}
-                    className="group-hover:text-neutral-900"
-                  >
-                    +
-                  </span>
-                </Link>
+                  <span style={{ display: 'inline-block', transform: 'translateY(3px)' }}>SI EN VOLS SABER</span>{' '}
+                  <span style={{ display: 'inline-block', fontSize: '25px', fontWeight: 100, lineHeight: 1, verticalAlign: 'middle', transform: 'translateY(1px)' }}>+</span>
+                </span>
+              </Link>
               </div>
             </div>
           </div>
 
           {/* Col·lecció 03: Austen (Distància de 5 files / 190px) */}
-          <div style={{ marginTop: '190px' }}>
+          <div style={{ marginTop: '162px' }}>
             <div
               style={{
                 position: 'relative',
@@ -523,18 +527,18 @@ function HomeClean() {
               }}
             >
               <CollectionTitle
-                index="03"
+                index=""
                 kicker="Col·lecció"
                 title="Austen"
                 subtitle="DIGUIS EL QUE DIGUIS, FES-HO AMB ELEGÀNCIA"
-                align="right"
+                align="center"
                 numberAlign="left"
                 titleTextAlign="center"
-                titleOffsetX="calc((var(--hg-tdp-xR) - var(--hg-tdp-xL)) / 6 + 3.75px)" // Centrat entre les columnes 2 i 3
+                titleOffsetX={0}
                 titleOffsetY={-4}
                 numberOffsetX={-22} // Mogut 14px a la dreta (abans -36)
                 numberOffsetY={-17}
-                subtitleOffsetY={5}
+                subtitleOffsetY={0}
               />
             </div>
             <div style={{ marginTop: '150px' }}>
@@ -590,50 +594,54 @@ function HomeClean() {
                   }}
                 />
 
-                {/* Indicador de més productes (Cercle discret + sota el producte de la tercera columna) */}
-                <Link
-                  to="/austen"
-                  style={{
-                    position: 'absolute',
-                    right: 'calc((100% - 2 * 22.5px) / 6 - 18px)',
-                    bottom: '-54px',
-                    width: '36px',
-                    height: '36px',
-                    borderRadius: '50%',
-                    backgroundColor: '#ffffff',
-                    border: '1px solid #e5e7eb',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
-                    cursor: 'pointer',
-                    zIndex: 20,
-                    transition: 'all 200ms ease',
-                    textDecoration: 'none',
+              {/* Indicador de més productes (Pill amb text sota el producte de la tercera columna) */}
+              <Link
+                to="/austen"
+                style={{
+                  position: 'absolute',
+                  left: '50%',
+                  bottom: '-54px',
+                  height: 'auto',
+                  width: 'auto',
+                  borderRadius: '9999px',
+                  backgroundColor: '#ffffff',
+                  border: '1px solid #e5e7eb',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  padding: '6px 14px',
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
+                  cursor: 'pointer',
+                  zIndex: 20,
+                  transition: 'all 200ms ease',
+                  textDecoration: 'none',
+                  transform: 'translateX(-50%)',
+                }}
+                className="hover:shadow-md hover:border-neutral-400 active:scale-95 group"
+                title="Veure tota la col·lecció"
+              >
+                <span
+                  style={{ 
+                    fontFamily: 'Oswald, sans-serif',
+                    fontWeight: 300,
+                    fontSize: '12px',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.05em',
+                    color: '#475059',
+                    lineHeight: 1,
                   }}
-                  className="hover:scale-110 hover:shadow-md hover:border-neutral-400 active:scale-95 group"
-                  title="Veure tota la col·lecció"
+                  className="group-hover:text-neutral-900"
                 >
-                  <span 
-                    style={{ 
-                      fontFamily: 'Oswald, sans-serif',
-                      fontWeight: 300,
-                      fontSize: '18px',
-                      color: '#475059',
-                      lineHeight: 1,
-                      transform: 'translateY(-1px)',
-                    }}
-                    className="group-hover:text-neutral-900"
-                  >
-                    +
-                  </span>
-                </Link>
+                  <span style={{ display: 'inline-block', transform: 'translateY(3px)' }}>SI EN VOLS SABER</span>{' '}
+                  <span style={{ display: 'inline-block', fontSize: '25px', fontWeight: 100, lineHeight: 1, verticalAlign: 'middle', transform: 'translateY(1px)' }}>+</span>
+                </span>
+              </Link>
               </div>
             </div>
           </div>
 
           {/* Col·lecció 04: Cube (Distància de 5 files / 190px - 1 fila amunt) */}
-          <div style={{ marginTop: '152px' }}>
+          <div style={{ marginTop: '104px' }}>
             <div
               style={{
                 position: 'relative',
@@ -643,18 +651,18 @@ function HomeClean() {
               }}
             >
               <CollectionTitle
-                index="04"
+                index=""
                 kicker="Col·lecció"
                 title="Cube"
                 subtitle="TOTS SOM ESTRANYS A ULLS NOSTRES"
-                align="left"
+                align="center"
                 numberAlign="right"
                 titleTextAlign="center"
-                titleOffsetX="calc((var(--hg-tdp-xR) - var(--hg-tdp-xL)) / -6 - 3.75px)" // Centrat entre les columnes 1 i 2
+                titleOffsetX={0}
                 titleOffsetY={13}
                 numberOffsetX={19} // Mogut 4px més a l'esquerra (abans 23)
                 numberOffsetY={0}
-                subtitleOffsetY={6}
+                subtitleOffsetY={1}
               />
             </div>
             <div style={{ marginTop: '150px' }}>
@@ -710,50 +718,54 @@ function HomeClean() {
                   }}
                 />
 
-                {/* Indicador de més productes (Cercle discret + sota el producte de la tercera columna) */}
-                <Link
-                  to="/cube"
-                  style={{
-                    position: 'absolute',
-                    right: 'calc((100% - 2 * 22.5px) / 6 - 18px)',
-                    bottom: '-54px',
-                    width: '36px',
-                    height: '36px',
-                    borderRadius: '50%',
-                    backgroundColor: '#ffffff',
-                    border: '1px solid #e5e7eb',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
-                    cursor: 'pointer',
-                    zIndex: 20,
-                    transition: 'all 200ms ease',
-                    textDecoration: 'none',
+              {/* Indicador de més productes (Pill amb text sota el producte de la tercera columna) */}
+              <Link
+                to="/cube"
+                style={{
+                  position: 'absolute',
+                  left: '50%',
+                  bottom: '-54px',
+                  height: 'auto',
+                  width: 'auto',
+                  borderRadius: '9999px',
+                  backgroundColor: '#ffffff',
+                  border: '1px solid #e5e7eb',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  padding: '6px 14px',
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
+                  cursor: 'pointer',
+                  zIndex: 20,
+                  transition: 'all 200ms ease',
+                  textDecoration: 'none',
+                  transform: 'translateX(-50%)',
+                }}
+                className="hover:shadow-md hover:border-neutral-400 active:scale-95 group"
+                title="Veure tota la col·lecció"
+              >
+                <span
+                  style={{ 
+                    fontFamily: 'Oswald, sans-serif',
+                    fontWeight: 300,
+                    fontSize: '12px',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.05em',
+                    color: '#475059',
+                    lineHeight: 1,
                   }}
-                  className="hover:scale-110 hover:shadow-md hover:border-neutral-400 active:scale-95 group"
-                  title="Veure tota la col·lecció"
+                  className="group-hover:text-neutral-900"
                 >
-                  <span 
-                    style={{ 
-                      fontFamily: 'Oswald, sans-serif',
-                      fontWeight: 300,
-                      fontSize: '18px',
-                      color: '#475059',
-                      lineHeight: 1,
-                      transform: 'translateY(-1px)',
-                    }}
-                    className="group-hover:text-neutral-900"
-                  >
-                    +
-                  </span>
-                </Link>
+                  <span style={{ display: 'inline-block', transform: 'translateY(3px)' }}>SI EN VOLS SABER</span>{' '}
+                  <span style={{ display: 'inline-block', fontSize: '25px', fontWeight: 100, lineHeight: 1, verticalAlign: 'middle', transform: 'translateY(1px)' }}>+</span>
+                </span>
+              </Link>
               </div>
             </div>
           </div>
 
           {/* Col·lecció 05: MISC (Distància de 5 files / 190px - 1 fila amunt + 20px avall) */}
-          <div style={{ marginTop: '172px', position: 'relative', zIndex: 30 }}>
+          <div style={{ marginTop: '124px', position: 'relative', zIndex: 30 }}>
             <div
               style={{
                 position: 'relative',
@@ -763,18 +775,18 @@ function HomeClean() {
               }}
             >
               <CollectionTitle
-                index="05"
+                index=""
                 kicker="Col·lecció"
-                title="MISC"
+                title="MISCEL·LÀNIA"
                 subtitle="MÉS VAL SOL QUE MAL ACOMPANYAT"
-                align="right"
+                align="center"
                 numberAlign="left"
                 titleTextAlign="center"
-                titleOffsetX="calc((var(--hg-tdp-xR) - var(--hg-tdp-xL)) / 6 + 3.75px)" // Centrat entre les columnes 2 i 3
+                titleOffsetX={0}
                 titleOffsetY={9}
                 numberOffsetX={-22} // Mogut 14px a la dreta (abans -36)
                 numberOffsetY={-4}
-                subtitleOffsetY={6}
+                subtitleOffsetY={1}
               />
             </div>
             <div style={{ marginTop: '150px' }}>
@@ -830,44 +842,48 @@ function HomeClean() {
                   }}
                 />
 
-                {/* Indicador de més productes (Cercle discret + sota el producte de la tercera columna) */}
-                <Link
-                  to="/miscellania"
-                  style={{
-                    position: 'absolute',
-                    right: 'calc((100% - 2 * 22.5px) / 6 - 18px)',
-                    bottom: '-54px',
-                    width: '36px',
-                    height: '36px',
-                    borderRadius: '50%',
-                    backgroundColor: '#ffffff',
-                    border: '1px solid #e5e7eb',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
-                    cursor: 'pointer',
-                    zIndex: 20,
-                    transition: 'all 200ms ease',
-                    textDecoration: 'none',
+              {/* Indicador de més productes (Pill amb text sota el producte de la tercera columna) */}
+              <Link
+                to="/miscellania"
+                style={{
+                  position: 'absolute',
+                  left: '50%',
+                  bottom: '-54px',
+                  height: 'auto',
+                  width: 'auto',
+                  borderRadius: '9999px',
+                  backgroundColor: '#ffffff',
+                  border: '1px solid #e5e7eb',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  padding: '6px 14px',
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
+                  cursor: 'pointer',
+                  zIndex: 20,
+                  transition: 'all 200ms ease',
+                  textDecoration: 'none',
+                  transform: 'translateX(-50%)',
+                }}
+                className="hover:shadow-md hover:border-neutral-400 active:scale-95 group"
+                title="Veure tota la col·lecció"
+              >
+                <span
+                  style={{ 
+                    fontFamily: 'Oswald, sans-serif',
+                    fontWeight: 300,
+                    fontSize: '12px',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.05em',
+                    color: '#475059',
+                    lineHeight: 1,
                   }}
-                  className="hover:scale-110 hover:shadow-md hover:border-neutral-400 active:scale-95 group"
-                  title="Veure toda la col·lecció"
+                  className="group-hover:text-neutral-900"
                 >
-                  <span 
-                    style={{ 
-                      fontFamily: 'Oswald, sans-serif',
-                      fontWeight: 300,
-                      fontSize: '18px',
-                      color: '#475059',
-                      lineHeight: 1,
-                      transform: 'translateY(-1px)',
-                    }}
-                    className="group-hover:text-neutral-900"
-                  >
-                    +
-                  </span>
-                </Link>
+                  <span style={{ display: 'inline-block', transform: 'translateY(3px)' }}>SI EN VOLS SABER</span>{' '}
+                  <span style={{ display: 'inline-block', fontSize: '25px', fontWeight: 100, lineHeight: 1, verticalAlign: 'middle', transform: 'translateY(1px)' }}>+</span>
+                </span>
+              </Link>
               </div>
             </div>
           </div>
