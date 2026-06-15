@@ -46,18 +46,21 @@ const FIRST_CONTACT = [
   'nx-01', 'ncc-1701', 'ncc-1701-d', 'wormhole', 'plasma-escape', 'vulcans-end', 'the-phoenix',
 ].map((n) => bw('first_contact', n, 'first_contact', { collection: 'first-contact', design: n }));
 
-// --- The Human Inside (negre + blanc) ---------------------------------------
-// Tots tenen mockup excepte `r2-d2` i `the-dalek` (no generats encara).
-const THI_WITH_MOCKUP = new Set([
-  'afrodita-a', 'c3-p0', 'cyberman', 'cylon-03', 'cylon-78', 'iron-man-08', 'iron-man-68',
-  'maschinenmensch', 'mazinger-z', 'robbie-the-robot', 'robocop', 'terminator', 'vader',
-]);
+// --- The Human Inside (negre + blanc + multi) -------------------------------
+// Tots tenen mockup pre-composat al disc (inclosos r2d2 i the-dalek).
+// Els ids "stripe" de la home divergeixen dels ids de fitxer del helper.
+const THI_DESIGN_MAP = {
+  'afrodita-a': 'afrodita',
+  'c3-p0': 'c3p0',
+  'mazinger-z': 'mazinger',
+  'r2-d2': 'r2d2',
+};
 const THE_HUMAN_INSIDE = [
   'afrodita-a', 'c3-p0', 'cyberman', 'cylon-03', 'cylon-78', 'iron-man-08', 'iron-man-68',
   'maschinenmensch', 'mazinger-z', 'r2-d2', 'robbie-the-robot', 'robocop', 'terminator',
   'the-dalek', 'vader',
 ].map((n) => bw('the_human_inside', n, 'the_human_inside',
-  THI_WITH_MOCKUP.has(n) ? { collection: 'the-human-inside', design: n } : undefined));
+  { collection: 'the-human-inside', design: THI_DESIGN_MAP[n] || n }));
 
 // --- Miscel·lània (negre + blanc) -------------------------------------------
 // Els 3 dibuixos del catàleg coincideixen amb el disc.
@@ -78,7 +81,7 @@ const CUBE_DESIGN_MAP = {
   'iron-cube-68-stripe': 'iron-cube',
   'maschinencube-stripe': 'maschinenmensch',
   'mazinger-c-stripe': 'mazinger-c',
-  'robocube-stripe': 'robocube',
+  'robocube-stripe': 'robbocube',
 };
 const CUBE = Object.entries(CUBE_DESIGN_MAP).map(([f, design]) =>
   colorOnly('cube', `cube/${f}.webp`, `cube/${f}`, { collection: 'cube', design })
@@ -119,21 +122,21 @@ const AUSTEN = [
   })),
   // keep_calm (negre + blanc) — al disc tenim 2 dissenys; usem `solid` per al
   // mockup pre-composat (el catalàg manté la id genèrica `keep-calm`).
-  bw('austen', 'keep-calm', 'austen/keep_calm', { collection: 'austen-keep-calm', design: 'solid' }),
+  bw('austen', 'keep-calm', 'austen/keep_calm', { collection: 'austen-keep-calm', design: 'keep-calm' }),
   // pemberley_house (negre + blanc + multi al disc)
-  bw('austen', 'pemberley-house', 'austen/pemberley_house', { collection: 'austen-pemberley', design: 'house' }),
+  bw('austen', 'pemberley-house', 'austen/pemberley_house', { collection: 'austen-pemberley', design: 'pemberley-house' }),
   // quotes (negre + blanc; només les que tenen parella b/w)
   ...[
     'body-and-soul', 'half-agony-half-hope', 'it-is-a-truth', 'you-must-allow-me',
   ].map((n) => bw('austen', n, 'austen/quotes',
-    AUSTEN_QUOTES_WITH_MOCKUP.has(n) ? { collection: 'austen-quotes', design: n } : undefined)),
-  // looking_for_my_darcy (NOMÉS color) — disseny = `solid`; frame-color variable.
-  ...Object.entries(LFMD_FRAME_MAP).map(([n, frameColor]) =>
+    AUSTEN_QUOTES_WITH_MOCKUP.has(n) ? { collection: 'austen-quotes', design: `quotes-${n}` } : undefined)),
+  // looking_for_my_darcy (NOMÉS color) — design = `looking-for-my-darcy-<variant>`.
+  ...Object.keys(LFMD_FRAME_MAP).map((n) =>
     colorOnly(
       'austen',
       `austen/looking_for_my_darcy/solid/${n}-stripe.webp`,
       `austen/lfmd/${n}`,
-      { collection: 'austen-looking-for-my-darcy', design: 'solid', frameColor }
+      { collection: 'austen-looking-for-my-darcy', design: `looking-for-my-darcy-${n}` }
     )
   ),
 ];
@@ -334,10 +337,10 @@ export const shirtMockupSrc = (color) =>
  */
 function resolvePrecomposedMockup(drawing, color, isDark) {
   if (!drawing?.mockup) return null;
-  const { collection, design, frameColor } = drawing.mockup;
+  const { collection, design } = drawing.mockup;
   const onlyMulti = collection === 'cube' || collection === 'austen-looking-for-my-darcy';
   const ink = onlyMulti ? 'multi' : isDark ? 'w' : 'b';
-  return getMockupPath({ collection, design, shirtColor: color, ink, frameColor });
+  return getMockupPath({ collection, design, shirtColor: color, ink });
 }
 
 function resolveOverlaySrc(drawing, isDark) {

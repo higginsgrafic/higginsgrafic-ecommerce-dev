@@ -45,19 +45,33 @@ const PUBLIC_BASE = '/placeholders/apparel/mockups';
 // Helper: convertir id (amb guions) a nom de directori (amb underscores)
 const toDir = (id) => String(id).replace(/-/g, '_');
 
+// Helper: derivar el prefix del filename a partir del directori.
+// El prefix sempre és el path del directori amb separadors normalitzats a '-'.
+//   first_contact                       -> first-contact
+//   miscellania/death_star2d2           -> miscellania-death-star2d2
+//   austen/crosswords/pride_and_prejudice -> austen-crosswords-pride-and-prejudice
+const prefixFromDir = (dir) => String(dir).replace(/[/_]/g, '-');
+
 /**
- * Catàleg de col·leccions. Cada entrada defineix:
- *   - dir:        carpeta arrel relativa a /placeholders/apparel/mockups
- *   - prefix:     prefix dels filenames (amb guions)
- *   - inks:       tintes disponibles
- *   - designs:    llista d'ids de disseny (amb guions, lowercase)
- *   - frameColors (opcional, només LFMD)
+ * Catàleg de col·leccions, sincronitzat amb l'estructura REAL de fitxers a
+ * /public/placeholders/apparel/mockups/ (font de veritat).
+ *
+ * Format de fitxer (PLA, sense subcarpeta de disseny):
+ *   <dir>/<prefix>-<design>-<ink>-<shirtColor>.<ext>
+ * on prefix = prefixFromDir(dir).
+ *
+ * Cada entrada defineix:
+ *   - dir:     carpeta fixa (relativa a PUBLIC_BASE) — o bé
+ *   - dirFor:  funció (design) => carpeta, per col·leccions amb subcarpeta per disseny
+ *   - inks:    tintes disponibles ('b' | 'w' | 'multi')
+ *   - designs: ids de disseny EXACTAMENT com apareixen al filename (després del prefix)
+ *   - ext:     extensió per defecte ('webp') — o bé
+ *   - extFor:  mapa { [design]: ext } per excepcions (p.ex. .png)
  */
 export const COLLECTIONS = {
   'first-contact': {
     dir: 'first_contact',
-    prefix: 'first-contact',
-    inks: [INK_BLACK, INK_WHITE],
+    inks: [INK_BLACK, INK_WHITE, INK_MULTI],
     designs: [
       'ncc-1701',
       'ncc-1701-d',
@@ -70,28 +84,30 @@ export const COLLECTIONS = {
   },
   'the-human-inside': {
     dir: 'the_human_inside',
-    prefix: 'the-human-inside',
-    inks: [INK_BLACK, INK_WHITE],
+    inks: [INK_BLACK, INK_WHITE, INK_MULTI],
     designs: [
-      'afrodita-a',
-      'c3-p0',
+      'afrodita',
+      'c3p0',
       'cyberman',
       'cylon-03',
       'cylon-78',
       'iron-man-08',
       'iron-man-68',
       'maschinenmensch',
-      'mazinger-z',
+      'mazinger',
+      'r2d2',
       'robbie-the-robot',
       'robocop',
       'terminator',
+      'the-dalek',
       'vader',
     ],
   },
   miscellania: {
-    dir: 'miscellania',
-    prefix: 'miscellania',
+    // Cada disseny viu a la seva pròpia subcarpeta: miscellania/<design_>
+    dirFor: (design) => `miscellania/${toDir(design)}`,
     inks: [INK_BLACK, INK_WHITE, INK_MULTI],
+    extFor: { 'death-star2d2': 'png', 'dj-vader': 'png' },
     designs: [
       'arthur-d-the-second',
       'death-star2d2',
@@ -101,8 +117,7 @@ export const COLLECTIONS = {
     ],
   },
   cube: {
-    dir: 'cube/cube',
-    prefix: 'cube',
+    dir: 'cube',
     inks: [INK_MULTI],
     designs: [
       '3cube-p0',
@@ -114,30 +129,29 @@ export const COLLECTIONS = {
       'iron-kong',
       'maschinenmensch',
       'mazinger-c',
-      'robocube',
+      'robbocube',
     ],
   },
   'austen-pemberley': {
     dir: 'austen/pemberley',
-    prefix: 'austen-pemberley',
     inks: [INK_BLACK, INK_WHITE, INK_MULTI],
-    designs: ['house'],
+    designs: ['pemberley-house'],
   },
   'austen-quotes': {
-    dir: 'austen/quotes',
-    prefix: 'austen-quotes',
+    dir: 'austen/cites/quotes',
     inks: [INK_BLACK, INK_WHITE],
     designs: [
-      'half-agony-half-hope',
-      'i-admire-and-love-you',
-      'it-is-a-truth',
-      'unsociable-and-taciturn',
-      'you-have-bewitched-me',
+      'quotes-half-agony-half-hope',
+      'quotes-i-admire-and-love-you',
+      'quotes-it-is-a-truth',
+      'quotes-unsociable-and-taciturn',
+      'quotes-you-have-bewitched-me',
     ],
   },
   'austen-crosswords': {
-    dir: 'austen/crosswords',
-    prefix: 'austen-crosswords',
+    // Cada subcol·lecció (persuasion / pride-and-prejudice / sense-and-sensibility)
+    // viu a austen/crosswords/<subcol_>; el disseny és <subcol>-<N>.
+    dirFor: (design) => `austen/crosswords/${toDir(design.replace(/-\d+$/, ''))}`,
     inks: [INK_BLACK, INK_WHITE],
     designs: [
       'persuasion-1',
@@ -156,18 +170,35 @@ export const COLLECTIONS = {
   },
   'austen-keep-calm': {
     dir: 'austen/keep_calm',
-    prefix: 'austen-keep-calm',
     inks: [INK_BLACK, INK_WHITE, INK_MULTI],
-    designs: ['poster', 'solid'],
+    designs: ['keep-calm'],
   },
   'austen-looking-for-my-darcy': {
-    dir: 'austen/looking_for_my_darcy',
-    prefix: 'austen-looking-for-my-darcy',
+    dir: 'austen/cites/looking_for_my_darcy',
     inks: [INK_MULTI],
-    designs: ['frame', 'gradient-dark', 'gradient-light', 'solid'],
-    frameColors: ['blau', 'vermell', 'groc', 'carabassa', 'fucsia'],
+    designs: [
+      'looking-for-my-darcy-blue-solid',
+      'looking-for-my-darcy-pink-solid',
+      'looking-for-my-darcy-pink-yellow-frame',
+      'looking-for-my-darcy-red-solid',
+      'looking-for-my-darcy-red-yellow-frame',
+      'looking-for-my-darcy-yellow-blue-frame',
+      'looking-for-my-darcy-yellow-pink-frame',
+      'looking-for-my-darcy-yellow-solid',
+    ],
   },
 };
+
+// Resol el directori i el prefix per a una col·lecció + disseny.
+function resolveDir(def, design) {
+  const dir = def.dirFor ? def.dirFor(design) : def.dir;
+  return { dir, prefix: def.prefix || prefixFromDir(dir) };
+}
+
+// Resol l'extensió per a una col·lecció + disseny.
+function resolveExt(def, design) {
+  return (def.extFor && def.extFor[design]) || def.ext || 'webp';
+}
 
 /** Llista d'ids de col·lecció disponibles. */
 export function listCollections() {
@@ -198,48 +229,34 @@ export function listInks(collectionId) {
  * @param {string} opts.design       id de disseny (ex: 'vader')
  * @param {string} opts.shirtColor   color de samarreta (ex: 'black')
  * @param {string} opts.ink          'b' | 'w' | 'multi'
- * @param {string} [opts.frameColor] obligatori per a 'austen-looking-for-my-darcy'
  * @returns {string|null}
  */
-export function getMockupPath({ collection, design, shirtColor, ink, frameColor } = {}) {
+export function getMockupPath({ collection, design, shirtColor, ink } = {}) {
   const def = COLLECTIONS[collection];
   if (!def) return null;
   if (!def.designs.includes(design)) return null;
   if (!def.inks.includes(ink)) return null;
   if (!SHIRT_COLORS.includes(shirtColor)) return null;
 
-  const designDir = toDir(design);
-  let filename;
-  if (def.frameColors) {
-    if (!def.frameColors.includes(frameColor)) return null;
-    filename = `${def.prefix}-${design}-${frameColor}-${shirtColor}-${ink}.webp`;
-  } else {
-    filename = `${def.prefix}-${design}-${shirtColor}-${ink}.webp`;
-  }
-  return `${PUBLIC_BASE}/${def.dir}/${designDir}/${filename}`;
+  const { dir, prefix } = resolveDir(def, design);
+  const ext = resolveExt(def, design);
+  // Estructura PLA: <dir>/<prefix>-<design>-<ink>-<shirtColor>.<ext>
+  const filename = `${prefix}-${design}-${ink}-${shirtColor}.${ext}`;
+  return `${PUBLIC_BASE}/${dir}/${filename}`;
 }
 
 /**
  * Llista totes les variants possibles d'un disseny (totes les combinacions de
- * shirtColor × ink × frameColor segons la col·lecció).
+ * shirtColor × ink segons la col·lecció).
  */
 export function listVariants({ collection, design }) {
   const def = COLLECTIONS[collection];
   if (!def || !def.designs.includes(design)) return [];
   const out = [];
-  const frames = def.frameColors ?? [null];
-  for (const frameColor of frames) {
-    for (const ink of def.inks) {
-      for (const shirtColor of SHIRT_COLORS) {
-        const path = getMockupPath({
-          collection,
-          design,
-          shirtColor,
-          ink,
-          ...(frameColor ? { frameColor } : {}),
-        });
-        if (path) out.push({ collection, design, shirtColor, ink, frameColor, path });
-      }
+  for (const ink of def.inks) {
+    for (const shirtColor of SHIRT_COLORS) {
+      const path = getMockupPath({ collection, design, shirtColor, ink });
+      if (path) out.push({ collection, design, shirtColor, ink, path });
     }
   }
   return out;

@@ -21,27 +21,26 @@ const DARK_COLORS = new Set([
   'royal', 'purple', 'navy', 'red', 'irish-green', 'military-green', 'forest-green', 'black',
 ]);
 
-// Mapeig PDP route → design id del helper.
+// Mapeig PDP route → design id del helper (sincronitzat amb els fitxers reals).
 // Per defecte assumim que route === design. Aquí només registrem excepcions.
 const DESIGN_MAP = {
   'the-human-inside': {
-    'afrodita': 'afrodita-a',
+    'c3-p0': 'c3p0',
+    'r2-d2': 'r2d2',
     'ironman-08': 'iron-man-08',
     'ironman-68': 'iron-man-68',
-    'mazinger': 'mazinger-z',
   },
   'cube': {
     'ironkong': 'iron-kong',
     'ironman-68': 'iron-cube',
     'maschinencube': 'maschinenmensch',
+    'robocube': 'robbocube',
   },
 };
 
 // Productes sense mockup pre-composat (cau al fallback blanc).
-const NO_MOCKUP = new Set([
-  'the-human-inside/r2-d2',
-  'the-human-inside/the-dalek',
-]);
+// Tots els dissenys de the-human-inside (inclosos r2d2 i the-dalek) ja tenen mockup.
+const NO_MOCKUP = new Set([]);
 
 const BLANK_SHIRT = (color) =>
   `/placeholders/apparel/t-shirt/gildan_5000/gildan-5000_t-shirt_crewneck_unisex_heavyWeight_xl_${color}_gpr-4-0_front.png`;
