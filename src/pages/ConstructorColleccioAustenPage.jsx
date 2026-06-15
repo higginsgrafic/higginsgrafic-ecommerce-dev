@@ -19,31 +19,50 @@ const tdpImage = (color) =>
   `/placeholders/apparel/t-shirt/gildan_5000/gildan-5000_t-shirt_crewneck_unisex_heavyWeight_xl_${color}_gpr-4-0_front.png`;
 
 // 14 colors canònics (ordre extret de FullWideSlideDemoHeader.jsx).
-// Repetits cíclicament fins a omplir les 16 cel·les del 4x4.
-const TDP_GRID_COLORS = [
-  ['white',        'light-blue',     'royal',         'purple'],
-  ['navy',         'daisy',          'gold',          'light-pink'],
-  ['red',          'kiwi',           'irish-green',   'military-green'],
-  ['forest-green', 'black',          'white',         'light-blue'],
+// S'assignen cíclicament a les cel·les de la graella.
+const CANON_COLORS = [
+  'white', 'light-blue', 'royal', 'purple',
+  'navy', 'daisy', 'gold', 'light-pink',
+  'red', 'kiwi', 'irish-green', 'military-green',
+  'forest-green', 'black',
 ];
-// Rutes de les PDP de producte de CUBE, en ordre.
-// S'assignen a les 16 cel·les de la graella de forma cíclica.
-const COLLECTION_SLUG = 'cube';
-const PRODUCTS = [
-  { route: 'afrodita-c', name: 'AFRODITA-C' },
-  { route: 'mazinger-c', name: 'MAZINGER-C' },
-  { route: 'ironman-68', name: 'IRONMAN-68' },
-  { route: 'ironkong', name: 'IRONKONG' },
-  { route: 'robocube', name: 'ROBOCUBE' },
-  { route: 'cylon-cube', name: 'CYLON CUBE' },
-  { route: 'maschinencube', name: 'MASCHINENCUBE' },
-  { route: 'darth-cube', name: 'DARTH CUBE' },
-  { route: '3cube-p0', name: '3CUBE-P0' },
-  { route: 'cybercube', name: 'CYBERCUBE' },
-];
-const productAt = (rowIdx, colIdx) => PRODUCTS[(rowIdx * 4 + colIdx) % PRODUCTS.length];
-const productHref = (rowIdx, colIdx) => `/${COLLECTION_SLUG}/${productAt(rowIdx, colIdx).route}`;
 
+// Productes d'AUSTEN. Austen abasta 5 subcol·leccions del catàleg de mockups,
+// per això cada item porta la seva pròpia clau `collection` (a diferència de
+// les altres pàgines de col·lecció, que tenen un únic COLLECTION_SLUG).
+const COLLECTION_SLUG = 'austen';
+const PRODUCTS = [
+  { collection: 'austen-pemberley', route: 'pemberley-house', name: 'PEMBERLEY HOUSE' },
+  { collection: 'austen-keep-calm', route: 'keep-calm', name: 'KEEP CALM' },
+  { collection: 'austen-quotes', route: 'quotes-half-agony-half-hope', name: 'HALF AGONY HALF HOPE' },
+  { collection: 'austen-quotes', route: 'quotes-i-admire-and-love-you', name: 'I ADMIRE AND LOVE YOU' },
+  { collection: 'austen-quotes', route: 'quotes-it-is-a-truth', name: 'IT IS A TRUTH' },
+  { collection: 'austen-quotes', route: 'quotes-unsociable-and-taciturn', name: 'UNSOCIABLE AND TACITURN' },
+  { collection: 'austen-quotes', route: 'quotes-you-have-bewitched-me', name: 'YOU HAVE BEWITCHED ME' },
+  { collection: 'austen-crosswords', route: 'persuasion-1', name: 'PERSUASION 1' },
+  { collection: 'austen-crosswords', route: 'persuasion-2', name: 'PERSUASION 2' },
+  { collection: 'austen-crosswords', route: 'persuasion-3', name: 'PERSUASION 3' },
+  { collection: 'austen-crosswords', route: 'persuasion-4', name: 'PERSUASION 4' },
+  { collection: 'austen-crosswords', route: 'pride-and-prejudice-1', name: 'PRIDE & PREJUDICE 1' },
+  { collection: 'austen-crosswords', route: 'pride-and-prejudice-2', name: 'PRIDE & PREJUDICE 2' },
+  { collection: 'austen-crosswords', route: 'pride-and-prejudice-3', name: 'PRIDE & PREJUDICE 3' },
+  { collection: 'austen-crosswords', route: 'pride-and-prejudice-4', name: 'PRIDE & PREJUDICE 4' },
+  { collection: 'austen-crosswords', route: 'sense-and-sensibility-1', name: 'SENSE & SENSIBILITY 1' },
+  { collection: 'austen-crosswords', route: 'sense-and-sensibility-2', name: 'SENSE & SENSIBILITY 2' },
+  { collection: 'austen-crosswords', route: 'sense-and-sensibility-3', name: 'SENSE & SENSIBILITY 3' },
+  { collection: 'austen-crosswords', route: 'sense-and-sensibility-4', name: 'SENSE & SENSIBILITY 4' },
+  { collection: 'austen-looking-for-my-darcy', route: 'looking-for-my-darcy-blue-solid', name: 'LOOKING FOR MY DARCY' },
+  { collection: 'austen-looking-for-my-darcy', route: 'looking-for-my-darcy-pink-solid', name: 'LOOKING FOR MY DARCY' },
+  { collection: 'austen-looking-for-my-darcy', route: 'looking-for-my-darcy-pink-yellow-frame', name: 'LOOKING FOR MY DARCY' },
+  { collection: 'austen-looking-for-my-darcy', route: 'looking-for-my-darcy-red-solid', name: 'LOOKING FOR MY DARCY' },
+  { collection: 'austen-looking-for-my-darcy', route: 'looking-for-my-darcy-red-yellow-frame', name: 'LOOKING FOR MY DARCY' },
+  { collection: 'austen-looking-for-my-darcy', route: 'looking-for-my-darcy-yellow-blue-frame', name: 'LOOKING FOR MY DARCY' },
+  { collection: 'austen-looking-for-my-darcy', route: 'looking-for-my-darcy-yellow-pink-frame', name: 'LOOKING FOR MY DARCY' },
+  { collection: 'austen-looking-for-my-darcy', route: 'looking-for-my-darcy-yellow-solid', name: 'LOOKING FOR MY DARCY' },
+];
+const NUM_COLS = 4;
+const NUM_ROWS = Math.ceil(PRODUCTS.length / NUM_COLS); // 7 files per a 27 productes
+const productHref = (idx) => `/${COLLECTION_SLUG}/${PRODUCTS[idx].route}`;
 function colorToProductName(color) {
   const map = {
     'white': 'White',
@@ -95,7 +114,7 @@ const HERO_SLIDES = [
   },
 ];
 
-const OVERLAY_STATE_STORAGE_KEY = 'hg.constructorColleccioCopy5.overlayOpacity.v1';
+const OVERLAY_STATE_STORAGE_KEY = 'hg.constructorColleccioCopy4.overlayOpacity.v1';
 
 const DEFAULT_OVERLAY_STATE = {
   pautaOpacity: 1,
@@ -114,7 +133,7 @@ function loadOverlayState() {
   }
 }
 
-function ConstructorColleccioPageCopy5() {
+function ConstructorColleccioAustenPage() {
   const [selectedSize, setSelectedSize] = useState('M');
   const [overlayState, setOverlayState] = useState(loadOverlayState);
   const [zeroLeftOffsetPx, setZeroLeftOffsetPx] = useState(0);
@@ -167,7 +186,7 @@ function ConstructorColleccioPageCopy5() {
   return (
     <section className="bg-background">
       <Helmet>
-        <title>Col·lecció (còpia 5) · Constructor | Higgins Gràfic</title>
+        <title>Austen · Constructor | Higgins Gràfic</title>
         <meta
           name="description"
           content="Plantilla de construcció de col·lecció amb header global, pauta de 4 columnes i footers globals."
@@ -208,7 +227,7 @@ function ConstructorColleccioPageCopy5() {
               transform: 'translateY(calc(1% + 10px))',
             }}
           >
-            CUBE
+            AUSTEN
           </h1>
         </div>
         <div
@@ -234,8 +253,8 @@ function ConstructorColleccioPageCopy5() {
       <Pauta4ColsOverlay
         pautaEnabled={false}
         tableEnabled={false}
-        numRows={90}
-        canvasAspect={[2642, 6708]}
+        numRows={150}
+        canvasAspect={[2642, 11180]}
         topOffset="0px"
         bottomPadding="0px"
         style={{
@@ -262,10 +281,12 @@ function ConstructorColleccioPageCopy5() {
             zIndex: 0,
           }}
         />
-        {[0, 1, 2, 3].flatMap((rowIdx) =>
+        {Array.from({ length: NUM_ROWS }).flatMap((_, rowIdx) =>
           [0, 1, 2, 3].map((colIdx) => {
-            const color = TDP_GRID_COLORS[rowIdx][colIdx];
-            if (!color) return null;
+            const idx = rowIdx * NUM_COLS + colIdx;
+            if (idx >= PRODUCTS.length) return null;
+            const product = PRODUCTS[idx];
+            const color = CANON_COLORS[idx % CANON_COLORS.length];
             const isV5 = (rowIdx + colIdx) % 2 === 1;
             const Card = isV5 ? CollectionProductCardV5 : CollectionProductCard;
             const col = colIdx + 1;
@@ -275,19 +296,19 @@ function ConstructorColleccioPageCopy5() {
                 key={`tdp-card-r${rowIdx}-c${colIdx}`}
                 gridColumn={`${col} / ${col + 1}`}
                 rowOffset={rowOffset}
-                productName={productAt(rowIdx, colIdx).name}
+                productName={product.name}
                 description={TDP_DESCRIPTION}
                 price="15,50€"
-                imageSrc={tdpImageFor('cube', productAt(rowIdx, colIdx).route, color)}
+                imageSrc={tdpImageFor(product.collection, product.route, color)}
                 imageAlt={`Samarreta Gildan 5000 ${color}`}
                 sizes={sizes}
                 selectedSize={selectedSize}
                 onSizeChange={setSelectedSize}
                 cartCount={0}
                 onAddToCart={() => {}}
-                editableIdPrefix="constructor-colleccio-copy5-tdp-col2"
-                presetVersion="constructor-colleccio-copy5-tdp-cart-34-v9"
-                collectionHref={`${productHref(rowIdx, colIdx)}?color=${color}`}
+                editableIdPrefix="constructor-colleccio-copy4-tdp-col2"
+                presetVersion="constructor-colleccio-copy4-tdp-cart-34-v9"
+                collectionHref={`${productHref(idx)}?color=${color}`}
                 productNamePlain
                 editable={false}
               />
@@ -314,7 +335,7 @@ function ConstructorColleccioPageCopy5() {
           boxShadow: '0 6px 24px rgba(0,0,0,0.12)',
         }}
       >
-        <strong className="mb-2 block">Controls col·lecció (còpia 5)</strong>
+        <strong className="mb-2 block">Controls col·lecció (còpia 4)</strong>
         <OpacitySlider label="Opacitat pauta" value={pautaOpacity} onChange={(value) => setOverlayState((prev) => ({ ...prev, pautaOpacity: value }))} />
         <OpacitySlider label="Opacitat taula" value={tableOpacity} onChange={(value) => setOverlayState((prev) => ({ ...prev, tableOpacity: value }))} />
         <OpacitySlider label="Opacitat BG" value={backgroundOpacity} onChange={(value) => setOverlayState((prev) => ({ ...prev, backgroundOpacity: value }))} />
@@ -344,4 +365,4 @@ function OpacitySlider({ label, value, onChange }) {
   );
 }
 
-export default ConstructorColleccioPageCopy5;
+export default ConstructorColleccioAustenPage;

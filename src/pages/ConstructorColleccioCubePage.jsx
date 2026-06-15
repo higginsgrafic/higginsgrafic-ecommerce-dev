@@ -26,14 +26,20 @@ const TDP_GRID_COLORS = [
   ['red',          'kiwi',           'irish-green',   'military-green'],
   ['forest-green', 'black',          'white',         'light-blue'],
 ];
-
-// Rutes de les PDP de producte de MISCEL·LÀNIA, en ordre.
+// Rutes de les PDP de producte de CUBE, en ordre.
 // S'assignen a les 16 cel·les de la graella de forma cíclica.
-const COLLECTION_SLUG = 'miscellania';
+const COLLECTION_SLUG = 'cube';
 const PRODUCTS = [
-  { route: 'pont-del-diable', name: 'PONT DEL DIABLE' },
-  { route: 'dj-vader', name: 'DJ VADER' },
-  { route: 'death-star2d2', name: 'DEATH STAR2D2' },
+  { route: 'afrodita-c', name: 'AFRODITA-C' },
+  { route: 'mazinger-c', name: 'MAZINGER-C' },
+  { route: 'ironman-68', name: 'IRONMAN-68' },
+  { route: 'ironkong', name: 'IRONKONG' },
+  { route: 'robocube', name: 'ROBOCUBE' },
+  { route: 'cylon-cube', name: 'CYLON CUBE' },
+  { route: 'maschinencube', name: 'MASCHINENCUBE' },
+  { route: 'darth-cube', name: 'DARTH CUBE' },
+  { route: '3cube-p0', name: '3CUBE-P0' },
+  { route: 'cybercube', name: 'CYBERCUBE' },
 ];
 const productAt = (rowIdx, colIdx) => PRODUCTS[(rowIdx * 4 + colIdx) % PRODUCTS.length];
 const productHref = (rowIdx, colIdx) => `/${COLLECTION_SLUG}/${productAt(rowIdx, colIdx).route}`;
@@ -57,6 +63,8 @@ function colorToProductName(color) {
   };
   return map[color] || color;
 }
+
+
 const HERO_SLIDES = [
   {
     id: 'first-contact',
@@ -87,7 +95,7 @@ const HERO_SLIDES = [
   },
 ];
 
-const OVERLAY_STATE_STORAGE_KEY = 'hg.constructorColleccioCopy6.overlayOpacity.v1';
+const OVERLAY_STATE_STORAGE_KEY = 'hg.constructorColleccioCopy5.overlayOpacity.v1';
 
 const DEFAULT_OVERLAY_STATE = {
   pautaOpacity: 1,
@@ -106,7 +114,7 @@ function loadOverlayState() {
   }
 }
 
-function ConstructorColleccioPageCopy6() {
+function ConstructorColleccioCubePage() {
   const [selectedSize, setSelectedSize] = useState('M');
   const [overlayState, setOverlayState] = useState(loadOverlayState);
   const [zeroLeftOffsetPx, setZeroLeftOffsetPx] = useState(0);
@@ -159,7 +167,7 @@ function ConstructorColleccioPageCopy6() {
   return (
     <section className="bg-background">
       <Helmet>
-        <title>Col·lecció (còpia 6) · Constructor | Higgins Gràfic</title>
+        <title>Cube · Constructor | Higgins Gràfic</title>
         <meta
           name="description"
           content="Plantilla de construcció de col·lecció amb header global, pauta de 4 columnes i footers globals."
@@ -200,7 +208,7 @@ function ConstructorColleccioPageCopy6() {
               transform: 'translateY(calc(1% + 10px))',
             }}
           >
-            MISCEL·LÀNIA
+            CUBE
           </h1>
         </div>
         <div
@@ -270,15 +278,15 @@ function ConstructorColleccioPageCopy6() {
                 productName={productAt(rowIdx, colIdx).name}
                 description={TDP_DESCRIPTION}
                 price="15,50€"
-                imageSrc={tdpImageFor('miscellania', productAt(rowIdx, colIdx).route, color)}
+                imageSrc={tdpImageFor('cube', productAt(rowIdx, colIdx).route, color)}
                 imageAlt={`Samarreta Gildan 5000 ${color}`}
                 sizes={sizes}
                 selectedSize={selectedSize}
                 onSizeChange={setSelectedSize}
                 cartCount={0}
                 onAddToCart={() => {}}
-                editableIdPrefix="constructor-colleccio-copy6-tdp-col2"
-                presetVersion="constructor-colleccio-copy6-tdp-cart-34-v9"
+                editableIdPrefix="constructor-colleccio-copy5-tdp-col2"
+                presetVersion="constructor-colleccio-copy5-tdp-cart-34-v9"
                 collectionHref={`${productHref(rowIdx, colIdx)}?color=${color}`}
                 productNamePlain
                 editable={false}
@@ -306,7 +314,7 @@ function ConstructorColleccioPageCopy6() {
           boxShadow: '0 6px 24px rgba(0,0,0,0.12)',
         }}
       >
-        <strong className="mb-2 block">Controls col·lecció (còpia 6)</strong>
+        <strong className="mb-2 block">Controls col·lecció (còpia 5)</strong>
         <OpacitySlider label="Opacitat pauta" value={pautaOpacity} onChange={(value) => setOverlayState((prev) => ({ ...prev, pautaOpacity: value }))} />
         <OpacitySlider label="Opacitat taula" value={tableOpacity} onChange={(value) => setOverlayState((prev) => ({ ...prev, tableOpacity: value }))} />
         <OpacitySlider label="Opacitat BG" value={backgroundOpacity} onChange={(value) => setOverlayState((prev) => ({ ...prev, backgroundOpacity: value }))} />
@@ -336,4 +344,4 @@ function OpacitySlider({ label, value, onChange }) {
   );
 }
 
-export default ConstructorColleccioPageCopy6;
+export default ConstructorColleccioCubePage;
