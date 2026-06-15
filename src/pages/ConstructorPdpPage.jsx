@@ -95,7 +95,34 @@ const SPECS = [
 const SIZES = ['S', 'M', 'L', 'XL', 'XXL'];
 const FINISHES = ['BLANC', 'COLOR', 'NEGRE'];
 
+function colorToProductName(color) {
+  const map = {
+    'white': 'White',
+    'light-blue': 'Light Blue',
+    'royal': 'Royal',
+    'navy': 'Navy',
+    'purple': 'Purple',
+    'light-pink': 'Light Pink',
+    'daisy': 'Daisy',
+    'gold': 'Gold',
+    'red': 'Red',
+    'kiwi': 'Kiwi',
+    'irish-green': 'Irish Green',
+    'military-green': 'Military Green',
+    'forest-green': 'Forest Green',
+    'black': 'Black',
+  };
+  return map[color] || color;
+}
+
 function ConstructorPdpPage() {
+  const location = useLocation();
+  const searchParams = new URLSearchParams(location.search);
+  const urlColor = searchParams.get('color');
+  const initialIndex = urlColor ? OFFICIAL_COLORS.indexOf(urlColor) : 0;
+  const effectiveInitialIndex = initialIndex >= 0 ? initialIndex : 0;
+  const productName = colorToProductName(OFFICIAL_COLORS[effectiveInitialIndex]);
+
   const {
     pdpControlsEnabled,
     pautaEnabled,
@@ -114,7 +141,7 @@ function ConstructorPdpPage() {
   const [selectedSize, setSelectedSize] = useState('M');
   const [sizeButtonTextSettings, setSizeButtonTextSettings] = useState(PDP_SIZE_SETTINGS);
   const [ctaTextSettings, setCtaTextSettings] = useState(PDP_CTA_SETTINGS);
-  const [mainVariantIndex, setMainVariantIndex] = useState(0);
+  const [mainVariantIndex, setMainVariantIndex] = useState(effectiveInitialIndex);
   const goPrevVariant = () => setMainVariantIndex((i) => (i - 1 + OFFICIAL_COLORS.length) % OFFICIAL_COLORS.length);
   const goNextVariant = () => setMainVariantIndex((i) => (i + 1) % OFFICIAL_COLORS.length);
   const mainVariantColor = OFFICIAL_COLORS[mainVariantIndex];
@@ -200,7 +227,7 @@ function ConstructorPdpPage() {
           <Breadcrumbs
             items={[
               { label: 'Col·lecció', link: '/constructor/colleccio' },
-              { label: 'Nom de producte' },
+              { label: productName },
             ]}
           />
         </div>
@@ -208,10 +235,10 @@ function ConstructorPdpPage() {
         {/* ─── Bloc producte: títol + descripció + talles + CTA (col 4 — dreta) ─── */}
         <EditableTextBox
           id="pdp-product-name"
-          initialText="NOM DE PRODUCTE"
+          initialText={productName}
           initialSettings={PDP_TITLE_SETTINGS}
           presetVersion={PDP_PRESET_VERSION}
-          renderHandle={pdpControlsEnabled}
+          renderHandle={false}
           handleRight="-22px"
           style={{ gridColumn: '4 / 5', gridRow: '6 / 7', alignSelf: 'end' }}
         />
@@ -221,7 +248,7 @@ function ConstructorPdpPage() {
           initialText="NOM DE COL·LECCIÓ"
           initialSettings={PDP_COLLECTION_SETTINGS}
           presetVersion={PDP_PRESET_VERSION}
-          renderHandle={pdpControlsEnabled}
+          renderHandle={false}
           handleRight="-22px"
           style={{ gridColumn: '4 / 5', gridRow: '7 / 8', alignSelf: 'start' }}
         />
@@ -232,7 +259,7 @@ function ConstructorPdpPage() {
           initialSettings={PDP_DESCRIPTION_SETTINGS}
           presetVersion={PDP_PRESET_VERSION}
           multiline
-          renderHandle={pdpControlsEnabled}
+          renderHandle={false}
           handleRight="-22px"
           style={{ gridColumn: '4 / 5', gridRow: '9 / 14' }}
         />
@@ -242,7 +269,7 @@ function ConstructorPdpPage() {
           initialText="15,50€"
           initialSettings={PDP_PRICE_SETTINGS}
           presetVersion={PDP_PRESET_VERSION}
-          renderHandle={pdpControlsEnabled}
+          renderHandle={false}
           handleRight="-22px"
           style={{ gridColumn: '4 / 5', gridRow: '14 / 15', alignSelf: 'center' }}
         />
@@ -312,7 +339,7 @@ function ConstructorPdpPage() {
           selectedColumn={selectedSize}
           onColumnSelect={setSelectedSize}
           renderText={false}
-          renderHandle={pdpControlsEnabled}
+          renderHandle={false}
           onSettingsChange={setSizeButtonTextSettings}
           initialSettings={PDP_SIZE_SETTINGS}
           presetVersion={PDP_PRESET_VERSION}
@@ -390,7 +417,7 @@ function ConstructorPdpPage() {
           initialSettings={PDP_CTA_SETTINGS}
           presetVersion={PDP_PRESET_VERSION}
           renderText={false}
-          renderHandle={pdpControlsEnabled}
+          renderHandle={false}
           onSettingsChange={setCtaTextSettings}
           handleRight="-22px"
           style={{ gridColumn: '4 / 5', gridRow: '19 / 20', zIndex: 100005, width: 0, height: 0, justifySelf: 'end' }}
@@ -536,7 +563,7 @@ function ConstructorPdpPage() {
               }}
             />
             <CarouselArrows
-              leftPx={0}
+              rightPx={0}
               bottomPx={0}
               onPrev={goPrevVariant}
               onNext={goNextVariant}
@@ -754,7 +781,7 @@ function ConstructorPdpPage() {
           selectedColumn={selectedFinish}
           onColumnSelect={setSelectedFinish}
           renderText={false}
-          renderHandle={pdpControlsEnabled}
+          renderHandle={false}
           onSettingsChange={setFinishButtonTextSettings}
           initialSettings={PDP_SIZE_SETTINGS}
           presetVersion={PDP_PRESET_VERSION}

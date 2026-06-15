@@ -104,6 +104,38 @@ const ConstructorColleccio03Page = lazy(() => import('@/pages/ConstructorCollecc
 const ConstructorColleccio04Page = lazy(() => import('@/pages/ConstructorColleccio04Page'));
 const ConstructorColleccio05Page = lazy(() => import('@/pages/ConstructorColleccio05Page'));
 const ConstructorPdpPage = lazy(() => import('@/pages/ConstructorPdpPage'));
+const FirstContactNx01Page = lazy(() => import('@/pages/products/FirstContactNx01Page'));
+const FirstContactNcc1701Page = lazy(() => import('@/pages/products/FirstContactNcc1701Page'));
+const FirstContactNcc1701DPage = lazy(() => import('@/pages/products/FirstContactNcc1701DPage'));
+const FirstContactWormholePage = lazy(() => import('@/pages/products/FirstContactWormholePage'));
+const FirstContactPlasmaEscapePage = lazy(() => import('@/pages/products/FirstContactPlasmaEscapePage'));
+const FirstContactVulcansEndPage = lazy(() => import('@/pages/products/FirstContactVulcansEndPage'));
+const FirstContactThePhoenixPage = lazy(() => import('@/pages/products/FirstContactThePhoenixPage'));
+const TheHumanInsideC3P0Page = lazy(() => import('@/pages/products/TheHumanInsideC3P0Page'));
+const TheHumanInsideR2D2Page = lazy(() => import('@/pages/products/TheHumanInsideR2D2Page'));
+const TheHumanInsideVaderPage = lazy(() => import('@/pages/products/TheHumanInsideVaderPage'));
+const TheHumanInsideAfroditaPage = lazy(() => import('@/pages/products/TheHumanInsideAfroditaPage'));
+const TheHumanInsideMazingerPage = lazy(() => import('@/pages/products/TheHumanInsideMazingerPage'));
+const TheHumanInsideCylon78Page = lazy(() => import('@/pages/products/TheHumanInsideCylon78Page'));
+const TheHumanInsideCylon03Page = lazy(() => import('@/pages/products/TheHumanInsideCylon03Page'));
+const TheHumanInsideCybermanPage = lazy(() => import('@/pages/products/TheHumanInsideCybermanPage'));
+const TheHumanInsideMaschinenmenschPage = lazy(() => import('@/pages/products/TheHumanInsideMaschinenmenschPage'));
+const TheHumanInsideRobocopPage = lazy(() => import('@/pages/products/TheHumanInsideRobocopPage'));
+const TheHumanInsideIronman68Page = lazy(() => import('@/pages/products/TheHumanInsideIronman68Page'));
+const TheHumanInsideIronman08Page = lazy(() => import('@/pages/products/TheHumanInsideIronman08Page'));
+const CubeAfroditaCPage = lazy(() => import('@/pages/products/CubeAfroditaCPage'));
+const CubeMazingerCPage = lazy(() => import('@/pages/products/CubeMazingerCPage'));
+const CubeIronman68Page = lazy(() => import('@/pages/products/CubeIronman68Page'));
+const CubeIronkongPage = lazy(() => import('@/pages/products/CubeIronkongPage'));
+const CubeRobocubePage = lazy(() => import('@/pages/products/CubeRobocubePage'));
+const CubeCylonCubePage = lazy(() => import('@/pages/products/CubeCylonCubePage'));
+const CubeMaschinencubePage = lazy(() => import('@/pages/products/CubeMaschinencubePage'));
+const CubeDarthCubePage = lazy(() => import('@/pages/products/CubeDarthCubePage'));
+const Cube3cubeP0Page = lazy(() => import('@/pages/products/Cube3cubeP0Page'));
+const CubeCybercubePage = lazy(() => import('@/pages/products/CubeCybercubePage'));
+const MiscellaniaPontDelDiablePage = lazy(() => import('@/pages/products/MiscellaniaPontDelDiablePage'));
+const MiscellaniaDjVaderPage = lazy(() => import('@/pages/products/MiscellaniaDjVaderPage'));
+const MiscellaniaDeathStar2d2Page = lazy(() => import('@/pages/products/MiscellaniaDeathStar2d2Page'));
 const HtmlBasePage = lazy(() => import('@/pages/HtmlBasePage'));
 const DevComponentsCatalogPage = lazy(() => import('@/pages/DevComponentsCatalogPage'));
 const DevLayoutBuilderPage = lazy(() => import('@/pages/DevLayoutBuilderPage'));
@@ -3237,6 +3269,39 @@ function App() {
                   element={<ConstructorColleccio05Page />}
                 />
                 <Route path="/constructor/pdp" element={<ConstructorPdpPage />} />
+                {/* ─── PDP de producte (per col·lecció/slug) ─── */}
+                <Route path="/first-contact/nx-01" element={<FirstContactNx01Page />} />
+                <Route path="/first-contact/ncc-1701" element={<FirstContactNcc1701Page />} />
+                <Route path="/first-contact/ncc-1701-d" element={<FirstContactNcc1701DPage />} />
+                <Route path="/first-contact/wormhole" element={<FirstContactWormholePage />} />
+                <Route path="/first-contact/plasma-escape" element={<FirstContactPlasmaEscapePage />} />
+                <Route path="/first-contact/vulcans-end" element={<FirstContactVulcansEndPage />} />
+                <Route path="/first-contact/the-phoenix" element={<FirstContactThePhoenixPage />} />
+                <Route path="/the-human-inside/c3-p0" element={<TheHumanInsideC3P0Page />} />
+                <Route path="/the-human-inside/r2-d2" element={<TheHumanInsideR2D2Page />} />
+                <Route path="/the-human-inside/vader" element={<TheHumanInsideVaderPage />} />
+                <Route path="/the-human-inside/afrodita" element={<TheHumanInsideAfroditaPage />} />
+                <Route path="/the-human-inside/mazinger" element={<TheHumanInsideMazingerPage />} />
+                <Route path="/the-human-inside/cylon-78" element={<TheHumanInsideCylon78Page />} />
+                <Route path="/the-human-inside/cylon-03" element={<TheHumanInsideCylon03Page />} />
+                <Route path="/the-human-inside/cyberman" element={<TheHumanInsideCybermanPage />} />
+                <Route path="/the-human-inside/maschinenmensch" element={<TheHumanInsideMaschinenmenschPage />} />
+                <Route path="/the-human-inside/robocop" element={<TheHumanInsideRobocopPage />} />
+                <Route path="/the-human-inside/ironman-68" element={<TheHumanInsideIronman68Page />} />
+                <Route path="/the-human-inside/ironman-08" element={<TheHumanInsideIronman08Page />} />
+                <Route path="/cube/afrodita-c" element={<CubeAfroditaCPage />} />
+                <Route path="/cube/mazinger-c" element={<CubeMazingerCPage />} />
+                <Route path="/cube/ironman-68" element={<CubeIronman68Page />} />
+                <Route path="/cube/ironkong" element={<CubeIronkongPage />} />
+                <Route path="/cube/robocube" element={<CubeRobocubePage />} />
+                <Route path="/cube/cylon-cube" element={<CubeCylonCubePage />} />
+                <Route path="/cube/maschinencube" element={<CubeMaschinencubePage />} />
+                <Route path="/cube/darth-cube" element={<CubeDarthCubePage />} />
+                <Route path="/cube/3cube-p0" element={<Cube3cubeP0Page />} />
+                <Route path="/cube/cybercube" element={<CubeCybercubePage />} />
+                <Route path="/miscellania/pont-del-diable" element={<MiscellaniaPontDelDiablePage />} />
+                <Route path="/miscellania/dj-vader" element={<MiscellaniaDjVaderPage />} />
+                <Route path="/miscellania/death-star2d2" element={<MiscellaniaDeathStar2d2Page />} />
                 <Route
                   path="/constructor/html-base"
                   element={<HtmlBasePage pautaEnabled={false} tableEnabled={false} />}

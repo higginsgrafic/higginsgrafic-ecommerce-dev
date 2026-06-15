@@ -5,6 +5,7 @@ import SizeButtonGroup from './ui/SizeButtonGroup';
 import SizeButton from './ui/SizeButton';
 import { useGridDebug } from '@/contexts/GridDebugContext';
 import { formatPrice } from '@/utils/formatters';
+import { productThumbnailFor } from '@/lib/pdpMockup';
 
 function ProductCard({ product, onAddToCart, cartItems = [], variant = 'default' }) {
   const [selectedSize, setSelectedSize] = useState('M');
@@ -29,7 +30,11 @@ function ProductCard({ product, onAddToCart, cartItems = [], variant = 'default'
     : '';
 
   const variantImage = product?.variants?.find(v => v?.image)?.image;
-  const cardImage = product.image || product.images?.[0] || variantImage || '/placeholder-product.svg';
+  // Prioritza el mockup pre-composat del catàleg local (samarreta + disseny
+  // ja imprimits) si existeix per a aquest producte. Si no, cau a les
+  // imatges del producte (Supabase) com abans.
+  const precomposedThumbnail = productThumbnailFor(product, 'white');
+  const cardImage = precomposedThumbnail || product.image || product.images?.[0] || variantImage || '/placeholder-product.svg';
 
   const availableSizes = (() => {
     const canonicalOrder = ['S', 'M', 'L', 'XL', 'XXL'];

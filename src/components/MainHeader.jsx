@@ -28,6 +28,8 @@ function MainHeader({
   const forceMegaMenuOpen = isNikeDemoRoute && demoManualEnabled;
   const forceMegaMenuOpenRef = useRef(false);
 
+  const openedExplicitlyRef = useRef(false);
+
   const cartClickTimeoutRef = useRef(null);
   const [activeMenu, setActiveMenu] = useState(null);
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -60,6 +62,7 @@ function MainHeader({
   const expandedGroupsResetTimerRef = useRef(null);
   const closeCollectionsRafRef = useRef(null);
   const openCollectionsTimerRef = useRef(null);
+  const lastOpenTimeRef = useRef(0);
   const [overlayVisible, setOverlayVisible] = useState(false);
   const [isClosingCollections, setIsClosingCollections] = useState(false);
   const [collectionsVisible, setCollectionsVisible] = useState(false);
@@ -348,6 +351,11 @@ function MainHeader({
 
     if (activeMenu !== 'collections') {
       setExpansionPhase('rest');
+      return undefined;
+    }
+
+    if (openedExplicitlyRef.current) {
+      openedExplicitlyRef.current = false;
       return undefined;
     }
 
@@ -682,6 +690,8 @@ function MainHeader({
   const closeCollections = () => {
     if (forceMegaMenuOpen) return;
 
+    if (Date.now() - lastOpenTimeRef.current < 350) return;
+
     if (closeCollectionsRafRef.current) {
       window.cancelAnimationFrame(closeCollectionsRafRef.current);
       closeCollectionsRafRef.current = null;
@@ -714,6 +724,9 @@ function MainHeader({
     setIsClosingCollections(false);
     setOverlayVisible(true);
     setCollectionsVisible(true);
+
+    lastOpenTimeRef.current = Date.now();
+    openedExplicitlyRef.current = true;
     setActiveMenu('collections');
 
     setExpansionPhase('expanded');

@@ -2307,7 +2307,24 @@ export default function FullWideSlideDemoHeader({
           items: [
             CONTROL_TILE_BN,
             '/custom_logos/drawings/images_grid/austen/looking_for_my_darcy/blue-dark-gradient-grid.webp',
+            '/custom_logos/drawings/images_grid/austen/looking_for_my_darcy/blue-frame-grid.webp',
+            '/custom_logos/drawings/images_grid/austen/looking_for_my_darcy/blue-light-gradient-grid.webp',
+            '/custom_logos/drawings/images_grid/austen/looking_for_my_darcy/blue-solid-grid.webp',
+            '/custom_logos/drawings/images_grid/austen/looking_for_my_darcy/fuchsia-dark-gradient-grid.webp',
+            '/custom_logos/drawings/images_grid/austen/looking_for_my_darcy/fuchsia-frame-grid.webp',
+            '/custom_logos/drawings/images_grid/austen/looking_for_my_darcy/fuchsia-light-gradient-grid.webp',
+            '/custom_logos/drawings/images_grid/austen/looking_for_my_darcy/fuchsia-solid-grid.webp',
+            '/custom_logos/drawings/images_grid/austen/looking_for_my_darcy/orange-dark-gradient-grid.webp',
+            '/custom_logos/drawings/images_grid/austen/looking_for_my_darcy/orange-frame-grid.webp',
+            '/custom_logos/drawings/images_grid/austen/looking_for_my_darcy/orange-light-gradient-grid.webp',
+            '/custom_logos/drawings/images_grid/austen/looking_for_my_darcy/orange-solid-grid.webp',
+            '/custom_logos/drawings/images_grid/austen/looking_for_my_darcy/red-dark-gradient-grid.webp',
             '/custom_logos/drawings/images_grid/austen/looking_for_my_darcy/red-frame-grid.webp',
+            '/custom_logos/drawings/images_grid/austen/looking_for_my_darcy/red-light-gradient-grid.webp',
+            '/custom_logos/drawings/images_grid/austen/looking_for_my_darcy/red-solid-grid.webp',
+            '/custom_logos/drawings/images_grid/austen/looking_for_my_darcy/yellow-dark-gradient-grid.webp',
+            '/custom_logos/drawings/images_grid/austen/looking_for_my_darcy/yellow-frame-grid.webp',
+            '/custom_logos/drawings/images_grid/austen/looking_for_my_darcy/yellow-light-gradient-grid.webp',
             '/custom_logos/drawings/images_grid/austen/looking_for_my_darcy/yellow-solid-grid.webp',
             '/custom_logos/drawings/images_grid/austen/keep_calm/keep-calm-multi-red-grid.webp',
             '/custom_logos/drawings/images_grid/austen/keep_calm/keep-calm-multi-w-red-grid.webp',
@@ -2318,9 +2335,18 @@ export default function FullWideSlideDemoHeader({
             '/custom_logos/drawings/images_grid/austen/quotes/body-and-soul-b-grid.webp',
             '/custom_logos/drawings/images_grid/austen/quotes/unsociable-and-taciturn-b-grid.webp',
             '/custom_logos/drawings/images_grid/austen/quotes/half-agony-half-hope-b-grid.webp',
-            '/custom_logos/drawings/images_grid/austen/crosswords/pride-and-prejudice-2-grid.webp',
-            '/custom_logos/drawings/images_grid/austen/crosswords/sense-and-sensibility-3-grid.webp',
+            '/custom_logos/drawings/images_grid/austen/crosswords/persuasion-1-grid.webp',
+            '/custom_logos/drawings/images_grid/austen/crosswords/persuasion-2-grid.webp',
+            '/custom_logos/drawings/images_grid/austen/crosswords/persuasion-3-grid.webp',
             '/custom_logos/drawings/images_grid/austen/crosswords/persuasion-4-grid.webp',
+            '/custom_logos/drawings/images_grid/austen/crosswords/pride-and-prejudice-1-grid.webp',
+            '/custom_logos/drawings/images_grid/austen/crosswords/pride-and-prejudice-2-grid.webp',
+            '/custom_logos/drawings/images_grid/austen/crosswords/pride-and-prejudice-3-grid.webp',
+            '/custom_logos/drawings/images_grid/austen/crosswords/pride-and-prejudice-4-grid.webp',
+            '/custom_logos/drawings/images_grid/austen/crosswords/sense-and-sensibility-1-grid.webp',
+            '/custom_logos/drawings/images_grid/austen/crosswords/sense-and-sensibility-2-grid.webp',
+            '/custom_logos/drawings/images_grid/austen/crosswords/sense-and-sensibility-3-grid.webp',
+            '/custom_logos/drawings/images_grid/austen/crosswords/sense-and-sensibility-4-grid.webp',
             CONTROL_TILE_ARROWS,
           ],
         },
@@ -2587,7 +2613,14 @@ export default function FullWideSlideDemoHeader({
         setActive(null);
         return;
       }
-      setActive(manualEnabledOverride ? (initialActiveId || 'first_contact') : null);
+      // Només forcem l'obertura inicial quan l'override està actiu (true).
+      // Quan és false i NO s'ha tancat explícitament, NO forcem setActive(null):
+      // si ho féssim, el primer clic (que fa setManualOverrideClosed(false))
+      // re-executaria aquest efecte i tancaria el menú a l'instant.
+      // L'obertura/tancament l'han de controlar les interaccions de l'usuari.
+      if (manualEnabledOverride) {
+        setActive(initialActiveId || 'first_contact');
+      }
       return;
     }
     if (contained) {

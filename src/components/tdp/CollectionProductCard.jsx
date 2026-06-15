@@ -20,6 +20,9 @@ function CollectionProductCard({
   imageTranslateY = 'calc(9px + 1lh)',
   productNameTranslateY = '1lh',
   descriptionTranslateY = 'calc(2lh - 1px)',
+  collectionHref,
+  productNamePlain = false,
+  editable = true,
 }) {
   const resolvedSlotGridRow = slotGridRow ?? `${6 + rowOffset} / ${21 + rowOffset}`;
   const descriptionGridRow = `${13 + rowOffset} / ${18 + rowOffset}`;
@@ -68,6 +71,9 @@ function CollectionProductCard({
         productNameTranslateY={productNameTranslateY}
         descriptionGridRow={descriptionGridRow}
         descriptionHeight="calc(100% - 3px)"
+        collectionHref={collectionHref}
+        productNamePlain={productNamePlain}
+        editable={editable}
         sizeButtonsGridRow={sizeButtonsGridRow}
         sizeButtonsHeight="100%"
         sizeButtonsMarginTop="0px"
