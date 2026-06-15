@@ -27,17 +27,15 @@ const TDP_GRID_COLORS = [
   ['forest-green', 'black',          'white',         'light-blue'],
 ];
 
-// Rutes de les PDP de producte de FIRST CONTACT, en ordre.
+// Rutes de les PDP de producte de MISCEL·LÀNIA, en ordre.
 // S'assignen a les 16 cel·les de la graella de forma cíclica.
-const COLLECTION_SLUG = 'first-contact';
+const COLLECTION_SLUG = 'miscellania';
 const PRODUCTS = [
-  { route: 'nx-01', name: 'NX-01' },
-  { route: 'ncc-1701', name: 'NCC-1701' },
-  { route: 'ncc-1701-d', name: 'NCC-1701-D' },
-  { route: 'wormhole', name: 'WORMHOLE' },
-  { route: 'plasma-escape', name: 'PLASMA ESCAPE' },
-  { route: 'vulcans-end', name: 'VULCANS END' },
-  { route: 'the-phoenix', name: 'THE PHOENIX' },
+  { route: 'pont-del-diable', name: 'PONT DEL DIABLE' },
+  { route: 'dj-vader', name: 'DJ VADER' },
+  { route: 'death-star2d2', name: 'DEATH STAR2D2' },
+  { route: 'arthur-d-the-second', name: 'ARTHUR D THE SECOND' },
+  { route: 'r2d2-quote', name: 'R2D2 QUOTE' },
 ];
 const productAt = (rowIdx, colIdx) => PRODUCTS[(rowIdx * 4 + colIdx) % PRODUCTS.length];
 const productHref = (rowIdx, colIdx) => `/${COLLECTION_SLUG}/${productAt(rowIdx, colIdx).route}`;
@@ -91,7 +89,7 @@ const HERO_SLIDES = [
   },
 ];
 
-const OVERLAY_STATE_STORAGE_KEY = 'hg.constructorColleccioCopy2.overlayOpacity.v1';
+const OVERLAY_STATE_STORAGE_KEY = 'hg.constructorColleccioCopy6.overlayOpacity.v1';
 
 const DEFAULT_OVERLAY_STATE = {
   pautaOpacity: 1,
@@ -110,7 +108,7 @@ function loadOverlayState() {
   }
 }
 
-function ConstructorColleccioPageCopy2() {
+function ConstructorColleccioMiscellaniaPage() {
   const [selectedSize, setSelectedSize] = useState('M');
   const [overlayState, setOverlayState] = useState(loadOverlayState);
   const [zeroLeftOffsetPx, setZeroLeftOffsetPx] = useState(0);
@@ -163,7 +161,7 @@ function ConstructorColleccioPageCopy2() {
   return (
     <section className="bg-background">
       <Helmet>
-        <title>FIRST CONTACT</title>
+        <title>Miscel·lània · Constructor | Higgins Gràfic</title>
         <meta
           name="description"
           content="Plantilla de construcció de col·lecció amb header global, pauta de 4 columnes i footers globals."
@@ -204,7 +202,7 @@ function ConstructorColleccioPageCopy2() {
               transform: 'translateY(calc(1% + 10px))',
             }}
           >
-            FIRST CONTACT
+            MISCEL·LÀNIA
           </h1>
         </div>
         <div
@@ -274,15 +272,15 @@ function ConstructorColleccioPageCopy2() {
                 productName={productAt(rowIdx, colIdx).name}
                 description={TDP_DESCRIPTION}
                 price="15,50€"
-                imageSrc={tdpImageFor('first-contact', productAt(rowIdx, colIdx).route, color)}
+                imageSrc={tdpImageFor('miscellania', productAt(rowIdx, colIdx).route, color)}
                 imageAlt={`Samarreta Gildan 5000 ${color}`}
                 sizes={sizes}
                 selectedSize={selectedSize}
                 onSizeChange={setSelectedSize}
                 cartCount={0}
                 onAddToCart={() => {}}
-                editableIdPrefix="constructor-colleccio-copy2-tdp-col2"
-                presetVersion="constructor-colleccio-copy2-tdp-cart-34-v9"
+                editableIdPrefix="constructor-colleccio-copy6-tdp-col2"
+                presetVersion="constructor-colleccio-copy6-tdp-cart-34-v9"
                 collectionHref={`${productHref(rowIdx, colIdx)}?color=${color}`}
                 productNamePlain
                 editable={false}
@@ -310,7 +308,7 @@ function ConstructorColleccioPageCopy2() {
           boxShadow: '0 6px 24px rgba(0,0,0,0.12)',
         }}
       >
-        <strong className="mb-2 block">Controls col·lecció (còpia 2)</strong>
+        <strong className="mb-2 block">Controls col·lecció (còpia 6)</strong>
         <OpacitySlider label="Opacitat pauta" value={pautaOpacity} onChange={(value) => setOverlayState((prev) => ({ ...prev, pautaOpacity: value }))} />
         <OpacitySlider label="Opacitat taula" value={tableOpacity} onChange={(value) => setOverlayState((prev) => ({ ...prev, tableOpacity: value }))} />
         <OpacitySlider label="Opacitat BG" value={backgroundOpacity} onChange={(value) => setOverlayState((prev) => ({ ...prev, backgroundOpacity: value }))} />
@@ -340,4 +338,4 @@ function OpacitySlider({ label, value, onChange }) {
   );
 }
 
-export default ConstructorColleccioPageCopy2;
+export default ConstructorColleccioMiscellaniaPage;

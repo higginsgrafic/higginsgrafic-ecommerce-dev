@@ -56,7 +56,7 @@ export function tdpImageFor(collectionSlug, productRoute, shirtColor) {
   if (NO_MOCKUP.has(key)) return BLANK_SHIRT(shirtColor);
 
   const design = DESIGN_MAP[collectionSlug]?.[productRoute] ?? productRoute;
-  const onlyMulti = collectionSlug === 'cube';
+  const onlyMulti = collectionSlug === 'cube' || collectionSlug === 'austen-looking-for-my-darcy';
   const ink = onlyMulti ? 'multi' : DARK_COLORS.has(shirtColor) ? 'w' : 'b';
 
   const path = getMockupPath({

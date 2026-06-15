@@ -93,11 +93,11 @@ const DevLinksPage = lazy(() => import('@/pages/DevLinksPage'));
 const ContactSheetPage = lazy(() => import('@/pages/dev/ContactSheetPage'));
 const SiteMapPage = lazy(() => import('@/pages/dev/SiteMapPage'));
 const ConstructorColleccioPage = lazy(() => import('@/pages/ConstructorColleccioPage'));
-const ConstructorColleccioPageCopy2 = lazy(() => import('@/pages/ConstructorColleccioPageCopy2'));
-const ConstructorColleccioPageCopy3 = lazy(() => import('@/pages/ConstructorColleccioPageCopy3'));
-const ConstructorColleccioPageCopy4 = lazy(() => import('@/pages/ConstructorColleccioPageCopy4'));
-const ConstructorColleccioPageCopy5 = lazy(() => import('@/pages/ConstructorColleccioPageCopy5'));
-const ConstructorColleccioPageCopy6 = lazy(() => import('@/pages/ConstructorColleccioPageCopy6'));
+const ConstructorColleccioFirstContactPage = lazy(() => import('@/pages/ConstructorColleccioFirstContactPage'));
+const ConstructorColleccioTheHumanInsidePage = lazy(() => import('@/pages/ConstructorColleccioTheHumanInsidePage'));
+const ConstructorColleccioAustenPage = lazy(() => import('@/pages/ConstructorColleccioAustenPage'));
+const ConstructorColleccioCubePage = lazy(() => import('@/pages/ConstructorColleccioCubePage'));
+const ConstructorColleccioMiscellaniaPage = lazy(() => import('@/pages/ConstructorColleccioMiscellaniaPage'));
 const ConstructorColleccio01Page = lazy(() => import('@/pages/ConstructorColleccio01Page'));
 const ConstructorColleccio02Page = lazy(() => import('@/pages/ConstructorColleccio02Page'));
 const ConstructorColleccio03Page = lazy(() => import('@/pages/ConstructorColleccio03Page'));
@@ -136,6 +136,38 @@ const CubeCybercubePage = lazy(() => import('@/pages/products/CubeCybercubePage'
 const MiscellaniaPontDelDiablePage = lazy(() => import('@/pages/products/MiscellaniaPontDelDiablePage'));
 const MiscellaniaDjVaderPage = lazy(() => import('@/pages/products/MiscellaniaDjVaderPage'));
 const MiscellaniaDeathStar2d2Page = lazy(() => import('@/pages/products/MiscellaniaDeathStar2d2Page'));
+const TheHumanInsideRobbieTheRobotPage = lazy(() => import('@/pages/products/TheHumanInsideRobbieTheRobotPage'));
+const TheHumanInsideTerminatorPage = lazy(() => import('@/pages/products/TheHumanInsideTerminatorPage'));
+const TheHumanInsideTheDalekPage = lazy(() => import('@/pages/products/TheHumanInsideTheDalekPage'));
+const MiscellaniaArthurDTheSecondPage = lazy(() => import('@/pages/products/MiscellaniaArthurDTheSecondPage'));
+const MiscellaniaR2d2QuotePage = lazy(() => import('@/pages/products/MiscellaniaR2d2QuotePage'));
+const AustenPemberleyHousePage = lazy(() => import('@/pages/products/AustenPemberleyHousePage'));
+const AustenKeepCalmPage = lazy(() => import('@/pages/products/AustenKeepCalmPage'));
+const AustenQuotesHalfAgonyHalfHopePage = lazy(() => import('@/pages/products/AustenQuotesHalfAgonyHalfHopePage'));
+const AustenQuotesIAdmireAndLoveYouPage = lazy(() => import('@/pages/products/AustenQuotesIAdmireAndLoveYouPage'));
+const AustenQuotesItIsATruthPage = lazy(() => import('@/pages/products/AustenQuotesItIsATruthPage'));
+const AustenQuotesUnsociableAndTaciturnPage = lazy(() => import('@/pages/products/AustenQuotesUnsociableAndTaciturnPage'));
+const AustenQuotesYouHaveBewitchedMePage = lazy(() => import('@/pages/products/AustenQuotesYouHaveBewitchedMePage'));
+const AustenPersuasion1Page = lazy(() => import('@/pages/products/AustenPersuasion1Page'));
+const AustenPersuasion2Page = lazy(() => import('@/pages/products/AustenPersuasion2Page'));
+const AustenPersuasion3Page = lazy(() => import('@/pages/products/AustenPersuasion3Page'));
+const AustenPersuasion4Page = lazy(() => import('@/pages/products/AustenPersuasion4Page'));
+const AustenPrideAndPrejudice1Page = lazy(() => import('@/pages/products/AustenPrideAndPrejudice1Page'));
+const AustenPrideAndPrejudice2Page = lazy(() => import('@/pages/products/AustenPrideAndPrejudice2Page'));
+const AustenPrideAndPrejudice3Page = lazy(() => import('@/pages/products/AustenPrideAndPrejudice3Page'));
+const AustenPrideAndPrejudice4Page = lazy(() => import('@/pages/products/AustenPrideAndPrejudice4Page'));
+const AustenSenseAndSensibility1Page = lazy(() => import('@/pages/products/AustenSenseAndSensibility1Page'));
+const AustenSenseAndSensibility2Page = lazy(() => import('@/pages/products/AustenSenseAndSensibility2Page'));
+const AustenSenseAndSensibility3Page = lazy(() => import('@/pages/products/AustenSenseAndSensibility3Page'));
+const AustenSenseAndSensibility4Page = lazy(() => import('@/pages/products/AustenSenseAndSensibility4Page'));
+const AustenLookingForMyDarcyBlueSolidPage = lazy(() => import('@/pages/products/AustenLookingForMyDarcyBlueSolidPage'));
+const AustenLookingForMyDarcyPinkSolidPage = lazy(() => import('@/pages/products/AustenLookingForMyDarcyPinkSolidPage'));
+const AustenLookingForMyDarcyPinkYellowFramePage = lazy(() => import('@/pages/products/AustenLookingForMyDarcyPinkYellowFramePage'));
+const AustenLookingForMyDarcyRedSolidPage = lazy(() => import('@/pages/products/AustenLookingForMyDarcyRedSolidPage'));
+const AustenLookingForMyDarcyRedYellowFramePage = lazy(() => import('@/pages/products/AustenLookingForMyDarcyRedYellowFramePage'));
+const AustenLookingForMyDarcyYellowBlueFramePage = lazy(() => import('@/pages/products/AustenLookingForMyDarcyYellowBlueFramePage'));
+const AustenLookingForMyDarcyYellowPinkFramePage = lazy(() => import('@/pages/products/AustenLookingForMyDarcyYellowPinkFramePage'));
+const AustenLookingForMyDarcyYellowSolidPage = lazy(() => import('@/pages/products/AustenLookingForMyDarcyYellowSolidPage'));
 const HtmlBasePage = lazy(() => import('@/pages/HtmlBasePage'));
 const DevComponentsCatalogPage = lazy(() => import('@/pages/DevComponentsCatalogPage'));
 const DevLayoutBuilderPage = lazy(() => import('@/pages/DevLayoutBuilderPage'));
@@ -3062,7 +3094,7 @@ function App() {
                     exit={{ opacity: 0, y: -10 }}
                     transition={{ duration: 0.3, ease: "easeInOut" }}
                   >
-                    <ConstructorColleccioPageCopy2 pautaEnabled={false} tableEnabled={false} {...pageProps} />
+                    <ConstructorColleccioFirstContactPage pautaEnabled={false} tableEnabled={false} {...pageProps} />
                   </motion.div>
                 } />
 
@@ -3073,7 +3105,7 @@ function App() {
                     exit={{ opacity: 0, y: -10 }}
                     transition={{ duration: 0.3, ease: "easeInOut" }}
                   >
-                    <ConstructorColleccioPageCopy3 pautaEnabled={false} tableEnabled={false} {...pageProps} />
+                    <ConstructorColleccioTheHumanInsidePage pautaEnabled={false} tableEnabled={false} {...pageProps} />
                   </motion.div>
                 } />
 
@@ -3084,7 +3116,7 @@ function App() {
                     exit={{ opacity: 0, y: -10 }}
                     transition={{ duration: 0.3, ease: "easeInOut" }}
                   >
-                    <ConstructorColleccioPageCopy4 pautaEnabled={false} tableEnabled={false} {...pageProps} />
+                    <ConstructorColleccioAustenPage pautaEnabled={false} tableEnabled={false} {...pageProps} />
                   </motion.div>
                 } />
 
@@ -3095,7 +3127,7 @@ function App() {
                     exit={{ opacity: 0, y: -10 }}
                     transition={{ duration: 0.3, ease: "easeInOut" }}
                   >
-                    <ConstructorColleccioPageCopy5 pautaEnabled={false} tableEnabled={false} {...pageProps} />
+                    <ConstructorColleccioCubePage pautaEnabled={false} tableEnabled={false} {...pageProps} />
                   </motion.div>
                 } />
 
@@ -3106,7 +3138,7 @@ function App() {
                     exit={{ opacity: 0, y: -10 }}
                     transition={{ duration: 0.3, ease: "easeInOut" }}
                   >
-                    <ConstructorColleccioPageCopy6 pautaEnabled={false} tableEnabled={false} {...pageProps} />
+                    <ConstructorColleccioMiscellaniaPage pautaEnabled={false} tableEnabled={false} {...pageProps} />
                   </motion.div>
                 } />
 
@@ -3234,19 +3266,19 @@ function App() {
                 />
                 <Route
                   path="/constructor/first-contact"
-                  element={<ConstructorColleccioPageCopy2 pautaEnabled={false} tableEnabled={false} />}
+                  element={<ConstructorColleccioFirstContactPage pautaEnabled={false} tableEnabled={false} />}
                 />
                 <Route
                   path="/constructor/austen"
-                  element={<ConstructorColleccioPageCopy4 pautaEnabled={false} tableEnabled={false} />}
+                  element={<ConstructorColleccioAustenPage pautaEnabled={false} tableEnabled={false} />}
                 />
                 <Route
                   path="/constructor/cube"
-                  element={<ConstructorColleccioPageCopy5 pautaEnabled={false} tableEnabled={false} />}
+                  element={<ConstructorColleccioCubePage pautaEnabled={false} tableEnabled={false} />}
                 />
                 <Route
                   path="/constructor/miscellania"
-                  element={<ConstructorColleccioPageCopy6 pautaEnabled={false} tableEnabled={false} />}
+                  element={<ConstructorColleccioMiscellaniaPage pautaEnabled={false} tableEnabled={false} />}
                 />
                 <Route
                   path="/constructor/colleccio01"
@@ -3302,6 +3334,38 @@ function App() {
                 <Route path="/miscellania/pont-del-diable" element={<MiscellaniaPontDelDiablePage />} />
                 <Route path="/miscellania/dj-vader" element={<MiscellaniaDjVaderPage />} />
                 <Route path="/miscellania/death-star2d2" element={<MiscellaniaDeathStar2d2Page />} />
+                <Route path="/the-human-inside/robbie-the-robot" element={<TheHumanInsideRobbieTheRobotPage />} />
+                <Route path="/the-human-inside/terminator" element={<TheHumanInsideTerminatorPage />} />
+                <Route path="/the-human-inside/the-dalek" element={<TheHumanInsideTheDalekPage />} />
+                <Route path="/miscellania/arthur-d-the-second" element={<MiscellaniaArthurDTheSecondPage />} />
+                <Route path="/miscellania/r2d2-quote" element={<MiscellaniaR2d2QuotePage />} />
+                <Route path="/austen/pemberley-house" element={<AustenPemberleyHousePage />} />
+                <Route path="/austen/keep-calm" element={<AustenKeepCalmPage />} />
+                <Route path="/austen/quotes-half-agony-half-hope" element={<AustenQuotesHalfAgonyHalfHopePage />} />
+                <Route path="/austen/quotes-i-admire-and-love-you" element={<AustenQuotesIAdmireAndLoveYouPage />} />
+                <Route path="/austen/quotes-it-is-a-truth" element={<AustenQuotesItIsATruthPage />} />
+                <Route path="/austen/quotes-unsociable-and-taciturn" element={<AustenQuotesUnsociableAndTaciturnPage />} />
+                <Route path="/austen/quotes-you-have-bewitched-me" element={<AustenQuotesYouHaveBewitchedMePage />} />
+                <Route path="/austen/persuasion-1" element={<AustenPersuasion1Page />} />
+                <Route path="/austen/persuasion-2" element={<AustenPersuasion2Page />} />
+                <Route path="/austen/persuasion-3" element={<AustenPersuasion3Page />} />
+                <Route path="/austen/persuasion-4" element={<AustenPersuasion4Page />} />
+                <Route path="/austen/pride-and-prejudice-1" element={<AustenPrideAndPrejudice1Page />} />
+                <Route path="/austen/pride-and-prejudice-2" element={<AustenPrideAndPrejudice2Page />} />
+                <Route path="/austen/pride-and-prejudice-3" element={<AustenPrideAndPrejudice3Page />} />
+                <Route path="/austen/pride-and-prejudice-4" element={<AustenPrideAndPrejudice4Page />} />
+                <Route path="/austen/sense-and-sensibility-1" element={<AustenSenseAndSensibility1Page />} />
+                <Route path="/austen/sense-and-sensibility-2" element={<AustenSenseAndSensibility2Page />} />
+                <Route path="/austen/sense-and-sensibility-3" element={<AustenSenseAndSensibility3Page />} />
+                <Route path="/austen/sense-and-sensibility-4" element={<AustenSenseAndSensibility4Page />} />
+                <Route path="/austen/looking-for-my-darcy-blue-solid" element={<AustenLookingForMyDarcyBlueSolidPage />} />
+                <Route path="/austen/looking-for-my-darcy-pink-solid" element={<AustenLookingForMyDarcyPinkSolidPage />} />
+                <Route path="/austen/looking-for-my-darcy-pink-yellow-frame" element={<AustenLookingForMyDarcyPinkYellowFramePage />} />
+                <Route path="/austen/looking-for-my-darcy-red-solid" element={<AustenLookingForMyDarcyRedSolidPage />} />
+                <Route path="/austen/looking-for-my-darcy-red-yellow-frame" element={<AustenLookingForMyDarcyRedYellowFramePage />} />
+                <Route path="/austen/looking-for-my-darcy-yellow-blue-frame" element={<AustenLookingForMyDarcyYellowBlueFramePage />} />
+                <Route path="/austen/looking-for-my-darcy-yellow-pink-frame" element={<AustenLookingForMyDarcyYellowPinkFramePage />} />
+                <Route path="/austen/looking-for-my-darcy-yellow-solid" element={<AustenLookingForMyDarcyYellowSolidPage />} />
                 <Route
                   path="/constructor/html-base"
                   element={<HtmlBasePage pautaEnabled={false} tableEnabled={false} />}
