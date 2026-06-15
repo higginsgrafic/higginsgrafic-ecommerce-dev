@@ -1,4 +1,4 @@
-import { useState, useLayoutEffect, useRef } from 'react';
+import { useState, useLayoutEffect, useRef, useMemo } from 'react';
 import { Helmet } from 'react-helmet';
 import { Link } from 'react-router-dom';
 import NikeHeroSlider from '@/components/NikeHeroSlider';
@@ -10,6 +10,7 @@ import Breadcrumbs from '@/components/Breadcrumbs';
 import TramFinal from '@/components/home/TramFinal';
 import TambeRail from '@/pages/nikeTambe/TambeRail';
 import CarouselArrows from '@/pages/nikeTambe/CarouselArrows';
+import { buildHomeDrawingPlan } from '@/components/home/homeDrawings';
 
 const HERO_SLIDES = [
   {
@@ -41,7 +42,7 @@ const HERO_SLIDES = [
   },
 ];
 
-function CollectionTitle({ index, kicker, title, subtitle, align = 'left', numberAlign, titleOffsetX = 0, titleOffsetY = 0, numberOffsetX = -20, numberOffsetY = 0, numberTopPercent = 50, subtitleOffsetX = 0, subtitleOffsetY = 0, titleTextAlign }) {
+function CollectionTitle({ index, kicker, title, subtitle, align = 'left', numberAlign, titleOffsetX = 0, titleOffsetY = 0, numberOffsetX = -20, numberOffsetY = 0, numberTopPercent = 50, subtitleOffsetX = 0, subtitleOffsetY = 0, titleTextAlign, collectionHref }) {
   const isRight = align === 'right';
   const resolvedNumberAlign = numberAlign || align;
   const isNumberRight = resolvedNumberAlign === 'right';
@@ -75,19 +76,37 @@ function CollectionTitle({ index, kicker, title, subtitle, align = 'left', numbe
           >
             {index}
           </span>
-          <span
-            className="relative"
-            style={
-              titleOffsetX || titleOffsetY
-                ? {
-                    display: 'inline-block',
-                    transform: `translate(${typeof titleOffsetX === 'string' ? titleOffsetX : `${titleOffsetX}px`}, ${typeof titleOffsetY === 'string' ? titleOffsetY : `${titleOffsetY}px`})`,
-                  }
-                : undefined
-            }
-          >
-            {title}
-          </span>
+          {collectionHref ? (
+            <Link to={collectionHref} target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none', color: 'inherit' }}>
+              <span
+                className="relative"
+                style={
+                  titleOffsetX || titleOffsetY
+                    ? {
+                        display: 'inline-block',
+                        transform: `translate(${typeof titleOffsetX === 'string' ? titleOffsetX : `${titleOffsetX}px`}, ${typeof titleOffsetY === 'string' ? titleOffsetY : `${titleOffsetY}px`})`,
+                      }
+                    : undefined
+                }
+              >
+                {title}
+              </span>
+            </Link>
+          ) : (
+            <span
+              className="relative"
+              style={
+                titleOffsetX || titleOffsetY
+                  ? {
+                      display: 'inline-block',
+                      transform: `translate(${typeof titleOffsetX === 'string' ? titleOffsetX : `${titleOffsetX}px`}, ${typeof titleOffsetY === 'string' ? titleOffsetY : `${titleOffsetY}px`})`,
+                    }
+                  : undefined
+              }
+            >
+              {title}
+            </span>
+          )}
         </h2>
 
         {subtitle ? (
@@ -129,6 +148,24 @@ function HomeClean() {
   const [selectedSize, setSelectedSize] = useState('M');
   const pautaGridRef = useRef(null);
   const [rowHeight, setRowHeight] = useState(38);
+
+  // Pla d'assignació dibuix + color de samarreta per a les targetes.
+  // Es calcula un cop per muntatge (aleatori a cada càrrega).
+  const drawingPlan = useMemo(() => buildHomeDrawingPlan({ perCollection: 3 }), []);
+  const cardProps = (slug, index) => {
+    const item = drawingPlan?.[slug]?.[index];
+    if (!item) return {};
+    return {
+      productName: item.productName,
+      imageSrc: item.mockupSrc,
+      imageAlt: `Samarreta ${item.color}`,
+      overlaySrc: item.overlaySrc,
+      overlayAlt: item.overlayAlt,
+      ...(item.productHref ? { productHref: item.productHref } : {}),
+      ...(item.overlayScale != null ? { overlayScale: item.overlayScale } : {}),
+      ...(item.overlayTranslateY != null ? { overlayTranslateY: item.overlayTranslateY } : {}),
+    };
+  };
 
   useLayoutEffect(() => {
     if (typeof window === 'undefined') return undefined;
@@ -259,6 +296,7 @@ function HomeClean() {
         numRows={90}
         topOffset="var(--appHeaderOffset, 33px)"
         bottomPadding="0px"
+        zIndex={9999}
       >
         <div
           style={{
@@ -281,7 +319,7 @@ function HomeClean() {
 
       <section className="bg-background text-foreground">
         <div className="mx-auto max-w-[1400px] px-4 pt-[120px] pb-[174px] sm:px-6 lg:px-10">
-          <CollectionTitle
+            <CollectionTitle
             index=""
             kicker="Col·lecció"
             title="First Contact"
@@ -293,6 +331,7 @@ function HomeClean() {
             titleOffsetY={5}
             numberOffsetX={-36}
             numberOffsetY={-4}
+            collectionHref="/first-contact"
           />
           <div style={{ marginTop: '150px' }}>
             <div
@@ -312,6 +351,8 @@ function HomeClean() {
               <TDP2
                 gridColumn="1 / 2"
                 editableIdPrefix="home-row1-tdp-1"
+                {...cardProps('first-contact', 0)}
+                collectionHref="/first-contact"
                 selectedSize={selectedSize}
                 onSizeChange={setSelectedSize}
                 copyMode={true}
@@ -325,6 +366,8 @@ function HomeClean() {
               <TDP1
                 gridColumn="2 / 3"
                 editableIdPrefix="home-row1-tdp-2"
+                {...cardProps('first-contact', 1)}
+                collectionHref="/first-contact"
                 selectedSize={selectedSize}
                 onSizeChange={setSelectedSize}
                 copyMode={true}
@@ -338,6 +381,8 @@ function HomeClean() {
               <TDP2
                 gridColumn="3 / 4"
                 editableIdPrefix="home-row1-tdp-3"
+                {...cardProps('first-contact', 2)}
+                collectionHref="/first-contact"
                 selectedSize={selectedSize}
                 onSizeChange={setSelectedSize}
                 copyMode={true}
@@ -348,7 +393,7 @@ function HomeClean() {
               />
 
               {/* Indicador de més productes (Pill amb text sota el producte de la tercera columna) */}
-              <Link
+              <Link target="_blank" rel="noopener noreferrer"
                 to="/first-contact"
                 style={{
                   position: 'absolute',
@@ -415,6 +460,7 @@ function HomeClean() {
                 numberOffsetY={-4}
                 subtitleOffsetX={0} // Centrat en X
                 subtitleOffsetY={0} // Pujat 18px (abans 18)
+                collectionHref="/the-human-inside"
               />
             </div>
             <div style={{ marginTop: '150px' }}>
@@ -435,6 +481,8 @@ function HomeClean() {
                 <TDP1
                   gridColumn="1 / 2"
                   editableIdPrefix="home-row2-tdp-1"
+                  {...cardProps('the-human-inside', 0)}
+                  collectionHref="/the-human-inside"
                   selectedSize={selectedSize}
                   onSizeChange={setSelectedSize}
                   copyMode={true}
@@ -448,6 +496,8 @@ function HomeClean() {
                 <TDP2
                   gridColumn="2 / 3"
                   editableIdPrefix="home-row2-tdp-2"
+                  {...cardProps('the-human-inside', 1)}
+                  collectionHref="/the-human-inside"
                   selectedSize={selectedSize}
                   onSizeChange={setSelectedSize}
                   copyMode={true}
@@ -461,6 +511,8 @@ function HomeClean() {
                 <TDP1
                   gridColumn="3 / 4"
                   editableIdPrefix="home-row2-tdp-3"
+                  {...cardProps('the-human-inside', 2)}
+                  collectionHref="/the-human-inside"
                   selectedSize={selectedSize}
                   onSizeChange={setSelectedSize}
                   copyMode={true}
@@ -471,8 +523,8 @@ function HomeClean() {
                 />
 
               {/* Indicador de més productes (Pill amb text sota el producte de la tercera columna) */}
-              <Link
-                to="/thin"
+              <Link target="_blank" rel="noopener noreferrer"
+                to="/the-human-inside"
                 style={{
                   position: 'absolute',
                   left: '50%',
@@ -539,6 +591,7 @@ function HomeClean() {
                 numberOffsetX={-22} // Mogut 14px a la dreta (abans -36)
                 numberOffsetY={-17}
                 subtitleOffsetY={0}
+                collectionHref="/austen"
               />
             </div>
             <div style={{ marginTop: '150px' }}>
@@ -559,6 +612,8 @@ function HomeClean() {
                 <TDP2
                   gridColumn="1 / 2"
                   editableIdPrefix="home-row3-tdp-1"
+                  {...cardProps('austen', 0)}
+                  collectionHref="/austen"
                   selectedSize={selectedSize}
                   onSizeChange={setSelectedSize}
                   copyMode={true}
@@ -572,6 +627,8 @@ function HomeClean() {
                 <TDP1
                   gridColumn="2 / 3"
                   editableIdPrefix="home-row3-tdp-2"
+                  {...cardProps('austen', 1)}
+                  collectionHref="/austen"
                   selectedSize={selectedSize}
                   onSizeChange={setSelectedSize}
                   copyMode={true}
@@ -585,6 +642,8 @@ function HomeClean() {
                 <TDP2
                   gridColumn="3 / 4"
                   editableIdPrefix="home-row3-tdp-3"
+                  {...cardProps('austen', 2)}
+                  collectionHref="/austen"
                   selectedSize={selectedSize}
                   onSizeChange={setSelectedSize}
                   copyMode={true}
@@ -595,7 +654,7 @@ function HomeClean() {
                 />
 
               {/* Indicador de més productes (Pill amb text sota el producte de la tercera columna) */}
-              <Link
+              <Link target="_blank" rel="noopener noreferrer"
                 to="/austen"
                 style={{
                   position: 'absolute',
@@ -663,6 +722,7 @@ function HomeClean() {
                 numberOffsetX={19} // Mogut 4px més a l'esquerra (abans 23)
                 numberOffsetY={0}
                 subtitleOffsetY={1}
+                collectionHref="/cube"
               />
             </div>
             <div style={{ marginTop: '150px' }}>
@@ -683,6 +743,8 @@ function HomeClean() {
                 <TDP1
                   gridColumn="1 / 2"
                   editableIdPrefix="home-row4-tdp-1"
+                  {...cardProps('cube', 0)}
+                  collectionHref="/cube"
                   selectedSize={selectedSize}
                   onSizeChange={setSelectedSize}
                   copyMode={true}
@@ -696,6 +758,8 @@ function HomeClean() {
                 <TDP2
                   gridColumn="2 / 3"
                   editableIdPrefix="home-row4-tdp-2"
+                  {...cardProps('cube', 1)}
+                  collectionHref="/cube"
                   selectedSize={selectedSize}
                   onSizeChange={setSelectedSize}
                   copyMode={true}
@@ -709,6 +773,8 @@ function HomeClean() {
                 <TDP1
                   gridColumn="3 / 4"
                   editableIdPrefix="home-row4-tdp-3"
+                  {...cardProps('cube', 2)}
+                  collectionHref="/cube"
                   selectedSize={selectedSize}
                   onSizeChange={setSelectedSize}
                   copyMode={true}
@@ -719,7 +785,7 @@ function HomeClean() {
                 />
 
               {/* Indicador de més productes (Pill amb text sota el producte de la tercera columna) */}
-              <Link
+              <Link target="_blank" rel="noopener noreferrer"
                 to="/cube"
                 style={{
                   position: 'absolute',
@@ -787,6 +853,7 @@ function HomeClean() {
                 numberOffsetX={-22} // Mogut 14px a la dreta (abans -36)
                 numberOffsetY={-4}
                 subtitleOffsetY={1}
+                collectionHref="/miscellania"
               />
             </div>
             <div style={{ marginTop: '150px' }}>
@@ -807,6 +874,8 @@ function HomeClean() {
                 <TDP2
                   gridColumn="1 / 2"
                   editableIdPrefix="home-row5-tdp-1"
+                  {...cardProps('miscellania', 0)}
+                  collectionHref="/miscellania"
                   selectedSize={selectedSize}
                   onSizeChange={setSelectedSize}
                   copyMode={true}
@@ -820,6 +889,8 @@ function HomeClean() {
                 <TDP1
                   gridColumn="2 / 3"
                   editableIdPrefix="home-row5-tdp-2"
+                  {...cardProps('miscellania', 1)}
+                  collectionHref="/miscellania"
                   selectedSize={selectedSize}
                   onSizeChange={setSelectedSize}
                   copyMode={true}
@@ -833,6 +904,8 @@ function HomeClean() {
                 <TDP2
                   gridColumn="3 / 4"
                   editableIdPrefix="home-row5-tdp-3"
+                  {...cardProps('miscellania', 2)}
+                  collectionHref="/miscellania"
                   selectedSize={selectedSize}
                   onSizeChange={setSelectedSize}
                   copyMode={true}
@@ -843,7 +916,7 @@ function HomeClean() {
                 />
 
               {/* Indicador de més productes (Pill amb text sota el producte de la tercera columna) */}
-              <Link
+              <Link target="_blank" rel="noopener noreferrer"
                 to="/miscellania"
                 style={{
                   position: 'absolute',

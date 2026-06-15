@@ -26,6 +26,7 @@ const OffersPage = lazy(() => import('@/pages/OffersPage'));
 const OrderTrackingPage = lazy(() => import('@/pages/OrderTrackingPage'));
 const CheckoutPage = lazy(() => import('@/pages/CheckoutPage'));
 const OrderConfirmationPage = lazy(() => import('@/pages/OrderConfirmationPage'));
+const TheHumanInsidePage = lazy(() => import('@/pages/TheHumanInsidePage'));
 const NotFoundPage = lazy(() => import('@/pages/NotFoundPage'));
 
 const pageTransition = {
@@ -132,6 +133,20 @@ function AppProd() {
                 <Route path="/privacy" element={<PrivacyPage />} />
                 <Route path="/terms" element={<TermsPage />} />
                 <Route path="/cc" element={<CreativeCommonsPage />} />
+
+                {/* Col·leccions */}
+                <Route
+                  path="/the-human-inside"
+                  element={
+                    <motion.div
+                      key="the-human-inside"
+                      {...pageTransition}
+                      style={{ width: '100%', height: '100%' }}
+                    >
+                      <TheHumanInsidePage />
+                    </motion.div>
+                  }
+                />
 
                 {/* 404 */}
                 <Route path="*" element={<NotFoundPage />} />

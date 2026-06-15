@@ -17,6 +17,26 @@ const TDP_DESCRIPTION = [
 const tdpImage = (color) =>
   `/placeholders/apparel/t-shirt/gildan_5000/gildan-5000_t-shirt_crewneck_unisex_heavyWeight_xl_${color}_gpr-4-0_front.png`;
 
+function colorToProductName(color) {
+  const map = {
+    'white': 'White',
+    'light-blue': 'Light Blue',
+    'royal': 'Royal',
+    'navy': 'Navy',
+    'purple': 'Purple',
+    'light-pink': 'Light Pink',
+    'daisy': 'Daisy',
+    'gold': 'Gold',
+    'red': 'Red',
+    'kiwi': 'Kiwi',
+    'irish-green': 'Irish Green',
+    'military-green': 'Military Green',
+    'forest-green': 'Forest Green',
+    'black': 'Black',
+  };
+  return map[color] || color;
+}
+
 // 14 colors canònics (ordre extret de FullWideSlideDemoHeader.jsx).
 // Repetits cíclicament fins a omplir les 16 cel·les del 4x4.
 const TDP_GRID_COLORS = [
@@ -242,7 +262,7 @@ function ConstructorColleccioPageCopy() {
                 key={`tdp-card-r${rowIdx}-c${colIdx}`}
                 gridColumn={`${col} / ${col + 1}`}
                 rowOffset={rowOffset}
-                productName="NOM DE PRODUCTE"
+                productName={colorToProductName(color)}
                 description={TDP_DESCRIPTION}
                 price="15,50€"
                 imageSrc={tdpImage(color)}
@@ -253,7 +273,10 @@ function ConstructorColleccioPageCopy() {
                 cartCount={0}
                 onAddToCart={() => {}}
                 editableIdPrefix="constructor-colleccio-tdp-col2"
-                presetVersion="constructor-colleccio-tdp-cart-34-v8"
+                presetVersion="constructor-colleccio-tdp-cart-34-v9"
+                collectionHref="/constructor/pdp"
+                productNamePlain
+                editable={false}
               />
             );
           })

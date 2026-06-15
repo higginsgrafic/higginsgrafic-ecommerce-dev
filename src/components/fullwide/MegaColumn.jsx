@@ -1190,8 +1190,8 @@ function MegaColumn({
                 </div>
               ) : it === CONTROL_TILE_ARROWS ? (
                 <div
-                  className={`relative z-40 mt-2 ${thinSlideEnabled || pagingEnabled ? '' : 'opacity-30 pointer-events-none'}`}
-                  aria-hidden={thinSlideEnabled || pagingEnabled ? undefined : true}
+                  className={`relative z-40 mt-2 ${thinSlideEnabled || pagingEnabled || (isHumanInside && onHumanPrev && onHumanNext) ? '' : 'opacity-30 pointer-events-none'}`}
+                  aria-hidden={thinSlideEnabled || pagingEnabled || (isHumanInside && onHumanPrev && onHumanNext) ? undefined : true}
                 >
                   <FirstContactDibuix09Buttons
                     tileSize={tileSize}
@@ -1203,7 +1203,7 @@ function MegaColumn({
                         return;
                       }
                       if (pagingEnabled) return setPageStart((v) => v - 1);
-                      if (isHumanInside && !humanInsideEnabled && onHumanPrev) return onHumanPrev();
+                      if (isHumanInside && onHumanPrev) return onHumanPrev();
                     }}
                     onNext={() => {
                       touchMegaPublicActivity();
@@ -1213,7 +1213,7 @@ function MegaColumn({
                         return;
                       }
                       if (pagingEnabled) return setPageStart((v) => v + 1);
-                      if (isHumanInside && !humanInsideEnabled && onHumanNext) return onHumanNext();
+                      if (isHumanInside && onHumanNext) return onHumanNext();
                     }}
                   />
                 </div>

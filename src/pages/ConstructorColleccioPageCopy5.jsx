@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { Helmet } from 'react-helmet';
 import Pauta4ColsOverlay from '@/components/pauta/Pauta4ColsOverlay';
+import { tdpImageFor } from '@/lib/pdpMockup';
 import NikeHeroSlider from '@/components/NikeHeroSlider';
 import CollectionProductCard from '@/components/tdp/CollectionProductCard';
 import CollectionProductCardV5 from '@/components/tdp/CollectionProductCardV5';
@@ -25,6 +26,45 @@ const TDP_GRID_COLORS = [
   ['red',          'kiwi',           'irish-green',   'military-green'],
   ['forest-green', 'black',          'white',         'light-blue'],
 ];
+// Rutes de les PDP de producte de CUBE, en ordre.
+// S'assignen a les 16 cel·les de la graella de forma cíclica.
+const COLLECTION_SLUG = 'cube';
+const PRODUCTS = [
+  { route: 'afrodita-c', name: 'AFRODITA-C' },
+  { route: 'mazinger-c', name: 'MAZINGER-C' },
+  { route: 'ironman-68', name: 'IRONMAN-68' },
+  { route: 'ironkong', name: 'IRONKONG' },
+  { route: 'robocube', name: 'ROBOCUBE' },
+  { route: 'cylon-cube', name: 'CYLON CUBE' },
+  { route: 'maschinencube', name: 'MASCHINENCUBE' },
+  { route: 'darth-cube', name: 'DARTH CUBE' },
+  { route: '3cube-p0', name: '3CUBE-P0' },
+  { route: 'cybercube', name: 'CYBERCUBE' },
+];
+const productAt = (rowIdx, colIdx) => PRODUCTS[(rowIdx * 4 + colIdx) % PRODUCTS.length];
+const productHref = (rowIdx, colIdx) => `/${COLLECTION_SLUG}/${productAt(rowIdx, colIdx).route}`;
+
+function colorToProductName(color) {
+  const map = {
+    'white': 'White',
+    'light-blue': 'Light Blue',
+    'royal': 'Royal',
+    'navy': 'Navy',
+    'purple': 'Purple',
+    'light-pink': 'Light Pink',
+    'daisy': 'Daisy',
+    'gold': 'Gold',
+    'red': 'Red',
+    'kiwi': 'Kiwi',
+    'irish-green': 'Irish Green',
+    'military-green': 'Military Green',
+    'forest-green': 'Forest Green',
+    'black': 'Black',
+  };
+  return map[color] || color;
+}
+
+
 const HERO_SLIDES = [
   {
     id: 'first-contact',
@@ -160,7 +200,7 @@ function ConstructorColleccioPageCopy5() {
               margin: 0,
               fontFamily: 'Oswald, sans-serif',
               fontWeight: 700,
-              fontSize: '9vw',
+              fontSize: '8vw',
               letterSpacing: '-0.01em',
               lineHeight: 0.85,
               color: '#0b0d10',
@@ -235,10 +275,10 @@ function ConstructorColleccioPageCopy5() {
                 key={`tdp-card-r${rowIdx}-c${colIdx}`}
                 gridColumn={`${col} / ${col + 1}`}
                 rowOffset={rowOffset}
-                productName="NOM DE PRODUCTE"
+                productName={productAt(rowIdx, colIdx).name}
                 description={TDP_DESCRIPTION}
                 price="15,50€"
-                imageSrc={tdpImage(color)}
+                imageSrc={tdpImageFor('cube', productAt(rowIdx, colIdx).route, color)}
                 imageAlt={`Samarreta Gildan 5000 ${color}`}
                 sizes={sizes}
                 selectedSize={selectedSize}
@@ -246,7 +286,10 @@ function ConstructorColleccioPageCopy5() {
                 cartCount={0}
                 onAddToCart={() => {}}
                 editableIdPrefix="constructor-colleccio-copy5-tdp-col2"
-                presetVersion="constructor-colleccio-copy5-tdp-cart-34-v8"
+                presetVersion="constructor-colleccio-copy5-tdp-cart-34-v9"
+                collectionHref={`${productHref(rowIdx, colIdx)}?color=${color}`}
+                productNamePlain
+                editable={false}
               />
             );
           })

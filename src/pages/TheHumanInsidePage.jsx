@@ -36,7 +36,7 @@ function TheHumanInsidePage({ onAddToCart, cartItems, onUpdateQuantity }) {
               transition={{ duration: 0.6 }}
               className="text-center max-w-4xl mx-auto"
             >
-              <h1 className="font-oswald font-bold uppercase mb-6" style={{ fontSize: '10vw' }}>
+              <h1 className="font-oswald font-bold uppercase mb-6" style={{ fontSize: '1vw' }}>
                 {texts.collections.theHumanInside.title}
               </h1>
               <p className="font-roboto text-lg lg:text-xl text-gray-200 italic">

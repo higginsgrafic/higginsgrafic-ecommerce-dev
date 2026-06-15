@@ -25,6 +25,27 @@ const TDP_GRID_COLORS = [
   ['red',          'kiwi',           'irish-green',   'military-green'],
   ['forest-green', 'black',          'white',         'light-blue'],
 ];
+
+function colorToProductName(color) {
+  const map = {
+    'white': 'White',
+    'light-blue': 'Light Blue',
+    'royal': 'Royal',
+    'navy': 'Navy',
+    'purple': 'Purple',
+    'light-pink': 'Light Pink',
+    'daisy': 'Daisy',
+    'gold': 'Gold',
+    'red': 'Red',
+    'kiwi': 'Kiwi',
+    'irish-green': 'Irish Green',
+    'military-green': 'Military Green',
+    'forest-green': 'Forest Green',
+    'black': 'Black',
+  };
+  return map[color] || color;
+}
+
 const HERO_SLIDES = [
   {
     id: 'first-contact',
@@ -235,7 +256,7 @@ function ConstructorColleccioPage() {
                 key={`tdp-card-r${rowIdx}-c${colIdx}`}
                 gridColumn={`${col} / ${col + 1}`}
                 rowOffset={rowOffset}
-                productName="NOM DE PRODUCTE"
+                productName={colorToProductName(color)}
                 description={TDP_DESCRIPTION}
                 price="15,50€"
                 imageSrc={tdpImage(color)}
@@ -246,7 +267,10 @@ function ConstructorColleccioPage() {
                 cartCount={0}
                 onAddToCart={() => {}}
                 editableIdPrefix="constructor-colleccio-tdp-col2"
-                presetVersion="constructor-colleccio-tdp-cart-34-v8"
+                presetVersion="constructor-colleccio-tdp-cart-34-v9"
+                collectionHref="/constructor/pdp"
+                productNamePlain
+                editable={false}
               />
             );
           })
