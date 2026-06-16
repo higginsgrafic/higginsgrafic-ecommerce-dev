@@ -89,8 +89,8 @@ function TDP2({
         copyMode={copyMode}
         variant="v4"
         rowOffset={4}
-        imageGridRow="2 / 12"               // Imatge a dalt (de fila 2 a 12)
-        productNameGridRow="14 / 15"         // Baixat 1 fila (abans 13 / 14)
+        imageGridRow="3 / 13"               // Imatge a dalt (baixada 1 fila, abans 2 / 12)
+        productNameGridRow="15 / 16"         // Baixat 1 fila (abans 14 / 15)
         productNameTranslateY="calc(50% - 13px)"
         descriptionGridRow="16 / 21"         // Baixat 1 fila (abans 15 / 20)
         descriptionTranslateY="-8px"
