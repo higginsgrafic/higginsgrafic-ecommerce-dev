@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { Helmet } from 'react-helmet';
 import Pauta4ColsOverlay from '@/components/pauta/Pauta4ColsOverlay';
-import { tdpImageFor } from '@/lib/pdpMockup';
+import { collectionGridImageFor, gridFinishFor, collectionGridHoverVariantsFor } from '@/lib/pdpMockup';
 import NikeHeroSlider from '@/components/NikeHeroSlider';
 import CollectionProductCard from '@/components/tdp/CollectionProductCard';
 import CollectionProductCardV5 from '@/components/tdp/CollectionProductCardV5';
@@ -32,8 +32,8 @@ const CANON_COLORS = [
 // les altres pàgines de col·lecció, que tenen un únic COLLECTION_SLUG).
 const COLLECTION_SLUG = 'austen';
 const PRODUCTS = [
-  { collection: 'austen-pemberley', route: 'pemberley-house', name: 'PEMBERLEY HOUSE' },
   { collection: 'austen-keep-calm', route: 'keep-calm', name: 'KEEP CALM' },
+  { collection: 'austen-pemberley', route: 'pemberley-house', name: 'PEMBERLEY HOUSE' },
   { collection: 'austen-quotes', route: 'quotes-half-agony-half-hope', name: 'HALF AGONY HALF HOPE' },
   { collection: 'austen-quotes', route: 'quotes-i-admire-and-love-you', name: 'I ADMIRE AND LOVE YOU' },
   { collection: 'austen-quotes', route: 'quotes-it-is-a-truth', name: 'IT IS A TRUTH' },
@@ -284,8 +284,10 @@ function ConstructorColleccioAustenPage() {
         {Array.from({ length: NUM_ROWS }).flatMap((_, rowIdx) =>
           [0, 1, 2, 3].map((colIdx) => {
             const idx = rowIdx * NUM_COLS + colIdx;
-            if (idx >= PRODUCTS.length) return null;
-            const product = PRODUCTS[idx];
+            // Sense files incompletes: la darrera fila es completa repetint
+            // productes des del principi (índex cíclic sobre PRODUCTS).
+            const pIdx = idx % PRODUCTS.length;
+            const product = PRODUCTS[pIdx];
             const color = CANON_COLORS[idx % CANON_COLORS.length];
             const isV5 = (rowIdx + colIdx) % 2 === 1;
             const Card = isV5 ? CollectionProductCardV5 : CollectionProductCard;
@@ -299,7 +301,8 @@ function ConstructorColleccioAustenPage() {
                 productName={product.name}
                 description={TDP_DESCRIPTION}
                 price="15,50€"
-                imageSrc={tdpImageFor(product.collection, product.route, color)}
+                imageSrc={collectionGridImageFor(product.collection, product.route, color, idx)}
+                hoverImages={collectionGridHoverVariantsFor(product.collection, product.route, color, idx)}
                 imageAlt={`Samarreta Gildan 5000 ${color}`}
                 sizes={sizes}
                 selectedSize={selectedSize}
@@ -308,7 +311,7 @@ function ConstructorColleccioAustenPage() {
                 onAddToCart={() => {}}
                 editableIdPrefix="constructor-colleccio-copy4-tdp-col2"
                 presetVersion="constructor-colleccio-copy4-tdp-cart-34-v9"
-                collectionHref={`${productHref(idx)}?color=${color}`}
+                collectionHref={`${productHref(pIdx)}?color=${color}&finish=${gridFinishFor(product.collection, color, idx)}`}
                 productNamePlain
                 editable={false}
               />
@@ -317,7 +320,9 @@ function ConstructorColleccioAustenPage() {
         )}
       </Pauta4ColsOverlay>
 
-      <TramFinal />
+      <TramFinal
+        posterLines={[{ text: 'CADA' }, { text: 'DIBUIX TÉ' }, { text: 'UNA MIRADA' }]}
+      />
 
       <div
         className="font-mono text-neutral-800"

@@ -23,6 +23,8 @@ function CollectionProductCard({
   collectionHref,
   productNamePlain = false,
   editable = true,
+  cardBackground = '#fbfcfd',
+  hoverImages,
 }) {
   const resolvedSlotGridRow = slotGridRow ?? `${6 + rowOffset} / ${21 + rowOffset}`;
   const descriptionGridRow = `${13 + rowOffset} / ${18 + rowOffset}`;
@@ -48,7 +50,7 @@ function CollectionProductCard({
             right: 0,
             top: 'calc(-100% / 15)',
             bottom: 'calc(-100% / 15)',
-            backgroundColor: '#fbfcfd',
+            backgroundColor: cardBackground,
           }}
         />
       </div>
@@ -60,6 +62,7 @@ function CollectionProductCard({
         price={price}
         imageSrc={imageSrc}
         imageAlt={imageAlt}
+        hoverImages={hoverImages}
         imageGridRow={imageGridRow}
         imageTranslateY={imageTranslateY}
         sizes={sizes}

@@ -5,8 +5,9 @@ import Pauta4ColsOverlay from '@/components/pauta/Pauta4ColsOverlay';
 import TambeRail from '@/pages/nikeTambe/TambeRail';
 import CarouselArrows from '@/pages/nikeTambe/CarouselArrows';
 import Breadcrumbs from '@/components/Breadcrumbs';
-import { tdpImageFor } from '@/lib/pdpMockup';
+import { tdpImageFor, availableFinishesFor, defaultFinishFor } from '@/lib/pdpMockup';
 import EditableTextBox from '@/components/dev/EditableTextBox';
+import StoryPosterLink from '@/components/StoryPosterLink';
 
 // =============================================================================
 //  PDP de producte — CUBE · CYLON CUBE
@@ -56,7 +57,7 @@ const PDP_SIZE_SETTINGS = {
   color: '#475059', textTransform: 'none',
 };
 
-const TDP_IMAGE = (color) => tdpImageFor(COLLECTION_SLUG, PRODUCT_ROUTE, color);
+const TDP_IMAGE = (color, finish) => tdpImageFor(COLLECTION_SLUG, PRODUCT_ROUTE, color, finish);
 
 const PRODUCT_DESCRIPTION = [
   "Mereixedors són d'honor, glòria e de fama e contínua bona memòria los",
@@ -81,6 +82,8 @@ const SPECS = [
 
 const SIZES = ['S', 'M', 'L', 'XL', 'XXL'];
 const FINISHES = ['BLANC', 'COLOR', 'NEGRE'];
+const AVAILABLE_FINISHES = availableFinishesFor(COLLECTION_SLUG);
+const DEFAULT_FINISH = defaultFinishFor(COLLECTION_SLUG);
 
 function CubeCylonCubePage() {
   const location = useLocation();
@@ -90,7 +93,9 @@ function CubeCylonCubePage() {
   const effectiveInitialIndex = initialIndex >= 0 ? initialIndex : 0;
   const productName = PRODUCT_NAME;
 
-  const [selectedFinish, setSelectedFinish] = useState('COLOR');
+  const urlFinish = searchParams.get('finish');
+  const initialFinish = urlFinish && AVAILABLE_FINISHES.includes(urlFinish) ? urlFinish : DEFAULT_FINISH;
+  const [selectedFinish, setSelectedFinish] = useState(initialFinish);
   const [finishButtonTextSettings, setFinishButtonTextSettings] = useState(PDP_SIZE_SETTINGS);
 
   const [selectedSize, setSelectedSize] = useState('M');
@@ -404,7 +409,7 @@ function CubeCylonCubePage() {
                 }}
               >
                 <img
-                  src={TDP_IMAGE(topColor)}
+                  src={TDP_IMAGE(topColor, selectedFinish)}
                   alt=""
                   aria-hidden="true"
                   draggable={false}
@@ -457,7 +462,7 @@ function CubeCylonCubePage() {
                     />
                   )}
                   <img
-                    src={TDP_IMAGE(color)}
+                    src={TDP_IMAGE(color, selectedFinish)}
                     alt=""
                     aria-hidden="true"
                     draggable={false}
@@ -489,7 +494,7 @@ function CubeCylonCubePage() {
             }}
           >
             <img
-              src={TDP_IMAGE(mainVariantColor)}
+              src={TDP_IMAGE(mainVariantColor, selectedFinish)}
               alt={`Producte principal ${mainVariantColor}`}
               draggable={false}
               style={{
@@ -570,25 +575,7 @@ function CubeCylonCubePage() {
             justifyContent: 'center',
           }}
         >
-          <div
-            style={{
-              textAlign: 'left',
-              fontFamily: 'Oswald, sans-serif',
-              fontSize: '60pt',
-              fontWeight: 300,
-              lineHeight: 1.1,
-              letterSpacing: '0.04em',
-              textTransform: 'uppercase',
-              color: '#111827',
-            }}
-          >
-            <div>CADA</div>
-            <div>PERSONA TÉ</div>
-            <div>UNA HISTÒRIA,</div>
-            <div style={{ marginTop: '0.4em' }}>CADA</div>
-            <div>HISTÒRIA TÉ</div>
-            <div>UN DIBUIX</div>
-          </div>
+          <StoryPosterLink />
         </div>
 
         {/* ─── Fitxa tècnica (col 1, fila 3+) — estil TDP ─── */}
@@ -675,12 +662,14 @@ function CubeCylonCubePage() {
             }}
           >
             {['BLANC', 'COLOR', 'NEGRE'].map((opt) => {
-              const isActive = selectedFinish === opt;
+              const isAvailable = AVAILABLE_FINISHES.includes(opt);
+              const isActive = isAvailable && selectedFinish === opt;
               return (
                 <button
                   key={opt}
                   type="button"
-                  onClick={() => setSelectedFinish(opt)}
+                  disabled={!isAvailable}
+                  onClick={isAvailable ? () => setSelectedFinish(opt) : undefined}
                   style={{
                     flex: 1,
                     fontFamily: `${finishButtonTextSettings.fontFamily}, sans-serif`,
@@ -689,11 +678,12 @@ function CubeCylonCubePage() {
                     letterSpacing: `${finishButtonTextSettings.letterSpacing}em`,
                     lineHeight: finishButtonTextSettings.lineHeight,
                     textTransform: finishButtonTextSettings.textTransform,
-                    color: isActive ? '#111827' : '#9ca3af',
+                    color: !isAvailable ? '#d1d5db' : (isActive ? '#111827' : '#9ca3af'),
                     backgroundColor: isActive ? '#ffffff' : 'transparent',
                     border: 'none',
                     borderRadius: 'clamp(2.11px, 0.6vw, 3.8px)',
-                    cursor: 'pointer',
+                    cursor: isAvailable ? 'pointer' : 'not-allowed',
+                    opacity: isAvailable ? 1 : 0.45,
                     transition: 'all 150ms ease',
                     boxShadow: isActive ? '0 1px 2px rgba(0,0,0,0.05)' : 'none',
                     display: 'flex',

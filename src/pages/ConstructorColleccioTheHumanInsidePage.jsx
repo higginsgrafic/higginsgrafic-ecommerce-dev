@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { Helmet } from 'react-helmet';
 import Pauta4ColsOverlay from '@/components/pauta/Pauta4ColsOverlay';
-import { tdpImageFor } from '@/lib/pdpMockup';
+import { collectionGridImageFor, gridFinishFor, collectionGridHoverVariantsFor } from '@/lib/pdpMockup';
 import NikeHeroSlider from '@/components/NikeHeroSlider';
 import CollectionProductCard from '@/components/tdp/CollectionProductCard';
 import CollectionProductCardV5 from '@/components/tdp/CollectionProductCardV5';
@@ -46,7 +46,15 @@ const PRODUCTS = [
   { route: 'terminator', name: 'TERMINATOR' },
   { route: 'the-dalek', name: 'THE DALEK' },
 ];
-const productAt = (rowIdx, colIdx) => PRODUCTS[(rowIdx * 4 + colIdx) % PRODUCTS.length];
+// Graella basada en el nombre de dissenys: tantes files com calguin per
+// mostrar tots els productes (4 columnes). Si la darrera fila queda
+// incompleta, es completa repetint des del principi (cap fila incompleta).
+const NUM_COLS = 4;
+const NUM_ROWS = Math.ceil(PRODUCTS.length / NUM_COLS);
+const TDP_GRID_COLORS_FLAT = TDP_GRID_COLORS.flat();
+const productAt = (rowIdx, colIdx) => PRODUCTS[(rowIdx * NUM_COLS + colIdx) % PRODUCTS.length];
+const colorAt = (rowIdx, colIdx) =>
+  TDP_GRID_COLORS_FLAT[(rowIdx * NUM_COLS + colIdx) % TDP_GRID_COLORS_FLAT.length];
 const productHref = (rowIdx, colIdx) => `/${COLLECTION_SLUG}/${productAt(rowIdx, colIdx).route}`;
 
 function colorToProductName(color) {
@@ -268,10 +276,9 @@ function ConstructorColleccioTheHumanInsidePage() {
             zIndex: 0,
           }}
         />
-        {[0, 1, 2, 3].flatMap((rowIdx) =>
+        {Array.from({ length: NUM_ROWS }).flatMap((_, rowIdx) =>
           [0, 1, 2, 3].map((colIdx) => {
-            const color = TDP_GRID_COLORS[rowIdx][colIdx];
-            if (!color) return null;
+            const color = colorAt(rowIdx, colIdx);
             const isV5 = (rowIdx + colIdx) % 2 === 1;
             const Card = isV5 ? CollectionProductCardV5 : CollectionProductCard;
             const col = colIdx + 1;
@@ -284,7 +291,8 @@ function ConstructorColleccioTheHumanInsidePage() {
                 productName={productAt(rowIdx, colIdx).name}
                 description={TDP_DESCRIPTION}
                 price="15,50€"
-                imageSrc={tdpImageFor('the-human-inside', productAt(rowIdx, colIdx).route, color)}
+                imageSrc={collectionGridImageFor('the-human-inside', productAt(rowIdx, colIdx).route, color, rowIdx * 4 + colIdx)}
+                hoverImages={collectionGridHoverVariantsFor('the-human-inside', productAt(rowIdx, colIdx).route, color, rowIdx * 4 + colIdx)}
                 imageAlt={`Samarreta Gildan 5000 ${color}`}
                 sizes={sizes}
                 selectedSize={selectedSize}
@@ -293,7 +301,7 @@ function ConstructorColleccioTheHumanInsidePage() {
                 onAddToCart={() => {}}
                 editableIdPrefix="constructor-colleccio-copy3-tdp-col2"
                 presetVersion="constructor-colleccio-copy3-tdp-cart-34-v9"
-                collectionHref={`${productHref(rowIdx, colIdx)}?color=${color}`}
+                collectionHref={`${productHref(rowIdx, colIdx)}?color=${color}&finish=${gridFinishFor('the-human-inside', color, rowIdx * 4 + colIdx)}`}
                 productNamePlain
                 editable={false}
               />
@@ -302,7 +310,9 @@ function ConstructorColleccioTheHumanInsidePage() {
         )}
       </Pauta4ColsOverlay>
 
-      <TramFinal />
+      <TramFinal
+        posterLines={[{ text: 'CADA' }, { text: 'HISTÒRIA TÉ' }, { text: 'UN DIBUIX' }]}
+      />
 
       <div
         className="font-mono text-neutral-800"

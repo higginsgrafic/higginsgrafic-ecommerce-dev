@@ -9,6 +9,7 @@ import CarouselArrows from '@/pages/nikeTambe/CarouselArrows';
 import Breadcrumbs from '@/components/Breadcrumbs';
 import EditableTextBox from '@/components/dev/EditableTextBox';
 import { useDebugOverlays } from '@/hooks/useDebugOverlays';
+import StoryPosterLink from '@/components/StoryPosterLink';
 
 const PDP_PRESET_VERSION = 'pdp-layout-2026-06-06-1953';
 
@@ -635,25 +636,7 @@ function ConstructorPdpPage() {
             justifyContent: 'center',
           }}
         >
-          <div
-            style={{
-              textAlign: 'left',
-              fontFamily: 'Oswald, sans-serif',
-              fontSize: '60pt',
-              fontWeight: 300,
-              lineHeight: 1.1,
-              letterSpacing: '0.04em',
-              textTransform: 'uppercase',
-              color: '#111827',
-            }}
-          >
-            <div>CADA</div>
-            <div>PERSONA TÉ</div>
-            <div>UNA HISTÒRIA,</div>
-            <div style={{ marginTop: '0.4em' }}>CADA</div>
-            <div>HISTÒRIA TÉ</div>
-            <div>UN DIBUIX</div>
-          </div>
+          <StoryPosterLink />
         </div>
 
         {/* ─── Fitxa tècnica (col 1, fila 3+) — estil TDP ─── */}
