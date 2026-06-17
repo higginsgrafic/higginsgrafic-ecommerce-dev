@@ -8,9 +8,8 @@ import EditableTextBox from '@/components/dev/EditableTextBox';
 import Pauta4ColsOverlay from '@/components/pauta/Pauta4ColsOverlay';
 import Breadcrumbs from '@/components/Breadcrumbs';
 import TramFinal from '@/components/home/TramFinal';
-import TambeRail from '@/pages/nikeTambe/TambeRail';
-import CarouselArrows from '@/pages/nikeTambe/CarouselArrows';
 import { buildHomeDrawingPlan } from '@/components/home/homeDrawings';
+import StoryPosterLink from '@/components/StoryPosterLink';
 
 const HERO_SLIDES = [
   {
@@ -161,6 +160,7 @@ function HomeClean() {
       imageAlt: `Samarreta ${item.color}`,
       overlaySrc: item.overlaySrc,
       overlayAlt: item.overlayAlt,
+      ...(item.hoverImages ? { hoverImages: item.hoverImages } : {}),
       ...(item.productHref ? { productHref: item.productHref } : {}),
       ...(item.overlayScale != null ? { overlayScale: item.overlayScale } : {}),
       ...(item.overlayTranslateY != null ? { overlayTranslateY: item.overlayTranslateY } : {}),
@@ -967,8 +967,8 @@ function HomeClean() {
               pautaEnabled={false}
               tableEnabled={false}
               numCols={4}
-              numRows={73}
-              canvasAspect={[2642, 5441]}
+              numRows={53}
+              canvasAspect={[2642, 3950]}
               topOffset="0px"
               bottomPadding="0px"
               innerRef={pautaGridRef}
@@ -987,88 +987,7 @@ function HomeClean() {
                   pointerEvents: 'auto',
                 }}
               >
-                <div
-                  style={{
-                    textAlign: 'left',
-                    fontFamily: 'Oswald, sans-serif',
-                    fontSize: '60pt',
-                    fontWeight: 300,
-                    lineHeight: 1.1,
-                    letterSpacing: '0.04em',
-                    textTransform: 'uppercase',
-                    color: '#111827',
-                  }}
-                >
-                  <div>CADA</div>
-                  <div>PERSONA TÉ</div>
-                  <div>UNA HISTÒRIA,</div>
-                  <div style={{ marginTop: '0.4em' }}>CADA</div>
-                  <div>HISTÒRIA TÉ</div>
-                  <div>UN DIBUIX</div>
-                </div>
-              </div>
-
-              {/* Subtítol "ALTRES HISTÒRIES" (Fila local 45 / 46 - correspon a global 245 / 246) */}
-              <div
-                style={{
-                  gridColumn: '1 / 3',
-                  gridRow: '45 / 46',
-                  alignSelf: 'center',
-                  fontFamily: 'Roboto Condensed, sans-serif',
-                  fontWeight: 400,
-                  fontSize: '15pt',
-                  lineHeight: 1.2,
-                  letterSpacing: '0.2em',
-                  textTransform: 'uppercase',
-                  color: 'rgba(71, 80, 89, 0.7)',
-                  textAlign: 'left',
-                  pointerEvents: 'auto',
-                  transform: 'translate(2px, 5px)', // Baixat 5px per alinear amb la fila (2px dreta)
-                }}
-              >
-                ALTRES HISTÒRIES
-              </div>
-
-              {/* Fletxes També et pot interessar (Fila local 45 / 46 - correspon a global 245 / 246) */}
-              <div
-                style={{
-                  gridColumn: '4 / 5',
-                  gridRow: '45 / 46',
-                  position: 'relative',
-                  width: '100%',
-                  height: '100%',
-                  minHeight: 0,
-                  pointerEvents: 'auto',
-                  transform: 'translateY(6px)', // Baixat 6px (només vertical)
-                }}
-              >
-                <CarouselArrows
-                  rightPx={0}
-                  centerVertically
-                  onPrev={() => {
-                    console.log('Dispatching tambe-rail:prev');
-                    window.dispatchEvent(new CustomEvent('tambe-rail:prev'));
-                  }}
-                  onNext={() => {
-                    console.log('Dispatching tambe-rail:next');
-                    window.dispatchEvent(new CustomEvent('tambe-rail:next'));
-                  }}
-                  rowHeight={rowHeight}
-                />
-              </div>
-
-              {/* També et pot interessar Rail (Fila local 43 / 60 - correspon a global 243 / 260) */}
-              <div
-                style={{
-                  gridColumn: '1 / 5',
-                  gridRow: '43 / 60',
-                  alignSelf: 'start',
-                  width: '100%',
-                  marginTop: '-41px', // Mogut 2px amunt (abans -39px)
-                  pointerEvents: 'auto',
-                }}
-              >
-                <TambeRail cardHref="/constructor/pdp" title="cada dibuix té una història" showInternalArrows={false} showTitle={false} />
+                <StoryPosterLink />
               </div>
             </Pauta4ColsOverlay>
           </div>

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import EditableTextBox from '@/components/dev/EditableTextBox';
 
@@ -132,11 +132,35 @@ function TdpConstructorProduct({
   overlayTranslateX = '0%',
   overlayTranslateY = '-9%',
   overlayOpacity = 1,
+  hoverImages,
+  hoverIntervalMs = 700,
 }) {
   const [sizeButtonTextSettings, setSizeButtonTextSettings] = useState(TDP_SIZE_BUTTON_TEXT_SETTINGS);
   const [cartSizeSettings, setCartSizeSettings] = useState(TDP_CART_SIZE_SETTINGS);
   const [nameHovered, setNameHovered] = useState(false);
   const columnCount = sizes.length;
+
+  // Carrusel de variants en hover: mentre el cursor és sobre la imatge, va
+  // rotant per `hoverImages`. En sortir, torna a la imatge original.
+  const variantImages = Array.isArray(hoverImages) ? hoverImages.filter(Boolean) : [];
+  const canCarousel = variantImages.length > 1;
+  const [variantIdx, setVariantIdx] = useState(0);
+  const carouselTimer = useRef(null);
+  const stopCarousel = () => {
+    if (carouselTimer.current) {
+      clearInterval(carouselTimer.current);
+      carouselTimer.current = null;
+    }
+    setVariantIdx(0);
+  };
+  const startCarousel = () => {
+    if (!canCarousel || carouselTimer.current) return;
+    carouselTimer.current = setInterval(() => {
+      setVariantIdx((i) => (i + 1) % variantImages.length);
+    }, hoverIntervalMs);
+  };
+  useEffect(() => stopCarousel, []); // eslint-disable-line react-hooks/exhaustive-deps
+  const shownImageSrc = canCarousel ? variantImages[variantIdx] : imageSrc;
   // Enllaç dels elements clicables de la fitxa (imatge + nom): prioritza la
   // pàgina de producte (productHref) i, si no n'hi ha, cau a la col·lecció.
   const linkHref = productHref || collectionHref;
@@ -181,6 +205,8 @@ function TdpConstructorProduct({
   return (
     <>
       <div
+        onMouseEnter={canCarousel ? startCarousel : undefined}
+        onMouseLeave={canCarousel ? stopCarousel : undefined}
         style={{
           gridColumn,
           gridRow: imageGridRow ?? (variant === 'v4' ? `${8 + rowOffset} / ${18 + rowOffset}` : `${1 + rowOffset} / ${12 + rowOffset}`),
@@ -205,7 +231,7 @@ function TdpConstructorProduct({
         {linkHref ? (
           <Link to={linkHref} target="_blank" rel="noopener noreferrer" style={{ display: 'contents', textDecoration: 'none', color: 'inherit' }}>
             <img
-              src={imageSrc}
+              src={shownImageSrc}
               alt={imageAlt}
               style={{
                 display: 'block',
@@ -228,7 +254,7 @@ function TdpConstructorProduct({
           </Link>
         ) : (
           <img
-            src={imageSrc}
+            src={shownImageSrc}
             alt={imageAlt}
             style={{
               display: 'block',

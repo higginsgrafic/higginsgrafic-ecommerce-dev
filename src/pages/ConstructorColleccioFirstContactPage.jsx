@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { Helmet } from 'react-helmet';
 import Pauta4ColsOverlay from '@/components/pauta/Pauta4ColsOverlay';
-import { tdpImageFor } from '@/lib/pdpMockup';
+import { collectionGridImageFor, gridFinishFor, collectionGridHoverVariantsFor } from '@/lib/pdpMockup';
 import NikeHeroSlider from '@/components/NikeHeroSlider';
 import CollectionProductCard from '@/components/tdp/CollectionProductCard';
 import CollectionProductCardV5 from '@/components/tdp/CollectionProductCardV5';
@@ -274,7 +274,8 @@ function ConstructorColleccioFirstContactPage() {
                 productName={productAt(rowIdx, colIdx).name}
                 description={TDP_DESCRIPTION}
                 price="15,50€"
-                imageSrc={tdpImageFor('first-contact', productAt(rowIdx, colIdx).route, color)}
+                imageSrc={collectionGridImageFor('first-contact', productAt(rowIdx, colIdx).route, color, rowIdx * 4 + colIdx)}
+                hoverImages={collectionGridHoverVariantsFor('first-contact', productAt(rowIdx, colIdx).route, color, rowIdx * 4 + colIdx)}
                 imageAlt={`Samarreta Gildan 5000 ${color}`}
                 sizes={sizes}
                 selectedSize={selectedSize}
@@ -283,7 +284,7 @@ function ConstructorColleccioFirstContactPage() {
                 onAddToCart={() => {}}
                 editableIdPrefix="constructor-colleccio-copy2-tdp-col2"
                 presetVersion="constructor-colleccio-copy2-tdp-cart-34-v9"
-                collectionHref={`${productHref(rowIdx, colIdx)}?color=${color}`}
+                collectionHref={`${productHref(rowIdx, colIdx)}?color=${color}&finish=${gridFinishFor('first-contact', color, rowIdx * 4 + colIdx)}`}
                 productNamePlain
                 editable={false}
               />
@@ -292,7 +293,9 @@ function ConstructorColleccioFirstContactPage() {
         )}
       </Pauta4ColsOverlay>
 
-      <TramFinal />
+      <TramFinal
+        posterLines={[{ text: 'CADA' }, { text: 'PERSONA TÉ' }, { text: 'UNA HISTÒRIA' }]}
+      />
 
       <div
         className="font-mono text-neutral-800"

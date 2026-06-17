@@ -23,11 +23,9 @@ import CarouselArrows from '@/pages/nikeTambe/CarouselArrows';
 //    - marginTop:     marge superior del bloc (per encaixar dins la pauta global).
 // =============================================================================
 
-const DEFAULT_POSTER_LINES = [
-  { text: 'ROBA' },
-  { text: 'QUE ET' },
-  { text: 'PARLA' },
-];
+// Sense frase per defecte: cada col·lecció ha de passar el seu `posterLines`.
+// Així cada frase apareix només a una sola col·lecció.
+const DEFAULT_POSTER_LINES = [];
 
 const TramFinal = forwardRef(function TramFinal(
   {
@@ -58,6 +56,10 @@ const TramFinal = forwardRef(function TramFinal(
         transform: 'translateX(-50%)',
         width: 'calc(var(--hg-tdp-xR) - var(--hg-tdp-xL))',
         boxSizing: 'border-box',
+        // El bloc puja amb marginTop negatiu i encavalca la darrera fila de la
+        // graella de col·lecció. Deixem passar el ratolí per la zona buida
+        // (els fills interactius reactiven pointerEvents:'auto').
+        pointerEvents: 'none',
         ...style,
       }}
     >

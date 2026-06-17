@@ -19,6 +19,7 @@
  */
 
 import { getMockupPath } from '@/lib/mockupPaths';
+import { collectionGridHoverVariantsFor } from '@/lib/pdpMockup';
 
 const STRIPE_BASE = '/custom_logos/drawings/images_stripe';
 
@@ -96,9 +97,10 @@ const crosswordGroup = (n) => {
   return undefined;
 };
 
-// Quotes que tenen mockup pre-composat al disc.
+// Quotes que tenen mockup pre-composat al disc (austen/cites/quotes).
 const AUSTEN_QUOTES_WITH_MOCKUP = new Set([
-  'half-agony-half-hope', 'it-is-a-truth',
+  'half-agony-half-hope', 'i-admire-and-love-you', 'it-is-a-truth',
+  'unsociable-and-taciturn', 'you-have-bewitched-me',
 ]);
 
 // Mapeig de frame-color (catalàn del disc) per a LFMD.
@@ -125,9 +127,10 @@ const AUSTEN = [
   bw('austen', 'keep-calm', 'austen/keep_calm', { collection: 'austen-keep-calm', design: 'keep-calm' }),
   // pemberley_house (negre + blanc + multi al disc)
   bw('austen', 'pemberley-house', 'austen/pemberley_house', { collection: 'austen-pemberley', design: 'pemberley-house' }),
-  // quotes (negre + blanc; només les que tenen parella b/w)
+  // quotes (negre + blanc) — totes tenen mockup pre-composat a austen/cites/quotes
   ...[
-    'body-and-soul', 'half-agony-half-hope', 'it-is-a-truth', 'you-must-allow-me',
+    'half-agony-half-hope', 'i-admire-and-love-you', 'it-is-a-truth',
+    'unsociable-and-taciturn', 'you-have-bewitched-me',
   ].map((n) => bw('austen', n, 'austen/quotes',
     AUSTEN_QUOTES_WITH_MOCKUP.has(n) ? { collection: 'austen-quotes', design: `quotes-${n}` } : undefined)),
   // looking_for_my_darcy (NOMÉS color) — design = `looking-for-my-darcy-<variant>`.
@@ -256,6 +259,9 @@ const DRAWING_LABELS = {
   'austen/body-and-soul': 'Body and Soul',
   'austen/half-agony-half-hope': 'Half Agony, Half Hope',
   'austen/it-is-a-truth': 'It is a Truth',
+  'austen/i-admire-and-love-you': 'I Admire and Love You',
+  'austen/unsociable-and-taciturn': 'Unsociable and Taciturn',
+  'austen/you-have-bewitched-me': 'You Have Bewitched Me',
   'austen/you-must-allow-me': 'You Must Allow Me',
 };
 
@@ -301,6 +307,14 @@ const PRODUCT_HREF = {
   'cube/darth-cube-stripe': '/cube/darth-cube',
   'cube/cube-3-p0-stripe': '/cube/3cube-p0',
   'cube/cyber-cube-stripe': '/cube/cybercube',
+  // Austen
+  'austen/keep-calm': '/austen/keep-calm',
+  'austen/pemberley-house': '/austen/pemberley-house',
+  'austen/half-agony-half-hope': '/austen/quotes-half-agony-half-hope',
+  'austen/i-admire-and-love-you': '/austen/quotes-i-admire-and-love-you',
+  'austen/it-is-a-truth': '/austen/quotes-it-is-a-truth',
+  'austen/unsociable-and-taciturn': '/austen/quotes-unsociable-and-taciturn',
+  'austen/you-have-bewitched-me': '/austen/quotes-you-have-bewitched-me',
   // Miscel·lània
   'miscellania/pont-del-diable': '/miscellania/pont-del-diable',
   'miscellania/dj-vader': '/miscellania/dj-vader',
@@ -385,7 +399,7 @@ export function buildHomeDrawingPlan({ perCollection = 3, rng = Math.random } = 
       }
       picks.push(drawing);
     }
-    plan[slug] = picks.map((drawing) => {
+    plan[slug] = picks.map((drawing, i) => {
       const color = nextColor();
       const isDark = DARK_COLORS.has(color);
       // Si el dibuix té mockup pre-composat al disc, l'usem com a `mockupSrc`
@@ -393,6 +407,15 @@ export function buildHomeDrawingPlan({ perCollection = 3, rng = Math.random } = 
       // Si no, mantenim el sistema actual: samarreta blanca + overlay.
       const precomposed = resolvePrecomposedMockup(drawing, color, isDark);
       const usePrecomposed = Boolean(precomposed);
+      // Carrusel de variants en hover: només per als mockups pre-composats
+      // (els basats en overlay no es poden recolorir només canviant la imatge).
+      // Forcem que la imatge mostrada (precomposed) sigui la primera del cicle.
+      let hoverImages;
+      if (usePrecomposed && drawing.mockup) {
+        const { collection, design } = drawing.mockup;
+        const variants = collectionGridHoverVariantsFor(collection, design, color, i);
+        hoverImages = [precomposed, ...variants.filter((u) => u && u !== precomposed)];
+      }
       return {
         color,
         productName: drawingLabel(drawing),
@@ -400,6 +423,7 @@ export function buildHomeDrawingPlan({ perCollection = 3, rng = Math.random } = 
         mockupSrc: usePrecomposed ? precomposed : shirtMockupSrc(color),
         overlaySrc: usePrecomposed ? null : resolveOverlaySrc(drawing, isDark),
         overlayAlt: drawing.id,
+        ...(hoverImages && hoverImages.length > 1 ? { hoverImages } : {}),
         // Ajustos de mida per dibuix concret (overlayScale per defecte = 0.345);
         // s'ignoren si usem mockup pre-composat.
         overlayScale: usePrecomposed ? undefined : resolveOverlayScale(drawing),

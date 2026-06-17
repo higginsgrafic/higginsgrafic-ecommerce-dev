@@ -107,7 +107,7 @@ export const COLLECTIONS = {
     // Cada disseny viu a la seva pròpia subcarpeta: miscellania/<design_>
     dirFor: (design) => `miscellania/${toDir(design)}`,
     inks: [INK_BLACK, INK_WHITE, INK_MULTI],
-    extFor: { 'death-star2d2': 'png', 'dj-vader': 'png' },
+    extFor: { 'death-star2d2': 'png' },
     designs: [
       'arthur-d-the-second',
       'death-star2d2',
