@@ -2,6 +2,9 @@ import React from 'react';
 import MegaColumn from './MegaColumn.jsx';
 
 function MegaStripePanel({
+  hideGrid,
+  reserveGridSpace,
+  stripeImageSrc,
   active,
   resolvedMega,
   showStripe,
@@ -41,46 +44,51 @@ function MegaStripePanel({
 }) {
   return (
     <div className="w-full shrink-0">
-      <div
-        className="relative z-10 grid grid-cols-1 gap-10"
-        style={{
-          transform: 'scale(var(--hgGridFitScale, 0.94))',
-          transformOrigin: 'top center',
-        }}
-      >
-        {(resolvedMega[active] || []).map((col, idx) => (
-          <MegaColumn
-            key={`${active}-${idx}`}
-            title={col.title}
-            isFirstContact={active === 'first_contact' || active === 'austen' || active === 'cube' || active === 'miscellania'}
-            isHumanInside={active === 'the_human_inside'}
-            collectionId={active}
-            disableMulti={active === 'austen' && austenSelectedDisableMulti}
-            stripeVariantVisibility={stripeVariantVisibility}
-            megaTileSelectorParams={megaTileSelectorParams}
-            onStartSelectorDrag={onStartSelectorDrag}
-            megaTileSize={megaTileSize}
-            humanInsideVariant={humanInsideVariant}
-            items={active === 'austen' ? reorderAustenQuotes(col.items) : col.items}
-            row={true}
-            firstContactVariant={firstContactVariant}
-            onFirstContactWhite={() => { setStripeOverlayOverrideActive(false); setFirstContactVariant('white'); }}
-            onFirstContactBlack={() => { setStripeOverlayOverrideActive(false); setFirstContactVariant('black'); }}
-            onFirstContactMulti={() => { setStripeOverlayOverrideActive(false); setFirstContactVariant('color'); }}
-            onHumanWhite={() => { setStripeOverlayOverrideActive(false); setHumanInsideVariant('white'); }}
-            onHumanBlack={() => { setStripeOverlayOverrideActive(false); setHumanInsideVariant('black'); }}
-            onHumanMulti={() => { setStripeOverlayOverrideActive(false); setHumanInsideVariant('color'); }}
-            onHumanPrev={() => setThinStartIndex((v) => v - 1)}
-            onHumanNext={() => setThinStartIndex((v) => v + 1)}
-            onSelectItem={(it) => {
-              setStripeOverlayOverrideActive(false);
-              if (active === 'first_contact') setFirstContactSelectedItem(it);
-              else if (active === 'the_human_inside') setHumanInsideSelectedItem(it);
-              else setSelectedItemByCollection((prev) => ({ ...prev, [active]: it }));
-            }}
-          />
-        ))}
-      </div>
+      {!hideGrid || reserveGridSpace ? (
+        <div
+          className="relative z-10 grid grid-cols-1 gap-10"
+          style={{
+            transform: 'scale(var(--hgGridFitScale, 0.94))',
+            transformOrigin: 'top center',
+            visibility: reserveGridSpace ? 'hidden' : undefined,
+            pointerEvents: reserveGridSpace ? 'none' : undefined,
+          }}
+          aria-hidden={reserveGridSpace ? true : undefined}
+        >
+          {(resolvedMega[active] || []).map((col, idx) => (
+            <MegaColumn
+              key={`${active}-${idx}`}
+              title={col.title}
+              isFirstContact={active === 'first_contact' || active === 'austen' || active === 'cube' || active === 'miscellania'}
+              isHumanInside={active === 'the_human_inside'}
+              collectionId={active}
+              disableMulti={active === 'austen' && austenSelectedDisableMulti}
+              stripeVariantVisibility={stripeVariantVisibility}
+              megaTileSelectorParams={megaTileSelectorParams}
+              onStartSelectorDrag={onStartSelectorDrag}
+              megaTileSize={megaTileSize}
+              humanInsideVariant={humanInsideVariant}
+              items={active === 'austen' ? reorderAustenQuotes(col.items) : col.items}
+              row={true}
+              firstContactVariant={firstContactVariant}
+              onFirstContactWhite={() => { setStripeOverlayOverrideActive(false); setFirstContactVariant('white'); }}
+              onFirstContactBlack={() => { setStripeOverlayOverrideActive(false); setFirstContactVariant('black'); }}
+              onFirstContactMulti={() => { setStripeOverlayOverrideActive(false); setFirstContactVariant('color'); }}
+              onHumanWhite={() => { setStripeOverlayOverrideActive(false); setHumanInsideVariant('white'); }}
+              onHumanBlack={() => { setStripeOverlayOverrideActive(false); setHumanInsideVariant('black'); }}
+              onHumanMulti={() => { setStripeOverlayOverrideActive(false); setHumanInsideVariant('color'); }}
+              onHumanPrev={() => setThinStartIndex((v) => v - 1)}
+              onHumanNext={() => setThinStartIndex((v) => v + 1)}
+              onSelectItem={(it) => {
+                setStripeOverlayOverrideActive(false);
+                if (active === 'first_contact') setFirstContactSelectedItem(it);
+                else if (active === 'the_human_inside') setHumanInsideSelectedItem(it);
+                else setSelectedItemByCollection((prev) => ({ ...prev, [active]: it }));
+              }}
+            />
+          ))}
+        </div>
+      ) : null}
 
       {showStripe ? (
         <div
@@ -224,7 +232,7 @@ function MegaStripePanel({
                 >
                   {megaStripeSpriteEnabledLocal ? (
                     <img
-                      src="/placeholders/t-shirt_buttons/v5/full-color-stripe-5.webp"
+                      src={stripeImageSrc || '/placeholders/t-shirt_buttons/v5/full-color-stripe-5.webp'}
                       alt=""
                       className="block"
                       style={{
