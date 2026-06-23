@@ -3030,56 +3030,55 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
                         flex: '1 1 auto',
                       }} />
 
-                      <div style={{ 
-                        flex: '0 0 auto', 
-                        width: 'var(--hg-mega-w, min(1350px, calc(100vw - 32px)))', 
-                        maxWidth: 'none', 
-                        position: 'relative', 
-                        height: '100%', 
-                        paddingLeft: '0px', 
+                      <div style={{
+                        flex: '0 0 auto',
+                        width: 'var(--hg-mega-w, min(1350px, calc(100vw - 32px)))',
+                        maxWidth: 'none',
+                        position: 'relative',
+                        height: '100%',
+                        paddingLeft: '0px',
                         paddingRight: '0px',
-                        display: 'flex',
-                        flexDirection: 'column',
-                        gap: '16px',
                       }}>
-                        <div style={{ 
-                          width: '100%', 
-                          height: '40px',
-                          backgroundColor: '#B2B2B2',
-                          display: 'flex',
-                          alignItems: 'center',
-                          paddingLeft: '16px',
-                          paddingRight: '16px',
-                        }}>
-                          <input
-                            value={searchQuery}
-                            onChange={(e) => {
-                              setSearchQuery(e.target.value);
-                              touchMegaPublicActivity();
-                            }}
-                            placeholder="Busca productes…"
-                            className="w-full bg-transparent outline-none text-sm font-semibold text-white placeholder:text-white/70"
-                            style={{ color: 'white' }}
-                          />
-                        </div>
-
-                        <div style={{ 
-                          display: 'grid',
-                          gridTemplateColumns: 'repeat(9, 1fr)',
-                          gap: '16px',
-                          flex: 1,
-                        }}>
-                          {[...Array(9)].map((_, i) => (
-                            <div
-                              key={i}
-                              style={{
-                                backgroundColor: '#B2B2B2',
-                                transform: (i === 1 || i === 3 || i === 5 || i === 7) ? 'scale(0.9)' : 'none',
-                                transformOrigin: 'top center',
-                              }}
-                            />
-                          ))}
-                        </div>
+                        <MegaStripePanel
+                          active={active}
+                          reserveGridSpace
+                          stripeImageSrc="/placeholders/cercador/full-white-stripe.jpg"
+                          resolvedMega={resolvedMega}
+                          showStripe={showStripe}
+                          stripeRowPadPx={stripeRowPadPx}
+                          stripeRowPadXPx={stripeRowPadXPx}
+                          stripePreviewHPx={stripePreviewHPx}
+                          stripeOverlayLoadState={stripeOverlayLoadState}
+                          resolvedOverlaySrc={resolvedOverlaySrc}
+                          stripeOverlayDebug={stripeOverlayDebug}
+                          stripeMaskDebugRectsPct={stripeMaskDebugRectsPct}
+                          megaStripeSpriteEnabledLocal={megaStripeSpriteEnabledLocal}
+                          megaStripeRefEnabledLocal={megaStripeRefEnabledLocal}
+                          megaStripeRefSrcLocal={megaStripeRefSrcLocal}
+                          megaStripeRef2EnabledLocal={megaStripeRef2EnabledLocal}
+                          megaStripeRef2SrcLocal={megaStripeRef2SrcLocal}
+                          megaShirtDrawingEnabledLocal={megaShirtDrawingEnabledLocal}
+                          drawingOverlaySrcEffective={drawingOverlaySrcEffective}
+                          stripeMaskTileRectsRawPct={stripeMaskTileRectsRawPct}
+                          drawingOverlayDebug={drawingOverlayDebug}
+                          tileGapPxLocal={tileGapPxLocal}
+                          humanInsideVariant={humanInsideVariant}
+                          firstContactVariant={firstContactVariant}
+                          reorderAustenQuotes={reorderAustenQuotes}
+                          austenSelectedDisableMulti={austenSelectedDisableMulti}
+                          stripeVariantVisibility={stripeVariantVisibility}
+                          megaTileSelectorParams={megaTileSelectorParams}
+                          onStartSelectorDrag={onStartSelectorDrag}
+                          megaTileSize={megaTileSize}
+                          setStripeOverlayOverrideActive={setStripeOverlayOverrideActive}
+                          setFirstContactVariant={setFirstContactVariant}
+                          setHumanInsideVariant={setHumanInsideVariant}
+                          setThinStartIndex={setThinStartIndex}
+                          setFirstContactSelectedItem={setFirstContactSelectedItem}
+                          setHumanInsideSelectedItem={setHumanInsideSelectedItem}
+                          setSelectedItemByCollection={setSelectedItemByCollection}
+                          normalizeOverlaySrc={normalizeOverlaySrc}
+                        />
                       </div>
 
                       <div style={{ 
