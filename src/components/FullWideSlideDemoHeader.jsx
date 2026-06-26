@@ -46,6 +46,8 @@ import MegaColumn, {
 } from './fullwide/MegaColumn.jsx';
 import UserComandesContent from './fullwide/UserComandesContent.jsx';
 import MegaStripePanel from './fullwide/MegaStripePanel.jsx';
+import CercadorTopBar, { CERCADOR_COLORS } from './fullwide/CercadorTopBar.jsx';
+import CercadorTextRow from './fullwide/CercadorTextRow.jsx';
 import CistellComandaContent from './fullwide/CistellComandaContent.jsx';
 import useMegaPublicIdleReset from '@/hooks/useMegaPublicIdleReset';
 import useUrlActiveCollection from '@/hooks/useUrlActiveCollection';
@@ -277,6 +279,99 @@ export default function FullWideSlideDemoHeader({
   const [firstContactSelectedItem, setFirstContactSelectedItem] = useState(null);
   const [humanInsideSelectedItem, setHumanInsideSelectedItem] = useState(null);
   const [selectedItemByCollection, setSelectedItemByCollection] = useState({});
+  const [cercadorSelectedColor, setCercadorSelectedColor] = useState('white');
+  const [hoveredStripeItem, setHoveredStripeItem] = useState(null);
+  const [hoveredStripeItemCollection, setHoveredStripeItemCollection] = useState(null);
+  const [austenSubcollection, setAustenSubcollection] = useState(null);
+
+  const resolvePdpUrl = useCallback((collection, item) => {
+    if (typeof item !== 'string') return null;
+    const s = item.toLowerCase().replace(/[\u2010\u2011\u2012\u2013\u2014\u2212]/g, '-').replace(/\s+/g, '-');
+
+    if (collection === 'first_contact') {
+      const map = {
+        'nx-01': 'nx-01', 'ncc-1701': 'ncc-1701', 'ncc-1701-d': 'ncc-1701-d',
+        'wormhole': 'wormhole', 'the phoenix': 'the-phoenix',
+        "vulcan's end": 'vulcans-end', 'plasma escape': 'plasma-escape',
+      };
+      const slug = map[s] || s;
+      return `/first-contact/${slug}`;
+    }
+    if (collection === 'the_human_inside') {
+      const map = {
+        'r2-d2': 'r2-d2', 'c3p0': 'c3-p0', 'c3-p0': 'c3-p0',
+        'vader': 'vader', 'afrodita': 'afrodita', 'afrodita-a': 'afrodita',
+        'mazinger': 'mazinger', 'mazinger-z': 'mazinger',
+        'cylon 78': 'cylon-78', 'cylon 03': 'cylon-03',
+        'iron man 68': 'ironman-68', 'iron man 08': 'ironman-08',
+        'cyberman': 'cyberman', 'maschinenmensch': 'maschinenmensch',
+        'robocop': 'robocop', 'the dalek': 'the-dalek',
+        'robbie the robot': 'robbie-the-robot', 'robby the robot': 'robbie-the-robot',
+        'terminator': 'terminator',
+      };
+      const slug = map[s] || s;
+      return `/the-human-inside/${slug}`;
+    }
+    if (collection === 'cube') {
+      const map = {
+        'iron kong': 'ironkong', 'iron cube 68': 'ironman-68',
+        'robocube': 'robocube', 'cylon cube 03': 'cylon-cube',
+        'maschinencube': 'maschinencube', 'mazinger c': 'mazinger-c',
+        'afrodita c': 'afrodita-c', 'cube 3 p0': '3cube-p0',
+        'cyber cube': 'cybercube', 'darth cube': 'darth-cube',
+      };
+      const slug = map[s] || s;
+      return `/cube/${slug}`;
+    }
+    if (collection === 'miscellania') {
+      const map = {
+        'dj vader': 'dj-vader', 'dj-vader': 'dj-vader',
+        'death star2d2': 'death-star2d2', 'death-star2d2': 'death-star2d2',
+        'pont del diable': 'pont-del-diable', 'pont-del-diable': 'pont-del-diable',
+        'arthur d the second': 'arthur-d-the-second',
+        'r2d2 quote': 'r2d2-quote',
+      };
+      const slug = map[s] || s;
+      return `/miscellania/${slug}`;
+    }
+    if (collection === 'austen') {
+      if (s.includes('/austen/pemberley_house/')) return '/austen/pemberley-house';
+      if (s.includes('/austen/keep_calm/')) return '/austen/keep-calm';
+      if (s.includes('/austen/quotes/')) {
+        const slug = s.split('/austen/quotes/')[1].replace(/-b-grid\.webp$/, '').replace(/\.webp$/, '');
+        const map = {
+          'it-is-a-truth': 'quotes-it-is-a-truth',
+          'you-must-allow-me': 'quotes-you-have-bewitched-me',
+          'body-and-soul': 'quotes-i-admire-and-love-you',
+          'unsociable-and-taciturn': 'quotes-unsociable-and-taciturn',
+          'half-agony-half-hope': 'quotes-half-agony-half-hope',
+        };
+        return `/austen/${map[slug] || slug}`;
+      }
+      if (s.includes('/austen/crosswords/')) {
+        const m = s.match(/(persuasion|pride-and-prejudice|sense-and-sensibility)-(\d)/);
+        if (m) return `/austen/${m[1]}-${m[2]}`;
+      }
+      if (s.includes('/austen/looking_for_my_darcy/')) {
+        const m = s.match(/(blue|fuchsia|red|yellow)-(solid|frame)/);
+        if (m) {
+          const colorMap = { fuchsia: 'pink' };
+          const c = colorMap[m[1]] || m[1];
+          if (m[2] === 'solid') return `/austen/looking-for-my-darcy-${c}-solid`;
+          if (m[2] === 'frame') {
+            const frameMap = {
+              'blue-frame': 'yellow-blue-frame',
+              'fuchsia-frame': 'yellow-pink-frame',
+              'red-frame': 'red-yellow-frame',
+            };
+            return `/austen/looking-for-my-darcy-${frameMap[`${m[1]}-frame`] || `${c}-frame`}`;
+          }
+        }
+      }
+    }
+    return null;
+  }, []);
+
   const [active, setActive] = useState(() => {
     try {
       const p = new URLSearchParams(location.search);
@@ -302,6 +397,10 @@ export default function FullWideSlideDemoHeader({
   const activeRef = useRef(active);
   useEffect(() => {
     activeRef.current = active;
+  }, [active]);
+
+  useEffect(() => {
+    if (active !== 'austen') setAustenSubcollection(null);
   }, [active]);
 
   useEffect(() => {
@@ -539,6 +638,17 @@ export default function FullWideSlideDemoHeader({
 
   const [firstContactVariant, setFirstContactVariant] = useState(() => readStripeVariantFromUrl() || 'black');
   const [humanInsideVariant, setHumanInsideVariant] = useState(() => readStripeVariantFromUrl() || 'black');
+
+  const onShirtClick = useCallback((collection, item, color) => {
+    const url = resolvePdpUrl(collection, item);
+    if (url) {
+      const matched = CERCADOR_COLORS.find((c) => c.hex === color);
+      const colorSlug = matched?.slug || cercadorSelectedColor || 'white';
+      const variant = collection === 'the_human_inside' ? humanInsideVariant : firstContactVariant;
+      navigate(`${url}?color=${colorSlug}&variant=${variant}`);
+    }
+  }, [navigate, resolvePdpUrl, cercadorSelectedColor, firstContactVariant, humanInsideVariant]);
+
   const [selectedColorSlug, setSelectedColorSlug] = useState('white');
   const [thinStartIndex, setThinStartIndex] = useState(0);
   const [gildan5000Catalog, setGildan5000Catalog] = useState(null);
@@ -589,6 +699,7 @@ export default function FullWideSlideDemoHeader({
         const s = typeof key === 'string' ? key.toLowerCase() : '';
         if (s.includes('/austen/crosswords/')) return { white: true, black: true, color: false };
         if (s.includes('/austen/pemberley_house/')) return { white: true, black: true, color: false };
+        if (s.includes('/austen/quotes/')) return { white: true, black: true, color: false };
         if (s.includes('/austen/looking_for_my_darcy/')) return { white: false, black: false, color: true };
         return { white: true, black: true, color: true };
       }
@@ -620,6 +731,20 @@ export default function FullWideSlideDemoHeader({
     } catch {
     }
   }, [active, stripeVariantVisibility, firstContactVariant]);
+
+  useEffect(() => {
+    // Evitar blanc sobre blanc i negre sobre negre: si la variant activa queda
+    // deshabilitada pel color de samarreta, canviar a una variant visible.
+    const fixVariant = (variant) => {
+      if (cercadorSelectedColor === 'white' && variant === 'white') return 'black';
+      if (cercadorSelectedColor === 'black' && variant === 'black') return 'white';
+      return null;
+    };
+    const fcFix = fixVariant(firstContactVariant);
+    if (fcFix) setFirstContactVariant(fcFix);
+    const hiFix = fixVariant(humanInsideVariant);
+    if (hiFix) setHumanInsideVariant(hiFix);
+  }, [cercadorSelectedColor, firstContactVariant, humanInsideVariant]);
 
   useEffect(() => {
     if (!import.meta.env.DEV) return;
@@ -737,8 +862,8 @@ export default function FullWideSlideDemoHeader({
           : lower.includes('-w-stripe')
             ? 'white'
             : (lower.includes('multi') || lower.includes('-multi-'))
-              ? 'multi'
-              : 'multi';
+              ? 'color'
+              : 'color';
         return `/custom_logos/drawings/images_stripe/austen/keep_calm/${folder}/${file}`;
       }
     } catch {
@@ -774,25 +899,33 @@ export default function FullWideSlideDemoHeader({
     };
     const isPathItem = (it) => typeof it === 'string' && /\.(png|jpg|jpeg|webp)$/i.test(it);
 
+    // Hover preview: override selected item with hovered item when applicable
+    const effFirstContact = (hoveredStripeItem && hoveredStripeItemCollection === 'first_contact')
+      ? hoveredStripeItem : firstContactSelectedItem;
+    const effHumanInside = (hoveredStripeItem && hoveredStripeItemCollection === 'the_human_inside')
+      ? hoveredStripeItem : humanInsideSelectedItem;
+    const effSelectedItemByCollection = (hoveredStripeItem && hoveredStripeItemCollection === active && active !== 'first_contact' && active !== 'the_human_inside')
+      ? { ...selectedItemByCollection, [active]: hoveredStripeItem } : selectedItemByCollection;
+
     if (stripeOverlayOverrideActive && overlaySrcFromUrl) {
       return overlaySrcFromUrl;
     }
 
-    if (active === 'first_contact' && firstContactSelectedItem) {
+    if (active === 'first_contact' && effFirstContact) {
       if (firstContactVariant === 'white') {
-        return FIRST_CONTACT_MEDIA_WHITE[firstContactSelectedItem]
-          || FIRST_CONTACT_MEDIA[firstContactSelectedItem]
+        return FIRST_CONTACT_MEDIA_WHITE[effFirstContact]
+          || FIRST_CONTACT_MEDIA[effFirstContact]
           || null;
       }
       if (firstContactVariant === 'color') {
-        return FIRST_CONTACT_MEDIA_COLOR[firstContactSelectedItem]
-          || FIRST_CONTACT_MEDIA[firstContactSelectedItem]
+        return FIRST_CONTACT_MEDIA_COLOR[effFirstContact]
+          || FIRST_CONTACT_MEDIA[effFirstContact]
           || null;
       }
-      return FIRST_CONTACT_MEDIA[firstContactSelectedItem] || null;
+      return FIRST_CONTACT_MEDIA[effFirstContact] || null;
     }
-    if (active === 'the_human_inside' && humanInsideSelectedItem) {
-      const key = normalizeKeyLocal(humanInsideSelectedItem).toLowerCase();
+    if (active === 'the_human_inside' && effHumanInside) {
+      const key = normalizeKeyLocal(effHumanInside).toLowerCase();
       const mapBlack = {
         'r2-d2': 'r2-d2-b-stripe.webp',
         c3p0: 'c3-p0-b-stripe.webp',
@@ -880,11 +1013,11 @@ export default function FullWideSlideDemoHeader({
         }
       }
       if (!file) return null;
-      const folder = isColor ? 'multi' : (isWhite ? 'white' : 'black');
+      const folder = isColor ? 'color' : (isWhite ? 'white' : 'black');
       return `/custom_logos/drawings/images_stripe/the_human_inside/${folder}/${file}`;
     }
-    if (active && selectedItemByCollection?.[active]) {
-      const key = selectedItemByCollection[active];
+    if (active && effSelectedItemByCollection?.[active]) {
+      const key = effSelectedItemByCollection[active];
 
       if (active === 'cube' && typeof key === 'string' && !isPathItem(key)) {
         const k = normalizeKeyLocal(key).toLowerCase();
@@ -918,9 +1051,9 @@ export default function FullWideSlideDemoHeader({
         const k = normalizeKeyLocal(key).toLowerCase();
         const out = (() => {
           if (firstContactVariant === 'color') {
-            if (k === 'dj vader' || k === 'dj-vader') return '/custom_logos/drawings/images_stripe/miscellania/multi/dj-vader-multi-light-stripe.webp';
-            if (k === 'deathstar2d2' || k === 'death star2d2' || k === 'death-star2d2') return '/custom_logos/drawings/images_stripe/miscellania/multi/death-star2d2-multi-light-stripe.webp';
-            if (k === 'pont del diable' || k === 'pont-del-diable') return '/custom_logos/drawings/images_stripe/miscellania/multi/pont-del-diable-multi-light-stripe.webp';
+            if (k === 'dj vader' || k === 'dj-vader') return '/custom_logos/drawings/images_stripe/miscellania/color/dj-vader-multi-light-stripe.webp';
+            if (k === 'deathstar2d2' || k === 'death star2d2' || k === 'death-star2d2') return '/custom_logos/drawings/images_stripe/miscellania/color/death-star2d2-multi-light-stripe.webp';
+            if (k === 'pont del diable' || k === 'pont-del-diable') return '/custom_logos/drawings/images_stripe/miscellania/color/pont-del-diable-multi-light-stripe.webp';
           }
 
           if (firstContactVariant === 'white') {
@@ -959,10 +1092,10 @@ export default function FullWideSlideDemoHeader({
           const whiteStem = slug === 'unsociable-and-taciturn' ? 'i-prefer-to-be' : slug;
           const multiStem = slug === 'unsociable-and-taciturn' ? 'i-prefer-to-be' : slug;
           const resolved = variant === 'color'
-            ? `/custom_logos/drawings/images_stripe/austen/quotes/multi/${multiStem}-multi-light-stripe.webp`
+            ? `/custom_logos/drawings/images_stripe/austen/quotes/color/${multiStem}-multi-light-stripe.webp`
             : variant === 'white'
               ? `/custom_logos/drawings/images_stripe/austen/quotes/white/${whiteStem}-w-stripe.webp`
-              : `/custom_logos/drawings/images_stripe/austen/quotes/black/${slug}-b-stripe.webp`;
+              : `/custom_logos/drawings/images_stripe/austen/quotes/black/${whiteStem}-b-stripe.webp`;
           if (resolved) return resolved;
 
           // Fallback for the common `...-b-grid.webp` filenames.
@@ -993,7 +1126,9 @@ export default function FullWideSlideDemoHeader({
           }
         }
         if (active === 'austen' && typeof key === 'string' && key.startsWith('/custom_logos/drawings/images_grid/austen/pemberley_house/')) {
-          return '/custom_logos/drawings/images_stripe/austen/pemberley_house/white/pemberley-house-w-stripe.webp';
+          if (variant === 'color') return '/custom_logos/drawings/images_stripe/austen/pemberley_house/color/pemberley-house-multi-light-stripe.webp';
+          if (variant === 'white') return '/custom_logos/drawings/images_stripe/austen/pemberley_house/white/pemberley-house-w-stripe.webp';
+          return '/custom_logos/drawings/images_stripe/austen/pemberley_house/black/pemberley-house-b-stripe.webp';
         }
         if (active === 'cube' && typeof key === 'string' && key.startsWith('/custom_logos/drawings/images_grid/cube/')) {
           const file = key.split('/').pop() || '';
@@ -1017,10 +1152,10 @@ export default function FullWideSlideDemoHeader({
           const file = key.split('/').pop() || '';
           const lower = file.toLowerCase();
           if (firstContactVariant === 'color') {
-            if (lower.includes('dj-vader')) return '/custom_logos/drawings/images_stripe/miscellania/multi/dj-vader-multi-light-stripe.webp';
-            if (lower.includes('death-star2d2')) return '/custom_logos/drawings/images_stripe/miscellania/multi/death-star2d2-multi-light-stripe.webp';
+            if (lower.includes('dj-vader')) return '/custom_logos/drawings/images_stripe/miscellania/color/dj-vader-multi-light-stripe.webp';
+            if (lower.includes('death-star2d2')) return '/custom_logos/drawings/images_stripe/miscellania/color/death-star2d2-multi-light-stripe.webp';
             if (lower.includes('pont-del-diable') || lower.includes('pont_del_diable')) {
-              return '/custom_logos/drawings/images_stripe/miscellania/multi/pont-del-diable-multi-light-stripe.webp';
+              return '/custom_logos/drawings/images_stripe/miscellania/color/pont-del-diable-multi-light-stripe.webp';
             }
           }
           if (firstContactVariant === 'white') {
@@ -1037,63 +1172,25 @@ export default function FullWideSlideDemoHeader({
           }
         }
         if (active === 'austen' && typeof key === 'string' && key.startsWith('/custom_logos/drawings/images_grid/austen/keep_calm/')) {
-          try {
-            const file = (key.split('/').pop() || '').toString().trim().toLowerCase();
-            const isKcb = file.includes('keep-calm-b') || file.includes('keep-calm-black');
-            const isKcr = file.includes('keep-calm-multi-red') || file.includes('keep-calm-multi-w-red');
-
-            if (isKcb) {
-              if (variant === 'color') {
-                return '/custom_logos/drawings/images_stripe/austen/keep_calm/multi/keep-calm-multi-light-stripe.webp';
-              }
-              if (variant === 'white') {
-                return '/custom_logos/drawings/images_stripe/austen/keep_calm/white/keep-calm-w-stripe.webp';
-              }
-              return '/custom_logos/drawings/images_stripe/austen/keep_calm/black/keep-calm-b-stripe.webp';
-            }
-
-            if (isKcr) {
-              if (variant === 'color') {
-                return '/custom_logos/drawings/images_stripe/austen/keep_calm/multi/keep-calm-multi-thru-light-stripe.webp';
-              }
-              if (variant === 'white') {
-                return '/custom_logos/drawings/images_stripe/austen/keep_calm/multi/keep-calm-multi-w-red-stripe.webp';
-              }
-              if (variant === 'black') {
-                return '/custom_logos/drawings/images_stripe/austen/keep_calm/multi/keep-calm-multi-thru-red-stripe.webp';
-              }
-              return '/custom_logos/drawings/images_stripe/austen/keep_calm/multi/keep-calm-multi-thru-light-stripe.webp';
-            }
-          } catch {
-            // ignore
+          if (variant === 'color') {
+            return '/custom_logos/drawings/images_stripe/austen/keep_calm/color/keep-calm-multi-light-stripe.webp';
           }
           if (variant === 'white') {
             return '/custom_logos/drawings/images_stripe/austen/keep_calm/white/keep-calm-w-stripe.webp';
           }
-          if (variant === 'black') {
-            return '/custom_logos/drawings/images_stripe/austen/keep_calm/black/keep-calm-b-stripe.webp';
-          }
-          return '/custom_logos/drawings/images_stripe/austen/keep_calm/multi/keep-calm-multi-thru-red-stripe.webp';
+          return '/custom_logos/drawings/images_stripe/austen/keep_calm/black/keep-calm-b-stripe.webp';
         }
         if (active === 'austen' && typeof key === 'string' && key.startsWith('/custom_logos/drawings/images_grid/austen/looking_for_my_darcy/')) {
           const file = key.split('/').pop() || '';
           const lower = file.toLowerCase();
           const base = lower.replace(/\.(webp|png|jpe?g)$/i, '').replace(/-grid$/i, '');
-          if (lower.includes('dark-gradient') || base.endsWith('-dark')) {
-            const c = base.replace(/-dark-gradient$/i, '').replace(/-dark$/i, '');
-            return `/custom_logos/drawings/images_stripe/austen/looking_for_my_darcy/dark/${c}-dark-gradient-stripe.webp`;
-          }
-          if (lower.includes('light-gradient') || base.endsWith('-light')) {
-            const c = base.replace(/-light-gradient$/i, '').replace(/-light$/i, '');
-            return `/custom_logos/drawings/images_stripe/austen/looking_for_my_darcy/light/${c}-light-gradient-stripe.webp`;
-          }
           if (base.endsWith('-frame') || lower.includes('-frame')) {
             const c = base.replace(/-frame$/i, '');
-            return `/custom_logos/drawings/images_stripe/austen/looking_for_my_darcy/frame/${c}-frame-stripe.webp`;
+            return `/custom_logos/drawings/images_stripe/austen/looking_for_my_darcy/color/frame/${c}-frame-stripe.webp`;
           }
           if (base.endsWith('-solid') || lower.includes('-solid')) {
             const c = base.replace(/-solid$/i, '');
-            return `/custom_logos/drawings/images_stripe/austen/looking_for_my_darcy/solid/${c}-solid-stripe.webp`;
+            return `/custom_logos/drawings/images_stripe/austen/looking_for_my_darcy/color/solid/${c}-solid-stripe.webp`;
           }
         }
         if (active === 'austen' && typeof key === 'string' && key.startsWith('/custom_logos/drawings/images_stripe/austen/crosswords/')) {
@@ -1150,10 +1247,9 @@ export default function FullWideSlideDemoHeader({
           return resolveAustenQuoteOriginalFromPath(key) || key;
         }
         if (active === 'austen' && typeof key === 'string' && key.startsWith('/custom_logos/drawings/images_grid/austen/pemberley_house/')) {
-          if (variant === 'white') {
-            return '/custom_logos/drawings/images_stripe/austen/pemberley_house/white/pemberley-house-w-stripe.webp';
-          }
-          return '/custom_logos/drawings/images_stripe/austen/pemberley_house/white/pemberley-house-w-stripe.webp';
+          if (variant === 'color') return '/custom_logos/drawings/images_stripe/austen/pemberley_house/color/pemberley-house-multi-light-stripe.webp';
+          if (variant === 'white') return '/custom_logos/drawings/images_stripe/austen/pemberley_house/white/pemberley-house-w-stripe.webp';
+          return '/custom_logos/drawings/images_stripe/austen/pemberley_house/black/pemberley-house-b-stripe.webp';
         }
         if (active === 'austen' && typeof key === 'string' && key.startsWith('/custom_logos/drawings/images_grid/austen/crosswords/')) {
           const file = key.split('/').pop() || '';
@@ -1185,9 +1281,9 @@ export default function FullWideSlideDemoHeader({
             .replace(/\.webp$/i, '');
           const whiteStem = slug === 'unsociable-and-taciturn' ? 'i-prefer-to-be' : slug;
           const multiStem = slug === 'unsociable-and-taciturn' ? 'i-prefer-to-be' : slug;
-          if (variant === 'color') return `/custom_logos/drawings/images_originals/stripe/austen/quotes/multi/${multiStem}-multi-light-stripe.webp`;
-          if (variant === 'white') return `/custom_logos/drawings/images_originals/stripe/austen/quotes/white/${whiteStem}-w-stripe.webp`;
-          return `/custom_logos/drawings/images_originals/stripe/austen/quotes/black/${slug}-b-stripe.webp`;
+          if (variant === 'color') return `/custom_logos/drawings/images_stripe/austen/quotes/color/${multiStem}-multi-light-stripe.webp`;
+          if (variant === 'white') return `/custom_logos/drawings/images_stripe/austen/quotes/white/${whiteStem}-w-stripe.webp`;
+          return `/custom_logos/drawings/images_stripe/austen/quotes/black/${whiteStem}-b-stripe.webp`;
         }
         const k = typeof key === 'string' ? normalizeKeyLocal(key).toLowerCase() : '';
         const id = resolveAustenQuoteAssetId(k);
@@ -1200,10 +1296,10 @@ export default function FullWideSlideDemoHeader({
           const file = key.split('/').pop() || '';
           const lower = file.toLowerCase();
           if (firstContactVariant === 'color') {
-            if (lower.includes('dj-vader')) return '/custom_logos/drawings/images_stripe/miscellania/multi/dj-vader-multi-light-stripe.webp';
-            if (lower.includes('death-star2d2')) return '/custom_logos/drawings/images_stripe/miscellania/multi/death-star2d2-multi-light-stripe.webp';
+            if (lower.includes('dj-vader')) return '/custom_logos/drawings/images_stripe/miscellania/color/dj-vader-multi-light-stripe.webp';
+            if (lower.includes('death-star2d2')) return '/custom_logos/drawings/images_stripe/miscellania/color/death-star2d2-multi-light-stripe.webp';
             if (lower.includes('pont-del-diable') || lower.includes('pont_del_diable')) {
-              return '/custom_logos/drawings/images_stripe/miscellania/multi/pont-del-diable-multi-light-stripe.webp';
+              return '/custom_logos/drawings/images_stripe/miscellania/color/pont-del-diable-multi-light-stripe.webp';
             }
           }
           if (firstContactVariant === 'white') {
@@ -1240,6 +1336,8 @@ export default function FullWideSlideDemoHeader({
     humanInsideVariant,
     selectedItemByCollection,
     stripeOverlayOverrideActive,
+    hoveredStripeItem,
+    hoveredStripeItemCollection,
   ]);
 
   const resolvedOverlaySrcEncoded = useMemo(() => {
@@ -1509,7 +1607,7 @@ export default function FullWideSlideDemoHeader({
     preloadSrc(resolvedOverlaySrc);
 
     const s = resolvedOverlaySrc.toLowerCase();
-    const isMulti = s.includes('/multi/') || s.includes('-multi-');
+    const isMulti = s.includes('/color/') || s.includes('-multi-');
     if (!isMulti) return;
 
     // For multi overlays we sometimes swap light/dark per tile. Preload the sibling
@@ -2247,21 +2345,22 @@ export default function FullWideSlideDemoHeader({
 
   const thinDrawings = useMemo(
     () => [
-      'R2-D2',
-      'C3P0',
-      'Vader',
+      // Columna 2 (en ordre)
       'Afrodita',
-      'Mazinger',
-      'Cylon 78',
-      'Cylon 03',
-      'Iron Man 68',
-      'Iron Man 08',
+      'C3P0',
       'Cyberman',
-      'The Dalek',
+      'Cylon 03',
+      'Cylon 78',
+      'Iron Man 08',
+      'Iron Man 68',
       'Maschinenmensch',
-      'Robocop',
-      'Terminator',
+      'Mazinger',
+      'R2-D2',
+      // Columna 3 (en ordre)
       'Robbie the Robot',
+      'Robocop',
+      'The Dalek',
+      'Vader',
     ],
     []
   );
@@ -2288,9 +2387,9 @@ export default function FullWideSlideDemoHeader({
             'NCC-1701',
             'NCC-1701-D',
             'Wormhole',
-            'Plasma Escape',
-            "Vulcan's End",
             'The Phoenix',
+            "Vulcan's End",
+            'Plasma Escape',
             CONTROL_TILE_ARROWS,
           ],
         },
@@ -2306,35 +2405,13 @@ export default function FullWideSlideDemoHeader({
           title: '',
           items: [
             CONTROL_TILE_BN,
-            '/custom_logos/drawings/images_grid/austen/looking_for_my_darcy/blue-dark-gradient-grid.webp',
-            '/custom_logos/drawings/images_grid/austen/looking_for_my_darcy/blue-frame-grid.webp',
-            '/custom_logos/drawings/images_grid/austen/looking_for_my_darcy/blue-light-gradient-grid.webp',
-            '/custom_logos/drawings/images_grid/austen/looking_for_my_darcy/blue-solid-grid.webp',
-            '/custom_logos/drawings/images_grid/austen/looking_for_my_darcy/fuchsia-dark-gradient-grid.webp',
-            '/custom_logos/drawings/images_grid/austen/looking_for_my_darcy/fuchsia-frame-grid.webp',
-            '/custom_logos/drawings/images_grid/austen/looking_for_my_darcy/fuchsia-light-gradient-grid.webp',
-            '/custom_logos/drawings/images_grid/austen/looking_for_my_darcy/fuchsia-solid-grid.webp',
-            '/custom_logos/drawings/images_grid/austen/looking_for_my_darcy/orange-dark-gradient-grid.webp',
-            '/custom_logos/drawings/images_grid/austen/looking_for_my_darcy/orange-frame-grid.webp',
-            '/custom_logos/drawings/images_grid/austen/looking_for_my_darcy/orange-light-gradient-grid.webp',
-            '/custom_logos/drawings/images_grid/austen/looking_for_my_darcy/orange-solid-grid.webp',
-            '/custom_logos/drawings/images_grid/austen/looking_for_my_darcy/red-dark-gradient-grid.webp',
-            '/custom_logos/drawings/images_grid/austen/looking_for_my_darcy/red-frame-grid.webp',
-            '/custom_logos/drawings/images_grid/austen/looking_for_my_darcy/red-light-gradient-grid.webp',
-            '/custom_logos/drawings/images_grid/austen/looking_for_my_darcy/red-solid-grid.webp',
-            '/custom_logos/drawings/images_grid/austen/looking_for_my_darcy/yellow-dark-gradient-grid.webp',
-            '/custom_logos/drawings/images_grid/austen/looking_for_my_darcy/yellow-frame-grid.webp',
-            '/custom_logos/drawings/images_grid/austen/looking_for_my_darcy/yellow-light-gradient-grid.webp',
-            '/custom_logos/drawings/images_grid/austen/looking_for_my_darcy/yellow-solid-grid.webp',
-            '/custom_logos/drawings/images_grid/austen/keep_calm/keep-calm-multi-red-grid.webp',
-            '/custom_logos/drawings/images_grid/austen/keep_calm/keep-calm-multi-w-red-grid.webp',
-            '/custom_logos/drawings/images_grid/austen/keep_calm/keep-calm-b-grid.webp',
             '/custom_logos/drawings/images_grid/austen/pemberley_house/pemberley-house-b-grid.webp',
-            '/custom_logos/drawings/images_grid/austen/quotes/it-is-a-truth-b-grid.webp',
+            '/custom_logos/drawings/images_grid/austen/keep_calm/keep-calm-b-grid.webp',
             '/custom_logos/drawings/images_grid/austen/quotes/you-must-allow-me-b-grid.webp',
             '/custom_logos/drawings/images_grid/austen/quotes/body-and-soul-b-grid.webp',
-            '/custom_logos/drawings/images_grid/austen/quotes/unsociable-and-taciturn-b-grid.webp',
             '/custom_logos/drawings/images_grid/austen/quotes/half-agony-half-hope-b-grid.webp',
+            '/custom_logos/drawings/images_grid/austen/quotes/unsociable-and-taciturn-b-grid.webp',
+            '/custom_logos/drawings/images_grid/austen/quotes/it-is-a-truth-b-grid.webp',
             '/custom_logos/drawings/images_grid/austen/crosswords/persuasion-1-grid.webp',
             '/custom_logos/drawings/images_grid/austen/crosswords/persuasion-2-grid.webp',
             '/custom_logos/drawings/images_grid/austen/crosswords/persuasion-3-grid.webp',
@@ -2347,6 +2424,14 @@ export default function FullWideSlideDemoHeader({
             '/custom_logos/drawings/images_grid/austen/crosswords/sense-and-sensibility-2-grid.webp',
             '/custom_logos/drawings/images_grid/austen/crosswords/sense-and-sensibility-3-grid.webp',
             '/custom_logos/drawings/images_grid/austen/crosswords/sense-and-sensibility-4-grid.webp',
+            '/custom_logos/drawings/images_grid/austen/looking_for_my_darcy/blue-solid-grid.webp',
+            '/custom_logos/drawings/images_grid/austen/looking_for_my_darcy/fuchsia-solid-grid.webp',
+            '/custom_logos/drawings/images_grid/austen/looking_for_my_darcy/red-solid-grid.webp',
+            '/custom_logos/drawings/images_grid/austen/looking_for_my_darcy/yellow-solid-grid.webp',
+            '/custom_logos/drawings/images_grid/austen/looking_for_my_darcy/blue-frame-grid.webp',
+            '/custom_logos/drawings/images_grid/austen/looking_for_my_darcy/fuchsia-frame-grid.webp',
+            '/custom_logos/drawings/images_grid/austen/looking_for_my_darcy/red-frame-grid.webp',
+            '/custom_logos/drawings/images_grid/austen/looking_for_my_darcy/yellow-frame-grid.webp',
             CONTROL_TILE_ARROWS,
           ],
         },
@@ -2356,16 +2441,16 @@ export default function FullWideSlideDemoHeader({
           title: '',
           items: [
             CONTROL_TILE_BN,
-            'Iron Kong',
-            'Iron Cube 68',
-            'RoboCube',
-            'Cylon Cube 03',
-            'MaschinenCube',
-            'Mazinger C',
             'Afrodita C',
             'Cube 3 P0',
             'Cyber Cube',
+            'Cylon Cube 03',
             'Darth Cube',
+            'Iron Kong',
+            'Iron Cube 68',
+            'MaschinenCube',
+            'Mazinger C',
+            'RoboCube',
             CONTROL_TILE_ARROWS,
           ],
         },
@@ -2375,9 +2460,11 @@ export default function FullWideSlideDemoHeader({
           title: '',
           items: [
             CONTROL_TILE_BN,
-            '/custom_logos/drawings/images_grid/miscellania/pont-del-diable-b-grid.webp',
-            '/custom_logos/drawings/images_grid/miscellania/dj-vader-b-grid.webp',
+            '/custom_logos/drawings/images_grid/miscellania/arthur-d-the-second-b-grid.webp',
             '/custom_logos/drawings/images_grid/miscellania/death-star2d2-b-grid.webp',
+            '/custom_logos/drawings/images_grid/miscellania/dj-vader-b-grid.webp',
+            '/custom_logos/drawings/images_grid/miscellania/pont-del-diable-b-grid.webp',
+            '/custom_logos/drawings/images_grid/miscellania/r2d2-quote-b-grid.webp',
             CONTROL_TILE_ARROWS,
           ],
         },
@@ -2434,6 +2521,244 @@ export default function FullWideSlideDemoHeader({
     return out;
   }, [defaultMega, gridCalibFromUrl, megaConfig, thinWindowItems]);
 
+  const AUSTEN_SUB_PREFIXES = useMemo(() => ({
+    pemberley: ['/austen/pemberley_house/'],
+    keep_calm: ['/austen/keep_calm/'],
+    quotes: ['/austen/quotes/'],
+    crosswords: ['/austen/crosswords/'],
+    looking_for_my_darcy: ['/austen/looking_for_my_darcy/'],
+  }), []);
+
+  const resolvedMegaFiltered = useMemo(() => {
+    if (active !== 'austen' || !austenSubcollection) return resolvedMega;
+    const prefixes = AUSTEN_SUB_PREFIXES[austenSubcollection];
+    if (!prefixes) return resolvedMega;
+    return {
+      ...resolvedMega,
+      austen: resolvedMega.austen.map((col) => ({
+        ...col,
+        items: col.items.filter((it) => {
+          if (typeof it !== 'string') return true;
+          if (it === CONTROL_TILE_BN || it === CONTROL_TILE_ARROWS) return true;
+          return prefixes.some((p) => it.includes(p));
+        }),
+      })),
+    };
+  }, [resolvedMega, active, austenSubcollection, AUSTEN_SUB_PREFIXES]);
+
+  const stripeTileOverlaySrcs = useMemo(() => {
+    const cols = resolvedMegaFiltered?.[active];
+    if (!Array.isArray(cols) || cols.length === 0) return null;
+    const items = cols[0]?.items || [];
+    const drawable = active === 'the_human_inside'
+      ? thinDrawings
+      : items.filter((it) =>
+          it && it !== CONTROL_TILE_BN && it !== CONTROL_TILE_ARROWS
+        );
+    if (drawable.length === 0) return null;
+
+    const variant = active === 'the_human_inside' ? humanInsideVariant : firstContactVariant;
+    // Versió multi (variant 'color'): només la samarreta blanca usa la Dark;
+    // totes les altres usen la Light, independentment del color de samarreta.
+    const multiTone = cercadorSelectedColor === 'white' ? 'dark' : 'light';
+    const resolveForItem = (it) => {
+      if (active === 'first_contact') {
+        if (variant === 'white') return FIRST_CONTACT_MEDIA_WHITE[it] || FIRST_CONTACT_MEDIA[it] || null;
+        if (variant === 'color') return FIRST_CONTACT_MEDIA_COLOR[it] || FIRST_CONTACT_MEDIA[it] || null;
+        return FIRST_CONTACT_MEDIA[it] || null;
+      }
+      if (active === 'the_human_inside') {
+        const k = String(it).trim().toLowerCase();
+        const mapBlack = {
+          'r2-d2': 'r2-d2-b-stripe.webp', c3p0: 'c3-p0-b-stripe.webp', 'c3-p0': 'c3-p0-b-stripe.webp',
+          vader: 'vader-b-stripe.webp', afrodita: 'afrodita-a-b-stripe.webp', 'afrodita-a': 'afrodita-a-b-stripe.webp',
+          mazinger: 'mazinger-z-b-stripe.webp', 'mazinger-z': 'mazinger-z-b-stripe.webp',
+          'cylon 78': 'cylon-78-b-stripe.webp', 'cylon 03': 'cylon-03-b-stripe.webp',
+          'iron man 68': 'iron-man-68-b-stripe.webp', 'iron man 08': 'iron-man-08-b-stripe.webp',
+          cyberman: 'cyberman-b-stripe.webp', 'the dalek': 'the-dalek-b-stripe.webp',
+          robocop: 'robocop-b-stripe.webp', terminator: 'terminator-b-stripe.webp',
+          maschinenmensch: 'maschinenmensch-b-stripe.webp',
+          'robby the robot': 'robbie-the-robot-b-stripe.webp', 'robbie the robot': 'robbie-the-robot-b-stripe.webp',
+        };
+        const file = mapBlack[k];
+        if (!file) return null;
+        if (variant === 'white') {
+          const wf = file.replace(/-b-stripe\.webp$/, '-w-stripe.webp');
+          return `/custom_logos/drawings/images_stripe/the_human_inside/white/${wf}`;
+        }
+        if (variant === 'color') {
+          const cf = file.replace(/-b-stripe\.webp$/, '-multi-light-stripe.webp');
+          return `/custom_logos/drawings/images_stripe/the_human_inside/color/${cf}`;
+        }
+        return `/custom_logos/drawings/images_stripe/the_human_inside/black/${file}`;
+      }
+      if (active === 'cube') {
+        return CUBE_MEDIA[it] || null;
+      }
+      if (active === 'miscellania') {
+        const lower = String(it).toLowerCase();
+        if (lower.includes('arthur-d-the-second') || lower.includes('arthur d the second')) {
+          if (variant === 'white') return '/custom_logos/drawings/images_stripe/miscellania/white/arthur-d-the-second-w-stripe.webp';
+          if (variant === 'color') return '/custom_logos/drawings/images_stripe/miscellania/color/arthur-d-the-second-multi-light-stripe.webp';
+          return '/custom_logos/drawings/images_stripe/miscellania/black/arthur-d-the-second-b-stripe.webp';
+        }
+        if (lower.includes('r2d2-quote') || lower.includes('r2d2 quote')) {
+          if (variant === 'white') return '/custom_logos/drawings/images_stripe/miscellania/white/r2d2-quote-w-stripe.webp';
+          if (variant === 'color') return '/custom_logos/drawings/images_stripe/miscellania/color/r2d2-quote-multi-light-stripe.webp';
+          return '/custom_logos/drawings/images_stripe/miscellania/black/r2d2-quote-b-stripe.webp';
+        }
+        if (lower.includes('dj-vader')) {
+          if (variant === 'white') return '/custom_logos/drawings/images_stripe/miscellania/white/dj-vader-w-stripe.webp';
+          if (variant === 'color') return '/custom_logos/drawings/images_stripe/miscellania/color/dj-vader-multi-light-stripe.webp';
+          return '/custom_logos/drawings/images_stripe/miscellania/black/dj-vader-b-stripe.webp';
+        }
+        if (lower.includes('death-star2d2')) {
+          if (variant === 'white') return '/custom_logos/drawings/images_stripe/miscellania/white/death-star2d2-w-stripe.webp';
+          if (variant === 'color') return '/custom_logos/drawings/images_stripe/miscellania/color/death-star2d2-multi-light-stripe.webp';
+          return '/custom_logos/drawings/images_stripe/miscellania/black/death-star2d2-b-stripe.webp';
+        }
+        if (lower.includes('pont-del-diable') || lower.includes('pont_del_diable')) {
+          if (variant === 'white') return '/custom_logos/drawings/images_stripe/miscellania/white/pont-del-diable-w-stripe.webp';
+          if (variant === 'color') return '/custom_logos/drawings/images_stripe/miscellania/color/pont-del-diable-multi-light-stripe.webp';
+          return '/custom_logos/drawings/images_stripe/miscellania/black/pont-del-diable-b-stripe.webp';
+        }
+        return null;
+      }
+      if (active === 'austen') {
+        const s = String(it);
+        if (s.includes('/austen/pemberley_house/')) {
+          if (variant === 'color') return '/custom_logos/drawings/images_stripe/austen/pemberley_house/color/pemberley-house-multi-light-stripe.webp';
+          if (variant === 'white') return '/custom_logos/drawings/images_stripe/austen/pemberley_house/white/pemberley-house-w-stripe.webp';
+          return '/custom_logos/drawings/images_stripe/austen/pemberley_house/black/pemberley-house-b-stripe.webp';
+        }
+        if (s.includes('/austen/keep_calm/')) {
+          if (variant === 'color') {
+            const isRed = cercadorSelectedColor === 'red';
+            return isRed
+              ? '/custom_logos/drawings/images_stripe/austen/keep_calm/color/keep-calm-multi-light-stripe.webp'
+              : '/custom_logos/drawings/images_stripe/austen/keep_calm/color/keep-calm-multi-dark-stripe.webp';
+          }
+          if (variant === 'white') return '/custom_logos/drawings/images_stripe/austen/keep_calm/white/keep-calm-w-stripe.webp';
+          return '/custom_logos/drawings/images_stripe/austen/keep_calm/black/keep-calm-b-stripe.webp';
+        }
+        if (s.includes('/austen/quotes/')) {
+          const file = s.split('/').pop() || '';
+          const slug = file.toLowerCase().replace(/-b-grid(?=\.webp$)/i, '').replace(/-grid(?=\.webp$)/i, '').replace(/\.webp$/i, '');
+          const whiteStem = slug === 'unsociable-and-taciturn' ? 'i-prefer-to-be' : slug;
+          if (variant === 'white') return `/custom_logos/drawings/images_stripe/austen/quotes/white/${whiteStem}-w-stripe.webp`;
+          if (variant === 'color') return `/custom_logos/drawings/images_stripe/austen/quotes/color/${slug}-multi-light-stripe.webp`;
+          return `/custom_logos/drawings/images_stripe/austen/quotes/black/${whiteStem}-b-stripe.webp`;
+        }
+        if (s.includes('/austen/crosswords/')) {
+          const file = s.split('/').pop() || '';
+          const m = file.toLowerCase().replace(/-grid(?=\.webp$)/i, '').match(/^(persuasion|pride-and-prejudice|sense-and-sensibility)-(\d)\.webp$/);
+          if (m) {
+            const book = m[1]; const n = m[2];
+            if (variant === 'white') return `/custom_logos/drawings/images_stripe/austen/crosswords/white/${book}-${n}-w-stripe.webp`;
+            return `/custom_logos/drawings/images_stripe/austen/crosswords/black/${book}-${n}-b-stripe.webp`;
+          }
+        }
+        if (s.includes('/austen/looking_for_my_darcy/')) {
+          const file = s.split('/').pop() || '';
+          const m = file.toLowerCase().match(/(blue|fuchsia|red|yellow)-(solid|frame)-grid\.webp$/);
+          if (m) {
+            const c = m[1];
+            if (m[2] === 'solid') {
+              return `/custom_logos/drawings/images_stripe/austen/looking_for_my_darcy/color/solid/${c}-solid-stripe.webp`;
+            }
+            if (m[2] === 'frame') {
+              return `/custom_logos/drawings/images_stripe/austen/looking_for_my_darcy/color/frame/${c}-frame-stripe.webp`;
+            }
+          }
+        }
+      }
+      return null;
+    };
+
+    // Dibuixos alineats a l'ESQUERRA; les caselles buides queden a la DRETA
+    // (on les imatges base N.jpg mostren les N samarretes buides).
+    const tileSrcs = [];
+    for (let i = 0; i < 14; i++) {
+      let src = i < drawable.length ? resolveForItem(drawable[i]) : null;
+      if (src && variant === 'color' && multiTone === 'dark') {
+        src = src.replace('-multi-light-stripe.webp', '-multi-dark-stripe.webp');
+      }
+      tileSrcs.push(src);
+    }
+    return tileSrcs;
+  }, [resolvedMegaFiltered, active, firstContactVariant, humanInsideVariant, cercadorSelectedColor, thinDrawings]);
+
+  // Identitat de l'ítem mostrat a cada tile de la franja (mateixa lògica
+  // cíclica que stripeTileOverlaySrcs). Permet saber quina samarreta correspon
+  // a cada fila de text.
+  const stripeTileItems = useMemo(() => {
+    const cols = resolvedMegaFiltered?.[active];
+    if (!Array.isArray(cols) || cols.length === 0) return null;
+    const items = cols[0]?.items || [];
+    const drawable = active === 'the_human_inside'
+      ? thinDrawings
+      : items.filter((it) =>
+          it && it !== CONTROL_TILE_BN && it !== CONTROL_TILE_ARROWS
+        );
+    if (drawable.length === 0) return null;
+    const arr = [];
+    for (let i = 0; i < 14; i++) arr.push(i < drawable.length ? drawable[i] : null);
+    return arr;
+  }, [resolvedMegaFiltered, active, thinDrawings]);
+
+  // Imatge base de la franja. Els estampats (-stripe.webp) són transparents i
+  // necessiten una samarreta blanca a sota, així que la base ha de tenir
+  // samarretes a TOTES les caselles. full-white-stripe (14 samarretes) ja
+  // mostra samarretes blanques a les caselles buides.
+  const stripeBaseImageSrc = '/placeholders/cercador/full-white-stripe.jpg';
+
+  // Índexs de les samarretes sense dibuix (buides) que cal desactivar.
+  const emptyTileIndices = useMemo(() => {
+    if (!Array.isArray(stripeTileItems)) return [];
+    const out = [];
+    stripeTileItems.forEach((it, i) => {
+      if (!it) out.push(i);
+    });
+    return out;
+  }, [stripeTileItems]);
+
+  // Imatge prerenderitzada de les samarretes buides esvaïdes (N = nombre de
+  // caselles buides). Es superposa, alineada amb la stripe, per esvair només
+  // les buides sense dibuixar rectangles CSS (que provocaven una franja recta).
+  // Només hi ha fitxers per a aquests nombres de buides.
+  const stripeEmptyMaskSrc = useMemo(() => {
+    // Samarretes buides desactivades: no s'aplica cap mask d'esvaïment perquè
+    // es vegin les imatges pujades sense cap superposició.
+    return null;
+  }, [emptyTileIndices]);
+
+  // Índexs de les samarretes (0-based) que mostren l'ítem sobre el qual es fa
+  // hover al text; es ressalten individualment a la franja.
+  const clicAreaHighlightIndices = useMemo(() => {
+    if (!hoveredStripeItem || !Array.isArray(stripeTileItems)) return [];
+    // Si la franja repeteix un únic dibuix (p.ex. una subcol·lecció amb un sol
+    // ítem com Pemberley), ressaltar-los tots alhora queda estrany; no ressaltem.
+    const distinct = new Set(stripeTileItems.filter(Boolean));
+    if (distinct.size <= 1) return [];
+    const out = [];
+    stripeTileItems.forEach((it, i) => {
+      if (it === hoveredStripeItem) out.push(i);
+    });
+    return out;
+  }, [hoveredStripeItem, stripeTileItems]);
+
+  // Índexs on es mostra el cercle del coll: només les samarretes corresponents
+  // a l'ítem en hover al text. (No s'usa la selecció de grup, que sempre apunta
+  // al primer ítem i deixava el cercle enganxat a la primera samarreta.)
+  const neckDotIndices = useMemo(() => {
+    if (!Array.isArray(stripeTileItems)) return [];
+    const out = [];
+    stripeTileItems.forEach((it, i) => {
+      if (it && it === hoveredStripeItem) out.push(i);
+    });
+    return out;
+  }, [stripeTileItems, hoveredStripeItem]);
+
   useEffect(() => {
     if (!active) return;
     if (stripeOverlayOverrideActive) return;
@@ -2455,26 +2780,20 @@ export default function FullWideSlideDemoHeader({
     if (!fallbackItem) return;
 
     if (active === 'first_contact') {
-      if (firstContactSelectedItem) return;
-      setFirstContactSelectedItem(fallbackItem);
+      // No autoseleccionar el primer ítem a First Contact: així NX-01 no surt
+      // en negreta en carregar (la negreta només s'aplica en seleccionar/hover).
       return;
     }
 
     if (active === 'the_human_inside') {
-      if (humanInsideSelectedItem) return;
-      setHumanInsideSelectedItem(fallbackItem);
+      // No autoseleccionar el primer ítem a The Human Inside: així R2-D2 no surt
+      // ressaltat en carregar (el ressaltat només s'aplica en seleccionar/hover).
       return;
     }
 
-    if (active === 'cube' || active === 'miscellania') {
-      if (selectedItemByCollection?.[active]) return;
-      setSelectedItemByCollection((prev) => ({ ...prev, [active]: fallbackItem }));
-    }
-
-    if (active === 'austen') {
-      if (selectedItemByCollection?.[active]) return;
-      setSelectedItemByCollection((prev) => ({ ...prev, [active]: fallbackItem }));
-    }
+    // No autoseleccionar cap ítem per defecte (cube, miscellania, austen):
+    // així cap dibuix surt ressaltat en carregar. La selecció només s'aplica
+    // quan l'usuari fa clic a un ítem del cercador.
   }, [
     active,
     CONTROL_TILE_ARROWS,
@@ -2496,18 +2815,20 @@ export default function FullWideSlideDemoHeader({
     
     // Actualitzar el selectedItem segons la col·lecció activa
     if (active === 'first_contact') {
-      if (firstContactSelectedItem !== target) {
-        setFirstContactSelectedItem(target);
-      }
+      // No sincronitzar el target del selector amb la selecció de First Contact:
+      // així cap ítem (ni NX-01) surt ressaltat en carregar. La selecció només
+      // s'aplica quan l'usuari fa clic a un ítem del cercador.
+      return;
     } else if (active === 'the_human_inside') {
-      if (humanInsideSelectedItem !== target) {
-        setHumanInsideSelectedItem(target);
-      }
+      // No sincronitzar el target del selector amb la selecció de The Human Inside:
+      // així cap ítem (ni R2-D2) surt ressaltat en carregar. La selecció només
+      // s'aplica quan l'usuari fa clic a un ítem del cercador.
+      return;
     } else {
-      // Per altres col·leccions (cube, austen, miscellania)
-      if (selectedItemByCollection?.[active] !== target) {
-        setSelectedItemByCollection((prev) => ({ ...prev, [active]: target }));
-      }
+      // Per altres col·leccions (cube, austen, miscellania): no sincronitzar el
+      // target del selector amb la selecció. Així cap ítem surt ressaltat en
+      // carregar; la selecció només s'aplica quan l'usuari fa clic.
+      return;
     }
   }, [
     active,
@@ -2805,8 +3126,10 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
                   touchMegaPublicActivity();
                 }}
               >
-                <svg className="h-[25px] w-[25px] text-foreground -translate-x-[1px] lg:h-[29px] lg:w-[29px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                <svg className="h-[25px] w-[25px] text-foreground -translate-x-[1px] lg:h-[29px] lg:w-[29px]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}>
+                  <polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21" />
+                  <line x1="9" y1="3" x2="9" y2="18" />
+                  <line x1="15" y1="6" x2="15" y2="21" />
                 </svg>
               </IconButton>
             </div>
@@ -2982,7 +3305,7 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
                       <div style={{ flex: '0 0 auto', width: 'var(--hg-mega-w, min(1350px, calc(100vw - 32px)))', maxWidth: 'none', position: 'relative', height: '100%', paddingLeft: '0px', paddingRight: '0px' }}>
                         <MegaStripePanel
                           active={active}
-                          resolvedMega={resolvedMega}
+                          resolvedMega={resolvedMegaFiltered}
                           showStripe={showStripe}
                           stripeRowPadPx={stripeRowPadPx}
                           stripeRowPadXPx={stripeRowPadXPx}
@@ -3017,6 +3340,13 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
                           setHumanInsideSelectedItem={setHumanInsideSelectedItem}
                           setSelectedItemByCollection={setSelectedItemByCollection}
                           normalizeOverlaySrc={normalizeOverlaySrc}
+                          shirtColor={CERCADOR_COLORS.find((c) => c.slug === cercadorSelectedColor)?.hex}
+                          onShirtClick={onShirtClick}
+                          stripeTileOverlaySrcs={stripeTileOverlaySrcs}
+                          stripeTileItems={stripeTileItems}
+                          neckDotIndices={neckDotIndices}
+                          emptyTileIndices={emptyTileIndices}
+                          stripeEmptyMaskSrc={stripeEmptyMaskSrc}
                         />
                       </div>
 
@@ -3039,11 +3369,92 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
                         paddingLeft: '0px',
                         paddingRight: '0px',
                       }}>
+                        {/* <img
+                          src="/placeholders/cercador/fons-cercador.png"
+                          alt=""
+                          aria-hidden="true"
+                          style={{
+                            position: 'absolute',
+                            top: 0,
+                            left: 0,
+                            width: '100%',
+                            height: 'auto',
+                            zIndex: 0,
+                            pointerEvents: 'none',
+                            userSelect: 'none',
+                            transform: 'scale(0.94)',
+                            transformOrigin: 'top center',
+                          }}
+                        /> */}
+                        <div style={{
+                          position: 'absolute',
+                          top: 'var(--hg-cercador-bar-top, 0px)',
+                          left: '50%',
+                          transform: 'translateX(-50%) scale(var(--hg-cercador-bar-scale, 1))',
+                          transformOrigin: 'top center',
+                          width: 'var(--hg-cercador-bar-width, 94%)',
+                          zIndex: 2,
+                        }}>
+                          <CercadorTopBar
+                            activeCollection={active}
+                            onSelectCollection={setActive}
+                            selectedColor={cercadorSelectedColor}
+                            onSelectColor={setCercadorSelectedColor}
+                          />
+                        </div>
+                        <div style={{
+                          position: 'absolute',
+                          top: 'var(--hg-cercador-bar-top, 0px)',
+                          left: '50%',
+                          transform: 'translateX(-50%) scale(var(--hg-cercador-bar-scale, 1))',
+                          transformOrigin: 'top center',
+                          width: 'var(--hg-cercador-bar-width, 94%)',
+                          zIndex: 2,
+                          containerType: 'inline-size',
+                        }}>
+                          <CercadorTextRow
+                            activeCollection={active}
+                            activeSubcollection={austenSubcollection}
+                            selectedStripeItem={
+                              active === 'first_contact' ? firstContactSelectedItem
+                              : active === 'the_human_inside' ? humanInsideSelectedItem
+                              : (selectedItemByCollection?.[active] ?? null)
+                            }
+                            hoveredStripeItem={hoveredStripeItem}
+                            onSelectGroup={(collection, subcollection, firstStripeItem) => {
+                              if (collection !== active) setActive(collection);
+                              if (collection === 'austen') {
+                                setAustenSubcollection(subcollection);
+                              } else {
+                                setAustenSubcollection(null);
+                              }
+                              setStripeOverlayOverrideActive(false);
+                              if (firstStripeItem) {
+                                if (collection === 'first_contact') {
+                                  setFirstContactSelectedItem(firstStripeItem);
+                                } else if (collection === 'the_human_inside') {
+                                  setHumanInsideSelectedItem(firstStripeItem);
+                                } else {
+                                  setSelectedItemByCollection((prev) => ({ ...prev, [collection]: firstStripeItem }));
+                                }
+                              }
+                            }}
+                            onHoverItem={(stripeItem, collection) => {
+                              setHoveredStripeItem(stripeItem);
+                              setHoveredStripeItemCollection(collection);
+                            }}
+                            onHoverLeave={() => {
+                              setHoveredStripeItem(null);
+                              setHoveredStripeItemCollection(null);
+                            }}
+                          />
+                        </div>
+                        <div style={{ position: 'relative', zIndex: 1, width: '100%' }}>
                         <MegaStripePanel
                           active={active}
                           reserveGridSpace
-                          stripeImageSrc="/placeholders/cercador/full-white-stripe.jpg"
-                          resolvedMega={resolvedMega}
+                          stripeImageSrc={stripeBaseImageSrc}
+                          resolvedMega={resolvedMegaFiltered}
                           showStripe={showStripe}
                           stripeRowPadPx={stripeRowPadPx}
                           stripeRowPadXPx={stripeRowPadXPx}
@@ -3078,7 +3489,86 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
                           setHumanInsideSelectedItem={setHumanInsideSelectedItem}
                           setSelectedItemByCollection={setSelectedItemByCollection}
                           normalizeOverlaySrc={normalizeOverlaySrc}
+                          shirtColor={CERCADOR_COLORS.find((c) => c.slug === cercadorSelectedColor)?.hex}
+                          onShirtClick={onShirtClick}
+                          stripeTileOverlaySrcs={stripeTileOverlaySrcs}
+                          stripeTileItems={stripeTileItems}
+                          clicAreaHighlightIndices={clicAreaHighlightIndices}
+                          neckDotIndices={neckDotIndices}
+                          emptyTileIndices={emptyTileIndices}
+                          stripeEmptyMaskSrc={stripeEmptyMaskSrc}
                         />
+                        </div>
+                        {active ? (
+                          <div style={{
+                            display: 'flex',
+                            marginTop: '18px',
+                            padding: '0 40px',
+                            justifyContent: 'center',
+                          }}>
+                            <div style={{
+                              display: 'flex',
+                              backgroundColor: '#f3f4f6',
+                              padding: '2px',
+                              borderRadius: 'clamp(2.81px, 0.8vw, 5.06px)',
+                              border: '1px solid #e5e7eb',
+                              width: '100%',
+                              maxWidth: '202px',
+                              boxSizing: 'border-box',
+                            }}>
+                              {['BLANC', 'COLOR', 'NEGRE'].map((opt) => {
+                                const currentVariant = active === 'the_human_inside' ? humanInsideVariant : firstContactVariant;
+                                const variantKey = opt === 'BLANC' ? 'white' : opt === 'NEGRE' ? 'black' : 'color';
+                                const isActive = currentVariant === variantKey;
+                                // Deshabilitar: (1) variants inexistents a la
+                                // col·lecció/subcol·lecció activa, (2) blanc sobre
+                                // blanc i negre sobre negre.
+                                const variantExists = stripeVariantVisibility?.[variantKey] !== false;
+                                const isDisabled = !variantExists
+                                  || (variantKey === 'white' && cercadorSelectedColor === 'white')
+                                  || (variantKey === 'black' && cercadorSelectedColor === 'black');
+                                return (
+                                  <button
+                                    key={opt}
+                                    type="button"
+                                    disabled={isDisabled}
+                                    onClick={() => {
+                                      if (isDisabled) return;
+                                      if (active === 'the_human_inside') {
+                                        setHumanInsideVariant(variantKey);
+                                      } else {
+                                        setFirstContactVariant(variantKey);
+                                      }
+                                    }}
+                                    style={{
+                                      flex: 1,
+                                      fontFamily: 'Oswald, sans-serif',
+                                      fontSize: '8.1pt',
+                                      fontWeight: isActive ? 400 : 300,
+                                      letterSpacing: '0em',
+                                      lineHeight: 1,
+                                      textTransform: 'none',
+                                      color: isDisabled ? '#d1d5db' : (isActive ? '#111827' : '#9ca3af'),
+                                      backgroundColor: isActive ? '#ffffff' : 'transparent',
+                                      border: 'none',
+                                      borderRadius: 'clamp(2.11px, 0.6vw, 3.8px)',
+                                      cursor: isDisabled ? 'not-allowed' : 'pointer',
+                                      opacity: isDisabled ? 0.5 : 1,
+                                      transition: 'all 150ms ease',
+                                      boxShadow: isActive ? '0 1px 2px rgba(0,0,0,0.05)' : 'none',
+                                      display: 'flex',
+                                      alignItems: 'center',
+                                      justifyContent: 'center',
+                                      padding: '5px 0',
+                                    }}
+                                  >
+                                    {opt}
+                                  </button>
+                                );
+                              })}
+                            </div>
+                          </div>
+                        ) : null}
                       </div>
 
                       <div style={{ 

@@ -492,7 +492,7 @@ function MegaColumn({
       if (collectionId === 'miscellania') {
         const normalized = typeof vPath === 'string' ? vPath.replace(/^\/?(black|white)\//i, '') : vPath;
         if (variant === 'color') {
-          return ensureThumbSuffix(`/custom_logos/drawings/images_stripe/miscellania/multi/${normalized}`, 'stripe');
+          return ensureThumbSuffix(`/custom_logos/drawings/images_stripe/miscellania/color/${normalized}`, 'stripe');
         }
         if (variant === 'white') {
           return ensureThumbSuffix(`/custom_logos/drawings/images_stripe/miscellania/white/${normalized}`, 'stripe');
@@ -601,14 +601,6 @@ function MegaColumn({
         const base = lower.replace(/\.(webp|png|jpe?g)$/i, '').replace(/-grid$/i, '');
 
         const mapped = (() => {
-          if (base.endsWith('-dark-gradient') || base.endsWith('-dark')) {
-            const c = base.replace(/-(dark-gradient|dark)$/i, '');
-            return `${c}-dark-gradient-grid.webp`;
-          }
-          if (base.endsWith('-light-gradient') || base.endsWith('-light')) {
-            const c = base.replace(/-(light-gradient|light)$/i, '');
-            return `${c}-light-gradient-grid.webp`;
-          }
           if (base.endsWith('-frame')) {
             const c = base.replace(/-frame$/i, '');
             return `${c}-frame-grid.webp`;
@@ -860,10 +852,10 @@ function MegaColumn({
         const whiteStem = slug === 'unsociable-and-taciturn' ? 'i-prefer-to-be' : slug;
         const multiStem = slug === 'unsociable-and-taciturn' ? 'i-prefer-to-be' : slug;
         const out = variant === 'color'
-          ? `/custom_logos/drawings/images_stripe/austen/quotes/multi/${multiStem}-multi-light-stripe.webp`
+          ? `/custom_logos/drawings/images_stripe/austen/quotes/color/${multiStem}-multi-light-stripe.webp`
           : variant === 'white'
             ? `/custom_logos/drawings/images_stripe/austen/quotes/white/${whiteStem}-w-stripe.webp`
-            : `/custom_logos/drawings/images_stripe/austen/quotes/black/${slug}-b-stripe.webp`;
+            : `/custom_logos/drawings/images_stripe/austen/quotes/black/${whiteStem}-b-stripe.webp`;
         return ensureThumbSuffix(out, 'stripe');
       }
       if (raw.includes('/austen/quotes/')) {
@@ -878,10 +870,10 @@ function MegaColumn({
           const whiteStem = slug === 'unsociable-and-taciturn' ? 'i-prefer-to-be' : slug;
           const multiStem = slug === 'unsociable-and-taciturn' ? 'i-prefer-to-be' : slug;
           const out = variant === 'color'
-            ? `/custom_logos/drawings/images_stripe/austen/quotes/multi/${multiStem}-multi-light-stripe.webp`
+            ? `/custom_logos/drawings/images_stripe/austen/quotes/color/${multiStem}-multi-light-stripe.webp`
             : variant === 'white'
               ? `/custom_logos/drawings/images_stripe/austen/quotes/white/${whiteStem}-w-stripe.webp`
-              : `/custom_logos/drawings/images_stripe/austen/quotes/black/${slug}-b-stripe.webp`;
+              : `/custom_logos/drawings/images_stripe/austen/quotes/black/${whiteStem}-b-stripe.webp`;
           return ensureThumbSuffix(out, 'stripe');
         } catch {
           return resolveAustenQuoteThumbFromPath(raw, 'stripe') || null;
@@ -889,50 +881,20 @@ function MegaColumn({
       }
 
       if (raw.includes('/austen/keep_calm/')) {
-        try {
-          const file = (raw.split('/').pop() || '').toString().trim().toLowerCase();
-          const isKcb = file.includes('keep-calm-b') || file.includes('keep-calm-black');
-          const isKcr = file.includes('keep-calm-multi-red') || file.includes('keep-calm-multi-w-red');
-
-          // Keep Calm Black (KCB): color must be the multi-light/dark pair (NOT thru-red).
-          if (isKcb) {
-            const out = variant === 'color'
-              ? '/custom_logos/drawings/images_stripe/austen/keep_calm/multi/keep-calm-multi-light-stripe.webp'
-              : variant === 'white'
-                ? '/custom_logos/drawings/images_stripe/austen/keep_calm/white/keep-calm-w-stripe.webp'
-                : '/custom_logos/drawings/images_stripe/austen/keep_calm/black/keep-calm-b-stripe.webp';
-            return ensureThumbSuffix(out, 'stripe');
-          }
-
-          // Keep Calm Red (KCR): white/black are the red-background variants.
-          if (isKcr) {
-            const out = variant === 'color'
-              ? '/custom_logos/drawings/images_stripe/austen/keep_calm/multi/keep-calm-multi-thru-light-stripe.webp'
-              : variant === 'white'
-                ? '/custom_logos/drawings/images_stripe/austen/keep_calm/multi/keep-calm-multi-w-red-stripe.webp'
-                : '/custom_logos/drawings/images_stripe/austen/keep_calm/multi/keep-calm-multi-thru-red-stripe.webp';
-            return ensureThumbSuffix(out, 'stripe');
-          }
-
-          // Default fallback: keep previous behavior.
-          const out = variant === 'color'
-            ? '/custom_logos/drawings/images_stripe/austen/keep_calm/multi/keep-calm-multi-thru-red-stripe.webp'
-            : variant === 'white'
-              ? '/custom_logos/drawings/images_stripe/austen/keep_calm/white/keep-calm-w-stripe.webp'
-              : '/custom_logos/drawings/images_stripe/austen/keep_calm/black/keep-calm-b-stripe.webp';
-          return ensureThumbSuffix(out, 'stripe');
-        } catch {
-          const out = variant === 'color'
-            ? '/custom_logos/drawings/images_stripe/austen/keep_calm/multi/keep-calm-multi-thru-red-stripe.webp'
-            : variant === 'white'
-              ? '/custom_logos/drawings/images_stripe/austen/keep_calm/white/keep-calm-w-stripe.webp'
-              : '/custom_logos/drawings/images_stripe/austen/keep_calm/black/keep-calm-b-stripe.webp';
-          return ensureThumbSuffix(out, 'stripe');
-        }
+        const out = variant === 'color'
+          ? '/custom_logos/drawings/images_stripe/austen/keep_calm/color/keep-calm-multi-light-stripe.webp'
+          : variant === 'white'
+            ? '/custom_logos/drawings/images_stripe/austen/keep_calm/white/keep-calm-w-stripe.webp'
+            : '/custom_logos/drawings/images_stripe/austen/keep_calm/black/keep-calm-b-stripe.webp';
+        return ensureThumbSuffix(out, 'stripe');
       }
 
       if (raw.includes('/austen/pemberley_house/')) {
-        const out = '/custom_logos/drawings/images_stripe/austen/pemberley_house/white/pemberley-house-w-stripe.webp';
+        const out = variant === 'color'
+          ? '/custom_logos/drawings/images_stripe/austen/pemberley_house/color/pemberley-house-multi-light-stripe.webp'
+          : variant === 'white'
+            ? '/custom_logos/drawings/images_stripe/austen/pemberley_house/white/pemberley-house-w-stripe.webp'
+            : '/custom_logos/drawings/images_stripe/austen/pemberley_house/black/pemberley-house-b-stripe.webp';
         return ensureThumbSuffix(out, 'stripe');
       }
 
@@ -953,11 +915,15 @@ function MegaColumn({
 
       if (raw.includes('/austen/looking_for_my_darcy/')) {
         const file = raw.split('/').pop() || '';
-        const lower = file.toLowerCase();
-        if (lower.includes('dark-gradient')) return ensureThumbSuffix(`/custom_logos/drawings/images_stripe/austen/looking_for_my_darcy/dark/${file}`, 'stripe');
-        if (lower.includes('light-gradient')) return ensureThumbSuffix(`/custom_logos/drawings/images_stripe/austen/looking_for_my_darcy/light/${file}`, 'stripe');
-        if (lower.includes('-frame')) return ensureThumbSuffix(`/custom_logos/drawings/images_stripe/austen/looking_for_my_darcy/frame/${file}`, 'stripe');
-        if (lower.includes('-solid')) return ensureThumbSuffix(`/custom_logos/drawings/images_stripe/austen/looking_for_my_darcy/solid/${file}`, 'stripe');
+        const base = file.toLowerCase().replace(/\.(webp|png|jpe?g)$/i, '').replace(/-(grid|stripe)$/i, '');
+        if (base.endsWith('-frame')) {
+          const c = base.replace(/-frame$/i, '');
+          return ensureThumbSuffix(`/custom_logos/drawings/images_stripe/austen/looking_for_my_darcy/color/frame/${c}-frame-stripe.webp`, 'stripe');
+        }
+        if (base.endsWith('-solid')) {
+          const c = base.replace(/-solid$/i, '');
+          return ensureThumbSuffix(`/custom_logos/drawings/images_stripe/austen/looking_for_my_darcy/color/solid/${c}-solid-stripe.webp`, 'stripe');
+        }
       }
 
       if (raw.includes('/austen/pemberley_house/')) {

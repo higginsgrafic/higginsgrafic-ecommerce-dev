@@ -1,5 +1,41 @@
-import React from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import MegaColumn from './MegaColumn.jsx';
+import ClicAreaOverlay from './ClicAreaOverlay.jsx';
+
+function useEmptyShirtMask(emptyTileIndices, shirtColor) {
+  const [dataUrl, setDataUrl] = useState(null);
+  const emptyKey = Array.isArray(emptyTileIndices) ? emptyTileIndices.join(',') : '';
+  useEffect(() => {
+    let cancelled = false;
+    fetch('/placeholders/cercador/full-clic-area-5.svg')
+      .then((r) => r.text())
+      .then((text) => {
+        if (cancelled) return;
+        try {
+          const doc = new DOMParser().parseFromString(text, 'image/svg+xml');
+          const emptySet = new Set(Array.isArray(emptyTileIndices) ? emptyTileIndices : []);
+          const paths = doc.querySelectorAll('.tshirt-outline');
+          const isWhite = !shirtColor || shirtColor === '#FFFFFF';
+          const emptyOpacity = isWhite ? '0.3' : '0.1';
+          paths.forEach((p, i) => {
+            p.setAttribute('fill', 'white');
+            p.setAttribute('fill-opacity', emptySet.has(i) ? emptyOpacity : '1');
+            p.removeAttribute('stroke');
+            p.removeAttribute('class');
+          });
+          const svgEl = doc.documentElement;
+          const serialized = new XMLSerializer().serializeToString(svgEl);
+          const encoded = encodeURIComponent(serialized);
+          setDataUrl(`data:image/svg+xml,${encoded}`);
+        } catch {
+          setDataUrl(null);
+        }
+      })
+      .catch(() => setDataUrl(null));
+    return () => { cancelled = true; };
+  }, [emptyKey, shirtColor]);
+  return dataUrl;
+}
 
 function MegaStripePanel({
   hideGrid,
@@ -41,7 +77,33 @@ function MegaStripePanel({
   setHumanInsideSelectedItem,
   setSelectedItemByCollection,
   normalizeOverlaySrc,
+  shirtColor,
+  onShirtClick,
+  stripeTileOverlaySrcs,
+  stripeTileItems,
+  clicAreaHighlight,
+  clicAreaHighlightIndices,
+  neckDotIndices,
+  emptyTileIndices,
+  stripeEmptyMaskSrc,
 }) {
+  const emptyShirtMaskUrl = useEmptyShirtMask(emptyTileIndices, shirtColor);
+
+  useEffect(() => {
+    const handler = (ev) => {
+      if (typeof onShirtClick !== 'function') return;
+      if (!Array.isArray(stripeTileItems)) return;
+      const x = ev.detail?.x;
+      if (typeof x !== 'number') return;
+      const tileIdx = Math.min(13, Math.max(0, Math.floor(x * 14)));
+      const item = stripeTileItems[tileIdx];
+      if (!item) return;
+      onShirtClick(active, item, shirtColor);
+    };
+    window.addEventListener('mega-stripe-full-hit', handler);
+    return () => window.removeEventListener('mega-stripe-full-hit', handler);
+  }, [onShirtClick, stripeTileItems, active, shirtColor]);
+
   return (
     <div className="w-full shrink-0">
       {!hideGrid || reserveGridSpace ? (
@@ -84,6 +146,7 @@ function MegaStripePanel({
                 if (active === 'first_contact') setFirstContactSelectedItem(it);
                 else if (active === 'the_human_inside') setHumanInsideSelectedItem(it);
                 else setSelectedItemByCollection((prev) => ({ ...prev, [active]: it }));
+                if (typeof onShirtClick === 'function') onShirtClick(active, it);
               }}
             />
           ))}
@@ -110,7 +173,7 @@ function MegaStripePanel({
                 width: 'auto',
               }}
             >
-              {stripeOverlayLoadState !== 'ok' ? (
+              {stripeOverlayDebug && stripeOverlayLoadState !== 'ok' ? (
                 <div
                   className="absolute left-2 top-2"
                   style={{
@@ -220,8 +283,12 @@ function MegaStripePanel({
                     display: 'inline-block',
                     position: 'relative',
                     zIndex: 1,
-                    WebkitMaskImage: 'url(/placeholders/t-shirt_buttons/v5/full-clic-area-5.svg)',
-                    maskImage: 'url(/placeholders/t-shirt_buttons/v5/full-clic-area-5.svg)',
+                    WebkitMaskImage: emptyShirtMaskUrl
+                      ? `url("${emptyShirtMaskUrl}")`
+                      : 'url(/placeholders/t-shirt_buttons/v5/full-clic-area-5.svg)',
+                    maskImage: emptyShirtMaskUrl
+                      ? `url("${emptyShirtMaskUrl}")`
+                      : 'url(/placeholders/t-shirt_buttons/v5/full-clic-area-5.svg)',
                     WebkitMaskRepeat: 'no-repeat',
                     maskRepeat: 'no-repeat',
                     WebkitMaskSize: '103% 100%',
@@ -241,6 +308,20 @@ function MegaStripePanel({
                       }}
                       loading="lazy"
                       decoding="async"
+                    />
+                  ) : null}
+
+                  {shirtColor && shirtColor !== '#FFFFFF' ? (
+                    <div
+                      aria-hidden="true"
+                      style={{
+                        position: 'absolute',
+                        inset: 0,
+                        backgroundColor: shirtColor,
+                        mixBlendMode: 'multiply',
+                        pointerEvents: 'none',
+                        zIndex: 5,
+                      }}
                     />
                   ) : null}
 
@@ -280,6 +361,63 @@ function MegaStripePanel({
                     />
                   ) : null}
 
+                  {/* Imatge prerenderitzada de les samarretes buides esvaïdes
+                      (N.png, transparent), alineada amb la stripe. Esvaeix només
+                      les buides; la zona dels dibuixos és transparent i no tapa
+                      les samarretes de color. */}
+                  {stripeEmptyMaskSrc ? (
+                    <img
+                      src={stripeEmptyMaskSrc}
+                      alt=""
+                      aria-hidden="true"
+                      className="block absolute"
+                      style={{
+                        top: 0,
+                        left: 0,
+                        height: '100%',
+                        width: 'auto',
+                        pointerEvents: 'none',
+                        zIndex: 9,
+                        opacity: 'var(--hgStripeEmptyMaskOpacity, 1)',
+                      }}
+                      loading="eager"
+                      decoding="async"
+                    />
+                  ) : null}
+
+                  {/* Capa de bloqueig de clics sobre les samarretes buides
+                      (transparent; el fade visual ve de stripeEmptyMaskSrc). */}
+                  {Array.isArray(emptyTileIndices) && emptyTileIndices.length > 0 ? (
+                    <div className="absolute inset-0" aria-hidden="true" style={{ pointerEvents: 'none', zIndex: 10 }}>
+                      {emptyTileIndices.map((idx) => {
+                        const r = Array.isArray(stripeMaskTileRectsRawPct) && stripeMaskTileRectsRawPct.length === 14
+                          ? stripeMaskTileRectsRawPct[idx]
+                          : null;
+                        const leftPct = r ? Number(r.left) || 0 : (idx / 14) * 100;
+                        const widthPct = r ? Number(r.width) || 0 : (1 / 14) * 100;
+                        const topPct = r ? Number(r.top) || 0 : 0;
+                        const heightPct = r ? Number(r.height) || 100 : 100;
+                        return (
+                          <div
+                            key={`disabled-tile-${idx}`}
+                            onPointerDown={(ev) => { ev.stopPropagation(); }}
+                            onClick={(ev) => { ev.stopPropagation(); }}
+                            style={{
+                              position: 'absolute',
+                              top: `${topPct}%`,
+                              height: `${heightPct}%`,
+                              left: `${leftPct}%`,
+                              width: `${widthPct}%`,
+                              background: 'var(--hgStripeDisabledFill, transparent)',
+                              pointerEvents: 'auto',
+                              cursor: 'default',
+                            }}
+                          />
+                        );
+                      })}
+                    </div>
+                  ) : null}
+
                   {megaShirtDrawingEnabledLocal && drawingOverlaySrcEffective ? (
                     <div
                       className="absolute inset-0"
@@ -293,8 +431,16 @@ function MegaStripePanel({
                     >
                       {Array.isArray(stripeMaskTileRectsRawPct) && stripeMaskTileRectsRawPct.length === 14
                         ? stripeMaskTileRectsRawPct.map((r, idx) => {
+                          // Tile buit (samarreta sense dibuix): no renderitzem res
+                          // (no repetim ni fem fallback al dibuix per defecte).
+                          if (Array.isArray(stripeTileOverlaySrcs) && !stripeTileOverlaySrcs[idx]) {
+                            return null;
+                          }
                           const base = (() => {
                             try {
+                              if (Array.isArray(stripeTileOverlaySrcs) && stripeTileOverlaySrcs[idx]) {
+                                return normalizeOverlaySrc(stripeTileOverlaySrcs[idx]);
+                              }
                               return normalizeOverlaySrc(drawingOverlaySrcEffective);
                             } catch {
                               return normalizeOverlaySrc(drawingOverlaySrcEffective);
@@ -364,9 +510,7 @@ function MegaStripePanel({
                               if (!shouldApplyRules) return src;
 
                               if ((active === 'the_human_inside' || isAustenTileSwapBW) && (mode === 'white' || mode === 'black') && !isAustenPemberley) {
-                                if (isFirst) return toBlack(src);
-                                if (isLast) return toWhite(src);
-                                return src;
+                                return mode === 'white' ? toWhite(src) : toBlack(src);
                               }
 
                               if (mode === 'color') {
@@ -380,13 +524,13 @@ function MegaStripePanel({
                                   if (hasMultiDark) return src.replace(/-multi-dark-/i, '-multi-light-');
                                   return src;
                                 }
-                                if (isFirst) {
-                                  if (hasMultiDark) return src;
+                                if (isAustenKeepCalm) {
+                                  const isRedShirt = shirtColor === '#BD2739';
+                                  if (isRedShirt) {
+                                    if (hasMultiDark) return src.replace(/-multi-dark-/i, '-multi-light-');
+                                    return src;
+                                  }
                                   if (hasMultiLight) return src.replace(/-multi-light-/i, '-multi-dark-');
-                                  if (hasThruDark) return src;
-                                  if (hasThruLight) return src.replace(/-multi-thru-light-/i, '-multi-thru-dark-');
-                                  if (hasThruRed) return src;
-                                  if (hasWRed) return src.replace(/-multi-w-red-/i, '-multi-thru-red-');
                                   return src;
                                 }
                                 if (hasMultiLight) return src;
@@ -406,14 +550,12 @@ function MegaStripePanel({
                                 const hasThruRed = src.toLowerCase().includes('-multi-thru-red-');
                                 const hasWRed = src.toLowerCase().includes('-multi-w-red-');
                                 if (hasThruRed || hasWRed) {
-                                  return isFirst
-                                    ? (hasThruRed ? src : src.replace(/-multi-w-red-/i, '-multi-thru-red-'))
-                                    : (hasWRed ? src : src.replace(/-multi-thru-red-/i, '-multi-w-red-'));
+                                  return hasWRed ? src : src.replace(/-multi-thru-red-/i, '-multi-w-red-');
                                 }
-                                return isFirst ? toBlack(src) : toWhite(src);
+                                return toWhite(src);
                               }
                               if (mode === 'black') {
-                                return isLast ? toWhite(src) : toBlack(src);
+                                return toBlack(src);
                               }
 
                               return src;
@@ -422,11 +564,13 @@ function MegaStripePanel({
                             }
                           };
 
+                          const hasPerTileSrc = Array.isArray(stripeTileOverlaySrcs) && !!stripeTileOverlaySrcs[idx];
                           const picked = (() => {
                             try {
                               if (!base) return null;
                               const perTile = resolvePerTileAssetSrc(base);
                               const candidate = perTile || base;
+                              if (hasPerTileSrc) return candidate;
                               return resolveDrawingOverlaySrcForTile(candidate) || candidate;
                             } catch {
                               return base;
@@ -503,9 +647,6 @@ function MegaStripePanel({
                                     'translate(var(--megaStripeDrawingOverlayDx, var(--hgShirtOverlayDx, 0px)), calc(var(--megaStripeDrawingOverlayDy, var(--hgShirtOverlayDy, 0px)) + var(--hgStripeDrawingExtraDy, -5px))) scale(calc(var(--megaStripeDrawingOverlayScale, var(--hgShirtOverlayScale, 1)) * var(--hgStripeDrawingExtraScale, 1)))',
                                   filter: (() => {
                                     const isPemberley = active === 'austen' && typeof resolvedOverlaySrc === 'string' && /\/austen\/pemberley_house\//i.test(resolvedOverlaySrc);
-                                    const tileIsFirst = Number(idx) === 0;
-                                    const tileIsLast = Number(idx) === 13;
-                                    const invertPemb = isPemberley && ((mode === 'white' && tileIsFirst) || (mode === 'black' && !tileIsLast));
                                     const baseFx = drawingOverlayDebug
                                       ? 'drop-shadow(0 0 2px rgba(0,0,0,0.65))'
                                       : active === 'austen'
@@ -516,9 +657,7 @@ function MegaStripePanel({
                                         : isPemberley
                                           ? 'drop-shadow(0 0 0px rgba(0,0,0,0.85))'
                                         : 'none';
-                                    if (!invertPemb) return baseFx;
-                                    if (!baseFx || baseFx === 'none') return 'invert(1)';
-                                    return `${baseFx} invert(1)`;
+                                    return baseFx;
                                   })(),
                                 }}
                                 loading="eager"
@@ -528,8 +667,15 @@ function MegaStripePanel({
                           );
                         })
                         : Array.from({ length: 14 }).map((_, idx) => {
+                          // Tile buit (samarreta sense dibuix): no renderitzem res.
+                          if (Array.isArray(stripeTileOverlaySrcs) && !stripeTileOverlaySrcs[idx]) {
+                            return null;
+                          }
                           const base = (() => {
                             try {
+                              if (Array.isArray(stripeTileOverlaySrcs) && stripeTileOverlaySrcs[idx]) {
+                                return normalizeOverlaySrc(stripeTileOverlaySrcs[idx]);
+                              }
                               return normalizeOverlaySrc(drawingOverlaySrcEffective);
                             } catch {
                               return normalizeOverlaySrc(drawingOverlaySrcEffective);
@@ -598,9 +744,7 @@ function MegaStripePanel({
                               if (!shouldApplyRules) return src;
 
                               if ((active === 'the_human_inside' || isAustenTileSwapBW) && (mode === 'white' || mode === 'black') && !isAustenPemberley) {
-                                if (isFirst) return toBlack(src);
-                                if (isLast) return toWhite(src);
-                                return src;
+                                return mode === 'white' ? toWhite(src) : toBlack(src);
                               }
 
                               if (mode === 'color') {
@@ -614,13 +758,13 @@ function MegaStripePanel({
                                   if (hasMultiDark) return src.replace(/-multi-dark-/i, '-multi-light-');
                                   return src;
                                 }
-                                if (isFirst) {
-                                  if (hasMultiDark) return src;
+                                if (isAustenKeepCalm) {
+                                  const isRedShirt = shirtColor === '#BD2739';
+                                  if (isRedShirt) {
+                                    if (hasMultiDark) return src.replace(/-multi-dark-/i, '-multi-light-');
+                                    return src;
+                                  }
                                   if (hasMultiLight) return src.replace(/-multi-light-/i, '-multi-dark-');
-                                  if (hasThruDark) return src;
-                                  if (hasThruLight) return src.replace(/-multi-thru-light-/i, '-multi-thru-dark-');
-                                  if (hasThruRed) return src;
-                                  if (hasWRed) return src.replace(/-multi-w-red-/i, '-multi-thru-red-');
                                   return src;
                                 }
                                 if (hasMultiLight) return src;
@@ -636,14 +780,12 @@ function MegaStripePanel({
                                 const hasThruRed = src.toLowerCase().includes('-multi-thru-red-');
                                 const hasWRed = src.toLowerCase().includes('-multi-w-red-');
                                 if (hasThruRed || hasWRed) {
-                                  return isFirst
-                                    ? (hasThruRed ? src : src.replace(/-multi-w-red-/i, '-multi-thru-red-'))
-                                    : (hasWRed ? src : src.replace(/-multi-thru-red-/i, '-multi-w-red-'));
+                                  return hasWRed ? src : src.replace(/-multi-thru-red-/i, '-multi-w-red-');
                                 }
-                                return isFirst ? toBlack(src) : toWhite(src);
+                                return toWhite(src);
                               }
                               if (mode === 'black') {
-                                return isLast ? toWhite(src) : toBlack(src);
+                                return toBlack(src);
                               }
 
                               return src;
@@ -661,10 +803,12 @@ function MegaStripePanel({
                             }
                           })();
 
+                          const hasPerTileSrcFallback = Array.isArray(stripeTileOverlaySrcs) && !!stripeTileOverlaySrcs[idx];
                           const picked = (() => {
                             try {
                               if (!base) return null;
                               const candidate = perTileRaw || base;
+                              if (hasPerTileSrcFallback) return candidate;
                               return resolveDrawingOverlaySrcForTile(candidate) || candidate;
                             } catch {
                               return base;
@@ -707,13 +851,8 @@ function MegaStripePanel({
                                     'translate(var(--megaStripeDrawingOverlayDx, var(--hgShirtOverlayDx, 0px)), calc(var(--megaStripeDrawingOverlayDy, var(--hgShirtOverlayDy, 0px)) + var(--hgStripeDrawingExtraDy, -5px))) scale(calc(var(--megaStripeDrawingOverlayScale, var(--hgShirtOverlayScale, 1)) * var(--hgStripeDrawingExtraScale, 1)))',
                                   filter: (() => {
                                     const isPemberley = active === 'austen' && typeof resolvedOverlaySrc === 'string' && /\/austen\/pemberley_house\//i.test(resolvedOverlaySrc);
-                                    const tileIsFirst = Number(idx) === 0;
-                                    const tileIsLast = Number(idx) === 13;
-                                    const invertPemb = isPemberley && ((mode === 'white' && tileIsFirst) || (mode === 'black' && !tileIsLast));
                                     const baseFx = isPemberley ? 'drop-shadow(0 0 0px rgba(0,0,0,0.85))' : 'none';
-                                    if (!invertPemb) return baseFx;
-                                    if (!baseFx || baseFx === 'none') return 'invert(1)';
-                                    return `${baseFx} invert(1)`;
+                                    return baseFx;
                                   })(),
                                 }}
                                 loading="eager"
@@ -744,6 +883,49 @@ function MegaStripePanel({
                     }}
                   />
                 </div>
+
+                {/* Cercle fosc sobre el coll de cada samarreta, situat al gap
+                    superior (fora de la imatge), alineat amb el centre de cada
+                    casella. Configurable amb CSS vars: --hgStripeNeckDotSize,
+                    --hgStripeNeckDotColor, --hgStripeNeckDotDy. */}
+                <div className="absolute inset-0" aria-hidden="true" style={{ pointerEvents: 'none', zIndex: 40 }}>
+                  {(Array.isArray(stripeMaskTileRectsRawPct) && stripeMaskTileRectsRawPct.length === 14
+                    ? stripeMaskTileRectsRawPct.map((r, idx) => ({
+                      idx,
+                      cx: (Number(r?.left) || 0) + (Number(r?.width) || 0) / 2,
+                    }))
+                    : Array.from({ length: 14 }).map((_, idx) => ({
+                      idx,
+                      cx: ((idx + 0.5) / 14) * 100,
+                    }))
+                  ).filter(({ idx }) => Array.isArray(neckDotIndices) && neckDotIndices.includes(idx)).map(({ idx, cx }) => (
+                    <span
+                      key={`neck-dot-${idx}`}
+                      style={{
+                        position: 'absolute',
+                        left: `${cx}%`,
+                        top: 0,
+                        width: 'var(--hgStripeNeckDotSize, 5.625px)',
+                        height: 'var(--hgStripeNeckDotSize, 5.625px)',
+                        borderRadius: '50%',
+                        backgroundColor: 'var(--hgStripeNeckDotColor, #1a1a1a)',
+                        transform: 'translate(-50%, calc(-100% + var(--hgStripeNeckDotDy, -2px)))',
+                      }}
+                    />
+                  ))}
+                </div>
+
+                {/* Contorn de l'àrea de clic (samarretes), alineat amb la
+                    màscara de la imatge (103% × 100%, centrat). Cada samarreta
+                    es ressalta en passar-hi el ratolí; si `clicAreaHighlight`
+                    (hover sobre el nom del dibuix) és cert, es ressalten totes. */}
+                <ClicAreaOverlay
+                  src="/placeholders/cercador/full-clic-area-5.svg"
+                  highlightAll={!!clicAreaHighlight}
+                  highlightIndices={clicAreaHighlightIndices}
+                  tshirtColor={shirtColor}
+                  disabledIndices={emptyTileIndices}
+                />
               </div>
             </div>
           </div>

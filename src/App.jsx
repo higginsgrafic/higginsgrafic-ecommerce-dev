@@ -4587,8 +4587,8 @@ function App() {
                                         : lower.includes('-w-stripe')
                                           ? 'white'
                                           : (lower.includes('multi') || lower.includes('-multi-'))
-                                            ? 'multi'
-                                            : 'multi';
+                                            ? 'color'
+                                            : 'color';
                                       return `/custom_logos/drawings/images_stripe/austen/keep_calm/${folder}/${file}`;
                                     }
                                     return s;

@@ -30,13 +30,13 @@ export const FIRST_CONTACT_MEDIA_WHITE = {
 };
 
 export const FIRST_CONTACT_MEDIA_COLOR = {
-  'NX-01': '/custom_logos/drawings/images_stripe/first_contact/multi/nx-01-multi-light-stripe.webp',
-  'NCC-1701': '/custom_logos/drawings/images_stripe/first_contact/multi/ncc-1701-multi-light-stripe.webp',
-  'NCC-1701-D': '/custom_logos/drawings/images_stripe/first_contact/multi/ncc-1701-d-multi-light-stripe.webp',
-  'Wormhole': '/custom_logos/drawings/images_stripe/first_contact/multi/wormhole-multi-light-stripe.webp',
-  'Plasma Escape': '/custom_logos/drawings/images_stripe/first_contact/multi/plasma-escape-multi-light-stripe.webp',
-  "Vulcan's End": '/custom_logos/drawings/images_stripe/first_contact/multi/vulcans-end-multi-light-stripe.webp',
-  'The Phoenix': '/custom_logos/drawings/images_stripe/first_contact/multi/the phoenix-multi-light-stripe.webp',
+  'NX-01': '/custom_logos/drawings/images_stripe/first_contact/color/nx-01-multi-light-stripe.webp',
+  'NCC-1701': '/custom_logos/drawings/images_stripe/first_contact/color/ncc-1701-multi-light-stripe.webp',
+  'NCC-1701-D': '/custom_logos/drawings/images_stripe/first_contact/color/ncc-1701-d-multi-light-stripe.webp',
+  'Wormhole': '/custom_logos/drawings/images_stripe/first_contact/color/wormhole-multi-light-stripe.webp',
+  'Plasma Escape': '/custom_logos/drawings/images_stripe/first_contact/color/plasma-escape-multi-light-stripe.webp',
+  "Vulcan's End": '/custom_logos/drawings/images_stripe/first_contact/color/vulcans-end-multi-light-stripe.webp',
+  'The Phoenix': '/custom_logos/drawings/images_stripe/first_contact/color/the-phoenix-multi-light-stripe.webp',
 };
 
 export const THE_HUMAN_INSIDE_MEDIA = {

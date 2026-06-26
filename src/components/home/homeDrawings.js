@@ -107,7 +107,6 @@ const AUSTEN_QUOTES_WITH_MOCKUP = new Set([
 const LFMD_FRAME_MAP = {
   'blue-solid': 'blau',
   'fuchsia-solid': 'fucsia',
-  'orange-solid': 'carabassa',
   'red-solid': 'vermell',
   'yellow-solid': 'groc',
 };
@@ -137,7 +136,7 @@ const AUSTEN = [
   ...Object.keys(LFMD_FRAME_MAP).map((n) =>
     colorOnly(
       'austen',
-      `austen/looking_for_my_darcy/solid/${n}-stripe.webp`,
+      `austen/looking_for_my_darcy/color/solid/${n}-stripe.webp`,
       `austen/lfmd/${n}`,
       { collection: 'austen-looking-for-my-darcy', design: `looking-for-my-darcy-${n}` }
     )
@@ -184,7 +183,6 @@ const OVERLAY_SCALE_OVERRIDES = {
   // Looking For My Darcy: 25% més petit (0.345 × 0.75).
   'austen/lfmd/blue-solid': 0.25875,
   'austen/lfmd/fuchsia-solid': 0.25875,
-  'austen/lfmd/orange-solid': 0.25875,
   'austen/lfmd/red-solid': 0.25875,
   'austen/lfmd/yellow-solid': 0.25875,
 };
