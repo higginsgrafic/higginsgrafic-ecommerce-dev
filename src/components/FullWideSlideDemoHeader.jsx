@@ -639,15 +639,25 @@ export default function FullWideSlideDemoHeader({
   const [firstContactVariant, setFirstContactVariant] = useState(() => readStripeVariantFromUrl() || 'black');
   const [humanInsideVariant, setHumanInsideVariant] = useState(() => readStripeVariantFromUrl() || 'black');
 
+  // Color de samarreta realment mostrat: coincideix amb el selector excepte
+  // quan la variant és BLANC sobre blanc o NEGRE sobre negre, llavors s'inverteix
+  // perquè la tinta sigui visible. El selector no es mou.
+  const displayedShirtColor = useMemo(() => {
+    const variant = active === 'the_human_inside' ? humanInsideVariant : firstContactVariant;
+    if (variant === 'white' && cercadorSelectedColor === 'white') return 'black';
+    if (variant === 'black' && cercadorSelectedColor === 'black') return 'white';
+    return cercadorSelectedColor;
+  }, [active, firstContactVariant, humanInsideVariant, cercadorSelectedColor]);
+
   const onShirtClick = useCallback((collection, item, color) => {
     const url = resolvePdpUrl(collection, item);
     if (url) {
       const matched = CERCADOR_COLORS.find((c) => c.hex === color);
-      const colorSlug = matched?.slug || cercadorSelectedColor || 'white';
+      const colorSlug = matched?.slug || displayedShirtColor || 'white';
       const variant = collection === 'the_human_inside' ? humanInsideVariant : firstContactVariant;
       navigate(`${url}?color=${colorSlug}&variant=${variant}`);
     }
-  }, [navigate, resolvePdpUrl, cercadorSelectedColor, firstContactVariant, humanInsideVariant]);
+  }, [navigate, resolvePdpUrl, displayedShirtColor, firstContactVariant, humanInsideVariant]);
 
   const [selectedColorSlug, setSelectedColorSlug] = useState('white');
   const [thinStartIndex, setThinStartIndex] = useState(0);
@@ -697,10 +707,10 @@ export default function FullWideSlideDemoHeader({
       if (active === 'austen') {
         const key = selectedItemByCollection?.austen;
         const s = typeof key === 'string' ? key.toLowerCase() : '';
-        if (s.includes('/austen/crosswords/')) return { white: true, black: true, color: false };
-        if (s.includes('/austen/pemberley_house/')) return { white: true, black: true, color: false };
-        if (s.includes('/austen/quotes/')) return { white: true, black: true, color: false };
-        if (s.includes('/austen/looking_for_my_darcy/')) return { white: false, black: false, color: true };
+        const sub = austenSubcollection || '';
+        if (s.includes('/austen/crosswords/') || sub === 'crosswords') return { white: true, black: true, color: false };
+        if (s.includes('/austen/quotes/') || sub === 'quotes') return { white: true, black: true, color: false };
+        if (s.includes('/austen/looking_for_my_darcy/') || sub === 'looking_for_my_darcy') return { white: false, black: false, color: true };
         return { white: true, black: true, color: true };
       }
 
@@ -708,7 +718,7 @@ export default function FullWideSlideDemoHeader({
     } catch {
       return { white: true, black: true, color: true };
     }
-  }, [active, selectedItemByCollection]);
+  }, [active, selectedItemByCollection, austenSubcollection]);
 
   useEffect(() => {
     if (active !== 'austen') return;
@@ -732,19 +742,6 @@ export default function FullWideSlideDemoHeader({
     }
   }, [active, stripeVariantVisibility, firstContactVariant]);
 
-  useEffect(() => {
-    // Evitar blanc sobre blanc i negre sobre negre: si la variant activa queda
-    // deshabilitada pel color de samarreta, canviar a una variant visible.
-    const fixVariant = (variant) => {
-      if (cercadorSelectedColor === 'white' && variant === 'white') return 'black';
-      if (cercadorSelectedColor === 'black' && variant === 'black') return 'white';
-      return null;
-    };
-    const fcFix = fixVariant(firstContactVariant);
-    if (fcFix) setFirstContactVariant(fcFix);
-    const hiFix = fixVariant(humanInsideVariant);
-    if (hiFix) setHumanInsideVariant(hiFix);
-  }, [cercadorSelectedColor, firstContactVariant, humanInsideVariant]);
 
   useEffect(() => {
     if (!import.meta.env.DEV) return;
@@ -2560,7 +2557,7 @@ export default function FullWideSlideDemoHeader({
     const variant = active === 'the_human_inside' ? humanInsideVariant : firstContactVariant;
     // Versió multi (variant 'color'): només la samarreta blanca usa la Dark;
     // totes les altres usen la Light, independentment del color de samarreta.
-    const multiTone = cercadorSelectedColor === 'white' ? 'dark' : 'light';
+    const multiTone = displayedShirtColor === 'white' ? 'dark' : 'light';
     const resolveForItem = (it) => {
       if (active === 'first_contact') {
         if (variant === 'white') return FIRST_CONTACT_MEDIA_WHITE[it] || FIRST_CONTACT_MEDIA[it] || null;
@@ -2633,7 +2630,7 @@ export default function FullWideSlideDemoHeader({
         }
         if (s.includes('/austen/keep_calm/')) {
           if (variant === 'color') {
-            const isRed = cercadorSelectedColor === 'red';
+            const isRed = displayedShirtColor === 'red';
             return isRed
               ? '/custom_logos/drawings/images_stripe/austen/keep_calm/color/keep-calm-multi-light-stripe.webp'
               : '/custom_logos/drawings/images_stripe/austen/keep_calm/color/keep-calm-multi-dark-stripe.webp';
@@ -2686,7 +2683,7 @@ export default function FullWideSlideDemoHeader({
       tileSrcs.push(src);
     }
     return tileSrcs;
-  }, [resolvedMegaFiltered, active, firstContactVariant, humanInsideVariant, cercadorSelectedColor, thinDrawings]);
+  }, [resolvedMegaFiltered, active, firstContactVariant, humanInsideVariant, displayedShirtColor, thinDrawings]);
 
   // Identitat de l'ítem mostrat a cada tile de la franja (mateixa lògica
   // cíclica que stripeTileOverlaySrcs). Permet saber quina samarreta correspon
@@ -3340,7 +3337,7 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
                           setHumanInsideSelectedItem={setHumanInsideSelectedItem}
                           setSelectedItemByCollection={setSelectedItemByCollection}
                           normalizeOverlaySrc={normalizeOverlaySrc}
-                          shirtColor={CERCADOR_COLORS.find((c) => c.slug === cercadorSelectedColor)?.hex}
+                          shirtColor={CERCADOR_COLORS.find((c) => c.slug === displayedShirtColor)?.hex}
                           onShirtClick={onShirtClick}
                           stripeTileOverlaySrcs={stripeTileOverlaySrcs}
                           stripeTileItems={stripeTileItems}
@@ -3397,7 +3394,17 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
                         }}>
                           <CercadorTopBar
                             activeCollection={active}
-                            onSelectCollection={setActive}
+                            activeSubcollection={austenSubcollection}
+                            onSelectCollection={(key) => {
+                              if (key.includes(':')) {
+                                const [col, sub] = key.split(':');
+                                setActive(col);
+                                setAustenSubcollection(sub);
+                              } else {
+                                setActive(key);
+                                setAustenSubcollection(null);
+                              }
+                            }}
                             selectedColor={cercadorSelectedColor}
                             onSelectColor={setCercadorSelectedColor}
                           />
@@ -3489,7 +3496,7 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
                           setHumanInsideSelectedItem={setHumanInsideSelectedItem}
                           setSelectedItemByCollection={setSelectedItemByCollection}
                           normalizeOverlaySrc={normalizeOverlaySrc}
-                          shirtColor={CERCADOR_COLORS.find((c) => c.slug === cercadorSelectedColor)?.hex}
+                          shirtColor={CERCADOR_COLORS.find((c) => c.slug === displayedShirtColor)?.hex}
                           onShirtClick={onShirtClick}
                           stripeTileOverlaySrcs={stripeTileOverlaySrcs}
                           stripeTileItems={stripeTileItems}
@@ -3520,13 +3527,10 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
                                 const currentVariant = active === 'the_human_inside' ? humanInsideVariant : firstContactVariant;
                                 const variantKey = opt === 'BLANC' ? 'white' : opt === 'NEGRE' ? 'black' : 'color';
                                 const isActive = currentVariant === variantKey;
-                                // Deshabilitar: (1) variants inexistents a la
-                                // col·lecció/subcol·lecció activa, (2) blanc sobre
-                                // blanc i negre sobre negre.
+                                // Deshabilitar: variants inexistents a la
+                                // col·lecció/subcol·lecció activa.
                                 const variantExists = stripeVariantVisibility?.[variantKey] !== false;
-                                const isDisabled = !variantExists
-                                  || (variantKey === 'white' && cercadorSelectedColor === 'white')
-                                  || (variantKey === 'black' && cercadorSelectedColor === 'black');
+                                const isDisabled = !variantExists;
                                 return (
                                   <button
                                     key={opt}

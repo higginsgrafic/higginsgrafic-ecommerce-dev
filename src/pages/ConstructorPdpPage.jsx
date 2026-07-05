@@ -188,7 +188,7 @@ function ConstructorPdpPage() {
   };
 
   return (
-    <section className="bg-background">
+    <section className="bg-background" style={{ transform: 'scale(0.94)', transformOrigin: 'center top' }}>
       <Helmet>
         <title>PDP · Constructor | Higgins Gràfic</title>
         <meta

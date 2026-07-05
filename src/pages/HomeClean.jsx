@@ -273,9 +273,11 @@ function HomeClean() {
             gridColumn: '1 / 4',
             gridRow: '10 / 25',
             position: 'relative',
-            top: '1px',
+            top: `calc(-5px - ${rowHeight / 2}px)`,
             width: 'calc(100% + 1px)',
             height: 'calc(100% + 2px)',
+            transform: 'scale(0.94)',
+            transformOrigin: 'center center',
           }}
         >
           <NikeHeroSlider
@@ -317,7 +319,7 @@ function HomeClean() {
         </div>
       </Pauta4ColsOverlay>
 
-      <section className="bg-background text-foreground">
+      <section className="bg-background text-foreground" style={{ transform: 'scale(0.94)', transformOrigin: 'center top' }}>
         <div className="mx-auto max-w-[1400px] px-4 pt-[120px] pb-[174px] sm:px-6 lg:px-10">
             <CollectionTitle
             index=""

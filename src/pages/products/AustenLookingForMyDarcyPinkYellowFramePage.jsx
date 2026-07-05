@@ -136,7 +136,7 @@ function AustenLookingForMyDarcyPinkYellowFramePage() {
   }, []);
 
   return (
-    <section className="bg-background">
+    <section className="bg-background" style={{ transform: 'scale(0.94)', transformOrigin: 'center top' }}>
       <Helmet>
         <title>{`${PRODUCT_NAME} · ${COLLECTION_NAME} | Higgins Gràfic`}</title>
         <meta

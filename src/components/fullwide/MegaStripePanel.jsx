@@ -1,6 +1,40 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import MegaColumn from './MegaColumn.jsx';
 import ClicAreaOverlay from './ClicAreaOverlay.jsx';
+import { STRIPE_DRAWING_CALIBRATIONS } from '../../config/stripeCalibrations';
+
+function canonicalKey(rawSrc) {
+  try {
+    const s = String(rawSrc || '').trim();
+    if (!s) return '';
+    const lower = s.toLowerCase();
+    if (lower.includes('/custom_logos/drawings/images_stripe/austen/keep_calm/')) {
+      return '__HG_CANONICAL_STRIPE_DRAWING_OVERLAY__::austen::keep_calm';
+    }
+    return s;
+  } catch {
+    return String(rawSrc || '').trim();
+  }
+}
+
+function getTileCalibration(src) {
+  if (!src) return { dx: 0, dy: 0, scale: 1 };
+  const cKey = canonicalKey(src);
+  let lsMap = null;
+  try {
+    const raw = window.localStorage.getItem('MEGA_STRIPE_DRAWING_OVERLAY_TRANSFORMS_BY_SRC');
+    lsMap = raw ? JSON.parse(String(raw)) : null;
+  } catch {
+    lsMap = null;
+  }
+  if (lsMap && typeof lsMap === 'object') {
+    const fromLs = (cKey && lsMap[cKey]) || lsMap[src];
+    if (fromLs && typeof fromLs === 'object') return fromLs;
+  }
+  const fromDefaults = (cKey && STRIPE_DRAWING_CALIBRATIONS[cKey]) || STRIPE_DRAWING_CALIBRATIONS[src];
+  if (fromDefaults && typeof fromDefaults === 'object') return fromDefaults;
+  return { dx: 0, dy: 0, scale: 1 };
+}
 
 function useEmptyShirtMask(emptyTileIndices, shirtColor) {
   const [dataUrl, setDataUrl] = useState(null);
@@ -643,8 +677,10 @@ function MegaStripePanel({
                                   objectFit: 'contain',
                                   opacity: 0.98,
                                   transformOrigin: 'top center',
-                                  transform:
-                                    'translate(var(--megaStripeDrawingOverlayDx, var(--hgShirtOverlayDx, 0px)), calc(var(--megaStripeDrawingOverlayDy, var(--hgShirtOverlayDy, 0px)) + var(--hgStripeDrawingExtraDy, -5px))) scale(calc(var(--megaStripeDrawingOverlayScale, var(--hgShirtOverlayScale, 1)) * var(--hgStripeDrawingExtraScale, 1)))',
+                                  transform: (() => {
+                                    const cal = getTileCalibration(picked);
+                                    return `translate(${cal.dx}px, calc(${cal.dy}px + var(--hgStripeDrawingExtraDy, -5px))) scale(calc(${cal.scale} * var(--hgStripeDrawingExtraScale, 1)))`;
+                                  })(),
                                   filter: (() => {
                                     const isPemberley = active === 'austen' && typeof resolvedOverlaySrc === 'string' && /\/austen\/pemberley_house\//i.test(resolvedOverlaySrc);
                                     const baseFx = drawingOverlayDebug
@@ -847,8 +883,10 @@ function MegaStripePanel({
                                   objectFit: 'contain',
                                   opacity: 0.98,
                                   transformOrigin: 'top center',
-                                  transform:
-                                    'translate(var(--megaStripeDrawingOverlayDx, var(--hgShirtOverlayDx, 0px)), calc(var(--megaStripeDrawingOverlayDy, var(--hgShirtOverlayDy, 0px)) + var(--hgStripeDrawingExtraDy, -5px))) scale(calc(var(--megaStripeDrawingOverlayScale, var(--hgShirtOverlayScale, 1)) * var(--hgStripeDrawingExtraScale, 1)))',
+                                  transform: (() => {
+                                    const cal = getTileCalibration(picked);
+                                    return `translate(${cal.dx}px, calc(${cal.dy}px + var(--hgStripeDrawingExtraDy, -5px))) scale(calc(${cal.scale} * var(--hgStripeDrawingExtraScale, 1)))`;
+                                  })(),
                                   filter: (() => {
                                     const isPemberley = active === 'austen' && typeof resolvedOverlaySrc === 'string' && /\/austen\/pemberley_house\//i.test(resolvedOverlaySrc);
                                     const baseFx = isPemberley ? 'drop-shadow(0 0 0px rgba(0,0,0,0.85))' : 'none';
