@@ -12,6 +12,7 @@ import {
   resolveAustenQuoteOriginalFromPath,
 } from '../utils/austenQuotesAssets.js';
 import FullWideSlideDemoHumanInsideSlider from './FullWideSlideDemoHumanInsideSlider.jsx';
+import MegaHeroSlider from './MegaHeroSlider.jsx';
 import { UserProfileTabs, UserProfileContent } from './UserProfileTabs.jsx';
 import { getSafeBelt, clampNumber } from '@/utils/layoutMetrics';
 import {
@@ -3225,14 +3226,56 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
       {canUseDom && (!contained || portalContainer) &&
         ReactDOM.createPortal(
           active ? (
-            <div
-              className={`${contained ? 'absolute' : 'fixed'} inset-0 z-[9990] bg-foreground/25`}
-              role="button"
-              tabIndex={0}
-              onClick={() => {
-                closeMegaExplicitly();
-              }}
-            />
+            <>
+              <div
+                className={`${contained ? 'absolute' : 'fixed'} inset-0 z-[9990]`}
+                style={{
+                  background: 'linear-gradient(to bottom, hsl(var(--foreground) / 0.95), hsl(var(--foreground) / 0.80))',
+                }}
+                role="button"
+                tabIndex={0}
+                onClick={() => {
+                  closeMegaExplicitly();
+                }}
+              />
+              <div
+                className={`${contained ? 'absolute' : 'fixed'} inset-0 z-[9991] pointer-events-none`}
+              >
+                <MegaHeroSlider
+                  slides={[
+                    {
+                      id: 'first-contact',
+                      imageSrc: '/placeholders/apparel/t-shirt/gildan_5000/gildan-5000_t-shirt_crewneck_unisex_heavyWeight_xl_royal_gpr-4-0_front.png',
+                      imageAlt: 'Samarreta de la col·lecció First Contact',
+                      kicker: 'First Contact',
+                      headline: 'Ciència-ficció per mirar cap a les estrelles.',
+                      primaryCta: { label: 'Compra', href: '/first-contact' },
+                      secondaryCta: { label: 'Descobreix', href: '/first-contact' },
+                    },
+                    {
+                      id: 'the-human-inside',
+                      imageSrc: '/placeholders/apparel/t-shirt/gildan_5000/gildan-5000_t-shirt_crewneck_unisex_heavyWeight_xl_black_gpr-4-0_front.png',
+                      imageAlt: 'Samarreta de la col·lecció The Human Inside',
+                      kicker: 'The Human Inside',
+                      headline: 'Robots, identitat i preguntes incòmodes.',
+                      primaryCta: { label: 'Compra', href: '/thin' },
+                      secondaryCta: { label: 'Descobreix', href: '/thin' },
+                    },
+                    {
+                      id: 'miscellania',
+                      imageSrc: '/placeholders/apparel/t-shirt/gildan_5000/gildan-5000_t-shirt_crewneck_unisex_heavyWeight_xl_forest-green_gpr-4-0_front.png',
+                      imageAlt: 'Samarreta de la col·lecció Miscel·lània',
+                      kicker: 'Miscel·lània',
+                      headline: 'Per a qui tria el seu propi camí.',
+                      primaryCta: { label: 'Compra', href: '/miscellania' },
+                      secondaryCta: { label: 'Descobreix', href: '/miscellania' },
+                    },
+                  ]}
+                  autoplay
+                  autoplayIntervalMs={8000}
+                />
+              </div>
+            </>
           ) : null,
           portalContainer || document.body
         )}
@@ -3242,7 +3285,7 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
       >
         {active ? (
           <div 
-            className="relative z-[10000] block border-b border-border bg-background" 
+            className="relative z-[10000] block border-b border-border" 
             style={{ 
               overflow: 'visible',
               ...(megaFullScreen ? {
