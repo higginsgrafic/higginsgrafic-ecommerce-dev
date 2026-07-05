@@ -1108,7 +1108,7 @@ const ProductDetailPage = ({ onAddToCart, cartItems = [], onUpdateQuantity, lang
 
       <SEOProductSchema product={product} />
 
-      <div className="min-h-screen bg-white">
+      <div className="min-h-screen bg-white" style={{ transform: 'scale(0.94)', transformOrigin: 'center top' }}>
         <div className="max-w-7xl mx-auto px-4 lg:px-8">
           <nav className="pt-[8px] lg:pt-[10px] pb-4 ml-[5px] -mt-[25px]">
             <Breadcrumbs

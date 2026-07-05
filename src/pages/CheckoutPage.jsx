@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef, useLayoutEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 import { Button } from '@/components/ui/button';
@@ -30,6 +30,7 @@ const inputCell = 'w-full h-full px-2 text-[12pt] border border-border rounded-s
 const titleCell = 'h-full w-full flex items-center text-[18pt] font-medium font-oswald uppercase tracking-[0.4px] text-foreground';
 
 const CheckoutPage = ({ cartItems, onClearCart }) => {
+  console.log('[Checkout] component rendering, cartItems:', cartItems?.length);
   const navigate = useNavigate();
   const location = useLocation();
   const { success, error: showError } = useToast();
@@ -45,6 +46,10 @@ const CheckoutPage = ({ cartItems, onClearCart }) => {
   const [formErrors, setFormErrors] = useState({});
   const [isProcessing, setIsProcessing] = useState(false);
   const [paymentDetailsOpen, setPaymentDetailsOpen] = useState(false);
+  const [productTableHeight, setProductTableHeight] = useState(0);
+  const productTableRef = useRef(null);
+  const scrollViewportRef = useRef(null);
+  const [scrollRow, setScrollRow] = useState(0);
 
   const checkoutCartItems = useMemo(() => {
     const stateItems = Array.isArray(location?.state?.cartItems) ? location.state.cartItems : [];
@@ -54,35 +59,49 @@ const CheckoutPage = ({ cartItems, onClearCart }) => {
   const isMockCheckout = checkoutCartItems.length === 0;
   const mockCheckoutItems = useMemo(() => ([
     { id: 'mock-1', name: 'Sense & Sensibility', size: 'L', quantity: 1, price: 15.5 },
-    { id: 'mock-2', name: 'Human Inside Tee', size: 'M', quantity: 1, price: 15.5 },
-    { id: 'mock-3', name: 'Austin Info Club', size: 'XL', quantity: 1, price: 15.5 },
-    { id: 'mock-4', name: 'First Contact', size: 'S', quantity: 2, price: 15.5 },
-    { id: 'mock-5', name: 'Cube Manifest', size: 'L', quantity: 1, price: 15.5 },
-    { id: 'mock-6', name: 'Misceŀlània 01', size: 'M', quantity: 1, price: 15.5 },
-    { id: 'mock-7', name: 'Graphic Basic', size: 'L', quantity: 3, price: 15.5 },
-    { id: 'mock-8', name: 'No Signal', size: 'XL', quantity: 1, price: 15.5 },
-    { id: 'mock-9', name: 'Soft Error', size: 'M', quantity: 1, price: 15.5 },
-    { id: 'mock-10', name: 'Local Ghost', size: 'S', quantity: 2, price: 15.5 },
-    { id: 'mock-11', name: 'Archive Mode', size: 'L', quantity: 1, price: 15.5 },
-    { id: 'mock-12', name: 'Under Construction', size: 'M', quantity: 1, price: 15.5 },
-    { id: 'mock-13', name: 'Pixel Picnic', size: 'XL', quantity: 1, price: 15.5 },
-    { id: 'mock-14', name: 'Botiga Oberta', size: 'L', quantity: 2, price: 15.5 },
-    { id: 'mock-15', name: 'The Human Inside', size: 'S', quantity: 1, price: 15.5 },
-    { id: 'mock-16', name: 'Checkout Club', size: 'M', quantity: 1, price: 15.5 },
-    { id: 'mock-17', name: 'Carrer Major', size: 'L', quantity: 1, price: 15.5 },
-    { id: 'mock-18', name: 'Final Boss Tee', size: 'XL', quantity: 2, price: 15.5 },
-    { id: 'mock-19', name: 'Blue Guide', size: 'M', quantity: 1, price: 15.5 },
-    { id: 'mock-20', name: 'Stripe Like', size: 'L', quantity: 1, price: 15.5 },
-    { id: 'mock-21', name: 'Scroll Test', size: 'S', quantity: 1, price: 15.5 },
-    { id: 'mock-22', name: 'Roboto Condensed', size: 'M', quantity: 2, price: 15.5 },
-    { id: 'mock-23', name: 'Belt Two', size: 'L', quantity: 1, price: 15.5 },
-    { id: 'mock-24', name: 'Tot Plegat', size: 'XL', quantity: 1, price: 15.5 },
   ]), []);
   const checkoutRenderItems = useMemo(() => (
-    checkoutCartItems.length > 0
-      ? checkoutCartItems
-      : mockCheckoutItems
-  ), [checkoutCartItems, mockCheckoutItems]);
+    mockCheckoutItems
+  ), [mockCheckoutItems]);
+
+  const PRODUCT_TABLE_MIN_ROWS = 5;
+  const PRODUCT_TABLE_MAX_ROWS = 20;
+  const visibleProductRows = Math.min(Math.max(checkoutRenderItems.length, PRODUCT_TABLE_MIN_ROWS), PRODUCT_TABLE_MAX_ROWS);
+
+  useEffect(() => {
+    const el = scrollViewportRef.current;
+    if (!el) return;
+    const handler = (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      const dir = e.deltaY > 0 ? 1 : -1;
+      setScrollRow(prev => {
+        const maxRow = Math.max(0, checkoutRenderItems.length - visibleProductRows);
+        return Math.max(0, Math.min(maxRow, prev + dir));
+      });
+    };
+    el.addEventListener('wheel', handler, { passive: false });
+    return () => el.removeEventListener('wheel', handler);
+  }, [checkoutRenderItems.length, visibleProductRows]);
+
+  const productTableStartRow = 4;
+  const totalsStartRow = productTableStartRow + visibleProductRows + 1;
+  const productTableEndRow = totalsStartRow;
+
+  useLayoutEffect(() => {
+    if (productTableRef.current) {
+      const h = productTableRef.current.clientHeight;
+      const scrollH = productTableRef.current.scrollHeight;
+      console.log('[Checkout] container height:', h, 'scrollHeight:', scrollH, 'items:', checkoutRenderItems.length);
+      setProductTableHeight(h);
+    } else {
+      console.log('[Checkout] productTableRef is NULL');
+    }
+  }, [visibleProductRows, checkoutRenderItems.length]);
+
+  useEffect(() => {
+    console.log('[Checkout] mounted, items:', checkoutRenderItems.length, 'visibleProductRows:', visibleProductRows, 'productTableEndRow:', productTableEndRow);
+  }, []);
 
   const subtotal = checkoutRenderItems.reduce((total, item) => total + (item.price * item.quantity), 0);
   const shipping = subtotal > 50 ? 0 : 5.95;
@@ -230,6 +249,7 @@ const CheckoutPage = ({ cartItems, onClearCart }) => {
           left: `calc(var(--belt2-xL, 0px) + ${CHECKOUT_PAGE_LEFT_OFFSET})`,
           top: CHECKOUT_PAGE_TOP_OFFSET,
           width: 'calc(var(--belt2-xR, 100vw) - var(--belt2-xL, 0px))',
+          transform: 'translateX(40px)',
           zIndex: 5,
           pointerEvents: 'auto',
         }}
@@ -423,18 +443,16 @@ const CheckoutPage = ({ cartItems, onClearCart }) => {
           />
           <div
             style={{
-              position: 'absolute',
-              left: 0,
-              top: `calc(${PAUTA_FIRST_ROW_PERCENT}% + ${PAUTA_FIRST_ROW_EXTRA_PX}px + (${PAUTA_OTHER_ROW_PERCENT}% - ${PAUTA_OTHER_ROW_COMP_PX}px))`,
-              height: `calc(${PAUTA_OTHER_ROW_PERCENT}% - ${PAUTA_OTHER_ROW_COMP_PX}px)`,
-              width: 'calc(50% - 3.75px)',
+              gridColumn: '1 / 2',
+              gridRow: '3 / 4',
               display: 'flex',
               alignItems: 'center',
               color: '#495058',
               fontFamily: 'Oswald, sans-serif',
               fontSize: '16pt',
-              fontWeight: 400,
+              fontWeight: 300,
               textTransform: 'uppercase',
+              transform: 'translateY(10px) translateX(40px)',
               zIndex: 2,
             }}
           >
@@ -449,11 +467,11 @@ const CheckoutPage = ({ cartItems, onClearCart }) => {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                transform: label === 'IMPORT' ? 'translateX(5px)' : label === 'QUANTITAT' ? 'translateX(4px)' : 'none',
+                transform: `translateY(10px)${label === 'IMPORT' ? ' translateX(5px)' : label === 'QUANTITAT' ? ' translateX(4px)' : ''}`,
                 color: '#495058',
                 fontFamily: 'Oswald, sans-serif',
                 fontSize: '16pt',
-                fontWeight: 400,
+                fontWeight: 300,
                 textTransform: 'uppercase',
                 zIndex: 2,
               }}
@@ -462,45 +480,93 @@ const CheckoutPage = ({ cartItems, onClearCart }) => {
             </div>
           ))}
           <div
+            ref={productTableRef}
+            data-checkout-table="true"
             style={{
               gridColumn: '1 / 5',
-              gridRow: '4 / 29',
-              display: 'grid',
-              gridTemplateColumns: 'calc(50% - 3.75px) repeat(3, minmax(0, 1fr))',
-              gridAutoRows: 'calc((100% - 24 * 3px) / 25)',
-              columnGap: '7.5px',
-              rowGap: '3px',
-              overflowY: 'auto',
-              overscrollBehavior: 'contain',
-              scrollbarWidth: 'none',
+              gridRow: `${productTableStartRow} / ${productTableEndRow}`,
+              position: 'relative',
+              marginTop: '0px',
+              marginLeft: '38.5px',
+              marginRight: '4px',
+              overflow: 'hidden',
               pointerEvents: 'auto',
               zIndex: 2,
             }}
           >
-            {checkoutRenderItems.flatMap((item, rowIndex) => (
-              [
+            <div
+              ref={scrollViewportRef}
+              style={{
+                position: 'relative',
+                height: `calc(${visibleProductRows} * 35.1px + ${visibleProductRows - 1} * 3px)`,
+                overflow: 'hidden',
+              }}
+            >
+              {/* Fons fixe: grid no scrollable */}
+              <div
+                style={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  display: 'grid',
+                  gridTemplateColumns: 'calc(50% - 3.75px) repeat(3, minmax(0, 1fr))',
+                  gridAutoRows: '35.1px',
+                  columnGap: '7.5px',
+                  rowGap: '3px',
+                  zIndex: 0,
+                }}
+              >
+                {Array.from({ length: visibleProductRows }).map((_, rowIndex) => (
+                  <div
+                    key={`product-table-row-bg-${rowIndex + 1}`}
+                    style={{
+                      gridColumn: '1 / 5',
+                      gridRow: `${rowIndex + 1} / ${rowIndex + 2}`,
+                      overflow: 'hidden',
+                    }}
+                  >
+                    <div
+                      style={{
+                        width: '100%',
+                        height: '100%',
+                        backgroundImage: 'url(/placeholders/fons_acordio/fons-una-fila.png)',
+                        backgroundRepeat: 'no-repeat',
+                        backgroundPosition: 'center center',
+                        backgroundSize: '100% 100%',
+                        transform: (rowIndex + 1) % 2 === 0 ? 'scaleX(-1)' : 'none',
+                      }}
+                    />
+                  </div>
+                ))}
+              </div>
+              {/* Text: renderitza només les files visibles segons scrollRow */}
+              <div
+                style={{
+                  position: 'relative',
+                  height: '100%',
+                  overflow: 'hidden',
+                  zIndex: 2,
+                }}
+              >
                 <div
-                  key={`product-table-row-bg-${rowIndex + 1}`}
                   style={{
-                    gridColumn: '1 / 5',
-                    gridRow: `${rowIndex * 2 + 1} / ${rowIndex * 2 + 3}`,
-                    overflow: 'hidden',
-                    zIndex: 0,
+                    display: 'grid',
+                    gridTemplateColumns: 'calc(50% - 3.75px) repeat(3, minmax(0, 1fr))',
+                    gridAutoRows: '35.1px',
+                    columnGap: '7.5px',
+                    rowGap: '3px',
                   }}
                 >
-                  <div
-                    style={{
-                      width: '100%',
-                      height: '100%',
-                      backgroundImage: 'url(/placeholders/fons_acordio/fons-una-fila.png)',
-                      backgroundRepeat: 'no-repeat',
-                      backgroundPosition: 'center center',
-                      backgroundSize: '100% 100%',
-                      transform: (rowIndex + 1) % 2 === 0 ? 'scaleX(-1)' : 'none',
-                      opacity: 1,
-                    }}
-                  />
-                </div>,
+            {checkoutRenderItems.slice(scrollRow, scrollRow + visibleProductRows).flatMap((item, visualRowIndex) => (
+              [
+                <div
+                  key={`product-table-row-spacer-${scrollRow + visualRowIndex + 1}`}
+                  style={{
+                    gridColumn: '1 / 5',
+                    gridRow: `${visualRowIndex + 1} / ${visualRowIndex + 2}`,
+                  }}
+                />,
                 ...[
                   item.name,
                   item.size || '—',
@@ -508,20 +574,19 @@ const CheckoutPage = ({ cartItems, onClearCart }) => {
                   displayPrice((item.price || 0) * (item.quantity || 1)),
                 ].map((label, index) => (
                   <div
-                    key={`product-table-row-${rowIndex + 1}-${index}`}
+                    key={`product-table-row-${scrollRow + visualRowIndex + 1}-${index}`}
                     style={{
                       gridColumn: `${index + 1} / ${index + 2}`,
-                      gridRow: `${rowIndex * 2 + 1} / ${rowIndex * 2 + 3}`,
+                      gridRow: `${visualRowIndex + 1} / ${visualRowIndex + 2}`,
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: index === 0 ? 'flex-start' : 'center',
-                      transform: index === 2 ? 'translateX(4px)' : 'none',
+                      transform: index === 2 ? 'translateX(4px) translateY(5px)' : 'translateY(5px)',
                       color: '#4A5057',
                       fontFamily: 'Roboto Condensed, sans-serif',
-                      fontSize: '18pt',
-                      fontWeight: index === 3 ? 300 : 400,
+                      fontSize: '14pt',
+                      fontWeight: index === 3 ? 200 : 300,
                       textTransform: 'uppercase',
-                      zIndex: 2,
                     }}
                   >
                     {index === 3 ? (
@@ -542,6 +607,9 @@ const CheckoutPage = ({ cartItems, onClearCart }) => {
                 ))
               ]
             ))}
+                </div>
+              </div>
+            </div>
           </div>
           <div
             aria-hidden="true"
@@ -550,91 +618,120 @@ const CheckoutPage = ({ cartItems, onClearCart }) => {
               gridRow: '3 / 4',
               alignSelf: 'end',
               height: '2px',
+              width: 'calc(100% - 45px)',
               backgroundColor: '#DEDFE1',
+              transform: 'translateY(10px) translateX(40px)',
               zIndex: 3,
             }}
           />
           <div
-            aria-hidden="true"
             style={{
               gridColumn: '1 / 5',
-              gridRow: '29 / 30',
-              alignSelf: 'start',
-              height: '2px',
-              backgroundColor: '#DEDFE1',
+              gridRow: `${totalsStartRow} / ${totalsStartRow + 5}`,
+              position: 'relative',
+              transform: 'translateX(-5px) translateY(-4px)',
               zIndex: 3,
             }}
-          />
-          <div
-            aria-hidden="true"
-            style={{
-              gridColumn: '1 / 5',
-              gridRow: '30 / 34',
-              backgroundImage: 'url(/placeholders/fons_acordio/fons-una-fila.png)',
-              backgroundRepeat: 'no-repeat',
-              backgroundPosition: 'center center',
-              backgroundSize: '100% 100%',
-              zIndex: 0,
-            }}
-          />
-          {[
-            ['SUBTOTAL', displayPrice(subtotal), false],
-            ['TRANSPORT', displayPrice(5.95), true],
-            ['IVA 21%', displayPrice(ivaAmount), false],
-            ['TOT PLEGAT FA', displayPrice(total), false],
-          ].flatMap(([label, amount, strikeAmount], index) => ([
+          >
             <div
-              key={`totals-label-${index}`}
+              aria-hidden="true"
               style={{
-                gridColumn: '2 / 4',
-                gridRow: `${30 + index} / ${31 + index}`,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'flex-end',
-                paddingRight: 'calc(12% + 3.75px)',
-                color: '#4A5057',
-                fontFamily: 'Roboto Condensed, sans-serif',
-                fontSize: label === 'TOT PLEGAT FA' ? '20pt' : '18pt',
-                fontWeight: label === 'TOT PLEGAT FA' ? 400 : 300,
-                textTransform: 'uppercase',
-                whiteSpace: 'nowrap',
+                position: 'absolute',
+                left: '40px',
+                right: 0,
+                top: 0,
+                height: '2px',
+                backgroundColor: '#DEDFE1',
+                zIndex: 3,
+              }}
+            />
+            <div
+              aria-hidden="true"
+              style={{
+                position: 'absolute',
+                left: 0,
+                right: 0,
+                top: 0,
+                bottom: 0,
+                backgroundImage: 'url(/placeholders/fons_acordio/fons-una-fila.png)',
+                backgroundRepeat: 'no-repeat',
+                backgroundPosition: 'center center',
+                backgroundSize: '100% 100%',
+                zIndex: 0,
+              }}
+            />
+            <div
+              style={{
+                position: 'relative',
+                display: 'grid',
+                gridTemplateColumns: 'calc(50% - 3.75px) repeat(3, minmax(0, 1fr))',
+                gridAutoRows: '35.1px',
+                columnGap: '7.5px',
+                rowGap: '3px',
+                width: '100%',
+                height: '100%',
                 zIndex: 2,
               }}
             >
-              {label}
-            </div>,
-            <div
-              key={`totals-amount-${index}`}
-              style={{
-                gridColumn: '4 / 5',
-                gridRow: `${30 + index} / ${31 + index}`,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'flex-start',
-                color: '#4A5057',
-                fontFamily: 'Roboto Condensed, sans-serif',
-                fontSize: label === 'TOT PLEGAT FA' ? '20pt' : '18pt',
-                fontWeight: label === 'TOT PLEGAT FA' ? 400 : 300,
-                textTransform: 'uppercase',
-                textDecoration: strikeAmount ? 'line-through' : 'none',
-                transform: label === 'TOT PLEGAT FA' ? 'translateX(4px)' : 'none',
-                zIndex: 2,
-              }}
-            >
-              <span
-                style={{
-                  display: 'grid',
-                  gridTemplateColumns: '1fr auto auto',
-                  width: '88px',
-                  fontVariantNumeric: 'tabular-nums',
-                }}
-              >
-                <span style={{ textAlign: 'right' }}>{amount.replace('€', '').split(',')[0]}</span>
-                <span>,</span>
-                <span>{amount.replace('€', '').split(',')[1]}€</span>
-              </span>
-            </div>,
-          ]))}
+              <div style={{ gridColumn: '1 / 5', gridRow: '1 / 2' }} />
+              {[
+                ['SUBTOTAL', displayPrice(subtotal), false],
+                ['TRANSPORT', displayPrice(5.95), true],
+                ['IVA 21%', displayPrice(ivaAmount), false],
+                ['TOT PLEGAT FA', displayPrice(total), false],
+              ].flatMap(([label, amount, strikeAmount], index) => ([
+                <div
+                  key={`totals-label-${index}`}
+                  style={{
+                    gridColumn: '2 / 4',
+                    gridRow: `${index + 2} / ${index + 3}`,
+                    display: 'flex',
+                    alignItems: 'flex-start',
+                    justifyContent: 'flex-end',
+                    paddingRight: 'calc(12% + 3.75px)',
+                    color: '#4A5057',
+                    fontFamily: 'Roboto Condensed, sans-serif',
+                    fontSize: '16pt',
+                    fontWeight: label === 'TOT PLEGAT FA' ? 400 : 300,
+                    textTransform: 'uppercase',
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  {label}
+                </div>,
+                <div
+                  key={`totals-amount-${index}`}
+                  style={{
+                    gridColumn: '4 / 5',
+                    gridRow: `${index + 2} / ${index + 3}`,
+                    display: 'flex',
+                    alignItems: 'flex-start',
+                    justifyContent: 'flex-start',
+                    transform: 'translateX(-4px)',
+                    color: '#4A5057',
+                    fontFamily: 'Roboto Condensed, sans-serif',
+                    fontSize: '16pt',
+                    fontWeight: label === 'TOT PLEGAT FA' ? 400 : 300,
+                    textTransform: 'uppercase',
+                    textDecoration: strikeAmount ? 'line-through' : 'none',
+                  }}
+                >
+                  <span
+                    style={{
+                      display: 'grid',
+                      gridTemplateColumns: '1fr auto auto',
+                      width: '88px',
+                      fontVariantNumeric: 'tabular-nums',
+                    }}
+                  >
+                    <span style={{ textAlign: 'right' }}>{amount.replace('€', '').split(',')[0]}</span>
+                    <span>,</span>
+                    <span>{amount.replace('€', '').split(',')[1]}€</span>
+                  </span>
+                </div>,
+              ]))}
+            </div>
+          </div>
         </div>
         {Array.from({ length: PAUTA_ROWS * 2 }).map((_, idx) => (
           <div

@@ -14,7 +14,7 @@ import React from 'react';
  */
 
 // Posició x del connector de cada columna (cqw), mesurada al mockup.
-const COL_X = [0, 11.68, 23.09, 35.95, 48.45, 62.65, 80.45, 92.42];
+const COL_X = [0, 11.5632, 22.8659, 35.5921, 47.9655, 62.0658, 79.6462, 91.4758];
 
 const TOP_CQW = 4.2;        // top de la primera línia
 const LINE_H = 1.064;       // interlineat (48px)
@@ -228,7 +228,7 @@ function Group({ group, isFirst, dimmed, clickable, selectedStripeItem, hoveredS
 
 function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripeItem, hoveredStripeItem, onSelectGroup, onHoverItem, onHoverLeave }) {
   return (
-    <div style={{ position: 'absolute', top: '-5px', left: '-2px', bottom: 0, right: '18px', pointerEvents: 'none' }}>
+    <div style={{ position: 'absolute', top: '-5px', left: '5px', bottom: 0, right: '18px', pointerEvents: 'none' }}>
       {COLUMNS.map((groups, col) => (
         <div
           key={col}

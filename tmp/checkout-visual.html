@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+<meta charset="UTF-8">
+<title>Checkout GRAFC - Interpretació visual</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@400&family=Roboto+Condensed:wght@200;300;400&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Roboto Condensed', sans-serif; background: #f5f5f5; display: flex; justify-content: center; padding: 20px; }
+  .frame { width: 100%; max-width: 1200px; background: #fff; border: 1px solid #ccc; position: relative; }
+  /* Capçalera */
+  .header { display: flex; align-items: center; justify-content: space-between; padding: 12px 24px; border-bottom: 1px solid #eee; }
+  .header .logo { font-family: 'Oswald', sans-serif; font-size: 20px; font-weight: 400; letter-spacing: 1px; }
+  .header nav { display: flex; gap: 20px; font-size: 12px; text-transform: uppercase; color: #666; }
+  .header .icons { display: flex; gap: 12px; font-size: 14px; color: #666; }
+  /* Pauta overlay */
+  .pauta { position: absolute; inset: 0; pointer-events: none; z-index: 10; }
+  .pauta .vline { position: absolute; top: 0; bottom: 0; width: 1px; background: rgba(0,116,217,0.15); }
+  .pauta .hline { position: absolute; left: 0; right: 0; height: 1px; background: rgba(0,116,217,0.08); }
+  .pauta .row-num { position: absolute; left: -28px; font-size: 9px; color: rgba(0,116,217,0.4); font-family: monospace; }
+  /* Layout principal */
+  .checkout { display: grid; gridTemplateColumns: 1fr 1fr; padding: 24px; gap: 24px; position: relative; }
+  .checkout { display: grid; grid-template-columns: 1fr 1fr; padding: 24px; gap: 24px; }
+  /* Columna esquerra: taula */
+  .product-list { display: flex; flex-direction: column; }
+  .table-header { display: grid; grid-template-columns: 2fr 0.6fr 0.6fr 0.8fr; padding: 8px 0; border-bottom: 2px solid #DEDFE1; font-family: 'Oswald', sans-serif; font-size: 12px; text-transform: uppercase; color: #495058; }
+  .table-header div:nth-child(2), .table-header div:nth-child(3) { text-align: center; }
+  .table-header div:nth-child(4) { text-align: center; }
+  .product-row { display: grid; grid-template-columns: 2fr 0.6fr 0.6fr 0.8fr; padding: 6px 0; border-bottom: 1px solid #f0f0f0; font-size: 11px; text-transform: uppercase; color: #4A5057; font-weight: 300; }
+  .product-row div:nth-child(2), .product-row div:nth-child(3) { text-align: center; }
+  .product-row div:nth-child(4) { text-align: center; font-weight: 200; }
+  .product-row .row-num { position: absolute; left: 4px; font-size: 8px; color: rgba(0,116,217,0.3); font-family: monospace; }
+  /* Totals */
+  .separator { height: 2px; background: #DEDFE1; margin: 8px 0; }
+  .totals-bg { background: #f8f8f8; padding: 4px 0; }
+  .total-row { display: grid; grid-template-columns: 2fr 0.6fr 0.6fr 0.8fr; padding: 5px 0; font-size: 12px; text-transform: uppercase; color: #4A5057; font-weight: 300; }
+  .total-row.bold { font-weight: 400; }
+  .total-row .label { grid-column: 1 / 4; text-align: right; padding-right: 12px; }
+  .total-row .amount { text-align: center; }
+  /* Columna dreta: formulari */
+  .form-section { margin-bottom: 20px; }
+  .form-section h3 { font-family: 'Oswald', sans-serif; font-size: 14px; text-transform: uppercase; color: #495058; margin-bottom: 10px; }
+  .form-field { margin-bottom: 10px; }
+  .form-field label { display: block; font-size: 11px; color: #666; margin-bottom: 4px; text-transform: uppercase; }
+  .form-field input, .form-field select { width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; }
+  .payment-option { display: flex; align-items: center; gap: 8px; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px; }
+  .checkbox-row { display: flex; align-items: center; gap: 8px; font-size: 12px; margin-bottom: 8px; }
+  .btn-pay { width: 100%; padding: 12px; background: #00D66F; color: #fff; border: none; border-radius: 4px; font-size: 14px; font-weight: 400; text-transform: uppercase; cursor: pointer; margin-top: 12px; }
+  .link-ticket { display: block; text-align: center; margin-top: 12px; font-size: 12px; color: #00a651; text-decoration: underline; }
+  /* Sidebar */
+  .sidebar { position: absolute; left: -180px; top: 0; width: 170px; font-size: 10px; color: #999; }
+  .sidebar h4 { font-size: 10px; text-transform: uppercase; margin-bottom: 8px; color: #666; }
+  .sidebar ul { list-style: none; }
+  .sidebar li { padding: 3px 0; border-bottom: 1px solid #f0f0f0; }
+  /* Guies labels */
+  .guides-label { position: absolute; right: 10px; top: 10px; font-size: 10px; color: rgba(0,116,217,0.5); font-family: monospace; }
+</style>
+</head>
+<body>
+<div class="frame">
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <h4>Eines actives</h4>
+    <ul>
+      <li>/checkout</li>
+      <li>/constructor/colleccio</li>
+      <li>/constructor/tdp</li>
+      <li>/pdp/...</li>
+    </ul>
+  </div>
+
+  <!-- Capçalera -->
+  <div class="header">
+    <div class="logo">GRAFC</div>
+    <nav>
+      <span>Col·leccions</span>
+      <span>Botiga</span>
+      <span>Constructor</span>
+    </nav>
+    <div class="icons">🛒 👤</div>
+  </div>
+
+  <!-- Guies label -->
+  <div class="guides-label">PAUTA + TAULA</div>
+
+  <!-- Pauta overlay (línies) -->
+  <div class="pauta" id="pauta"></div>
+
+  <!-- Checkout -->
+  <div class="checkout">
+    <!-- Columna esquerra -->
+    <div class="product-list">
+      <div class="table-header">
+        <div>PRODUCTES</div>
+        <div>TALLATGE</div>
+        <div>QUANTITAT</div>
+        <div>IMPORT</div>
+      </div>
+      <div id="product-rows"></div>
+      <div class="separator"></div>
+      <div class="totals-bg" id="totals"></div>
+    </div>
+
+    <!-- Columna dreta -->
+    <div class="form-sections">
+      <div class="form-section">
+        <h3>Pagament</h3>
+        <div class="form-field">
+          <label>Email</label>
+          <input type="email" placeholder="email@exemple.com" value="usuari@exemple.cat">
+        </div>
+        <div class="payment-option">
+          <span>💳</span>
+          <span>Pag. amb Mastercard ****1734</span>
+        </div>
+      </div>
+      <div class="form-section">
+        <h3>Altres dades</h3>
+        <div class="checkbox-row">
+          <input type="checkbox"> Missatges tèxtils?
+        </div>
+        <div style="font-size:11px;color:#666;">5,95€</div>
+      </div>
+      <div class="checkbox-row">
+        <input type="checkbox" checked> Accepto els termes i condicions
+      </div>
+      <button class="btn-pay">Confirma la compra</button>
+      <a class="link-ticket" href="#">Continua amb el tiquet</a>
+    </div>
+  </div>
+</div>
+
+<script>
+  const products = [
+    ['SENSE & SENSIBILITY','L','1','19,95€'],
+    ['ROBBIE THE ROBOT','L','1','19,95€'],
+    ['PRIDE & PREJUDICE','M','1','19,95€'],
+    ['ROBOCUBE','XL','2','39,90€'],
+    ['PUNT DE LLIURABLE','S','1','19,95€'],
+    ['NCC-1701-D','M','1','19,95€'],
+    ['WASCH-BÄRMENSCH','L','1','19,95€'],
+    ['PERSUASIÓN','L','1','19,95€'],
+    ['CYBERMAN','M','1','19,95€'],
+    ['DJ VADER','L','1','19,95€'],
+    ['PLASMA ESCAPE','M','1','19,95€'],
+    ['VADER','L','1','19,95€'],
+    ['SENSE & SENSIBILITY','M','1','19,95€'],
+    ['MAZINGER-C','XL','1','19,95€'],
+  ];
+
+  const rowsContainer = document.getElementById('product-rows');
+  products.forEach((p, i) => {
+    const row = document.createElement('div');
+    row.className = 'product-row';
+    row.innerHTML = `<div>${p[0]}</div><div>${p[1]}</div><div>${p[2]}</div><div>${p[3]}</div>`;
+    rowsContainer.appendChild(row);
+  });
+
+  const totals = [
+    ['SUBTOTAL','299,25€', false],
+    ['TRANSPORT','5,95€', false],
+    ['IVA 21%','62,84€', false],
+    ['TOT PLEGAT FA','299,25€', true],
+  ];
+  const totalsContainer = document.getElementById('totals');
+  totals.forEach(([label, amount, bold]) => {
+    const row = document.createElement('div');
+    row.className = 'total-row' + (bold ? ' bold' : '');
+    row.innerHTML = `<div class="label">${label}</div><div class="amount">${amount}</div>`;
+    totalsContainer.appendChild(row);
+  });
+
+  // Pauta lines
+  const pauta = document.getElementById('pauta');
+  const frame = document.querySelector('.frame');
+  const cols = 4;
+  for (let c = 1; c < cols; c++) {
+    const line = document.createElement('div');
+    line.className = 'vline';
+    line.style.left = `${(c / cols) * 100}%`;
+    pauta.appendChild(line);
+  }
+  for (let r = 1; r <= 33; r++) {
+    const line = document.createElement('div');
+    line.className = 'hline';
+    line.style.top = `${60 + r * 24}px`;
+    pauta.appendChild(line);
+    const num = document.createElement('div');
+    num.className = 'row-num';
+    num.style.top = `${60 + r * 24 - 6}px`;
+    num.textContent = r;
+    pauta.appendChild(num);
+  }
+</script>
+</body>
+</html>

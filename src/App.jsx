@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useMemo, useCallback, Suspense, lazy, useLayoutEffect } from 'react';
+import React, { useState, useEffect, useRef, useMemo, useCallback, Suspense, lazy, useLayoutEffect, startTransition } from 'react';
 import { Routes, Route, useLocation, useNavigate, Navigate } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Helmet } from 'react-helmet';
@@ -6069,7 +6069,7 @@ function App() {
             <SiteFrame />
             {import.meta.env.DEV && <BeltReferenceOverlay enabled={belt2GuidesEnabled} />}
 
-            {import.meta.env.DEV && (pautaEnabled || tableEnabled) && (
+            {import.meta.env.DEV && (pautaEnabled || tableEnabled) && (location.pathname !== '/checkout' || tableEnabled) && (
               <Pauta4ColsOverlay
                 overlay
                 pautaEnabled={pautaEnabled}
@@ -6128,7 +6128,7 @@ function App() {
                 <ToggleRow
                   label="Pauta"
                   checked={pautaEnabled}
-                  onChange={(v) => setPautaEnabled(v)}
+                  onChange={(v) => startTransition(() => setPautaEnabled(v))}
                 />
                 <OpacitySlider
                   label="Opacitat pauta"
@@ -6139,7 +6139,7 @@ function App() {
                 <ToggleRow
                   label="Taula + numeració"
                   checked={tableEnabled}
-                  onChange={(v) => setTableEnabled(v)}
+                  onChange={(v) => startTransition(() => setTableEnabled(v))}
                 />
                 <OpacitySlider
                   label="Opacitat taula"

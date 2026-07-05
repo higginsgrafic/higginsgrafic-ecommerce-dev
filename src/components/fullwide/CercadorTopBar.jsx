@@ -14,7 +14,11 @@ import React from 'react';
 export const CERCADOR_COLLECTIONS = [
   { key: 'first_contact', label: 'FIRST CONTACT' },
   { key: 'the_human_inside', label: 'THE HUMAN INSIDE' },
-  { key: 'austen', label: 'AUSTEN' },
+  { key: 'austen:pemberley', label: 'PEMBERLEY' },
+  { key: 'austen:keep_calm', label: 'KEEP CALM' },
+  { key: 'austen:quotes', label: 'QUOTES' },
+  { key: 'austen:crosswords', label: 'CROSSWORDS' },
+  { key: 'austen:looking_for_my_darcy', label: 'LOOKING FOR MY DARCY' },
   { key: 'cube', label: 'CUBE' },
   { key: 'miscellania', label: 'MISCEL·LÀNIA' },
 ];
@@ -46,26 +50,30 @@ export const CERCADOR_COLORS = [
 //   anell exterior 96px img -> 2.128cqw
 //   gap = 3.407 - 2.128 = 1.279cqw
 //   padding dret = 2.19cqw - 0.36cqw (mig cercle) ≈ 1.83cqw
-const C_CIRCLE = '1.396cqw';
+const C_CIRCLE = '1.05cqw';
 const C_RING_THICKNESS = '0.111cqw';
-const C_RING_OUTER = '2.128cqw'; // anell exterior mesurat (96px img)
-const C_COLORS_GAP = '1.279cqw'; // 3.407 (centre-a-centre) - 2.128 (ample botó)
-const C_COLORS_PAD_RIGHT = '1.83cqw'; // 2.919 (right gap) - 1.064 (mig botó)
+const C_RING_OUTER = '1.6cqw'; // anell exterior mesurat (96px img)
+const C_COLORS_GAP = '1.146cqw'; // 3.407 (centre-a-centre) - 2.128 (ample botó)
+const C_COLORS_PAD_RIGHT = '1.2cqw'; // 2.919 (right gap) - 1.064 (mig botó)
 const C_OUTLINE = '0.5px solid rgba(0,0,0,0.22)'; // contorn fi (0.5px editor)
 // Col·leccions: 5 cel·les iguals. Centres mesurats 233/685/1136/1588/2039px
 // (separació uniforme 451.5px = 10.01% de la barra). Zona = 50cqw, marge
 // esquerre 7px = 0.155cqw. Font cap-height 25px -> em ~0.78cqw.
-const C_COLLECTIONS_WIDTH = '50cqw';
-const C_COLLECTIONS_LEFT = '0.155cqw';
-const C_COLLECTIONS_FONT = '0.78cqw';
+const C_COLLECTIONS_WIDTH = '58cqw';
+const C_COLLECTIONS_LEFT = 'calc(0.155cqw + 15px)';
+const C_COLLECTIONS_FONT = '7pt';
 
 function CercadorTopBar({
   activeCollection,
+  activeSubcollection,
   onSelectCollection,
   selectedColor = 'white',
   onSelectColor,
   barBg = '#F8F8F8',
 }) {
+  const activeKey = activeCollection === 'austen'
+    ? `austen:${activeSubcollection || ''}`
+    : activeCollection;
   return (
     <div
       style={{
@@ -78,7 +86,7 @@ function CercadorTopBar({
         padding: 0,
         height: 38,
         boxSizing: 'border-box',
-        gap: 24,
+        gap: 12,
         containerType: 'inline-size',
       }}
     >
@@ -87,7 +95,8 @@ function CercadorTopBar({
       <div
         style={{
           display: 'flex',
-          alignItems: 'stretch',
+          alignItems: 'center',
+          justifyContent: 'space-between',
           width: C_COLLECTIONS_WIDTH,
           marginLeft: C_COLLECTIONS_LEFT,
           height: '100%',
@@ -95,7 +104,7 @@ function CercadorTopBar({
         }}
       >
         {CERCADOR_COLLECTIONS.map(({ key, label }) => {
-          const isActive = key === activeCollection;
+          const isActive = key === activeKey;
           return (
             <button
               key={key}
@@ -109,7 +118,7 @@ function CercadorTopBar({
                 background: 'transparent',
                 cursor: 'pointer',
                 position: 'relative',
-                flex: '1 1 0',
+                flex: '0 0 auto',
                 height: '100%',
                 display: 'flex',
                 alignItems: 'center',
@@ -117,35 +126,37 @@ function CercadorTopBar({
                 padding: 0,
               }}
             >
-              {isActive ? (
+              <span style={{ position: 'relative', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>
                 <span
+                  className="font-roboto-condensed"
                   aria-hidden="true"
                   style={{
-                    position: 'absolute',
-                    left: '2%',
-                    right: '2%',
-                    top: '12%',
-                    bottom: '12%',
-                    backgroundColor: '#FFFFFF',
-                    borderRadius: 3,
-                    pointerEvents: 'none',
+                    visibility: 'hidden',
+                    whiteSpace: 'nowrap',
+                    fontSize: C_COLLECTIONS_FONT,
+                    fontWeight: 700,
+                    letterSpacing: '0.02em',
+                    lineHeight: 1.1,
                   }}
-                />
-              ) : null}
-              <span
-                className="font-roboto-condensed"
-                style={{
-                  position: 'relative',
-                  zIndex: 1,
-                  whiteSpace: 'nowrap',
-                  fontSize: C_COLLECTIONS_FONT,
-                  fontWeight: isActive ? 700 : 300,
-                  letterSpacing: '0.04em',
-                  lineHeight: 1,
-                  color: '#3A3A3A',
-                }}
-              >
-                {label}
+                >
+                  {label}
+                </span>
+                <span
+                  className="font-roboto-condensed"
+                  style={{
+                    position: 'absolute',
+                    left: 0,
+                    top: 0,
+                    whiteSpace: 'nowrap',
+                    fontSize: C_COLLECTIONS_FONT,
+                    fontWeight: isActive ? 700 : 300,
+                    letterSpacing: '0.02em',
+                    lineHeight: 1.1,
+                    color: '#3A3A3A',
+                  }}
+                >
+                  {label}
+                </span>
               </span>
             </button>
           );
