@@ -141,7 +141,12 @@ export default function FullWideSlide({
         <div className="fixed inset-0 z-[30000]">
           <button
             type="button"
-            className={isMega ? 'absolute inset-0 bg-foreground/25' : 'absolute inset-0 bg-foreground/30'}
+            className="absolute inset-0"
+            style={{
+              background: isMega
+                ? 'linear-gradient(to bottom, hsl(var(--foreground) / 0.95), hsl(var(--foreground) / 0.80))'
+                : 'linear-gradient(to bottom, hsl(var(--foreground) / 0.97), hsl(var(--foreground) / 0.85))',
+            }}
             onClick={close}
             aria-label={overlayAriaLabel}
           />

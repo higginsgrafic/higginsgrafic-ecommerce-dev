@@ -947,8 +947,8 @@ export default function SlideShell({
             className={isFullWide ? 'fixed left-0 right-0 bottom-0 z-[20000] backdrop-blur-sm' : 'fixed inset-0 z-[20000] backdrop-blur-sm'}
             style={
               isFullWide
-                ? { top: fullWideTop, backgroundColor: 'hsl(var(--foreground) / 0.5)' }
-                : { backgroundColor: 'hsl(var(--foreground) / 0.5)' }
+                ? { top: fullWideTop, background: 'linear-gradient(to bottom, hsl(var(--foreground) / 0.65), hsl(var(--foreground) / 0.35))' }
+                : { background: 'linear-gradient(to bottom, hsl(var(--foreground) / 0.65), hsl(var(--foreground) / 0.35))' }
             }
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
