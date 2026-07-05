@@ -116,6 +116,13 @@ export default function DevLinksPage() {
           { path: '/documentation-files', label: 'Documentation Files' },
         ],
       },
+      {
+        title: 'Components',
+        separator: true,
+        items: [
+          { path: '/checkout', label: 'Llista Checkout', tags: ['WIP'] },
+        ],
+      },
     ],
     []
   );
@@ -201,6 +208,9 @@ export default function DevLinksPage() {
         <div className="mt-[25px] grid grid-cols-1 gap-6 md:grid-cols-3">
           {groups.map((group) => (
             <div key={group.title}>
+              {group.separator && (
+                <div className="mb-4 h-px bg-border" />
+              )}
               <div className="text-center">
                 <div className="text-sm font-semibold text-foreground">
                   {group.title}

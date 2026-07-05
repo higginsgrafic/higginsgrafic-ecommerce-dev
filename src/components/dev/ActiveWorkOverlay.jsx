@@ -18,6 +18,8 @@ const ACTIVE_PAGES = [
   { path: '/constructor/full-wide-slide', label: 'FULL-SLIDE', note: 'Full Wide Slide' },
   { path: '/constructor/colleccio', label: 'COL·LECCIÓ', note: 'Constructor pàgina col·lecció (4 col)' },
   { path: '/constructor/pdp', label: 'PDP', note: 'Constructor pàgina de detall de producte' },
+  { separator: true, section: 'Components' },
+  { path: '/checkout', label: 'LLISTA CHECKOUT', note: 'Llista + totals + breadcrumbs' },
 ];
 
 const STORAGE_KEY = 'hg.activeWorkOverlay.collapsed';
@@ -100,7 +102,7 @@ function ActiveWorkOverlay() {
         title={collapsed ? 'Mostra pàgines actives' : 'Amaga pàgines actives'}
       >
         <span style={{ fontWeight: 700 }}>WORK</span>
-        <span style={{ opacity: 0.85 }}>{ACTIVE_PAGES.length}</span>
+        <span style={{ opacity: 0.85 }}>{ACTIVE_PAGES.filter((p) => !p.separator).length}</span>
       </button>
 
       {!collapsed ? (
@@ -134,10 +136,26 @@ function ActiveWorkOverlay() {
                     aria-hidden="true"
                     style={{
                       height: '1px',
-                      margin: '4px 2px',
+                      margin: page.section ? '20px 2px 2px' : '4px 2px',
                       backgroundColor: 'rgba(255,255,255,0.18)',
                     }}
-                  />
+                  >
+                    {page.section ? (
+                      <div
+                        style={{
+                          position: 'relative',
+                          top: '-10px',
+                          fontSize: '10px',
+                          fontWeight: 700,
+                          letterSpacing: '0.08em',
+                          color: 'rgba(255,255,255,0.55)',
+                          textTransform: 'uppercase',
+                        }}
+                      >
+                        {page.section}
+                      </div>
+                    ) : null}
+                  </li>
                 );
               }
               const isCurrent = location.pathname === page.path;
