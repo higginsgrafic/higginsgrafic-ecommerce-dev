@@ -2990,7 +2990,7 @@ export default function FullWideSlideDemoHeader({
   return (
     <header
       ref={headerRef}
-      className={`${contained ? 'relative' : 'fixed'} z-[10000] bg-background`}
+      className={`${contained ? 'relative' : 'fixed'} z-[10000]`}
       onMouseLeave={(e) => {
         if (isManualLockEnabled()) return;
         if (megaAccordionLocked) return;
@@ -3227,6 +3227,9 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
         ReactDOM.createPortal(
           active ? (
             <>
+              <div
+                className={`${contained ? 'absolute' : 'fixed'} inset-0 z-[9989] bg-background`}
+              />
               <div
                 className={`${contained ? 'absolute' : 'fixed'} inset-0 z-[9990]`}
                 style={{
