@@ -3243,21 +3243,9 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
               >
                 <MegaHeroSlider
                   slides={[
-                    {
-                      id: 'white-1',
-                      imageSrc: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1' height='1'%3E%3Crect width='1' height='1' fill='%23ffffff'/%3E%3C/svg%3E",
-                      imageAlt: 'Fons blanc',
-                    },
-                    {
-                      id: 'white-2',
-                      imageSrc: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1' height='1'%3E%3Crect width='1' height='1' fill='%23ffffff'/%3E%3C/svg%3E",
-                      imageAlt: 'Fons blanc',
-                    },
-                    {
-                      id: 'white-3',
-                      imageSrc: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1' height='1'%3E%3Crect width='1' height='1' fill='%23ffffff'/%3E%3C/svg%3E",
-                      imageAlt: 'Fons blanc',
-                    },
+                    { id: 'white-1' },
+                    { id: 'white-2' },
+                    { id: 'white-3' },
                   ]}
                   autoplay
                   autoplayIntervalMs={8000}
