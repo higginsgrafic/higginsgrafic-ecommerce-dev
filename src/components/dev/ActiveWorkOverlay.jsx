@@ -20,6 +20,7 @@ const ACTIVE_PAGES = [
   { path: '/constructor/pdp', label: 'PDP', note: 'Constructor pàgina de detall de producte' },
   { separator: true, section: 'Components' },
   { path: '/checkout', label: 'LLISTA CHECKOUT', note: 'Llista + totals + breadcrumbs' },
+  { path: '/constructor/full-wide-slide', label: 'MEGASLIDE PÀG.2', note: 'MegaslidePagina2: sitemap + samarretes + calibratge + selector + carrussel' },
 ];
 
 const STORAGE_KEY = 'hg.activeWorkOverlay.collapsed';
