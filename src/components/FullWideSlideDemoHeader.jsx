@@ -3245,18 +3245,18 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
                   slides={[
                     {
                       id: 'white-1',
-                      imageSrc: '/placeholders/apparel/t-shirt/gildan_5000/gildan-5000_t-shirt_crewneck_unisex_heavyWeight_xl_white_gpr-4-0_front.png',
-                      imageAlt: 'Samarreta blanca',
+                      imageSrc: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1' height='1'%3E%3Crect width='1' height='1' fill='%23ffffff'/%3E%3C/svg%3E",
+                      imageAlt: 'Fons blanc',
                     },
                     {
                       id: 'white-2',
-                      imageSrc: '/placeholders/apparel/t-shirt/gildan_5000/gildan-5000_t-shirt_crewneck_unisex_heavyWeight_xl_white_gpr-4-0_front.png',
-                      imageAlt: 'Samarreta blanca',
+                      imageSrc: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1' height='1'%3E%3Crect width='1' height='1' fill='%23ffffff'/%3E%3C/svg%3E",
+                      imageAlt: 'Fons blanc',
                     },
                     {
                       id: 'white-3',
-                      imageSrc: '/placeholders/apparel/t-shirt/gildan_5000/gildan-5000_t-shirt_crewneck_unisex_heavyWeight_xl_white_gpr-4-0_front.png',
-                      imageAlt: 'Samarreta blanca',
+                      imageSrc: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1' height='1'%3E%3Crect width='1' height='1' fill='%23ffffff'/%3E%3C/svg%3E",
+                      imageAlt: 'Fons blanc',
                     },
                   ]}
                   autoplay
