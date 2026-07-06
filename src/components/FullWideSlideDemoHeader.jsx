@@ -3459,9 +3459,15 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
                         paddingRight: '0px',
                         display: 'flex',
                         flexDirection: 'column',
-                        transform: 'scale(0.94)',
-                        transformOrigin: 'top center',
                       }}>
+                        <div style={{
+                          transform: 'scale(0.94)',
+                          transformOrigin: 'top center',
+                          width: '100%',
+                          height: '100%',
+                          flexShrink: 0,
+                          position: 'relative',
+                        }}>
                         {/* Ombra esquerra del carrusel */}
                         <div aria-hidden="true" style={{
                           position: 'absolute',
@@ -3882,6 +3888,8 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
                           />
                         )}
 
+                        </div>
+
                         {/* Contingut de l'acordió - Overlay absolut full-width */}
                         {acordioExpanded && (
                           <div style={{
@@ -3912,9 +3920,9 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
                               position: 'absolute',
                               top: '1px',
                               left: '50%',
-                              transform: `translateX(-50%) scale(${accordionPautaScale})`,
+                              transform: `translateX(-50%) scale(${accordionPautaScale * 0.94})`,
                               transformOrigin: 'top center',
-                              width: `calc(100% / ${accordionPautaScale})`,
+                              width: `calc(100% / (${accordionPautaScale} * 0.94))`,
                               height: '737.015px',
                               overflow: 'hidden',
                             }}>
