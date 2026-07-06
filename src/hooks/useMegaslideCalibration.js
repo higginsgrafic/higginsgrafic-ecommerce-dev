@@ -3,6 +3,16 @@ import useMegaStripeDebugVars from './useMegaStripeDebugVars';
 import useMegaTileSelectorDrag from './useMegaTileSelectorDrag';
 import { getMegaPublicSelectorFor } from '../components/fullwide/megaPublicSelectorState.js';
 
+const readKey = (ns, baseKey) => {
+  try {
+    const v = window.localStorage.getItem(`${ns}${baseKey}`);
+    if (v != null) return v;
+    return window.localStorage.getItem(baseKey);
+  } catch {
+    return null;
+  }
+};
+
 const DEFAULT_SELECTOR_PARAMS = {
   keyset: 'v1',
   enabled: true,
@@ -200,51 +210,51 @@ export default function useMegaslideCalibration(namespace = '', active = null, c
 
       const hasV2 = (() => {
         try {
-          const a = window.localStorage.getItem(`${ns}MEGA_TILE_SELECTOR_V2_ENABLED`);
-          const b = window.localStorage.getItem(`${ns}MEGA_TILE_SELECTOR_V2_TARGET`);
-          const c = window.localStorage.getItem(`${ns}MEGA_TILE_SELECTOR_V2_SIZE_PX`);
-          const d = window.localStorage.getItem(`${ns}MEGA_TILE_SELECTOR_V2_STROKE_PX`);
-          const e = window.localStorage.getItem(`${ns}MEGA_TILE_SELECTOR_V2_COLOR`);
-          const f = window.localStorage.getItem(`${ns}MEGA_TILE_SELECTOR_V2_STEP_X`);
-          const g = window.localStorage.getItem(`${ns}MEGA_TILE_SELECTOR_V2_STEP_Y`);
+          const a = readKey(ns, 'MEGA_TILE_SELECTOR_V2_ENABLED');
+          const b = readKey(ns, 'MEGA_TILE_SELECTOR_V2_TARGET');
+          const c = readKey(ns, 'MEGA_TILE_SELECTOR_V2_SIZE_PX');
+          const d = readKey(ns, 'MEGA_TILE_SELECTOR_V2_STROKE_PX');
+          const e = readKey(ns, 'MEGA_TILE_SELECTOR_V2_COLOR');
+          const f = readKey(ns, 'MEGA_TILE_SELECTOR_V2_STEP_X');
+          const g = readKey(ns, 'MEGA_TILE_SELECTOR_V2_STEP_Y');
           return a != null || b != null || c != null || d != null || e != null || f != null || g != null;
         } catch {
           return false;
         }
       })();
 
-      const readBool = (k, fallback) => {
-        const raw = window.localStorage.getItem(k);
+      const readBoolNs = (baseKey, fallback) => {
+        const raw = readKey(ns, baseKey);
         if (raw == null) return fallback;
         const v = String(raw).trim().toLowerCase();
         if (v === '') return true;
         return v === '1' || v === 'true' || v === 'on' || v === 'yes';
       };
 
-      const v1Enabled = readBool(`${ns}MEGA_TILE_SELECTOR_ENABLED`, true);
-      const v2Enabled = readBool(`${ns}MEGA_TILE_SELECTOR_V2_ENABLED`, hasV2 ? false : true);
+      const v1Enabled = readBoolNs('MEGA_TILE_SELECTOR_ENABLED', true);
+      const v2Enabled = readBoolNs('MEGA_TILE_SELECTOR_V2_ENABLED', hasV2 ? false : true);
       const activeKeyset = v2Enabled ? 'v2' : (v1Enabled ? 'v1' : 'v2');
-      const K = (suffix) => (activeKeyset === 'v2' ? `${ns}MEGA_TILE_SELECTOR_V2_${suffix}` : `${ns}MEGA_TILE_SELECTOR_${suffix}`);
+      const K = (suffix) => (activeKeyset === 'v2' ? `MEGA_TILE_SELECTOR_V2_${suffix}` : `MEGA_TILE_SELECTOR_${suffix}`);
 
-      const readNum = (k, fallback) => {
-        const raw = window.localStorage.getItem(k);
+      const readNumNs = (baseKey, fallback) => {
+        const raw = readKey(ns, baseKey);
         const n = raw == null ? NaN : Number.parseFloat(String(raw));
         return Number.isFinite(n) ? n : fallback;
       };
       return {
         keyset: activeKeyset,
-        enabled: readBool(K('ENABLED'), activeKeyset === 'v2' ? false : true),
-        target: String(window.localStorage.getItem(K('TARGET')) || 'NCC-1701-D'),
-        sizePx: Math.min(800, Math.max(20, readNum(K('SIZE_PX'), 200))),
-        strokePx: Math.min(80, Math.max(0, readNum(K('STROKE_PX'), 10))),
-        color: String(window.localStorage.getItem(K('COLOR')) || 'black'),
-        stepX: Math.min(99, Math.max(-99, readNum(K('STEP_X'), 0))),
-        stepY: Math.min(99, Math.max(-99, readNum(K('STEP_Y'), 0))),
-        radiusPx: Math.min(200, Math.max(0, readNum(K('RADIUS_PX'), 8))),
-        extendTopPx: Math.min(500, Math.max(-500, readNum(K('EXTEND_TOP_PX'), 30))),
-        extendRightPx: Math.min(500, Math.max(-500, readNum(K('EXTEND_RIGHT_PX'), 0))),
-        extendBottomPx: Math.min(500, Math.max(-500, readNum(K('EXTEND_BOTTOM_PX'), 0))),
-        extendLeftPx: Math.min(500, Math.max(-500, readNum(K('EXTEND_LEFT_PX'), 0))),
+        enabled: readBoolNs(K('ENABLED'), activeKeyset === 'v2' ? false : true),
+        target: String(readKey(ns, K('TARGET')) || 'NCC-1701-D'),
+        sizePx: Math.min(800, Math.max(20, readNumNs(K('SIZE_PX'), 200))),
+        strokePx: Math.min(80, Math.max(0, readNumNs(K('STROKE_PX'), 10))),
+        color: String(readKey(ns, K('COLOR')) || 'black'),
+        stepX: Math.min(99, Math.max(-99, readNumNs(K('STEP_X'), 0))),
+        stepY: Math.min(99, Math.max(-99, readNumNs(K('STEP_Y'), 0))),
+        radiusPx: Math.min(200, Math.max(0, readNumNs(K('RADIUS_PX'), 8))),
+        extendTopPx: Math.min(500, Math.max(-500, readNumNs(K('EXTEND_TOP_PX'), 30))),
+        extendRightPx: Math.min(500, Math.max(-500, readNumNs(K('EXTEND_RIGHT_PX'), 0))),
+        extendBottomPx: Math.min(500, Math.max(-500, readNumNs(K('EXTEND_BOTTOM_PX'), 0))),
+        extendLeftPx: Math.min(500, Math.max(-500, readNumNs(K('EXTEND_LEFT_PX'), 0))),
       };
     } catch {
       return { ...DEFAULT_SELECTOR_PARAMS };
@@ -259,65 +269,65 @@ export default function useMegaslideCalibration(namespace = '', active = null, c
         const activeNow = String(activeRef.current || '');
         const hasV2 = (() => {
           try {
-            const a = window.localStorage.getItem(`${ns}MEGA_TILE_SELECTOR_V2_ENABLED`);
-            const b = window.localStorage.getItem(`${ns}MEGA_TILE_SELECTOR_V2_TARGET`);
-            const c = window.localStorage.getItem(`${ns}MEGA_TILE_SELECTOR_V2_SIZE_PX`);
-            const d = window.localStorage.getItem(`${ns}MEGA_TILE_SELECTOR_V2_STROKE_PX`);
-            const e = window.localStorage.getItem(`${ns}MEGA_TILE_SELECTOR_V2_COLOR`);
-            const f = window.localStorage.getItem(`${ns}MEGA_TILE_SELECTOR_V2_STEP_X`);
-            const g = window.localStorage.getItem(`${ns}MEGA_TILE_SELECTOR_V2_STEP_Y`);
+            const a = readKey(ns, 'MEGA_TILE_SELECTOR_V2_ENABLED');
+            const b = readKey(ns, 'MEGA_TILE_SELECTOR_V2_TARGET');
+            const c = readKey(ns, 'MEGA_TILE_SELECTOR_V2_SIZE_PX');
+            const d = readKey(ns, 'MEGA_TILE_SELECTOR_V2_STROKE_PX');
+            const e = readKey(ns, 'MEGA_TILE_SELECTOR_V2_COLOR');
+            const f = readKey(ns, 'MEGA_TILE_SELECTOR_V2_STEP_X');
+            const g = readKey(ns, 'MEGA_TILE_SELECTOR_V2_STEP_Y');
             return a != null || b != null || c != null || d != null || e != null || f != null || g != null;
           } catch {
             return false;
           }
         })();
 
-        const readBool = (k, fallback) => {
-          const raw = window.localStorage.getItem(k);
+        const readBoolNs = (baseKey, fallback) => {
+          const raw = readKey(ns, baseKey);
           if (raw == null) return fallback;
           const v = String(raw).trim().toLowerCase();
           if (v === '') return true;
           return v === '1' || v === 'true' || v === 'on' || v === 'yes';
         };
 
-        const v1Enabled = readBool(`${ns}MEGA_TILE_SELECTOR_ENABLED`, true);
-        const v2Enabled = readBool(`${ns}MEGA_TILE_SELECTOR_V2_ENABLED`, hasV2 ? false : true);
+        const v1Enabled = readBoolNs('MEGA_TILE_SELECTOR_ENABLED', true);
+        const v2Enabled = readBoolNs('MEGA_TILE_SELECTOR_V2_ENABLED', hasV2 ? false : true);
         const activeKeyset = v2Enabled ? 'v2' : (v1Enabled ? 'v1' : 'v2');
-        const K = (suffix) => (activeKeyset === 'v2' ? `${ns}MEGA_TILE_SELECTOR_V2_${suffix}` : `${ns}MEGA_TILE_SELECTOR_${suffix}`);
+        const K = (suffix) => (activeKeyset === 'v2' ? `MEGA_TILE_SELECTOR_V2_${suffix}` : `MEGA_TILE_SELECTOR_${suffix}`);
 
-        const readNum = (k, fallback) => {
-          const raw = window.localStorage.getItem(k);
+        const readNumNs = (baseKey, fallback) => {
+          const raw = readKey(ns, baseKey);
           const n = raw == null ? NaN : Number.parseFloat(String(raw));
           return Number.isFinite(n) ? n : fallback;
         };
         setMegaTileSelectorParams({
           keyset: activeKeyset,
-          enabled: readBool(K('ENABLED'), activeKeyset === 'v2' ? false : true),
+          enabled: readBoolNs(K('ENABLED'), activeKeyset === 'v2' ? false : true),
           target: (() => {
             const publicState = getMegaPublicSelectorFor(activeNow, activeKeyset);
             const t = typeof publicState?.target === 'string' ? publicState.target.trim() : '';
-            return t ? t : String(window.localStorage.getItem(K('TARGET')) || 'NCC-1701-D');
+            return t ? t : String(readKey(ns, K('TARGET')) || 'NCC-1701-D');
           })(),
-          sizePx: Math.min(800, Math.max(20, readNum(K('SIZE_PX'), 200))),
-          strokePx: Math.min(80, Math.max(0, readNum(K('STROKE_PX'), 10))),
-          color: String(window.localStorage.getItem(K('COLOR')) || 'black'),
+          sizePx: Math.min(800, Math.max(20, readNumNs(K('SIZE_PX'), 200))),
+          strokePx: Math.min(80, Math.max(0, readNumNs(K('STROKE_PX'), 10))),
+          color: String(readKey(ns, K('COLOR')) || 'black'),
           stepX: (() => {
             const publicState = getMegaPublicSelectorFor(activeNow, activeKeyset);
             const v = Number(publicState?.stepX);
             if (Number.isFinite(v)) return Math.min(99, Math.max(-99, v));
-            return Math.min(99, Math.max(-99, readNum(K('STEP_X'), 0)));
+            return Math.min(99, Math.max(-99, readNumNs(K('STEP_X'), 0)));
           })(),
           stepY: (() => {
             const publicState = getMegaPublicSelectorFor(activeNow, activeKeyset);
             const v = Number(publicState?.stepY);
             if (Number.isFinite(v)) return Math.min(99, Math.max(-99, v));
-            return Math.min(99, Math.max(-99, readNum(K('STEP_Y'), 0)));
+            return Math.min(99, Math.max(-99, readNumNs(K('STEP_Y'), 0)));
           })(),
-          radiusPx: Math.min(200, Math.max(0, readNum(K('RADIUS_PX'), 8))),
-          extendTopPx: Math.min(500, Math.max(-500, readNum(K('EXTEND_TOP_PX'), 30))),
-          extendRightPx: Math.min(500, Math.max(-500, readNum(K('EXTEND_RIGHT_PX'), 0))),
-          extendBottomPx: Math.min(500, Math.max(-500, readNum(K('EXTEND_BOTTOM_PX'), 0))),
-          extendLeftPx: Math.min(500, Math.max(-500, readNum(K('EXTEND_LEFT_PX'), 0))),
+          radiusPx: Math.min(200, Math.max(0, readNumNs(K('RADIUS_PX'), 8))),
+          extendTopPx: Math.min(500, Math.max(-500, readNumNs(K('EXTEND_TOP_PX'), 30))),
+          extendRightPx: Math.min(500, Math.max(-500, readNumNs(K('EXTEND_RIGHT_PX'), 0))),
+          extendBottomPx: Math.min(500, Math.max(-500, readNumNs(K('EXTEND_BOTTOM_PX'), 0))),
+          extendLeftPx: Math.min(500, Math.max(-500, readNumNs(K('EXTEND_LEFT_PX'), 0))),
         });
       } catch {
         // ignore
@@ -326,8 +336,7 @@ export default function useMegaslideCalibration(namespace = '', active = null, c
 
     const onStorage = (e) => {
       if (!e || !e.key) return;
-      const prefix = ns;
-      if (e.key.startsWith(prefix)) {
+      if (e.key.startsWith(ns) || e.key.startsWith('MEGA_TILE_SELECTOR')) {
         read();
       }
     };
@@ -335,9 +344,11 @@ export default function useMegaslideCalibration(namespace = '', active = null, c
     read();
     window.addEventListener('storage', onStorage);
     window.addEventListener(`${ns}mega-tile-selector-changed`, read);
+    if (ns) window.addEventListener('mega-tile-selector-changed', read);
     return () => {
       window.removeEventListener('storage', onStorage);
       window.removeEventListener(`${ns}mega-tile-selector-changed`, read);
+      if (ns) window.removeEventListener('mega-tile-selector-changed', read);
     };
   }, [ns]);
 
