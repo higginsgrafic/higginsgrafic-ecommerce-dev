@@ -289,7 +289,7 @@ export default function MegaHeroSlider({
                 {s.imageSrc ? (
                   <img className={styles.image} src={s.imageSrc} alt={s.imageAlt} />
                 ) : (
-                  <div className={styles.image} style={{ backgroundColor: '#ffffff' }} aria-hidden="true" />
+                  <div className={styles.image} aria-hidden="true" />
                 )}
 
                 {shirtDrawingEnabled && drawingOverlaySrc ? (
@@ -323,6 +323,7 @@ export default function MegaHeroSlider({
                     decoding="async"
                   />
                 ) : null}
+                {s.kicker || s.headline || s.primaryCta || s.secondaryCta ? (
                 <div className={styles.overlay}>
                   <div className="mx-auto w-full max-w-[1400px] px-4 pb-9 sm:px-6 lg:px-10 lg:pb-10">
                     {s.kicker ? <p className={styles.kicker}>{s.kicker}</p> : null}
@@ -342,6 +343,7 @@ export default function MegaHeroSlider({
                     </div>
                   </div>
                 </div>
+                ) : null}
               </article>
             ))}
           </div>

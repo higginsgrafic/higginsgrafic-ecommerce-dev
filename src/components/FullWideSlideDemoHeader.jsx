@@ -3255,6 +3255,12 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
           active ? (
             <>
               <div
+                className={`${contained ? 'absolute' : 'fixed'} inset-0 z-[9989]`}
+                style={{
+                  background: 'linear-gradient(to bottom, hsl(var(--foreground) / 0.75), hsl(var(--foreground) / 0.55))',
+                }}
+              />
+              <div
                 className={`${contained ? 'absolute' : 'fixed'} inset-0 z-[9990] pointer-events-none`}
               >
                 <Pauta4ColsOverlay
@@ -3294,12 +3300,6 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
                   </div>
                 </Pauta4ColsOverlay>
               </div>
-              <div
-                className={`${contained ? 'absolute' : 'fixed'} inset-0 z-[9991] pointer-events-none`}
-                style={{
-                  background: 'linear-gradient(to bottom, hsl(var(--foreground) / 0.75), hsl(var(--foreground) / 0.55))',
-                }}
-              />
             </>
           ) : null,
           portalContainer || document.body
