@@ -3017,7 +3017,7 @@ export default function FullWideSlideDemoHeader({
   return (
     <header
       ref={headerRef}
-      className={`${contained ? 'relative' : 'fixed'} z-[10000]`}
+      className={`${contained ? 'relative' : 'fixed'} z-[10000] bg-background`}
       onMouseLeave={(e) => {
         if (isManualLockEnabled()) return;
         if (megaAccordionLocked) return;
@@ -3255,7 +3255,7 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
           active ? (
             <>
               <div
-                className={`${contained ? 'absolute' : 'fixed'} inset-0 z-[9991] pointer-events-none`}
+                className={`${contained ? 'absolute' : 'fixed'} inset-0 z-[9990] pointer-events-none`}
               >
                 <Pauta4ColsOverlay
                   pautaEnabled={false}
@@ -3272,7 +3272,8 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
                       gridColumn: '1 / 4',
                       gridRow: '10 / 25',
                       position: 'relative',
-                      top: `calc(-5px - ${megaHeroRowHeight / 2}px)`,
+                      left: '9px',
+                      top: `calc(138px - ${megaHeroRowHeight / 2}px)`,
                       width: 'calc(100% + 1px)',
                       height: 'calc(100% + 2px)',
                       transform: 'scale(0.94)',
@@ -3293,6 +3294,12 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
                   </div>
                 </Pauta4ColsOverlay>
               </div>
+              <div
+                className={`${contained ? 'absolute' : 'fixed'} inset-0 z-[9991] pointer-events-none`}
+                style={{
+                  background: 'linear-gradient(to bottom, hsl(var(--foreground) / 0.75), hsl(var(--foreground) / 0.55))',
+                }}
+              />
             </>
           ) : null,
           portalContainer || document.body
@@ -3303,7 +3310,7 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
       >
         {active ? (
           <div 
-            className="relative z-[10000] block border-b border-border" 
+            className="relative z-[10000] block border-b border-border bg-background" 
             style={{ 
               overflow: 'visible',
               ...(megaFullScreen ? {
