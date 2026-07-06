@@ -3253,54 +3253,12 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
       {canUseDom && (!contained || portalContainer) &&
         ReactDOM.createPortal(
           active ? (
-            <>
-              <div
+            <div
                 className={`${contained ? 'absolute' : 'fixed'} inset-0 z-[9989]`}
                 style={{
                   background: 'linear-gradient(to bottom, hsl(var(--foreground) / 0.75), hsl(var(--foreground) / 0.55))',
                 }}
               />
-              <div
-                className={`${contained ? 'absolute' : 'fixed'} inset-0 z-[9990] pointer-events-none`}
-              >
-                <Pauta4ColsOverlay
-                  pautaEnabled={false}
-                  tableEnabled={false}
-                  numCols={3}
-                  numRows={24}
-                  canvasAspect={[2642, 1780]}
-                  topOffset="76px"
-                  bottomPadding="0px"
-                  innerRef={megaHeroGridRef}
-                >
-                  <div
-                    style={{
-                      gridColumn: '1 / 4',
-                      gridRow: '10 / 25',
-                      position: 'relative',
-                      left: '9px',
-                      top: `calc(138px - ${megaHeroRowHeight / 2}px)`,
-                      width: 'calc(100% + 1px)',
-                      height: 'calc(100% + 2px)',
-                      transform: 'scale(0.94)',
-                      transformOrigin: 'center center',
-                    }}
-                  >
-                    <MegaHeroSlider
-                      slides={[
-                        { id: 'white-1' },
-                        { id: 'white-2' },
-                        { id: 'white-3' },
-                      ]}
-                      autoplay
-                      autoplayIntervalMs={8000}
-                      className="h-full"
-                      flush
-                    />
-                  </div>
-                </Pauta4ColsOverlay>
-              </div>
-            </>
           ) : null,
           portalContainer || document.body
         )}
@@ -3310,7 +3268,7 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
       >
         {active ? (
           <div 
-            className="relative z-[10000] block border-b border-border bg-background" 
+            className="relative z-[10000] block border-b border-border" 
             style={{ 
               overflow: 'visible',
               ...(megaFullScreen ? {
@@ -3458,7 +3416,7 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
                           transform: 'translateX(-50%) scale(var(--hg-cercador-bar-scale, 1))',
                           transformOrigin: 'top center',
                           width: 'var(--hg-cercador-bar-width, 94%)',
-                          zIndex: 2,
+                          zIndex: 3,
                         }}>
                           <CercadorTopBar
                             activeCollection={active}
@@ -3484,7 +3442,7 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
                           transform: 'translateX(-50%) scale(var(--hg-cercador-bar-scale, 1))',
                           transformOrigin: 'top center',
                           width: 'var(--hg-cercador-bar-width, 94%)',
-                          zIndex: 2,
+                          zIndex: 3,
                           containerType: 'inline-size',
                         }}>
                           <CercadorTextRow
@@ -3576,6 +3534,8 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
                         </div>
                         {active ? (
                           <div style={{
+                            position: 'relative',
+                            zIndex: 3,
                             display: 'flex',
                             marginTop: '18px',
                             padding: '0 40px',
@@ -3641,6 +3601,45 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
                             </div>
                           </div>
                         ) : null}
+                        <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, zIndex: 1, pointerEvents: 'none' }}>
+                        <Pauta4ColsOverlay
+                          pautaEnabled={false}
+                          tableEnabled={false}
+                          numCols={3}
+                          numRows={24}
+                          canvasAspect={[2642, 1780]}
+                          topOffset="76px"
+                          bottomPadding="0px"
+                          innerRef={megaHeroGridRef}
+                        >
+                          <div
+                            style={{
+                              gridColumn: '1 / 4',
+                              gridRow: '10 / 25',
+                              position: 'relative',
+                              left: '-1px',
+                              top: `calc(-31px - ${megaHeroRowHeight / 2}px)`,
+                              width: 'calc(100% + 1px)',
+                              height: 'calc(100% + 2px)',
+                              transform: 'scale(0.94)',
+                              transformOrigin: 'center center',
+                              pointerEvents: 'auto',
+                            }}
+                          >
+                            <MegaHeroSlider
+                              slides={[
+                                { id: 'white-1' },
+                                { id: 'white-2' },
+                                { id: 'white-3' },
+                              ]}
+                              autoplay
+                              autoplayIntervalMs={8000}
+                              className="h-full"
+                              flush
+                            />
+                          </div>
+                        </Pauta4ColsOverlay>
+                        </div>
                       </div>
 
                       <div style={{ 
