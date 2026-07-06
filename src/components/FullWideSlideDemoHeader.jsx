@@ -3244,31 +3244,19 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
                 <MegaHeroSlider
                   slides={[
                     {
-                      id: 'first-contact',
-                      imageSrc: '/placeholders/apparel/t-shirt/gildan_5000/gildan-5000_t-shirt_crewneck_unisex_heavyWeight_xl_royal_gpr-4-0_front.png',
-                      imageAlt: 'Samarreta de la col·lecció First Contact',
-                      kicker: 'First Contact',
-                      headline: 'Ciència-ficció per mirar cap a les estrelles.',
-                      primaryCta: { label: 'Compra', href: '/first-contact' },
-                      secondaryCta: { label: 'Descobreix', href: '/first-contact' },
+                      id: 'white-1',
+                      imageSrc: '/placeholders/apparel/t-shirt/gildan_5000/gildan-5000_t-shirt_crewneck_unisex_heavyWeight_xl_white_gpr-4-0_front.png',
+                      imageAlt: 'Samarreta blanca',
                     },
                     {
-                      id: 'the-human-inside',
-                      imageSrc: '/placeholders/apparel/t-shirt/gildan_5000/gildan-5000_t-shirt_crewneck_unisex_heavyWeight_xl_black_gpr-4-0_front.png',
-                      imageAlt: 'Samarreta de la col·lecció The Human Inside',
-                      kicker: 'The Human Inside',
-                      headline: 'Robots, identitat i preguntes incòmodes.',
-                      primaryCta: { label: 'Compra', href: '/thin' },
-                      secondaryCta: { label: 'Descobreix', href: '/thin' },
+                      id: 'white-2',
+                      imageSrc: '/placeholders/apparel/t-shirt/gildan_5000/gildan-5000_t-shirt_crewneck_unisex_heavyWeight_xl_white_gpr-4-0_front.png',
+                      imageAlt: 'Samarreta blanca',
                     },
                     {
-                      id: 'miscellania',
-                      imageSrc: '/placeholders/apparel/t-shirt/gildan_5000/gildan-5000_t-shirt_crewneck_unisex_heavyWeight_xl_forest-green_gpr-4-0_front.png',
-                      imageAlt: 'Samarreta de la col·lecció Miscel·lània',
-                      kicker: 'Miscel·lània',
-                      headline: 'Per a qui tria el seu propi camí.',
-                      primaryCta: { label: 'Compra', href: '/miscellania' },
-                      secondaryCta: { label: 'Descobreix', href: '/miscellania' },
+                      id: 'white-3',
+                      imageSrc: '/placeholders/apparel/t-shirt/gildan_5000/gildan-5000_t-shirt_crewneck_unisex_heavyWeight_xl_white_gpr-4-0_front.png',
+                      imageAlt: 'Samarreta blanca',
                     },
                   ]}
                   autoplay
