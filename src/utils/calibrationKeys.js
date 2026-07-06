@@ -11,6 +11,11 @@ export const CALIBRATION_KEY_PREFIXES = [
   'HG_DEV_BELT2_',
   'HG_BELT2_',
   'HG_BELT_',
+  'MEGA_STRIPE_',
+  'MEGA_TILE_SELECTOR_',
+  'HG_SHIRT_DRAWING_',
+  'HG_DRAWING_OVERLAY_',
+  'p2_',
 ];
 
 export const CALIBRATION_KEY_LITERALS = [

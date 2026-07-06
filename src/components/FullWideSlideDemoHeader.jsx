@@ -3341,7 +3341,7 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
                       <div style={{ flex: '0 0 auto', width: 'var(--hg-mega-w, min(1350px, calc(100vw - 32px)))', maxWidth: 'none', position: 'relative', height: '100%', paddingLeft: '0px', paddingRight: '0px' }}>
                         <MegaStripePanel
                           active={active}
-                          resolvedMega={resolvedMegaFiltered}
+                          resolvedMega={resolvedMega}
                           showStripe={showStripe}
                           stripeRowPadPx={stripeRowPadPx}
                           stripeRowPadXPx={stripeRowPadXPx}
@@ -3376,13 +3376,6 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
                           setHumanInsideSelectedItem={setHumanInsideSelectedItem}
                           setSelectedItemByCollection={setSelectedItemByCollection}
                           normalizeOverlaySrc={normalizeOverlaySrc}
-                          shirtColor={CERCADOR_COLORS.find((c) => c.slug === displayedShirtColor)?.hex}
-                          onShirtClick={onShirtClick}
-                          stripeTileOverlaySrcs={stripeTileOverlaySrcs}
-                          stripeTileItems={stripeTileItems}
-                          neckDotIndices={neckDotIndices}
-                          emptyTileIndices={emptyTileIndices}
-                          stripeEmptyMaskSrc={stripeEmptyMaskSrc}
                         />
                       </div>
 

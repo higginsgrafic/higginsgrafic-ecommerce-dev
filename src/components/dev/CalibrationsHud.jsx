@@ -7,6 +7,7 @@ import {
 } from '@/api/calibrations';
 import {
   applyCalibrationSnapshot,
+  isCalibrationKey,
   readCalibrationSnapshot,
 } from '@/utils/calibrationKeys';
 
@@ -109,6 +110,75 @@ function CalibrationsHud() {
   }, [collapsed]);
 
   const localKeyCount = snapshotKeyCount(readCalibrationSnapshot());
+
+  const handleCloneToNamespace = useCallback((ns) => {
+    if (busy) return;
+    const prefix = `${ns}_`;
+    const keysToClone = [
+      'MEGA_STRIPE_REF_ENABLED',
+      'MEGA_STRIPE_REF_SRC',
+      'MEGA_STRIPE_REF2_ENABLED',
+      'MEGA_STRIPE_REF2_SRC',
+      'MEGA_STRIPE_SPRITE_ENABLED',
+      'MEGA_STRIPE_TILE_GAP_PX',
+      'HG_SHIRT_DRAWING_ENABLED',
+      'HG_SHIRT_DRAWING_OVERLAY_ENABLED',
+      'HG_DRAWING_OVERLAY_SRC',
+      'MEGA_TILE_SELECTOR_ENABLED',
+      'MEGA_TILE_SELECTOR_TARGET',
+      'MEGA_TILE_SELECTOR_SIZE_PX',
+      'MEGA_TILE_SELECTOR_STROKE_PX',
+      'MEGA_TILE_SELECTOR_COLOR',
+      'MEGA_TILE_SELECTOR_STEP_X',
+      'MEGA_TILE_SELECTOR_STEP_Y',
+      'MEGA_TILE_SELECTOR_RADIUS_PX',
+      'MEGA_TILE_SELECTOR_EXTEND_TOP_PX',
+      'MEGA_TILE_SELECTOR_EXTEND_RIGHT_PX',
+      'MEGA_TILE_SELECTOR_EXTEND_BOTTOM_PX',
+      'MEGA_TILE_SELECTOR_EXTEND_LEFT_PX',
+      'MEGA_TILE_SELECTOR_V2_ENABLED',
+      'MEGA_TILE_SELECTOR_V2_TARGET',
+      'MEGA_TILE_SELECTOR_V2_SIZE_PX',
+      'MEGA_TILE_SELECTOR_V2_STROKE_PX',
+      'MEGA_TILE_SELECTOR_V2_COLOR',
+      'MEGA_TILE_SELECTOR_V2_STEP_X',
+      'MEGA_TILE_SELECTOR_V2_STEP_Y',
+      'MEGA_TILE_SELECTOR_V2_RADIUS_PX',
+      'MEGA_TILE_SELECTOR_V2_EXTEND_TOP_PX',
+      'MEGA_TILE_SELECTOR_V2_EXTEND_RIGHT_PX',
+      'MEGA_TILE_SELECTOR_V2_EXTEND_BOTTOM_PX',
+      'MEGA_TILE_SELECTOR_V2_EXTEND_LEFT_PX',
+    ];
+    let count = 0;
+    try {
+      keysToClone.forEach((key) => {
+        const raw = window.localStorage.getItem(key);
+        if (raw == null) return;
+        window.localStorage.setItem(`${prefix}${key}`, raw);
+        count += 1;
+      });
+      // Dispatch events so hooks pick up the change
+      keysToClone.forEach((key) => {
+        const evtMap = {
+          MEGA_STRIPE_REF_ENABLED: 'mega-stripe-ref-changed',
+          MEGA_STRIPE_REF_SRC: 'mega-stripe-ref-changed',
+          MEGA_STRIPE_REF2_ENABLED: 'mega-stripe-ref2-changed',
+          MEGA_STRIPE_REF2_SRC: 'mega-stripe-ref2-changed',
+          MEGA_STRIPE_SPRITE_ENABLED: 'mega-stripe-sprite-enabled-changed',
+          MEGA_STRIPE_TILE_GAP_PX: 'mega-stripe-tile-gap-changed',
+          HG_SHIRT_DRAWING_ENABLED: 'hg-shirt-drawing-enabled-changed',
+          HG_SHIRT_DRAWING_OVERLAY_ENABLED: 'hg-shirt-drawing-overlay-enabled-changed',
+          HG_DRAWING_OVERLAY_SRC: 'hg-drawing-overlay-changed',
+        };
+        const evt = evtMap[key];
+        if (evt) window.dispatchEvent(new Event(`${prefix}${evt}`));
+      });
+      window.dispatchEvent(new Event(`${prefix}mega-tile-selector-changed`));
+      setInfo(`Clonades ${count} claus a ${ns}_`);
+    } catch (e) {
+      setError(e?.message || 'Error clonant');
+    }
+  }, [busy]);
 
   const handlePublish = useCallback(async () => {
     if (!unlocked || busy) return;
@@ -251,6 +321,41 @@ function CalibrationsHud() {
             >
               Recarregar del servidor
             </button>
+          </div>
+
+          <div style={{ borderTop: '1px solid rgba(71, 80, 89, 0.12)', paddingTop: 8, display: 'grid', gap: 6 }}>
+            <div style={{ fontWeight: 600 }}>Clonar calibratge</div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
+              <button
+                type="button"
+                style={{ ...ghostButton, opacity: busy ? 0.6 : 1 }}
+                disabled={busy}
+                onClick={() => handleCloneToNamespace('p2')}
+              >
+                Clonar a p2
+              </button>
+              <button
+                type="button"
+                style={{ ...ghostButton, opacity: busy ? 0.6 : 1 }}
+                disabled={busy}
+                onClick={() => {
+                  if (!window.confirm('Eliminar totes les claus p2_?')) return;
+                  try {
+                    const toRemove = [];
+                    for (let i = 0; i < window.localStorage.length; i++) {
+                      const k = window.localStorage.key(i);
+                      if (k && k.startsWith('p2_')) toRemove.push(k);
+                    }
+                    toRemove.forEach((k) => window.localStorage.removeItem(k));
+                    setInfo(`Eliminades ${toRemove.length} claus p2_`);
+                  } catch (e) {
+                    setError(e?.message || 'Error netejant');
+                  }
+                }}
+              >
+                Netejar p2
+              </button>
+            </div>
           </div>
 
           <div style={{ borderTop: '1px solid rgba(71, 80, 89, 0.12)', paddingTop: 8, display: 'grid', gap: 6 }}>
