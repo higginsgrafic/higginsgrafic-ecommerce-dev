@@ -195,7 +195,7 @@ function MegaStripePanel({
             paddingBottom: `${stripeRowPadPx}px`,
             paddingLeft: `${stripeRowPadXPx?.left || 0}px`,
             paddingRight: `${stripeRowPadXPx?.right || 0}px`,
-            transform: 'translateY(-10px)',
+            transform: 'translateY(-15px)',
           }}
         >
           <div className="w-full flex justify-center bg-transparent">
