@@ -3230,7 +3230,7 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
               <div
                 className={`${contained ? 'absolute' : 'fixed'} inset-0 z-[9990]`}
                 style={{
-                  background: 'linear-gradient(to bottom, hsl(var(--foreground) / 0.95), hsl(var(--foreground) / 0.80))',
+                  background: 'linear-gradient(to bottom, hsl(var(--foreground) / 0.75), hsl(var(--foreground) / 0.55))',
                 }}
                 role="button"
                 tabIndex={0}
