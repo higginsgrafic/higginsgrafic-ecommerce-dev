@@ -3228,9 +3228,6 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
           active ? (
             <>
               <div
-                className={`${contained ? 'absolute' : 'fixed'} inset-0 z-[9989] bg-background`}
-              />
-              <div
                 className={`${contained ? 'absolute' : 'fixed'} inset-0 z-[9990]`}
                 style={{
                   background: 'linear-gradient(to bottom, hsl(var(--foreground) / 0.75), hsl(var(--foreground) / 0.55))',
@@ -3242,17 +3239,22 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
                 }}
               />
               <div
-                className={`${contained ? 'absolute' : 'fixed'} inset-0 z-[9991] pointer-events-none`}
+                className="fixed left-0 right-0 z-[9991] pointer-events-none"
+                style={{ top: 0 }}
               >
-                <MegaHeroSlider
-                  slides={[
-                    { id: 'white-1' },
-                    { id: 'white-2' },
-                    { id: 'white-3' },
-                  ]}
-                  autoplay
-                  autoplayIntervalMs={8000}
-                />
+                <div className="mt-4">
+                  <div className="mx-auto max-w-[1400px] px-4 sm:px-6 lg:px-10">
+                    <MegaHeroSlider
+                      slides={[
+                        { id: 'white-1' },
+                        { id: 'white-2' },
+                        { id: 'white-3' },
+                      ]}
+                      autoplay
+                      autoplayIntervalMs={8000}
+                    />
+                  </div>
+                </div>
               </div>
             </>
           ) : null,
