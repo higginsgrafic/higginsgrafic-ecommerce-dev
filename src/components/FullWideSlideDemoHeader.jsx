@@ -1056,17 +1056,23 @@ export default function FullWideSlideDemoHeader({
             if (k === 'dj vader' || k === 'dj-vader') return '/custom_logos/drawings/images_stripe/miscellania/color/dj-vader-multi-light-stripe.webp';
             if (k === 'deathstar2d2' || k === 'death star2d2' || k === 'death-star2d2') return '/custom_logos/drawings/images_stripe/miscellania/color/death-star2d2-multi-light-stripe.webp';
             if (k === 'pont del diable' || k === 'pont-del-diable') return '/custom_logos/drawings/images_stripe/miscellania/color/pont-del-diable-multi-light-stripe.webp';
+            if (k === 'arthur d the second' || k === 'arthur-d-the-second') return '/custom_logos/drawings/images_stripe/miscellania/color/arthur-d-the-second-multi-light-stripe.webp';
+            if (k === 'r2d2 quote' || k === 'r2d2-quote') return '/custom_logos/drawings/images_stripe/miscellania/color/r2d2-quote-multi-light-stripe.webp';
           }
 
           if (firstContactVariant === 'white') {
             if (k === 'dj vader' || k === 'dj-vader') return '/custom_logos/drawings/images_stripe/miscellania/white/dj-vader-w-stripe.webp';
             if (k === 'deathstar2d2' || k === 'death star2d2' || k === 'death-star2d2') return '/custom_logos/drawings/images_stripe/miscellania/white/death-star2d2-w-stripe.webp';
             if (k === 'pont del diable' || k === 'pont-del-diable') return '/custom_logos/drawings/images_stripe/miscellania/white/pont-del-diable-w-stripe.webp';
+            if (k === 'arthur d the second' || k === 'arthur-d-the-second') return '/custom_logos/drawings/images_stripe/miscellania/white/arthur-d-the-second-w-stripe.webp';
+            if (k === 'r2d2 quote' || k === 'r2d2-quote') return '/custom_logos/drawings/images_stripe/miscellania/white/r2d2-quote-w-stripe.webp';
           }
 
           if (k === 'dj vader' || k === 'dj-vader') return '/custom_logos/drawings/images_stripe/miscellania/black/dj-vader-b-stripe.webp';
           if (k === 'deathstar2d2' || k === 'death star2d2' || k === 'death-star2d2') return '/custom_logos/drawings/images_stripe/miscellania/black/death-star2d2-b-stripe.webp';
           if (k === 'pont del diable' || k === 'pont-del-diable') return '/custom_logos/drawings/images_stripe/miscellania/black/pont-del-diable-b-stripe.webp';
+          if (k === 'arthur d the second' || k === 'arthur-d-the-second') return '/custom_logos/drawings/images_stripe/miscellania/black/arthur-d-the-second-b-stripe.webp';
+          if (k === 'r2d2 quote' || k === 'r2d2-quote') return '/custom_logos/drawings/images_stripe/miscellania/black/r2d2-quote-b-stripe.webp';
           return null;
         })();
         if (import.meta.env.DEV && !out) {
@@ -1159,6 +1165,8 @@ export default function FullWideSlideDemoHeader({
             if (lower.includes('pont-del-diable') || lower.includes('pont_del_diable')) {
               return '/custom_logos/drawings/images_stripe/miscellania/color/pont-del-diable-multi-light-stripe.webp';
             }
+            if (lower.includes('arthur-d-the-second')) return '/custom_logos/drawings/images_stripe/miscellania/color/arthur-d-the-second-multi-light-stripe.webp';
+            if (lower.includes('r2d2-quote')) return '/custom_logos/drawings/images_stripe/miscellania/color/r2d2-quote-multi-light-stripe.webp';
           }
           if (firstContactVariant === 'white') {
             if (lower.includes('dj-vader')) return '/custom_logos/drawings/images_stripe/miscellania/white/dj-vader-w-stripe.webp';
@@ -1166,12 +1174,16 @@ export default function FullWideSlideDemoHeader({
             if (lower.includes('pont-del-diable') || lower.includes('pont_del_diable')) {
               return '/custom_logos/drawings/images_stripe/miscellania/white/pont-del-diable-w-stripe.webp';
             }
+            if (lower.includes('arthur-d-the-second')) return '/custom_logos/drawings/images_stripe/miscellania/white/arthur-d-the-second-w-stripe.webp';
+            if (lower.includes('r2d2-quote')) return '/custom_logos/drawings/images_stripe/miscellania/white/r2d2-quote-w-stripe.webp';
           }
           if (lower.includes('dj-vader')) return '/custom_logos/drawings/images_stripe/miscellania/black/dj-vader-b-stripe.webp';
           if (lower.includes('death-star2d2')) return '/custom_logos/drawings/images_stripe/miscellania/black/death-star2d2-b-stripe.webp';
           if (lower.includes('pont-del-diable') || lower.includes('pont_del_diable')) {
             return '/custom_logos/drawings/images_stripe/miscellania/black/pont-del-diable-b-stripe.webp';
           }
+          if (lower.includes('arthur-d-the-second')) return '/custom_logos/drawings/images_stripe/miscellania/black/arthur-d-the-second-b-stripe.webp';
+          if (lower.includes('r2d2-quote')) return '/custom_logos/drawings/images_stripe/miscellania/black/r2d2-quote-b-stripe.webp';
         }
         if (active === 'austen' && typeof key === 'string' && key.startsWith('/custom_logos/drawings/images_grid/austen/keep_calm/')) {
           if (variant === 'color') {
