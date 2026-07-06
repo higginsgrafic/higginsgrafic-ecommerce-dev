@@ -50,29 +50,30 @@ const readRefPair = (enabledKey, srcKey) => {
  *        helper that returns a sanitized overlay src or null
  * @returns {object} debug variable bag
  */
-export default function useMegaStripeDebugVars(normalizeOverlaySrc) {
+export default function useMegaStripeDebugVars(normalizeOverlaySrc, namespace = '') {
+  const ns = namespace ? `${namespace}_` : '';
   const ref = useStorageEventState(
-    'mega-stripe-ref-changed',
-    () => readRefPair('MEGA_STRIPE_REF_ENABLED', 'MEGA_STRIPE_REF_SRC'),
+    `${ns}mega-stripe-ref-changed`,
+    () => readRefPair(`${ns}MEGA_STRIPE_REF_ENABLED`, `${ns}MEGA_STRIPE_REF_SRC`),
     { enabled: false, src: '' },
   );
 
   const ref2 = useStorageEventState(
-    'mega-stripe-ref2-changed',
-    () => readRefPair('MEGA_STRIPE_REF2_ENABLED', 'MEGA_STRIPE_REF2_SRC'),
+    `${ns}mega-stripe-ref2-changed`,
+    () => readRefPair(`${ns}MEGA_STRIPE_REF2_ENABLED`, `${ns}MEGA_STRIPE_REF2_SRC`),
     { enabled: false, src: '' },
   );
 
   const spriteEnabled = useStorageEventState(
-    'mega-stripe-sprite-enabled-changed',
-    () => parseBool(window.localStorage.getItem('MEGA_STRIPE_SPRITE_ENABLED'), true),
+    `${ns}mega-stripe-sprite-enabled-changed`,
+    () => parseBool(window.localStorage.getItem(`${ns}MEGA_STRIPE_SPRITE_ENABLED`), true),
     true,
   );
 
   const tileGapPx = useStorageEventState(
-    'mega-stripe-tile-gap-changed',
+    `${ns}mega-stripe-tile-gap-changed`,
     () => {
-      const raw = window.localStorage.getItem('MEGA_STRIPE_TILE_GAP_PX');
+      const raw = window.localStorage.getItem(`${ns}MEGA_STRIPE_TILE_GAP_PX`);
       const n = raw == null ? 0 : Number.parseFloat(String(raw));
       return Number.isFinite(n) ? Math.min(200, Math.max(-200, n)) : 0;
     },
@@ -81,9 +82,9 @@ export default function useMegaStripeDebugVars(normalizeOverlaySrc) {
 
   const [shirtDrawingEnabled, setShirtDrawingEnabled] = useState(() => {
     try {
-      const rawNew = window.localStorage.getItem('HG_SHIRT_DRAWING_ENABLED');
+      const rawNew = window.localStorage.getItem(`${ns}HG_SHIRT_DRAWING_ENABLED`);
       if (rawNew != null) return parseBool(rawNew, true);
-      const rawOld = window.localStorage.getItem('HG_SHIRT_DRAWING_OVERLAY_ENABLED');
+      const rawOld = window.localStorage.getItem(`${ns}HG_SHIRT_DRAWING_OVERLAY_ENABLED`);
       if (rawOld != null) return parseBool(rawOld, true);
       return true;
     } catch {
@@ -95,12 +96,12 @@ export default function useMegaStripeDebugVars(normalizeOverlaySrc) {
     if (typeof window === 'undefined') return undefined;
     const sync = () => {
       try {
-        const rawNew = window.localStorage.getItem('HG_SHIRT_DRAWING_ENABLED');
+        const rawNew = window.localStorage.getItem(`${ns}HG_SHIRT_DRAWING_ENABLED`);
         if (rawNew != null) {
           setShirtDrawingEnabled(parseBool(rawNew, true));
           return;
         }
-        const rawOld = window.localStorage.getItem('HG_SHIRT_DRAWING_OVERLAY_ENABLED');
+        const rawOld = window.localStorage.getItem(`${ns}HG_SHIRT_DRAWING_OVERLAY_ENABLED`);
         if (rawOld != null) {
           setShirtDrawingEnabled(parseBool(rawOld, true));
           return;
@@ -111,17 +112,17 @@ export default function useMegaStripeDebugVars(normalizeOverlaySrc) {
       }
     };
     sync();
-    window.addEventListener('hg-shirt-drawing-enabled-changed', sync);
-    window.addEventListener('hg-shirt-drawing-overlay-enabled-changed', sync);
+    window.addEventListener(`${ns}hg-shirt-drawing-enabled-changed`, sync);
+    window.addEventListener(`${ns}hg-shirt-drawing-overlay-enabled-changed`, sync);
     return () => {
-      window.removeEventListener('hg-shirt-drawing-enabled-changed', sync);
-      window.removeEventListener('hg-shirt-drawing-overlay-enabled-changed', sync);
+      window.removeEventListener(`${ns}hg-shirt-drawing-enabled-changed`, sync);
+      window.removeEventListener(`${ns}hg-shirt-drawing-overlay-enabled-changed`, sync);
     };
-  }, []);
+  }, [ns]);
 
   const [drawingOverlaySrc, setDrawingOverlaySrc] = useState(() => {
     try {
-      const raw = String(window.localStorage.getItem('HG_DRAWING_OVERLAY_SRC') || '').trim();
+      const raw = String(window.localStorage.getItem(`${ns}HG_DRAWING_OVERLAY_SRC`) || '').trim();
       if (!raw) return null;
       const normalized = (normalizeOverlaySrc && normalizeOverlaySrc(raw)) || raw;
       const lower = normalized.toLowerCase();
@@ -137,7 +138,7 @@ export default function useMegaStripeDebugVars(normalizeOverlaySrc) {
     if (typeof window === 'undefined') return undefined;
     const sync = () => {
       try {
-        const raw = String(window.localStorage.getItem('HG_DRAWING_OVERLAY_SRC') || '').trim();
+        const raw = String(window.localStorage.getItem(`${ns}HG_DRAWING_OVERLAY_SRC`) || '').trim();
         if (!raw) {
           setDrawingOverlaySrc(null);
           return;
@@ -152,9 +153,9 @@ export default function useMegaStripeDebugVars(normalizeOverlaySrc) {
       }
     };
     sync();
-    window.addEventListener('hg-drawing-overlay-changed', sync);
-    return () => window.removeEventListener('hg-drawing-overlay-changed', sync);
-  }, [normalizeOverlaySrc]);
+    window.addEventListener(`${ns}hg-drawing-overlay-changed`, sync);
+    return () => window.removeEventListener(`${ns}hg-drawing-overlay-changed`, sync);
+  }, [normalizeOverlaySrc, ns]);
 
   const drawingOverlaySrcEffective = useMemo(() => {
     try {
