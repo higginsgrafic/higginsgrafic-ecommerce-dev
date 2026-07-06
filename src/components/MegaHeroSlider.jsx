@@ -286,7 +286,11 @@ export default function MegaHeroSlider({
           >
             {resolvedSlides.map((s, i) => (
               <article key={s.id} className={styles.slide} aria-label={`Slide ${i + 1}`}>
-                <img className={styles.image} src={s.imageSrc} alt={s.imageAlt} />
+                {s.imageSrc ? (
+                  <img className={styles.image} src={s.imageSrc} alt={s.imageAlt} />
+                ) : (
+                  <div className={styles.image} style={{ backgroundColor: '#ffffff' }} aria-hidden="true" />
+                )}
 
                 {shirtDrawingEnabled && drawingOverlaySrc ? (
                   <img
