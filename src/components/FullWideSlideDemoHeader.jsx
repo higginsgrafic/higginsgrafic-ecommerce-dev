@@ -3447,6 +3447,8 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
                         paddingRight: '0px',
                         display: 'flex',
                         flexDirection: 'column',
+                        transform: 'scale(0.94)',
+                        transformOrigin: 'top center',
                       }}>
                         {/* Ombra esquerra del carrusel */}
                         <div aria-hidden="true" style={{
@@ -3973,7 +3975,8 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
                           gap: '7.5px',
                           position: 'relative',
                           zIndex: 1,
-                          transform: 'translateX(-4px)',
+                          transform: 'scale(0.94)',
+                          transformOrigin: 'top center',
                         }}>
                           {['COMANDES', 'MISSATGES', 'COMPTE', 'SEGURETAT'].map((label) => (
                             <div key={label} style={{
@@ -4039,9 +4042,9 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
                               position: 'absolute',
                               top: '1px',
                               left: '50%',
-                              transform: `translateX(calc(-50% - 2px)) scale(${accordionPautaScale})`,
+                              transform: `translateX(calc(-50% + 2px)) scale(${accordionPautaScale * 0.94})`,
                               transformOrigin: 'top center',
-                              width: `calc(100% / ${accordionPautaScale} + 4px)`,
+                              width: `calc(100% / (${accordionPautaScale} * 0.94) + 4px)`,
                               height: '737.015px',
                               overflow: 'hidden',
                             }}>

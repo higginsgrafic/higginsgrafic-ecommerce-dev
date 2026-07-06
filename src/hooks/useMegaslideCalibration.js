@@ -106,102 +106,127 @@ export default function useMegaslideCalibration(namespace = '', active = null, c
 
   // Measure padding from container
   useLayoutEffect(() => {
-    try {
-      if (!active) return undefined;
-      const el = containerRef?.current;
-      if (!el || typeof window === 'undefined') return undefined;
-
-      const update = () => {
-        try {
-          const cs = window.getComputedStyle(el);
-          const pt = Number.parseFloat(cs?.paddingTop || '0');
-          const pl = Number.parseFloat(cs?.paddingLeft || '0');
-          const pr = Number.parseFloat(cs?.paddingRight || '0');
-          if (Number.isFinite(pt) && pt >= 0) {
-            setStripeRowPadPx((prev) => (prev === pt ? prev : pt));
-          }
-          if (Number.isFinite(pl) && pl >= 0 && Number.isFinite(pr) && pr >= 0) {
-            setStripeRowPadXPx((prev) => {
-              if (!prev) return { left: pl, right: pr };
-              if (prev.left === pl && prev.right === pr) return prev;
-              return { left: pl, right: pr };
-            });
-          }
-        } catch {
-          // ignore
-        }
-      };
-
-      update();
-      window.requestAnimationFrame(() => update());
-      window.addEventListener('resize', update);
-      return () => {
-        window.removeEventListener('resize', update);
-      };
-    } catch {
-      return undefined;
-    }
-  }, [active, containerRef]);
-
-  // Measure tile size from container
-  useLayoutEffect(() => {
-    if (!active) return undefined;
-    const el = containerRef?.current;
-    if (!el) return undefined;
-
-    const GAP_PX = 12;
-    const COLS = 9;
-
     let rafId = null;
     let retryCount = 0;
-    const MAX_RETRIES = 24;
-    let ro = null;
+    const MAX_RETRIES = 10;
 
-    const recompute = () => {
-      const w = el.clientWidth;
-      if (!w) {
-        if (retryCount < MAX_RETRIES) {
-          retryCount += 1;
-          if (rafId != null) cancelAnimationFrame(rafId);
-          rafId = requestAnimationFrame(recompute);
+    const update = () => {
+      try {
+        const el = containerRef?.current;
+        if (!el || typeof window === 'undefined') {
+          if (retryCount < MAX_RETRIES) {
+            retryCount += 1;
+            rafId = requestAnimationFrame(update);
+          }
+          return;
         }
-        return;
-      }
-      const cs = window.getComputedStyle(el);
-      const pl = parseFloat(cs.paddingLeft || '0') || 0;
-      const pr = parseFloat(cs.paddingRight || '0') || 0;
-      const contentW = w - pl - pr;
-      if (!contentW) return;
-      const totalGaps = (COLS - 1) * GAP_PX;
-      const colW = (contentW - totalGaps) / COLS;
-      if (!Number.isFinite(colW) || colW <= 0) return;
-      const MAX_TILE_PX = 144;
-      setMegaTileSize(Math.min(colW, MAX_TILE_PX));
-    };
-
-    recompute();
-    rafId = requestAnimationFrame(recompute);
-    window.addEventListener('resize', recompute);
-
-    if (typeof ResizeObserver !== 'undefined') {
-      ro = new ResizeObserver(() => recompute());
-      try {
-        ro.observe(el);
-      } catch {
-        ro = null;
-      }
-    }
-
-    return () => {
-      window.removeEventListener('resize', recompute);
-      if (rafId != null) cancelAnimationFrame(rafId);
-      try {
-        ro?.disconnect?.();
+        const cs = window.getComputedStyle(el);
+        const pt = Number.parseFloat(cs?.paddingTop || '0');
+        const pl = Number.parseFloat(cs?.paddingLeft || '0');
+        const pr = Number.parseFloat(cs?.paddingRight || '0');
+        if (Number.isFinite(pt) && pt >= 0) {
+          setStripeRowPadPx((prev) => (prev === pt ? prev : pt));
+        }
+        if (Number.isFinite(pl) && pl >= 0 && Number.isFinite(pr) && pr >= 0) {
+          setStripeRowPadXPx((prev) => {
+            if (!prev) return { left: pl, right: pr };
+            if (prev.left === pl && prev.right === pr) return prev;
+            return { left: pl, right: pr };
+          });
+        }
       } catch {
         // ignore
       }
     };
-  }, [active, containerRef]);
+
+    update();
+    rafId = requestAnimationFrame(() => update());
+    window.addEventListener('resize', update);
+    return () => {
+      window.removeEventListener('resize', update);
+      if (rafId != null) cancelAnimationFrame(rafId);
+    };
+  }, [containerRef]);
+
+  // Measure tile size from container
+  useLayoutEffect(() => {
+    let retryCount2 = 0;
+    const MAX_RETRIES2 = 10;
+    let el = containerRef?.current;
+
+    const startMeasure = () => {
+      const GAP_PX = 12;
+      const COLS = 9;
+
+      let rafId = null;
+      let retryCount = 0;
+      const MAX_RETRIES = 24;
+      let ro = null;
+
+      const recompute = () => {
+        const w = el.clientWidth;
+        if (!w) {
+          if (retryCount < MAX_RETRIES) {
+            retryCount += 1;
+            if (rafId != null) cancelAnimationFrame(rafId);
+            rafId = requestAnimationFrame(recompute);
+          }
+          return;
+        }
+        const cs = window.getComputedStyle(el);
+        const pl = parseFloat(cs.paddingLeft || '0') || 0;
+        const pr = parseFloat(cs.paddingRight || '0') || 0;
+        const contentW = w - pl - pr;
+        if (!contentW) return;
+        const totalGaps = (COLS - 1) * GAP_PX;
+        const colW = (contentW - totalGaps) / COLS;
+        if (!Number.isFinite(colW) || colW <= 0) return;
+        const MAX_TILE_PX = 144;
+        setMegaTileSize(Math.min(colW, MAX_TILE_PX));
+      };
+
+      recompute();
+      rafId = requestAnimationFrame(recompute);
+      window.addEventListener('resize', recompute);
+
+      if (typeof ResizeObserver !== 'undefined') {
+        ro = new ResizeObserver(() => recompute());
+        try {
+          ro.observe(el);
+        } catch {
+          ro = null;
+        }
+      }
+
+      return () => {
+        window.removeEventListener('resize', recompute);
+        if (rafId != null) cancelAnimationFrame(rafId);
+        try {
+          ro?.disconnect?.();
+        } catch {
+          // ignore
+        }
+      };
+    };
+
+    if (!el) {
+      let cleanup = () => {};
+      const waitForEl = () => {
+        el = containerRef?.current;
+        if (!el) {
+          if (retryCount2 < MAX_RETRIES2) {
+            retryCount2 += 1;
+            requestAnimationFrame(waitForEl);
+          }
+          return;
+        }
+        cleanup = startMeasure();
+      };
+      requestAnimationFrame(waitForEl);
+      return () => cleanup();
+    }
+    return startMeasure();
+  }, [containerRef]);
 
   // megaTileSelectorParams (namespaced localStorage)
   const [megaTileSelectorParams, setMegaTileSelectorParams] = useState(() => {

@@ -205,7 +205,7 @@ function UserComandesContent() {
             transition: background-color 9999s ease-in-out 0s;
           }
         `}</style>
-        <div style={{ width: '1350px', marginLeft: 'auto', marginRight: 'auto', marginTop: '-0.5px', overflow: 'hidden', position: 'relative', backgroundImage: 'url("/placeholders/fons_acordio/fons-usuari-compte.png")', backgroundRepeat: 'no-repeat', backgroundPosition: 'top left', backgroundSize: '1350px 100%', transform: 'translateX(-3px)' }}>
+        <div style={{ width: '1350px', marginLeft: 'auto', marginRight: 'auto', marginTop: '-0.5px', overflow: 'hidden', position: 'relative', backgroundImage: 'url("/placeholders/fons_acordio/fons-usuari-compte.png")', backgroundRepeat: 'no-repeat', backgroundPosition: 'top left', backgroundSize: '1350px 100%', transform: 'translateX(3px)' }}>
           <table className="compte-grid" style={{
             width: '1365px',
             marginLeft: '-7.5px',
@@ -948,7 +948,7 @@ function UserComandesContent() {
                     gridTemplateColumns: '331.875px 331.875px 501.5625px 162.1875px',
                     columnGap: '7.5px',
                     width: '1350px',
-                    transform: 'translateX(-3px)',
+                    transform: 'translateX(-1px)',
                   }}>
                     {[0, 1].map((i) => {
                       const toggleMode = i === 0 ? 'comanda' : 'correu';
@@ -1160,7 +1160,7 @@ function UserComandesContent() {
                     width: '100%',
                     height: '30px',
                     display: 'block',
-                    transform: 'translateX(-3px)',
+                    transform: 'translateX(-1px)',
                   };
                   const attachBtnStyle = {
                     ...btnBase,
