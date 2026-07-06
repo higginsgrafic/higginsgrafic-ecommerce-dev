@@ -3,6 +3,10 @@
   height: 520px;
 }
 
+.hero:global(.h-full) {
+  height: 100%;
+}
+
 .inner {
   max-width: 1400px;
   margin: 0 auto;
