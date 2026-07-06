@@ -13,6 +13,7 @@ import {
 } from '../utils/austenQuotesAssets.js';
 import FullWideSlideDemoHumanInsideSlider from './FullWideSlideDemoHumanInsideSlider.jsx';
 import MegaHeroSlider from './MegaHeroSlider.jsx';
+import Pauta4ColsOverlay from './pauta/Pauta4ColsOverlay';
 import { UserProfileTabs, UserProfileContent } from './UserProfileTabs.jsx';
 import { getSafeBelt, clampNumber } from '@/utils/layoutMetrics';
 import {
@@ -262,6 +263,8 @@ export default function FullWideSlideDemoHeader({
   const [searchCaretVisible, setSearchCaretVisible] = useState(true);
   const [megaPage, setMegaPage] = usePersistentState('HG_MEGA_PAGE', 1);
   const [megaFullScreen, setMegaFullScreen] = useState(false);
+  const [megaHeroRowHeight, setMegaHeroRowHeight] = useState(38);
+  const megaHeroGridRef = useRef(null);
   const [manualOverrideClosed, setManualOverrideClosed] = useState(false);
   // TTL de 30 minuts perquè l'estat de l'acordió es mantingui en
   // canviar entre pestanyes (cistell ↔ compte) i en obrir/tancar el
@@ -2052,6 +2055,30 @@ export default function FullWideSlideDemoHeader({
 
   useLayoutEffect(() => {
     if (typeof window === 'undefined') return undefined;
+    if (!active) return undefined;
+
+    const measure = () => {
+      const el = megaHeroGridRef.current;
+      if (!el) return;
+      const rect = el.getBoundingClientRect();
+      if (rect.height <= 0) return;
+      const rowGap = 3;
+      const numRows = 24;
+      const singleRowH = (rect.height - (numRows - 1) * rowGap) / numRows;
+      setMegaHeroRowHeight((prev) => (Math.abs(prev - singleRowH) < 0.1 ? prev : singleRowH));
+    };
+
+    measure();
+    window.addEventListener('resize', measure);
+    const t = window.setTimeout(measure, 100);
+    return () => {
+      window.removeEventListener('resize', measure);
+      window.clearTimeout(t);
+    };
+  }, [active]);
+
+  useLayoutEffect(() => {
+    if (typeof window === 'undefined') return undefined;
 
     const measure = () => {
       // Font segura cross-browser (Chromium, WebKit, Firefox).
@@ -3228,22 +3255,30 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
           active ? (
             <>
               <div
-                className={`${contained ? 'absolute' : 'fixed'} inset-0 z-[9990]`}
-                style={{
-                  background: 'linear-gradient(to bottom, hsl(var(--foreground) / 0.75), hsl(var(--foreground) / 0.55))',
-                }}
-                role="button"
-                tabIndex={0}
-                onClick={() => {
-                  closeMegaExplicitly();
-                }}
-              />
-              <div
-                className="fixed left-0 right-0 z-[9991] pointer-events-none"
-                style={{ top: 0 }}
+                className={`${contained ? 'absolute' : 'fixed'} inset-0 z-[9991] pointer-events-none`}
               >
-                <div className="mt-4">
-                  <div className="mx-auto max-w-[1400px] px-4 sm:px-6 lg:px-10">
+                <Pauta4ColsOverlay
+                  pautaEnabled={false}
+                  tableEnabled={false}
+                  numCols={3}
+                  numRows={24}
+                  canvasAspect={[2642, 1780]}
+                  topOffset="76px"
+                  bottomPadding="0px"
+                  innerRef={megaHeroGridRef}
+                >
+                  <div
+                    style={{
+                      gridColumn: '1 / 4',
+                      gridRow: '10 / 25',
+                      position: 'relative',
+                      top: `calc(-5px - ${megaHeroRowHeight / 2}px)`,
+                      width: 'calc(100% + 1px)',
+                      height: 'calc(100% + 2px)',
+                      transform: 'scale(0.94)',
+                      transformOrigin: 'center center',
+                    }}
+                  >
                     <MegaHeroSlider
                       slides={[
                         { id: 'white-1' },
@@ -3252,9 +3287,11 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
                       ]}
                       autoplay
                       autoplayIntervalMs={8000}
+                      className="h-full"
+                      flush
                     />
                   </div>
-                </div>
+                </Pauta4ColsOverlay>
               </div>
             </>
           ) : null,
