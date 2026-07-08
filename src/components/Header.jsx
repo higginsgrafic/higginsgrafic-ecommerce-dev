@@ -25,7 +25,11 @@ function Header({
   const navLinks = [
     { name: texts.header.navigation.firstContact, href: '/first-contact' },
     { name: texts.header.navigation.theHumanInside, href: '/the-human-inside' },
-    { name: texts.header.navigation.austen, href: '/austen' },
+    { name: texts.header.navigation.pemberley, href: '/austen/pemberley-house' },
+    { name: texts.header.navigation.keepCalm, href: '/austen/keep-calm' },
+    { name: texts.header.navigation.quotes, href: '/austen/quotes' },
+    { name: texts.header.navigation.crosswords, href: '/austen/crosswords' },
+    { name: texts.header.navigation.lookingForMy, href: '/austen/looking-for-my-darcy' },
     { name: texts.header.navigation.cube, href: '/cube' },
     { name: texts.header.navigation.miscellania, href: '/miscellania' }
   ];

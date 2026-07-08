@@ -43,7 +43,11 @@ export const ca = {
     navigation: {
       firstContact: 'First Contact',
       theHumanInside: 'The Human Inside',
-      austen: 'Austen',
+      pemberley: 'Pemberley',
+      keepCalm: 'Keep Calm',
+      quotes: 'Quotes',
+      crosswords: 'Crosswords',
+      lookingForMy: 'Looking For My',
       cube: 'Cube',
       miscellania: 'Miscel·lània',
     },
