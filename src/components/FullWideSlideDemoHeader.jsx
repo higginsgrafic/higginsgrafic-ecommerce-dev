@@ -289,6 +289,8 @@ export default function FullWideSlideDemoHeader({
   const [hoveredStripeItemCollection, setHoveredStripeItemCollection] = useState(null);
   const [austenSubcollection, setAustenSubcollection] = useState(null);
 
+  const AUSTEN_IDS = useMemo(() => new Set(['austen', 'pemberley', 'keep_calm', 'quotes', 'crosswords', 'looking_for_my']), []);
+
   const resolvePdpUrl = useCallback((collection, item) => {
     if (typeof item !== 'string') return null;
     const s = item.toLowerCase().replace(/[\u2010\u2011\u2012\u2013\u2014\u2212]/g, '-').replace(/\s+/g, '-');
@@ -405,7 +407,7 @@ export default function FullWideSlideDemoHeader({
   }, [active]);
 
   useEffect(() => {
-    if (active !== 'austen') setAustenSubcollection(null);
+    if (!AUSTEN_IDS.has(active)) setAustenSubcollection(null);
   }, [active]);
 
   useEffect(() => {
@@ -709,13 +711,14 @@ export default function FullWideSlideDemoHeader({
       if (active === 'miscellania') return { white: true, black: true, color: true };
       if (active === 'cube') return { white: false, black: false, color: true };
 
-      if (active === 'austen') {
-        const key = selectedItemByCollection?.austen;
+      if (AUSTEN_IDS.has(active)) {
+        const key = selectedItemByCollection?.austen || selectedItemByCollection?.[active];
         const s = typeof key === 'string' ? key.toLowerCase() : '';
-        const sub = austenSubcollection || '';
+        const sub = austenSubcollection || (active === 'pemberley' ? 'pemberley' : active === 'keep_calm' ? 'keep_calm' : active === 'quotes' ? 'quotes' : active === 'crosswords' ? 'crosswords' : active === 'looking_for_my' ? 'looking_for_my_darcy' : '') || '';
         if (s.includes('/austen/crosswords/') || sub === 'crosswords') return { white: true, black: true, color: false };
         if (s.includes('/austen/quotes/') || sub === 'quotes') return { white: true, black: true, color: false };
         if (s.includes('/austen/looking_for_my_darcy/') || sub === 'looking_for_my_darcy') return { white: false, black: false, color: true };
+        if (active === 'pemberley' || active === 'keep_calm') return { white: true, black: true, color: true };
         return { white: true, black: true, color: true };
       }
 
@@ -726,7 +729,7 @@ export default function FullWideSlideDemoHeader({
   }, [active, selectedItemByCollection, austenSubcollection]);
 
   useEffect(() => {
-    if (active !== 'austen') return;
+    if (!AUSTEN_IDS.has(active)) return;
     if (!austenSelectedDisableMulti) return;
     if (firstContactVariant !== 'color') return;
     setFirstContactVariant('white');
@@ -1086,7 +1089,7 @@ export default function FullWideSlideDemoHeader({
       if (isPathItem(key)) {
         const variant = firstContactVariant;
         if (
-          active === 'austen'
+          AUSTEN_IDS.has(active)
           && typeof key === 'string'
           && key.startsWith('/custom_logos/drawings/images_grid/austen/quotes/')
         ) {
@@ -1121,7 +1124,7 @@ export default function FullWideSlideDemoHeader({
           })();
           return q ? `${fallbackResolved}?${q}` : fallbackResolved;
         }
-        if (active === 'austen' && typeof key === 'string' && key.startsWith('/custom_logos/drawings/images_grid/austen/crosswords/')) {
+        if (AUSTEN_IDS.has(active) && typeof key === 'string' && key.startsWith('/custom_logos/drawings/images_grid/austen/crosswords/')) {
           const file = (key.split('/').pop() || '').replace(/\?.*$/, '');
           const lower = file.toLowerCase();
           const m = lower.replace(/-grid(?=\.webp$)/i, '').match(/^(persuasion|pride-and-prejudice|sense-and-sensibility)-(\d)\.webp$/);
@@ -1133,7 +1136,7 @@ export default function FullWideSlideDemoHeader({
             return `/custom_logos/drawings/images_stripe/austen/crosswords/white/${book}-${n}-w-stripe.webp`;
           }
         }
-        if (active === 'austen' && typeof key === 'string' && key.startsWith('/custom_logos/drawings/images_grid/austen/pemberley_house/')) {
+        if (AUSTEN_IDS.has(active) && typeof key === 'string' && key.startsWith('/custom_logos/drawings/images_grid/austen/pemberley_house/')) {
           if (variant === 'color') return '/custom_logos/drawings/images_stripe/austen/pemberley_house/color/pemberley-house-multi-light-stripe.webp';
           if (variant === 'white') return '/custom_logos/drawings/images_stripe/austen/pemberley_house/white/pemberley-house-w-stripe.webp';
           return '/custom_logos/drawings/images_stripe/austen/pemberley_house/black/pemberley-house-b-stripe.webp';
@@ -1185,7 +1188,7 @@ export default function FullWideSlideDemoHeader({
           if (lower.includes('arthur-d-the-second')) return '/custom_logos/drawings/images_stripe/miscellania/black/arthur-d-the-second-b-stripe.webp';
           if (lower.includes('r2d2-quote')) return '/custom_logos/drawings/images_stripe/miscellania/black/r2d2-quote-b-stripe.webp';
         }
-        if (active === 'austen' && typeof key === 'string' && key.startsWith('/custom_logos/drawings/images_grid/austen/keep_calm/')) {
+        if (AUSTEN_IDS.has(active) && typeof key === 'string' && key.startsWith('/custom_logos/drawings/images_grid/austen/keep_calm/')) {
           if (variant === 'color') {
             return '/custom_logos/drawings/images_stripe/austen/keep_calm/color/keep-calm-multi-light-stripe.webp';
           }
@@ -1194,7 +1197,7 @@ export default function FullWideSlideDemoHeader({
           }
           return '/custom_logos/drawings/images_stripe/austen/keep_calm/black/keep-calm-b-stripe.webp';
         }
-        if (active === 'austen' && typeof key === 'string' && key.startsWith('/custom_logos/drawings/images_grid/austen/looking_for_my_darcy/')) {
+        if (AUSTEN_IDS.has(active) && typeof key === 'string' && key.startsWith('/custom_logos/drawings/images_grid/austen/looking_for_my_darcy/')) {
           const file = key.split('/').pop() || '';
           const lower = file.toLowerCase();
           const base = lower.replace(/\.(webp|png|jpe?g)$/i, '').replace(/-grid$/i, '');
@@ -1207,7 +1210,7 @@ export default function FullWideSlideDemoHeader({
             return `/custom_logos/drawings/images_stripe/austen/looking_for_my_darcy/color/solid/${c}-solid-stripe.webp`;
           }
         }
-        if (active === 'austen' && typeof key === 'string' && key.startsWith('/custom_logos/drawings/images_stripe/austen/crosswords/')) {
+        if (AUSTEN_IDS.has(active) && typeof key === 'string' && key.startsWith('/custom_logos/drawings/images_stripe/austen/crosswords/')) {
           const file = (key.split('/').pop() || '').replace(/\?.*$/, '');
           const m = file.match(/^(persuasion|pride-and-prejudice|sense-and-sensibility)-(\d+)-stripe\.(webp|png)$/i);
           if (m) {
@@ -1215,14 +1218,14 @@ export default function FullWideSlideDemoHeader({
             return `/custom_logos/drawings/images_stripe/austen/crosswords/${folder}/${m[1]}-${m[2]}.${m[3]}`;
           }
         }
-        if (active === 'austen' && typeof key === 'string' && key.startsWith('/custom_logos/drawings/images_originals/grid/austen/crosswords/')) {
+        if (AUSTEN_IDS.has(active) && typeof key === 'string' && key.startsWith('/custom_logos/drawings/images_originals/grid/austen/crosswords/')) {
           const file = (key.split('/').pop() || '').replace(/\?.*$/, '');
           const m = file.match(/^(persuasion|pride-and-prejudice|sense-and-sensibility)-(\d+)-grid\.(webp|png)$/i);
           if (m) {
             return `/custom_logos/drawings/images_grid/austen/crosswords/${m[1]}-${m[2]}.${m[3]}`;
           }
         }
-        if (active === 'austen' && typeof key === 'string' && key.startsWith('/custom_logos/drawings/images_grid/austen/crosswords/')) {
+        if (AUSTEN_IDS.has(active) && typeof key === 'string' && key.startsWith('/custom_logos/drawings/images_grid/austen/crosswords/')) {
           const file = key.split('/').pop() || '';
           const lower = file.toLowerCase();
           const persuasion = lower.match(/^persuasion-(\d)(?:-grid)?\.webp$/);
@@ -1251,7 +1254,7 @@ export default function FullWideSlideDemoHeader({
           }
         }
         if (
-          active === 'austen'
+          AUSTEN_IDS.has(active)
           && typeof key === 'string'
           && (
             key.startsWith('/custom_logos/drawings/images_grid/austen/quotes/')
@@ -1260,12 +1263,12 @@ export default function FullWideSlideDemoHeader({
         ) {
           return resolveAustenQuoteOriginalFromPath(key) || key;
         }
-        if (active === 'austen' && typeof key === 'string' && key.startsWith('/custom_logos/drawings/images_grid/austen/pemberley_house/')) {
+        if (AUSTEN_IDS.has(active) && typeof key === 'string' && key.startsWith('/custom_logos/drawings/images_grid/austen/pemberley_house/')) {
           if (variant === 'color') return '/custom_logos/drawings/images_stripe/austen/pemberley_house/color/pemberley-house-multi-light-stripe.webp';
           if (variant === 'white') return '/custom_logos/drawings/images_stripe/austen/pemberley_house/white/pemberley-house-w-stripe.webp';
           return '/custom_logos/drawings/images_stripe/austen/pemberley_house/black/pemberley-house-b-stripe.webp';
         }
-        if (active === 'austen' && typeof key === 'string' && key.startsWith('/custom_logos/drawings/images_grid/austen/crosswords/')) {
+        if (AUSTEN_IDS.has(active) && typeof key === 'string' && key.startsWith('/custom_logos/drawings/images_grid/austen/crosswords/')) {
           const file = key.split('/').pop() || '';
           const lower = file.toLowerCase();
           const m = lower.replace(/-grid(?=\.webp$)/i, '').match(/^(persuasion|pride-and-prejudice|sense-and-sensibility)-(\d)\.webp$/);
@@ -2323,7 +2326,11 @@ export default function FullWideSlideDemoHeader({
     () => [
       { id: 'first_contact', label: 'First Contact' },
       { id: 'the_human_inside', label: 'The Human Inside' },
-      { id: 'austen', label: 'Austen' },
+      { id: 'pemberley', label: 'Pemberley', subcollection: 'pemberley' },
+      { id: 'keep_calm', label: 'Keep Calm', subcollection: 'keep_calm' },
+      { id: 'quotes', label: 'Quotes', subcollection: 'quotes' },
+      { id: 'crosswords', label: 'Crosswords', subcollection: 'crosswords' },
+      { id: 'looking_for_my', label: 'Looking For My', subcollection: 'looking_for_my_darcy' },
       { id: 'cube', label: 'Cube' },
       { id: 'miscellania', label: 'Miscel·lània' },
     ],
@@ -2474,6 +2481,78 @@ export default function FullWideSlideDemoHeader({
           ],
         },
       ],
+      pemberley: [
+        {
+          title: '',
+          items: [
+            CONTROL_TILE_BN,
+            '/custom_logos/drawings/images_grid/austen/pemberley_house/pemberley-house-b-grid.webp',
+            CONTROL_TILE_ARROWS,
+          ],
+        },
+      ],
+      keep_calm: [
+        {
+          title: '',
+          items: [
+            CONTROL_TILE_BN,
+            '/custom_logos/drawings/images_grid/austen/keep_calm/keep-calm-b-grid.webp',
+            CONTROL_TILE_ARROWS,
+          ],
+        },
+      ],
+      quotes: [
+        {
+          title: '',
+          items: [
+            CONTROL_TILE_BN,
+            '/custom_logos/drawings/images_grid/austen/quotes/you-must-allow-me-b-grid.webp',
+            '/custom_logos/drawings/images_grid/austen/quotes/body-and-soul-b-grid.webp',
+            '/custom_logos/drawings/images_grid/austen/quotes/half-agony-half-hope-b-grid.webp',
+            '/custom_logos/drawings/images_grid/austen/quotes/unsociable-and-taciturn-b-grid.webp',
+            '/custom_logos/drawings/images_grid/austen/quotes/it-is-a-truth-b-grid.webp',
+            CONTROL_TILE_ARROWS,
+          ],
+        },
+      ],
+      crosswords: [
+        {
+          title: '',
+          items: [
+            CONTROL_TILE_BN,
+            '/custom_logos/drawings/images_grid/austen/crosswords/persuasion-1-grid.webp',
+            '/custom_logos/drawings/images_grid/austen/crosswords/persuasion-2-grid.webp',
+            '/custom_logos/drawings/images_grid/austen/crosswords/persuasion-3-grid.webp',
+            '/custom_logos/drawings/images_grid/austen/crosswords/persuasion-4-grid.webp',
+            '/custom_logos/drawings/images_grid/austen/crosswords/pride-and-prejudice-1-grid.webp',
+            '/custom_logos/drawings/images_grid/austen/crosswords/pride-and-prejudice-2-grid.webp',
+            '/custom_logos/drawings/images_grid/austen/crosswords/pride-and-prejudice-3-grid.webp',
+            '/custom_logos/drawings/images_grid/austen/crosswords/pride-and-prejudice-4-grid.webp',
+            '/custom_logos/drawings/images_grid/austen/crosswords/sense-and-sensibility-1-grid.webp',
+            '/custom_logos/drawings/images_grid/austen/crosswords/sense-and-sensibility-2-grid.webp',
+            '/custom_logos/drawings/images_grid/austen/crosswords/sense-and-sensibility-3-grid.webp',
+            '/custom_logos/drawings/images_grid/austen/crosswords/sense-and-sensibility-4-grid.webp',
+            CONTROL_TILE_ARROWS,
+          ],
+        },
+      ],
+      looking_for_my: [
+        {
+          title: '',
+          items: [
+            CONTROL_TILE_BN,
+            '/custom_logos/drawings/images_grid/austen/looking_for_my_darcy/blue-solid-grid.webp',
+            '/custom_logos/drawings/images_grid/austen/looking_for_my_darcy/fuchsia-solid-grid.webp',
+            '/custom_logos/drawings/images_grid/austen/looking_for_my_darcy/red-solid-grid.webp',
+            '/custom_logos/drawings/images_grid/austen/looking_for_my_darcy/yellow-solid-grid.webp',
+            '/custom_logos/drawings/images_grid/austen/looking_for_my_darcy/blue-frame-grid.webp',
+            '/custom_logos/drawings/images_grid/austen/looking_for_my_darcy/fuchsia-frame-grid.webp',
+            '/custom_logos/drawings/images_grid/austen/looking_for_my_darcy/red-frame-grid.webp',
+            '/custom_logos/drawings/images_grid/austen/looking_for_my_darcy/yellow-frame-grid.webp',
+            CONTROL_TILE_ARROWS,
+          ],
+        },
+      ],
       cube: [
         {
           title: '',
@@ -2568,21 +2647,8 @@ export default function FullWideSlideDemoHeader({
   }), []);
 
   const resolvedMegaFiltered = useMemo(() => {
-    if (active !== 'austen' || !austenSubcollection) return resolvedMega;
-    const prefixes = AUSTEN_SUB_PREFIXES[austenSubcollection];
-    if (!prefixes) return resolvedMega;
-    return {
-      ...resolvedMega,
-      austen: resolvedMega.austen.map((col) => ({
-        ...col,
-        items: col.items.filter((it) => {
-          if (typeof it !== 'string') return true;
-          if (it === CONTROL_TILE_BN || it === CONTROL_TILE_ARROWS) return true;
-          return prefixes.some((p) => it.includes(p));
-        }),
-      })),
-    };
-  }, [resolvedMega, active, austenSubcollection, AUSTEN_SUB_PREFIXES]);
+    return resolvedMega;
+  }, [resolvedMega]);
 
   const stripeTileOverlaySrcs = useMemo(() => {
     const cols = resolvedMegaFiltered?.[active];
@@ -2662,7 +2728,7 @@ export default function FullWideSlideDemoHeader({
         }
         return null;
       }
-      if (active === 'austen') {
+      if (AUSTEN_IDS.has(active)) {
         const s = String(it);
         if (s.includes('/austen/pemberley_house/')) {
           if (variant === 'color') return '/custom_logos/drawings/images_stripe/austen/pemberley_house/color/pemberley-house-multi-light-stripe.webp';
@@ -3100,52 +3166,38 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
             </Link>
           </div>
 
-          <nav className="hidden lg:flex flex-1 items-center justify-center gap-6">
+          <nav className="hidden lg:flex flex-1 items-center justify-center gap-4">
             {resolvedNav.map((item) => {
-              // L'indicador d'obert (fletxa rotada + color) només s'ha
-              // d'activar quan realment veiem la col·lecció (megaPage=1).
-              // Si l'usuari canvia a cerca/cistell/compte (2/3/4), la
-              // col·lecció deixa de ser "visible" tot i mantenir `active`.
               const open = active === item.id && megaPage === 1;
               return (
                 <button
                   key={item.id}
                   type="button"
-                  className={`inline-flex items-center gap-1 text-xs font-semibold tracking-[0.18em] uppercase ${open ? 'text-foreground' : 'text-muted-foreground hover:text-foreground'}`}
+                  className={`inline-flex items-center text-[10px] font-semibold tracking-[0.12em] uppercase whitespace-nowrap ${open ? 'text-foreground' : 'text-muted-foreground hover:text-foreground'}`}
                   aria-expanded={open ? 'true' : 'false'}
                   onMouseEnter={() => {
                     if (!active) return;
-                    // Si la col·lecció ja és l'activa PERÒ el mega està
-                    // mostrant una altra pestanya (cerca/cistell/compte
-                    // = megaPage 2/3/4), tornem a la pàgina 1 perquè el
-                    // hover pugui "re-entrar" a la col·lecció. Sense
-                    // això, l'usuari es queda atrapat: `active` indica
-                    // que ja hi és, però visualment veu una altra
-                    // pestanya i no pot tornar-hi.
                     if (active === item.id && megaPage === 1) return;
                     setMegaPage(1);
                     setMegaFullScreen(false);
                     setActive(item.id);
+                    if (item.subcollection) setAustenSubcollection(item.subcollection);
                     touchMegaPublicActivity();
                   }}
                   onClick={() => {
                     setManualOverrideClosed(false);
                     setMegaFullScreen(false);
-                    // Toggle només si ja som a la col·lecció i a la
-                    // pàgina 1. Si som a una altra pestanya (2/3/4),
-                    // un click ha d'obrir la col·lecció (page 1) en
-                    // comptes de tancar-la.
                     if (active === item.id && megaPage === 1) {
                       setActive(null);
                     } else {
                       setMegaPage(1);
                       setActive(item.id);
+                      if (item.subcollection) setAustenSubcollection(item.subcollection);
                       touchMegaPublicActivity();
                     }
                   }}
                 >
                   {item.label}
-                  <ChevronDown className={`h-4 w-4 ${open ? 'rotate-180' : ''}`} />
                 </button>
               );
             })}
@@ -4123,10 +4175,12 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
                 key={item.id}
                 type="button"
                 className="flex items-center justify-between rounded-xl px-3 py-3 text-left text-xs font-semibold tracking-[0.18em] uppercase text-muted-foreground hover:bg-muted hover:text-foreground"
-                onClick={() => setActive((prev) => (prev === item.id ? null : item.id))}
+                onClick={() => {
+                  setActive((prev) => (prev === item.id ? null : item.id));
+                  if (item.subcollection) setAustenSubcollection(item.subcollection);
+                }}
               >
                 {item.label}
-                <ChevronDown className={`h-4 w-4 ${active === item.id ? 'rotate-180' : ''}`} />
               </button>
             ))}
           </div>

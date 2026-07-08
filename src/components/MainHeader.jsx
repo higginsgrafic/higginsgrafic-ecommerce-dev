@@ -112,16 +112,19 @@ function MainHeader({
   const navLinks = useMemo(() => {
     return [
       { name: texts?.header?.navigation?.firstContact || 'First Contact', href: '/first-contact' },
-      { name: texts?.header?.navigation?.proves || 'Proves', href: '/proves' },
       { name: texts?.header?.navigation?.theHumanInside || 'The Human Inside', href: '/the-human-inside' },
-      { name: texts?.header?.navigation?.austen || 'Austen', href: '/austen' },
+      { name: texts?.header?.navigation?.pemberley || 'Pemberley', href: '/austen/pemberley-house' },
+      { name: texts?.header?.navigation?.keepCalm || 'Keep Calm', href: '/austen/keep-calm' },
+      { name: texts?.header?.navigation?.quotes || 'Quotes', href: '/austen/quotes' },
+      { name: texts?.header?.navigation?.crosswords || 'Crosswords', href: '/austen/crosswords' },
+      { name: texts?.header?.navigation?.lookingForMy || 'Looking For My', href: '/austen/looking-for-my-darcy' },
       { name: texts?.header?.navigation?.cube || 'Cube', href: '/cube' },
       { name: texts?.header?.navigation?.miscellania || 'Miscel·lània', href: '/miscellania' },
     ];
   }, [texts]);
 
   const desktopNavLinks = useMemo(() => {
-    return navLinks.filter((l) => (l.href || '').toString() !== '/proves');
+    return navLinks;
   }, [navLinks]);
 
   const maybeOpenCollectionsFromNavPointer = (clientX) => {
