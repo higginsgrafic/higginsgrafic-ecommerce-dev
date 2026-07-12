@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   AlertCircle,
   Check,
@@ -15,9 +15,25 @@ import {
   X,
 } from 'lucide-react';
 import usePersistentState from '@/hooks/usePersistentState';
+import { useOrders } from '@/hooks/useOrders';
 
 // Plantilla de la secció COMANDES del perfil d'usuari — alineada amb la pauta verda
-function UserComandesContent() {
+function UserComandesContent({ userEmail }) {
+  const { orders: fetchedOrders } = useOrders(userEmail);
+  const ICON_MAP = {
+    'MoreHorizontal': MoreHorizontal,
+    'Check': Check,
+    'Loader2': Loader2,
+    'Search': Search,
+    'Truck': Truck,
+    'AlertCircle': AlertCircle,
+    'X': X,
+    'Package': Package,
+  };
+  const ORDERS = useMemo(() => fetchedOrders.map(o => ({
+    ...o,
+    icon: ICON_MAP[o.icon] || MoreHorizontal,
+  })), [fetchedOrders]);
   const [activeTab, setActiveTab] = usePersistentState('HG_USER_ACTIVE_TAB', 'COMANDES');
   const [sortDirs, setSortDirs] = usePersistentState('HG_USER_SORT_DIRS', { 'COMANDA': 'desc', 'ESTAT': 'desc', 'DATA': 'desc', 'TOT PLEGAT': 'desc' });
   const [contactMode, setContactMode] = usePersistentState('HG_USER_CONTACT_MODE', 'comanda'); // 'comanda' | 'correu'
@@ -35,24 +51,6 @@ function UserComandesContent() {
   const [nameSortDir, setNameSortDir] = usePersistentState('HG_USER_NAME_SORT', 'asc'); // 'asc' | 'desc'
   const [dateSortDir, setDateSortDir] = usePersistentState('HG_USER_DATE_SORT', 'desc'); // 'asc' | 'desc'
   const toggleSort = (key) => setSortDirs((prev) => ({ ...prev, [key]: prev[key] === 'desc' ? 'asc' : 'desc' }));
-  const ORDERS = [
-    { num: '#00000000000000000000027', status: 'PENDENT', icon: MoreHorizontal, date: '27-04-26', total: '15,50€', active: true },
-    { num: '#00000000000000000000026', status: 'EN PREPARACIÓ', icon: Loader2, date: '27-04-26', total: '15,50€', active: true },
-    { num: '#00000000000000000000025', status: 'SEGUIMENT', icon: Search, date: '27-04-26', total: '15,50€', active: true },
-    { num: '#00000000000000000000024', status: 'CONFIRMADA', icon: Check, date: '23-04-26', total: '15,50€', active: true },
-    { num: '#00000000000000000000023', status: 'PENDENT', icon: MoreHorizontal, date: '23-04-26', total: '15,50€', active: true },
-    { num: '#00000000000000000000022', status: 'EN REPARTIMENT', icon: Truck, date: '23-04-26', total: '15,50€', active: true },
-    { num: '#00000000000000000000021', status: 'ENTREGADA', icon: Package, date: '23-04-26', total: '15,50€', active: true },
-    { num: '#00000000000000000000020', status: 'CANCEL·LADA', icon: X, date: '23-04-26', total: '15,50€', active: false },
-    { num: '#00000000000000000000019', status: 'ENTREGADA', icon: Package, date: '23-04-26', total: '15,50€', active: false },
-    { num: '#00000000000000000000018', status: 'ENTREGADA', icon: Package, date: '23-04-26', total: '15,50€', active: false },
-    { num: '#00000000000000000000017', status: 'CANCEL·LADA', icon: X, date: '23-04-26', total: '15,50€', active: false },
-    { num: '#00000000000000000000016', status: 'ATURADA', icon: AlertCircle, date: '23-04-26', total: '15,50€', active: false },
-    { num: '#00000000000000000000015', status: 'ENTREGADA', icon: Package, date: '23-04-26', total: '15,50€', active: false },
-    { num: '#00000000000000000000014', status: 'ENTREGADA', icon: Package, date: '23-04-26', total: '15,50€', active: false },
-    { num: '#00000000000000000000013', status: 'ENTREGADA', icon: Package, date: '23-04-26', total: '15,50€', active: false },
-  ];
-
   const LEGEND = [
     { label: 'PENDENT', icon: MoreHorizontal },
     { label: 'CONFIRMADA', icon: Check },
@@ -457,7 +455,7 @@ function UserComandesContent() {
 
         {/* Separador (fila 17) + llegenda (fila 18) */}
         {activeTab === 'COMPTE' && (<>
-        <div style={{ height: `${ROW_H}px` }} />
+        <div style={{ height: `${ROW_H - 1}px` }} />
         <div style={{
           width: '1350px',
           marginLeft: 'auto',
@@ -1030,7 +1028,7 @@ function UserComandesContent() {
               </tr>
             </thead>
             <tbody>
-              {[...ORDERS, null, null, null].map((_, idx) => {
+              {Array.from({ length: 18 }).map((_, idx) => {
                 const inputStyle = {
                   ...TEXT,
                   fontFamily: 'Roboto Condensed, sans-serif',
@@ -1082,7 +1080,7 @@ function UserComandesContent() {
                 }
                 // Files 4..(N-2): àrea de Missatge (rowSpan), cols 1+2.
                 // Última fila (N-1): reservada per a la llegenda (encara per posar).
-                const totalRows = ORDERS.length + 3; // 14 + 3 nulls = 17
+                const totalRows = 18;
                 const lastIdx = totalRows - 1; // fila de botons
                 const legendIdx = lastIdx - 1;
                 const messageStart = 2;
@@ -1274,7 +1272,34 @@ function UserComandesContent() {
           </tr>
         </thead>
         <tbody>
-          {ORDERS.map((o, idx) => {
+          {ORDERS.length === 0 ? (
+            <tr>
+              <td colSpan={5} style={{ textAlign: 'center', verticalAlign: 'middle', height: '489.2px' }}>
+                <div style={{
+                  fontFamily: 'Oswald, sans-serif',
+                  fontWeight: 200,
+                  fontSize: '18pt',
+                  color: '#C3C8CD',
+                  letterSpacing: '1px',
+                  textTransform: 'uppercase',
+                  textAlign: 'center',
+                }}>
+                  NO HI HA CAP COMANDA
+                </div>
+                <div style={{
+                  fontFamily: 'Roboto Condensed, sans-serif',
+                  fontWeight: 300,
+                  fontSize: '10pt',
+                  color: '#E0E3E8',
+                  marginTop: '12px',
+                  letterSpacing: '0.5px',
+                  textAlign: 'center',
+                }}>
+                  Encara no has fet cap comanda
+                </div>
+              </td>
+            </tr>
+          ) : ORDERS.map((o, idx) => {
             const Icon = o.icon;
             const isStruck = o.status === 'CANCEL·LADA' || o.status === 'ATURADA';
             const opacity = o.active ? 1 : (isStruck ? 0.7 : 0.35);
@@ -1316,7 +1341,7 @@ function UserComandesContent() {
       </div>
 
       {/* Espai d'una fila abans de la llegenda */}
-      <div style={{ height: `${ROW_H}px` }} />
+      <div style={{ height: `${ROW_H - 1}px` }} />
 
       {/* 4. Llegenda */}
       <div style={{ width: '1350px', marginLeft: 'auto', marginRight: 'auto', display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', columnGap: '7.5px' }}>

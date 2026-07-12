@@ -302,7 +302,7 @@ function MiscellaniaR2d2QuotePage() {
           onClick={() => {
             try {
               window.dispatchEvent(new CustomEvent('hg:open-full-wide-cart', {
-                detail: { source: 'product-pdp-cta', firstPartOnly: true },
+                detail: { source: 'product-pdp-cta', firstPartOnly: true, item: { title: productName.toUpperCase(), collection: COLLECTION_NAME, qty: 1, size: selectedSize, price: '19,95€', color: mainVariantColor, drawing: '', disabled: false } },
               }));
             } catch {
               // ignore

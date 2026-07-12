@@ -152,7 +152,7 @@ function CistellComandaContent({ cartItems, setCartItems, onCloseMegaSlide, onFi
             textTransform: 'uppercase',
             textAlign: 'center',
           }}>
-            EL CISTELL ÉS BUIT
+            EL CISTELL ÉS BEN BUIT
           </div>
           <div style={{
             fontFamily: 'Roboto Condensed, sans-serif',
@@ -163,7 +163,7 @@ function CistellComandaContent({ cartItems, setCartItems, onCloseMegaSlide, onFi
             letterSpacing: '0.5px',
             textAlign: 'center',
           }}>
-            Encara no has afegit cap producte
+            Encara no hi has afegit cap producte
           </div>
         </div>
       ) : (

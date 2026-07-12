@@ -4,6 +4,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { ChevronDown, ChevronLeft, ChevronRight, ChevronUp, Menu, UserRound, X, Check, Clock, Package, Truck, Search, AlertCircle, MoreHorizontal, Loader2, Eye, EyeOff, LayoutGrid, Layers } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useProductContext } from '@/contexts/ProductContext';
+import { useAdmin } from '@/contexts/AdminContext';
 import { getGildan5000Catalog } from '../utils/placeholders.js';
 import {
   AUSTEN_QUOTES_ASSETS,
@@ -83,28 +84,16 @@ export default function FullWideSlideHeader({
   const location = useLocation();
   const navigate = useNavigate();
   const { products: contextProducts } = useProductContext();
+  const { adminEmail } = useAdmin();
   const cartClickTimeoutRef = useRef(null);
   const accountClickTimeoutRef = useRef(null);
   const dblClickDelayMs = 0;
   const [searchQuery, setSearchQuery] = useState('');
 
   // Estat compartit del cistell (llista definitiva de compra)
-  const [cartItems, setCartItems] = useState([
-    { title: 'SENSE & SENSIBILITY', collection: 'AUSTEN', qty: 1, size: 'L', price: '19,95€', color: 'white', drawing: 'austen/crosswords/sense-and-sensibility-4-stripe.webp', disabled: false },
-    { title: 'ROBBIE THE ROBOT', collection: 'THE HUMAN INSIDE', qty: 1, size: 'L', price: '19,95€', color: 'light-blue', drawing: 'the_human_inside/black/robbie-the-robot-b-stripe.webp', disabled: false },
-    { title: 'PRIDE & PREJUDICE', collection: 'AUSTEN', qty: 1, size: 'M', price: '19,95€', color: 'royal', drawing: 'austen/crosswords/pride-and-prejudice-1-stripe.webp', disabled: false },
-    { title: 'ROBOCUBE', collection: 'CUBE', qty: 2, size: 'XL', price: '19,95€', color: 'navy', drawing: 'cube/robocube-stripe.webp', disabled: false },
-    { title: 'PONT DEL DIABLE', collection: 'MISCEL·LÀNIA', qty: 1, size: 'S', price: '19,95€', color: 'purple', drawing: 'miscellania/black/pont-del-diable-b-stripe.webp', disabled: false },
-    { title: 'NCC-1701-D', collection: 'THE HUMAN INSIDE', qty: 1, size: 'M', price: '19,95€', color: 'light-pink', drawing: 'first_contact/black/ncc-1701-d-b-stripe.webp', disabled: false },
-    { title: 'MASCHINENMENSCH', collection: 'THE HUMAN INSIDE', qty: 1, size: 'L', price: '19,95€', color: 'daisy', drawing: 'the_human_inside/black/maschinenmensch-b-stripe.webp', disabled: false },
-    { title: 'PERSUASION', collection: 'AUSTEN', qty: 1, size: 'L', price: '19,95€', color: 'gold', drawing: 'austen/crosswords/persuasion-1-stripe.webp', disabled: false },
-    { title: 'CYBERMAN', collection: 'THE HUMAN INSIDE', qty: 1, size: 'M', price: '19,95€', color: 'red', drawing: 'cube/cyber-cube-stripe.webp', disabled: false },
-    { title: 'DJ VADER', collection: 'MISCEL·LÀNIA', qty: 1, size: 'L', price: '19,95€', color: 'kiwi', drawing: 'miscellania/black/dj-vader-b-stripe.webp', disabled: false },
-    { title: 'PLASMA ESCAPE', collection: 'MISCEL·LÀNIA', qty: 1, size: 'M', price: '19,95€', color: 'irish-green', drawing: 'first_contact/black/plasma-escape-b-stripe.webp', disabled: false },
-    { title: 'VADER', collection: 'MISCEL·LÀNIA', qty: 1, size: 'L', price: '19,95€', color: 'military-green', drawing: 'the_human_inside/black/vader-b-stripe.webp', disabled: false },
-    { title: 'SENSE & SENSIBILITY', collection: 'AUSTEN', qty: 1, size: 'M', price: '19,95€', color: 'forest-green', drawing: 'austen/crosswords/sense-and-sensibility-1-stripe.webp', disabled: false },
-    { title: 'MAZINGER-C', collection: 'THE HUMAN INSIDE', qty: 1, size: 'XL', price: '19,95€', color: 'black', drawing: 'cube/mazinger-c-stripe.webp', disabled: false },
-  ]);
+  const [cartItems, setCartItems] = useState([]);
+
+  const localCartItemCount = cartItems.filter(it => !it.disabled).reduce((acc, it) => acc + (it.qty || 1), 0);
 
   const searchResults = useMemo(() => {
     const products = Array.isArray(contextProducts) ? contextProducts : [];
@@ -506,7 +495,7 @@ export default function FullWideSlideHeader({
     // render, el reobririria immediatament.
     const keepLockedAccordionOpen = () => {
       if (!megaAccordionLocked) return;
-      if (megaPage === 3) {
+      if (megaPage === 3 && localCartItemCount > 0) {
         setAcordioExpanded(true);
       }
       if (megaPage === 4) {
@@ -1950,9 +1939,25 @@ export default function FullWideSlideHeader({
   };
 
   useEffect(() => {
-    const openFullWideCart = () => {
+    const openFullWideCart = (e) => {
+      const { item } = (e && e.detail) || {};
+      if (item) {
+        setCartItems((prev) => {
+          const existing = prev.find(
+            (it) => it.title === item.title && it.size === item.size && !it.disabled
+          );
+          if (existing) {
+            return prev.map((it) =>
+              it.title === item.title && it.size === item.size && !it.disabled
+                ? { ...it, qty: it.qty + (item.qty || 1) }
+                : it
+            );
+          }
+          return [...prev, item];
+        });
+      }
       setMegaPage(3);
-      setAcordioExpanded(true);
+      setAcordioExpanded(!!item || localCartItemCount > 0);
       setMegaFullScreen(false);
       ensureMegaOpen();
       touchMegaPublicActivity();
@@ -3104,13 +3109,16 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
                 cartClickTimeoutRef.current = window.setTimeout(() => {
                   cartClickTimeoutRef.current = null;
                   setManualOverrideClosed(false);
-                  // Seqüència de 3 clics al cistell:
-                  //  1r: obre la pestanya (acordió tancat)
-                  //  2n: obre l'acordió
-                  //  3r: tanca tot (acordió i pestanya)
+                  // Seqüència de clics al cistell:
+                  //  Amb items: 1r obre pestanya, 2n obre acordió, 3r tanca tot
+                  //  Sense items: 1r obre pestanya, 2n tanca tot
                   if (megaPage === 3 && active) {
                     if (!acordioExpanded) {
-                      setAcordioExpanded(true);
+                      if (localCartItemCount > 0) {
+                        setAcordioExpanded(true);
+                      } else {
+                        setActive(null);
+                      }
                     } else {
                       setAcordioExpanded(false);
                       setActive(null);
@@ -3132,8 +3140,8 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
                   style={{
                     display: 'block',
                     backgroundColor: 'currentColor',
-                    WebkitMaskImage: `url(${cartItemCount > 0 ? '/custom_logos/icons/cistell-ple-2.svg' : '/custom_logos/icons/cistell-buit.svg'})`,
-                    maskImage: `url(${cartItemCount > 0 ? '/custom_logos/icons/cistell-ple-2.svg' : '/custom_logos/icons/cistell-buit.svg'})`,
+                    WebkitMaskImage: `url(${localCartItemCount > 0 ? '/custom_logos/icons/cistell-ple-2.svg' : '/custom_logos/icons/cistell-buit.svg'})`,
+                    maskImage: `url(${localCartItemCount > 0 ? '/custom_logos/icons/cistell-ple-2.svg' : '/custom_logos/icons/cistell-buit.svg'})`,
                     WebkitMaskRepeat: 'no-repeat',
                     maskRepeat: 'no-repeat',
                     WebkitMaskPosition: 'center',
@@ -3142,12 +3150,12 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
                     maskSize: 'contain',
                   }}
                 />
-                {cartItemCount > 0 ? (
+                {localCartItemCount > 0 ? (
                   <span
                     className="absolute left-1/2 -translate-x-1/2 text-whiteStrong text-[13.75px] font-bold lg:text-[16.25px]"
                     style={{ top: 'calc(60% - 0.5px)', transform: 'translate(-50%, -50%)', lineHeight: '1' }}
                   >
-                    {cartItemCount}
+                    {localCartItemCount}
                   </span>
                 ) : null}
               </span>
@@ -3390,7 +3398,7 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
                           setCartItems={setCartItems}
                           onCloseMegaSlide={() => setActive(null)}
                           onFinalizeOrder={() => {
-                            if (!megaAccordionLocked && !acordioExpanded) setAcordioExpanded(true);
+                            if (localCartItemCount > 0 && !megaAccordionLocked && !acordioExpanded) setAcordioExpanded(true);
                             touchMegaPublicActivity();
                           }}
                         />
@@ -3434,7 +3442,7 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
                           />
                         )}
 
-                        {!acordioExpanded && (
+                        {!acordioExpanded && localCartItemCount > 0 && (
                           <div
                             onClick={() => {
                               setAcordioExpanded(true);
@@ -3655,7 +3663,7 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
                               }} />
 
                               {/* Contingut alineat amb la pauta */}
-                              <UserComandesContent />
+                              <UserComandesContent userEmail={adminEmail} />
 
                               {/* PAUTA-VERDA - Línies horitzontals (referència) */}
                               {false && <div style={{
