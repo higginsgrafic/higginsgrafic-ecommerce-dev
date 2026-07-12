@@ -3443,15 +3443,16 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
                             style={{
                             position: 'absolute',
                             bottom: '-50px',
-                            left: 'calc(50% + 5px)',
+                            left: '50%',
                             transform: 'translateX(-50%)',
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
+                            gap: '0px',
                             cursor: 'pointer',
                             zIndex: 10,
                             }}>
-                            <svg width="45" height="45" viewBox="0 0 24 24" fill="none" stroke="#000" strokeWidth="0.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                            <svg width="30" height="45" viewBox="4 0 16 24" fill="none" stroke="#000" strokeWidth="0.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                               <line x1="4" y1="11" x2="12" y2="17" />
                               <line x1="12" y1="17" x2="20" y2="11" />
                             </svg>
