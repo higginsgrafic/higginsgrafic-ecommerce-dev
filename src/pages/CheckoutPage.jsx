@@ -7,6 +7,7 @@ import LlistaCheckout from '@/components/LlistaCheckout';
 import { formatPrice } from '@/utils/formatters';
 import { validateEmail, validateRequired, validatePostalCode, validateForm } from '@/utils/validation';
 import { trackBeginCheckout, trackPurchase } from '@/utils/analytics';
+import { useShippingCosts } from '@/hooks/useShippingCosts';
 
 const PAUTA_ROWS = 33;
 const PAUTA_FIRST_ROW_SCALE = 0.7;
@@ -81,8 +82,9 @@ const CheckoutPage = ({ cartItems, onClearCart }) => {
     mockCheckoutItems
   ), [mockCheckoutItems]);
 
+  const { getCost, zoneInfo } = useShippingCosts('es_peninsula');
   const subtotal = checkoutRenderItems.reduce((total, item) => total + (item.price * item.quantity), 0);
-  const shipping = subtotal > 50 ? 0 : 5.95;
+  const shipping = getCost(subtotal);
   const total = subtotal + shipping;
   const ivaAmount = subtotal * 0.21;
   const displayPrice = (value) => formatPrice(value).replace(/\u00a0/g, ' ').replace(/\s+/g, '').replace(/\s*€\s*$/, '€');
@@ -93,7 +95,7 @@ const CheckoutPage = ({ cartItems, onClearCart }) => {
   };
   const alignedAmountStyle = { fontVariantNumeric: 'tabular-nums', gridTemplateColumns: '1fr auto', minWidth: '92px' };
   const subtotalParts = splitPriceParts(subtotal);
-  const transportParts = splitPriceParts(shipping === 0 ? 5.95 : shipping);
+  const transportParts = splitPriceParts(shipping === 0 ? zoneInfo.cost : shipping);
   const ivaParts = splitPriceParts(ivaAmount);
   const totalParts = splitPriceParts(total);
 

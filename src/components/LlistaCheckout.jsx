@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo, useRef, useLayoutEffect } from 'react';
 import Breadcrumbs from '@/components/Breadcrumbs';
 import { formatPrice } from '@/utils/formatters';
+import { useShippingCosts } from '@/hooks/useShippingCosts';
 
 const PAUTA_ROWS = 33;
 const PAUTA_FIRST_ROW_SCALE = 0.7;
@@ -53,8 +54,9 @@ const LlistaCheckout = ({ items, onBreadcrumbClick }) => {
     }
   }, [visibleProductRows, checkoutRenderItems.length]);
 
+  const { getCost, zoneInfo } = useShippingCosts('es_peninsula');
   const subtotal = checkoutRenderItems.reduce((total, item) => total + (item.price * item.quantity), 0);
-  const shipping = subtotal > 50 ? 0 : 5.95;
+  const shipping = getCost(subtotal);
   const total = subtotal + shipping;
   const ivaAmount = subtotal * 0.21;
   const displayPrice = (value) => formatPrice(value).replace(/\u00a0/g, ' ').replace(/\s+/g, '').replace(/\s*€\s*$/, '€');
@@ -447,7 +449,7 @@ const LlistaCheckout = ({ items, onBreadcrumbClick }) => {
               <div style={{ gridColumn: '1 / 5', gridRow: '1 / 2' }} />
               {[
                 ['SUBTOTAL', displayPrice(subtotal), false],
-                ['TRANSPORT', displayPrice(5.95), true],
+                ['TRANSPORT', displayPrice(zoneInfo.cost), true],
                 ['IVA 21%', displayPrice(ivaAmount), false],
                 ['TOT PLEGAT FA', displayPrice(total), false],
               ].flatMap(([label, amount, strikeAmount], index) => ([
