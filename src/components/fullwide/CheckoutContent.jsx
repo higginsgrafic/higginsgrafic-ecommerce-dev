@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Check } from 'lucide-react';
 import { validateEmail, validateRequired, validatePostalCode, validateForm } from '@/utils/validation';
 import { trackBeginCheckout, trackPurchase } from '@/utils/analytics';
+import { useShippingCosts } from '@/hooks/useShippingCosts';
 
 function CheckoutContent({ cartItems, setCartItems, onCloseMegaSlide }) {
   const navigate = useNavigate();
@@ -40,7 +41,8 @@ function CheckoutContent({ cartItems, setCartItems, onCloseMegaSlide }) {
     return Number.isNaN(unit) ? acc : acc + unit * (it.qty || 1);
   }, 0);
   const subtotal = grossSum / 1.21;
-  const shipping = 4.99;
+  const { getCost, zoneInfo } = useShippingCosts('es_peninsula');
+  const shipping = getCost(grossSum / 1.21);
   const ivaAmount = grossSum - subtotal;
   const total = grossSum;
 
@@ -50,7 +52,7 @@ function CheckoutContent({ cartItems, setCartItems, onCloseMegaSlide }) {
     return { intPart, decPart };
   };
   const subtotalParts = splitPrice(subtotal);
-  const shippingParts = splitPrice(shipping);
+  const shippingParts = splitPrice(shipping === 0 ? zoneInfo.cost : shipping);
   const ivaParts = splitPrice(ivaAmount);
   const totalParts = splitPrice(total);
 
