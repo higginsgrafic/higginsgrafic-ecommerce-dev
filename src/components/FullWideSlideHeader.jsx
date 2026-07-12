@@ -3493,7 +3493,7 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
                               transform: `translateX(-50%) scale(${accordionPautaScale * 0.94})`,
                               transformOrigin: 'top center',
                               width: `calc(100% / (${accordionPautaScale} * 0.94))`,
-                              height: '800px',
+                              height: '900px',
                               overflow: 'hidden',
                             }}>
                               {/* Checkout dins l'acordió */}
