@@ -16,6 +16,10 @@ async function fetchShippingRates() {
 
   fetchPromise = (async () => {
     try {
+      if (import.meta.env.DEV) {
+        cachedRates = DEFAULT_RATES;
+        return cachedRates;
+      }
       const res = await fetch('/api/shipping-rates');
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data = await res.json();
@@ -45,7 +49,7 @@ export function useShippingCosts(zone = 'es_peninsula') {
     return () => { active = false; };
   }, []);
 
-  const zoneInfo = rates[zone] || DEFAULT_RATES[zone];
+  const zoneInfo = rates[zone] || DEFAULT_RATES[zone] || { label: zone, cost: 0, free_threshold: null };
   const getCost = useCallback((subtotal) => {
     if (zoneInfo.free_threshold != null && subtotal >= zoneInfo.free_threshold) return 0;
     return zoneInfo.cost;
