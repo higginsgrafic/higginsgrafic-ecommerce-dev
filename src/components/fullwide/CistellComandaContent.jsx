@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { ChevronDown, ChevronUp, ArrowLeft, X, Trash2, Plus } from 'lucide-react';
+import { useShippingCosts } from '@/hooks/useShippingCosts';
 
 function CistellComandaContent({ cartItems, setCartItems, onCloseMegaSlide, onFinalizeOrder }) {
   const navigate = useNavigate();
@@ -121,6 +122,8 @@ function CistellComandaContent({ cartItems, setCartItems, onCloseMegaSlide, onFi
   const HEAD = { fontFamily: 'Oswald, sans-serif', fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.4px', color: '#475059' };
   const META = { fontFamily: 'Roboto Condensed, sans-serif', fontWeight: 400, color: '#7D8895' };
   const VAL  = { fontFamily: 'Roboto Condensed, sans-serif', fontWeight: 500, color: '#475059' };
+
+  const { zoneInfo } = useShippingCosts('es_peninsula');
 
   const activeItems = CART_ITEMS.filter(it => !it.disabled);
   const isEmpty = activeItems.length === 0;
@@ -440,7 +443,7 @@ function CistellComandaContent({ cartItems, setCartItems, onCloseMegaSlide, onFi
           if (Number.isNaN(unit)) return acc;
           return acc + unit * (it.qty || 1);
         }, 0);
-        const transport = 4.95;
+        const transport = zoneInfo.cost;
         const grossTotal = subtotal;
         const iva = subtotal * 0.21;
         const fmt = (n) => n.toFixed(2).replace('.', ',') + '€';
