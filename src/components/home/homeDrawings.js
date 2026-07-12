@@ -2,7 +2,7 @@
  * homeDrawings
  * -----------------------------------------------------------------------------
  * Catàleg de dibuixos per col·lecció + planificador d'assignació per a les
- * targetes de la home (`HomeClean`).
+ * targetes de la home (`Home`).
  *
  * Regles (request usuari):
  *  - Cada col·lecció mostra dibuixos PROPIS, aleatoris i sense repetir-se dins
@@ -154,7 +154,7 @@ export const HOME_DRAWINGS = {
 // Ordre de les seccions a la home.
 export const HOME_COLLECTIONS_ORDER = ['first-contact', 'the-human-inside', 'austen', 'cube', 'miscellania'];
 
-// 14 colors canònics (de TDP_GRID_COLORS / FullWideSlideDemoHeader).
+// 14 colors canònics (de TDP_GRID_COLORS / FullWideSlideHeader).
 export const SHIRT_COLORS = [
   'white', 'light-blue', 'royal', 'purple', 'navy', 'daisy', 'gold',
   'light-pink', 'red', 'kiwi', 'irish-green', 'military-green', 'forest-green', 'black',

@@ -12,9 +12,6 @@ const OffersHeader = ({ adminBannerVisible = false }) => {
   const { enabled, text, loading, bgColor, textColor, fontSize, font, link, clickable } = useOffersConfig();
   const { getDebugStyle, isSectionEnabled } = useGridDebug();
 
-  // Canvia a true per mostrar el banner de descàrrega del tema WordPress
-  const SHOW_DOWNLOAD_BANNER = false;
-
   // Determinar si s'ha de mostrar (mentre carrega o quan està enabled)
   const shouldShow = enabled && !loading;
 
@@ -77,29 +74,6 @@ const OffersHeader = ({ adminBannerVisible = false }) => {
 
   return (
     <>
-      {/* 🎉 BANNER DE DESCÀRREGA WORDPRESS - Activar/Desactivar amb SHOW_DOWNLOAD_BANNER */}
-      {SHOW_DOWNLOAD_BANNER && (
-        <div className="bg-gradient-to-r from-gray-900 to-gray-800 text-white text-center py-3 px-4 sticky top-0 z-50">
-          <div className="max-w-7xl mx-auto flex items-center justify-center gap-3 flex-wrap">
-            <span className="font-semibold">{texts.offersHeader.wpThemeReady}</span>
-            <a
-              href="/grafc-theme-wordpress.zip"
-              download
-              className="bg-white text-blue-600 px-4 py-1.5 rounded-md font-bold hover:bg-gray-100 transition-colors inline-flex items-center gap-2"
-            >
-              {texts.offersHeader.downloadTheme}
-            </a>
-            <a
-              href="/descarrega-tema.html"
-              target="_blank"
-              className="text-white underline hover:text-yellow-200 text-sm"
-            >
-              {texts.offersHeader.moreInfo}
-            </a>
-          </div>
-        </div>
-      )}
-
       {/* Banner animat d'ofertes */}
       <motion.div
         className={`fixed top-0 left-0 right-0 z-50 text-white text-sm flex items-center px-4 sm:px-6 lg:px-8 overflow-hidden ${isClickable ? 'pointer-events-auto' : 'pointer-events-none'}`}

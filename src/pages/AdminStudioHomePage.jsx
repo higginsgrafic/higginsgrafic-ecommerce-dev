@@ -268,7 +268,6 @@ export default function AdminStudioHomePage() {
       ],
       dev: [
         { label: 'Dev Links', path: '/dev-links' },
-        { label: 'Nike Hero Demo', path: '/nike-hero-demo' },
       ],
       wip: [
         { label: 'FullWideSlide', path: '/full-wide-slide' },

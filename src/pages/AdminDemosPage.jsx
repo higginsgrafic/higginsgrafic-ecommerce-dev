@@ -3,18 +3,7 @@ import { Link } from 'react-router-dom';
 import { ArrowLeft, ExternalLink, Copy } from 'lucide-react';
 import SEO from '@/components/SEO';
 
-const demos = [
-  {
-    title: 'Nike Hero Demo',
-    description: 'Hero slider tipus Nike.',
-    path: '/nike-hero-demo',
-  },
-  {
-    title: 'Nike: També et pot agradar',
-    description: 'Rail/carrusel de recomanacions (demo).',
-    path: '/nike-tambe',
-  },
-];
+const demos = [];
 
 export default function AdminDemosPage() {
   const copyUrl = async (path) => {

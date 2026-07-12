@@ -13,7 +13,7 @@ import ScrollToTop from '@/components/ScrollToTop';
 import Footer from '@/components/Footer';
 
 // PROD pages — lazy loaded
-const HomeClean = lazy(() => import('@/pages/HomeClean'));
+const Home = lazy(() => import('@/pages/Home'));
 const AboutPage = lazy(() => import('@/pages/AboutPage'));
 const ContactPage = lazy(() => import('@/pages/ContactPage'));
 const FAQPage = lazy(() => import('@/pages/FAQPage'));
@@ -67,7 +67,7 @@ function AppProd() {
                       {...pageTransition}
                       style={{ width: '100%', height: '100%' }}
                     >
-                      <HomeClean />
+                      <Home />
                     </motion.div>
                   }
                 />

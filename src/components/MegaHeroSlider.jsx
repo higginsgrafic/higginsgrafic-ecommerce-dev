@@ -287,7 +287,7 @@ export default function MegaHeroSlider({
             {resolvedSlides.map((s, i) => (
               <article key={s.id} className={styles.slide} aria-label={`Slide ${i + 1}`}>
                 {s.imageSrc ? (
-                  <img className={styles.image} src={s.imageSrc} alt={s.imageAlt} />
+                  <img className={styles.image} src={s.imageSrc} alt={s.imageAlt} loading="lazy" />
                 ) : (
                   <div className={styles.image} aria-hidden="true" />
                 )}

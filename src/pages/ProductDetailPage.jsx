@@ -4,7 +4,6 @@ import { Helmet } from 'react-helmet';
 import { ChevronLeft, ChevronRight, X } from 'lucide-react';
 import ProductGallery from '@/components/ProductGallery';
 import ProductInfo from '@/components/ProductInfo';
-import ProductMockups from '@/components/ProductMockups';
 import EpisodeControls from '@/components/EpisodeControls';
 import EpisodeDisplay from '@/components/EpisodeDisplay';
 import SEOProductSchema from '@/components/SEOProductSchema';
@@ -19,7 +18,7 @@ import { useRelatedProducts } from '@/hooks/useProducts';
 import { useAdmin } from '@/contexts/AdminContext';
 import { formatPrice } from '@/utils/formatters';
 
-const ProductDetailPage = ({ onAddToCart, cartItems = [], onUpdateQuantity, language = 'ca' }) => {
+const ProductDetailPage = ({ onAddToCart, cartItems = [], language = 'ca' }) => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { products, getProductById, toggleWishlist, isInWishlist } = useProductContext();
@@ -29,9 +28,6 @@ const ProductDetailPage = ({ onAddToCart, cartItems = [], onUpdateQuantity, lang
   const product = getProductById(id);
 
   const TEPAProducts = useRelatedProducts(product?.id, 3);
-
-  const relatedCollections = [];
-  const isTEPAEnabled = false;
 
   useEffect(() => {
     if (!import.meta.env.DEV) return;
@@ -1018,31 +1014,14 @@ const ProductDetailPage = ({ onAddToCart, cartItems = [], onUpdateQuantity, lang
     navigate('/checkout');
   };
 
-  const getCollectionLogo = (collection) => {
-    switch (collection) {
-      case 'austen':
-        return '/custom_logos/collections/collection-jean-austen-logo.svg';
-      case 'cube':
-        return '/custom_logos/collections/collection-cube-logo.svg';
-      case 'first-contact':
-        return '/custom_logos/collections/collection-first-contact-logo.svg';
-      case 'miscellania':
-        return '/custom_logos/collections/collection-miscellania-logo.svg';
-      default:
-        return '/custom_logos/collections/collection-thin-logo.svg';
-    }
-  };
-
-  const normalizeText = (s) => (s || '').toString().replace(/<[^>]*>/g, '').trim();
-
-  const getNikeStatus = (p) => {
+  const getProductStatus = (p) => {
     const variants = Array.isArray(p?.variants) ? p.variants : [];
     if (variants.length === 0) return null;
     const available = variants.some((v) => v && v.isAvailable !== false);
     return available ? null : 'Producte esgotat';
   };
 
-  const getNikeSubtitle = (p) => {
+  const getProductSubtitle = (p) => {
     const parts = [];
     const base = (p?.category || '').toString().trim();
     if (base) parts.push(base);
@@ -1334,45 +1313,6 @@ const ProductDetailPage = ({ onAddToCart, cartItems = [], onUpdateQuantity, lang
         </div>
       )}
 
-      {isTEPAEnabled && relatedCollections.length > 0 && (
-        <div className="max-w-7xl mx-auto px-4 lg:px-8">
-          <div className="border-t border-gray-200 pt-12">
-            <h2 className="font-roboto text-2xl sm:text-3xl font-normal uppercase mb-8 text-foreground">
-              Col·leccions
-            </h2>
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 items-center">
-              {relatedCollections.map((collection) => (
-                <div key={collection} className="w-full">
-                  <div
-                    className="w-full bg-white flex items-center justify-center"
-                    style={{ height: '110px' }}
-                  >
-                    <img
-                      src={getCollectionLogoSrc(collection)}
-                      alt={humanizeLabel(collection)}
-                      className="block object-contain"
-                      style={{
-                        height: '70px',
-                        width: 'auto',
-                        maxWidth: '220px',
-                        transform: (collection === 'the-human-inside' || collection === 'thin')
-                          ? 'scale(1.18)'
-                          : undefined,
-                        transformOrigin: (collection === 'the-human-inside' || collection === 'thin')
-                          ? 'center'
-                          : undefined
-                      }}
-                      loading="lazy"
-                      decoding="async"
-                    />
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
-
       {TEPAProducts.length > 0 && (
         <TEPASection title="també et pot agradar">
           {TEPAProducts.slice(0, 3).map((p) => {
@@ -1380,9 +1320,9 @@ const ProductDetailPage = ({ onAddToCart, cartItems = [], onUpdateQuantity, lang
             const productSlugOrId = p?.slug || productId;
             const productUrl = productSlugOrId ? `/product/${productSlugOrId}` : '/';
             const name = p?.name || '';
-            const subtitle = getNikeSubtitle(p);
+            const subtitle = getProductSubtitle(p);
             const img = p?.image || p?.images?.[0] || p?.variants?.find((v) => v?.image)?.image || '/placeholder-product.svg';
-            const status = getNikeStatus(p);
+            const status = getProductStatus(p);
             const colors = getUniqueColors(p);
 
             return (

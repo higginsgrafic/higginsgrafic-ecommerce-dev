@@ -1,12 +1,17 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { loadTexts } from '@/data/siteTexts';
 
 class ErrorBoundary extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { hasError: false, error: null, errorInfo: null, copied: false };
-    this.texts = loadTexts();
+    this.state = {
+      hasError: false,
+      error: null,
+      errorInfo: null,
+      copied: false,
+      carouselIndex: 0,
+    };
+    this.carouselTimer = null;
   }
 
   legacyCopyViaTextarea = (text) => {
@@ -74,7 +79,6 @@ class ErrorBoundary extends React.Component {
       errorInfo: errorInfo
     });
 
-    // Aquí podries enviar l'error a un servei de logging
     console.error('Error captat per Error Boundary:', {
       name: error?.name,
       message: error?.message,
@@ -84,80 +88,200 @@ class ErrorBoundary extends React.Component {
     }, errorInfo);
   }
 
+  componentDidMount() {
+    if (this.state.hasError) {
+      this.startCarousel();
+    }
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    if (this.state.hasError && !prevState.hasError) {
+      this.startCarousel();
+    }
+  }
+
+  componentWillUnmount() {
+    if (this.carouselTimer) {
+      clearInterval(this.carouselTimer);
+    }
+  }
+
+  startCarousel = () => {
+    if (this.carouselTimer) clearInterval(this.carouselTimer);
+    this.carouselTimer = setInterval(() => {
+      this.setState((prev) => ({
+        carouselIndex: (prev.carouselIndex + 1) % 2,
+      }));
+    }, 4000);
+  }
+
   render() {
     if (this.state.hasError) {
+      const phrases = [
+        "L'operació ha finalitzat amb errors.",
+        "Si et plau, torna-ho a provar.",
+      ];
+      const { carouselIndex } = this.state;
+
       return (
-        <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
-          <div className="max-w-6xl w-full bg-white rounded-lg shadow-lg p-8 text-center">
-            <div className="mb-6">
-              <svg
-                className="mx-auto h-16 w-16 text-red-500"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-                />
-              </svg>
+        <div style={{
+          position: 'relative',
+          minHeight: '100vh',
+          background: '#090912',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: '32px',
+          overflow: 'hidden',
+          fontFamily: "'Roboto', sans-serif",
+        }}>
+          <div style={{ textAlign: 'center', maxWidth: '600px', position: 'relative', zIndex: 1 }}>
+            <h2 style={{
+              fontFamily: "'Roboto', sans-serif",
+              fontSize: '44px',
+              fontWeight: 600,
+              color: '#f4f4f5',
+              marginBottom: '16px',
+              letterSpacing: '-0.02em',
+              margin: '0 0 16px 0',
+            }}>
+              Alguna cosa no va alhora
+            </h2>
+
+            <div style={{
+              color: '#a1a1aa',
+              marginBottom: '28px',
+              fontSize: '24px',
+              fontWeight: 300,
+              height: '32px',
+              overflow: 'hidden',
+              position: 'relative',
+            }}>
+              {phrases.map((phrase, i) => {
+                let transform = 'translateX(-100%)';
+                let opacity = 0;
+                if (i === carouselIndex) {
+                  transform = 'translateX(0)';
+                  opacity = 1;
+                } else if (i === (carouselIndex + 1) % 2) {
+                  transform = 'translateX(100%)';
+                  opacity = 1;
+                }
+                return (
+                  <div
+                    key={i}
+                    style={{
+                      position: 'absolute',
+                      top: 0,
+                      left: 0,
+                      width: '100%',
+                      opacity,
+                      transform,
+                      transition: 'transform 0.5s ease',
+                    }}
+                  >
+                    {phrase}
+                  </div>
+                );
+              })}
             </div>
 
-            <h1 className="text-2xl font-bold font-oswald mb-4" style={{ color: '#141414' }}>
-              {this.texts.errorBoundary.title}
-            </h1>
-
-            <p className="text-gray-600 mb-6 font-roboto">
-              {this.texts.errorBoundary.message}
-            </p>
-
             {process.env.NODE_ENV === 'development' && this.state.error && (
-              <div className="mb-6">
-                <details className="text-left bg-gray-100 p-4 rounded text-sm" style={{ maxHeight: '70vh', overflow: 'auto' }}>
-                  <summary className="cursor-pointer font-medium mb-2">{this.texts.errorBoundary.detailsTitle}</summary>
-                  <pre className="text-xs whitespace-pre-wrap break-words" style={{ maxHeight: '60vh', overflow: 'auto' }}>
+              <div style={{ marginBottom: '24px' }}>
+                <details style={{
+                  textAlign: 'left',
+                  background: '#18181b',
+                  padding: '16px',
+                  borderRadius: '6px',
+                  fontSize: '13px',
+                  maxHeight: '40vh',
+                  overflow: 'auto',
+                  color: '#a1a1aa',
+                  border: '1px solid #27272a',
+                }}>
+                  <summary style={{ cursor: 'pointer', fontWeight: 500, marginBottom: '8px', color: '#f4f4f5' }}>
+                    Detalls de l'error
+                  </summary>
+                  <pre style={{
+                    fontSize: '11px',
+                    whiteSpace: 'pre-wrap',
+                    wordBreak: 'break-word',
+                    maxHeight: '30vh',
+                    overflow: 'auto',
+                    margin: 0,
+                  }}>
                     {this.formatError(this.state.error)}
                     {this.state.errorInfo && this.state.errorInfo.componentStack}
                   </pre>
                 </details>
                 <button
                   onClick={this.copyErrorToClipboard}
-                  className="mt-3 w-full flex items-center justify-center gap-2 px-4 py-2 bg-gray-800 hover:bg-gray-700 text-white rounded-md transition-colors font-roboto text-sm font-medium"
+                  style={{
+                    marginTop: '12px',
+                    width: '100%',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '8px',
+                    padding: '10px 16px',
+                    background: '#18181b',
+                    color: '#f4f4f5',
+                    border: '1px solid #27272a',
+                    borderRadius: '4px',
+                    fontFamily: "'Roboto', sans-serif",
+                    fontSize: '13px',
+                    fontWeight: 500,
+                    cursor: 'pointer',
+                  }}
                 >
-                  {this.state.copied ? (
-                    <>
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                      </svg>
-                      <span>Copiat!</span>
-                    </>
-                  ) : (
-                    <>
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                      </svg>
-                      <span>Copiar codi d'error</span>
-                    </>
-                  )}
+                  {this.state.copied ? 'Copiat!' : "Copiar codi d'error"}
                 </button>
               </div>
             )}
 
-            <div className="flex gap-4">
+            <div style={{ display: 'flex', gap: '8px', justifyContent: 'center' }}>
               <Link
                 to="/"
-                className="flex-1 bg-gray-900 text-white px-6 py-3 rounded-md hover:bg-gray-800 transition-colors font-oswald"
                 onClick={() => this.setState({ hasError: false })}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  padding: '10px 24px',
+                  borderRadius: '4px',
+                  fontFamily: "'Roboto', sans-serif",
+                  fontWeight: 500,
+                  fontSize: '14px',
+                  lineHeight: 1,
+                  cursor: 'pointer',
+                  textDecoration: 'none',
+                  background: '#f4f4f5',
+                  color: '#09090b',
+                  border: 'none',
+                }}
               >
-                {this.texts.errorBoundary.backHome}
+                INICI
               </Link>
               <button
                 onClick={() => window.location.reload()}
-                className="flex-1 border border-gray-300 text-gray-700 px-6 py-3 rounded-md hover:bg-gray-50 transition-colors font-oswald"
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  padding: '10px 24px',
+                  borderRadius: '4px',
+                  fontFamily: "'Roboto', sans-serif",
+                  fontWeight: 500,
+                  fontSize: '14px',
+                  lineHeight: 1,
+                  cursor: 'pointer',
+                  background: 'transparent',
+                  border: 'none',
+                  boxShadow: '0 0 0 0.75px #a1a1aa',
+                  color: '#a1a1aa',
+                }}
               >
-                {this.texts.errorBoundary.refresh}
+                REFRESCA
               </button>
             </div>
           </div>

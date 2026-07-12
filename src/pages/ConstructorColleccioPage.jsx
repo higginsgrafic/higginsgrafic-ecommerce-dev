@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { Helmet } from 'react-helmet';
 import Pauta4ColsOverlay from '@/components/pauta/Pauta4ColsOverlay';
-import NikeHeroSlider from '@/components/NikeHeroSlider';
+import HeroSlider from '@/components/HeroSlider';
 import CollectionProductCard from '@/components/tdp/CollectionProductCard';
 import CollectionProductCardV5 from '@/components/tdp/CollectionProductCardV5';
 import TramFinal from '@/components/home/TramFinal';
@@ -16,7 +16,7 @@ const TDP_DESCRIPTION = [
 const tdpImage = (color) =>
   `/placeholders/apparel/t-shirt/gildan_5000/gildan-5000_t-shirt_crewneck_unisex_heavyWeight_xl_${color}_gpr-4-0_front.png`;
 
-// 14 colors canònics (ordre extret de FullWideSlideDemoHeader.jsx).
+// 14 colors canònics (ordre extret de FullWideSlideHeader.jsx).
 // Repetits cíclicament fins a omplir les 16 cel·les del 4x4.
 const TDP_GRID_COLORS = [
   ['white',        'light-blue',     'royal',         'purple'],
@@ -201,7 +201,7 @@ function ConstructorColleccioPage() {
             height: 'calc(100% + 2px)',
           }}
         >
-          <NikeHeroSlider
+          <HeroSlider
             slides={HERO_SLIDES}
             autoplay
             autoplayIntervalMs={8000}

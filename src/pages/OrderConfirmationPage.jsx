@@ -210,7 +210,7 @@ const OrderConfirmationPage = () => {
               {orderData.items.map((item, index) => (
                 <div key={index} className="flex gap-4">
                   <div className="w-20 h-20 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
-                    <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+                    <img src={item.image} alt={item.name} loading="lazy" className="w-full h-full object-cover" />
                   </div>
                   <div className="flex-1">
                     <p className="font-oswald font-bold uppercase">{item.name}</p>

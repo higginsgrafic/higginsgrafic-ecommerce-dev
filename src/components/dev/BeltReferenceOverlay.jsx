@@ -382,7 +382,7 @@ export default function BeltReferenceOverlay({ enabled }) {
       // pauta està al DOM s'utilitza directament; en cas contrari es
       // calcula com `top + 737.015 * scale` on `scale =
       // clamp((xR - xL) / 1350, 0.5, 1)` — la mateixa fórmula que
-      // FullWideSlideDemoHeader fa servir per a `accordionPautaScale`.
+      // FullWideSlideHeader fa servir per a `accordionPautaScale`.
       // Així belt2 funciona com a marc de referència del dev a totes les
       // rutes, fins i tot quan l'acordió no és visible.
       // yCarouselTop: AUTO-REFERENCIAL (calibrat i CONFIRMAT). La guia TOP de
@@ -443,7 +443,7 @@ export default function BeltReferenceOverlay({ enabled }) {
         try {
           // IMPORTANT: agafem NOMÉS el grid global (overlay canonical de 90
           // files), no qualsevol `[data-pauta-grid]`. A pàgines com la home
-          // (`/`) hi ha pautes locals (p.ex. `numRows=24` a HomeClean) que
+          // (`/`) hi ha pautes locals (p.ex. `numRows=24` a Home) que
           // apareixen abans en el DOM i confondrien la lectura: si la primera
           // que trobéssim no té 30 files, saltaríem al fallback matemàtic
           // amb un baseline incorrecte i la guia podria quedar fora del

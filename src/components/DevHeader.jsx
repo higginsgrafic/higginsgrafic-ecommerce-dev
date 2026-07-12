@@ -96,8 +96,7 @@ export default function DevHeader({
   }, [strongHex, softHex, suppressThemeOverrides]);
 
   const demoLinks = [
-    { label: 'Nike També', href: '/nike-tambe' },
-    { label: 'Nike Hero', href: '/nike-hero-demo' },
+    { label: 'Hero Slider', href: '/full-wide-slide-demo' },
   ];
 
   return (

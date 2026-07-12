@@ -63,12 +63,7 @@ function SEO({
     "@context": "https://schema.org",
     "@type": "WebSite",
     "name": "GRÀFIC",
-    "url": SITE_ORIGIN,
-    "potentialAction": {
-      "@type": "SearchAction",
-      "target": buildSiteUrl('/search?q={search_term_string}'),
-      "query-input": "required name=search_term_string"
-    }
+    "url": SITE_ORIGIN
   };
 
   return (

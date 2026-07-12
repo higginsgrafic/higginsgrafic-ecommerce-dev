@@ -3,9 +3,9 @@ import { useLocation } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 import Pauta4ColsOverlay from '@/components/pauta/Pauta4ColsOverlay';
 import CollectionProductCard from '@/components/tdp/CollectionProductCard';
-import TambeRail from '@/pages/nikeTambe/TambeRail';
-import RespescaTitle from '@/pages/nikeTambe/RespescaTitle';
-import CarouselArrows from '@/pages/nikeTambe/CarouselArrows';
+import TambeRail from '@/pages/productRail/TambeRail';
+import RespescaTitle from '@/pages/productRail/RespescaTitle';
+import CarouselArrows from '@/pages/productRail/CarouselArrows';
 import Breadcrumbs from '@/components/Breadcrumbs';
 import EditableTextBox from '@/components/dev/EditableTextBox';
 import { useDebugOverlays } from '@/hooks/useDebugOverlays';
@@ -772,7 +772,7 @@ function ConstructorPdpPage() {
           style={{ gridColumn: '4 / 5', gridRow: '17 / 18', zIndex: 100005, width: 0, height: 0, justifySelf: 'end' }}
         />
 
-        {/* ─── Bloc "També et pot interessar" (rail Nike) - Dins de la graella de la pauta alineat al top de la fila 48 ─── */}
+        {/* ─── Bloc "També et pot interessar" (rail recomanats) - Dins de la graella de la pauta alineat al top de la fila 48 ─── */}
         <div
           style={{
             gridColumn: '1 / 5',

@@ -1,7 +1,7 @@
 import { forwardRef } from 'react';
 import Pauta4ColsOverlay from '@/components/pauta/Pauta4ColsOverlay';
-import TambeRail from '@/pages/nikeTambe/TambeRail';
-import CarouselArrows from '@/pages/nikeTambe/CarouselArrows';
+import TambeRail from '@/pages/productRail/TambeRail';
+import CarouselArrows from '@/pages/productRail/CarouselArrows';
 
 // =============================================================================
 //  TRAM FINAL — Component reutilitzable
