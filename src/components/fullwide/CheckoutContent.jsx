@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ChevronLeft, ChevronRight, ArrowLeft, X, Check } from 'lucide-react';
+import { Check } from 'lucide-react';
 import { validateEmail, validateRequired, validatePostalCode, validateForm } from '@/utils/validation';
 import { trackBeginCheckout, trackPurchase } from '@/utils/analytics';
 
@@ -11,23 +11,24 @@ function CheckoutContent({ cartItems, setCartItems, onCloseMegaSlide }) {
     firstName: '',
     lastName: '',
     address: '',
+    address2: '',
     city: '',
     postalCode: '',
     country: 'Espanya',
+    phone: '',
     cardNumber: '',
     expiryDate: '',
     cvv: '',
   });
   const [formErrors, setFormErrors] = useState({});
   const [isProcessing, setIsProcessing] = useState(false);
+  const [paymentDetailsOpen, setPaymentDetailsOpen] = useState(false);
 
   const ROW_H = 32.8;
-  const GUTTER = 7.5;
   const V_GUTTER = 2.8;
   const TOP_OFFSET = 1.5 * ROW_H;
   const TABLE_WIDTH = 675;
-  const COLS = 4;
-  const COL_WIDTH = (TABLE_WIDTH - GUTTER * (COLS - 1)) / COLS; // meitat d'amplada
+  const FORM_WIDTH = 384;
 
   const activeItems = useMemo(
     () => (cartItems || []).filter(it => !it.disabled),
@@ -128,49 +129,57 @@ function CheckoutContent({ cartItems, setCartItems, onCloseMegaSlide }) {
         <span style={{ ...HEAD, fontSize: '18pt', fontWeight: 600 }}>CHECKOUT</span>
       </div>
 
-      {/* Formulari — columna esquerra (dades enviament) */}
+      {/* Contenidor principal — dues columnes (estil Stripe Link) */}
       <div style={{
         position: 'absolute',
         top: `${TOP_OFFSET + 2 * ROW_H}px`,
         left: `calc(50% - ${TABLE_WIDTH / 2}px)`,
-        width: `${COL_WIDTH * 2 + GUTTER}px`,
+        width: `${TABLE_WIDTH}px`,
+        display: 'grid',
+        gridTemplateColumns: '1fr 1fr',
+        columnGap: '45px',
         zIndex: 2,
         pointerEvents: 'auto',
       }}>
-        <div style={{ ...HEAD, fontSize: '12pt', marginBottom: '12px' }}>DADES D'ENVIAMENT</div>
-        <div style={{ display: 'grid', rowGap: '10px' }}>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', columnGap: '10px' }}>
-            <div>
-              <label style={{ ...LABEL, display: 'block', marginBottom: '3px' }}>Nom</label>
-              <input type="text" name="firstName" value={formData.firstName} onChange={handleChange} placeholder="Nom" style={inputStyle} />
-              {formErrors.firstName && <div style={errorStyle}>{formErrors.firstName}</div>}
+
+      {/* ═══ COLUMNA ESQUERRA: Dades d'enviament ═══ */}
+      <div>
+
+        {/* Dades d'enviament */}
+        <div style={{ display: 'grid', rowGap: '12px' }}>
+          <div style={{ fontSize: '12pt', fontWeight: 500, color: '#4A5057', fontFamily: 'Roboto Condensed, sans-serif' }}>Dades d'enviament</div>
+          <div style={{ display: 'grid', rowGap: '8px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', columnGap: '10px' }}>
+              <div>
+                <label style={{ ...LABEL, display: 'block', marginBottom: '3px' }}>Nom</label>
+                <input type="text" name="firstName" value={formData.firstName} onChange={handleChange} placeholder="Nom" style={inputStyle} />
+                {formErrors.firstName && <div style={errorStyle}>{formErrors.firstName}</div>}
+              </div>
+              <div>
+                <label style={{ ...LABEL, display: 'block', marginBottom: '3px' }}>Cognoms</label>
+                <input type="text" name="lastName" value={formData.lastName} onChange={handleChange} placeholder="Cognoms" style={inputStyle} />
+                {formErrors.lastName && <div style={errorStyle}>{formErrors.lastName}</div>}
+              </div>
             </div>
             <div>
-              <label style={{ ...LABEL, display: 'block', marginBottom: '3px' }}>Cognoms</label>
-              <input type="text" name="lastName" value={formData.lastName} onChange={handleChange} placeholder="Cognoms" style={inputStyle} />
-              {formErrors.lastName && <div style={errorStyle}>{formErrors.lastName}</div>}
-            </div>
-          </div>
-          <div>
-            <label style={{ ...LABEL, display: 'block', marginBottom: '3px' }}>Email</label>
-            <input type="email" name="email" value={formData.email} onChange={handleChange} placeholder="email@exemple.com" style={inputStyle} />
-            {formErrors.email && <div style={errorStyle}>{formErrors.email}</div>}
-          </div>
-          <div>
-            <label style={{ ...LABEL, display: 'block', marginBottom: '3px' }}>Adreça</label>
-            <input type="text" name="address" value={formData.address} onChange={handleChange} placeholder="Carrer, número, pis" style={inputStyle} />
-            {formErrors.address && <div style={errorStyle}>{formErrors.address}</div>}
-          </div>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', columnGap: '10px' }}>
-            <div>
-              <label style={{ ...LABEL, display: 'block', marginBottom: '3px' }}>Codi postal</label>
-              <input type="text" name="postalCode" value={formData.postalCode} onChange={handleChange} placeholder="08001" maxLength={5} style={inputStyle} />
-              {formErrors.postalCode && <div style={errorStyle}>{formErrors.postalCode}</div>}
+              <label style={{ ...LABEL, display: 'block', marginBottom: '3px' }}>Adreça</label>
+              <input type="text" name="address" value={formData.address} onChange={handleChange} placeholder="Carrer i número" style={inputStyle} />
+              {formErrors.address && <div style={errorStyle}>{formErrors.address}</div>}
             </div>
             <div>
-              <label style={{ ...LABEL, display: 'block', marginBottom: '3px' }}>Ciutat</label>
-              <input type="text" name="city" value={formData.city} onChange={handleChange} placeholder="Barcelona" style={inputStyle} />
-              {formErrors.city && <div style={errorStyle}>{formErrors.city}</div>}
+              <input type="text" name="address2" value={formData.address2} onChange={handleChange} placeholder="Pis, porta" style={inputStyle} />
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', columnGap: '10px' }}>
+              <div>
+                <label style={{ ...LABEL, display: 'block', marginBottom: '3px' }}>Codi postal</label>
+                <input type="text" name="postalCode" value={formData.postalCode} onChange={handleChange} placeholder="08001" maxLength={5} style={inputStyle} />
+                {formErrors.postalCode && <div style={errorStyle}>{formErrors.postalCode}</div>}
+              </div>
+              <div>
+                <label style={{ ...LABEL, display: 'block', marginBottom: '3px' }}>Ciutat</label>
+                <input type="text" name="city" value={formData.city} onChange={handleChange} placeholder="Barcelona" style={inputStyle} />
+                {formErrors.city && <div style={errorStyle}>{formErrors.city}</div>}
+              </div>
             </div>
             <div>
               <label style={{ ...LABEL, display: 'block', marginBottom: '3px' }}>País</label>
@@ -180,79 +189,157 @@ function CheckoutContent({ cartItems, setCartItems, onCloseMegaSlide }) {
                 <option value="Andorra">Andorra</option>
               </select>
             </div>
+            <div>
+              <label style={{ ...LABEL, display: 'block', marginBottom: '3px' }}>Telèfon</label>
+              <input type="text" name="phone" value={formData.phone} onChange={handleChange} placeholder="+34 600 123 456" style={inputStyle} />
+            </div>
           </div>
+          <label style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', fontSize: '9.5pt', lineHeight: 1.25, fontWeight: 300, color: '#4A5057', fontFamily: 'Roboto Condensed, sans-serif', marginTop: '4px' }}>
+            <input type="checkbox" checked readOnly style={{ marginTop: '1px' }} />
+            <span>Accepto els Termes del Servei, la Política de Privacitat i la Política d'ús acceptable.</span>
+          </label>
         </div>
       </div>
 
-      {/* Formulari — columna dreta (pagament) */}
-      <div style={{
-        position: 'absolute',
-        top: `${TOP_OFFSET + 2 * ROW_H}px`,
-        left: `calc(50% - ${TABLE_WIDTH / 2}px + ${COL_WIDTH * 2 + GUTTER * 2}px)`,
-        width: `${COL_WIDTH * 2 + GUTTER}px`,
-        zIndex: 2,
-        pointerEvents: 'auto',
-      }}>
-        <div style={{ ...HEAD, fontSize: '12pt', marginBottom: '12px' }}>PAGAMENT</div>
+      {/* ═══ COLUMNA DRETA: Targeta Link + Pagament ═══ */}
+      <div>
+
+        {/* Targeta Link */}
         <div style={{
           border: '1px solid #E6E8EC',
-          borderRadius: '6px',
+          borderRadius: '9px',
           background: '#FFFFFF',
+          boxShadow: '0 1px 2px rgba(16, 24, 40, 0.04)',
           overflow: 'hidden',
         }}>
           <div style={{
-            padding: '10px 12px',
-            borderBottom: '1px solid #EEF0F3',
+            height: '42px',
             display: 'flex',
             alignItems: 'center',
-            gap: '8px',
-            fontSize: '11pt',
-            fontWeight: 500,
-            color: '#4A5057',
-            fontFamily: 'Roboto Condensed, sans-serif',
+            justifyContent: 'space-between',
+            padding: '0 16px',
+            borderBottom: '1px solid #EEF0F3',
           }}>
-            <span style={{ width: '13px', height: '10px', border: '1px solid #4A5057', borderRadius: '2px', display: 'inline-block' }} />
-            <span>Targeta</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '7px', fontSize: '12pt', fontWeight: 600, fontFamily: 'Roboto Condensed, sans-serif', color: '#4A5057' }}>
+              <span style={{ width: '18px', height: '18px', borderRadius: '50%', background: '#00D66F', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', color: '#FFFFFF', fontSize: '9pt', fontWeight: 700 }}>›</span>
+              <span>link</span>
+            </div>
+            <span style={{ color: '#98A2B4', fontSize: '15pt', lineHeight: 1 }}>···</span>
           </div>
-          <div style={{ padding: '10px 12px', display: 'grid', rowGap: '8px' }}>
-            <div>
-              <label style={{ ...LABEL, display: 'block', marginBottom: '3px' }}>Número de targeta</label>
-              <input type="text" name="cardNumber" value={formData.cardNumber} onChange={handleChange} placeholder="4242 4242 4242 4242" maxLength={19} style={inputStyle} />
+          <div style={{ padding: '14px 16px 12px', display: 'grid', rowGap: '14px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '74px 1fr', alignItems: 'center', columnGap: '12px', fontSize: '11pt', fontFamily: 'Roboto Condensed, sans-serif' }}>
+              <span style={{ color: '#667085', fontWeight: 300 }}>Email</span>
+              <input type="email" name="email" value={formData.email} onChange={handleChange} placeholder="email@exemple.com" style={{ border: 'none', outline: 'none', background: 'transparent', color: '#4A5057', fontFamily: 'Roboto Condensed, sans-serif', fontSize: '11pt', fontWeight: 400 }} />
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', columnGap: '10px' }}>
-              <div>
-                <label style={{ ...LABEL, display: 'block', marginBottom: '3px' }}>Caducitat</label>
-                <input type="text" name="expiryDate" value={formData.expiryDate} onChange={handleChange} placeholder="MM / YY" maxLength={5} style={inputStyle} />
-              </div>
-              <div>
-                <label style={{ ...LABEL, display: 'block', marginBottom: '3px' }}>CVC</label>
-                <input type="text" name="cvv" value={formData.cvv} onChange={handleChange} placeholder="123" maxLength={4} style={inputStyle} />
+            {formErrors.email && <div style={{ ...errorStyle, paddingLeft: '86px' }}>{formErrors.email}</div>}
+            <div style={{ display: 'grid', gridTemplateColumns: '74px 1fr', alignItems: 'center', columnGap: '12px', fontSize: '11pt', fontFamily: 'Roboto Condensed, sans-serif' }}>
+              <span style={{ color: '#667085', fontWeight: 300 }}>Paga amb</span>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', minWidth: 0 }}>
+                <span style={{ width: '28px', height: '18px', borderRadius: '4px', background: '#111827', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', color: '#F59E0B', fontSize: '8pt', flexShrink: 0 }}>●●</span>
+                <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontWeight: 400, color: '#4A5057' }}>Mastercard</span>
+                <span style={{ color: '#98A2B4', fontWeight: 300, whiteSpace: 'nowrap' }}>•••• 1234</span>
               </div>
             </div>
+            <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '10.5pt', fontWeight: 300, color: '#4A5057', fontFamily: 'Roboto Condensed, sans-serif' }}>
+              <input type="checkbox" />
+              <span>Si falla, utilitza Visa •••• 5678</span>
+            </label>
           </div>
         </div>
-        <div style={{ marginTop: '10px', fontSize: '9pt', color: '#667085', fontFamily: 'Roboto Condensed, sans-serif', lineHeight: 1.3 }}>
-          Pagament segur encriptat. Les teves dades no es guarden.
+
+        {/* Botó confirma */}
+        <button
+          onClick={handleSubmit}
+          disabled={isProcessing}
+          style={{
+            width: '100%',
+            height: '46px',
+            border: 'none',
+            borderRadius: '5px',
+            backgroundColor: isProcessing ? '#8FE8B9' : '#00D66F',
+            color: '#063B21',
+            fontFamily: 'Roboto Condensed, sans-serif',
+            fontSize: '12pt',
+            fontWeight: 600,
+            letterSpacing: '0.01em',
+            boxShadow: '0 1px 2px rgba(16, 24, 40, 0.08)',
+            cursor: isProcessing ? 'not-allowed' : 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '8px',
+            marginTop: '14px',
+          }}
+        >
+          {isProcessing ? 'Processant…' : (<><Check size={18} strokeWidth={2} /> Confirma la compra</>)}
+        </button>
+
+        {/* Text legal */}
+        <div style={{ marginTop: '10px', textAlign: 'center', color: '#667085', fontSize: '9pt', fontWeight: 300, fontFamily: 'Roboto Condensed, sans-serif', lineHeight: 1.25 }}>
+          En confirmar el pagament, autoritzes el càrrec d'aquest pagament i futurs pagaments segons els termes.
         </div>
+
+        {/* Toggle continua com a hoste */}
+        <button
+          type="button"
+          onClick={() => setPaymentDetailsOpen(open => !open)}
+          style={{ width: '100%', border: 'none', background: 'transparent', color: '#4A5057', fontFamily: 'Roboto Condensed, sans-serif', fontSize: '10pt', fontWeight: 500, cursor: 'pointer', marginTop: '16px' }}
+        >
+          {paymentDetailsOpen ? 'Amaga les dades de pagament' : 'Continua com a hoste'}
+        </button>
+
+        {/* Dades de pagament desplegables */}
+        {paymentDetailsOpen && (
+          <div style={{ marginTop: '16px', display: 'grid', rowGap: '12px' }}>
+            <div style={{ fontSize: '12pt', fontWeight: 500, color: '#4A5057', fontFamily: 'Roboto Condensed, sans-serif' }}>Dades de pagament</div>
+            <div style={{ border: '1px solid #E6E8EC', borderRadius: '6px', background: '#FFFFFF', overflow: 'hidden' }}>
+              <div style={{ padding: '10px 12px', borderBottom: '1px solid #EEF0F3', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '11pt', fontWeight: 500, fontFamily: 'Roboto Condensed, sans-serif', color: '#4A5057' }}>
+                <span style={{ width: '13px', height: '10px', border: '1px solid #4A5057', borderRadius: '2px', display: 'inline-block' }} />
+                <span>Targeta</span>
+              </div>
+              <div style={{ padding: '10px 12px', display: 'grid', rowGap: '8px' }}>
+                <label style={{ display: 'grid', rowGap: '4px', fontSize: '10pt', fontWeight: 300, color: '#667085', fontFamily: 'Roboto Condensed, sans-serif' }}>
+                  Informació de la targeta
+                  <div style={{ border: '1px solid #D8DDE3', borderRadius: '4px', overflow: 'hidden', background: '#FFFFFF' }}>
+                    <input type="text" name="cardNumber" value={formData.cardNumber} onChange={handleChange} placeholder="4242 4242 4242 4242" maxLength={19} style={{ width: '100%', height: '31px', border: 'none', borderBottom: '1px solid #E6E8EC', padding: '0 10px', fontFamily: 'Roboto Condensed, sans-serif', fontSize: '10.5pt', color: '#4A5057', outline: 'none', boxSizing: 'border-box' }} />
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr' }}>
+                      <input type="text" name="expiryDate" value={formData.expiryDate} onChange={handleChange} placeholder="MM / YY" maxLength={5} style={{ height: '31px', border: 'none', borderRight: '1px solid #E6E8EC', padding: '0 10px', fontFamily: 'Roboto Condensed, sans-serif', fontSize: '10.5pt', color: '#4A5057', outline: 'none', boxSizing: 'border-box' }} />
+                      <input type="text" name="cvv" value={formData.cvv} onChange={handleChange} placeholder="CVC" maxLength={4} style={{ height: '31px', border: 'none', padding: '0 10px', fontFamily: 'Roboto Condensed, sans-serif', fontSize: '10.5pt', color: '#4A5057', outline: 'none', boxSizing: 'border-box' }} />
+                    </div>
+                  </div>
+                </label>
+                <label style={{ display: 'grid', rowGap: '4px', fontSize: '10pt', fontWeight: 300, color: '#667085', fontFamily: 'Roboto Condensed, sans-serif' }}>
+                  Nom del titular
+                  <input type="text" name="firstName" value={formData.firstName} onChange={handleChange} placeholder="Nom tal com surt a la targeta" style={{ height: '32px', border: '1px solid #D8DDE3', borderRadius: '4px', padding: '0 10px', fontFamily: 'Roboto Condensed, sans-serif', fontSize: '10.5pt', color: '#4A5057', outline: 'none' }} />
+                </label>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Footer */}
+        <div style={{ marginTop: '16px', textAlign: 'center', color: '#98A2B4', fontSize: '8.5pt', fontWeight: 300, fontFamily: 'Roboto Condensed, sans-serif' }}>
+          Powered by Stripe&nbsp;&nbsp;|&nbsp;&nbsp;Termes&nbsp;&nbsp;Privacitat
+        </div>
+      </div>
       </div>
 
       {/* Totals — fila inferior */}
       {(() => {
-        const TOTALS_ROW = 16;
+        const PAYMENT_EXPAND_ROWS = paymentDetailsOpen ? 6 : 0;
+        const TOTALS_ROW = 17 + PAYMENT_EXPAND_ROWS;
         const rows = [
-          { label: 'Subtotal', amount: fmt(subtotal), strong: false },
-          { label: 'Transport', amount: fmt(shipping), strong: false, strike: shipping === 0 },
-          { label: 'IVA 21%', amount: fmt(ivaAmount), strong: false },
-          { label: 'Tot plegat fa', amount: fmt(total), strong: true },
+          { label: 'Subtotal', amount: subtotalParts, strong: false },
+          { label: 'Transport', amount: shippingParts, strong: false, strike: shipping === 0 },
+          { label: 'IVA 21%', amount: ivaParts, strong: false },
+          { label: 'Tot plegat fa', amount: totalParts, strong: true },
         ];
         return rows.map((r, k) => {
           const rowTop = TOP_OFFSET + (TOTALS_ROW - 1 + k) * ROW_H;
-          const parts = splitPrice(r.strike ? 0 : (r.label === 'Subtotal' ? subtotal : r.label === 'Transport' ? shipping : r.label === 'IVA 21%' ? ivaAmount : total));
-          const amountValue = r.strike ? splitPrice(0) : parts;
           const labelStyle = {
             fontFamily: 'Oswald, sans-serif',
-            fontWeight: r.strong ? 400 : 300,
-            fontSize: r.strong ? '20pt' : '14pt',
+            fontWeight: r.strong ? 200 : 300,
+            fontSize: r.strong ? '24pt' : '18pt',
             color: r.strong ? '#474F59' : '#99A3B5',
             letterSpacing: '0.4px',
             textTransform: 'uppercase',
@@ -261,8 +348,8 @@ function CheckoutContent({ cartItems, setCartItems, onCloseMegaSlide }) {
           };
           const amountStyle = {
             fontFamily: 'Oswald, sans-serif',
-            fontWeight: r.strong ? 500 : 300,
-            fontSize: r.strong ? '22pt' : '14pt',
+            fontWeight: r.strong ? 300 : 300,
+            fontSize: r.strong ? '24pt' : '18pt',
             color: r.strong ? '#474F59' : '#99A3B5',
             letterSpacing: '0.6px',
             whiteSpace: 'nowrap',
@@ -286,68 +373,14 @@ function CheckoutContent({ cartItems, setCartItems, onCloseMegaSlide }) {
               borderTop: r.strong ? '1px solid rgba(71, 80, 89, 0.18)' : 'none',
             }}>
               <span style={labelStyle}>{r.label}</span>
-              <span style={{ display: 'flex', alignItems: 'baseline' }}>
-                <span style={{ ...amountStyle, textAlign: 'right' }}>{amountValue.intPart},</span>
-                <span style={{ ...amountStyle, marginLeft: '-2px' }}>{amountValue.decPart}€</span>
+              <span style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'flex-end', marginRight: r.strong ? '0' : '12px' }}>
+                <span style={{ ...amountStyle, width: '90px', textAlign: 'right', display: 'block' }}>{r.amount.intPart},</span>
+                <span style={{ ...amountStyle, marginLeft: '-2px' }}>{r.amount.decPart}€</span>
               </span>
             </div>
           );
         });
       })()}
-
-      {/* Botó confirma */}
-      <div style={{
-        position: 'absolute',
-        top: `${TOP_OFFSET + 20 * ROW_H}px`,
-        left: '50%',
-        transform: 'translateX(-50%)',
-        width: `${TABLE_WIDTH}px`,
-        display: 'flex',
-        justifyContent: 'center',
-        zIndex: 4,
-        pointerEvents: 'auto',
-      }}>
-        <button
-          onClick={handleSubmit}
-          disabled={isProcessing}
-          style={{
-            width: 'min(100%, 384px)',
-            height: '46px',
-            border: 'none',
-            borderRadius: '5px',
-            backgroundColor: isProcessing ? '#8FE8B9' : '#00D66F',
-            color: '#063B21',
-            fontFamily: 'Roboto Condensed, sans-serif',
-            fontSize: '12pt',
-            fontWeight: 600,
-            letterSpacing: '0.01em',
-            cursor: isProcessing ? 'not-allowed' : 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: '8px',
-          }}
-        >
-          {isProcessing ? 'Processant…' : (<><Check size={18} strokeWidth={2} /> Confirma la compra</>)}
-        </button>
-      </div>
-
-      {/* Powered by */}
-      <div style={{
-        position: 'absolute',
-        top: `${TOP_OFFSET + 21 * ROW_H}px`,
-        left: '50%',
-        transform: 'translateX(-50%)',
-        width: `${TABLE_WIDTH}px`,
-        textAlign: 'center',
-        color: '#98A2B4',
-        fontSize: '8.5pt',
-        fontFamily: 'Roboto Condensed, sans-serif',
-        fontWeight: 300,
-        zIndex: 2,
-      }}>
-        Powered by Stripe&nbsp;&nbsp;|&nbsp;&nbsp;Termes&nbsp;&nbsp;Privacitat
-      </div>
     </>
   );
 }
