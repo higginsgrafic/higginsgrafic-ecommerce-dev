@@ -4,8 +4,10 @@ import { Check } from 'lucide-react';
 import { validateEmail, validateRequired, validatePostalCode, validateForm } from '@/utils/validation';
 import { trackBeginCheckout, trackPurchase } from '@/utils/analytics';
 import { useShippingCosts } from '@/hooks/useShippingCosts';
+import { useOrders } from '@/hooks/useOrders';
 
 function CheckoutContent({ cartItems, setCartItems, onCloseMegaSlide }) {
+  const { createOrder } = useOrders();
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     email: '',
@@ -88,13 +90,36 @@ function CheckoutContent({ cartItems, setCartItems, onCloseMegaSlide }) {
     setFormErrors({});
     setIsProcessing(true);
     try {
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      const orderId = 'GRF-2024-' + Math.random().toString(36).substr(2, 9).toUpperCase();
-      trackPurchase(orderId, activeItems, total, shipping, 0);
+      let orderNumber = null;
+      if (!import.meta.env.DEV) {
+        const order = await createOrder({
+          email: formData.email,
+          items: activeItems,
+          subtotal,
+          shippingCost: shipping,
+          iva: ivaAmount,
+          total,
+          shippingZone: 'es_peninsula',
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          address: formData.address,
+          address2: formData.address2,
+          city: formData.city,
+          postalCode: formData.postalCode,
+          country: formData.country,
+          phone: formData.phone,
+        });
+        orderNumber = order?.order_number || null;
+      } else {
+        await new Promise(resolve => setTimeout(resolve, 1200));
+        orderNumber = 'GRF-DEV-' + Math.random().toString(36).substr(2, 9).toUpperCase();
+      }
+      trackPurchase(orderNumber, activeItems, total, shipping, 0);
       if (setCartItems) setCartItems([]);
       setIsProcessing(false);
-      navigate(`/order-confirmation/${orderId}`);
+      navigate(`/order-confirmation/${orderNumber}`);
     } catch (err) {
+      console.error('[checkout] Error creating order:', err);
       setIsProcessing(false);
     }
   };

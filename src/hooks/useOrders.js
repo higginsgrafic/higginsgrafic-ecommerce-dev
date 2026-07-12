@@ -1,0 +1,118 @@
+import { useState, useEffect, useCallback, useRef } from 'react';
+
+const STATUS_ICONS = {
+  'PENDENT': 'MoreHorizontal',
+  'CONFIRMADA': 'Check',
+  'EN PREPARACIÓ': 'Loader2',
+  'SEGUIMENT': 'Search',
+  'EN REPARTIMENT': 'Truck',
+  'ATURADA': 'AlertCircle',
+  'CANCEL·LADA': 'X',
+  'ENTREGADA': 'Package',
+};
+
+const STATUS_ACTIVE = {
+  'PENDENT': true,
+  'CONFIRMADA': true,
+  'EN PREPARACIÓ': true,
+  'SEGUIMENT': true,
+  'EN REPARTIMENT': true,
+  'ATURADA': false,
+  'CANCEL·LADA': false,
+  'ENTREGADA': false,
+};
+
+function formatDate(dateStr) {
+  if (!dateStr) return '';
+  try {
+    const d = new Date(dateStr);
+    const dd = String(d.getDate()).padStart(2, '0');
+    const mm = String(d.getMonth() + 1).padStart(2, '0');
+    const yy = String(d.getFullYear()).slice(-2);
+    return `${dd}-${mm}-${yy}`;
+  } catch {
+    return '';
+  }
+}
+
+function formatTotal(num) {
+  if (typeof num !== 'number') num = parseFloat(num) || 0;
+  return num.toFixed(2).replace('.', ',') + '€';
+}
+
+function mapOrderFromApi(o) {
+  return {
+    num: o.order_number || o.id,
+    status: o.statusLabel || o.status || 'PENDENT',
+    icon: STATUS_ICONS[o.statusLabel] || 'MoreHorizontal',
+    date: formatDate(o.created_at),
+    total: formatTotal(o.total),
+    active: STATUS_ACTIVE[o.statusLabel] !== false,
+    raw: o,
+  };
+}
+
+export function useOrders(email) {
+  const [orders, setOrders] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const emailRef = useRef(email);
+
+  const fetchOrders = useCallback(async (emailToFetch) => {
+    const targetEmail = emailToFetch || emailRef.current;
+    if (!targetEmail) return;
+
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await fetch(`/api/orders?email=${encodeURIComponent(targetEmail)}`);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+      if (data.orders && Array.isArray(data.orders)) {
+        setOrders(data.orders.map(mapOrderFromApi));
+      }
+    } catch (err) {
+      console.warn('[useOrders] Fetch failed:', err.message);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const createOrder = useCallback(async (orderData) => {
+    const res = await fetch('/api/orders', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(orderData),
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    if (data.order) {
+      const mapped = mapOrderFromApi(data.order);
+      setOrders((prev) => [mapped, ...prev]);
+    }
+    return data.order;
+  }, []);
+
+  const updateOrderStatus = useCallback(async (orderNumber, status) => {
+    const res = await fetch('/api/orders', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ orderNumber, status }),
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    if (data.order) {
+      const mapped = mapOrderFromApi(data.order);
+      setOrders((prev) => prev.map((o) => (o.num === mapped.num ? mapped : o)));
+    }
+    return data.order;
+  }, []);
+
+  useEffect(() => {
+    emailRef.current = email;
+    if (import.meta.env.DEV) return;
+    if (email) fetchOrders(email);
+  }, [email, fetchOrders]);
+
+  return { orders, loading, error, fetchOrders, createOrder, updateOrderStatus };
+}
