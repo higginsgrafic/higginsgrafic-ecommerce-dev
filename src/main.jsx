@@ -67,6 +67,8 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import { ProductProvider } from '@/contexts/ProductContext';
+import { CartProvider } from '@/contexts/CartContext';
+import { WishlistProvider } from '@/contexts/WishlistContext';
 import { ToastProvider } from '@/contexts/ToastContext';
 import { GridDebugProvider } from '@/contexts/GridDebugContext';
 import { AdminProvider } from '@/contexts/AdminContext';
@@ -87,13 +89,17 @@ ReactDOM.createRoot(document.getElementById('root')).render(
     <AdminProvider>
       <AdminToolsProvider>
         <GridDebugProvider>
-          <ProductProvider>
-            <ToastProvider>
-              <App />
-              <BranchBadge />
-              <ActiveWorkOverlay />
-            </ToastProvider>
-          </ProductProvider>
+          <CartProvider>
+            <WishlistProvider>
+              <ProductProvider>
+                <ToastProvider>
+                  <App />
+                  <BranchBadge />
+                  <ActiveWorkOverlay />
+                </ToastProvider>
+              </ProductProvider>
+            </WishlistProvider>
+          </CartProvider>
         </GridDebugProvider>
       </AdminToolsProvider>
     </AdminProvider>

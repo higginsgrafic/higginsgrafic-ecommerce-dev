@@ -127,6 +127,17 @@ export default defineConfig({
     assetsDir: 'assets',
     sourcemap: false,
     copyPublicDir: true,
+    chunkSizeWarningLimit: 600,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'react-vendor': ['react', 'react-dom', 'react-router-dom', 'react-helmet'],
+          'supabase': ['@supabase/supabase-js'],
+          'radix-ui': ['@radix-ui/react-toast', '@radix-ui/react-dialog', '@radix-ui/react-dropdown-menu'],
+          'motion': ['framer-motion'],
+        },
+      },
+    },
   },
   assetsInclude: ['**/*.zip', '**/*.tar.gz'],
 })

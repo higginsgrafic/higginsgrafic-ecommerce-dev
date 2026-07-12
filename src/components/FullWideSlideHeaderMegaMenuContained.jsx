@@ -1,5 +1,5 @@
 import React, { useRef } from 'react';
-import FullWideSlideDemoHeader from '@/components/FullWideSlideDemoHeader';
+import FullWideSlideHeader from '@/components/FullWideSlideHeader';
 
 export default function FullWideSlideHeaderMegaMenuContained({
   portalContainer,
@@ -24,7 +24,7 @@ export default function FullWideSlideHeaderMegaMenuContained({
         }}
       >
         <div className="h-full w-full overflow-y-auto">
-          <FullWideSlideDemoHeader
+          <FullWideSlideHeader
             contained
             portalContainer={effectivePortalContainer}
             manualEnabledOverride={manualEnabledOverride}

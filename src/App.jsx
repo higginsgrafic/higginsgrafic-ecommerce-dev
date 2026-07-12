@@ -27,21 +27,16 @@ import DevHeader from '@/components/DevHeader';
 import ScrollToTop from '@/components/ScrollToTop';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import Footer from '@/components/Footer';
-import Checkout from '@/components/Checkout';
 import SupabaseCollectionRoute from '@/pages/SupabaseCollectionRoute.jsx';
 import SiteFrame from '@/components/layout/SiteFrame.jsx';
-import SlideShell from '@/components/SlideShell';
-import useSlidesConfig from '@/hooks/useSlidesConfig';
 import useComponentCatalogConfig from '@/hooks/useComponentCatalogConfig';
 
 const FulfillmentPage = lazy(() => import('@/pages/FulfillmentPage'));
 const FulfillmentSettingsPage = lazy(() => import('@/pages/FulfillmentSettingsPage'));
 const ProductDetailPageEnhanced = lazy(() => import('@/pages/ProductDetailPageEnhanced'));
-const ProductPage = lazy(() => import('@/pages/ProductPage'));
 
 // Lazy loading de pàgines per millorar performance (code splitting)
-const HomeClean = lazy(() => import('@/pages/HomeClean'));
-const NewPage = lazy(() => import('@/pages/NewPage'));
+const Home = lazy(() => import('@/pages/Home'));
 const OrderTrackingPage = lazy(() => import('@/pages/OrderTrackingPage'));
 const CheckoutPage = lazy(() => import('@/pages/CheckoutPage'));
 const NotFoundPage = lazy(() => import('@/pages/NotFoundPage'));
@@ -69,11 +64,9 @@ const PromotionsManagerPage = lazy(() => import('@/pages/PromotionsManagerPage')
 const ECConfigPage = lazy(() => import('@/pages/ECConfigPage'));
 const SystemMessagesPage = lazy(() => import('@/pages/SystemMessagesPage'));
 const AdminMediaPage = lazy(() => import('@/pages/AdminMediaPage'));
-const UserIconPicker = lazy(() => import('@/pages/UserIconPicker'));
 const HeroSettingsPage = lazy(() => import('@/pages/HeroSettingsPage'));
 const AdminStudioLayout = lazy(() => import('@/components/AdminStudioLayout'));
 const FullWideSlidePage = lazy(() => import('@/pages/FullWideSlidePage'));
-const DocumentationFilesPage = lazy(() => import('@/pages/DocumentationFilesPage'));
 const GelatoBlankProductsPage = lazy(() => import('@/pages/GelatoBlankProductsPage'));
 const AdminUploadPage = lazy(() => import('@/pages/AdminUploadPage'));
 const UnitatsCanviPage = lazy(() => import('@/pages/UnitatsCanviPage'));
@@ -88,21 +81,15 @@ const ProductsOverviewPage = lazy(() => import('@/pages/ProductsOverviewPage'));
 const AdminPlantillesPage = lazy(() => import('@/pages/AdminPlantillesPage.jsx'));
 const PlantillaCatalegComponentsPage = lazy(() => import('@/pages/PlantillaCatalegComponentsPage'));
 
-const NikeTambePage = lazy(() => import('@/pages/NikeTambePage.jsx'));
 const DevLinksPage = lazy(() => import('@/pages/DevLinksPage'));
 const ContactSheetPage = lazy(() => import('@/pages/dev/ContactSheetPage'));
 const SiteMapPage = lazy(() => import('@/pages/dev/SiteMapPage'));
 const ConstructorColleccioPage = lazy(() => import('@/pages/ConstructorColleccioPage'));
-const ConstructorColleccioFirstContactPage = lazy(() => import('@/pages/ConstructorColleccioFirstContactPage'));
-const ConstructorColleccioTheHumanInsidePage = lazy(() => import('@/pages/ConstructorColleccioTheHumanInsidePage'));
-const ConstructorColleccioAustenPage = lazy(() => import('@/pages/ConstructorColleccioAustenPage'));
-const ConstructorColleccioCubePage = lazy(() => import('@/pages/ConstructorColleccioCubePage'));
-const ConstructorColleccioMiscellaniaPage = lazy(() => import('@/pages/ConstructorColleccioMiscellaniaPage'));
-const ConstructorColleccio01Page = lazy(() => import('@/pages/ConstructorColleccio01Page'));
-const ConstructorColleccio02Page = lazy(() => import('@/pages/ConstructorColleccio02Page'));
-const ConstructorColleccio03Page = lazy(() => import('@/pages/ConstructorColleccio03Page'));
-const ConstructorColleccio04Page = lazy(() => import('@/pages/ConstructorColleccio04Page'));
-const ConstructorColleccio05Page = lazy(() => import('@/pages/ConstructorColleccio05Page'));
+const CollectionFirstContactPage = lazy(() => import('@/pages/CollectionFirstContactPage'));
+const CollectionTheHumanInsidePage = lazy(() => import('@/pages/CollectionTheHumanInsidePage'));
+const CollectionAustenPage = lazy(() => import('@/pages/CollectionAustenPage'));
+const CollectionCubePage = lazy(() => import('@/pages/CollectionCubePage'));
+const CollectionMiscellaniaPage = lazy(() => import('@/pages/CollectionMiscellaniaPage'));
 const ConstructorPdpPage = lazy(() => import('@/pages/ConstructorPdpPage'));
 const FirstContactNx01Page = lazy(() => import('@/pages/products/FirstContactNx01Page'));
 const FirstContactNcc1701Page = lazy(() => import('@/pages/products/FirstContactNcc1701Page'));
@@ -171,21 +158,17 @@ const AustenLookingForMyDarcyYellowSolidPage = lazy(() => import('@/pages/produc
 const HtmlBasePage = lazy(() => import('@/pages/HtmlBasePage'));
 const DevComponentsCatalogPage = lazy(() => import('@/pages/DevComponentsCatalogPage'));
 const DevLayoutBuilderPage = lazy(() => import('@/pages/DevLayoutBuilderPage'));
-const TheHumanInsidePage = lazy(() => import('@/pages/TheHumanInsidePage'));
 const LabDemosPage = lazy(() => import('@/pages/LabDemosPage.jsx'));
 const LabWipPage = lazy(() => import('@/pages/LabWipPage.jsx'));
 const LabHomePage = lazy(() => import('@/pages/LabHomePage.jsx'));
 const AdminWipPage = lazy(() => import('@/pages/AdminWipPage.jsx'));
 
 // Overlays i components condicionals (només en DEV o mode demo)
-const FullWideSlideDemoHeader = lazy(() => import('@/components/FullWideSlideDemoHeader'));
+const FullWideSlideHeader = lazy(() => import('@/components/FullWideSlideHeader'));
 const DevGuidesOverlay = lazy(() => import('@/components/DevGuidesOverlay.jsx'));
 const BeltReferenceOverlay = lazy(() => import('@/components/dev/BeltReferenceOverlay.jsx'));
 const Pauta4ColsOverlay = lazy(() => import('@/components/pauta/Pauta4ColsOverlay'));
 
-// Pàgines administratives
-const AppsPage = lazy(() => import('@/pages/AppsPage'));
-const DocumentationPage = lazy(() => import('@/pages/DocumentationPage'));
 
 const devHexToHslTriplet = (hex) => {
   const raw = (hex || '').toString().trim();
@@ -270,10 +253,7 @@ const applyDevThemeVarsFromStorage = () => {
 
 function App() {
   const { config: componentCatalogConfig } = useComponentCatalogConfig();
-  const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
   const [isNavigating, setIsNavigating] = useState(false);
-  const [slideOpen, setSlideOpen] = useState(false);
-  const [slidePresetId, setSlidePresetId] = useState('');
   const [selectedElement, setSelectedElement] = useState(null);
   const [selectedContainerToken, setSelectedContainerToken] = useState('');
   const [copyContainerStatus, setCopyContainerStatus] = useState('idle');
@@ -789,7 +769,6 @@ function App() {
   const [cistellLayout, setCistellLayout] = useState(1);
   const [clicksEnabled, setClicksEnabled] = useState(false);
   const [clickMarks, setClickMarks] = useState([]);
-  const [nikeTambeBgOn, setNikeTambeBgOn] = useState(true);
   const megaStripeLastNonOffOverlayModeRef = useRef('black');
   const debugButtonsWrapRef = useRef(null);
   const selectedElementNodeRef = useRef(null);
@@ -2105,7 +2084,6 @@ function App() {
     };
   }, []);
 
-  const { config: slidesConfig } = useSlidesConfig();
 
   const floatingDebugBtnOnStyle = useMemo(() => ({ fontWeight: 900, opacity: 0.98 }), []);
   const floatingDebugBtnOffStyle = useMemo(() => ({ fontWeight: 300, opacity: 0.28 }), []);
@@ -2189,8 +2167,6 @@ function App() {
     try {
       localStorage.removeItem('layoutInspectorPickEnabled');
       localStorage.removeItem('adminTools');
-      localStorage.removeItem('NIKE_DEMO_MANUAL');
-      localStorage.removeItem('NIKE_DEMO_PHASE');
     } catch {
       // ignore
     }
@@ -2331,12 +2307,10 @@ function App() {
     }
   }, [shouldRedirect, redirectUrl, redirectLoading, location.pathname, navigate, bypassUnderConstruction]);
 
-  const isNikeDemoRoute = location.pathname === '/nike-tambe' || location.pathname.startsWith('/proves/demo-nike-tambe');
-  const isNikeHeroDemoRoute = false;
   const isHomeRoute = location.pathname === '/';
   const isPreview = location.pathname === '/ec-preview' || location.pathname === '/ec-preview-lite';
   const isDemoStyleLayoutRoute = (isFullWideSlideDemoRoute || isFullWideSlideRoute);
-  const isDevDemoRoute = isNikeDemoRoute || isFullWideSlideDemoRoute || isFullWideSlideRoute;
+  const isDevDemoRoute = isFullWideSlideDemoRoute || isFullWideSlideRoute;
   const isContactSheetRoute = location.pathname === '/dev/contact-sheet';
   const isEmbeddedPreview = isContactSheetRoute || (() => {
     try {
@@ -2399,53 +2373,7 @@ function App() {
     }
   }, [layoutInspectorActive]);
 
-  useEffect(() => {
-    try {
-      const raw = window.localStorage.getItem('NIKE_TAMBE_BG_ON');
-      if (raw === null) {
-        setNikeTambeBgOn(true);
-        return;
-      }
-      setNikeTambeBgOn(raw === '1');
-    } catch {
-      setNikeTambeBgOn(true);
-    }
-  }, []);
-
-  const [nikeDemoManualEnabled, setNikeDemoManualEnabled] = useState(false);
-  const [nikeDemoPhaseOverride, setNikeDemoPhaseOverride] = useState(null);
   const [fullWideSlideManualEnabled, setFullWideSlideManualEnabled] = useState(false);
-
-  useEffect(() => {
-    if (!isDevDemoRoute) {
-      setNikeDemoManualEnabled(false);
-      setNikeDemoPhaseOverride(null);
-      return undefined;
-    }
-
-    const readControls = () => {
-      try {
-        const enabled = window.localStorage.getItem('NIKE_DEMO_MANUAL') === '1';
-        const phase = window.localStorage.getItem('NIKE_DEMO_PHASE');
-        setNikeDemoManualEnabled(enabled);
-        setNikeDemoPhaseOverride(phase === 'rest' || phase === 'expanded' ? phase : null);
-      } catch {
-        setNikeDemoManualEnabled(false);
-        setNikeDemoPhaseOverride(null);
-      }
-    };
-
-    const onStorage = (e) => {
-      if (!e || !e.key) return;
-      if (e.key === 'NIKE_DEMO_MANUAL' || e.key === 'NIKE_DEMO_PHASE') {
-        readControls();
-      }
-    };
-
-    readControls();
-    window.addEventListener('storage', onStorage);
-    return () => window.removeEventListener('storage', onStorage);
-  }, [isDevDemoRoute]);
 
   useEffect(() => {
     if (!(isFullWideSlideDemoRoute || isHomeRoute)) {
@@ -2479,28 +2407,6 @@ function App() {
       window.removeEventListener('full-wide-slide-demo-controls-changed', onLocalChange);
     };
   }, [isFullWideSlideDemoRoute, isHomeRoute]);
-
-  const writeNikeDemoControls = ({ enabled, phase }) => {
-    try {
-      window.localStorage.setItem('NIKE_DEMO_MANUAL', enabled ? '1' : '0');
-      if (enabled) {
-        window.localStorage.setItem('NIKE_DEMO_PHASE', phase);
-      } else {
-        window.localStorage.removeItem('NIKE_DEMO_PHASE');
-      }
-    } catch {
-      // ignore
-    }
-
-    try {
-      window.dispatchEvent(new Event('nike-demo-controls-changed'));
-    } catch {
-      // ignore
-    }
-
-    setNikeDemoManualEnabled(enabled);
-    setNikeDemoPhaseOverride(phase === 'rest' || phase === 'expanded' ? phase : null);
-  };
 
   const writeFullWideSlideDemoControls = ({ enabled }) => {
     try {
@@ -2857,16 +2763,9 @@ function App() {
   const showProductsLoadingScreen = !!loading;
   const showProductsErrorScreen = !!(error && (!products || products.length === 0));
 
-  const cartPresetId = 'FastCartSlide';
-  const viewPresetId = isFullWideSlideRoute ? 'FullWideViewSlide' : 'FastViewSlide';
-
   // Obrir cistell quan s'afegeix un producte
   const handleAddToCart = (product, size, quantity = 1, shouldOpenCart = true) => {
     addToCart(product, size, quantity);
-    if (shouldOpenCart) {
-      setSlidePresetId(cartPresetId);
-      setSlideOpen(true);
-    }
   };
 
   // Shared props for pages
@@ -2889,7 +2788,6 @@ function App() {
   // EXCEPTIONS: header-demo pages keep their own headers, so don't override them.
   const isDevHeaderRoute =
     location.pathname.startsWith('/proves') ||
-    isNikeDemoRoute ||
     isDevToolsRoute ||
     isDevComponentsRoute ||
     isComponentsCatalogTemplateRoute;
@@ -3002,30 +2900,18 @@ function App() {
               isAdmin={isAdmin}
               isDevDemoRoute={isDevDemoRoute}
               isFullWideSlideRoute={isFullWideSlideRoute}
-              isNikeDemoRoute={isNikeDemoRoute}
               adminBannerHeight={adminBannerHeight}
               rulerInset={rulerInset}
               cartItemCount={getTotalItems()}
-              onCartClick={() => toggleSlidePreset(cartPresetId)}
-              onUserClick={() => toggleSlidePreset(viewPresetId)}
+              onCartClick={() => navigate('/cart')}
+              onUserClick={() => navigate('/profile')}
             />
           )}
 
       {/* Main Header - NO mostrar a pàgines full-screen ni admin ni a dev tools */}
       {!isFullScreenRoute && !isAdminRoute && !isDemoStyleLayoutRoute && !isDevHeaderRoute && (
-        isHomeRoute ? null : import.meta.env.DEV && isNikeDemoRoute ? (
-          <MainHeader
-            cartItemCount={getTotalItems()}
-            onCartClick={() => toggleSlidePreset(cartPresetId)}
-            onUserClick={() => toggleSlidePreset(viewPresetId)}
-            adminBannerVisible={adminBannerVisible}
-            guidesOffsetPx={rulerInset}
-            offersHeaderVisible={offersHeaderVisible}
-            offersHeaderHeight={offersHeaderHeight}
-            offersHeaderTop={offersHeaderTop}
-          />
-        ) : (
-          <FullWideSlideDemoHeader
+        isHomeRoute ? null : (
+          <FullWideSlideHeader
             cartItemCount={getTotalItems()}
             onCartClick={() => {
               navigate('/cart');
@@ -3064,7 +2950,7 @@ function App() {
                     transition={{ duration: 0.3, ease: "easeInOut" }}
                   >
                     <div className="w-full max-w-none" style={{ '--appHeaderOffset': demoHeaderOffset }}>
-                      <FullWideSlideDemoHeader
+                      <FullWideSlideHeader
                         cartItemCount={getTotalItems()}
                         onCartClick={() => {
                           navigate('/cart');
@@ -3080,7 +2966,7 @@ function App() {
                         showCatalogPanel={fullWideShowCatalogPanel}
                       />
                     </div>
-                    <HomeClean />
+                    <Home />
                   </motion.div>
                 } />
 
@@ -3094,7 +2980,7 @@ function App() {
                     exit={{ opacity: 0, y: -10 }}
                     transition={{ duration: 0.3, ease: "easeInOut" }}
                   >
-                    <ConstructorColleccioFirstContactPage pautaEnabled={false} tableEnabled={false} {...pageProps} />
+                    <CollectionFirstContactPage pautaEnabled={false} tableEnabled={false} {...pageProps} />
                   </motion.div>
                 } />
 
@@ -3105,7 +2991,7 @@ function App() {
                     exit={{ opacity: 0, y: -10 }}
                     transition={{ duration: 0.3, ease: "easeInOut" }}
                   >
-                    <ConstructorColleccioTheHumanInsidePage pautaEnabled={false} tableEnabled={false} {...pageProps} />
+                    <CollectionTheHumanInsidePage pautaEnabled={false} tableEnabled={false} {...pageProps} />
                   </motion.div>
                 } />
 
@@ -3116,7 +3002,7 @@ function App() {
                     exit={{ opacity: 0, y: -10 }}
                     transition={{ duration: 0.3, ease: "easeInOut" }}
                   >
-                    <ConstructorColleccioAustenPage pautaEnabled={false} tableEnabled={false} {...pageProps} />
+                    <CollectionAustenPage pautaEnabled={false} tableEnabled={false} {...pageProps} />
                   </motion.div>
                 } />
 
@@ -3127,7 +3013,7 @@ function App() {
                     exit={{ opacity: 0, y: -10 }}
                     transition={{ duration: 0.3, ease: "easeInOut" }}
                   >
-                    <ConstructorColleccioCubePage pautaEnabled={false} tableEnabled={false} {...pageProps} />
+                    <CollectionCubePage pautaEnabled={false} tableEnabled={false} {...pageProps} />
                   </motion.div>
                 } />
 
@@ -3138,7 +3024,7 @@ function App() {
                     exit={{ opacity: 0, y: -10 }}
                     transition={{ duration: 0.3, ease: "easeInOut" }}
                   >
-                    <ConstructorColleccioMiscellaniaPage pautaEnabled={false} tableEnabled={false} {...pageProps} />
+                    <CollectionMiscellaniaPage pautaEnabled={false} tableEnabled={false} {...pageProps} />
                   </motion.div>
                 } />
 
@@ -3155,7 +3041,6 @@ function App() {
 
                 <Route path="/proves" element={<ProtectedRoute><Navigate to="/lab/proves" replace /></ProtectedRoute>} />
 
-                <Route path="/proves/demo-nike-tambe" element={<ProtectedRoute><NikeTambePage /></ProtectedRoute>} />
                 <Route path="/proves/dev-links" element={<ProtectedRoute><DevLinksPage /></ProtectedRoute>} />
                 <Route path="/proves/dev-components" element={<ProtectedRoute><DevComponentsCatalogPage /></ProtectedRoute>} />
                 <Route path="/proves/layout-builder" element={<ProtectedRoute><DevLayoutBuilderPage /></ProtectedRoute>} />
@@ -3203,8 +3088,6 @@ function App() {
                     </motion.div>
                   }
                 />
-
-                <Route path="/wishlist" element={<Navigate to="/" replace />} />
 
                 <Route
                   path="/full-wide-slide"
@@ -3263,42 +3146,6 @@ function App() {
                 <Route
                   path="/constructor/colleccio"
                   element={<ConstructorColleccioPage pautaEnabled={false} tableEnabled={false} />}
-                />
-                <Route
-                  path="/constructor/first-contact"
-                  element={<ConstructorColleccioFirstContactPage pautaEnabled={false} tableEnabled={false} />}
-                />
-                <Route
-                  path="/constructor/austen"
-                  element={<ConstructorColleccioAustenPage pautaEnabled={false} tableEnabled={false} />}
-                />
-                <Route
-                  path="/constructor/cube"
-                  element={<ConstructorColleccioCubePage pautaEnabled={false} tableEnabled={false} />}
-                />
-                <Route
-                  path="/constructor/miscellania"
-                  element={<ConstructorColleccioMiscellaniaPage pautaEnabled={false} tableEnabled={false} />}
-                />
-                <Route
-                  path="/constructor/colleccio01"
-                  element={<ConstructorColleccio01Page />}
-                />
-                <Route
-                  path="/constructor/colleccio02"
-                  element={<ConstructorColleccio02Page />}
-                />
-                <Route
-                  path="/constructor/colleccio03"
-                  element={<ConstructorColleccio03Page />}
-                />
-                <Route
-                  path="/constructor/colleccio04"
-                  element={<ConstructorColleccio04Page />}
-                />
-                <Route
-                  path="/constructor/colleccio05"
-                  element={<ConstructorColleccio05Page />}
                 />
                 <Route path="/constructor/pdp" element={<ConstructorPdpPage />} />
                 {/* ─── PDP de producte (per col·lecció/slug) ─── */}
@@ -3371,13 +3218,11 @@ function App() {
                   element={<HtmlBasePage pautaEnabled={false} tableEnabled={false} />}
                 />
 
-                <Route path="/new" element={<NewPage />} />
                 <Route path="/dev/contact-sheet" element={<ProtectedRoute><ContactSheetPage /></ProtectedRoute>} />
                 <Route path="/dev/site-map" element={<ProtectedRoute><SiteMapPage /></ProtectedRoute>} />
                 <Route path="/dev-links" element={<ProtectedRoute><Navigate to="/proves/dev-links" replace /></ProtectedRoute>} />
                 <Route path="/dev-components" element={<ProtectedRoute><Navigate to="/proves/dev-components" replace /></ProtectedRoute>} />
                 <Route path="/layout-builder" element={<ProtectedRoute><Navigate to="/proves/layout-builder" replace /></ProtectedRoute>} />
-                <Route path="/nike-tambe" element={<ProtectedRoute><Navigate to="/proves/demo-nike-tambe" replace /></ProtectedRoute>} />
                 <Route path="/status" element={<Navigate to="/track" replace />} />
                 <Route path="/track" element={<OrderTrackingPage />} />
 
@@ -3465,12 +3310,6 @@ function App() {
                   </motion.div>
                 } />
 
-                {/* User Icon Picker - Temporal */}
-                <Route path="/user-icon-picker" element={<ProtectedRoute><UserIconPicker /></ProtectedRoute>} />
-
-                {/* Documentation Files - Temporal */}
-                <Route path="/documentation-files" element={<ProtectedRoute><DocumentationFilesPage /></ProtectedRoute>} />
-
                 {/* 404 Page - Must be last */}
                 <Route path="*" element={<NotFoundPage />} />
 
@@ -3493,48 +3332,6 @@ function App() {
         )}
 
         <ScrollToTop />
-
-        <SlideShell
-          open={slideOpen}
-          presetId={slidePresetId}
-          slidesConfig={slidesConfig}
-          onClose={() => {
-            setSlideOpen(false);
-            setSlidePresetId('');
-          }}
-          cartItems={cartItems}
-          totalPrice={getTotalPrice()}
-          onUpdateQuantity={updateQuantity}
-          onRemove={removeFromCart}
-          onUpdateSize={updateSize}
-          onViewCart={() => {
-            setSlideOpen(false);
-            setSlidePresetId('');
-          }}
-          onCheckout={() => {
-            setIsCheckoutOpen(true);
-            setSlideOpen(false);
-            setSlidePresetId('');
-          }}
-          onClearCart={() => {
-            clearCart();
-          }}
-          onLogout={() => {
-            setSlideOpen(false);
-            setSlidePresetId('');
-          }}
-        />
-
-        <Checkout
-          isOpen={isCheckoutOpen}
-          onClose={() => setIsCheckoutOpen(false)}
-          items={cartItems}
-          totalPrice={getTotalPrice()}
-          onComplete={() => {
-            clearCart();
-            setIsCheckoutOpen(false);
-          }}
-        />
 
         {import.meta.env.DEV && rulersOverlayActive && (
           <DevGuidesOverlay

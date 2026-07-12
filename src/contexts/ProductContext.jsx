@@ -3,19 +3,12 @@ import { mockProducts, mockProductsBlava, mockProductsNegra, mockProductsGreen, 
 import productsService from '@/api/supabase-products';
 import { syncGelatoProductsToSupabase, syncMockProductsToSupabase } from '@/api/gelato-sync';
 import { syncGelatoStoreProducts } from '@/api/gelato';
+import { useCart } from '@/contexts/CartContext';
+import { useWishlist } from '@/contexts/WishlistContext';
 
 const ProductContext = createContext();
 
 const USE_SUPABASE = import.meta.env.VITE_USE_MOCK_DATA === 'false';
-
-console.log('🔧 ProductContext Config:', {
-  VITE_USE_MOCK_DATA: import.meta.env.VITE_USE_MOCK_DATA,
-  USE_SUPABASE,
-  hasSupabaseUrl: !!import.meta.env.VITE_SUPABASE_URL
-});
-
-console.log('⚠️ IMPORTANT: If USE_SUPABASE is false, you need to reload the browser tab completely!');
-console.log('⚠️ Current value: USE_SUPABASE =', USE_SUPABASE);
 
 const allMockProducts = [
   ...mockProducts,
@@ -42,12 +35,6 @@ const isBlackOrWhite = (value) => {
     key === 'black' ||
     key === 'negro'
   );
-};
-
-const isMiscellaniaAllowedColor = (value) => {
-  // Miscel·lània should show all available colors/variants.
-  // Any previous restrictions here caused only a subset (e.g. Militar) to be visible.
-  return true;
 };
 
 const inferMiscellaniaColorFromImageUrl = (url) => {
@@ -94,7 +81,7 @@ const sanitizeMiscellaniaProducts = (items) => {
     if (!p || (p.collection || '').toString().toLowerCase() !== 'miscellania') return p;
 
     const variants = Array.isArray(p.variants) ? p.variants : [];
-    const filteredVariants = variants.filter((v) => isMiscellaniaAllowedColor(v?.color));
+    const filteredVariants = variants;
 
     const pickImageFromList = (list) => {
       const urls = (Array.isArray(list) ? list : []).filter((u) => typeof u === 'string' && u.length > 0);
@@ -178,18 +165,6 @@ export const ProductProvider = ({ children }) => {
       .replace(/[^a-z0-9]+/g, '-')
       .replace(/^-+|-+$/g, '');
   };
-
-  // Cistell (persistit a localStorage)
-  const [cartItems, setCartItems] = useState(() => {
-    const savedCart = localStorage.getItem('cart');
-    return savedCart ? JSON.parse(savedCart) : [];
-  });
-
-  // Favorits/Wishlist (persistit a localStorage)
-  const [wishlistItems, setWishlistItems] = useState(() => {
-    const savedWishlist = localStorage.getItem('wishlist');
-    return savedWishlist ? JSON.parse(savedWishlist) : [];
-  });
 
   // Filtres actius
   const [filters, setFilters] = useState({
@@ -374,16 +349,12 @@ export const ProductProvider = ({ children }) => {
   }
 
   async function loadProducts() {
-    console.log('📦 loadProducts called');
     setLoading(true);
     setError(null);
 
     try {
-      console.log('🔄 USE_SUPABASE:', USE_SUPABASE);
       if (USE_SUPABASE) {
-        console.log('🌐 Fetching from Supabase...');
         const supabaseProducts = await productsService.getAllProductsIncludingInactive();
-        console.log('📊 Supabase products received:', supabaseProducts?.length);
 
         let storeProducts = [];
         try {
@@ -392,7 +363,6 @@ export const ProductProvider = ({ children }) => {
             ? storeResponse
             : (storeResponse?.data || storeResponse?.products || []);
         } catch (gelatoErr) {
-          console.warn('⚠️ Error carregant productes de Gelato store:', gelatoErr);
           storeProducts = [];
         }
 
@@ -450,25 +420,20 @@ export const ProductProvider = ({ children }) => {
 
         if (!merged || merged.length === 0) {
           if (!supabaseProducts || supabaseProducts.length === 0) {
-            console.log('⚠️ No hi ha productes (Gelato/Supabase), carregant mock products...');
             setProducts(sanitizeMiscellaniaProducts(allMockProducts));
           } else {
-            console.log('⚠️ No hi ha productes de Gelato, fent fallback a Supabase');
             setProducts(sanitizeMiscellaniaProducts(supabaseProducts));
           }
         } else {
           setProducts(sanitizeMiscellaniaProducts(merged));
         }
       } else {
-        console.log('📝 Using mock products');
         setProducts(sanitizeMiscellaniaProducts(allMockProducts));
       }
     } catch (err) {
-      console.error('❌ Error carregant productes:', err);
       setError(err);
       setProducts(sanitizeMiscellaniaProducts(allMockProducts));
     } finally {
-      console.log('✅ Loading complete, setting loading=false');
       setLoading(false);
     }
   }
@@ -518,14 +483,6 @@ export const ProductProvider = ({ children }) => {
   }
 
   useEffect(() => {
-    localStorage.setItem('cart', JSON.stringify(cartItems));
-  }, [cartItems]);
-
-  useEffect(() => {
-    localStorage.setItem('wishlist', JSON.stringify(wishlistItems));
-  }, [wishlistItems]);
-
-  useEffect(() => {
     if (!import.meta.env.DEV) return;
     window.__PRODUCTS__ = products || [];
   }, [products]);
@@ -561,119 +518,12 @@ export const ProductProvider = ({ children }) => {
     return collectionProducts.slice(0, count);
   };
 
-  const getProductsByType = (productType) => {
-    return products.filter(p => p.product_type === productType || (!p.product_type && productType === 'mockup'));
-  };
-
   const searchProducts = (query) => {
     const lowercaseQuery = query.toLowerCase();
     return products.filter(p =>
       p.name.toLowerCase().includes(lowercaseQuery) ||
       p.description.toLowerCase().includes(lowercaseQuery)
     );
-  };
-
-  // Funcions per gestionar cistell
-  const addToCart = (product, size, quantity = 1) => {
-    const existingItem = cartItems.find(
-      item => item.id === product.id && item.size === size
-    );
-
-    if (existingItem) {
-      setCartItems(
-        cartItems.map(item =>
-          item.id === product.id && item.size === size
-            ? { ...item, quantity: item.quantity + quantity }
-            : item
-        )
-      );
-    } else {
-      setCartItems([...cartItems, { ...product, size, quantity }]);
-    }
-  };
-
-  const updateQuantity = (itemId, size, newQuantity) => {
-    if (newQuantity === 0) {
-      removeFromCart(itemId, size);
-      return;
-    }
-
-    setCartItems(
-      cartItems.map(item =>
-        item.id === itemId && item.size === size
-          ? { ...item, quantity: newQuantity }
-          : item
-      )
-    );
-  };
-
-  const removeFromCart = (itemId, size) => {
-    setCartItems(cartItems.filter(item => !(item.id === itemId && item.size === size)));
-  };
-
-  const updateSize = (itemId, oldSize, newSize, quantity) => {
-    const item = cartItems.find(i => i.id === itemId && i.size === oldSize);
-    if (!item) return;
-
-    const newCartItems = cartItems.filter(i => !(i.id === itemId && i.size === oldSize));
-    const existingNewSizeItem = newCartItems.find(i => i.id === itemId && i.size === newSize);
-
-    if (existingNewSizeItem) {
-      setCartItems(
-        newCartItems.map(i =>
-          i.id === itemId && i.size === newSize
-            ? { ...i, quantity: i.quantity + quantity }
-            : i
-        )
-      );
-    } else {
-      setCartItems([...newCartItems, { ...item, size: newSize, quantity }]);
-    }
-  };
-
-  const clearCart = () => {
-    setCartItems([]);
-  };
-
-  const getTotalItems = () => {
-    return cartItems.reduce((total, item) => total + item.quantity, 0);
-  };
-
-  const getTotalPrice = () => {
-    return cartItems.reduce((total, item) => total + (item.price * item.quantity), 0);
-  };
-
-  // Funcions per gestionar wishlist/favorits
-  const addToWishlist = (product) => {
-    const exists = wishlistItems.find(item => item.id === product.id);
-    if (!exists) {
-      setWishlistItems([...wishlistItems, product]);
-    }
-  };
-
-  const removeFromWishlist = (productId) => {
-    setWishlistItems(wishlistItems.filter(item => item.id !== productId));
-  };
-
-  const toggleWishlist = (product) => {
-    const exists = wishlistItems.find(item => item.id === product.id);
-    if (exists) {
-      removeFromWishlist(product.id);
-    } else {
-      addToWishlist(product);
-    }
-  };
-
-  const isInWishlist = (productId) => {
-    return wishlistItems.some(item => item.id === productId);
-  };
-
-  const clearWishlist = () => {
-    setWishlistItems([]);
-  };
-
-  const getWishlistCount = () => {
-    return wishlistItems.length;
   };
 
   // Aplicar filtres
@@ -705,6 +555,10 @@ export const ProductProvider = ({ children }) => {
 
   const isProductReady = !loading;
 
+  // Cart i wishlist — delegats als contexts propis
+  const cart = useCart();
+  const wishlist = useWishlist();
+
   const value = {
     products,
     loading,
@@ -716,28 +570,25 @@ export const ProductProvider = ({ children }) => {
     getProductById,
     getProductsByCollection,
     getRandomProductsByCollection,
-    getProductsByType,
     searchProducts,
     getFilteredProducts,
 
-    // Cistell
-    cartItems,
-    addToCart,
-    updateQuantity,
-    removeFromCart,
-    updateSize,
-    clearCart,
-    getTotalItems,
-    getTotalPrice,
+    // Cistell (delegat a CartContext)
+    cartItems: cart.cartItems,
+    addToCart: cart.addToCart,
+    updateQuantity: cart.updateQuantity,
+    removeFromCart: cart.removeFromCart,
+    updateSize: cart.updateSize,
+    clearCart: cart.clearCart,
+    getTotalItems: cart.getTotalItems,
+    getTotalPrice: cart.getTotalPrice,
 
-    // Wishlist/Favorits
-    wishlistItems,
-    addToWishlist,
-    removeFromWishlist,
-    toggleWishlist,
-    isInWishlist,
-    clearWishlist,
-    getWishlistCount,
+    // Wishlist (delegat a WishlistContext)
+    wishlistItems: wishlist.wishlistItems,
+    addToWishlist: wishlist.addToWishlist,
+    removeFromWishlist: wishlist.removeFromWishlist,
+    toggleWishlist: wishlist.toggleWishlist,
+    isInWishlist: wishlist.isInWishlist,
 
     // Filtres
     filters,

@@ -2,8 +2,8 @@ import React, { useState, useLayoutEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 import Pauta4ColsOverlay from '@/components/pauta/Pauta4ColsOverlay';
-import TambeRail from '@/pages/nikeTambe/TambeRail';
-import CarouselArrows from '@/pages/nikeTambe/CarouselArrows';
+import TambeRail from '@/pages/productRail/TambeRail';
+import CarouselArrows from '@/pages/productRail/CarouselArrows';
 import Breadcrumbs from '@/components/Breadcrumbs';
 import { tdpImageFor, availableFinishesFor, defaultFinishFor } from '@/lib/pdpMockup';
 import EditableTextBox from '@/components/dev/EditableTextBox';
@@ -714,7 +714,7 @@ function TheHumanInsideMazingerPage() {
           style={{ gridColumn: '4 / 5', gridRow: '17 / 18', zIndex: 100005, width: 0, height: 0, justifySelf: 'end' }}
         />
 
-        {/* ─── Bloc "També et pot interessar" (rail Nike) ─── */}
+        {/* ─── Bloc "També et pot interessar" (rail recomanats) ─── */}
         <div
           style={{
             gridColumn: '1 / 5',

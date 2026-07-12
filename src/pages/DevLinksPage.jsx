@@ -68,11 +68,7 @@ export default function DevLinksPage() {
     () => [
       {
         title: 'Demos',
-        items: [
-          { path: '/adidas-demo', label: 'Adidas Demo' },
-          { path: '/nike-hero-demo', label: 'Nike Hero Demo' },
-          { path: '/nike-tambe', label: 'Nike: També et pot agradar' },
-        ],
+        items: [],
       },
       {
         title: 'Admin',

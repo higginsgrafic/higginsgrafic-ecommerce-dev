@@ -25,7 +25,11 @@ export const PAGES_MANIFEST = [
   { path: '/', label: 'Home', group: 'Home', tag: 'keep' },
 
   // Col·leccions
-  // (Cap pàgina per ara — grup reservat al manifest.)
+  { path: '/first-contact', label: 'First Contact', group: 'Col·leccions', tag: 'keep' },
+  { path: '/the-human-inside', label: 'The Human Inside', group: 'Col·leccions', tag: 'keep' },
+  { path: '/austen', label: 'Austen', group: 'Col·leccions', tag: 'keep' },
+  { path: '/cube', label: 'Cube', group: 'Col·leccions', tag: 'keep' },
+  { path: '/miscellania', label: 'Miscel·lània', group: 'Col·leccions', tag: 'keep' },
 
   // Constructors (pàgines per construir un component / preset visual)
   { path: '/constructor/tdp', label: 'TDP Constructor', group: 'Constructors', tag: 'keep' },
@@ -56,11 +60,9 @@ export const PAGES_MANIFEST = [
   { path: '/lab/demos', label: 'Lab · Demos', group: 'Lab/Proves', tag: 'dev-only' },
   { path: '/lab/wip', label: 'Lab · WIP', group: 'Lab/Proves', tag: 'dev-only' },
   { path: '/lab/proves', label: 'Lab · Proves', group: 'Lab/Proves', tag: 'dev-only' },
-  { path: '/proves/demo-nike-tambe', label: 'Demo Nike També', group: 'Lab/Proves', tag: 'dev-only' },
   { path: '/proves/dev-links', label: 'Dev Links', group: 'Lab/Proves', tag: 'dev-only' },
   { path: '/proves/dev-components', label: 'Dev Components Catalog', group: 'Lab/Proves', tag: 'dev-only' },
   { path: '/proves/layout-builder', label: 'Layout Builder', group: 'Lab/Proves', tag: 'dev-only' },
-  { path: '/new', label: 'New (sandbox)', group: 'Lab/Proves', tag: 'review' },
 
   // Tècnic (visors o pantalles d'eines internes accessibles)
   { path: '/ec-preview', label: 'EC Preview (full)', group: 'Tècnic', tag: 'dev-only' },
@@ -107,14 +109,11 @@ export const DYNAMIC_ROUTES = [
 
 // Redireccions documentades (no es renderitzen a la Contact Sheet).
 export const REDIRECTS = [
-  { from: '/the-human-inside', to: '/thin' },
   { from: '/proves', to: '/lab/proves' },
-  { from: '/wishlist', to: '/' },
   { from: '/tdp', to: '/constructor/tdp' },
   { from: '/dev-links', to: '/proves/dev-links' },
   { from: '/dev-components', to: '/proves/dev-components' },
   { from: '/layout-builder', to: '/proves/layout-builder' },
-  { from: '/nike-tambe', to: '/proves/demo-nike-tambe' },
   { from: '/status', to: '/track' },
   { from: '/ruleta-demo', to: '/admin/draft/ruleta' },
   { from: '/index', to: '/admin/index' },

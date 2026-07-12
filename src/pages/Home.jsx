@@ -1,597 +1,999 @@
-import React, { useState, useEffect, useMemo, useRef } from 'react';
+import { useState, useLayoutEffect, useRef, useMemo } from 'react';
 import { Helmet } from 'react-helmet';
-import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronLeft, ChevronRight, Trash2, Search, X, Edit3 } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
-import DockSection from '@/components/DockSection';
-import { useProductContext } from '@/contexts/ProductContext';
-import { useTexts } from '@/hooks/useTexts';
-import { supabase } from '@/api/supabase-products';
-import { useToast } from '@/components/ui/use-toast';
-import { useAdmin } from '@/contexts/AdminContext';
-import HeroSettingsPage from '@/pages/HeroSettingsPage';
-import OverlayUnderHeader from '@/components/OverlayUnderHeader';
-import NikeHeroSlider from '@/components/NikeHeroSlider';
+import { Link } from 'react-router-dom';
+import HeroSlider from '@/components/HeroSlider';
+import TDP1 from '@/components/tdp/TDP1';
+import TDP2 from '@/components/tdp/TDP2';
+import EditableTextBox from '@/components/dev/EditableTextBox';
+import Pauta4ColsOverlay from '@/components/pauta/Pauta4ColsOverlay';
+import Breadcrumbs from '@/components/Breadcrumbs';
+import { buildHomeDrawingPlan } from '@/components/home/homeDrawings';
+import StoryPosterLink from '@/components/StoryPosterLink';
 
-function Home({ onAddToCart, cartItems, onUpdateQuantity }) {
-  const texts = useTexts();
-  const navigate = useNavigate();
-  const { getRandomProductsByCollection } = useProductContext();
-  const [collections, setCollections] = useState([]);
-  const { toast } = useToast();
-  const { isAdmin } = useAdmin();
+const HERO_SLIDES = [
+  {
+    id: 'first-contact',
+    imageSrc: '/placeholders/apparel/t-shirt/gildan_5000/gildan-5000_t-shirt_crewneck_unisex_heavyWeight_xl_royal_gpr-4-0_front.png',
+    imageAlt: 'Samarreta de la col·lecció First Contact',
+    kicker: 'First Contact',
+    headline: 'Ciència-ficció per mirar cap a les estrelles.',
+    primaryCta: { label: 'Compra', href: '/first-contact' },
+    secondaryCta: { label: 'Descobreix', href: '/first-contact' },
+  },
+  {
+    id: 'the-human-inside',
+    imageSrc: '/placeholders/apparel/t-shirt/gildan_5000/gildan-5000_t-shirt_crewneck_unisex_heavyWeight_xl_black_gpr-4-0_front.png',
+    imageAlt: 'Samarreta de la col·lecció The Human Inside',
+    kicker: 'The Human Inside',
+    headline: 'Robots, identitat i preguntes incòmodes.',
+    primaryCta: { label: 'Compra', href: '/thin' },
+    secondaryCta: { label: 'Descobreix', href: '/thin' },
+  },
+  {
+    id: 'miscellania',
+    imageSrc: '/placeholders/apparel/t-shirt/gildan_5000/gildan-5000_t-shirt_crewneck_unisex_heavyWeight_xl_forest-green_gpr-4-0_front.png',
+    imageAlt: 'Samarreta de la col·lecció Miscel·lània',
+    kicker: 'Miscel·lània',
+    headline: 'Per a qui tria el seu propi camí.',
+    primaryCta: { label: 'Compra', href: '/miscellania' },
+    secondaryCta: { label: 'Descobreix', href: '/miscellania' },
+  },
+];
 
-  // Hero editor states
-  const [slides, setSlides] = useState([]);
-  const [currentSlide, setCurrentSlide] = useState(0);
-  const [autoplay, setAutoplay] = useState(true);
-  const [autoplayInterval, setAutoplayInterval] = useState(8000);
-  const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
-  const [activeTab, setActiveTab] = useState('text');
-  const [editMode, setEditMode] = useState(false);
-  const [searchDialog, setSearchDialog] = useState({ open: false, type: null });
-  const [searchQuery, setSearchQuery] = useState('');
-  const [deleteConfirmDialog, setDeleteConfirmDialog] = useState(false);
-  const [editingInterval, setEditingInterval] = useState(false);
-  const [tempInterval, setTempInterval] = useState({ seconds: 8, milliseconds: 0 });
-  const initialLoadRef = useRef(true);
-  const isDragging = useRef(false);
-  const [showHeroSettings, setShowHeroSettings] = useState(false);
-
-  const availableRoutes = [
-    { path: '/', label: 'Inici' },
-    { path: '/first-contact', label: 'First Contact' },
-    { path: '/about', label: 'Sobre nosaltres' },
-    { path: '/contact', label: 'Contacte' },
-  ];
-
-  const availableVideos = [
-    { id: 'I0VjId1PtNA', label: 'First Contact' },
-  ];
-
-  const defaultSlides = [
-    {
-      slide_index: 0,
-      title: "First Contact",
-      subtitle: "Explora el primer contacte amb altres civilitzacions",
-      video_url: "I0VjId1PtNA",
-      path: "/first-contact",
-      bg_type: "video",
-      bg_value: "I0VjId1PtNA",
-      bg_opacity: 0.6,
-      autoplay_enabled: true,
-      autoplay_interval: 8000,
-      active: true,
-      order: 0
-    }
-  ];
-
-  useEffect(() => {
-    loadCollections();
-  }, []);
-
-  const loadCollections = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('collections')
-        .select('*')
-        .eq('is_active', true)
-        .order('display_order', { ascending: true });
-
-      if (error) throw error;
-
-      if (data && data.length > 0) {
-        setCollections(data);
-      }
-    } catch (error) {
-      console.error('Error loading collections:', error);
-    }
+function CollectionTitle({ index, kicker, title, subtitle, align = 'left', numberAlign, titleOffsetX = 0, titleOffsetY = 0, numberOffsetX = -20, numberOffsetY = 0, numberTopPercent = 50, subtitleOffsetX = 0, subtitleOffsetY = 0, titleTextAlign, collectionHref }) {
+  const isRight = align === 'right';
+  const resolvedNumberAlign = numberAlign || align;
+  const isNumberRight = resolvedNumberAlign === 'right';
+  const ghostStyle = {
+    fontFamily: 'Oswald, sans-serif',
+    fontSize: 'clamp(9rem, 30vw, 26rem)',
+    top: `${numberTopPercent}%`,
+    lineHeight: 1,
+    ...(isNumberRight
+      ? { right: `${-numberOffsetX}px`, transform: `translateY(calc(-50% + ${numberOffsetY}px))` }
+      : { left: `${numberOffsetX}px`, transform: `translateY(calc(-50% + ${numberOffsetY}px))` }),
   };
+  return (
+    <div className={`relative mb-10 mt-[27px] lg:mb-14 w-full ${isRight ? 'text-right' : 'text-left'}`}>
+      <div
+        className="relative flex flex-col gap-3 w-full"
+      >
+        <h2
+          className="relative font-black uppercase leading-[0.85] tracking-[-0.02em] text-foreground"
+          style={{
+            fontFamily: 'Oswald, sans-serif',
+            fontSize: '4.4vw',
+            width: '100%',
+            textAlign: titleTextAlign || (isRight ? 'right' : 'left'),
+          }}
+        >
+          <span
+            aria-hidden="true"
+            className="pointer-events-none absolute hidden select-none font-black leading-none tracking-tighter text-foreground/[0.06] sm:block"
+            style={ghostStyle}
+          >
+            {index}
+          </span>
+          {collectionHref ? (
+            <Link to={collectionHref} target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none', color: 'inherit' }}>
+              <span
+                className="relative"
+                style={
+                  titleOffsetX || titleOffsetY
+                    ? {
+                        display: 'inline-block',
+                        transform: `translate(${typeof titleOffsetX === 'string' ? titleOffsetX : `${titleOffsetX}px`}, ${typeof titleOffsetY === 'string' ? titleOffsetY : `${titleOffsetY}px`})`,
+                      }
+                    : undefined
+                }
+              >
+                {title}
+              </span>
+            </Link>
+          ) : (
+            <span
+              className="relative"
+              style={
+                titleOffsetX || titleOffsetY
+                  ? {
+                      display: 'inline-block',
+                      transform: `translate(${typeof titleOffsetX === 'string' ? titleOffsetX : `${titleOffsetX}px`}, ${typeof titleOffsetY === 'string' ? titleOffsetY : `${titleOffsetY}px`})`,
+                    }
+                  : undefined
+              }
+            >
+              {title}
+            </span>
+          )}
+        </h2>
 
-  useEffect(() => {
-    loadSlides();
-  }, []);
-
-  useEffect(() => {
-    if (initialLoadRef.current) {
-      return;
-    }
-
-    const timeoutId = setTimeout(() => {
-      saveSlides();
-    }, 1000);
-
-    return () => clearTimeout(timeoutId);
-  }, [slides, autoplay, autoplayInterval]);
-
-  useEffect(() => {
-    if (!autoplay || editMode || slides.length === 0) return;
-
-    const timer = setInterval(() => {
-      if (!isDragging.current) {
-        nextSlide();
-      }
-    }, autoplayInterval);
-
-    return () => clearInterval(timer);
-  }, [autoplay, autoplayInterval, currentSlide, editMode, slides.length]);
-
-  useEffect(() => {
-    const seconds = Math.floor(autoplayInterval / 1000);
-    const milliseconds = autoplayInterval % 1000;
-    setTempInterval({ seconds, milliseconds });
-  }, [autoplayInterval]);
-
-  const openSearchDialog = (type) => {
-    setSearchDialog({ open: true, type });
-    setSearchQuery('');
-  };
-
-  const closeSearchDialog = () => {
-    setSearchDialog({ open: false, type: null });
-    setSearchQuery('');
-  };
-
-  const selectValue = (value) => {
-    if (searchDialog.type === 'video') {
-      updateSlide(currentSlide, 'bg_value', value);
-    } else if (searchDialog.type === 'route') {
-      updateSlide(currentSlide, 'path', value);
-    }
-    closeSearchDialog();
-  };
-
-  const getFilteredOptions = () => {
-    const query = searchQuery.toLowerCase();
-    if (searchDialog.type === 'video') {
-      return availableVideos.filter(v =>
-        v.id.toLowerCase().includes(query) ||
-        v.label.toLowerCase().includes(query)
-      );
-    } else if (searchDialog.type === 'route') {
-      return availableRoutes.filter(r =>
-        r.path.toLowerCase().includes(query) ||
-        r.label.toLowerCase().includes(query)
-      );
-    }
-    return [];
-  };
-
-  const handleIntervalClick = () => {
-    setEditingInterval(true);
-  };
-
-  const handleIntervalChange = (field, value) => {
-    const numValue = parseInt(value) || 0;
-    setTempInterval(prev => ({
-      ...prev,
-      [field]: Math.max(0, numValue)
-    }));
-  };
-
-  const handleIntervalBlur = () => {
-    const newInterval = (tempInterval.seconds * 1000) + tempInterval.milliseconds;
-    if (newInterval >= 1000) {
-      setAutoplayInterval(newInterval);
-    } else {
-      const seconds = Math.floor(autoplayInterval / 1000);
-      const milliseconds = autoplayInterval % 1000;
-      setTempInterval({ seconds, milliseconds });
-    }
-    setEditingInterval(false);
-  };
-
-  const handleIntervalKeyDown = (e) => {
-    if (e.key === 'Enter') {
-      handleIntervalBlur();
-    } else if (e.key === 'Escape') {
-      const seconds = Math.floor(autoplayInterval / 1000);
-      const milliseconds = autoplayInterval % 1000;
-      setTempInterval({ seconds, milliseconds });
-      setEditingInterval(false);
-    }
-  };
-
-  const loadSlides = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('hero_config')
-        .select('*')
-        .order('order', { ascending: true });
-
-      if (error) throw error;
-
-      if (!data || data.length === 0) {
-        setSlides(defaultSlides);
-      } else {
-        setSlides(data);
-        if (data.length > 0) {
-          setAutoplay(data[0].autoplay_enabled);
-          setAutoplayInterval(data[0].autoplay_interval);
-        }
-      }
-    } catch (error) {
-      console.error('Error loading slides:', error);
-      setSlides(defaultSlides);
-    } finally {
-      setLoading(false);
-      setTimeout(() => {
-        initialLoadRef.current = false;
-      }, 100);
-    }
-  };
-
-  const saveSlides = async () => {
-    if (slides.length === 0) return;
-
-    try {
-      setSaving(true);
-
-      const { error: deleteError } = await supabase
-        .from('hero_config')
-        .delete()
-        .neq('id', '00000000-0000-0000-0000-000000000000');
-
-      if (deleteError) throw deleteError;
-
-      const slidesToSave = slides.map((slide, index) => {
-        const { id, created_at, ...slideData } = slide;
-        return {
-          ...slideData,
-          order: index,
-          autoplay_enabled: autoplay,
-          autoplay_interval: autoplayInterval
-        };
-      });
-
-      const { error: insertError } = await supabase
-        .from('hero_config')
-        .insert(slidesToSave);
-
-      if (insertError) throw insertError;
-    } catch (error) {
-      console.error('Error saving slides:', error);
-      toast({
-        title: "Error",
-        description: "No s'ha pogut guardar la configuració",
-        variant: "destructive"
-      });
-    } finally {
-      setSaving(false);
-    }
-  };
-
-  const updateSlide = (index, field, value) => {
-    const newSlides = [...slides];
-    newSlides[index] = { ...newSlides[index], [field]: value };
-    setSlides(newSlides);
-  };
-
-  const nextSlide = () => {
-    setCurrentSlide((prev) => (prev + 1) % slides.length);
-  };
-
-  const prevSlide = () => {
-    setCurrentSlide((prev) => (prev === 0 ? slides.length - 1 : prev - 1));
-  };
-
-  const addSlide = () => {
-    const newSlide = {
-      slide_index: slides.length,
-      title: "Nou Slide",
-      subtitle: "Descripció del nou slide",
-      video_url: "I0VjId1PtNA",
-      path: "/",
-      bg_type: "video",
-      bg_value: "I0VjId1PtNA",
-      bg_opacity: 0.6,
-      autoplay_enabled: true,
-      autoplay_interval: 8000,
-      active: true,
-      order: slides.length
-    };
-    setSlides([...slides, newSlide]);
-    setCurrentSlide(slides.length);
-  };
-
-  const handleDragStart = () => {
-    isDragging.current = true;
-  };
-
-  const handleDragEnd = (event, info) => {
-    const swipeThreshold = 50;
-
-    setTimeout(() => {
-      isDragging.current = false;
-    }, 100);
-
-    if (info.offset.x < -swipeThreshold) {
-      nextSlide();
-    } else if (info.offset.x > swipeThreshold) {
-      prevSlide();
-    }
-  };
-
-  const handleContainerClick = () => {
-    if (!isDragging.current && !editMode && slides[currentSlide]?.path) {
-      navigate(slides[currentSlide].path);
-    }
-  };
-
-  const deleteSlide = (index) => {
-    if (slides.length <= 1) {
-      toast({
-        title: "Error",
-        description: "Has de mantenir almenys un slide",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    const newSlides = slides.filter((_, i) => i !== index);
-    setSlides(newSlides);
-    if (currentSlide >= newSlides.length) {
-      setCurrentSlide(newSlides.length - 1);
-    }
-  };
-
-
-  const heroSliderSlides = useMemo(() => {
-    const fallbackImages = [
-      '/placeholders/apparel/t-shirt/gildan_5000/gildan-5000_t-shirt_crewneck_unisex_heavyWeight_xl_royal_gpr-4-0_front.png',
-      '/placeholders/apparel/t-shirt/gildan_5000/gildan-5000_t-shirt_crewneck_unisex_heavyWeight_xl_black_gpr-4-0_front.png',
-      '/placeholders/apparel/t-shirt/gildan_5000/gildan-5000_t-shirt_crewneck_unisex_heavyWeight_xl_forest-green_gpr-4-0_front.png',
-    ];
-
-    if (!Array.isArray(slides) || slides.length === 0) return [];
-
-    return slides.map((s, idx) => {
-      const imageSrc = s.image_src || s.imageSrc || fallbackImages[idx % fallbackImages.length];
-      const href = s.path || '/';
-      return {
-        id: s.id || `hero-${idx}`,
-        imageSrc,
-        imageAlt: s.title || s.subtitle || `Hero ${idx + 1}`,
-        kicker: s.title,
-        headline: s.subtitle,
-        primaryCta: { label: 'Compra', href },
-        secondaryCta: { label: 'Descobreix', href },
-      };
-    });
-  }, [slides]);
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-muted flex items-center justify-center">
-        <div className="text-muted-foreground">Carregant...</div>
+        {subtitle ? (
+          <p
+            className="font-roboto text-[1.125rem] text-muted-foreground uppercase"
+            style={{
+              letterSpacing: '0.1em',
+              margin: 0,
+              whiteSpace: 'nowrap',
+              display: 'inline-block',
+              width: '100%',
+              textAlign: titleTextAlign || (isRight ? 'right' : 'left'),
+            }}
+          >
+            <span
+              className="relative"
+              style={
+                (titleOffsetX || titleOffsetY || subtitleOffsetX || subtitleOffsetY)
+                  ? {
+                      display: 'inline-block',
+                      transform: `translate(
+                        calc(${typeof titleOffsetX === 'string' ? titleOffsetX : `${titleOffsetX}px`} + ${typeof subtitleOffsetX === 'string' ? subtitleOffsetX : `${subtitleOffsetX}px`}),
+                        calc(${typeof titleOffsetY === 'string' ? titleOffsetY : `${titleOffsetY}px`} + ${typeof subtitleOffsetY === 'string' ? subtitleOffsetY : `${subtitleOffsetY}px`})
+                      )`,
+                    }
+                  : undefined
+              }
+            >
+              {subtitle}
+            </span>
+          </p>
+        ) : null}
       </div>
-    );
-  }
+    </div>
+  );
+}
+
+function Home() {
+  const [selectedSize, setSelectedSize] = useState('M');
+  const pautaGridRef = useRef(null);
+  const [rowHeight, setRowHeight] = useState(38);
+
+  // Pla d'assignació dibuix + color de samarreta per a les targetes.
+  // Es calcula un cop per muntatge (aleatori a cada càrrega).
+  const drawingPlan = useMemo(() => buildHomeDrawingPlan({ perCollection: 3 }), []);
+  const cardProps = (slug, index) => {
+    const item = drawingPlan?.[slug]?.[index];
+    if (!item) return {};
+    return {
+      productName: item.productName,
+      imageSrc: item.mockupSrc,
+      imageAlt: `Samarreta ${item.color}`,
+      overlaySrc: item.overlaySrc,
+      overlayAlt: item.overlayAlt,
+      ...(item.hoverImages ? { hoverImages: item.hoverImages } : {}),
+      ...(item.productHref ? { productHref: item.productHref } : {}),
+      ...(item.overlayScale != null ? { overlayScale: item.overlayScale } : {}),
+      ...(item.overlayTranslateY != null ? { overlayTranslateY: item.overlayTranslateY } : {}),
+    };
+  };
+
+  useLayoutEffect(() => {
+    if (typeof window === 'undefined') return undefined;
+    const measure = () => {
+      const gridEl = pautaGridRef.current;
+      if (!gridEl) return;
+      const rect = gridEl.getBoundingClientRect();
+      const numRows = 73; // Nombre de files per aquest segment (ha de coincidir amb la pauta numRows={73})
+      const rowGap = 3; // gutterY per defecte de Pauta4ColsOverlay
+      // Alçada EXACTA d'una fila (descomptant els gaps entre files), perquè
+      // les fletxes quadrades càpiguen exactament dins d'una sola fila.
+      const singleRowH = (rect.height - (numRows - 1) * rowGap) / numRows;
+      setRowHeight((prev) => (Math.abs(prev - singleRowH) < 0.1 ? prev : singleRowH));
+    };
+
+    measure();
+    window.addEventListener('resize', measure);
+    const t = setTimeout(measure, 100);
+    return () => {
+      window.removeEventListener('resize', measure);
+      clearTimeout(t);
+    };
+  }, []);
 
   return (
     <>
       <Helmet>
-        <title>{texts.home.seo.title}</title>
-        <meta name="description" content={texts.home.seo.description} />
+        <title>HIGGINS GRÀFIC — Inici</title>
+        <meta
+          name="description"
+          content="Samarretes gràfiques d'autor, roba unisex i col·leccions pròpies produïdes sota demanda."
+        />
       </Helmet>
 
-      <OverlayUnderHeader open={showHeroSettings} onClose={() => setShowHeroSettings(false)}>
-        <HeroSettingsPage
-          mode="embedded"
-          onRequestClose={() => setShowHeroSettings(false)}
-        />
-      </OverlayUnderHeader>
+      <Pauta4ColsOverlay
+        pautaEnabled={false}
+        tableEnabled={false}
+        numCols={3}
+        numRows={24}
+        canvasAspect={[2642, 1780]}
+        topOffset="76px"
+        bottomPadding="0px"
+      >
+        {/* Breadcrumbs (fila 2 / 3) */}
+        <div
+          style={{
+            gridColumn: '1 / 4',
+            gridRow: '2 / 3',
+            alignSelf: 'start',
+            transform: 'translateY(-86px)', // -10 original -76 per revertir el moviment del topOffset
+          }}
+        >
+          <Breadcrumbs
+            items={[
+              { label: 'Col·leccions', link: '/first-contact' },
+              { label: 'POD' },
+            ]}
+          />
+        </div>
 
-      <div className="mt-4">
-        <div className="mx-auto max-w-[1400px] px-4 sm:px-6 lg:px-10">
-          <div className="py-8 lg:py-10">
-            <div className="text-xs font-semibold tracking-[0.18em] text-muted-foreground opacity-50">ADIDAS-STYLE DEMO</div>
-            <h1 className="mt-4 text-4xl font-black tracking-tight text-foreground sm:text-5xl">
-              Header + Mega-menú (placeholders)
-            </h1>
-            <p className="mt-3 max-w-2xl text-sm leading-relaxed text-muted-foreground opacity-60">
-              Aquesta pàgina és una demo per iterar ràpidament sobre un header tipus adidas.es: sticky, mega-menú desktop,
-              menú mobile i layout de categories. Les lògiques les podem ajustar fins trobar el que busques.
-            </p>
+        {/* Títol HIGGINS GRÀFIC editable i centrat com a la captura (fila 3 / 8) */}
+        <div
+          style={{
+            gridColumn: '1 / 4',
+            gridRow: '3 / 8',
+            alignSelf: 'center',
+            position: 'relative',
+            zIndex: 10,
+            width: '100%',
+            height: '100%',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            pointerEvents: 'auto',
+            transform: 'translateY(-38px)', // Pujat 1 fila
+          }}
+        >
+          <EditableTextBox
+            id="home-store-name-v1"
+            initialText="HIGGINS GRÀFIC"
+            initialSettings={{
+              x: 0,
+              y: 0,
+              fontFamily: 'Oswald',
+              fontSize: 24, // pt
+              fontWeight: 700,
+              selectedFontWeight: 700,
+              letterSpacing: 0.8, // em
+              lineHeight: 1,
+              textAlign: 'center',
+              verticalAlign: 'center',
+              color: '#000000',
+              textTransform: 'uppercase',
+            }}
+            presetVersion="tdp-home-v4-clean"
+            renderHandle={true}
+            handleRight="-18px"
+            style={{ width: '100%', height: '100%', pointerEvents: 'auto' }}
+          />
+        </div>
+
+        {/* Hero Slider Carrussel (fila 10 / 25 — amplada total de col 1 a col 5) */}
+        <div
+          style={{
+            gridColumn: '1 / 4',
+            gridRow: '10 / 25',
+            position: 'relative',
+            top: `calc(-5px - ${rowHeight / 2}px)`,
+            width: 'calc(100% + 1px)',
+            height: 'calc(100% + 2px)',
+            transform: 'scale(0.94)',
+            transformOrigin: 'center center',
+          }}
+        >
+          <HeroSlider
+            slides={HERO_SLIDES}
+            autoplay
+            autoplayIntervalMs={8000}
+            className="h-full"
+            flush
+          />
+        </div>
+      </Pauta4ColsOverlay>
+
+      <Pauta4ColsOverlay
+        overlay
+        pautaEnabled={false}
+        tableEnabled={false}
+        numCols={3}
+        numRows={90}
+        topOffset="var(--appHeaderOffset, 33px)"
+        bottomPadding="0px"
+        zIndex={9999}
+      >
+        <div
+          style={{
+            gridColumn: '1 / 4',
+            gridRow: '33 / 34', // Pujat 4 files (abans 37 / 38)
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontFamily: 'Roboto, sans-serif',
+            fontSize: '1.125rem',
+            color: 'rgb(115, 115, 115)',
+            letterSpacing: '0.1em',
+            margin: 0,
+            whiteSpace: 'nowrap',
+          }}
+        >
+          LA CIÈNCIA FICCIÓ QUE MIRA ENDINS
+        </div>
+      </Pauta4ColsOverlay>
+
+      <section className="bg-background text-foreground" style={{ transform: 'scale(0.94)', transformOrigin: 'center top' }}>
+        <div className="mx-auto max-w-[1400px] px-4 pt-[120px] pb-[174px] sm:px-6 lg:px-10">
+            <CollectionTitle
+            index=""
+            kicker="Col·lecció"
+            title="First Contact"
+            subtitle={null}
+            align="center"
+            titleTextAlign="center"
+            numberAlign="left"
+            titleOffsetX={0}
+            titleOffsetY={5}
+            numberOffsetX={-36}
+            numberOffsetY={-4}
+            collectionHref="/first-contact"
+          />
+          <div style={{ marginTop: '150px' }}>
+            <div
+              style={{
+                position: 'relative',
+                left: '50%',
+                top: '-13px', // Mogut 1 fila cap amunt (abans 25px, reduït 38px)
+                transform: 'translateX(-50%)',
+                width: 'calc(var(--hg-tdp-xR) - var(--hg-tdp-xL))',
+                height: 'calc(calc(calc(var(--hg-tdp-xR) - var(--hg-tdp-xL)) * 0.84632) - 231px)',
+                display: 'grid',
+                gridTemplateColumns: `repeat(3, minmax(0, calc((100% - ${2 * 22.5}px) / 3)))`,
+                columnGap: '22.5px',
+              }}
+            >
+              {/* Columna 1: TDP2 */}
+              <TDP2
+                gridColumn="1 / 2"
+                editableIdPrefix="home-row1-tdp-1"
+                {...cardProps('first-contact', 0)}
+                collectionHref="/first-contact"
+                selectedSize={selectedSize}
+                onSizeChange={setSelectedSize}
+                copyMode={true}
+                style={{
+                  height: '100%',
+                  boxSizing: 'border-box',
+                }}
+              />
+
+              {/* Columna 2: TDP1 */}
+              <TDP1
+                gridColumn="2 / 3"
+                editableIdPrefix="home-row1-tdp-2"
+                {...cardProps('first-contact', 1)}
+                collectionHref="/first-contact"
+                selectedSize={selectedSize}
+                onSizeChange={setSelectedSize}
+                copyMode={true}
+                style={{
+                  height: '100%',
+                  boxSizing: 'border-box',
+                }}
+              />
+
+              {/* Columna 3: TDP2 (Amb imatge a dalt i bloc Nom/Descripció a dota) */}
+              <TDP2
+                gridColumn="3 / 4"
+                editableIdPrefix="home-row1-tdp-3"
+                {...cardProps('first-contact', 2)}
+                collectionHref="/first-contact"
+                selectedSize={selectedSize}
+                onSizeChange={setSelectedSize}
+                copyMode={true}
+                style={{
+                  height: '100%',
+                  boxSizing: 'border-box',
+                }}
+              />
+
+              {/* Indicador de més productes (Pill amb text sota el producte de la tercera columna) */}
+              <Link target="_blank" rel="noopener noreferrer"
+                to="/first-contact"
+                style={{
+                  position: 'absolute',
+                  left: '50%',
+                  bottom: '-54px',
+                  height: 'auto',
+                  width: 'auto',
+                  borderRadius: '9999px',
+                  backgroundColor: '#ffffff',
+                  border: '1px solid #e5e7eb',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  padding: '6px 14px',
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
+                  cursor: 'pointer',
+                  zIndex: 20,
+                  transition: 'all 200ms ease',
+                  textDecoration: 'none',
+                  transform: 'translateX(-50%)',
+                }}
+                className="hover:shadow-md hover:border-neutral-400 active:scale-95 group"
+                title="Veure tota la col·lecció"
+              >
+                <span
+                  style={{ 
+                    fontFamily: 'Oswald, sans-serif',
+                    fontWeight: 300,
+                    fontSize: '12px',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.05em',
+                    color: '#475059',
+                    lineHeight: 1,
+                  }}
+                  className="group-hover:text-neutral-900"
+                >
+                  <span style={{ display: 'inline-block', transform: 'translateY(3px)' }}>SI EN VOLS SABER</span>{' '}
+                  <span style={{ display: 'inline-block', fontSize: '25px', fontWeight: 100, lineHeight: 1, verticalAlign: 'middle', transform: 'translateY(1px)' }}>+</span>
+                </span>
+              </Link>
+            </div>
+          </div>
+
+          {/* Col·lecció 02: The Human Inside (Distància de 5 files / 190px + 15px avall - 1 fila amunt) */}
+          <div style={{ marginTop: '129px' }}>
+            <div
+              style={{
+                position: 'relative',
+                left: '50%',
+                transform: 'translateX(-50%)',
+                width: 'calc(var(--hg-tdp-xR) - var(--hg-tdp-xL))',
+              }}
+            >
+              <CollectionTitle
+                index=""
+                kicker="Col·lecció"
+                title="THE HUMAN INSIDE"
+                subtitle="EN EL TEU RACÓ MÉS PROFUND HI HA UN HEROI"
+                align="center"
+                numberAlign="right"
+                titleTextAlign="center"
+                titleOffsetY={-1}
+                numberOffsetX={1} // Mogut 4px més a l'esquerra (abans 5)
+                numberOffsetY={-4}
+                subtitleOffsetX={0} // Centrat en X
+                subtitleOffsetY={0} // Pujat 18px (abans 18)
+                collectionHref="/the-human-inside"
+              />
+            </div>
+            <div style={{ marginTop: '150px' }}>
+              <div
+                style={{
+                  position: 'relative',
+                  left: '50%',
+                  top: '0px', // Mogut 1 fila cap amunt (abans 38px, reduït 38px)
+                  transform: 'translateX(-50%)',
+                  width: 'calc(var(--hg-tdp-xR) - var(--hg-tdp-xL))',
+                  height: 'calc(calc(calc(var(--hg-tdp-xR) - var(--hg-tdp-xL)) * 0.84632) - 231px)',
+                  display: 'grid',
+                  gridTemplateColumns: `repeat(3, minmax(0, calc((100% - ${2 * 22.5}px) / 3)))`,
+                  columnGap: '22.5px',
+                }}
+              >
+                {/* Columna 1: TDP1 */}
+                <TDP1
+                  gridColumn="1 / 2"
+                  editableIdPrefix="home-row2-tdp-1"
+                  {...cardProps('the-human-inside', 0)}
+                  collectionHref="/the-human-inside"
+                  selectedSize={selectedSize}
+                  onSizeChange={setSelectedSize}
+                  copyMode={true}
+                  style={{
+                    height: '100%',
+                    boxSizing: 'border-box',
+                  }}
+                />
+
+                {/* Columna 2: TDP2 */}
+                <TDP2
+                  gridColumn="2 / 3"
+                  editableIdPrefix="home-row2-tdp-2"
+                  {...cardProps('the-human-inside', 1)}
+                  collectionHref="/the-human-inside"
+                  selectedSize={selectedSize}
+                  onSizeChange={setSelectedSize}
+                  copyMode={true}
+                  style={{
+                    height: '100%',
+                    boxSizing: 'border-box',
+                  }}
+                />
+
+                {/* Columna 3: TDP1 */}
+                <TDP1
+                  gridColumn="3 / 4"
+                  editableIdPrefix="home-row2-tdp-3"
+                  {...cardProps('the-human-inside', 2)}
+                  collectionHref="/the-human-inside"
+                  selectedSize={selectedSize}
+                  onSizeChange={setSelectedSize}
+                  copyMode={true}
+                  style={{
+                    height: '100%',
+                    boxSizing: 'border-box',
+                  }}
+                />
+
+              {/* Indicador de més productes (Pill amb text sota el producte de la tercera columna) */}
+              <Link target="_blank" rel="noopener noreferrer"
+                to="/the-human-inside"
+                style={{
+                  position: 'absolute',
+                  left: '50%',
+                  bottom: '-54px',
+                  height: 'auto',
+                  width: 'auto',
+                  borderRadius: '9999px',
+                  backgroundColor: '#ffffff',
+                  border: '1px solid #e5e7eb',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  padding: '6px 14px',
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
+                  cursor: 'pointer',
+                  zIndex: 20,
+                  transition: 'all 200ms ease',
+                  textDecoration: 'none',
+                  transform: 'translateX(-50%)',
+                }}
+                className="hover:shadow-md hover:border-neutral-400 active:scale-95 group"
+                title="Veure tota la col·lecció"
+              >
+                <span
+                  style={{ 
+                    fontFamily: 'Oswald, sans-serif',
+                    fontWeight: 300,
+                    fontSize: '12px',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.05em',
+                    color: '#475059',
+                    lineHeight: 1,
+                  }}
+                  className="group-hover:text-neutral-900"
+                >
+                  <span style={{ display: 'inline-block', transform: 'translateY(3px)' }}>SI EN VOLS SABER</span>{' '}
+                  <span style={{ display: 'inline-block', fontSize: '25px', fontWeight: 100, lineHeight: 1, verticalAlign: 'middle', transform: 'translateY(1px)' }}>+</span>
+                </span>
+              </Link>
+              </div>
+            </div>
+          </div>
+
+          {/* Col·lecció 03: Austen (Distància de 5 files / 190px) */}
+          <div style={{ marginTop: '162px' }}>
+            <div
+              style={{
+                position: 'relative',
+                left: '50%',
+                transform: 'translateX(-50%)',
+                width: 'calc(var(--hg-tdp-xR) - var(--hg-tdp-xL))',
+              }}
+            >
+              <CollectionTitle
+                index=""
+                kicker="Col·lecció"
+                title="Austen"
+                subtitle="DIGUIS EL QUE DIGUIS, FES-HO AMB ELEGÀNCIA"
+                align="center"
+                numberAlign="left"
+                titleTextAlign="center"
+                titleOffsetX={0}
+                titleOffsetY={-4}
+                numberOffsetX={-22} // Mogut 14px a la dreta (abans -36)
+                numberOffsetY={-17}
+                subtitleOffsetY={0}
+                collectionHref="/austen"
+              />
+            </div>
+            <div style={{ marginTop: '150px' }}>
+              <div
+                style={{
+                  position: 'relative',
+                  left: '50%',
+                  top: '-22px', // Mogut 9px més cap amunt (abans -13px)
+                  transform: 'translateX(-50%)',
+                  width: 'calc(var(--hg-tdp-xR) - var(--hg-tdp-xL))',
+                  height: 'calc(calc(calc(var(--hg-tdp-xR) - var(--hg-tdp-xL)) * 0.84632) - 231px)',
+                  display: 'grid',
+                  gridTemplateColumns: `repeat(3, minmax(0, calc((100% - ${2 * 22.5}px) / 3)))`,
+                  columnGap: '22.5px',
+                }}
+              >
+                {/* Columna 1: TDP2 */}
+                <TDP2
+                  gridColumn="1 / 2"
+                  editableIdPrefix="home-row3-tdp-1"
+                  {...cardProps('austen', 0)}
+                  collectionHref="/austen"
+                  selectedSize={selectedSize}
+                  onSizeChange={setSelectedSize}
+                  copyMode={true}
+                  style={{
+                    height: '100%',
+                    boxSizing: 'border-box',
+                  }}
+                />
+
+                {/* Columna 2: TDP1 */}
+                <TDP1
+                  gridColumn="2 / 3"
+                  editableIdPrefix="home-row3-tdp-2"
+                  {...cardProps('austen', 1)}
+                  collectionHref="/austen"
+                  selectedSize={selectedSize}
+                  onSizeChange={setSelectedSize}
+                  copyMode={true}
+                  style={{
+                    height: '100%',
+                    boxSizing: 'border-box',
+                  }}
+                />
+
+                {/* Columna 3: TDP2 */}
+                <TDP2
+                  gridColumn="3 / 4"
+                  editableIdPrefix="home-row3-tdp-3"
+                  {...cardProps('austen', 2)}
+                  collectionHref="/austen"
+                  selectedSize={selectedSize}
+                  onSizeChange={setSelectedSize}
+                  copyMode={true}
+                  style={{
+                    height: '100%',
+                    boxSizing: 'border-box',
+                  }}
+                />
+
+              {/* Indicador de més productes (Pill amb text sota el producte de la tercera columna) */}
+              <Link target="_blank" rel="noopener noreferrer"
+                to="/austen"
+                style={{
+                  position: 'absolute',
+                  left: '50%',
+                  bottom: '-54px',
+                  height: 'auto',
+                  width: 'auto',
+                  borderRadius: '9999px',
+                  backgroundColor: '#ffffff',
+                  border: '1px solid #e5e7eb',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  padding: '6px 14px',
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
+                  cursor: 'pointer',
+                  zIndex: 20,
+                  transition: 'all 200ms ease',
+                  textDecoration: 'none',
+                  transform: 'translateX(-50%)',
+                }}
+                className="hover:shadow-md hover:border-neutral-400 active:scale-95 group"
+                title="Veure tota la col·lecció"
+              >
+                <span
+                  style={{ 
+                    fontFamily: 'Oswald, sans-serif',
+                    fontWeight: 300,
+                    fontSize: '12px',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.05em',
+                    color: '#475059',
+                    lineHeight: 1,
+                  }}
+                  className="group-hover:text-neutral-900"
+                >
+                  <span style={{ display: 'inline-block', transform: 'translateY(3px)' }}>SI EN VOLS SABER</span>{' '}
+                  <span style={{ display: 'inline-block', fontSize: '25px', fontWeight: 100, lineHeight: 1, verticalAlign: 'middle', transform: 'translateY(1px)' }}>+</span>
+                </span>
+              </Link>
+              </div>
+            </div>
+          </div>
+
+          {/* Col·lecció 04: Cube (Distància de 5 files / 190px - 1 fila amunt) */}
+          <div style={{ marginTop: '104px' }}>
+            <div
+              style={{
+                position: 'relative',
+                left: '50%',
+                transform: 'translateX(-50%)',
+                width: 'calc(var(--hg-tdp-xR) - var(--hg-tdp-xL))',
+              }}
+            >
+              <CollectionTitle
+                index=""
+                kicker="Col·lecció"
+                title="Cube"
+                subtitle="TOTS SOM ESTRANYS A ULLS NOSTRES"
+                align="center"
+                numberAlign="right"
+                titleTextAlign="center"
+                titleOffsetX={0}
+                titleOffsetY={13}
+                numberOffsetX={19} // Mogut 4px més a l'esquerra (abans 23)
+                numberOffsetY={0}
+                subtitleOffsetY={1}
+                collectionHref="/cube"
+              />
+            </div>
+            <div style={{ marginTop: '150px' }}>
+              <div
+                style={{
+                  position: 'relative',
+                  left: '50%',
+                  top: '-6px', // Mogut 1 fila cap amunt (abans 32px, reduït 38px)
+                  transform: 'translateX(-50%)',
+                  width: 'calc(var(--hg-tdp-xR) - var(--hg-tdp-xL))',
+                  height: 'calc(calc(calc(var(--hg-tdp-xR) - var(--hg-tdp-xL)) * 0.84632) - 231px)',
+                  display: 'grid',
+                  gridTemplateColumns: `repeat(3, minmax(0, calc((100% - ${2 * 22.5}px) / 3)))`,
+                  columnGap: '22.5px',
+                }}
+              >
+                {/* Columna 1: TDP1 */}
+                <TDP1
+                  gridColumn="1 / 2"
+                  editableIdPrefix="home-row4-tdp-1"
+                  {...cardProps('cube', 0)}
+                  collectionHref="/cube"
+                  selectedSize={selectedSize}
+                  onSizeChange={setSelectedSize}
+                  copyMode={true}
+                  style={{
+                    height: '100%',
+                    boxSizing: 'border-box',
+                  }}
+                />
+
+                {/* Columna 2: TDP2 */}
+                <TDP2
+                  gridColumn="2 / 3"
+                  editableIdPrefix="home-row4-tdp-2"
+                  {...cardProps('cube', 1)}
+                  collectionHref="/cube"
+                  selectedSize={selectedSize}
+                  onSizeChange={setSelectedSize}
+                  copyMode={true}
+                  style={{
+                    height: '100%',
+                    boxSizing: 'border-box',
+                  }}
+                />
+
+                {/* Columna 3: TDP1 */}
+                <TDP1
+                  gridColumn="3 / 4"
+                  editableIdPrefix="home-row4-tdp-3"
+                  {...cardProps('cube', 2)}
+                  collectionHref="/cube"
+                  selectedSize={selectedSize}
+                  onSizeChange={setSelectedSize}
+                  copyMode={true}
+                  style={{
+                    height: '100%',
+                    boxSizing: 'border-box',
+                  }}
+                />
+
+              {/* Indicador de més productes (Pill amb text sota el producte de la tercera columna) */}
+              <Link target="_blank" rel="noopener noreferrer"
+                to="/cube"
+                style={{
+                  position: 'absolute',
+                  left: '50%',
+                  bottom: '-54px',
+                  height: 'auto',
+                  width: 'auto',
+                  borderRadius: '9999px',
+                  backgroundColor: '#ffffff',
+                  border: '1px solid #e5e7eb',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  padding: '6px 14px',
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
+                  cursor: 'pointer',
+                  zIndex: 20,
+                  transition: 'all 200ms ease',
+                  textDecoration: 'none',
+                  transform: 'translateX(-50%)',
+                }}
+                className="hover:shadow-md hover:border-neutral-400 active:scale-95 group"
+                title="Veure tota la col·lecció"
+              >
+                <span
+                  style={{ 
+                    fontFamily: 'Oswald, sans-serif',
+                    fontWeight: 300,
+                    fontSize: '12px',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.05em',
+                    color: '#475059',
+                    lineHeight: 1,
+                  }}
+                  className="group-hover:text-neutral-900"
+                >
+                  <span style={{ display: 'inline-block', transform: 'translateY(3px)' }}>SI EN VOLS SABER</span>{' '}
+                  <span style={{ display: 'inline-block', fontSize: '25px', fontWeight: 100, lineHeight: 1, verticalAlign: 'middle', transform: 'translateY(1px)' }}>+</span>
+                </span>
+              </Link>
+              </div>
+            </div>
+          </div>
+
+          {/* Col·lecció 05: MISC (Distància de 5 files / 190px - 1 fila amunt + 20px avall) */}
+          <div style={{ marginTop: '124px', position: 'relative', zIndex: 30 }}>
+            <div
+              style={{
+                position: 'relative',
+                left: '50%',
+                transform: 'translateX(-50%)',
+                width: 'calc(var(--hg-tdp-xR) - var(--hg-tdp-xL))',
+              }}
+            >
+              <CollectionTitle
+                index=""
+                kicker="Col·lecció"
+                title="MISCEL·LÀNIA"
+                subtitle="MÉS VAL SOL QUE MAL ACOMPANYAT"
+                align="center"
+                numberAlign="left"
+                titleTextAlign="center"
+                titleOffsetX={0}
+                titleOffsetY={9}
+                numberOffsetX={-22} // Mogut 14px a la dreta (abans -36)
+                numberOffsetY={-4}
+                subtitleOffsetY={1}
+                collectionHref="/miscellania"
+              />
+            </div>
+            <div style={{ marginTop: '150px' }}>
+              <div
+                style={{
+                  position: 'relative',
+                  left: '50%',
+                  top: '-13px', // Mogut 1 fila cap amunt (abans 25px, reduït 38px)
+                  transform: 'translateX(-50%)',
+                  width: 'calc(var(--hg-tdp-xR) - var(--hg-tdp-xL))',
+                  height: 'calc(calc(calc(var(--hg-tdp-xR) - var(--hg-tdp-xL)) * 0.84632) - 231px)',
+                  display: 'grid',
+                  gridTemplateColumns: `repeat(3, minmax(0, calc((100% - ${2 * 22.5}px) / 3)))`,
+                  columnGap: '22.5px',
+                }}
+              >
+                {/* Columna 1: TDP2 */}
+                <TDP2
+                  gridColumn="1 / 2"
+                  editableIdPrefix="home-row5-tdp-1"
+                  {...cardProps('miscellania', 0)}
+                  collectionHref="/miscellania"
+                  selectedSize={selectedSize}
+                  onSizeChange={setSelectedSize}
+                  copyMode={true}
+                  style={{
+                    height: '100%',
+                    boxSizing: 'border-box',
+                  }}
+                />
+
+                {/* Columna 2: TDP1 */}
+                <TDP1
+                  gridColumn="2 / 3"
+                  editableIdPrefix="home-row5-tdp-2"
+                  {...cardProps('miscellania', 1)}
+                  collectionHref="/miscellania"
+                  selectedSize={selectedSize}
+                  onSizeChange={setSelectedSize}
+                  copyMode={true}
+                  style={{
+                    height: '100%',
+                    boxSizing: 'border-box',
+                  }}
+                />
+
+                {/* Columna 3: TDP2 */}
+                <TDP2
+                  gridColumn="3 / 4"
+                  editableIdPrefix="home-row5-tdp-3"
+                  {...cardProps('miscellania', 2)}
+                  collectionHref="/miscellania"
+                  selectedSize={selectedSize}
+                  onSizeChange={setSelectedSize}
+                  copyMode={true}
+                  style={{
+                    height: '100%',
+                    boxSizing: 'border-box',
+                  }}
+                />
+
+              {/* Indicador de més productes (Pill amb text sota el producte de la tercera columna) */}
+              <Link target="_blank" rel="noopener noreferrer"
+                to="/miscellania"
+                style={{
+                  position: 'absolute',
+                  left: '50%',
+                  bottom: '-54px',
+                  height: 'auto',
+                  width: 'auto',
+                  borderRadius: '9999px',
+                  backgroundColor: '#ffffff',
+                  border: '1px solid #e5e7eb',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  padding: '6px 14px',
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
+                  cursor: 'pointer',
+                  zIndex: 20,
+                  transition: 'all 200ms ease',
+                  textDecoration: 'none',
+                  transform: 'translateX(-50%)',
+                }}
+                className="hover:shadow-md hover:border-neutral-400 active:scale-95 group"
+                title="Veure tota la col·lecció"
+              >
+                <span
+                  style={{ 
+                    fontFamily: 'Oswald, sans-serif',
+                    fontWeight: 300,
+                    fontSize: '12px',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.05em',
+                    color: '#475059',
+                    lineHeight: 1,
+                  }}
+                  className="group-hover:text-neutral-900"
+                >
+                  <span style={{ display: 'inline-block', transform: 'translateY(3px)' }}>SI EN VOLS SABER</span>{' '}
+                  <span style={{ display: 'inline-block', fontSize: '25px', fontWeight: 100, lineHeight: 1, verticalAlign: 'middle', transform: 'translateY(1px)' }}>+</span>
+                </span>
+              </Link>
+              </div>
+            </div>
+          </div>
+
+          {/* Bloc Copiat des de /pdp (fila 20 a 62) posicionat a la fila global 215 en endavant (Mogut 19 files amunt i 20px més amunt) */}
+          <div style={{ marginTop: '-552px' }}>
+            <Pauta4ColsOverlay
+              pautaEnabled={false}
+              tableEnabled={false}
+              numCols={4}
+              numRows={53}
+              canvasAspect={[2642, 3950]}
+              topOffset="0px"
+              bottomPadding="0px"
+              innerRef={pautaGridRef}
+              style={{ position: 'relative' }}
+            >
+              {/* TEXT POSTER GRAN (Fila local 27 / 33 - correspon a global 227 / 233) */}
+              <div
+                style={{
+                  gridColumn: '1 / 5',
+                  gridRow: '27 / 33',
+                  paddingTop: '50px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  pointerEvents: 'auto',
+                }}
+              >
+                <StoryPosterLink />
+              </div>
+            </Pauta4ColsOverlay>
           </div>
         </div>
-
-        <NikeHeroSlider
-          slides={heroSliderSlides}
-          autoplay={autoplay}
-          autoplayIntervalMs={autoplayInterval}
-        />
-      </div>
-
-      {/* Delete Confirmation Dialog */}
-      <AnimatePresence>
-        {deleteConfirmDialog && (
-          <>
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-foreground/50 z-50"
-              onClick={() => setDeleteConfirmDialog(false)}
-            />
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-md bg-background rounded-lg shadow-xl z-50"
-            >
-              <div className="p-6">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-lg font-semibold text-foreground">
-                    Esborrar slide
-                  </h3>
-                  <button
-                    onClick={() => setDeleteConfirmDialog(false)}
-                    className="p-1 text-muted-foreground hover:text-foreground transition-colors"
-                  >
-                    <X className="w-5 h-5" />
-                  </button>
-                </div>
-
-                <p className="text-sm text-muted-foreground mb-6">
-                  Estàs segur que vols esborrar aquest slide? Aquesta acció no es pot desfer.
-                </p>
-
-                <div className="flex gap-3 justify-end">
-                  <button
-                    onClick={() => setDeleteConfirmDialog(false)}
-                    className="px-4 py-2 text-sm text-foreground bg-background border border-border rounded-md hover:bg-muted transition-colors"
-                  >
-                    Cancel·lar
-                  </button>
-                  <button
-                    onClick={() => {
-                      deleteSlide(currentSlide);
-                      setDeleteConfirmDialog(false);
-                    }}
-                    className="px-4 py-2 text-sm text-whiteStrong bg-red-600 rounded-md hover:bg-red-700 transition-colors"
-                  >
-                    Esborrar
-                  </button>
-                </div>
-              </div>
-            </motion.div>
-          </>
-        )}
-      </AnimatePresence>
-
-      {/* Search Dialog */}
-      <AnimatePresence>
-        {searchDialog.open && (
-          <>
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-foreground/50 z-50"
-              onClick={closeSearchDialog}
-            />
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-md bg-background rounded-lg shadow-xl z-50"
-            >
-              <div className="p-6">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-lg font-semibold text-foreground">
-                    {searchDialog.type === 'video' ? 'Selecciona un vídeo' : 'Selecciona una ruta'}
-                  </h3>
-                  <button
-                    onClick={closeSearchDialog}
-                    className="p-1 text-muted-foreground hover:text-foreground transition-colors"
-                  >
-                    <X className="w-5 h-5" />
-                  </button>
-                </div>
-
-                <div className="relative mb-4">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                  <input
-                    type="text"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="Cerca..."
-                    className="w-full pl-10 pr-4 py-2 border border-border rounded-md focus:ring-2 focus:ring-ring focus:border-transparent"
-                    autoFocus
-                  />
-                </div>
-
-                <div className="max-h-80 overflow-y-auto space-y-1">
-                  {getFilteredOptions().map((option) => (
-                    <button
-                      key={searchDialog.type === 'video' ? option.id : option.path}
-                      onClick={() => selectValue(searchDialog.type === 'video' ? option.id : option.path)}
-                      className="w-full text-left px-4 py-3 rounded-md hover:bg-muted transition-colors"
-                    >
-                      <div className="font-medium text-foreground">
-                        {searchDialog.type === 'video' ? option.id : option.path}
-                      </div>
-                      <div className="text-sm text-muted-foreground">
-                        {option.label}
-                      </div>
-                    </button>
-                  ))}
-                  {getFilteredOptions().length === 0 && (
-                    <div className="text-center py-8 text-muted-foreground">
-                      No s'han trobat resultats
-                    </div>
-                  )}
-                </div>
-
-                {searchDialog.type === 'video' && (
-                  <div className="mt-4 pt-4 border-t border-border">
-                    <input
-                      type="text"
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter' && searchQuery.trim()) {
-                          selectValue(searchQuery.trim());
-                        }
-                      }}
-                      placeholder="O escriu un ID personalitzat"
-                      className="w-full px-4 py-2 border border-border rounded-md focus:ring-2 focus:ring-ring focus:border-transparent"
-                    />
-                    <button
-                      onClick={() => searchQuery.trim() && selectValue(searchQuery.trim())}
-                      disabled={!searchQuery.trim()}
-                      className="w-full mt-2 px-4 py-2 bg-blue-600 text-whiteStrong rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                    >
-                      Usar ID personalitzat
-                    </button>
-                  </div>
-                )}
-
-                {searchDialog.type === 'route' && (
-                  <div className="mt-4 pt-4 border-t border-border">
-                    <input
-                      type="text"
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter' && searchQuery.trim()) {
-                          selectValue(searchQuery.trim());
-                        }
-                      }}
-                      placeholder="O escriu una ruta personalitzada"
-                      className="w-full px-4 py-2 border border-border rounded-md focus:ring-2 focus:ring-ring focus:border-transparent"
-                    />
-                    <button
-                      onClick={() => searchQuery.trim() && selectValue(searchQuery.trim())}
-                      disabled={!searchQuery.trim()}
-                      className="w-full mt-2 px-4 py-2 bg-blue-600 text-whiteStrong rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                    >
-                      Usar ruta personalitzada
-                    </button>
-                  </div>
-                )}
-              </div>
-            </motion.div>
-          </>
-        )}
-      </AnimatePresence>
-
-      {/* Collection Sections */}
-      <div>
-        <div className="space-y-0">
-          {collections.map((collection) => (
-            <DockSection
-              key={collection.slug}
-              collectionSlug={collection.slug}
-              onAddToCart={onAddToCart}
-              cartItems={cartItems}
-              onUpdateQuantity={onUpdateQuantity}
-            />
-          ))}
-        </div>
-      </div>
+      </section>
     </>
   );
 }

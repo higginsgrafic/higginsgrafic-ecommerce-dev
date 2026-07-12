@@ -1,6 +1,6 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import FullWideSlideDemoHeader from '@/components/FullWideSlideDemoHeader';
+import FullWideSlideHeader from '@/components/FullWideSlideHeader';
 import useComponentCatalogConfig from '@/hooks/useComponentCatalogConfig';
 import { useProductContext } from '@/contexts/ProductContext';
 
@@ -276,7 +276,7 @@ html, body { scrollbar-width: none; }
         height: 'calc(100vh - var(--appHeaderOffset, 0px) - var(--megaStripeHudBottomHPx, 0px))',
       }}
     >
-      <FullWideSlideDemoHeader
+      <FullWideSlideHeader
         cartItemCount={getTotalItems()}
         onCartClick={() => {
           navigate('/cart');

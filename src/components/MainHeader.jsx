@@ -21,11 +21,7 @@ function MainHeader({
   const navigate = useNavigate();
   const texts = useTexts();
 
-  const isNikeDemoRoute = location.pathname === '/nike-hero-demo' || location.pathname === '/nike-tambe';
-  const [demoManualEnabled, setDemoManualEnabled] = useState(false);
-  const [demoPhaseOverride, setDemoPhaseOverride] = useState(null);
-
-  const forceMegaMenuOpen = isNikeDemoRoute && demoManualEnabled;
+  const forceMegaMenuOpen = false;
   const forceMegaMenuOpenRef = useRef(false);
 
   const openedExplicitlyRef = useRef(false);
@@ -72,20 +68,6 @@ function MainHeader({
   const [megaMenuFontPx, setMegaMenuFontPx] = useState(MEGA_MENU_REST_FONT_PX);
   const lastMegaFontPxRef = useRef(MEGA_MENU_REST_FONT_PX);
 
-  const writeNikeControls = ({ enabled, phase }) => {
-    try {
-      window.localStorage.setItem('NIKE_DEMO_MANUAL', enabled ? '1' : '0');
-      if (enabled) {
-        window.localStorage.setItem('NIKE_DEMO_PHASE', phase);
-      } else {
-        window.localStorage.removeItem('NIKE_DEMO_PHASE');
-      }
-      window.dispatchEvent(new Event('nike-demo-controls'));
-    } catch {
-      // ignore
-    }
-  };
-
   const topOffset = adminBannerVisible && offersHeaderVisible
     ? '80px'
     : adminBannerVisible
@@ -112,19 +94,16 @@ function MainHeader({
   const navLinks = useMemo(() => {
     return [
       { name: texts?.header?.navigation?.firstContact || 'First Contact', href: '/first-contact' },
+      { name: texts?.header?.navigation?.proves || 'Proves', href: '/proves' },
       { name: texts?.header?.navigation?.theHumanInside || 'The Human Inside', href: '/the-human-inside' },
-      { name: texts?.header?.navigation?.pemberley || 'Pemberley', href: '/austen/pemberley-house' },
-      { name: texts?.header?.navigation?.keepCalm || 'Keep Calm', href: '/austen/keep-calm' },
-      { name: texts?.header?.navigation?.quotes || 'Quotes', href: '/austen/quotes' },
-      { name: texts?.header?.navigation?.crosswords || 'Crosswords', href: '/austen/crosswords' },
-      { name: texts?.header?.navigation?.lookingForMy || 'Looking For My', href: '/austen/looking-for-my-darcy' },
+      { name: texts?.header?.navigation?.austen || 'Austen', href: '/austen' },
       { name: texts?.header?.navigation?.cube || 'Cube', href: '/cube' },
       { name: texts?.header?.navigation?.miscellania || 'Miscel·lània', href: '/miscellania' },
     ];
   }, [texts]);
 
   const desktopNavLinks = useMemo(() => {
-    return navLinks;
+    return navLinks.filter((l) => (l.href || '').toString() !== '/proves');
   }, [navLinks]);
 
   const maybeOpenCollectionsFromNavPointer = (clientX) => {
@@ -313,45 +292,6 @@ function MainHeader({
   }, [activeMenu]);
 
   useEffect(() => {
-    if (isNikeDemoRoute) {
-      const readControls = () => {
-        try {
-          const enabled = window.localStorage.getItem('NIKE_DEMO_MANUAL') === '1';
-          const phase = window.localStorage.getItem('NIKE_DEMO_PHASE');
-          setDemoManualEnabled(enabled);
-          setDemoPhaseOverride(phase === 'rest' || phase === 'expanded' ? phase : null);
-        } catch {
-          setDemoManualEnabled(false);
-          setDemoPhaseOverride(null);
-        }
-      };
-
-      readControls();
-      const onCustom = () => readControls();
-      const onStorage = (e) => {
-        if (e?.key === 'NIKE_DEMO_MANUAL' || e?.key === 'NIKE_DEMO_PHASE') {
-          readControls();
-        }
-      };
-
-      window.addEventListener('nike-demo-controls-changed', onCustom);
-      window.addEventListener('storage', onStorage);
-      return () => {
-        window.removeEventListener('nike-demo-controls-changed', onCustom);
-        window.removeEventListener('storage', onStorage);
-      };
-    }
-
-    return undefined;
-  }, [isNikeDemoRoute]);
-
-  useEffect(() => {
-    if (demoManualEnabled && demoPhaseOverride) {
-      openCollections();
-      setExpansionPhase(demoPhaseOverride);
-      return undefined;
-    }
-
     if (activeMenu !== 'collections') {
       setExpansionPhase('rest');
       return undefined;
@@ -365,7 +305,7 @@ function MainHeader({
     setExpansionPhase('rest');
     const raf = window.requestAnimationFrame(() => setExpansionPhase('expanded'));
     return () => window.cancelAnimationFrame(raf);
-  }, [activeMenu, demoManualEnabled, demoPhaseOverride]);
+  }, [activeMenu]);
 
   useEffect(() => {
     if (expansionPhase === 'expanded') {
@@ -619,7 +559,7 @@ function MainHeader({
               tableColWidth = Math.round(r0.width);
             }
           }
-          window.__NIKE_HEADER_COLUMNS__ = {
+          window.__HEADER_COLUMNS__ = {
             theHumanInsideWidth: w,
             firstContactWidth: firstEl ? Math.max(0, Math.round(firstEl.getBoundingClientRect().width)) : undefined,
             cubeMaschinenWidth: cubeEl ? Math.max(0, Math.round(cubeEl.getBoundingClientRect().width)) : undefined,
@@ -693,8 +633,6 @@ function MainHeader({
   const closeCollections = () => {
     if (forceMegaMenuOpen) return;
 
-    if (Date.now() - lastOpenTimeRef.current < 350) return;
-
     if (closeCollectionsRafRef.current) {
       window.cancelAnimationFrame(closeCollectionsRafRef.current);
       closeCollectionsRafRef.current = null;
@@ -737,12 +675,6 @@ function MainHeader({
   };
 
   useEffect(() => {
-    if (!isNikeDemoRoute) return;
-    if (!demoManualEnabled) return;
-    openCollections();
-  }, [demoManualEnabled, isNikeDemoRoute]);
-
-  useEffect(() => {
     return () => {
       if (closeTimerRef.current) {
         window.clearTimeout(closeTimerRef.current);
@@ -760,50 +692,18 @@ function MainHeader({
       initial={false}
       animate={{ top: topOffsetWithGuides }}
       transition={{ duration: MOTION_DURATION, ease: MOTION_EASE }}
-      onMouseLeave={() => {
-        closeCollections();
-      }}
     >
       <div className="hidden lg:block bg-white border-b border-border">
         <div className="max-w-[1696px] mx-auto px-6 md:px-12 h-10 flex items-center gap-6 text-xs text-muted-foreground">
-          {isNikeDemoRoute && (
-            <div className="flex items-center gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                className="h-7 px-2 text-[11px]"
-                disabled={!demoManualEnabled}
-                onClick={() => {
-                  const current = demoPhaseOverride === 'rest' || demoPhaseOverride === 'expanded' ? demoPhaseOverride : 'expanded';
-                  const next = current === 'expanded' ? 'rest' : 'expanded';
-                  writeNikeControls({ enabled: demoManualEnabled, phase: next });
-                }}
-              >
-                {(demoPhaseOverride || 'expanded') === 'expanded' ? 'Rest' : 'Expand'}
-              </Button>
-
-              <Button
-                variant="outline"
-                size="sm"
-                className="h-7 px-2 text-[11px]"
-                onClick={() => {
-                  const nextEnabled = !demoManualEnabled;
-                  const phase = (demoPhaseOverride === 'rest' || demoPhaseOverride === 'expanded') ? demoPhaseOverride : 'expanded';
-                  writeNikeControls({ enabled: nextEnabled, phase });
-                }}
-              >
-                {demoManualEnabled ? 'Disable manual' : 'Enable manual'}
-              </Button>
-            </div>
-          )}
-          <Link to="/adidas-demo" className="hover:text-foreground transition-colors">Adidas</Link>
-          <Link to="/nike-hero-demo" className="hover:text-foreground transition-colors">Nike Hero</Link>
-          <Link to="/proves" className="hover:text-foreground transition-colors">Proves</Link>
-          <Link to="/help" className="hover:text-foreground transition-colors">Ajuda</Link>
-          <Link to="/contact" className="hover:text-foreground transition-colors">Contacte</Link>
+          <Link to="/proves" onClick={closeCollections} className="hover:text-foreground transition-colors">Proves</Link>
+          <Link to="/help" onClick={closeCollections} className="hover:text-foreground transition-colors">Ajuda</Link>
+          <Link to="/contact" onClick={closeCollections} className="hover:text-foreground transition-colors">Contacte</Link>
           <button
             type="button"
-            onClick={() => onUserClick?.()}
+            onClick={() => {
+              closeCollections();
+              onUserClick?.();
+            }}
             className="hover:text-foreground transition-colors"
           >
             Compte
@@ -835,7 +735,7 @@ function MainHeader({
                 {mobileOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
               </Button>
 
-              <Link to="/" className="relative z-10 pointer-events-auto block transition-transform hover:scale-105 active:scale-95" title="GRÀFIC - Inici">
+              <Link to="/" onClick={closeCollections} className="relative z-10 pointer-events-auto block transition-transform hover:scale-105 active:scale-95" title="GRÀFIC - Inici">
                 <span
                   aria-hidden="true"
                   data-brand-logo="1"
@@ -858,7 +758,7 @@ function MainHeader({
 
             <div className="hidden lg:flex absolute inset-y-0 left-[-48px] right-[-48px] items-center">
               <motion.nav
-                data-nike-nav="true"
+                data-header-nav="true"
                 ref={navRef}
                 className="w-full h-full grid grid-flow-col justify-items-stretch items-center"
                 style={
@@ -929,6 +829,7 @@ function MainHeader({
                 size="icon"
                 onClick={(e) => {
                   e.preventDefault();
+                  closeCollections();
                   if (cartClickTimeoutRef.current) window.clearTimeout(cartClickTimeoutRef.current);
                   cartClickTimeoutRef.current = window.setTimeout(() => {
                     cartClickTimeoutRef.current = null;
@@ -967,7 +868,10 @@ function MainHeader({
               <Button
                 variant="ghost"
                 size="icon"
-                onClick={onUserClick}
+                onClick={() => {
+                  closeCollections();
+                  onUserClick?.();
+                }}
                 className="h-9 w-9 lg:h-10 lg:w-10 hover:bg-transparent focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                 aria-label="Obrir compte"
               >
@@ -1056,7 +960,7 @@ function MainHeader({
 
                 <div className="max-w-[1696px] mx-auto px-6 md:px-12 pt-0 pb-8">
                   <motion.div
-                    data-nike-mega-grid="true"
+                    data-header-mega-grid="true"
                     ref={megaTableRef}
                     initial={false}
                     className="relative mx-auto grid grid-flow-col justify-items-stretch"

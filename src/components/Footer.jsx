@@ -5,20 +5,11 @@ import { useTexts } from '@/hooks/useTexts';
 import { useGridDebug } from '@/contexts/GridDebugContext';
 import CCLogo from '@/components/CCLogo';
 
-const Footer = ({ copyrightOnly = false }) => {
+const Footer = () => {
   const containerRef = useRef(null);
   const menuGroupRef = useRef(null);
-  const measureRef = useRef(null);
   const mobileContainerRef = useRef(null);
-  const copyrightFooterRef = useRef(null);
   const [gap, setGap] = useState(0);
-  const [gapToLogo, setGapToLogo] = useState(0);
-  const [mobileGap, setMobileGap] = useState(0);
-  const [mobileGapToLogo, setMobileGapToLogo] = useState(0);
-  const [cartPosition, setCartPosition] = useState(0);
-  const [tabletLeftColumn, setTabletLeftColumn] = useState(0);
-  const [tabletRightColumn, setTabletRightColumn] = useState(0);
-  const [isTablet, setIsTablet] = useState(false);
   const [higginsAlignYDesktop, setHigginsAlignYDesktop] = useState(0);
   const [higginsAlignYMobile, setHigginsAlignYMobile] = useState(0);
   const texts = useTexts();
@@ -35,74 +26,8 @@ const Footer = ({ copyrightOnly = false }) => {
     }
   }, []);
 
-  useEffect(() => {
-    if (!copyrightOnly) return undefined;
-
-    const update = () => {
-      try {
-        const h = copyrightFooterRef.current?.offsetHeight;
-        if (!Number.isFinite(h) || h <= 0) return;
-        document.documentElement.style.setProperty('--copyrightFooterHeight', `${Math.round(h)}px`);
-      } catch {
-        // ignore
-      }
-    };
-
-    update();
-    window.addEventListener('resize', update);
-    return () => {
-      window.removeEventListener('resize', update);
-      try {
-        document.documentElement.style.removeProperty('--copyrightFooterHeight');
-      } catch {
-        // ignore
-      }
-    };
-  }, [copyrightOnly]);
-
-
-
   // Creative Commons dinàmic amb any actual
   const currentYear = new Date().getFullYear();
-
-  const copyrightOnlyMarkup = (
-    <footer
-      ref={copyrightFooterRef}
-      className="fixed bottom-0 left-0 right-0 z-[1000] bg-white border-t border-border transition-colors duration-200"
-      style={{
-        ...(isSectionEnabled('footer') ? getDebugStyle('footer', 'main') : {}),
-        transform: 'translateY(100px)',
-      }}
-    >
-      <div className="bg-white px-4 lg:px-8 py-12 lg:py-16 transition-colors duration-200">
-        <div className="max-w-7xl mx-auto flex items-center justify-center">
-          {copyrightData ? (
-            <p
-              className="inline-flex items-center justify-center gap-2 text-muted-foreground"
-              style={{
-                fontFamily: copyrightData.font || 'Roboto',
-                fontSize: copyrightData.fontSize || '14px',
-                opacity: 0.7,
-              }}
-            >
-              {copyrightData.text}
-            </p>
-          ) : (
-            <p
-              className="font-roboto text-[12pt] lg:text-[14pt] font-normal inline-flex items-center justify-center gap-2 text-muted-foreground"
-              style={{ opacity: 0.7 }}
-            >
-              <span className="inline-flex items-center">GRÀFIC</span>
-              <span className="inline-flex items-center gap-2">
-                <CCLogo className="h-[1em] w-auto" />
-                <span className="inline-flex items-center">2023-{currentYear}</span>
-              </span>
-            </p>
-          )}
-        </div>
-      </div>
-    </footer>
-  );
 
   // Ordre per mòbil (Higgins al mig - posició 5)
   const collectionsMobile = [
@@ -127,7 +52,7 @@ const Footer = ({ copyrightOnly = false }) => {
   useEffect(() => {
     const calculateGap = () => {
       // Desktop gaps calculation
-      if (!containerRef.current || !menuGroupRef.current || !measureRef.current) return;
+      if (!containerRef.current || !menuGroupRef.current) return;
 
       const container = containerRef.current;
       const containerWidth = container.offsetWidth;
@@ -151,7 +76,6 @@ const Footer = ({ copyrightOnly = false }) => {
         const cartRect = cartButton.getBoundingClientRect();
         const containerRect = container.getBoundingClientRect();
         rightPosition = cartRect.left - containerRect.left; // Inici del cistell
-        setCartPosition(rightPosition); // Guardar posició del cistell
       }
 
       // Pas 3: Calcular amplada disponible entre logo i cistell
@@ -162,7 +86,6 @@ const Footer = ({ copyrightOnly = false }) => {
       const imageWidth = availableWidth / 11; // 6 imatges + 5 gaps = 11 parts iguals
 
       setGap(imageWidth);
-      setGapToLogo(leftPosition); // Alinear amb el final del logo del header
     };
 
     const calculateHigginsAlignment = () => {
@@ -195,85 +118,13 @@ const Footer = ({ copyrightOnly = false }) => {
       }
     };
 
-    const calculateMobileGap = () => {
-      // Mobile gaps calculation
-      if (!mobileContainerRef.current) return;
-
-      const mobileContainer = mobileContainerRef.current;
-      const mobileContainerWidth = mobileContainer.offsetWidth;
-
-      // Trobar posició del logo del header (esquerra)
-      const headerLogo = document.querySelector('header img[alt="GRAFC"]');
-      let leftPosition = 0;
-
-      if (headerLogo) {
-        const logoRect = headerLogo.getBoundingClientRect();
-        const containerRect = mobileContainer.getBoundingClientRect();
-        leftPosition = logoRect.right - containerRect.left; // Fi del logo
-      }
-
-      // Trobar posició de la icona d'hamburguesa del header (dreta)
-      const hamburgerButton = document.querySelector('header button svg');
-      let rightPosition = mobileContainerWidth;
-
-      if (hamburgerButton) {
-        const hamburgerRect = hamburgerButton.getBoundingClientRect();
-        const containerRect = mobileContainer.getBoundingClientRect();
-        rightPosition = hamburgerRect.left - containerRect.left; // Inici de la hamburguesa
-      }
-
-      // Amplada disponible entre logo i hamburguesa
-      const availableWidth = rightPosition - leftPosition;
-
-      // Distribuir uniformement: 6 imatges + 5 gaps = 11 parts iguals
-      const imageWidth = availableWidth / 11;
-
-      setMobileGap(imageWidth);
-      setMobileGapToLogo(leftPosition); // Posició on comença el primer logo en mòbil
-    };
-
-    const calculateTabletColumns = () => {
-      // Tablet columns calculation - Alinear amb logos First Contact i Austen
-      if (!containerRef.current || !menuGroupRef.current) return;
-
-      const container = containerRef.current;
-      const containerRect = container.getBoundingClientRect();
-
-      // Trobar TOTS els logos de les col·leccions
-      const allLogos = menuGroupRef.current.querySelectorAll('img');
-
-      if (allLogos.length >= 6) {
-        // Logo First Contact = primer logo (índex 0)
-        const firstContactRect = allLogos[0].getBoundingClientRect();
-        const leftColumnPosition = firstContactRect.left - containerRect.left;
-        setTabletLeftColumn(leftColumnPosition);
-
-        // Logo Austen = tercer logo (índex 2)
-        const austenRect = allLogos[2].getBoundingClientRect();
-        const rightColumnPosition = austenRect.left - containerRect.left;
-        setTabletRightColumn(rightColumnPosition);
-      }
-    };
-
-    // Detectar si estem en tablet
-    const checkIfTablet = () => {
-      const width = window.innerWidth;
-      setIsTablet(width >= 768 && width < 1024);
-    };
-
     // Calcular al carregar i quan canviï la mida
-    checkIfTablet();
     calculateGap();
-    calculateMobileGap();
-    calculateTabletColumns();
     // Align after initial layout
     requestAnimationFrame(calculateHigginsAlignment);
 
     const handleResize = () => {
-      checkIfTablet();
       calculateGap();
-      calculateMobileGap();
-      calculateTabletColumns();
       requestAnimationFrame(calculateHigginsAlignment);
     };
 
@@ -282,20 +133,14 @@ const Footer = ({ copyrightOnly = false }) => {
     // Delays per assegurar que les fonts i imatges s'han carregat
     setTimeout(() => {
       calculateGap();
-      calculateMobileGap();
-      calculateTabletColumns();
       calculateHigginsAlignment();
     }, 100);
     setTimeout(() => {
       calculateGap();
-      calculateMobileGap();
-      calculateTabletColumns();
       calculateHigginsAlignment();
     }, 500);
     setTimeout(() => {
       calculateGap();
-      calculateMobileGap();
-      calculateTabletColumns();
       calculateHigginsAlignment();
     }, 1000);
 
@@ -303,8 +148,6 @@ const Footer = ({ copyrightOnly = false }) => {
       window.removeEventListener('resize', handleResize);
     };
   }, []);
-
-  if (copyrightOnly) return copyrightOnlyMarkup;
 
   return (
     <footer
@@ -314,17 +157,6 @@ const Footer = ({ copyrightOnly = false }) => {
         transform: 'translateY(100px)',
       }}
     >
-      {/* Element invisible per mesurar textos */}
-      <span
-        ref={measureRef}
-        className="font-oswald text-[18.4pt] font-normal uppercase whitespace-nowrap"
-        style={{
-          position: 'absolute',
-          visibility: 'hidden',
-          pointerEvents: 'none'
-        }}
-      />
-
       {/* PEU DE COL·LECCIONS DESKTOP - Centrat simètricament - Fons gris clar - VISIBLE PRIMER */}
       <div className="hidden lg:block bg-muted transition-colors duration-200">
         <div ref={containerRef} className="max-w-7xl mx-auto px-4 lg:px-8 py-16">
@@ -551,7 +383,6 @@ const Footer = ({ copyrightOnly = false }) => {
             <div className="text-left">
               <p className="font-oswald font-semibold mb-3 lg:mb-4 text-[13pt] lg:text-[14pt] text-foreground">{texts.footer.services.shop.title}</p>
               <ul className="space-y-2.5 lg:space-y-3 text-left">
-                <li><Link to="/new" className="font-roboto text-sm font-normal transition-all inline-block text-foreground" style={{ opacity: 0.75 }} onMouseEnter={(e) => { const color = document.documentElement.classList.contains('dark') ? '#ffffff' : 'hsl(var(--foreground))'; e.target.style.textShadow = `0 0 0.55px ${color}, 0 0 0.55px ${color}`; }} onMouseLeave={(e) => e.target.style.textShadow = 'none'}>{texts.footer.services.shop.new}</Link></li>
                 <li><Link to="/offers" className="font-roboto text-sm font-normal transition-all inline-block text-foreground" style={{ opacity: 0.75 }} onMouseEnter={(e) => { const color = document.documentElement.classList.contains('dark') ? '#ffffff' : 'hsl(var(--foreground))'; e.target.style.textShadow = `0 0 0.55px ${color}, 0 0 0.55px ${color}`; }} onMouseLeave={(e) => e.target.style.textShadow = 'none'}>{texts.footer.services.shop.offers}</Link></li>
               </ul>
             </div>
@@ -561,7 +392,7 @@ const Footer = ({ copyrightOnly = false }) => {
               <p className="font-oswald font-semibold mb-3 lg:mb-4 text-[13pt] lg:text-[14pt] text-foreground">{texts.footer.services.customer.title}</p>
               <ul className="space-y-2.5 lg:space-y-3 text-left">
                 <li><Link to="/shipping" className="font-roboto text-sm font-normal transition-all inline-block text-foreground" style={{ opacity: 0.75 }} onMouseEnter={(e) => { const color = document.documentElement.classList.contains('dark') ? '#ffffff' : 'hsl(var(--foreground))'; e.target.style.textShadow = `0 0 0.55px ${color}, 0 0 0.55px ${color}`; }} onMouseLeave={(e) => e.target.style.textShadow = 'none'}>{texts.footer.services.customer.shipping}</Link></li>
-                <li><Link to="/status" className="font-roboto text-sm font-normal transition-all inline-block text-foreground" style={{ opacity: 0.75 }} onMouseEnter={(e) => { const color = document.documentElement.classList.contains('dark') ? '#ffffff' : 'hsl(var(--foreground))'; e.target.style.textShadow = `0 0 0.55px ${color}, 0 0 0.55px ${color}`; }} onMouseLeave={(e) => e.target.style.textShadow = 'none'}>{texts.footer.services.customer.orderStatus}</Link></li>
+                <li><Link to="/track" className="font-roboto text-sm font-normal transition-all inline-block text-foreground" style={{ opacity: 0.75 }} onMouseEnter={(e) => { const color = document.documentElement.classList.contains('dark') ? '#ffffff' : 'hsl(var(--foreground))'; e.target.style.textShadow = `0 0 0.55px ${color}, 0 0 0.55px ${color}`; }} onMouseLeave={(e) => e.target.style.textShadow = 'none'}>{texts.footer.services.customer.orderStatus}</Link></li>
                 <li><Link to="/track" className="font-roboto text-sm font-normal transition-all inline-block text-foreground" style={{ opacity: 0.75 }} onMouseEnter={(e) => { const color = document.documentElement.classList.contains('dark') ? '#ffffff' : 'hsl(var(--foreground))'; e.target.style.textShadow = `0 0 0.55px ${color}, 0 0 0.55px ${color}`; }} onMouseLeave={(e) => e.target.style.textShadow = 'none'}>Seguiment comanda</Link></li>
                 <li><Link to="/sizing" className="font-roboto text-sm font-normal transition-all inline-block text-foreground" style={{ opacity: 0.75 }} onMouseEnter={(e) => { const color = document.documentElement.classList.contains('dark') ? '#ffffff' : 'hsl(var(--foreground))'; e.target.style.textShadow = `0 0 0.55px ${color}, 0 0 0.55px ${color}`; }} onMouseLeave={(e) => e.target.style.textShadow = 'none'}>{texts.footer.services.customer.sizing}</Link></li>
               </ul>

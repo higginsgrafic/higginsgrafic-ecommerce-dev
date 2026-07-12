@@ -16,23 +16,11 @@ const PAUTA_ROWS_TEMPLATE = `minmax(${PAUTA_FIRST_ROW_EXTRA_PX}px, ${PAUTA_FIRST
 const LEFT_ROW_GRADIENT_STYLE = {
   background: 'transparent',
 };
-const PAUTA_OTHER_ROW_PERCENT = (1 / PAUTA_TOTAL_WEIGHT) * 100;
-const PAUTA_OTHER_ROW_COMP_PX = PAUTA_FIRST_ROW_EXTRA_PX / (PAUTA_ROWS - 1);
-const PAUTA_FIRST_ROW_PERCENT = (PAUTA_FIRST_ROW_SCALE / PAUTA_TOTAL_WEIGHT) * 100;
-const PAUTA_ROWS_TEMPLATE_2 = `minmax(0, calc(${PAUTA_FIRST_ROW_PERCENT}% + ${PAUTA_FIRST_ROW_EXTRA_PX}px)) repeat(${PAUTA_ROWS - 1}, minmax(0, calc(${PAUTA_OTHER_ROW_PERCENT}% - ${PAUTA_OTHER_ROW_COMP_PX}px)))`;
 const CHECKOUT_PAGE_TOP_OFFSET = '32px';
 const CHECKOUT_PAGE_LEFT_OFFSET = '-17px';
-const PRODUCT_TABLE_MIN_ROWS = 5;
-const PRODUCT_TABLE_MAX_ROWS = 20;
-const stripePublishableKey = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || 'pk_test_CONFIGURED_NOT_CONNECTED';
-const stripeConfigured = !!stripePublishableKey;
-const stripeConnectionEnabled = false;
 
-const inputCell = 'w-full h-full px-2 text-[12pt] border border-border rounded-sm bg-white text-foreground focus:outline-none focus:ring-1 focus:ring-ring';
-const titleCell = 'h-full w-full flex items-center text-[18pt] font-medium font-oswald uppercase tracking-[0.4px] text-foreground';
 
 const CheckoutPage = ({ cartItems, onClearCart }) => {
-  console.log('[Checkout] component rendering, cartItems:', cartItems?.length);
   const navigate = useNavigate();
   const location = useLocation();
   const { success, error: showError } = useToast();
@@ -159,8 +147,8 @@ const CheckoutPage = ({ cartItems, onClearCart }) => {
     const errors = validateForm(formData, rules);
 
     if (Object.keys(errors).length > 0) {
-      setFormErrors({});
-      success('Compra efectuada, moltes gràcies.');
+      setFormErrors(errors);
+      showError('Revisa els camps del formulari');
       return;
     }
 
@@ -195,39 +183,8 @@ const CheckoutPage = ({ cartItems, onClearCart }) => {
     }
   };
 
-  const disablePageContent = false;
-  const textOnlyMode = true;
-  const hideCheckoutText = false;
-
-  if (disablePageContent) {
-    return (
-      <div className="relative min-h-screen bg-white">
-        <Helmet>
-          <title>Checkout | GRAFC</title>
-          <meta name="description" content="Completa la teva comanda de manera segura." />
-        </Helmet>
-        <div
-          aria-hidden="true"
-          style={{
-            position: 'fixed',
-            left: 'var(--belt2-xL, 0px)',
-            top: 'var(--belt2-yT, 0px)',
-            width: 'calc(var(--belt2-xR, 100vw) - var(--belt2-xL, 0px))',
-            height: 'calc(var(--belt2-yB, 100vh) - var(--belt2-yT, 0px))',
-            backgroundImage: 'url(/tmp/CHECKOUT-V1.png)',
-            backgroundRepeat: 'no-repeat',
-            backgroundPosition: 'center top',
-            backgroundSize: '100% 100%',
-            pointerEvents: 'none',
-            zIndex: 1,
-          }}
-        />
-      </div>
-    );
-  }
-
   return (
-    <div className={`relative pt-0 pb-0 ${textOnlyMode ? 'checkout-text-only' : ''}`} style={{ backgroundColor: '#fff', minHeight: 'calc(var(--belt2-yB, 100vh) - var(--belt2-yT, 0px) + 192px)' }}>
+    <div className="relative pt-0 pb-0 checkout-text-only" style={{ backgroundColor: '#fff', minHeight: 'calc(var(--belt2-yB, 100vh) - var(--belt2-yT, 0px) + 192px)' }}>
       <Helmet>
         <title>Checkout | GRAFC</title>
         <meta name="description" content="Completa la teva comanda de manera segura." />
@@ -235,7 +192,7 @@ const CheckoutPage = ({ cartItems, onClearCart }) => {
 
       <LlistaCheckout items={checkoutRenderItems} onBreadcrumbClick={openFullWideCartSlide} />
 
-      {textOnlyMode && (
+      {(
         <style>
           {`
             .checkout-text-only,
@@ -289,7 +246,7 @@ const CheckoutPage = ({ cartItems, onClearCart }) => {
           top: CHECKOUT_PAGE_TOP_OFFSET,
           width: 'calc(var(--belt2-xR, 100vw) - var(--belt2-xL, 0px))',
           height: 'calc(var(--belt2-yB, 100vh) - var(--belt2-yT, 0px))',
-          display: hideCheckoutText ? 'none' : 'block',
+          display: 'block',
           pointerEvents: 'none',
         }}
       >
@@ -501,7 +458,7 @@ const CheckoutPage = ({ cartItems, onClearCart }) => {
               </div>
             </div>
           </div>
-          <input type="hidden" name="stripeConnectionEnabled" value={String(stripeConnectionEnabled)} />
+          <input type="hidden" name="stripeConnectionEnabled" value="false" />
         </div>
         <div id="stripe-guide-checkout-layout-bottom-anchor" style={{ height: 0 }} />
       </div>

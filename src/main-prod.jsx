@@ -10,6 +10,8 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import { ProductProvider } from '@/contexts/ProductContext';
+import { CartProvider } from '@/contexts/CartContext';
+import { WishlistProvider } from '@/contexts/WishlistContext';
 import { ToastProvider } from '@/contexts/ToastContext';
 import { GridDebugProvider } from '@/contexts/GridDebugContext';
 import AppProd from '@/AppProd';
@@ -18,13 +20,17 @@ import '@/index.css';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <BrowserRouter>
-    <ProductProvider>
-      <GridDebugProvider>
-        <ToastProvider>
-          <AppProd />
-          <ProdBadge />
-        </ToastProvider>
-      </GridDebugProvider>
-    </ProductProvider>
+    <CartProvider>
+      <WishlistProvider>
+        <ProductProvider>
+          <GridDebugProvider>
+            <ToastProvider>
+              <AppProd />
+              <ProdBadge />
+            </ToastProvider>
+          </GridDebugProvider>
+        </ProductProvider>
+      </WishlistProvider>
+    </CartProvider>
   </BrowserRouter>
 );

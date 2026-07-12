@@ -453,7 +453,7 @@ function TdpConstructorProduct({
         </div>
         <div className="col-start-4 flex items-center justify-center" style={{ position: 'relative', zIndex: 1, transform: 'translateY(-1.5px)' }}>
           <button type="button" onClick={onAddToCart} aria-label="Afegir al cistell" className="relative flex items-center justify-center bg-transparent p-0 transition-transform duration-200 active:scale-95" style={{ width: `${cartSizeSettings.fontSize}px`, height: `${cartSizeSettings.fontSize}px` }}>
-            <img src={getTdpCartIconSrc(cartCount)} alt="" aria-hidden="true" draggable="false" style={{ display: 'block', width: '100%', height: '100%', objectFit: 'contain' }} />
+            <img src={getTdpCartIconSrc(cartCount)} alt="" aria-hidden="true" draggable="false" loading="lazy" style={{ display: 'block', width: '100%', height: '100%', objectFit: 'contain' }} />
           </button>
         </div>
       </div>
