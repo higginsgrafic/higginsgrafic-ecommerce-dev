@@ -3442,7 +3442,7 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
                             }}
                             style={{
                             position: 'absolute',
-                            bottom: '-55px',
+                            bottom: '-50px',
                             left: 'calc(50% + 5px)',
                             transform: 'translateX(-50%)',
                             display: 'flex',
@@ -3451,7 +3451,7 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
                             cursor: 'pointer',
                             zIndex: 10,
                             }}>
-                            <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="#000" strokeWidth="0.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                            <svg width="45" height="45" viewBox="0 0 24 24" fill="none" stroke="#000" strokeWidth="0.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                               <line x1="4" y1="11" x2="12" y2="17" />
                               <line x1="12" y1="17" x2="20" y2="11" />
                             </svg>
