@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { ChevronDown, ChevronUp, ArrowLeft, X } from 'lucide-react';
+import { ChevronDown, ChevronUp, ArrowLeft, X, Trash2, Plus } from 'lucide-react';
 
 function CistellComandaContent({ cartItems, setCartItems, onCloseMegaSlide, onFinalizeOrder }) {
   const navigate = useNavigate();
@@ -88,6 +88,9 @@ function CistellComandaContent({ cartItems, setCartItems, onCloseMegaSlide, onFi
       return next;
     });
   };
+  const restoreItem = (idx) => {
+    setCartItems(prev => prev.map((it, j) => j === idx ? { ...it, disabled: false } : it));
+  };
   const handleFinalizeOrder = () => {
     if (typeof onFinalizeOrder === 'function') {
       onFinalizeOrder();
@@ -119,8 +122,49 @@ function CistellComandaContent({ cartItems, setCartItems, onCloseMegaSlide, onFi
   const META = { fontFamily: 'Roboto Condensed, sans-serif', fontWeight: 400, color: '#7D8895' };
   const VAL  = { fontFamily: 'Roboto Condensed, sans-serif', fontWeight: 500, color: '#475059' };
 
+  const activeItems = CART_ITEMS.filter(it => !it.disabled);
+  const isEmpty = activeItems.length === 0;
+
   return (
     <>
+      {isEmpty ? (
+        <div style={{
+          position: 'absolute',
+          top: `${TOP_OFFSET}px`,
+          left: `calc(50% - ${TABLE_WIDTH / 2}px)`,
+          width: `${TABLE_WIDTH + COL4_EXTRA}px`,
+          height: `${VISIBLE_HEIGHT}px`,
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 2,
+        }}>
+          <div style={{
+            fontFamily: 'Oswald, sans-serif',
+            fontWeight: 200,
+            fontSize: '18pt',
+            color: '#C3C8CD',
+            letterSpacing: '1px',
+            textTransform: 'uppercase',
+            textAlign: 'center',
+          }}>
+            EL CISTELL ÉS BUIT
+          </div>
+          <div style={{
+            fontFamily: 'Roboto Condensed, sans-serif',
+            fontWeight: 300,
+            fontSize: '10pt',
+            color: '#E0E3E8',
+            marginTop: '12px',
+            letterSpacing: '0.5px',
+            textAlign: 'center',
+          }}>
+            Encara no has afegit cap producte
+          </div>
+        </div>
+      ) : (
+      <>
       {/* Finestra de scroll vertical de les línies del cistell (sense barra) */}
       <div
         onWheel={handleCartWheel}
@@ -148,7 +192,7 @@ function CistellComandaContent({ cartItems, setCartItems, onCloseMegaSlide, onFi
         const i = scrollRow + rowIndex;
         const colBg = { backgroundColor: 'transparent', height: '100%', boxSizing: 'border-box' };
         return (
-        <div key={i} style={{
+        <div key={i} className="cart-row" style={{
           position: 'absolute',
           top: `${rowIndex * ITEM_STRIDE}px`,
           left: `${SLIDE_OFFSET_X}px`,
@@ -159,9 +203,6 @@ function CistellComandaContent({ cartItems, setCartItems, onCloseMegaSlide, onFi
           columnGap: `${SLIDE_GAP}px`,
           alignItems: 'stretch',
           overflow: 'hidden',
-          filter: item.disabled ? 'grayscale(100%)' : 'none',
-          opacity: item.disabled ? 0.5 : 1,
-          transition: 'filter 0.3s ease, opacity 0.3s ease',
         }}>
           <div style={{
             position: 'absolute',
@@ -173,6 +214,9 @@ function CistellComandaContent({ cartItems, setCartItems, onCloseMegaSlide, onFi
             transform: rowIndex % 2 === 0 ? 'scaleX(-1)' : 'none',
             pointerEvents: 'none',
             zIndex: 0,
+            opacity: item.disabled ? 0.3 : undefined,
+            filter: item.disabled ? 'grayscale(1)' : undefined,
+            transition: 'opacity 0.3s ease, filter 0.3s ease',
           }} />
           <div style={{
             position: 'relative',
@@ -185,7 +229,7 @@ function CistellComandaContent({ cartItems, setCartItems, onCloseMegaSlide, onFi
             height: '100%',
           }}>
           {/* Col 1: samarreta + dibuix (cadascú centrat amb el slot del carrusel del damunt) */}
-          <div style={{ ...colBg, position: 'relative', display: 'grid', gridTemplateColumns: `${SLOT_W}px ${SLOT_W}px`, columnGap: `${SLIDE_GAP}px`, alignItems: 'center', justifyItems: 'center', padding: 0, minWidth: 0, overflow: 'hidden' }}>
+          <div style={{ ...colBg, position: 'relative', display: 'grid', gridTemplateColumns: `${SLOT_W}px ${SLOT_W}px`, columnGap: `${SLIDE_GAP}px`, alignItems: 'center', justifyItems: 'center', padding: 0, minWidth: 0, overflow: 'hidden', ...(item.disabled ? { opacity: 0.3, filter: 'grayscale(1)' } : {}), transition: 'opacity 0.3s ease, filter 0.3s ease' }}>
             <div style={{
               alignSelf: 'start',
               width: `${SLOT_W}px`,
@@ -200,7 +244,7 @@ function CistellComandaContent({ cartItems, setCartItems, onCloseMegaSlide, onFi
               <img
                 src={tshirtSrc(item.color)}
                 alt={`${item.title} — ${item.color}`}
-                style={{ width: '75%', height: '75%', objectFit: 'contain', display: 'block', transform: 'translateY(1px)' }}
+                style={{ width: '75%', height: '75%', objectFit: 'contain', display: 'block', transform: 'translateY(1px)', ...(item.disabled ? { filter: 'grayscale(1)' } : {}), transition: 'filter 0.3s ease' }}
               />
             </div>
             <div style={{
@@ -233,7 +277,7 @@ function CistellComandaContent({ cartItems, setCartItems, onCloseMegaSlide, onFi
           </div>
 
           {/* Col 2: títol + col·lecció */}
-          <div style={{ ...colBg, display: 'flex', flexDirection: 'column', justifyContent: 'center', minWidth: 0, overflow: 'hidden', padding: '0 4px' }}>
+          <div style={{ ...colBg, display: 'flex', flexDirection: 'column', justifyContent: 'center', minWidth: 0, overflow: 'hidden', padding: '0 4px', ...(item.disabled ? { opacity: 0.3, filter: 'grayscale(1)' } : {}), transition: 'opacity 0.3s ease, filter 0.3s ease' }}>
             <div style={{ ...HEAD, fontSize: '11.6424pt', lineHeight: 1.1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
               {item.title}
             </div>
@@ -243,19 +287,19 @@ function CistellComandaContent({ cartItems, setCartItems, onCloseMegaSlide, onFi
           </div>
 
           {/* Col 3: QUANTITAT + TALLATGE (cadascun centrat amb el slot del carrusel del damunt) */}
-          <div style={{ ...colBg, display: 'grid', gridTemplateColumns: `${SLOT_W}px ${SLOT_W}px`, gridTemplateRows: `${ROW_H - V_GUTTER}px ${ROW_H - V_GUTTER}px`, columnGap: `${SLIDE_GAP}px`, rowGap: `${V_GUTTER}px`, alignItems: 'center', justifyItems: 'center', transform: 'translateX(-30px)' }}>
+          <div style={{ ...colBg, display: 'grid', gridTemplateColumns: `${SLOT_W}px ${SLOT_W}px`, gridTemplateRows: `${ROW_H - V_GUTTER}px ${ROW_H - V_GUTTER}px`, columnGap: `${SLIDE_GAP}px`, rowGap: `${V_GUTTER}px`, alignItems: 'center', justifyItems: 'center', transform: 'translateX(-35px)', ...(item.disabled ? { opacity: 0.3, filter: 'grayscale(1)' } : {}), transition: 'opacity 0.3s ease, filter 0.3s ease' }}>
             <div style={{ gridRow: 2, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '4px', transform: `translateY(${-0.5 * ROW_H}px)` }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '14px', ...VAL, fontSize: '11.6424pt' }}>
-                <button onClick={() => changeQty(i, -1)} style={{ width: `${(ROW_H - V_GUTTER) * 1.25}px`, height: `${(ROW_H - V_GUTTER) * 1.25}px`, border: '1px solid #C9D0D9', borderRadius: '50%', backgroundColor: 'transparent', color: '#475059', cursor: 'pointer', fontSize: '8.7318pt', lineHeight: 1, padding: 0 }}>−</button>
+                <button disabled={item.disabled} onClick={() => changeQty(i, -1)} onMouseEnter={(e) => { if (item.disabled) return; e.currentTarget.style.color = '#475059'; e.currentTarget.style.fontSize = '12pt'; e.currentTarget.style.transform = 'scale(1.3)'; }} onMouseLeave={(e) => { if (item.disabled) return; e.currentTarget.style.color = '#C3C8CD'; e.currentTarget.style.fontSize = '8.7318pt'; e.currentTarget.style.transform = 'scale(1)'; }} style={{ width: `${(ROW_H - V_GUTTER) * 1.25}px`, height: `${(ROW_H - V_GUTTER) * 1.25}px`, border: '1px solid #C9D0D9', borderRadius: '50%', backgroundColor: 'transparent', color: '#C3C8CD', cursor: item.disabled ? 'default' : 'pointer', fontSize: '8.7318pt', lineHeight: 1, padding: 0, transition: 'color 0.15s ease, transform 0.15s ease, font-size 0.15s ease' }}>−</button>
                 <span style={{ minWidth: '20px', textAlign: 'center', fontWeight: 600 }}>{item.qty}</span>
-                <button onClick={() => changeQty(i, +1)} style={{ width: `${(ROW_H - V_GUTTER) * 1.25}px`, height: `${(ROW_H - V_GUTTER) * 1.25}px`, border: '1px solid #C9D0D9', borderRadius: '50%', backgroundColor: 'transparent', color: '#475059', cursor: 'pointer', fontSize: '8.7318pt', lineHeight: 1, padding: 0 }}>+</button>
+                <button disabled={item.disabled} onClick={() => changeQty(i, +1)} onMouseEnter={(e) => { if (item.disabled) return; e.currentTarget.style.color = '#475059'; e.currentTarget.style.fontSize = '12pt'; e.currentTarget.style.transform = 'scale(1.3)'; }} onMouseLeave={(e) => { if (item.disabled) return; e.currentTarget.style.color = '#C3C8CD'; e.currentTarget.style.fontSize = '8.7318pt'; e.currentTarget.style.transform = 'scale(1)'; }} style={{ width: `${(ROW_H - V_GUTTER) * 1.25}px`, height: `${(ROW_H - V_GUTTER) * 1.25}px`, border: '1px solid #C9D0D9', borderRadius: '50%', backgroundColor: 'transparent', color: '#C3C8CD', cursor: item.disabled ? 'default' : 'pointer', fontSize: '8.7318pt', lineHeight: 1, padding: 0, transition: 'color 0.15s ease, transform 0.15s ease, font-size 0.15s ease' }}>+</button>
               </div>
             </div>
-            <div style={{ gridRow: 2, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '4px', transform: `translateY(${-0.5 * ROW_H}px)` }}>
+            <div style={{ gridRow: 2, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '4px', transform: `translate(23px, ${-0.5 * ROW_H}px)` }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px', ...VAL, fontSize: '11.6424pt' }}>
-                <button onClick={() => changeSize(i, -1)} style={{ width: `${ROW_H - V_GUTTER}px`, height: `${ROW_H - V_GUTTER}px`, border: 'none', background: 'transparent', color: '#7D8895', cursor: 'pointer', padding: 0, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}><ChevronDown size={ROW_H - V_GUTTER} strokeWidth={1} /></button>
+                <button disabled={item.disabled} onClick={() => changeSize(i, -1)} onMouseEnter={(e) => { if (item.disabled) return; e.currentTarget.style.color = '#7D8895'; e.currentTarget.style.transform = 'scale(1.3)'; }} onMouseLeave={(e) => { if (item.disabled) return; e.currentTarget.style.color = '#C3C8CD'; e.currentTarget.style.transform = 'scale(1)'; }} style={{ width: `${ROW_H - V_GUTTER}px`, height: `${ROW_H - V_GUTTER}px`, border: 'none', background: 'transparent', color: '#C3C8CD', cursor: item.disabled ? 'default' : 'pointer', padding: 0, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', transition: 'color 0.15s ease, transform 0.15s ease' }}><ChevronDown size={19.64655} strokeWidth={2.5} /></button>
                 <span style={{ minWidth: '32px', textAlign: 'center', fontWeight: 600 }}>{item.size}</span>
-                <button onClick={() => changeSize(i, +1)} style={{ width: `${ROW_H - V_GUTTER}px`, height: `${ROW_H - V_GUTTER}px`, border: 'none', background: 'transparent', color: '#7D8895', cursor: 'pointer', padding: 0, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}><ChevronUp size={ROW_H - V_GUTTER} strokeWidth={1} /></button>
+                <button disabled={item.disabled} onClick={() => changeSize(i, +1)} onMouseEnter={(e) => { if (item.disabled) return; e.currentTarget.style.color = '#7D8895'; e.currentTarget.style.transform = 'scale(1.3)'; }} onMouseLeave={(e) => { if (item.disabled) return; e.currentTarget.style.color = '#C3C8CD'; e.currentTarget.style.transform = 'scale(1)'; }} style={{ width: `${ROW_H - V_GUTTER}px`, height: `${ROW_H - V_GUTTER}px`, border: 'none', background: 'transparent', color: '#C3C8CD', cursor: item.disabled ? 'default' : 'pointer', padding: 0, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', transition: 'color 0.15s ease, transform 0.15s ease' }}><ChevronUp size={19.64655} strokeWidth={2.5} /></button>
               </div>
             </div>
           </div>
@@ -264,16 +308,22 @@ function CistellComandaContent({ cartItems, setCartItems, onCloseMegaSlide, onFi
           <div style={{ ...colBg, display: 'grid', gridTemplateRows: `${ROW_H - V_GUTTER}px ${ROW_H - V_GUTTER}px`, rowGap: `${V_GUTTER}px`, padding: 0, transform: 'translateX(80px)' }}>
             <div />
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', transform: `translateY(${-0.5 * ROW_H}px)` }}>
-              <div style={{ display: 'grid', gridTemplateColumns: 'auto 40px 70px 70px', alignItems: 'center', columnGap: '8px' }}>
-                <span style={{ ...HEAD, fontSize: '10.1871pt', fontWeight: 400, color: '#7D8895', marginRight: '24px', visibility: 'hidden', transform: `translateY(${ROW_H}px)` }}>TOT PLEGAT FA</span>
-                <button onClick={() => removeItem(i)} onMouseEnter={(e) => { e.currentTarget.style.color = '#D04B4B'; }} onMouseLeave={(e) => { e.currentTarget.style.color = '#C3C8CD'; }} style={{ width: '40px', height: '40px', border: 'none', background: 'transparent', color: '#C3C8CD', cursor: 'pointer', padding: 0, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', justifySelf: 'center', transform: 'translate(-15px, 0.5px)', transition: 'color 0.15s ease' }}>
-                  <X size={19.64655} strokeWidth={2.5} />
+              <div style={{ display: 'grid', gridTemplateColumns: 'auto 40px 40px 70px 70px', alignItems: 'center', columnGap: '8px' }}>
+                <span style={{ ...HEAD, fontSize: '10.1871pt', fontWeight: 400, color: '#7D8895', marginRight: '24px', visibility: 'hidden', transform: `translateY(${ROW_H}px)`, ...(item.disabled ? { opacity: 0.3, filter: 'grayscale(1)' } : {}), transition: 'opacity 0.3s ease, filter 0.3s ease' }}>TOT PLEGAT FA</span>
+                {item.disabled && (
+                  <button onClick={() => restoreItem(i)} onMouseEnter={(e) => { e.currentTarget.style.color = '#475059'; e.currentTarget.querySelector('svg').setAttribute('width', '25.5'); e.currentTarget.querySelector('svg').setAttribute('height', '25.5'); }} onMouseLeave={(e) => { e.currentTarget.style.color = '#000'; e.currentTarget.querySelector('svg').setAttribute('width', '19.64655'); e.currentTarget.querySelector('svg').setAttribute('height', '19.64655'); }} style={{ width: '40px', height: '40px', border: 'none', background: 'transparent', color: '#000', cursor: 'pointer', padding: 0, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', justifySelf: 'center', transform: 'translate(-20px, 0.5px)', transition: 'color 0.15s ease' }}>
+                    <Plus size={19.64655} strokeWidth={2.5} />
+                  </button>
+                )}
+                {!item.disabled && <span />}
+                <button onClick={() => removeItem(i)} onMouseEnter={(e) => { e.currentTarget.style.color = item.disabled ? '#FF0000' : '#475059'; e.currentTarget.querySelector('svg').setAttribute('width', '25.5'); e.currentTarget.querySelector('svg').setAttribute('height', '25.5'); }} onMouseLeave={(e) => { e.currentTarget.style.color = '#000'; e.currentTarget.querySelector('svg').setAttribute('width', '19.64655'); e.currentTarget.querySelector('svg').setAttribute('height', '19.64655'); }} style={{ width: '40px', height: '40px', border: 'none', background: 'transparent', color: '#000', cursor: 'pointer', padding: 0, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', justifySelf: 'center', transform: 'translate(-20px, 0.5px)', transition: 'color 0.15s ease' }}>
+                  {item.disabled ? <X size={19.64655} strokeWidth={2.5} /> : <Trash2 size={19.64655} strokeWidth={2.5} />}
                 </button>
                 {(() => {
                   const unit = parseFloat(String(item.price).replace('€','').replace(/\s/g,'').replace(',','.'));
                   const total = Number.isNaN(unit) ? null : (unit * (item.qty || 1)).toFixed(2);
                   const [intPart, decPart] = total ? total.split('.') : ['', ''];
-                  const priceStyle = { ...HEAD, fontSize: '14.553pt', fontWeight: 350, color: '#474F59', letterSpacing: '0.6px' };
+                  const priceStyle = { ...HEAD, fontSize: '14.553pt', fontWeight: 350, color: '#474F59', letterSpacing: '0.6px', ...(item.disabled ? { opacity: 0.3, filter: 'grayscale(1)' } : {}), transition: 'opacity 0.3s ease, filter 0.3s ease' };
                   const priceColumnOffsetX = '-36px';
                   if (!total) return <><span style={{ ...priceStyle, justifySelf: 'end' }}>{item.price}</span><span /></>;
                   return (
@@ -471,11 +521,12 @@ function CistellComandaContent({ cartItems, setCartItems, onCloseMegaSlide, onFi
               </div>
               {/* Col 4: mateix patró que la fila de preu de l'ítem */}
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', transform: 'translateX(80px)' }}>
-                <div style={{ display: 'grid', gridTemplateColumns: 'auto 40px 70px 70px', alignItems: 'center', columnGap: '8px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'auto 40px 40px 70px 70px', alignItems: 'center', columnGap: '8px' }}>
                   <span style={{ position: 'relative', marginRight: '24px' }}>
                     <span style={{ ...HEAD, fontSize: '10.1871pt', fontWeight: 400, color: '#7D8895', visibility: 'hidden' }}>TOT PLEGAT FA</span>
                     <span style={{ ...labelStyle, position: 'absolute', right: 0, top: '50%', transform: 'translateY(-50%)', textAlign: 'right', whiteSpace: 'nowrap' }}>{r.label}</span>
                   </span>
+                  <span />
                   <span />
                   <span style={{ ...amountStyle, justifySelf: 'end', width: '70px', textAlign: 'right', transform: 'translateX(-36px)' }}>{intPart},</span>
                   <span style={{ ...amountStyle, justifySelf: 'start', width: '70px', marginLeft: '-8px', transform: 'translateX(-36px)' }}>{decPart}€</span>
@@ -538,6 +589,8 @@ function CistellComandaContent({ cartItems, setCartItems, onCloseMegaSlide, onFi
           </button>
         </div>
       </div>
+      </>
+      )}
     </>
   );
 }
