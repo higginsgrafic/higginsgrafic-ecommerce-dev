@@ -35,13 +35,14 @@ function CheckoutContent({ cartItems, setCartItems, onCloseMegaSlide }) {
     [cartItems]
   );
 
-  const subtotal = activeItems.reduce((acc, it) => {
+  const grossSum = activeItems.reduce((acc, it) => {
     const unit = parseFloat(String(it.price).replace('€', '').replace(/\s/g, '').replace(',', '.'));
     return Number.isNaN(unit) ? acc : acc + unit * (it.qty || 1);
   }, 0);
-  const shipping = subtotal > 50 ? 0 : 4.95;
-  const total = subtotal + shipping;
-  const ivaAmount = subtotal * 0.21;
+  const subtotal = grossSum / 1.21;
+  const shipping = 4.99;
+  const ivaAmount = grossSum - subtotal;
+  const total = grossSum;
 
   const fmt = (n) => n.toFixed(2).replace('.', ',') + '€';
   const splitPrice = (n) => {
@@ -330,7 +331,7 @@ function CheckoutContent({ cartItems, setCartItems, onCloseMegaSlide }) {
         const TOTALS_ROW = 17 + PAYMENT_EXPAND_ROWS;
         const rows = [
           { label: 'Subtotal', amount: subtotalParts, strong: false },
-          { label: 'Transport', amount: shippingParts, strong: false, strike: shipping === 0 },
+          { label: 'Transport', amount: shippingParts, strong: false, strike: true },
           { label: 'IVA 21%', amount: ivaParts, strong: false },
           { label: 'Tot plegat fa', amount: totalParts, strong: true },
         ];
@@ -344,7 +345,6 @@ function CheckoutContent({ cartItems, setCartItems, onCloseMegaSlide }) {
             letterSpacing: '0.4px',
             textTransform: 'uppercase',
             lineHeight: 1,
-            textDecoration: r.strike ? 'line-through' : 'none',
           };
           const amountStyle = {
             fontFamily: 'Oswald, sans-serif',
@@ -356,6 +356,8 @@ function CheckoutContent({ cartItems, setCartItems, onCloseMegaSlide }) {
             fontVariantNumeric: 'tabular-nums',
             lineHeight: 1,
             textDecoration: r.strike ? 'line-through' : 'none',
+            textDecorationColor: r.strike ? '#000' : undefined,
+            textDecorationThickness: r.strike ? '1px' : undefined,
           };
           return (
             <div key={r.label} style={{
@@ -370,7 +372,8 @@ function CheckoutContent({ cartItems, setCartItems, onCloseMegaSlide }) {
               padding: '0 20px',
               boxSizing: 'border-box',
               zIndex: 2,
-              borderTop: r.strong ? '1px solid rgba(71, 80, 89, 0.18)' : 'none',
+              borderTop: r.strong ? '0.5px solid #000' : 'none',
+              paddingTop: r.strong ? '10px' : '0',
             }}>
               <span style={labelStyle}>{r.label}</span>
               <span style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'flex-end', marginRight: r.strong ? '0' : '12px' }}>
