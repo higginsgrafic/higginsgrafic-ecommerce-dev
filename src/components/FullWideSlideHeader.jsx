@@ -2749,67 +2749,28 @@ export default function FullWideSlideHeader({
     if (!fallbackItem) return;
 
     if (active === 'first_contact') {
-      // No autoseleccionar el primer ítem a First Contact: així NX-01 no surt
-      // en negreta en carregar (la negreta només s'aplica en seleccionar/hover).
+      setFirstContactSelectedItem(fallbackItem);
+      const keyset = String(megaTileSelectorParams?.keyset || 'v1');
+      setMegaPublicSelectorFor(active, keyset, { target: fallbackItem, stepX: 0, stepY: 0 });
+      window.dispatchEvent(new Event('mega-tile-selector-changed'));
       return;
     }
 
     if (active === 'the_human_inside') {
-      // No autoseleccionar el primer ítem a The Human Inside: així R2-D2 no surt
-      // ressaltat en carregar (el ressaltat només s'aplica en seleccionar/hover).
+      setHumanInsideSelectedItem(fallbackItem);
+      const keyset = String(megaTileSelectorParams?.keyset || 'v1');
+      setMegaPublicSelectorFor(active, keyset, { target: fallbackItem, stepX: 0, stepY: 0 });
+      window.dispatchEvent(new Event('mega-tile-selector-changed'));
       return;
     }
 
-    // No autoseleccionar cap ítem per defecte (cube, miscellania, austen):
-    // així cap dibuix surt ressaltat en carregar. La selecció només s'aplica
-    // quan l'usuari fa clic a un ítem del cercador.
-  }, [
-    active,
-    CONTROL_TILE_ARROWS,
-    CONTROL_TILE_BN,
-    firstContactSelectedItem,
-    humanInsideSelectedItem,
-    resolvedMega,
-    selectedItemByCollection,
-    stripeOverlayOverrideActive,
-  ]);
+    setSelectedItemByCollection((prev) => ({ ...prev, [active]: fallbackItem }));
 
-  // Sincronitzar selectedItem amb el target del selector
-  useEffect(() => {
-    if (!active) return;
-    if (!megaTileSelectorParams?.enabled) return;
-    
-    const target = megaTileSelectorParams?.target;
-    if (!target || typeof target !== 'string') return;
-    
-    // Actualitzar el selectedItem segons la col·lecció activa
-    if (active === 'first_contact') {
-      // No sincronitzar el target del selector amb la selecció de First Contact:
-      // així cap ítem (ni NX-01) surt ressaltat en carregar. La selecció només
-      // s'aplica quan l'usuari fa clic a un ítem del cercador.
-      return;
-    } else if (active === 'the_human_inside') {
-      // No sincronitzar el target del selector amb la selecció de The Human Inside:
-      // així cap ítem (ni R2-D2) surt ressaltat en carregar. La selecció només
-      // s'aplica quan l'usuari fa clic a un ítem del cercador.
-      return;
-    } else {
-      // Per altres col·leccions (cube, austen, miscellania): no sincronitzar el
-      // target del selector amb la selecció. Així cap ítem surt ressaltat en
-      // carregar; la selecció només s'aplica quan l'usuari fa clic.
-      return;
-    }
-  }, [
-    active,
-    megaTileSelectorParams?.target,
-    megaTileSelectorParams?.enabled,
-    firstContactSelectedItem,
-    humanInsideSelectedItem,
-    selectedItemByCollection,
-    setFirstContactSelectedItem,
-    setHumanInsideSelectedItem,
-    setSelectedItemByCollection,
-  ]);
+    const keyset = String(megaTileSelectorParams?.keyset || 'v1');
+    setMegaPublicSelectorFor(active, keyset, { target: fallbackItem, stepX: 0, stepY: 0 });
+    window.dispatchEvent(new Event('mega-tile-selector-changed'));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [active]);
 
   useEffect(() => {
     if (typeof manualEnabledOverride === 'boolean') return undefined;
