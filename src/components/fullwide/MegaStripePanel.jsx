@@ -17,7 +17,7 @@ function canonicalKey(rawSrc) {
   }
 }
 
-function getTileCalibration(src) {
+function getTileCalibration(src, overrides) {
   if (!src) return { dx: 0, dy: 0, scale: 1 };
   const cKey = canonicalKey(src);
   let lsMap = null;
@@ -26,6 +26,10 @@ function getTileCalibration(src) {
     lsMap = raw ? JSON.parse(String(raw)) : null;
   } catch {
     lsMap = null;
+  }
+  if (overrides && typeof overrides === 'object') {
+    const fromOv = (cKey && overrides[cKey]) || overrides[src];
+    if (fromOv && typeof fromOv === 'object') return fromOv;
   }
   if (lsMap && typeof lsMap === 'object') {
     const fromLs = (cKey && lsMap[cKey]) || lsMap[src];
@@ -120,6 +124,7 @@ function MegaStripePanel({
   neckDotIndices,
   emptyTileIndices,
   stripeEmptyMaskSrc,
+  calibrationOverrides,
 }) {
   const emptyShirtMaskUrl = useEmptyShirtMask(emptyTileIndices, shirtColor);
 
@@ -678,7 +683,7 @@ function MegaStripePanel({
                                   opacity: 0.98,
                                   transformOrigin: 'top center',
                                   transform: (() => {
-                                    const cal = getTileCalibration(picked);
+                                    const cal = getTileCalibration(picked, calibrationOverrides);
                                     return `translate(${cal.dx}px, calc(${cal.dy}px + var(--hgStripeDrawingExtraDy, -5px))) scale(calc(${cal.scale} * var(--hgStripeDrawingExtraScale, 1)))`;
                                   })(),
                                   filter: (() => {
@@ -884,7 +889,7 @@ function MegaStripePanel({
                                   opacity: 0.98,
                                   transformOrigin: 'top center',
                                   transform: (() => {
-                                    const cal = getTileCalibration(picked);
+                                    const cal = getTileCalibration(picked, calibrationOverrides);
                                     return `translate(${cal.dx}px, calc(${cal.dy}px + var(--hgStripeDrawingExtraDy, -5px))) scale(calc(${cal.scale} * var(--hgStripeDrawingExtraScale, 1)))`;
                                   })(),
                                   filter: (() => {
