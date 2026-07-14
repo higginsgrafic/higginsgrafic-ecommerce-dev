@@ -5,6 +5,7 @@ import { ChevronDown, ChevronLeft, ChevronRight, ChevronUp, Menu, UserRound, X, 
 import { motion } from 'framer-motion';
 import { useProductContext } from '@/contexts/ProductContext';
 import { useAdmin } from '@/contexts/AdminContext';
+import { useOrders } from '@/hooks/useOrders';
 import { getGildan5000Catalog } from '../utils/placeholders.js';
 import {
   AUSTEN_QUOTES_ASSETS,
@@ -85,6 +86,7 @@ export default function FullWideSlideHeader({
   const navigate = useNavigate();
   const { products: contextProducts } = useProductContext();
   const { adminEmail } = useAdmin();
+  const { orders } = useOrders(adminEmail);
   const cartClickTimeoutRef = useRef(null);
   const accountClickTimeoutRef = useRef(null);
   const dblClickDelayMs = 0;
@@ -3577,21 +3579,191 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
                           transform: 'scale(0.94)',
                           transformOrigin: 'top center',
                         }}>
-                          {['COMANDES', 'MISSATGES', 'COMPTE', 'SEGURETAT'].map((label) => (
-                            <div key={label} style={{
-                              backgroundColor: '#D4D7DC',
-                              border: 'none',
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                              fontFamily: 'Oswald, sans-serif',
-                              fontWeight: 400,
-                              fontSize: '15pt',
-                              color: '#fff',
-                            }}>
-                              {label}
-                            </div>
-                          ))}
+                          {(() => {
+                            const STATUS_DOT = {
+                              'PENDENT': '#9CA3AF',
+                              'CONFIRMADA': '#2F61B2',
+                              'EN PREPARACIÓ': '#7C3AED',
+                              'SEGUIMENT': '#0891B2',
+                              'EN REPARTIMENT': '#D97706',
+                              'ATURADA': '#DC2626',
+                              'CANCEL·LADA': '#991B1B',
+                              'ENTREGADA': '#16A34A',
+                            };
+                            const mockOrders = [
+                              { num: '#00000000000000000000027', status: 'PENDENT', date: '12-07-26', active: true },
+                              { num: '#00000000000000000000026', status: 'EN PREPARACIÓ', date: '10-07-26', active: true },
+                              { num: '#00000000000000000000025', status: 'EN REPARTIMENT', date: '08-07-26', active: true },
+                              { num: '#00000000000000000000024', status: 'ENTREGADA', date: '03-07-26', active: false },
+                              { num: '#00000000000000000000023', status: 'ENTREGADA', date: '28-06-26', active: false },
+                              { num: '#00000000000000000000022', status: 'CANCEL·LADA', date: '25-06-26', active: false },
+                              { num: '#00000000000000000000021', status: 'ENTREGADA', date: '20-06-26', active: false },
+                              { num: '#00000000000000000000020', status: 'ENTREGADA', date: '15-06-26', active: false },
+                            ];
+                            const mockMessages = [
+                              { from: 'Botiga Higgins', subject: 'La teva comanda #26 ja està en preparació', date: '10-07-26', unread: true },
+                              { from: 'Correos Express', subject: 'Seguiment #25 — En repartiment', date: '08-07-26', unread: true },
+                              { from: 'Botiga Higgins', subject: 'Confirmació de la comanda #27', date: '12-07-26', unread: true },
+                            ];
+                            const mockUser = {
+                              name: 'Martí Vidal i Castany',
+                              email: 'marti.vidal@higginsgrafic.cat',
+                              phone: '+34 678 452 193',
+                              company: 'Estudi Vidal S.L.',
+                              memberSince: 'Gener 2025',
+                              verified: true,
+                            };
+                            const mockSecurity = {
+                              cards: 2,
+                              cardsList: ['Visa •••• 4729', 'Mastercard •••• 8815'],
+                              twoFactor: true,
+                              lastPassword: 'fa 14 dies',
+                            };
+                            const displayOrders = orders.length > 0 ? orders : mockOrders;
+                            const activeCount = displayOrders.filter(o => o.active).length;
+                            const deliveredCount = displayOrders.filter(o => o.status === 'ENTREGADA').length;
+                            const lastOrder = displayOrders[0];
+                            const unreadCount = mockMessages.filter(m => m.unread).length;
+                            const qvData = [
+                              {
+                                label: 'COMANDES',
+                                icon: Package,
+                                content: displayOrders.length > 0 ? (
+                                  <>
+                                    <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px' }}>
+                                      <span style={{ fontFamily: 'Oswald, sans-serif', fontWeight: 300, fontSize: '28pt', color: '#2F3540', lineHeight: 1 }}>{displayOrders.length}</span>
+                                      <span style={{ fontFamily: 'Roboto Condensed, sans-serif', fontWeight: 300, fontSize: '9pt', color: '#2F3540', opacity: 0.6 }}>total</span>
+                                    </div>
+                                    <div style={{ display: 'flex', gap: '10px', marginTop: '6px' }}>
+                                      <span style={{ fontFamily: 'Roboto Condensed, sans-serif', fontWeight: 400, fontSize: '8.5pt', color: '#2F3540', opacity: 0.7 }}>{activeCount} actives</span>
+                                      <span style={{ fontFamily: 'Roboto Condensed, sans-serif', fontWeight: 400, fontSize: '8.5pt', color: '#2F3540', opacity: 0.5 }}>{deliveredCount} entregades</span>
+                                    </div>
+                                    {lastOrder && (
+                                      <div style={{ marginTop: '8px', display: 'flex', alignItems: 'center', gap: '5px' }}>
+                                        <span style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: STATUS_DOT[lastOrder.status] || '#9CA3AF', flexShrink: 0 }} />
+                                        <span style={{ fontFamily: 'Roboto Condensed, sans-serif', fontWeight: 300, fontSize: '8pt', color: '#2F3540', opacity: 0.55, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                                          {lastOrder.num} · {lastOrder.date}
+                                        </span>
+                                      </div>
+                                    )}
+                                  </>
+                                ) : (
+                                  <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', marginTop: '4px' }}>
+                                    <span style={{ fontFamily: 'Oswald, sans-serif', fontWeight: 200, fontSize: '14pt', color: '#2F3540', opacity: 0.5 }}>Cap comanda</span>
+                                    <span style={{ fontFamily: 'Roboto Condensed, sans-serif', fontWeight: 300, fontSize: '8.5pt', color: '#2F3540', opacity: 0.35 }}>encara no n'has fet cap</span>
+                                  </div>
+                                ),
+                              },
+                              {
+                                label: 'MISSATGES',
+                                icon: Search,
+                                content: (
+                                  <>
+                                    <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px' }}>
+                                      <span style={{ fontFamily: 'Oswald, sans-serif', fontWeight: 300, fontSize: '28pt', color: '#2F3540', lineHeight: 1 }}>{mockMessages.length}</span>
+                                      <span style={{ fontFamily: 'Roboto Condensed, sans-serif', fontWeight: 300, fontSize: '9pt', color: '#2F3540', opacity: 0.6 }}>missatges</span>
+                                    </div>
+                                    <div style={{ marginTop: '6px' }}>
+                                      <span style={{ fontFamily: 'Roboto Condensed, sans-serif', fontWeight: 400, fontSize: '8.5pt', color: '#2F3540', opacity: 0.7 }}>{unreadCount} sense llegir</span>
+                                    </div>
+                                    <div style={{ marginTop: '8px', display: 'flex', alignItems: 'center', gap: '5px' }}>
+                                      <span style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: '#2F61B2', flexShrink: 0 }} />
+                                      <span style={{ fontFamily: 'Roboto Condensed, sans-serif', fontWeight: 300, fontSize: '8pt', color: '#2F3540', opacity: 0.55, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                                        {mockMessages[0].from} · {mockMessages[0].date}
+                                      </span>
+                                    </div>
+                                  </>
+                                ),
+                              },
+                              {
+                                label: 'COMPTE',
+                                icon: UserRound,
+                                content: adminEmail ? (
+                                  <>
+                                    <div style={{ fontFamily: 'Oswald, sans-serif', fontWeight: 300, fontSize: '16pt', color: '#2F3540', lineHeight: 1.1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                                      {adminEmail.split('@')[0]}
+                                    </div>
+                                    <div style={{ marginTop: '6px' }}>
+                                      <span style={{ fontFamily: 'Roboto Condensed, sans-serif', fontWeight: 300, fontSize: '8.5pt', color: '#2F3540', opacity: 0.5, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', display: 'block' }}>
+                                        {adminEmail}
+                                      </span>
+                                    </div>
+                                    <div style={{ marginTop: '8px', display: 'flex', alignItems: 'center', gap: '5px' }}>
+                                      <span style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: '#16A34A', flexShrink: 0 }} />
+                                      <span style={{ fontFamily: 'Roboto Condensed, sans-serif', fontWeight: 300, fontSize: '8pt', color: '#2F3540', opacity: 0.55 }}>Compte verificat</span>
+                                    </div>
+                                  </>
+                                ) : (
+                                  <>
+                                    <div style={{ fontFamily: 'Oswald, sans-serif', fontWeight: 300, fontSize: '16pt', color: '#2F3540', lineHeight: 1.1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                                      {mockUser.name}
+                                    </div>
+                                    <div style={{ marginTop: '6px' }}>
+                                      <span style={{ fontFamily: 'Roboto Condensed, sans-serif', fontWeight: 300, fontSize: '8.5pt', color: '#2F3540', opacity: 0.5, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', display: 'block' }}>
+                                        {mockUser.email}
+                                      </span>
+                                    </div>
+                                    <div style={{ marginTop: '8px', display: 'flex', alignItems: 'center', gap: '5px' }}>
+                                      <span style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: '#16A34A', flexShrink: 0 }} />
+                                      <span style={{ fontFamily: 'Roboto Condensed, sans-serif', fontWeight: 300, fontSize: '8pt', color: '#2F3540', opacity: 0.55 }}>Membre des de {mockUser.memberSince}</span>
+                                    </div>
+                                  </>
+                                ),
+                              },
+                              {
+                                label: 'SEGURETAT',
+                                icon: Check,
+                                content: (
+                                  <>
+                                    <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px' }}>
+                                      <span style={{ fontFamily: 'Oswald, sans-serif', fontWeight: 300, fontSize: '28pt', color: '#2F3540', lineHeight: 1 }}>{mockSecurity.cards}</span>
+                                      <span style={{ fontFamily: 'Roboto Condensed, sans-serif', fontWeight: 300, fontSize: '9pt', color: '#2F3540', opacity: 0.6 }}>targetes</span>
+                                    </div>
+                                    <div style={{ marginTop: '6px' }}>
+                                      <span style={{ fontFamily: 'Roboto Condensed, sans-serif', fontWeight: 400, fontSize: '8.5pt', color: '#2F3540', opacity: 0.6 }}>{mockSecurity.cardsList[0]}</span>
+                                    </div>
+                                    <div style={{ marginTop: '8px', display: 'flex', alignItems: 'center', gap: '5px' }}>
+                                      <span style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: mockSecurity.twoFactor ? '#16A34A' : '#D97706', flexShrink: 0 }} />
+                                      <span style={{ fontFamily: 'Roboto Condensed, sans-serif', fontWeight: 300, fontSize: '8pt', color: '#2F3540', opacity: 0.55 }}>
+                                        {mockSecurity.twoFactor ? 'Doble factor actiu' : 'Doble factor inactiu'}
+                                      </span>
+                                    </div>
+                                  </>
+                                ),
+                              },
+                            ];
+                            return qvData.map(({ label, icon: Icon, content }) => (
+                              <div key={label} style={{
+                                backgroundColor: '#D4D7DC',
+                                border: 'none',
+                                display: 'flex',
+                                flexDirection: 'column',
+                                padding: '16px 18px',
+                                boxSizing: 'border-box',
+                                position: 'relative',
+                                overflow: 'hidden',
+                              }}>
+                                <div style={{
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  gap: '8px',
+                                  marginBottom: '12px',
+                                }}>
+                                  <Icon size={18} strokeWidth={1.5} style={{ color: '#2F3540', opacity: 0.6 }} />
+                                  <span style={{
+                                    fontFamily: 'Oswald, sans-serif',
+                                    fontWeight: 400,
+                                    fontSize: '15pt',
+                                    color: '#2F3540',
+                                    letterSpacing: '0.5px',
+                                  }}>
+                                    {label}
+                                  </span>
+                                </div>
+                                {content}
+                              </div>
+                            ));
+                          })()}
                         </div>
 
                         {/* Anchor invisible per a la guia belt2 (DEV) — vegeu pàgina cistell. */}

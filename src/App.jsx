@@ -580,6 +580,24 @@ function App() {
     }
   };
 
+  const writeCalibrationToMap = (src, partial) => {
+    try {
+      const overlayKey = String(src || '').trim();
+      if (!overlayKey) return;
+      const canonicalOverlayKey = canonicalStripeDrawingOverlayKey(overlayKey);
+      const keyToWrite = canonicalOverlayKey || overlayKey;
+      const raw = window.localStorage.getItem('MEGA_STRIPE_DRAWING_OVERLAY_TRANSFORMS_BY_SRC');
+      let parsed = null;
+      try { parsed = raw ? JSON.parse(String(raw)) : null; } catch { parsed = null; }
+      const out = parsed && typeof parsed === 'object' ? { ...parsed } : {};
+      const prev = out[keyToWrite];
+      const next = { ...(prev && typeof prev === 'object' ? prev : {}), ...partial };
+      out[keyToWrite] = next;
+      if (canonicalOverlayKey && canonicalOverlayKey !== overlayKey) out[overlayKey] = next;
+      window.localStorage.setItem('MEGA_STRIPE_DRAWING_OVERLAY_TRANSFORMS_BY_SRC', JSON.stringify(out));
+    } catch { /* ignore */ }
+  };
+
   const parseFinite = (raw) => {
     const n = Number.parseFloat(String(raw));
     return Number.isFinite(n) ? n : null;
@@ -957,6 +975,10 @@ function App() {
         }
       } catch {
         picked = null;
+      }
+      if (!picked && (canonicalOverlayKey || overlayKey)) {
+        const fromDefaults = (canonicalOverlayKey && STRIPE_DRAWING_CALIBRATIONS[canonicalOverlayKey]) || STRIPE_DRAWING_CALIBRATIONS[overlayKey];
+        if (fromDefaults && typeof fromDefaults === 'object') picked = fromDefaults;
       }
 
       const stripeDrawingDxFallbackRaw = picked?.dx ?? (rawStripeDrawingDx != null ? rawStripeDrawingDx : rawShirtOverlayDx);
@@ -1430,29 +1452,10 @@ function App() {
       document.documentElement.style.setProperty('--megaStripeDrawingOverlayDy', `${dy}px`);
       window.localStorage.setItem('MEGA_STRIPE_DRAWING_OVERLAY_DX', String(dx));
       window.localStorage.setItem('MEGA_STRIPE_DRAWING_OVERLAY_DY', String(dy));
-
-      const overlayKey = String(megaShirtDrawingOverlaySrc || '').trim();
-      if (overlayKey) {
-        const canonicalOverlayKey = canonicalStripeDrawingOverlayKey(overlayKey);
-        const keyToWrite = canonicalOverlayKey || overlayKey;
-        const rawStripeDrawingMap = window.localStorage.getItem('MEGA_STRIPE_DRAWING_OVERLAY_TRANSFORMS_BY_SRC');
-        let parsed = null;
-        try {
-          parsed = rawStripeDrawingMap ? JSON.parse(String(rawStripeDrawingMap)) : null;
-        } catch {
-          parsed = null;
-        }
-        const out = parsed && typeof parsed === 'object' ? { ...parsed } : {};
-        const prev = out[keyToWrite];
-        const next = { ...(prev && typeof prev === 'object' ? prev : {}), dx, dy };
-        out[keyToWrite] = next;
-        if (canonicalOverlayKey && canonicalOverlayKey !== overlayKey) out[overlayKey] = next;
-        window.localStorage.setItem('MEGA_STRIPE_DRAWING_OVERLAY_TRANSFORMS_BY_SRC', JSON.stringify(out));
-      }
     } catch {
       // ignore
     }
-  }, [megaStripeDrawingOverlayDx, megaStripeDrawingOverlayDy, megaShirtDrawingOverlaySrc]);
+  }, [megaStripeDrawingOverlayDx, megaStripeDrawingOverlayDy]);
 
   useEffect(() => {
     try {
@@ -1471,30 +1474,10 @@ function App() {
       const v = Number.isFinite(megaStripeDrawingOverlayScale) ? megaStripeDrawingOverlayScale : 1;
       const clamped = clampScale(v, 1);
       document.documentElement.style.setProperty('--megaStripeDrawingOverlayScale', String(clamped));
-      window.localStorage.setItem('MEGA_STRIPE_DRAWING_OVERLAY_SCALE', String(clamped));
-
-      const overlayKey = String(megaShirtDrawingOverlaySrc || '').trim();
-      if (overlayKey) {
-        const canonicalOverlayKey = canonicalStripeDrawingOverlayKey(overlayKey);
-        const keyToWrite = canonicalOverlayKey || overlayKey;
-        const rawStripeDrawingMap = window.localStorage.getItem('MEGA_STRIPE_DRAWING_OVERLAY_TRANSFORMS_BY_SRC');
-        let parsed = null;
-        try {
-          parsed = rawStripeDrawingMap ? JSON.parse(String(rawStripeDrawingMap)) : null;
-        } catch {
-          parsed = null;
-        }
-        const out = parsed && typeof parsed === 'object' ? { ...parsed } : {};
-        const prev = out[keyToWrite];
-        const next = { ...(prev && typeof prev === 'object' ? prev : {}), scale: clamped };
-        out[keyToWrite] = next;
-        if (canonicalOverlayKey && canonicalOverlayKey !== overlayKey) out[overlayKey] = next;
-        window.localStorage.setItem('MEGA_STRIPE_DRAWING_OVERLAY_TRANSFORMS_BY_SRC', JSON.stringify(out));
-      }
     } catch {
       // ignore
     }
-  }, [megaStripeDrawingOverlayScale, megaShirtDrawingOverlaySrc]);
+  }, [megaStripeDrawingOverlayScale]);
 
   useEffect(() => {
     const v = String(megaStripeOverlayMode || 'off');
@@ -3357,7 +3340,7 @@ function App() {
                   zIndex: 1000000,
                   fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace',
                   transform: (Number.isFinite(megaStripeHudSnapDyPx) && Math.abs(megaStripeHudSnapDyPx) > 0.001) ? `translateY(${megaStripeHudSnapDyPx}px)` : undefined,
-                  display: 'none',
+                  display: 'flex',
                   flexDirection: 'column',
                   pointerEvents: 'none',
                   transition: 'height 300ms ease',
@@ -4177,6 +4160,7 @@ function App() {
                                   return;
                                 }
                                 setMegaStripeDrawingOverlayDx(n);
+                                writeCalibrationToMap(megaShirtDrawingOverlaySrc, { dx: n });
                               }}
                               onChange={(e) => setMegaStripeDrawingOverlayDxDraft(e.target.value)}
                               onClick={(e) => e.stopPropagation()}
@@ -4199,6 +4183,7 @@ function App() {
                                   return;
                                 }
                                 setMegaStripeDrawingOverlayDy(n);
+                                writeCalibrationToMap(megaShirtDrawingOverlaySrc, { dy: n });
                               }}
                               onChange={(e) => setMegaStripeDrawingOverlayDyDraft(e.target.value)}
                               onClick={(e) => e.stopPropagation()}
@@ -4221,6 +4206,7 @@ function App() {
                                   return;
                                 }
                                 setMegaStripeDrawingOverlayScale(clampScale(n, 1));
+                                writeCalibrationToMap(megaShirtDrawingOverlaySrc, { scale: clampScale(n, 1) });
                               }}
                               onChange={(e) => setMegaStripeDrawingOverlayScaleDraft(e.target.value)}
                               onClick={(e) => e.stopPropagation()}

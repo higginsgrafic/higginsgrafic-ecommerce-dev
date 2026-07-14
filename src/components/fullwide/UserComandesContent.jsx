@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef } from 'react';
 import {
   AlertCircle,
   Check,
@@ -8,6 +8,8 @@ import {
   Eye,
   EyeOff,
   Loader2,
+  Pencil,
+  Copy,
   MoreHorizontal,
   Package,
   Search,
@@ -48,6 +50,46 @@ function UserComandesContent({ userEmail }) {
   const [mailingOpen, setMailingOpen] = useState(true);
   const [factorOpen, setFactorOpen] = useState(true);
   const [segVisible, setSegVisible] = useState(false);
+  const [paymentMethods, setPaymentMethods] = useState([
+    { id: 1, ent: 'Visa',       nom: 'Marc Higgins',  num: '4111 1111 1111 1111', exp: '12/29', cvvVerified: true },
+  ]);
+  const [cvvInput, setCvvInput] = useState('');
+  const nextCardId = useRef(2);
+  const [editingCard, setEditingCard] = useState(null);
+  const [editForm, setEditForm] = useState({ ent: '', nom: '', num: '', exp: '', cvv: '' });
+  const handleAddCard = () => {
+    const newId = nextCardId.current++;
+    setPaymentMethods(prev => [...prev, { id: newId, ent: '', nom: '', num: '', exp: '', cvvVerified: false }]);
+    setEditingCard(newId);
+    setEditForm({ ent: '', nom: '', num: '', exp: '', cvvVerified: false });
+    setCvvInput('');
+  };
+  const handleEditCard = (card) => {
+    setEditingCard(card.id);
+    setEditForm({ ent: card.ent, nom: card.nom, num: card.num, exp: card.exp, cvvVerified: card.cvvVerified });
+    setCvvInput('');
+  };
+  const handleVerifyCvv = () => {
+    const isValid = cvvInput.length >= 3;
+    setEditForm(p => ({ ...p, cvvVerified: isValid }));
+    if (isValid) setCvvInput('');
+  };
+  const handleSaveCard = () => {
+    const cvvVerified = cvvInput.length >= 3 || editForm.cvvVerified;
+    setPaymentMethods(prev => prev.map(c => c.id === editingCard ? { ...c, ...editForm, cvvVerified } : c));
+    setEditingCard(null);
+  };
+  const handleCancelEdit = () => setEditingCard(null);
+  const handleDuplicateCard = (card) => {
+    setPaymentMethods(prev => [...prev, { id: nextCardId.current++, ...card, nom: card.nom + ' (còpia)', cvvVerified: false }]);
+  };
+  const handleDeleteLastCard = () => {
+    setPaymentMethods(prev => prev.length > 1 ? prev.slice(0, -1) : prev);
+  };
+  const roundBtnStyle = (bg, color = '#FFFFFF') => ({ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color, fontSize: '14pt', fontWeight: 400, width: '22px', height: '22px', borderRadius: '50%', background: bg, lineHeight: 1 });
+  const minusBtn = (
+    <span role="button" aria-label="Eliminar última targeta" onClick={(e) => { e.stopPropagation(); handleDeleteLastCard(); }} style={roundBtnStyle('#FEE2E2', '#DC2626')}>−</span>
+  );
   const [nameSortDir, setNameSortDir] = usePersistentState('HG_USER_NAME_SORT', 'asc'); // 'asc' | 'desc'
   const [dateSortDir, setDateSortDir] = usePersistentState('HG_USER_DATE_SORT', 'desc'); // 'asc' | 'desc'
   const toggleSort = (key) => setSortDirs((prev) => ({ ...prev, [key]: prev[key] === 'desc' ? 'asc' : 'desc' }));
@@ -622,15 +664,6 @@ function UserComandesContent({ userEmail }) {
                     {segVisible ? <EyeOff size={18} /> : <Eye size={18} />}
                   </span>
                 );
-                const segDemo = [
-                  { ent: 'Visa',       nom: 'Marc Higgins',  num: '4111 1111 1111 1111', exp: '12/29', cvv: '123' },
-                  { ent: 'Mastercard', nom: 'Anna Soler',    num: '5500 0000 0000 0004', exp: '03/27', cvv: '456' },
-                  { ent: 'Amex',       nom: 'Joan Vidal',    num: '3782 822463 10005',   exp: '11/26', cvv: '7890' },
-                  { ent: 'Visa',       nom: 'Maria Pla',     num: '4242 4242 4242 4242', exp: '07/28', cvv: '321' },
-                  { ent: 'Maestro',    nom: 'Pere Font',     num: '6759 6498 2643 8453', exp: '09/30', cvv: '654' },
-                  { ent: 'Visa',       nom: 'Laura Riu',     num: '4012 8888 8888 1881', exp: '05/25', cvv: '987' },
-                  { ent: 'Discover',   nom: 'Toni Gel',      num: '6011 0009 9013 9424', exp: '02/31', cvv: '159' },
-                ];
                 const cardDots = '\u2022\u2022\u2022\u2022 \u2022\u2022\u2022\u2022 \u2022\u2022\u2022\u2022 \u2022\u2022\u2022\u2022';
                 return Array.from({ length: 19 }).map((_, r) => {
                   if (r === 0) {
@@ -651,24 +684,24 @@ function UserComandesContent({ userEmail }) {
                     return (
                       <tr key={r} style={{ height: '29.75px' }}>
                         <td colSpan={1} style={{ height: '29.75px', padding: 0 }}>
-                          <div style={{ ...cellStyle, color: RED, fontSize: '13pt' }}>
+                          <div style={{ ...cellStyle, color: RED, fontSize: '13pt', justifyContent: 'center' }}>
                             <span>Entitat</span>
                           </div>
                         </td>
-                        <td colSpan={1} style={{ height: '29.75px', padding: 0 }}>
-                          <div style={{ ...cellStyle, justifyContent: 'center' }}>{eyeBtn}</div>
-                        </td>
                         <td colSpan={4} style={{ height: '29.75px', padding: 0 }}>
-                          <div style={{ ...cellStyle, color: RED, fontSize: '13pt' }}>Nom del titular</div>
+                          <div style={{ ...cellStyle, color: RED, fontSize: '13pt', justifyContent: 'center' }}>Nom del titular</div>
+                        </td>
+                        <td colSpan={1} style={{ height: '29.75px', padding: 0 }}>
+                          <div style={{ ...cellStyle, color: RED, fontSize: '13pt', justifyContent: 'center' }}>Edició</div>
                         </td>
                         <td colSpan={3} style={{ height: '29.75px', padding: 0 }}>
-                          <div style={{ ...cellStyle, color: RED, fontSize: '13pt', transform: `translateX(${SEG_SHIFT_X})` }}>Número de targeta<span style={supSt}>1</span></div>
+                          <div style={{ ...cellStyle, color: RED, fontSize: '13pt', justifyContent: 'center' }}>Número de targeta<span style={supSt}>1</span></div>
                         </td>
                         <td colSpan={2} style={{ height: '29.75px', padding: 0 }}>
-                          <div style={{ ...cellStyle, color: RED, fontSize: '13pt', transform: `translateX(${SEG_SHIFT_X})` }}>Caducitat<span style={supSt}>1</span></div>
+                          <div style={{ ...cellStyle, color: RED, fontSize: '13pt', justifyContent: 'center' }}>Caducitat<span style={supSt}>1</span></div>
                         </td>
                         <td colSpan={1} style={{ height: '29.75px', padding: 0 }}>
-                          <div style={{ ...cellStyle, color: RED, fontSize: '13pt', transform: `translateX(${SEG_SHIFT_X})` }}>CVV<span style={supSt}>2</span></div>
+                          <div style={{ ...cellStyle, color: RED, fontSize: '13pt', justifyContent: 'center' }}>CVV<span style={supSt}>2</span></div>
                         </td>
                       </tr>
                     );
@@ -681,45 +714,158 @@ function UserComandesContent({ userEmail }) {
                         </tr>
                       );
                     }
-                    const d = segDemo[r - 2];
+                    const cardIdx = r - 2;
+                    const d = paymentMethods[cardIdx];
                     const noPupilEye = (
                       <svg width="18" height="10" viewBox="0 0 18 10" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                         <path d="M1 5C2.8 2.3 5.6 1 9 1C12.4 1 15.2 2.3 17 5C15.2 7.7 12.4 9 9 9C5.6 9 2.8 7.7 1 5Z" stroke="#C3C8CD" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/>
                       </svg>
                     );
+                    const CARD_BRANDS = {
+                      'Visa':       { gradient: 'linear-gradient(135deg, #1A1F71 0%, #2D5BA8 100%)',           text: 'VISA' },
+                      'Mastercard': { gradient: 'linear-gradient(135deg, #EB001B 0%, #F79E1B 100%)',         text: 'MC' },
+                      'Amex':       { gradient: 'linear-gradient(135deg, #006FCF 0%, #00A1DE 100%)',         text: 'AMEX' },
+                      'Maestro':    { gradient: 'linear-gradient(135deg, #0099DF 0%, #ED0006 100%)',         text: 'MAESTRO' },
+                      'Discover':   { gradient: 'linear-gradient(135deg, #FF6F00 0%, #FF8F00 100%)',         text: 'DISC' },
+                      'PayPal':     { gradient: 'linear-gradient(135deg, #003087 0%, #009CDE 100%)',         text: 'PP' },
+                      'Apple Pay':  { gradient: 'linear-gradient(135deg, #1A1A1A 0%, #3A3A3A 100%)',         text: 'PAY' },
+                      'Google Pay': { gradient: 'linear-gradient(135deg, #4285F4 0%, #34A853 100%)',         text: 'G PAY' },
+                    };
+                    const getBrandStyle = (ent) => CARD_BRANDS[ent] || { gradient: 'linear-gradient(to bottom, #B8BCC4, #DCE0E6)', text: ent ? ent.toUpperCase().slice(0, 4) : '' };
                     const rect = (
-                      <span style={{ width: '45px', height: '29px', background: '#E5E7EB', borderRadius: '5px', flexShrink: 0, marginRight: '10px' }} />
+                      <span style={{
+                        width: '45px', height: '29px', borderRadius: '4px', flexShrink: 0,
+                        background: getBrandStyle(d ? d.ent : '').gradient,
+                        display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                        boxShadow: '0 1px 2px rgba(0,0,0,0.15)',
+                      }}>
+                        <span style={{ color: '#FFFFFF', fontSize: '7pt', fontWeight: 700, fontFamily: 'Oswald, sans-serif', letterSpacing: '0.3px', lineHeight: 1 }}>{getBrandStyle(d ? d.ent : '').text}</span>
+                      </span>
                     );
+                    const inputStyle = { fontFamily: 'Roboto Condensed, sans-serif', fontWeight: 400, fontSize: '12pt', color: '#475059', border: '1px solid #C9CED6', borderRadius: '3px', padding: '2px 6px', width: '100%', boxSizing: 'border-box', height: '24px', outline: 'none' };
+                    const cardActionBtn = (icon, label, onClick, color = '#8892A0') => (
+                      <span role="button" aria-label={label} onClick={(e) => { e.stopPropagation(); onClick(); }} style={{ display: 'inline-flex', alignItems: 'center', cursor: 'pointer', color, padding: '0 2px' }}>
+                        {icon}
+                      </span>
+                    );
+                    const isEditing = editingCard === d?.id;
+                    if (!d) {
+                      const isAddRow = r === 2 + paymentMethods.length;
+                      return (
+                        <tr key={r} style={{ height: '29.75px' }}>
+                          {isAddRow ? (
+                            <>
+                              <td colSpan={1} style={{ height: '29.75px', padding: 0 }}>
+                                <div style={{ ...cellStyle, justifyContent: 'center' }}>
+                                  <span role="button" aria-label="Afegir targeta" onClick={(e) => { e.stopPropagation(); handleAddCard(); }} style={roundBtnStyle('#DCFCE7', '#16A34A')}>+</span>
+                                </div>
+                              </td>
+                              <td colSpan={10} style={{ height: '29.75px', padding: 0 }} />
+                              <td colSpan={1} style={{ height: '29.75px', padding: 0 }}>
+                                <div style={{ ...cellStyle, justifyContent: 'center' }}>
+                                  {paymentMethods.length > 1 && minusBtn}
+                                </div>
+                              </td>
+                            </>
+                          ) : (
+                            <td colSpan={12} style={{ height: '29.75px', padding: 0 }} />
+                          )}
+                        </tr>
+                      );
+                    }
+                    if (isEditing) {
+                      const f = editForm;
+                      return (
+                        <tr key={r} style={{ height: '29.75px' }}>
+                          <td colSpan={1} style={{ height: '29.75px', padding: 0 }}>
+                            <div style={{ ...cellStyle, padding: '0 4px', justifyContent: 'center' }}>
+                              <input value={f.ent} onChange={e => setEditForm(p => ({ ...p, ent: e.target.value }))} placeholder="Entitat" style={{ ...inputStyle, width: '80px' }} />
+                            </div>
+                          </td>
+                          <td colSpan={4} style={{ height: '29.75px', padding: 0 }}>
+                            <div style={{ ...cellStyle, padding: '0 4px' }}>
+                              <input value={f.nom} onChange={e => setEditForm(p => ({ ...p, nom: e.target.value }))} placeholder="Nom del titular" style={inputStyle} />
+                            </div>
+                          </td>
+                          <td colSpan={1} style={{ height: '29.75px', padding: 0 }}>
+                            <div style={{ ...cellStyle, justifyContent: 'center', gap: '2px' }}>
+                              {cardActionBtn(<Check size={14} strokeWidth={1.75} />, 'Desar', handleSaveCard, '#16A34A')}
+                              {cardActionBtn(<X size={14} strokeWidth={1.75} />, 'Cancel·lar', handleCancelEdit, '#DC2626')}
+                            </div>
+                          </td>
+                          <td colSpan={3} style={{ height: '29.75px', padding: 0 }}>
+                            <div style={{ ...cellStyle, padding: '0 4px', justifyContent: 'center' }}>
+                              <input value={f.num} onChange={e => setEditForm(p => ({ ...p, num: e.target.value }))} placeholder="Número" style={{ ...inputStyle, width: '90%' }} />
+                            </div>
+                          </td>
+                          <td colSpan={2} style={{ height: '29.75px', padding: 0 }}>
+                            <div style={{ ...cellStyle, padding: '0 4px', justifyContent: 'center' }}>
+                              <input value={f.exp} onChange={e => setEditForm(p => ({ ...p, exp: e.target.value }))} placeholder="MM/AA" style={{ ...inputStyle, width: '70px' }} />
+                            </div>
+                          </td>
+                          <td colSpan={1} style={{ height: '29.75px', padding: 0 }}>
+                            <div style={{ ...cellStyle, justifyContent: 'center' }}>
+                              {f.cvvVerified ? (
+                                <Check size={16} strokeWidth={2} style={{ color: '#16A34A' }} />
+                              ) : (
+                                <input value={cvvInput} onChange={e => setCvvInput(e.target.value)} placeholder="CVV" style={{ ...inputStyle, width: '50px', textAlign: 'center' }} />
+                              )}
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    }
                     return (
                       <tr key={r} style={{ height: '29.75px', color: '#C3C8CD' }}>
                         <td colSpan={1} style={{ height: '29.75px', padding: 0 }}>
-                          <div style={{ ...cellStyle, color: '#C3C8CD' }}>
+                          <div style={{ ...cellStyle, color: '#C3C8CD', justifyContent: 'center' }}>
                             {rect}
-                            <span style={{ flex: 1 }}>{segVisible ? d.ent : ''}</span>
+                            <span style={{ flex: 1, textAlign: 'center' }}>{segVisible ? d.ent : ''}</span>
                           </div>
                         </td>
-                        <td colSpan={1} style={{ height: '29.75px', padding: 0 }}>
-                          <div style={{ ...cellStyle, color: '#C3C8CD', justifyContent: 'center' }}>{noPupilEye}</div>
-                        </td>
                         <td colSpan={4} style={{ height: '29.75px', padding: 0 }}>
-                          <div style={{ ...cellStyle, color: '#C3C8CD' }}>{segVisible ? d.nom : 'Nom'}</div>
+                          <div style={{ ...cellStyle, color: '#C3C8CD' }}>{d.nom}</div>
+                        </td>
+                        <td colSpan={1} style={{ height: '29.75px', padding: 0 }}>
+                          <div style={{ ...cellStyle, justifyContent: 'center', gap: '2px' }}>
+                            {cardActionBtn(<Pencil size={14} strokeWidth={1.5} />, 'Editar', () => handleEditCard(d), '#8892A0')}
+                            {cardActionBtn(<Copy size={14} strokeWidth={1.5} />, 'Duplicar', () => handleDuplicateCard(d), '#8892A0')}
+                          </div>
                         </td>
                         <td colSpan={3} style={{ height: '29.75px', padding: 0 }}>
-                          <div style={{ ...cellStyle, color: '#C3C8CD', whiteSpace: 'nowrap', letterSpacing: segVisible ? 'normal' : '2px', fontSize: segVisible ? '12pt' : '14pt', transform: `translateX(${SEG_SHIFT_X})` }}>{segVisible ? d.num : cardDots}</div>
+                          <div style={{ ...cellStyle, color: '#C3C8CD', whiteSpace: 'nowrap', letterSpacing: segVisible ? 'normal' : '2px', fontSize: segVisible ? '12pt' : '14pt', justifyContent: 'center' }}>{segVisible ? d.num : cardDots}</div>
                         </td>
                         <td colSpan={2} style={{ height: '29.75px', padding: 0 }}>
-                          <div style={{ ...cellStyle, color: '#C3C8CD', whiteSpace: 'nowrap', letterSpacing: segVisible ? 'normal' : '2px', fontSize: segVisible ? '12pt' : '14pt', transform: `translateX(${SEG_SHIFT_X})` }}>{segVisible ? d.exp : '••/••'}</div>
+                          <div style={{ ...cellStyle, color: '#C3C8CD', whiteSpace: 'nowrap', letterSpacing: segVisible ? 'normal' : '2px', fontSize: segVisible ? '12pt' : '14pt', justifyContent: 'center' }}>{segVisible ? d.exp : '••/••'}</div>
                         </td>
                         <td colSpan={1} style={{ height: '29.75px', padding: 0 }}>
-                          <div style={{ ...cellStyle, color: '#C3C8CD', whiteSpace: 'nowrap', letterSpacing: segVisible ? 'normal' : '2px', fontSize: segVisible ? '12pt' : '14pt', transform: `translateX(${SEG_SHIFT_X})` }}>{segVisible ? d.cvv : '•••'}</div>
+                          <div style={{ ...cellStyle, color: '#C3C8CD', justifyContent: 'center' }}>
+                            {d.cvvVerified ? (
+                              <Check size={16} strokeWidth={2} style={{ color: '#16A34A' }} />
+                            ) : (
+                              <X size={16} strokeWidth={2} style={{ color: '#DC2626' }} />
+                            )}
+                          </div>
                         </td>
                       </tr>
                     );
                   }
                   if (r === 9) {
+                    const isFull = paymentMethods.length === 7;
                     return (
                       <tr key={r} style={{ height: '29.75px' }}>
-                        <td colSpan={12} style={{ height: '29.75px', padding: 0 }} />
+                        {isFull && paymentMethods.length > 1 ? (
+                          <>
+                            <td colSpan={11} style={{ height: '29.75px', padding: 0 }} />
+                            <td colSpan={1} style={{ height: '29.75px', padding: 0 }}>
+                              <div style={{ ...cellStyle, justifyContent: 'center' }}>
+                                {minusBtn}
+                              </div>
+                            </td>
+                          </>
+                        ) : (
+                          <td colSpan={12} style={{ height: '29.75px', padding: 0 }} />
+                        )}
                       </tr>
                     );
                   }
@@ -1295,7 +1441,7 @@ function UserComandesContent({ userEmail }) {
                   letterSpacing: '0.5px',
                   textAlign: 'center',
                 }}>
-                  Encara no has fet cap comanda
+                  Encara no s'ha fet cap comanda
                 </div>
               </td>
             </tr>

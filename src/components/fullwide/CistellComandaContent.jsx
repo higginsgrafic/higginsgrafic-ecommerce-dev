@@ -163,7 +163,7 @@ function CistellComandaContent({ cartItems, setCartItems, onCloseMegaSlide, onFi
             letterSpacing: '0.5px',
             textAlign: 'center',
           }}>
-            Encara no hi has afegit cap producte
+            Encara no s'hi ha afegit cap producte
           </div>
         </div>
       ) : (
