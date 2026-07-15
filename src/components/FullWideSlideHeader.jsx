@@ -1546,6 +1546,14 @@ export default function FullWideSlideHeader({
   }, [resolvedOverlaySrc]);
 
   useEffect(() => {
+    if (active !== 'cube') return;
+    const unique = new Set(Object.values(CUBE_MEDIA));
+    for (const src of unique) {
+      if (src) preloadSrc(src);
+    }
+  }, [active]);
+
+  useEffect(() => {
     if (!import.meta.env.DEV) return;
     try {
       if (typeof window === 'undefined') return;
@@ -2677,6 +2685,13 @@ export default function FullWideSlideHeader({
     }
     return tileSrcs;
   }, [resolvedMegaFiltered, active, firstContactVariant, humanInsideVariant, displayedShirtColor, thinDrawings, resolvedOverlaySrc]);
+
+  useEffect(() => {
+    if (!Array.isArray(stripeTileOverlaySrcs)) return;
+    for (const src of stripeTileOverlaySrcs) {
+      if (src) preloadSrc(src);
+    }
+  }, [stripeTileOverlaySrcs]);
 
   // Identitat de l'ítem mostrat a cada tile de la franja (mateixa lògica
   // cíclica que stripeTileOverlaySrcs). Permet saber quina samarreta correspon

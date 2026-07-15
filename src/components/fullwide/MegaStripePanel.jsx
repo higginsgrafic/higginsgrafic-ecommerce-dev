@@ -530,15 +530,6 @@ function MegaStripePanel({
                                   ? (baseMode === 'color' ? 'color' : 'white')
                                   : baseMode;
 
-                              if (active === 'cube' && !isFirst) {
-                                if (/\/cube\/afrodita-c-stripe\.webp$/i.test(src)) {
-                                  return '/custom_logos/drawings/images_originals/stripe/cube/afrodita-cut-c-stripe.webp';
-                                }
-                                if (/\/cube\/cyber-cube-stripe\.webp$/i.test(src)) {
-                                  return '/custom_logos/drawings/images_originals/stripe/cube/cyber-cube-cut-stripe.webp';
-                                }
-                              }
-
                               const toBlack = (s) => {
                                 let out = s;
                                 out = out.replace(/\/white\//i, '/black/');
@@ -779,15 +770,6 @@ function MegaStripePanel({
                                 : useEdgeOverride && isLast
                                   ? (baseMode === 'color' ? 'color' : 'white')
                                   : baseMode;
-
-                              if (active === 'cube' && !isFirst) {
-                                if (/\/cube\/afrodita-c-stripe\.webp$/i.test(src)) {
-                                  return '/custom_logos/drawings/images_originals/stripe/cube/afrodita-cut-c-stripe.webp';
-                                }
-                                if (/\/cube\/cyber-cube-stripe\.webp$/i.test(src)) {
-                                  return '/custom_logos/drawings/images_originals/stripe/cube/cyber-cube-cut-stripe.webp';
-                                }
-                              }
 
                               const toBlack = (s) => {
                                 let out = s;
