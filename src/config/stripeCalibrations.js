@@ -253,6 +253,10 @@ export const STRIPE_DRAWING_CALIBRATIONS = {
   '/custom_logos/drawings/images_stripe/miscellania/color/arthur-d-the-second-multi-dark-stripe.webp': { dx: 0.75, dy: 30, scale: 0.29 },
   '/custom_logos/drawings/images_stripe/miscellania/color/r2d2-quote-multi-light-stripe.webp': { dx: 0.75, dy: 30, scale: 0.29 },
   '/custom_logos/drawings/images_stripe/miscellania/color/r2d2-quote-multi-dark-stripe.webp': { dx: 0.75, dy: 30, scale: 0.29 },
+  '/custom_logos/drawings/images_stripe/miscellania/black/arthur-d-the-second-b-stripe.webp': { dx: 0.75, dy: 30, scale: 0.29 },
+  '/custom_logos/drawings/images_stripe/miscellania/white/arthur-d-the-second-w-stripe.webp': { dx: 0.75, dy: 30, scale: 0.29 },
+  '/custom_logos/drawings/images_stripe/miscellania/black/r2d2-quote-b-stripe.webp': { dx: 0.75, dy: 30, scale: 0.29 },
+  '/custom_logos/drawings/images_stripe/miscellania/white/r2d2-quote-w-stripe.webp': { dx: 0.75, dy: 30, scale: 0.29 },
 
   '/custom_logos/drawings/images_stripe/first_contact/color/the-phoenix-multi-light-stripe.webp': { dx: 0.25, dy: 23, scale: 0.56 },
   '/custom_logos/drawings/images_stripe/first_contact/color/the-phoenix-multi-dark-stripe.webp': { dx: 0.25, dy: 23, scale: 0.56 },

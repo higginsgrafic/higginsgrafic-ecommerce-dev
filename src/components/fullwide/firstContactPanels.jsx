@@ -83,48 +83,89 @@ export function FirstContactDibuix00Buttons({
   showWhite = true,
   showBlack = true,
   showMulti = true,
+  selectedVariant,
 }) {
   const buttons = [];
   if (showWhite) buttons.push({ key: 'white', label: 'Blanc', onClick: onWhite });
-  if (showBlack) buttons.push({ key: 'black', label: 'Negre', onClick: onBlack });
   if (showMulti) buttons.push({ key: 'color', label: 'Color', onClick: onMulti });
+  if (showBlack) buttons.push({ key: 'black', label: 'Negre', onClick: onBlack });
 
   if (!buttons.length) return null;
 
-  const heightPct = 100 / buttons.length;
+  const selectedIndex = Math.max(0, buttons.findIndex((b) => b.key === selectedVariant));
+  const slotPct = 100 / buttons.length;
+  const sliderTopPct = selectedIndex * slotPct;
+  const sliderHeightPct = slotPct;
 
   return (
-    <div className="relative mt-2 aspect-square w-full" data-stripe-buttonbar="bn">
-      <div className="absolute inset-0 overflow-hidden rounded-md bg-muted">
-        {buttons.map((btn, i) => {
-          const topPct = i * heightPct;
-          const isFirst = i === 0;
-          const className = btn.key === 'white'
-            ? 'bg-foreground'
-            : btn.key === 'black'
-              ? 'bg-background'
-              : 'bg-muted';
-          const textClass = btn.key === 'white' ? 'text-whiteStrong' : 'text-foreground';
-
-          return (
-            <button
-              key={btn.key}
-              type="button"
-              aria-label={btn.label}
-              id={isFirst ? 'stripe-guide-left-anchor' : undefined}
-              onClick={btn.onClick}
-              className={`absolute left-0 w-full focus:outline-none focus-visible:ring-2 focus-visible:ring-ring ${className}`}
-              style={{ top: `${topPct}%`, height: `${heightPct}%` }}
+    <div
+      className="relative mt-2 aspect-square w-full"
+      data-stripe-buttonbar="bn"
+      style={{
+        border: '1px solid #D1D5DB',
+        borderRadius: '6px',
+        backgroundColor: '#F3F4F6',
+        boxSizing: 'border-box',
+        overflow: 'hidden',
+      }}
+    >
+      {buttons.map((btn, i) => {
+        const topPct = i * slotPct;
+        return (
+          <button
+            key={btn.key}
+            type="button"
+            aria-label={btn.label}
+            onClick={btn.onClick}
+            className="absolute left-0 w-full focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            style={{
+              top: `${topPct}%`,
+              height: `${slotPct}%`,
+              border: 'none',
+              background: 'transparent',
+              cursor: 'pointer',
+              padding: 0,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              zIndex: 2,
+            }}
+          >
+            <span
+              className="font-oswald"
+              style={{
+                fontSize: '14px',
+                fontWeight: 400,
+                textTransform: 'uppercase',
+                color: selectedIndex === i ? '#1A1A1A' : '#6B7280',
+                pointerEvents: 'none',
+                lineHeight: 1,
+                transition: 'color 200ms ease',
+              }}
             >
-              <span
-                className={`pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 font-oswald text-[20px] font-normal uppercase ${textClass}`}
-              >
-                {btn.label}
-              </span>
-            </button>
-          );
-        })}
-      </div>
+              {btn.label}
+            </span>
+          </button>
+        );
+      })}
+      <span
+        aria-hidden="true"
+        style={{
+          position: 'absolute',
+          left: '3px',
+          right: '3px',
+          top: `calc(${sliderTopPct}% + 3px)`,
+          height: `calc(${sliderHeightPct}% - 6px)`,
+          backgroundColor: '#FFFFFF',
+          borderRadius: '4px',
+          border: '1px solid #D1D5DB',
+          boxShadow: '0 1px 3px rgba(0,0,0,0.12)',
+          boxSizing: 'border-box',
+          pointerEvents: 'none',
+          transition: 'top 200ms cubic-bezier(0.32, 0.72, 0, 1)',
+          zIndex: 1,
+        }}
+      />
     </div>
   );
 }
