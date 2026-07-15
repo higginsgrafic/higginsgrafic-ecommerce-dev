@@ -2530,10 +2530,10 @@ export default function FullWideSlideHeader({
     // Versió multi (variant 'color'): només la samarreta blanca usa la Dark;
     // totes les altres usen la Light, independentment del color de samarreta.
     const multiTone = displayedShirtColor === 'white' ? 'dark' : 'light';
-    const resolveForItem = (it) => {
+    const resolveForItem = (it, tileVariant) => {
       if (active === 'first_contact') {
-        if (variant === 'white') return FIRST_CONTACT_MEDIA_WHITE[it] || FIRST_CONTACT_MEDIA[it] || null;
-        if (variant === 'color') return FIRST_CONTACT_MEDIA_COLOR[it] || FIRST_CONTACT_MEDIA[it] || null;
+        if (tileVariant === 'white') return FIRST_CONTACT_MEDIA_WHITE[it] || FIRST_CONTACT_MEDIA[it] || null;
+        if (tileVariant === 'color') return FIRST_CONTACT_MEDIA_COLOR[it] || FIRST_CONTACT_MEDIA[it] || null;
         return FIRST_CONTACT_MEDIA[it] || null;
       }
       if (active === 'the_human_inside') {
@@ -2551,11 +2551,11 @@ export default function FullWideSlideHeader({
         };
         const file = mapBlack[k];
         if (!file) return null;
-        if (variant === 'white') {
+        if (tileVariant === 'white') {
           const wf = file.replace(/-b-stripe\.webp$/, '-w-stripe.webp');
           return `/custom_logos/drawings/images_stripe/the_human_inside/white/${wf}`;
         }
-        if (variant === 'color') {
+        if (tileVariant === 'color') {
           const cf = file.replace(/-b-stripe\.webp$/, '-multi-light-stripe.webp');
           return `/custom_logos/drawings/images_stripe/the_human_inside/color/${cf}`;
         }
@@ -2567,28 +2567,28 @@ export default function FullWideSlideHeader({
       if (active === 'miscellania') {
         const lower = String(it).toLowerCase();
         if (lower.includes('arthur-d-the-second') || lower.includes('arthur d the second')) {
-          if (variant === 'white') return '/custom_logos/drawings/images_stripe/miscellania/white/arthur-d-the-second-w-stripe.webp';
-          if (variant === 'color') return '/custom_logos/drawings/images_stripe/miscellania/color/arthur-d-the-second-multi-light-stripe.webp';
+          if (tileVariant === 'white') return '/custom_logos/drawings/images_stripe/miscellania/white/arthur-d-the-second-w-stripe.webp';
+          if (tileVariant === 'color') return '/custom_logos/drawings/images_stripe/miscellania/color/arthur-d-the-second-multi-light-stripe.webp';
           return '/custom_logos/drawings/images_stripe/miscellania/black/arthur-d-the-second-b-stripe.webp';
         }
         if (lower.includes('r2d2-quote') || lower.includes('r2d2 quote')) {
-          if (variant === 'white') return '/custom_logos/drawings/images_stripe/miscellania/white/r2d2-quote-w-stripe.webp';
-          if (variant === 'color') return '/custom_logos/drawings/images_stripe/miscellania/color/r2d2-quote-multi-light-stripe.webp';
+          if (tileVariant === 'white') return '/custom_logos/drawings/images_stripe/miscellania/white/r2d2-quote-w-stripe.webp';
+          if (tileVariant === 'color') return '/custom_logos/drawings/images_stripe/miscellania/color/r2d2-quote-multi-light-stripe.webp';
           return '/custom_logos/drawings/images_stripe/miscellania/black/r2d2-quote-b-stripe.webp';
         }
         if (lower.includes('dj-vader')) {
-          if (variant === 'white') return '/custom_logos/drawings/images_stripe/miscellania/white/dj-vader-w-stripe.webp';
-          if (variant === 'color') return '/custom_logos/drawings/images_stripe/miscellania/color/dj-vader-multi-light-stripe.webp';
+          if (tileVariant === 'white') return '/custom_logos/drawings/images_stripe/miscellania/white/dj-vader-w-stripe.webp';
+          if (tileVariant === 'color') return '/custom_logos/drawings/images_stripe/miscellania/color/dj-vader-multi-light-stripe.webp';
           return '/custom_logos/drawings/images_stripe/miscellania/black/dj-vader-b-stripe.webp';
         }
         if (lower.includes('death-star2d2')) {
-          if (variant === 'white') return '/custom_logos/drawings/images_stripe/miscellania/white/death-star2d2-w-stripe.webp';
-          if (variant === 'color') return '/custom_logos/drawings/images_stripe/miscellania/color/death-star2d2-multi-light-stripe.webp';
+          if (tileVariant === 'white') return '/custom_logos/drawings/images_stripe/miscellania/white/death-star2d2-w-stripe.webp';
+          if (tileVariant === 'color') return '/custom_logos/drawings/images_stripe/miscellania/color/death-star2d2-multi-light-stripe.webp';
           return '/custom_logos/drawings/images_stripe/miscellania/black/death-star2d2-b-stripe.webp';
         }
         if (lower.includes('pont-del-diable') || lower.includes('pont_del_diable')) {
-          if (variant === 'white') return '/custom_logos/drawings/images_stripe/miscellania/white/pont-del-diable-w-stripe.webp';
-          if (variant === 'color') return '/custom_logos/drawings/images_stripe/miscellania/color/pont-del-diable-multi-light-stripe.webp';
+          if (tileVariant === 'white') return '/custom_logos/drawings/images_stripe/miscellania/white/pont-del-diable-w-stripe.webp';
+          if (tileVariant === 'color') return '/custom_logos/drawings/images_stripe/miscellania/color/pont-del-diable-multi-light-stripe.webp';
           return '/custom_logos/drawings/images_stripe/miscellania/black/pont-del-diable-b-stripe.webp';
         }
         return null;
@@ -2596,26 +2596,26 @@ export default function FullWideSlideHeader({
       if (active === 'austen') {
         const s = String(it);
         if (s.includes('/austen/pemberley_house/')) {
-          if (variant === 'color') return '/custom_logos/drawings/images_stripe/austen/pemberley_house/color/pemberley-house-multi-light-stripe.webp';
-          if (variant === 'white') return '/custom_logos/drawings/images_stripe/austen/pemberley_house/white/pemberley-house-w-stripe.webp';
+          if (tileVariant === 'color') return '/custom_logos/drawings/images_stripe/austen/pemberley_house/color/pemberley-house-multi-light-stripe.webp';
+          if (tileVariant === 'white') return '/custom_logos/drawings/images_stripe/austen/pemberley_house/white/pemberley-house-w-stripe.webp';
           return '/custom_logos/drawings/images_stripe/austen/pemberley_house/black/pemberley-house-b-stripe.webp';
         }
         if (s.includes('/austen/keep_calm/')) {
-          if (variant === 'color') {
+          if (tileVariant === 'color') {
             const isRed = displayedShirtColor === 'red';
             return isRed
               ? '/custom_logos/drawings/images_stripe/austen/keep_calm/color/keep-calm-multi-light-stripe.webp'
               : '/custom_logos/drawings/images_stripe/austen/keep_calm/color/keep-calm-multi-dark-stripe.webp';
           }
-          if (variant === 'white') return '/custom_logos/drawings/images_stripe/austen/keep_calm/white/keep-calm-w-stripe.webp';
+          if (tileVariant === 'white') return '/custom_logos/drawings/images_stripe/austen/keep_calm/white/keep-calm-w-stripe.webp';
           return '/custom_logos/drawings/images_stripe/austen/keep_calm/black/keep-calm-b-stripe.webp';
         }
         if (s.includes('/austen/quotes/')) {
           const file = s.split('/').pop() || '';
           const slug = file.toLowerCase().replace(/-b-grid(?=\.webp$)/i, '').replace(/-grid(?=\.webp$)/i, '').replace(/\.webp$/i, '');
           const whiteStem = slug === 'unsociable-and-taciturn' ? 'i-prefer-to-be' : slug;
-          if (variant === 'white') return `/custom_logos/drawings/images_stripe/austen/quotes/white/${whiteStem}-w-stripe.webp`;
-          if (variant === 'color') return `/custom_logos/drawings/images_stripe/austen/quotes/color/${slug}-multi-light-stripe.webp`;
+          if (tileVariant === 'white') return `/custom_logos/drawings/images_stripe/austen/quotes/white/${whiteStem}-w-stripe.webp`;
+          if (tileVariant === 'color') return `/custom_logos/drawings/images_stripe/austen/quotes/color/${slug}-multi-light-stripe.webp`;
           return `/custom_logos/drawings/images_stripe/austen/quotes/black/${whiteStem}-b-stripe.webp`;
         }
         if (s.includes('/austen/crosswords/')) {
@@ -2623,7 +2623,7 @@ export default function FullWideSlideHeader({
           const m = file.toLowerCase().replace(/-grid(?=\.webp$)/i, '').match(/^(persuasion|pride-and-prejudice|sense-and-sensibility)-(\d)\.webp$/);
           if (m) {
             const book = m[1]; const n = m[2];
-            if (variant === 'white') return `/custom_logos/drawings/images_stripe/austen/crosswords/white/${book}-${n}-w-stripe.webp`;
+            if (tileVariant === 'white') return `/custom_logos/drawings/images_stripe/austen/crosswords/white/${book}-${n}-w-stripe.webp`;
             return `/custom_logos/drawings/images_stripe/austen/crosswords/black/${book}-${n}-b-stripe.webp`;
           }
         }
@@ -2647,15 +2647,36 @@ export default function FullWideSlideHeader({
     // Dibuixos alineats a l'ESQUERRA; les caselles buides queden a la DRETA
     // (on les imatges base N.jpg mostren les N samarretes buides).
     const tileSrcs = [];
+    const isKeepCalm = active === 'austen' && typeof resolvedOverlaySrc === 'string' && /\/austen\/keep_calm\//i.test(resolvedOverlaySrc);
     for (let i = 0; i < 14; i++) {
-      let src = i < drawable.length ? resolveForItem(drawable[i]) : null;
-      if (src && variant === 'color' && multiTone === 'dark') {
+      const isEdgeTile0 = i === 0;
+      const isEdgeTile13 = i === 13;
+      const isKeepCalmColor = isKeepCalm && variant === 'color';
+      const tileVariant = isKeepCalmColor
+        ? variant
+        : isEdgeTile0
+          ? (variant === 'color' ? 'color' : 'black')
+          : isEdgeTile13
+            ? (variant === 'color' ? 'color' : 'white')
+            : variant;
+      let src = i < drawable.length ? resolveForItem(drawable[i], tileVariant) : null;
+      const tileMultiTone = isKeepCalmColor
+        ? (i === 8 ? 'light' : multiTone)
+        : isEdgeTile0
+          ? 'dark'
+          : isEdgeTile13
+            ? 'light'
+            : multiTone;
+      if (src && tileVariant === 'color' && tileMultiTone === 'dark') {
         src = src.replace('-multi-light-stripe.webp', '-multi-dark-stripe.webp');
+      }
+      if (src && tileVariant === 'color' && tileMultiTone === 'light') {
+        src = src.replace('-multi-dark-stripe.webp', '-multi-light-stripe.webp');
       }
       tileSrcs.push(src);
     }
     return tileSrcs;
-  }, [resolvedMegaFiltered, active, firstContactVariant, humanInsideVariant, displayedShirtColor, thinDrawings]);
+  }, [resolvedMegaFiltered, active, firstContactVariant, humanInsideVariant, displayedShirtColor, thinDrawings, resolvedOverlaySrc]);
 
   // Identitat de l'ítem mostrat a cada tile de la franja (mateixa lògica
   // cíclica que stripeTileOverlaySrcs). Permet saber quina samarreta correspon
