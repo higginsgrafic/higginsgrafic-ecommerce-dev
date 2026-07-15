@@ -523,7 +523,7 @@ function MegaStripePanel({
                               const safeIdx = Number.isFinite(Number(idx)) ? Number(idx) : 0;
                               const isFirst = safeIdx === 0;
                               const isLast = safeIdx === 13;
-                              const useEdgeOverride = active === 'first_contact' || active === 'the_human_inside' || isAustenPemberley || isAustenKeepCalm;
+                              const useEdgeOverride = active === 'first_contact' || active === 'the_human_inside' || active === 'miscellania' || isAustenPemberley || isAustenKeepCalm;
                               const mode = useEdgeOverride && isFirst
                                 ? (baseMode === 'color' ? 'color' : 'black')
                                 : useEdgeOverride && isLast
@@ -545,7 +545,7 @@ function MegaStripePanel({
 
                               if (!shouldApplyRules) return src;
 
-                              if ((active === 'the_human_inside' || isAustenTileSwapBW) && (mode === 'white' || mode === 'black') && !isAustenPemberley) {
+                              if ((active === 'the_human_inside' || active === 'miscellania' || isAustenTileSwapBW) && (mode === 'white' || mode === 'black') && !isAustenPemberley) {
                                 return mode === 'white' ? toWhite(src) : toBlack(src);
                               }
 
@@ -764,7 +764,7 @@ function MegaStripePanel({
                               const safeIdx = Number.isFinite(Number(idx)) ? Number(idx) : 0;
                               const isFirst = safeIdx === 0;
                               const isLast = safeIdx === 13;
-                              const useEdgeOverride = active === 'first_contact' || active === 'the_human_inside' || isAustenPemberley || isAustenKeepCalm;
+                              const useEdgeOverride = active === 'first_contact' || active === 'the_human_inside' || active === 'miscellania' || isAustenPemberley || isAustenKeepCalm;
                               const mode = useEdgeOverride && isFirst
                                 ? (baseMode === 'color' ? 'color' : 'black')
                                 : useEdgeOverride && isLast
@@ -786,7 +786,7 @@ function MegaStripePanel({
 
                               if (!shouldApplyRules) return src;
 
-                              if ((active === 'the_human_inside' || isAustenTileSwapBW) && (mode === 'white' || mode === 'black') && !isAustenPemberley) {
+                              if ((active === 'the_human_inside' || active === 'miscellania' || isAustenTileSwapBW) && (mode === 'white' || mode === 'black') && !isAustenPemberley) {
                                 return mode === 'white' ? toWhite(src) : toBlack(src);
                               }
 

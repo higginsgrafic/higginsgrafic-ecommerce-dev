@@ -1133,6 +1133,7 @@ function MegaColumn({
                       showWhite={stripeVariantVisibility?.white !== false}
                       showBlack={stripeVariantVisibility?.black !== false}
                       showMulti={stripeVariantVisibility?.color !== false}
+                      selectedVariant={firstContactVariant}
                     />
                   ) : isHumanInside ? (
                     <FirstContactDibuix00Buttons
@@ -1142,6 +1143,7 @@ function MegaColumn({
                       showWhite={stripeVariantVisibility?.white !== false}
                       showBlack={stripeVariantVisibility?.black !== false}
                       showMulti={stripeVariantVisibility?.color !== false}
+                      selectedVariant={humanInsideVariant}
                     />
                   ) : collectionId === 'austen' ? (
                     <FirstContactDibuix00Buttons
@@ -1151,6 +1153,7 @@ function MegaColumn({
                       showWhite={stripeVariantVisibility?.white !== false}
                       showBlack={stripeVariantVisibility?.black !== false}
                       showMulti={stripeVariantVisibility?.color !== false}
+                      selectedVariant={firstContactVariant}
                     />
                   ) : null}
                 </div>
