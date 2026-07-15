@@ -512,7 +512,7 @@ function MegaStripePanel({
                             && typeof resolvedOverlaySrc === 'string'
                             && /\/austen\/(pemberley_house|crosswords|quotes)\//i.test(resolvedOverlaySrc);
                           const shouldApplyRules = active === 'first_contact' || active === 'the_human_inside' || active === 'cube' || active === 'miscellania' || isAustenKeepCalm || isAustenTileSwapBW;
-                          const mode = active === 'the_human_inside' ? humanInsideVariant : firstContactVariant;
+                          const baseMode = active === 'the_human_inside' ? humanInsideVariant : firstContactVariant;
                           const isAustenPemberley = active === 'austen'
                             && typeof resolvedOverlaySrc === 'string'
                             && /\/austen\/pemberley_house\//i.test(resolvedOverlaySrc);
@@ -523,6 +523,12 @@ function MegaStripePanel({
                               const safeIdx = Number.isFinite(Number(idx)) ? Number(idx) : 0;
                               const isFirst = safeIdx === 0;
                               const isLast = safeIdx === 13;
+                              const useEdgeOverride = active === 'first_contact' || active === 'the_human_inside' || isAustenPemberley || isAustenKeepCalm;
+                              const mode = useEdgeOverride && isFirst
+                                ? (baseMode === 'color' ? 'color' : 'black')
+                                : useEdgeOverride && isLast
+                                  ? (baseMode === 'color' ? 'color' : 'white')
+                                  : baseMode;
 
                               if (active === 'cube' && !isFirst) {
                                 if (/\/cube\/afrodita-c-stripe\.webp$/i.test(src)) {
@@ -559,11 +565,20 @@ function MegaStripePanel({
                                 const hasThruDark = src.toLowerCase().includes('-multi-thru-dark-');
                                 const hasThruRed = src.toLowerCase().includes('-multi-thru-red-');
                                 const hasWRed = src.toLowerCase().includes('-multi-w-red-');
+                                if (useEdgeOverride && !isAustenKeepCalm && isFirst && hasMultiLight) return src.replace(/-multi-light-/i, '-multi-dark-');
+                                if (useEdgeOverride && !isAustenKeepCalm && isFirst && hasMultiDark) return src;
+                                if (useEdgeOverride && !isAustenKeepCalm && isLast && hasMultiDark) return src.replace(/-multi-dark-/i, '-multi-light-');
+                                if (useEdgeOverride && !isAustenKeepCalm && isLast && hasMultiLight) return src;
                                 if (isAustenPemberley) {
                                   if (hasMultiDark) return src.replace(/-multi-dark-/i, '-multi-light-');
                                   return src;
                                 }
                                 if (isAustenKeepCalm) {
+                                  const safeIdxKc = safeIdx;
+                                  if (safeIdxKc === 8) {
+                                    if (hasMultiDark) return src.replace(/-multi-dark-/i, '-multi-light-');
+                                    return src;
+                                  }
                                   const isRedShirt = shirtColor === '#BD2739';
                                   if (isRedShirt) {
                                     if (hasMultiDark) return src.replace(/-multi-dark-/i, '-multi-light-');
@@ -581,7 +596,7 @@ function MegaStripePanel({
                                 return src;
                               }
 
-                              if (isAustenPemberley && (mode === 'white' || mode === 'black')) {
+                              if (isAustenPemberley && (mode === 'white' || mode === 'black') && !(useEdgeOverride && (isFirst || isLast))) {
                                 return src;
                               }
 
@@ -616,7 +631,6 @@ function MegaStripePanel({
                             }
                           })();
                           const imgUrl = picked ? encodeURI(picked) : '';
-
                           const safeW = Number(r?.width) || 0;
                           const safeH = Number(r?.height) || 0;
                           const safeL = Number(r?.left) || 0;
@@ -687,13 +701,13 @@ function MegaStripePanel({
                                     return `translate(${cal.dx}px, calc(${cal.dy}px + var(--hgStripeDrawingExtraDy, -5px))) scale(calc(${cal.scale} * var(--hgStripeDrawingExtraScale, 1)))`;
                                   })(),
                                   filter: (() => {
-                                    const isPemberley = active === 'austen' && typeof resolvedOverlaySrc === 'string' && /\/austen\/pemberley_house\//i.test(resolvedOverlaySrc);
+                                    const isPemberley = active === 'austen' && typeof picked === 'string' && /\/austen\/pemberley_house\//i.test(picked);
                                     const baseFx = drawingOverlayDebug
                                       ? 'drop-shadow(0 0 2px rgba(0,0,0,0.65))'
                                       : active === 'austen'
-                                            && typeof resolvedOverlaySrc === 'string'
-                                            && resolvedOverlaySrc.toLowerCase().includes('/austen/keep_calm/')
-                                            && resolvedOverlaySrc.toLowerCase().endsWith('keep-calm-w-stripe.webp')
+                                            && typeof picked === 'string'
+                                            && picked.toLowerCase().includes('/austen/keep_calm/')
+                                            && picked.toLowerCase().endsWith('keep-calm-w-stripe.webp')
                                           ? 'drop-shadow(0 0 2px rgba(0,0,0,0.75))'
                                         : isPemberley
                                           ? 'drop-shadow(0 0 0px rgba(0,0,0,0.85))'
@@ -748,7 +762,7 @@ function MegaStripePanel({
                             && typeof resolvedOverlaySrc === 'string'
                             && /\/austen\/(pemberley_house|crosswords|quotes)\//i.test(resolvedOverlaySrc);
                           const shouldApplyRules = active === 'first_contact' || active === 'the_human_inside' || active === 'cube' || active === 'miscellania' || isAustenKeepCalm || isAustenTileSwapBW;
-                          const mode = active === 'the_human_inside' ? humanInsideVariant : firstContactVariant;
+                          const baseMode = active === 'the_human_inside' ? humanInsideVariant : firstContactVariant;
                           const isAustenPemberley = active === 'austen'
                             && typeof resolvedOverlaySrc === 'string'
                             && /\/austen\/pemberley_house\//i.test(resolvedOverlaySrc);
@@ -759,6 +773,12 @@ function MegaStripePanel({
                               const safeIdx = Number.isFinite(Number(idx)) ? Number(idx) : 0;
                               const isFirst = safeIdx === 0;
                               const isLast = safeIdx === 13;
+                              const useEdgeOverride = active === 'first_contact' || active === 'the_human_inside' || isAustenPemberley || isAustenKeepCalm;
+                              const mode = useEdgeOverride && isFirst
+                                ? (baseMode === 'color' ? 'color' : 'black')
+                                : useEdgeOverride && isLast
+                                  ? (baseMode === 'color' ? 'color' : 'white')
+                                  : baseMode;
 
                               if (active === 'cube' && !isFirst) {
                                 if (/\/cube\/afrodita-c-stripe\.webp$/i.test(src)) {
@@ -795,11 +815,20 @@ function MegaStripePanel({
                                 const hasThruDark = src.toLowerCase().includes('-multi-thru-dark-');
                                 const hasThruRed = src.toLowerCase().includes('-multi-thru-red-');
                                 const hasWRed = src.toLowerCase().includes('-multi-w-red-');
+                                if (useEdgeOverride && !isAustenKeepCalm && isFirst && hasMultiLight) return src.replace(/-multi-light-/i, '-multi-dark-');
+                                if (useEdgeOverride && !isAustenKeepCalm && isFirst && hasMultiDark) return src;
+                                if (useEdgeOverride && !isAustenKeepCalm && isLast && hasMultiDark) return src.replace(/-multi-dark-/i, '-multi-light-');
+                                if (useEdgeOverride && !isAustenKeepCalm && isLast && hasMultiLight) return src;
                                 if (isAustenPemberley) {
                                   if (hasMultiDark) return src.replace(/-multi-dark-/i, '-multi-light-');
                                   return src;
                                 }
                                 if (isAustenKeepCalm) {
+                                  const safeIdxKc = safeIdx;
+                                  if (safeIdxKc === 8) {
+                                    if (hasMultiDark) return src.replace(/-multi-dark-/i, '-multi-light-');
+                                    return src;
+                                  }
                                   const isRedShirt = shirtColor === '#BD2739';
                                   if (isRedShirt) {
                                     if (hasMultiDark) return src.replace(/-multi-dark-/i, '-multi-light-');
