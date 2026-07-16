@@ -559,6 +559,10 @@ export default function FullWideSlideHeader({
   const [firstContactVariant, setFirstContactVariant] = useState(() => readStripeVariantFromUrl() || 'black');
   const [humanInsideVariant, setHumanInsideVariant] = useState(() => readStripeVariantFromUrl() || 'black');
 
+  // Pàgina 2: estat de variant independent per desacoplar de la pàgina 1
+  const [firstContactVariantP2, setFirstContactVariantP2] = useState(() => readStripeVariantFromUrl() || 'black');
+  const [humanInsideVariantP2, setHumanInsideVariantP2] = useState(() => readStripeVariantFromUrl() || 'black');
+
   // Color de samarreta realment mostrat: coincideix amb el selector excepte
   // quan la variant és BLANC sobre blanc o NEGRE sobre negre, llavors s'inverteix
   // perquè la tinta sigui visible. El selector no es mou.
@@ -568,6 +572,14 @@ export default function FullWideSlideHeader({
     if (variant === 'black' && cercadorSelectedColor === 'black') return 'white';
     return cercadorSelectedColor;
   }, [active, firstContactVariant, humanInsideVariant, cercadorSelectedColor]);
+
+  // Pàgina 2: displayedShirtColor propi amb les variants P2
+  const displayedShirtColorP2 = useMemo(() => {
+    const variant = active === 'the_human_inside' ? humanInsideVariantP2 : firstContactVariantP2;
+    if (variant === 'white' && cercadorSelectedColor === 'white') return 'black';
+    if (variant === 'black' && cercadorSelectedColor === 'black') return 'white';
+    return cercadorSelectedColor;
+  }, [active, firstContactVariantP2, humanInsideVariantP2, cercadorSelectedColor]);
 
   const onShirtClick = useCallback((collection, item, color) => {
     const url = resolvePdpUrl(collection, item);
@@ -579,6 +591,17 @@ export default function FullWideSlideHeader({
     }
   }, [navigate, resolvePdpUrl, displayedShirtColor, firstContactVariant, humanInsideVariant]);
 
+  // Pàgina 2: onShirtClick propi amb variants P2
+  const onShirtClickP2 = useCallback((collection, item, color) => {
+    const url = resolvePdpUrl(collection, item);
+    if (url) {
+      const matched = CERCADOR_COLORS.find((c) => c.hex === color);
+      const colorSlug = matched?.slug || displayedShirtColorP2 || 'white';
+      const variant = collection === 'the_human_inside' ? humanInsideVariantP2 : firstContactVariantP2;
+      navigate(`${url}?color=${colorSlug}&variant=${variant}`);
+    }
+  }, [navigate, resolvePdpUrl, displayedShirtColorP2, firstContactVariantP2, humanInsideVariantP2]);
+
   const [selectedColorSlug, setSelectedColorSlug] = useState('white');
   const [thinStartIndex, setThinStartIndex] = useState(0);
   const [gildan5000Catalog, setGildan5000Catalog] = useState(null);
@@ -589,6 +612,8 @@ export default function FullWideSlideHeader({
       if (!v) return;
       setFirstContactVariant(v);
       setHumanInsideVariant(v);
+      setFirstContactVariantP2(v);
+      setHumanInsideVariantP2(v);
     } catch {
       // ignore
     }
@@ -804,7 +829,7 @@ export default function FullWideSlideHeader({
     drawingOverlaySrcLocal,
     drawingOverlaySrcEffective,
     tileGapPxLocal,
-  } = useMegaStripeDebugVars(normalizeOverlaySrc);
+  } = useMegaStripeDebugVars(normalizeOverlaySrc, 'p1');
 
   const resolvedOverlaySrc = useMemo(() => {
     const normalizeKeyLocal = (value) => {
@@ -1622,23 +1647,33 @@ export default function FullWideSlideHeader({
         };
       }
 
+      const P1 = 'p1_';
+      const readKeyP1 = (key) => {
+        try {
+          const v = window.localStorage.getItem(`${P1}${key}`);
+          if (v != null) return v;
+          return window.localStorage.getItem(key);
+        } catch {
+          return null;
+        }
+      };
       const hasV2 = (() => {
         try {
-          const a = window.localStorage.getItem('MEGA_TILE_SELECTOR_V2_ENABLED');
-          const b = window.localStorage.getItem('MEGA_TILE_SELECTOR_V2_TARGET');
-          const c = window.localStorage.getItem('MEGA_TILE_SELECTOR_V2_SIZE_PX');
-          const d = window.localStorage.getItem('MEGA_TILE_SELECTOR_V2_STROKE_PX');
-          const e = window.localStorage.getItem('MEGA_TILE_SELECTOR_V2_COLOR');
-          const f = window.localStorage.getItem('MEGA_TILE_SELECTOR_V2_STEP_X');
-          const g = window.localStorage.getItem('MEGA_TILE_SELECTOR_V2_STEP_Y');
+          const a = readKeyP1('MEGA_TILE_SELECTOR_V2_ENABLED');
+          const b = readKeyP1('MEGA_TILE_SELECTOR_V2_TARGET');
+          const c = readKeyP1('MEGA_TILE_SELECTOR_V2_SIZE_PX');
+          const d = readKeyP1('MEGA_TILE_SELECTOR_V2_STROKE_PX');
+          const e = readKeyP1('MEGA_TILE_SELECTOR_V2_COLOR');
+          const f = readKeyP1('MEGA_TILE_SELECTOR_V2_STEP_X');
+          const g = readKeyP1('MEGA_TILE_SELECTOR_V2_STEP_Y');
           return a != null || b != null || c != null || d != null || e != null || f != null || g != null;
         } catch {
           return false;
         }
       })();
 
-      const readBool = (k, fallback) => {
-        const raw = window.localStorage.getItem(k);
+      const readBool = (key, fallback) => {
+        const raw = readKeyP1(key);
         if (raw == null) return fallback;
         const v = String(raw).trim().toLowerCase();
         if (v === '') return true;
@@ -1650,18 +1685,18 @@ export default function FullWideSlideHeader({
       const activeKeyset = v2Enabled ? 'v2' : (v1Enabled ? 'v1' : 'v2');
       const K = (suffix) => (activeKeyset === 'v2' ? `MEGA_TILE_SELECTOR_V2_${suffix}` : `MEGA_TILE_SELECTOR_${suffix}`);
 
-      const readNum = (k, fallback) => {
-        const raw = window.localStorage.getItem(k);
+      const readNum = (key, fallback) => {
+        const raw = readKeyP1(key);
         const n = raw == null ? NaN : Number.parseFloat(String(raw));
         return Number.isFinite(n) ? n : fallback;
       };
       return {
         keyset: activeKeyset,
         enabled: readBool(K('ENABLED'), activeKeyset === 'v2' ? false : true),
-        target: String(window.localStorage.getItem(K('TARGET')) || 'NCC-1701-D'),
+        target: String(readKeyP1(K('TARGET')) || 'NCC-1701-D'),
         sizePx: Math.min(800, Math.max(20, readNum(K('SIZE_PX'), 200))),
         strokePx: Math.min(80, Math.max(0, readNum(K('STROKE_PX'), 10))),
-        color: String(window.localStorage.getItem(K('COLOR')) || 'black'),
+        color: String(readKeyP1(K('COLOR')) || 'black'),
         stepX: Math.min(99, Math.max(-99, readNum(K('STEP_X'), 0))),
         stepY: Math.min(99, Math.max(-99, readNum(K('STEP_Y'), 0))),
         radiusPx: Math.min(200, Math.max(0, readNum(K('RADIUS_PX'), 8))),
@@ -1696,26 +1731,36 @@ export default function FullWideSlideHeader({
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
+    const P1 = 'p1_';
+    const readKeyP1 = (key) => {
+      try {
+        const v = window.localStorage.getItem(`${P1}${key}`);
+        if (v != null) return v;
+        return window.localStorage.getItem(key);
+      } catch {
+        return null;
+      }
+    };
     const read = () => {
       try {
         const activeNow = String(activeRef.current || '');
         const hasV2 = (() => {
           try {
-            const a = window.localStorage.getItem('MEGA_TILE_SELECTOR_V2_ENABLED');
-            const b = window.localStorage.getItem('MEGA_TILE_SELECTOR_V2_TARGET');
-            const c = window.localStorage.getItem('MEGA_TILE_SELECTOR_V2_SIZE_PX');
-            const d = window.localStorage.getItem('MEGA_TILE_SELECTOR_V2_STROKE_PX');
-            const e = window.localStorage.getItem('MEGA_TILE_SELECTOR_V2_COLOR');
-            const f = window.localStorage.getItem('MEGA_TILE_SELECTOR_V2_STEP_X');
-            const g = window.localStorage.getItem('MEGA_TILE_SELECTOR_V2_STEP_Y');
+            const a = readKeyP1('MEGA_TILE_SELECTOR_V2_ENABLED');
+            const b = readKeyP1('MEGA_TILE_SELECTOR_V2_TARGET');
+            const c = readKeyP1('MEGA_TILE_SELECTOR_V2_SIZE_PX');
+            const d = readKeyP1('MEGA_TILE_SELECTOR_V2_STROKE_PX');
+            const e = readKeyP1('MEGA_TILE_SELECTOR_V2_COLOR');
+            const f = readKeyP1('MEGA_TILE_SELECTOR_V2_STEP_X');
+            const g = readKeyP1('MEGA_TILE_SELECTOR_V2_STEP_Y');
             return a != null || b != null || c != null || d != null || e != null || f != null || g != null;
           } catch {
             return false;
           }
         })();
 
-        const readBool = (k, fallback) => {
-          const raw = window.localStorage.getItem(k);
+        const readBool = (key, fallback) => {
+          const raw = readKeyP1(key);
           if (raw == null) return fallback;
           const v = String(raw).trim().toLowerCase();
           if (v === '') return true;
@@ -1727,8 +1772,8 @@ export default function FullWideSlideHeader({
         const activeKeyset = v2Enabled ? 'v2' : (v1Enabled ? 'v1' : 'v2');
         const K = (suffix) => (activeKeyset === 'v2' ? `MEGA_TILE_SELECTOR_V2_${suffix}` : `MEGA_TILE_SELECTOR_${suffix}`);
 
-        const readNum = (k, fallback) => {
-          const raw = window.localStorage.getItem(k);
+        const readNum = (key, fallback) => {
+          const raw = readKeyP1(key);
           const n = raw == null ? NaN : Number.parseFloat(String(raw));
           return Number.isFinite(n) ? n : fallback;
         };
@@ -1738,11 +1783,11 @@ export default function FullWideSlideHeader({
           target: (() => {
             const publicState = getMegaPublicSelectorFor(activeNow, activeKeyset);
             const t = typeof publicState?.target === 'string' ? publicState.target.trim() : '';
-            return t ? t : String(window.localStorage.getItem(K('TARGET')) || 'NCC-1701-D');
+            return t ? t : String(readKeyP1(K('TARGET')) || 'NCC-1701-D');
           })(),
           sizePx: Math.min(800, Math.max(20, readNum(K('SIZE_PX'), 200))),
           strokePx: Math.min(80, Math.max(0, readNum(K('STROKE_PX'), 10))),
-          color: String(window.localStorage.getItem(K('COLOR')) || 'black'),
+          color: String(readKeyP1(K('COLOR')) || 'black'),
           stepX: (() => {
             const publicState = getMegaPublicSelectorFor(activeNow, activeKeyset);
             const v = Number(publicState?.stepX);
@@ -1768,31 +1813,32 @@ export default function FullWideSlideHeader({
 
     const onStorage = (e) => {
       if (!e || !e.key) return;
+      const bareKey = e.key.startsWith('p1_') ? e.key.slice(3) : e.key;
       if (
-        e.key === 'MEGA_TILE_SELECTOR_ENABLED'
-        || e.key === 'MEGA_TILE_SELECTOR_TARGET'
-        || e.key === 'MEGA_TILE_SELECTOR_SIZE_PX'
-        || e.key === 'MEGA_TILE_SELECTOR_STROKE_PX'
-        || e.key === 'MEGA_TILE_SELECTOR_COLOR'
-        || e.key === 'MEGA_TILE_SELECTOR_STEP_X'
-        || e.key === 'MEGA_TILE_SELECTOR_STEP_Y'
-        || e.key === 'MEGA_TILE_SELECTOR_RADIUS_PX'
-        || e.key === 'MEGA_TILE_SELECTOR_EXTEND_TOP_PX'
-        || e.key === 'MEGA_TILE_SELECTOR_EXTEND_RIGHT_PX'
-        || e.key === 'MEGA_TILE_SELECTOR_EXTEND_BOTTOM_PX'
-        || e.key === 'MEGA_TILE_SELECTOR_EXTEND_LEFT_PX'
-        || e.key === 'MEGA_TILE_SELECTOR_V2_ENABLED'
-        || e.key === 'MEGA_TILE_SELECTOR_V2_TARGET'
-        || e.key === 'MEGA_TILE_SELECTOR_V2_SIZE_PX'
-        || e.key === 'MEGA_TILE_SELECTOR_V2_STROKE_PX'
-        || e.key === 'MEGA_TILE_SELECTOR_V2_COLOR'
-        || e.key === 'MEGA_TILE_SELECTOR_V2_STEP_X'
-        || e.key === 'MEGA_TILE_SELECTOR_V2_STEP_Y'
-        || e.key === 'MEGA_TILE_SELECTOR_V2_RADIUS_PX'
-        || e.key === 'MEGA_TILE_SELECTOR_V2_EXTEND_TOP_PX'
-        || e.key === 'MEGA_TILE_SELECTOR_V2_EXTEND_RIGHT_PX'
-        || e.key === 'MEGA_TILE_SELECTOR_V2_EXTEND_BOTTOM_PX'
-        || e.key === 'MEGA_TILE_SELECTOR_V2_EXTEND_LEFT_PX'
+        bareKey === 'MEGA_TILE_SELECTOR_ENABLED'
+        || bareKey === 'MEGA_TILE_SELECTOR_TARGET'
+        || bareKey === 'MEGA_TILE_SELECTOR_SIZE_PX'
+        || bareKey === 'MEGA_TILE_SELECTOR_STROKE_PX'
+        || bareKey === 'MEGA_TILE_SELECTOR_COLOR'
+        || bareKey === 'MEGA_TILE_SELECTOR_STEP_X'
+        || bareKey === 'MEGA_TILE_SELECTOR_STEP_Y'
+        || bareKey === 'MEGA_TILE_SELECTOR_RADIUS_PX'
+        || bareKey === 'MEGA_TILE_SELECTOR_EXTEND_TOP_PX'
+        || bareKey === 'MEGA_TILE_SELECTOR_EXTEND_RIGHT_PX'
+        || bareKey === 'MEGA_TILE_SELECTOR_EXTEND_BOTTOM_PX'
+        || bareKey === 'MEGA_TILE_SELECTOR_EXTEND_LEFT_PX'
+        || bareKey === 'MEGA_TILE_SELECTOR_V2_ENABLED'
+        || bareKey === 'MEGA_TILE_SELECTOR_V2_TARGET'
+        || bareKey === 'MEGA_TILE_SELECTOR_V2_SIZE_PX'
+        || bareKey === 'MEGA_TILE_SELECTOR_V2_STROKE_PX'
+        || bareKey === 'MEGA_TILE_SELECTOR_V2_COLOR'
+        || bareKey === 'MEGA_TILE_SELECTOR_V2_STEP_X'
+        || bareKey === 'MEGA_TILE_SELECTOR_V2_STEP_Y'
+        || bareKey === 'MEGA_TILE_SELECTOR_V2_RADIUS_PX'
+        || bareKey === 'MEGA_TILE_SELECTOR_V2_EXTEND_TOP_PX'
+        || bareKey === 'MEGA_TILE_SELECTOR_V2_EXTEND_RIGHT_PX'
+        || bareKey === 'MEGA_TILE_SELECTOR_V2_EXTEND_BOTTOM_PX'
+        || bareKey === 'MEGA_TILE_SELECTOR_V2_EXTEND_LEFT_PX'
       ) {
         read();
       }
@@ -2523,246 +2569,8 @@ export default function FullWideSlideHeader({
     };
   }, [resolvedMega, active, austenSubcollection, AUSTEN_SUB_PREFIXES]);
 
-  const stripeTileOverlaySrcs = useMemo(() => {
-    const cols = resolvedMegaFiltered?.[active];
-    if (!Array.isArray(cols) || cols.length === 0) return null;
-    const items = cols[0]?.items || [];
-    const drawable = active === 'the_human_inside'
-      ? thinDrawings
-      : items.filter((it) =>
-          it && it !== CONTROL_TILE_BN && it !== CONTROL_TILE_ARROWS
-        );
-    if (drawable.length === 0) return null;
-
-    const variant = active === 'the_human_inside' ? humanInsideVariant : firstContactVariant;
-    // Versió multi (variant 'color'): només la samarreta blanca usa la Dark;
-    // totes les altres usen la Light, independentment del color de samarreta.
-    const multiTone = displayedShirtColor === 'white' ? 'dark' : 'light';
-    const resolveForItem = (it, tileVariant) => {
-      if (active === 'first_contact') {
-        if (tileVariant === 'white') return FIRST_CONTACT_MEDIA_WHITE[it] || FIRST_CONTACT_MEDIA[it] || null;
-        if (tileVariant === 'color') return FIRST_CONTACT_MEDIA_COLOR[it] || FIRST_CONTACT_MEDIA[it] || null;
-        return FIRST_CONTACT_MEDIA[it] || null;
-      }
-      if (active === 'the_human_inside') {
-        const k = String(it).trim().toLowerCase();
-        const mapBlack = {
-          'r2-d2': 'r2-d2-b-stripe.webp', c3p0: 'c3-p0-b-stripe.webp', 'c3-p0': 'c3-p0-b-stripe.webp',
-          vader: 'vader-b-stripe.webp', afrodita: 'afrodita-a-b-stripe.webp', 'afrodita-a': 'afrodita-a-b-stripe.webp',
-          mazinger: 'mazinger-z-b-stripe.webp', 'mazinger-z': 'mazinger-z-b-stripe.webp',
-          'cylon 78': 'cylon-78-b-stripe.webp', 'cylon 03': 'cylon-03-b-stripe.webp',
-          'iron man 68': 'iron-man-68-b-stripe.webp', 'iron man 08': 'iron-man-08-b-stripe.webp',
-          cyberman: 'cyberman-b-stripe.webp', 'the dalek': 'the-dalek-b-stripe.webp',
-          robocop: 'robocop-b-stripe.webp', terminator: 'terminator-b-stripe.webp',
-          maschinenmensch: 'maschinenmensch-b-stripe.webp',
-          'robby the robot': 'robbie-the-robot-b-stripe.webp', 'robbie the robot': 'robbie-the-robot-b-stripe.webp',
-        };
-        const file = mapBlack[k];
-        if (!file) return null;
-        if (tileVariant === 'white') {
-          const wf = file.replace(/-b-stripe\.webp$/, '-w-stripe.webp');
-          return `/custom_logos/drawings/images_stripe/the_human_inside/white/${wf}`;
-        }
-        if (tileVariant === 'color') {
-          const cf = file.replace(/-b-stripe\.webp$/, '-multi-light-stripe.webp');
-          return `/custom_logos/drawings/images_stripe/the_human_inside/color/${cf}`;
-        }
-        return `/custom_logos/drawings/images_stripe/the_human_inside/black/${file}`;
-      }
-      if (active === 'cube') {
-        return CUBE_MEDIA[it] || null;
-      }
-      if (active === 'miscellania') {
-        const lower = String(it).toLowerCase();
-        if (lower.includes('arthur-d-the-second') || lower.includes('arthur d the second')) {
-          if (tileVariant === 'white') return '/custom_logos/drawings/images_stripe/miscellania/white/arthur-d-the-second-w-stripe.webp';
-          if (tileVariant === 'color') return '/custom_logos/drawings/images_stripe/miscellania/color/arthur-d-the-second-multi-light-stripe.webp';
-          return '/custom_logos/drawings/images_stripe/miscellania/black/arthur-d-the-second-b-stripe.webp';
-        }
-        if (lower.includes('r2d2-quote') || lower.includes('r2d2 quote')) {
-          if (tileVariant === 'white') return '/custom_logos/drawings/images_stripe/miscellania/white/r2d2-quote-w-stripe.webp';
-          if (tileVariant === 'color') return '/custom_logos/drawings/images_stripe/miscellania/color/r2d2-quote-multi-light-stripe.webp';
-          return '/custom_logos/drawings/images_stripe/miscellania/black/r2d2-quote-b-stripe.webp';
-        }
-        if (lower.includes('dj-vader')) {
-          if (tileVariant === 'white') return '/custom_logos/drawings/images_stripe/miscellania/white/dj-vader-w-stripe.webp';
-          if (tileVariant === 'color') return '/custom_logos/drawings/images_stripe/miscellania/color/dj-vader-multi-light-stripe.webp';
-          return '/custom_logos/drawings/images_stripe/miscellania/black/dj-vader-b-stripe.webp';
-        }
-        if (lower.includes('death-star2d2')) {
-          if (tileVariant === 'white') return '/custom_logos/drawings/images_stripe/miscellania/white/death-star2d2-w-stripe.webp';
-          if (tileVariant === 'color') return '/custom_logos/drawings/images_stripe/miscellania/color/death-star2d2-multi-light-stripe.webp';
-          return '/custom_logos/drawings/images_stripe/miscellania/black/death-star2d2-b-stripe.webp';
-        }
-        if (lower.includes('pont-del-diable') || lower.includes('pont_del_diable')) {
-          if (tileVariant === 'white') return '/custom_logos/drawings/images_stripe/miscellania/white/pont-del-diable-w-stripe.webp';
-          if (tileVariant === 'color') return '/custom_logos/drawings/images_stripe/miscellania/color/pont-del-diable-multi-light-stripe.webp';
-          return '/custom_logos/drawings/images_stripe/miscellania/black/pont-del-diable-b-stripe.webp';
-        }
-        return null;
-      }
-      if (active === 'austen') {
-        const s = String(it);
-        if (s.includes('/austen/pemberley_house/')) {
-          if (tileVariant === 'color') return '/custom_logos/drawings/images_stripe/austen/pemberley_house/color/pemberley-house-multi-light-stripe.webp';
-          if (tileVariant === 'white') return '/custom_logos/drawings/images_stripe/austen/pemberley_house/white/pemberley-house-w-stripe.webp';
-          return '/custom_logos/drawings/images_stripe/austen/pemberley_house/black/pemberley-house-b-stripe.webp';
-        }
-        if (s.includes('/austen/keep_calm/')) {
-          if (tileVariant === 'color') {
-            const isRed = displayedShirtColor === 'red';
-            return isRed
-              ? '/custom_logos/drawings/images_stripe/austen/keep_calm/color/keep-calm-multi-light-stripe.webp'
-              : '/custom_logos/drawings/images_stripe/austen/keep_calm/color/keep-calm-multi-dark-stripe.webp';
-          }
-          if (tileVariant === 'white') return '/custom_logos/drawings/images_stripe/austen/keep_calm/white/keep-calm-w-stripe.webp';
-          return '/custom_logos/drawings/images_stripe/austen/keep_calm/black/keep-calm-b-stripe.webp';
-        }
-        if (s.includes('/austen/quotes/')) {
-          const file = s.split('/').pop() || '';
-          const slug = file.toLowerCase().replace(/-b-grid(?=\.webp$)/i, '').replace(/-grid(?=\.webp$)/i, '').replace(/\.webp$/i, '');
-          const whiteStem = slug === 'unsociable-and-taciturn' ? 'i-prefer-to-be' : slug;
-          if (tileVariant === 'white') return `/custom_logos/drawings/images_stripe/austen/quotes/white/${whiteStem}-w-stripe.webp`;
-          if (tileVariant === 'color') return `/custom_logos/drawings/images_stripe/austen/quotes/color/${slug}-multi-light-stripe.webp`;
-          return `/custom_logos/drawings/images_stripe/austen/quotes/black/${whiteStem}-b-stripe.webp`;
-        }
-        if (s.includes('/austen/crosswords/')) {
-          const file = s.split('/').pop() || '';
-          const m = file.toLowerCase().replace(/-grid(?=\.webp$)/i, '').match(/^(persuasion|pride-and-prejudice|sense-and-sensibility)-(\d)\.webp$/);
-          if (m) {
-            const book = m[1]; const n = m[2];
-            if (tileVariant === 'white') return `/custom_logos/drawings/images_stripe/austen/crosswords/white/${book}-${n}-w-stripe.webp`;
-            return `/custom_logos/drawings/images_stripe/austen/crosswords/black/${book}-${n}-b-stripe.webp`;
-          }
-        }
-        if (s.includes('/austen/looking_for_my_darcy/')) {
-          const file = s.split('/').pop() || '';
-          const m = file.toLowerCase().match(/(blue|fuchsia|red|yellow)-(solid|frame)-grid\.webp$/);
-          if (m) {
-            const c = m[1];
-            if (m[2] === 'solid') {
-              return `/custom_logos/drawings/images_stripe/austen/looking_for_my_darcy/color/solid/${c}-solid-stripe.webp`;
-            }
-            if (m[2] === 'frame') {
-              return `/custom_logos/drawings/images_stripe/austen/looking_for_my_darcy/color/frame/${c}-frame-stripe.webp`;
-            }
-          }
-        }
-      }
-      return null;
-    };
-
-    // Dibuixos alineats a l'ESQUERRA; les caselles buides queden a la DRETA
-    // (on les imatges base N.jpg mostren les N samarretes buides).
-    const tileSrcs = [];
-    const isKeepCalm = active === 'austen' && typeof resolvedOverlaySrc === 'string' && /\/austen\/keep_calm\//i.test(resolvedOverlaySrc);
-    for (let i = 0; i < 14; i++) {
-      const isEdgeTile0 = i === 0;
-      const isEdgeTile13 = i === 13;
-      const isKeepCalmColor = isKeepCalm && variant === 'color';
-      const tileVariant = isKeepCalmColor
-        ? variant
-        : isEdgeTile0
-          ? (variant === 'color' ? 'color' : 'black')
-          : isEdgeTile13
-            ? (variant === 'color' ? 'color' : 'white')
-            : variant;
-      let src = i < drawable.length ? resolveForItem(drawable[i], tileVariant) : null;
-      const tileMultiTone = isKeepCalmColor
-        ? (i === 8 ? 'light' : multiTone)
-        : isEdgeTile0
-          ? 'dark'
-          : isEdgeTile13
-            ? 'light'
-            : multiTone;
-      if (src && tileVariant === 'color' && tileMultiTone === 'dark') {
-        src = src.replace('-multi-light-stripe.webp', '-multi-dark-stripe.webp');
-      }
-      if (src && tileVariant === 'color' && tileMultiTone === 'light') {
-        src = src.replace('-multi-dark-stripe.webp', '-multi-light-stripe.webp');
-      }
-      tileSrcs.push(src);
-    }
-    return tileSrcs;
-  }, [resolvedMegaFiltered, active, firstContactVariant, humanInsideVariant, displayedShirtColor, thinDrawings, resolvedOverlaySrc]);
-
-  useEffect(() => {
-    if (!Array.isArray(stripeTileOverlaySrcs)) return;
-    for (const src of stripeTileOverlaySrcs) {
-      if (src) preloadSrc(src);
-    }
-  }, [stripeTileOverlaySrcs]);
-
-  // Identitat de l'ítem mostrat a cada tile de la franja (mateixa lògica
-  // cíclica que stripeTileOverlaySrcs). Permet saber quina samarreta correspon
-  // a cada fila de text.
-  const stripeTileItems = useMemo(() => {
-    const cols = resolvedMegaFiltered?.[active];
-    if (!Array.isArray(cols) || cols.length === 0) return null;
-    const items = cols[0]?.items || [];
-    const drawable = active === 'the_human_inside'
-      ? thinDrawings
-      : items.filter((it) =>
-          it && it !== CONTROL_TILE_BN && it !== CONTROL_TILE_ARROWS
-        );
-    if (drawable.length === 0) return null;
-    const arr = [];
-    for (let i = 0; i < 14; i++) arr.push(i < drawable.length ? drawable[i] : null);
-    return arr;
-  }, [resolvedMegaFiltered, active, thinDrawings]);
-
-  // Imatge base de la franja. Els estampats (-stripe.webp) són transparents i
-  // necessiten una samarreta blanca a sota, així que la base ha de tenir
-  // samarretes a TOTES les caselles. full-white-stripe (14 samarretes) ja
-  // mostra samarretes blanques a les caselles buides.
+  // Imatge base de la franja per a la pàgina 2.
   const stripeBaseImageSrc = '/placeholders/cercador/full-white-stripe.jpg';
-
-  // Índexs de les samarretes sense dibuix (buides) que cal desactivar.
-  const emptyTileIndices = useMemo(() => {
-    if (!Array.isArray(stripeTileItems)) return [];
-    const out = [];
-    stripeTileItems.forEach((it, i) => {
-      if (!it) out.push(i);
-    });
-    return out;
-  }, [stripeTileItems]);
-
-  // Imatge prerenderitzada de les samarretes buides esvaïdes (N = nombre de
-  // caselles buides). Es superposa, alineada amb la stripe, per esvair només
-  // les buides sense dibuixar rectangles CSS (que provocaven una franja recta).
-  // Només hi ha fitxers per a aquests nombres de buides.
-  const stripeEmptyMaskSrc = useMemo(() => {
-    // Samarretes buides desactivades: no s'aplica cap mask d'esvaïment perquè
-    // es vegin les imatges pujades sense cap superposició.
-    return null;
-  }, [emptyTileIndices]);
-
-  // Índexs de les samarretes (0-based) que mostren l'ítem sobre el qual es fa
-  // hover al text; es ressalten individualment a la franja.
-  const clicAreaHighlightIndices = useMemo(() => {
-    if (!hoveredStripeItem || !Array.isArray(stripeTileItems)) return [];
-    // Si la franja repeteix un únic dibuix (p.ex. una subcol·lecció amb un sol
-    // ítem com Pemberley), ressaltar-los tots alhora queda estrany; no ressaltem.
-    const distinct = new Set(stripeTileItems.filter(Boolean));
-    if (distinct.size <= 1) return [];
-    const out = [];
-    stripeTileItems.forEach((it, i) => {
-      if (it === hoveredStripeItem) out.push(i);
-    });
-    return out;
-  }, [hoveredStripeItem, stripeTileItems]);
-
-  // Índexs on es mostra el cercle del coll: només les samarretes corresponents
-  // a l'ítem en hover al text. (No s'usa la selecció de grup, que sempre apunta
-  // al primer ítem i deixava el cercle enganxat a la primera samarreta.)
-  const neckDotIndices = useMemo(() => {
-    if (!Array.isArray(stripeTileItems)) return [];
-    const out = [];
-    stripeTileItems.forEach((it, i) => {
-      if (it && it === hoveredStripeItem) out.push(i);
-    });
-    return out;
-  }, [stripeTileItems, hoveredStripeItem]);
 
   useEffect(() => {
     if (!active) return;
@@ -3347,22 +3155,17 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
                       stripeMaskDebugRectsPct={stripeMaskDebugRectsPct}
                       stripeMaskTileRectsRawPct={stripeMaskTileRectsRawPct}
                       drawingOverlayDebug={drawingOverlayDebug}
-                      humanInsideVariant={humanInsideVariant}
-                      firstContactVariant={firstContactVariant}
+                      humanInsideVariant={humanInsideVariantP2}
+                      firstContactVariant={firstContactVariantP2}
                       reorderAustenQuotes={reorderAustenQuotes}
                       austenSelectedDisableMulti={austenSelectedDisableMulti}
                       stripeVariantVisibility={stripeVariantVisibility}
-                      setFirstContactVariant={setFirstContactVariant}
-                      setHumanInsideVariant={setHumanInsideVariant}
+                      setFirstContactVariant={setFirstContactVariantP2}
+                      setHumanInsideVariant={setHumanInsideVariantP2}
                       setThinStartIndex={setThinStartIndex}
-                      displayedShirtColor={displayedShirtColor}
-                      onShirtClick={onShirtClick}
-                      stripeTileOverlaySrcs={stripeTileOverlaySrcs}
-                      stripeTileItems={stripeTileItems}
-                      clicAreaHighlightIndices={clicAreaHighlightIndices}
-                      neckDotIndices={neckDotIndices}
-                      emptyTileIndices={emptyTileIndices}
-                      stripeEmptyMaskSrc={stripeEmptyMaskSrc}
+                      displayedShirtColor={displayedShirtColorP2}
+                      onShirtClick={onShirtClickP2}
+                      thinDrawings={thinDrawings}
                       megaMenuRef={megaMenuRef}
                     />
 
