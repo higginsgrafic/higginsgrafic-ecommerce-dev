@@ -1,10 +1,15 @@
-import React, { useRef } from 'react';
+import React, { useEffect, useMemo, useRef } from 'react';
 import CercadorTopBar, { CERCADOR_COLORS } from '../fullwide/CercadorTopBar.jsx';
 import CercadorTextRow from '../fullwide/CercadorTextRow.jsx';
 import MegaStripePanel from '../fullwide/MegaStripePanel.jsx';
 import MegaHeroSlider from '../MegaHeroSlider.jsx';
 import Pauta4ColsOverlay from '../pauta/Pauta4ColsOverlay';
 import useMegaslideCalibration from '@/hooks/useMegaslideCalibration';
+import {
+  CONTROL_TILE_BN,
+  CONTROL_TILE_ARROWS,
+} from '../fullwide/MegaColumn.jsx';
+import { computeStripeTileOverlaySrcs, computeStripeTileItems } from '@/utils/resolveStripeTile.js';
 
 export default function MegaslidePagina2({
   active,
@@ -45,12 +50,7 @@ export default function MegaslidePagina2({
   setThinStartIndex,
   displayedShirtColor,
   onShirtClick,
-  stripeTileOverlaySrcs,
-  stripeTileItems,
-  clicAreaHighlightIndices,
-  neckDotIndices,
-  emptyTileIndices,
-  stripeEmptyMaskSrc,
+  thinDrawings,
   megaMenuRef,
 }) {
   const cal = useMegaslideCalibration('p2', active, megaMenuRef);
@@ -71,6 +71,70 @@ export default function MegaslidePagina2({
     megaTileSize,
     normalizeOverlaySrc,
   } = cal;
+
+  const variant = active === 'the_human_inside' ? humanInsideVariant : firstContactVariant;
+
+  const drawable = useMemo(() => {
+    const cols = resolvedMegaFiltered?.[active];
+    if (!Array.isArray(cols) || cols.length === 0) return [];
+    const items = cols[0]?.items || [];
+    const d = active === 'the_human_inside'
+      ? thinDrawings
+      : items.filter((it) => it && it !== CONTROL_TILE_BN && it !== CONTROL_TILE_ARROWS);
+    return d;
+  }, [resolvedMegaFiltered, active, thinDrawings]);
+
+  const stripeTileOverlaySrcs = useMemo(() => {
+    if (drawable.length === 0) return null;
+    return computeStripeTileOverlaySrcs({
+      drawable,
+      variant,
+      active,
+      displayedShirtColor,
+      resolvedOverlaySrc,
+    });
+  }, [drawable, variant, active, displayedShirtColor, resolvedOverlaySrc]);
+
+  const stripeTileItems = useMemo(() => {
+    if (drawable.length === 0) return null;
+    return computeStripeTileItems(drawable);
+  }, [drawable]);
+
+  const emptyTileIndices = useMemo(() => {
+    if (!Array.isArray(stripeTileItems)) return [];
+    const out = [];
+    stripeTileItems.forEach((it, i) => { if (!it) out.push(i); });
+    return out;
+  }, [stripeTileItems]);
+
+  const clicAreaHighlightIndices = useMemo(() => {
+    if (!hoveredStripeItem || !Array.isArray(stripeTileItems)) return [];
+    const distinct = new Set(stripeTileItems.filter(Boolean));
+    if (distinct.size <= 1) return [];
+    const out = [];
+    stripeTileItems.forEach((it, i) => { if (it === hoveredStripeItem) out.push(i); });
+    return out;
+  }, [hoveredStripeItem, stripeTileItems]);
+
+  const neckDotIndices = useMemo(() => {
+    if (!Array.isArray(stripeTileItems)) return [];
+    const out = [];
+    stripeTileItems.forEach((it, i) => { if (it && it === hoveredStripeItem) out.push(i); });
+    return out;
+  }, [stripeTileItems, hoveredStripeItem]);
+
+  const stripeEmptyMaskSrc = null;
+
+  useEffect(() => {
+    if (!Array.isArray(stripeTileOverlaySrcs)) return;
+    for (const src of stripeTileOverlaySrcs) {
+      if (src) {
+        const img = new Image();
+        img.src = src;
+      }
+    }
+  }, [stripeTileOverlaySrcs]);
+
   return (
     <div style={{ width: '25%', flexShrink: 0, display: 'flex', height: '100%', position: 'relative', justifyContent: 'center' }}>
       <div style={{
