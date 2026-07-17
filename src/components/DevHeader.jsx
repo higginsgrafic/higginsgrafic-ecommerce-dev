@@ -1,10 +1,10 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { memo, useEffect, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { UserRound } from 'lucide-react';
 
-export default function DevHeader({
+function DevHeader({
   adminBannerHeight = 0,
   rulerInset = 0,
   cartItemCount = 0,
@@ -243,3 +243,5 @@ export default function DevHeader({
     </div>
   );
 }
+
+export default memo(DevHeader);

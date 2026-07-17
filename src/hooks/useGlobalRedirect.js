@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { supabase } from '@/api/supabase-products';
 
 export function useGlobalRedirect(bypassEnabled = false) {
   const [shouldRedirect, setShouldRedirect] = useState(false);
@@ -9,6 +8,7 @@ export function useGlobalRedirect(bypassEnabled = false) {
   useEffect(() => {
     const checkGlobalRedirect = async () => {
       try {
+        const { supabase } = await import('@/api/supabase-products');
         if (!supabase) {
           setShouldRedirect(false);
           setRedirectUrl(null);

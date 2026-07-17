@@ -135,6 +135,7 @@ export default defineConfig({
           'supabase': ['@supabase/supabase-js'],
           'radix-ui': ['@radix-ui/react-toast', '@radix-ui/react-dialog', '@radix-ui/react-dropdown-menu'],
           'motion': ['framer-motion'],
+          'lucide-icons': ['lucide-react'],
         },
       },
     },
