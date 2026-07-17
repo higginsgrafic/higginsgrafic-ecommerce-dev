@@ -706,7 +706,7 @@ function MegaStripePanel({
                                     return baseFx;
                                   })(),
                                 }}
-                                loading="eager"
+                                loading={idx === 0 ? 'eager' : 'lazy'}
                                 decoding="async"
                                 fetchpriority={idx === 0 ? 'high' : undefined}
                               />
@@ -910,7 +910,7 @@ function MegaStripePanel({
                                     return baseFx;
                                   })(),
                                 }}
-                                loading="eager"
+                                loading={idx === 0 ? 'eager' : 'lazy'}
                                 decoding="async"
                               />
                             </div>

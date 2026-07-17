@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AEG ORC6N361EW — TwinTech Total No Frost</title>
+<style>
+  :root {
+    --bg: #0f0f12;
+    --card: #1a1a20;
+    --accent: #d4af37;
+    --accent2: #e8c547;
+    --text: #e8e8e8;
+    --muted: #888;
+    --border: #2a2a30;
+    --green: #4caf50;
+    --red: #ef5350;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  /* HERO */
+  .hero {
+    position: relative;
+    overflow: hidden;
+    padding: 80px 24px 60px;
+    text-align: center;
+    background: linear-gradient(135deg, #1a1a20 0%, #0f0f12 50%, #1a1a20 100%);
+    border-bottom: 1px solid var(--border);
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -50%; left: -50%;
+    width: 200%; height: 200%;
+    background: radial-gradient(circle at 50% 50%, rgba(212,175,55,0.06) 0%, transparent 50%);
+    animation: pulse 8s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); opacity: 0.5; }
+    50% { transform: scale(1.1); opacity: 1; }
+  }
+  .hero-badge {
+    display: inline-block;
+    padding: 6px 18px;
+    border: 1px solid var(--accent);
+    border-radius: 20px;
+    font-size: 12px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 24px;
+    position: relative;
+  }
+  .hero h1 {
+    font-size: clamp(28px, 5vw, 52px);
+    font-weight: 700;
+    letter-spacing: -1px;
+    margin-bottom: 12px;
+    position: relative;
+  }
+  .hero h1 span { color: var(--accent); }
+  .hero-subtitle {
+    font-size: clamp(16px, 2.5vw, 22px);
+    color: var(--muted);
+    font-weight: 300;
+    position: relative;
+  }
+  .hero-price {
+    margin-top: 32px;
+    position: relative;
+  }
+  .hero-price .from { font-size: 13px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
+  .hero-price .amount { font-size: 42px; font-weight: 700; color: var(--accent); }
+  .hero-price .note { font-size: 13px; color: var(--muted); }
+
+  /* CONTAINER */
+  .container { max-width: 1000px; margin: 0 auto; padding: 48px 24px; }
+
+  /* KEY FEATURE — TwinTech */
+  .twintech {
+    background: linear-gradient(135deg, #1c1c24 0%, #15151a 100%);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 48px 36px;
+    margin-bottom: 48px;
+    text-align: center;
+  }
+  .twintech-icon {
+    width: 72px; height: 72px;
+    margin: 0 auto 24px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 32px;
+  }
+  .twintech h2 { font-size: 26px; margin-bottom: 16px; }
+  .twintech h2 span { color: var(--accent); }
+  .twintech p { color: var(--muted); font-size: 16px; max-width: 640px; margin: 0 auto 32px; }
+  .twintech-diagram {
+    display: flex;
+    gap: 24px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  .twintech-card {
+    flex: 1;
+    min-width: 260px;
+    max-width: 340px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 28px 24px;
+    text-align: left;
+  }
+  .twintech-card .icon { font-size: 28px; margin-bottom: 12px; }
+  .twintech-card h3 { font-size: 17px; margin-bottom: 8px; }
+  .twintech-card p { font-size: 14px; color: var(--muted); margin: 0; text-align: left; }
+
+  /* SPECS GRID */
+  .section-title {
+    font-size: 22px;
+    font-weight: 600;
+    margin-bottom: 24px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border);
+  }
+  .specs-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 16px;
+    margin-bottom: 48px;
+  }
+  .spec-item {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px;
+  }
+  .spec-item .label { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
+  .spec-item .value { font-size: 20px; font-weight: 600; }
+  .spec-item .value.highlight { color: var(--accent); }
+  .spec-item .sub { font-size: 13px; color: var(--muted); margin-top: 4px; }
+
+  /* REQUIREMENTS CHECK */
+  .checklist {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 36px;
+    margin-bottom: 48px;
+  }
+  .checklist h2 { font-size: 22px; margin-bottom: 24px; }
+  .check-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .check-item:last-child { border-bottom: none; }
+  .check-icon {
+    flex-shrink: 0;
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    background: rgba(76,175,80,0.15);
+    border: 1px solid var(--green);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--green);
+    font-size: 14px;
+    font-weight: 700;
+  }
+  .check-item.warn .check-icon { background: rgba(239,83,80,0.15); border-color: var(--red); color: var(--red); }
+  .check-text h4 { font-size: 15px; margin-bottom: 2px; }
+  .check-text p { font-size: 13px; color: var(--muted); }
+
+  /* TECH CALLOUTS */
+  .callouts {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+    margin-bottom: 48px;
+  }
+  .callout {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 28px;
+  }
+  .callout .emoji { font-size: 32px; margin-bottom: 14px; }
+  .callout h3 { font-size: 16px; margin-bottom: 8px; }
+  .callout p { font-size: 14px; color: var(--muted); }
+
+  /* COMPARISON TABLE */
+  .compare {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+    margin-bottom: 48px;
+  }
+  .compare table { width: 100%; border-collapse: collapse; }
+  .compare th {
+    background: rgba(212,175,55,0.08);
+    padding: 16px 20px;
+    text-align: left;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--accent);
+    border-bottom: 1px solid var(--border);
+  }
+  .compare td {
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--border);
+    font-size: 14px;
+  }
+  .compare td:first-child { color: var(--muted); }
+  .compare td:last-child { font-weight: 600; }
+  .compare tr:last-child td { border-bottom: none; }
+
+  /* BUY SECTION */
+  .buy {
+    text-align: center;
+    padding: 48px 24px;
+    border-top: 1px solid var(--border);
+  }
+  .buy h2 { font-size: 24px; margin-bottom: 16px; }
+  .buy p { color: var(--muted); margin-bottom: 28px; }
+  .buy-links {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  .buy-link {
+    display: inline-block;
+    padding: 14px 28px;
+    border-radius: 10px;
+    text-decoration: none;
+    font-size: 15px;
+    font-weight: 600;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .buy-link:hover { transform: translateY(-2px); }
+  .buy-link.primary {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    color: #0f0f12;
+    box-shadow: 0 4px 20px rgba(212,175,55,0.3);
+  }
+  .buy-link.secondary {
+    background: var(--card);
+    border: 1px solid var(--border);
+    color: var(--text);
+  }
+
+  /* FOOTER */
+  .footer {
+    text-align: center;
+    padding: 32px 24px;
+    color: var(--muted);
+    font-size: 12px;
+    border-top: 1px solid var(--border);
+  }
+
+  @media (max-width: 640px) {
+    .twintech-card { min-width: 100%; }
+    .specs-grid { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-badge">AEG · Serie 6000</div>
+  <h1>ORC6N361EW<br><span>TwinTech® Total No Frost</span></h1>
+  <p class="hero-subtitle">Doble sistema de refrigeració independent. Aliments destapats que no es fan malbé.</p>
+  <div class="hero-price">
+    <div class="from">Preu més baix trobat</div>
+    <div class="amount">599 €</div>
+    <div class="note">envío inclòs · idealo.es</div>
+  </div>
+</section>
+
+<div class="container">
+
+  <!-- TWINTECH EXPLAINED -->
+  <div class="twintech">
+    <div class="twintech-icon">❄️</div>
+    <h2>TwinTech® <span>Total No Frost</span></h2>
+    <p>
+      Doble sistema de refrigeració independent: el congelador es manté sense escarcha
+      i la nevera manté la humedad òptima. Els aliments es conserven
+      <strong style="color:var(--accent)">un 60% més hidratats</strong>
+      que en frigorífics d'un sol evaporador.
+    </p>
+    <div class="twintech-diagram">
+      <div class="twintech-card">
+        <div class="icon">🧊</div>
+        <h3>Congelador — Circuit 1</h3>
+        <p>Aire sec circulat per No Frost. Sense escarcha, sense descongelar manualment. 101 L de capacitat, 4 estrelles.</p>
+      </div>
+      <div class="twintech-card">
+        <div class="icon">💧</div>
+        <h3>Nevera — Circuit 2</h3>
+        <p>Humedad natural preservada. L'aire del congelador no entra a la nevera. Pots deixar un aliment sense tapar i no es farà malbé.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- REQUIREMENTS CHECK -->
+  <div class="checklist">
+    <h2>✅ Requisits demanats</h2>
+
+    <div class="check-item">
+      <div class="check-icon">✓</div>
+      <div class="check-text">
+        <h4>No Frost al congelador</h4>
+        <p>Sistema No Frost confirmat. Sense escarcha, sense descongelació manual.</p>
+      </div>
+    </div>
+
+    <div class="check-item">
+      <div class="check-icon">✓</div>
+      <div class="check-text">
+        <h4>No crema aliments a la nevera</h4>
+        <p>TwinTech amb doble circuit independent. La nevera manté humedad òptima, no usa aire sec del congelador.</p>
+      </div>
+    </div>
+
+    <div class="check-item">
+      <div class="check-icon">✓</div>
+      <div class="check-text">
+        <h4>Aliment destapat sense que es faci malbé</h4>
+        <p>Confirmat per la tecnologia TwinTech: "evita que los alimentos se sequen". Humedad natural preservada.</p>
+      </div>
+    </div>
+
+    <div class="check-item">
+      <div class="check-icon">✓</div>
+      <div class="check-text">
+        <h4>Alçada ≥ 200 cm</h4>
+        <p>201 cm — compleix.</p>
+      </div>
+    </div>
+
+    <div class="check-item">
+      <div class="check-icon">✓</div>
+      <div class="check-text">
+        <h4>Amplada = 60 cm</h4>
+        <p>59,5 cm — compleix (estàndard 60 cm).</p>
+      </div>
+    </div>
+
+    <div class="check-item">
+      <div class="check-icon">✓</div>
+      <div class="check-text">
+        <h4>Profunditat ≥ 65 cm</h4>
+        <p>65 cm — compleix exactament.</p>
+      </div>
+    </div>
+
+    <div class="check-item">
+      <div class="check-icon">✓</div>
+      <div class="check-text">
+        <h4>Preu ≤ 700 €</h4>
+        <p>599 € (preu més baix trobat, envío inclòs).</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- SPECS -->
+  <h2 class="section-title">📋 Especificacions tècniques</h2>
+  <div class="specs-grid">
+    <div class="spec-item">
+      <div class="label">Dimensions</div>
+      <div class="value">201 × 59,5 × 65 cm</div>
+      <div class="sub">Alçada × Amplada × Profunditat</div>
+    </div>
+    <div class="spec-item">
+      <div class="label">Capacitat total</div>
+      <div class="value">366 L</div>
+      <div class="sub">266 L nevera + 101 L congelador</div>
+    </div>
+    <div class="spec-item">
+      <div class="label">Classe energètica</div>
+      <div class="value">E</div>
+      <div class="sub">250 kWh/any</div>
+    </div>
+    <div class="spec-item">
+      <div class="label">Soroll</div>
+      <div class="value">38 dB</div>
+      <div class="sub">Classe C</div>
+    </div>
+    <div class="spec-item">
+      <div class="label">Congelació</div>
+      <div class="value">8 kg/24h</div>
+      <div class="sub">4 estrelles</div>
+    </div>
+    <div class="spec-item">
+      <div class="label">Color</div>
+      <div class="value">Blanc</div>
+      <div class="sub">Porta plana</div>
+    </div>
+    <div class="spec-item">
+      <div class="label">Tecnologia</div>
+      <div class="value highlight">TwinTech</div>
+      <div class="sub">Doble circuit + MultiFlow</div>
+    </div>
+    <div class="spec-item">
+      <div class="label">Garantia compressor</div>
+      <div class="value highlight">10 anys</div>
+      <div class="sub">Maó d'obra, transport, recàrrega</div>
+    </div>
+  </div>
+
+  <!-- TECH CALLOUTS -->
+  <h2 class="section-title">🔧 Tecnologia</h2>
+  <div class="callouts">
+    <div class="callout">
+      <div class="emoji">🌬️</div>
+      <h3>MultiFlow</h3>
+      <p>Circulació d'aire frío per tota la nevera. Temperatura estable a cada estant. Conserva millor i evita que es sequin.</p>
+    </div>
+    <div class="callout">
+      <div class="emoji">🥩</div>
+      <h3>Cajó ExtraChill</h3>
+      <p>Cajó per a aliments frescos i delicats. Manté temperatura més baixa que la resta de la nevera. Ideal per a formatges i embotits.</p>
+    </div>
+    <div class="callout">
+      <div class="emoji">⚡</div>
+      <h3>Compresor Inverter</h3>
+      <p>Velocitat variable segons la demanda de fred. Menor consum, major eficiència, menys soroll. 10 anys de garantia.</p>
+    </div>
+    <div class="callout">
+      <div class="emoji">💡</div>
+      <h3>Il·luminació LED</h3>
+      <p>Llum interior LED clara i eficient. Visibilitat completa de tot l'interior.</p>
+    </div>
+    <div class="callout">
+      <div class="emoji">🌡️</div>
+      <h3>Control digital</h3>
+      <p>Display LED interior. Ajusta la temperatura amb precisió. Funcions SuperCool i vacances.</p>
+    </div>
+    <div class="callout">
+      <div class="emoji">🚪</div>
+      <h3>Disseny</h3>
+      <p>Porta plana blanca amb tirador integrat. Porta reversible. Lliure instal·lació.</p>
+    </div>
+  </div>
+
+  <!-- COMPARISON WITH REQUIREMENTS -->
+  <h2 class="section-title">📊 Resum comparatiu</h2>
+  <div class="compare">
+    <table>
+      <thead>
+        <tr>
+          <th>Concepte</th>
+          <th>Requisit</th>
+          <th>AEG ORC6N361EW</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>Congelador No Frost</td><td>Sí</td><td>✓ Sí</td></tr>
+        <tr><td>Doble circuit</td><td>Sí (ideal)</td><td>✓ TwinTech</td></tr>
+        <tr><td>No assecar aliments destapats</td><td>Sí</td><td>✓ Confirmat</td></tr>
+        <tr><td>Alçada</td><td>≥ 200 cm</td><td>201 cm</td></tr>
+        <tr><td>Amplada</td><td>60 cm</td><td>59,5 cm</td></tr>
+        <tr><td>Profunditat</td><td>≥ 65 cm</td><td>65 cm</td></tr>
+        <tr><td>Preu</td><td>≤ 700 €</td><td>599 €</td></tr>
+        <tr><td>Classe energètica</td><td>—</td><td>E</td></tr>
+        <tr><td>Soroll</td><td>—</td><td>38 dB</td></tr>
+        <tr><td>Capacitat</td><td>—</td><td>366 L</td></tr>
+        <tr><td>Garantia compressor</td><td>—</td><td>10 anys</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>
+
+<!-- BUY -->
+<section class="buy">
+  <h2>On comprar</h2>
+  <p>Preus trobats a juliol 2026. Compara abans de comprar.</p>
+  <div class="buy-links">
+    <a href="https://www.idealo.es/precios/204465694/aeg-orc6n361ew.html" target="_blank" class="buy-link primary">idealo — 599 €</a>
+    <a href="https://www.sihogar.com/es/frigorificos-combinados-de-mas-de-190cm-super-ofertas/95699-aeg-orc6n361ew-frigo-combi-de-201x59-5x65cm-clase-e-libre-instalacion-7333394033457.html" target="_blank" class="buy-link secondary">SiHogar — 619 €</a>
+    <a href="https://tiendadelelectro.com/producto/aeg-orc6n361ew/" target="_blank" class="buy-link secondary">TiendaDelElectro — 717 €</a>
+  </div>
+</section>
+
+<div class="footer">
+  AEG ORC6N361EW · Serie 6000 TwinTech® Total No Frost · Recerca de nevera · Juliol 2026
+</div>
+
+</body>
+</html>

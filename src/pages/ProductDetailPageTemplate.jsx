@@ -1,5 +1,5 @@
 import React, { useState, useLayoutEffect, useRef } from 'react';
-import { useLocation, useParams } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 import Pauta4ColsOverlay from '@/components/pauta/Pauta4ColsOverlay';
 import TambeRail from '@/pages/productRail/TambeRail';
@@ -67,10 +67,8 @@ const SIZES = ['S', 'M', 'L', 'XL', 'XXL'];
 const FINISHES = ['BLANC', 'COLOR', 'NEGRE'];
 
 function ProductDetailPageTemplate() {
-  const { collection: collectionSlug, productRoute } = useParams();
   const location = useLocation();
-
-  const registryKey = `${collectionSlug}/${productRoute}`;
+  const registryKey = location.pathname.replace(/^\//, '');
   const product = PDP_REGISTRY_BY_ROUTE[registryKey];
 
   if (!product) {

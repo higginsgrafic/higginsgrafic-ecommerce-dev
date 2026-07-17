@@ -1,11 +1,9 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: [
-    './pages/**/*.{js,jsx}',
-    './components/**/*.{js,jsx}',
-    './app/**/*.{js,jsx}',
     './src/**/*.{js,jsx}',
-	],
+    './index.html',
+  ],
   prefix: "",
   theme: {
     container: {
@@ -17,10 +15,6 @@ module.exports = {
     },
     extend: {
       colors: {
-        gray: {
-          900: '#ff0000',
-        },
-        black: '#ff0000',
         whiteStrong: "hsl(var(--white-strong))",
         whiteSoft: "hsl(var(--white-soft))",
         border: "hsl(var(--border))",
@@ -86,16 +80,6 @@ module.exports = {
         oswald: ['Oswald', 'sans-serif'],
         roboto: ['Roboto', 'sans-serif'],
         'roboto-condensed': ['Roboto Condensed', 'sans-serif'],
-        'ibm-plex-sans': ['IBM Plex Sans', 'sans-serif'],
-        'ibm-plex-mono': ['IBM Plex Mono', 'monospace'],
-        montserrat: ['Montserrat', 'sans-serif'],
-        'open-sans': ['Open Sans', 'sans-serif'],
-        lato: ['Lato', 'sans-serif'],
-        raleway: ['Raleway', 'sans-serif'],
-        poppins: ['Poppins', 'sans-serif'],
-        'playfair-display': ['Playfair Display', 'serif'],
-        merriweather: ['Merriweather', 'serif'],
-        nunito: ['Nunito', 'sans-serif'],
       },
     },
   },

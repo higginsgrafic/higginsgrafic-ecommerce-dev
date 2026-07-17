@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef } from 'react';
+import React, { useMemo } from 'react';
 import CercadorTopBar, { CERCADOR_COLORS } from '../fullwide/CercadorTopBar.jsx';
 import CercadorTextRow from '../fullwide/CercadorTextRow.jsx';
 import MegaStripePanel from '../fullwide/MegaStripePanel.jsx';
@@ -124,16 +124,6 @@ export default function MegaslidePagina2({
   }, [stripeTileItems, hoveredStripeItem]);
 
   const stripeEmptyMaskSrc = null;
-
-  useEffect(() => {
-    if (!Array.isArray(stripeTileOverlaySrcs)) return;
-    for (const src of stripeTileOverlaySrcs) {
-      if (src) {
-        const img = new Image();
-        img.src = src;
-      }
-    }
-  }, [stripeTileOverlaySrcs]);
 
   return (
     <div style={{ width: '25%', flexShrink: 0, display: 'flex', height: '100%', position: 'relative', justifyContent: 'center' }}>

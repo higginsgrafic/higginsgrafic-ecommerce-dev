@@ -71,12 +71,13 @@ import { CartProvider } from '@/contexts/CartContext';
 import { WishlistProvider } from '@/contexts/WishlistContext';
 import { ToastProvider } from '@/contexts/ToastContext';
 import { GridDebugProvider } from '@/contexts/GridDebugContext';
-import { AdminProvider } from '@/contexts/AdminContext';
-import { AdminToolsProvider } from '@/contexts/AdminToolsContext';
 import App from '@/App';
 import BranchBadge from '@/components/dev/BranchBadge';
 import ActiveWorkOverlay from '@/components/dev/ActiveWorkOverlay';
 import '@/index.css';
+if (import.meta.env.DEV) {
+  import('@/debug.css');
+}
 
 console.log('📦 All imports loaded successfully');
 
@@ -86,23 +87,19 @@ window.__GRAFIC_REACT_MOUNTED__ = false;
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <BrowserRouter>
-    <AdminProvider>
-      <AdminToolsProvider>
-        <GridDebugProvider>
-          <CartProvider>
-            <WishlistProvider>
-              <ProductProvider>
-                <ToastProvider>
-                  <App />
-                  <BranchBadge />
-                  <ActiveWorkOverlay />
-                </ToastProvider>
-              </ProductProvider>
-            </WishlistProvider>
-          </CartProvider>
-        </GridDebugProvider>
-      </AdminToolsProvider>
-    </AdminProvider>
+    <GridDebugProvider>
+      <CartProvider>
+        <WishlistProvider>
+          <ProductProvider>
+            <ToastProvider>
+              <App />
+              <BranchBadge />
+              <ActiveWorkOverlay />
+            </ToastProvider>
+          </ProductProvider>
+        </WishlistProvider>
+      </CartProvider>
+    </GridDebugProvider>
   </BrowserRouter>
 );
 

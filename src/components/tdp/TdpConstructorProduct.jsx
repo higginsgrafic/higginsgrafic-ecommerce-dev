@@ -2,6 +2,13 @@ import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import EditableTextBox from '@/components/dev/EditableTextBox';
 
+let pdpPrefetched = false;
+function prefetchPdpChunk() {
+  if (pdpPrefetched) return;
+  pdpPrefetched = true;
+  import('@/pages/ProductDetailPageTemplate');
+}
+
 const TDP_TEXT_PRESET_VERSION = 'tdp-layout-2026-05-14-0516';
 
 const TDP_PRODUCT_NAME_SETTINGS = {
@@ -229,7 +236,7 @@ function TdpConstructorProduct({
         }}
       >
         {linkHref ? (
-          <Link to={linkHref} target="_blank" rel="noopener noreferrer" style={{ display: 'contents', textDecoration: 'none', color: 'inherit' }}>
+          <Link to={linkHref} onMouseEnter={prefetchPdpChunk} style={{ display: 'contents', textDecoration: 'none', color: 'inherit' }}>
             <img
               src={shownImageSrc}
               alt={imageAlt}
@@ -321,9 +328,7 @@ function TdpConstructorProduct({
           linkHref ? (
             <Link
               to={linkHref}
-              target="_blank"
-              rel="noopener noreferrer"
-              onMouseEnter={() => setNameHovered(true)}
+              onMouseEnter={() => { prefetchPdpChunk(); setNameHovered(true); }}
               onMouseLeave={() => setNameHovered(false)}
               style={{
                 display: 'flex',
@@ -371,7 +376,7 @@ function TdpConstructorProduct({
             </div>
           )
         ) : collectionHref ? (
-          <Link to={collectionHref} target="_blank" rel="noopener noreferrer" style={{ display: 'contents', textDecoration: 'none', color: 'inherit' }}>
+          <Link to={collectionHref} style={{ display: 'contents', textDecoration: 'none', color: 'inherit' }}>
             <EditableTextBox
               id={`${editableIdPrefix}-product-name-layout-v2`}
               initialText={productName}

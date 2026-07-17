@@ -1,10 +1,21 @@
 import React, { useMemo } from 'react';
 import { Link, Navigate, Outlet, useLocation } from 'react-router-dom';
 import { LayoutDashboard } from 'lucide-react';
-import { useAdmin } from '@/contexts/AdminContext';
+import { AdminProvider, useAdmin } from '@/contexts/AdminContext';
+import { AdminToolsProvider } from '@/contexts/AdminToolsContext';
 import AdminMegaMenu from '@/components/AdminMegaMenu';
 
 export default function AdminStudioLayout() {
+  return (
+    <AdminProvider>
+      <AdminToolsProvider>
+        <AdminStudioLayoutInner />
+      </AdminToolsProvider>
+    </AdminProvider>
+  );
+}
+
+function AdminStudioLayoutInner() {
   const { isAdmin, authReady } = useAdmin();
   const location = useLocation();
 
