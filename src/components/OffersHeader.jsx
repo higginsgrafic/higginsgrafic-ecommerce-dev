@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 import { Truck } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
@@ -111,4 +111,4 @@ const OffersHeader = ({ adminBannerVisible = false }) => {
   );
 };
 
-export default OffersHeader;
+export default memo(OffersHeader);

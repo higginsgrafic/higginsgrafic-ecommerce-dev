@@ -9,22 +9,6 @@ import { tdpImageFor, availableFinishesFor, defaultFinishFor } from '@/lib/pdpMo
 import EditableTextBox from '@/components/dev/EditableTextBox';
 import StoryPosterLink from '@/components/StoryPosterLink';
 
-// =============================================================================
-//  PDP de producte — AUSTEN · PRIDE & PREJUDICE 4
-// -----------------------------------------------------------------------------
-//  Fitxer independent (còpia de la plantilla ConstructorPdpPage) amb el nom de
-//  producte i la col·lecció fixats. Els ids dels EditableTextBox estan prefixats
-//  amb l'slug ("nx01-") perquè la configuració editable sigui independent de la
-//  resta de PDP.
-// =============================================================================
-
-const PRODUCT_SLUG = 'austen-pride-and-prejudice-4';
-const PRODUCT_ROUTE = 'pride-and-prejudice-4';
-const PRODUCT_NAME = "PRIDE & PREJUDICE 4";
-const COLLECTION_NAME = "AUSTEN";
-const COLLECTION_SLUG = 'austen';
-const IMAGE_COLLECTION = 'austen-crosswords';
-
 const PDP_PRESET_VERSION = 'pdp-layout-2026-06-06-1953';
 
 const PDP_TITLE_SETTINGS = {
@@ -58,14 +42,11 @@ const PDP_SIZE_SETTINGS = {
   color: '#475059', textTransform: 'none',
 };
 
-const TDP_IMAGE = (color, finish) => tdpImageFor(IMAGE_COLLECTION, PRODUCT_ROUTE, color, finish);
-
 const PRODUCT_DESCRIPTION = [
   "Mereixedors són d'honor, glòria e de fama e contínua bona memòria los",
   'hòmens virtuosos, e singularment aquells qui per la república lluitaren.',
 ].join(' ');
 
-// 14 colors oficials Gildan 5000 en l'ordre de la stripe (MegaStripe).
 const OFFICIAL_COLORS = [
   'white', 'light-blue', 'royal', 'navy', 'purple', 'light-pink', 'daisy',
   'gold', 'red', 'kiwi', 'irish-green', 'military-green', 'forest-green', 'black',
@@ -83,10 +64,23 @@ const SPECS = [
 
 const SIZES = ['S', 'M', 'L', 'XL', 'XXL'];
 const FINISHES = ['BLANC', 'COLOR', 'NEGRE'];
-const AVAILABLE_FINISHES = availableFinishesFor(IMAGE_COLLECTION);
-const DEFAULT_FINISH = defaultFinishFor(IMAGE_COLLECTION);
 
-function AustenPrideAndPrejudice4Page() {
+export default function ProductDetailTemplate({ product }) {
+  const {
+    slug: PRODUCT_SLUG,
+    route: PRODUCT_ROUTE,
+    name: PRODUCT_NAME,
+    collectionName: COLLECTION_NAME,
+    collectionSlug: COLLECTION_SLUG,
+    imageCollection,
+  } = product;
+
+  const IMAGE_COLLECTION = imageCollection || COLLECTION_SLUG;
+
+  const TDP_IMAGE = (color, finish) => tdpImageFor(IMAGE_COLLECTION, PRODUCT_ROUTE, color, finish);
+  const AVAILABLE_FINISHES = availableFinishesFor(IMAGE_COLLECTION);
+  const DEFAULT_FINISH = defaultFinishFor(IMAGE_COLLECTION);
+
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
   const urlColor = searchParams.get('color');
@@ -732,5 +726,3 @@ function AustenPrideAndPrejudice4Page() {
     </section>
   );
 }
-
-export default AustenPrideAndPrejudice4Page;

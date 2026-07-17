@@ -1,5 +1,4 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { supabase } from '@/api/supabase-products';
 
 const AdminContext = createContext();
 
@@ -64,6 +63,7 @@ export function AdminProvider({ children }) {
   };
 
   const enableAdminWithGoogle = async ({ redirectTo } = {}) => {
+    const { supabase } = await import('@/api/supabase-products');
     if (!supabase?.auth) return { ok: false, error: 'Supabase auth no disponible' };
     try {
       const options = {};
@@ -96,6 +96,8 @@ export function AdminProvider({ children }) {
         setAuthReady(true);
         return;
       }
+
+      const { supabase } = await import('@/api/supabase-products');
 
       if (!supabase?.auth) {
         setAuthReady(true);
@@ -157,6 +159,7 @@ export function AdminProvider({ children }) {
   }, [isAdmin]);
 
   const enableAdmin = async ({ email, password }) => {
+    const { supabase } = await import('@/api/supabase-products');
     if (!supabase?.auth) return { ok: false, error: 'Supabase auth no disponible' };
     const normalizedEmail = (email || '').toString().trim();
     if (!normalizedEmail) return { ok: false, error: 'Email obligatori' };
@@ -202,6 +205,7 @@ export function AdminProvider({ children }) {
     } catch {
       // ignore
     }
+    const { supabase } = await import('@/api/supabase-products');
     if (supabase?.auth) {
       try {
         await supabase.auth.signOut();

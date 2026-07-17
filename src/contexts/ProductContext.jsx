@@ -1,7 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { mockProducts, mockProductsBlava, mockProductsNegra, mockProductsGreen, mockProductsCube } from '@/data/mockProducts.jsx';
-import productsService from '@/api/supabase-products';
-import { syncGelatoProductsToSupabase, syncMockProductsToSupabase } from '@/api/gelato-sync';
 import { syncGelatoStoreProducts } from '@/api/gelato';
 import { useCart } from '@/contexts/CartContext';
 import { useWishlist } from '@/contexts/WishlistContext';
@@ -354,6 +352,7 @@ export const ProductProvider = ({ children }) => {
 
     try {
       if (USE_SUPABASE) {
+        const { default: productsService } = await import('@/api/supabase-products');
         const supabaseProducts = await productsService.getAllProductsIncludingInactive();
 
         let storeProducts = [];
@@ -443,6 +442,7 @@ export const ProductProvider = ({ children }) => {
     setError(null);
 
     try {
+      const { syncGelatoProductsToSupabase } = await import('@/api/gelato-sync');
       const result = await syncGelatoProductsToSupabase();
 
       if (result.success) {
@@ -465,6 +465,7 @@ export const ProductProvider = ({ children }) => {
     setError(null);
 
     try {
+      const { syncMockProductsToSupabase } = await import('@/api/gelato-sync');
       const result = await syncMockProductsToSupabase();
 
       if (result.success) {

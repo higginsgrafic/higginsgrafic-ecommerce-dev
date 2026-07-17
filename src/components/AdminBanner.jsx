@@ -1,11 +1,11 @@
-import React from 'react';
+import React, { memo } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { LayoutDashboard, ChevronLeft, ChevronRight, LogOut, Lock, Copy } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAdmin } from '@/contexts/AdminContext';
 import { useToast } from '@/contexts/ToastContext';
 
-export default function AdminBanner({ rulerInset = 0 }) {
+function AdminBanner({ rulerInset = 0 }) {
   const navigate = useNavigate();
   const location = useLocation();
   const { isAdmin, disableAdmin, bypassUnderConstruction, toggleBypassUnderConstruction } = useAdmin();
@@ -166,3 +166,5 @@ export default function AdminBanner({ rulerInset = 0 }) {
     </div>
   );
 }
+
+export default memo(AdminBanner);

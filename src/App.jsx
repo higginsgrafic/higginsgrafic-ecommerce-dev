@@ -91,70 +91,8 @@ const CollectionAustenPage = lazy(() => import('@/pages/CollectionAustenPage'));
 const CollectionCubePage = lazy(() => import('@/pages/CollectionCubePage'));
 const CollectionMiscellaniaPage = lazy(() => import('@/pages/CollectionMiscellaniaPage'));
 const ConstructorPdpPage = lazy(() => import('@/pages/ConstructorPdpPage'));
-const FirstContactNx01Page = lazy(() => import('@/pages/products/FirstContactNx01Page'));
-const FirstContactNcc1701Page = lazy(() => import('@/pages/products/FirstContactNcc1701Page'));
-const FirstContactNcc1701DPage = lazy(() => import('@/pages/products/FirstContactNcc1701DPage'));
-const FirstContactWormholePage = lazy(() => import('@/pages/products/FirstContactWormholePage'));
-const FirstContactPlasmaEscapePage = lazy(() => import('@/pages/products/FirstContactPlasmaEscapePage'));
-const FirstContactVulcansEndPage = lazy(() => import('@/pages/products/FirstContactVulcansEndPage'));
-const FirstContactThePhoenixPage = lazy(() => import('@/pages/products/FirstContactThePhoenixPage'));
-const TheHumanInsideC3P0Page = lazy(() => import('@/pages/products/TheHumanInsideC3P0Page'));
-const TheHumanInsideR2D2Page = lazy(() => import('@/pages/products/TheHumanInsideR2D2Page'));
-const TheHumanInsideVaderPage = lazy(() => import('@/pages/products/TheHumanInsideVaderPage'));
-const TheHumanInsideAfroditaPage = lazy(() => import('@/pages/products/TheHumanInsideAfroditaPage'));
-const TheHumanInsideMazingerPage = lazy(() => import('@/pages/products/TheHumanInsideMazingerPage'));
-const TheHumanInsideCylon78Page = lazy(() => import('@/pages/products/TheHumanInsideCylon78Page'));
-const TheHumanInsideCylon03Page = lazy(() => import('@/pages/products/TheHumanInsideCylon03Page'));
-const TheHumanInsideCybermanPage = lazy(() => import('@/pages/products/TheHumanInsideCybermanPage'));
-const TheHumanInsideMaschinenmenschPage = lazy(() => import('@/pages/products/TheHumanInsideMaschinenmenschPage'));
-const TheHumanInsideRobocopPage = lazy(() => import('@/pages/products/TheHumanInsideRobocopPage'));
-const TheHumanInsideIronman68Page = lazy(() => import('@/pages/products/TheHumanInsideIronman68Page'));
-const TheHumanInsideIronman08Page = lazy(() => import('@/pages/products/TheHumanInsideIronman08Page'));
-const CubeAfroditaCPage = lazy(() => import('@/pages/products/CubeAfroditaCPage'));
-const CubeMazingerCPage = lazy(() => import('@/pages/products/CubeMazingerCPage'));
-const CubeIronman68Page = lazy(() => import('@/pages/products/CubeIronman68Page'));
-const CubeIronkongPage = lazy(() => import('@/pages/products/CubeIronkongPage'));
-const CubeRobocubePage = lazy(() => import('@/pages/products/CubeRobocubePage'));
-const CubeCylonCubePage = lazy(() => import('@/pages/products/CubeCylonCubePage'));
-const CubeMaschinencubePage = lazy(() => import('@/pages/products/CubeMaschinencubePage'));
-const CubeDarthCubePage = lazy(() => import('@/pages/products/CubeDarthCubePage'));
-const Cube3cubeP0Page = lazy(() => import('@/pages/products/Cube3cubeP0Page'));
-const CubeCybercubePage = lazy(() => import('@/pages/products/CubeCybercubePage'));
-const MiscellaniaPontDelDiablePage = lazy(() => import('@/pages/products/MiscellaniaPontDelDiablePage'));
-const MiscellaniaDjVaderPage = lazy(() => import('@/pages/products/MiscellaniaDjVaderPage'));
-const MiscellaniaDeathStar2d2Page = lazy(() => import('@/pages/products/MiscellaniaDeathStar2d2Page'));
-const TheHumanInsideRobbieTheRobotPage = lazy(() => import('@/pages/products/TheHumanInsideRobbieTheRobotPage'));
-const TheHumanInsideTerminatorPage = lazy(() => import('@/pages/products/TheHumanInsideTerminatorPage'));
-const TheHumanInsideTheDalekPage = lazy(() => import('@/pages/products/TheHumanInsideTheDalekPage'));
-const MiscellaniaArthurDTheSecondPage = lazy(() => import('@/pages/products/MiscellaniaArthurDTheSecondPage'));
-const MiscellaniaR2d2QuotePage = lazy(() => import('@/pages/products/MiscellaniaR2d2QuotePage'));
-const AustenPemberleyHousePage = lazy(() => import('@/pages/products/AustenPemberleyHousePage'));
-const AustenKeepCalmPage = lazy(() => import('@/pages/products/AustenKeepCalmPage'));
-const AustenQuotesHalfAgonyHalfHopePage = lazy(() => import('@/pages/products/AustenQuotesHalfAgonyHalfHopePage'));
-const AustenQuotesIAdmireAndLoveYouPage = lazy(() => import('@/pages/products/AustenQuotesIAdmireAndLoveYouPage'));
-const AustenQuotesItIsATruthPage = lazy(() => import('@/pages/products/AustenQuotesItIsATruthPage'));
-const AustenQuotesUnsociableAndTaciturnPage = lazy(() => import('@/pages/products/AustenQuotesUnsociableAndTaciturnPage'));
-const AustenQuotesYouHaveBewitchedMePage = lazy(() => import('@/pages/products/AustenQuotesYouHaveBewitchedMePage'));
-const AustenPersuasion1Page = lazy(() => import('@/pages/products/AustenPersuasion1Page'));
-const AustenPersuasion2Page = lazy(() => import('@/pages/products/AustenPersuasion2Page'));
-const AustenPersuasion3Page = lazy(() => import('@/pages/products/AustenPersuasion3Page'));
-const AustenPersuasion4Page = lazy(() => import('@/pages/products/AustenPersuasion4Page'));
-const AustenPrideAndPrejudice1Page = lazy(() => import('@/pages/products/AustenPrideAndPrejudice1Page'));
-const AustenPrideAndPrejudice2Page = lazy(() => import('@/pages/products/AustenPrideAndPrejudice2Page'));
-const AustenPrideAndPrejudice3Page = lazy(() => import('@/pages/products/AustenPrideAndPrejudice3Page'));
-const AustenPrideAndPrejudice4Page = lazy(() => import('@/pages/products/AustenPrideAndPrejudice4Page'));
-const AustenSenseAndSensibility1Page = lazy(() => import('@/pages/products/AustenSenseAndSensibility1Page'));
-const AustenSenseAndSensibility2Page = lazy(() => import('@/pages/products/AustenSenseAndSensibility2Page'));
-const AustenSenseAndSensibility3Page = lazy(() => import('@/pages/products/AustenSenseAndSensibility3Page'));
-const AustenSenseAndSensibility4Page = lazy(() => import('@/pages/products/AustenSenseAndSensibility4Page'));
-const AustenLookingForMyDarcyBlueSolidPage = lazy(() => import('@/pages/products/AustenLookingForMyDarcyBlueSolidPage'));
-const AustenLookingForMyDarcyPinkSolidPage = lazy(() => import('@/pages/products/AustenLookingForMyDarcyPinkSolidPage'));
-const AustenLookingForMyDarcyPinkYellowFramePage = lazy(() => import('@/pages/products/AustenLookingForMyDarcyPinkYellowFramePage'));
-const AustenLookingForMyDarcyRedSolidPage = lazy(() => import('@/pages/products/AustenLookingForMyDarcyRedSolidPage'));
-const AustenLookingForMyDarcyRedYellowFramePage = lazy(() => import('@/pages/products/AustenLookingForMyDarcyRedYellowFramePage'));
-const AustenLookingForMyDarcyYellowBlueFramePage = lazy(() => import('@/pages/products/AustenLookingForMyDarcyYellowBlueFramePage'));
-const AustenLookingForMyDarcyYellowPinkFramePage = lazy(() => import('@/pages/products/AustenLookingForMyDarcyYellowPinkFramePage'));
-const AustenLookingForMyDarcyYellowSolidPage = lazy(() => import('@/pages/products/AustenLookingForMyDarcyYellowSolidPage'));
+const ProductDetailPageTemplate = lazy(() => import('@/pages/ProductDetailPageTemplate'));
+import { PDP_REGISTRY } from '@/data/pdpRegistry';
 const HtmlBasePage = lazy(() => import('@/pages/HtmlBasePage'));
 const DevComponentsCatalogPage = lazy(() => import('@/pages/DevComponentsCatalogPage'));
 const DevLayoutBuilderPage = lazy(() => import('@/pages/DevLayoutBuilderPage'));
@@ -787,17 +725,23 @@ function App() {
   const showProductsLoadingScreen = !!loading;
   const showProductsErrorScreen = !!(error && (!products || products.length === 0));
 
-  // Obrir cistell quan s'afegeix un producte
-  const handleAddToCart = (product, size, quantity = 1, shouldOpenCart = true) => {
+  const handleAddToCart = useCallback((product, size, quantity = 1, shouldOpenCart = true) => {
     addToCart(product, size, quantity);
-  };
+  }, [addToCart]);
 
-  // Shared props for pages
-  const pageProps = {
+  const handleCartClick = useCallback(() => {
+    navigate('/cart');
+  }, [navigate]);
+
+  const handleUserClick = useCallback(() => {
+    navigate('/profile');
+  }, [navigate]);
+
+  const pageProps = useMemo(() => ({
     onAddToCart: handleAddToCart,
     cartItems,
     onUpdateQuantity: updateQuantity
-  };
+  }), [handleAddToCart, cartItems, updateQuantity]);
 
   const isFullScreenRoute = location.pathname === '/ec-preview' || location.pathname === '/ec-preview-lite' || location.pathname === '/dev/contact-sheet' || location.pathname === '/dev/site-map' || isEmbeddedPreview;
   const isAdminRoute = ['/admin', '/index', '/promotions', '/ec-config', '/system-messages', '/fulfillment', '/fulfillment-settings', '/admin/media', '/admin-login', '/colleccio-settings', '/user-icon-picker', '/mockups', '/admin/gelato-sync', '/admin/gelato-blank', '/admin/products-overview', '/admin/draft', '/admin/draft/fulfillment-settings', '/admin/draft/mockup-settings', '/admin/draft/ruleta'].includes(location.pathname) || location.pathname.startsWith('/fulfillment/') || location.pathname.startsWith('/admin');
@@ -927,8 +871,8 @@ function App() {
               adminBannerHeight={adminBannerHeight}
               rulerInset={rulerInset}
               cartItemCount={getTotalItems()}
-              onCartClick={() => navigate('/cart')}
-              onUserClick={() => navigate('/profile')}
+              onCartClick={handleCartClick}
+              onUserClick={handleUserClick}
             />
           )}
 
@@ -937,12 +881,8 @@ function App() {
         isHomeRoute ? null : (
           <FullWideSlideHeader
             cartItemCount={getTotalItems()}
-            onCartClick={() => {
-              navigate('/cart');
-            }}
-            onUserClick={() => {
-              navigate('/profile');
-            }}
+            onCartClick={handleCartClick}
+            onUserClick={handleUserClick}
             manualEnabledOverride={false}
             ignoreStripeDebugFromUrl
             navItems={resolvedFullWideNavItems}
@@ -976,12 +916,8 @@ function App() {
                     <div className="w-full max-w-none" style={{ '--appHeaderOffset': demoHeaderOffset }}>
                       <FullWideSlideHeader
                         cartItemCount={getTotalItems()}
-                        onCartClick={() => {
-                          navigate('/cart');
-                        }}
-                        onUserClick={() => {
-                          navigate('/profile');
-                        }}
+                        onCartClick={handleCartClick}
+                        onUserClick={handleUserClick}
                         manualEnabledOverride={false}
                         ignoreStripeDebugFromUrl
                         navItems={resolvedFullWideNavItems}
@@ -1173,70 +1109,9 @@ function App() {
                 />
                 <Route path="/constructor/pdp" element={<ConstructorPdpPage />} />
                 {/* ─── PDP de producte (per col·lecció/slug) ─── */}
-                <Route path="/first-contact/nx-01" element={<FirstContactNx01Page />} />
-                <Route path="/first-contact/ncc-1701" element={<FirstContactNcc1701Page />} />
-                <Route path="/first-contact/ncc-1701-d" element={<FirstContactNcc1701DPage />} />
-                <Route path="/first-contact/wormhole" element={<FirstContactWormholePage />} />
-                <Route path="/first-contact/plasma-escape" element={<FirstContactPlasmaEscapePage />} />
-                <Route path="/first-contact/vulcans-end" element={<FirstContactVulcansEndPage />} />
-                <Route path="/first-contact/the-phoenix" element={<FirstContactThePhoenixPage />} />
-                <Route path="/the-human-inside/c3-p0" element={<TheHumanInsideC3P0Page />} />
-                <Route path="/the-human-inside/r2-d2" element={<TheHumanInsideR2D2Page />} />
-                <Route path="/the-human-inside/vader" element={<TheHumanInsideVaderPage />} />
-                <Route path="/the-human-inside/afrodita" element={<TheHumanInsideAfroditaPage />} />
-                <Route path="/the-human-inside/mazinger" element={<TheHumanInsideMazingerPage />} />
-                <Route path="/the-human-inside/cylon-78" element={<TheHumanInsideCylon78Page />} />
-                <Route path="/the-human-inside/cylon-03" element={<TheHumanInsideCylon03Page />} />
-                <Route path="/the-human-inside/cyberman" element={<TheHumanInsideCybermanPage />} />
-                <Route path="/the-human-inside/maschinenmensch" element={<TheHumanInsideMaschinenmenschPage />} />
-                <Route path="/the-human-inside/robocop" element={<TheHumanInsideRobocopPage />} />
-                <Route path="/the-human-inside/ironman-68" element={<TheHumanInsideIronman68Page />} />
-                <Route path="/the-human-inside/ironman-08" element={<TheHumanInsideIronman08Page />} />
-                <Route path="/cube/afrodita-c" element={<CubeAfroditaCPage />} />
-                <Route path="/cube/mazinger-c" element={<CubeMazingerCPage />} />
-                <Route path="/cube/ironman-68" element={<CubeIronman68Page />} />
-                <Route path="/cube/ironkong" element={<CubeIronkongPage />} />
-                <Route path="/cube/robocube" element={<CubeRobocubePage />} />
-                <Route path="/cube/cylon-cube" element={<CubeCylonCubePage />} />
-                <Route path="/cube/maschinencube" element={<CubeMaschinencubePage />} />
-                <Route path="/cube/darth-cube" element={<CubeDarthCubePage />} />
-                <Route path="/cube/3cube-p0" element={<Cube3cubeP0Page />} />
-                <Route path="/cube/cybercube" element={<CubeCybercubePage />} />
-                <Route path="/miscellania/pont-del-diable" element={<MiscellaniaPontDelDiablePage />} />
-                <Route path="/miscellania/dj-vader" element={<MiscellaniaDjVaderPage />} />
-                <Route path="/miscellania/death-star2d2" element={<MiscellaniaDeathStar2d2Page />} />
-                <Route path="/the-human-inside/robbie-the-robot" element={<TheHumanInsideRobbieTheRobotPage />} />
-                <Route path="/the-human-inside/terminator" element={<TheHumanInsideTerminatorPage />} />
-                <Route path="/the-human-inside/the-dalek" element={<TheHumanInsideTheDalekPage />} />
-                <Route path="/miscellania/arthur-d-the-second" element={<MiscellaniaArthurDTheSecondPage />} />
-                <Route path="/miscellania/r2d2-quote" element={<MiscellaniaR2d2QuotePage />} />
-                <Route path="/austen/pemberley-house" element={<AustenPemberleyHousePage />} />
-                <Route path="/austen/keep-calm" element={<AustenKeepCalmPage />} />
-                <Route path="/austen/quotes-half-agony-half-hope" element={<AustenQuotesHalfAgonyHalfHopePage />} />
-                <Route path="/austen/quotes-i-admire-and-love-you" element={<AustenQuotesIAdmireAndLoveYouPage />} />
-                <Route path="/austen/quotes-it-is-a-truth" element={<AustenQuotesItIsATruthPage />} />
-                <Route path="/austen/quotes-unsociable-and-taciturn" element={<AustenQuotesUnsociableAndTaciturnPage />} />
-                <Route path="/austen/quotes-you-have-bewitched-me" element={<AustenQuotesYouHaveBewitchedMePage />} />
-                <Route path="/austen/persuasion-1" element={<AustenPersuasion1Page />} />
-                <Route path="/austen/persuasion-2" element={<AustenPersuasion2Page />} />
-                <Route path="/austen/persuasion-3" element={<AustenPersuasion3Page />} />
-                <Route path="/austen/persuasion-4" element={<AustenPersuasion4Page />} />
-                <Route path="/austen/pride-and-prejudice-1" element={<AustenPrideAndPrejudice1Page />} />
-                <Route path="/austen/pride-and-prejudice-2" element={<AustenPrideAndPrejudice2Page />} />
-                <Route path="/austen/pride-and-prejudice-3" element={<AustenPrideAndPrejudice3Page />} />
-                <Route path="/austen/pride-and-prejudice-4" element={<AustenPrideAndPrejudice4Page />} />
-                <Route path="/austen/sense-and-sensibility-1" element={<AustenSenseAndSensibility1Page />} />
-                <Route path="/austen/sense-and-sensibility-2" element={<AustenSenseAndSensibility2Page />} />
-                <Route path="/austen/sense-and-sensibility-3" element={<AustenSenseAndSensibility3Page />} />
-                <Route path="/austen/sense-and-sensibility-4" element={<AustenSenseAndSensibility4Page />} />
-                <Route path="/austen/looking-for-my-darcy-blue-solid" element={<AustenLookingForMyDarcyBlueSolidPage />} />
-                <Route path="/austen/looking-for-my-darcy-pink-solid" element={<AustenLookingForMyDarcyPinkSolidPage />} />
-                <Route path="/austen/looking-for-my-darcy-pink-yellow-frame" element={<AustenLookingForMyDarcyPinkYellowFramePage />} />
-                <Route path="/austen/looking-for-my-darcy-red-solid" element={<AustenLookingForMyDarcyRedSolidPage />} />
-                <Route path="/austen/looking-for-my-darcy-red-yellow-frame" element={<AustenLookingForMyDarcyRedYellowFramePage />} />
-                <Route path="/austen/looking-for-my-darcy-yellow-blue-frame" element={<AustenLookingForMyDarcyYellowBlueFramePage />} />
-                <Route path="/austen/looking-for-my-darcy-yellow-pink-frame" element={<AustenLookingForMyDarcyYellowPinkFramePage />} />
-                <Route path="/austen/looking-for-my-darcy-yellow-solid" element={<AustenLookingForMyDarcyYellowSolidPage />} />
+                {PDP_REGISTRY.map((p) => (
+                  <Route key={p.slug} path={`/${p.collectionSlug}/${p.route}`} element={<ProductDetailPageTemplate />} />
+                ))}
                 <Route
                   path="/constructor/html-base"
                   element={<HtmlBasePage pautaEnabled={false} tableEnabled={false} />}

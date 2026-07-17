@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { memo, useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useTexts } from '@/hooks/useTexts';
@@ -520,4 +520,4 @@ const Footer = () => {
     </footer>
   );
 };
-export default Footer;
+export default memo(Footer);

@@ -1,5 +1,5 @@
 import React, { useState, useLayoutEffect, useRef } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 import Pauta4ColsOverlay from '@/components/pauta/Pauta4ColsOverlay';
 import TambeRail from '@/pages/productRail/TambeRail';
@@ -8,21 +8,7 @@ import Breadcrumbs from '@/components/Breadcrumbs';
 import { tdpImageFor, availableFinishesFor, defaultFinishFor } from '@/lib/pdpMockup';
 import EditableTextBox from '@/components/dev/EditableTextBox';
 import StoryPosterLink from '@/components/StoryPosterLink';
-
-// =============================================================================
-//  PDP de producte — CUBE · IRONMAN-68
-// -----------------------------------------------------------------------------
-//  Fitxer independent (còpia de la plantilla ConstructorPdpPage) amb el nom de
-//  producte i la col·lecció fixats. Els ids dels EditableTextBox estan prefixats
-//  amb l'slug ("nx01-") perquè la configuració editable sigui independent de la
-//  resta de PDP.
-// =============================================================================
-
-const PRODUCT_SLUG = 'cube-ironman-68';
-const PRODUCT_ROUTE = 'ironman-68';
-const PRODUCT_NAME = "IRONMAN-68";
-const COLLECTION_NAME = "CUBE";
-const COLLECTION_SLUG = 'cube';
+import { PDP_REGISTRY_BY_ROUTE } from '@/data/pdpRegistry';
 
 const PDP_PRESET_VERSION = 'pdp-layout-2026-06-06-1953';
 
@@ -57,14 +43,11 @@ const PDP_SIZE_SETTINGS = {
   color: '#475059', textTransform: 'none',
 };
 
-const TDP_IMAGE = (color, finish) => tdpImageFor(COLLECTION_SLUG, PRODUCT_ROUTE, color, finish);
-
 const PRODUCT_DESCRIPTION = [
   "Mereixedors són d'honor, glòria e de fama e contínua bona memòria los",
   'hòmens virtuosos, e singularment aquells qui per la república lluitaren.',
 ].join(' ');
 
-// 14 colors oficials Gildan 5000 en l'ordre de la stripe (MegaStripe).
 const OFFICIAL_COLORS = [
   'white', 'light-blue', 'royal', 'navy', 'purple', 'light-pink', 'daisy',
   'gold', 'red', 'kiwi', 'irish-green', 'military-green', 'forest-green', 'black',
@@ -82,11 +65,39 @@ const SPECS = [
 
 const SIZES = ['S', 'M', 'L', 'XL', 'XXL'];
 const FINISHES = ['BLANC', 'COLOR', 'NEGRE'];
-const AVAILABLE_FINISHES = availableFinishesFor(COLLECTION_SLUG);
-const DEFAULT_FINISH = defaultFinishFor(COLLECTION_SLUG);
 
-function CubeIronman68Page() {
+function ProductDetailPageTemplate() {
+  const { collection: collectionSlug, productRoute } = useParams();
   const location = useLocation();
+
+  const registryKey = `${collectionSlug}/${productRoute}`;
+  const product = PDP_REGISTRY_BY_ROUTE[registryKey];
+
+  if (!product) {
+    return (
+      <section className="bg-background">
+        <Helmet>
+          <title>Producte no trobat | Higgins Gràfic</title>
+        </Helmet>
+        <div style={{ padding: '4rem', textAlign: 'center' }}>
+          <h1>Producte no trobat</h1>
+          <p>No s'ha trobat cap producte per a la ruta <code>{registryKey}</code>.</p>
+        </div>
+      </section>
+    );
+  }
+
+  const PRODUCT_SLUG = product.slug;
+  const PRODUCT_ROUTE = product.route;
+  const PRODUCT_NAME = product.name;
+  const COLLECTION_NAME = product.collectionName;
+  const COLLECTION_SLUG = product.collectionSlug;
+  const IMAGE_COLLECTION = product.imageCollection || product.collectionSlug;
+
+  const TDP_IMAGE = (color, finish) => tdpImageFor(IMAGE_COLLECTION, PRODUCT_ROUTE, color, finish);
+  const AVAILABLE_FINISHES = availableFinishesFor(IMAGE_COLLECTION);
+  const DEFAULT_FINISH = defaultFinishFor(IMAGE_COLLECTION);
+
   const searchParams = new URLSearchParams(location.search);
   const urlColor = searchParams.get('color');
   const initialIndex = urlColor ? OFFICIAL_COLORS.indexOf(urlColor) : 0;
@@ -661,7 +672,7 @@ function CubeIronman68Page() {
               boxSizing: 'border-box',
             }}
           >
-            {['BLANC', 'COLOR', 'NEGRE'].map((opt) => {
+            {FINISHES.map((opt) => {
               const isAvailable = AVAILABLE_FINISHES.includes(opt);
               const isActive = isAvailable && selectedFinish === opt;
               return (
@@ -732,4 +743,4 @@ function CubeIronman68Page() {
   );
 }
 
-export default CubeIronman68Page;
+export default ProductDetailPageTemplate;

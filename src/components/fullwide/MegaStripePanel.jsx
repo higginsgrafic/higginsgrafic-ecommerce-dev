@@ -708,6 +708,7 @@ function MegaStripePanel({
                                 }}
                                 loading="eager"
                                 decoding="async"
+                                fetchpriority={idx === 0 ? 'high' : undefined}
                               />
                             </div>
                           );
