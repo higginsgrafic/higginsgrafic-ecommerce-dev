@@ -10,8 +10,12 @@ class ErrorBoundary extends React.Component {
       errorInfo: null,
       copied: false,
       carouselIndex: 0,
+      exitIndex: null,
+      bgColorIndex: 0,
     };
     this.carouselTimer = null;
+    this.exitTimer = null;
+    this.bgColorTimer = null;
   }
 
   legacyCopyViaTextarea = (text) => {
@@ -69,6 +73,34 @@ class ErrorBoundary extends React.Component {
     });
   }
 
+  carouselPhrases = [
+    "L'operació ha finalitzat amb errors.",
+    "Si et plau, torna-ho a provar.",
+  ];
+
+  bgColors = [
+    'rgba(255,0,0,0.25)',
+    'rgba(0,0,0,0.25)',
+    'rgba(0,50,0,0.25)',
+    'rgba(0,0,128,0.25)',
+    'rgba(255,165,0,0.25)',
+    'rgba(128,0,128,0.25)',
+    'rgba(100,100,0,0.25)',
+    'rgba(0,255,255,0.25)',
+    'rgba(255,0,255,0.25)',
+    'rgba(0,128,128,0.25)',
+    'rgba(128,128,0,0.25)',
+    'rgba(255,192,203,0.25)',
+    'rgba(139,69,19,0.25)',
+    'rgba(0,50,0,0.25)',
+    'rgba(75,0,130,0.25)',
+    'rgba(255,69,0,0.25)',
+    'rgba(0,250,154,0.25)',
+    'rgba(220,20,60,0.25)',
+    'rgba(70,130,180,0.25)',
+    'rgba(218,165,32,0.25)',
+  ];
+
   static getDerivedStateFromError(error) {
     return { hasError: true };
   }
@@ -91,115 +123,130 @@ class ErrorBoundary extends React.Component {
   componentDidMount() {
     if (this.state.hasError) {
       this.startCarousel();
+      this.startBgColorCycle();
     }
   }
 
   componentDidUpdate(prevProps, prevState) {
-    if (this.state.hasError && !prevState.hasError) {
+    if (!prevState.hasError && this.state.hasError) {
       this.startCarousel();
+      this.startBgColorCycle();
     }
   }
 
   componentWillUnmount() {
-    if (this.carouselTimer) {
-      clearInterval(this.carouselTimer);
-    }
+    if (this.carouselTimer) clearInterval(this.carouselTimer);
+    if (this.exitTimer) clearTimeout(this.exitTimer);
+    if (this.bgColorTimer) clearInterval(this.bgColorTimer);
   }
 
   startCarousel = () => {
-    if (this.carouselTimer) clearInterval(this.carouselTimer);
     this.carouselTimer = setInterval(() => {
-      this.setState((prev) => ({
-        carouselIndex: (prev.carouselIndex + 1) % 2,
-      }));
+      const prev = this.state.carouselIndex;
+      const next = (prev + 1) % this.carouselPhrases.length;
+      this.setState({ carouselIndex: next, exitIndex: prev });
+      this.exitTimer = setTimeout(() => {
+        this.setState({ exitIndex: null });
+      }, 500);
     }, 4000);
+  }
+
+  startBgColorCycle = () => {
+    this.bgColorTimer = setInterval(() => {
+      this.setState((prev) => ({
+        bgColorIndex: (prev.bgColorIndex + 1) % this.bgColors.length,
+      }));
+    }, 3000);
+  }
+
+  getCarouselItemStyle = (index) => {
+    const isActive = index === this.state.carouselIndex;
+    const isExit = index === this.state.exitIndex;
+    return {
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      width: '100%',
+      opacity: isActive ? 1 : 0,
+      transform: isActive ? 'translateX(0)' : (isExit ? 'translateX(100%)' : 'translateX(-100%)'),
+      transition: 'transform 0.5s ease, opacity 0.5s ease',
+      whiteSpace: 'nowrap',
+    };
   }
 
   render() {
     if (this.state.hasError) {
-      const phrases = [
-        "L'operació ha finalitzat amb errors.",
-        "Si et plau, torna-ho a provar.",
-      ];
-      const { carouselIndex } = this.state;
+      const bgStyle = {
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        width: '100%',
+        height: '100%',
+        backgroundImage: "url('/placeholders/fons_error/fons-error-6.png')",
+        backgroundColor: this.bgColors[this.state.bgColorIndex],
+        backgroundSize: '150% 150%',
+        backgroundPosition: 'center',
+        opacity: 0.5,
+        transition: 'opacity 3s ease, background-color 3s ease',
+        zIndex: -1,
+      };
 
       return (
         <div style={{
-          position: 'relative',
           minHeight: '100vh',
-          background: '#090912',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
           padding: '32px',
-          overflow: 'hidden',
           fontFamily: "'Roboto', sans-serif",
+          position: 'relative',
+          overflow: 'hidden',
         }}>
-          <div style={{ textAlign: 'center', maxWidth: '600px', position: 'relative', zIndex: 1 }}>
+          <style>{`@import url('https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@300;400;500;600;700&display=swap');`}</style>
+          <div style={bgStyle} />
+          <div style={{ textAlign: 'center', maxWidth: '480px' }}>
             <h2 style={{
-              fontFamily: "'Roboto', sans-serif",
-              fontSize: '44px',
-              fontWeight: 600,
-              color: '#f4f4f5',
-              marginBottom: '16px',
-              letterSpacing: '-0.02em',
-              margin: '0 0 16px 0',
+              fontFamily: "'Roboto Condensed', sans-serif",
+              fontSize: '32.8125px',
+              fontWeight: 500,
+              color: '#475059',
+              margin: '0 0 8px 0',
             }}>
               Alguna cosa no va alhora
             </h2>
 
             <div style={{
-              color: '#a1a1aa',
-              marginBottom: '28px',
-              fontSize: '24px',
-              fontWeight: 300,
-              height: '32px',
+              width: '100%',
+              textAlign: 'center',
+              color: '#98A2B4',
+              fontSize: '20.78125px',
+              fontWeight: 400,
+              margin: '0 0 24px 0',
+              height: '28.5px',
               overflow: 'hidden',
               position: 'relative',
             }}>
-              {phrases.map((phrase, i) => {
-                let transform = 'translateX(-100%)';
-                let opacity = 0;
-                if (i === carouselIndex) {
-                  transform = 'translateX(0)';
-                  opacity = 1;
-                } else if (i === (carouselIndex + 1) % 2) {
-                  transform = 'translateX(100%)';
-                  opacity = 1;
-                }
-                return (
-                  <div
-                    key={i}
-                    style={{
-                      position: 'absolute',
-                      top: 0,
-                      left: 0,
-                      width: '100%',
-                      opacity,
-                      transform,
-                      transition: 'transform 0.5s ease',
-                    }}
-                  >
-                    {phrase}
-                  </div>
-                );
-              })}
+              <div style={{ position: 'relative', width: '100%', height: '100%' }}>
+                {this.carouselPhrases.map((text, i) => (
+                  <div key={i} style={this.getCarouselItemStyle(i)}>{text}</div>
+                ))}
+              </div>
             </div>
 
             {process.env.NODE_ENV === 'development' && this.state.error && (
               <div style={{ marginBottom: '24px' }}>
                 <details style={{
                   textAlign: 'left',
-                  background: '#18181b',
-                  padding: '16px',
+                  background: '#F4F6F8',
+                  padding: '12px',
                   borderRadius: '6px',
                   fontSize: '13px',
                   maxHeight: '40vh',
                   overflow: 'auto',
-                  color: '#a1a1aa',
-                  border: '1px solid #27272a',
+                  color: '#475059',
+                  border: '1px solid #E6E8EC',
                 }}>
-                  <summary style={{ cursor: 'pointer', fontWeight: 500, marginBottom: '8px', color: '#f4f4f5' }}>
+                  <summary style={{ cursor: 'pointer', fontWeight: 500, marginBottom: '8px', color: '#475059' }}>
                     Detalls de l'error
                   </summary>
                   <pre style={{
@@ -223,10 +270,10 @@ class ErrorBoundary extends React.Component {
                     alignItems: 'center',
                     justifyContent: 'center',
                     gap: '8px',
-                    padding: '10px 16px',
-                    background: '#18181b',
-                    color: '#f4f4f5',
-                    border: '1px solid #27272a',
+                    padding: '8px 16px',
+                    background: '#FFFFFF',
+                    color: '#475059',
+                    border: '1px solid #E6E8EC',
                     borderRadius: '4px',
                     fontFamily: "'Roboto', sans-serif",
                     fontSize: '13px',
@@ -239,7 +286,7 @@ class ErrorBoundary extends React.Component {
               </div>
             )}
 
-            <div style={{ display: 'flex', gap: '8px', justifyContent: 'center' }}>
+            <div style={{ width: '100%', display: 'flex', gap: '8px', justifyContent: 'center' }}>
               <Link
                 to="/"
                 onClick={() => this.setState({ hasError: false })}
@@ -247,16 +294,16 @@ class ErrorBoundary extends React.Component {
                   display: 'inline-flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  padding: '10px 24px',
+                  padding: '8px 20px',
                   borderRadius: '4px',
                   fontFamily: "'Roboto', sans-serif",
                   fontWeight: 500,
-                  fontSize: '14px',
+                  fontSize: '13px',
                   lineHeight: 1,
                   cursor: 'pointer',
                   textDecoration: 'none',
-                  background: '#f4f4f5',
-                  color: '#09090b',
+                  background: '#475059',
+                  color: '#FFFFFF',
                   border: 'none',
                 }}
               >
@@ -268,17 +315,16 @@ class ErrorBoundary extends React.Component {
                   display: 'inline-flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  padding: '10px 24px',
+                  padding: '8px 20px',
                   borderRadius: '4px',
                   fontFamily: "'Roboto', sans-serif",
                   fontWeight: 500,
-                  fontSize: '14px',
+                  fontSize: '13px',
                   lineHeight: 1,
                   cursor: 'pointer',
-                  background: 'transparent',
-                  border: 'none',
-                  boxShadow: '0 0 0 0.75px #a1a1aa',
-                  color: '#a1a1aa',
+                  background: '#FFFFFF',
+                  border: '1px solid #475059',
+                  color: '#475059',
                 }}
               >
                 REFRESCA
