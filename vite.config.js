@@ -131,11 +131,18 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks: {
-          'react-vendor': ['react', 'react-dom', 'react-router-dom', 'react-helmet'],
+          'react-vendor': ['react', 'react-dom', 'react-router-dom'],
           'supabase': ['@supabase/supabase-js'],
-          'radix-ui': ['@radix-ui/react-toast', '@radix-ui/react-dialog', '@radix-ui/react-dropdown-menu'],
+          'radix-ui': [
+            '@radix-ui/react-toast',
+            '@radix-ui/react-dialog',
+            '@radix-ui/react-dropdown-menu',
+            '@radix-ui/react-tabs',
+            '@radix-ui/react-slot',
+          ],
           'motion': ['framer-motion'],
           'lucide-icons': ['lucide-react'],
+          'ui-utils': ['clsx', 'tailwind-merge', 'class-variance-authority'],
         },
       },
     },

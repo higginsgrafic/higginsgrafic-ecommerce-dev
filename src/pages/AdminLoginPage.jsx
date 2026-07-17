@@ -1,10 +1,18 @@
 import React, { useMemo, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { useAdmin } from '@/contexts/AdminContext';
+import { AdminProvider, useAdmin } from '@/contexts/AdminContext';
 import { Lock, Eye, EyeOff } from 'lucide-react';
 import SEO from '@/components/SEO';
 
 export default function AdminLoginPage() {
+  return (
+    <AdminProvider>
+      <AdminLoginPageInner />
+    </AdminProvider>
+  );
+}
+
+function AdminLoginPageInner() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);

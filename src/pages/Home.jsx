@@ -75,7 +75,7 @@ function CollectionTitle({ index, kicker, title, subtitle, align = 'left', numbe
             {index}
           </span>
           {collectionHref ? (
-            <Link to={collectionHref} target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none', color: 'inherit' }}>
+            <Link to={collectionHref} style={{ textDecoration: 'none', color: 'inherit' }}>
               <span
                 className="relative"
                 style={
@@ -394,7 +394,7 @@ function Home() {
               />
 
               {/* Indicador de més productes (Pill amb text sota el producte de la tercera columna) */}
-              <Link target="_blank" rel="noopener noreferrer"
+              <Link
                 to="/first-contact"
                 style={{
                   position: 'absolute',
@@ -524,7 +524,7 @@ function Home() {
                 />
 
               {/* Indicador de més productes (Pill amb text sota el producte de la tercera columna) */}
-              <Link target="_blank" rel="noopener noreferrer"
+              <Link
                 to="/the-human-inside"
                 style={{
                   position: 'absolute',
@@ -655,7 +655,7 @@ function Home() {
                 />
 
               {/* Indicador de més productes (Pill amb text sota el producte de la tercera columna) */}
-              <Link target="_blank" rel="noopener noreferrer"
+              <Link
                 to="/austen"
                 style={{
                   position: 'absolute',
@@ -786,7 +786,7 @@ function Home() {
                 />
 
               {/* Indicador de més productes (Pill amb text sota el producte de la tercera columna) */}
-              <Link target="_blank" rel="noopener noreferrer"
+              <Link
                 to="/cube"
                 style={{
                   position: 'absolute',
@@ -917,7 +917,7 @@ function Home() {
                 />
 
               {/* Indicador de més productes (Pill amb text sota el producte de la tercera columna) */}
-              <Link target="_blank" rel="noopener noreferrer"
+              <Link
                 to="/miscellania"
                 style={{
                   position: 'absolute',

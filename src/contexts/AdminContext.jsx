@@ -34,6 +34,22 @@ const DEV_FORCE_ADMIN_EMAIL = (() => {
   }
 })();
 
+const noop = async () => ({ ok: false, error: 'AdminProvider no disponible' });
+
+const DEFAULT_ADMIN_VALUE = {
+  isAdmin: DEV_FORCE_ADMIN,
+  authReady: true,
+  adminEmail: DEV_FORCE_ADMIN ? DEV_FORCE_ADMIN_EMAIL : null,
+  editMode: false,
+  bypassUnderConstruction: DEV_FORCE_ADMIN,
+  setEditMode: () => {},
+  toggleEditMode: () => {},
+  toggleBypassUnderConstruction: () => {},
+  enableAdmin: noop,
+  enableAdminWithGoogle: noop,
+  disableAdmin: noop,
+};
+
 export function AdminProvider({ children }) {
   const [authReady, setAuthReady] = useState(DEV_FORCE_ADMIN);
   const [adminEmail, setAdminEmail] = useState(DEV_FORCE_ADMIN ? DEV_FORCE_ADMIN_EMAIL : null);
@@ -254,8 +270,5 @@ export function AdminProvider({ children }) {
 
 export function useAdmin() {
   const context = useContext(AdminContext);
-  if (!context) {
-    throw new Error('useAdmin must be used within AdminProvider');
-  }
-  return context;
+  return context || DEFAULT_ADMIN_VALUE;
 }

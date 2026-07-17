@@ -294,6 +294,9 @@ const PRODUCT_HREF = {
   'the_human_inside/robocop': '/the-human-inside/robocop',
   'the_human_inside/iron-man-68': '/the-human-inside/ironman-68',
   'the_human_inside/iron-man-08': '/the-human-inside/ironman-08',
+  'the_human_inside/robbie-the-robot': '/the-human-inside/robbie-the-robot',
+  'the_human_inside/terminator': '/the-human-inside/terminator',
+  'the_human_inside/the-dalek': '/the-human-inside/the-dalek',
   // Cube
   'cube/afrodita-c-stripe': '/cube/afrodita-c',
   'cube/mazinger-c-stripe': '/cube/mazinger-c',
@@ -313,6 +316,21 @@ const PRODUCT_HREF = {
   'austen/it-is-a-truth': '/austen/quotes-it-is-a-truth',
   'austen/unsociable-and-taciturn': '/austen/quotes-unsociable-and-taciturn',
   'austen/you-have-bewitched-me': '/austen/quotes-you-have-bewitched-me',
+  'austen/persuasion-1': '/austen/persuasion-1',
+  'austen/persuasion-2': '/austen/persuasion-2',
+  'austen/persuasion-3': '/austen/persuasion-3',
+  'austen/persuasion-4': '/austen/persuasion-4',
+  'austen/pride-and-prejudice-1': '/austen/pride-and-prejudice-1',
+  'austen/pride-and-prejudice-2': '/austen/pride-and-prejudice-2',
+  'austen/pride-and-prejudice-3': '/austen/pride-and-prejudice-3',
+  'austen/pride-and-prejudice-4': '/austen/pride-and-prejudice-4',
+  'austen/sense-and-sensibility-1': '/austen/sense-and-sensibility-1',
+  'austen/sense-and-sensibility-2': '/austen/sense-and-sensibility-2',
+  'austen/sense-and-sensibility-3': '/austen/sense-and-sensibility-3',
+  'austen/sense-and-sensibility-4': '/austen/sense-and-sensibility-4',
+  'austen/lfmd/blue-solid': '/austen/looking-for-my-darcy-blue-solid',
+  'austen/lfmd/red-solid': '/austen/looking-for-my-darcy-red-solid',
+  'austen/lfmd/yellow-solid': '/austen/looking-for-my-darcy-yellow-solid',
   // Miscel·lània
   'miscellania/pont-del-diable': '/miscellania/pont-del-diable',
   'miscellania/dj-vader': '/miscellania/dj-vader',
@@ -414,10 +432,11 @@ export function buildHomeDrawingPlan({ perCollection = 3, rng = Math.random } = 
         const variants = collectionGridHoverVariantsFor(collection, design, color, i);
         hoverImages = [precomposed, ...variants.filter((u) => u && u !== precomposed)];
       }
+      const baseHref = resolveProductHref(drawing);
       return {
         color,
         productName: drawingLabel(drawing),
-        productHref: resolveProductHref(drawing),
+        productHref: baseHref ? `${baseHref}?color=${color}` : undefined,
         mockupSrc: usePrecomposed ? precomposed : shirtMockupSrc(color),
         overlaySrc: usePrecomposed ? null : resolveOverlaySrc(drawing, isDark),
         overlayAlt: drawing.id,
