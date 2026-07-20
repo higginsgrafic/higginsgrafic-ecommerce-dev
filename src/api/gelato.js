@@ -10,6 +10,13 @@ const GELATO_ORDER_API = 'https://order.gelatoapis.com/v4';
 const GELATO_API_KEY = import.meta.env.VITE_GELATO_API_KEY;
 const GELATO_SANDBOX = import.meta.env.VITE_GELATO_SANDBOX === 'true';
 
+const GELATO_COST_PRICE = 5.91;
+const SELLING_PRICE = 15.50;
+
+function calculateSellingPrice() {
+  return SELLING_PRICE;
+}
+
 /**
  * Client específic per Gelato
  */
@@ -334,7 +341,7 @@ export const mapGelatoProduct = (gelatoProduct, index = 0) => {
         size: dim.value || 'M',
         color: dim.valueFormatted || 'Default',
         color_hex: '#FFFFFF',
-        price: 29.99,
+        price: calculateSellingPrice(),
         stock: 999,
         is_available: true
       };
@@ -348,7 +355,7 @@ export const mapGelatoProduct = (gelatoProduct, index = 0) => {
     id: productId,
     name: formatProductName(productName),
     description: `${formatProductName(productName)} - Print on Demand`,
-    price: 29.99,
+    price: calculateSellingPrice(),
     currency: 'EUR',
     images: images,
     category: 'apparel',
@@ -428,7 +435,7 @@ export const mapGelatoVariant = (gelatoVariant) => {
     sku: gelatoVariant.sku,
     size: mapGelatoSize(gelatoVariant.size),
     color: mapGelatoColor(gelatoVariant.color),
-    price: gelatoVariant.price?.amount || 0,
+    price: gelatoVariant.price?.amount || calculateSellingPrice(),
     stock: gelatoVariant.available ? 999 : 0, // Gelato té stock il·limitat
     isAvailable: gelatoVariant.available,
     image: gelatoVariant.image?.url || null,

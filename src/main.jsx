@@ -71,6 +71,7 @@ import { CartProvider } from '@/contexts/CartContext';
 import { WishlistProvider } from '@/contexts/WishlistContext';
 import { ToastProvider } from '@/contexts/ToastContext';
 import { GridDebugProvider } from '@/contexts/GridDebugContext';
+import { AuthProvider } from '@/contexts/AuthContext';
 import App from '@/App';
 import BranchBadge from '@/components/dev/BranchBadge';
 import ActiveWorkOverlay from '@/components/dev/ActiveWorkOverlay';
@@ -87,19 +88,21 @@ window.__GRAFIC_REACT_MOUNTED__ = false;
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <BrowserRouter>
-    <GridDebugProvider>
-      <CartProvider>
-        <WishlistProvider>
-          <ProductProvider>
-            <ToastProvider>
-              <App />
-              <BranchBadge />
-              <ActiveWorkOverlay />
-            </ToastProvider>
-          </ProductProvider>
-        </WishlistProvider>
-      </CartProvider>
-    </GridDebugProvider>
+    <AuthProvider>
+      <GridDebugProvider>
+        <CartProvider>
+          <WishlistProvider>
+            <ProductProvider>
+              <ToastProvider>
+                <App />
+                <BranchBadge />
+                <ActiveWorkOverlay />
+              </ToastProvider>
+            </ProductProvider>
+          </WishlistProvider>
+        </CartProvider>
+      </GridDebugProvider>
+    </AuthProvider>
   </BrowserRouter>
 );
 

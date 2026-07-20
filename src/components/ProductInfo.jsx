@@ -160,12 +160,12 @@ const ProductInfo = ({
             <Heart className={`h-6 w-6 ${isInWishlist ? 'fill-current text-red-500' : ''}`} />
           </button>
           <button
-            onClick={onCheckout}
+            onClick={onAddToCart}
             className="bg-[#F9FAFB] hover:bg-gray-300 transition-all font-oswald text-xl tracking-wide"
             style={{ width: '154.5px', height: '35px', position: 'relative', top: '0px', left: '-0.75px', clipPath: 'polygon(0 0, calc(100% - 10.1px) 0, 100% 50%, calc(100% - 10.1px) 100%, 0 100%)', borderRadius: '6px 0 0 6px', fontWeight: 500 }}
-            aria-label="Checkout"
+            aria-label="Afegir al cistell"
           >
-            CHECKOUT
+            CISTELL
           </button>
           <button
             onClick={onShare}
@@ -354,11 +354,11 @@ const ProductInfo = ({
           <Heart className={`h-6 w-6 ${isInWishlist ? 'fill-current text-red-500' : ''}`} />
         </button>
         <button
-          onClick={onCheckout}
+          onClick={onAddToCart}
           className="flex-1 bg-black text-white py-3 px-6 rounded-md font-oswald text-lg hover:bg-gray-800 transition-all"
           style={{ fontWeight: 500 }}
         >
-          CHECKOUT
+          CISTELL
         </button>
         <button
           onClick={onShare}

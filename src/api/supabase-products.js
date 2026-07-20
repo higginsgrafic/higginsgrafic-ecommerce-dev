@@ -448,7 +448,7 @@ export const productsService = {
 
     const { data, error } = await requireSupabase()
       .from('products')
-      .upsert(productData)
+      .upsert(productData, { onConflict: 'gelato_product_id' })
       .select()
       .single();
 

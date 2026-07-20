@@ -1,0 +1,60 @@
+const PHASES = [
+  {n:0, name:'Infraestructura'},
+  {n:1, name:'Catàleg de productes reals'},
+  {n:2, name:'Autenticació de clients'},
+  {n:3, name:'Pagament amb Stripe'},
+  {n:4, name:'Flux de comanda end-to-end'},
+  {n:5, name:'Poliment i legal'},
+];
+
+const STEPS = [
+  {id:'0.1',phase:0,title:'Verificar Supabase',what:'Confirmar projecte actiu, taules i RLS',files:'Cap (verificació)',verify:'VITE_SUPABASE_URL + ANON_KEY al .env. Taules products/orders/profiles/addresses. SUPABASE_SERVICE_ROLE_KEY a Netlify. RLS activada.',deps:[],opt:false},
+  {id:'0.2',phase:0,title:'Configurar Stripe',what:'Obtenir claus Stripe i configurar-les',files:'.env + Netlify',verify:'pk_test_ al .env, STRIPE_SECRET_KEY a Netlify, build OK',deps:[],opt:false},
+  {id:'0.3',phase:0,title:'Verificar Gelato',what:'Confirmar credencials i productes',files:'Cap (verificació)',verify:'GELATO_API_KEY + STORE_ID al .env, productes al dashboard, sync retorna dades',deps:['0.1'],opt:false},
+  {id:'1.1',phase:1,title:'Completar col·leccions',what:'Afegir the-human-inside, austen, cube; omplir miscellania',files:'src/config/collections.js',verify:'5 col·leccions amb breadcrumbLabel, headerClassName, productSlugs. Build OK.',deps:['0.1'],opt:false},
+  {id:'1.2',phase:1,title:'Sincronitzar Gelato → Supabase',what:'Carregar productes reals via sync',files:'Cap (execució /admin/gelato-sync)',verify:'Taula products té registres amb nom, preu, imatge, variants, isActive',deps:['0.3','1.1'],opt:false},
+  {id:'1.3',phase:1,title:'Verificar ProductContext',what:'Confirmar loadProducts() des de Supabase, no mocks',files:'src/contexts/ProductContext.jsx',verify:'VITE_USE_MOCK_DATA=false. /first-contact mostra productes reals. Sense warnings mock.',deps:['1.2'],opt:false},
+  {id:'1.4',phase:1,title:'Actualitzar productSlugs',what:'Extreure slugs reals i omplir collections.js',files:'src/config/collections.js',verify:'Cap col·lecció buida. Cada col·lecció mostra productes correctes.',deps:['1.2','1.1'],opt:false},
+  {id:'1.5',phase:1,title:'Aïllar mocks a dev',what:'Marcar mockProducts com a fallback dev només',files:'src/data/mockProducts.jsx, src/api/endpoints.js',verify:'Producció sense mocks. Dev els manté com a fallback.',deps:['1.3'],opt:false},
+  {id:'2.1',phase:2,title:'Crear AuthContext',what:"Context auth client separat d'AdminContext amb Supabase Auth",files:'src/contexts/AuthContext.jsx (nou)',verify:'useAuth() retorna {user:null, authReady:false}. Build OK.',deps:['0.1'],opt:false},
+  {id:'2.2',phase:2,title:'Pàgina de registre',what:'Formulari nom+email+password. Crear fila profiles.',files:'src/pages/RegisterPage.jsx (nou)',verify:'Registre prova → Supabase crea usuari. Taula profiles té fila.',deps:['2.1'],opt:false},
+  {id:'2.3',phase:2,title:'Pàgina de login',what:'Formulari email+password. Link recuperació.',files:'src/pages/LoginPage.jsx (nou)',verify:'Login → useAuth() retorna user. Redirect correcte.',deps:['2.1'],opt:false},
+  {id:'2.4',phase:2,title:'Rutes i ProtectedRoute client',what:'Afegir /login, /register. Protegir rutes client.',files:'src/routes/AppRoutes.jsx, src/components/ProtectedRoute.jsx',verify:'/perfil sense sessió → redirect /login. Amb sessió → mostra.',deps:['2.2','2.3'],opt:false},
+  {id:'2.5',phase:2,title:'UserProfileTabs amb dades reals',what:'Substituir hardcoded per Supabase. Llegir/escriure profiles, addresses, orders.',files:'src/components/UserProfileTabs.jsx, src/hooks/useProfile.js (nou)',verify:'Perfil mostra email real. Editar nom → persistent. Comandes reals.',deps:['2.4'],opt:false},
+  {id:'2.6',phase:2,title:'Auth al mega-slide (pàg.4)',what:'Pàg.4 USUARI: login compacte si no auth, perfil real si auth',files:'src/components/FullWideSlideDemoHeader.jsx',verify:'Sense sessió → formulari. Amb sessió → dades reals.',deps:['2.5'],opt:false},
+  {id:'3.1',phase:3,title:'Netlify Function create-payment-intent',what:'Funció serverless crea Payment Intent, retorna clientSecret',files:'netlify/functions/create-payment-intent.js (nou)',verify:'curl retorna clientSecret. Errors validats.',deps:['0.2'],opt:false},
+  {id:'3.2',phase:3,title:'Instal·lar Stripe Elements',what:'@stripe/react-stripe-js + stripe-js. Wrapper Elements.',files:'package.json, src/components/StripeProvider.jsx (nou)',verify:'import Elements funciona. Build OK.',deps:['0.2'],opt:false},
+  {id:'3.3',phase:3,title:'Stripe Elements al CheckoutPage',what:'Substituir camps fake (cardNumber/cvv) per PaymentElement',files:'src/pages/CheckoutPage.jsx',verify:'Formulari mostra Stripe Elements. Sense camps manuals. Build OK.',deps:['3.1','3.2'],opt:false},
+  {id:'3.4',phase:3,title:'Flux de pagament real',what:'Cridar create-payment-intent + stripe.confirmPayment() + redirect',files:'src/pages/CheckoutPage.jsx (editar handleSubmit)',verify:'Targeta test 4242 → èxit. Targeta 4000...0002 → error mostrat.',deps:['3.3'],opt:false},
+  {id:'3.5',phase:3,title:'(Opcional) Webhook Stripe',what:'Netlify Function escolta payment_intent.succeeded, actualitza Supabase',files:'netlify/functions/stripe-webhook.js (nou)',verify:'Stripe test event → comanda canvia a confirmada.',deps:['3.1','4.2'],opt:true},
+  {id:'4.1',phase:4,title:'Connectar cistell al CheckoutPage',what:'Passar cartItems reals del CartContext. Eliminar mockCheckoutItems.',files:'src/routes/AppRoutes.jsx, src/pages/CheckoutPage.jsx',verify:'Afegir producte → /checkout mostra producte real. Cistell buit → missatge.',deps:['1.3'],opt:false},
+  {id:'4.2',phase:4,title:'Crear comanda a Supabase',what:'Després pagament, cridar useOrders().createOrder() amb dades reals',files:'src/pages/CheckoutPage.jsx',verify:'Pagament exitós → taula orders té nova fila. order_number generat.',deps:['3.4','2.4'],opt:false},
+  {id:'4.3',phase:4,title:'Crear comanda a Gelato',what:'Cridar gelatoAPI.createOrder(). Guardar gelatoOrderId a Supabase.',files:'src/pages/CheckoutPage.jsx, src/api/gelato.js',verify:'Comanda Supabase té gelatoOrderId. Dashboard Gelato mostra comanda.',deps:['4.2','0.3'],opt:false},
+  {id:'4.4',phase:4,title:'Netejar cistell i redirect',what:'clearCart() + redirect a /order-confirmation/:orderId',files:'src/pages/CheckoutPage.jsx',verify:'Cistell buit després compra. URL canvia a /order-confirmation/GRF-XXXX.',deps:['4.2'],opt:false},
+  {id:'4.5',phase:4,title:'OrderConfirmationPage amb dades reals',what:'Substituir orderData hardcoded per lectura Supabase via orderId URL',files:'src/pages/OrderConfirmationPage.jsx',verify:'Pàgina mostra productes reals comprats, total real, adreça real.',deps:['4.2'],opt:false},
+  {id:'4.6',phase:4,title:'OrderTrackingPage amb Supabase',what:'Canviar localStorage per crida /api/orders?email=...',files:'src/pages/OrderTrackingPage.jsx',verify:'Buscar comanda existent → mostra estat real. No trobada → error.',deps:['4.2'],opt:false},
+  {id:'5.1',phase:5,title:'Revisar continguts legals',what:'Actualitzar 4 pàgines legals amb text real',files:'TermsPage.jsx, PrivacyPage.jsx, ShippingPage.jsx, FAQPage.jsx',verify:'Contingut coherent, en català, sense Lorem Ipsum.',deps:['4.6'],opt:false},
+  {id:'5.2',phase:5,title:'Verificar SEO',what:'Confirmar SEO.jsx + SEOProductSchema.jsx amb productes reals',files:'src/components/SEO.jsx, SEOProductSchema.jsx, public/robots.txt',verify:'Meta tags correctes. Google Rich Results Test passa.',deps:['1.3'],opt:false},
+  {id:'5.3',phase:5,title:'Testing final end-to-end',what:'Flux complet manual: registre → navegar → cistell → pagar → confirmació',files:'Cap (testing)',verify:'Tot el flux completa sense errors. Mobile responsive. Error boundary actiu.',deps:['4.6','5.1'],opt:false},
+];
+
+const INITIAL_STATE = {
+  '0.1': 'completed',
+  '0.2': 'completed',
+  '0.3': 'completed',
+  '1.1': 'completed',
+  '3.1': 'completed',
+  '3.2': 'completed',
+};
+
+const ACCEPTANCE = [
+  'Productes reals visibles (mínim 1 per col·lecció)',
+  'Registre i login de clients funcionen',
+  'Pagament Stripe processat (test mode primer, live després)',
+  'Comanda creada a Supabase i Gelato després del pagament',
+  'Pàgina de confirmació mostra dades reals',
+  'Perfil d\'usuari mostra dades reals',
+  'Pàgines legals amb contingut real',
+  'Error boundary actiu',
+  'Build de producció sense errors',
+];

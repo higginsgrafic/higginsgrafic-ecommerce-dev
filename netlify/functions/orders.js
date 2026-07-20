@@ -78,6 +78,7 @@ export async function handler(event, context) {
         country,
         phone,
         userId,
+        paymentIntentId,
       } = body;
 
       if (!email || !items || !Array.isArray(items) || items.length === 0) {
@@ -104,6 +105,7 @@ export async function handler(event, context) {
           postal_code: postalCode || null,
           country: country || 'Espanya',
           phone: phone || null,
+          payment_intent_id: paymentIntentId || null,
         })
         .select()
         .single();
@@ -120,11 +122,37 @@ export async function handler(event, context) {
     }
   }
 
-  // GET: List orders for a user (by email or userId)
+  // GET: List orders for a user (by email, userId, or single order by orderNumber)
   if (method === 'GET') {
     try {
       const params = event.queryStringParameters || {};
-      const { email, userId } = params;
+      const { email, userId, orderNumber } = params;
+
+      if (orderNumber) {
+        let query = supabase
+          .from('orders')
+          .select('*')
+          .eq('order_number', orderNumber);
+
+        if (email) {
+          query = query.eq('email', email);
+        }
+
+        const { data, error } = await query.single();
+
+        if (error) {
+          console.error('[orders] Error fetching single order:', error);
+          return jsonResponse(404, { error: 'Comanda no trobada' });
+        }
+
+        const formatted = {
+          ...data,
+          statusLabel: STATUS_LABELS[data.status] || data.status,
+          items: typeof data.items === 'string' ? JSON.parse(data.items) : data.items,
+        };
+
+        return jsonResponse(200, { order: formatted });
+      }
 
       let query = supabase
         .from('orders')
@@ -136,7 +164,7 @@ export async function handler(event, context) {
       } else if (email) {
         query = query.eq('email', email);
       } else {
-        return jsonResponse(400, { error: 'Cal proporcionar email o userId' });
+        return jsonResponse(400, { error: 'Cal proporcionar email, userId o orderNumber' });
       }
 
       const { data, error } = await query;
@@ -163,19 +191,30 @@ export async function handler(event, context) {
   if (method === 'PATCH') {
     try {
       const body = JSON.parse(event.body || '{}');
-      const { orderNumber, status } = body;
+      const { orderNumber, status, gelatoOrderId } = body;
 
-      if (!orderNumber || !status) {
-        return jsonResponse(400, { error: 'Falten camps (orderNumber, status)' });
+      if (!orderNumber) {
+        return jsonResponse(400, { error: 'Falta orderNumber' });
       }
 
-      if (!VALID_STATUSES.includes(status)) {
-        return jsonResponse(400, { error: `Status invàlid. Vàlids: ${VALID_STATUSES.join(', ')}` });
+      const updateFields = {};
+      if (status) {
+        if (!VALID_STATUSES.includes(status)) {
+          return jsonResponse(400, { error: `Status invàlid. Vàlids: ${VALID_STATUSES.join(', ')}` });
+        }
+        updateFields.status = status;
+      }
+      if (gelatoOrderId !== undefined) {
+        updateFields.gelato_order_id = gelatoOrderId;
+      }
+
+      if (Object.keys(updateFields).length === 0) {
+        return jsonResponse(400, { error: 'Cal proporcionar status o gelatoOrderId' });
       }
 
       const { data, error } = await supabase
         .from('orders')
-        .update({ status })
+        .update(updateFields)
         .eq('order_number', orderNumber)
         .select()
         .single();

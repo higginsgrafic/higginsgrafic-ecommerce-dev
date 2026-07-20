@@ -142,17 +142,41 @@ function CollectionTitle({ index, kicker, title, subtitle, align = 'left', numbe
   );
 }
 
+const COLLECTION_NAMES = {
+  'first-contact': 'FIRST CONTACT',
+  'the-human-inside': 'THE HUMAN INSIDE',
+  'austen': 'AUSTEN',
+  'cube': 'CUBE',
+  'miscellania': 'MISCEL·LÀNIA',
+};
+
+function HomeTdpCard({ Component, slug, index, cardPropsFn, collectionHref, editableIdPrefix, gridColumn, style }) {
+  const [size, setSize] = useState('M');
+  return (
+    <Component
+      gridColumn={gridColumn}
+      editableIdPrefix={editableIdPrefix}
+      {...cardPropsFn(slug, index, size)}
+      collectionHref={collectionHref}
+      selectedSize={size}
+      onSizeChange={setSize}
+      copyMode={true}
+      style={style}
+    />
+  );
+}
+
 function Home() {
-  const [selectedSize, setSelectedSize] = useState('M');
   const pautaGridRef = useRef(null);
   const [rowHeight, setRowHeight] = useState(38);
 
   // Pla d'assignació dibuix + color de samarreta per a les targetes.
   // Es calcula un cop per muntatge (aleatori a cada càrrega).
   const drawingPlan = useMemo(() => buildHomeDrawingPlan({ perCollection: 3 }), []);
-  const cardProps = (slug, index) => {
+  const cardProps = (slug, index, size) => {
     const item = drawingPlan?.[slug]?.[index];
     if (!item) return {};
+    const collectionName = COLLECTION_NAMES[slug] || slug.toUpperCase();
     return {
       productName: item.productName,
       imageSrc: item.mockupSrc,
@@ -163,6 +187,28 @@ function Home() {
       ...(item.productHref ? { productHref: item.productHref } : {}),
       ...(item.overlayScale != null ? { overlayScale: item.overlayScale } : {}),
       ...(item.overlayTranslateY != null ? { overlayTranslateY: item.overlayTranslateY } : {}),
+      onAddToCart: () => {
+        try {
+          window.dispatchEvent(new CustomEvent('hg:open-full-wide-cart', {
+            detail: {
+              source: 'home-tdp-cta',
+              firstPartOnly: true,
+              item: {
+                title: item.productName.toUpperCase(),
+                collection: collectionName,
+                qty: 1,
+                size: size,
+                price: '19,95€',
+                color: item.color,
+                drawing: '',
+                disabled: false,
+              },
+            },
+          }));
+        } catch {
+          // ignore
+        }
+      },
     };
   };
 
@@ -349,49 +395,13 @@ function Home() {
               }}
             >
               {/* Columna 1: TDP2 */}
-              <TDP2
-                gridColumn="1 / 2"
-                editableIdPrefix="home-row1-tdp-1"
-                {...cardProps('first-contact', 0)}
-                collectionHref="/first-contact"
-                selectedSize={selectedSize}
-                onSizeChange={setSelectedSize}
-                copyMode={true}
-                style={{
-                  height: '100%',
-                  boxSizing: 'border-box',
-                }}
-              />
+              <HomeTdpCard Component={TDP2} slug="first-contact" index={0} cardPropsFn={cardProps} collectionHref="/first-contact" editableIdPrefix="home-row1-tdp-1" gridColumn="1 / 2" style={{ height: '100%', boxSizing: 'border-box' }} />
 
               {/* Columna 2: TDP1 */}
-              <TDP1
-                gridColumn="2 / 3"
-                editableIdPrefix="home-row1-tdp-2"
-                {...cardProps('first-contact', 1)}
-                collectionHref="/first-contact"
-                selectedSize={selectedSize}
-                onSizeChange={setSelectedSize}
-                copyMode={true}
-                style={{
-                  height: '100%',
-                  boxSizing: 'border-box',
-                }}
-              />
+              <HomeTdpCard Component={TDP1} slug="first-contact" index={1} cardPropsFn={cardProps} collectionHref="/first-contact" editableIdPrefix="home-row1-tdp-2" gridColumn="2 / 3" style={{ height: '100%', boxSizing: 'border-box' }} />
 
               {/* Columna 3: TDP2 (Amb imatge a dalt i bloc Nom/Descripció a dota) */}
-              <TDP2
-                gridColumn="3 / 4"
-                editableIdPrefix="home-row1-tdp-3"
-                {...cardProps('first-contact', 2)}
-                collectionHref="/first-contact"
-                selectedSize={selectedSize}
-                onSizeChange={setSelectedSize}
-                copyMode={true}
-                style={{
-                  height: '100%',
-                  boxSizing: 'border-box',
-                }}
-              />
+              <HomeTdpCard Component={TDP2} slug="first-contact" index={2} cardPropsFn={cardProps} collectionHref="/first-contact" editableIdPrefix="home-row1-tdp-3" gridColumn="3 / 4" style={{ height: '100%', boxSizing: 'border-box' }} />
 
               {/* Indicador de més productes (Pill amb text sota el producte de la tercera columna) */}
               <Link
@@ -479,49 +489,13 @@ function Home() {
                 }}
               >
                 {/* Columna 1: TDP1 */}
-                <TDP1
-                  gridColumn="1 / 2"
-                  editableIdPrefix="home-row2-tdp-1"
-                  {...cardProps('the-human-inside', 0)}
-                  collectionHref="/the-human-inside"
-                  selectedSize={selectedSize}
-                  onSizeChange={setSelectedSize}
-                  copyMode={true}
-                  style={{
-                    height: '100%',
-                    boxSizing: 'border-box',
-                  }}
-                />
+                <HomeTdpCard Component={TDP1} slug="the-human-inside" index={0} cardPropsFn={cardProps} collectionHref="/the-human-inside" editableIdPrefix="home-row2-tdp-1" gridColumn="1 / 2" style={{ height: '100%', boxSizing: 'border-box' }} />
 
                 {/* Columna 2: TDP2 */}
-                <TDP2
-                  gridColumn="2 / 3"
-                  editableIdPrefix="home-row2-tdp-2"
-                  {...cardProps('the-human-inside', 1)}
-                  collectionHref="/the-human-inside"
-                  selectedSize={selectedSize}
-                  onSizeChange={setSelectedSize}
-                  copyMode={true}
-                  style={{
-                    height: '100%',
-                    boxSizing: 'border-box',
-                  }}
-                />
+                <HomeTdpCard Component={TDP2} slug="the-human-inside" index={1} cardPropsFn={cardProps} collectionHref="/the-human-inside" editableIdPrefix="home-row2-tdp-2" gridColumn="2 / 3" style={{ height: '100%', boxSizing: 'border-box' }} />
 
                 {/* Columna 3: TDP1 */}
-                <TDP1
-                  gridColumn="3 / 4"
-                  editableIdPrefix="home-row2-tdp-3"
-                  {...cardProps('the-human-inside', 2)}
-                  collectionHref="/the-human-inside"
-                  selectedSize={selectedSize}
-                  onSizeChange={setSelectedSize}
-                  copyMode={true}
-                  style={{
-                    height: '100%',
-                    boxSizing: 'border-box',
-                  }}
-                />
+                <HomeTdpCard Component={TDP1} slug="the-human-inside" index={2} cardPropsFn={cardProps} collectionHref="/the-human-inside" editableIdPrefix="home-row2-tdp-3" gridColumn="3 / 4" style={{ height: '100%', boxSizing: 'border-box' }} />
 
               {/* Indicador de més productes (Pill amb text sota el producte de la tercera columna) */}
               <Link
@@ -610,49 +584,13 @@ function Home() {
                 }}
               >
                 {/* Columna 1: TDP2 */}
-                <TDP2
-                  gridColumn="1 / 2"
-                  editableIdPrefix="home-row3-tdp-1"
-                  {...cardProps('austen', 0)}
-                  collectionHref="/austen"
-                  selectedSize={selectedSize}
-                  onSizeChange={setSelectedSize}
-                  copyMode={true}
-                  style={{
-                    height: '100%',
-                    boxSizing: 'border-box',
-                  }}
-                />
+                <HomeTdpCard Component={TDP2} slug="austen" index={0} cardPropsFn={cardProps} collectionHref="/austen" editableIdPrefix="home-row3-tdp-1" gridColumn="1 / 2" style={{ height: '100%', boxSizing: 'border-box' }} />
 
                 {/* Columna 2: TDP1 */}
-                <TDP1
-                  gridColumn="2 / 3"
-                  editableIdPrefix="home-row3-tdp-2"
-                  {...cardProps('austen', 1)}
-                  collectionHref="/austen"
-                  selectedSize={selectedSize}
-                  onSizeChange={setSelectedSize}
-                  copyMode={true}
-                  style={{
-                    height: '100%',
-                    boxSizing: 'border-box',
-                  }}
-                />
+                <HomeTdpCard Component={TDP1} slug="austen" index={1} cardPropsFn={cardProps} collectionHref="/austen" editableIdPrefix="home-row3-tdp-2" gridColumn="2 / 3" style={{ height: '100%', boxSizing: 'border-box' }} />
 
                 {/* Columna 3: TDP2 */}
-                <TDP2
-                  gridColumn="3 / 4"
-                  editableIdPrefix="home-row3-tdp-3"
-                  {...cardProps('austen', 2)}
-                  collectionHref="/austen"
-                  selectedSize={selectedSize}
-                  onSizeChange={setSelectedSize}
-                  copyMode={true}
-                  style={{
-                    height: '100%',
-                    boxSizing: 'border-box',
-                  }}
-                />
+                <HomeTdpCard Component={TDP2} slug="austen" index={2} cardPropsFn={cardProps} collectionHref="/austen" editableIdPrefix="home-row3-tdp-3" gridColumn="3 / 4" style={{ height: '100%', boxSizing: 'border-box' }} />
 
               {/* Indicador de més productes (Pill amb text sota el producte de la tercera columna) */}
               <Link
@@ -741,49 +679,13 @@ function Home() {
                 }}
               >
                 {/* Columna 1: TDP1 */}
-                <TDP1
-                  gridColumn="1 / 2"
-                  editableIdPrefix="home-row4-tdp-1"
-                  {...cardProps('cube', 0)}
-                  collectionHref="/cube"
-                  selectedSize={selectedSize}
-                  onSizeChange={setSelectedSize}
-                  copyMode={true}
-                  style={{
-                    height: '100%',
-                    boxSizing: 'border-box',
-                  }}
-                />
+                <HomeTdpCard Component={TDP1} slug="cube" index={0} cardPropsFn={cardProps} collectionHref="/cube" editableIdPrefix="home-row4-tdp-1" gridColumn="1 / 2" style={{ height: '100%', boxSizing: 'border-box' }} />
 
                 {/* Columna 2: TDP2 */}
-                <TDP2
-                  gridColumn="2 / 3"
-                  editableIdPrefix="home-row4-tdp-2"
-                  {...cardProps('cube', 1)}
-                  collectionHref="/cube"
-                  selectedSize={selectedSize}
-                  onSizeChange={setSelectedSize}
-                  copyMode={true}
-                  style={{
-                    height: '100%',
-                    boxSizing: 'border-box',
-                  }}
-                />
+                <HomeTdpCard Component={TDP2} slug="cube" index={1} cardPropsFn={cardProps} collectionHref="/cube" editableIdPrefix="home-row4-tdp-2" gridColumn="2 / 3" style={{ height: '100%', boxSizing: 'border-box' }} />
 
                 {/* Columna 3: TDP1 */}
-                <TDP1
-                  gridColumn="3 / 4"
-                  editableIdPrefix="home-row4-tdp-3"
-                  {...cardProps('cube', 2)}
-                  collectionHref="/cube"
-                  selectedSize={selectedSize}
-                  onSizeChange={setSelectedSize}
-                  copyMode={true}
-                  style={{
-                    height: '100%',
-                    boxSizing: 'border-box',
-                  }}
-                />
+                <HomeTdpCard Component={TDP1} slug="cube" index={2} cardPropsFn={cardProps} collectionHref="/cube" editableIdPrefix="home-row4-tdp-3" gridColumn="3 / 4" style={{ height: '100%', boxSizing: 'border-box' }} />
 
               {/* Indicador de més productes (Pill amb text sota el producte de la tercera columna) */}
               <Link
@@ -872,49 +774,13 @@ function Home() {
                 }}
               >
                 {/* Columna 1: TDP2 */}
-                <TDP2
-                  gridColumn="1 / 2"
-                  editableIdPrefix="home-row5-tdp-1"
-                  {...cardProps('miscellania', 0)}
-                  collectionHref="/miscellania"
-                  selectedSize={selectedSize}
-                  onSizeChange={setSelectedSize}
-                  copyMode={true}
-                  style={{
-                    height: '100%',
-                    boxSizing: 'border-box',
-                  }}
-                />
+                <HomeTdpCard Component={TDP2} slug="miscellania" index={0} cardPropsFn={cardProps} collectionHref="/miscellania" editableIdPrefix="home-row5-tdp-1" gridColumn="1 / 2" style={{ height: '100%', boxSizing: 'border-box' }} />
 
                 {/* Columna 2: TDP1 */}
-                <TDP1
-                  gridColumn="2 / 3"
-                  editableIdPrefix="home-row5-tdp-2"
-                  {...cardProps('miscellania', 1)}
-                  collectionHref="/miscellania"
-                  selectedSize={selectedSize}
-                  onSizeChange={setSelectedSize}
-                  copyMode={true}
-                  style={{
-                    height: '100%',
-                    boxSizing: 'border-box',
-                  }}
-                />
+                <HomeTdpCard Component={TDP1} slug="miscellania" index={1} cardPropsFn={cardProps} collectionHref="/miscellania" editableIdPrefix="home-row5-tdp-2" gridColumn="2 / 3" style={{ height: '100%', boxSizing: 'border-box' }} />
 
                 {/* Columna 3: TDP2 */}
-                <TDP2
-                  gridColumn="3 / 4"
-                  editableIdPrefix="home-row5-tdp-3"
-                  {...cardProps('miscellania', 2)}
-                  collectionHref="/miscellania"
-                  selectedSize={selectedSize}
-                  onSizeChange={setSelectedSize}
-                  copyMode={true}
-                  style={{
-                    height: '100%',
-                    boxSizing: 'border-box',
-                  }}
-                />
+                <HomeTdpCard Component={TDP2} slug="miscellania" index={2} cardPropsFn={cardProps} collectionHref="/miscellania" editableIdPrefix="home-row5-tdp-3" gridColumn="3 / 4" style={{ height: '100%', boxSizing: 'border-box' }} />
 
               {/* Indicador de més productes (Pill amb text sota el producte de la tercera columna) */}
               <Link

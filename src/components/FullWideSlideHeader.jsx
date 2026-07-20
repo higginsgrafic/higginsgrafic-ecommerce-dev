@@ -1994,20 +1994,27 @@ function FullWideSlideHeader({
       if (item) {
         setCartItems((prev) => {
           const existing = prev.find(
-            (it) => it.title === item.title && it.size === item.size && !it.disabled
+            (it) => !it.disabled &&
+              it.title === item.title &&
+              it.size === item.size &&
+              it.color === item.color
           );
           if (existing) {
             return prev.map((it) =>
-              it.title === item.title && it.size === item.size && !it.disabled
+              !it.disabled &&
+              it.title === item.title &&
+              it.size === item.size &&
+              it.color === item.color
                 ? { ...it, qty: it.qty + (item.qty || 1) }
                 : it
             );
           }
           return [...prev, item];
         });
+        return;
       }
       setMegaPage(3);
-      setAcordioExpanded(!!item || localCartItemCount > 0);
+      setAcordioExpanded(false);
       setMegaFullScreen(false);
       ensureMegaOpen();
       touchMegaPublicActivity();
@@ -3088,6 +3095,7 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
         orders={orders}
         adminEmail={adminEmail}
         acordioExpandedPage4={acordioExpandedPage4}
+        setAcordioExpandedPage4={setAcordioExpandedPage4}
       />
 
       {mobileOpen ? (

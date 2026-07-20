@@ -1,5 +1,7 @@
 import React from 'react';
-import { Package, Search, UserRound, Check } from 'lucide-react';
+import { Package, Search, UserRound, Check, LogIn } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
+import { useProfile } from '@/hooks/useProfile';
 import UserComandesContent from '@/components/fullwide/UserComandesContent';
 
 const STATUS_DOT = {
@@ -50,9 +52,14 @@ export default function MegaslidePagina4({
   orders,
   adminEmail,
   acordioExpandedPage4,
+  setAcordioExpandedPage4,
+  touchMegaPublicActivity,
   accordionPautaScale,
 }) {
-  const displayOrders = orders.length > 0 ? orders : MOCK_ORDERS;
+  const { user, authReady } = useAuth();
+  const { profile, orders: profileOrders, loading } = useProfile();
+
+  const displayOrders = (profileOrders && profileOrders.length > 0) ? profileOrders : (orders.length > 0 ? orders : []);
   const activeCount = displayOrders.filter(o => o.active).length;
   const deliveredCount = displayOrders.filter(o => o.status === 'ENTREGADA').length;
   const lastOrder = displayOrders[0];
@@ -112,14 +119,14 @@ export default function MegaslidePagina4({
     {
       label: 'COMPTE',
       icon: UserRound,
-      content: adminEmail ? (
+      content: user ? (
         <>
           <div style={{ fontFamily: 'Oswald, sans-serif', fontWeight: 300, fontSize: '16pt', color: '#2F3540', lineHeight: 1.1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-            {adminEmail.split('@')[0]}
+            {profile?.full_name || user.email?.split('@')[0] || 'Usuari'}
           </div>
           <div style={{ marginTop: '6px' }}>
             <span style={{ fontFamily: 'Roboto Condensed, sans-serif', fontWeight: 300, fontSize: '8.5pt', color: '#2F3540', opacity: 0.5, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', display: 'block' }}>
-              {adminEmail}
+              {user.email}
             </span>
           </div>
           <div style={{ marginTop: '8px', display: 'flex', alignItems: 'center', gap: '5px' }}>
@@ -127,19 +134,27 @@ export default function MegaslidePagina4({
             <span style={{ fontFamily: 'Roboto Condensed, sans-serif', fontWeight: 300, fontSize: '8pt', color: '#2F3540', opacity: 0.55 }}>Compte verificat</span>
           </div>
         </>
-      ) : (
+      ) : authReady ? (
         <>
-          <div style={{ fontFamily: 'Oswald, sans-serif', fontWeight: 300, fontSize: '16pt', color: '#2F3540', lineHeight: 1.1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-            {MOCK_USER.name}
+          <div style={{ fontFamily: 'Oswald, sans-serif', fontWeight: 300, fontSize: '16pt', color: '#2F3540', lineHeight: 1.1, opacity: 0.5 }}>
+            Inicia sessió
           </div>
           <div style={{ marginTop: '6px' }}>
-            <span style={{ fontFamily: 'Roboto Condensed, sans-serif', fontWeight: 300, fontSize: '8.5pt', color: '#2F3540', opacity: 0.5, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', display: 'block' }}>
-              {MOCK_USER.email}
+            <span style={{ fontFamily: 'Roboto Condensed, sans-serif', fontWeight: 300, fontSize: '8.5pt', color: '#2F3540', opacity: 0.35, display: 'block' }}>
+              Per veure les teves dades
             </span>
           </div>
           <div style={{ marginTop: '8px', display: 'flex', alignItems: 'center', gap: '5px' }}>
-            <span style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: '#16A34A', flexShrink: 0 }} />
-            <span style={{ fontFamily: 'Roboto Condensed, sans-serif', fontWeight: 300, fontSize: '8pt', color: '#2F3540', opacity: 0.55 }}>Membre des de {MOCK_USER.memberSince}</span>
+            <LogIn size={10} style={{ color: '#2F3540', opacity: 0.4 }} />
+            <span style={{ fontFamily: 'Roboto Condensed, sans-serif', fontWeight: 300, fontSize: '8pt', color: '#2F3540', opacity: 0.4 }}>
+              /login o /register
+            </span>
+          </div>
+        </>
+      ) : (
+        <>
+          <div style={{ fontFamily: 'Oswald, sans-serif', fontWeight: 300, fontSize: '16pt', color: '#2F3540', lineHeight: 1.1, opacity: 0.3 }}>
+            …
           </div>
         </>
       ),
@@ -243,6 +258,33 @@ export default function MegaslidePagina4({
               {content}
             </div>
           ))}
+
+          {/* Fletxa per obrir l'acordió — igual que la pàgina 3 */}
+          {!acordioExpandedPage4 && (
+            <div
+              onClick={() => {
+                setAcordioExpandedPage4(true);
+                touchMegaPublicActivity();
+              }}
+              style={{
+                position: 'absolute',
+                bottom: '-50px',
+                left: '50%',
+                transform: 'translateX(-50%)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '0px',
+                cursor: 'pointer',
+                zIndex: 10,
+              }}
+            >
+              <svg width="30" height="45" viewBox="4 0 16 24" fill="none" stroke="#000" strokeWidth="0.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <line x1="4" y1="11" x2="12" y2="17" />
+                <line x1="12" y1="17" x2="20" y2="11" />
+              </svg>
+            </div>
+          )}
         </div>
 
         {/* Anchor invisible per a la guia belt2 (DEV) */}
@@ -314,7 +356,7 @@ export default function MegaslidePagina4({
               }} />
 
               {/* Contingut alineat amb la pauta */}
-              <UserComandesContent userEmail={adminEmail} />
+              <UserComandesContent userEmail={user?.email || adminEmail} />
 
               {/* PAUTA-VERDA - Línies horitzontals (referència) */}
               {false && <div style={{

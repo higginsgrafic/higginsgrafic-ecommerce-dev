@@ -13,6 +13,18 @@ const OrderTrackingPage = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
+  // Mapeig d'estats de Supabase a les etapes de seguiment
+  const STATUS_TO_STAGE = {
+    'pendent': 'created',
+    'confirmada': 'created',
+    'en_preparacio': 'processing',
+    'seguiment': 'processing',
+    'en_repartiment': 'shipped',
+    'aturada': 'processing',
+    'cancel_lada': 'created',
+    'entregada': 'delivered',
+  };
+
   // Buscar comanda
   const handleTrackOrder = async (e) => {
     e?.preventDefault();
@@ -26,17 +38,49 @@ const OrderTrackingPage = () => {
     setError('');
 
     try {
-      // Buscar a localStorage (simulat)
-      const savedOrders = JSON.parse(localStorage.getItem('orders') || '[]');
-      const foundOrder = savedOrders.find(
-        o => o.id === orderId && o.email.toLowerCase() === email.toLowerCase()
-      );
-
-      if (!foundOrder) {
-        throw new Error('Comanda no trobada. Verifica el número i l\'email.');
+      const res = await fetch(`/api/orders?orderNumber=${encodeURIComponent(orderId.trim())}&email=${encodeURIComponent(email.trim())}`);
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.error || 'Comanda no trobada. Verifica el número i l\'email.');
       }
 
-      setOrder(foundOrder);
+      const data = await res.json();
+      if (!data.order) {
+        throw new Error('Comanda no trobada.');
+      }
+
+      const o = data.order;
+      const items = Array.isArray(o.items) ? o.items : (typeof o.items === 'string' ? JSON.parse(o.items) : []);
+
+      setOrder({
+        id: o.order_number || o.id,
+        createdAt: o.created_at,
+        status: STATUS_TO_STAGE[o.status] || 'created',
+        totalPrice: parseFloat(o.total) || 0,
+        email: o.email,
+        items: items.map((item, idx) => ({
+          id: item.id || idx,
+          name: item.name || 'Producte',
+          size: item.size || '-',
+          quantity: item.quantity || 1,
+          price: item.price || 0,
+          image: item.image || null,
+        })),
+        shippingAddress: {
+          firstName: o.first_name || '',
+          lastName: o.last_name || '',
+          street: o.address || '',
+          city: o.city || '',
+          postalCode: o.postal_code || '',
+          country: o.country || '',
+        },
+        tracking: o.tracking_number ? {
+          carrier: o.tracking_carrier || null,
+          trackingNumber: o.tracking_number,
+          trackingUrl: o.tracking_url || null,
+        } : null,
+        estimatedDelivery: o.estimated_delivery || null,
+      });
     } catch (err) {
       setError(err.message);
       setOrder(null);

@@ -82,6 +82,7 @@ export default function MegaMenuPanel({
   orders,
   adminEmail,
   acordioExpandedPage4,
+  setAcordioExpandedPage4,
 }) {
   if (!active) return null;
 
@@ -253,6 +254,8 @@ export default function MegaMenuPanel({
                     orders={orders}
                     adminEmail={adminEmail}
                     acordioExpandedPage4={acordioExpandedPage4}
+                    setAcordioExpandedPage4={setAcordioExpandedPage4}
+                    touchMegaPublicActivity={touchMegaPublicActivity}
                     accordionPautaScale={accordionPautaScale}
                   />
                 </Suspense>

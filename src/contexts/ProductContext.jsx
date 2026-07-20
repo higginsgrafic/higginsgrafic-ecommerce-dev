@@ -1,6 +1,4 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { mockProducts, mockProductsBlava, mockProductsNegra, mockProductsGreen, mockProductsCube } from '@/data/mockProducts.jsx';
-import { syncGelatoStoreProducts } from '@/api/gelato';
 import { useCart } from '@/contexts/CartContext';
 import { useWishlist } from '@/contexts/WishlistContext';
 
@@ -8,13 +6,13 @@ const ProductContext = createContext();
 
 const USE_SUPABASE = import.meta.env.VITE_USE_MOCK_DATA === 'false';
 
-const allMockProducts = [
-  ...mockProducts,
-  ...mockProductsBlava,
-  ...mockProductsNegra,
-  ...mockProductsGreen,
-  ...mockProductsCube
-];
+const allMockProducts = import.meta.env.DEV ? [
+  ...(await import('@/data/mockProducts.jsx')).mockProducts,
+  ...(await import('@/data/mockProducts.jsx')).mockProductsBlava,
+  ...(await import('@/data/mockProducts.jsx')).mockProductsNegra,
+  ...(await import('@/data/mockProducts.jsx')).mockProductsGreen,
+  ...(await import('@/data/mockProducts.jsx')).mockProductsCube
+] : [];
 
 const normalizeColorKey = (value) => {
   return (value || '')
@@ -353,78 +351,12 @@ export const ProductProvider = ({ children }) => {
     try {
       if (USE_SUPABASE) {
         const { default: productsService } = await import('@/api/supabase-products');
-        const supabaseProducts = await productsService.getAllProductsIncludingInactive();
+        const supabaseProducts = await productsService.getAllProducts();
 
-        let storeProducts = [];
-        try {
-          const storeResponse = await syncGelatoStoreProducts();
-          storeProducts = Array.isArray(storeResponse)
-            ? storeResponse
-            : (storeResponse?.data || storeResponse?.products || []);
-        } catch (gelatoErr) {
-          storeProducts = [];
-        }
-
-        const supabaseByGelatoId = new Map(
-          (supabaseProducts || [])
-            .filter(p => p?.gelatoProductId)
-            .map(p => [p.gelatoProductId?.toString(), p])
-        );
-
-        const supabaseBySlug = new Map(
-          (supabaseProducts || [])
-            .filter(p => p?.slug)
-            .map(p => [p.slug?.toString(), p])
-        );
-
-        const mappedStoreProducts = (storeProducts || []).map((p, idx) => mapStoreProductToInternal(p, idx));
-        const mergedStoreProducts = mappedStoreProducts.map(p => {
-          const gelatoIdKey = p.gelatoProductId?.toString();
-          const computedSlug = `${slugify(p.collection)}-${slugify(p.name)}`;
-
-          const supabaseMatch =
-            (gelatoIdKey ? supabaseByGelatoId.get(gelatoIdKey) : null) ||
-            (p.slug ? supabaseBySlug.get(p.slug?.toString()) : null) ||
-            supabaseBySlug.get(computedSlug);
-
-          if (!supabaseMatch) {
-            return {
-              ...p,
-              slug: p.slug || computedSlug
-            };
-          }
-
-          return {
-            ...p,
-            supabaseId: supabaseMatch.id,
-            slug: supabaseMatch.slug || p.slug || computedSlug,
-            name: supabaseMatch.name || p.name,
-            description: supabaseMatch.description || p.description,
-            images: (supabaseMatch.images && supabaseMatch.images.length > 0) ? supabaseMatch.images : p.images,
-            image: supabaseMatch.image || p.image,
-            variants: (supabaseMatch.variants && supabaseMatch.variants.length > 0) ? supabaseMatch.variants : p.variants,
-            collection: supabaseMatch.collection || p.collection,
-            isActive: supabaseMatch.isActive !== undefined ? supabaseMatch.isActive : p.isActive
-          };
-        });
-
-        // Include Supabase-only products (e.g. created via /admin/upload) that don't exist in Gelato store.
-        const storeIds = new Set((mappedStoreProducts || []).map(p => p?.gelatoProductId?.toString()).filter(Boolean));
-        const supabaseOnlyProducts = (supabaseProducts || []).filter(p => {
-          const gid = p?.gelatoProductId?.toString();
-          return !gid || !storeIds.has(gid);
-        });
-
-        const merged = [...mergedStoreProducts, ...supabaseOnlyProducts];
-
-        if (!merged || merged.length === 0) {
-          if (!supabaseProducts || supabaseProducts.length === 0) {
-            setProducts(sanitizeMiscellaniaProducts(allMockProducts));
-          } else {
-            setProducts(sanitizeMiscellaniaProducts(supabaseProducts));
-          }
+        if (!supabaseProducts || supabaseProducts.length === 0) {
+          setProducts(sanitizeMiscellaniaProducts(allMockProducts));
         } else {
-          setProducts(sanitizeMiscellaniaProducts(merged));
+          setProducts(sanitizeMiscellaniaProducts(supabaseProducts));
         }
       } else {
         setProducts(sanitizeMiscellaniaProducts(allMockProducts));

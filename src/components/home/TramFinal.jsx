@@ -1,7 +1,5 @@
 import { forwardRef } from 'react';
-import Pauta4ColsOverlay from '@/components/pauta/Pauta4ColsOverlay';
 import TambeRail from '@/pages/productRail/TambeRail';
-import CarouselArrows from '@/pages/productRail/CarouselArrows';
 
 // =============================================================================
 //  TRAM FINAL — Component reutilitzable
@@ -36,6 +34,7 @@ const TramFinal = forwardRef(function TramFinal(
     tambeHref = '/constructor/pdp',
     marginTop = '-552px',
     posterTextAlign = 'left',
+    tambeImages,
     style,
   },
   pautaGridRef,
@@ -118,32 +117,6 @@ const TramFinal = forwardRef(function TramFinal(
         ALTRES HISTÒRIES
       </div>
 
-      {/* Fletxes També et pot interessar (Fila local 45 / 46 - correspon a global 245 / 246) */}
-      <div
-        style={{
-          gridColumn: '4 / 5',
-          gridRow: '39 / 40',
-          position: 'relative',
-          width: '100%',
-          height: '100%',
-          minHeight: 0,
-          pointerEvents: 'auto',
-          transform: 'translateY(20px) translateX(2px)', // Baixat 1px (abans 19px) i 2px dreta
-        }}
-      >
-        <CarouselArrows
-          rightPx={0}
-          topPx={0}
-          onPrev={() => {
-            window.dispatchEvent(new CustomEvent('tambe-rail:prev'));
-          }}
-          onNext={() => {
-            window.dispatchEvent(new CustomEvent('tambe-rail:next'));
-          }}
-          rowHeight={rowHeight - 3}
-        />
-      </div>
-
       {/* També et pot interessar Rail (Fila local 43 / 60 - correspon a global 243 / 260) */}
       <div
         style={{
@@ -158,6 +131,7 @@ const TramFinal = forwardRef(function TramFinal(
         <TambeRail
           cardHref={tambeHref}
           title={tambeTitle}
+          images={tambeImages}
           showInternalArrows={false}
           showTitle={false}
         />

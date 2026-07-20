@@ -4,6 +4,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { PDP_REGISTRY } from '@/data/pdpRegistry';
 import SupabaseCollectionRoute from '@/pages/SupabaseCollectionRoute.jsx';
 import ProtectedRoute from '@/components/ProtectedRoute';
+import ClientProtectedRoute from '@/components/ClientProtectedRoute';
 import * as P from './lazyPages';
 
 const pageTransition = {
@@ -67,7 +68,7 @@ export default function AppRoutes({ location, pageProps, pautaEnabled, tableEnab
         <Route path="/constructor/full-wide-slide" element={<P.FullWideSlidePage pautaEnabled={false} tableEnabled={false} />} />
         <Route path="/plantilla-cataleg-components" element={<ProtectedRoute><P.PlantillaCatalegComponentsPage /></ProtectedRoute>} />
 
-        <Route path="/checkout" element={<P.CheckoutPage cartItems={[]} onClearCart={clearCart} pautaEnabled={pautaEnabled} mockMode="single" />} />
+        <Route path="/checkout" element={<P.CheckoutPage />} />
         <Route path="/order-confirmation/:orderId" element={<MotionDiv><P.OrderConfirmationPage /></MotionDiv>} />
 
         <Route path="/about" element={<P.AboutPage />} />
@@ -98,6 +99,9 @@ export default function AppRoutes({ location, pageProps, pautaEnabled, tableEnab
         <Route path="/layout-builder" element={<ProtectedRoute><Navigate to="/proves/layout-builder" replace /></ProtectedRoute>} />
         <Route path="/status" element={<Navigate to="/track" replace />} />
         <Route path="/track" element={<P.OrderTrackingPage />} />
+        <Route path="/login" element={<P.LoginPage />} />
+        <Route path="/register" element={<P.RegisterPage />} />
+        <Route path="/perfil" element={<ClientProtectedRoute><P.ProfilePage /></ClientProtectedRoute>} />
         <Route path="/ruleta-demo" element={<Navigate to="/admin/draft/ruleta" replace />} />
 
         <Route path="/ec-preview" element={<motion.div {...fadeIn}><P.ECPreviewPage /></motion.div>} />

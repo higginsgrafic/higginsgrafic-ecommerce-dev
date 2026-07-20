@@ -67,3 +67,6 @@ export const DevGuidesOverlay = lazy(() => import('@/components/DevGuidesOverlay
 export const BeltReferenceOverlay = lazy(() => import('@/components/dev/BeltReferenceOverlay.jsx'));
 export const Pauta4ColsOverlay = lazy(() => import('@/components/pauta/Pauta4ColsOverlay'));
 export const MegaStripeHud = lazy(() => import('@/components/MegaStripeHud'));
+export const LoginPage = lazy(() => import('@/pages/LoginPage'));
+export const RegisterPage = lazy(() => import('@/pages/RegisterPage'));
+export const ProfilePage = lazy(() => import('@/pages/ProfilePage'));

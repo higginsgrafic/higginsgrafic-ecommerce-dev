@@ -1009,11 +1009,6 @@ const ProductDetailPage = ({ onAddToCart, cartItems = [], language = 'ca' }) => 
     }
   };
 
-  const handleCheckout = () => {
-    handleAddToCart();
-    navigate('/checkout');
-  };
-
   const getProductStatus = (p) => {
     const variants = Array.isArray(p?.variants) ? p.variants : [];
     if (variants.length === 0) return null;
@@ -1135,7 +1130,6 @@ const ProductDetailPage = ({ onAddToCart, cartItems = [], language = 'ca' }) => 
             onSizeChange={setSelectedSize}
             onColorChange={setSelectedColor}
             onWishlistToggle={handleWishlistToggle}
-            onCheckout={handleCheckout}
             onShare={handleShare}
             isInWishlist={isInWishlist(product.id)}
             cartItems={cartItems}
@@ -1244,7 +1238,6 @@ const ProductDetailPage = ({ onAddToCart, cartItems = [], language = 'ca' }) => 
           onSizeChange={setSelectedSize}
           onColorChange={setSelectedColor}
           onWishlistToggle={handleWishlistToggle}
-          onCheckout={handleCheckout}
           onShare={handleShare}
           isInWishlist={isInWishlist(product.id)}
           cartItems={cartItems}

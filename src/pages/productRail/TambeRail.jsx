@@ -206,7 +206,9 @@ export default function TambeRail({
 
   useEffect(() => {
     const imgs = [];
-    images.forEach((src) => {
+    images.forEach((entry) => {
+      const src = entry && typeof entry === 'object' ? entry.src : entry;
+      if (!src) return;
       const img = new Image();
       img.decoding = 'async';
       img.loading = 'eager';
@@ -415,18 +417,27 @@ export default function TambeRail({
                 {extendedCards.map((card, pos) => {
                   const idx = card.idx;
                   const leftPx = pos * stepPx;
-                  const img = images[idx] || null;
+                  const item = images[idx] || null;
+                  const isObj = item && typeof item === 'object' && !Array.isArray(item);
+                  const img = isObj ? item.src : item;
+                  const cardBrand = isObj ? item.brand : undefined;
+                  const cardTitle = isObj ? item.title : undefined;
+                  const cardPrice = isObj ? item.price : undefined;
+                  const cardLink = isObj && item.href ? item.href : cardHref;
                   return (
                     <ProductCard
                       key={`${pos}-${idx}`}
                       positionKey={`${pos}-${idx}`}
-                      href={cardHref}
+                      href={cardLink}
                       imageSrc={img}
                       leftPx={leftPx}
                       tileStyle={dynamicTileStyle}
                       textBlockStyle={dynamicTextBlockStyle}
                       overlaySrc={drawingOverlaySrc}
                       overlayEnabled={shirtDrawingEnabled}
+                      brand={cardBrand}
+                      title={cardTitle}
+                      price={cardPrice}
                       cardIndex={idx}
                       onNavigateBlocked={() => {
                         if (dragRef.current.moved) {

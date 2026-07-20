@@ -15,6 +15,21 @@ function readGitBranch() {
   }
 }
 
+function renameProdHtmlPlugin() {
+  return {
+    name: 'rename-prod-html',
+    apply: 'build',
+    writeBundle() {
+      const distDir = path.resolve(__dirname, 'dist')
+      const from = path.join(distDir, 'index-prod.html')
+      const to = path.join(distDir, 'index.html')
+      if (fs.existsSync(from)) {
+        fs.renameSync(from, to)
+      }
+    },
+  }
+}
+
 function componentCatalogDevApi() {
   const CONFIG_REL_PATH = 'public/component-catalog.config.json'
 
@@ -93,7 +108,7 @@ function componentCatalogDevApi() {
 }
 
 export default defineConfig({
-  plugins: [react(), componentCatalogDevApi()],
+  plugins: [react(), componentCatalogDevApi(), renameProdHtmlPlugin()],
   define: {
     __HG_GIT_BRANCH__: JSON.stringify(readGitBranch()),
   },
@@ -129,6 +144,7 @@ export default defineConfig({
     copyPublicDir: true,
     chunkSizeWarningLimit: 600,
     rollupOptions: {
+      input: path.resolve(__dirname, 'index-prod.html'),
       output: {
         manualChunks: {
           'react-vendor': ['react', 'react-dom', 'react-router-dom'],

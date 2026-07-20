@@ -1,5 +1,13 @@
 import { syncGelatoStoreProducts, mapGelatoProduct } from './gelato';
 import productsService from './supabase-products';
+import { supabase } from './supabase-products';
+
+const GELATO_COST_PRICE = 5.91;
+const SELLING_PRICE = 15.50;
+
+function calculateSellingPrice() {
+  return SELLING_PRICE;
+}
 
 export async function syncGelatoProductsToSupabase() {
   try {
@@ -19,10 +27,19 @@ export async function syncGelatoProductsToSupabase() {
     const results = [];
     let successCount = 0;
     let errorCount = 0;
+    const usedSlugs = new Set();
 
     for (const gelatoProduct of gelatoProducts) {
       try {
         const transformedProduct = transformStoreProductForSupabase(gelatoProduct);
+        let slug = transformedProduct.slug;
+        if (usedSlugs.has(slug)) {
+          let suffix = 2;
+          while (usedSlugs.has(`${slug}-${suffix}`)) suffix++;
+          slug = `${slug}-${suffix}`;
+          transformedProduct.slug = slug;
+        }
+        usedSlugs.add(slug);
         await productsService.upsertProduct(transformedProduct);
         results.push({ success: true, product: gelatoProduct.title || gelatoProduct.name });
         successCount++;
@@ -34,6 +51,25 @@ export async function syncGelatoProductsToSupabase() {
     }
 
     console.log(`✅ Sincronització completada: ${successCount} productes sincronitzats, ${errorCount} errors`);
+
+    const syncedGelatoIds = gelatoProducts
+      .map(p => (p.id || p.productId || '').toString())
+      .filter(Boolean);
+
+    if (syncedGelatoIds.length > 0 && supabase) {
+      console.log('🔄 [SYNC] Desactivant productes que ja no existeixen a Gelato...');
+      const { error: deactivateError } = await supabase
+        .from('products')
+        .update({ is_active: false })
+        .not('gelato_product_id', 'in', `(${syncedGelatoIds.map(id => `"${id}"`).join(',')})`)
+        .eq('product_type', 'fulfillment');
+
+      if (deactivateError) {
+        console.error('⚠️ [SYNC] Error desactivant productes obsolets:', deactivateError);
+      } else {
+        console.log('✅ [SYNC] Productes obsolets desactivats');
+      }
+    }
 
     return {
       success: errorCount === 0,
@@ -51,6 +87,24 @@ export async function syncGelatoProductsToSupabase() {
   }
 }
 
+function slugify(str) {
+  return (str || '')
+    .toString()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .replace(/-+/g, '-');
+}
+
+function generateProductSlug(collection, title) {
+  let name = title.toLowerCase();
+  name = name.replace(/^(austen|first\s*contact|the\s*human\s*inside|cube|miscel·lània|miscellania)\s*[-\s]+/, '');
+  name = name.replace(/\s*[-\s]+[nbc]\s*$/, '');
+  name = name.replace(/^(cites|crosswords|quotes)\s*[-\s]+/, '');
+  name = name.replace(/\s*[-\s]+[nc]\s*$/, '');
+  return `${collection}-${slugify(name)}`;
+}
+
 function transformStoreProductForSupabase(storeProduct) {
   const collectionMap = {
     'austen': 'austen',
@@ -59,8 +113,14 @@ function transformStoreProductForSupabase(storeProduct) {
     'the-human-inside': 'the-human-inside',
     'human inside': 'the-human-inside',
     'cube': 'cube',
+    'miscel·lània': 'miscellania',
     'miscellania': 'miscellania',
-    'dj vader': 'first-contact'
+    'dj vader': 'miscellania',
+    'death star': 'miscellania',
+    'r2d2': 'miscellania',
+    'arthur d': 'miscellania',
+    'pont del diable': 'miscellania',
+    'quotes': 'austen'
   };
 
   const productTitle = storeProduct.title || storeProduct.name || 'Product';
@@ -99,15 +159,18 @@ function transformStoreProductForSupabase(storeProduct) {
       size: size,
       color: color,
       color_hex: mapColorToHex(color),
-      price: v.price || storeProduct.price || 29.99,
+      price: v.price || storeProduct.price || calculateSellingPrice(),
       stock: 999,
       is_available: true,
       image_url: v.mockupUrl || mockupUrl
     };
   });
 
+  const generatedSlug = generateProductSlug(collection, productTitle);
+
   return {
     gelato_product_id: storeProduct.id?.toString() || storeProduct.productId?.toString(),
+    slug: generatedSlug,
     name: productTitle,
     description: (() => {
       const raw = (storeProduct.description || '').toString().trim();
@@ -115,17 +178,13 @@ function transformStoreProductForSupabase(storeProduct) {
       if (normalizeComparable(raw) === normalizeComparable(productTitle)) return '';
       return raw;
     })(),
-    price: storeProduct.price || 29.99,
+    price: storeProduct.price || calculateSellingPrice(),
     currency: 'EUR',
     category: 'apparel',
     collection: collection,
     sku: storeProduct.sku || storeProduct.id?.toString() || '',
     is_active: true,
     product_type: 'fulfillment',
-    product_images: images.map((url, index) => ({
-      url,
-      position: index
-    })),
     product_variants: variants
   };
 }
