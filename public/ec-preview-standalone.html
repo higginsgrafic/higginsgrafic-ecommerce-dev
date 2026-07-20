@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GRÀFIC — En construcció</title>
+<meta http-equiv="refresh" content="8; url=https://etsy.com/shop/HigginsGrafic">
+<link rel="dns-prefetch" href="https://etsy.com">
+<link rel="preconnect" href="https://etsy.com">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #000; overflow: hidden; }
+  .video-container {
+    position: fixed; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+  }
+  video {
+    width: 100%; height: 100%; object-fit: cover;
+  }
+</style>
+</head>
+<body>
+<div class="video-container" id="videoContainer">
+  <video autoplay muted playsInline preload="auto" id="brandVideo">
+    <source src="/video/ec-preview-video.mp4" type="video/mp4">
+  </video>
+</div>
+<script>
+  var video = document.getElementById('brandVideo');
+  var redirected = false;
+
+  function doRedirect() {
+    if (redirected) return;
+    redirected = true;
+    window.location.replace('https://etsy.com/shop/HigginsGrafic');
+  }
+
+  video.addEventListener('ended', doRedirect);
+  video.addEventListener('canplay', function() { video.play(); });
+  setTimeout(doRedirect, 4500);
+</script>
+</body>
+</html>

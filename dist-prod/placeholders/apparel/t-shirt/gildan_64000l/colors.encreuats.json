@@ -1,0 +1,13 @@
+{
+  "schema": 1,
+  "selected": [
+    "white"
+  ],
+  "colors": [
+    {
+      "slug": "white",
+      "label": "White",
+      "selected": true
+    }
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "name": "GRÀFIC - Samarretes Premium",
+  "short_name": "GRÀFIC",
+  "description": "Col·leccions exclusives de samarretes amb dissenys únics d'autor",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#FFFFFF",
+  "theme_color": "#181818",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/favicon.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/logo-grafc.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["shopping", "lifestyle"],
+  "lang": "ca",
+  "dir": "ltr",
+  "scope": "/"
+}

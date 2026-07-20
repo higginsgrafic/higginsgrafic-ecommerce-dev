@@ -14,7 +14,22 @@ function ECPreviewPage() {
   const params = new URLSearchParams(location.search || '');
   const debug = (params.get('debug') || '').trim() === '1' || (params.get('noRedirect') || '').trim() === '1';
 
+  const [isRedirecting, setIsRedirecting] = useState(false);
   const defaultVideoUrl = '/video/ec-preview-video.mp4';
+
+  const doRedirect = () => {
+    if (debug) return;
+    const shouldRedirect = !!(config?.autoRedirect || config?.globalRedirect);
+    if (shouldRedirect && config?.redirectUrl) {
+      setIsRedirecting(true);
+      const target = config.redirectUrl;
+      if (target.startsWith('http://') || target.startsWith('https://')) {
+        window.location.href = target;
+      } else {
+        navigate(target);
+      }
+    }
+  };
 
   useEffect(() => {
     const shouldMatch = (value) => /\bbolt\b|bolt\.com|bolt\.new|made in bolt/i.test(String(value || ''));
@@ -188,7 +203,11 @@ function ECPreviewPage() {
 
     // If we have a video background, let it play and redirect onEnded.
     // This avoids an instant redirect that makes the video appear to play "at full speed".
-    if (effectiveBackgroundType === 'video' && effectiveVideoUrl) return;
+    if (effectiveBackgroundType === 'video' && effectiveVideoUrl) {
+      // Fallback: redirect after 5s in case onEnded never fires
+      const fallbackId = window.setTimeout(() => doRedirect(), 5000);
+      return () => window.clearTimeout(fallbackId);
+    }
 
     // Otherwise redirect immediately.
     // This page acts as an under-construction bridge (e.g. to Etsy).
@@ -242,15 +261,7 @@ function ECPreviewPage() {
   };
 
   const handleVideoEnd = () => {
-    if (debug) return;
-    const shouldRedirect = !!(config?.autoRedirect || config?.globalRedirect);
-    if (shouldRedirect && config?.redirectUrl) {
-      if (config.redirectUrl.startsWith('http://') || config.redirectUrl.startsWith('https://')) {
-        window.location.href = config.redirectUrl;
-      } else {
-        navigate(config.redirectUrl);
-      }
-    }
+    doRedirect();
   };
 
   const handleScreenClick = () => {
@@ -384,8 +395,7 @@ function ECPreviewPage() {
             muted
             loop={!(String(config.redirectUrl || '').trim() && (config.autoRedirect || config.globalRedirect))}
             playsInline
-            preload="metadata"
-            poster={config.imageUrl || undefined}
+            preload="auto"
             src={effectiveVideoUrl}
             onEnded={handleVideoEnd}
           />
@@ -463,8 +473,13 @@ function ECPreviewPage() {
         )}
 
       </div>
-    </>
-  );
+
+      {isRedirecting && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black">
+          <div className="text-white text-xl animate-pulse">Redirigint a Etsy…</div>
+        </div>
+      )}
+    </>);
 }
 
 export default ECPreviewPage;
