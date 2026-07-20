@@ -4,6 +4,7 @@ import Pauta4ColsOverlay from '@/components/pauta/Pauta4ColsOverlay';
 import HeroSlider from '@/components/HeroSlider';
 import CollectionProductCard from '@/components/tdp/CollectionProductCard';
 import CollectionProductCardV5 from '@/components/tdp/CollectionProductCardV5';
+import CollectionTdpCard from '@/components/tdp/CollectionTdpCard';
 import TramFinal from '@/components/home/TramFinal';
 
 const COLLECTION_BG_SRC = '/tmp/PAGINES/PAGINES TIPUS/00 COLLECCIO.png';
@@ -95,7 +96,6 @@ function loadOverlayState() {
 }
 
 function ConstructorColleccioPage() {
-  const [selectedSize, setSelectedSize] = useState('M');
   const [overlayState, setOverlayState] = useState(loadOverlayState);
   const [zeroLeftOffsetPx, setZeroLeftOffsetPx] = useState(0);
   const pautaGridRef = useRef(null);
@@ -250,21 +250,25 @@ function ConstructorColleccioPage() {
             const Card = isV5 ? CollectionProductCardV5 : CollectionProductCard;
             const col = colIdx + 1;
             const rowOffset = 10 + rowIdx * 20;
+            const productName = colorToProductName(color);
             return (
-              <Card
+              <CollectionTdpCard
                 key={`tdp-card-r${rowIdx}-c${colIdx}`}
+                Component={Card}
                 gridColumn={`${col} / ${col + 1}`}
                 rowOffset={rowOffset}
-                productName={colorToProductName(color)}
+                productName={productName}
                 description={TDP_DESCRIPTION}
                 price="15,50€"
                 imageSrc={tdpImage(color)}
                 imageAlt={`Samarreta Gildan 5000 ${color}`}
                 sizes={sizes}
-                selectedSize={selectedSize}
-                onSizeChange={setSelectedSize}
                 cartCount={0}
-                onAddToCart={() => {}}
+                onAddToCart={(size) => {
+                  window.dispatchEvent(new CustomEvent('hg:open-full-wide-cart', {
+                    detail: { source: 'collection-tdp-cta', firstPartOnly: true, item: { title: productName.toUpperCase(), collection: 'COL·LECCIÓ', qty: 1, size, price: '15,50€', color, drawing: '', disabled: false } },
+                  }));
+                }}
                 editableIdPrefix="constructor-colleccio-tdp-col2"
                 presetVersion="constructor-colleccio-tdp-cart-34-v9"
                 collectionHref="/constructor/pdp"

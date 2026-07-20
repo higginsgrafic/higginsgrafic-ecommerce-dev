@@ -246,7 +246,7 @@ const DRAWING_LABELS = {
   'cube/cyber-cube-stripe': 'Cyber Cube',
   'cube/cylon-cube-03-stripe': 'Cylon Cube 03',
   'cube/darth-cube-stripe': 'Darth Cube',
-  'cube/iron-cube-08-iron-kong-stripe': 'Iron Kong',
+  'cube/iron-cube-08-iron-kong-stripe': 'Iron Cube 08',
   'cube/iron-cube-68-stripe': 'Iron Cube 68',
   'cube/maschinencube-stripe': 'MaschinenCube',
   'cube/mazinger-c-stripe': 'Mazinger C',
@@ -449,4 +449,30 @@ export function buildHomeDrawingPlan({ perCollection = 3, rng = Math.random } = 
     });
   }
   return plan;
+}
+
+const COLLECTION_DISPLAY_NAMES = {
+  'first-contact': 'FIRST CONTACT',
+  'the-human-inside': 'THE HUMAN INSIDE',
+  'austen': 'AUSTEN',
+  'cube': 'CUBE',
+  'miscellania': 'MISCEL·LÀNIA',
+};
+
+export function buildOtherCollectionsImages(currentSlug, { perCollection = 1, rng = Math.random } = {}) {
+  const plan = buildHomeDrawingPlan({ perCollection: 3, rng });
+  const others = HOME_COLLECTIONS_ORDER.filter((s) => s !== currentSlug);
+  const shuffled = shuffle(others, rng);
+  return shuffled.map((slug) => {
+    const items = plan[slug] || [];
+    const pick = items[Math.floor(rng() * items.length)] || items[0];
+    if (!pick) return null;
+    return {
+      src: pick.mockupSrc,
+      brand: COLLECTION_DISPLAY_NAMES[slug] || slug.toUpperCase(),
+      title: pick.productName,
+      price: '15,50€',
+      href: pick.productHref,
+    };
+  }).filter(Boolean);
 }

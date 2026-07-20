@@ -1,11 +1,13 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useMemo } from 'react';
 import { Helmet } from 'react-helmet';
 import Pauta4ColsOverlay from '@/components/pauta/Pauta4ColsOverlay';
 import { collectionGridImageFor, gridFinishFor, collectionGridHoverVariantsFor } from '@/lib/pdpMockup';
 import HeroSlider from '@/components/HeroSlider';
 import CollectionProductCard from '@/components/tdp/CollectionProductCard';
 import CollectionProductCardV5 from '@/components/tdp/CollectionProductCardV5';
+import CollectionTdpCard from '@/components/tdp/CollectionTdpCard';
 import TramFinal from '@/components/home/TramFinal';
+import { buildOtherCollectionsImages } from '@/components/home/homeDrawings';
 
 const COLLECTION_BG_SRC = '/tmp/PAGINES/PAGINES TIPUS/00 COLLECCIO.png';
 
@@ -110,12 +112,12 @@ function loadOverlayState() {
 }
 
 function CollectionFirstContactPage() {
-  const [selectedSize, setSelectedSize] = useState('M');
   const [overlayState, setOverlayState] = useState(loadOverlayState);
   const [zeroLeftOffsetPx, setZeroLeftOffsetPx] = useState(0);
   const pautaGridRef = useRef(null);
   const sizes = ['S', 'M', 'L', 'XL', 'XXL'];
   const { pautaOpacity, tableOpacity, backgroundOpacity } = overlayState;
+  const otherImages = useMemo(() => buildOtherCollectionsImages('first-contact'), []);
 
   useEffect(() => {
     try {
@@ -265,22 +267,26 @@ function CollectionFirstContactPage() {
             const Card = isV5 ? CollectionProductCardV5 : CollectionProductCard;
             const col = colIdx + 1;
             const rowOffset = 10 + rowIdx * 20;
+            const productName = productAt(rowIdx, colIdx).name;
             return (
-              <Card
+              <CollectionTdpCard
                 key={`tdp-card-r${rowIdx}-c${colIdx}`}
+                Component={Card}
                 gridColumn={`${col} / ${col + 1}`}
                 rowOffset={rowOffset}
-                productName={productAt(rowIdx, colIdx).name}
+                productName={productName}
                 description={TDP_DESCRIPTION}
                 price="15,50€"
                 imageSrc={collectionGridImageFor('first-contact', productAt(rowIdx, colIdx).route, color, rowIdx * 4 + colIdx)}
                 hoverImages={collectionGridHoverVariantsFor('first-contact', productAt(rowIdx, colIdx).route, color, rowIdx * 4 + colIdx)}
                 imageAlt={`Samarreta Gildan 5000 ${color}`}
                 sizes={sizes}
-                selectedSize={selectedSize}
-                onSizeChange={setSelectedSize}
                 cartCount={0}
-                onAddToCart={() => {}}
+                onAddToCart={(size) => {
+                  window.dispatchEvent(new CustomEvent('hg:open-full-wide-cart', {
+                    detail: { source: 'collection-tdp-cta', firstPartOnly: true, item: { title: productName.toUpperCase(), collection: 'FIRST CONTACT', qty: 1, size, price: '15,50€', color, drawing: '', disabled: false } },
+                  }));
+                }}
                 editableIdPrefix="constructor-colleccio-copy2-tdp-col2"
                 presetVersion="constructor-colleccio-copy2-tdp-cart-34-v9"
                 collectionHref={`${productHref(rowIdx, colIdx)}?color=${color}&finish=${gridFinishFor('first-contact', color, rowIdx * 4 + colIdx)}`}
@@ -294,6 +300,7 @@ function CollectionFirstContactPage() {
 
       <TramFinal
         posterLines={[{ text: 'CADA' }, { text: 'PERSONA TÉ' }, { text: 'UNA HISTÒRIA' }]}
+        tambeImages={otherImages}
       />
 
       <div

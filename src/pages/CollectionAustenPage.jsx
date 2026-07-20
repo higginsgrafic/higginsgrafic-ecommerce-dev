@@ -1,11 +1,13 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useMemo } from 'react';
 import { Helmet } from 'react-helmet';
 import Pauta4ColsOverlay from '@/components/pauta/Pauta4ColsOverlay';
 import { collectionGridImageFor, gridFinishFor, collectionGridHoverVariantsFor } from '@/lib/pdpMockup';
 import HeroSlider from '@/components/HeroSlider';
 import CollectionProductCard from '@/components/tdp/CollectionProductCard';
 import CollectionProductCardV5 from '@/components/tdp/CollectionProductCardV5';
+import CollectionTdpCard from '@/components/tdp/CollectionTdpCard';
 import TramFinal from '@/components/home/TramFinal';
+import { buildOtherCollectionsImages } from '@/components/home/homeDrawings';
 
 const COLLECTION_BG_SRC = '/tmp/PAGINES/PAGINES TIPUS/00 COLLECCIO.png';
 
@@ -133,12 +135,12 @@ function loadOverlayState() {
 }
 
 function CollectionAustenPage() {
-  const [selectedSize, setSelectedSize] = useState('M');
   const [overlayState, setOverlayState] = useState(loadOverlayState);
   const [zeroLeftOffsetPx, setZeroLeftOffsetPx] = useState(0);
   const pautaGridRef = useRef(null);
   const sizes = ['S', 'M', 'L', 'XL', 'XXL'];
   const { pautaOpacity, tableOpacity, backgroundOpacity } = overlayState;
+  const otherImages = useMemo(() => buildOtherCollectionsImages('austen'), []);
 
   useEffect(() => {
     try {
@@ -293,8 +295,9 @@ function CollectionAustenPage() {
             const col = colIdx + 1;
             const rowOffset = 10 + rowIdx * 20;
             return (
-              <Card
+              <CollectionTdpCard
                 key={`tdp-card-r${rowIdx}-c${colIdx}`}
+                Component={Card}
                 gridColumn={`${col} / ${col + 1}`}
                 rowOffset={rowOffset}
                 productName={product.name}
@@ -304,10 +307,12 @@ function CollectionAustenPage() {
                 hoverImages={collectionGridHoverVariantsFor(product.collection, product.route, color, idx)}
                 imageAlt={`Samarreta Gildan 5000 ${color}`}
                 sizes={sizes}
-                selectedSize={selectedSize}
-                onSizeChange={setSelectedSize}
                 cartCount={0}
-                onAddToCart={() => {}}
+                onAddToCart={(size) => {
+                  window.dispatchEvent(new CustomEvent('hg:open-full-wide-cart', {
+                    detail: { source: 'collection-tdp-cta', firstPartOnly: true, item: { title: product.name.toUpperCase(), collection: 'AUSTEN', qty: 1, size, price: '15,50€', color, drawing: '', disabled: false } },
+                  }));
+                }}
                 editableIdPrefix="constructor-colleccio-copy4-tdp-col2"
                 presetVersion="constructor-colleccio-copy4-tdp-cart-34-v9"
                 collectionHref={`${productHref(pIdx)}?color=${color}&finish=${gridFinishFor(product.collection, color, idx)}`}
@@ -321,6 +326,7 @@ function CollectionAustenPage() {
 
       <TramFinal
         posterLines={[{ text: 'CADA' }, { text: 'DIBUIX TÉ' }, { text: 'UNA MIRADA' }]}
+        tambeImages={otherImages}
       />
 
       <div

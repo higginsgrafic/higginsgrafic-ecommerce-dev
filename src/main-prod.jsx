@@ -13,24 +13,28 @@ import { ProductProvider } from '@/contexts/ProductContext';
 import { CartProvider } from '@/contexts/CartContext';
 import { WishlistProvider } from '@/contexts/WishlistContext';
 import { ToastProvider } from '@/contexts/ToastContext';
-import { GridDebugProvider } from '@/contexts/GridDebugContext';
+import { AdminProvider } from '@/contexts/AdminContext';
+import { AdminToolsProvider } from '@/contexts/AdminToolsContext';
+import { AuthProvider } from '@/contexts/AuthContext';
 import AppProd from '@/AppProd';
-import ProdBadge from '@/components/dev/ProdBadge';
 import '@/index.css';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <BrowserRouter>
-    <CartProvider>
-      <WishlistProvider>
-        <ProductProvider>
-          <GridDebugProvider>
-            <ToastProvider>
-              <AppProd />
-              <ProdBadge />
-            </ToastProvider>
-          </GridDebugProvider>
-        </ProductProvider>
-      </WishlistProvider>
-    </CartProvider>
+    <AuthProvider>
+      <AdminProvider>
+        <CartProvider>
+          <WishlistProvider>
+            <ProductProvider>
+              <AdminToolsProvider>
+                <ToastProvider>
+                  <AppProd />
+                </ToastProvider>
+              </AdminToolsProvider>
+            </ProductProvider>
+          </WishlistProvider>
+        </CartProvider>
+      </AdminProvider>
+    </AuthProvider>
   </BrowserRouter>
 );

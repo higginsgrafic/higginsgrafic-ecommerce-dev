@@ -351,13 +351,7 @@ function UserComandesContent({ userEmail }) {
                     lbl('Nom', true), lbl('eCorreu', true), lbl('Telèfon', true), lbl('Empresa/Organització', true),
                   ] },
                 ];
-                if (!isSeg) {
-                  lSections.push({ open: gestioOpen, origHeader: 7, header: headerNode('GESTIÓ DE LA CONTRASENYA', gestioOpen, () => setGestioOpen(v => !v)), content: [
-                    passwordMask(), pwd('Contrasenya nova'), pwd('Confirma la contrasenya'),
-                  ] });
-                } else {
-                  lSections.push({ spacer: 7 });
-                }
+                lSections.push({ spacer: 2 });
                 lSections.push({ open: privacOpen, origHeader: 13, header: headerNode(isSeg ? 'FORMATS' : 'PRIVACITAT', privacOpen, () => setPrivacOpen(v => !v)), content: [
                   chk('Accepto rebre comunicacions comercials', false, acceptCommActive, () => setAcceptCommActive(v => !v)),
                   chk('Accepto compartir dades amb el transportista', true, acceptShareActive, () => setAcceptShareActive(v => !v)),
@@ -653,7 +647,25 @@ function UserComandesContent({ userEmail }) {
                   null,
                   null,
                 ];
-                const anyBottomOpen = formatsOpen || mailingOpen || factorOpen;
+                const segPwdStyle = { width: '100%', height: '24px', border: '1px solid #C9CED6', borderRadius: '3px', padding: '0 6px', fontFamily: 'Roboto Condensed, sans-serif', fontSize: '12pt', color: '#475059', boxSizing: 'border-box', outline: 'none', background: 'transparent' };
+                const segPwd = (text) => (
+                  <div style={{ ...cellStyle, padding: '0 4px' }}>
+                    <input type="password" placeholder={text} autoComplete="new-password" style={segPwdStyle} />
+                  </div>
+                );
+                const segPwdMask = () => (
+                  <div style={{ ...cellStyle, padding: '0 10px' }}>
+                    <span style={{ color: '#C5CACF', fontFamily: 'Roboto Condensed, sans-serif', fontSize: '14pt', letterSpacing: '4px', lineHeight: 1 }}>{'\u2022'.repeat(5)}</span>
+                  </div>
+                );
+                const gestioRows = [
+                  segPwdMask(),
+                  segPwd('Contrasenya nova'),
+                  segPwd('Confirma la contrasenya'),
+                  null,
+                  null,
+                ];
+                const anyBottomOpen = formatsOpen || mailingOpen || factorOpen || gestioOpen;
                 const eyeBtn = (
                   <span
                     role="button"
@@ -873,7 +885,7 @@ function UserComandesContent({ userEmail }) {
                     return (
                       <tr key={r} style={{ height: '29.75px' }}>
                         <td colSpan={4} style={{ height: '29.75px', padding: 0 }}><div style={{ width: 'calc(100% - 3px)' }}>{headerNode('FORMATS', formatsOpen, () => setFormatsOpen(v => !v))}</div></td>
-                        <td colSpan={2} style={{ height: '29.75px', padding: 0 }} />
+                        <td colSpan={2} style={{ height: '29.75px', padding: 0 }}>{headerNode('GESTIÓ DE LA CONTRASENYA', gestioOpen, () => setGestioOpen(v => !v))}</td>
                         <td colSpan={3} style={{ height: '29.75px', padding: 0 }}>{headerNode('MAILING', mailingOpen, () => setMailingOpen(v => !v))}</td>
                         <td colSpan={3} style={{ height: '29.75px', padding: 0 }}>{headerNode('DOBLE FACTOR', factorOpen, () => setFactorOpen(v => !v))}</td>
                       </tr>
@@ -884,7 +896,7 @@ function UserComandesContent({ userEmail }) {
                     return (
                       <tr key={r} style={{ height: anyBottomOpen ? '29.75px' : '0px' }}>
                         <td colSpan={4} style={{ height: anyBottomOpen ? '29.75px' : '0px', padding: 0 }}>{formatsOpen ? formatRows[i] : null}</td>
-                        <td colSpan={2} style={{ height: anyBottomOpen ? '29.75px' : '0px', padding: 0 }} />
+                        <td colSpan={2} style={{ height: anyBottomOpen ? '29.75px' : '0px', padding: 0 }}>{gestioOpen ? gestioRows[i] : null}</td>
                         <td colSpan={3} style={{ height: anyBottomOpen ? '29.75px' : '0px', padding: 0 }}>{mailingOpen ? mailingRows[i] : null}</td>
                         <td colSpan={3} style={{ height: anyBottomOpen ? '29.75px' : '0px', padding: 0 }}>{factorOpen ? factorRows[i] : null}</td>
                       </tr>

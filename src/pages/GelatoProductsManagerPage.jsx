@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../api/supabase-products';
-import { syncGelatoStoreProducts } from '../api/gelato';
+import { syncGelatoProductsToSupabase } from '../api/gelato-sync';
 
 export default function GelatoProductsManagerPage() {
   const [products, setProducts] = useState([]);
@@ -43,38 +43,15 @@ export default function GelatoProductsManagerPage() {
   const handleSync = async () => {
     try {
       setSyncing(true);
-      const storeProducts = await syncGelatoStoreProducts();
-
-      for (const product of storeProducts) {
-        const { data: existingProduct } = await supabase
-          .from('products')
-          .select('id')
-          .eq('gelato_product_id', product.id)
-          .maybeSingle();
-
-        if (existingProduct) {
-          await supabase
-            .from('products')
-            .update({
-              name: product.title || product.name,
-              updated_at: new Date().toISOString()
-            })
-            .eq('id', existingProduct.id);
-        } else {
-          await supabase
-            .from('products')
-            .insert({
-              gelato_product_id: product.id,
-              name: product.title || product.name,
-              description: product.description || '',
-              price: 29.99,
-              is_active: false
-            });
-        }
-      }
+      const result = await syncGelatoProductsToSupabase();
 
       await loadProducts();
-      alert('Sincronització completada!');
+
+      if (result.success) {
+        alert(`Sincronització completada: ${result.count} productes. Productes obsolets desactivats.`);
+      } else {
+        alert(`Sincronització amb errors: ${result.count} productes sincronitzats, ${result.errors} errors. ${result.error || ''}`);
+      }
     } catch (error) {
       console.error('Error syncing:', error);
       alert('Error sincronitzant: ' + error.message);

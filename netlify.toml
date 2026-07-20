@@ -94,6 +94,11 @@
      Content-Security-Policy = "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'self'; img-src 'self' data: https://jnuuejlxuyqhhkfucuxg.supabase.co https://images.unsplash.com https://product.gelatoapis.com https://order.gelatoapis.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; connect-src 'self' https://jnuuejlxuyqhhkfucuxg.supabase.co https://product.gelatoapis.com https://order.gelatoapis.com https://*.ingest.sentry.io https://*.sentry.io https://plausible.io; media-src 'self'; worker-src blob:; script-src 'self' 'unsafe-inline' https://js.stripe.com https://plausible.io; frame-src https://js.stripe.com https://www.youtube.com;"
 
 [[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/:splat"
+  status = 200
+
+[[redirects]]
   from = "/video/*"
   to = "/video/:splat"
   status = 200

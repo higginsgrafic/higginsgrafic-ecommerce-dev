@@ -123,11 +123,10 @@ export const ordersAPI = {
 
 export const paymentsAPI = {
   /**
-   * Crear intenció de pagament amb Stripe
+   * @deprecated CheckoutPage usa directament la Netlify Function /create-payment-intent
    */
   createPaymentIntent: async (amount, currency = 'EUR') => {
     if (USE_MOCK) {
-      // Mock: retornar client secret simulat
       return {
         clientSecret: 'pi_test_' + Math.random().toString(36).substr(2, 9),
         amount,
@@ -138,7 +137,7 @@ export const paymentsAPI = {
   },
 
   /**
-   * Confirmar pagament
+   * @deprecated CheckoutPage confirma el pagament directament amb Stripe.js
    */
   confirmPayment: async (paymentIntentId) => {
     if (USE_MOCK) {

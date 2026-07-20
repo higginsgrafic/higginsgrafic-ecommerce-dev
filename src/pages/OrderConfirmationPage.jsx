@@ -1,8 +1,8 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 import { motion } from 'framer-motion';
-import { CheckCircle, Package, Truck, CreditCard, Mail, MapPin, Clock, Download, ArrowRight } from 'lucide-react';
+import { CheckCircle, Package, Truck, CreditCard, Mail, MapPin, Clock, Download, ArrowRight, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { formatPrice } from '@/utils/formatters';
 import { useToast } from '@/contexts/ToastContext';
@@ -11,50 +11,94 @@ const OrderConfirmationPage = () => {
   const { orderId } = useParams();
   const navigate = useNavigate();
   const { info } = useToast();
-
-  // Simulació de dades de comanda (en producció vindrien del backend)
-  const orderData = {
-    id: orderId || 'GRF-2024-' + Math.random().toString(36).substr(2, 9).toUpperCase(),
-    date: new Date().toLocaleDateString('ca-ES', {
-      day: '2-digit',
-      month: 'long',
-      year: 'numeric'
-    }),
-    estimatedDelivery: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toLocaleDateString('ca-ES', {
-      day: '2-digit',
-      month: 'long'
-    }),
-    email: 'client@exemple.cat',
-    shippingAddress: {
-      name: 'Joan Garcia',
-      street: 'Carrer de la Pau, 123',
-      city: 'Barcelona',
-      postalCode: '08001',
-      country: 'Espanya'
-    },
-    items: [
-      {
-        id: 1,
-        name: 'MASCHINENMENSCH',
-        size: 'M',
-        quantity: 1,
-        price: 29.99,
-        image: '/tshirt-white.jpg'
-      }
-    ],
-    subtotal: 29.99,
-    shipping: 0,
-    total: 29.99
-  };
+  const [orderData, setOrderData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    // Scroll to top on mount
     window.scrollTo(0, 0);
-  }, []);
+
+    async function fetchOrder() {
+      if (!orderId) {
+        setError('No s\'ha trobat l\'ID de la comanda');
+        setLoading(false);
+        return;
+      }
+
+      try {
+        const res = await fetch(`/api/orders?orderNumber=${encodeURIComponent(orderId)}`);
+        if (!res.ok) {
+          throw new Error(`HTTP ${res.status}`);
+        }
+        const data = await res.json();
+        if (data.order) {
+          const o = data.order;
+          const items = Array.isArray(o.items) ? o.items : (typeof o.items === 'string' ? JSON.parse(o.items) : []);
+          setOrderData({
+            id: o.order_number || o.id,
+            date: o.created_at ? new Date(o.created_at).toLocaleDateString('ca-ES', { day: '2-digit', month: 'long', year: 'numeric' }) : '',
+            estimatedDelivery: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toLocaleDateString('ca-ES', { day: '2-digit', month: 'long' }),
+            email: o.email || '',
+            status: o.statusLabel || o.status || 'PENDENT',
+            shippingAddress: {
+              name: `${o.first_name || ''} ${o.last_name || ''}`.trim(),
+              street: o.address || '',
+              city: o.city || '',
+              postalCode: o.postal_code || '',
+              country: o.country || 'Espanya',
+            },
+            items: items.map((item, idx) => ({
+              id: item.id || idx,
+              name: item.name || 'Producte',
+              size: item.size || '-',
+              quantity: item.quantity || 1,
+              price: item.price || 0,
+              image: item.image || '/tshirt-white.jpg',
+            })),
+            subtotal: parseFloat(o.subtotal) || 0,
+            shipping: parseFloat(o.shipping_cost) || 0,
+            total: parseFloat(o.total) || 0,
+          });
+        } else {
+          setError('Comanda no trobada');
+        }
+      } catch (err) {
+        console.error('[OrderConfirmation] Error fetching order:', err);
+        setError('No s\'ha pogut carregar la comanda');
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchOrder();
+  }, [orderId]);
 
   const handleDownloadInvoice = () => {
     info('Funció de descàrrega de factura (per implementar amb backend)');
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-gray-400" />
+      </div>
+    );
+  }
+
+  if (error || !orderData) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
+        <div className="text-center">
+          <p className="text-lg font-medium mb-2" style={{ color: '#141414' }}>{error || 'Comanda no trobada'}</p>
+          <Link to="/">
+            <Button className="mt-4" style={{ backgroundColor: '#141414', color: '#FFFFFF' }}>
+              Tornar a l'inici
+            </Button>
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <>
