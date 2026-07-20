@@ -16,6 +16,7 @@ import { ToastProvider } from '@/contexts/ToastContext';
 import { AdminProvider } from '@/contexts/AdminContext';
 import { AdminToolsProvider } from '@/contexts/AdminToolsContext';
 import { AuthProvider } from '@/contexts/AuthContext';
+import { GridDebugProvider } from '@/contexts/GridDebugContext';
 import AppProd from '@/AppProd';
 import '@/index.css';
 
@@ -23,17 +24,19 @@ ReactDOM.createRoot(document.getElementById('root')).render(
   <BrowserRouter>
     <AuthProvider>
       <AdminProvider>
-        <CartProvider>
-          <WishlistProvider>
-            <ProductProvider>
-              <AdminToolsProvider>
-                <ToastProvider>
-                  <AppProd />
-                </ToastProvider>
-              </AdminToolsProvider>
-            </ProductProvider>
-          </WishlistProvider>
-        </CartProvider>
+        <GridDebugProvider>
+          <CartProvider>
+            <WishlistProvider>
+              <ProductProvider>
+                <AdminToolsProvider>
+                  <ToastProvider>
+                    <AppProd />
+                  </ToastProvider>
+                </AdminToolsProvider>
+              </ProductProvider>
+            </WishlistProvider>
+          </CartProvider>
+        </GridDebugProvider>
       </AdminProvider>
     </AuthProvider>
   </BrowserRouter>

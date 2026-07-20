@@ -125,14 +125,16 @@ function AppProd() {
   const handleUserClick = useCallback(() => navigate('/profile'), [navigate]);
   const pageProps = useMemo(() => ({ onAddToCart: handleAddToCart, cartItems, onUpdateQuantity: updateQuantity }), [handleAddToCart, cartItems, updateQuantity]);
 
-  const showProductsLoadingScreen = !!loading;
+  const showProductsLoadingScreen = !!loading && !shouldRedirect && !redirectLoading;
   const showProductsErrorScreen = !!(error && (!products || products.length === 0));
 
   return (
     <ErrorBoundary>
       <Helmet defaultTitle="GRAFC - Samarretes Premium | Col·leccions Exclusives" titleTemplate="%s | GRAFC" />
 
-      {!productContext ? (
+      {(shouldRedirect || redirectLoading) && !isFullScreenRoute ? (
+        <div className="w-full h-screen bg-black" />
+      ) : !productContext ? (
         <div className="min-h-screen flex items-center justify-center">
           <div className="text-center">
             <h1 className="text-2xl font-bold mb-4">Error: ProductContext no disponible</h1>
@@ -157,7 +159,7 @@ function AppProd() {
       ) : (
         <>
           <SkipLink />
-          {isNavigating && !isAdminRoute && <LoadingScreen />}
+          {isNavigating && !isAdminRoute && !isFullScreenRoute && !shouldRedirect && <LoadingScreen />}
 
           {adminBannerVisible && <AdminBanner rulerInset={0} />}
 
