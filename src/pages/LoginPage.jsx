@@ -3,6 +3,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Mail, Lock, Eye, EyeOff, LogIn } from 'lucide-react';
 import SEO from '@/components/SEO';
+import Breadcrumbs from '@/components/Breadcrumbs';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -51,7 +52,10 @@ export default function LoginPage() {
     <>
       <SEO title="Inici de sessió — Higgins Gràfic" />
       <div className="min-h-screen bg-neutral-50 flex items-center justify-center p-4">
-        <div className="w-full max-w-md">
+        <div className="w-full max-w-md pt-[129px] lg:pt-[145px]">
+          <div className="mb-6">
+            <Breadcrumbs items={[{ label: 'Inici de sessió' }]} />
+          </div>
           <div className="bg-white rounded-lg shadow-lg p-8">
             <div className="flex items-center justify-center mb-6">
               <div className="p-3 bg-neutral-100 rounded-full">

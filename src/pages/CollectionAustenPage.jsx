@@ -8,6 +8,7 @@ import CollectionProductCardV5 from '@/components/tdp/CollectionProductCardV5';
 import CollectionTdpCard from '@/components/tdp/CollectionTdpCard';
 import TramFinal from '@/components/home/TramFinal';
 import { buildOtherCollectionsImages } from '@/components/home/homeDrawings';
+import Breadcrumbs from '@/components/Breadcrumbs';
 
 const COLLECTION_BG_SRC = '/tmp/PAGINES/PAGINES TIPUS/00 COLLECCIO.png';
 
@@ -194,6 +195,7 @@ function CollectionAustenPage() {
         />
       </Helmet>
 
+      <div style={{ transform: 'scale(0.94)', transformOrigin: 'top center' }}>
       <Pauta4ColsOverlay
         pautaEnabled={false}
         tableEnabled={false}
@@ -203,6 +205,18 @@ function CollectionAustenPage() {
         topOffset="76px"
         bottomPadding="0px"
       >
+        {/* Breadcrumbs (fila 2 / 3) */}
+        <div
+          style={{
+            gridColumn: '1 / 4',
+            gridRow: '2 / 3',
+            alignSelf: 'start',
+            transform: 'translateY(-86px)',
+          }}
+        >
+          <Breadcrumbs items={[{ label: 'Austen' }]} />
+        </div>
+
         <div
           aria-label="Títol col·lecció"
           style={{
@@ -328,6 +342,7 @@ function CollectionAustenPage() {
         posterLines={[{ text: 'CADA' }, { text: 'DIBUIX TÉ' }, { text: 'UNA MIRADA' }]}
         tambeImages={otherImages}
       />
+      </div>
 
       <div
         className="font-mono text-neutral-800"

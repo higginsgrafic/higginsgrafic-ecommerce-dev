@@ -6,6 +6,7 @@ import { CheckCircle, Package, Truck, CreditCard, Mail, MapPin, Clock, Download,
 import { Button } from '@/components/ui/button';
 import { formatPrice } from '@/utils/formatters';
 import { useToast } from '@/contexts/ToastContext';
+import Breadcrumbs from '@/components/Breadcrumbs';
 
 const OrderConfirmationPage = () => {
   const { orderId } = useParams();
@@ -110,6 +111,9 @@ const OrderConfirmationPage = () => {
 
       <div className="min-h-screen bg-gray-50 py-8 md:py-12">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="mb-6">
+            <Breadcrumbs items={[{ label: 'Comanda confirmada' }]} />
+          </div>
           {/* Capçalera d'èxit */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}

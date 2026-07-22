@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import SEO from '@/components/SEO';
+import Breadcrumbs from '@/components/Breadcrumbs';
 import { formatPrice } from '@/utils/formatters';
 
 const OrderTrackingPage = () => {
@@ -144,6 +145,9 @@ const OrderTrackingPage = () => {
 
       <div className="min-h-screen bg-gray-50 py-12">
         <div className="max-w-4xl mx-auto px-4">
+          <div className="mb-6">
+            <Breadcrumbs items={[{ label: 'Seguiment de Comanda' }]} />
+          </div>
           {/* Header */}
           <div className="text-center mb-8">
             <h1 className="font-oswald text-4xl md:text-5xl font-bold uppercase mb-3">

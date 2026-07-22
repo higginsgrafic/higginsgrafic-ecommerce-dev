@@ -11,11 +11,17 @@ function prefetchPdpChunk() {
 
 const TDP_TEXT_PRESET_VERSION = 'tdp-layout-2026-05-14-0516';
 
+// Responsive font helper: scales font size proportionally with belt width.
+// beltWidth ranges from ~320px (narrow) to 1350px (max). At max, scale = 1.
+const BELT_MAX = 1350;
+const responsiveFont = (ptAtMax, minPt) =>
+  `clamp(${minPt}pt, calc((var(--hg-tdp-xR, 1350px) - var(--hg-tdp-xL, 0px)) * ${ptAtMax * 1.333 / BELT_MAX}), ${ptAtMax}pt)`;
+
 const TDP_PRODUCT_NAME_SETTINGS = {
   x: 0,
   y: 0,
   fontFamily: 'Oswald',
-  fontSize: 24,
+  fontSize: responsiveFont(24, 9),
   fontWeight: 300,
   selectedFontWeight: 700,
   letterSpacing: 0.04,
@@ -30,7 +36,7 @@ const TDP_PRODUCT_DESCRIPTION_SETTINGS = {
   x: 0,
   y: 20,
   fontFamily: 'Roboto',
-  fontSize: 19,
+  fontSize: responsiveFont(19, 8),
   fontWeight: 300,
   selectedFontWeight: 700,
   letterSpacing: 0.03,
@@ -45,7 +51,7 @@ const TDP_PRICE_SETTINGS = {
   x: 0,
   y: 0,
   fontFamily: 'Oswald',
-  fontSize: 24,
+  fontSize: responsiveFont(24, 9),
   fontWeight: 300,
   selectedFontWeight: 700,
   letterSpacing: 0,
@@ -60,7 +66,7 @@ const TDP_SIZE_BUTTON_TEXT_SETTINGS = {
   x: 0,
   y: 0,
   fontFamily: 'Oswald',
-  fontSize: 12,
+  fontSize: responsiveFont(12, 7),
   fontWeight: 300,
   selectedFontWeight: 400,
   letterSpacing: 0,
@@ -340,7 +346,7 @@ function TdpConstructorProduct({
                 color: nameHovered ? '#111827' : TDP_PRODUCT_NAME_SETTINGS.color,
                 transition: 'color 200ms',
                 fontFamily: `${TDP_PRODUCT_NAME_SETTINGS.fontFamily}, sans-serif`,
-                fontSize: `${TDP_PRODUCT_NAME_SETTINGS.fontSize}pt`,
+                fontSize: TDP_PRODUCT_NAME_SETTINGS.fontSize,
                 fontWeight: TDP_PRODUCT_NAME_SETTINGS.fontWeight,
                 letterSpacing: `${TDP_PRODUCT_NAME_SETTINGS.letterSpacing}em`,
                 lineHeight: TDP_PRODUCT_NAME_SETTINGS.lineHeight,
@@ -363,7 +369,7 @@ function TdpConstructorProduct({
                 justifyContent: 'center',
                 color: TDP_PRODUCT_NAME_SETTINGS.color,
                 fontFamily: `${TDP_PRODUCT_NAME_SETTINGS.fontFamily}, sans-serif`,
-                fontSize: `${TDP_PRODUCT_NAME_SETTINGS.fontSize}pt`,
+                fontSize: TDP_PRODUCT_NAME_SETTINGS.fontSize,
                 fontWeight: TDP_PRODUCT_NAME_SETTINGS.fontWeight,
                 letterSpacing: `${TDP_PRODUCT_NAME_SETTINGS.letterSpacing}em`,
                 lineHeight: TDP_PRODUCT_NAME_SETTINGS.lineHeight,
@@ -430,7 +436,7 @@ function TdpConstructorProduct({
             transform: descriptionTranslateY ? `translateY(${descriptionTranslateY})` : undefined,
             color: TDP_PRODUCT_DESCRIPTION_SETTINGS.color,
             fontFamily: `${TDP_PRODUCT_DESCRIPTION_SETTINGS.fontFamily}, sans-serif`,
-            fontSize: `${descriptionFontSize ?? TDP_PRODUCT_DESCRIPTION_SETTINGS.fontSize}pt`,
+            fontSize: descriptionFontSize ?? TDP_PRODUCT_DESCRIPTION_SETTINGS.fontSize,
             fontWeight: TDP_PRODUCT_DESCRIPTION_SETTINGS.fontWeight,
             letterSpacing: `${TDP_PRODUCT_DESCRIPTION_SETTINGS.letterSpacing}em`,
             lineHeight: TDP_PRODUCT_DESCRIPTION_SETTINGS.lineHeight,
@@ -508,7 +514,7 @@ function TdpConstructorProduct({
               style={{
                 borderRadius: 'clamp(2.81px, 0.8vw, 5.06px)',
                 fontFamily: `${sizeButtonTextSettings.fontFamily}, sans-serif`,
-                fontSize: `${sizeButtonTextSettings.fontSize}pt`,
+                fontSize: typeof sizeButtonTextSettings.fontSize === 'string' ? sizeButtonTextSettings.fontSize : `${sizeButtonTextSettings.fontSize}pt`,
                 fontWeight: selectedSize === size ? sizeButtonTextSettings.selectedFontWeight : sizeButtonTextSettings.fontWeight,
                 letterSpacing: `${sizeButtonTextSettings.letterSpacing}em`,
                 height: '100%',

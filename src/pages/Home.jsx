@@ -6,7 +6,6 @@ import TDP1 from '@/components/tdp/TDP1';
 import TDP2 from '@/components/tdp/TDP2';
 import EditableTextBox from '@/components/dev/EditableTextBox';
 import Pauta4ColsOverlay from '@/components/pauta/Pauta4ColsOverlay';
-import Breadcrumbs from '@/components/Breadcrumbs';
 import { buildHomeDrawingPlan } from '@/components/home/homeDrawings';
 import StoryPosterLink from '@/components/StoryPosterLink';
 
@@ -254,23 +253,6 @@ function Home() {
         topOffset="76px"
         bottomPadding="0px"
       >
-        {/* Breadcrumbs (fila 2 / 3) */}
-        <div
-          style={{
-            gridColumn: '1 / 4',
-            gridRow: '2 / 3',
-            alignSelf: 'start',
-            transform: 'translateY(-86px)', // -10 original -76 per revertir el moviment del topOffset
-          }}
-        >
-          <Breadcrumbs
-            items={[
-              { label: 'Col·leccions', link: '/first-contact' },
-              { label: 'POD' },
-            ]}
-          />
-        </div>
-
         {/* Títol HIGGINS GRÀFIC editable i centrat com a la captura (fila 3 / 8) */}
         <div
           style={{
