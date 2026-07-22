@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useMemo, useCallback, Suspense } from 'react';
+import React, { useState, useEffect, useRef, useMemo, useCallback, useTransition, Suspense } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useProductContext } from '@/contexts/ProductContext';
 import { useAdmin } from '@/contexts/AdminContext';
@@ -61,6 +61,14 @@ function App() {
   }, []);
   const location = useLocation();
   const navigate = useNavigate();
+  const [_, startTransition] = useTransition();
+  const [deferredLocation, setDeferredLocation] = useState(location);
+
+  useEffect(() => {
+    startTransition(() => {
+      setDeferredLocation(location);
+    });
+  }, [location, startTransition]);
   const { layoutInspectorEnabled, setLayoutInspectorEnabled, guidesEnabled, setGuidesEnabled, copiedDesign, setCopiedDesign, belt2GuidesEnabled, setBelt2GuidesEnabled, megaAccordionLocked, setMegaAccordionLocked } = useDebugToggles({ locationSearch: location.search });
   const beltEnabledFromUrl = (() => {
     try {
@@ -332,7 +340,7 @@ function App() {
         >
           <Suspense fallback={<LoadingScreen />}>
             <AppRoutes
-              location={location}
+              location={deferredLocation}
               pageProps={pageProps}
               pautaEnabled={pautaEnabled}
               tableEnabled={tableEnabled}

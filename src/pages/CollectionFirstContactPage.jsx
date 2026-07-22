@@ -8,6 +8,7 @@ import CollectionProductCardV5 from '@/components/tdp/CollectionProductCardV5';
 import CollectionTdpCard from '@/components/tdp/CollectionTdpCard';
 import TramFinal from '@/components/home/TramFinal';
 import { buildOtherCollectionsImages } from '@/components/home/homeDrawings';
+import Breadcrumbs from '@/components/Breadcrumbs';
 
 const COLLECTION_BG_SRC = '/tmp/PAGINES/PAGINES TIPUS/00 COLLECCIO.png';
 
@@ -171,6 +172,7 @@ function CollectionFirstContactPage() {
         />
       </Helmet>
 
+      <div style={{ transform: 'scale(0.94)', transformOrigin: 'top center' }}>
       <Pauta4ColsOverlay
         pautaEnabled={false}
         tableEnabled={false}
@@ -180,6 +182,18 @@ function CollectionFirstContactPage() {
         topOffset="76px"
         bottomPadding="0px"
       >
+        {/* Breadcrumbs (fila 2 / 3) */}
+        <div
+          style={{
+            gridColumn: '1 / 4',
+            gridRow: '2 / 3',
+            alignSelf: 'start',
+            transform: 'translateY(-86px)',
+          }}
+        >
+          <Breadcrumbs items={[{ label: 'First Contact' }]} />
+        </div>
+
         <div
           aria-label="Títol col·lecció"
           style={{
@@ -302,6 +316,7 @@ function CollectionFirstContactPage() {
         posterLines={[{ text: 'CADA' }, { text: 'PERSONA TÉ' }, { text: 'UNA HISTÒRIA' }]}
         tambeImages={otherImages}
       />
+      </div>
 
       <div
         className="font-mono text-neutral-800"

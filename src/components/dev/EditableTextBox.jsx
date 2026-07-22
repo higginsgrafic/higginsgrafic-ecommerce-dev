@@ -65,7 +65,7 @@ function EditableTextBox({
   const textStyle = {
     color: settings.color,
     fontFamily: `${settings.fontFamily}, sans-serif`,
-    fontSize: `${settings.fontSize}pt`,
+    fontSize: typeof settings.fontSize === 'string' ? settings.fontSize : `${settings.fontSize}pt`,
     fontWeight: settings.fontWeight,
     letterSpacing: `${settings.letterSpacing}em`,
     lineHeight: settings.lineHeight,

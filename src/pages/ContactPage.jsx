@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Mail, MessageSquare, Clock, MapPin } from 'lucide-react';
 import SEO from '@/components/SEO';
+import Breadcrumbs from '@/components/Breadcrumbs';
 
 function ContactPage() {
   const [formData, setFormData] = useState({
@@ -77,7 +78,10 @@ function ContactPage() {
       />
 
       <div className="min-h-screen bg-white flex items-center justify-center px-4">
-        <div className="w-full max-w-md">
+        <div className="w-full max-w-md pt-[129px] lg:pt-[145px]">
+          <div className="mb-6">
+            <Breadcrumbs items={[{ label: 'Contacte' }]} />
+          </div>
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
