@@ -27,7 +27,7 @@ function MiscellaniaPage({ onAddToCart, cartItems, onUpdateQuantity }) {
                 items={[
                   { label: 'Miscel·lània' }
                 ]}
-                lightMode={true}
+
               />
             </div>
 

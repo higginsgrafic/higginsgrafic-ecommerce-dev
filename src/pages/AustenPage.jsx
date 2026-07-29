@@ -26,7 +26,7 @@ function AustenPage({ onAddToCart, cartItems, onUpdateQuantity }) {
                 items={[
                   { label: 'Austen' }
                 ]}
-                lightMode={true}
+
               />
             </div>
 

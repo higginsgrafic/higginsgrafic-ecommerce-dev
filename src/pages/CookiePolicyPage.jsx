@@ -1,116 +1,91 @@
 import React, { useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import SEO from '@/components/SEO';
 
-function PrivacyPage() {
+function CookiePolicyPage() {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
 
   const sections = [
     {
-      bullet: '1. Quina informació recollim',
+      bullet: '1. Què són les Cookies?',
+      paragraph: 'Les cookies són petits fitxers de text que els llocs web col·loquen al navegador dels dispositius dels usuaris. Permeten reconèixer l\'usuari en visites posteriors i emmagatzemar informació sobre les seves preferències i comportament de navegació.',
       items: [
-        'Nom',
-        'Correu electrònic',
-        'Adreça',
-        'Número de telèfon',
-        'Informació de pagament',
-        'Preferències de compra.',
+        'Les cookies són essencials per al funcionament d\'Internet, aportant nombroses avantatges en la prestació de serveis interactius.',
       ],
     },
     {
-      bullet: '2. En quins casos es fa servir',
+      bullet: '2. Tipus de Cookies que Utilitzem',
+      paragraph: '2.1 Cookies essencials (tècniques) — Són necessàries per al funcionament bàsic del lloc web. Permeten la navegació, l\'accés a àrees segures i la realització de compres. No es poden desactivar.',
       items: [
-        'Processar i complir les comandes.',
-        'Comunicació de les comandes i el nostre servei.',
-        'Obtenir estadístiques de la botiga.',
-        'Millorar els nostres productes i serveis.',
-        'Detectar i prevenir fraus.',
-        'Complir amb el nostre deure legal.',
+        'Mantenir la sessió d\'usuari',
+        'Recordar els productes de la cistella',
+        'Garantir la seguretat de les transaccions',
       ],
     },
     {
-      bullet: '3. Amb qui compartim la informació',
+      bullet: '2.2 Cookies analítiques',
+      paragraph: 'Permeten quantificar el nombre d\'usuaris i analitzar l\'ús que fan del lloc web, per millorar el servei.',
       items: [
-        'Proveïdors de serveis que ens ajuden a operar el nostre negoci (pagaments, enviament, hosting, etc.).',
-        'Els impressors encarregats de la fabricació i enviament dels productes.',
-        'Google Analytics per a les estadístiques del nostre lloc web.',
-        'Autoritats legals quan així sigui requerit per llei o per protegir-nos els drets.',
-        'No venem ni lloguem informació personal a/o de tercers.',
+        'Google Analytics: mesura visites, pàgines vistes, temps de permanència',
+        'Dades agregades i anònimes',
       ],
     },
     {
-      bullet: '4. Fem servir les cookies per',
+      bullet: '2.3 Cookies de màrqueting',
+      paragraph: 'Gestiona i controla la publicitat mostrada a l\'usuari.',
       items: [
-        'Recordar les preferències i configuració.',
-        'Entendre com s\'utilitza el nostre lloc web.',
-        'Personalitzar el contingut i els anuncis.',
-        'Millorar el rendiment del lloc web.',
+        'Actualment no utilitzem cookies de màrqueting de tercers',
+        'Només utilitzem les nostres pròpies comunicacions si l\'usuari s\'ha subscrit',
       ],
-      note: 'Podeu gestionar les preferències de cookies a través de la configuració del navegador. Tingueu en compte que deshabilitar certes cookies pot afectar la funcionalitat correcta del lloc web.',
+    },
+    {
+      bullet: '3. Cookies de Tercers',
+      paragraph: 'El lloc web utilitza serveis de tercers que poden instal·lar cookies:',
+      items: [
+        'Stripe — Processament de pagaments. Necessari per completar les transaccions de forma segura. No emmagatzema dades de targetes.',
+        'Gelato — Soci de producció i enviament. Pot utilitzar cookies per gestionar les comandes.',
+        'Google Analytics (si està activat) — Anàlisi del comportament dels usuaris de forma anònima.',
+      ],
+      note: 'Aquests tercers gestionen les seves pròpies polítiques de cookies segons les seves condicions.',
       noteBold: true,
     },
     {
-      bullet: '5. Seguretat de les Dades',
-      paragraph: 'A Higgins GRÀFIC ens prenem seriosament la seguretat de les dades i hem disposat les mesures, tècniques i organitzatives, adequades per a protegir la informació personal de l\'accés no autoritzat, l\'alteració, la divulgació o la destrucció de les dades dels nostres clients.',
-      note: 'Disposem de xifrat SSL per protegir la informació confidencial durant les operacions.',
+      bullet: '4. Durada de les Cookies',
+      paragraph: 'Les cookies poden ser:',
+      items: [
+        'De sessió — S\'esborren quan l\'usuari tanca el navegador.',
+        'Persistents — Permaneixen al dispositiu durant un període determinat (des de minuts fins a anys).',
+      ],
+      note: 'La majoria de cookies que utilitzem són de sessió o tenen una durada curta. Les cookies analítiques, si s\'activen, tenen una durada màxima de 2 anys.',
       noteBold: true,
     },
     {
-      bullet: '6. Quins són els teus drets',
+      bullet: '5. Gestió de les Cookies',
+      paragraph: 'Pots gestionar les preferències de cookies de diverses maneres:',
       items: [
-        'Accés — Demanar una còpia de les dades personals.',
-        'Rectificació — Corregir dades inexactes o incompletes.',
-        'Supressió — Sol·licitar l\'eliminació de les dades ("dret a l\'oblit").',
-        'Restricció — Limitar el tractament de les dades.',
-        'Portabilitat — Rebre les dades en un format estructurat.',
-        'Oposició — Oposar-vos al tractament de les dades.',
-        'No ser objecte de decisions automatitzades.',
-      ],
-      note: 'Per exercir aquests drets contacteu amb nosaltres a higginsgrafic@gmail.com.',
-      noteBold: true,
-    },
-    {
-      bullet: '7. Retenció de Dades',
-      paragraph: 'Conservem la informació personal durant el temps necessari per complir amb els fins descrits en aquesta política, tret que la llei requereixi o permeti un període de retenció més llarg.',
-      items: [
-        'Comandes: 10 anys (obligació fiscal).',
-        'Compte: Mentre el compte estigui actiu.',
-        'Màrqueting: Fins que retires el consentiment.',
-        'Cookies: Segons la configuració del navegador.',
+        'Chrome: Configuració > Privacitat i seguretat > Cookies',
+        'Firefox: Preferències > Privacitat i seguretat > Cookies',
+        'Safari: Preferències > Privacitat > Cookies',
+        'Edge: Configuració > Cookies i permisos del lloc',
       ],
     },
     {
-      bullet: '8. Transferències Internacionals',
-      paragraph: 'Les dades poden ser transferides i processades fora de l\'Espai Econòmic Europeu (EEE), incloent:',
+      bullet: '6. Actualitzacions',
+      paragraph: 'Higgins GRÀFIC pot modificar aquesta política de cookies en qualsevol moment per adaptar-la a les novetats legislatives o jurisprudencials, o a les instruccions dictades per l\'Agència Espanyola de Protecció de Dades (AEPD).',
       items: [
-        'Servidors de Netlify (Estats Units).',
-        'Sistemes de Gelato (global).',
-        'Stripe (global).',
-        'Etc.',
+        'Qualsevol canvi significatiu serà comunicat als usuaris a través d\'un avís visible al lloc web.',
       ],
-      note: 'En aquests casos, ens assegurem que es prenguin les mesures adequades per a protegir les dades d\'acord amb el RGPD, com ara les clàusules contractuals aprovades per la Comissió Europea.',
-      noteBold: true,
     },
     {
-      bullet: '9. Menors d\'Edat',
-      paragraph: 'Els nostres serveis no estan dirigits a menors de 16 anys. No obstant, a vegades, és impossible discriminar entre els clients. No recopilem, de forma conscient, cap mena d\'informació personal de menors de 16 anys. Si sou pare/mare o tutor i creieu que el vostre fill ens ha proporcionat informació personal, us preguem que us poseu en contacte amb nosaltres per a poder rescindir les dades.',
-    },
-    {
-      bullet: '10. Canvis a Aquesta Política',
-      paragraph: 'Us volem fer avinent que les polítiques de privacitat són susceptibles de rebre canvis o retocs puntuals per tal de reflectir la realitat social o, també, canvis que afectin la nostra operativa ja sigui, per raons legals, per qüestions reguladores, etc. Informarem de qualsevol canvi tot publicant la nova edició en aquesta pàgina i actualitzarem la data de la darrera actualització a la part superior. Recomanem revisar aquesta política, de tant en tant, per estar al dia sobre com protegim la informació.',
-    },
-    {
-      bullet: '11. Contacte',
-      paragraph: 'Si teniu preguntes o preocupacions sobre aquesta Política de Privacitat o sobre com gestionem les dades personals ens les podeu fer arribar a:',
+      bullet: '7. Contacte',
+      paragraph: 'Si tens qualsevol dubte sobre la nostra política de cookies, pots contactar amb nosaltres:',
       contact: [
-        'Higgins GRÀFIC',
-        'Carrer Convent, 11',
-        'Cardedeu 08440, Barcelona',
-        '(a determinar)',
         'higginsgrafic@gmail.com',
       ],
-      note: 'També teniu dret a presentar una reclamació davant l\'Agència Espanyola de Protecció de Dades (AEPD) si considereu que el tractament de les dades personals vulnera la normativa aplicable.',
+      note: 'També pots consultar la nostra Política de Privacitat per a més informació sobre el tractament de dades personals.',
+      noteLink: '/privacy',
       noteBold: true,
     },
   ];
@@ -118,11 +93,11 @@ function PrivacyPage() {
   return (
     <>
       <SEO
-        title="Política de Privacitat | Higgins GRÀFIC"
-        description="Política de privacitat de Higgins GRÀFIC. Informació sobre com recopilem, utilitzem i protegim les dades personals segons el RGPD i LOPDGDD."
-        keywords="política privacitat higgins gràfic, rgpd, protecció dades, privacitat"
+        title="Política de Cookies | Higgins GRÀFIC"
+        description="Política de cookies de Higgins GRÀFIC. Informació sobre els tipus de cookies que utilitzem, la seva finalitat i com gestionar-les segons la normativa vigent."
+        keywords="política cookies gràfic, cookies, privacitat, RGPD, configuració cookies"
         type="website"
-        url="/privacy"
+        url="/cookies"
       />
 
       <div
@@ -132,9 +107,9 @@ function PrivacyPage() {
         <div className="pt-[129px] lg:pt-[145px] relative" style={{ zIndex: 1 }} />
 
         {/* Title + subtitle — centered, outside columns */}
-        <div className="mx-auto px-6 lg:px-8 relative text-center" style={{ zIndex: 1, maxWidth: '1100px' }}>
+        <div className="mx-auto px-6 lg:px-8 relative text-right w-fit" style={{ zIndex: 1, maxWidth: '1100px' }}>
           <h1 className="font-roboto text-[30pt] font-normal uppercase text-[#141414] mb-1">
-            Política de Privacitat
+            Política de Cookies
           </h1>
           <p className="font-roboto text-[10pt] font-normal text-gray-500 mb-40">
             Darrera actualització, juliol 2026
@@ -151,7 +126,7 @@ function PrivacyPage() {
             backgroundSize: '102% 100%',
             backgroundAttachment: 'scroll',
             paddingTop: '100px',
-            paddingBottom: '30px',
+            paddingBottom: '0px',
           }}
         >
 
@@ -162,12 +137,12 @@ function PrivacyPage() {
             {/* Intro */}
             <div className="mb-10 self-center w-[500px] bg-white border border-[#DFEBED] rounded-md p-[26px]">
               <p className="font-roboto text-[8pt] font-bold text-gray-800 leading-[1.25] text-justify" style={{ hyphens: 'auto', WebkitHyphens: 'auto' }}>
-                A Higgins GRÀFIC, tenim el compromís ferm de protegir la privacitat i les dades personals dels nostres clients. Aquesta Política de Privacitat explica com recopilem, protegim, fem servir i compartim la informació quan utilitzeu el nostre lloc web i els seus serveis, en compliment amb el Reglament General de Protecció de Dades (RGPD) de la Unió Europea i la Llei Orgànica de Protecció de Dades Personals i Garantia dels Drets Digitals de la (LOPDGDD).
+                Higgins GRÀFIC utilitza cookies per millorar l'experiència de navegació i oferir un servei de qualitat. Aquesta política explica quines cookies utilitzem, per què i com pots gestionar-les, en compliment amb la Llei 34/2002 de serveis de la societat de la informació i de comerç electrònic (LSSI) i el Reglament General de Protecció de Dades (RGPD).
               </p>
             </div>
 
-            {/* Sections 0-5 */}
-            {sections.slice(0, 6).map((section, i) => (
+            {/* Sections 0-4 */}
+            {sections.slice(0, 5).map((section, i) => (
               <div key={i} className="mb-7">
                 <h2 className="font-roboto text-[10pt] font-normal text-[#141414] mb-0 flex items-start gap-2">
                   <span className="text-[#141414]">•</span>
@@ -207,7 +182,13 @@ function PrivacyPage() {
                 {section.note && section.noteBold && (
                   <div className="mt-[66px] mb-[66px] self-center w-[500px] bg-white border border-[#DFEBED] rounded-md p-[26px]">
                     <p className="font-roboto text-[8pt] font-medium leading-[1.25] text-gray-700">
-                      {section.note}
+                      {section.noteLink ? (
+                        <>
+                          {section.note.split('Política de Privacitat')[0]}
+                          <Link to={section.noteLink} className="underline hover:text-gray-900">Política de Privacitat</Link>
+                          {section.note.split('Política de Privacitat')[1]}
+                        </>
+                      ) : section.note}
                     </p>
                   </div>
                 )}
@@ -222,9 +203,9 @@ function PrivacyPage() {
 
           {/* Right column */}
           <div className="flex-1 min-w-0">
-            {/* Sections 6-11 */}
-            {sections.slice(6).map((section, i) => (
-              <div key={i + 6} className="mb-7">
+            {/* Sections 5+ */}
+            {sections.slice(5).map((section, i) => (
+              <div key={i + 5} className="mb-7">
                 <h2 className="font-roboto text-[10pt] font-normal text-[#141414] mb-0 flex items-start gap-2">
                   <span className="text-[#141414]">•</span>
                   <span>{section.bullet}</span>
@@ -263,7 +244,13 @@ function PrivacyPage() {
                 {section.note && section.noteBold && (
                   <div className="mt-[66px] mb-[66px] self-center w-[500px] bg-white border border-[#DFEBED] rounded-md p-[26px]">
                     <p className="font-roboto text-[8pt] font-medium leading-[1.25] text-gray-700">
-                      {section.note}
+                      {section.noteLink ? (
+                        <>
+                          {section.note.split('Política de Privacitat')[0]}
+                          <Link to={section.noteLink} className="underline hover:text-gray-900">Política de Privacitat</Link>
+                          {section.note.split('Política de Privacitat')[1]}
+                        </>
+                      ) : section.note}
                     </p>
                   </div>
                 )}
@@ -275,15 +262,10 @@ function PrivacyPage() {
               </div>
             ))}
 
-            {/* AEPD link */}
-            <p className="font-roboto text-[10pt] font-light text-gray-700 text-center mt-[-5px] mb-[61px]">
-              <a href="https://www.aepd.es" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-900">www.aepd.es</a>
-            </p>
-
             {/* Footer */}
             <div className="mt-10 self-center w-[500px] bg-white border border-[#DFEBED] rounded-md p-[26px]">
               <p className="font-roboto text-[8pt] font-bold text-gray-700 leading-[1.25]">
-                Aquesta Política de Privacitat està obligatòriament subjecta a la legislació espanyola i europea. Fer servir els nostres serveis equival a l'acceptació, de facto, de la Política de Privacitat.
+                Aquesta Política de Cookies està obligatòriament subjecta a la legislació espanyola i europea. Fer servir els nostres serveis equival a l'acceptació, de facto, de la Política de Cookies.
               </p>
             </div>
           </div>
@@ -291,11 +273,11 @@ function PrivacyPage() {
         </div>
 
         {/* Spacer between background and footer */}
-        <div className="h-[200px]" />
+        <div className="h-[300px]" />
 
       </div>
     </>
   );
 }
 
-export default PrivacyPage;
+export default CookiePolicyPage;

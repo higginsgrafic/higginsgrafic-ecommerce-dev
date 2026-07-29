@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Ruler, Info, AlertCircle } from 'lucide-react';
 import SEO from '@/components/SEO';
-import Breadcrumbs from '@/components/Breadcrumbs';
 
 function SizeGuidePage() {
   const [unit, setUnit] = useState('cm'); // cm o inches
@@ -79,12 +78,6 @@ function SizeGuidePage() {
         {/* Header */}
         <div className="bg-gray-900 text-white pt-[129px] lg:pt-[145px] pb-16 lg:pb-24">
           <div className="max-w-4xl mx-auto px-4 lg:px-8">
-            <div className="mb-8">
-              <Breadcrumbs
-                items={[{ label: 'Guia de Talles' }]}
-                lightMode={true}
-              />
-            </div>
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}

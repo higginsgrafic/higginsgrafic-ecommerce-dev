@@ -26,7 +26,7 @@ function TheHumanInsidePage({ onAddToCart, cartItems, onUpdateQuantity }) {
                 items={[
                   { label: 'The Human Inside' }
                 ]}
-                lightMode={true}
+
               />
             </div>
 

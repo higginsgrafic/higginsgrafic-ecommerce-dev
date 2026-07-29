@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom';
 import { useTexts } from '@/hooks/useTexts';
 import { ExternalLink } from 'lucide-react';
 import SEO from '@/components/SEO';
-import Breadcrumbs from '@/components/Breadcrumbs';
 
 const CreativeCommonsPage = () => {
   const texts = useTexts();
@@ -19,9 +18,6 @@ const CreativeCommonsPage = () => {
       />
 
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-20">
-        <div className="mb-6">
-          <Breadcrumbs items={[{ label: 'Creative Commons' }]} />
-        </div>
         {/* Header */}
         <div className="mb-8 lg:mb-12">
           <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold font-oswald uppercase mb-4" style={{ color: '#141414' }}>

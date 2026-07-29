@@ -189,7 +189,7 @@ function CollectionPage({ config, onAddToCart, cartItems, onUpdateQuantity }) {
             <div className="mb-8">
               <Breadcrumbs
                 items={[{ label: (config?.breadcrumbLabel || title || '').toString() }]}
-                lightMode={true}
+
               />
             </div>
 

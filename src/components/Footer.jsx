@@ -154,7 +154,6 @@ const Footer = () => {
       className="bg-white transition-colors duration-200"
       style={{
         ...(isSectionEnabled('footer') ? getDebugStyle('footer', 'main') : {}),
-        transform: 'translateY(100px)',
       }}
     >
       {/* PEU DE COL·LECCIONS DESKTOP - Centrat simètricament - Fons gris clar - VISIBLE PRIMER */}
@@ -376,17 +375,9 @@ const Footer = () => {
       <div className="bg-white transition-colors duration-200">
         <div className="max-w-7xl mx-auto py-[82px] lg:py-[98px] px-4 lg:px-8">
           <div
-            className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-x-6 gap-y-12 lg:gap-x-12"
-            style={isSectionEnabled('footer') ? getDebugStyle('footer', 'row1') : {}}
+            className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-x-6 gap-y-12 lg:gap-x-12 mx-auto"
+            style={{ ...(isSectionEnabled('footer') ? getDebugStyle('footer', 'row1') : {}), maxWidth: '600px' }}
           >
-            {/* Botiga */}
-            <div className="text-left">
-              <p className="font-oswald font-semibold mb-3 lg:mb-4 text-[13pt] lg:text-[14pt] text-foreground">{texts.footer.services.shop.title}</p>
-              <ul className="space-y-2.5 lg:space-y-3 text-left">
-                <li><Link to="/offers" className="font-roboto text-sm font-normal transition-all inline-block text-foreground" style={{ opacity: 0.75 }} onMouseEnter={(e) => { const color = document.documentElement.classList.contains('dark') ? '#ffffff' : 'hsl(var(--foreground))'; e.target.style.textShadow = `0 0 0.55px ${color}, 0 0 0.55px ${color}`; }} onMouseLeave={(e) => e.target.style.textShadow = 'none'}>{texts.footer.services.shop.offers}</Link></li>
-              </ul>
-            </div>
-
             {/* Client */}
             <div className="text-left">
               <p className="font-oswald font-semibold mb-3 lg:mb-4 text-[13pt] lg:text-[14pt] text-foreground">{texts.footer.services.customer.title}</p>
@@ -414,25 +405,11 @@ const Footer = () => {
               <ul className="space-y-2.5 lg:space-y-3 text-left">
                 <li><Link to="/privacy" className="font-roboto text-sm font-normal transition-all inline-block text-foreground" style={{ opacity: 0.75 }} onMouseEnter={(e) => { const color = document.documentElement.classList.contains('dark') ? '#ffffff' : 'hsl(var(--foreground))'; e.target.style.textShadow = `0 0 0.55px ${color}, 0 0 0.55px ${color}`; }} onMouseLeave={(e) => e.target.style.textShadow = 'none'}>{texts.footer.services.legal.privacy}</Link></li>
                 <li><Link to="/terms" className="font-roboto text-sm font-normal transition-all inline-block text-foreground" style={{ opacity: 0.75 }} onMouseEnter={(e) => { const color = document.documentElement.classList.contains('dark') ? '#ffffff' : 'hsl(var(--foreground))'; e.target.style.textShadow = `0 0 0.55px ${color}, 0 0 0.55px ${color}`; }} onMouseLeave={(e) => e.target.style.textShadow = 'none'}>{texts.footer.services.legal.terms}</Link></li>
+                <li><Link to="/legal" className="font-roboto text-sm font-normal transition-all inline-block text-foreground" style={{ opacity: 0.75 }} onMouseEnter={(e) => { const color = document.documentElement.classList.contains('dark') ? '#ffffff' : 'hsl(var(--foreground))'; e.target.style.textShadow = `0 0 0.55px ${color}, 0 0 0.55px ${color}`; }} onMouseLeave={(e) => e.target.style.textShadow = 'none'}>Avís Legal</Link></li>
+                <li><Link to="/cookies" className="font-roboto text-sm font-normal transition-all inline-block text-foreground" style={{ opacity: 0.75 }} onMouseEnter={(e) => { const color = document.documentElement.classList.contains('dark') ? '#ffffff' : 'hsl(var(--foreground))'; e.target.style.textShadow = `0 0 0.55px ${color}, 0 0 0.55px ${color}`; }} onMouseLeave={(e) => e.target.style.textShadow = 'none'}>Cookies</Link></li>
               </ul>
             </div>
 
-            {/* Idioma */}
-            <div className="text-left">
-              <p className="font-oswald font-semibold mb-3 lg:mb-4 text-[13pt] lg:text-[14pt] text-foreground">{texts.footer.services.language.title}</p>
-              <ul className="space-y-2.5 lg:space-y-3 text-left">
-                <li>
-                  <span className="font-roboto text-sm font-bold text-foreground">
-                    Català
-                  </span>
-                </li>
-                <li>
-                  <span className="font-roboto text-sm font-normal cursor-not-allowed text-foreground" style={{ opacity: 0.3 }}>
-                    English
-                  </span>
-                </li>
-              </ul>
-            </div>
           </div>
         </div>
       </div>

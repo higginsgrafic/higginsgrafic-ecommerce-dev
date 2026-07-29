@@ -2,7 +2,6 @@ import React, { useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Heart, Globe, Leaf, Users, Lightbulb, Target } from 'lucide-react';
 import SEO from '@/components/SEO';
-import Breadcrumbs from '@/components/Breadcrumbs';
 
 function AboutPage() {
   useEffect(() => {
@@ -84,12 +83,6 @@ function AboutPage() {
         {/* Hero */}
         <div className="bg-gray-900 text-white py-24 lg:py-32">
           <div className="max-w-4xl mx-auto px-4 lg:px-8">
-            <div className="mb-8">
-              <Breadcrumbs
-                items={[{ label: 'Sobre Nosaltres' }]}
-                lightMode={true}
-              />
-            </div>
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}

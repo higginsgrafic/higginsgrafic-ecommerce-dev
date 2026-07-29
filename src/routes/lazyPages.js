@@ -18,6 +18,8 @@ export const SizeGuidePage = lazy(() => import('@/pages/SizeGuidePage'));
 export const PrivacyPage = lazy(() => import('@/pages/PrivacyPage'));
 export const TermsPage = lazy(() => import('@/pages/TermsPage'));
 export const CreativeCommonsPage = lazy(() => import('@/pages/CreativeCommonsPage'));
+export const LegalNoticePage = lazy(() => import('@/pages/LegalNoticePage'));
+export const CookiePolicyPage = lazy(() => import('@/pages/CookiePolicyPage'));
 export const TdpPage = lazy(() => import('@/pages/TdpPage'));
 export const AdminStudioHomePage = lazy(() => import('@/pages/AdminStudioHomePage'));
 export const AdminDemosPage = lazy(() => import('@/pages/AdminDemosPage'));
