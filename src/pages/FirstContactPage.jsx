@@ -48,7 +48,7 @@ function FirstContactPage({ onAddToCart, cartItems, onUpdateQuantity }) {
                 items={[
                   { label: 'First Contact' }
                 ]}
-                lightMode={true}
+
               />
             </div>
 

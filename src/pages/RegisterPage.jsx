@@ -3,7 +3,6 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { User, Mail, Lock, Eye, EyeOff, UserPlus } from 'lucide-react';
 import SEO from '@/components/SEO';
-import Breadcrumbs from '@/components/Breadcrumbs';
 
 export default function RegisterPage() {
   const [fullName, setFullName] = useState('');
@@ -46,9 +45,6 @@ export default function RegisterPage() {
       <SEO title="Registre — Higgins Gràfic" />
       <div className="min-h-screen bg-neutral-50 flex items-center justify-center p-4">
         <div className="w-full max-w-md pt-[129px] lg:pt-[145px]">
-          <div className="mb-6">
-            <Breadcrumbs items={[{ label: 'Registre' }]} />
-          </div>
           <div className="bg-white rounded-lg shadow-lg p-8">
             <div className="flex items-center justify-center mb-6">
               <div className="p-3 bg-neutral-100 rounded-full">

@@ -230,7 +230,9 @@ function App() {
   const offersHeaderTop = adminBannerVisible ? adminBannerHeight : 0;
   const adminRouteDevHeaderHeight = (isAdminRoute && devHeaderVisible) ? baseHeaderHeight : 0;
 
-  const rulersOverlayActive = rulersOverlayEnabled && (isAdmin || isDevDemoRoute || isFullWideSlideRoute) && location.pathname !== '/ec-preview' && location.pathname !== '/ec-preview-lite' && !isEmbeddedPreview;
+  const isPrivacyRoute = location.pathname === '/privacy';
+  const debugOverlaysRoute = isAdmin || isDevDemoRoute || isFullWideSlideRoute || isPrivacyRoute;
+  const rulersOverlayActive = rulersOverlayEnabled && debugOverlaysRoute && location.pathname !== '/ec-preview' && location.pathname !== '/ec-preview-lite' && !isEmbeddedPreview;
   const rulerInset = rulersOverlayActive ? 18 : 0;
 
   const adminRouteOffset = `${adminBannerHeight + adminRouteDevHeaderHeight + rulerInset}px`;
@@ -410,7 +412,7 @@ function App() {
               setLayoutInspectorEnabled={setLayoutInspectorEnabled}
             />
 
-                {debugOverlaysEnabled && (isAdmin || isDevDemoRoute || isFullWideSlideRoute) && location.pathname !== '/ec-preview' && location.pathname !== '/ec-preview-lite' && !isEmbeddedPreview ? (
+                {debugOverlaysEnabled && debugOverlaysRoute && location.pathname !== '/ec-preview' && location.pathname !== '/ec-preview-lite' && !isEmbeddedPreview ? (
                   <DebugButtonsBar
                     debugButtonsWrapRef={debugButtonsWrapRef}
                     clicksEnabled={clicksEnabled}

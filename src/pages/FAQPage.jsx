@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronDown, ChevronUp, Search } from 'lucide-react';
 import SEO from '@/components/SEO';
-import Breadcrumbs from '@/components/Breadcrumbs';
 
 function FAQPage() {
   const [openIndex, setOpenIndex] = useState(null);
@@ -152,12 +151,6 @@ function FAQPage() {
         {/* Header */}
         <div className="bg-gray-900 text-white pt-[129px] lg:pt-[145px] pb-16 lg:pb-24">
           <div className="max-w-4xl mx-auto px-4 lg:px-8">
-            <div className="mb-8">
-              <Breadcrumbs
-                items={[{ label: 'FAQ' }]}
-                lightMode={true}
-              />
-            </div>
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}

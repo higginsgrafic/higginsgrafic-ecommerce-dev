@@ -26,7 +26,7 @@ function CubePage({ onAddToCart, cartItems, onUpdateQuantity }) {
                 items={[
                   { label: 'Cube' }
                 ]}
-                lightMode={true}
+
               />
             </div>
 

@@ -79,6 +79,8 @@ export default function AppRoutes({ location, pageProps, pautaEnabled, tableEnab
         <Route path="/privacy" element={<P.PrivacyPage />} />
         <Route path="/terms" element={<P.TermsPage />} />
         <Route path="/cc" element={<P.CreativeCommonsPage />} />
+        <Route path="/legal" element={<P.LegalNoticePage />} />
+        <Route path="/cookies" element={<P.CookiePolicyPage />} />
         <Route path="/offers" element={<P.OffersPage />} />
 
         <Route path="/constructor/tdp" element={<P.TdpPage pautaEnabled={false} tableEnabled={false} />} />
