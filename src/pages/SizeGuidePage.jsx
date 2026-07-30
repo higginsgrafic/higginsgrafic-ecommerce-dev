@@ -1,376 +1,219 @@
-import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { Ruler, Info, AlertCircle } from 'lucide-react';
+import React, { useEffect } from 'react';
 import SEO from '@/components/SEO';
 
 function SizeGuidePage() {
-  const [unit, setUnit] = useState('cm'); // cm o inches
-
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
 
-  const sizeChartCm = [
-    { size: 'S', chest: '94-97', length: '71', sleeve: '19' },
-    { size: 'M', chest: '99-102', length: '74', sleeve: '20' },
-    { size: 'L', chest: '104-107', length: '76', sleeve: '21' },
-    { size: 'XL', chest: '109-112', length: '78', sleeve: '22' },
-    { size: '2XL', chest: '114-117', length: '80', sleeve: '23' }
-  ];
-
-  const sizeChartInches = [
-    { size: 'S', chest: '37-38', length: '28', sleeve: '7.5' },
-    { size: 'M', chest: '39-40', length: '29', sleeve: '7.9' },
-    { size: 'L', chest: '41-42', length: '30', sleeve: '8.3' },
-    { size: 'XL', chest: '43-44', length: '31', sleeve: '8.7' },
-    { size: '2XL', chest: '45-46', length: '31.5', sleeve: '9.1' }
-  ];
-
-  const sizeChart = unit === 'cm' ? sizeChartCm : sizeChartInches;
-
-  const measurementTips = [
+  const sections = [
     {
-      title: 'Pit (Chest)',
-      description: 'Mesura al voltant de la part més ampla del pit, mantenint la cinta mètrica horitzontal.',
-      image: '👕'
+      bullet: '1. Taula de Talles (cm)',
+      table: {
+        headers: ['Talla', 'Pit', 'Llargada', 'Màniga'],
+        rows: [
+          ['S', '94-97', '71', '19'],
+          ['M', '99-102', '74', '20'],
+          ['L', '104-107', '76', '21'],
+          ['XL', '109-112', '78', '22'],
+          ['2XL', '114-117', '80', '23'],
+        ],
+      },
+      note: 'Totes les mesures són aproximades i poden variar ±2 cm.',
     },
     {
-      title: 'Llargada (Length)',
-      description: 'Mesura des del punt més alt de l\'espatlla fins a la vora inferior de la samarreta.',
-      image: '📏'
+      bullet: '2. Taula de Talles (in)',
+      table: {
+        headers: ['Talla', 'Pit', 'Llargada', 'Màniga'],
+        rows: [
+          ['S', '37-38', '28', '7.5'],
+          ['M', '39-40', '29', '7.9'],
+          ['L', '41-42', '30', '8.3'],
+          ['XL', '43-44', '31', '8.7'],
+          ['2XL', '45-46', '31.5', '9.1'],
+        ],
+      },
+      note: 'Totes les mesures són aproximades i poden variar ±2".',
     },
     {
-      title: 'Màniga (Sleeve)',
-      description: 'Mesura des del punt on la màniga es troba amb l\'espatlla fins a la vora de la màniga.',
-      image: '📐'
-    }
-  ];
-
-  const fitGuide = [
-    {
-      fit: 'Ajustada',
-      description: 'Si vols un fit més ajustat al cos, tria la teva talla habitual.',
-      recommendation: 'Talla habitual'
+      bullet: '3. Com es prenen les mesures',
+      items: [
+        'Pit — Passa la cinta mètrica al voltant de la part més ampla del pit de forma horitzontal.',
+        'Llargada — Pren la mida des del punt més alt del coll fins a la cintura de la samarreta.',
+        'Màniga — Pren la mida des del punt on la màniga es troba amb l\'espatlla fins a la vora de la màniga.',
+      ],
+      note: 'Una manera d\'assegurar-te de triar la talla correcta és la de comparar-la amb una samarreta que ja tens i que et va bé. La poses ben plana sobre una superfície llisa -el llit, per exemple- i en prens les mesures del pit, de llargada i de la màniga. Després la compares amb la taula de talles.',
     },
     {
-      fit: 'Relaxada',
-      description: 'Si prefereixes una caiguda més còmoda i ampla, tria una talla més.',
-      recommendation: 'Una talla més'
+      bullet: '4. Quin estil t\'agrada?',
+      items: [
+        'Ajustada — Si vols un fit més ajustat al cos, tria la teva talla habitual.',
+        'Relaxada — Si prefereixes una caiguda més còmoda i ampla, tria una talla més.',
+        'Oversize — Per un look oversized, tria dues talles més grans.',
+      ],
     },
     {
-      fit: 'Oversize',
-      description: 'Per un look oversized, tria dues talles més grans.',
-      recommendation: 'Dues talles més'
-    }
+      bullet: '5. Material i Cura',
+      paragraph: 'Composició: 100% Cotó Orgànic Certificat, 180 g/m² (qualitat prèmium).',
+      items: [
+        'Renta-ho màxim a 30°C.',
+        'Renta-ho del revés per protegir el dibuix.',
+        'No és recomanable fer servir l\'assecadora.',
+        'Planxa-ho del revés a temperatura mitjana.',
+        'No hi facis servir lleixeu',
+      ],
+      note: 'El cotó orgànic es pot encongir lleugerament, fins a un 2 o un 3% després de la primera rentada, per això, les mesures de la taula, són un cop rentats. Segueix les instruccions de cura per mantenir la qualitat i mesures de la samarreta.',
+      noteBold: true,
+    },
+    {
+      bullet: '6. Contacte',
+      paragraph: 'Si no estàs segur de quina talla has de triar, mirarem d\'ajudar-te:',
+      contact: [
+        'higginsgrafic@gmail.com',
+      ],
+      note: 'Ens comprometem a respondre les consultes en un màxim de 48 hores laborables.',
+      noteBold: true,
+    },
   ];
 
   return (
     <>
       <SEO
-        title="Guia de Talles | GRÀFIC"
-        description="Guia de talles de GRÀFIC. Taules de mesures detallades i consells per triar la talla perfecta per a les nostres samarretes. Talles S, M, L, XL, 2XL."
+        title="Guia de Talles | Higgins GRÀFIC"
+        description="Guia de talles de Higgins GRÀFIC. Taules de mesures detallades i consells per triar la talla perfecta per a les nostres samarretes. Talles S, M, L, XL, 2XL."
         keywords="guia talles gràfic, talles samarretes, mides, mesures, com triar talla"
         type="website"
         url="/sizing"
       />
 
-      <div className="min-h-screen bg-white">
-        {/* Header */}
-        <div className="bg-gray-900 text-white pt-[129px] lg:pt-[145px] pb-16 lg:pb-24">
-          <div className="max-w-4xl mx-auto px-4 lg:px-8">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
-            >
-              <div className="flex items-center gap-3 mb-4">
-                <Ruler className="w-10 h-10" />
-                <h1 className="font-oswald text-[36pt] lg:text-[48pt] font-bold uppercase">
-                  Guia de Talles
-                </h1>
-              </div>
-              <p className="font-roboto text-[14pt] text-gray-300">
-                Troba la teva talla perfecta amb les nostres mesures detallades
-              </p>
-            </motion.div>
-          </div>
+      <div
+        className="min-h-screen bg-white relative"
+      >
+        {/* Top spacer for fixed header */}
+        <div className="pt-[129px] lg:pt-[145px] relative" style={{ zIndex: 1 }} />
+
+        {/* Title + subtitle — centered, outside columns */}
+        <div className="relative text-center" style={{ zIndex: 1 }}>
+          <h1 className="font-roboto text-[30pt] font-normal uppercase text-[#141414] mb-1 whitespace-nowrap">
+            Guia de Talles
+          </h1>
+          <p className="font-roboto text-[10pt] font-normal text-gray-500 mb-24 text-center">
+            Darrera actualització, juliol 2026
+          </p>
         </div>
 
-        <div className="max-w-4xl mx-auto px-4 lg:px-8 py-12 lg:py-16">
-          {/* Important Note */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            className="bg-blue-50 border-l-4 border-blue-600 p-6 mb-12"
-          >
-            <div className="flex items-start gap-3">
-              <Info className="w-6 h-6 text-blue-600 flex-shrink-0 mt-1" />
-              <div>
-                <h3 className="font-oswald text-[16pt] font-bold mb-2 text-blue-900">
-                  Consell Important
-                </h3>
-                <p className="font-roboto text-[13pt] text-blue-800 leading-relaxed">
-                  Les nostres samarretes segueixen <strong>talles europees estàndard</strong>.
-                  Per assegurar-te que tries la talla correcta, et recomanem que prenguis mesures
-                  d'una samarreta que t'encaixi bé i les comparis amb la nostra taula de talles.
-                </p>
-              </div>
-            </div>
-          </motion.div>
+        {/* Background wrapper — only around the two columns with margin */}
+        <div
+          className="relative"
+          style={{
+            backgroundImage: 'url(/_TMP/SERVEIS/serveis-fons-1-columna.png)',
+            backgroundRepeat: 'no-repeat',
+            backgroundPosition: 'center top',
+            backgroundSize: '102% 100%',
+            backgroundAttachment: 'scroll',
+            paddingTop: '50px',
+            paddingBottom: '100px',
+          }}
+        >
 
-          {/* Unit Toggle */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.3 }}
-            className="flex justify-center mb-8"
-          >
-            <div className="inline-flex rounded-lg border border-gray-300 overflow-hidden">
-              <button
-                onClick={() => setUnit('cm')}
-                className={`px-6 py-3 font-roboto text-[13pt] font-medium transition-colors ${
-                  unit === 'cm'
-                    ? 'bg-gray-900 text-white'
-                    : 'bg-white text-gray-700 hover:bg-gray-50'
-                }`}
-              >
-                Centímetres (cm)
-              </button>
-              <button
-                onClick={() => setUnit('inches')}
-                className={`px-6 py-3 font-roboto text-[13pt] font-medium transition-colors ${
-                  unit === 'inches'
-                    ? 'bg-gray-900 text-white'
-                    : 'bg-white text-gray-700 hover:bg-gray-50'
-                }`}
-              >
-                Polzades (in)
-              </button>
-            </div>
-          </motion.div>
-
-          {/* Size Chart */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.4 }}
-            className="mb-16"
-          >
-            <h2 className="font-oswald text-[28pt] font-bold mb-6" style={{ color: '#141414' }}>
-              Taula de Talles
-            </h2>
-
-            <div className="overflow-x-auto">
-              <table className="w-full border-collapse">
-                <thead>
-                  <tr className="bg-gray-900 text-white">
-                    <th className="px-6 py-4 font-oswald text-[14pt] font-bold text-left">
-                      TALLA
-                    </th>
-                    <th className="px-6 py-4 font-oswald text-[14pt] font-bold text-left">
-                      PIT ({unit})
-                    </th>
-                    <th className="px-6 py-4 font-oswald text-[14pt] font-bold text-left">
-                      LLARGADA ({unit})
-                    </th>
-                    <th className="px-6 py-4 font-oswald text-[14pt] font-bold text-left">
-                      MÀNIGA ({unit})
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {sizeChart.map((row, index) => (
-                    <tr
-                      key={index}
-                      className={`border-b border-gray-200 ${
-                        index % 2 === 0 ? 'bg-gray-50' : 'bg-white'
-                      } hover:bg-blue-50 transition-colors`}
-                    >
-                      <td className="px-6 py-4 font-oswald text-[16pt] font-bold" style={{ color: '#141414' }}>
-                        {row.size}
-                      </td>
-                      <td className="px-6 py-4 font-roboto text-[14pt] text-gray-700">
-                        {row.chest}
-                      </td>
-                      <td className="px-6 py-4 font-roboto text-[14pt] text-gray-700">
-                        {row.length}
-                      </td>
-                      <td className="px-6 py-4 font-roboto text-[14pt] text-gray-700">
-                        {row.sleeve}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+        {/* Document — single column */}
+        <div className="mx-auto relative" style={{ zIndex: 1, maxWidth: '500px' }}>
+          <div className="w-full">
+            {/* Intro */}
+            <div className="mb-10 self-center w-[500px] bg-white border border-[#DFEBED] rounded-md p-[26px]">
+              <p className="font-roboto text-[8pt] font-bold text-gray-800 leading-[1.25] text-justify" style={{ hyphens: 'auto', WebkitHyphens: 'auto' }}>
+                Les nostres samarretes segueixen el tallatge europeu estàndard. Per assegurar-te que tries la talla correcta et recomanem que comparis la talla que vols amb una samarreta que ja tinguis i que et vagi bé.
+              </p>
             </div>
 
-            <p className="font-roboto text-[11pt] text-gray-500 mt-4 italic">
-              * Totes les mesures són aproximades i poden variar ±2{unit === 'cm' ? 'cm' : '"'}
-            </p>
-          </motion.div>
-
-          {/* How to Measure */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.5 }}
-            className="mb-16"
-          >
-            <h2 className="font-oswald text-[28pt] font-bold mb-6" style={{ color: '#141414' }}>
-              Com Prendre Mesures
-            </h2>
-
-            <div className="grid md:grid-cols-3 gap-6">
-              {measurementTips.map((tip, index) => (
-                <div
-                  key={index}
-                  className="bg-gray-50 border border-gray-200 rounded-lg p-6 hover:border-gray-300 transition-colors"
-                >
-                  <div className="text-4xl mb-4">{tip.image}</div>
-                  <h3 className="font-oswald text-[16pt] font-bold mb-2" style={{ color: '#141414' }}>
-                    {tip.title}
-                  </h3>
-                  <p className="font-roboto text-[13pt] text-gray-700 leading-relaxed">
-                    {tip.description}
+            {/* Sections */}
+            {sections.map((section, i) => (
+              <div key={i} className="mb-7">
+                <h2 className="font-roboto text-[10pt] font-normal text-[#141414] mb-0 flex items-start gap-2">
+                  <span className="text-[#141414]">•</span>
+                  <span>{section.bullet}</span>
+                </h2>
+                {section.paragraph && (
+                  <p className="font-roboto text-[10pt] font-light text-gray-700 leading-[1.5] mb-2 pl-5">
+                    {section.paragraph}
                   </p>
-                </div>
-              ))}
-            </div>
-
-            <div className="bg-yellow-50 border-l-4 border-yellow-600 p-6 mt-8">
-              <div className="flex items-start gap-3">
-                <AlertCircle className="w-6 h-6 text-yellow-600 flex-shrink-0 mt-1" />
-                <div>
-                  <h3 className="font-oswald text-[16pt] font-bold mb-2 text-yellow-900">
-                    Consell Professional
-                  </h3>
-                  <p className="font-roboto text-[13pt] text-yellow-800 leading-relaxed">
-                    La millor manera de triar la talla correcta és comparar amb una samarreta que
-                    ja tens i que t'encaixi perfectament. Col·loca-la plana sobre una superfície i
-                    pren les mesures de pit, llargada i màniga. Després compara amb la nostra taula.
-                  </p>
-                </div>
-              </div>
-            </div>
-          </motion.div>
-
-          {/* Fit Guide */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.6 }}
-            className="mb-16"
-          >
-            <h2 className="font-oswald text-[28pt] font-bold mb-6" style={{ color: '#141414' }}>
-              Tipus de Caiguda
-            </h2>
-
-            <div className="space-y-4">
-              {fitGuide.map((item, index) => (
-                <div
-                  key={index}
-                  className="border border-gray-200 rounded-lg p-6 hover:border-gray-300 transition-colors"
-                >
-                  <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                    <div className="flex-grow">
-                      <h3 className="font-oswald text-[18pt] font-bold mb-2" style={{ color: '#141414' }}>
-                        {item.fit}
-                      </h3>
-                      <p className="font-roboto text-[13pt] text-gray-700 leading-relaxed">
-                        {item.description}
-                      </p>
-                    </div>
-                    <div className="md:text-right flex-shrink-0">
-                      <span className="inline-block bg-gray-900 text-white px-4 py-2 rounded-lg font-roboto text-[12pt] font-medium">
-                        {item.recommendation}
-                      </span>
+                )}
+                {section.table && (
+                  <div className="pl-5 mb-2">
+                    <table className="w-full border-collapse">
+                      <thead>
+                        <tr className="border-b border-gray-300">
+                          {section.table.headers.map((h, k) => (
+                            <th key={k} className="font-roboto text-[8pt] font-normal text-[#141414] text-left py-[4px] px-[8px]">{h}</th>
+                          ))}
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {section.table.rows.map((row, r) => (
+                          <tr key={r} className="border-b border-gray-100">
+                            {row.map((cell, c) => (
+                              <td key={c} className={`font-roboto text-[8pt] py-[4px] px-[8px] ${c === 0 ? 'font-normal text-[#141414]' : 'font-light text-gray-700'}`}>{cell}</td>
+                            ))}
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+                {section.items && (
+                  <ul className="pl-5 mb-0">
+                    {section.items.map((item, j) => {
+                      const dashIdx = item.indexOf(' — ');
+                      const boldPart = dashIdx >= 0 ? item.substring(0, dashIdx) : item;
+                      const restPart = dashIdx >= 0 ? item.substring(dashIdx) : '';
+                      return (
+                        <li key={j} className="font-roboto text-[10pt] font-light text-gray-700 leading-[1.5] flex items-start gap-2">
+                          <span className="text-gray-700 mt-[-1px]">-</span>
+                          <span><span className="font-normal">{boldPart}</span>{restPart}</span>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                )}
+                {section.contact && (
+                  <div className="mt-[66px] mb-[66px] self-center w-[500px] bg-white border border-[#DFEBED] rounded-md p-[26px] text-center">
+                    <div className="inline-block text-left">
+                      {section.contact.map((line, j) => (
+                        <p key={j} className={`font-roboto text-[10pt] leading-[1.5] text-gray-700 ${j === 0 ? 'font-normal' : 'font-light'}`}>
+                          {line}
+                        </p>
+                      ))}
                     </div>
                   </div>
-                </div>
-              ))}
-            </div>
-          </motion.div>
-
-          {/* Material Info */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.7 }}
-            className="mb-16"
-          >
-            <h2 className="font-oswald text-[28pt] font-bold mb-6" style={{ color: '#141414' }}>
-              Material i Cura
-            </h2>
-
-            <div className="bg-gray-50 border border-gray-200 rounded-lg p-6">
-              <div className="space-y-4">
-                <div>
-                  <h3 className="font-oswald text-[16pt] font-bold mb-2" style={{ color: '#141414' }}>
-                    Composició
-                  </h3>
-                  <p className="font-roboto text-[13pt] text-gray-700 leading-relaxed">
-                    100% Cotó Orgànic Certificat | 180 g/m² (qualitat premium)
+                )}
+                {section.note && section.noteBold && (
+                  <div className="mt-[66px] mb-[66px] self-center w-[500px] bg-white border border-[#DFEBED] rounded-md p-[26px]">
+                    <p className="font-roboto text-[8pt] font-medium leading-[1.25] text-gray-700">
+                      {section.note}
+                    </p>
+                  </div>
+                )}
+                {section.note && !section.noteBold && (
+                  <p className="font-roboto pl-5 text-[10pt] font-light leading-[1.5] text-gray-700">
+                    {section.note}
                   </p>
-                </div>
-
-                <div>
-                  <h3 className="font-oswald text-[16pt] font-bold mb-2" style={{ color: '#141414' }}>
-                    Instruccions de Rentat
-                  </h3>
-                  <ul className="font-roboto text-[13pt] text-gray-700 leading-relaxed space-y-2">
-                    <li>• Rentar a 30°C màxim</li>
-                    <li>• Rentar del revés per protegir el disseny</li>
-                    <li>• No utilitzar assecadora</li>
-                    <li>• Planxar del revés a temperatura mitjana</li>
-                    <li>• No utilitzar lleixiu</li>
-                  </ul>
-                </div>
-
-                <div>
-                  <h3 className="font-oswald text-[16pt] font-bold mb-2" style={{ color: '#141414' }}>
-                    Encongiment
-                  </h3>
-                  <p className="font-roboto text-[13pt] text-gray-700 leading-relaxed">
-                    El cotó orgànic pot encongir lleugerament (2-3%) després del primer rentat.
-                    Les mesures de la taula són post-rentat. Segueix les instruccions de cura
-                    per mantenir la qualitat i mesures de la samarreta.
-                  </p>
-                </div>
+                )}
               </div>
-            </div>
-          </motion.div>
+            ))}
 
-          {/* Contact CTA */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.8 }}
-            className="bg-gray-900 text-white rounded-lg p-8 lg:p-12 text-center"
-          >
-            <h2 className="font-oswald text-[28pt] font-bold mb-4">
-              Encara tens Dubtes sobre la Talla?
-            </h2>
-            <p className="font-roboto text-[14pt] text-gray-300 mb-6 max-w-2xl mx-auto">
-              Si no estàs segur/a de quina talla triar, contacta'ns i t'ajudarem a trobar
-              la teva talla perfecta. És millor preguntar abans que haver de fer un canvi després!
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <a
-                href="/contact"
-                className="bg-white text-gray-900 px-8 py-4 rounded-lg font-roboto text-[14pt] font-medium hover:bg-gray-100 transition-colors"
-              >
-                Contacta amb Nosaltres
-              </a>
-              <a
-                href="/faq"
-                className="bg-transparent border-2 border-white text-white px-8 py-4 rounded-lg font-roboto text-[14pt] font-medium hover:bg-white hover:text-gray-900 transition-colors"
-              >
-                Veure FAQ
-              </a>
+            {/* Footer */}
+            <div className="mt-10 self-center w-[500px] bg-white border border-[#DFEBED] rounded-md p-[26px]">
+              <p className="font-roboto text-[8pt] font-bold text-gray-700 leading-[1.25]">
+                Aquesta guia de talles està, obligatòriament, subjecta a la legislació espanyola i europea. Fer servir els nostres serveis equival a l'acceptació, de facto, d'aquesta informació.
+              </p>
             </div>
-          </motion.div>
+          </div>
         </div>
+        </div>
+
+        {/* Spacer between background and footer */}
+        <div className="h-[300px]" />
+
       </div>
     </>
   );
