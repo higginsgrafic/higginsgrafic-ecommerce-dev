@@ -1,110 +1,157 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import { useTexts } from '@/hooks/useTexts';
-import { ExternalLink } from 'lucide-react';
+import React, { useEffect } from 'react';
 import SEO from '@/components/SEO';
 
-const CreativeCommonsPage = () => {
-  const texts = useTexts();
-  const cc = texts.pages.cc;
+function CreativeCommonsPage() {
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
+  const sections = [
+    {
+      bullet: '1. Llicència Creative Commons BY-NC-ND 4.0',
+      paragraph: 'Els dibuixos, imatges i textos originals de Higgins GRÀFIC estan protegits sota la llicència Creative Commons Reconeixement-NoComercial-SenseObraDerivada 4.0 Internacional.',
+    },
+    {
+      bullet: '2. Això vol dir que:',
+      items: [
+        'BY (Reconeixement) — Cal reconèixer l\'autoria de manera adequada.',
+        'NC (No Comercial) — No es pot utilitzar per a finalitats comercials.',
+        'ND (Sense Obra Derivada) — No es pot distribuir obres derivades.',
+      ],
+    },
+    {
+      bullet: '3. Més informació',
+      paragraph: 'Per a més informació sobre aquesta llicència, visita:',
+      contact: [
+        'https://creativecommons.org/licenses/by-nc-nd/4.0/deed.ca',
+      ],
+    },
+    {
+      bullet: '4. Drets reservats',
+      note: 'Tots els drets són reservats per a les marques, logotips i elements distintius de Higgins GRÀFIC.',
+      noteBold: true,
+      noteTopHalf: true,
+    },
+  ];
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <>
       <SEO
-        title={cc.seo.title}
-        description={cc.seo.description}
+        title="Creative Commons | Higgins GRÀFIC"
+        description="Informació sobre la llicència Creative Commons BY-NC-ND 4.0 que protegeix el contingut creatiu de Higgins GRÀFIC."
         type="website"
         url="/cc"
       />
 
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-20">
-        {/* Header */}
-        <div className="mb-8 lg:mb-12">
-          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold font-oswald uppercase mb-4" style={{ color: '#141414' }}>
-            {cc.title}
+      <div
+        className="min-h-screen bg-white relative"
+      >
+        {/* Top spacer for fixed header */}
+        <div className="pt-[129px] lg:pt-[145px] relative" style={{ zIndex: 1 }} />
+
+        {/* Title + subtitle — centered, outside columns */}
+        <div className="relative text-center" style={{ zIndex: 1 }}>
+          <h1 className="font-roboto text-[30pt] font-normal uppercase text-[#141414] mb-1 whitespace-nowrap">
+            Creative Commons
           </h1>
-          <p className="text-base sm:text-lg font-roboto" style={{ color: '#141414', opacity: 0.7 }}>
-            {cc.content}
+          <p className="font-roboto text-[10pt] font-normal text-gray-500 mb-24 text-center">
+            Darrera actualització, juliol 2026
           </p>
         </div>
 
-        {/* Content Card */}
-        <div className="bg-white rounded-lg shadow-sm p-6 sm:p-8 lg:p-10 mb-8">
-          {/* License Name */}
-          <div className="mb-8 pb-6 border-b border-gray-200">
-            <h2 className="text-xl sm:text-2xl font-bold font-oswald uppercase mb-3" style={{ color: '#141414' }}>
-              {cc.license}
-            </h2>
-            <p className="text-sm sm:text-base font-roboto leading-relaxed" style={{ color: '#141414', opacity: 0.8 }}>
-              {cc.description}
-            </p>
-          </div>
+        {/* Background wrapper — only around the content with margin */}
+        <div
+          className="relative"
+          style={{
+            backgroundImage: 'url(/_TMP/SERVEIS/serveis-fons-1-columna.png)',
+            backgroundRepeat: 'no-repeat',
+            backgroundPosition: 'center top',
+            backgroundSize: '102% 100%',
+            backgroundAttachment: 'scroll',
+            paddingTop: '50px',
+            paddingBottom: '100px',
+          }}
+        >
 
-          {/* What it means */}
-          <div className="mb-8">
-            <h3 className="text-lg sm:text-xl font-bold font-oswald uppercase mb-4" style={{ color: '#141414' }}>
-              {cc.meaning}
-            </h3>
-            <ul className="space-y-4">
-              <li className="flex items-start gap-3">
-                <span className="text-2xl flex-shrink-0">✓</span>
-                <p className="text-sm sm:text-base font-roboto" style={{ color: '#141414' }}>
-                  <strong className="font-medium">BY</strong> — {cc.attribution}
-                </p>
-              </li>
-              <li className="flex items-start gap-3">
-                <span className="text-2xl flex-shrink-0">✓</span>
-                <p className="text-sm sm:text-base font-roboto" style={{ color: '#141414' }}>
-                  <strong className="font-medium">NC</strong> — {cc.nonCommercial}
-                </p>
-              </li>
-              <li className="flex items-start gap-3">
-                <span className="text-2xl flex-shrink-0">✓</span>
-                <p className="text-sm sm:text-base font-roboto" style={{ color: '#141414' }}>
-                  <strong className="font-medium">ND</strong> — {cc.noDerivatives}
-                </p>
-              </li>
-            </ul>
-          </div>
+        {/* Document — single column */}
+        <div className="mx-auto relative" style={{ zIndex: 1, maxWidth: '500px' }}>
+          <div className="w-full">
+            {/* Intro */}
+            <div className="mb-10 self-center w-[500px] bg-white border border-[#DFEBED] rounded-md p-[26px]">
+              <p className="font-roboto text-[8pt] font-bold text-gray-800 leading-[1.25] whitespace-nowrap">
+                Tot el contingut creatiu de Higgins GRÀFIC està protegit sota llicència Creative Commons.
+              </p>
+            </div>
 
-          {/* External Link */}
-          <div className="mb-6 p-4 bg-gray-50 rounded-md">
-            <p className="text-sm sm:text-base font-roboto mb-2" style={{ color: '#141414', opacity: 0.8 }}>
-              {cc.moreInfo}
-            </p>
-            <a
-              href={cc.link}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 text-sm sm:text-base font-roboto font-medium hover:underline transition-all"
-              style={{ color: '#141414' }}
-            >
-              Creative Commons Official Website
-              <ExternalLink className="h-4 w-4" />
-            </a>
-          </div>
+            {/* Sections */}
+            {sections.map((section, i) => (
+              <div key={i} className="mb-7">
+                <h2 className="font-roboto text-[10pt] font-normal text-[#141414] mb-0 flex items-start gap-2">
+                  <span className="text-[#141414]">•</span>
+                  <span>{section.bullet}</span>
+                </h2>
+                {section.paragraph && (
+                  <p className="font-roboto text-[10pt] font-light text-gray-700 leading-[1.5] mb-2 pl-5">
+                    {section.paragraph}
+                  </p>
+                )}
+                {section.items && (
+                  <ul className="pl-5 mb-0">
+                    {section.items.map((item, j) => {
+                      const dashIdx = item.indexOf(' — ');
+                      const boldPart = dashIdx >= 0 ? item.substring(0, dashIdx) : item;
+                      const restPart = dashIdx >= 0 ? item.substring(dashIdx) : '';
+                      return (
+                        <li key={j} className="font-roboto text-[10pt] font-light text-gray-700 leading-[1.5] flex items-start gap-2">
+                          <span className="text-gray-700 mt-[-1px]">-</span>
+                          <span><span className="font-normal">{boldPart}</span>{restPart}</span>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                )}
+                {section.contact && (
+                  <div className="mt-[66px] mb-[66px] self-center w-[500px] bg-white border border-[#DFEBED] rounded-md p-[26px] text-center">
+                    <div className="inline-block text-left">
+                      {section.contact.map((line, j) => (
+                        <p key={j} className={`font-roboto text-[10pt] leading-[1.5] text-gray-700 ${j === 0 ? 'font-normal' : 'font-light'}`}>
+                          {line}
+                        </p>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                {section.note && section.noteBold && (
+                  <div className={`${section.noteTopHalf ? 'mt-[33px]' : 'mt-[66px]'} mb-[66px] self-center w-[500px] bg-white border border-[#DFEBED] rounded-md p-[26px]`}>
+                    <p className="font-roboto text-[8pt] font-medium leading-[1.25] text-gray-700 whitespace-nowrap">
+                      {section.note}
+                    </p>
+                  </div>
+                )}
+                {section.note && !section.noteBold && (
+                  <p className="font-roboto pl-5 text-[10pt] font-light leading-[1.5] text-gray-700">
+                    {section.note}
+                  </p>
+                )}
+              </div>
+            ))}
 
-          {/* Copyright Notice */}
-          <div className="pt-6 border-t border-gray-200">
-            <p className="text-xs sm:text-sm font-roboto italic" style={{ color: '#141414', opacity: 0.6 }}>
-              {cc.copyright}
-            </p>
+            {/* Footer */}
+            <div className="mt-10 self-center w-[500px] bg-white border border-[#DFEBED] rounded-md p-[26px]">
+              <p className="font-roboto text-[8pt] font-bold text-gray-700 leading-[1.25]">
+                Aquesta informació està, obligatòriament, subjecta a la legislació espanyola i europea. Fer servir els nostres serveis equival a l'acceptació, de facto, d'aquesta informació.
+              </p>
+            </div>
           </div>
         </div>
-
-        {/* Back Link */}
-        <div className="text-center">
-          <Link
-            to="/"
-            className="inline-block text-sm sm:text-base font-roboto font-medium hover:underline transition-all"
-            style={{ color: '#141414', opacity: 0.7 }}
-          >
-            ← {texts.common.backToHome}
-          </Link>
         </div>
+
+        {/* Spacer between background and footer */}
+        <div className="h-[300px]" />
+
       </div>
-    </div>
+    </>
   );
-};
+}
 
 export default CreativeCommonsPage;

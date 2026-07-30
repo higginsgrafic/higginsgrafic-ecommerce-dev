@@ -95,11 +95,11 @@ function LegalNoticePage() {
         <div className="pt-[129px] lg:pt-[145px] relative" style={{ zIndex: 1 }} />
 
         {/* Title + subtitle — centered, outside columns */}
-        <div className="mx-auto px-6 lg:px-8 relative text-right w-fit" style={{ zIndex: 1, maxWidth: '1100px' }}>
-          <h1 className="font-roboto text-[30pt] font-normal uppercase text-[#141414] mb-1">
+        <div className="relative text-center" style={{ zIndex: 1 }}>
+          <h1 className="font-roboto text-[30pt] font-normal uppercase text-[#141414] mb-1 whitespace-nowrap">
             Avís Legal
           </h1>
-          <p className="font-roboto text-[10pt] font-normal text-gray-500 mb-40">
+          <p className="font-roboto text-[10pt] font-normal text-gray-500 mb-24 text-center">
             Darrera actualització, juliol 2026
           </p>
         </div>
@@ -108,20 +108,19 @@ function LegalNoticePage() {
         <div
           className="relative"
           style={{
-            backgroundImage: 'url(/_TMP/SERVEIS/serveis-fons.png)',
+            backgroundImage: 'url(/_TMP/SERVEIS/serveis-fons-1-columna.png)',
             backgroundRepeat: 'no-repeat',
             backgroundPosition: 'center top',
             backgroundSize: '102% 100%',
             backgroundAttachment: 'scroll',
-            paddingTop: '100px',
-            paddingBottom: '0px',
+            paddingTop: '50px',
+            paddingBottom: '100px',
           }}
         >
 
-        {/* Document — two columns, 100px gap */}
-        <div className="mx-auto px-6 lg:px-8 relative flex gap-[100px]" style={{ zIndex: 1, maxWidth: '1100px' }}>
-          {/* Left column */}
-          <div className="flex-1 min-w-0">
+        {/* Document — single column */}
+        <div className="mx-auto relative" style={{ zIndex: 1, maxWidth: '500px' }}>
+          <div className="w-full">
             {/* Intro */}
             <div className="mb-10 self-center w-[500px] bg-white border border-[#DFEBED] rounded-md p-[26px]">
               <p className="font-roboto text-[8pt] font-bold text-gray-800 leading-[1.25] text-justify" style={{ hyphens: 'auto', WebkitHyphens: 'auto' }}>
@@ -129,65 +128,9 @@ function LegalNoticePage() {
               </p>
             </div>
 
-            {/* Sections 0-3 */}
-            {sections.slice(0, 4).map((section, i) => (
+            {/* Sections */}
+            {sections.map((section, i) => (
               <div key={i} className="mb-7">
-                <h2 className="font-roboto text-[10pt] font-normal text-[#141414] mb-0 flex items-start gap-2">
-                  <span className="text-[#141414]">•</span>
-                  <span>{section.bullet}</span>
-                </h2>
-                {section.paragraph && (
-                  <p className="font-roboto text-[10pt] font-light text-gray-700 leading-[1.5] mb-2 pl-5">
-                    {section.paragraph}
-                  </p>
-                )}
-                {section.items && (
-                  <ul className="pl-5 mb-0">
-                    {section.items.map((item, j) => {
-                      const dashIdx = item.indexOf(' — ');
-                      const boldPart = dashIdx >= 0 ? item.substring(0, dashIdx) : item;
-                      const restPart = dashIdx >= 0 ? item.substring(dashIdx) : '';
-                      return (
-                        <li key={j} className="font-roboto text-[10pt] font-light text-gray-700 leading-[1.5] flex items-start gap-2">
-                          <span className="text-gray-700 mt-[-1px]">-</span>
-                          <span><span className="font-normal">{boldPart}</span>{restPart}</span>
-                        </li>
-                      );
-                    })}
-                  </ul>
-                )}
-                {section.contact && (
-                  <div className="mt-[66px] mb-[66px] self-center w-[500px] bg-white border border-[#DFEBED] rounded-md p-[26px] text-center">
-                    <div className="inline-block text-left">
-                      {section.contact.map((line, j) => (
-                        <p key={j} className={`font-roboto text-[10pt] leading-[1.5] text-gray-700 ${j === 0 ? 'font-normal' : 'font-light'}`}>
-                          {line}
-                        </p>
-                      ))}
-                    </div>
-                  </div>
-                )}
-                {section.note && section.noteBold && (
-                  <div className="mt-[66px] mb-[66px] self-center w-[500px] bg-white border border-[#DFEBED] rounded-md p-[26px]">
-                    <p className="font-roboto text-[8pt] font-medium leading-[1.25] text-gray-700">
-                      {section.note}
-                    </p>
-                  </div>
-                )}
-                {section.note && !section.noteBold && (
-                  <p className="font-roboto pl-5 text-[10pt] font-light leading-[1.5] text-gray-700">
-                    {section.note}
-                  </p>
-                )}
-              </div>
-            ))}
-          </div>
-
-          {/* Right column */}
-          <div className="flex-1 min-w-0">
-            {/* Sections 4+ */}
-            {sections.slice(4).map((section, i) => (
-              <div key={i + 4} className="mb-7">
                 <h2 className="font-roboto text-[10pt] font-normal text-[#141414] mb-0 flex items-start gap-2">
                   <span className="text-[#141414]">•</span>
                   <span>{section.bullet}</span>
