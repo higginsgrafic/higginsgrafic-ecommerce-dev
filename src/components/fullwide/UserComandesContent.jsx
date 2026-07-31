@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useRef } from 'react';
+import React, { useState, useMemo, useRef, useEffect } from 'react';
 import {
   AlertCircle,
   Check,
@@ -37,6 +37,15 @@ function UserComandesContent({ userEmail }) {
     icon: ICON_MAP[o.icon] || MoreHorizontal,
   })), [fetchedOrders]);
   const [activeTab, setActiveTab] = usePersistentState('HG_USER_ACTIVE_TAB', 'COMANDES');
+
+  useEffect(() => {
+    const handler = (e) => {
+      const { tab } = (e && e.detail) || {};
+      if (tab) setActiveTab(tab);
+    };
+    window.addEventListener('hg:open-user-tab', handler);
+    return () => window.removeEventListener('hg:open-user-tab', handler);
+  }, [setActiveTab]);
   const [sortDirs, setSortDirs] = usePersistentState('HG_USER_SORT_DIRS', { 'COMANDA': 'desc', 'ESTAT': 'desc', 'DATA': 'desc', 'TOT PLEGAT': 'desc' });
   const [contactMode, setContactMode] = usePersistentState('HG_USER_CONTACT_MODE', 'comanda'); // 'comanda' | 'correu'
   const [acceptCommActive, setAcceptCommActive] = useState(false);

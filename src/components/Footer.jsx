@@ -1,11 +1,12 @@
-import React, { memo, useEffect, useRef, useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { memo, useEffect, useRef, useState, useCallback } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useTexts } from '@/hooks/useTexts';
 import { useGridDebug } from '@/contexts/GridDebugContext';
 import CCLogo from '@/components/CCLogo';
 
 const Footer = () => {
+  const navigate = useNavigate();
   const containerRef = useRef(null);
   const menuGroupRef = useRef(null);
   const mobileContainerRef = useRef(null);
@@ -148,6 +149,16 @@ const Footer = () => {
       window.removeEventListener('resize', handleResize);
     };
   }, []);
+
+  const goToUserTab = useCallback((tab) => {
+    const now = Date.now();
+    const ttl = 30 * 60 * 1000;
+    sessionStorage.setItem('HG_MEGA_PAGE', JSON.stringify({ value: 4, expiresAt: now + ttl }));
+    sessionStorage.setItem('HG_ACORDIO_EXPANDED_PAGE4', JSON.stringify({ value: true, expiresAt: now + ttl }));
+    sessionStorage.setItem('HG_USER_ACTIVE_TAB', JSON.stringify({ value: tab, expiresAt: now + ttl }));
+    window.dispatchEvent(new CustomEvent('hg:open-user-tab', { detail: { tab } }));
+    navigate('/?active=first_contact');
+  }, [navigate]);
 
   return (
     <footer
@@ -380,31 +391,33 @@ const Footer = () => {
           >
             {/* Client */}
             <div className="text-left">
-              <p className="font-oswald font-semibold mb-3 lg:mb-4 text-[13pt] lg:text-[14pt] text-foreground">{texts.footer.services.customer.title}</p>
+              <p className="font-oswald font-semibold mb-3 lg:mb-4 text-[13pt] lg:text-[14pt] text-foreground">Client</p>
               <ul className="space-y-2.5 lg:space-y-3 text-left">
-                <li><Link to="/shipping" className="font-roboto text-sm font-normal transition-all inline-block text-foreground" style={{ opacity: 0.75 }} onMouseEnter={(e) => { const color = document.documentElement.classList.contains('dark') ? '#ffffff' : 'hsl(var(--foreground))'; e.target.style.textShadow = `0 0 0.55px ${color}, 0 0 0.55px ${color}`; }} onMouseLeave={(e) => e.target.style.textShadow = 'none'}>{texts.footer.services.customer.shipping}</Link></li>
-                <li><Link to="/track" className="font-roboto text-sm font-normal transition-all inline-block text-foreground" style={{ opacity: 0.75 }} onMouseEnter={(e) => { const color = document.documentElement.classList.contains('dark') ? '#ffffff' : 'hsl(var(--foreground))'; e.target.style.textShadow = `0 0 0.55px ${color}, 0 0 0.55px ${color}`; }} onMouseLeave={(e) => e.target.style.textShadow = 'none'}>{texts.footer.services.customer.orderStatus}</Link></li>
-                <li><Link to="/track" className="font-roboto text-sm font-normal transition-all inline-block text-foreground" style={{ opacity: 0.75 }} onMouseEnter={(e) => { const color = document.documentElement.classList.contains('dark') ? '#ffffff' : 'hsl(var(--foreground))'; e.target.style.textShadow = `0 0 0.55px ${color}, 0 0 0.55px ${color}`; }} onMouseLeave={(e) => e.target.style.textShadow = 'none'}>Seguiment comanda</Link></li>
-                <li><Link to="/sizing" className="font-roboto text-sm font-normal transition-all inline-block text-foreground" style={{ opacity: 0.75 }} onMouseEnter={(e) => { const color = document.documentElement.classList.contains('dark') ? '#ffffff' : 'hsl(var(--foreground))'; e.target.style.textShadow = `0 0 0.55px ${color}, 0 0 0.55px ${color}`; }} onMouseLeave={(e) => e.target.style.textShadow = 'none'}>{texts.footer.services.customer.sizing}</Link></li>
+                <li><button onClick={() => goToUserTab('COMANDES')} className="font-roboto text-sm font-normal transition-all inline-block text-foreground" style={{ opacity: 0.75 }} onMouseEnter={(e) => { const color = document.documentElement.classList.contains('dark') ? '#ffffff' : 'hsl(var(--foreground))'; e.target.style.textShadow = `0 0 0.55px ${color}, 0 0 0.55px ${color}`; }} onMouseLeave={(e) => e.target.style.textShadow = 'none'}>Comandes</button></li>
+                <li><button onClick={() => goToUserTab('MISSATGES')} className="font-roboto text-sm font-normal transition-all inline-block text-foreground" style={{ opacity: 0.75 }} onMouseEnter={(e) => { const color = document.documentElement.classList.contains('dark') ? '#ffffff' : 'hsl(var(--foreground))'; e.target.style.textShadow = `0 0 0.55px ${color}, 0 0 0.55px ${color}`; }} onMouseLeave={(e) => e.target.style.textShadow = 'none'}>Missatges</button></li>
+                <li><button onClick={() => goToUserTab('COMPTE')} className="font-roboto text-sm font-normal transition-all inline-block text-foreground" style={{ opacity: 0.75 }} onMouseEnter={(e) => { const color = document.documentElement.classList.contains('dark') ? '#ffffff' : 'hsl(var(--foreground))'; e.target.style.textShadow = `0 0 0.55px ${color}, 0 0 0.55px ${color}`; }} onMouseLeave={(e) => e.target.style.textShadow = 'none'}>Compte</button></li>
+                <li><button onClick={() => goToUserTab('SEGURETAT')} className="font-roboto text-sm font-normal transition-all inline-block text-foreground" style={{ opacity: 0.75 }} onMouseEnter={(e) => { const color = document.documentElement.classList.contains('dark') ? '#ffffff' : 'hsl(var(--foreground))'; e.target.style.textShadow = `0 0 0.55px ${color}, 0 0 0.55px ${color}`; }} onMouseLeave={(e) => e.target.style.textShadow = 'none'}>Seguretat</button></li>
               </ul>
             </div>
 
             {/* Informació */}
             <div className="text-left">
-              <p className="font-oswald font-semibold mb-3 lg:mb-4 text-[13pt] lg:text-[14pt] text-foreground">{texts.footer.services.info.title}</p>
+              <p className="font-oswald font-semibold mb-3 lg:mb-4 text-[13pt] lg:text-[14pt] text-foreground">Informació</p>
               <ul className="space-y-2.5 lg:space-y-3 text-left">
-                <li><Link to="/contact" className="font-roboto text-sm font-normal transition-all inline-block text-foreground" style={{ opacity: 0.75 }} onMouseEnter={(e) => { const color = document.documentElement.classList.contains('dark') ? '#ffffff' : 'hsl(var(--foreground))'; e.target.style.textShadow = `0 0 0.55px ${color}, 0 0 0.55px ${color}`; }} onMouseLeave={(e) => e.target.style.textShadow = 'none'}>{texts.footer.services.info.contact}</Link></li>
-                <li><Link to="/about" className="font-roboto text-sm font-normal transition-all inline-block text-foreground" style={{ opacity: 0.75 }} onMouseEnter={(e) => { const color = document.documentElement.classList.contains('dark') ? '#ffffff' : 'hsl(var(--foreground))'; e.target.style.textShadow = `0 0 0.55px ${color}, 0 0 0.55px ${color}`; }} onMouseLeave={(e) => e.target.style.textShadow = 'none'}>{texts.footer.services.info.about}</Link></li>
-                <li><Link to="/faq" className="font-roboto text-sm font-normal transition-all inline-block text-foreground" style={{ opacity: 0.75 }} onMouseEnter={(e) => { const color = document.documentElement.classList.contains('dark') ? '#ffffff' : 'hsl(var(--foreground))'; e.target.style.textShadow = `0 0 0.55px ${color}, 0 0 0.55px ${color}`; }} onMouseLeave={(e) => e.target.style.textShadow = 'none'}>{texts.footer.services.info.faq}</Link></li>
+                <li><Link to="/sizing" className="font-roboto text-sm font-normal transition-all inline-block text-foreground" style={{ opacity: 0.75 }} onMouseEnter={(e) => { const color = document.documentElement.classList.contains('dark') ? '#ffffff' : 'hsl(var(--foreground))'; e.target.style.textShadow = `0 0 0.55px ${color}, 0 0 0.55px ${color}`; }} onMouseLeave={(e) => e.target.style.textShadow = 'none'}>Talles i Cura</Link></li>
+                <li><Link to="/contact" className="font-roboto text-sm font-normal transition-all inline-block text-foreground" style={{ opacity: 0.75 }} onMouseEnter={(e) => { const color = document.documentElement.classList.contains('dark') ? '#ffffff' : 'hsl(var(--foreground))'; e.target.style.textShadow = `0 0 0.55px ${color}, 0 0 0.55px ${color}`; }} onMouseLeave={(e) => e.target.style.textShadow = 'none'}>Contacte</Link></li>
+                <li><Link to="/about" className="font-roboto text-sm font-normal transition-all inline-block text-foreground" style={{ opacity: 0.75 }} onMouseEnter={(e) => { const color = document.documentElement.classList.contains('dark') ? '#ffffff' : 'hsl(var(--foreground))'; e.target.style.textShadow = `0 0 0.55px ${color}, 0 0 0.55px ${color}`; }} onMouseLeave={(e) => e.target.style.textShadow = 'none'}>Qui som</Link></li>
+                <li><Link to="/faq" className="font-roboto text-sm font-normal transition-all inline-block text-foreground" style={{ opacity: 0.75 }} onMouseEnter={(e) => { const color = document.documentElement.classList.contains('dark') ? '#ffffff' : 'hsl(var(--foreground))'; e.target.style.textShadow = `0 0 0.55px ${color}, 0 0 0.55px ${color}`; }} onMouseLeave={(e) => e.target.style.textShadow = 'none'}>FAQ</Link></li>
               </ul>
             </div>
 
             {/* Legal */}
             <div className="text-left">
-              <p className="font-oswald font-semibold mb-3 lg:mb-4 text-[13pt] lg:text-[14pt] text-foreground">{texts.footer.services.legal.title}</p>
+              <p className="font-oswald font-semibold mb-3 lg:mb-4 text-[13pt] lg:text-[14pt] text-foreground">Legal</p>
               <ul className="space-y-2.5 lg:space-y-3 text-left">
-                <li><Link to="/privacy" className="font-roboto text-sm font-normal transition-all inline-block text-foreground" style={{ opacity: 0.75 }} onMouseEnter={(e) => { const color = document.documentElement.classList.contains('dark') ? '#ffffff' : 'hsl(var(--foreground))'; e.target.style.textShadow = `0 0 0.55px ${color}, 0 0 0.55px ${color}`; }} onMouseLeave={(e) => e.target.style.textShadow = 'none'}>{texts.footer.services.legal.privacy}</Link></li>
-                <li><Link to="/terms" className="font-roboto text-sm font-normal transition-all inline-block text-foreground" style={{ opacity: 0.75 }} onMouseEnter={(e) => { const color = document.documentElement.classList.contains('dark') ? '#ffffff' : 'hsl(var(--foreground))'; e.target.style.textShadow = `0 0 0.55px ${color}, 0 0 0.55px ${color}`; }} onMouseLeave={(e) => e.target.style.textShadow = 'none'}>{texts.footer.services.legal.terms}</Link></li>
+                <li><Link to="/shipping" className="font-roboto text-sm font-normal transition-all inline-block text-foreground" style={{ opacity: 0.75 }} onMouseEnter={(e) => { const color = document.documentElement.classList.contains('dark') ? '#ffffff' : 'hsl(var(--foreground))'; e.target.style.textShadow = `0 0 0.55px ${color}, 0 0 0.55px ${color}`; }} onMouseLeave={(e) => e.target.style.textShadow = 'none'}>Enviaments i Devolucions</Link></li>
+                <li><Link to="/terms" className="font-roboto text-sm font-normal transition-all inline-block text-foreground" style={{ opacity: 0.75 }} onMouseEnter={(e) => { const color = document.documentElement.classList.contains('dark') ? '#ffffff' : 'hsl(var(--foreground))'; e.target.style.textShadow = `0 0 0.55px ${color}, 0 0 0.55px ${color}`; }} onMouseLeave={(e) => e.target.style.textShadow = 'none'}>Termes i Condicions</Link></li>
+                <li><Link to="/privacy" className="font-roboto text-sm font-normal transition-all inline-block text-foreground" style={{ opacity: 0.75 }} onMouseEnter={(e) => { const color = document.documentElement.classList.contains('dark') ? '#ffffff' : 'hsl(var(--foreground))'; e.target.style.textShadow = `0 0 0.55px ${color}, 0 0 0.55px ${color}`; }} onMouseLeave={(e) => e.target.style.textShadow = 'none'}>Política de Privacitat</Link></li>
                 <li><Link to="/legal" className="font-roboto text-sm font-normal transition-all inline-block text-foreground" style={{ opacity: 0.75 }} onMouseEnter={(e) => { const color = document.documentElement.classList.contains('dark') ? '#ffffff' : 'hsl(var(--foreground))'; e.target.style.textShadow = `0 0 0.55px ${color}, 0 0 0.55px ${color}`; }} onMouseLeave={(e) => e.target.style.textShadow = 'none'}>Avís Legal</Link></li>
                 <li><Link to="/cookies" className="font-roboto text-sm font-normal transition-all inline-block text-foreground" style={{ opacity: 0.75 }} onMouseEnter={(e) => { const color = document.documentElement.classList.contains('dark') ? '#ffffff' : 'hsl(var(--foreground))'; e.target.style.textShadow = `0 0 0.55px ${color}, 0 0 0.55px ${color}`; }} onMouseLeave={(e) => e.target.style.textShadow = 'none'}>Cookies</Link></li>
               </ul>

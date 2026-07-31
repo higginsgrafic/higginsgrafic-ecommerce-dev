@@ -1,6 +1,4 @@
 import React, { useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { Heart, Globe, Leaf, Users, Lightbulb, Target } from 'lucide-react';
 import SEO from '@/components/SEO';
 
 function AboutPage() {
@@ -8,281 +6,148 @@ function AboutPage() {
     window.scrollTo(0, 0);
   }, []);
 
-  const values = [
+  const sections = [
     {
-      icon: Heart,
-      title: 'Autenticitat',
-      description: 'Creem dissenys amb missatge que reflecteixen qui som realment. Sense filtres, sense màscares.'
+      bullet: '1. Què és Higgins GRÀFIC',
+      paragraph: 'Higgins GRÀFIC és una botigueta casolana feta i pensada per a vendre petites artesanies digitals que es poden reproduir sobre diversos formats. Nosaltres fem servir el més comú i el rei de tots: la samarreta. Esperem que ben aviat puguem tenir més formats a la vostra disposició.',
     },
     {
-      icon: Globe,
-      title: 'Sostenibilitat',
-      description: 'Producció sota demanda per evitar residus. Cada peça es fabrica només quan es demana.'
+      bullet: '2. El format',
+      paragraph: 'Evidentment, el format, és important i no pot ser de qualsevol manera i és per aquest motiu que hem triat el model 5000 de la marca Gildan perquè compta amb una sèrie de qualitats que el fan ideal per a la impressió digital i la portabilitat diària de la peça. No oblidem que aquest llenç és una samarreta de debò.',
     },
     {
-      icon: Leaf,
-      title: 'Qualitat',
-      description: 'Materials orgànics i processos certificats. La qualitat és el nostre compromís.'
+      bullet: '3. Producció sostenible',
+      paragraph: 'No es fabrica res fins que algú no ho demana. No hi ha estoc, no es malbarata, no hi ha magatzems plens de samarretes que ningú no vol. Cada peça es produeix al centre més proper a la teva adreça per reduir emissions de transport.',
+      items: [
+        'Cotó orgànic certificat — 180 g/m², qualitat prèmium.',
+        'Tintes ecològiques — Lliures de substàncies tòxiques.',
+        'Sense estocs — Es fabrica només quan es demana.',
+        'Producció local — El centre més proper a tu, quan és possible.',
+      ],
     },
     {
-      icon: Users,
-      title: 'Comunitat',
-      description: 'Som una comunitat de persones que pensen diferent i no tenen por de mostrar-ho.'
+      bullet: '4. Qui som',
+      paragraph: 'Sóc una sola persona que fa els seus dibuixos i que ha trobat una manera de vendre\'ls. No tinc equip de màrqueting, no tinc inversors, no tinc pressió per créixer. L\'objectiu: fer els meus dibuixos i que arribin a la gent que els aprecia.',
+      contact: [
+        'higginsgrafic@gmail.com',
+      ],
+      note: 'Si tens cap dubte, suggeriment o simplement vols comentar-me alguna cosa, escriu-me. Llegeixo tot el que m\'arriba. Diga\'m Higgins.',
+      noteBold: true,
     },
-    {
-      icon: Lightbulb,
-      title: 'Creativitat',
-      description: 'Cada col·lecció neix d\'una idea, una reflexió, una provocació. Art portable.'
-    },
-    {
-      icon: Target,
-      title: 'Transparència',
-      description: 'Sabreu d\'on ve la samarreta, qui la fa i com es produeix. Total transparència.'
-    }
-  ];
-
-  const collections = [
-    {
-      name: 'First Contact',
-      tagline: 'Only you understand everything this journey entails.',
-      description: 'Una reflexió sobre els viatges interiors que només coneixeu. Sobre els camins que es prenen sense que ningú més ho vegi.'
-    },
-    {
-      name: 'The Human Inside',
-      tagline: 'In the deepest, darkest corner rests your hero.',
-      description: 'L\'heroi interior viu en els racons més foscos. Allà on pocs s\'atreveixen a mirar és on es troba la força.'
-    },
-    {
-      name: 'Austen',
-      tagline: 'I hate to hear you talk about women as if they were irrational simpletons.',
-      description: 'Homenatge a Jane Austen i a totes les dones que han lluitat per ser escolades, no silenciades.'
-    },
-    {
-      name: 'Cube',
-      tagline: 'Deep down, we are all strangers to our own eyes.',
-      description: 'Som éssers complexos, multidimensionals. El que veus a fora no és mai tota la història.'
-    },
-    {
-      name: 'Miscel·lània',
-      tagline: 'As they say, better alone than in bad company.',
-      description: 'Per als qui prefereixen la solitud autèntica abans que la companyia falsa. Per als inadaptats orgullosos.'
-    }
   ];
 
   return (
     <>
       <SEO
-        title="Sobre Nosaltres | GRÀFIC"
-        description="Descobreix la història de GRÀFIC, una marca de roba amb missatge. Creem samarretes amb dissenys que provoquen, inspiren i fan pensar. Producció sostenible sota demanda."
-        keywords="sobre gràfic, marca catalana, roba amb missatge, sostenibilitat, ciència-ficció, art conceptual, producció sostenible"
+        title="Sobre Higgins GRÀFIC | Higgins GRÀFIC"
+        description="Higgins GRÀFIC és un projecte de disseny gràfic que ven el seu treball a través de la samarreta. Producció sota demanda, cotó orgànic, dissenys originals."
+        keywords="sobre higgins gràfic, disseny gràfic, samarretes, producció sota demanda, cotó orgànic"
         type="website"
         url="/about"
       />
 
-      <div className="min-h-screen bg-white">
-        {/* Hero */}
-        <div className="bg-gray-900 text-white py-24 lg:py-32">
-          <div className="max-w-4xl mx-auto px-4 lg:px-8">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
-              className="text-center"
-            >
-              <h1 className="font-oswald text-[48pt] lg:text-[64pt] font-bold uppercase mb-6">
-                GRÀFIC
-              </h1>
-              <p className="font-roboto text-[16pt] lg:text-[18pt] text-gray-300 max-w-2xl mx-auto">
-                Roba amb missatge per a persones que pensen diferent
-              </p>
-            </motion.div>
-          </div>
+      <div
+        className="min-h-screen bg-white relative"
+      >
+        {/* Top spacer for fixed header */}
+        <div className="pt-[129px] lg:pt-[145px] relative" style={{ zIndex: 1 }} />
+
+        {/* Title + subtitle — centered, outside columns */}
+        <div className="relative text-center" style={{ zIndex: 1 }}>
+          <h1 className="font-roboto text-[30pt] font-normal uppercase text-[#141414] mb-1 whitespace-nowrap">
+            Higgins GRÀFIC
+          </h1>
+          <p className="font-roboto text-[10pt] font-normal text-gray-500 mb-24 text-center">
+            Dibuixos en petit format
+          </p>
         </div>
 
-        {/* Our Story */}
-        <div className="max-w-4xl mx-auto px-4 lg:px-8 py-16 lg:py-24">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-          >
-            <h2 className="font-oswald text-[32pt] lg:text-[42pt] font-bold mb-8" style={{ color: '#141414' }}>
-              La Nostra Història
-            </h2>
+        {/* Background wrapper */}
+        <div
+          className="relative"
+          style={{
+            backgroundImage: 'url(/_TMP/SERVEIS/serveis-fons-1-columna.png)',
+            backgroundRepeat: 'no-repeat',
+            backgroundPosition: 'center top',
+            backgroundSize: '102% 100%',
+            backgroundAttachment: 'scroll',
+            paddingTop: '50px',
+            paddingBottom: '100px',
+          }}
+        >
 
-            <div className="space-y-6 font-roboto text-[14pt] text-gray-700 leading-relaxed">
-              <p>
-                GRÀFIC va néixer d'una pregunta simple: <strong>Per què la roba ha de ser només roba?</strong>
-              </p>
+        {/* Brightness overlay — 10% lighter */}
+        <div className="absolute inset-0" style={{ backgroundColor: 'rgba(255,255,255,0.1)', zIndex: 0 }} />
 
-              <p>
-                En un món saturat d'imatges buides i missatges superficials, vam decidir crear alguna cosa
-                diferent. Alguna cosa que fes pensar. Alguna cosa que provoqués converses. Alguna cosa que
-                digués més que mil paraules.
-              </p>
-
-              <p>
-                No som una marca de moda convencional. Som una plataforma d'expressió. Cada disseny que
-                creem porta un missatge, una reflexió, una provocació. Perquè creiem que el que portes
-                a sobre pot dir molt de qui ets a dins.
-              </p>
-
-              <p>
-                Treballem amb producció sota demanda perquè <strong>no creiem en el malbaratament</strong>.
-                Cada samarreta es fabrica només quan algú la demana, amb materials orgànics i processos
-                certificats. Sostenibilitat no és un extra, és la base.
-              </p>
-
-              <p>
-                Les nostres col·leccions exploren temes que importen: identitat, feminisme, solitud triada,
-                viatges interiors, la complexitat humana. <strong>No tenim por de les converses incòmodes.</strong>
+        {/* Document — single column */}
+        <div className="mx-auto relative" style={{ zIndex: 1, maxWidth: '500px' }}>
+          <div className="w-full">
+            {/* Intro */}
+            <div className="mb-10">
+              <p className="font-roboto text-[12pt] font-normal text-gray-800 leading-[1.25] text-center">
+                La samarreta és l'últim bastió de la llibertat d'expressió.
               </p>
             </div>
-          </motion.div>
-        </div>
 
-        {/* Values */}
-        <div className="bg-gray-50 py-16 lg:py-24">
-          <div className="max-w-7xl mx-auto px-4 lg:px-8">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.3 }}
-              className="text-center mb-12"
-            >
-              <h2 className="font-oswald text-[32pt] lg:text-[42pt] font-bold mb-4" style={{ color: '#141414' }}>
-                Els Nostres Valors
-              </h2>
-              <p className="font-roboto text-[14pt] text-gray-600 max-w-2xl mx-auto">
-                Sis principis que guien tot el que fem
-              </p>
-            </motion.div>
-
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {values.map((value, index) => {
-                const Icon = value.icon;
-                return (
-                  <motion.div
-                    key={index}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.6, delay: 0.1 * index }}
-                    className="bg-white p-8 rounded-lg shadow-sm hover:shadow-md transition-shadow"
-                  >
-                    <Icon className="w-12 h-12 mb-4" style={{ color: '#141414' }} />
-                    <h3 className="font-oswald text-[20pt] font-bold mb-3" style={{ color: '#141414' }}>
-                      {value.title}
-                    </h3>
-                    <p className="font-roboto text-[13pt] text-gray-600 leading-relaxed">
-                      {value.description}
+            {/* Sections */}
+            {sections.map((section, i) => (
+              <div key={i} className="mb-7">
+                <h2 className="font-roboto text-[10pt] font-normal text-[#141414] mb-0 flex items-start gap-2">
+                  <span className="text-[#141414]">•</span>
+                  <span>{section.bullet}</span>
+                </h2>
+                {section.paragraph && (
+                  <p className="font-roboto text-[10pt] font-light text-gray-700 leading-[1.5] mb-2 pl-5">
+                    {section.paragraph}
+                  </p>
+                )}
+                {section.items && (
+                  <ul className="pl-5 mb-0">
+                    {section.items.map((item, j) => {
+                      const dashIdx = item.indexOf(' — ');
+                      const boldPart = dashIdx >= 0 ? item.substring(0, dashIdx) : item;
+                      const restPart = dashIdx >= 0 ? item.substring(dashIdx) : '';
+                      return (
+                        <li key={j} className="font-roboto text-[10pt] font-light text-gray-700 leading-[1.5] flex items-start gap-2">
+                          <span className="text-gray-700 mt-[-1px]">-</span>
+                          <span><span className="font-normal">{boldPart}</span>{restPart}</span>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                )}
+                {section.contact && (
+                  <div className="mt-[66px] mb-[66px] self-center w-[500px] bg-white border border-[#DFEBED] rounded-md p-[26px] text-center">
+                    <div className="inline-block text-left">
+                      {section.contact.map((line, j) => (
+                        <p key={j} className={`font-roboto text-[10pt] leading-[1.5] text-gray-700 ${j === 0 ? 'font-normal' : 'font-light'}`}>
+                          {line}
+                        </p>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                {section.note && section.noteBold && (
+                  <div className="mt-[66px] mb-[66px] self-center w-[500px] bg-white border border-[#DFEBED] rounded-md p-[26px]">
+                    <p className="font-roboto text-[8pt] font-medium leading-[1.25] text-gray-700">
+                      {section.note}
                     </p>
-                  </motion.div>
-                );
-              })}
-            </div>
-          </div>
-        </div>
-
-        {/* Collections Philosophy */}
-        <div className="max-w-4xl mx-auto px-4 lg:px-8 py-16 lg:py-24">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.4 }}
-          >
-            <h2 className="font-oswald text-[32pt] lg:text-[42pt] font-bold mb-12" style={{ color: '#141414' }}>
-              Les Nostres Col·leccions
-            </h2>
-
-            <div className="space-y-10">
-              {collections.map((collection, index) => (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.6, delay: 0.1 * index }}
-                  className="border-l-4 border-gray-900 pl-6"
-                >
-                  <h3 className="font-oswald text-[24pt] font-bold mb-2" style={{ color: '#141414' }}>
-                    {collection.name}
-                  </h3>
-                  <p className="font-roboto text-[12pt] text-gray-500 italic mb-3">
-                    "{collection.tagline}"
+                  </div>
+                )}
+                {section.note && !section.noteBold && (
+                  <p className="font-roboto pl-5 text-[10pt] font-light leading-[1.5] text-gray-700">
+                    {section.note}
                   </p>
-                  <p className="font-roboto text-[13pt] text-gray-700 leading-relaxed">
-                    {collection.description}
-                  </p>
-                </motion.div>
-              ))}
-            </div>
-          </motion.div>
-        </div>
-
-        {/* Sustainability */}
-        <div className="bg-gray-900 text-white py-16 lg:py-24">
-          <div className="max-w-4xl mx-auto px-4 lg:px-8">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.5 }}
-              className="text-center"
-            >
-              <Leaf className="w-16 h-16 mx-auto mb-6" />
-              <h2 className="font-oswald text-[32pt] lg:text-[42pt] font-bold mb-6">
-                Compromís Sostenible
-              </h2>
-              <div className="space-y-4 font-roboto text-[14pt] text-gray-300 leading-relaxed max-w-2xl mx-auto">
-                <p>
-                  <strong className="text-white">Producció sota demanda:</strong> Zero estoc, zero residus.
-                  Cada peça es fabrica només quan algú la compra.
-                </p>
-                <p>
-                  <strong className="text-white">Materials orgànics:</strong> Cotó orgànic certificat,
-                  tintes ecològiques, processos respectuosos amb el medi ambient.
-                </p>
-                <p>
-                  <strong className="text-white">Transparència total:</strong> Sabràs exactament d'on ve
-                  la teva samarreta i com s'ha fet.
-                </p>
-                <p>
-                  <strong className="text-white">Qualitat duradora:</strong> Roba feta per durar anys,
-                  no temporades. Menys consum, més valor.
-                </p>
+                )}
               </div>
-            </motion.div>
+            ))}
           </div>
         </div>
-
-        {/* Join Us */}
-        <div className="max-w-4xl mx-auto px-4 lg:px-8 py-16 lg:py-24 text-center">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.6 }}
-          >
-            <h2 className="font-oswald text-[32pt] lg:text-[42pt] font-bold mb-6" style={{ color: '#141414' }}>
-              Uneix-te a la Conversa
-            </h2>
-            <p className="font-roboto text-[14pt] text-gray-700 leading-relaxed mb-8 max-w-2xl mx-auto">
-              GRÀFIC és més que roba. És una comunitat de persones que no tenen por de pensar diferent,
-              de qüestionar, de provocar converses. Si això ressona, benvingut/da a casa.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <a
-                href="/first-contact"
-                className="bg-gray-900 text-white px-8 py-4 rounded-lg font-roboto text-[14pt] font-medium hover:bg-gray-800 transition-colors"
-              >
-                Explora les Col·leccions
-              </a>
-              <a
-                href="/contact"
-                className="bg-white border-2 border-gray-900 text-gray-900 px-8 py-4 rounded-lg font-roboto text-[14pt] font-medium hover:bg-gray-50 transition-colors"
-              >
-                Contacta amb Nosaltres
-              </a>
-            </div>
-          </motion.div>
         </div>
+
+        {/* Spacer between background and footer */}
+        <div className="h-[300px]" />
+
       </div>
     </>
   );

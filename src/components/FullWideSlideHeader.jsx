@@ -1,7 +1,7 @@
 import React, { memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import * as ReactDOM from 'react-dom';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { ChevronDown, ChevronLeft, ChevronRight, ChevronUp, Menu, UserRound, X, Clock, Truck, AlertCircle, MoreHorizontal, Loader2, Eye, EyeOff, LayoutGrid, Layers } from 'lucide-react';
+import { ChevronDown, ChevronLeft, ChevronRight, ChevronUp, Menu, UserRound, UserPlus, X, Clock, Truck, AlertCircle, MoreHorizontal, Loader2, Eye, EyeOff, LayoutGrid, Layers } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useProductContext } from '@/contexts/ProductContext';
 import { useAdmin } from '@/contexts/AdminContext';
@@ -37,6 +37,7 @@ import {
 } from './fullwide/megaPublicSelectorState.js';
 import OptimizedImg from './fullwide/OptimizedImg.jsx';
 import IconButton from './fullwide/MegaIconButton.jsx';
+import RegisterOverlay from './fullwide/RegisterOverlay.jsx';
 import usePersistentState from '@/hooks/usePersistentState';
 import {
   FirstContactStripeMockupPanel,
@@ -286,6 +287,7 @@ function FullWideSlideHeader({
     return null;
   }, []);
 
+  const [showRegisterOverlay, setShowRegisterOverlay] = useState(false);
   const [active, setActive] = useState(() => {
     try {
       const p = new URLSearchParams(location.search);
@@ -2024,6 +2026,19 @@ function FullWideSlideHeader({
     return () => window.removeEventListener('hg:open-full-wide-cart', openFullWideCart);
   }, [setMegaPage, setAcordioExpanded]);
 
+  useEffect(() => {
+    const openUserTab = (e) => {
+      const { tab } = (e && e.detail) || {};
+      setMegaPage(4);
+      setAcordioExpandedPage4(true);
+      setManualOverrideClosed(false);
+      ensureMegaOpen();
+      touchMegaPublicActivity();
+    };
+    window.addEventListener('hg:open-user-tab', openUserTab);
+    return () => window.removeEventListener('hg:open-user-tab', openUserTab);
+  }, [setMegaPage, setAcordioExpandedPage4]);
+
 
   const scrollSearchGridBy = (deltaPx) => {
     const el = searchGridScrollRef.current;
@@ -2979,25 +2994,15 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
                   accountClickTimeoutRef.current = window.setTimeout(() => {
                     accountClickTimeoutRef.current = null;
                     setManualOverrideClosed(false);
-                    // Mateixa seqüència de 3 clics al compte d'usuari
-                    // que al cistell.
-                    if (megaPage === 4 && active) {
-                      if (!acordioExpandedPage4) {
-                        setAcordioExpandedPage4(true);
-                      } else {
-                        setAcordioExpandedPage4(false);
-                        setActive(null);
-                      }
-                    } else {
-                      setMegaPage(4);
-                      setAcordioExpandedPage4(false);
-                      if (!active) ensureMegaOpen();
-                    }
+                    setMegaPage(4);
+                    setAcordioExpandedPage4(false);
+                    if (!active) ensureMegaOpen();
+                    setShowRegisterOverlay(true);
                     touchMegaPublicActivity();
                   }, dblClickDelayMs);
                 }}
               >
-                <UserRound className="h-[25px] w-[25px] text-foreground lg:h-[29px] lg:w-[29px]" strokeWidth={1.5} />
+                <UserPlus className="h-[25px] w-[25px] text-foreground lg:h-[29px] lg:w-[29px]" strokeWidth={1.5} />
               </IconButton>
             </div>
           </div>
@@ -3097,6 +3102,12 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
         acordioExpandedPage4={acordioExpandedPage4}
         setAcordioExpandedPage4={setAcordioExpandedPage4}
       />
+
+      {canUseDom && showRegisterOverlay &&
+        ReactDOM.createPortal(
+          <RegisterOverlay onClose={() => setShowRegisterOverlay(false)} />,
+          document.body
+        )}
 
       {mobileOpen ? (
         <div className="lg:hidden border-b border-border bg-background">

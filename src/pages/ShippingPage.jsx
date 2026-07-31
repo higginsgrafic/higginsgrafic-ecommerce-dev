@@ -65,15 +65,6 @@ function ShippingPage() {
       note: 'Els costos d\'enviament del reemplaçament van totalment a càrrec nostre.',
       noteBold: true,
     },
-    {
-      bullet: '9. Contacte',
-      paragraph: 'Si tens cap dubte sobre enviaments o devolucions, pots contactar amb nosaltres:',
-      contact: [
-        'higginsgrafic@gmail.com',
-      ],
-      note: 'Ens comprometem a respondre les consultes en un màxim de 48 hores laborables.',
-      noteBold: true,
-    },
   ];
 
   return (
