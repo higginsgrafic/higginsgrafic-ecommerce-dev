@@ -59,15 +59,6 @@ function FAQPage() {
       ],
       note: 'No venem o lloguem les dades de tercers o a tercers. Podeu consultar tots els detalls a la nostra Política de Privacitat, que compleix amb el RGPD.',
     },
-    {
-      bullet: '7. Contacte',
-      paragraph: 'Si tens qualsevol pregunta que no aparegui aquí, pots contactar amb nosaltres:',
-      contact: [
-        'higginsgrafic@gmail.com',
-      ],
-      note: 'Ens comprometem a respondre les consultes en un màxim de 48 hores laborables.',
-      noteBold: true,
-    },
   ];
 
   return (

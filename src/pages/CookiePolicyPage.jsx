@@ -78,16 +78,6 @@ function CookiePolicyPage() {
         'Qualsevol canvi significatiu serà comunicat als usuaris a través d\'un avís visible al lloc web.',
       ],
     },
-    {
-      bullet: '7. Contacte',
-      paragraph: 'Si tens qualsevol dubte sobre la nostra política de cookies, pots contactar amb nosaltres:',
-      contact: [
-        'higginsgrafic@gmail.com',
-      ],
-      note: 'També pots consultar la nostra Política de Privacitat per a més informació sobre el tractament de dades personals.',
-      noteLink: '/privacy',
-      noteBold: true,
-    },
   ];
 
   return (

@@ -1,205 +1,158 @@
-import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { Mail, MessageSquare, Clock, MapPin } from 'lucide-react';
+import React, { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import SEO from '@/components/SEO';
 
 function ContactPage() {
-  const [formData, setFormData] = useState({
-    name: '',
-    orderNumber: '',
-    email: '',
-    subject: '',
-    message: ''
-  });
-  const [status, setStatus] = useState('');
+  const navigate = useNavigate();
 
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setStatus('sending');
-
-    // Simulació d'enviament (després implementarem amb Netlify Forms o similar)
-    setTimeout(() => {
-      setStatus('success');
-      setFormData({ name: '', orderNumber: '', email: '', subject: '', message: '' });
-
-      setTimeout(() => {
-        setStatus('');
-      }, 5000);
-    }, 1500);
+  const goToMessages = () => {
+    const now = Date.now();
+    const ttl = 30 * 60 * 1000;
+    sessionStorage.setItem('HG_MEGA_PAGE', JSON.stringify({ value: 4, expiresAt: now + ttl }));
+    sessionStorage.setItem('HG_ACORDIO_EXPANDED_PAGE4', JSON.stringify({ value: true, expiresAt: now + ttl }));
+    sessionStorage.setItem('HG_USER_ACTIVE_TAB', JSON.stringify({ value: 'MISSATGES', expiresAt: now + ttl }));
+    window.dispatchEvent(new CustomEvent('hg:open-user-tab', { detail: { tab: 'MISSATGES' } }));
+    navigate('/?active=first_contact');
   };
 
-  const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    });
-  };
-
-  const contactMethods = [
+  const sections = [
     {
-      icon: Mail,
-      title: 'Email General',
-      detail: 'higginsgrafic@gmail.com',
-      description: 'Per consultes generals i informació'
+      intro: (
+        <>
+          Si us podem ajudar a resoldre cap qüestió no dubteu a posar-vos en contacte amb nosaltres per correu electrònic, Telegram, WhatsApp o per correu postal. També pots contactar amb nosaltres a través del <span onClick={goToMessages} style={{ cursor: 'pointer', color: '#141414', textDecoration: 'underline' }}>formulari que tens dins del teu usuari</span> de la botiga.
+        </>
+      ),
+      contact: [
+        'Higgins GRÀFIC',
+        '52161740 V',
+        'Carrer Convent, 11',
+        'Cardedeu 08440, Barcelona',
+        '+34 000 000 000',
+        'higginsgrafic@gmail.com',
+      ],
+      note: 'Ens comprometem a respondre dins del terme màxim de 48 hores laborables.',
+      noteBold: true,
     },
-    {
-      icon: MessageSquare,
-      title: 'Comandes',
-      detail: 'higginsgrafic@gmail.com',
-      description: 'Seguiment i preguntes sobre comandes'
-    },
-    {
-      icon: MessageSquare,
-      title: 'Devolucions',
-      detail: 'higginsgrafic@gmail.com',
-      description: 'Devolucions i canvis de productes'
-    },
-    {
-      icon: Clock,
-      title: 'Horari d\'Atenció',
-      detail: 'Dilluns - Divendres',
-      description: '9:00h - 18:00h (CET)'
-    }
   ];
 
   return (
     <>
       <SEO
-        title="Contacte | GRÀFIC"
-        description="Contacta amb GRÀFIC. Estem aquí per ajudar-te amb qualsevol pregunta sobre els nostres productes, comandes o col·leccions. Resposta en 24-48h."
-        keywords="contacte gràfic, atenció client, suport, preguntes, contactar marca"
+        title="Contacte | Higgins GRÀFIC"
+        description="Contacta amb Higgins GRÀFIC. Email, temps de resposta i informació de contacte. Diga'm Higgins."
+        keywords="contacte higgins gràfic, email, atenció client, suport"
         type="website"
         url="/contact"
       />
 
-      <div className="min-h-screen bg-white flex items-center justify-center px-4">
-        <div className="w-full max-w-md pt-[129px] lg:pt-[145px]">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-          >
-            <h2 className="font-oswald text-[28pt] font-bold mb-6 text-center" style={{ color: '#141414' }}>
-              Contacte
-            </h2>
+      <div
+        className="min-h-screen bg-white relative"
+      >
+        {/* Top spacer for fixed header */}
+        <div className="pt-[129px] lg:pt-[145px] relative" style={{ zIndex: 1 }} />
 
-            <form onSubmit={handleSubmit} className="space-y-6">
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label htmlFor="name" className="block font-roboto text-[12pt] font-medium text-gray-700 mb-2">
-                      Nom *
-                    </label>
-                    <input
-                      type="text"
-                      id="name"
-                      name="name"
-                      value={formData.name}
-                      onChange={handleChange}
-                      required
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent font-roboto text-[13pt]"
-                      placeholder="El teu nom"
-                    />
-                  </div>
-                  <div>
-                    <label htmlFor="orderNumber" className="block font-roboto text-[12pt] font-medium text-gray-700 mb-2">
-                      Número de comanda
-                    </label>
-                    <input
-                      type="text"
-                      id="orderNumber"
-                      name="orderNumber"
-                      value={formData.orderNumber}
-                      onChange={handleChange}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent font-roboto text-[13pt]"
-                      placeholder="Opcional"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label htmlFor="email" className="block font-roboto text-[12pt] font-medium text-gray-700 mb-2">
-                    Email *
-                  </label>
-                  <input
-                    type="email"
-                    id="email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleChange}
-                    required
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent font-roboto text-[13pt]"
-                    placeholder="el-teu-email@exemple.com"
-                  />
-                </div>
-
-                <div>
-                  <label htmlFor="subject" className="block font-roboto text-[12pt] font-medium text-gray-700 mb-2">
-                    Assumpte *
-                  </label>
-                  <select
-                    id="subject"
-                    name="subject"
-                    value={formData.subject}
-                    onChange={handleChange}
-                    required
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent font-roboto text-[13pt]"
-                  >
-                    <option value="">Selecciona un assumpte</option>
-                    <option value="order">Pregunta sobre comanda</option>
-                    <option value="product">Informació de producte</option>
-                    <option value="shipping">Enviament i lliurament</option>
-                    <option value="return">Devolució o canvi</option>
-                    <option value="collaboration">Col·laboració</option>
-                    <option value="other">Altres</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label htmlFor="message" className="block font-roboto text-[12pt] font-medium text-gray-700 mb-2">
-                    Missatge *
-                  </label>
-                  <textarea
-                    id="message"
-                    name="message"
-                    value={formData.message}
-                    onChange={handleChange}
-                    required
-                    rows="6"
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent font-roboto text-[13pt] resize-none"
-                    placeholder="Explica'ns com et podem ajudar..."
-                  />
-                </div>
-
-                <button
-                  type="submit"
-                  disabled={status === 'sending'}
-                  className="w-full bg-gray-900 text-white px-8 py-4 rounded-lg font-roboto text-[14pt] font-medium hover:bg-gray-800 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
-                >
-                  {status === 'sending' ? 'Enviant...' : 'Enviar Missatge'}
-                </button>
-
-                {status === 'success' && (
-                  <motion.div
-                    initial={{ opacity: 0, y: -10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="bg-green-50 border border-green-200 rounded-lg p-4"
-                  >
-                    <p className="font-roboto text-[13pt] text-green-800">
-                      ✓ Missatge enviat correctament! Et respondrem en un màxim de 48 hores.
-                    </p>
-                  </motion.div>
-                )}
-              </form>
-
-              <p className="font-roboto text-[11pt] text-gray-500 mt-4">
-                * Camps obligatoris
-              </p>
-          </motion.div>
+        {/* Title + subtitle — centered, outside columns */}
+        <div className="relative text-center" style={{ zIndex: 1 }}>
+          <h1 className="font-roboto text-[30pt] font-normal uppercase text-[#141414] mb-1 whitespace-nowrap">
+            Contacte
+          </h1>
+          <p className="font-roboto text-[10pt] font-normal text-gray-500 mb-24 text-center">
+            Diga'm Higgins
+          </p>
         </div>
+
+        {/* Background wrapper */}
+        <div
+          className="relative"
+          style={{
+            backgroundImage: 'url(/_TMP/SERVEIS/serveis-fons-1-columna.png)',
+            backgroundRepeat: 'no-repeat',
+            backgroundPosition: 'center top',
+            backgroundSize: '102% 100%',
+            backgroundAttachment: 'scroll',
+            paddingTop: '50px',
+            paddingBottom: '100px',
+          }}
+        >
+
+        {/* Brightness overlay — 10% lighter */}
+        <div className="absolute inset-0" style={{ backgroundColor: 'rgba(255,255,255,0.1)', zIndex: 0 }} />
+
+        {/* Document — single column */}
+        <div className="mx-auto relative" style={{ zIndex: 1, maxWidth: '500px' }}>
+          <div className="w-full">
+            {/* Sections */}
+            {sections.map((section, i) => (
+              <div key={i} className="mb-7">
+                {section.intro && (
+                  <div className="mb-10 self-center w-[500px] bg-white border border-[#DFEBED] rounded-md p-[26px]">
+                    <p className="font-roboto text-[8pt] font-bold text-gray-800 leading-[1.25] text-justify" style={{ hyphens: 'auto', WebkitHyphens: 'auto' }}>
+                      {section.intro}
+                    </p>
+                  </div>
+                )}
+                {section.bullet && (
+                  <h2 className="font-roboto text-[10pt] font-normal text-[#141414] mb-0 flex items-start gap-2">
+                    <span className="text-[#141414]">•</span>
+                    <span>{section.bullet}</span>
+                  </h2>
+                )}
+                {section.paragraph && (
+                  <p className="font-roboto text-[10pt] font-light text-gray-700 leading-[1.5] mb-2 pl-5">
+                    {section.paragraph}
+                  </p>
+                )}
+                {section.items && (
+                  <ul className="pl-5 mb-0">
+                    {section.items.map((item, j) => {
+                      const dashIdx = item.indexOf(' — ');
+                      const boldPart = dashIdx >= 0 ? item.substring(0, dashIdx) : item;
+                      const restPart = dashIdx >= 0 ? item.substring(dashIdx) : '';
+                      return (
+                        <li key={j} className="font-roboto text-[10pt] font-light text-gray-700 leading-[1.5] flex items-start gap-2">
+                          <span className="text-gray-700 mt-[-1px]">-</span>
+                          <span><span className="font-normal">{boldPart}</span>{restPart}</span>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                )}
+                {section.contact && (
+                  <div className="mt-[66px] mb-[66px] self-center w-[500px] bg-white border border-[#DFEBED] rounded-md p-[26px] text-center">
+                    <div className="inline-block text-left">
+                      {section.contact.map((line, j) => (
+                        <p key={j} className={`font-roboto text-[10pt] leading-[1.5] text-gray-700 ${j === 0 || j === section.contact.length - 1 ? 'font-normal' : 'font-light'}`}>
+                          {line}
+                        </p>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                {section.note && section.noteBold && (
+                  <div className="mt-[66px] mb-[66px] self-center w-[500px] bg-white border border-[#DFEBED] rounded-md p-[26px] text-center">
+                    <p className="font-roboto text-[8pt] font-medium leading-[1.25] text-gray-700">
+                      {section.note}
+                    </p>
+                  </div>
+                )}
+                {section.note && !section.noteBold && (
+                  <p className="font-roboto pl-5 text-[10pt] font-light leading-[1.5] text-gray-700">
+                    {section.note}
+                  </p>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+        </div>
+
+        {/* Spacer between background and footer */}
+        <div className="h-[300px]" />
+
       </div>
     </>
   );

@@ -67,15 +67,6 @@ function LegalNoticePage() {
         'Com a consumidor, pots accedir a la plataforma europea de resolució de litigis en línia: https://ec.europa.eu/consumers/odr',
       ],
     },
-    {
-      bullet: '7. Contacte',
-      paragraph: 'Per qualsevol qüestió relacionada amb aquest avís legal, podeu contactar amb nosaltres:',
-      contact: [
-        'higginsgrafic@gmail.com',
-      ],
-      note: 'Ens comprometem a respondre les consultes en un màxim de 48 hores laborables.',
-      noteBold: true,
-    },
   ];
 
   return (

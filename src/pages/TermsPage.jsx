@@ -268,12 +268,6 @@ function TermsPage() {
       bullet: '13.4 Comunicacions',
       paragraph: 'Totes les comunicacions relacionades amb comandes s\'enviaran per email a l\'adreça proporcionada durant el procés de compra.',
     },
-    {
-      bullet: '14. Contacte',
-      paragraph: 'Per qualsevol qüestió relacionada amb aquestes Condicions Generals o amb les comandes, podeu contactar amb nosaltres a: higginsgrafic@gmail.com',
-      note: 'Ens comprometem a respondre les consultes en un màxim de 48 hores laborables.',
-      noteBold: true,
-    },
   ];
 
   return (

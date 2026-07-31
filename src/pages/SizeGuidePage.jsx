@@ -65,15 +65,6 @@ function SizeGuidePage() {
       note: 'El cotó orgànic es pot encongir lleugerament, fins a un 2 o un 3% després de la primera rentada, per això, les mesures de la taula, són un cop rentats. Segueix les instruccions de cura per mantenir la qualitat i mesures de la samarreta.',
       noteBold: true,
     },
-    {
-      bullet: '6. Contacte',
-      paragraph: 'Si no estàs segur de quina talla has de triar, mirarem d\'ajudar-te:',
-      contact: [
-        'higginsgrafic@gmail.com',
-      ],
-      note: 'Ens comprometem a respondre les consultes en un màxim de 48 hores laborables.',
-      noteBold: true,
-    },
   ];
 
   return (

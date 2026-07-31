@@ -100,19 +100,6 @@ function PrivacyPage() {
       bullet: '10. Canvis a Aquesta Política',
       paragraph: 'Us volem fer avinent que les polítiques de privacitat són susceptibles de rebre canvis o retocs puntuals per tal de reflectir la realitat social o, també, canvis que afectin la nostra operativa ja sigui, per raons legals, per qüestions reguladores, etc. Informarem de qualsevol canvi tot publicant la nova edició en aquesta pàgina i actualitzarem la data de la darrera actualització a la part superior. Recomanem revisar aquesta política, de tant en tant, per estar al dia sobre com protegim la informació.',
     },
-    {
-      bullet: '11. Contacte',
-      paragraph: 'Si teniu preguntes o preocupacions sobre aquesta Política de Privacitat o sobre com gestionem les dades personals ens les podeu fer arribar a:',
-      contact: [
-        'Higgins GRÀFIC',
-        'Carrer Convent, 11',
-        'Cardedeu 08440, Barcelona',
-        '(a determinar)',
-        'higginsgrafic@gmail.com',
-      ],
-      note: 'També teniu dret a presentar una reclamació davant l\'Agència Espanyola de Protecció de Dades (AEPD) si considereu que el tractament de les dades personals vulnera la normativa aplicable.',
-      noteBold: true,
-    },
   ];
 
   return (
