@@ -1,10 +1,11 @@
 import React, { memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import * as ReactDOM from 'react-dom';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { ChevronDown, ChevronLeft, ChevronRight, ChevronUp, Menu, UserRound, UserPlus, X, Clock, Truck, AlertCircle, MoreHorizontal, Loader2, Eye, EyeOff, LayoutGrid, Layers } from 'lucide-react';
+import { ChevronDown, ChevronLeft, ChevronRight, ChevronUp, Menu, User, UserPlus, LogIn, X, Clock, Truck, AlertCircle, MoreHorizontal, Loader2, Eye, EyeOff, LayoutGrid, Layers } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useProductContext } from '@/contexts/ProductContext';
 import { useAdmin } from '@/contexts/AdminContext';
+import { useAuth } from '@/contexts/AuthContext';
 import { useOrders } from '@/hooks/useOrders';
 import { getGildan5000Catalog } from '../utils/placeholders.js';
 import {
@@ -288,6 +289,7 @@ function FullWideSlideHeader({
   }, []);
 
   const [showRegisterOverlay, setShowRegisterOverlay] = useState(false);
+  const { user } = useAuth();
   const [active, setActive] = useState(() => {
     try {
       const p = new URLSearchParams(location.search);
@@ -2997,12 +2999,15 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
                     setMegaPage(4);
                     setAcordioExpandedPage4(false);
                     if (!active) ensureMegaOpen();
-                    setShowRegisterOverlay(true);
+                    if (!user) setShowRegisterOverlay(true);
                     touchMegaPublicActivity();
                   }, dblClickDelayMs);
                 }}
               >
-                <UserPlus className="h-[25px] w-[25px] text-foreground lg:h-[29px] lg:w-[29px]" strokeWidth={1.5} />
+                {user
+                  ? <User className="h-[25px] w-[25px] text-foreground lg:h-[29px] lg:w-[29px]" strokeWidth={1.5} />
+                  : <LogIn className="h-[25px] w-[25px] text-foreground lg:h-[29px] lg:w-[29px]" strokeWidth={1.5} />
+                }
               </IconButton>
             </div>
           </div>

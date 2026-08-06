@@ -52,6 +52,17 @@ function mapOrderFromApi(o) {
   };
 }
 
+const MOCK_ORDERS = [
+  { num: '#00000000000000000000027', status: 'PENDENT', date: '12-07-26', active: true, total: '45,90€', icon: 'MoreHorizontal' },
+  { num: '#00000000000000000000026', status: 'EN PREPARACIÓ', date: '10-07-26', active: true, total: '32,50€', icon: 'Loader2' },
+  { num: '#00000000000000000000025', status: 'EN REPARTIMENT', date: '08-07-26', active: true, total: '78,00€', icon: 'Truck' },
+  { num: '#00000000000000000000024', status: 'ENTREGADA', date: '03-07-26', active: false, total: '56,75€', icon: 'Package' },
+  { num: '#00000000000000000000023', status: 'ENTREGADA', date: '28-06-26', active: false, total: '24,99€', icon: 'Package' },
+  { num: '#00000000000000000000022', status: 'CANCEL·LADA', date: '25-06-26', active: false, total: '41,20€', icon: 'X' },
+  { num: '#00000000000000000000021', status: 'ENTREGADA', date: '20-06-26', active: false, total: '63,40€', icon: 'Package' },
+  { num: '#00000000000000000000020', status: 'ENTREGADA', date: '15-06-26', active: false, total: '18,90€', icon: 'Package' },
+];
+
 export function useOrders(email) {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(false);
