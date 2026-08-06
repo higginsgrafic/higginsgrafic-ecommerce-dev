@@ -2,7 +2,7 @@ import React, { memo, useEffect, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { UserRound } from 'lucide-react';
+import { User } from 'lucide-react';
 
 function DevHeader({
   adminBannerHeight = 0,
@@ -234,7 +234,7 @@ function DevHeader({
               aria-label="Obrir menú d'usuari"
               id="dev-header-user"
             >
-              <UserRound className="h-5 w-5 lg:h-6 lg:w-6 translate-y-[5px] text-foreground" />
+              <User className="h-5 w-5 lg:h-6 lg:w-6 translate-y-[5px] text-foreground" />
               <span className="sr-only">Usuari</span>
             </Button>
           </div>

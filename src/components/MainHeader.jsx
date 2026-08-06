@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { motion, AnimatePresence, animate, useMotionValue } from 'framer-motion';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Search, UserRound, Menu, X } from 'lucide-react';
+import { Search, User, Menu, X } from 'lucide-react';
 import { createPortal } from 'react-dom';
 import { Button } from '@/components/ui/button';
 import { useTexts } from '@/hooks/useTexts';
@@ -875,7 +875,7 @@ function MainHeader({
                 className="h-9 w-9 lg:h-10 lg:w-10 hover:bg-transparent focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                 aria-label="Obrir compte"
               >
-                <UserRound className="h-5 w-5 lg:h-6 lg:w-6" strokeWidth={1.5} />
+                <User className="h-5 w-5 lg:h-6 lg:w-6" strokeWidth={1.5} />
               </Button>
             </div>
           </div>

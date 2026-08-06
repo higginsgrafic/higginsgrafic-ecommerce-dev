@@ -3,7 +3,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { User, Mail, Lock, Eye, EyeOff, UserPlus, LogIn, X } from 'lucide-react';
 
 export default function RegisterOverlay({ onClose }) {
-  const [mode, setMode] = useState('register');
+  const [mode, setMode] = useState('login');
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
