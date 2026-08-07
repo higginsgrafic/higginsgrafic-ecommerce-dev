@@ -68,7 +68,7 @@ export default function AppRoutes({ location, pageProps, pautaEnabled, tableEnab
         <Route path="/constructor/full-wide-slide" element={<P.FullWideSlidePage pautaEnabled={false} tableEnabled={false} />} />
         <Route path="/plantilla-cataleg-components" element={<ProtectedRoute><P.PlantillaCatalegComponentsPage /></ProtectedRoute>} />
 
-        <Route path="/checkout" element={<P.CheckoutPage />} />
+        <Route path="/checkout" element={<Navigate to="/" replace />} />
         <Route path="/order-confirmation/:orderId" element={<MotionDiv><P.OrderConfirmationPage /></MotionDiv>} />
 
         <Route path="/about" element={<P.AboutPage />} />

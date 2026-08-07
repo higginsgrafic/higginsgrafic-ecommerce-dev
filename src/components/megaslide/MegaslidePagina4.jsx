@@ -1,7 +1,9 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useProfile } from '@/hooks/useProfile';
-import { MoreHorizontal, Loader2, Truck, AlertCircle, X, Package } from 'lucide-react';
+import { MoreHorizontal, Loader2, Truck, AlertCircle, X, Package, LogOut } from 'lucide-react';
+import { MOCK_CLIENT } from '@/lib/mockOrderStore';
 
 const STATUS_COLOR = {
   'PENDENT': '#9CA3AF',
@@ -59,11 +61,30 @@ export default function MegaslidePagina4({
   adminEmail,
   touchMegaPublicActivity,
 }) {
-  const { user, authReady } = useAuth();
+  const { user, authReady, signOut } = useAuth();
   const { profile, orders: profileOrders, addresses } = useProfile();
+  const navigate = useNavigate();
+
+  const handleSignOut = async () => {
+    await signOut();
+    navigate('/');
+  };
 
   const displayOrders = (profileOrders && profileOrders.length > 0) ? profileOrders : (orders && orders.length > 0 ? orders : []);
-  const defaultAddress = (addresses && addresses[0]) || {};
+  const isDev = import.meta.env.DEV;
+  const defaultAddress = (addresses && addresses[0]) || (isDev ? {
+    street: MOCK_CLIENT.address,
+    floor_door: '2º 1ª',
+    city: MOCK_CLIENT.city,
+    postal_code: MOCK_CLIENT.postalCode,
+    province: 'Barcelona',
+    country: MOCK_CLIENT.country,
+  } : {});
+  const displayProfile = profile && (profile.full_name || profile.phone) ? profile : (isDev ? {
+    ...profile,
+    full_name: profile?.full_name || MOCK_CLIENT.fullName,
+    phone: profile?.phone || '600 123 456',
+  } : profile);
 
   return (
     <div style={{ width: '25%', flexShrink: 0, display: 'flex', height: '100%', position: 'relative', justifyContent: 'center' }}>
@@ -154,29 +175,34 @@ export default function MegaslidePagina4({
                     </tr>
                   </thead>
                   <tbody>
-                    {displayOrders.length > 0 ? displayOrders.slice(0, 8).map((o, idx) => {
+                    {Array.from({ length: 9 }).map((_, idx) => {
+                      const o = displayOrders[idx];
+                      if (!o) {
+                        return (
+                          <tr key={`empty-${idx}`} style={{ height: '22px' }}>
+                            {Array.from({ length: 5 }).map((_, c) => (
+                              <td key={c} style={{ border: 'none', padding: '4px' }} />
+                            ))}
+                          </tr>
+                        );
+                      }
                       const status = o.status || o.raw?.status || 'PENDENT';
                       const Icon = STATUS_ICON[status] || MoreHorizontal;
                       const color = STATUS_COLOR[status] || '#9CA3AF';
                       return (
-                        <tr key={o.num || idx}>
-                          <td style={{ ...TEXT, fontSize: '7pt', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', padding: '4px', textAlign: 'left', border: 'none' }}>{o.num}</td>
-                          <td style={{ padding: '4px', textAlign: 'center', border: 'none' }}>
-                            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '2px' }}>
-                              <Icon size={9} color={color} strokeWidth={2} />
-                              <span style={{ ...TEXT, fontSize: '6pt', color, fontWeight: 300 }}>{status}</span>
+                        <tr key={o.num || idx} style={{ height: '22px' }}>
+                          <td style={{ ...TEXT, fontSize: '7pt', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', padding: '4px', textAlign: 'center', border: 'none' }}>{o.num}</td>
+                          <td style={{ padding: '4px', border: 'none' }}>
+                            <div style={{ display: 'flex', justifyContent: 'center' }}>
+                              <Icon size={11} color={color} strokeWidth={2} />
                             </div>
                           </td>
-                          <td style={{ ...TEXT, fontSize: '7pt', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', padding: '4px', textAlign: 'right', border: 'none' }}>{o.tracking_number || o.raw?.tracking_number || '—'}</td>
-                          <td style={{ ...TEXT, fontSize: '7pt', padding: '4px', textAlign: 'right', border: 'none' }}>{o.date}</td>
-                          <td style={{ ...TEXT, fontSize: '7pt', padding: '4px', textAlign: 'right', border: 'none' }}>{o.total || '—'}</td>
+                          <td style={{ ...TEXT, fontSize: '7pt', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', padding: '4px', textAlign: 'center', border: 'none' }}>{o.tracking_number || o.raw?.tracking_number || '—'}</td>
+                          <td style={{ ...TEXT, fontSize: '7pt', padding: '4px', textAlign: 'center', border: 'none' }}>{o.date}</td>
+                          <td style={{ ...TEXT, fontSize: '7pt', padding: '4px', textAlign: 'center', border: 'none' }}>{o.total || '—'}</td>
                         </tr>
                       );
-                    }) : (
-                      <tr>
-                        <td colSpan={5} style={{ ...TEXT, fontSize: '8pt', opacity: 0.4, padding: '16px 0', textAlign: 'center', border: 'none' }}>Encara no s'ha fet cap comanda</td>
-                      </tr>
-                    )}
+                    })}
                   </tbody>
                 </table>
                 {/* Legend */}
@@ -226,7 +252,7 @@ export default function MegaslidePagina4({
                     {/* Row 1: Nom + eCorreu */}
                     <tr>
                       <td style={{ width: '50%', padding: '4px', border: 'none' }}>
-                        <TransparentInput placeholder="Nom" defaultValue={profile?.full_name || ''} />
+                        <TransparentInput placeholder="Nom" defaultValue={displayProfile?.full_name || ''} />
                       </td>
                       <td style={{ width: '50%', padding: '4px', border: 'none' }}>
                         <TransparentInput placeholder="eCorreu" defaultValue={user?.email || ''} />
@@ -314,7 +340,7 @@ export default function MegaslidePagina4({
                     </thead>
                     <tbody>
                       <tr>
-                        <td style={{ padding: '2px 4px 2.5px', border: 'none' }}><TransparentInput placeholder="Nom" defaultValue={profile?.full_name || ''} /></td>
+                        <td style={{ padding: '2px 4px 2.5px', border: 'none' }}><TransparentInput placeholder="Nom" defaultValue={displayProfile?.full_name || ''} /></td>
                         <td style={{ padding: '2px 4px 2.5px', border: 'none' }}><TransparentInput placeholder="Carrer" defaultValue={defaultAddress.street || ''} /></td>
                       </tr>
                       <tr>
@@ -322,7 +348,7 @@ export default function MegaslidePagina4({
                         <td style={{ padding: '2px 4px 2.5px', border: 'none' }}><TransparentInput placeholder="Pis" defaultValue={defaultAddress.floor_door || ''} /></td>
                       </tr>
                       <tr>
-                        <td style={{ padding: '2px 4px 2.5px', border: 'none' }}><TransparentInput placeholder="Telèfon" defaultValue={profile?.phone || ''} /></td>
+                        <td style={{ padding: '2px 4px 2.5px', border: 'none' }}><TransparentInput placeholder="Telèfon" defaultValue={displayProfile?.phone || ''} /></td>
                         <td style={{ padding: '2px 4px 2.5px', border: 'none' }}><TransparentInput placeholder="Ciutat" defaultValue={defaultAddress.city || ''} /></td>
                       </tr>
                       <tr>
@@ -345,7 +371,27 @@ export default function MegaslidePagina4({
                 {/* Desa button — same size and Y position as bloc 2 buttons */}
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '4px', height: '9%', flexShrink: 0, position: 'relative', top: '7px', marginRight: '-9px' }}>
                   <div />
-                  <div />
+                  <button
+                    onClick={handleSignOut}
+                    style={{
+                      ...HEAD,
+                      fontSize: '7pt',
+                      color: '#475059',
+                      backgroundColor: 'rgba(244,246,248,0.7)',
+                      border: 'none',
+                      borderRadius: '2px',
+                      cursor: 'pointer',
+                      padding: 0,
+                      height: '100%',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '4px',
+                    }}
+                  >
+                    <LogOut size={10} color="#475059" strokeWidth={2} />
+                    Tanca sessió
+                  </button>
                   <button style={{
                     ...HEAD,
                     fontSize: '7pt',

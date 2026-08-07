@@ -362,7 +362,7 @@ function ConstructorPdpPage() {
                     collection: 'CONSTRUCTOR',
                     qty: 1,
                     size: selectedSize,
-                    price: '19,95€',
+                    price: '15,50€',
                     color: mainVariantColor,
                     drawing: '',
                     disabled: false,

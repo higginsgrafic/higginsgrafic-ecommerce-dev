@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { ChevronDown, ChevronUp, ArrowLeft, X, Trash2, Plus } from 'lucide-react';
 import { useShippingCosts } from '@/hooks/useShippingCosts';
+import { drawingStripePath } from '@/lib/drawingPaths';
 
 function CistellComandaContent({ cartItems, setCartItems, onCloseMegaSlide, onFinalizeOrder }) {
   const navigate = useNavigate();
@@ -41,7 +42,6 @@ function CistellComandaContent({ cartItems, setCartItems, onCloseMegaSlide, onFi
   const TSHIRT_SUFFIX = '_gpr-4-0_front.png';
   const tshirtSrc = (color) => `${TSHIRT_BASE}${color}${TSHIRT_SUFFIX}`;
 
-  const DRAWING_BASE = '/custom_logos/drawings/images_stripe/';
 
   const SIZES = ['XS', 'S', 'M', 'L', 'XL', 'XXL'];
   const CART_ITEMS = cartItems;
@@ -218,46 +218,48 @@ function CistellComandaContent({ cartItems, setCartItems, onCloseMegaSlide, onFi
             height: '100%',
           }}>
           {/* Col 1: samarreta + dibuix (cadascú centrat amb el slot del carrusel del damunt) */}
-          <div style={{ ...colBg, position: 'relative', display: 'grid', gridTemplateColumns: `${SLOT_W}px ${SLOT_W}px`, columnGap: `${SLIDE_GAP}px`, alignItems: 'center', justifyItems: 'center', padding: 0, minWidth: 0, overflow: 'hidden' }}>
-            <div style={{
-              alignSelf: 'start',
-              width: `${SLOT_W}px`,
-              height: `${2 * ROW_H - V_GUTTER}px`,
-              backgroundColor: 'transparent',
-              boxSizing: 'border-box',
-              overflow: 'hidden',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}>
-              <img
-                src={tshirtSrc(item.color)}
-                alt={`${item.title} — ${item.color}`}
-                style={{ width: '75%', height: '75%', objectFit: 'contain', display: 'block', transform: 'translateY(1px)' }}
-              />
-            </div>
-            <div style={{
-              alignSelf: 'start',
-              width: `${SLOT_W}px`,
-              height: `${2 * ROW_H - V_GUTTER}px`,
-              backgroundColor: 'transparent',
-              boxSizing: 'border-box',
-              overflow: 'hidden',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}>
-              <img
-                src={`${DRAWING_BASE}${item.drawing}`}
-                alt={item.title}
-                style={{ width: item.title === 'NCC-1701-D' ? '54.45%' : '72.6%', height: item.title === 'NCC-1701-D' ? '54.45%' : '72.6%', objectFit: 'contain', display: 'block', transform: item.title === 'ROBBIE THE ROBOT' ? 'translateY(1px)' : undefined }}
-              />
+          <div style={{ ...colBg, position: 'relative', padding: 0, minWidth: 0 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: `${SLOT_W}px ${SLOT_W}px`, columnGap: `${SLIDE_GAP}px`, alignItems: 'center', justifyItems: 'center', height: '100%' }}>
+              <div style={{
+                alignSelf: 'start',
+                width: `${SLOT_W}px`,
+                height: `${2 * ROW_H - V_GUTTER}px`,
+                backgroundColor: 'transparent',
+                boxSizing: 'border-box',
+                overflow: 'hidden',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}>
+                <img
+                  src={tshirtSrc(item.color)}
+                  alt={`${item.title} — ${item.color}`}
+                  style={{ width: '75%', height: '75%', objectFit: 'contain', display: 'block', transform: 'translateY(1px)' }}
+                />
+              </div>
+              <div style={{
+                alignSelf: 'start',
+                width: `${SLOT_W}px`,
+                height: `${2 * ROW_H - V_GUTTER}px`,
+                backgroundColor: 'transparent',
+                boxSizing: 'border-box',
+                overflow: 'hidden',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}>
+                <img
+                  src={(item.collectionSlug && item.productRoute ? drawingStripePath(item.collectionSlug, item.productRoute, item.color, item.finish) : item.drawing) || ''}
+                  alt={item.title}
+                  style={{ width: item.title === 'NCC-1701-D' ? '54.45%' : '72.6%', height: item.title === 'NCC-1701-D' ? '54.45%' : '72.6%', objectFit: 'contain', display: 'block', transform: item.title === 'ROBBIE THE ROBOT' ? 'translateY(1px)' : undefined, filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.25))' }}
+                />
+              </div>
             </div>
             <svg
               viewBox="0 0 24 24"
               width={(2 * ROW_H - V_GUTTER) * 0.421875}
               height={(2 * ROW_H - V_GUTTER) * 0.421875}
-              style={{ position: 'absolute', left: '50%', top: `${(2 * ROW_H - V_GUTTER) / 2}px`, transform: 'translate(-50%, -50%)', pointerEvents: 'none' }}
+              style={{ position: 'absolute', left: '50%', top: '50%', transform: 'translate(-50%, -50%)', pointerEvents: 'none', zIndex: 2 }}
               aria-hidden="true"
             >
               <line x1="12" y1="3" x2="12" y2="21" stroke="#7D8895" strokeWidth="1" strokeLinecap="butt" />

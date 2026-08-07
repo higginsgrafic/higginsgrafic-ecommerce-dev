@@ -1,6 +1,36 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/api/supabase-products';
 import { useAuth } from '@/contexts/AuthContext';
+import { fetchMockOrdersByEmail } from '@/lib/mockOrderStore';
+
+function formatDate(dateStr) {
+  if (!dateStr) return '';
+  try {
+    const d = new Date(dateStr);
+    const dd = String(d.getDate()).padStart(2, '0');
+    const mm = String(d.getMonth() + 1).padStart(2, '0');
+    const yy = String(d.getFullYear()).slice(-2);
+    return `${dd}-${mm}-${yy}`;
+  } catch {
+    return '';
+  }
+}
+
+function formatTotal(num) {
+  if (typeof num !== 'number') num = parseFloat(num) || 0;
+  return num.toFixed(2).replace('.', ',') + '€';
+}
+
+function mapMockOrder(o) {
+  return {
+    num: o.order_number || o.id,
+    status: o.statusLabel || (o.status || 'PENDENT').toUpperCase(),
+    date: formatDate(o.created_at),
+    total: formatTotal(o.total),
+    tracking_number: o.tracking_number || '—',
+    raw: o,
+  };
+}
 
 export function useProfile() {
   const { user } = useAuth();
@@ -39,12 +69,17 @@ export function useProfile() {
       setAddresses(addressData || []);
 
       try {
-        const ordersRes = await fetch(`/api/orders?userId=${encodeURIComponent(user.id)}`);
-        if (ordersRes.ok) {
-          const ordersData = await ordersRes.json();
-          setOrders(ordersData.orders || []);
+        if (import.meta.env.DEV) {
+          const mockOrders = fetchMockOrdersByEmail(user.email);
+          setOrders(mockOrders.map(mapMockOrder));
         } else {
-          setOrders([]);
+          const ordersRes = await fetch(`/api/orders?userId=${encodeURIComponent(user.id)}`);
+          if (ordersRes.ok) {
+            const ordersData = await ordersRes.json();
+            setOrders(ordersData.orders || []);
+          } else {
+            setOrders([]);
+          }
         }
       } catch {
         setOrders([]);
