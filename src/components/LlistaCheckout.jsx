@@ -375,6 +375,23 @@ const LlistaCheckout = ({ items, onBreadcrumbClick }) => {
                         <span>,</span>
                         <span>{label.replace('€', '').split(',')[1]}€</span>
                       </span>
+                    ) : index === 0 ? (
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        {item.image && (
+                          <img
+                            src={item.image}
+                            alt={item.name}
+                            style={{
+                              width: '28px',
+                              height: '28px',
+                              objectFit: 'cover',
+                              borderRadius: '2px',
+                              flexShrink: 0,
+                            }}
+                          />
+                        )}
+                        <span>{label}</span>
+                      </div>
                     ) : label}
                   </div>
                 ))

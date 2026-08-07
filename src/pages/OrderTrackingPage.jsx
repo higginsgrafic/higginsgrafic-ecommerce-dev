@@ -3,13 +3,14 @@ import { useSearchParams } from 'react-router-dom';
 import SEO from '@/components/SEO';
 import Breadcrumbs from '@/components/Breadcrumbs';
 import { formatPrice } from '@/utils/formatters';
+import { fetchMockOrder, MOCK_CLIENT } from '@/lib/mockOrderStore';
 
 const OrderTrackingPage = () => {
   const [searchParams] = useSearchParams();
   const orderIdFromUrl = searchParams.get('order');
 
   const [orderId, setOrderId] = useState(orderIdFromUrl || '');
-  const [email, setEmail] = useState('');
+  const [email, setEmail] = useState(import.meta.env.DEV && orderIdFromUrl ? MOCK_CLIENT.email : '');
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -37,6 +38,44 @@ const OrderTrackingPage = () => {
 
     setLoading(true);
     setError('');
+
+    if (import.meta.env.DEV) {
+      const mockOrder = fetchMockOrder(orderId.trim(), email.trim());
+      if (mockOrder) {
+        const items = Array.isArray(mockOrder.items) ? mockOrder.items : [];
+        setOrder({
+          id: mockOrder.order_number || mockOrder.id,
+          createdAt: mockOrder.created_at,
+          status: 'created',
+          totalPrice: parseFloat(mockOrder.total) || 0,
+          email: mockOrder.email,
+          items: items.map((item, idx) => ({
+            id: item.id || idx,
+            name: item.name || 'Producte',
+            size: item.size || '-',
+            quantity: item.quantity || 1,
+            price: item.price || 0,
+            image: item.image || null,
+          })),
+          shippingAddress: {
+            firstName: mockOrder.first_name || '',
+            lastName: mockOrder.last_name || '',
+            street: mockOrder.address || '',
+            city: mockOrder.city || '',
+            postalCode: mockOrder.postal_code || '',
+            country: mockOrder.country || '',
+          },
+          tracking: mockOrder.tracking_number ? {
+            carrier: mockOrder.tracking_carrier || null,
+            trackingNumber: mockOrder.tracking_number,
+            trackingUrl: mockOrder.tracking_url || null,
+          } : null,
+          estimatedDelivery: mockOrder.estimated_delivery || null,
+        });
+        setLoading(false);
+        return;
+      }
+    }
 
     try {
       const res = await fetch(`/api/orders?orderNumber=${encodeURIComponent(orderId.trim())}&email=${encodeURIComponent(email.trim())}`);

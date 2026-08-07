@@ -34,7 +34,7 @@ export default function ProductCard({
   overlayEnabled = false,
   brand = 'THE HUMAN INSIDE',
   title = 'IRON KONG',
-  price = '19,99 €',
+  price = '15,50 €',
   onNavigateBlocked,
   cardIndex,
   positionKey,

@@ -5,27 +5,29 @@ import { validateEmail, validateRequired, validatePostalCode, validateForm } fro
 import { trackBeginCheckout, trackPurchase } from '@/utils/analytics';
 import { useShippingCosts } from '@/hooks/useShippingCosts';
 import { useOrders } from '@/hooks/useOrders';
+import { createMockOrder, MOCK_CLIENT } from '@/lib/mockOrderStore';
 
 function CheckoutContent({ cartItems, setCartItems, onCloseMegaSlide }) {
   const { createOrder } = useOrders();
   const navigate = useNavigate();
+  const isDev = import.meta.env.DEV;
   const [formData, setFormData] = useState({
-    email: '',
-    firstName: '',
-    lastName: '',
-    address: '',
+    email: isDev ? MOCK_CLIENT.email : '',
+    firstName: isDev ? MOCK_CLIENT.firstName : '',
+    lastName: isDev ? MOCK_CLIENT.lastName : '',
+    address: isDev ? MOCK_CLIENT.address : '',
     address2: '',
-    city: '',
-    postalCode: '',
-    country: 'Espanya',
-    phone: '',
+    city: isDev ? MOCK_CLIENT.city : '',
+    postalCode: isDev ? MOCK_CLIENT.postalCode : '',
+    country: isDev ? MOCK_CLIENT.country : 'Espanya',
+    phone: isDev ? '600 123 456' : '',
     cardNumber: '',
     expiryDate: '',
     cvv: '',
   });
   const [formErrors, setFormErrors] = useState({});
   const [isProcessing, setIsProcessing] = useState(false);
-  const [paymentDetailsOpen, setPaymentDetailsOpen] = useState(false);
+  const [paymentDetailsOpen, setPaymentDetailsOpen] = useState(isDev);
 
   const ROW_H = 32.8;
   const V_GUTTER = 2.8;
@@ -111,8 +113,23 @@ function CheckoutContent({ cartItems, setCartItems, onCloseMegaSlide }) {
         });
         orderNumber = order?.order_number || null;
       } else {
-        await new Promise(resolve => setTimeout(resolve, 1200));
-        orderNumber = 'GRF-DEV-' + Math.random().toString(36).substr(2, 9).toUpperCase();
+        const orderItems = activeItems.map((item, idx) => ({
+          id: item.id || `item-${idx}`,
+          name: item.title || item.name || 'Producte',
+          size: item.size || 'L',
+          quantity: item.qty || 1,
+          price: parseFloat(String(item.price).replace('€', '').replace(/\s/g, '').replace(',', '.')) || 0,
+          image: item.image || '/tshirt-white.jpg',
+        }));
+        const mockOrder = createMockOrder({
+          items: orderItems,
+          subtotal,
+          shipping,
+          iva: ivaAmount,
+          total,
+          formData,
+        });
+        orderNumber = mockOrder.order_number;
       }
       trackPurchase(orderNumber, activeItems, total, shipping, 0);
       if (setCartItems) setCartItems([]);

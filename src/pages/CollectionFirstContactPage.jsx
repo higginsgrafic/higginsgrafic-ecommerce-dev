@@ -298,7 +298,7 @@ function CollectionFirstContactPage() {
                 cartCount={0}
                 onAddToCart={(size) => {
                   window.dispatchEvent(new CustomEvent('hg:open-full-wide-cart', {
-                    detail: { source: 'collection-tdp-cta', firstPartOnly: true, item: { title: productName.toUpperCase(), collection: 'FIRST CONTACT', qty: 1, size, price: '15,50€', color, drawing: '', disabled: false } },
+                    detail: { source: 'collection-tdp-cta', firstPartOnly: true, item: { title: productName.toUpperCase(), collection: 'FIRST CONTACT', collectionSlug: 'first-contact', productRoute: productAt(rowIdx, colIdx).route, qty: 1, size, price: '15,50€', color, finish: gridFinishFor('first-contact', color, rowIdx * 4 + colIdx), drawing: '', disabled: false } },
                   }));
                 }}
                 editableIdPrefix="constructor-colleccio-copy2-tdp-col2"

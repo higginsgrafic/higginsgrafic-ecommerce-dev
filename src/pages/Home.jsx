@@ -188,6 +188,8 @@ function Home() {
       ...(item.overlayTranslateY != null ? { overlayTranslateY: item.overlayTranslateY } : {}),
       onAddToCart: () => {
         try {
+          const href = item.productHref || '';
+          const productRoute = href.split('?')[0].split('/')[2] || '';
           window.dispatchEvent(new CustomEvent('hg:open-full-wide-cart', {
             detail: {
               source: 'home-tdp-cta',
@@ -195,9 +197,11 @@ function Home() {
               item: {
                 title: item.productName.toUpperCase(),
                 collection: collectionName,
+                collectionSlug: slug,
+                productRoute,
                 qty: 1,
                 size: size,
-                price: '19,95€',
+                price: '15,50€',
                 color: item.color,
                 drawing: '',
                 disabled: false,

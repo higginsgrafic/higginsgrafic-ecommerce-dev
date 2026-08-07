@@ -339,7 +339,7 @@ export default function MegaslidePagina2({
           </div>
         ) : null}
 
-        {/* MegaHeroSlider */}
+        {/* MegaHeroSlider — amagat temporalment
         <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, zIndex: 1, pointerEvents: 'none' }}>
           <Pauta4ColsOverlay
             pautaEnabled={false}
@@ -379,6 +379,7 @@ export default function MegaslidePagina2({
             </div>
           </Pauta4ColsOverlay>
         </div>
+        */}
       </div>
 
       <div style={{

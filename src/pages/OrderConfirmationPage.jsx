@@ -1,16 +1,16 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 import { motion } from 'framer-motion';
-import { CheckCircle, Package, Truck, CreditCard, Mail, MapPin, Clock, Download, ArrowRight, Loader2 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { ArrowRight, Loader2 } from 'lucide-react';
 import { formatPrice } from '@/utils/formatters';
-import { useToast } from '@/contexts/ToastContext';
+import { fetchMockOrder } from '@/lib/mockOrderStore';
+import Pauta4ColsOverlay from '@/components/pauta/Pauta4ColsOverlay';
+
+const HERO_IMAGE = '/placeholders/fons-confirmacio-comanda.png';
 
 const OrderConfirmationPage = () => {
   const { orderId } = useParams();
-  const navigate = useNavigate();
-  const { info } = useToast();
   const [orderData, setOrderData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -25,35 +25,43 @@ const OrderConfirmationPage = () => {
         return;
       }
 
-      try {
-        const res = await fetch(`/api/orders?orderNumber=${encodeURIComponent(orderId)}`);
-        if (!res.ok) {
-          throw new Error(`HTTP ${res.status}`);
-        }
-        const data = await res.json();
-        if (data.order) {
-          const o = data.order;
-          const items = Array.isArray(o.items) ? o.items : (typeof o.items === 'string' ? JSON.parse(o.items) : []);
+      if (import.meta.env.DEV) {
+        const mockOrder = fetchMockOrder(orderId);
+        if (mockOrder) {
+          const items = Array.isArray(mockOrder.items) ? mockOrder.items : [];
           setOrderData({
-            id: o.order_number || o.id,
-            date: o.created_at ? new Date(o.created_at).toLocaleDateString('ca-ES', { day: '2-digit', month: 'long', year: 'numeric' }) : '',
-            estimatedDelivery: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toLocaleDateString('ca-ES', { day: '2-digit', month: 'long' }),
-            email: o.email || '',
-            status: o.statusLabel || o.status || 'PENDENT',
-            shippingAddress: {
-              name: `${o.first_name || ''} ${o.last_name || ''}`.trim(),
-              street: o.address || '',
-              city: o.city || '',
-              postalCode: o.postal_code || '',
-              country: o.country || 'Espanya',
-            },
+            id: mockOrder.order_number || mockOrder.id,
             items: items.map((item, idx) => ({
               id: item.id || idx,
               name: item.name || 'Producte',
               size: item.size || '-',
               quantity: item.quantity || 1,
               price: item.price || 0,
-              image: item.image || '/tshirt-white.jpg',
+            })),
+            subtotal: parseFloat(mockOrder.subtotal) || 0,
+            shipping: parseFloat(mockOrder.shipping_cost) || 0,
+            total: parseFloat(mockOrder.total) || 0,
+          });
+          setLoading(false);
+          return;
+        }
+      }
+
+      try {
+        const res = await fetch(`/api/orders?orderNumber=${encodeURIComponent(orderId)}`);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+        if (data.order) {
+          const o = data.order;
+          const items = Array.isArray(o.items) ? o.items : (typeof o.items === 'string' ? JSON.parse(o.items) : []);
+          setOrderData({
+            id: o.order_number || o.id,
+            items: items.map((item, idx) => ({
+              id: item.id || idx,
+              name: item.name || 'Producte',
+              size: item.size || '-',
+              quantity: item.quantity || 1,
+              price: item.price || 0,
             })),
             subtotal: parseFloat(o.subtotal) || 0,
             shipping: parseFloat(o.shipping_cost) || 0,
@@ -73,13 +81,9 @@ const OrderConfirmationPage = () => {
     fetchOrder();
   }, [orderId]);
 
-  const handleDownloadInvoice = () => {
-    info('Funció de descàrrega de factura (per implementar amb backend)');
-  };
-
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f5f5f5' }}>
         <Loader2 className="w-8 h-8 animate-spin text-gray-400" />
       </div>
     );
@@ -87,13 +91,11 @@ const OrderConfirmationPage = () => {
 
   if (error || !orderData) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
-        <div className="text-center">
-          <p className="text-lg font-medium mb-2" style={{ color: '#141414' }}>{error || 'Comanda no trobada'}</p>
-          <Link to="/">
-            <Button className="mt-4" style={{ backgroundColor: '#141414', color: '#FFFFFF' }}>
-              Tornar a l'inici
-            </Button>
+      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f5f5f5' }}>
+        <div style={{ textAlign: 'center' }}>
+          <p style={{ fontSize: '18px', fontWeight: 500, marginBottom: '8px', color: '#141414' }}>{error || 'Comanda no trobada'}</p>
+          <Link to="/" style={{ display: 'inline-block', marginTop: '16px', padding: '12px 32px', backgroundColor: '#141414', color: '#FFFFFF', textDecoration: 'none', borderRadius: '4px' }}>
+            Tornar a l'inici
           </Link>
         </div>
       </div>
@@ -108,235 +110,206 @@ const OrderConfirmationPage = () => {
         <meta name="robots" content="noindex, nofollow" />
       </Helmet>
 
-      <div className="min-h-screen bg-gray-50 py-8 md:py-12">
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Capçalera d'èxit */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-center mb-8"
+      {/* Hero amb fons fixe i confirmació a dins */}
+      <Pauta4ColsOverlay
+        pautaEnabled={false}
+        tableEnabled={false}
+        numCols={3}
+        numRows={24}
+        canvasAspect={[2642, 1780]}
+        topOffset="76px"
+        bottomPadding="0px"
+      >
+        {/* Imatge de fons + contingut de confirmació al mateix contenidor */}
+        <div
+          style={{
+            gridColumn: '1 / 4',
+            gridRow: '5 / 20',
+            position: 'relative',
+            top: `calc(-5px)`,
+            width: 'calc(100% + 1px)',
+            height: 'calc(100% + 2px)',
+            transform: 'scale(0.94)',
+            transformOrigin: 'center center',
+            borderRadius: '18px',
+            overflow: 'hidden',
+          }}
+        >
+          <img
+            src={HERO_IMAGE}
+            alt="Confirmació de comanda"
+            style={{
+              position: 'absolute',
+              inset: 0,
+              width: '100%',
+              height: '100%',
+              objectFit: 'cover',
+            }}
+          />
+          {/* Contingut de confirmació a sobre de la imatge */}
+          <div
+            style={{
+              position: 'relative',
+              zIndex: 2,
+              width: '100%',
+              height: '100%',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              padding: '0 24px',
+              textAlign: 'center',
+              marginTop: '50px',
+            }}
           >
-            <motion.div
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              transition={{ delay: 0.2, type: 'spring' }}
-              className="inline-flex items-center justify-center w-20 h-20 bg-green-100 rounded-full mb-4"
-            >
-              <CheckCircle className="w-12 h-12 text-green-600" />
-            </motion.div>
-
-            <h1 className="font-oswald text-3xl sm:text-4xl font-bold uppercase mb-2" style={{ color: '#141414' }}>
-              Comanda confirmada!
-            </h1>
-            <p className="text-lg" style={{ color: '#141414', opacity: 0.7 }}>
-              Sia servit i gràcies
-            </p>
-            <p className="text-sm mt-2" style={{ color: '#141414', opacity: 0.5 }}>
-              Número de comanda: <span className="font-mono font-bold">{orderData.id}</span>
-            </p>
-          </motion.div>
-
-          {/* Informació de seguiment */}
-          <motion.div
+          {/* Títol */}
+          <motion.h1
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
-            className="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-6"
+            style={{
+              fontFamily: 'Oswald, sans-serif',
+              fontSize: 'clamp(1.8rem, 4vw, 3rem)',
+              fontWeight: 700,
+              textTransform: 'uppercase',
+              lineHeight: 1,
+              color: '#FFFFFF',
+              marginBottom: '10px',
+              textShadow: '0 2px 8px rgba(0,0,0,0.6)',
+            }}
           >
-            <div className="flex items-start gap-4">
-              <Mail className="w-6 h-6 text-blue-600 flex-shrink-0 mt-0.5" />
-              <div>
-                <p className="font-medium mb-1">Confirmació enviada</p>
-                <p className="text-sm" style={{ color: '#141414', opacity: 0.7 }}>
-                  Hem enviat un correu de confirmació a <strong>{orderData.email}</strong> amb tots els detalls de la teva comanda.
-                </p>
-              </div>
-            </div>
-          </motion.div>
+            Comanda confirmada!
+          </motion.h1>
 
-          {/* Timeline de lliurament */}
-          <motion.div
+          {/* Subtítol */}
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.35 }}
+            style={{
+              fontFamily: 'Roboto Condensed, sans-serif',
+              fontSize: 'clamp(0.9rem, 1.8vw, 1.15rem)',
+              color: '#FFFFFF',
+              opacity: 0.85,
+              marginBottom: '6px',
+              textShadow: '0 1px 4px rgba(0,0,0,0.6)',
+            }}
+          >
+            Sia servit i gràcies
+          </motion.p>
+
+          {/* Número de comanda */}
+          <motion.p
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4 }}
-            className="bg-white rounded-lg shadow-sm p-6 mb-6"
+            style={{
+              fontFamily: 'Roboto Condensed, sans-serif',
+              fontSize: '13px',
+              color: '#FFFFFF',
+              opacity: 0.7,
+              marginBottom: '75px',
+              textShadow: '0 1px 4px rgba(0,0,0,0.6)',
+            }}
           >
-            <h2 className="font-oswald text-xl font-bold uppercase mb-6" style={{ color: '#141414' }}>
-              Estat de la comanda
-            </h2>
-
-            <div className="space-y-6">
-              {/* Pas 1: Processant */}
-              <div className="flex items-start gap-4">
-                <div className="flex-shrink-0">
-                  <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
-                    <CheckCircle className="w-6 h-6 text-green-600" />
-                  </div>
-                </div>
-                <div className="flex-1 pt-1">
-                  <p className="font-medium">Comanda rebuda</p>
-                  <p className="text-sm" style={{ color: '#141414', opacity: 0.6 }}>
-                    {orderData.date}
-                  </p>
-                </div>
-              </div>
-
-              {/* Connector */}
-              <div className="ml-5 h-8 w-0.5 bg-gray-200"></div>
-
-              {/* Pas 2: Preparant */}
-              <div className="flex items-start gap-4">
-                <div className="flex-shrink-0">
-                  <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center animate-pulse">
-                    <Package className="w-6 h-6 text-blue-600" />
-                  </div>
-                </div>
-                <div className="flex-1 pt-1">
-                  <p className="font-medium">Preparant l'enviament</p>
-                  <p className="text-sm" style={{ color: '#141414', opacity: 0.6 }}>
-                    En procés
-                  </p>
-                </div>
-              </div>
-
-              {/* Connector */}
-              <div className="ml-5 h-8 w-0.5 bg-gray-200"></div>
-
-              {/* Pas 3: Enviat */}
-              <div className="flex items-start gap-4 opacity-50">
-                <div className="flex-shrink-0">
-                  <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center">
-                    <Truck className="w-6 h-6 text-gray-400" />
-                  </div>
-                </div>
-                <div className="flex-1 pt-1">
-                  <p className="font-medium">En trànsit</p>
-                  <p className="text-sm" style={{ color: '#141414', opacity: 0.6 }}>
-                    Pendent
-                  </p>
-                </div>
-              </div>
-
-              {/* Connector */}
-              <div className="ml-5 h-8 w-0.5 bg-gray-200"></div>
-
-              {/* Pas 4: Lliurat */}
-              <div className="flex items-start gap-4 opacity-50">
-                <div className="flex-shrink-0">
-                  <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center">
-                    <MapPin className="w-6 h-6 text-gray-400" />
-                  </div>
-                </div>
-                <div className="flex-1 pt-1">
-                  <p className="font-medium">Lliurat</p>
-                  <p className="text-sm flex items-center gap-1" style={{ color: '#141414', opacity: 0.6 }}>
-                    <Clock className="w-4 h-4" />
-                    Estimat: {orderData.estimatedDelivery}
-                  </p>
-                </div>
-              </div>
-            </div>
-          </motion.div>
+            Número de comanda: <span style={{ fontFamily: 'monospace', fontWeight: 700 }}>{orderData.id}</span>
+          </motion.p>
 
           {/* Resum de la comanda */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.5 }}
-            className="bg-white rounded-lg shadow-sm p-6 mb-6"
+            transition={{ delay: 0.45 }}
+            style={{
+              width: '100%',
+              maxWidth: '480px',
+              background: 'rgba(255,255,255,0.95)',
+              borderRadius: '10px',
+              boxShadow: '0 4px 24px rgba(0,0,0,0.15)',
+              padding: '20px',
+              marginBottom: '20px',
+              textAlign: 'left',
+              backdropFilter: 'blur(8px)',
+            }}
           >
-            <h2 className="font-oswald text-xl font-bold uppercase mb-4" style={{ color: '#141414' }}>
+            <h2 style={{
+              fontFamily: 'Oswald, sans-serif',
+              fontSize: '16px',
+              fontWeight: 700,
+              textTransform: 'uppercase',
+              color: '#141414',
+              marginBottom: '14px',
+            }}>
               Resum de la comanda
             </h2>
 
             {/* Productes */}
-            <div className="space-y-4 mb-6 pb-6 border-b border-gray-200">
+            <div style={{ marginBottom: '14px', paddingBottom: '14px', borderBottom: '1px solid #E6E8EC' }}>
               {orderData.items.map((item, index) => (
-                <div key={index} className="flex gap-4">
-                  <div className="w-20 h-20 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
-                    <img src={item.image} alt={item.name} loading="lazy" className="w-full h-full object-cover" />
+                <div key={index} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: index === orderData.items.length - 1 ? 0 : '6px' }}>
+                  <div>
+                    <span style={{ fontFamily: 'Oswald, sans-serif', fontWeight: 700, textTransform: 'uppercase', fontSize: '13px', color: '#141414' }}>{item.name}</span>
+                    <span style={{ fontFamily: 'Roboto Condensed, sans-serif', fontSize: '12px', color: '#141414', opacity: 0.5, marginLeft: '6px' }}>
+                      {item.size} · {item.quantity}u
+                    </span>
                   </div>
-                  <div className="flex-1">
-                    <p className="font-oswald font-bold uppercase">{item.name}</p>
-                    <p className="text-sm" style={{ color: '#141414', opacity: 0.6 }}>
-                      Talla: {item.size} · Quantitat: {item.quantity}
-                    </p>
-                    <p className="font-oswald text-lg mt-1">{formatPrice(item.price)}</p>
-                  </div>
+                  <span style={{ fontFamily: 'Oswald, sans-serif', fontSize: '13px', color: '#141414' }}>{formatPrice(item.price)}</span>
                 </div>
               ))}
             </div>
 
             {/* Totals */}
-            <div className="space-y-2">
-              <div className="flex justify-between text-sm">
-                <span style={{ color: '#141414', opacity: 0.7 }}>Subtotal</span>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', color: '#141414', opacity: 0.7 }}>
+                <span>Subtotal</span>
                 <span>{formatPrice(orderData.subtotal)}</span>
               </div>
-              <div className="flex justify-between text-sm">
-                <span style={{ color: '#141414', opacity: 0.7 }}>Enviament</span>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', color: '#141414', opacity: 0.7 }}>
+                <span>Enviament</span>
                 <span>{orderData.shipping === 0 ? 'Gratuït' : formatPrice(orderData.shipping)}</span>
               </div>
-              <div className="flex justify-between pt-2 border-t font-oswald text-xl">
+              <div style={{ display: 'flex', justifyContent: 'space-between', paddingTop: '6px', marginTop: '3px', borderTop: '1px solid #E6E8EC', fontFamily: 'Oswald, sans-serif', fontSize: '18px', color: '#141414' }}>
                 <span>Tot plegat fa</span>
                 <span>{formatPrice(orderData.total)}</span>
               </div>
             </div>
           </motion.div>
 
-          {/* Adreça d'enviament */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.6 }}
-            className="bg-white rounded-lg shadow-sm p-6 mb-6"
-          >
-            <h2 className="font-oswald text-xl font-bold uppercase mb-4" style={{ color: '#141414' }}>
-              Dades d'enviament
-            </h2>
-            <div className="text-sm space-y-1" style={{ color: '#141414', opacity: 0.8 }}>
-              <p className="font-medium">{orderData.shippingAddress.name}</p>
-              <p>{orderData.shippingAddress.street}</p>
-              <p>{orderData.shippingAddress.postalCode} {orderData.shippingAddress.city}</p>
-              <p>{orderData.shippingAddress.country}</p>
-            </div>
-          </motion.div>
-
-          {/* Accions */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.7 }}
-            className="flex flex-col sm:flex-row gap-3"
-          >
-            <Button
-              onClick={handleDownloadInvoice}
-              variant="outline"
-              className="flex-1 h-12 border-2"
-            >
-              <Download className="mr-2 h-5 w-5" />
-              Descarregar factura
-            </Button>
-            <Link to="/" className="flex-1">
-              <Button className="w-full h-12" style={{ backgroundColor: '#141414', color: '#FFFFFF' }}>
-                Continua comprant
-                <ArrowRight className="ml-2 h-5 w-5" />
-              </Button>
-            </Link>
-          </motion.div>
-
-          {/* Suport */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.8 }}
-            className="text-center mt-8 text-sm"
-            style={{ color: '#141414', opacity: 0.6 }}
-          >
-            <p>Necessites ajuda? <Link to="/contact" className="underline hover:opacity-80">Contacta'ns</Link></p>
-          </motion.div>
+          </div>
         </div>
+      </Pauta4ColsOverlay>
+
+      {/* Botó continua comprant — fora de la hero, a la part de sota */}
+      <div style={{ display: 'flex', justifyContent: 'center', padding: '40px 24px' }}>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5 }}
+        >
+          <Link
+            to="/"
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '8px',
+              padding: '14px 36px',
+              backgroundColor: '#141414',
+              color: '#FFFFFF',
+              textDecoration: 'none',
+              borderRadius: '5px',
+              fontFamily: 'Roboto Condensed, sans-serif',
+              fontSize: '16px',
+              fontWeight: 600,
+            }}
+          >
+            Continua comprant
+            <ArrowRight size={18} strokeWidth={2} />
+          </Link>
+        </motion.div>
       </div>
+
+      {/* Separació de 300px entre el hero i el footer */}
+      <div style={{ height: '300px' }} />
     </>
   );
 };

@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { fetchMockOrdersByEmail } from '@/lib/mockOrderStore';
 
 const STATUS_ICONS = {
   'PENDENT': 'MoreHorizontal',
@@ -121,7 +122,13 @@ export function useOrders(email) {
 
   useEffect(() => {
     emailRef.current = email;
-    if (import.meta.env.DEV) return;
+    if (import.meta.env.DEV) {
+      if (email) {
+        const mockOrders = fetchMockOrdersByEmail(email);
+        setOrders(mockOrders.map(mapOrderFromApi));
+      }
+      return;
+    }
     if (email) fetchOrders(email);
   }, [email, fetchOrders]);
 

@@ -14,6 +14,7 @@ import { useCart } from '@/contexts/CartContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { useOrders } from '@/hooks/useOrders';
 import { createGelatoOrder } from '@/api/gelato';
+import { createMockOrder, MOCK_CLIENT } from '@/lib/mockOrderStore';
 
 const PAUTA_ROWS = 33;
 const PAUTA_FIRST_ROW_SCALE = 0.7;
@@ -37,57 +38,60 @@ const CheckoutPageInner = () => {
   const { user } = useAuth();
   const { createOrder } = useOrders();
   const [formData, setFormData] = useState({
-    email: '',
-    firstName: '',
-    lastName: '',
-    address: '',
-    city: '',
-    postalCode: '',
-    country: ''
+    email: MOCK_CLIENT.email,
+    firstName: MOCK_CLIENT.firstName,
+    lastName: MOCK_CLIENT.lastName,
+    address: MOCK_CLIENT.address,
+    city: MOCK_CLIENT.city,
+    postalCode: MOCK_CLIENT.postalCode,
+    country: MOCK_CLIENT.country
   });
   const [formErrors, setFormErrors] = useState({});
   const [isProcessing, setIsProcessing] = useState(false);
-  const [paymentDetailsOpen, setPaymentDetailsOpen] = useState(false);
+  const [paymentDetailsOpen, setPaymentDetailsOpen] = useState(import.meta.env.DEV);
+
+  const isDev = import.meta.env.DEV;
 
   const checkoutCartItems = useMemo(() => {
     const stateItems = Array.isArray(location?.state?.cartItems) ? location.state.cartItems : [];
     return stateItems.length > 0 ? stateItems : (Array.isArray(cartItems) ? cartItems : []);
   }, [location?.state?.cartItems, cartItems]);
 
-  const isMockCheckout = checkoutCartItems.length === 0;
+  const isMockCheckout = checkoutCartItems.length === 0 && !isDev;
+  const mockImages = ['/tshirt-white.jpg', '/tshirt-red.jpg', '/tshirt-green.jpg', '/tshirt-blue.jpg'];
   const mockCheckoutItems = useMemo(() => ([
-    { id: 'mock-1', name: 'Sense & Sensibility', size: 'L', quantity: 1, price: 15.5 },
-    { id: 'mock-2', name: 'Human Inside Tee', size: 'M', quantity: 1, price: 15.5 },
-    { id: 'mock-3', name: 'Austin Info Club', size: 'XL', quantity: 1, price: 15.5 },
-    { id: 'mock-4', name: 'First Contact', size: 'S', quantity: 2, price: 15.5 },
-    { id: 'mock-5', name: 'Cube Manifest', size: 'L', quantity: 1, price: 15.5 },
-    { id: 'mock-6', name: 'Misceŀlània 01', size: 'M', quantity: 1, price: 15.5 },
-    { id: 'mock-7', name: 'Graphic Basic', size: 'L', quantity: 3, price: 15.5 },
-    { id: 'mock-8', name: 'No Signal', size: 'XL', quantity: 1, price: 15.5 },
-    { id: 'mock-9', name: 'Soft Error', size: 'M', quantity: 1, price: 15.5 },
-    { id: 'mock-10', name: 'Local Ghost', size: 'S', quantity: 2, price: 15.5 },
-    { id: 'mock-11', name: 'Archive Mode', size: 'L', quantity: 1, price: 15.5 },
-    { id: 'mock-12', name: 'Under Construction', size: 'M', quantity: 1, price: 15.5 },
-    { id: 'mock-13', name: 'Pixel Picnic', size: 'XL', quantity: 1, price: 15.5 },
-    { id: 'mock-14', name: 'Botiga Oberta', size: 'L', quantity: 2, price: 15.5 },
-    { id: 'mock-15', name: 'The Human Inside', size: 'S', quantity: 1, price: 15.5 },
-    { id: 'mock-16', name: 'Checkout Club', size: 'M', quantity: 1, price: 15.5 },
-    { id: 'mock-17', name: 'Carrer Major', size: 'L', quantity: 1, price: 15.5 },
-    { id: 'mock-18', name: 'Final Boss Tee', size: 'XL', quantity: 2, price: 15.5 },
-    { id: 'mock-19', name: 'Blue Guide', size: 'M', quantity: 1, price: 15.5 },
-    { id: 'mock-20', name: 'Stripe Like', size: 'L', quantity: 1, price: 15.5 },
-    { id: 'mock-21', name: 'Scroll Test', size: 'S', quantity: 1, price: 15.5 },
-    { id: 'mock-22', name: 'Roboto Condensed', size: 'M', quantity: 2, price: 15.5 },
-    { id: 'mock-23', name: 'Belt Two', size: 'L', quantity: 1, price: 15.5 },
-    { id: 'mock-24', name: 'Tot Plegat', size: 'XL', quantity: 1, price: 15.5 },
-    { id: 'mock-25', name: 'Mazinger-C', size: 'L', quantity: 1, price: 15.5 },
-    { id: 'mock-26', name: 'Pixel Dust', size: 'M', quantity: 2, price: 15.5 },
-    { id: 'mock-27', name: 'Grid Lock', size: 'S', quantity: 1, price: 15.5 },
-    { id: 'mock-28', name: 'Final Cut', size: 'XL', quantity: 1, price: 15.5 },
-    { id: 'mock-29', name: 'Open Source', size: 'L', quantity: 1, price: 15.5 },
-    { id: 'mock-30', name: 'Dark Mode', size: 'M', quantity: 2, price: 15.5 },
-    { id: 'mock-31', name: 'Light Mode', size: 'S', quantity: 1, price: 15.5 },
-    { id: 'mock-32', name: 'Cache Clear', size: 'XL', quantity: 1, price: 15.5 },
+    { id: 'mock-1', name: 'Sense & Sensibility', size: 'L', quantity: 1, price: 15.5, image: mockImages[0] },
+    { id: 'mock-2', name: 'Human Inside Tee', size: 'M', quantity: 1, price: 15.5, image: mockImages[1] },
+    { id: 'mock-3', name: 'Austin Info Club', size: 'XL', quantity: 1, price: 15.5, image: mockImages[2] },
+    { id: 'mock-4', name: 'First Contact', size: 'S', quantity: 2, price: 15.5, image: mockImages[3] },
+    { id: 'mock-5', name: 'Cube Manifest', size: 'L', quantity: 1, price: 15.5, image: mockImages[0] },
+    { id: 'mock-6', name: 'Misceŀlània 01', size: 'M', quantity: 1, price: 15.5, image: mockImages[1] },
+    { id: 'mock-7', name: 'Graphic Basic', size: 'L', quantity: 3, price: 15.5, image: mockImages[2] },
+    { id: 'mock-8', name: 'No Signal', size: 'XL', quantity: 1, price: 15.5, image: mockImages[3] },
+    { id: 'mock-9', name: 'Soft Error', size: 'M', quantity: 1, price: 15.5, image: mockImages[0] },
+    { id: 'mock-10', name: 'Local Ghost', size: 'S', quantity: 2, price: 15.5, image: mockImages[1] },
+    { id: 'mock-11', name: 'Archive Mode', size: 'L', quantity: 1, price: 15.5, image: mockImages[2] },
+    { id: 'mock-12', name: 'Under Construction', size: 'M', quantity: 1, price: 15.5, image: mockImages[3] },
+    { id: 'mock-13', name: 'Pixel Picnic', size: 'XL', quantity: 1, price: 15.5, image: mockImages[0] },
+    { id: 'mock-14', name: 'Botiga Oberta', size: 'L', quantity: 2, price: 15.5, image: mockImages[1] },
+    { id: 'mock-15', name: 'The Human Inside', size: 'S', quantity: 1, price: 15.5, image: mockImages[2] },
+    { id: 'mock-16', name: 'Checkout Club', size: 'M', quantity: 1, price: 15.5, image: mockImages[3] },
+    { id: 'mock-17', name: 'Carrer Major', size: 'L', quantity: 1, price: 15.5, image: mockImages[0] },
+    { id: 'mock-18', name: 'Final Boss Tee', size: 'XL', quantity: 2, price: 15.5, image: mockImages[1] },
+    { id: 'mock-19', name: 'Blue Guide', size: 'M', quantity: 1, price: 15.5, image: mockImages[2] },
+    { id: 'mock-20', name: 'Stripe Like', size: 'L', quantity: 1, price: 15.5, image: mockImages[3] },
+    { id: 'mock-21', name: 'Scroll Test', size: 'S', quantity: 1, price: 15.5, image: mockImages[0] },
+    { id: 'mock-22', name: 'Roboto Condensed', size: 'M', quantity: 2, price: 15.5, image: mockImages[1] },
+    { id: 'mock-23', name: 'Belt Two', size: 'L', quantity: 1, price: 15.5, image: mockImages[2] },
+    { id: 'mock-24', name: 'Tot Plegat', size: 'XL', quantity: 1, price: 15.5, image: mockImages[3] },
+    { id: 'mock-25', name: 'Mazinger-C', size: 'L', quantity: 1, price: 15.5, image: mockImages[0] },
+    { id: 'mock-26', name: 'Pixel Dust', size: 'M', quantity: 2, price: 15.5, image: mockImages[1] },
+    { id: 'mock-27', name: 'Grid Lock', size: 'S', quantity: 1, price: 15.5, image: mockImages[2] },
+    { id: 'mock-28', name: 'Final Cut', size: 'XL', quantity: 1, price: 15.5, image: mockImages[3] },
+    { id: 'mock-29', name: 'Open Source', size: 'L', quantity: 1, price: 15.5, image: mockImages[0] },
+    { id: 'mock-30', name: 'Dark Mode', size: 'M', quantity: 2, price: 15.5, image: mockImages[1] },
+    { id: 'mock-31', name: 'Light Mode', size: 'S', quantity: 1, price: 15.5, image: mockImages[2] },
+    { id: 'mock-32', name: 'Cache Clear', size: 'XL', quantity: 1, price: 15.5, image: mockImages[3] },
   ]), []);
   const checkoutRenderItems = useMemo(() => (
     checkoutCartItems.length > 0 ? checkoutCartItems : mockCheckoutItems
@@ -167,6 +171,40 @@ const CheckoutPageInner = () => {
 
     setFormErrors({});
     setIsProcessing(true);
+
+    if (isDev) {
+      try {
+        const orderItems = checkoutRenderItems.map((item, idx) => ({
+          id: item.id || `item-${idx}`,
+          name: item.name,
+          size: item.size,
+          quantity: item.quantity,
+          price: item.price,
+          image: item.image || '/tshirt-white.jpg',
+        }));
+
+        const mockOrder = createMockOrder({
+          items: orderItems,
+          subtotal,
+          shipping,
+          iva: ivaAmount,
+          total,
+          formData,
+        });
+
+        trackPurchase(mockOrder.order_number, orderItems, total, shipping, 0);
+        clearCart();
+        setIsProcessing(false);
+        success('Comanda confirmada');
+        navigate(`/order-confirmation/${mockOrder.order_number}`);
+        return;
+      } catch (err) {
+        console.error('[Checkout] Mock order error:', err);
+        showError('Error creant comanda mock');
+        setIsProcessing(false);
+        return;
+      }
+    }
 
     try {
       const stripe = await getStripe();
@@ -373,6 +411,20 @@ const CheckoutPageInner = () => {
             }
           `}
         </style>
+        {isDev && (
+          <style>{`
+            .checkout-text-only input,
+            .checkout-text-only select,
+            .checkout-text-only textarea {
+              color: #4A5057 !important;
+              caret-color: #4A5057 !important;
+            }
+            .checkout-text-only input::placeholder,
+            .checkout-text-only textarea::placeholder {
+              color: #98A2B4 !important;
+            }
+          `}</style>
+        )}
 
       <div
         className="absolute z-[3]"
