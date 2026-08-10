@@ -19,8 +19,8 @@ function saveStoredOrders(orders) {
   }
 }
 
-export function createMockOrder({ items, subtotal, shipping, iva, total, formData }) {
-  const orderNumber = generateOrderNumber(15);
+export function createMockOrder({ items, subtotal, shipping, iva, total, formData, orderNumber: customOrderNumber }) {
+  const orderNumber = customOrderNumber || generateOrderNumber(15);
   const trackingNumber = generateTrackingNumber();
   const order = buildMockOrder({ items, subtotal, shipping, iva, total, formData, orderNumber, trackingNumber });
   const orders = getStoredOrders();
