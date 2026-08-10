@@ -4,10 +4,9 @@ import { Helmet } from 'react-helmet';
 import { motion } from 'framer-motion';
 import { ArrowRight, Loader2 } from 'lucide-react';
 import { formatPrice } from '@/utils/formatters';
-import { fetchMockOrder } from '@/lib/mockOrderStore';
-import Pauta4ColsOverlay from '@/components/pauta/Pauta4ColsOverlay';
-
-const HERO_IMAGE = '/placeholders/fons-confirmacio-comanda.png';
+import { fetchMockOrder, createMockOrder } from '@/lib/mockOrderStore';
+import { MOCK_CLIENT } from '@/lib/mockOrder';
+const HERO_IMAGE = '/placeholders/fons-pagament/fons-confirmacio-pagament.png';
 
 const OrderConfirmationPage = () => {
   const { orderId } = useParams();
@@ -26,10 +25,27 @@ const OrderConfirmationPage = () => {
       }
 
       if (import.meta.env.DEV) {
-        const mockOrder = fetchMockOrder(orderId);
-        if (mockOrder) {
-          const items = Array.isArray(mockOrder.items) ? mockOrder.items : [];
-          setOrderData({
+        const mockOrder = createMockOrder({
+            orderNumber: orderId,
+            items: [
+              { id: 'item-1', name: 'SENSE AND SENSIBILITY 4', size: 'M', quantity: 1, price: 15.50 },
+            ],
+            subtotal: 15.50,
+            shipping: 0,
+            iva: 3.25,
+            total: 15.50,
+            formData: {
+              email: MOCK_CLIENT.email,
+              firstName: MOCK_CLIENT.firstName,
+              lastName: MOCK_CLIENT.lastName,
+              address: MOCK_CLIENT.address,
+              city: MOCK_CLIENT.city,
+              postalCode: MOCK_CLIENT.postalCode,
+              country: MOCK_CLIENT.country,
+            },
+          });
+        const items = Array.isArray(mockOrder.items) ? mockOrder.items : [];
+        setOrderData({
             id: mockOrder.order_number || mockOrder.id,
             items: items.map((item, idx) => ({
               id: item.id || idx,
@@ -44,7 +60,6 @@ const OrderConfirmationPage = () => {
           });
           setLoading(false);
           return;
-        }
       }
 
       try {
@@ -110,202 +125,213 @@ const OrderConfirmationPage = () => {
         <meta name="robots" content="noindex, nofollow" />
       </Helmet>
 
-      {/* Hero amb fons fixe i confirmació a dins */}
-      <Pauta4ColsOverlay
-        pautaEnabled={false}
-        tableEnabled={false}
-        numCols={3}
-        numRows={24}
-        canvasAspect={[2642, 1780]}
-        topOffset="76px"
-        bottomPadding="0px"
-      >
-        {/* Imatge de fons + contingut de confirmació al mateix contenidor */}
-        <div
-          style={{
-            gridColumn: '1 / 4',
-            gridRow: '5 / 20',
-            position: 'relative',
-            top: `calc(-5px)`,
-            width: 'calc(100% + 1px)',
-            height: 'calc(100% + 2px)',
-            transform: 'scale(0.94)',
-            transformOrigin: 'center center',
-            borderRadius: '18px',
-            overflow: 'hidden',
-          }}
-        >
-          <img
-            src={HERO_IMAGE}
-            alt="Confirmació de comanda"
-            style={{
-              position: 'absolute',
-              inset: 0,
-              width: '100%',
-              height: '100%',
-              objectFit: 'cover',
-            }}
-          />
-          {/* Contingut de confirmació a sobre de la imatge */}
-          <div
-            style={{
-              position: 'relative',
-              zIndex: 2,
-              width: '100%',
-              height: '100%',
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              justifyContent: 'center',
-              padding: '0 24px',
-              textAlign: 'center',
-              marginTop: '50px',
-            }}
-          >
-          {/* Títol */}
-          <motion.h1
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-            style={{
-              fontFamily: 'Oswald, sans-serif',
-              fontSize: 'clamp(1.8rem, 4vw, 3rem)',
-              fontWeight: 700,
-              textTransform: 'uppercase',
-              lineHeight: 1,
-              color: '#FFFFFF',
-              marginBottom: '10px',
-              textShadow: '0 2px 8px rgba(0,0,0,0.6)',
-            }}
-          >
-            Comanda confirmada!
-          </motion.h1>
+      {/* Hero a pantalla completa amb imatge de fons */}
+      <div style={{ position: 'relative', width: '100%', height: '100vh', overflow: 'hidden' }}>
+        <img
+          src={HERO_IMAGE}
+          alt="Confirmació de comanda"
+          style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }}
+        />
 
-          {/* Subtítol */}
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.35 }}
-            style={{
-              fontFamily: 'Roboto Condensed, sans-serif',
-              fontSize: 'clamp(0.9rem, 1.8vw, 1.15rem)',
-              color: '#FFFFFF',
-              opacity: 0.85,
-              marginBottom: '6px',
-              textShadow: '0 1px 4px rgba(0,0,0,0.6)',
-            }}
-          >
-            Sia servit i gràcies
-          </motion.p>
-
-          {/* Número de comanda */}
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4 }}
-            style={{
-              fontFamily: 'Roboto Condensed, sans-serif',
-              fontSize: '13px',
-              color: '#FFFFFF',
-              opacity: 0.7,
-              marginBottom: '75px',
-              textShadow: '0 1px 4px rgba(0,0,0,0.6)',
-            }}
-          >
-            Número de comanda: <span style={{ fontFamily: 'monospace', fontWeight: 700 }}>{orderData.id}</span>
-          </motion.p>
-
-          {/* Resum de la comanda */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.45 }}
-            style={{
-              width: '100%',
-              maxWidth: '480px',
-              background: 'rgba(255,255,255,0.95)',
-              borderRadius: '10px',
-              boxShadow: '0 4px 24px rgba(0,0,0,0.15)',
-              padding: '20px',
-              marginBottom: '20px',
-              textAlign: 'left',
-              backdropFilter: 'blur(8px)',
-            }}
-          >
-            <h2 style={{
-              fontFamily: 'Oswald, sans-serif',
-              fontSize: '16px',
-              fontWeight: 700,
-              textTransform: 'uppercase',
-              color: '#141414',
-              marginBottom: '14px',
-            }}>
-              Resum de la comanda
-            </h2>
-
-            {/* Productes */}
-            <div style={{ marginBottom: '14px', paddingBottom: '14px', borderBottom: '1px solid #E6E8EC' }}>
-              {orderData.items.map((item, index) => (
-                <div key={index} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: index === orderData.items.length - 1 ? 0 : '6px' }}>
-                  <div>
-                    <span style={{ fontFamily: 'Oswald, sans-serif', fontWeight: 700, textTransform: 'uppercase', fontSize: '13px', color: '#141414' }}>{item.name}</span>
-                    <span style={{ fontFamily: 'Roboto Condensed, sans-serif', fontSize: '12px', color: '#141414', opacity: 0.5, marginLeft: '6px' }}>
-                      {item.size} · {item.quantity}u
-                    </span>
-                  </div>
-                  <span style={{ fontFamily: 'Oswald, sans-serif', fontSize: '13px', color: '#141414' }}>{formatPrice(item.price)}</span>
-                </div>
-              ))}
-            </div>
-
-            {/* Totals */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', color: '#141414', opacity: 0.7 }}>
-                <span>Subtotal</span>
-                <span>{formatPrice(orderData.subtotal)}</span>
-              </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', color: '#141414', opacity: 0.7 }}>
-                <span>Enviament</span>
-                <span>{orderData.shipping === 0 ? 'Gratuït' : formatPrice(orderData.shipping)}</span>
-              </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', paddingTop: '6px', marginTop: '3px', borderTop: '1px solid #E6E8EC', fontFamily: 'Oswald, sans-serif', fontSize: '18px', color: '#141414' }}>
-                <span>Tot plegat fa</span>
-                <span>{formatPrice(orderData.total)}</span>
-              </div>
-            </div>
-          </motion.div>
-
-          </div>
+        {/* Títol LA COMANDA — just sobre la línia divisòria */}
+        <div style={{
+          position: 'absolute',
+          top: 'calc(50% + 14px - 24px - 44px)',
+          left: 'calc(33.33% + 83px + 20px)',
+          zIndex: 2,
+        }}>
+          <h2 style={{
+            fontFamily: 'Oswald, sans-serif',
+            fontSize: '25.34px',
+            fontWeight: 500,
+            textTransform: 'uppercase',
+            color: '#141414',
+            margin: 0,
+          }}>
+            La comanda
+          </h2>
         </div>
-      </Pauta4ColsOverlay>
 
-      {/* Botó continua comprant — fora de la hero, a la part de sota */}
-      <div style={{ display: 'flex', justifyContent: 'center', padding: '40px 24px' }}>
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5 }}
-        >
+        {/* Taula de la comanda */}
+        <div style={{
+          position: 'absolute',
+          top: 'calc(50% + 14px)',
+          left: 'calc(33.33% + 83px)',
+          width: 'calc(33.33% - 166px)',
+          height: 'calc(25% + 59.5px)',
+          zIndex: 1,
+          pointerEvents: 'none',
+          display: 'grid',
+          gridTemplateRows: 'repeat(15, 1fr)',
+          gridTemplateColumns: 'auto 180px auto',
+          justifyContent: 'space-between',
+          fontFamily: 'Roboto, sans-serif',
+          fontSize: '16.1px',
+          color: '#141414',
+          overflow: 'hidden',
+        }}>
+          {/* Fila producte */}
+          <div style={{ padding: '0 20px', fontWeight: 300, textTransform: 'uppercase', textAlign: 'left', whiteSpace: 'nowrap', display: 'flex', alignItems: 'center', minHeight: 0, overflow: 'hidden' }}>
+            {orderData.items[0]?.name || 'SENSE AND SENSIBILITY 4'}
+          </div>
+          <div style={{ padding: '0 20px', textAlign: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 0, overflow: 'hidden' }}>
+            <span style={{ display: 'inline-flex', gap: '24px' }}>
+              <span style={{ fontWeight: 300, opacity: 0.5 }}>/ {orderData.items[0]?.size || 'M'}</span>
+              <span style={{ fontWeight: 300, opacity: 0.5 }}>/ x{orderData.items[0]?.quantity || 1}</span>
+            </span>
+          </div>
+          <div style={{ padding: '0 20px', fontWeight: 300, textAlign: 'right', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', minHeight: 0, overflow: 'hidden' }}>
+            {formatPrice(orderData.items[0]?.price || 15.50)}
+          </div>
+          {/* Files buides */}
+          {Array.from({ length: 10 }).flatMap((_, i) => [
+            <div key={`empty-${i}-0`} />,
+            <div key={`empty-${i}-1`} />,
+            <div key={`empty-${i}-2`} />,
+          ])}
+          {/* Preu */}
+          <div />
+          <div style={{ padding: '0 20px', fontWeight: 400, opacity: 0.7, textAlign: 'left', whiteSpace: 'nowrap', display: 'flex', alignItems: 'center', minHeight: 0, overflow: 'hidden' }}>Preu</div>
+          <div style={{ padding: '0 20px', fontWeight: 400, opacity: 0.7, textAlign: 'right', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', minHeight: 0, overflow: 'hidden' }}>{formatPrice(orderData.subtotal || 15.50)}</div>
+          {/* Descompte */}
+          <div />
+          <div style={{ padding: '0 20px', fontWeight: 400, opacity: 0.7, textAlign: 'left', whiteSpace: 'nowrap', display: 'flex', alignItems: 'center', minHeight: 0, overflow: 'hidden' }}>Descompte <span style={{ fontSize: '11.48px' }}>(-10%)</span></div>
+          <div style={{ padding: '0 20px', fontWeight: 400, opacity: 0.7, textAlign: 'right', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', minHeight: 0, overflow: 'hidden' }}>-1,55 €</div>
+          {/* IVA */}
+          <div />
+          <div style={{ padding: '0 20px', fontWeight: 400, opacity: 0.7, textAlign: 'left', whiteSpace: 'nowrap', display: 'flex', alignItems: 'center', minHeight: 0, overflow: 'hidden' }}>IVA 21%</div>
+          <div style={{ padding: '0 20px', fontWeight: 400, opacity: 0.7, textAlign: 'right', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', minHeight: 0, overflow: 'hidden' }}>3,25 €</div>
+          {/* Tot plegat fa */}
+          <div />
+          <div style={{ padding: '0 20px', fontFamily: 'Oswald, sans-serif', fontSize: '17.5px', fontWeight: 400, textAlign: 'left', whiteSpace: 'nowrap', display: 'flex', alignItems: 'center', minHeight: 0, overflow: 'hidden' }}>Tot plegat fa</div>
+          <div style={{ padding: '0 20px', fontFamily: 'Oswald, sans-serif', fontSize: '17.5px', fontWeight: 400, textAlign: 'right', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', minHeight: 0, overflow: 'hidden' }}>{formatPrice(orderData.total || 15.50)}</div>
+        </div>
+
+        {/* Botó — fora del requadre, just a sota */}
+        <div style={{
+          position: 'absolute',
+          top: 'calc(50% + 14px + 25% + 35px + 8px - 13px + 82px)',
+          left: 'calc(33.33% + 83px)',
+          width: 'calc(33.33% - 166px)',
+          zIndex: 2,
+        }}>
           <Link
             to="/"
             style={{
-              display: 'inline-flex',
+              display: 'flex',
               alignItems: 'center',
-              gap: '8px',
-              padding: '14px 36px',
+              justifyContent: 'center',
+              padding: '10px 28px',
               backgroundColor: '#141414',
               color: '#FFFFFF',
               textDecoration: 'none',
-              borderRadius: '5px',
-              fontFamily: 'Roboto Condensed, sans-serif',
-              fontSize: '16px',
-              fontWeight: 600,
+              borderRadius: '4px',
+              fontFamily: 'Oswald, sans-serif',
+              fontSize: '14px',
+              fontWeight: 400,
+              width: '100%',
+              boxSizing: 'border-box',
             }}
           >
-            Continua comprant
-            <ArrowRight size={18} strokeWidth={2} />
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', marginRight: '-21px' }}>
+              TORNA A LA BOTIGA
+              <ArrowRight size={13} strokeWidth={2} />
+            </span>
           </Link>
-        </motion.div>
+        </div>
+
+        {/* Contingut de confirmació — dues files */}
+        <div style={{
+          position: 'relative',
+          zIndex: 2,
+          width: '100%',
+          height: '100%',
+          display: 'flex',
+          flexDirection: 'column',
+          padding: '0 24px',
+        }}>
+          {/* Fila superior — texts de confirmació */}
+          <div style={{
+            flex: '1',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            textAlign: 'center',
+          }}>
+            {/* Títol */}
+            <motion.h1
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 }}
+              style={{
+                fontFamily: 'Roboto, sans-serif',
+                fontSize: '23.03px',
+                fontWeight: 700,
+                lineHeight: 1,
+                color: '#141414',
+                marginBottom: '8px',
+              }}
+            >
+              Pagament confirmat
+            </motion.h1>
+
+            {/* Subtítol */}
+            <motion.p
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.35 }}
+              style={{
+                fontFamily: 'Roboto, sans-serif',
+                fontSize: '34.51px',
+                fontWeight: 400,
+                color: '#141414',
+                opacity: 0.85,
+                marginBottom: '4px',
+                marginTop: '12px',
+              }}
+            >
+              GRÀCIES PER LA VISITA!
+            </motion.p>
+
+            {/* Número de comanda + label, alineats a la dreta */}
+            <div style={{ textAlign: 'right' }}>
+              <motion.p
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.4 }}
+                style={{
+                  fontFamily: 'Oswald, sans-serif',
+                  fontSize: '57.54px',
+                  fontWeight: 400,
+                  color: '#141414',
+                  marginBottom: '0px',
+                }}
+              >
+                {orderData.id}
+              </motion.p>
+
+              <motion.p
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.42 }}
+                style={{
+                  fontFamily: 'Roboto, sans-serif',
+                  fontSize: '16.1px',
+                  fontWeight: 400,
+                  color: '#141414',
+                  opacity: 0.7,
+                  marginTop: '-2px',
+                }}
+              >
+                Nombre de comanda
+              </motion.p>
+            </div>
+          </div>
+
+          {/* Fila inferior — buida, el contingut va posicionat absolutament */}
+          <div style={{ flex: '1' }} />
+        </div>
       </div>
 
       {/* Separació de 300px entre el hero i el footer */}
