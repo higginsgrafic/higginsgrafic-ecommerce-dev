@@ -4,8 +4,7 @@ import { Helmet } from 'react-helmet';
 import { motion } from 'framer-motion';
 import { ArrowRight, Loader2 } from 'lucide-react';
 import { formatPrice } from '@/utils/formatters';
-import { fetchMockOrder, createMockOrder } from '@/lib/mockOrderStore';
-import { MOCK_CLIENT } from '@/lib/mockOrder';
+import { fetchMockOrder } from '@/lib/mockOrderStore';
 const HERO_IMAGE = '/placeholders/fons-pagament/fons-confirmacio-pagament.png';
 
 const OrderConfirmationPage = () => {
@@ -25,27 +24,10 @@ const OrderConfirmationPage = () => {
       }
 
       if (import.meta.env.DEV) {
-        const mockOrder = createMockOrder({
-            orderNumber: orderId,
-            items: [
-              { id: 'item-1', name: 'SENSE AND SENSIBILITY 4', size: 'M', quantity: 1, price: 15.50 },
-            ],
-            subtotal: 15.50,
-            shipping: 0,
-            iva: 3.25,
-            total: 15.50,
-            formData: {
-              email: MOCK_CLIENT.email,
-              firstName: MOCK_CLIENT.firstName,
-              lastName: MOCK_CLIENT.lastName,
-              address: MOCK_CLIENT.address,
-              city: MOCK_CLIENT.city,
-              postalCode: MOCK_CLIENT.postalCode,
-              country: MOCK_CLIENT.country,
-            },
-          });
-        const items = Array.isArray(mockOrder.items) ? mockOrder.items : [];
-        setOrderData({
+        const mockOrder = fetchMockOrder(orderId);
+        if (mockOrder) {
+          const items = Array.isArray(mockOrder.items) ? mockOrder.items : [];
+          setOrderData({
             id: mockOrder.order_number || mockOrder.id,
             items: items.map((item, idx) => ({
               id: item.id || idx,
@@ -58,8 +40,11 @@ const OrderConfirmationPage = () => {
             shipping: parseFloat(mockOrder.shipping_cost) || 0,
             total: parseFloat(mockOrder.total) || 0,
           });
-          setLoading(false);
-          return;
+        } else {
+          setError('Comanda no trobada');
+        }
+        setLoading(false);
+        return;
       }
 
       try {
@@ -160,7 +145,6 @@ const OrderConfirmationPage = () => {
           width: 'calc(33.33% - 166px)',
           height: 'calc(25% + 59.5px)',
           zIndex: 1,
-          pointerEvents: 'none',
           display: 'grid',
           gridTemplateRows: 'repeat(15, 1fr)',
           gridTemplateColumns: 'auto 180px auto',
@@ -214,6 +198,7 @@ const OrderConfirmationPage = () => {
           left: 'calc(33.33% + 83px)',
           width: 'calc(33.33% - 166px)',
           zIndex: 2,
+          pointerEvents: 'auto',
         }}>
           <Link
             to="/"
@@ -249,6 +234,7 @@ const OrderConfirmationPage = () => {
           display: 'flex',
           flexDirection: 'column',
           padding: '0 24px',
+          pointerEvents: 'none',
         }}>
           {/* Fila superior — texts de confirmació */}
           <div style={{
@@ -271,6 +257,7 @@ const OrderConfirmationPage = () => {
                 lineHeight: 1,
                 color: '#141414',
                 marginBottom: '8px',
+                pointerEvents: 'auto',
               }}
             >
               Pagament confirmat
@@ -289,13 +276,14 @@ const OrderConfirmationPage = () => {
                 opacity: 0.85,
                 marginBottom: '4px',
                 marginTop: '12px',
+                pointerEvents: 'auto',
               }}
             >
               GRÀCIES PER LA VISITA!
             </motion.p>
 
             {/* Número de comanda + label, alineats a la dreta */}
-            <div style={{ textAlign: 'right' }}>
+            <div style={{ textAlign: 'right', pointerEvents: 'auto' }}>
               <motion.p
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -306,6 +294,7 @@ const OrderConfirmationPage = () => {
                   fontWeight: 400,
                   color: '#141414',
                   marginBottom: '0px',
+                  pointerEvents: 'auto',
                 }}
               >
                 {orderData.id}
@@ -322,6 +311,7 @@ const OrderConfirmationPage = () => {
                   color: '#141414',
                   opacity: 0.7,
                   marginTop: '-2px',
+                  pointerEvents: 'auto',
                 }}
               >
                 Nombre de comanda
@@ -330,7 +320,7 @@ const OrderConfirmationPage = () => {
           </div>
 
           {/* Fila inferior — buida, el contingut va posicionat absolutament */}
-          <div style={{ flex: '1' }} />
+          <div style={{ flex: '1', pointerEvents: 'none' }} />
         </div>
       </div>
 
