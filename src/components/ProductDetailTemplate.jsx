@@ -88,8 +88,14 @@ export default function ProductDetailTemplate({ product }) {
   const effectiveInitialIndex = initialIndex >= 0 ? initialIndex : 0;
   const productName = PRODUCT_NAME;
 
+  const VARIANT_TO_FINISH = { white: 'BLANC', black: 'NEGRE', color: 'COLOR' };
   const urlFinish = searchParams.get('finish');
-  const initialFinish = urlFinish && AVAILABLE_FINISHES.includes(urlFinish) ? urlFinish : DEFAULT_FINISH;
+  const urlVariant = searchParams.get('variant');
+  const variantFinish = urlVariant && VARIANT_TO_FINISH[urlVariant];
+  const resolvedFinish = (urlFinish && AVAILABLE_FINISHES.includes(urlFinish)) ? urlFinish
+    : (variantFinish && AVAILABLE_FINISHES.includes(variantFinish)) ? variantFinish
+    : DEFAULT_FINISH;
+  const initialFinish = resolvedFinish;
   const [selectedFinish, setSelectedFinish] = useState(initialFinish);
   const [finishButtonTextSettings, setFinishButtonTextSettings] = useState(PDP_SIZE_SETTINGS);
 

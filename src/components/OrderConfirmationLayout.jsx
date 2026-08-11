@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
 import { formatPrice } from '@/utils/formatters';
+import { useOffersConfig } from '@/hooks/useOffersConfig';
 
 const OrderConfirmationLayout = ({
   orderData,
@@ -12,9 +13,12 @@ const OrderConfirmationLayout = ({
   title = 'Pagament confirmat',
   subtitle = 'GRÀCIES PER LA VISITA!',
   orderLabel = 'Nombre de comanda',
-  discountRate = '-10%',
   ivaRate = '21%',
 }) => {
+  const offersConfig = useOffersConfig();
+  const discountEnabled = offersConfig.discountEnabled;
+  const discountRate = offersConfig.discountRate / 100;
+  const discountLabel = `-${offersConfig.discountRate}%`;
   const VISIBLE_ROWS = 11;
   const productsRef = useRef(null);
   const [rowHeight, setRowHeight] = useState(0);
@@ -25,7 +29,7 @@ const OrderConfirmationLayout = ({
 
   const items = orderData.items || [];
   const subtotal = items.reduce((sum, item) => sum + (parseFloat(item.price) || 0) * (item.quantity || 1), 0);
-  const discountAmount = subtotal * 0.10;
+  const discountAmount = discountEnabled ? subtotal * discountRate : 0;
   const totalPlegat = subtotal - discountAmount;
   const ivaAmount = totalPlegat * 0.21;
   const maxScroll = Math.max(0, items.length - VISIBLE_ROWS);
@@ -133,10 +137,10 @@ const OrderConfirmationLayout = ({
         top: 'calc(50% + 14px + (25% + 59.5px) * 11 / 15)',
         left: 'calc(33.33% + 83px)',
         width: 'calc(33.33% - 166px)',
-        height: 'calc((25% + 59.5px) * 4 / 15)',
+        height: `calc((25% + 59.5px) * ${discountEnabled ? 4 : 3} / 15)`,
         zIndex: 1,
         display: 'grid',
-        gridTemplateRows: 'repeat(4, 1fr)',
+        gridTemplateRows: `repeat(${discountEnabled ? 4 : 3}, 1fr)`,
         gridTemplateColumns: '1fr 90px 90px auto',
         justifyContent: 'space-between',
         fontFamily: 'Roboto, sans-serif',
@@ -149,10 +153,12 @@ const OrderConfirmationLayout = ({
         <div />
         <div style={{ padding: '0 20px', fontWeight: 400, opacity: 0.7, textAlign: 'left', whiteSpace: 'nowrap', display: 'flex', alignItems: 'center', minHeight: 0, overflow: 'hidden', gridColumn: '2 / 4' }}>Preu</div>
         <div style={{ padding: '0 20px', fontWeight: 400, opacity: 0.7, textAlign: 'right', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', minHeight: 0, overflow: 'hidden', }}>{formatPrice(subtotal)}</div>
+        {discountEnabled && (<>
         {/* Descompte */}
         <div />
-        <div style={{ padding: '0 20px', fontWeight: 400, opacity: 0.7, textAlign: 'left', whiteSpace: 'nowrap', display: 'flex', alignItems: 'center', minHeight: 0, overflow: 'hidden', gridColumn: '2 / 4' }}>Descompte&nbsp;<span style={{ fontSize: '11.48px' }}>({discountRate})</span></div>
+        <div style={{ padding: '0 20px', fontWeight: 400, opacity: 0.7, textAlign: 'left', whiteSpace: 'nowrap', display: 'flex', alignItems: 'center', minHeight: 0, overflow: 'hidden', gridColumn: '2 / 4' }}>Descompte&nbsp;<span style={{ fontSize: '11.48px' }}>({discountLabel})</span></div>
         <div style={{ padding: '0 20px', fontWeight: 400, opacity: 0.7, textAlign: 'right', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', minHeight: 0, overflow: 'hidden', }}>-{formatPrice(discountAmount)}</div>
+        </>)}
         {/* IVA */}
         <div />
         <div style={{ padding: '0 20px', fontWeight: 400, opacity: 0.7, textAlign: 'left', whiteSpace: 'nowrap', display: 'flex', alignItems: 'center', minHeight: 0, overflow: 'hidden', gridColumn: '2 / 4' }}>IVA {ivaRate}</div>

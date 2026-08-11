@@ -25,7 +25,7 @@ export const ca = {
   },
 
   offersHeader: {
-    freeShipping: 'Enviament gratuït en comandes superiors a 50€',
+    freeShipping: 'Transport inclòs',
     wpThemeReady: '🎉 Tema WordPress de GRÀFIC disponible!',
     downloadTheme: 'Descarregueu el tema',
     moreInfo: 'Més informació',
@@ -70,7 +70,7 @@ export const ca = {
     subtotal: 'Subtotal',
     shipping: 'Enviament',
     total: 'Total',
-    freeShipping: 'Enviament gratuït',
+    freeShipping: 'Transport inclòs',
     checkout: 'Finalitza la compra',
     continueShopping: 'Continua comprant',
     remove: 'Eliminar',
@@ -303,14 +303,14 @@ export const ca = {
     shipping: {
       title: 'Enviaments i Devolucions',
       content: 'Informació sobre enviaments i política de devolucions.',
-      freeShipping: 'Enviaments gratuïts a tota la península per comandes superiors a 50€.',
+      freeShipping: 'Transport inclòs.',
       processing: 'Les comandes es processen en 24-48 hores laborables.',
       delivery: 'L\'enviament estàndard tarda 3-5 dies laborables.',
       returns: 'Tens 30 dies per fer una devolució gratuïta si no estàs satisfet amb la teva compra.',
       condition: 'Els productes retornats han d\'estar en perfecte estat, sense usar i amb les etiquetes originals.',
       seo: {
         title: 'Enviaments i Devolucions - GRÀFIC',
-        description: 'Informació sobre enviaments gratuïts, temps de lliurament i política de devolucions.',
+        description: 'Informació sobre enviaments, transport inclòs en el preu i política de devolucions.',
       },
     },
     sizing: {

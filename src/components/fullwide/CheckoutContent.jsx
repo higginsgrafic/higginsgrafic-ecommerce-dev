@@ -6,11 +6,17 @@ import { trackBeginCheckout, trackPurchase } from '@/utils/analytics';
 import { useShippingCosts } from '@/hooks/useShippingCosts';
 import { useOrders } from '@/hooks/useOrders';
 import { createMockOrder, MOCK_CLIENT } from '@/lib/mockOrderStore';
+import { useAuth } from '@/contexts/AuthContext';
+import { useOffersConfig } from '@/hooks/useOffersConfig';
 
 function CheckoutContent({ cartItems, setCartItems, onCloseMegaSlide }) {
   const { createOrder } = useOrders();
   const navigate = useNavigate();
+  const { user } = useAuth();
   const isDev = import.meta.env.DEV;
+  const offersConfig = useOffersConfig();
+  const discountEnabled = offersConfig.discountEnabled;
+  const discountRate = offersConfig.discountRate / 100;
   const [formData, setFormData] = useState({
     email: isDev ? MOCK_CLIENT.email : '',
     firstName: isDev ? MOCK_CLIENT.firstName : '',
@@ -27,7 +33,7 @@ function CheckoutContent({ cartItems, setCartItems, onCloseMegaSlide }) {
   });
   const [formErrors, setFormErrors] = useState({});
   const [isProcessing, setIsProcessing] = useState(false);
-  const [paymentDetailsOpen, setPaymentDetailsOpen] = useState(isDev);
+  const [paymentDetailsOpen, setPaymentDetailsOpen] = useState(isDev && !user);
 
   const ROW_H = 32.8;
   const V_GUTTER = 2.8;
@@ -44,21 +50,23 @@ function CheckoutContent({ cartItems, setCartItems, onCloseMegaSlide }) {
     const unit = parseFloat(String(it.price).replace('€', '').replace(/\s/g, '').replace(',', '.'));
     return Number.isNaN(unit) ? acc : acc + unit * (it.qty || 1);
   }, 0);
-  const subtotal = grossSum / 1.21;
+  const preu = grossSum;
+  const descompte = discountEnabled ? preu * discountRate : 0;
+  const totalPlegat = preu - descompte;
+  const ivaAmount = totalPlegat * 0.21;
   const { getCost, zoneInfo } = useShippingCosts('es_peninsula');
   const shipping = getCost(grossSum / 1.21);
-  const ivaAmount = grossSum - subtotal;
-  const total = grossSum;
+  const total = totalPlegat;
 
   const fmt = (n) => n.toFixed(2).replace('.', ',') + '€';
   const splitPrice = (n) => {
     const [intPart, decPart = '00'] = n.toFixed(2).split('.');
     return { intPart, decPart };
   };
-  const subtotalParts = splitPrice(subtotal);
-  const shippingParts = splitPrice(shipping === 0 ? zoneInfo.cost : shipping);
+  const preuParts = splitPrice(preu);
+  const descompteParts = splitPrice(descompte);
   const ivaParts = splitPrice(ivaAmount);
-  const totalParts = splitPrice(total);
+  const totalParts = splitPrice(totalPlegat);
 
   const HEAD = { fontFamily: 'Oswald, sans-serif', fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.4px', color: '#475059' };
   const LABEL = { fontFamily: 'Roboto Condensed, sans-serif', fontWeight: 400, color: '#667085', fontSize: '10pt' };
@@ -97,10 +105,10 @@ function CheckoutContent({ cartItems, setCartItems, onCloseMegaSlide }) {
         const order = await createOrder({
           email: formData.email,
           items: activeItems,
-          subtotal,
+          subtotal: preu,
           shippingCost: shipping,
           iva: ivaAmount,
-          total,
+          total: totalPlegat,
           shippingZone: 'es_peninsula',
           firstName: formData.firstName,
           lastName: formData.lastName,
@@ -123,17 +131,18 @@ function CheckoutContent({ cartItems, setCartItems, onCloseMegaSlide }) {
         }));
         const mockOrder = createMockOrder({
           items: orderItems,
-          subtotal,
+          subtotal: preu,
           shipping,
           iva: ivaAmount,
-          total,
+          total: totalPlegat,
           formData,
         });
         orderNumber = mockOrder.order_number;
       }
-      trackPurchase(orderNumber, activeItems, total, shipping, 0);
+      trackPurchase(orderNumber, activeItems, totalPlegat, shipping, 0);
       if (setCartItems) setCartItems([]);
       setIsProcessing(false);
+      if (onCloseMegaSlide) onCloseMegaSlide();
       navigate(`/order-confirmation/${orderNumber}`);
     } catch (err) {
       console.error('[checkout] Error creating order:', err);
@@ -374,13 +383,13 @@ function CheckoutContent({ cartItems, setCartItems, onCloseMegaSlide }) {
         const PAYMENT_EXPAND_ROWS = paymentDetailsOpen ? 6 : 0;
         const TOTALS_ROW = 17 + PAYMENT_EXPAND_ROWS;
         const rows = [
-          { label: 'Subtotal', amount: subtotalParts, strong: false },
-          { label: 'Transport', amount: shippingParts, strong: false, strike: true },
+          { label: 'Preu', amount: preuParts, strong: false },
+          ...(discountEnabled ? [{ label: `Descompte (-${offersConfig.discountRate}%)`, amount: descompteParts, strong: false }] : []),
           { label: 'IVA 21%', amount: ivaParts, strong: false },
           { label: 'Tot plegat fa', amount: totalParts, strong: true },
         ];
         return rows.map((r, k) => {
-          const rowTop = TOP_OFFSET + (TOTALS_ROW - 1 + k) * ROW_H;
+          const rowTop = TOP_OFFSET + (TOTALS_ROW - 1 + k) * ROW_H - 25;
           const labelStyle = {
             fontFamily: 'Oswald, sans-serif',
             fontWeight: r.strong ? 200 : 300,

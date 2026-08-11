@@ -19,12 +19,14 @@ export async function getPromotionsConfig() {
     if (!data) {
       return {
         enabled: true,
-        text: 'Enviament gratuït en comandes superiors a 50€',
+        text: 'Transport inclòs',
         link: '/offers',
         bgColor: '#111827',
         textColor: '#ffffff',
         fontSize: '14px',
-        font: 'Roboto'
+        font: 'Roboto',
+        discountEnabled: false,
+        discountRate: 0,
       };
     }
 
@@ -37,6 +39,8 @@ export async function getPromotionsConfig() {
       textColor: data.text_color,
       fontSize: data.font_size,
       font: data.font,
+      discountEnabled: data.discount_enabled ?? false,
+      discountRate: data.discount_rate ?? 0,
       createdAt: data.created_at,
       updatedAt: data.updated_at
     };
@@ -65,7 +69,9 @@ export async function updatePromotionsConfig(config) {
       bg_color: config.bgColor,
       text_color: config.textColor,
       font_size: config.fontSize,
-      font: config.font
+      font: config.font,
+      discount_enabled: config.discountEnabled ?? false,
+      discount_rate: config.discountRate ?? 0,
     };
 
     let result;
@@ -99,6 +105,8 @@ export async function updatePromotionsConfig(config) {
       textColor: result.data.text_color,
       fontSize: result.data.font_size,
       font: result.data.font,
+      discountEnabled: result.data.discount_enabled ?? false,
+      discountRate: result.data.discount_rate ?? 0,
       updatedAt: result.data.updated_at
     };
   } catch (error) {
@@ -122,12 +130,14 @@ export async function togglePromotionsBanner(enabled) {
     if (!existing.data) {
       const defaultConfig = {
         enabled,
-        text: 'Enviament gratuït en comandes superiors a 50€',
+        text: 'Transport inclòs',
         link: '/offers',
         bg_color: '#111827',
         text_color: '#ffffff',
         font_size: '14px',
-        font: 'Roboto'
+        font: 'Roboto',
+        discount_enabled: false,
+        discount_rate: 0,
       };
 
       const { data, error } = await supabase
@@ -146,7 +156,9 @@ export async function togglePromotionsBanner(enabled) {
         bgColor: data.bg_color,
         textColor: data.text_color,
         fontSize: data.font_size,
-        font: data.font
+        font: data.font,
+        discountEnabled: data.discount_enabled ?? false,
+        discountRate: data.discount_rate ?? 0,
       };
     }
 
@@ -167,7 +179,9 @@ export async function togglePromotionsBanner(enabled) {
       bgColor: data.bg_color,
       textColor: data.text_color,
       fontSize: data.font_size,
-      font: data.font
+      font: data.font,
+      discountEnabled: data.discount_enabled ?? false,
+      discountRate: data.discount_rate ?? 0,
     };
   } catch (error) {
     console.error('Error toggling promotions banner:', error);
