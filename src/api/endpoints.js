@@ -253,7 +253,7 @@ export const configAPI = {
       // En producció, això vindria del WordPress (custom field o ACF)
       return {
         enabled: import.meta.env.VITE_OFFERS_ENABLED !== 'false',
-        text: 'Enviament gratuït en comandes superiors a 50€',
+        text: 'Transport inclòs',
         link: '/offers'
       };
     }

@@ -19,14 +19,16 @@ import api from '@/api/endpoints';
 export const useOffersConfig = () => {
   const [config, setConfig] = useState({
     enabled: import.meta.env.VITE_OFFERS_ENABLED !== 'false',
-    text: 'Enviament gratuït en comandes superiors a 50€',
+    text: 'Transport inclòs',
     loading: true,
     bgColor: '#111827',
     textColor: '#ffffff',
     fontSize: '14px',
     font: 'Roboto',
     link: null,
-    clickable: false
+    clickable: false,
+    discountEnabled: false,
+    discountRate: 0,
   });
 
   useEffect(() => {
@@ -45,7 +47,9 @@ export const useOffersConfig = () => {
             fontSize: supabaseConfig.fontSize,
             font: supabaseConfig.font,
             link: supabaseConfig.link,
-            clickable: supabaseConfig.clickable
+            clickable: supabaseConfig.clickable,
+            discountEnabled: supabaseConfig.discountEnabled ?? false,
+            discountRate: supabaseConfig.discountRate ?? 0,
           });
           return;
         }
@@ -61,14 +65,16 @@ export const useOffersConfig = () => {
           const editorData = JSON.parse(savedOffersHeader);
           setConfig({
             enabled: true,
-            text: editorData.text || 'Enviament gratuït en comandes superiors a 50€',
+            text: editorData.text || 'Transport inclòs',
             loading: false,
             bgColor: editorData.bgColor || '#111827',
             textColor: editorData.textColor || '#ffffff',
             fontSize: editorData.fontSize || '14px',
             font: editorData.font || 'Roboto',
             link: editorData.link || null,
-            clickable: editorData.clickable || false
+            clickable: editorData.clickable || false,
+            discountEnabled: false,
+            discountRate: 0,
           });
           return;
         } catch (error) {
@@ -83,14 +89,16 @@ export const useOffersConfig = () => {
         if (response && typeof response.enabled !== 'undefined') {
           setConfig({
             enabled: response.enabled,
-            text: response.text || 'Enviament gratuït en comandes superiors a 50€',
+            text: response.text || 'Transport inclòs',
             loading: false,
             bgColor: response.bgColor || '#111827',
             textColor: response.textColor || '#ffffff',
             fontSize: response.fontSize || '14px',
             font: response.font || 'Roboto',
             link: response.link || null,
-            clickable: response.clickable || false
+            clickable: response.clickable || false,
+            discountEnabled: response.discountEnabled ?? false,
+            discountRate: response.discountRate ?? 0,
           });
           return;
         }

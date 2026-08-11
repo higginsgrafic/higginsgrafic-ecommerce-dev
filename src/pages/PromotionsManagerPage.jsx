@@ -13,13 +13,15 @@ export default function PromotionsManagerPage() {
   const [pinnedTexts, setPinnedTexts] = useState([]);
   const [config, setConfig] = useState({
     enabled: true,
-    text: 'Enviament gratuït en comandes superiors a 50€',
+    text: 'Transport inclòs',
     bgColor: '#111827',
     textColor: '#ffffff',
     fontSize: '14px',
     font: 'Roboto',
     link: '',
-    clickable: false
+    clickable: false,
+    discountEnabled: false,
+    discountRate: 0
   });
 
   useEffect(() => {
@@ -335,6 +337,47 @@ export default function PromotionsManagerPage() {
                 <option value="Times New Roman">Times New Roman</option>
                 <option value="Courier New">Courier New</option>
               </select>
+            </div>
+          </div>
+
+          {/* Descompte */}
+          <div className="border-t border-gray-200 pt-4">
+            <h2 className="text-sm font-medium mb-3">Descompte</h2>
+
+            <div className="space-y-3">
+              <div className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  id="discountEnabled"
+                  checked={config.discountEnabled}
+                  onChange={(e) => handleChange('discountEnabled', e.target.checked)}
+                  className="w-4 h-4 cursor-pointer"
+                />
+                <label htmlFor="discountEnabled" className="text-sm cursor-pointer">
+                  Activar descompte
+                </label>
+              </div>
+
+              {config.discountEnabled && (
+                <div>
+                  <label className="block text-xs text-gray-500 mb-1">
+                    Percentatge de descompte (%)
+                  </label>
+                  <input
+                    type="number"
+                    min="0"
+                    max="100"
+                    value={config.discountRate}
+                    onChange={(e) => handleChange('discountRate', parseInt(e.target.value) || 0)}
+                    className="w-24 px-3 py-2 border border-gray-300 text-sm focus:outline-none focus:border-gray-400"
+                  />
+                  {config.discountRate > 0 && (
+                    <p className="text-xs text-gray-400 mt-1">
+                      Es mostrarà "Descompte (-{config.discountRate}%)" al checkout i a la confirmació de comanda.
+                    </p>
+                  )}
+                </div>
+              )}
             </div>
           </div>
 
