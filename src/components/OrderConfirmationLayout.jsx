@@ -7,7 +7,7 @@ import { useOffersConfig } from '@/hooks/useOffersConfig';
 
 const OrderConfirmationLayout = ({
   orderData,
-  heroImage = '/placeholders/fons-pagament/fons-confirmacio-pagament.png',
+  heroImage = '/placeholders/tots_els_fons/fons-pagament/fons-confirmacio-pagament.png',
   backToUrl = '/',
   backToLabel = 'TORNA A LA BOTIGA',
   title = 'Pagament confirmat',

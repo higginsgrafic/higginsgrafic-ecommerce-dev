@@ -303,7 +303,7 @@ const LlistaCheckout = ({ items, onBreadcrumbClick }) => {
                       style={{
                         width: '100%',
                         height: '100%',
-                        backgroundImage: 'url(/placeholders/fons_acordio/fons-una-fila.png)',
+                        backgroundImage: 'url(/placeholders/tots_els_fons/fons_acordio/fons-una-fila.png)',
                         backgroundRepeat: 'no-repeat',
                         backgroundPosition: 'center center',
                         backgroundSize: '100% 100%',
@@ -443,7 +443,7 @@ const LlistaCheckout = ({ items, onBreadcrumbClick }) => {
                 right: 0,
                 top: 0,
                 bottom: 0,
-                backgroundImage: 'url(/placeholders/fons_acordio/fons-una-fila.png)',
+                backgroundImage: 'url(/placeholders/tots_els_fons/fons_acordio/fons-una-fila.png)',
                 backgroundRepeat: 'no-repeat',
                 backgroundPosition: 'center center',
                 backgroundSize: '100% 100%',

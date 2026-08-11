@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Benvingut a Higgins Gràfic</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+      background-color: #f5f5f5;
+      color: #111827;
+    }
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      background-color: #ffffff;
+    }
+    .header {
+      background-color: #141414;
+      padding: 48px 24px;
+      text-align: center;
+    }
+    .logo {
+      font-family: 'Oswald', sans-serif;
+      font-size: 32px;
+      font-weight: 700;
+      color: #ffffff;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin: 0 0 16px 0;
+    }
+    .header-subtitle {
+      font-size: 14px;
+      color: rgba(255, 255, 255, 0.7);
+      margin: 0;
+    }
+    .content {
+      padding: 40px 24px;
+    }
+    .title {
+      font-family: 'Oswald', sans-serif;
+      font-size: 28px;
+      font-weight: 300;
+      text-transform: uppercase;
+      color: #475059;
+      margin: 0 0 24px 0;
+      letter-spacing: 0.04em;
+      text-align: center;
+    }
+    .intro-text {
+      font-size: 16px;
+      line-height: 1.8;
+      color: #4b5563;
+      margin: 0 0 32px 0;
+      text-align: center;
+    }
+    .feature-grid {
+      display: table;
+      width: 100%;
+      margin: 32px 0;
+    }
+    .feature-item {
+      display: table-row;
+    }
+    .feature-icon {
+      display: table-cell;
+      width: 48px;
+      padding: 12px 0;
+      vertical-align: top;
+      text-align: center;
+      font-size: 24px;
+    }
+    .feature-content {
+      display: table-cell;
+      padding: 12px 0 12px 16px;
+      vertical-align: top;
+    }
+    .feature-title {
+      font-weight: 600;
+      font-size: 16px;
+      color: #111827;
+      margin: 0 0 4px 0;
+    }
+    .feature-description {
+      font-size: 14px;
+      color: #6b7280;
+      margin: 0;
+      line-height: 1.5;
+    }
+    .cta-button {
+      display: inline-block;
+      background-color: #141414;
+      color: #ffffff;
+      text-decoration: none;
+      padding: 16px 40px;
+      border-radius: 5px;
+      font-family: 'Roboto Condensed', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin: 32px 0;
+    }
+    .footer {
+      background-color: #f9fafb;
+      padding: 32px 24px;
+      text-align: center;
+      font-size: 12px;
+      color: #6b7280;
+      line-height: 1.6;
+    }
+    .footer a {
+      color: #141414;
+      text-decoration: none;
+    }
+    @media only screen and (max-width: 600px) {
+      .content {
+        padding: 24px 16px;
+      }
+      .header {
+        padding: 32px 16px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1 class="logo">Higgins Gràfic</h1>
+      <p class="header-subtitle">Samarretes amb disseny</p>
+    </div>
+
+    <div class="content">
+      <h2 class="title">Benvingut, {{USER_NAME}}!</h2>
+
+      <p class="intro-text">
+        Gràcies per unir-te a la comunitat d'Higgins Gràfic. Estem contents de tenir-te aquí.
+      </p>
+
+      <div class="feature-grid">
+        <div class="feature-item">
+          <div class="feature-icon">🎨</div>
+          <div class="feature-content">
+            <p class="feature-title">Dissenys únics</p>
+            <p class="feature-description">Explora col·leccions inspirades en ciència-ficció, cultura pop i art.</p>
+          </div>
+        </div>
+        <div class="feature-item">
+          <div class="feature-icon">✨</div>
+          <div class="feature-content">
+            <p class="feature-title">Qualitat premium</p>
+            <p class="feature-description">Samarretes de qualitat amb impressió duradora i sostenible.</p>
+          </div>
+        </div>
+        <div class="feature-item">
+          <div class="feature-icon">🚚</div>
+          <div class="feature-content">
+            <p class="feature-title">Transport inclòs</p>
+            <p class="feature-description">Enviament gratuït a tota la península en comandes superiors a 50€.</p>
+          </div>
+        </div>
+        <div class="feature-item">
+          <div class="feature-icon">🔒</div>
+          <div class="feature-content">
+            <p class="feature-title">Compra segura</p>
+            <p class="feature-description">Pagament segur amb Stripe i protecció de dades garantida.</p>
+          </div>
+        </div>
+      </div>
+
+      <div style="text-align: center;">
+        <a href="{{SITE_URL}}" class="cta-button">Descobreix les col·leccions</a>
+      </div>
+
+      <p style="margin: 40px 0 0 0; font-size: 13px; line-height: 1.6; color: #6b7280; text-align: center;">
+        Si tens qualsevol pregunta, estem aquí per ajudar-te.<br>
+        Contacta'ns a <a href="mailto:higginsgrafic@gmail.com" style="color: #141414;">higginsgrafic@gmail.com</a>
+      </p>
+    </div>
+
+    <div class="footer">
+      <p style="margin: 0 0 8px 0;">
+        <strong>Higgins Gràfic</strong><br>
+        Samarretes amb disseny
+      </p>
+      <p style="margin: 16px 0 0 0;">
+        <a href="{{SITE_URL}}">Visita la botiga</a> ·
+        <a href="{{SITE_URL}}/about">Sobre nosaltres</a> ·
+        <a href="{{SITE_URL}}/contact">Contacte</a>
+      </p>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Missatge rebut</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+      background-color: #f5f5f5;
+      color: #111827;
+    }
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      background-color: #ffffff;
+    }
+    .header {
+      background-color: #141414;
+      padding: 32px 24px;
+      text-align: center;
+    }
+    .logo {
+      font-family: 'Oswald', sans-serif;
+      font-size: 28px;
+      font-weight: 700;
+      color: #ffffff;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin: 0;
+    }
+    .content {
+      padding: 40px 24px;
+    }
+    .title {
+      font-family: 'Oswald', sans-serif;
+      font-size: 24px;
+      font-weight: 300;
+      text-transform: uppercase;
+      color: #475059;
+      margin: 0 0 24px 0;
+      letter-spacing: 0.04em;
+    }
+    .message-box {
+      background-color: #f9fafb;
+      border-left: 4px solid #10b981;
+      padding: 20px;
+      margin: 24px 0;
+      border-radius: 4px;
+    }
+    .message-label {
+      font-family: 'Roboto Condensed', sans-serif;
+      font-size: 11px;
+      color: rgba(71, 80, 89, 0.7);
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+      margin: 0 0 8px 0;
+    }
+    .message-text {
+      font-size: 14px;
+      line-height: 1.6;
+      color: #111827;
+      margin: 0;
+      white-space: pre-wrap;
+    }
+    .footer {
+      background-color: #f9fafb;
+      padding: 32px 24px;
+      text-align: center;
+      font-size: 12px;
+      color: #6b7280;
+      line-height: 1.6;
+    }
+    .footer a {
+      color: #141414;
+      text-decoration: none;
+    }
+    @media only screen and (max-width: 600px) {
+      .content {
+        padding: 24px 16px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1 class="logo">Higgins Gràfic</h1>
+    </div>
+
+    <div class="content">
+      <h2 class="title">Hem rebut el teu missatge</h2>
+
+      <p style="margin: 0 0 24px 0; font-size: 14px; line-height: 1.6; color: #4b5563;">
+        Hola {{USER_NAME}},
+      </p>
+
+      <p style="margin: 0 0 24px 0; font-size: 14px; line-height: 1.6; color: #4b5563;">
+        Gràcies per contactar amb nosaltres. Hem rebut el teu missatge i et respondrem el més aviat possible, normalment en menys de 24 hores.
+      </p>
+
+      <div class="message-box">
+        <p class="message-label">El teu missatge</p>
+        <p class="message-text">{{MESSAGE}}</p>
+      </div>
+
+      <p style="margin: 24px 0 0 0; font-size: 14px; line-height: 1.6; color: #4b5563;">
+        Si tens més preguntes o necessites ajuda urgent, pots contactar-nos directament a <a href="mailto:higginsgrafic@gmail.com" style="color: #141414;">higginsgrafic@gmail.com</a>
+      </p>
+
+      <p style="margin: 32px 0 0 0; font-size: 13px; line-height: 1.6; color: #6b7280;">
+        Gràcies per la teva paciència,<br>
+        <strong>L'equip d'Higgins Gràfic</strong>
+      </p>
+    </div>
+
+    <div class="footer">
+      <p style="margin: 0 0 8px 0;">
+        <strong>Higgins Gràfic</strong><br>
+        Samarretes amb disseny
+      </p>
+      <p style="margin: 16px 0 0 0;">
+        <a href="{{SITE_URL}}">Visita la botiga</a> ·
+        <a href="{{SITE_URL}}/faq">Preguntes freqüents</a> ·
+        <a href="{{SITE_URL}}/contact">Contacte</a>
+      </p>
+    </div>
+  </div>
+</body>
+</html>

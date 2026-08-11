@@ -452,7 +452,7 @@ const CheckoutPageInner = () => {
             style={{
               gridColumn: '2 / 3',
               gridRow: '1 / 34',
-              backgroundImage: 'url(/placeholders/fons_acordio/una-columnat.png)',
+              backgroundImage: 'url(/placeholders/tots_els_fons/fons_acordio/una-columnat.png)',
               backgroundRepeat: 'repeat-y',
               backgroundPosition: 'center top',
               backgroundSize: '100% auto',
