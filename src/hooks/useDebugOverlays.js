@@ -141,7 +141,7 @@ function usePersistentFlag(key, defaultValue, type = 'bool') {
 
 export function useDebugOverlays() {
   const [debugsEnabled, setDebugsEnabled] = usePersistentFlag(KEY_DEBUGS, true, 'bool');
-  const [activeWorkEnabled, setActiveWorkEnabled] = usePersistentFlag(KEY_ACTIVE_WORK, true, 'bool');
+  const [activeWorkEnabled, setActiveWorkEnabled] = usePersistentFlag(KEY_ACTIVE_WORK, false, 'bool');
   const [rulersEnabled, setRulersEnabled] = usePersistentFlag(KEY_RULERS, true, 'bool');
   const [pdpControlsEnabled, setPdpControlsEnabled] = usePersistentFlag(KEY_PDP_CONTROLS, true, 'bool');
   const [pautaEnabled, setPautaEnabled] = usePersistentFlag(KEY_PAUTA, true, 'bool');

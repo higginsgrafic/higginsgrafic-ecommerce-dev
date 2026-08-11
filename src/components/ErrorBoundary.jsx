@@ -182,7 +182,7 @@ class ErrorBoundary extends React.Component {
         left: 0,
         width: '100%',
         height: '100%',
-        backgroundImage: "url('/placeholders/fons_error/fons-error-6.png')",
+        backgroundImage: "url('/placeholders/tots_els_fons/fons_error/fons-error-6.png')",
         backgroundColor: this.bgColors[this.state.bgColorIndex],
         backgroundSize: '150% 150%',
         backgroundPosition: 'center',

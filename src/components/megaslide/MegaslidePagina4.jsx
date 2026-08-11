@@ -2,7 +2,7 @@ import React, { useRef, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useProfile } from '@/hooks/useProfile';
-import { MoreHorizontal, Loader2, Truck, AlertCircle, X, Package, LogOut } from 'lucide-react';
+import { MoreHorizontal, Loader2, Truck, AlertCircle, X, Package, LogOut, ChevronUp, ChevronDown, PenLine } from 'lucide-react';
 import { MOCK_CLIENT } from '@/lib/mockOrderStore';
 
 const STATUS_COLOR = {
@@ -27,7 +27,7 @@ const LEGEND = ['PENDENT', 'EN PREPARACIÓ', 'EN REPARTIMENT', 'ATURADA', 'CANCE
 
 const COL_TEMPLATE = '2.2fr 1fr 1.3fr 1.3fr 0.9fr';
 
-const TEXT = { fontFamily: 'Roboto Condensed, sans-serif', fontWeight: 300, fontSize: '9pt', color: '#475059' };
+const TEXT = { fontFamily: 'Roboto, sans-serif', fontWeight: 300, fontSize: '9pt', color: '#475059' };
 const HEAD = { fontFamily: 'Oswald, sans-serif', fontWeight: 400, textTransform: 'uppercase', letterSpacing: '0.5px', color: '#2F3540' };
 
 const IMG_W = 1024;
@@ -70,6 +70,10 @@ export default function MegaslidePagina4({
   const ordersRef = useRef(null);
   const [scrollIndex, setScrollIndex] = useState(0);
   const isScrolling = useRef(false);
+  const [messagesSlideOpen, setMessagesSlideOpen] = useState(false);
+  const [activeMessageTab, setActiveMessageTab] = useState('rebuts');
+
+  const formSlideOpen = messagesSlideOpen;
 
   const handleSignOut = async () => {
     await signOut();
@@ -110,6 +114,18 @@ export default function MegaslidePagina4({
     phone: profile?.phone || '600 123 456',
   } : profile);
 
+  const mockMessages = isDev ? [
+    { id: 1, type: 'rebuts', date: '2026-08-10', subject: 'Consulta sobre comanda', status: 'Respost', preview: 'Hola, voldria saber l\'estat de la meva comanda...' },
+    { id: 2, type: 'rebuts', date: '2026-08-08', subject: 'Canvi de talla', status: 'Pendent', preview: 'Necessito canviar la talla d\'una samarreta...' },
+    { id: 3, type: 'rebuts', date: '2026-08-05', subject: 'Problema amb el pagament', status: 'Respost', preview: 'El pagament no s\'ha processat correctament...' },
+    { id: 4, type: 'enviats', date: '2026-08-02', subject: 'Informació sobre enviament', status: 'Respost', preview: 'Quan arribarà la meva comanda?' },
+    { id: 5, type: 'enviats', date: '2026-08-01', subject: 'Re: Canvi de talla', status: 'Enviat', preview: 'Ja hem processat el canvi de talla...' },
+    { id: 6, type: 'enviats', date: '2026-07-28', subject: 'Esborrany: Consulta disseny', status: 'Esborrany', preview: 'Hola, m\'agradaria saber si...' },
+  ] : [];
+
+  const rebutsMessages = mockMessages.filter(m => m.type === 'rebuts');
+  const enviatsMessages = mockMessages.filter(m => m.type === 'enviats');
+
   return (
     <div style={{ width: '25%', flexShrink: 0, display: 'flex', height: '100%', position: 'relative', justifyContent: 'center' }}>
       <div style={{ flex: '1 1 auto' }} />
@@ -138,7 +154,7 @@ export default function MegaslidePagina4({
             width: '100%',
             height: '100%',
             position: 'relative',
-            backgroundImage: 'url("/placeholders/fons_pagina_4/pagina-4-fons.png")',
+            backgroundImage: 'url("/placeholders/tots_els_fons/fons_pagina_4/pagina-4-fons.png")',
             backgroundRepeat: 'no-repeat',
             backgroundPosition: 'top left',
             backgroundSize: '100% 100%',
@@ -166,8 +182,8 @@ export default function MegaslidePagina4({
                 {/* Taula — capçalera fixa + body scrollable */}
                 <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
                 <table style={{
-                  width: 'calc(100% + 14px)',
-                  marginLeft: '-9px',
+                  width: '100%',
+                  marginLeft: '0',
                   marginTop: '2px',
                   borderCollapse: 'collapse',
                   tableLayout: 'fixed',
@@ -175,11 +191,11 @@ export default function MegaslidePagina4({
                   border: 'none',
                 }}>
                   <colgroup>
-                    <col style={{ width: '30.7%' }} />
-                    <col style={{ width: '7.8%' }} />
-                    <col style={{ width: '29.5%' }} />
-                    <col style={{ width: '9.75%' }} />
-                    <col style={{ width: '7.95%' }} />
+                    <col style={{ width: '34%' }} />
+                    <col style={{ width: '7%' }} />
+                    <col style={{ width: '32%' }} />
+                    <col style={{ width: '14%' }} />
+                    <col style={{ width: '13%' }} />
                   </colgroup>
                   <thead>
                     <tr>
@@ -205,20 +221,20 @@ export default function MegaslidePagina4({
                   ref={ordersRef}
                   style={{ flex: 1, overflow: 'hidden', position: 'relative' }}
                 >
-                  <div style={{ transform: `translateY(-${scrollIndex * ROW_HEIGHT}px)` }}>
+                  <div style={{ transform: `translateY(-${scrollIndex * ROW_HEIGHT}px)`, transition: 'transform 0.3s ease-in-out' }}>
                     <table style={{
-                      width: 'calc(100% + 14px)',
-                      marginLeft: '-9px',
+                      width: '100%',
+                      marginLeft: '0',
                       borderCollapse: 'collapse',
                       tableLayout: 'fixed',
                       border: 'none',
                     }}>
                       <colgroup>
-                        <col style={{ width: '30.7%' }} />
-                        <col style={{ width: '7.8%' }} />
-                        <col style={{ width: '29.5%' }} />
-                        <col style={{ width: '9.75%' }} />
-                        <col style={{ width: '7.95%' }} />
+                        <col style={{ width: '34%' }} />
+                        <col style={{ width: '7%' }} />
+                        <col style={{ width: '32%' }} />
+                        <col style={{ width: '14%' }} />
+                        <col style={{ width: '13%' }} />
                       </colgroup>
                       <tbody>
                         {displayOrders.map((o, idx) => {
@@ -227,15 +243,15 @@ export default function MegaslidePagina4({
                           const color = STATUS_COLOR[status] || '#9CA3AF';
                           return (
                             <tr key={o.num || idx} style={{ height: `${ROW_HEIGHT}px` }}>
-                              <td style={{ ...TEXT, fontSize: '7pt', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', padding: '4px', textAlign: 'center', border: 'none' }}>{o.num}</td>
-                              <td style={{ padding: '4px', border: 'none' }}>
+                              <td style={{ ...TEXT, fontSize: '10pt', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', padding: '4px 2px', textAlign: 'center', border: 'none', maxWidth: 0 }}>{o.num}</td>
+                              <td style={{ padding: '4px 2px', border: 'none' }}>
                                 <div style={{ display: 'flex', justifyContent: 'center' }}>
                                   <Icon size={11} color={color} strokeWidth={2} />
                                 </div>
                               </td>
-                              <td style={{ ...TEXT, fontSize: '7pt', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', padding: '4px', textAlign: 'center', border: 'none' }}>{o.tracking_number || o.raw?.tracking_number || '—'}</td>
-                              <td style={{ ...TEXT, fontSize: '7pt', padding: '4px', textAlign: 'center', border: 'none' }}>{o.date}</td>
-                              <td style={{ ...TEXT, fontSize: '7pt', padding: '4px', textAlign: 'center', border: 'none' }}>{o.total || '—'}</td>
+                              <td style={{ ...TEXT, fontSize: '10pt', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', padding: '4px 2px', textAlign: 'center', border: 'none', maxWidth: 0 }}>{o.tracking_number || o.raw?.tracking_number || '—'}</td>
+                              <td style={{ ...TEXT, fontSize: '10pt', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', padding: '4px 2px', textAlign: 'center', border: 'none', maxWidth: 0 }}>{o.date}</td>
+                              <td style={{ ...TEXT, fontSize: '10pt', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', padding: '4px 2px', textAlign: 'center', border: 'none', maxWidth: 0 }}>{o.total || '—'}</td>
                             </tr>
                           );
                         })}
@@ -251,6 +267,7 @@ export default function MegaslidePagina4({
                   flexWrap: 'wrap',
                   gap: '8px 12px',
                   alignItems: 'center',
+                  justifyContent: 'center',
                   paddingTop: '12px',
                 }}>
                   {LEGEND.map((label) => {
@@ -267,7 +284,7 @@ export default function MegaslidePagina4({
               </div>
 
               {/* COLUMNA 2: MISSATGES */}
-              <div style={{ display: 'flex', flexDirection: 'column', padding: '0 10px 10px', overflow: 'hidden' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', padding: '0 10px 10px', overflow: 'hidden', position: 'relative' }}>
                 {/* Title */}
                 <div style={{
                   ...HEAD,
@@ -278,71 +295,214 @@ export default function MegaslidePagina4({
                 }}>
                   Missatges
                 </div>
-                {/* Form table */}
-                <table style={{
-                  width: '100%',
-                  marginTop: '1px',
-                  borderCollapse: 'collapse',
-                  tableLayout: 'fixed',
-                  flex: 1,
-                  border: 'none',
-                }}>
-                  <tbody>
-                    {/* Row 1: Nom + eCorreu */}
-                    <tr>
-                      <td style={{ width: '50%', padding: '4px', border: 'none' }}>
-                        <TransparentInput placeholder="Nom" defaultValue={displayProfile?.full_name || ''} />
-                      </td>
-                      <td style={{ width: '50%', padding: '4px', border: 'none' }}>
-                        <TransparentInput placeholder="eCorreu" defaultValue={user?.email || ''} />
-                      </td>
-                    </tr>
-                    {/* Row 2: Assumpte */}
-                    <tr>
-                      <td colSpan={2} style={{ padding: '4px', border: 'none' }}>
-                        <TransparentInput placeholder="Assumpte" />
-                      </td>
-                    </tr>
-                    {/* Row 3: Missatge */}
-                    <tr>
-                      <td colSpan={2} style={{ padding: '0 4px', border: 'none', height: '100%', verticalAlign: 'top' }}>
-                        <textarea
-                          placeholder="Missatge"
+
+                {/* Messages list — visible by default */}
+                <div style={{ flex: 1, overflow: 'auto', padding: '8px 12px' }}>
+                  {/* Tab selector — estil selector de color pàgina 2 */}
+                  <div style={{
+                    display: 'flex',
+                    backgroundColor: '#f3f4f6',
+                    padding: '2px',
+                    borderRadius: '4px',
+                    border: 'none',
+                    width: '100%',
+                    boxSizing: 'border-box',
+                    marginBottom: '8px',
+                  }}>
+                    {['rebuts', 'enviats'].map((tab) => {
+                      const isActive = activeMessageTab === tab;
+                      return (
+                        <button
+                          key={tab}
+                          type="button"
+                          onClick={() => setActiveMessageTab(tab)}
                           style={{
-                            ...TEXT,
-                            width: '100%',
-                            height: '100%',
-                            boxSizing: 'border-box',
-                            padding: '4px 8px',
-                            border: 'none',
-                            borderRadius: 0,
-                            outline: 'none',
-                            resize: 'none',
-                            background: 'transparent',
+                            flex: 1,
+                            fontFamily: 'Oswald, sans-serif',
                             fontSize: '8pt',
-                            textAlign: 'left',
+                            fontWeight: isActive ? 400 : 300,
+                            letterSpacing: '0em',
+                            lineHeight: 1,
+                            textTransform: 'capitalize',
+                            color: isActive ? '#111827' : '#9ca3af',
+                            backgroundColor: isActive ? '#ffffff' : 'transparent',
+                            border: 'none',
+                            borderRadius: '3px',
+                            cursor: 'pointer',
+                            transition: 'all 150ms ease',
+                            boxShadow: isActive ? '0 1px 2px rgba(0,0,0,0.05)' : 'none',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            padding: '5px 0',
                           }}
-                        />
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-                {/* Buttons */}
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '4px', height: '9%', flexShrink: 0, position: 'relative', top: '7px' }}>
-                  {['Adjunta', "Cancel·la", 'Envia'].map((label, i) => (
-                    <button key={label} style={{
-                      ...HEAD,
-                      fontSize: '7pt',
-                      color: i === 2 ? '#FFFFFF' : '#475059',
-                      backgroundColor: i === 2 ? '#2F3540' : 'rgba(244,246,248,0.7)',
+                        >
+                          {tab}
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  {mockMessages.length === 0 ? (
+                    <div style={{ ...TEXT, fontSize: '8pt', textAlign: 'center', opacity: 0.5, marginTop: '20px' }}>
+                      No hi ha missatges
+                    </div>
+                  ) : (
+                    (activeMessageTab === 'rebuts' ? rebutsMessages : enviatsMessages).map((msg, idx) => (
+                      <div
+                        key={msg.id}
+                        style={{
+                          padding: '8px 0',
+                          marginBottom: '3px',
+                          cursor: 'pointer',
+                          position: 'relative',
+                          backgroundImage: `url("/placeholders/tots_els_fons/fons_pagina_4/fons-una-filera.png")`,
+                          backgroundRepeat: 'no-repeat',
+                          backgroundPosition: 'center center',
+                          backgroundSize: '100% 100%',
+                          transform: idx % 2 === 0 ? 'scaleX(-1)' : 'none',
+                        }}
+                      >
+                        <div style={{ transform: idx % 2 === 0 ? 'scaleX(-1)' : 'none', position: 'relative' }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '4px' }}>
+                            <span style={{ ...HEAD, fontSize: '7pt', color: '#111827' }}>{msg.subject}</span>
+                            <span style={{ ...TEXT, fontSize: '6pt', color: '#6b7280' }}>
+                              {msg.date}
+                            </span>
+                          </div>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2px' }}>
+                            <div style={{ fontFamily: 'Roboto, sans-serif', fontWeight: 300, fontSize: '10px', color: '#4b5563', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1 }}>
+                              {msg.preview}
+                            </div>
+                            <span style={{ ...TEXT, fontSize: '6pt', color: msg.status === 'Esborrany' ? '#9CA3AF' : msg.status === 'Pendent' ? '#D97706' : '#16A34A', marginLeft: '8px', flexShrink: 0 }}>
+                              {msg.status}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
+
+                {/* Sliding panel for message form */}
+                <div
+                  style={{
+                    position: 'absolute',
+                    bottom: messagesSlideOpen ? '3px' : '3px',
+                    left: '10px',
+                    right: '10px',
+                    height: messagesSlideOpen ? 'calc(100% - 42px)' : '32px',
+                    backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                    backgroundImage: 'url("/placeholders/tots_els_fons/fons_pagina_4/pagina-4-fons-missatges.png")',
+                    backgroundRepeat: 'no-repeat',
+                    backgroundPosition: 'center calc(50% + 36px)',
+                    backgroundSize: '100% 100%',
+                    borderTopLeftRadius: '4px',
+                    borderTopRightRadius: '4px',
+                    boxShadow: '0 -2px 8px rgba(0,0,0,0.1)',
+                    transition: 'height 0.3s ease-in-out, bottom 0.3s ease-in-out',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    overflow: 'hidden',
+                    zIndex: 1,
+                  }}
+                >
+                  {/* Arrow toggle button */}
+                  <button
+                    onClick={() => setMessagesSlideOpen(!messagesSlideOpen)}
+                    style={{
+                      width: '100%',
+                      height: '32px',
                       border: 'none',
-                      borderRadius: '2px',
+                      background: 'transparent',
                       cursor: 'pointer',
-                      padding: 0,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      padding: '0 12px',
+                      flexShrink: 0,
+                    }}
+                  >
+                    {messagesSlideOpen ? (
+                      <ChevronDown size={16} color="#475059" strokeWidth={2} />
+                    ) : (
+                      <ChevronUp size={16} color="#475059" strokeWidth={2} />
+                    )}
+                    <PenLine size={14} color="#475059" strokeWidth={2} />
+                    <div style={{ width: '16px' }} />
+                  </button>
+
+                  {/* Form table — inside slider */}
+                  {messagesSlideOpen && (
+                    <table style={{
+                      width: '100%',
+                      marginTop: '1px',
+                      borderCollapse: 'collapse',
+                      tableLayout: 'fixed',
+                      flex: 1,
+                      border: 'none',
                     }}>
-                      {label}
-                    </button>
-                  ))}
+                      <tbody>
+                        {/* Row 1: Nom + eCorreu */}
+                        <tr>
+                          <td style={{ width: '50%', padding: '4px', border: 'none' }}>
+                            <TransparentInput placeholder="Nom" defaultValue={displayProfile?.full_name || ''} />
+                          </td>
+                          <td style={{ width: '50%', padding: '4px', border: 'none' }}>
+                            <TransparentInput placeholder="eCorreu" defaultValue={user?.email || ''} />
+                          </td>
+                        </tr>
+                        {/* Row 2: Assumpte */}
+                        <tr>
+                          <td colSpan={2} style={{ padding: '4px', border: 'none' }}>
+                            <TransparentInput placeholder="Assumpte" />
+                          </td>
+                        </tr>
+                        {/* Row 3: Missatge */}
+                        <tr>
+                          <td colSpan={2} style={{ padding: '0 4px', border: 'none', height: '100%', verticalAlign: 'top' }}>
+                            <textarea
+                              placeholder="Missatge"
+                              style={{
+                                ...TEXT,
+                                width: '100%',
+                                height: '100%',
+                                boxSizing: 'border-box',
+                                padding: '6px 8px',
+                                border: 'none',
+                                borderRadius: 0,
+                                outline: 'none',
+                                resize: 'none',
+                                background: 'transparent',
+                                fontSize: '8pt',
+                                textAlign: 'left',
+                              }}
+                            />
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  )}
+
+                  {/* Buttons — inside slider */}
+                  {messagesSlideOpen && (
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '4px', flexShrink: 0, padding: '4px 8px 8px' }}>
+                      {['Adjunta', "Cancel·la", 'Envia'].map((label, i) => (
+                        <button key={label} style={{
+                          ...HEAD,
+                          fontSize: '7pt',
+                          color: i === 2 ? '#FFFFFF' : '#475059',
+                          backgroundColor: i === 2 ? '#2F3540' : '#FFFFFF',
+                          border: 'none',
+                          borderRadius: '2px',
+                          cursor: 'pointer',
+                          padding: '4px 0',
+                        }}>
+                          {label}
+                        </button>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
 

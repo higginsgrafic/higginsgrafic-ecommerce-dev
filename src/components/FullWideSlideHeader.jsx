@@ -2867,13 +2867,6 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
                   type="button"
                   className={`inline-flex items-center gap-1 text-xs font-semibold tracking-[0.18em] uppercase ${open ? 'text-foreground' : 'text-muted-foreground hover:text-foreground'}`}
                   aria-expanded={open ? 'true' : 'false'}
-                  onMouseEnter={() => {
-                    if (!active) return;
-                    if (megaPage !== 1) return;
-                    if (active === item.id) return;
-                    setActive(item.id);
-                    touchMegaPublicActivity();
-                  }}
                   onClick={() => {
                     setManualOverrideClosed(false);
                     setMegaFullScreen(false);
@@ -2996,10 +2989,14 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
                   accountClickTimeoutRef.current = window.setTimeout(() => {
                     accountClickTimeoutRef.current = null;
                     setManualOverrideClosed(false);
-                    setMegaPage(4);
-                    setAcordioExpandedPage4(false);
-                    if (!active) ensureMegaOpen();
-                    if (!user) setShowRegisterOverlay(true);
+                    if (megaPage === 4 && active) {
+                      setActive(null);
+                    } else {
+                      setMegaPage(4);
+                      setAcordioExpandedPage4(false);
+                      if (!active) ensureMegaOpen();
+                      if (!user) setShowRegisterOverlay(true);
+                    }
                     touchMegaPublicActivity();
                   }, dblClickDelayMs);
                 }}

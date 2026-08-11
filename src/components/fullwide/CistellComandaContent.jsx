@@ -199,7 +199,7 @@ function CistellComandaContent({ cartItems, setCartItems, onCloseMegaSlide, onFi
           <div style={{
             position: 'absolute',
             inset: 0,
-            backgroundImage: `url("${encodeURI('/placeholders/fons_acordio/fons-cistell-compra.png')}")`,
+            backgroundImage: `url("${encodeURI('/placeholders/tots_els_fons/fons_acordio/fons-cistell-compra.png')}")`,
             backgroundRepeat: 'no-repeat',
             backgroundPosition: 'center top',
             backgroundSize: `${TABLE_WIDTH + COL4_EXTRA}px auto`,
@@ -448,7 +448,7 @@ function CistellComandaContent({ cartItems, setCartItems, onCloseMegaSlide, onFi
               left: `calc(50% - ${TABLE_WIDTH / 2}px + ${SLIDE_OFFSET_X}px)`,
               width: `${TABLE_WIDTH + COL4_EXTRA}px`,
               height: `${rows.length * ROW_H - V_GUTTER}px`,
-              backgroundImage: `url("${encodeURI('/placeholders/fons_acordio/fons-cistell-compra.png')}")`,
+              backgroundImage: `url("${encodeURI('/placeholders/tots_els_fons/fons_acordio/fons-cistell-compra.png')}")`,
               backgroundRepeat: 'no-repeat',
               backgroundPosition: 'center top',
               backgroundSize: `${TABLE_WIDTH}px 100%`,

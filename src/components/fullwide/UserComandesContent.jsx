@@ -254,7 +254,7 @@ function UserComandesContent({ userEmail }) {
             transition: background-color 9999s ease-in-out 0s;
           }
         `}</style>
-        <div style={{ width: '1350px', marginLeft: 'auto', marginRight: 'auto', marginTop: '-0.5px', overflow: 'hidden', position: 'relative', backgroundImage: 'url("/placeholders/fons_acordio/fons-usuari-compte.png")', backgroundRepeat: 'no-repeat', backgroundPosition: 'top left', backgroundSize: '1350px 100%', transform: 'translateX(3px)' }}>
+        <div style={{ width: '1350px', marginLeft: 'auto', marginRight: 'auto', marginTop: '-0.5px', overflow: 'hidden', position: 'relative', backgroundImage: 'url("/placeholders/tots_els_fons/fons_acordio/fons-usuari-compte.png")', backgroundRepeat: 'no-repeat', backgroundPosition: 'top left', backgroundSize: '1350px 100%', transform: 'translateX(3px)' }}>
           <table className="compte-grid" style={{
             width: '1365px',
             marginLeft: '-7.5px',
@@ -589,7 +589,7 @@ function UserComandesContent({ userEmail }) {
       </>)}
 
       {activeTab === 'SEGURETAT' && (
-        <div style={{ width: '1350px', marginLeft: 'auto', marginRight: 'auto', marginTop: '0px', height: SEG_TABLE_LOCKED_HEIGHT, overflow: 'visible', position: 'relative', zIndex: 2, backgroundColor: 'transparent', backgroundImage: 'url("/placeholders/fons_acordio/fons-usuari-seguretat.png")', backgroundRepeat: 'no-repeat', backgroundPosition: 'top left', backgroundSize: '1350px 528px', paddingLeft: 0, paddingRight: 0, transform: `translate(${SEG_X_OFFSET}, ${SEG_Y_OFFSET})` }}>
+        <div style={{ width: '1350px', marginLeft: 'auto', marginRight: 'auto', marginTop: '0px', height: SEG_TABLE_LOCKED_HEIGHT, overflow: 'visible', position: 'relative', zIndex: 2, backgroundColor: 'transparent', backgroundImage: 'url("/placeholders/tots_els_fons/fons_acordio/fons-usuari-seguretat.png")', backgroundRepeat: 'no-repeat', backgroundPosition: 'top left', backgroundSize: '1350px 528px', paddingLeft: 0, paddingRight: 0, transform: `translate(${SEG_X_OFFSET}, ${SEG_Y_OFFSET})` }}>
           <style>{`.seguretat-table td { outline: none; border: none; box-shadow: none; background: transparent; }`}</style>
          <table className="seguretat-table" style={{
             width: '1365px',
@@ -1085,7 +1085,7 @@ function UserComandesContent({ userEmail }) {
           marginTop: '-0.5px',
           position: 'relative',
           boxSizing: 'border-box',
-          backgroundImage: 'url("/placeholders/fons_acordio/fons-usuari-missatges.png")',
+          backgroundImage: 'url("/placeholders/tots_els_fons/fons_acordio/fons-usuari-missatges.png")',
           backgroundRepeat: 'no-repeat',
           backgroundPosition: 'top left',
           backgroundSize: '1350px 525.2px',
@@ -1383,7 +1383,7 @@ function UserComandesContent({ userEmail }) {
         }
         .comandes-table th > *, .comandes-table td > * { min-width: 0; max-width: 100%; }
       `}</style>
-      <div style={{ width: '1350px', marginLeft: 'auto', marginRight: 'auto', marginTop: '-0.5px', overflow: 'hidden', position: 'relative', backgroundImage: 'url("/placeholders/fons_acordio/fons-usuari-comandes.png")', backgroundRepeat: 'no-repeat', backgroundPosition: 'top left', backgroundSize: '1350px 100%' }}>
+      <div style={{ width: '1350px', marginLeft: 'auto', marginRight: 'auto', marginTop: '-0.5px', overflow: 'hidden', position: 'relative', backgroundImage: 'url("/placeholders/tots_els_fons/fons_acordio/fons-usuari-comandes.png")', backgroundRepeat: 'no-repeat', backgroundPosition: 'top left', backgroundSize: '1350px 100%' }}>
         <table className="comandes-table" style={{
           width: '1365px',
           marginLeft: '-7.5px',

@@ -119,7 +119,7 @@ export default function MegaslidePagina4V2({
             width: '100%',
             height: '100%',
             position: 'relative',
-            backgroundImage: 'url("/placeholders/fons_pagina_4/pagina-4-fons.png")',
+            backgroundImage: 'url("/placeholders/tots_els_fons/fons_pagina_4/pagina-4-fons.png")',
             backgroundRepeat: 'no-repeat',
             backgroundPosition: 'top left',
             backgroundSize: '100% 100%',

@@ -62,3 +62,4 @@ public/contact-sheet/
 
 # Mockups: els ZIPs originals no es versionen (font extreta i normalitzada a mockups/)
 public/placeholders/apparel/mockups/**/*.zip
+backup-complet-*.bundle
