@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useProfile } from '@/hooks/useProfile';
 import { MoreHorizontal, Loader2, Truck, AlertCircle, X, Package, LogOut } from 'lucide-react';
-import { MOCK_CLIENT } from '@/lib/mockOrderStore';
 
 const STATUS_COLOR = {
   'PENDENT': '#9CA3AF',
@@ -25,14 +24,8 @@ const STATUS_ICON = {
 
 const LEGEND = ['PENDENT', 'EN PREPARACIÓ', 'EN REPARTIMENT', 'ATURADA', 'CANCEL·LADA', 'ENTREGADA'];
 
-const COL_TEMPLATE = '2.2fr 1fr 1.3fr 1.3fr 0.9fr';
-
 const TEXT = { fontFamily: 'Roboto Condensed, sans-serif', fontWeight: 300, fontSize: '9pt', color: '#475059' };
 const HEAD = { fontFamily: 'Oswald, sans-serif', fontWeight: 400, textTransform: 'uppercase', letterSpacing: '0.5px', color: '#2F3540' };
-
-const IMG_W = 1024;
-const IMG_H = 270;
-const IMG_RATIO = IMG_H / IMG_W;
 
 function TransparentInput({ placeholder, defaultValue, style }) {
   return (
@@ -56,7 +49,7 @@ function TransparentInput({ placeholder, defaultValue, style }) {
   );
 }
 
-export default function MegaslidePagina4({
+export default function MegaslidePagina4V2({
   orders,
   adminEmail,
   touchMegaPublicActivity,
@@ -95,20 +88,8 @@ export default function MegaslidePagina4({
     el.addEventListener('wheel', handleWheel, { passive: false });
     return () => el.removeEventListener('wheel', handleWheel);
   }, [maxScroll]);
-  const isDev = import.meta.env.DEV;
-  const defaultAddress = (addresses && addresses[0]) || (isDev ? {
-    street: MOCK_CLIENT.address,
-    floor_door: '2º 1ª',
-    city: MOCK_CLIENT.city,
-    postal_code: MOCK_CLIENT.postalCode,
-    province: 'Barcelona',
-    country: MOCK_CLIENT.country,
-  } : {});
-  const displayProfile = profile && (profile.full_name || profile.phone) ? profile : (isDev ? {
-    ...profile,
-    full_name: profile?.full_name || MOCK_CLIENT.fullName,
-    phone: profile?.phone || '600 123 456',
-  } : profile);
+  const defaultAddress = (addresses && addresses[0]) || {};
+  const displayProfile = profile && (profile.full_name || profile.phone) ? profile : profile || {};
 
   return (
     <div style={{ width: '25%', flexShrink: 0, display: 'flex', height: '100%', position: 'relative', justifyContent: 'center' }}>
@@ -133,7 +114,7 @@ export default function MegaslidePagina4({
           flexShrink: 0,
           position: 'relative',
         }}>
-          {/* Container with background image — fills full area, preserves aspect ratio */}
+          {/* Container with background image */}
           <div style={{
             width: '100%',
             height: '100%',
@@ -143,7 +124,7 @@ export default function MegaslidePagina4({
             backgroundPosition: 'top left',
             backgroundSize: '100% 100%',
           }}>
-            {/* Form overlay — absolute on top of background image */}
+            {/* Form overlay — 3 columnes */}
             <div style={{
               position: 'absolute',
               inset: 0,
@@ -152,7 +133,6 @@ export default function MegaslidePagina4({
             }}>
               {/* COLUMNA 1: COMANDES */}
               <div style={{ display: 'flex', flexDirection: 'column', padding: '0 10px 10px', overflow: 'hidden' }}>
-                {/* Title */}
                 <div style={{
                   ...HEAD,
                   fontSize: '11pt',
@@ -162,7 +142,6 @@ export default function MegaslidePagina4({
                 }}>
                   Comandes
                 </div>
-                {/* Table */}
                 {/* Taula — capçalera fixa + body scrollable */}
                 <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
                 <table style={{
@@ -244,7 +223,7 @@ export default function MegaslidePagina4({
                   </div>
                 </div>
                 </div>
-                {/* Legend */}
+                {/* Llegenda d'estats */}
                 <div style={{
                   flexShrink: 0,
                   display: 'flex',
@@ -268,7 +247,6 @@ export default function MegaslidePagina4({
 
               {/* COLUMNA 2: MISSATGES */}
               <div style={{ display: 'flex', flexDirection: 'column', padding: '0 10px 10px', overflow: 'hidden' }}>
-                {/* Title */}
                 <div style={{
                   ...HEAD,
                   fontSize: '11pt',
@@ -278,7 +256,6 @@ export default function MegaslidePagina4({
                 }}>
                   Missatges
                 </div>
-                {/* Form table */}
                 <table style={{
                   width: '100%',
                   marginTop: '1px',
@@ -327,7 +304,7 @@ export default function MegaslidePagina4({
                     </tr>
                   </tbody>
                 </table>
-                {/* Buttons */}
+                {/* Botons */}
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '4px', height: '9%', flexShrink: 0, position: 'relative', top: '7px' }}>
                   {['Adjunta', "Cancel·la", 'Envia'].map((label, i) => (
                     <button key={label} style={{
@@ -348,7 +325,6 @@ export default function MegaslidePagina4({
 
               {/* COLUMNA 3: COMPTE */}
               <div style={{ display: 'flex', flexDirection: 'column', padding: '0 10px 10px', overflow: 'hidden' }}>
-                {/* Title */}
                 <div style={{
                   ...HEAD,
                   fontSize: '11pt',
@@ -407,7 +383,7 @@ export default function MegaslidePagina4({
                   </div>
                 )}
                 <div style={{ flex: 1 }} />
-                {/* Desa button — same size and Y position as bloc 2 buttons */}
+                {/* Botons: Tanca sessió + Desa */}
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '4px', height: '9%', flexShrink: 0, position: 'relative', top: '7px', marginRight: '-9px' }}>
                   <div />
                   <button
