@@ -41,6 +41,9 @@ export function useProfile() {
 
   const loadProfile = useCallback(async () => {
     if (!user?.id || !supabase) {
+      setProfile(null);
+      setAddresses([]);
+      setOrders([]);
       setLoading(false);
       return;
     }

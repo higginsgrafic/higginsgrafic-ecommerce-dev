@@ -2,13 +2,13 @@ import React, { useRef, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useProfile } from '@/hooks/useProfile';
-import { MoreHorizontal, Loader2, Truck, AlertCircle, X, Package, LogOut, ChevronUp, ChevronDown, PenLine } from 'lucide-react';
+import { MoreHorizontal, Loader2, Truck, AlertCircle, X, Package, LogOut, ChevronUp, ChevronDown, PenLine, Check, Circle } from 'lucide-react';
 import { MOCK_CLIENT } from '@/lib/mockOrderStore';
 
 const STATUS_COLOR = {
   'PENDENT': '#9CA3AF',
-  'EN PREPARACIÓ': '#7C3AED',
-  'EN REPARTIMENT': '#D97706',
+  'PREPARACIÓ': '#7C3AED',
+  'REPARTIMENT': '#D97706',
   'ATURADA': '#EAB308',
   'CANCEL·LADA': '#991B1B',
   'ENTREGADA': '#16A34A',
@@ -16,45 +16,56 @@ const STATUS_COLOR = {
 
 const STATUS_ICON = {
   'PENDENT': MoreHorizontal,
-  'EN PREPARACIÓ': Loader2,
-  'EN REPARTIMENT': Truck,
+  'PREPARACIÓ': Loader2,
+  'REPARTIMENT': Truck,
   'ATURADA': AlertCircle,
   'CANCEL·LADA': X,
   'ENTREGADA': Package,
 };
 
-const LEGEND = ['PENDENT', 'EN PREPARACIÓ', 'EN REPARTIMENT', 'ATURADA', 'CANCEL·LADA', 'ENTREGADA'];
+const LEGEND = ['PENDENT', 'PREPARACIÓ', 'REPARTIMENT', 'ATURADA', 'CANCEL·LADA', 'ENTREGADA'];
 
 const COL_TEMPLATE = '2.2fr 1fr 1.3fr 1.3fr 0.9fr';
 
 const TEXT = { fontFamily: 'Roboto, sans-serif', fontWeight: 300, fontSize: '9pt', color: '#475059' };
 const HEAD = { fontFamily: 'Oswald, sans-serif', fontWeight: 400, textTransform: 'uppercase', letterSpacing: '0.5px', color: '#2F3540' };
 
+const PHONE_PREFIXES = [
+  '+34', '+39', '+33', '+49', '+353', '+44', '+46', '+45',
+  '+351', '+32', '+31', '+43', '+48', '+420', '+36', '+385',
+  '+421', '+386', '+359', '+40', '+30', '+358', '+372', '+371',
+  '+370', '+352', '+356', '+357', '+376',
+  '+47', '+354', '+423', '+41',
+  '+1', '+61', '+64', '+55', '+65', '+81',
+];
+
 const IMG_W = 1024;
 const IMG_H = 270;
 const IMG_RATIO = IMG_H / IMG_W;
 
-function TransparentInput({ placeholder, defaultValue, style }) {
+const TransparentInput = React.forwardRef(function TransparentInput({ placeholder, defaultValue, style, onBlur, error }, ref) {
   return (
     <input
+      ref={ref}
       type="text"
       placeholder={placeholder}
       defaultValue={defaultValue}
+      onBlur={onBlur}
       style={{
         ...TEXT,
         width: '100%',
         height: '100%',
         boxSizing: 'border-box',
         padding: '0 8px',
-        border: 'none',
-        borderRadius: 0,
+        border: error ? '1px solid #e74c3c' : 'none',
+        borderRadius: error ? '2px' : 0,
         outline: 'none',
-        background: 'transparent',
+        background: error ? 'rgba(231,76,60,0.05)' : 'transparent',
         ...style,
       }}
     />
   );
-}
+});
 
 export default function MegaslidePagina4({
   orders,
@@ -62,25 +73,180 @@ export default function MegaslidePagina4({
   touchMegaPublicActivity,
 }) {
   const { user, authReady, signOut } = useAuth();
-  const { profile, orders: profileOrders, addresses } = useProfile();
+  const { profile, orders: profileOrders, addresses, updateProfile, updateAddress, addAddress } = useProfile();
   const navigate = useNavigate();
 
   const VISIBLE_ROWS = 9;
-  const ROW_HEIGHT = 30;
+  const ROW_HEIGHT = 24;
   const ordersRef = useRef(null);
   const [scrollIndex, setScrollIndex] = useState(0);
   const isScrolling = useRef(false);
   const [messagesSlideOpen, setMessagesSlideOpen] = useState(false);
   const [activeMessageTab, setActiveMessageTab] = useState('rebuts');
+  const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
+  const [sending, setSending] = useState(false);
+  const [sent, setSent] = useState(false);
+  const [attachments, setAttachments] = useState([]);
+  const [missingFields, setMissingFields] = useState([]);
+  const fileInputRef = useRef(null);
 
   const formSlideOpen = messagesSlideOpen;
 
-  const handleSignOut = async () => {
-    await signOut();
-    navigate('/');
+  const nameRef = useRef(null);
+  const emailRef = useRef(null);
+  const phoneRef = useRef(null);
+  const streetRef = useRef(null);
+  const streetNumberRef = useRef(null);
+  const floorRef = useRef(null);
+  const cityRef = useRef(null);
+  const cpRef = useRef(null);
+  const provinceRef = useRef(null);
+  const countryRef = useRef(null);
+
+  const msgNameRef = useRef(null);
+  const msgEmailRef = useRef(null);
+  const msgSubjectRef = useRef(null);
+  const msgBodyRef = useRef(null);
+
+  const handleAttach = () => {
+    fileInputRef.current?.click();
   };
 
-  const displayOrders = (profileOrders && profileOrders.length > 0) ? profileOrders : (orders && orders.length > 0 ? orders : []);
+  const handleStreetBlur = (e) => {
+    const val = e.target.value.trim();
+    if (!val) return;
+    const match = val.match(/^(.+?)\s+,?\s*(\d+[A-Za-z]?)\s*$/);
+    if (match && streetNumberRef.current) {
+      e.target.value = match[1].trim();
+      streetNumberRef.current.value = match[2];
+    }
+  };
+
+  const handleCpBlur = async (e) => {
+    const cp = e.target.value.trim();
+    if (!cp) return;
+    try {
+      const res = await fetch(`https://postali.app/api/v1/es/cp/${encodeURIComponent(cp)}`);
+      if (!res.ok) return;
+      const data = await res.json();
+      if (data.municipio && cityRef.current) cityRef.current.value = data.municipio;
+      if (data.estado && provinceRef.current) provinceRef.current.value = data.estado;
+      if (countryRef.current) countryRef.current.value = 'Espanya';
+    } catch (err) {
+      console.error('[CP lookup] Error:', err);
+    }
+  };
+
+  const handleFileChange = (e) => {
+    const files = Array.from(e.target.files || []);
+    setAttachments(prev => [...prev, ...files]);
+  };
+
+  const handleCancel = () => {
+    setMessagesSlideOpen(false);
+    setAttachments([]);
+    setSent(false);
+  };
+
+  const handleSend = async () => {
+    const name = msgNameRef.current?.value || '';
+    const email = msgEmailRef.current?.value || '';
+    const subject = msgSubjectRef.current?.value || '';
+    const message = msgBodyRef.current?.value || '';
+
+    if (!email || !message) return;
+
+    setSending(true);
+    try {
+      const formData = new FormData();
+      formData.append('name', name);
+      formData.append('email', email);
+      formData.append('subject', subject);
+      formData.append('message', message);
+      attachments.forEach((f, i) => formData.append(`file_${i}`, f));
+
+      const res = await fetch('/.netlify/functions/send-message', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, subject, message }),
+      });
+      const data = await res.json();
+      if (data.ok) {
+        setSent(true);
+        setAttachments([]);
+        if (msgSubjectRef.current) msgSubjectRef.current.value = '';
+        if (msgBodyRef.current) msgBodyRef.current.value = '';
+        setTimeout(() => setSent(false), 3000);
+      }
+    } catch (err) {
+      console.error('[send-message] Error:', err);
+    } finally {
+      setSending(false);
+    }
+  };
+
+  const handleSave = async () => {
+    const required = [
+      { key: 'full_name', ref: nameRef, label: 'Nom' },
+      { key: 'phone', ref: phoneRef, label: 'Mòbil' },
+      { key: 'street', ref: streetRef, label: 'Carrer' },
+      { key: 'street_number', ref: streetNumberRef, label: 'Nombre' },
+      { key: 'city', ref: cityRef, label: 'Ciutat' },
+      { key: 'postal_code', ref: cpRef, label: 'CP' },
+      { key: 'province', ref: provinceRef, label: 'Província' },
+      { key: 'country', ref: countryRef, label: 'País' },
+    ];
+    const missing = required.filter(f => !f.ref.current?.value?.trim());
+    setMissingFields(missing.map(f => f.key));
+    if (missing.length > 0) return;
+
+    setSaving(true);
+    const profileUpdates = {
+      full_name: nameRef.current?.value || '',
+      phone: phonePrefixState + (phoneRef.current?.value || ''),
+    };
+    const addressUpdates = {
+      street: streetRef.current?.value || '',
+      street_number: streetNumberRef.current?.value || '',
+      floor_door: floorRef.current?.value || '',
+      city: cityRef.current?.value || '',
+      postal_code: cpRef.current?.value || '',
+      province: provinceRef.current?.value || '',
+      country: countryRef.current?.value || '',
+    };
+    const profileResult = await updateProfile(profileUpdates);
+    let addressResult = null;
+    if (defaultAddress?.id) {
+      addressResult = await updateAddress(defaultAddress.id, addressUpdates);
+    } else {
+      addressResult = await addAddress({ ...addressUpdates, is_default: true });
+    }
+    console.log('[Desa] profileResult:', profileResult, 'addressResult:', addressResult, 'user:', user?.id, 'addressId:', defaultAddress?.id);
+    if (!profileResult?.ok) console.error('[Desa] profile error:', profileResult?.error);
+    if (!addressResult?.ok) console.error('[Desa] address error:', addressResult?.error);
+    setSaving(false);
+    setSaved(true);
+    setMissingFields([]);
+    setTimeout(() => setSaved(false), 3000);
+  };
+
+  const handleSignOut = async () => {
+    await signOut();
+    setMissingFields([]);
+    setSaved(false);
+    setSaving(false);
+    [nameRef, emailRef, phoneRef, streetRef, streetNumberRef, floorRef, cityRef, cpRef, provinceRef, countryRef].forEach(r => {
+      if (r.current) r.current.value = '';
+    });
+  };
+
+  const isLoggedIn = !!user?.id;
+  const isDev = import.meta.env.DEV;
+  const isTestUser = user?.email === 'client.prova@higginsgrafic.com';
+  const useMocks = isDev && isLoggedIn && isTestUser;
+
+  const displayOrders = isLoggedIn ? ((profileOrders && profileOrders.length > 0) ? profileOrders : (useMocks && orders && orders.length > 0 ? orders : [])) : [];
   const maxScroll = Math.max(0, displayOrders.length - VISIBLE_ROWS);
 
   useEffect(() => {
@@ -99,8 +265,7 @@ export default function MegaslidePagina4({
     el.addEventListener('wheel', handleWheel, { passive: false });
     return () => el.removeEventListener('wheel', handleWheel);
   }, [maxScroll]);
-  const isDev = import.meta.env.DEV;
-  const defaultAddress = (addresses && addresses[0]) || (isDev ? {
+  const defaultAddress = (addresses && addresses[0]) || (useMocks ? {
     street: MOCK_CLIENT.address,
     floor_door: '2º 1ª',
     city: MOCK_CLIENT.city,
@@ -108,13 +273,26 @@ export default function MegaslidePagina4({
     province: 'Barcelona',
     country: MOCK_CLIENT.country,
   } : {});
-  const displayProfile = profile && (profile.full_name || profile.phone) ? profile : (isDev ? {
-    ...profile,
-    full_name: profile?.full_name || MOCK_CLIENT.fullName,
-    phone: profile?.phone || '600 123 456',
-  } : profile);
+  const rawStreet = defaultAddress?.street || '';
+  const streetNumber = defaultAddress?.street_number || '';
+  const streetName = streetNumber ? rawStreet : rawStreet.replace(/\s+\d+[A-Za-z]?\s*$/, '').trim();
+  const displayProfile = profile || (useMocks ? {
+    full_name: MOCK_CLIENT.fullName,
+    phone: '600 123 456',
+  } : {});
 
-  const mockMessages = isDev ? [
+  const [phonePrefixState, setPhonePrefixState] = useState('+34');
+
+  const rawPhone = displayProfile?.phone || '';
+  const phoneMatch = rawPhone.match(/^(\+\d{1,4})(.*)$/);
+  const phonePrefix = phoneMatch ? phoneMatch[1] : '+34';
+  const phoneNumber = phoneMatch ? phoneMatch[2] : rawPhone;
+
+  useEffect(() => {
+    setPhonePrefixState(phonePrefix);
+  }, [phonePrefix]);
+
+  const mockMessages = useMocks ? [
     { id: 1, type: 'rebuts', date: '2026-08-10', subject: 'Consulta sobre comanda', status: 'Respost', preview: 'Hola, voldria saber l\'estat de la meva comanda...' },
     { id: 2, type: 'rebuts', date: '2026-08-08', subject: 'Canvi de talla', status: 'Pendent', preview: 'Necessito canviar la talla d\'una samarreta...' },
     { id: 3, type: 'rebuts', date: '2026-08-05', subject: 'Problema amb el pagament', status: 'Respost', preview: 'El pagament no s\'ha processat correctament...' },
@@ -264,11 +442,12 @@ export default function MegaslidePagina4({
                 <div style={{
                   flexShrink: 0,
                   display: 'flex',
-                  flexWrap: 'wrap',
-                  gap: '8px 12px',
+                  flexWrap: 'nowrap',
+                  gap: '4px 6px',
                   alignItems: 'center',
                   justifyContent: 'center',
                   paddingTop: '12px',
+                  overflow: 'hidden',
                 }}>
                   {LEGEND.map((label) => {
                     const Icon = STATUS_ICON[label];
@@ -297,7 +476,7 @@ export default function MegaslidePagina4({
                 </div>
 
                 {/* Messages list — visible by default */}
-                <div style={{ flex: 1, overflow: 'auto', padding: '8px 12px' }}>
+                <div style={{ flex: 1, overflow: 'auto', padding: '8px 0', display: 'flex', flexDirection: 'column' }}>
                   {/* Tab selector — estil selector de color pàgina 2 */}
                   <div style={{
                     display: 'flex',
@@ -319,7 +498,7 @@ export default function MegaslidePagina4({
                           style={{
                             flex: 1,
                             fontFamily: 'Oswald, sans-serif',
-                            fontSize: '8pt',
+                            fontSize: '9pt',
                             fontWeight: isActive ? 400 : 300,
                             letterSpacing: '0em',
                             lineHeight: 1,
@@ -344,8 +523,10 @@ export default function MegaslidePagina4({
                   </div>
 
                   {mockMessages.length === 0 ? (
-                    <div style={{ ...TEXT, fontSize: '8pt', textAlign: 'center', opacity: 0.5, marginTop: '20px' }}>
-                      No hi ha missatges
+                    <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', paddingBottom: '25px' }}>
+                      <span style={{ ...TEXT, fontSize: '9pt', textAlign: 'center', opacity: 0.5 }}>
+                        No hi ha cap missatge
+                      </span>
                     </div>
                   ) : (
                     (activeMessageTab === 'rebuts' ? rebutsMessages : enviatsMessages).map((msg, idx) => (
@@ -363,20 +544,22 @@ export default function MegaslidePagina4({
                           transform: idx % 2 === 0 ? 'scaleX(-1)' : 'none',
                         }}
                       >
-                        <div style={{ transform: idx % 2 === 0 ? 'scaleX(-1)' : 'none', position: 'relative' }}>
+                        <div style={{ transform: idx % 2 === 0 ? 'scaleX(-1)' : 'none', position: 'relative', padding: '0 10px' }}>
                           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '4px' }}>
-                            <span style={{ ...HEAD, fontSize: '7pt', color: '#111827' }}>{msg.subject}</span>
-                            <span style={{ ...TEXT, fontSize: '6pt', color: '#6b7280' }}>
+                            <span style={{ ...TEXT, fontSize: '10pt', color: '#111827', fontFamily: 'Oswald, sans-serif', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{msg.subject}</span>
+                            <span style={{ ...TEXT, fontSize: '10pt', color: '#6b7280' }}>
                               {msg.date}
                             </span>
                           </div>
                           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2px' }}>
-                            <div style={{ fontFamily: 'Roboto, sans-serif', fontWeight: 300, fontSize: '10px', color: '#4b5563', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1 }}>
+                            <div style={{ fontFamily: 'Roboto, sans-serif', fontWeight: 300, fontSize: '10pt', color: '#4b5563', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1 }}>
                               {msg.preview}
                             </div>
-                            <span style={{ ...TEXT, fontSize: '6pt', color: msg.status === 'Esborrany' ? '#9CA3AF' : msg.status === 'Pendent' ? '#D97706' : '#16A34A', marginLeft: '8px', flexShrink: 0 }}>
-                              {msg.status}
-                            </span>
+                            {msg.status === 'Pendent' ? (
+                              <Circle size={10} color="#D97706" strokeWidth={2} style={{ marginLeft: '8px', flexShrink: 0 }} />
+                            ) : (
+                              <Check size={12} color="#16A34A" strokeWidth={2.5} style={{ marginLeft: '8px', flexShrink: 0 }} />
+                            )}
                           </div>
                         </div>
                       </div>
@@ -446,22 +629,23 @@ export default function MegaslidePagina4({
                         {/* Row 1: Nom + eCorreu */}
                         <tr>
                           <td style={{ width: '50%', padding: '4px', border: 'none' }}>
-                            <TransparentInput placeholder="Nom" defaultValue={displayProfile?.full_name || ''} />
+                            <TransparentInput ref={msgNameRef} placeholder="Nom" defaultValue={displayProfile?.full_name || ''} style={{ fontSize: '10pt' }} />
                           </td>
                           <td style={{ width: '50%', padding: '4px', border: 'none' }}>
-                            <TransparentInput placeholder="eCorreu" defaultValue={user?.email || ''} />
+                            <TransparentInput ref={msgEmailRef} placeholder="eCorreu" defaultValue={user?.email || ''} style={{ fontSize: '10pt' }} />
                           </td>
                         </tr>
                         {/* Row 2: Assumpte */}
                         <tr>
                           <td colSpan={2} style={{ padding: '4px', border: 'none' }}>
-                            <TransparentInput placeholder="Assumpte" />
+                            <TransparentInput ref={msgSubjectRef} placeholder="Assumpte" style={{ fontSize: '10pt' }} />
                           </td>
                         </tr>
                         {/* Row 3: Missatge */}
                         <tr>
                           <td colSpan={2} style={{ padding: '0 4px', border: 'none', height: '100%', verticalAlign: 'top' }}>
                             <textarea
+                              ref={msgBodyRef}
                               placeholder="Missatge"
                               style={{
                                 ...TEXT,
@@ -474,7 +658,7 @@ export default function MegaslidePagina4({
                                 outline: 'none',
                                 resize: 'none',
                                 background: 'transparent',
-                                fontSize: '8pt',
+                                fontSize: '10pt',
                                 textAlign: 'left',
                               }}
                             />
@@ -487,20 +671,57 @@ export default function MegaslidePagina4({
                   {/* Buttons — inside slider */}
                   {messagesSlideOpen && (
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '4px', flexShrink: 0, padding: '4px 8px 8px' }}>
-                      {['Adjunta', "Cancel·la", 'Envia'].map((label, i) => (
-                        <button key={label} style={{
+                      <input
+                        ref={fileInputRef}
+                        type="file"
+                        multiple
+                        style={{ display: 'none' }}
+                        onChange={handleFileChange}
+                      />
+                      <button
+                        onClick={handleAttach}
+                        style={{
                           ...HEAD,
                           fontSize: '7pt',
-                          color: i === 2 ? '#FFFFFF' : '#475059',
-                          backgroundColor: i === 2 ? '#2F3540' : '#FFFFFF',
+                          color: '#475059',
+                          backgroundColor: '#FFFFFF',
                           border: 'none',
                           borderRadius: '2px',
                           cursor: 'pointer',
                           padding: '4px 0',
                         }}>
-                          {label}
-                        </button>
-                      ))}
+                        {attachments.length > 0 ? `Adjunta (${attachments.length})` : 'Adjunta'}
+                      </button>
+                      <button
+                        onClick={handleCancel}
+                        style={{
+                          ...HEAD,
+                          fontSize: '7pt',
+                          color: '#475059',
+                          backgroundColor: '#FFFFFF',
+                          border: 'none',
+                          borderRadius: '2px',
+                          cursor: 'pointer',
+                          padding: '4px 0',
+                        }}>
+                        Cancel·la
+                      </button>
+                      <button
+                        onClick={handleSend}
+                        disabled={sending}
+                        style={{
+                          ...HEAD,
+                          fontSize: '7pt',
+                          color: '#FFFFFF',
+                          backgroundColor: '#2F3540',
+                          border: 'none',
+                          borderRadius: '2px',
+                          cursor: 'pointer',
+                          padding: '4px 0',
+                          opacity: sending ? 0.6 : 1,
+                        }}>
+                        {sending ? 'Enviant…' : sent ? '✓ Enviat' : 'Envia'}
+                      </button>
                     </div>
                   )}
                 </div>
@@ -518,12 +739,51 @@ export default function MegaslidePagina4({
                 }}>
                   Compte
                 </div>
-                {authReady && !user ? (
-                  <div style={{ ...TEXT, fontSize: '8pt', opacity: 0.5, textAlign: 'center', marginTop: '20px' }}>
-                    Inicia sessió per veure les teves dades
+                {!isLoggedIn ? (
+                  <div style={{ flex: '0.390', marginTop: '5px' }}>
+                    <table style={{
+                      width: 'calc(100% + 11px)',
+                      marginLeft: '-2px',
+                      borderCollapse: 'collapse',
+                      tableLayout: 'fixed',
+                      border: 'none',
+                    }}>
+                      <thead>
+                        <tr>
+                          <th style={{ ...HEAD, fontSize: '7pt', textAlign: 'center', padding: '4px', border: 'none' }}>Dades de contacte</th>
+                          <th style={{ ...HEAD, fontSize: '7pt', textAlign: 'center', padding: '4px', border: 'none' }}>Dades d'enviament</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td style={{ padding: '2px 4px 2.5px', border: 'none' }}><TransparentInput placeholder="Nom" defaultValue="" style={{ fontSize: '10pt' }} /></td>
+                          <td style={{ padding: '2px 4px 2.5px', border: 'none' }}><div style={{ display: 'flex', gap: '4px' }}><TransparentInput placeholder="Carrer" defaultValue="" style={{ fontSize: '10pt', flex: 1 }} /><TransparentInput placeholder="Nombre" defaultValue="" style={{ fontSize: '10pt', width: '38%' }} /></div></td>
+                        </tr>
+                        <tr>
+                          <td style={{ padding: '2px 4px 2.5px', border: 'none' }}><TransparentInput placeholder="eCorreu" defaultValue="" style={{ fontSize: '10pt' }} /></td>
+                          <td style={{ padding: '2px 4px 2.5px', border: 'none' }}><TransparentInput placeholder="Pis" defaultValue="" style={{ fontSize: '10pt' }} /></td>
+                        </tr>
+                        <tr>
+                          <td style={{ padding: '2px 4px 2.5px', border: 'none' }}><div style={{ display: 'flex', gap: '4px' }}><select defaultValue="+34" style={{ fontSize: '10pt', border: 'none', background: 'transparent', outline: 'none', fontFamily: 'Roboto, sans-serif', fontWeight: 300, color: '#475059', cursor: 'pointer' }}>{PHONE_PREFIXES.map(p => <option key={p} value={p}>{p}</option>)}</select><TransparentInput placeholder="Mòbil" defaultValue="" style={{ fontSize: '10pt', flex: 1 }} /></div></td>
+                          <td style={{ padding: '2px 4px 2.5px', border: 'none' }}><TransparentInput placeholder="CP" defaultValue="" onBlur={handleCpBlur} style={{ fontSize: '10pt' }} /></td>
+                        </tr>
+                        <tr>
+                          <td style={{ border: 'none', paddingBottom: '2.5px' }} />
+                          <td style={{ padding: '2px 4px 2.5px', border: 'none' }}><TransparentInput placeholder="Ciutat" defaultValue="" style={{ fontSize: '10pt' }} /></td>
+                        </tr>
+                        <tr>
+                          <td style={{ border: 'none', paddingBottom: '2.5px' }} />
+                          <td style={{ padding: '2px 4px 2.5px', border: 'none' }}><TransparentInput placeholder="Província" defaultValue="" style={{ fontSize: '10pt' }} /></td>
+                        </tr>
+                        <tr>
+                          <td style={{ border: 'none' }} />
+                          <td style={{ padding: '2px 4px', border: 'none' }}><TransparentInput placeholder="País" defaultValue="" style={{ fontSize: '10pt' }} /></td>
+                        </tr>
+                      </tbody>
+                    </table>
                   </div>
                 ) : (
-                  <div style={{ flex: '0.390', marginTop: '9px' }}>
+                <div style={{ flex: '0.390', marginTop: '5px' }}>
                   <table style={{
                     width: 'calc(100% + 11px)',
                     marginLeft: '-2px',
@@ -539,28 +799,28 @@ export default function MegaslidePagina4({
                     </thead>
                     <tbody>
                       <tr>
-                        <td style={{ padding: '2px 4px 2.5px', border: 'none' }}><TransparentInput placeholder="Nom" defaultValue={displayProfile?.full_name || ''} /></td>
-                        <td style={{ padding: '2px 4px 2.5px', border: 'none' }}><TransparentInput placeholder="Carrer" defaultValue={defaultAddress.street || ''} /></td>
+                        <td style={{ padding: '2px 4px 2.5px', border: 'none' }}><TransparentInput ref={nameRef} placeholder="Nom" defaultValue={displayProfile?.full_name || ''} error={missingFields.includes('full_name')} style={{ fontSize: '10pt' }} /></td>
+                        <td style={{ padding: '2px 4px 2.5px', border: 'none' }}><div style={{ display: 'flex', gap: '4px' }}><TransparentInput ref={streetRef} placeholder="Carrer" defaultValue={streetName} error={missingFields.includes('street')} onBlur={handleStreetBlur} style={{ fontSize: '10pt', flex: 1 }} /><TransparentInput ref={streetNumberRef} placeholder="Nombre" defaultValue={streetNumber} error={missingFields.includes('street_number')} style={{ fontSize: '10pt', width: '38%' }} /></div></td>
                       </tr>
                       <tr>
-                        <td style={{ padding: '2px 4px 2.5px', border: 'none' }}><TransparentInput placeholder="eCorreu" defaultValue={user?.email || ''} /></td>
-                        <td style={{ padding: '2px 4px 2.5px', border: 'none' }}><TransparentInput placeholder="Pis" defaultValue={defaultAddress.floor_door || ''} /></td>
+                        <td style={{ padding: '2px 4px 2.5px', border: 'none' }}><TransparentInput ref={emailRef} placeholder="eCorreu" defaultValue={user?.email || ''} style={{ fontSize: '10pt' }} /></td>
+                        <td style={{ padding: '2px 4px 2.5px', border: 'none' }}><TransparentInput ref={floorRef} placeholder="Pis" defaultValue={defaultAddress.floor_door || ''} style={{ fontSize: '10pt' }} /></td>
                       </tr>
                       <tr>
-                        <td style={{ padding: '2px 4px 2.5px', border: 'none' }}><TransparentInput placeholder="Telèfon" defaultValue={displayProfile?.phone || ''} /></td>
-                        <td style={{ padding: '2px 4px 2.5px', border: 'none' }}><TransparentInput placeholder="Ciutat" defaultValue={defaultAddress.city || ''} /></td>
-                      </tr>
-                      <tr>
-                        <td style={{ border: 'none', paddingBottom: '2.5px' }} />
-                        <td style={{ padding: '2px 4px 2.5px', border: 'none' }}><TransparentInput placeholder="CP" defaultValue={defaultAddress.postal_code || ''} /></td>
+                        <td style={{ padding: '2px 4px 2.5px', border: 'none' }}><div style={{ display: 'flex', gap: '4px' }}><select value={phonePrefixState} onChange={e => setPhonePrefixState(e.target.value)} style={{ fontSize: '10pt', border: 'none', background: 'transparent', outline: 'none', fontFamily: 'Roboto, sans-serif', fontWeight: 300, color: '#9CA3AF', cursor: 'pointer' }}>{PHONE_PREFIXES.map(p => <option key={p} value={p}>{p}</option>)}</select><TransparentInput ref={phoneRef} placeholder="Mòbil" defaultValue={phoneNumber} error={missingFields.includes('phone')} style={{ fontSize: '10pt', flex: 1 }} /></div></td>
+                        <td style={{ padding: '2px 4px 2.5px', border: 'none' }}><TransparentInput ref={cpRef} placeholder="CP" defaultValue={defaultAddress.postal_code || ''} onBlur={handleCpBlur} error={missingFields.includes('postal_code')} style={{ fontSize: '10pt' }} /></td>
                       </tr>
                       <tr>
                         <td style={{ border: 'none', paddingBottom: '2.5px' }} />
-                        <td style={{ padding: '2px 4px 2.5px', border: 'none' }}><TransparentInput placeholder="Província" defaultValue={defaultAddress.province || ''} /></td>
+                        <td style={{ padding: '2px 4px 2.5px', border: 'none' }}><TransparentInput ref={cityRef} placeholder="Ciutat" defaultValue={defaultAddress.city || ''} error={missingFields.includes('city')} style={{ fontSize: '10pt' }} /></td>
+                      </tr>
+                      <tr>
+                        <td style={{ border: 'none', paddingBottom: '2.5px' }} />
+                        <td style={{ padding: '2px 4px 2.5px', border: 'none' }}><TransparentInput ref={provinceRef} placeholder="Província" defaultValue={defaultAddress.province || ''} error={missingFields.includes('province')} style={{ fontSize: '10pt' }} /></td>
                       </tr>
                       <tr>
                         <td style={{ border: 'none' }} />
-                        <td style={{ padding: '2px 4px', border: 'none' }}><TransparentInput placeholder="País" defaultValue={defaultAddress.country || ''} /></td>
+                        <td style={{ padding: '2px 4px', border: 'none' }}><TransparentInput ref={countryRef} placeholder="País" defaultValue={defaultAddress.country || ''} error={missingFields.includes('country')} style={{ fontSize: '10pt' }} /></td>
                       </tr>
                     </tbody>
                   </table>
@@ -591,18 +851,22 @@ export default function MegaslidePagina4({
                     <LogOut size={10} color="#475059" strokeWidth={2} />
                     Tanca sessió
                   </button>
-                  <button style={{
-                    ...HEAD,
-                    fontSize: '7pt',
-                    color: '#FFFFFF',
-                    backgroundColor: '#2F3540',
-                    border: 'none',
-                    borderRadius: '2px',
-                    cursor: 'pointer',
-                    padding: 0,
-                    height: '100%',
-                  }}>
-                    Desa
+                  <button
+                    onClick={handleSave}
+                    disabled={saving}
+                    style={{
+                      ...HEAD,
+                      fontSize: '7pt',
+                      color: '#FFFFFF',
+                      backgroundColor: '#2F3540',
+                      border: 'none',
+                      borderRadius: '2px',
+                      cursor: 'pointer',
+                      padding: 0,
+                      height: '100%',
+                      opacity: saving ? 0.6 : 1,
+                    }}>
+                    {saving ? 'Desant…' : saved ? '✓ Desat' : 'Desa'}
                   </button>
                 </div>
               </div>
