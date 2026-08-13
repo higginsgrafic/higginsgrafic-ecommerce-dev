@@ -1,7 +1,7 @@
 import React, { memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import * as ReactDOM from 'react-dom';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { ChevronDown, ChevronLeft, ChevronRight, ChevronUp, Menu, User, UserPlus, LogIn, X, Clock, Truck, AlertCircle, MoreHorizontal, Loader2, Eye, EyeOff, LayoutGrid, Layers } from 'lucide-react';
+import { ChevronDown, ChevronLeft, ChevronRight, ChevronUp, Menu, User, LogIn, X, Clock, Truck, AlertCircle, MoreHorizontal, Loader2, Eye, EyeOff, LayoutGrid, Layers } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useProductContext } from '@/contexts/ProductContext';
 import { useAdmin } from '@/contexts/AdminContext';
@@ -2884,6 +2884,7 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
                   }}
                 >
                   {item.label}
+                  <ChevronDown className={`h-3 w-3 transition-transform ${open ? 'rotate-180' : ''}`} />
                 </button>
               );
             })}
@@ -2989,8 +2990,10 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
                   accountClickTimeoutRef.current = window.setTimeout(() => {
                     accountClickTimeoutRef.current = null;
                     setManualOverrideClosed(false);
-                    if (megaPage === 4 && active) {
+                    if (megaPage === 4 && active && user) {
                       setActive(null);
+                    } else if (megaPage === 4 && active && !user) {
+                      setShowRegisterOverlay(true);
                     } else {
                       setMegaPage(4);
                       setAcordioExpandedPage4(false);
@@ -3002,7 +3005,7 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
                 }}
               >
                 {user
-                  ? <User className="h-[25px] w-[25px] text-foreground lg:h-[29px] lg:w-[29px]" strokeWidth={1.5} />
+                  ? <User className="h-[25px] w-[25px] text-foreground lg:h-[29px] lg:w-[29px]" strokeWidth={2.5} />
                   : <LogIn className="h-[25px] w-[25px] text-foreground lg:h-[29px] lg:w-[29px]" strokeWidth={1.5} />
                 }
               </IconButton>
