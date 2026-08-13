@@ -257,7 +257,7 @@ function Home() {
         topOffset="76px"
         bottomPadding="0px"
       >
-        {/* Títol HIGGINS GRÀFIC editable i centrat com a la captura (fila 3 / 8) */}
+        {/* Logo HIGGINS GRÀFIC centrat com a la captura (fila 3 / 8) */}
         <div
           style={{
             gridColumn: '1 / 4',
@@ -274,27 +274,14 @@ function Home() {
             transform: 'translateY(-38px)', // Pujat 1 fila
           }}
         >
-          <EditableTextBox
-            id="home-store-name-v1"
-            initialText="HIGGINS GRÀFIC"
-            initialSettings={{
-              x: 0,
-              y: 0,
-              fontFamily: 'Oswald',
-              fontSize: 24, // pt
-              fontWeight: 700,
-              selectedFontWeight: 700,
-              letterSpacing: 0.8, // em
-              lineHeight: 1,
-              textAlign: 'center',
-              verticalAlign: 'center',
-              color: '#000000',
-              textTransform: 'uppercase',
+          <img
+            src="/custom_logos/brand/HIGGINS GRAFIC NEGRE.png"
+            alt="HIGGINS GRÀFIC"
+            style={{
+              width: '35%',
+              height: 'auto',
+              objectFit: 'contain',
             }}
-            presetVersion="tdp-home-v4-clean"
-            renderHandle={true}
-            handleRight="-18px"
-            style={{ width: '100%', height: '100%', pointerEvents: 'auto' }}
           />
         </div>
 
