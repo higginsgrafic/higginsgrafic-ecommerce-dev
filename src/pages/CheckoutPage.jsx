@@ -97,9 +97,10 @@ const CheckoutPageInner = () => {
     checkoutCartItems.length > 0 ? checkoutCartItems : mockCheckoutItems
   ), [checkoutCartItems, mockCheckoutItems]);
 
-  const { getCost, zoneInfo } = useShippingCosts('es_peninsula');
+  const { getCost, zoneInfo } = useShippingCosts();
   const subtotal = checkoutRenderItems.reduce((total, item) => total + (item.price * item.quantity), 0);
-  const shipping = getCost(subtotal);
+  const totalQuantity = checkoutRenderItems.reduce((total, item) => total + (item.quantity || 1), 0);
+  const shipping = getCost(formData.country, totalQuantity, subtotal);
   const total = subtotal + shipping;
   const ivaAmount = subtotal * 0.21;
   const displayPrice = (value) => formatPrice(value).replace(/\u00a0/g, ' ').replace(/\s+/g, '').replace(/\s*€\s*$/, '€');
@@ -365,7 +366,7 @@ const CheckoutPageInner = () => {
 
       {!isMockCheckout && (
       <>
-      <LlistaCheckout items={checkoutRenderItems} onBreadcrumbClick={openFullWideCartSlide} />
+      <LlistaCheckout items={checkoutRenderItems} onBreadcrumbClick={openFullWideCartSlide} country={formData.country} />
 
       <style>
           {`
@@ -632,9 +633,27 @@ const CheckoutPageInner = () => {
                       Adreça de facturació
                       <div style={{ border: '1px solid #D8DDE3', borderRadius: '4px', overflow: 'hidden', background: '#FFFFFF' }}>
                         <select name="country" value={formData.country} onChange={handleChange} style={{ width: '100%', height: '31px', border: 'none', borderBottom: '1px solid #E6E8EC', padding: '0 10px', fontFamily: 'Roboto Condensed, sans-serif', fontSize: '10.5pt', color: '#4A5057', outline: 'none', background: '#FFFFFF', boxSizing: 'border-box' }}>
-                          <option value="">Espanya</option>
+                          <option value="">Selecciona un país</option>
                           <option value="Espanya">Espanya</option>
                           <option value="França">França</option>
+                          <option value="Alemanya">Alemanya</option>
+                          <option value="Itàlia">Itàlia</option>
+                          <option value="Regne Unit">Regne Unit</option>
+                          <option value="Irlanda">Irlanda</option>
+                          <option value="Suècia">Suècia</option>
+                          <option value="Dinamarca">Dinamarca</option>
+                          <option value="Noruega">Noruega</option>
+                          <option value="Portugal">Portugal</option>
+                          <option value="Bèlgica">Bèlgica</option>
+                          <option value="Països Baixos">Països Baixos</option>
+                          <option value="Àustria">Àustria</option>
+                          <option value="Suïssa">Suïssa</option>
+                          <option value="Islàndia">Islàndia</option>
+                          <option value="Andorra">Andorra</option>
+                          <option value="Estats Units">Estats Units</option>
+                          <option value="Canadà">Canadà</option>
+                          <option value="Austràlia">Austràlia</option>
+                          <option value="Japó">Japó</option>
                         </select>
                         <input type="text" name="address" placeholder="Adreça línia 1" value={formData.address} onChange={handleChange} style={{ width: '100%', height: '31px', border: 'none', borderBottom: '1px solid #E6E8EC', padding: '0 10px', fontFamily: 'Roboto Condensed, sans-serif', fontSize: '10.5pt', color: '#4A5057', outline: 'none', boxSizing: 'border-box' }} />
                         <input type="text" name="address2" placeholder="Adreça línia 2" value={formData.address2 || ''} onChange={handleChange} style={{ width: '100%', height: '31px', border: 'none', borderBottom: '1px solid #E6E8EC', padding: '0 10px', fontFamily: 'Roboto Condensed, sans-serif', fontSize: '10.5pt', color: '#4A5057', outline: 'none', boxSizing: 'border-box' }} />

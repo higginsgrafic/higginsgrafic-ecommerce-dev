@@ -18,7 +18,7 @@ const CHECKOUT_PAGE_LEFT_OFFSET = '-17px';
 const PRODUCT_TABLE_MIN_ROWS = 5;
 const PRODUCT_TABLE_MAX_ROWS = 20;
 
-const LlistaCheckout = ({ items, onBreadcrumbClick }) => {
+const LlistaCheckout = ({ items, onBreadcrumbClick, country = 'Espanya' }) => {
   const productTableRef = useRef(null);
   const scrollViewportRef = useRef(null);
   const [scrollRow, setScrollRow] = useState(0);
@@ -54,9 +54,10 @@ const LlistaCheckout = ({ items, onBreadcrumbClick }) => {
     }
   }, [visibleProductRows, checkoutRenderItems.length]);
 
-  const { getCost, zoneInfo } = useShippingCosts('es_peninsula');
+  const { getCost, zoneInfo } = useShippingCosts();
   const subtotal = checkoutRenderItems.reduce((total, item) => total + (item.price * item.quantity), 0);
-  const shipping = getCost(subtotal);
+  const totalQuantity = checkoutRenderItems.reduce((total, item) => total + (item.quantity || 1), 0);
+  const shipping = getCost(country, totalQuantity, subtotal);
   const total = subtotal + shipping;
   const ivaAmount = subtotal * 0.21;
   const displayPrice = (value) => formatPrice(value).replace(/\u00a0/g, ' ').replace(/\s+/g, '').replace(/\s*€\s*$/, '€');
