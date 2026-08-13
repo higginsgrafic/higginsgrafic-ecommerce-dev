@@ -55,9 +55,39 @@ export async function handler(event) {
       }
     }
 
-    // Send email notification via Netlify's email integration (if configured)
-    // or just log it for now
-    console.log(`[send-message] New message from ${name || 'Unknown'} <${email}>: ${subject || '(no subject)'}`);
+    // Send email notification via Resend (if RESEND_API_KEY is set)
+    const resendApiKey = process.env.RESEND_API_KEY;
+    if (resendApiKey) {
+      try {
+        const emailRes = await fetch('https://api.resend.com/emails', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${resendApiKey}`,
+          },
+          body: JSON.stringify({
+            from: 'Higgins GRÀFIC <noreply@higginsgrafic.com>',
+            to: [adminEmail],
+            reply_to: email,
+            subject: `Nou missatge: ${subject || '(sense assumpte)'}`,
+            html: `
+              <p><strong>Nom:</strong> ${name || '—'}</p>
+              <p><strong>Email:</strong> ${email}</p>
+              <p><strong>Assumpte:</strong> ${subject || '—'}</p>
+              <hr>
+              <p style="white-space: pre-wrap;">${message}</p>
+            `,
+          }),
+        });
+        if (!emailRes.ok) {
+          console.error('[send-message] Resend error:', await emailRes.text());
+        }
+      } catch (emailErr) {
+        console.error('[send-message] Email send failed:', emailErr);
+      }
+    } else {
+      console.log(`[send-message] New message from ${name || 'Unknown'} <${email}>: ${subject || '(no subject)'}`);
+    }
 
     return jsonResponse(200, { ok: true, message: 'Missatge enviat correctament' });
   } catch (err) {
