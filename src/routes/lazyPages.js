@@ -72,3 +72,4 @@ export const MegaStripeHud = lazy(() => import('@/components/MegaStripeHud'));
 export const LoginPage = lazy(() => import('@/pages/LoginPage'));
 export const RegisterPage = lazy(() => import('@/pages/RegisterPage'));
 export const ProfilePage = lazy(() => import('@/pages/ProfilePage'));
+export const PricingConfigPage = lazy(() => import('@/pages/PricingConfigPage'));

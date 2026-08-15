@@ -87,6 +87,20 @@ export async function handler(event, context) {
       case 'payment_intent.payment_failed': {
         const paymentIntent = stripeEvent.data.object;
         console.log('[stripe-webhook] Payment failed:', paymentIntent.id);
+
+        const supabaseFail = getSupabase();
+        if (supabaseFail) {
+          const { error: failError } = await supabaseFail
+            .from('orders')
+            .update({ status: 'cancel_lada' })
+            .eq('payment_intent_id', paymentIntent.id);
+
+          if (failError) {
+            console.error('[stripe-webhook] Error updating failed order:', failError.message);
+          } else {
+            console.log('[stripe-webhook] Order marked as cancel_lada for PI:', paymentIntent.id);
+          }
+        }
         break;
       }
 

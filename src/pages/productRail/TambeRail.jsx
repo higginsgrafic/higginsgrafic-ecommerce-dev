@@ -353,7 +353,7 @@ export default function TambeRail({
                 marginLeft: `${left1}px`,
                 width: `${viewportWidthPx}px`,
                 overflow: 'hidden',
-                touchAction: 'none',
+                touchAction: 'pan-y',
                 minHeight: `${viewportHeightPx}px`,
               }}
               data-container="carousel-viewport"
@@ -365,11 +365,6 @@ export default function TambeRail({
                 r.startX = typeof e.clientX === 'number' ? e.clientX : 0;
                 r.startY = typeof e.clientY === 'number' ? e.clientY : 0;
                 r.lastDx = 0; r.lastDy = 0; r.moved = false; r.consumed = false;
-                try {
-                  if (typeof e.currentTarget?.setPointerCapture === 'function' && typeof e.pointerId === 'number') {
-                    e.currentTarget.setPointerCapture(e.pointerId);
-                  }
-                } catch { /* ignore */ }
               }}
               onPointerMove={(e) => {
                 const r = dragRef.current;
@@ -382,17 +377,33 @@ export default function TambeRail({
                 if (Math.abs(dx) > 6 && Math.abs(dx) > Math.abs(dy)) {
                   r.moved = true;
                   try { e.preventDefault(); } catch { /* ignore */ }
+                  try {
+                    if (typeof e.currentTarget?.setPointerCapture === 'function' && typeof e.pointerId === 'number') {
+                      e.currentTarget.setPointerCapture(e.pointerId);
+                    }
+                  } catch { /* ignore */ }
                 }
               }}
-              onPointerUp={() => {
+              onPointerUp={(e) => {
                 const r = dragRef.current;
                 r.active = false; r.pointerId = null;
+                try {
+                  if (typeof e.currentTarget?.releasePointerCapture === 'function' && typeof e.pointerId === 'number') {
+                    e.currentTarget.releasePointerCapture(e.pointerId);
+                  }
+                } catch { /* ignore */ }
                 const dx = r.lastDx; const dy = r.lastDy;
                 if (!r.consumed && Math.abs(dx) >= 44 && Math.abs(dx) > Math.abs(dy)) {
                   r.consumed = true;
                   if (dx < 0) goNext(); else goPrev();
                 }
-                if (r.moved) setTimeout(() => { dragRef.current.moved = false; }, 0);
+                if (r.moved) {
+                  if (Math.abs(dx) >= 44 && Math.abs(dx) > Math.abs(dy)) {
+                    setTimeout(() => { dragRef.current.moved = false; }, 0);
+                  } else {
+                    r.moved = false;
+                  }
+                }
               }}
               onPointerCancel={() => { dragRef.current.active = false; dragRef.current.pointerId = null; }}
             >

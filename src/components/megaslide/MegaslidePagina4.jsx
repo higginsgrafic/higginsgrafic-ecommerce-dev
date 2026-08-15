@@ -740,18 +740,19 @@ export default function MegaslidePagina4({
                   Compte
                 </div>
                 {!isLoggedIn ? (
-                  <div style={{ flex: '0.390', marginTop: '5px' }}>
+                  <div style={{ flex: '0.390', marginTop: '7px', paddingTop: '2px' }}>
                     <table style={{
                       width: 'calc(100% + 11px)',
                       marginLeft: '-2px',
+                      marginTop: '3px',
                       borderCollapse: 'collapse',
                       tableLayout: 'fixed',
                       border: 'none',
                     }}>
                       <thead>
                         <tr>
-                          <th style={{ ...HEAD, fontSize: '7pt', textAlign: 'center', padding: '4px', border: 'none' }}>Dades de contacte</th>
-                          <th style={{ ...HEAD, fontSize: '7pt', textAlign: 'center', padding: '4px', border: 'none' }}>Dades d'enviament</th>
+                          <th style={{ ...HEAD, fontSize: '7pt', textAlign: 'center', padding: '1px 4px 4px', border: 'none' }}>Dades de contacte</th>
+                          <th style={{ ...HEAD, fontSize: '7pt', textAlign: 'center', padding: '1px 4px 4px', border: 'none' }}>Dades d'enviament</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -764,7 +765,7 @@ export default function MegaslidePagina4({
                           <td style={{ padding: '2px 4px 2.5px', border: 'none' }}><TransparentInput placeholder="Pis" defaultValue="" style={{ fontSize: '10pt' }} /></td>
                         </tr>
                         <tr>
-                          <td style={{ padding: '2px 4px 2.5px', border: 'none' }}><div style={{ display: 'flex', gap: '4px' }}><select defaultValue="+34" style={{ fontSize: '10pt', border: 'none', background: 'transparent', outline: 'none', fontFamily: 'Roboto, sans-serif', fontWeight: 300, color: '#475059', cursor: 'pointer' }}>{PHONE_PREFIXES.map(p => <option key={p} value={p}>{p}</option>)}</select><TransparentInput placeholder="Mòbil" defaultValue="" style={{ fontSize: '10pt', flex: 1 }} /></div></td>
+                          <td style={{ padding: '2px 4px 2.5px', border: 'none' }}><div style={{ display: 'flex', gap: '4px' }}><select defaultValue="+34" style={{ fontSize: '10pt', border: 'none', background: 'transparent', outline: 'none', fontFamily: 'Roboto, sans-serif', fontWeight: 300, color: '#9CA3AF', cursor: 'pointer' }}>{PHONE_PREFIXES.map(p => <option key={p} value={p}>{p}</option>)}</select><TransparentInput placeholder="Mòbil" defaultValue="" style={{ fontSize: '10pt', flex: 1 }} /></div></td>
                           <td style={{ padding: '2px 4px 2.5px', border: 'none' }}><TransparentInput placeholder="CP" defaultValue="" onBlur={handleCpBlur} style={{ fontSize: '10pt' }} /></td>
                         </tr>
                         <tr>
@@ -779,22 +780,33 @@ export default function MegaslidePagina4({
                           <td style={{ border: 'none' }} />
                           <td style={{ padding: '2px 4px', border: 'none' }}><TransparentInput placeholder="País" defaultValue="" style={{ fontSize: '10pt' }} /></td>
                         </tr>
+                        <tr style={{ height: '7.5px' }}><td style={{ border: 'none' }} colSpan={2} /></tr>
+                        <tr>
+                          <td style={{ border: 'none' }} />
+                          <td style={{ padding: '2px 4px', border: 'none' }}>
+                            <button onClick={() => navigate('/shipping')} style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', border: 'none', background: 'transparent', cursor: 'pointer', fontFamily: 'Roboto, sans-serif', fontSize: '9pt', fontWeight: 300, color: '#475059', padding: 0 }}>
+                              <span style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: '14px', height: '14px', borderRadius: '50%', border: '1px solid #9CA3AF', fontSize: '8pt', fontWeight: 400, color: '#9CA3AF', lineHeight: 1 }}>i</span>
+                              Enviaments i Temps
+                            </button>
+                          </td>
+                        </tr>
                       </tbody>
                     </table>
                   </div>
                 ) : (
-                <div style={{ flex: '0.390', marginTop: '5px' }}>
+                <div style={{ flex: '0.390', marginTop: '7px', paddingTop: '2px' }}>
                   <table style={{
                     width: 'calc(100% + 11px)',
                     marginLeft: '-2px',
+                    marginTop: '3px',
                     borderCollapse: 'collapse',
                     tableLayout: 'fixed',
                     border: 'none',
                   }}>
                     <thead>
                       <tr>
-                        <th style={{ ...HEAD, fontSize: '7pt', textAlign: 'center', padding: '4px', border: 'none' }}>Dades de contacte</th>
-                        <th style={{ ...HEAD, fontSize: '7pt', textAlign: 'center', padding: '4px', border: 'none' }}>Dades d'enviament</th>
+                        <th style={{ ...HEAD, fontSize: '7pt', textAlign: 'center', padding: '1px 4px 4px', border: 'none' }}>Dades de contacte</th>
+                        <th style={{ ...HEAD, fontSize: '7pt', textAlign: 'center', padding: '1px 4px 4px', border: 'none' }}>Dades d'enviament</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -821,6 +833,16 @@ export default function MegaslidePagina4({
                       <tr>
                         <td style={{ border: 'none' }} />
                         <td style={{ padding: '2px 4px', border: 'none' }}><TransparentInput ref={countryRef} placeholder="País" defaultValue={defaultAddress.country || ''} error={missingFields.includes('country')} style={{ fontSize: '10pt' }} /></td>
+                      </tr>
+                      <tr style={{ height: '7.5px' }}><td style={{ border: 'none' }} colSpan={2} /></tr>
+                      <tr>
+                        <td style={{ border: 'none' }} />
+                        <td style={{ padding: '2px 4px', border: 'none' }}>
+                          <button onClick={() => navigate('/shipping')} style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', border: 'none', background: 'transparent', cursor: 'pointer', fontFamily: 'Roboto, sans-serif', fontSize: '9pt', fontWeight: 300, color: '#475059', padding: 0 }}>
+                            <span style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: '14px', height: '14px', borderRadius: '50%', border: '1px solid #9CA3AF', fontSize: '8pt', fontWeight: 400, color: '#9CA3AF', lineHeight: 1 }}>i</span>
+                            Enviaments i Temps
+                          </button>
+                        </td>
                       </tr>
                     </tbody>
                   </table>

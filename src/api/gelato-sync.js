@@ -1,12 +1,37 @@
-import { syncGelatoStoreProducts, mapGelatoProduct } from './gelato';
+import { syncGelatoStoreProducts, mapGelatoProduct, gelatoClient } from './gelato';
 import productsService from './supabase-products';
 import { supabase } from './supabase-products';
 
 const GELATO_COST_PRICE = 5.91;
 const SELLING_PRICE = 15.50;
+const GELATO_PLUS_DISCOUNT = 0.20;
 
 function calculateSellingPrice() {
   return SELLING_PRICE;
+}
+
+const sleep = (ms) => new Promise(r => setTimeout(r, ms));
+
+async function fetchVariantCosts(storeProduct) {
+  if (!gelatoClient || !storeProduct.variants) return;
+  const batchSize = 20;
+  for (let i = 0; i < storeProduct.variants.length; i += batchSize) {
+    const batch = storeProduct.variants.slice(i, i + batchSize);
+    await Promise.all(batch.map(async (v) => {
+      const variantUid = v.productUid || v.id?.toString();
+      if (!variantUid) return;
+      try {
+        const prices = await gelatoClient.getProductPrices(variantUid);
+        const arr = Array.isArray(prices) ? prices : (prices?.data || []);
+        const entry = arr.find(p => p.quantity === 1) || arr[0];
+        if (entry && entry.price != null) {
+          v.cost = parseFloat(entry.price) * (1 - GELATO_PLUS_DISCOUNT);
+        }
+      } catch (e) {
+        // s'usa el fallback GELATO_COST_PRICE
+      }
+    }));
+  }
 }
 
 export async function syncGelatoProductsToSupabase() {
@@ -31,6 +56,8 @@ export async function syncGelatoProductsToSupabase() {
 
     for (const gelatoProduct of gelatoProducts) {
       try {
+        console.log(`🔄 [SYNC] Obtenint preus per ${gelatoProduct.title || gelatoProduct.name}...`);
+        await fetchVariantCosts(gelatoProduct);
         const transformedProduct = transformStoreProductForSupabase(gelatoProduct);
         let slug = transformedProduct.slug;
         if (usedSlugs.has(slug)) {
@@ -147,19 +174,18 @@ function transformStoreProductForSupabase(storeProduct) {
   const images = mockupUrl ? [mockupUrl] : [];
 
   const variants = (storeProduct.variants || []).map(v => {
-    const colorMatch = v.title?.match(/Color\s+([^,]+)/i);
-    const sizeMatch = v.title?.match(/Talla\s+(\w+)/i);
-
-    const color = colorMatch ? colorMatch[1].trim() : 'Default';
-    const size = sizeMatch ? sizeMatch[1].trim() : 'M';
+    const parts = (v.title || '').split(' - ');
+    const color = parts[0]?.trim() || 'Default';
+    const size = parts[1]?.trim() || 'M';
 
     return {
-      gelato_variant_id: v.id?.toString() || v.variantId?.toString(),
+      gelato_variant_id: v.productUid || v.id?.toString() || v.variantId?.toString(),
       sku: v.sku || '',
       size: size,
       color: color,
       color_hex: mapColorToHex(color),
       price: v.price || storeProduct.price || calculateSellingPrice(),
+      gelato_cost: v.cost || GELATO_COST_PRICE,
       stock: 999,
       is_available: true,
       image_url: v.mockupUrl || mockupUrl

@@ -1,8 +1,9 @@
 import React, { useEffect } from 'react';
 import SEO from '@/components/SEO';
+import { faqShippingZones as shippingZones } from './FAQPage';
 
 // Banderes amb tintes planes (SVG inline, sense gradients ni textures)
-const Flag = ({ code, size = 14 }) => {
+export const Flag = ({ code, size = 14 }) => {
   const flags = {
     ES: <svg width={size} height={size * 0.667} viewBox="0 0 30 20"><rect width="30" height="5" fill="#AA151B"/><rect y="5" width="30" height="10" fill="#F1BF00"/><rect y="15" width="30" height="5" fill="#AA151B"/></svg>,
     IT: <svg width={size} height={size * 0.667} viewBox="0 0 30 20"><rect width="10" height="20" fill="#009246"/><rect x="10" width="10" height="20" fill="#F1F2F1"/><rect x="20" width="10" height="20" fill="#CE2B37"/></svg>,
@@ -45,6 +46,10 @@ const Flag = ({ code, size = 14 }) => {
     SG: <svg width={size} height={size * 0.667} viewBox="0 0 30 20"><rect width="30" height="10" fill="#EF3340"/><rect y="10" width="30" height="10" fill="#F1F2F1"/></svg>,
     JP: <svg width={size} height={size * 0.667} viewBox="0 0 30 20"><rect width="30" height="20" fill="#F1F2F1"/><circle cx="15" cy="10" r="6" fill="#BC002D"/></svg>,
     EU: <svg width={size} height={size * 0.667} viewBox="0 0 30 20"><rect width="30" height="20" fill="#003399"/><circle cx="15" cy="10" r="4" fill="#FFCC00"/></svg>,
+    HN: <svg width={size} height={size * 0.667} viewBox="0 0 30 20"><rect width="30" height="6.67" fill="#0073CF"/><rect y="6.67" width="30" height="6.67" fill="#F1F2F1"/><rect y="13.33" width="30" height="6.67" fill="#0073CF"/><circle cx="15" cy="10" r="2.5" fill="#0073CF"/></svg>,
+    DO: <svg width={size} height={size * 0.667} viewBox="0 0 30 20"><rect width="15" height="10" fill="#002D62"/><rect x="15" y="0" width="15" height="10" fill="#CE1126"/><rect y="10" width="15" height="10" fill="#CE1126"/><rect x="15" y="10" width="15" height="10" fill="#F1F2F1"/><circle cx="15" cy="10" r="2.5" fill="#F1F2F1" stroke="#002D62" strokeWidth="0.5"/></svg>,
+    NI: <svg width={size} height={size * 0.667} viewBox="0 0 30 20"><rect width="10" height="20" fill="#0067B9"/><rect x="10" width="10" height="20" fill="#F1F2F1"/><rect x="20" width="10" height="20" fill="#0067B9"/></svg>,
+    BD: <svg width={size} height={size * 0.667} viewBox="0 0 30 20"><rect width="30" height="20" fill="#006A4E"/><circle cx="12" cy="10" r="5" fill="#F42A41"/></svg>,
   };
   return flags[code] || null;
 };
@@ -54,77 +59,7 @@ function ShippingPage() {
     window.scrollTo(0, 0);
   }, []);
 
-  // Zones amb tarifes reals de Gelato (Gildan 5000, DTG, Economy)
-  const zones = [
-    {
-      title: 'Zona A — UE amb tarifa pròpia',
-      desc: 'Països on Gelato té producció local o tarifa específica.',
-      time: '4-7',
-      countries: [
-        { code: 'ES', name: 'Espanya', first: '4,29', additional: '1,39', free: '50' },
-        { code: 'IT', name: 'Itàlia', first: '4,29', additional: '1,39', free: '50' },
-        { code: 'FR', name: 'França', first: '4,39', additional: '1,39', free: '50' },
-        { code: 'DE', name: 'Alemanya', first: '4,19', additional: '1,29', free: '50' },
-        { code: 'IE', name: 'Irlanda', first: '3,99', additional: '1,25', free: '50' },
-        { code: 'GB', name: 'Regne Unit', first: '3,72', additional: '1,11', free: '50' },
-        { code: 'SE', name: 'Suècia', first: '4,78', additional: '1,53', free: '50' },
-        { code: 'DK', name: 'Dinamarca', first: '4,72', additional: '1,34', free: '50' },
-      ],
-    },
-    {
-      title: 'Zona B — UE genèrica',
-      desc: 'Resta de països de la UE. Tarifa plana "Europe" de Gelato.',
-      time: '6-9',
-      countries: [
-        { code: 'PT', name: 'Portugal', first: '3,99', additional: '1,25', free: '50' },
-        { code: 'BE', name: 'Bèlgica', first: '3,99', additional: '1,25', free: '50' },
-        { code: 'NL', name: 'Països Baixos', first: '3,99', additional: '1,25', free: '50' },
-        { code: 'AT', name: 'Àustria', first: '3,99', additional: '1,25', free: '50' },
-        { code: 'PL', name: 'Polònia', first: '3,99', additional: '1,25', free: '50' },
-        { code: 'CZ', name: 'República Txeca', first: '3,99', additional: '1,25', free: '50' },
-        { code: 'HU', name: 'Hongria', first: '3,99', additional: '1,25', free: '50' },
-        { code: 'HR', name: 'Croàcia', first: '3,99', additional: '1,25', free: '50' },
-        { code: 'SK', name: 'Eslovàquia', first: '3,99', additional: '1,25', free: '50' },
-        { code: 'SI', name: 'Eslovènia', first: '3,99', additional: '1,25', free: '50' },
-        { code: 'BG', name: 'Bulgària', first: '3,99', additional: '1,25', free: '50' },
-        { code: 'RO', name: 'Romania', first: '3,99', additional: '1,25', free: '50' },
-        { code: 'GR', name: 'Grècia', first: '3,99', additional: '1,25', free: '50' },
-        { code: 'FI', name: 'Finlàndia', first: '3,99', additional: '1,25', free: '50' },
-        { code: 'EE', name: 'Estònia', first: '3,99', additional: '1,25', free: '50' },
-        { code: 'LV', name: 'Letònia', first: '3,99', additional: '1,25', free: '50' },
-        { code: 'LT', name: 'Lituània', first: '3,99', additional: '1,25', free: '50' },
-        { code: 'LU', name: 'Luxemburg', first: '3,99', additional: '1,25', free: '50' },
-        { code: 'MT', name: 'Malta', first: '3,99', additional: '1,25', free: '50' },
-        { code: 'CY', name: 'Xipre', first: '3,99', additional: '1,25', free: '50' },
-        { code: 'AD', name: 'Andorra', first: '3,99', additional: '1,25', free: '50' },
-      ],
-    },
-    {
-      title: 'Zona C — EFTA i Noruega',
-      desc: 'Països europeus fora de la UE. Sense enviament gratuït.',
-      time: '8-12',
-      countries: [
-        { code: 'NO', name: 'Noruega', first: '7,48', additional: '2,19', free: null },
-        { code: 'IS', name: 'Islàndia', first: '8,99', additional: '1,00', free: null },
-        { code: 'LI', name: 'Liechtenstein', first: '8,99', additional: '1,00', free: null },
-        { code: 'CH', name: 'Suïssa', first: '8,99', additional: '1,00', free: null },
-      ],
-    },
-    {
-      title: 'Zona D — Resta del món',
-      desc: 'Opcional. Només si els dissenys hi tenen tracció.',
-      time: '8-15',
-      countries: [
-        { code: 'US', name: 'Estats Units', first: '4,21', additional: '0,83', free: null },
-        { code: 'CA', name: 'Canadà', first: '8,03', additional: '2,42', free: null },
-        { code: 'AU', name: 'Austràlia', first: '7,65', additional: '2,31', free: null },
-        { code: 'NZ', name: 'Nova Zelanda', first: '5,14', additional: '0,96', free: null },
-        { code: 'BR', name: 'Brasil', first: '3,47', additional: '1,93', free: null },
-        { code: 'SG', name: 'Singapur', first: '10,03', additional: '2,41', free: null },
-        { code: 'JP', name: 'Japó', first: '9,45', additional: '2,26', free: null },
-      ],
-    },
-  ];
+  const zones = shippingZones;
 
   const sections = [
     {
@@ -260,18 +195,17 @@ function ShippingPage() {
                     {zones.map((zone, zi) => (
                       <div key={zi} className="mb-4">
                         <p className="font-roboto text-[9pt] font-bold text-gray-800 mb-1">
-                          {zone.title}
+                          {zone.title} <span className="font-light text-gray-500">({zone.time} dies)</span>
                         </p>
                         <p className="font-roboto text-[8pt] font-light text-gray-500 mb-2">
                           {zone.desc}
                         </p>
                         <table className="w-full mb-2" style={{ borderCollapse: 'collapse', tableLayout: 'fixed' }}>
                           <colgroup>
-                            <col style={{ width: '38%' }} />
-                            <col style={{ width: '15%' }} />
-                            <col style={{ width: '19%' }} />
-                            <col style={{ width: '14%' }} />
-                            <col style={{ width: '14%' }} />
+                            <col style={{ width: '44%' }} />
+                            <col style={{ width: '18%' }} />
+                            <col style={{ width: '22%' }} />
+                            <col style={{ width: '16%' }} />
                           </colgroup>
                           <thead>
                             <tr style={{ borderBottom: '1px solid #E6E8EC' }}>
@@ -279,7 +213,6 @@ function ShippingPage() {
                               <th className="font-roboto text-[7pt] font-normal text-gray-500 text-right py-1">1a peça</th>
                               <th className="font-roboto text-[7pt] font-normal text-gray-500 text-right py-1">Addicional</th>
                               <th className="font-roboto text-[7pt] font-normal text-gray-500 text-right py-1">Gratuït</th>
-                              <th className="font-roboto text-[7pt] font-normal text-gray-500 text-right py-1">Temps</th>
                             </tr>
                           </thead>
                           <tbody>
@@ -295,9 +228,6 @@ function ShippingPage() {
                                 <td className="font-roboto text-[8pt] font-light text-gray-700 text-right py-1" style={{ fontVariantNumeric: 'tabular-nums' }}>{c.additional}€</td>
                                 <td className="font-roboto text-[8pt] font-light text-right py-1" style={{ color: c.free ? '#00a651' : '#999', fontVariantNumeric: 'tabular-nums' }}>
                                   {c.free ? `${c.free}€` : '—'}
-                                </td>
-                                <td className="font-roboto text-[8pt] font-light text-gray-700 text-right py-1" style={{ fontVariantNumeric: 'tabular-nums' }}>
-                                  {zone.time} dies
                                 </td>
                               </tr>
                             ))}

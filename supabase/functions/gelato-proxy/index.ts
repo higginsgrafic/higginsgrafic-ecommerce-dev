@@ -60,7 +60,9 @@ Deno.serve(async (req: Request) => {
         break;
       case 'prices':
         const priceProductId = url.searchParams.get('productId');
-        gelatoUrl = `${GELATO_PRODUCTS_API}/products/${priceProductId}/prices`;
+        const currency = url.searchParams.get('currency') || 'EUR';
+        const country = url.searchParams.get('country') || 'ES';
+        gelatoUrl = `${GELATO_PRODUCTS_API}/products/${priceProductId}/prices?currency=${currency}&country=${country}`;
         break;
       case 'order':
         if (req.method === 'POST') {
