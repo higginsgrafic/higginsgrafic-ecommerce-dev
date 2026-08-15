@@ -37,6 +37,8 @@ function CistellComandaContent({ cartItems, setCartItems, onCloseMegaSlide, onFi
   const CART_VIEWPORT = TABLE_WIDTH + COL4_EXTRA;
   // Col 4 ocupa la resta del viewport (TABLE_WIDTH - 3 cols - 3 gaps).
   const COL3 = CART_VIEWPORT - 3 * COL2 - 3 * SLIDE_GAP;
+  // Col 1 i Col 4 simètriques: 2*COL_OUTER + 2*COL2 + 3*SLIDE_GAP = CART_VIEWPORT
+  const COL_OUTER = (CART_VIEWPORT - 2 * COL2 - 3 * SLIDE_GAP) / 2;
 
   const TSHIRT_BASE = '/placeholders/apparel/t-shirt/gildan_5000/gildan-5000_t-shirt_crewneck_unisex_heavyWeight_xl_';
   const TSHIRT_SUFFIX = '_gpr-4-0_front.png';
@@ -53,7 +55,7 @@ function CistellComandaContent({ cartItems, setCartItems, onCloseMegaSlide, onFi
   const FIRST_VIEWPORT_ROW = 0;
   const LAST_VIEWPORT_ROW = 14;
   // Cada ítem ocupa 2 files de contingut (sense fila buida de separació).
-  const ITEM_STRIDE = 2 * ROW_H;
+  const ITEM_STRIDE = 2 * ROW_H - 4;
   const VISIBLE_HEIGHT = (LAST_VIEWPORT_ROW - FIRST_VIEWPORT_ROW) * ROW_H - V_GUTTER;
   const VISIBLE_ITEMS = Math.max(1, Math.floor((VISIBLE_HEIGHT + V_GUTTER) / ITEM_STRIDE));
   const [scrollRow, setScrollRow] = useState(0);
@@ -168,6 +170,7 @@ function CistellComandaContent({ cartItems, setCartItems, onCloseMegaSlide, onFi
           height: `${VISIBLE_HEIGHT}px`,
           overflow: 'hidden',
           zIndex: 2,
+          border: '1px solid red',
         }}
       >
       <div style={{
@@ -189,12 +192,13 @@ function CistellComandaContent({ cartItems, setCartItems, onCloseMegaSlide, onFi
           top: `${rowIndex * ITEM_STRIDE}px`,
           left: `${SLIDE_OFFSET_X}px`,
           width: `${TABLE_WIDTH + COL4_EXTRA}px`,
-          height: `${2 * ROW_H - V_GUTTER}px`,
+          height: `${2 * ROW_H - V_GUTTER - 2}px`,
           display: 'grid',
-          gridTemplateColumns: `${COL2}px ${COL2}px ${COL2}px ${COL3}px`,
+          gridTemplateColumns: `${COL_OUTER}px ${COL2}px ${COL2}px ${COL_OUTER}px`,
           columnGap: `${SLIDE_GAP}px`,
           alignItems: 'stretch',
           overflow: 'hidden',
+          border: '1px solid orange',
         }}>
           <div style={{
             position: 'absolute',
@@ -211,14 +215,14 @@ function CistellComandaContent({ cartItems, setCartItems, onCloseMegaSlide, onFi
             position: 'relative',
             zIndex: 1,
             display: 'grid',
-            gridTemplateColumns: `${COL2}px ${COL2}px ${COL2}px ${COL3}px`,
+            gridTemplateColumns: `${COL_OUTER}px ${COL2}px ${COL2}px ${COL_OUTER}px`,
             columnGap: `${SLIDE_GAP}px`,
             alignItems: 'stretch',
             width: '100%',
             height: '100%',
           }}>
           {/* Col 1: samarreta + dibuix (cadascú centrat amb el slot del carrusel del damunt) */}
-          <div style={{ ...colBg, position: 'relative', padding: 0, minWidth: 0 }}>
+          <div style={{ ...colBg, position: 'relative', padding: 0, minWidth: 0, border: '1px solid purple' }}>
             <div style={{ display: 'grid', gridTemplateColumns: `${SLOT_W}px ${SLOT_W}px`, columnGap: `${SLIDE_GAP}px`, alignItems: 'center', justifyItems: 'center', height: '100%' }}>
               <div style={{
                 alignSelf: 'start',
@@ -268,7 +272,7 @@ function CistellComandaContent({ cartItems, setCartItems, onCloseMegaSlide, onFi
           </div>
 
           {/* Col 2: títol + col·lecció */}
-          <div style={{ ...colBg, display: 'flex', flexDirection: 'column', justifyContent: 'center', minWidth: 0, overflow: 'hidden', padding: '0 4px' }}>
+          <div style={{ ...colBg, display: 'flex', flexDirection: 'column', justifyContent: 'center', minWidth: 0, overflow: 'hidden', padding: '0 4px', border: '1px solid cyan' }}>
             <div style={{ ...HEAD, fontSize: '11.6424pt', lineHeight: 1.1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
               {item.title}
             </div>
@@ -278,7 +282,7 @@ function CistellComandaContent({ cartItems, setCartItems, onCloseMegaSlide, onFi
           </div>
 
           {/* Col 3: QUANTITAT + TALLATGE (cadascun centrat amb el slot del carrusel del damunt) */}
-          <div style={{ ...colBg, display: 'grid', gridTemplateColumns: `${SLOT_W}px ${SLOT_W}px`, gridTemplateRows: `${ROW_H - V_GUTTER}px ${ROW_H - V_GUTTER}px`, columnGap: `${SLIDE_GAP}px`, rowGap: `${V_GUTTER}px`, alignItems: 'center', justifyItems: 'center', transform: 'translateX(-35px)' }}>
+          <div style={{ ...colBg, display: 'grid', gridTemplateColumns: `${SLOT_W}px ${SLOT_W}px`, gridTemplateRows: `${ROW_H - V_GUTTER}px ${ROW_H - V_GUTTER}px`, columnGap: `${SLIDE_GAP}px`, rowGap: `${V_GUTTER}px`, alignItems: 'center', justifyItems: 'center', border: '1px solid magenta' }}>
             <div style={{ gridRow: 2, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '4px', transform: `translateY(${-0.5 * ROW_H}px)` }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '14px', ...VAL, fontSize: '11.6424pt' }}>
                 <button onClick={() => changeQty(i, -1)} onMouseEnter={(e) => { e.currentTarget.style.color = '#475059'; e.currentTarget.style.fontSize = '12pt'; e.currentTarget.style.transform = 'scale(1.3)'; }} onMouseLeave={(e) => { e.currentTarget.style.color = '#C3C8CD'; e.currentTarget.style.fontSize = '8.7318pt'; e.currentTarget.style.transform = 'scale(1)'; }} style={{ width: `${(ROW_H - V_GUTTER) * 1.25}px`, height: `${(ROW_H - V_GUTTER) * 1.25}px`, border: '1px solid #C9D0D9', borderRadius: '50%', backgroundColor: 'transparent', color: '#C3C8CD', cursor: 'pointer', fontSize: '8.7318pt', lineHeight: 1, padding: 0, transition: 'color 0.15s ease, transform 0.15s ease, font-size 0.15s ease' }}>−</button>
@@ -296,7 +300,7 @@ function CistellComandaContent({ cartItems, setCartItems, onCloseMegaSlide, onFi
           </div>
 
           {/* Col 4: fila 1 buida · fila 2 = "TOT PLEGAT FA" + X + preu (flush dret) */}
-          <div style={{ ...colBg, display: 'grid', gridTemplateRows: `${ROW_H - V_GUTTER}px ${ROW_H - V_GUTTER}px`, rowGap: `${V_GUTTER}px`, padding: 0, transform: 'translateX(80px)' }}>
+          <div style={{ ...colBg, display: 'grid', gridTemplateRows: `${ROW_H - V_GUTTER}px ${ROW_H - V_GUTTER}px`, rowGap: `${V_GUTTER}px`, padding: 0, justifyItems: 'end', border: '1px solid brown' }}>
             <div />
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', transform: `translateY(${-0.5 * ROW_H}px)` }}>
               <div style={{ display: 'grid', gridTemplateColumns: 'auto 40px 40px 70px 70px', alignItems: 'center', columnGap: '8px' }}>
@@ -439,15 +443,16 @@ function CistellComandaContent({ cartItems, setCartItems, onCloseMegaSlide, onFi
         // (lint-friendly: marquem-los com a usats).
         void subtotal; void transport; void iva;
         // Fila 19 de la pauta (1-indexada), contingut només a la col 4.
-        const TOTALS_FIRST_ROW = 18;
+        const TOTALS_FIRST_ROW = 12;
         return (
           <>
             <div style={{
               position: 'absolute',
-              top: `${TOP_OFFSET + (TOTALS_FIRST_ROW - 1) * ROW_H}px`,
+              bottom: `0px`,
               left: `calc(50% - ${TABLE_WIDTH / 2}px + ${SLIDE_OFFSET_X}px)`,
               width: `${TABLE_WIDTH + COL4_EXTRA}px`,
-              height: `${rows.length * ROW_H - V_GUTTER}px`,
+              height: `${rows.length * 2 * ROW_H - V_GUTTER}px`,
+              border: '1px solid blue',
               backgroundImage: `url("${encodeURI('/placeholders/tots_els_fons/fons_acordio/fons-cistell-compra.png')}")`,
               backgroundRepeat: 'no-repeat',
               backgroundPosition: 'center top',
@@ -457,7 +462,7 @@ function CistellComandaContent({ cartItems, setCartItems, onCloseMegaSlide, onFi
               zIndex: 1,
             }} />
             {rows.map((r, k) => {
-          const rowTop = TOP_OFFSET + (TOTALS_FIRST_ROW - 1 + k) * ROW_H;
+          const rowBottom = (rows.length - 1 - k) * ROW_H;
           const [intPart, decPart] = r.amount.replace('€','').split(',');
           const labelStyle = {
             fontFamily: 'Oswald, sans-serif',
@@ -485,12 +490,12 @@ function CistellComandaContent({ cartItems, setCartItems, onCloseMegaSlide, onFi
           return (
             <div key={r.label} style={{
               position: 'absolute',
-              top: `${rowTop}px`,
+              bottom: `${rowBottom}px`,
               left: `calc(50% - ${TABLE_WIDTH / 2}px + ${SLIDE_OFFSET_X}px)`,
               width: `${TABLE_WIDTH + COL4_EXTRA}px`,
-              height: `${ROW_H - V_GUTTER}px`,
+              height: `${2 * ROW_H - V_GUTTER}px`,
               display: 'grid',
-              gridTemplateColumns: `${COL2}px ${COL2}px ${COL2}px ${COL3}px`,
+              gridTemplateColumns: `${COL_OUTER}px ${COL2}px ${COL2}px ${COL_OUTER}px`,
               columnGap: `${SLIDE_GAP}px`,
               boxSizing: 'border-box',
               zIndex: 2,
@@ -505,9 +510,9 @@ function CistellComandaContent({ cartItems, setCartItems, onCloseMegaSlide, onFi
                 <span />
               </div>
               {/* Col 4: mateix patró que la fila de preu de l'ítem */}
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', transform: 'translateX(80px)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <div style={{ display: 'grid', gridTemplateColumns: 'auto 40px 40px 70px 70px', alignItems: 'center', columnGap: '8px' }}>
-                  <span style={{ position: 'relative', marginRight: '24px' }}>
+                  <span style={{ position: 'relative', marginRight: '24px', transform: 'translateX(80px)' }}>
                     <span style={{ ...HEAD, fontSize: '10.1871pt', fontWeight: 400, color: '#7D8895', visibility: 'hidden' }}>TOT PLEGAT FA</span>
                     <span style={{ ...labelStyle, position: 'absolute', right: 0, top: '50%', transform: 'translateY(-50%)', textAlign: 'right', whiteSpace: 'nowrap' }}>{r.label}</span>
                   </span>
@@ -527,10 +532,11 @@ function CistellComandaContent({ cartItems, setCartItems, onCloseMegaSlide, onFi
       {/* Botonera central (REVERTEIX / CANCEL·LA / DESA) — alineada amb l'última fila de la taula */}
       <div style={{
         position: 'absolute',
-        top: `${TOP_OFFSET + 19 * ROW_H}px`,
+        bottom: '3px',
         left: '50%',
         transform: 'translate(-50%, 2px)',
         width: `${TABLE_WIDTH}px`,
+        border: '1px solid green',
         display: 'grid',
         gridTemplateColumns: 'repeat(4, 1fr)',
         columnGap: `${GUTTER}px`,
@@ -538,10 +544,11 @@ function CistellComandaContent({ cartItems, setCartItems, onCloseMegaSlide, onFi
       }}>
         <div style={{
           gridColumn: '2 / span 2',
-          height: `${ROW_H - V_GUTTER}px`,
+          height: `${2 * ROW_H - V_GUTTER - 5}px`,
           display: 'grid',
           gridTemplateColumns: '1fr',
           gap: `${GUTTER}px`,
+          justifyItems: 'center',
         }}>
           <button
             id="stripe-guide-finalize-order"
@@ -563,6 +570,8 @@ function CistellComandaContent({ cartItems, setCartItems, onCloseMegaSlide, onFi
               cursor: 'pointer',
               padding: 0,
               height: '100%',
+              width: 'calc(100% - 40px)',
+              margin: '0 auto',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',

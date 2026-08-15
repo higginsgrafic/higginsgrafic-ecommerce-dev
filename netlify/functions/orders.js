@@ -79,6 +79,8 @@ export async function handler(event, context) {
         phone,
         userId,
         paymentIntentId,
+        company,
+        taxId,
       } = body;
 
       if (!email || !items || !Array.isArray(items) || items.length === 0) {
@@ -106,6 +108,8 @@ export async function handler(event, context) {
           country: country || 'Espanya',
           phone: phone || null,
           payment_intent_id: paymentIntentId || null,
+          company: company || null,
+          tax_id: taxId || null,
         })
         .select()
         .single();

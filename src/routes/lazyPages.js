@@ -5,7 +5,6 @@ export const FulfillmentSettingsPage = lazy(() => import('@/pages/FulfillmentSet
 export const ProductDetailPageEnhanced = lazy(() => import('@/pages/ProductDetailPageEnhanced'));
 export const Home = lazy(() => import('@/pages/Home'));
 export const OrderTrackingPage = lazy(() => import('@/pages/OrderTrackingPage'));
-export const CheckoutPage = lazy(() => import('@/pages/CheckoutPage'));
 export const NotFoundPage = lazy(() => import('@/pages/NotFoundPage'));
 export const OffersPage = lazy(() => import('@/pages/OffersPage'));
 export const ProductDetailPage = lazy(() => import('@/pages/ProductDetailPage'));
