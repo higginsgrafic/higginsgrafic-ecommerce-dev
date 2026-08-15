@@ -2928,9 +2928,6 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
                 cartClickTimeoutRef.current = window.setTimeout(() => {
                   cartClickTimeoutRef.current = null;
                   setManualOverrideClosed(false);
-                  // Seqüència de clics al cistell:
-                  //  Amb items: 1r obre pestanya, 2n obre acordió, 3r tanca tot
-                  //  Sense items: 1r obre pestanya, 2n tanca tot
                   if (megaPage === 3 && active) {
                     if (!acordioExpanded) {
                       if (localCartItemCount > 0) {

@@ -28,123 +28,111 @@ export default function MegaslidePagina3({
         display: 'flex',
         flexDirection: 'column',
       }}>
+
+        {/* DEBUG: Rectangle mostrant l'espai real disponible */}
+        <div style={{
+          position: 'absolute',
+          top: 0,
+          left: '3%',
+          width: '94%',
+          height: '100%',
+          border: '2px dashed red',
+          boxSizing: 'border-box',
+          pointerEvents: 'none',
+          zIndex: 999,
+        }} />
+
         <div style={{
           transform: 'scale(0.94)',
           transformOrigin: 'top center',
           width: '100%',
           height: '100%',
-          flexShrink: 0,
-          position: 'relative',
+          position: 'absolute',
+          top: 0,
+          left: 0,
         }}>
-          <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', overflow: 'hidden' }}>
-            <CistellComandaContent
-              cartItems={cartItems}
-              setCartItems={setCartItems}
-              onCloseMegaSlide={() => setActive(null)}
-              onFinalizeOrder={() => {
-                if (localCartItemCount > 0 && !megaAccordionLocked && !acordioExpanded) setAcordioExpanded(true);
-                touchMegaPublicActivity();
-              }}
-            />
-          </div>
 
-          <div style={{
-            position: 'absolute',
-            bottom: 0,
-            left: '50%',
-            transform: 'translateX(-50%)',
-            width: 'var(--hg-mega-w, min(1350px, calc(100vw - 32px)))',
-            height: '1px',
-            background: '#E6E8EC',
-            pointerEvents: 'none',
-            zIndex: 10,
-          }} />
-
-          {!acordioExpanded && (
-            <div
-              aria-hidden="true"
-              data-stripe-guide="accordion-pauta"
-              style={{
-                position: 'absolute',
-                top: 'calc(100% + 1px)',
-                left: 0,
-                width: '1px',
-                height: `${737.015 * accordionPautaScale}px`,
-                pointerEvents: 'none',
-                opacity: 0,
-              }}
-            />
-          )}
-
-          {!acordioExpanded && localCartItemCount > 0 && (
-            <div
-              onClick={() => {
-                setAcordioExpanded(true);
-                touchMegaPublicActivity();
-              }}
-              style={{
-                position: 'absolute',
-                bottom: '-50px',
-                left: '50%',
-                transform: 'translateX(-50%)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '0px',
-                cursor: 'pointer',
-                zIndex: 10,
-              }}
-            >
-              <svg width="30" height="45" viewBox="4 0 16 24" fill="none" stroke="#000" strokeWidth="0.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                <line x1="4" y1="11" x2="12" y2="17" />
-                <line x1="12" y1="17" x2="20" y2="11" />
-              </svg>
-            </div>
-          )}
-        </div>
-
-        {acordioExpanded && (
-          <div style={{
-            position: 'absolute',
-            top: '100%',
-            left: '50%',
-            transform: 'translateX(-50%)',
-            width: '100%',
-            minHeight: '100vh',
-            paddingTop: '40px',
-            paddingBottom: '40px',
-            zIndex: 10,
-          }}>
-            <div aria-hidden="true" style={{
-              position: 'absolute',
-              top: 0,
-              left: '50%',
-              transform: 'translateX(-50%)',
-              width: '100vw',
-              height: '100%',
-              minHeight: '100vh',
-              backgroundColor: 'white',
-              pointerEvents: 'none',
-              zIndex: -1,
-            }} />
-            <div data-stripe-guide="accordion-pauta" style={{
-              position: 'absolute',
-              top: '1px',
-              left: '50%',
-              transform: `translateX(-50%) scale(${accordionPautaScale * 0.94})`,
-              transformOrigin: 'top center',
-              width: `calc(100% / (${accordionPautaScale} * 0.94))`,
-              height: '900px',
-              overflow: 'hidden',
-            }}>
+          <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: acordioExpanded ? '100%' : '106.4%', overflow: 'visible' }}>
+            {!acordioExpanded ? (
+              <CistellComandaContent
+                cartItems={cartItems}
+                setCartItems={setCartItems}
+                onCloseMegaSlide={() => setActive(null)}
+                onFinalizeOrder={() => {
+                  if (localCartItemCount > 0 && !acordioExpanded) setAcordioExpanded(true);
+                }}
+              />
+            ) : (
               <CheckoutContent
                 cartItems={cartItems}
                 setCartItems={setCartItems}
                 onCloseMegaSlide={() => setActive(null)}
+                onBackToCart={() => setAcordioExpanded(false)}
               />
-            </div>
+            )}
           </div>
-        )}
+
+        </div>
+
+        {/* Toggle CISTELL / PAGAMENT — fora del megaslide, a sota, com el selector de la pàgina 2 */}
+        <div style={{
+          position: 'relative',
+          zIndex: 3,
+          display: 'flex',
+          marginTop: '409px',
+          padding: '0 40px',
+          justifyContent: 'center',
+        }}>
+          <div style={{
+            display: 'flex',
+            backgroundColor: '#f3f4f6',
+            padding: '2px',
+            borderRadius: 'clamp(2.81px, 0.8vw, 5.06px)',
+            border: '1px solid #e5e7eb',
+            width: '100%',
+            maxWidth: '202px',
+            boxSizing: 'border-box',
+          }}>
+            {['CISTELL', 'PAGAMENT'].map((opt) => {
+              const isActive = (opt === 'CISTELL' && !acordioExpanded) || (opt === 'PAGAMENT' && acordioExpanded);
+              const isDisabled = opt === 'PAGAMENT' && localCartItemCount === 0;
+              return (
+                <button
+                  key={opt}
+                  type="button"
+                  disabled={isDisabled}
+                  onClick={() => {
+                    if (opt === 'CISTELL') setAcordioExpanded(false);
+                    else if (opt === 'PAGAMENT' && localCartItemCount > 0) setAcordioExpanded(true);
+                  }}
+                  style={{
+                    flex: 1,
+                    fontFamily: 'Oswald, sans-serif',
+                    fontSize: '8.1pt',
+                    fontWeight: isActive ? 400 : 300,
+                    letterSpacing: '0em',
+                    lineHeight: 1,
+                    textTransform: 'none',
+                    color: isDisabled ? '#d1d5db' : (isActive ? '#111827' : '#9ca3af'),
+                    backgroundColor: isActive ? '#ffffff' : 'transparent',
+                    border: 'none',
+                    borderRadius: 'clamp(2.11px, 0.6vw, 3.8px)',
+                    cursor: isDisabled ? 'not-allowed' : 'pointer',
+                    opacity: isDisabled ? 0.5 : 1,
+                    transition: 'all 150ms ease',
+                    boxShadow: isActive ? '0 1px 2px rgba(0,0,0,0.05)' : 'none',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    padding: '5px 0',
+                  }}
+                >
+                  {opt}
+                </button>
+              );
+            })}
+          </div>
+        </div>
 
         <style>{`
           div::-webkit-scrollbar {

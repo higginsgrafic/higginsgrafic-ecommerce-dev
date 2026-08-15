@@ -1,5 +1,6 @@
 import Stripe from 'stripe';
 import { createClient } from '@supabase/supabase-js';
+import { createGelatoOrderServer } from './_gelato.js';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
@@ -26,6 +27,48 @@ function jsonResponse(statusCode, body) {
     },
     body: JSON.stringify(body),
   };
+}
+
+/**
+ * Creació de la comanda a Gelato a partir de la fila d'orders.
+ * Idempotent: si ja hi ha gelato_order_id, no fa res.
+ * Retorna 'retry' si cal que Stripe reenviï l'esdeveniment, 'ok' o 'skip' altrament.
+ */
+async function fulfillGelato(supabase, order) {
+  if (order.gelato_order_id) {
+    console.log('[stripe-webhook] Comanda ja enviada a Gelato:', order.gelato_order_id, '— skip');
+    return 'ok';
+  }
+
+  try {
+    const gelato = await createGelatoOrderServer(order);
+    if (gelato.orderId) {
+      const { error: updateError } = await supabase
+        .from('orders')
+        .update({ gelato_order_id: gelato.orderId, status: 'en_preparacio' })
+        .eq('id', order.id);
+      if (updateError) {
+        console.error('[stripe-webhook] Error desant gelato_order_id:', updateError.message);
+        return 'retry';
+      }
+      console.log('[stripe-webhook] Comanda creada a Gelato:', gelato.orderId);
+    }
+    return 'ok';
+  } catch (err) {
+    if (err.code === 'NO_API_KEY') {
+      console.warn('[stripe-webhook] GELATO_API_KEY no configurada — fulfillment manual:', err.message);
+      return 'skip';
+    }
+    if (err.code === 'NO_VALID_ITEMS' || err.code === 'GELATO_DATA_ERROR') {
+      // Error de dades: reintentar no ho solucionarà. La comanda queda 'confirmada'
+      // sense gelato_order_id → cal gestió manual (visible a l'admin).
+      console.error('[stripe-webhook] Gelato rebutja la comanda (manual):', err.message);
+      return 'skip';
+    }
+    // Error de xarxa/Gelato caigut: respondre 500 perquè Stripe reintenti
+    console.error('[stripe-webhook] Error creant comanda Gelato (es reintentarà):', err.message);
+    return 'retry';
+  }
 }
 
 export async function handler(event, context) {
@@ -74,6 +117,10 @@ export async function handler(event, context) {
             console.error('[stripe-webhook] Error updating order:', error.message);
           } else if (data) {
             console.log('[stripe-webhook] Order updated to confirmada:', data.order_number || data.id);
+            const result = await fulfillGelato(supabase, data);
+            if (result === 'retry') {
+              return jsonResponse(500, { error: 'Gelato fulfillment pendent de reintent' });
+            }
           } else {
             console.log('[stripe-webhook] No order found with payment_intent_id:', paymentIntent.id);
           }
