@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Elements, CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
 import { Check } from 'lucide-react';
 import { validateEmail, validateRequired, validatePostalCode, validateForm } from '@/utils/validation';
 import { trackBeginCheckout, trackPurchase } from '@/utils/analytics';
@@ -8,8 +9,12 @@ import { useOrders } from '@/hooks/useOrders';
 import { createMockOrder, MOCK_CLIENT } from '@/lib/mockOrderStore';
 import { useAuth } from '@/contexts/AuthContext';
 import { useOffersConfig } from '@/hooks/useOffersConfig';
+import { getStripe } from '@/api/stripe';
+import { createGelatoOrder } from '@/api/gelato';
 
-function CheckoutContent({ cartItems, setCartItems, onCloseMegaSlide }) {
+function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide }) {
+  const stripe = useStripe();
+  const elements = useElements();
   const { createOrder } = useOrders();
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -27,9 +32,6 @@ function CheckoutContent({ cartItems, setCartItems, onCloseMegaSlide }) {
     postalCode: isDev ? MOCK_CLIENT.postalCode : '',
     country: isDev ? MOCK_CLIENT.country : 'Espanya',
     phone: isDev ? '600 123 456' : '',
-    cardNumber: '',
-    expiryDate: '',
-    cvv: '',
   });
   const [formErrors, setFormErrors] = useState({});
   const [isProcessing, setIsProcessing] = useState(false);
@@ -76,6 +78,8 @@ function CheckoutContent({ cartItems, setCartItems, onCloseMegaSlide }) {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  const [paymentError, setPaymentError] = useState(null);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     const rules = {
@@ -98,29 +102,12 @@ function CheckoutContent({ cartItems, setCartItems, onCloseMegaSlide }) {
       return;
     }
     setFormErrors({});
+    setPaymentError(null);
     setIsProcessing(true);
     try {
       let orderNumber = null;
-      if (!import.meta.env.DEV) {
-        const order = await createOrder({
-          email: formData.email,
-          items: activeItems,
-          subtotal: preu,
-          shippingCost: shipping,
-          iva: ivaAmount,
-          total: totalPlegat,
-          shippingZone: 'es_peninsula',
-          firstName: formData.firstName,
-          lastName: formData.lastName,
-          address: formData.address,
-          address2: formData.address2,
-          city: formData.city,
-          postalCode: formData.postalCode,
-          country: formData.country,
-          phone: formData.phone,
-        });
-        orderNumber = order?.order_number || null;
-      } else {
+
+      if (isDev) {
         const orderItems = activeItems.map((item, idx) => ({
           id: item.id || `item-${idx}`,
           name: item.title || item.name || 'Producte',
@@ -138,7 +125,114 @@ function CheckoutContent({ cartItems, setCartItems, onCloseMegaSlide }) {
           formData,
         });
         orderNumber = mockOrder.order_number;
+      } else {
+        if (!stripe || !elements) {
+          setPaymentError('Stripe no s\'ha carregat. Torna-ho a provar.');
+          setIsProcessing(false);
+          return;
+        }
+
+        const response = await fetch('/.netlify/functions/create-payment-intent', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            amount: Math.round(totalPlegat * 100),
+            currency: 'eur',
+          }),
+        });
+
+        if (!response.ok) {
+          throw new Error('Error creant Payment Intent');
+        }
+
+        const { clientSecret, paymentIntentId } = await response.json();
+
+        const { error: stripeError, paymentIntent } = await stripe.confirmCardPayment(
+          clientSecret,
+          {
+            payment_method: {
+              card: elements.getElement(CardElement),
+              billing_details: {
+                name: `${formData.firstName} ${formData.lastName}`,
+                email: formData.email,
+                address: {
+                  line1: formData.address,
+                  city: formData.city,
+                  postal_code: formData.postalCode,
+                  country: 'ES',
+                },
+              },
+            },
+          }
+        );
+
+        if (stripeError) {
+          setPaymentError(stripeError.message || 'Error processant el pagament');
+          setIsProcessing(false);
+          return;
+        }
+
+        const order = await createOrder({
+          email: formData.email,
+          userId: user?.id || null,
+          items: activeItems.map((item, idx) => ({
+            id: item.id || `item-${idx}`,
+            name: item.title || item.name || 'Producte',
+            size: item.size || 'L',
+            quantity: item.qty || 1,
+            price: parseFloat(String(item.price).replace('€', '').replace(/\s/g, '').replace(',', '.')) || 0,
+            image: item.image || '/tshirt-white.jpg',
+          })),
+          subtotal: preu,
+          shippingCost: shipping,
+          iva: ivaAmount,
+          total: totalPlegat,
+          shippingZone: 'es_peninsula',
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          address: formData.address,
+          address2: formData.address2,
+          city: formData.city,
+          postalCode: formData.postalCode,
+          country: formData.country,
+          phone: formData.phone,
+          paymentIntentId,
+        });
+        orderNumber = order?.order_number || order?.id || paymentIntentId;
+
+        try {
+          const gelatoResult = await createGelatoOrder({
+            id: orderNumber,
+            items: activeItems.map((item) => ({
+              gelatoProductId: item.gelatoProductId || item.id,
+              gelatoVariantId: item.gelatoVariantId || null,
+              quantity: item.qty || 1,
+              designFiles: item.designFiles || [],
+              designUrl: item.designUrl || null,
+            })),
+            shippingAddress: {
+              firstName: formData.firstName,
+              lastName: formData.lastName,
+              street: formData.address,
+              city: formData.city,
+              postalCode: formData.postalCode,
+              country: formData.country || 'Espanya',
+            },
+            email: formData.email,
+          });
+
+          if (gelatoResult?.orderId && gelatoResult.orderId !== orderNumber) {
+            await fetch('/api/orders', {
+              method: 'PATCH',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ orderNumber, gelatoOrderId: gelatoResult.orderId }),
+            }).catch(() => {});
+          }
+        } catch (gelatoErr) {
+          console.error('[checkout] Gelato order creation failed:', gelatoErr);
+        }
       }
+
       trackPurchase(orderNumber, activeItems, totalPlegat, shipping, 0);
       if (setCartItems) setCartItems([]);
       setIsProcessing(false);
@@ -146,6 +240,7 @@ function CheckoutContent({ cartItems, setCartItems, onCloseMegaSlide }) {
       navigate(`/order-confirmation/${orderNumber}`);
     } catch (err) {
       console.error('[checkout] Error creating order:', err);
+      setPaymentError('Error processant la comanda');
       setIsProcessing(false);
     }
   };
@@ -333,6 +428,13 @@ function CheckoutContent({ cartItems, setCartItems, onCloseMegaSlide }) {
           En confirmar el pagament, autoritzes el càrrec d'aquest pagament i futurs pagaments segons els termes.
         </div>
 
+        {/* Error de pagament */}
+        {paymentError && (
+          <div style={{ marginTop: '10px', color: '#D04B4B', fontSize: '10pt', fontFamily: 'Roboto Condensed, sans-serif', textAlign: 'center' }}>
+            {paymentError}
+          </div>
+        )}
+
         {/* Toggle continua com a hoste */}
         <button
           type="button"
@@ -354,12 +456,19 @@ function CheckoutContent({ cartItems, setCartItems, onCloseMegaSlide }) {
               <div style={{ padding: '10px 12px', display: 'grid', rowGap: '8px' }}>
                 <label style={{ display: 'grid', rowGap: '4px', fontSize: '10pt', fontWeight: 300, color: '#667085', fontFamily: 'Roboto Condensed, sans-serif' }}>
                   Informació de la targeta
-                  <div style={{ border: '1px solid #D8DDE3', borderRadius: '4px', overflow: 'hidden', background: '#FFFFFF' }}>
-                    <input type="text" name="cardNumber" value={formData.cardNumber} onChange={handleChange} placeholder="4242 4242 4242 4242" maxLength={19} style={{ width: '100%', height: '31px', border: 'none', borderBottom: '1px solid #E6E8EC', padding: '0 10px', fontFamily: 'Roboto Condensed, sans-serif', fontSize: '10.5pt', color: '#4A5057', outline: 'none', boxSizing: 'border-box' }} />
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr' }}>
-                      <input type="text" name="expiryDate" value={formData.expiryDate} onChange={handleChange} placeholder="MM / YY" maxLength={5} style={{ height: '31px', border: 'none', borderRight: '1px solid #E6E8EC', padding: '0 10px', fontFamily: 'Roboto Condensed, sans-serif', fontSize: '10.5pt', color: '#4A5057', outline: 'none', boxSizing: 'border-box' }} />
-                      <input type="text" name="cvv" value={formData.cvv} onChange={handleChange} placeholder="CVC" maxLength={4} style={{ height: '31px', border: 'none', padding: '0 10px', fontFamily: 'Roboto Condensed, sans-serif', fontSize: '10.5pt', color: '#4A5057', outline: 'none', boxSizing: 'border-box' }} />
-                    </div>
+                  <div style={{ border: '1px solid #D8DDE3', borderRadius: '4px', overflow: 'hidden', background: '#FFFFFF', padding: '10px 12px' }}>
+                    <CardElement options={{
+                      style: {
+                        base: {
+                          color: '#4A5057',
+                          fontFamily: 'Roboto Condensed, sans-serif',
+                          fontSize: '14px',
+                          '::placeholder': { color: '#98A2B4' },
+                        },
+                        invalid: { color: '#ef4444' },
+                      },
+                      hidePostalCode: true,
+                    }} />
                   </div>
                 </label>
                 <label style={{ display: 'grid', rowGap: '4px', fontSize: '10pt', fontWeight: 300, color: '#667085', fontFamily: 'Roboto Condensed, sans-serif' }}>
@@ -393,7 +502,7 @@ function CheckoutContent({ cartItems, setCartItems, onCloseMegaSlide }) {
           const labelStyle = {
             fontFamily: 'Oswald, sans-serif',
             fontWeight: r.strong ? 200 : 300,
-            fontSize: r.strong ? '24pt' : '18pt',
+            fontSize: r.strong ? '18pt' : '13.5pt',
             color: r.strong ? '#474F59' : '#99A3B5',
             letterSpacing: '0.4px',
             textTransform: 'uppercase',
@@ -402,7 +511,7 @@ function CheckoutContent({ cartItems, setCartItems, onCloseMegaSlide }) {
           const amountStyle = {
             fontFamily: 'Oswald, sans-serif',
             fontWeight: r.strong ? 300 : 300,
-            fontSize: r.strong ? '24pt' : '18pt',
+            fontSize: r.strong ? '18pt' : '13.5pt',
             color: r.strong ? '#474F59' : '#99A3B5',
             letterSpacing: '0.6px',
             whiteSpace: 'nowrap',
@@ -440,5 +549,15 @@ function CheckoutContent({ cartItems, setCartItems, onCloseMegaSlide }) {
     </>
   );
 }
+
+const CheckoutContent = (props) => {
+  const stripePromise = useMemo(() => getStripe(), []);
+
+  return (
+    <Elements stripe={stripePromise}>
+      <CheckoutContentInner {...props} />
+    </Elements>
+  );
+};
 
 export default CheckoutContent;

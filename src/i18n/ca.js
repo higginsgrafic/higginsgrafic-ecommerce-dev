@@ -261,7 +261,7 @@ export const ca = {
       },
       q2: {
         question: 'Com puc fer una devolució?',
-        answer: 'Tens 30 dies per fer una devolució gratuïta. Contacta\'ns per email i t\'enviarem les instruccions.',
+        answer: 'Tens 14 dies per fer una devolució. Contacta\'ns per email i t\'enviarem les instruccions.',
       },
       q3: {
         question: 'Quins materials utilitzeu?',
@@ -306,7 +306,7 @@ export const ca = {
       freeShipping: 'Transport inclòs.',
       processing: 'Les comandes es processen en 24-48 hores laborables.',
       delivery: 'L\'enviament estàndard tarda 3-5 dies laborables.',
-      returns: 'Tens 30 dies per fer una devolució gratuïta si no estàs satisfet amb la teva compra.',
+      returns: 'Tens 14 dies per fer una devolució si no estàs satisfet amb la teva compra.',
       condition: 'Els productes retornats han d\'estar en perfecte estat, sense usar i amb les etiquetes originals.',
       seo: {
         title: 'Enviaments i Devolucions - GRÀFIC',

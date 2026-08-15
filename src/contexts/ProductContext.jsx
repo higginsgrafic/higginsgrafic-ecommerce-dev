@@ -293,7 +293,10 @@ export const ProductProvider = ({ children }) => {
       return 'Default';
     };
 
-    const variants = (storeProduct?.variants || []).map(v => {
+    const SIZE_ORDER = ['XS', 'S', 'M', 'L', 'XL', '2XL', '3XL', '4XL', '5XL'];
+    const sizeRank = (s) => { const i = SIZE_ORDER.indexOf(s); return i === -1 ? 99 : i; };
+
+    const rawVariants = (storeProduct?.variants || []).map(v => {
       const color = extractVariantColor(v);
       const size = extractVariantSize(v);
 
@@ -321,9 +324,15 @@ export const ProductProvider = ({ children }) => {
         stock: 999,
         isAvailable: true,
         image: v?.mockupUrl || mockupUrl || null,
-        gelatoVariantId: v?.id?.toString() || v?.variantId?.toString() || null,
+        gelatoVariantId: v?.productUid || v?.id?.toString() || v?.variantId?.toString() || null,
         design: null
       };
+    });
+
+    const variants = rawVariants.slice().sort((a, b) => {
+      const c = (a.color || '').localeCompare(b.color || '');
+      if (c !== 0) return c;
+      return sizeRank(a.size) - sizeRank(b.size);
     });
 
     return {

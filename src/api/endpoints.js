@@ -5,7 +5,7 @@ import apiClient from './client';
  * En desenvolupament utilitzen mocks, en producció connecten amb backend real
  */
 
-const USE_MOCK = import.meta.env.DEV || !import.meta.env.VITE_API_URL;
+const USE_MOCK = import.meta.env.DEV;
 
 // ==================== PRODUCTES ====================
 

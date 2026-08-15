@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Diagnosi del projecte — GRÀFIC E-commerce</title>
+<style>
+  :root {
+    --bg: #f8f9fa;
+    --card: #ffffff;
+    --border: #e2e8f0;
+    --text: #1a202c;
+    --muted: #64748b;
+    --green: #16a34a;
+    --green-bg: #dcfce7;
+    --red: #dc2626;
+    --red-bg: #fee2e2;
+    --yellow: #ca8a04;
+    --yellow-bg: #fef9c3;
+    --blue: #2563eb;
+    --blue-bg: #dbeafe;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    padding: 2rem 1rem;
+  }
+  .container { max-width: 900px; margin: 0 auto; }
+  h1 { font-size: 1.75rem; margin-bottom: 0.25rem; }
+  .subtitle { color: var(--muted); margin-bottom: 2rem; font-size: 0.95rem; }
+  h2 { font-size: 1.25rem; margin: 2rem 0 0.75rem; border-bottom: 2px solid var(--border); padding-bottom: 0.5rem; }
+
+  .summary-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+  .stat-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1rem 1.25rem;
+    text-align: center;
+  }
+  .stat-number { font-size: 2rem; font-weight: 700; }
+  .stat-label { font-size: 0.8rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
+  .stat-green .stat-number { color: var(--green); }
+  .stat-red .stat-number { color: var(--red); }
+  .stat-yellow .stat-number { color: var(--yellow); }
+  .stat-blue .stat-number { color: var(--blue); }
+
+  .phase {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    overflow: hidden;
+  }
+  .phase-header {
+    padding: 0.75rem 1.25rem;
+    font-weight: 600;
+    font-size: 1.05rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    user-select: none;
+  }
+  .phase-header:hover { background: #f1f5f9; }
+  .phase-badge {
+    font-size: 0.75rem;
+    padding: 0.15rem 0.6rem;
+    border-radius: 999px;
+    font-weight: 600;
+  }
+  .badge-completed { background: var(--green-bg); color: var(--green); }
+  .badge-pending { background: var(--yellow-bg); color: var(--yellow); }
+  .badge-critical { background: var(--red-bg); color: var(--red); }
+  .badge-info { background: var(--blue-bg); color: var(--blue); }
+
+  .phase-body { padding: 0; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+  }
+  th {
+    text-align: left;
+    padding: 0.5rem 1rem;
+    background: #f8fafc;
+    border-bottom: 1px solid var(--border);
+    font-weight: 600;
+    color: var(--muted);
+    text-transform: uppercase;
+    font-size: 0.7rem;
+    letter-spacing: 0.05em;
+  }
+  td {
+    padding: 0.6rem 1rem;
+    border-bottom: 1px solid #f1f5f9;
+    vertical-align: top;
+  }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: #fafbfc; }
+
+  .status-cell { white-space: nowrap; }
+  .status-dot {
+    display: inline-block;
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    margin-right: 6px;
+    vertical-align: middle;
+  }
+  .dot-completed { background: var(--green); }
+  .dot-pending { background: var(--yellow); }
+  .dot-critical { background: var(--red); }
+  .dot-optional { background: var(--blue); }
+
+  .critical-list {
+    background: var(--red-bg);
+    border: 1px solid #fca5a5;
+    border-radius: 8px;
+    padding: 1rem 1.25rem;
+    margin-bottom: 1.5rem;
+  }
+  .critical-list h3 { color: var(--red); margin-bottom: 0.5rem; font-size: 1rem; }
+  .critical-list ul { list-style: none; padding: 0; }
+  .critical-list li {
+    padding: 0.4rem 0;
+    border-bottom: 1px solid rgba(220,38,38,0.1);
+    font-size: 0.9rem;
+  }
+  .critical-list li:last-child { border-bottom: none; }
+  .critical-list code {
+    background: rgba(220,38,38,0.1);
+    padding: 0.1rem 0.3rem;
+    border-radius: 3px;
+    font-size: 0.8rem;
+  }
+
+  .acceptance {
+    background: var(--blue-bg);
+    border: 1px solid #93c5fd;
+    border-radius: 8px;
+    padding: 1rem 1.25rem;
+    margin-bottom: 1.5rem;
+  }
+  .acceptance h3 { color: var(--blue); margin-bottom: 0.5rem; font-size: 1rem; }
+  .acceptance ul { list-style: none; padding: 0; }
+  .acceptance li {
+    padding: 0.35rem 0;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+  .acceptance li::before { content: "☐"; color: var(--blue); font-weight: bold; }
+
+  .file-ref {
+    font-family: 'SF Mono', Monaco, monospace;
+    font-size: 0.78rem;
+    color: var(--muted);
+    background: #f1f5f9;
+    padding: 0.1rem 0.3rem;
+    border-radius: 3px;
+  }
+
+  .footer-note {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 0.8rem;
+    text-align: center;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <h1>Diagnosi del projecte — GRÀFIC E-commerce</h1>
+  <p class="subtitle">Data: 14 d'agost de 2026 · Última actualització: 15 d'agost de 2026 · Projecte: higginsgrafic-ecommerce-dev</p>
+
+  <div class="summary-grid">
+    <div class="stat-card stat-green">
+      <div class="stat-number">21</div>
+      <div class="stat-label">Passos completats</div>
+    </div>
+    <div class="stat-card stat-yellow">
+      <div class="stat-number">3</div>
+      <div class="stat-label">Passos pendents</div>
+    </div>
+    <div class="stat-card stat-red">
+      <div class="stat-number">1</div>
+      <div class="stat-label">Crítics per publicar</div>
+    </div>
+    <div class="stat-card stat-blue">
+      <div class="stat-number">1</div>
+      <div class="stat-label">Opcional</div>
+    </div>
+  </div>
+
+  <h2>⚠️ Problemes crítics detectats</h2>
+  <div class="critical-list">
+    <h3>Bloquejants per publicar</h3>
+    <ul>
+      <li><strong>Claus Stripe en test</strong> — <code>VITE_STRIPE_PUBLISHABLE_KEY</code> i <code>STRIPE_SECRET_KEY</code> encara són en mode test. Cal canviar a live abans de publicar.</li>
+    </ul>
+  </div>
+
+  <h2>Estat per fases</h2>
+
+  <!-- Fase 0 -->
+  <div class="phase">
+    <div class="phase-header">
+      <span>Fase 0 — Infraestructura</span>
+      <span class="phase-badge badge-completed">Completada</span>
+    </div>
+    <div class="phase-body">
+      <table>
+        <thead><tr><th></th><th>ID</th><th>Títol</th><th>Verificació</th></tr></thead>
+        <tbody>
+          <tr>
+            <td class="status-cell"><span class="status-dot dot-completed"></span>Completat</td>
+            <td>0.1</td><td>Verificar Supabase</td>
+            <td>Supabase URL activa. Taules products/orders/profiles/addresses. RLS activada.</td>
+          </tr>
+          <tr>
+            <td class="status-cell"><span class="status-dot dot-completed"></span>Completat</td>
+            <td>0.2</td><td>Configurar Stripe</td>
+            <td>pk_test_ al .env. STRIPE_SECRET_KEY a Netlify. ⚠️ Pendents canviar a live.</td>
+          </tr>
+          <tr>
+            <td class="status-cell"><span class="status-dot dot-completed"></span>Completat</td>
+            <td>0.3</td><td>Verificar Gelato</td>
+            <td>GELATO_API_KEY + STORE_ID configurats. Productes sincronitzats.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Fase 1 -->
+  <div class="phase">
+    <div class="phase-header">
+      <span>Fase 1 — Catàleg de productes reals</span>
+      <span class="phase-badge badge-pending">Parcialment completada</span>
+    </div>
+    <div class="phase-body">
+      <table>
+        <thead><tr><th></th><th>ID</th><th>Títol</th><th>Estat</th></tr></thead>
+        <tbody>
+          <tr>
+            <td class="status-cell"><span class="status-dot dot-completed"></span>Completat</td>
+            <td>1.1</td><td>Completar col·leccions</td>
+            <td>5 col·leccions configurades: first-contact, the-human-inside, austen, miscellania, cube</td>
+          </tr>
+          <tr>
+            <td class="status-cell"><span class="status-dot dot-completed"></span>Completat</td>
+            <td>1.2</td><td>Sincronitzar Gelato → Supabase</td>
+            <td>Sincronització completada. Costs reals de Gelato obtinguts via API (prices endpoint) amb descompte Gelato+ (20%) aplicat. Preus de venda actualitzats a /admin/pricing.</td>
+          </tr>
+          <tr>
+            <td class="status-cell"><span class="status-dot dot-completed"></span>Completat</td>
+            <td>1.3</td><td>Verificar ProductContext</td>
+            <td><span class="file-ref">src/contexts/ProductContext.jsx</span> — VITE_USE_MOCK_DATA=false. Clau anon Supabase corregida (reference→ref). Productes reals confirmats via API REST.</td>
+          </tr>
+          <tr>
+            <td class="status-cell"><span class="status-dot dot-completed"></span>Completat</td>
+            <td>1.4</td><td>Actualitzar productSlugs</td>
+            <td><span class="file-ref">src/config/collections.js</span> — Slugs sincronitzats amb Supabase. 14 productes the-human-inside, 27 austen, 10 cube, 7 first-contact, 5 miscellania.</td>
+          </tr>
+          <tr>
+            <td class="status-cell"><span class="status-dot dot-completed"></span>Completat</td>
+            <td>1.5</td><td>Aïllar mocks a dev</td>
+            <td>Tots els mocks (mockOrderStore, MOCK_CLIENT, endpoints.js) protegits amb <code>import.meta.env.DEV</code>. <span class="file-ref">src/api/endpoints.js</span> — USE_MOCK ara només en dev. Debug logs eliminats de <span class="file-ref">src/api/supabase-products.js</span>.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Fase 2 -->
+  <div class="phase">
+    <div class="phase-header">
+      <span>Fase 2 — Autenticació de clients</span>
+      <span class="phase-badge badge-completed">Completada</span>
+    </div>
+    <div class="phase-body">
+      <table>
+        <thead><tr><th></th><th>ID</th><th>Títol</th><th>Estat</th></tr></thead>
+        <tbody>
+          <tr><td class="status-cell"><span class="status-dot dot-completed"></span>Completat</td><td>2.1</td><td>Crear AuthContext</td><td><span class="file-ref">src/contexts/AuthContext.jsx</span> — signIn/signUp/signOut/resetPassword</td></tr>
+          <tr><td class="status-cell"><span class="status-dot dot-completed"></span>Completat</td><td>2.2</td><td>Pàgina de registre</td><td><span class="file-ref">src/pages/RegisterPage.jsx</span></td></tr>
+          <tr><td class="status-cell"><span class="status-dot dot-completed"></span>Completat</td><td>2.3</td><td>Pàgina de login</td><td><span class="file-ref">src/pages/LoginPage.jsx</span></td></tr>
+          <tr><td class="status-cell"><span class="status-dot dot-completed"></span>Completat</td><td>2.4</td><td>Rutes i ProtectedRoute</td><td><span class="file-ref">src/components/ClientProtectedRoute.jsx</span> — Rutes /login, /register, /perfil</td></tr>
+          <tr><td class="status-cell"><span class="status-dot dot-completed"></span>Completat</td><td>2.5</td><td>UserProfileTabs amb dades reals</td><td><span class="file-ref">src/hooks/useProfile.js</span> — Llegeix profiles, addresses, orders de Supabase</td></tr>
+          <tr><td class="status-cell"><span class="status-dot dot-completed"></span>Completat</td><td>2.6</td><td>Auth al mega-slide (pàg.4)</td><td>MegaslidePagina4 usa useAuth — login compacte si no auth, dades reals si auth</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Fase 3 -->
+  <div class="phase">
+    <div class="phase-header">
+      <span>Fase 3 — Pagament amb Stripe</span>
+      <span class="phase-badge badge-completed">Completada (excepte webhook)</span>
+    </div>
+    <div class="phase-body">
+      <table>
+        <thead><tr><th></th><th>ID</th><th>Títol</th><th>Estat</th></tr></thead>
+        <tbody>
+          <tr><td class="status-cell"><span class="status-dot dot-completed"></span>Completat</td><td>3.1</td><td>Netlify Function create-payment-intent</td><td><span class="file-ref">netlify/functions/create-payment-intent.js</span></td></tr>
+          <tr><td class="status-cell"><span class="status-dot dot-completed"></span>Completat</td><td>3.2</td><td>Instal·lar Stripe Elements</td><td>@stripe/react-stripe-js + stripe-js instal·lats</td></tr>
+          <tr><td class="status-cell"><span class="status-dot dot-completed"></span>Completat</td><td>3.3</td><td>Stripe Elements al CheckoutPage</td><td><span class="file-ref">src/pages/CheckoutPage.jsx</span> — CardElement substitueix inputs fake</td></tr>
+          <tr><td class="status-cell"><span class="status-dot dot-completed"></span>Completat</td><td>3.4</td><td>Flux de pagament real</td><td>handleSubmit crida create-payment-intent + stripe.confirmCardPayment()</td></tr>
+          <tr><td class="status-cell"><span class="status-dot dot-optional"></span>Opcional</td><td>3.5</td><td>Webhook Stripe</td><td><span class="file-ref">netlify/functions/stripe-webhook.js</span> — Existeix però pendent de verificar. Prioritat baixa.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Fase 4 -->
+  <div class="phase">
+    <div class="phase-header">
+      <span>Fase 4 — Flux de comanda end-to-end</span>
+      <span class="phase-badge badge-completed">Completada</span>
+    </div>
+    <div class="phase-body">
+      <table>
+        <thead><tr><th></th><th>ID</th><th>Títol</th><th>Estat</th></tr></thead>
+        <tbody>
+          <tr>
+            <td class="status-cell"><span class="status-dot dot-completed"></span>Completat</td>
+            <td>4.1</td><td>Connectar cistell al CheckoutPage</td>
+            <td><span class="file-ref">src/pages/CheckoutPage.jsx</span> — Cistell buit mostra missatge correcte. Dades mock limitades a dev. Pagament Stripe integrat.</td>
+          </tr>
+          <tr>
+            <td class="status-cell"><span class="status-dot dot-completed"></span>Completat</td>
+            <td>4.2</td><td>Crear comanda a Supabase</td>
+            <td><span class="file-ref">src/components/fullwide/CheckoutContent.jsx</span> — Pagament Stripe integrat. <code>confirmCardPayment()</code> abans de <code>createOrder()</code>. Comanda a Gelato també creada després del pagament.</td>
+          </tr>
+          <tr>
+            <td class="status-cell"><span class="status-dot dot-completed"></span>Completat</td>
+            <td>4.3</td><td>Crear comanda a Gelato</td>
+            <td><span class="file-ref">src/api/gelato.js</span> — <code>createGelatoOrder()</code> implementa crida real a Gelato API via proxy. <span class="file-ref">src/api/endpoints.js</span> manté mock per dev, però els checkouts usen <code>createGelatoOrder</code> de gelato.js directament.</td>
+          </tr>
+          <tr>
+            <td class="status-cell"><span class="status-dot dot-completed"></span>Completat</td>
+            <td>4.4</td><td>Netejar cistell i redirect</td>
+            <td>CheckoutPage: <code>clearCart()</code> + navigate. CheckoutContent: <code>setCartItems([])</code> + navigate. Ambdós redirigeixen a <code>/order-confirmation/:orderNumber</code>.</td>
+          </tr>
+          <tr>
+            <td class="status-cell"><span class="status-dot dot-completed"></span>Completat</td>
+            <td>4.5</td><td>OrderConfirmationPage amb dades reals</td>
+            <td><span class="file-ref">src/pages/OrderConfirmationPage.jsx</span> — Usa <code>fetch('/api/orders?orderNumber=')</code> en producció. Netlify Function <span class="file-ref">netlify/functions/orders.js</span> implementada amb Supabase.</td>
+          </tr>
+          <tr>
+            <td class="status-cell"><span class="status-dot dot-completed"></span>Completat</td>
+            <td>4.6</td><td>OrderTrackingPage amb Supabase</td>
+            <td><span class="file-ref">src/pages/OrderTrackingPage.jsx</span> — Usa <code>fetch('/api/orders?orderNumber=&email=')</code> en producció. Mapeig d'estats Supabase → etapes de seguiment implementat.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Fase 5 -->
+  <div class="phase">
+    <div class="phase-header">
+      <span>Fase 5 — Poliment i legal</span>
+      <span class="phase-badge badge-pending">Pendent</span>
+    </div>
+    <div class="phase-body">
+      <table>
+        <thead><tr><th></th><th>ID</th><th>Títol</th><th>Estat</th></tr></thead>
+        <tbody>
+          <tr>
+            <td class="status-cell"><span class="status-dot dot-completed"></span>Completat</td>
+            <td>5.1</td><td>Revisar continguts legals</td>
+            <td>TermsPage (394 línies), PrivacyPage (231), ShippingPage (288), FAQPage (281) — Contingut real en català. Dades empresa, zones d'enviament, FAQs completes.</td>
+          </tr>
+          <tr>
+            <td class="status-cell"><span class="status-dot dot-completed"></span>Completat</td>
+            <td>5.2</td><td>Verificar SEO</td>
+            <td><span class="file-ref">src/components/SEOProductSchema.jsx</span> — Integrat a ProductDetailPage i ProductDetailPageTemplate. robots.txt i sitemap.xml existeixen. ConstructorPdpPage usa Helmet bàsic (no és pàgina pública de producte).</td>
+          </tr>
+          <tr>
+            <td class="status-cell"><span class="status-dot dot-pending"></span>Pendent</td>
+            <td>5.3</td><td>Testing final end-to-end</td>
+            <td>Flux complet manual: registre → navegar → cistell → pagar → confirmació. Mobile responsive. Error boundary actiu.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <h2>Criteris d'acceptació</h2>
+  <div class="acceptance">
+    <h3>Abans de publicar</h3>
+    <ul>
+      <li>Productes reals visibles (mínim 1 per col·lecció)</li>
+      <li>Registre i login de clients funcionen</li>
+      <li>Pagament Stripe processat (test mode primer, live després)</li>
+      <li>Comanda creada a Supabase i Gelato després del pagament</li>
+      <li>Pàgina de confirmació mostra dades reals</li>
+      <li>Perfil d'usuari mostra dades reals</li>
+      <li>Pàgines legals amb contingut real</li>
+      <li>Error boundary actiu</li>
+      <li>Build de producció sense errors</li>
+    </ul>
+  </div>
+
+  <h2>Resum d'accions prioritàries</h2>
+  <table>
+    <thead><tr><th>Prioritat</th><th>Acció</th><th>Fitxers afectats</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><span class="phase-badge badge-critical">4 — Crític</span></td>
+        <td>Canviar claus Stripe de test a live</td>
+        <td><span class="file-ref">.env</span>, <span class="file-ref">Netlify env vars</span></td>
+      </tr>
+      <tr>
+        <td><span class="phase-badge badge-completed">Completat</span></td>
+        <td>Verificar endpoint /api/orders per OrderConfirmation i OrderTracking</td>
+        <td><span class="file-ref">netlify/functions/orders.js</span> — Implementat. OrderConfirmationPage i OrderTrackingPage usen /api/orders en producció.</td>
+      </tr>
+      <tr>
+        <td><span class="phase-badge badge-completed">Completat</span></td>
+        <td>Integrar SEOProductSchema a totes les pàgines de producte</td>
+        <td><span class="file-ref">src/pages/ProductDetailPageTemplate.jsx</span> — SEOProductSchema integrat. ProductDetailPage ja el tenia.</td>
+      </tr>
+      <tr>
+        <td><span class="phase-badge badge-completed">Completat</span></td>
+        <td>Revisar i completar pàgines legals</td>
+        <td><span class="file-ref">TermsPage.jsx</span>, <span class="file-ref">PrivacyPage.jsx</span>, <span class="file-ref">ShippingPage.jsx</span>, <span class="file-ref">FAQPage.jsx</span> — Contingut real en català.</td>
+      </tr>
+      <tr>
+        <td><span class="phase-badge badge-pending">8 — Mitjana</span></td>
+        <td>Testing final end-to-end complet</td>
+        <td>Flux manual complet</td>
+      </tr>
+      <tr>
+        <td><span class="phase-badge badge-info">9 — Opcional</span></td>
+        <td>Verificar webhook Stripe</td>
+        <td><span class="file-ref">netlify/functions/stripe-webhook.js</span></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="footer-note">
+    Diagnosi generada el 14 d'agost de 2026 · Última actualització: 15 d'agost de 2026 · GRÀFIC E-commerce · higginsgrafic-ecommerce-dev
+  </div>
+
+</div>
+</body>
+</html>

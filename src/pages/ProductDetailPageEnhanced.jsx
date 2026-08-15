@@ -232,7 +232,7 @@ export default function ProductDetailPageEnhanced() {
       return;
     }
 
-    addToCart(product, selectedSize, quantity);
+    addToCart({ ...product, gelatoVariantId: selectedVariant?.gelatoVariantId, selectedColor }, selectedSize, quantity);
     success('Producte afegit al cistell');
   };
 
@@ -715,7 +715,7 @@ export default function ProductDetailPageEnhanced() {
                 <div className="text-center">
                   <RotateCcw className="w-10 h-10 mx-auto mb-2" style={{ color: '#141414' }} />
                   <p className="text-xs font-roboto font-medium mb-1" style={{ color: '#141414' }}>
-                    Devolucions 30 dies
+                    Devolucions 14 dies
                   </p>
                   <p className="text-xs text-gray-600">sense preguntes</p>
                 </div>
@@ -1053,7 +1053,7 @@ export default function ProductDetailPageEnhanced() {
                 <RotateCcw className="w-12 h-12 mx-auto mb-3 text-gray-700" />
                 <h3 className="font-oswald font-bold text-sm uppercase mb-2">Devolució Fàcil</h3>
                 <p className="text-sm font-roboto text-gray-600">
-                  30 dies per canviar d'opinió
+                  14 dies per canviar d'opinió
                 </p>
               </div>
               <div className="text-center">

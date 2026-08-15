@@ -147,7 +147,19 @@ class GelatoClient {
    * Obtenir preus d'un producte
    */
   async getProductPrices(productUid) {
-    return this.request(`/products/${productUid}/prices`);
+    const url = new URL(this.edgeFunctionUrl);
+    url.searchParams.set('action', 'prices');
+    url.searchParams.set('productId', productUid);
+    url.searchParams.set('currency', 'EUR');
+    url.searchParams.set('country', 'ES');
+    const response = await fetch(url.toString(), {
+      headers: this.headers
+    });
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Gelato prices error: ${response.status} - ${errorText}`);
+    }
+    return response.json();
   }
 
   // ==================== STORE PRODUCTS ====================
@@ -545,16 +557,31 @@ export const createGelatoOrder = async (orderData) => {
   }
 
   try {
-    // Transformar dades de comanda al format Gelato
+    const validItems = orderData.items.filter(item => item.gelatoVariantId && item.gelatoVariantId.startsWith('apparel_'));
+    if (validItems.length === 0) {
+      console.warn('[gelato] No items with valid gelatoVariantId (productUid), skipping Gelato order');
+      return { orderId: null, status: 'skipped' };
+    }
+
     const gelatoOrderData = {
       orderReferenceId: orderData.id,
       currency: 'EUR',
-      items: orderData.items.map(item => ({
-        productUid: item.gelatoProductId,
-        variantUid: item.gelatoVariantId,
-        quantity: item.quantity,
-        files: item.designFiles || [] // URLs dels dissenys personalitzats
-      })),
+      items: validItems.map((item, idx) => {
+        const files = (item.designFiles || []).map(f => ({
+          type: 'default',
+          url: typeof f === 'string' ? f : f.url,
+        }));
+        if (files.length === 0 && item.designUrl) {
+          files.push({ type: 'default', url: item.designUrl });
+        }
+        return {
+          itemReferenceId: `item-${idx + 1}`,
+          productUid: item.gelatoVariantId,
+          variantUid: item.gelatoVariantId,
+          quantity: item.quantity,
+          files,
+        };
+      }),
       shippingAddress: {
         firstName: orderData.shippingAddress.firstName,
         lastName: orderData.shippingAddress.lastName,
@@ -568,9 +595,14 @@ export const createGelatoOrder = async (orderData) => {
 
     const response = await gelatoClient.createOrder(gelatoOrderData);
 
-        return response;
+    return {
+      orderId: response?.id || response?.orderId || null,
+      status: response?.status || 'created',
+      response,
+    };
   } catch (error) {
-        throw error;
+    console.error('[gelato] createOrder error:', error);
+    throw error;
   }
 };
 

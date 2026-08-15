@@ -10,6 +10,7 @@ import Breadcrumbs from '@/components/Breadcrumbs';
 import EditableTextBox from '@/components/dev/EditableTextBox';
 import { useDebugOverlays } from '@/hooks/useDebugOverlays';
 import StoryPosterLink from '@/components/StoryPosterLink';
+import { Flag } from './ShippingPage';
 
 const PDP_PRESET_VERSION = 'pdp-layout-2026-06-06-1953';
 
@@ -85,12 +86,12 @@ const OFFICIAL_COLORS = [
 const THUMB_COUNT = OFFICIAL_COLORS.length;
 
 const SPECS = [
-  { label: 'Material', value: '100 cotó pentinat 180/gm2', row: 9 },
-  { label: 'Tall', value: 'Crew unisex regular', row: 11 },
-  { label: 'Procedència', value: 'Bangladesh certificat', row: 13 },
-  { label: 'Estampació', value: 'Serigrafia manual aigua', row: 15 },
-  { label: 'Cura', value: 'Rentar del revés a 30°C', row: 17 },
-  { label: 'Garantia', value: 'Devolució 30 dies', row: 19 },
+  { label: 'Material', value: '100% cotó pentinat de 180 g/m²', row: 9 },
+  { label: 'Tall', value: 'Coll rodó', row: 11 },
+  { label: 'Procedència', value: <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}><Flag code="HN" size={16} /><Flag code="DO" size={16} /><Flag code="NI" size={16} /><Flag code="BD" size={16} /><Flag code="US" size={16} /></span>, row: 13 },
+  { label: 'Estampació', value: 'Impressió DTG', row: 15 },
+  { label: 'Cura', value: 'Renta-la al revés i a 30°C', row: 17 },
+  { label: 'Garantia', value: 'Devolució 14 dies', row: 19 },
 ];
 
 const SIZES = ['S', 'M', 'L', 'XL', 'XXL'];

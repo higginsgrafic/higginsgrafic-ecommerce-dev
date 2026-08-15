@@ -3,14 +3,30 @@ import { createClient } from '@supabase/supabase-js';
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
-console.log('🔧 Supabase Config:', {
-  url: supabaseUrl,
-  hasKey: !!supabaseKey,
-  keyLength: supabaseKey?.length
-});
-
 if (!supabaseUrl || !supabaseKey) {
   console.error('❌ Missing Supabase credentials!', { supabaseUrl, hasKey: !!supabaseKey });
+}
+
+let pricingCache = { global: null, collections: {} };
+let pricingLoaded = false;
+
+async function loadPricingConfig() {
+  if (pricingLoaded) return;
+  try {
+    const { data, error } = await supabase.from('pricing_config').select('*');
+    if (error) return;
+    (data || []).forEach(row => {
+      if (row.scope === 'global') pricingCache.global = parseFloat(row.price);
+      else if (row.scope === 'collection' && row.collection) pricingCache.collections[row.collection] = parseFloat(row.price);
+    });
+    pricingLoaded = true;
+  } catch {}
+}
+
+function resolvePrice(basePrice, collection) {
+  if (collection && pricingCache.collections[collection] != null) return pricingCache.collections[collection];
+  if (pricingCache.global != null) return pricingCache.global;
+  return basePrice;
 }
 
 const supabase = (supabaseUrl && supabaseKey) ? createClient(supabaseUrl, supabaseKey) : null;
@@ -190,6 +206,7 @@ export const productsService = {
             color,
             color_hex,
             price,
+            gelato_cost,
             stock,
             is_available,
             image_url,
@@ -203,6 +220,8 @@ export const productsService = {
         console.error('❌ Error fetching products:', error);
         throw error;
       }
+
+      await loadPricingConfig();
 
       console.log('✅ Products fetched:', data?.length);
       console.log('📦 Sample product:', data?.[0]);
@@ -239,6 +258,7 @@ export const productsService = {
             color,
             color_hex,
             price,
+            gelato_cost,
             stock,
             is_available,
             image_url,
@@ -571,13 +591,24 @@ function transformProduct(dbProduct) {
     .sort((a, b) => a.position - b.position)
     .map(img => img.url);
 
-  const variants = (dbProduct.product_variants || []).map(v => ({
+  const SIZE_ORDER = ['XS', 'S', 'M', 'L', 'XL', '2XL', '3XL', '4XL', '5XL'];
+  const sizeRank = (s) => { const i = SIZE_ORDER.indexOf(s); return i === -1 ? 99 : i; };
+
+  const variants = (dbProduct.product_variants || [])
+    .slice()
+    .sort((a, b) => {
+      const c = (a.color || '').localeCompare(b.color || '');
+      if (c !== 0) return c;
+      return sizeRank(a.size) - sizeRank(b.size);
+    })
+    .map(v => ({
     id: v.id,
     sku: v.sku,
     size: v.size,
     color: v.color,
     colorHex: v.color_hex,
-    price: parseFloat(v.price),
+    price: parseFloat(v.price) || resolvePrice(parseFloat(dbProduct.price), dbProduct.collection),
+    gelatoCost: parseFloat(v.gelato_cost) || null,
     stock: v.stock,
     isAvailable: v.is_available,
     image: v.image_url,
@@ -593,7 +624,7 @@ function transformProduct(dbProduct) {
     slug: dbProduct.slug,
     name: dbProduct.name,
     description: dbProduct.description,
-    price: parseFloat(dbProduct.price),
+    price: resolvePrice(parseFloat(dbProduct.price), dbProduct.collection),
     currency: dbProduct.currency,
     image: productImage,
     images: finalImages,

@@ -129,6 +129,7 @@ export default function AppRoutes({ location, pageProps, pautaEnabled, tableEnab
           <Route path="fulfillment" element={<P.FulfillmentPage />} />
           <Route path="fulfillment-settings" element={<P.FulfillmentSettingsPage />} />
           <Route path="gelato-sync" element={<P.GelatoProductsManagerPage />} />
+          <Route path="pricing" element={<P.PricingConfigPage />} />
           <Route path="gelato-blank" element={<P.GelatoBlankProductsPage />} />
           <Route path="gelato-templates" element={<P.GelatoTemplatesPage />} />
           <Route path="products-overview" element={<P.ProductsOverviewPage />} />

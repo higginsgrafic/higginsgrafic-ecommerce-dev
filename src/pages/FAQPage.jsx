@@ -1,10 +1,64 @@
 import React, { useEffect } from 'react';
 import SEO from '@/components/SEO';
+import { Flag } from './ShippingPage';
+
+export const faqShippingZones = [
+    { title: 'Zona A — UE', time: '4-7', countries: [
+      { code: 'ES', name: 'Espanya', first: '4,29', additional: '1,39', free: '50' },
+      { code: 'IT', name: 'Itàlia', first: '4,29', additional: '1,39', free: '50' },
+      { code: 'FR', name: 'França', first: '4,39', additional: '1,39', free: '50' },
+      { code: 'DE', name: 'Alemanya', first: '4,19', additional: '1,29', free: '50' },
+      { code: 'IE', name: 'Irlanda', first: '3,99', additional: '1,25', free: '50' },
+      { code: 'GB', name: 'Regne Unit', first: '3,72', additional: '1,11', free: '50' },
+      { code: 'SE', name: 'Suècia', first: '4,78', additional: '1,53', free: '50' },
+      { code: 'DK', name: 'Dinamarca', first: '4,72', additional: '1,34', free: '50' },
+    ]},
+    { title: 'Zona B — UE genèrica', time: '6-9', countries: [
+      { code: 'PT', name: 'Portugal', first: '3,99', additional: '1,25', free: '50' },
+      { code: 'BE', name: 'Bèlgica', first: '3,99', additional: '1,25', free: '50' },
+      { code: 'NL', name: 'Països Baixos', first: '3,99', additional: '1,25', free: '50' },
+      { code: 'AT', name: 'Àustria', first: '3,99', additional: '1,25', free: '50' },
+      { code: 'PL', name: 'Polònia', first: '3,99', additional: '1,25', free: '50' },
+      { code: 'CZ', name: 'Rep. Txeca', first: '3,99', additional: '1,25', free: '50' },
+      { code: 'HU', name: 'Hongria', first: '3,99', additional: '1,25', free: '50' },
+      { code: 'HR', name: 'Croàcia', first: '3,99', additional: '1,25', free: '50' },
+      { code: 'SK', name: 'Eslovàquia', first: '3,99', additional: '1,25', free: '50' },
+      { code: 'SI', name: 'Eslovènia', first: '3,99', additional: '1,25', free: '50' },
+      { code: 'BG', name: 'Bulgària', first: '3,99', additional: '1,25', free: '50' },
+      { code: 'RO', name: 'Romania', first: '3,99', additional: '1,25', free: '50' },
+      { code: 'GR', name: 'Grècia', first: '3,99', additional: '1,25', free: '50' },
+      { code: 'FI', name: 'Finlàndia', first: '3,99', additional: '1,25', free: '50' },
+      { code: 'EE', name: 'Estònia', first: '3,99', additional: '1,25', free: '50' },
+      { code: 'LV', name: 'Letònia', first: '3,99', additional: '1,25', free: '50' },
+      { code: 'LT', name: 'Lituània', first: '3,99', additional: '1,25', free: '50' },
+      { code: 'LU', name: 'Luxemburg', first: '3,99', additional: '1,25', free: '50' },
+      { code: 'MT', name: 'Malta', first: '3,99', additional: '1,25', free: '50' },
+      { code: 'CY', name: 'Xipre', first: '3,99', additional: '1,25', free: '50' },
+      { code: 'AD', name: 'Andorra', first: '3,99', additional: '1,25', free: '50' },
+    ]},
+    { title: 'Zona C — EFTA', time: '8-12', countries: [
+      { code: 'NO', name: 'Noruega', first: '7,48', additional: '2,19', free: null },
+      { code: 'IS', name: 'Islàndia', first: '8,99', additional: '1,00', free: null },
+      { code: 'LI', name: 'Liechtenstein', first: '8,99', additional: '1,00', free: null },
+      { code: 'CH', name: 'Suïssa', first: '8,99', additional: '1,00', free: null },
+    ]},
+    { title: 'Zona D — Resta del món', time: '8-15', countries: [
+      { code: 'US', name: 'Estats Units', first: '4,21', additional: '0,83', free: null },
+      { code: 'CA', name: 'Canadà', first: '8,03', additional: '2,42', free: null },
+      { code: 'AU', name: 'Austràlia', first: '7,65', additional: '2,31', free: null },
+      { code: 'NZ', name: 'Nova Zelanda', first: '5,14', additional: '0,96', free: null },
+      { code: 'BR', name: 'Brasil', first: '3,47', additional: '1,93', free: null },
+      { code: 'SG', name: 'Singapur', first: '10,03', additional: '2,41', free: null },
+      { code: 'JP', name: 'Japó', first: '9,45', additional: '2,26', free: null },
+    ]},
+  ];
 
 function FAQPage() {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
+
+  const zones = faqShippingZones;
 
   const sections = [
     {
@@ -18,10 +72,8 @@ function FAQPage() {
     },
     {
       bullet: '2. Enviaments',
+      zonesTable: true,
       items: [
-        'Quant triga l\'enviament? — Els temps de lliurament es componen de producció + enviament. Producció: 2-5 dies laborables. Enviament Espanya: 3-5 dies laborables. Enviament UE: 5-10 dies laborables. Enviament Internacional: 10-15 dies laborables. Rebreu un correu amb número de seguiment quan el paquet s\'enviï.',
-        'Quant costa l\'enviament? — Espanya: 4,95€. Unió Europea: 6,95€. Internacional: Calculat al pagament segons destinació. El cost exacte es mostra sempre abans de finalitzar la comanda.',
-        'Envieu a tot el món? — Enviem a la majoria de països del món a través de la xarxa de producció global Gelato. Els costos i temps d\'enviament varien segons el país de destinació. Podeu veure el cost exacte introduint l\'adreça durant el pagament.',
         'Puc fer seguiment de la meva comanda? — Oh i tant que sí! Un cop el paquet s\'enviï, rebreu un correu amb un número de seguiment que permetrà veure exactament on és el paquet en tot moment. També podeu contactar amb nosaltres a higginsgrafic@gmail.com si teniu qualsevol dubte.',
       ],
     },
@@ -122,6 +174,50 @@ function FAQPage() {
                   <p className="font-roboto text-[10pt] font-light text-gray-700 leading-[1.5] mb-2 pl-5">
                     {section.paragraph}
                   </p>
+                )}
+                {section.zonesTable && (
+                  <div className="pl-5 mb-3">
+                    {zones.map((zone, zi) => (
+                      <div key={zi} className="mb-4">
+                        <p className="font-roboto text-[9pt] font-bold text-gray-800 mb-1">
+                          {zone.title} <span className="font-light text-gray-500">({zone.time} dies)</span>
+                        </p>
+                        <table className="w-full mb-1" style={{ borderCollapse: 'collapse', tableLayout: 'fixed' }}>
+                          <colgroup>
+                            <col style={{ width: '40%' }} />
+                            <col style={{ width: '18%' }} />
+                            <col style={{ width: '22%' }} />
+                            <col style={{ width: '20%' }} />
+                          </colgroup>
+                          <thead>
+                            <tr style={{ borderBottom: '1px solid #E6E8EC' }}>
+                              <th className="font-roboto text-[7pt] font-normal text-gray-500 text-left py-1">País</th>
+                              <th className="font-roboto text-[7pt] font-normal text-gray-500 text-right py-1">1a peça</th>
+                              <th className="font-roboto text-[7pt] font-normal text-gray-500 text-right py-1">Addicional</th>
+                              <th className="font-roboto text-[7pt] font-normal text-gray-500 text-right py-1">Gratuït</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {zone.countries.map((c, ci) => (
+                              <tr key={ci} style={{ borderBottom: '1px solid #F0F0F0' }}>
+                                <td className="font-roboto text-[8pt] font-light text-gray-700 py-1">
+                                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', verticalAlign: 'middle' }}>
+                                    <Flag code={c.code} size={11} />
+                                    {c.name}
+                                  </span>
+                                </td>
+                                <td className="font-roboto text-[8pt] font-normal text-gray-700 text-right py-1" style={{ fontVariantNumeric: 'tabular-nums' }}>{c.first}€</td>
+                                <td className="font-roboto text-[8pt] font-light text-gray-700 text-right py-1" style={{ fontVariantNumeric: 'tabular-nums' }}>{c.additional}€</td>
+                                <td className="font-roboto text-[8pt] font-light text-right py-1" style={{ color: c.free ? '#00a651' : '#999', fontVariantNumeric: 'tabular-nums' }}>
+                                  {c.free ? `${c.free}€` : '—'}
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    ))}
+                  </div>
                 )}
                 {section.items && (
                   <ul className="pl-5 mb-0">
