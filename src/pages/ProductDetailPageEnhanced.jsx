@@ -31,6 +31,8 @@ import {
   Globe
 } from 'lucide-react';
 import { productsService } from '@/api/supabase-products';
+import { drawingStripePath } from '@/lib/drawingPaths';
+import { COLLECTIONS as MOCKUP_COLLECTIONS } from '@/lib/mockupPaths';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/contexts/ToastContext';
 import { useProductContext } from '@/contexts/ProductContext';
@@ -232,7 +234,42 @@ export default function ProductDetailPageEnhanced() {
       return;
     }
 
-    addToCart({ ...product, gelatoVariantId: selectedVariant?.gelatoVariantId, selectedColor }, selectedSize, quantity);
+    const baseCollection = product.collection || null;
+    const productRoute = product.slug && baseCollection
+      ? product.slug.replace(new RegExp('^' + baseCollection + '-'), '')
+      : null;
+    const shirtColor = selectedColor || selectedVariant?.color || 'white';
+
+    const resolveCollectionSlug = (base, route) => {
+      if (!base) return null;
+      if (base !== 'austen') return base;
+      const austenSubs = Object.keys(MOCKUP_COLLECTIONS).filter(k => k.startsWith('austen-'));
+      for (const sub of austenSubs) {
+        const designs = MOCKUP_COLLECTIONS[sub]?.designs || [];
+        if (designs.some(d => d === route || d === route.replace(/^quotes-/, ''))) return sub;
+      }
+      return base;
+    };
+    const collectionSlug = resolveCollectionSlug(baseCollection, productRoute);
+
+    const designUrl = (selectedVariant?.design)
+      ? selectedVariant.design
+      : (collectionSlug && productRoute
+          ? drawingStripePath(collectionSlug, productRoute, shirtColor)
+          : null);
+    const absoluteDesignUrl = designUrl
+      ? new URL(designUrl, window.location.origin).href
+      : null;
+    addToCart({
+      ...product,
+      gelatoVariantId: selectedVariant?.gelatoVariantId,
+      selectedColor,
+      collectionSlug,
+      productRoute,
+      color: shirtColor,
+      designUrl: absoluteDesignUrl,
+      designFiles: absoluteDesignUrl ? [absoluteDesignUrl] : [],
+    }, selectedSize, quantity);
     success('Producte afegit al cistell');
   };
 
