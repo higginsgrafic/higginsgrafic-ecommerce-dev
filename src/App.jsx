@@ -358,7 +358,7 @@ function App() {
             null
           ) : (
             !isDevLayoutRoute && (
-              <div style={isHomeRoute ? { marginTop: '-532px', position: 'relative', zIndex: 50 } : undefined}>
+              <div style={isHomeRoute ? { marginTop: '-832px', position: 'relative', zIndex: 50 } : undefined}>
                 <Footer />
               </div>
             )

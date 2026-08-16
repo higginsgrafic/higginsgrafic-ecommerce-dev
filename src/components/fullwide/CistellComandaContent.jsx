@@ -170,7 +170,6 @@ function CistellComandaContent({ cartItems, setCartItems, onCloseMegaSlide, onFi
           height: `${VISIBLE_HEIGHT}px`,
           overflow: 'hidden',
           zIndex: 2,
-          border: '1px solid red',
         }}
       >
       <div style={{
@@ -198,7 +197,6 @@ function CistellComandaContent({ cartItems, setCartItems, onCloseMegaSlide, onFi
           columnGap: `${SLIDE_GAP}px`,
           alignItems: 'stretch',
           overflow: 'hidden',
-          border: '1px solid orange',
         }}>
           <div style={{
             position: 'absolute',
@@ -222,7 +220,7 @@ function CistellComandaContent({ cartItems, setCartItems, onCloseMegaSlide, onFi
             height: '100%',
           }}>
           {/* Col 1: samarreta + dibuix (cadascú centrat amb el slot del carrusel del damunt) */}
-          <div style={{ ...colBg, position: 'relative', padding: 0, minWidth: 0, border: '1px solid purple' }}>
+          <div style={{ ...colBg, position: 'relative', padding: 0, minWidth: 0,  }}>
             <div style={{ display: 'grid', gridTemplateColumns: `${SLOT_W}px ${SLOT_W}px`, columnGap: `${SLIDE_GAP}px`, alignItems: 'center', justifyItems: 'center', height: '100%' }}>
               <div style={{
                 alignSelf: 'start',
@@ -255,7 +253,7 @@ function CistellComandaContent({ cartItems, setCartItems, onCloseMegaSlide, onFi
                 <img
                   src={(item.collectionSlug && item.productRoute ? drawingStripePath(item.collectionSlug, item.productRoute, item.color, item.finish) : item.drawing) || ''}
                   alt={item.title}
-                  style={{ width: item.title === 'NCC-1701-D' ? '54.45%' : '72.6%', height: item.title === 'NCC-1701-D' ? '54.45%' : '72.6%', objectFit: 'contain', display: 'block', transform: item.title === 'ROBBIE THE ROBOT' ? 'translateY(1px)' : undefined, filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.25))' }}
+                  style={{ width: ['NX-01','NCC-1701','NCC-1701-D'].includes(item.title) ? (item.title === 'NCC-1701-D' ? '27.225%' : '36.3%') : '72.6%', height: ['NX-01','NCC-1701','NCC-1701-D'].includes(item.title) ? (item.title === 'NCC-1701-D' ? '27.225%' : '36.3%') : '72.6%', objectFit: 'contain', display: 'block', transform: item.title === 'ROBBIE THE ROBOT' ? 'translateY(1px)' : undefined, filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.25))' }}
                 />
               </div>
             </div>
@@ -272,7 +270,7 @@ function CistellComandaContent({ cartItems, setCartItems, onCloseMegaSlide, onFi
           </div>
 
           {/* Col 2: títol + col·lecció */}
-          <div style={{ ...colBg, display: 'flex', flexDirection: 'column', justifyContent: 'center', minWidth: 0, overflow: 'hidden', padding: '0 4px', border: '1px solid cyan' }}>
+          <div style={{ ...colBg, display: 'flex', flexDirection: 'column', justifyContent: 'center', minWidth: 0, overflow: 'hidden', padding: '0 4px',  }}>
             <div style={{ ...HEAD, fontSize: '11.6424pt', lineHeight: 1.1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
               {item.title}
             </div>
@@ -282,7 +280,7 @@ function CistellComandaContent({ cartItems, setCartItems, onCloseMegaSlide, onFi
           </div>
 
           {/* Col 3: QUANTITAT + TALLATGE (cadascun centrat amb el slot del carrusel del damunt) */}
-          <div style={{ ...colBg, display: 'grid', gridTemplateColumns: `${SLOT_W}px ${SLOT_W}px`, gridTemplateRows: `${ROW_H - V_GUTTER}px ${ROW_H - V_GUTTER}px`, columnGap: `${SLIDE_GAP}px`, rowGap: `${V_GUTTER}px`, alignItems: 'center', justifyItems: 'center', border: '1px solid magenta' }}>
+          <div style={{ ...colBg, display: 'grid', gridTemplateColumns: `${SLOT_W}px ${SLOT_W}px`, gridTemplateRows: `${ROW_H - V_GUTTER}px ${ROW_H - V_GUTTER}px`, columnGap: `${SLIDE_GAP}px`, rowGap: `${V_GUTTER}px`, alignItems: 'center', justifyItems: 'center',  }}>
             <div style={{ gridRow: 2, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '4px', transform: `translateY(${-0.5 * ROW_H}px)` }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '14px', ...VAL, fontSize: '11.6424pt' }}>
                 <button onClick={() => changeQty(i, -1)} onMouseEnter={(e) => { e.currentTarget.style.color = '#475059'; e.currentTarget.style.fontSize = '12pt'; e.currentTarget.style.transform = 'scale(1.3)'; }} onMouseLeave={(e) => { e.currentTarget.style.color = '#C3C8CD'; e.currentTarget.style.fontSize = '8.7318pt'; e.currentTarget.style.transform = 'scale(1)'; }} style={{ width: `${(ROW_H - V_GUTTER) * 1.25}px`, height: `${(ROW_H - V_GUTTER) * 1.25}px`, border: '1px solid #C9D0D9', borderRadius: '50%', backgroundColor: 'transparent', color: '#C3C8CD', cursor: 'pointer', fontSize: '8.7318pt', lineHeight: 1, padding: 0, transition: 'color 0.15s ease, transform 0.15s ease, font-size 0.15s ease' }}>−</button>
@@ -300,7 +298,7 @@ function CistellComandaContent({ cartItems, setCartItems, onCloseMegaSlide, onFi
           </div>
 
           {/* Col 4: fila 1 buida · fila 2 = "TOT PLEGAT FA" + X + preu (flush dret) */}
-          <div style={{ ...colBg, display: 'grid', gridTemplateRows: `${ROW_H - V_GUTTER}px ${ROW_H - V_GUTTER}px`, rowGap: `${V_GUTTER}px`, padding: 0, justifyItems: 'end', border: '1px solid brown' }}>
+          <div style={{ ...colBg, display: 'grid', gridTemplateRows: `${ROW_H - V_GUTTER}px ${ROW_H - V_GUTTER}px`, rowGap: `${V_GUTTER}px`, padding: 0, justifyItems: 'end',  }}>
             <div />
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', transform: `translateY(${-0.5 * ROW_H}px)` }}>
               <div style={{ display: 'grid', gridTemplateColumns: 'auto 40px 40px 70px 70px', alignItems: 'center', columnGap: '8px' }}>
@@ -451,12 +449,8 @@ function CistellComandaContent({ cartItems, setCartItems, onCloseMegaSlide, onFi
               bottom: `0px`,
               left: `calc(50% - ${TABLE_WIDTH / 2}px + ${SLIDE_OFFSET_X}px)`,
               width: `${TABLE_WIDTH + COL4_EXTRA}px`,
-              height: `${rows.length * 2 * ROW_H - V_GUTTER}px`,
-              border: '1px solid blue',
-              backgroundImage: `url("${encodeURI('/placeholders/tots_els_fons/fons_acordio/fons-cistell-compra.png')}")`,
-              backgroundRepeat: 'no-repeat',
-              backgroundPosition: 'center top',
-              backgroundSize: `${TABLE_WIDTH}px 100%`,
+              height: `${rows.length * 2 * ROW_H - V_GUTTER - 3}px`,
+              background: 'linear-gradient(90deg, transparent 0%, #F0F2F5 100%)',
               transform: 'none',
               pointerEvents: 'none',
               zIndex: 1,
@@ -536,7 +530,6 @@ function CistellComandaContent({ cartItems, setCartItems, onCloseMegaSlide, onFi
         left: '50%',
         transform: 'translate(-50%, 2px)',
         width: `${TABLE_WIDTH}px`,
-        border: '1px solid green',
         display: 'grid',
         gridTemplateColumns: 'repeat(4, 1fr)',
         columnGap: `${GUTTER}px`,
@@ -557,13 +550,13 @@ function CistellComandaContent({ cartItems, setCartItems, onCloseMegaSlide, onFi
               : handleFinalizeOrder}
             aria-label={isOnCheckoutRoute ? 'Torna al checkout' : 'Finalitza la comanda'}
             style={{
-              fontFamily: 'Roboto Condensed, sans-serif',
+              fontFamily: 'Oswald, sans-serif',
               fontWeight: 500,
-              fontSize: '8.00415pt',
+              fontSize: '14.553pt',
               textTransform: 'uppercase',
-              letterSpacing: '0.05em',
-              color: '#98A2B4',
-              backgroundColor: '#F4F6F8',
+              letterSpacing: '0.4px',
+              color: '#F4F6F8',
+              backgroundColor: '#474F59',
               border: 'none',
               borderRadius: '3px',
               boxSizing: 'border-box',

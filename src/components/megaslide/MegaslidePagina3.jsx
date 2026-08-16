@@ -29,19 +29,6 @@ export default function MegaslidePagina3({
         flexDirection: 'column',
       }}>
 
-        {/* DEBUG: Rectangle mostrant l'espai real disponible */}
-        <div style={{
-          position: 'absolute',
-          top: 0,
-          left: '3%',
-          width: '94%',
-          height: '100%',
-          border: '2px dashed red',
-          boxSizing: 'border-box',
-          pointerEvents: 'none',
-          zIndex: 999,
-        }} />
-
         <div style={{
           transform: 'scale(0.94)',
           transformOrigin: 'top center',
@@ -52,8 +39,18 @@ export default function MegaslidePagina3({
           left: 0,
         }}>
 
-          <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: acordioExpanded ? '100%' : '106.4%', overflow: 'visible' }}>
-            {!acordioExpanded ? (
+          <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '106.4%', overflow: 'visible' }}>
+            <div style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              width: '100%',
+              height: '100%',
+              transform: acordioExpanded ? 'translateX(-100%)' : 'translateX(0)',
+              opacity: acordioExpanded ? 0 : 1,
+              transition: 'transform 350ms ease-in-out, opacity 300ms ease-in-out',
+              pointerEvents: acordioExpanded ? 'none' : 'auto',
+            }}>
               <CistellComandaContent
                 cartItems={cartItems}
                 setCartItems={setCartItems}
@@ -62,14 +59,25 @@ export default function MegaslidePagina3({
                   if (localCartItemCount > 0 && !acordioExpanded) setAcordioExpanded(true);
                 }}
               />
-            ) : (
+            </div>
+            <div style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              width: '100%',
+              height: '100%',
+              transform: acordioExpanded ? 'translateX(0)' : 'translateX(100%)',
+              opacity: acordioExpanded ? 1 : 0,
+              transition: 'transform 350ms ease-in-out, opacity 300ms ease-in-out',
+              pointerEvents: acordioExpanded ? 'auto' : 'none',
+            }}>
               <CheckoutContent
                 cartItems={cartItems}
                 setCartItems={setCartItems}
                 onCloseMegaSlide={() => setActive(null)}
                 onBackToCart={() => setAcordioExpanded(false)}
               />
-            )}
+            </div>
           </div>
 
         </div>
