@@ -59,6 +59,13 @@ const STRIPE_DESIGN_MAP = {
     'mazinger-c': 'mazinger-c-stripe',
     'robocube': 'robocube-stripe',
   },
+  'austen-quotes': {
+    'quotes-half-agony-half-hope': 'half-agony-half-hope',
+    'quotes-i-admire-and-love-you': 'i-prefer-to-be',
+    'quotes-it-is-a-truth': 'it-is-a-truth',
+    'quotes-unsociable-and-taciturn': 'body-and-soul',
+    'quotes-you-have-bewitched-me': 'you-must-allow-me',
+  },
 };
 
 // Mapeig productRoute → subcarpeta per a LFMD (looking-for-my-darcy)

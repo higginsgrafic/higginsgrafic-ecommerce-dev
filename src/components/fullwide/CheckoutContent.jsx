@@ -8,6 +8,8 @@ import { useShippingCosts } from '@/hooks/useShippingCosts';
 import { useOrders } from '@/hooks/useOrders';
 import { createMockOrder, MOCK_CLIENT } from '@/lib/mockOrderStore';
 import { useAuth } from '@/contexts/AuthContext';
+import { drawingStripePath } from '@/lib/drawingPaths';
+import { getMockupPath, INK_BLACK, INK_WHITE, COLLECTIONS } from '@/lib/mockupPaths';
 import { useOffersConfig } from '@/hooks/useOffersConfig';
 import { getStripe } from '@/api/stripe';
 import { createGelatoOrder } from '@/api/gelato';
@@ -274,11 +276,32 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, onBac
     marginTop: '2px',
   };
 
+  const TSHIRT_BASE = '/placeholders/apparel/t-shirt/gildan_5000/gildan-5000_t-shirt_crewneck_unisex_heavyWeight_xl_';
+  const TSHIRT_SUFFIX = '_gpr-4-0_front.png';
+  const tshirtSrc = (color) => `${TSHIRT_BASE}${color}${TSHIRT_SUFFIX}`;
+  const DARK_COLORS = new Set(['royal','purple','navy','red','irish-green','military-green','forest-green','black']);
+  const FINISH_TO_INK = { BLANC: INK_WHITE, COLOR: 'multi', NEGRE: INK_BLACK };
+  const resolveInk = (collectionSlug, shirtColor, finish) => {
+    const inks = COLLECTIONS[collectionSlug]?.inks ?? [];
+    const effFinish = finish && ['BLANC','COLOR','NEGRE'].includes(finish) ? finish : null;
+    let ink = effFinish ? FINISH_TO_INK[effFinish] : (DARK_COLORS.has(shirtColor) ? INK_WHITE : INK_BLACK);
+    if (ink === INK_WHITE && shirtColor === 'white') ink = INK_BLACK;
+    else if (ink === INK_BLACK && shirtColor === 'black') ink = INK_WHITE;
+    if (!inks.includes(ink)) ink = inks[0];
+    return ink;
+  };
+  const mockupSrc = (item) => {
+    if (!item.collectionSlug || !item.productRoute) return null;
+    const design = item.productRoute;
+    const ink = resolveInk(item.collectionSlug, item.color, item.finish);
+    return getMockupPath({ collection: item.collectionSlug, design, shirtColor: item.color, ink });
+  };
+
   return (
-    <div style={{ width:'100%', height:'106.4%', display:'flex', flexDirection:'column', fontFamily:'Roboto Condensed, sans-serif', color:'#4A5057', overflow:'visible', padding:0, margin:0 }}>
+    <div style={{ width:'100%', height:'100%', display:'flex', flexDirection:'column', fontFamily:'Roboto Condensed, sans-serif', color:'#4A5057', overflow:'visible', padding:0, margin:0 }}>
       <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr 1fr 1fr', columnGap:'24px', padding:0, margin:0, flexShrink:0, alignItems:'center' }}>
         <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between' }}>
-          <span style={{ ...HEAD, fontSize:'18pt', fontWeight:600 }}>CHECKOUT</span>
+          <span style={{ ...HEAD, fontSize:'18pt', fontWeight:600 }}>PAGAMENT</span>
           <span style={{ fontSize:'12pt', fontWeight:500 }}>La teva comanda</span>
         </div>
         <div style={{ display:'flex', alignItems:'center', justifyContent:'flex-end' }}>
@@ -294,13 +317,20 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, onBac
       <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr 1fr 1fr', columnGap:'24px', flex:'1 1 auto', minHeight:0 }}>
         {/* COL 1: Cistell + Totals */}
         <div style={{ display:'flex', flexDirection:'column', minHeight:0 }}>
-          <div style={{ flex:'1 1 auto', overflow:'visible', minHeight:0 }}>
+          <div style={{ flex:'1 1 auto', overflowY:'auto', minHeight:0 }}>
             {activeItems.map((item, idx) => {
               const ip = parseFloat(String(item.price).replace('€','').replace(/\s/g,'').replace(',','.'))||0;
               const q = item.qty||1;
               return (
                 <div key={`c-${item.id}-${idx}`} style={{ display:'grid', gridTemplateColumns:'48px 1fr auto', columnGap:'10px', alignItems:'center', padding:'8px 0', borderBottom:'1px solid #EEF0F3' }}>
-                  <div style={{ width:'48px', height:'48px', borderRadius:'4px', background:'#F3F4F6', overflow:'hidden', flexShrink:0 }}>{item.image && <img src={item.image} alt="" style={{ width:'100%', height:'100%', objectFit:'cover' }} />}</div>
+                  <div style={{ width:'48px', height:'48px', borderRadius:'4px', background:'#F3F4F6', overflow:'hidden', flexShrink:0, display:'flex', alignItems:'center', justifyContent:'center' }}>
+                    {(() => {
+                      const mockup = mockupSrc(item);
+                      return mockup
+                        ? <img src={mockup} alt="" style={{ width:'100%', height:'100%', objectFit:'contain' }} />
+                        : <img src={tshirtSrc(item.color)} alt="" style={{ width:'85%', height:'85%', objectFit:'contain' }} />;
+                    })()}
+                  </div>
                   <div style={{ overflow:'hidden' }}>
                     <div style={{ fontSize:'10.5pt', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{item.title||item.name||'Producte'}</div>
                     <div style={{ fontSize:'9pt', color:'#667085' }}>Talla: {item.size||'-'} · Qty: {q}</div>
