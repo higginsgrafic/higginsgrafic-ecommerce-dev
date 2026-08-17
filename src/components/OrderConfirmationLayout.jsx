@@ -28,10 +28,11 @@ const OrderConfirmationLayout = ({
   if (!orderData) return null;
 
   const items = orderData.items || [];
-  const subtotal = items.reduce((sum, item) => sum + (parseFloat(item.price) || 0) * (item.quantity || 1), 0);
+  const subtotal = orderData.subtotal || items.reduce((sum, item) => sum + (parseFloat(item.price) || 0) * (item.quantity || 1), 0);
   const discountAmount = discountEnabled ? subtotal * discountRate : 0;
-  const totalPlegat = subtotal - discountAmount;
-  const ivaAmount = totalPlegat * 0.21;
+  const shipping = orderData.shipping || 0;
+  const ivaAmount = orderData.iva || 0;
+  const totalPlegat = orderData.total || subtotal - discountAmount;
   const maxScroll = Math.max(0, items.length - VISIBLE_ROWS);
 
   useEffect(() => {
@@ -137,10 +138,10 @@ const OrderConfirmationLayout = ({
         top: 'calc(50% + 14px + (25% + 59.5px) * 11 / 15)',
         left: 'calc(33.33% + 83px)',
         width: 'calc(33.33% - 166px)',
-        height: `calc((25% + 59.5px) * ${discountEnabled ? 4 : 3} / 15)`,
+        height: `calc((25% + 59.5px) * ${discountEnabled ? 5 : 4} / 15)`,
         zIndex: 1,
         display: 'grid',
-        gridTemplateRows: `repeat(${discountEnabled ? 4 : 3}, 1fr)`,
+        gridTemplateRows: `repeat(${discountEnabled ? 5 : 4}, 1fr)`,
         gridTemplateColumns: '1fr 90px 90px auto',
         justifyContent: 'space-between',
         fontFamily: 'Roboto, sans-serif',
@@ -159,6 +160,10 @@ const OrderConfirmationLayout = ({
         <div style={{ padding: '0 20px', fontWeight: 400, opacity: 0.7, textAlign: 'left', whiteSpace: 'nowrap', display: 'flex', alignItems: 'center', minHeight: 0, overflow: 'hidden', gridColumn: '2 / 4' }}>Descompte&nbsp;<span style={{ fontSize: '11.48px' }}>({discountLabel})</span></div>
         <div style={{ padding: '0 20px', fontWeight: 400, opacity: 0.7, textAlign: 'right', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', minHeight: 0, overflow: 'hidden', }}>-{formatPrice(discountAmount)}</div>
         </>)}
+        {/* Ports */}
+        <div />
+        <div style={{ padding: '0 20px', fontWeight: 400, opacity: 0.7, textAlign: 'left', whiteSpace: 'nowrap', display: 'flex', alignItems: 'center', minHeight: 0, overflow: 'hidden', gridColumn: '2 / 4' }}>Ports</div>
+        <div style={{ padding: '0 20px', fontWeight: 400, opacity: 0.7, textAlign: 'right', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', minHeight: 0, overflow: 'hidden', }}>{formatPrice(shipping)}</div>
         {/* IVA */}
         <div />
         <div style={{ padding: '0 20px', fontWeight: 400, opacity: 0.7, textAlign: 'left', whiteSpace: 'nowrap', display: 'flex', alignItems: 'center', minHeight: 0, overflow: 'hidden', gridColumn: '2 / 4' }}>IVA {ivaRate}</div>
