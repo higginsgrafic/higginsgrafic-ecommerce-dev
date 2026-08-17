@@ -4,6 +4,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Search, User, Menu, X } from 'lucide-react';
 import { createPortal } from 'react-dom';
 import { Button } from '@/components/ui/button';
+import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
 import { useTexts } from '@/hooks/useTexts';
 
 function MainHeader({
@@ -824,6 +825,8 @@ function MainHeader({
             </div>
 
             <div className="flex items-center justify-end gap-1">
+              <Tooltip>
+              <TooltipTrigger asChild>
               <Button
                 variant="ghost"
                 size="icon"
@@ -864,7 +867,12 @@ function MainHeader({
                   </span>
                 )}
               </Button>
+              </TooltipTrigger>
+              <TooltipContent>Cistell</TooltipContent>
+              </Tooltip>
 
+              <Tooltip>
+              <TooltipTrigger asChild>
               <Button
                 variant="ghost"
                 size="icon"
@@ -877,6 +885,9 @@ function MainHeader({
               >
                 <User className="h-5 w-5 lg:h-6 lg:w-6" strokeWidth={1.5} />
               </Button>
+              </TooltipTrigger>
+              <TooltipContent>Compte</TooltipContent>
+              </Tooltip>
             </div>
           </div>
         </div>

@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, ChevronLeft, ChevronRight, ZoomIn } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
 import { useGridDebug } from '@/contexts/GridDebugContext';
 import { formatPrice } from '@/utils/formatters';
 
@@ -75,6 +76,8 @@ function ProductDetail({ product, onClose, onAddToCart }) {
             <h2 className="font-oswald text-xl sm:text-2xl font-bold truncate pr-4" style={{ color: "#141414" }}>
               {product.name}
             </h2>
+            <Tooltip>
+            <TooltipTrigger asChild>
             <Button
               ref={closeButtonRef}
               variant="ghost"
@@ -86,6 +89,9 @@ function ProductDetail({ product, onClose, onAddToCart }) {
             >
               <X className="h-5 w-5" />
             </Button>
+            </TooltipTrigger>
+            <TooltipContent>Tancar</TooltipContent>
+            </Tooltip>
           </div>
 
           {/* Content */}
@@ -115,27 +121,44 @@ function ProductDetail({ product, onClose, onAddToCart }) {
                   </AnimatePresence>
 
                   {/* Zoom indicator */}
-                  <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm rounded-full p-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <Tooltip>
+                  <TooltipTrigger asChild>
+                  <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm rounded-full p-2 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer" onClick={() => setIsZoomed(!isZoomed)}>
                     <ZoomIn className="h-4 w-4" style={{ color: "#141414" }} />
                   </div>
+                  </TooltipTrigger>
+                  <TooltipContent>Zoom</TooltipContent>
+                  </Tooltip>
 
                   {/* Fletxes de navegació */}
                   {gallery.length > 1 && (
                     <>
+                      <Tooltip>
+                      <TooltipTrigger asChild>
                       <button
                         onClick={prevImage}
                         className="absolute left-2 top-1/2 -translate-y-1/2 bg-white/90 backdrop-blur-sm rounded-full p-2 shadow-lg opacity-0 group-hover:opacity-100 transition-opacity hover:bg-white"
                         style={{ color: "#141414" }}
+                        aria-label="Imatge anterior"
                       >
                         <ChevronLeft className="h-5 w-5" />
                       </button>
+                      </TooltipTrigger>
+                      <TooltipContent>Anterior</TooltipContent>
+                      </Tooltip>
+                      <Tooltip>
+                      <TooltipTrigger asChild>
                       <button
                         onClick={nextImage}
                         className="absolute right-2 top-1/2 -translate-y-1/2 bg-white/90 backdrop-blur-sm rounded-full p-2 shadow-lg opacity-0 group-hover:opacity-100 transition-opacity hover:bg-white"
                         style={{ color: "#141414" }}
+                        aria-label="Imatge següent"
                       >
                         <ChevronRight className="h-5 w-5" />
                       </button>
+                      </TooltipTrigger>
+                      <TooltipContent>Següent</TooltipContent>
+                      </Tooltip>
                     </>
                   )}
 

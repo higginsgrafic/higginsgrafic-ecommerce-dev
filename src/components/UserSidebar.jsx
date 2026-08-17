@@ -1,6 +1,7 @@
 import React, { useRef, useEffect } from 'react';
 import { X, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
 import { Link } from 'react-router-dom';
 import { useFocusTrap } from '@/hooks/useFocusTrap';
 import { useGridDebug } from '@/contexts/GridDebugContext';
@@ -114,9 +115,14 @@ const UserSidebar = ({ isOpen, onClose }) => {
         <div className="p-4 sm:p-6 border-b bg-white">
           <div className="flex items-center justify-between">
             <h2 id="user-sidebar-title" className="text-xl sm:text-2xl font-oswald font-bold uppercase" style={{ color: '#141414' }}>Menú</h2>
+            <Tooltip>
+            <TooltipTrigger asChild>
             <Button variant="ghost" size="icon" onClick={onClose} aria-label="Tanca el menú">
               <X className="h-6 w-6" style={{ color: '#141414' }} />
             </Button>
+            </TooltipTrigger>
+            <TooltipContent>Tancar</TooltipContent>
+            </Tooltip>
           </div>
         </div>
 

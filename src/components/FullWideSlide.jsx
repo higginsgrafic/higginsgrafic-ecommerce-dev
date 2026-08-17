@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Menu, Search, X } from 'lucide-react';
+import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
 
 function normalizeText(value) {
   return (value || '')
@@ -160,6 +161,8 @@ export default function FullWideSlide({
                   {subtitle ? <div className="text-xs text-muted-foreground">{subtitle}</div> : null}
                 </div>
 
+                <Tooltip>
+                <TooltipTrigger asChild>
                 <button
                   type="button"
                   className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-border text-foreground hover:bg-muted"
@@ -168,9 +171,14 @@ export default function FullWideSlide({
                 >
                   <X className="h-4 w-4" />
                 </button>
+                </TooltipTrigger>
+                <TooltipContent>Tancar</TooltipContent>
+                </Tooltip>
               </div>
             ) : (
               <div className="flex items-center justify-end border-b border-border px-4 py-3">
+                <Tooltip>
+                <TooltipTrigger asChild>
                 <button
                   type="button"
                   className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-border text-foreground hover:bg-muted"
@@ -179,6 +187,9 @@ export default function FullWideSlide({
                 >
                   <X className="h-4 w-4" />
                 </button>
+                </TooltipTrigger>
+                <TooltipContent>Tencar</TooltipContent>
+                </Tooltip>
               </div>
             )}
 
