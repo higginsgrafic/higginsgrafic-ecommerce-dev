@@ -59,9 +59,10 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, onBac
   const preu = grossSum;
   const descompte = discountEnabled ? preu * discountRate : 0;
   const totalPlegat = preu - descompte;
-  const ivaAmount = totalPlegat * 0.21;
   const { getCost, zoneInfo } = useShippingCosts('es_peninsula');
-  const shipping = getCost(grossSum / 1.21);
+  const shipping = getCost(totalPlegat);
+  const baseImponible = (totalPlegat - shipping) / 1.21;
+  const ivaAmount = (totalPlegat - shipping) - baseImponible;
   const total = totalPlegat;
 
   const fmt = (n) => n.toFixed(2).replace('.', ',') + '€';
@@ -343,7 +344,7 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, onBac
           <div style={{ flexShrink:0, paddingTop:'12px', borderTop:'1px solid #E6E8EC', marginTop:'8px' }}>
             <div style={{ display:'flex', justifyContent:'space-between', fontSize:'10pt', color:'#667085', padding:'2px 0' }}><span>Subtotal</span><span style={{ fontVariantNumeric:'tabular-nums' }}>{preu.toFixed(2).replace('.',',')}€</span></div>
             {discountEnabled && <div style={{ display:'flex', justifyContent:'space-between', fontSize:'10pt', color:'#667085', padding:'2px 0' }}><span>Descompte (-{offersConfig.discountRate}%)</span><span style={{ fontVariantNumeric:'tabular-nums' }}>-{descompte.toFixed(2).replace('.',',')}€</span></div>}
-            <div style={{ display:'flex', justifyContent:'space-between', fontSize:'10pt', color:'#667085', padding:'2px 0' }}><span>Portes</span><span style={{ fontVariantNumeric:'tabular-nums' }}>{shipping.toFixed(2).replace('.',',')}€</span></div>
+            <div style={{ display:'flex', justifyContent:'space-between', fontSize:'10pt', color:'#667085', padding:'2px 0' }}><span>Ports</span><span style={{ fontVariantNumeric:'tabular-nums' }}>{shipping.toFixed(2).replace('.',',')}€</span></div>
             <div style={{ display:'flex', justifyContent:'space-between', fontSize:'10pt', color:'#667085', padding:'2px 0' }}><span>IVA 21%</span><span style={{ fontVariantNumeric:'tabular-nums' }}>{ivaAmount.toFixed(2).replace('.',',')}€</span></div>
             <div style={{ display:'flex', justifyContent:'space-between', fontSize:'13pt', fontWeight:500, padding:'8px 0 0', borderTop:'1px solid #E6E8EC', marginTop:'4px' }}><span>Total</span><span style={{ fontVariantNumeric:'tabular-nums' }}>{totalPlegat.toFixed(2).replace('.',',')}€</span></div>
           </div>
