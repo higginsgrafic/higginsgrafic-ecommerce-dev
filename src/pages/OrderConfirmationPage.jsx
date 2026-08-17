@@ -34,6 +34,10 @@ const OrderConfirmationPage = () => {
               quantity: item.quantity || 1,
               price: item.price || 0,
             })),
+            shipping: mockOrder.shipping_cost || 0,
+            iva: mockOrder.iva || 0,
+            total: mockOrder.total || 0,
+            subtotal: mockOrder.subtotal || 0,
           });
         } else {
           setError('Comanda no trobada');
@@ -58,6 +62,10 @@ const OrderConfirmationPage = () => {
               quantity: item.quantity || 1,
               price: item.price || 0,
             })),
+            shipping: o.shipping_cost || 0,
+            iva: o.iva || 0,
+            total: o.total || 0,
+            subtotal: o.subtotal || 0,
           });
         } else {
           setError('Comanda no trobada');
