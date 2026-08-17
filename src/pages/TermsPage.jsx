@@ -41,7 +41,7 @@ function TermsPage() {
         'Tots els preus inclouen l\'IVA (21% disposat per l\'estat espanyol).',
         'Els preus poden variar sense cap avís.',
         'El preu aplicable és el vigent en el moment de la comanda.',
-        'Els costos d\'enviament s\'afegiran al preu del producte.',
+        'Els costos d\'enviament estan inclosos en el preu total mostrat.',
       ],
     },
     {
@@ -292,7 +292,7 @@ function TermsPage() {
             Termes i Condicions
           </h1>
           <p className="font-roboto text-[10pt] font-normal text-gray-500 mb-24 text-center">
-            Darrera actualització, juliol 2026
+            Darrera actualització, agost 2026
           </p>
         </div>
 

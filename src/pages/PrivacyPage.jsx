@@ -124,7 +124,7 @@ function PrivacyPage() {
             Política de Privacitat
           </h1>
           <p className="font-roboto text-[10pt] font-normal text-gray-500 mb-24 text-center">
-            Darrera actualització, juliol 2026
+            Darrera actualització, agost 2026
           </p>
         </div>
 
