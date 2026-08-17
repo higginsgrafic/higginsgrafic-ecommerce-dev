@@ -1,6 +1,7 @@
 import Stripe from 'stripe';
 import { createClient } from '@supabase/supabase-js';
 import { createGelatoOrderServer } from './_gelato.js';
+import { sendOrderEmail } from './_email.js';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
@@ -52,6 +53,7 @@ async function fulfillGelato(supabase, order) {
         return 'retry';
       }
       console.log('[stripe-webhook] Comanda creada a Gelato:', gelato.orderId);
+      await sendOrderEmail('order_in_production', order);
     }
     return 'ok';
   } catch (err) {
@@ -117,6 +119,7 @@ export async function handler(event, context) {
             console.error('[stripe-webhook] Error updating order:', error.message);
           } else if (data) {
             console.log('[stripe-webhook] Order updated to confirmada:', data.order_number || data.id);
+            await sendOrderEmail('order_confirmed', data);
             const result = await fulfillGelato(supabase, data);
             if (result === 'retry') {
               return jsonResponse(500, { error: 'Gelato fulfillment pendent de reintent' });
@@ -146,6 +149,14 @@ export async function handler(event, context) {
             console.error('[stripe-webhook] Error updating failed order:', failError.message);
           } else {
             console.log('[stripe-webhook] Order marked as cancel_lada for PI:', paymentIntent.id);
+          const { data: failData } = await supabaseFail
+            .from('orders')
+            .select()
+            .eq('payment_intent_id', paymentIntent.id)
+            .single();
+          if (failData) {
+            await sendOrderEmail('order_failed', failData);
+          }
           }
         }
         break;
