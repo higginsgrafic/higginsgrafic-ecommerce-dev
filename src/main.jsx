@@ -72,6 +72,7 @@ import { WishlistProvider } from '@/contexts/WishlistContext';
 import { ToastProvider } from '@/contexts/ToastContext';
 import { GridDebugProvider } from '@/contexts/GridDebugContext';
 import { AuthProvider } from '@/contexts/AuthContext';
+import { TooltipProvider } from '@/components/ui/tooltip';
 import App from '@/App';
 import BranchBadge from '@/components/dev/BranchBadge';
 import ActiveWorkOverlay from '@/components/dev/ActiveWorkOverlay';
@@ -88,6 +89,7 @@ window.__GRAFIC_REACT_MOUNTED__ = false;
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <BrowserRouter>
+    <TooltipProvider delayDuration={400}>
     <AuthProvider>
       <GridDebugProvider>
         <CartProvider>
@@ -103,6 +105,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
         </CartProvider>
       </GridDebugProvider>
     </AuthProvider>
+    </TooltipProvider>
   </BrowserRouter>
 );
 

@@ -1,5 +1,6 @@
 import React, { useLayoutEffect, useState } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
 
 const EpisodeControls = ({ currentEpisode, onPrevious, onNext, layout = 'desktop' }) => {
   if (layout === 'desktop') {
@@ -56,6 +57,8 @@ const EpisodeControls = ({ currentEpisode, onPrevious, onNext, layout = 'desktop
         </div>
 
         <div style={{ position: 'absolute', top: '78px', left: arrowsLeft || '975px', height: '32px', width: '70px', transform: 'scale(1.01)', zIndex: 2, display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
+          <Tooltip>
+          <TooltipTrigger asChild>
           <button
             onClick={onPrevious}
             style={{
@@ -74,10 +77,14 @@ const EpisodeControls = ({ currentEpisode, onPrevious, onNext, layout = 'desktop
               flexShrink: 0
             }}
             aria-label="Episodi anterior"
-            title="Episodi anterior"
           >
             <ChevronLeft strokeWidth={2.5} style={{ width: '20px', height: '20px', display: 'block' }} />
           </button>
+          </TooltipTrigger>
+          <TooltipContent>Anterior</TooltipContent>
+          </Tooltip>
+          <Tooltip>
+          <TooltipTrigger asChild>
           <button
             onClick={onNext}
             style={{
@@ -96,10 +103,12 @@ const EpisodeControls = ({ currentEpisode, onPrevious, onNext, layout = 'desktop
               flexShrink: 0
             }}
             aria-label="Episodi següent"
-            title="Episodi següent"
           >
             <ChevronRight strokeWidth={2.5} style={{ width: '20px', height: '20px', display: 'block' }} />
           </button>
+          </TooltipTrigger>
+          <TooltipContent>Següent</TooltipContent>
+          </Tooltip>
         </div>
       </>
     );
@@ -115,6 +124,8 @@ const EpisodeControls = ({ currentEpisode, onPrevious, onNext, layout = 'desktop
           Temporada {currentEpisode.season} - Episodi {currentEpisode.episode}
         </span>
       </div>
+      <Tooltip>
+      <TooltipTrigger asChild>
       <button
         onClick={onPrevious}
         className="bg-transparent text-foreground p-2"
@@ -122,6 +133,11 @@ const EpisodeControls = ({ currentEpisode, onPrevious, onNext, layout = 'desktop
       >
         <ChevronLeft className="h-5 w-5" strokeWidth={2.5} />
       </button>
+      </TooltipTrigger>
+      <TooltipContent>Anterior</TooltipContent>
+      </Tooltip>
+      <Tooltip>
+      <TooltipTrigger asChild>
       <button
         onClick={onNext}
         className="bg-transparent text-foreground p-2"
@@ -129,6 +145,9 @@ const EpisodeControls = ({ currentEpisode, onPrevious, onNext, layout = 'desktop
       >
         <ChevronRight className="h-5 w-5" strokeWidth={2.5} />
       </button>
+      </TooltipTrigger>
+      <TooltipContent>Següent</TooltipContent>
+      </Tooltip>
     </div>
   );
 };
