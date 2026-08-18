@@ -89,7 +89,7 @@ window.__GRAFIC_REACT_MOUNTED__ = false;
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <BrowserRouter>
-    <TooltipProvider delayDuration={400}>
+    <TooltipProvider delayDuration={200} skipDelayDuration={0}>
     <AuthProvider>
       <GridDebugProvider>
         <CartProvider>

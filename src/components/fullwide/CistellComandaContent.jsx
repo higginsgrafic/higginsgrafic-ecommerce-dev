@@ -422,14 +422,16 @@ function CistellComandaContent({ cartItems, setCartItems, onCloseMegaSlide, onFi
       {/* Totals — SUBTOTAL / TRANSPORT / IVA / TOTAL, just a sobre de la botonera */}
       {(() => {
         const totalQty = CART_ITEMS.reduce((acc, it) => acc + (it.qty || 1), 0);
-        const subtotal = CART_ITEMS.reduce((acc, it) => {
+        const itemTotal = CART_ITEMS.reduce((acc, it) => {
           const unit = parseFloat(String(it.price).replace('€','').replace(/\s/g,'').replace(',','.'));
           if (Number.isNaN(unit)) return acc;
           return acc + unit * (it.qty || 1);
         }, 0);
         const transport = zoneInfo.cost;
-        const grossTotal = subtotal;
-        const iva = subtotal * 0.21;
+        const grossTotal = itemTotal;
+        const baseImponible = (grossTotal - transport) / 1.21;
+        const iva = (grossTotal - transport) - baseImponible;
+        const subtotal = baseImponible;
         const fmt = (n) => n.toFixed(2).replace('.', ',') + '€';
         // Només mostrem TOT PLEGAT FA. SUBTOTAL/TRANSPORT/IVA
         // s'han eliminat per alliberar 2 files que ara ocupa la

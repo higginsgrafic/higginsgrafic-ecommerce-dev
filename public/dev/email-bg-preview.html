@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>NOMBRE DE SEGUIMENT — preview</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Roboto+Condensed:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: #F5F5F7; display: flex; justify-content: center; padding: 24px 8px; }
+    .canvas {
+      width: 520px;
+      max-width: 100%;
+      min-height: 727px;
+      background-image: url('/placeholders/tots_els_fons/fons_correu/NOMBRE%20DE%20SEGUIMENT.png?nocache=20260818e');
+      background-size: 100% 100%;
+      background-repeat: no-repeat;
+      background-position: center;
+      padding: 34px 48px 24px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+    }
+    .canvas > * { position: relative; z-index: 1; }
+    .logo { text-align: center; height: 36px; transform: translateY(2px); }
+    .logo img { height: 30px; width: auto; }
+    .header { text-align: center; position: absolute; z-index: 3; bottom: calc(75% - 15px); left: 0; width: 100%; }
+    .header .status { font-family: 'Roboto Condensed',Helvetica,Arial,sans-serif; font-size: 14px; font-weight: 700; color: #141414; margin-bottom: 3px; }
+    .header .label { font-family: 'Roboto Condensed',Helvetica,Arial,sans-serif; font-size: 14px; font-weight: 400; letter-spacing: 0.5px; color: #141414; text-transform: uppercase; margin-bottom: 6px; transform: translateY(-5px); }
+    .header .number { font-family: 'Roboto Condensed',Helvetica,Arial,sans-serif; font-size: 24px; font-weight: 400; letter-spacing: 0.75px; color: #141414; text-transform: uppercase; transform: translateY(-10px); }
+    .message { text-align: left; position: absolute; z-index: 3; top: 30%; left: 16.66%; width: 66.68%; font-family: Roboto,Helvetica,Arial,sans-serif; font-size: 14px; font-weight: 400; color: #141414; line-height: 1.6; }
+    .info-table { width: 100%; height: 100%; border-collapse: collapse; position: absolute; top: 0; left: 0; z-index: 2; display: none; }
+    .info-table td { padding: 0; font-family: 'Roboto Condensed',Helvetica,Arial,sans-serif; font-size: 9px; color: rgba(20,20,20,0.25); text-align: center; border: 1px solid rgba(20,20,20,0.25); background: transparent; opacity: 0.3; }
+    .reminder { text-align: left; position: absolute; z-index: 3; top: calc(60.71% - 10px); left: 16.66%; width: 66.68%; font-family: Roboto,Helvetica,Arial,sans-serif; font-size: 14px; font-weight: 400; color: #141414; line-height: 1.6; }
+    .pill-number { position: absolute; z-index: 3; top: 50%; left: 16.66%; width: 66.68%; transform: translateY(-50%); text-align: center; font-family: 'Roboto Condensed',Helvetica,Arial,sans-serif; font-size: 24px; font-weight: 500; letter-spacing: 1px; color: #141414; text-transform: uppercase; }
+    .track-link { text-align: center; position: absolute; z-index: 3; top: calc(75% + 15px); left: 0; width: 100%; font-family: 'Roboto Condensed',Helvetica,Arial,sans-serif; font-size: 16px; font-weight: 400; color: #141414; }
+    .footer-url { text-align: center; position: absolute; z-index: 3; bottom: calc(5% + 10px); left: 0; width: 100%; font-family: 'Roboto Condensed',Helvetica,Arial,sans-serif; font-size: 14px; font-weight: 400; color: #141414; }
+  </style>
+</head>
+<body>
+  <div class="canvas">
+    <div class="logo"><img src="/custom_logos/brand/HIGGINS GRAFIC NEGRE.png" alt="Higgins Gràfic"></div>
+    <div class="header">
+      <div class="status">Actualització d'estat</div>
+      <div class="label">Nombre de seguiment</div>
+      <div class="number">PQ401234567ES</div>
+    </div>
+    <div class="message">
+      Hola Maria,<br>
+      <span style="display:inline-block;transform:translateY(12px);">La comanda que has demanat serà en repartiment ben <span style="display:inline-block;transform:translateY(-5px);">aviat. Aquí tens el nombre de seguiment.</span></span>
+    </div>
+    <table class="info-table">
+      <tbody>
+        <tr><td>A1</td><td>B1</td><td>C1</td><td>D1</td><td>E1</td><td>F1</td><td>G1</td><td>H1</td><td>I1</td><td>J1</td><td>K1</td><td>L1</td></tr>
+        <tr><td>A2</td><td>B2</td><td>C2</td><td>D2</td><td>E2</td><td>F2</td><td>G2</td><td>H2</td><td>I2</td><td>J2</td><td>K2</td><td>L2</td></tr>
+        <tr><td>A3</td><td>B3</td><td>C3</td><td>D3</td><td>E3</td><td>F3</td><td>G3</td><td>H3</td><td>I3</td><td>J3</td><td>K3</td><td>L3</td></tr>
+        <tr><td>A4</td><td>B4</td><td>C4</td><td>D4</td><td>E4</td><td>F4</td><td>G4</td><td>H4</td><td>I4</td><td>J4</td><td>K4</td><td>L4</td></tr>
+        <tr><td>A5</td><td>B5</td><td>C5</td><td>D5</td><td>E5</td><td>F5</td><td>G5</td><td>H5</td><td>I5</td><td>J5</td><td>K5</td><td>L5</td></tr>
+        <tr><td>A6</td><td>B6</td><td>C6</td><td>D6</td><td>E6</td><td>F6</td><td>G6</td><td>H6</td><td>I6</td><td>J6</td><td>K6</td><td>L6</td></tr>
+        <tr><td>A7</td><td>B7</td><td>C7</td><td>D7</td><td>E7</td><td>F7</td><td>G7</td><td>H7</td><td>I7</td><td>J7</td><td>K7</td><td>L7</td></tr>
+        <tr><td>A8</td><td>B8</td><td>C8</td><td>D8</td><td>E8</td><td>F8</td><td>G8</td><td>H8</td><td>I8</td><td>J8</td><td>K8</td><td>L8</td></tr>
+        <tr><td>A9</td><td>B9</td><td>C9</td><td>D9</td><td>E9</td><td>F9</td><td>G9</td><td>H9</td><td>I9</td><td>J9</td><td>K9</td><td>L9</td></tr>
+        <tr><td>A10</td><td>B10</td><td>C10</td><td>D10</td><td>E10</td><td>F10</td><td>G10</td><td>H10</td><td>I10</td><td>J10</td><td>K10</td><td>L10</td></tr>
+        <tr><td>A11</td><td>B11</td><td>C11</td><td>D11</td><td>E11</td><td>F11</td><td>G11</td><td>H11</td><td>I11</td><td>J11</td><td>K11</td><td>L11</td></tr>
+        <tr><td>A12</td><td>B12</td><td>C12</td><td>D12</td><td>E12</td><td>F12</td><td>G12</td><td>H12</td><td>I12</td><td>J12</td><td>K12</td><td>L12</td></tr>
+        <tr><td>A13</td><td>B13</td><td>C13</td><td>D13</td><td>E13</td><td>F13</td><td>G13</td><td>H13</td><td>I13</td><td>J13</td><td>K13</td><td>L13</td></tr>
+        <tr><td>A14</td><td>B14</td><td>C14</td><td>D14</td><td>E14</td><td>F14</td><td>G14</td><td>H14</td><td>I14</td><td>J14</td><td>K14</td><td>L14</td></tr>
+        <tr><td>A15</td><td>B15</td><td>C15</td><td>D15</td><td>E15</td><td>F15</td><td>G15</td><td>H15</td><td>I15</td><td>J15</td><td>K15</td><td>L15</td></tr>
+        <tr><td>A16</td><td>B16</td><td>C16</td><td>D16</td><td>E16</td><td>F16</td><td>G16</td><td>H16</td><td>I16</td><td>J16</td><td>K16</td><td>L16</td></tr>
+        <tr><td>A17</td><td>B17</td><td>C17</td><td>D17</td><td>E17</td><td>F17</td><td>G17</td><td>H17</td><td>I17</td><td>J17</td><td>K17</td><td>L17</td></tr>
+        <tr><td>A18</td><td>B18</td><td>C18</td><td>D18</td><td>E18</td><td>F18</td><td>G18</td><td>H18</td><td>I18</td><td>J18</td><td>K18</td><td>L18</td></tr>
+        <tr><td>A19</td><td>B19</td><td>C19</td><td>D19</td><td>E19</td><td>F19</td><td>G19</td><td>H19</td><td>I19</td><td>J19</td><td>K19</td><td>L19</td></tr>
+        <tr><td>A20</td><td>B20</td><td>C20</td><td>D20</td><td>E20</td><td>F20</td><td>G20</td><td>H20</td><td>I20</td><td>J20</td><td>K20</td><td>L20</td></tr>
+        <tr><td>A21</td><td>B21</td><td>C21</td><td>D21</td><td>E21</td><td>F21</td><td>G21</td><td>H21</td><td>I21</td><td>J21</td><td>K21</td><td>L21</td></tr>
+        <tr><td>A22</td><td>B22</td><td>C22</td><td>D22</td><td>E22</td><td>F22</td><td>G22</td><td>H22</td><td>I22</td><td>J22</td><td>K22</td><td>L22</td></tr>
+        <tr><td>A23</td><td>B23</td><td>C23</td><td>D23</td><td>E23</td><td>F23</td><td>G23</td><td>H23</td><td>I23</td><td>J23</td><td>K23</td><td>L23</td></tr>
+        <tr><td>A24</td><td>B24</td><td>C24</td><td>D24</td><td>E24</td><td>F24</td><td>G24</td><td>H24</td><td>I24</td><td>J24</td><td>K24</td><td>L24</td></tr>
+        <tr><td>A25</td><td>B25</td><td>C25</td><td>D25</td><td>E25</td><td>F25</td><td>G25</td><td>H25</td><td>I25</td><td>J25</td><td>K25</td><td>L25</td></tr>
+        <tr><td>A26</td><td>B26</td><td>C26</td><td>D26</td><td>E26</td><td>F26</td><td>G26</td><td>H26</td><td>I26</td><td>J26</td><td>K26</td><td>L26</td></tr>
+        <tr><td>A27</td><td>B27</td><td>C27</td><td>D27</td><td>E27</td><td>F27</td><td>G27</td><td>H27</td><td>I27</td><td>J27</td><td>K27</td><td>L27</td></tr>
+        <tr><td>A28</td><td>B28</td><td>C28</td><td>D28</td><td>E28</td><td>F28</td><td>G28</td><td>H28</td><td>I28</td><td>J28</td><td>K28</td><td>L28</td></tr>
+      </tbody>
+    </table>
+    <div class="pill-number">PQ4X1234567ES</div>
+    <div class="reminder"><span style="display:inline-block;transform:translateY(1px);">Recorda que el nombre de seguiment pot trigar fins a</span> <span style="display:inline-block;transform:translateY(-1px);">48 hores a activar-se al sitema del transportista.</span></div>
+    <div class="track-link">Segueix el paquet &rarr;</div>
+    <div class="footer-url">higginsgrafic.com</div>
+  </div>
+</body>
+</html>

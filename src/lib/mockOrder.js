@@ -1,6 +1,6 @@
 const CHARSET = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
 
-export function generateOrderNumber(length = 15) {
+export function generateOrderNumber(length = 10) {
   let s = '';
   for (let i = 0; i < length; i++) {
     s += CHARSET[Math.floor(Math.random() * CHARSET.length)];

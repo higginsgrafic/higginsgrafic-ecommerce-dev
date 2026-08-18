@@ -11,7 +11,7 @@ import React from 'react';
  *  - El fitxer es diu `MegaIconButton.jsx` perquè `Icon*` està al .gitignore;
  *    el component, però, manté el nom `IconButton` per claredat al codi.
  */
-export default function IconButton({
+const IconButton = React.forwardRef(function IconButton({
   id,
   label,
   onClick,
@@ -19,19 +19,31 @@ export default function IconButton({
   onMouseEnter,
   buttonRef,
   children,
-}) {
+  ...rest
+}, ref) {
+  const setRefs = (node) => {
+    if (typeof ref === 'function') ref(node);
+    else if (ref) ref.current = node;
+    if (buttonRef) {
+      if (typeof buttonRef === 'function') buttonRef(node);
+      else buttonRef.current = node;
+    }
+  };
   return (
     <button
       id={id}
-      ref={buttonRef}
+      ref={setRefs}
       type="button"
       aria-label={label}
       onClick={onClick}
       onDoubleClick={onDoubleClick}
       onMouseEnter={onMouseEnter}
       className="inline-flex h-9 w-9 items-end justify-center pb-[2px] rounded-md text-foreground hover:bg-transparent focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 lg:h-10 lg:w-10 lg:pb-[3px]"
+      {...rest}
     >
       {children}
     </button>
   );
-}
+});
+
+export default IconButton;

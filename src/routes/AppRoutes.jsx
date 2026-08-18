@@ -151,6 +151,8 @@ export default function AppRoutes({ location, pageProps, pautaEnabled, tableEnab
 
         <Route path="/fulfillment/:id" element={<MotionDiv><P.ProductDetailPageEnhanced /></MotionDiv>} />
 
+        <Route path="/dev/email-preview" element={<P.EmailPreviewPage />} />
+
         <Route path="*" element={<P.NotFoundPage />} />
       </Routes>
     </AnimatePresence>
