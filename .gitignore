@@ -43,6 +43,7 @@ test-results
 
 public/bolt_tmp/
 .tmp/
+tmp/
 mockups-supabase-*.csv
 
 private/radioactiu/

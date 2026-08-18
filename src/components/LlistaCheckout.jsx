@@ -55,11 +55,13 @@ const LlistaCheckout = ({ items, onBreadcrumbClick, country = 'Espanya' }) => {
   }, [visibleProductRows, checkoutRenderItems.length]);
 
   const { getCost, zoneInfo } = useShippingCosts();
-  const subtotal = checkoutRenderItems.reduce((total, item) => total + (item.price * item.quantity), 0);
+  const itemTotal = checkoutRenderItems.reduce((total, item) => total + (item.price * item.quantity), 0);
   const totalQuantity = checkoutRenderItems.reduce((total, item) => total + (item.quantity || 1), 0);
-  const shipping = getCost(country, totalQuantity, subtotal);
-  const total = subtotal + shipping;
-  const ivaAmount = subtotal * 0.21;
+  const shipping = getCost(country, totalQuantity, itemTotal);
+  const total = itemTotal;
+  const baseImponible = (total - shipping) / 1.21;
+  const ivaAmount = (total - shipping) - baseImponible;
+  const subtotal = baseImponible;
   const displayPrice = (value) => formatPrice(value).replace(/\u00a0/g, ' ').replace(/\s+/g, '').replace(/\s*€\s*$/, '€');
 
   return (
@@ -467,7 +469,7 @@ const LlistaCheckout = ({ items, onBreadcrumbClick, country = 'Espanya' }) => {
               <div style={{ gridColumn: '1 / 5', gridRow: '1 / 2' }} />
               {[
                 ['SUBTOTAL', displayPrice(subtotal), false],
-                ['TRANSPORT', displayPrice(zoneInfo.cost), true],
+                ['TRANSPORT', displayPrice(shipping), true],
                 ['IVA 21%', displayPrice(ivaAmount), false],
                 ['TOT PLEGAT FA', displayPrice(total), false],
               ].flatMap(([label, amount, strikeAmount], index) => ([

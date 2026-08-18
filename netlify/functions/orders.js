@@ -1,4 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
+import { sendOrderEmail } from './_email.js';
 
 const SUPABASE_URL = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
 const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -195,7 +196,14 @@ export async function handler(event, context) {
   if (method === 'PATCH') {
     try {
       const body = JSON.parse(event.body || '{}');
-      const { orderNumber, status, gelatoOrderId } = body;
+      const {
+        orderNumber,
+        status,
+        gelatoOrderId,
+        trackingNumber,
+        trackingCarrier,
+        trackingUrl,
+      } = body;
 
       if (!orderNumber) {
         return jsonResponse(400, { error: 'Falta orderNumber' });
@@ -211,9 +219,18 @@ export async function handler(event, context) {
       if (gelatoOrderId !== undefined) {
         updateFields.gelato_order_id = gelatoOrderId;
       }
+      if (trackingNumber !== undefined) {
+        updateFields.tracking_number = trackingNumber;
+      }
+      if (trackingCarrier !== undefined) {
+        updateFields.tracking_carrier = trackingCarrier;
+      }
+      if (trackingUrl !== undefined) {
+        updateFields.tracking_url = trackingUrl;
+      }
 
       if (Object.keys(updateFields).length === 0) {
-        return jsonResponse(400, { error: 'Cal proporcionar status o gelatoOrderId' });
+        return jsonResponse(400, { error: 'Cal proporcionar status, gelatoOrderId o camps de tracking' });
       }
 
       const { data, error } = await supabase
@@ -226,6 +243,15 @@ export async function handler(event, context) {
       if (error) {
         console.error('[orders] Error updating order:', error);
         return jsonResponse(500, { error: error.message });
+      }
+
+      // Enviar correus transaccionals segons l'estat actualitzat
+      if (data) {
+        if (status === 'seguiment' || status === 'en_repartiment' || trackingNumber) {
+          await sendOrderEmail('order_shipped', data);
+        } else if (status === 'en_preparacio') {
+          await sendOrderEmail('order_in_production', data);
+        }
       }
 
       return jsonResponse(200, { order: data });

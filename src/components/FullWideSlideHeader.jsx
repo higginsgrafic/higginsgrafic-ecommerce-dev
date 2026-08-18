@@ -38,6 +38,7 @@ import {
 } from './fullwide/megaPublicSelectorState.js';
 import OptimizedImg from './fullwide/OptimizedImg.jsx';
 import IconButton from './fullwide/MegaIconButton.jsx';
+import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
 import RegisterOverlay from './fullwide/RegisterOverlay.jsx';
 import usePersistentState from '@/hooks/usePersistentState';
 import {
@@ -2896,6 +2897,8 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
             data-icons-wrap="true"
           >
             <div>
+              <Tooltip>
+              <TooltipTrigger asChild>
               <IconButton
                 label="Search"
                 onClick={() => {
@@ -2919,7 +2922,12 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
                   <line x1="15" y1="6" x2="15" y2="21" />
                 </svg>
               </IconButton>
+              </TooltipTrigger>
+              <TooltipContent>Selector</TooltipContent>
+              </Tooltip>
             </div>
+            <Tooltip>
+            <TooltipTrigger asChild>
             <button
               type="button"
               onClick={(e) => {
@@ -2977,7 +2985,12 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
                 ) : null}
               </span>
             </button>
+            </TooltipTrigger>
+            <TooltipContent>Cistell</TooltipContent>
+            </Tooltip>
             <div>
+              <Tooltip>
+              <TooltipTrigger asChild>
               <IconButton
                 id="stripe-guide-user-icon-anchor"
                 label="Account"
@@ -3007,6 +3020,9 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
                   : <LogIn className="h-[25px] w-[25px] text-foreground lg:h-[29px] lg:w-[29px]" strokeWidth={2} />
                 }
               </IconButton>
+              </TooltipTrigger>
+              <TooltipContent>Compte</TooltipContent>
+              </Tooltip>
             </div>
           </div>
         </div>

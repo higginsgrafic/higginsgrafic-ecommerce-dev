@@ -131,7 +131,7 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, onBac
         }));
         const mockOrder = createMockOrder({
           items: orderItems,
-          subtotal: preu,
+          subtotal: baseImponible,
           shipping,
           iva: ivaAmount,
           total: totalPlegat,
@@ -196,7 +196,7 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, onBac
             price: parseFloat(String(item.price).replace('€', '').replace(/\s/g, '').replace(',', '.')) || 0,
             image: item.image || '/tshirt-white.jpg',
           })),
-          subtotal: preu,
+          subtotal: baseImponible,
           shippingCost: shipping,
           iva: ivaAmount,
           total: totalPlegat,
@@ -342,9 +342,9 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, onBac
             })}
           </div>
           <div style={{ flexShrink:0, paddingTop:'12px', borderTop:'1px solid #E6E8EC', marginTop:'8px' }}>
-            <div style={{ display:'flex', justifyContent:'space-between', fontSize:'10pt', color:'#667085', padding:'2px 0' }}><span>Subtotal</span><span style={{ fontVariantNumeric:'tabular-nums' }}>{preu.toFixed(2).replace('.',',')}€</span></div>
+            <div style={{ display:'flex', justifyContent:'space-between', fontSize:'10pt', color:'#667085', padding:'2px 0' }}><span>Subtotal</span><span style={{ fontVariantNumeric:'tabular-nums' }}>{baseImponible.toFixed(2).replace('.',',')}€</span></div>
             {discountEnabled && <div style={{ display:'flex', justifyContent:'space-between', fontSize:'10pt', color:'#667085', padding:'2px 0' }}><span>Descompte (-{offersConfig.discountRate}%)</span><span style={{ fontVariantNumeric:'tabular-nums' }}>-{descompte.toFixed(2).replace('.',',')}€</span></div>}
-            <div style={{ display:'flex', justifyContent:'space-between', fontSize:'10pt', color:'#667085', padding:'2px 0' }}><span>Ports</span><span style={{ fontVariantNumeric:'tabular-nums' }}>{shipping.toFixed(2).replace('.',',')}€</span></div>
+            <div style={{ display:'flex', justifyContent:'space-between', fontSize:'10pt', color:'#667085', padding:'2px 0' }}><span>Transport</span><span style={{ fontVariantNumeric:'tabular-nums' }}>{shipping.toFixed(2).replace('.',',')}€</span></div>
             <div style={{ display:'flex', justifyContent:'space-between', fontSize:'10pt', color:'#667085', padding:'2px 0' }}><span>IVA 21%</span><span style={{ fontVariantNumeric:'tabular-nums' }}>{ivaAmount.toFixed(2).replace('.',',')}€</span></div>
             <div style={{ display:'flex', justifyContent:'space-between', fontSize:'13pt', fontWeight:500, padding:'8px 0 0', borderTop:'1px solid #E6E8EC', marginTop:'4px' }}><span>Total</span><span style={{ fontVariantNumeric:'tabular-nums' }}>{totalPlegat.toFixed(2).replace('.',',')}€</span></div>
           </div>

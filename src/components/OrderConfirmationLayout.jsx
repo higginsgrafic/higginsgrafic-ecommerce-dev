@@ -28,11 +28,12 @@ const OrderConfirmationLayout = ({
   if (!orderData) return null;
 
   const items = orderData.items || [];
-  const subtotal = orderData.subtotal || items.reduce((sum, item) => sum + (parseFloat(item.price) || 0) * (item.quantity || 1), 0);
-  const discountAmount = discountEnabled ? subtotal * discountRate : 0;
+  const itemTotal = items.reduce((sum, item) => sum + (parseFloat(item.price) || 0) * (item.quantity || 1), 0);
   const shipping = orderData.shipping || 0;
   const ivaAmount = orderData.iva || 0;
-  const totalPlegat = orderData.total || subtotal - discountAmount;
+  const totalPlegat = orderData.total || itemTotal;
+  const subtotal = orderData.subtotal != null ? orderData.subtotal : (totalPlegat - shipping - ivaAmount);
+  const discountAmount = discountEnabled ? subtotal * discountRate : 0;
   const maxScroll = Math.max(0, items.length - VISIBLE_ROWS);
 
   useEffect(() => {
@@ -160,9 +161,9 @@ const OrderConfirmationLayout = ({
         <div style={{ padding: '0 20px', fontWeight: 400, opacity: 0.7, textAlign: 'left', whiteSpace: 'nowrap', display: 'flex', alignItems: 'center', minHeight: 0, overflow: 'hidden', gridColumn: '2 / 4' }}>Descompte&nbsp;<span style={{ fontSize: '11.48px' }}>({discountLabel})</span></div>
         <div style={{ padding: '0 20px', fontWeight: 400, opacity: 0.7, textAlign: 'right', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', minHeight: 0, overflow: 'hidden', }}>-{formatPrice(discountAmount)}</div>
         </>)}
-        {/* Ports */}
+        {/* Transport */}
         <div />
-        <div style={{ padding: '0 20px', fontWeight: 400, opacity: 0.7, textAlign: 'left', whiteSpace: 'nowrap', display: 'flex', alignItems: 'center', minHeight: 0, overflow: 'hidden', gridColumn: '2 / 4' }}>Ports</div>
+        <div style={{ padding: '0 20px', fontWeight: 400, opacity: 0.7, textAlign: 'left', whiteSpace: 'nowrap', display: 'flex', alignItems: 'center', minHeight: 0, overflow: 'hidden', gridColumn: '2 / 4' }}>Transport</div>
         <div style={{ padding: '0 20px', fontWeight: 400, opacity: 0.7, textAlign: 'right', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', minHeight: 0, overflow: 'hidden', }}>{formatPrice(shipping)}</div>
         {/* IVA */}
         <div />

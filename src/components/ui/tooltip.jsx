@@ -15,12 +15,17 @@ const TooltipContent = React.forwardRef(({ className, sideOffset = 4, ...props }
     <TooltipPrimitive.Content
       ref={ref}
       sideOffset={sideOffset}
-      className={cn(
-        'z-[99999] overflow-hidden rounded-md bg-foreground px-2.5 py-1 text-xs font-roboto text-background shadow-md',
-        'animate-in fade-in-0 zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95',
-        'data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2',
-        className
-      )}
+      style={{
+        zIndex: 99999,
+        borderRadius: '6px',
+        backgroundColor: '#141414',
+        padding: '4px 10px',
+        fontSize: '12px',
+        fontFamily: 'Roboto, sans-serif',
+        color: '#ffffff',
+        boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
+        whiteSpace: 'nowrap',
+      }}
       {...props}
     />
   </TooltipPrimitive.Portal>
