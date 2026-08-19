@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
 import { useCart } from '@/contexts/CartContext';
 import { useWishlist } from '@/contexts/WishlistContext';
 
@@ -501,7 +501,7 @@ export const ProductProvider = ({ children }) => {
   const cart = useCart();
   const wishlist = useWishlist();
 
-  const value = {
+  const value = useMemo(() => ({
     products,
     loading,
     isProductReady,
@@ -535,7 +535,23 @@ export const ProductProvider = ({ children }) => {
     // Filtres
     filters,
     setFilters
-  };
+  }), [
+    products,
+    loading,
+    isProductReady,
+    error,
+    loadProducts,
+    syncGelatoProducts,
+    syncMockProducts,
+    getProductById,
+    getProductsByCollection,
+    getRandomProductsByCollection,
+    searchProducts,
+    getFilteredProducts,
+    cart,
+    wishlist,
+    filters,
+  ]);
 
   return (
     <ProductContext.Provider value={value}>

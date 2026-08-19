@@ -16,7 +16,7 @@ import ScrollToTop from '@/components/ScrollToTop';
 import Footer from '@/components/Footer';
 import SiteFrame from '@/components/layout/SiteFrame.jsx';
 import AppRoutes from '@/routes/AppRoutes';
-import * as P from '@/routes/lazyPages';
+import { FullWideSlideHeader } from '@/routes/lazyPages';
 
 function AppProd() {
   const [isNavigating, setIsNavigating] = useState(false);
@@ -170,7 +170,7 @@ function AppProd() {
           {/* Main Header — NO mostrar a pàgines full-screen ni admin ni dev tools */}
           {!isFullScreenRoute && !isAdminRoute && !isDemoStyleLayoutRoute && !isDevHeaderRoute && (
             isHomeRoute ? null : (
-              <P.FullWideSlideHeader
+              <FullWideSlideHeader
                 cartItemCount={getTotalItems()}
                 onCartClick={handleCartClick}
                 onUserClick={handleUserClick}
