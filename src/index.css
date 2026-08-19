@@ -4,8 +4,9 @@
 
 @keyframes hg-typewriter {
   0% { opacity: 0; }
-  15% { opacity: 1; }
-  75% { opacity: 1; }
+  12% { opacity: 1; }
+  72% { opacity: 1; }
+  88% { opacity: 0; }
   100% { opacity: 0; }
 }
 
