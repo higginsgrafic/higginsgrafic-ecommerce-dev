@@ -103,7 +103,7 @@ const LogoSpinner = () => {
               height: '40px',
               width: 'auto',
               opacity: 0,
-              animation: `hg-typewriter 1.8s ease-in-out ${i * 0.18}s infinite`,
+              animation: `hg-typewriter 2.2s ease-in-out ${i * 0.14}s infinite`,
             }}
           />
         ))}
