@@ -18,7 +18,8 @@ import { OrderFailedEmail, orderFailedMeta } from '../emails/templates/OrderFail
 const RESEND_API = 'https://api.resend.com/emails';
 
 function getFrom() {
-  return process.env.RESEND_FROM_EMAIL || 'onboarding@resend.dev';
+  const from = process.env.RESEND_FROM_EMAIL || 'onboarding@resend.dev';
+  return from.replace(/^["']|["']$/g, '').trim();
 }
 
 const TEMPLATES = {

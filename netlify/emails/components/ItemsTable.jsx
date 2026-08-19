@@ -12,16 +12,68 @@ export function ItemsTable({ items }) {
     const price = formatPrice(item.price || 0);
     return (
       <tr key={i}>
-        <td style={{ padding: '4px 0', fontFamily: 'Roboto,Helvetica,Arial,sans-serif', fontSize: '13px', color: '#141414', textAlign: 'left' }}>{name}</td>
-        <td style={{ padding: '4px 10px', fontFamily: 'Roboto,Helvetica,Arial,sans-serif', fontSize: '13px', color: '#141414', textAlign: 'center' }}>{size}</td>
-        <td style={{ padding: '4px 10px', fontFamily: 'Roboto,Helvetica,Arial,sans-serif', fontSize: '13px', color: '#141414', textAlign: 'center' }}>{qty}</td>
-        <td style={{ padding: '4px 0', fontFamily: 'Roboto,Helvetica,Arial,sans-serif', fontSize: '13px', color: '#141414', textAlign: 'right', whiteSpace: 'nowrap' }}>{price}</td>
+        <td
+          style={{
+            width: '52%',
+            padding: '5px 0',
+            fontFamily: 'Roboto,Helvetica,Arial,sans-serif',
+            fontSize: '13px',
+            color: '#141414',
+            textAlign: 'left',
+          }}
+        >
+          {name}
+        </td>
+        <td
+          style={{
+            width: '16%',
+            padding: '5px 4px',
+            fontFamily: 'Roboto,Helvetica,Arial,sans-serif',
+            fontSize: '13px',
+            color: '#141414',
+            textAlign: 'center',
+          }}
+        >
+          {size}
+        </td>
+        <td
+          style={{
+            width: '12%',
+            padding: '5px 4px',
+            fontFamily: 'Roboto,Helvetica,Arial,sans-serif',
+            fontSize: '13px',
+            color: '#141414',
+            textAlign: 'center',
+          }}
+        >
+          {qty}
+        </td>
+        <td
+          style={{
+            width: '20%',
+            padding: '5px 0',
+            fontFamily: 'Roboto,Helvetica,Arial,sans-serif',
+            fontSize: '13px',
+            color: '#141414',
+            textAlign: 'right',
+            whiteSpace: 'nowrap',
+          }}
+        >
+          {price}
+        </td>
       </tr>
     );
   });
 
   return (
-    <table style={{ width: '100%', borderCollapse: 'collapse', margin: 0 }}>
+    <table
+      role="presentation"
+      width="100%"
+      cellPadding="0"
+      cellSpacing="0"
+      border="0"
+      style={{ width: '100%', borderCollapse: 'collapse', margin: 0 }}
+    >
       <tbody>{rows}</tbody>
     </table>
   );

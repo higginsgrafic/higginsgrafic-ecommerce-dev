@@ -12,10 +12,15 @@ export function SummaryTable({ order }) {
 
   return (
     <table
+      role="presentation"
+      width="100%"
+      cellPadding="0"
+      cellSpacing="0"
+      border="0"
       style={{
         width: '100%',
         borderCollapse: 'collapse',
-        marginTop: '36px',
+        marginTop: '28px',
         borderTop: '1px solid #141414',
       }}
     >
