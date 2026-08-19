@@ -46,6 +46,43 @@ function jsonResponse(statusCode, body) {
   };
 }
 
+async function isAuthorizedAdmin(event, supabase) {
+  if (process.env.NODE_ENV === 'development' || process.env.NETLIFY_DEV === 'true') {
+    return true;
+  }
+
+  const authHeader = event.headers.authorization || event.headers.Authorization || '';
+  if (authHeader.startsWith('Bearer ')) {
+    const token = authHeader.replace(/^Bearer\s+/i, '').trim();
+    if (!token) return false;
+
+    try {
+      const { data: { user }, error } = await supabase.auth.getUser(token);
+      if (error || !user) return false;
+
+      const adminEmailsRaw = process.env.ADMIN_EMAILS || process.env.VITE_ADMIN_EMAILS || '';
+      const adminEmails = adminEmailsRaw
+        .split(',')
+        .map((e) => e.trim().toLowerCase())
+        .filter(Boolean);
+
+      if (adminEmails.length > 0) {
+        return adminEmails.includes((user.email || '').toLowerCase());
+      }
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  const adminSecret = event.headers['x-admin-secret'];
+  if (adminSecret && process.env.ADMIN_SECRET && adminSecret === process.env.ADMIN_SECRET) {
+    return true;
+  }
+
+  return false;
+}
+
 export async function handler(event, context) {
   if (event.httpMethod === 'OPTIONS') {
     return jsonResponse(200, {});
@@ -192,9 +229,14 @@ export async function handler(event, context) {
     }
   }
 
-  // PATCH: Update order status
+  // PATCH: Update order status (Admin only)
   if (method === 'PATCH') {
     try {
+      const authorized = await isAuthorizedAdmin(event, supabase);
+      if (!authorized) {
+        return jsonResponse(401, { error: 'No autoritzat per modificar comandes' });
+      }
+
       const body = JSON.parse(event.body || '{}');
       const {
         orderNumber,

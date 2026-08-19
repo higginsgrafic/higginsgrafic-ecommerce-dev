@@ -25,20 +25,26 @@ export async function handler(event, context) {
   }
 
   try {
-    const { amount, currency = 'eur' } = JSON.parse(event.body || '{}');
+    const { amount, currency = 'eur', metadata = {} } = JSON.parse(event.body || '{}');
 
-    if (!amount || typeof amount !== 'number' || amount <= 0) {
-      return jsonResponse(400, { error: 'Amount ha de ser un nombre positiu (en cèntims)' });
+    const numAmount = Math.round(Number(amount));
+    if (isNaN(numAmount) || numAmount < 50 || numAmount > 500000) {
+      return jsonResponse(400, { error: 'Import invàlid (ha de ser entre 0.50 € i 5000.00 €)' });
     }
 
-    if (!currency || typeof currency !== 'string') {
-      return jsonResponse(400, { error: 'Currency és obligatori' });
+    const normCurrency = String(currency).toLowerCase().trim();
+    if (normCurrency !== 'eur') {
+      return jsonResponse(400, { error: 'Moneda no suportada (només EUR)' });
     }
 
     const paymentIntent = await stripe.paymentIntents.create({
-      amount: Math.round(amount),
-      currency,
+      amount: numAmount,
+      currency: normCurrency,
       automatic_payment_methods: { enabled: true },
+      metadata: {
+        platform: 'higginsgrafic-web',
+        ...metadata,
+      },
     });
 
     return jsonResponse(200, {
