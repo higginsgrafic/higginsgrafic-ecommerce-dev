@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 
 const SPINNER_KEY = 'HG_LOADING_SPINNER';
 
