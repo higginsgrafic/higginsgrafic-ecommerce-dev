@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import ReactDOM from 'react-dom';
 
 const SPINNER_KEY = 'HG_LOADING_SPINNER';
 
@@ -132,20 +133,42 @@ const LoadingScreen = ({ spinnerId: propSpinnerId }) => {
   }
 
   const id = propSpinnerId || getSpinnerId();
-  const Spinner = SPINNERS[id] || CircleSpinner;
+  const Spinner = SPINNERS[id] || LogoSpinner;
 
-  return (
-    <div className="fixed inset-0 bg-background z-50 flex items-center justify-center pointer-events-none">
-      <div className="text-center">
-        <div className="flex justify-center">
-          <Spinner />
-        </div>
-        <p className="mt-6 text-foreground text-sm font-medium">
+  const content = (
+    <div
+      style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        width: '100vw',
+        height: '100vh',
+        zIndex: 99999,
+        background: '#ffffff',
+        color: '#141414',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        pointerEvents: 'none',
+      }}
+    >
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+        <Spinner />
+        <p style={{ marginTop: '24px', fontFamily: 'system-ui, -apple-system, sans-serif', fontSize: '14px', fontWeight: 500, color: '#141414', letterSpacing: '0.3px', lineHeight: 'normal' }}>
           Carregant...
         </p>
       </div>
     </div>
   );
+
+  if (typeof document !== 'undefined' && document.body) {
+    return ReactDOM.createPortal(content, document.body);
+  }
+
+  return content;
 };
 
 export default LoadingScreen;
