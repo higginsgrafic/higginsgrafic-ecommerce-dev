@@ -50,7 +50,10 @@ export async function sendOrderEmail(templateKey, order) {
 
   const { Component, meta } = template;
   const element = createElement(Component, { order });
-  const html = await render(element);
+  const rawHtml = await render(element);
+  const html = rawHtml
+    .replace(/src="\/([^"]+)"/g, 'src="https://higginsgrafic.com/$1"')
+    .replace(/url\('\/([^']+)'\)/g, "url('https://higginsgrafic.com/$1')");
   const subject = meta.subject(order);
 
   try {
