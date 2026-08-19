@@ -75,6 +75,17 @@ function AppProd() {
   const fullWideShowCatalogPanel = fullWideMegaMenuConfig?.showCatalogPanel !== false;
 
   const isHomeRoute = location.pathname === '/';
+
+  useEffect(() => {
+    const el = document.getElementById('app-preloader');
+    if (el) {
+      el.classList.add('fade-out');
+      const timer = setTimeout(() => {
+        try { el.remove(); } catch {}
+      }, 400);
+      return () => clearTimeout(timer);
+    }
+  }, []);
   const isFullWideSlideRoute = location.pathname === '/full-wide-slide' || location.pathname === '/constructor/full-wide-slide';
   const isFullWideSlideDemoRoute = location.pathname === '/full-wide-slide-demo';
   const isDemoStyleLayoutRoute = isFullWideSlideDemoRoute || isFullWideSlideRoute;

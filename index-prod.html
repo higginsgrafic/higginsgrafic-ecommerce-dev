@@ -49,28 +49,31 @@
 		<title>Higgins GRÀFIC - Samarretes Premium | Col·leccions Exclusives</title>
 	</head>
 	<body>
-		<div id="root">
-			<div style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; background: #ffffff;">
-				<div style="text-align: center;">
-					<div style="display: flex; align-items: center; justify-content: center; gap: 2px;">
-						<img src="/custom_logos/brand/G.svg" alt="G" style="height: 40px; width: auto; opacity: 0; animation: hg-typewriter 1.8s ease-in-out 0s infinite;" />
-						<img src="/custom_logos/brand/R.svg" alt="R" style="height: 40px; width: auto; opacity: 0; animation: hg-typewriter 1.8s ease-in-out 0.18s infinite;" />
-						<img src="/custom_logos/brand/A.svg" alt="À" style="height: 40px; width: auto; opacity: 0; animation: hg-typewriter 1.8s ease-in-out 0.36s infinite;" />
-						<img src="/custom_logos/brand/F.svg" alt="F" style="height: 40px; width: auto; opacity: 0; animation: hg-typewriter 1.8s ease-in-out 0.54s infinite;" />
-						<img src="/custom_logos/brand/IC.svg" alt="IC" style="height: 40px; width: auto; opacity: 0; animation: hg-typewriter 1.8s ease-in-out 0.72s infinite;" />
-					</div>
-					<p style="margin-top: 24px; font-family: system-ui, -apple-system, sans-serif; font-size: 14px; font-weight: 500; color: #1f2937;">Carregant...</p>
+		<div id="app-preloader" style="position: fixed; inset: 0; z-index: 99999; background: #ffffff; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: opacity 0.35s ease, visibility 0.35s ease; pointer-events: none;">
+			<div style="text-align: center;">
+				<div style="display: flex; align-items: center; justify-content: center; gap: 2px;">
+					<img src="/custom_logos/brand/G.svg" alt="G" style="height: 40px; width: auto; opacity: 0; animation: hg-typewriter 1.8s ease-in-out 0s infinite;" />
+					<img src="/custom_logos/brand/R.svg" alt="R" style="height: 40px; width: auto; opacity: 0; animation: hg-typewriter 1.8s ease-in-out 0.18s infinite;" />
+					<img src="/custom_logos/brand/A.svg" alt="À" style="height: 40px; width: auto; opacity: 0; animation: hg-typewriter 1.8s ease-in-out 0.36s infinite;" />
+					<img src="/custom_logos/brand/F.svg" alt="F" style="height: 40px; width: auto; opacity: 0; animation: hg-typewriter 1.8s ease-in-out 0.54s infinite;" />
+					<img src="/custom_logos/brand/IC.svg" alt="IC" style="height: 40px; width: auto; opacity: 0; animation: hg-typewriter 1.8s ease-in-out 0.72s infinite;" />
 				</div>
+				<p style="margin-top: 24px; font-family: system-ui, -apple-system, sans-serif; font-size: 14px; font-weight: 500; color: #1f2937;">Carregant...</p>
 			</div>
-			<style>
-				@keyframes hg-typewriter {
-					0% { opacity: 0; }
-					15% { opacity: 1; }
-					75% { opacity: 1; }
-					100% { opacity: 0; }
-				}
-			</style>
 		</div>
+		<style>
+			#app-preloader.fade-out {
+				opacity: 0;
+				visibility: hidden;
+			}
+			@keyframes hg-typewriter {
+				0% { opacity: 0; }
+				15% { opacity: 1; }
+				75% { opacity: 1; }
+				100% { opacity: 0; }
+			}
+		</style>
+		<div id="root"></div>
 		<script>
 			console.log('🌟 PROD — HTML loaded, waiting for React...');
 			window.addEventListener('error', (e) => {

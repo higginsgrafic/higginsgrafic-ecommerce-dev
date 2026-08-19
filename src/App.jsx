@@ -157,6 +157,17 @@ function App() {
     safeProductContext;
 
   const isHomeRoute = location.pathname === '/';
+
+  useEffect(() => {
+    const el = document.getElementById('app-preloader');
+    if (el) {
+      el.classList.add('fade-out');
+      const timer = setTimeout(() => {
+        try { el.remove(); } catch {}
+      }, 400);
+      return () => clearTimeout(timer);
+    }
+  }, []);
   const isPreview = location.pathname === '/ec-preview' || location.pathname === '/ec-preview-lite';
   const isDemoStyleLayoutRoute = (isFullWideSlideDemoRoute || isFullWideSlideRoute);
   const isDevDemoRoute = isFullWideSlideDemoRoute || isFullWideSlideRoute;
