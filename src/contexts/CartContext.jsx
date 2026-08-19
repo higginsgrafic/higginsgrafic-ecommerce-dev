@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
 
 const CartContext = createContext();
 
@@ -13,79 +13,81 @@ export const CartProvider = ({ children }) => {
   });
 
   useEffect(() => {
-    localStorage.setItem('cart', JSON.stringify(cartItems));
+    try {
+      localStorage.setItem('cart', JSON.stringify(cartItems));
+    } catch { /* ignore */ }
   }, [cartItems]);
 
-  const addToCart = (product, size, quantity = 1) => {
-    const existingItem = cartItems.find(
-      item => item.id === product.id && item.size === size
-    );
+  const addToCart = useCallback((product, size, quantity = 1) => {
+    setCartItems(prevItems => {
+      const existingItem = prevItems.find(
+        item => item.id === product.id && item.size === size
+      );
 
-    if (existingItem) {
-      setCartItems(
-        cartItems.map(item =>
+      if (existingItem) {
+        return prevItems.map(item =>
           item.id === product.id && item.size === size
             ? { ...item, quantity: item.quantity + quantity }
             : item
-        )
-      );
-    } else {
-      setCartItems([...cartItems, { ...product, size, quantity }]);
-    }
-  };
+        );
+      } else {
+        return [...prevItems, { ...product, size, quantity }];
+      }
+    });
+  }, []);
 
-  const updateQuantity = (itemId, size, newQuantity) => {
+  const updateQuantity = useCallback((itemId, size, newQuantity) => {
     if (newQuantity === 0) {
-      removeFromCart(itemId, size);
+      setCartItems(prev => prev.filter(item => !(item.id === itemId && item.size === size)));
       return;
     }
 
-    setCartItems(
-      cartItems.map(item =>
+    setCartItems(prev =>
+      prev.map(item =>
         item.id === itemId && item.size === size
           ? { ...item, quantity: newQuantity }
           : item
       )
     );
-  };
+  }, []);
 
-  const removeFromCart = (itemId, size) => {
-    setCartItems(cartItems.filter(item => !(item.id === itemId && item.size === size)));
-  };
+  const removeFromCart = useCallback((itemId, size) => {
+    setCartItems(prev => prev.filter(item => !(item.id === itemId && item.size === size)));
+  }, []);
 
-  const updateSize = (itemId, oldSize, newSize, quantity) => {
-    const item = cartItems.find(i => i.id === itemId && i.size === oldSize);
-    if (!item) return;
+  const updateSize = useCallback((itemId, oldSize, newSize, quantity) => {
+    setCartItems(prev => {
+      const item = prev.find(i => i.id === itemId && i.size === oldSize);
+      if (!item) return prev;
 
-    const newCartItems = cartItems.filter(i => !(i.id === itemId && i.size === oldSize));
-    const existingNewSizeItem = newCartItems.find(i => i.id === itemId && i.size === newSize);
+      const newCartItems = prev.filter(i => !(i.id === itemId && i.size === oldSize));
+      const existingNewSizeItem = newCartItems.find(i => i.id === itemId && i.size === newSize);
 
-    if (existingNewSizeItem) {
-      setCartItems(
-        newCartItems.map(i =>
+      if (existingNewSizeItem) {
+        return newCartItems.map(i =>
           i.id === itemId && i.size === newSize
             ? { ...i, quantity: i.quantity + quantity }
             : i
-        )
-      );
-    } else {
-      setCartItems([...newCartItems, { ...item, size: newSize, quantity }]);
-    }
-  };
+        );
+      } else {
+        return [...newCartItems, { ...item, size: newSize, quantity }];
+      }
+    });
+  }, []);
 
-  const clearCart = () => {
+  const clearCart = useCallback(() => {
     setCartItems([]);
-  };
+  }, []);
 
-  const getTotalItems = () => {
-    return cartItems.reduce((total, item) => total + item.quantity, 0);
-  };
+  const getTotalItems = useCallback(() => {
+    return cartItems.reduce((total, item) => total + (item.quantity || 1), 0);
+  }, [cartItems]);
 
-  const getTotalPrice = () => {
-    return cartItems.reduce((total, item) => total + (item.price * item.quantity), 0);
-  };
+  const getTotalPrice = useCallback(() => {
+    return cartItems.reduce((total, item) => total + ((Number(item.price) || 0) * (item.quantity || 1)), 0);
+  }, [cartItems]);
 
-  const value = {
+  const value = useMemo(() => ({
     cartItems,
     addToCart,
     updateQuantity,
@@ -94,7 +96,7 @@ export const CartProvider = ({ children }) => {
     clearCart,
     getTotalItems,
     getTotalPrice,
-  };
+  }), [cartItems, addToCart, updateQuantity, removeFromCart, updateSize, clearCart, getTotalItems, getTotalPrice]);
 
   return (
     <CartContext.Provider value={value}>

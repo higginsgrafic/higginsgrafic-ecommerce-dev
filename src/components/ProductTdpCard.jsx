@@ -43,6 +43,8 @@ function ProductTdpCard({
             alt={frameImageAlt}
             className="h-full w-full object-cover"
             style={frameImageStyle}
+            loading="lazy"
+            decoding="async"
           />
         </div>
       ) : (
@@ -60,6 +62,8 @@ function ProductTdpCard({
           width: '267.778px',
           opacity: 0.85
         }}
+        loading="lazy"
+        decoding="async"
       />
       <div
         className="absolute left-1/2 grid -translate-x-1/2 grid-cols-5"
