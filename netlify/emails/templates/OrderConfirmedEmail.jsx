@@ -2,15 +2,12 @@ import { EmailLayout } from '../components/EmailLayout.jsx';
 import { ItemsTable } from '../components/ItemsTable.jsx';
 import { SummaryTable } from '../components/SummaryTable.jsx';
 
-const BG_URL = '/placeholders/tots_els_fons/fons_correu/fons-correu-simple.png';
-
 export function OrderConfirmedEmail({ order }) {
   const clientName = order.first_name || '';
   const items = parseItems(order);
 
   return (
     <EmailLayout
-      useCssGradient={true}
       clientName={clientName}
       labelText="DETALL DE LA COMANDA"
       messageText="La teva comanda ha estat confirmada. Ja s'està preparant tot perquè t'arribi ben aviat."
@@ -35,3 +32,4 @@ function parseItems(order) {
 export const orderConfirmedMeta = {
   subject: (order) => `Comanda confirmada #${order.order_number || order.id || ''}`,
 };
+
