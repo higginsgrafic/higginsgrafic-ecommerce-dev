@@ -14,7 +14,7 @@ import useContentLayout from '@/hooks/useContentLayout';
 import useGlobalEffects from '@/hooks/useGlobalEffects';
 import useStripeOverlayDebug from '@/hooks/useStripeOverlayDebug';
 import ErrorBoundary from '@/components/ErrorBoundary';
-import LoadingScreen from '@/components/LoadingScreen';
+import LoadingScreen, { DismissPreloaderOnMount } from '@/components/LoadingScreen';
 import SkipLink from '@/components/SkipLink';
 import OffersHeader from '@/components/OffersHeader';
 import AdminBanner from '@/components/AdminBanner';
@@ -157,17 +157,6 @@ function App() {
     safeProductContext;
 
   const isHomeRoute = location.pathname === '/';
-
-  useEffect(() => {
-    const el = document.getElementById('app-preloader');
-    if (el) {
-      el.classList.add('fade-out');
-      const timer = setTimeout(() => {
-        try { el.remove(); } catch {}
-      }, 400);
-      return () => clearTimeout(timer);
-    }
-  }, []);
   const isPreview = location.pathname === '/ec-preview' || location.pathname === '/ec-preview-lite';
   const isDemoStyleLayoutRoute = (isFullWideSlideDemoRoute || isFullWideSlideRoute);
   const isDevDemoRoute = isFullWideSlideDemoRoute || isFullWideSlideRoute;
@@ -352,6 +341,7 @@ function App() {
           tabIndex={-1}
         >
           <Suspense fallback={<LoadingScreen />}>
+            <DismissPreloaderOnMount />
             <AppRoutes
               location={deferredLocation}
               pageProps={pageProps}

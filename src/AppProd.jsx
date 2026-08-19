@@ -8,7 +8,7 @@ import { useGlobalRedirect } from '@/hooks/useGlobalRedirect';
 import useGlobalEffects from '@/hooks/useGlobalEffects';
 import useComponentCatalogConfig from '@/hooks/useComponentCatalogConfig';
 import ErrorBoundary from '@/components/ErrorBoundary';
-import LoadingScreen from '@/components/LoadingScreen';
+import LoadingScreen, { DismissPreloaderOnMount } from '@/components/LoadingScreen';
 import SkipLink from '@/components/SkipLink';
 import OffersHeader from '@/components/OffersHeader';
 import AdminBanner from '@/components/AdminBanner';
@@ -75,17 +75,6 @@ function AppProd() {
   const fullWideShowCatalogPanel = fullWideMegaMenuConfig?.showCatalogPanel !== false;
 
   const isHomeRoute = location.pathname === '/';
-
-  useEffect(() => {
-    const el = document.getElementById('app-preloader');
-    if (el) {
-      el.classList.add('fade-out');
-      const timer = setTimeout(() => {
-        try { el.remove(); } catch {}
-      }, 400);
-      return () => clearTimeout(timer);
-    }
-  }, []);
   const isFullWideSlideRoute = location.pathname === '/full-wide-slide' || location.pathname === '/constructor/full-wide-slide';
   const isFullWideSlideDemoRoute = location.pathname === '/full-wide-slide-demo';
   const isDemoStyleLayoutRoute = isFullWideSlideDemoRoute || isFullWideSlideRoute;
@@ -206,6 +195,7 @@ function AppProd() {
             tabIndex={-1}
           >
             <Suspense fallback={<LoadingScreen />}>
+              <DismissPreloaderOnMount />
               <AppRoutes
                 location={location}
                 pageProps={pageProps}
