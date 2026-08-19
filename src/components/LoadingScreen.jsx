@@ -121,7 +121,33 @@ const SPINNERS = {
   logo: LogoSpinner,
 };
 
+export const dismissAppPreloader = () => {
+  if (typeof document === 'undefined') return;
+  const el = document.getElementById('app-preloader');
+  if (el && !el.classList.contains('fade-out')) {
+    el.classList.add('fade-out');
+    setTimeout(() => {
+      try { el.remove(); } catch {}
+    }, 450);
+  }
+};
+
+export const DismissPreloaderOnMount = () => {
+  useEffect(() => {
+    const raf = requestAnimationFrame(() => {
+      dismissAppPreloader();
+    });
+    return () => cancelAnimationFrame(raf);
+  }, []);
+  return null;
+};
+
 const LoadingScreen = ({ spinnerId: propSpinnerId }) => {
+  // Evitar duplicar l'spinner si l'overlay HTML inicial encara està present
+  if (typeof document !== 'undefined' && document.getElementById('app-preloader')) {
+    return null;
+  }
+
   const id = propSpinnerId || getSpinnerId();
   const Spinner = SPINNERS[id] || CircleSpinner;
 
