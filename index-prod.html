@@ -49,7 +49,7 @@
 		<title>Higgins GRÀFIC - Samarretes Premium | Col·leccions Exclusives</title>
 	</head>
 	<body>
-		<div id="app-preloader" style="position: fixed; inset: 0; z-index: 99999; background: #ffffff; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: opacity 0.35s ease, visibility 0.35s ease; pointer-events: none;">
+		<div id="app-preloader" style="position: fixed; inset: 0; z-index: 99999; background: #ffffff; display: flex; flex-direction: column; align-items: center; justify-content: center; pointer-events: none; transition: opacity 0.4s cubic-bezier(0.25, 1, 0.5, 1); will-change: opacity;">
 			<div style="text-align: center;">
 				<div style="display: flex; align-items: center; justify-content: center; gap: 2px;">
 					<img src="/custom_logos/brand/G.svg" alt="G" style="height: 40px; width: auto; opacity: 0; animation: hg-typewriter 1.8s ease-in-out 0s infinite;" />
@@ -64,7 +64,6 @@
 		<style>
 			#app-preloader.fade-out {
 				opacity: 0;
-				visibility: hidden;
 			}
 			@keyframes hg-typewriter {
 				0% { opacity: 0; }

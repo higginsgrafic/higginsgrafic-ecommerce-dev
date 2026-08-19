@@ -128,16 +128,17 @@ export const dismissAppPreloader = () => {
     el.classList.add('fade-out');
     setTimeout(() => {
       try { el.remove(); } catch {}
-    }, 450);
+    }, 500);
   }
 };
 
 export const DismissPreloaderOnMount = () => {
   useEffect(() => {
-    const raf = requestAnimationFrame(() => {
+    // Breu pausa de 120ms per permetre que la geometria del layout (SiteFrame, FullWideSlideHeader) s'estabilitzi completament
+    const timer = setTimeout(() => {
       dismissAppPreloader();
-    });
-    return () => cancelAnimationFrame(raf);
+    }, 120);
+    return () => clearTimeout(timer);
   }, []);
   return null;
 };
