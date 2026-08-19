@@ -13,9 +13,9 @@ export const SPINNER_OPTIONS = [
 
 export const getSpinnerId = () => {
   try {
-    return localStorage.getItem(SPINNER_KEY) || 'circle';
+    return localStorage.getItem(SPINNER_KEY) || 'logo';
   } catch {
-    return 'circle';
+    return 'logo';
   }
 };
 

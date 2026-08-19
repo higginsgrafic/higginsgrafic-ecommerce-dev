@@ -50,14 +50,25 @@
 	</head>
 	<body>
 		<div id="root">
-			<div style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; background: #ffffff; color: #141414; font-family: system-ui, -apple-system, sans-serif;">
+			<div style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; background: #ffffff;">
 				<div style="text-align: center;">
-					<div style="width: 32px; height: 32px; border: 3px solid #f3f4f6; border-top-color: #141414; border-radius: 50%; animation: hg-spin 0.8s linear infinite; margin: 0 auto 16px auto;"></div>
-					<div style="font-size: 13px; font-weight: 500; letter-spacing: 0.5px; text-transform: uppercase; color: #141414;">Higgins GRÀFIC</div>
+					<div style="display: flex; align-items: center; justify-content: center; gap: 2px;">
+						<img src="/custom_logos/brand/G.svg" alt="G" style="height: 40px; width: auto; opacity: 0; animation: hg-typewriter 1.8s ease-in-out 0s infinite;" />
+						<img src="/custom_logos/brand/R.svg" alt="R" style="height: 40px; width: auto; opacity: 0; animation: hg-typewriter 1.8s ease-in-out 0.18s infinite;" />
+						<img src="/custom_logos/brand/A.svg" alt="À" style="height: 40px; width: auto; opacity: 0; animation: hg-typewriter 1.8s ease-in-out 0.36s infinite;" />
+						<img src="/custom_logos/brand/F.svg" alt="F" style="height: 40px; width: auto; opacity: 0; animation: hg-typewriter 1.8s ease-in-out 0.54s infinite;" />
+						<img src="/custom_logos/brand/IC.svg" alt="IC" style="height: 40px; width: auto; opacity: 0; animation: hg-typewriter 1.8s ease-in-out 0.72s infinite;" />
+					</div>
+					<p style="margin-top: 24px; font-family: system-ui, -apple-system, sans-serif; font-size: 14px; font-weight: 500; color: #1f2937;">Carregant...</p>
 				</div>
 			</div>
 			<style>
-				@keyframes hg-spin { to { transform: rotate(360deg); } }
+				@keyframes hg-typewriter {
+					0% { opacity: 0; }
+					15% { opacity: 1; }
+					75% { opacity: 1; }
+					100% { opacity: 0; }
+				}
 			</style>
 		</div>
 		<script>
