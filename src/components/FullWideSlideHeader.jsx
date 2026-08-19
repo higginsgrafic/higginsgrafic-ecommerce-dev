@@ -2833,7 +2833,7 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
               {mobileOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
             </button>
 
-            <Link id="stripe-guide-header-logo-anchor" to="/" className="relative z-10 pointer-events-auto flex items-center gap-2 font-black tracking-tight text-foreground">
+            <Link id="stripe-guide-header-logo-anchor" to="/" aria-label="Higgins GRÀFIC - Pàgina d'inici" className="relative z-10 pointer-events-auto flex items-center gap-2 font-black tracking-tight text-foreground">
               <span
                 id="stripe-guide-header-logo-mark-anchor"
                 ref={logoMarkRef}
@@ -2900,7 +2900,7 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
               <Tooltip>
               <TooltipTrigger asChild>
               <IconButton
-                label="Search"
+                label="Cercador i catàleg"
                 onClick={() => {
                   setManualOverrideClosed(false);
                   // Cerca: pestanya única (sense acordió secundari).
@@ -2923,7 +2923,7 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
                 </svg>
               </IconButton>
               </TooltipTrigger>
-              <TooltipContent>Selector</TooltipContent>
+              <TooltipContent>Cercador</TooltipContent>
               </Tooltip>
             </div>
             <Tooltip>
@@ -2955,7 +2955,7 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
                   touchMegaPublicActivity();
                 }, dblClickDelayMs);
               }}
-              aria-label="Cart"
+              aria-label={localCartItemCount > 0 ? `Cistell de la compra, ${localCartItemCount} ${localCartItemCount === 1 ? 'article' : 'articles'}` : 'Cistell de la compra buit'}
               className="relative inline-flex h-9 w-9 items-center justify-center rounded-md text-foreground hover:bg-transparent focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 lg:h-10 lg:w-10"
               style={{ marginLeft: '1px' }}
             >
@@ -2975,15 +2975,22 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
                     maskSize: 'contain',
                   }}
                 />
-                {localCartItemCount > 0 ? (
-                  <span
-                    className="absolute left-1/2 -translate-x-1/2 text-whiteStrong text-[13.75px] font-bold lg:text-[16.25px]"
-                    style={{ top: 'calc(60% - 0.5px)', transform: 'translate(-50%, -50%)', lineHeight: '1' }}
-                  >
-                    {localCartItemCount}
-                  </span>
-                ) : null}
               </span>
+              {localCartItemCount > 0 && (
+                <span
+                  className="absolute pointer-events-none flex items-center justify-center rounded-full bg-foreground text-background font-bold font-oswald shadow-md"
+                  style={{
+                    top: '2px',
+                    right: '2px',
+                    width: '16px',
+                    height: '16px',
+                    fontSize: '10px',
+                    lineHeight: '1',
+                  }}
+                >
+                  {localCartItemCount}
+                </span>
+              )}
             </button>
             </TooltipTrigger>
             <TooltipContent>Cistell</TooltipContent>
@@ -2993,7 +3000,7 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
               <TooltipTrigger asChild>
               <IconButton
                 id="stripe-guide-user-icon-anchor"
-                label="Account"
+                label={user ? "Compte d'usuari" : "Iniciar sessió"}
                 buttonRef={accountButtonRef}
                 onClick={(e) => {
                   e.preventDefault();

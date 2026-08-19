@@ -12,7 +12,7 @@ function CartIcon({
     <button
       onClick={onClick}
       className={`relative hover:bg-muted rounded-md transition-colors text-foreground ${className}`}
-      aria-label="Afegir al cistell"
+      aria-label={count > 0 ? `Cistell de la compra, ${count} ${count === 1 ? 'article' : 'articles'}` : 'Cistell de la compra buit'}
       style={{ padding: 'clamp(0.1rem, 0.35vw, 0.2rem)' }}
     >
       <span
