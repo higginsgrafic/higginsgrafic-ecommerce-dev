@@ -9,55 +9,33 @@ export function PasswordResetEmail({ data = {} }) {
       statusText="Seguretat del compte"
       labelText="RECUPERACIÓ DE CONTRASENYA"
       clientName={clientName}
-      messageText="Hem rebut una sol·licitud per canviar la contrasenya del teu compte. Clica el botó següent per definir-ne una de nova. Si no ho has demanat tu, pots ignorar aquest correu amb tranquil·litat."
+      messageText="Hem rebut una sol·licitud per canviar la contrasenya del teu compte. Clica l'enllaç següent per definir-ne una de nova. Si no ho has demanat tu, pots ignorar aquest correu amb tranquil·litat."
     >
-      {/* Action Button */}
-      <table
-        role="presentation"
-        width="100%"
-        cellPadding="0"
-        cellSpacing="0"
-        border="0"
-        style={{ width: '100%', margin: '0 0 24px 0' }}
+      {/* Action link */}
+      <div
+        style={{
+          textAlign: 'center',
+          fontFamily: "'Roboto Condensed', 'Roboto', Helvetica, Arial, sans-serif",
+          fontSize: '16px',
+          fontWeight: 400,
+          color: '#141414',
+          marginTop: '12px',
+          marginBottom: '28px',
+        }}
       >
-        <tr>
-          <td align="center">
-            <table
-              role="presentation"
-              cellPadding="0"
-              cellSpacing="0"
-              border="0"
-              style={{ margin: '0 auto' }}
-            >
-              <tr>
-                <td
-                  align="center"
-                  style={{
-                    backgroundColor: '#141414',
-                    borderRadius: '6px',
-                    padding: '12px 28px',
-                  }}
-                >
-                  <a
-                    href={resetUrl}
-                    style={{
-                      color: '#FFFFFF',
-                      fontFamily: "'Roboto Condensed', 'Roboto', Helvetica, Arial, sans-serif",
-                      fontSize: '15px',
-                      fontWeight: 600,
-                      textDecoration: 'none',
-                      display: 'inline-block',
-                      letterSpacing: '0.5px',
-                    }}
-                  >
-                    Restablir contrasenya &rsaquo;
-                  </a>
-                </td>
-              </tr>
-            </table>
-          </td>
-        </tr>
-      </table>
+        <a
+          href={resetUrl}
+          style={{
+            color: '#141414',
+            textDecoration: 'none',
+            fontFamily: "'Roboto Condensed', 'Roboto', Helvetica, Arial, sans-serif",
+            fontSize: '16px',
+            fontWeight: 500,
+          }}
+        >
+          Restableix la contrasenya <span style={{ display: 'inline-block', marginLeft: '12px' }}>&rsaquo;</span>
+        </a>
+      </div>
 
       {/* Security notice */}
       <div
@@ -70,7 +48,7 @@ export function PasswordResetEmail({ data = {} }) {
           textAlign: 'center',
         }}
       >
-        Aquest enllaç és d'un sol ús i caduca en 60 minuts per motius de seguretat.
+        Aquest enllaç és d'un sol ús i caducarà d'aquí a 60 minuts per motius de seguretat.
       </div>
     </EmailLayout>
   );
@@ -79,3 +57,4 @@ export function PasswordResetEmail({ data = {} }) {
 export const passwordResetMeta = {
   subject: () => 'Restablir la contrasenya — Higgins GRÀFIC',
 };
+
