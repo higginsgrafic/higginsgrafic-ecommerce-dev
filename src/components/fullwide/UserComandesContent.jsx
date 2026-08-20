@@ -48,6 +48,55 @@ function UserComandesContent({ userEmail }) {
   }, [setActiveTab]);
   const [sortDirs, setSortDirs] = usePersistentState('HG_USER_SORT_DIRS', { 'COMANDA': 'desc', 'ESTAT': 'desc', 'DATA': 'desc', 'TOT PLEGAT': 'desc' });
   const [contactMode, setContactMode] = usePersistentState('HG_USER_CONTACT_MODE', 'comanda'); // 'comanda' | 'correu'
+  const [msgName, setMsgName] = useState('');
+  const [msgEmailOrOrder, setMsgEmailOrOrder] = useState('');
+  const [msgSubject, setMsgSubject] = useState('');
+  const [msgBody, setMsgBody] = useState('');
+  const [isSendingMsg, setIsSendingMsg] = useState(false);
+  const [msgFeedback, setMsgFeedback] = useState(null); // { type: 'success' | 'error', text: string }
+
+  const isEmailValid = (em) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(em || '').trim());
+  const effectiveEmail = contactMode === 'correu' ? msgEmailOrOrder.trim() : (userEmail || (isEmailValid(msgEmailOrOrder) ? msgEmailOrOrder.trim() : ''));
+  const isMessageFormValid = Boolean(
+    msgName.trim().length > 0 &&
+    msgBody.trim().length > 0 &&
+    (contactMode === 'correu' ? isEmailValid(msgEmailOrOrder) : (msgEmailOrOrder.trim().length > 0 && isEmailValid(effectiveEmail)))
+  );
+
+  const handleSendMessage = async () => {
+    if (!isMessageFormValid || isSendingMsg) return;
+    setIsSendingMsg(true);
+    setMsgFeedback(null);
+
+    const payload = {
+      name: msgName.trim(),
+      email: effectiveEmail,
+      orderNumber: contactMode === 'comanda' ? msgEmailOrOrder.trim() : undefined,
+      subject: msgSubject.trim(),
+      message: msgBody.trim(),
+    };
+
+    try {
+      const res = await fetch('/.netlify/functions/send-message', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+
+      if (!res.ok) {
+        throw new Error('Error al servidor');
+      }
+
+      setMsgFeedback({ type: 'success', text: "Missatge enviat correctament! T'hem enviat una còpia al teu correu." });
+      setMsgBody('');
+      setMsgSubject('');
+    } catch (err) {
+      console.error('Error enviant missatge:', err);
+      setMsgFeedback({ type: 'error', text: 'No s\'ha pogut enviar el missatge. Torna-ho a provar o escriu-nos a higginsgrafic@gmail.com' });
+    } finally {
+      setIsSendingMsg(false);
+    }
+  };
   const [acceptCommActive, setAcceptCommActive] = useState(false);
   const [acceptShareActive, setAcceptShareActive] = useState(false);
   const [facturacioActive, setFacturacioActive] = useState(false);
@@ -1216,13 +1265,25 @@ function UserComandesContent({ userEmail }) {
                     <tr key={idx} style={{ height: '30px' }}>
                       <td style={{ height: '30px', padding: 0 }}>
                         <div className="msg-ph-wrap">
-                          <input type="text" placeholder=" " style={inputStyle} />
+                          <input
+                            type="text"
+                            placeholder=" "
+                            style={inputStyle}
+                            value={msgName}
+                            onChange={(e) => setMsgName(e.target.value)}
+                          />
                           <span className="msg-ph"><span>Nom<sup>1</sup></span></span>
                         </div>
                       </td>
                       <td style={{ height: '30px', padding: 0 }}>
                         <div className="msg-ph-wrap">
-                          <input type="text" placeholder=" " style={inputStyle} />
+                          <input
+                            type="text"
+                            placeholder=" "
+                            style={inputStyle}
+                            value={msgEmailOrOrder}
+                            onChange={(e) => setMsgEmailOrOrder(e.target.value)}
+                          />
                           <span className="msg-ph"><span>{contactMode === 'comanda' ? <>Nombre de comanda<sup>1</sup></> : <>eCorreu<sup>1</sup></>}</span></span>
                         </div>
                       </td>
@@ -1236,8 +1297,14 @@ function UserComandesContent({ userEmail }) {
                     <tr key={idx} style={{ height: '30px' }}>
                       <td colSpan={2} style={{ height: '30px', padding: 0 }}>
                         <div className="msg-ph-wrap">
-                          <input type="text" placeholder=" " style={inputStyle} />
-                          <span className="msg-ph"><span>Assumpte<sup>1</sup></span></span>
+                          <input
+                            type="text"
+                            placeholder=" "
+                            style={inputStyle}
+                            value={msgSubject}
+                            onChange={(e) => setMsgSubject(e.target.value)}
+                          />
+                          <span className="msg-ph"><span>Assumpte</span></span>
                         </div>
                       </td>
                       <td style={{ height: '30px', padding: 0 }} />
@@ -1258,14 +1325,19 @@ function UserComandesContent({ userEmail }) {
                     <tr key={idx} style={{ height: '30px' }}>
                       <td colSpan={2} rowSpan={messageRowSpan} style={{ height: `${messageRowSpan * 30 + (messageRowSpan - 1) * 2.8}px`, padding: 0, verticalAlign: 'top' }}>
                         <div className="msg-ph-wrap msg-ph-top">
-                          <textarea placeholder=" " style={{
-                            ...inputStyle,
-                            backgroundColor: 'transparent',
-                            height: '100%',
-                            padding: '8px 10px',
-                            resize: 'none',
-                            lineHeight: 1.3,
-                          }} />
+                          <textarea
+                            placeholder=" "
+                            value={msgBody}
+                            onChange={(e) => setMsgBody(e.target.value)}
+                            style={{
+                              ...inputStyle,
+                              backgroundColor: 'transparent',
+                              height: '100%',
+                              padding: '8px 10px',
+                              resize: 'none',
+                              lineHeight: 1.3,
+                            }}
+                          />
                           <span className="msg-ph"><span>Missatge<sup>1</sup></span></span>
                         </div>
                       </td>
@@ -1299,13 +1371,17 @@ function UserComandesContent({ userEmail }) {
                           fontSize: '9.5pt',
                           letterSpacing: '0.05em',
                           lineHeight: 1,
-                          color: '#474F58',
+                          color: msgFeedback ? (msgFeedback.type === 'error' ? '#DC2626' : '#16A34A') : '#474F58',
                           whiteSpace: 'nowrap',
                           overflow: 'hidden',
                           textOverflow: 'ellipsis',
                           transform: 'translateY(-5px)',
                         }}>
-                          <span><sup style={{ fontFamily: 'Oswald, sans-serif', fontWeight: 700, fontSize: '0.7em', verticalAlign: 'baseline' }}>1</sup>Dades obligatòries per a la comunicació.</span>
+                          {msgFeedback ? (
+                            <span>{msgFeedback.text}</span>
+                          ) : (
+                            <span><sup style={{ fontFamily: 'Oswald, sans-serif', fontWeight: 700, fontSize: '0.7em', verticalAlign: 'baseline' }}>1</sup>Dades obligatòries per a la comunicació.</span>
+                          )}
                         </div>
                       </td>
                       <td style={{ height: '30px', padding: 0 }} />
@@ -1340,8 +1416,11 @@ function UserComandesContent({ userEmail }) {
                     ...btnBase,
                     fontWeight: 900,
                     color: '#FFFFFF',
-                    backgroundColor: '#2F61B2',
+                    backgroundColor: isMessageFormValid ? '#2F61B2' : '#98A2B4',
                     border: 'none',
+                    opacity: isMessageFormValid && !isSendingMsg ? 1 : 0.6,
+                    cursor: isMessageFormValid && !isSendingMsg ? 'pointer' : 'not-allowed',
+                    transition: 'opacity 0.2s, background-color 0.2s',
                   };
                   return (
                     <tr key={idx} style={{ height: '30px' }}>
@@ -1349,7 +1428,13 @@ function UserComandesContent({ userEmail }) {
                         <button style={attachBtnStyle}>ADJUNTA UN FITXER</button>
                       </td>
                       <td style={{ height: '30px', padding: 0 }}>
-                        <button style={sendBtnStyle}>ENVIA EL MISSATGE</button>
+                        <button
+                          style={sendBtnStyle}
+                          disabled={!isMessageFormValid || isSendingMsg}
+                          onClick={handleSendMessage}
+                        >
+                          {isSendingMsg ? 'ENVIANT...' : 'ENVIA EL MISSATGE'}
+                        </button>
                       </td>
                       <td style={{ height: '30px', padding: 0 }} />
                       <td style={{ height: '30px', padding: 0 }} />

@@ -1,3 +1,5 @@
+import { sendOrderEmail } from './_email.js';
+
 function jsonResponse(statusCode, body) {
   return {
     statusCode,
@@ -21,13 +23,13 @@ export async function handler(event) {
   }
 
   try {
-    const { name, email, subject, message } = JSON.parse(event.body || '{}');
+    const { name, email, subject, message, orderNumber } = JSON.parse(event.body || '{}');
 
     if (!email || !message) {
       return jsonResponse(400, { error: 'Falten camps obligatoris (email, message)' });
     }
 
-    const adminEmail = process.env.ADMIN_EMAIL || process.env.SMTP_TO || 'hola@higginsgrafic.com';
+    const adminEmail = process.env.ADMIN_EMAIL || process.env.RESEND_FROM_EMAIL || 'higginsgrafic@gmail.com';
 
     // Store message in Supabase if available
     const supabaseUrl = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL;
@@ -45,7 +47,7 @@ export async function handler(event) {
           body: JSON.stringify({
             name: name || '',
             email,
-            subject: subject || '',
+            subject: subject || (orderNumber ? `Comanda #${orderNumber}` : ''),
             message,
             created_at: new Date().toISOString(),
           }),
@@ -55,38 +57,47 @@ export async function handler(event) {
       }
     }
 
-    // Send email notification via Resend (if RESEND_API_KEY is set)
+    // 1. Send notification to admin / store
     const resendApiKey = process.env.RESEND_API_KEY;
     if (resendApiKey) {
+      const fromEmail = process.env.RESEND_FROM_EMAIL || 'onboarding@resend.dev';
       try {
-        const emailRes = await fetch('https://api.resend.com/emails', {
+        await fetch('https://api.resend.com/emails', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${resendApiKey}`,
           },
           body: JSON.stringify({
-            from: 'Higgins GRÀFIC <noreply@higginsgrafic.com>',
-            to: [adminEmail],
+            from: fromEmail,
+            to: adminEmail,
             reply_to: email,
-            subject: `Nou missatge: ${subject || '(sense assumpte)'}`,
+            subject: `Nou missatge de ${name || email}: ${subject || (orderNumber ? `Comanda #${orderNumber}` : '(sense assumpte)')}`,
             html: `
               <p><strong>Nom:</strong> ${name || '—'}</p>
               <p><strong>Email:</strong> ${email}</p>
+              ${orderNumber ? `<p><strong>Comanda:</strong> #${orderNumber}</p>` : ''}
               <p><strong>Assumpte:</strong> ${subject || '—'}</p>
               <hr>
               <p style="white-space: pre-wrap;">${message}</p>
             `,
           }),
         });
-        if (!emailRes.ok) {
-          console.error('[send-message] Resend error:', await emailRes.text());
-        }
-      } catch (emailErr) {
-        console.error('[send-message] Email send failed:', emailErr);
+      } catch (adminErr) {
+        console.error('[send-message] Admin notification failed:', adminErr);
       }
-    } else {
-      console.log(`[send-message] New message from ${name || 'Unknown'} <${email}>: ${subject || '(no subject)'}`);
+
+      // 2. Send confirmation email to client with copy of message
+      try {
+        await sendOrderEmail('contact_received', {
+          email,
+          first_name: name || '',
+          name: name || '',
+          message,
+        });
+      } catch (clientErr) {
+        console.error('[send-message] Client confirmation email failed:', clientErr);
+      }
     }
 
     return jsonResponse(200, { ok: true, message: 'Missatge enviat correctament' });
@@ -95,3 +106,4 @@ export async function handler(event) {
     return jsonResponse(500, { error: 'Error intern del servidor' });
   }
 }
+
