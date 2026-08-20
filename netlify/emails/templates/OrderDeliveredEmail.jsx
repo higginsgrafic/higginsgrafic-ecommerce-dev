@@ -83,7 +83,7 @@ export function OrderDeliveredEmail({ order = {} }) {
             fontWeight: 500,
           }}
         >
-          Tens cap dubte o consulta? Contacta'ns <span style={{ display: 'inline-block', marginLeft: '6px' }}>&rsaquo;</span>
+          Si tens cap dubte o consulta, contacta'ns <span style={{ display: 'inline-block', marginLeft: '6px' }}>&rsaquo;</span>
         </a>
       </div>
     </EmailLayout>
