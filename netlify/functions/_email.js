@@ -13,7 +13,12 @@ import { createElement } from 'react';
 import { OrderConfirmedEmail, orderConfirmedMeta } from '../emails/templates/OrderConfirmedEmail.jsx';
 import { OrderInProductionEmail, orderInProductionMeta } from '../emails/templates/OrderInProductionEmail.jsx';
 import { OrderShippedEmail, orderShippedMeta } from '../emails/templates/OrderShippedEmail.jsx';
+import { OrderDeliveredEmail, orderDeliveredMeta } from '../emails/templates/OrderDeliveredEmail.jsx';
+import { OrderRefundedEmail, orderRefundedMeta } from '../emails/templates/OrderRefundedEmail.jsx';
 import { OrderFailedEmail, orderFailedMeta } from '../emails/templates/OrderFailedEmail.jsx';
+import { WelcomeEmail, welcomeMeta } from '../emails/templates/WelcomeEmail.jsx';
+import { PasswordResetEmail, passwordResetMeta } from '../emails/templates/PasswordResetEmail.jsx';
+import { ContactReceivedEmail, contactReceivedMeta } from '../emails/templates/ContactReceivedEmail.jsx';
 
 const RESEND_API = 'https://api.resend.com/emails';
 
@@ -23,13 +28,18 @@ function getFrom() {
 }
 
 const TEMPLATES = {
-  order_confirmed: { Component: OrderConfirmedEmail, meta: orderConfirmedMeta },
-  order_in_production: { Component: OrderInProductionEmail, meta: orderInProductionMeta },
-  order_shipped: { Component: OrderShippedEmail, meta: orderShippedMeta },
-  order_failed: { Component: OrderFailedEmail, meta: orderFailedMeta },
+  order_confirmed: { Component: OrderConfirmedEmail, meta: orderConfirmedMeta, propName: 'order' },
+  order_in_production: { Component: OrderInProductionEmail, meta: orderInProductionMeta, propName: 'order' },
+  order_shipped: { Component: OrderShippedEmail, meta: orderShippedMeta, propName: 'order' },
+  order_delivered: { Component: OrderDeliveredEmail, meta: orderDeliveredMeta, propName: 'order' },
+  order_refunded: { Component: OrderRefundedEmail, meta: orderRefundedMeta, propName: 'order' },
+  order_failed: { Component: OrderFailedEmail, meta: orderFailedMeta, propName: 'order' },
+  welcome: { Component: WelcomeEmail, meta: welcomeMeta, propName: 'user' },
+  password_reset: { Component: PasswordResetEmail, meta: passwordResetMeta, propName: 'data' },
+  contact_received: { Component: ContactReceivedEmail, meta: contactReceivedMeta, propName: 'data' },
 };
 
-export async function sendOrderEmail(templateKey, order) {
+export async function sendOrderEmail(templateKey, payload) {
   const apiKey = process.env.RESEND_API_KEY;
   if (!apiKey) {
     console.warn('[_email] RESEND_API_KEY no configurada — skip email');
@@ -42,19 +52,19 @@ export async function sendOrderEmail(templateKey, order) {
     return { error: 'unknown_template' };
   }
 
-  const to = order.email;
+  const to = payload.email || payload.to;
   if (!to) {
-    console.warn('[_email] Ordre sense email — skip');
+    console.warn('[_email] Destinatari sense email — skip');
     return { skipped: true };
   }
 
-  const { Component, meta } = template;
-  const element = createElement(Component, { order });
+  const { Component, meta, propName } = template;
+  const element = createElement(Component, { [propName]: payload });
   const rawHtml = await render(element);
   const html = rawHtml
     .replace(/src="\/([^"]+)"/g, 'src="https://higginsgrafic.com/$1"')
     .replace(/url\('\/([^']+)'\)/g, "url('https://higginsgrafic.com/$1')");
-  const subject = meta.subject(order);
+  const subject = typeof meta.subject === 'function' ? meta.subject(payload) : meta.subject;
 
   try {
     const res = await fetch(RESEND_API, {
@@ -85,3 +95,4 @@ export async function sendOrderEmail(templateKey, order) {
     return { error: err.message };
   }
 }
+
