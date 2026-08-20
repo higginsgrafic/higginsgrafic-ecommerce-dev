@@ -57,7 +57,6 @@ export function EmailLayout({
                   borderRadius: '12px',
                   overflow: 'hidden',
                   margin: '0 auto',
-                  border: '1px solid #E5E7EB',
                 }}
               >
                 {/* Logo Row */}
@@ -66,10 +65,10 @@ export function EmailLayout({
                     <Img
                       src={LOGO_URL}
                       alt="Higgins GRÀFIC"
-                      width="120"
+                      width="150"
                       style={{
                         display: 'block',
-                        width: '120px',
+                        width: '150px',
                         height: 'auto',
                         margin: '0 auto',
                         border: 0,
@@ -92,7 +91,6 @@ export function EmailLayout({
                         backgroundColor: '#F0F2F6',
                         background: 'linear-gradient(180deg, #F0F2F6 0%, #FFFFFF 100%)',
                         borderRadius: '10px',
-                        border: '1px solid #E2E4E9',
                       }}
                     >
                       {/* Header: Status + Label */}
