@@ -9,7 +9,7 @@ export function OrderDeliveredEmail({ order = {} }) {
       statusText="Actualització d'estat"
       labelText="COMANDA LLIURADA"
       clientName={clientName}
-      messageText="El transportista ens ha confirmat que el teu paquet ha estat lliurat a la teva adreça. Esperem que gaudeixis molt de la teva peça Higgins GRÀFIC!"
+      messageText="El transportista ha confirmat que el teu paquet ha estat lliurat a l'adreça indicada. Esperem que en gaudeixis força i que et tornem a veure, ben aviat, a Higgins GRÀFIC. Gràcies per la compra!"
     >
       {/* Order Number Pill */}
       <table
@@ -60,7 +60,7 @@ export function OrderDeliveredEmail({ order = {} }) {
           marginBottom: '28px',
         }}
       >
-        Recorda que disposes de 14 dies naturals de dret de desistiment si necessites fer qualsevol gestió amb el teu producte.
+        Recorda que disposes de 14 dies naturals, des d'avui mateix, per exercir el teu dret de desistiment.
       </div>
 
       {/* Support link */}
@@ -83,7 +83,7 @@ export function OrderDeliveredEmail({ order = {} }) {
             fontWeight: 500,
           }}
         >
-          Alguna incidència amb el lliurament? Contacta'ns <span style={{ display: 'inline-block', marginLeft: '6px' }}>&rsaquo;</span>
+          Tens cap dubte o consulta? Contacta'ns <span style={{ display: 'inline-block', marginLeft: '6px' }}>&rsaquo;</span>
         </a>
       </div>
     </EmailLayout>
