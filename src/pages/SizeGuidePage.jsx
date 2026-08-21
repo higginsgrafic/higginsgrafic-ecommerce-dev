@@ -54,15 +54,15 @@ function SizeGuidePage() {
     },
     {
       bullet: '5. Material i Cura',
-      paragraph: 'Composició: 100% Cotó Orgànic Certificat, 180 g/m² (qualitat prèmium).',
+      paragraph: 'Composició: 100% Cotó Ring-Spun filat en anell (Gildan® 64000 Softstyle), 153 g/m² amb impressió DTF d\'alta definició.',
       items: [
         'Renta-ho màxim a 30°C.',
         'Renta-ho del revés per protegir el dibuix.',
         'No és recomanable fer servir l\'assecadora.',
         'Planxa-ho del revés a temperatura mitjana.',
-        'No hi facis servir lleixeu',
+        'No hi facis servir lleixiu.',
       ],
-      note: 'El cotó orgànic es pot encongir lleugerament, fins a un 2 o un 3% després de la primera rentada, per això, les mesures de la taula, són un cop rentats. Segueix les instruccions de cura per mantenir la qualitat i mesures de la samarreta.',
+      note: 'El cotó ring-spun pre-encongit garanteix una gran estabilitat dimensional després de les rentades. Segueix les instruccions de cura per mantenir la màxima intensitat del color.',
       noteBold: true,
     },
   ];
