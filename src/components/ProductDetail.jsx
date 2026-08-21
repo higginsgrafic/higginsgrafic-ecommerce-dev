@@ -252,23 +252,27 @@ function ProductDetail({ product, onClose, onAddToCart }) {
                   <ul className="font-roboto space-y-2 text-sm" style={{ color: "#141414", opacity: 0.7 }}>
                     <li className="flex items-start gap-2">
                       <span className="text-gray-900 mt-0.5">•</span>
-                      <span>Gildan 5000 100% Cotó premium</span>
+                      <span>Gildan® 64000 Softstyle — 100% Cotó Ring-Spun filat en anell</span>
                     </li>
                     <li className="flex items-start gap-2">
                       <span className="text-gray-900 mt-0.5">•</span>
-                      <span>Teixit pre-encongit per major durabilitat</span>
+                      <span>Impressió DTF (Direct-to-Film) d'alta definició i màxima intensitat</span>
                     </li>
                     <li className="flex items-start gap-2">
                       <span className="text-gray-900 mt-0.5">•</span>
-                      <span>Coll de doble agulla sense costures</span>
+                      <span>Gramatge 153 g/m²: teixit lleuger, fresc i de tacte ultra-suau</span>
                     </li>
                     <li className="flex items-start gap-2">
                       <span className="text-gray-900 mt-0.5">•</span>
-                      <span>Coll i espatlles reforçades</span>
+                      <span>Tall clàssic modern amb coll fi de canalé sense costures</span>
                     </li>
                     <li className="flex items-start gap-2">
                       <span className="text-gray-900 mt-0.5">•</span>
-                      <span>Etiqueta extraïble per màxim confort</span>
+                      <span>Espatlles i coll reforçats i encintats per a major confort</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-gray-900 mt-0.5">•</span>
+                      <span>Teixit pre-encongit de fibra compacta</span>
                     </li>
                     <li className="flex items-start gap-2">
                       <span className="text-gray-900 mt-0.5">•</span>
