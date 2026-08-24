@@ -20,7 +20,7 @@ export function SummaryTable({ order }) {
       style={{
         width: '100%',
         borderCollapse: 'collapse',
-        marginTop: '63px',
+        marginTop: '37px',
       }}
     >
       <tbody>

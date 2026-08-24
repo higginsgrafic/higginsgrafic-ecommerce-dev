@@ -85,13 +85,11 @@ export function EmailLayout({
                     <table
                       role="presentation"
                       width="100%"
-                      height="520"
                       cellPadding="0"
                       cellSpacing="0"
                       border="0"
                       style={{
                         width: '100%',
-                        height: '520px',
                         minHeight: '520px',
                         backgroundColor: '#F0F2F6',
                         background: 'linear-gradient(180deg, #F0F2F6 0%, #FFFFFF 100%)',
@@ -100,8 +98,8 @@ export function EmailLayout({
                       }}
                     >
                       <tr>
-                        {/* Content Area: (E, 8) to (T, 24) -> 2 cols padding left/right (43.3px), 2 rows top (52px) */}
-                        <td style={{ padding: '52px 43.33px 0 43.33px', verticalAlign: 'top' }}>
+                        {/* Content Area: (E, 8) to (T, 24) -> 2 cols padding left/right (43.3px), 2 rows top (52px), 1 row bottom (26px) */}
+                        <td style={{ padding: showCta ? '52px 43.33px 0 43.33px' : '52px 43.33px 26px 43.33px', verticalAlign: 'top' }}>
                           {/* Upper Text Area: Rows 8 to 15 (Height 208px) so slot below starts exactly at Row 16 */}
                           <div style={{ height: '208px', boxSizing: 'border-box' }}>
                             {/* Header: Status + Label */}

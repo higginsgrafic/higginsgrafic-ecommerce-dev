@@ -75,7 +75,6 @@ import { AuthProvider } from '@/contexts/AuthContext';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import App from '@/App';
 import BranchBadge from '@/components/dev/BranchBadge';
-import ActiveWorkOverlay from '@/components/dev/ActiveWorkOverlay';
 import '@/index.css';
 if (import.meta.env.DEV) {
   import('@/debug.css');
@@ -98,7 +97,6 @@ ReactDOM.createRoot(document.getElementById('root')).render(
               <ToastProvider>
                 <App />
                 <BranchBadge />
-                <ActiveWorkOverlay />
               </ToastProvider>
             </ProductProvider>
           </WishlistProvider>

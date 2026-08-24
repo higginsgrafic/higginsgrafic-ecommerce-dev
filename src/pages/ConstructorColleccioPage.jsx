@@ -281,51 +281,7 @@ function ConstructorColleccioPage() {
       </Pauta4ColsOverlay>
 
       <TramFinal />
-
-      <div
-        className="font-mono text-neutral-800"
-        style={{
-          position: 'fixed',
-          right: 16,
-          top: 170,
-          width: 260,
-          zIndex: 100000,
-          background: 'rgba(255,255,255,0.96)',
-          border: '1px solid rgba(0,0,0,0.10)',
-          borderRadius: 10,
-          padding: 12,
-          fontSize: 12,
-          boxShadow: '0 6px 24px rgba(0,0,0,0.12)',
-        }}
-      >
-        <strong className="mb-2 block">Controls col·lecció</strong>
-        <OpacitySlider label="Opacitat pauta" value={pautaOpacity} onChange={(value) => setOverlayState((prev) => ({ ...prev, pautaOpacity: value }))} />
-        <OpacitySlider label="Opacitat taula" value={tableOpacity} onChange={(value) => setOverlayState((prev) => ({ ...prev, tableOpacity: value }))} />
-        <OpacitySlider label="Opacitat BG" value={backgroundOpacity} onChange={(value) => setOverlayState((prev) => ({ ...prev, backgroundOpacity: value }))} />
-      </div>
     </section>
-  );
-}
-
-// El component anterior CollectionOutroSection ha estat eliminat per utilitzar el component global TramFinal.
-
-function OpacitySlider({ label, value, onChange }) {
-  return (
-    <label className="mb-2 block">
-      <div className="flex items-center justify-between text-[11px] text-neutral-700">
-        <span>{label}</span>
-        <span className="tabular-nums text-neutral-900">{value.toFixed(2)}</span>
-      </div>
-      <input
-        type="range"
-        min={0}
-        max={1}
-        step={0.05}
-        value={value}
-        onChange={(event) => onChange(parseFloat(event.target.value))}
-        className="w-full accent-orange-600"
-      />
-    </label>
   );
 }
 
