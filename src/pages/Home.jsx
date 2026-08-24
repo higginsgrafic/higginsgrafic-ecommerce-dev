@@ -39,6 +39,39 @@ const HERO_SLIDES = [
   },
 ];
 
+const COLLECTIONS_MENU = [
+  {
+    id: 'first-contact',
+    name: 'First Contact',
+    href: '/first-contact',
+    icon: '/custom_logos/collections/collection-first-contact-logo.svg',
+  },
+  {
+    id: 'the-human-inside',
+    name: 'The Human Inside',
+    href: '/the-human-inside',
+    icon: '/custom_logos/collections/collection-thin-logo.svg',
+  },
+  {
+    id: 'austen',
+    name: 'Austen',
+    href: '/austen',
+    icon: '/custom_logos/collections/collection-jean-austen-logo.svg',
+  },
+  {
+    id: 'cube',
+    name: 'Cube',
+    href: '/cube',
+    icon: '/custom_logos/collections/collection-cube-logo.svg',
+  },
+  {
+    id: 'miscellania',
+    name: 'Miscel·lània',
+    href: '/miscellania',
+    icon: '/custom_logos/collections/collection-miscellania-logo.svg',
+  },
+];
+
 function CollectionTitle({ index, kicker, title, subtitle, align = 'left', numberAlign, titleOffsetX = 0, titleOffsetY = 0, numberOffsetX = -20, numberOffsetY = 0, numberTopPercent = 50, subtitleOffsetX = 0, subtitleOffsetY = 0, titleTextAlign, collectionHref }) {
   const isRight = align === 'right';
   const resolvedNumberAlign = numberAlign || align;
@@ -257,11 +290,11 @@ function Home() {
         topOffset="76px"
         bottomPadding="0px"
       >
-        {/* Logo HIGGINS GRÀFIC centrat com a la captura (fila 3 / 8) */}
+        {/* Logo HIGGINS GRÀFIC centrat */}
         <div
           style={{
             gridColumn: '1 / 4',
-            gridRow: '3 / 8',
+            gridRow: '3 / 7',
             alignSelf: 'center',
             position: 'relative',
             zIndex: 10,
@@ -271,7 +304,7 @@ function Home() {
             alignItems: 'center',
             justifyContent: 'center',
             pointerEvents: 'auto',
-            transform: 'translateY(-38px)', // Pujat 1 fila
+            transform: 'translateY(-26px)',
           }}
         >
           <img
@@ -283,6 +316,55 @@ function Home() {
               objectFit: 'contain',
             }}
           />
+        </div>
+
+        {/* Menú de col·leccions centrat en Y entre títol i hero, alineat al top */}
+        <div
+          style={{
+            gridColumn: '1 / 4',
+            gridRow: '7 / 10',
+            alignSelf: 'center',
+            position: 'relative',
+            zIndex: 10,
+            width: '100%',
+            height: '100%',
+            display: 'flex',
+            alignItems: 'flex-start',
+            justifyContent: 'center',
+            gap: '44px',
+            pointerEvents: 'auto',
+            transform: 'translateY(0px)',
+          }}
+        >
+          {COLLECTIONS_MENU.map((c) => {
+            const isFirstContact = c.id === 'first-contact';
+            return (
+              <Link
+                key={c.id}
+                to={c.href}
+                title={c.name}
+                aria-label={c.name}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'flex-start',
+                  justifyContent: 'center',
+                  transition: 'transform 0.15s ease, opacity 0.15s ease',
+                }}
+                className="hover:scale-110 active:scale-95 opacity-90 hover:opacity-100"
+              >
+                <img
+                  src={c.icon}
+                  alt={c.name}
+                  style={{
+                    width: isFirstContact ? '42.1px' : 'auto',
+                    height: isFirstContact ? 'auto' : '44px',
+                    objectFit: 'contain',
+                    display: 'block',
+                  }}
+                />
+              </Link>
+            );
+          })}
         </div>
 
         {/* Hero Slider Carrussel (fila 10 / 25 — amplada total de col 1 a col 5) */}

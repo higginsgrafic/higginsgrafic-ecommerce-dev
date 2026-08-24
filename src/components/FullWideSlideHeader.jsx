@@ -2975,22 +2975,15 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
                     maskSize: 'contain',
                   }}
                 />
+                {localCartItemCount > 0 && (
+                  <span
+                    className="absolute left-1/2 -translate-x-1/2 text-whiteStrong text-[13.75px] font-bold lg:text-[16.25px]"
+                    style={{ top: 'calc(60% - 0.5px)', transform: 'translate(-50%, -50%)', lineHeight: '1' }}
+                  >
+                    {localCartItemCount}
+                  </span>
+                )}
               </span>
-              {localCartItemCount > 0 && (
-                <span
-                  className="absolute pointer-events-none flex items-center justify-center rounded-full bg-foreground text-background font-bold font-oswald shadow-md"
-                  style={{
-                    top: '2px',
-                    right: '2px',
-                    width: '16px',
-                    height: '16px',
-                    fontSize: '10px',
-                    lineHeight: '1',
-                  }}
-                >
-                  {localCartItemCount}
-                </span>
-              )}
             </button>
             </TooltipTrigger>
             <TooltipContent>Cistell</TooltipContent>

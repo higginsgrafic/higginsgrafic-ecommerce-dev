@@ -1,5 +1,6 @@
-import { useEffect, useState, useRef, useMemo } from 'react';
+import { useEffect, useLayoutEffect, useState, useRef, useMemo } from 'react';
 import { Helmet } from 'react-helmet';
+import { Link } from 'react-router-dom';
 import Pauta4ColsOverlay from '@/components/pauta/Pauta4ColsOverlay';
 import { collectionGridImageFor, gridFinishFor, collectionGridHoverVariantsFor } from '@/lib/pdpMockup';
 import HeroSlider from '@/components/HeroSlider';
@@ -11,6 +12,39 @@ import { buildOtherCollectionsImages } from '@/components/home/homeDrawings';
 import Breadcrumbs from '@/components/Breadcrumbs';
 
 const COLLECTION_BG_SRC = '/tmp/PAGINES/PAGINES TIPUS/00 COLLECCIO.png';
+
+const COLLECTIONS_MENU = [
+  {
+    id: 'first-contact',
+    name: 'First Contact',
+    href: '/first-contact',
+    icon: '/custom_logos/collections/collection-first-contact-logo.svg',
+  },
+  {
+    id: 'the-human-inside',
+    name: 'The Human Inside',
+    href: '/the-human-inside',
+    icon: '/custom_logos/collections/collection-thin-logo.svg',
+  },
+  {
+    id: 'austen',
+    name: 'Austen',
+    href: '/austen',
+    icon: '/custom_logos/collections/collection-jean-austen-logo.svg',
+  },
+  {
+    id: 'cube',
+    name: 'Cube',
+    href: '/cube',
+    icon: '/custom_logos/collections/collection-cube-logo.svg',
+  },
+  {
+    id: 'miscellania',
+    name: 'Miscel·lània',
+    href: '/miscellania',
+    icon: '/custom_logos/collections/collection-miscellania-logo.svg',
+  },
+];
 
 const TDP_DESCRIPTION = [
   "Mereixedors són d'honor, glòria e de fama e contínua bona memòria los ",
@@ -132,6 +166,7 @@ function loadOverlayState() {
 function CollectionTheHumanInsidePage() {
   const [overlayState, setOverlayState] = useState(loadOverlayState);
   const [zeroLeftOffsetPx, setZeroLeftOffsetPx] = useState(0);
+  const [rowHeight, setRowHeight] = useState(38);
   const pautaGridRef = useRef(null);
   const sizes = ['S', 'M', 'L', 'XL', 'XXL'];
   const { pautaOpacity, tableOpacity, backgroundOpacity } = overlayState;
@@ -163,6 +198,11 @@ function CollectionTheHumanInsidePage() {
       const gridRect = grid.getBoundingClientRect();
       const offset = Math.max(0, logoRect.left - gridRect.left);
       setZeroLeftOffsetPx((prev) => (Math.abs(prev - offset) < 0.5 ? prev : offset));
+
+      const numRows = 24;
+      const rowGap = 3;
+      const singleRowH = (gridRect.height - (numRows - 1) * rowGap) / numRows;
+      setRowHeight((prev) => (Math.abs(prev - singleRowH) < 0.1 ? prev : singleRowH));
     };
     measure();
     const onResize = () => {
@@ -189,7 +229,6 @@ function CollectionTheHumanInsidePage() {
         />
       </Helmet>
 
-      <div style={{ transform: 'scale(0.94)', transformOrigin: 'top center' }}>
       <Pauta4ColsOverlay
         pautaEnabled={false}
         tableEnabled={false}
@@ -211,43 +250,116 @@ function CollectionTheHumanInsidePage() {
           <Breadcrumbs items={[{ label: 'The Human Inside' }]} />
         </div>
 
+        {/* Títol col·lecció (fila 3 / 7) */}
         <div
           aria-label="Títol col·lecció"
           style={{
             gridColumn: '1 / 4',
-            gridRow: '1 / 7',
+            gridRow: '3 / 7',
+            alignSelf: 'center',
+            position: 'relative',
+            zIndex: 10,
+            width: '100%',
+            height: '100%',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            zIndex: 4,
             pointerEvents: 'none',
+            transform: 'translateY(-26px)',
           }}
         >
           <h1
             style={{
               margin: 0,
               fontFamily: 'Oswald, sans-serif',
-              fontWeight: 700,
-              fontSize: '8vw',
-              letterSpacing: '-0.01em',
-              lineHeight: 0.85,
+              fontWeight: 300,
+              fontSize: 'clamp(2.5rem, 8.5vw, 125px)',
+              letterSpacing: '0.02em',
+              lineHeight: 0.9,
               color: '#0b0d10',
               textTransform: 'uppercase',
               textAlign: 'center',
-              transform: 'translateY(calc(1% + 10px))',
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '0.35em',
+              whiteSpace: 'nowrap',
             }}
           >
-            THE HUMAN INSIDE
+            <img
+              src="/custom_logos/collections/collection-thin-logo.svg"
+              alt=""
+              aria-hidden="true"
+              style={{
+                height: '0.75em',
+                width: 'auto',
+                objectFit: 'contain',
+                display: 'inline-block',
+                flexShrink: 0,
+              }}
+            />
+            <span>THE HUMAN INSIDE</span>
           </h1>
+        </div>
+
+        {/* Menú de col·leccions centrat en Y entre títol i hero, alineat al top */}
+        <div
+          style={{
+            gridColumn: '1 / 4',
+            gridRow: '7 / 10',
+            alignSelf: 'center',
+            position: 'relative',
+            zIndex: 10,
+            width: '100%',
+            height: '100%',
+            display: 'flex',
+            alignItems: 'flex-start',
+            justifyContent: 'center',
+            gap: '44px',
+            pointerEvents: 'auto',
+            transform: 'translateY(0px)',
+          }}
+        >
+          {COLLECTIONS_MENU.map((c) => {
+            const isFirstContact = c.id === 'first-contact';
+            return (
+              <Link
+                key={c.id}
+                to={c.href}
+                title={c.name}
+                aria-label={c.name}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'flex-start',
+                  justifyContent: 'center',
+                  transition: 'transform 0.15s ease, opacity 0.15s ease',
+                }}
+                className="hover:scale-110 active:scale-95 opacity-90 hover:opacity-100"
+              >
+                <img
+                  src={c.icon}
+                  alt={c.name}
+                  style={{
+                    width: isFirstContact ? '42.1px' : 'auto',
+                    height: isFirstContact ? 'auto' : '44px',
+                    objectFit: 'contain',
+                    display: 'block',
+                  }}
+                />
+              </Link>
+            );
+          })}
         </div>
         <div
           style={{
             gridColumn: '1 / 4',
             gridRow: '10 / 25',
             position: 'relative',
-            top: '1px',
+            top: `calc(-5px - ${rowHeight / 2}px)`,
             width: 'calc(100% + 1px)',
             height: 'calc(100% + 2px)',
+            transform: 'scale(0.94)',
+            transformOrigin: 'center center',
           }}
         >
           <HeroSlider
@@ -333,50 +445,7 @@ function CollectionTheHumanInsidePage() {
         posterLines={[{ text: 'CADA' }, { text: 'HISTÒRIA TÉ' }, { text: 'UN DIBUIX' }]}
         tambeImages={otherImages}
       />
-      </div>
-
-      <div
-        className="font-mono text-neutral-800"
-        style={{
-          position: 'fixed',
-          right: 16,
-          top: 170,
-          width: 260,
-          zIndex: 100000,
-          background: 'rgba(255,255,255,0.96)',
-          border: '1px solid rgba(0,0,0,0.10)',
-          borderRadius: 10,
-          padding: 12,
-          fontSize: 12,
-          boxShadow: '0 6px 24px rgba(0,0,0,0.12)',
-        }}
-      >
-        <strong className="mb-2 block">Controls col·lecció (còpia 3)</strong>
-        <OpacitySlider label="Opacitat pauta" value={pautaOpacity} onChange={(value) => setOverlayState((prev) => ({ ...prev, pautaOpacity: value }))} />
-        <OpacitySlider label="Opacitat taula" value={tableOpacity} onChange={(value) => setOverlayState((prev) => ({ ...prev, tableOpacity: value }))} />
-        <OpacitySlider label="Opacitat BG" value={backgroundOpacity} onChange={(value) => setOverlayState((prev) => ({ ...prev, backgroundOpacity: value }))} />
-      </div>
     </section>
-  );
-}
-
-function OpacitySlider({ label, value, onChange }) {
-  return (
-    <label className="mb-2 block">
-      <div className="flex items-center justify-between text-[11px] text-neutral-700">
-        <span>{label}</span>
-        <span className="tabular-nums text-neutral-900">{value.toFixed(2)}</span>
-      </div>
-      <input
-        type="range"
-        min={0}
-        max={1}
-        step={0.05}
-        value={value}
-        onChange={(event) => onChange(parseFloat(event.target.value))}
-        className="w-full accent-orange-600"
-      />
-    </label>
   );
 }
 

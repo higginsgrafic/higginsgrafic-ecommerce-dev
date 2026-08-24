@@ -140,12 +140,12 @@ function usePersistentFlag(key, defaultValue, type = 'bool') {
 }
 
 export function useDebugOverlays() {
-  const [debugsEnabled, setDebugsEnabled] = usePersistentFlag(KEY_DEBUGS, true, 'bool');
+  const [debugsEnabled, setDebugsEnabled] = usePersistentFlag(KEY_DEBUGS, false, 'bool');
   const [activeWorkEnabled, setActiveWorkEnabled] = usePersistentFlag(KEY_ACTIVE_WORK, false, 'bool');
-  const [rulersEnabled, setRulersEnabled] = usePersistentFlag(KEY_RULERS, true, 'bool');
-  const [pdpControlsEnabled, setPdpControlsEnabled] = usePersistentFlag(KEY_PDP_CONTROLS, true, 'bool');
-  const [pautaEnabled, setPautaEnabled] = usePersistentFlag(KEY_PAUTA, true, 'bool');
-  const [tableEnabled, setTableEnabled] = usePersistentFlag(KEY_TABLE, true, 'bool');
+  const [rulersEnabled, setRulersEnabled] = usePersistentFlag(KEY_RULERS, false, 'bool');
+  const [pdpControlsEnabled, setPdpControlsEnabled] = usePersistentFlag(KEY_PDP_CONTROLS, false, 'bool');
+  const [pautaEnabled, setPautaEnabled] = usePersistentFlag(KEY_PAUTA, false, 'bool');
+  const [tableEnabled, setTableEnabled] = usePersistentFlag(KEY_TABLE, false, 'bool');
   const [pautaOpacity, setPautaOpacity] = usePersistentFlag(KEY_PAUTA_OPACITY, 1, 'number');
   const [tableOpacity, setTableOpacity] = usePersistentFlag(KEY_TABLE_OPACITY, 0.5, 'number');
 

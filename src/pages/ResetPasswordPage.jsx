@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Lock, Eye, EyeOff, KeyRound, CheckCircle2, Shuffle, Copy } from 'lucide-react';
+import { Lock, Eye, EyeOff, KeyRound, CheckCircle2, Shuffle, X } from 'lucide-react';
 import SEO from '@/components/SEO';
 import { supabase } from '@/api/supabase-products';
 
@@ -12,9 +12,11 @@ export default function ResetPasswordPage() {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [sessionReady, setSessionReady] = useState(false);
-  const [suggestion, setSuggestion] = useState('');
-  const [copied, setCopied] = useState(false);
   const navigate = useNavigate();
+
+  const handleClose = () => {
+    navigate('/');
+  };
 
   const generatePassword = () => {
     const lower = 'abcdefghijkmnpqrstuvwxyz';
@@ -26,27 +28,15 @@ export default function ResetPasswordPage() {
     for (let i = 0; i < 12; i++) {
       pwd += all[Math.floor(Math.random() * all.length)];
     }
-    setSuggestion(pwd);
-    setCopied(false);
-  };
-
-  const copySuggestion = () => {
-    if (!suggestion) return;
-    navigator.clipboard.writeText(suggestion);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
-
-  const useSuggestion = () => {
-    setPassword(suggestion);
-    setConfirmPassword(suggestion);
+    setPassword(pwd);
+    setConfirmPassword(pwd);
     setShowPassword(true);
   };
 
   useEffect(() => {
     const initSession = async () => {
       if (!supabase?.auth) {
-        setError('Supabase auth no disponible');
+        if (!import.meta.env.DEV) setError('Supabase auth no disponible');
         setSessionReady(true);
         return;
       }
@@ -59,12 +49,12 @@ export default function ResetPasswordPage() {
             if (hashError) {
               setError('L\'enllaç de recuperació no és vàlid o ha caducat.');
             }
-          } else {
+          } else if (!import.meta.env.DEV) {
             setError('L\'enllaç de recuperació no és vàlid o ha caducat.');
           }
         }
       } catch {
-        setError('No s\'ha pogut verificar l\'enllaç de recuperació.');
+        if (!import.meta.env.DEV) setError('No s\'ha pogut verificar l\'enllaç de recuperació.');
       } finally {
         setSessionReady(true);
       }
@@ -101,17 +91,30 @@ export default function ResetPasswordPage() {
     }
   };
 
-  return (
+    return (
     <>
       <SEO title="Recuperació de contrasenya — Higgins Gràfic" />
-      <div className="min-h-screen bg-neutral-50 flex items-center justify-center p-4">
-        <div className="w-full max-w-md pt-[129px] lg:pt-[145px]">
-          <div className="bg-white rounded-lg shadow-lg p-8">
-            <div className="flex items-center justify-center mb-6">
-              <div className="p-3 bg-neutral-100 rounded-full">
-                <KeyRound className="w-8 h-8 text-neutral-700" />
-              </div>
-            </div>
+      <div
+        className="fixed inset-0 z-[10001] flex items-center justify-center"
+        style={{ backgroundColor: 'rgba(0, 0, 0, 0.6)' }}
+        onClick={handleClose}
+      >
+        <div
+          className="relative bg-white rounded-lg shadow-2xl p-8 w-full max-w-md mx-4"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <button
+            type="button"
+            onClick={handleClose}
+            className="absolute top-4 right-4 text-neutral-400 hover:text-neutral-700 transition-colors"
+            aria-label="Tancar"
+          >
+            <X className="w-5 h-5" />
+          </button>
+
+          <div className="flex items-center justify-center mb-6">
+            <KeyRound className="w-8 h-8 text-neutral-700" />
+          </div>
 
             <h1 className="text-2xl font-bold text-center text-neutral-900 mb-2">
               Nova contrasenya
@@ -126,34 +129,6 @@ export default function ResetPasswordPage() {
               </div>
             )}
 
-            {suggestion && !success && (
-              <div className="mb-4 p-3 bg-neutral-50 border border-neutral-200 rounded-lg">
-                <div className="flex items-center justify-between gap-2">
-                  <code className="text-sm font-mono text-neutral-900 break-all">{suggestion}</code>
-                  <div className="flex items-center gap-1 flex-shrink-0">
-                    <button
-                      type="button"
-                      onClick={copySuggestion}
-                      className="p-1.5 text-neutral-500 hover:text-neutral-900 rounded"
-                      title={copied ? 'Copiat!' : 'Copia'}
-                    >
-                      <Copy className="w-4 h-4" />
-                    </button>
-                    <button
-                      type="button"
-                      onClick={useSuggestion}
-                      className="text-xs px-2 py-1 bg-neutral-900 text-white rounded hover:bg-neutral-800"
-                    >
-                      Usa-la
-                    </button>
-                  </div>
-                </div>
-                {copied && (
-                  <p className="text-xs text-green-600 mt-1">Copiada al porta-retalls</p>
-                )}
-              </div>
-            )}
-
             {success && (
               <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg text-sm text-green-700 flex items-center gap-2">
                 <CheckCircle2 className="w-5 h-5 flex-shrink-0" />
@@ -163,15 +138,6 @@ export default function ResetPasswordPage() {
 
             {!success && sessionReady && (
               <form onSubmit={handleSubmit} className="space-y-4">
-                <button
-                  type="button"
-                  onClick={generatePassword}
-                  className="w-full flex items-center justify-center gap-2 py-2 text-sm text-neutral-600 hover:text-neutral-900 border border-neutral-200 rounded-lg hover:border-neutral-300 transition-colors"
-                >
-                  <Shuffle className="w-4 h-4" />
-                  Proposa una contrasenya aleatòria
-                </button>
-
                 <div>
                   <label className="block text-sm font-medium text-neutral-700 mb-1">
                     Nova contrasenya
@@ -183,16 +149,29 @@ export default function ResetPasswordPage() {
                       required
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
-                      className="w-full pl-10 pr-10 py-2.5 border border-neutral-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-transparent"
+                      className="w-full pl-10 pr-20 py-2.5 border border-neutral-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-transparent"
                       placeholder="Mínim 6 caràcters"
                     />
-                    <button
-                      type="button"
-                      onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-600"
-                    >
-                      {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                    </button>
+                    <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1">
+                      <button
+                        type="button"
+                        onClick={generatePassword}
+                        className="p-1 text-neutral-400 hover:text-neutral-700 transition-colors rounded"
+                        title="Contrasenya al·leatòria"
+                        aria-label="Contrasenya al·leatòria"
+                      >
+                        <Shuffle className="w-4 h-4" />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="p-1 text-neutral-400 hover:text-neutral-700 transition-colors rounded"
+                        title={showPassword ? 'Amaga la contrasenya' : 'Mostra la contrasenya'}
+                        aria-label={showPassword ? 'Amaga la contrasenya' : 'Mostra la contrasenya'}
+                      >
+                        {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                      </button>
+                    </div>
                   </div>
                 </div>
 
@@ -232,7 +211,6 @@ export default function ResetPasswordPage() {
             )}
           </div>
         </div>
-      </div>
     </>
   );
 }

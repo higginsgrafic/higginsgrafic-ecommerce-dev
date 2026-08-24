@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { User, Mail, Lock, Eye, EyeOff, UserPlus, LogIn, X } from 'lucide-react';
+import { User, Mail, Lock, Eye, EyeOff, UserPlus, LogIn, X, Shuffle } from 'lucide-react';
 
-export default function RegisterOverlay({ onClose }) {
-  const [mode, setMode] = useState('login');
+export default function RegisterOverlay({ onClose, initialMode = 'login' }) {
+  const [mode, setMode] = useState(initialMode);
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -14,6 +14,20 @@ export default function RegisterOverlay({ onClose }) {
   const [resetSent, setResetSent] = useState(false);
   const [resetting, setResetting] = useState(false);
   const { signUp, signIn, resetPassword } = useAuth();
+
+  const generatePassword = () => {
+    const lower = 'abcdefghijkmnpqrstuvwxyz';
+    const upper = 'ABCDEFGHJKLMNPQRSTUVWXYZ';
+    const digits = '23456789';
+    const symbols = '!@#$%&*?';
+    const all = lower + upper + digits + symbols;
+    let pwd = '';
+    for (let i = 0; i < 12; i++) {
+      pwd += all[Math.floor(Math.random() * all.length)];
+    }
+    setPassword(pwd);
+    setShowPassword(true);
+  };
 
   const switchMode = (next) => {
     setMode(next);
@@ -180,16 +194,31 @@ export default function RegisterOverlay({ onClose }) {
                 autoComplete={mode === 'register' ? 'new-password' : 'current-password'}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full pl-10 pr-10 py-2.5 border border-neutral-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-transparent"
+                className="w-full pl-10 pr-20 py-2.5 border border-neutral-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-transparent"
                 placeholder="..."
               />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-600"
-              >
-                {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-              </button>
+              <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1">
+                {mode === 'register' && (
+                  <button
+                    type="button"
+                    onClick={generatePassword}
+                    className="p-1 text-neutral-400 hover:text-neutral-700 transition-colors rounded"
+                    title="Contrasenya al·leatòria"
+                    aria-label="Contrasenya al·leatòria"
+                  >
+                    <Shuffle className="w-4 h-4" />
+                  </button>
+                )}
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="p-1 text-neutral-400 hover:text-neutral-700 transition-colors rounded"
+                  title={showPassword ? 'Amaga la contrasenya' : 'Mostra la contrasenya'}
+                  aria-label={showPassword ? 'Amaga la contrasenya' : 'Mostra la contrasenya'}
+                >
+                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                </button>
+              </div>
             </div>
           </div>
 
