@@ -296,6 +296,7 @@ function CollectionTheHumanInsidePage() {
                 objectFit: 'contain',
                 display: 'inline-block',
                 flexShrink: 0,
+                transform: 'translateY(5px)',
               }}
             />
             <span>THE HUMAN INSIDE</span>

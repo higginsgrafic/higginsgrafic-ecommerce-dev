@@ -1,7 +1,7 @@
 import { EmailLayout } from '../components/EmailLayout.jsx';
 import { Img } from '@react-email/components';
 
-const EXPLANATION_IMG = '/emails/assets/imatge-explicativa.png';
+const EXPLANATION_IMG = 'https://raw.githubusercontent.com/higginsgrafic/higginsgrafic-ecommerce-dev/main/public/emails/assets/imatge-explicativa.png';
 
 export function WelcomeEmail({ user = {} }) {
   const clientName = user.first_name || user.fullName || user.name || 'Maria';

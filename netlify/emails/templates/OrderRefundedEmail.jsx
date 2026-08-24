@@ -23,50 +23,49 @@ export function OrderRefundedEmail({ order = {} }) {
       ctaUrl="https://higginsgrafic.com"
     >
       {/* Box with Order number on top border and refund price inside (E, 16) to (T, 19) */}
-      <div
-        style={{
-          position: 'relative',
-          margin: '0 auto 16px auto',
-          width: '100%',
-          maxWidth: '346.67px',
-          height: '104px',
-          boxSizing: 'border-box',
-          border: '1px solid #141414',
-          borderRadius: '10px',
-          textAlign: 'center',
-          backgroundColor: 'transparent',
-        }}
-      >
-        {/* Badge in top line */}
-        <div
-          style={{
-            position: 'absolute',
-            top: '-8px',
-            left: '50%',
-            transform: 'translateX(-50%)',
-            backgroundColor: '#EEF0F4',
-            padding: '0 8px',
-            fontFamily: "'Roboto Condensed', 'Roboto', monospace, sans-serif",
-            fontSize: '11px',
-            fontWeight: 700,
-            letterSpacing: '1px',
-            color: '#666666',
-          }}
-        >
-          #{orderNumber}
+      <div style={{ textAlign: 'center', margin: '0 auto 16px auto', width: '100%', maxWidth: '346.67px' }}>
+        {/* Badge overlapping top border */}
+        <div style={{ textAlign: 'center' }}>
+          <span
+            style={{
+              display: 'inline-block',
+              position: 'relative',
+              top: '8px',
+              backgroundColor: '#EEF0F4',
+              padding: '0 8px',
+              fontFamily: "'Roboto Condensed', 'Roboto', monospace, sans-serif",
+              fontSize: '11px',
+              fontWeight: 700,
+              letterSpacing: '1px',
+              color: '#666666',
+            }}
+          >
+            #{orderNumber}
+          </span>
         </div>
 
-        {/* Large Amount */}
+        {/* Box with Large Amount */}
         <div
           style={{
-            fontFamily: "'Roboto', Helvetica, Arial, sans-serif",
-            fontSize: '24px',
-            fontWeight: 700,
-            color: '#141414',
-            lineHeight: '102px',
+            height: '104px',
+            boxSizing: 'border-box',
+            border: '1px solid #141414',
+            borderRadius: '10px',
+            textAlign: 'center',
+            backgroundColor: 'transparent',
           }}
         >
-          {refundAmount}
+          <div
+            style={{
+              fontFamily: "'Roboto', Helvetica, Arial, sans-serif",
+              fontSize: '24px',
+              fontWeight: 700,
+              color: '#141414',
+              lineHeight: '104px',
+            }}
+          >
+            {refundAmount}
+          </div>
         </div>
       </div>
 

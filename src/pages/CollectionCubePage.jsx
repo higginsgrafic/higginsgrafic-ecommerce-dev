@@ -282,6 +282,7 @@ function CollectionCubePage() {
                 objectFit: 'contain',
                 display: 'inline-block',
                 flexShrink: 0,
+                transform: 'translateY(5px)',
               }}
             />
             <span>CUBE</span>

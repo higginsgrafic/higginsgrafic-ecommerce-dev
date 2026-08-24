@@ -275,7 +275,7 @@ function CollectionFirstContactPage() {
                 objectFit: 'contain',
                 display: 'inline-block',
                 flexShrink: 0,
-                transform: 'translateY(0.152em)',
+                transform: 'translateY(calc(0.152em + 5px))',
               }}
             />
             <span>FIRST CONTACT</span>
