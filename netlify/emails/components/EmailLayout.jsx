@@ -4,9 +4,12 @@ const LOGO_URL = 'https://raw.githubusercontent.com/higginsgrafic/higginsgrafic-
 
 export function EmailLayout({
   statusText = "Actualització d'estat",
-  labelText = 'Detall de la comanda',
+  labelText = 'DETALL DE LA COMANDA',
   clientName = '',
-  messageText = '',
+  messageContent = null,
+  ctaText = 'Torna a la botiga >',
+  ctaUrl = 'https://higginsgrafic.com',
+  showCta = true,
   children,
 }) {
   return (
@@ -25,13 +28,12 @@ export function EmailLayout({
       <Body
         style={{
           margin: 0,
-          padding: '32px 10px',
-          backgroundColor: '#F5F5F7',
+          padding: 0,
+          backgroundColor: '#FFFFFF',
           fontFamily: "'Roboto', Helvetica, Arial, sans-serif",
           WebkitFontSmoothing: 'antialiased',
         }}
       >
-        {/* Outer container */}
         <table
           role="presentation"
           width="100%"
@@ -41,8 +43,8 @@ export function EmailLayout({
           style={{ width: '100%', margin: 0, padding: 0 }}
         >
           <tr>
-            <td align="center">
-              {/* Card 1: Outer card (linear-gradient White to #F0F2F6) */}
+            <td align="center" style={{ padding: 0 }}>
+              {/* Primer fons (Outer card: 520px wide, White to Grey gradient) */}
               <table
                 role="presentation"
                 width="520"
@@ -59,16 +61,16 @@ export function EmailLayout({
                   margin: '0 auto',
                 }}
               >
-                {/* Logo Row */}
+                {/* Logo Row: Rows 1 to 5 (Top padding + Logo + spacing = ~130px total) */}
                 <tr>
-                  <td align="center" style={{ padding: '34px 20px 24px 20px' }}>
+                  <td align="center" style={{ height: '130px', padding: '22px 0 18px 0', verticalAlign: 'middle' }}>
                     <Img
                       src={LOGO_URL}
                       alt="Higgins GRÀFIC"
-                      width="150"
+                      width="237"
                       style={{
                         display: 'block',
-                        width: '150px',
+                        width: '237px',
                         height: 'auto',
                         margin: '0 auto',
                         border: 0,
@@ -77,91 +79,130 @@ export function EmailLayout({
                   </td>
                 </tr>
 
-                {/* Card 2: Inner card container (10/12 width = 83.333%) */}
+                {/* Segon fons (Inner card: (C, 6) to (V, 25), Grey to White gradient) */}
                 <tr>
-                  <td align="center" style={{ padding: '0 43px' }}>
+                  <td align="center" style={{ padding: '0 43.33px' }}>
                     <table
                       role="presentation"
                       width="100%"
+                      height="520"
                       cellPadding="0"
                       cellSpacing="0"
                       border="0"
                       style={{
                         width: '100%',
+                        height: '520px',
+                        minHeight: '520px',
                         backgroundColor: '#F0F2F6',
                         background: 'linear-gradient(180deg, #F0F2F6 0%, #FFFFFF 100%)',
                         borderRadius: '10px',
+                        boxSizing: 'border-box',
                       }}
                     >
-                      {/* Header: Status + Label */}
                       <tr>
-                        <td align="center" style={{ padding: '42px 36px 0 36px' }}>
-                          <div
-                            style={{
-                              fontFamily: "'Roboto Condensed', 'Roboto', Helvetica, Arial, sans-serif",
-                              fontSize: '14px',
-                              fontWeight: 700,
-                              color: '#141414',
-                              marginBottom: '3px',
-                              textAlign: 'center',
-                            }}
-                          >
-                            {statusText}
+                        {/* Content Area: (E, 8) to (T, 24) -> 2 cols padding left/right (43.3px), 2 rows top (52px) */}
+                        <td style={{ padding: '52px 43.33px 0 43.33px', verticalAlign: 'top' }}>
+                          {/* Upper Text Area: Rows 8 to 15 (Height 208px) so slot below starts exactly at Row 16 */}
+                          <div style={{ height: '208px', boxSizing: 'border-box' }}>
+                            {/* Header: Status + Label */}
+                            <div style={{ textAlign: 'center', margin: '0 0 32px 0', padding: 0 }}>
+                              <div
+                                style={{
+                                  fontFamily: "'Roboto Condensed', 'Roboto', Helvetica, Arial, sans-serif",
+                                  fontSize: '12pt',
+                                  fontWeight: 700,
+                                  lineHeight: '1',
+                                  color: '#141414',
+                                  margin: '0 0 4px 0',
+                                  padding: 0,
+                                }}
+                              >
+                                {statusText}
+                              </div>
+                              <div
+                                style={{
+                                  fontFamily: "'Roboto Condensed', 'Roboto', Helvetica, Arial, sans-serif",
+                                  fontSize: '13.5pt',
+                                  fontWeight: 400,
+                                  lineHeight: '1.2',
+                                  letterSpacing: '0.5px',
+                                  color: '#141414',
+                                  textTransform: 'uppercase',
+                                  margin: 0,
+                                  padding: 0,
+                                }}
+                              >
+                                {labelText}
+                              </div>
+                            </div>
+
+                            {/* Greeting & Message */}
+                            <div
+                              style={{
+                                fontFamily: "'Roboto', Helvetica, Arial, sans-serif",
+                                fontSize: '10.05pt',
+                                fontWeight: 400,
+                                color: '#141414',
+                                lineHeight: '1.28',
+                                textAlign: 'left',
+                              }}
+                            >
+                              {clientName && (
+                                <div style={{ marginBottom: '8px' }}>
+                                  Hola {clientName},
+                                </div>
+                              )}
+                              {messageContent}
+                            </div>
                           </div>
-                          <div
-                            style={{
-                              fontFamily: "'Roboto Condensed', 'Roboto', Helvetica, Arial, sans-serif",
-                              fontSize: '14px',
-                              fontWeight: 400,
-                              letterSpacing: '0.5px',
-                              color: '#141414',
-                              textTransform: 'uppercase',
-                              textAlign: 'center',
-                            }}
-                          >
-                            {labelText}
-                          </div>
+
+                          {/* Specific card body / children starting at Row 16 */}
+                          <div>{children}</div>
                         </td>
                       </tr>
 
-                      {/* Greeting + Message */}
-                      <tr>
-                        <td
-                          align="left"
-                          style={{
-                            padding: '36px 36px 0 36px',
-                            fontFamily: "'Roboto', Helvetica, Arial, sans-serif",
-                            fontSize: '14px',
-                            fontWeight: 400,
-                            color: '#141414',
-                            lineHeight: '1.6',
-                          }}
-                        >
-                          Hola {clientName},
-                          <br />
-                          <br />
-                          {messageText}
-                        </td>
-                      </tr>
-
-                      {/* Specific template children */}
-                      <tr>
-                        <td style={{ padding: '36px 36px 42px 36px' }}>
-                          {children}
-                        </td>
-                      </tr>
+                      {/* Bottom CTA Link centered on Line 24 */}
+                      {showCta && (
+                        <tr>
+                          <td
+                            align="center"
+                            style={{
+                              height: '42px',
+                              paddingBottom: '27px',
+                              verticalAlign: 'middle',
+                              textAlign: 'center',
+                            }}
+                          >
+                            <Link
+                              href={ctaUrl}
+                              style={{
+                                color: '#141414',
+                                textDecoration: 'none',
+                                fontFamily: "'Roboto Condensed', 'Roboto', Helvetica, Arial, sans-serif",
+                                fontSize: '10.05pt',
+                                fontWeight: 500,
+                                lineHeight: '1',
+                              }}
+                            >
+                              {ctaText}
+                            </Link>
+                          </td>
+                        </tr>
+                      )}
                     </table>
                   </td>
                 </tr>
 
-                {/* Footer link */}
+                {/* Footer outside card: Rows 26 to 28 (~78px height) */}
                 <tr>
                   <td
                     align="center"
                     style={{
-                      padding: '30px 20px 28px 20px',
-                      fontFamily: "'Roboto Condensed', 'Roboto', Helvetica, Arial, sans-serif",
-                      fontSize: '14px',
+                      height: '78px',
+                      padding: '24px 0 28px 0',
+                      verticalAlign: 'middle',
+                      fontFamily: "'Roboto', Helvetica, Arial, sans-serif",
+                      fontSize: '13px',
                       fontWeight: 400,
                       color: '#141414',
                     }}
@@ -171,8 +212,8 @@ export function EmailLayout({
                       style={{
                         color: '#141414',
                         textDecoration: 'none',
-                        fontFamily: "'Roboto Condensed', 'Roboto', Helvetica, Arial, sans-serif",
-                        fontSize: '14px',
+                        fontFamily: "'Roboto', Helvetica, Arial, sans-serif",
+                        fontSize: '13px',
                         fontWeight: 400,
                       }}
                     >

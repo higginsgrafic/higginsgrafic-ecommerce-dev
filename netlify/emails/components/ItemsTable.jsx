@@ -9,19 +9,28 @@ export function ItemsTable({ items }) {
     const name = item.name || 'Producte';
     const size = item.size || '-';
     const qty = item.quantity || item.qty || 1;
-    const price = formatPrice(item.price || 0);
+    const price = formatPrice(item.price ? item.price * qty : 0);
+    const rowStyle = i === 0 ? {} : { marginTop: '-12px' };
     return (
       <tr key={i}>
-        <td style={{ padding: '4px 0', fontFamily: 'Roboto,Helvetica,Arial,sans-serif', fontSize: '13px', color: '#141414', textAlign: 'left' }}>{name}</td>
-        <td style={{ padding: '4px 10px', fontFamily: 'Roboto,Helvetica,Arial,sans-serif', fontSize: '13px', color: '#141414', textAlign: 'center' }}>{size}</td>
-        <td style={{ padding: '4px 10px', fontFamily: 'Roboto,Helvetica,Arial,sans-serif', fontSize: '13px', color: '#141414', textAlign: 'center' }}>{qty}</td>
-        <td style={{ padding: '4px 0', fontFamily: 'Roboto,Helvetica,Arial,sans-serif', fontSize: '13px', color: '#141414', textAlign: 'right', whiteSpace: 'nowrap' }}>{price}</td>
+        <td style={{ padding: '8px 0', fontFamily: "'Roboto', Helvetica, Arial, sans-serif", fontSize: '14px', color: '#141414', textAlign: 'left' }}>
+          <div style={rowStyle}>{name}</div>
+        </td>
+        <td style={{ padding: '8px 12px', fontFamily: "'Roboto', Helvetica, Arial, sans-serif", fontSize: '14px', color: '#141414', textAlign: 'center' }}>
+          <div style={rowStyle}>{size}</div>
+        </td>
+        <td style={{ padding: '8px 12px', fontFamily: "'Roboto', Helvetica, Arial, sans-serif", fontSize: '14px', color: '#141414', textAlign: 'center' }}>
+          <div style={rowStyle}>{qty}</div>
+        </td>
+        <td style={{ padding: '8px 0', fontFamily: "'Roboto', Helvetica, Arial, sans-serif", fontSize: '14px', color: '#141414', textAlign: 'right', whiteSpace: 'nowrap' }}>
+          <div style={rowStyle}>{price}</div>
+        </td>
       </tr>
     );
   });
 
   return (
-    <table style={{ width: '100%', borderCollapse: 'collapse', margin: 0 }}>
+    <table style={{ width: '100%', borderCollapse: 'collapse', margin: '10px 0 16px 0' }}>
       <tbody>{rows}</tbody>
     </table>
   );

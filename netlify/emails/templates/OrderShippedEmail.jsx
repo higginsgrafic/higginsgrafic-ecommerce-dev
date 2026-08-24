@@ -1,97 +1,66 @@
 import { EmailLayout } from '../components/EmailLayout.jsx';
 
-export function OrderShippedEmail({ order }) {
-  const tracking = order.tracking_number || '';
-  const clientName = order.first_name || '';
-  const trackingUrl = order.tracking_url || 'https://www.correos.es/seguimiento';
+export function OrderShippedEmail({ order = {} }) {
+  const clientName = order.first_name || 'Maria';
+  const trackingNumber = order.tracking_number || 'RR123456789ES';
 
   return (
     <EmailLayout
+      statusText="Actualització d'estat"
+      labelText="CODI DE SEGUIMENT"
       clientName={clientName}
-      labelText="NOMBRE DE SEGUIMENT"
-      messageText="La comanda que has demanat serà en repartiment ben aviat. Aquí tens el nombre de seguiment."
+      messageContent={
+        <span>
+          El transportista ja té la teva comanda i en pocs dies la tindràs a l'adreça indicada. Amb <strong>aquest codi</strong> podràs seguir-ne el recorregut des del web de paqueteria.
+        </span>
+      }
+      ctaText="Torna a la botiga >"
+      ctaUrl="https://higginsgrafic.com"
     >
-      {/* Tracking Number Pill */}
-      <table
-        role="presentation"
-        width="100%"
-        cellPadding="0"
-        cellSpacing="0"
-        border="0"
-        style={{ width: '100%', margin: '0 0 24px 0' }}
-      >
-        <tr>
-          <td
-            align="center"
-            style={{
-              padding: '16px 20px',
-              backgroundColor: '#FFFFFF',
-              borderRadius: '8px',
-              border: '1px solid #E2E4E9',
-              textAlign: 'center',
-            }}
-          >
-            <div
-              style={{
-                fontFamily: "'Roboto Condensed', 'Roboto', Helvetica, Arial, sans-serif",
-                fontSize: '24px',
-                fontWeight: 700,
-                letterSpacing: '2px',
-                color: '#141414',
-                textTransform: 'uppercase',
-                margin: 0,
-              }}
-            >
-              {tracking}
-            </div>
-          </td>
-        </tr>
-      </table>
-
-      {/* Reminder */}
+      {/* Tracking Box (E, 16) to (T, 19) */}
       <div
         style={{
+          margin: '0 auto 16px auto',
+          width: '100%',
+          maxWidth: '346.67px',
+          height: '104px',
+          boxSizing: 'border-box',
+          border: '1px solid #141414',
+          borderRadius: '10px',
+          backgroundColor: 'transparent',
+          textAlign: 'center',
+          lineHeight: '102px',
+          fontFamily: "'Roboto Condensed', 'Roboto', monospace, sans-serif",
+          fontSize: '22px',
+          fontWeight: 700,
+          letterSpacing: '2px',
+          color: '#141414',
+          textTransform: 'uppercase',
+        }}
+      >
+        {trackingNumber}
+      </div>
+
+      {/* Subtext */}
+      <div
+        style={{
+          paddingTop: '15px',
           fontFamily: "'Roboto', Helvetica, Arial, sans-serif",
-          fontSize: '14px',
+          fontSize: '10.05pt',
           fontWeight: 400,
           color: '#141414',
-          lineHeight: '1.6',
+          lineHeight: '1.28',
           textAlign: 'left',
-          marginBottom: '36px',
         }}
       >
         Recorda que el nombre de seguiment pot trigar fins a 48 hores a activar-se al sistema del transportista.
-      </div>
-
-      {/* Track link */}
-      <div
-        style={{
-          textAlign: 'center',
-          fontFamily: "'Roboto Condensed', 'Roboto', Helvetica, Arial, sans-serif",
-          fontSize: '16px',
-          fontWeight: 400,
-          color: '#141414',
-        }}
-      >
-        <a
-          href={trackingUrl}
-          style={{
-            color: '#141414',
-            textDecoration: 'none',
-            fontFamily: "'Roboto Condensed', 'Roboto', Helvetica, Arial, sans-serif",
-            fontSize: '16px',
-            fontWeight: 500,
-          }}
-        >
-          Segueix el paquet <span style={{ display: 'inline-block', marginLeft: '12px' }}>&rsaquo;</span>
-        </a>
       </div>
     </EmailLayout>
   );
 }
 
 export const orderShippedMeta = {
-  subject: (order) => `Comanda enviada #${order.order_number || order.id || ''}`,
+  subject: (order) => `Codi de seguiment #${order?.order_number || order?.id || ''}`,
 };
 
 

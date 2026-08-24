@@ -2,18 +2,26 @@ import { EmailLayout } from '../components/EmailLayout.jsx';
 import { ItemsTable } from '../components/ItemsTable.jsx';
 import { SummaryTable } from '../components/SummaryTable.jsx';
 
-export function OrderConfirmedEmail({ order }) {
-  const clientName = order.first_name || '';
+export function OrderConfirmedEmail({ order = {} }) {
+  const clientName = order.first_name || 'Maria';
   const items = parseItems(order);
 
   return (
     <EmailLayout
+      statusText="Actualització d'estat"
+      labelText="GRÀCIES PER LA COMPRA!"
       clientName={clientName}
-      labelText="DETALL DE LA COMANDA"
-      messageText="La teva comanda ha estat confirmada. Ja s'està preparant tot perquè t'arribi ben aviat."
+      messageContent={
+        <span>
+          Aquí tens el resum de la teva comanda. Aviat rebràs el nombre de comanda per a poder seguir l'evolució més còmodament.
+        </span>
+      }
+      showCta={false}
     >
-      <ItemsTable items={items} />
-      <SummaryTable order={order} />
+      <div style={{ marginTop: '-15px' }}>
+        <ItemsTable items={items} />
+        <SummaryTable order={order} />
+      </div>
     </EmailLayout>
   );
 }
@@ -30,6 +38,6 @@ function parseItems(order) {
 }
 
 export const orderConfirmedMeta = {
-  subject: (order) => `Comanda confirmada #${order.order_number || order.id || ''}`,
+  subject: (order) => `Gràcies per la compra #${order?.order_number || order?.id || ''}`,
 };
 
