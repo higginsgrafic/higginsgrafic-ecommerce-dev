@@ -1,146 +1,91 @@
 import { EmailLayout } from '../components/EmailLayout.jsx';
 
-export function OrderFailedEmail({ order }) {
-  const clientName = order.first_name || '';
+export function OrderFailedEmail({ order = {} }) {
+  const clientName = order.first_name || 'Maria';
 
   return (
     <EmailLayout
+      statusText="Actualització d'estat"
+      labelText="PAGAMENT NO COMPLETAT"
       clientName={clientName}
-      labelText="PAGAMENT NO PROCESSAT"
-      messageText="El pagament de la comanda no s'ha confirmat i, per tant, no hem pogut efectuar el càrrec. Si creus que és un error pots contactar amb nosaltres i mirarem d'ajudar-te."
+      messageContent={
+        <span>
+          El pagament de la comanda no s'ha confirmat i, per tant, no hem pogut efectuar el càrrec. Si creus que és un error pots contactar amb nosaltres i mirarem d'ajudar-te.
+        </span>
+      }
+      ctaText="Torna a la botiga >"
+      ctaUrl="https://higginsgrafic.com"
     >
-      {/* Contact buttons and links */}
-      <table
-        role="presentation"
-        width="100%"
-        cellPadding="0"
-        cellSpacing="0"
-        border="0"
-        style={{ width: '100%', margin: '0 auto' }}
-      >
-        {/* Email contact */}
-        <tr>
-          <td align="center" style={{ padding: '8px 0 20px 0' }}>
-            <a
-              href="mailto:hola@higginsgrafic.com"
-              style={{
-                fontFamily: "'Roboto', Helvetica, Arial, sans-serif",
-                fontSize: '15px',
-                fontWeight: 500,
-                color: '#141414',
-                textDecoration: 'none',
-              }}
-            >
-              hola@higginsgrafic.com
-            </a>
-          </td>
-        </tr>
+      <div style={{ textAlign: 'center', margin: '18px 0 12px 0' }}>
+        {/* Email link */}
+        <div style={{ marginBottom: '16px' }}>
+          <a
+            href="mailto:hola@higginsgrafic.com"
+            style={{
+              fontFamily: "'Roboto', Helvetica, Arial, sans-serif",
+              fontSize: '10.05pt',
+              fontWeight: 700,
+              color: '#141414',
+              textDecoration: 'none',
+            }}
+          >
+            hola@higginsgrafic.com
+          </a>
+        </div>
 
         {/* WhatsApp Button */}
-        <tr>
-          <td align="center" style={{ padding: '0 0 12px 0' }}>
-            <table
-              role="presentation"
-              cellPadding="0"
-              cellSpacing="0"
-              border="0"
-              style={{ margin: '0 auto' }}
-            >
-              <tr>
-                <td
-                  align="center"
-                  style={{
-                    backgroundColor: '#25D366',
-                    borderRadius: '6px',
-                    padding: '10px 32px',
-                  }}
-                >
-                  <a
-                    href="https://wa.me/34000000000?text=Hola%20Higgins%20GR%C3%80FIC%2C%20tinc%20una%20q%C3%BCesti%C3%B3%20sobre%20una%20comanda."
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    style={{
-                      color: '#FFFFFF',
-                      fontFamily: "'Roboto Condensed', 'Roboto', Helvetica, Arial, sans-serif",
-                      fontSize: '14px',
-                      fontWeight: 600,
-                      textDecoration: 'none',
-                      display: 'inline-block',
-                      letterSpacing: '0.5px',
-                    }}
-                  >
-                    WhatsApp
-                  </a>
-                </td>
-              </tr>
-            </table>
-          </td>
-        </tr>
+        <div style={{ marginBottom: '12px' }}>
+          <a
+            href="https://wa.me/34000000000?text=Hola%20Higgins%20GR%C3%80FIC%2C%20tinc%20una%20q%C3%BCesti%C3%B3%20sobre%20una%20comanda."
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              display: 'inline-block',
+              width: '160px',
+              backgroundColor: '#55C86A',
+              color: '#FFFFFF',
+              fontFamily: "'Roboto', Helvetica, Arial, sans-serif",
+              fontSize: '13px',
+              fontWeight: 700,
+              padding: '10px 0',
+              borderRadius: '6px',
+              textDecoration: 'none',
+              textAlign: 'center',
+            }}
+          >
+            WhatsApp
+          </a>
+        </div>
 
         {/* Telegram Button */}
-        <tr>
-          <td align="center" style={{ padding: '0 0 28px 0' }}>
-            <table
-              role="presentation"
-              cellPadding="0"
-              cellSpacing="0"
-              border="0"
-              style={{ margin: '0 auto' }}
-            >
-              <tr>
-                <td
-                  align="center"
-                  style={{
-                    backgroundColor: '#0088CC',
-                    borderRadius: '6px',
-                    padding: '10px 32px',
-                  }}
-                >
-                  <a
-                    href="https://t.me/higginsgrafic"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    style={{
-                      color: '#FFFFFF',
-                      fontFamily: "'Roboto Condensed', 'Roboto', Helvetica, Arial, sans-serif",
-                      fontSize: '14px',
-                      fontWeight: 600,
-                      textDecoration: 'none',
-                      display: 'inline-block',
-                      letterSpacing: '0.5px',
-                    }}
-                  >
-                    Telegram
-                  </a>
-                </td>
-              </tr>
-            </table>
-          </td>
-        </tr>
-
-        {/* Return to shop */}
-        <tr>
-          <td align="center" style={{ padding: '8px 0 0 0' }}>
-            <a
-              href="https://higginsgrafic.com"
-              style={{
-                color: '#141414',
-                textDecoration: 'none',
-                fontFamily: "'Roboto Condensed', 'Roboto', Helvetica, Arial, sans-serif",
-                fontSize: '15px',
-                fontWeight: 500,
-              }}
-            >
-              Tornar a la botiga &rsaquo;
-            </a>
-          </td>
-        </tr>
-      </table>
+        <div>
+          <a
+            href="https://t.me/higginsgrafic"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              display: 'inline-block',
+              width: '160px',
+              backgroundColor: '#2A82C9',
+              color: '#FFFFFF',
+              fontFamily: "'Roboto', Helvetica, Arial, sans-serif",
+              fontSize: '13px',
+              fontWeight: 700,
+              padding: '10px 0',
+              borderRadius: '6px',
+              textDecoration: 'none',
+              textAlign: 'center',
+            }}
+          >
+            Telegram
+          </a>
+        </div>
+      </div>
     </EmailLayout>
   );
 }
 
 export const orderFailedMeta = {
-  subject: (order) => `Pagament no processat #${order.order_number || order.id || ''}`,
+  subject: (order) => `Pagament no processat #${order?.order_number || order?.id || ''}`,
 };
 

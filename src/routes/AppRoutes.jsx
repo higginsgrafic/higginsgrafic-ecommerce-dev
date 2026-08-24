@@ -75,6 +75,7 @@ import {
   UnitatsCanviPage,
   RuletaDemoPage,
   EmailPreviewPage,
+  ResetPasswordPage,
 } from './lazyPages';
 
 const pageTransition = {
@@ -221,6 +222,7 @@ export default function AppRoutes({ location, pageProps, pautaEnabled, tableEnab
 
         <Route path="/fulfillment/:id" element={<MotionDiv><ProductDetailPageEnhanced /></MotionDiv>} />
 
+        <Route path="/reset-password" element={<ResetPasswordPage />} />
         <Route path="/dev/email-preview" element={<EmailPreviewPage />} />
 
         <Route path="*" element={<NotFoundPage />} />

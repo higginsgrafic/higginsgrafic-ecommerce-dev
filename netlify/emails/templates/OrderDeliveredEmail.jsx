@@ -1,95 +1,64 @@
 import { EmailLayout } from '../components/EmailLayout.jsx';
 
 export function OrderDeliveredEmail({ order = {} }) {
-  const clientName = order.first_name || '';
-  const orderNumber = order.order_number || order.id || 'HG8M2K9PX4';
+  const clientName = order.first_name || 'Maria';
+  const orderNumber = order.order_number || order.id || 'HG3EVTEMDTUJ3U';
 
   return (
     <EmailLayout
       statusText="Actualització d'estat"
-      labelText="COMANDA LLIURADA"
+      labelText="COMANDA ENTREGADA!"
       clientName={clientName}
-      messageText="El transportista ha confirmat que el teu paquet ha estat lliurat a l'adreça indicada. Esperem que en gaudeixis força i que et tornem a veure, ben aviat, a Higgins GRÀFIC. Gràcies per la compra!"
+      messageContent={
+        <span>
+          El transportista ha confirmat que el teu paquet ha estat lliurat a l'adreça indicada. Esperem que en gaudeixis i que et tornem a veure ben aviat a Higgins GRÀFIC.
+        </span>
+      }
+      ctaText="Si tens cap dubte o consulta, contacta'ns >"
+      ctaUrl="https://higginsgrafic.com"
     >
-      {/* Order Number Pill */}
-      <table
-        role="presentation"
-        width="100%"
-        cellPadding="0"
-        cellSpacing="0"
-        border="0"
-        style={{ width: '100%', margin: '0 0 24px 0' }}
-      >
-        <tr>
-          <td
-            align="center"
-            style={{
-              padding: '16px 20px',
-              backgroundColor: '#FFFFFF',
-              borderRadius: '8px',
-              border: '1px solid #E2E4E9',
-              textAlign: 'center',
-            }}
-          >
-            <div
-              style={{
-                fontFamily: "'Roboto Condensed', 'Roboto', Helvetica, Arial, sans-serif",
-                fontSize: '24px',
-                fontWeight: 700,
-                letterSpacing: '2px',
-                color: '#141414',
-                textTransform: 'uppercase',
-                margin: 0,
-              }}
-            >
-              #{orderNumber}
-            </div>
-          </td>
-        </tr>
-      </table>
-
-      {/* Reminder 14 days */}
+      {/* Order Number Box (E, 16) to (T, 19) */}
       <div
         style={{
-          fontFamily: "'Roboto', Helvetica, Arial, sans-serif",
-          fontSize: '14px',
-          fontWeight: 400,
+          margin: '0 auto 16px auto',
+          width: '100%',
+          maxWidth: '346.67px',
+          height: '104px',
+          boxSizing: 'border-box',
+          border: '1px solid #141414',
+          borderRadius: '10px',
+          backgroundColor: 'transparent',
+          textAlign: 'center',
+          lineHeight: '102px',
+          fontFamily: "'Roboto Condensed', 'Roboto', monospace, sans-serif",
+          fontSize: '22px',
+          fontWeight: 700,
+          letterSpacing: '2px',
           color: '#141414',
-          lineHeight: '1.6',
-          textAlign: 'left',
-          marginBottom: '28px',
+          textTransform: 'uppercase',
         }}
       >
-        Recorda que disposes de 14 dies naturals, des d'avui mateix, per exercir el teu dret de desistiment.
+        #{orderNumber}
       </div>
 
-      {/* Support link */}
+      {/* Subtext */}
       <div
         style={{
-          textAlign: 'center',
-          fontFamily: "'Roboto Condensed', 'Roboto', Helvetica, Arial, sans-serif",
-          fontSize: '15px',
-          fontWeight: 500,
+          paddingTop: '15px',
+          fontFamily: "'Roboto', Helvetica, Arial, sans-serif",
+          fontSize: '10.05pt',
+          fontWeight: 400,
           color: '#141414',
+          lineHeight: '1.28',
+          textAlign: 'left',
         }}
       >
-        <a
-          href="https://higginsgrafic.com/contact"
-          style={{
-            color: '#141414',
-            textDecoration: 'none',
-            fontFamily: "'Roboto Condensed', 'Roboto', Helvetica, Arial, sans-serif",
-            fontSize: '15px',
-            fontWeight: 500,
-          }}
-        >
-          Si tens cap dubte o consulta, contacta'ns <span style={{ display: 'inline-block', marginLeft: '6px' }}>&rsaquo;</span>
-        </a>
+        Recorda que disposes de fins a 14 dies naturals, des d'avui mateix, per a exercir el teu dret al desisitiment.
       </div>
     </EmailLayout>
   );
 }
 
 export const orderDeliveredMeta = {
-  subject: (order) => `Comanda lliurada #${order.order_number || order.id || ''}`,
+  subject: (order) => `Comanda entregada #${order?.order_number || order?.id || ''}`,
 };

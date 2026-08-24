@@ -20,26 +20,47 @@ export function SummaryTable({ order }) {
       style={{
         width: '100%',
         borderCollapse: 'collapse',
-        marginTop: '24px',
-        borderTop: '1px solid #141414',
+        marginTop: '63px',
       }}
     >
       <tbody>
         <tr>
-          <td style={{ padding: '8px 0 4px', fontFamily: "'Roboto', Helvetica, Arial, sans-serif", fontSize: '13px', color: '#141414' }}>Subtotal</td>
-          <td style={{ padding: '8px 0 4px', fontFamily: "'Roboto', Helvetica, Arial, sans-serif", fontSize: '13px', color: '#141414', textAlign: 'right' }}>{subtotal}</td>
+          <td colSpan="2" style={{ borderTop: '1px solid #141414', padding: 0 }} />
         </tr>
         <tr>
-          <td style={{ padding: '4px 0', fontFamily: "'Roboto', Helvetica, Arial, sans-serif", fontSize: '13px', color: '#141414' }}>Transport</td>
-          <td style={{ padding: '4px 0', fontFamily: "'Roboto', Helvetica, Arial, sans-serif", fontSize: '13px', color: '#141414', textAlign: 'right' }}>{shipping}</td>
+          <td style={{ padding: '10px 0 4px', fontFamily: "'Roboto', Helvetica, Arial, sans-serif", fontSize: '14px', color: '#141414' }}>
+            Subtotal
+          </td>
+          <td style={{ padding: '10px 0 4px', fontFamily: "'Roboto', Helvetica, Arial, sans-serif", fontSize: '14px', color: '#141414', textAlign: 'right' }}>
+            {subtotal}
+          </td>
         </tr>
         <tr>
-          <td style={{ padding: '4px 0 8px', fontFamily: "'Roboto', Helvetica, Arial, sans-serif", fontSize: '13px', color: '#666666' }}>IVA 21% inclòs</td>
-          <td style={{ padding: '4px 0 8px', fontFamily: "'Roboto', Helvetica, Arial, sans-serif", fontSize: '13px', color: '#666666', textAlign: 'right' }}>{iva}</td>
+          <td style={{ padding: '0 0 4px', fontFamily: "'Roboto', Helvetica, Arial, sans-serif", fontSize: '14px', color: '#141414' }}>
+            Transport
+          </td>
+          <td style={{ padding: '0 0 4px', fontFamily: "'Roboto', Helvetica, Arial, sans-serif", fontSize: '14px', color: '#141414', textAlign: 'right' }}>
+            {shipping}
+          </td>
         </tr>
-        <tr style={{ borderTop: '1px solid #141414' }}>
-          <td style={{ padding: '10px 0 0', fontFamily: "'Roboto', Helvetica, Arial, sans-serif", fontSize: '14px', fontWeight: 700, color: '#141414' }}>Tot plegat fa</td>
-          <td style={{ padding: '10px 0 0', fontFamily: "'Roboto', Helvetica, Arial, sans-serif", fontSize: '14px', fontWeight: 700, color: '#141414', textAlign: 'right' }}>{total}</td>
+        <tr>
+          <td style={{ padding: '2px 0 0', fontFamily: "'Roboto', Helvetica, Arial, sans-serif", fontSize: '14px', color: '#141414' }}>
+            IVA - 21%
+          </td>
+          <td style={{ padding: '2px 0 0', fontFamily: "'Roboto', Helvetica, Arial, sans-serif", fontSize: '14px', color: '#141414', textAlign: 'right' }}>
+            {iva}
+          </td>
+        </tr>
+        <tr>
+          <td colSpan="2" style={{ borderTop: '1px solid #141414', padding: 0 }} />
+        </tr>
+        <tr>
+          <td style={{ padding: '0 0 4px', fontFamily: "'Roboto', Helvetica, Arial, sans-serif", fontSize: '15px', fontWeight: 700, color: '#141414' }}>
+            <div style={{ marginTop: '2px' }}>Tot plegat fa</div>
+          </td>
+          <td style={{ padding: '0 0 4px', fontFamily: "'Roboto', Helvetica, Arial, sans-serif", fontSize: '15px', fontWeight: 700, color: '#141414', textAlign: 'right' }}>
+            <div style={{ marginTop: '2px' }}>{total}</div>
+          </td>
         </tr>
       </tbody>
     </table>

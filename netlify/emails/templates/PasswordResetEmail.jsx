@@ -1,60 +1,70 @@
 import { EmailLayout } from '../components/EmailLayout.jsx';
 
 export function PasswordResetEmail({ data = {} }) {
-  const clientName = data.first_name || data.fullName || data.name || '';
-  const resetUrl = data.reset_url || 'https://higginsgrafic.com/login';
+  const clientName = data.first_name || data.fullName || data.name || 'Maria';
+  const resetUrl = data.reset_url || 'https://higginsgrafic.com/reset-password';
 
   return (
     <EmailLayout
-      statusText="Seguretat del compte"
-      labelText="RECUPERACIÓ DE CONTRASENYA"
+      statusText="Actualització d'estat"
+      labelText="RECUPERACIO DE CONTRASENYA"
       clientName={clientName}
-      messageText="Hem rebut una sol·licitud per canviar la contrasenya del teu compte. Clica l'enllaç següent per definir-ne una de nova. Si no ho has demanat tu, pots ignorar aquest correu amb tranquil·litat."
+      messageContent={
+        <span>
+          Hem rebut una sol·licitud per canviar la contrasenya del teu compte. Clica l'enllaç de sota si vols establir-ne una de nova.
+          <br />
+          <br />
+          <span style={{ display: 'block', marginTop: '-4px' }}>Si no l'has demanada tu pots ignorar aquest correu.</span>
+        </span>
+      }
+      ctaText="Torna a la botiga >"
+      ctaUrl="https://higginsgrafic.com"
     >
-      {/* Action link */}
-      <div
-        style={{
-          textAlign: 'center',
-          fontFamily: "'Roboto Condensed', 'Roboto', Helvetica, Arial, sans-serif",
-          fontSize: '16px',
-          fontWeight: 400,
-          color: '#141414',
-          marginTop: '12px',
-          marginBottom: '28px',
-        }}
-      >
+      {/* Reset password button box (E, 16) to (T, 19) */}
+      <div style={{ margin: '0 auto 16px auto', width: '100%', maxWidth: '346.67px', textAlign: 'center' }}>
         <a
           href={resetUrl}
           style={{
-            color: '#141414',
+            display: 'block',
+            width: '100%',
+            height: '104px',
+            boxSizing: 'border-box',
+            border: '1px solid #141414',
+            borderRadius: '10px',
+            backgroundColor: 'transparent',
+            lineHeight: '102px',
             textDecoration: 'none',
             fontFamily: "'Roboto Condensed', 'Roboto', Helvetica, Arial, sans-serif",
-            fontSize: '16px',
-            fontWeight: 500,
+            fontSize: '15px',
+            fontWeight: 700,
+            color: '#141414',
+            textAlign: 'center',
           }}
         >
-          Restableix la contrasenya <span style={{ display: 'inline-block', marginLeft: '12px' }}>&rsaquo;</span>
+          Regenera la contrasenya &gt;
         </a>
       </div>
 
-      {/* Security notice */}
+      {/* Security note */}
       <div
         style={{
+          paddingTop: '9px',
           fontFamily: "'Roboto', Helvetica, Arial, sans-serif",
-          fontSize: '13px',
+          fontSize: '10.05pt',
           fontWeight: 400,
-          color: '#666666',
-          lineHeight: '1.5',
+          color: '#141414',
+          lineHeight: '1.28',
           textAlign: 'center',
         }}
       >
-        Aquest enllaç és d'un sol ús i caducarà d'aquí a 60 minuts per motius de seguretat.
+        Per motius de seguretat ,aquest enllaç és d'un sol ús i{' '}
+        <strong>caducarà d'aquí a 30 minuts.</strong>
       </div>
     </EmailLayout>
   );
 }
 
 export const passwordResetMeta = {
-  subject: () => 'Restablir la contrasenya — Higgins GRÀFIC',
+  subject: () => 'Recuperació de contrasenya — Higgins GRÀFIC',
 };
 
