@@ -1,6 +1,6 @@
 import React from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
-import { AdminProvider, useAdmin } from '@/contexts/AdminContext';
+import { useAdmin } from '@/contexts/AdminContext';
 
 /**
  * ProtectedRoute — embolcalla rutes que només poden visitar administradors autenticats.
@@ -11,14 +11,6 @@ import { AdminProvider, useAdmin } from '@/contexts/AdminContext';
  * - Si és admin, renderitza els `children`.
  */
 export default function ProtectedRoute({ children }) {
-  return (
-    <AdminProvider>
-      <ProtectedRouteInner>{children}</ProtectedRouteInner>
-    </AdminProvider>
-  );
-}
-
-function ProtectedRouteInner({ children }) {
   const { isAdmin, authReady } = useAdmin();
   const location = useLocation();
 
