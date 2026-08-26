@@ -1,6 +1,7 @@
 import Stripe from 'stripe';
 import { createClient } from '@supabase/supabase-js';
 import { checkRateLimit } from './_rate-limit.js';
+import { generateTrackingToken, hashToken, getTokenExpiry, buildTrackingLink } from './_token.js';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
@@ -154,9 +155,10 @@ export async function handler(event, context) {
 
     const idempotencyKey = `pi_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`;
 
-    const crypto = await import('node:crypto');
-    const trackingToken = crypto.randomBytes(32).toString('hex');
-    const trackingTokenExpiresAt = new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString();
+    const rawTrackingToken = generateTrackingToken();
+    const trackingTokenHash = hashToken(rawTrackingToken);
+    const trackingTokenExpiresAt = getTokenExpiry(parseInt(process.env.TRACKING_TOKEN_EXPIRY_DAYS || '90', 10));
+    const trackingLink = buildTrackingLink(process.env.SITE_URL, rawTrackingToken);
 
     const { data: order, error: orderError } = await supabase
       .from('orders')
@@ -171,7 +173,7 @@ export async function handler(event, context) {
         total: calc.total / 100,
         shipping_zone: shippingZone,
         idempotency_key: idempotencyKey,
-        tracking_token: trackingToken,
+        tracking_token_hash: trackingTokenHash,
         tracking_token_expires_at: trackingTokenExpiresAt,
       })
       .select()
@@ -191,6 +193,7 @@ export async function handler(event, context) {
         order_id: order.id,
         order_number: order.order_number || '',
         idempotency_key: idempotencyKey,
+        tracking_link: trackingLink,
         ...metadata,
       },
     });
@@ -205,7 +208,7 @@ export async function handler(event, context) {
       paymentIntentId: paymentIntent.id,
       orderId: order.id,
       orderNumber: order.order_number,
-      trackingToken: trackingToken,
+      trackingToken: rawTrackingToken,
       subtotal: calc.subtotal,
       shippingCost: calc.shippingCost,
       iva: calc.iva,
