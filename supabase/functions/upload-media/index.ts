@@ -7,6 +7,42 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "content-type, authorization, x-client-info, apikey, x-requested-with, accept, origin",
 };
 
+const ALLOWED_MIME_TYPES = new Set([
+  "image/jpeg",
+  "image/png",
+  "image/gif",
+  "image/webp",
+  "image/svg+xml",
+  "application/pdf",
+]);
+
+const MAX_FILE_SIZE_BYTES = 10 * 1024 * 1024; // 10 MB
+const ALLOWED_BUCKETS = new Set(["media", "project-downloads"]);
+
+async function verifyAdmin(req: Request, supabaseUrl: string, serviceRoleKey: string): Promise<boolean> {
+  const authHeader = req.headers.get('Authorization') || '';
+  if (!authHeader.startsWith('Bearer ')) return false;
+
+  const token = authHeader.replace(/^Bearer\s+/i, '').trim();
+  if (!token) return false;
+
+  const supabaseAdmin = createClient(supabaseUrl, serviceRoleKey, {
+    auth: { persistSession: false },
+  });
+
+  const { data: { user }, error } = await supabaseAdmin.auth.getUser(token);
+  if (error || !user) return false;
+
+  const { data: staff } = await supabaseAdmin
+    .from('staff')
+    .select('id, role, is_active')
+    .eq('user_id', user.id)
+    .eq('is_active', true)
+    .single();
+
+  return !!staff;
+}
+
 Deno.serve(async (req: Request) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { status: 200, headers: corsHeaders });
@@ -20,14 +56,20 @@ Deno.serve(async (req: Request) => {
   }
 
   try {
-    // Supabase Dashboard reserves some env var prefixes (like SUPABASE_*).
-    // Prefer custom names for secrets, but keep compatibility if SUPABASE_URL is
-    // available by default in the Edge Runtime.
     const supabaseUrl = Deno.env.get("SUPABASE_URL") || Deno.env.get("PROJECT_URL");
     const serviceRoleKey = Deno.env.get("SERVICE_ROLE_KEY") || Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
 
     if (!supabaseUrl || !serviceRoleKey) {
-      throw new Error("Missing PROJECT_URL and/or SERVICE_ROLE_KEY");
+      throw new Error("Missing SUPABASE_URL and/or SERVICE_ROLE_KEY");
+    }
+
+    // D0 containment: require admin authentication
+    const isAdmin = await verifyAdmin(req, supabaseUrl, serviceRoleKey);
+    if (!isAdmin) {
+      return new Response(
+        JSON.stringify({ error: "No autoritzat. Cal autenticació d'administrador." }),
+        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
     }
 
     const body = await req.json();
@@ -51,9 +93,30 @@ Deno.serve(async (req: Request) => {
       });
     }
 
+    if (!ALLOWED_BUCKETS.has(bucket)) {
+      return new Response(JSON.stringify({ error: `Bucket not allowed: ${bucket}` }), {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    if (!ALLOWED_MIME_TYPES.has(contentType)) {
+      return new Response(JSON.stringify({ error: `MIME type not allowed: ${contentType}` }), {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     const supabaseAdmin = createClient(supabaseUrl, serviceRoleKey);
 
     const bytes = Uint8Array.from(atob(base64), (c) => c.charCodeAt(0));
+
+    if (bytes.length > MAX_FILE_SIZE_BYTES) {
+      return new Response(JSON.stringify({ error: `File too large: ${bytes.length} bytes (max ${MAX_FILE_SIZE_BYTES})` }), {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
 
     const { error: uploadError } = await supabaseAdmin.storage
       .from(bucket)
@@ -69,7 +132,6 @@ Deno.serve(async (req: Request) => {
         JSON.stringify({
           error: "Upload failed",
           message: e?.message,
-          details: uploadError,
         }),
         {
           status: 400,
@@ -96,7 +158,6 @@ Deno.serve(async (req: Request) => {
     return new Response(
       JSON.stringify({
         error: error?.message || "Internal server error",
-        details: String(error),
       }),
       {
         status: 500,
