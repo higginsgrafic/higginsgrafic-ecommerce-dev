@@ -1,4 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
+import { verifyAdmin } from './_auth.js';
+import { checkRateLimit } from './_rate-limit.js';
 
 const SUPABASE_URL = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
 const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -128,6 +130,15 @@ export async function handler(event, context) {
   }
 
   if (httpMethod === 'POST') {
+    const { authorized, error: authError } = await verifyAdmin(event);
+    if (!authorized) {
+      return {
+        statusCode: 403,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ error: authError || 'No autoritzat' }),
+      };
+    }
+
     if (!SUPABASE_URL || !SUPABASE_SERVICE_KEY) {
       return {
         statusCode: 500,
