@@ -1,4 +1,5 @@
 import { sendOrderEmail } from './_email.js';
+import { checkRateLimit } from './_rate-limit.js';
 
 function jsonResponse(statusCode, body) {
   return {
@@ -20,6 +21,14 @@ export async function handler(event) {
 
   if (event.httpMethod !== 'POST') {
     return jsonResponse(405, { error: 'Method not allowed' });
+  }
+
+  const { allowed } = await checkRateLimit(event, 'contact_form', {
+    maxCount: 5,
+    windowSeconds: 300,
+  });
+  if (!allowed) {
+    return jsonResponse(429, { error: 'Massa missatges enviats. Torna-ho a provar més tard.' });
   }
 
   try {

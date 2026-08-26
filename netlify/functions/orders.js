@@ -1,5 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
 import { sendOrderEmail } from './_email.js';
+import { verifyAdmin, verifyUser } from './_auth.js';
+import { checkRateLimit } from './_rate-limit.js';
 
 const SUPABASE_URL = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
 const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -46,42 +48,6 @@ function jsonResponse(statusCode, body) {
   };
 }
 
-async function isAuthorizedAdmin(event, supabase) {
-  if (process.env.NODE_ENV === 'development' || process.env.NETLIFY_DEV === 'true') {
-    return true;
-  }
-
-  const authHeader = event.headers.authorization || event.headers.Authorization || '';
-  if (authHeader.startsWith('Bearer ')) {
-    const token = authHeader.replace(/^Bearer\s+/i, '').trim();
-    if (!token) return false;
-
-    try {
-      const { data: { user }, error } = await supabase.auth.getUser(token);
-      if (error || !user) return false;
-
-      const adminEmailsRaw = process.env.ADMIN_EMAILS || process.env.VITE_ADMIN_EMAILS || '';
-      const adminEmails = adminEmailsRaw
-        .split(',')
-        .map((e) => e.trim().toLowerCase())
-        .filter(Boolean);
-
-      if (adminEmails.length > 0) {
-        return adminEmails.includes((user.email || '').toLowerCase());
-      }
-      return true;
-    } catch {
-      return false;
-    }
-  }
-
-  const adminSecret = event.headers['x-admin-secret'];
-  if (adminSecret && process.env.ADMIN_SECRET && adminSecret === process.env.ADMIN_SECRET) {
-    return true;
-  }
-
-  return false;
-}
 
 export async function handler(event, context) {
   if (event.httpMethod === 'OPTIONS') {
@@ -95,96 +61,42 @@ export async function handler(event, context) {
 
   const method = event.httpMethod;
 
-  // POST: Create a new order
+  // POST: Disabled — orders are created by create-payment-intent function only
   if (method === 'POST') {
-    try {
-      const body = JSON.parse(event.body || '{}');
-      const {
-        email,
-        items,
-        subtotal,
-        shippingCost,
-        iva,
-        total,
-        shippingZone,
-        firstName,
-        lastName,
-        address,
-        address2,
-        city,
-        postalCode,
-        country,
-        phone,
-        userId,
-        paymentIntentId,
-        company,
-        taxId,
-      } = body;
-
-      if (!email || !items || !Array.isArray(items) || items.length === 0) {
-        return jsonResponse(400, { error: 'Falten camps obligatoris (email, items)' });
-      }
-
-      const { data, error } = await supabase
-        .from('orders')
-        .insert({
-          email,
-          user_id: userId || null,
-          status: 'pendent',
-          items: JSON.stringify(items),
-          subtotal: subtotal || 0,
-          shipping_cost: shippingCost || 0,
-          iva: iva || 0,
-          total: total || 0,
-          shipping_zone: shippingZone || 'es_peninsula',
-          first_name: firstName || null,
-          last_name: lastName || null,
-          address: address || null,
-          address2: address2 || null,
-          city: city || null,
-          postal_code: postalCode || null,
-          country: country || 'Espanya',
-          phone: phone || null,
-          payment_intent_id: paymentIntentId || null,
-          company: company || null,
-          tax_id: taxId || null,
-        })
-        .select()
-        .single();
-
-      if (error) {
-        console.error('[orders] Error creating order:', error);
-        return jsonResponse(500, { error: error.message });
-      }
-
-      return jsonResponse(200, { order: data });
-    } catch (err) {
-      console.error('[orders] POST error:', err);
-      return jsonResponse(500, { error: err.message });
-    }
+    return jsonResponse(403, { error: 'La creació de comandes es fa via create-payment-intent' });
   }
 
-  // GET: List orders for a user (by email, userId, or single order by orderNumber)
+  // GET: Retrieve orders
+  // Authenticated users: by user_id (from JWT)
+  // Guest tracking: by trackingToken (high-entropy, expiring)
+  // Admin: can query by email or orderNumber with Bearer token
   if (method === 'GET') {
+    const { allowed: rlAllowed } = await checkRateLimit(event, 'order_tracking', {
+      maxCount: 20,
+      windowSeconds: 60,
+    });
+    if (!rlAllowed) {
+      return jsonResponse(429, { error: 'Massa sol·licituds. Torna-ho a provar en un moment.' });
+    }
+
     try {
       const params = event.queryStringParameters || {};
-      const { email, userId, orderNumber } = params;
+      const { trackingToken, orderNumber, email } = params;
 
-      if (orderNumber) {
-        let query = supabase
+      // Guest tracking via high-entropy token
+      if (trackingToken) {
+        const { data, error } = await supabase
           .from('orders')
           .select('*')
-          .eq('order_number', orderNumber);
+          .eq('tracking_token', trackingToken)
+          .single();
 
-        if (email) {
-          query = query.eq('email', email);
+        if (error || !data) {
+          return jsonResponse(404, { error: 'Comanda no trobada' });
         }
 
-        const { data, error } = await query.single();
-
-        if (error) {
-          console.error('[orders] Error fetching single order:', error);
-          return jsonResponse(404, { error: 'Comanda no trobada' });
+        if (data.tracking_token_expires_at && new Date(data.tracking_token_expires_at) < new Date()) {
+          return jsonResponse(403, { error: 'Token de seguiment caducat' });
         }
 
         const formatted = {
@@ -196,45 +108,88 @@ export async function handler(event, context) {
         return jsonResponse(200, { order: formatted });
       }
 
-      let query = supabase
-        .from('orders')
-        .select('*')
-        .order('created_at', { ascending: false });
+      // Authenticated user: list own orders
+      const { user, error: userError } = await verifyUser(event);
+      if (user) {
+        const { data, error } = await supabase
+          .from('orders')
+          .select('*')
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: false });
 
-      if (userId) {
-        query = query.eq('user_id', userId);
-      } else if (email) {
-        query = query.eq('email', email);
-      } else {
-        return jsonResponse(400, { error: 'Cal proporcionar email, userId o orderNumber' });
+        if (error) {
+          console.error('[orders] Error fetching user orders:', error);
+          return jsonResponse(500, { error: error.message });
+        }
+
+        const formatted = (data || []).map((o) => ({
+          ...o,
+          statusLabel: STATUS_LABELS[o.status] || o.status,
+          items: typeof o.items === 'string' ? JSON.parse(o.items) : o.items,
+        }));
+
+        return jsonResponse(200, { orders: formatted });
       }
 
-      const { data, error } = await query;
+      // Admin: can query by email or orderNumber
+      const { authorized: isAdmin } = await verifyAdmin(event);
+      if (isAdmin) {
+        if (orderNumber) {
+          const { data, error } = await supabase
+            .from('orders')
+            .select('*')
+            .eq('order_number', orderNumber)
+            .single();
 
-      if (error) {
-        console.error('[orders] Error fetching orders:', error);
-        return jsonResponse(500, { error: error.message });
+          if (error) {
+            return jsonResponse(404, { error: 'Comanda no trobada' });
+          }
+
+          const formatted = {
+            ...data,
+            statusLabel: STATUS_LABELS[data.status] || data.status,
+            items: typeof data.items === 'string' ? JSON.parse(data.items) : data.items,
+          };
+
+          return jsonResponse(200, { order: formatted });
+        }
+
+        if (email) {
+          const { data, error } = await supabase
+            .from('orders')
+            .select('*')
+            .eq('email', email)
+            .order('created_at', { ascending: false });
+
+          if (error) {
+            return jsonResponse(500, { error: error.message });
+          }
+
+          const formatted = (data || []).map((o) => ({
+            ...o,
+            statusLabel: STATUS_LABELS[o.status] || o.status,
+            items: typeof o.items === 'string' ? JSON.parse(o.items) : o.items,
+          }));
+
+          return jsonResponse(200, { orders: formatted });
+        }
+
+        return jsonResponse(400, { error: 'Cal proporcionar email, orderNumber o trackingToken' });
       }
 
-      const formatted = (data || []).map((o) => ({
-        ...o,
-        statusLabel: STATUS_LABELS[o.status] || o.status,
-        items: typeof o.items === 'string' ? JSON.parse(o.items) : o.items,
-      }));
-
-      return jsonResponse(200, { orders: formatted });
+      return jsonResponse(401, { error: 'Cal autenticació o token de seguiment' });
     } catch (err) {
       console.error('[orders] GET error:', err);
       return jsonResponse(500, { error: err.message });
     }
   }
 
-  // PATCH: Update order status (Admin only)
+  // PATCH: Update order status (Admin only — via _auth.js staff table lookup)
   if (method === 'PATCH') {
     try {
-      const authorized = await isAuthorizedAdmin(event, supabase);
+      const { authorized, error: authError } = await verifyAdmin(event);
       if (!authorized) {
-        return jsonResponse(401, { error: 'No autoritzat per modificar comandes' });
+        return jsonResponse(403, { error: authError || 'No autoritzat per modificar comandes' });
       }
 
       const body = JSON.parse(event.body || '{}');
