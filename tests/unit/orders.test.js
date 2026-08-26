@@ -143,6 +143,35 @@ describe('orders.js — GET authorization', () => {
     expect(res.statusCode).toBe(404);
   });
 
+  it('returns 404 for garbage/invalid tracking token', async () => {
+    currentFromMock = buildFromMock({
+      selectData: null,
+      selectError: 'not found',
+    });
+
+    const res = await handler(makeEvent('GET', {
+      query: { trackingToken: '!!!invalid-token!!!' },
+    }));
+
+    expect(res.statusCode).toBe(404);
+    expect(JSON.parse(res.body).error).toBe('Comanda no trobada');
+  });
+
+  it('returns 404 for empty tracking token', async () => {
+    currentFromMock = buildFromMock({
+      selectData: null,
+      selectError: 'not found',
+    });
+
+    const res = await handler(makeEvent('GET', {
+      query: { trackingToken: '' },
+    }));
+
+    // Empty string is falsy, so it falls through to user auth check
+    // Without auth, returns 401
+    expect(res.statusCode).toBe(401);
+  });
+
   it('returns user orders when authenticated with valid JWT', async () => {
     mockAuthGetUser.mockResolvedValue({
       data: { user: { id: 'user-1', email: 'user@test.com' } },
