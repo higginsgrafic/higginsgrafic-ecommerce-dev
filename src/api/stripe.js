@@ -18,8 +18,7 @@ export const getStripe = () => {
   return stripePromise;
 };
 
-// Funció per crear un Payment Intent
-export const createPaymentIntent = async (amount, currency = 'eur') => {
+export const createPaymentIntent = async (items, shippingZone = 'es_peninsula', currency = 'eur', opts = {}) => {
   try {
     const response = await fetch('/.netlify/functions/create-payment-intent', {
       method: 'POST',
@@ -27,13 +26,17 @@ export const createPaymentIntent = async (amount, currency = 'eur') => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        amount: Math.round(amount * 100), // Convertir a cèntims
+        items,
+        shippingZone,
         currency,
+        email: opts.email || undefined,
+        userId: opts.userId || undefined,
       }),
     });
 
     if (!response.ok) {
-      throw new Error('Error creant Payment Intent');
+      const errData = await response.json().catch(() => ({}));
+      throw new Error(errData.error || 'Error creant Payment Intent');
     }
 
     const data = await response.json();
