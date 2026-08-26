@@ -154,6 +154,10 @@ export async function handler(event, context) {
 
     const idempotencyKey = `pi_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`;
 
+    const crypto = await import('node:crypto');
+    const trackingToken = crypto.randomBytes(32).toString('hex');
+    const trackingTokenExpiresAt = new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString();
+
     const { data: order, error: orderError } = await supabase
       .from('orders')
       .insert({
@@ -167,6 +171,8 @@ export async function handler(event, context) {
         total: calc.total / 100,
         shipping_zone: shippingZone,
         idempotency_key: idempotencyKey,
+        tracking_token: trackingToken,
+        tracking_token_expires_at: trackingTokenExpiresAt,
       })
       .select()
       .single();
@@ -199,6 +205,7 @@ export async function handler(event, context) {
       paymentIntentId: paymentIntent.id,
       orderId: order.id,
       orderNumber: order.order_number,
+      trackingToken: trackingToken,
       subtotal: calc.subtotal,
       shippingCost: calc.shippingCost,
       iva: calc.iva,
