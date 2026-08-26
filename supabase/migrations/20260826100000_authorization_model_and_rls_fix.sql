@@ -649,6 +649,15 @@ CREATE POLICY "Admin can delete from project-downloads"
 -- 6. Fix function search paths (from earlier migration, ensure applied)
 -- ============================================================
 
-ALTER FUNCTION IF EXISTS public.update_updated_at_column() SET search_path = public, pg_temp;
-ALTER FUNCTION IF EXISTS public.generate_order_number() SET search_path = public, pg_temp;
-ALTER FUNCTION IF EXISTS public.update_updated_at() SET search_path = public, pg_temp;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.routines WHERE routine_name = 'update_updated_at_column' AND routine_schema = 'public') THEN
+    ALTER FUNCTION public.update_updated_at_column() SET search_path = public, pg_temp;
+  END IF;
+  IF EXISTS (SELECT 1 FROM information_schema.routines WHERE routine_name = 'generate_order_number' AND routine_schema = 'public') THEN
+    ALTER FUNCTION public.generate_order_number() SET search_path = public, pg_temp;
+  END IF;
+  IF EXISTS (SELECT 1 FROM information_schema.routines WHERE routine_name = 'update_updated_at' AND routine_schema = 'public') THEN
+    ALTER FUNCTION public.update_updated_at() SET search_path = public, pg_temp;
+  END IF;
+END $$;
