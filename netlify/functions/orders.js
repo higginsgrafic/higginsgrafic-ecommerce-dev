@@ -2,6 +2,7 @@ import { createClient } from '@supabase/supabase-js';
 import { sendOrderEmail } from './_email.js';
 import { verifyAdmin, verifyUser } from './_auth.js';
 import { checkRateLimit } from './_rate-limit.js';
+import { hashToken, isTokenExpired } from './_token.js';
 
 const SUPABASE_URL = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
 const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -83,19 +84,20 @@ export async function handler(event, context) {
       const params = event.queryStringParameters || {};
       const { trackingToken, orderNumber, email } = params;
 
-      // Guest tracking via high-entropy token
+      // Guest tracking via high-entropy token (stored as hash)
       if (trackingToken) {
+        const tokenHash = hashToken(trackingToken);
         const { data, error } = await supabase
           .from('orders')
           .select('*')
-          .eq('tracking_token', trackingToken)
+          .eq('tracking_token_hash', tokenHash)
           .single();
 
         if (error || !data) {
           return jsonResponse(404, { error: 'Comanda no trobada' });
         }
 
-        if (data.tracking_token_expires_at && new Date(data.tracking_token_expires_at) < new Date()) {
+        if (isTokenExpired(data.tracking_token_expires_at)) {
           return jsonResponse(403, { error: 'Token de seguiment caducat' });
         }
 

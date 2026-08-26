@@ -2,6 +2,7 @@ import Stripe from 'stripe';
 import { createClient } from '@supabase/supabase-js';
 import { createGelatoOrderServer } from './_gelato.js';
 import { sendOrderEmail } from './_email.js';
+import { buildTrackingLink } from './_token.js';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
@@ -137,8 +138,12 @@ export async function handler(event, context) {
             processResult = { ok: false, error: error.message };
           } else if (data) {
             console.log('[stripe-webhook] Order updated to confirmada:', data.order_number || data.id);
-            await sendOrderEmail('order_confirmed', data);
-            const result = await fulfillGelato(supabase, data);
+            const enrichedData = {
+              ...data,
+              tracking_link: paymentIntent.metadata?.tracking_link || null,
+            };
+            await sendOrderEmail('order_confirmed', enrichedData);
+            const result = await fulfillGelato(supabase, enrichedData);
             if (result === 'retry') {
               processResult = { ok: false, error: 'Gelato fulfillment pendent de reintent' };
             }
