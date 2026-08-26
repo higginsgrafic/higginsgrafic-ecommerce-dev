@@ -91,18 +91,27 @@ async function calculateServerSideTotal(supabase, items, shippingZone) {
     shippingCost = 4.95;
   }
 
-  const iva = Math.round(subtotal * 0.21 * 100) / 100;
-  const total = Math.round((subtotal + shippingCost + iva) * 100);
+  // Preus i transport són PVP (IVA 21% inclòs). No afegim IVA a sobre del total.
+  const subtotalPvp = Math.round(subtotal * 100) / 100;
+  const shippingPvp = Math.round(shippingCost * 100) / 100;
+  const totalEur = Math.round((subtotalPvp + shippingPvp) * 100) / 100;
+  const totalCents = Math.round(totalEur * 100);
 
-  if (total < 50 || total > 500000) {
+  // Desglossament d'IVA 21% (base imposable + quota d'IVA)
+  const baseImponible = Math.round((totalEur / 1.21) * 100) / 100;
+  const iva = Math.round((totalEur - baseImponible) * 100) / 100;
+
+  if (totalCents < 50 || totalCents > 500000) {
     return { error: 'Total fora del rang permès (0.50€ - 5000.00€)' };
   }
 
   return {
-    subtotal: Math.round(subtotal * 100) / 100,
-    shippingCost: Math.round(shippingCost * 100) / 100,
+    subtotal: subtotalPvp,
+    shippingCost: shippingPvp,
+    baseImponible,
     iva,
-    total,
+    total: totalCents,
+    totalEur,
     validatedItems,
   };
 }
@@ -211,6 +220,7 @@ export async function handler(event, context) {
       trackingToken: rawTrackingToken,
       subtotal: calc.subtotal,
       shippingCost: calc.shippingCost,
+      baseImponible: calc.baseImponible,
       iva: calc.iva,
       total: calc.total / 100,
       validatedItems: calc.validatedItems,

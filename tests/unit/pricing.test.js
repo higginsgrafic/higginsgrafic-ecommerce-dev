@@ -128,19 +128,21 @@ describe('create-payment-intent — server-side pricing', () => {
     expect(body.trackingToken).toBeDefined();
     expect(body.trackingToken.length).toBe(64); // 32 bytes hex
 
-    // subtotal = 15.50*2 + 18.00*1 = 49.00
+    // subtotal PVP = 15.50*2 + 18.00*1 = 49.00
     expect(body.subtotal).toBe(49.00);
-    // shipping = 4.95 (subtotal < 50 threshold)
+    // shipping PVP = 4.95 (subtotal < 50 threshold)
     expect(body.shippingCost).toBe(4.95);
-    // iva = 49.00 * 0.21 = 10.29
-    expect(body.iva).toBe(10.29);
-    // total = (49.00 + 4.95 + 10.29) = 64.24
-    expect(body.total).toBe(64.24);
+    // base imposable = (49.00 + 4.95) / 1.21 = 44.59
+    expect(body.baseImponible).toBe(44.59);
+    // iva 21% desglossat = 53.95 - 44.59 = 9.36
+    expect(body.iva).toBe(9.36);
+    // total = (49.00 + 4.95) = 53.95 EUR
+    expect(body.total).toBe(53.95);
 
-    // Verify Stripe was called with server-calculated amount
+    // Verify Stripe was called with exact PVP total in cents
     expect(mockStripeCreate).toHaveBeenCalledWith(
       expect.objectContaining({
-        amount: Math.round((49.00 + 4.95 + 10.29) * 100),
+        amount: 5395,
         currency: 'eur',
       })
     );

@@ -55,12 +55,14 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, onBac
   }, 0);
   const preu = grossSum;
   const descompte = discountEnabled ? preu * discountRate : 0;
-  const totalPlegat = preu - descompte;
-  const { getCost, zoneInfo } = useShippingCosts('es_peninsula');
-  const shipping = getCost(totalPlegat);
-  const baseImponible = (totalPlegat - shipping) / 1.21;
-  const ivaAmount = (totalPlegat - shipping) - baseImponible;
-  const total = totalPlegat;
+  const totalArticles = preu - descompte;
+  const totalQuantity = activeItems.reduce((acc, it) => acc + (it.qty || 1), 0);
+  const { getCost, zoneInfo } = useShippingCosts(formData.country || 'ES');
+  const shipping = getCost(formData.country || 'ES', totalQuantity, totalArticles);
+  const totalFinal = totalArticles + shipping;
+  const baseImponible = totalFinal / 1.21;
+  const ivaAmount = totalFinal - baseImponible;
+  const total = totalFinal;
 
   const fmt = (n) => n.toFixed(2).replace('.', ',') + '€';
   const splitPrice = (n) => {
@@ -70,7 +72,7 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, onBac
   const preuParts = splitPrice(preu);
   const descompteParts = splitPrice(descompte);
   const ivaParts = splitPrice(ivaAmount);
-  const totalParts = splitPrice(totalPlegat);
+  const totalParts = splitPrice(totalFinal);
 
   const HEAD = { fontFamily: 'Oswald, sans-serif', fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.4px', color: '#475059' };
   const LABEL = { fontFamily: 'Roboto Condensed, sans-serif', fontWeight: 400, color: '#667085', fontSize: '10pt' };
@@ -117,7 +119,7 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, onBac
     try {
       let orderNumber = null;
 
-      if (isDev) {
+      if (import.meta.env.DEV) {
         const orderItems = activeItems.map((item, idx) => ({
           id: item.id || `item-${idx}`,
           name: item.title || item.name || 'Producte',
@@ -128,10 +130,10 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, onBac
         }));
         const mockOrder = createMockOrder({
           items: orderItems,
-          subtotal: baseImponible,
+          subtotal: totalArticles,
           shipping,
           iva: ivaAmount,
-          total: totalPlegat,
+          total: totalFinal,
           formData,
         });
         orderNumber = mockOrder.order_number;
@@ -151,7 +153,7 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, onBac
             productName: item.title || item.name || 'Producte',
             size: item.size || 'L',
           })),
-          'es_peninsula',
+          formData.country || 'es_peninsula',
           'eur',
           { email: formData.email, userId: user?.id || undefined }
         );
@@ -280,11 +282,11 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, onBac
             })}
           </div>
           <div style={{ flexShrink:0, paddingTop:'12px', borderTop:'1px solid #E6E8EC', marginTop:'8px' }}>
-            <div style={{ display:'flex', justifyContent:'space-between', fontSize:'10pt', color:'#667085', padding:'2px 0' }}><span>Subtotal</span><span style={{ fontVariantNumeric:'tabular-nums' }}>{baseImponible.toFixed(2).replace('.',',')}€</span></div>
+            <div style={{ display:'flex', justifyContent:'space-between', fontSize:'10pt', color:'#667085', padding:'2px 0' }}><span>Subtotal</span><span style={{ fontVariantNumeric:'tabular-nums' }}>{totalArticles.toFixed(2).replace('.',',')}€</span></div>
             {discountEnabled && <div style={{ display:'flex', justifyContent:'space-between', fontSize:'10pt', color:'#667085', padding:'2px 0' }}><span>Descompte (-{offersConfig.discountRate}%)</span><span style={{ fontVariantNumeric:'tabular-nums' }}>-{descompte.toFixed(2).replace('.',',')}€</span></div>}
-            <div style={{ display:'flex', justifyContent:'space-between', fontSize:'10pt', color:'#667085', padding:'2px 0' }}><span>Transport</span><span style={{ fontVariantNumeric:'tabular-nums' }}>{shipping.toFixed(2).replace('.',',')}€</span></div>
-            <div style={{ display:'flex', justifyContent:'space-between', fontSize:'10pt', color:'#667085', padding:'2px 0' }}><span>IVA 21%</span><span style={{ fontVariantNumeric:'tabular-nums' }}>{ivaAmount.toFixed(2).replace('.',',')}€</span></div>
-            <div style={{ display:'flex', justifyContent:'space-between', fontSize:'13pt', fontWeight:500, padding:'8px 0 0', borderTop:'1px solid #E6E8EC', marginTop:'4px' }}><span>Total</span><span style={{ fontVariantNumeric:'tabular-nums' }}>{totalPlegat.toFixed(2).replace('.',',')}€</span></div>
+            <div style={{ display:'flex', justifyContent:'space-between', fontSize:'10pt', color:'#667085', padding:'2px 0' }}><span>Transport</span><span style={{ fontVariantNumeric:'tabular-nums' }}>{shipping === 0 ? 'Gratuït' : `${shipping.toFixed(2).replace('.',',')}€`}</span></div>
+            <div style={{ display:'flex', justifyContent:'space-between', fontSize:'10pt', color:'#667085', padding:'2px 0' }}><span>IVA 21% (inclòs)</span><span style={{ fontVariantNumeric:'tabular-nums' }}>{ivaAmount.toFixed(2).replace('.',',')}€</span></div>
+            <div style={{ display:'flex', justifyContent:'space-between', fontSize:'13pt', fontWeight:500, padding:'8px 0 0', borderTop:'1px solid #E6E8EC', marginTop:'4px' }}><span>Total</span><span style={{ fontVariantNumeric:'tabular-nums' }}>{totalFinal.toFixed(2).replace('.',',')}€</span></div>
           </div>
         </div>
         {/* COL 2: Dades d'enviament */}

@@ -193,8 +193,9 @@ function checkNoDevMockInProd() {
     const hasMockPath = checkoutFile.includes('mockOrder') || checkoutFile.includes('createMockOrder');
     if (hasMockPath) {
       // Check if it's behind a dev check
-      const mockSection = checkoutFile.match(/mockOrder[\s\S]{0,200}/);
-      if (mockSection && !mockSection[0].includes('import.meta.env.DEV')) {
+      const mockIndex = checkoutFile.indexOf('createMockOrder');
+      const surrounding = checkoutFile.slice(Math.max(0, mockIndex - 300), mockIndex + 300);
+      if (!surrounding.includes('import.meta.env.DEV')) {
         warnings.push('CheckoutContent.jsx — mock order creation may not be guarded by import.meta.env.DEV');
       }
     }
