@@ -51,14 +51,15 @@ BEGIN
   END IF;
 END $$;
 
--- tracking_token: high-entropy token for guest order tracking
+-- tracking_token_hash: SHA-256 hash of the high-entropy tracking token
+-- Raw token is only returned to the client at order creation time, never stored
 DO $$
 BEGIN
   IF NOT EXISTS (
     SELECT 1 FROM information_schema.columns
-    WHERE table_name = 'orders' AND column_name = 'tracking_token'
+    WHERE table_name = 'orders' AND column_name = 'tracking_token_hash'
   ) THEN
-    ALTER TABLE orders ADD COLUMN tracking_token text;
+    ALTER TABLE orders ADD COLUMN tracking_token_hash text;
   END IF;
 END $$;
 
@@ -96,10 +97,10 @@ BEGIN
   END IF;
 END $$;
 
--- Index for tracking_token lookups
-CREATE INDEX IF NOT EXISTS idx_orders_tracking_token
-  ON orders (tracking_token)
-  WHERE tracking_token IS NOT NULL;
+-- Index for tracking_token_hash lookups
+CREATE INDEX IF NOT EXISTS idx_orders_tracking_token_hash
+  ON orders (tracking_token_hash)
+  WHERE tracking_token_hash IS NOT NULL;
 
 -- ============================================================
 -- 3. order_events — audit trail for status changes
