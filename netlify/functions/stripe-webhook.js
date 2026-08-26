@@ -2,6 +2,7 @@ import Stripe from 'stripe';
 import { createClient } from '@supabase/supabase-js';
 import { createGelatoOrderServer } from './_gelato.js';
 import { sendOrderEmail } from './_email.js';
+import { buildTrackingLink } from './_token.js';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
@@ -100,13 +101,30 @@ export async function handler(event, context) {
     return jsonResponse(400, { error: `Webhook signature verification failed: ${err.message}` });
   }
 
+  const supabase = getSupabase();
+
+  // Idempotency: check if this event has already been processed
+  if (supabase) {
+    const { data: existingEvent } = await supabase
+      .from('processed_stripe_events')
+      .select('id, result')
+      .eq('event_id', stripeEvent.id)
+      .single();
+
+    if (existingEvent) {
+      console.log('[stripe-webhook] Event already processed:', stripeEvent.id, '— skip');
+      return jsonResponse(200, { received: true, duplicate: true });
+    }
+  }
+
   try {
+    let processResult = { ok: true };
+
     switch (stripeEvent.type) {
       case 'payment_intent.succeeded': {
         const paymentIntent = stripeEvent.data.object;
         console.log('[stripe-webhook] Payment succeeded:', paymentIntent.id);
 
-        const supabase = getSupabase();
         if (supabase) {
           const { data, error } = await supabase
             .from('orders')
@@ -117,12 +135,17 @@ export async function handler(event, context) {
 
           if (error) {
             console.error('[stripe-webhook] Error updating order:', error.message);
+            processResult = { ok: false, error: error.message };
           } else if (data) {
             console.log('[stripe-webhook] Order updated to confirmada:', data.order_number || data.id);
-            await sendOrderEmail('order_confirmed', data);
-            const result = await fulfillGelato(supabase, data);
+            const enrichedData = {
+              ...data,
+              tracking_link: paymentIntent.metadata?.tracking_link || null,
+            };
+            await sendOrderEmail('order_confirmed', enrichedData);
+            const result = await fulfillGelato(supabase, enrichedData);
             if (result === 'retry') {
-              return jsonResponse(500, { error: 'Gelato fulfillment pendent de reintent' });
+              processResult = { ok: false, error: 'Gelato fulfillment pendent de reintent' };
             }
           } else {
             console.log('[stripe-webhook] No order found with payment_intent_id:', paymentIntent.id);
@@ -138,9 +161,8 @@ export async function handler(event, context) {
         const paymentIntent = stripeEvent.data.object;
         console.log('[stripe-webhook] Payment failed:', paymentIntent.id);
 
-        const supabaseFail = getSupabase();
-        if (supabaseFail) {
-          const { error: failError } = await supabaseFail
+        if (supabase) {
+          const { error: failError } = await supabase
             .from('orders')
             .update({ status: 'cancel_lada' })
             .eq('payment_intent_id', paymentIntent.id);
@@ -149,7 +171,7 @@ export async function handler(event, context) {
             console.error('[stripe-webhook] Error updating failed order:', failError.message);
           } else {
             console.log('[stripe-webhook] Order marked as cancel_lada for PI:', paymentIntent.id);
-          const { data: failData } = await supabaseFail
+          const { data: failData } = await supabase
             .from('orders')
             .select()
             .eq('payment_intent_id', paymentIntent.id)
@@ -170,6 +192,22 @@ export async function handler(event, context) {
 
       default:
         console.log('[stripe-webhook] Unhandled event type:', stripeEvent.type);
+    }
+
+    // Record the processed event for idempotency
+    if (supabase) {
+      await supabase
+        .from('processed_stripe_events')
+        .insert({
+          event_id: stripeEvent.id,
+          event_type: stripeEvent.type,
+          payment_intent_id: stripeEvent.data?.object?.id || null,
+          result: processResult,
+        });
+    }
+
+    if (!processResult.ok) {
+      return jsonResponse(500, { error: processResult.error });
     }
 
     return jsonResponse(200, { received: true });

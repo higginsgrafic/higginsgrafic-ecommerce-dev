@@ -5,21 +5,18 @@ import { Check, ArrowLeft } from 'lucide-react';
 import { validateEmail, validateRequired, validatePostalCode, validateForm } from '@/utils/validation';
 import { trackBeginCheckout, trackPurchase } from '@/utils/analytics';
 import { useShippingCosts } from '@/hooks/useShippingCosts';
-import { useOrders } from '@/hooks/useOrders';
 import { createMockOrder, MOCK_CLIENT } from '@/lib/mockOrderStore';
 import { useAuth } from '@/contexts/AuthContext';
 import { drawingStripePath } from '@/lib/drawingPaths';
 import { getMockupPath, INK_BLACK, INK_WHITE, COLLECTIONS } from '@/lib/mockupPaths';
 import { useOffersConfig } from '@/hooks/useOffersConfig';
-import { getStripe } from '@/api/stripe';
-import { createGelatoOrder } from '@/api/gelato';
+import { getStripe, createPaymentIntent } from '@/api/stripe';
 
 function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, onBackToCart }) {
   const stripe = useStripe();
   const elements = useElements();
-  const { createOrder } = useOrders();
-  const navigate = useNavigate();
   const { user } = useAuth();
+  const navigate = useNavigate();
   const isDev = import.meta.env.DEV;
   const offersConfig = useOffersConfig();
   const discountEnabled = offersConfig.discountEnabled;
@@ -145,20 +142,21 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, onBac
           return;
         }
 
-        const response = await fetch('/.netlify/functions/create-payment-intent', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            amount: Math.round(totalPlegat * 100),
-            currency: 'eur',
-          }),
-        });
+        const piResponse = await createPaymentIntent(
+          activeItems.map((item, idx) => ({
+            gelatoVariantId: item.gelatoVariantId || null,
+            quantity: item.qty || 1,
+            designFiles: item.designFiles || [],
+            designUrl: item.designUrl || null,
+            productName: item.title || item.name || 'Producte',
+            size: item.size || 'L',
+          })),
+          'es_peninsula',
+          'eur',
+          { email: formData.email, userId: user?.id || undefined }
+        );
 
-        if (!response.ok) {
-          throw new Error('Error creant Payment Intent');
-        }
-
-        const { clientSecret, paymentIntentId } = await response.json();
+        const { clientSecret, paymentIntentId, orderNumber: serverOrderNumber } = piResponse;
 
         const { error: stripeError, paymentIntent } = await stripe.confirmCardPayment(
           clientSecret,
@@ -185,67 +183,7 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, onBac
           return;
         }
 
-        const order = await createOrder({
-          email: formData.email,
-          userId: user?.id || null,
-          items: activeItems.map((item, idx) => ({
-            id: item.id || `item-${idx}`,
-            name: item.title || item.name || 'Producte',
-            size: item.size || 'L',
-            quantity: item.qty || 1,
-            price: parseFloat(String(item.price).replace('€', '').replace(/\s/g, '').replace(',', '.')) || 0,
-            image: item.image || '/tshirt-white.jpg',
-          })),
-          subtotal: baseImponible,
-          shippingCost: shipping,
-          iva: ivaAmount,
-          total: totalPlegat,
-          shippingZone: 'es_peninsula',
-          firstName: formData.firstName,
-          lastName: formData.lastName,
-          address: formData.address,
-          address2: formData.address2,
-          city: formData.city,
-          postalCode: formData.postalCode,
-          country: formData.country,
-          phone: formData.phone,
-          paymentIntentId,
-          company: needsInvoice ? formData.company : null,
-          taxId: needsInvoice ? formData.taxId : null,
-        });
-        orderNumber = order?.order_number || order?.id || paymentIntentId;
-
-        try {
-          const gelatoResult = await createGelatoOrder({
-            id: orderNumber,
-            items: activeItems.map((item) => ({
-              gelatoProductId: item.gelatoProductId || item.id,
-              gelatoVariantId: item.gelatoVariantId || null,
-              quantity: item.qty || 1,
-              designFiles: item.designFiles || [],
-              designUrl: item.designUrl || null,
-            })),
-            shippingAddress: {
-              firstName: formData.firstName,
-              lastName: formData.lastName,
-              street: formData.address,
-              city: formData.city,
-              postalCode: formData.postalCode,
-              country: formData.country || 'Espanya',
-            },
-            email: formData.email,
-          });
-
-          if (gelatoResult?.orderId && gelatoResult.orderId !== orderNumber) {
-            await fetch('/api/orders', {
-              method: 'PATCH',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ orderNumber, gelatoOrderId: gelatoResult.orderId }),
-            }).catch(() => {});
-          }
-        } catch (gelatoErr) {
-          console.error('[checkout] Gelato order creation failed:', gelatoErr);
-        }
+        orderNumber = serverOrderNumber || paymentIntentId;
       }
 
       trackPurchase(orderNumber, activeItems, totalPlegat, shipping, 0);

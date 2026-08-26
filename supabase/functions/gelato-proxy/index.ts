@@ -1,4 +1,5 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 declare const Deno: any;
 
@@ -11,6 +12,41 @@ const corsHeaders = {
 const GELATO_PRODUCTS_API = 'https://product.gelatoapis.com/v3';
 const GELATO_ORDER_API = 'https://order.gelatoapis.com/v4';
 const GELATO_ECOMMERCE_API = 'https://ecommerce.gelatoapis.com/v1';
+
+// Actions that require admin authentication
+const ADMIN_ACTIONS = new Set(['order', 'stores', 'store-products', 'store-product', 'template']);
+
+// Actions that are disabled entirely (D0 containment)
+const DISABLED_ACTIONS = new Set(['order']);
+
+async function verifyAdmin(req: Request): Promise<boolean> {
+  const supabaseUrl = Deno.env.get("SUPABASE_URL") || Deno.env.get("PROJECT_URL");
+  const serviceRoleKey = Deno.env.get("SERVICE_ROLE_KEY") || Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+
+  if (!supabaseUrl || !serviceRoleKey) return false;
+
+  const authHeader = req.headers.get('Authorization') || '';
+  if (!authHeader.startsWith('Bearer ')) return false;
+
+  const token = authHeader.replace(/^Bearer\s+/i, '').trim();
+  if (!token) return false;
+
+  const supabaseAdmin = createClient(supabaseUrl, serviceRoleKey, {
+    auth: { persistSession: false },
+  });
+
+  const { data: { user }, error } = await supabaseAdmin.auth.getUser(token);
+  if (error || !user) return false;
+
+  const { data: staff } = await supabaseAdmin
+    .from('staff')
+    .select('id, role, is_active')
+    .eq('user_id', user.id)
+    .eq('is_active', true)
+    .single();
+
+  return !!staff;
+}
 
 Deno.serve(async (req: Request) => {
   if (req.method === "OPTIONS") {
@@ -34,8 +70,25 @@ Deno.serve(async (req: Request) => {
     const offset = url.searchParams.get('offset');
 
     console.log('[gelato-proxy] Action:', action);
-    console.log('[gelato-proxy] Catalog ID:', catalogId);
-    console.log('[gelato-proxy] Store ID:', storeId);
+
+    // D0 containment: disabled actions return safe error
+    if (DISABLED_ACTIONS.has(action)) {
+      return new Response(
+        JSON.stringify({ error: 'Aquesta acció no està disponible. Contacta amb administració.' }),
+        { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Admin-only actions require authentication
+    if (ADMIN_ACTIONS.has(action)) {
+      const isAdmin = await verifyAdmin(req);
+      if (!isAdmin) {
+        return new Response(
+          JSON.stringify({ error: 'No autoritzat' }),
+          { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+    }
 
     let gelatoUrl = '';
     let gelatoOptions: RequestInit = {
@@ -63,17 +116,6 @@ Deno.serve(async (req: Request) => {
         const currency = url.searchParams.get('currency') || 'EUR';
         const country = url.searchParams.get('country') || 'ES';
         gelatoUrl = `${GELATO_PRODUCTS_API}/products/${priceProductId}/prices?currency=${currency}&country=${country}`;
-        break;
-      case 'order':
-        if (req.method === 'POST') {
-          const orderData = await req.json();
-          gelatoUrl = `${GELATO_ORDER_API}/orders`;
-          gelatoOptions.method = 'POST';
-          gelatoOptions.body = JSON.stringify(orderData);
-        } else {
-          const orderId = url.searchParams.get('orderId');
-          gelatoUrl = `${GELATO_ORDER_API}/orders/${orderId}`;
-        }
         break;
       case 'stores':
         gelatoUrl = `${GELATO_ECOMMERCE_API}/stores`;
@@ -118,7 +160,6 @@ Deno.serve(async (req: Request) => {
     }
 
     const data = await gelatoResponse.json();
-    console.log('[gelato-proxy] Response data keys:', Object.keys(data));
 
     return new Response(
       JSON.stringify(data),

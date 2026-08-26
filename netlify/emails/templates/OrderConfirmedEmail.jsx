@@ -1,10 +1,12 @@
 import { EmailLayout } from '../components/EmailLayout.jsx';
 import { ItemsTable } from '../components/ItemsTable.jsx';
 import { SummaryTable } from '../components/SummaryTable.jsx';
+import { Link } from '@react-email/components';
 
 export function OrderConfirmedEmail({ order = {} }) {
   const clientName = order.first_name || 'Maria';
   const items = parseItems(order);
+  const trackingLink = order.tracking_link || null;
 
   return (
     <EmailLayout
@@ -21,6 +23,26 @@ export function OrderConfirmedEmail({ order = {} }) {
       <div style={{ marginTop: '-15px' }}>
         <ItemsTable items={items} />
         <SummaryTable order={order} />
+        {trackingLink && (
+          <div style={{ marginTop: '24px', textAlign: 'center' }}>
+            <Link
+              href={trackingLink}
+              style={{
+                display: 'inline-block',
+                padding: '12px 24px',
+                backgroundColor: '#141414',
+                color: '#FFFFFF',
+                textDecoration: 'none',
+                fontFamily: "'Roboto Condensed', 'Roboto', Helvetica, Arial, sans-serif",
+                fontSize: '11pt',
+                fontWeight: 500,
+                borderRadius: '6px',
+              }}
+            >
+              Segueix la teva comanda →
+            </Link>
+          </div>
+        )}
       </div>
     </EmailLayout>
   );

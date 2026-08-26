@@ -7,8 +7,7 @@ import apiClient from './client';
 
 const GELATO_PRODUCTS_API = 'https://product.gelatoapis.com/v3';
 const GELATO_ORDER_API = 'https://order.gelatoapis.com/v4';
-const GELATO_API_KEY = import.meta.env.VITE_GELATO_API_KEY;
-const GELATO_SANDBOX = import.meta.env.VITE_GELATO_SANDBOX === 'true';
+// GELATO_API_KEY removed from client — server-side only via Netlify functions and edge function
 
 const GELATO_COST_PRICE = 5.91;
 const SELLING_PRICE = 15.50;
@@ -21,8 +20,7 @@ function calculateSellingPrice() {
  * Client específic per Gelato
  */
 class GelatoClient {
-  constructor(apiKey, sandbox = false) {
-    this.apiKey = apiKey;
+  constructor() {
     this.storeId = import.meta.env.VITE_GELATO_STORE_ID;
     this.supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
     this.supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
@@ -315,10 +313,8 @@ class GelatoClient {
   }
 }
 
-// Instància del client Gelato
-const gelatoClient = GELATO_API_KEY
-  ? new GelatoClient(GELATO_API_KEY, GELATO_SANDBOX)
-  : null;
+// Instància del client Gelato (read-only catalog via edge function)
+const gelatoClient = new GelatoClient();
 
 // ==================== MAPEJAT DE PRODUCTES ====================
 
@@ -546,64 +542,13 @@ export const syncGelatoCatalog = async () => {
 };
 
 /**
- * Crear comanda a Gelato
+ * Crear comanda a Gelato — DEPRECATED
+ * La creació de comandes Gelato es fa server-side via stripe-webhook.js
+ * quan es confirma el pagament. Aquesta funció retorna error per evitar
+ * ús client-side.
  */
-export const createGelatoOrder = async (orderData) => {
-  if (!gelatoClient) {
-        return {
-      orderId: 'GLT-MOCK-' + Math.random().toString(36).substr(2, 9).toUpperCase(),
-      status: 'processing'
-    };
-  }
-
-  try {
-    const validItems = orderData.items.filter(item => item.gelatoVariantId && item.gelatoVariantId.startsWith('apparel_'));
-    if (validItems.length === 0) {
-      console.warn('[gelato] No items with valid gelatoVariantId (productUid), skipping Gelato order');
-      return { orderId: null, status: 'skipped' };
-    }
-
-    const gelatoOrderData = {
-      orderReferenceId: orderData.id,
-      currency: 'EUR',
-      items: validItems.map((item, idx) => {
-        const files = (item.designFiles || []).map(f => ({
-          type: 'default',
-          url: typeof f === 'string' ? f : f.url,
-        }));
-        if (files.length === 0 && item.designUrl) {
-          files.push({ type: 'default', url: item.designUrl });
-        }
-        return {
-          itemReferenceId: `item-${idx + 1}`,
-          productUid: item.gelatoVariantId,
-          variantUid: item.gelatoVariantId,
-          quantity: item.quantity,
-          files,
-        };
-      }),
-      shippingAddress: {
-        firstName: orderData.shippingAddress.firstName,
-        lastName: orderData.shippingAddress.lastName,
-        addressLine1: orderData.shippingAddress.street,
-        city: orderData.shippingAddress.city,
-        postCode: orderData.shippingAddress.postalCode,
-        country: orderData.shippingAddress.country,
-        email: orderData.email
-      }
-    };
-
-    const response = await gelatoClient.createOrder(gelatoOrderData);
-
-    return {
-      orderId: response?.id || response?.orderId || null,
-      status: response?.status || 'created',
-      response,
-    };
-  } catch (error) {
-    console.error('[gelato] createOrder error:', error);
-    throw error;
-  }
+export const createGelatoOrder = async () => {
+  throw new Error('La creació de comandes Gelato es fa server-side via stripe-webhook');
 };
 
 /**
@@ -669,7 +614,6 @@ export { gelatoClient };
 export default {
   syncCatalog: syncGelatoCatalog,
   syncStoreProducts: syncGelatoStoreProducts,
-  createOrder: createGelatoOrder,
   getOrderStatus: getGelatoOrderStatus,
   mapProduct: mapGelatoProduct,
   mapVariant: mapGelatoVariant
