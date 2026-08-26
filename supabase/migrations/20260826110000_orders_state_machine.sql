@@ -74,6 +74,17 @@ BEGIN
   END IF;
 END $$;
 
+-- payment_intent_id: Stripe PaymentIntent ID (added if missing)
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM information_schema.columns
+    WHERE table_name = 'orders' AND column_name = 'payment_intent_id'
+  ) THEN
+    ALTER TABLE orders ADD COLUMN payment_intent_id text;
+  END IF;
+END $$;
+
 -- Unique constraint on payment_intent_id (one order per PaymentIntent)
 -- Only enforce for non-null values (NULL payment_intent_id = pre-payment order)
 DO $$
@@ -211,14 +222,15 @@ CREATE INDEX IF NOT EXISTS idx_rate_limit_lookup
 -- 6. Function: generate_tracking_token
 -- ============================================================
 
--- Generates a URL-safe random tracking token
+-- Generates a URL-safe random tracking token (64 hex chars = 32 bytes)
+-- Uses gen_random_uuid() (native, no extensions needed) — two UUIDs = 32 bytes
 CREATE OR REPLACE FUNCTION public.generate_tracking_token()
 RETURNS text
 LANGUAGE sql
 SECURITY DEFINER
 SET search_path = public, pg_temp
 AS $$
-  SELECT encode(gen_random_bytes(32), 'hex')
+  SELECT replace(gen_random_uuid()::text, '-', '') || replace(gen_random_uuid()::text, '-', '')
 $$;
 
 -- ============================================================
