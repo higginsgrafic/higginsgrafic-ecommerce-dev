@@ -143,7 +143,7 @@ function FAQPage() {
         <div
           className="relative"
           style={{
-            backgroundImage: 'url(/_TMP/SERVEIS/serveis-fons-1-columna.png)',
+            backgroundImage: 'url(/placeholders/tots_els_fons/fons_serveis/serveis-fons-1-columna.png)',
             backgroundRepeat: 'no-repeat',
             backgroundPosition: 'center top',
             backgroundSize: '102% 100%',
