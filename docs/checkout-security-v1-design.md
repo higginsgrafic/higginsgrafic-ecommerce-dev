@@ -96,8 +96,8 @@ $$;
 | Columna | Tipus | Descripció |
 |---------|-------|------------|
 | `idempotency_key` | text | Clau d'idempotència per deduplicar creació de comandes. UNIQUE. |
-| `tracking_token` | text | Token d'alta entropia (32 bytes hex) per seguiment de convidats. Indexat. |
-| `tracking_token_expires_at` | timestamptz | Caducitat del token de seguiment. |
+| `tracking_token_hash` | text | Hash SHA-256 del token d'alta entropia (32 bytes hex). Indexat. El raw token **no** es guarda. |
+| `tracking_token_expires_at` | timestamptz | Caducitat del token de seguiment. Configurable via `TRACKING_TOKEN_EXPIRY_DAYS` (default 90). |
 
 ### 2.4. Constraint `UNIQUE(payment_intent_id)`
 
@@ -241,15 +241,16 @@ Tots els canvis d'estat es registren a `order_events` via trigger.
 ## 8. Model de seguiment de convidats
 
 - Quan una comanda es crea (convidat, sense `user_id`), es genera un `tracking_token` (32 bytes hex, 64 chars).
-- El token s'inclou a l'email de confirmació com a enllaç de seguiment.
-- `tracking_token_expires_at` = 90 dies desde la creació.
-- `orders.js` GET: accepta `?trackingToken=...`, verifica caducitat.
+- **Només es guarda el hash SHA-256** a la columna `tracking_token_hash`. El raw token **mai** es guarda a la DB.
+- El raw token es retorna **només** a la resposta API de `create-payment-intent`.
+- El `tracking_link` (URL amb el raw token) es passa via Stripe PaymentIntent metadata al webhook.
+- El webhook extreu el `tracking_link` i l'inclou a l'email de confirmació.
+- `tracking_token_expires_at` = configurable via `TRACKING_TOKEN_EXPIRY_DAYS` (default 90 dies).
+- `orders.js` GET: accepta `?trackingToken=...`, fa hash de l'incoming token, consulta per `tracking_token_hash`, verifica caducitat.
+- Tokens invalids, caducats, o no trobats retornen respostes genèriques segures (404/403).
 - **No** es permet cercar per `orderNumber` o `email` sense autenticació.
 - Usuaris autenticats veuen les seves comandes via `user_id = auth.uid()`.
-
-> **Nota**: La generació del tracking_token i l'email amb l'enllaç encara no estan implementats al webhook.  
-> La infraestructura (columna, índex, funció `generate_tracking_token()`) està a la migració.  
-> Falta: generar el token al crear la comanda i incloure'l a l'email. **Pendent d'implementar.**
+- El raw token **no** es loga en cap lloc del codi.
 
 ---
 
@@ -294,38 +295,41 @@ Tots els canvis d'estat es registren a `order_events` via trigger.
 
 ---
 
-## 11. Tests pendents
+## 11. Tests
 
-### Implementats (15 tests, tots passen)
+### Implementats (68 tests unitaris + 9 E2E, tots passen)
 
 - `auth.test.js`: verifyAdmin (5), verifyUser (2)
 - `rate-limit.test.js`: checkRateLimit (3)
 - `security.test.js`: createPaymentIntent, getStripe, createGelatoOrder throw, default export (4)
-
-### Pendents (requisit de l'usuari)
-
-- [ ] Càlcul de preu i IVA (server-side pricing)
-- [ ] Transicions d'estat de comandes
-- [ ] Retries de Stripe webhook
-- [ ] Prevenció de pagament duplicat
-- [ ] Retries de fulfillment Gelato
-- [ ] Accés no autoritzat a orders/catalog/storage
-- [ ] Caducitat de tracking token de convidat
-- [ ] Flux complet de checkout
+- `pricing.test.js`: items buits, moneda, càlcul server-side, shipping, variant, rate limit, GET 405 (7)
+- `webhook.test.js`: payment succeeded, duplicats, payment failed, signature, Gelato retries (9)
+- `orders.test.js`: POST 403, GET auth, tracking token, rate limit, PATCH admin (13)
+- `token.test.js`: generació, hash, caducitat, isTokenExpired, buildTrackingLink (14)
+- `duplicate-prevention.test.js`: Stripe event idempotency, Gelato fulfillment, UNIQUE constraint (5)
+- `email-tracking.test.js`: tracking link present/absent/null, subject (4)
+- `smoke.test.js`: smoke (1)
+- `checkout-security.spec.js` (E2E): create PI, orders POST/GET/PATCH, shipping-rates, gelato disabled, no API key, checkout flow (9)
 
 ---
 
 ## 12. Decisió Go/No-Go
 
-### ⚠️ NO-GO per producció — pendent
+### ⚠️ NO-GO per producció — pendent aprovació humana
 
 **Raons:**
-1. Falten tests crítics (preu, transicions, webhook retries, duplicats, fulfillment, tracking token, checkout complet).
-2. La generació del tracking_token i el seu enviament per email no estan implementats al webhook.
-3. Les migracions no estan aplicades (per disseny — cal aprovació).
-4. No s'ha verificat l'estat del backend compartit al Dashboard.
+1. Les migracions no estan aplicades (per disseny — cal aprovació).
+2. No s'ha verificat l'estat del backend compartit al Dashboard.
+3. Cal eliminar `VITE_GELATO_API_KEY` de l'`.env` local i de Netlify env vars.
+4. Els tests E2E no s'han executat (requereixen build + preview).
+5. Cal revisió humana del codi abans de promocions.
 
-**Llest per:**
-- Revisió de codi a la branca `release/checkout-security-v1`.
-- Aplicació de migracions en entorn de test (si es disposa d'un projecte Supabase de staging).
-- Execució de tests ampliats (pendents d'implementar).
+**Implementat i verificat localment:**
+- 68 tests unitaris passen
+- Script de verificació: 6/6 pass, 1 warning, 1 error (.env local)
+- Tracking token hashed (SHA-256), raw només a creació
+- Tracking link al email de confirmació
+- Idempotència webhook + Gelato
+- Rate limiting, admin auth, RLS correctives
+- Migracions SQL amb preflight, forward-only, idempotents
+- Tests E2E amb mocks (no toquen serveis reals)
