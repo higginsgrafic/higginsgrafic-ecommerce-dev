@@ -79,9 +79,9 @@ export default function MegaslidePagina2({
     if (!Array.isArray(cols) || cols.length === 0) return [];
     const items = cols[0]?.items || [];
     const d = active === 'the_human_inside'
-      ? thinDrawings
+      ? (Array.isArray(thinDrawings) ? thinDrawings : [])
       : items.filter((it) => it && it !== CONTROL_TILE_BN && it !== CONTROL_TILE_ARROWS);
-    return d;
+    return Array.isArray(d) ? d : [];
   }, [resolvedMegaFiltered, active, thinDrawings]);
 
   const stripeTileOverlaySrcs = useMemo(() => {
@@ -261,6 +261,11 @@ export default function MegaslidePagina2({
             normalizeOverlaySrc={normalizeOverlaySrc}
             shirtColor={CERCADOR_COLORS.find((c) => c.slug === displayedShirtColor)?.hex}
             onShirtClick={onShirtClick}
+            selectedItem={
+              active === 'first_contact' ? firstContactSelectedItem
+              : active === 'the_human_inside' ? humanInsideSelectedItem
+              : (selectedItemByCollection?.[active] ?? null)
+            }
             stripeTileOverlaySrcs={stripeTileOverlaySrcs}
             stripeTileItems={stripeTileItems}
             clicAreaHighlightIndices={clicAreaHighlightIndices}

@@ -28,6 +28,7 @@ function invertHex(hex) {
 function ClicAreaOverlay({ src, highlightAll, highlightIndices, tshirtColor, disabledIndices }) {
   const [markup, setMarkup] = useState('');
   const containerRef = useRef(null);
+  const fallbackRef = useRef(null);
   const outlineColor = invertHex(tshirtColor);
 
   useEffect(() => {
@@ -64,7 +65,8 @@ function ClicAreaOverlay({ src, highlightAll, highlightIndices, tshirtColor, dis
 
   const handlePointerDown = (ev) => {
     try {
-      const r = containerRef.current?.getBoundingClientRect();
+      const el = containerRef.current || fallbackRef.current;
+      const r = el?.getBoundingClientRect();
       if (!r) return;
       const x = (ev.clientX - r.left) / (r.width || 1);
       const y = (ev.clientY - r.top) / (r.height || 1);
@@ -81,7 +83,15 @@ function ClicAreaOverlay({ src, highlightAll, highlightIndices, tshirtColor, dis
         .clic-area-overlay svg { display: block; width: 100%; height: 100%; }
         .clic-area-overlay .tshirt-outline { opacity: 0; pointer-events: all; cursor: pointer; stroke: var(--hg-outline-color, #000000) !important; }
         .clic-area-overlay .tshirt-outline.is-disabled { pointer-events: none; cursor: default; opacity: 0; stroke: none !important; fill: none !important; }
+        .clic-area-fallback { position: absolute; inset: 0; pointer-events: all; cursor: pointer; z-index: 29; background: transparent; }
       `}</style>
+      {markup ? null : (
+        <div
+          ref={fallbackRef}
+          className="clic-area-fallback"
+          onPointerDown={handlePointerDown}
+        />
+      )}
       <div
         ref={containerRef}
         className={`clic-area-overlay${highlightAll ? ' highlight-all' : ''}`}

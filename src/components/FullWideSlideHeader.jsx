@@ -1,7 +1,7 @@
 import React, { memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import * as ReactDOM from 'react-dom';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { ChevronDown, ChevronLeft, ChevronRight, ChevronUp, Menu, User, LogIn, X, Clock, Truck, AlertCircle, MoreHorizontal, Loader2, Eye, EyeOff, LayoutGrid, Layers } from 'lucide-react';
+import { ChevronDown, ChevronLeft, ChevronRight, ChevronUp, Menu, User, LogIn, X, Clock, Truck, AlertCircle, MoreHorizontal, Loader2, Eye, EyeOff, LayoutGrid, Layers, Lock, Unlock } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useProductContext } from '@/contexts/ProductContext';
 import { useAdmin } from '@/contexts/AdminContext';
@@ -57,8 +57,9 @@ import useUrlActiveCollection from '@/hooks/useUrlActiveCollection';
 import useMegaStripeDebugVars from '@/hooks/useMegaStripeDebugVars';
 import useMegaTileSelectorDrag from '@/hooks/useMegaTileSelectorDrag';
 
-
-
+const STRIPE_DARK_SHIRT_COLORS = new Set([
+  'royal', 'purple', 'navy', 'red', 'irish-green', 'military-green', 'forest-green', 'black',
+]);
 
 // Plantilla independent de l'acordió del CISTELL — taula pròpia sobre la pauta
 
@@ -231,24 +232,28 @@ function FullWideSlideHeader({
     }
     if (collection === 'cube') {
       const map = {
-        'iron kong': 'ironkong', 'iron cube 68': 'ironman-68',
-        'robocube': 'robocube', 'cylon cube 03': 'cylon-cube',
-        'maschinencube': 'maschinencube', 'mazinger c': 'mazinger-c',
-        'afrodita c': 'afrodita-c', 'cube 3 p0': '3cube-p0',
-        'cyber cube': 'cybercube', 'darth cube': 'darth-cube',
+        'iron-kong': 'ironkong', 'iron-cube-68': 'ironman-68',
+        'robocube': 'robocube', 'cylon-cube-03': 'cylon-cube',
+        'maschinencube': 'maschinencube', 'mazinger-c': 'mazinger-c',
+        'afrodita-c': 'afrodita-c', 'cube-3-p0': '3cube-p0',
+        'cyber-cube': 'cybercube', 'darth-cube': 'darth-cube',
       };
       const slug = map[s] || s;
       return `/cube/${slug}`;
     }
     if (collection === 'miscellania') {
+      let name = s;
+      if (s.includes('/miscellania/')) {
+        name = s.split('/miscellania/')[1].replace(/-b-grid\.webp$/, '').replace(/\.webp$/, '');
+      }
       const map = {
-        'dj vader': 'dj-vader', 'dj-vader': 'dj-vader',
-        'death star2d2': 'death-star2d2', 'death-star2d2': 'death-star2d2',
-        'pont del diable': 'pont-del-diable', 'pont-del-diable': 'pont-del-diable',
-        'arthur d the second': 'arthur-d-the-second',
-        'r2d2 quote': 'r2d2-quote',
+        'dj-vader': 'dj-vader',
+        'death-star2d2': 'death-star2d2',
+        'pont-del-diable': 'pont-del-diable',
+        'arthur-d-the-second': 'arthur-d-the-second',
+        'r2d2-quote': 'r2d2-quote',
       };
-      const slug = map[s] || s;
+      const slug = map[name] || name;
       return `/miscellania/${slug}`;
     }
     if (collection === 'austen') {
@@ -290,6 +295,8 @@ function FullWideSlideHeader({
   }, []);
 
   const [showRegisterOverlay, setShowRegisterOverlay] = useState(false);
+  const [megaLocked, setMegaLocked] = useState(false);
+  const [lockBtnTop, setLockBtnTop] = useState(null);
   const { user } = useAuth();
   const [active, setActive] = useState(() => {
     try {
@@ -585,7 +592,9 @@ function FullWideSlideHeader({
     if (url) {
       const matched = CERCADOR_COLORS.find((c) => c.hex === color);
       const colorSlug = matched?.slug || displayedShirtColor || 'white';
-      const variant = collection === 'the_human_inside' ? humanInsideVariant : firstContactVariant;
+      const selectedVariant = collection === 'the_human_inside' ? humanInsideVariant : firstContactVariant;
+      const variant = selectedVariant === 'color' ? 'color'
+        : STRIPE_DARK_SHIRT_COLORS.has(colorSlug) ? 'white' : 'black';
       navigate(`${url}?color=${colorSlug}&variant=${variant}`);
     }
   }, [navigate, resolvePdpUrl, displayedShirtColor, firstContactVariant, humanInsideVariant]);
@@ -596,7 +605,9 @@ function FullWideSlideHeader({
     if (url) {
       const matched = CERCADOR_COLORS.find((c) => c.hex === color);
       const colorSlug = matched?.slug || displayedShirtColorP2 || 'white';
-      const variant = collection === 'the_human_inside' ? humanInsideVariantP2 : firstContactVariantP2;
+      const selectedVariant = collection === 'the_human_inside' ? humanInsideVariantP2 : firstContactVariantP2;
+      const variant = selectedVariant === 'color' ? 'color'
+        : STRIPE_DARK_SHIRT_COLORS.has(colorSlug) ? 'white' : 'black';
       navigate(`${url}?color=${colorSlug}&variant=${variant}`);
     }
   }, [navigate, resolvePdpUrl, displayedShirtColorP2, firstContactVariantP2, humanInsideVariantP2]);
@@ -1897,6 +1908,33 @@ function FullWideSlideHeader({
     const el = megaMenuRef.current;
     if (!el) return undefined;
 
+    const measure = () => {
+      try {
+        const stripe = el.querySelector('[data-stripe-bottom]') || el.firstElementChild;
+        if (stripe) {
+          const rect = stripe.getBoundingClientRect();
+          setLockBtnTop((prev) => (prev === rect.bottom ? prev : rect.bottom));
+        }
+      } catch { /* ignore */ }
+    };
+
+    measure();
+    const raf = requestAnimationFrame(measure);
+    window.addEventListener('resize', measure);
+    const ro = new ResizeObserver(measure);
+    ro.observe(el);
+    return () => {
+      cancelAnimationFrame(raf);
+      window.removeEventListener('resize', measure);
+      ro.disconnect();
+    };
+  }, [active]);
+
+  useLayoutEffect(() => {
+    if (!active) return undefined;
+    const el = megaMenuRef.current;
+    if (!el) return undefined;
+
     const GAP_PX = 12; // gap-x-3
     const COLS = 9;
 
@@ -2672,13 +2710,14 @@ function FullWideSlideHeader({
     const onKeyDown = (e) => {
       if (e.key !== 'Escape') return;
       if (demoManualEnabled) return;
+      if (megaLocked) return;
       setActive(null);
       setMobileOpen(false);
     };
 
     window.addEventListener('keydown', onKeyDown);
     return () => window.removeEventListener('keydown', onKeyDown);
-  }, [demoManualEnabled]);
+  }, [demoManualEnabled, megaLocked]);
 
   useEffect(() => {
     let mounted = true;
@@ -3034,14 +3073,26 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
             <div
                 className={`${contained ? 'absolute' : 'fixed'} inset-0 z-[9989]`}
                 style={{
-                  background: 'linear-gradient(to bottom, hsl(var(--foreground) / 0.75), hsl(var(--foreground) / 0.55))',
                   cursor: 'pointer',
+                  pointerEvents: megaLocked ? 'none' : 'auto',
                 }}
-                onClick={() => setActive(null)}
+                onClick={() => { if (!megaLocked) setActive(null); }}
               />
           ) : null,
           portalContainer || document.body
         )}
+
+      {canUseDom && active && (
+        <button
+          onClick={() => setMegaLocked((v) => !v)}
+          className="fixed z-[10001] right-4 flex h-10 w-10 items-center justify-center rounded-full border border-border bg-background shadow-lg transition-colors hover:bg-muted"
+          style={{ top: lockBtnTop != null ? `${lockBtnTop + 8}px` : '16px' }}
+          title={megaLocked ? 'Desbloca el megaslide' : 'Bloca el megaslide'}
+          aria-label={megaLocked ? 'Desbloca el megaslide' : 'Bloca el megaslide'}
+        >
+          {megaLocked ? <Lock size={18} /> : <Unlock size={18} />}
+        </button>
+      )}
 
       <MegaMenuPanel
         active={active}

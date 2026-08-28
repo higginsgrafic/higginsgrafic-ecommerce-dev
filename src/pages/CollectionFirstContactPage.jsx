@@ -314,7 +314,7 @@ function CollectionFirstContactPage() {
                   justifyContent: 'center',
                   transition: 'transform 0.15s ease, opacity 0.15s ease',
                 }}
-                className="hover:scale-110 active:scale-95 opacity-90 hover:opacity-100"
+                className="hover:scale-110 active:scale-95 opacity-40 hover:opacity-100"
               >
                 <img
                   src={c.icon}

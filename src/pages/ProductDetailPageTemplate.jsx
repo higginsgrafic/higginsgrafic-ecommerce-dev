@@ -1,5 +1,5 @@
-import React, { useState, useLayoutEffect, useRef } from 'react';
-import { useLocation } from 'react-router-dom';
+import React, { useState, useLayoutEffect, useRef, useEffect, useMemo } from 'react';
+import { useLocation, Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 import Pauta4ColsOverlay from '@/components/pauta/Pauta4ColsOverlay';
 import TambeRail from '@/pages/productRail/TambeRail';
@@ -11,6 +11,7 @@ import StoryPosterLink from '@/components/StoryPosterLink';
 import { Flag } from './ShippingPage';
 import { PDP_REGISTRY_BY_ROUTE } from '@/data/pdpRegistry';
 import SEOProductSchema from '@/components/SEOProductSchema';
+import { buildOtherCollectionsImages } from '@/components/home/homeDrawings';
 
 const PDP_PRESET_VERSION = 'pdp-layout-2026-06-06-1953';
 
@@ -60,7 +61,7 @@ const SPECS = [
   { label: 'Material', value: '100% cotó pentinat de 180 g/m²', row: 9 },
   { label: 'Tall', value: 'Coll rodó', row: 11 },
   { label: 'Procedència', value: <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}><Flag code="HN" size={16} /><Flag code="DO" size={16} /><Flag code="NI" size={16} /><Flag code="BD" size={16} /><Flag code="US" size={16} /></span>, row: 13 },
-  { label: 'Estampació', value: 'Impressió DTG', row: 15 },
+  { label: 'Estampació', value: 'Impressió DTF', row: 15 },
   { label: 'Cura', value: 'Renta-la al revés i a 30°C', row: 17 },
   { label: 'Garantia', value: 'Devolució 14 dies', row: 19 },
 ];
@@ -97,6 +98,7 @@ function ProductDetailPageTemplate() {
   const TDP_IMAGE = (color, finish) => tdpImageFor(IMAGE_COLLECTION, PRODUCT_ROUTE, color, finish);
   const AVAILABLE_FINISHES = availableFinishesFor(IMAGE_COLLECTION);
   const DEFAULT_FINISH = defaultFinishFor(IMAGE_COLLECTION);
+  const otherImages = useMemo(() => buildOtherCollectionsImages(COLLECTION_SLUG).map((img) => ({ ...img, price: null })), [COLLECTION_SLUG]);
 
   const searchParams = new URLSearchParams(location.search);
   const urlColor = searchParams.get('color');
@@ -133,10 +135,10 @@ function ProductDetailPageTemplate() {
       const gridEl = pautaGridRef.current;
       if (!gridEl) return;
       const rect = gridEl.getBoundingClientRect();
-      const numRows = 65;
+      const numRows = 38;
       const singleRowH = rect.height / numRows;
       setRowHeight((prev) => (Math.abs(prev - singleRowH) < 0.1 ? prev : singleRowH));
-      const gridRows = 70;
+      const gridRows = 40;
       const rowGap = 3;
       const exactRowH = (rect.height - (gridRows - 1) * rowGap) / gridRows;
       setExactRowHeight((prev) => (Math.abs(prev - exactRowH) < 0.1 ? prev : exactRowH));
@@ -151,8 +153,22 @@ function ProductDetailPageTemplate() {
     };
   }, []);
 
+  useEffect(() => {
+    const sp = new URLSearchParams(location.search);
+    const urlColor = sp.get('color');
+    const urlVariant = sp.get('variant');
+    if (urlColor) {
+      const idx = OFFICIAL_COLORS.indexOf(urlColor);
+      if (idx >= 0) setMainVariantIndex(idx);
+    }
+    if (urlVariant) {
+      const vf = VARIANT_TO_FINISH[urlVariant];
+      if (vf && AVAILABLE_FINISHES.includes(vf)) setSelectedFinish(vf);
+    }
+  }, [location.search]);
+
   return (
-    <section className="bg-background" style={{ transform: 'scale(0.94)', transformOrigin: 'center top' }}>
+    <section className="bg-background" style={{ transform: 'scale(0.94)', transformOrigin: 'center top', marginTop: '250px', marginBottom: '300px' }}>
       <Helmet>
         <title>{`${PRODUCT_NAME} · ${COLLECTION_NAME} | Higgins Gràfic`}</title>
         <meta
@@ -163,8 +179,8 @@ function ProductDetailPageTemplate() {
       <SEOProductSchema product={{ name: PRODUCT_NAME, description: `${PRODUCT_NAME} — ${COLLECTION_NAME}`, image: TDP_IMAGE(product.colors?.[0], DEFAULT_FINISH), slug: PRODUCT_SLUG, collection: COLLECTION_SLUG }} url={`/${PRODUCT_ROUTE}`} />
 
       <Pauta4ColsOverlay
-        numRows={70}
-        canvasAspect={[2642, 5217]}
+        numRows={40}
+        canvasAspect={[2642, 2981]}
         pautaEnabled={false}
         tableEnabled={false}
         topOffset="0px"
@@ -173,7 +189,7 @@ function ProductDetailPageTemplate() {
         style={{
           zIndex: 5,
           position: 'relative',
-          marginBottom: 'calc(-2 * (var(--hg-tdp-xR) - var(--hg-tdp-xL)) * 5217 / 2642 / 70 - 23px)',
+          marginBottom: 'calc(-2 * (var(--hg-tdp-xR) - var(--hg-tdp-xL)) * 2981 / 2642 / 40 - 23px)',
         }}
       >
         {/* ─── Breadcrumbs (col 1, fila 1) ─── */}
@@ -187,15 +203,39 @@ function ProductDetailPageTemplate() {
             justifySelf: 'start',
             padding: 0,
             margin: 0,
-            transform: 'translateY(-10px)',
+            transform: 'translateY(calc(-10px - 250px / 0.94))',
+            pointerEvents: 'auto',
+            zIndex: 10,
           }}
         >
           <Breadcrumbs
             items={[
-              { label: 'Inici', link: '/' },
               { label: COLLECTION_NAME, link: `/${COLLECTION_SLUG}` },
               { label: productName },
             ]}
+          />
+        </div>
+
+        {/* ─── TambeRail (altres històries, sense títol) ─── */}
+        <div
+          style={{
+            gridColumn: '1 / 5',
+            gridRow: '2 / 3',
+            minHeight: 0,
+            alignSelf: 'center',
+            justifySelf: 'center',
+            padding: 0,
+            margin: 0,
+            transform: 'translateY(calc(-125px / 0.94 + 35px))',
+            width: '100%',
+            pointerEvents: 'auto',
+          }}
+        >
+          <TambeRail
+            images={otherImages}
+            showTitle={false}
+            showInternalArrows={false}
+            visibleCards={4}
           />
         </div>
 
@@ -535,52 +575,6 @@ function ProductDetailPageTemplate() {
           </div>
         </div>
 
-        {/* Subtítol "ALTRES HISTÒRIES" */}
-        <div
-          style={{
-            gridColumn: '1 / 3',
-            gridRow: '50 / 51',
-            alignSelf: 'center',
-            fontFamily: 'Roboto Condensed, sans-serif',
-            fontWeight: 400,
-            fontSize: '15pt',
-            lineHeight: 1.2,
-            letterSpacing: '0.2em',
-            textTransform: 'uppercase',
-            color: 'rgba(71, 80, 89, 0.7)',
-            textAlign: 'left',
-            pointerEvents: 'auto',
-            transform: 'translateX(2px)',
-          }}
-        >
-          ALTRES HISTÒRIES
-        </div>
-
-        {/* Fletxes També et pot interessar */}
-        <div
-          style={{
-            gridColumn: '4 / 5',
-            gridRow: '50 / 51',
-            position: 'relative',
-            width: '100%',
-            height: '100%',
-            minHeight: 0,
-            pointerEvents: 'auto',
-          }}
-        >
-          <CarouselArrows
-            rightPx={0}
-            centerVertically
-            onPrev={() => {
-              window.dispatchEvent(new CustomEvent('tambe-rail:prev'));
-            }}
-            onNext={() => {
-              window.dispatchEvent(new CustomEvent('tambe-rail:next'));
-            }}
-            rowHeight={exactRowHeight}
-          />
-        </div>
-
         {/* TEXT POSTER GRAN (Fila 32 / 38) */}
         <div
           style={{
@@ -731,19 +725,6 @@ function ProductDetailPageTemplate() {
           handleRight="-22px"
           style={{ gridColumn: '4 / 5', gridRow: '17 / 18', zIndex: 100005, width: 0, height: 0, justifySelf: 'end' }}
         />
-
-        {/* ─── Bloc "També et pot interessar" (rail recomanats) ─── */}
-        <div
-          style={{
-            gridColumn: '1 / 5',
-            gridRow: '48 / 65',
-            alignSelf: 'start',
-            width: '100%',
-            marginTop: '-48px',
-          }}
-        >
-          <TambeRail cardHref={`/${COLLECTION_SLUG}/${PRODUCT_ROUTE}`} title="cada dibuix té una història" showInternalArrows={false} showTitle={false} />
-        </div>
 
       </Pauta4ColsOverlay>
     </section>
