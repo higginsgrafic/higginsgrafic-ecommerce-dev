@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import MegaColumn from './MegaColumn.jsx';
 import ClicAreaOverlay from './ClicAreaOverlay.jsx';
+import { CERCADOR_COLORS } from './CercadorTopBar.jsx';
 import { STRIPE_DRAWING_CALIBRATIONS } from '../../config/stripeCalibrations';
 
 function canonicalKey(rawSrc) {
@@ -117,6 +118,7 @@ function MegaStripePanel({
   normalizeOverlaySrc,
   shirtColor,
   onShirtClick,
+  selectedItem,
   stripeTileOverlaySrcs,
   stripeTileItems,
   clicAreaHighlight,
@@ -131,17 +133,17 @@ function MegaStripePanel({
   useEffect(() => {
     const handler = (ev) => {
       if (typeof onShirtClick !== 'function') return;
-      if (!Array.isArray(stripeTileItems)) return;
       const x = ev.detail?.x;
       if (typeof x !== 'number') return;
       const tileIdx = Math.min(13, Math.max(0, Math.floor(x * 14)));
-      const item = stripeTileItems[tileIdx];
+      const item = selectedItem || stripeTileItems?.[0];
       if (!item) return;
-      onShirtClick(active, item, shirtColor);
+      const tileColor = CERCADOR_COLORS[tileIdx]?.hex || shirtColor;
+      onShirtClick(active, item, tileColor);
     };
     window.addEventListener('mega-stripe-full-hit', handler);
     return () => window.removeEventListener('mega-stripe-full-hit', handler);
-  }, [onShirtClick, stripeTileItems, active, shirtColor]);
+  }, [onShirtClick, selectedItem, stripeTileItems, active, shirtColor]);
 
   return (
     <div className="w-full shrink-0">
@@ -919,24 +921,11 @@ function MegaStripePanel({
                     </div>
                   ) : null}
 
-                  <div
-                    className="absolute inset-0"
-                    style={{
-                      pointerEvents: 'auto',
-                      background: 'transparent',
-                      zIndex: 3,
-                    }}
-                    onPointerDown={(ev) => {
-                      try {
-                        const el = ev.currentTarget;
-                        const r = el.getBoundingClientRect();
-                        const x = (ev.clientX - r.left) / (r.width || 1);
-                        const y = (ev.clientY - r.top) / (r.height || 1);
-                        window.dispatchEvent(new CustomEvent('mega-stripe-full-hit', { detail: { x, y } }));
-                      } catch {
-                      }
-                    }}
-                  />
+                  {/* ClicAreaOverlay is the sole click target for shirts.
+                      The old transparent div (z-index 3) that also dispatched
+                      mega-stripe-full-hit has been removed to avoid duplicate
+                      events and coordinate mismatches. */}
+
                 </div>
 
                 {/* Cercle fosc sobre el coll de cada samarreta, situat al gap

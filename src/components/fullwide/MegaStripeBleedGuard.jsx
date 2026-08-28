@@ -26,6 +26,7 @@ export default function MegaStripeBleedGuard({
   const sum = l + r;
   return (
     <div
+      data-stripe-bottom
       style={{
         height: heightPx,
         width: sum ? `calc(100% + ${sum}px)` : '100%',

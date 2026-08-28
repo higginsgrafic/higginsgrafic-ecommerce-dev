@@ -135,52 +135,47 @@ export default function ProductCard({
               ) : null}
             </>
           ) : null}
-        </div>
 
-        <div style={{ marginTop: '8px', fontFamily: 'Roboto, system-ui, -apple-system, Segoe UI, Arial, sans-serif' }}>
-          <div>
+          {brand || title ? (
             <div
               style={{
-                position: 'relative',
-                top: '3px',
-                marginTop: '2px',
-                fontSize: '10px',
-                fontWeight: 500,
-                lineHeight: 1.2,
-                color: 'hsl(var(--muted-foreground))',
-                fontKerning: 'normal',
-                letterSpacing: '0.14em',
+                position: 'absolute',
+                bottom: '8px',
+                left: '8px',
+                zIndex: 3,
+                fontFamily: 'Roboto, system-ui, -apple-system, Segoe UI, Arial, sans-serif',
+                pointerEvents: 'none',
               }}
             >
-              {brand}
+              {brand ? (
+                <div
+                  style={{
+                    fontSize: '10px',
+                    fontWeight: 500,
+                    lineHeight: 1.2,
+                    color: 'hsl(var(--muted-foreground))',
+                    letterSpacing: '0.14em',
+                    textShadow: '0 1px 2px rgba(255,255,255,0.8)',
+                  }}
+                >
+                  {brand}
+                </div>
+              ) : null}
+              {title ? (
+                <div
+                  style={{
+                    fontSize: '14px',
+                    fontWeight: 500,
+                    lineHeight: 1.1,
+                    color: 'hsl(var(--foreground))',
+                    textShadow: '0 1px 2px rgba(255,255,255,0.8)',
+                  }}
+                >
+                  {title}
+                </div>
+              ) : null}
             </div>
-            <div
-              style={{
-                position: 'relative',
-                top: '6px',
-                fontSize: '14px',
-                fontWeight: 500,
-                lineHeight: 1.1,
-                color: 'hsl(var(--foreground))',
-              }}
-            >
-              {title}
-            </div>
-            <div
-              style={{
-                position: 'relative',
-                top: '7px',
-                left: '-1px',
-                marginTop: '6px',
-                fontSize: '14px',
-                fontWeight: 400,
-                lineHeight: 1.1,
-                color: 'hsl(var(--foreground))',
-              }}
-            >
-              {price}
-            </div>
-          </div>
+          ) : null}
         </div>
       </div>
     </Link>

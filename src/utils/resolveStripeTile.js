@@ -152,6 +152,7 @@ export function resolveForItem(it, tileVariant, ctx) {
  * @returns {(string|null)[]} array de 14 elements
  */
 export function computeStripeTileOverlaySrcs({ drawable, variant, active, displayedShirtColor, resolvedOverlaySrc }) {
+  if (!Array.isArray(drawable) || drawable.length === 0) return null;
   const multiTone = displayedShirtColor === 'white' ? 'dark' : 'light';
   const isKeepCalm = active === 'austen' && typeof resolvedOverlaySrc === 'string' && /\/austen\/keep_calm\//i.test(resolvedOverlaySrc);
   const ctx = { active, displayedShirtColor, resolvedOverlaySrc };
@@ -182,7 +183,7 @@ export function computeStripeTileOverlaySrcs({ drawable, variant, active, displa
  * @returns {(string|null)[]} array de 14 elements
  */
 export function computeStripeTileItems(drawable) {
-  if (!drawable || drawable.length === 0) return null;
+  if (!Array.isArray(drawable) || drawable.length === 0) return null;
   const arr = [];
   for (let i = 0; i < 14; i++) arr.push(i < drawable.length ? drawable[i] : null);
   return arr;

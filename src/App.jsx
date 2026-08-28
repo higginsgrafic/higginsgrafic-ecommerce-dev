@@ -315,7 +315,6 @@ function App() {
 
       {/* Main Header - NO mostrar a pàgines full-screen ni admin ni a dev tools */}
       {!isFullScreenRoute && !isAdminRoute && !isDemoStyleLayoutRoute && !isDevHeaderRoute && (
-        isHomeRoute ? null : (
           <P.FullWideSlideHeader
             cartItemCount={getTotalItems()}
             onCartClick={handleCartClick}
@@ -327,7 +326,6 @@ function App() {
             showStripe={fullWideShowStripe}
             showCatalogPanel={fullWideShowCatalogPanel}
           />
-        )
       )}
 
         <main

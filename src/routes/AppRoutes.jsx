@@ -102,15 +102,6 @@ export default function AppRoutes({ location, pageProps, pautaEnabled, tableEnab
       <Routes location={location} key={location.pathname}>
         <Route path="/" element={
           <motion.div {...pageTransition}>
-            <div className="w-full max-w-none" style={{ '--appHeaderOffset': demoHeaderOffset }}>
-              <FullWideSlideHeader
-                cartItemCount={pageProps.cartItems?.reduce((acc, i) => acc + (i.quantity || 1), 0) || 0}
-                onCartClick={pageProps.onCartClick}
-                onUserClick={pageProps.onUserClick}
-                manualEnabledOverride={false}
-                ignoreStripeDebugFromUrl
-              />
-            </div>
             <Home />
           </motion.div>
         } />
