@@ -272,7 +272,7 @@ const Footer = () => {
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.3, delay: 0.3, ease: "easeOut" }}
           >
-            <Link to="/" className="flex items-center justify-center flex-shrink-0 transition-transform hover:scale-105 active:scale-95">
+            <Link to="/" aria-label="GRÀFIC - Pàgina d'inici" className="flex items-center justify-center flex-shrink-0 transition-transform hover:scale-105 active:scale-95">
               <span
                 aria-hidden="true"
                 className="h-[37.5px] w-[160px] block text-foreground"

@@ -28,6 +28,7 @@ export async function checkRateLimit(event, bucket, opts = {}) {
 
   const supabase = getClient();
   if (!supabase) {
+    console.warn('[_rate-limit] Supabase not configured — rate limiting DISABLED (fail-open)');
     return { allowed: true, error: null };
   }
 
@@ -42,7 +43,7 @@ export async function checkRateLimit(event, bucket, opts = {}) {
     });
 
     if (error) {
-      console.error('[_rate-limit] RPC error:', error.message);
+      console.error('[_rate-limit] RPC error — FAILING OPEN:', error.message);
       return { allowed: true, error: null };
     }
 
@@ -53,7 +54,7 @@ export async function checkRateLimit(event, bucket, opts = {}) {
 
     return { allowed: data === true, error: null };
   } catch (err) {
-    console.error('[_rate-limit] Error:', err.message);
+    console.error('[_rate-limit] Error — FAILING OPEN:', err.message);
     return { allowed: true, error: null };
   }
 }

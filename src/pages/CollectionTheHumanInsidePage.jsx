@@ -290,6 +290,7 @@ function CollectionTheHumanInsidePage() {
               src="/custom_logos/collections/collection-thin-logo.svg"
               alt=""
               aria-hidden="true"
+              loading="lazy"
               style={{
                 height: '0.75em',
                 width: 'auto',
@@ -340,6 +341,8 @@ function CollectionTheHumanInsidePage() {
                 <img
                   src={c.icon}
                   alt={c.name}
+                  loading="lazy"
+                  decoding="async"
                   style={{
                     width: isFirstContact ? '42.1px' : 'auto',
                     height: isFirstContact ? 'auto' : '44px',
@@ -390,6 +393,7 @@ function CollectionTheHumanInsidePage() {
           src={COLLECTION_BG_SRC}
           alt=""
           aria-hidden="true"
+          loading="lazy"
           draggable={false}
           onError={(e) => { e.currentTarget.style.display = 'none'; }}
           style={{

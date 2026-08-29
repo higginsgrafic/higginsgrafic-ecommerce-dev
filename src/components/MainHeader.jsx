@@ -736,7 +736,7 @@ function MainHeader({
                 {mobileOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
               </Button>
 
-              <Link to="/" onClick={closeCollections} className="relative z-10 pointer-events-auto block transition-transform hover:scale-105 active:scale-95" title="GRÀFIC - Inici">
+              <Link to="/" onClick={closeCollections} aria-label="GRÀFIC - Pàgina d'inici" className="relative z-10 pointer-events-auto block transition-transform hover:scale-105 active:scale-95" title="GRÀFIC - Inici">
                 <span
                   aria-hidden="true"
                   data-brand-logo="1"

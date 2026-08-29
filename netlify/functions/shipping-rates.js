@@ -1,6 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
 import { verifyAdmin } from './_auth.js';
 import { checkRateLimit } from './_rate-limit.js';
+import { jsonResponse } from './_cors.js';
 
 const SUPABASE_URL = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
 const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -90,11 +91,7 @@ export async function handler(event, context) {
 
   if (httpMethod === 'GET') {
     if (!SUPABASE_URL || !SUPABASE_SERVICE_KEY) {
-      return {
-        statusCode: 200,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ rates: DEFAULT_COSTS, source: 'defaults' }),
-      };
+      return jsonResponse(event, 200, { rates: DEFAULT_COSTS, source: 'defaults' });
     }
 
     try {
@@ -115,36 +112,21 @@ export async function handler(event, context) {
         };
       }
 
-      return {
-        statusCode: 200,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ rates, source: 'supabase' }),
-      };
+      return jsonResponse(event, 200, { rates, source: 'supabase' });
     } catch (err) {
-      return {
-        statusCode: 200,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ rates: DEFAULT_COSTS, source: 'fallback', error: err.message }),
-      };
+      console.error('[shipping-rates] GET error:', err);
+      return jsonResponse(event, 200, { rates: DEFAULT_COSTS, source: 'fallback' });
     }
   }
 
   if (httpMethod === 'POST') {
     const { authorized, error: authError } = await verifyAdmin(event);
     if (!authorized) {
-      return {
-        statusCode: 403,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ error: authError || 'No autoritzat' }),
-      };
+      return jsonResponse(event, 403, { error: authError || 'No autoritzat' });
     }
 
     if (!SUPABASE_URL || !SUPABASE_SERVICE_KEY) {
-      return {
-        statusCode: 500,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ error: 'Missing Supabase credentials' }),
-      };
+      return jsonResponse(event, 500, { error: 'Missing Supabase credentials' });
     }
 
     try {
@@ -152,23 +134,12 @@ export async function handler(event, context) {
       const rates = await fetchCorreosRates();
       await updateSupabase(supabase, rates);
 
-      return {
-        statusCode: 200,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ success: true, rates, source: 'correos' }),
-      };
+      return jsonResponse(event, 200, { success: true, rates, source: 'correos' });
     } catch (err) {
-      return {
-        statusCode: 500,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ error: err.message }),
-      };
+      console.error('[shipping-rates] POST error:', err);
+      return jsonResponse(event, 500, { error: 'Error intern del servidor' });
     }
   }
 
-  return {
-    statusCode: 405,
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ error: 'Method not allowed' }),
-  };
+  return jsonResponse(event, 405, { error: 'Method not allowed' });
 }
