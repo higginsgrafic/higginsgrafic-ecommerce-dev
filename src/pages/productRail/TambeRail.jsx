@@ -435,6 +435,8 @@ export default function TambeRail({
                   const cardTitle = isObj ? item.title : undefined;
                   const cardPrice = isObj ? item.price : undefined;
                   const cardLink = isObj && item.href ? item.href : cardHref;
+                  const cardOverlaySrc = isObj && item.overlaySrc ? item.overlaySrc : drawingOverlaySrc;
+                  const cardOverlayEnabled = isObj && item.overlayEnabled ? true : (shirtDrawingEnabled && Boolean(drawingOverlaySrc));
                   return (
                     <ProductCard
                       key={`${pos}-${idx}`}
@@ -444,8 +446,8 @@ export default function TambeRail({
                       leftPx={leftPx}
                       tileStyle={dynamicTileStyle}
                       textBlockStyle={dynamicTextBlockStyle}
-                      overlaySrc={drawingOverlaySrc}
-                      overlayEnabled={shirtDrawingEnabled}
+                      overlaySrc={cardOverlaySrc}
+                      overlayEnabled={cardOverlayEnabled}
                       brand={cardBrand}
                       title={cardTitle}
                       price={cardPrice}

@@ -473,6 +473,8 @@ export function buildOtherCollectionsImages(currentSlug, { perCollection = 1, rn
       title: pick.productName,
       price: '15,50€',
       href: pick.productHref,
+      overlaySrc: pick.overlaySrc || null,
+      overlayEnabled: Boolean(pick.overlaySrc),
     };
   }).filter(Boolean);
 }

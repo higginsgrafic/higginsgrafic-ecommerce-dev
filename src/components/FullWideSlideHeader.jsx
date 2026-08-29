@@ -264,8 +264,8 @@ function FullWideSlideHeader({
         const slug = s.split('/austen/quotes/')[1].replace(/-b-grid\.webp$/, '').replace(/\.webp$/, '');
         const map = {
           'it-is-a-truth': 'quotes-it-is-a-truth',
-          'you-must-allow-me': 'quotes-you-have-bewitched-me',
-          'body-and-soul': 'quotes-i-admire-and-love-you',
+          'you-must-allow-me': 'quotes-i-admire-and-love-you',
+          'body-and-soul': 'quotes-you-have-bewitched-me',
           'unsociable-and-taciturn': 'quotes-unsociable-and-taciturn',
           'half-agony-half-hope': 'quotes-half-agony-half-hope',
         };
@@ -704,39 +704,71 @@ function FullWideSlideHeader({
 
   // Preservar variant en entrar/sortir de col·leccions només-color (Cube, Looking For My Darcy)
   const isColorOnly = active === 'cube' || (active === 'austen' && austenSubcollection === 'looking_for_my_darcy');
+  const wasColorOnlyRef = useRef(false);
   useEffect(() => {
     if (isColorOnly) {
       if (firstContactVariant !== 'color') {
         prevVariantRef.current = firstContactVariant;
         setFirstContactVariant('color');
       }
+      wasColorOnlyRef.current = true;
     } else {
-      if (firstContactVariant === 'color' && prevVariantRef.current && prevVariantRef.current !== 'color') {
+      if (wasColorOnlyRef.current && firstContactVariant === 'color' && prevVariantRef.current && prevVariantRef.current !== 'color') {
         const allowed = stripeVariantVisibility || { white: true, black: true, color: true };
         const want = prevVariantRef.current;
         const ok = (want === 'white' && allowed.white) || (want === 'black' && allowed.black) || (want === 'color' && allowed.color);
         if (ok) setFirstContactVariant(want);
       }
+      wasColorOnlyRef.current = false;
     }
   }, [isColorOnly, firstContactVariant, stripeVariantVisibility]);
 
   // Pàgina 2: mateixa preservació
   const isColorOnlyP2 = active === 'cube' || (active === 'austen' && austenSubcollection === 'looking_for_my_darcy');
+  const wasColorOnlyP2Ref = useRef(false);
   useEffect(() => {
     if (isColorOnlyP2) {
       if (firstContactVariantP2 !== 'color') {
         prevVariantP2Ref.current = firstContactVariantP2;
         setFirstContactVariantP2('color');
       }
+      wasColorOnlyP2Ref.current = true;
     } else {
-      if (firstContactVariantP2 === 'color' && prevVariantP2Ref.current && prevVariantP2Ref.current !== 'color') {
+      if (wasColorOnlyP2Ref.current && firstContactVariantP2 === 'color' && prevVariantP2Ref.current && prevVariantP2Ref.current !== 'color') {
         const allowed = stripeVariantVisibility || { white: true, black: true, color: true };
         const want = prevVariantP2Ref.current;
         const ok = (want === 'white' && allowed.white) || (want === 'black' && allowed.black) || (want === 'color' && allowed.color);
         if (ok) setFirstContactVariantP2(want);
       }
+      wasColorOnlyP2Ref.current = false;
     }
   }, [isColorOnlyP2, firstContactVariantP2, stripeVariantVisibility]);
+
+  // Pàgina 2: si austen deshabilita color (Crosswords, Pemberley, Quotes), forçar white
+  useEffect(() => {
+    if (active !== 'austen') return;
+    if (!austenSelectedDisableMulti) return;
+    if (firstContactVariantP2 !== 'color') return;
+    setFirstContactVariantP2('white');
+  }, [active, austenSelectedDisableMulti, firstContactVariantP2]);
+
+  // Pàgina 2: validar variant contra stripeVariantVisibility
+  useEffect(() => {
+    try {
+      if (!active) return;
+      if (active === 'the_human_inside') return;
+      if (active === 'cube') return;
+      if (active === 'austen' && austenSubcollection === 'looking_for_my_darcy') return;
+      const allowed = stripeVariantVisibility || { white: true, black: true, color: true };
+      const want = firstContactVariantP2;
+      const ok = (want === 'white' && allowed.white) || (want === 'black' && allowed.black) || (want === 'color' && allowed.color);
+      if (ok) return;
+      if (allowed.white) setFirstContactVariantP2('white');
+      else if (allowed.black) setFirstContactVariantP2('black');
+      else if (allowed.color) setFirstContactVariantP2('color');
+    } catch {
+    }
+  }, [active, stripeVariantVisibility, firstContactVariantP2, austenSubcollection]);
 
 
   useEffect(() => {
@@ -3127,7 +3159,7 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
       {canUseDom && active && (
         <button
           onClick={() => setMegaLocked((v) => !v)}
-          className="fixed z-[10001] right-4 flex h-10 w-10 items-center justify-center rounded-full border border-border bg-background shadow-lg transition-colors hover:bg-muted"
+          className="fixed z-[10001] left-1/2 -translate-x-1/2 flex h-10 w-10 items-center justify-center rounded-full border border-border bg-background shadow-lg transition-colors hover:bg-muted"
           style={{ top: lockBtnTop != null ? `${lockBtnTop + 8}px` : '16px' }}
           title={megaLocked ? 'Desbloca el megaslide' : 'Bloca el megaslide'}
           aria-label={megaLocked ? 'Desbloca el megaslide' : 'Bloca el megaslide'}
