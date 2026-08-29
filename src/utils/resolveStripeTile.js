@@ -155,6 +155,7 @@ export function computeStripeTileOverlaySrcs({ drawable, variant, active, displa
   if (!Array.isArray(drawable) || drawable.length === 0) return null;
   const multiTone = displayedShirtColor === 'white' ? 'dark' : 'light';
   const isKeepCalm = active === 'austen' && typeof resolvedOverlaySrc === 'string' && /\/austen\/keep_calm\//i.test(resolvedOverlaySrc);
+  const isPemberley = active === 'austen' && typeof resolvedOverlaySrc === 'string' && /\/austen\/pemberley_house\//i.test(resolvedOverlaySrc);
   const ctx = { active, displayedShirtColor, resolvedOverlaySrc };
 
   const tileSrcs = [];
@@ -164,7 +165,7 @@ export function computeStripeTileOverlaySrcs({ drawable, variant, active, displa
     let src = i < drawable.length ? resolveForItem(drawable[i], tileVariant, ctx) : null;
     const tileMultiTone = isKeepCalmColor
       ? (i === 8 ? 'light' : multiTone)
-      : multiTone;
+      : (isPemberley && tileVariant === 'color' ? 'light' : multiTone);
     if (src && tileVariant === 'color' && tileMultiTone === 'dark') {
       src = src.replace('-multi-light-stripe.webp', '-multi-dark-stripe.webp');
     }
