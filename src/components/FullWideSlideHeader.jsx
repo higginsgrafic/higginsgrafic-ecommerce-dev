@@ -209,8 +209,9 @@ function FullWideSlideHeader({
     if (collection === 'first_contact') {
       const map = {
         'nx-01': 'nx-01', 'ncc-1701': 'ncc-1701', 'ncc-1701-d': 'ncc-1701-d',
-        'wormhole': 'wormhole', 'the phoenix': 'the-phoenix',
-        "vulcan's end": 'vulcans-end', 'plasma escape': 'plasma-escape',
+        'wormhole': 'wormhole', 'the-phoenix': 'the-phoenix',
+        "vulcan's-end": 'vulcans-end', 'vulcans-end': 'vulcans-end',
+        'plasma-escape': 'plasma-escape',
       };
       const slug = map[s] || s;
       return `/first-contact/${slug}`;
@@ -220,11 +221,11 @@ function FullWideSlideHeader({
         'r2-d2': 'r2-d2', 'c3p0': 'c3-p0', 'c3-p0': 'c3-p0',
         'vader': 'vader', 'afrodita': 'afrodita', 'afrodita-a': 'afrodita',
         'mazinger': 'mazinger', 'mazinger-z': 'mazinger',
-        'cylon 78': 'cylon-78', 'cylon 03': 'cylon-03',
-        'iron man 68': 'ironman-68', 'iron man 08': 'ironman-08',
+        'cylon-78': 'cylon-78', 'cylon-03': 'cylon-03',
+        'iron-man-68': 'ironman-68', 'iron-man-08': 'ironman-08',
         'cyberman': 'cyberman', 'maschinenmensch': 'maschinenmensch',
-        'robocop': 'robocop', 'the dalek': 'the-dalek',
-        'robbie the robot': 'robbie-the-robot', 'robby the robot': 'robbie-the-robot',
+        'robocop': 'robocop', 'the-dalek': 'the-dalek',
+        'robbie-the-robot': 'robbie-the-robot', 'robby-the-robot': 'robbie-the-robot',
         'terminator': 'terminator',
       };
       const slug = map[s] || s;
@@ -285,6 +286,7 @@ function FullWideSlideHeader({
               'blue-frame': 'yellow-blue-frame',
               'fuchsia-frame': 'yellow-pink-frame',
               'red-frame': 'red-yellow-frame',
+              'yellow-frame': 'pink-yellow-frame',
             };
             return `/austen/looking-for-my-darcy-${frameMap[`${m[1]}-frame`] || `${c}-frame`}`;
           }
@@ -568,6 +570,7 @@ function FullWideSlideHeader({
   // Pàgina 2: estat de variant independent per desacoplar de la pàgina 1
   const [firstContactVariantP2, setFirstContactVariantP2] = useState(() => readStripeVariantFromUrl() || 'black');
   const [humanInsideVariantP2, setHumanInsideVariantP2] = useState(() => readStripeVariantFromUrl() || 'black');
+  const [cercadorSelectedColorP2, setCercadorSelectedColorP2] = useState('white');
 
   // Color de samarreta realment mostrat: coincideix amb el selector excepte
   // quan la variant és BLANC sobre blanc o NEGRE sobre negre, llavors s'inverteix
@@ -579,55 +582,13 @@ function FullWideSlideHeader({
     return cercadorSelectedColor;
   }, [active, firstContactVariant, humanInsideVariant, cercadorSelectedColor]);
 
-  // Pàgina 2: displayedShirtColor propi amb les variants P2
+  // Pàgina 2: displayedShirtColor propi amb les variants P2 i color P2
   const displayedShirtColorP2 = useMemo(() => {
     const variant = active === 'the_human_inside' ? humanInsideVariantP2 : firstContactVariantP2;
-    if (variant === 'white' && cercadorSelectedColor === 'white') return 'black';
-    if (variant === 'black' && cercadorSelectedColor === 'black') return 'white';
-    return cercadorSelectedColor;
-  }, [active, firstContactVariantP2, humanInsideVariantP2, cercadorSelectedColor]);
-
-  const onShirtClick = useCallback((collection, item, color) => {
-    const url = resolvePdpUrl(collection, item);
-    if (url) {
-      const matched = CERCADOR_COLORS.find((c) => c.hex === color);
-      const colorSlug = matched?.slug || displayedShirtColor || 'white';
-      const selectedVariant = collection === 'the_human_inside' ? humanInsideVariant : firstContactVariant;
-      const variant = selectedVariant === 'color' ? 'color'
-        : STRIPE_DARK_SHIRT_COLORS.has(colorSlug) ? 'white' : 'black';
-      navigate(`${url}?color=${colorSlug}&variant=${variant}`);
-    }
-  }, [navigate, resolvePdpUrl, displayedShirtColor, firstContactVariant, humanInsideVariant]);
-
-  // Pàgina 2: onShirtClick propi amb variants P2
-  const onShirtClickP2 = useCallback((collection, item, color) => {
-    const url = resolvePdpUrl(collection, item);
-    if (url) {
-      const matched = CERCADOR_COLORS.find((c) => c.hex === color);
-      const colorSlug = matched?.slug || displayedShirtColorP2 || 'white';
-      const selectedVariant = collection === 'the_human_inside' ? humanInsideVariantP2 : firstContactVariantP2;
-      const variant = selectedVariant === 'color' ? 'color'
-        : STRIPE_DARK_SHIRT_COLORS.has(colorSlug) ? 'white' : 'black';
-      navigate(`${url}?color=${colorSlug}&variant=${variant}`);
-    }
-  }, [navigate, resolvePdpUrl, displayedShirtColorP2, firstContactVariantP2, humanInsideVariantP2]);
-
-  const [selectedColorSlug, setSelectedColorSlug] = useState('white');
-  const [thinStartIndex, setThinStartIndex] = useState(0);
-  const [gildan5000Catalog, setGildan5000Catalog] = useState(null);
-
-  useEffect(() => {
-    try {
-      const v = readStripeVariantFromUrl();
-      if (!v) return;
-      setFirstContactVariant(v);
-      setHumanInsideVariant(v);
-      setFirstContactVariantP2(v);
-      setHumanInsideVariantP2(v);
-    } catch {
-      // ignore
-    }
-  }, [location.search]);
+    if (variant === 'white' && cercadorSelectedColorP2 === 'white') return 'black';
+    if (variant === 'black' && cercadorSelectedColorP2 === 'black') return 'white';
+    return cercadorSelectedColorP2;
+  }, [active, firstContactVariantP2, humanInsideVariantP2, cercadorSelectedColorP2]);
 
   const austenSelectedIsCrosswords = useMemo(() => {
     try {
@@ -674,6 +635,42 @@ function FullWideSlideHeader({
       return { white: true, black: true, color: true };
     }
   }, [active, selectedItemByCollection, austenSubcollection]);
+
+  const onShirtClick = useCallback((collection, item, color) => {
+    const url = resolvePdpUrl(collection, item);
+    const selectedVariant = collection === 'the_human_inside' ? humanInsideVariant : firstContactVariant;
+    if (url) {
+      const matched = CERCADOR_COLORS.find((c) => c.hex === color);
+      const colorSlug = matched?.slug || displayedShirtColor || 'white';
+      navigate(`${url}?color=${colorSlug}&variant=${selectedVariant}`);
+    }
+  }, [navigate, resolvePdpUrl, displayedShirtColor, firstContactVariant, humanInsideVariant]);
+
+  // Pàgina 2: onShirtClick propi amb variants P2
+  const onShirtClickP2 = useCallback((collection, item, color) => {
+    const url = resolvePdpUrl(collection, item);
+    if (url) {
+      const matched = CERCADOR_COLORS.find((c) => c.hex === color);
+      const colorSlug = matched?.slug || displayedShirtColorP2 || 'white';
+      const selectedVariant = collection === 'the_human_inside' ? humanInsideVariantP2 : firstContactVariantP2;
+      navigate(`${url}?color=${colorSlug}&variant=${selectedVariant}`);
+    }
+  }, [navigate, resolvePdpUrl, displayedShirtColorP2, firstContactVariantP2, humanInsideVariantP2]);
+
+  const [selectedColorSlug, setSelectedColorSlug] = useState('white');
+  const [thinStartIndex, setThinStartIndex] = useState(0);
+  const [gildan5000Catalog, setGildan5000Catalog] = useState(null);
+
+  useEffect(() => {
+    try {
+      const v = readStripeVariantFromUrl();
+      if (!v) return;
+      setFirstContactVariant(v);
+      setHumanInsideVariant(v);
+    } catch {
+      // ignore
+    }
+  }, [location.search]);
 
   useEffect(() => {
     if (active !== 'austen') return;
@@ -2838,6 +2835,7 @@ function FullWideSlideHeader({
       onMouseLeave={(e) => {
         if (isManualLockEnabled()) return;
         if (megaAccordionLocked) return;
+        if (megaLocked) return;
         const nextTarget = e?.relatedTarget;
         if (nextTarget instanceof Node && e.currentTarget.contains(nextTarget)) return;
         if (nextTarget instanceof Element && nextTarget.closest('.debug-exempt')) return;
@@ -3157,7 +3155,10 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
         setFirstContactVariantP2={setFirstContactVariantP2}
         setHumanInsideVariantP2={setHumanInsideVariantP2}
         displayedShirtColorP2={displayedShirtColorP2}
+        onShirtClick={onShirtClick}
         onShirtClickP2={onShirtClickP2}
+        cercadorSelectedColorP2={cercadorSelectedColorP2}
+        setCercadorSelectedColorP2={setCercadorSelectedColorP2}
         thinDrawings={thinDrawings}
         cartItems={cartItems}
         setCartItems={setCartItems}
