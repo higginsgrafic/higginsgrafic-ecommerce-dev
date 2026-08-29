@@ -14,7 +14,28 @@ import React from 'react';
  */
 
 // Posició x del connector de cada columna (cqw), mesurada al mockup.
-const COL_X = [0, 11.5632, 22.8659, 35.5921, 47.9655, 62.0658, 79.6462, 91.4758];
+const COL_X_ORIG = [0, 11.5632, 22.8659, 35.5921, 47.9655, 62.0658, 79.6462, 91.4758];
+const COL_X = (() => {
+  const first = COL_X_ORIG[7] * 0.12; // col 1 fixada
+  const last = COL_X_ORIG[7];         // col 8 fixada
+  const span = last - first;
+  const split = 0.425; // cols 1-5 ocupen 42.5%, cols 5-8 ocupen 57.5%
+  const step1 = (span * split) / 4;   // gap entre cols 1-5
+  const step2 = (span * (1 - split)) / 3; // gap entre cols 5-8
+  return [
+    first,
+    first + step1,
+    first + step1 * 2,
+    first + step1 * 3,
+    first + step1 * 4,
+    first + step1 * 4 + step2,
+    first + step1 * 4 + step2 * 2,
+    last,
+  ];
+})();
+
+// Offsets manuals en px per a ajust fi de cada columna.
+const COL_PX_OFFSET = [0, 3, 22, 37, 70, 22, 49, 0];
 
 const TOP_CQW = 4.2;        // top de la primera línia
 const LINE_H = 1.064;       // interlineat (48px)
@@ -232,7 +253,7 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
       {COLUMNS.map((groups, col) => (
         <div
           key={col}
-          style={{ position: 'absolute', top: `${TOP_CQW}cqw`, left: `${COL_X[col]}cqw` }}
+          style={{ position: 'absolute', top: `${TOP_CQW}cqw`, left: `calc(${COL_X[col]}cqw + ${COL_PX_OFFSET[col] || 0}px)` }}
         >
           {groups.map((group, gi) => {
             const isDimmed = activeCollection && group.collection !== activeCollection

@@ -3,9 +3,9 @@ import { useParams } from 'react-router-dom';
 import ProductDetailTemplate from '@/components/ProductDetailTemplate';
 import { findPdpProduct } from '@/config/pdpProducts';
 
-export default function PdpRoute() {
+export default function PdpRoute({ product: productProp } = {}) {
   const { collection, product } = useParams();
-  const productData = findPdpProduct(collection, product);
+  const productData = productProp || findPdpProduct(collection, product);
 
   if (!productData) {
     return (

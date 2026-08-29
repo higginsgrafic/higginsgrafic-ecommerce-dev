@@ -14,7 +14,6 @@ import {
   CollectionCubePage,
   CollectionMiscellaniaPage,
   ProductDetailPage,
-  ProductDetailPageTemplate,
   ProductDetailPageEnhanced,
   OrderConfirmationPage,
   OrderTrackingPage,
@@ -35,7 +34,9 @@ import {
   NotFoundPage,
   FullWideSlidePage,
   ConstructorColleccioPage,
-  ConstructorPdpPage,
+  PdpRoute,
+  PdpPage,
+  ConstructorPdpPreview,
   HtmlBasePage,
   TdpPage,
   ECPreviewPage,
@@ -148,10 +149,10 @@ export default function AppRoutes({ location, pageProps, pautaEnabled, tableEnab
         <Route path="/constructor/tdp" element={<TdpPage pautaEnabled={false} tableEnabled={false} />} />
         <Route path="/tdp" element={<Navigate to="/constructor/tdp" replace />} />
         <Route path="/constructor/colleccio" element={<ConstructorColleccioPage pautaEnabled={false} tableEnabled={false} />} />
-        <Route path="/constructor/pdp" element={<ConstructorPdpPage />} />
+        <Route path="/constructor/pdp" element={<ConstructorPdpPreview />} />
 
         {PDP_REGISTRY.map((p) => (
-          <Route key={p.slug} path={`/${p.collectionSlug}/${p.route}`} element={<ProductDetailPageTemplate />} />
+          <Route key={p.slug} path={`/${p.collectionSlug}/${p.route}`} element={<PdpPage />} />
         ))}
 
         <Route path="/constructor/html-base" element={<HtmlBasePage pautaEnabled={false} tableEnabled={false} />} />

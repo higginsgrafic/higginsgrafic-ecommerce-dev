@@ -566,16 +566,20 @@ function FullWideSlideHeader({
 
   const [firstContactVariant, setFirstContactVariant] = useState(() => readStripeVariantFromUrl() || 'black');
   const [humanInsideVariant, setHumanInsideVariant] = useState(() => readStripeVariantFromUrl() || 'black');
+  const prevVariantRef = useRef(firstContactVariant);
 
   // Pàgina 2: estat de variant independent per desacoplar de la pàgina 1
   const [firstContactVariantP2, setFirstContactVariantP2] = useState(() => readStripeVariantFromUrl() || 'black');
   const [humanInsideVariantP2, setHumanInsideVariantP2] = useState(() => readStripeVariantFromUrl() || 'black');
+  const prevVariantP2Ref = useRef(firstContactVariantP2);
   const [cercadorSelectedColorP2, setCercadorSelectedColorP2] = useState('white');
 
   // Color de samarreta realment mostrat: coincideix amb el selector excepte
   // quan la variant és BLANC sobre blanc o NEGRE sobre negre, llavors s'inverteix
   // perquè la tinta sigui visible. El selector no es mou.
   const displayedShirtColor = useMemo(() => {
+    if (active === 'cube') return cercadorSelectedColor;
+    if (active === 'austen' && austenSubcollection === 'looking_for_my_darcy') return cercadorSelectedColor;
     const variant = active === 'the_human_inside' ? humanInsideVariant : firstContactVariant;
     if (variant === 'white' && cercadorSelectedColor === 'white') return 'black';
     if (variant === 'black' && cercadorSelectedColor === 'black') return 'white';
@@ -584,6 +588,8 @@ function FullWideSlideHeader({
 
   // Pàgina 2: displayedShirtColor propi amb les variants P2 i color P2
   const displayedShirtColorP2 = useMemo(() => {
+    if (active === 'cube') return cercadorSelectedColorP2;
+    if (active === 'austen' && austenSubcollection === 'looking_for_my_darcy') return cercadorSelectedColorP2;
     const variant = active === 'the_human_inside' ? humanInsideVariantP2 : firstContactVariantP2;
     if (variant === 'white' && cercadorSelectedColorP2 === 'white') return 'black';
     if (variant === 'black' && cercadorSelectedColorP2 === 'black') return 'white';
@@ -640,7 +646,7 @@ function FullWideSlideHeader({
     const url = resolvePdpUrl(collection, item);
     const selectedVariant = collection === 'the_human_inside' ? humanInsideVariant : firstContactVariant;
     if (url) {
-      const matched = CERCADOR_COLORS.find((c) => c.hex === color);
+      const matched = CERCADOR_COLORS.find((c) => c.overlayHex === color);
       const colorSlug = matched?.slug || displayedShirtColor || 'white';
       navigate(`${url}?color=${colorSlug}&variant=${selectedVariant}`);
     }
@@ -650,7 +656,7 @@ function FullWideSlideHeader({
   const onShirtClickP2 = useCallback((collection, item, color) => {
     const url = resolvePdpUrl(collection, item);
     if (url) {
-      const matched = CERCADOR_COLORS.find((c) => c.hex === color);
+      const matched = CERCADOR_COLORS.find((c) => c.overlayHex === color);
       const colorSlug = matched?.slug || displayedShirtColorP2 || 'white';
       const selectedVariant = collection === 'the_human_inside' ? humanInsideVariantP2 : firstContactVariantP2;
       navigate(`${url}?color=${colorSlug}&variant=${selectedVariant}`);
@@ -683,6 +689,8 @@ function FullWideSlideHeader({
     try {
       if (!active) return;
       if (active === 'the_human_inside') return;
+      if (active === 'cube') return;
+      if (active === 'austen' && austenSubcollection === 'looking_for_my_darcy') return;
       const allowed = stripeVariantVisibility || { white: true, black: true, color: true };
       const want = firstContactVariant;
       const ok = (want === 'white' && allowed.white) || (want === 'black' && allowed.black) || (want === 'color' && allowed.color);
@@ -692,7 +700,43 @@ function FullWideSlideHeader({
       else if (allowed.color) setFirstContactVariant('color');
     } catch {
     }
-  }, [active, stripeVariantVisibility, firstContactVariant]);
+  }, [active, stripeVariantVisibility, firstContactVariant, austenSubcollection]);
+
+  // Preservar variant en entrar/sortir de col·leccions només-color (Cube, Looking For My Darcy)
+  const isColorOnly = active === 'cube' || (active === 'austen' && austenSubcollection === 'looking_for_my_darcy');
+  useEffect(() => {
+    if (isColorOnly) {
+      if (firstContactVariant !== 'color') {
+        prevVariantRef.current = firstContactVariant;
+        setFirstContactVariant('color');
+      }
+    } else {
+      if (firstContactVariant === 'color' && prevVariantRef.current && prevVariantRef.current !== 'color') {
+        const allowed = stripeVariantVisibility || { white: true, black: true, color: true };
+        const want = prevVariantRef.current;
+        const ok = (want === 'white' && allowed.white) || (want === 'black' && allowed.black) || (want === 'color' && allowed.color);
+        if (ok) setFirstContactVariant(want);
+      }
+    }
+  }, [isColorOnly, firstContactVariant, stripeVariantVisibility]);
+
+  // Pàgina 2: mateixa preservació
+  const isColorOnlyP2 = active === 'cube' || (active === 'austen' && austenSubcollection === 'looking_for_my_darcy');
+  useEffect(() => {
+    if (isColorOnlyP2) {
+      if (firstContactVariantP2 !== 'color') {
+        prevVariantP2Ref.current = firstContactVariantP2;
+        setFirstContactVariantP2('color');
+      }
+    } else {
+      if (firstContactVariantP2 === 'color' && prevVariantP2Ref.current && prevVariantP2Ref.current !== 'color') {
+        const allowed = stripeVariantVisibility || { white: true, black: true, color: true };
+        const want = prevVariantP2Ref.current;
+        const ok = (want === 'white' && allowed.white) || (want === 'black' && allowed.black) || (want === 'color' && allowed.color);
+        if (ok) setFirstContactVariantP2(want);
+      }
+    }
+  }, [isColorOnlyP2, firstContactVariantP2, stripeVariantVisibility]);
 
 
   useEffect(() => {

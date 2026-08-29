@@ -14,7 +14,7 @@ const PDP_PRESET_VERSION = 'pdp-layout-2026-06-06-1953';
 
 const PDP_TITLE_SETTINGS = {
   x: 0, y: 0, fontFamily: 'Oswald', fontSize: 24, fontWeight: 300, selectedFontWeight: 700,
-  letterSpacing: 0.04, lineHeight: 1, textAlign: 'left', verticalAlign: 'bottom',
+  letterSpacing: 0.003, lineHeight: 1, textAlign: 'left', verticalAlign: 'bottom',
   color: '#475059', textTransform: 'uppercase',
 };
 const PDP_COLLECTION_SETTINGS = {
@@ -55,7 +55,7 @@ const OFFICIAL_COLORS = [
 const THUMB_COUNT = OFFICIAL_COLORS.length;
 
 const SPECS = [
-  { label: 'Material', value: '100% cotó pentinat de 180 g/m²', row: 9 },
+  { label: 'Material', value: '100% cotó pentinat de 150 g/m²', row: 9 },
   { label: 'Tall', value: 'Coll rodó', row: 11 },
   { label: 'Procedència', value: <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}><Flag code="HN" size={16} /><Flag code="DO" size={16} /><Flag code="NI" size={16} /><Flag code="BD" size={16} /><Flag code="US" size={16} /></span>, row: 13 },
   { label: 'Estampació', value: 'Impressió DTG', row: 15 },
@@ -493,6 +493,8 @@ export default function ProductDetailTemplate({ product }) {
               alignItems: 'center',
               justifyContent: 'center',
               overflow: 'hidden',
+              marginTop: '-70px',
+              paddingTop: '70px',
             }}
           >
             <img
@@ -504,6 +506,7 @@ export default function ProductDetailTemplate({ product }) {
                 maxHeight: '90%',
                 objectFit: 'contain',
                 userSelect: 'none',
+                marginTop: '-35px',
               }}
             />
             <CarouselArrows

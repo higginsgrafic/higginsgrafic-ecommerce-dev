@@ -9,6 +9,7 @@ import {
   CONTROL_TILE_BN,
   CONTROL_TILE_ARROWS,
 } from '../fullwide/MegaColumn.jsx';
+import { FirstContactDibuix00Buttons } from '../fullwide/firstContactPanels.jsx';
 import { computeStripeTileOverlaySrcs, computeStripeTileItems } from '@/utils/resolveStripeTile.js';
 
 export default function MegaslidePagina2({
@@ -71,6 +72,8 @@ export default function MegaslidePagina2({
     megaTileSize,
     normalizeOverlaySrc,
   } = cal;
+
+  const bnSliderSize = megaTileSize || 120;
 
   const variant = active === 'the_human_inside' ? humanInsideVariant : firstContactVariant;
 
@@ -141,6 +144,31 @@ export default function MegaslidePagina2({
         paddingLeft: '0px',
         paddingRight: '0px',
       }}>
+        {/* Slider B/N/C vertical — cantó esquerre, alçada barra grisa */}
+        {active ? (
+          <div style={{
+            position: 'absolute',
+            top: 'calc(var(--hg-cercador-bar-top, 0px) + 45px)',
+            left: '40px',
+            width: `${bnSliderSize}px`,
+            height: `${bnSliderSize}px`,
+            zIndex: 4,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}>
+            <FirstContactDibuix00Buttons
+              onWhite={() => { setStripeOverlayOverrideActive(false); active === 'the_human_inside' ? setHumanInsideVariant('white') : setFirstContactVariant('white'); }}
+              onBlack={() => { setStripeOverlayOverrideActive(false); active === 'the_human_inside' ? setHumanInsideVariant('black') : setFirstContactVariant('black'); }}
+              onMulti={() => { setStripeOverlayOverrideActive(false); active === 'the_human_inside' ? setHumanInsideVariant('color') : setFirstContactVariant('color'); }}
+              showWhite={stripeVariantVisibility?.white !== false}
+              showBlack={stripeVariantVisibility?.black !== false}
+              showMulti={stripeVariantVisibility?.color !== false}
+              selectedVariant={active === 'the_human_inside' ? humanInsideVariant : firstContactVariant}
+            />
+          </div>
+        ) : null}
+
         {/* CercadorTopBar */}
         <div style={{
           position: 'absolute',
@@ -259,7 +287,7 @@ export default function MegaslidePagina2({
             setHumanInsideSelectedItem={setHumanInsideSelectedItem}
             setSelectedItemByCollection={setSelectedItemByCollection}
             normalizeOverlaySrc={normalizeOverlaySrc}
-            shirtColor={CERCADOR_COLORS.find((c) => c.slug === displayedShirtColor)?.hex}
+            shirtColor={CERCADOR_COLORS.find((c) => c.slug === displayedShirtColor)?.overlayHex}
             onShirtClick={onShirtClick}
             selectedItem={
               active === 'first_contact' ? firstContactSelectedItem
@@ -274,75 +302,6 @@ export default function MegaslidePagina2({
             stripeEmptyMaskSrc={stripeEmptyMaskSrc}
           />
         </div>
-
-        {/* Selector BLANC/COLOR/NEGRE */}
-        {active ? (
-          <div style={{
-            position: 'relative',
-            zIndex: 3,
-            display: 'flex',
-            marginTop: '56px',
-            padding: '0 40px',
-            justifyContent: 'center',
-          }}>
-            <div style={{
-              display: 'flex',
-              backgroundColor: '#f3f4f6',
-              padding: '2px',
-              borderRadius: 'clamp(2.81px, 0.8vw, 5.06px)',
-              border: '1px solid #e5e7eb',
-              width: '100%',
-              maxWidth: '202px',
-              boxSizing: 'border-box',
-            }}>
-              {['BLANC', 'COLOR', 'NEGRE'].map((opt) => {
-                const currentVariant = active === 'the_human_inside' ? humanInsideVariant : firstContactVariant;
-                const variantKey = opt === 'BLANC' ? 'white' : opt === 'NEGRE' ? 'black' : 'color';
-                const isActive = currentVariant === variantKey;
-                const variantExists = stripeVariantVisibility?.[variantKey] !== false;
-                const isDisabled = !variantExists;
-                return (
-                  <button
-                    key={opt}
-                    type="button"
-                    disabled={isDisabled}
-                    onClick={() => {
-                      if (isDisabled) return;
-                      if (active === 'the_human_inside') {
-                        setHumanInsideVariant(variantKey);
-                      } else {
-                        setFirstContactVariant(variantKey);
-                      }
-                    }}
-                    style={{
-                      flex: 1,
-                      fontFamily: 'Oswald, sans-serif',
-                      fontSize: '8.1pt',
-                      fontWeight: isActive ? 400 : 300,
-                      letterSpacing: '0em',
-                      lineHeight: 1,
-                      textTransform: 'none',
-                      color: isDisabled ? '#d1d5db' : (isActive ? '#111827' : '#9ca3af'),
-                      backgroundColor: isActive ? '#ffffff' : 'transparent',
-                      border: 'none',
-                      borderRadius: 'clamp(2.11px, 0.6vw, 3.8px)',
-                      cursor: isDisabled ? 'not-allowed' : 'pointer',
-                      opacity: isDisabled ? 0.5 : 1,
-                      transition: 'all 150ms ease',
-                      boxShadow: isActive ? '0 1px 2px rgba(0,0,0,0.05)' : 'none',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      padding: '5px 0',
-                    }}
-                  >
-                    {opt}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-        ) : null}
 
         {/* MegaHeroSlider — amagat temporalment
         <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, zIndex: 1, pointerEvents: 'none' }}>

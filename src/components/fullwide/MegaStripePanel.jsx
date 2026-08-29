@@ -359,6 +359,7 @@ function MegaStripePanel({
                         inset: 0,
                         backgroundColor: shirtColor,
                         mixBlendMode: 'multiply',
+                        opacity: 0.9,
                         pointerEvents: 'none',
                         zIndex: 5,
                       }}
@@ -571,7 +572,7 @@ function MegaStripePanel({
                                     if (hasMultiDark) return src.replace(/-multi-dark-/i, '-multi-light-');
                                     return src;
                                   }
-                                  const isRedShirt = shirtColor === '#BD2739';
+                                  const isRedShirt = shirtColor === '#CB001D';
                                   if (isRedShirt) {
                                     if (hasMultiDark) return src.replace(/-multi-dark-/i, '-multi-light-');
                                     return src;
@@ -813,7 +814,7 @@ function MegaStripePanel({
                                     if (hasMultiDark) return src.replace(/-multi-dark-/i, '-multi-light-');
                                     return src;
                                   }
-                                  const isRedShirt = shirtColor === '#BD2739';
+                                  const isRedShirt = shirtColor === '#CB001D';
                                   if (isRedShirt) {
                                     if (hasMultiDark) return src.replace(/-multi-dark-/i, '-multi-light-');
                                     return src;
