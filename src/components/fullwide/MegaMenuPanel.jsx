@@ -1,6 +1,6 @@
 import React, { lazy, Suspense } from 'react';
 import MegaStripeBleedGuard from './MegaStripeBleedGuard.jsx';
-import MegaStripePanel from './MegaStripePanel.jsx';
+import MegaStripePanelP1 from './MegaStripePanelP1.jsx';
 import MegaslidePagina2 from '../megaslide/MegaslidePagina2.jsx';
 
 const MegaslidePagina3 = lazy(() => import('../megaslide/MegaslidePagina3.jsx'));
@@ -69,7 +69,10 @@ export default function MegaMenuPanel({
   setFirstContactVariantP2,
   setHumanInsideVariantP2,
   displayedShirtColorP2,
+  onShirtClick,
   onShirtClickP2,
+  cercadorSelectedColorP2,
+  setCercadorSelectedColorP2,
   thinDrawings,
   cartItems,
   setCartItems,
@@ -85,6 +88,10 @@ export default function MegaMenuPanel({
   setAcordioExpandedPage4,
 }) {
   if (!active) return null;
+
+  const page1SelectedItem = active === 'first_contact' ? firstContactSelectedItem
+    : active === 'the_human_inside' ? humanInsideSelectedItem
+    : (selectedItemByCollection?.[active] ?? null);
 
   return (
     <div className="relative">
@@ -147,7 +154,7 @@ export default function MegaMenuPanel({
                   }} />
 
                   <div style={{ flex: '0 0 auto', width: 'var(--hg-mega-w, min(1350px, calc(100vw - 32px)))', maxWidth: 'none', position: 'relative', height: '100%', paddingLeft: '0px', paddingRight: '0px' }}>
-                    <MegaStripePanel
+                    <MegaStripePanelP1
                       active={active}
                       resolvedMega={resolvedMega}
                       showStripe={showStripe}
@@ -184,6 +191,8 @@ export default function MegaMenuPanel({
                       setHumanInsideSelectedItem={setHumanInsideSelectedItem}
                       setSelectedItemByCollection={setSelectedItemByCollection}
                       normalizeOverlaySrc={normalizeOverlaySrc}
+                      onShirtClick={onShirtClick}
+                      selectedItem={page1SelectedItem}
                     />
                   </div>
 
@@ -197,8 +206,8 @@ export default function MegaMenuPanel({
                   setActive={setActive}
                   austenSubcollection={austenSubcollection}
                   setAustenSubcollection={setAustenSubcollection}
-                  cercadorSelectedColor={cercadorSelectedColor}
-                  setCercadorSelectedColor={setCercadorSelectedColor}
+                  cercadorSelectedColor={cercadorSelectedColorP2}
+                  setCercadorSelectedColor={setCercadorSelectedColorP2}
                   firstContactSelectedItem={firstContactSelectedItem}
                   humanInsideSelectedItem={humanInsideSelectedItem}
                   selectedItemByCollection={selectedItemByCollection}

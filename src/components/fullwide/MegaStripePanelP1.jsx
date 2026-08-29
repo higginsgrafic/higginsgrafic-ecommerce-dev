@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import MegaColumn from './MegaColumn.jsx';
-import ClicAreaOverlay from './ClicAreaOverlay.jsx';
+import ClicAreaOverlayP1 from './ClicAreaOverlayP1.jsx';
 import { CERCADOR_COLORS } from './CercadorTopBar.jsx';
 import { STRIPE_DRAWING_CALIBRATIONS } from '../../config/stripeCalibrations';
 
@@ -76,7 +76,7 @@ function useEmptyShirtMask(emptyTileIndices, shirtColor) {
   return dataUrl;
 }
 
-function MegaStripePanel({
+function MegaStripePanelP1({
   hideGrid,
   reserveGridSpace,
   stripeImageSrc,
@@ -136,12 +136,13 @@ function MegaStripePanel({
       const x = ev.detail?.x;
       if (typeof x !== 'number') return;
       const tileIdx = Math.min(13, Math.max(0, Math.floor(x * 14)));
-      const item = stripeTileItems?.[tileIdx] || selectedItem || stripeTileItems?.[0];
+      const item = selectedItem || stripeTileItems?.[0];
       if (!item) return;
-      onShirtClick(active, item, shirtColor);
+      const tileColor = CERCADOR_COLORS[tileIdx]?.hex || shirtColor;
+      onShirtClick(active, item, tileColor);
     };
-    window.addEventListener('mega-stripe-full-hit-p2', handler);
-    return () => window.removeEventListener('mega-stripe-full-hit-p2', handler);
+    window.addEventListener('mega-stripe-full-hit-p1', handler);
+    return () => window.removeEventListener('mega-stripe-full-hit-p1', handler);
   }, [onShirtClick, selectedItem, stripeTileItems, active, shirtColor]);
 
   return (
@@ -206,7 +207,7 @@ function MegaStripePanel({
         >
           <div className="w-full flex justify-center bg-transparent">
             <div
-              id="stripe-guide-stripe-row"
+              id="stripe-guide-stripe-row-p1"
               className="relative inline-block"
               style={{
                 height: `${stripePreviewHPx}px`,
@@ -263,7 +264,7 @@ function MegaStripePanel({
                     {Array.isArray(stripeMaskDebugRectsPct) && stripeMaskDebugRectsPct.length === 14
                       ? stripeMaskDebugRectsPct.map((r, idx) => (
                         <div
-                          key={`stripe-tile-debug-abs-${idx}`}
+                          key={`stripe-tile-debug-abs-p1-${idx}`}
                           style={{
                             position: 'absolute',
                             left: `${r.left}%`,
@@ -302,7 +303,7 @@ function MegaStripePanel({
                       ))
                       : Array.from({ length: 14 }).map((_, idx) => (
                         <div
-                          key={`stripe-tile-debug-abs-fallback-${idx}`}
+                          key={`stripe-tile-debug-abs-fallback-p1-${idx}`}
                           style={{
                             height: '100%',
                             flex: '1 1 0%',
@@ -401,10 +402,6 @@ function MegaStripePanel({
                     />
                   ) : null}
 
-                  {/* Imatge prerenderitzada de les samarretes buides esvaïdes
-                      (N.png, transparent), alineada amb la stripe. Esvaeix només
-                      les buides; la zona dels dibuixos és transparent i no tapa
-                      les samarretes de color. */}
                   {stripeEmptyMaskSrc ? (
                     <img
                       src={stripeEmptyMaskSrc}
@@ -425,8 +422,6 @@ function MegaStripePanel({
                     />
                   ) : null}
 
-                  {/* Capa de bloqueig de clics sobre les samarretes buides
-                      (transparent; el fade visual ve de stripeEmptyMaskSrc). */}
                   {Array.isArray(emptyTileIndices) && emptyTileIndices.length > 0 ? (
                     <div className="absolute inset-0" aria-hidden="true" style={{ pointerEvents: 'none', zIndex: 10 }}>
                       {emptyTileIndices.map((idx) => {
@@ -439,7 +434,7 @@ function MegaStripePanel({
                         const heightPct = r ? Number(r.height) || 100 : 100;
                         return (
                           <div
-                            key={`disabled-tile-${idx}`}
+                            key={`disabled-tile-p1-${idx}`}
                             onPointerDown={(ev) => { ev.stopPropagation(); }}
                             onClick={(ev) => { ev.stopPropagation(); }}
                             style={{
@@ -471,8 +466,6 @@ function MegaStripePanel({
                     >
                       {Array.isArray(stripeMaskTileRectsRawPct) && stripeMaskTileRectsRawPct.length === 14
                         ? stripeMaskTileRectsRawPct.map((r, idx) => {
-                          // Tile buit (samarreta sense dibuix): no renderitzem res
-                          // (no repetim ni fem fallback al dibuix per defecte).
                           if (Array.isArray(stripeTileOverlaySrcs) && !stripeTileOverlaySrcs[idx]) {
                             return null;
                           }
@@ -630,7 +623,7 @@ function MegaStripePanel({
 
                           return (
                             <div
-                              key={`stripe-tile-drawing-${idx}-${imgUrl || ''}`}
+                              key={`stripe-tile-drawing-p1-${idx}-${imgUrl || ''}`}
                               style={{
                                 position: 'absolute',
                                 left: `${safeL}%`,
@@ -668,15 +661,6 @@ function MegaStripePanel({
                                 className="block absolute inset-0"
                                 onError={(e) => {
                                   try {
-                                    if (
-                                      import.meta.env.DEV
-                                      && active === 'austen'
-                                      && typeof resolvedOverlaySrc === 'string'
-                                      && /\/austen\/pemberley_house\//i.test(resolvedOverlaySrc)
-                                    ) {
-                                      // eslint-disable-next-line no-console
-                                      console.error('[MEGA stripe tile img error]', { idx, src: imgUrl, resolvedOverlaySrc });
-                                    }
                                     e.currentTarget.style.display = 'none';
                                   } catch {
                                   }
@@ -715,7 +699,6 @@ function MegaStripePanel({
                           );
                         })
                         : Array.from({ length: 14 }).map((_, idx) => {
-                          // Tile buit (samarreta sense dibuix): no renderitzem res.
                           if (Array.isArray(stripeTileOverlaySrcs) && !stripeTileOverlaySrcs[idx]) {
                             return null;
                           }
@@ -872,7 +855,7 @@ function MegaStripePanel({
                           const imgUrl = picked ? encodeURI(picked) : '';
                           return (
                             <div
-                              key={`stripe-tile-drawing-fallback-${idx}-${imgUrl || ''}`}
+                              key={`stripe-tile-drawing-fallback-p1-${idx}-${imgUrl || ''}`}
                               style={{
                                 position: 'absolute',
                                 top: '0%',
@@ -920,17 +903,8 @@ function MegaStripePanel({
                     </div>
                   ) : null}
 
-                  {/* ClicAreaOverlay is the sole click target for shirts.
-                      The old transparent div (z-index 3) that also dispatched
-                      mega-stripe-full-hit has been removed to avoid duplicate
-                      events and coordinate mismatches. */}
-
                 </div>
 
-                {/* Cercle fosc sobre el coll de cada samarreta, situat al gap
-                    superior (fora de la imatge), alineat amb el centre de cada
-                    casella. Configurable amb CSS vars: --hgStripeNeckDotSize,
-                    --hgStripeNeckDotColor, --hgStripeNeckDotDy. */}
                 <div className="absolute inset-0" aria-hidden="true" style={{ pointerEvents: 'none', zIndex: 40 }}>
                   {(Array.isArray(stripeMaskTileRectsRawPct) && stripeMaskTileRectsRawPct.length === 14
                     ? stripeMaskTileRectsRawPct.map((r, idx) => ({
@@ -943,7 +917,7 @@ function MegaStripePanel({
                     }))
                   ).filter(({ idx }) => Array.isArray(neckDotIndices) && neckDotIndices.includes(idx)).map(({ idx, cx }) => (
                     <span
-                      key={`neck-dot-${idx}`}
+                      key={`neck-dot-p1-${idx}`}
                       style={{
                         position: 'absolute',
                         left: `${cx}%`,
@@ -958,11 +932,7 @@ function MegaStripePanel({
                   ))}
                 </div>
 
-                {/* Contorn de l'àrea de clic (samarretes), alineat amb la
-                    màscara de la imatge (103% × 100%, centrat). Cada samarreta
-                    es ressalta en passar-hi el ratolí; si `clicAreaHighlight`
-                    (hover sobre el nom del dibuix) és cert, es ressalten totes. */}
-                <ClicAreaOverlay
+                <ClicAreaOverlayP1
                   src="/placeholders/cercador/full-clic-area-5.svg"
                   highlightAll={!!clicAreaHighlight}
                   highlightIndices={clicAreaHighlightIndices}
@@ -978,4 +948,4 @@ function MegaStripePanel({
   );
 }
 
-export default MegaStripePanel;
+export default MegaStripePanelP1;

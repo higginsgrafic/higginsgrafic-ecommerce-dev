@@ -1,21 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
 
-/**
- * ClicAreaOverlay
- * -----------------------------------------------------------------------------
- * Superposa l'SVG de l'àrea de clic (contorns de les 14 samarretes) sobre la
- * imatge de la franja. L'SVG s'injecta inline (no <img>) per poder controlar
- * cada samarreta individualment:
- *   - En passar el ratolí per damunt d'una samarreta concreta, es ressalta el
- *     seu contorn (CSS :hover sobre cada <path class="tshirt-outline">).
- *   - `highlightIndices` (array d'índexs 0-based) ressalta les samarretes
- *     corresponents a la fila sobre la qual es fa hover al text.
- *   - Si `highlightAll` és cert, es ressalten totes les samarretes alhora.
- * Els clics sobre les samarretes es reenvien com a esdeveniment
- * `mega-stripe-full-hit` perquè la lògica de selecció existent segueixi
- * funcionant.
- */
-// Negatiu (invers) d'un color hex: #RRGGBB -> #(255-R)(255-G)(255-B).
 function invertHex(hex) {
   const h = String(hex || '#FFFFFF').replace('#', '');
   if (h.length < 6) return '#000000';
@@ -25,7 +9,7 @@ function invertHex(hex) {
   return '#' + [r, g, b].map((v) => v.toString(16).padStart(2, '0')).join('');
 }
 
-function ClicAreaOverlay({ src, highlightAll, highlightIndices, tshirtColor, disabledIndices }) {
+function ClicAreaOverlayP1({ src, highlightAll, highlightIndices, tshirtColor, disabledIndices }) {
   const [markup, setMarkup] = useState('');
   const containerRef = useRef(null);
   const fallbackRef = useRef(null);
@@ -44,8 +28,6 @@ function ClicAreaOverlay({ src, highlightAll, highlightIndices, tshirtColor, dis
     };
   }, [src]);
 
-  // Ressalta els contorns de les samarretes indicades per índex (0-based),
-  // afegint la classe `is-highlighted` als paths corresponents.
   const indicesKey = Array.isArray(highlightIndices) ? highlightIndices.join(',') : '';
   const disabledKey = Array.isArray(disabledIndices) ? disabledIndices.join(',') : '';
   useEffect(() => {
@@ -70,7 +52,7 @@ function ClicAreaOverlay({ src, highlightAll, highlightIndices, tshirtColor, dis
       if (!r) return;
       const x = (ev.clientX - r.left) / (r.width || 1);
       const y = (ev.clientY - r.top) / (r.height || 1);
-      window.dispatchEvent(new CustomEvent('mega-stripe-full-hit-p2', { detail: { x, y } }));
+      window.dispatchEvent(new CustomEvent('mega-stripe-full-hit-p1', { detail: { x, y } }));
     } catch {
       // ignore
     }
@@ -79,22 +61,22 @@ function ClicAreaOverlay({ src, highlightAll, highlightIndices, tshirtColor, dis
   return (
     <>
       <style>{`
-        .clic-area-overlay { position: absolute; top: 0; left: 50%; transform: translateX(calc(-50% - 0.25px)) scaleX(var(--hg-clic-scale-x, 0.979)) scaleY(var(--hg-clic-scale-y, 1.02)); transform-origin: center center; height: 100%; width: 103%; z-index: 30; pointer-events: none; }
-        .clic-area-overlay svg { display: block; width: 100%; height: 100%; }
-        .clic-area-overlay .tshirt-outline { opacity: 0; pointer-events: all; cursor: pointer; stroke: var(--hg-outline-color, #000000) !important; }
-        .clic-area-overlay .tshirt-outline.is-disabled { pointer-events: none; cursor: default; opacity: 0; stroke: none !important; fill: none !important; }
-        .clic-area-fallback { position: absolute; inset: 0; pointer-events: all; cursor: pointer; z-index: 29; background: transparent; }
+        .clic-area-overlay-p1 { position: absolute; top: 0; left: 50%; transform: translateX(calc(-50% - 0.25px)) scaleX(var(--hg-clic-scale-x, 0.979)) scaleY(var(--hg-clic-scale-y, 1.02)); transform-origin: center center; height: 100%; width: 103%; z-index: 30; pointer-events: none; }
+        .clic-area-overlay-p1 svg { display: block; width: 100%; height: 100%; }
+        .clic-area-overlay-p1 .tshirt-outline { opacity: 0; pointer-events: all; cursor: pointer; stroke: var(--hg-outline-color, #000000) !important; }
+        .clic-area-overlay-p1 .tshirt-outline.is-disabled { pointer-events: none; cursor: default; opacity: 0; stroke: none !important; fill: none !important; }
+        .clic-area-fallback-p1 { position: absolute; inset: 0; pointer-events: all; cursor: pointer; z-index: 29; background: transparent; }
       `}</style>
       {markup ? null : (
         <div
           ref={fallbackRef}
-          className="clic-area-fallback"
+          className="clic-area-fallback-p1"
           onPointerDown={handlePointerDown}
         />
       )}
       <div
         ref={containerRef}
-        className={`clic-area-overlay${highlightAll ? ' highlight-all' : ''}`}
+        className={`clic-area-overlay-p1${highlightAll ? ' highlight-all' : ''}`}
         style={{ '--hg-outline-color': outlineColor }}
         aria-hidden="true"
         onPointerDown={handlePointerDown}
@@ -104,4 +86,4 @@ function ClicAreaOverlay({ src, highlightAll, highlightIndices, tshirtColor, dis
   );
 }
 
-export default ClicAreaOverlay;
+export default ClicAreaOverlayP1;
