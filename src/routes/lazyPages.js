@@ -54,8 +54,9 @@ export const CollectionTheHumanInsidePage = lazy(() => import('@/pages/Collectio
 export const CollectionAustenPage = lazy(() => import('@/pages/CollectionAustenPage'));
 export const CollectionCubePage = lazy(() => import('@/pages/CollectionCubePage'));
 export const CollectionMiscellaniaPage = lazy(() => import('@/pages/CollectionMiscellaniaPage'));
-export const ConstructorPdpPage = lazy(() => import('@/pages/ConstructorPdpPage'));
-export const ProductDetailPageTemplate = lazy(() => import('@/pages/ProductDetailPageTemplate'));
+export const PdpRoute = lazy(() => import('@/pages/PdpRoute'));
+export const PdpPage = lazy(() => import('@/pages/PdpPage'));
+export const ConstructorPdpPreview = lazy(() => import('@/pages/ConstructorPdpPreview'));
 export const HtmlBasePage = lazy(() => import('@/pages/HtmlBasePage'));
 export const DevComponentsCatalogPage = lazy(() => import('@/pages/DevComponentsCatalogPage'));
 export const DevLayoutBuilderPage = lazy(() => import('@/pages/DevLayoutBuilderPage'));

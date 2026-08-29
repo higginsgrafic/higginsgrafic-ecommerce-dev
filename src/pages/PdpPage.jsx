@@ -1,22 +1,23 @@
-import React, { useEffect, useState, useLayoutEffect, useRef } from 'react';
-import { useLocation } from 'react-router-dom';
+import React, { useState, useLayoutEffect, useRef, useEffect, useMemo } from 'react';
+import { useLocation, Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 import Pauta4ColsOverlay from '@/components/pauta/Pauta4ColsOverlay';
-import CollectionProductCard from '@/components/tdp/CollectionProductCard';
 import TambeRail from '@/pages/productRail/TambeRail';
-import RespescaTitle from '@/pages/productRail/RespescaTitle';
 import CarouselArrows from '@/pages/productRail/CarouselArrows';
 import Breadcrumbs from '@/components/Breadcrumbs';
+import { tdpImageFor, availableFinishesFor, defaultFinishFor } from '@/lib/pdpMockup';
 import EditableTextBox from '@/components/dev/EditableTextBox';
-import { useDebugOverlays } from '@/hooks/useDebugOverlays';
 import StoryPosterLink from '@/components/StoryPosterLink';
 import { Flag } from './ShippingPage';
+import { PDP_REGISTRY_BY_ROUTE } from '@/data/pdpRegistry';
+import SEOProductSchema from '@/components/SEOProductSchema';
+import { buildOtherCollectionsImages } from '@/components/home/homeDrawings';
 
 const PDP_PRESET_VERSION = 'pdp-layout-2026-06-06-1953';
 
 const PDP_TITLE_SETTINGS = {
   x: 0, y: 0, fontFamily: 'Oswald', fontSize: 24, fontWeight: 300, selectedFontWeight: 700,
-  letterSpacing: 0.04, lineHeight: 1, textAlign: 'left', verticalAlign: 'bottom',
+  letterSpacing: 0.003, lineHeight: 1, textAlign: 'left', verticalAlign: 'bottom',
   color: '#475059', textTransform: 'uppercase',
 };
 const PDP_COLLECTION_SETTINGS = {
@@ -44,41 +45,12 @@ const PDP_SIZE_SETTINGS = {
   letterSpacing: 0, lineHeight: 1, textAlign: 'center', verticalAlign: 'center',
   color: '#475059', textTransform: 'none',
 };
-const PDP_SPECS_HEADING_SETTINGS = {
-  x: 0, y: 0, fontFamily: 'Oswald', fontSize: 24, fontWeight: 300, selectedFontWeight: 700,
-  letterSpacing: 0.04, lineHeight: 1, textAlign: 'right', verticalAlign: 'bottom',
-  color: '#475059', textTransform: 'uppercase',
-};
-const PDP_SPEC_LABEL_SETTINGS = {
-  x: 0, y: 0, fontFamily: 'Roboto Condensed', fontSize: 8, fontWeight: 700, selectedFontWeight: 700,
-  letterSpacing: 0.2, lineHeight: 1.2, textAlign: 'right', verticalAlign: 'bottom',
-  color: '#111827', textTransform: 'uppercase',
-};
-const PDP_SPEC_VALUE_SETTINGS = {
-  x: 0, y: 0, fontFamily: 'Roboto', fontSize: 16, fontWeight: 300, selectedFontWeight: 700,
-  letterSpacing: 0.03, lineHeight: 1.2, textAlign: 'right', verticalAlign: 'top',
-  color: 'rgba(71, 80, 89, 0.7)', textTransform: 'none',
-};
-
-
-// =============================================================================
-//  Constructor PDP — pàgina de detall de producte (plantilla)
-// -----------------------------------------------------------------------------
-//  Còpia neta de la base HTML amb tots els elements posicionats com a
-//  grid-items directes dins de `Pauta4ColsOverlay`. Cap wrapper, cap state
-//  global de calibratge: la pauta és el contracte universal i cada element
-//  ocupa unes files i columnes explícites.
-// =============================================================================
-
-const TDP_IMAGE = (color) =>
-  `/placeholders/apparel/t-shirt/gildan_5000/gildan-5000_t-shirt_crewneck_unisex_heavyWeight_xl_${color}_gpr-4-0_front.png`;
 
 const PRODUCT_DESCRIPTION = [
   "Mereixedors són d'honor, glòria e de fama e contínua bona memòria los",
   'hòmens virtuosos, e singularment aquells qui per la república lluitaren.',
 ].join(' ');
 
-// 14 colors oficials Gildan 5000 en l'ordre de la stripe (MegaStripe).
 const OFFICIAL_COLORS = [
   'white', 'light-blue', 'royal', 'navy', 'purple', 'light-pink', 'daisy',
   'gold', 'red', 'kiwi', 'irish-green', 'military-green', 'forest-green', 'black',
@@ -86,10 +58,10 @@ const OFFICIAL_COLORS = [
 const THUMB_COUNT = OFFICIAL_COLORS.length;
 
 const SPECS = [
-  { label: 'Material', value: '100% cotó pentinat de 180 g/m²', row: 9 },
+  { label: 'Material', value: '100% cotó pentinat de 150 g/m²', row: 9 },
   { label: 'Tall', value: 'Coll rodó', row: 11 },
   { label: 'Procedència', value: <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}><Flag code="HN" size={16} /><Flag code="DO" size={16} /><Flag code="NI" size={16} /><Flag code="BD" size={16} /><Flag code="US" size={16} /></span>, row: 13 },
-  { label: 'Estampació', value: 'Impressió DTG', row: 15 },
+  { label: 'Estampació', value: 'Impressió DTF', row: 15 },
   { label: 'Cura', value: 'Renta-la al revés i a 30°C', row: 17 },
   { label: 'Garantia', value: 'Devolució 14 dies', row: 19 },
 ];
@@ -97,47 +69,52 @@ const SPECS = [
 const SIZES = ['S', 'M', 'L', 'XL', 'XXL'];
 const FINISHES = ['BLANC', 'COLOR', 'NEGRE'];
 
-function colorToProductName(color) {
-  const map = {
-    'white': 'White',
-    'light-blue': 'Light Blue',
-    'royal': 'Royal',
-    'navy': 'Navy',
-    'purple': 'Purple',
-    'light-pink': 'Light Pink',
-    'daisy': 'Daisy',
-    'gold': 'Gold',
-    'red': 'Red',
-    'kiwi': 'Kiwi',
-    'irish-green': 'Irish Green',
-    'military-green': 'Military Green',
-    'forest-green': 'Forest Green',
-    'black': 'Black',
-  };
-  return map[color] || color;
-}
-
-function ConstructorPdpPage() {
+function PdpPage() {
   const location = useLocation();
+  const registryKey = location.pathname.replace(/^\//, '');
+  const product = PDP_REGISTRY_BY_ROUTE[registryKey];
+
+  if (!product) {
+    return (
+      <section className="bg-background">
+        <Helmet>
+          <title>Producte no trobat | Higgins Gràfic</title>
+        </Helmet>
+        <div style={{ padding: '4rem', textAlign: 'center' }}>
+          <h1>Producte no trobat</h1>
+          <p>No s'ha trobat cap producte per a la ruta <code>{registryKey}</code>.</p>
+        </div>
+      </section>
+    );
+  }
+
+  const PRODUCT_SLUG = product.slug;
+  const PRODUCT_ROUTE = product.route;
+  const PRODUCT_NAME = product.name;
+  const COLLECTION_NAME = product.collectionName;
+  const COLLECTION_SLUG = product.collectionSlug;
+  const IMAGE_COLLECTION = product.imageCollection || product.collectionSlug;
+
+  const TDP_IMAGE = (color, finish) => tdpImageFor(IMAGE_COLLECTION, PRODUCT_ROUTE, color, finish);
+  const AVAILABLE_FINISHES = availableFinishesFor(IMAGE_COLLECTION);
+  const DEFAULT_FINISH = defaultFinishFor(IMAGE_COLLECTION);
+  const otherImages = useMemo(() => buildOtherCollectionsImages(COLLECTION_SLUG).map((img) => ({ ...img, price: null })), [COLLECTION_SLUG]);
+
   const searchParams = new URLSearchParams(location.search);
   const urlColor = searchParams.get('color');
   const initialIndex = urlColor ? OFFICIAL_COLORS.indexOf(urlColor) : 0;
   const effectiveInitialIndex = initialIndex >= 0 ? initialIndex : 0;
-  const productName = colorToProductName(OFFICIAL_COLORS[effectiveInitialIndex]);
+  const productName = PRODUCT_NAME;
 
-  const {
-    pdpControlsEnabled,
-    pautaEnabled,
-    setPautaEnabled,
-    tableEnabled,
-    setTableEnabled,
-    pautaOpacity,
-    setPautaOpacity,
-    tableOpacity,
-    setTableOpacity,
-  } = useDebugOverlays();
-
-  const [selectedFinish, setSelectedFinish] = useState('COLOR');
+  const VARIANT_TO_FINISH = { white: 'BLANC', black: 'NEGRE', color: 'COLOR' };
+  const urlFinish = searchParams.get('finish');
+  const urlVariant = searchParams.get('variant');
+  const variantFinish = urlVariant && VARIANT_TO_FINISH[urlVariant];
+  const resolvedFinish = (urlFinish && AVAILABLE_FINISHES.includes(urlFinish)) ? urlFinish
+    : (variantFinish && AVAILABLE_FINISHES.includes(variantFinish)) ? variantFinish
+    : DEFAULT_FINISH;
+  const initialFinish = resolvedFinish;
+  const [selectedFinish, setSelectedFinish] = useState(initialFinish);
   const [finishButtonTextSettings, setFinishButtonTextSettings] = useState(PDP_SIZE_SETTINGS);
 
   const [selectedSize, setSelectedSize] = useState('M');
@@ -150,10 +127,7 @@ function ConstructorPdpPage() {
 
   const pautaGridRef = useRef(null);
   const [rowHeight, setRowHeight] = useState(38);
-  // Alçada EXACTA d'una fila de la pauta real (70 files) per dimensionar les
-  // fletxes "També et pot interessar" exactament com l'alçada d'una fila.
   const [exactRowHeight, setExactRowHeight] = useState(38);
-  const [copiedDesign, setCopiedDesign] = useState(false);
 
   useLayoutEffect(() => {
     if (typeof window === 'undefined') return undefined;
@@ -161,11 +135,10 @@ function ConstructorPdpPage() {
       const gridEl = pautaGridRef.current;
       if (!gridEl) return;
       const rect = gridEl.getBoundingClientRect();
-      const numRows = 65; // Nombre canònic de files de la PDP
+      const numRows = 38;
       const singleRowH = rect.height / numRows;
       setRowHeight((prev) => (Math.abs(prev - singleRowH) < 0.1 ? prev : singleRowH));
-      // Alçada exacta d'una fila del grid real (numRows={70}, gutterY=3px)
-      const gridRows = 70;
+      const gridRows = 40;
       const rowGap = 3;
       const exactRowH = (rect.height - (gridRows - 1) * rowGap) / gridRows;
       setExactRowHeight((prev) => (Math.abs(prev - exactRowH) < 0.1 ? prev : exactRowH));
@@ -173,7 +146,6 @@ function ConstructorPdpPage() {
 
     measure();
     window.addEventListener('resize', measure);
-    // També mesurem una miqueta després perquè s'hagin carregat imatges o layouts inicials
     const t = setTimeout(measure, 100);
     return () => {
       window.removeEventListener('resize', measure);
@@ -181,26 +153,34 @@ function ConstructorPdpPage() {
     };
   }, []);
 
-  const updateState = (patch) => {
-    if ('pautaEnabled' in patch) setPautaEnabled(patch.pautaEnabled);
-    if ('tableEnabled' in patch) setTableEnabled(patch.tableEnabled);
-    if ('pautaOpacity' in patch) setPautaOpacity(patch.pautaOpacity);
-    if ('tableOpacity' in patch) setTableOpacity(patch.tableOpacity);
-  };
+  useEffect(() => {
+    const sp = new URLSearchParams(location.search);
+    const urlColor = sp.get('color');
+    const urlVariant = sp.get('variant');
+    if (urlColor) {
+      const idx = OFFICIAL_COLORS.indexOf(urlColor);
+      if (idx >= 0) setMainVariantIndex(idx);
+    }
+    if (urlVariant) {
+      const vf = VARIANT_TO_FINISH[urlVariant];
+      if (vf && AVAILABLE_FINISHES.includes(vf)) setSelectedFinish(vf);
+    }
+  }, [location.search]);
 
   return (
-    <section className="bg-background" style={{ transform: 'scale(0.94)', transformOrigin: 'center top' }}>
+    <section className="bg-background" style={{ transform: 'scale(0.94)', transformOrigin: 'center top', marginTop: '250px', marginBottom: '300px' }}>
       <Helmet>
-        <title>PDP · Constructor | Higgins Gràfic</title>
+        <title>{`${PRODUCT_NAME} · ${COLLECTION_NAME} | Higgins Gràfic`}</title>
         <meta
           name="description"
-          content="Constructor pàgina de detall de producte: pauta de 4 columnes amb tots els elements (carrusel, fitxa tècnica, outro, més peces)."
+          content={`${PRODUCT_NAME} — ${COLLECTION_NAME}. Pàgina de detall de producte.`}
         />
       </Helmet>
+      <SEOProductSchema product={{ name: PRODUCT_NAME, description: `${PRODUCT_NAME} — ${COLLECTION_NAME}`, image: TDP_IMAGE(product.colors?.[0], DEFAULT_FINISH), slug: PRODUCT_SLUG, collection: COLLECTION_SLUG }} url={`/${PRODUCT_ROUTE}`} />
 
       <Pauta4ColsOverlay
-        numRows={70}
-        canvasAspect={[2642, 5217]}
+        numRows={40}
+        canvasAspect={[2642, 2981]}
         pautaEnabled={false}
         tableEnabled={false}
         topOffset="0px"
@@ -209,10 +189,10 @@ function ConstructorPdpPage() {
         style={{
           zIndex: 5,
           position: 'relative',
-          marginBottom: 'calc(-2 * (var(--hg-tdp-xR) - var(--hg-tdp-xL)) * 5217 / 2642 / 70 - 23px)',
+          marginBottom: 'calc(-2 * (var(--hg-tdp-xR) - var(--hg-tdp-xL)) * 2981 / 2642 / 40 - 23px)',
         }}
       >
-        {/* ─── Breadcrumbs (col 1, fila 1 — cantonada superior esquerra del belt2) ─── */}
+        {/* ─── Breadcrumbs (col 1, fila 1) ─── */}
         <div
           className="[&_ol]:pl-0 [&_nav]:p-0"
           style={{
@@ -223,20 +203,45 @@ function ConstructorPdpPage() {
             justifySelf: 'start',
             padding: 0,
             margin: 0,
-            transform: 'translateY(-10px)',
+            transform: 'translateY(calc(-10px - 250px / 0.94))',
+            pointerEvents: 'auto',
+            zIndex: 10,
           }}
         >
           <Breadcrumbs
             items={[
-              { label: 'Col·lecció', link: '/constructor/colleccio' },
+              { label: COLLECTION_NAME, link: `/${COLLECTION_SLUG}` },
               { label: productName },
             ]}
           />
         </div>
 
+        {/* ─── TambeRail (altres històries, sense títol) ─── */}
+        <div
+          style={{
+            gridColumn: '1 / 5',
+            gridRow: '2 / 3',
+            minHeight: 0,
+            alignSelf: 'center',
+            justifySelf: 'center',
+            padding: 0,
+            margin: 0,
+            transform: 'translateY(calc(-125px / 0.94 + 35px))',
+            width: '100%',
+            pointerEvents: 'auto',
+          }}
+        >
+          <TambeRail
+            images={otherImages}
+            showTitle={false}
+            showInternalArrows={false}
+            visibleCards={4}
+          />
+        </div>
+
         {/* ─── Bloc producte: títol + descripció + talles + CTA (col 4 — dreta) ─── */}
         <EditableTextBox
-          id="pdp-product-name"
+          id={`${PRODUCT_SLUG}-pdp-product-name`}
           initialText={productName}
           initialSettings={PDP_TITLE_SETTINGS}
           presetVersion={PDP_PRESET_VERSION}
@@ -246,8 +251,8 @@ function ConstructorPdpPage() {
         />
 
         <EditableTextBox
-          id="pdp-collection-name"
-          initialText="NOM DE COL·LECCIÓ"
+          id={`${PRODUCT_SLUG}-pdp-collection-name`}
+          initialText={COLLECTION_NAME}
           initialSettings={PDP_COLLECTION_SETTINGS}
           presetVersion={PDP_PRESET_VERSION}
           renderHandle={false}
@@ -256,7 +261,7 @@ function ConstructorPdpPage() {
         />
 
         <EditableTextBox
-          id="pdp-product-description"
+          id={`${PRODUCT_SLUG}-pdp-product-description`}
           initialText={PRODUCT_DESCRIPTION}
           initialSettings={PDP_DESCRIPTION_SETTINGS}
           presetVersion={PDP_PRESET_VERSION}
@@ -267,7 +272,7 @@ function ConstructorPdpPage() {
         />
 
         <EditableTextBox
-          id="pdp-price"
+          id={`${PRODUCT_SLUG}-pdp-price`}
           initialText="15,50€"
           initialSettings={PDP_PRICE_SETTINGS}
           presetVersion={PDP_PRESET_VERSION}
@@ -335,7 +340,7 @@ function ConstructorPdpPage() {
 
         {/* Handle d'edició per als botons de talles (mode columns) */}
         <EditableTextBox
-          id="pdp-size-buttons"
+          id={`${PRODUCT_SLUG}-pdp-size-buttons`}
           initialText={SIZES.join(' ')}
           columns={SIZES}
           selectedColumn={selectedSize}
@@ -355,20 +360,7 @@ function ConstructorPdpPage() {
           onClick={() => {
             try {
               window.dispatchEvent(new CustomEvent('hg:open-full-wide-cart', {
-                detail: {
-                  source: 'constructor-pdp-cta',
-                  firstPartOnly: true,
-                  item: {
-                    title: productName.toUpperCase(),
-                    collection: 'CONSTRUCTOR',
-                    qty: 1,
-                    size: selectedSize,
-                    price: '15,50€',
-                    color: mainVariantColor,
-                    drawing: '',
-                    disabled: false,
-                  },
-                },
+                detail: { source: 'product-pdp-cta', firstPartOnly: true, item: { title: productName.toUpperCase(), collection: COLLECTION_NAME, collectionSlug: IMAGE_COLLECTION, productRoute: PRODUCT_ROUTE, qty: 1, size: selectedSize, price: '15,50€', color: mainVariantColor, finish: selectedFinish, drawing: '', disabled: false } },
               }));
             } catch {
               // ignore
@@ -427,7 +419,7 @@ function ConstructorPdpPage() {
 
         {/* Handle d'edició per al CTA (no renderitza text, només handle) */}
         <EditableTextBox
-          id="pdp-cta"
+          id={`${PRODUCT_SLUG}-pdp-cta`}
           initialText="AFEGEIX AL CISTELL"
           initialSettings={PDP_CTA_SETTINGS}
           presetVersion={PDP_PRESET_VERSION}
@@ -450,11 +442,7 @@ function ConstructorPdpPage() {
             gap: 8,
           }}
         >
-          {/* Miniatura petita d'una fila a dalt (la primera de totes) — crea
-              la sensació de profunditat, mirall de la de sota/última. */}
           {(() => {
-            // Miniatura peek superior: el color immediatament anterior a la
-            // finestra centrada (amb wrap), per continuar la sensació de profunditat.
             const N = OFFICIAL_COLORS.length;
             const topIdx = ((mainVariantIndex - 3) % N + N) % N;
             const topColor = OFFICIAL_COLORS[topIdx];
@@ -479,7 +467,7 @@ function ConstructorPdpPage() {
                 }}
               >
                 <img
-                  src={TDP_IMAGE(topColor)}
+                  src={TDP_IMAGE(topColor, selectedFinish)}
                   alt=""
                   aria-hidden="true"
                   draggable={false}
@@ -488,18 +476,15 @@ function ConstructorPdpPage() {
               </button>
             );
           })()}
-          {/* Thumbs (col 2 del subgrid — a la dreta de la imatge).
-              Es mostren `THUMB_VISIBLE` thumbs alhora; els altres viuen al
-              carrusel i s'amaguen fins que arribin a la finestra visible. */}
           {(() => {
             const THUMB_VISIBLE = 7;
             const N = OFFICIAL_COLORS.length;
-            const center = Math.floor(THUMB_VISIBLE / 2) - 1; // slot FIX del selector (pujat 1 posició)
+            const center = Math.floor(THUMB_VISIBLE / 2) - 1;
             const wrap = (i) => ((i % N) + N) % N;
             return Array.from({ length: THUMB_VISIBLE }).map((_, vIdx) => {
               const idx = wrap(mainVariantIndex - center + vIdx);
               const color = OFFICIAL_COLORS[idx];
-              const isActive = vIdx === center; // l'actiu sempre al centre
+              const isActive = vIdx === center;
               return (
                 <button
                   key={`thumb-slot-${vIdx}`}
@@ -535,7 +520,7 @@ function ConstructorPdpPage() {
                     />
                   )}
                   <img
-                    src={TDP_IMAGE(color)}
+                    src={TDP_IMAGE(color, selectedFinish)}
                     alt=""
                     aria-hidden="true"
                     draggable={false}
@@ -567,7 +552,7 @@ function ConstructorPdpPage() {
             }}
           >
             <img
-              src={TDP_IMAGE(mainVariantColor)}
+              src={TDP_IMAGE(mainVariantColor, selectedFinish)}
               alt={`Producte principal ${mainVariantColor}`}
               draggable={false}
               style={{
@@ -590,55 +575,7 @@ function ConstructorPdpPage() {
           </div>
         </div>
 
-        {/* Subtítol "ALTRES HISTÒRIES" - Alineat en Y amb les fletxes (fila 50) i en X a l'esquerra de la col 1 */}
-        <div
-          style={{
-            gridColumn: '1 / 3',
-            gridRow: '50 / 51',
-            alignSelf: 'center',
-            fontFamily: 'Roboto Condensed, sans-serif',
-            fontWeight: 400,
-            fontSize: '15pt',
-            lineHeight: 1.2,
-            letterSpacing: '0.2em',
-            textTransform: 'uppercase',
-            color: 'rgba(71, 80, 89, 0.7)',
-            textAlign: 'left',
-            pointerEvents: 'auto',
-            transform: 'translateX(2px)', // Sense desplaçament vertical (Y = 0)
-          }}
-        >
-          ALTRES HISTÒRIES
-        </div>
-
-        {/* Fletxes També et pot interessar: directament al grid a la fila 50, columna 4 (alineat a la dreta) */}
-        <div
-          style={{
-            gridColumn: '4 / 5',
-            gridRow: '50 / 51',
-            position: 'relative',
-            width: '100%',
-            height: '100%',
-            minHeight: 0,
-            pointerEvents: 'auto',
-          }}
-        >
-          <CarouselArrows
-            rightPx={0}
-            centerVertically
-            onPrev={() => {
-              console.log('Dispatching tambe-rail:prev');
-              window.dispatchEvent(new CustomEvent('tambe-rail:prev'));
-            }}
-            onNext={() => {
-              console.log('Dispatching tambe-rail:next');
-              window.dispatchEvent(new CustomEvent('tambe-rail:next'));
-            }}
-            rowHeight={exactRowHeight}
-          />
-        </div>
-
-        {/* TEXT POSTER GRAN (Fila 32 / 38) - Centrat a la pàgina amb un padding top de 50px respecte la PDP */}
+        {/* TEXT POSTER GRAN (Fila 32 / 38) */}
         <div
           style={{
             gridColumn: '1 / 5',
@@ -736,13 +673,15 @@ function ConstructorPdpPage() {
               boxSizing: 'border-box',
             }}
           >
-            {['BLANC', 'COLOR', 'NEGRE'].map((opt) => {
-              const isActive = selectedFinish === opt;
+            {FINISHES.map((opt) => {
+              const isAvailable = AVAILABLE_FINISHES.includes(opt);
+              const isActive = isAvailable && selectedFinish === opt;
               return (
                 <button
                   key={opt}
                   type="button"
-                  onClick={() => setSelectedFinish(opt)}
+                  disabled={!isAvailable}
+                  onClick={isAvailable ? () => setSelectedFinish(opt) : undefined}
                   style={{
                     flex: 1,
                     fontFamily: `${finishButtonTextSettings.fontFamily}, sans-serif`,
@@ -751,11 +690,12 @@ function ConstructorPdpPage() {
                     letterSpacing: `${finishButtonTextSettings.letterSpacing}em`,
                     lineHeight: finishButtonTextSettings.lineHeight,
                     textTransform: finishButtonTextSettings.textTransform,
-                    color: isActive ? '#111827' : '#9ca3af',
+                    color: !isAvailable ? '#d1d5db' : (isActive ? '#111827' : '#9ca3af'),
                     backgroundColor: isActive ? '#ffffff' : 'transparent',
                     border: 'none',
                     borderRadius: 'clamp(2.11px, 0.6vw, 3.8px)',
-                    cursor: 'pointer',
+                    cursor: isAvailable ? 'pointer' : 'not-allowed',
+                    opacity: isAvailable ? 1 : 0.45,
                     transition: 'all 150ms ease',
                     boxShadow: isActive ? '0 1px 2px rgba(0,0,0,0.05)' : 'none',
                     display: 'flex',
@@ -770,9 +710,9 @@ function ConstructorPdpPage() {
           </div>
         </div>
 
-        {/* Handle d'edició per al selector d'acabats/colors (Declarat desprès per z-index / ordre DOM) */}
+        {/* Handle d'edició per al selector d'acabats/colors */}
         <EditableTextBox
-          id="pdp-finish-buttons"
+          id={`${PRODUCT_SLUG}-pdp-finish-buttons`}
           initialText="BLANC COLOR NEGRE"
           columns={FINISHES}
           selectedColumn={selectedFinish}
@@ -786,22 +726,9 @@ function ConstructorPdpPage() {
           style={{ gridColumn: '4 / 5', gridRow: '17 / 18', zIndex: 100005, width: 0, height: 0, justifySelf: 'end' }}
         />
 
-        {/* ─── Bloc "També et pot interessar" (rail recomanats) - Dins de la graella de la pauta alineat al top de la fila 48 ─── */}
-        <div
-          style={{
-            gridColumn: '1 / 5',
-            gridRow: '48 / 65',
-            alignSelf: 'start',
-            width: '100%',
-            marginTop: '-48px', // Ajustat 3px addicionals cap amunt per a una alineació visual mil·limètrica
-          }}
-        >
-          <TambeRail cardHref="/constructor/pdp" title="cada dibuix té una història" showInternalArrows={false} showTitle={false} />
-        </div>
-
       </Pauta4ColsOverlay>
     </section>
   );
 }
 
-export default ConstructorPdpPage;
+export default PdpPage;

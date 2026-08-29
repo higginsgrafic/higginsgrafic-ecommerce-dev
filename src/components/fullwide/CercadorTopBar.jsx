@@ -25,20 +25,20 @@ export const CERCADOR_COLLECTIONS = [
 
 // Ordre i hex mostrejats directament del mockup fons-cercador.png.
 export const CERCADOR_COLORS = [
-  { slug: 'white', hex: '#FFFFFF' },
-  { slug: 'light-blue', hex: '#99AFC6' },
-  { slug: 'royal', hex: '#347DCD' },
-  { slug: 'navy', hex: '#212B42' },
-  { slug: 'purple', hex: '#471387' },
-  { slug: 'light-pink', hex: '#D9C4CC' },
-  { slug: 'daisy', hex: '#EDCC5D' },
-  { slug: 'gold', hex: '#E2A13B' },
-  { slug: 'red', hex: '#BD2739' },
-  { slug: 'kiwi', hex: '#B7CE88' },
-  { slug: 'irish-green', hex: '#49A256' },
-  { slug: 'military-green', hex: '#607060' },
-  { slug: 'forest-green', hex: '#2D3B34' },
-  { slug: 'black', hex: '#000000' },
+  { slug: 'white',          hex: '#FFFFFF', overlayHex: '#FFFFFF' },
+  { slug: 'light-blue',     hex: '#99AFC6', overlayHex: '#91AEC8' },
+  { slug: 'royal',          hex: '#347DCD', overlayHex: '#0071D6' },
+  { slug: 'navy',           hex: '#212B42', overlayHex: '#061431' },
+  { slug: 'purple',         hex: '#471387', overlayHex: '#3D0083' },
+  { slug: 'light-pink',     hex: '#D9C4CC', overlayHex: '#DBBDCA' },
+  { slug: 'daisy',          hex: '#EDCC5D', overlayHex: '#F3C72E' },
+  { slug: 'gold',           hex: '#E2A13B', overlayHex: '#F19800' },
+  { slug: 'red',            hex: '#BD2739', overlayHex: '#CB001D' },
+  { slug: 'kiwi',           hex: '#B7CE88', overlayHex: '#A9CC71' },
+  { slug: 'irish-green',    hex: '#49A256', overlayHex: '#009C39' },
+  { slug: 'military-green', hex: '#607060', overlayHex: '#4F6751' },
+  { slug: 'forest-green',   hex: '#2D3B34', overlayHex: '#0F271E' },
+  { slug: 'black',          hex: '#000000', overlayHex: '#0D1114' },
 ];
 
 // Mides responsives en cqw (= 1% de l'amplada de la barra, que coincideix amb

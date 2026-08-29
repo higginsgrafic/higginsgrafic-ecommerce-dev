@@ -138,7 +138,7 @@ function MegaStripePanelP1({
       const tileIdx = Math.min(13, Math.max(0, Math.floor(x * 14)));
       const item = selectedItem || stripeTileItems?.[0];
       if (!item) return;
-      const tileColor = CERCADOR_COLORS[tileIdx]?.hex || shirtColor;
+      const tileColor = CERCADOR_COLORS[tileIdx]?.overlayHex || shirtColor;
       onShirtClick(active, item, tileColor);
     };
     window.addEventListener('mega-stripe-full-hit-p1', handler);
@@ -360,6 +360,7 @@ function MegaStripePanelP1({
                         inset: 0,
                         backgroundColor: shirtColor,
                         mixBlendMode: 'multiply',
+                        opacity: 0.9,
                         pointerEvents: 'none',
                         zIndex: 5,
                       }}
@@ -564,7 +565,7 @@ function MegaStripePanelP1({
                                     if (hasMultiDark) return src.replace(/-multi-dark-/i, '-multi-light-');
                                     return src;
                                   }
-                                  const isRedShirt = shirtColor === '#BD2739';
+                                  const isRedShirt = shirtColor === '#CB001D';
                                   if (isRedShirt) {
                                     if (hasMultiDark) return src.replace(/-multi-dark-/i, '-multi-light-');
                                     return src;
@@ -796,7 +797,7 @@ function MegaStripePanelP1({
                                     if (hasMultiDark) return src.replace(/-multi-dark-/i, '-multi-light-');
                                     return src;
                                   }
-                                  const isRedShirt = shirtColor === '#BD2739';
+                                  const isRedShirt = shirtColor === '#CB001D';
                                   if (isRedShirt) {
                                     if (hasMultiDark) return src.replace(/-multi-dark-/i, '-multi-light-');
                                     return src;

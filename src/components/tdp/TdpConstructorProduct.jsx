@@ -6,7 +6,7 @@ let pdpPrefetched = false;
 function prefetchPdpChunk() {
   if (pdpPrefetched) return;
   pdpPrefetched = true;
-  import('@/pages/ProductDetailPageTemplate');
+  import('@/pages/PdpPage');
 }
 
 const TDP_TEXT_PRESET_VERSION = 'tdp-layout-2026-05-14-0516';
