@@ -207,7 +207,9 @@
   border: none;
   background: rgba(255, 255, 255, 0.45);
   cursor: pointer;
-  padding: 0;
+  padding: 8px;
+  background-clip: content-box;
+  box-sizing: content-box;
   transition: transform 0.3s ease, background 0.3s ease;
 }
 

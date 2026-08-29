@@ -269,6 +269,7 @@ function CollectionFirstContactPage() {
               src="/custom_logos/collections/collection-first-contact-logo.svg"
               alt=""
               aria-hidden="true"
+              loading="lazy"
               style={{
                 width: '0.718em',
                 height: 'auto',
@@ -319,6 +320,8 @@ function CollectionFirstContactPage() {
                 <img
                   src={c.icon}
                   alt={c.name}
+                  loading="lazy"
+                  decoding="async"
                   style={{
                     width: isFirstContact ? '42.1px' : 'auto',
                     height: isFirstContact ? 'auto' : '44px',
@@ -369,6 +372,7 @@ function CollectionFirstContactPage() {
           src={COLLECTION_BG_SRC}
           alt=""
           aria-hidden="true"
+          loading="lazy"
           draggable={false}
           onError={(e) => { e.currentTarget.style.display = 'none'; }}
           style={{

@@ -268,8 +268,8 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, onBac
                     {(() => {
                       const mockup = mockupSrc(item);
                       return mockup
-                        ? <img src={mockup} alt="" style={{ width:'100%', height:'100%', objectFit:'contain' }} />
-                        : <img src={tshirtSrc(item.color)} alt="" style={{ width:'85%', height:'85%', objectFit:'contain' }} />;
+                        ? <img src={mockup} alt="" loading="lazy" decoding="async" style={{ width:'100%', height:'100%', objectFit:'contain' }} />
+                        : <img src={tshirtSrc(item.color)} alt="" loading="lazy" decoding="async" style={{ width:'85%', height:'85%', objectFit:'contain' }} />;
                     })()}
                   </div>
                   <div style={{ overflow:'hidden' }}>

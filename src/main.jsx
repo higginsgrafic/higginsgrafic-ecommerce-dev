@@ -76,9 +76,24 @@ import { TooltipProvider } from '@/components/ui/tooltip';
 import App from '@/App';
 import BranchBadge from '@/components/dev/BranchBadge';
 import '@/index.css';
+import { onLCP, onCLS, onINP, onFCP, onTTFB } from 'web-vitals';
 if (import.meta.env.DEV) {
   import('@/debug.css');
 }
+
+const vitals = {};
+const logVitals = (metric) => {
+  vitals[metric.name] = metric.value;
+  console.log(`[Web Vitals] ${metric.name}: ${metric.value.toFixed(2)} ${metric.rating || ''}`);
+  if (metric.name === 'CLS' || metric.name === 'LCP' || metric.name === 'INP') {
+    window.__HG_VITALS__ = vitals;
+  }
+};
+onLCP(logVitals);
+onCLS(logVitals);
+onINP(logVitals);
+onFCP(logVitals);
+onTTFB(logVitals);
 
 console.log('📦 All imports loaded successfully');
 

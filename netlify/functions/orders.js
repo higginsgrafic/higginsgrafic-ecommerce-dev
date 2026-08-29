@@ -3,6 +3,7 @@ import { sendOrderEmail } from './_email.js';
 import { verifyAdmin, verifyUser } from './_auth.js';
 import { checkRateLimit } from './_rate-limit.js';
 import { hashToken, isTokenExpired } from './_token.js';
+import { jsonResponse } from './_cors.js';
 
 const SUPABASE_URL = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
 const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -36,35 +37,22 @@ const STATUS_LABELS = {
   'entregada': 'ENTREGADA',
 };
 
-function jsonResponse(statusCode, body) {
-  return {
-    statusCode,
-    headers: {
-      'Content-Type': 'application/json',
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'GET, POST, PATCH, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-    },
-    body: JSON.stringify(body),
-  };
-}
-
 
 export async function handler(event, context) {
   if (event.httpMethod === 'OPTIONS') {
-    return jsonResponse(200, {});
+    return jsonResponse(event, 200, {});
   }
 
   const supabase = getSupabase();
   if (!supabase) {
-    return jsonResponse(500, { error: 'Supabase no configurat' });
+    return jsonResponse(event, 500, { error: 'Supabase no configurat' });
   }
 
   const method = event.httpMethod;
 
   // POST: Disabled — orders are created by create-payment-intent function only
   if (method === 'POST') {
-    return jsonResponse(403, { error: 'La creació de comandes es fa via create-payment-intent' });
+    return jsonResponse(event, 403, { error: 'La creació de comandes es fa via create-payment-intent' });
   }
 
   // GET: Retrieve orders
@@ -77,7 +65,7 @@ export async function handler(event, context) {
       windowSeconds: 60,
     });
     if (!rlAllowed) {
-      return jsonResponse(429, { error: 'Massa sol·licituds. Torna-ho a provar en un moment.' });
+      return jsonResponse(event, 429, { error: 'Massa sol·licituds. Torna-ho a provar en un moment.' });
     }
 
     try {
@@ -94,11 +82,11 @@ export async function handler(event, context) {
           .single();
 
         if (error || !data) {
-          return jsonResponse(404, { error: 'Comanda no trobada' });
+          return jsonResponse(event, 404, { error: 'Comanda no trobada' });
         }
 
         if (isTokenExpired(data.tracking_token_expires_at)) {
-          return jsonResponse(403, { error: 'Token de seguiment caducat' });
+          return jsonResponse(event, 403, { error: 'Token de seguiment caducat' });
         }
 
         const formatted = {
@@ -107,7 +95,7 @@ export async function handler(event, context) {
           items: typeof data.items === 'string' ? JSON.parse(data.items) : data.items,
         };
 
-        return jsonResponse(200, { order: formatted });
+        return jsonResponse(event, 200, { order: formatted });
       }
 
       // Authenticated user: list own orders
@@ -121,7 +109,7 @@ export async function handler(event, context) {
 
         if (error) {
           console.error('[orders] Error fetching user orders:', error);
-          return jsonResponse(500, { error: error.message });
+          return jsonResponse(event, 500, { error: 'Error intern del servidor' });
         }
 
         const formatted = (data || []).map((o) => ({
@@ -130,7 +118,7 @@ export async function handler(event, context) {
           items: typeof o.items === 'string' ? JSON.parse(o.items) : o.items,
         }));
 
-        return jsonResponse(200, { orders: formatted });
+        return jsonResponse(event, 200, { orders: formatted });
       }
 
       // Admin: can query by email or orderNumber
@@ -144,7 +132,7 @@ export async function handler(event, context) {
             .single();
 
           if (error) {
-            return jsonResponse(404, { error: 'Comanda no trobada' });
+            return jsonResponse(event, 404, { error: 'Comanda no trobada' });
           }
 
           const formatted = {
@@ -153,7 +141,7 @@ export async function handler(event, context) {
             items: typeof data.items === 'string' ? JSON.parse(data.items) : data.items,
           };
 
-          return jsonResponse(200, { order: formatted });
+          return jsonResponse(event, 200, { order: formatted });
         }
 
         if (email) {
@@ -164,7 +152,8 @@ export async function handler(event, context) {
             .order('created_at', { ascending: false });
 
           if (error) {
-            return jsonResponse(500, { error: error.message });
+            console.error('[orders] Admin email query error:', error);
+            return jsonResponse(event, 500, { error: 'Error intern del servidor' });
           }
 
           const formatted = (data || []).map((o) => ({
@@ -173,16 +162,16 @@ export async function handler(event, context) {
             items: typeof o.items === 'string' ? JSON.parse(o.items) : o.items,
           }));
 
-          return jsonResponse(200, { orders: formatted });
+          return jsonResponse(event, 200, { orders: formatted });
         }
 
-        return jsonResponse(400, { error: 'Cal proporcionar email, orderNumber o trackingToken' });
+        return jsonResponse(event, 400, { error: 'Cal proporcionar email, orderNumber o trackingToken' });
       }
 
-      return jsonResponse(401, { error: 'Cal autenticació o token de seguiment' });
+      return jsonResponse(event, 401, { error: 'Cal autenticació o token de seguiment' });
     } catch (err) {
       console.error('[orders] GET error:', err);
-      return jsonResponse(500, { error: err.message });
+      return jsonResponse(event, 500, { error: 'Error intern del servidor' });
     }
   }
 
@@ -191,7 +180,7 @@ export async function handler(event, context) {
     try {
       const { authorized, error: authError } = await verifyAdmin(event);
       if (!authorized) {
-        return jsonResponse(403, { error: authError || 'No autoritzat per modificar comandes' });
+        return jsonResponse(event, 403, { error: authError || 'No autoritzat per modificar comandes' });
       }
 
       const body = JSON.parse(event.body || '{}');
@@ -205,13 +194,13 @@ export async function handler(event, context) {
       } = body;
 
       if (!orderNumber) {
-        return jsonResponse(400, { error: 'Falta orderNumber' });
+        return jsonResponse(event, 400, { error: 'Falta orderNumber' });
       }
 
       const updateFields = {};
       if (status) {
         if (!VALID_STATUSES.includes(status)) {
-          return jsonResponse(400, { error: `Status invàlid. Vàlids: ${VALID_STATUSES.join(', ')}` });
+          return jsonResponse(event, 400, { error: `Status invàlid. Vàlids: ${VALID_STATUSES.join(', ')}` });
         }
         updateFields.status = status;
       }
@@ -229,7 +218,7 @@ export async function handler(event, context) {
       }
 
       if (Object.keys(updateFields).length === 0) {
-        return jsonResponse(400, { error: 'Cal proporcionar status, gelatoOrderId o camps de tracking' });
+        return jsonResponse(event, 400, { error: 'Cal proporcionar status, gelatoOrderId o camps de tracking' });
       }
 
       const { data, error } = await supabase
@@ -241,7 +230,7 @@ export async function handler(event, context) {
 
       if (error) {
         console.error('[orders] Error updating order:', error);
-        return jsonResponse(500, { error: error.message });
+        return jsonResponse(event, 500, { error: 'Error intern del servidor' });
       }
 
       // Enviar correus transaccionals segons l'estat actualitzat
@@ -253,12 +242,12 @@ export async function handler(event, context) {
         }
       }
 
-      return jsonResponse(200, { order: data });
+      return jsonResponse(event, 200, { order: data });
     } catch (err) {
       console.error('[orders] PATCH error:', err);
-      return jsonResponse(500, { error: err.message });
+      return jsonResponse(event, 500, { error: 'Error intern del servidor' });
     }
   }
 
-  return jsonResponse(405, { error: `Method ${method} not allowed` });
+  return jsonResponse(event, 405, { error: `Method ${method} not allowed` });
 }

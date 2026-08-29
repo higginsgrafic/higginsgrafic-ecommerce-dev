@@ -276,6 +276,7 @@ function CollectionCubePage() {
               src="/custom_logos/collections/collection-cube-logo.svg"
               alt=""
               aria-hidden="true"
+              loading="lazy"
               style={{
                 height: '0.75em',
                 width: 'auto',
@@ -326,6 +327,8 @@ function CollectionCubePage() {
                 <img
                   src={c.icon}
                   alt={c.name}
+                  loading="lazy"
+                  decoding="async"
                   style={{
                     width: isFirstContact ? '42.1px' : 'auto',
                     height: isFirstContact ? 'auto' : '44px',
@@ -376,6 +379,7 @@ function CollectionCubePage() {
           src={COLLECTION_BG_SRC}
           alt=""
           aria-hidden="true"
+          loading="lazy"
           draggable={false}
           onError={(e) => { e.currentTarget.style.display = 'none'; }}
           style={{

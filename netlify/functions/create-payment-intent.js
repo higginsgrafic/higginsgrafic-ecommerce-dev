@@ -2,6 +2,7 @@ import Stripe from 'stripe';
 import { createClient } from '@supabase/supabase-js';
 import { checkRateLimit } from './_rate-limit.js';
 import { generateTrackingToken, hashToken, getTokenExpiry, buildTrackingLink } from './_token.js';
+import { jsonResponse } from './_cors.js';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
@@ -13,19 +14,6 @@ function getSupabase() {
   return createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY, {
     auth: { persistSession: false },
   });
-}
-
-function jsonResponse(statusCode, body) {
-  return {
-    statusCode,
-    headers: {
-      'Content-Type': 'application/json',
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'POST, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-    },
-    body: JSON.stringify(body),
-  };
 }
 
 async function calculateServerSideTotal(supabase, items, shippingZone) {
@@ -118,11 +106,11 @@ async function calculateServerSideTotal(supabase, items, shippingZone) {
 
 export async function handler(event, context) {
   if (event.httpMethod === 'OPTIONS') {
-    return jsonResponse(200, {});
+    return jsonResponse(event, 200, {}, { methods: 'POST, OPTIONS' });
   }
 
   if (event.httpMethod !== 'POST') {
-    return jsonResponse(405, { error: `Method ${event.httpMethod} not allowed` });
+    return jsonResponse(event, 405, { error: `Method ${event.httpMethod} not allowed` }, { methods: 'POST, OPTIONS' });
   }
 
   const { allowed } = await checkRateLimit(event, 'payment_intent', {
@@ -130,7 +118,7 @@ export async function handler(event, context) {
     windowSeconds: 60,
   });
   if (!allowed) {
-    return jsonResponse(429, { error: 'Massa sol·licituds. Torna-ho a provar en un moment.' });
+    return jsonResponse(event, 429, { error: 'Massa sol·licituds. Torna-ho a provar en un moment.' });
   }
 
   try {
@@ -144,22 +132,22 @@ export async function handler(event, context) {
     } = JSON.parse(event.body || '{}');
 
     if (!items || !Array.isArray(items) || items.length === 0) {
-      return jsonResponse(400, { error: 'Falten items' });
+      return jsonResponse(event, 400, { error: 'Falten items' });
     }
 
     const normCurrency = String(currency).toLowerCase().trim();
     if (normCurrency !== 'eur') {
-      return jsonResponse(400, { error: 'Moneda no suportada (només EUR)' });
+      return jsonResponse(event, 400, { error: 'Moneda no suportada (només EUR)' });
     }
 
     const supabase = getSupabase();
     if (!supabase) {
-      return jsonResponse(500, { error: 'Supabase no configurat' });
+      return jsonResponse(event, 500, { error: 'Supabase no configurat' });
     }
 
     const calc = await calculateServerSideTotal(supabase, items, shippingZone);
     if (calc.error) {
-      return jsonResponse(400, { error: calc.error });
+      return jsonResponse(event, 400, { error: calc.error });
     }
 
     const idempotencyKey = `pi_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`;
@@ -190,7 +178,7 @@ export async function handler(event, context) {
 
     if (orderError) {
       console.error('[create-payment-intent] Order creation error:', orderError.message);
-      return jsonResponse(500, { error: 'Error creant la comanda' });
+      return jsonResponse(event, 500, { error: 'Error creant la comanda' });
     }
 
     const paymentIntent = await stripe.paymentIntents.create({
@@ -212,7 +200,7 @@ export async function handler(event, context) {
       .update({ payment_intent_id: paymentIntent.id })
       .eq('id', order.id);
 
-    return jsonResponse(200, {
+    return jsonResponse(event, 200, {
       clientSecret: paymentIntent.client_secret,
       paymentIntentId: paymentIntent.id,
       orderId: order.id,
@@ -227,6 +215,6 @@ export async function handler(event, context) {
     });
   } catch (error) {
     console.error('[create-payment-intent] Error:', error);
-    return jsonResponse(500, { error: error.message });
+    return jsonResponse(event, 500, { error: 'Error intern del servidor' });
   }
 }

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import * as Tabs from '@radix-ui/react-tabs';
+import { sanitizeHtml } from '@/utils/sanitizeHtml';
 import {
   Settings,
   Search,
@@ -541,7 +542,7 @@ function BlankProductDetailsPanel({ product }) {
                   Característiques
                 </dt>
                 <dd className="text-sm text-gray-900">
-                  <div dangerouslySetInnerHTML={{ __html: parsedDescription.features }} className="prose prose-sm max-w-none" />
+                  <div dangerouslySetInnerHTML={{ __html: sanitizeHtml(parsedDescription.features) }} className="prose prose-sm max-w-none" />
                 </dd>
               </div>
             )}
@@ -681,7 +682,7 @@ function BlankProductDetailsPanel({ product }) {
 
           {expandedSections.sizes && (
             <div className="p-6 pt-0">
-              <div dangerouslySetInnerHTML={{ __html: parsedDescription.sizeGuide }} className="prose prose-sm max-w-none overflow-x-auto" />
+              <div dangerouslySetInnerHTML={{ __html: sanitizeHtml(parsedDescription.sizeGuide) }} className="prose prose-sm max-w-none overflow-x-auto" />
             </div>
           )}
         </div>
@@ -705,7 +706,7 @@ function BlankProductDetailsPanel({ product }) {
 
           {expandedSections.care && (
             <div className="p-6 pt-0">
-              <div dangerouslySetInnerHTML={{ __html: parsedDescription.careInstructions }} className="prose prose-sm max-w-none" />
+              <div dangerouslySetInnerHTML={{ __html: sanitizeHtml(parsedDescription.careInstructions) }} className="prose prose-sm max-w-none" />
             </div>
           )}
         </div>

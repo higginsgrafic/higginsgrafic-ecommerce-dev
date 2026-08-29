@@ -26,7 +26,7 @@ function StoryPosterLink({ style }) {
     <div
       role="link"
       tabIndex={0}
-      aria-label="Vés a una història aleatòria"
+      aria-label="ROBA QUE PARLA PER TU — Vés a una història aleatòria"
       onClick={go}
       onKeyDown={(e) => {
         if (e.key === 'Enter' || e.key === ' ') {

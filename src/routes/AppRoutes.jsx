@@ -7,7 +7,6 @@ import ProtectedRoute from '@/components/ProtectedRoute';
 import ClientProtectedRoute from '@/components/ClientProtectedRoute';
 import {
   Home,
-  FullWideSlideHeader,
   CollectionFirstContactPage,
   CollectionTheHumanInsidePage,
   CollectionAustenPage,

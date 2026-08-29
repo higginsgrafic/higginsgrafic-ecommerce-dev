@@ -1,26 +1,23 @@
 import { sendOrderEmail } from './_email.js';
 import { checkRateLimit } from './_rate-limit.js';
+import { jsonResponse } from './_cors.js';
 
-function jsonResponse(statusCode, body) {
-  return {
-    statusCode,
-    headers: {
-      'Content-Type': 'application/json',
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'POST, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type',
-    },
-    body: JSON.stringify(body),
-  };
+function escapeHtml(str) {
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
 }
 
 export async function handler(event) {
   if (event.httpMethod === 'OPTIONS') {
-    return jsonResponse(200, {});
+    return jsonResponse(event, 200, {}, { methods: 'POST, OPTIONS', headers: 'Content-Type' });
   }
 
   if (event.httpMethod !== 'POST') {
-    return jsonResponse(405, { error: 'Method not allowed' });
+    return jsonResponse(event, 405, { error: 'Method not allowed' }, { methods: 'POST, OPTIONS', headers: 'Content-Type' });
   }
 
   const { allowed } = await checkRateLimit(event, 'contact_form', {
@@ -28,14 +25,14 @@ export async function handler(event) {
     windowSeconds: 300,
   });
   if (!allowed) {
-    return jsonResponse(429, { error: 'Massa missatges enviats. Torna-ho a provar més tard.' });
+    return jsonResponse(event, 429, { error: 'Massa missatges enviats. Torna-ho a provar més tard.' }, { methods: 'POST, OPTIONS', headers: 'Content-Type' });
   }
 
   try {
     const { name, email, subject, message, orderNumber } = JSON.parse(event.body || '{}');
 
     if (!email || !message) {
-      return jsonResponse(400, { error: 'Falten camps obligatoris (email, message)' });
+      return jsonResponse(event, 400, { error: 'Falten camps obligatoris (email, message)' }, { methods: 'POST, OPTIONS', headers: 'Content-Type' });
     }
 
     const adminEmail = process.env.ADMIN_EMAIL || process.env.RESEND_FROM_EMAIL || 'higginsgrafic@gmail.com';
@@ -83,12 +80,12 @@ export async function handler(event) {
             reply_to: email,
             subject: `Nou missatge de ${name || email}: ${subject || (orderNumber ? `Comanda #${orderNumber}` : '(sense assumpte)')}`,
             html: `
-              <p><strong>Nom:</strong> ${name || '—'}</p>
-              <p><strong>Email:</strong> ${email}</p>
-              ${orderNumber ? `<p><strong>Comanda:</strong> #${orderNumber}</p>` : ''}
-              <p><strong>Assumpte:</strong> ${subject || '—'}</p>
+              <p><strong>Nom:</strong> ${escapeHtml(name || '—')}</p>
+              <p><strong>Email:</strong> ${escapeHtml(email)}</p>
+              ${orderNumber ? `<p><strong>Comanda:</strong> #${escapeHtml(orderNumber)}</p>` : ''}
+              <p><strong>Assumpte:</strong> ${escapeHtml(subject || '—')}</p>
               <hr>
-              <p style="white-space: pre-wrap;">${message}</p>
+              <p style="white-space: pre-wrap;">${escapeHtml(message)}</p>
             `,
           }),
         });
@@ -109,10 +106,10 @@ export async function handler(event) {
       }
     }
 
-    return jsonResponse(200, { ok: true, message: 'Missatge enviat correctament' });
+    return jsonResponse(event, 200, { ok: true, message: 'Missatge enviat correctament' }, { methods: 'POST, OPTIONS', headers: 'Content-Type' });
   } catch (err) {
     console.error('[send-message] Error:', err);
-    return jsonResponse(500, { error: 'Error intern del servidor' });
+    return jsonResponse(event, 500, { error: 'Error intern del servidor' }, { methods: 'POST, OPTIONS', headers: 'Content-Type' });
   }
 }
 

@@ -9,6 +9,7 @@ import { OrderShippedEmail } from '../../netlify/emails/templates/OrderShippedEm
 import { OrderDeliveredEmail } from '../../netlify/emails/templates/OrderDeliveredEmail.jsx';
 import { OrderInProductionEmail } from '../../netlify/emails/templates/OrderInProductionEmail.jsx';
 import { OrderConfirmedEmail } from '../../netlify/emails/templates/OrderConfirmedEmail.jsx';
+import { sanitizeHtml } from '@/utils/sanitizeHtml';
 
 function Grid24x28() {
   const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.slice(0, 24).split('');
@@ -420,7 +421,7 @@ export default function EmailPreviewPage() {
                     }}
                   >
                     {renderGrid && <Grid24x28 />}
-                    <div dangerouslySetInnerHTML={{ __html: html }} />
+                    <div dangerouslySetInnerHTML={{ __html: sanitizeHtml(html) }} />
                   </div>
                 </div>
 
@@ -526,7 +527,7 @@ export default function EmailPreviewPage() {
                     zIndex: 1,
                     opacity: viewMode === 'overlay' && bgImage ? (1 - bgOpacity * 0.3) : 1,
                   }}
-                  dangerouslySetInnerHTML={{ __html: html }}
+                  dangerouslySetInnerHTML={{ __html: sanitizeHtml(html) }}
                 />
               </div>
             )}

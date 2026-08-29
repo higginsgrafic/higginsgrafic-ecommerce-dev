@@ -3,6 +3,7 @@ import { createClient } from '@supabase/supabase-js';
 import { createGelatoOrderServer } from './_gelato.js';
 import { sendOrderEmail } from './_email.js';
 import { buildTrackingLink } from './_token.js';
+import { jsonResponse } from './_cors.js';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
@@ -16,19 +17,6 @@ function getSupabase() {
   return createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY, {
     auth: { persistSession: false },
   });
-}
-
-function jsonResponse(statusCode, body) {
-  return {
-    statusCode,
-    headers: {
-      'Content-Type': 'application/json',
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'POST, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type, Stripe-Signature',
-    },
-    body: JSON.stringify(body),
-  };
 }
 
 /**
@@ -76,16 +64,16 @@ async function fulfillGelato(supabase, order) {
 
 export async function handler(event, context) {
   if (event.httpMethod === 'OPTIONS') {
-    return jsonResponse(200, {});
+    return jsonResponse(event, 200, {}, { methods: 'POST, OPTIONS', headers: 'Content-Type, Stripe-Signature' });
   }
 
   if (event.httpMethod !== 'POST') {
-    return jsonResponse(405, { error: `Method ${event.httpMethod} not allowed` });
+    return jsonResponse(event, 405, { error: `Method ${event.httpMethod} not allowed` }, { methods: 'POST, OPTIONS', headers: 'Content-Type, Stripe-Signature' });
   }
 
   const sig = event.headers['stripe-signature'];
   if (!sig || !WEBHOOK_SECRET) {
-    return jsonResponse(400, { error: 'Falta Stripe-Signature o webhook secret' });
+    return jsonResponse(event, 400, { error: 'Falta Stripe-Signature o webhook secret' }, { methods: 'POST, OPTIONS', headers: 'Content-Type, Stripe-Signature' });
   }
 
   let stripeEvent;
@@ -98,7 +86,7 @@ export async function handler(event, context) {
     );
   } catch (err) {
     console.error('[stripe-webhook] Signature verification failed:', err.message);
-    return jsonResponse(400, { error: `Webhook signature verification failed: ${err.message}` });
+    return jsonResponse(event, 400, { error: 'Webhook signature verification failed' }, { methods: 'POST, OPTIONS', headers: 'Content-Type, Stripe-Signature' });
   }
 
   const supabase = getSupabase();
@@ -113,7 +101,7 @@ export async function handler(event, context) {
 
     if (existingEvent) {
       console.log('[stripe-webhook] Event already processed:', stripeEvent.id, '— skip');
-      return jsonResponse(200, { received: true, duplicate: true });
+      return jsonResponse(event, 200, { received: true, duplicate: true }, { methods: 'POST, OPTIONS', headers: 'Content-Type, Stripe-Signature' });
     }
   }
 
@@ -207,12 +195,12 @@ export async function handler(event, context) {
     }
 
     if (!processResult.ok) {
-      return jsonResponse(500, { error: processResult.error });
+      return jsonResponse(event, 500, { error: 'Error processant l\'esdeveniment' }, { methods: 'POST, OPTIONS', headers: 'Content-Type, Stripe-Signature' });
     }
 
-    return jsonResponse(200, { received: true });
+    return jsonResponse(event, 200, { received: true }, { methods: 'POST, OPTIONS', headers: 'Content-Type, Stripe-Signature' });
   } catch (error) {
     console.error('[stripe-webhook] Error processing event:', error);
-    return jsonResponse(500, { error: error.message });
+    return jsonResponse(event, 500, { error: 'Error intern del servidor' }, { methods: 'POST, OPTIONS', headers: 'Content-Type, Stripe-Signature' });
   }
 }
