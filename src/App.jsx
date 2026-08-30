@@ -1,64 +1,34 @@
-import React, { useState, useEffect, useRef, useMemo, useCallback, useTransition, Suspense } from 'react';
+import React, { useState, useEffect, useMemo, useCallback, useTransition, Suspense, lazy } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useProductContext } from '@/contexts/ProductContext';
 import { useAdmin } from '@/contexts/AdminContext';
-import { useAdminTools } from '@/contexts/AdminToolsContext';
-import { installLayoutMetricsProbe } from '@/utils/layoutMetrics';
 import { useOffersConfig } from '@/hooks/useOffersConfig';
 import { useGlobalRedirect } from '@/hooks/useGlobalRedirect';
-import { useDebugOverlays } from '@/hooks/useDebugOverlays';
-import useMegaStripeDebugState from '@/hooks/useMegaStripeDebugState';
-import useDebugToggles from '@/hooks/useDebugToggles';
-import useExportModal from '@/hooks/useExportModal';
-import useContentLayout from '@/hooks/useContentLayout';
 import useGlobalEffects from '@/hooks/useGlobalEffects';
-import useStripeOverlayDebug from '@/hooks/useStripeOverlayDebug';
 import ErrorBoundary from '@/components/ErrorBoundary';
 import LoadingScreen, { DismissPreloaderOnMount } from '@/components/LoadingScreen';
 import SkipLink from '@/components/SkipLink';
 import OffersHeader from '@/components/OffersHeader';
 import AdminBanner from '@/components/AdminBanner';
-import DevHeader from '@/components/DevHeader';
 import ScrollToTop from '@/components/ScrollToTop';
 import Footer from '@/components/Footer';
 import SiteFrame from '@/components/layout/SiteFrame.jsx';
 import useComponentCatalogConfig from '@/hooks/useComponentCatalogConfig';
-import useLayoutInspector from '@/hooks/useLayoutInspector';
-import { megaStripeRefPresets } from '@/data/megaStripeRefPresets';
 import AppRoutes from '@/routes/AppRoutes';
-import DebugButtonsBar from '@/components/dev/DebugButtonsBar';
-import PdpControlsPanel from '@/components/dev/PdpControlsPanel';
 import * as P from '@/routes/lazyPages';
+
+const DebugLayer = lazy(() => import('@/components/DebugLayer'));
 
 
 function App() {
   const { config: componentCatalogConfig } = useComponentCatalogConfig();
   const [isNavigating, setIsNavigating] = useState(false);
-  const { exportCopyStatus, setExportCopyStatus, exportTab, setExportTab, exportModalOpen, setExportModalOpen, exportModalTitle, setExportModalTitle, exportModalText, setExportModalText } = useExportModal();
+  const [debugState, setDebugState] = useState({ rulerInset: 0, pautaEnabled: false, tableEnabled: false, layoutInspectorActive: false });
+  const onDebugStateChange = useCallback((next) => setDebugState((prev) => {
+    if (prev.rulerInset === next.rulerInset && prev.pautaEnabled === next.pautaEnabled && prev.tableEnabled === next.tableEnabled && prev.layoutInspectorActive === next.layoutInspectorActive) return prev;
+    return next;
+  }), []);
 
-  const toggleSlidePreset = (nextPresetId) => {
-    if (!nextPresetId) return;
-    if (slideOpen && slidePresetId === nextPresetId) {
-      setSlideOpen(false);
-      setSlidePresetId('');
-      return;
-    }
-
-    setSlidePresetId(nextPresetId);
-    setSlideOpen(true);
-  };
-
-  useEffect(() => {
-    const onOpenSlidePreset = (event) => {
-      const presetId = event?.detail?.presetId;
-      if (!presetId || typeof presetId !== 'string') return;
-      setSlidePresetId(presetId);
-      setSlideOpen(true);
-    };
-
-    window.addEventListener('hg:open-slide-preset', onOpenSlidePreset);
-    return () => window.removeEventListener('hg:open-slide-preset', onOpenSlidePreset);
-  }, []);
   const location = useLocation();
   const navigate = useNavigate();
   const [_, startTransition] = useTransition();
@@ -69,18 +39,6 @@ function App() {
       setDeferredLocation(location);
     });
   }, [location, startTransition]);
-  const { layoutInspectorEnabled, setLayoutInspectorEnabled, guidesEnabled, setGuidesEnabled, copiedDesign, setCopiedDesign, belt2GuidesEnabled, setBelt2GuidesEnabled, megaAccordionLocked, setMegaAccordionLocked } = useDebugToggles({ locationSearch: location.search });
-  const beltEnabledFromUrl = (() => {
-    try {
-      const sp = new URLSearchParams(window.location.search);
-      return sp.has('belt') && sp.get('belt') !== '0';
-    } catch {
-      return false;
-    }
-  })();
-  const megaStripeState = useMegaStripeDebugState({ beltEnabledFromUrl, locationPathname: location.pathname });
-  const [cistellExpanded, setCistellExpanded] = useState(false);
-  const [cistellLayout, setCistellLayout] = useState(1);
   const [isLargeScreen, setIsLargeScreen] = useState(window.innerWidth >= 1024);
 
   const fullWideSlideConfig = componentCatalogConfig?.components?.fullWideSlide;
@@ -101,26 +59,9 @@ function App() {
 
   const isFullWideSlideRoute = location.pathname === '/full-wide-slide' || location.pathname === '/constructor/full-wide-slide';
   const isFullWideSlideDemoRoute = location.pathname === '/full-wide-slide-demo';
-  const HUD_DEBUG_BOTTOM_RESERVE_PX = 104;
-
-  const { snapshot: stripeOverlayDebugSnapshot, debugOn: stripeOverlayDebugOn } = useStripeOverlayDebug(location.search);
 
   const productContext = useProductContext();
   const { isAdmin, bypassUnderConstruction } = useAdmin();
-  const { tools, toggleTool } = useAdminTools();
-  const {
-    debugsEnabled: debugOverlaysEnabled,
-    rulersEnabled: rulersOverlayEnabled,
-    pdpControlsEnabled,
-    pautaEnabled,
-    setPautaEnabled,
-    tableEnabled,
-    setTableEnabled,
-    pautaOpacity,
-    setPautaOpacity,
-    tableOpacity,
-    setTableOpacity,
-  } = useDebugOverlays();
   const { enabled: offersEnabled, loading: offersLoading } = useOffersConfig();
   const { shouldRedirect, redirectUrl, loading: redirectLoading } = useGlobalRedirect(bypassUnderConstruction);
 
@@ -168,36 +109,7 @@ function App() {
       return false;
     }
   })();
-  const layoutInspectorActive = debugOverlaysEnabled && !isEmbeddedPreview && (isAdmin || isDevDemoRoute)
-    ? layoutInspectorEnabled
-    : false;
-  const layoutInspectorWrap = Boolean(layoutInspectorActive);
-
-  const {
-    selectedElement,
-    selectedContainerToken,
-    copyContainerStatus,
-    selectionStatus,
-    layoutInspectorPickEnabled,
-    setLayoutInspectorPickEnabled,
-    clicksEnabled,
-    setClicksEnabled,
-    clickMarks,
-    setClickMarks,
-    debugButtonsWrapRef,
-    copySelectedContainer,
-  } = useLayoutInspector({ layoutInspectorActive });
-
-  useEffect(() => {
-    const next = String(megaStripeState.megaStripeRefSrc || '');
-    megaStripeState.setMegaStripeRef2Src((prev) => {
-      const cur = String(prev || '');
-      if (cur === next) return prev;
-      return next;
-    });
-  }, [megaStripeState.megaStripeRefSrc]);
-
-  const { fullWideSlideManualEnabled, writeFullWideSlideDemoControls, contentContainerLeft, contentContainerRight } = useContentLayout({ isFullWideSlideDemoRoute, isHomeRoute, locationPathname: location.pathname });
+  const { rulerInset, pautaEnabled, tableEnabled, layoutInspectorActive } = debugState;
 
   const showProductsLoadingScreen = !!loading;
   const showProductsErrorScreen = !!(error && (!products || products.length === 0));
@@ -231,9 +143,6 @@ function App() {
   const adminRouteDevHeaderHeight = (isAdminRoute && devHeaderVisible) ? baseHeaderHeight : 0;
 
   const isPrivacyRoute = location.pathname === '/privacy';
-  const debugOverlaysRoute = isAdmin || isDevDemoRoute || isFullWideSlideRoute || isPrivacyRoute;
-  const rulersOverlayActive = rulersOverlayEnabled && debugOverlaysRoute && location.pathname !== '/ec-preview' && location.pathname !== '/ec-preview-lite' && !isEmbeddedPreview;
-  const rulerInset = rulersOverlayActive ? 18 : 0;
 
   const adminRouteOffset = `${adminBannerHeight + adminRouteDevHeaderHeight + rulerInset}px`;
   const appHeaderOffset = `${(isDevHeaderRoute ? heroSettingsDevHeaderHeight : baseHeaderHeight) + offersHeaderHeight + adminBannerHeight + rulerInset}px`;
@@ -247,20 +156,6 @@ function App() {
       document.documentElement.style.setProperty('--appHeaderOffset', nextOffset);
       document.documentElement.style.setProperty('--globalHeaderTopOffset', globalHeaderTopOffset);
       document.documentElement.style.setProperty('--rulerInset', `${rulerInset}px`);
-      if (import.meta.env.DEV) installLayoutMetricsProbe();
-      window.__HG_ZOOM_LAYOUT_PROBE__ = () => {
-        const round2 = (v) => Math.round(v * 100) / 100;
-        const rootStyle = window.getComputedStyle(document.documentElement);
-        const xL = parseFloat(rootStyle.getPropertyValue('--belt2-xL'));
-        const xR = parseFloat(rootStyle.getPropertyValue('--belt2-xR'));
-        const result = {
-          viewport: { innerWidth: round2(window.innerWidth), clientWidth: round2(document.documentElement.clientWidth), visualWidth: round2(window.visualViewport?.width ?? window.innerWidth), devicePixelRatio: round2(window.devicePixelRatio || 1), large1024: window.innerWidth >= 1024 },
-          app: { isLargeScreen, baseHeaderHeight, adminBannerHeight, rulerInset, appHeaderOffset, demoHeaderOffset, globalHeaderTopOffset },
-          belt2: { xL: round2(xL), xR: round2(xR), width: round2(xR - xL) },
-        };
-        console.table(result.viewport); console.table(result.app); console.table(result.belt2);
-        return result;
-      };
     } catch { /* ignore */ }
   }, [adminBannerHeight, adminRouteOffset, appHeaderOffset, baseHeaderHeight, demoHeaderOffset, globalHeaderTopOffset, isAdminRoute, isDemoStyleLayoutRoute, isFullScreenRoute, isLargeScreen, rulerInset]);
 
@@ -297,20 +192,6 @@ function App() {
 
           {!isFullScreenRoute && !isAdminRoute && !isDevLayoutRoute && offersHeaderVisible && (
             <OffersHeader adminBannerVisible={adminBannerVisible} />
-          )}
-
-          {import.meta.env.DEV && devHeaderVisible && (
-            <DevHeader
-              isPreview={isPreview}
-              isAdmin={isAdmin}
-              isDevDemoRoute={isDevDemoRoute}
-              isFullWideSlideRoute={isFullWideSlideRoute}
-              adminBannerHeight={adminBannerHeight}
-              rulerInset={rulerInset}
-              cartItemCount={getTotalItems()}
-              onCartClick={handleCartClick}
-              onUserClick={handleUserClick}
-            />
           )}
 
       {/* Main Header - NO mostrar a pàgines full-screen ni admin ni a dev tools */}
@@ -366,127 +247,39 @@ function App() {
 
         <ScrollToTop />
 
-        {import.meta.env.DEV && rulersOverlayActive && (
-          <P.DevGuidesOverlay
-            guidesEnabled={guidesEnabled}
-            zIndex={1300000}
-          />
-        )}
+        <SiteFrame />
 
-            <P.MegaStripeHud
-              megaStripeState={megaStripeState}
-              isFullWideSlideDemoRoute={isFullWideSlideDemoRoute}
-              isFullWideSlideRoute={isFullWideSlideRoute}
-              cistellExpanded={cistellExpanded}
-              setCistellExpanded={setCistellExpanded}
-              cistellLayout={cistellLayout}
-              setCistellLayout={setCistellLayout}
-              navigate={navigate}
+        {(import.meta.env.DEV || isAdmin || isDevDemoRoute || isAdminRoute) && (
+          <Suspense fallback={null}>
+            <DebugLayer
               location={location}
-              stripeOverlayDebugSnapshot={stripeOverlayDebugSnapshot}
-              stripeOverlayDebugOn={stripeOverlayDebugOn}
-              megaStripeRefPresets={megaStripeRefPresets}
-              HUD_DEBUG_BOTTOM_RESERVE_PX={HUD_DEBUG_BOTTOM_RESERVE_PX}
-              exportCopyStatus={exportCopyStatus}
-              setExportCopyStatus={setExportCopyStatus}
-              exportTab={exportTab}
-              setExportTab={setExportTab}
-              exportModalOpen={exportModalOpen}
-              setExportModalOpen={setExportModalOpen}
-              exportModalTitle={exportModalTitle}
-              setExportModalTitle={setExportModalTitle}
-              exportModalText={exportModalText}
-              setExportModalText={setExportModalText}
-              belt2GuidesEnabled={belt2GuidesEnabled}
-              setBelt2GuidesEnabled={setBelt2GuidesEnabled}
-              megaAccordionLocked={megaAccordionLocked}
-              setMegaAccordionLocked={setMegaAccordionLocked}
-              debugOverlaysEnabled={debugOverlaysEnabled}
-              guidesEnabled={guidesEnabled}
-              setGuidesEnabled={setGuidesEnabled}
+              navigate={navigate}
               isAdmin={isAdmin}
+              isPreview={isPreview}
               isDevDemoRoute={isDevDemoRoute}
+              isFullWideSlideRoute={isFullWideSlideRoute}
+              isFullWideSlideDemoRoute={isFullWideSlideDemoRoute}
+              isFullScreenRoute={isFullScreenRoute}
               isEmbeddedPreview={isEmbeddedPreview}
-              layoutInspectorActive={layoutInspectorActive}
-              setLayoutInspectorEnabled={setLayoutInspectorEnabled}
+              isHomeRoute={isHomeRoute}
+              isDevHeaderRoute={isDevHeaderRoute}
+              isDevLayoutRoute={isDevLayoutRoute}
+              isAdminRoute={isAdminRoute}
+              isPrivacyRoute={isPrivacyRoute}
+              isComponentsCatalogTemplateRoute={isComponentsCatalogTemplateRoute}
+              isContactSheetRoute={isContactSheetRoute}
+              cartItemCount={getTotalItems()}
+              onCartClick={handleCartClick}
+              onUserClick={handleUserClick}
+              onDebugStateChange={onDebugStateChange}
+              appHeaderOffset={appHeaderOffset}
+              demoHeaderOffset={demoHeaderOffset}
+              baseHeaderHeight={baseHeaderHeight}
+              adminBannerHeight={adminBannerHeight}
+              offersHeaderHeight={offersHeaderHeight}
+              isLargeScreen={isLargeScreen}
             />
-
-                {debugOverlaysEnabled && debugOverlaysRoute && location.pathname !== '/ec-preview' && location.pathname !== '/ec-preview-lite' && !isEmbeddedPreview ? (
-                  <DebugButtonsBar
-                    debugButtonsWrapRef={debugButtonsWrapRef}
-                    clicksEnabled={clicksEnabled}
-                    setClicksEnabled={setClicksEnabled}
-                    layoutInspectorActive={layoutInspectorActive}
-                    setLayoutInspectorEnabled={setLayoutInspectorEnabled}
-                    selectedContainerToken={selectedContainerToken}
-                    copyContainerStatus={copyContainerStatus}
-                    selectionStatus={selectionStatus}
-                    copySelectedContainer={copySelectedContainer}
-                    guidesEnabled={guidesEnabled}
-                    setGuidesEnabled={setGuidesEnabled}
-                    belt2GuidesEnabled={belt2GuidesEnabled}
-                    setBelt2GuidesEnabled={setBelt2GuidesEnabled}
-                    megaAccordionLocked={megaAccordionLocked}
-                    setMegaAccordionLocked={setMegaAccordionLocked}
-                  />
-                ) : null}
-
-            <SiteFrame />
-            {import.meta.env.DEV && <P.BeltReferenceOverlay enabled={belt2GuidesEnabled} />}
-
-            {import.meta.env.DEV && (pautaEnabled || tableEnabled) && (location.pathname !== '/checkout' || tableEnabled) && (
-              <P.Pauta4ColsOverlay
-                overlay
-                pautaEnabled={pautaEnabled}
-                tableEnabled={tableEnabled}
-                pautaOpacity={pautaOpacity}
-                tableOpacity={tableOpacity}
-                gutterX="7.5px"
-                topOffset={isFullScreenRoute ? '0px' : appHeaderOffset}
-                numCols={(isHomeRoute || location.pathname === '/constructor/tdp' || location.pathname === '/tdp') ? 3 : 4}
-                numRows={isHomeRoute ? 280 : (location.pathname.startsWith('/constructor/colleccio') ? 160 : (location.pathname.includes('pdp') ? 70 : 90))}
-                canvasAspect={isHomeRoute ? [2642, 20869] : (location.pathname.startsWith('/constructor/colleccio') ? [2642, 11928] : (location.pathname.includes('pdp') ? [2642, 5217] : [2642, 6708]))}
-              />
-            )}
-
-            {clicksEnabled && clickMarks.length > 0 && (
-              <div
-                className="fixed inset-0 z-[99998] pointer-events-none debug-exempt"
-                data-dev-overlay="true"
-              >
-                {clickMarks.map((m) => (
-                  <div
-                    key={m.t}
-                    style={{
-                      position: 'absolute',
-                      left: m.x,
-                      top: m.y,
-                      width: 10,
-                      height: 10,
-                      borderRadius: 9999,
-                      background: 'rgba(0,0,0,0.65)',
-                      transform: 'translate(-50%, -50%)',
-                    }}
-                  />
-                ))}
-              </div>
-            )}
-
-            {pdpControlsEnabled && (
-              <PdpControlsPanel
-                pautaEnabled={pautaEnabled}
-                setPautaEnabled={setPautaEnabled}
-                pautaOpacity={pautaOpacity}
-                setPautaOpacity={setPautaOpacity}
-                tableEnabled={tableEnabled}
-                setTableEnabled={setTableEnabled}
-                tableOpacity={tableOpacity}
-                setTableOpacity={setTableOpacity}
-                isPdpConstructorRoute={location.pathname === '/constructor/pdp'}
-                copiedDesign={copiedDesign}
-                setCopiedDesign={setCopiedDesign}
-              />
-            )}
+          </Suspense>
       </>
     )}
     </ErrorBoundary>
