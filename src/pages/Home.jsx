@@ -390,42 +390,13 @@ function Home() {
         </div>
       </Pauta4ColsOverlay>
 
-      <Pauta4ColsOverlay
-        overlay
-        pautaEnabled={false}
-        tableEnabled={false}
-        numCols={3}
-        numRows={90}
-        topOffset="var(--appHeaderOffset, 33px)"
-        bottomPadding="0px"
-        zIndex={9999}
-      >
-        <div
-          style={{
-            gridColumn: '1 / 4',
-            gridRow: '33 / 34', // Pujat 4 files (abans 37 / 38)
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontFamily: 'Roboto, sans-serif',
-            fontSize: '1.125rem',
-            color: 'rgb(115, 115, 115)',
-            letterSpacing: '0.1em',
-            margin: 0,
-            whiteSpace: 'nowrap',
-          }}
-        >
-          LA CIÈNCIA FICCIÓ QUE MIRA ENDINS
-        </div>
-      </Pauta4ColsOverlay>
-
       <section className="bg-background text-foreground" style={{ transform: 'scale(0.94)', transformOrigin: 'center top' }}>
         <div className="mx-auto max-w-[1400px] px-4 pt-[120px] pb-[174px] sm:px-6 lg:px-10">
             <CollectionTitle
             index=""
             kicker="Col·lecció"
             title="First Contact"
-            subtitle={null}
+            subtitle="LA CIÈNCIA FICCIÓ QUE MIRA ENDINS"
             align="center"
             titleTextAlign="center"
             numberAlign="left"
@@ -433,6 +404,8 @@ function Home() {
             titleOffsetY={5}
             numberOffsetX={-36}
             numberOffsetY={-4}
+            subtitleOffsetX={0}
+            subtitleOffsetY={0}
             collectionHref="/first-contact"
           />
           <div style={{ marginTop: '150px' }}>
