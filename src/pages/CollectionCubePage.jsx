@@ -414,7 +414,7 @@ function CollectionCubePage() {
                 price="15,50€"
                 imageSrc={collectionGridImageFor('cube', productAt(rowIdx, colIdx).route, color, rowIdx * 4 + colIdx)}
                 hoverImages={collectionGridHoverVariantsFor('cube', productAt(rowIdx, colIdx).route, color, rowIdx * 4 + colIdx)}
-                imageAlt={`Samarreta Gildan 5000 ${color}`}
+                imageAlt={`Samarreta Gildan 64000 ${color}`}
                 sizes={sizes}
                 cartCount={0}
                 onAddToCart={(size) => {

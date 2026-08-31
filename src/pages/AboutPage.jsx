@@ -13,13 +13,13 @@ function AboutPage() {
     },
     {
       bullet: '2. El format',
-      paragraph: 'Evidentment, el format, és important i no pot ser de qualsevol manera i és per aquest motiu que hem triat el model 5000 de la marca Gildan perquè compta amb una sèrie de qualitats que el fan ideal per a la impressió digital i la portabilitat diària de la peça. No oblidem que aquest llenç és una samarreta de debò.',
+      paragraph: 'Evidentment, el format, és important i no pot ser de qualsevol manera i és per aquest motiu que hem triat el model 64000 de la marca Gildan perquè compta amb una sèrie de qualitats que el fan ideal per a la impressió digital i la portabilitat diària de la peça. No oblidem que aquest llenç és una samarreta de debò.',
     },
     {
       bullet: '3. Producció sostenible',
       paragraph: 'No es fabrica res fins que algú no ho demana. No hi ha estoc, no es malbarata, no hi ha magatzems plens de samarretes que ningú no vol. Cada peça es produeix al centre més proper a la teva adreça per reduir emissions de transport.',
       items: [
-        'Cotó orgànic certificat — 180 g/m², qualitat prèmium.',
+        'Cotó orgànic certificat — 150 g/m², qualitat prèmium.',
         'Tintes ecològiques — Lliures de substàncies tòxiques.',
         'Sense estocs — Es fabrica només quan es demana.',
         'Producció local — El centre més proper a tu, quan és possible.',

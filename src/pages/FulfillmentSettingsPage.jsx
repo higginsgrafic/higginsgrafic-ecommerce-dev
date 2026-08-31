@@ -87,7 +87,7 @@ function StoreProductsTab() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [products, setProducts] = useState([]);
-  const [searchTerm, setSearchTerm] = useState('gildan 5000');
+  const [searchTerm, setSearchTerm] = useState('gildan 64000');
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [productDetails, setProductDetails] = useState(null);
   const [loadingDetails, setLoadingDetails] = useState(false);
@@ -115,27 +115,27 @@ function StoreProductsTab() {
       if (Array.isArray(response)) {
         setProducts(response);
 
-        const gildan5000 = response.find(p =>
-          p.title?.includes('Gildan® 5000') ||
+        const gildan64000 = response.find(p =>
+          p.title?.includes('Gildan® 64000') ||
           p.productUid?.includes('gildan_5000')
         );
 
-        if (gildan5000) {
-          console.log('🎯 Gildan 5000 trobat, carregant automàticament...');
-          loadProductDetails(gildan5000.id, gildan5000.productUid);
+        if (gildan64000) {
+          console.log('🎯 Gildan 64000 trobat, carregant automàticament...');
+          loadProductDetails(gildan64000.id, gildan64000.productUid);
         }
       } else if (response && response.data) {
         setProducts(response.data);
 
-        // Auto-seleccionar Gildan 5000 si existeix
-        const gildan5000 = response.data.find(p =>
-          p.title?.includes('Gildan® 5000') ||
+        // Auto-seleccionar Gildan 64000 si existeix
+        const gildan64000 = response.data.find(p =>
+          p.title?.includes('Gildan® 64000') ||
           p.productUid?.includes('gildan_5000')
         );
 
-        if (gildan5000) {
-          console.log('🎯 Gildan 5000 trobat, carregant automàticament...');
-          loadProductDetails(gildan5000.id, gildan5000.productUid);
+        if (gildan64000) {
+          console.log('🎯 Gildan 64000 trobat, carregant automàticament...');
+          loadProductDetails(gildan64000.id, gildan64000.productUid);
         }
       }
     } catch (err) {
@@ -300,7 +300,7 @@ function StoreProductsTab() {
                 Fes clic a un producte de l'esquerra per veure totes les seves dades
               </p>
               <p className="text-xs mt-4 text-gray-500">
-                Cerca "Gildan 5000" per veure el producte de referència
+                Cerca "Gildan 64000" per veure el producte de referència
               </p>
             </div>
           </div>

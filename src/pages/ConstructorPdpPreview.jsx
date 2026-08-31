@@ -78,7 +78,7 @@ const PRODUCT_DESCRIPTION = [
   'hòmens virtuosos, e singularment aquells qui per la república lluitaren.',
 ].join(' ');
 
-// 14 colors oficials Gildan 5000 en l'ordre de la stripe (MegaStripe).
+// 14 colors oficials Gildan 64000 en l'ordre de la stripe (MegaStripe).
 const OFFICIAL_COLORS = [
   'white', 'light-blue', 'royal', 'navy', 'purple', 'light-pink', 'daisy',
   'gold', 'red', 'kiwi', 'irish-green', 'military-green', 'forest-green', 'black',

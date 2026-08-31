@@ -436,7 +436,7 @@ function CollectionAustenPage() {
                 price="15,50€"
                 imageSrc={collectionGridImageFor(product.collection, product.route, color, idx)}
                 hoverImages={collectionGridHoverVariantsFor(product.collection, product.route, color, idx)}
-                imageAlt={`Samarreta Gildan 5000 ${color}`}
+                imageAlt={`Samarreta Gildan 64000 ${color}`}
                 sizes={sizes}
                 cartCount={0}
                 onAddToCart={(size) => {

@@ -7,7 +7,7 @@ import { useProductContext } from '@/contexts/ProductContext';
 import { useAdmin } from '@/contexts/AdminContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { useOrders } from '@/hooks/useOrders';
-import { getGildan5000Catalog } from '../utils/placeholders.js';
+import { getGildan64000Catalog } from '../utils/placeholders.js';
 import {
   AUSTEN_QUOTES_ASSETS,
   resolveAustenQuoteAssetId,
@@ -165,7 +165,7 @@ function FullWideSlideHeader({
 
   const searchSuggestions = useMemo(
     () => [
-      'Samarreta Gildan 5000',
+      'Samarreta Gildan 64000',
       'Dibuixos',
       'Logotips',
       'Bosses',
@@ -665,7 +665,7 @@ function FullWideSlideHeader({
 
   const [selectedColorSlug, setSelectedColorSlug] = useState('white');
   const [thinStartIndex, setThinStartIndex] = useState(0);
-  const [gildan5000Catalog, setGildan5000Catalog] = useState(null);
+  const [gildan64000Catalog, setGildan64000Catalog] = useState(null);
 
   useEffect(() => {
     try {
@@ -2338,14 +2338,14 @@ function FullWideSlideHeader({
   }, [selectedColorHex]);
 
   const colorLabelBySlug = useMemo(() => {
-    const colors = Array.isArray(gildan5000Catalog?.colors) ? gildan5000Catalog.colors : [];
+    const colors = Array.isArray(gildan64000Catalog?.colors) ? gildan64000Catalog.colors : [];
     const out = {};
     for (const c of colors) {
       if (!c?.slug) continue;
       out[c.slug] = c.label || c.slug;
     }
     return out;
-  }, [gildan5000Catalog]);
+  }, [gildan64000Catalog]);
 
   const selectedColorOrder = useMemo(
     () => [
@@ -2794,8 +2794,8 @@ function FullWideSlideHeader({
 
   useEffect(() => {
     let mounted = true;
-    getGildan5000Catalog().then((catalog) => {
-      if (mounted) setGildan5000Catalog(catalog);
+    getGildan64000Catalog().then((catalog) => {
+      if (mounted) setGildan64000Catalog(catalog);
     });
     return () => {
       mounted = false;
@@ -2804,21 +2804,21 @@ function FullWideSlideHeader({
 
   useEffect(() => {
     if (!active) return;
-    if (gildan5000Catalog) return;
+    if (gildan64000Catalog) return;
     let cancelled = false;
-    getGildan5000Catalog()
+    getGildan64000Catalog()
       .then((data) => {
         if (cancelled) return;
-        setGildan5000Catalog(data);
+        setGildan64000Catalog(data);
       })
       .catch(() => {
         if (cancelled) return;
-        setGildan5000Catalog({ selected: [], selectedSlugs: new Set(), getPlaceholderSrc: () => null });
+        setGildan64000Catalog({ selected: [], selectedSlugs: new Set(), getPlaceholderSrc: () => null });
       });
     return () => {
       cancelled = true;
     };
-  }, [active, gildan5000Catalog]);
+  }, [active, gildan64000Catalog]);
 
   useEffect(() => {
     try {

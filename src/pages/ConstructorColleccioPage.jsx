@@ -261,7 +261,7 @@ function ConstructorColleccioPage() {
                 description={TDP_DESCRIPTION}
                 price="15,50€"
                 imageSrc={tdpImage(color)}
-                imageAlt={`Samarreta Gildan 5000 ${color}`}
+                imageAlt={`Samarreta Gildan 64000 ${color}`}
                 sizes={sizes}
                 cartCount={0}
                 onAddToCart={(size) => {

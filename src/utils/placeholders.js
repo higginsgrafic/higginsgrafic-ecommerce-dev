@@ -1,21 +1,21 @@
 const DEFAULT_BASE = '/placeholders/apparel/t-shirt/gildan_5000';
 
-export async function loadGildan5000Colors({ base = DEFAULT_BASE, fetchFn = fetch } = {}) {
+export async function loadGildan64000Colors({ base = DEFAULT_BASE, fetchFn = fetch } = {}) {
   const res = await fetchFn(`${base}/colors.json`);
   if (!res.ok) throw new Error(`Failed to load colors.json (${res.status})`);
   return res.json();
 }
 
-export async function loadGildan5000Manifest({ base = DEFAULT_BASE, fetchFn = fetch } = {}) {
+export async function loadGildan64000Manifest({ base = DEFAULT_BASE, fetchFn = fetch } = {}) {
   const res = await fetchFn(`${base}/manifest.json`);
   if (!res.ok) throw new Error(`Failed to load manifest.json (${res.status})`);
   return res.json();
 }
 
-export async function getGildan5000Catalog({ base = DEFAULT_BASE, fetchFn = fetch } = {}) {
+export async function getGildan64000Catalog({ base = DEFAULT_BASE, fetchFn = fetch } = {}) {
   const [colorsJson, manifest] = await Promise.all([
-    loadGildan5000Colors({ base, fetchFn }),
-    loadGildan5000Manifest({ base, fetchFn }),
+    loadGildan64000Colors({ base, fetchFn }),
+    loadGildan64000Manifest({ base, fetchFn }),
   ]);
 
   const colors = Array.isArray(colorsJson.colors) ? colorsJson.colors : [];
