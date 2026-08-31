@@ -280,6 +280,7 @@ function App() {
               isLargeScreen={isLargeScreen}
             />
           </Suspense>
+        )}
       </>
     )}
     </ErrorBoundary>
