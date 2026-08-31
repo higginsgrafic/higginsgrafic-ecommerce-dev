@@ -6,7 +6,7 @@ import { Link } from '@react-email/components';
 export function OrderConfirmedEmail({ order = {} }) {
   const clientName = order.first_name || 'Maria';
   const items = parseItems(order);
-  const trackingLink = order.tracking_link || null;
+  const trackingLink = sanitizeTrackingLink(order.tracking_link);
 
   return (
     <EmailLayout
@@ -57,6 +57,18 @@ function parseItems(order) {
   } catch {
     return [];
   }
+}
+
+/**
+ * Sanititza el tracking link per evitar schemes perillosos (javascript:, data:).
+ * Defense-in-depth: el link es genera server-side, però si algú manipula
+ * metadata o SITE_URL, no volem executar codi al client de l'email.
+ */
+function sanitizeTrackingLink(link) {
+  if (!link || typeof link !== 'string') return null;
+  // Permet només http: i https: schemes
+  if (/^https?:\/\//i.test(link)) return link;
+  return null;
 }
 
 export const orderConfirmedMeta = {

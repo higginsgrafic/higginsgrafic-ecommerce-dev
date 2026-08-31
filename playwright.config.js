@@ -18,17 +18,62 @@ const config = {
   },
   snapshotPathTemplate: '{snapshotDir}/{testFilePath}-snapshots/{projectName}/{arg}{ext}',
   projects: [
+    // Desktop browsers — executen tots els tests excepte mobile.spec.js i lighthouse.spec.js
     {
       name: 'chromium',
       use: { browserName: 'chromium' },
+      testIgnore: [/mobile\.spec\.js$/, /lighthouse\.spec\.js$/],
     },
     {
       name: 'firefox',
       use: { browserName: 'firefox' },
+      testIgnore: [/mobile\.spec\.js$/, /lighthouse\.spec\.js$/],
     },
     {
       name: 'webkit',
       use: { browserName: 'webkit' },
+      testIgnore: [/mobile\.spec\.js$/, /lighthouse\.spec\.js$/],
+    },
+    // Mobile viewports — només executen mobile.spec.js
+    // (cross-browser-layout depèn de CSS vars que no es publiquen a mòbil)
+    {
+      name: 'mobile-chrome',
+      testMatch: /mobile\.spec\.js$/,
+      use: {
+        browserName: 'chromium',
+        viewport: { width: 375, height: 667 },
+        isMobile: true,
+        hasTouch: true,
+      },
+    },
+    {
+      name: 'mobile-safari',
+      testMatch: /mobile\.spec\.js$/,
+      use: {
+        browserName: 'webkit',
+        viewport: { width: 390, height: 844 },
+        isMobile: true,
+        hasTouch: true,
+      },
+    },
+    // Tablet — només mobile.spec.js
+    {
+      name: 'tablet',
+      testMatch: /mobile\.spec\.js$/,
+      use: {
+        browserName: 'chromium',
+        viewport: { width: 768, height: 1024 },
+        isMobile: true,
+        hasTouch: true,
+      },
+    },
+    // Lighthouse — només executa lighthouse.spec.js (chromium, single worker)
+    {
+      name: 'lighthouse',
+      testMatch: /lighthouse\.spec\.js$/,
+      use: { browserName: 'chromium' },
+      // Lighthouse és CPU-intensiu, no paral·lelitzar
+      retries: 1,
     },
   ],
   webServer: {

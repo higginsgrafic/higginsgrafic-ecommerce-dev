@@ -8,7 +8,11 @@ export function generateTrackingToken() {
 }
 
 export function hashToken(rawToken) {
-  return crypto.createHash('sha256').update(rawToken).digest('hex');
+  // Guard: crypto.update() throws TypeError si rep null/undefined.
+  // Convertim a string per evitar crash; el hash resultant no coincidirà
+  // amb cap token vàlid, per tant la consulta retornarà 404 (no 500).
+  const input = rawToken == null ? '' : String(rawToken);
+  return crypto.createHash('sha256').update(input).digest('hex');
 }
 
 export function getTokenExpiry(days = DEFAULT_EXPIRY_DAYS) {

@@ -78,7 +78,7 @@ export const PRODUCT_PATHS = [
   '/austen/looking-for-my-darcy-yellow-solid',
 ];
 
-// 14 colors oficials Gildan 5000.
+// 14 colors oficials Gildan 64000.
 export const ALL_COLORS = [
   'white', 'light-blue', 'royal', 'navy', 'purple', 'light-pink', 'daisy',
   'gold', 'red', 'kiwi', 'irish-green', 'military-green', 'forest-green', 'black',

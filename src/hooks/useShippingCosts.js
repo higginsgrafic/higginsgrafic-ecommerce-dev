@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 
-// Tarifes d'enviament de Gelato (Gildan 5000, DTG, Economy).
+// Tarifes d'enviament de Gelato (Gildan 64000, DTG, Economy).
 // first    = cost del primer producte de la comanda
 // additional = cost de cada producte addicional de la mateixa comanda
 // free_threshold = import mínim per enviament gratuït (null = sense llindar)
