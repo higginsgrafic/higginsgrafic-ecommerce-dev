@@ -68,6 +68,7 @@ const TransparentInput = React.forwardRef(function TransparentInput({ placeholde
 });
 
 export default function MegaslidePagina4({
+  isPortraitTablet = false,
   orders,
   adminEmail,
   touchMegaPublicActivity,
@@ -305,12 +306,36 @@ export default function MegaslidePagina4({
   const enviatsMessages = mockMessages.filter(m => m.type === 'enviats');
 
   return (
-    <div style={{ width: '25%', flexShrink: 0, display: 'flex', height: '100%', position: 'relative', justifyContent: 'center' }}>
-      <div style={{ flex: '1 1 auto' }} />
+    <div style={{ width: '25%', flexShrink: 0, display: 'block', height: '100%', position: 'relative', overflow: isPortraitTablet ? 'hidden' : 'visible' }}>
+      {isPortraitTablet && (
+        <div aria-hidden="true" style={{
+          position: 'absolute',
+          top: 0,
+          bottom: '8px',
+          left: '8px',
+          right: '8px',
+          boxShadow: '0 0 0 9999px #ffffff',
+          pointerEvents: 'none',
+          zIndex: 20,
+        }} />
+      )}
+      <div data-mega-page-viewport="4" style={{
+        width: '100%',
+        height: '100%',
+        display: 'flex',
+        justifyContent: isPortraitTablet ? 'flex-start' : 'center',
+        overflowX: isPortraitTablet ? 'auto' : 'visible',
+        overflowY: isPortraitTablet ? 'hidden' : 'visible',
+        overscrollBehaviorX: isPortraitTablet ? 'contain' : undefined,
+        WebkitOverflowScrolling: isPortraitTablet ? 'touch' : undefined,
+        scrollbarWidth: isPortraitTablet ? 'thin' : undefined,
+        touchAction: isPortraitTablet ? 'pan-x pinch-zoom' : undefined,
+      }}>
+      <div style={{ flex: isPortraitTablet ? '0 0 0px' : '1 1 auto' }} />
 
       <div style={{
         flex: '0 0 auto',
-        width: 'var(--hg-mega-w, min(1350px, calc(100vw - 32px)))',
+        width: isPortraitTablet ? 'min(1350px, calc(100vh - 32px))' : 'var(--hg-mega-w, min(1350px, calc(100vw - 32px)))',
         maxWidth: 'none',
         position: 'relative',
         height: '100%',
@@ -897,7 +922,8 @@ export default function MegaslidePagina4({
         </div>
       </div>
 
-      <div style={{ flex: '1 1 auto' }} />
+      <div style={{ flex: isPortraitTablet ? '0 0 0px' : '1 1 auto' }} />
+      </div>
     </div>
   );
 }

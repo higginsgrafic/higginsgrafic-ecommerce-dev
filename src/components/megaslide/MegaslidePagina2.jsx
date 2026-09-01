@@ -86,45 +86,61 @@ export default function MegaslidePagina2({
   const neutralGammaRef = useRef(null);
   const tiltDeltaRef = useRef(0);
 
+  const getActiveViewport = useCallback(() => {
+    if (typeof document === 'undefined') return viewportRef.current;
+    return document.querySelector(`[data-mega-page-viewport="${megaPage}"]`) || viewportRef.current;
+  }, [megaPage]);
+
   const updateScrollProgress = useCallback(() => {
-    const viewport = viewportRef.current;
+    const viewport = getActiveViewport();
     if (!viewport) return;
     const maxScroll = Math.max(0, viewport.scrollWidth - viewport.clientWidth);
     setScrollProgress(maxScroll > 0 ? viewport.scrollLeft / maxScroll : 0);
-  }, []);
+  }, [getActiveViewport]);
 
   const scrollToProgress = useCallback((progress, behavior = 'smooth') => {
-    const viewport = viewportRef.current;
+    const viewport = getActiveViewport();
     if (!viewport) return;
     const maxScroll = Math.max(0, viewport.scrollWidth - viewport.clientWidth);
     viewport.scrollTo({ left: maxScroll * Math.min(1, Math.max(0, progress)), behavior });
-  }, []);
+  }, [getActiveViewport]);
 
   const handlePortraitScroll = useCallback(() => {
     updateScrollProgress();
     window.clearTimeout(snapTimerRef.current);
     snapTimerRef.current = window.setTimeout(() => {
       if (Math.abs(tiltDeltaRef.current) > 3) return;
-      const viewport = viewportRef.current;
+      const viewport = getActiveViewport();
       if (!viewport) return;
       const maxScroll = Math.max(0, viewport.scrollWidth - viewport.clientWidth);
       if (maxScroll <= 0) return;
       const snapStep = maxScroll / 4;
       viewport.scrollTo({ left: Math.round(viewport.scrollLeft / snapStep) * snapStep, behavior: 'smooth' });
     }, 180);
-  }, [updateScrollProgress]);
+  }, [getActiveViewport, updateScrollProgress]);
 
   useLayoutEffect(() => {
-    const viewport = viewportRef.current;
+    const viewport = getActiveViewport();
     if (!viewport) return undefined;
     if (!isPortraitTablet) {
       viewport.scrollLeft = 0;
       setScrollProgress(0);
       return undefined;
     }
-    const frame = requestAnimationFrame(() => scrollToProgress(0, 'auto'));
+    const frame = requestAnimationFrame(() => {
+      scrollToProgress(0, 'auto');
+      updateScrollProgress();
+    });
     return () => cancelAnimationFrame(frame);
-  }, [active, isPortraitTablet, scrollToProgress]);
+  }, [active, isPortraitTablet, megaPage, getActiveViewport, scrollToProgress, updateScrollProgress]);
+
+  useEffect(() => {
+    if (!isPortraitTablet) return undefined;
+    const viewport = getActiveViewport();
+    if (!viewport) return undefined;
+    viewport.addEventListener('scroll', handlePortraitScroll, { passive: true });
+    return () => viewport.removeEventListener('scroll', handlePortraitScroll);
+  }, [isPortraitTablet, megaPage, getActiveViewport, handlePortraitScroll]);
 
   useEffect(() => () => window.clearTimeout(snapTimerRef.current), []);
 
@@ -145,7 +161,7 @@ export default function MegaslidePagina2({
       tiltDeltaRef.current = event.gamma - neutralGammaRef.current;
     };
     const tick = () => {
-      const viewport = viewportRef.current;
+      const viewport = getActiveViewport();
       const delta = tiltDeltaRef.current;
       if (viewport && Math.abs(delta) > 3) {
         const velocity = Math.sign(delta) * Math.min(10, (Math.abs(delta) - 3) * 0.45);
@@ -162,14 +178,14 @@ export default function MegaslidePagina2({
       neutralGammaRef.current = null;
       tiltDeltaRef.current = 0;
     };
-  }, [isPortraitTablet, tiltEnabled]);
+  }, [isPortraitTablet, tiltEnabled, getActiveViewport]);
 
   useEffect(() => {
-    if (!isPortraitTablet || megaPage !== 2) {
+    if (!isPortraitTablet) {
       setTiltEnabled(false);
       setTiltStatus('idle');
     }
-  }, [isPortraitTablet, megaPage]);
+  }, [isPortraitTablet]);
 
   const toggleTilt = useCallback(async () => {
     if (tiltEnabled) {
@@ -281,7 +297,7 @@ export default function MegaslidePagina2({
       )}
       <div
         ref={viewportRef}
-        onScroll={isPortraitTablet ? handlePortraitScroll : undefined}
+        data-mega-page-viewport="2"
         style={{
           width: '100%',
           height: '100%',
@@ -516,11 +532,11 @@ export default function MegaslidePagina2({
         }} />
       </div>
 
-      {isPortraitTablet && megaPage === 2 && (
+      {isPortraitTablet && (
         <div
           style={{
             position: 'fixed',
-            left: '50%',
+            left: `calc(50% + ${(megaPage - 2) * 100}vw)`,
             top: 'calc(14.32vh + 176.65px)',
             transform: 'translateX(calc(-50% - 650px))',
             zIndex: 30,
