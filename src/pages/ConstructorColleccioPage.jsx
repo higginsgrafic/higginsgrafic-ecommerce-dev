@@ -9,10 +9,7 @@ import TramFinal from '@/components/home/TramFinal';
 
 const COLLECTION_BG_SRC = '/tmp/PAGINES/PAGINES TIPUS/00 COLLECCIO.png';
 
-const TDP_DESCRIPTION = [
-  "Mereixedors són d'honor, glòria e de fama e contínua bona memòria los ",
-  'hòmens virtuosos, e singularment aquells qui per la república lluitaren.',
-].join('\n');
+const TDP_DESCRIPTION = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna";
 
 const tdpImage = (color) =>
   `/placeholders/apparel/t-shirt/gildan_5000/gildan-5000_t-shirt_crewneck_unisex_heavyWeight_xl_${color}_gpr-4-0_front.png`;
