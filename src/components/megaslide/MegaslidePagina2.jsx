@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import CercadorTopBar, { CERCADOR_COLORS } from '../fullwide/CercadorTopBar.jsx';
 import CercadorTextRow from '../fullwide/CercadorTextRow.jsx';
 import MegaStripePanel from '../fullwide/MegaStripePanel.jsx';
@@ -14,6 +14,8 @@ import { computeStripeTileOverlaySrcs, computeStripeTileItems } from '@/utils/re
 
 export default function MegaslidePagina2({
   active,
+  isPortraitTablet = false,
+  megaPage = 2,
   setActive,
   austenSubcollection,
   setAustenSubcollection,
@@ -54,7 +56,10 @@ export default function MegaslidePagina2({
   thinDrawings,
   megaMenuRef,
 }) {
-  const cal = useMegaslideCalibration('p2', active, megaMenuRef);
+  const viewportRef = useRef(null);
+  const portraitContentRef = useRef(null);
+  const calibrationRef = isPortraitTablet ? portraitContentRef : megaMenuRef;
+  const cal = useMegaslideCalibration('p2', active, calibrationRef);
   const {
     stripeRowPadPx,
     stripeRowPadXPx,
@@ -74,6 +79,123 @@ export default function MegaslidePagina2({
   } = cal;
 
   const bnSliderSize = megaTileSize || 120;
+  const [scrollProgress, setScrollProgress] = useState(0.5);
+  const [tiltEnabled, setTiltEnabled] = useState(false);
+  const [tiltStatus, setTiltStatus] = useState('idle');
+  const snapTimerRef = useRef(0);
+  const neutralGammaRef = useRef(null);
+  const tiltDeltaRef = useRef(0);
+
+  const updateScrollProgress = useCallback(() => {
+    const viewport = viewportRef.current;
+    if (!viewport) return;
+    const maxScroll = Math.max(0, viewport.scrollWidth - viewport.clientWidth);
+    setScrollProgress(maxScroll > 0 ? viewport.scrollLeft / maxScroll : 0);
+  }, []);
+
+  const scrollToProgress = useCallback((progress, behavior = 'smooth') => {
+    const viewport = viewportRef.current;
+    if (!viewport) return;
+    const maxScroll = Math.max(0, viewport.scrollWidth - viewport.clientWidth);
+    viewport.scrollTo({ left: maxScroll * Math.min(1, Math.max(0, progress)), behavior });
+  }, []);
+
+  const handlePortraitScroll = useCallback(() => {
+    updateScrollProgress();
+    window.clearTimeout(snapTimerRef.current);
+    snapTimerRef.current = window.setTimeout(() => {
+      if (Math.abs(tiltDeltaRef.current) > 3) return;
+      const viewport = viewportRef.current;
+      if (!viewport) return;
+      const maxScroll = Math.max(0, viewport.scrollWidth - viewport.clientWidth);
+      if (maxScroll <= 0) return;
+      const snapStep = maxScroll / 4;
+      viewport.scrollTo({ left: Math.round(viewport.scrollLeft / snapStep) * snapStep, behavior: 'smooth' });
+    }, 180);
+  }, [updateScrollProgress]);
+
+  useLayoutEffect(() => {
+    const viewport = viewportRef.current;
+    if (!viewport) return undefined;
+    if (!isPortraitTablet) {
+      viewport.scrollLeft = 0;
+      setScrollProgress(0);
+      return undefined;
+    }
+    const frame = requestAnimationFrame(() => scrollToProgress(0, 'auto'));
+    return () => cancelAnimationFrame(frame);
+  }, [active, isPortraitTablet, scrollToProgress]);
+
+  useEffect(() => () => window.clearTimeout(snapTimerRef.current), []);
+
+  useEffect(() => {
+    if (!isPortraitTablet || !tiltEnabled) return undefined;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      setTiltEnabled(false);
+      setTiltStatus('reduced-motion');
+      return undefined;
+    }
+
+    neutralGammaRef.current = null;
+    tiltDeltaRef.current = 0;
+    let frame = 0;
+    const handleOrientation = (event) => {
+      if (!Number.isFinite(event.gamma)) return;
+      if (neutralGammaRef.current == null) neutralGammaRef.current = event.gamma;
+      tiltDeltaRef.current = event.gamma - neutralGammaRef.current;
+    };
+    const tick = () => {
+      const viewport = viewportRef.current;
+      const delta = tiltDeltaRef.current;
+      if (viewport && Math.abs(delta) > 3) {
+        const velocity = Math.sign(delta) * Math.min(10, (Math.abs(delta) - 3) * 0.45);
+        viewport.scrollLeft += velocity;
+      }
+      frame = requestAnimationFrame(tick);
+    };
+
+    window.addEventListener('deviceorientation', handleOrientation);
+    frame = requestAnimationFrame(tick);
+    return () => {
+      window.removeEventListener('deviceorientation', handleOrientation);
+      cancelAnimationFrame(frame);
+      neutralGammaRef.current = null;
+      tiltDeltaRef.current = 0;
+    };
+  }, [isPortraitTablet, tiltEnabled]);
+
+  useEffect(() => {
+    if (!isPortraitTablet || megaPage !== 2) {
+      setTiltEnabled(false);
+      setTiltStatus('idle');
+    }
+  }, [isPortraitTablet, megaPage]);
+
+  const toggleTilt = useCallback(async () => {
+    if (tiltEnabled) {
+      setTiltEnabled(false);
+      setTiltStatus('idle');
+      return;
+    }
+    const OrientationEvent = window.DeviceOrientationEvent;
+    if (!OrientationEvent) {
+      setTiltStatus('unsupported');
+      return;
+    }
+    try {
+      if (typeof OrientationEvent.requestPermission === 'function') {
+        const permission = await OrientationEvent.requestPermission();
+        if (permission !== 'granted') {
+          setTiltStatus('denied');
+          return;
+        }
+      }
+      setTiltStatus('active');
+      setTiltEnabled(true);
+    } catch {
+      setTiltStatus('denied');
+    }
+  }, [tiltEnabled]);
 
   const variant = active === 'the_human_inside' ? humanInsideVariant : firstContactVariant;
 
@@ -129,21 +251,64 @@ export default function MegaslidePagina2({
   const stripeEmptyMaskSrc = null;
 
   return (
-    <div style={{ width: '25%', flexShrink: 0, display: 'flex', height: '100%', position: 'relative', justifyContent: 'center' }}>
-      <div style={{
-        flex: '1 1 auto',
-      }} />
-
+    <div style={{ width: '25%', flexShrink: 0, display: isPortraitTablet ? 'block' : 'flex', height: '100%', position: 'relative', justifyContent: 'center', overflow: isPortraitTablet ? 'hidden' : 'visible' }}>
+      {isPortraitTablet && (
+        <div aria-hidden="true" style={{
+          position: 'absolute',
+          top: 0,
+          bottom: '8px',
+          left: '8px',
+          right: '8px',
+          boxShadow: '0 0 0 9999px #ffffff',
+          pointerEvents: 'none',
+          zIndex: 20,
+        }} />
+      )}
+      {isPortraitTablet && (
+        <div
+          ref={portraitContentRef}
+          aria-hidden="true"
+          style={{
+            position: 'absolute',
+            width: 'min(1350px, calc(100vh - 15px))',
+            height: 1,
+            boxSizing: 'border-box',
+            padding: '32px 40px',
+            visibility: 'hidden',
+            pointerEvents: 'none',
+          }}
+        />
+      )}
       <div
+        ref={viewportRef}
+        onScroll={isPortraitTablet ? handlePortraitScroll : undefined}
         style={{
-        flex: '0 0 auto',
-        width: 'var(--hg-mega-w, min(1350px, calc(100vw - 32px)))',
-        maxWidth: 'none',
-        position: 'relative',
-        height: '100%',
-        paddingLeft: '0px',
-        paddingRight: '0px',
-      }}>
+          width: '100%',
+          height: '100%',
+          display: 'flex',
+          justifyContent: isPortraitTablet ? 'flex-start' : 'center',
+          overflowX: isPortraitTablet ? 'auto' : 'visible',
+          overflowY: isPortraitTablet ? 'hidden' : 'visible',
+          overscrollBehaviorX: isPortraitTablet ? 'contain' : undefined,
+          WebkitOverflowScrolling: isPortraitTablet ? 'touch' : undefined,
+          scrollbarWidth: isPortraitTablet ? 'thin' : undefined,
+          touchAction: isPortraitTablet ? 'pan-x pinch-zoom' : undefined,
+        }}
+      >
+        <div style={{
+          flex: isPortraitTablet ? '0 0 0px' : '1 1 auto',
+        }} />
+
+        <div
+          style={{
+          flex: '0 0 auto',
+          width: isPortraitTablet ? 'min(1350px, calc(100vh - 32px))' : 'var(--hg-mega-w, min(1350px, calc(100vw - 32px)))',
+          maxWidth: 'none',
+          position: 'relative',
+          height: '100%',
+          paddingLeft: '0px',
+          paddingRight: '0px',
+        }}>
         {/* Slider B/N/C vertical — cantó esquerre, alçada barra grisa */}
         {active ? (
           <div style={{
@@ -200,7 +365,7 @@ export default function MegaslidePagina2({
         {/* CercadorTextRow */}
         <div style={{
           position: 'absolute',
-          top: 'var(--hg-cercador-bar-top, 0px)',
+          top: isPortraitTablet ? 'calc(var(--hg-cercador-bar-top, 0px) + 8px)' : 'var(--hg-cercador-bar-top, 0px)',
           left: '50%',
           transform: 'translateX(-50%) scale(var(--hg-cercador-bar-scale, 1))',
           transformOrigin: 'top center',
@@ -344,11 +509,74 @@ export default function MegaslidePagina2({
           </Pauta4ColsOverlay>
         </div>
         */}
+        </div>
+
+        <div style={{
+          flex: isPortraitTablet ? '0 0 0px' : '1 1 auto',
+        }} />
       </div>
 
-      <div style={{
-        flex: '1 1 auto',
-      }} />
+      {isPortraitTablet && megaPage === 2 && (
+        <div
+          style={{
+            position: 'fixed',
+            left: '50%',
+            top: 'calc(14.32vh + 176.65px)',
+            transform: 'translateX(calc(-50% - 650px))',
+            zIndex: 30,
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            padding: '6px 8px',
+            border: '1px solid rgba(71, 80, 89, 0.2)',
+            borderRadius: '999px',
+            background: 'rgba(255, 255, 255, 0.9)',
+            boxShadow: '0 2px 10px rgba(0, 0, 0, 0.08)',
+            backdropFilter: 'blur(8px)',
+          }}
+        >
+          <button
+            type="button"
+            aria-label="Desplaça la stripe cap a l'esquerra"
+            onClick={() => scrollToProgress(scrollProgress - 0.25)}
+            style={{ width: 28, height: 28, border: 0, borderRadius: '50%', background: '#f3f4f6', color: '#111827', cursor: 'pointer' }}
+          >
+            ‹
+          </button>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 5 }} aria-label="Posició de la stripe">
+            {Array.from({ length: 5 }).map((_, index) => {
+              const progress = index / 4;
+              const activeDot = Math.round(scrollProgress * 4) === index;
+              return (
+                <button
+                  key={`stripe-scroll-dot-${index}`}
+                  type="button"
+                  aria-label={`Posició ${index + 1} de 5`}
+                  onClick={() => scrollToProgress(progress)}
+                  style={{ width: activeDot ? 16 : 6, height: 6, padding: 0, border: 0, borderRadius: 999, background: activeDot ? '#111827' : '#cbd5e1', cursor: 'pointer', transition: 'width 160ms ease, background 160ms ease' }}
+                />
+              );
+            })}
+          </div>
+          <button
+            type="button"
+            aria-label="Desplaça la stripe cap a la dreta"
+            onClick={() => scrollToProgress(scrollProgress + 0.25)}
+            style={{ width: 28, height: 28, border: 0, borderRadius: '50%', background: '#f3f4f6', color: '#111827', cursor: 'pointer' }}
+          >
+            ›
+          </button>
+          <button
+            type="button"
+            aria-pressed={tiltEnabled}
+            onClick={toggleTilt}
+            title="Controla el desplaçament inclinant la tablet"
+            style={{ height: 28, padding: '0 10px', border: '1px solid #e5e7eb', borderRadius: 999, background: tiltEnabled ? '#111827' : '#ffffff', color: tiltEnabled ? '#ffffff' : '#475059', fontFamily: 'Roboto Condensed, sans-serif', fontSize: 10, letterSpacing: '0.08em', cursor: 'pointer' }}
+          >
+            {tiltStatus === 'active' ? 'INCLINACIÓ ACTIVA' : tiltStatus === 'denied' ? 'PERMÍS DENEGAT' : tiltStatus === 'unsupported' ? 'SENSE SENSOR' : tiltStatus === 'reduced-motion' ? 'MOVIMENT REDUÏT' : 'INCLINACIÓ'}
+          </button>
+        </div>
+      )}
     </div>
   );
 }

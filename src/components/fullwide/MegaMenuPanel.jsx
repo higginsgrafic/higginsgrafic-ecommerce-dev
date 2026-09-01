@@ -86,12 +86,20 @@ export default function MegaMenuPanel({
   adminEmail,
   acordioExpandedPage4,
   setAcordioExpandedPage4,
+  isPortraitTablet = false,
 }) {
   if (!active) return null;
 
   const page1SelectedItem = active === 'first_contact' ? firstContactSelectedItem
     : active === 'the_human_inside' ? humanInsideSelectedItem
     : (selectedItemByCollection?.[active] ?? null);
+  const portraitPage2TileSize = 'min(144px, calc((min(1350px, calc(100vh - 15px)) - 176px) / 9))';
+  const defaultBleedGuardHeight = effectiveMegaTileSize
+    ? `${Math.round(effectiveMegaTileSize * 2 + 37 + Math.max(0, stripeRowPadPx))}px`
+    : undefined;
+  const bleedGuardHeight = isPortraitTablet && megaPage === 2
+    ? `calc(${portraitPage2TileSize} + ${portraitPage2TileSize} + ${37 + Math.max(0, stripeRowPadPx)}px)`
+    : defaultBleedGuardHeight;
 
   return (
     <div className="relative">
@@ -115,18 +123,7 @@ export default function MegaMenuPanel({
           }}
         >
           <MegaStripeBleedGuard
-            heightPx={effectiveMegaTileSize
-              ? `${Math.round(effectiveMegaTileSize * 2 + 37 + (() => {
-                try {
-                  const qs = (typeof window !== 'undefined') ? window.location?.search : '';
-                  const p = qs ? new URLSearchParams(qs) : null;
-                  const bottomPad = stripeRowPadPx;
-                  return Math.max(0, bottomPad);
-                } catch {
-                  return 0;
-                }
-              })())}px`
-              : undefined}
+            heightPx={bleedGuardHeight}
             debug={false}
             expandLeftPx={bleedGuardExpandPx?.left || 0}
             expandRightPx={bleedGuardExpandPx?.right || 0}
@@ -203,6 +200,8 @@ export default function MegaMenuPanel({
 
                 <MegaslidePagina2
                   active={active}
+                  isPortraitTablet={isPortraitTablet}
+                  megaPage={megaPage}
                   setActive={setActive}
                   austenSubcollection={austenSubcollection}
                   setAustenSubcollection={setAustenSubcollection}
