@@ -94,12 +94,18 @@ export default function MegaMenuPanel({
     : active === 'the_human_inside' ? humanInsideSelectedItem
     : (selectedItemByCollection?.[active] ?? null);
   const portraitPage2TileSize = 'min(144px, calc((min(1350px, calc(100vh - 15px)) - 176px) / 9))';
+  const portraitLandscapeWidth = typeof window !== 'undefined'
+    ? Math.min(1350, window.innerHeight - 15)
+    : 1024;
+  const portraitPage1TileSize = Math.min(144, (portraitLandscapeWidth - 176) / 9);
   const defaultBleedGuardHeight = effectiveMegaTileSize
     ? `${Math.round(effectiveMegaTileSize * 2 + 37 + Math.max(0, stripeRowPadPx))}px`
     : undefined;
   const bleedGuardHeight = isPortraitTablet && megaPage === 2
     ? `calc(${portraitPage2TileSize} + ${portraitPage2TileSize} + ${37 + Math.max(0, stripeRowPadPx)}px)`
-    : defaultBleedGuardHeight;
+    : isPortraitTablet
+      ? `${Math.round(portraitPage1TileSize * 2 + 69)}px`
+      : defaultBleedGuardHeight;
 
   return (
     <div className="relative">
@@ -145,19 +151,43 @@ export default function MegaMenuPanel({
                   transition: 'transform 320ms cubic-bezier(0.32, 0.72, 0, 1)',
                 }}
               >
-                <div style={{ width: '25%', flexShrink: 0, display: 'flex', height: '100%', position: 'relative', justifyContent: 'center' }}>
+                <div style={{ width: '25%', flexShrink: 0, display: 'block', height: '100%', position: 'relative', overflow: isPortraitTablet ? 'hidden' : 'visible' }}>
+                  {isPortraitTablet && (
+                    <div aria-hidden="true" style={{
+                      position: 'absolute',
+                      top: 0,
+                      bottom: '8px',
+                      left: '8px',
+                      right: '8px',
+                      boxShadow: '0 0 0 9999px #ffffff',
+                      pointerEvents: 'none',
+                      zIndex: 20,
+                    }} />
+                  )}
+                  <div data-mega-page-viewport="1" style={{
+                    width: '100%',
+                    height: '100%',
+                    display: 'flex',
+                    justifyContent: isPortraitTablet ? 'flex-start' : 'center',
+                    overflowX: isPortraitTablet ? 'auto' : 'visible',
+                    overflowY: isPortraitTablet ? 'hidden' : 'visible',
+                    overscrollBehaviorX: isPortraitTablet ? 'contain' : undefined,
+                    WebkitOverflowScrolling: isPortraitTablet ? 'touch' : undefined,
+                    scrollbarWidth: isPortraitTablet ? 'thin' : undefined,
+                    touchAction: isPortraitTablet ? 'pan-x pinch-zoom' : undefined,
+                  }}>
                   <div style={{
-                    flex: '1 1 auto',
+                    flex: isPortraitTablet ? '0 0 0px' : '1 1 auto',
                   }} />
 
-                  <div style={{ flex: '0 0 auto', width: 'var(--hg-mega-w, min(1350px, calc(100vw - 32px)))', maxWidth: 'none', position: 'relative', height: '100%', paddingLeft: '0px', paddingRight: '0px' }}>
+                  <div style={{ flex: '0 0 auto', width: isPortraitTablet ? 'min(1350px, calc(100vh - 32px))' : 'var(--hg-mega-w, min(1350px, calc(100vw - 32px)))', maxWidth: 'none', position: 'relative', height: '100%', paddingLeft: '0px', paddingRight: '0px' }}>
                     <MegaStripePanelP1
                       active={active}
                       resolvedMega={resolvedMega}
                       showStripe={showStripe}
-                      stripeRowPadPx={stripeRowPadPx}
-                      stripeRowPadXPx={stripeRowPadXPx}
-                      stripePreviewHPx={stripePreviewHPx}
+                      stripeRowPadPx={isPortraitTablet ? 32 : stripeRowPadPx}
+                      stripeRowPadXPx={isPortraitTablet ? { left: 40, right: 40 } : stripeRowPadXPx}
+                      stripePreviewHPx={isPortraitTablet ? Math.round(portraitPage1TileSize * 0.9) : stripePreviewHPx}
                       stripeOverlayLoadState={stripeOverlayLoadState}
                       resolvedOverlaySrc={resolvedOverlaySrc}
                       stripeOverlayDebug={stripeOverlayDebug}
@@ -179,7 +209,7 @@ export default function MegaMenuPanel({
                       stripeVariantVisibility={stripeVariantVisibility}
                       megaTileSelectorParams={megaTileSelectorParams}
                       onStartSelectorDrag={onStartSelectorDrag}
-                      megaTileSize={megaTileSize}
+                      megaTileSize={isPortraitTablet ? portraitPage1TileSize : megaTileSize}
                       setStripeOverlayOverrideActive={setStripeOverlayOverrideActive}
                       setFirstContactVariant={setFirstContactVariant}
                       setHumanInsideVariant={setHumanInsideVariant}
@@ -194,8 +224,9 @@ export default function MegaMenuPanel({
                   </div>
 
                   <div style={{
-                    flex: '1 1 auto',
+                    flex: isPortraitTablet ? '0 0 0px' : '1 1 auto',
                   }} />
+                  </div>
                 </div>
 
                 <MegaslidePagina2
@@ -245,6 +276,7 @@ export default function MegaMenuPanel({
 
                 <Suspense fallback={null}>
                   <MegaslidePagina3
+                    isPortraitTablet={isPortraitTablet}
                     cartItems={cartItems}
                     setCartItems={setCartItems}
                     setActive={setActive}
@@ -259,6 +291,7 @@ export default function MegaMenuPanel({
 
                 <Suspense fallback={null}>
                   <MegaslidePagina4
+                    isPortraitTablet={isPortraitTablet}
                     orders={orders}
                     adminEmail={adminEmail}
                     acordioExpandedPage4={acordioExpandedPage4}
