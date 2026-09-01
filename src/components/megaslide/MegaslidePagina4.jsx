@@ -82,6 +82,23 @@ export default function MegaslidePagina4({
   const ordersRef = useRef(null);
   const [scrollIndex, setScrollIndex] = useState(0);
   const isScrolling = useRef(false);
+  const [isLandscapeTablet, setIsLandscapeTablet] = useState(
+    typeof window !== 'undefined'
+      && window.innerWidth >= 1024
+      && window.innerWidth <= 1366
+      && window.innerHeight < window.innerWidth
+  );
+  useEffect(() => {
+    const onResize = () => {
+      setIsLandscapeTablet(
+        window.innerWidth >= 1024
+          && window.innerWidth <= 1366
+          && window.innerHeight < window.innerWidth
+      );
+    };
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, []);
   const [messagesSlideOpen, setMessagesSlideOpen] = useState(false);
   const [activeMessageTab, setActiveMessageTab] = useState('rebuts');
   const [saving, setSaving] = useState(false);
@@ -875,7 +892,7 @@ export default function MegaslidePagina4({
                 )}
                 <div style={{ flex: 1 }} />
                 {/* Desa button — same size and Y position as bloc 2 buttons */}
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '4px', height: '9%', flexShrink: 0, position: 'relative', top: '7px', marginRight: '-9px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '4px', height: '9%', flexShrink: 0, position: 'relative', top: isLandscapeTablet ? '0px' : '7px', marginRight: '-9px' }}>
                   <div />
                   <button
                     onClick={handleSignOut}
