@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState, useImperativeHandle, forwardRef } from 'react';
+import React, { useEffect, useLayoutEffect, useMemo, useRef, useState, useImperativeHandle, forwardRef } from 'react';
 import RespescaTitle from '@/pages/productRail/RespescaTitle';
 import CarouselArrows from '@/pages/productRail/CarouselArrows';
 import ProductCard from '@/pages/productRail/ProductCard';
@@ -57,6 +57,10 @@ export default function TambeRail({
   visibleCards = 4,
   showInternalArrows = true,
   showTitle = true,
+  stabilizeInitialLayout = false,
+  stabilizedViewportScale = 1,
+  stabilizedViewportWidth = null,
+  stabilizedGutterX = null,
 }) {
   const [shirtDrawingEnabled, setShirtDrawingEnabled] = useState(() => {
     try {
@@ -107,7 +111,7 @@ export default function TambeRail({
   const lastIntentRef = useRef(0);
   const clearPendingRef = useRef(null);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     let raf = null;
     let ro = null;
     let mo = null;
@@ -131,12 +135,25 @@ export default function TambeRail({
       const beltOk = Number.isFinite(beltXL) && Number.isFinite(beltXR) && beltXR > beltXL;
 
       if (beltOk) {
-        const devLeftRaw = Math.max(0, beltXL - pr.left);
+        const renderedScale = pageEl.offsetWidth > 0 ? pr.width / pageEl.offsetWidth : 1;
+        const width = stabilizeInitialLayout
+          ? stabilizedViewportWidth || document.documentElement.clientWidth / renderedScale
+          : Math.max(0, beltXR - beltXL);
+        const centeredLeft = (document.documentElement.clientWidth - width * renderedScale) / 2;
+        const devLeftRaw = stabilizeInitialLayout
+          ? Math.max(0, (centeredLeft - pr.left) / renderedScale)
+          : Math.max(0, beltXL - pr.left);
         const userRightRaw = Math.max(0, beltXR - pr.left);
-        const devLeft = Math.min(devLeftRaw, Math.max(0, pageWidth - CARD_W));
+        const devLeft = stabilizeInitialLayout
+          ? devLeftRaw
+          : Math.min(devLeftRaw, Math.max(0, pageWidth - CARD_W));
         const userRight = Math.min(userRightRaw, pageWidth);
-        const width = Math.max(0, beltXR - beltXL);
         setBgMetrics({ x: devLeft, width, devLeft, userRight, pageWidth });
+        return;
+      }
+
+      if (stabilizeInitialLayout) {
+        setBgMetrics(null);
         return;
       }
 
@@ -155,7 +172,7 @@ export default function TambeRail({
       setBgMetrics({ x, width, devLeft, userRight, pageWidth });
     };
     const schedule = () => { if (raf) cancelAnimationFrame(raf); raf = requestAnimationFrame(read); };
-    schedule(); setTimeout(schedule, 50); setTimeout(schedule, 250);
+    read(); setTimeout(schedule, 50); setTimeout(schedule, 250);
     window.addEventListener('resize', schedule);
     try {
       ro = new ResizeObserver(schedule);
@@ -177,7 +194,7 @@ export default function TambeRail({
       if (ro) ro.disconnect();
       if (mo) mo.disconnect();
     };
-  }, []);
+  }, [stabilizeInitialLayout, stabilizedViewportScale, stabilizedViewportWidth]);
 
   useEffect(() => {
     let raf = null;
@@ -230,11 +247,14 @@ export default function TambeRail({
   }, [totalCards]);
 
   const left1 = bgMetrics ? bgMetrics.devLeft : 0;
-  const beltWidth = bgMetrics ? bgMetrics.width : CARD_W * visibleCards;
+  const fallbackBeltWidth = stabilizeInitialLayout && typeof window !== 'undefined'
+    ? stabilizedViewportWidth || Math.max(320, window.innerWidth / stabilizedViewportScale)
+    : CARD_W * visibleCards;
+  const beltWidth = bgMetrics ? bgMetrics.width : fallbackBeltWidth;
   // Card width = 1 columna de la pauta amb gutter `PAUTA_GUTTER_X` entre cols.
   //   cardW = (belt2Width - (visibleCards - 1) * gutterX) / visibleCards
   //   stepPx = cardW + gutterX
-  const PAUTA_GUTTER_X = 22.5;
+  const PAUTA_GUTTER_X = stabilizedGutterX ?? 22.5;
   const cardW = Math.max(80, (beltWidth - (visibleCards - 1) * PAUTA_GUTTER_X) / visibleCards);
   const stepPx = cardW + PAUTA_GUTTER_X;
   const viewportWidthPx = useMemo(() => Math.max(0, beltWidth), [beltWidth]);
@@ -245,15 +265,30 @@ export default function TambeRail({
   }, [viewportWidthPx]);
   const cardImgTopPx = 161;
   const cardTextBlockHeightPx = 140;
-  const viewportHeightPx = useMemo(() => cardImgTopPx + Math.round(cardW) + cardTextBlockHeightPx, [cardW]);
+  const renderedCardW = stabilizeInitialLayout ? cardW : Math.round(cardW);
+  const viewportHeightPx = useMemo(() => cardImgTopPx + renderedCardW + cardTextBlockHeightPx, [renderedCardW]);
   const dynamicTileStyle = useMemo(() => ({
-    width: `${Math.round(cardW)}px`,
-    height: `${Math.round(cardW)}px`,
+    width: `${renderedCardW}px`,
+    height: `${renderedCardW}px`,
     backgroundColor: '#f5f5f5',
     position: 'relative',
     boxShadow: 'none',
-  }), [cardW]);
-  const dynamicTextBlockStyle = useMemo(() => ({ width: `${Math.round(cardW)}px` }), [cardW]);
+  }), [renderedCardW]);
+  const dynamicTextBlockStyle = useMemo(() => ({ width: `${renderedCardW}px` }), [renderedCardW]);
+
+  useLayoutEffect(() => {
+    setCarouselAnimate(false);
+    isAnimRef.current = false;
+    pendingRef.current = 0;
+    let nextFrame = 0;
+    const frame = requestAnimationFrame(() => {
+      nextFrame = requestAnimationFrame(() => setCarouselAnimate(true));
+    });
+    return () => {
+      cancelAnimationFrame(frame);
+      cancelAnimationFrame(nextFrame);
+    };
+  }, [visibleCards, beltWidth, PAUTA_GUTTER_X]);
 
   const settleQueuedNav = () => {
     isAnimRef.current = false;
@@ -334,7 +369,7 @@ export default function TambeRail({
   }, [carouselStartIndex, upper]);
 
   return (
-    <div ref={containerRef} data-component="tambe-rail" style={{ position: 'relative', width: '100%' }}>
+    <div ref={containerRef} data-component="tambe-rail" style={{ position: 'relative', width: '100%', visibility: stabilizeInitialLayout && !bgMetrics ? 'hidden' : 'visible' }}>
       <div
         ref={respescaRef}
         className="relative"

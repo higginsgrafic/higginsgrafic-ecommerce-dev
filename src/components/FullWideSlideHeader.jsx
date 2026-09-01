@@ -79,6 +79,7 @@ function FullWideSlideHeader({
   megaConfig,
   showStripe = true,
   showCatalogPanel = true,
+  isPortraitTablet = false,
 }) {
   const location = useLocation();
   const navigate = useNavigate();
@@ -544,6 +545,11 @@ function FullWideSlideHeader({
 
   const [stripeOverlayOverrideActive, setStripeOverlayOverrideActive] = useState(() => Boolean(overlaySrcFromUrl));
   const [mobileOpen, setMobileOpen] = useState(false);
+
+  useEffect(() => {
+    if (isPortraitTablet) setMobileOpen(false);
+  }, [isPortraitTablet]);
+
   const [demoManualEnabled, setDemoManualEnabled] = useState(() => {
     if (typeof manualEnabledOverride === 'boolean') return manualEnabledOverride;
     if (contained) return true;
@@ -2925,10 +2931,11 @@ function FullWideSlideHeader({
 top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right: 0 }
       }
     >
-      <div className="border-b border-border">
+      <div className={isPortraitTablet ? '' : 'border-b border-border'}>
         <div
           className="flex h-16 items-center gap-3 px-4 sm:px-6 lg:h-20 lg:px-10"
           style={{
+            height: isPortraitTablet ? '64px' : undefined,
             // Ancorat exactament a SiteFrame (=belt2) per evitar discrepàncies
             // de centratge causades per scrollbar-gutter, rulerInset i el fet
             // que el `<header>` és `position: fixed` (`right: 0` viewport).
@@ -2937,14 +2944,16 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
           }}
         >
           <div className="flex items-center gap-2">
-            <button
-              type="button"
-              className="inline-flex h-10 w-10 items-center justify-center rounded-full text-foreground hover:bg-muted lg:hidden"
-              aria-label={mobileOpen ? 'Tancar menú' : 'Obrir menú'}
-              onClick={() => setMobileOpen((v) => !v)}
-            >
-              {mobileOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-            </button>
+            {!isPortraitTablet && (
+              <button
+                type="button"
+                className="inline-flex h-10 w-10 items-center justify-center rounded-full text-foreground hover:bg-muted lg:hidden"
+                aria-label={mobileOpen ? 'Tancar menú' : 'Obrir menú'}
+                onClick={() => setMobileOpen((v) => !v)}
+              >
+                {mobileOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+              </button>
+            )}
 
             <Link id="stripe-guide-header-logo-anchor" to="/" aria-label="Higgins GRÀFIC - Pàgina d'inici" className="relative z-10 pointer-events-auto flex items-center gap-2 font-black tracking-tight text-foreground">
               <span
@@ -2968,7 +2977,7 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
             </Link>
           </div>
 
-          <nav className="hidden lg:flex flex-1 items-center justify-center gap-6">
+          <nav className="hidden lg:flex flex-1 items-center justify-center gap-6" style={isPortraitTablet ? { display: 'none' } : undefined}>
             {resolvedNav.map((item) => {
               // L'indicador d'obert (fletxa rotada + color) només s'ha
               // d'activar quan realment veiem la col·lecció (megaPage=1).
@@ -3139,6 +3148,41 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
             </div>
           </div>
         </div>
+        {isPortraitTablet && (
+          <nav
+            className="flex h-10 items-center justify-center gap-[18px] border-t border-border px-4"
+            style={{
+              width: 'var(--site-w, 100%)',
+              marginLeft: 'calc(var(--site-xL, 0px) - var(--rulerInset, 0px))',
+            }}
+          >
+            {resolvedNav.map((item) => {
+              const open = active === item.id && megaPage === 1;
+              return (
+                <button
+                  key={item.id}
+                  type="button"
+                  className={`inline-flex items-center gap-1 whitespace-nowrap text-[10px] font-semibold tracking-[0.08em] uppercase ${open ? 'text-foreground' : 'text-muted-foreground hover:text-foreground'}`}
+                  aria-expanded={open ? 'true' : 'false'}
+                  onClick={() => {
+                    setManualOverrideClosed(false);
+                    setMegaFullScreen(false);
+                    if (open) {
+                      setActive(null);
+                    } else {
+                      setMegaPage(1);
+                      setActive(item.id);
+                      touchMegaPublicActivity();
+                    }
+                  }}
+                >
+                  {item.label}
+                  <ChevronDown className={`h-3 w-3 transition-transform ${open ? 'rotate-180' : ''}`} />
+                </button>
+              );
+            })}
+          </nav>
+        )}
       </div>
 
       {canUseDom && (!contained || portalContainer) &&
@@ -3248,6 +3292,7 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
         adminEmail={adminEmail}
         acordioExpandedPage4={acordioExpandedPage4}
         setAcordioExpandedPage4={setAcordioExpandedPage4}
+        isPortraitTablet={isPortraitTablet}
       />
 
       {canUseDom && showRegisterOverlay &&
@@ -3256,7 +3301,7 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
           document.body
         )}
 
-      {mobileOpen ? (
+      {mobileOpen && !isPortraitTablet ? (
         <div className="lg:hidden border-b border-border bg-background">
           <div className="px-4 py-4 grid gap-2">
             {resolvedNav.map((item) => (

@@ -40,6 +40,17 @@ function App() {
     });
   }, [location, startTransition]);
   const [isLargeScreen, setIsLargeScreen] = useState(window.innerWidth >= 1024);
+  const [isPortraitTablet, setIsPortraitTablet] = useState(
+    window.innerWidth >= 768 && window.innerWidth <= 1024 && window.innerHeight > window.innerWidth
+  );
+
+  useEffect(() => {
+    const update = () => setIsPortraitTablet(
+      window.innerWidth >= 768 && window.innerWidth <= 1024 && window.innerHeight > window.innerWidth
+    );
+    window.addEventListener('resize', update);
+    return () => window.removeEventListener('resize', update);
+  }, []);
 
   const fullWideSlideConfig = componentCatalogConfig?.components?.fullWideSlide;
   const fullWideMegaMenuConfig = fullWideSlideConfig?.megaMenu;
@@ -134,7 +145,7 @@ function App() {
 
   const offersHeaderVisible = !isAdminRoute && !isFullScreenRoute && !isDevLayoutRoute && !isHomeRoute && offersEnabled && !offersLoading;
 
-  const baseHeaderHeight = isLargeScreen ? 80 : 64;
+  const baseHeaderHeight = isPortraitTablet ? 104 : (isLargeScreen ? 80 : 64);
   const heroSettingsDevHeaderHeight = isDevHeaderRoute ? baseHeaderHeight : 0;
   const offersHeaderHeight = offersHeaderVisible ? 40 : 0;
   const adminBannerVisible = (isAdmin || isDevDemoRoute || isAdminRoute) && !isEmbeddedPreview;
@@ -206,6 +217,7 @@ function App() {
             megaConfig={resolvedFullWideMegaConfig}
             showStripe={fullWideShowStripe}
             showCatalogPanel={fullWideShowCatalogPanel}
+            isPortraitTablet={isPortraitTablet}
           />
       )}
 
