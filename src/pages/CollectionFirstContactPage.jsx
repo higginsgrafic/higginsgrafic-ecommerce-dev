@@ -147,6 +147,12 @@ function CollectionFirstContactPage() {
   const [overlayState, setOverlayState] = useState(loadOverlayState);
   const [zeroLeftOffsetPx, setZeroLeftOffsetPx] = useState(0);
   const [rowHeight, setRowHeight] = useState(38);
+  const [isLandscapeTablet, setIsLandscapeTablet] = useState(
+    typeof window !== 'undefined'
+      && window.innerWidth >= 1024
+      && window.innerWidth <= 1366
+      && window.innerHeight < window.innerWidth
+  );
   const pautaGridRef = useRef(null);
   const sizes = ['S', 'M', 'L', 'XL', 'XXL'];
   const { pautaOpacity, tableOpacity, backgroundOpacity } = overlayState;
@@ -165,6 +171,11 @@ function CollectionFirstContactPage() {
     let raf = 0;
     const measure = () => {
       if (cancelled) return;
+      setIsLandscapeTablet(
+        window.innerWidth >= 1024
+          && window.innerWidth <= 1366
+          && window.innerHeight < window.innerWidth
+      );
       const logo = document.querySelector('[data-brand-logo="1"]');
       const grid = document.querySelector('[data-pauta-grid]');
       if (!logo || !grid) {
@@ -393,6 +404,14 @@ function CollectionFirstContactPage() {
             const col = colIdx + 1;
             const rowOffset = 10 + rowIdx * 20;
             const productName = productAt(rowIdx, colIdx).name;
+            const liftCols = isLandscapeTablet && (colIdx === 0 || colIdx === 2);
+            const liftOffset = liftCols ? ' - 30px' : '';
+            const productNameLiftOffset = liftCols ? ' - 40px' : '';
+            const lowerCols = isLandscapeTablet && (colIdx === 1 || colIdx === 3);
+            const lowerOffset = lowerCols ? ' + 15px' : '';
+            const imageLowerOffset = lowerCols ? ' - 30px' : '';
+            const descriptionExtraOffset = isLandscapeTablet ? ' + 5px' : '';
+            const globalLiftOffset = isLandscapeTablet ? ' + 10px' : '';
             return (
               <CollectionTdpCard
                 key={`tdp-card-r${rowIdx}-c${colIdx}`}
@@ -417,6 +436,9 @@ function CollectionFirstContactPage() {
                 collectionHref={`${productHref(rowIdx, colIdx)}?color=${color}&finish=${gridFinishFor('first-contact', color, rowIdx * 4 + colIdx)}`}
                 productNamePlain
                 editable={false}
+                imageTranslateY={liftCols ? `calc(9px + 1lh${liftOffset}${globalLiftOffset})` : (lowerCols ? `calc(9px + 1lh + 159px${imageLowerOffset}${globalLiftOffset})` : (isLandscapeTablet ? `calc(9px + 1lh${globalLiftOffset})` : undefined))}
+                productNameTranslateY={liftCols ? `calc(1lh${productNameLiftOffset}${globalLiftOffset})` : (lowerCols ? `calc(1lh - 325px${globalLiftOffset})` : (isLandscapeTablet ? `calc(1lh${globalLiftOffset})` : undefined))}
+                descriptionTranslateY={liftCols ? `calc(2lh - 1px${liftOffset}${descriptionExtraOffset}${globalLiftOffset})` : (lowerCols ? `calc(2lh - 1px - 325px${lowerOffset}${descriptionExtraOffset}${globalLiftOffset})` : (isLandscapeTablet ? `calc(2lh - 1px${descriptionExtraOffset}${globalLiftOffset})` : undefined))}
               />
             );
           })
