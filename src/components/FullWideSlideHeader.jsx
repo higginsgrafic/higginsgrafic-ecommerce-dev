@@ -3292,6 +3292,7 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
         adminEmail={adminEmail}
         acordioExpandedPage4={acordioExpandedPage4}
         setAcordioExpandedPage4={setAcordioExpandedPage4}
+        isPortraitTablet={isPortraitTablet}
       />
 
       {canUseDom && showRegisterOverlay &&
