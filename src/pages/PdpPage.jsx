@@ -125,13 +125,26 @@ function PdpPage() {
   const pautaGridRef = useRef(null);
   const [rowHeight, setRowHeight] = useState(38);
   const [exactRowHeight, setExactRowHeight] = useState(38);
+  const [breadcrumbOffsetX, setBreadcrumbOffsetX] = useState(0);
+  const [isLayoutReady, setIsLayoutReady] = useState(true);
+  const [isPortraitTablet, setIsPortraitTablet] = useState(
+    typeof window !== 'undefined'
+      && window.innerWidth >= 768
+      && window.innerWidth <= 1024
+      && window.innerHeight > window.innerWidth
+  );
 
   useLayoutEffect(() => {
     if (typeof window === 'undefined') return undefined;
     const measure = () => {
+      const portraitTablet = window.innerWidth >= 768
+        && window.innerWidth <= 1024
+        && window.innerHeight > window.innerWidth;
+      setIsPortraitTablet(portraitTablet);
       const gridEl = pautaGridRef.current;
       if (!gridEl) return;
       const rect = gridEl.getBoundingClientRect();
+      setBreadcrumbOffsetX(portraitTablet ? (16 - rect.left) / 0.846 : 0);
       const numRows = 38;
       const singleRowH = rect.height / numRows;
       setRowHeight((prev) => (Math.abs(prev - singleRowH) < 0.1 ? prev : singleRowH));
@@ -141,12 +154,26 @@ function PdpPage() {
       setExactRowHeight((prev) => (Math.abs(prev - exactRowH) < 0.1 ? prev : exactRowH));
     };
 
+    let settleTimer = 0;
+    let settleFrame = 0;
+    const handleResize = () => {
+      setIsLayoutReady(false);
+      measure();
+      clearTimeout(settleTimer);
+      settleTimer = window.setTimeout(() => {
+        measure();
+        settleFrame = requestAnimationFrame(() => setIsLayoutReady(true));
+      }, 120);
+    };
+
     measure();
-    window.addEventListener('resize', measure);
+    window.addEventListener('resize', handleResize);
     const t = setTimeout(measure, 100);
     return () => {
-      window.removeEventListener('resize', measure);
+      window.removeEventListener('resize', handleResize);
       clearTimeout(t);
+      clearTimeout(settleTimer);
+      cancelAnimationFrame(settleFrame);
     };
   }, []);
 
@@ -164,8 +191,32 @@ function PdpPage() {
     }
   }, [location.search]);
 
+  const portraitDesktopPdpStyle = isPortraitTablet
+    ? {
+        '--pdp-landscape-belt': 'min(1350px, calc(100vh - 32px))',
+        width: 'var(--pdp-landscape-belt)',
+        '--hg-tdp-xL': '0px',
+        '--hg-tdp-xR': 'var(--pdp-landscape-belt)',
+      }
+    : {};
+  const portraitLandscapeBelt = isPortraitTablet && typeof window !== 'undefined'
+    ? Math.min(1350, Math.max(320, window.innerHeight - 32))
+    : null;
+  const portraitHorizontalCardWidth = portraitLandscapeBelt
+    ? Math.round((portraitLandscapeBelt - 67.5) / 4) * (0.94 / 0.846)
+    : null;
+  const portraitRailMaxWidth = portraitHorizontalCardWidth && typeof window !== 'undefined'
+    ? (window.innerWidth - 32) / 0.846
+    : null;
+  const portraitRailGutterX = portraitHorizontalCardWidth && portraitRailMaxWidth
+    ? Math.min(22.5, Math.max(0, (portraitRailMaxWidth - portraitHorizontalCardWidth * 3) / 2))
+    : null;
+  const portraitRailViewportWidth = portraitHorizontalCardWidth && portraitRailGutterX != null
+    ? portraitHorizontalCardWidth * 3 + portraitRailGutterX * 2
+    : null;
+
   return (
-    <section className="bg-background" style={{ transform: 'scale(0.94)', transformOrigin: 'center top', marginTop: '250px', marginBottom: '300px' }}>
+    <section className="bg-background" style={{ transform: `scale(${isPortraitTablet ? 0.846 : 0.94})`, transformOrigin: 'center top', marginTop: '250px', marginBottom: '300px', visibility: isLayoutReady ? 'visible' : 'hidden' }}>
       <Helmet>
         <title>{`${PRODUCT_NAME} · ${COLLECTION_NAME} | Higgins Gràfic`}</title>
         <meta
@@ -176,17 +227,20 @@ function PdpPage() {
       <SEOProductSchema product={{ name: PRODUCT_NAME, description: `${PRODUCT_NAME} — ${COLLECTION_NAME}`, image: TDP_IMAGE(product.colors?.[0], DEFAULT_FINISH), slug: PRODUCT_SLUG, collection: COLLECTION_SLUG }} url={`/${PRODUCT_ROUTE}`} />
 
       <Pauta4ColsOverlay
+        key={isPortraitTablet ? 'portrait-tablet' : 'landscape'}
         numRows={40}
         canvasAspect={[2642, 2981]}
         pautaEnabled={false}
         tableEnabled={false}
         topOffset="0px"
         bottomPadding="0px"
+        leftOffset={isPortraitTablet ? 'calc(-1 * (((var(--pdp-landscape-belt) - 67.5px) / 4 + 22.5px) / 2))' : '0px'}
         innerRef={pautaGridRef}
         style={{
           zIndex: 5,
           position: 'relative',
           marginBottom: 'calc(-2 * (var(--hg-tdp-xR) - var(--hg-tdp-xL)) * 2981 / 2642 / 40 - 23px)',
+          ...portraitDesktopPdpStyle,
         }}
       >
         {/* ─── Breadcrumbs (col 1, fila 1) ─── */}
@@ -200,7 +254,9 @@ function PdpPage() {
             justifySelf: 'start',
             padding: 0,
             margin: 0,
-            transform: 'translateY(calc(-10px - 250px / 0.94))',
+            transform: isPortraitTablet
+              ? `translate(${breadcrumbOffsetX}px, calc(-10px - 250px / 0.94 - 47.2814px))`
+              : 'translateY(calc(-10px - 250px / 0.94))',
             pointerEvents: 'auto',
             zIndex: 10,
           }}
@@ -223,7 +279,9 @@ function PdpPage() {
             justifySelf: 'center',
             padding: 0,
             margin: 0,
-            transform: 'translateY(calc(-125px / 0.94 + 35px))',
+            transform: isPortraitTablet
+              ? 'translateY(calc(-125px / 0.94 + 35px - 47.2814px))'
+              : 'translateY(calc(-125px / 0.94 + 35px))',
             width: '100%',
             pointerEvents: 'auto',
           }}
@@ -232,7 +290,11 @@ function PdpPage() {
             images={otherImages}
             showTitle={false}
             showInternalArrows={false}
-            visibleCards={4}
+            visibleCards={isPortraitTablet ? 3 : 4}
+            stabilizeInitialLayout={isPortraitTablet}
+            stabilizedViewportScale={isPortraitTablet ? 0.846 : 1}
+            stabilizedViewportWidth={portraitRailViewportWidth}
+            stabilizedGutterX={portraitRailGutterX}
           />
         </div>
 
@@ -260,7 +322,7 @@ function PdpPage() {
         <EditableTextBox
           id={`${PRODUCT_SLUG}-pdp-product-description`}
           initialText={PRODUCT_DESCRIPTION}
-          initialSettings={PDP_DESCRIPTION_SETTINGS}
+          initialSettings={{ ...PDP_DESCRIPTION_SETTINGS, lineHeight: isPortraitTablet ? 1.25 : PDP_DESCRIPTION_SETTINGS.lineHeight }}
           presetVersion={PDP_PRESET_VERSION}
           multiline
           renderHandle={false}
@@ -594,6 +656,7 @@ function PdpPage() {
             gridRow: '6 / 7',
             margin: 0,
             minHeight: 0,
+            display: isPortraitTablet ? 'none' : 'block',
             alignSelf: 'end',
             fontFamily: 'Oswald, sans-serif',
             fontWeight: 300,
@@ -615,7 +678,7 @@ function PdpPage() {
               gridRow: `${row} / ${row + 1}`,
               margin: 0,
               minHeight: 0,
-              display: 'flex',
+              display: isPortraitTablet ? 'none' : 'flex',
               flexDirection: 'column',
               alignItems: 'flex-end',
               justifyContent: 'center',
