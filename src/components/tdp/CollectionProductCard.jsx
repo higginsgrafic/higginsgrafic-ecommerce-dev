@@ -83,8 +83,9 @@ function CollectionProductCard({
         sizeButtonsAlignSelf="center"
         editableIdPrefix={editableIdPrefix}
         presetVersion={presetVersion}
-        descriptionFontSize={12}
-        descriptionTranslateY={descriptionTranslateY}
+        descriptionFontSize="12pt"
+        descriptionLineHeight={1.3}
+        descriptionTranslateY={descriptionTranslateY ? `calc(${descriptionTranslateY} + 10px)` : '10px'}
       />
     </>
   );

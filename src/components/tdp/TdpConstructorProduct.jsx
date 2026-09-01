@@ -117,6 +117,7 @@ function TdpConstructorProduct({
   copyMode = false,
   variant = 'v3',
   descriptionFontSize,
+  descriptionLineHeight,
   imageGridRow,
   imageTranslateY = '0px',
   productNameGridRow,
@@ -412,14 +413,14 @@ function TdpConstructorProduct({
           initialSettings={{
             ...TDP_PRODUCT_DESCRIPTION_SETTINGS,
             y: presetVersion === 'tdp-home-v4-clean' ? 0 : TDP_PRODUCT_DESCRIPTION_SETTINGS.y,
-            lineHeight: presetVersion === 'tdp-home-v4-clean' ? 1.5 : TDP_PRODUCT_DESCRIPTION_SETTINGS.lineHeight,
+            lineHeight: descriptionLineHeight ?? (presetVersion === 'tdp-home-v4-clean' ? 1.5 : TDP_PRODUCT_DESCRIPTION_SETTINGS.lineHeight),
             fontSize: descriptionFontSize ?? TDP_PRODUCT_DESCRIPTION_SETTINGS.fontSize,
           }}
           presetVersion={presetVersion}
           multiline
           renderHandle={!copyMode}
           handleRight="-18px"
-          style={{ gridColumn, gridRow: descriptionGridRow ?? (variant === 'v4' ? `${3 + rowOffset} / ${8 + rowOffset}` : `${13 + rowOffset} / ${18 + rowOffset}`), zIndex: 5, width: '100%', height: descriptionHeight ?? '100%', transform: descriptionTranslateY ? `translateY(calc(${descriptionTranslateY} + ${variant === 'v4' ? '2px' : '0px'}))` : (variant === 'v4' ? 'translateY(-17px)' : undefined) }}
+          style={{ gridColumn, gridRow: descriptionGridRow ?? (variant === 'v4' ? `${3 + rowOffset} / ${8 + rowOffset}` : `${13 + rowOffset} / ${18 + rowOffset}`), zIndex: 5, width: 'calc(100% - 96px)', height: descriptionHeight ?? '100%', marginLeft: '48px', marginRight: '48px', transform: descriptionTranslateY ? `translateY(calc(${descriptionTranslateY} + ${variant === 'v4' ? '2px' : '0px'}))` : (variant === 'v4' ? 'translateY(-17px)' : undefined) }}
         />
       ) : (
         <div
@@ -427,19 +428,21 @@ function TdpConstructorProduct({
             gridColumn,
             gridRow: descriptionGridRow ?? `${13 + rowOffset} / ${18 + rowOffset}`,
             zIndex: 5,
-            width: '100%',
+            width: 'calc(100% - 96px)',
             height: descriptionHeight ?? '100%',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'flex-start',
             overflow: 'hidden',
             transform: descriptionTranslateY ? `translateY(${descriptionTranslateY})` : undefined,
+            marginLeft: '48px',
+            marginRight: '48px',
             color: TDP_PRODUCT_DESCRIPTION_SETTINGS.color,
             fontFamily: `${TDP_PRODUCT_DESCRIPTION_SETTINGS.fontFamily}, sans-serif`,
             fontSize: descriptionFontSize ?? TDP_PRODUCT_DESCRIPTION_SETTINGS.fontSize,
             fontWeight: TDP_PRODUCT_DESCRIPTION_SETTINGS.fontWeight,
             letterSpacing: `${TDP_PRODUCT_DESCRIPTION_SETTINGS.letterSpacing}em`,
-            lineHeight: TDP_PRODUCT_DESCRIPTION_SETTINGS.lineHeight,
+            lineHeight: descriptionLineHeight ?? TDP_PRODUCT_DESCRIPTION_SETTINGS.lineHeight,
             textAlign: TDP_PRODUCT_DESCRIPTION_SETTINGS.textAlign,
             textTransform: TDP_PRODUCT_DESCRIPTION_SETTINGS.textTransform,
             whiteSpace: 'pre-wrap',

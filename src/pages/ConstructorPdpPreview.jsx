@@ -73,10 +73,7 @@ const PDP_SPEC_VALUE_SETTINGS = {
 const TDP_IMAGE = (color) =>
   `/placeholders/apparel/t-shirt/gildan_5000/gildan-5000_t-shirt_crewneck_unisex_heavyWeight_xl_${color}_gpr-4-0_front.png`;
 
-const PRODUCT_DESCRIPTION = [
-  "Mereixedors són d'honor, glòria e de fama e contínua bona memòria los",
-  'hòmens virtuosos, e singularment aquells qui per la república lluitaren.',
-].join(' ');
+const PRODUCT_DESCRIPTION = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna";
 
 // 14 colors oficials Gildan 64000 en l'ordre de la stripe (MegaStripe).
 const OFFICIAL_COLORS = [

@@ -46,10 +46,7 @@ const PDP_SIZE_SETTINGS = {
   color: '#475059', textTransform: 'none',
 };
 
-const PRODUCT_DESCRIPTION = [
-  "Mereixedors són d'honor, glòria e de fama e contínua bona memòria los",
-  'hòmens virtuosos, e singularment aquells qui per la república lluitaren.',
-].join(' ');
+const PRODUCT_DESCRIPTION = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna";
 
 const OFFICIAL_COLORS = [
   'white', 'light-blue', 'royal', 'navy', 'purple', 'light-pink', 'daisy',

@@ -13,10 +13,7 @@ const PAUTA_ROWS_TEMPLATE = `minmax(${PAUTA_FIRST_ROW_EXTRA_PX}px, ${PAUTA_FIRST
 const PAUTA_COLUMNS_TEMPLATE = 'repeat(3, minmax(0, calc((100% - 45px) / 3)))';
 const TDP_PAGE_TOP_OFFSET = '33px';
 const TDP_PAGE_LEFT_OFFSET = '0px';
-const tdpEditableDescription = [
-  "Mereixedors són d'honor, glòria e de fama e contínua bona memòria los ",
-  'hòmens virtuosos, e singularment aquells qui per la república lluitaren.',
-].join('\n');
+const tdpEditableDescription = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna";
 
 if (typeof window !== 'undefined' && typeof document !== 'undefined') {
   try {
