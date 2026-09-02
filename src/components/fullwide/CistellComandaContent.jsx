@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { ChevronDown, ChevronUp, ArrowLeft, X, Trash2, Plus } from 'lucide-react';
 import { useShippingCosts } from '@/hooks/useShippingCosts';
@@ -118,6 +119,54 @@ function CistellComandaContent({ cartItems, setCartItems, onCloseMegaSlide, onFi
   const { zoneInfo } = useShippingCosts('es_peninsula');
 
   const isEmpty = CART_ITEMS.length === 0;
+
+  const [isTablet, setIsTablet] = useState(
+    typeof window !== 'undefined'
+      && window.innerWidth >= 768
+      && window.innerWidth <= 1366
+  );
+  const [isPortraitTablet, setIsPortraitTablet] = useState(
+    typeof window !== 'undefined'
+      && window.innerWidth >= 768
+      && window.innerWidth <= 1366
+      && window.innerHeight > window.innerWidth
+  );
+  const [isLandscapeTablet, setIsLandscapeTablet] = useState(
+    typeof window !== 'undefined'
+      && window.innerWidth >= 768
+      && window.innerWidth <= 1366
+      && window.innerWidth >= window.innerHeight
+  );
+  const finalizeBtnRef = useRef(null);
+  const [overlayTop, setOverlayTop] = useState(null);
+  const [overlayLeft, setOverlayLeft] = useState(null);
+  useEffect(() => {
+    const onResize = () => {
+      const w = window.innerWidth;
+      const h = window.innerHeight;
+      setIsTablet(w >= 768 && w <= 1366);
+      setIsPortraitTablet(w >= 768 && w <= 1366 && h > w);
+      setIsLandscapeTablet(w >= 768 && w <= 1366 && w >= h);
+    };
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, []);
+  useEffect(() => {
+    if (!isTablet || isEmpty) return;
+    let raf = 0;
+    const measure = () => {
+      const btn = finalizeBtnRef.current;
+      if (!btn) return;
+      const r = btn.getBoundingClientRect();
+      const nextY = Math.round(r.top + r.height / 2);
+      const nextX = Math.round(r.left + r.width / 2);
+      setOverlayTop((prev) => (prev === nextY ? prev : nextY));
+      setOverlayLeft((prev) => (prev === nextX ? prev : nextX));
+      raf = requestAnimationFrame(measure);
+    };
+    raf = requestAnimationFrame(measure);
+    return () => cancelAnimationFrame(raf);
+  }, [isTablet, isEmpty, CART_ITEMS.length]);
 
   return (
     <>
@@ -420,7 +469,7 @@ function CistellComandaContent({ cartItems, setCartItems, onCloseMegaSlide, onFi
       })()}
 
       {/* Totals — SUBTOTAL / TRANSPORT / IVA / TOTAL, just a sobre de la botonera */}
-      {(() => {
+      {!isTablet && (() => {
         const totalQty = CART_ITEMS.reduce((acc, it) => acc + (it.qty || 1), 0);
         const itemTotal = CART_ITEMS.reduce((acc, it) => {
           const unit = parseFloat(String(it.price).replace('€','').replace(/\s/g,'').replace(',','.'));
@@ -528,18 +577,100 @@ function CistellComandaContent({ cartItems, setCartItems, onCloseMegaSlide, onFi
       {/* Botonera central (REVERTEIX / CANCEL·LA / DESA) — alineada amb l'última fila de la taula */}
       <div style={{
         position: 'absolute',
-        bottom: '3px',
+        bottom: '8px',
         left: '50%',
-        transform: 'translate(-50%, 2px)',
+        transform: 'translate(-50%, 0px)',
         width: `${TABLE_WIDTH}px`,
         display: 'grid',
+        visibility: isTablet ? 'hidden' : 'visible',
         gridTemplateColumns: 'repeat(4, 1fr)',
         columnGap: `${GUTTER}px`,
         zIndex: 4,
       }}>
+        {isTablet && !isEmpty && (() => {
+          const itemTotal = CART_ITEMS.reduce((acc, it) => {
+            const unit = parseFloat(String(it.price).replace('€','').replace(/\s/g,'').replace(',','.'));
+            if (Number.isNaN(unit)) return acc;
+            return acc + unit * (it.qty || 1);
+          }, 0);
+          const fmt = (n) => n.toFixed(2).replace('.', ',') + '€';
+          const renderOverlay = (orientation) => {
+            const isPortrait = orientation === 'portrait';
+            return createPortal((
+              <div style={{
+                position: 'fixed',
+                top: overlayTop != null ? `${overlayTop}px` : '50%',
+                left: overlayLeft != null ? `${overlayLeft - (isPortrait ? 160 : 0)}px` : '50vw',
+                transform: 'translate(-50%, -50%)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '12px',
+                padding: '6px 16px',
+                backgroundColor: 'rgba(244, 246, 248, 0.95)',
+                borderRadius: '6px',
+                boxShadow: '0 2px 12px rgba(0,0,0,0.15)',
+                zIndex: 100000,
+                pointerEvents: 'auto',
+                whiteSpace: 'nowrap',
+              }}>
+                <span style={{
+                  fontFamily: 'Oswald, sans-serif',
+                  fontWeight: 300,
+                  fontSize: '11pt',
+                  color: '#475059',
+                  letterSpacing: '0.04em',
+                  textTransform: 'uppercase',
+                  whiteSpace: 'nowrap',
+                }}>
+                  Tot plegat fa
+                </span>
+                <span style={{
+                  fontFamily: 'Oswald, sans-serif',
+                  fontWeight: 500,
+                  fontSize: '13pt',
+                  color: '#111827',
+                  whiteSpace: 'nowrap',
+                }}>
+                  {fmt(itemTotal)}
+                </span>
+                <button
+                  onClick={isOnCheckoutRoute
+                    ? () => { if (typeof onCloseMegaSlide === 'function') onCloseMegaSlide(); }
+                    : handleFinalizeOrder}
+                  aria-label={isOnCheckoutRoute ? 'Torna al checkout' : 'Finalitza la comanda'}
+                  style={{
+                    fontFamily: 'Oswald, sans-serif',
+                    fontWeight: 500,
+                    fontSize: '11pt',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.4px',
+                    color: '#F4F6F8',
+                    backgroundColor: '#474F59',
+                    border: 'none',
+                    borderRadius: '3px',
+                    cursor: 'pointer',
+                    padding: '6px 16px',
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  {isOnCheckoutRoute
+                    ? <ArrowLeft size={14} strokeWidth={1.75} aria-hidden="true" />
+                    : 'FINALITZA LA COMANDA'}
+                </button>
+              </div>
+            ), document.body);
+          };
+          return (
+            <>
+              {isPortraitTablet && renderOverlay('portrait')}
+              {isLandscapeTablet && renderOverlay('landscape')}
+            </>
+          );
+        })()}
         <div style={{
           gridColumn: '2 / span 2',
-          height: `${2 * ROW_H - V_GUTTER - 5}px`,
+          height: `${2 * ROW_H - V_GUTTER - 10}px`,
           display: 'grid',
           gridTemplateColumns: '1fr',
           gap: `${GUTTER}px`,
@@ -547,6 +678,7 @@ function CistellComandaContent({ cartItems, setCartItems, onCloseMegaSlide, onFi
         }}>
           <button
             id="stripe-guide-finalize-order"
+            ref={finalizeBtnRef}
             onClick={isOnCheckoutRoute
               ? () => { if (typeof onCloseMegaSlide === 'function') onCloseMegaSlide(); }
               : handleFinalizeOrder}

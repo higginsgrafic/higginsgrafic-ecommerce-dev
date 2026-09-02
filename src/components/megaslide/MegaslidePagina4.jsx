@@ -323,19 +323,7 @@ export default function MegaslidePagina4({
   const enviatsMessages = mockMessages.filter(m => m.type === 'enviats');
 
   return (
-    <div style={{ width: '25%', flexShrink: 0, display: 'block', height: '100%', position: 'relative', overflow: isPortraitTablet ? 'hidden' : 'visible' }}>
-      {isPortraitTablet && (
-        <div aria-hidden="true" style={{
-          position: 'absolute',
-          top: 0,
-          bottom: '8px',
-          left: '8px',
-          right: '8px',
-          boxShadow: '0 0 0 9999px #ffffff',
-          pointerEvents: 'none',
-          zIndex: 20,
-        }} />
-      )}
+    <div style={{ width: '25%', flexShrink: 0, display: 'block', height: '100%', position: 'relative', overflow: isPortraitTablet ? 'hidden' : 'visible', boxShadow: isPortraitTablet ? 'inset 8px 0 0 #ffffff, inset -8px 0 0 #ffffff' : undefined }}>
       <div data-mega-page-viewport="4" style={{
         width: '100%',
         height: '100%',
@@ -892,7 +880,7 @@ export default function MegaslidePagina4({
                 )}
                 <div style={{ flex: 1 }} />
                 {/* Desa button — same size and Y position as bloc 2 buttons */}
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '4px', height: '9%', flexShrink: 0, position: 'relative', top: isLandscapeTablet ? '0px' : '7px', marginRight: '-9px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '4px', height: '9%', flexShrink: 0, position: 'relative', top: isLandscapeTablet ? '0px' : (isPortraitTablet ? '-3px' : '7px'), marginRight: '-9px' }}>
                   <div />
                   <button
                     onClick={handleSignOut}

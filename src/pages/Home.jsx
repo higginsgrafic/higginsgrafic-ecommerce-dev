@@ -186,8 +186,8 @@ function HomeTdpCard({ Component, slug, index, cardPropsFn, collectionHref, edit
   const [size, setSize] = useState('M');
   const portraitAdjustment = portraitTablet
     ? Component === TDP2
-      ? { imageTranslateY: 'calc(-34.6383px + calc(calc(var(--hg-tdp-xR) - var(--hg-tdp-xL)) * 0.01410547))' }
-      : { descriptionTranslateY: 'calc(-25px - 10% + 10.6383px)' }
+      ? { imageTranslateY: 'calc(-44px + calc(calc(var(--hg-tdp-xR) - var(--hg-tdp-xL)) * 0.01410547))', descriptionLineHeight: 1.2 }
+      : { descriptionTranslateY: 'calc(-5px - 10%)', descriptionLineHeight: 1.2 }
     : {};
   return (
     <Component
@@ -290,11 +290,11 @@ function Home() {
 
   const portraitTabletTdpGridStyle = isPortraitTablet
     ? {
-        width: '653.833333px',
-        height: '608.54944px',
-        gridTemplateColumns: 'repeat(2, minmax(0, 315.666667px))',
+        width: '720.5px',
+        height: '752px',
+        gridTemplateColumns: 'repeat(2, minmax(0, 349px))',
         '--hg-tdp-xL': '16px',
-        '--hg-tdp-xR': '1008px',
+        '--hg-tdp-xR': '1178px',
       }
     : {};
 
@@ -889,7 +889,7 @@ function Home() {
           </div>
 
           {/* Bloc Copiat des de /pdp (fila 20 a 62) posicionat a la fila global 215 en endavant (Mogut 19 files amunt i 20px més amunt) */}
-          <div style={{ marginTop: '-552px' }}>
+          <div style={{ marginTop: isPortraitTablet ? '-309px' : '-552px' }}>
             <Pauta4ColsOverlay
               pautaEnabled={false}
               tableEnabled={false}
@@ -914,9 +914,10 @@ function Home() {
                   pointerEvents: 'auto',
                 }}
               >
-                <StoryPosterLink />
+                <StoryPosterLink style={isPortraitTablet ? { fontSize: '54pt' } : undefined} />
               </div>
             </Pauta4ColsOverlay>
+            {isPortraitTablet && <div style={{ height: '97px' }} />}
           </div>
         </div>
       </section>

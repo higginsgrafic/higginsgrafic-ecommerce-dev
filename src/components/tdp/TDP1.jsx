@@ -90,7 +90,7 @@ function TDP1({
         productNameGridRow="2 / 3"
         productNameTranslateY="calc(50% - 9px)"
         descriptionGridRow="4 / 9"
-        descriptionTranslateY="calc(-25px - 10%)"
+        descriptionTranslateY="calc(-5px - 10%)"
         priceTranslateY="calc(-50% - 8px)"
         sizeButtonsMarginTop="calc(-1 * 3px - 9.5px)"
         imageWidth="100%"

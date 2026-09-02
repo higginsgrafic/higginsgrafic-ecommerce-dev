@@ -176,7 +176,7 @@ const Footer = () => {
         <div ref={mobileContainerRef} className="max-w-7xl mx-auto px-4 py-12 min-h-[100px]">
           {/* Imatges de col·leccions en grid de 3 columnes */}
           <motion.div
-            className="grid grid-cols-3 gap-6 max-w-md mx-auto"
+            className="grid grid-cols-3 md:grid-cols-5 gap-6 md:max-w-2xl max-w-md mx-auto"
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, ease: "easeOut" }}
@@ -188,22 +188,22 @@ const Footer = () => {
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.3, delay: index * 0.05, ease: "easeOut" }}
-                className="flex items-center justify-center"
+                className="flex items-center justify-center h-20"
               >
                 <Link
                   to={collection.path}
                   className="flex items-center justify-center transition-transform group w-20 hover:scale-110 active:scale-95"
                   title={collection.name}
                   style={{
-                    alignSelf: collection.id === 'first-contact' ? 'flex-start' : 'center',
-                    marginTop: collection.id === 'first-contact' ? '20px' : '0'
+                    alignSelf: 'center',
+                    marginTop: '0'
                   }}
                 >
                   <img
                       src={collection.icon}
                       alt={collection.name}
                       data-collection-id={collection.id}
-                      className="w-full h-auto object-contain block transition-transform duration-300 group-hover:scale-110"
+                      className="w-full max-h-20 h-auto object-contain block transition-transform duration-300 group-hover:scale-110"
                       style={{
                         opacity: 1
                       }}
