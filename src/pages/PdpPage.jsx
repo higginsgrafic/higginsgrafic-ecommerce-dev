@@ -133,6 +133,12 @@ function PdpPage() {
       && window.innerWidth <= 1024
       && window.innerHeight > window.innerWidth
   );
+  const [isLandscapeTablet, setIsLandscapeTablet] = useState(
+    typeof window !== 'undefined'
+      && window.innerWidth >= 1024
+      && window.innerWidth <= 1366
+      && window.innerHeight < window.innerWidth
+  );
 
   useLayoutEffect(() => {
     if (typeof window === 'undefined') return undefined;
@@ -141,6 +147,11 @@ function PdpPage() {
         && window.innerWidth <= 1024
         && window.innerHeight > window.innerWidth;
       setIsPortraitTablet(portraitTablet);
+      setIsLandscapeTablet(
+        window.innerWidth >= 1024
+          && window.innerWidth <= 1366
+          && window.innerHeight < window.innerWidth
+      );
       const gridEl = pautaGridRef.current;
       if (!gridEl) return;
       const rect = gridEl.getBoundingClientRect();
@@ -240,6 +251,7 @@ function PdpPage() {
           zIndex: 5,
           position: 'relative',
           marginBottom: 'calc(-2 * (var(--hg-tdp-xR) - var(--hg-tdp-xL)) * 2981 / 2642 / 40 - 23px)',
+          marginTop: isLandscapeTablet ? '-100px' : undefined,
           ...portraitDesktopPdpStyle,
         }}
       >
@@ -322,7 +334,7 @@ function PdpPage() {
         <EditableTextBox
           id={`${PRODUCT_SLUG}-pdp-product-description`}
           initialText={PRODUCT_DESCRIPTION}
-          initialSettings={{ ...PDP_DESCRIPTION_SETTINGS, lineHeight: isPortraitTablet ? 1.25 : PDP_DESCRIPTION_SETTINGS.lineHeight }}
+          initialSettings={{ ...PDP_DESCRIPTION_SETTINGS, lineHeight: isPortraitTablet ? 1.25 : (isLandscapeTablet ? 1.3 : PDP_DESCRIPTION_SETTINGS.lineHeight) }}
           presetVersion={PDP_PRESET_VERSION}
           multiline
           renderHandle={false}

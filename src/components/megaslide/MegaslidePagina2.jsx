@@ -80,47 +80,41 @@ export default function MegaslidePagina2({
 
   const bnSliderSize = megaTileSize || 120;
   const [scrollProgress, setScrollProgress] = useState(0.5);
-  const [tiltEnabled, setTiltEnabled] = useState(false);
-  const [tiltStatus, setTiltStatus] = useState('idle');
   const snapTimerRef = useRef(0);
   const neutralGammaRef = useRef(null);
   const tiltDeltaRef = useRef(0);
 
-  const getActiveViewport = useCallback(() => {
-    if (typeof document === 'undefined') return viewportRef.current;
-    return document.querySelector(`[data-mega-page-viewport="${megaPage}"]`) || viewportRef.current;
-  }, [megaPage]);
 
   const updateScrollProgress = useCallback(() => {
-    const viewport = getActiveViewport();
+    const viewport = viewportRef.current;
     if (!viewport) return;
     const maxScroll = Math.max(0, viewport.scrollWidth - viewport.clientWidth);
     setScrollProgress(maxScroll > 0 ? viewport.scrollLeft / maxScroll : 0);
-  }, [getActiveViewport]);
+  }, []);
 
   const scrollToProgress = useCallback((progress, behavior = 'smooth') => {
-    const viewport = getActiveViewport();
+    const viewport = viewportRef.current;
     if (!viewport) return;
     const maxScroll = Math.max(0, viewport.scrollWidth - viewport.clientWidth);
     viewport.scrollTo({ left: maxScroll * Math.min(1, Math.max(0, progress)), behavior });
-  }, [getActiveViewport]);
+  }, []);
 
   const handlePortraitScroll = useCallback(() => {
     updateScrollProgress();
     window.clearTimeout(snapTimerRef.current);
     snapTimerRef.current = window.setTimeout(() => {
       if (Math.abs(tiltDeltaRef.current) > 3) return;
-      const viewport = getActiveViewport();
+      const viewport = viewportRef.current;
       if (!viewport) return;
       const maxScroll = Math.max(0, viewport.scrollWidth - viewport.clientWidth);
       if (maxScroll <= 0) return;
-      const snapStep = maxScroll / 4;
+      const snapStep = maxScroll / 2;
       viewport.scrollTo({ left: Math.round(viewport.scrollLeft / snapStep) * snapStep, behavior: 'smooth' });
     }, 180);
-  }, [getActiveViewport, updateScrollProgress]);
+  }, [updateScrollProgress]);
 
   useLayoutEffect(() => {
-    const viewport = getActiveViewport();
+    const viewport = viewportRef.current;
     if (!viewport) return undefined;
     if (!isPortraitTablet) {
       viewport.scrollLeft = 0;
@@ -132,24 +126,40 @@ export default function MegaslidePagina2({
       updateScrollProgress();
     });
     return () => cancelAnimationFrame(frame);
-  }, [active, isPortraitTablet, megaPage, getActiveViewport, scrollToProgress, updateScrollProgress]);
+  }, [active, isPortraitTablet, scrollToProgress, updateScrollProgress]);
 
   useEffect(() => {
-    if (!isPortraitTablet) return undefined;
-    const viewport = getActiveViewport();
-    if (!viewport) return undefined;
+    if (!isPortraitTablet || !active) return undefined;
+    let viewport = viewportRef.current;
+    if (!viewport) {
+      // El viewport pot aparèixer després que el mega menu s'obri
+      const observer = new MutationObserver(() => {
+        viewport = viewportRef.current;
+        if (viewport) {
+          observer.disconnect();
+          viewport.addEventListener('scroll', handlePortraitScroll, { passive: true });
+        }
+      });
+      observer.observe(document.body, { childList: true, subtree: true });
+      return () => {
+        observer.disconnect();
+        if (viewport) viewport.removeEventListener('scroll', handlePortraitScroll);
+      };
+    }
     viewport.addEventListener('scroll', handlePortraitScroll, { passive: true });
     return () => viewport.removeEventListener('scroll', handlePortraitScroll);
-  }, [isPortraitTablet, megaPage, getActiveViewport, handlePortraitScroll]);
+  }, [isPortraitTablet, active, handlePortraitScroll]);
 
   useEffect(() => () => window.clearTimeout(snapTimerRef.current), []);
 
   useEffect(() => {
-    if (!isPortraitTablet || !tiltEnabled) return undefined;
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      setTiltEnabled(false);
-      setTiltStatus('reduced-motion');
-      return undefined;
+    if (!isPortraitTablet) return undefined;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return undefined;
+
+    // Sol·licita permís per a deviceorientation a iOS
+    const OrientationEvent = window.DeviceOrientationEvent;
+    if (OrientationEvent && typeof OrientationEvent.requestPermission === 'function') {
+      OrientationEvent.requestPermission().catch(() => {});
     }
 
     neutralGammaRef.current = null;
@@ -161,7 +171,7 @@ export default function MegaslidePagina2({
       tiltDeltaRef.current = event.gamma - neutralGammaRef.current;
     };
     const tick = () => {
-      const viewport = getActiveViewport();
+      const viewport = viewportRef.current;
       const delta = tiltDeltaRef.current;
       if (viewport && Math.abs(delta) > 3) {
         const velocity = Math.sign(delta) * Math.min(10, (Math.abs(delta) - 3) * 0.45);
@@ -178,40 +188,7 @@ export default function MegaslidePagina2({
       neutralGammaRef.current = null;
       tiltDeltaRef.current = 0;
     };
-  }, [isPortraitTablet, tiltEnabled, getActiveViewport]);
-
-  useEffect(() => {
-    if (!isPortraitTablet) {
-      setTiltEnabled(false);
-      setTiltStatus('idle');
-    }
   }, [isPortraitTablet]);
-
-  const toggleTilt = useCallback(async () => {
-    if (tiltEnabled) {
-      setTiltEnabled(false);
-      setTiltStatus('idle');
-      return;
-    }
-    const OrientationEvent = window.DeviceOrientationEvent;
-    if (!OrientationEvent) {
-      setTiltStatus('unsupported');
-      return;
-    }
-    try {
-      if (typeof OrientationEvent.requestPermission === 'function') {
-        const permission = await OrientationEvent.requestPermission();
-        if (permission !== 'granted') {
-          setTiltStatus('denied');
-          return;
-        }
-      }
-      setTiltStatus('active');
-      setTiltEnabled(true);
-    } catch {
-      setTiltStatus('denied');
-    }
-  }, [tiltEnabled]);
 
   const variant = active === 'the_human_inside' ? humanInsideVariant : firstContactVariant;
 
@@ -267,19 +244,7 @@ export default function MegaslidePagina2({
   const stripeEmptyMaskSrc = null;
 
   return (
-    <div style={{ width: '25%', flexShrink: 0, display: isPortraitTablet ? 'block' : 'flex', height: '100%', position: 'relative', justifyContent: 'center', overflow: isPortraitTablet ? 'hidden' : 'visible' }}>
-      {isPortraitTablet && (
-        <div aria-hidden="true" style={{
-          position: 'absolute',
-          top: 0,
-          bottom: '8px',
-          left: '8px',
-          right: '8px',
-          boxShadow: '0 0 0 9999px #ffffff',
-          pointerEvents: 'none',
-          zIndex: 20,
-        }} />
-      )}
+    <div style={{ width: '25%', flexShrink: 0, display: isPortraitTablet ? 'block' : 'flex', height: '100%', position: 'relative', justifyContent: 'center', overflow: isPortraitTablet ? 'hidden' : 'visible', boxShadow: isPortraitTablet ? 'inset 8px 0 0 #ffffff, inset -8px 0 0 #ffffff' : undefined }}>
       {isPortraitTablet && (
         <div
           ref={portraitContentRef}
@@ -537,60 +502,57 @@ export default function MegaslidePagina2({
           style={{
             position: 'fixed',
             left: `calc(50% + ${(megaPage - 2) * 100}vw)`,
-            top: 'calc(14.32vh + 176.65px)',
-            transform: 'translateX(calc(-50% - 650px))',
+            top: 'calc(14.32vh + 194.65px)',
+            transform: 'translateX(calc(-50% - 582px))',
             zIndex: 30,
             display: 'flex',
             alignItems: 'center',
-            gap: '8px',
-            padding: '6px 8px',
-            border: '1px solid rgba(71, 80, 89, 0.2)',
-            borderRadius: '999px',
-            background: 'rgba(255, 255, 255, 0.9)',
-            boxShadow: '0 2px 10px rgba(0, 0, 0, 0.08)',
-            backdropFilter: 'blur(8px)',
           }}
+          aria-label="Posició de la stripe"
         >
-          <button
-            type="button"
-            aria-label="Desplaça la stripe cap a l'esquerra"
-            onClick={() => scrollToProgress(scrollProgress - 0.25)}
-            style={{ width: 28, height: 28, border: 0, borderRadius: '50%', background: '#f3f4f6', color: '#111827', cursor: 'pointer' }}
-          >
-            ‹
-          </button>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 5 }} aria-label="Posició de la stripe">
-            {Array.from({ length: 5 }).map((_, index) => {
-              const progress = index / 4;
-              const activeDot = Math.round(scrollProgress * 4) === index;
+          {/* Pista amb marques i polsador mòbil */}
+          <div style={{ position: 'relative', display: 'flex', alignItems: 'center', gap: 60, height: 24 }}>
+            {/* Polsador mòbil (nivellador) per sobre de les marques */}
+            <div
+              aria-hidden="true"
+              style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                width: 24,
+                height: 24,
+                borderRadius: '50%',
+                background: '#111827',
+                marginLeft: -12,
+                transform: `translateX(${scrollProgress * 120}px)`,
+                transition: 'transform 80ms linear',
+                pointerEvents: 'none',
+                zIndex: 1,
+              }}
+            />
+            {/* Marques fixes: curta, alta (centre), curta */}
+            {Array.from({ length: 3 }).map((_, index) => {
+              const progress = index / 2;
+              const isCenter = index === 1;
               return (
                 <button
-                  key={`stripe-scroll-dot-${index}`}
+                  key={`stripe-scroll-mark-${index}`}
                   type="button"
-                  aria-label={`Posició ${index + 1} de 5`}
+                  aria-label={`Posició ${index + 1} de 3`}
                   onClick={() => scrollToProgress(progress)}
-                  style={{ width: activeDot ? 16 : 6, height: 6, padding: 0, border: 0, borderRadius: 999, background: activeDot ? '#111827' : '#cbd5e1', cursor: 'pointer', transition: 'width 160ms ease, background 160ms ease' }}
+                  style={{
+                    width: 1,
+                    height: isCenter ? 24 : 12,
+                    padding: 0,
+                    border: 0,
+                    background: isCenter ? '#111827' : '#d0d0d0',
+                    cursor: 'pointer',
+                    flexShrink: 0,
+                  }}
                 />
               );
             })}
           </div>
-          <button
-            type="button"
-            aria-label="Desplaça la stripe cap a la dreta"
-            onClick={() => scrollToProgress(scrollProgress + 0.25)}
-            style={{ width: 28, height: 28, border: 0, borderRadius: '50%', background: '#f3f4f6', color: '#111827', cursor: 'pointer' }}
-          >
-            ›
-          </button>
-          <button
-            type="button"
-            aria-pressed={tiltEnabled}
-            onClick={toggleTilt}
-            title="Controla el desplaçament inclinant la tablet"
-            style={{ height: 28, padding: '0 10px', border: '1px solid #e5e7eb', borderRadius: 999, background: tiltEnabled ? '#111827' : '#ffffff', color: tiltEnabled ? '#ffffff' : '#475059', fontFamily: 'Roboto Condensed, sans-serif', fontSize: 10, letterSpacing: '0.08em', cursor: 'pointer' }}
-          >
-            {tiltStatus === 'active' ? 'INCLINACIÓ ACTIVA' : tiltStatus === 'denied' ? 'PERMÍS DENEGAT' : tiltStatus === 'unsupported' ? 'SENSE SENSOR' : tiltStatus === 'reduced-motion' ? 'MOVIMENT REDUÏT' : 'INCLINACIÓ'}
-          </button>
         </div>
       )}
     </div>

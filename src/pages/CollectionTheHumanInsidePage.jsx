@@ -170,6 +170,12 @@ function CollectionTheHumanInsidePage() {
       && window.innerWidth <= 1366
       && window.innerHeight < window.innerWidth
   );
+  const [isPortraitTablet, setIsPortraitTablet] = useState(
+    typeof window !== "undefined"
+      && window.innerWidth >= 768
+      && window.innerWidth <= 1024
+      && window.innerHeight > window.innerWidth
+  );
   const pautaGridRef = useRef(null);
   const sizes = ['S', 'M', 'L', 'XL', 'XXL'];
   const { pautaOpacity, tableOpacity, backgroundOpacity } = overlayState;
@@ -194,6 +200,11 @@ function CollectionTheHumanInsidePage() {
         window.innerWidth >= 1024
           && window.innerWidth <= 1366
           && window.innerHeight < window.innerWidth
+      );
+      setIsPortraitTablet(
+        window.innerWidth >= 768
+          && window.innerWidth <= 1024
+          && window.innerHeight > window.innerWidth
       );
       const logo = document.querySelector('[data-brand-logo="1"]')
         || document.getElementById('stripe-guide-header-logo-anchor');
@@ -387,14 +398,15 @@ function CollectionTheHumanInsidePage() {
       <Pauta4ColsOverlay
         pautaEnabled={false}
         tableEnabled={false}
+        numCols={isPortraitTablet ? 3 : 4}
         numRows={90}
-        canvasAspect={[2642, 6708]}
+        canvasAspect={[2642, isPortraitTablet ? 9717 : 6708]}
         topOffset="0px"
         bottomPadding="0px"
         style={{
           // Puja tot el contingut sota el hero 12 files de la taula (41 → 29).
           // Alçada d'1 fila = ampladaBelt × 6708/2642/90; 12 files ≈ 0.3385 × amplada.
-          marginTop: 'calc((var(--hg-tdp-xL, 0px) - var(--hg-tdp-xR, 0px)) * 0.3385)',
+          marginTop: `calc((var(--hg-tdp-xL, 0px) - var(--hg-tdp-xR, 0px)) * 0.3385${isLandscapeTablet ? ' - 30px' : ''})`,
         }}
       >
         <img
@@ -417,21 +429,26 @@ function CollectionTheHumanInsidePage() {
           }}
         />
         {Array.from({ length: NUM_ROWS }).flatMap((_, rowIdx) =>
-          [0, 1, 2, 3].map((colIdx) => {
+          (isPortraitTablet ? [0, 1, 2] : [0, 1, 2, 3]).map((colIdx) => {
             const color = colorAt(rowIdx, colIdx);
             const isV5 = (rowIdx + colIdx) % 2 === 1;
             const Card = isV5 ? CollectionProductCardV5 : CollectionProductCard;
             const col = colIdx + 1;
             const rowOffset = 10 + rowIdx * 20;
             const productName = productAt(rowIdx, colIdx).name;
-            const liftCols = isLandscapeTablet && (colIdx === 0 || colIdx === 2);
-            const liftOffset = liftCols ? " - 30px" : "";
-            const productNameLiftOffset = liftCols ? " - 40px" : "";
-            const lowerCols = isLandscapeTablet && (colIdx === 1 || colIdx === 3);
+            const tabletLayout = isLandscapeTablet || isPortraitTablet;
+            const portraitFirstColumnLift = isPortraitTablet && (colIdx === 0 || colIdx === 2) ? 20 : 0;
+            const portraitFirstColumnImageNameLift = isPortraitTablet && (colIdx === 0 || colIdx === 2) ? ' - 10px' : '';
+            const portraitSecondColumnImageLift = isPortraitTablet && colIdx === 1 ? ' - 10px' : '';
+            const portraitSecondColumnDescriptionDrop = isPortraitTablet && colIdx === 1 ? ' + 10px' : '';
+            const liftCols = tabletLayout && (colIdx === 0 || colIdx === 2);
+            const liftOffset = liftCols ? ` - ${30 + portraitFirstColumnLift}px` : "";
+            const productNameLiftOffset = liftCols ? ` - ${40 + portraitFirstColumnLift}px` : "";
+            const lowerCols = tabletLayout && (colIdx === 1 || colIdx === 3);
             const lowerOffset = lowerCols ? ' + 15px' : '';
             const imageLowerOffset = lowerCols ? ' - 30px' : '';
-            const descriptionExtraOffset = isLandscapeTablet ? ' + 5px' : '';
-            const globalLiftOffset = isLandscapeTablet ? ' + 10px' : '';
+            const descriptionExtraOffset = tabletLayout ? ' + 5px' : '';
+            const globalLiftOffset = tabletLayout ? ' + 10px' : '';
             return (
               <CollectionTdpCard
                 key={`tdp-card-r${rowIdx}-c${colIdx}`}
@@ -456,9 +473,9 @@ function CollectionTheHumanInsidePage() {
                 collectionHref={`${productHref(rowIdx, colIdx)}?color=${color}&finish=${gridFinishFor('the-human-inside', color, rowIdx * 4 + colIdx)}`}
                 productNamePlain
                 editable={false}
-                imageTranslateY={liftCols ? `calc(9px + 1lh${liftOffset}${globalLiftOffset})` : (lowerCols ? `calc(9px + 1lh + 159px${imageLowerOffset}${globalLiftOffset})` : (isLandscapeTablet ? `calc(9px + 1lh${globalLiftOffset})` : undefined))}
-                productNameTranslateY={liftCols ? `calc(1lh${productNameLiftOffset}${globalLiftOffset})` : (lowerCols ? `calc(1lh - 325px${globalLiftOffset})` : (isLandscapeTablet ? `calc(1lh${globalLiftOffset})` : undefined))}
-                descriptionTranslateY={liftCols ? `calc(2lh - 1px${liftOffset}${descriptionExtraOffset}${globalLiftOffset})` : (lowerCols ? `calc(2lh - 1px - 325px${lowerOffset}${descriptionExtraOffset}${globalLiftOffset})` : (isLandscapeTablet ? `calc(2lh - 1px${descriptionExtraOffset}${globalLiftOffset})` : undefined))}
+                imageTranslateY={liftCols ? `calc(9px + 1lh${liftOffset}${globalLiftOffset}${portraitFirstColumnImageNameLift})` : (lowerCols ? `calc(9px + 1lh + 159px${imageLowerOffset}${globalLiftOffset}${portraitSecondColumnImageLift})` : (isLandscapeTablet ? `calc(9px + 1lh${globalLiftOffset})` : undefined))}
+                productNameTranslateY={liftCols ? `calc(1lh${productNameLiftOffset}${globalLiftOffset}${portraitFirstColumnImageNameLift})` : (lowerCols ? `calc(1lh - 325px${globalLiftOffset})` : (isLandscapeTablet ? `calc(1lh${globalLiftOffset})` : undefined))}
+                descriptionTranslateY={liftCols ? `calc(2lh - 1px${liftOffset}${descriptionExtraOffset}${globalLiftOffset})` : (lowerCols ? `calc(2lh - 1px - 325px${lowerOffset}${descriptionExtraOffset}${globalLiftOffset}${portraitSecondColumnDescriptionDrop})` : (isLandscapeTablet ? `calc(2lh - 1px${descriptionExtraOffset}${globalLiftOffset})` : undefined))}
               />
             );
           })
@@ -468,6 +485,7 @@ function CollectionTheHumanInsidePage() {
       <TramFinal
         posterLines={[{ text: 'CADA' }, { text: 'HISTÒRIA TÉ' }, { text: 'UN DIBUIX' }]}
         tambeImages={otherImages}
+        marginTop={isPortraitTablet ? '-350px' : '-552px'}
       />
     </section>
   );

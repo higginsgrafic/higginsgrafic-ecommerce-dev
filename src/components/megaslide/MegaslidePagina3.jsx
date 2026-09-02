@@ -15,19 +15,7 @@ export default function MegaslidePagina3({
   accordionPautaScale,
 }) {
   return (
-    <div style={{ width: '25%', flexShrink: 0, display: 'block', height: '100%', position: 'relative', overflow: isPortraitTablet ? 'hidden' : 'visible' }}>
-      {isPortraitTablet && (
-        <div aria-hidden="true" style={{
-          position: 'absolute',
-          top: 0,
-          bottom: '8px',
-          left: '8px',
-          right: '8px',
-          boxShadow: '0 0 0 9999px #ffffff',
-          pointerEvents: 'none',
-          zIndex: 20,
-        }} />
-      )}
+    <div style={{ width: '25%', flexShrink: 0, display: 'block', height: '100%', position: 'relative', overflow: isPortraitTablet ? 'hidden' : 'visible', boxShadow: isPortraitTablet ? 'inset 8px 0 0 #ffffff, inset -8px 0 0 #ffffff' : undefined }}>
       <div data-mega-page-viewport="3" style={{
         width: '100%',
         height: '100%',

@@ -88,14 +88,14 @@ function TDP2({
         rowOffset={4}
         imageGridRow="3 / 13"               // Imatge a dalt (baixada 1 fila, abans 2 / 12)
         productNameGridRow="15 / 16"         // Baixat 1 fila (abans 14 / 15)
-        productNameTranslateY="calc(50% - 13px)"
+        productNameTranslateY="calc(50% - 33px)"
         descriptionGridRow="16 / 21"         // Baixat 1 fila (abans 15 / 20)
         descriptionTranslateY="-8px"
         priceTranslateY="calc(-50% - 8px)"
         sizeButtonsMarginTop="calc(-1 * 3px - 9.5px)"
         imageWidth="100%"
         imageMaxHeight="none"
-        imageTranslateY="calc(-24px + calc(calc(var(--hg-tdp-xR) - var(--hg-tdp-xL)) * 0.01410547))"
+        imageTranslateY="calc(-44px + calc(calc(var(--hg-tdp-xR) - var(--hg-tdp-xL)) * 0.01410547))"
         presetVersion="tdp-home-v4-clean"
         productNamePlain={true}
         {...extraProps}
