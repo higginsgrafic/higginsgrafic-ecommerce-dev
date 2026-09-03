@@ -1,7 +1,7 @@
 import React, { memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import * as ReactDOM from 'react-dom';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { ChevronDown, ChevronLeft, ChevronRight, ChevronUp, Menu, User, LogIn, X, Clock, Truck, AlertCircle, MoreHorizontal, Loader2, Eye, EyeOff, LayoutGrid, Layers, Lock, Unlock } from 'lucide-react';
+import { ChevronDown, ChevronLeft, ChevronRight, ChevronUp, Menu, User, LogIn, X, Clock, Truck, AlertCircle, MoreHorizontal, Loader2, Eye, EyeOff, LayoutGrid, Layers, Lock, Unlock, Search } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useProductContext } from '@/contexts/ProductContext';
 import { useAdmin } from '@/contexts/AdminContext';
@@ -80,6 +80,7 @@ function FullWideSlideHeader({
   showStripe = true,
   showCatalogPanel = true,
   isPortraitTablet = false,
+  isLandscapeTablet = false,
 }) {
   const location = useLocation();
   const navigate = useNavigate();
@@ -2933,9 +2934,9 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
     >
       <div className={isPortraitTablet ? '' : 'border-b border-border'}>
         <div
-          className="flex h-16 items-center gap-3 px-4 sm:px-6 lg:h-20 lg:px-10"
+          className="flex h-20 items-center gap-3 px-4 sm:px-6 lg:h-20 lg:px-10"
           style={{
-            height: isPortraitTablet ? '64px' : undefined,
+            height: isPortraitTablet ? '80px' : undefined,
             // Ancorat exactament a SiteFrame (=belt2) per evitar discrepàncies
             // de centratge causades per scrollbar-gutter, rulerInset i el fet
             // que el `<header>` és `position: fixed` (`right: 0` viewport).
@@ -2943,11 +2944,11 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
             marginLeft: 'calc(var(--site-xL, 0px) - var(--rulerInset, 0px))',
           }}
         >
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 lg:gap-2">
             {!isPortraitTablet && (
               <button
                 type="button"
-                className="inline-flex h-10 w-10 items-center justify-center rounded-full text-foreground hover:bg-muted lg:hidden"
+                className="inline-flex h-10 w-10 items-center justify-center rounded-full text-foreground hover:bg-muted md:hidden"
                 aria-label={mobileOpen ? 'Tancar menú' : 'Obrir menú'}
                 onClick={() => setMobileOpen((v) => !v)}
               >
@@ -2955,7 +2956,8 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
               </button>
             )}
 
-            <Link id="stripe-guide-header-logo-anchor" to="/" aria-label="Higgins GRÀFIC - Pàgina d'inici" className="relative z-10 pointer-events-auto flex items-center gap-2 font-black tracking-tight text-foreground">
+            {/* Logo a l'esquerra (desktop + tablet vertical) */}
+            <Link id="stripe-guide-header-logo-anchor" to="/" aria-label="Higgins GRÀFIC - Pàgina d'inici" className="relative z-10 pointer-events-auto hidden md:flex items-center gap-2 font-black tracking-tight text-foreground">
               <span
                 id="stripe-guide-header-logo-mark-anchor"
                 ref={logoMarkRef}
@@ -2977,7 +2979,36 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
             </Link>
           </div>
 
-          <nav className="hidden lg:flex flex-1 items-center justify-center gap-6" style={isPortraitTablet ? { display: 'none' } : undefined}>
+          {/* Mòbil: logo centrat en X respecte al viewport */}
+          <Link
+            to="/"
+            aria-label="Higgins GRÀFIC - Pàgina d'inici"
+            className="md:hidden absolute z-10 pointer-events-auto flex items-center gap-2 font-black tracking-tight text-foreground"
+            style={{
+              left: '50vw',
+              top: '50%',
+              transform: 'translate(-50%, -50%)',
+            }}
+          >
+            <span
+              aria-hidden="true"
+              data-brand-logo="1"
+              className="h-10 w-[140px] block text-foreground"
+              style={{
+                backgroundColor: 'currentColor',
+                WebkitMaskImage: 'url(/custom_logos/brand/marca-grafic-logo.svg)',
+                maskImage: 'url(/custom_logos/brand/marca-grafic-logo.svg)',
+                WebkitMaskRepeat: 'no-repeat',
+                maskRepeat: 'no-repeat',
+                WebkitMaskPosition: 'center',
+                maskPosition: 'center',
+                WebkitMaskSize: 'contain',
+                maskSize: 'contain',
+              }}
+            />
+          </Link>
+
+          <nav className="hidden md:flex flex-1 items-center justify-center gap-1 lg:gap-6 flex-nowrap" style={isPortraitTablet ? { marginLeft: '-40px' } : (isLandscapeTablet ? { gap: '0.5rem' } : undefined)}>
             {resolvedNav.map((item) => {
               // L'indicador d'obert (fletxa rotada + color) només s'ha
               // d'activar quan realment veiem la col·lecció (megaPage=1).
@@ -2988,7 +3019,8 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
                 <button
                   key={item.id}
                   type="button"
-                  className={`inline-flex items-center gap-1 text-xs font-semibold tracking-[0.18em] uppercase ${open ? 'text-foreground' : 'text-muted-foreground hover:text-foreground'}`}
+                  className={`inline-flex items-center gap-1 text-[12px] lg:text-xs font-semibold tracking-[0.04em] lg:tracking-[0.18em] uppercase ${open ? 'text-foreground' : 'text-muted-foreground hover:text-foreground'}`}
+                  style={isLandscapeTablet ? { letterSpacing: '0.04em' } : undefined}
                   aria-expanded={open ? 'true' : 'false'}
                   onClick={() => {
                     setManualOverrideClosed(false);
@@ -3014,7 +3046,7 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
           </nav>
 
           <div
-            className="ml-auto flex items-center"
+            className="ml-auto hidden md:flex items-center"
             style={{ gap: '0px' }}
             data-icons-wrap="true"
           >
@@ -3038,11 +3070,7 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
                   touchMegaPublicActivity();
                 }}
               >
-                <svg className="h-[25px] w-[25px] text-foreground -translate-x-[1px] lg:h-[29px] lg:w-[29px]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5}>
-                  <polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21" />
-                  <line x1="9" y1="3" x2="9" y2="18" />
-                  <line x1="15" y1="6" x2="15" y2="21" />
-                </svg>
+                <Search className="h-[25px] w-[25px] text-foreground -translate-x-[1px] lg:h-[29px] lg:w-[29px]" strokeWidth={2.5} />
               </IconButton>
               </TooltipTrigger>
               <TooltipContent>Cercador</TooltipContent>
@@ -3148,41 +3176,6 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
             </div>
           </div>
         </div>
-        {isPortraitTablet && (
-          <nav
-            className="flex h-10 items-center justify-center gap-[18px] border-t border-border px-4"
-            style={{
-              width: 'var(--site-w, 100%)',
-              marginLeft: 'calc(var(--site-xL, 0px) - var(--rulerInset, 0px))',
-            }}
-          >
-            {resolvedNav.map((item) => {
-              const open = active === item.id && megaPage === 1;
-              return (
-                <button
-                  key={item.id}
-                  type="button"
-                  className={`inline-flex items-center gap-1 whitespace-nowrap text-[10px] font-semibold tracking-[0.08em] uppercase ${open ? 'text-foreground' : 'text-muted-foreground hover:text-foreground'}`}
-                  aria-expanded={open ? 'true' : 'false'}
-                  onClick={() => {
-                    setManualOverrideClosed(false);
-                    setMegaFullScreen(false);
-                    if (open) {
-                      setActive(null);
-                    } else {
-                      setMegaPage(1);
-                      setActive(item.id);
-                      touchMegaPublicActivity();
-                    }
-                  }}
-                >
-                  {item.label}
-                  <ChevronDown className={`h-3 w-3 transition-transform ${open ? 'rotate-180' : ''}`} />
-                </button>
-              );
-            })}
-          </nav>
-        )}
       </div>
 
       {canUseDom && (!contained || portalContainer) &&
@@ -3303,6 +3296,83 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
 
       {mobileOpen && !isPortraitTablet ? (
         <div className="lg:hidden border-b border-border bg-background">
+          {/* Cercador, cistell i usuari dins l'hamburguesa */}
+          <div className="px-4 py-3 flex items-center gap-6 border-b border-border">
+            <button
+              type="button"
+              className="flex items-center gap-2 text-sm text-foreground"
+              onClick={() => {
+                setMobileOpen(false);
+                setManualOverrideClosed(false);
+                setMegaPage(2);
+                setMegaFullScreen(false);
+                if (!active) ensureMegaOpen();
+                touchMegaPublicActivity();
+              }}
+            >
+              <Search className="h-5 w-5 text-foreground" strokeWidth={2.5} />
+              <span>Cercador</span>
+            </button>
+            <button
+              type="button"
+              className="flex items-center gap-2 text-sm text-foreground"
+              onClick={() => {
+                setMobileOpen(false);
+                setManualOverrideClosed(false);
+                setMegaPage(3);
+                setAcordioExpanded(false);
+                if (!active) ensureMegaOpen();
+                touchMegaPublicActivity();
+              }}
+            >
+              <span aria-hidden="true" className="block h-[24px] w-[24px] relative">
+                <span
+                  className="absolute inset-0"
+                  style={{
+                    display: 'block',
+                    backgroundColor: 'currentColor',
+                    WebkitMaskImage: `url(${localCartItemCount > 0 ? '/custom_logos/icons/cistell-ple-2.svg' : '/custom_logos/icons/cistell-buit.svg'})`,
+                    maskImage: `url(${localCartItemCount > 0 ? '/custom_logos/icons/cistell-ple-2.svg' : '/custom_logos/icons/cistell-buit.svg'})`,
+                    WebkitMaskRepeat: 'no-repeat',
+                    maskRepeat: 'no-repeat',
+                    WebkitMaskPosition: 'center',
+                    maskPosition: 'center',
+                    WebkitMaskSize: 'contain',
+                    maskSize: 'contain',
+                  }}
+                />
+                {localCartItemCount > 0 && (
+                  <span
+                    className="absolute left-1/2 -translate-x-1/2 text-whiteStrong text-[12px] font-bold"
+                    style={{ top: 'calc(60% - 0.5px)', transform: 'translate(-50%, -50%)', lineHeight: '1' }}
+                  >
+                    {localCartItemCount}
+                  </span>
+                )}
+              </span>
+              <span>Cistell{localCartItemCount > 0 ? ` (${localCartItemCount})` : ''}</span>
+            </button>
+            <button
+              type="button"
+              className="flex items-center gap-2 text-sm text-foreground"
+              onClick={() => {
+                setMobileOpen(false);
+                setManualOverrideClosed(false);
+                setMegaPage(4);
+                setAcordioExpandedPage4(false);
+                if (!active) ensureMegaOpen();
+                if (!user) setShowRegisterOverlay(true);
+                touchMegaPublicActivity();
+              }}
+            >
+              {user
+                ? <User className="h-5 w-5 text-foreground" strokeWidth={2.5} />
+                : <LogIn className="h-5 w-5 text-foreground" strokeWidth={2} />
+              }
+              <span>{user ? 'Compte' : 'Iniciar sessió'}</span>
+            </button>
+          </div>
+
           <div className="px-4 py-4 grid gap-2">
             {resolvedNav.map((item) => (
               <button

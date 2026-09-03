@@ -228,7 +228,7 @@ export default function TambeRail({
       if (!src) return;
       const img = new Image();
       img.decoding = 'async';
-      img.loading = 'eager';
+      img.loading = 'lazy';
       img.src = src;
       imgs.push(img);
     });

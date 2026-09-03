@@ -35,6 +35,7 @@ const TramFinal = forwardRef(function TramFinal(
     marginTop = '-552px',
     posterTextAlign = 'left',
     tambeImages,
+    visibleCards,
     style,
   },
   pautaGridRef,
@@ -134,6 +135,7 @@ const TramFinal = forwardRef(function TramFinal(
           images={tambeImages}
           showInternalArrows={false}
           showTitle={false}
+          visibleCards={visibleCards}
         />
       </div>
     </div>

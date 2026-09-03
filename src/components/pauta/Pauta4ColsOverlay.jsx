@@ -64,9 +64,12 @@ function useReactiveBelt() {
 
     const apply = () => {
       const next = getSafeBelt({ maxContent: 1350, sideMargin: 16, minContent: 320 });
-      root.style.setProperty('--hg-tdp-xL', `${next.left}px`);
-      root.style.setProperty('--hg-tdp-xR', `${next.right}px`);
-      setBelt((prev) => (prev.left === next.left && prev.right === next.right ? prev : next));
+      setBelt((prev) => {
+        if (prev.left === next.left && prev.right === next.right) return prev;
+        root.style.setProperty('--hg-tdp-xL', `${next.left}px`);
+        root.style.setProperty('--hg-tdp-xR', `${next.right}px`);
+        return next;
+      });
     };
 
     apply();

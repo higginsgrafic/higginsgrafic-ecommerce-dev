@@ -19,7 +19,7 @@
 
 .slider {
   position: relative;
-  border-radius: 18px;
+  border-radius: 9px;
   overflow: hidden;
   background: #f0f0f0;
   border: 1px solid rgba(0, 0, 0, 0.08);
@@ -198,8 +198,8 @@
 }
 
 .dot {
-  width: 8px;
-  height: 8px;
+  width: 32px;
+  height: 32px;
   border-radius: 999px;
   border: none;
   background: rgba(255, 255, 255, 0.45);
@@ -211,8 +211,8 @@
 }
 
 .dot[aria-current='true'] {
-  background: #fff;
-  transform: scale(1.25);
+  background: radial-gradient(circle, #fff 25%, rgba(255, 255, 255, 0.45) 25%);
+  background-clip: content-box;
 }
 
 @media (max-width: 768px) {

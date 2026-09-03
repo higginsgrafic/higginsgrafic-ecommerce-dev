@@ -12,6 +12,8 @@ import { Flag } from './ShippingPage';
 import { PDP_REGISTRY_BY_ROUTE } from '@/data/pdpRegistry';
 import SEOProductSchema from '@/components/SEOProductSchema';
 import { buildOtherCollectionsImages } from '@/components/home/homeDrawings';
+import useIsMobile from '@/hooks/useIsMobile';
+import PdpMobile from '@/pages/PdpMobile';
 
 const PDP_PRESET_VERSION = 'pdp-layout-2026-06-06-1953';
 
@@ -67,6 +69,7 @@ const SIZES = ['S', 'M', 'L', 'XL', 'XXL'];
 const FINISHES = ['BLANC', 'COLOR', 'NEGRE'];
 
 function PdpPage() {
+  const isMobile = useIsMobile();
   const location = useLocation();
   const registryKey = location.pathname.replace(/^\//, '');
   const product = PDP_REGISTRY_BY_ROUTE[registryKey];
@@ -83,6 +86,10 @@ function PdpPage() {
         </div>
       </section>
     );
+  }
+
+  if (isMobile) {
+    return <PdpMobile />;
   }
 
   const PRODUCT_SLUG = product.slug;
@@ -650,15 +657,15 @@ function PdpPage() {
         <div
           style={{
             gridColumn: '1 / 5',
-            gridRow: '32 / 38',
-            paddingTop: '50px',
+            gridRow: isPortraitTablet ? '29 / 35' : '32 / 38',
+            paddingTop: isPortraitTablet ? '0px' : '50px',
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
             justifyContent: 'center',
           }}
         >
-          <StoryPosterLink />
+          <StoryPosterLink style={isPortraitTablet ? { marginLeft: '300px' } : undefined} />
         </div>
 
         {/* ─── Fitxa tècnica (col 1, fila 3+) — estil TDP ─── */}

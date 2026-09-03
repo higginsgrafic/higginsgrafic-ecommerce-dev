@@ -127,8 +127,8 @@ const Footer = () => {
         ...(isSectionEnabled('footer') ? getDebugStyle('footer', 'main') : {}),
       }}
     >
-      {/* PEU DE COL·LECCIONS DESKTOP - Centrat simètricament - Fons gris clar - VISIBLE PRIMER */}
-      <div className="hidden lg:block bg-muted transition-colors duration-200">
+      {/* PEU DE COL·LECCIONS DESKTOP + TABLET - Centrat simètricament - Fons gris clar - VISIBLE PRIMER */}
+      <div className="hidden md:block bg-muted transition-colors duration-200">
         <div ref={containerRef} className="max-w-7xl mx-auto px-4 lg:px-8 py-16">
           {/* Grup menú amb gaps calculats - centrat simètricament */}
           <div ref={menuGroupRef} className="flex items-center justify-center min-h-[110px]">
@@ -153,7 +153,8 @@ const Footer = () => {
                         className="transition-transform duration-300 w-full h-auto object-contain group-hover:scale-110"
                         style={{
                           display: 'block',
-                          opacity: 1
+                          opacity: 1,
+                          filter: 'brightness(0)',
                         }}
                         loading="lazy"
                         decoding="async"
@@ -172,11 +173,11 @@ const Footer = () => {
       </div>
 
       {/* PEU DE COL·LECCIONS MÒBIL - VISIBLE PRIMER EN MÒBIL */}
-      <div className="lg:hidden bg-muted transition-colors duration-200">
+      <div className="md:hidden bg-muted transition-colors duration-200">
         <div ref={mobileContainerRef} className="max-w-7xl mx-auto px-4 py-12 min-h-[100px]">
           {/* Imatges de col·leccions en grid de 3 columnes */}
           <motion.div
-            className="grid grid-cols-3 md:grid-cols-5 gap-6 md:max-w-2xl max-w-md mx-auto"
+            className="grid grid-cols-5 gap-4 max-w-md mx-auto"
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, ease: "easeOut" }}
@@ -205,7 +206,8 @@ const Footer = () => {
                       data-collection-id={collection.id}
                       className="w-full max-h-20 h-auto object-contain block transition-transform duration-300 group-hover:scale-110"
                       style={{
-                        opacity: 1
+                        opacity: 1,
+                        filter: 'brightness(0)',
                       }}
                       loading="lazy"
                       decoding="async"
@@ -220,42 +222,42 @@ const Footer = () => {
 
       {/* PEU DELS SERVEIS - Grid simple i responsive - Fons blanc - SEGON */}
       <div className="bg-white transition-colors duration-200">
-        <div className="max-w-7xl mx-auto py-[82px] lg:py-[98px] px-4 lg:px-8">
+        <div className="max-w-7xl mx-auto py-[60px] md:py-[82px] lg:py-[98px] px-4 lg:px-8">
           <div
-            className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-x-6 gap-y-12 lg:gap-x-12 mx-auto"
+            className="grid grid-cols-3 md:grid-cols-3 lg:grid-cols-3 gap-x-4 gap-y-8 md:gap-x-6 md:gap-y-12 lg:gap-x-12 mx-auto"
             style={{ ...(isSectionEnabled('footer') ? getDebugStyle('footer', 'row1') : {}), maxWidth: '600px' }}
           >
             {/* Client */}
             <div className="text-left">
-              <p className="font-oswald font-semibold mb-3 lg:mb-4 text-[13pt] lg:text-[14pt] text-foreground">Client</p>
-              <ul className="space-y-2.5 lg:space-y-3 text-left">
-                <li><button onClick={() => goToUserTab('COMANDES')} className="font-roboto text-sm font-normal transition-all inline-block text-foreground" style={{ opacity: 0.75 }} onMouseEnter={(e) => { const color = document.documentElement.classList.contains('dark') ? '#ffffff' : 'hsl(var(--foreground))'; e.target.style.textShadow = `0 0 0.55px ${color}, 0 0 0.55px ${color}`; }} onMouseLeave={(e) => e.target.style.textShadow = 'none'}>Comandes</button></li>
-                <li><button onClick={() => goToUserTab('MISSATGES')} className="font-roboto text-sm font-normal transition-all inline-block text-foreground" style={{ opacity: 0.75 }} onMouseEnter={(e) => { const color = document.documentElement.classList.contains('dark') ? '#ffffff' : 'hsl(var(--foreground))'; e.target.style.textShadow = `0 0 0.55px ${color}, 0 0 0.55px ${color}`; }} onMouseLeave={(e) => e.target.style.textShadow = 'none'}>Missatges</button></li>
-                <li><button onClick={() => goToUserTab('COMPTE')} className="font-roboto text-sm font-normal transition-all inline-block text-foreground" style={{ opacity: 0.75 }} onMouseEnter={(e) => { const color = document.documentElement.classList.contains('dark') ? '#ffffff' : 'hsl(var(--foreground))'; e.target.style.textShadow = `0 0 0.55px ${color}, 0 0 0.55px ${color}`; }} onMouseLeave={(e) => e.target.style.textShadow = 'none'}>Compte</button></li>
-                <li><Link to="/shipping" className="font-roboto text-sm font-normal transition-all inline-block text-foreground" style={{ opacity: 0.75 }} onMouseEnter={(e) => { const color = document.documentElement.classList.contains('dark') ? '#ffffff' : 'hsl(var(--foreground))'; e.target.style.textShadow = `0 0 0.55px ${color}, 0 0 0.55px ${color}`; }} onMouseLeave={(e) => e.target.style.textShadow = 'none'}>Transport</Link></li>
+              <p className="font-oswald font-semibold mb-2 md:mb-3 lg:mb-4 text-[10pt] md:text-[13pt] lg:text-[14pt] text-foreground">Client</p>
+              <ul className="space-y-1.5 md:space-y-2.5 lg:space-y-3 text-left">
+                <li><button onClick={() => goToUserTab('COMANDES')} className="font-roboto text-[10px] md:text-sm font-normal transition-all inline-block text-foreground" style={{ opacity: 0.75 }} onMouseEnter={(e) => { const color = document.documentElement.classList.contains('dark') ? '#ffffff' : 'hsl(var(--foreground))'; e.target.style.textShadow = `0 0 0.55px ${color}, 0 0 0.55px ${color}`; }} onMouseLeave={(e) => e.target.style.textShadow = 'none'}>Comandes</button></li>
+                <li><button onClick={() => goToUserTab('MISSATGES')} className="font-roboto text-[10px] md:text-sm font-normal transition-all inline-block text-foreground" style={{ opacity: 0.75 }} onMouseEnter={(e) => { const color = document.documentElement.classList.contains('dark') ? '#ffffff' : 'hsl(var(--foreground))'; e.target.style.textShadow = `0 0 0.55px ${color}, 0 0 0.55px ${color}`; }} onMouseLeave={(e) => e.target.style.textShadow = 'none'}>Missatges</button></li>
+                <li><button onClick={() => goToUserTab('COMPTE')} className="font-roboto text-[10px] md:text-sm font-normal transition-all inline-block text-foreground" style={{ opacity: 0.75 }} onMouseEnter={(e) => { const color = document.documentElement.classList.contains('dark') ? '#ffffff' : 'hsl(var(--foreground))'; e.target.style.textShadow = `0 0 0.55px ${color}, 0 0 0.55px ${color}`; }} onMouseLeave={(e) => e.target.style.textShadow = 'none'}>Compte</button></li>
+                <li><Link to="/shipping" className="font-roboto text-[10px] md:text-sm font-normal transition-all inline-block text-foreground" style={{ opacity: 0.75 }} onMouseEnter={(e) => { const color = document.documentElement.classList.contains('dark') ? '#ffffff' : 'hsl(var(--foreground))'; e.target.style.textShadow = `0 0 0.55px ${color}, 0 0 0.55px ${color}`; }} onMouseLeave={(e) => e.target.style.textShadow = 'none'}>Transport</Link></li>
               </ul>
             </div>
 
             {/* Informació */}
             <div className="text-left">
-              <p className="font-oswald font-semibold mb-3 lg:mb-4 text-[13pt] lg:text-[14pt] text-foreground">Informació</p>
-              <ul className="space-y-2.5 lg:space-y-3 text-left">
-                <li><Link to="/sizing" className="font-roboto text-sm font-normal transition-all inline-block text-foreground" style={{ opacity: 0.75 }} onMouseEnter={(e) => { const color = document.documentElement.classList.contains('dark') ? '#ffffff' : 'hsl(var(--foreground))'; e.target.style.textShadow = `0 0 0.55px ${color}, 0 0 0.55px ${color}`; }} onMouseLeave={(e) => e.target.style.textShadow = 'none'}>Talles i Cura</Link></li>
-                <li><Link to="/contact" className="font-roboto text-sm font-normal transition-all inline-block text-foreground" style={{ opacity: 0.75 }} onMouseEnter={(e) => { const color = document.documentElement.classList.contains('dark') ? '#ffffff' : 'hsl(var(--foreground))'; e.target.style.textShadow = `0 0 0.55px ${color}, 0 0 0.55px ${color}`; }} onMouseLeave={(e) => e.target.style.textShadow = 'none'}>Contacte</Link></li>
-                <li><Link to="/about" className="font-roboto text-sm font-normal transition-all inline-block text-foreground" style={{ opacity: 0.75 }} onMouseEnter={(e) => { const color = document.documentElement.classList.contains('dark') ? '#ffffff' : 'hsl(var(--foreground))'; e.target.style.textShadow = `0 0 0.55px ${color}, 0 0 0.55px ${color}`; }} onMouseLeave={(e) => e.target.style.textShadow = 'none'}>Qui som</Link></li>
-                <li><Link to="/faq" className="font-roboto text-sm font-normal transition-all inline-block text-foreground" style={{ opacity: 0.75 }} onMouseEnter={(e) => { const color = document.documentElement.classList.contains('dark') ? '#ffffff' : 'hsl(var(--foreground))'; e.target.style.textShadow = `0 0 0.55px ${color}, 0 0 0.55px ${color}`; }} onMouseLeave={(e) => e.target.style.textShadow = 'none'}>FAQ</Link></li>
+              <p className="font-oswald font-semibold mb-2 md:mb-3 lg:mb-4 text-[10pt] md:text-[13pt] lg:text-[14pt] text-foreground">Informació</p>
+              <ul className="space-y-1.5 md:space-y-2.5 lg:space-y-3 text-left">
+                <li><Link to="/sizing" className="font-roboto text-[10px] md:text-sm font-normal transition-all inline-block text-foreground" style={{ opacity: 0.75 }} onMouseEnter={(e) => { const color = document.documentElement.classList.contains('dark') ? '#ffffff' : 'hsl(var(--foreground))'; e.target.style.textShadow = `0 0 0.55px ${color}, 0 0 0.55px ${color}`; }} onMouseLeave={(e) => e.target.style.textShadow = 'none'}>Talles i Cura</Link></li>
+                <li><Link to="/contact" className="font-roboto text-[10px] md:text-sm font-normal transition-all inline-block text-foreground" style={{ opacity: 0.75 }} onMouseEnter={(e) => { const color = document.documentElement.classList.contains('dark') ? '#ffffff' : 'hsl(var(--foreground))'; e.target.style.textShadow = `0 0 0.55px ${color}, 0 0 0.55px ${color}`; }} onMouseLeave={(e) => e.target.style.textShadow = 'none'}>Contacte</Link></li>
+                <li><Link to="/about" className="font-roboto text-[10px] md:text-sm font-normal transition-all inline-block text-foreground" style={{ opacity: 0.75 }} onMouseEnter={(e) => { const color = document.documentElement.classList.contains('dark') ? '#ffffff' : 'hsl(var(--foreground))'; e.target.style.textShadow = `0 0 0.55px ${color}, 0 0 0.55px ${color}`; }} onMouseLeave={(e) => e.target.style.textShadow = 'none'}>Qui som</Link></li>
+                <li><Link to="/faq" className="font-roboto text-[10px] md:text-sm font-normal transition-all inline-block text-foreground" style={{ opacity: 0.75 }} onMouseEnter={(e) => { const color = document.documentElement.classList.contains('dark') ? '#ffffff' : 'hsl(var(--foreground))'; e.target.style.textShadow = `0 0 0.55px ${color}, 0 0 0.55px ${color}`; }} onMouseLeave={(e) => e.target.style.textShadow = 'none'}>FAQ</Link></li>
               </ul>
             </div>
 
             {/* Legal */}
             <div className="text-left">
-              <p className="font-oswald font-semibold mb-3 lg:mb-4 text-[13pt] lg:text-[14pt] text-foreground">Legal</p>
-              <ul className="space-y-2.5 lg:space-y-3 text-left">
-                <li><Link to="/shipping" className="font-roboto text-sm font-normal transition-all inline-block text-foreground" style={{ opacity: 0.75 }} onMouseEnter={(e) => { const color = document.documentElement.classList.contains('dark') ? '#ffffff' : 'hsl(var(--foreground))'; e.target.style.textShadow = `0 0 0.55px ${color}, 0 0 0.55px ${color}`; }} onMouseLeave={(e) => e.target.style.textShadow = 'none'}>Enviaments i Devolucions</Link></li>
-                <li><Link to="/terms" className="font-roboto text-sm font-normal transition-all inline-block text-foreground" style={{ opacity: 0.75 }} onMouseEnter={(e) => { const color = document.documentElement.classList.contains('dark') ? '#ffffff' : 'hsl(var(--foreground))'; e.target.style.textShadow = `0 0 0.55px ${color}, 0 0 0.55px ${color}`; }} onMouseLeave={(e) => e.target.style.textShadow = 'none'}>Termes i Condicions</Link></li>
-                <li><Link to="/privacy" className="font-roboto text-sm font-normal transition-all inline-block text-foreground" style={{ opacity: 0.75 }} onMouseEnter={(e) => { const color = document.documentElement.classList.contains('dark') ? '#ffffff' : 'hsl(var(--foreground))'; e.target.style.textShadow = `0 0 0.55px ${color}, 0 0 0.55px ${color}`; }} onMouseLeave={(e) => e.target.style.textShadow = 'none'}>Política de Privacitat</Link></li>
-                <li><Link to="/legal" className="font-roboto text-sm font-normal transition-all inline-block text-foreground" style={{ opacity: 0.75 }} onMouseEnter={(e) => { const color = document.documentElement.classList.contains('dark') ? '#ffffff' : 'hsl(var(--foreground))'; e.target.style.textShadow = `0 0 0.55px ${color}, 0 0 0.55px ${color}`; }} onMouseLeave={(e) => e.target.style.textShadow = 'none'}>Avís Legal</Link></li>
-                <li><Link to="/cookies" className="font-roboto text-sm font-normal transition-all inline-block text-foreground" style={{ opacity: 0.75 }} onMouseEnter={(e) => { const color = document.documentElement.classList.contains('dark') ? '#ffffff' : 'hsl(var(--foreground))'; e.target.style.textShadow = `0 0 0.55px ${color}, 0 0 0.55px ${color}`; }} onMouseLeave={(e) => e.target.style.textShadow = 'none'}>Cookies</Link></li>
+              <p className="font-oswald font-semibold mb-2 md:mb-3 lg:mb-4 text-[10pt] md:text-[13pt] lg:text-[14pt] text-foreground">Legal</p>
+              <ul className="space-y-1.5 md:space-y-2.5 lg:space-y-3 text-left">
+                <li><Link to="/shipping" className="font-roboto text-[10px] md:text-sm font-normal transition-all inline-block text-foreground" style={{ opacity: 0.75 }} onMouseEnter={(e) => { const color = document.documentElement.classList.contains('dark') ? '#ffffff' : 'hsl(var(--foreground))'; e.target.style.textShadow = `0 0 0.55px ${color}, 0 0 0.55px ${color}`; }} onMouseLeave={(e) => e.target.style.textShadow = 'none'}>Enviaments i Devolucions</Link></li>
+                <li><Link to="/terms" className="font-roboto text-[10px] md:text-sm font-normal transition-all inline-block text-foreground" style={{ opacity: 0.75 }} onMouseEnter={(e) => { const color = document.documentElement.classList.contains('dark') ? '#ffffff' : 'hsl(var(--foreground))'; e.target.style.textShadow = `0 0 0.55px ${color}, 0 0 0.55px ${color}`; }} onMouseLeave={(e) => e.target.style.textShadow = 'none'}>Termes i Condicions</Link></li>
+                <li><Link to="/privacy" className="font-roboto text-[10px] md:text-sm font-normal transition-all inline-block text-foreground" style={{ opacity: 0.75 }} onMouseEnter={(e) => { const color = document.documentElement.classList.contains('dark') ? '#ffffff' : 'hsl(var(--foreground))'; e.target.style.textShadow = `0 0 0.55px ${color}, 0 0 0.55px ${color}`; }} onMouseLeave={(e) => e.target.style.textShadow = 'none'}>Política de Privacitat</Link></li>
+                <li><Link to="/legal" className="font-roboto text-[10px] md:text-sm font-normal transition-all inline-block text-foreground" style={{ opacity: 0.75 }} onMouseEnter={(e) => { const color = document.documentElement.classList.contains('dark') ? '#ffffff' : 'hsl(var(--foreground))'; e.target.style.textShadow = `0 0 0.55px ${color}, 0 0 0.55px ${color}`; }} onMouseLeave={(e) => e.target.style.textShadow = 'none'}>Avís Legal</Link></li>
+                <li><Link to="/cookies" className="font-roboto text-[10px] md:text-sm font-normal transition-all inline-block text-foreground" style={{ opacity: 0.75 }} onMouseEnter={(e) => { const color = document.documentElement.classList.contains('dark') ? '#ffffff' : 'hsl(var(--foreground))'; e.target.style.textShadow = `0 0 0.55px ${color}, 0 0 0.55px ${color}`; }} onMouseLeave={(e) => e.target.style.textShadow = 'none'}>Cookies</Link></li>
               </ul>
             </div>
 
@@ -264,7 +266,7 @@ const Footer = () => {
       </div>
 
       {/* Peu del Logo Mòbil - Només el logo - Fons gris clar - VISIBLE NOMÉS EN MÒBIL */}
-      <div className="lg:hidden bg-muted transition-colors duration-200">
+      <div className="md:hidden bg-muted transition-colors duration-200">
         <div className="max-w-7xl mx-auto px-4 py-8">
           <motion.div
             className="flex items-center justify-center min-h-[70px]"
@@ -273,20 +275,10 @@ const Footer = () => {
             transition={{ duration: 0.3, delay: 0.3, ease: "easeOut" }}
           >
             <Link to="/" aria-label="GRÀFIC - Pàgina d'inici" className="flex items-center justify-center flex-shrink-0 transition-transform hover:scale-105 active:scale-95">
-              <span
-                aria-hidden="true"
-                className="h-[37.5px] w-[160px] block text-foreground"
-                style={{
-                  backgroundColor: 'currentColor',
-                  WebkitMaskImage: 'url(/custom_logos/brand/marca-grafic-logo.svg)',
-                  maskImage: 'url(/custom_logos/brand/marca-grafic-logo.svg)',
-                  WebkitMaskRepeat: 'no-repeat',
-                  maskRepeat: 'no-repeat',
-                  WebkitMaskPosition: 'center',
-                  maskPosition: 'center',
-                  WebkitMaskSize: 'contain',
-                  maskSize: 'contain'
-                }}
+              <img
+                src="/custom_logos/brand/higgins-grafic-negre.png"
+                alt="Higgins Gràfic"
+                className="h-[37.5px] w-[160px] block object-contain"
               />
             </Link>
           </motion.div>
@@ -294,24 +286,14 @@ const Footer = () => {
       </div>
 
       {/* Peu del Logo Desktop - Només el logo - Fons gris clar - OCULT EN MÒBIL */}
-      <div className="hidden lg:block bg-muted transition-colors duration-200">
+      <div className="hidden md:block bg-muted transition-colors duration-200">
         <div className="max-w-7xl mx-auto px-4 lg:px-8 py-10">
           <div className="flex items-center justify-center min-h-[80px]">
             <Link to="/" className="transition-transform hover:scale-105">
-              <span
-                aria-hidden="true"
-                className="h-[49.5px] w-[200px] block text-foreground"
-                style={{
-                  backgroundColor: 'currentColor',
-                  WebkitMaskImage: 'url(/custom_logos/brand/marca-grafic-logo.svg)',
-                  maskImage: 'url(/custom_logos/brand/marca-grafic-logo.svg)',
-                  WebkitMaskRepeat: 'no-repeat',
-                  maskRepeat: 'no-repeat',
-                  WebkitMaskPosition: 'center',
-                  maskPosition: 'center',
-                  WebkitMaskSize: 'contain',
-                  maskSize: 'contain'
-                }}
+              <img
+                src="/custom_logos/brand/higgins-grafic-negre.png"
+                alt="Higgins Gràfic"
+                className="h-[49.5px] w-[200px] block object-contain"
               />
             </Link>
           </div>

@@ -10,6 +10,8 @@ import CollectionTdpCard from '@/components/tdp/CollectionTdpCard';
 import TramFinal from '@/components/home/TramFinal';
 import { buildOtherCollectionsImages } from '@/components/home/homeDrawings';
 import Breadcrumbs from '@/components/Breadcrumbs';
+import useIsMobile from '@/hooks/useIsMobile';
+import CollectionMobile from '@/pages/CollectionMobile';
 
 const COLLECTION_BG_SRC = '/tmp/PAGINES/PAGINES TIPUS/00 COLLECCIO.png';
 
@@ -144,6 +146,7 @@ function loadOverlayState() {
 }
 
 function CollectionFirstContactPage() {
+  const isMobile = useIsMobile();
   const [overlayState, setOverlayState] = useState(loadOverlayState);
   const [zeroLeftOffsetPx, setZeroLeftOffsetPx] = useState(0);
   const [rowHeight, setRowHeight] = useState(38);
@@ -228,6 +231,18 @@ function CollectionFirstContactPage() {
         />
       </Helmet>
 
+      {isMobile ? (
+        <CollectionMobile
+          collectionSlug="first-contact"
+          collectionTitle="First Contact"
+          collectionIcon="/custom_logos/collections/collection-first-contact-logo.svg"
+          products={PRODUCTS}
+          colors={TDP_GRID_COLORS}
+          posterLines={[{ text: 'CADA' }, { text: 'PERSONA TÉ' }, { text: 'UNA HISTÒRIA' }]}
+        />
+      ) : (
+        <>
+
       <Pauta4ColsOverlay
         pautaEnabled={false}
         tableEnabled={false}
@@ -244,6 +259,7 @@ function CollectionFirstContactPage() {
             gridRow: '2 / 3',
             alignSelf: 'start',
             transform: 'translateY(-86px)',
+            paddingLeft: `${zeroLeftOffsetPx}px`,
           }}
         >
           <Breadcrumbs items={[{ label: 'First Contact' }]} />
@@ -302,56 +318,6 @@ function CollectionFirstContactPage() {
           </h1>
         </div>
 
-        {/* Menú de col·leccions centrat en Y entre títol i hero, alineat al top */}
-        <div
-          style={{
-            gridColumn: '1 / 4',
-            gridRow: '7 / 10',
-            alignSelf: 'center',
-            position: 'relative',
-            zIndex: 10,
-            width: '100%',
-            height: '100%',
-            display: 'flex',
-            alignItems: 'flex-start',
-            justifyContent: 'center',
-            gap: '44px',
-            pointerEvents: 'auto',
-            transform: 'translateY(0px)',
-          }}
-        >
-          {COLLECTIONS_MENU.map((c) => {
-            const isFirstContact = c.id === 'first-contact';
-            return (
-              <Link
-                key={c.id}
-                to={c.href}
-                title={c.name}
-                aria-label={c.name}
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'flex-start',
-                  justifyContent: 'center',
-                  transition: 'transform 0.15s ease, opacity 0.15s ease',
-                }}
-                className="hover:scale-110 active:scale-95 opacity-40 hover:opacity-100"
-              >
-                <img
-                  src={c.icon}
-                  alt={c.name}
-                  loading="lazy"
-                  decoding="async"
-                  style={{
-                    width: isFirstContact ? '42.1px' : 'auto',
-                    height: isFirstContact ? 'auto' : '44px',
-                    objectFit: 'contain',
-                    display: 'block',
-                  }}
-                />
-              </Link>
-            );
-          })}
-        </div>
         <div
           style={{
             gridColumn: '1 / 4',
@@ -362,6 +328,7 @@ function CollectionFirstContactPage() {
             height: 'calc(100% + 2px)',
             transform: 'scale(0.94)',
             transformOrigin: 'center center',
+            zIndex: 1,
           }}
         >
           <HeroSlider
@@ -374,18 +341,66 @@ function CollectionFirstContactPage() {
         </div>
       </Pauta4ColsOverlay>
 
+      {/* Menú de col·leccions sota la Hero */}
+      <div
+        style={{
+          position: 'relative',
+          zIndex: 20,
+          width: '100%',
+          display: 'flex',
+          alignItems: 'flex-start',
+          justifyContent: 'center',
+          gap: '44px',
+          padding: '20px 0',
+          pointerEvents: 'auto',
+        }}
+      >
+        {COLLECTIONS_MENU.map((c) => {
+          const isFirstContact = c.id === 'first-contact';
+          return (
+            <Link
+              key={c.id}
+              to={c.href}
+              title={c.name}
+              aria-label={c.name}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'flex-start',
+                justifyContent: 'center',
+                transition: 'transform 0.15s ease, opacity 0.15s ease',
+              }}
+              className="hover:scale-110 active:scale-95"
+            >
+              <img
+                src={c.icon}
+                alt={c.name}
+                loading="lazy"
+                decoding="async"
+                style={{
+                  width: isFirstContact ? '42.1px' : 'auto',
+                  height: isFirstContact ? 'auto' : '44px',
+                  objectFit: 'contain',
+                  display: 'block',
+                  filter: 'brightness(0)',
+                }}
+              />
+            </Link>
+          );
+        })}
+      </div>
+
       <Pauta4ColsOverlay
         pautaEnabled={false}
         tableEnabled={false}
-        numCols={isPortraitTablet ? 3 : 4}
+        numCols={(isPortraitTablet || isLandscapeTablet) ? 3 : 4}
         numRows={90}
-        canvasAspect={[2642, isPortraitTablet ? 9717 : 6708]}
+        canvasAspect={[2642, (isPortraitTablet || isLandscapeTablet) ? 9717 : 6708]}
         topOffset="0px"
         bottomPadding="0px"
         style={{
           // Puja tot el contingut sota el hero 12 files de la taula (41 → 29).
           // Alçada d'1 fila = ampladaBelt × 6708/2642/90; 12 files ≈ 0.3385 × amplada.
-          marginTop: `calc((var(--hg-tdp-xL, 0px) - var(--hg-tdp-xR, 0px)) * 0.3385${isLandscapeTablet ? ' - 30px' : ''})`,
+          marginTop: `calc((var(--hg-tdp-xL, 0px) - var(--hg-tdp-xR, 0px)) * 0.3385${isLandscapeTablet ? ' - 30px' : ''}${isPortraitTablet ? ' - 120px' : ''})`,
         }}
       >
         <img
@@ -408,7 +423,7 @@ function CollectionFirstContactPage() {
           }}
         />
         {[0, 1, 2, 3].flatMap((rowIdx) =>
-          (isPortraitTablet ? [0, 1, 2] : [0, 1, 2, 3]).map((colIdx) => {
+          ((isPortraitTablet || isLandscapeTablet) ? [0, 1, 2] : [0, 1, 2, 3]).map((colIdx) => {
             const color = TDP_GRID_COLORS[rowIdx][colIdx];
             if (!color) return null;
             const isV5 = (rowIdx + colIdx) % 2 === 1;
@@ -421,6 +436,8 @@ function CollectionFirstContactPage() {
             const portraitFirstColumnImageNameLift = isPortraitTablet && (colIdx === 0 || colIdx === 2) ? ' - 10px' : '';
             const portraitSecondColumnImageLift = isPortraitTablet && colIdx === 1 ? ' - 10px' : '';
             const portraitSecondColumnDescriptionDrop = isPortraitTablet && colIdx === 1 ? ' + 10px' : '';
+            const landscapeCol2Lift = isLandscapeTablet && colIdx === 1 ? ' - 40px' : '';
+            const landscapeCol2DescriptionLift = isLandscapeTablet && colIdx === 1 ? ' - 60px' : '';
             const liftCols = tabletLayout && (colIdx === 0 || colIdx === 2);
             const liftOffset = liftCols ? ` - ${30 + portraitFirstColumnLift}px` : '';
             const productNameLiftOffset = liftCols ? ` - ${40 + portraitFirstColumnLift}px` : '';
@@ -454,8 +471,8 @@ function CollectionFirstContactPage() {
                 productNamePlain
                 editable={false}
                 imageTranslateY={liftCols ? `calc(9px + 1lh${liftOffset}${globalLiftOffset}${portraitFirstColumnImageNameLift})` : (lowerCols ? `calc(9px + 1lh + 159px${imageLowerOffset}${globalLiftOffset}${portraitSecondColumnImageLift})` : (isLandscapeTablet ? `calc(9px + 1lh${globalLiftOffset})` : undefined))}
-                productNameTranslateY={liftCols ? `calc(1lh${productNameLiftOffset}${globalLiftOffset}${portraitFirstColumnImageNameLift})` : (lowerCols ? `calc(1lh - 325px${globalLiftOffset})` : (isLandscapeTablet ? `calc(1lh${globalLiftOffset})` : undefined))}
-                descriptionTranslateY={liftCols ? `calc(2lh - 1px${liftOffset}${descriptionExtraOffset}${globalLiftOffset})` : (lowerCols ? `calc(2lh - 1px - 325px${lowerOffset}${descriptionExtraOffset}${globalLiftOffset}${portraitSecondColumnDescriptionDrop})` : (isLandscapeTablet ? `calc(2lh - 1px${descriptionExtraOffset}${globalLiftOffset})` : undefined))}
+                productNameTranslateY={liftCols ? `calc(1lh${productNameLiftOffset}${globalLiftOffset}${portraitFirstColumnImageNameLift})` : (lowerCols ? `calc(1lh - 325px${globalLiftOffset}${landscapeCol2Lift})` : (isLandscapeTablet ? `calc(1lh${globalLiftOffset})` : undefined))}
+                descriptionTranslateY={liftCols ? `calc(2lh - 1px${liftOffset}${descriptionExtraOffset}${globalLiftOffset})` : (lowerCols ? `calc(2lh - 1px - 325px${lowerOffset}${descriptionExtraOffset}${globalLiftOffset}${portraitSecondColumnDescriptionDrop}${landscapeCol2DescriptionLift})` : (isLandscapeTablet ? `calc(2lh - 1px${descriptionExtraOffset}${globalLiftOffset})` : undefined))}
               />
             );
           })
@@ -466,7 +483,10 @@ function CollectionFirstContactPage() {
         posterLines={[{ text: 'CADA' }, { text: 'PERSONA TÉ' }, { text: 'UNA HISTÒRIA' }]}
         tambeImages={otherImages}
         marginTop={isPortraitTablet ? '-350px' : '-552px'}
+        visibleCards={(isPortraitTablet || isLandscapeTablet) ? 3 : 4}
       />
+        </>
+      )}
     </section>
   );
 }
