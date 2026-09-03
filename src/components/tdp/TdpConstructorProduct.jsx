@@ -247,6 +247,8 @@ function TdpConstructorProduct({
             <img
               src={shownImageSrc}
               alt={imageAlt}
+              loading="lazy"
+              decoding="async"
               style={{
                 display: 'block',
                 width: variant === 'v4' ? '100%' : imageWidth,
@@ -270,6 +272,8 @@ function TdpConstructorProduct({
           <img
             src={shownImageSrc}
             alt={imageAlt}
+            loading="lazy"
+            decoding="async"
             style={{
               display: 'block',
               width: variant === 'v4' ? '100%' : imageWidth,
@@ -311,7 +315,7 @@ function TdpConstructorProduct({
               transformOrigin: 'center center',
               zIndex: 1,
             }}
-            loading="eager"
+            loading="lazy"
             decoding="async"
           />
         ) : null}

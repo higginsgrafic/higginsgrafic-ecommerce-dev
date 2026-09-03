@@ -8,6 +8,8 @@ import EditableTextBox from '@/components/dev/EditableTextBox';
 import Pauta4ColsOverlay from '@/components/pauta/Pauta4ColsOverlay';
 import { buildHomeDrawingPlan } from '@/components/home/homeDrawings';
 import StoryPosterLink from '@/components/StoryPosterLink';
+import useIsMobile from '@/hooks/useIsMobile';
+import HomeMobile from '@/pages/HomeMobile';
 
 const HERO_SLIDES = [
   {
@@ -91,7 +93,7 @@ function CollectionTitle({ index, kicker, title, subtitle, align = 'left', numbe
         className="relative flex flex-col gap-3 w-full"
       >
         <h2
-          className="relative font-black uppercase leading-[0.85] tracking-[-0.02em] text-foreground"
+          className="relative font-light uppercase leading-[0.85] tracking-[-0.02em] text-foreground"
           style={{
             fontFamily: 'Oswald, sans-serif',
             fontSize: '4.4vw',
@@ -101,7 +103,7 @@ function CollectionTitle({ index, kicker, title, subtitle, align = 'left', numbe
         >
           <span
             aria-hidden="true"
-            className="pointer-events-none absolute hidden select-none font-black leading-none tracking-tighter text-foreground/[0.06] sm:block"
+            className="pointer-events-none absolute hidden select-none font-light leading-none tracking-tighter text-foreground/[0.06] sm:block"
             style={ghostStyle}
           >
             {index}
@@ -205,6 +207,7 @@ function HomeTdpCard({ Component, slug, index, cardPropsFn, collectionHref, edit
 }
 
 function Home() {
+  const isMobile = useIsMobile();
   const pautaGridRef = useRef(null);
   const [rowHeight, setRowHeight] = useState(38);
   const [isPortraitTablet, setIsPortraitTablet] = useState(
@@ -308,6 +311,10 @@ function Home() {
         />
       </Helmet>
 
+      {isMobile ? (
+        <HomeMobile />
+      ) : (
+        <>
       <Pauta4ColsOverlay
         pautaEnabled={false}
         tableEnabled={false}
@@ -317,7 +324,7 @@ function Home() {
         topOffset="76px"
         bottomPadding="0px"
       >
-        {/* Logo HIGGINS GRÀFIC centrat */}
+        {/* Icones de col·leccions on era el logo */}
         <div
           style={{
             gridColumn: '1 / 4',
@@ -330,37 +337,9 @@ function Home() {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            pointerEvents: 'auto',
-            transform: 'translateY(-26px)',
-          }}
-        >
-          <img
-            src="/custom_logos/brand/HIGGINS GRAFIC NEGRE.png"
-            alt="HIGGINS GRÀFIC"
-            style={{
-              width: '35%',
-              height: 'auto',
-              objectFit: 'contain',
-            }}
-          />
-        </div>
-
-        {/* Menú de col·leccions centrat en Y entre títol i hero, alineat al top */}
-        <div
-          style={{
-            gridColumn: '1 / 4',
-            gridRow: '7 / 10',
-            alignSelf: 'center',
-            position: 'relative',
-            zIndex: 10,
-            width: '100%',
-            height: '100%',
-            display: 'flex',
-            alignItems: 'flex-start',
-            justifyContent: 'center',
             gap: '44px',
             pointerEvents: 'auto',
-            transform: 'translateY(0px)',
+            transform: 'translateY(-26px)',
           }}
         >
           {COLLECTIONS_MENU.map((c) => {
@@ -373,20 +352,22 @@ function Home() {
                 aria-label={c.name}
                 style={{
                   display: 'inline-flex',
-                  alignItems: 'flex-start',
+                  alignItems: 'center',
                   justifyContent: 'center',
-                  transition: 'transform 0.15s ease, opacity 0.15s ease',
+                  transform: isFirstContact ? undefined : 'translateY(-18px)',
+                  transition: 'transform 0.15s ease',
                 }}
-                className="hover:scale-110 active:scale-95 opacity-40 hover:opacity-100"
+                className="hover:scale-110 active:scale-95"
               >
                 <img
                   src={c.icon}
                   alt={c.name}
                   style={{
-                    width: isFirstContact ? '42.1px' : 'auto',
-                    height: isFirstContact ? 'auto' : '44px',
+                    width: isFirstContact ? '67.36px' : 'auto',
+                    height: isFirstContact ? 'auto' : '70.4px',
                     objectFit: 'contain',
                     display: 'block',
+                    filter: 'brightness(0)',
                   }}
                 />
               </Link>
@@ -921,6 +902,8 @@ function Home() {
           </div>
         </div>
       </section>
+        </>
+      )}
     </>
   );
 }

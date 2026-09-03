@@ -43,11 +43,21 @@ function App() {
   const [isPortraitTablet, setIsPortraitTablet] = useState(
     window.innerWidth >= 768 && window.innerWidth <= 1024 && window.innerHeight > window.innerWidth
   );
+  const [isLandscapeTablet, setIsLandscapeTablet] = useState(
+    window.innerWidth >= 1024 && window.innerWidth <= 1366 && window.innerHeight < window.innerWidth
+  );
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
 
   useEffect(() => {
-    const update = () => setIsPortraitTablet(
-      window.innerWidth >= 768 && window.innerWidth <= 1024 && window.innerHeight > window.innerWidth
-    );
+    const update = () => {
+      setIsPortraitTablet(
+        window.innerWidth >= 768 && window.innerWidth <= 1024 && window.innerHeight > window.innerWidth
+      );
+      setIsLandscapeTablet(
+        window.innerWidth >= 1024 && window.innerWidth <= 1366 && window.innerHeight < window.innerWidth
+      );
+      setIsMobile(window.innerWidth < 768);
+    };
     window.addEventListener('resize', update);
     return () => window.removeEventListener('resize', update);
   }, []);
@@ -145,7 +155,7 @@ function App() {
 
   const offersHeaderVisible = !isAdminRoute && !isFullScreenRoute && !isDevLayoutRoute && !isHomeRoute && offersEnabled && !offersLoading;
 
-  const baseHeaderHeight = isPortraitTablet ? 104 : (isLargeScreen ? 80 : 64);
+  const baseHeaderHeight = isPortraitTablet ? 80 : (isLargeScreen ? 80 : (isMobile ? 80 : 64));
   const heroSettingsDevHeaderHeight = isDevHeaderRoute ? baseHeaderHeight : 0;
   const offersHeaderHeight = offersHeaderVisible ? 40 : 0;
   const adminBannerVisible = (isAdmin || isDevDemoRoute || isAdminRoute) && !isEmbeddedPreview;
@@ -218,6 +228,7 @@ function App() {
             showStripe={fullWideShowStripe}
             showCatalogPanel={fullWideShowCatalogPanel}
             isPortraitTablet={isPortraitTablet}
+            isLandscapeTablet={isLandscapeTablet}
           />
       )}
 
@@ -250,7 +261,7 @@ function App() {
             null
           ) : (
             !isDevLayoutRoute && (
-              <div style={isHomeRoute ? { marginTop: '-832px', position: 'relative', zIndex: 50 } : undefined}>
+              <div style={isHomeRoute ? { marginTop: '-832px', position: 'relative', zIndex: 50 } : (isPortraitTablet ? { marginTop: '200px' } : undefined)}>
                 <Footer />
               </div>
             )
@@ -292,6 +303,28 @@ function App() {
               isLargeScreen={isLargeScreen}
             />
           </Suspense>
+        )}
+        {/* GUIA VISUAL TEMPORAL: rectangle 360x800 centrat per a mòbil */}
+        {isMobile && (
+          <div style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            width: '100vw',
+            height: '100vh',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 99999,
+            pointerEvents: 'none',
+          }}>
+            <div style={{
+              width: '350px',
+              height: '790px',
+              border: '2px solid red',
+              flexShrink: 0,
+            }} />
+          </div>
         )}
       </>
     )}
