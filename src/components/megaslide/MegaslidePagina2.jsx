@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef } from 'react';
 import CercadorTopBar, { CERCADOR_COLORS } from '../fullwide/CercadorTopBar.jsx';
 import CercadorTextRow from '../fullwide/CercadorTextRow.jsx';
 import MegaStripePanel from '../fullwide/MegaStripePanel.jsx';
@@ -15,7 +15,6 @@ import { computeStripeTileOverlaySrcs, computeStripeTileItems } from '@/utils/re
 export default function MegaslidePagina2({
   active,
   isPortraitTablet = false,
-  megaPage = 2,
   setActive,
   austenSubcollection,
   setAustenSubcollection,
@@ -79,18 +78,10 @@ export default function MegaslidePagina2({
   } = cal;
 
   const bnSliderSize = megaTileSize || 120;
-  const [scrollProgress, setScrollProgress] = useState(0.5);
   const snapTimerRef = useRef(0);
   const neutralGammaRef = useRef(null);
   const tiltDeltaRef = useRef(0);
 
-
-  const updateScrollProgress = useCallback(() => {
-    const viewport = viewportRef.current;
-    if (!viewport) return;
-    const maxScroll = Math.max(0, viewport.scrollWidth - viewport.clientWidth);
-    setScrollProgress(maxScroll > 0 ? viewport.scrollLeft / maxScroll : 0);
-  }, []);
 
   const scrollToProgress = useCallback((progress, behavior = 'smooth') => {
     const viewport = viewportRef.current;
@@ -100,7 +91,6 @@ export default function MegaslidePagina2({
   }, []);
 
   const handlePortraitScroll = useCallback(() => {
-    updateScrollProgress();
     window.clearTimeout(snapTimerRef.current);
     snapTimerRef.current = window.setTimeout(() => {
       if (Math.abs(tiltDeltaRef.current) > 3) return;
@@ -111,22 +101,20 @@ export default function MegaslidePagina2({
       const snapStep = maxScroll / 2;
       viewport.scrollTo({ left: Math.round(viewport.scrollLeft / snapStep) * snapStep, behavior: 'smooth' });
     }, 180);
-  }, [updateScrollProgress]);
+  }, []);
 
   useLayoutEffect(() => {
     const viewport = viewportRef.current;
     if (!viewport) return undefined;
     if (!isPortraitTablet) {
       viewport.scrollLeft = 0;
-      setScrollProgress(0);
       return undefined;
     }
     const frame = requestAnimationFrame(() => {
       scrollToProgress(0, 'auto');
-      updateScrollProgress();
     });
     return () => cancelAnimationFrame(frame);
-  }, [active, isPortraitTablet, scrollToProgress, updateScrollProgress]);
+  }, [active, isPortraitTablet, scrollToProgress]);
 
   useEffect(() => {
     if (!isPortraitTablet || !active) return undefined;
@@ -497,64 +485,6 @@ export default function MegaslidePagina2({
         }} />
       </div>
 
-      {isPortraitTablet && (
-        <div
-          style={{
-            position: 'fixed',
-            left: `calc(50% + ${(megaPage - 2) * 100}vw)`,
-            top: 'calc(14.32vh + 194.65px)',
-            transform: 'translateX(calc(-50% - 582px))',
-            zIndex: 30,
-            display: 'flex',
-            alignItems: 'center',
-          }}
-          aria-label="Posició de la stripe"
-        >
-          {/* Pista amb marques i polsador mòbil */}
-          <div style={{ position: 'relative', display: 'flex', alignItems: 'center', gap: 60, height: 24 }}>
-            {/* Polsador mòbil (nivellador) per sobre de les marques */}
-            <div
-              aria-hidden="true"
-              style={{
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                width: 24,
-                height: 24,
-                borderRadius: '50%',
-                background: '#111827',
-                marginLeft: -12,
-                transform: `translateX(${scrollProgress * 120}px)`,
-                transition: 'transform 80ms linear',
-                pointerEvents: 'none',
-                zIndex: 1,
-              }}
-            />
-            {/* Marques fixes: curta, alta (centre), curta */}
-            {Array.from({ length: 3 }).map((_, index) => {
-              const progress = index / 2;
-              const isCenter = index === 1;
-              return (
-                <button
-                  key={`stripe-scroll-mark-${index}`}
-                  type="button"
-                  aria-label={`Posició ${index + 1} de 3`}
-                  onClick={() => scrollToProgress(progress)}
-                  style={{
-                    width: 1,
-                    height: isCenter ? 24 : 12,
-                    padding: 0,
-                    border: 0,
-                    background: isCenter ? '#111827' : '#d0d0d0',
-                    cursor: 'pointer',
-                    flexShrink: 0,
-                  }}
-                />
-              );
-            })}
-          </div>
-        </div>
-      )}
     </div>
   );
 }
