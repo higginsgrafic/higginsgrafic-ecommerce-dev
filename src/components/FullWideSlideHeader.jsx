@@ -3095,7 +3095,6 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
                       }
                     } else {
                       setAcordioExpanded(false);
-                      setActive(null);
                     }
                   } else {
                     setMegaPage(3);

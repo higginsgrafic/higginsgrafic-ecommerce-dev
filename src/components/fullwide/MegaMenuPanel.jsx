@@ -107,6 +107,18 @@ export default function MegaMenuPanel({
       ? `${Math.round(portraitPage1TileSize * 2 + 69)}px`
       : defaultBleedGuardHeight;
 
+  // El formulari de pagament necessita alçada per centrar-s'hi: a les dues
+  // tauletes, obrir l'acordió estira la franja fins al peu de pantalla.
+  // 112px = capçalera (80px) + padding vertical del panell (32px).
+  const landscapeTablet = typeof window !== 'undefined'
+    && window.innerWidth >= 768
+    && window.innerWidth <= 1366
+    && window.innerWidth >= window.innerHeight;
+  const paymentFillsScreen = (isPortraitTablet || landscapeTablet) && megaPage === 3 && acordioExpanded;
+  const guardHeightPx = paymentFillsScreen
+    ? 'calc(100vh - var(--globalHeaderTopOffset, 0px) - 112px)'
+    : bleedGuardHeight;
+
   return (
     <div className="relative">
       <div
@@ -129,7 +141,7 @@ export default function MegaMenuPanel({
           }}
         >
           <MegaStripeBleedGuard
-            heightPx={bleedGuardHeight}
+            heightPx={guardHeightPx}
             debug={false}
             expandLeftPx={bleedGuardExpandPx?.left || 0}
             expandRightPx={bleedGuardExpandPx?.right || 0}
@@ -220,7 +232,6 @@ export default function MegaMenuPanel({
                 <MegaslidePagina2
                   active={active}
                   isPortraitTablet={isPortraitTablet}
-                  megaPage={megaPage}
                   setActive={setActive}
                   austenSubcollection={austenSubcollection}
                   setAustenSubcollection={setAustenSubcollection}
