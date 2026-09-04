@@ -3008,7 +3008,7 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
             />
           </Link>
 
-          <nav className="hidden md:flex flex-1 items-center justify-center gap-1 lg:gap-6 flex-nowrap" style={(isPortraitTablet || isLandscapeTablet) ? { gap: '0.25rem', minWidth: 0, justifyContent: 'flex-start', marginLeft: '-60px' } : undefined}>
+          <nav className="hidden md:flex flex-1 items-center justify-center gap-1 lg:gap-6 flex-nowrap" style={(isPortraitTablet || isLandscapeTablet) ? { gap: isLandscapeTablet ? '1.5rem' : '0.25rem', minWidth: 0, justifyContent: 'flex-start', marginLeft: isPortraitTablet ? '-60px' : undefined } : undefined}>
             {resolvedNav.map((item) => {
               // L'indicador d'obert (fletxa rotada + color) només s'ha
               // d'activar quan realment veiem la col·lecció (megaPage=1).

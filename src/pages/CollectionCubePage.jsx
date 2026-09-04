@@ -2,6 +2,7 @@ import { useEffect, useLayoutEffect, useState, useRef, useMemo } from 'react';
 import { Helmet } from 'react-helmet';
 import { Link } from 'react-router-dom';
 import Pauta4ColsOverlay from '@/components/pauta/Pauta4ColsOverlay';
+import { useCollectionCardLayout } from '@/hooks/useCollectionCardLayout';
 import { collectionGridImageFor, gridFinishFor, collectionGridHoverVariantsFor } from '@/lib/pdpMockup';
 import HeroSlider from '@/components/HeroSlider';
 import CollectionProductCard from '@/components/tdp/CollectionProductCard';
@@ -170,6 +171,7 @@ function CollectionCubePage() {
   const sizes = ['S', 'M', 'L', 'XL', 'XXL'];
   const { pautaOpacity, tableOpacity, backgroundOpacity } = overlayState;
   const otherImages = useMemo(() => buildOtherCollectionsImages('cube'), []);
+  const getCardLayout = useCollectionCardLayout({ isPortraitTablet, isLandscapeTablet });
 
   useEffect(() => {
     try {
@@ -438,21 +440,7 @@ function CollectionCubePage() {
             const col = colIdx + 1;
             const rowOffset = 10 + rowIdx * 20;
             const productName = productAt(rowIdx, colIdx).name;
-            const tabletLayout = isLandscapeTablet || isPortraitTablet;
-            const portraitFirstColumnLift = isPortraitTablet && (colIdx === 0 || colIdx === 2) ? 20 : 0;
-            const portraitFirstColumnImageNameLift = isPortraitTablet && (colIdx === 0 || colIdx === 2) ? ' - 10px' : '';
-            const portraitSecondColumnImageLift = isPortraitTablet && colIdx === 1 ? ' - 10px' : '';
-            const portraitSecondColumnDescriptionDrop = isPortraitTablet && colIdx === 1 ? ' + 10px' : '';
-            const landscapeCol2Lift = isLandscapeTablet && colIdx === 1 ? ' - 40px' : '';
-            const landscapeCol2DescriptionLift = isLandscapeTablet && colIdx === 1 ? ' - 60px' : '';
-            const liftCols = tabletLayout && (colIdx === 0 || colIdx === 2);
-            const liftOffset = liftCols ? ` - ${30 + portraitFirstColumnLift}px` : "";
-            const productNameLiftOffset = liftCols ? ` - ${40 + portraitFirstColumnLift}px` : "";
-            const lowerCols = tabletLayout && (colIdx === 1 || colIdx === 3);
-            const lowerOffset = lowerCols ? ' + 15px' : '';
-            const imageLowerOffset = lowerCols ? ' - 30px' : '';
-            const descriptionExtraOffset = tabletLayout ? ' + 5px' : '';
-            const globalLiftOffset = tabletLayout ? ' + 10px' : '';
+            const { imageTranslateY, productNameTranslateY, descriptionTranslateY } = getCardLayout(colIdx);
             return (
               <CollectionTdpCard
                 key={`tdp-card-r${rowIdx}-c${colIdx}`}
@@ -477,9 +465,9 @@ function CollectionCubePage() {
                 collectionHref={`${productHref(rowIdx, colIdx)}?color=${color}&finish=${gridFinishFor('cube', color, rowIdx * 4 + colIdx)}`}
                 productNamePlain
                 editable={false}
-                imageTranslateY={liftCols ? `calc(9px + 1lh${liftOffset}${globalLiftOffset}${portraitFirstColumnImageNameLift})` : (lowerCols ? `calc(9px + 1lh + 159px${imageLowerOffset}${globalLiftOffset}${portraitSecondColumnImageLift})` : (isLandscapeTablet ? `calc(9px + 1lh${globalLiftOffset})` : undefined))}
-                productNameTranslateY={liftCols ? `calc(1lh${productNameLiftOffset}${globalLiftOffset}${portraitFirstColumnImageNameLift})` : (lowerCols ? `calc(1lh - 325px${globalLiftOffset}${landscapeCol2Lift})` : (isLandscapeTablet ? `calc(1lh${globalLiftOffset})` : undefined))}
-                descriptionTranslateY={liftCols ? `calc(2lh - 1px${liftOffset}${descriptionExtraOffset}${globalLiftOffset})` : (lowerCols ? `calc(2lh - 1px - 325px${lowerOffset}${descriptionExtraOffset}${globalLiftOffset}${portraitSecondColumnDescriptionDrop}${landscapeCol2DescriptionLift})` : (isLandscapeTablet ? `calc(2lh - 1px${descriptionExtraOffset}${globalLiftOffset})` : undefined))}
+                imageTranslateY={imageTranslateY}
+                productNameTranslateY={productNameTranslateY}
+                descriptionTranslateY={descriptionTranslateY}
               />
             );
           })

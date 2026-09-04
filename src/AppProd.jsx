@@ -21,6 +21,13 @@ import { FullWideSlideHeader } from '@/routes/lazyPages';
 function AppProd() {
   const [isNavigating, setIsNavigating] = useState(false);
   const [isLargeScreen, setIsLargeScreen] = useState(window.innerWidth >= 1024);
+  const [isPortraitTablet, setIsPortraitTablet] = useState(
+    window.innerWidth >= 768 && window.innerWidth <= 1024 && window.innerHeight > window.innerWidth
+  );
+  const [isLandscapeTablet, setIsLandscapeTablet] = useState(
+    window.innerWidth >= 1024 && window.innerWidth <= 1366 && window.innerHeight < window.innerWidth
+  );
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
   const location = useLocation();
   const navigate = useNavigate();
   const { isAdmin, bypassUnderConstruction } = useAdmin();
@@ -39,6 +46,20 @@ function AppProd() {
     bypassUnderConstruction,
     isAdmin,
   });
+
+  useEffect(() => {
+    const update = () => {
+      setIsPortraitTablet(
+        window.innerWidth >= 768 && window.innerWidth <= 1024 && window.innerHeight > window.innerWidth
+      );
+      setIsLandscapeTablet(
+        window.innerWidth >= 1024 && window.innerWidth <= 1366 && window.innerHeight < window.innerWidth
+      );
+      setIsMobile(window.innerWidth < 768);
+    };
+    window.addEventListener('resize', update);
+    return () => window.removeEventListener('resize', update);
+  }, []);
 
   const productContext = useProductContext();
   const safeProductContext =
@@ -101,7 +122,7 @@ function AppProd() {
   const offersHeaderVisible = !isAdminRoute && !isFullScreenRoute && !isDevLayoutRoute && !isHomeRoute && offersEnabled && !offersLoading;
   const adminBannerVisible = (isAdmin || isDevDemoRoute || isAdminRoute) && !isEmbeddedPreview;
 
-  const baseHeaderHeight = isLargeScreen ? 80 : 64;
+  const baseHeaderHeight = isPortraitTablet ? 80 : (isLargeScreen ? 80 : (isMobile ? 80 : 64));
   const offersHeaderHeight = offersHeaderVisible ? 40 : 0;
   const adminBannerHeight = adminBannerVisible ? 40 : 0;
   const adminRouteDevHeaderHeight = (isAdminRoute && (isAdminStudioRoute)) ? baseHeaderHeight : 0;
@@ -125,14 +146,14 @@ function AppProd() {
   const handleUserClick = useCallback(() => navigate('/profile'), [navigate]);
   const pageProps = useMemo(() => ({ onAddToCart: handleAddToCart, cartItems, onUpdateQuantity: updateQuantity }), [handleAddToCart, cartItems, updateQuantity]);
 
-  const showProductsLoadingScreen = !!loading && !shouldRedirect && !redirectLoading;
+  const showProductsLoadingScreen = !!loading;
   const showProductsErrorScreen = !!(error && (!products || products.length === 0));
 
   return (
     <ErrorBoundary>
       <Helmet defaultTitle="GRAFC - Samarretes Premium | Col·leccions Exclusives" titleTemplate="%s | GRAFC" />
 
-      {(shouldRedirect || redirectLoading) && !isFullScreenRoute ? (
+      {shouldRedirect && !isFullScreenRoute ? (
         <div className="w-full h-screen bg-black" />
       ) : !productContext ? (
         <div className="min-h-screen flex items-center justify-center">
@@ -180,6 +201,8 @@ function AppProd() {
                 megaConfig={resolvedFullWideMegaConfig}
                 showStripe={fullWideShowStripe}
                 showCatalogPanel={fullWideShowCatalogPanel}
+                isPortraitTablet={isPortraitTablet}
+                isLandscapeTablet={isLandscapeTablet}
               />
             )
           )}
@@ -213,7 +236,7 @@ function AppProd() {
               null
             ) : (
               !isDevLayoutRoute && (
-                <div style={isHomeRoute ? { marginTop: '-532px', position: 'relative', zIndex: 50 } : undefined}>
+                <div style={isHomeRoute ? { marginTop: '-832px', position: 'relative', zIndex: 50 } : (isPortraitTablet ? { marginTop: '200px' } : undefined)}>
                   <Footer />
                 </div>
               )
