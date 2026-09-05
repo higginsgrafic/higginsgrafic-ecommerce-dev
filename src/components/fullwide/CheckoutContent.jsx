@@ -333,7 +333,7 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
         orderNumber = serverOrderNumber || paymentIntentId;
       }
 
-      trackPurchase(orderNumber, activeItems, totalPlegat, shipping, 0);
+      trackPurchase(orderNumber, activeItems, totalFinal, shipping, 0);
       if (setCartItems) setCartItems([]);
       setIsProcessing(false);
       if (onCloseMegaSlide) onCloseMegaSlide();
