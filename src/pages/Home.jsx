@@ -216,6 +216,13 @@ function Home() {
       && window.innerWidth <= 1024
       && window.innerHeight > window.innerWidth
   );
+  const [isLandscapeTablet, setIsLandscapeTablet] = useState(
+    typeof window !== 'undefined'
+      && window.innerWidth >= 1024
+      && window.innerWidth <= 1366
+      && window.innerHeight < window.innerWidth
+  );
+  const isTablet = isPortraitTablet || isLandscapeTablet;
 
   // Pla d'assignació dibuix + color de samarreta per a les targetes.
   // Es calcula un cop per muntatge (aleatori a cada càrrega).
@@ -271,6 +278,11 @@ function Home() {
           && window.innerWidth <= 1024
           && window.innerHeight > window.innerWidth
       );
+      setIsLandscapeTablet(
+        window.innerWidth >= 1024
+          && window.innerWidth <= 1366
+          && window.innerHeight < window.innerWidth
+      );
       const gridEl = pautaGridRef.current;
       if (!gridEl) return;
       const rect = gridEl.getBoundingClientRect();
@@ -321,7 +333,7 @@ function Home() {
         numCols={3}
         numRows={24}
         canvasAspect={[2642, 1780]}
-        topOffset="76px"
+        topOffset={isTablet ? '38px' : '76px'}
         bottomPadding="0px"
       >
         {/* Icones de col·leccions on era el logo */}
@@ -339,7 +351,7 @@ function Home() {
             justifyContent: 'center',
             gap: '44px',
             pointerEvents: 'auto',
-            transform: 'translateY(-26px)',
+            transform: `translateY(${isPortraitTablet ? '9px' : '-26px'})`,
           }}
         >
           {COLLECTIONS_MENU.map((c) => {
@@ -381,11 +393,12 @@ function Home() {
             gridColumn: '1 / 4',
             gridRow: '10 / 25',
             position: 'relative',
-            top: `calc(-5px - ${rowHeight / 2}px)`,
+            top: `calc(-5px - ${rowHeight / 2}px${isLandscapeTablet ? ' - 50px' : ''})`,
             width: 'calc(100% + 1px)',
-            height: 'calc(100% + 2px)',
+            height: isPortraitTablet ? '430px' : 'calc(100% + 2px)',
             transform: 'scale(0.94)',
             transformOrigin: 'center center',
+            zIndex: isPortraitTablet ? 5 : undefined,
           }}
         >
           <HeroSlider
@@ -398,8 +411,10 @@ function Home() {
         </div>
       </Pauta4ColsOverlay>
 
+      {isPortraitTablet && <div style={{ height: '120px' }} />}
+
       <section className="bg-background text-foreground" style={{ transform: 'scale(0.94)', transformOrigin: 'center top' }}>
-        <div className="mx-auto max-w-[1400px] px-4 pt-[120px] pb-[174px] sm:px-6 lg:px-10">
+        <div className="mx-auto max-w-[1400px] px-4 pt-[120px] pb-[174px] sm:px-6 lg:px-10" style={isTablet ? { paddingTop: '60px' } : undefined}>
             <CollectionTitle
             index=""
             kicker="Col·lecció"
@@ -416,7 +431,7 @@ function Home() {
             subtitleOffsetY={0}
             collectionHref="/first-contact"
           />
-          <div style={{ marginTop: '150px' }}>
+          <div style={{ marginTop: isTablet ? '75px' : '150px' }}>
             <div
               style={{
                 position: 'relative',
@@ -511,7 +526,7 @@ function Home() {
                 collectionHref="/the-human-inside"
               />
             </div>
-            <div style={{ marginTop: '150px' }}>
+            <div style={{ marginTop: isTablet ? '75px' : '150px' }}>
               <div
                 style={{
                   position: 'relative',
@@ -607,7 +622,7 @@ function Home() {
                 collectionHref="/austen"
               />
             </div>
-            <div style={{ marginTop: '150px' }}>
+            <div style={{ marginTop: isTablet ? '75px' : '150px' }}>
               <div
                 style={{
                   position: 'relative',
@@ -703,7 +718,7 @@ function Home() {
                 collectionHref="/cube"
               />
             </div>
-            <div style={{ marginTop: '150px' }}>
+            <div style={{ marginTop: isTablet ? '75px' : '150px' }}>
               <div
                 style={{
                   position: 'relative',
@@ -799,7 +814,7 @@ function Home() {
                 collectionHref="/miscellania"
               />
             </div>
-            <div style={{ marginTop: '150px' }}>
+            <div style={{ marginTop: isTablet ? '75px' : '150px' }}>
               <div
                 style={{
                   position: 'relative',
