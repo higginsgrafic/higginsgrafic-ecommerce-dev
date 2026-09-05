@@ -128,7 +128,7 @@ const Footer = () => {
       }}
     >
       {/* PEU DE COL·LECCIONS DESKTOP + TABLET - Centrat simètricament - Fons gris clar - VISIBLE PRIMER */}
-      <div className="hidden md:block bg-muted transition-colors duration-200">
+      <div className="hidden md:block bg-neutral-200 transition-colors duration-200">
         <div ref={containerRef} className="max-w-7xl mx-auto px-4 lg:px-8 py-16">
           {/* Grup menú amb gaps calculats - centrat simètricament */}
           <div ref={menuGroupRef} className="flex items-center justify-center min-h-[110px]">
@@ -173,7 +173,7 @@ const Footer = () => {
       </div>
 
       {/* PEU DE COL·LECCIONS MÒBIL - VISIBLE PRIMER EN MÒBIL */}
-      <div className="md:hidden bg-muted transition-colors duration-200">
+      <div className="md:hidden bg-neutral-200 transition-colors duration-200">
         <div ref={mobileContainerRef} className="max-w-7xl mx-auto px-4 py-12 min-h-[100px]">
           {/* Imatges de col·leccions en grid de 3 columnes */}
           <motion.div
@@ -266,7 +266,7 @@ const Footer = () => {
       </div>
 
       {/* Peu del Logo Mòbil - Només el logo - Fons gris clar - VISIBLE NOMÉS EN MÒBIL */}
-      <div className="md:hidden bg-muted transition-colors duration-200">
+      <div className="md:hidden bg-neutral-200 transition-colors duration-200">
         <div className="max-w-7xl mx-auto px-4 py-8">
           <motion.div
             className="flex items-center justify-center min-h-[70px]"
@@ -286,7 +286,7 @@ const Footer = () => {
       </div>
 
       {/* Peu del Logo Desktop - Només el logo - Fons gris clar - OCULT EN MÒBIL */}
-      <div className="hidden md:block bg-muted transition-colors duration-200">
+      <div className="hidden md:block bg-neutral-200 transition-colors duration-200">
         <div className="max-w-7xl mx-auto px-4 lg:px-8 py-10">
           <div className="flex items-center justify-center min-h-[80px]">
             <Link to="/" className="transition-transform hover:scale-105">

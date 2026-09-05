@@ -3008,7 +3008,7 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
             />
           </Link>
 
-          <nav className="hidden md:flex flex-1 items-center justify-center gap-1 lg:gap-6 flex-nowrap" style={(isPortraitTablet || isLandscapeTablet) ? { gap: isLandscapeTablet ? '1.5rem' : '0.25rem', minWidth: 0, justifyContent: 'flex-start', marginLeft: isPortraitTablet ? '-60px' : undefined } : undefined}>
+          <nav className={`hidden md:flex flex-1 items-center justify-center gap-1 lg:gap-6 flex-nowrap ${isPortraitTablet ? 'md:hidden' : ''}`} style={(isPortraitTablet || isLandscapeTablet) ? { gap: isLandscapeTablet ? '1.5rem' : '0.25rem', minWidth: 0, justifyContent: 'flex-start', marginLeft: isPortraitTablet ? '-60px' : undefined } : undefined}>
             {resolvedNav.map((item) => {
               // L'indicador d'obert (fletxa rotada + color) només s'ha
               // d'activar quan realment veiem la col·lecció (megaPage=1).
@@ -3177,6 +3177,46 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
         </div>
       </div>
 
+      {/* Segon header per portrait tablet — enllaços de col·leccions */}
+      {isPortraitTablet && (
+        <div
+          className="bg-background"
+          style={{
+            width: 'var(--site-w, 100%)',
+            marginLeft: 'calc(var(--site-xL, 0px) - var(--rulerInset, 0px))',
+            borderTop: '1px solid #E6E8EC',
+          }}
+        >
+          <nav className="flex items-center justify-center gap-6 px-10 py-2 flex-nowrap overflow-x-auto" style={{ scrollbarWidth: 'none', marginTop: '10px' }}>
+            {resolvedNav.map((item) => {
+              const open = active === item.id && megaPage === 1;
+              return (
+                <button
+                  key={item.id}
+                  type="button"
+                  className={`inline-flex items-center gap-1 text-xs font-semibold tracking-[0.18em] uppercase whitespace-nowrap ${open ? 'text-foreground' : 'text-muted-foreground hover:text-foreground'}`}
+                  aria-expanded={open ? 'true' : 'false'}
+                  onClick={() => {
+                    setManualOverrideClosed(false);
+                    setMegaFullScreen(false);
+                    if (active === item.id && megaPage === 1) {
+                      setActive(null);
+                    } else {
+                      setActive(item.id);
+                      setMegaPage(1);
+                      if (!active) ensureMegaOpen();
+                    }
+                    touchMegaPublicActivity();
+                  }}
+                >
+                  {item.label}
+                  <ChevronDown className={`h-3 w-3 transition-transform ${open ? 'rotate-180' : ''}`} />
+                </button>
+              );
+            })}
+          </nav>
+        </div>
+      )}
       {canUseDom && (!contained || portalContainer) &&
         ReactDOM.createPortal(
           active ? (

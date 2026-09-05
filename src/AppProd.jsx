@@ -122,7 +122,7 @@ function AppProd() {
   const offersHeaderVisible = !isAdminRoute && !isFullScreenRoute && !isDevLayoutRoute && !isHomeRoute && offersEnabled && !offersLoading;
   const adminBannerVisible = (isAdmin || isDevDemoRoute || isAdminRoute) && !isEmbeddedPreview;
 
-  const baseHeaderHeight = isPortraitTablet ? 80 : (isLargeScreen ? 80 : (isMobile ? 80 : 64));
+  const baseHeaderHeight = isPortraitTablet ? 116 : (isLargeScreen ? 80 : (isMobile ? 80 : 64));
   const offersHeaderHeight = offersHeaderVisible ? 40 : 0;
   const adminBannerHeight = adminBannerVisible ? 40 : 0;
   const adminRouteDevHeaderHeight = (isAdminRoute && (isAdminStudioRoute)) ? baseHeaderHeight : 0;
@@ -236,7 +236,7 @@ function AppProd() {
               null
             ) : (
               !isDevLayoutRoute && (
-                <div style={isHomeRoute ? { marginTop: '-832px', position: 'relative', zIndex: 50 } : (isPortraitTablet ? { marginTop: '200px' } : undefined)}>
+                <div style={isHomeRoute ? { marginTop: '-832px', position: 'relative', zIndex: 50 } : (isPortraitTablet ? { marginTop: '236px' } : (isLandscapeTablet ? { marginTop: '120px' } : undefined))}>
                   <Footer />
                 </div>
               )
