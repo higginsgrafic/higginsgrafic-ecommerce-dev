@@ -31,8 +31,8 @@ function CistellComandaContent({ cartItems, setCartItems, onCloseMegaSlide, onFi
       && window.innerWidth >= window.innerHeight
   );
 
-  // La recepta estreta és només del vertical; l'horitzontal usa les mides
-  // originals de creació (les d'escriptori).
+  // Micro-retocs propis de la vertical (ancoratge a l'esquerra, junts i
+  // compensacions de text). L'horitzontal en conserva els d'escriptori.
   const isNarrowCart = isPortraitTablet;
 
   const ROW_H = 23.867;        // alçada d'una fila de la pauta
@@ -44,14 +44,20 @@ function CistellComandaContent({ cartItems, setCartItems, onCloseMegaSlide, onFi
   const TABLE_WIDTH = 1350;
   const COL_WIDTH = (TABLE_WIDTH - GUTTER * (COLS - 1)) / COLS; // 322.875px
 
-  // Pauta del CARRUSEL — VALORS MANUALS EDITABLES:
+  // Pauta del CARRUSEL — VALORS MANUALS EDITABLES (un número per variant):
   //   SLOT_W   → amplada d'una targeta del carrusel (px)
   //   SLIDE_GAP→ separaci\u00f3 entre slots (px) — igual que el carrusel
   //   SLIDE_OFFSET_X → desplaçament horitzontal del grid del cistell respecte
   //     a la seva posici\u00f3 natural (per quadrar amb el carrusel). Pot ser
   //     positiu (cap a la dreta) o negatiu (cap a l'esquerra).
-  const SLOT_W = isNarrowCart ? 80 : 144 + 11;
-  const SLIDE_GAP = isPortraitTablet ? 2 : 3;
+  // L'horitzontal fa ara l'estructura de la vertical: 4 columnes d'iguals, sense
+  // columnes externes, i la fila tan ampla com el seu contingut — així deixa de
+  // sobresortir del viewport. L'escriptori i la vertical conserven els números.
+  const L_SLOT_W = 122; // ← amplada de slot de l'horitzontal
+  const L_GAP = 2;      // ← separació entre slots de l'horitzontal
+  const isCompactCart = isPortraitTablet || isLandscapeTablet;
+  const SLOT_W = isPortraitTablet ? 80 : (isLandscapeTablet ? L_SLOT_W : 144 + 11);
+  const SLIDE_GAP = isPortraitTablet ? 2 : (isLandscapeTablet ? L_GAP : 3);
   const SLIDE_OFFSET_X = 0;
   const SLIDE_SLOTS = 9; // 9 slots originals; en renderitzem SLIDE_SLOTS - 1 = 8.
   // Columnes: 2+2+2+(2 + porci\u00f3 visible del 9\u00e8 slot).
@@ -62,7 +68,11 @@ function CistellComandaContent({ cartItems, setCartItems, onCloseMegaSlide, onFi
   // Col 4 ocupa la resta del viewport (TABLE_WIDTH - 3 cols - 3 gaps).
   const COL3 = CART_VIEWPORT - 3 * COL2 - 3 * SLIDE_GAP;
   // Col 1 i Col 4 simètriques: 2*COL_OUTER + 2*COL2 + 3*SLIDE_GAP = CART_VIEWPORT
-  const COL_OUTER = isNarrowCart ? 0 : (CART_VIEWPORT - 2 * COL2 - 3 * SLIDE_GAP) / 2;
+  const COL_OUTER = isCompactCart ? 0 : (CART_VIEWPORT - 2 * COL2 - 3 * SLIDE_GAP) / 2;
+  // Amplada real d'una fila del cistell. A l'horitzontal ve donada pel seu
+  // contingut (4 columnes + 3 junts) perquè no sobrepassi el viewport; a
+  // l'escriptori i a la vertical segueix sent la taula de 1350px.
+  const ROW_W = isLandscapeTablet ? (4 * COL2 + 3 * SLIDE_GAP) : CART_VIEWPORT;
 
   const TSHIRT_BASE = '/placeholders/apparel/t-shirt/gildan_5000/gildan-5000_t-shirt_crewneck_unisex_heavyWeight_xl_';
   const TSHIRT_SUFFIX = '_gpr-4-0_front.png';
@@ -181,8 +191,8 @@ function CistellComandaContent({ cartItems, setCartItems, onCloseMegaSlide, onFi
         <div style={{
           position: 'absolute',
           top: `${TOP_OFFSET}px`,
-          left: `calc(50% - ${TABLE_WIDTH / 2}px)`,
-          width: `${TABLE_WIDTH + COL4_EXTRA}px`,
+          left: `calc(50% - ${ROW_W / 2}px)`,
+          width: `${ROW_W}px`,
           height: `${VISIBLE_HEIGHT}px`,
           display: 'flex',
           flexDirection: 'column',
@@ -221,8 +231,8 @@ function CistellComandaContent({ cartItems, setCartItems, onCloseMegaSlide, onFi
         style={{
           position: 'absolute',
           top: `${TOP_OFFSET}px`,
-          left: isNarrowCart ? '0' : `calc(50% - ${TABLE_WIDTH / 2}px)`,
-          width: `${TABLE_WIDTH + COL4_EXTRA}px`,
+          left: isNarrowCart ? '0' : `calc(50% - ${ROW_W / 2}px)`,
+          width: `${ROW_W}px`,
           height: `${VISIBLE_HEIGHT}px`,
           overflow: 'hidden',
           zIndex: 2,
@@ -246,10 +256,10 @@ function CistellComandaContent({ cartItems, setCartItems, onCloseMegaSlide, onFi
           position: 'absolute',
           top: `${rowIndex * ITEM_STRIDE}px`,
           left: `${SLIDE_OFFSET_X}px`,
-          width: `${TABLE_WIDTH + COL4_EXTRA}px`,
+          width: `${ROW_W}px`,
           height: `${2 * ROW_H - V_GUTTER - 2}px`,
           display: 'grid',
-          gridTemplateColumns: isNarrowCart ? `${COL2}px ${COL2}px ${COL2}px ${COL2}px` : `${COL_OUTER}px ${COL2}px ${COL2}px ${COL_OUTER}px`,
+          gridTemplateColumns: isCompactCart ? `${COL2}px ${COL2}px ${COL2}px ${COL2}px` : `${COL_OUTER}px ${COL2}px ${COL2}px ${COL_OUTER}px`,
           columnGap: `${SLIDE_GAP}px`,
           alignItems: 'stretch',
           overflow: 'hidden',
@@ -260,6 +270,9 @@ function CistellComandaContent({ cartItems, setCartItems, onCloseMegaSlide, onFi
             backgroundImage: `url("${encodeURI('/placeholders/tots_els_fons/fons_acordio/fons-cistell-compra.png')}")`,
             backgroundRepeat: 'no-repeat',
             backgroundPosition: 'center top',
+            // La franja sempre es dibuixa a la seva amplada original de creació
+            // (1350px): així els plecs de l'acordió no s'estiren i la fila
+            // estreta de l'horitzontal només en retalla els extrems.
             backgroundSize: `${TABLE_WIDTH + COL4_EXTRA}px auto`,
             transform: rowIndex % 2 === 0 ? 'scaleX(-1)' : 'none',
             pointerEvents: 'none',
@@ -269,7 +282,7 @@ function CistellComandaContent({ cartItems, setCartItems, onCloseMegaSlide, onFi
             position: 'relative',
             zIndex: 1,
             display: 'grid',
-            gridTemplateColumns: isNarrowCart ? `${COL2}px ${COL2}px ${COL2}px ${COL2}px` : `${COL_OUTER}px ${COL2}px ${COL2}px ${COL_OUTER}px`,
+            gridTemplateColumns: isCompactCart ? `${COL2}px ${COL2}px ${COL2}px ${COL2}px` : `${COL_OUTER}px ${COL2}px ${COL2}px ${COL_OUTER}px`,
             columnGap: `${SLIDE_GAP}px`,
             alignItems: 'stretch',
             width: '100%',
