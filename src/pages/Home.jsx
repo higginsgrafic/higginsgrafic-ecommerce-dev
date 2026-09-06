@@ -1,6 +1,7 @@
-import { useState, useLayoutEffect, useRef, useMemo } from 'react';
+import { useState, useLayoutEffect, useRef, useMemo, useEffect } from 'react';
 import { Helmet } from 'react-helmet';
 import { Link } from 'react-router-dom';
+import { Shuffle } from 'lucide-react';
 import HeroSlider from '@/components/HeroSlider';
 import TDP1 from '@/components/tdp/TDP1';
 import TDP2 from '@/components/tdp/TDP2';
@@ -243,7 +244,15 @@ function Home() {
   const isTablet = isPortraitTablet || isLandscapeTablet;
 
   // Pla de franges per l'hero: 5 colors + 5 dibuixos aleatoris
-  const heroStripePlan = useMemo(() => buildHeroStripePlan(), []);
+  // Només es regenera quan l'usuari clica el botó shuffle.
+  // Es manté el pla anterior perquè les velles surtin mentre les noves entren.
+  const [heroPlans, setHeroPlans] = useState({ current: buildHeroStripePlan(), prev: null });
+  const [heroCycle, setHeroCycle] = useState(0);
+
+  const handleShuffle = () => {
+    setHeroPlans(({ current }) => ({ current: buildHeroStripePlan(), prev: current }));
+    setHeroCycle((c) => c + 1);
+  };
 
   // Pla d'assignació dibuix + color de samarreta per a les targetes.
   // Es calcula un cop per muntatge (aleatori a cada càrrega).
@@ -427,143 +436,153 @@ function Home() {
             borderRadius: '4px',
           }}
         >
-          {heroStripePlan.map((s, i) => (
-            <Link
-              key={i}
-              to={((i === 1 || i === 2) && s.productHref) ? s.productHref : s.collectionHref}
-              style={{
-                flex: '1 1 0',
-                position: 'relative',
-                display: 'flex',
-                alignItems: 'center',
-                overflow: 'hidden',
-                // El wash és el fons de la franja: la samarreta i el dibuix van a sobre.
-                background: `linear-gradient(${i % 2 === 0 ? '90deg' : '270deg'}, ${isTablet ? '#E5E7EB' : '#F9FAFB'} 0%, #FFFFFF 100%)`,
-                textDecoration: 'none',
-              }}
-              className="group hover:opacity-90 transition-opacity"
-            >
-              {/* Samarreta: la mateixa forma centrada verticalment en tot
-                  el contenidor (500% d'alçada), retallada per aquesta franja.
-                  Cada franja té un color diferent. */}
+          {/* Botó shuffle manual */}
+          <button
+            onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleShuffle(); }}
+            aria-label="Barreja samarretes i dibuixos"
+            style={{
+              position: 'absolute',
+              top: '50%',
+              right: '32px',
+              transform: 'translateY(-50%)',
+              zIndex: 10,
+              background: 'rgba(255,255,255,0.85)',
+              border: '1px solid #E5E7EB',
+              borderRadius: '50%',
+              width: '72px',
+              height: '72px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer',
+              backdropFilter: 'blur(4px)',
+            }}
+            className="hover:bg-white transition-colors"
+          >
+            <Shuffle size={32} color="#475059" />
+          </button>
+          {heroPlans.current.map((s, i) => {
+            const prev = heroPlans.prev ? heroPlans.prev[i] : null;
+            const renderBand = (band, idx, animType, key) => band ? (
               <div
+                key={key}
                 style={{
+                  width: '100%',
+                  height: '100%',
                   position: 'absolute',
-                  left: 0,
-                  right: 0,
                   top: 0,
-                  height: '500%',
-                  backgroundImage: `url(${s.mockupSrc})`,
-                  backgroundSize: 'auto 100%',
-                  backgroundPosition: 'center top',
-                  backgroundRepeat: 'no-repeat',
-                  transform: `translateY(-${i * 20}%)`,
-                  pointerEvents: 'none',
+                  left: 0,
+                  // Sortida: delay = i * 0.6s. Entrada: delay = i * 0.6s + 3s
+                  // (la nova entra només quan la vella ha desaparegut)
+                  animation: heroPlans.prev
+                    ? `${i % 2 === 0 ? `hg-hero-${animType}-even` : `hg-hero-${animType}-odd`} 0.4s ease-in-out ${i * 0.15 + (animType === 'enter' ? 0.2 : 0)}s both`
+                    : 'none',
                 }}
-              />
-              {/* Dibuix: escalat segons l'overlayScale del dibuix (per defecte
-                  0.345 = 30% de l'alçada total), posicionat al centre del pit.
-                  Cada franja només mostra la porció que li correspon. */}
-              {s.overlaySrc && (
+              >
+                {/* Samarreta */}
                 <div
                   style={{
                     position: 'absolute',
-                    left: 0,
-                    right: 0,
-                    top: 0,
+                    left: 0, right: 0, top: 0,
                     height: '500%',
-                    backgroundImage: `url(${s.overlaySrc})`,
-                    backgroundSize: `auto ${(() => {
-                      // El div overlay és 500% d'una franja. backgroundSize
-                      // és % del div, no de la franja. Els dibuixos "normal"
-                      // tenen molt padding transparent i a 30% es veuen bé.
-                      // Els dibuixos "plens" (ships, quotes, LFMD) necessiten
-                      // valors molt més petits.
-                      const id = s.overlayAlt;
-                      // Les cites que el catàleg ven com "It Is a Truth" i
-                      // "You Must Allow Me" són el mateix mòdul 2:1; la segona
-                      // arriba al hero amb la id `i-admire-and-love-you` (els
-                      // dos fitxers webp són píxel a píxel idèntics).
-                      const overrides = {
-                        'first_contact/nx-01': 7,
-                        'first_contact/ncc-1701': 7,
-                        'first_contact/ncc-1701-d': 3.5,
-                        'first_contact/the-phoenix': isTablet ? 35 : 38.5,
-                        'austen/it-is-a-truth': isTablet ? 12.8 : 12.16,
-                        'austen/half-agony-half-hope': isTablet ? 6 : 4.8,
-                        'austen/unsociable-and-taciturn': isTablet ? 3 : 2.4,
-                        'austen/i-admire-and-love-you': isTablet ? 6 : 12.16,
-                        'austen/you-have-bewitched-me': isTablet ? 3 : 2.4,
-                        'austen/lfmd/blue-solid': 19,
-                        'austen/lfmd/fuchsia-solid': 19,
-                        'austen/lfmd/red-solid': 19,
-                        'austen/lfmd/yellow-solid': 19,
-                      };
-                      return overrides[id] != null ? overrides[id] : 30;
-                    })()}%`,
-                    backgroundPosition: 'center 35%',
+                    backgroundImage: `url(${band.mockupSrc})`,
+                    backgroundSize: 'auto 100%',
+                    backgroundPosition: 'center top',
                     backgroundRepeat: 'no-repeat',
-                    transform: `translateY(-${i * 20}%)`,
+                    transform: `translateY(-${idx * 20}%)`,
                     pointerEvents: 'none',
-                    opacity: 0.95,
                   }}
                 />
-              )}
-              <div
-                style={{
-                  position: 'relative',
-                  zIndex: 2,
-                  paddingLeft: '24px',
-                  color: '#475059',
-                }}
-              >
-                {s.collectionName && (() => {
-                  const showAustenSplit = isPortraitTablet && (i === 1 || i === 2) && s.collectionSlug === 'austen' && s.drawingLabel;
-                  if (showAustenSplit) {
-                    return (
-                      <div>
-                        <p style={{
-                          fontFamily: 'Oswald, sans-serif',
-                          fontSize: '13px',
-                          fontWeight: 600,
-                          letterSpacing: '0.18em',
-                          textTransform: 'uppercase',
-                          margin: 0,
-                          opacity: 0.95,
-                        }}>
-                          {`${s.collectionName}/`}
-                        </p>
-                        <p style={{
-                          fontFamily: 'Oswald, sans-serif',
-                          fontSize: '11px',
-                          fontWeight: 400,
-                          letterSpacing: '0.05em',
-                          textTransform: 'uppercase',
-                          margin: '1px 0 0 0',
-                          opacity: 0.8,
-                        }}>
-                          {s.drawingLabel}
-                        </p>
-                      </div>
-                    );
-                  }
-                  return (
-                    <p style={{
-                      fontFamily: 'Oswald, sans-serif',
-                      fontSize: '13px',
-                      fontWeight: 600,
-                      letterSpacing: '0.18em',
-                      textTransform: 'uppercase',
-                      margin: 0,
+                {/* Dibuix */}
+                {band.overlaySrc && (
+                  <div
+                    style={{
+                      position: 'absolute',
+                      left: 0, right: 0, top: 0,
+                      height: '500%',
+                      backgroundImage: `url(${band.overlaySrc})`,
+                      backgroundSize: `auto ${(() => {
+                        const id = band.overlayAlt;
+                        const overrides = {
+                          'first_contact/nx-01': 7,
+                          'first_contact/ncc-1701': 7,
+                          'first_contact/ncc-1701-d': 3.5,
+                          'first_contact/the-phoenix': isTablet ? 35 : 38.5,
+                          'austen/it-is-a-truth': isTablet ? 12.8 : 12.16,
+                          'austen/half-agony-half-hope': isTablet ? 6 : 4.8,
+                          'austen/unsociable-and-taciturn': isTablet ? 3 : 2.4,
+                          'austen/i-admire-and-love-you': isTablet ? 6 : 12.16,
+                          'austen/you-have-bewitched-me': isTablet ? 3 : 2.4,
+                          'austen/lfmd/blue-solid': 19,
+                          'austen/lfmd/fuchsia-solid': 19,
+                          'austen/lfmd/red-solid': 19,
+                          'austen/lfmd/yellow-solid': 19,
+                        };
+                        return overrides[id] != null ? overrides[id] : 30;
+                      })()}%`,
+                      backgroundPosition: 'center 35%',
+                      backgroundRepeat: 'no-repeat',
+                      transform: `translateY(-${idx * 20}%)`,
+                      pointerEvents: 'none',
                       opacity: 0.95,
-                    }}>
-                      {(i === 1 || i === 2) && s.subName ? `${s.collectionName} / ${s.subName}` : s.collectionName}
-                    </p>
-                  );
-                })()}
+                    }}
+                  />
+                )}
+                {/* Títol */}
+                <div
+                  style={{
+                    position: 'relative',
+                    zIndex: 2,
+                    paddingLeft: '24px',
+                    color: '#475059',
+                  }}
+                >
+                  {band.collectionName && (() => {
+                    const showAustenSplit = isPortraitTablet && (idx === 1 || idx === 2) && band.collectionSlug === 'austen' && band.drawingLabel;
+                    if (showAustenSplit) {
+                      return (
+                        <div>
+                          <p style={{ fontFamily: 'Oswald, sans-serif', fontSize: '13px', fontWeight: 600, letterSpacing: '0.18em', textTransform: 'uppercase', margin: 0, opacity: 0.95 }}>
+                            {`${band.collectionName}/`}
+                          </p>
+                          <p style={{ fontFamily: 'Oswald, sans-serif', fontSize: '11px', fontWeight: 400, letterSpacing: '0.05em', textTransform: 'uppercase', margin: '1px 0 0 0', opacity: 0.8 }}>
+                            {band.drawingLabel}
+                          </p>
+                        </div>
+                      );
+                    }
+                    return (
+                      <p style={{ fontFamily: 'Oswald, sans-serif', fontSize: '13px', fontWeight: 600, letterSpacing: '0.18em', textTransform: 'uppercase', margin: 0, opacity: 0.95 }}>
+                        {(idx === 1 || idx === 2) && band.subName ? `${band.collectionName} / ${band.subName}` : band.collectionName}
+                      </p>
+                    );
+                  })()}
+                </div>
               </div>
-            </Link>
-          ))}
+            ) : null;
+
+            return (
+              <Link
+                key={`${heroCycle}-${i}`}
+                to={((i === 1 || i === 2) && s.productHref) ? s.productHref : s.collectionHref}
+                style={{
+                  flex: '1 1 0',
+                  position: 'relative',
+                  display: 'flex',
+                  alignItems: 'center',
+                  overflow: 'hidden',
+                  background: `linear-gradient(${i % 2 === 0 ? '90deg' : '270deg'}, ${isTablet ? '#E5E7EB' : '#F9FAFB'} 0%, #FFFFFF 100%)`,
+                  textDecoration: 'none',
+                }}
+                className="group hover:opacity-90 transition-opacity"
+              >
+                {/* Capa anterior: surt per la part grisa */}
+                {renderBand(prev, i, 'exit', `prev-${i}`)}
+                {/* Capa actual: entra per la part blanca i es queda */}
+                {renderBand(s, i, 'enter', `cur-${i}`)}
+              </Link>
+            );
+          })}
         </div>
       </Pauta4ColsOverlay>
 
