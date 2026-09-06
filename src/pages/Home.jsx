@@ -475,7 +475,7 @@ function Home() {
                   // Sortida: delay = i * 0.6s. Entrada: delay = i * 0.6s + 3s
                   // (la nova entra només quan la vella ha desaparegut)
                   animation: heroPlans.prev
-                    ? `${i % 2 === 0 ? `hg-hero-${animType}-even` : `hg-hero-${animType}-odd`} 0.4s ease-in-out ${i * 0.15 + (animType === 'enter' ? 0.2 : 0)}s both`
+                    ? `${i % 2 === 0 ? `hg-hero-${animType}-even` : `hg-hero-${animType}-odd`} 0.2s ease-in-out ${i * 0.075 + (animType === 'enter' ? 0.1 : 0)}s both`
                     : 'none',
                 }}
               >
