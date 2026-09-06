@@ -10,6 +10,26 @@
   100% { opacity: 0; }
 }
 
+@keyframes hg-hero-enter-even {
+  0%   { transform: translateX(100%); }
+  100% { transform: translateX(0%); }
+}
+
+@keyframes hg-hero-exit-even {
+  0%   { transform: translateX(0%); }
+  100% { transform: translateX(-100%); }
+}
+
+@keyframes hg-hero-enter-odd {
+  0%   { transform: translateX(-100%); }
+  100% { transform: translateX(0%); }
+}
+
+@keyframes hg-hero-exit-odd {
+  0%   { transform: translateX(0%); }
+  100% { transform: translateX(100%); }
+}
+
 html {
   scrollbar-gutter: stable;
 }
