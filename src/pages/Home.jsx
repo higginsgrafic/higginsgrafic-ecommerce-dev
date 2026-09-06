@@ -433,7 +433,7 @@ function Home() {
             flexDirection: 'column',
             gap: '2px',
             overflow: 'hidden',
-            borderRadius: '4px',
+            borderRadius: isTablet ? '12px' : '24px',
           }}
         >
           {/* Botó shuffle manual */}
@@ -444,11 +444,11 @@ function Home() {
               position: 'absolute',
               top: '50%',
               right: '32px',
-              transform: 'translateY(-50%)',
+              animation: 'hg-shuffle-zoom 4s ease-in-out infinite',
               zIndex: 10,
-              background: 'rgba(255,255,255,0.85)',
-              border: '1px solid #E5E7EB',
-              borderRadius: '50%',
+              background: 'transparent',
+              border: 'none',
+              borderRadius: '12px',
               width: '72px',
               height: '72px',
               display: 'flex',
@@ -507,12 +507,13 @@ function Home() {
                           'first_contact/nx-01': 7,
                           'first_contact/ncc-1701': 7,
                           'first_contact/ncc-1701-d': 3.5,
-                          'first_contact/the-phoenix': isTablet ? 35 : 38.5,
+                          'first_contact/the-phoenix': isTablet ? 42.35 : 46.585,
                           'austen/it-is-a-truth': isTablet ? 12.8 : 12.16,
                           'austen/half-agony-half-hope': isTablet ? 6 : 4.8,
                           'austen/unsociable-and-taciturn': isTablet ? 3 : 2.4,
                           'austen/i-admire-and-love-you': isTablet ? 6 : 12.16,
                           'austen/you-have-bewitched-me': isTablet ? 3 : 2.4,
+                          'austen/you-must-allow-me': isTablet ? 12.8 : 12.16,
                           'austen/lfmd/blue-solid': 19,
                           'austen/lfmd/fuchsia-solid': 19,
                           'austen/lfmd/red-solid': 19,
@@ -531,7 +532,10 @@ function Home() {
                 {/* Títol */}
                 <div
                   style={{
-                    position: 'relative',
+                    position: 'absolute',
+                    top: '50%',
+                    left: 0,
+                    transform: 'translateY(-50%)',
                     zIndex: 2,
                     paddingLeft: '24px',
                     color: '#475059',
@@ -542,17 +546,17 @@ function Home() {
                     if (showAustenSplit) {
                       return (
                         <div>
-                          <p style={{ fontFamily: 'Oswald, sans-serif', fontSize: '13px', fontWeight: 600, letterSpacing: '0.18em', textTransform: 'uppercase', margin: 0, opacity: 0.95 }}>
+                          <p style={{ fontFamily: 'Oswald, sans-serif', fontSize: isTablet ? '13px' : '18px', fontWeight: 600, letterSpacing: '0.18em', textTransform: 'uppercase', margin: 0, opacity: 0.95 }}>
                             {`${band.collectionName}/`}
                           </p>
-                          <p style={{ fontFamily: 'Oswald, sans-serif', fontSize: '11px', fontWeight: 400, letterSpacing: '0.05em', textTransform: 'uppercase', margin: '1px 0 0 0', opacity: 0.8 }}>
+                          <p style={{ fontFamily: 'Oswald, sans-serif', fontSize: isTablet ? '11px' : '15px', fontWeight: 400, letterSpacing: '0.05em', textTransform: 'uppercase', margin: '1px 0 0 0', opacity: 0.8 }}>
                             {band.drawingLabel}
                           </p>
                         </div>
                       );
                     }
                     return (
-                      <p style={{ fontFamily: 'Oswald, sans-serif', fontSize: '13px', fontWeight: 600, letterSpacing: '0.18em', textTransform: 'uppercase', margin: 0, opacity: 0.95 }}>
+                      <p style={{ fontFamily: 'Oswald, sans-serif', fontSize: isTablet ? '13px' : '18px', fontWeight: 600, letterSpacing: '0.18em', textTransform: 'uppercase', margin: 0, opacity: 0.95 }}>
                         {(idx === 1 || idx === 2) && band.subName ? `${band.collectionName} / ${band.subName}` : band.collectionName}
                       </p>
                     );
@@ -571,7 +575,7 @@ function Home() {
                   display: 'flex',
                   alignItems: 'center',
                   overflow: 'hidden',
-                  background: `linear-gradient(${i % 2 === 0 ? '90deg' : '270deg'}, ${isTablet ? '#E5E7EB' : '#F9FAFB'} 0%, #FFFFFF 100%)`,
+                  background: '#FFFFFF',
                   textDecoration: 'none',
                 }}
                 className="group hover:opacity-90 transition-opacity"

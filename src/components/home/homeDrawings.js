@@ -129,7 +129,7 @@ const AUSTEN = [
   // quotes (negre + blanc) — totes tenen mockup pre-composat a austen/cites/quotes
   ...[
     'half-agony-half-hope', 'i-admire-and-love-you', 'it-is-a-truth',
-    'unsociable-and-taciturn', 'you-have-bewitched-me',
+    'unsociable-and-taciturn', 'you-have-bewitched-me', 'you-must-allow-me',
   ].map((n) => bw('austen', n, 'austen/quotes',
     AUSTEN_QUOTES_WITH_MOCKUP.has(n) ? { collection: 'austen-quotes', design: `quotes-${n}` } : undefined)),
   // looking_for_my_darcy (NOMÉS color) — design = `looking-for-my-darcy-<variant>`.
@@ -446,6 +446,7 @@ const STRIPE2_ONLY_IDS = new Set([
   'austen/unsociable-and-taciturn',
   'austen/i-admire-and-love-you',
   'austen/you-have-bewitched-me',
+  'austen/you-must-allow-me',
   'first_contact/nx-01',
   'first_contact/ncc-1701',
   'first_contact/ncc-1701-d',
@@ -471,6 +472,69 @@ function inkKinds(drawing) {
  *  · Les tintes de color surten: ~1 de cada 2 vegades quan el dibuix les té, i
  *    sempre a Cube i Looking For My Darcy, que només existeixen en color.
  */
+
+// ── Estat d'equitat entre clics ──────────────────────────────────────────
+// Compta quantes vegades ha sortit cada dibuix al hero, per garantir que
+// tots apareixen la mateixa quantitat de vegades i cap es quedi sense sortir.
+const heroFairness = {
+  counts: new Map(),     // drawingId → vegades mostrat
+  lastBand3Repeat: null, // drawingId repetit a la franja 3 la ronda anterior
+};
+
+export function resetHeroFairness() {
+  heroFairness.counts.clear();
+  heroFairness.lastBand3Repeat = null;
+}
+
+/**
+ * Selecciona un dibuix del pool de manera justa:
+ *  1. Sempre prefereix dibuixos no vistos (count = 0).
+ *  2. Si tots han sortit, agafa el menys mostrat.
+ *  3. A la franja 3, si la franja 2 està mostrant un dibuix nou, pot repetir
+ *     un dibuix ja vist (diferent de la repetició de la ronda anterior).
+ *  4. Entre dibuixos amb el mateix recompte, tria aleatòriament per
+ *     augmentar la sensació d'espontaneitat.
+ */
+function pickFair(pool, rng, opts = {}) {
+  if (pool.length === 0) return null;
+  const { canRepeat = false, excludeRepeat = null } = opts;
+
+  const counted = pool.map((d) => ({
+    d,
+    count: heroFairness.counts.get(d.id) || 0,
+  }));
+
+  const unseen = counted.filter((x) => x.count === 0);
+  const seen = counted.filter((x) => x.count > 0);
+
+  // Franja 3 amb permís de repetició: 50% de probabilitat de repetir
+  if (canRepeat && seen.length > 0 && rng() < 0.5) {
+    const repeatable = seen.filter((x) => x.d.id !== excludeRepeat);
+    if (repeatable.length > 0) {
+      const minCount = Math.min(...repeatable.map((x) => x.count));
+      const leastShown = repeatable.filter((x) => x.count === minCount);
+      return leastShown[Math.floor(rng() * leastShown.length)].d;
+    }
+  }
+
+  // Regla general: si hi ha dibuixos no vistos, n'agafa un aleatori
+  if (unseen.length > 0) {
+    // 15% de probabilitat de triar un de vist amb recompte baix per trencar
+    // predictibilitat, però només si n'hi ha
+    if (seen.length > 0 && rng() < 0.15) {
+      const minSeen = Math.min(...seen.map((x) => x.count));
+      const lowSeen = seen.filter((x) => x.count === minSeen);
+      return lowSeen[Math.floor(rng() * lowSeen.length)].d;
+    }
+    return unseen[Math.floor(rng() * unseen.length)].d;
+  }
+
+  // Tot vist: agafa el menys mostrat, aleatori entre empats
+  const minCount = Math.min(...counted.map((x) => x.count));
+  const leastShown = counted.filter((x) => x.count === minCount);
+  return leastShown[Math.floor(rng() * leastShown.length)].d;
+}
+
 export function buildHeroStripePlan(rng = Math.random) {
   const allDrawings = [];
   for (const slug of HOME_COLLECTIONS_ORDER) {
@@ -490,10 +554,37 @@ export function buildHeroStripePlan(rng = Math.random) {
     return pool;
   };
 
-  const picks = strips.map((slug, i) => {
+  // Ordre de selecció: franja 2 primer (per saber si és nova), després
+  // franja 3 (pot repetir si la 2 és nova), després la resta.
+  const pickOrder = [1, 2, 0, 3, 4];
+  const picks = new Array(5);
+  let band2IsNew = false;
+
+  for (const i of pickOrder) {
+    const slug = strips[i];
     const pool = candidatesFor(slug, i);
-    return pool[Math.floor(rng() * pool.length)];
-  });
+    const canRepeat = i === 2 && band2IsNew;
+    const pick = pickFair(pool, rng, {
+      canRepeat,
+      excludeRepeat: heroFairness.lastBand3Repeat,
+    });
+    picks[i] = pick;
+
+    if (i === 1 && pick) {
+      band2IsNew = !heroFairness.counts.has(pick.id);
+    }
+
+    // Actualitza recompte
+    if (pick) {
+      const prevCount = heroFairness.counts.get(pick.id) || 0;
+      heroFairness.counts.set(pick.id, prevCount + 1);
+
+      // Registra repetició a franja 3
+      if (i === 2 && canRepeat && prevCount > 0) {
+        heroFairness.lastBand3Repeat = pick.id;
+      }
+    }
+  }
 
   const inks = picks.map((drawing) => {
     const kinds = inkKinds(drawing);
@@ -513,17 +604,42 @@ export function buildHeroStripePlan(rng = Math.random) {
     }
   }
 
-  // El color de samarreta ve de la tinta: la negra demana samarreta clara, la
-  // blanca una de fosca, i la de color funciona sobre qualsevol color.
-  const lights = shuffle(LIGHT_SHIRT_COLORS, rng);
-  const darks = shuffle([...DARK_COLORS], rng);
-  let li = 0;
-  let di = 0;
-  const colors = inks.map((ink) => {
-    if (ink === 'w') return darks[di++];
-    if (ink === 'b') return lights[li++];
-    if (rng() < 0.5) return li < lights.length ? lights[li++] : darks[di++];
-    return di < darks.length ? darks[di++] : lights[li++];
+  // Assignació de colors: no es poden repetir colors al mateix resultat.
+  // Restricció: les samarretes blanques no poden anar a la franja 1 ni la 5
+  // (índex 0 i 4) perquè visualment es confonen amb el fons.
+  const usedColors = new Set();
+  const allColorsShuffled = shuffle(SHIRT_COLORS, rng);
+
+  const pickColor = (i, preferLight, preferDark) => {
+    const noWhite = i === 0 || i === 4;
+    // Ordena candidates segons preferència
+    let candidates = allColorsShuffled.filter((c) => {
+      if (usedColors.has(c)) return false;
+      if (noWhite && c === 'white') return false;
+      return true;
+    });
+    if (preferLight && !preferDark) {
+      candidates = candidates.sort((a, b) => {
+        const aLight = !DARK_COLORS.has(a);
+        const bLight = !DARK_COLORS.has(b);
+        return (bLight ? 1 : 0) - (aLight ? 1 : 0);
+      });
+    } else if (preferDark && !preferLight) {
+      candidates = candidates.sort((a, b) => {
+        const aDark = DARK_COLORS.has(a);
+        const bDark = DARK_COLORS.has(b);
+        return (bDark ? 1 : 0) - (aDark ? 1 : 0);
+      });
+    }
+    const color = candidates[0];
+    if (color) usedColors.add(color);
+    return color;
+  };
+
+  const colors = inks.map((ink, i) => {
+    if (ink === 'w') return pickColor(i, false, true);  // blanca → fosca
+    if (ink === 'b') return pickColor(i, true, false);  // negra → clara
+    return pickColor(i, false, false);                   // color → qualsevol
   });
 
   return picks.map((drawing, i) => {
