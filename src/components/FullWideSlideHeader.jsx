@@ -2111,6 +2111,12 @@ function FullWideSlideHeader({
     setMegaFullScreen(false);
   };
 
+  // El cadenat només té sentit amb el panell obert: quan es tanca (logo, nav,
+  // canvi de ruta...) la propera obertura ha d'arrencar desbloquejada.
+  useEffect(() => {
+    if (!active) setMegaLocked(false);
+  }, [active]);
+
   useEffect(() => {
     const openFullWideCart = (e) => {
       const { item } = (e && e.detail) || {};
@@ -2957,7 +2963,7 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
             )}
 
             {/* Logo a l'esquerra (desktop + tablet vertical) */}
-            <Link id="stripe-guide-header-logo-anchor" to="/" aria-label="Higgins GRÀFIC - Pàgina d'inici" className="relative z-10 pointer-events-auto hidden md:flex items-center gap-2 font-black tracking-tight text-foreground">
+            <Link id="stripe-guide-header-logo-anchor" to="/" aria-label="Higgins GRÀFIC - Pàgina d'inici" onClick={() => { if (active) closeMegaExplicitly(); }} className="relative z-10 pointer-events-auto hidden md:flex items-center gap-2 font-black tracking-tight text-foreground">
               <span
                 id="stripe-guide-header-logo-mark-anchor"
                 ref={logoMarkRef}
@@ -2983,6 +2989,7 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
           <Link
             to="/"
             aria-label="Higgins GRÀFIC - Pàgina d'inici"
+            onClick={() => { if (active) closeMegaExplicitly(); }}
             className="md:hidden absolute z-10 pointer-events-auto flex items-center gap-2 font-black tracking-tight text-foreground"
             style={{
               left: '50vw',
