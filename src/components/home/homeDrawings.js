@@ -161,7 +161,7 @@ export const SHIRT_COLORS = [
 ];
 
 // Colors foscos → necessiten el dibuix en BLANC (per a dibuixos amb b/w).
-const DARK_COLORS = new Set([
+export const DARK_COLORS = new Set([
   'royal', 'purple', 'navy', 'red', 'irish-green', 'military-green', 'forest-green', 'black',
 ]);
 
@@ -200,7 +200,7 @@ function resolveOverlayTranslateY(drawing) {
 
 // Escala d'overlay per a un dibuix: prioritza l'override per id, després per
 // grup (p.ex. tots els Crosswords d'Austen un 25% més petits = 0.25875).
-function resolveOverlayScale(drawing) {
+export function resolveOverlayScale(drawing) {
   if (!drawing) return undefined;
   if (OVERLAY_SCALE_OVERRIDES[drawing.id] != null) return OVERLAY_SCALE_OVERRIDES[drawing.id];
   if (typeof drawing.group === 'string' && drawing.group.startsWith('crosswords/')) return 0.2716875;
@@ -342,7 +342,7 @@ function resolveProductHref(drawing) {
   return PRODUCT_HREF[drawing.id];
 }
 
-function drawingLabel(drawing) {
+export function drawingLabel(drawing) {
   if (!drawing) return '';
   if (DRAWING_LABELS[drawing.id]) return DRAWING_LABELS[drawing.id];
   if (drawing.group === 'crosswords/persuasion') return 'Persuasion';
@@ -373,7 +373,7 @@ function resolvePrecomposedMockup(drawing, color, isDark) {
   return getMockupPath({ collection, design, shirtColor: color, ink });
 }
 
-function resolveOverlaySrc(drawing, isDark) {
+export function resolveOverlaySrc(drawing, isDark) {
   if (!drawing) return null;
   if (drawing.color) return drawing.color;
   if (drawing.black && drawing.white) return isDark ? drawing.white : drawing.black;
@@ -387,6 +387,175 @@ function shuffle(arr, rng = Math.random) {
     [a[i], a[j]] = [a[j], a[i]];
   }
   return a;
+}
+
+// --- Hero en franges ---------------------------------------------------------
+// Una samarreta sencera partida en 5 bandes horitzontals; cada banda enllaça a
+// una col·lecció.
+
+const HERO_COLLECTION_NAMES = {
+  'first-contact': 'First Contact',
+  'the-human-inside': 'The Human Inside',
+  austen: 'Austen',
+  cube: 'Cube',
+  miscellania: 'Miscel·lània',
+};
+
+const HERO_COLLECTION_HREFS = {
+  'first-contact': '/first-contact',
+  'the-human-inside': '/the-human-inside',
+  austen: '/austen',
+  cube: '/cube',
+  miscellania: '/miscellania',
+};
+
+// Dissenys que, a més de la tinta negra i la blanca, tenen tinta de COLOR al disc
+// (`<dir>/color/<name>-multi-{dark,light}-stripe.webp`).
+const COLOR_INK_IDS = new Set([
+  ...FIRST_CONTACT,
+  ...THE_HUMAN_INSIDE,
+  ...MISCELLANIA,
+  'austen/keep-calm',
+  'austen/pemberley-house',
+].map((d) => (typeof d === 'string' ? d : d.id)));
+
+export function hasColorInk(drawing) {
+  return Boolean(drawing && (drawing.color || COLOR_INK_IDS.has(drawing.id)));
+}
+
+// Tinta de COLOR per a un dibuix: mateix mòdul que la negra però en la versió
+// multi, que es barreja amb el color de la samarreta. Regla de to: `-multi-dark`
+// per a la samarreta BLANCA i `-multi-light` per a qualsevol altre color.
+// (Els dissenys que només existeixen en color —Cube i LFMD— tenen un únic
+// fitxer, sense to a triar.)
+export function resolveColorOverlaySrc(drawing, isWhiteShirt) {
+  if (!drawing) return null;
+  if (drawing.color) return drawing.color;
+  if (!COLOR_INK_IDS.has(drawing.id) || !drawing.black) return null;
+  return drawing.black
+    .replace('/black/', '/color/')
+    .replace('-b-stripe.webp', isWhiteShirt ? '-multi-dark-stripe.webp' : '-multi-light-stripe.webp');
+}
+
+// Dissenys d'una sola línia de text: al hero només caben a la franja 2, que és la
+// banda on el seu marc cau dins del pit. A qualsevol altra franja sortirien
+// tallats i no es veurien, per això no hi poden anar mai.
+const STRIPE2_ONLY_IDS = new Set([
+  'austen/it-is-a-truth',
+  'austen/half-agony-half-hope',
+  'austen/unsociable-and-taciturn',
+  'austen/i-admire-and-love-you',
+  'austen/you-have-bewitched-me',
+  'first_contact/nx-01',
+  'first_contact/ncc-1701',
+  'first_contact/ncc-1701-d',
+]);
+
+const LIGHT_SHIRT_COLORS = SHIRT_COLORS.filter((c) => !DARK_COLORS.has(c));
+
+// Tintes disponibles per a un dibuix, sense mirar encara el color de samarreta:
+// 'b' negra, 'w' blanca, 'm' color.
+function inkKinds(drawing) {
+  if (drawing.color) return ['m'];
+  if (drawing.black && drawing.white) return hasColorInk(drawing) ? ['b', 'w', 'm'] : ['b', 'w'];
+  return [drawing.white ? 'w' : 'b'];
+}
+
+/**
+ * Pla de les 5 franges del hero.
+ *  · Cada franja rep una col·lecció diferent, en ordre aleatori: les 5 hi són
+ *    sempre, barrejades, i cap dibuix es repeteix.
+ *  · Els textos d'una sola línia només poden anar a la franja 2, però no s'hi
+ *    imposen: entren al sorteig com qualsevol altre de la seva col·lecció.
+ *  · Les franges 2 i 3, que es toquen, no coincideixen mai de tinta.
+ *  · Les tintes de color surten: ~1 de cada 2 vegades quan el dibuix les té, i
+ *    sempre a Cube i Looking For My Darcy, que només existeixen en color.
+ */
+export function buildHeroStripePlan(rng = Math.random) {
+  const allDrawings = [];
+  for (const slug of HOME_COLLECTIONS_ORDER) {
+    for (const d of HOME_DRAWINGS[slug] || []) allDrawings.push({ ...d, collectionSlug: slug });
+  }
+
+  const strips = shuffle(HOME_COLLECTIONS_ORDER, rng);
+
+  const candidatesFor = (slug, i) => {
+    let pool = allDrawings.filter((d) => d.collectionSlug === slug);
+    if (i !== 1) pool = pool.filter((d) => !STRIPE2_ONLY_IDS.has(d.id));
+    // Cube i les LFMD d'Austen són només de color: si en-cau un a cada banda de
+    // la frontera 2|3 no podríem distingir les dues tintes.
+    if (slug === 'austen' && (i === 1 || i === 2) && strips[i === 1 ? 2 : 1] === 'cube') {
+      pool = pool.filter((d) => !d.color);
+    }
+    return pool;
+  };
+
+  const picks = strips.map((slug, i) => {
+    const pool = candidatesFor(slug, i);
+    return pool[Math.floor(rng() * pool.length)];
+  });
+
+  const inks = picks.map((drawing) => {
+    const kinds = inkKinds(drawing);
+    if (kinds.length === 1) return kinds[0];
+    if (kinds.includes('m') && rng() < 0.5) return 'm';
+    const plain = kinds.filter((k) => k !== 'm');
+    return plain[Math.floor(rng() * plain.length)];
+  });
+
+  if (inks[1] === inks[2]) {
+    for (const i of rng() < 0.5 ? [1, 2] : [2, 1]) {
+      const alt = inkKinds(picks[i]).filter((k) => k !== inks[i === 1 ? 2 : 1]);
+      if (alt.length) {
+        inks[i] = alt[Math.floor(rng() * alt.length)];
+        break;
+      }
+    }
+  }
+
+  // El color de samarreta ve de la tinta: la negra demana samarreta clara, la
+  // blanca una de fosca, i la de color funciona sobre qualsevol color.
+  const lights = shuffle(LIGHT_SHIRT_COLORS, rng);
+  const darks = shuffle([...DARK_COLORS], rng);
+  let li = 0;
+  let di = 0;
+  const colors = inks.map((ink) => {
+    if (ink === 'w') return darks[di++];
+    if (ink === 'b') return lights[li++];
+    if (rng() < 0.5) return li < lights.length ? lights[li++] : darks[di++];
+    return di < darks.length ? darks[di++] : lights[li++];
+  });
+
+  return picks.map((drawing, i) => {
+    const color = colors[i];
+    const isDark = DARK_COLORS.has(color);
+    const colorSrc = inks[i] === 'm' ? resolveColorOverlaySrc(drawing, color === 'white') : null;
+    const baseHref = resolveProductHref(drawing);
+    // Subcol·lecció d'Austen (p.ex. "Quotes", "Crosswords", "Keep Calm", etc.)
+    const rawMockupCollection = drawing?.mockup?.collection || '';
+    const austenSubcollection = rawMockupCollection.startsWith('austen-')
+      ? rawMockupCollection.replace('austen-', '')
+      : '';
+    const subName = austenSubcollection
+      ? austenSubcollection.charAt(0).toUpperCase() + austenSubcollection.slice(1)
+      : '';
+    return {
+      color,
+      mockupSrc: shirtMockupSrc(color),
+      overlaySrc: colorSrc || resolveOverlaySrc(drawing, isDark),
+      overlayAlt: drawing?.id || '',
+      overlayScale: resolveOverlayScale(drawing),
+      collectionSlug: drawing?.collectionSlug || 'first-contact',
+      collectionName: HERO_COLLECTION_NAMES[drawing?.collectionSlug] || '',
+      collectionHref: HERO_COLLECTION_HREFS[drawing?.collectionSlug] || '/',
+      drawingId: drawing?.id || '',
+      // PDP amb color; només per la franja 2 on el dibuix és visible
+      productHref: baseHref ? `${baseHref}?color=${color}` : undefined,
+      // Subcol·lecció (només Austen per ara)
+      subName,
+      drawingLabel: drawingLabel(drawing),
+    };
+  });
 }
 
 /**
