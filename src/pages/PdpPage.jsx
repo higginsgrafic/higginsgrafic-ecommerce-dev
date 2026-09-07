@@ -136,13 +136,13 @@ function PdpPage() {
   const [isPortraitTablet, setIsPortraitTablet] = useState(
     typeof window !== 'undefined'
       && window.innerWidth >= 768
-      && window.innerWidth <= 1366
+      && window.innerWidth <= 1024
       && window.innerHeight > window.innerWidth
   );
   const [isLandscapeTablet, setIsLandscapeTablet] = useState(
     typeof window !== 'undefined'
       && window.innerWidth >= 768
-      && window.innerWidth <= 1600
+      && window.innerWidth <= 1366
       && window.innerHeight >= 480
       && window.innerHeight < window.innerWidth
   );
@@ -151,12 +151,12 @@ function PdpPage() {
     if (typeof window === 'undefined') return undefined;
     const measure = () => {
       const portraitTablet = window.innerWidth >= 768
-        && window.innerWidth <= 1366
+        && window.innerWidth <= 1024
         && window.innerHeight > window.innerWidth;
       setIsPortraitTablet(portraitTablet);
       setIsLandscapeTablet(
         window.innerWidth >= 768
-          && window.innerWidth <= 1600
+          && window.innerWidth <= 1366
           && window.innerHeight >= 480
           && window.innerHeight < window.innerWidth
       );
@@ -283,25 +283,25 @@ function PdpPage() {
   const isTablet = isPortraitTablet || isLandscapeTablet;
 
   // --- Estils per a tablet portrait ---
-  const portraitBelt = isPortraitTablet && typeof window !== 'undefined'
-    ? Math.min(1350, Math.max(320, window.innerHeight - 32))
+  // 3 targetes quadrades amb gap de 5px i marges simètrics
+  const portraitRailGutterX = isPortraitTablet ? 5 : null;
+  const portraitAvailableWidth = isPortraitTablet && typeof window !== 'undefined'
+    ? window.innerWidth - 32
     : null;
-  const portraitHorizontalCardWidth = portraitBelt
-    ? Math.round((portraitBelt - 67.5) / 4) * (0.94 / 0.846)
+  const portraitRailViewportWidth = portraitAvailableWidth;
+  const portraitHorizontalCardWidth = portraitAvailableWidth != null
+    ? Math.floor((portraitAvailableWidth - 10) / 3)
     : null;
-  const portraitRailMaxWidth = portraitHorizontalCardWidth && typeof window !== 'undefined'
-    ? (window.innerWidth - 32) / 0.846
-    : null;
-  const portraitRailGutterX = portraitHorizontalCardWidth && portraitRailMaxWidth
-    ? Math.min(22.5, Math.max(0, (portraitRailMaxWidth - portraitHorizontalCardWidth * 3) / 2))
-    : null;
-  const portraitRailViewportWidth = portraitHorizontalCardWidth && portraitRailGutterX != null
-    ? portraitHorizontalCardWidth * 3 + portraitRailGutterX * 2
-    : null;
+  const portraitBelt = portraitRailViewportWidth;
 
   // --- Ample del contenidor de 3 columnes ---
-  const containerMaxWidth = isPortraitTablet && portraitBelt
-    ? `${portraitBelt}px`
+  const portraitControlWidth = isPortraitTablet && portraitHorizontalCardWidth
+    ? `${portraitHorizontalCardWidth - 20}px`
+    : '100%';
+
+  // --- Ample del contenidor de 3 columnes ---
+  const containerMaxWidth = isPortraitTablet && typeof window !== 'undefined'
+    ? `${window.innerWidth}px`
     : '1350px';
 
   // --- Grid 4 columnes (1+2+1) ---
@@ -312,16 +312,14 @@ function PdpPage() {
   // Tant portrait com landscape tablet fan servir la mateixa mida compacta
   const isCompactTablet = isLandscapeTablet || isPortraitTablet;
   const PAUTA_GUTTER_X = isPortraitTablet
-    ? (portraitRailGutterX ?? 14)
-    : (isLandscapeTablet ? 14 : 22.5);
+    ? (portraitRailGutterX ?? 5)
+    : (isLandscapeTablet ? 5 : 22.5);
   const colGap = `${PAUTA_GUTTER_X}px`;
   const tdpGridTemplate = `repeat(4, 1fr)`;
   const tdpBaseHeight = isCompactTablet ? 280 : 360;
-  const tdpFitScale = isPortraitTablet
-    ? 0.846
-    : (isLandscapeTablet && Number.isFinite(tdpAvailableHeight)
-      ? Math.min(1, tdpAvailableHeight / tdpBaseHeight)
-      : 1);
+  const tdpFitScale = isLandscapeTablet && Number.isFinite(tdpAvailableHeight)
+    ? Math.min(1, tdpAvailableHeight / tdpBaseHeight)
+    : 1;
   const tdpRenderedHeight = Math.round(tdpBaseHeight * tdpFitScale);
   const titleSettings = isCompactTablet ? { ...PDP_TITLE_SETTINGS, fontSize: 19, lineHeight: 0.95 } : PDP_TITLE_SETTINGS;
   const collectionSettings = isCompactTablet ? { ...PDP_COLLECTION_SETTINGS, fontSize: 14, lineHeight: 1 } : PDP_COLLECTION_SETTINGS;
@@ -367,14 +365,14 @@ function PdpPage() {
         )}
 
         <PageBand type="related" style={{ display: 'flex', alignItems: 'center', overflow: 'hidden' }}>
-          <div style={{ width: '100%', transform: 'translateY(-32px)' }}>
+          <div style={{ width: '100%', transform: `translateY(${isLandscapeTablet ? '-52px' : '78px'})` }}>
             <TambeRail
               images={otherImages}
               showTitle={false}
               showInternalArrows={false}
               visibleCards={isPortraitTablet ? 3 : 4}
               stabilizeInitialLayout={isPortraitTablet}
-              stabilizedViewportScale={isPortraitTablet ? 0.846 : 1}
+              stabilizedViewportScale={1}
               stabilizedViewportWidth={portraitRailViewportWidth}
               stabilizedGutterX={isPortraitTablet ? portraitRailGutterX : PAUTA_GUTTER_X}
             />
@@ -385,9 +383,9 @@ function PdpPage() {
           type="product"
           fluid
           style={{
-            height: (isLandscapeTablet && Number.isFinite(tdpAvailableHeight)) || isPortraitTablet ? `${tdpRenderedHeight}px` : undefined,
-            overflow: (isLandscapeTablet && Number.isFinite(tdpAvailableHeight)) || isPortraitTablet ? 'hidden' : undefined,
-            marginTop: '18px',
+            height: isLandscapeTablet && Number.isFinite(tdpAvailableHeight) ? `${tdpRenderedHeight}px` : undefined,
+            overflow: isLandscapeTablet && Number.isFinite(tdpAvailableHeight) ? 'hidden' : undefined,
+            marginTop: isPortraitTablet ? '148px' : '-32px',
             marginBottom: '32px',
           }}
         >
@@ -395,14 +393,14 @@ function PdpPage() {
             ref={productRowRef}
             style={{
               display: 'grid',
-              gridTemplateColumns: isPortraitTablet ? 'repeat(3, 1fr)' : tdpGridTemplate,
+              gridTemplateColumns: isPortraitTablet && portraitHorizontalCardWidth
+                ? `repeat(3, ${portraitHorizontalCardWidth}px)`
+                : (isPortraitTablet ? 'repeat(3, 1fr)' : tdpGridTemplate),
               gap: colGap,
               alignItems: 'stretch',
-              width: isPortraitTablet && portraitRailViewportWidth
-                ? `${portraitRailViewportWidth}px`
-                : (tdpFitScale < 1 ? `${100 / tdpFitScale}%` : (beltWidth ? `${beltWidth}px` : '100%')),
+              width: tdpFitScale < 1 ? `${100 / tdpFitScale}%` : (isPortraitTablet && portraitRailViewportWidth ? `${portraitRailViewportWidth}px` : (beltWidth ? `${beltWidth}px` : '100%')),
               height: `${tdpBaseHeight}px`,
-              margin: isPortraitTablet ? '0 auto' : (beltWidth ? '0 auto' : undefined),
+              margin: beltWidth ? '0 auto' : undefined,
               transform: tdpFitScale < 1 ? `scale(${tdpFitScale})` : undefined,
               transformOrigin: 'top left',
             }}
@@ -514,7 +512,7 @@ function PdpPage() {
                   maxHeight: isCompactTablet ? '240px' : '288px',
                   objectFit: 'contain',
                   userSelect: 'none',
-                  transform: 'translateX(-4px)',
+                  transform: 'translateX(20px)',
                 }}
               />
               <CarouselArrows
@@ -579,7 +577,7 @@ function PdpPage() {
                             aria-hidden="true"
                             style={{
                               position: 'absolute',
-                              left: '4px',
+                              right: '4px',
                               top: '4px',
                               bottom: '4px',
                               width: '3px',
@@ -616,7 +614,7 @@ function PdpPage() {
               minWidth: 0,
               height: '100%',
               position: 'relative',
-              paddingRight: '30px',
+              paddingRight: isPortraitTablet ? '5px' : '0px',
               boxSizing: 'border-box',
             }}
           >
@@ -646,7 +644,7 @@ function PdpPage() {
             {/* Preu — sobre el selector de talles, mateixa alçada i gap */}
             <div
               style={{
-                width: 'calc(100% - 30px)',
+                width: portraitControlWidth,
                 height: '44px',
                 boxSizing: 'border-box',
                 position: 'absolute',
@@ -675,7 +673,7 @@ function PdpPage() {
                 padding: '2px',
                 borderRadius: 'clamp(2.81px, 0.8vw, 5.06px)',
                 border: '1px solid #e5e7eb',
-                width: 'calc(100% - 30px)',
+                width: portraitControlWidth,
                 height: '44px',
                 boxSizing: 'border-box',
                 position: 'absolute',
@@ -741,7 +739,7 @@ function PdpPage() {
                 padding: '2px',
                 borderRadius: 'clamp(2.81px, 0.8vw, 5.06px)',
                 border: '1px solid #e5e7eb',
-                width: 'calc(100% - 30px)',
+                width: portraitControlWidth,
                 height: '44px',
                 boxSizing: 'border-box',
                 position: 'absolute',
@@ -816,7 +814,7 @@ function PdpPage() {
               }}
               className="bg-muted text-[#475059] transition-all duration-200 hover:bg-white hover:text-[#111827] hover:shadow-sm active:scale-95"
               style={{
-                width: 'calc(100% - 30px)',
+                width: portraitControlWidth,
                 height: '44px',
                 position: 'absolute',
                 bottom: '0',

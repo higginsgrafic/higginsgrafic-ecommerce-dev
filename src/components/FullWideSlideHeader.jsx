@@ -304,6 +304,7 @@ function FullWideSlideHeader({
   const [megaLocked, setMegaLocked] = useState(false);
   const [lockBtnTop, setLockBtnTop] = useState(null);
   const [lockBtnScrollProgress, setLockBtnScrollProgress] = useState(0.5);
+  const lockDragRef = useRef({ dragged: false });
   const { user } = useAuth();
   const [active, setActive] = useState(() => {
     try {
@@ -2055,7 +2056,11 @@ function FullWideSlideHeader({
       const cs = window.getComputedStyle(el);
       const pl = parseFloat(cs.paddingLeft || '0') || 0;
       const pr = parseFloat(cs.paddingRight || '0') || 0;
-      const contentW = w - pl - pr;
+      // En portrait tablet, el contingut del mega-slide té amplada landscape (1350px)
+      // dins d'un viewport scrollable. Calculem el tile amb aquesta amplada.
+      const contentW = isPortraitTablet
+        ? 1350 - pl - pr
+        : w - pl - pr;
       if (!contentW) return;
       const totalGaps = (COLS - 1) * GAP_PX;
       const colW = (contentW - totalGaps) / COLS;
@@ -2063,7 +2068,11 @@ function FullWideSlideHeader({
       // Cap màxim per evitar sobreescalat a viewport amples / zoom alts
       // (1400px max-content design ⇒ tile ≈ 136px). Cap a 144px.
       const MAX_TILE_PX = 144;
-      setMegaTileSize(Math.min(colW, MAX_TILE_PX));
+      const computedTile = Math.min(colW, MAX_TILE_PX);
+      setMegaTileSize(computedTile);
+      // En portrait tablet, el mega-slide usa scroll horitzontal amb el
+      // contingut a escala landscape. El grid ha de mantenir l'escala 0.94.
+      document.documentElement.style.setProperty('--hgGridFitScale', '0.94');
     };
 
     recompute();
@@ -2088,7 +2097,7 @@ function FullWideSlideHeader({
         // ignore
       }
     };
-  }, [active]);
+  }, [active, isPortraitTablet]);
 
   useEffect(() => {
     if (!import.meta.env.DEV) return;
@@ -3208,12 +3217,14 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
         <div
           className="bg-background"
           style={{
+            position: 'relative',
+            zIndex: 10001,
             width: 'var(--site-w, 100%)',
             marginLeft: 'calc(var(--site-xL, 0px) - var(--rulerInset, 0px))',
             borderTop: '1px solid #E6E8EC',
           }}
         >
-          <nav className="flex items-center justify-center gap-6 px-10 py-2 flex-nowrap overflow-x-auto" style={{ scrollbarWidth: 'none', marginTop: '10px' }}>
+          <nav className="flex items-center justify-center gap-6 px-10 py-2 flex-nowrap overflow-x-auto" style={{ scrollbarWidth: 'none', marginTop: '30px' }}>
             {resolvedNav.map((item) => {
               const open = active === item.id && megaPage === 1;
               return (
@@ -3260,7 +3271,38 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
 
       {canUseDom && active && (
         <button
-          onClick={() => setMegaLocked((v) => !v)}
+          onClick={(e) => {
+            if (lockDragRef.current.dragged) {
+              lockDragRef.current.dragged = false;
+              return;
+            }
+            setMegaLocked((v) => !v);
+          }}
+          onPointerDown={(e) => {
+            if (!isPortraitTablet) return;
+            const btn = e.currentTarget;
+            const startX = e.clientX;
+            const viewport = document.querySelector('[data-mega-page-viewport="1"]');
+            if (!viewport) return;
+            const maxScroll = Math.max(1, viewport.scrollWidth - viewport.clientWidth);
+            lockDragRef.current = { dragged: false, startX, viewport, maxScroll };
+            btn.setPointerCapture(e.pointerId);
+            const onMove = (ev) => {
+              const dx = ev.clientX - startX;
+              if (Math.abs(dx) > 3) lockDragRef.current.dragged = true;
+              const progress = Math.max(0, Math.min(1, 0.5 + dx / 320));
+              viewport.scrollLeft = progress * maxScroll;
+            };
+            const onUp = (ev) => {
+              btn.releasePointerCapture(ev.pointerId);
+              btn.removeEventListener('pointermove', onMove);
+              btn.removeEventListener('pointerup', onUp);
+              btn.removeEventListener('pointercancel', onUp);
+            };
+            btn.addEventListener('pointermove', onMove);
+            btn.addEventListener('pointerup', onUp);
+            btn.addEventListener('pointercancel', onUp);
+          }}
           className="fixed z-[10001] left-1/2 -translate-x-1/2 flex h-10 w-10 items-center justify-center rounded-full border border-border bg-background shadow-lg transition-colors hover:bg-muted"
           style={{
             top: lockBtnTop != null ? `${lockBtnTop + 8}px` : '16px',
@@ -3268,6 +3310,8 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
               ? `translateX(calc(-50% + ${(lockBtnScrollProgress - 0.5) * 160}px))`
               : undefined,
             transition: 'transform 120ms ease-out, background-color 150ms',
+            cursor: isPortraitTablet ? 'grab' : 'pointer',
+            touchAction: isPortraitTablet ? 'none' : undefined,
           }}
           title={megaLocked ? 'Desbloca el megaslide' : 'Bloca el megaslide'}
           aria-label={megaLocked ? 'Desbloca el megaslide' : 'Bloca el megaslide'}

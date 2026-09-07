@@ -423,7 +423,7 @@ function Home() {
             gridColumn: '1 / 4',
             gridRow: '10 / 25',
             position: 'relative',
-            top: `calc(-5px - ${rowHeight / 2}px${isLandscapeTablet ? ' - 50px' : ''} - 50px${isLandscapeTablet ? ' + 75px' : ''})`,
+            top: `calc(-5px - ${rowHeight / 2}px${isLandscapeTablet ? ' - 50px' : ''} - 50px${isLandscapeTablet ? ' + 50px' : ''})`,
             width: 'calc(100% + 1px)',
             height: isPortraitTablet ? '430px' : 'calc(100% + 2px)',
             transform: 'scale(0.705)',

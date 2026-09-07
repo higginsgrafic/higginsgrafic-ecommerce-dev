@@ -129,11 +129,22 @@ function MegaStripePanelP1({
   calibrationOverrides,
   compactLandscape = false,
   onP1ContentBottomChange,
+  isPortraitTablet = false,
 }) {
   const emptyShirtMaskUrl = useEmptyShirtMask(emptyTileIndices, shirtColor);
   const pageRootRef = useRef(null);
   const pageLiftRef = useRef(0);
   const [pageLift, setPageLift] = useState(0);
+
+  // En portrait tablet, la stripe està dins d'un viewport scrollable amb
+  // overflowY hidden. Reduïm l'escala de la stripe perquè no es talli.
+  useLayoutEffect(() => {
+    if (!isPortraitTablet) return;
+    const root = pageRootRef.current;
+    if (!root) return;
+    root.style.setProperty('--megaStripeScale', '1.17');
+    return () => { root.style.removeProperty('--megaStripeScale'); };
+  }, [isPortraitTablet]);
 
   useLayoutEffect(() => {
     const root = pageRootRef.current;
@@ -197,7 +208,7 @@ function MegaStripePanelP1({
     <div
       ref={pageRootRef}
       className="w-full shrink-0"
-      style={{ transform: pageLift > 0 ? `translateY(-${pageLift}px)` : undefined }}
+      style={{ transform: (!isPortraitTablet && pageLift > 0) ? `translateY(-${pageLift}px)` : undefined }}
     >
       {!hideGrid || reserveGridSpace ? (
         <div

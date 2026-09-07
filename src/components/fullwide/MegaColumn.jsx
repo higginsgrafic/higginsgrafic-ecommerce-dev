@@ -1301,17 +1301,17 @@ function MegaColumn({
                   <>
                     {!hideSelectorBackground && (
                       <div
-                        className="absolute z-10 bg-muted"
+                        className="absolute z-10"
                         style={{
                           top: '-12px',
                           right: '-6px',
                           bottom: '-6px',
                           left: '-6px',
                           transform: `translate(${selectorTranslateXForRender}px, ${selectorTranslateYForRender}px)`,
-                          borderStyle: 'none',
-                          borderWidth: '0px',
-                          borderColor: 'transparent',
-                          background: 'color-mix(in srgb, color-mix(in srgb, hsl(var(--muted)) 97%, rgb(59 130 246) 3%) 90%, white 10%)',
+                          borderStyle: 'solid',
+                          borderWidth: `${selectorStrokePx}px`,
+                          borderColor: String(megaTileSelectorParams?.color || 'black'),
+                          background: 'transparent',
                           borderRadius: `${selectorRadiusPx}px`,
                           boxSizing: 'border-box',
                           pointerEvents: 'none',
