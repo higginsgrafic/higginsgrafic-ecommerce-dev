@@ -23,7 +23,7 @@ const PDP_TITLE_SETTINGS = {
   color: '#475059', textTransform: 'uppercase',
 };
 const PDP_COLLECTION_SETTINGS = {
-  x: 0, y: 0, fontFamily: 'Roboto Condensed', fontSize: 8, fontWeight: 400, selectedFontWeight: 700,
+  x: 0, y: 0, fontFamily: 'Roboto Condensed', fontSize: 16, fontWeight: 400, selectedFontWeight: 700,
   letterSpacing: 0.2, lineHeight: 1.2, textAlign: 'left', verticalAlign: 'top',
   color: 'rgba(71, 80, 89, 0.7)', textTransform: 'uppercase',
 };
@@ -132,6 +132,7 @@ function PdpPage() {
   const [isLayoutReady, setIsLayoutReady] = useState(true);
   const productRowRef = useRef(null);
   const [tdpAvailableHeight, setTdpAvailableHeight] = useState(null);
+  const [beltWidth, setBeltWidth] = useState(null);
   const [isPortraitTablet, setIsPortraitTablet] = useState(
     typeof window !== 'undefined'
       && window.innerWidth >= 768
@@ -183,6 +184,38 @@ function PdpPage() {
       cancelAnimationFrame(settleFrame);
     };
   }, []);
+
+  // Llegeix belt2 (CSS vars) per alinear el grid del PDP amb el rail de targetes
+  useLayoutEffect(() => {
+    if (typeof window === 'undefined') return undefined;
+    const readCss = (name) => {
+      try {
+        const raw = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+        const n = parseFloat(raw);
+        return Number.isFinite(n) ? n : null;
+      } catch { return null; }
+    };
+    const measure = () => {
+      const xL = readCss('--belt2-xL');
+      const xR = readCss('--belt2-xR');
+      if (Number.isFinite(xL) && Number.isFinite(xR) && xR > xL) {
+        setBeltWidth(xR - xL);
+      }
+    };
+    measure();
+    const t = setTimeout(measure, 200);
+    let mo = null;
+    try {
+      mo = new MutationObserver(measure);
+      mo.observe(document.documentElement, { attributes: true, attributeFilter: ['style'] });
+    } catch { /* ignore */ }
+    window.addEventListener('resize', measure);
+    return () => {
+      window.removeEventListener('resize', measure);
+      clearTimeout(t);
+      if (mo) mo.disconnect();
+    };
+  }, [isPortraitTablet]);
 
   useLayoutEffect(() => {
     if (!isLandscapeTablet || typeof window === 'undefined') {
@@ -271,23 +304,29 @@ function PdpPage() {
     ? `${portraitBelt}px`
     : '1350px';
 
-  // --- Proporcions de les 3 columnes (flex) ---
-  // Esquerra (specs): ~22% | Centre (imatge): ~56% | Dreta (info): ~22%
-  const colSpecsFlex = '0 0 22%';
-  const colImageFlex = '1 1 0%';
-  const colInfoFlex = '0 0 22%';
-  const colGap = isLandscapeTablet ? '14px' : '22.5px';
-  const tdpBaseHeight = isLandscapeTablet ? 460 : 600;
+  // --- Grid 4 columnes (1+2+1) ---
+  // Mateix grid que les 4 targetes d'Altres històries:
+  //   col1 (specs) = targeta 1
+  //   col2-3 (imatge+fons gris) = targetes 2+3 (span 2)
+  //   col4 (info) = targeta 4
+  // Tant portrait com landscape tablet fan servir la mateixa mida compacta
+  const isCompactTablet = isLandscapeTablet || isPortraitTablet;
+  const PAUTA_GUTTER_X = isPortraitTablet
+    ? (portraitRailGutterX ?? 14)
+    : (isLandscapeTablet ? 14 : 22.5);
+  const colGap = `${PAUTA_GUTTER_X}px`;
+  const tdpGridTemplate = `repeat(4, 1fr)`;
+  const tdpBaseHeight = isCompactTablet ? 280 : 360;
   const tdpFitScale = isLandscapeTablet && Number.isFinite(tdpAvailableHeight)
     ? Math.min(1, tdpAvailableHeight / tdpBaseHeight)
     : 1;
   const tdpRenderedHeight = Math.round(tdpBaseHeight * tdpFitScale);
-  const titleSettings = isLandscapeTablet ? { ...PDP_TITLE_SETTINGS, fontSize: 19, lineHeight: 0.95 } : PDP_TITLE_SETTINGS;
-  const collectionSettings = isLandscapeTablet ? { ...PDP_COLLECTION_SETTINGS, fontSize: 7, lineHeight: 1 } : PDP_COLLECTION_SETTINGS;
-  const descriptionSettings = isLandscapeTablet
+  const titleSettings = isCompactTablet ? { ...PDP_TITLE_SETTINGS, fontSize: 19, lineHeight: 0.95 } : PDP_TITLE_SETTINGS;
+  const collectionSettings = isCompactTablet ? { ...PDP_COLLECTION_SETTINGS, fontSize: 14, lineHeight: 1 } : PDP_COLLECTION_SETTINGS;
+  const descriptionSettings = isCompactTablet
     ? { ...PDP_DESCRIPTION_SETTINGS, fontSize: 12, lineHeight: 1.2, letterSpacing: 0.02 }
-    : { ...PDP_DESCRIPTION_SETTINGS, lineHeight: isPortraitTablet ? 1.25 : PDP_DESCRIPTION_SETTINGS.lineHeight };
-  const priceSettings = isLandscapeTablet ? { ...PDP_PRICE_SETTINGS, fontSize: 19 } : PDP_PRICE_SETTINGS;
+    : { ...PDP_DESCRIPTION_SETTINGS, lineHeight: PDP_DESCRIPTION_SETTINGS.lineHeight };
+  const priceSettings = isCompactTablet ? { ...PDP_PRICE_SETTINGS, fontSize: 19 } : PDP_PRICE_SETTINGS;
 
   return (
     <section
@@ -335,7 +374,7 @@ function PdpPage() {
               stabilizeInitialLayout={isPortraitTablet}
               stabilizedViewportScale={isPortraitTablet ? 0.846 : 1}
               stabilizedViewportWidth={portraitRailViewportWidth}
-              stabilizedGutterX={portraitRailGutterX}
+              stabilizedGutterX={isPortraitTablet ? portraitRailGutterX : PAUTA_GUTTER_X}
             />
           </div>
         </PageBand>
@@ -346,27 +385,28 @@ function PdpPage() {
           style={{
             height: isLandscapeTablet && Number.isFinite(tdpAvailableHeight) ? `${tdpRenderedHeight}px` : undefined,
             overflow: isLandscapeTablet && Number.isFinite(tdpAvailableHeight) ? 'hidden' : undefined,
-            marginTop: '-32px',
+            marginTop: isPortraitTablet ? '48px' : '-32px',
             marginBottom: '32px',
           }}
         >
           <div
             ref={productRowRef}
             style={{
-              display: 'flex',
-              flexDirection: isPortraitTablet ? 'column' : 'row',
+              display: 'grid',
+              gridTemplateColumns: isPortraitTablet ? 'repeat(3, 1fr)' : tdpGridTemplate,
               gap: colGap,
               alignItems: 'stretch',
-              width: tdpFitScale < 1 ? `${100 / tdpFitScale}%` : '100%',
+              width: tdpFitScale < 1 ? `${100 / tdpFitScale}%` : (isPortraitTablet && portraitRailViewportWidth ? `${portraitRailViewportWidth}px` : (beltWidth ? `${beltWidth}px` : '100%')),
               height: `${tdpBaseHeight}px`,
+              margin: beltWidth ? '0 auto' : undefined,
               transform: tdpFitScale < 1 ? `scale(${tdpFitScale})` : undefined,
               transformOrigin: 'top left',
             }}
           >
-          {/* ═══ Columna esquerra: ESPECIFICACIONS ═══ */}
+          {/* ═══ Columna 1: ESPECIFICACIONS ═══ */}
           <div
             style={{
-              flex: isPortraitTablet ? '1 1 auto' : colSpecsFlex,
+              gridColumn: '1',
               display: isPortraitTablet ? 'none' : 'flex',
               flexDirection: 'column',
               minWidth: 0,
@@ -375,10 +415,10 @@ function PdpPage() {
             <h2
               style={{
                 margin: 0,
-                marginBottom: isLandscapeTablet ? '10px' : '20px',
+                marginBottom: isCompactTablet ? '10px' : '20px',
                 fontFamily: 'Oswald, sans-serif',
                 fontWeight: 300,
-                fontSize: isLandscapeTablet ? '16pt' : '20pt',
+                fontSize: isCompactTablet ? '16pt' : '20pt',
                 lineHeight: 1,
                 letterSpacing: '0.04em',
                 textTransform: 'uppercase',
@@ -396,7 +436,7 @@ function PdpPage() {
                 flexDirection: 'column',
                 alignItems: 'flex-end',
                 justifyContent: 'space-between',
-                rowGap: isLandscapeTablet ? '4px' : '12px',
+                rowGap: isCompactTablet ? '4px' : '12px',
               }}
             >
               {SPECS.map(({ label, value }) => (
@@ -410,8 +450,8 @@ function PdpPage() {
                     rowGap: 2,
                     fontFamily: 'Roboto Condensed, sans-serif',
                     fontWeight: 300,
-                    fontSize: isLandscapeTablet ? '11pt' : '14pt',
-                    lineHeight: isLandscapeTablet ? 1.05 : 1.2,
+                    fontSize: isCompactTablet ? '11pt' : '14pt',
+                    lineHeight: isCompactTablet ? 1.05 : 1.2,
                     letterSpacing: '0.03em',
                     color: 'rgba(71, 80, 89, 0.7)',
                     textAlign: 'right',
@@ -420,7 +460,7 @@ function PdpPage() {
                   <dt
                     style={{
                       fontFamily: 'Roboto Condensed, sans-serif',
-                      fontSize: isLandscapeTablet ? 9 : 11,
+                      fontSize: isCompactTablet ? 9 : 11,
                       fontWeight: 700,
                       letterSpacing: '0.2em',
                       textTransform: 'uppercase',
@@ -436,19 +476,18 @@ function PdpPage() {
             </dl>
           </div>
 
-          {/* ═══ Columna centre: imatge + thumbnails ═══ */}
+          {/* ═══ Columna 2-3: imatge + thumbnails (span 2) ═══ */}
           <div
             style={{
-              flex: isPortraitTablet ? '1 1 auto' : colImageFlex,
+              gridColumn: isPortraitTablet ? '1 / 3' : '2 / 4',
               display: 'flex',
               flexDirection: 'row',
-              gap: isLandscapeTablet ? '4px' : '8px',
               minWidth: 0,
-              minHeight: isPortraitTablet ? '400px' : (isLandscapeTablet ? 0 : '600px'),
-              height: isLandscapeTablet ? '100%' : undefined,
+              minHeight: isCompactTablet ? 0 : '360px',
+              height: isCompactTablet ? '100%' : undefined,
             }}
           >
-            {/* Imatge principal */}
+            {/* Imatge principal + miniatures dins del fons gris */}
             <div
               style={{
                 position: 'relative',
@@ -467,10 +506,11 @@ function PdpPage() {
                 alt={`Producte principal ${mainVariantColor}`}
                 draggable={false}
                 style={{
-                  maxWidth: '90%',
-                  maxHeight: '90%',
+                  maxWidth: '60%',
+                  maxHeight: isCompactTablet ? '240px' : '288px',
                   objectFit: 'contain',
                   userSelect: 'none',
+                  transform: 'translateX(20px)',
                 }}
               />
               <CarouselArrows
@@ -483,91 +523,100 @@ function PdpPage() {
                 rowHeight={44}
                 vertical
               />
-            </div>
 
-            {/* Columna de thumbnails */}
-            <div
-              style={{
-                display: 'flex',
-                flexDirection: 'column',
-                gap: isLandscapeTablet ? '3px' : '6px',
-                width: isLandscapeTablet ? '56px' : '72px',
-                flexShrink: 0,
-                justifyContent: 'flex-start',
-                paddingTop: isLandscapeTablet ? 0 : '8px',
-              }}
-            >
-              {(() => {
-                const THUMB_VISIBLE = 7;
-                const N = OFFICIAL_COLORS.length;
-                const center = Math.floor(THUMB_VISIBLE / 2) - 1;
-                const wrap = (i) => ((i % N) + N) % N;
-                return Array.from({ length: THUMB_VISIBLE }).map((_, vIdx) => {
-                  const idx = wrap(mainVariantIndex - center + vIdx);
-                  const color = OFFICIAL_COLORS[idx];
-                  const isActive = vIdx === center;
-                  return (
-                    <button
-                      key={`thumb-slot-${vIdx}`}
-                      type="button"
-                      aria-label={`Variant ${color}`}
-                      aria-pressed={isActive}
-                      onClick={() => setMainVariantIndex(idx)}
-                      style={{
-                        position: 'relative',
-                        flex: '1 1 0%',
-                        minHeight: 0,
-                        border: 'none',
-                        background: '#fbfcfd',
-                        cursor: 'pointer',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        padding: 0,
-                      }}
-                    >
-                      {isActive && (
-                        <span
+              {/* 5 miniatures dins del fons gris, alineades a l'esquerra */}
+              <div
+                style={{
+                  position: 'absolute',
+                  left: 0,
+                  top: 0,
+                  bottom: 0,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: isCompactTablet ? '4px' : '8px',
+                  width: isCompactTablet ? '80px' : '120px',
+                  flexShrink: 0,
+                  justifyContent: 'center',
+                  padding: isCompactTablet ? '4px' : '8px',
+                  boxSizing: 'border-box',
+                }}
+              >
+                {(() => {
+                  const THUMB_VISIBLE = 5;
+                  const N = OFFICIAL_COLORS.length;
+                  const center = Math.floor(THUMB_VISIBLE / 2);
+                  const wrap = (i) => ((i % N) + N) % N;
+                  return Array.from({ length: THUMB_VISIBLE }).map((_, vIdx) => {
+                    const idx = wrap(mainVariantIndex - center + vIdx);
+                    const color = OFFICIAL_COLORS[idx];
+                    const isActive = vIdx === center;
+                    return (
+                      <button
+                        key={`thumb-slot-${vIdx}`}
+                        type="button"
+                        aria-label={`Variant ${color}`}
+                        aria-pressed={isActive}
+                        onClick={() => setMainVariantIndex(idx)}
+                        style={{
+                          position: 'relative',
+                          flex: '1 1 0%',
+                          minHeight: 0,
+                          border: 'none',
+                          background: 'transparent',
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          padding: 0,
+                        }}
+                      >
+                        {isActive && (
+                          <span
+                            aria-hidden="true"
+                            style={{
+                              position: 'absolute',
+                              left: '4px',
+                              top: '4px',
+                              bottom: '4px',
+                              width: '3px',
+                              background: '#0b0d10',
+                            }}
+                          />
+                        )}
+                        <img
+                          src={TDP_IMAGE(color, selectedFinish)}
+                          alt=""
                           aria-hidden="true"
+                          draggable={false}
                           style={{
-                            position: 'absolute',
-                            left: 0,
-                            top: 0,
-                            bottom: 0,
-                            width: '3px',
-                            background: '#0b0d10',
+                            maxWidth: '90%',
+                            maxHeight: '90%',
+                            objectFit: 'contain',
+                            userSelect: 'none',
                           }}
                         />
-                      )}
-                      <img
-                        src={TDP_IMAGE(color, selectedFinish)}
-                        alt=""
-                        aria-hidden="true"
-                        draggable={false}
-                        style={{
-                          maxWidth: '85%',
-                          maxHeight: '85%',
-                          objectFit: 'contain',
-                          userSelect: 'none',
-                        }}
-                      />
-                    </button>
-                  );
-                });
-              })()}
+                      </button>
+                    );
+                  });
+                })()}
+              </div>
             </div>
           </div>
 
-          {/* ═══ Columna dreta: info producte ═══ */}
+          {/* ═══ Columna 4: info producte ═══ */}
           <div
             style={{
-              flex: isPortraitTablet ? '1 1 auto' : colInfoFlex,
+              gridColumn: isPortraitTablet ? '3' : '4',
               display: 'flex',
               flexDirection: 'column',
               minWidth: 0,
-              gap: isLandscapeTablet ? '6px' : '12px',
+              height: '100%',
+              position: 'relative',
+              paddingRight: '30px',
+              boxSizing: 'border-box',
             }}
           >
+            <div style={{ display: 'flex', flexDirection: 'column', gap: isCompactTablet ? '6px' : '12px' }}>
             {/* Nom del producte */}
             <EditableTextBox
               id={`${PRODUCT_SLUG}-pdp-product-name`}
@@ -590,19 +639,19 @@ function PdpPage() {
               style={{ width: '100%' }}
             />
 
-            {/* Descripció */}
-            <EditableTextBox
-              id={`${PRODUCT_SLUG}-pdp-product-description`}
-              initialText={PRODUCT_DESCRIPTION}
-              initialSettings={descriptionSettings}
-              presetVersion={PDP_PRESET_VERSION}
-              multiline
-              renderHandle={false}
-              handleRight="-22px"
-              style={{ width: '100%' }}
-            />
-
-            {/* Preu */}
+            {/* Preu — sobre el selector de talles, mateixa alçada i gap */}
+            <div
+              style={{
+                width: 'calc(100% - 30px)',
+                height: '44px',
+                boxSizing: 'border-box',
+                position: 'absolute',
+                bottom: '162px',
+                left: '0',
+                display: 'flex',
+                alignItems: 'center',
+              }}
+            >
             <EditableTextBox
               id={`${PRODUCT_SLUG}-pdp-price`}
               initialText="15,50€"
@@ -612,8 +661,9 @@ function PdpPage() {
               handleRight="-22px"
               style={{ width: '100%' }}
             />
+            </div>
 
-            {/* Selector de talles */}
+            {/* Selector de talles — sobre el selector de colors, mateixa alçada i gap */}
             <div
               style={{
                 display: 'flex',
@@ -621,8 +671,12 @@ function PdpPage() {
                 padding: '2px',
                 borderRadius: 'clamp(2.81px, 0.8vw, 5.06px)',
                 border: '1px solid #e5e7eb',
-                width: '100%',
+                width: 'calc(100% - 30px)',
+                height: '44px',
                 boxSizing: 'border-box',
+                position: 'absolute',
+                bottom: '108px',
+                left: '0',
               }}
             >
               {SIZES.map((size) => {
@@ -673,8 +727,9 @@ function PdpPage() {
               handleRight="-22px"
               style={{ width: 0, height: 0, alignSelf: 'flex-end' }}
             />
+            </div>
 
-            {/* Selector d'acabats */}
+            {/* Selector d'acabats — alineat amb la fletxa, bottom del fons gris */}
             <div
               style={{
                 display: 'flex',
@@ -682,8 +737,12 @@ function PdpPage() {
                 padding: '2px',
                 borderRadius: 'clamp(2.81px, 0.8vw, 5.06px)',
                 border: '1px solid #e5e7eb',
-                width: '100%',
+                width: 'calc(100% - 30px)',
+                height: '44px',
                 boxSizing: 'border-box',
+                position: 'absolute',
+                bottom: '54px',
+                left: '0',
               }}
             >
               {FINISHES.map((opt) => {
@@ -753,10 +812,14 @@ function PdpPage() {
               }}
               className="bg-muted text-[#475059] transition-all duration-200 hover:bg-white hover:text-[#111827] hover:shadow-sm active:scale-95"
               style={{
-                width: '100%',
+                width: 'calc(100% - 30px)',
+                height: '44px',
+                position: 'absolute',
+                bottom: '0',
+                left: '0',
                 border: '1px solid #e5e7eb',
                 borderRadius: 'clamp(2.81px, 0.8vw, 5.06px)',
-                padding: isLandscapeTablet ? '7px 10px' : '12px 16px',
+                padding: '0 16px',
                 cursor: 'pointer',
                 fontFamily: `${ctaTextSettings.fontFamily}, sans-serif`,
                 fontSize: `${ctaTextSettings.fontSize}pt`,

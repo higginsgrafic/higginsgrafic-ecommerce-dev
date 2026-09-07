@@ -2957,7 +2957,7 @@ function FullWideSlideHeader({
 top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right: 0 }
       }
     >
-      <div className={`${isPortraitTablet ? '' : 'border-b border-border'} bg-background`}>
+      <div className={`${isPortraitTablet ? '' : 'border-b border-transparent'} bg-background`}>
         <div
           className="flex h-20 items-center gap-3 px-4 sm:px-6 lg:h-20 lg:px-10"
           style={{
@@ -3034,7 +3034,7 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
             />
           </Link>
 
-          <nav className={`hidden md:flex flex-1 items-center justify-center gap-1 lg:gap-6 flex-nowrap ${isPortraitTablet ? 'md:hidden' : ''}`} style={(isPortraitTablet || isLandscapeTablet) ? { gap: isLandscapeTablet ? '1.5rem' : '0.25rem', minWidth: 0, justifyContent: 'flex-start', marginLeft: isPortraitTablet ? '-60px' : undefined } : undefined}>
+          <nav className={`hidden md:flex flex-1 items-center justify-center gap-1 lg:gap-4 flex-nowrap overflow-hidden`} style={(isPortraitTablet || isLandscapeTablet) ? { gap: isLandscapeTablet ? '1rem' : '0.25rem', minWidth: 0, justifyContent: 'flex-start', marginLeft: isPortraitTablet ? '-60px' : undefined } : { transform: 'translateX(-5%)' }}>
             {resolvedNav.map((item) => {
               // L'indicador d'obert (fletxa rotada + color) només s'ha
               // d'activar quan realment veiem la col·lecció (megaPage=1).
@@ -3045,8 +3045,8 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
                 <button
                   key={item.id}
                   type="button"
-                  className={`inline-flex items-center gap-1 text-[12px] lg:text-xs font-semibold tracking-[0.04em] lg:tracking-[0.18em] uppercase ${open ? 'text-foreground' : 'text-muted-foreground hover:text-foreground'}`}
-                  style={(isPortraitTablet || isLandscapeTablet) ? { letterSpacing: isPortraitTablet ? '0.04em' : '0.04em', fontSize: isPortraitTablet ? '11.5px' : '12px', whiteSpace: 'nowrap' } : undefined}
+                  className={`inline-flex items-center gap-1 whitespace-nowrap text-[11px] lg:text-[11px] font-semibold tracking-[0.04em] lg:tracking-[0.18em] uppercase ${open ? 'text-foreground' : 'text-muted-foreground hover:text-foreground'}`}
+                  style={(isPortraitTablet || isLandscapeTablet) ? { letterSpacing: isPortraitTablet ? '0.04em' : '0.04em', fontSize: isPortraitTablet ? '11.5px' : '12px', whiteSpace: 'nowrap' } : { whiteSpace: 'nowrap' }}
                   aria-expanded={open ? 'true' : 'false'}
                   onClick={() => {
                     setManualOverrideClosed(false);
