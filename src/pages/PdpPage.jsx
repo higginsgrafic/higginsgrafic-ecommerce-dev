@@ -13,6 +13,7 @@ import SEOProductSchema from '@/components/SEOProductSchema';
 import { buildOtherCollectionsImages } from '@/components/home/homeDrawings';
 import useIsMobile from '@/hooks/useIsMobile';
 import PdpMobile from '@/pages/PdpMobile';
+import PageBand from '@/components/layout/PageBand';
 
 const PDP_PRESET_VERSION = 'pdp-layout-2026-06-06-1953';
 
@@ -129,9 +130,8 @@ function PdpPage() {
   const mainVariantColor = OFFICIAL_COLORS[mainVariantIndex];
 
   const [isLayoutReady, setIsLayoutReady] = useState(true);
-  const railLayerRef = useRef(null);
-  const contentContainerRef = useRef(null);
-  const [tdpTopPadding, setTdpTopPadding] = useState(350);
+  const productRowRef = useRef(null);
+  const [tdpAvailableHeight, setTdpAvailableHeight] = useState(null);
   const [isPortraitTablet, setIsPortraitTablet] = useState(
     typeof window !== 'undefined'
       && window.innerWidth >= 768
@@ -185,36 +185,53 @@ function PdpPage() {
   }, []);
 
   useLayoutEffect(() => {
-    const rail = railLayerRef.current;
-    const container = contentContainerRef.current;
-    if (!rail || !container) return undefined;
+    if (!isLandscapeTablet || typeof window === 'undefined') {
+      setTdpAvailableHeight(null);
+      return undefined;
+    }
 
     let frame = 0;
+    let observedStripe = null;
+    const resizeObserver = typeof ResizeObserver !== 'undefined'
+      ? new ResizeObserver(() => schedule())
+      : null;
+
     const measure = () => {
-      cancelAnimationFrame(frame);
-      frame = requestAnimationFrame(() => {
-        const containerRect = container.getBoundingClientRect();
-        const cards = rail.querySelectorAll('[data-component="product-card"]');
-        let bottom = rail.getBoundingClientRect().bottom;
-        cards.forEach((card) => {
-          bottom = Math.max(bottom, card.getBoundingClientRect().bottom);
-        });
-        const scale = isPortraitTablet ? 0.846 : 0.94;
-        const next = Math.max(190, Math.ceil((bottom - containerRect.top) / scale + 24));
-        setTdpTopPadding((previous) => Math.abs(previous - next) < 1 ? previous : next);
-      });
+      const row = productRowRef.current;
+      const stripe = document.querySelector('[data-stripe-bottom]');
+      if (stripe !== observedStripe) {
+        if (observedStripe) resizeObserver?.unobserve(observedStripe);
+        observedStripe = stripe;
+        if (observedStripe) resizeObserver?.observe(observedStripe);
+      }
+      if (!row || !stripe) {
+        setTdpAvailableHeight(null);
+        return;
+      }
+      const viewportHeight = document.documentElement.clientHeight || window.innerHeight;
+      const top = Math.max(row.getBoundingClientRect().top, stripe.getBoundingClientRect().bottom);
+      const next = Math.max(80, Math.floor(viewportHeight - top - 8));
+      setTdpAvailableHeight((previous) => previous === next ? previous : next);
     };
 
-    measure();
-    const observer = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(measure) : null;
-    observer?.observe(rail);
-    window.addEventListener('resize', measure);
+    const schedule = () => {
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(measure);
+    };
+
+    schedule();
+    const mutationObserver = new MutationObserver(schedule);
+    mutationObserver.observe(document.body, { childList: true, subtree: true, attributes: true });
+    window.addEventListener('resize', schedule);
+    window.visualViewport?.addEventListener('resize', schedule);
     return () => {
       cancelAnimationFrame(frame);
-      observer?.disconnect();
-      window.removeEventListener('resize', measure);
+      resizeObserver?.disconnect();
+      mutationObserver.disconnect();
+      window.removeEventListener('resize', schedule);
+      window.visualViewport?.removeEventListener('resize', schedule);
     };
-  }, [isPortraitTablet, otherImages]);
+  }, [isLandscapeTablet]);
 
   useEffect(() => {
     const sp = new URLSearchParams(location.search);
@@ -259,16 +276,23 @@ function PdpPage() {
   const colSpecsFlex = '0 0 22%';
   const colImageFlex = '1 1 0%';
   const colInfoFlex = '0 0 22%';
-  const colGap = '22.5px';
+  const colGap = isLandscapeTablet ? '14px' : '22.5px';
+  const tdpBaseHeight = isLandscapeTablet ? 460 : 600;
+  const tdpFitScale = isLandscapeTablet && Number.isFinite(tdpAvailableHeight)
+    ? Math.min(1, tdpAvailableHeight / tdpBaseHeight)
+    : 1;
+  const tdpRenderedHeight = Math.round(tdpBaseHeight * tdpFitScale);
+  const titleSettings = isLandscapeTablet ? { ...PDP_TITLE_SETTINGS, fontSize: 19, lineHeight: 0.95 } : PDP_TITLE_SETTINGS;
+  const collectionSettings = isLandscapeTablet ? { ...PDP_COLLECTION_SETTINGS, fontSize: 7, lineHeight: 1 } : PDP_COLLECTION_SETTINGS;
+  const descriptionSettings = isLandscapeTablet
+    ? { ...PDP_DESCRIPTION_SETTINGS, fontSize: 12, lineHeight: 1.2, letterSpacing: 0.02 }
+    : { ...PDP_DESCRIPTION_SETTINGS, lineHeight: isPortraitTablet ? 1.25 : PDP_DESCRIPTION_SETTINGS.lineHeight };
+  const priceSettings = isLandscapeTablet ? { ...PDP_PRICE_SETTINGS, fontSize: 19 } : PDP_PRICE_SETTINGS;
 
   return (
     <section
       className="bg-background"
       style={{
-        transform: `scale(${isPortraitTablet ? 0.846 : 0.94})`,
-        transformOrigin: 'center top',
-        marginTop: '250px',
-        marginBottom: '300px',
         position: 'relative',
         visibility: isLayoutReady ? 'visible' : 'hidden',
       }}
@@ -282,9 +306,7 @@ function PdpPage() {
       </Helmet>
       <SEOProductSchema product={{ name: PRODUCT_NAME, description: `${PRODUCT_NAME} — ${COLLECTION_NAME}`, image: TDP_IMAGE(product.colors?.[0], DEFAULT_FINISH), slug: PRODUCT_SLUG, collection: COLLECTION_SLUG }} url={`/${PRODUCT_ROUTE}`} />
 
-      {/* ─── Contenidor centrat ─── */}
       <div
-        ref={contentContainerRef}
         style={{
           maxWidth: containerMaxWidth,
           margin: '0 auto',
@@ -293,15 +315,7 @@ function PdpPage() {
         }}
       >
         {!isTablet && (
-          <div
-            style={{
-              position: 'absolute',
-              top: 0,
-              left: '16px',
-              transform: 'translateY(calc(10px - 250px / 0.94))',
-              zIndex: 10,
-            }}
-          >
+          <div style={{ position: 'absolute', top: 0, left: '16px', zIndex: 10 }}>
             <Breadcrumbs
               items={[
                 { label: COLLECTION_NAME, link: `/${COLLECTION_SLUG}` },
@@ -311,40 +325,44 @@ function PdpPage() {
           </div>
         )}
 
-        <div
-          ref={railLayerRef}
-          style={{
-            position: 'absolute',
-            top: 0,
-            left: '16px',
-            right: '16px',
-            transform: isPortraitTablet
-              ? 'translateY(calc(-125px / 0.94 + 35px - 47.2814px))'
-              : 'translateY(calc(-125px / 0.94 + 35px))',
-            pointerEvents: 'auto',
-          }}
-        >
-          <TambeRail
-            images={otherImages}
-            showTitle={false}
-            showInternalArrows={false}
-            visibleCards={isPortraitTablet ? 3 : 4}
-            stabilizeInitialLayout={isPortraitTablet}
-            stabilizedViewportScale={isPortraitTablet ? 0.846 : 1}
-            stabilizedViewportWidth={portraitRailViewportWidth}
-            stabilizedGutterX={portraitRailGutterX}
-          />
-        </div>
+        <PageBand type="related" style={{ display: 'flex', alignItems: 'center', overflow: 'hidden' }}>
+          <div style={{ width: '100%', transform: 'translateY(-32px)' }}>
+            <TambeRail
+              images={otherImages}
+              showTitle={false}
+              showInternalArrows={false}
+              visibleCards={isPortraitTablet ? 3 : 4}
+              stabilizeInitialLayout={isPortraitTablet}
+              stabilizedViewportScale={isPortraitTablet ? 0.846 : 1}
+              stabilizedViewportWidth={portraitRailViewportWidth}
+              stabilizedGutterX={portraitRailGutterX}
+            />
+          </div>
+        </PageBand>
 
-        <div
+        <PageBand
+          type="product"
+          fluid
           style={{
-            display: 'flex',
-            flexDirection: isPortraitTablet ? 'column' : 'row',
-            gap: colGap,
-            alignItems: 'stretch',
-            paddingTop: `${tdpTopPadding}px`,
+            height: isLandscapeTablet && Number.isFinite(tdpAvailableHeight) ? `${tdpRenderedHeight}px` : undefined,
+            overflow: isLandscapeTablet && Number.isFinite(tdpAvailableHeight) ? 'hidden' : undefined,
+            marginTop: '-32px',
+            marginBottom: '32px',
           }}
         >
+          <div
+            ref={productRowRef}
+            style={{
+              display: 'flex',
+              flexDirection: isPortraitTablet ? 'column' : 'row',
+              gap: colGap,
+              alignItems: 'stretch',
+              width: tdpFitScale < 1 ? `${100 / tdpFitScale}%` : '100%',
+              height: `${tdpBaseHeight}px`,
+              transform: tdpFitScale < 1 ? `scale(${tdpFitScale})` : undefined,
+              transformOrigin: 'top left',
+            }}
+          >
           {/* ═══ Columna esquerra: ESPECIFICACIONS ═══ */}
           <div
             style={{
@@ -357,10 +375,10 @@ function PdpPage() {
             <h2
               style={{
                 margin: 0,
-                marginBottom: '20px',
+                marginBottom: isLandscapeTablet ? '10px' : '20px',
                 fontFamily: 'Oswald, sans-serif',
                 fontWeight: 300,
-                fontSize: '20pt',
+                fontSize: isLandscapeTablet ? '16pt' : '20pt',
                 lineHeight: 1,
                 letterSpacing: '0.04em',
                 textTransform: 'uppercase',
@@ -378,7 +396,7 @@ function PdpPage() {
                 flexDirection: 'column',
                 alignItems: 'flex-end',
                 justifyContent: 'space-between',
-                rowGap: '12px',
+                rowGap: isLandscapeTablet ? '4px' : '12px',
               }}
             >
               {SPECS.map(({ label, value }) => (
@@ -392,8 +410,8 @@ function PdpPage() {
                     rowGap: 2,
                     fontFamily: 'Roboto Condensed, sans-serif',
                     fontWeight: 300,
-                    fontSize: '14pt',
-                    lineHeight: 1.2,
+                    fontSize: isLandscapeTablet ? '11pt' : '14pt',
+                    lineHeight: isLandscapeTablet ? 1.05 : 1.2,
                     letterSpacing: '0.03em',
                     color: 'rgba(71, 80, 89, 0.7)',
                     textAlign: 'right',
@@ -402,7 +420,7 @@ function PdpPage() {
                   <dt
                     style={{
                       fontFamily: 'Roboto Condensed, sans-serif',
-                      fontSize: 11,
+                      fontSize: isLandscapeTablet ? 9 : 11,
                       fontWeight: 700,
                       letterSpacing: '0.2em',
                       textTransform: 'uppercase',
@@ -424,9 +442,10 @@ function PdpPage() {
               flex: isPortraitTablet ? '1 1 auto' : colImageFlex,
               display: 'flex',
               flexDirection: 'row',
-              gap: '8px',
+              gap: isLandscapeTablet ? '4px' : '8px',
               minWidth: 0,
-              minHeight: isPortraitTablet ? '400px' : '600px',
+              minHeight: isPortraitTablet ? '400px' : (isLandscapeTablet ? 0 : '600px'),
+              height: isLandscapeTablet ? '100%' : undefined,
             }}
           >
             {/* Imatge principal */}
@@ -471,11 +490,11 @@ function PdpPage() {
               style={{
                 display: 'flex',
                 flexDirection: 'column',
-                gap: '6px',
-                width: '72px',
+                gap: isLandscapeTablet ? '3px' : '6px',
+                width: isLandscapeTablet ? '56px' : '72px',
                 flexShrink: 0,
                 justifyContent: 'flex-start',
-                paddingTop: '8px',
+                paddingTop: isLandscapeTablet ? 0 : '8px',
               }}
             >
               {(() => {
@@ -546,14 +565,14 @@ function PdpPage() {
               display: 'flex',
               flexDirection: 'column',
               minWidth: 0,
-              gap: '12px',
+              gap: isLandscapeTablet ? '6px' : '12px',
             }}
           >
             {/* Nom del producte */}
             <EditableTextBox
               id={`${PRODUCT_SLUG}-pdp-product-name`}
               initialText={productName}
-              initialSettings={PDP_TITLE_SETTINGS}
+              initialSettings={titleSettings}
               presetVersion={PDP_PRESET_VERSION}
               renderHandle={false}
               handleRight="-22px"
@@ -564,7 +583,7 @@ function PdpPage() {
             <EditableTextBox
               id={`${PRODUCT_SLUG}-pdp-collection-name`}
               initialText={COLLECTION_NAME}
-              initialSettings={PDP_COLLECTION_SETTINGS}
+              initialSettings={collectionSettings}
               presetVersion={PDP_PRESET_VERSION}
               renderHandle={false}
               handleRight="-22px"
@@ -575,7 +594,7 @@ function PdpPage() {
             <EditableTextBox
               id={`${PRODUCT_SLUG}-pdp-product-description`}
               initialText={PRODUCT_DESCRIPTION}
-              initialSettings={{ ...PDP_DESCRIPTION_SETTINGS, lineHeight: isPortraitTablet ? 1.25 : (isLandscapeTablet ? 1.3 : PDP_DESCRIPTION_SETTINGS.lineHeight) }}
+              initialSettings={descriptionSettings}
               presetVersion={PDP_PRESET_VERSION}
               multiline
               renderHandle={false}
@@ -587,7 +606,7 @@ function PdpPage() {
             <EditableTextBox
               id={`${PRODUCT_SLUG}-pdp-price`}
               initialText="15,50€"
-              initialSettings={PDP_PRICE_SETTINGS}
+              initialSettings={priceSettings}
               presetVersion={PDP_PRESET_VERSION}
               renderHandle={false}
               handleRight="-22px"
@@ -737,7 +756,7 @@ function PdpPage() {
                 width: '100%',
                 border: '1px solid #e5e7eb',
                 borderRadius: 'clamp(2.81px, 0.8vw, 5.06px)',
-                padding: '12px 16px',
+                padding: isLandscapeTablet ? '7px 10px' : '12px 16px',
                 cursor: 'pointer',
                 fontFamily: `${ctaTextSettings.fontFamily}, sans-serif`,
                 fontSize: `${ctaTextSettings.fontSize}pt`,
@@ -791,21 +810,20 @@ function PdpPage() {
               style={{ width: 0, height: 0, alignSelf: 'flex-end' }}
             />
           </div>
-        </div>
+          </div>
+        </PageBand>
 
-        {/* ─── Story poster link ─── */}
-        <div
+        <PageBand
+          type="transition"
           style={{
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
             justifyContent: 'center',
-            paddingTop: '50px',
-            marginTop: '40px',
           }}
         >
           <StoryPosterLink style={isPortraitTablet ? { marginLeft: '300px' } : undefined} />
-        </div>
+        </PageBand>
       </div>
     </section>
   );

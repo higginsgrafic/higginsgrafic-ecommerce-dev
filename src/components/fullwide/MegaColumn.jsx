@@ -52,6 +52,8 @@ function MegaColumn({
   megaTileSelectorParams,
   onStartSelectorDrag,
   compactLandscape = false,
+  hideLabels = false,
+  hideSelectorBackground = false,
 }) {
   const tileSizeRef = useRef(null);
   const [tileSize, setTileSize] = useState(null);
@@ -1100,8 +1102,8 @@ function MegaColumn({
                 );
                 const displayLabel = isSelected ? labelForItemWhenSelected(it) : labelForItem(it);
 
-                return compactLandscape || !it || it === CONTROL_TILE_ARROWS || it === CONTROL_TILE_BN ? (
-                  <div className={compactLandscape ? 'h-0' : 'h-4'} />
+                return hideLabels || compactLandscape || !it || it === CONTROL_TILE_ARROWS || it === CONTROL_TILE_BN ? (
+                  <div className={hideLabels || compactLandscape ? 'h-0' : 'h-4'} />
                 ) : (
                   <Link
                     to="#"
@@ -1297,24 +1299,26 @@ function MegaColumn({
                 && String(it || '').trim().toLowerCase() === String(megaTileSelectorParams?.target || '').trim().toLowerCase() ? (
                 String(megaTileSelectorParams?.keyset || 'v1') === 'v2' ? (
                   <>
-                    <div
-                      className="absolute z-10 bg-muted"
-                      style={{
-                        top: '-12px',
-                        right: '-6px',
-                        bottom: '-6px',
-                        left: '-6px',
-                        transform: `translate(${selectorTranslateXForRender}px, ${selectorTranslateYForRender}px)`,
-                        borderStyle: 'none',
-                        borderWidth: '0px',
-                        borderColor: 'transparent',
-                        background: 'color-mix(in srgb, color-mix(in srgb, hsl(var(--muted)) 97%, rgb(59 130 246) 3%) 90%, white 10%)',
-                        borderRadius: `${selectorRadiusPx}px`,
-                        boxSizing: 'border-box',
-                        pointerEvents: 'none',
-                      }}
-                      aria-hidden="true"
-                    />
+                    {!hideSelectorBackground && (
+                      <div
+                        className="absolute z-10 bg-muted"
+                        style={{
+                          top: '-12px',
+                          right: '-6px',
+                          bottom: '-6px',
+                          left: '-6px',
+                          transform: `translate(${selectorTranslateXForRender}px, ${selectorTranslateYForRender}px)`,
+                          borderStyle: 'none',
+                          borderWidth: '0px',
+                          borderColor: 'transparent',
+                          background: 'color-mix(in srgb, color-mix(in srgb, hsl(var(--muted)) 97%, rgb(59 130 246) 3%) 90%, white 10%)',
+                          borderRadius: `${selectorRadiusPx}px`,
+                          boxSizing: 'border-box',
+                          pointerEvents: 'none',
+                        }}
+                        aria-hidden="true"
+                      />
+                    )}
                     <div
                       className="absolute z-[55]"
                       style={{

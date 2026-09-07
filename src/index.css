@@ -94,9 +94,33 @@ html.scrollbar-compensate .offers-header-cart-open {
     --ring: 0 100% 50%;
 
     --radius: 0.5rem;
+    --page-band-belt-width: min(1350px, calc(100vw - 32px));
+    --page-band-collection-intro-height: calc(76px + var(--page-band-belt-width) * 1780 / 2642);
+    --page-band-title-height: calc(76px + var(--page-band-belt-width) * 1780 / 2642 * 9 / 24);
+    --page-band-hero-height: calc(var(--page-band-belt-width) * 1780 / 2642 * 15 / 24);
+    --page-band-final-master-height: calc(var(--page-band-belt-width) * 4323 / 2642);
+    --page-band-transition-height: max(320px, calc(var(--page-band-final-master-height) * 36 / 58 - 552px));
+    --page-band-related-height: var(--page-band-title-height);
+    --page-band-footer-height: 620px;
   }
 
 
+}
+
+@media (min-width: 768px) and (max-width: 1024px) and (orientation: portrait) {
+  :root {
+    --page-band-transition-height: max(320px, calc(var(--page-band-final-master-height) * 36 / 58 - 350px));
+  }
+}
+
+@media (max-width: 767px) {
+  :root {
+    --page-band-title-height: 160px;
+    --page-band-hero-height: 230px;
+    --page-band-transition-height: 430px;
+    --page-band-related-height: var(--page-band-title-height);
+    --page-band-footer-height: 520px;
+  }
 }
 
 @layer base {
