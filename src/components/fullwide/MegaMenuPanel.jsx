@@ -141,7 +141,8 @@ export default function MegaMenuPanel({
   return (
     <div className="relative">
       <div
-        className="relative z-[10000] block border-b border-border"
+        data-mega-panel-surface="1"
+        className="relative z-[10000] block"
         style={{
           overflow: 'visible',
           backgroundColor: '#ffffff',

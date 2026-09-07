@@ -102,9 +102,9 @@ export function FirstContactDibuix00Buttons({
       className="relative mt-2 aspect-square w-full"
       data-stripe-buttonbar="bn"
       style={{
-        border: '1px solid #D1D5DB',
+        border: 'none',
         borderRadius: '6px',
-        backgroundColor: '#F3F4F6',
+        backgroundColor: 'transparent',
         boxSizing: 'border-box',
         overflow: 'hidden',
       }}

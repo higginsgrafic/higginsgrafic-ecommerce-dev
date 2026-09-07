@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import MegaColumn from './MegaColumn.jsx';
 import ClicAreaOverlayP1 from './ClicAreaOverlayP1.jsx';
 import { CERCADOR_COLORS } from './CercadorTopBar.jsx';
@@ -130,6 +130,40 @@ function MegaStripePanelP1({
   compactLandscape = false,
 }) {
   const emptyShirtMaskUrl = useEmptyShirtMask(emptyTileIndices, shirtColor);
+  const pageRootRef = useRef(null);
+  const pageLiftRef = useRef(0);
+  const [pageLift, setPageLift] = useState(0);
+
+  useLayoutEffect(() => {
+    const root = pageRootRef.current;
+    const panel = root?.closest('[data-mega-panel-surface="1"]');
+    if (!root || !panel) return undefined;
+
+    let frame = 0;
+    const measure = () => {
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(() => {
+        const selector = root.querySelector('[data-stripe-buttonbar="bn"]');
+        if (!selector) return;
+        const delta = selector.getBoundingClientRect().top - panel.getBoundingClientRect().top;
+        const next = Math.max(0, pageLiftRef.current + delta);
+        if (Math.abs(next - pageLiftRef.current) < 0.5) return;
+        pageLiftRef.current = next;
+        setPageLift(next);
+      });
+    };
+
+    measure();
+    const observer = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(measure) : null;
+    observer?.observe(panel);
+    observer?.observe(root);
+    window.addEventListener('resize', measure);
+    return () => {
+      cancelAnimationFrame(frame);
+      observer?.disconnect();
+      window.removeEventListener('resize', measure);
+    };
+  }, [active, megaTileSize]);
 
   useEffect(() => {
     const handler = (ev) => {
@@ -147,7 +181,11 @@ function MegaStripePanelP1({
   }, [onShirtClick, selectedItem, stripeTileItems, active, shirtColor]);
 
   return (
-    <div className="w-full shrink-0">
+    <div
+      ref={pageRootRef}
+      className="w-full shrink-0"
+      style={{ transform: pageLift > 0 ? `translateY(-${pageLift}px)` : undefined }}
+    >
       {!hideGrid || reserveGridSpace ? (
         <div
           className="relative z-10 grid grid-cols-1 gap-10"
@@ -172,6 +210,8 @@ function MegaStripePanelP1({
               onStartSelectorDrag={onStartSelectorDrag}
               megaTileSize={megaTileSize}
               compactLandscape={compactLandscape}
+              hideLabels
+              hideSelectorBackground
               humanInsideVariant={humanInsideVariant}
               items={active === 'austen' ? reorderAustenQuotes(col.items) : col.items}
               row={true}
