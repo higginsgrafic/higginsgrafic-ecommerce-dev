@@ -423,7 +423,7 @@ function Home() {
             gridColumn: '1 / 4',
             gridRow: '10 / 25',
             position: 'relative',
-            top: `calc(-5px - ${rowHeight / 2}px${isLandscapeTablet ? ' - 50px' : ''} - 50px)`,
+            top: `calc(-5px - ${rowHeight / 2}px${isLandscapeTablet ? ' - 50px' : ''} - 50px${isLandscapeTablet ? ' + 75px' : ''})`,
             width: 'calc(100% + 1px)',
             height: isPortraitTablet ? '430px' : 'calc(100% + 2px)',
             transform: 'scale(0.705)',
@@ -459,7 +459,7 @@ function Home() {
             }}
             className="hover:bg-white transition-colors"
           >
-            <Shuffle size={32} color="#475059" />
+            <Shuffle size={50} color="#475059" />
           </button>
           {heroPlans.current.map((s, i) => {
             const prev = heroPlans.prev ? heroPlans.prev[i] : null;
@@ -592,8 +592,8 @@ function Home() {
 
       {isPortraitTablet && <div style={{ height: '120px' }} />}
 
-      <section className="bg-background text-foreground" style={{ transform: 'scale(0.94)', transformOrigin: 'center top' }}>
-        <div className="mx-auto max-w-[1400px] px-4 pt-[120px] pb-[174px] sm:px-6 lg:px-10" style={isTablet ? { paddingTop: '60px' } : undefined}>
+      <section className="bg-background text-foreground" style={{ transform: 'scale(0.94)', transformOrigin: 'center top', marginTop: isLandscapeTablet ? '-60px' : undefined }}>
+        <div className="mx-auto max-w-[1400px] px-4 pt-[60px] pb-[174px] sm:px-6 lg:px-10" style={isTablet ? { paddingTop: '30px' } : undefined}>
             <CollectionTitle
             index=""
             kicker="Col·lecció"
@@ -610,7 +610,7 @@ function Home() {
             subtitleOffsetY={0}
             collectionHref="/first-contact"
           />
-          <div style={{ marginTop: isTablet ? '75px' : '150px' }}>
+          <div style={{ marginTop: isTablet ? '37px' : '75px' }}>
             <div
               style={{
                 position: 'relative',
