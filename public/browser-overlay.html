@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Overlay Navegador - Higgins</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #1a1a2e;
+    color: #fff;
+    font-family: -apple-system, system-ui, sans-serif;
+    overflow: hidden;
+    height: 100vh;
+  }
+  .toolbar {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    background: #0f0f1e;
+    padding: 10px 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    z-index: 1000;
+    border-bottom: 1px solid #333;
+  }
+  .toolbar h1 { font-size: 14px; margin-right: 8px; white-space: nowrap; }
+  .toolbar select {
+    background: #1a1a3e;
+    color: #fff;
+    border: 1px solid #444;
+    border-radius: 6px;
+    padding: 6px 10px;
+    font-size: 13px;
+    cursor: pointer;
+  }
+  .toolbar button {
+    background: #1a1a3e;
+    color: #fff;
+    border: 1px solid #444;
+    border-radius: 6px;
+    padding: 6px 12px;
+    font-size: 13px;
+    cursor: pointer;
+  }
+  .toolbar button:hover { background: #2a2a5e; }
+  .toolbar .info {
+    font-size: 11px;
+    color: #888;
+    margin-left: auto;
+  }
+  .stage {
+    position: fixed;
+    top: 48px; left: 0; right: 0; bottom: 0;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    overflow: auto;
+    background: #111;
+    padding: 20px;
+  }
+  .device-frame {
+    position: relative;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.5);
+  }
+  .device-frame iframe {
+    position: absolute;
+    border: none;
+    background: #fff;
+  }
+  .device-frame .browser-overlay {
+    position: absolute;
+    top: 0; left: 0;
+    pointer-events: none;
+    z-index: 10;
+  }
+  .device-frame .viewport-marker {
+    position: absolute;
+    left: 0; right: 0;
+    height: 2px;
+    background: #ff0040;
+    z-index: 11;
+    pointer-events: none;
+  }
+  .device-frame .viewport-marker.bottom {
+    bottom: 0;
+  }
+  .red-line { background: #ff0040; }
+  .green-line { background: #00ff80; }
+</style>
+</head>
+<body>
+
+<div class="toolbar">
+  <h1>Overlay Navegador</h1>
+  <select id="format">
+    <option value="desktop">Desktop Chrome (1920x1080)</option>
+    <option value="tablet-landscape">Tablet Horitzontal Safari (1024x768)</option>
+    <option value="tablet-portrait">Tablet Vertical Safari (768x1024)</option>
+    <option value="mobile-portrait">Mòbil Vertical Safari (390x844)</option>
+    <option value="mobile-landscape">Mòbil Horitzontal Safari (844x390)</option>
+    <option value="pwa">PWA Standalone (390x844)</option>
+  </select>
+  <button id="reload">Recarregar</button>
+  <button id="toggle-overlay">Amaga/Mostra navegador</button>
+  <span class="info" id="info"></span>
+</div>
+
+<div class="stage">
+  <div class="device-frame" id="frame">
+    <iframe id="site" src="/"></iframe>
+    <img class="browser-overlay" id="overlay" />
+    <div class="viewport-marker red-line" id="marker-top"></div>
+    <div class="viewport-marker bottom red-line" id="marker-bottom"></div>
+  </div>
+</div>
+
+<script>
+const FORMATS = {
+  'desktop': {
+    img: '/browser-frames/desktop-chrome.png',
+    w: 1920, h: 1080,
+    chromeTop: 134, chromeBottom: 0,
+    scale: 0.5,
+    label: 'Chrome: 134px superior · Viewport: 1920x946'
+  },
+  'tablet-landscape': {
+    img: '/browser-frames/tablet-landscape-safari.png',
+    w: 1024, h: 768,
+    chromeTop: 78, chromeBottom: 0,
+    scale: 0.75,
+    label: 'Safari: 78px superior · Viewport: 1024x690'
+  },
+  'tablet-portrait': {
+    img: '/browser-frames/tablet-portrait-safari.png',
+    w: 768, h: 1024,
+    chromeTop: 72, chromeBottom: 0,
+    scale: 0.65,
+    label: 'Safari: 72px superior · Viewport: 768x952'
+  },
+  'mobile-portrait': {
+    img: '/browser-frames/mobile-portrait-safari.png',
+    w: 390, h: 844,
+    chromeTop: 88, chromeBottom: 44,
+    scale: 0.85,
+    label: 'Safari: 88px sup + 44px inf · Viewport: 390x712'
+  },
+  'mobile-landscape': {
+    img: '/browser-frames/mobile-landscape-safari.png',
+    w: 844, h: 390,
+    chromeTop: 50, chromeBottom: 0,
+    scale: 0.75,
+    label: 'Safari: 50px superior · Viewport: 844x340'
+  },
+  'pwa': {
+    img: '/browser-frames/pwa-standalone.png',
+    w: 390, h: 844,
+    chromeTop: 14, chromeBottom: 0,
+    scale: 0.85,
+    label: 'PWA: 14px status bar · Viewport: 390x830'
+  },
+};
+
+const frame = document.getElementById('frame');
+const iframe = document.getElementById('site');
+const overlay = document.getElementById('overlay');
+const markerTop = document.getElementById('marker-top');
+const markerBottom = document.getElementById('marker-bottom');
+const info = document.getElementById('info');
+const select = document.getElementById('format');
+const reloadBtn = document.getElementById('reload');
+const toggleBtn = document.getElementById('toggle-overlay');
+
+let overlayVisible = true;
+
+function applyFormat(key) {
+  const fmt = FORMATS[key];
+  const s = fmt.scale;
+  const dw = fmt.w * s;
+  const dh = fmt.h * s;
+  const ct = fmt.chromeTop * s;
+  const cb = fmt.chromeBottom * s;
+
+  frame.style.width = dw + 'px';
+  frame.style.height = dh + 'px';
+
+  overlay.src = fmt.img;
+  overlay.style.width = dw + 'px';
+  overlay.style.height = dh + 'px';
+  overlay.style.display = overlayVisible ? 'block' : 'none';
+
+  // iframe: es renderitza a mida real del dispositiu i s'escala amb transform
+  // El transformOrigin és 0 0 i translateY mou l'iframe sota les barres del navegador
+  const vpH = fmt.h - fmt.chromeTop - fmt.chromeBottom;
+  iframe.style.top = '0';
+  iframe.style.left = '0';
+  iframe.style.width = fmt.w + 'px';
+  iframe.style.height = vpH + 'px';
+  iframe.style.transformOrigin = '0 0';
+  iframe.style.transform = `scale(${s})`;
+  // Posicionem l'iframe escalat just sota el chrome
+  iframe.style.position = 'absolute';
+  iframe.style.marginTop = ct + 'px';
+
+  // Red markers showing viewport boundaries
+  markerTop.style.top = ct + 'px';
+  markerTop.style.display = overlayVisible ? 'block' : 'none';
+  markerBottom.style.bottom = cb + 'px';
+  markerBottom.style.display = (overlayVisible && cb > 0) ? 'block' : 'none';
+
+  info.textContent = fmt.label;
+}
+
+select.addEventListener('change', (e) => applyFormat(e.target.value));
+reloadBtn.addEventListener('click', () => { iframe.src = iframe.src; });
+toggleBtn.addEventListener('click', () => {
+  overlayVisible = !overlayVisible;
+  applyFormat(select.value);
+});
+
+applyFormat('desktop');
+</script>
+
+</body>
+</html>

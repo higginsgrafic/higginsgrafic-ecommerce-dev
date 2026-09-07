@@ -6,6 +6,7 @@ import { useAdmin } from '@/contexts/AdminContext';
 import { useOffersConfig } from '@/hooks/useOffersConfig';
 import { useGlobalRedirect } from '@/hooks/useGlobalRedirect';
 import useGlobalEffects from '@/hooks/useGlobalEffects';
+import useDeviceLayout from '@/hooks/useDeviceLayout';
 import useComponentCatalogConfig from '@/hooks/useComponentCatalogConfig';
 import ErrorBoundary from '@/components/ErrorBoundary';
 import LoadingScreen, { DismissPreloaderOnMount } from '@/components/LoadingScreen';
@@ -20,14 +21,14 @@ import { FullWideSlideHeader } from '@/routes/lazyPages';
 
 function AppProd() {
   const [isNavigating, setIsNavigating] = useState(false);
-  const [isLargeScreen, setIsLargeScreen] = useState(window.innerWidth >= 1024);
-  const [isPortraitTablet, setIsPortraitTablet] = useState(
-    window.innerWidth >= 768 && window.innerWidth <= 1024 && window.innerHeight > window.innerWidth
-  );
-  const [isLandscapeTablet, setIsLandscapeTablet] = useState(
-    window.innerWidth >= 1024 && window.innerWidth <= 1366 && window.innerHeight < window.innerWidth
-  );
-  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+  const {
+    isLargeScreen,
+    isPortraitTablet,
+    isLandscapeTablet,
+    isMobile,
+    viewportWidth,
+    viewportHeight,
+  } = useDeviceLayout();
   const location = useLocation();
   const navigate = useNavigate();
   const { isAdmin, bypassUnderConstruction } = useAdmin();
@@ -39,27 +40,12 @@ function AppProd() {
     location,
     navigate,
     setIsNavigating,
-    setIsLargeScreen,
     shouldRedirect,
     redirectUrl,
     redirectLoading,
     bypassUnderConstruction,
     isAdmin,
   });
-
-  useEffect(() => {
-    const update = () => {
-      setIsPortraitTablet(
-        window.innerWidth >= 768 && window.innerWidth <= 1024 && window.innerHeight > window.innerWidth
-      );
-      setIsLandscapeTablet(
-        window.innerWidth >= 1024 && window.innerWidth <= 1366 && window.innerHeight < window.innerWidth
-      );
-      setIsMobile(window.innerWidth < 768);
-    };
-    window.addEventListener('resize', update);
-    return () => window.removeEventListener('resize', update);
-  }, []);
 
   const productContext = useProductContext();
   const safeProductContext =
@@ -203,6 +189,8 @@ function AppProd() {
                 showCatalogPanel={fullWideShowCatalogPanel}
                 isPortraitTablet={isPortraitTablet}
                 isLandscapeTablet={isLandscapeTablet}
+                viewportWidth={viewportWidth}
+                viewportHeight={viewportHeight}
               />
             )
           )}

@@ -1,7 +1,6 @@
 import React, { useState, useLayoutEffect, useRef, useEffect, useMemo } from 'react';
 import { useLocation, Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
-import Pauta4ColsOverlay from '@/components/pauta/Pauta4ColsOverlay';
 import TambeRail from '@/pages/productRail/TambeRail';
 import CarouselArrows from '@/pages/productRail/CarouselArrows';
 import Breadcrumbs from '@/components/Breadcrumbs';
@@ -57,12 +56,12 @@ const OFFICIAL_COLORS = [
 const THUMB_COUNT = OFFICIAL_COLORS.length;
 
 const SPECS = [
-  { label: 'Material', value: '100% cotó pentinat de 150 g/m²', row: 9 },
-  { label: 'Tall', value: 'Coll rodó', row: 11 },
-  { label: 'Procedència', value: <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}><Flag code="HN" size={16} /><Flag code="DO" size={16} /><Flag code="NI" size={16} /><Flag code="BD" size={16} /><Flag code="US" size={16} /></span>, row: 13 },
-  { label: 'Estampació', value: 'Impressió DTF', row: 15 },
-  { label: 'Cura', value: 'Renta-la al revés i a 30°C', row: 17 },
-  { label: 'Garantia', value: 'Devolució 14 dies', row: 19 },
+  { label: 'Material', value: '100% cotó pentinat de 150 g/m²' },
+  { label: 'Tall', value: 'Coll rodó' },
+  { label: 'Procedència', value: <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}><Flag code="HN" size={16} /><Flag code="DO" size={16} /><Flag code="NI" size={16} /><Flag code="BD" size={16} /><Flag code="US" size={16} /></span> },
+  { label: 'Estampació', value: 'Impressió DTF' },
+  { label: 'Cura', value: 'Renta-la al revés i a 30°C' },
+  { label: 'Garantia', value: 'Devolució 14 dies' },
 ];
 
 const SIZES = ['S', 'M', 'L', 'XL', 'XXL'];
@@ -129,11 +128,10 @@ function PdpPage() {
   const goNextVariant = () => setMainVariantIndex((i) => (i + 1) % OFFICIAL_COLORS.length);
   const mainVariantColor = OFFICIAL_COLORS[mainVariantIndex];
 
-  const pautaGridRef = useRef(null);
-  const [rowHeight, setRowHeight] = useState(38);
-  const [exactRowHeight, setExactRowHeight] = useState(38);
-  const [breadcrumbOffsetX, setBreadcrumbOffsetX] = useState(0);
   const [isLayoutReady, setIsLayoutReady] = useState(true);
+  const railLayerRef = useRef(null);
+  const contentContainerRef = useRef(null);
+  const [tdpTopPadding, setTdpTopPadding] = useState(350);
   const [isPortraitTablet, setIsPortraitTablet] = useState(
     typeof window !== 'undefined'
       && window.innerWidth >= 768
@@ -142,8 +140,9 @@ function PdpPage() {
   );
   const [isLandscapeTablet, setIsLandscapeTablet] = useState(
     typeof window !== 'undefined'
-      && window.innerWidth >= 1024
+      && window.innerWidth >= 768
       && window.innerWidth <= 1366
+      && window.innerHeight >= 480
       && window.innerHeight < window.innerWidth
   );
 
@@ -155,21 +154,11 @@ function PdpPage() {
         && window.innerHeight > window.innerWidth;
       setIsPortraitTablet(portraitTablet);
       setIsLandscapeTablet(
-        window.innerWidth >= 1024
+        window.innerWidth >= 768
           && window.innerWidth <= 1366
+          && window.innerHeight >= 480
           && window.innerHeight < window.innerWidth
       );
-      const gridEl = pautaGridRef.current;
-      if (!gridEl) return;
-      const rect = gridEl.getBoundingClientRect();
-      setBreadcrumbOffsetX(portraitTablet ? (16 - rect.left) / 0.846 : 0);
-      const numRows = 38;
-      const singleRowH = rect.height / numRows;
-      setRowHeight((prev) => (Math.abs(prev - singleRowH) < 0.1 ? prev : singleRowH));
-      const gridRows = 40;
-      const rowGap = 3;
-      const exactRowH = (rect.height - (gridRows - 1) * rowGap) / gridRows;
-      setExactRowHeight((prev) => (Math.abs(prev - exactRowH) < 0.1 ? prev : exactRowH));
     };
 
     let settleTimer = 0;
@@ -195,6 +184,38 @@ function PdpPage() {
     };
   }, []);
 
+  useLayoutEffect(() => {
+    const rail = railLayerRef.current;
+    const container = contentContainerRef.current;
+    if (!rail || !container) return undefined;
+
+    let frame = 0;
+    const measure = () => {
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(() => {
+        const containerRect = container.getBoundingClientRect();
+        const cards = rail.querySelectorAll('[data-component="product-card"]');
+        let bottom = rail.getBoundingClientRect().bottom;
+        cards.forEach((card) => {
+          bottom = Math.max(bottom, card.getBoundingClientRect().bottom);
+        });
+        const scale = isPortraitTablet ? 0.846 : 0.94;
+        const next = Math.max(190, Math.ceil((bottom - containerRect.top) / scale + 24));
+        setTdpTopPadding((previous) => Math.abs(previous - next) < 1 ? previous : next);
+      });
+    };
+
+    measure();
+    const observer = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(measure) : null;
+    observer?.observe(rail);
+    window.addEventListener('resize', measure);
+    return () => {
+      cancelAnimationFrame(frame);
+      observer?.disconnect();
+      window.removeEventListener('resize', measure);
+    };
+  }, [isPortraitTablet, otherImages]);
+
   useEffect(() => {
     const sp = new URLSearchParams(location.search);
     const urlColor = sp.get('color');
@@ -209,19 +230,14 @@ function PdpPage() {
     }
   }, [location.search]);
 
-  const portraitDesktopPdpStyle = isPortraitTablet
-    ? {
-        '--pdp-landscape-belt': 'min(1350px, calc(100vh - 32px))',
-        width: 'var(--pdp-landscape-belt)',
-        '--hg-tdp-xL': '0px',
-        '--hg-tdp-xR': 'var(--pdp-landscape-belt)',
-      }
-    : {};
-  const portraitLandscapeBelt = isPortraitTablet && typeof window !== 'undefined'
+  const isTablet = isPortraitTablet || isLandscapeTablet;
+
+  // --- Estils per a tablet portrait ---
+  const portraitBelt = isPortraitTablet && typeof window !== 'undefined'
     ? Math.min(1350, Math.max(320, window.innerHeight - 32))
     : null;
-  const portraitHorizontalCardWidth = portraitLandscapeBelt
-    ? Math.round((portraitLandscapeBelt - 67.5) / 4) * (0.94 / 0.846)
+  const portraitHorizontalCardWidth = portraitBelt
+    ? Math.round((portraitBelt - 67.5) / 4) * (0.94 / 0.846)
     : null;
   const portraitRailMaxWidth = portraitHorizontalCardWidth && typeof window !== 'undefined'
     ? (window.innerWidth - 32) / 0.846
@@ -233,8 +249,30 @@ function PdpPage() {
     ? portraitHorizontalCardWidth * 3 + portraitRailGutterX * 2
     : null;
 
+  // --- Ample del contenidor de 3 columnes ---
+  const containerMaxWidth = isPortraitTablet && portraitBelt
+    ? `${portraitBelt}px`
+    : '1350px';
+
+  // --- Proporcions de les 3 columnes (flex) ---
+  // Esquerra (specs): ~22% | Centre (imatge): ~56% | Dreta (info): ~22%
+  const colSpecsFlex = '0 0 22%';
+  const colImageFlex = '1 1 0%';
+  const colInfoFlex = '0 0 22%';
+  const colGap = '22.5px';
+
   return (
-    <section className="bg-background" style={{ transform: `scale(${isPortraitTablet ? 0.846 : 0.94})`, transformOrigin: 'center top', marginTop: '250px', marginBottom: '300px', visibility: isLayoutReady ? 'visible' : 'hidden' }}>
+    <section
+      className="bg-background"
+      style={{
+        transform: `scale(${isPortraitTablet ? 0.846 : 0.94})`,
+        transformOrigin: 'center top',
+        marginTop: '250px',
+        marginBottom: '300px',
+        position: 'relative',
+        visibility: isLayoutReady ? 'visible' : 'hidden',
+      }}
+    >
       <Helmet>
         <title>{`${PRODUCT_NAME} · ${COLLECTION_NAME} | Higgins Gràfic`}</title>
         <meta
@@ -244,64 +282,45 @@ function PdpPage() {
       </Helmet>
       <SEOProductSchema product={{ name: PRODUCT_NAME, description: `${PRODUCT_NAME} — ${COLLECTION_NAME}`, image: TDP_IMAGE(product.colors?.[0], DEFAULT_FINISH), slug: PRODUCT_SLUG, collection: COLLECTION_SLUG }} url={`/${PRODUCT_ROUTE}`} />
 
-      <Pauta4ColsOverlay
-        key={isPortraitTablet ? 'portrait-tablet' : 'landscape'}
-        numRows={40}
-        canvasAspect={[2642, 2981]}
-        pautaEnabled={false}
-        tableEnabled={false}
-        topOffset="0px"
-        bottomPadding="0px"
-        leftOffset={isPortraitTablet ? 'calc(-1 * (((var(--pdp-landscape-belt) - 67.5px) / 4 + 22.5px) / 2))' : '0px'}
-        innerRef={pautaGridRef}
+      {/* ─── Contenidor centrat ─── */}
+      <div
+        ref={contentContainerRef}
         style={{
-          zIndex: 5,
+          maxWidth: containerMaxWidth,
+          margin: '0 auto',
+          padding: '0 16px',
           position: 'relative',
-          marginBottom: 'calc(-2 * (var(--hg-tdp-xR) - var(--hg-tdp-xL)) * 2981 / 2642 / 40 - 23px)',
-          marginTop: isLandscapeTablet ? '-100px' : undefined,
-          ...portraitDesktopPdpStyle,
         }}
       >
-        {/* ─── Breadcrumbs (col 1, fila 1) ─── */}
-        <div
-          className="[&_ol]:pl-0 [&_nav]:p-0"
-          style={{
-            gridColumn: '1 / 5',
-            gridRow: '2 / 3',
-            minHeight: 0,
-            alignSelf: 'start',
-            justifySelf: 'start',
-            padding: 0,
-            margin: 0,
-            transform: isPortraitTablet
-              ? `translate(${breadcrumbOffsetX}px, calc(-10px - 250px / 0.94 - 47.2814px))`
-              : 'translateY(calc(-10px - 250px / 0.94))',
-            pointerEvents: 'auto',
-            zIndex: 10,
-          }}
-        >
-          <Breadcrumbs
-            items={[
-              { label: COLLECTION_NAME, link: `/${COLLECTION_SLUG}` },
-              { label: productName },
-            ]}
-          />
-        </div>
+        {!isTablet && (
+          <div
+            style={{
+              position: 'absolute',
+              top: 0,
+              left: '16px',
+              transform: 'translateY(calc(10px - 250px / 0.94))',
+              zIndex: 10,
+            }}
+          >
+            <Breadcrumbs
+              items={[
+                { label: COLLECTION_NAME, link: `/${COLLECTION_SLUG}` },
+                { label: productName },
+              ]}
+            />
+          </div>
+        )}
 
-        {/* ─── TambeRail (altres històries, sense títol) ─── */}
         <div
+          ref={railLayerRef}
           style={{
-            gridColumn: '1 / 5',
-            gridRow: '2 / 3',
-            minHeight: 0,
-            alignSelf: 'center',
-            justifySelf: 'center',
-            padding: 0,
-            margin: 0,
+            position: 'absolute',
+            top: 0,
+            left: '16px',
+            right: '16px',
             transform: isPortraitTablet
               ? 'translateY(calc(-125px / 0.94 + 35px - 47.2814px))'
               : 'translateY(calc(-125px / 0.94 + 35px))',
-            width: '100%',
             pointerEvents: 'auto',
           }}
         >
@@ -317,495 +336,477 @@ function PdpPage() {
           />
         </div>
 
-        {/* ─── Bloc producte: títol + descripció + talles + CTA (col 4 — dreta) ─── */}
-        <EditableTextBox
-          id={`${PRODUCT_SLUG}-pdp-product-name`}
-          initialText={productName}
-          initialSettings={PDP_TITLE_SETTINGS}
-          presetVersion={PDP_PRESET_VERSION}
-          renderHandle={false}
-          handleRight="-22px"
-          style={{ gridColumn: '4 / 5', gridRow: '6 / 7', alignSelf: 'end' }}
-        />
-
-        <EditableTextBox
-          id={`${PRODUCT_SLUG}-pdp-collection-name`}
-          initialText={COLLECTION_NAME}
-          initialSettings={PDP_COLLECTION_SETTINGS}
-          presetVersion={PDP_PRESET_VERSION}
-          renderHandle={false}
-          handleRight="-22px"
-          style={{ gridColumn: '4 / 5', gridRow: '7 / 8', alignSelf: 'start' }}
-        />
-
-        <EditableTextBox
-          id={`${PRODUCT_SLUG}-pdp-product-description`}
-          initialText={PRODUCT_DESCRIPTION}
-          initialSettings={{ ...PDP_DESCRIPTION_SETTINGS, lineHeight: isPortraitTablet ? 1.25 : (isLandscapeTablet ? 1.3 : PDP_DESCRIPTION_SETTINGS.lineHeight) }}
-          presetVersion={PDP_PRESET_VERSION}
-          multiline
-          renderHandle={false}
-          handleRight="-22px"
-          style={{ gridColumn: '4 / 5', gridRow: '9 / 14' }}
-        />
-
-        <EditableTextBox
-          id={`${PRODUCT_SLUG}-pdp-price`}
-          initialText="15,50€"
-          initialSettings={PDP_PRICE_SETTINGS}
-          presetVersion={PDP_PRESET_VERSION}
-          renderHandle={false}
-          handleRight="-22px"
-          style={{ gridColumn: '4 / 5', gridRow: '14 / 15', alignSelf: 'center' }}
-        />
-
         <div
           style={{
-            gridColumn: '4 / 5',
-            gridRow: '16 / 17',
-            minHeight: 0,
-            alignSelf: 'center',
-            height: '100%',
             display: 'flex',
-            alignItems: 'center',
+            flexDirection: isPortraitTablet ? 'column' : 'row',
+            gap: colGap,
+            alignItems: 'stretch',
+            paddingTop: `${tdpTopPadding}px`,
           }}
         >
+          {/* ═══ Columna esquerra: ESPECIFICACIONS ═══ */}
           <div
             style={{
-              display: 'flex',
-              backgroundColor: '#f3f4f6',
-              padding: '2px',
-              borderRadius: 'clamp(2.81px, 0.8vw, 5.06px)',
-              border: '1px solid #e5e7eb',
-              width: '100%',
-              height: '100%',
-              boxSizing: 'border-box',
+              flex: isPortraitTablet ? '1 1 auto' : colSpecsFlex,
+              display: isPortraitTablet ? 'none' : 'flex',
+              flexDirection: 'column',
+              minWidth: 0,
             }}
           >
-            {SIZES.map((size) => {
-              const isSelected = size === selectedSize;
-              return (
-                <button
-                  key={`size-${size}`}
-                  type="button"
-                  onClick={() => setSelectedSize(size)}
+            <h2
+              style={{
+                margin: 0,
+                marginBottom: '20px',
+                fontFamily: 'Oswald, sans-serif',
+                fontWeight: 300,
+                fontSize: '20pt',
+                lineHeight: 1,
+                letterSpacing: '0.04em',
+                textTransform: 'uppercase',
+                color: '#475059',
+                textAlign: 'right',
+              }}
+            >
+              ESPECIFICACIONS
+            </h2>
+            <dl
+              style={{
+                margin: 0,
+                flex: '1 1 auto',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'flex-end',
+                justifyContent: 'space-between',
+                rowGap: '12px',
+              }}
+            >
+              {SPECS.map(({ label, value }) => (
+                <div
+                  key={`spec-${label}`}
                   style={{
-                    flex: 1,
-                    fontFamily: `${sizeButtonTextSettings.fontFamily}, sans-serif`,
-                    fontSize: `${sizeButtonTextSettings.fontSize}pt`,
-                    fontWeight: isSelected ? sizeButtonTextSettings.selectedFontWeight : sizeButtonTextSettings.fontWeight,
-                    letterSpacing: `${sizeButtonTextSettings.letterSpacing}em`,
-                    lineHeight: sizeButtonTextSettings.lineHeight,
-                    textTransform: sizeButtonTextSettings.textTransform,
-                    color: isSelected ? '#111827' : '#9ca3af',
-                    backgroundColor: isSelected ? '#ffffff' : 'transparent',
-                    border: 'none',
-                    borderRadius: 'clamp(2.11px, 0.6vw, 3.8px)',
-                    cursor: 'pointer',
-                    transition: 'all 150ms ease',
-                    boxShadow: isSelected ? '0 1px 2px rgba(0,0,0,0.05)' : 'none',
+                    margin: 0,
                     display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
+                    flexDirection: 'column',
+                    alignItems: 'flex-end',
+                    rowGap: 2,
+                    fontFamily: 'Roboto Condensed, sans-serif',
+                    fontWeight: 300,
+                    fontSize: '14pt',
+                    lineHeight: 1.2,
+                    letterSpacing: '0.03em',
+                    color: 'rgba(71, 80, 89, 0.7)',
+                    textAlign: 'right',
                   }}
                 >
-                  {size}
-                </button>
-              );
-            })}
+                  <dt
+                    style={{
+                      fontFamily: 'Roboto Condensed, sans-serif',
+                      fontSize: 11,
+                      fontWeight: 700,
+                      letterSpacing: '0.2em',
+                      textTransform: 'uppercase',
+                      color: '#111827',
+                      lineHeight: 1.2,
+                    }}
+                  >
+                    {label}
+                  </dt>
+                  <dd style={{ margin: 0 }}>{value}</dd>
+                </div>
+              ))}
+            </dl>
           </div>
-        </div>
 
-        {/* Handle d'edició per als botons de talles (mode columns) */}
-        <EditableTextBox
-          id={`${PRODUCT_SLUG}-pdp-size-buttons`}
-          initialText={SIZES.join(' ')}
-          columns={SIZES}
-          selectedColumn={selectedSize}
-          onColumnSelect={setSelectedSize}
-          renderText={false}
-          renderHandle={false}
-          onSettingsChange={setSizeButtonTextSettings}
-          initialSettings={PDP_SIZE_SETTINGS}
-          presetVersion={PDP_PRESET_VERSION}
-          handleRight="-22px"
-          style={{ gridColumn: '4 / 5', gridRow: '16 / 17', zIndex: 100005, width: 0, height: 0, justifySelf: 'end' }}
-        />
-
-        <button
-          type="button"
-          aria-label="Afegeix al cistell"
-          onClick={() => {
-            try {
-              window.dispatchEvent(new CustomEvent('hg:open-full-wide-cart', {
-                detail: { source: 'product-pdp-cta', firstPartOnly: true, item: { title: productName.toUpperCase(), collection: COLLECTION_NAME, collectionSlug: IMAGE_COLLECTION, productRoute: PRODUCT_ROUTE, qty: 1, size: selectedSize, price: '15,50€', color: mainVariantColor, finish: selectedFinish, drawing: '', disabled: false } },
-              }));
-            } catch {
-              // ignore
-            }
-          }}
-          className="bg-muted text-[#475059] transition-all duration-200 hover:bg-white hover:text-[#111827] hover:shadow-sm active:scale-95"
-          style={{
-            gridColumn: '4 / 5',
-            gridRow: '19 / 20',
-            width: '100%',
-            height: '100%',
-            minWidth: 0,
-            minHeight: 0,
-            border: '1px solid #e5e7eb',
-            borderRadius: 'clamp(2.81px, 0.8vw, 5.06px)',
-            padding: 0,
-            cursor: 'pointer',
-            fontFamily: `${ctaTextSettings.fontFamily}, sans-serif`,
-            fontSize: `${ctaTextSettings.fontSize}pt`,
-            fontWeight: ctaTextSettings.fontWeight,
-            letterSpacing: `${ctaTextSettings.letterSpacing}em`,
-            lineHeight: ctaTextSettings.lineHeight,
-            textTransform: ctaTextSettings.textTransform,
-            color: ctaTextSettings.color,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: 12,
-          }}
-        >
-          <svg
-            width="calc(1.2em - 1px)"
-            height="calc(1.2em - 1px)"
-            viewBox="0 0 70 69"
+          {/* ═══ Columna centre: imatge + thumbnails ═══ */}
+          <div
             style={{
-              fillRule: 'evenodd',
-              clipRule: 'evenodd',
-              strokeLinejoin: 'round',
-              strokeMiterlimit: 2,
-              display: 'block',
-              transform: 'translateY(-2px)',
-              fill: 'currentColor',
+              flex: isPortraitTablet ? '1 1 auto' : colImageFlex,
+              display: 'flex',
+              flexDirection: 'row',
+              gap: '8px',
+              minWidth: 0,
+              minHeight: isPortraitTablet ? '400px' : '600px',
             }}
           >
-            <rect id="v3-buit" x="0" y="0.852" width="70" height="68" style={{ fill: 'none' }} />
-            <g clipPath="url(#_clip1_cta)">
-              <clipPath id="_clip1_cta">
-                <rect x="0" y="0.852" width="70" height="68" />
-              </clipPath>
-              <path d="M-0.004,16.609l70.007,0l-5.013,39.965c-1.062,8.376 -5.433,12.278 -13.816,12.278l-32.337,0c-8.384,0 -12.754,-3.902 -13.804,-12.278l-5.038,-39.965Zm64.335,5.034l-58.664,0l4.321,34.299c0.343,2.734 1.031,4.826 2.499,6.146l0.004,0.004c1.483,1.318 3.625,1.739 6.346,1.739l32.337,0c2.721,0 4.863,-0.422 6.342,-1.736c1.486,-1.322 2.164,-3.416 2.508,-6.154l4.308,-34.298Z" />
-              <path d="M24.674,26.676c0.512,5.307 4.943,9.468 10.338,9.468c5.384,0 9.814,-4.161 10.326,-9.468l-3.265,0c-0.496,3.493 -3.478,6.183 -7.06,6.183c-3.594,0 -6.577,-2.69 -7.073,-6.183l-3.265,0Z" />
-            </g>
-          </svg>
-          AFEGEIX AL CISTELL
-        </button>
-
-        {/* Handle d'edició per al CTA (no renderitza text, només handle) */}
-        <EditableTextBox
-          id={`${PRODUCT_SLUG}-pdp-cta`}
-          initialText="AFEGEIX AL CISTELL"
-          initialSettings={PDP_CTA_SETTINGS}
-          presetVersion={PDP_PRESET_VERSION}
-          renderText={false}
-          renderHandle={false}
-          onSettingsChange={setCtaTextSettings}
-          handleRight="-22px"
-          style={{ gridColumn: '4 / 5', gridRow: '19 / 20', zIndex: 100005, width: 0, height: 0, justifySelf: 'end' }}
-        />
-
-        {/* ─── Carrusel: imatge gran (col 2-3, centre) + thumbs (col 3 dreta de la imatge) ─── */}
-        <div
-          style={{
-            gridColumn: '2 / 4',
-            gridRow: '8 / 20',
-            minHeight: 0,
-            display: 'grid',
-            gridTemplateColumns: '1fr 72px',
-            gridTemplateRows: 'subgrid',
-            gap: 8,
-          }}
-        >
-          {(() => {
-            const N = OFFICIAL_COLORS.length;
-            const topIdx = ((mainVariantIndex - 3) % N + N) % N;
-            const topColor = OFFICIAL_COLORS[topIdx];
-            return (
-              <button
-                type="button"
-                aria-label={`Variant ${topColor}`}
-                onClick={() => setMainVariantIndex(topIdx)}
+            {/* Imatge principal */}
+            <div
+              style={{
+                position: 'relative',
+                flex: '1 1 auto',
+                minWidth: 0,
+                minHeight: 0,
+                background: '#fbfcfd',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                overflow: 'hidden',
+              }}
+            >
+              <img
+                src={TDP_IMAGE(mainVariantColor, selectedFinish)}
+                alt={`Producte principal ${mainVariantColor}`}
+                draggable={false}
                 style={{
-                  position: 'relative',
-                  gridColumn: '2 / 3',
-                  gridRow: '1 / 2',
-                  minHeight: 0,
-                  border: 'none',
-                  background: '#fbfcfd',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  padding: 0,
-                  overflow: 'hidden',
+                  maxWidth: '90%',
+                  maxHeight: '90%',
+                  objectFit: 'contain',
+                  userSelect: 'none',
+                }}
+              />
+              <CarouselArrows
+                rightPx={0}
+                bottomPx={0}
+                onPrev={goPrevVariant}
+                onNext={goNextVariant}
+                prevLabel="Variant anterior"
+                nextLabel="Variant següent"
+                rowHeight={44}
+                vertical
+              />
+            </div>
+
+            {/* Columna de thumbnails */}
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '6px',
+                width: '72px',
+                flexShrink: 0,
+                justifyContent: 'flex-start',
+                paddingTop: '8px',
+              }}
+            >
+              {(() => {
+                const THUMB_VISIBLE = 7;
+                const N = OFFICIAL_COLORS.length;
+                const center = Math.floor(THUMB_VISIBLE / 2) - 1;
+                const wrap = (i) => ((i % N) + N) % N;
+                return Array.from({ length: THUMB_VISIBLE }).map((_, vIdx) => {
+                  const idx = wrap(mainVariantIndex - center + vIdx);
+                  const color = OFFICIAL_COLORS[idx];
+                  const isActive = vIdx === center;
+                  return (
+                    <button
+                      key={`thumb-slot-${vIdx}`}
+                      type="button"
+                      aria-label={`Variant ${color}`}
+                      aria-pressed={isActive}
+                      onClick={() => setMainVariantIndex(idx)}
+                      style={{
+                        position: 'relative',
+                        flex: '1 1 0%',
+                        minHeight: 0,
+                        border: 'none',
+                        background: '#fbfcfd',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        padding: 0,
+                      }}
+                    >
+                      {isActive && (
+                        <span
+                          aria-hidden="true"
+                          style={{
+                            position: 'absolute',
+                            left: 0,
+                            top: 0,
+                            bottom: 0,
+                            width: '3px',
+                            background: '#0b0d10',
+                          }}
+                        />
+                      )}
+                      <img
+                        src={TDP_IMAGE(color, selectedFinish)}
+                        alt=""
+                        aria-hidden="true"
+                        draggable={false}
+                        style={{
+                          maxWidth: '85%',
+                          maxHeight: '85%',
+                          objectFit: 'contain',
+                          userSelect: 'none',
+                        }}
+                      />
+                    </button>
+                  );
+                });
+              })()}
+            </div>
+          </div>
+
+          {/* ═══ Columna dreta: info producte ═══ */}
+          <div
+            style={{
+              flex: isPortraitTablet ? '1 1 auto' : colInfoFlex,
+              display: 'flex',
+              flexDirection: 'column',
+              minWidth: 0,
+              gap: '12px',
+            }}
+          >
+            {/* Nom del producte */}
+            <EditableTextBox
+              id={`${PRODUCT_SLUG}-pdp-product-name`}
+              initialText={productName}
+              initialSettings={PDP_TITLE_SETTINGS}
+              presetVersion={PDP_PRESET_VERSION}
+              renderHandle={false}
+              handleRight="-22px"
+              style={{ width: '100%' }}
+            />
+
+            {/* Nom de la col·lecció */}
+            <EditableTextBox
+              id={`${PRODUCT_SLUG}-pdp-collection-name`}
+              initialText={COLLECTION_NAME}
+              initialSettings={PDP_COLLECTION_SETTINGS}
+              presetVersion={PDP_PRESET_VERSION}
+              renderHandle={false}
+              handleRight="-22px"
+              style={{ width: '100%' }}
+            />
+
+            {/* Descripció */}
+            <EditableTextBox
+              id={`${PRODUCT_SLUG}-pdp-product-description`}
+              initialText={PRODUCT_DESCRIPTION}
+              initialSettings={{ ...PDP_DESCRIPTION_SETTINGS, lineHeight: isPortraitTablet ? 1.25 : (isLandscapeTablet ? 1.3 : PDP_DESCRIPTION_SETTINGS.lineHeight) }}
+              presetVersion={PDP_PRESET_VERSION}
+              multiline
+              renderHandle={false}
+              handleRight="-22px"
+              style={{ width: '100%' }}
+            />
+
+            {/* Preu */}
+            <EditableTextBox
+              id={`${PRODUCT_SLUG}-pdp-price`}
+              initialText="15,50€"
+              initialSettings={PDP_PRICE_SETTINGS}
+              presetVersion={PDP_PRESET_VERSION}
+              renderHandle={false}
+              handleRight="-22px"
+              style={{ width: '100%' }}
+            />
+
+            {/* Selector de talles */}
+            <div
+              style={{
+                display: 'flex',
+                backgroundColor: '#f3f4f6',
+                padding: '2px',
+                borderRadius: 'clamp(2.81px, 0.8vw, 5.06px)',
+                border: '1px solid #e5e7eb',
+                width: '100%',
+                boxSizing: 'border-box',
+              }}
+            >
+              {SIZES.map((size) => {
+                const isSelected = size === selectedSize;
+                return (
+                  <button
+                    key={`size-${size}`}
+                    type="button"
+                    onClick={() => setSelectedSize(size)}
+                    style={{
+                      flex: 1,
+                      fontFamily: `${sizeButtonTextSettings.fontFamily}, sans-serif`,
+                      fontSize: `${sizeButtonTextSettings.fontSize}pt`,
+                      fontWeight: isSelected ? sizeButtonTextSettings.selectedFontWeight : sizeButtonTextSettings.fontWeight,
+                      letterSpacing: `${sizeButtonTextSettings.letterSpacing}em`,
+                      lineHeight: sizeButtonTextSettings.lineHeight,
+                      textTransform: sizeButtonTextSettings.textTransform,
+                      color: isSelected ? '#111827' : '#9ca3af',
+                      backgroundColor: isSelected ? '#ffffff' : 'transparent',
+                      border: 'none',
+                      borderRadius: 'clamp(2.11px, 0.6vw, 3.8px)',
+                      cursor: 'pointer',
+                      transition: 'all 150ms ease',
+                      boxShadow: isSelected ? '0 1px 2px rgba(0,0,0,0.05)' : 'none',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
+                  >
+                    {size}
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Handle d'edició per als botons de talles */}
+            <EditableTextBox
+              id={`${PRODUCT_SLUG}-pdp-size-buttons`}
+              initialText={SIZES.join(' ')}
+              columns={SIZES}
+              selectedColumn={selectedSize}
+              onColumnSelect={setSelectedSize}
+              renderText={false}
+              renderHandle={false}
+              onSettingsChange={setSizeButtonTextSettings}
+              initialSettings={PDP_SIZE_SETTINGS}
+              presetVersion={PDP_PRESET_VERSION}
+              handleRight="-22px"
+              style={{ width: 0, height: 0, alignSelf: 'flex-end' }}
+            />
+
+            {/* Selector d'acabats */}
+            <div
+              style={{
+                display: 'flex',
+                backgroundColor: '#f3f4f6',
+                padding: '2px',
+                borderRadius: 'clamp(2.81px, 0.8vw, 5.06px)',
+                border: '1px solid #e5e7eb',
+                width: '100%',
+                boxSizing: 'border-box',
+              }}
+            >
+              {FINISHES.map((opt) => {
+                const isAvailable = AVAILABLE_FINISHES.includes(opt);
+                const isActive = isAvailable && selectedFinish === opt;
+                return (
+                  <button
+                    key={opt}
+                    type="button"
+                    disabled={!isAvailable}
+                    onClick={isAvailable ? () => setSelectedFinish(opt) : undefined}
+                    style={{
+                      flex: 1,
+                      fontFamily: `${finishButtonTextSettings.fontFamily}, sans-serif`,
+                      fontSize: `${finishButtonTextSettings.fontSize}pt`,
+                      fontWeight: isActive ? finishButtonTextSettings.selectedFontWeight : finishButtonTextSettings.fontWeight,
+                      letterSpacing: `${finishButtonTextSettings.letterSpacing}em`,
+                      lineHeight: finishButtonTextSettings.lineHeight,
+                      textTransform: finishButtonTextSettings.textTransform,
+                      color: !isAvailable ? '#d1d5db' : (isActive ? '#111827' : '#9ca3af'),
+                      backgroundColor: isActive ? '#ffffff' : 'transparent',
+                      border: 'none',
+                      borderRadius: 'clamp(2.11px, 0.6vw, 3.8px)',
+                      cursor: isAvailable ? 'pointer' : 'not-allowed',
+                      opacity: isAvailable ? 1 : 0.45,
+                      transition: 'all 150ms ease',
+                      boxShadow: isActive ? '0 1px 2px rgba(0,0,0,0.05)' : 'none',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
+                  >
+                    {opt}
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Handle d'edició per al selector d'acabats */}
+            <EditableTextBox
+              id={`${PRODUCT_SLUG}-pdp-finish-buttons`}
+              initialText="BLANC COLOR NEGRE"
+              columns={FINISHES}
+              selectedColumn={selectedFinish}
+              onColumnSelect={setSelectedFinish}
+              renderText={false}
+              renderHandle={false}
+              onSettingsChange={setFinishButtonTextSettings}
+              initialSettings={PDP_SIZE_SETTINGS}
+              presetVersion={PDP_PRESET_VERSION}
+              handleRight="-22px"
+              style={{ width: 0, height: 0, alignSelf: 'flex-end' }}
+            />
+
+            {/* CTA */}
+            <button
+              type="button"
+              aria-label="Afegeix al cistell"
+              onClick={() => {
+                try {
+                  window.dispatchEvent(new CustomEvent('hg:open-full-wide-cart', {
+                    detail: { source: 'product-pdp-cta', firstPartOnly: true, item: { title: productName.toUpperCase(), collection: COLLECTION_NAME, collectionSlug: IMAGE_COLLECTION, productRoute: PRODUCT_ROUTE, qty: 1, size: selectedSize, price: '15,50€', color: mainVariantColor, finish: selectedFinish, drawing: '', disabled: false } },
+                  }));
+                } catch {
+                  // ignore
+                }
+              }}
+              className="bg-muted text-[#475059] transition-all duration-200 hover:bg-white hover:text-[#111827] hover:shadow-sm active:scale-95"
+              style={{
+                width: '100%',
+                border: '1px solid #e5e7eb',
+                borderRadius: 'clamp(2.81px, 0.8vw, 5.06px)',
+                padding: '12px 16px',
+                cursor: 'pointer',
+                fontFamily: `${ctaTextSettings.fontFamily}, sans-serif`,
+                fontSize: `${ctaTextSettings.fontSize}pt`,
+                fontWeight: ctaTextSettings.fontWeight,
+                letterSpacing: `${ctaTextSettings.letterSpacing}em`,
+                lineHeight: ctaTextSettings.lineHeight,
+                textTransform: ctaTextSettings.textTransform,
+                color: ctaTextSettings.color,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 12,
+              }}
+            >
+              <svg
+                width="calc(1.2em - 1px)"
+                height="calc(1.2em - 1px)"
+                viewBox="0 0 70 69"
+                style={{
+                  fillRule: 'evenodd',
+                  clipRule: 'evenodd',
+                  strokeLinejoin: 'round',
+                  strokeMiterlimit: 2,
+                  display: 'block',
+                  transform: 'translateY(-2px)',
+                  fill: 'currentColor',
                 }}
               >
-                <img
-                  src={TDP_IMAGE(topColor, selectedFinish)}
-                  alt=""
-                  aria-hidden="true"
-                  draggable={false}
-                  style={{ maxWidth: '85%', maxHeight: '85%', objectFit: 'contain', userSelect: 'none' }}
-                />
-              </button>
-            );
-          })()}
-          {(() => {
-            const THUMB_VISIBLE = 7;
-            const N = OFFICIAL_COLORS.length;
-            const center = Math.floor(THUMB_VISIBLE / 2) - 1;
-            const wrap = (i) => ((i % N) + N) % N;
-            return Array.from({ length: THUMB_VISIBLE }).map((_, vIdx) => {
-              const idx = wrap(mainVariantIndex - center + vIdx);
-              const color = OFFICIAL_COLORS[idx];
-              const isActive = vIdx === center;
-              return (
-                <button
-                  key={`thumb-slot-${vIdx}`}
-                  type="button"
-                  aria-label={`Variant ${color}`}
-                  aria-pressed={isActive}
-                  onClick={() => setMainVariantIndex(idx)}
-                  style={{
-                    position: 'relative',
-                    gridColumn: '2 / 3',
-                    gridRow: `${vIdx * 2 + 2} / ${vIdx * 2 + 4}`,
-                    minHeight: 0,
-                    border: 'none',
-                    background: '#fbfcfd',
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    padding: 0,
-                  }}
-                >
-                  {isActive && (
-                    <span
-                      aria-hidden="true"
-                      style={{
-                        position: 'absolute',
-                        left: 0,
-                        top: 0,
-                        bottom: 0,
-                        width: '3px',
-                        background: '#0b0d10',
-                      }}
-                    />
-                  )}
-                  <img
-                    src={TDP_IMAGE(color, selectedFinish)}
-                    alt=""
-                    aria-hidden="true"
-                    draggable={false}
-                    style={{
-                      maxWidth: '85%',
-                      maxHeight: '85%',
-                      objectFit: 'contain',
-                      userSelect: 'none',
-                    }}
-                  />
-                </button>
-              );
-            });
-          })()}
+                <rect id="v3-buit" x="0" y="0.852" width="70" height="68" style={{ fill: 'none' }} />
+                <g clipPath="url(#_clip1_cta)">
+                  <clipPath id="_clip1_cta">
+                    <rect x="0" y="0.852" width="70" height="68" />
+                  </clipPath>
+                  <path d="M-0.004,16.609l70.007,0l-5.013,39.965c-1.062,8.376 -5.433,12.278 -13.816,12.278l-32.337,0c-8.384,0 -12.754,-3.902 -13.804,-12.278l-5.038,-39.965Zm64.335,5.034l-58.664,0l4.321,34.299c0.343,2.734 1.031,4.826 2.499,6.146l0.004,0.004c1.483,1.318 3.625,1.739 6.346,1.739l32.337,0c2.721,0 4.863,-0.422 6.342,-1.736c1.486,-1.322 2.164,-3.416 2.508,-6.154l4.308,-34.298Z" />
+                  <path d="M24.674,26.676c0.512,5.307 4.943,9.468 10.338,9.468c5.384,0 9.814,-4.161 10.326,-9.468l-3.265,0c-0.496,3.493 -3.478,6.183 -7.06,6.183c-3.594,0 -6.577,-2.69 -7.073,-6.183l-3.265,0Z" />
+                </g>
+              </svg>
+              AFEGEIX AL CISTELL
+            </button>
 
-          {/* Imatge principal (col 1 del subgrid — ocupa l'amplada principal centrada) */}
-          <div
-            style={{
-              position: 'relative',
-              gridColumn: '1 / 2',
-              gridRow: `1 / ${THUMB_COUNT + 1}`,
-              minWidth: 0,
-              minHeight: 0,
-              background: '#fbfcfd',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              overflow: 'hidden',
-            }}
-          >
-            <img
-              src={TDP_IMAGE(mainVariantColor, selectedFinish)}
-              alt={`Producte principal ${mainVariantColor}`}
-              draggable={false}
-              style={{
-                maxWidth: '90%',
-                maxHeight: '90%',
-                objectFit: 'contain',
-                userSelect: 'none',
-              }}
-            />
-            <CarouselArrows
-              rightPx={0}
-              bottomPx={0}
-              onPrev={goPrevVariant}
-              onNext={goNextVariant}
-              prevLabel="Variant anterior"
-              nextLabel="Variant següent"
-              rowHeight={exactRowHeight}
-              vertical
+            {/* Handle d'edició per al CTA */}
+            <EditableTextBox
+              id={`${PRODUCT_SLUG}-pdp-cta`}
+              initialText="AFEGEIX AL CISTELL"
+              initialSettings={PDP_CTA_SETTINGS}
+              presetVersion={PDP_PRESET_VERSION}
+              renderText={false}
+              renderHandle={false}
+              onSettingsChange={setCtaTextSettings}
+              handleRight="-22px"
+              style={{ width: 0, height: 0, alignSelf: 'flex-end' }}
             />
           </div>
         </div>
 
-        {/* TEXT POSTER GRAN (Fila 32 / 38) */}
+        {/* ─── Story poster link ─── */}
         <div
           style={{
-            gridColumn: '1 / 5',
-            gridRow: isPortraitTablet ? '29 / 35' : '32 / 38',
-            paddingTop: isPortraitTablet ? '0px' : '50px',
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
             justifyContent: 'center',
+            paddingTop: '50px',
+            marginTop: '40px',
           }}
         >
           <StoryPosterLink style={isPortraitTablet ? { marginLeft: '300px' } : undefined} />
         </div>
-
-        {/* ─── Fitxa tècnica (col 1, fila 3+) — estil TDP ─── */}
-        <h2
-          style={{
-            gridColumn: '1 / 2',
-            gridRow: '6 / 7',
-            margin: 0,
-            minHeight: 0,
-            display: isPortraitTablet ? 'none' : 'block',
-            alignSelf: 'end',
-            fontFamily: 'Oswald, sans-serif',
-            fontWeight: 300,
-            fontSize: '20pt',
-            lineHeight: 1,
-            letterSpacing: '0.04em',
-            textTransform: 'uppercase',
-            color: '#475059',
-            textAlign: 'right',
-          }}
-        >
-          ESPECIFICACIONS
-        </h2>
-        {SPECS.map(({ label, value, row }) => (
-          <div
-            key={`spec-${label}`}
-            style={{
-              gridColumn: '1 / 2',
-              gridRow: `${row} / ${row + 1}`,
-              margin: 0,
-              minHeight: 0,
-              display: isPortraitTablet ? 'none' : 'flex',
-              flexDirection: 'column',
-              alignItems: 'flex-end',
-              justifyContent: 'center',
-              rowGap: 2,
-              fontFamily: 'Roboto Condensed, sans-serif',
-              fontWeight: 300,
-              fontSize: '14pt',
-              lineHeight: 1.2,
-              letterSpacing: '0.03em',
-              color: 'rgba(71, 80, 89, 0.7)',
-              textAlign: 'right',
-            }}
-          >
-            <dt
-              style={{
-                fontFamily: 'Roboto Condensed, sans-serif',
-                fontSize: 11,
-                fontWeight: 700,
-                letterSpacing: '0.2em',
-                textTransform: 'uppercase',
-                color: '#111827',
-                lineHeight: 1.2,
-              }}
-            >
-              {label}
-            </dt>
-            <dd style={{ margin: 0 }}>{value}</dd>
-          </div>
-        ))}
-
-        {/* PASTILLA SEGMENTADA (Fila 17, Columna 4) */}
-        <div
-          style={{
-            gridColumn: '4 / 5',
-            gridRow: '17 / 18',
-            alignSelf: 'center',
-            height: '100%',
-            display: 'flex',
-            alignItems: 'center',
-            minHeight: 0,
-          }}
-        >
-          <div
-            style={{
-              display: 'flex',
-              backgroundColor: '#f3f4f6',
-              padding: '2px',
-              borderRadius: 'clamp(2.81px, 0.8vw, 5.06px)',
-              border: '1px solid #e5e7eb',
-              width: '100%',
-              height: '100%',
-              boxSizing: 'border-box',
-            }}
-          >
-            {FINISHES.map((opt) => {
-              const isAvailable = AVAILABLE_FINISHES.includes(opt);
-              const isActive = isAvailable && selectedFinish === opt;
-              return (
-                <button
-                  key={opt}
-                  type="button"
-                  disabled={!isAvailable}
-                  onClick={isAvailable ? () => setSelectedFinish(opt) : undefined}
-                  style={{
-                    flex: 1,
-                    fontFamily: `${finishButtonTextSettings.fontFamily}, sans-serif`,
-                    fontSize: `${finishButtonTextSettings.fontSize}pt`,
-                    fontWeight: isActive ? finishButtonTextSettings.selectedFontWeight : finishButtonTextSettings.fontWeight,
-                    letterSpacing: `${finishButtonTextSettings.letterSpacing}em`,
-                    lineHeight: finishButtonTextSettings.lineHeight,
-                    textTransform: finishButtonTextSettings.textTransform,
-                    color: !isAvailable ? '#d1d5db' : (isActive ? '#111827' : '#9ca3af'),
-                    backgroundColor: isActive ? '#ffffff' : 'transparent',
-                    border: 'none',
-                    borderRadius: 'clamp(2.11px, 0.6vw, 3.8px)',
-                    cursor: isAvailable ? 'pointer' : 'not-allowed',
-                    opacity: isAvailable ? 1 : 0.45,
-                    transition: 'all 150ms ease',
-                    boxShadow: isActive ? '0 1px 2px rgba(0,0,0,0.05)' : 'none',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                  }}
-                >
-                  {opt}
-                </button>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Handle d'edició per al selector d'acabats/colors */}
-        <EditableTextBox
-          id={`${PRODUCT_SLUG}-pdp-finish-buttons`}
-          initialText="BLANC COLOR NEGRE"
-          columns={FINISHES}
-          selectedColumn={selectedFinish}
-          onColumnSelect={setSelectedFinish}
-          renderText={false}
-          renderHandle={false}
-          onSettingsChange={setFinishButtonTextSettings}
-          initialSettings={PDP_SIZE_SETTINGS}
-          presetVersion={PDP_PRESET_VERSION}
-          handleRight="-22px"
-          style={{ gridColumn: '4 / 5', gridRow: '17 / 18', zIndex: 100005, width: 0, height: 0, justifySelf: 'end' }}
-        />
-
-      </Pauta4ColsOverlay>
+      </div>
     </section>
   );
 }

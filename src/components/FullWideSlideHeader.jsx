@@ -81,6 +81,8 @@ function FullWideSlideHeader({
   showCatalogPanel = true,
   isPortraitTablet = false,
   isLandscapeTablet = false,
+  viewportWidth = 0,
+  viewportHeight = 0,
 }) {
   const location = useLocation();
   const navigate = useNavigate();
@@ -301,6 +303,7 @@ function FullWideSlideHeader({
   const [showRegisterOverlay, setShowRegisterOverlay] = useState(false);
   const [megaLocked, setMegaLocked] = useState(false);
   const [lockBtnTop, setLockBtnTop] = useState(null);
+  const [lockBtnScrollProgress, setLockBtnScrollProgress] = useState(0.5);
   const { user } = useAuth();
   const [active, setActive] = useState(() => {
     try {
@@ -549,6 +552,22 @@ function FullWideSlideHeader({
 
   useEffect(() => {
     if (isPortraitTablet) setMobileOpen(false);
+  }, [isPortraitTablet]);
+
+  // Escolta el progrés de scroll horitzontal del megaslide en portrait tablet
+  // per moure el botó de bloqueig com a indicador visual de la posició.
+  useEffect(() => {
+    if (!isPortraitTablet) {
+      setLockBtnScrollProgress(0.5);
+      return undefined;
+    }
+    const handler = (e) => {
+      if (typeof e?.detail?.progress === 'number') {
+        setLockBtnScrollProgress(e.detail.progress);
+      }
+    };
+    window.addEventListener('mega-portrait-scroll', handler);
+    return () => window.removeEventListener('mega-portrait-scroll', handler);
   }, [isPortraitTablet]);
 
   const [demoManualEnabled, setDemoManualEnabled] = useState(() => {
@@ -2920,7 +2939,7 @@ function FullWideSlideHeader({
   return (
     <header
       ref={headerRef}
-      className={`${contained ? 'relative' : 'fixed'} z-[10000] bg-background`}
+      className={`${contained ? 'relative' : 'fixed'} z-[10000] ${isLandscapeTablet && active ? 'bg-transparent' : 'bg-background'}`}
       onMouseLeave={(e) => {
         if (isManualLockEnabled()) return;
         if (megaAccordionLocked) return;
@@ -2938,7 +2957,7 @@ function FullWideSlideHeader({
 top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right: 0 }
       }
     >
-      <div className={isPortraitTablet ? '' : 'border-b border-border'}>
+      <div className={`${isPortraitTablet ? '' : 'border-b border-border'} bg-background`}>
         <div
           className="flex h-20 items-center gap-3 px-4 sm:px-6 lg:h-20 lg:px-10"
           style={{
@@ -3243,7 +3262,13 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
         <button
           onClick={() => setMegaLocked((v) => !v)}
           className="fixed z-[10001] left-1/2 -translate-x-1/2 flex h-10 w-10 items-center justify-center rounded-full border border-border bg-background shadow-lg transition-colors hover:bg-muted"
-          style={{ top: lockBtnTop != null ? `${lockBtnTop + 8}px` : '16px' }}
+          style={{
+            top: lockBtnTop != null ? `${lockBtnTop + 8}px` : '16px',
+            transform: isPortraitTablet
+              ? `translateX(calc(-50% + ${(lockBtnScrollProgress - 0.5) * 160}px))`
+              : undefined,
+            transition: 'transform 120ms ease-out, background-color 150ms',
+          }}
           title={megaLocked ? 'Desbloca el megaslide' : 'Bloca el megaslide'}
           aria-label={megaLocked ? 'Desbloca el megaslide' : 'Bloca el megaslide'}
         >
@@ -3332,6 +3357,7 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
         acordioExpandedPage4={acordioExpandedPage4}
         setAcordioExpandedPage4={setAcordioExpandedPage4}
         isPortraitTablet={isPortraitTablet}
+        isLandscapeTablet={isLandscapeTablet}
       />
 
       {canUseDom && showRegisterOverlay &&

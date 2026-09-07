@@ -39,6 +39,21 @@ html {
   scrollbar-gutter: stable;
 }
 
+/* Maximitza l'area visible en mòbil/tablet:
+   - 100dvh s'ajusta automàticament quan les barres del navegador apareixen/desapareixen
+   - viewport-fit=cover (al meta tag) permet estendre's sota el notch
+   - safe-area-inset-* respecta el notch/Dynamic Island on cal */
+@supports (height: 100dvh) {
+  :root {
+    --vh: 100dvh;
+  }
+}
+@supports not (height: 100dvh) {
+  :root {
+    --vh: 100vh;
+  }
+}
+
 html.scrollbar-compensate [data-main-header="true"].cart-open,
 html.scrollbar-compensate .offers-header-cart-open {
   padding-right: var(--scrollbar-width, 0);

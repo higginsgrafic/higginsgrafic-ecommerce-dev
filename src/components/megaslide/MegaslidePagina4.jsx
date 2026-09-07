@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef, useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useProfile } from '@/hooks/useProfile';
@@ -80,8 +80,25 @@ export default function MegaslidePagina4({
   const VISIBLE_ROWS = 9;
   const ROW_HEIGHT = 24;
   const ordersRef = useRef(null);
+  const viewportRef4 = useRef(null);
   const [scrollIndex, setScrollIndex] = useState(0);
   const isScrolling = useRef(false);
+
+  const handlePortraitScroll4 = useCallback(() => {
+    const viewport = viewportRef4.current;
+    if (!viewport) return;
+    const maxScroll = Math.max(0, viewport.scrollWidth - viewport.clientWidth);
+    const progress = maxScroll > 0 ? viewport.scrollLeft / maxScroll : 0;
+    window.dispatchEvent(new CustomEvent('mega-portrait-scroll', { detail: { progress } }));
+  }, []);
+
+  useEffect(() => {
+    if (!isPortraitTablet) return undefined;
+    const viewport = viewportRef4.current;
+    if (!viewport) return undefined;
+    viewport.addEventListener('scroll', handlePortraitScroll4, { passive: true });
+    return () => viewport.removeEventListener('scroll', handlePortraitScroll4);
+  }, [isPortraitTablet, handlePortraitScroll4]);
   const [isLandscapeTablet, setIsLandscapeTablet] = useState(
     typeof window !== 'undefined'
       && window.innerWidth >= 1024
@@ -324,7 +341,7 @@ export default function MegaslidePagina4({
 
   return (
     <div style={{ width: '25%', flexShrink: 0, display: 'block', height: '100%', position: 'relative', overflow: isPortraitTablet ? 'hidden' : 'visible', boxShadow: isPortraitTablet ? 'inset 8px 0 0 #ffffff, inset -8px 0 0 #ffffff' : undefined }}>
-      <div data-mega-page-viewport="4" style={{
+      <div ref={viewportRef4} data-mega-page-viewport="4" style={{
         width: '100%',
         height: '100%',
         display: 'flex',
