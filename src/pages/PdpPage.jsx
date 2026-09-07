@@ -136,13 +136,13 @@ function PdpPage() {
   const [isPortraitTablet, setIsPortraitTablet] = useState(
     typeof window !== 'undefined'
       && window.innerWidth >= 768
-      && window.innerWidth <= 1024
+      && window.innerWidth <= 1366
       && window.innerHeight > window.innerWidth
   );
   const [isLandscapeTablet, setIsLandscapeTablet] = useState(
     typeof window !== 'undefined'
       && window.innerWidth >= 768
-      && window.innerWidth <= 1366
+      && window.innerWidth <= 1600
       && window.innerHeight >= 480
       && window.innerHeight < window.innerWidth
   );
@@ -151,12 +151,12 @@ function PdpPage() {
     if (typeof window === 'undefined') return undefined;
     const measure = () => {
       const portraitTablet = window.innerWidth >= 768
-        && window.innerWidth <= 1024
+        && window.innerWidth <= 1366
         && window.innerHeight > window.innerWidth;
       setIsPortraitTablet(portraitTablet);
       setIsLandscapeTablet(
         window.innerWidth >= 768
-          && window.innerWidth <= 1366
+          && window.innerWidth <= 1600
           && window.innerHeight >= 480
           && window.innerHeight < window.innerWidth
       );
@@ -317,9 +317,11 @@ function PdpPage() {
   const colGap = `${PAUTA_GUTTER_X}px`;
   const tdpGridTemplate = `repeat(4, 1fr)`;
   const tdpBaseHeight = isCompactTablet ? 280 : 360;
-  const tdpFitScale = isLandscapeTablet && Number.isFinite(tdpAvailableHeight)
-    ? Math.min(1, tdpAvailableHeight / tdpBaseHeight)
-    : 1;
+  const tdpFitScale = isPortraitTablet
+    ? 0.846
+    : (isLandscapeTablet && Number.isFinite(tdpAvailableHeight)
+      ? Math.min(1, tdpAvailableHeight / tdpBaseHeight)
+      : 1);
   const tdpRenderedHeight = Math.round(tdpBaseHeight * tdpFitScale);
   const titleSettings = isCompactTablet ? { ...PDP_TITLE_SETTINGS, fontSize: 19, lineHeight: 0.95 } : PDP_TITLE_SETTINGS;
   const collectionSettings = isCompactTablet ? { ...PDP_COLLECTION_SETTINGS, fontSize: 14, lineHeight: 1 } : PDP_COLLECTION_SETTINGS;
@@ -383,8 +385,8 @@ function PdpPage() {
           type="product"
           fluid
           style={{
-            height: isLandscapeTablet && Number.isFinite(tdpAvailableHeight) ? `${tdpRenderedHeight}px` : undefined,
-            overflow: isLandscapeTablet && Number.isFinite(tdpAvailableHeight) ? 'hidden' : undefined,
+            height: (isLandscapeTablet && Number.isFinite(tdpAvailableHeight)) || isPortraitTablet ? `${tdpRenderedHeight}px` : undefined,
+            overflow: (isLandscapeTablet && Number.isFinite(tdpAvailableHeight)) || isPortraitTablet ? 'hidden' : undefined,
             marginTop: '18px',
             marginBottom: '32px',
           }}
@@ -396,9 +398,11 @@ function PdpPage() {
               gridTemplateColumns: isPortraitTablet ? 'repeat(3, 1fr)' : tdpGridTemplate,
               gap: colGap,
               alignItems: 'stretch',
-              width: tdpFitScale < 1 ? `${100 / tdpFitScale}%` : (isPortraitTablet && portraitRailViewportWidth ? `${portraitRailViewportWidth}px` : (beltWidth ? `${beltWidth}px` : '100%')),
+              width: isPortraitTablet && portraitRailViewportWidth
+                ? `${portraitRailViewportWidth}px`
+                : (tdpFitScale < 1 ? `${100 / tdpFitScale}%` : (beltWidth ? `${beltWidth}px` : '100%')),
               height: `${tdpBaseHeight}px`,
-              margin: beltWidth ? '0 auto' : undefined,
+              margin: isPortraitTablet ? '0 auto' : (beltWidth ? '0 auto' : undefined),
               transform: tdpFitScale < 1 ? `scale(${tdpFitScale})` : undefined,
               transformOrigin: 'top left',
             }}
@@ -510,7 +514,7 @@ function PdpPage() {
                   maxHeight: isCompactTablet ? '240px' : '288px',
                   objectFit: 'contain',
                   userSelect: 'none',
-                  transform: 'translateX(20px)',
+                  transform: 'translateX(-4px)',
                 }}
               />
               <CarouselArrows
