@@ -385,7 +385,7 @@ function PdpPage() {
           style={{
             height: isLandscapeTablet && Number.isFinite(tdpAvailableHeight) ? `${tdpRenderedHeight}px` : undefined,
             overflow: isLandscapeTablet && Number.isFinite(tdpAvailableHeight) ? 'hidden' : undefined,
-            marginTop: isPortraitTablet ? '48px' : '-32px',
+            marginTop: '18px',
             marginBottom: '32px',
           }}
         >

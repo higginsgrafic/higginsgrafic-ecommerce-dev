@@ -3034,7 +3034,7 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
             />
           </Link>
 
-          <nav className={`hidden md:flex flex-1 items-center justify-center gap-1 lg:gap-4 flex-nowrap overflow-hidden`} style={(isPortraitTablet || isLandscapeTablet) ? { gap: isLandscapeTablet ? '1rem' : '0.25rem', minWidth: 0, justifyContent: 'flex-start', marginLeft: isPortraitTablet ? '-60px' : undefined } : { transform: 'translateX(-5%)' }}>
+          <nav className={`hidden md:flex flex-1 items-center justify-center gap-1 lg:gap-4 flex-nowrap overflow-hidden ${isPortraitTablet ? 'md:hidden' : ''}`} style={(isPortraitTablet || isLandscapeTablet) ? { gap: isLandscapeTablet ? '1rem' : '0.25rem', minWidth: 0, justifyContent: 'flex-start', marginLeft: isPortraitTablet ? '-60px' : undefined } : { transform: 'translateX(-5%)' }}>
             {resolvedNav.map((item) => {
               // L'indicador d'obert (fletxa rotada + color) només s'ha
               // d'activar quan realment veiem la col·lecció (megaPage=1).
