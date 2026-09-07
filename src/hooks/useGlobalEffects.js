@@ -102,7 +102,9 @@ export default function useGlobalEffects({
   // Track viewport size for responsive padding
   useEffect(() => {
     const handleResize = () => {
-      setIsLargeScreen(window.innerWidth >= 1024);
+      if (typeof setIsLargeScreen === 'function') {
+        setIsLargeScreen(window.innerWidth >= 1024);
+      }
     };
 
     window.addEventListener('resize', handleResize);
@@ -116,6 +118,9 @@ export default function useGlobalEffects({
     const enableInDev = String(import.meta?.env?.VITE_ENABLE_GLOBAL_REDIRECT_IN_DEV || '').toLowerCase() === 'true';
     const hostname = (typeof window !== 'undefined' ? window.location?.hostname : '') || '';
     const isLocalhost = hostname === 'localhost' || hostname === '127.0.0.1' || hostname === '0.0.0.0';
+    // IPs locals de xarxa (192.168.x.x, 10.x.x.x, 172.16-31.x.x) també són dev
+    const isPrivateIp = /^192\.168\./.test(hostname) || /^10\./.test(hostname) || /^172\.(1[6-9]|2[0-9]|3[01])\./.test(hostname);
+    const isDev = import.meta?.env?.DEV || isLocalhost || isPrivateIp;
 
     const adminRoutes = [
       '/admin',
@@ -141,8 +146,8 @@ export default function useGlobalEffects({
     // Never redirect directly to the external target from here.
     // We always route through /ec-preview so the under-construction page can control
     // UX (video/click) and apply any defensive measures.
-    if ((import.meta?.env?.DEV || isLocalhost) && !enableInDev) {
-      // In dev, keep global redirects disabled unless explicitly enabled.
+    if (isDev && !enableInDev) {
+      // In dev (including local network IPs), keep global redirects disabled unless explicitly enabled.
       return;
     }
 

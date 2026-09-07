@@ -51,6 +51,7 @@ function MegaColumn({
   stripeVariantVisibility,
   megaTileSelectorParams,
   onStartSelectorDrag,
+  compactLandscape = false,
 }) {
   const tileSizeRef = useRef(null);
   const [tileSize, setTileSize] = useState(null);
@@ -1085,6 +1086,11 @@ function MegaColumn({
             <div
               key={`${it}-${idx}`}
               className="min-w-0 relative z-10 self-start"
+              style={compactLandscape ? {
+                width: `${megaTileSize || 80}px`,
+                maxWidth: '100%',
+                justifySelf: 'center',
+              } : undefined}
             >
               {(() => {
                 const isSelected = Boolean(
@@ -1094,8 +1100,8 @@ function MegaColumn({
                 );
                 const displayLabel = isSelected ? labelForItemWhenSelected(it) : labelForItem(it);
 
-                return !it || it === CONTROL_TILE_ARROWS || it === CONTROL_TILE_BN ? (
-                  <div className="h-4" />
+                return compactLandscape || !it || it === CONTROL_TILE_ARROWS || it === CONTROL_TILE_BN ? (
+                  <div className={compactLandscape ? 'h-0' : 'h-4'} />
                 ) : (
                   <Link
                     to="#"
@@ -1124,7 +1130,7 @@ function MegaColumn({
               })()}
 
               {!it ? null : it === CONTROL_TILE_BN ? (
-                <div className="relative z-40 mt-2">
+                <div className={`relative z-40 ${compactLandscape ? 'mt-0' : 'mt-2'}`}>
                   {isFirstContact ? (
                     <FirstContactDibuix00Buttons
                       onWhite={onFirstContactWhite}
@@ -1159,7 +1165,7 @@ function MegaColumn({
                 </div>
               ) : it === CONTROL_TILE_ARROWS ? (
                 <div
-                  className={`relative z-40 mt-2 ${thinSlideEnabled || pagingEnabled || (isHumanInside && onHumanPrev && onHumanNext) ? '' : 'opacity-30 pointer-events-none'}`}
+                  className={`relative z-40 ${compactLandscape ? 'mt-0' : 'mt-2'} ${thinSlideEnabled || pagingEnabled || (isHumanInside && onHumanPrev && onHumanNext) ? '' : 'opacity-30 pointer-events-none'}`}
                   aria-hidden={thinSlideEnabled || pagingEnabled || (isHumanInside && onHumanPrev && onHumanNext) ? undefined : true}
                 >
                   <FirstContactDibuix09Buttons
@@ -1189,7 +1195,7 @@ function MegaColumn({
               ) : (
                 <button
                   type="button"
-                  className={`relative z-50 mt-2 aspect-square w-full ${typeof onSelectItem === 'function' ? 'cursor-pointer pointer-events-auto' : 'pointer-events-none'}`}
+                  className={`relative z-50 ${compactLandscape ? 'mt-0' : 'mt-2'} aspect-square w-full ${typeof onSelectItem === 'function' ? 'cursor-pointer pointer-events-auto' : 'pointer-events-none'}`}
                   data-mega-tile="1"
                   data-mega-collection={collectionId}
                   data-mega-item={typeof it === 'string' ? it : ''}
@@ -1275,7 +1281,7 @@ function MegaColumn({
                         <OptimizedImg
                           src={thumbSrc}
                           alt={labelForItem(it) || it}
-                          className={useContain ? 'h-full w-full object-contain' : 'h-full w-full object-cover'}
+                          className={compactLandscape || useContain ? 'h-full w-full object-contain' : 'h-full w-full object-cover'}
                         />
                       ) : (
                         <div className="h-full w-full bg-black/5" />

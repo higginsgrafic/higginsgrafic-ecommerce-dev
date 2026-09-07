@@ -15,6 +15,7 @@ import { computeStripeTileOverlaySrcs, computeStripeTileItems } from '@/utils/re
 export default function MegaslidePagina2({
   active,
   isPortraitTablet = false,
+  isLandscapeTablet = false,
   setActive,
   austenSubcollection,
   setAustenSubcollection,
@@ -77,7 +78,9 @@ export default function MegaslidePagina2({
     normalizeOverlaySrc,
   } = cal;
 
-  const bnSliderSize = megaTileSize || 120;
+  const compactMegaTileSize = megaTileSize;
+  const compactStripePreviewHPx = stripePreviewHPx;
+  const bnSliderSize = compactMegaTileSize || 120;
   const snapTimerRef = useRef(0);
   const neutralGammaRef = useRef(null);
   const tiltDeltaRef = useRef(0);
@@ -92,9 +95,14 @@ export default function MegaslidePagina2({
 
   const handlePortraitScroll = useCallback(() => {
     window.clearTimeout(snapTimerRef.current);
+    const viewport = viewportRef.current;
+    if (viewport) {
+      const maxScroll = Math.max(0, viewport.scrollWidth - viewport.clientWidth);
+      const progress = maxScroll > 0 ? viewport.scrollLeft / maxScroll : 0;
+      window.dispatchEvent(new CustomEvent('mega-portrait-scroll', { detail: { progress } }));
+    }
     snapTimerRef.current = window.setTimeout(() => {
       if (Math.abs(tiltDeltaRef.current) > 3) return;
-      const viewport = viewportRef.current;
       if (!viewport) return;
       const maxScroll = Math.max(0, viewport.scrollWidth - viewport.clientWidth);
       if (maxScroll <= 0) return;
@@ -164,6 +172,9 @@ export default function MegaslidePagina2({
       if (viewport && Math.abs(delta) > 3) {
         const velocity = Math.sign(delta) * Math.min(10, (Math.abs(delta) - 3) * 0.45);
         viewport.scrollLeft += velocity;
+        const maxScroll = Math.max(0, viewport.scrollWidth - viewport.clientWidth);
+        const progress = maxScroll > 0 ? viewport.scrollLeft / maxScroll : 0;
+        window.dispatchEvent(new CustomEvent('mega-portrait-scroll', { detail: { progress } }));
       }
       frame = requestAnimationFrame(tick);
     };
@@ -390,7 +401,7 @@ export default function MegaslidePagina2({
             showStripe={showStripe}
             stripeRowPadPx={stripeRowPadPx}
             stripeRowPadXPx={stripeRowPadXPx}
-            stripePreviewHPx={stripePreviewHPx}
+            stripePreviewHPx={compactStripePreviewHPx}
             stripeOverlayLoadState={stripeOverlayLoadState}
             resolvedOverlaySrc={resolvedOverlaySrc}
             stripeOverlayDebug={stripeOverlayDebug}
@@ -412,7 +423,7 @@ export default function MegaslidePagina2({
             stripeVariantVisibility={stripeVariantVisibility}
             megaTileSelectorParams={megaTileSelectorParams}
             onStartSelectorDrag={onStartSelectorDrag}
-            megaTileSize={megaTileSize}
+            megaTileSize={compactMegaTileSize}
             setStripeOverlayOverrideActive={setStripeOverlayOverrideActive}
             setFirstContactVariant={setFirstContactVariant}
             setHumanInsideVariant={setHumanInsideVariant}

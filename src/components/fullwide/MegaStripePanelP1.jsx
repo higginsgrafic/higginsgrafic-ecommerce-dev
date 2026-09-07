@@ -127,6 +127,7 @@ function MegaStripePanelP1({
   emptyTileIndices,
   stripeEmptyMaskSrc,
   calibrationOverrides,
+  compactLandscape = false,
 }) {
   const emptyShirtMaskUrl = useEmptyShirtMask(emptyTileIndices, shirtColor);
 
@@ -170,6 +171,7 @@ function MegaStripePanelP1({
               megaTileSelectorParams={megaTileSelectorParams}
               onStartSelectorDrag={onStartSelectorDrag}
               megaTileSize={megaTileSize}
+              compactLandscape={compactLandscape}
               humanInsideVariant={humanInsideVariant}
               items={active === 'austen' ? reorderAustenQuotes(col.items) : col.items}
               row={true}
@@ -198,11 +200,11 @@ function MegaStripePanelP1({
         <div
           className="relative z-0"
           style={{
-            marginTop: `${stripeRowPadPx}px`,
-            paddingBottom: `${stripeRowPadPx}px`,
+            marginTop: compactLandscape ? '16px' : `${stripeRowPadPx}px`,
+            paddingBottom: compactLandscape ? '8px' : `${stripeRowPadPx}px`,
             paddingLeft: `${stripeRowPadXPx?.left || 0}px`,
             paddingRight: `${stripeRowPadXPx?.right || 0}px`,
-            transform: 'translateY(-15px)',
+            transform: compactLandscape ? 'none' : 'translateY(-15px)',
           }}
         >
           <div className="w-full flex justify-center bg-transparent">

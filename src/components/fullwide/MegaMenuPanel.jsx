@@ -1,4 +1,5 @@
-import React, { lazy, Suspense } from 'react';
+import React, { lazy, Suspense, useRef, useEffect, useCallback } from 'react';
+import { clampNumber } from '@/utils/layoutMetrics';
 import MegaStripeBleedGuard from './MegaStripeBleedGuard.jsx';
 import MegaStripePanelP1 from './MegaStripePanelP1.jsx';
 import MegaslidePagina2 from '../megaslide/MegaslidePagina2.jsx';
@@ -87,8 +88,26 @@ export default function MegaMenuPanel({
   acordioExpandedPage4,
   setAcordioExpandedPage4,
   isPortraitTablet = false,
+  isLandscapeTablet = false,
 }) {
   if (!active) return null;
+
+  const viewport1Ref = useRef(null);
+  const handlePortraitScroll1 = useCallback(() => {
+    const viewport = viewport1Ref.current;
+    if (!viewport) return;
+    const maxScroll = Math.max(0, viewport.scrollWidth - viewport.clientWidth);
+    const progress = maxScroll > 0 ? viewport.scrollLeft / maxScroll : 0;
+    window.dispatchEvent(new CustomEvent('mega-portrait-scroll', { detail: { progress } }));
+  }, []);
+
+  useEffect(() => {
+    if (!isPortraitTablet) return undefined;
+    const viewport = viewport1Ref.current;
+    if (!viewport) return undefined;
+    viewport.addEventListener('scroll', handlePortraitScroll1, { passive: true });
+    return () => viewport.removeEventListener('scroll', handlePortraitScroll1);
+  }, [isPortraitTablet, handlePortraitScroll1]);
 
   const page1SelectedItem = active === 'first_contact' ? firstContactSelectedItem
     : active === 'the_human_inside' ? humanInsideSelectedItem
@@ -97,7 +116,10 @@ export default function MegaMenuPanel({
   const portraitLandscapeWidth = typeof window !== 'undefined'
     ? Math.min(1350, window.innerHeight - 15)
     : 1024;
-  const portraitPage1TileSize = Math.min(144, (portraitLandscapeWidth - 176) / 9);
+  const portraitTileCap = typeof window !== 'undefined'
+    ? clampNumber(window.innerHeight * 0.14, 96, 144)
+    : 144;
+  const portraitPage1TileSize = Math.min(portraitTileCap, (portraitLandscapeWidth - 176) / 9);
   const defaultBleedGuardHeight = effectiveMegaTileSize
     ? `${Math.round(effectiveMegaTileSize * 2 + 37 + Math.max(0, stripeRowPadPx))}px`
     : undefined;
@@ -110,11 +132,8 @@ export default function MegaMenuPanel({
   // El formulari de pagament necessita alçada per centrar-s'hi: a les dues
   // tauletes, obrir l'acordió estira la franja fins al peu de pantalla.
   // 112px = capçalera (80px) + padding vertical del panell (32px).
-  const landscapeTablet = typeof window !== 'undefined'
-    && window.innerWidth >= 768
-    && window.innerWidth <= 1366
-    && window.innerWidth >= window.innerHeight;
-  const paymentFillsScreen = (isPortraitTablet || landscapeTablet) && megaPage === 3 && acordioExpanded;
+  // S'usa la prop isLandscapeTablet (detecció centralitzada a useDeviceLayout).
+  const paymentFillsScreen = (isPortraitTablet || isLandscapeTablet) && megaPage === 3 && acordioExpanded;
   const guardHeightPx = paymentFillsScreen
     ? 'calc(100vh - var(--globalHeaderTopOffset, 0px) - 112px)'
     : bleedGuardHeight;
@@ -125,6 +144,7 @@ export default function MegaMenuPanel({
         className="relative z-[10000] block border-b border-border"
         style={{
           overflow: 'visible',
+          backgroundColor: '#ffffff',
           ...(megaFullScreen ? {
             minHeight: '100vh',
           } : {})
@@ -164,7 +184,7 @@ export default function MegaMenuPanel({
                 }}
               >
                 <div style={{ width: '25%', flexShrink: 0, display: 'block', height: '100%', position: 'relative', overflow: isPortraitTablet ? 'hidden' : 'visible', boxShadow: isPortraitTablet ? 'inset 8px 0 0 #ffffff, inset -8px 0 0 #ffffff' : undefined }}>
-                  <div data-mega-page-viewport="1" style={{
+                  <div ref={viewport1Ref} data-mega-page-viewport="1" style={{
                     width: '100%',
                     height: '100%',
                     display: 'flex',
@@ -232,6 +252,7 @@ export default function MegaMenuPanel({
                 <MegaslidePagina2
                   active={active}
                   isPortraitTablet={isPortraitTablet}
+                  isLandscapeTablet={isLandscapeTablet}
                   setActive={setActive}
                   austenSubcollection={austenSubcollection}
                   setAustenSubcollection={setAustenSubcollection}

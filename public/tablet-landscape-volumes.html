@@ -1,0 +1,257 @@
+<!doctype html>
+<html lang="ca">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Volums tablet horitzontal · GRÀFIC</title>
+  <style>
+    * { box-sizing: border-box; }
+    html, body { margin: 0; min-height: 100%; background: #16191d; color: #eef1f4; }
+    body { font-family: Arial, Helvetica, sans-serif; padding: 20px; }
+    .page { width: min(1120px, 100%); margin: 0 auto; }
+    h1 { margin: 0 0 6px; font-size: 20px; font-weight: 600; }
+    .intro { margin: 0 0 16px; color: #aeb6bf; font-size: 13px; line-height: 1.45; }
+    .controls { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+    button {
+      border: 1px solid #59616b;
+      border-radius: 7px;
+      padding: 8px 12px;
+      background: #252a30;
+      color: #fff;
+      font: inherit;
+      cursor: pointer;
+    }
+    button.active { background: #eef1f4; color: #15181b; }
+    .screen-wrap { width: 100%; overflow: auto; padding-bottom: 8px; }
+    .screen {
+      position: relative;
+      width: 960px;
+      height: 600px;
+      transform-origin: top left;
+      overflow: hidden;
+      background: #f5f6f7;
+      border: 1px solid #69717a;
+      box-shadow: 0 18px 50px rgba(0,0,0,.35);
+    }
+    .status {
+      position: absolute; inset: 0 0 auto 0; height: 22px;
+      background: #f3f3f3; color: #555;
+      border-bottom: 1px solid #ddd;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 10px; font-size: 10px;
+    }
+    .browser {
+      position: absolute; left: 0; right: 0; top: 22px; height: 66px;
+      background: #fff; border-bottom: 1px solid #d7dade;
+      display: grid; grid-template-columns: 82px 1fr 110px;
+      align-items: center; gap: 10px; padding: 0 14px; color: #30343a;
+    }
+    .browser-nav { font-size: 25px; letter-spacing: 10px; color: #31363b; }
+    .browser-title { font-size: 15px; line-height: 1.15; }
+    .browser-url { margin-top: 4px; font-size: 9px; color: #5c626a; }
+    .browser-actions { text-align: right; font-size: 20px; letter-spacing: 12px; }
+    .viewport {
+      position: absolute; left: 0; right: 0; top: 88px; bottom: 36px;
+      background: #fff; overflow: hidden;
+    }
+    .viewport-size {
+      position: absolute; right: 8px; top: 6px; z-index: 30;
+      padding: 4px 7px; border-radius: 4px;
+      background: #16191d; color: white; font-size: 10px;
+    }
+    .site-header {
+      position: absolute; left: 0; right: 0; top: 0; height: 36px;
+      background: rgba(255,255,255,.98); border-bottom: 1px solid #dfe2e5;
+      display: grid; grid-template-columns: 145px 1fr 105px;
+      align-items: center; padding: 0 20px; z-index: 20;
+    }
+    .logo { font-size: 20px; font-weight: 900; letter-spacing: -2px; }
+    .nav { text-align: center; font-size: 8px; font-weight: 700; letter-spacing: .05em; }
+    .icons { text-align: right; font-size: 16px; letter-spacing: 6px; }
+    .pdp {
+      position: absolute; left: 24px; right: 24px; top: 50px; bottom: 12px;
+      display: grid; grid-template-columns: 190px minmax(0, 1fr) 220px;
+      gap: 16px;
+    }
+    .volume {
+      position: relative; border: 2px solid currentColor; border-radius: 7px;
+      display: flex; align-items: center; justify-content: center;
+      text-align: center; font-size: 13px; line-height: 1.35; font-weight: 700;
+      overflow: hidden;
+    }
+    .volume small { display: block; margin-top: 5px; font-size: 10px; font-weight: 400; opacity: .85; }
+    .specs { color: #3467c8; background: rgba(52,103,200,.10); }
+    .product { color: #079668; background: rgba(7,150,104,.10); }
+    .purchase { color: #b96b00; background: rgba(185,107,0,.10); }
+    .shirt {
+      width: 62%; height: 73%; border-radius: 42% 42% 12% 12%;
+      background: rgba(7,150,104,.20); border: 2px dashed currentColor;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .mega {
+      position: absolute; left: 0; right: 0; top: 36px; height: 218px;
+      z-index: 25; padding: 10px 24px 12px;
+      background: rgba(255,255,255,.84);
+      backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px);
+      border-bottom: 1px solid rgba(90,98,108,.40);
+      box-shadow: 0 8px 24px rgba(17,24,39,.10);
+      transition: opacity 160ms ease, transform 160ms ease;
+    }
+    .mega.hidden { opacity: 0; transform: translateY(-100%); pointer-events: none; }
+    .mega-grid { height: 100%; display: grid; grid-template-rows: 98px 82px; gap: 8px; }
+    .design-row, .color-row { display: grid; grid-template-columns: 90px repeat(8, 1fr); gap: 8px; }
+    .selector, .tile {
+      border: 1px solid rgba(70,80,90,.35); border-radius: 5px;
+      background: rgba(245,247,249,.86); color: #454c54;
+      display: flex; align-items: center; justify-content: center;
+      text-align: center; font-size: 9px; padding: 4px;
+    }
+    .tile.selected { background: rgba(224,230,242,.92); border-width: 2px; }
+    .shirt-mini { width: 54px; height: 62px; background: currentColor; clip-path: polygon(26% 0, 40% 9%, 60% 9%, 74% 0, 100% 18%, 82% 40%, 74% 32%, 74% 100%, 26% 100%, 26% 32%, 18% 40%, 0 18%); }
+    .c1 { color:#e9e9e4; } .c2 { color:#86a9c8; } .c3 { color:#046bb0; }
+    .c4 { color:#20283d; } .c5 { color:#682193; } .c6 { color:#efccd9; }
+    .c7 { color:#f5c529; } .c8 { color:#df123f; }
+    .lock-line {
+      position: absolute; left: 0; right: 0; top: 252px; height: 2px;
+      background: rgba(74,82,91,.38); z-index: 27;
+      transition: opacity 160ms ease, transform 160ms ease;
+    }
+    .lock-line.hidden { opacity: 0; transform: translateY(-218px); }
+    .lock {
+      position: absolute; left: 50%; top: -18px; transform: translateX(-50%);
+      width: 38px; height: 38px; border-radius: 50%;
+      border: 1px solid #cfd4d9; background: white; color: #30363d;
+      box-shadow: 0 3px 8px rgba(0,0,0,.14);
+      display: flex; align-items: center; justify-content: center; font-size: 17px;
+    }
+    .android-nav {
+      position: absolute; left: 0; right: 0; bottom: 0; height: 36px;
+      background: #050505; color: white;
+      display: flex; align-items: center; justify-content: space-around;
+      padding: 0 75px; font-size: 20px;
+    }
+    .measure {
+      position: absolute; z-index: 40; color: #e00046; font-size: 9px;
+      border-left: 1px solid #e00046; padding-left: 4px;
+    }
+    .m-browser { left: 4px; top: 24px; height: 62px; }
+    .m-header { left: 4px; top: 91px; height: 31px; }
+    .m-mega { right: 4px; top: 130px; height: 210px; border-left: 0; border-right: 1px solid #e00046; padding: 0 4px 0 0; }
+    .legend {
+      display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 10px;
+      margin-top: 16px;
+    }
+    .legend-item { border: 1px solid #39414a; border-radius: 7px; padding: 10px; font-size: 11px; color: #c4cbd2; }
+    .legend-item strong { display: block; color: white; margin-bottom: 4px; }
+    @media (max-width: 1000px) {
+      body { padding: 10px; }
+      .screen { transform: scale(calc((100vw - 20px) / 960)); }
+      .screen-wrap { height: calc(600px * ((100vw - 20px) / 960)); }
+      .legend { grid-template-columns: repeat(2, minmax(0,1fr)); }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <h1>Volums generals · tablet horitzontal Huawei</h1>
+    <p class="intro">Pantalla de referència: 960×600px CSS. Àrea útil amb Chrome i navegació Android visibles: aproximadament 960×476px.<br /><strong id="deviceMetrics" style="color:#fff">Mesurant aquest dispositiu…</strong></p>
+    <div class="controls">
+      <button id="open" class="active" type="button">Mega-slide obert</button>
+      <button id="closed" type="button">Mega-slide tancat</button>
+    </div>
+
+    <div class="screen-wrap">
+      <section class="screen" aria-label="Representació de la tablet horitzontal">
+        <div class="status"><span>22:36</span><span>Wi-Fi&nbsp;&nbsp;100%</span></div>
+        <div class="browser">
+          <div class="browser-nav">×⌄</div>
+          <div>
+            <div class="browser-title">PONT DEL DIABLE · MISCELLANIA | Higgins Gràfic</div>
+            <div class="browser-url">192.168.68.100:3003</div>
+          </div>
+          <div class="browser-actions">⌯ ⋮</div>
+        </div>
+
+        <div class="viewport">
+          <div class="viewport-size">VIEWPORT ÚTIL 960×476</div>
+          <div class="site-header">
+            <div class="logo">GRÀFIC</div>
+            <div class="nav">FIRST CONTACT · THE HUMAN INSIDE · AUSTEN · CUBE · MISCEL·LÀNIA</div>
+            <div class="icons">⌕ □ →</div>
+          </div>
+
+          <div class="pdp">
+            <div class="volume specs">ESPECIFICACIONS<small>190px · 21%</small></div>
+            <div class="volume product">
+              <div class="shirt">SAMARRETA<small>zona prioritària · 51%</small></div>
+            </div>
+            <div class="volume purchase">NOM + COMPRA<small>220px · 25%</small></div>
+          </div>
+
+          <div class="mega" id="mega">
+            <div class="mega-grid">
+              <div class="design-row">
+                <div class="selector">TINTA<br />BLANC / COLOR / NEGRE</div>
+                <div class="tile selected">DISSENY 01</div><div class="tile">DISSENY 02</div>
+                <div class="tile">DISSENY 03</div><div class="tile">DISSENY 04</div>
+                <div class="tile">DISSENY 05</div><div class="tile">DISSENY 06</div>
+                <div class="tile">DISSENY 07</div><div class="tile">FLETXES</div>
+              </div>
+              <div class="color-row">
+                <div class="selector">COLORS</div>
+                <div class="tile"><div class="shirt-mini c1"></div></div>
+                <div class="tile"><div class="shirt-mini c2"></div></div>
+                <div class="tile"><div class="shirt-mini c3"></div></div>
+                <div class="tile"><div class="shirt-mini c4"></div></div>
+                <div class="tile"><div class="shirt-mini c5"></div></div>
+                <div class="tile"><div class="shirt-mini c6"></div></div>
+                <div class="tile"><div class="shirt-mini c7"></div></div>
+                <div class="tile"><div class="shirt-mini c8"></div></div>
+              </div>
+            </div>
+          </div>
+          <div class="lock-line" id="lockLine"><div class="lock">▢</div></div>
+        </div>
+
+        <div class="android-nav"><span>△</span><span>○</span><span>□</span></div>
+        <div class="measure m-browser">88px navegador</div>
+        <div class="measure m-header">36px header</div>
+        <div class="measure m-mega">218px mega</div>
+      </section>
+    </div>
+
+    <div class="legend">
+      <div class="legend-item"><strong>Navegador + sistema</strong>88px superiors i 36px inferiors.</div>
+      <div class="legend-item"><strong>Capçalera</strong>36px, sempre opaca i funcional.</div>
+      <div class="legend-item"><strong>Mega-slide</strong>218px, superposat i translúcid.</div>
+      <div class="legend-item"><strong>PDP</strong>190px + centre fluid + 220px, amb 16px de canal.</div>
+    </div>
+  </main>
+
+  <script>
+    const mega = document.getElementById('mega');
+    const lockLine = document.getElementById('lockLine');
+    const open = document.getElementById('open');
+    const closed = document.getElementById('closed');
+    const deviceMetrics = document.getElementById('deviceMetrics');
+
+    function updateMetrics() {
+      const visual = window.visualViewport;
+      deviceMetrics.textContent = `Aquest dispositiu: screen ${screen.width}×${screen.height} CSS · viewport ${window.innerWidth}×${window.innerHeight} CSS · visual ${Math.round(visual?.width || window.innerWidth)}×${Math.round(visual?.height || window.innerHeight)} CSS · DPR ${window.devicePixelRatio || 1}`;
+    }
+
+    function setOpen(value) {
+      mega.classList.toggle('hidden', !value);
+      lockLine.classList.toggle('hidden', !value);
+      open.classList.toggle('active', value);
+      closed.classList.toggle('active', !value);
+    }
+
+    open.addEventListener('click', () => setOpen(true));
+    closed.addEventListener('click', () => setOpen(false));
+    updateMetrics();
+    window.addEventListener('resize', updateMetrics);
+    window.visualViewport?.addEventListener('resize', updateMetrics);
+  </script>
+</body>
+</html>

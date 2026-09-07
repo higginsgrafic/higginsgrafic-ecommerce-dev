@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mock Navegador - Espai real per format</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    background: #1a1a2e;
+    color: #fff;
+    padding: 24px;
+    min-height: 100vh;
+  }
+  h1 { font-size: 22px; margin-bottom: 8px; }
+  .subtitle { color: #888; font-size: 13px; margin-bottom: 24px; }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
+    gap: 32px;
+  }
+  .format-card {
+    background: #16213e;
+    border-radius: 12px;
+    padding: 20px;
+    border: 1px solid #333;
+  }
+  .format-card h2 {
+    font-size: 16px;
+    margin-bottom: 4px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .format-card .info {
+    font-size: 12px;
+    color: #888;
+    margin-bottom: 16px;
+  }
+  .browser-mock {
+    position: relative;
+    background: #fff;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.3);
+    margin: 0 auto;
+  }
+  /* Browser chrome bars */
+  .chrome-bar {
+    background: #e8e8e8;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 0 8px;
+    font-size: 10px;
+    color: #555;
+    flex-shrink: 0;
+  }
+  .traffic-lights {
+    display: flex;
+    gap: 5px;
+    padding: 6px 0;
+    flex-shrink: 0;
+  }
+  .traffic-lights span {
+    width: 10px; height: 10px; border-radius: 50%;
+  }
+  .traffic-lights .red { background: #ff5f57; }
+  .traffic-lights .yellow { background: #febc2e; }
+  .traffic-lights .green { background: #28c840; }
+  .tab-bar {
+    height: 28px;
+    background: #d4d4d4;
+    display: flex;
+    align-items: flex-end;
+    padding: 0 6px;
+    gap: 2px;
+  }
+  .tab {
+    background: #fff;
+    border-radius: 6px 6px 0 0;
+    padding: 4px 12px;
+    font-size: 10px;
+    color: #333;
+    max-width: 140px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+  .tab.active { background: #fff; }
+  .tab.inactive { background: #b8b8b8; color: #888; }
+  .url-bar {
+    height: 32px;
+    background: #f0f0f0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0 10px;
+    border-bottom: 1px solid #ddd;
+  }
+  .url-bar .nav-btn {
+    width: 16px; height: 16px;
+    border-radius: 50%;
+    background: #ccc;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 8px; color: #666;
+  }
+  .url-field {
+    flex: 1;
+    background: #fff;
+    border-radius: 8px;
+    padding: 4px 10px;
+    font-size: 10px;
+    color: #555;
+    border: 1px solid #ddd;
+  }
+  .bookmarks-bar {
+    height: 22px;
+    background: #f5f5f5;
+    border-bottom: 1px solid #ddd;
+    display: flex;
+    align-items: center;
+    padding: 0 10px;
+    gap: 12px;
+    font-size: 9px;
+    color: #666;
+  }
+  .bottom-bar {
+    height: 44px;
+    background: #f8f8f8;
+    border-top: 1px solid #ddd;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    font-size: 9px;
+    color: #666;
+  }
+  .bottom-bar .icon {
+    display: flex; flex-direction: column; align-items: center; gap: 2px;
+  }
+  .viewport-content {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 600;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .viewport-content::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.08) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.08) 1px, transparent 1px);
+    background-size: 20px 20px;
+  }
+  .viewport-label {
+    position: relative;
+    z-index: 1;
+    background: rgba(0,0,0,0.4);
+    padding: 8px 16px;
+    border-radius: 8px;
+    backdrop-filter: blur(4px);
+  }
+  .chrome-px {
+    background: rgba(233, 30, 99, 0.85);
+    color: #fff;
+    font-size: 9px;
+    padding: 2px 6px;
+    border-radius: 4px;
+    position: absolute;
+    right: 4px;
+    top: 2px;
+    z-index: 2;
+  }
+  .legend {
+    margin-top: 12px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    font-size: 10px;
+    color: #888;
+  }
+  .legend-item {
+    display: flex; align-items: center; gap: 4px;
+  }
+  .legend-swatch {
+    width: 12px; height: 12px; border-radius: 3px;
+  }
+  .pwa-info {
+    background: #0f3460;
+    border-radius: 12px;
+    padding: 20px;
+    margin-top: 32px;
+    border: 1px solid #1a4a7a;
+  }
+  .pwa-info h2 { font-size: 16px; margin-bottom: 12px; }
+  .pwa-info p { font-size: 13px; color: #aac; line-height: 1.6; margin-bottom: 8px; }
+  .pwa-info code {
+    background: #1a1a3e;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 12px;
+    color: #7ec;
+  }
+  .pwa-info .yes { color: #4ade80; font-weight: 600; }
+  .pwa-info .no { color: #f87171; font-weight: 600; }
+</style>
+</head>
+<body>
+
+<h1>Mock de Navegador - Espai real disponible</h1>
+<p class="subtitle">Visualització de quant ocupen les barres del navegador en cada format. La zona porpra és el viewport real on va la web.</p>
+
+<div class="grid">
+
+  <!-- DESKTOP -->
+  <div class="format-card">
+    <h2>🖥️ Desktop</h2>
+    <div class="info">1920×1080 físics · Chrome/Firefox/Safari</div>
+    <div class="browser-mock" style="width: 100%; max-width: 480px;">
+      <div class="chrome-bar" style="height: 30px;">
+        <div class="traffic-lights"><span class="red"></span><span class="yellow"></span><span class="green"></span></div>
+        <span style="margin-left: auto;">Chrome</span>
+      </div>
+      <div class="tab-bar">
+        <div class="tab active">GRÀFIC - Samarretes Premium</div>
+        <div class="tab inactive">Gmail</div>
+        <div class="tab inactive">Figma</div>
+      </div>
+      <div class="url-bar">
+        <div class="nav-btn">‹</div>
+        <div class="nav-btn">›</div>
+        <div class="url-field">🔒 higginsgrafic.com</div>
+        <div class="nav-btn">⟳</div>
+      </div>
+      <div class="bookmarks-bar">
+        <span>⭐ Favorits</span>
+        <span>GRÀFIC</span>
+        <span>Admin</span>
+      </div>
+      <div class="viewport-content" style="height: 200px;">
+        <div class="chrome-px">Chrome: -88px</div>
+        <div class="viewport-label">Viewport: 1920×992<br>(88px de chrome)</div>
+      </div>
+    </div>
+    <div class="legend">
+      <div class="legend-item"><div class="legend-swatch" style="background: #d4d4d4;"></div>Tabs (28px)</div>
+      <div class="legend-item"><div class="legend-swatch" style="background: #f0f0f0;"></div>URL (32px)</div>
+      <div class="legend-item"><div class="legend-swatch" style="background: #f5f5f5;"></div>Bookmarks (22px)</div>
+    </div>
+  </div>
+
+  <!-- TABLET HORIZONTAL -->
+  <div class="format-card">
+    <h2>📱 Tablet Horitzontal (Safari iOS)</h2>
+    <div class="info">1024×768 físics · iPad</div>
+    <div class="browser-mock" style="width: 100%; max-width: 480px; aspect-ratio: 1024/768;">
+      <div class="chrome-bar" style="height: 24px; background: #f5f5f5;">
+        <span style="font-size: 9px; padding: 4px 8px;">⌖</span>
+        <span style="margin-left: auto; font-size: 9px; padding: 4px;">100%</span>
+      </div>
+      <div class="tab-bar" style="height: 22px;">
+        <div class="tab active" style="font-size: 8px; padding: 3px 8px;">GRÀFIC</div>
+        <div class="tab inactive" style="font-size: 8px; padding: 3px 8px;">Gmail</div>
+      </div>
+      <div class="url-bar" style="height: 28px;">
+        <div class="nav-btn" style="width: 14px; height: 14px;">‹</div>
+        <div class="nav-btn" style="width: 14px; height: 14px;">›</div>
+        <div class="url-field" style="font-size: 9px;">🔒 higginsgrafic.com</div>
+      </div>
+      <div class="viewport-content" style="flex: 1; min-height: 120px;">
+        <div class="chrome-px">Safari: -50px</div>
+        <div class="viewport-label">Viewport: 1024×718<br>(50px de chrome)</div>
+      </div>
+    </div>
+    <div class="legend">
+      <div class="legend-item"><div class="legend-swatch" style="background: #f5f5f5;"></div>Status (24px)</div>
+      <div class="legend-item"><div class="legend-swatch" style="background: #d4d4d4;"></div>Tabs (22px)</div>
+      <div class="legend-item"><div class="legend-swatch" style="background: #f0f0f0;"></div>URL (28px)</div>
+    </div>
+  </div>
+
+  <!-- TABLET VERTICAL -->
+  <div class="format-card">
+    <h2>📱 Tablet Vertical (Safari iOS)</h2>
+    <div class="info">768×1024 físics · iPad Portrait</div>
+    <div class="browser-mock" style="width: 240px; aspect-ratio: 768/1024;">
+      <div class="chrome-bar" style="height: 20px; background: #f5f5f5;">
+        <span style="font-size: 8px; padding: 3px 6px;">⌖</span>
+        <span style="margin-left: auto; font-size: 8px;">100%</span>
+      </div>
+      <div class="tab-bar" style="height: 18px;">
+        <div class="tab active" style="font-size: 7px; padding: 2px 6px;">GRÀFIC</div>
+        <div class="tab inactive" style="font-size: 7px; padding: 2px 6px;">Gmail</div>
+      </div>
+      <div class="url-bar" style="height: 24px;">
+        <div class="nav-btn" style="width: 12px; height: 12px; font-size: 6px;">‹</div>
+        <div class="nav-btn" style="width: 12px; height: 12px; font-size: 6px;">›</div>
+        <div class="url-field" style="font-size: 8px;">🔒 higginsgrafic.com</div>
+      </div>
+      <div class="viewport-content" style="flex: 1; min-height: 200px;">
+        <div class="chrome-px">Safari: -50px</div>
+        <div class="viewport-label" style="font-size: 10px;">Viewport<br>768×974<br>(50px chrome)</div>
+      </div>
+    </div>
+    <div class="legend">
+      <div class="legend-item"><div class="legend-swatch" style="background: #f5f5f5;"></div>Status (20px)</div>
+      <div class="legend-item"><div class="legend-swatch" style="background: #d4d4d4;"></div>Tabs (18px)</div>
+      <div class="legend-item"><div class="legend-swatch" style="background: #f0f0f0;"></div>URL (24px)</div>
+    </div>
+  </div>
+
+  <!-- MOBILE VERTICAL -->
+  <div class="format-card">
+    <h2>📱 Mòbil Vertical (Safari iOS)</h2>
+    <div class="info">390×844 físics · iPhone 14</div>
+    <div class="browser-mock" style="width: 160px; aspect-ratio: 390/844;">
+      <div class="chrome-bar" style="height: 18px; background: #f5f5f5;">
+        <span style="font-size: 7px; padding: 2px 4px;">⌖</span>
+        <span style="margin-left: auto; font-size: 7px;">100%</span>
+      </div>
+      <div class="url-bar" style="height: 26px;">
+        <div class="nav-btn" style="width: 11px; height: 11px; font-size: 5px;">‹</div>
+        <div class="nav-btn" style="width: 11px; height: 11px; font-size: 5px;">›</div>
+        <div class="url-field" style="font-size: 7px;">🔒 higginsgrafic.com</div>
+      </div>
+      <div class="viewport-content" style="flex: 1; min-height: 220px;">
+        <div class="chrome-px" style="font-size: 7px;">-88px</div>
+        <div class="viewport-label" style="font-size: 9px;">Viewport<br>390×756<br>(88px chrome)</div>
+      </div>
+      <div class="bottom-bar" style="height: 36px;">
+        <div class="icon"><span>‹</span><span style="font-size: 6px;">Enrere</span></div>
+        <div class="icon"><span>↑</span><span style="font-size: 6px;">Comp.</span></div>
+        <div class="icon"><span>⎘</span><span style="font-size: 6px;">Pest.</span></div>
+      </div>
+    </div>
+    <div class="legend">
+      <div class="legend-item"><div class="legend-swatch" style="background: #f5f5f5;"></div>Status (18px)</div>
+      <div class="legend-item"><div class="legend-swatch" style="background: #f0f0f0;"></div>URL (26px)</div>
+      <div class="legend-item"><div class="legend-swatch" style="background: #f8f8f8;"></div>Bottom (36px)</div>
+    </div>
+  </div>
+
+  <!-- MOBILE HORIZONTAL -->
+  <div class="format-card">
+    <h2>📱 Mòbil Horitzontal (Safari iOS)</h2>
+    <div class="info">844×390 físics · iPhone 14 Landscape</div>
+    <div class="browser-mock" style="width: 100%; max-width: 380px; aspect-ratio: 844/390;">
+      <div class="chrome-bar" style="height: 16px; background: #f5f5f5;">
+        <span style="font-size: 7px; padding: 2px 4px;">⌖</span>
+        <div class="url-field" style="font-size: 7px; flex: 1; margin: 0 4px;">🔒 higginsgrafic.com</div>
+        <span style="font-size: 7px;">⎘</span>
+      </div>
+      <div class="viewport-content" style="flex: 1; min-height: 80px;">
+        <div class="chrome-px" style="font-size: 7px;">-50px</div>
+        <div class="viewport-label" style="font-size: 10px;">Viewport: 844×340<br>(50px chrome)</div>
+      </div>
+    </div>
+    <div class="legend">
+      <div class="legend-item"><div class="legend-swatch" style="background: #f5f5f5;"></div>Barra única (50px)</div>
+    </div>
+  </div>
+
+  <!-- PWA STANDALONE -->
+  <div class="format-card" style="border-color: #4ade80;">
+    <h2>✅ PWA Standalone (App)</h2>
+    <div class="info">Sense barres del navegador · "Add to Home Screen"</div>
+    <div class="browser-mock" style="width: 160px; aspect-ratio: 390/844; border: 2px solid #4ade80;">
+      <div class="chrome-bar" style="height: 14px; background: #181818; color: #fff;">
+        <span style="font-size: 7px; padding: 2px 6px;">GRÀFIC</span>
+        <span style="margin-left: auto; font-size: 7px; padding: 2px 4px;">⏰ 100%</span>
+      </div>
+      <div class="viewport-content" style="flex: 1; min-height: 280px; background: linear-gradient(135deg, #4ade80 0%, #22d3ee 100%);">
+        <div class="chrome-px" style="background: rgba(0,0,0,0.5);">-14px</div>
+        <div class="viewport-label" style="font-size: 10px;">Viewport: 390×830<br>(14px status bar)<br><br>💯 Tot l'espai per la web!</div>
+      </div>
+    </div>
+    <div class="legend">
+      <div class="legend-item"><div class="legend-swatch" style="background: #181818;"></div>Status bar (14px)</div>
+      <div class="legend-item"><div class="legend-swatch" style="background: #4ade80;"></div>Web = tot</div>
+    </div>
+  </div>
+
+</div>
+
+<div class="pwa-info">
+  <h2>📲 Maximitzar l'àrea sense que el client faci res (passiu)</h2>
+  <p><strong>3 tècniques aplicades automàticament:</strong></p>
+  <p><strong>1. <code>viewport-fit=cover</code></strong> — El contingut s'estén sota el notch/Dynamic Island dels iPhones/iPads moderns. Guanyeu ~24px addicionals a la part superior.</p>
+  <p><strong>2. <code>100dvh</code> en lloc de <code>100vh</code></strong> — Les unitats dinàmiques (Dynamic Viewport Height) s'ajusten automàticament quan les barres del navegador apareixen/desapareixen en fer scroll. Quan l'usuari fa scroll avall, la barra d'URL s'amaga i el contingut s'expandeix. <span class="yes">Aplicat via CSS variable <code>--vh</code>.</span></p>
+  <p><strong>3. <code>apple-mobile-web-app-capable</code></strong> — Meta tag que ajuda a Safari iOS a maximitzar l'àrea fins i tot sense que l'usuari instal·li res.</p>
+  <p><strong>Resultat passiu (sense acció del client):</strong></p>
+  <p>· <strong>Mòbil vertical Safari:</strong> en fer scroll avall, la barra d'URL s'amaga → viewport passa de 390×756 a <strong>390×844</strong> (guany de 88px automàtic)</p>
+  <p>· <strong>Tablet Safari:</strong> la barra superior es compacta → guany de ~20px</p>
+  <p>· <strong>Notch respectat:</strong> amb <code>env(safe-area-inset-top)</code> es pot posar contingut sota el notch sense que quedi tapat</p>
+  <p><strong>Si el client VOL instal·lar-la (PWA):</strong> <span class="yes">ja configurat</span> amb <code>display: standalone</code> — s'eliminen totes les barres.</p>
+</div>
+
+</body>
+</html>

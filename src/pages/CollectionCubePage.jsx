@@ -261,7 +261,8 @@ function CollectionCubePage() {
         topOffset="76px"
         bottomPadding="0px"
       >
-        {/* Breadcrumbs (fila 2 / 3) */}
+        {/* Breadcrumbs (fila 2 / 3) — ocults a tablets */}
+        {!(isPortraitTablet || isLandscapeTablet) && (
         <div
           style={{
             gridColumn: '1 / 4',
@@ -273,6 +274,7 @@ function CollectionCubePage() {
         >
           <Breadcrumbs items={[{ label: 'Cube' }]} />
         </div>
+        )}
 
         {/* Títol col·lecció (fila 3 / 7) */}
         <div

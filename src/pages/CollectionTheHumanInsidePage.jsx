@@ -274,7 +274,8 @@ function CollectionTheHumanInsidePage() {
         topOffset="76px"
         bottomPadding="0px"
       >
-        {/* Breadcrumbs (fila 2 / 3) */}
+        {/* Breadcrumbs (fila 2 / 3) — ocults a tablets */}
+        {!(isPortraitTablet || isLandscapeTablet) && (
         <div
           style={{
             gridColumn: '1 / 4',
@@ -286,6 +287,7 @@ function CollectionTheHumanInsidePage() {
         >
           <Breadcrumbs items={[{ label: 'The Human Inside' }]} />
         </div>
+        )}
 
         {/* Títol col·lecció (fila 3 / 7) */}
         <div
