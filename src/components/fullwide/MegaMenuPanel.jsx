@@ -166,6 +166,7 @@ export default function MegaMenuPanel({
           className="mx-auto max-w-[1350px] px-4 sm:px-6 lg:px-10 py-8"
           style={{
             overflow: 'visible',
+            marginTop: isPortraitTablet ? '-32px' : undefined,
             ...(megaFullScreen ? {
               minHeight: 'calc(100vh - 16px)',
             } : {})
@@ -194,20 +195,25 @@ export default function MegaMenuPanel({
                   transition: 'transform 320ms cubic-bezier(0.32, 0.72, 0, 1)',
                 }}
               >
-                <div style={{ width: '25%', flexShrink: 0, display: 'block', height: '100%', position: 'relative', overflow: 'visible' }}>
+                <div style={{ width: '25%', flexShrink: 0, display: 'block', height: '100%', position: 'relative', overflow: isPortraitTablet ? 'hidden' : 'visible' }}>
                   <div ref={viewport1Ref} data-mega-page-viewport="1" style={{
                     width: '100%',
                     height: '100%',
                     display: 'flex',
-                    justifyContent: 'center',
-                    overflowX: 'visible',
-                    overflowY: 'visible',
+                    justifyContent: isPortraitTablet ? 'flex-start' : 'center',
+                    overflowX: isPortraitTablet ? 'auto' : 'visible',
+                    overflowY: isPortraitTablet ? 'hidden' : 'visible',
+                    overscrollBehaviorX: isPortraitTablet ? 'contain' : undefined,
+                    WebkitOverflowScrolling: isPortraitTablet ? 'touch' : undefined,
+                    scrollbarWidth: isPortraitTablet ? 'none' : undefined,
+                    touchAction: isPortraitTablet ? 'pan-x' : undefined,
+                    pointerEvents: isPortraitTablet ? 'auto' : undefined,
                   }}>
                   <div style={{
-                    flex: '1 1 auto',
+                    flex: isPortraitTablet ? '0 0 0px' : '1 1 auto',
                   }} />
 
-                  <div style={{ flex: '0 0 auto', width: 'var(--hg-mega-w, min(1350px, calc(100vw - 32px)))', maxWidth: 'none', position: 'relative', height: '100%', paddingLeft: '0px', paddingRight: '0px' }}>
+                  <div style={{ flex: '0 0 auto', width: isPortraitTablet ? '1350px' : 'var(--hg-mega-w, min(1350px, calc(100vw - 32px)))', maxWidth: 'none', position: 'relative', height: '100%', paddingLeft: '0px', paddingRight: '0px' }}>
                     <MegaStripePanelP1
                       active={active}
                       resolvedMega={resolvedMega}
@@ -248,11 +254,12 @@ export default function MegaMenuPanel({
                       normalizeOverlaySrc={normalizeOverlaySrc}
                       onShirtClick={onShirtClick}
                       selectedItem={page1SelectedItem}
+                      isPortraitTablet={isPortraitTablet}
                     />
                   </div>
 
                   <div style={{
-                    flex: '1 1 auto',
+                    flex: isPortraitTablet ? '0 0 0px' : '1 1 auto',
                   }} />
                   </div>
                 </div>

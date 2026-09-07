@@ -28,6 +28,7 @@ export default function ProductCard({
   imageAlt = 'Producte',
   topPx = 161,
   leftPx = 0,
+  textBottomPx = 8,
   tileStyle = DEFAULT_TILE_STYLE,
   textBlockStyle = DEFAULT_TEXT_BLOCK_STYLE,
   overlaySrc = null,
@@ -140,7 +141,7 @@ export default function ProductCard({
             <div
               style={{
                 position: 'absolute',
-                bottom: '8px',
+                bottom: `${textBottomPx}px`,
                 left: '8px',
                 zIndex: 3,
                 fontFamily: 'Roboto, system-ui, -apple-system, Segoe UI, Arial, sans-serif',

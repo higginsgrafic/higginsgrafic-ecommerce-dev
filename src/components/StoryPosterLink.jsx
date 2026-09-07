@@ -36,8 +36,9 @@ function StoryPosterLink({ style }) {
       }}
       style={{
         textAlign: 'left',
+        margin: '0 auto',
         fontFamily: 'Oswald, sans-serif',
-        fontSize: '60pt',
+        fontSize: '48pt',
         fontWeight: 300,
         lineHeight: 1.1,
         letterSpacing: '0.04em',

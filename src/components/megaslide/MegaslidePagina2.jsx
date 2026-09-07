@@ -242,7 +242,7 @@ export default function MegaslidePagina2({
   const stripeEmptyMaskSrc = null;
 
   return (
-    <div style={{ width: '25%', flexShrink: 0, display: 'flex', height: '100%', position: 'relative', justifyContent: 'center', overflow: 'visible' }}>
+    <div style={{ width: '25%', flexShrink: 0, display: isPortraitTablet ? 'block' : 'flex', height: '100%', position: 'relative', justifyContent: 'center', overflow: isPortraitTablet ? 'hidden' : 'visible' }}>
       <div
         ref={viewportRef}
         data-mega-page-viewport="2"
@@ -250,19 +250,23 @@ export default function MegaslidePagina2({
           width: '100%',
           height: '100%',
           display: 'flex',
-          justifyContent: 'center',
-          overflowX: 'visible',
-          overflowY: 'visible',
+          justifyContent: isPortraitTablet ? 'flex-start' : 'center',
+          overflowX: isPortraitTablet ? 'auto' : 'visible',
+          overflowY: isPortraitTablet ? 'hidden' : 'visible',
+          overscrollBehaviorX: isPortraitTablet ? 'contain' : undefined,
+          WebkitOverflowScrolling: isPortraitTablet ? 'touch' : undefined,
+          scrollbarWidth: isPortraitTablet ? 'none' : undefined,
+          touchAction: isPortraitTablet ? 'pan-x pinch-zoom' : undefined,
         }}
       >
         <div style={{
-          flex: '1 1 auto',
+          flex: isPortraitTablet ? '0 0 0px' : '1 1 auto',
         }} />
 
         <div
           style={{
           flex: '0 0 auto',
-          width: 'var(--hg-mega-w, min(1350px, calc(100vw - 32px)))',
+          width: isPortraitTablet ? '1350px' : 'var(--hg-mega-w, min(1350px, calc(100vw - 32px)))',
           maxWidth: 'none',
           position: 'relative',
           height: '100%',
@@ -472,7 +476,7 @@ export default function MegaslidePagina2({
         </div>
 
         <div style={{
-          flex: '1 1 auto',
+          flex: isPortraitTablet ? '0 0 0px' : '1 1 auto',
         }} />
       </div>
 

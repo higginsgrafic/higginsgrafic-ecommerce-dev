@@ -246,11 +246,11 @@ export default function TambeRail({
     return [...base.slice(-CLONE_COUNT), ...base, ...base.slice(0, CLONE_COUNT)];
   }, [totalCards]);
 
-  const left1 = bgMetrics ? bgMetrics.devLeft : 0;
+  const left1 = stabilizeInitialLayout ? 0 : (bgMetrics ? bgMetrics.devLeft : 0);
   const fallbackBeltWidth = stabilizeInitialLayout && typeof window !== 'undefined'
     ? stabilizedViewportWidth || Math.max(320, window.innerWidth / stabilizedViewportScale)
     : CARD_W * visibleCards;
-  const beltWidth = bgMetrics ? bgMetrics.width : fallbackBeltWidth;
+  const beltWidth = stabilizeInitialLayout ? fallbackBeltWidth : (bgMetrics ? bgMetrics.width : fallbackBeltWidth);
   // Card width = 1 columna de la pauta amb gutter `PAUTA_GUTTER_X` entre cols.
   //   cardW = (belt2Width - (visibleCards - 1) * gutterX) / visibleCards
   //   stepPx = cardW + gutterX
@@ -264,8 +264,8 @@ export default function TambeRail({
     return Math.max(0, viewportWidthPx - inset - buttonsW);
   }, [viewportWidthPx]);
   const cardImgTopPx = 161;
-  const cardTextBlockHeightPx = 140;
-  const renderedCardW = stabilizeInitialLayout ? cardW : Math.round(cardW);
+  const cardTextBlockHeightPx = stabilizeInitialLayout ? 200 : 140;
+  const renderedCardW = stabilizeInitialLayout ? Math.floor(cardW) : Math.round(cardW);
   const viewportHeightPx = useMemo(() => cardImgTopPx + renderedCardW + cardTextBlockHeightPx, [renderedCardW]);
   const dynamicTileStyle = useMemo(() => ({
     width: `${renderedCardW}px`,
@@ -478,6 +478,8 @@ export default function TambeRail({
                       positionKey={`${pos}-${idx}`}
                       href={cardLink}
                       imageSrc={img}
+                      topPx={stabilizeInitialLayout ? 151 : 161}
+                      textBottomPx={stabilizeInitialLayout ? 48 : 8}
                       leftPx={leftPx}
                       tileStyle={dynamicTileStyle}
                       textBlockStyle={dynamicTextBlockStyle}
