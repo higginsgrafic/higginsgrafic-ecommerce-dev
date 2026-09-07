@@ -57,8 +57,7 @@ export default function MegaslidePagina2({
   megaMenuRef,
 }) {
   const viewportRef = useRef(null);
-  const portraitContentRef = useRef(null);
-  const calibrationRef = isPortraitTablet ? portraitContentRef : megaMenuRef;
+  const calibrationRef = megaMenuRef;
   const cal = useMegaslideCalibration('p2', active, calibrationRef);
   const {
     stripeRowPadPx,
@@ -243,22 +242,7 @@ export default function MegaslidePagina2({
   const stripeEmptyMaskSrc = null;
 
   return (
-    <div style={{ width: '25%', flexShrink: 0, display: isPortraitTablet ? 'block' : 'flex', height: '100%', position: 'relative', justifyContent: 'center', overflow: isPortraitTablet ? 'hidden' : 'visible', boxShadow: isPortraitTablet ? 'inset 8px 0 0 #ffffff, inset -8px 0 0 #ffffff' : undefined }}>
-      {isPortraitTablet && (
-        <div
-          ref={portraitContentRef}
-          aria-hidden="true"
-          style={{
-            position: 'absolute',
-            width: 'min(1350px, calc(100vh - 15px))',
-            height: 1,
-            boxSizing: 'border-box',
-            padding: '32px 40px',
-            visibility: 'hidden',
-            pointerEvents: 'none',
-          }}
-        />
-      )}
+    <div style={{ width: '25%', flexShrink: 0, display: 'flex', height: '100%', position: 'relative', justifyContent: 'center', overflow: 'visible' }}>
       <div
         ref={viewportRef}
         data-mega-page-viewport="2"
@@ -266,23 +250,19 @@ export default function MegaslidePagina2({
           width: '100%',
           height: '100%',
           display: 'flex',
-          justifyContent: isPortraitTablet ? 'flex-start' : 'center',
-          overflowX: isPortraitTablet ? 'auto' : 'visible',
-          overflowY: isPortraitTablet ? 'hidden' : 'visible',
-          overscrollBehaviorX: isPortraitTablet ? 'contain' : undefined,
-          WebkitOverflowScrolling: isPortraitTablet ? 'touch' : undefined,
-          scrollbarWidth: isPortraitTablet ? 'thin' : undefined,
-          touchAction: isPortraitTablet ? 'pan-x pinch-zoom' : undefined,
+          justifyContent: 'center',
+          overflowX: 'visible',
+          overflowY: 'visible',
         }}
       >
         <div style={{
-          flex: isPortraitTablet ? '0 0 0px' : '1 1 auto',
+          flex: '1 1 auto',
         }} />
 
         <div
           style={{
           flex: '0 0 auto',
-          width: isPortraitTablet ? 'min(1350px, calc(100vh - 32px))' : 'var(--hg-mega-w, min(1350px, calc(100vw - 32px)))',
+          width: 'var(--hg-mega-w, min(1350px, calc(100vw - 32px)))',
           maxWidth: 'none',
           position: 'relative',
           height: '100%',
@@ -345,7 +325,7 @@ export default function MegaslidePagina2({
         {/* CercadorTextRow */}
         <div style={{
           position: 'absolute',
-          top: isPortraitTablet ? 'calc(var(--hg-cercador-bar-top, 0px) + 8px)' : 'var(--hg-cercador-bar-top, 0px)',
+          top: 'var(--hg-cercador-bar-top, 0px)',
           left: '50%',
           transform: 'translateX(-50%) scale(var(--hg-cercador-bar-scale, 1))',
           transformOrigin: 'top center',
@@ -492,7 +472,7 @@ export default function MegaslidePagina2({
         </div>
 
         <div style={{
-          flex: isPortraitTablet ? '0 0 0px' : '1 1 auto',
+          flex: '1 1 auto',
         }} />
       </div>
 

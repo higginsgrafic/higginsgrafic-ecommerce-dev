@@ -128,6 +128,7 @@ function MegaStripePanelP1({
   stripeEmptyMaskSrc,
   calibrationOverrides,
   compactLandscape = false,
+  onP1ContentBottomChange,
 }) {
   const emptyShirtMaskUrl = useEmptyShirtMask(emptyTileIndices, shirtColor);
   const pageRootRef = useRef(null);
@@ -144,12 +145,24 @@ function MegaStripePanelP1({
       cancelAnimationFrame(frame);
       frame = requestAnimationFrame(() => {
         const selector = root.querySelector('[data-stripe-buttonbar="bn"]');
-        if (!selector) return;
-        const delta = selector.getBoundingClientRect().top - panel.getBoundingClientRect().top;
-        const next = Math.max(0, pageLiftRef.current + delta);
-        if (Math.abs(next - pageLiftRef.current) < 0.5) return;
-        pageLiftRef.current = next;
-        setPageLift(next);
+        if (selector) {
+          const delta = selector.getBoundingClientRect().top - panel.getBoundingClientRect().top;
+          const next = Math.max(0, pageLiftRef.current + delta);
+          if (Math.abs(next - pageLiftRef.current) >= 0.5) {
+            pageLiftRef.current = next;
+            setPageLift(next);
+          }
+        }
+        // Bottom visual de les samarretes (ja inclou l'escala interna de la
+        // franja i el pageLift) mesurat des del capdamunt del panell: el pare
+        // el fa servir per retallar l'alçada de la pàgina 1 sense números màgics.
+        if (typeof onP1ContentBottomChange === 'function') {
+          const stripeContent = root.querySelector('[data-stripe-visual-content="1"]');
+          if (stripeContent) {
+            const bottom = stripeContent.getBoundingClientRect().bottom - panel.getBoundingClientRect().top;
+            if (Number.isFinite(bottom) && bottom > 0) onP1ContentBottomChange(bottom);
+          }
+        }
       });
     };
 
@@ -163,7 +176,7 @@ function MegaStripePanelP1({
       observer?.disconnect();
       window.removeEventListener('resize', measure);
     };
-  }, [active, megaTileSize]);
+  }, [active, megaTileSize, onP1ContentBottomChange]);
 
   useEffect(() => {
     const handler = (ev) => {
@@ -282,6 +295,7 @@ function MegaStripePanelP1({
 
               <div
                 className="relative"
+                data-stripe-visual-content="1"
                 style={{
                   height: '100%',
                   width: 'fit-content',

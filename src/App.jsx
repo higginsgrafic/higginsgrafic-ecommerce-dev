@@ -292,28 +292,6 @@ function App() {
             />
           </Suspense>
         )}
-        {/* GUIA VISUAL TEMPORAL: rectangle 360x800 centrat per a mòbil */}
-        {isMobile && (
-          <div style={{
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            width: '100vw',
-            height: '100vh',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            zIndex: 99999,
-            pointerEvents: 'none',
-          }}>
-            <div style={{
-              width: '350px',
-              height: '790px',
-              border: '2px solid red',
-              flexShrink: 0,
-            }} />
-          </div>
-        )}
       </>
     )}
     </ErrorBoundary>

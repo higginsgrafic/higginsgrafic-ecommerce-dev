@@ -1,4 +1,4 @@
-import React, { lazy, Suspense, useRef, useEffect, useCallback } from 'react';
+import React, { lazy, Suspense, useRef, useEffect, useCallback, useState } from 'react';
 import { clampNumber } from '@/utils/layoutMetrics';
 import MegaStripeBleedGuard from './MegaStripeBleedGuard.jsx';
 import MegaStripePanelP1 from './MegaStripePanelP1.jsx';
@@ -6,6 +6,10 @@ import MegaslidePagina2 from '../megaslide/MegaslidePagina2.jsx';
 
 const MegaslidePagina3 = lazy(() => import('../megaslide/MegaslidePagina3.jsx'));
 const MegaslidePagina4 = lazy(() => import('../megaslide/MegaslidePagina4.jsx'));
+
+// Pàgina 1: espai que queda entre la vora inferior de les samarretes i la vora
+// inferior del panell. Aquest és el número a retocar si en vol més o menys.
+const P1_STRIPE_BOTTOM_GAP = 30;
 
 export default function MegaMenuPanel({
   active,
@@ -112,37 +116,43 @@ export default function MegaMenuPanel({
   const page1SelectedItem = active === 'first_contact' ? firstContactSelectedItem
     : active === 'the_human_inside' ? humanInsideSelectedItem
     : (selectedItemByCollection?.[active] ?? null);
-  const portraitPage2TileSize = 'min(144px, calc((min(1350px, calc(100vh - 15px)) - 176px) / 9))';
+  const portraitPage2TileSize = `${effectiveMegaTileSize || 120}px`;
   const portraitLandscapeWidth = typeof window !== 'undefined'
     ? Math.min(1350, window.innerHeight - 15)
     : 1024;
-  const portraitTileCap = typeof window !== 'undefined'
-    ? clampNumber(window.innerHeight * 0.14, 96, 144)
-    : 144;
-  const portraitPage1TileSize = Math.min(portraitTileCap, (portraitLandscapeWidth - 176) / 9);
+  const portraitTileCap = effectiveMegaTileSize || 120;
+  const portraitPage1TileSize = effectiveMegaTileSize || 120;
   const defaultBleedGuardHeight = effectiveMegaTileSize
     ? `${Math.round(effectiveMegaTileSize * 2 + 37 + Math.max(0, stripeRowPadPx))}px`
     : undefined;
-  const bleedGuardHeight = isPortraitTablet && megaPage === 2
-    ? `calc(${portraitPage2TileSize} + ${portraitPage2TileSize} + ${37 + Math.max(0, stripeRowPadPx)}px)`
-    : isPortraitTablet
-      ? `${Math.round(portraitPage1TileSize * 2 + 69)}px`
-      : defaultBleedGuardHeight;
+  const bleedGuardHeight = defaultBleedGuardHeight;
 
   // El formulari de pagament necessita alçada per centrar-s'hi: a les dues
   // tauletes, obrir l'acordió estira la franja fins al peu de pantalla.
   // 112px = capçalera (80px) + padding vertical del panell (32px).
   // S'usa la prop isLandscapeTablet (detecció centralitzada a useDeviceLayout).
   const paymentFillsScreen = (isPortraitTablet || isLandscapeTablet) && megaPage === 3 && acordioExpanded;
-  const guardHeightPx = paymentFillsScreen
+  const guardHeightPxDefault = paymentFillsScreen
     ? 'calc(100vh - var(--globalHeaderTopOffset, 0px) - 112px)'
     : bleedGuardHeight;
+
+  // Retall de la pàgina 1: el panell acaba P1_STRIPE_BOTTOM_GAP px sota el
+  // bottom visible de les samarretes. La mesura ve de MegaStripePanelP1 (ja hi
+  // inclou l'escala de la franja i el pageLift). 64 = py-8 (32+32) del
+  // contenidor del panell. Mentre no hi ha mesura, s'usa l'alçada de sempre.
+  const [p1ContentBottomPx, setP1ContentBottomPx] = useState(null);
+  const handleP1ContentBottom = useCallback((px) => {
+    setP1ContentBottomPx((prev) => (prev != null && Math.abs(prev - px) < 0.5 ? prev : px));
+  }, []);
+  const guardHeightPx = megaPage === 1 && p1ContentBottomPx != null && !paymentFillsScreen
+    ? `${Math.max(0, Math.round(p1ContentBottomPx + P1_STRIPE_BOTTOM_GAP - 64))}px`
+    : guardHeightPxDefault;
 
   return (
     <div className="relative">
       <div
         data-mega-panel-surface="1"
-        className="relative z-[10000] block"
+        className="relative z-[10000] block border-b border-border"
         style={{
           overflow: 'visible',
           backgroundColor: '#ffffff',
@@ -184,31 +194,28 @@ export default function MegaMenuPanel({
                   transition: 'transform 320ms cubic-bezier(0.32, 0.72, 0, 1)',
                 }}
               >
-                <div style={{ width: '25%', flexShrink: 0, display: 'block', height: '100%', position: 'relative', overflow: isPortraitTablet ? 'hidden' : 'visible', boxShadow: isPortraitTablet ? 'inset 8px 0 0 #ffffff, inset -8px 0 0 #ffffff' : undefined }}>
+                <div style={{ width: '25%', flexShrink: 0, display: 'block', height: '100%', position: 'relative', overflow: 'visible' }}>
                   <div ref={viewport1Ref} data-mega-page-viewport="1" style={{
                     width: '100%',
                     height: '100%',
                     display: 'flex',
-                    justifyContent: isPortraitTablet ? 'flex-start' : 'center',
-                    overflowX: isPortraitTablet ? 'auto' : 'visible',
-                    overflowY: isPortraitTablet ? 'hidden' : 'visible',
-                    overscrollBehaviorX: isPortraitTablet ? 'contain' : undefined,
-                    WebkitOverflowScrolling: isPortraitTablet ? 'touch' : undefined,
-                    scrollbarWidth: isPortraitTablet ? 'thin' : undefined,
-                    touchAction: isPortraitTablet ? 'pan-x pinch-zoom' : undefined,
+                    justifyContent: 'center',
+                    overflowX: 'visible',
+                    overflowY: 'visible',
                   }}>
                   <div style={{
-                    flex: isPortraitTablet ? '0 0 0px' : '1 1 auto',
+                    flex: '1 1 auto',
                   }} />
 
-                  <div style={{ flex: '0 0 auto', width: isPortraitTablet ? 'min(1350px, calc(100vh - 32px))' : 'var(--hg-mega-w, min(1350px, calc(100vw - 32px)))', maxWidth: 'none', position: 'relative', height: '100%', paddingLeft: '0px', paddingRight: '0px' }}>
+                  <div style={{ flex: '0 0 auto', width: 'var(--hg-mega-w, min(1350px, calc(100vw - 32px)))', maxWidth: 'none', position: 'relative', height: '100%', paddingLeft: '0px', paddingRight: '0px' }}>
                     <MegaStripePanelP1
                       active={active}
                       resolvedMega={resolvedMega}
                       showStripe={showStripe}
-                      stripeRowPadPx={isPortraitTablet ? 32 : stripeRowPadPx}
-                      stripeRowPadXPx={isPortraitTablet ? { left: 40, right: 40 } : stripeRowPadXPx}
-                      stripePreviewHPx={isPortraitTablet ? Math.round(portraitPage1TileSize * 0.9) : stripePreviewHPx}
+                      onP1ContentBottomChange={handleP1ContentBottom}
+                      stripeRowPadPx={stripeRowPadPx}
+                      stripeRowPadXPx={stripeRowPadXPx}
+                      stripePreviewHPx={stripePreviewHPx}
                       stripeOverlayLoadState={stripeOverlayLoadState}
                       resolvedOverlaySrc={resolvedOverlaySrc}
                       stripeOverlayDebug={stripeOverlayDebug}
@@ -230,7 +237,7 @@ export default function MegaMenuPanel({
                       stripeVariantVisibility={stripeVariantVisibility}
                       megaTileSelectorParams={megaTileSelectorParams}
                       onStartSelectorDrag={onStartSelectorDrag}
-                      megaTileSize={isPortraitTablet ? portraitPage1TileSize : megaTileSize}
+                      megaTileSize={megaTileSize}
                       setStripeOverlayOverrideActive={setStripeOverlayOverrideActive}
                       setFirstContactVariant={setFirstContactVariant}
                       setHumanInsideVariant={setHumanInsideVariant}
@@ -245,7 +252,7 @@ export default function MegaMenuPanel({
                   </div>
 
                   <div style={{
-                    flex: isPortraitTablet ? '0 0 0px' : '1 1 auto',
+                    flex: '1 1 auto',
                   }} />
                   </div>
                 </div>
