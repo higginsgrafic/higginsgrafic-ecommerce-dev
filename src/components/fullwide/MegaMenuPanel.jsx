@@ -144,7 +144,8 @@ export default function MegaMenuPanel({
   const handleP1ContentBottom = useCallback((px) => {
     setP1ContentBottomPx((prev) => (prev != null && Math.abs(prev - px) < 0.5 ? prev : px));
   }, []);
-  const guardHeightPx = megaPage === 1 && p1ContentBottomPx != null && !paymentFillsScreen
+  const matchesPage1Height = megaPage === 1 || megaPage === 2;
+  const guardHeightPx = matchesPage1Height && p1ContentBottomPx != null && !paymentFillsScreen
     ? `${Math.max(0, Math.round(p1ContentBottomPx + P1_STRIPE_BOTTOM_GAP - 64))}px`
     : guardHeightPxDefault;
 
@@ -287,6 +288,8 @@ export default function MegaMenuPanel({
                   megaHeroGridRef={megaHeroGridRef}
                   megaHeroRowHeight={megaHeroRowHeight}
                   stripeBaseImageSrc={stripeBaseImageSrc}
+                  page1MegaTileSize={effectiveMegaTileSize}
+                  page1StripePreviewHPx={stripePreviewHPx}
                   resolvedMegaFiltered={resolvedMegaFiltered}
                   showStripe={showStripe}
                   stripeOverlayLoadState={stripeOverlayLoadState}
