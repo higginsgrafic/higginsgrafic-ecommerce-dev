@@ -90,20 +90,20 @@ export default function RuletaDemoPage() {
 
   const colorButtonSrcBySlug = useMemo(
     () => ({
-      white: '/placeholders/t-shirt_buttons/selector-color-white.png',
-      'light-pink': '/placeholders/t-shirt_buttons/selector-color-light-pink.png',
-      'light-blue': '/placeholders/t-shirt_buttons/selector-color-light-blue.png',
-      daisy: '/placeholders/t-shirt_buttons/selector-color-daisy.png',
-      gold: '/placeholders/t-shirt_buttons/selector-color-gold.png',
-      red: '/placeholders/t-shirt_buttons/selector-color-red.png',
-      purple: '/placeholders/t-shirt_buttons/selector-color-purple.png',
-      royal: '/placeholders/t-shirt_buttons/selector-color-blue-royal.png',
-      navy: '/placeholders/t-shirt_buttons/selector-color-blue-navy.png',
-      'military-green': '/placeholders/t-shirt_buttons/selector-color-military-green.png',
-      'forest-green': '/placeholders/t-shirt_buttons/selector-color-forest-green.png',
-      'irish-green': '/placeholders/t-shirt_buttons/selector-color-irish-green.png',
-      kiwi: '/placeholders/t-shirt_buttons/selector-color-kiwi.png',
-      black: '/placeholders/t-shirt_buttons/selector-color-black.png',
+      white: '/placeholders/t-shirt_buttons/selector-color-white.webp',
+      'light-pink': '/placeholders/t-shirt_buttons/selector-color-light-pink.webp',
+      'light-blue': '/placeholders/t-shirt_buttons/selector-color-light-blue.webp',
+      daisy: '/placeholders/t-shirt_buttons/selector-color-daisy.webp',
+      gold: '/placeholders/t-shirt_buttons/selector-color-gold.webp',
+      red: '/placeholders/t-shirt_buttons/selector-color-red.webp',
+      purple: '/placeholders/t-shirt_buttons/selector-color-purple.webp',
+      royal: '/placeholders/t-shirt_buttons/selector-color-blue-royal.webp',
+      navy: '/placeholders/t-shirt_buttons/selector-color-blue-navy.webp',
+      'military-green': '/placeholders/t-shirt_buttons/selector-color-military-green.webp',
+      'forest-green': '/placeholders/t-shirt_buttons/selector-color-forest-green.webp',
+      'irish-green': '/placeholders/t-shirt_buttons/selector-color-irish-green.webp',
+      kiwi: '/placeholders/t-shirt_buttons/selector-color-kiwi.webp',
+      black: '/placeholders/t-shirt_buttons/selector-color-black.webp',
     }),
     []
   );
@@ -411,7 +411,7 @@ export default function RuletaDemoPage() {
 
             <div className="absolute inset-0 overflow-hidden" style={{ borderRadius: '18px' }}>
               <img
-                src="/tmp/moviment-polze.png"
+                src="/tmp/moviment-polze.webp"
                 alt="Moviment del polze"
                 className="absolute inset-0 h-full w-full"
                 style={{ objectFit: 'none', objectPosition: 'center', pointerEvents: 'none' }}
@@ -465,7 +465,7 @@ export default function RuletaDemoPage() {
                         const theta = i * stripeCircle.delta;
                         const selected = selectedColorSlug === slug;
                         const outline = 'none';
-                        const finalSrc = `/placeholders/t-shirt_buttons/final.png?v=${finalPngVersion}`;
+                        const finalSrc = `/placeholders/t-shirt_buttons/final.webp?v=${finalPngVersion}`;
                         const isFinalTile = i === 0;
                         const tileSrc = isFinalTile ? finalSrc : src;
 
@@ -544,7 +544,7 @@ export default function RuletaDemoPage() {
               onClick={() => setFinalPngVersion(Date.now())}
               className="h-8 w-full rounded-md border border-white/15 bg-white/5 px-3 text-[12px] font-semibold text-white/80 hover:bg-white/10"
             >
-              Reload final.png
+              Reload final.webp
             </button>
           </div>
 

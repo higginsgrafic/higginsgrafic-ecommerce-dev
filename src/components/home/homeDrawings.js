@@ -354,7 +354,7 @@ export function drawingLabel(drawing) {
 }
 
 export const shirtMockupSrc = (color) =>
-  `/placeholders/apparel/t-shirt/gildan_5000/gildan-5000_t-shirt_crewneck_unisex_heavyWeight_xl_${color}_gpr-4-0_front.png`;
+  `/placeholders/apparel/t-shirt/gildan_5000/gildan-5000_t-shirt_crewneck_unisex_heavyWeight_xl_${color}_gpr-4-0_front.webp`;
 
 /**
  * Resol el camí al mockup pre-composat (samarreta + dibuix ja imprimits) per a

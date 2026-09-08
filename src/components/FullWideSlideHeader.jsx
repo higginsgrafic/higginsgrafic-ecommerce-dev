@@ -2457,20 +2457,20 @@ function FullWideSlideHeader({
 
   const colorButtonSrcBySlug = useMemo(
     () => ({
-      white: '/placeholders/t-shirt_buttons/1.png',
-      'light-pink': '/placeholders/t-shirt_buttons/selector-color-light-pink.png',
-      'light-blue': '/placeholders/t-shirt_buttons/selector-color-light-blue.png',
-      daisy: '/placeholders/t-shirt_buttons/selector-color-daisy.png',
-      gold: '/placeholders/t-shirt_buttons/selector-color-gold.png',
-      red: '/placeholders/t-shirt_buttons/selector-color-red.png',
-      purple: '/placeholders/t-shirt_buttons/selector-color-purple.png',
-      royal: '/placeholders/t-shirt_buttons/selector-color-blue-royal.png',
-      navy: '/placeholders/t-shirt_buttons/selector-color-blue-navy.png',
-      'military-green': '/placeholders/t-shirt_buttons/selector-color-military-green.png',
-      'forest-green': '/placeholders/t-shirt_buttons/selector-color-forest-green.png',
-      'irish-green': '/placeholders/t-shirt_buttons/selector-color-irish-green.png',
-      kiwi: '/placeholders/t-shirt_buttons/selector-color-kiwi.png',
-      black: '/placeholders/t-shirt_buttons/selector-color-black.png',
+      white: '/placeholders/t-shirt_buttons/1.webp',
+      'light-pink': '/placeholders/t-shirt_buttons/selector-color-light-pink.webp',
+      'light-blue': '/placeholders/t-shirt_buttons/selector-color-light-blue.webp',
+      daisy: '/placeholders/t-shirt_buttons/selector-color-daisy.webp',
+      gold: '/placeholders/t-shirt_buttons/selector-color-gold.webp',
+      red: '/placeholders/t-shirt_buttons/selector-color-red.webp',
+      purple: '/placeholders/t-shirt_buttons/selector-color-purple.webp',
+      royal: '/placeholders/t-shirt_buttons/selector-color-blue-royal.webp',
+      navy: '/placeholders/t-shirt_buttons/selector-color-blue-navy.webp',
+      'military-green': '/placeholders/t-shirt_buttons/selector-color-military-green.webp',
+      'forest-green': '/placeholders/t-shirt_buttons/selector-color-forest-green.webp',
+      'irish-green': '/placeholders/t-shirt_buttons/selector-color-irish-green.webp',
+      kiwi: '/placeholders/t-shirt_buttons/selector-color-kiwi.webp',
+      black: '/placeholders/t-shirt_buttons/selector-color-black.webp',
     }),
     []
   );
@@ -2741,7 +2741,7 @@ function FullWideSlideHeader({
   }, [resolvedMega, active, austenSubcollection, AUSTEN_SUB_PREFIXES]);
 
   // Imatge base de la franja per a la pàgina 2.
-  const stripeBaseImageSrc = '/placeholders/cercador/full-white-stripe.jpg';
+  const stripeBaseImageSrc = '/placeholders/cercador/full-white-stripe.webp';
 
   useEffect(() => {
     if (!active) return;

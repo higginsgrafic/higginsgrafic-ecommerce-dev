@@ -17,7 +17,7 @@ export const getTheHumanInsideOverlayPreset = (overlaySrc) => {
       (!isCylon03 && (s.includes('cylon-78') || s.includes('cylon_78')))
       || (!isCylon03 && (
         s.includes('/cylon.webp')
-        || s.includes('/cylon.png')
+        || s.includes('/cylon.webp')
         || s.includes('/cylon-stripe.webp')
         || s.includes('/cylon-b-stripe.webp')
       ))

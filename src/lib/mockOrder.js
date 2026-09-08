@@ -52,7 +52,7 @@ export function buildMockOrder({ items, subtotal, shipping, iva, total, formData
       size: item.size,
       quantity: item.quantity,
       price: item.price,
-      image: item.image || '/tshirt-white.jpg',
+      image: item.image || '/tshirt-white.webp',
     })),
     subtotal,
     shipping_cost: shipping,

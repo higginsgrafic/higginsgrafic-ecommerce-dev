@@ -75,7 +75,7 @@ function CistellComandaContent({ cartItems, setCartItems, onCloseMegaSlide, onFi
   const ROW_W = isLandscapeTablet ? (4 * COL2 + 3 * SLIDE_GAP) : CART_VIEWPORT;
 
   const TSHIRT_BASE = '/placeholders/apparel/t-shirt/gildan_5000/gildan-5000_t-shirt_crewneck_unisex_heavyWeight_xl_';
-  const TSHIRT_SUFFIX = '_gpr-4-0_front.png';
+  const TSHIRT_SUFFIX = '_gpr-4-0_front.webp';
   const tshirtSrc = (color) => `${TSHIRT_BASE}${color}${TSHIRT_SUFFIX}`;
 
 
@@ -267,7 +267,7 @@ function CistellComandaContent({ cartItems, setCartItems, onCloseMegaSlide, onFi
           <div style={{
             position: 'absolute',
             inset: 0,
-            backgroundImage: `url("${encodeURI('/placeholders/tots_els_fons/fons_acordio/fons-cistell-compra.png')}")`,
+            backgroundImage: `url("${encodeURI('/placeholders/tots_els_fons/fons_acordio/fons-cistell-compra.webp')}")`,
             backgroundRepeat: 'no-repeat',
             backgroundPosition: 'center top',
             // La franja sempre es dibuixa a la seva amplada original de creació

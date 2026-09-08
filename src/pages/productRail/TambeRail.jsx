@@ -4,20 +4,20 @@ import CarouselArrows from '@/pages/productRail/CarouselArrows';
 import ProductCard from '@/pages/productRail/ProductCard';
 
 const DEFAULT_IMAGES = [
-  '/placeholders/apparel/t-shirt/gildan_5000/gildan-5000_t-shirt_crewneck_unisex_heavyWeight_xl_black_gpr-4-0_front.png',
-  '/placeholders/apparel/t-shirt/gildan_5000/gildan-5000_t-shirt_crewneck_unisex_heavyWeight_xl_daisy_gpr-4-0_front.png',
-  '/placeholders/apparel/t-shirt/gildan_5000/gildan-5000_t-shirt_crewneck_unisex_heavyWeight_xl_forest-green_gpr-4-0_front.png',
-  '/placeholders/apparel/t-shirt/gildan_5000/gildan-5000_t-shirt_crewneck_unisex_heavyWeight_xl_gold_gpr-4-0_front.png',
-  '/placeholders/apparel/t-shirt/gildan_5000/gildan-5000_t-shirt_crewneck_unisex_heavyWeight_xl_irish-green_gpr-4-0_front.png',
-  '/placeholders/apparel/t-shirt/gildan_5000/gildan-5000_t-shirt_crewneck_unisex_heavyWeight_xl_kiwi_gpr-4-0_front.png',
-  '/placeholders/apparel/t-shirt/gildan_5000/gildan-5000_t-shirt_crewneck_unisex_heavyWeight_xl_light-blue_gpr-4-0_front.png',
-  '/placeholders/apparel/t-shirt/gildan_5000/gildan-5000_t-shirt_crewneck_unisex_heavyWeight_xl_light-pink_gpr-4-0_front.png',
-  '/placeholders/apparel/t-shirt/gildan_5000/gildan-5000_t-shirt_crewneck_unisex_heavyWeight_xl_military-green_gpr-4-0_front.png',
-  '/placeholders/apparel/t-shirt/gildan_5000/gildan-5000_t-shirt_crewneck_unisex_heavyWeight_xl_navy_gpr-4-0_front.png',
-  '/placeholders/apparel/t-shirt/gildan_5000/gildan-5000_t-shirt_crewneck_unisex_heavyWeight_xl_purple_gpr-4-0_front.png',
-  '/placeholders/apparel/t-shirt/gildan_5000/gildan-5000_t-shirt_crewneck_unisex_heavyWeight_xl_red_gpr-4-0_front.png',
-  '/placeholders/apparel/t-shirt/gildan_5000/gildan-5000_t-shirt_crewneck_unisex_heavyWeight_xl_royal_gpr-4-0_front.png',
-  '/placeholders/apparel/t-shirt/gildan_5000/gildan-5000_t-shirt_crewneck_unisex_heavyWeight_xl_white_gpr-4-0_front.png',
+  '/placeholders/apparel/t-shirt/gildan_5000/gildan-5000_t-shirt_crewneck_unisex_heavyWeight_xl_black_gpr-4-0_front.webp',
+  '/placeholders/apparel/t-shirt/gildan_5000/gildan-5000_t-shirt_crewneck_unisex_heavyWeight_xl_daisy_gpr-4-0_front.webp',
+  '/placeholders/apparel/t-shirt/gildan_5000/gildan-5000_t-shirt_crewneck_unisex_heavyWeight_xl_forest-green_gpr-4-0_front.webp',
+  '/placeholders/apparel/t-shirt/gildan_5000/gildan-5000_t-shirt_crewneck_unisex_heavyWeight_xl_gold_gpr-4-0_front.webp',
+  '/placeholders/apparel/t-shirt/gildan_5000/gildan-5000_t-shirt_crewneck_unisex_heavyWeight_xl_irish-green_gpr-4-0_front.webp',
+  '/placeholders/apparel/t-shirt/gildan_5000/gildan-5000_t-shirt_crewneck_unisex_heavyWeight_xl_kiwi_gpr-4-0_front.webp',
+  '/placeholders/apparel/t-shirt/gildan_5000/gildan-5000_t-shirt_crewneck_unisex_heavyWeight_xl_light-blue_gpr-4-0_front.webp',
+  '/placeholders/apparel/t-shirt/gildan_5000/gildan-5000_t-shirt_crewneck_unisex_heavyWeight_xl_light-pink_gpr-4-0_front.webp',
+  '/placeholders/apparel/t-shirt/gildan_5000/gildan-5000_t-shirt_crewneck_unisex_heavyWeight_xl_military-green_gpr-4-0_front.webp',
+  '/placeholders/apparel/t-shirt/gildan_5000/gildan-5000_t-shirt_crewneck_unisex_heavyWeight_xl_navy_gpr-4-0_front.webp',
+  '/placeholders/apparel/t-shirt/gildan_5000/gildan-5000_t-shirt_crewneck_unisex_heavyWeight_xl_purple_gpr-4-0_front.webp',
+  '/placeholders/apparel/t-shirt/gildan_5000/gildan-5000_t-shirt_crewneck_unisex_heavyWeight_xl_red_gpr-4-0_front.webp',
+  '/placeholders/apparel/t-shirt/gildan_5000/gildan-5000_t-shirt_crewneck_unisex_heavyWeight_xl_royal_gpr-4-0_front.webp',
+  '/placeholders/apparel/t-shirt/gildan_5000/gildan-5000_t-shirt_crewneck_unisex_heavyWeight_xl_white_gpr-4-0_front.webp',
 ];
 
 const TILE_STYLE = { width: '450px', height: '450px', backgroundColor: '#f5f5f5', position: 'relative', transform: 'scale(0.8822222222)', transformOrigin: 'bottom left', boxShadow: 'none' };
@@ -263,17 +263,20 @@ export default function TambeRail({
     const inset = 20;
     return Math.max(0, viewportWidthPx - inset - buttonsW);
   }, [viewportWidthPx]);
-  const cardImgTopPx = 161;
-  const cardTextBlockHeightPx = stabilizeInitialLayout ? 200 : 140;
+  const cardImgTopPx = stabilizeInitialLayout ? 0 : 161;
+  const cardTextBlockHeightPx = stabilizeInitialLayout ? 0 : 140;
   const renderedCardW = stabilizeInitialLayout ? Math.floor(cardW) : Math.round(cardW);
-  const viewportHeightPx = useMemo(() => cardImgTopPx + renderedCardW + cardTextBlockHeightPx, [renderedCardW]);
+  const imgPaddingPx = 48;
+  const viewportHeightPx = useMemo(() => cardImgTopPx + renderedCardW + cardTextBlockHeightPx, [cardImgTopPx, cardTextBlockHeightPx, renderedCardW]);
   const dynamicTileStyle = useMemo(() => ({
     width: `${renderedCardW}px`,
     height: `${renderedCardW}px`,
     backgroundColor: '#f5f5f5',
     position: 'relative',
     boxShadow: 'none',
-  }), [renderedCardW]);
+    padding: `${imgPaddingPx}px`,
+    boxSizing: 'border-box',
+  }), [renderedCardW, imgPaddingPx]);
   const dynamicTextBlockStyle = useMemo(() => ({ width: `${renderedCardW}px` }), [renderedCardW]);
 
   useLayoutEffect(() => {
@@ -380,7 +383,11 @@ export default function TambeRail({
           <RespescaTitle leftPx={left1} title={title} subtitle={subtitle} />
         )}
 
-        <div className="w-full py-10" data-container="cards-row">
+        <div
+          className="w-full"
+          data-container="cards-row"
+          style={{ paddingTop: stabilizeInitialLayout ? '56px' : '40px', paddingBottom: stabilizeInitialLayout ? 0 : '40px' }}
+        >
           <div style={{ position: 'relative', minHeight: `${viewportHeightPx}px` }}>
             <div
               style={{
@@ -478,8 +485,9 @@ export default function TambeRail({
                       positionKey={`${pos}-${idx}`}
                       href={cardLink}
                       imageSrc={img}
-                      topPx={stabilizeInitialLayout ? 151 : 161}
-                      textBottomPx={stabilizeInitialLayout ? 48 : 8}
+                      topPx={cardImgTopPx}
+                      textBottomPx={8}
+                      imgPaddingPx={48}
                       leftPx={leftPx}
                       tileStyle={dynamicTileStyle}
                       textBlockStyle={dynamicTextBlockStyle}

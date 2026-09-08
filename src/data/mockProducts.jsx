@@ -6,7 +6,7 @@ export const mockProducts = [
     "name": "Wormhole",
     "description": "Captura l'esperit de l'aventura i el descobriment més enllà de les estrelles conegudes.",
     "price": 15.50,
-    "image": "/tshirt-white.jpg",
+    "image": "/tshirt-white.webp",
     "collection": "first-contact"
   },
   {
@@ -14,7 +14,7 @@ export const mockProducts = [
     "name": "Vulcan's End",
     "description": "Transforma l'ordinari en extraordinari amb la lògica i la raó de les civilitzacions avançades.",
     "price": 15.50,
-    "image": "/tshirt-red.jpg",
+    "image": "/tshirt-red.webp",
     "collection": "first-contact"
   },
   {
@@ -22,7 +22,7 @@ export const mockProducts = [
     "name": "NX-01",
     "description": "Segueix la teva estrella i descobreix els misteris del cosmos que encara estan per revelar.",
     "price": 15.50,
-    "image": "/tshirt-green.jpg",
+    "image": "/tshirt-green.webp",
     "collection": "first-contact"
   },
   {
@@ -30,7 +30,7 @@ export const mockProducts = [
     "name": "NCC-1701",
     "description": "Els somnis són el principi de les grans aventures que ens porten cap a nous mons.",
     "price": 15.50,
-    "image": "/tshirt-blue.jpg",
+    "image": "/tshirt-blue.webp",
     "collection": "first-contact"
   }
 ];
@@ -41,7 +41,7 @@ export const mockProductsBlava = [
     "name": "Wormhole",
     "description": "La calma de l'oceà infinit que connecta tots els cors humans amb la serenitat eterna.",
     "price": 15.50,
-    "image": "/tshirt-white.jpg",
+    "image": "/tshirt-white.webp",
     "collection": "the-human-inside"
   },
   {
@@ -49,7 +49,7 @@ export const mockProductsBlava = [
     "name": "Vulcan's End",
     "description": "La màgia eterna de les estrelles que il·luminen el camí cap a la comprensió profunda.",
     "price": 15.50,
-    "image": "/tshirt-red.jpg",
+    "image": "/tshirt-red.webp",
     "collection": "the-human-inside"
   },
   {
@@ -57,7 +57,7 @@ export const mockProductsBlava = [
     "name": "NX-01",
     "description": "La serenor dels llacs de muntanya reflecteix la pau interior que tots busquem.",
     "price": 15.50,
-    "image": "/tshirt-green.jpg",
+    "image": "/tshirt-green.webp",
     "collection": "the-human-inside"
   },
   {
@@ -65,7 +65,7 @@ export const mockProductsBlava = [
     "name": "NCC-1701",
     "description": "Ordre i caos en perfecta harmonia creant l'equilibri necessari per a l'existència.",
     "price": 15.50,
-    "image": "/tshirt-blue.jpg",
+    "image": "/tshirt-blue.webp",
     "collection": "the-human-inside"
   }
 ];
@@ -76,7 +76,7 @@ export const mockProductsNegra = [
     "name": "Wormhole",
     "description": "Contempla el món des de fora i descobreix noves perspectives que només la distància atorga.",
     "price": 15.50,
-    "image": "/tshirt-white.jpg",
+    "image": "/tshirt-white.webp",
     "collection": "miscellania"
   },
   {
@@ -84,7 +84,7 @@ export const mockProductsNegra = [
     "name": "Vulcan's End",
     "description": "La bellesa del llenguatge digital revela patrons ocults que connecten tota la realitat.",
     "price": 15.50,
-    "image": "/tshirt-red.jpg",
+    "image": "/tshirt-red.webp",
     "collection": "miscellania"
   },
   {
@@ -92,7 +92,7 @@ export const mockProductsNegra = [
     "name": "NX-01",
     "description": "Pau en la foscor, força en la solitud. El silenci ens ensenya el que el soroll amaga.",
     "price": 15.50,
-    "image": "/tshirt-green.jpg",
+    "image": "/tshirt-green.webp",
     "collection": "miscellania"
   },
   {
@@ -100,7 +100,7 @@ export const mockProductsNegra = [
     "name": "NCC-1701",
     "description": "El caos amaga l'ordre intern que només els ulls entrenats poden reconèixer i comprendre.",
     "price": 15.50,
-    "image": "/tshirt-blue.jpg",
+    "image": "/tshirt-blue.webp",
     "collection": "miscellania"
   }
 ];
@@ -111,7 +111,7 @@ export const mockProductsGreen = [
     "name": "Wormhole",
     "description": "Homenatge a la saviesa ancestral que ha guiat generacions amb la seva llum immortal.",
     "price": 15.50,
-    "image": "/tshirt-white.jpg",
+    "image": "/tshirt-white.webp",
     "collection": "austen"
   },
   {
@@ -119,7 +119,7 @@ export const mockProductsGreen = [
     "name": "Vulcan's End",
     "description": "Elegància discreta per la ciutat que valora la sofisticació sense renunciar a la comoditat.",
     "price": 15.50,
-    "image": "/tshirt-red.jpg",
+    "image": "/tshirt-red.webp",
     "collection": "austen"
   },
   {
@@ -127,7 +127,7 @@ export const mockProductsGreen = [
     "name": "NX-01",
     "description": "Per a ànimes indòmites que recorren els seus propis camins sense por al judici aliè.",
     "price": 15.50,
-    "image": "/tshirt-green.jpg",
+    "image": "/tshirt-green.webp",
     "collection": "austen"
   },
   {
@@ -135,7 +135,7 @@ export const mockProductsGreen = [
     "name": "NCC-1701",
     "description": "Mantén-te ferm davant les tempestes que la vida posa al teu camí amb determinació.",
     "price": 15.50,
-    "image": "/tshirt-blue.jpg",
+    "image": "/tshirt-blue.webp",
     "collection": "austen"
   }
 ];
@@ -146,7 +146,7 @@ export const mockProductsCube = [
     "name": "Wormhole",
     "description": "Celebra el repte de trobar solucions als enigmes més complexos que presenta l'univers.",
     "price": 15.50,
-    "image": "/tshirt-white.jpg",
+    "image": "/tshirt-white.webp",
     "collection": "cube"
   },
   {
@@ -154,7 +154,7 @@ export const mockProductsCube = [
     "name": "Vulcan's End",
     "description": "Perspectives impossibles. Angles nous. Geometries que desafien la nostra comprensió espacial.",
     "price": 15.50,
-    "image": "/tshirt-red.jpg",
+    "image": "/tshirt-red.webp",
     "collection": "cube"
   },
   {
@@ -162,7 +162,7 @@ export const mockProductsCube = [
     "name": "NX-01",
     "description": "Per a ments que busquen l'essencial més enllà de les aparences i el superficial.",
     "price": 15.50,
-    "image": "/tshirt-green.jpg",
+    "image": "/tshirt-green.webp",
     "collection": "cube"
   },
   {
@@ -170,7 +170,7 @@ export const mockProductsCube = [
     "name": "NCC-1701",
     "description": "Noves dimensions que trenquen els límits del que creiem possible en la realitat física.",
     "price": 15.50,
-    "image": "/tshirt-blue.jpg",
+    "image": "/tshirt-blue.webp",
     "collection": "cube"
   }
 ];

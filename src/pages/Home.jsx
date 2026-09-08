@@ -15,7 +15,7 @@ import HomeMobile from '@/pages/HomeMobile';
 const HERO_SLIDES = [
   {
     id: 'first-contact',
-    imageSrc: '/placeholders/apparel/t-shirt/gildan_5000/gildan-5000_t-shirt_crewneck_unisex_heavyWeight_xl_royal_gpr-4-0_front.png',
+    imageSrc: '/placeholders/apparel/t-shirt/gildan_5000/gildan-5000_t-shirt_crewneck_unisex_heavyWeight_xl_royal_gpr-4-0_front.webp',
     imageAlt: 'Samarreta de la col·lecció First Contact',
     kicker: 'First Contact',
     headline: 'Ciència-ficció per mirar cap a les estrelles.',
@@ -24,7 +24,7 @@ const HERO_SLIDES = [
   },
   {
     id: 'the-human-inside',
-    imageSrc: '/placeholders/apparel/t-shirt/gildan_5000/gildan-5000_t-shirt_crewneck_unisex_heavyWeight_xl_black_gpr-4-0_front.png',
+    imageSrc: '/placeholders/apparel/t-shirt/gildan_5000/gildan-5000_t-shirt_crewneck_unisex_heavyWeight_xl_black_gpr-4-0_front.webp',
     imageAlt: 'Samarreta de la col·lecció The Human Inside',
     kicker: 'The Human Inside',
     headline: 'Robots, identitat i preguntes incòmodes.',
@@ -33,7 +33,7 @@ const HERO_SLIDES = [
   },
   {
     id: 'austen',
-    imageSrc: '/placeholders/apparel/t-shirt/gildan_5000/gildan-5000_t-shirt_crewneck_unisex_heavyWeight_xl_cardinal-red_gpr-4-0_front.png',
+    imageSrc: '/placeholders/apparel/t-shirt/gildan_5000/gildan-5000_t-shirt_crewneck_unisex_heavyWeight_xl_cardinal-red_gpr-4-0_front.webp',
     imageAlt: 'Samarreta de la col·lecció Austen',
     kicker: 'Austen',
     headline: 'Diguis el que diguis, fes-ho amb elegància.',
@@ -42,7 +42,7 @@ const HERO_SLIDES = [
   },
   {
     id: 'cube',
-    imageSrc: '/placeholders/apparel/t-shirt/gildan_5000/gildan-5000_t-shirt_crewneck_unisex_heavyWeight_xl_purple_gpr-4-0_front.png',
+    imageSrc: '/placeholders/apparel/t-shirt/gildan_5000/gildan-5000_t-shirt_crewneck_unisex_heavyWeight_xl_purple_gpr-4-0_front.webp',
     imageAlt: 'Samarreta de la col·lecció Cube',
     kicker: 'Cube',
     headline: 'Tots som estranys a ulls nostres.',
@@ -51,7 +51,7 @@ const HERO_SLIDES = [
   },
   {
     id: 'miscellania',
-    imageSrc: '/placeholders/apparel/t-shirt/gildan_5000/gildan-5000_t-shirt_crewneck_unisex_heavyWeight_xl_forest-green_gpr-4-0_front.png',
+    imageSrc: '/placeholders/apparel/t-shirt/gildan_5000/gildan-5000_t-shirt_crewneck_unisex_heavyWeight_xl_forest-green_gpr-4-0_front.webp',
     imageAlt: 'Samarreta de la col·lecció Miscel·lània',
     kicker: 'Miscel·lània',
     headline: 'Per a qui tria el seu propi camí.',

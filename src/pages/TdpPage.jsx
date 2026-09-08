@@ -217,7 +217,7 @@ function TdpPage({ pautaEnabled = false, tableEnabled = false }) {
             productName="NOM DE PRODUCTE"
             description={tdpEditableDescription}
             price="15,50€"
-            imageSrc="/placeholders/apparel/t-shirt/gildan_5000/gildan-5000_t-shirt_crewneck_unisex_heavyWeight_xl_white_gpr-4-0_front.png"
+            imageSrc="/placeholders/apparel/t-shirt/gildan_5000/gildan-5000_t-shirt_crewneck_unisex_heavyWeight_xl_white_gpr-4-0_front.webp"
             imageAlt="Samarreta blanca Gildan 64000"
             sizes={sizes}
             selectedSize={selectedSize}
@@ -235,7 +235,7 @@ function TdpPage({ pautaEnabled = false, tableEnabled = false }) {
             productName="NOM DE PRODUCTE"
             description={tdpEditableDescription}
             price="15,50€"
-            imageSrc="/placeholders/apparel/t-shirt/gildan_5000/gildan-5000_t-shirt_crewneck_unisex_heavyWeight_xl_white_gpr-4-0_front.png"
+            imageSrc="/placeholders/apparel/t-shirt/gildan_5000/gildan-5000_t-shirt_crewneck_unisex_heavyWeight_xl_white_gpr-4-0_front.webp"
             imageAlt="Samarreta blanca Gildan 64000"
             sizes={sizes}
             selectedSize={selectedSize}
@@ -251,7 +251,7 @@ function TdpPage({ pautaEnabled = false, tableEnabled = false }) {
             productName="NOM DE PRODUCTE"
             description={tdpEditableDescription}
             price="15,50€"
-            imageSrc="/placeholders/apparel/t-shirt/gildan_5000/gildan-5000_t-shirt_crewneck_unisex_heavyWeight_xl_white_gpr-4-0_front.png"
+            imageSrc="/placeholders/apparel/t-shirt/gildan_5000/gildan-5000_t-shirt_crewneck_unisex_heavyWeight_xl_white_gpr-4-0_front.webp"
             imageAlt="Samarreta blanca Gildan 64000"
             sizes={sizes}
             selectedSize={selectedSize}

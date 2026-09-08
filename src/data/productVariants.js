@@ -63,31 +63,31 @@ export const COLORS = {
     id: 'white',
     label: 'Blanc',
     hex: '#FFFFFF',
-    image: '/tshirt-white.jpg'
+    image: '/tshirt-white.webp'
   },
   BLACK: {
     id: 'black',
     label: 'Negre',
     hex: '#181818',
-    image: '/tshirt-black.jpg'
+    image: '/tshirt-black.webp'
   },
   BLUE: {
     id: 'blue',
     label: 'Blau',
     hex: '#2563EB',
-    image: '/tshirt-blue.jpg'
+    image: '/tshirt-blue.webp'
   },
   GREEN: {
     id: 'green',
     label: 'Verd',
     hex: '#10B981',
-    image: '/tshirt-green.jpg'
+    image: '/tshirt-green.webp'
   },
   RED: {
     id: 'red',
     label: 'Vermell',
     hex: '#DC2626',
-    image: '/tshirt-red.jpg'
+    image: '/tshirt-red.webp'
   }
 };
 

@@ -405,7 +405,7 @@ function MegaStripePanel({
                   ) : null}
 
                   {/* Imatge prerenderitzada de les samarretes buides esvaïdes
-                      (N.png, transparent), alineada amb la stripe. Esvaeix només
+                      (N.webp, transparent), alineada amb la stripe. Esvaeix només
                       les buides; la zona dels dibuixos és transparent i no tapa
                       les samarretes de color. */}
                   {stripeEmptyMaskSrc ? (

@@ -29,6 +29,7 @@ export default function ProductCard({
   topPx = 161,
   leftPx = 0,
   textBottomPx = 8,
+  imgPaddingPx = 48,
   tileStyle = DEFAULT_TILE_STYLE,
   textBlockStyle = DEFAULT_TEXT_BLOCK_STYLE,
   overlaySrc = null,
@@ -86,10 +87,9 @@ export default function ProductCard({
                   e.preventDefault();
                 }}
                 style={{
-                  width: '100%',
-                  height: '100%',
+                  maxWidth: '100%',
+                  maxHeight: '100%',
                   objectFit: 'contain',
-                  padding: '48px',
                   userSelect: 'none',
                   WebkitUserDrag: 'none',
                 }}
@@ -115,10 +115,10 @@ export default function ProductCard({
                   }}
                   style={{
                     position: 'absolute',
-                    inset: 0,
+                    inset: `${imgPaddingPx}px`,
                     zIndex: 2,
-                    width: '100%',
-                    height: '100%',
+                    width: `calc(100% - ${imgPaddingPx * 2}px)`,
+                    height: `calc(100% - ${imgPaddingPx * 2}px)`,
                     objectFit: 'contain',
                     padding: 0,
                     pointerEvents: 'none',

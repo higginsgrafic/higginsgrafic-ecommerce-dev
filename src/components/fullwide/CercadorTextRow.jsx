@@ -9,7 +9,7 @@ import React from 'react';
  * un stub horitzontal, mentre que les continuacions d'una llista (col3 g1 i
  * col5) només tenen la línia.
  *
- * Mètriques calibrades del mockup fons-cercador.png (amplada 4512px = 100cqw,
+ * Mètriques calibrades del mockup fons-cercador.webp (amplada 4512px = 100cqw,
  * factor px -> cqw = 1/45.12). Text Roboto Condensed 10,5pt Light.
  */
 
