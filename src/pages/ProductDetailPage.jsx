@@ -551,7 +551,7 @@ const ProductDetailPage = ({ onAddToCart, cartItems = [], language = 'ca' }) => 
       if (!file) return null;
 
       // Special cases where filename contains both ink + shirt color tokens.
-      // Example: '...-white-black.png' means white ink on black shirt => Negre shirt.
+      // Example: '...-white-black.webp' means white ink on black shirt => Negre shirt.
       if (file.includes('white-black')) return 'Negre';
       if (file.includes('black-white')) return 'Blanc';
 

@@ -81,7 +81,7 @@ export const productsService = {
 
       const looksLikeFile = (name) => {
         const lower = (name || '').toString().toLowerCase();
-        return lower.endsWith('.png') || lower.endsWith('.jpg') || lower.endsWith('.jpeg') || lower.endsWith('.webp') || lower.endsWith('.gif') || lower.endsWith('.svg');
+        return lower.endsWith('.webp') || lower.endsWith('.webp') || lower.endsWith('.webp') || lower.endsWith('.webp') || lower.endsWith('.gif') || lower.endsWith('.svg');
       };
 
       const isFileEntry = (x) => {

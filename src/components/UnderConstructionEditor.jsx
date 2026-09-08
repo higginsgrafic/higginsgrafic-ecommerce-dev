@@ -380,7 +380,7 @@ export default function UnderConstructionEditor() {
                       value={config.imageUrl}
                       onChange={(e) => setConfig({ ...config, imageUrl: e.target.value })}
                       className="flex-1 px-3 py-2 text-sm border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      placeholder="https://example.com/image.jpg"
+                      placeholder="https://example.com/image.webp"
                     />
                     <button
                       type="button"

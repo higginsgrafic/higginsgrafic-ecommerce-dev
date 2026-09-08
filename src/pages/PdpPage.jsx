@@ -364,8 +364,8 @@ function PdpPage() {
           </div>
         )}
 
-        <PageBand type="related" style={{ display: 'flex', alignItems: 'center', overflow: 'hidden' }}>
-          <div style={{ width: '100%', transform: `translateY(${isLandscapeTablet ? '-52px' : '78px'})` }}>
+        <PageBand type="related" fluid={isPortraitTablet} style={{ display: 'flex', alignItems: isPortraitTablet ? 'flex-start' : 'center', overflow: 'hidden' }}>
+          <div style={{ width: '100%', transform: `translateY(${isLandscapeTablet ? '-52px' : (isPortraitTablet ? '0px' : '-72px')})` }}>
             <TambeRail
               images={otherImages}
               showTitle={false}
@@ -385,7 +385,7 @@ function PdpPage() {
           style={{
             height: isLandscapeTablet && Number.isFinite(tdpAvailableHeight) ? `${tdpRenderedHeight}px` : undefined,
             overflow: isLandscapeTablet && Number.isFinite(tdpAvailableHeight) ? 'hidden' : undefined,
-            marginTop: isPortraitTablet ? '148px' : '-32px',
+            marginTop: isPortraitTablet ? '100px' : '-32px',
             marginBottom: '32px',
           }}
         >

@@ -112,7 +112,7 @@ export default function HomeMobile() {
         paddingBottom: '24px',
       }}>
         <img
-          src="/custom_logos/brand/HIGGINS GRAFIC NEGRE.png"
+          src="/custom_logos/brand/HIGGINS GRAFIC NEGRE.webp"
           alt="HIGGINS GRÀFIC"
           style={{ width: '60%', height: 'auto', objectFit: 'contain' }}
         />

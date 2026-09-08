@@ -23,7 +23,7 @@ export const CERCADOR_COLLECTIONS = [
   { key: 'miscellania', label: 'MISCEL·LÀNIA' },
 ];
 
-// Ordre i hex mostrejats directament del mockup fons-cercador.png.
+// Ordre i hex mostrejats directament del mockup fons-cercador.webp.
 export const CERCADOR_COLORS = [
   { slug: 'white',          hex: '#FFFFFF', overlayHex: '#FFFFFF' },
   { slug: 'light-blue',     hex: '#99AFC6', overlayHex: '#91AEC8' },
@@ -43,7 +43,7 @@ export const CERCADOR_COLORS = [
 
 // Mides responsives en cqw (= 1% de l'amplada de la barra, que coincideix amb
 // l'amplada visible del fons).
-// Derivades del mockup fons-cercador.png (amplada 4512px):
+// Derivades del mockup fons-cercador.webp (amplada 4512px):
 //   cercle ple ⌀ 63px img -> 1.396cqw
 //   selector 5px img -> 0.111cqw
 //   centre-a-centre 153.7px img -> 3.407cqw

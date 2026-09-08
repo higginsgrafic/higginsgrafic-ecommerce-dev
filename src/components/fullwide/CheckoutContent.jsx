@@ -320,7 +320,7 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
           size: item.size || 'L',
           quantity: item.qty || 1,
           price: parseFloat(String(item.price).replace('€', '').replace(/\s/g, '').replace(',', '.')) || 0,
-          image: item.image || '/tshirt-white.jpg',
+          image: item.image || '/tshirt-white.webp',
         }));
         const mockOrder = createMockOrder({
           items: orderItems,
@@ -412,7 +412,7 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
   };
 
   const TSHIRT_BASE = '/placeholders/apparel/t-shirt/gildan_5000/gildan-5000_t-shirt_crewneck_unisex_heavyWeight_xl_';
-  const TSHIRT_SUFFIX = '_gpr-4-0_front.png';
+  const TSHIRT_SUFFIX = '_gpr-4-0_front.webp';
   const tshirtSrc = (color) => `${TSHIRT_BASE}${color}${TSHIRT_SUFFIX}`;
   const DARK_COLORS = new Set(['royal','purple','navy','red','irish-green','military-green','forest-green','black']);
   const FINISH_TO_INK = { BLANC: INK_WHITE, COLOR: 'multi', NEGRE: INK_BLACK };

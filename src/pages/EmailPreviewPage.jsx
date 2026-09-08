@@ -125,14 +125,14 @@ const ALL_SAMPLE_ITEMS = [
 
 const TEMPLATE_CONFIGS = [
   { id: 'welcome', name: '1. Compte de client (HOLA!)', category: 'Usuaris', Component: WelcomeEmail, propKey: 'user', bgImage: null },
-  { id: 'refunded', name: '2. Actualització d\'estat (COMANDA CANCEL·LADA)', category: 'Comandes', Component: OrderRefundedEmail, propKey: 'order', bgImage: '/emails/backgrounds/comanda-cancellada.png' },
-  { id: 'failed', name: '3. Actualització d\'estat (PAGAMENT NO COMPLETAT)', category: 'Comandes', Component: OrderFailedEmail, propKey: 'order', bgImage: '/emails/backgrounds/pagament-no-completat.png' },
-  { id: 'contact', name: '4. Atenció al client (MISSATGE REBUT)', category: 'Suport', Component: ContactReceivedEmail, propKey: 'data', bgImage: '/emails/backgrounds/missatge-rebut.png' },
-  { id: 'reset', name: '5. Actualització d\'estat (RECUPERACIO DE CONTRASENYA)', category: 'Usuaris', Component: PasswordResetEmail, propKey: 'data', bgImage: '/emails/backgrounds/recuperacio-de-contrasenya.png' },
-  { id: 'shipped', name: '6. Actualització d\'estat (CODI DE SEGUIMENT)', category: 'Comandes', Component: OrderShippedEmail, propKey: 'order', bgImage: '/emails/backgrounds/codi-de-seguiment.png' },
-  { id: 'delivered', name: '7. Actualització d\'estat (COMANDA ENTREGADA!)', category: 'Comandes', Component: OrderDeliveredEmail, propKey: 'order', bgImage: '/emails/backgrounds/comanda-entregada.png' },
-  { id: 'production', name: '8. Actualització d\'estat (NOMBRE DE COMANDA)', category: 'Comandes', Component: OrderInProductionEmail, propKey: 'order', bgImage: '/emails/backgrounds/nombre-de-comanda.png' },
-  { id: 'confirmed', name: '9. Actualització d\'estat (GRÀCIES PER LA COMPRA!)', category: 'Comandes', Component: OrderConfirmedEmail, propKey: 'order', bgImage: '/emails/backgrounds/pagament-confirmat.png' },
+  { id: 'refunded', name: '2. Actualització d\'estat (COMANDA CANCEL·LADA)', category: 'Comandes', Component: OrderRefundedEmail, propKey: 'order', bgImage: '/emails/backgrounds/comanda-cancellada.webp' },
+  { id: 'failed', name: '3. Actualització d\'estat (PAGAMENT NO COMPLETAT)', category: 'Comandes', Component: OrderFailedEmail, propKey: 'order', bgImage: '/emails/backgrounds/pagament-no-completat.webp' },
+  { id: 'contact', name: '4. Atenció al client (MISSATGE REBUT)', category: 'Suport', Component: ContactReceivedEmail, propKey: 'data', bgImage: '/emails/backgrounds/missatge-rebut.webp' },
+  { id: 'reset', name: '5. Actualització d\'estat (RECUPERACIO DE CONTRASENYA)', category: 'Usuaris', Component: PasswordResetEmail, propKey: 'data', bgImage: '/emails/backgrounds/recuperacio-de-contrasenya.webp' },
+  { id: 'shipped', name: '6. Actualització d\'estat (CODI DE SEGUIMENT)', category: 'Comandes', Component: OrderShippedEmail, propKey: 'order', bgImage: '/emails/backgrounds/codi-de-seguiment.webp' },
+  { id: 'delivered', name: '7. Actualització d\'estat (COMANDA ENTREGADA!)', category: 'Comandes', Component: OrderDeliveredEmail, propKey: 'order', bgImage: '/emails/backgrounds/comanda-entregada.webp' },
+  { id: 'production', name: '8. Actualització d\'estat (NOMBRE DE COMANDA)', category: 'Comandes', Component: OrderInProductionEmail, propKey: 'order', bgImage: '/emails/backgrounds/nombre-de-comanda.webp' },
+  { id: 'confirmed', name: '9. Actualització d\'estat (GRÀCIES PER LA COMPRA!)', category: 'Comandes', Component: OrderConfirmedEmail, propKey: 'order', bgImage: '/emails/backgrounds/pagament-confirmat.webp' },
 ];
 
 export default function EmailPreviewPage() {

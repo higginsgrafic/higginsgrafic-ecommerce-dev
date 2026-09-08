@@ -66,7 +66,7 @@ const prefixFromDir = (dir) => String(dir).replace(/[/_]/g, '-');
  *   - inks:    tintes disponibles ('b' | 'w' | 'multi')
  *   - designs: ids de disseny EXACTAMENT com apareixen al filename (després del prefix)
  *   - ext:     extensió per defecte ('webp') — o bé
- *   - extFor:  mapa { [design]: ext } per excepcions (p.ex. .png)
+ *   - extFor:  mapa { [design]: ext } per excepcions (p.ex. .webp)
  */
 export const COLLECTIONS = {
   'first-contact': {
@@ -107,7 +107,7 @@ export const COLLECTIONS = {
     // Cada disseny viu a la seva pròpia subcarpeta: miscellania/<design_>
     dirFor: (design) => `miscellania/${toDir(design)}`,
     inks: [INK_BLACK, INK_WHITE, INK_MULTI],
-    extFor: { 'death-star2d2': 'png' },
+    extFor: { 'death-star2d2': 'webp' },
     designs: [
       'arthur-d-the-second',
       'death-star2d2',

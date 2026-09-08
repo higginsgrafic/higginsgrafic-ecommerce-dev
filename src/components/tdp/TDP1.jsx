@@ -8,7 +8,7 @@ const PAUTA_FIRST_ROW_EXTRA_PX = 4;
 const DEFAULT_DESCRIPTION = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna";
 
 const DEFAULT_IMAGE_SRC =
-  '/placeholders/apparel/t-shirt/gildan_5000/gildan-5000_t-shirt_crewneck_unisex_heavyWeight_xl_white_gpr-4-0_front.png';
+  '/placeholders/apparel/t-shirt/gildan_5000/gildan-5000_t-shirt_crewneck_unisex_heavyWeight_xl_white_gpr-4-0_front.webp';
 
 function TDP1({
   gridColumn,

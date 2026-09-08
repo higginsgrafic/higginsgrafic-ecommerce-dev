@@ -421,7 +421,7 @@ function extractProductImages(gelatoProduct, index) {
 
   // Si no hem trobat cap imatge, utilitzar placeholder
   if (images.length === 0) {
-    const placeholder = `/products/gelato-${index + 1}.jpg`;
+    const placeholder = `/products/gelato-${index + 1}.webp`;
     images.push(placeholder);
       }
 

@@ -38,7 +38,7 @@ const inferMiscellaniaColorFromImageUrl = (url) => {
   if (!key) return null;
 
   // Miscel·lània mockup filenames may include multiple color tokens (e.g. ink + garment):
-  // miscellania-xxx-black-green.png
+  // miscellania-xxx-black-green.webp
   // In that case, we want the *last* color token as the best guess for the garment color.
   const tokens = [
     'militar', 'military', 'army', 'olive', 'khaki',
@@ -104,7 +104,7 @@ const sanitizeMiscellaniaProducts = (items) => {
     // If product has no variants (common for Gelato store products in this app), do NOT guess/override images.
     // We'll only fallback if the image is missing.
     const fallbackImage =
-      '/placeholders/apparel/t-shirt/gildan_5000/gildan-5000_t-shirt_crewneck_unisex_heavyWeight_xl_black_gpr-4-0_front.png';
+      '/placeholders/apparel/t-shirt/gildan_5000/gildan-5000_t-shirt_crewneck_unisex_heavyWeight_xl_black_gpr-4-0_front.webp';
     const hasAnyImage =
       (typeof p?.image === 'string' && p.image.length > 0) ||
       (Array.isArray(p?.images) && p.images.length > 0);

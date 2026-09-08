@@ -276,7 +276,7 @@ const Footer = () => {
           >
             <Link to="/" aria-label="GRÀFIC - Pàgina d'inici" className="flex items-center justify-center flex-shrink-0 transition-transform hover:scale-105 active:scale-95">
               <img
-                src="/custom_logos/brand/higgins-grafic-negre.png"
+                src="/custom_logos/brand/higgins-grafic-negre.webp"
                 alt="Higgins Gràfic"
                 className="h-[37.5px] w-[160px] block object-contain"
               />
@@ -291,7 +291,7 @@ const Footer = () => {
           <div className="flex items-center justify-center min-h-[80px]">
             <Link to="/" className="transition-transform hover:scale-105">
               <img
-                src="/custom_logos/brand/higgins-grafic-negre.png"
+                src="/custom_logos/brand/higgins-grafic-negre.webp"
                 alt="Higgins Gràfic"
                 className="h-[49.5px] w-[200px] block object-contain"
               />
