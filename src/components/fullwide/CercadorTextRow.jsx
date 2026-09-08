@@ -248,7 +248,7 @@ function Group({ group, isFirst, dimmed, clickable, selectedStripeItem, hoveredS
   );
 }
 
-function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripeItem, hoveredStripeItem, onSelectGroup, onHoverItem, onHoverLeave, compact = false, selectedColor = 'white', onSelectColor, onSelectCollection }) {
+function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripeItem, hoveredStripeItem, onSelectGroup, onHoverItem, onHoverLeave, compact = false, selectedColor = 'white', onSelectColor, onSelectCollection, isPortraitTablet = false, isLandscapeTablet = false }) {
   if (compact) {
     const items = COLUMNS.flatMap((groups) => groups.flatMap((group) => group.items.map((label) => ({
       label,
@@ -266,7 +266,7 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
         style={{
           position: 'absolute',
           top: '40px',
-          left: '88px',
+          left: isPortraitTablet ? '93px' : (isLandscapeTablet ? '93px' : '105px'),
           right: '0px',
           display: 'grid',
           gridTemplateColumns: 'minmax(0, 1fr) 78px 142px',
@@ -275,7 +275,7 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
           pointerEvents: 'auto',
         }}
       >
-        <div style={{ display: 'grid', gridTemplateColumns: `repeat(${numColumns}, minmax(0, 1fr))`, columnGap: '5px', width: 'calc(100% + 45px)', minWidth: 0 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: `repeat(${numColumns}, minmax(0, 1fr))`, columnGap: '5px', width: isPortraitTablet ? '100%' : 'calc(100% + 45px)', minWidth: 0 }}>
           {columns.map((column, columnIndex) => (
             <div key={columnIndex} style={{ minWidth: 0, transform: columnIndex === 1 ? 'translateX(-20px)' : columnIndex === 2 ? 'translateX(-30px)' : columnIndex === 3 ? 'translateX(-30px)' : columnIndex === 4 ? 'translateX(-30px)' : columnIndex === 5 ? 'translateX(-22px)' : columnIndex === 6 ? 'translateX(-10px)' : 'none' }}>
               {column.map(({ label, collection, subcollection, stripeItem }) => {
@@ -300,9 +300,9 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
                     background: 'transparent',
                     color: '#2B2B2B',
                     opacity: dimmed ? 0.24 : 1,
-                    fontSize: '8px',
+                    fontSize: isPortraitTablet ? '7px' : (isLandscapeTablet ? '8px' : '11px'),
                     fontWeight: emphasized ? 700 : 300,
-                    lineHeight: '12px',
+                    lineHeight: isPortraitTablet ? '10px' : (isLandscapeTablet ? '12px' : '15px'),
                     textAlign: 'left',
                     whiteSpace: 'nowrap',
                     overflow: 'visible',
@@ -317,7 +317,7 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
           ))}
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 21px)', gridAutoRows: '21px', gap: '6px', transform: 'translateX(40px)' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: `repeat(4, ${isPortraitTablet ? '16px' : (isLandscapeTablet ? '19px' : '25px')})`, gridAutoRows: isPortraitTablet ? '16px' : (isLandscapeTablet ? '19px' : '25px'), gap: isPortraitTablet ? '4px' : (isLandscapeTablet ? '6px' : '8px'), transform: 'translateX(45px)' }}>
           {CERCADOR_COLORS.map(({ slug, hex }) => {
             const selected = slug === selectedColor;
             return (
@@ -327,11 +327,13 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
                 aria-label={slug}
                 onClick={() => onSelectColor?.(slug)}
                 style={{
-                  width: '21px',
-                  height: '21px',
+                  width: isPortraitTablet ? '16px' : (isLandscapeTablet ? '19px' : '25px'),
+                  height: isPortraitTablet ? '16px' : (isLandscapeTablet ? '19px' : '25px'),
                   padding: 0,
                   borderRadius: '50%',
-                  border: selected ? '2px solid #111827' : '0.5px solid rgba(0,0,0,0.22)',
+                  border: selected ? '0.5px solid rgba(0,0,0,0.22)' : '0.5px solid rgba(0,0,0,0.22)',
+                  outline: selected ? '2px solid #111827' : 'none',
+                  outlineOffset: '3px',
                   backgroundColor: hex,
                   boxSizing: 'border-box',
                   cursor: 'pointer',
@@ -345,9 +347,9 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              height: '21px',
-              padding: '0 6px',
-              borderRadius: '10.5px',
+              height: isPortraitTablet ? '18px' : (isLandscapeTablet ? '21px' : '28px'),
+              padding: isPortraitTablet ? '0 5px' : (isLandscapeTablet ? '0 6px' : '0 8px'),
+              borderRadius: isPortraitTablet ? '9px' : (isLandscapeTablet ? '10.5px' : '14px'),
               backgroundColor: '#FFFFFF',
               border: '0.5px solid rgba(0,0,0,0.22)',
               boxSizing: 'border-box',
@@ -357,7 +359,7 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
               className="font-oswald"
               style={{
                 fontWeight: 700,
-                fontSize: '8px',
+                fontSize: isPortraitTablet ? '7px' : (isLandscapeTablet ? '8px' : '11px'),
                 lineHeight: 1,
                 letterSpacing: '0.04em',
                 color: '#2B2B2B',
@@ -378,14 +380,14 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
               className="font-roboto-condensed"
               style={{
                 display: 'block',
-                height: '12px',
+                height: isPortraitTablet ? '8px' : (isLandscapeTablet ? '11px' : '13px'),
                 padding: 0,
                 border: 0,
                 background: 'transparent',
                 color: '#2B2B2B',
-                fontSize: '8px',
+                fontSize: isPortraitTablet ? '7px' : (isLandscapeTablet ? '8px' : '11px'),
                 fontWeight: key === activeKey ? 700 : 300,
-                lineHeight: '12px',
+                lineHeight: isPortraitTablet ? '8px' : (isLandscapeTablet ? '11px' : '13px'),
                 textAlign: 'left',
                 whiteSpace: 'nowrap',
                 cursor: 'pointer',
