@@ -82,7 +82,7 @@ export default function MegaslidePagina2({
   const portraitMegaTileSize = Math.min((1350 - (8 * 12)) / 9, 144);
   const compactMegaTileSize = page1MegaTileSize || (isPortraitTablet ? portraitMegaTileSize : megaTileSize);
   const compactStripePreviewHPx = page1StripePreviewHPx || stripePreviewHPx;
-  const bnSliderSize = (compactMegaTileSize || 120) * ((isPortraitTablet || isLandscapeTablet) ? 0.94 : 1);
+  const bnSliderSize = (compactMegaTileSize || 120) * ((isPortraitTablet || isLandscapeTablet) ? 0.94 : 1) * (isPortraitTablet ? 0.7 : 1);
   const [stripeVisualAlignmentY, setStripeVisualAlignmentY] = useState(0);
   const [topVisualAlignmentY, setTopVisualAlignmentY] = useState(0);
   const snapTimerRef = useRef(0);
@@ -338,7 +338,7 @@ export default function MegaslidePagina2({
             style={{
             position: 'absolute',
             top: 'calc(var(--hg-cercador-bar-top, 0px) + 40px)',
-            left: '7px',
+            left: '27px',
             width: `${bnSliderSize}px`,
             height: `${bnSliderSize}px`,
             zIndex: 4,
@@ -363,16 +363,18 @@ export default function MegaslidePagina2({
         {/* CercadorTextRow */}
         <div style={{
           position: 'absolute',
-          top: `calc(var(--hg-cercador-bar-top, 0px) + ${topVisualAlignmentY + 5}px)`,
-          left: '50%',
-          transform: 'translateX(-50%) scale(var(--hg-cercador-bar-scale, 1))',
+          top: `calc(var(--hg-cercador-bar-top, 0px) + ${topVisualAlignmentY + (isPortraitTablet ? 20 : (isLandscapeTablet ? 5 : 20))}px)`,
+          left: isPortraitTablet ? '0' : '50%',
+          transform: isPortraitTablet ? 'scale(var(--hg-cercador-bar-scale, 1))' : 'translateX(-50%) scale(var(--hg-cercador-bar-scale, 1))',
           transformOrigin: 'top center',
-          width: 'var(--hg-cercador-bar-width, 94%)',
+          width: isPortraitTablet ? '768px' : 'var(--hg-cercador-bar-width, 94%)',
           zIndex: 3,
           containerType: 'inline-size',
         }}>
           <CercadorTextRow
             compact
+            isPortraitTablet={isPortraitTablet}
+            isLandscapeTablet={isLandscapeTablet}
             activeCollection={active}
             activeSubcollection={austenSubcollection}
             selectedColor={cercadorSelectedColor}
