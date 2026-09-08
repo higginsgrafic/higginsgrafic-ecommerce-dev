@@ -381,7 +381,7 @@ function Home() {
             justifyContent: 'center',
             gap: '44px',
             pointerEvents: 'auto',
-            transform: `translateY(${isPortraitTablet ? '9px' : '-26px'})`,
+            transform: `translateY(${isPortraitTablet ? '109px' : '-26px'})`,
           }}
         >
           {COLLECTIONS_MENU.map((c) => {
@@ -423,7 +423,7 @@ function Home() {
             gridColumn: '1 / 4',
             gridRow: '10 / 25',
             position: 'relative',
-            top: `calc(-5px - ${rowHeight / 2}px${isLandscapeTablet ? ' - 50px' : ''} - 50px${isLandscapeTablet ? ' + 50px' : ''})`,
+            top: `calc(-5px - ${rowHeight / 2}px${isLandscapeTablet ? ' - 50px' : ''} - 50px${isLandscapeTablet ? ' + 50px' : ''}${isPortraitTablet ? ' + 175px' : ''})`,
             width: 'calc(100% + 1px)',
             height: isPortraitTablet ? '430px' : 'calc(100% + 2px)',
             transform: 'scale(0.705)',
@@ -592,7 +592,7 @@ function Home() {
 
       {isPortraitTablet && <div style={{ height: '120px' }} />}
 
-      <section className="bg-background text-foreground" style={{ transform: 'scale(0.94)', transformOrigin: 'center top', marginTop: isLandscapeTablet ? '-60px' : undefined }}>
+      <section className="bg-background text-foreground" style={{ transform: 'scale(0.94)', transformOrigin: 'center top', marginTop: isPortraitTablet ? '75px' : (isLandscapeTablet ? '-60px' : undefined) }}>
         <div className="mx-auto max-w-[1400px] px-4 pt-[60px] pb-[174px] sm:px-6 lg:px-10" style={isTablet ? { paddingTop: '30px' } : undefined}>
             <CollectionTitle
             index=""

@@ -1,4 +1,5 @@
 import React from 'react';
+import { CERCADOR_COLLECTIONS, CERCADOR_COLORS } from './CercadorTopBar.jsx';
 
 /**
  * CercadorTextRow
@@ -247,7 +248,157 @@ function Group({ group, isFirst, dimmed, clickable, selectedStripeItem, hoveredS
   );
 }
 
-function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripeItem, hoveredStripeItem, onSelectGroup, onHoverItem, onHoverLeave }) {
+function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripeItem, hoveredStripeItem, onSelectGroup, onHoverItem, onHoverLeave, compact = false, selectedColor = 'white', onSelectColor, onSelectCollection }) {
+  if (compact) {
+    const items = COLUMNS.flatMap((groups) => groups.flatMap((group) => group.items.map((label) => ({
+      label,
+      collection: group.collection,
+      subcollection: group.subcollection,
+      stripeItem: STRIPE_MAP[label],
+    }))));
+    const numColumns = 8;
+    const perColumn = Math.ceil(items.length / numColumns);
+    const columns = Array.from({ length: numColumns }, (_, index) => items.slice(index * perColumn, index * perColumn + perColumn));
+    const activeKey = activeCollection === 'austen' ? `austen:${activeSubcollection || ''}` : activeCollection;
+
+    return (
+      <div
+        style={{
+          position: 'absolute',
+          top: '40px',
+          left: '88px',
+          right: '0px',
+          display: 'grid',
+          gridTemplateColumns: 'minmax(0, 1fr) 78px 142px',
+          columnGap: '10px',
+          alignItems: 'start',
+          pointerEvents: 'auto',
+        }}
+      >
+        <div style={{ display: 'grid', gridTemplateColumns: `repeat(${numColumns}, minmax(0, 1fr))`, columnGap: '5px', width: 'calc(100% + 45px)', minWidth: 0 }}>
+          {columns.map((column, columnIndex) => (
+            <div key={columnIndex} style={{ minWidth: 0, transform: columnIndex === 1 ? 'translateX(-20px)' : columnIndex === 2 ? 'translateX(-30px)' : columnIndex === 3 ? 'translateX(-30px)' : columnIndex === 4 ? 'translateX(-30px)' : columnIndex === 5 ? 'translateX(-22px)' : columnIndex === 6 ? 'translateX(-10px)' : 'none' }}>
+              {column.map(({ label, collection, subcollection, stripeItem }) => {
+              const dimmed = activeCollection && collection !== activeCollection
+                ? true
+                : activeCollection === 'austen' && collection === 'austen' && activeSubcollection && subcollection !== activeSubcollection;
+              const emphasized = stripeItem && (stripeItem === selectedStripeItem || stripeItem === hoveredStripeItem);
+              return (
+                <button
+                  key={label}
+                  type="button"
+                  onClick={() => onSelectGroup?.(collection, subcollection, stripeItem)}
+                  onMouseEnter={() => stripeItem && onHoverItem?.(stripeItem, collection)}
+                  onMouseLeave={onHoverLeave}
+                  className="font-roboto-condensed"
+                  style={{
+                    display: 'block',
+                    width: '100%',
+                    minHeight: '12px',
+                    padding: 0,
+                    border: 0,
+                    background: 'transparent',
+                    color: '#2B2B2B',
+                    opacity: dimmed ? 0.24 : 1,
+                    fontSize: '8px',
+                    fontWeight: emphasized ? 700 : 300,
+                    lineHeight: '12px',
+                    textAlign: 'left',
+                    whiteSpace: 'nowrap',
+                    overflow: 'visible',
+                    cursor: 'pointer',
+                  }}
+                >
+                  {label.replace(/^Looking For My Darcy/, 'LFMD')}
+                </button>
+              );
+              })}
+            </div>
+          ))}
+        </div>
+
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 21px)', gridAutoRows: '21px', gap: '6px', transform: 'translateX(40px)' }}>
+          {CERCADOR_COLORS.map(({ slug, hex }) => {
+            const selected = slug === selectedColor;
+            return (
+              <button
+                key={slug}
+                type="button"
+                aria-label={slug}
+                onClick={() => onSelectColor?.(slug)}
+                style={{
+                  width: '21px',
+                  height: '21px',
+                  padding: 0,
+                  borderRadius: '50%',
+                  border: selected ? '2px solid #111827' : '0.5px solid rgba(0,0,0,0.22)',
+                  backgroundColor: hex,
+                  boxSizing: 'border-box',
+                  cursor: 'pointer',
+                }}
+              />
+            );
+          })}
+          <div
+            style={{
+              gridColumn: 'span 2',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              height: '21px',
+              padding: '0 6px',
+              borderRadius: '10.5px',
+              backgroundColor: '#FFFFFF',
+              border: '0.5px solid rgba(0,0,0,0.22)',
+              boxSizing: 'border-box',
+            }}
+          >
+            <span
+              className="font-oswald"
+              style={{
+                fontWeight: 700,
+                fontSize: '8px',
+                lineHeight: 1,
+                letterSpacing: '0.04em',
+                color: '#2B2B2B',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              COLOR
+            </span>
+          </div>
+        </div>
+
+        <div style={{ transform: 'translateX(70px)' }}>
+          {CERCADOR_COLLECTIONS.map(({ key, label }) => (
+            <button
+              key={key}
+              type="button"
+              onClick={() => onSelectCollection?.(key)}
+              className="font-roboto-condensed"
+              style={{
+                display: 'block',
+                height: '12px',
+                padding: 0,
+                border: 0,
+                background: 'transparent',
+                color: '#2B2B2B',
+                fontSize: '8px',
+                fontWeight: key === activeKey ? 700 : 300,
+                lineHeight: '12px',
+                textAlign: 'left',
+                whiteSpace: 'nowrap',
+                cursor: 'pointer',
+              }}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div style={{ position: 'absolute', top: '-5px', left: '5px', bottom: 0, right: '18px', pointerEvents: 'none' }}>
       {COLUMNS.map((groups, col) => (

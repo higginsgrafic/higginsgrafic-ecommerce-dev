@@ -1,5 +1,5 @@
-import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef } from 'react';
-import CercadorTopBar, { CERCADOR_COLORS } from '../fullwide/CercadorTopBar.jsx';
+import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { CERCADOR_COLORS } from '../fullwide/CercadorTopBar.jsx';
 import CercadorTextRow from '../fullwide/CercadorTextRow.jsx';
 import MegaStripePanel from '../fullwide/MegaStripePanel.jsx';
 import MegaHeroSlider from '../MegaHeroSlider.jsx';
@@ -35,6 +35,8 @@ export default function MegaslidePagina2({
   megaHeroGridRef,
   megaHeroRowHeight,
   stripeBaseImageSrc,
+  page1MegaTileSize,
+  page1StripePreviewHPx,
   resolvedMegaFiltered,
   showStripe,
   stripeOverlayLoadState,
@@ -77,9 +79,12 @@ export default function MegaslidePagina2({
     normalizeOverlaySrc,
   } = cal;
 
-  const compactMegaTileSize = megaTileSize;
-  const compactStripePreviewHPx = stripePreviewHPx;
-  const bnSliderSize = compactMegaTileSize || 120;
+  const portraitMegaTileSize = Math.min((1350 - (8 * 12)) / 9, 144);
+  const compactMegaTileSize = page1MegaTileSize || (isPortraitTablet ? portraitMegaTileSize : megaTileSize);
+  const compactStripePreviewHPx = page1StripePreviewHPx || stripePreviewHPx;
+  const bnSliderSize = (compactMegaTileSize || 120) * ((isPortraitTablet || isLandscapeTablet) ? 0.94 : 1);
+  const [stripeVisualAlignmentY, setStripeVisualAlignmentY] = useState(0);
+  const [topVisualAlignmentY, setTopVisualAlignmentY] = useState(0);
   const snapTimerRef = useRef(0);
   const neutralGammaRef = useRef(null);
   const tiltDeltaRef = useRef(0);
@@ -188,6 +193,59 @@ export default function MegaslidePagina2({
     };
   }, [isPortraitTablet]);
 
+  useLayoutEffect(() => {
+    let frame = 0;
+    let settleTimer = 0;
+    const alignToPage1 = () => {
+      const page1Stripe = document.querySelector('[data-stripe-visual-content="1"]');
+      const page2Stripe = viewportRef.current?.querySelector('[data-stripe-visual-content="2"]');
+      if (!page1Stripe || !page2Stripe) return;
+      const delta = page1Stripe.getBoundingClientRect().top - page2Stripe.getBoundingClientRect().top;
+      if (Math.abs(delta) < 0.5) return;
+      setStripeVisualAlignmentY((current) => current + delta);
+    };
+    const schedule = () => {
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(alignToPage1);
+    };
+
+    schedule();
+    settleTimer = window.setTimeout(schedule, 180);
+    window.addEventListener('resize', schedule);
+    return () => {
+      cancelAnimationFrame(frame);
+      window.clearTimeout(settleTimer);
+      window.removeEventListener('resize', schedule);
+    };
+  }, [active, compactMegaTileSize, compactStripePreviewHPx, isPortraitTablet]);
+
+  useLayoutEffect(() => {
+    let frame = 0;
+    let settleTimer = 0;
+    const alignTopRowToPage1 = () => {
+      const page1Viewport = document.querySelector('[data-mega-page-viewport="1"]');
+      const page1Selector = page1Viewport?.querySelector('button[aria-label="Color"]');
+      const page2Selector = viewportRef.current?.querySelector('[data-p2-color-selector] button[aria-label="Color"]');
+      if (!page1Selector || !page2Selector) return;
+      const delta = page1Selector.getBoundingClientRect().top - page2Selector.getBoundingClientRect().top;
+      if (Math.abs(delta) < 0.5) return;
+      setTopVisualAlignmentY((current) => current + delta);
+    };
+    const schedule = () => {
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(alignTopRowToPage1);
+    };
+
+    schedule();
+    settleTimer = window.setTimeout(schedule, 180);
+    window.addEventListener('resize', schedule);
+    return () => {
+      cancelAnimationFrame(frame);
+      window.clearTimeout(settleTimer);
+      window.removeEventListener('resize', schedule);
+    };
+  }, [active, bnSliderSize, isPortraitTablet, stripeVisualAlignmentY]);
+
   const variant = active === 'the_human_inside' ? humanInsideVariant : firstContactVariant;
 
   const drawable = useMemo(() => {
@@ -275,10 +333,12 @@ export default function MegaslidePagina2({
         }}>
         {/* Slider B/N/C vertical — cantó esquerre, alçada barra grisa */}
         {active ? (
-          <div style={{
+          <div
+            data-p2-color-selector
+            style={{
             position: 'absolute',
-            top: 'calc(var(--hg-cercador-bar-top, 0px) + 45px)',
-            left: '40px',
+            top: 'calc(var(--hg-cercador-bar-top, 0px) + 40px)',
+            left: '7px',
             width: `${bnSliderSize}px`,
             height: `${bnSliderSize}px`,
             zIndex: 4,
@@ -286,50 +346,24 @@ export default function MegaslidePagina2({
             alignItems: 'center',
             justifyContent: 'center',
           }}>
-            <FirstContactDibuix00Buttons
-              onWhite={() => { setStripeOverlayOverrideActive(false); active === 'the_human_inside' ? setHumanInsideVariant('white') : setFirstContactVariant('white'); }}
-              onBlack={() => { setStripeOverlayOverrideActive(false); active === 'the_human_inside' ? setHumanInsideVariant('black') : setFirstContactVariant('black'); }}
-              onMulti={() => { setStripeOverlayOverrideActive(false); active === 'the_human_inside' ? setHumanInsideVariant('color') : setFirstContactVariant('color'); }}
-              showWhite={stripeVariantVisibility?.white !== false}
-              showBlack={stripeVariantVisibility?.black !== false}
-              showMulti={stripeVariantVisibility?.color !== false}
-              selectedVariant={active === 'the_human_inside' ? humanInsideVariant : firstContactVariant}
-            />
+            <div style={{ width: '100%', height: '100%', transform: `translateY(${topVisualAlignmentY}px)` }}>
+              <FirstContactDibuix00Buttons
+                onWhite={() => { setStripeOverlayOverrideActive(false); active === 'the_human_inside' ? setHumanInsideVariant('white') : setFirstContactVariant('white'); }}
+                onBlack={() => { setStripeOverlayOverrideActive(false); active === 'the_human_inside' ? setHumanInsideVariant('black') : setFirstContactVariant('black'); }}
+                onMulti={() => { setStripeOverlayOverrideActive(false); active === 'the_human_inside' ? setHumanInsideVariant('color') : setFirstContactVariant('color'); }}
+                showWhite={stripeVariantVisibility?.white !== false}
+                showBlack={stripeVariantVisibility?.black !== false}
+                showMulti={stripeVariantVisibility?.color !== false}
+                selectedVariant={active === 'the_human_inside' ? humanInsideVariant : firstContactVariant}
+              />
+            </div>
           </div>
         ) : null}
-
-        {/* CercadorTopBar */}
-        <div style={{
-          position: 'absolute',
-          top: 'var(--hg-cercador-bar-top, 0px)',
-          left: '50%',
-          transform: 'translateX(-50%) scale(var(--hg-cercador-bar-scale, 1))',
-          transformOrigin: 'top center',
-          width: 'var(--hg-cercador-bar-width, 94%)',
-          zIndex: 3,
-        }}>
-          <CercadorTopBar
-            activeCollection={active}
-            activeSubcollection={austenSubcollection}
-            onSelectCollection={(key) => {
-              if (key.includes(':')) {
-                const [col, sub] = key.split(':');
-                setActive(col);
-                setAustenSubcollection(sub);
-              } else {
-                setActive(key);
-                setAustenSubcollection(null);
-              }
-            }}
-            selectedColor={cercadorSelectedColor}
-            onSelectColor={setCercadorSelectedColor}
-          />
-        </div>
 
         {/* CercadorTextRow */}
         <div style={{
           position: 'absolute',
-          top: 'var(--hg-cercador-bar-top, 0px)',
+          top: `calc(var(--hg-cercador-bar-top, 0px) + ${topVisualAlignmentY + 5}px)`,
           left: '50%',
           transform: 'translateX(-50%) scale(var(--hg-cercador-bar-scale, 1))',
           transformOrigin: 'top center',
@@ -338,8 +372,21 @@ export default function MegaslidePagina2({
           containerType: 'inline-size',
         }}>
           <CercadorTextRow
+            compact
             activeCollection={active}
             activeSubcollection={austenSubcollection}
+            selectedColor={cercadorSelectedColor}
+            onSelectColor={setCercadorSelectedColor}
+            onSelectCollection={(key) => {
+              if (key.includes(':')) {
+                const [collection, subcollection] = key.split(':');
+                setActive(collection);
+                setAustenSubcollection(subcollection);
+              } else {
+                setActive(key);
+                setAustenSubcollection(null);
+              }
+            }}
             selectedStripeItem={
               active === 'first_contact' ? firstContactSelectedItem
               : active === 'the_human_inside' ? humanInsideSelectedItem
@@ -386,6 +433,7 @@ export default function MegaslidePagina2({
             stripeRowPadPx={stripeRowPadPx}
             stripeRowPadXPx={stripeRowPadXPx}
             stripePreviewHPx={compactStripePreviewHPx}
+            visualOffsetY={stripeVisualAlignmentY}
             stripeOverlayLoadState={stripeOverlayLoadState}
             resolvedOverlaySrc={resolvedOverlaySrc}
             stripeOverlayDebug={stripeOverlayDebug}

@@ -127,6 +127,7 @@ function MegaStripePanel({
   emptyTileIndices,
   stripeEmptyMaskSrc,
   calibrationOverrides,
+  visualOffsetY = 0,
   compactLandscape = false,
 }) {
   const emptyShirtMaskUrl = useEmptyShirtMask(emptyTileIndices, shirtColor);
@@ -241,12 +242,13 @@ function MegaStripePanel({
 
               <div
                 className="relative"
+                data-stripe-visual-content="2"
                 style={{
                   height: '100%',
                   width: 'fit-content',
                   display: 'inline-block',
                   transformOrigin: 'top center',
-                  transform: 'translate(var(--megaStripeDx, 0px), var(--megaStripeDy, 0px)) scale(var(--megaStripeScale, 1.2125))',
+                  transform: `translate(var(--megaStripeDx, 0px), calc(var(--megaStripeDy, 0px) + ${visualOffsetY}px)) scale(var(--megaStripeScale, 1.2125))`,
                   isolation: 'isolate',
                 }}
               >
@@ -341,12 +343,13 @@ function MegaStripePanel({
                 >
                   {megaStripeSpriteEnabledLocal ? (
                     <img
-                      src={stripeImageSrc || '/placeholders/t-shirt_buttons/v5/full-color-stripe-5.webp'}
+                      src={stripeImageSrc || '/placeholders/t-shirt_buttons/v5/full-color-stripe-5.webp?v=2866'}
                       alt=""
                       className="block"
                       style={{
                         height: '100%',
                         width: 'auto',
+                        maxWidth: 'none',
                       }}
                       loading="lazy"
                       decoding="async"
@@ -378,6 +381,7 @@ function MegaStripePanel({
                         zIndex: 6,
                         height: '100%',
                         width: 'auto',
+                        maxWidth: 'none',
                         transformOrigin: 'top center',
                         transform: 'translate(var(--megaStripeRefDx, 0px), var(--megaStripeRefDy, 0px)) scale(var(--megaStripeRefScale, 1))',
                       }}
@@ -396,6 +400,7 @@ function MegaStripePanel({
                         zIndex: 7,
                         height: '100%',
                         width: 'auto',
+                        maxWidth: 'none',
                         transformOrigin: 'top center',
                         transform: 'translate(var(--megaStripeRef2Dx, 0px), var(--megaStripeRef2Dy, 0px)) scale(var(--megaStripeRef2Scale, 1))',
                       }}
@@ -419,6 +424,7 @@ function MegaStripePanel({
                         left: 0,
                         height: '100%',
                         width: 'auto',
+                        maxWidth: 'none',
                         pointerEvents: 'none',
                         zIndex: 9,
                         opacity: 'var(--hgStripeEmptyMaskOpacity, 1)',
@@ -693,7 +699,9 @@ function MegaStripePanel({
                                   transformOrigin: 'top center',
                                   transform: (() => {
                                     const cal = getTileCalibration(picked, calibrationOverrides);
-                                    return `translate(${cal.dx}px, calc(${cal.dy}px + var(--hgStripeDrawingExtraDy, -5px))) scale(calc(${cal.scale} * var(--hgStripeDrawingExtraScale, 1)))`;
+                                    const isPemberleyHouse = active === 'austen' && typeof picked === 'string' && /\/austen\/pemberley_house\//i.test(picked);
+                                    const extraDx = isPemberleyHouse ? -2 : 0;
+                                    return `translate(${cal.dx + extraDx}px, calc(${cal.dy}px + var(--hgStripeDrawingExtraDy, -5px))) scale(calc(${cal.scale} * var(--hgStripeDrawingExtraScale, 1)))`;
                                   })(),
                                   filter: (() => {
                                     const isPemberley = active === 'austen' && typeof picked === 'string' && /\/austen\/pemberley_house\//i.test(picked);
@@ -906,7 +914,9 @@ function MegaStripePanel({
                                   transformOrigin: 'top center',
                                   transform: (() => {
                                     const cal = getTileCalibration(picked, calibrationOverrides);
-                                    return `translate(${cal.dx}px, calc(${cal.dy}px + var(--hgStripeDrawingExtraDy, -5px))) scale(calc(${cal.scale} * var(--hgStripeDrawingExtraScale, 1)))`;
+                                    const isPemberleyHouse = active === 'austen' && typeof picked === 'string' && /\/austen\/pemberley_house\//i.test(picked);
+                                    const extraDx = isPemberleyHouse ? -2 : 0;
+                                    return `translate(${cal.dx + extraDx}px, calc(${cal.dy}px + var(--hgStripeDrawingExtraDy, -5px))) scale(calc(${cal.scale} * var(--hgStripeDrawingExtraScale, 1)))`;
                                   })(),
                                   filter: (() => {
                                     const isPemberley = active === 'austen' && typeof resolvedOverlaySrc === 'string' && /\/austen\/pemberley_house\//i.test(resolvedOverlaySrc);

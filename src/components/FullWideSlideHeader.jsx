@@ -2741,7 +2741,7 @@ function FullWideSlideHeader({
   }, [resolvedMega, active, austenSubcollection, AUSTEN_SUB_PREFIXES]);
 
   // Imatge base de la franja per a la pàgina 2.
-  const stripeBaseImageSrc = '/placeholders/cercador/full-white-stripe.webp';
+  const stripeBaseImageSrc = '/placeholders/cercador/full-white-stripe.webp?v=2866';
 
   useEffect(() => {
     if (!active) return;

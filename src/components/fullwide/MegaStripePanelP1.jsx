@@ -742,7 +742,9 @@ function MegaStripePanelP1({
                                   transformOrigin: 'top center',
                                   transform: (() => {
                                     const cal = getTileCalibration(picked, calibrationOverrides);
-                                    return `translate(${cal.dx}px, calc(${cal.dy}px + var(--hgStripeDrawingExtraDy, -5px))) scale(calc(${cal.scale} * var(--hgStripeDrawingExtraScale, 1)))`;
+                                    const isPemberleyHouse = active === 'austen' && typeof picked === 'string' && /\/austen\/pemberley_house\//i.test(picked);
+                                    const extraDx = isPemberleyHouse ? -2 : 0;
+                                    return `translate(${cal.dx + extraDx}px, calc(${cal.dy}px + var(--hgStripeDrawingExtraDy, -5px))) scale(calc(${cal.scale} * var(--hgStripeDrawingExtraScale, 1)))`;
                                   })(),
                                   filter: (() => {
                                     const isPemberley = active === 'austen' && typeof picked === 'string' && /\/austen\/pemberley_house\//i.test(picked);
@@ -954,7 +956,9 @@ function MegaStripePanelP1({
                                   transformOrigin: 'top center',
                                   transform: (() => {
                                     const cal = getTileCalibration(picked, calibrationOverrides);
-                                    return `translate(${cal.dx}px, calc(${cal.dy}px + var(--hgStripeDrawingExtraDy, -5px))) scale(calc(${cal.scale} * var(--hgStripeDrawingExtraScale, 1)))`;
+                                    const isPemberleyHouse = active === 'austen' && typeof picked === 'string' && /\/austen\/pemberley_house\//i.test(picked);
+                                    const extraDx = isPemberleyHouse ? -2 : 0;
+                                    return `translate(${cal.dx + extraDx}px, calc(${cal.dy}px + var(--hgStripeDrawingExtraDy, -5px))) scale(calc(${cal.scale} * var(--hgStripeDrawingExtraScale, 1)))`;
                                   })(),
                                   filter: (() => {
                                     const isPemberley = active === 'austen' && typeof resolvedOverlaySrc === 'string' && /\/austen\/pemberley_house\//i.test(resolvedOverlaySrc);
