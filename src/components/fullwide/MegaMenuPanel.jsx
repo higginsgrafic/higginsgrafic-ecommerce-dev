@@ -3,6 +3,7 @@ import { clampNumber } from '@/utils/layoutMetrics';
 import MegaStripeBleedGuard from './MegaStripeBleedGuard.jsx';
 import MegaStripePanelP1 from './MegaStripePanelP1.jsx';
 import MegaslidePagina2 from '../megaslide/MegaslidePagina2.jsx';
+import MegaslidePagina2Cercador from '../megaslide/MegaslidePagina2Cercador.jsx';
 
 const MegaslidePagina3 = lazy(() => import('../megaslide/MegaslidePagina3.jsx'));
 const MegaslidePagina4 = lazy(() => import('../megaslide/MegaslidePagina4.jsx'));
@@ -125,7 +126,7 @@ export default function MegaMenuPanel({
   const defaultBleedGuardHeight = effectiveMegaTileSize
     ? `${Math.round(effectiveMegaTileSize * 2 + 37 + Math.max(0, stripeRowPadPx))}px`
     : undefined;
-  const bleedGuardHeight = defaultBleedGuardHeight;
+  const bleedGuardHeight = isPortraitTablet ? '269px' : defaultBleedGuardHeight;
 
   // El formulari de pagament necessita alçada per centrar-s'hi: a les dues
   // tauletes, obrir l'acordió estira la franja fins al peu de pantalla.
@@ -145,7 +146,9 @@ export default function MegaMenuPanel({
     setP1ContentBottomPx((prev) => (prev != null && Math.abs(prev - px) < 0.5 ? prev : px));
   }, []);
   const matchesPage1Height = megaPage === 1 || megaPage === 2;
-  const guardHeightPx = matchesPage1Height && p1ContentBottomPx != null && !paymentFillsScreen
+  const guardHeightPx = isPortraitTablet
+    ? '269px'
+    : matchesPage1Height && p1ContentBottomPx != null && !paymentFillsScreen
     ? `${Math.max(0, Math.round(p1ContentBottomPx + P1_STRIPE_BOTTOM_GAP - 64))}px`
     : guardHeightPxDefault;
 
@@ -196,10 +199,10 @@ export default function MegaMenuPanel({
                   transition: 'transform 320ms cubic-bezier(0.32, 0.72, 0, 1)',
                 }}
               >
-                <div style={{ width: '25%', flexShrink: 0, display: 'block', height: '100%', position: 'relative', overflow: isPortraitTablet ? 'hidden' : 'visible' }}>
+                <div style={{ width: '25%', flexShrink: 0, display: 'block', height: isPortraitTablet ? '269px' : '100%', position: 'relative', overflow: isPortraitTablet ? 'hidden' : 'visible' }}>
                   <div ref={viewport1Ref} data-mega-page-viewport="1" style={{
                     width: '100%',
-                    height: '100%',
+                    height: isPortraitTablet ? '269px' : '100%',
                     display: 'flex',
                     justifyContent: isPortraitTablet ? 'flex-start' : 'center',
                     overflowX: isPortraitTablet ? 'auto' : 'visible',
@@ -214,7 +217,7 @@ export default function MegaMenuPanel({
                     flex: isPortraitTablet ? '0 0 0px' : '1 1 auto',
                   }} />
 
-                  <div style={{ flex: '0 0 auto', width: isPortraitTablet ? '1350px' : 'var(--hg-mega-w, min(1350px, calc(100vw - 32px)))', maxWidth: 'none', position: 'relative', height: '100%', paddingLeft: '0px', paddingRight: '0px' }}>
+                  <div style={{ flex: '0 0 auto', width: isPortraitTablet ? '1350px' : 'var(--hg-mega-w, min(1350px, calc(100vw - 32px)))', maxWidth: 'none', position: 'relative', height: '100%', paddingLeft: '0px', paddingRight: '0px', zoom: isPortraitTablet ? 0.868 : 1 }}>
                     <MegaStripePanelP1
                       active={active}
                       resolvedMega={resolvedMega}
@@ -265,18 +268,19 @@ export default function MegaMenuPanel({
                   </div>
                 </div>
 
-                <MegaslidePagina2
-                  active={active}
-                  isPortraitTablet={isPortraitTablet}
-                  isLandscapeTablet={isLandscapeTablet}
-                  setActive={setActive}
-                  austenSubcollection={austenSubcollection}
-                  setAustenSubcollection={setAustenSubcollection}
-                  cercadorSelectedColor={cercadorSelectedColorP2}
-                  setCercadorSelectedColor={setCercadorSelectedColorP2}
-                  firstContactSelectedItem={firstContactSelectedItem}
-                  humanInsideSelectedItem={humanInsideSelectedItem}
-                  selectedItemByCollection={selectedItemByCollection}
+                {isPortraitTablet ? (
+                  <MegaslidePagina2Cercador
+                    active={active}
+                    isPortraitTablet={isPortraitTablet}
+                    isLandscapeTablet={isLandscapeTablet}
+                    setActive={setActive}
+                    austenSubcollection={austenSubcollection}
+                    setAustenSubcollection={setAustenSubcollection}
+                    cercadorSelectedColor={cercadorSelectedColorP2}
+                    setCercadorSelectedColor={setCercadorSelectedColorP2}
+                    firstContactSelectedItem={firstContactSelectedItem}
+                    humanInsideSelectedItem={humanInsideSelectedItem}
+                    selectedItemByCollection={selectedItemByCollection}
                   hoveredStripeItem={hoveredStripeItem}
                   setHoveredStripeItem={setHoveredStripeItem}
                   hoveredStripeItemCollection={hoveredStripeItemCollection}
@@ -311,6 +315,54 @@ export default function MegaMenuPanel({
                   thinDrawings={thinDrawings}
                   megaMenuRef={megaMenuRef}
                 />
+                ) : (
+                  <MegaslidePagina2
+                    active={active}
+                    isPortraitTablet={isPortraitTablet}
+                    isLandscapeTablet={isLandscapeTablet}
+                    setActive={setActive}
+                    austenSubcollection={austenSubcollection}
+                    setAustenSubcollection={setAustenSubcollection}
+                    cercadorSelectedColor={cercadorSelectedColorP2}
+                    setCercadorSelectedColor={setCercadorSelectedColorP2}
+                    firstContactSelectedItem={firstContactSelectedItem}
+                    humanInsideSelectedItem={humanInsideSelectedItem}
+                    selectedItemByCollection={selectedItemByCollection}
+                    hoveredStripeItem={hoveredStripeItem}
+                    setHoveredStripeItem={setHoveredStripeItem}
+                    hoveredStripeItemCollection={hoveredStripeItemCollection}
+                    setHoveredStripeItemCollection={setHoveredStripeItemCollection}
+                    setStripeOverlayOverrideActive={setStripeOverlayOverrideActive}
+                    setFirstContactSelectedItem={setFirstContactSelectedItem}
+                    setHumanInsideSelectedItem={setHumanInsideSelectedItem}
+                    setSelectedItemByCollection={setSelectedItemByCollection}
+                    megaHeroGridRef={megaHeroGridRef}
+                    megaHeroRowHeight={megaHeroRowHeight}
+                    stripeBaseImageSrc={stripeBaseImageSrc}
+                    page1MegaTileSize={effectiveMegaTileSize}
+                    page1StripePreviewHPx={stripePreviewHPx}
+                    resolvedMegaFiltered={resolvedMegaFiltered}
+                    showStripe={showStripe}
+                    stripeOverlayLoadState={stripeOverlayLoadState}
+                    resolvedOverlaySrc={resolvedOverlaySrc}
+                    stripeOverlayDebug={stripeOverlayDebug}
+                    stripeMaskDebugRectsPct={stripeMaskDebugRectsPct}
+                    stripeMaskTileRectsRawPct={stripeMaskTileRectsRawPct}
+                    drawingOverlayDebug={drawingOverlayDebug}
+                    humanInsideVariant={humanInsideVariantP2}
+                    firstContactVariant={firstContactVariantP2}
+                    reorderAustenQuotes={reorderAustenQuotes}
+                    austenSelectedDisableMulti={austenSelectedDisableMulti}
+                    stripeVariantVisibility={stripeVariantVisibility}
+                    setFirstContactVariant={setFirstContactVariantP2}
+                    setHumanInsideVariant={setHumanInsideVariantP2}
+                    setThinStartIndex={setThinStartIndex}
+                    displayedShirtColor={displayedShirtColorP2}
+                    onShirtClick={onShirtClickP2}
+                    thinDrawings={thinDrawings}
+                    megaMenuRef={megaMenuRef}
+                  />
+                )}
 
                 <Suspense fallback={null}>
                   <MegaslidePagina3
