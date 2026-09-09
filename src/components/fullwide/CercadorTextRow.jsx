@@ -248,7 +248,7 @@ function Group({ group, isFirst, dimmed, clickable, selectedStripeItem, hoveredS
   );
 }
 
-function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripeItem, hoveredStripeItem, onSelectGroup, onHoverItem, onHoverLeave, compact = false, selectedColor = 'white', onSelectColor, onSelectCollection, isPortraitTablet = false, isLandscapeTablet = false }) {
+function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripeItem, hoveredStripeItem, onSelectGroup, onHoverItem, onHoverLeave, compact = false, selectedColor = 'white', onSelectColor, onSelectCollection, isPortraitTablet = false, isLandscapeTablet = false, leftOffset = 0, uniformColumns = false, fontBoost = 0 }) {
   if (compact) {
     const items = COLUMNS.flatMap((groups) => groups.flatMap((group) => group.items.map((label) => ({
       label,
@@ -266,7 +266,7 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
         style={{
           position: 'absolute',
           top: '40px',
-          left: isPortraitTablet ? '93px' : (isLandscapeTablet ? '93px' : '105px'),
+          left: `calc(${isPortraitTablet ? '93px' : (isLandscapeTablet ? '93px' : '105px')} + ${leftOffset}px)`,
           right: '0px',
           display: 'grid',
           gridTemplateColumns: 'minmax(0, 1fr) 78px 142px',
@@ -275,9 +275,9 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
           pointerEvents: 'auto',
         }}
       >
-        <div style={{ display: 'grid', gridTemplateColumns: `repeat(${numColumns}, minmax(0, 1fr))`, columnGap: '5px', width: isPortraitTablet ? '100%' : 'calc(100% + 45px)', minWidth: 0 }}>
+        <div style={{ display: uniformColumns ? 'flex' : 'grid', gridTemplateColumns: uniformColumns ? 'none' : `repeat(${numColumns}, minmax(0, 1fr))`, columnGap: uniformColumns ? '30px' : '5px', width: uniformColumns ? 'auto' : (isPortraitTablet ? '100%' : 'calc(100% + 45px)'), minWidth: 0 }}>
           {columns.map((column, columnIndex) => (
-            <div key={columnIndex} style={{ minWidth: 0, transform: columnIndex === 1 ? 'translateX(-20px)' : columnIndex === 2 ? 'translateX(-30px)' : columnIndex === 3 ? 'translateX(-30px)' : columnIndex === 4 ? 'translateX(-30px)' : columnIndex === 5 ? 'translateX(-22px)' : columnIndex === 6 ? 'translateX(-10px)' : 'none' }}>
+            <div key={columnIndex} style={{ minWidth: 0, transform: uniformColumns ? 'none' : (columnIndex === 1 ? 'translateX(-20px)' : columnIndex === 2 ? 'translateX(-30px)' : columnIndex === 3 ? 'translateX(-30px)' : columnIndex === 4 ? 'translateX(-30px)' : columnIndex === 5 ? 'translateX(-22px)' : columnIndex === 6 ? 'translateX(-10px)' : 'none') }}>
               {column.map(({ label, collection, subcollection, stripeItem }) => {
               const dimmed = activeCollection && collection !== activeCollection
                 ? true
@@ -300,9 +300,9 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
                     background: 'transparent',
                     color: '#2B2B2B',
                     opacity: dimmed ? 0.24 : 1,
-                    fontSize: isPortraitTablet ? '7px' : (isLandscapeTablet ? '8px' : '11px'),
+                    fontSize: `${(isPortraitTablet ? 7 : (isLandscapeTablet ? 8 : 11)) + fontBoost}px`,
                     fontWeight: emphasized ? 700 : 300,
-                    lineHeight: isPortraitTablet ? '10px' : (isLandscapeTablet ? '12px' : '15px'),
+                    lineHeight: `${(isPortraitTablet ? 10 : (isLandscapeTablet ? 12 : 15)) + fontBoost}px`,
                     textAlign: 'left',
                     whiteSpace: 'nowrap',
                     overflow: 'visible',
@@ -317,7 +317,7 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
           ))}
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: `repeat(4, ${isPortraitTablet ? '16px' : (isLandscapeTablet ? '19px' : '25px')})`, gridAutoRows: isPortraitTablet ? '16px' : (isLandscapeTablet ? '19px' : '25px'), gap: isPortraitTablet ? '4px' : (isLandscapeTablet ? '6px' : '8px'), transform: 'translateX(45px)' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: `repeat(4, ${isPortraitTablet ? '16px' : (isLandscapeTablet ? '19px' : '25px')})`, gridAutoRows: isPortraitTablet ? '16px' : (isLandscapeTablet ? '19px' : '25px'), gap: isPortraitTablet ? '4px' : (isLandscapeTablet ? '6px' : '8px'), transform: 'translateX(-55px)' }}>
           {CERCADOR_COLORS.map(({ slug, hex }) => {
             const selected = slug === selectedColor;
             return (
@@ -371,7 +371,7 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
           </div>
         </div>
 
-        <div style={{ transform: 'translateX(70px)' }}>
+        <div style={{ transform: 'translateX(-30px)' }}>
           {CERCADOR_COLLECTIONS.map(({ key, label }) => (
             <button
               key={key}

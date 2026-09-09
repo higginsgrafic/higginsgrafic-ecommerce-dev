@@ -84,6 +84,9 @@ export function FirstContactDibuix00Buttons({
   showBlack = true,
   showMulti = true,
   selectedVariant,
+  sliderInset = 3,
+  sliderSideInset = null,
+  compact = false,
 }) {
   const buttons = [];
   if (showWhite) buttons.push({ key: 'white', label: 'Blanc', onClick: onWhite });
@@ -94,8 +97,20 @@ export function FirstContactDibuix00Buttons({
 
   const selectedIndex = Math.max(0, buttons.findIndex((b) => b.key === selectedVariant));
   const slotPct = 100 / buttons.length;
-  const sliderTopPct = selectedIndex * slotPct;
-  const sliderHeightPct = slotPct;
+
+  // Mode compacte: redueix l'espai entre textos, manté l'últim (Negre) fixat
+  const btnH = compact ? 24 : slotPct;
+  const getTopPct = (i) => {
+    if (!compact) return i * slotPct;
+    const last = buttons.length - 1;
+    // Ancorar l'últim botó al seu centre original
+    const lastCenter = last * slotPct + slotPct / 2;
+    const lastTop = lastCenter - btnH / 2;
+    return lastTop - (last - i) * btnH;
+  };
+
+  const sliderTopPct = compact ? getTopPct(selectedIndex) : selectedIndex * slotPct;
+  const sliderHeightPct = btnH;
 
   return (
     <div
@@ -110,7 +125,7 @@ export function FirstContactDibuix00Buttons({
       }}
     >
       {buttons.map((btn, i) => {
-        const topPct = i * slotPct;
+        const topPct = getTopPct(i);
         return (
           <button
             key={btn.key}
@@ -120,7 +135,7 @@ export function FirstContactDibuix00Buttons({
             className="absolute left-0 w-full focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             style={{
               top: `${topPct}%`,
-              height: `${slotPct}%`,
+              height: `${btnH}%`,
               border: 'none',
               background: 'transparent',
               cursor: 'pointer',
@@ -152,10 +167,10 @@ export function FirstContactDibuix00Buttons({
         aria-hidden="true"
         style={{
           position: 'absolute',
-          left: '3px',
-          right: '3px',
-          top: `calc(${sliderTopPct}% + 3px)`,
-          height: `calc(${sliderHeightPct}% - 6px)`,
+          left: `${sliderSideInset ?? sliderInset}px`,
+          right: `${sliderSideInset ?? sliderInset}px`,
+          top: `calc(${sliderTopPct}% + ${sliderInset}px)`,
+          height: `calc(${sliderHeightPct}% - ${sliderInset * 2}px)`,
           backgroundColor: '#FFFFFF',
           borderRadius: '4px',
           border: '1px solid #D1D5DB',

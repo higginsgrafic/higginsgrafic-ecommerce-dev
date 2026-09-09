@@ -340,10 +340,10 @@ export default function MegaslidePagina4({
   const enviatsMessages = mockMessages.filter(m => m.type === 'enviats');
 
   return (
-    <div style={{ width: '25%', flexShrink: 0, display: 'block', height: '100%', position: 'relative', overflow: isPortraitTablet ? 'hidden' : 'visible', boxShadow: isPortraitTablet ? 'inset 8px 0 0 #ffffff, inset -8px 0 0 #ffffff' : undefined }}>
+    <div style={{ width: '25%', flexShrink: 0, display: 'block', height: isPortraitTablet ? '269px' : '100%', position: 'relative', overflow: isPortraitTablet ? 'hidden' : 'visible', boxShadow: isPortraitTablet ? 'inset 8px 0 0 #ffffff, inset -8px 0 0 #ffffff' : undefined }}>
       <div ref={viewportRef4} data-mega-page-viewport="4" style={{
         width: '100%',
-        height: '100%',
+        height: isPortraitTablet ? '269px' : '100%',
         display: 'flex',
         justifyContent: isPortraitTablet ? 'flex-start' : 'center',
         overflowX: isPortraitTablet ? 'auto' : 'visible',
