@@ -81,7 +81,7 @@ export default function MegaslidePagina2Cercador({
 
   const portraitMegaTileSize = Math.min((1350 - (8 * 12)) / 9, 144);
   const compactMegaTileSize = page1MegaTileSize || megaTileSize;
-  const compactStripePreviewHPx = 117;
+  const compactStripePreviewHPx = page1StripePreviewHPx || 117;
   const bnSliderSize = 123;
   const [stripeVisualAlignmentY, setStripeVisualAlignmentY] = useState(0);
   const [topVisualAlignmentY, setTopVisualAlignmentY] = useState(0);
@@ -127,6 +127,14 @@ export default function MegaslidePagina2Cercador({
     });
     return () => cancelAnimationFrame(frame);
   }, [active, isPortraitTablet, scrollToProgress]);
+
+  useLayoutEffect(() => {
+    if (!isPortraitTablet) return undefined;
+    const root = viewportRef.current;
+    if (!root) return undefined;
+    root.style.setProperty('--megaStripeScale', '1.17');
+    return () => { root.style.removeProperty('--megaStripeScale'); };
+  }, [isPortraitTablet]);
 
   useEffect(() => {
     if (!isPortraitTablet || !active) return undefined;
@@ -306,7 +314,7 @@ export default function MegaslidePagina2Cercador({
         data-mega-page-viewport="2-cercador"
         style={{
           width: '100%',
-          height: '269px',
+          height: isPortraitTablet ? '269px' : '100%',
           display: 'flex',
           justifyContent: isPortraitTablet ? 'flex-start' : 'center',
           overflowX: isPortraitTablet ? 'auto' : 'visible',
@@ -314,7 +322,8 @@ export default function MegaslidePagina2Cercador({
           overscrollBehaviorX: isPortraitTablet ? 'contain' : undefined,
           WebkitOverflowScrolling: isPortraitTablet ? 'touch' : undefined,
           scrollbarWidth: isPortraitTablet ? 'none' : undefined,
-          touchAction: isPortraitTablet ? 'pan-x pinch-zoom' : undefined,
+          touchAction: isPortraitTablet ? 'pan-x' : undefined,
+          pointerEvents: isPortraitTablet ? 'auto' : undefined,
         }}
       >
         <div style={{
@@ -328,10 +337,9 @@ export default function MegaslidePagina2Cercador({
           maxWidth: 'none',
           position: 'relative',
           height: '100%',
-          paddingLeft: '45px',
+          paddingLeft: '0px',
           paddingRight: '0px',
-          transformOrigin: 'top left',
-          transform: 'none',
+          zoom: isPortraitTablet ? 0.868 : 1,
         }}>
         {/* Slider B/N/C vertical — cantó esquerre, alçada barra grisa */}
         {active ? (
@@ -340,7 +348,7 @@ export default function MegaslidePagina2Cercador({
             style={{
             position: 'absolute',
             top: 'calc(var(--hg-cercador-bar-top, 0px) + 10px)',
-            left: '32px',
+            left: '44px',
             width: `${bnSliderSize}px`,
             height: `${bnSliderSize}px`,
             zIndex: 4,
@@ -357,9 +365,6 @@ export default function MegaslidePagina2Cercador({
                 showBlack={stripeVariantVisibility?.black !== false}
                 showMulti={stripeVariantVisibility?.color !== false}
                 selectedVariant={active === 'the_human_inside' ? humanInsideVariant : firstContactVariant}
-                sliderInset={2}
-                sliderSideInset={14.5}
-                compact
               />
             </div>
           </div>
@@ -368,10 +373,9 @@ export default function MegaslidePagina2Cercador({
         {/* CercadorTextRow */}
         <div style={{
           position: 'absolute',
-          top: `calc(var(--hg-cercador-bar-top, 0px) + ${topVisualAlignmentY + 10}px)`,
-          left: 'calc(50% - 89px)',
-          transform: `translateX(-50%) scale(${isPortraitTablet ? 1 : 'var(--hg-cercador-bar-scale, 1)'})`,
-          zoom: isPortraitTablet ? 0.868 : 1,
+          top: `calc(var(--hg-cercador-bar-top, 0px) + ${topVisualAlignmentY - 10}px)`,
+          left: 'calc(50% - 64px)',
+          transform: `translateX(-50%) scale(var(--hg-cercador-bar-scale, 1))`,
           transformOrigin: 'top center',
           width: 'var(--hg-cercador-bar-width, 94%)',
           zIndex: 3,
@@ -434,7 +438,7 @@ export default function MegaslidePagina2Cercador({
         </div>
 
         {/* MegaStripePanel */}
-        <div style={{ position: 'relative', zIndex: 1, width: '100%', height: '310px', left: isPortraitTablet ? '-113px' : '0', zoom: isPortraitTablet ? 0.868 : 1 }}>
+        <div style={{ position: 'relative', zIndex: 1, width: '100%', height: '310px', left: '2px' }}>
           <MegaStripePanel
             active={active}
             reserveGridSpace
