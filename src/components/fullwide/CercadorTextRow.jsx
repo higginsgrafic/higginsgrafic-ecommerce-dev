@@ -275,9 +275,9 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
           pointerEvents: 'auto',
         }}
       >
-        <div style={{ display: uniformColumns ? 'flex' : 'grid', gridTemplateColumns: uniformColumns ? 'none' : `repeat(${numColumns}, minmax(0, 1fr))`, columnGap: '0px', width: uniformColumns ? '100%' : (isPortraitTablet ? '100%' : 'calc(100% + 45px)'), minWidth: 0 }}>
+        <div style={{ display: uniformColumns ? 'flex' : 'grid', gridTemplateColumns: uniformColumns ? 'none' : `repeat(${numColumns}, minmax(0, 1fr))`, columnGap: uniformColumns ? '0px' : '5px', width: uniformColumns ? '100%' : (isPortraitTablet ? '100%' : 'calc(100% + 45px - 50px)'), minWidth: 0, transform: (!isPortraitTablet && !isLandscapeTablet) ? 'translateX(30px)' : undefined }}>
           {columns.map((column, columnIndex) => (
-            <div key={columnIndex} style={{ minWidth: 0, flex: uniformColumns ? '1 1 0' : undefined, overflow: 'hidden', transform: uniformColumns ? `translateX(${-25 + columnIndex * (125 / 7) - (columnIndex >= 1 && columnIndex <= 4 ? 20 : 0) - (columnIndex >= 2 && columnIndex <= 4 ? 10 : 0) - (columnIndex === 5 ? 20 : 0) - (columnIndex === 7 ? 20 : 0)}px)` : 'none' }}>
+            <div key={columnIndex} style={{ minWidth: 0, flex: uniformColumns ? '1 1 0' : undefined, overflow: uniformColumns ? 'hidden' : undefined, transform: uniformColumns ? `translateX(${-25 + columnIndex * (125 / 7) - (columnIndex >= 1 && columnIndex <= 4 ? 20 : 0) - (columnIndex >= 2 && columnIndex <= 4 ? 10 : 0) - (columnIndex === 5 ? 20 : 0) - (columnIndex === 7 ? 20 : 0)}px)` : (columnIndex === 1 ? 'translateX(-20px)' : columnIndex === 2 ? 'translateX(-30px)' : columnIndex === 3 ? 'translateX(-30px)' : columnIndex === 4 ? 'translateX(-30px)' : columnIndex === 5 ? 'translateX(-22px)' : columnIndex === 6 ? 'translateX(-10px)' : columnIndex === 7 ? 'translateX(-35px)' : 'none') }}>
               {column.map(({ label, collection, subcollection, stripeItem }) => {
               const dimmed = activeCollection && collection !== activeCollection
                 ? true
@@ -305,7 +305,7 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
                     lineHeight: `${(isPortraitTablet ? 10 : (isLandscapeTablet ? 12 : 15)) + fontBoost}px`,
                     textAlign: 'left',
                     whiteSpace: 'nowrap',
-                    overflow: 'hidden',
+                    overflow: uniformColumns ? 'hidden' : 'visible',
                     cursor: 'pointer',
                   }}
                 >
@@ -317,7 +317,7 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
           ))}
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: `repeat(4, ${isPortraitTablet ? '16px' : (isLandscapeTablet ? '19px' : '25px')})`, gridAutoRows: isPortraitTablet ? '16px' : (isLandscapeTablet ? '19px' : '25px'), gap: isPortraitTablet ? '4px' : (isLandscapeTablet ? '6px' : '8px'), transform: 'translateX(85px)', marginTop: '5px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: `repeat(4, ${isPortraitTablet ? '16px' : (isLandscapeTablet ? '19px' : '25px')})`, gridAutoRows: isPortraitTablet ? '16px' : (isLandscapeTablet ? '19px' : '25px'), gap: isPortraitTablet ? '4px' : (isLandscapeTablet ? '6px' : '8px'), transform: uniformColumns ? 'translateX(85px)' : (isLandscapeTablet ? 'translateX(20px)' : 'translateX(-10px)'), marginTop: uniformColumns ? '5px' : undefined }}>
           {CERCADOR_COLORS.map(({ slug, hex }) => {
             const selected = slug === selectedColor;
             return (
@@ -371,7 +371,7 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
           </div>
         </div>
 
-        <div style={{ transform: 'translateX(120px)' }}>
+        <div style={{ transform: uniformColumns ? 'translateX(120px)' : 'translateX(45px)' }}>
           {CERCADOR_COLLECTIONS.map(({ key, label }) => (
             <button
               key={key}

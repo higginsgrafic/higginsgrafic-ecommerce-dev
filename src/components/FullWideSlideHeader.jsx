@@ -2270,13 +2270,19 @@ function FullWideSlideHeader({
     };
 
     measure();
+    // Re-mesura després del següent paint i també després de 200ms
+    // per assegurar que --belt2-xL/xR s'han actualitzat al DOM
+    const rafId = requestAnimationFrame(measure);
+    const timeoutId = window.setTimeout(measure, 200);
     window.addEventListener('resize', measure);
     window.addEventListener('scroll', measure, true);
     return () => {
+      cancelAnimationFrame(rafId);
+      window.clearTimeout(timeoutId);
       window.removeEventListener('resize', measure);
       window.removeEventListener('scroll', measure, true);
     };
-  }, []);
+  }, [isPortraitTablet, isLandscapeTablet]);
 
   const isManualLockEnabled = () => {
     if (typeof manualEnabledOverride === 'boolean') return manualEnabledOverride;
