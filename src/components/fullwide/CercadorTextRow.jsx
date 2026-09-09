@@ -116,7 +116,7 @@ const STRIPE_MAP = {
   'Cyber Cube': 'Cyber Cube',
   "Cylon Cube '03": 'Cylon Cube 03',
   'Darth Cube': 'Darth Cube',
-  "Iron Cube '08 (Iron Kong)": 'Iron Kong',
+  "Iron Cube '08": 'Iron Kong',
   "Iron Cube '68": 'Iron Cube 68',
   'Maschinencube': 'MaschinenCube',
   'Mazinger-C': 'Mazinger C',
@@ -152,7 +152,7 @@ const COLUMNS = [
   // 6 · AUSTEN (Looking For My Darcy)
   [{ bullet: true, collection: 'austen', subcollection: 'looking_for_my_darcy', items: ['Looking For My Darcy Blue Solid', 'Looking For My Darcy Pink Solid', 'Looking For My Darcy Red Solid', 'Looking For My Darcy Yellow Solid', 'Looking For My Darcy Yellow Blue Frame', 'Looking For My Darcy Yellow Pink Frame', 'Looking For My Darcy Red Yellow Frame', 'Looking For My Darcy Yellow Frame'] }],
   // 7 · CUBE
-  [{ bullet: true, collection: 'cube', subcollection: null, items: ['Afrodita-C', '3cube-P0', 'Cyber Cube', "Cylon Cube '03", 'Darth Cube', "Iron Cube '08 (Iron Kong)", "Iron Cube '68", 'Maschinencube', 'Mazinger-C', 'Robocube'] }],
+  [{ bullet: true, collection: 'cube', subcollection: null, items: ['Afrodita-C', '3cube-P0', 'Cyber Cube', "Cylon Cube '03", 'Darth Cube', "Iron Cube '08", "Iron Cube '68", 'Maschinencube', 'Mazinger-C', 'Robocube'] }],
   // 8 · MISCEL·LÀNIA
   [{ bullet: true, collection: 'miscellania', subcollection: null, items: ['Arthur D The Second', 'Death staR2D2', 'DJ Vader', 'Pont Del Diable', 'R2D2 Quote'] }],
 ];
@@ -275,9 +275,9 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
           pointerEvents: 'auto',
         }}
       >
-        <div style={{ display: uniformColumns ? 'flex' : 'grid', gridTemplateColumns: uniformColumns ? 'none' : `repeat(${numColumns}, minmax(0, 1fr))`, columnGap: uniformColumns ? '30px' : '5px', width: uniformColumns ? 'auto' : (isPortraitTablet ? '100%' : 'calc(100% + 45px)'), minWidth: 0 }}>
+        <div style={{ display: uniformColumns ? 'flex' : 'grid', gridTemplateColumns: uniformColumns ? 'none' : `repeat(${numColumns}, minmax(0, 1fr))`, columnGap: '0px', width: uniformColumns ? '100%' : (isPortraitTablet ? '100%' : 'calc(100% + 45px)'), minWidth: 0 }}>
           {columns.map((column, columnIndex) => (
-            <div key={columnIndex} style={{ minWidth: 0, transform: uniformColumns ? 'none' : (columnIndex === 1 ? 'translateX(-20px)' : columnIndex === 2 ? 'translateX(-30px)' : columnIndex === 3 ? 'translateX(-30px)' : columnIndex === 4 ? 'translateX(-30px)' : columnIndex === 5 ? 'translateX(-22px)' : columnIndex === 6 ? 'translateX(-10px)' : 'none') }}>
+            <div key={columnIndex} style={{ minWidth: 0, flex: uniformColumns ? '1 1 0' : undefined, overflow: 'hidden', transform: uniformColumns ? `translateX(${-25 + columnIndex * (125 / 7) - (columnIndex >= 1 && columnIndex <= 4 ? 20 : 0) - (columnIndex >= 2 && columnIndex <= 4 ? 10 : 0) - (columnIndex === 5 ? 20 : 0) - (columnIndex === 7 ? 20 : 0)}px)` : 'none' }}>
               {column.map(({ label, collection, subcollection, stripeItem }) => {
               const dimmed = activeCollection && collection !== activeCollection
                 ? true
@@ -305,7 +305,7 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
                     lineHeight: `${(isPortraitTablet ? 10 : (isLandscapeTablet ? 12 : 15)) + fontBoost}px`,
                     textAlign: 'left',
                     whiteSpace: 'nowrap',
-                    overflow: 'visible',
+                    overflow: 'hidden',
                     cursor: 'pointer',
                   }}
                 >
@@ -317,7 +317,7 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
           ))}
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: `repeat(4, ${isPortraitTablet ? '16px' : (isLandscapeTablet ? '19px' : '25px')})`, gridAutoRows: isPortraitTablet ? '16px' : (isLandscapeTablet ? '19px' : '25px'), gap: isPortraitTablet ? '4px' : (isLandscapeTablet ? '6px' : '8px'), transform: 'translateX(-55px)' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: `repeat(4, ${isPortraitTablet ? '16px' : (isLandscapeTablet ? '19px' : '25px')})`, gridAutoRows: isPortraitTablet ? '16px' : (isLandscapeTablet ? '19px' : '25px'), gap: isPortraitTablet ? '4px' : (isLandscapeTablet ? '6px' : '8px'), transform: 'translateX(85px)', marginTop: '5px' }}>
           {CERCADOR_COLORS.map(({ slug, hex }) => {
             const selected = slug === selectedColor;
             return (
@@ -371,7 +371,7 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
           </div>
         </div>
 
-        <div style={{ transform: 'translateX(-30px)' }}>
+        <div style={{ transform: 'translateX(120px)' }}>
           {CERCADOR_COLLECTIONS.map(({ key, label }) => (
             <button
               key={key}
