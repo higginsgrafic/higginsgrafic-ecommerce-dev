@@ -69,6 +69,7 @@ const TransparentInput = React.forwardRef(function TransparentInput({ placeholde
 
 export default function MegaslidePagina4({
   isPortraitTablet = false,
+  isLandscapeTablet = false,
   orders,
   adminEmail,
   touchMegaPublicActivity,
@@ -99,23 +100,6 @@ export default function MegaslidePagina4({
     viewport.addEventListener('scroll', handlePortraitScroll4, { passive: true });
     return () => viewport.removeEventListener('scroll', handlePortraitScroll4);
   }, [isPortraitTablet, handlePortraitScroll4]);
-  const [isLandscapeTablet, setIsLandscapeTablet] = useState(
-    typeof window !== 'undefined'
-      && window.innerWidth >= 1024
-      && window.innerWidth <= 1366
-      && window.innerHeight < window.innerWidth
-  );
-  useEffect(() => {
-    const onResize = () => {
-      setIsLandscapeTablet(
-        window.innerWidth >= 1024
-          && window.innerWidth <= 1366
-          && window.innerHeight < window.innerWidth
-      );
-    };
-    window.addEventListener('resize', onResize);
-    return () => window.removeEventListener('resize', onResize);
-  }, []);
   const [messagesSlideOpen, setMessagesSlideOpen] = useState(false);
   const [activeMessageTab, setActiveMessageTab] = useState('rebuts');
   const [saving, setSaving] = useState(false);
@@ -367,7 +351,7 @@ export default function MegaslidePagina4({
         paddingRight: '0px',
       }}>
         <div style={{
-          transform: 'scale(0.94)',
+          transform: isLandscapeTablet ? 'scale(0.92)' : 'scale(0.94)',
           transformOrigin: 'top center',
           width: '100%',
           height: '100%',
@@ -379,18 +363,35 @@ export default function MegaslidePagina4({
             width: '100%',
             height: '100%',
             position: 'relative',
-            backgroundImage: 'url("/placeholders/tots_els_fons/fons_pagina_4/pagina-4-fons.webp")',
+            backgroundImage: isLandscapeTablet ? 'none' : 'url("/placeholders/tots_els_fons/fons_pagina_4/pagina-4-fons.webp")',
             backgroundRepeat: 'no-repeat',
             backgroundPosition: 'top left',
             backgroundSize: '100% 100%',
           }}>
             {/* Form overlay — absolute on top of background image */}
-            <div style={{
-              position: 'absolute',
-              inset: 0,
-              display: 'grid',
-              gridTemplateColumns: '1fr 1fr 1fr',
-            }}>
+            <div
+              data-page4-landscape-container={isLandscapeTablet ? 'true' : undefined}
+              style={isLandscapeTablet ? {
+                width: '100%',
+                height: 'auto',
+                aspectRatio: '800 / 209',
+                position: 'relative',
+                backgroundImage: 'url("/placeholders/tots_els_fons/fons_pagina_4/pagina-4-fons.webp")',
+                backgroundRepeat: 'no-repeat',
+                backgroundPosition: 'top left',
+                backgroundSize: '100% 100%',
+                transform: 'translateY(-45px)',
+              } : { display: 'contents' }}
+            >
+              {isLandscapeTablet && (
+                <style>{`[data-page4-landscape-container="true"] [data-page4-account-fields] tbody td:first-child { position: relative; left: -30px; }`}</style>
+              )}
+              <div style={{
+                position: 'absolute',
+                inset: 0,
+                display: 'grid',
+                gridTemplateColumns: '1fr 1fr 1fr',
+              }}>
               {/* COLUMNA 1: COMANDES */}
               <div style={{ display: 'flex', flexDirection: 'column', padding: '0 10px 10px', overflow: 'hidden' }}>
                 {/* Title */}
@@ -400,6 +401,7 @@ export default function MegaslidePagina4({
                   textAlign: 'center',
                   padding: '6px 0',
                   flexShrink: 0,
+                  transform: isLandscapeTablet ? 'translateY(-3px)' : undefined,
                 }}>
                   Comandes
                 </div>
@@ -423,7 +425,7 @@ export default function MegaslidePagina4({
                     <col style={{ width: '13%' }} />
                   </colgroup>
                   <thead>
-                    <tr>
+                    <tr style={{ transform: isLandscapeTablet ? 'translateY(-10px)' : undefined }}>
                       {['Nombre de comanda', 'Estat', 'Nombre de seguiment', 'Data', 'Preu'].map((h) => (
                         <th key={h} style={{
                           ...HEAD,
@@ -518,6 +520,7 @@ export default function MegaslidePagina4({
                   textAlign: 'center',
                   padding: '6px 0',
                   flexShrink: 0,
+                  transform: isLandscapeTablet ? 'translateY(-3px)' : undefined,
                 }}>
                   Missatges
                 </div>
@@ -534,6 +537,7 @@ export default function MegaslidePagina4({
                     width: '100%',
                     boxSizing: 'border-box',
                     marginBottom: '8px',
+                    transform: isLandscapeTablet ? 'translateY(-10px)' : undefined,
                   }}>
                     {['rebuts', 'enviats'].map((tab) => {
                       const isActive = activeMessageTab === tab;
@@ -783,12 +787,13 @@ export default function MegaslidePagina4({
                   textAlign: 'center',
                   padding: '6px 0',
                   flexShrink: 0,
+                  transform: isLandscapeTablet ? 'translateY(-3px)' : undefined,
                 }}>
                   Compte
                 </div>
                 {!isLoggedIn ? (
-                  <div style={{ flex: '0.390', marginTop: '7px', paddingTop: '2px' }}>
-                    <table style={{
+                  <div style={{ flex: '0.390', marginTop: '7px', paddingTop: '2px', transform: isLandscapeTablet ? 'scale(0.85)' : undefined, transformOrigin: 'top center' }}>
+                    <table data-page4-account-fields style={{
                       width: 'calc(100% + 11px)',
                       marginLeft: '-2px',
                       marginTop: '3px',
@@ -797,15 +802,15 @@ export default function MegaslidePagina4({
                       border: 'none',
                     }}>
                       <thead>
-                        <tr>
+                        <tr style={{ transform: isLandscapeTablet ? 'translateY(-10px)' : undefined }}>
                           <th style={{ ...HEAD, fontSize: '7pt', textAlign: 'center', padding: '1px 4px 4px', border: 'none' }}>Dades de contacte</th>
                           <th style={{ ...HEAD, fontSize: '7pt', textAlign: 'center', padding: '1px 4px 4px', border: 'none' }}>Dades d'enviament</th>
                         </tr>
                       </thead>
-                      <tbody>
+                      <tbody style={{ transform: isLandscapeTablet ? 'translateY(-10px)' : undefined }}>
                         <tr>
                           <td style={{ padding: '2px 4px 2.5px', border: 'none' }}><TransparentInput placeholder="Nom" defaultValue="" style={{ fontSize: '10pt' }} /></td>
-                          <td style={{ padding: '2px 4px 2.5px', border: 'none' }}><div style={{ display: 'flex', gap: '4px' }}><TransparentInput placeholder="Carrer" defaultValue="" style={{ fontSize: '10pt', flex: 1 }} /><TransparentInput placeholder="Nombre" defaultValue="" style={{ fontSize: '10pt', width: '38%' }} /></div></td>
+                          <td style={{ padding: '2px 4px 2.5px', border: 'none' }}><div style={{ display: 'flex', gap: '4px' }}><TransparentInput placeholder="Carrer" defaultValue="" style={{ fontSize: '10pt', flex: 1 }} /><TransparentInput placeholder="Nombre" defaultValue="" style={{ fontSize: '10pt', width: isLandscapeTablet ? '45%' : '38%' }} /></div></td>
                         </tr>
                         <tr>
                           <td style={{ padding: '2px 4px 2.5px', border: 'none' }}><TransparentInput placeholder="eCorreu" defaultValue="" style={{ fontSize: '10pt' }} /></td>
@@ -841,8 +846,8 @@ export default function MegaslidePagina4({
                     </table>
                   </div>
                 ) : (
-                <div style={{ flex: '0.390', marginTop: '7px', paddingTop: '2px' }}>
-                  <table style={{
+                <div style={{ flex: '0.390', marginTop: '7px', paddingTop: '2px', transform: isLandscapeTablet ? 'scale(0.85)' : undefined, transformOrigin: 'top center' }}>
+                  <table data-page4-account-fields style={{
                     width: 'calc(100% + 11px)',
                     marginLeft: '-2px',
                     marginTop: '3px',
@@ -851,15 +856,15 @@ export default function MegaslidePagina4({
                     border: 'none',
                   }}>
                     <thead>
-                      <tr>
+                      <tr style={{ transform: isLandscapeTablet ? 'translateY(-10px)' : undefined }}>
                         <th style={{ ...HEAD, fontSize: '7pt', textAlign: 'center', padding: '1px 4px 4px', border: 'none' }}>Dades de contacte</th>
                         <th style={{ ...HEAD, fontSize: '7pt', textAlign: 'center', padding: '1px 4px 4px', border: 'none' }}>Dades d'enviament</th>
                       </tr>
                     </thead>
-                    <tbody>
+                    <tbody style={{ transform: isLandscapeTablet ? 'translateY(-10px)' : undefined }}>
                       <tr>
                         <td style={{ padding: '2px 4px 2.5px', border: 'none' }}><TransparentInput ref={nameRef} placeholder="Nom" defaultValue={displayProfile?.full_name || ''} error={missingFields.includes('full_name')} style={{ fontSize: '10pt' }} /></td>
-                        <td style={{ padding: '2px 4px 2.5px', border: 'none' }}><div style={{ display: 'flex', gap: '4px' }}><TransparentInput ref={streetRef} placeholder="Carrer" defaultValue={streetName} error={missingFields.includes('street')} onBlur={handleStreetBlur} style={{ fontSize: '10pt', flex: 1 }} /><TransparentInput ref={streetNumberRef} placeholder="Nombre" defaultValue={streetNumber} error={missingFields.includes('street_number')} style={{ fontSize: '10pt', width: '38%' }} /></div></td>
+                        <td style={{ padding: '2px 4px 2.5px', border: 'none' }}><div style={{ display: 'flex', gap: '4px' }}><TransparentInput ref={streetRef} placeholder="Carrer" defaultValue={streetName} error={missingFields.includes('street')} onBlur={handleStreetBlur} style={{ fontSize: '10pt', flex: 1 }} /><TransparentInput ref={streetNumberRef} placeholder="Nombre" defaultValue={streetNumber} error={missingFields.includes('street_number')} style={{ fontSize: '10pt', width: isLandscapeTablet ? '45%' : '38%' }} /></div></td>
                       </tr>
                       <tr>
                         <td style={{ padding: '2px 4px 2.5px', border: 'none' }}><TransparentInput ref={emailRef} placeholder="eCorreu" defaultValue={user?.email || ''} style={{ fontSize: '10pt' }} /></td>
@@ -897,7 +902,7 @@ export default function MegaslidePagina4({
                 )}
                 <div style={{ flex: 1 }} />
                 {/* Desa button — same size and Y position as bloc 2 buttons */}
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '4px', height: '9%', flexShrink: 0, position: 'relative', top: isLandscapeTablet ? '0px' : (isPortraitTablet ? '-3px' : '7px'), marginRight: '-9px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '4px', height: '9%', flexShrink: 0, position: 'relative', top: isLandscapeTablet ? '-35px' : (isPortraitTablet ? '-3px' : '7px'), marginRight: '-9px' }}>
                   <div />
                   <button
                     onClick={handleSignOut}
@@ -939,6 +944,7 @@ export default function MegaslidePagina4({
                   </button>
                 </div>
               </div>
+            </div>
             </div>
           </div>
         </div>

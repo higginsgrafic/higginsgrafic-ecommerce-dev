@@ -145,7 +145,7 @@ export default function MegaMenuPanel({
   const handleP1ContentBottom = useCallback((px) => {
     setP1ContentBottomPx((prev) => (prev != null && Math.abs(prev - px) < 0.5 ? prev : px));
   }, []);
-  const matchesPage1Height = megaPage === 1 || megaPage === 2;
+  const matchesPage1Height = megaPage === 1 || megaPage === 2 || megaPage === 3 || megaPage === 4;
   const guardHeightPx = isPortraitTablet
     ? '269px'
     : matchesPage1Height && p1ContentBottomPx != null && !paymentFillsScreen
@@ -382,6 +382,7 @@ export default function MegaMenuPanel({
                 <Suspense fallback={null}>
                   <MegaslidePagina4
                     isPortraitTablet={isPortraitTablet}
+                    isLandscapeTablet={isLandscapeTablet}
                     orders={orders}
                     adminEmail={adminEmail}
                     acordioExpandedPage4={acordioExpandedPage4}
