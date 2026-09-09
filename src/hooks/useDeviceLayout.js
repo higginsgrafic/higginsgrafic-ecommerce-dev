@@ -48,7 +48,7 @@ export default function useDeviceLayout() {
     const isPortraitTablet =
       vw >= 768 && vw <= 1024 && vh > vw;
     const isLandscapeTablet =
-      vw >= 768 && vh < vw && vh > 0 && vh <= 1100;
+      isTouch && vw >= 768 && vh < vw && vh > 0 && vh <= 1100;
     const isDesktop =
       (!isPortraitTablet && !isLandscapeTablet && vw >= 1024);
 
