@@ -3230,7 +3230,7 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
             borderTop: '1px solid #E6E8EC',
           }}
         >
-          <nav className="flex items-center justify-center gap-6 px-10 py-2 flex-nowrap overflow-x-auto" style={{ scrollbarWidth: 'none', marginTop: '30px' }}>
+          <nav className="flex items-center justify-center gap-6 px-10 py-2 flex-nowrap overflow-x-auto" style={{ scrollbarWidth: 'none', marginTop: '10px' }}>
             {resolvedNav.map((item) => {
               const open = active === item.id && megaPage === 1;
               return (
@@ -3275,7 +3275,7 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
           portalContainer || document.body
         )}
 
-      {canUseDom && active && (
+      {canUseDom && active && ReactDOM.createPortal(
         <button
           onClick={(e) => {
             if (lockDragRef.current.dragged) {
@@ -3285,7 +3285,7 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
             setMegaLocked((v) => !v);
           }}
           onPointerDown={(e) => {
-            if (!isPortraitTablet) return;
+            if (!isPortraitTablet || megaPage === 3) return;
             const btn = e.currentTarget;
             const startX = e.clientX;
             const viewport = document.querySelector('[data-mega-page-viewport="1"]');
@@ -3312,18 +3312,20 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
           className="fixed z-[10001] left-1/2 -translate-x-1/2 flex h-10 w-10 items-center justify-center rounded-full border border-border bg-background shadow-lg transition-colors hover:bg-muted"
           style={{
             top: lockBtnTop != null ? `${lockBtnTop + 8}px` : '16px',
-            transform: isPortraitTablet
+            transform: isPortraitTablet && megaPage !== 3
               ? `translateX(calc(-50% + ${(lockBtnScrollProgress - 0.5) * 160}px))`
               : undefined,
             transition: 'transform 120ms ease-out, background-color 150ms',
-            cursor: isPortraitTablet ? 'grab' : 'pointer',
-            touchAction: isPortraitTablet ? 'none' : undefined,
+            cursor: isPortraitTablet && megaPage !== 3 ? 'grab' : 'pointer',
+            touchAction: isPortraitTablet && megaPage !== 3 ? 'none' : undefined,
+            zIndex: 100001,
           }}
           title={megaLocked ? 'Desbloca el megaslide' : 'Bloca el megaslide'}
           aria-label={megaLocked ? 'Desbloca el megaslide' : 'Bloca el megaslide'}
         >
           {megaLocked ? <Lock size={18} /> : <Unlock size={18} />}
-        </button>
+        </button>,
+        document.body
       )}
 
       <MegaMenuPanel

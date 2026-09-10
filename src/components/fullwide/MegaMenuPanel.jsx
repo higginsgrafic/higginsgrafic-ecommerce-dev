@@ -146,9 +146,11 @@ export default function MegaMenuPanel({
     setP1ContentBottomPx((prev) => (prev != null && Math.abs(prev - px) < 0.5 ? prev : px));
   }, []);
   const matchesPage1Height = megaPage === 1 || megaPage === 2 || megaPage === 3 || megaPage === 4;
-  const guardHeightPx = isPortraitTablet
+  const guardHeightPx = paymentFillsScreen
+    ? guardHeightPxDefault
+    : isPortraitTablet
     ? '269px'
-    : matchesPage1Height && p1ContentBottomPx != null && !paymentFillsScreen
+    : matchesPage1Height && p1ContentBottomPx != null
     ? `${Math.max(0, Math.round(p1ContentBottomPx + P1_STRIPE_BOTTOM_GAP - 64))}px`
     : guardHeightPxDefault;
 
