@@ -168,7 +168,7 @@ export default function ProductDetailTemplate({ product }) {
             justifySelf: 'start',
             padding: 0,
             margin: 0,
-            transform: 'translateY(-10px)',
+            transform: 'translateY(-10px) translateX(20px)',
           }}
         >
           <Breadcrumbs

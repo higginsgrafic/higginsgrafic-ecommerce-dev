@@ -246,7 +246,7 @@ export default function TambeRail({
     return [...base.slice(-CLONE_COUNT), ...base, ...base.slice(0, CLONE_COUNT)];
   }, [totalCards]);
 
-  const left1 = stabilizeInitialLayout ? 0 : (bgMetrics ? bgMetrics.devLeft : 0);
+  const left1 = stabilizeInitialLayout ? 0 : (bgMetrics ? bgMetrics.devLeft + 20 : 20);
   const fallbackBeltWidth = stabilizeInitialLayout && typeof window !== 'undefined'
     ? stabilizedViewportWidth || Math.max(320, window.innerWidth / stabilizedViewportScale)
     : CARD_W * visibleCards;
@@ -255,9 +255,9 @@ export default function TambeRail({
   //   cardW = (belt2Width - (visibleCards - 1) * gutterX) / visibleCards
   //   stepPx = cardW + gutterX
   const PAUTA_GUTTER_X = stabilizedGutterX ?? 22.5;
-  const cardW = Math.max(80, (beltWidth - (visibleCards - 1) * PAUTA_GUTTER_X) / visibleCards);
+  const cardW = Math.max(80, (beltWidth - (visibleCards - 1) * PAUTA_GUTTER_X) / visibleCards * (stabilizeInitialLayout ? 1 : 0.94));
   const stepPx = cardW + PAUTA_GUTTER_X;
-  const viewportWidthPx = useMemo(() => Math.max(0, beltWidth), [beltWidth]);
+  const viewportWidthPx = useMemo(() => Math.max(0, stabilizeInitialLayout ? beltWidth : Math.min(beltWidth, cardW * visibleCards + (visibleCards - 1) * PAUTA_GUTTER_X)), [beltWidth, cardW, visibleCards, PAUTA_GUTTER_X, stabilizeInitialLayout]);
   const arrowsLeftPx = useMemo(() => {
     const buttonsW = (44 * 2) + 10;
     const inset = 20;
@@ -386,7 +386,7 @@ export default function TambeRail({
         <div
           className="w-full"
           data-container="cards-row"
-          style={{ paddingTop: stabilizeInitialLayout ? '56px' : '40px', paddingBottom: stabilizeInitialLayout ? 0 : '40px' }}
+          style={{ paddingTop: stabilizeInitialLayout ? '56px' : '100px', paddingBottom: stabilizeInitialLayout ? 0 : '40px' }}
         >
           <div style={{ position: 'relative', minHeight: `${viewportHeightPx}px` }}>
             <div

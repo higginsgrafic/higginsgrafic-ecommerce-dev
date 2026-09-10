@@ -196,7 +196,7 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
   // columnes fan la mateixa alçada de fila, i el Telèfon és l'últim camp de
   // l'enviament. D_BUTTON_LIFT és l'únic número per afinar-ho (0 = clavats,
   // positiu = baixa el botó; el peu el segueix perquè penja d'ell).
-  const D_BUTTON_LIFT = 0;
+  const D_BUTTON_LIFT = 18;
   // Termes clavats al cap del camp de l'Email. No és un número fix: els 8 blocs
   // de l'enviament fan 34px i es reparteixen amb `space-between` dins la fila,
   // i la fila fa el que deixa la franja (294px amb finestra ≥1440, 290 a 1366,
@@ -206,13 +206,13 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
   // (positiu = baixa els termes, negatiu = puja'ls). 0 = tall geomètric del cap
   // de l'Email; ara és a 5 (baixats 5px, 2026-09-05), que és just el desplaçament
   // que ell va validar a l'horitzontal (vegeu TERMS_TOP).
-  const D_TERMS_ADJ = 5;
+  const D_TERMS_ADJ = 15;
   const D_TERMS_TOP = `calc(${6 * 34}px + (100% - ${8 * 34}px) * 6 / 7 + ${D_TERMS_ADJ}px)`;
   // "Necessites factura?": va com a marge de dalt del seu bloc, o sigui que es
   // mesura des del peu de la capsa de targeta. 14px originals de creació pujats
   // 10 (2026-09-05). Únic número a retocar. Com que a l'escriptori els termes i
   // el botó ja pengen absoluts, moure-la no els mogui ni un píxel.
-  const D_INVOICE_TOP = 14 - 10;
+  const D_INVOICE_TOP = 14 - 20;
   // La capsa dels dos camps (empresa + CIF) seu, a la posició de creació, just
   // després dels 8px de joc (rowGap) que separen del retol "Necessites factura?":
   // cap de la capsa a 21 + 8 = 29px damunt del bloc. Aquest número la puja sobre
@@ -485,7 +485,7 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
   );
 
   return (
-    <div style={{ width:'100%', height:'100%', position: isTabletRecipe ? 'relative' : undefined, display:'flex', flexDirection:'column', justifyContent:'center', fontFamily:'Roboto Condensed, sans-serif', color:'#4A5057', overflow:'visible', padding:0, paddingBottom: liftPad, margin:0 }}>
+    <div style={{ width:'100%', height:'100%', position: isTabletRecipe ? 'relative' : undefined, display:'flex', flexDirection:'column', justifyContent:'center', fontFamily:'Roboto Condensed, sans-serif', color:'#4A5057', overflow:'visible', padding:0, paddingBottom: liftPad, marginTop: isTabletRecipe ? 0 : '-30px' }}>
       {isTabletRecipe && (
         <span style={{ ...HEAD, fontSize:'18pt', fontWeight:600, position:'absolute', top:titleY, left: isPortraitTablet ? P_SHIFT_X : SHIFT_X, transform:'translateY(-50%)' }}>PAGAMENT</span>
       )}
@@ -564,13 +564,13 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
                 penja del seu bloc, no de la banda de dalt. */}
             {isPortraitTablet && <span style={{ fontSize:'12pt', fontWeight:500, marginBottom:`${P_TITLE_GAP}px` }}>Dades de pagament</span>}
             {/* Pagament */}
-            <div style={{ display:'grid', rowGap: isNarrowForm ? '2px' : '8px' }}>
-              <div style={{ border:'1px solid #E6E8EC', borderRadius:'6px', background:'#FFFFFF', overflow:'hidden' }}>
-                <div style={{ padding: isNarrowForm ? '6px 10px' : '10px 12px', borderBottom:'1px solid #EEF0F3', display:'flex', alignItems:'center', gap:'8px', fontSize: isNarrowForm ? '9pt' : '11pt', fontWeight:500, color:'#4A5057' }}>
+            <div style={{ display:'grid', rowGap: isNarrowForm ? '2px' : '8px', marginTop: isTabletRecipe ? undefined : '-10px' }}>
+              <div style={{ background:'#FFFFFF', overflow:'hidden' }}>
+                <div style={{ padding: isNarrowForm ? '6px 10px' : '10px 12px', display:'flex', alignItems:'center', gap:'8px', fontSize: isNarrowForm ? '9pt' : '11pt', fontWeight:500, color:'#4A5057' }}>
                   <span style={{ width:'13px', height:'10px', border:'1px solid #4A5057', borderRadius:'2px', display:'inline-block' }} />
                   <span>Targeta</span>
                 </div>
-                <div style={{ padding: isNarrowForm ? '6px 10px' : '10px 12px', display:'grid', rowGap: isNarrowForm ? '2px' : '8px' }}>
+                <div style={{ padding: isNarrowForm ? '6px 10px' : '10px 12px', display:'grid', rowGap: isNarrowForm ? '2px' : '8px', marginTop: isTabletRecipe ? undefined : '-20px' }}>
                   <div style={{ border:'1px solid #D8DDE3', borderRadius:'4px', overflow:'hidden', background:'#FFFFFF', padding: isNarrowForm ? '6px 10px' : '10px 12px' }}>
                     <CardNumberElement options={{ style: { base: { color:'#4A5057', fontFamily:'Roboto Condensed, sans-serif', fontSize: isNarrowForm ? '11px' : '14px', '::placeholder': { color:'#98A2B4' } }, invalid: { color:'#ef4444' } } }} />
                   </div>

@@ -133,6 +133,7 @@ function PdpPage() {
   const productRowRef = useRef(null);
   const [tdpAvailableHeight, setTdpAvailableHeight] = useState(null);
   const [beltWidth, setBeltWidth] = useState(null);
+  const [beltLeft, setBeltLeft] = useState(null);
   const [isPortraitTablet, setIsPortraitTablet] = useState(
     typeof window !== 'undefined'
       && window.innerWidth >= 768
@@ -200,6 +201,7 @@ function PdpPage() {
       const xR = readCss('--belt2-xR');
       if (Number.isFinite(xL) && Number.isFinite(xR) && xR > xL) {
         setBeltWidth(xR - xL);
+        setBeltLeft(xL);
       }
     };
     measure();
@@ -316,6 +318,13 @@ function PdpPage() {
     : (isLandscapeTablet ? 5 : 22.5);
   const colGap = `${PAUTA_GUTTER_X}px`;
   const tdpGridTemplate = `repeat(4, 1fr)`;
+  // Aligna el right del fons de la imatge de producte amb el right de la 3a targeta
+  // del rail d'Altres històries. El rail fa servir targetes al 94% + 20px offset.
+  const railCardW = beltWidth != null
+    ? Math.max(80, (beltWidth - 3 * PAUTA_GUTTER_X) / 4 * (isPortraitTablet ? 1 : 0.94))
+    : null;
+  const railGridW = railCardW != null ? 4 * railCardW + 3 * PAUTA_GUTTER_X : null;
+  const railLeftOffset = isPortraitTablet ? 0 : 20;
   const tdpBaseHeight = isCompactTablet ? 280 : 360;
   const tdpFitScale = isLandscapeTablet && Number.isFinite(tdpAvailableHeight)
     ? Math.min(1, tdpAvailableHeight / tdpBaseHeight)
@@ -354,7 +363,7 @@ function PdpPage() {
         }}
       >
         {!isTablet && (
-          <div style={{ position: 'absolute', top: 0, left: '16px', zIndex: 10 }}>
+          <div style={{ position: 'absolute', top: 0, left: '36px', zIndex: 10 }}>
             <Breadcrumbs
               items={[
                 { label: COLLECTION_NAME, link: `/${COLLECTION_SLUG}` },
@@ -398,9 +407,9 @@ function PdpPage() {
                 : (isPortraitTablet ? 'repeat(3, 1fr)' : tdpGridTemplate),
               gap: colGap,
               alignItems: 'stretch',
-              width: tdpFitScale < 1 ? `${100 / tdpFitScale}%` : (isPortraitTablet && portraitRailViewportWidth ? `${portraitRailViewportWidth}px` : (beltWidth ? `${beltWidth}px` : '100%')),
+              width: tdpFitScale < 1 ? `${100 / tdpFitScale}%` : (isPortraitTablet && portraitRailViewportWidth ? `${portraitRailViewportWidth}px` : (railGridW ? `${railGridW}px` : (beltWidth ? `${beltWidth}px` : '100%'))),
               height: `${tdpBaseHeight}px`,
-              margin: beltWidth ? '0 auto' : undefined,
+              margin: railGridW ? `0 0 0 ${railLeftOffset}px` : (beltWidth ? '0 auto' : undefined),
               transform: tdpFitScale < 1 ? `scale(${tdpFitScale})` : undefined,
               transformOrigin: 'top left',
             }}
