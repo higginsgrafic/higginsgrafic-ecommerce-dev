@@ -14,11 +14,13 @@ export default function MegaslidePagina3({
   touchMegaPublicActivity,
   accordionPautaScale,
 }) {
+  const pageHeight = isPortraitTablet && !acordioExpanded ? '269px' : '100%';
+
   return (
-    <div style={{ width: '25%', flexShrink: 0, display: 'block', height: isPortraitTablet ? '269px' : '100%', position: 'relative', overflow: isPortraitTablet ? 'hidden' : 'visible', boxShadow: isPortraitTablet ? 'inset 8px 0 0 #ffffff, inset -8px 0 0 #ffffff' : undefined }}>
+    <div style={{ width: '25%', flexShrink: 0, display: 'block', height: pageHeight, position: 'relative', overflow: isPortraitTablet ? 'hidden' : 'visible', boxShadow: isPortraitTablet ? 'inset 8px 0 0 #ffffff, inset -8px 0 0 #ffffff' : undefined }}>
       <div data-mega-page-viewport="3" style={{
         width: '100%',
-        height: isPortraitTablet ? '269px' : '100%',
+        height: pageHeight,
         display: 'flex',
         justifyContent: isPortraitTablet ? 'flex-start' : 'center',
         overflowX: isPortraitTablet ? 'hidden' : 'visible',

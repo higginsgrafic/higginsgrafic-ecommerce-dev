@@ -87,18 +87,48 @@ function CistellComandaContent({ cartItems, setCartItems, onCloseMegaSlide, onFi
   // rowIndex 0..N i només canvia el contingut (text, samarretes,
   // dibuixos) que hi apareix a sobre quan l'usuari fa scroll.
   const FIRST_VIEWPORT_ROW = 0;
-  const LAST_VIEWPORT_ROW = 14;
+  const LAST_VIEWPORT_ROW = isTablet ? 11 : 15;
   // Cada ítem ocupa 2 files de contingut (sense fila buida de separació).
   const ITEM_STRIDE = 2 * ROW_H - 4;
   const VISIBLE_HEIGHT = (LAST_VIEWPORT_ROW - FIRST_VIEWPORT_ROW) * ROW_H - V_GUTTER;
-  const VISIBLE_ITEMS = Math.max(1, Math.floor((VISIBLE_HEIGHT + V_GUTTER) / ITEM_STRIDE));
+  const VISIBLE_ITEMS = Math.max(1, Math.floor((VISIBLE_HEIGHT + V_GUTTER) / ITEM_STRIDE)) - 1;
   const [scrollRow, setScrollRow] = useState(0);
   const maxScrollRow = Math.max(0, CART_ITEMS.length - VISIBLE_ITEMS);
-  const handleCartWheel = (e) => {
-    e.preventDefault();
+  const cartViewportRef = useRef(null);
+  const cartTouchRef = useRef(null);
+  useEffect(() => {
+    const viewport = cartViewportRef.current;
+    if (!viewport) return undefined;
+    const handleWheel = (e) => {
+      if (Math.abs(e.deltaY) <= Math.abs(e.deltaX)) return;
+      e.preventDefault();
+      e.stopPropagation();
+      const direction = e.deltaY > 0 ? 1 : -1;
+      setScrollRow(prev => Math.max(0, Math.min(maxScrollRow, prev + direction)));
+    };
+    viewport.addEventListener('wheel', handleWheel, { passive: false });
+    return () => viewport.removeEventListener('wheel', handleWheel);
+  }, [maxScrollRow, CART_ITEMS.length]);
+  const handleCartTouchStart = (e) => {
+    const touch = e.touches[0];
+    if (!touch) return;
+    cartTouchRef.current = { x: touch.clientX, y: touch.clientY };
+  };
+  const handleCartTouchMove = (e) => {
+    const start = cartTouchRef.current;
+    const touch = e.touches[0];
+    if (!start || !touch) return;
+    const deltaX = touch.clientX - start.x;
+    const deltaY = touch.clientY - start.y;
+    if (Math.abs(deltaY) <= Math.abs(deltaX) || Math.abs(deltaY) < ROW_H / 2) return;
+    if (e.cancelable) e.preventDefault();
     e.stopPropagation();
-    const direction = e.deltaY > 0 ? 1 : -1;
+    const direction = deltaY < 0 ? 1 : -1;
     setScrollRow(prev => Math.max(0, Math.min(maxScrollRow, prev + direction)));
+    cartTouchRef.current = { x: touch.clientX, y: touch.clientY };
+  };
+  const handleCartTouchEnd = () => {
+    cartTouchRef.current = null;
   };
   const changeQty = (idx, delta) => {
     setCartItems(prev => prev.map((it, j) => j === idx ? { ...it, qty: Math.max(1, it.qty + delta) } : it));
@@ -169,7 +199,7 @@ function CistellComandaContent({ cartItems, setCartItems, onCloseMegaSlide, onFi
     return () => window.removeEventListener('resize', onResize);
   }, []);
   useEffect(() => {
-    if (!isTablet || isEmpty) return;
+    if (isEmpty) return;
     let raf = 0;
     const measure = () => {
       const btn = finalizeBtnRef.current;
@@ -227,14 +257,20 @@ function CistellComandaContent({ cartItems, setCartItems, onCloseMegaSlide, onFi
       <>
       {/* Finestra de scroll vertical de les línies del cistell (sense barra) */}
       <div
-        onWheel={handleCartWheel}
+        ref={cartViewportRef}
+        onTouchStart={handleCartTouchStart}
+        onTouchMove={handleCartTouchMove}
+        onTouchEnd={handleCartTouchEnd}
+        onTouchCancel={handleCartTouchEnd}
         style={{
           position: 'absolute',
-          top: `${TOP_OFFSET}px`,
+          top: `${isPortraitTablet ? TOP_OFFSET : TOP_OFFSET - ROW_H - 20}px`,
           left: isNarrowCart ? '0' : `calc(50% - ${ROW_W / 2}px)`,
           width: `${ROW_W}px`,
           height: `${VISIBLE_HEIGHT}px`,
           overflow: 'hidden',
+          touchAction: 'pan-x',
+          overscrollBehavior: 'contain',
           zIndex: 2,
         }}
       >
@@ -488,112 +524,6 @@ function CistellComandaContent({ cartItems, setCartItems, onCloseMegaSlide, onFi
         );
       })()}
 
-      {/* Totals — SUBTOTAL / TRANSPORT / IVA / TOTAL, just a sobre de la botonera */}
-      {!isTablet && (() => {
-        const totalQty = CART_ITEMS.reduce((acc, it) => acc + (it.qty || 1), 0);
-        const itemTotal = CART_ITEMS.reduce((acc, it) => {
-          const unit = parseFloat(String(it.price).replace('€','').replace(/\s/g,'').replace(',','.'));
-          if (Number.isNaN(unit)) return acc;
-          return acc + unit * (it.qty || 1);
-        }, 0);
-        const transport = zoneInfo.cost;
-        const grossTotal = itemTotal;
-        const baseImponible = (grossTotal - transport) / 1.21;
-        const iva = (grossTotal - transport) - baseImponible;
-        const subtotal = baseImponible;
-        const fmt = (n) => n.toFixed(2).replace('.', ',') + '€';
-        // Només mostrem TOT PLEGAT FA. SUBTOTAL/TRANSPORT/IVA
-        // s'han eliminat per alliberar 2 files que ara ocupa la
-        // llista d'ítems del cistell.
-        const rows = [
-          { label: 'TOT PLEGAT FA', amount: fmt(grossTotal), strong: true  },
-        ];
-        // Mantenim els valors calculats per si calen més endavant
-        // (lint-friendly: marquem-los com a usats).
-        void subtotal; void transport; void iva;
-        // Fila 19 de la pauta (1-indexada), contingut només a la col 4.
-        const TOTALS_FIRST_ROW = 12;
-        return (
-          <>
-            <div style={{
-              position: 'absolute',
-              bottom: `0px`,
-              left: `calc(50% - ${TABLE_WIDTH / 2}px + ${SLIDE_OFFSET_X}px)`,
-              width: `${TABLE_WIDTH + COL4_EXTRA}px`,
-              height: `${rows.length * 2 * ROW_H - V_GUTTER - 3}px`,
-              background: 'linear-gradient(90deg, transparent 0%, #F0F2F5 100%)',
-              transform: 'none',
-              pointerEvents: 'none',
-              zIndex: 1,
-            }} />
-            {rows.map((r, k) => {
-          const rowBottom = (rows.length - 1 - k) * ROW_H;
-          const [intPart, decPart] = r.amount.replace('€','').split(',');
-          const labelStyle = {
-            fontFamily: 'Oswald, sans-serif',
-            fontWeight: r.strong ? 200 : 300,
-            fontSize: r.strong ? '14.553pt' : '13.0977pt',
-            color: r.strong ? '#474F59' : '#99A3B5',
-            letterSpacing: '0.4px',
-            textTransform: 'uppercase',
-            lineHeight: 1,
-          };
-          const amountStyle = {
-            fontFamily: 'Oswald, sans-serif',
-            fontWeight: r.strong ? 400 : 200,
-            fontSize: r.strong ? '16.0083pt' : '13.0977pt',
-            color: r.strong ? '#474F59' : '#99A3B5',
-            letterSpacing: '0.6px',
-            whiteSpace: 'nowrap',
-            fontVariantNumeric: 'tabular-nums',
-            fontFeatureSettings: '"tnum" 1',
-            lineHeight: 1,
-            textDecoration: r.label === 'TRANSPORT' ? 'line-through' : 'none',
-            textDecorationColor: r.label === 'TRANSPORT' ? '#475059' : undefined,
-            textDecorationThickness: r.label === 'TRANSPORT' ? '1.5px' : undefined,
-          };
-          return (
-            <div key={r.label} style={{
-              position: 'absolute',
-              bottom: `${rowBottom}px`,
-              left: `calc(50% - ${TABLE_WIDTH / 2}px + ${SLIDE_OFFSET_X}px)`,
-              width: `${TABLE_WIDTH + COL4_EXTRA}px`,
-              height: `${2 * ROW_H - V_GUTTER}px`,
-              display: 'grid',
-              gridTemplateColumns: `${COL_OUTER}px ${COL2}px ${COL2}px ${COL_OUTER}px`,
-              columnGap: `${SLIDE_GAP}px`,
-              boxSizing: 'border-box',
-              zIndex: 2,
-            }}>
-              <div />
-              <div />
-              <div style={{ display: 'grid', gridTemplateColumns: `${SLOT_W}px ${SLOT_W}px`, columnGap: `${SLIDE_GAP}px`, alignItems: 'center', justifyItems: 'center' }}>
-                {/* L'indicador "N PRODUCTES" s'ha eliminat per
-                    petició de l'usuari: la fila de TOT PLEGAT FA
-                    queda sola al peu de la llista. */}
-                <span />
-                <span />
-              </div>
-              {/* Col 4: mateix patró que la fila de preu de l'ítem */}
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <div style={{ display: 'grid', gridTemplateColumns: 'auto 40px 40px 70px 70px', alignItems: 'center', columnGap: '8px' }}>
-                  <span style={{ position: 'relative', marginRight: '24px', transform: 'translateX(80px)' }}>
-                    <span style={{ ...HEAD, fontSize: '10.1871pt', fontWeight: 400, color: '#7D8895', visibility: 'hidden' }}>TOT PLEGAT FA</span>
-                    <span style={{ ...labelStyle, position: 'absolute', right: 0, top: '50%', transform: 'translateY(-50%)', textAlign: 'right', whiteSpace: 'nowrap' }}>{r.label}</span>
-                  </span>
-                  <span />
-                  <span />
-                  <span style={{ ...amountStyle, justifySelf: 'end', width: '70px', textAlign: 'right', transform: 'translateX(-36px)' }}>{intPart},</span>
-                  <span style={{ ...amountStyle, justifySelf: 'start', width: '70px', marginLeft: '-8px', transform: 'translateX(-36px)' }}>{decPart}€</span>
-                </div>
-              </div>
-            </div>
-          );
-            })}
-          </>
-        );
-      })()}
-
       {/* Botonera central (REVERTEIX / CANCEL·LA / DESA) — alineada amb l'última fila de la taula */}
       <div style={{
         position: 'absolute',
@@ -602,12 +532,12 @@ function CistellComandaContent({ cartItems, setCartItems, onCloseMegaSlide, onFi
         transform: 'translate(-50%, 0px)',
         width: `${TABLE_WIDTH}px`,
         display: 'grid',
-        visibility: isTablet ? 'hidden' : 'visible',
+        visibility: 'hidden',
         gridTemplateColumns: 'repeat(4, 1fr)',
         columnGap: `${GUTTER}px`,
         zIndex: 4,
       }}>
-        {isTablet && !isEmpty && (() => {
+        {!isEmpty && (() => {
           const itemTotal = CART_ITEMS.reduce((acc, it) => {
             const unit = parseFloat(String(it.price).replace('€','').replace(/\s/g,'').replace(',','.'));
             if (Number.isNaN(unit)) return acc;
@@ -616,11 +546,12 @@ function CistellComandaContent({ cartItems, setCartItems, onCloseMegaSlide, onFi
           const fmt = (n) => n.toFixed(2).replace('.', ',') + '€';
           const renderOverlay = (orientation) => {
             const isPortrait = orientation === 'portrait';
+            const isDesktop = orientation === 'desktop';
             return createPortal((
               <div style={{
                 position: 'fixed',
-                top: overlayTop != null ? `${overlayTop}px` : '50%',
-                left: overlayLeft != null ? `${overlayLeft - (isPortrait ? 100 : 0)}px` : '50vw',
+                top: overlayTop != null ? `${overlayTop + (isPortrait ? 26 : 25)}px` : `calc(50% + ${isPortrait ? 26 : 25}px)`,
+                left: overlayLeft != null ? `${overlayLeft - (isPortrait ? 106 : 0) + 5}px` : 'calc(50vw + 5px)',
                 transform: 'translate(-50%, -50%)',
                 display: 'flex',
                 alignItems: 'center',
@@ -630,7 +561,7 @@ function CistellComandaContent({ cartItems, setCartItems, onCloseMegaSlide, onFi
                 backgroundColor: 'rgba(244, 246, 248, 0.95)',
                 borderRadius: '6px',
                 boxShadow: '0 2px 12px rgba(0,0,0,0.15)',
-                zIndex: 100000,
+                zIndex: 10000,
                 pointerEvents: 'auto',
                 whiteSpace: 'nowrap',
               }}>
@@ -685,6 +616,7 @@ function CistellComandaContent({ cartItems, setCartItems, onCloseMegaSlide, onFi
             <>
               {isPortraitTablet && renderOverlay('portrait')}
               {isLandscapeTablet && renderOverlay('landscape')}
+              {!isTablet && renderOverlay('desktop')}
             </>
           );
         })()}

@@ -230,7 +230,7 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
   const liftPad = isLandscapeTablet
     ? `${CONJUNT_LIFT * 2}px`
     : (isPortraitTablet ? `${P_CONJUNT_LIFT * 2}px` : `${D_CONJUNT_LIFT * 2}px`);
-  const bodyH = isTabletRecipe ? undefined : `${D_BODY_H}px`;
+  const bodyH = isLandscapeTablet ? `${FORMS_H}px` : (isPortraitTablet ? undefined : `${D_BODY_H}px`);
   const groupW = isPortraitTablet ? P_GROUP_W : undefined;
   const groupX = isPortraitTablet ? P_SHIFT_X : undefined;
 
@@ -506,7 +506,7 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
       <div style={{ display:'grid', gridTemplateColumns: isPortraitTablet ? '1fr 1fr' : '1fr 1fr 1fr 1fr', columnGap:'24px', rowGap: isPortraitTablet ? `${P_ROW_GAP}px` : undefined, width: groupW, marginLeft: groupX, flex: '0 1 auto', height: bodyH, minHeight:0, transform: shiftColsX }}>
         {/* COL 1: Cistell + Totals */}
         <div style={{ display:'flex', flexDirection:'column', minHeight:0 }}>
-          <div style={{ flex:'1 1 auto', overflowY:'auto', minHeight:0 }}>
+          <div style={{ flex:'1 1 auto', overflowY:'auto', minHeight:0, maxHeight: isPortraitTablet ? '195px' : undefined }}>
             {activeItems.map((item, idx) => {
               const ip = parseFloat(String(item.price).replace('€','').replace(/\s/g,'').replace(',','.'))||0;
               const q = item.qty||1;
