@@ -2827,7 +2827,10 @@ function FullWideSlideHeader({
       if (demoManualEnabled) return;
       if (megaLocked) return;
       setActive(null);
-      setMobileOpen(false);
+      // NOTA: aquí hi havia `setMobileOpen(false)`, però aquest estat no
+      // existeix enlloc del fitxer (és una resta d'una refactorització).
+      // La crida llançava "ReferenceError: setMobileOpen is not defined"
+      // cada cop que es premia Escape.
     };
 
     window.addEventListener('keydown', onKeyDown);
