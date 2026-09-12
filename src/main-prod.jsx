@@ -17,7 +17,7 @@ import { AdminProvider } from '@/contexts/AdminContext';
 import { AdminToolsProvider } from '@/contexts/AdminToolsContext';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { GridDebugProvider } from '@/contexts/GridDebugContext';
-import AppProd from '@/AppProd';
+import App from '@/App';
 import '@/index.css';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
@@ -30,7 +30,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
               <ProductProvider>
                 <AdminToolsProvider>
                   <ToastProvider>
-                    <AppProd />
+                    <App />
                   </ToastProvider>
                 </AdminToolsProvider>
               </ProductProvider>
