@@ -1,7 +1,10 @@
 import React, { useEffect } from 'react';
 import SEO from '@/components/SEO';
+import useIsMobile from '@/hooks/useIsMobile';
+import ServiceDocument from '@/components/ServiceDocument';
 
 function AboutPage() {
+  const isMobile = useIsMobile();
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
@@ -46,6 +49,14 @@ function AboutPage() {
         url="/about"
       />
 
+      {isMobile ? (
+        <ServiceDocument
+          title="Higgins GRÀFIC"
+          updated="Dibuixos en petit format"
+          intro="La samarreta és l'últim bastió de la llibertat d'expressió."
+          sections={sections}
+        />
+      ) : (
       <div
         className="min-h-screen bg-white relative"
       >
@@ -149,6 +160,7 @@ function AboutPage() {
         <div className="h-[300px]" />
 
       </div>
+      )}
     </>
   );
 }

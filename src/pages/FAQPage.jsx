@@ -1,5 +1,7 @@
 import React, { useEffect } from 'react';
 import SEO from '@/components/SEO';
+import useIsMobile from '@/hooks/useIsMobile';
+import ServiceDocument from '@/components/ServiceDocument';
 import { Flag } from './ShippingPage';
 
 export const faqShippingZones = [
@@ -57,6 +59,8 @@ function FAQPage() {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
+
+  const isMobile = useIsMobile();
 
   const zones = faqShippingZones;
 
@@ -122,7 +126,15 @@ function FAQPage() {
         type="website"
         url="/faq"
       />
-
+      {isMobile ? (
+        <ServiceDocument
+          title="Preguntes Freqüents"
+          updated="Darrera actualització, juliol 2026"
+          intro="Aquí trobaràs respostes a les preguntes més freqüents sobre comandes, enviaments, devolucions, productes i sostenibilitat a Higgins GRÀFIC."
+          sections={sections}
+          closing="Aquesta FAQ està subjecta, obligatòriament, a la legislació espanyola i europea. Fer servir els nostres serveis equival a l'acceptació, de facto, d'aquesta informació."
+        />
+      ) : (
       <div
         className="min-h-screen bg-white relative"
       >
@@ -274,6 +286,7 @@ function FAQPage() {
         <div className="h-[300px]" />
 
       </div>
+      )}
     </>
   );
 }

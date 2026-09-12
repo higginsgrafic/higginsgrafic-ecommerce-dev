@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 const BRANCH = typeof __HG_GIT_BRANCH__ !== 'undefined' ? __HG_GIT_BRANCH__ : 'unknown';
 
@@ -17,7 +17,13 @@ function getBranchStyle(branch) {
 
 function BranchBadge() {
   const [hidden, setHidden] = useState(false);
-  if (hidden) return null;
+  const [isMobile, setIsMobile] = useState(() => typeof window !== 'undefined' ? window.innerWidth < 768 : false);
+  useEffect(() => {
+    const update = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener('resize', update);
+    return () => window.removeEventListener('resize', update);
+  }, []);
+  if (hidden || isMobile) return null;
   const { bg, border, label } = getBranchStyle(BRANCH);
 
   return (

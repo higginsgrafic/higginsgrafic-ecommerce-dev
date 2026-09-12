@@ -1,11 +1,15 @@
 import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import SEO from '@/components/SEO';
+import useIsMobile from '@/hooks/useIsMobile';
+import ServiceDocument from '@/components/ServiceDocument';
 
 function CookiePolicyPage() {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
+
+  const isMobile = useIsMobile();
 
   const sections = [
     {
@@ -89,7 +93,15 @@ function CookiePolicyPage() {
         type="website"
         url="/cookies"
       />
-
+      {isMobile ? (
+        <ServiceDocument
+          title="Política de Cookies"
+          updated="Darrera actualització, juliol 2026"
+          intro="Higgins GRÀFIC utilitza cookies per millorar l'experiència de navegació i oferir un servei de qualitat. Aquesta política explica quines cookies utilitzem, per què i com pots gestionar-les, en compliment amb la Llei 34/2002 de serveis de la societat de la informació i de comerç electrònic (LSSI) i el Reglament General de Protecció de Dades (RGPD)."
+          sections={sections}
+          closing="Aquesta Política de Cookies està obligatòriament subjecta a la legislació espanyola i europea. Fer servir els nostres serveis equival a l'acceptació, de facto, de la Política de Cookies."
+        />
+      ) : (
       <div
         className="min-h-screen bg-white relative"
       >
@@ -203,6 +215,7 @@ function CookiePolicyPage() {
         <div className="h-[300px]" />
 
       </div>
+      )}
     </>
   );
 }

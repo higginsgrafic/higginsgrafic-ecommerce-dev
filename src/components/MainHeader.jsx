@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { motion, AnimatePresence, animate, useMotionValue } from 'framer-motion';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Search, User, Menu, X } from 'lucide-react';
+import { Search, User, X } from 'lucide-react';
 import { createPortal } from 'react-dom';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
@@ -29,7 +29,6 @@ function MainHeader({
 
   const cartClickTimeoutRef = useRef(null);
   const [activeMenu, setActiveMenu] = useState(null);
-  const [mobileOpen, setMobileOpen] = useState(false);
   const [expandedGroups, setExpandedGroups] = useState({});
   const headerRef = useRef(null);
   const headerBarRef = useRef(null);
@@ -271,7 +270,6 @@ function MainHeader({
       if (e.key === 'Escape') {
         if (forceMegaMenuOpenRef.current) return;
         setActiveMenu(null);
-        setMobileOpen(false);
       }
     }
 
@@ -628,7 +626,6 @@ function MainHeader({
 
   function closeAll() {
     setActiveMenu(null);
-    setMobileOpen(false);
   }
 
   const closeCollections = () => {
@@ -726,16 +723,6 @@ function MainHeader({
         <div className="max-w-[1696px] mx-auto px-6 md:px-12">
           <div className="relative h-16 lg:h-20 flex items-center justify-between gap-4">
             <div className="flex items-center gap-3">
-              <Button
-                variant="ghost"
-                size="icon"
-                className="lg:hidden hover:bg-transparent"
-                aria-label={mobileOpen ? 'Tancar menú' : 'Obrir menú'}
-                onClick={() => setMobileOpen((v) => !v)}
-              >
-                {mobileOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-              </Button>
-
               <Link to="/" onClick={closeCollections} aria-label="GRÀFIC - Pàgina d'inici" className="relative z-10 pointer-events-auto block transition-transform hover:scale-105 active:scale-95" title="GRÀFIC - Inici">
                 <span
                   aria-hidden="true"
@@ -1119,31 +1106,6 @@ function MainHeader({
                 </div>
               </motion.div>
             </>
-          )}
-        </AnimatePresence>
-
-        <AnimatePresence>
-          {mobileOpen && (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: 'auto' }}
-              exit={{ opacity: 0, height: 0 }}
-              transition={{ duration: MOTION_DURATION, ease: MOTION_EASE }}
-              className="lg:hidden border-t border-border bg-white"
-            >
-              <div className="px-4 py-4 grid gap-3">
-                {navLinks.map((i) => (
-                  <Link
-                    key={i.name}
-                    to={i.href}
-                    className="py-2 text-sm text-foreground"
-                    onClick={closeAll}
-                  >
-                    {i.name}
-                  </Link>
-                ))}
-              </div>
-            </motion.div>
           )}
         </AnimatePresence>
       </div>
