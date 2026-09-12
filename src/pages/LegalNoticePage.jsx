@@ -1,10 +1,14 @@
 import React, { useEffect } from 'react';
 import SEO from '@/components/SEO';
+import useIsMobile from '@/hooks/useIsMobile';
+import ServiceDocument from '@/components/ServiceDocument';
 
 function LegalNoticePage() {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
+
+  const isMobile = useIsMobile();
 
   const sections = [
     {
@@ -78,7 +82,15 @@ function LegalNoticePage() {
         type="website"
         url="/legal"
       />
-
+      {isMobile ? (
+        <ServiceDocument
+          title="Avís Legal"
+          updated="Darrera actualització, juliol 2026"
+          intro="L'accés al lloc web higginsgrafic.com implica l'acceptació d'aquest avís legal. Si no esteu d'acord amb tot o part d'aquestes condicions, si us plau, no utilitzeu el lloc web."
+          sections={sections}
+          closing="Aquest avís legal constitueix un acord legal vinculant entre vós i Higgins GRÀFIC. Si teniu qualsevol dubte sobre aquestes condicions, si us plau, contacteu amb nosaltres abans de fer anar el lloc web."
+        />
+      ) : (
       <div
         className="min-h-screen bg-white relative"
       >
@@ -186,6 +198,7 @@ function LegalNoticePage() {
         <div className="h-[300px]" />
 
       </div>
+      )}
     </>
   );
 }

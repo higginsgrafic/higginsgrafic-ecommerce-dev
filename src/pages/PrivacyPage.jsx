@@ -1,10 +1,14 @@
 import React, { useEffect } from 'react';
 import SEO from '@/components/SEO';
+import useIsMobile from '@/hooks/useIsMobile';
+import ServiceDocument from '@/components/ServiceDocument';
 
 function PrivacyPage() {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
+
+  const isMobile = useIsMobile();
 
   const sections = [
     {
@@ -111,7 +115,15 @@ function PrivacyPage() {
         type="website"
         url="/privacy"
       />
-
+      {isMobile ? (
+        <ServiceDocument
+          title="Política de Privacitat"
+          updated="Darrera actualització, agost 2026"
+          intro="A Higgins GRÀFIC, tenim el compromís ferm de protegir la privacitat i les dades personals dels nostres clients. Aquesta Política de Privacitat explica com recopilem, protegim, fem servir i compartim la informació quan utilitzeu el nostre lloc web i els seus serveis, en compliment amb el Reglament General de Protecció de Dades (RGPD) de la Unió Europea i la Llei Orgànica de Protecció de Dades Personals i Garantia dels Drets Digitals de la (LOPDGDD)."
+          sections={sections}
+          closing="Aquesta Política de Privacitat està obligatòriament subjecta a la legislació espanyola i europea. Fer servir els nostres serveis equival a l'acceptació, de facto, de la Política de Privacitat."
+        />
+      ) : (
       <div
         className="min-h-screen bg-white relative"
       >
@@ -224,6 +236,7 @@ function PrivacyPage() {
         <div className="h-[300px]" />
 
       </div>
+      )}
     </>
   );
 }

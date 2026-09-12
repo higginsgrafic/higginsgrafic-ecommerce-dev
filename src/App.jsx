@@ -17,6 +17,8 @@ import SiteFrame from '@/components/layout/SiteFrame.jsx';
 import useComponentCatalogConfig from '@/hooks/useComponentCatalogConfig';
 import AppRoutes from '@/routes/AppRoutes';
 import * as P from '@/routes/lazyPages';
+import BottomTabBar from '@/components/BottomTabBar';
+import { MobileCercadorSheet } from '@/components/MobileCercadorSheet';
 
 const DebugLayer = lazy(() => import('@/components/DebugLayer'));
 
@@ -226,7 +228,7 @@ function App() {
           style={!isFullScreenRoute ? (
             isAdminRoute
               ? { paddingTop: adminRouteOffset, paddingLeft: `${rulerInset}px`, '--appHeaderOffset': adminRouteOffset, '--rulerInset': `${rulerInset}px` }
-              : { paddingTop: isDemoStyleLayoutRoute ? demoHeaderOffset : appHeaderOffset, paddingLeft: `${rulerInset}px`, '--appHeaderOffset': isDemoStyleLayoutRoute ? demoHeaderOffset : appHeaderOffset, '--rulerInset': `${rulerInset}px` }
+              : { paddingTop: isDemoStyleLayoutRoute ? demoHeaderOffset : appHeaderOffset, paddingLeft: `${rulerInset}px`, paddingBottom: isMobile && !isAdminRoute ? '64px' : undefined, '--appHeaderOffset': isDemoStyleLayoutRoute ? demoHeaderOffset : appHeaderOffset, '--rulerInset': `${rulerInset}px` }
           ) : {}}
           tabIndex={-1}
         >
@@ -256,11 +258,19 @@ function App() {
           )
         )}
 
+        {/* Mobile bottom tab bar + cercador sheet */}
+        {isMobile && !isFullScreenRoute && !isAdminRoute && (
+          <>
+            <MobileCercadorSheet />
+            <BottomTabBar />
+          </>
+        )}
+
         <ScrollToTop />
 
         <SiteFrame />
 
-        {(import.meta.env.DEV || isAdmin || isDevDemoRoute || isAdminRoute) && (
+        {(!isMobile && (import.meta.env.DEV || isAdmin || isDevDemoRoute || isAdminRoute)) && (
           <Suspense fallback={null}>
             <DebugLayer
               location={location}

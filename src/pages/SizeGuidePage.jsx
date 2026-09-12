@@ -1,10 +1,14 @@
 import React, { useEffect } from 'react';
 import SEO from '@/components/SEO';
+import useIsMobile from '@/hooks/useIsMobile';
+import ServiceDocument from '@/components/ServiceDocument';
 
 function SizeGuidePage() {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
+
+  const isMobile = useIsMobile();
 
   const sections = [
     {
@@ -76,7 +80,15 @@ function SizeGuidePage() {
         type="website"
         url="/sizing"
       />
-
+      {isMobile ? (
+        <ServiceDocument
+          title="Guia de Talles"
+          updated="Darrera actualització, juliol 2026"
+          intro="Les nostres samarretes segueixen el tallatge europeu estàndard. Per assegurar-te que tries la talla correcta et recomanem que comparis la talla que vols amb una samarreta que ja tinguis i que et vagi bé."
+          sections={sections}
+          closing="Aquesta guia de talles està, obligatòriament, subjecta a la legislació espanyola i europea. Fer servir els nostres serveis equival a l'acceptació, de facto, d'aquesta informació."
+        />
+      ) : (
       <div
         className="min-h-screen bg-white relative"
       >
@@ -206,6 +218,7 @@ function SizeGuidePage() {
         <div className="h-[300px]" />
 
       </div>
+      )}
     </>
   );
 }

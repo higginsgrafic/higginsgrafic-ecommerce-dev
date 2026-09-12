@@ -1,9 +1,10 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useRef } from 'react';
 import { Link } from 'react-router-dom';
+import { Shuffle } from 'lucide-react';
 import TDP1 from '@/components/tdp/TDP1';
-import TDP2 from '@/components/tdp/TDP2';
 import StoryPosterLink from '@/components/StoryPosterLink';
-import { buildHomeDrawingPlan } from '@/components/home/homeDrawings';
+import { buildHomeDrawingPlan, buildHeroStripePlan } from '@/components/home/homeDrawings';
+import MobileFooter from '@/components/MobileFooter';
 
 const COLLECTIONS_MENU = [
   { id: 'first-contact', name: 'First Contact', href: '/first-contact', icon: '/custom_logos/collections/collection-first-contact-logo.svg' },
@@ -39,9 +40,167 @@ function MobileTdpCard({ Component, slug, index, cardPropsFn, collectionHref, ed
       selectedSize={size}
       onSizeChange={setSize}
       copyMode={true}
+      description=""
       style={{ height: '100%', boxSizing: 'border-box' }}
-      descriptionLineHeight={1.2}
     />
+  );
+}
+
+const HERO_OVERLAY_SIZE = {
+  'first_contact/nx-01': 7,
+  'first_contact/ncc-1701': 7,
+  'first_contact/ncc-1701-d': 3.5,
+  'first_contact/the-phoenix': 46.585,
+  'austen/it-is-a-truth': 12.16,
+  'austen/half-agony-half-hope': 4.8,
+  'austen/unsociable-and-taciturn': 2.4,
+  'austen/i-admire-and-love-you': 12.16,
+  'austen/you-have-bewitched-me': 2.4,
+  'austen/you-must-allow-me': 12.16,
+  'austen/lfmd/blue-solid': 19,
+  'austen/lfmd/fuchsia-solid': 19,
+  'austen/lfmd/red-solid': 19,
+  'austen/lfmd/yellow-solid': 19,
+};
+
+function MobileHero() {
+  const [heroPlan, setHeroPlan] = useState(() => buildHeroStripePlan());
+  const [heroCycle, setHeroCycle] = useState(0);
+  const [zoomToggle, setZoomToggle] = useState(false);
+
+  const handleShuffle = () => {
+    setHeroPlan(buildHeroStripePlan());
+    setHeroCycle((c) => c + 1);
+    setZoomToggle((t) => !t);
+  };
+
+  const renderBand = (band, idx) => band ? (
+    <div
+      style={{
+        width: '100%',
+        height: '100%',
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        animation: `hg-hero-enter-${idx % 2 === 0 ? 'even' : 'odd'} 0.1s ease-in-out ${idx * 0.0375}s both`,
+      }}
+    >
+      {/* Samarreta */}
+      <div
+        style={{
+          position: 'absolute',
+          left: 0, right: 0, top: 0,
+          height: '500%',
+          backgroundImage: `url(${band.mockupSrc})`,
+          backgroundSize: 'auto 100%',
+          backgroundPosition: 'center top',
+          backgroundRepeat: 'no-repeat',
+          transform: `translateY(-${idx * 20}%)`,
+          pointerEvents: 'none',
+        }}
+      />
+      {/* Dibuix */}
+      {band.overlaySrc && (
+        <div
+          style={{
+            position: 'absolute',
+            left: 0, right: 0, top: 0,
+            height: '500%',
+            backgroundImage: `url(${band.overlaySrc})`,
+            backgroundSize: `auto ${HERO_OVERLAY_SIZE[band.overlayAlt] ?? 30}%`,
+            backgroundPosition: 'center 35%',
+            backgroundRepeat: 'no-repeat',
+            transform: `translateY(-${idx * 20}%)`,
+            pointerEvents: 'none',
+            opacity: 0.95,
+          }}
+        />
+      )}
+      {/* Nom de col·lecció */}
+      <div
+        style={{
+          position: 'absolute',
+          top: '50%',
+          left: 0,
+          transform: 'translateY(-50%)',
+          zIndex: 2,
+          paddingLeft: '12px',
+          color: '#475059',
+        }}
+      >
+        <p style={{
+          fontFamily: 'Oswald, sans-serif',
+          fontSize: '11px',
+          fontWeight: 600,
+          letterSpacing: '0.14em',
+          textTransform: 'uppercase',
+          margin: 0,
+          opacity: 0.95,
+        }}>
+          {(idx === 1 || idx === 2) && band.subName ? `${band.collectionName} / ${band.subName}` : band.collectionName}
+        </p>
+      </div>
+    </div>
+  ) : null;
+
+  return (
+    <div style={{ paddingLeft: '16px', paddingRight: '16px', paddingBottom: '40px' }}>
+      <div
+        style={{
+          position: 'relative',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '2px',
+          overflow: 'hidden',
+          borderRadius: '12px',
+          height: 'min(84vw, 390px)',
+          background: '#FFFFFF',
+        }}
+      >
+        {heroPlan.map((s, i) => (
+          <Link
+            key={`${heroCycle}-${i}`}
+            to={((i === 1 || i === 2) && s.productHref) ? s.productHref : s.collectionHref}
+            style={{
+              flex: '1 1 0',
+              position: 'relative',
+              display: 'flex',
+              alignItems: 'center',
+              overflow: 'hidden',
+              background: '#FFFFFF',
+              textDecoration: 'none',
+            }}
+            className="active:opacity-90 transition-opacity"
+          >
+            {renderBand(s, i)}
+          </Link>
+        ))}
+      </div>
+
+      {/* Botó shuffle sota la hero */}
+      <div style={{ display: 'flex', justifyContent: 'center', marginTop: '16px' }}>
+        <button
+          onClick={handleShuffle}
+          aria-label="Barreja samarretes i dibuixos"
+          style={{
+            background: '#ffffff',
+            border: '1px solid #e5e7eb',
+            borderRadius: '9999px',
+            width: '70px',
+            height: '70px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            cursor: 'pointer',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
+            animation: `${zoomToggle ? 'hg-shuffle-zoom-mobile-double' : 'hg-shuffle-zoom-mobile'} 4s ease-in-out infinite`,
+          }}
+          className="active:scale-95"
+        >
+          <Shuffle size={35} color="#475059" strokeWidth={1.5} />
+        </button>
+      </div>
+    </div>
   );
 }
 
@@ -103,27 +262,13 @@ export default function HomeMobile() {
         '--hg-tdp-xR': 'calc(100vw - 16px)',
       }}
     >
-      {/* Logo centrat */}
-      <div style={{
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        paddingTop: '100px',
-        paddingBottom: '24px',
-      }}>
-        <img
-          src="/custom_logos/brand/HIGGINS GRAFIC NEGRE.webp"
-          alt="HIGGINS GRÀFIC"
-          style={{ width: '60%', height: 'auto', objectFit: 'contain' }}
-        />
-      </div>
-
       {/* Icones de col·leccions en una fila */}
       <div style={{
         display: 'flex',
         justifyContent: 'center',
-        alignItems: 'center',
-        gap: '28px',
+        alignItems: 'flex-start',
+        gap: '15.75px',
+        paddingTop: '60px',
         paddingBottom: '40px',
       }}>
         {COLLECTIONS_MENU.map((c) => {
@@ -134,10 +279,10 @@ export default function HomeMobile() {
               to={c.href}
               title={c.name}
               aria-label={c.name}
-              className="opacity-40 hover:opacity-100 active:scale-95"
+              className="hover:opacity-100 active:scale-95"
               style={{
                 display: 'inline-flex',
-                alignItems: 'center',
+                alignItems: 'flex-start',
                 justifyContent: 'center',
                 minWidth: '44px',
                 minHeight: '44px',
@@ -148,8 +293,8 @@ export default function HomeMobile() {
                 src={c.icon}
                 alt={c.name}
                 style={{
-                  width: isFirstContact ? '36px' : 'auto',
-                  height: isFirstContact ? 'auto' : '40px',
+                  width: isFirstContact ? '49.5px' : 'auto',
+                  height: isFirstContact ? 'auto' : '55px',
                   objectFit: 'contain',
                   display: 'block',
                   filter: 'brightness(0)',
@@ -159,6 +304,8 @@ export default function HomeMobile() {
           );
         })}
       </div>
+
+      <MobileHero />
 
       {/* Col·leccions amb 2 columnes de TDP */}
       {COLLECTIONS.map((col, colIdx) => (
@@ -210,7 +357,7 @@ export default function HomeMobile() {
               height: `${CARD_HEIGHT}px`,
             }}>
               <MobileTdpCard
-                Component={colIdx % 2 === 0 ? TDP2 : TDP1}
+                Component={TDP1}
                 slug={col.slug}
                 index={0}
                 cardPropsFn={cardProps}
@@ -218,7 +365,7 @@ export default function HomeMobile() {
                 editableIdPrefix={`home-mobile-${colIdx}-tdp-1`}
               />
               <MobileTdpCard
-                Component={colIdx % 2 === 0 ? TDP1 : TDP2}
+                Component={TDP1}
                 slug={col.slug}
                 index={1}
                 cardPropsFn={cardProps}
@@ -231,7 +378,7 @@ export default function HomeMobile() {
             <div style={{
               display: 'flex',
               justifyContent: 'center',
-              marginTop: '20px',
+              marginTop: `${20 - (CARD_HEIGHT / 24) * 9}px`,
             }}>
               <Link
                 to={col.href}
@@ -283,6 +430,8 @@ export default function HomeMobile() {
       }}>
         <StoryPosterLink style={{ fontSize: '32pt' }} />
       </div>
+
+      <MobileFooter />
     </div>
   );
 }

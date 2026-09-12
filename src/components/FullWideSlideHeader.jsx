@@ -1,7 +1,7 @@
 import React, { memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import * as ReactDOM from 'react-dom';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { ChevronDown, ChevronLeft, ChevronRight, ChevronUp, Menu, User, LogIn, X, Clock, Truck, AlertCircle, MoreHorizontal, Loader2, Eye, EyeOff, LayoutGrid, Layers, Lock, Unlock, Search } from 'lucide-react';
+import { ChevronDown, ChevronLeft, ChevronRight, ChevronUp, User, LogIn, X, Clock, Truck, AlertCircle, MoreHorizontal, Loader2, Eye, EyeOff, LayoutGrid, Layers, Lock, Unlock, Search } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useProductContext } from '@/contexts/ProductContext';
 import { useAdmin } from '@/contexts/AdminContext';
@@ -549,11 +549,6 @@ function FullWideSlideHeader({
   }, [active]);
 
   const [stripeOverlayOverrideActive, setStripeOverlayOverrideActive] = useState(() => Boolean(overlaySrcFromUrl));
-  const [mobileOpen, setMobileOpen] = useState(false);
-
-  useEffect(() => {
-    if (isPortraitTablet) setMobileOpen(false);
-  }, [isPortraitTablet]);
 
   // Escolta el progrés de scroll horitzontal del megaslide en portrait tablet
   // per moure el botó de bloqueig com a indicador visual de la posició.
@@ -2909,16 +2904,6 @@ function FullWideSlideHeader({
 
   useEffect(() => {
     if (contained) return undefined;
-    if (!mobileOpen) return undefined;
-    const prev = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-    return () => {
-      document.body.style.overflow = prev;
-    };
-  }, [contained, mobileOpen]);
-
-  useEffect(() => {
-    if (contained) return undefined;
     if (!active) return undefined;
     const prev = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
@@ -2985,17 +2970,6 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
           }}
         >
           <div className="flex items-center gap-2 lg:gap-2">
-            {!isPortraitTablet && (
-              <button
-                type="button"
-                className="inline-flex h-10 w-10 items-center justify-center rounded-full text-foreground hover:bg-muted md:hidden"
-                aria-label={mobileOpen ? 'Tancar menú' : 'Obrir menú'}
-                onClick={() => setMobileOpen((v) => !v)}
-              >
-                {mobileOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-              </button>
-            )}
-
             {/* Logo a l'esquerra (desktop + tablet vertical) */}
             <Link id="stripe-guide-header-logo-anchor" to="/" aria-label="Higgins GRÀFIC - Pàgina d'inici" onClick={() => { if (active) closeMegaExplicitly(); }} className="relative z-10 pointer-events-auto hidden md:flex items-center gap-2 font-black tracking-tight text-foreground">
               <span
@@ -3018,36 +2992,6 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
               />
             </Link>
           </div>
-
-          {/* Mòbil: logo centrat en X respecte al viewport */}
-          <Link
-            to="/"
-            aria-label="Higgins GRÀFIC - Pàgina d'inici"
-            onClick={() => { if (active) closeMegaExplicitly(); }}
-            className="md:hidden absolute z-10 pointer-events-auto flex items-center gap-2 font-black tracking-tight text-foreground"
-            style={{
-              left: '50vw',
-              top: '50%',
-              transform: 'translate(-50%, -50%)',
-            }}
-          >
-            <span
-              aria-hidden="true"
-              data-brand-logo="1"
-              className="h-10 w-[140px] block text-foreground"
-              style={{
-                backgroundColor: 'currentColor',
-                WebkitMaskImage: 'url(/custom_logos/brand/marca-grafic-logo.svg)',
-                maskImage: 'url(/custom_logos/brand/marca-grafic-logo.svg)',
-                WebkitMaskRepeat: 'no-repeat',
-                maskRepeat: 'no-repeat',
-                WebkitMaskPosition: 'center',
-                maskPosition: 'center',
-                WebkitMaskSize: 'contain',
-                maskSize: 'contain',
-              }}
-            />
-          </Link>
 
           <nav className={`hidden md:flex flex-1 items-center justify-center gap-1 lg:gap-4 flex-nowrap overflow-hidden ${isPortraitTablet ? 'md:hidden' : ''}`} style={(isPortraitTablet || isLandscapeTablet) ? { gap: isLandscapeTablet ? '1rem' : '0.25rem', minWidth: 0, justifyContent: 'flex-start', marginLeft: isPortraitTablet ? '-60px' : undefined } : { transform: 'translateX(-5%)' }}>
             {resolvedNav.map((item) => {
@@ -3418,312 +3362,6 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
           document.body
         )}
 
-      {mobileOpen && !isPortraitTablet ? (
-        <div className="lg:hidden border-b border-border bg-background">
-          {/* Cercador, cistell i usuari dins l'hamburguesa */}
-          <div className="px-4 py-3 flex items-center gap-6 border-b border-border">
-            <button
-              type="button"
-              className="flex items-center gap-2 text-sm text-foreground"
-              onClick={() => {
-                setMobileOpen(false);
-                setManualOverrideClosed(false);
-                setMegaPage(2);
-                setMegaFullScreen(false);
-                if (!active) ensureMegaOpen();
-                touchMegaPublicActivity();
-              }}
-            >
-              <Search className="h-5 w-5 text-foreground" strokeWidth={2.5} />
-              <span>Cercador</span>
-            </button>
-            <button
-              type="button"
-              className="flex items-center gap-2 text-sm text-foreground"
-              onClick={() => {
-                setMobileOpen(false);
-                setManualOverrideClosed(false);
-                setMegaPage(3);
-                setAcordioExpanded(false);
-                if (!active) ensureMegaOpen();
-                touchMegaPublicActivity();
-              }}
-            >
-              <span aria-hidden="true" className="block h-[24px] w-[24px] relative">
-                <span
-                  className="absolute inset-0"
-                  style={{
-                    display: 'block',
-                    backgroundColor: 'currentColor',
-                    WebkitMaskImage: `url(${localCartItemCount > 0 ? '/custom_logos/icons/cistell-ple-2.svg' : '/custom_logos/icons/cistell-buit.svg'})`,
-                    maskImage: `url(${localCartItemCount > 0 ? '/custom_logos/icons/cistell-ple-2.svg' : '/custom_logos/icons/cistell-buit.svg'})`,
-                    WebkitMaskRepeat: 'no-repeat',
-                    maskRepeat: 'no-repeat',
-                    WebkitMaskPosition: 'center',
-                    maskPosition: 'center',
-                    WebkitMaskSize: 'contain',
-                    maskSize: 'contain',
-                  }}
-                />
-                {localCartItemCount > 0 && (
-                  <span
-                    className="absolute left-1/2 -translate-x-1/2 text-whiteStrong text-[12px] font-bold"
-                    style={{ top: 'calc(60% - 0.5px)', transform: 'translate(-50%, -50%)', lineHeight: '1' }}
-                  >
-                    {localCartItemCount}
-                  </span>
-                )}
-              </span>
-              <span>Cistell{localCartItemCount > 0 ? ` (${localCartItemCount})` : ''}</span>
-            </button>
-            <button
-              type="button"
-              className="flex items-center gap-2 text-sm text-foreground"
-              onClick={() => {
-                setMobileOpen(false);
-                setManualOverrideClosed(false);
-                setMegaPage(4);
-                setAcordioExpandedPage4(false);
-                if (!active) ensureMegaOpen();
-                if (!user) setShowRegisterOverlay(true);
-                touchMegaPublicActivity();
-              }}
-            >
-              {user
-                ? <User className="h-5 w-5 text-foreground" strokeWidth={2.5} />
-                : <LogIn className="h-5 w-5 text-foreground" strokeWidth={2} />
-              }
-              <span>{user ? 'Compte' : 'Iniciar sessió'}</span>
-            </button>
-          </div>
-
-          <div className="px-4 py-4 grid gap-2">
-            {resolvedNav.map((item) => (
-              <button
-                key={item.id}
-                type="button"
-                className="flex items-center justify-between rounded-xl px-3 py-3 text-left text-xs font-semibold tracking-[0.18em] uppercase text-muted-foreground hover:bg-muted hover:text-foreground"
-                onClick={() => setActive((prev) => (prev === item.id ? null : item.id))}
-              >
-                {item.label}
-                <ChevronDown className={`h-4 w-4 ${active === item.id ? 'rotate-180' : ''}`} />
-              </button>
-            ))}
-          </div>
-
-          {active ? (
-            <div className="border-t border-border px-4 py-4">
-              <div className="grid gap-4">
-                {(resolvedMega[active] || []).map((col) => (
-                  <div key={col.title} className="rounded-2xl bg-muted p-4">
-                    <div
-                      ref={
-                        active === 'the_human_inside' && Array.isArray(col.items) && col.items.length > 9 ? mobileHumanScrollRef : undefined
-                      }
-                      className={
-                        active === 'the_human_inside' && Array.isArray(col.items) && col.items.length > 9
-                          ? 'relative mt-3 overflow-x-auto'
-                          : 'mt-3 grid grid-cols-3 gap-3'
-                      }
-                    >
-                      <div
-                        className={active === 'the_human_inside' && Array.isArray(col.items) && col.items.length > 9 ? 'grid gap-x-3' : ''}
-                        style={
-                          active === 'the_human_inside' && Array.isArray(col.items) && col.items.length > 9
-                            ? {
-                                width: 'max-content',
-                                gridAutoFlow: 'column',
-                                gridAutoColumns: '120px',
-                              }
-                            : undefined
-                        }
-                      >
-                        {(() => {
-                          const isPath = (v) => typeof v === 'string' && /\.(png|jpg|jpeg|webp)$/i.test(v);
-                          const base = active === 'the_human_inside' ? col.items : col.items.slice(0, 9);
-                          if (active !== 'miscellania') return base;
-                          const variant = firstContactVariant;
-                          return base.filter((it) => {
-                            if (it === CONTROL_TILE_BN || it === CONTROL_TILE_ARROWS) return true;
-                            if (!isPath(it)) return false;
-                            if (it.startsWith('black/')) return variant !== 'white';
-                            if (it.startsWith('white/')) return variant === 'white';
-                            return true;
-                          });
-                        })().map((it, idx) => (
-                          <div key={`${it}-${idx}`} className="min-w-0">
-                            {!it || it === CONTROL_TILE_ARROWS || it === CONTROL_TILE_BN ? (
-                              <div className="h-4" />
-                            ) : active === 'miscellania' && typeof it === 'string' && /\.(png|jpg|jpeg|webp)$/i.test(it) ? (
-                              <div className="h-4" />
-                            ) : (
-                              <Link
-                                to="#"
-                                className="flex h-4 w-full items-center justify-center rounded-none bg-muted px-2 text-xs text-muted-foreground hover:text-foreground"
-                              >
-                                {it}
-                              </Link>
-                            )}
-
-                            {FIRST_CONTACT_MEDIA[it] ? (
-                              <div className="relative mt-2 aspect-square w-full overflow-hidden">
-                                {idx >= 1 && idx <= 7 ? (
-                                  <div
-                                    className={`absolute inset-0 rounded-md ${
-                                      firstContactVariant === 'white' ? 'bg-foreground' : 'bg-transparent'
-                                    }`}
-                                  />
-                                ) : null}
-                                <OptimizedImg
-                                  src={resolveGridThumbSrc(it, active) || FIRST_CONTACT_MEDIA[it]}
-                                  alt={it}
-                                  className={
-                                    it === 'The Phoenix'
-                                      ? 'absolute left-1/2 top-1/2 h-[92%] w-[92%] -translate-x-1/2 -translate-y-1/2 object-contain'
-                                      : 'absolute inset-0 h-full w-full object-contain'
-                                  }
-                                />
-
-                                {idx >= 1 && idx <= 7 && firstContactVariant === 'white' && !(
-                                  typeof resolveGridThumbSrc(it, active) === 'string'
-                                  && resolveGridThumbSrc(it, active).includes('/custom_logos/drawings/images_grid/first_contact/white/')
-                                ) ? (
-                                  <OptimizedImg
-                                    src={resolveGridThumbSrc(it, active) || FIRST_CONTACT_MEDIA_WHITE[it] || FIRST_CONTACT_MEDIA[it]}
-                                    alt={it}
-                                    className={`absolute inset-0 z-20 h-full w-full object-contain transition-opacity duration-300 ease-in-out ${
-                                      firstContactVariant === 'white' ? 'opacity-100' : 'opacity-0'
-                                    } ${
-                                      it === 'Wormhole'
-                                        ? 'scale-[0.54]'
-                                        : it === 'Plasma Escape'
-                                          ? 'scale-[0.54]'
-                                          : it === "Vulcan's End"
-                                            ? 'scale-[0.66]'
-                                            : 'scale-[0.6]'
-                                    }`}
-                                  />
-                                ) : null}
-                              </div>
-                            ) : active === 'miscellania' && typeof it === 'string' && /\.(png|jpg|jpeg|webp)$/i.test(it) ? (
-                              <div className="relative mt-2 aspect-square w-full overflow-hidden">
-                                <OptimizedImg
-                                  src={resolveGridThumbSrc(it, active) || it}
-                                  alt=""
-                                  className="relative z-10 h-full w-full object-contain"
-                                />
-                              </div>
-                            ) : THE_HUMAN_INSIDE_MEDIA[it] ? (
-                              <div className="relative mt-2 aspect-square w-full overflow-hidden">
-                                <OptimizedImg
-                                  src={(humanInsideVariant === 'white' ? THE_HUMAN_INSIDE_MEDIA_WHITE : THE_HUMAN_INSIDE_MEDIA)[it]}
-                                  alt={it}
-                                  className={`relative z-10 h-full w-full object-contain ${it === 'Mazinger' ? 'scale-[0.64]' : it === 'Maschinenmensch' ? 'scale-[0.65]' : 'scale-[0.6]'}`}
-                                />
-                              </div>
-                            ) : it === CONTROL_TILE_BN ? (
-                              active === 'the_human_inside' ? (
-                                <FirstContactDibuix00Buttons onWhite={() => { setStripeOverlayOverrideActive(false); setHumanInsideVariant('white'); }} onBlack={() => { setStripeOverlayOverrideActive(false); setHumanInsideVariant('black'); }} onMulti={() => { setStripeOverlayOverrideActive(false); setHumanInsideVariant('color'); }} />
-                              ) : (
-                                <FirstContactDibuix00Buttons
-                                  onWhite={() => { setStripeOverlayOverrideActive(false); setFirstContactVariant('white'); }}
-                                  onBlack={() => { setStripeOverlayOverrideActive(false); setFirstContactVariant('black'); }}
-                                  onMulti={() => { setStripeOverlayOverrideActive(false); setFirstContactVariant('color'); }}
-                                  showWhite={stripeVariantVisibility?.white !== false}
-                                  showBlack={stripeVariantVisibility?.black !== false}
-                                  showMulti={stripeVariantVisibility?.color !== false}
-                                />
-                              )
-                            ) : it === CONTROL_TILE_ARROWS ? (
-                              <FirstContactDibuix09Buttons
-                                tileSize={120}
-                                onPrev={active === 'the_human_inside' ? () => setThinStartIndex((v) => v - 1) : () => {}}
-                                onNext={active === 'the_human_inside' ? () => setThinStartIndex((v) => v + 1) : () => {}}
-                              />
-                            ) : (
-                              <div className="mt-2 aspect-square w-full rounded-md bg-muted" />
-                            )}
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-
-                    {active === 'the_human_inside' && Array.isArray(col.items) && col.items.length > 9 ? (
-                      <div className="mt-3 grid grid-cols-2 gap-3">
-                        <button
-                          type="button"
-                          className="h-9 rounded-xl border border-border bg-background text-xs font-semibold tracking-[0.18em] uppercase text-foreground/80"
-                          onClick={() => scrollMobileHumanByTiles(-1)}
-                        >
-                          Anterior
-                        </button>
-                        <button
-                          type="button"
-                          className="h-9 rounded-xl border border-border bg-background text-xs font-semibold tracking-[0.18em] uppercase text-foreground/80"
-                          onClick={() => scrollMobileHumanByTiles(1)}
-                        >
-                          Següent
-                        </button>
-                      </div>
-                    ) : null}
-
-                    {active === 'miscellania' ? null : (
-                      <div className="mt-4">
-                        <div className="grid gap-2">
-                          {(col.items || []).filter(Boolean).slice(0, 8).map((it) => (
-                            <Link key={it} to="#" className="text-sm text-muted-foreground hover:text-foreground">
-                              {it}
-                            </Link>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-
-                    <div className="mt-6">
-                      <div className="h-[1px] w-full bg-border" />
-                      <div className="mt-4 flex items-center justify-between">
-                        <button
-                          type="button"
-                          className="inline-flex items-center gap-2 rounded-xl border border-border bg-background px-3 py-2 text-xs font-semibold tracking-[0.18em] uppercase text-foreground"
-                        >
-                          <LayoutGrid className="h-4 w-4" strokeWidth={1.75} />
-                          Catàleg
-                        </button>
-                        <button
-                          type="button"
-                          className="inline-flex items-center gap-2 rounded-xl border border-border bg-background px-3 py-2 text-xs font-semibold tracking-[0.18em] uppercase text-foreground"
-                        >
-                          <Layers className="h-4 w-4" strokeWidth={1.75} />
-                          Col·lecció
-                        </button>
-                      </div>
-                    </div>
-
-                    <div className="mt-6">
-                      <div className="h-[1px] w-full bg-border" />
-                      <div className="mt-4 flex items-center justify-between">
-                        <button
-                          type="button"
-                          className="inline-flex items-center gap-2 rounded-xl border border-border bg-background px-3 py-2 text-xs font-semibold tracking-[0.18em] uppercase text-foreground"
-                        >
-                          <motion.span layoutId={`stripe-${active}`} className="h-3 w-3 rounded-full bg-foreground" />
-                          Color
-                        </button>
-                        <button
-                          type="button"
-                          className="inline-flex items-center gap-2 rounded-xl border border-border bg-background px-3 py-2 text-xs font-semibold tracking-[0.18em] uppercase text-foreground"
-                        >
-                          Detalls
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          ) : null}
-        </div>
-      ) : null}
     </header>
   );
 }

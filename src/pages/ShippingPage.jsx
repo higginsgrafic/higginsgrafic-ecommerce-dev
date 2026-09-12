@@ -1,5 +1,7 @@
 import React, { useEffect } from 'react';
 import SEO from '@/components/SEO';
+import useIsMobile from '@/hooks/useIsMobile';
+import ServiceDocument from '@/components/ServiceDocument';
 import { faqShippingZones as shippingZones } from './FAQPage';
 
 // Banderes amb tintes planes (SVG inline, sense gradients ni textures)
@@ -58,6 +60,8 @@ function ShippingPage() {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
+
+  const isMobile = useIsMobile();
 
   const zones = shippingZones;
 
@@ -130,7 +134,15 @@ function ShippingPage() {
         type="website"
         url="/shipping"
       />
-
+      {isMobile ? (
+        <ServiceDocument
+          title="Enviaments i Devolucions"
+          updated="Darrera actualització, agost 2026"
+          intro="Higgins GRÀFIC ven cada peça sota demanda per evitar malbaratament de material i acumulació d'estoc. Aquesta política explica els temps de producció, enviaments, costos i el procés de devolució en compliment de la normativa europea de protecció del consumidor."
+          sections={sections}
+          closing="Aquesta política d'enviaments i devolucions està subjecta, obligatòriament, a la legislació espanyola i europea. Fer servir els nostres serveis equival a l'acceptació, de facto, d'aquesta política."
+        />
+      ) : (
       <div
         className="min-h-screen bg-white relative"
       >
@@ -281,6 +293,7 @@ function ShippingPage() {
         <div className="h-[300px]" />
 
       </div>
+      )}
     </>
   );
 }

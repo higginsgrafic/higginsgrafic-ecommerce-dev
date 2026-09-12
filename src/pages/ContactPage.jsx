@@ -1,6 +1,8 @@
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import SEO from '@/components/SEO';
+import useIsMobile from '@/hooks/useIsMobile';
+import ServiceDocument from '@/components/ServiceDocument';
 
 function ContactPage() {
   const navigate = useNavigate();
@@ -8,6 +10,8 @@ function ContactPage() {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
+
+  const isMobile = useIsMobile();
 
   const goToMessages = () => {
     const now = Date.now();
@@ -53,7 +57,13 @@ function ContactPage() {
         type="website"
         url="/contact"
       />
-
+      {isMobile ? (
+        <ServiceDocument
+          title="Contacte"
+          updated="Diga'm Higgins"
+          sections={sections}
+        />
+      ) : (
       <div
         className="min-h-screen bg-white relative"
       >
@@ -201,6 +211,7 @@ function ContactPage() {
         <div className="h-[300px]" />
 
       </div>
+      )}
     </>
   );
 }

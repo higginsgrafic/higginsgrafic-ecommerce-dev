@@ -1,10 +1,14 @@
 import React, { useEffect } from 'react';
 import SEO from '@/components/SEO';
+import useIsMobile from '@/hooks/useIsMobile';
+import ServiceDocument from '@/components/ServiceDocument';
 
 function TermsPage() {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
+
+  const isMobile = useIsMobile();
 
   const sections = [
     {
@@ -279,7 +283,15 @@ function TermsPage() {
         type="website"
         url="/terms"
       />
-
+      {isMobile ? (
+        <ServiceDocument
+          title="Termes i Condicions"
+          updated="Darrera actualització, agost 2026"
+          intro="Us recomanem que llegiu amb atenció aquestes Condicions Generals abans de fer una comanda, ja que fer servir els nostres serveis equival a l'acceptació, de facto, de totes elles. Dites Condicions Generals estan dissenyades per protegir tant els teus drets com a consumidor com els nostres com a empresa en el compliment de la legislació vigent."
+          sections={sections}
+          closing="Aquests Termes i Condicions constitueixen un acord legal vinculant entre vós i Higgins GRÀFIC. Si teniu qualsevol dubte sobre aquestes condicions, si us plau, contacteu amb nosaltres abans de fer una comanda. La satisfacció i confiança són la nostra prioritat."
+        />
+      ) : (
       <div
         className="min-h-screen bg-white relative"
       >
@@ -387,6 +399,7 @@ function TermsPage() {
         <div className="h-[300px]" />
 
       </div>
+      )}
     </>
   );
 }
