@@ -237,14 +237,12 @@ export default function AdminStudioHomePage() {
     return {
       content: [
         { label: 'Editor de Textos', path: '/admin/index' },
-        { label: 'Textos de Sistema', path: '/admin/system-messages' },
       ],
       templates: [
         { label: 'Plantilla catàleg components', path: '/plantilla-cataleg-components' },
       ],
       storefront: [
         { label: 'Promocions', path: '/admin/promotions' },
-        { label: 'Hero', path: '/admin/hero' },
         { label: 'Col·leccions', path: '/admin/collections' },
       ],
       assets: [
