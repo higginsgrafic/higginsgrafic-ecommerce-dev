@@ -2993,6 +2993,36 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
             </Link>
           </div>
 
+          {/* Mòbil: logo centrat en X respecte al viewport */}
+          <Link
+            to="/"
+            aria-label="Higgins GRÀFIC - Pàgina d'inici"
+            onClick={() => { if (active) closeMegaExplicitly(); }}
+            className="md:hidden absolute z-10 pointer-events-auto flex items-center gap-2 font-black tracking-tight text-foreground"
+            style={{
+              left: '50vw',
+              top: '50%',
+              transform: 'translate(-50%, -50%)',
+            }}
+          >
+            <span
+              aria-hidden="true"
+              data-brand-logo="1"
+              className="h-10 w-[140px] block text-foreground"
+              style={{
+                backgroundColor: 'currentColor',
+                WebkitMaskImage: 'url(/custom_logos/brand/marca-grafic-logo.svg)',
+                maskImage: 'url(/custom_logos/brand/marca-grafic-logo.svg)',
+                WebkitMaskRepeat: 'no-repeat',
+                maskRepeat: 'no-repeat',
+                WebkitMaskPosition: 'center',
+                maskPosition: 'center',
+                WebkitMaskSize: 'contain',
+                maskSize: 'contain',
+              }}
+            />
+          </Link>
+
           <nav className={`hidden md:flex flex-1 items-center justify-center gap-1 lg:gap-4 flex-nowrap overflow-hidden ${isPortraitTablet ? 'md:hidden' : ''}`} style={(isPortraitTablet || isLandscapeTablet) ? { gap: isLandscapeTablet ? '1rem' : '0.25rem', minWidth: 0, justifyContent: 'flex-start', marginLeft: isPortraitTablet ? '-60px' : undefined } : { transform: 'translateX(-5%)' }}>
             {resolvedNav.map((item) => {
               // L'indicador d'obert (fletxa rotada + color) només s'ha
