@@ -11,7 +11,7 @@ export function OrderShippedEmail({ order = {} }) {
       clientName={clientName}
       messageContent={
         <span>
-          El transportista ja té la teva comanda i en pocs dies la tindràs a l'adreça indicada. Amb <strong>aquest codi</strong> podràs seguir-ne el recorregut des del web de paqueteria.
+          El transportista ja té la teva comanda i en pocs dies la tindràs a l'adreça indicada. Amb <strong>aquest codi</strong> podràs seguir-ne el recorregut des del web de missatgeria.
         </span>
       }
       ctaText="Torna a la botiga >"

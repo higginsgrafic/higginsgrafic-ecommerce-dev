@@ -53,7 +53,7 @@ export function OrderDeliveredEmail({ order = {} }) {
           textAlign: 'left',
         }}
       >
-        Recorda que disposes de fins a 14 dies naturals, des d'avui mateix, per a exercir el teu dret al desisitiment.
+        Recorda que disposes de fins a 14 dies naturals, des d'avui mateix, per a exercir el teu dret al desistiment.
       </div>
     </EmailLayout>
   );
