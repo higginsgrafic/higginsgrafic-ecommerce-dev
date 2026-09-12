@@ -62,6 +62,28 @@ Si es fes servir `App.jsx`, això desapareixeria:
 
 ---
 
+### ⚠️ ACTUALITZACIÓ (12/09/2026, després d'aplicar-ho)
+
+**B2 va resultar ser un consell equivocat.** Es va portar la branca
+`shouldRedirect` (pantalla negra) a `App.jsx`, i això **va deixar l'aplicació
+en blanc, tant en desenvolupament com en producció**.
+
+El motiu: `AppProd.jsx` tenia aquella branca **perquè va néixer com a versió de
+producció**, on el lloc està en construcció i s'ha de redirigir. `App.jsx` no
+la tenia **a propòsit**: en desenvolupament has de poder veure la botiga mentre
+hi treballes.
+
+La lliçó, que val per a tota aquesta comparació: **una diferència entre els dos
+fitxers no és automàticament una funcionalitat que s'ha de conservar.** Pot ser
+una diferència deliberada entre entorns. Cal preguntar-se *per què* existeix
+abans de portar-la.
+
+Estat final: B1 (Helmet) i B3 (condicions de càrrega) sí que es van portar i són
+correctes. B2 s'ha revertit. B4 no calia.
+
+
+---
+
 ## C. Diferències que no són pèrdues
 
 - **Ordre dels hooks**: `App.jsx` els té tots a dalt; `AppProd.jsx` els
