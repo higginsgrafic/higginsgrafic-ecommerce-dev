@@ -7,14 +7,14 @@ export function PasswordResetEmail({ data = {} }) {
   return (
     <EmailLayout
       statusText="Actualització d'estat"
-      labelText="RECUPERACIO DE CONTRASENYA"
+      labelText="RECUPERACIÓ DE CONTRASENYA"
       clientName={clientName}
       messageContent={
         <span>
           Hem rebut una sol·licitud per canviar la contrasenya del teu compte. Clica l'enllaç de sota si vols establir-ne una de nova.
           <br />
           <br />
-          <span style={{ display: 'block', marginTop: '-4px' }}>Si no l'has demanada tu pots ignorar aquest correu.</span>
+          <span style={{ display: 'block', marginTop: '-4px' }}>Si no l'has demanada, pots ignorar aquest correu.</span>
         </span>
       }
       ctaText="Torna a la botiga >"
@@ -57,7 +57,7 @@ export function PasswordResetEmail({ data = {} }) {
           textAlign: 'center',
         }}
       >
-        Per motius de seguretat ,aquest enllaç és d'un sol ús i{' '}
+        Per motius de seguretat, aquest enllaç és d'un sol ús i{' '}
         <strong>caducarà d'aquí a 30 minuts.</strong>
       </div>
     </EmailLayout>
