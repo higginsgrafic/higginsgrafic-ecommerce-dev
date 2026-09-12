@@ -18,7 +18,6 @@ export default function AdminMegaMenu({ className = '' }) {
         title: 'Storefront',
         items: [
           { label: 'Promocions', path: '/admin/promotions' },
-          { label: 'Hero', path: '/admin/hero' },
           { label: 'Col·leccions', path: '/admin/collections' },
         ],
       },
@@ -26,7 +25,6 @@ export default function AdminMegaMenu({ className = '' }) {
         title: 'Contingut',
         items: [
           { label: 'Editor de Textos', path: '/admin/index' },
-          { label: 'Textos de Sistema', path: '/admin/system-messages' },
         ],
       },
       {
