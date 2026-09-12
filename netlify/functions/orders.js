@@ -100,7 +100,18 @@ export async function handler(event, context) {
 
       // Authenticated user: list own orders
       const { user, error: userError } = await verifyUser(event);
-      if (user) {
+
+      // Un administrador autenticat TAMBÉ passa verifyUser. Si demana una
+      // comanda concreta (per número o per email), ha de poder veure-la encara
+      // que no sigui seva, així que l'hem de deixar passar cap a la branca
+      // d'administració de sota. Sense això, la cerca de comandes de
+      // l'administració quedava inabastable i només retornava les seves.
+      const volComandaConcreta = Boolean(orderNumber || email);
+      const esAdminAmbConsulta = volComandaConcreta
+        ? (await verifyAdmin(event)).authorized
+        : false;
+
+      if (user && !esAdminAmbConsulta) {
         const { data, error } = await supabase
           .from('orders')
           .select('*')
