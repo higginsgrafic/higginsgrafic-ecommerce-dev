@@ -157,8 +157,19 @@ export default function PricingConfigPage() {
     setSaving(`var-${variantId}`);
     try {
       const updates = {};
-      if (dirty[`varprice-${variantId}`]) updates.price = parseFloat(variantPrices[variantId]);
-      if (dirty[`varcost-${variantId}`]) updates.gelato_cost = parseFloat(variantCosts[variantId]);
+      // Validem els números abans de desar-los: si el camp és buit,
+      // parseFloat('') retorna NaN, i desar NaN a la columna del preu la
+      // deixava corrupta (o feia fallar l'update amb un error gens clar).
+      if (dirty[`varprice-${variantId}`]) {
+        const price = parseFloat(variantPrices[variantId]);
+        if (Number.isNaN(price)) throw new Error('El preu de la variant no és un número vàlid');
+        updates.price = price;
+      }
+      if (dirty[`varcost-${variantId}`]) {
+        const cost = parseFloat(variantCosts[variantId]);
+        if (Number.isNaN(cost)) throw new Error('El cost de la variant no és un número vàlid');
+        updates.gelato_cost = cost;
+      }
       if (Object.keys(updates).length === 0) return;
       const { error } = await supabase
         .from('product_variants')
