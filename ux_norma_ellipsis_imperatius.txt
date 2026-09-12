@@ -1,3 +1,20 @@
+════════════════════════════════════════════════════════════════════
+⚠️  ATENCIÓ: AQUEST DOCUMENT ESTÀ SUPERAT
+════════════════════════════════════════════════════════════════════
+Les regles sobre "vós" i sobre l'imperatiu PLURAL que conté NO s'apliquen.
+
+La norma vigent és:  docs/norma-linguistica-vigent.md
+
+  · Tractament al client: 2a persona SINGULAR. Mai el pronom "tu".
+    ("La teva comanda" i "Tens 14 dies" són correctes.)
+  · Botons: imperatiu SINGULAR. Mai infinitiu.
+    (Desa · Confirma · Cancel·la · Esborra)
+  · Només català, amb excepció de la terminologia tècnica.
+
+Aquest fitxer es conserva com a historial. En cas de dubte, mana el
+document vigent.
+════════════════════════════════════════════════════════════════════
+
 SUPLEMENT NORMA CATALANA: SUBJECTE EL·LÌPTIC + IMPERATIUS UX WEB
 ================================================================
 
