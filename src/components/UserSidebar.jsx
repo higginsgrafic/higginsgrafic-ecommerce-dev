@@ -129,7 +129,7 @@ const UserSidebar = ({ isOpen, onClose }) => {
         <div className="flex-1 overflow-y-auto p-4 sm:p-6">
           <nav className="flex flex-col space-y-1">
             <Link
-              to="/profile"
+              to="/perfil"
               className="font-roboto text-[14pt] font-normal transition-all py-3 px-4 w-full text-left hover:bg-gray-50 rounded-md flex items-center gap-3 text-gray-900 group"
               onClick={onClose}
             >

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, useSearchParams, Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 import { Loader2 } from 'lucide-react';
 import { fetchMockOrder } from '@/lib/mockOrderStore';
@@ -7,6 +7,11 @@ import OrderConfirmationLayout from '@/components/OrderConfirmationLayout';
 
 const OrderConfirmationPage = () => {
   const { orderId } = useParams();
+  const [searchParams] = useSearchParams();
+  // Token de seguiment retornat per create-payment-intent. És l'única via per
+  //què un client convidat pugui veure la seva comanda: la consulta per
+  // orderNumber està restringida a administradors.
+  const trackingToken = searchParams.get('token');
   const [orderData, setOrderData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -47,7 +52,12 @@ const OrderConfirmationPage = () => {
       }
 
       try {
-        const res = await fetch(`/api/orders?orderNumber=${encodeURIComponent(orderId)}`);
+        // Amb token de seguiment (convidats) es consulta per token; sense
+        // token es prova per número de comanda (requereix sessió d'admin).
+        const url = trackingToken
+          ? `/api/orders?trackingToken=${encodeURIComponent(trackingToken)}`
+          : `/api/orders?orderNumber=${encodeURIComponent(orderId)}`;
+        const res = await fetch(url);
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const data = await res.json();
         if (data.order) {

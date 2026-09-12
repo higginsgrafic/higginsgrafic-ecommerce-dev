@@ -10,9 +10,9 @@ import { useState, useEffect } from 'react';
  *
  * Criteri de detecció:
  *   - isTouch:        navigator.maxTouchPoints > 0 (fallback ontouchstart).
- *   - isMobile:       width < 768.
- *   - isPortraitTablet: 768 ≤ width ≤ 1024 + height > width.
- *   - isLandscapeTablet: width ≥ 768 + height < width + height ≤ 1100.
+ *   - isMobile:       width < 768 i NO és tablet tàctil vertical.
+ *   - isPortraitTablet: (touch + width >= 600 + height > width) O (768 ≤ width ≤ 1024 + height > width).
+ *   - isLandscapeTablet: width ≥ 600 + height < width + height ≤ 1100.
  *                       (L'alçada ≤ 1100 separa tablet de monitor desktop.
  *                        No hi ha cap superior d'amplada: una tablet de 1600px
  *                        entra correctament.)
@@ -44,11 +44,11 @@ export default function useDeviceLayout() {
     const vw = window.innerWidth || 0;
     const vh = window.innerHeight || 0;
 
-    const isMobile = vw < 768;
+    const isMobile = vw < 600;
     const isPortraitTablet =
-      vw >= 768 && vw <= 1024 && vh > vw;
+      vw >= 600 && vw <= 1024 && vh > vw;
     const isLandscapeTablet =
-      isTouch && vw >= 768 && vh < vw && vh > 0 && vh <= 1100;
+      isTouch && vw >= 600 && vh < vw && vh > 0 && vh <= 1100;
     const isDesktop =
       (!isPortraitTablet && !isLandscapeTablet && vw >= 1024);
 

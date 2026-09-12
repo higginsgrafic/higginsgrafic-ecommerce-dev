@@ -21,12 +21,18 @@ export const validatePhone = (phone) => {
 };
 
 /**
- * Validar codi postal espanyol
+ * Validar codi postal.
+ *
+ * El checkout ofereix Espanya, França i Andorra, i els codis postals són molt
+ * diferents entre països (08001, 75001, AD500). Validar només el format
+ * espanyol (/^[0-5]\d{4}$/) bloquejava completament les compres
+ * internacionals tot i que el selector de país les ofereix.
+ * Ara s'accepta el format internacional habitual: entre 3 i 10 caràcters
+ * alfanumèrics, amb espais o guions opcionals.
  */
 export const validatePostalCode = (postalCode) => {
-  // Format: 08001 (5 dígits)
-  const regex = /^[0-5]\d{4}$/;
-  return regex.test(postalCode);
+  const value = String(postalCode == null ? '' : postalCode).trim();
+  return /^[A-Za-z0-9][A-Za-z0-9 -]{2,9}$/.test(value);
 };
 
 /**

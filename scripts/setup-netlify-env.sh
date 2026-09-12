@@ -2,66 +2,108 @@
 # ============================================================
 # Configuració de variables d'entorn a Netlify
 # ============================================================
-# 
-# REQUISIT PREVI: Autenticar-se amb netlify-cli des del navegador
+#
+# AQUEST SCRIPT NO CONTÉ CAP SECRET.
+# Llegeix els valors del fitxer .env local (que està al .gitignore)
+# i els puja a Netlify. Així els secrets no arriben mai al repositori.
+#
+# HISTÒRIC: la versió anterior d'aquest script tenia les claus escrites
+# en clar i es va versionar en un repositori públic. Es van haver de
+# revocar totes (Supabase service_role, Supabase anon i Gelato) el
+# 12/09/2026. No hi tornis a escriure claus.
+#
+# REQUISIT PREVI:
 #   npx --yes netlify-cli login
-#
-# Si falla la instal·lacio global, pots usar sempre npx:
-#   npx --yes netlify-cli <comanda>
-#
-# Per instal·lar globalment (requereix sudo):
-#   sudo npm install -g netlify-cli
-#
-# Després de l'auth, vincular el projecte (si no està ja):
 #   npx --yes netlify-cli link
+#
+# ÚS:
+#   bash scripts/setup-netlify-env.sh
 #
 # ============================================================
 
-set -e
+set -euo pipefail
 
-echo "📦 Configurant variables d'entorn de Netlify..."
+ENV_FILE="${ENV_FILE:-.env}"
+CONTEXT="${CONTEXT:-production}"
+
+if [ ! -f "$ENV_FILE" ]; then
+  echo "❌ No s'ha trobat el fitxer $ENV_FILE"
+  echo "   Copia .env.example a .env i omple-hi els valors reals."
+  exit 1
+fi
+
+# Variables que es pugen a Netlify.
+# NOTA: VITE_GELATO_API_KEY ja NO s'hi inclou. Era una clau privada amb
+# prefix VITE_, cosa que la incrustava al JavaScript del navegador.
+# Cap fitxer del codi la fa servir: la clau de Gelato és només de servidor
+# (GELATO_API_KEY).
+VARS=(
+  # Públiques (acaben al bundle del navegador — mai hi posis secrets)
+  VITE_SUPABASE_URL
+  VITE_SUPABASE_ANON_KEY
+  VITE_STRIPE_PUBLISHABLE_KEY
+  VITE_SENTRY_DSN
+  VITE_ADMIN_EMAILS
+  VITE_GELATO_STORE_ID
+  VITE_GELATO_SANDBOX
+  VITE_USE_MOCK_DATA
+  # Privades (només servidor)
+  SUPABASE_SERVICE_ROLE_KEY
+  STRIPE_SECRET_KEY
+  STRIPE_WEBHOOK_SECRET
+  GELATO_API_KEY
+  RESEND_API_KEY
+  RESEND_FROM_EMAIL
+  ADMIN_EMAIL
+)
+
+get_env_value() {
+  grep -E "^${1}=" "$ENV_FILE" | head -1 | cut -d= -f2- \
+    | sed -e 's/^["'\'']//' -e 's/["'\'']$//' -e 's/[[:space:]]*$//'
+}
+
+echo "📦 Pujant variables d'entorn a Netlify (context: $CONTEXT)"
+echo "   Origen: $ENV_FILE"
 echo ""
 
-# === CRÍTIQUES (obligatòries) ===
+pujades=0
+omeses=0
+avisos=0
 
-echo "🔴 Variables CRÍTIQUES:"
+for name in "${VARS[@]}"; do
+  value="$(get_env_value "$name" || true)"
 
-netlify env:set VITE_GELATO_API_KEY "065e87f5-53b9-462c-9106-c184736ea1e9-bffd61f3-0cd2-485f-a1a3-0e16a0e44b88:c37a7a77-5f60-40db-b835-1e5260525cc7" --context production
-echo "  ✅ VITE_GELATO_API_KEY"
+  if [ -z "$value" ]; then
+    echo "  ⚠️  $name — buit o absent, s'omet"
+    omeses=$((omeses + 1))
+    continue
+  fi
 
-netlify env:set VITE_GELATO_STORE_ID "3fc67d70-cfbc-4741-9474-f460f03bc8d1" --context production
-echo "  ✅ VITE_GELATO_STORE_ID"
+  # Avisar si sembla una clau JWT legacy de Supabase (revocades el 12/09/2026)
+  case "$value" in
+    eyJ*)
+      echo "  🛑 $name — sembla una clau JWT LEGACY (eyJ...)"
+      echo "       Aquestes claus es van revocar el 12/09/2026 i ja no funcionen."
+      echo "       Cal usar el format nou: sb_secret_... / sb_publishable_..."
+      avisos=$((avisos + 1))
+      continue
+      ;;
+  esac
 
-netlify env:set VITE_SUPABASE_URL "https://jnuuejlxuyqhhkfucuxg.supabase.co" --context production
-echo "  ✅ VITE_SUPABASE_URL"
-
-netlify env:set VITE_SUPABASE_ANON_KEY "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpudXVlamx4dXlxaGhrZnVjdXhnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjY0MTgwODgsImV4cCI6MjA4MTk5NDA4OH0.39ATMJ50D3Ll4t9eWd25kL77Aw7jA4zub714HnEmX7k" --context production
-echo "  ✅ VITE_SUPABASE_ANON_KEY"
-
-netlify env:set SUPABASE_SERVICE_ROLE_KEY "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpudXVlamx4dXlxaGhrZnVjdXhnIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2NjQxODA4OCwiZXhwIjoyMDgxOTk0MDg4fQ.sQpODlILcyXgCyrFxmb1DwsAwqXa75nujjOzSrfQqgk" --context production
-echo "  ✅ SUPABASE_SERVICE_ROLE_KEY"
-
-netlify env:set VITE_ADMIN_EMAILS "higginsgrafic@gmail.com" --context production
-echo "  ✅ VITE_ADMIN_EMAILS"
-
-# === NO CRÍTIQUES (opcionals amb defaults) ===
-
-echo ""
-echo "🟢 Variables OPCIONALS:"
-
-netlify env:set VITE_GELATO_SANDBOX "false" --context production
-echo "  ✅ VITE_GELATO_SANDBOX"
-
-netlify env:set VITE_USE_MOCK_DATA "false" --context production
-echo "  ✅ VITE_USE_MOCK_DATA"
+  npx --yes netlify-cli env:set "$name" "$value" --context "$CONTEXT" >/dev/null
+  echo "  ✅ $name"
+  pujades=$((pujades + 1))
+done
 
 echo ""
 echo "========================================"
-echo "🎉 Configuració completada!"
+echo "  Pujades:   $pujades"
+echo "  Omeses:    $omeses"
+[ "$avisos" -gt 0 ] && echo "  Avortades: $avisos  (claus legacy detectades)"
 echo "========================================"
 echo ""
 echo "Per verificar:"
-echo "  npx --yes netlify-cli env:list"
+echo "  npx --yes netlify-cli env:list --context $CONTEXT"
 echo ""
-echo "Després, fer un deploy de producció:"
+echo "Després, desplegar:"
 echo "  npx --yes netlify-cli deploy --build --prod"

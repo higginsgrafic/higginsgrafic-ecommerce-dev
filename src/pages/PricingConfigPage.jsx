@@ -85,9 +85,40 @@ export default function PricingConfigPage() {
   const saveGlobal = async () => {
     setSaving('global');
     try {
-      const { error } = await supabase
+      const price = parseFloat(globalPrice);
+      if (Number.isNaN(price)) {
+        throw new Error('El preu global no és un número vàlid');
+      }
+
+      // NO es pot fer upsert amb onConflict:'scope,collection' quan collection
+      // és NULL: a PostgreSQL els NULL no col·lideixen en un índex únic, així
+      // que cada desat INSERIA una fila nova. A la base de dades ja hi havia
+      // dues files 'global' idèntiques.
+      //
+      // Actualitzem TOTES les files globals, no només una: el lector
+      // (supabase-products.js:18-21) recorre les files i es queda amb l'última
+      // que troba, i l'ordre de `select('*')` no està garantit. Si n'actualitzem
+      // només una, el preu mostrat podria no canviar mai.
+      const { data: existing, error: readError } = await supabase
         .from('pricing_config')
-        .upsert({ scope: 'global', collection: null, price: parseFloat(globalPrice) }, { onConflict: 'scope,collection' });
+        .select('id')
+        .eq('scope', 'global')
+        .is('collection', null);
+
+      if (readError) throw readError;
+
+      const hiHaFiles = Array.isArray(existing) && existing.length > 0;
+
+      const { error } = hiHaFiles
+        ? await supabase
+            .from('pricing_config')
+            .update({ price })
+            .eq('scope', 'global')
+            .is('collection', null)
+        : await supabase
+            .from('pricing_config')
+            .insert({ scope: 'global', collection: null, price });
+
       if (error) throw error;
       setDirty(d => ({ ...d, global: false }));
     } catch (err) {

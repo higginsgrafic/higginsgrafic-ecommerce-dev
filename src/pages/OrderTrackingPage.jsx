@@ -8,6 +8,9 @@ import { fetchMockOrder, MOCK_CLIENT } from '@/lib/mockOrderStore';
 const OrderTrackingPage = () => {
   const [searchParams] = useSearchParams();
   const orderIdFromUrl = searchParams.get('order');
+  // Token de seguiment que arriba als enllaços dels correus transaccionals
+  // (buildTrackingLink). Permet consultar la comanda sense número ni email.
+  const trackingTokenFromUrl = searchParams.get('trackingToken');
 
   const [orderId, setOrderId] = useState(orderIdFromUrl || '');
   const [email, setEmail] = useState(import.meta.env.DEV && orderIdFromUrl ? MOCK_CLIENT.email : '');
@@ -31,7 +34,8 @@ const OrderTrackingPage = () => {
   const handleTrackOrder = async (e) => {
     e?.preventDefault();
 
-    if (!orderId.trim() || !email.trim()) {
+    // Amb un token de seguiment (enllaç del correu) no cal número ni email.
+    if (!trackingTokenFromUrl && (!orderId.trim() || !email.trim())) {
       setError('Si us plau, introdueix el número de comanda i l\'email');
       return;
     }
@@ -78,7 +82,10 @@ const OrderTrackingPage = () => {
     }
 
     try {
-      const res = await fetch(`/api/orders?orderNumber=${encodeURIComponent(orderId.trim())}&email=${encodeURIComponent(email.trim())}`);
+      const url = trackingTokenFromUrl
+        ? `/api/orders?trackingToken=${encodeURIComponent(trackingTokenFromUrl)}`
+        : `/api/orders?orderNumber=${encodeURIComponent(orderId.trim())}&email=${encodeURIComponent(email.trim())}`;
+      const res = await fetch(url);
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
         throw new Error(data.error || 'Comanda no trobada. Verifica el número i l\'email.');
@@ -131,7 +138,7 @@ const OrderTrackingPage = () => {
 
   // Buscar automàticament si ve de l'URL
   useEffect(() => {
-    if (orderIdFromUrl && email) {
+    if (trackingTokenFromUrl || (orderIdFromUrl && email)) {
       handleTrackOrder();
     }
   }, []);

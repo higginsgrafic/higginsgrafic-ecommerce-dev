@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/api/supabase-products';
+import { authHeaders } from '@/api/authHeaders';
 import { useAuth } from '@/contexts/AuthContext';
 import { fetchMockOrdersByEmail } from '@/lib/mockOrderStore';
 
@@ -76,7 +77,12 @@ export function useProfile() {
           const mockOrders = fetchMockOrdersByEmail(user.email);
           setOrders(mockOrders.map(mapMockOrder));
         } else {
-          const ordersRes = await fetch(`/api/orders?userId=${encodeURIComponent(user.id)}`);
+          // Cal el token de sessió: /api/orders respon 401 sense ell i la
+          // pestanya de comandes del perfil sortia sempre buida. El servidor
+          // identifica l'usuari pel token, no pel paràmetre userId.
+          const ordersRes = await fetch(`/api/orders?userId=${encodeURIComponent(user.id)}`, {
+            headers: await authHeaders(),
+          });
           if (ordersRes.ok) {
             const ordersData = await ordersRes.json();
             setOrders(ordersData.orders || []);

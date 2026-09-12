@@ -176,9 +176,11 @@ describe('Duplicate prevention', () => {
 
     const res = await handler(makeWebhookEvent());
     expect(res.statusCode).toBe(500);
-    // Event should still be recorded (but with error result)
-    expect(_insertCallCount).toBe(1);
-    expect(_insertPayload.result).toHaveProperty('ok', false);
+    // L'esdeveniment NO s'ha de desar com a processat: si es desés, la
+    // comprovació d'idempotència del principi de la funció el detectaria com
+    // a duplicat en el reintent de Stripe i la comanda no s'enviaria mai a
+    // Gelato. El reintent ha de poder tornar-lo a processar.
+    expect(_insertCallCount).toBe(0);
   });
 });
 

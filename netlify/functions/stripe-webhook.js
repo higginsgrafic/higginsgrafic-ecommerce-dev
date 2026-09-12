@@ -182,8 +182,14 @@ export async function handler(event, context) {
         console.log('[stripe-webhook] Unhandled event type:', stripeEvent.type);
     }
 
-    // Record the processed event for idempotency
-    if (supabase) {
+    // Registrem l'esdeveniment com a processat NOMÉS si ha anat bé.
+    //
+    // BUG CORREGIT: abans s'inseria sempre, també quan tot seguit es retornava
+    // un 500 per demanar a Stripe que reintentés. Com que la comprovació
+    // d'idempotència del principi busca per event_id, el reintent es detectava
+    // com a duplicat i se saltava: una comanda que fallava per xarxa en el
+    // fulfillment a Gelato no s'hi tornava a enviar mai de forma automàtica.
+    if (supabase && processResult.ok) {
       await supabase
         .from('processed_stripe_events')
         .insert({

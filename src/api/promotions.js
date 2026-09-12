@@ -62,16 +62,21 @@ export async function updatePromotionsConfig(config) {
       .select('id')
       .maybeSingle();
 
+    // ATENCIÓ: `discount_enabled` i `discount_rate` NO existeixen a la taula
+    // `promotions_config` real. Escriure'ls feia fallar TOTS els desats de la
+    // configuració d'ofertes amb "column does not exist", i per això l'admin
+    // no podia desar res del banner.
+    // `clickable` sí que existeix i no s'escrivia mai: el banner no es podia
+    // fer clicable. L'afegim.
     const updateData = {
       enabled: config.enabled,
       text: config.text,
       link: config.link,
+      clickable: config.clickable ?? false,
       bg_color: config.bgColor,
       text_color: config.textColor,
       font_size: config.fontSize,
       font: config.font,
-      discount_enabled: config.discountEnabled ?? false,
-      discount_rate: config.discountRate ?? 0,
     };
 
     let result;
