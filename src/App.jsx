@@ -195,9 +195,12 @@ function App() {
           Google i les pestanyes del navegador). */}
       <Helmet defaultTitle="GRAFC - Samarretes Premium | Col·leccions Exclusives" titleTemplate="%s | GRAFC" />
 
-      {shouldRedirect && !isFullScreenRoute ? (
-        <div className="w-full h-screen bg-black" />
-      ) : !productContext ? (
+      {/* NOTA: aqui hi havia la branca `shouldRedirect` (pantalla negra) que es
+          va portar d'AppProd.jsx en unificar les dues aplicacions. S'ha tret
+          perque bloquejava tambe el desenvolupament: l'aplicació original no
+          la tenia a proposit. Si cal recuperar-la, ha de ser una decisió
+          conscient i condicionada a l'entorn, no un port automatic. */}
+      {!productContext ? (
         <div className="min-h-screen flex items-center justify-center">
           <div className="text-center">
             <h1 className="text-2xl font-bold mb-4">Error: ProductContext no disponible</h1>
