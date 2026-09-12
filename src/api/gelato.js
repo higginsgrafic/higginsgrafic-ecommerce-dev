@@ -4,6 +4,7 @@
  */
 
 import apiClient from './client';
+import { supabase } from './supabase-products';
 
 const GELATO_PRODUCTS_API = 'https://product.gelatoapis.com/v3';
 const GELATO_ORDER_API = 'https://order.gelatoapis.com/v4';
@@ -32,8 +33,29 @@ class GelatoClient {
     };
   }
 
-  async request(endpoint, options = {}, useOrdersAPI = false) {
+  /**
+   * Capçaleres per cridar l'edge function `gelato-proxy`.
+   *
+   * La capçalera Authorization ha de portar el token de SESSIÓ de l'usuari,
+   * no la clau `anon`: l'edge function valida el token amb auth.getUser() per
+   * comprovar que qui crida és administrador. Amb la clau anon això falla
+   * sempre, així que totes les accions d'administració —entre elles
+   * `store-products`, que és la que fa servir la sincronització de productes—
+   * retornaven 403 i la sincronització era impossible d'executar.
+   */
+  async buildHeaders() {
+    const headers = { ...this.headers };
     try {
+      const { data } = (await supabase?.auth?.getSession?.()) ?? {};
+      const token = data?.session?.access_token;
+      if (token) headers.Authorization = `Bearer ${token}`;
+    } catch {
+      // Sense sessió es manté la clau anon: les accions públiques segueixen.
+    }
+    return headers;
+  }
+
+  async request(endpoint, options = {}, useOrdersAPI = false) {    try {
       // Construir URL de la edge function amb paràmetres
       let url;
       try {
@@ -73,7 +95,7 @@ class GelatoClient {
             const response = await fetch(url.toString(), {
         ...options,
         headers: {
-          ...this.headers,
+          ...(await this.buildHeaders()),
           ...options.headers
         }
       });
@@ -151,7 +173,7 @@ class GelatoClient {
     url.searchParams.set('currency', 'EUR');
     url.searchParams.set('country', 'ES');
     const response = await fetch(url.toString(), {
-      headers: this.headers
+      headers: await this.buildHeaders()
     });
     if (!response.ok) {
       const errorText = await response.text();
@@ -181,7 +203,7 @@ class GelatoClient {
       }
 
             const response = await fetch(url.toString(), {
-        headers: this.headers
+        headers: await this.buildHeaders()
       });
 
       if (!response.ok) {
@@ -234,7 +256,7 @@ class GelatoClient {
       }
 
             const response = await fetch(url.toString(), {
-        headers: this.headers
+        headers: await this.buildHeaders()
       });
 
       if (!response.ok) {
@@ -259,7 +281,7 @@ class GelatoClient {
       url.searchParams.set('templateId', templateId);
 
             const response = await fetch(url.toString(), {
-        headers: this.headers
+        headers: await this.buildHeaders()
       });
 
       if (!response.ok) {
