@@ -18,6 +18,7 @@ import useComponentCatalogConfig from '@/hooks/useComponentCatalogConfig';
 import AppRoutes from '@/routes/AppRoutes';
 import * as P from '@/routes/lazyPages';
 import BottomTabBar from '@/components/BottomTabBar';
+import CollectionIconsBar from '@/components/CollectionIconsBar';
 import { MobileCercadorSheet } from '@/components/MobileCercadorSheet';
 
 const DebugLayer = lazy(() => import('@/components/DebugLayer'));
@@ -228,7 +229,7 @@ function App() {
           style={!isFullScreenRoute ? (
             isAdminRoute
               ? { paddingTop: adminRouteOffset, paddingLeft: `${rulerInset}px`, '--appHeaderOffset': adminRouteOffset, '--rulerInset': `${rulerInset}px` }
-              : { paddingTop: isDemoStyleLayoutRoute ? demoHeaderOffset : appHeaderOffset, paddingLeft: `${rulerInset}px`, paddingBottom: isMobile && !isAdminRoute ? '64px' : undefined, '--appHeaderOffset': isDemoStyleLayoutRoute ? demoHeaderOffset : appHeaderOffset, '--rulerInset': `${rulerInset}px` }
+              : { paddingTop: isDemoStyleLayoutRoute ? demoHeaderOffset : appHeaderOffset, paddingLeft: `${rulerInset}px`, paddingBottom: isMobile && !isAdminRoute ? (isHomeRoute ? '152px' : '64px') : undefined, '--appHeaderOffset': isDemoStyleLayoutRoute ? demoHeaderOffset : appHeaderOffset, '--rulerInset': `${rulerInset}px` }
           ) : {}}
           tabIndex={-1}
         >
@@ -262,6 +263,7 @@ function App() {
         {isMobile && !isFullScreenRoute && !isAdminRoute && (
           <>
             <MobileCercadorSheet />
+            {isHomeRoute && <CollectionIconsBar />}
             <BottomTabBar />
           </>
         )}
