@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo, useCallback, useTransition, Suspense, lazy } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { Helmet } from 'react-helmet';
 import { useProductContext } from '@/contexts/ProductContext';
 import { useAdmin } from '@/contexts/AdminContext';
 import { useOffersConfig } from '@/hooks/useOffersConfig';
@@ -188,7 +189,15 @@ function App() {
 
   return (
     <ErrorBoundary>
-      {!productContext ? (
+      {/* Títols per defecte del lloc. Provenen de l'antiga aplicació de
+          producció (AppProd.jsx, ja eliminada): aquest fitxer no els tenia i,
+          en unificar les dues aplicacions, s'haurien perdut (és el que veuen
+          Google i les pestanyes del navegador). */}
+      <Helmet defaultTitle="GRAFC - Samarretes Premium | Col·leccions Exclusives" titleTemplate="%s | GRAFC" />
+
+      {shouldRedirect && !isFullScreenRoute ? (
+        <div className="w-full h-screen bg-black" />
+      ) : !productContext ? (
         <div className="min-h-screen flex items-center justify-center">
           <div className="text-center">
             <h1 className="text-2xl font-bold mb-4">Error: ProductContext no disponible</h1>
@@ -213,7 +222,7 @@ function App() {
       ) : (
         <>
           <SkipLink />
-          {isNavigating && !isAdminRoute && <LoadingScreen />}
+          {isNavigating && !isAdminRoute && !isFullScreenRoute && !shouldRedirect && <LoadingScreen />}
 
           {adminBannerVisible && <AdminBanner rulerInset={rulerInset} />}
 
