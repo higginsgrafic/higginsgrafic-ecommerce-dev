@@ -31,6 +31,11 @@ export const createPaymentIntent = async (items, shippingZone = 'es_peninsula', 
         currency,
         email: opts.email || undefined,
         userId: opts.userId || undefined,
+        shipping: opts.shipping || undefined,
+        // Dades de facturació B2B (empresa i CIF). El formulari les demanava
+        // i s'acabaven llençant, així que el comerciant no podia emetre
+        // factura. El servidor les desa a les metadades del pagament.
+        invoice: opts.invoice || undefined,
       }),
     });
 

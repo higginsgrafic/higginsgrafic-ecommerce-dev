@@ -1,0 +1,33 @@
+-- ============================================================
+-- Elimina la inserció anònima a rate_limit_log
+-- ============================================================
+-- La política "Anyone can insert rate limit log" permetia a qualsevol amb la
+-- clau `anon` (que és pública per disseny) inserir files directament via
+-- PostgREST, saltant-se el rate limiting de les Netlify Functions.
+--
+-- Per què és perillós:
+--   check_rate_limit() fa un COUNT(*) sobre aquesta taula. Un atacant pot
+--   inserir files massivament fins a degradar la consulta i provocar un
+--   timeout; i com que el rate limiter és FAIL-OPEN (vegeu
+--   netlify/functions/_rate-limit.js), un timeout DESACTIVA el rate limiting
+--   de tota la plataforma: contacte, seguiment de comandes i pagaments.
+--
+-- Les Netlify Functions fan servir service_role, de manera que no necessiten
+-- aquesta política: "Service role can manage rate limit log" (FOR ALL TO
+-- service_role) ja cobreix les insercions.
+--
+-- NOTA: les polítiques SELECT no es toquen; `anon` no en té cap, així que
+-- les dades de la taula no eren llegibles.
+-- ============================================================
+
+DROP POLICY IF EXISTS "Anyone can insert rate limit log" ON public.rate_limit_log;
+
+-- ============================================================
+-- Verificació posterior (executar a mà per confirmar):
+--
+--   SELECT policyname, roles, cmd
+--   FROM pg_policies
+--   WHERE tablename = 'rate_limit_log';
+--
+-- Ha de retornar ÚNICAMENT "Service role can manage rate limit log".
+-- ============================================================

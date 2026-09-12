@@ -3,7 +3,7 @@ import react from '@vitejs/plugin-react'
 import path from 'path'
 import { fileURLToPath } from 'url'
 import fs from 'fs'
-import { execSync } from 'child_process'
+import { execSync, execFileSync } from 'child_process'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
@@ -79,11 +79,18 @@ function componentCatalogDevApi() {
 
               const doCommit = url.searchParams.get('commit') === '1'
               const commitMessage = url.searchParams.get('message') || 'chore(catalog): update component catalog config'
+              // El missatge ve de la URL: traiem salts de línia i limitem la
+              // longitud abans de passar-lo a git.
+              const safeMessage = String(commitMessage).replace(/[\r\n]+/g, ' ').slice(0, 200)
 
               let git = { didCommit: false }
               if (doCommit) {
-                execSync(`git add ${CONFIG_REL_PATH}`, { cwd: __dirname, stdio: 'ignore' })
-                execSync(`git commit -m "${commitMessage.replace(/\"/g, '\\"')}"`, { cwd: __dirname, stdio: 'ignore' })
+                // execFileSync amb arguments separats: no passa per cap shell,
+                // així que el paràmetre `message` no pot injectar comandes.
+                // (Abans s'usava execSync amb interpolació de la URL i només
+                // s'escapaven les cometes dobles: $(...) i backticks s'executaven.)
+                execFileSync('git', ['add', CONFIG_REL_PATH], { cwd: __dirname, stdio: 'ignore' })
+                execFileSync('git', ['commit', '-m', safeMessage], { cwd: __dirname, stdio: 'ignore' })
                 git = { didCommit: true }
               }
 

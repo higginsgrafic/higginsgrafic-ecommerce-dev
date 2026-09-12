@@ -9,6 +9,18 @@ import { SITE_ORIGIN, buildSiteUrl } from '@/config/siteOrigin.js';
  * - Twitter Cards
  * - Schema.org JSON-LD
  */
+/**
+ * Serialitza dades per a un <script type="application/ld+json">.
+ *
+ * react-helmet insereix el contingut d'aquests scripts sense escapar: un
+ * `</script>` dins d'un nom o una descripció de producte trencaria el tag i
+ * injectaria HTML/JS a totes les pàgines de producte (XSS emmagatzemat
+ * d'administrador cap a visitants). Escapem `<` com a \u003c per evitar-ho.
+ */
+function jsonLd(data) {
+  return JSON.stringify(data).replace(/</g, '\\u003c');
+}
+
 function SEO({
   title,
   description,
@@ -118,18 +130,18 @@ function SEO({
 
       {/* Schema.org JSON-LD - Organization */}
       <script type="application/ld+json">
-        {JSON.stringify(baseOrganizationSchema)}
+        {jsonLd(baseOrganizationSchema)}
       </script>
 
       {/* Schema.org JSON-LD - WebSite */}
       <script type="application/ld+json">
-        {JSON.stringify(websiteSchema)}
+        {jsonLd(websiteSchema)}
       </script>
 
       {/* Custom Schema.org data */}
       {schema && (
         <script type="application/ld+json">
-          {JSON.stringify(schema)}
+          {jsonLd(schema)}
         </script>
       )}
     </Helmet>

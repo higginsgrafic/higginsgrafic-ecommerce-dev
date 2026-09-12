@@ -4,7 +4,11 @@
 
 La clau API de Gelato ja està configurada i el sistema està preparat per sincronitzar productes reals!
 
-**Clau API configurada**: `065e87f5-53b9-462c-9106-c184736ea1e9...`
+**Clau API**: es configura amb la variable d'entorn `GELATO_API_KEY` (servidor). No s'ha d'escriure cap clau en aquest document ni enlloc del repositori.
+
+> ⚠️ **Les claus d'API no es versionen mai.** La clau que hi havia aquí es va exposar
+> públicament i es va revocar el 12/09/2026. Si necessites configurar-la, fes servir
+> `scripts/setup-netlify-env.sh`, que llegeix els valors del `.env` local (no versionat).
 
 ## Estat actual de la configuració
 

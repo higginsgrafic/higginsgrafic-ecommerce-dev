@@ -128,8 +128,24 @@ function AppProd() {
   }, [adminBannerHeight, adminRouteOffset, appHeaderOffset, demoHeaderOffset, globalHeaderTopOffset, isAdminRoute, isDemoStyleLayoutRoute, isFullScreenRoute]);
 
   const handleAddToCart = useCallback((product, size, quantity = 1) => addToCart(product, size, quantity), [addToCart]);
-  const handleCartClick = useCallback(() => navigate('/cart'), [navigate]);
-  const handleUserClick = useCallback(() => navigate('/profile'), [navigate]);
+
+  // Obrir el cistell: abans es navegava a '/cart', una ruta que NO existeix,
+  // així que la pestanya "Cistell" del mòbil i la icona del cistell obrien una
+  // pàgina de "no trobat". El cistell viu dins del mega-slide, que s'obre amb
+  // aquest esdeveniment (el mateix que fan servir els botons "afegir al cistell").
+  const handleCartClick = useCallback(() => {
+    try {
+      window.dispatchEvent(new CustomEvent('hg:open-full-wide-cart', {
+        detail: { source: 'app-cart-click' },
+      }));
+    } catch {
+      // ignore
+    }
+  }, []);
+
+  // La ruta real del perfil és '/perfil' (vegeu AppRoutes.jsx). Abans
+  // s'apuntava a '/profile', que no existeix: la pestanya "Usuari" obria un 404.
+  const handleUserClick = useCallback(() => navigate('/perfil'), [navigate]);
   const pageProps = useMemo(() => ({ onAddToCart: handleAddToCart, cartItems, onUpdateQuantity: updateQuantity }), [handleAddToCart, cartItems, updateQuantity]);
 
   const showProductsLoadingScreen = !!loading;

@@ -29,7 +29,12 @@ function resolvePrice(basePrice, collection) {
   return basePrice;
 }
 
-const supabase = (supabaseUrl && supabaseKey) ? createClient(supabaseUrl, supabaseKey) : null;
+const supabase = (supabaseUrl && supabaseKey) ? createClient(supabaseUrl, supabaseKey, {
+  auth: {
+    autoRefreshToken: false,
+    persistSession: false,
+  },
+}) : null;
 
 export { supabase };
 
@@ -81,7 +86,12 @@ export const productsService = {
 
       const looksLikeFile = (name) => {
         const lower = (name || '').toString().toLowerCase();
-        return lower.endsWith('.webp') || lower.endsWith('.webp') || lower.endsWith('.webp') || lower.endsWith('.webp') || lower.endsWith('.gif') || lower.endsWith('.svg');
+        // BUG CORREGIT: '.webp' estava comprovat quatre vegades (error de
+        // copiar i enganxar) en lloc de '.jpg', '.jpeg' i '.png'. Els fitxers
+        // amb aquestes extensions i sense metadades no es reconeixien com a
+        // fitxers, es tractaven com a carpetes i no arribaven mai a la galeria.
+        return ['.webp', '.jpg', '.jpeg', '.png', '.gif', '.svg', '.avif', '.bmp']
+          .some((ext) => lower.endsWith(ext));
       };
 
       const isFileEntry = (x) => {

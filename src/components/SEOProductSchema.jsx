@@ -3,6 +3,15 @@ import { Helmet } from 'react-helmet';
 import { buildSiteUrl } from '@/config/siteOrigin.js';
 
 /**
+ * react-helmet insereix el contingut de <script type="application/ld+json">
+ * sense escapar: un `</script>` dins del nom o la descripció d'un producte
+ * trencaria el tag i injectaria HTML/JS. Escapem `<` com a \u003c.
+ */
+function jsonLd(data) {
+  return JSON.stringify(data).replace(/</g, '\\u003c');
+}
+
+/**
  * Component per afegir structured data (JSON-LD) a les pàgines de producte
  * Això ajuda Google i altres motors de cerca a entendre millor el contingut
  */
@@ -57,7 +66,7 @@ const SEOProductSchema = ({ product, url }) => {
   return (
     <Helmet>
       <script type="application/ld+json">
-        {JSON.stringify(schema)}
+        {jsonLd(schema)}
       </script>
     </Helmet>
   );

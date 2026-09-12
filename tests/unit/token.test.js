@@ -92,7 +92,10 @@ describe('_token.js — tracking token utilities', () => {
   describe('buildTrackingLink', () => {
     it('builds a URL with the raw token as query param', () => {
       const link = buildTrackingLink('https://example.com', 'rawtoken123');
-      expect(link).toBe('https://example.com/comanda?trackingToken=rawtoken123');
+      // La ruta ha de ser /track: és la que existeix a AppRoutes.jsx.
+      // Abans apuntava a /comanda, que no existeix, i tots els enllaços
+      // "Segueix la teva comanda" dels correus portaven a un 404.
+      expect(link).toBe('https://example.com/track?trackingToken=rawtoken123');
     });
 
     it('uses SITE_URL env var when siteUrl is not provided', () => {

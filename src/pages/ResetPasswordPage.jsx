@@ -18,6 +18,21 @@ export default function ResetPasswordPage() {
     navigate('/');
   };
 
+  // Math.random() no és criptogràficament segur: la contrasenya suggerida es
+  // podria predir. Fem servir crypto.getRandomValues quan és disponible.
+  const randomInt = (max) => {
+    try {
+      if (typeof crypto !== 'undefined' && crypto.getRandomValues) {
+        const arr = new Uint32Array(1);
+        crypto.getRandomValues(arr);
+        return arr[0] % max;
+      }
+    } catch {
+      // cau al Math.random de sota
+    }
+    return Math.floor(Math.random() * max);
+  };
+
   const generatePassword = () => {
     const lower = 'abcdefghijkmnpqrstuvwxyz';
     const upper = 'ABCDEFGHJKLMNPQRSTUVWXYZ';
@@ -26,7 +41,7 @@ export default function ResetPasswordPage() {
     const all = lower + upper + digits + symbols;
     let pwd = '';
     for (let i = 0; i < 12; i++) {
-      pwd += all[Math.floor(Math.random() * all.length)];
+      pwd += all[randomInt(all.length)];
     }
     setPassword(pwd);
     setConfirmPassword(pwd);

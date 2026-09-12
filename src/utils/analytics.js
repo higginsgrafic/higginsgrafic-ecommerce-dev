@@ -212,19 +212,36 @@ export const trackBeginCheckout = (items, totalValue) => {
  * Registrar compra completada
  */
 export const trackPurchase = (orderId, items, totalValue, shippingCost = 0, tax = 0) => {
+  // Els articles del cistell del mega-slide fan servir { title, qty, price } i
+  // el preu és TEXT ('15,50€'), mentre que aquesta funció esperava
+  // { id, name, quantity, price } amb el preu numèric. Sense normalitzar-ho,
+  // l'esdeveniment de compra sortia amb identificadors i noms buits, quantitats
+  // indefinides i el preu com a text: les estadístiques de vendes no servien
+  // per saber què s'havia venut.
+  const normalizeItem = (item = {}) => {
+    const rawPrice = item.price ?? item.unitPrice ?? 0;
+    const numericPrice = typeof rawPrice === 'number'
+      ? rawPrice
+      : parseFloat(String(rawPrice).replace('€', '').replace(/\s/g, '').replace(',', '.')) || 0;
+
+    return {
+      item_id: item.id || item.sku || item.productRoute || item.title || 'desconegut',
+      item_name: item.name || item.title || 'Producte',
+      item_category: item.collection || item.collectionSlug || undefined,
+      price: numericPrice,
+      quantity: item.quantity || item.qty || 1,
+    };
+  };
+
+  const normalizedItems = (Array.isArray(items) ? items : []).map(normalizeItem);
+
   const eventParams = {
     transaction_id: orderId,
     value: totalValue,
     currency: 'EUR',
     shipping: shippingCost,
     tax: tax,
-    items: items.map(item => ({
-      item_id: item.id,
-      item_name: item.name,
-      item_category: item.collection,
-      price: item.price,
-      quantity: item.quantity
-    }))
+    items: normalizedItems
   };
 
   trackEvent('purchase', eventParams);
@@ -232,8 +249,8 @@ export const trackPurchase = (orderId, items, totalValue, shippingCost = 0, tax 
   // Meta Pixel Purchase
   if (window.fbq && !DEBUG_ANALYTICS) {
     window.fbq('track', 'Purchase', {
-      content_ids: items.map(i => i.id),
-      contents: items.map(i => ({ id: i.id, quantity: i.quantity })),
+      content_ids: normalizedItems.map(i => i.item_id),
+      contents: normalizedItems.map(i => ({ id: i.item_id, quantity: i.quantity })),
       value: totalValue,
       currency: 'EUR'
     });

@@ -68,6 +68,11 @@ const SPECS = [
 const SIZES = ['S', 'M', 'L', 'XL', 'XXL'];
 const FINISHES = ['BLANC', 'COLOR', 'NEGRE'];
 
+// Embolcall: decideix entre mòbil i escriptori ABANS de muntar cap hook del
+// cos d'escriptori. Abans la decisió es prenia amb un `return` anticipat dins
+// del mateix component, de manera que en passar la finestra per sobre o per
+// sota de 768px canviava el nombre de hooks i React llançava "Rendered fewer
+// hooks than expected", desmuntant l'arbre (pantalla en blanc).
 function PdpPage() {
   const isMobile = useIsMobile();
   const location = useLocation();
@@ -91,6 +96,12 @@ function PdpPage() {
   if (isMobile) {
     return <PdpMobile />;
   }
+
+  return <PdpDesktop product={product} />;
+}
+
+function PdpDesktop({ product }) {
+  const location = useLocation();
 
   const PRODUCT_SLUG = product.slug;
   const PRODUCT_ROUTE = product.route;

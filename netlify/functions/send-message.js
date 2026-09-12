@@ -11,6 +11,20 @@ function escapeHtml(str) {
     .replace(/'/g, '&#39;');
 }
 
+// Validació bàsica de format d'adreça. Sense això, el formulari de contacte
+// fa de relay: qualsevol pot fer que el servidor enviï correu a una adreça
+// arbitrària des del domini de la botiga (spam i crema de reputació).
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+
+// Els valors que acaben en capçaleres de correu (subject, reply_to) no poden
+// contenir salts de línia: permetrien injectar capçaleres addicionals.
+function cleanHeader(value, maxLen = 200) {
+  return String(value == null ? '' : value)
+    .replace(/[\r\n]+/g, ' ')
+    .trim()
+    .slice(0, maxLen);
+}
+
 export async function handler(event) {
   if (event.httpMethod === 'OPTIONS') {
     return jsonResponse(event, 200, {}, { methods: 'POST, OPTIONS', headers: 'Content-Type' });
@@ -33,6 +47,14 @@ export async function handler(event) {
 
     if (!email || !message) {
       return jsonResponse(event, 400, { error: 'Falten camps obligatoris (email, message)' }, { methods: 'POST, OPTIONS', headers: 'Content-Type' });
+    }
+
+    if (typeof email !== 'string' || !EMAIL_RE.test(email.trim())) {
+      return jsonResponse(event, 400, { error: 'Adreça de correu no vàlida' }, { methods: 'POST, OPTIONS', headers: 'Content-Type' });
+    }
+
+    if (typeof message !== 'string' || message.length > 5000) {
+      return jsonResponse(event, 400, { error: 'El missatge és massa llarg (màxim 5000 caràcters)' }, { methods: 'POST, OPTIONS', headers: 'Content-Type' });
     }
 
     const adminEmail = process.env.ADMIN_EMAIL || process.env.RESEND_FROM_EMAIL || 'higginsgrafic@gmail.com';
@@ -77,8 +99,8 @@ export async function handler(event) {
           body: JSON.stringify({
             from: fromEmail,
             to: adminEmail,
-            reply_to: email,
-            subject: `Nou missatge de ${name || email}: ${subject || (orderNumber ? `Comanda #${orderNumber}` : '(sense assumpte)')}`,
+            reply_to: cleanHeader(email, 320),
+            subject: `Nou missatge de ${cleanHeader(name, 80) || cleanHeader(email, 320)}: ${cleanHeader(subject, 120) || (orderNumber ? `Comanda #${cleanHeader(orderNumber, 40)}` : '(sense assumpte)')}`,
             html: `
               <p><strong>Nom:</strong> ${escapeHtml(name || '—')}</p>
               <p><strong>Email:</strong> ${escapeHtml(email)}</p>

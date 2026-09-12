@@ -22,7 +22,9 @@ const OffersHeader = ({ adminBannerVisible = false }) => {
     if (isClickable) {
       // Si l'enllaç comença amb http:// o https://, navegar externament
       if (link.startsWith('http://') || link.startsWith('https://')) {
-        window.open(link, '_blank');
+        // Sense 'noopener' la pàgina destí pot manipular window.opener
+        // (reverse tabnabbing). L'enllaç ve de promotions_config.
+        window.open(link, '_blank', 'noopener,noreferrer');
       } else {
         // Si és una ruta interna, usar navigate
         navigate(link);

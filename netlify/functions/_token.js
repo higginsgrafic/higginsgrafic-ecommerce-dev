@@ -28,5 +28,8 @@ export function isTokenExpired(expiresAt) {
 
 export function buildTrackingLink(siteUrl, rawToken) {
   const base = siteUrl || process.env.SITE_URL || 'https://higginsgrafic.com';
-  return `${base}/comanda?trackingToken=${rawToken}`;
+  // La ruta de seguiment de l'aplicació és /track (vegeu AppRoutes.jsx).
+  // Abans apuntava a /comanda, que no existeix: l'enllaç "Segueix la teva
+  // comanda" de tots els correus portava a una pàgina de "no trobat".
+  return `${base}/track?trackingToken=${rawToken}`;
 }

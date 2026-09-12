@@ -72,7 +72,11 @@ export default function PdpPage() {
 
   const handleAddToCart = () => {
     addToCart({
-      id: `${COLLECTION_SLUG}-${PRODUCT_ROUTE}-${mainVariantColor}`,
+      // L'acabat (BLANC/COLOR/NEGRE) ha de formar part de l'id: CartContext
+      // fusiona les línies per id+talla, així que sense l'acabat afegir la
+      // mateixa samarreta en BLANC i després en NEGRE incrementava UNA sola
+      // línia i s'acabava fabricant l'acabat de la primera.
+      id: `${COLLECTION_SLUG}-${PRODUCT_ROUTE}-${mainVariantColor}-${selectedFinish}`,
       name: PRODUCT_NAME,
       productRoute: PRODUCT_ROUTE,
       collection: COLLECTION_SLUG,

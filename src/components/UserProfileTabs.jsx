@@ -144,9 +144,13 @@ function AccountTab({ profile, addresses, onUpdateProfile }) {
           addresses.map((addr) => (
             <div key={addr.id} style={{ backgroundColor: 'white', border: '1px solid #ccc', padding: '12px', marginBottom: '12px' }}>
               <div style={{ fontFamily: 'Roboto Condensed, sans-serif', fontSize: '12pt', fontWeight: 300 }}>
-                <strong>{addr.recipient_name}</strong><br />
-                {addr.street}<br />
+                {/* `recipient_name` no existeix a la taula `addresses`: sortia
+                    sempre buit. Els camps reals són street, street_number,
+                    floor_door, postal_code, city, province i country. */}
+                {addr.street}{addr.street_number ? ` ${addr.street_number}` : ''}<br />
+                {addr.floor_door ? <>{addr.floor_door}<br /></> : null}
                 {addr.postal_code} {addr.city}<br />
+                {addr.province ? <>{addr.province}<br /></> : null}
                 {addr.country}
               </div>
               {addr.is_default && (

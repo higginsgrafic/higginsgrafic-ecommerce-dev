@@ -279,10 +279,20 @@ html, body { scrollbar-width: none; }
       <FullWideSlideHeader
         cartItemCount={getTotalItems()}
         onCartClick={() => {
-          navigate('/cart');
+          // '/cart' no existeix. El cistell viu dins del mega-slide i s'obre
+          // amb aquest esdeveniment (el mateix que fan servir els botons
+          // "afegir al cistell").
+          try {
+            window.dispatchEvent(new CustomEvent('hg:open-full-wide-cart', {
+              detail: { source: 'full-wide-slide-cart-click' },
+            }));
+          } catch {
+            // ignore
+          }
         }}
         onUserClick={() => {
-          navigate('/profile');
+          // La ruta real del perfil és '/perfil'; '/profile' no existeix.
+          navigate('/perfil');
         }}
         manualEnabledOverride={false}
         ignoreStripeDebugFromUrl

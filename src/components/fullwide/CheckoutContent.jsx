@@ -4,13 +4,14 @@ import { Elements, CardNumberElement, CardExpiryElement, CardCvcElement, useStri
 import { Check } from 'lucide-react';
 import { validateEmail, validateRequired, validatePostalCode, validateForm } from '@/utils/validation';
 import { trackBeginCheckout, trackPurchase } from '@/utils/analytics';
-import { useShippingCosts } from '@/hooks/useShippingCosts';
+import { useShippingCosts, normalizeCountry } from '@/hooks/useShippingCosts';
 import { createMockOrder, MOCK_CLIENT } from '@/lib/mockOrderStore';
 import { useAuth } from '@/contexts/AuthContext';
 import { drawingStripePath } from '@/lib/drawingPaths';
 import { getMockupPath, INK_BLACK, INK_WHITE, COLLECTIONS } from '@/lib/mockupPaths';
 import { useOffersConfig } from '@/hooks/useOffersConfig';
 import { getStripe, createPaymentIntent } from '@/api/stripe';
+import { PDP_REGISTRY_BY_ROUTE } from '@/data/pdpRegistry';
 
 function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPortraitTablet = false }) {
   const stripe = useStripe();
@@ -291,7 +292,7 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
       city: [{ validate: validateRequired, message: 'La ciutat és obligatòria' }],
       postalCode: [
         { validate: validateRequired, message: 'El codi postal és obligatori' },
-        { validate: validatePostalCode, message: 'Codi postal invàlid (format: 08001)' }
+        { validate: validatePostalCode, message: 'Codi postal invàlid' }
       ],
     };
     const errors = validateForm(formData, rules);
@@ -340,7 +341,13 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
 
         const piResponse = await createPaymentIntent(
           activeItems.map((item, idx) => ({
+            // El cistell del mega-slide no guarda la variant de Gelato: treballa
+            // amb la ruta del disseny, la talla i el color. Enviem el slug del
+            // producte perquè el servidor pugui resoldre la variant contra la
+            // base de dades (product_variants), que és on viu gelato_variant_id.
             gelatoVariantId: item.gelatoVariantId || null,
+            productSlug: PDP_REGISTRY_BY_ROUTE[item.productRoute]?.slug || null,
+            color: item.color || null,
             quantity: item.qty || 1,
             designFiles: item.designFiles || [],
             designUrl: item.designUrl || null,
@@ -349,10 +356,32 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
           })),
           formData.country || 'es_peninsula',
           'eur',
-          { email: formData.email, userId: user?.id || undefined }
+          {
+            email: formData.email,
+            userId: user?.id || undefined,
+            // L'adreça d'enviament s'ha de desar al servidor: és la que es
+            // tramet a Gelato per fabricar i enviar la comanda. Sense això,
+            // la comanda es paga però no es pot produir.
+            shipping: {
+              firstName: formData.firstName,
+              lastName: formData.lastName,
+              address: formData.address,
+              address2: formData.address2,
+              city: formData.city,
+              postalCode: formData.postalCode,
+              country: formData.country,
+              phone: formData.phone,
+            },
+            // Dades de facturació: el formulari les demana quan el client
+            // marca "Necessites factura?" i abans es perdien.
+            invoice: {
+              company: formData.company,
+              taxId: formData.taxId,
+            },
+          }
         );
 
-        const { clientSecret, paymentIntentId, orderNumber: serverOrderNumber } = piResponse;
+        const { clientSecret, paymentIntentId, orderNumber: serverOrderNumber, trackingToken } = piResponse;
 
         const { error: stripeError, paymentIntent } = await stripe.confirmCardPayment(
           clientSecret,
@@ -366,7 +395,9 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
                   line1: formData.address,
                   city: formData.city,
                   postal_code: formData.postalCode,
-                  country: 'ES',
+                  // El país ha de ser el que ha triat el client, no 'ES' fix:
+                  // Stripe fa servir aquesta dada per a la verificació d'adreça.
+                  country: normalizeCountry(formData.country),
                 },
               },
             },
@@ -386,7 +417,16 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
       if (setCartItems) setCartItems([]);
       setIsProcessing(false);
       if (onCloseMegaSlide) onCloseMegaSlide();
-      navigate(`/order-confirmation/${orderNumber}`);
+      // Codifiquem el número de comanda: el trigger de la base de dades el
+      // genera amb '#' al davant ('#000…1'), i sense codificar el '#' es
+      // converteix en fragment d'URL, la ruta /order-confirmation/:orderId ja
+      // no casa i el client acaba en una pàgina de "no trobat" després de pagar.
+      // Hi afegim el token de seguiment perquè el client (sobretot un convidat,
+      // sense sessió) pugui carregar la seva comanda: la consulta per número
+      // està restringida a administradors.
+      const confirmationUrl = `/order-confirmation/${encodeURIComponent(orderNumber)}`
+        + (trackingToken ? `?token=${encodeURIComponent(trackingToken)}` : '');
+      navigate(confirmationUrl);
     } catch (err) {
       console.error('[checkout] Error creating order:', err);
       setPaymentError('Error processant la comanda');

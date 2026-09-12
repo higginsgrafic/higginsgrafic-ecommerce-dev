@@ -90,15 +90,18 @@ export default function ColleccioSettingsPage() {
     try {
       setSaving(true);
 
-      const { error: deleteError } = await supabase
-        .from('collections')
-        .delete()
-        .neq('id', '00000000-0000-0000-0000-000000000000');
-
-      if (deleteError) throw deleteError;
-
+      // ABANS: s'esborraven TOTES les files i després s'inserien les noves.
+      // Si l'insert fallava (una columna que faltés, un error de xarxa, un
+      // duplicat), la taula `collections` quedava BUIDA i la botiga perdia
+      // totes les col·leccions sense possibilitat de recuperar-les.
+      //
+      // ARA: no s'esborra res fins que les dades noves són desades.
+      //   1) upsert de les col·leccions existents (tenen id)
+      //   2) insert de les noves (sense id)
+      //   3) esborrat NOMÉS de les que ja no són a la llista
+      // Si qualsevol pas falla, les dades existents queden intactes.
       const collectionsToSave = collections.map((collection, index) => {
-        const { id, created_at, ...collectionData } = collection;
+        const { created_at, ...collectionData } = collection;
         return {
           ...collectionData,
           display_order: index,
@@ -106,11 +109,35 @@ export default function ColleccioSettingsPage() {
         };
       });
 
-      const { error: insertError } = await supabase
-        .from('collections')
-        .insert(collectionsToSave);
+      const existents = collectionsToSave.filter((c) => c.id);
+      const noves = collectionsToSave.filter((c) => !c.id);
 
-      if (insertError) throw insertError;
+      if (existents.length > 0) {
+        const { error: upsertError } = await supabase
+          .from('collections')
+          .upsert(existents, { onConflict: 'id' });
+        if (upsertError) throw upsertError;
+      }
+
+      if (noves.length > 0) {
+        const { error: insertError } = await supabase
+          .from('collections')
+          .insert(noves);
+        if (insertError) throw insertError;
+      }
+
+      // Només esborrem les que han desaparegut de la llista. Ho fem amb els
+      // identificadors coneguts; si no n'hi hagués cap, no s'esborra res.
+      const idsConservats = existents.map((c) => c.id);
+      if (idsConservats.length > 0) {
+        const { error: deleteError } = await supabase
+          .from('collections')
+          .delete()
+          .not('id', 'in', `(${idsConservats.join(',')})`);
+        if (deleteError) throw deleteError;
+      } else {
+        console.warn('[ColleccioSettings] Cap col·lecció amb id: no s\'esborra res per seguretat.');
+      }
 
       setLastSaved(new Date());
     } catch (error) {

@@ -159,9 +159,16 @@ export function useShippingCosts(defaultCountry = 'ES') {
 
   const defaultCode = useMemo(() => normalizeCountry(defaultCountry), [defaultCountry]);
 
+  // Les tarifes poden arribar de `/api/shipping-rates`, que les indexa per
+  // ZONA (es_peninsula, es_canarias, eu, international), o de la taula local
+  // SHIPPING_RATES, indexada per CODI DE PAÍS (ES, FR...). Si les rebudes no
+  // contenen el codi que busquem, cal caure a la taula local: sense aquest
+  // fallback, `buildRate(undefined)` llança un TypeError i la pàgina peta.
+  // (Aquest cas només es donava en producció, on la petició sí que funciona.)
   const resolveRate = useCallback((country) => {
     const code = normalizeCountry(country) || defaultCode;
-    return rates[code] || rates['EU'] || rates['ES'];
+    return rates[code] || rates['EU'] || rates['ES']
+      || SHIPPING_RATES[code] || SHIPPING_RATES['EU'] || SHIPPING_RATES['ES'];
   }, [rates, defaultCode]);
 
   const getZoneInfo = useCallback((country) => {
@@ -189,7 +196,13 @@ export function useShippingCosts(defaultCountry = 'ES') {
     return calculate(defaultCode, 1, args[0]);
   }, [calculate, defaultCode]);
 
-  const zoneInfo = useMemo(() => buildRate(rates[defaultCode] || rates['EU'] || rates['ES']), [rates, defaultCode]);
+  const zoneInfo = useMemo(
+    () => buildRate(
+      rates[defaultCode] || rates['EU'] || rates['ES']
+      || SHIPPING_RATES[defaultCode] || SHIPPING_RATES['EU'] || SHIPPING_RATES['ES']
+    ),
+    [rates, defaultCode]
+  );
 
   return { rates, zoneInfo, getCost, getZoneInfo, loading };
 }

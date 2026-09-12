@@ -74,7 +74,10 @@ export function AdminProvider({ children }) {
   const isAllowedAdminEmail = (email) => {
     const normalized = (email || '').toString().trim().toLowerCase();
     if (!normalized) return false;
-    if (!allowedAdminEmails) return true;
+    // FAIL-CLOSED: si la llista d'administradors no està configurada, no
+    // s'autoritza ningú. Abans retornava `true`, de manera que qualsevol
+    // usuari registrat obtenia isAdmin si faltava VITE_ADMIN_EMAILS.
+    if (!allowedAdminEmails) return false;
     return allowedAdminEmails.has(normalized);
   };
 

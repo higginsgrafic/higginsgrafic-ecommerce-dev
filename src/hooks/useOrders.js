@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { fetchMockOrdersByEmail } from '@/lib/mockOrderStore';
+import { authHeaders } from '@/api/authHeaders';
 
 const STATUS_ICONS = {
   'PENDENT': 'MoreHorizontal',
@@ -77,7 +78,11 @@ export function useOrders(email) {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch(`/api/orders?email=${encodeURIComponent(targetEmail)}`);
+      // Cal el token de sessió: /api/orders respon 401 sense ell i la llista
+      // de comandes de l'usuari sortia sempre buida.
+      const res = await fetch(`/api/orders?email=${encodeURIComponent(targetEmail)}`, {
+        headers: await authHeaders(),
+      });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data = await res.json();
       if (data.orders && Array.isArray(data.orders)) {
@@ -85,6 +90,9 @@ export function useOrders(email) {
       }
     } catch (err) {
       console.warn('[useOrders] Fetch failed:', err.message);
+      // Abans només es registrava a consola: l'usuari veia "cap comanda"
+      // tant si no en tenia com si la crida havia fallat.
+      setError(err);
     } finally {
       setLoading(false);
     }

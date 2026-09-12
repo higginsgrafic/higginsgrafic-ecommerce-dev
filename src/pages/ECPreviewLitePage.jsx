@@ -13,7 +13,16 @@ export default function ECPreviewLitePage() {
 
   const defaultVideoUrl = '/video/ec-preview-video.mp4';
 
-  const redirectUrl = (params.get('redirect') || '').trim() || String(import.meta.env.VITE_EC_PREVIEW_LITE_REDIRECT_URL || '').trim();
+  // El paràmetre `redirect` de la URL el controla qui visita la pàgina, així que
+  // només s'accepten rutes internes: sense aquest filtre, un enllaç com
+  // /ec-preview-lite?redirect=https://evil.example redirigeix l'usuari fora del
+  // lloc fent servir el domini oficial com a reclam (open redirect → phishing).
+  // La variable d'entorn sí que pot apuntar a fora, perquè la configura el
+  // propietari del lloc i no un visitant.
+  const redirectParam = (params.get('redirect') || '').trim();
+  const internalRedirect =
+    redirectParam.startsWith('/') && !redirectParam.startsWith('//') ? redirectParam : '';
+  const redirectUrl = internalRedirect || String(import.meta.env.VITE_EC_PREVIEW_LITE_REDIRECT_URL || '').trim();
   const backgroundType = (params.get('bg') || '').trim() || String(import.meta.env.VITE_EC_PREVIEW_LITE_BG || 'video');
   const videoUrl =
     (params.get('video') || '').trim() ||

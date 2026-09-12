@@ -127,7 +127,11 @@ function generateProductSlug(collection, title) {
   let name = title.toLowerCase();
   name = name.replace(/^(austen|first\s*contact|the\s*human\s*inside|cube|miscel·lània|miscellania)\s*[-\s]+/, '');
   name = name.replace(/\s*[-\s]+[nbc]\s*$/, '');
-  name = name.replace(/^(cites|crosswords|quotes)\s*[-\s]+/, '');
+  // NO s'ha de treure el prefix 'quotes'/'cites'/'crosswords': el registre de
+  // rutes del mega-slide (src/data/pdpRegistry.js) el conserva. Abans es
+  // treia, i per això la sincronització creava 'austen-half-agony-half-hope'
+  // mentre la botiga buscava 'austen-quotes-half-agony-half-hope': el disseny
+  // existia a la base de dades però era impossible de comprar.
   name = name.replace(/\s*[-\s]+[nc]\s*$/, '');
   return `${collection}-${slugify(name)}`;
 }

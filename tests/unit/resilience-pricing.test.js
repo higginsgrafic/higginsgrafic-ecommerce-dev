@@ -181,8 +181,8 @@ describe('create-payment-intent — resiliència', () => {
     });
   });
 
-  describe('shipping_config no trobat', () => {
-    it('fa fallback a 4.95 quan shipping_config no existeix', async () => {
+  describe('zona d\'enviament no reconeguda', () => {
+    it('cau a la tarifa d\'Espanya quan la zona no es reconeix', async () => {
       _shippingConfigResult = { data: null, error: 'not found' };
 
       const res = await handler(makeEvent({
@@ -192,8 +192,10 @@ describe('create-payment-intent — resiliència', () => {
 
       expect(res.statusCode).toBe(200);
       const body = JSON.parse(res.body);
-      // Fallback a 4.95
-      expect(body.shippingCost).toBe(4.95);
+      // Mateixa tarifa que mostra el client per a un país desconegut:
+      // Espanya, 1 article -> 4.29 (abans s'aplicava un 4.95 pla que el
+      // client no ensenyava mai).
+      expect(body.shippingCost).toBe(4.29);
     });
   });
 
