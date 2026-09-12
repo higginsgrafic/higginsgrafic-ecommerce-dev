@@ -84,17 +84,40 @@ export async function syncGelatoProductsToSupabase() {
       .filter(Boolean);
 
     if (syncedGelatoIds.length > 0 && supabase) {
-      console.log('🔄 [SYNC] Desactivant productes que ja no existeixen a Gelato...');
-      const { error: deactivateError } = await supabase
+      // SALVAGUARDA: aquesta operació desactiva TOTS els productes que no
+      // hagin tornat de Gelato. Si Gelato respon a mitges (error de xarxa,
+      // paginació incompleta), es desactivaria mig catàleg sense avís i la
+      // botiga quedaria buida.
+      // Si el que ha tornat és menys de la meitat del que hi ha actiu, és molt
+      // més probable que la sincronització sigui incompleta que no pas que
+      // hàgim esborrat mig catàleg: en aquest cas no es toca res.
+      const { count: actius } = await supabase
         .from('products')
-        .update({ is_active: false })
-        .not('gelato_product_id', 'in', `(${syncedGelatoIds.map(id => `"${id}"`).join(',')})`)
-        .eq('product_type', 'fulfillment');
+        .select('id', { count: 'exact', head: true })
+        .eq('product_type', 'fulfillment')
+        .eq('is_active', true);
 
-      if (deactivateError) {
-        console.error('⚠️ [SYNC] Error desactivant productes obsolets:', deactivateError);
+      const totalActius = actius || 0;
+
+      if (totalActius > 0 && syncedGelatoIds.length < totalActius / 2) {
+        console.warn(
+          `⚠️ [SYNC] Només han tornat ${syncedGelatoIds.length} productes i n'hi ha ` +
+          `${totalActius} d'actius. NO es desactiva res per seguretat: sembla una ` +
+          `sincronització incompleta. Torna-ho a provar.`
+        );
       } else {
-        console.log('✅ [SYNC] Productes obsolets desactivats');
+        console.log('🔄 [SYNC] Desactivant productes que ja no existeixen a Gelato...');
+        const { error: deactivateError } = await supabase
+          .from('products')
+          .update({ is_active: false })
+          .not('gelato_product_id', 'in', `(${syncedGelatoIds.map(id => `"${id}"`).join(',')})`)
+          .eq('product_type', 'fulfillment');
+
+        if (deactivateError) {
+          console.error('⚠️ [SYNC] Error desactivant productes obsolets:', deactivateError);
+        } else {
+          console.log('✅ [SYNC] Productes obsolets desactivats');
+        }
       }
     }
 
