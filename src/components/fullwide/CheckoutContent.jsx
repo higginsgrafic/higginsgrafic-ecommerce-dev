@@ -278,6 +278,11 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
   // I la del marge dret (la vora de la targeta dels totals): nome s surt si hi
   // ha fitxes amagades en aquesta banda, o sigui si no som al final de la cinta.
   const [cintaAmbMesDreta, setCintaAmbMesDreta] = useState(false);
+  // A l'apaisada i a l'escriptori, la franja de fitxes ha de fer el mateix que a
+  // la vertical: anar de la guia verda (títol + 20) a la blava (final del
+  // mega-slide - 20). Alla l'alçada del mega-slide és fixa, pero aqui es fluida,
+  // aixi que la mesurem quan el panell es obert i la guardem.
+  const [franjaMides, setFranjaMides] = useState({ marge: null, altura: null });
   useEffect(() => {
     const el = cintaRef.current;
     if (!el) return undefined;
@@ -349,6 +354,54 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
       window.removeEventListener('resize', update);
     };
   }, [activeItems.length]);
+
+  // A l'apaisada i a l'escriptori, la franja de fitxes ha de fer el mateix que a
+  // la vertical: comencar a la guia verda (titol + 20) i acabar a la blava
+  // (final del mega-slide - 20). Alla l'alcada del mega-slide es fixa; aqui es
+  // fluida, aixi que la mesurem mentre el panell es obert i la guardem.
+  useEffect(() => {
+    if (isPortraitTablet) return undefined;
+    let raf = 0;
+    const mesura = () => {
+      const pane = document.querySelector('[data-mega-page-viewport="3"]');
+      const titol = [...document.querySelectorAll('span')].find((el) => el.textContent.trim() === 'PAGAMENT');
+      const franjaEl = document.querySelector('[data-franja-fitxa="true"]');
+      if (pane && titol && franjaEl && pane.getBoundingClientRect().height > 0) {
+        // El final del mega-slide es la vora del panell (porta el border-bottom).
+        let panell = pane;
+        let pare = pane.parentElement;
+        while (pare) {
+          if (getComputedStyle(pare).borderBottomWidth !== '0px') { panell = pare; break; }
+          pare = pare.parentElement;
+        }
+        const blava = Math.round(panell.getBoundingClientRect().bottom) - 20;
+        // La guia verda surt de la tinta del titol, com a la guia de color.
+        const st = getComputedStyle(titol);
+        const box = titol.getBoundingClientRect();
+        const cv = document.createElement('canvas').getContext('2d');
+        cv.font = `${st.fontStyle} ${st.fontWeight} ${st.fontSize} ${st.fontFamily}`;
+        const m = cv.measureText(titol.textContent || '');
+        const lh = parseFloat(st.lineHeight);
+        const liniaBase = box.top + ((lh - (m.fontBoundingBoxAscent + m.fontBoundingBoxDescent)) / 2) + m.fontBoundingBoxAscent;
+        const verda = Math.round(liniaBase + m.actualBoundingBoxDescent) + 20;
+        // El marge es corregeix sobre el que ja hi ha: entre la base i la franja
+        // hi ha el desplaçament del bloc de productes, que canvia segons la
+        // versio, aixi que en comptes de calcular-lo el mesurem i l'ajustem.
+        // Amb la zona morta d'1px no balla.
+        const altura = blava - verda;
+        const franjaTop = Math.round(franjaEl.getBoundingClientRect().top);
+        setFranjaMides((prev) => {
+          const correccio = verda - franjaTop;
+          const marge = Math.abs(correccio) <= 1 ? (prev.marge ?? 0) : (prev.marge ?? 0) + correccio;
+          if (prev.marge === marge && prev.altura === altura) return prev;
+          return { marge, altura };
+        });
+      }
+      raf = requestAnimationFrame(mesura);
+    };
+    raf = requestAnimationFrame(mesura);
+    return () => cancelAnimationFrame(raf);
+  }, [isPortraitTablet]);
 
   const grossSum = activeItems.reduce((acc, it) => {
     const unit = parseFloat(String(it.price).replace('€', '').replace(/\s/g, '').replace(',', '.'));
@@ -840,7 +893,7 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
       {/* A la vertical, 33px en comptes de 34: el bloc de productes ha de
           comencar exactament a la guia verda (el final de la tinta del titol
           mes 20px), i amb 34 hi queia 1px a sota. */}
-      <div style={{ marginTop: isPortraitTablet ? '33px' : '34px', flexShrink:0, minHeight: isPortraitTablet ? 0 : (isTabletRecipe ? '29px' : '24px'), marginBottom: isPortraitTablet ? 0 : (isTabletRecipe ? `${titleGap}px` : undefined) }} />
+      <div data-franja-base="true" style={{ marginTop: isPortraitTablet ? '33px' : '34px', flexShrink:0, minHeight: isPortraitTablet ? 0 : (isTabletRecipe ? '29px' : '24px'), marginBottom: isPortraitTablet ? 0 : (isTabletRecipe ? `${titleGap}px` : undefined) }} />
       <div style={{ display:'grid', gridTemplateColumns: isPortraitTablet ? '1fr 1fr' : '1fr 1fr 1fr 1fr', columnGap:'24px', rowGap: isPortraitTablet ? `${P_ROW_GAP}px` : '18px', marginTop: productesLift, flex: '0 0 auto', minHeight:0, transform: shiftColsX }}>
         {/* COL 1: el cistell. Una cinta de fitxes que es desplaça de costat amb
             la targeta dels totals clavada a la dreta, per sobre de les fitxes
@@ -849,7 +902,7 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
             La franja porta un degradat de #F9FAFB (a l'esquerra) a #FFFFFF,
             d'una banda a l'altra del contingut (del logo a la icona de
             l'usuari), a totes les versions. */}
-        <div style={{ gridColumn:'1 / -1', position:'relative', display:'flex', minHeight:0, background:'linear-gradient(to right, #F9FAFB 0%, #FFFFFF 100%)' }}>
+        <div style={{ gridColumn:'1 / -1', position:'relative', display:'flex', minHeight:0, marginTop: isPortraitTablet ? undefined : (franjaMides.marge != null ? `${franjaMides.marge}px` : undefined), background:'linear-gradient(to right, #F9FAFB 0%, #FFFFFF 100%)' }}>
           {/* Cinta de fitxes. L'espaiador del davant empeny les fitxes cap a la
               dreta (quan n'hi ha poques) i s'arronsa a zero quan no hi caben:
               així sempre creixen cap a l'esquerra, des de la targeta dels
@@ -865,8 +918,8 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
               const ip = parseFloat(String(item.price).replace('€','').replace(/\s/g,'').replace(',','.'))||0;
               const q = item.qty||1;
               return (
-                <div key={`c-${item.id}-${idx}`} style={{ flex:'0 0 auto', width:`${FITXA_W}px`, height: isPortraitTablet ? `${P_FITXA_H}px` : undefined, boxSizing:'border-box', display:'flex', flexDirection:'column', alignItems:'center', gap:'4px', border:'1px solid #E6E8EC', borderRadius:'6px', background:'#FFFFFF', padding:'8px' }}>
-                  <div style={{ width:'100%', height: isPortraitTablet ? undefined : '88px', flex: isPortraitTablet ? '1 1 auto' : '0 0 auto', minHeight:0, overflow:'hidden', flexShrink:0, display:'flex', alignItems:'center', justifyContent:'center' }}>
+                <div key={`c-${item.id}-${idx}`} data-franja-fitxa="true" style={{ flex:'0 0 auto', width:`${FITXA_W}px`, height: isPortraitTablet ? `${P_FITXA_H}px` : (franjaMides.altura != null ? `${franjaMides.altura}px` : undefined), boxSizing:'border-box', display:'flex', flexDirection:'column', alignItems:'center', gap:'4px', border:'1px solid #E6E8EC', borderRadius:'6px', background:'#FFFFFF', padding:'8px' }}>
+                  <div style={{ width:'100%', height: isPortraitTablet ? undefined : (franjaMides.altura != null ? undefined : '88px'), flex: isPortraitTablet ? '1 1 auto' : (franjaMides.altura != null ? '1 1 auto' : '0 0 auto'), minHeight:0, overflow:'hidden', flexShrink:0, display:'flex', alignItems:'center', justifyContent:'center' }}>
                     <img src={imatgeArticle(item)} alt="" loading="lazy" decoding="async" style={{ width:'100%', height:'100%', objectFit:'contain' }} />
                   </div>
                   <div style={{ width:'100%', fontSize:'9pt', lineHeight:1.2, textAlign:'center', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{item.title||item.name||'Producte'}</div>
