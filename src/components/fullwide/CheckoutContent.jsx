@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Elements, CardNumberElement, CardExpiryElement, CardCvcElement, useStripe, useElements } from '@stripe/react-stripe-js';
 import { Check } from 'lucide-react';
@@ -250,16 +250,37 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
 
   // ===== CISTELL DEL CHECKOUT: FITXES EN CINTA =====
   // El cistell no és una llista vertical (que creixia cap avall i empenyia el
-  // formulari) sinó una cinta de fitxes que es desplaça de costat, amb la
-  // targeta dels totals clavada a la dreta. Les fitxes hi passen per sota.
+  // formulari) sinó una cinta de fitxes verticals (imatge a dalt, informació a
+  // sota) que es desplaça de costat, amb la targeta dels totals clavada a la
+  // dreta. Les fitxes estan ancorades a la dreta i creixen cap a l'esquerra, i
+  // passen per sota la targeta dels totals.
   // Amb aquest mecanisme el cistell ocupa una sola franja d'alçada fixa, faci
   // els productes que faci, i el formulari de pagament no es mou mai de lloc.
   // L'aire de sota el bloc NO es toca: és on acaba el mega-slide quan s'obre el
   // cistell, i ha de quedar net.
-  const FITXA_W = 196;     // amplada d'una fitxa de producte
-  const FITXA_H = 62;      // 44px de miniatura + 8px de coixí a dalt i a baix + 2px de vores
+  const FITXA_W = 132;     // amplada d'una fitxa de producte
+  const GAP_FITXES = 10;   // separació entre fitxes
   const TOTALS_W = 250;    // amplada de la targeta dels totals
-  const CINTA_H = FITXA_H + 4;  // la franja: la fitxa més un pèl d'aire
+  const TOTALS_GAP = 28;   // aire entre l'última fitxa i la targeta dels totals
+  // La roda del ratolí també desplaça la cinta. Sense això, amb ratolí només es
+  // pot moure amb Majúscules + roda, que gairebé ningú no endevina.
+  const cintaRef = useRef(null);
+  useEffect(() => {
+    const el = cintaRef.current;
+    if (!el) return undefined;
+    const onWheel = (e) => {
+      // Només s'ho empassa si realment hi ha cinta per recórrer; si no, la
+      // pàgina ha de poder desplaçar-se amb normalitat.
+      if (el.scrollWidth <= el.clientWidth + 1) return;
+      const delta = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
+      if (!delta) return;
+      const abans = el.scrollLeft;
+      el.scrollLeft = abans + delta;
+      if (el.scrollLeft !== abans) e.preventDefault();
+    };
+    el.addEventListener('wheel', onWheel, { passive: false });
+    return () => el.removeEventListener('wheel', onWheel);
+  }, []);
 
   // Valors derivats segons la variant que es renderitza: l'horitzontal dona
   // exactament els mateixos números que donava abans, l'escriptori res.
@@ -288,6 +309,14 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
     () => (cartItems || []).filter(it => !it.disabled),
     [cartItems]
   );
+
+  // Les fitxes estan ancorades a la dreta: quan n'hi ha més de les que caben, la
+  // cinta s'ha de veure pel final (l'últim producte tocant a la targeta dels
+  // totals) i no per l'inici.
+  useEffect(() => {
+    const el = cintaRef.current;
+    if (el) el.scrollLeft = el.scrollWidth;
+  }, [activeItems.length]);
 
   const grossSum = activeItems.reduce((acc, it) => {
     const unit = parseFloat(String(it.price).replace('€', '').replace(/\s/g, '').replace(',', '.'));
@@ -510,7 +539,11 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
 
   const TSHIRT_BASE = '/placeholders/apparel/t-shirt/gildan_5000/gildan-5000_t-shirt_crewneck_unisex_heavyWeight_xl_';
   const TSHIRT_SUFFIX = '_gpr-4-0_front.webp';
-  const tshirtSrc = (color) => `${TSHIRT_BASE}${color}${TSHIRT_SUFFIX}`;
+  // El cistell guarda el color amb el nom que es mostra ('Black', 'Light Pink'),
+  // però els ajudants d'imatge l'esperen en format slug ('black', 'light-pink').
+  // Sense aquesta conversió la imatge de la fitxa no es trobava i sortia trencada.
+  const colorSlug = (c) => String(c || '').trim().toLowerCase().replace(/\s+/g, '-');
+  const tshirtSrc = (color) => `${TSHIRT_BASE}${colorSlug(color)}${TSHIRT_SUFFIX}`;
   const DARK_COLORS = new Set(['royal','purple','navy','red','irish-green','military-green','forest-green','black']);
   const FINISH_TO_INK = { BLANC: INK_WHITE, COLOR: 'multi', NEGRE: INK_BLACK };
   const resolveInk = (collectionSlug, shirtColor, finish) => {
@@ -525,8 +558,18 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
   const mockupSrc = (item) => {
     if (!item.collectionSlug || !item.productRoute) return null;
     const design = item.productRoute;
-    const ink = resolveInk(item.collectionSlug, item.color, item.finish);
-    return getMockupPath({ collection: item.collectionSlug, design, shirtColor: item.color, ink });
+    const color = colorSlug(item.color);
+    const ink = resolveInk(item.collectionSlug, color, item.finish);
+    return getMockupPath({ collection: item.collectionSlug, design, shirtColor: color, ink });
+  };
+  // La imatge de la fitxa del cistell: primer la foto real de la peça (la que ja
+  // porta l'article), després el mockup del disseny i, si no, una samarreta
+  // neutra. Així mai no queda una icona d'imatge trencada.
+  // Compte amb '/placeholder-product.svg': és un fitxer que no existeix i que
+  // alguns productes porten com a imatge; si el féssim servir, sortiria trencada.
+  const imatgeArticle = (item) => {
+    const propia = item.image && item.image !== '/placeholder-product.svg' ? item.image : null;
+    return propia || mockupSrc(item) || tshirtSrc(item.color);
   };
 
   // L'acceptació de termes i el botó de confirmar, definits aquí perquè les dues
@@ -749,28 +792,24 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
             (que hi passen per sota). Ocupa una franja d'alçada fixa: el
             formulari de pagament no es mou mai, faci els productes que faci. */}
         <div style={{ gridColumn:'1 / -1', position:'relative', display:'flex', minHeight:0 }}>
-          {/* Cinta de fitxes. El coixí de la dreta fa l'amplada de la targeta
-              dels totals: sense ell, l'últim producte quedaria sempre a sota
-              i no s'hi podria arribar mai. */}
-          <div style={{ flex:'1 1 auto', minWidth:0, display:'flex', alignItems:'center', gap:'10px', minHeight:`${CINTA_H}px`, overflowX:'auto', overflowY:'hidden', paddingRight:`${TOTALS_W + 10}px`, scrollbarWidth:'thin' }}>
+          {/* Cinta de fitxes. L'espaiador del davant empeny les fitxes cap a la
+              dreta (quan n'hi ha poques) i s'arronsa a zero quan no hi caben:
+              així sempre creixen cap a l'esquerra, des de la targeta dels
+              totals. El coixí de la dreta fa l'amplada de la targeta més el
+              marge, de manera que l'última fitxa sempre es pot treure de sota. */}
+          <div ref={cintaRef} style={{ flex:'1 1 auto', minWidth:0, display:'flex', alignItems:'stretch', gap:`${GAP_FITXES}px`, overflowX:'auto', overflowY:'hidden', paddingRight:`${TOTALS_W + TOTALS_GAP}px`, scrollbarWidth:'thin' }}>
+            <div style={{ flex:'1 1 auto', minWidth:0 }} />
             {activeItems.map((item, idx) => {
               const ip = parseFloat(String(item.price).replace('€','').replace(/\s/g,'').replace(',','.'))||0;
               const q = item.qty||1;
               return (
-                <div key={`c-${item.id}-${idx}`} style={{ flex:'0 0 auto', width:`${FITXA_W}px`, height:`${FITXA_H}px`, boxSizing:'border-box', display:'flex', alignItems:'center', gap:'10px', border:'1px solid #E6E8EC', borderRadius:'6px', background:'#FFFFFF', padding:'8px 10px' }}>
-                  <div style={{ width:'44px', height:'44px', borderRadius:'4px', background:'#F3F4F6', overflow:'hidden', flexShrink:0, display:'flex', alignItems:'center', justifyContent:'center' }}>
-                    {(() => {
-                      const mockup = mockupSrc(item);
-                      return mockup
-                        ? <img src={mockup} alt="" loading="lazy" decoding="async" style={{ width:'100%', height:'100%', objectFit:'contain' }} />
-                        : <img src={tshirtSrc(item.color)} alt="" loading="lazy" decoding="async" style={{ width:'85%', height:'85%', objectFit:'contain' }} />;
-                    })()}
+                <div key={`c-${item.id}-${idx}`} style={{ flex:'0 0 auto', width:`${FITXA_W}px`, boxSizing:'border-box', display:'flex', flexDirection:'column', alignItems:'center', gap:'4px', border:'1px solid #E6E8EC', borderRadius:'6px', background:'#FFFFFF', padding:'8px' }}>
+                  <div style={{ width:'100%', height:'52px', borderRadius:'4px', background:'#F3F4F6', overflow:'hidden', flexShrink:0, display:'flex', alignItems:'center', justifyContent:'center' }}>
+                    <img src={imatgeArticle(item)} alt="" loading="lazy" decoding="async" style={{ width:'100%', height:'100%', objectFit:'contain' }} />
                   </div>
-                  <div style={{ minWidth:0, flex:'1 1 auto' }}>
-                    <div style={{ fontSize:'10pt', lineHeight:1.2, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{item.title||item.name||'Producte'}</div>
-                    <div style={{ fontSize:'8.5pt', lineHeight:1.3, color:'#667085' }}>Talla {item.size||'-'} · {q} u.</div>
-                    <div style={{ fontSize:'10.5pt', lineHeight:1.3, fontVariantNumeric:'tabular-nums' }}>{(ip*q).toFixed(2).replace('.',',')}€</div>
-                  </div>
+                  <div style={{ width:'100%', fontSize:'9pt', lineHeight:1.2, textAlign:'center', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{item.title||item.name||'Producte'}</div>
+                  <div style={{ fontSize:'8pt', lineHeight:1.2, color:'#667085', textAlign:'center' }}>Talla {item.size||'-'} · {q} u.</div>
+                  <div style={{ fontSize:'10pt', lineHeight:1.2, fontVariantNumeric:'tabular-nums' }}>{(ip*q).toFixed(2).replace('.',',')}€</div>
                 </div>
               );
             })}
