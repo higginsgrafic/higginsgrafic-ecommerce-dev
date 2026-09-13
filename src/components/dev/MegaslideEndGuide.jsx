@@ -1,18 +1,17 @@
 import { useEffect, useState } from 'react';
 
 /**
- * MegaslideEndGuide — guia de desenvolupament.
+ * MegaslideEndGuide — guia de desenvolupament (temporal).
  *
- * Dibuixa una línia horitzontal exactament allà on acaba el mega-slide quan
- * s'obre el cistell. Serveix per calibrar l'aire que hi ha entre el bloc de
- * productes i el formulari del checkout: el mega-slide hi acaba a sobre i
- * aquella franja ha de quedar neta.
+ * Dibuixa tres línies horitzontals per calibrar el checkout:
+ *   1. On acaba el títol PAGAMENT + 20 px.
+ *   2. Aquest límit − 20 px (el del mega-slide).
+ *   3. El límit del mega-slide: on acaba el panell quan s'obre el cistell.
  *
  * Com s'activa:
  *   - En desenvolupament (npm run dev) surt sempre.
- *   - Al lloc publicat, només si s'hi afegeix `?megaslide=1` a l'adreça.
- *   - Un cop s'ha obert el cistell del mega-slide una vegada, la posició es
- *     recorda (localStorage) i la línia continua sortint amb el cistell tancat.
+ *   - Al lloc publicat, només amb `?megaslide=1` a l'adreça.
+ *   - Alt+M l'amaga i el torna a mostrar.
  *
  * El panell del mega-slide només és al DOM mentre és obert: per això la guia
  * mesura quan el troba i es guarda l'últim valor bo.
@@ -57,7 +56,8 @@ function llegirAlcadaDesada() {
 
 export default function MegaslideEndGuide() {
   const [activat, setActivat] = useState(llegirActivat);
-  const [alcada, setAlcada] = useState(llegirAlcadaDesada);
+  const [megaFinal, setMegaFinal] = useState(llegirAlcadaDesada);
+  const [titolFinal, setTitolFinal] = useState(null);
 
   // El panell del mega-slide va i ve: mesurem mentre hi sigui.
   useEffect(() => {
@@ -69,8 +69,8 @@ export default function MegaslideEndGuide() {
         const r = el.getBoundingClientRect();
         if (r.height > 0) {
           // El panell no acaba on acaba la caixa del contingut del cistell: a
-          // sota seu hi ha el peu del panell (uns 33px). Pugem pels pares fins
-          // a trobar la vora de debò, que és la que porta el border-bottom.
+          // sota seu hi ha el peu del panell. Pugem pels pares fins a trobar la
+          // vora de debò, que és la que porta el border-bottom.
           let panell = el;
           let pare = el.parentElement;
           while (pare) {
@@ -81,12 +81,18 @@ export default function MegaslideEndGuide() {
             pare = pare.parentElement;
           }
           const bottom = Math.round(panell.getBoundingClientRect().bottom);
-          setAlcada((prev) => {
+          setMegaFinal((prev) => {
             if (prev === bottom) return prev;
             try { window.localStorage.setItem(CLAU_ALCADA, String(bottom)); } catch { /* ignore */ }
             return bottom;
           });
         }
+      }
+      // El títol PAGAMENT, en canvi, sempre hi és.
+      const titol = [...document.querySelectorAll('span')].find((s) => s.textContent.trim() === 'PAGAMENT');
+      if (titol) {
+        const bottom = Math.round(titol.getBoundingClientRect().bottom) + 20;
+        setTitolFinal((prev) => (prev === bottom ? prev : bottom));
       }
       raf = requestAnimationFrame(mesura);
     };
@@ -111,37 +117,52 @@ export default function MegaslideEndGuide() {
 
   if (!activat) return null;
 
+  const linies = [
+    titolFinal != null && { y: titolFinal, color: '#0A7A46', text: `títol + 20 px · ${titolFinal}` },
+    megaFinal != null && { y: megaFinal - 20, color: '#2563EB', text: `mega-slide − 20 px · ${megaFinal - 20}` },
+    megaFinal != null && { y: megaFinal, color: '#E11D48', text: `final del mega-slide · ${megaFinal} px (Alt+M per amagar)` },
+  ].filter(Boolean);
+
   return (
-    <div
-      aria-hidden="true"
-      style={{
-        position: 'fixed',
-        left: 0,
-        right: 0,
-        top: alcada != null ? `${alcada}px` : 'auto',
-        bottom: alcada == null ? 0 : 'auto',
-        zIndex: 2147483000,
-        pointerEvents: 'none',
-        borderTop: '1px dashed #E11D48',
-        display: 'flex',
-        justifyContent: 'flex-start',
-      }}
-    >
-      <span
-        style={{
-          fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace',
-          fontSize: '10px',
-          lineHeight: 1.6,
-          color: '#FFFFFF',
-          background: '#E11D48',
-          padding: '1px 6px',
-          whiteSpace: 'nowrap',
-        }}
-      >
-        {alcada != null
-          ? `final del mega-slide · ${alcada} px (Alt+M per amagar)`
-          : 'obre el cistell del mega-slide per calibrar la línia (Alt+M per amagar)'}
-      </span>
-    </div>
+    <>
+      {linies.map((l) => (
+        <div
+          key={l.text}
+          aria-hidden="true"
+          style={{
+            position: 'fixed',
+            left: 0,
+            right: 0,
+            top: `${l.y}px`,
+            zIndex: 2147483000,
+            pointerEvents: 'none',
+            borderTop: `1px dashed ${l.color}`,
+            display: 'flex',
+            justifyContent: 'flex-start',
+          }}
+        >
+          <span
+            style={{
+              fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace',
+              fontSize: '10px',
+              lineHeight: 1.6,
+              color: '#FFFFFF',
+              background: l.color,
+              padding: '1px 6px',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            {l.text}
+          </span>
+        </div>
+      ))}
+      {megaFinal == null && (
+        <div aria-hidden="true" style={{ position: 'fixed', left: 0, bottom: 0, zIndex: 2147483000, pointerEvents: 'none' }}>
+          <span style={{ fontFamily: 'ui-monospace, Menlo, monospace', fontSize: '10px', color: '#FFFFFF', background: '#E11D48', padding: '1px 6px' }}>
+            obre el cistell del mega-slide per calibrar-ne les línies (Alt+M per amagar)
+          </span>
+        </div>
+      )}
+    </>
   );
 }
