@@ -1,4 +1,4 @@
-import { sendOrderEmail } from './_email.js';
+import { sendOrderEmail } from './_notify.js';
 import { checkRateLimit } from './_rate-limit.js';
 import { jsonResponse } from './_cors.js';
 

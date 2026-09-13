@@ -1,7 +1,7 @@
 import Stripe from 'stripe';
 import { createClient } from '@supabase/supabase-js';
 import { createGelatoOrderServer } from './_gelato.js';
-import { sendOrderEmail } from './_email.js';
+import { sendOrderEmail } from './_notify.js';
 import { buildTrackingLink } from './_token.js';
 import { jsonResponse } from './_cors.js';
 
