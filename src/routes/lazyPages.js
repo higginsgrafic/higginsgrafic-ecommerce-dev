@@ -9,6 +9,7 @@ export const NotFoundPage = lazy(() => import('@/pages/NotFoundPage'));
 export const OffersPage = lazy(() => import('@/pages/OffersPage'));
 export const ProductDetailPage = lazy(() => import('@/pages/ProductDetailPage'));
 export const OrderConfirmationPage = lazy(() => import('@/pages/OrderConfirmationPage'));
+export const CheckoutPage = lazy(() => import('@/pages/CheckoutPage'));
 export const AboutPage = lazy(() => import('@/pages/AboutPage'));
 export const ContactPage = lazy(() => import('@/pages/ContactPage'));
 export const FAQPage = lazy(() => import('@/pages/FAQPage'));

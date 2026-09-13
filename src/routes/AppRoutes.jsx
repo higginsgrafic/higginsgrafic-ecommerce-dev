@@ -15,6 +15,7 @@ import {
   ProductDetailPage,
   ProductDetailPageEnhanced,
   OrderConfirmationPage,
+  CheckoutPage,
   OrderTrackingPage,
   AboutPage,
   ContactPage,
@@ -128,7 +129,10 @@ export default function AppRoutes({ location, pageProps, pautaEnabled, tableEnab
         <Route path="/constructor/full-wide-slide" element={<FullWideSlidePage pautaEnabled={false} tableEnabled={false} />} />
         <Route path="/plantilla-cataleg-components" element={<ProtectedRoute><PlantillaCatalegComponentsPage /></ProtectedRoute>} />
 
-        <Route path="/checkout" element={<Navigate to="/" replace />} />
+        {/* Pàgina de pagament pròpia. Abans això era una redirecció a l'inici:
+            qualsevol intent d'anar a /checkout acabava a la portada, i per això
+            el botó "FINALITZA LA COMANDA" no portava enlloc. */}
+        <Route path="/checkout" element={<CheckoutPage />} />
         <Route path="/order-confirmation/:orderId" element={<MotionDiv><OrderConfirmationPage /></MotionDiv>} />
 
         <Route path="/about" element={<AboutPage />} />
