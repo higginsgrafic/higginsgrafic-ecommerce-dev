@@ -5,7 +5,20 @@ import { generateTrackingToken, hashToken, getTokenExpiry, buildTrackingLink } f
 import { jsonResponse } from '../lib/cors.js';
 import { quoteShipping } from '../lib/shipping.js';
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+// El client de Stripe es crea quan realment es necessita, no en carregar el
+// fitxer. Si es creava a dalt de tot i faltava STRIPE_SECRET_KEY, la funció
+// SENCERA no arrencava (502 ImportModuleError), cosa que va deixar el
+// pagament inservible sense cap missatge clar.
+let _stripe = null;
+
+function getStripe() {
+  if (!_stripe) {
+    const key = process.env.STRIPE_SECRET_KEY;
+    if (!key) throw new Error('STRIPE_SECRET_KEY no configurada');
+    _stripe = new Stripe(key);
+  }
+  return _stripe;
+}
 
 const SUPABASE_URL = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
 const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -290,7 +303,7 @@ export async function handler(event, context) {
       return jsonResponse(event, 500, { error: 'Error creant la comanda' });
     }
 
-    const paymentIntent = await stripe.paymentIntents.create({
+    const paymentIntent = await getStripe().paymentIntents.create({
       amount: calc.total,
       currency: normCurrency,
       automatic_payment_methods: { enabled: true },

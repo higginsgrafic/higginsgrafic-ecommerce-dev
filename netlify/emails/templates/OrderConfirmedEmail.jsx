@@ -1,3 +1,4 @@
+import React from 'react';
 import { EmailLayout } from '../components/EmailLayout.jsx';
 import { ItemsTable } from '../components/ItemsTable.jsx';
 import { SummaryTable } from '../components/SummaryTable.jsx';
@@ -74,4 +75,3 @@ function sanitizeTrackingLink(link) {
 export const orderConfirmedMeta = {
   subject: (order) => `Gràcies per la compra #${order?.order_number || order?.id || ''}`,
 };
-

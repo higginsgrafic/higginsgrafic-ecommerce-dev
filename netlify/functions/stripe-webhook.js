@@ -5,7 +5,21 @@ import { sendOrderEmail } from '../lib/notify.js';
 import { buildTrackingLink } from '../lib/token.js';
 import { jsonResponse } from '../lib/cors.js';
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+// El client de Stripe es crea quan realment es necessita, no en carregar el
+// fitxer. Si es creava a dalt de tot i faltava STRIPE_SECRET_KEY, la funció
+// SENCERA no arrencava (502 ImportModuleError) i no podia ni tan sols
+// retornar un error entenedor: Stripe reenviava l'avís una i una altra vegada
+// i la comanda no es confirmava mai.
+let _stripe = null;
+
+function getStripe() {
+  if (!_stripe) {
+    const key = process.env.STRIPE_SECRET_KEY;
+    if (!key) throw new Error('STRIPE_SECRET_KEY no configurada');
+    _stripe = new Stripe(key);
+  }
+  return _stripe;
+}
 
 const WEBHOOK_SECRET = process.env.STRIPE_WEBHOOK_SECRET;
 
@@ -76,10 +90,15 @@ export async function handler(event, context) {
     return jsonResponse(event, 400, { error: 'Falta Stripe-Signature o webhook secret' }, { methods: 'POST, OPTIONS', headers: 'Content-Type, Stripe-Signature' });
   }
 
+  if (!process.env.STRIPE_SECRET_KEY) {
+    console.error('[stripe-webhook] STRIPE_SECRET_KEY no configurada — no es pot verificar la signatura');
+    return jsonResponse(event, 500, { error: 'Passarel·la de pagament no configurada' }, { methods: 'POST, OPTIONS', headers: 'Content-Type, Stripe-Signature' });
+  }
+
   let stripeEvent;
 
   try {
-    stripeEvent = stripe.webhooks.constructEvent(
+    stripeEvent = getStripe().webhooks.constructEvent(
       event.body,
       sig,
       WEBHOOK_SECRET

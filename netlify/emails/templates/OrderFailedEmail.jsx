@@ -1,3 +1,4 @@
+import React from 'react';
 import { EmailLayout } from '../components/EmailLayout.jsx';
 
 export function OrderFailedEmail({ order = {} }) {
@@ -88,4 +89,3 @@ export function OrderFailedEmail({ order = {} }) {
 export const orderFailedMeta = {
   subject: (order) => `Pagament no processat #${order?.order_number || order?.id || ''}`,
 };
-

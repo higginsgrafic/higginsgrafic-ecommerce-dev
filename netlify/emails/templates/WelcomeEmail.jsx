@@ -1,3 +1,4 @@
+import React from 'react';
 import { EmailLayout } from '../components/EmailLayout.jsx';
 import { Img } from '@react-email/components';
 
@@ -42,4 +43,3 @@ export function WelcomeEmail({ user = {} }) {
 export const welcomeMeta = {
   subject: () => 'Compte de client — HOLA!',
 };
-

@@ -1,3 +1,4 @@
+import React from 'react';
 import { EmailLayout } from '../components/EmailLayout.jsx';
 
 export function OrderShippedEmail({ order = {} }) {
@@ -62,5 +63,3 @@ export function OrderShippedEmail({ order = {} }) {
 export const orderShippedMeta = {
   subject: (order) => `Codi de seguiment #${order?.order_number || order?.id || ''}`,
 };
-
-
