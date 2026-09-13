@@ -46,6 +46,24 @@ export default function CheckoutPage() {
     return () => window.removeEventListener('resize', onResize);
   }, []);
 
+  // Tauleta apaïsada (768-1366 px i més ampla que alta). Només ella té el
+  // contingut pujat 25px; la resta de versions es queden amb el coixí de sempre.
+  const [esApaïsat, setEsApaïsat] = useState(
+    () => typeof window !== 'undefined'
+      && window.innerWidth >= 768
+      && window.innerWidth <= 1366
+      && window.innerWidth >= window.innerHeight
+  );
+
+  useEffect(() => {
+    const onResize = () => {
+      const w = window.innerWidth;
+      setEsApaïsat(w >= 768 && w <= 1366 && w >= window.innerHeight);
+    };
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, []);
+
   useEffect(() => {
     if (buitEnEntrar) navigate('/', { replace: true });
   }, [buitEnEntrar, navigate]);
@@ -83,15 +101,15 @@ export default function CheckoutPage() {
           marc del lloc ja deixa 16px de marge als costats.
           El marge de dalt el posa App (--appHeaderOffset, l'alçada de la
           capçalera) i aquí hi afegim l'aire que queda entre la capçalera i el
-          contingut: 3px. Abans eren 28px; s'han retallat 25 perquè tot el
-          contingut de la pàgina (títol, productes i formularis) pugi 25px. */}
+          contingut: 28px de sempre. A la tauleta apaïsada són 3px, perquè allà
+          el contingut va 25px més amunt (retoc propi d'aquella versió). */}
       <div
         className="px-4 sm:px-6 lg:px-10"
         style={{
           minHeight: '60vh',
           width: 'var(--site-w, 100%)',
           marginLeft: 'calc(var(--site-xL, 0px) - var(--rulerInset, 0px))',
-          paddingTop: '3px',
+          paddingTop: esApaïsat ? '3px' : '28px',
           paddingBottom: '48px',
           boxSizing: 'border-box',
         }}
