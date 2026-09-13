@@ -879,7 +879,7 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
           {/* Targeta dels totals: opaca, i amb la mateixa linia de 2px que la
               cinta a la vora esquerra (abans una ombra difusa), perquè es vegi
               que les fitxes li passen per sota. */}
-          <div style={{ position:'absolute', top:0, bottom:0, right:0, width:`${TOTALS_W}px`, boxSizing:'border-box', display:'flex', flexDirection:'column', fontFamily: isPortraitTablet ? 'Roboto, sans-serif' : undefined, padding:'10px 12px', background:'#FFFFFF', border:'1px solid #E6E8EC', borderRadius:'6px' }}>
+          <div style={{ position:'absolute', top:0, bottom:0, right:0, width:`${TOTALS_W}px`, boxSizing:'border-box', display:'flex', flexDirection:'column', fontFamily: isPortraitTablet ? 'Roboto, sans-serif' : undefined, padding:'10px 12px', background:'#FFFFFF', border: isPortraitTablet ? 'none' : '1px solid #E6E8EC', borderRadius:'6px', overflow:'hidden' }}>
             {/* La mateixa linia de 2px que la cinta, a la vora esquerra, i amb el mateix comportament: nome s surt si hi ha fitxes amagades en aquesta banda. */}
             <div aria-hidden="true" style={{ position:'absolute', left:0, top:0, bottom:0, width:'2px', pointerEvents:'none', opacity: cintaAmbMesDreta ? 1 : 0, transition:'opacity 160ms ease', background:'#98A2B4', borderRadius:'6px 0 0 6px' }} />
             {/* Logo de Grup Higgins, nome s a la vertical, com a marca d'aigua
@@ -888,7 +888,7 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
                 deformar-lo. Va amb màscara per poder-lo tenyir: el SVG nome s
                 aporta la forma i el color surt del fons. */}
             {isPortraitTablet && (
-              <div aria-hidden="true" style={{ position:'absolute', inset:'1px', pointerEvents:'none', backgroundColor:'#F9FAFB', WebkitMaskImage:'url(/custom_logos/brand/grup-higgins-logo.svg)', maskImage:'url(/custom_logos/brand/grup-higgins-logo.svg)', WebkitMaskRepeat:'no-repeat', maskRepeat:'no-repeat', WebkitMaskPosition:'center', maskPosition:'center', WebkitMaskSize:'contain', maskSize:'contain' }} />
+              <div aria-hidden="true" style={{ position:'absolute', inset:0, pointerEvents:'none', backgroundColor:'#F9FAFB', WebkitMaskImage:'url(/custom_logos/brand/grup-higgins-logo.svg)', maskImage:'url(/custom_logos/brand/grup-higgins-logo.svg)', WebkitMaskRepeat:'no-repeat', maskRepeat:'no-repeat', WebkitMaskPosition:'center', maskPosition:'center', WebkitMaskSize:'contain', maskSize:'contain' }} />
             )}
             {/* Els totals són una suma: cada concepte a la seva ratlla, el nom a
                 l'esquerra i la xifra a la dreta, com una columna de números.
