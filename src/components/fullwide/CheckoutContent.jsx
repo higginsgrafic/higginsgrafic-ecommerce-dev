@@ -637,7 +637,7 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
   // columna de la targeta i el vertical la penja a la cel·la dreta, a la pista del
   // Telèfon i al nivell del retol "Dades de pagament" (P_INVOICE_TOP).
   const invoiceBlock = (
-    <div style={{ display:'grid', rowGap:'8px', marginTop: isPortraitTablet ? 0 : '16px', position: isPortraitTablet ? 'absolute' : undefined, top: isPortraitTablet ? `${P_INVOICE_TOP}px` : undefined, left: isPortraitTablet ? 0 : undefined, right: isPortraitTablet ? 0 : undefined }}>
+    <div style={{ display:'grid', rowGap: isPortraitTablet ? '9px' : '8px', marginTop: isPortraitTablet ? 0 : '16px', position: isPortraitTablet ? 'absolute' : undefined, top: isPortraitTablet ? `${P_INVOICE_TOP}px` : undefined, left: isPortraitTablet ? 0 : undefined, right: isPortraitTablet ? 0 : undefined }}>
       <label style={{ display:'flex', alignItems:'center', gap:'8px', fontSize: isNarrowForm ? '9pt' : '10.5pt', fontWeight:300 }}>
         <input type="checkbox" checked={needsInvoice} onChange={(e) => setNeedsInvoice(e.target.checked)} />
         <span>Necessites factura?</span>
