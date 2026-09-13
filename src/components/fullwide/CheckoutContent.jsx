@@ -345,8 +345,12 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
             // amb la ruta del disseny, la talla i el color. Enviem el slug del
             // producte perquè el servidor pugui resoldre la variant contra la
             // base de dades (product_variants), que és on viu gelato_variant_id.
+            //
+            // Si l'article porta el slug propi (les fitxes de producte sí que
+            // l'hi posen), es fa servir aquest; la llista PDP_REGISTRY_BY_ROUTE
+            // només cobreix els dissenys del mega-slide.
             gelatoVariantId: item.gelatoVariantId || null,
-            productSlug: PDP_REGISTRY_BY_ROUTE[item.productRoute]?.slug || null,
+            productSlug: item.productSlug || PDP_REGISTRY_BY_ROUTE[item.productRoute]?.slug || null,
             color: item.color || null,
             quantity: item.qty || 1,
             designFiles: item.designFiles || [],
