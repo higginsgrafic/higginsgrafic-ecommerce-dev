@@ -44,3 +44,9 @@ checkout (títol + 20, mega-slide − 20 i el final del mega-slide). Estan
 **apagades per defecte**: només surten amb `?megaslide=1` a l'adreça o prement
 Alt+M. A la vertical no s'hi apliquen. **S'han d'esborrar quan s'acabi la
 feina**: el component i la línia que l'importa a `CheckoutPage.jsx`.
+
+## Regla de publicació
+
+**No es puja res ni es desplega res si no ho demana explícitament.** La feina es
+queda committed al despatx local i s'hi acumula; quan digui que sí, es puja i es
+desplega tot de cop i es verifica contra el lloc publicat.
