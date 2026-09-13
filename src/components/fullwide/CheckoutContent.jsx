@@ -897,8 +897,11 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
           </div>
           {/* Targeta dels totals: opaca, i amb la mateixa linia de 2px que la
               cinta a la vora esquerra (abans una ombra difusa), perquè es vegi
-              que les fitxes li passen per sota. */}
-          <div style={{ position:'absolute', top:0, bottom:0, right:0, width:`${TOTALS_W}px`, boxSizing:'border-box', display:'flex', flexDirection:'column', fontFamily: isPortraitTablet ? 'Roboto, sans-serif' : undefined, justifyContent: isPortraitTablet ? 'flex-end' : 'space-between', gap: isPortraitTablet ? '2px' : undefined, padding:'10px 12px', background:'#FFFFFF', border:'1px solid #E6E8EC', borderRadius:'6px' }}>
+              que les fitxes li passen per sota.
+              La disposicio interior es la mateixa que la de la vertical: en
+              Roboto, els conceptes aplegats a baix (flex-end) amb un junt de
+              2px i a 11pt, i TOT PLEGAT FA en Roboto Condensed a 12.5pt. */}
+          <div style={{ position:'absolute', top:0, bottom:0, right:0, width:`${TOTALS_W}px`, boxSizing:'border-box', display:'flex', flexDirection:'column', fontFamily:'Roboto, sans-serif', justifyContent:'flex-end', gap:'2px', padding:'10px 12px', background:'#FFFFFF', border:'1px solid #E6E8EC', borderRadius:'6px' }}>
             {/* La mateixa linia de 2px que la cinta, a la vora esquerra, i amb el mateix comportament: nome s surt si hi ha fitxes amagades en aquesta banda. */}
             <div aria-hidden="true" style={{ position:'absolute', left:0, top:0, bottom:0, width:'2px', pointerEvents:'none', opacity: cintaAmbMesDreta ? 1 : 0, transition:'opacity 160ms ease', background:'#98A2B4', borderRadius:'6px 0 0 6px' }} />
             {/* Els totals són una suma: cada concepte a la seva ratlla, el nom a
@@ -907,10 +910,10 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
                 el transport i l'IVA són dins del preu, però es desglossen aquí
                 perquè es vegi d'on surt el total. Les tres ratlles sumen
                 exactament TOT PLEGAT FA. */}
-            <div style={{ display:'flex', justifyContent:'space-between', alignItems:'baseline', fontSize: isPortraitTablet ? '11pt' : '9.5pt', lineHeight:1.2, color:'#667085' }}><span>Subtotal</span><span style={{ fontVariantNumeric:'tabular-nums' }}>{subtotalNet.toFixed(2).replace('.',',')}€</span></div>
-            {discountEnabled && <div style={{ display:'flex', justifyContent:'space-between', alignItems:'baseline', fontSize: isPortraitTablet ? '11pt' : '9.5pt', lineHeight:1.2, color:'#667085' }}><span>Descompte (-{offersConfig.discountRate}%)</span><span style={{ fontVariantNumeric:'tabular-nums' }}>-{descompte.toFixed(2).replace('.',',')}€</span></div>}
-            <div style={{ display:'flex', justifyContent:'space-between', alignItems:'baseline', fontSize: isPortraitTablet ? '11pt' : '9.5pt', lineHeight:1.2, color:'#667085' }}><span>Transport</span><span style={{ fontVariantNumeric:'tabular-nums' }}>{transport === 0 ? 'Gratuït' : `${transport.toFixed(2).replace('.',',')}€`}</span></div>
-            <div style={{ display:'flex', justifyContent:'space-between', alignItems:'baseline', fontSize: isPortraitTablet ? '11pt' : '9.5pt', lineHeight:1.2, color:'#667085' }}><span>IVA 21%</span><span style={{ fontVariantNumeric:'tabular-nums' }}>{ivaAmount.toFixed(2).replace('.',',')}€</span></div>
+            <div style={{ display:'flex', justifyContent:'space-between', alignItems:'baseline', fontSize:'11pt', lineHeight:1.2, color:'#667085' }}><span>Subtotal</span><span style={{ fontVariantNumeric:'tabular-nums' }}>{subtotalNet.toFixed(2).replace('.',',')}€</span></div>
+            {discountEnabled && <div style={{ display:'flex', justifyContent:'space-between', alignItems:'baseline', fontSize:'11pt', lineHeight:1.2, color:'#667085' }}><span>Descompte (-{offersConfig.discountRate}%)</span><span style={{ fontVariantNumeric:'tabular-nums' }}>-{descompte.toFixed(2).replace('.',',')}€</span></div>}
+            <div style={{ display:'flex', justifyContent:'space-between', alignItems:'baseline', fontSize:'11pt', lineHeight:1.2, color:'#667085' }}><span>Transport</span><span style={{ fontVariantNumeric:'tabular-nums' }}>{transport === 0 ? 'Gratuït' : `${transport.toFixed(2).replace('.',',')}€`}</span></div>
+            <div style={{ display:'flex', justifyContent:'space-between', alignItems:'baseline', fontSize:'11pt', lineHeight:1.2, color:'#667085' }}><span>IVA 21%</span><span style={{ fontVariantNumeric:'tabular-nums' }}>{ivaAmount.toFixed(2).replace('.',',')}€</span></div>
             {/* TOT PLEGAT FA es queda en Roboto Condensed encara que la resta
                 de la targeta vagi en Roboto. */}
             <div style={{ display:'flex', justifyContent:'space-between', alignItems:'baseline', fontFamily:'Roboto Condensed, sans-serif', fontSize:'12.5pt', fontWeight:500, lineHeight:1.2, paddingTop:'6px', borderTop:'1px solid #E6E8EC' }}><span>TOT PLEGAT FA</span><span style={{ fontVariantNumeric:'tabular-nums' }}>{totalFinal.toFixed(2).replace('.',',')}€</span></div>
