@@ -90,6 +90,8 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
   // primera filera de producte del cistell és 2*23,867 - 2,037 - 2 = 43,70px,
   // així que el seu centre és a 21,85px. TITLE_Y és l'únic número a retocar.
   const TITLE_Y = 21.85;
+  // A l'apaisada el titol queda una mica just i semblava tallat: hi baixa 2px.
+  const L_TITLE_Y = TITLE_Y + 2;
 
   // A l'horitzontal el formulari d'enviament s'obre amb gaps: FIELD_GAP és
   // l'únic número a retocar (7 junts entre els 8 blocs de camps).
@@ -127,10 +129,9 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
   // mateixa recepta; d'aquí en endavant cada variant se'n retoca per separado.
   const P_FIELD_GAP = 5;
   const P_TITLE_GAP = 10;
-  // El titol PAGAMENT de la vertical va mes amunt que a la resta. Aquest es
-  // l'unic numero que el mou: si el puges massa, la part de dalt del titol
-  // queda tallada pel capdamunt de la pagina.
-  const P_TITLE_Y = 13.85;
+  // El titol PAGAMENT de la vertical va 10px mes amunt que a la resta.
+  // Aquest es l'unic numero que el mou.
+  const P_TITLE_Y = 11.85;
   // El vertical encara no el pujem: es queda exactament al centre.
   const P_CONJUNT_LIFT = 0;
   // Aire entre la filera de dalt (comanda + enviament) i la de baix
@@ -275,7 +276,7 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
   // exactament els mateixos números que donava abans, l'escriptori res.
   const fieldGap = isPortraitTablet ? P_FIELD_GAP : FIELD_GAP;
   const titleGap = isLandscapeTablet ? TITLE_GAP : (isPortraitTablet ? P_TITLE_GAP : undefined);
-  const titleY = isLandscapeTablet ? `${TITLE_Y}px` : (isPortraitTablet ? `${P_TITLE_Y}px` : `${TITLE_Y}px`);
+  const titleY = isLandscapeTablet ? `${L_TITLE_Y}px` : (isPortraitTablet ? `${P_TITLE_Y}px` : `${TITLE_Y}px`);
   const liftPad = isLandscapeTablet
     ? `${CONJUNT_LIFT * 2}px`
     : (isPortraitTablet ? `${P_CONJUNT_LIFT * 2}px` : `${D_CONJUNT_LIFT * 2}px`);
