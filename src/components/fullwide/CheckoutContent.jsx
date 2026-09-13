@@ -849,7 +849,7 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
             queda just a sobre de la seva columna, es mogui on es mogui. */}
         <div style={{ gridColumn:'span 2', marginTop: columnesTop, display:'flex', flexDirection:'column', minHeight:0, overflow:'visible', justifyContent: 'flex-start', gap: fieldGap }}>
           {/* 15px de marge + els 5px de junt de la columna = 20px fins al primer camp */}
-          <div style={{ fontSize:'12pt', fontWeight:500, marginBottom:'15px' }}>Dades d'enviament</div>
+          <div style={{ fontSize:'12pt', fontWeight:500, marginTop: isLandscapeTablet ? '10px' : undefined, marginBottom: isLandscapeTablet ? '5px' : '15px' }}>Dades d'enviament</div>
           <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', columnGap:'10px' }}>
             <div><input type="text" name="firstName" value={formData.firstName} onChange={handleChange} placeholder="Nom" style={inputStyle} />{formErrors.firstName && <div style={errorStyle}>{formErrors.firstName}</div>}</div>
             <div><input type="text" name="lastName" value={formData.lastName} onChange={handleChange} placeholder="Cognoms" style={inputStyle} />{formErrors.lastName && <div style={errorStyle}>{formErrors.lastName}</div>}</div>
@@ -872,7 +872,7 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
         {/* Mateix marge que la columna d'enviament: així el bloc de la targeta
             queda alineat pel capdamunt amb el camp del client. */}
         <div style={{ gridColumn:'span 2', marginTop: columnesTop, display:'flex', flexDirection:'column', minHeight:0, overflow:'visible', position: isPortraitTablet ? undefined : 'relative', gap: isNarrowForm ? '1px' : undefined }}>
-          <div style={{ fontSize:'12pt', fontWeight:500, marginBottom:'20px' }}>Dades de pagament</div>
+          <div style={{ fontSize:'12pt', fontWeight:500, marginTop: isLandscapeTablet ? '10px' : undefined, marginBottom: isLandscapeTablet ? '10px' : '20px' }}>Dades de pagament</div>
           <div style={{ display:'flex', flexDirection:'column', flex:'1 1 auto', gap: isNarrowForm ? '1px' : undefined }}>
             {/* Pagament */}
             <div style={{ display:'grid', rowGap: '8px' }}>
