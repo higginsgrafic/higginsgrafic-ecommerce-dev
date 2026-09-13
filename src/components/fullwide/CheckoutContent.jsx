@@ -788,7 +788,10 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
           tauletes), de manera que tot el que hi ha a sota no es mou ni un
           píxel. Els 34px de dalt són els que aparten el contingut del títol
           PAGAMENT, que va posicionat absolut i no ocupa lloc. */}
-      <div style={{ marginTop:'34px', flexShrink:0, minHeight: isPortraitTablet ? 0 : (isTabletRecipe ? '29px' : '24px'), marginBottom: isPortraitTablet ? 0 : (isTabletRecipe ? `${titleGap}px` : undefined) }} />
+      {/* A la vertical, 33px en comptes de 34: el bloc de productes ha de
+          comencar exactament a la guia verda (el final de la tinta del titol
+          mes 20px), i amb 34 hi queia 1px a sota. */}
+      <div style={{ marginTop: isPortraitTablet ? '33px' : '34px', flexShrink:0, minHeight: isPortraitTablet ? 0 : (isTabletRecipe ? '29px' : '24px'), marginBottom: isPortraitTablet ? 0 : (isTabletRecipe ? `${titleGap}px` : undefined) }} />
       <div style={{ display:'grid', gridTemplateColumns: isPortraitTablet ? '1fr 1fr' : '1fr 1fr 1fr 1fr', columnGap:'24px', rowGap: isPortraitTablet ? `${P_ROW_GAP}px` : '18px', marginTop: productesLift, flex: '0 0 auto', minHeight:0, transform: shiftColsX }}>
         {/* COL 1: el cistell. Una cinta de fitxes que es desplaça de costat amb
             la targeta dels totals clavada a la dreta, per sobre de les fitxes
