@@ -248,6 +248,17 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
   // de productes). El fan servir l'escriptori i la tauleta vertical, tal qual.
   const COLUMNES_TOP = 90;
 
+  // ===== LLISTAT DE PRODUCTES DEL CISTELL =====
+  // El cistell no ha de manar sobre el formulari: la llista té files compactes
+  // (36px de miniatura + 6px de coixí a dalt i a baix + 1px de ratlla = 49px) i
+  // un sostre de dues files. Amb més productes, la llista es desplaça per dins
+  // i el formulari de pagament no es mou mai de lloc.
+  // L'aire que queda entre aquest bloc i el formulari NO es toca: és on acaba
+  // el mega-slide quan s'obre el cistell, i ha de quedar net.
+  const ALCADA_FILA = 49;
+  const FILES_VISIBLES = 2;
+  const ALCADA_LLISTAT = ALCADA_FILA * FILES_VISIBLES;
+
   // Valors derivats segons la variant que es renderitza: l'horitzontal dona
   // exactament els mateixos números que donava abans, l'escriptori res.
   const fieldGap = isPortraitTablet ? P_FIELD_GAP : FIELD_GAP;
@@ -733,13 +744,14 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
       <div style={{ display:'grid', gridTemplateColumns: isPortraitTablet ? '1fr 1fr' : '1fr 1fr 1fr 1fr', columnGap:'24px', rowGap: isPortraitTablet ? `${P_ROW_GAP}px` : '18px', width: groupW, marginLeft: groupX, marginTop: productesLift, flex: '0 0 auto', minHeight:0, transform: shiftColsX }}>
         {/* COL 1: Cistell + Totals. Ara ocupa tota la fila de dalt. */}
         <div style={{ gridColumn:'1 / -1', display:'flex', flexDirection:'column', minHeight:0 }}>
-          <div style={{ flex:'1 1 auto', overflowY:'auto', minHeight:0, maxHeight: isPortraitTablet ? '195px' : undefined }}>
+          <div style={{ position:'relative', flex:'0 0 auto', minHeight:0 }}>
+            <div style={{ overflowY:'auto', minHeight:0, maxHeight:`${ALCADA_LLISTAT}px` }}>
             {activeItems.map((item, idx) => {
               const ip = parseFloat(String(item.price).replace('€','').replace(/\s/g,'').replace(',','.'))||0;
               const q = item.qty||1;
               return (
-                <div key={`c-${item.id}-${idx}`} style={{ display:'grid', gridTemplateColumns:'48px 1fr auto', columnGap:'10px', alignItems:'center', padding:'8px 0', borderBottom:'1px solid #EEF0F3' }}>
-                  <div style={{ width:'48px', height:'48px', borderRadius:'4px', background:'#F3F4F6', overflow:'hidden', flexShrink:0, display:'flex', alignItems:'center', justifyContent:'center' }}>
+                <div key={`c-${item.id}-${idx}`} style={{ display:'grid', gridTemplateColumns:'36px 1fr auto', columnGap:'10px', alignItems:'center', padding:'6px 0', borderBottom:'1px solid #EEF0F3' }}>
+                  <div style={{ width:'36px', height:'36px', borderRadius:'4px', background:'#F3F4F6', overflow:'hidden', flexShrink:0, display:'flex', alignItems:'center', justifyContent:'center' }}>
                     {(() => {
                       const mockup = mockupSrc(item);
                       return mockup
@@ -748,20 +760,29 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
                     })()}
                   </div>
                   <div style={{ overflow:'hidden' }}>
-                    <div style={{ fontSize:'10.5pt', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{item.title||item.name||'Producte'}</div>
-                    <div style={{ fontSize:'9pt', color:'#667085' }}>Talla: {item.size||'-'} · Qty: {q}</div>
+                    <div style={{ fontSize:'10.5pt', lineHeight:1.2, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{item.title||item.name||'Producte'}</div>
+                    <div style={{ fontSize:'9pt', lineHeight:1.2, color:'#667085' }}>Talla: {item.size||'-'} · Qty: {q}</div>
                   </div>
-                  <div style={{ fontSize:'10.5pt', fontVariantNumeric:'tabular-nums', whiteSpace:'nowrap' }}>{(ip*q).toFixed(2).replace('.',',')}€</div>
+                  <div style={{ fontSize:'10.5pt', lineHeight:1.2, fontVariantNumeric:'tabular-nums', whiteSpace:'nowrap' }}>{(ip*q).toFixed(2).replace('.',',')}€</div>
                 </div>
               );
             })}
+            </div>
+            {/* Si hi ha més productes dels que es veuen, un degradat suaument
+                blanc avisa que la llista continua. Sense aquest senyal, algú
+                podria pensar que només té dues coses al cistell. */}
+            {activeItems.length > FILES_VISIBLES && (
+              <div style={{ position:'absolute', left:0, right:0, bottom:0, height:'16px', background:'linear-gradient(to bottom, rgba(255,255,255,0), #FFFFFF)', pointerEvents:'none' }} />
+            )}
           </div>
           <div style={{ flexShrink:0, paddingTop:'12px', borderTop:'1px solid #E6E8EC', marginTop:'8px' }}>
-            <div style={{ display:'flex', justifyContent:'space-between', fontSize:'10pt', color:'#667085', padding: isNarrowForm ? 0 : '2px 0', lineHeight: isNarrowForm ? 1.15 : undefined }}><span>Subtotal</span><span style={{ fontVariantNumeric:'tabular-nums' }}>{totalArticles.toFixed(2).replace('.',',')}€</span></div>
-            {discountEnabled && <div style={{ display:'flex', justifyContent:'space-between', fontSize:'10pt', color:'#667085', padding: isNarrowForm ? 0 : '2px 0', lineHeight: isNarrowForm ? 1.15 : undefined }}><span>Descompte (-{offersConfig.discountRate}%)</span><span style={{ fontVariantNumeric:'tabular-nums' }}>-{descompte.toFixed(2).replace('.',',')}€</span></div>}
-            <div style={{ display:'flex', justifyContent:'space-between', fontSize:'10pt', color:'#667085', padding: isNarrowForm ? 0 : '2px 0', lineHeight: isNarrowForm ? 1.15 : undefined }}><span>Transport</span><span style={{ fontVariantNumeric:'tabular-nums' }}>{shipping === 0 ? 'Gratuït' : `${shipping.toFixed(2).replace('.',',')}€`}</span></div>
-            <div style={{ display:'flex', justifyContent:'space-between', fontSize:'10pt', color:'#667085', padding: isNarrowForm ? 0 : '2px 0', lineHeight: isNarrowForm ? 1.15 : undefined }}><span>IVA 21% (inclòs)</span><span style={{ fontVariantNumeric:'tabular-nums' }}>{ivaAmount.toFixed(2).replace('.',',')}€</span></div>
-            <div style={{ display:'flex', justifyContent:'space-between', fontSize:'13pt', fontWeight:500, padding:'8px 0 0', borderTop:'1px solid #E6E8EC', marginTop:'4px' }}><span>Total</span><span style={{ fontVariantNumeric:'tabular-nums' }}>{totalFinal.toFixed(2).replace('.',',')}€</span></div>
+            <div style={{ display:'flex', flexWrap:'wrap', alignItems:'baseline', columnGap:'14px', rowGap:'2px', fontSize:'10pt', lineHeight:1.25, color:'#667085' }}>
+              <span>Subtotal <span style={{ fontVariantNumeric:'tabular-nums' }}>{totalArticles.toFixed(2).replace('.',',')}€</span></span>
+              {discountEnabled && <span>Descompte (-{offersConfig.discountRate}%) <span style={{ fontVariantNumeric:'tabular-nums' }}>-{descompte.toFixed(2).replace('.',',')}€</span></span>}
+              <span>Transport <span style={{ fontVariantNumeric:'tabular-nums' }}>{shipping === 0 ? 'Gratuït' : `${shipping.toFixed(2).replace('.',',')}€`}</span></span>
+              <span>IVA 21% (inclòs) <span style={{ fontVariantNumeric:'tabular-nums' }}>{ivaAmount.toFixed(2).replace('.',',')}€</span></span>
+            </div>
+            <div style={{ display:'flex', justifyContent:'space-between', fontSize:'13pt', fontWeight:500, lineHeight:1.2, padding:'6px 0 0', borderTop:'1px solid #E6E8EC', marginTop:'5px' }}><span>Total</span><span style={{ fontVariantNumeric:'tabular-nums' }}>{totalFinal.toFixed(2).replace('.',',')}€</span></div>
           </div>
         </div>
         {/* COL 2: Dades d'enviament. Baixa a la fila de sota i ocupa mitja
