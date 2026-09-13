@@ -188,10 +188,26 @@ export default function MegaMenuPanel({
     return () => window.clearTimeout(t);
   }, [isPortraitTablet, paymentFillsScreen, p1ContentBottomPx]);
 
+  // Al checkout, el mega-slide no pot arribar més avall d'on comença el
+  // formulari: el cistell el taparia. Amb una alçada fixa per format (la que
+  // deixa el formulari just a sota) el cistell no tapa res i, de passada, en
+  // obrir-lo no es veu cap ajust d'alçada.
+  const esCheckout = typeof window !== 'undefined' && window.location.pathname === '/checkout';
+  // La variant la detectem aqui: les props isPortraitTablet/isLandscapeTablet
+  // existeixen pero el header no les hi passa, aixi que sempre valen false.
+  const w = typeof window !== 'undefined' ? window.innerWidth : 0;
+  const h = typeof window !== 'undefined' ? window.innerHeight : 0;
+  const esVerticalAqui = w >= 768 && w <= 1366 && h > w;
+  const esApaissadaAqui = w >= 768 && w <= 1366 && w >= h;
+  // 270px de panell a l'apaisada i 330 a l'escriptori: son les alcades que
+  // deixen el formulari just a sota. A la vertical no cal limit.
+  const CHECKOUT_GUARD_H = esVerticalAqui ? null : (esApaissadaAqui ? 206 : 266);
   const guardHeightPx = paymentFillsScreen
     ? guardHeightPxDefault
     : isPortraitTablet
     ? '269px'
+    : esCheckout && CHECKOUT_GUARD_H != null
+    ? `${CHECKOUT_GUARD_H}px`
     : matchesPage1Height && p1ContentBottomPx != null && mesuraEstable
     ? `${Math.max(0, Math.round(p1ContentBottomPx + P1_STRIPE_BOTTOM_GAP - 64))}px`
     : (alcadaRecordada || guardHeightPxDefault);
