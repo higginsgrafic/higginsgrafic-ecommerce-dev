@@ -1,16 +1,17 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { ChevronDown, ChevronUp, ArrowLeft, X, Trash2, Plus } from 'lucide-react';
+import { ChevronDown, ChevronUp, X, Trash2, Plus } from 'lucide-react';
 import { useShippingCosts } from '@/hooks/useShippingCosts';
 import { drawingStripePath } from '@/lib/drawingPaths';
 
-function CistellComandaContent({ cartItems, setCartItems, onCloseMegaSlide, onFinalizeOrder }) {
+function CistellComandaContent({ cartItems, setCartItems, onFinalizeOrder }) {
   const navigate = useNavigate();
   const location = useLocation();
-  // Si l'usuari ja es troba a /checkout i obre el cistell del mega-slide,
-  // el botó "FINALITZA LA COMANDA" no té sentit (ja hi és). En el seu lloc
-  // mostrem una fletxa que tanca el mega-slide per tornar al checkout.
+  // Si l'usuari ja ha passat pel pagament (és a /checkout) i torna a obrir el
+  // cistell del mega-slide, el botó "FINALITZA LA COMANDA" no hi pinta res: la
+  // pàgina de pagament és al darrere i es veu tota l'estona. Per això el botó
+  // només apareix quan NO som a /checkout.
   const isOnCheckoutRoute = location?.pathname === '/checkout';
 
   const [isTablet, setIsTablet] = useState(
@@ -585,30 +586,34 @@ function CistellComandaContent({ cartItems, setCartItems, onCloseMegaSlide, onFi
                 }}>
                   {fmt(itemTotal)}
                 </span>
-                <button
-                  onClick={isOnCheckoutRoute
-                    ? () => { if (typeof onCloseMegaSlide === 'function') onCloseMegaSlide(); }
-                    : handleFinalizeOrder}
-                  aria-label={isOnCheckoutRoute ? 'Torna al checkout' : 'Finalitza la comanda'}
-                  style={{
-                    fontFamily: 'Oswald, sans-serif',
-                    fontWeight: 500,
-                    fontSize: '11pt',
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.4px',
-                    color: '#F4F6F8',
-                    backgroundColor: '#474F59',
-                    border: 'none',
-                    borderRadius: '3px',
-                    cursor: 'pointer',
-                    padding: '6px 16px',
-                    whiteSpace: 'nowrap',
-                  }}
-                >
-                  {isOnCheckoutRoute
-                    ? <ArrowLeft size={14} strokeWidth={1.75} aria-hidden="true" />
-                    : 'FINALITZA LA COMANDA'}
-                </button>
+                {/* El botó només hi és mentre no s'hagi passat pel pagament. Un
+                    cop s'ha clicat (i per tant ja som a /checkout), desapareix:
+                    la pàgina de pagament és al darrere del cistell i es veu
+                    tota l'estona, així que la fletxa no hi porta enlloc. El
+                    preu, en canvi, es queda: és l'únic lloc on el cistell diu
+                    quant suma tot plegat. */}
+                {!isOnCheckoutRoute && (
+                  <button
+                    onClick={handleFinalizeOrder}
+                    aria-label="Finalitza la comanda"
+                    style={{
+                      fontFamily: 'Oswald, sans-serif',
+                      fontWeight: 500,
+                      fontSize: '11pt',
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.4px',
+                      color: '#F4F6F8',
+                      backgroundColor: '#474F59',
+                      border: 'none',
+                      borderRadius: '3px',
+                      cursor: 'pointer',
+                      padding: '6px 16px',
+                      whiteSpace: 'nowrap',
+                    }}
+                  >
+                    FINALITZA LA COMANDA
+                  </button>
+                )}
               </div>
             ), document.body);
           };
@@ -643,10 +648,8 @@ function CistellComandaContent({ cartItems, setCartItems, onCloseMegaSlide, onFi
             // es mogui ni un píxel.
             tabIndex={-1}
             aria-hidden="true"
-            onClick={isOnCheckoutRoute
-              ? () => { if (typeof onCloseMegaSlide === 'function') onCloseMegaSlide(); }
-              : handleFinalizeOrder}
-            aria-label={isOnCheckoutRoute ? 'Torna al checkout' : 'Finalitza la comanda'}
+            onClick={handleFinalizeOrder}
+            aria-label="Finalitza la comanda"
             style={{
               fontFamily: 'Oswald, sans-serif',
               fontWeight: 500,
@@ -670,9 +673,7 @@ function CistellComandaContent({ cartItems, setCartItems, onCloseMegaSlide, onFi
               pointerEvents: 'none',
             }}
           >
-            {isOnCheckoutRoute
-              ? <ArrowLeft size={14.553} strokeWidth={1.75} aria-hidden="true" />
-              : 'FINALITZA LA COMANDA'}
+            FINALITZA LA COMANDA
           </button>
         </div>
       </div>
