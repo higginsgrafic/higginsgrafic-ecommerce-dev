@@ -196,8 +196,10 @@ export default function MegaMenuPanel({
   const esVerticalAqui = w >= 768 && w <= 1366 && h > w;
   const esApaissadaAqui = w >= 768 && w <= 1366 && w >= h;
   // 270px de panell a l'apaisada i 330 a l'escriptori: son les alcades que
-  // deixen el formulari just a sota. A la vertical no cal limit.
-  const CHECKOUT_GUARD_H = esVerticalAqui ? null : (esApaissadaAqui ? 206 : 266);
+  // deixen el formulari just a sota. A la vertical i al mobil no cal limit
+  // (al mobil el mega-slide ja es baixet i el limit li tapava el formulari).
+  const esMobilAqui = w < 768;
+  const CHECKOUT_GUARD_H = (esVerticalAqui || esMobilAqui) ? null : (esApaissadaAqui ? 206 : 266);
   const guardHeightPx = paymentFillsScreen
     ? guardHeightPxDefault
     : isPortraitTablet
