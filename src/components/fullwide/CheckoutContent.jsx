@@ -241,9 +241,15 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
   // de retallar el marge de dalt de les columnes (L_COLUMNES_TOP).
   const L_PRODUCTES_LIFT = 25;
   const L_FORM_LIFT = 50;
-  // Marge de creació de les dues columnes (el que les separa dels productes).
-  const COLUMNES_TOP = 90;
-  const L_COLUMNES_TOP = COLUMNES_TOP - (L_FORM_LIFT - L_PRODUCTES_LIFT); // 65
+  // Marge que separa les dues columnes de dades (enviament i pagament) del bloc
+  // de productes. El valor de creació era 90; se n'han tret 25 perquè tot el
+  // bloc de formularis pugi 25px a les tres receptes de pantalla ampla
+  // (escriptori i les dues tauletes). Als telèfons no s'aplica: allà el
+  // formulari va en una columna i no pot pujar sense trepitjar la comanda.
+  const COLUMNES_TOP = 65;
+  // A la tauleta apaïsada, a més, el formulari va 50px per sobre del llistat:
+  // com que el llistat ja puja 25px, els 25 que falten surten d'aquest marge.
+  const L_COLUMNES_TOP = COLUMNES_TOP - (L_FORM_LIFT - L_PRODUCTES_LIFT); // 40
 
   // Valors derivats segons la variant que es renderitza: l'horitzontal dona
   // exactament els mateixos números que donava abans, l'escriptori res.
