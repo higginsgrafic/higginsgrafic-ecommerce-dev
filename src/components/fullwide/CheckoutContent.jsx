@@ -156,7 +156,7 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
   // ABSOLUT, com el botó: així es pot alinear amb el camp de Província de la
   // columna del costat (-78, o sigui 709 en pantalla) sense empenyir els
   // termes ni el botó. Positiu = baixa la factura.
-  const P_INVOICE_TOP = -78;
+  const P_INVOICE_TOP = -98;
   // Marge de dalt de la cel·la dels termes dins la graella. -87 la deixa de
   // manera que el BOTÓ de pagar acabi exactament al mateix nivell que el camp
   // del telèfon (860). Si es canvia, P_INVOICE_TOP s'ha d'ajustar perquè la
@@ -531,7 +531,9 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
 
   const inputStyle = {
     width: '100%',
-    height: isNarrowForm ? '28px' : '34px',
+    // A la vertical els camps fan la mateixa alçada que el botó de pagar
+    // (39px), que és la del camp de la targeta.
+    height: isPortraitTablet ? `${P_CARD_FIELD_H}px` : (isNarrowForm ? '28px' : '34px'),
     border: '1px solid #D8DDE3',
     borderRadius: '4px',
     padding: '0 10px',
@@ -641,8 +643,8 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
       </label>
       {needsInvoice && (
         <div style={{ border:'1px solid #D8DDE3', borderRadius:'4px', overflow:'hidden', background:'#FFFFFF' }}>
-          <input type="text" name="company" placeholder="Nom de l'empresa" value={formData.company} onChange={handleChange} style={{ width:'100%', height: isNarrowForm ? '26px' : '31px', border:'none', borderBottom:'1px solid #E6E8EC', padding:'0 10px', fontFamily:'Roboto Condensed, sans-serif', fontSize: isNarrowForm ? '9pt' : '10.5pt', color:'#4A5057', outline:'none', boxSizing:'border-box' }} />
-          <input type="text" name="taxId" placeholder="CIF (ex: ESA12345672)" value={formData.taxId} onChange={handleChange} style={{ width:'100%', height: isNarrowForm ? '26px' : '31px', border:'none', padding:'0 10px', fontFamily:'Roboto Condensed, sans-serif', fontSize: isNarrowForm ? '9pt' : '10.5pt', color:'#4A5057', outline:'none', boxSizing:'border-box' }} />
+          <input type="text" name="company" placeholder="Nom de l'empresa" value={formData.company} onChange={handleChange} style={{ width:'100%', height: isPortraitTablet ? `${P_CARD_FIELD_H}px` : (isNarrowForm ? '26px' : '31px'), border:'none', borderBottom:'1px solid #E6E8EC', padding:'0 10px', fontFamily:'Roboto Condensed, sans-serif', fontSize: isNarrowForm ? '9pt' : '10.5pt', color:'#4A5057', outline:'none', boxSizing:'border-box' }} />
+          <input type="text" name="taxId" placeholder="CIF (ex: ESA12345672)" value={formData.taxId} onChange={handleChange} style={{ width:'100%', height: isPortraitTablet ? `${P_CARD_FIELD_H}px` : (isNarrowForm ? '26px' : '31px'), border:'none', padding:'0 10px', fontFamily:'Roboto Condensed, sans-serif', fontSize: isNarrowForm ? '9pt' : '10.5pt', color:'#4A5057', outline:'none', boxSizing:'border-box' }} />
         </div>
       )}
     </div>
