@@ -174,6 +174,62 @@ describe('gelato-webhook — estat de la comanda', () => {
       ]);
       expect(correus).toEqual([]);
     });
+
+    it('desa TOTS els números si Gelato divideix la comanda en dos paquets', async () => {
+      // Exemple real del panell de Gelato: un avís d'estat amb dos enviaments.
+      await handler(
+        avis({
+          event: 'order_status_updated',
+          orderReferenceId: '#0001',
+          fulfillmentStatus: 'shipped',
+          items: [
+            {
+              itemReferenceId: 'item-1',
+              fulfillmentStatus: 'shipped',
+              fulfillments: [
+                { trackingCode: 'code123', trackingUrl: 'https://exemple.test/1', shipmentMethodName: 'DHL' },
+                { trackingCode: 'code234', trackingUrl: 'https://exemple.test/2', shipmentMethodName: 'DHL' },
+              ],
+            },
+          ],
+        })
+      );
+
+      expect(actualitzacions[0].tracking_number).toBe('code123 · code234');
+      expect(actualitzacions[0].tracking_url).toBe('https://exemple.test/1');
+    });
+
+    it('acumula el número d\'un segon paquet que arriba en un avís posterior', async () => {
+      ordre.tracking_number = 'code123';
+      ordre.tracking_url = 'https://exemple.test/1';
+
+      await handler(
+        avis({
+          event: 'order_item_tracking_code_updated',
+          orderReferenceId: '#0001',
+          trackingCode: 'code234',
+          trackingUrl: 'https://exemple.test/2',
+        })
+      );
+
+      expect(actualitzacions[0].tracking_number).toBe('code123 · code234');
+    });
+
+    it('no repeteix un número que ja teníem', async () => {
+      ordre.tracking_number = 'code123';
+
+      const resposta = await handler(
+        avis({
+          event: 'order_item_tracking_code_updated',
+          orderReferenceId: '#0001',
+          trackingCode: 'code123',
+        })
+      );
+
+      // Ja el teníem i no hi ha res més a canviar: no es toca la comanda.
+      expect(actualitzacions).toEqual([]);
+      expect(resposta.statusCode).toBe(200);
+    });
   });
 
   describe("correu d'enviament", () => {

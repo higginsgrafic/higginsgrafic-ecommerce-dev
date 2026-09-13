@@ -73,6 +73,29 @@ const STATUS_MAP = {
 };
 
 /**
+ * Ajunta els números de seguiment que ja teníem amb els nous, sense repetir-ne
+ * cap i separant-los amb " · ".
+ *
+ * Una comanda es pot dividir en diversos paquets i cada paquet té el seu
+ * número. Com que la botiga només té una casella per al seguiment, els hi
+ * posem tots: val més que el client vegi "code123 · code234" que no pas que es
+ * pensi que només li arribarà un paquet.
+ */
+function ajuntaCodisSeguiment(actual, nous) {
+  const codis = String(actual || '')
+    .split('·')
+    .map((codi) => codi.trim())
+    .filter(Boolean);
+
+  for (const codi of nous) {
+    const net = String(codi || '').trim();
+    if (net && !codis.includes(net)) codis.push(net);
+  }
+
+  return codis.length > 0 ? codis.join(' · ') : null;
+}
+
+/**
  * Verifica que l'avís ve realment de Gelato.
  *
  * Accepta el secret de tres maneres, perquè no tots els panells el poden
@@ -192,13 +215,34 @@ export async function handler(event) {
     // --- Recollim què ens diu aquest avís ---
     const canvis = {};
 
-    // Número de seguiment. Pot arribar sol (order_item_tracking_code_updated)
-    // o dins d'un avís d'estat.
-    if (tipus === 'order_item_tracking_code_updated') {
-      if (payload.trackingCode) canvis.tracking_number = payload.trackingCode;
-      if (payload.trackingUrl) canvis.tracking_url = payload.trackingUrl;
-      if (payload.shipmentMethodName) canvis.tracking_carrier = payload.shipmentMethodName;
+    // Número de seguiment. Pot arribar de dues maneres:
+    //   - sol, a l'avís de codi de seguiment (order_item_tracking_code_updated)
+    //   - dins d'un avís d'estat, a items[].fulfillments[]
+    //
+    // ATENCIÓ: una comanda es pot dividir en DOS o més paquets, i llavors hi ha
+    // un número de seguiment per paquet. Abans només se'n desava un i la resta
+    // es perdien: el client veia un sol número quan en tenia dos. Ara
+    // s'acumulen tots (vegeu ajuntaCodisSeguiment).
+    const codisSeguiment = [];
+    let urlSeguiment = null;
+    let transportista = null;
+
+    if (payload.trackingCode) codisSeguiment.push(payload.trackingCode);
+    if (payload.trackingUrl) urlSeguiment = payload.trackingUrl;
+    if (payload.shipmentMethodName) transportista = payload.shipmentMethodName;
+
+    for (const item of Array.isArray(payload.items) ? payload.items : []) {
+      for (const enviament of Array.isArray(item?.fulfillments) ? item.fulfillments : []) {
+        if (enviament?.trackingCode) codisSeguiment.push(enviament.trackingCode);
+        if (!urlSeguiment && enviament?.trackingUrl) urlSeguiment = enviament.trackingUrl;
+        if (!transportista && enviament?.shipmentMethodName) transportista = enviament.shipmentMethodName;
+      }
     }
+
+    const codisUnits = ajuntaCodisSeguiment(order.tracking_number, codisSeguiment);
+    if (codisUnits && codisUnits !== order.tracking_number) canvis.tracking_number = codisUnits;
+    if (urlSeguiment && urlSeguiment !== order.tracking_url) canvis.tracking_url = urlSeguiment;
+    if (transportista && transportista !== order.tracking_carrier) canvis.tracking_carrier = transportista;
 
     // Estat de la comanda. Gelato el envia de DUES maneres diferents:
     //
@@ -230,14 +274,6 @@ export async function handler(event) {
           canvis.status = nouEstat;
         }
       }
-    }
-
-    // Aprofitem per desar el seguiment si ve dins dels items.
-    const primer = payload.items?.[0]?.fulfillments?.[0];
-    if (primer) {
-      if (primer.trackingCode) canvis.tracking_number = primer.trackingCode;
-      if (primer.trackingUrl) canvis.tracking_url = primer.trackingUrl;
-      if (primer.shipmentMethodName) canvis.tracking_carrier = primer.shipmentMethodName;
     }
 
     // Si l'avís no ens aporta res nou, no toquem la base de dades.
