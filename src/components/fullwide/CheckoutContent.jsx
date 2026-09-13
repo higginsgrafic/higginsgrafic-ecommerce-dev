@@ -1,13 +1,12 @@
-import React, { useState, useEffect, useMemo, useRef } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Elements, CardNumberElement, CardExpiryElement, CardCvcElement, useStripe, useElements } from '@stripe/react-stripe-js';
 import { Check } from 'lucide-react';
 import { validateEmail, validateRequired, validatePostalCode, validateForm } from '@/utils/validation';
-import { trackBeginCheckout, trackPurchase } from '@/utils/analytics';
+import { trackPurchase } from '@/utils/analytics';
 import { useShippingCosts, normalizeCountry } from '@/hooks/useShippingCosts';
 import { createMockOrder } from '@/lib/mockOrderStore';
 import { useAuth } from '@/contexts/AuthContext';
-import { drawingStripePath } from '@/lib/drawingPaths';
 import { getMockupPath, INK_BLACK, INK_WHITE, COLLECTIONS } from '@/lib/mockupPaths';
 import { useOffersConfig } from '@/hooks/useOffersConfig';
 import { getStripe, createPaymentIntent } from '@/api/stripe';
@@ -105,20 +104,11 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
   // Derivada, perquè si retoca FIELD_GAP l'alineament de baix la segueixi.
   const FIELD_STRIDE = 34 + FIELD_GAP;                 // 41px entre caps de camp
   const FORMS_H = 8 * 34 + 7 * FIELD_GAP;              // 321px
-  // El setè bloc (Email) comença a 6·41 = 246px del cap de la columna.
-  const FIELD_EMAIL_TOP = 6 * FIELD_STRIDE;
-  // Termes: 5px per sota de la línia de l'Email (retoc visual seu).
-  const TERMS_TOP = FIELD_EMAIL_TOP;
 
   // Aire entre la banda dels títols de columna (fa 29px) i la fila de contingut.
   // Únic número a retocar; no mou l'amplada de les columnes ni els seus junts.
   const TITLE_GAP = 10;
 
-  // "Necessites factura?" pujat 11px sobre els 14px originals de creació (6 + 5).
-  const INVOICE_TOP = 0;
-  // "Nom d'empresa" + CIF: aire real entre la ratlla del xec i la seva capsa.
-  // (Els 8px originals de la graella, menys 7 de pujada.)
-  const INVOICE_FIELDS_GAP = 8;
 
   // Pujada del conjunt (banda dels títols + fila de contingut) sobre el centre.
   // El bloc es centra amb justify-content:center dins l'arrel, així que es
@@ -139,19 +129,6 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
   // Aire entre la filera de dalt (comanda + enviament) i la de baix
   // (dades de pagament + acceptació i botó).
   const P_ROW_GAP = 14;
-  // ===== VERTICAL: amplada =====
-  // La vertical ja no té amplada pròpia: fa servir la mateixa franja que la
-  // resta de versions, la que va del logo de la capçalera a la icona de
-  // l'usuari (les mateixes pistes d'1fr i el mateix junt de 24px). Abans
-  // s'encongia a un grup de 484px centrat a la pantalla, i per això el botó de
-  // pagar quedava desalineat respecte del contingut.
-  // Cap de l'acceptació de termes, mesurat des del cap de la seva cel·la. L'esquerra
-  // no cal tocar-la: termes i botó són a la mateixa pista que la columna
-  // d'enviament. El nivell, en canvi, ve d'aquí: 88 = títol "Dades de pagament"
-  // (16px * 1,5) + 10 de joc + vora 1 + capçalera "Targeta" (10 + 22 + 10) + seva
-  // vora 1 + padding 10 = el cap de la capsa del número de targeta. Aquest número
-  // fa d'àncora vertical també per al botó (vegeu P_BUTTON_TOP).
-  const P_TERMS_TOP = 0;
   // "Necessites factura?" també va a la cel·la dreta (la del Telèfon) i penja
   // ABSOLUT, com el botó: així es pot alinear amb la columna del costat sense
   // empenyir els termes ni el botó. Amb -119 la TINTA del text acaba a 724,
@@ -182,59 +159,11 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
   // Cap del CVC = cap del número + la capsa del número + els 8px de joc interior
   // de la capsa de targeta (el `rowGap` de dins seu).
   // P_BUTTON_TOP_ADJ separa el NIVELL de l'ALÇADA: serveix per afinar el cap del
-  // botó sense tocar-li l'alçada (positiu = baixa el botó).
-  const P_BUTTON_TOP_ADJ = 0;
-  const P_BUTTON_TOP = P_TERMS_TOP + P_CARD_FIELD_H + 8 + P_BUTTON_TOP_ADJ;
   const P_BUTTON_H = P_CARD_FIELD_H;
-  // Desplaçament horitzontal manual del botó, en px de la capsa (positiu cap a la
-  // dreta). Acumula 30 + 30 = 60px a l'esquerra i ara 60px a la dreta, o sigui 0:
-  // el botó torna a la seva pista, exactament sota els termes i amplada de Telèfon.
-  // En pantalla tot es veu reduït per l'escat 0,94: 60px de capsa = 56,4px reals.
-  const P_BUTTON_SHIFT_X = 0;
 
-  // ===== ESCRIPTORI =====
-  // El cos de dades s'estirava per omplir la franja, i per això no hi havia res
-  // a centrar: ara fa una alçada fixa — els 322px que mesurava amb la franja
-  // tancada — i el conjunt (banda de títols + cos) penja centrat en Y, com a
-  // l'horitzontal. Únic número a retocar si vol més o menys aire entre camps.
-  const D_BODY_H = 322;
   // Palanca del conjunt centrat, com el CONJUNT_LIFT de les tauletes: va com a
   // padding-bottom de l'arrel i puja el bloc la meitat del valor. 0 = centrat.
   const D_CONJUNT_LIFT = 0;
-  // El botó de confirmar era l'última peça de la columna i el peu «Powered by
-  // Stripe | Termes | Privacitat» anava DINS del seu bloc, en flux: 10px de joc +
-  // 17px de línia (8,5pt × 1,5) = 27px de capsa que empenyien el botó cap amunt.
-  // Per això quedava 27px per sobre del fons del camp del Telèfon (25,4px en
-  // pantalla, per l'escat 0,94). Ara el peu penja fora del flux, com a
-  // l'horitzontal, i el botó toca el fons de la cel·la per construcció: les dues
-  // columnes fan la mateixa alçada de fila, i el Telèfon és l'últim camp de
-  // l'enviament. D_BUTTON_LIFT és l'únic número per afinar-ho (0 = clavats,
-  // positiu = baixa el botó; el peu el segueix perquè penja d'ell).
-  const D_BUTTON_LIFT = 0;
-  // Termes clavats al cap del camp de l'Email. No és un número fix: els 8 blocs
-  // de l'enviament fan 34px i es reparteixen amb `space-between` dins la fila,
-  // i la fila fa el que deixa la franja (294px amb finestra ≥1440, 290 a 1366,
-  // 276 a 1300). El cap del 7è bloc (Email) és a 6·34 + 6·(fila − 272)/7, i
-  // això ho dona aquest `calc` amb `100%` = alçada de la fila → segueix la fila
-  // quan la finestra canvia d'ample. D_TERMS_ADJ és l'únic número a retocar
-  // (positiu = baixa els termes, negatiu = puja'ls). 0 = tall geomètric del cap
-  // de l'Email; ara és a 5 (baixats 5px, 2026-09-05), que és just el desplaçament
-  // que ell va validar a l'horitzontal (vegeu TERMS_TOP).
-  const D_TERMS_ADJ = 0;
-  const D_TERMS_TOP = `calc(${6 * 34}px + (100% - ${8 * 34}px) * 6 / 7 + ${D_TERMS_ADJ}px)`;
-  // "Necessites factura?": va com a marge de dalt del seu bloc, o sigui que es
-  // mesura des del peu de la capsa de targeta. 14px originals de creació pujats
-  // 10 (2026-09-05). Únic número a retocar. Com que a l'escriptori els termes i
-  // el botó ja pengen absoluts, moure-la no els mogui ni un píxel.
-  const D_INVOICE_TOP = 0;
-  // La capsa dels dos camps (empresa + CIF) seu, a la posició de creació, just
-  // després dels 8px de joc (rowGap) que separen del retol "Necessites factura?":
-  // cap de la capsa a 21 + 8 = 29px damunt del bloc. Aquest número la puja sobre
-  // aquella posició i va com a marge de dalt NEGATIU, així que el retol no es mou
-  // i les tauletes queden igual que estaven. Amb 10 el cap de la capsa va a 19px,
-  // o sigui 1,5px per sota de les lletres del retol (la seva línia fa 21px i els
-  // glifs ocupen de 3,5 a 17,5).
-  const D_INVOICE_FIELDS_LIFT = 0;
 
   // ===== TAU LETA APAÏSADA (retocs propis) =====
   // Aquesta és l'ÚNICA versió on el repartiment vertical està retocat a mà.
@@ -320,7 +249,6 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
   const liftPad = isLandscapeTablet
     ? `${CONJUNT_LIFT * 2}px`
     : (isPortraitTablet ? `${P_CONJUNT_LIFT * 2}px` : `${D_CONJUNT_LIFT * 2}px`);
-  const bodyH = isLandscapeTablet ? `${FORMS_H}px` : (isPortraitTablet ? undefined : `${D_BODY_H}px`);
   // A la tauleta apaïsada, el llistat de productes puja 25px (entra dins l'aire
   // de la franja buida, que no pinta res) i les columnes de dades arrenquen amb
   // el marge curt. A la resta de mides, tot igual que sempre.
@@ -331,9 +259,6 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
       ? `${L_COLUMNES_TOP - L_FRANJA_CREIX}px`
       : (isPortraitTablet ? `${COLUMNES_TOP}px` : `${D_COLUMNES_TOP}px`));
 
-  const ROW_H = 32.8;
-  const V_GUTTER = 2.8;
-  const TOP_OFFSET = 1.5 * ROW_H;
 
   const activeItems = useMemo(
     () => (cartItems || []).filter(it => !it.disabled),
@@ -390,8 +315,6 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
   const totalFinal = totalArticles;
   const subtotalNet = Math.round(((totalFinal - transport) / 1.21) * 100) / 100;
   const ivaAmount = Math.round((totalFinal - transport - subtotalNet) * 100) / 100;
-  const baseImponible = subtotalNet;
-  const total = totalFinal;
 
   const fmt = (n) => n.toFixed(2).replace('.', ',') + '€';
   const splitPrice = (n) => {

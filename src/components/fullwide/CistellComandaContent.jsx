@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { ChevronDown, ChevronUp, X, Trash2, Plus } from 'lucide-react';
+import { ChevronDown, ChevronUp, X, Trash2 } from 'lucide-react';
 import { useShippingCosts } from '@/hooks/useShippingCosts';
 import { drawingStripePath } from '@/lib/drawingPaths';
 
@@ -554,7 +554,6 @@ function CistellComandaContent({ cartItems, setCartItems, onFinalizeOrder }) {
           const fmt = (n) => n.toFixed(2).replace('.', ',') + '€';
           const renderOverlay = (orientation) => {
             const isPortrait = orientation === 'portrait';
-            const isDesktop = orientation === 'desktop';
             return createPortal((
               <div style={{
                 // Fins que no hi ha mesura, el bloc no es veu: si no, sortia a la
