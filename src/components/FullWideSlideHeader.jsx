@@ -92,6 +92,10 @@ function FullWideSlideHeader({
   const { orders } = useOrders(adminEmail);
   const cartClickTimeoutRef = useRef(null);
   const accountClickTimeoutRef = useRef(null);
+  // Marca de temps de l'últim clic sobre la icona del cistell. Serveix per
+  // ignorar el segon clic d'un clic ràpid doble: sense això, l'acció s'executa
+  // dues vegades seguides (obre i tanca) i la pàgina sembla que reboti enrere.
+  const cartLastClickRef = useRef(0);
   const dblClickDelayMs = 0;
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -3088,6 +3092,12 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
               type="button"
               onClick={(e) => {
                 e.preventDefault();
+                // Un clic ràpid doble executava l'acció dues vegades (obrir i
+                // tancar el mega-slide de cop) i la pàgina saltava endavant i
+                // enrere. Ignorem el segon clic si arriba massa seguit.
+                const ara = Date.now();
+                if (ara - cartLastClickRef.current < 350) return;
+                cartLastClickRef.current = ara;
                 if (cartClickTimeoutRef.current) window.clearTimeout(cartClickTimeoutRef.current);
                 cartClickTimeoutRef.current = window.setTimeout(() => {
                   cartClickTimeoutRef.current = null;
