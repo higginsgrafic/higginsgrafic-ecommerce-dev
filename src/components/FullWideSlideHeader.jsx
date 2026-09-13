@@ -3093,15 +3093,14 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
                   cartClickTimeoutRef.current = null;
                   setManualOverrideClosed(false);
                   if (megaPage === 3 && active) {
-                    if (!acordioExpanded) {
-                      if (localCartItemCount > 0) {
-                        setAcordioExpanded(true);
-                      } else {
-                        setActive(null);
-                      }
-                    } else {
-                      setAcordioExpanded(false);
-                    }
+                    // La icona del cistell, quan el cistell ja és obert, el
+                    // TANCA. Abans, si hi havia articles, només obria i
+                    // tancava l'acordió de la tauleta vertical: a l'escriptori
+                    // no feia res (no es podia tancar amb la icona) i a la
+                    // vertical feia créixer el panell fins a baix de tot, que
+                    // no és el que s'espera d'un clic sobre la icona.
+                    setAcordioExpanded(false);
+                    setActive(null);
                   } else {
                     setMegaPage(3);
                     setAcordioExpanded(false);
