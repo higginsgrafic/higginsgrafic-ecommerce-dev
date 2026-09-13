@@ -53,3 +53,25 @@ ReactDOM.createRoot(document.getElementById('root')).render(
     </TooltipProvider>
   </BrowserRouter>
 );
+
+// ---------------------------------------------------------------------------
+// Service worker: ESBORRAT A POSTA
+//
+// El codi actual no en registra cap. Però versions anteriors de la botiga sí
+// que ho feien, i un navegador que encara el tingui instal·lat pot servir
+// fitxers vells (JavaScript i CSS d'abans) i fer que la botiga sembli
+// espatllada fins que l'usuari refresca. Aquí el desregistrem i buidem la
+// memòria cau perquè això no pugui passar.
+// ---------------------------------------------------------------------------
+if (typeof navigator !== 'undefined' && 'serviceWorker' in navigator) {
+  navigator.serviceWorker
+    .getRegistrations()
+    .then((registres) => registres.forEach((registre) => registre.unregister()))
+    .catch(() => { /* ignore */ });
+}
+if (typeof caches !== 'undefined' && typeof caches.keys === 'function') {
+  caches
+    .keys()
+    .then((noms) => noms.forEach((nom) => caches.delete(nom)))
+    .catch(() => { /* ignore */ });
+}
