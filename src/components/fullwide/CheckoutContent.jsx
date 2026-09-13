@@ -879,15 +879,16 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
           {/* Targeta dels totals: opaca, i amb la mateixa linia de 2px que la
               cinta a la vora esquerra (abans una ombra difusa), perquè es vegi
               que les fitxes li passen per sota. */}
-          <div style={{ position:'absolute', top:0, bottom:0, right:0, width:`${TOTALS_W}px`, boxSizing:'border-box', display:'flex', flexDirection:'column', fontFamily: isPortraitTablet ? 'Roboto, sans-serif' : undefined, justifyContent: isPortraitTablet ? 'flex-end' : 'space-between', gap: isPortraitTablet ? '2px' : undefined, padding:'10px 12px', background:'#FFFFFF', border:'1px solid #E6E8EC', borderRadius:'6px' }}>
+          <div style={{ position:'absolute', top:0, bottom:0, right:0, width:`${TOTALS_W}px`, boxSizing:'border-box', display:'flex', flexDirection:'column', fontFamily: isPortraitTablet ? 'Roboto, sans-serif' : undefined, padding:'10px 12px', background:'#FFFFFF', border:'1px solid #E6E8EC', borderRadius:'6px' }}>
             {/* La mateixa linia de 2px que la cinta, a la vora esquerra, i amb el mateix comportament: nome s surt si hi ha fitxes amagades en aquesta banda. */}
             <div aria-hidden="true" style={{ position:'absolute', left:0, top:0, bottom:0, width:'2px', pointerEvents:'none', opacity: cintaAmbMesDreta ? 1 : 0, transition:'opacity 160ms ease', background:'#98A2B4', borderRadius:'6px 0 0 6px' }} />
             {/* Logo de Grup Higgins, nome s a la vertical, com a marca d'aigua
-                del bloc de totals. Va amb màscara per poder-lo tenyir: el SVG
-                nome s aporta la forma. El marge de baix automatic empeny els
-                totals cap avall, aixi que el logo queda a dalt. */}
+                del bloc de totals. Ocupa tota la targeta: va posicionat absolut
+                a tota la caixa i la mascara 'contain' el fa cabre sencer, sense
+                deformar-lo. Va amb màscara per poder-lo tenyir: el SVG nome s
+                aporta la forma i el color surt del fons. */}
             {isPortraitTablet && (
-              <div aria-hidden="true" style={{ alignSelf:'center', width:'92px', height:'92px', marginBottom:'auto', backgroundColor:'#F9FAFB', WebkitMaskImage:'url(/custom_logos/brand/grup-higgins-logo.svg)', maskImage:'url(/custom_logos/brand/grup-higgins-logo.svg)', WebkitMaskRepeat:'no-repeat', maskRepeat:'no-repeat', WebkitMaskPosition:'center', maskPosition:'center', WebkitMaskSize:'contain', maskSize:'contain' }} />
+              <div aria-hidden="true" style={{ position:'absolute', inset:'1px', pointerEvents:'none', backgroundColor:'#F9FAFB', WebkitMaskImage:'url(/custom_logos/brand/grup-higgins-logo.svg)', maskImage:'url(/custom_logos/brand/grup-higgins-logo.svg)', WebkitMaskRepeat:'no-repeat', maskRepeat:'no-repeat', WebkitMaskPosition:'center', maskPosition:'center', WebkitMaskSize:'contain', maskSize:'contain' }} />
             )}
             {/* Els totals són una suma: cada concepte a la seva ratlla, el nom a
                 l'esquerra i la xifra a la dreta, com una columna de números.
@@ -895,6 +896,9 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
                 el transport i l'IVA són dins del preu, però es desglossen aquí
                 perquè es vegi d'on surt el total. Les tres ratlles sumen
                 exactament TOT PLEGAT FA. */}
+            {/* Els totals, dins un bloc posicionat: aixi queden per sobre del
+                logo (que es absolut) i el repartiment vertical es fa aqui. */}
+            <div style={{ position:'relative', flex:'1 1 auto', display:'flex', flexDirection:'column', justifyContent: isPortraitTablet ? 'flex-end' : 'space-between', gap: isPortraitTablet ? '2px' : undefined }}>
             <div style={{ display:'flex', justifyContent:'space-between', alignItems:'baseline', fontSize: isPortraitTablet ? '11pt' : '9.5pt', lineHeight:1.2, color:'#667085' }}><span>Subtotal</span><span style={{ fontVariantNumeric:'tabular-nums' }}>{subtotalNet.toFixed(2).replace('.',',')}€</span></div>
             {discountEnabled && <div style={{ display:'flex', justifyContent:'space-between', alignItems:'baseline', fontSize: isPortraitTablet ? '11pt' : '9.5pt', lineHeight:1.2, color:'#667085' }}><span>Descompte (-{offersConfig.discountRate}%)</span><span style={{ fontVariantNumeric:'tabular-nums' }}>-{descompte.toFixed(2).replace('.',',')}€</span></div>}
             <div style={{ display:'flex', justifyContent:'space-between', alignItems:'baseline', fontSize: isPortraitTablet ? '11pt' : '9.5pt', lineHeight:1.2, color:'#667085' }}><span>Transport</span><span style={{ fontVariantNumeric:'tabular-nums' }}>{transport === 0 ? 'Gratuït' : `${transport.toFixed(2).replace('.',',')}€`}</span></div>
@@ -902,6 +906,7 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
             {/* TOT PLEGAT FA es queda en Roboto Condensed encara que la resta
                 de la targeta vagi en Roboto. */}
             <div style={{ display:'flex', justifyContent:'space-between', alignItems:'baseline', fontFamily:'Roboto Condensed, sans-serif', fontSize:'12.5pt', fontWeight:500, lineHeight:1.2, paddingTop:'6px', borderTop:'1px solid #E6E8EC' }}><span>TOT PLEGAT FA</span><span style={{ fontVariantNumeric:'tabular-nums' }}>{totalFinal.toFixed(2).replace('.',',')}€</span></div>
+            </div>
           </div>
         </div>
         {/* COL 2: Dades d'enviament. Baixa a la fila de sota i ocupa mitja
