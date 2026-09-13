@@ -43,15 +43,14 @@ vi.mock('@supabase/supabase-js', () => ({
           select: () => ({
             eq: (col, val) => {
               if (col === 'event_id') _queryEventId = val;
-              return {
-                single: () => {
-                  const existing = _eventsStore.get(_queryEventId);
-                  if (existing) {
-                    return Promise.resolve({ data: existing, error: null });
-                  }
-                  return Promise.resolve({ data: null, error: 'not found' });
-                },
+              const troba = () => {
+                const existing = _eventsStore.get(_queryEventId);
+                if (existing) {
+                  return Promise.resolve({ data: existing, error: null });
+                }
+                return Promise.resolve({ data: null, error: null });
               };
+              return { single: troba, maybeSingle: troba };
             },
           }),
           insert: (payload) => {
@@ -70,13 +69,14 @@ vi.mock('@supabase/supabase-js', () => ({
       const ordersChain = {
         eq: () => ordersChain,
         single: () => Promise.resolve({ data: null, error: 'not found' }),
+        maybeSingle: () => Promise.resolve({ data: null, error: 'not found' }),
         select: () => ordersChain,
       };
       return {
         select: () => ordersChain,
         update: () => ({
           eq: () => ({
-            select: () => ({ single: () => Promise.resolve(_ordersUpdateResult) }),
+            select: () => ({ single: () => Promise.resolve(_ordersUpdateResult), maybeSingle: () => Promise.resolve(_ordersUpdateResult) }),
             then: (resolve) => resolve(_ordersUpdateResult),
           }),
         }),

@@ -35,7 +35,7 @@ vi.mock('@supabase/supabase-js', () => ({
   createClient: () => ({
     from: (table) => {
       if (table === 'processed_stripe_events') {
-        const chain = { eq: () => chain, single: () => Promise.resolve(_eventsSelectResult) };
+        const chain = { eq: () => chain, single: () => Promise.resolve(_eventsSelectResult), maybeSingle: () => Promise.resolve(_eventsSelectResult) };
         return {
           select: () => chain,
           insert: () => Promise.resolve({ error: null }),
@@ -44,13 +44,14 @@ vi.mock('@supabase/supabase-js', () => ({
       const ordersChain = {
         eq: () => ordersChain,
         single: () => Promise.resolve({ data: null, error: 'not found' }),
+        maybeSingle: () => Promise.resolve({ data: null, error: 'not found' }),
         select: () => ordersChain,
       };
       return {
         select: () => ordersChain,
         update: () => ({
           eq: () => ({
-            select: () => ({ single: () => Promise.resolve(_ordersUpdateResult) }),
+            select: () => ({ single: () => Promise.resolve(_ordersUpdateResult), maybeSingle: () => Promise.resolve(_ordersUpdateResult) }),
             then: (resolve) => resolve(_ordersUpdateResult),
           }),
         }),
@@ -119,5 +120,22 @@ describe('stripe-webhook — mode de proves', () => {
     // altra vegada i no s'acabaria mai.
     expect(res.statusCode).toBe(200);
     expect(JSON.parse(res.body).received).toBe(true);
+  });
+
+  it('un pagament que no correspon a cap comanda no fa reintentar Stripe', async () => {
+    // Cas real: un pagament fet fora de la botiga (o una comanda que no s'ha
+    // pogut enllaçar). Abans això responia 500 i Stripe ho reintentava durant
+    // dies, sense poder-ho resoldre mai perquè no hi ha res a arreglar.
+    _ordersUpdateResult = { data: null, error: null };
+
+    const res = await handler({
+      httpMethod: 'POST',
+      headers: { 'stripe-signature': 'sig_test' },
+      body: 'raw_body_data',
+    });
+
+    expect(res.statusCode).toBe(200);
+    expect(mockSendOrderEmail).not.toHaveBeenCalled();
+    expect(mockGelatoCreate).not.toHaveBeenCalled();
   });
 });
