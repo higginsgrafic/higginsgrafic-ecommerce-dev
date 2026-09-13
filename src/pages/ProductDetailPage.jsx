@@ -941,6 +941,41 @@ const ProductDetailPage = ({ onAddToCart, cartItems = [], language = 'ca' }) => 
       selectedColor: variantColorCanonical || selectedColor
     };
     trackAddToCart(productToAdd, quantity);
+
+    // El cistell de debò de la botiga viu dins del mega-slide, i s'omple amb
+    // aquest esdeveniment (és el que fan servir la resta de pàgines de la
+    // botiga). Abans aquesta fitxa només cridava onAddToCart, que omple un
+    // cistell diferent que el mega-slide no llegeix: el client afegia un
+    // producte, obria el cistell i el trobava BUIT, i per tant no podia
+    // comprar res des d'una fitxa de producte.
+    //
+    // Hi enviem el preu i, sobretot, `gelatoVariantId` i `productSlug`: amb
+    // això el servidor sap exactament quina variant de Gelato ha de fabricar,
+    // sense dependre de com s'escrigui el color ni de cap llista del client.
+    try {
+      const preu = Number(selectedVariant?.price ?? product?.price ?? 0);
+      window.dispatchEvent(new CustomEvent('hg:open-full-wide-cart', {
+        detail: {
+          source: 'product-detail-add',
+          item: {
+            title: (product?.name || '').toUpperCase(),
+            collection: product?.collection || '',
+            productSlug: product?.slug || null,
+            productRoute: product?.slug || '',
+            gelatoVariantId: selectedVariant?.gelatoVariantId || null,
+            qty: quantity,
+            size: selectedSize,
+            price: `${preu.toFixed(2).replace('.', ',')}€`,
+            color: variantColorCanonical || selectedColor,
+            finish: '',
+            drawing: '',
+            disabled: false,
+          },
+        },
+      }));
+    } catch {
+      // ignore
+    }
     onAddToCart(productToAdd, selectedSize, quantity, true);
     success('Producte afegit al cistell');
   };
