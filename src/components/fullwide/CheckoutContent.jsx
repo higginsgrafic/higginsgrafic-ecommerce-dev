@@ -507,7 +507,13 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
   );
 
   const buttonBlock = (
-    <div style={{ marginTop: '18px' }}>
+    // `marginTop: auto` empeny el botó fins al final de la seva columna. Com que
+    // les dues columnes tenen la mateixa alçada (la graella les estira), el botó
+    // acaba exactament al mateix nivell que l'últim camp de l'enviament (el
+    // Telèfon). Així no cal cap número calculat a mà: si demà canvia un camp,
+    // l'alineació es manté tota sola. La línia "Powered by Stripe" va posicionada
+    // absoluta i, per tant, queda fora del flux i no desplaça res.
+    <div style={{ marginTop: 'auto' }}>
       <button onClick={handleSubmit} disabled={isProcessing} style={{ width:'100%', height: isPortraitTablet ? `${P_BUTTON_H}px` : (isNarrowForm ? '28px' : '34px'), border:'none', borderRadius:'4px', backgroundColor: isProcessing?'#8FE8B9':'#00D66F', color:'#063B21', fontFamily:'Roboto Condensed, sans-serif', fontSize:'10.5pt', fontWeight:600, boxShadow:'0 1px 2px rgba(16,24,40,0.08)', cursor: isProcessing?'not-allowed':'pointer', display:'flex', alignItems:'center', justifyContent:'center', gap:'8px' }}>
         {isProcessing ? 'Processant…' : (<><Check size={14} strokeWidth={2} /> Confirma la compra</>)}
       </button>
@@ -687,7 +693,7 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
           <span style={{ fontSize:'12pt', fontWeight:500 }}>La teva comanda</span>
         </div>
       </div>
-      <div style={{ display:'grid', gridTemplateColumns: isPortraitTablet ? '1fr 1fr' : '1fr 1fr 1fr 1fr', columnGap:'24px', rowGap: isPortraitTablet ? `${P_ROW_GAP}px` : '18px', width: groupW, marginLeft: groupX, flex: '0 0 auto', minHeight:0, transform: shiftColsX, alignItems:'start' }}>
+      <div style={{ display:'grid', gridTemplateColumns: isPortraitTablet ? '1fr 1fr' : '1fr 1fr 1fr 1fr', columnGap:'24px', rowGap: isPortraitTablet ? `${P_ROW_GAP}px` : '18px', width: groupW, marginLeft: groupX, flex: '0 0 auto', minHeight:0, transform: shiftColsX }}>
         {/* COL 1: Cistell + Totals. Ara ocupa tota la fila de dalt. */}
         <div style={{ gridColumn:'1 / -1', display:'flex', flexDirection:'column', minHeight:0 }}>
           <div style={{ flex:'1 1 auto', overflowY:'auto', minHeight:0, maxHeight: isPortraitTablet ? '195px' : undefined }}>
@@ -750,7 +756,7 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
             queda alineat pel capdamunt amb el camp del client. */}
         <div style={{ gridColumn:'span 2', marginTop: isPhone ? undefined : '90px', display:'flex', flexDirection:'column', minHeight:0, overflow:'visible', position: isPortraitTablet ? undefined : 'relative', gap: isNarrowForm ? '1px' : undefined }}>
           <div style={{ fontSize:'12pt', fontWeight:500, marginBottom:'20px' }}>Dades de pagament</div>
-          <div style={{ display:'flex', flexDirection:'column', gap: isNarrowForm ? '1px' : undefined }}>
+          <div style={{ display:'flex', flexDirection:'column', flex:'1 1 auto', gap: isNarrowForm ? '1px' : undefined }}>
             {/* Pagament */}
             <div style={{ display:'grid', rowGap: '8px' }}>
               <div style={{ background:'#FFFFFF', overflow:'hidden' }}>
