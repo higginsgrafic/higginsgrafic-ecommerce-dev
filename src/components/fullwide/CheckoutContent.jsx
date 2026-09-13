@@ -95,7 +95,7 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
   // l'únic número a retocar (7 junts entre els 8 blocs de camps).
   // 7px = la separació que realment dona l'escriptori, on els 8 blocs es
   // reparteixen amb space-between dins un cos de 322px: (322 - 8*34) / 7 = 7,16.
-  const FIELD_GAP = 4;
+  const FIELD_GAP = 5;
 
   // Alçada real del bloc de camps de l'enviament: 8 camps de 34px + 7 junts.
   // Derivada, perquè si retoca FIELD_GAP l'alineament de baix la segueixi.
@@ -125,7 +125,7 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
   // ===== VERTICAL (2 columnes) =====
   // Números propis, als mateixos valors inicials que l'horitzontal perquè és la
   // mateixa recepta; d'aquí en endavant cada variant se'n retoca per separado.
-  const P_FIELD_GAP = 4;
+  const P_FIELD_GAP = 5;
   const P_TITLE_GAP = 10;
   const P_TITLE_Y = 21.85;
   // El vertical encara no el pujem: es queda exactament al centre.
@@ -724,7 +724,7 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
         {/* COL 2: Dades d'enviament. Baixa a la fila de sota i ocupa mitja
             amplada. El títol va DINS de la columna (primera peça): així sempre
             queda just a sobre de la seva columna, es mogui on es mogui. */}
-        <div style={{ gridColumn:'span 2', marginTop: isPhone ? undefined : '97px', display:'flex', flexDirection:'column', minHeight:0, overflow:'visible', justifyContent: 'flex-start', gap: fieldGap }}>
+        <div style={{ gridColumn:'span 2', marginTop: isPhone ? undefined : '90px', display:'flex', flexDirection:'column', minHeight:0, overflow:'visible', justifyContent: 'flex-start', gap: fieldGap }}>
           <div style={{ fontSize:'12pt', fontWeight:500, marginBottom:'20px' }}>Dades d'enviament</div>
           <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', columnGap:'10px' }}>
             <div><input type="text" name="firstName" value={formData.firstName} onChange={handleChange} placeholder="Nom" style={inputStyle} />{formErrors.firstName && <div style={errorStyle}>{formErrors.firstName}</div>}</div>
