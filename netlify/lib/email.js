@@ -60,6 +60,38 @@ const TEMPLATES = {
   contact_received: { Component: ContactReceivedEmail, meta: contactReceivedMeta, propName: 'data' },
 };
 
+/**
+ * Adreça pública de la botiga.
+ *
+ * Els correus no tenen "pàgina actual": si una imatge hi va amb ruta relativa
+ * (/emails/assets/logo.png), el client de correu no la pot trobar. Cal
+ * convertir-la en adreça sencera, i per això cal saber en quin domini viu la
+ * botiga.
+ *
+ * Ordre de preferència:
+ *   1. SITE_URL / VITE_SITE_ORIGIN — per fixar-ho a mà si mai cal
+ *   2. URL / DEPLOY_PRIME_URL      — les posa Netlify tot sol, i s'actualitzen
+ *                                    soles quan canvia el domini principal
+ *   3. dev.higginsgrafic.com       — últim recurs
+ *
+ * IMPORTANT: no hi posis higginsgrafic.com escrit a mà. Aquell domini, mentre
+ * la botiga estigui en construcció, respon amb la pàgina d'avís en comptes de
+ * la imatge, i el logo sortiria trencat al correu.
+ */
+function getSiteBase() {
+  const candidats = [
+    process.env.SITE_URL,
+    process.env.VITE_SITE_ORIGIN,
+    process.env.URL,
+    process.env.DEPLOY_PRIME_URL,
+  ];
+  for (const candidat of candidats) {
+    const valor = (candidat || '').toString().trim();
+    if (valor.startsWith('http')) return valor.replace(/\/$/, '');
+  }
+  return 'https://dev.higginsgrafic.com';
+}
+
 export async function sendOrderEmail(templateKey, payload) {
   const apiKey = process.env.RESEND_API_KEY;
   if (!apiKey) {
@@ -84,9 +116,10 @@ export async function sendOrderEmail(templateKey, payload) {
   // Antigament: await render(element) de @react-email/render (vegeu la nota
   // de dalt). renderToStaticMarkup és síncron i retorna el mateix HTML.
   const rawHtml = DOCTYPE + renderToStaticMarkup(element);
+  const base = getSiteBase();
   const html = rawHtml
-    .replace(/src="\/([^"]+)"/g, 'src="https://higginsgrafic.com/$1"')
-    .replace(/url\('\/([^']+)'\)/g, "url('https://higginsgrafic.com/$1')");
+    .replace(/src="\/([^"]+)"/g, `src="${base}/$1"`)
+    .replace(/url\('\/([^']+)'\)/g, `url('${base}/$1')`);
   const subject = typeof meta.subject === 'function' ? meta.subject(payload) : meta.subject;
 
   try {
@@ -111,7 +144,9 @@ export async function sendOrderEmail(templateKey, payload) {
     }
 
     const data = await res.json();
-    console.log('[_email] Email enviat:', templateKey, '→', data.id);
+    // La base de les imatges s'imprimeix per poder detectar d'un cop d'ull, als
+    // registres, si el logo del correu apunta on toca.
+    console.log('[_email] Email enviat:', templateKey, '→', data.id, '| base imatges:', base);
     return { id: data.id };
   } catch (err) {
     console.error('[_email] Error enviant email:', err.message);
