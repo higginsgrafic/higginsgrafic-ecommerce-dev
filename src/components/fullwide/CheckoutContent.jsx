@@ -816,8 +816,11 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
         {/* COL 1: el cistell. Una cinta de fitxes que es desplaça de costat amb
             la targeta dels totals clavada a la dreta, per sobre de les fitxes
             (que hi passen per sota). Ocupa una franja d'alçada fixa: el
-            formulari de pagament no es mou mai, faci els productes que faci. */}
-        <div style={{ gridColumn:'1 / -1', position:'relative', display:'flex', minHeight:0 }}>
+            formulari de pagament no es mou mai, faci els productes que faci.
+            La franja porta un degradat de #F9FAFB (a l'esquerra) a #FFFFFF,
+            d'una banda a l'altra del contingut (del logo a la icona de
+            l'usuari), a totes les versions. */}
+        <div style={{ gridColumn:'1 / -1', position:'relative', display:'flex', minHeight:0, background:'linear-gradient(to right, #F9FAFB 0%, #FFFFFF 100%)' }}>
           {/* Cinta de fitxes. L'espaiador del davant empeny les fitxes cap a la
               dreta (quan n'hi ha poques) i s'arronsa a zero quan no hi caben:
               així sempre creixen cap a l'esquerra, des de la targeta dels
