@@ -153,10 +153,10 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
   // fa d'àncora vertical també per al botó (vegeu P_BUTTON_TOP).
   const P_TERMS_TOP = 0;
   // "Necessites factura?" també va a la cel·la dreta (la del Telèfon) i penja
-  // ABSOLUT, com el botó: així es pot alinear amb el camp de Província de la
-  // columna del costat (-78, o sigui 709 en pantalla) sense empenyir els
-  // termes ni el botó. Positiu = baixa la factura.
-  const P_INVOICE_TOP = -98;
+  // ABSOLUT, com el botó: així es pot alinear amb la columna del costat sense
+  // empenyir els termes ni el botó. Amb -124 el seu FONS cau on cau el fons
+  // del camp de Ciutat (724). Positiu = baixa la factura.
+  const P_INVOICE_TOP = -124;
   // Marge de dalt de la cel·la dels termes dins la graella. -87 la deixa de
   // manera que el BOTÓ de pagar acabi exactament al mateix nivell que el camp
   // del telèfon (860). Si es canvia, P_INVOICE_TOP s'ha d'ajustar perquè la
