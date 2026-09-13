@@ -13,7 +13,6 @@ const OrderConfirmationLayout = ({
   title = 'Pagament confirmat',
   subtitle = 'GRÀCIES PER LA VISITA!',
   orderLabel = 'Nombre de comanda',
-  ivaRate = '21%',
 }) => {
   const offersConfig = useOffersConfig();
   const discountEnabled = offersConfig.discountEnabled;
@@ -142,7 +141,7 @@ const OrderConfirmationLayout = ({
         height: `calc((25% + 59.5px) * ${discountEnabled ? 5 : 4} / 15)`,
         zIndex: 1,
         display: 'grid',
-        gridTemplateRows: `repeat(${discountEnabled ? 5 : 4}, 1fr)`,
+        gridTemplateRows: `repeat(${discountEnabled ? 4 : 3}, 1fr)`,
         gridTemplateColumns: '1fr 90px 90px auto',
         justifyContent: 'space-between',
         fontFamily: 'Roboto, sans-serif',
@@ -165,10 +164,9 @@ const OrderConfirmationLayout = ({
         <div />
         <div style={{ padding: '0 20px', fontWeight: 400, opacity: 0.7, textAlign: 'left', whiteSpace: 'nowrap', display: 'flex', alignItems: 'center', minHeight: 0, overflow: 'hidden', gridColumn: '2 / 4' }}>Transport</div>
         <div style={{ padding: '0 20px', fontWeight: 400, opacity: 0.7, textAlign: 'right', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', minHeight: 0, overflow: 'hidden', }}>{formatPrice(shipping)}</div>
-        {/* IVA */}
-        <div />
-        <div style={{ padding: '0 20px', fontWeight: 400, opacity: 0.7, textAlign: 'left', whiteSpace: 'nowrap', display: 'flex', alignItems: 'center', minHeight: 0, overflow: 'hidden', gridColumn: '2 / 4' }}>IVA {ivaRate}</div>
-        <div style={{ padding: '0 20px', fontWeight: 400, opacity: 0.7, textAlign: 'right', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', minHeight: 0, overflow: 'hidden', }}>{formatPrice(ivaAmount)}</div>
+        {/* L'IVA no és una ratlla que se sumi: els preus de la botiga ja el porten
+            inclòs, i si el poséssim aquí la columna no quadraría (Preu +
+            Transport + IVA donaria més que el total). */}
         {/* Tot plegat fa */}
         <div />
         <div style={{ padding: '0 20px', fontFamily: 'Oswald, sans-serif', fontSize: '17.5px', fontWeight: 400, textAlign: 'left', whiteSpace: 'nowrap', display: 'flex', alignItems: 'center', minHeight: 0, overflow: 'hidden', gridColumn: '2 / 4' }}>Tot plegat fa</div>

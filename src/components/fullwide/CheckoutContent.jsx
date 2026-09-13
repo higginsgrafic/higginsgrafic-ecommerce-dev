@@ -681,8 +681,8 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
               <div style={{ display: 'flex', justifyContent: 'space-between', color: '#0A7A46' }}><span>Descompte</span><span>-{fmt(descompte)}</span></div>
             )}
             <div style={{ display: 'flex', justifyContent: 'space-between' }}><span>Transport</span><span>{shipping === 0 ? 'Gratuït' : fmt(shipping)}</span></div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', color: '#667085' }}><span>IVA 21% (inclòs)</span><span>{fmt(ivaAmount)}</span></div>
             <div style={{ display: 'flex', justifyContent: 'space-between', ...HEAD, fontSize: '12pt', marginTop: '8px' }}><span>Total</span><span>{fmt(totalFinal)}</span></div>
+            <div style={{ textAlign: 'right', color: '#98A2B4', fontSize: '8.5pt' }}>IVA 21% inclòs en el total: {fmt(ivaAmount)}</div>
           </div>
         </div>
 
@@ -827,8 +827,11 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
             <div style={{ display:'flex', justifyContent:'space-between', alignItems:'baseline', fontSize:'9.5pt', lineHeight:1.2, color:'#667085' }}><span>Subtotal</span><span style={{ fontVariantNumeric:'tabular-nums' }}>{totalArticles.toFixed(2).replace('.',',')}€</span></div>
             {discountEnabled && <div style={{ display:'flex', justifyContent:'space-between', alignItems:'baseline', fontSize:'9.5pt', lineHeight:1.2, color:'#667085' }}><span>Descompte (-{offersConfig.discountRate}%)</span><span style={{ fontVariantNumeric:'tabular-nums' }}>-{descompte.toFixed(2).replace('.',',')}€</span></div>}
             <div style={{ display:'flex', justifyContent:'space-between', alignItems:'baseline', fontSize:'9.5pt', lineHeight:1.2, color:'#667085' }}><span>Transport</span><span style={{ fontVariantNumeric:'tabular-nums' }}>{shipping === 0 ? 'Gratuït' : `${shipping.toFixed(2).replace('.',',')}€`}</span></div>
-            <div style={{ display:'flex', justifyContent:'space-between', alignItems:'baseline', fontSize:'9.5pt', lineHeight:1.2, color:'#667085' }}><span>IVA 21% (inclòs)</span><span style={{ fontVariantNumeric:'tabular-nums' }}>{ivaAmount.toFixed(2).replace('.',',')}€</span></div>
             <div style={{ display:'flex', justifyContent:'space-between', alignItems:'baseline', fontSize:'12.5pt', fontWeight:500, lineHeight:1.2, paddingTop:'6px', borderTop:'1px solid #E6E8EC' }}><span>Total</span><span style={{ fontVariantNumeric:'tabular-nums' }}>{totalFinal.toFixed(2).replace('.',',')}€</span></div>
+            {/* L'IVA no és un concepte que se sumi: els preus de la botiga ja el
+                porten inclòs. Va aquí sota, com a nota, perquè la columna de
+                números quadri: Subtotal + Transport = Total. */}
+            <div style={{ fontSize:'8pt', lineHeight:1.2, color:'#98A2B4', textAlign:'right' }}>IVA 21% inclòs en el total: {ivaAmount.toFixed(2).replace('.',',')}€</div>
           </div>
         </div>
         {/* COL 2: Dades d'enviament. Baixa a la fila de sota i ocupa mitja
