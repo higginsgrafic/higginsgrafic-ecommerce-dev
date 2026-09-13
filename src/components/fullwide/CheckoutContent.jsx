@@ -5,7 +5,7 @@ import { Check } from 'lucide-react';
 import { validateEmail, validateRequired, validatePostalCode, validateForm } from '@/utils/validation';
 import { trackBeginCheckout, trackPurchase } from '@/utils/analytics';
 import { useShippingCosts, normalizeCountry } from '@/hooks/useShippingCosts';
-import { createMockOrder, MOCK_CLIENT } from '@/lib/mockOrderStore';
+import { createMockOrder } from '@/lib/mockOrderStore';
 import { useAuth } from '@/contexts/AuthContext';
 import { drawingStripePath } from '@/lib/drawingPaths';
 import { getMockupPath, INK_BLACK, INK_WHITE, COLLECTIONS } from '@/lib/mockupPaths';
@@ -22,16 +22,18 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
   const offersConfig = useOffersConfig();
   const discountEnabled = offersConfig.discountEnabled;
   const discountRate = offersConfig.discountRate / 100;
+  // Els camps comencen BUITS, tambe en desenvolupament: abans s'omplien amb
+  // un client d'exemple i donava la sensacio que el formulari ja venia ple.
   const [formData, setFormData] = useState({
-    email: isDev ? MOCK_CLIENT.email : '',
-    firstName: isDev ? MOCK_CLIENT.firstName : '',
-    lastName: isDev ? MOCK_CLIENT.lastName : '',
-    address: isDev ? MOCK_CLIENT.address : '',
+    email: '',
+    firstName: '',
+    lastName: '',
+    address: '',
     address2: '',
-    city: isDev ? MOCK_CLIENT.city : '',
-    postalCode: isDev ? MOCK_CLIENT.postalCode : '',
-    country: isDev ? MOCK_CLIENT.country : 'Espanya',
-    phone: isDev ? '600 123 456' : '',
+    city: '',
+    postalCode: '',
+    country: 'Espanya',
+    phone: '',
     company: '',
     taxId: '',
   });
@@ -150,13 +152,12 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
   // vora 1 + padding 10 = el cap de la capsa del número de targeta. Aquest número
   // fa d'àncora vertical també per al botó (vegeu P_BUTTON_TOP).
   const P_TERMS_TOP = 0;
-  // "Necessites factura?" també va a la cel·la dreta (pista del Telèfon) i penja
-  // ABSOLUT, com el botó: així no pot empènyer els termes cap avall. 0 el posava a
-  // la mateixa línia que el retol "Dades de pagament"; demanar-lo de pujar 10px el
-  // deixa a -10, o sigui DINS el joc de 14px (P_ROW_GAP) que separa les dues
-  // fileres: només li queden 4px fins als camps d'enviament de sobre.
-  // Positiu = baixa la factura. Únic número a retocar per al seu nivell.
-  const P_INVOICE_TOP = 0;
+  // "Necessites factura?" també va a la cel·la dreta (la del Telèfon) i penja
+  // ABSOLUT, com el botó: així es pot alinear amb el camp de Província de la
+  // columna del costat (-117, o sigui 709 en pantalla) sense empenyir els
+  // termes ni el botó, que es queden al capdamunt de la cel·la. Positiu = baixa
+  // la factura. Únic número a retocar per al seu nivell.
+  const P_INVOICE_TOP = -117;
   // Alçada d'UNA capsa de camp de targeta (número, caducitat i CVC en fan la
   // mateixa): vores 1+1 + padding 10+10 + l'interior que posa l'iframe de Stripe.
   // L'interior no ve del nostre codi, així que el 42 d'abans era ESTIMAT i el botó
@@ -620,7 +621,7 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
   // columna de la targeta i el vertical la penja a la cel·la dreta, a la pista del
   // Telèfon i al nivell del retol "Dades de pagament" (P_INVOICE_TOP).
   const invoiceBlock = (
-    <div style={{ display:'grid', rowGap:'8px', marginTop:'16px' }}>
+    <div style={{ display:'grid', rowGap:'8px', marginTop: isPortraitTablet ? 0 : '16px', position: isPortraitTablet ? 'absolute' : undefined, top: isPortraitTablet ? `${P_INVOICE_TOP}px` : undefined, left: isPortraitTablet ? 0 : undefined, right: isPortraitTablet ? 0 : undefined }}>
       <label style={{ display:'flex', alignItems:'center', gap:'8px', fontSize: isNarrowForm ? '9pt' : '10.5pt', fontWeight:300 }}>
         <input type="checkbox" checked={needsInvoice} onChange={(e) => setNeedsInvoice(e.target.checked)} />
         <span>Necessites factura?</span>
