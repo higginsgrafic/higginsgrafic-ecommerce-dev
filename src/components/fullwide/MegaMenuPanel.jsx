@@ -1,4 +1,4 @@
-import { lazy, Suspense, useRef, useEffect, useCallback, useState } from 'react';
+import { lazy, Suspense, useRef, useEffect, useCallback } from 'react';
 import MegaStripeBleedGuard from './MegaStripeBleedGuard.jsx';
 import MegaStripePanelP1 from './MegaStripePanelP1.jsx';
 import MegaslidePagina2 from '../megaslide/MegaslidePagina2.jsx';
@@ -9,29 +9,6 @@ const MegaslidePagina4 = lazy(() => import('../megaslide/MegaslidePagina4.jsx'))
 
 // Pàgina 1: espai que queda entre la vora inferior de les samarretes i la vora
 // inferior del panell. Aquest és el número a retocar si en vol més o menys.
-const P1_STRIPE_BOTTOM_GAP = 30;
-
-// Memoria de l'alcada bona del panell. El mega-slide es munta i es desmunta cada
-// cop que s'obre, i la mesura del contingut de la pagina 1 triga una estona a
-// arribar i va canviant (476 -> 456 -> 417): allo es veia com un rebot. Guardant
-// l'ultima alcada bona al navegador, el panell ja neix amb l'alcada correcta
-// tambe despres de recarregar la pagina. Es per mida de finestra, perque
-// l'alcada en depen.
-const KEY_ALCADA = 'hg.megaPanelHeight.v1';
-function llegirAlcadaDesada() {
-  try {
-    const cru = window.localStorage.getItem(KEY_ALCADA);
-    if (!cru) return null;
-    const d = JSON.parse(cru);
-    if (d && d.w === window.innerWidth && d.h === window.innerHeight && typeof d.px === 'string') return d.px;
-  } catch { /* ignore */ }
-  return null;
-}
-function desarAlcada(px) {
-  try {
-    window.localStorage.setItem(KEY_ALCADA, JSON.stringify({ w: window.innerWidth, h: window.innerHeight, px }));
-  } catch { /* ignore */ }
-}
 
 export default function MegaMenuPanel({
   active,
@@ -78,8 +55,6 @@ export default function MegaMenuPanel({
   setActive,
   austenSubcollection,
   setAustenSubcollection,
-  cercadorSelectedColor,
-  setCercadorSelectedColor,
   firstContactSelectedItem,
   humanInsideSelectedItem,
   selectedItemByCollection,
@@ -138,9 +113,6 @@ export default function MegaMenuPanel({
   const page1SelectedItem = active === 'first_contact' ? firstContactSelectedItem
     : active === 'the_human_inside' ? humanInsideSelectedItem
     : (selectedItemByCollection?.[active] ?? null);
-  const portraitLandscapeWidth = typeof window !== 'undefined'
-    ? Math.min(1350, window.innerHeight - 15)
-    : 1024;
   const defaultBleedGuardHeight = effectiveMegaTileSize
     ? `${Math.round(effectiveMegaTileSize * 2 + 37 + Math.max(0, stripeRowPadPx))}px`
     : undefined;
@@ -155,35 +127,6 @@ export default function MegaMenuPanel({
     ? 'calc(100vh - var(--globalHeaderTopOffset, 0px) - 112px)'
     : bleedGuardHeight;
 
-  // Retall de la pàgina 1: el panell acaba P1_STRIPE_BOTTOM_GAP px sota el
-  // bottom visible de les samarretes. La mesura ve de MegaStripePanelP1 (ja hi
-  // inclou l'escala de la franja i el pageLift). 64 = py-8 (32+32) del
-  // contenidor del panell. Mentre no hi ha mesura, s'usa l'alçada de sempre.
-  const [p1ContentBottomPx, setP1ContentBottomPx] = useState(null);
-  const handleP1ContentBottom = useCallback((px) => {
-    setP1ContentBottomPx((prev) => (prev != null && Math.abs(prev - px) < 0.5 ? prev : px));
-  }, []);
-  const matchesPage1Height = megaPage === 1 || megaPage === 2 || megaPage === 3 || megaPage === 4;
-  // El rebot en obrir: l'alcada del panell surt d'una mesura del contingut de la
-  // pagina 1 que va canviant mentre les imatges de la franja carreguen
-  // (476 -> 456 -> 417). Com que el header creix amb el panell, allo es veu com
-  // un rebot. Mentre la mesura no faci estona que no canvia, el panell es queda
-  // amb l'alcada de reserva; aixi nome s canvia un cop, i no tres.
-  const [alcadaRecordada] = useState(llegirAlcadaDesada);
-  // Sempre arrenca "no estable": encara que tinguem una alcada recordada, cal
-  // esperar que la mesura d'aquesta obertura tambe es quedi quieta. Si no, la
-  // primera mesura (dolenta) s'aplicava de seguida i el panell saltava.
-  const [mesuraEstable, setMesuraEstable] = useState(false);
-  useEffect(() => {
-    if (isPortraitTablet || paymentFillsScreen) {
-      setMesuraEstable(true);
-      return undefined;
-    }
-    if (p1ContentBottomPx == null) return undefined;
-    const t = window.setTimeout(() => setMesuraEstable(true), 220);
-    return () => window.clearTimeout(t);
-  }, [isPortraitTablet, paymentFillsScreen, p1ContentBottomPx]);
-
   // Al checkout, el mega-slide no pot arribar més avall d'on comença el
   // formulari: el cistell el taparia. Amb una alçada fixa per format (la que
   // deixa el formulari just a sota) el cistell no tapa res i, de passada, en
@@ -195,25 +138,24 @@ export default function MegaMenuPanel({
   const h = typeof window !== 'undefined' ? window.innerHeight : 0;
   const esVerticalAqui = w >= 768 && w <= 1366 && h > w;
   const esApaissadaAqui = w >= 768 && w <= 1366 && w >= h;
+  const esMobilAqui = w < 768;
   // 270px de panell a l'apaisada i 330 a l'escriptori: son les alcades que
-  // deixen el formulari just a sota. A la vertical no cal limit.
-  const CHECKOUT_GUARD_H = esVerticalAqui ? null : (esApaissadaAqui ? 206 : 266);
+  // deixen el formulari just a sota. A la vertical i al mobil no cal limit.
+  const CHECKOUT_GUARD_H = (esVerticalAqui || esMobilAqui) ? null : (esApaissadaAqui ? 206 : 266);
+
+  // Alcada fixa del panell per format, tambe a les pagines de colleccio. La
+  // mesura del contingut de la pagina 1 va canviant mentre les imatges de la
+  // franja carreguen (347 -> 284 a l'apaisada) i allo es veia com un ajust en
+  // obrir el mega-slide. Amb el valor ja assentar, obre d'un sol cop, com al
+  // checkout. Els numeros son la mesura assentada menys els 64px de padding.
+  const MEGA_GUARD_FIX = esMobilAqui ? 50 : (esVerticalAqui ? 270 : (esApaissadaAqui ? 220 : 272));
   const guardHeightPx = paymentFillsScreen
     ? guardHeightPxDefault
     : isPortraitTablet
     ? '269px'
     : esCheckout && CHECKOUT_GUARD_H != null
     ? `${CHECKOUT_GUARD_H}px`
-    : matchesPage1Height && p1ContentBottomPx != null && mesuraEstable
-    ? `${Math.max(0, Math.round(p1ContentBottomPx + P1_STRIPE_BOTTOM_GAP - 64))}px`
-    : (alcadaRecordada || guardHeightPxDefault);
-
-  // Quan l'alcada bona ja es ferma, la guardem per a les properes obertures.
-  useEffect(() => {
-    if (isPortraitTablet || paymentFillsScreen) return;
-    if (!mesuraEstable || p1ContentBottomPx == null) return;
-    desarAlcada(`${Math.max(0, Math.round(p1ContentBottomPx + P1_STRIPE_BOTTOM_GAP - 64))}px`);
-  }, [mesuraEstable, p1ContentBottomPx, isPortraitTablet, paymentFillsScreen]);
+    : `${MEGA_GUARD_FIX}px`;
 
   return (
     <div className="relative">
@@ -285,7 +227,6 @@ export default function MegaMenuPanel({
                       active={active}
                       resolvedMega={resolvedMega}
                       showStripe={showStripe}
-                      onP1ContentBottomChange={handleP1ContentBottom}
                       stripeRowPadPx={stripeRowPadPx}
                       stripeRowPadXPx={stripeRowPadXPx}
                       stripePreviewHPx={stripePreviewHPx}
