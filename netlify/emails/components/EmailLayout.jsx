@@ -18,7 +18,11 @@ export function EmailLayout({
   clientName = '',
   messageContent = null,
   ctaText = 'Torna a la botiga >',
-  ctaUrl = 'https://higginsgrafic.com',
+  // Ruta relativa a posta: `email.js` la converteix en adreça completa del
+  // lloc on visqui la botiga. Així, mentre es fan proves, el botó porta a la
+  // botiga de proves, i el dia que es publiqui a higginsgrafic.com hi portarà
+  // tot sol, sense haver de tocar cap plantilla.
+  ctaUrl = '/',
   showCta = true,
   children,
 }) {
@@ -216,7 +220,7 @@ export function EmailLayout({
                     }}
                   >
                     <Link
-                      href="https://higginsgrafic.com"
+                      href="/"
                       style={{
                         color: '#141414',
                         textDecoration: 'none',

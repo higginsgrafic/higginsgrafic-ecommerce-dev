@@ -18,7 +18,7 @@ export function ContactReceivedEmail({ data = {} }) {
         </span>
       }
       ctaText="Torna a la botiga >"
-      ctaUrl="https://higginsgrafic.com"
+      ctaUrl="/"
     >
       {/* User Message Box (E, 16) to (T, 22) */}
       <div

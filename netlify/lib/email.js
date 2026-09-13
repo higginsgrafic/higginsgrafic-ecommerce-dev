@@ -25,6 +25,7 @@
 // prettier, cosa irrellevant per a un correu.
 import { renderToStaticMarkup } from 'react-dom/server';
 import { createElement } from 'react';
+import { getSiteBase } from './site-url.js';
 import { OrderConfirmedEmail, orderConfirmedMeta } from '../emails/templates/OrderConfirmedEmail.jsx';
 import { OrderInProductionEmail, orderInProductionMeta } from '../emails/templates/OrderInProductionEmail.jsx';
 import { OrderShippedEmail, orderShippedMeta } from '../emails/templates/OrderShippedEmail.jsx';
@@ -60,38 +61,6 @@ const TEMPLATES = {
   contact_received: { Component: ContactReceivedEmail, meta: contactReceivedMeta, propName: 'data' },
 };
 
-/**
- * Adreça pública de la botiga.
- *
- * Els correus no tenen "pàgina actual": si una imatge hi va amb ruta relativa
- * (/emails/assets/logo.png), el client de correu no la pot trobar. Cal
- * convertir-la en adreça sencera, i per això cal saber en quin domini viu la
- * botiga.
- *
- * Ordre de preferència:
- *   1. SITE_URL / VITE_SITE_ORIGIN — per fixar-ho a mà si mai cal
- *   2. URL / DEPLOY_PRIME_URL      — les posa Netlify tot sol, i s'actualitzen
- *                                    soles quan canvia el domini principal
- *   3. dev.higginsgrafic.com       — últim recurs
- *
- * IMPORTANT: no hi posis higginsgrafic.com escrit a mà. Aquell domini, mentre
- * la botiga estigui en construcció, respon amb la pàgina d'avís en comptes de
- * la imatge, i el logo sortiria trencat al correu.
- */
-function getSiteBase() {
-  const candidats = [
-    process.env.SITE_URL,
-    process.env.VITE_SITE_ORIGIN,
-    process.env.URL,
-    process.env.DEPLOY_PRIME_URL,
-  ];
-  for (const candidat of candidats) {
-    const valor = (candidat || '').toString().trim();
-    if (valor.startsWith('http')) return valor.replace(/\/$/, '');
-  }
-  return 'https://dev.higginsgrafic.com';
-}
-
 export async function sendOrderEmail(templateKey, payload) {
   const apiKey = process.env.RESEND_API_KEY;
   if (!apiKey) {
@@ -117,8 +86,15 @@ export async function sendOrderEmail(templateKey, payload) {
   // de dalt). renderToStaticMarkup és síncron i retorna el mateix HTML.
   const rawHtml = DOCTYPE + renderToStaticMarkup(element);
   const base = getSiteBase();
+  // Els correus no tenen "pàgina actual": qualsevol enllaç o imatge amb ruta
+  // relativa (/reset-password, /emails/assets/logo.png) s'ha de convertir en
+  // adreça completa del lloc on visqui la botiga.
+  //
+  // Això inclou els ENLLAÇOS, no només les imatges: abans les plantilles
+  // portaven higginsgrafic.com escrit a mà, i mentre el domini final encara no
+  // està actualitzat, els botons dels correus hi enviaven la gent.
   const html = rawHtml
-    .replace(/src="\/([^"]+)"/g, `src="${base}/$1"`)
+    .replace(/(src|href)="\/([^"]*)"/g, `$1="${base}/$2"`)
     .replace(/url\('\/([^']+)'\)/g, `url('${base}/$1')`);
   const subject = typeof meta.subject === 'function' ? meta.subject(payload) : meta.subject;
 

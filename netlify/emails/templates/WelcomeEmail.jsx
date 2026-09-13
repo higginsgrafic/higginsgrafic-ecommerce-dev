@@ -9,7 +9,7 @@ const EXPLANATION_IMG = '/emails/assets/imatge-explicativa.png';
 
 export function WelcomeEmail({ user = {} }) {
   const clientName = user.first_name || user.fullName || user.name || 'Maria';
-  const shopUrl = user.account_url || 'https://higginsgrafic.com';
+  const shopUrl = user.account_url || '/';
 
   return (
     <EmailLayout

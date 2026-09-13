@@ -21,7 +21,7 @@ export function OrderRefundedEmail({ order = {} }) {
         </span>
       }
       ctaText="Torna a la botiga >"
-      ctaUrl="https://higginsgrafic.com"
+      ctaUrl="/"
     >
       {/* Box with Order number on top border and refund price inside (E, 16) to (T, 19) */}
       <div style={{ textAlign: 'center', margin: '0 auto 16px auto', width: '100%', maxWidth: '346.67px' }}>

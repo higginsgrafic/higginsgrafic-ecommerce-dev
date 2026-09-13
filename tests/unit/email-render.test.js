@@ -45,7 +45,7 @@ const ORDER = {
   created_at: '2026-09-13T10:00:00.000Z',
   tracking_number: 'PQ123456789ES',
   tracking_url: 'https://tracking.example.com/PQ123456789ES',
-  tracking_link: 'https://higginsgrafic.com/track?trackingToken=abc123',
+  tracking_link: 'https://exemple.test/track?trackingToken=abc123',
   shipping_address: {
     street: 'Carrer Major 1',
     city: 'Barcelona',
@@ -136,10 +136,14 @@ describe('Correus transaccionals', () => {
 
       it('el HTML és equivalent al del renderitzador oficial', async () => {
         await sendOrderEmail(key, payload);
-        // Les rutes relatives (/emails/assets/...) s'han convertit en adreces
-        // absolutes; per comparar amb el renderitzador oficial les traiem.
-        const nostre = enviats[0].body.html.split('https://exemple.test').join('');
-        const oficial = await renderReactEmail(createElement(Component, { [propName]: payload }));
+        // Les rutes relatives (/emails/assets/..., /track...) s'han convertit
+        // en adreces absolutes del lloc on viu la botiga. Per poder comparar
+        // amb el renderitzador oficial, traiem la base de TOTS DOS textos.
+        const base = 'https://exemple.test';
+        const nostre = enviats[0].body.html.split(base).join('');
+        const oficial = (await renderReactEmail(createElement(Component, { [propName]: payload })))
+          .split(base)
+          .join('');
 
         expect(normalize(nostre)).toBe(normalize(oficial));
       });
@@ -177,6 +181,29 @@ describe('Correus transaccionals', () => {
       expect(enviats[0].body.html, `el correu "${key}" encara apunta a GitHub`).not.toContain(
         'raw.githubusercontent.com'
       );
+    }
+  });
+
+  // Els botons i enllaços dels correus han de portar a la botiga on s'està
+  // provant. Si hi hagués el domini final escrit a mà, durant les proves
+  // enviarien la gent a un lloc que encara no està actualitzat.
+  it('cap enllaç del correu apunta al domini final escrit a mà', async () => {
+    for (const [key, , , , payload] of TEMPLATES) {
+      enviats = [];
+      await sendOrderEmail(key, payload);
+      const html = enviats[0].body.html;
+
+      const enllacos = [...html.matchAll(/href="([^"]+)"/g)].map((m) => m[1]);
+      expect(enllacos.length, `el correu "${key}" no té cap enllaç`).toBeGreaterThan(0);
+
+      for (const enllac of enllacos) {
+        // O bé és una adreça del lloc on es prova la botiga, o bé no és del
+        // projecte (per exemple l'enllaç de seguiment del transportista).
+        expect(
+          enllac,
+          `el correu "${key}" té un enllaç fix cap al domini final: ${enllac}`
+        ).not.toMatch(/^https?:\/\/(www\.)?higginsgrafic\.com/);
+      }
     }
   });
 
