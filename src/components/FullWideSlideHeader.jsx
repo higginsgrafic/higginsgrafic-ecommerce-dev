@@ -6,6 +6,7 @@ import { motion } from 'framer-motion';
 import { useProductContext } from '@/contexts/ProductContext';
 import { useAdmin } from '@/contexts/AdminContext';
 import { useAuth } from '@/contexts/AuthContext';
+import { useCart } from '@/contexts/CartContext';
 import { useOrders } from '@/hooks/useOrders';
 import { getGildan64000Catalog } from '../utils/placeholders.js';
 import {
@@ -94,10 +95,12 @@ function FullWideSlideHeader({
   const dblClickDelayMs = 0;
   const [searchQuery, setSearchQuery] = useState('');
 
-  // Estat compartit del cistell (llista definitiva de compra)
-  const [cartItems, setCartItems] = useState([]);
+  // El cistell és ÚNIC per a tota la botiga i viu a CartContext. Abans aquest
+  // component en tenia un de propi, i per això afegir un producte des d'una
+  // fitxa omplia un cistell que aquí no es veia (el carretó sortia buit).
+  const { cartItems, setCartItems, addToCart, getTotalItems } = useCart();
 
-  const localCartItemCount = cartItems.filter(it => !it.disabled).reduce((acc, it) => acc + (it.qty || 1), 0);
+  const localCartItemCount = getTotalItems();
 
   const searchResults = useMemo(() => {
     const products = Array.isArray(contextProducts) ? contextProducts : [];
@@ -2144,25 +2147,10 @@ function FullWideSlideHeader({
     const openFullWideCart = (e) => {
       const { item } = (e && e.detail) || {};
       if (item) {
-        setCartItems((prev) => {
-          const existing = prev.find(
-            (it) => !it.disabled &&
-              it.title === item.title &&
-              it.size === item.size &&
-              it.color === item.color
-          );
-          if (existing) {
-            return prev.map((it) =>
-              !it.disabled &&
-              it.title === item.title &&
-              it.size === item.size &&
-              it.color === item.color
-                ? { ...it, qty: it.qty + (item.qty || 1) }
-                : it
-            );
-          }
-          return [...prev, item];
-        });
+        // La fusió de línies iguals (mateix producte, talla, color i acabat) la
+        // fa el cistell únic. Abans es comparava per títol i color, i dos
+        // productes amb el mateix títol s'ajuntaven en una sola línia.
+        addToCart(item);
         return;
       }
       setMegaPage(3);
