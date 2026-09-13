@@ -275,6 +275,9 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
   // Per la sombra del marge esquerre: nome s'ha de veure si realment hi ha
   // fitxes amagades en aquesta banda.
   const [cintaAmbMes, setCintaAmbMes] = useState(false);
+  // I la del marge dret (la vora de la targeta dels totals): nome s surt si hi
+  // ha fitxes amagades en aquesta banda, o sigui si no som al final de la cinta.
+  const [cintaAmbMesDreta, setCintaAmbMesDreta] = useState(false);
   useEffect(() => {
     const el = cintaRef.current;
     if (!el) return undefined;
@@ -332,7 +335,12 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
   useEffect(() => {
     const el = cintaRef.current;
     if (!el) return undefined;
-    const update = () => setCintaAmbMes(el.scrollLeft > 1 && el.scrollWidth > el.clientWidth + 1);
+    const update = () => {
+      const overflow = el.scrollWidth > el.clientWidth + 1;
+      const max = el.scrollWidth - el.clientWidth;
+      setCintaAmbMes(overflow && el.scrollLeft > 1);
+      setCintaAmbMesDreta(overflow && el.scrollLeft < max - 1);
+    };
     update();
     el.addEventListener('scroll', update, { passive: true });
     window.addEventListener('resize', update);
@@ -871,7 +879,9 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
           {/* Targeta dels totals: opaca, i amb la mateixa linia de 2px que la
               cinta a la vora esquerra (abans una ombra difusa), perquè es vegi
               que les fitxes li passen per sota. */}
-          <div style={{ position:'absolute', top:0, bottom:0, right:0, width:`${TOTALS_W}px`, boxSizing:'border-box', display:'flex', flexDirection:'column', fontFamily: isPortraitTablet ? 'Roboto, sans-serif' : undefined, justifyContent: isPortraitTablet ? 'flex-end' : 'space-between', gap: isPortraitTablet ? '2px' : undefined, padding:'10px 12px', background:'#FFFFFF', border:'1px solid #E6E8EC', borderLeft:'2px solid #98A2B4', borderRadius:'6px' }}>
+          <div style={{ position:'absolute', top:0, bottom:0, right:0, width:`${TOTALS_W}px`, boxSizing:'border-box', display:'flex', flexDirection:'column', fontFamily: isPortraitTablet ? 'Roboto, sans-serif' : undefined, justifyContent: isPortraitTablet ? 'flex-end' : 'space-between', gap: isPortraitTablet ? '2px' : undefined, padding:'10px 12px', background:'#FFFFFF', border:'1px solid #E6E8EC', borderRadius:'6px' }}>
+            {/* La mateixa linia de 2px que la cinta, a la vora esquerra, i amb el mateix comportament: nome s surt si hi ha fitxes amagades en aquesta banda. */}
+            <div aria-hidden="true" style={{ position:'absolute', left:0, top:0, bottom:0, width:'2px', pointerEvents:'none', opacity: cintaAmbMesDreta ? 1 : 0, transition:'opacity 160ms ease', background:'#98A2B4', borderRadius:'6px 0 0 6px' }} />
             {/* Els totals són una suma: cada concepte a la seva ratlla, el nom a
                 l'esquerra i la xifra a la dreta, com una columna de números.
                 El Subtotal és el preu de la peça sense transport i sense IVA;
