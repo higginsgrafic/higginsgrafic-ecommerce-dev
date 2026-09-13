@@ -40,10 +40,8 @@ function CistellComandaContent({ cartItems, setCartItems, onFinalizeOrder }) {
   const GUTTER = 5.457;        // gutter horitzontal entre columnes
   const V_GUTTER = 2.037;      // gutter vertical entre files
   const TOP_OFFSET = 0; // al contenidor del carrusel la llista comença a dalt
-  const COLS = 4;
   const ROWS = 21;
   const TABLE_WIDTH = 1350;
-  const COL_WIDTH = (TABLE_WIDTH - GUTTER * (COLS - 1)) / COLS; // 322.875px
 
   // Pauta del CARRUSEL — VALORS MANUALS EDITABLES (un número per variant):
   //   SLOT_W   → amplada d'una targeta del carrusel (px)
@@ -60,7 +58,6 @@ function CistellComandaContent({ cartItems, setCartItems, onFinalizeOrder }) {
   const SLOT_W = isPortraitTablet ? 80 : (isLandscapeTablet ? L_SLOT_W : 144 + 11);
   const SLIDE_GAP = isPortraitTablet ? 2 : (isLandscapeTablet ? L_GAP : 3);
   const SLIDE_OFFSET_X = 0;
-  const SLIDE_SLOTS = 9; // 9 slots originals; en renderitzem SLIDE_SLOTS - 1 = 8.
   // Columnes: 2+2+2+(2 + porci\u00f3 visible del 9\u00e8 slot).
   const COL2 = SLOT_W * 2 + SLIDE_GAP;
   // Amplada del contenidor del cistell = TABLE_WIDTH (= viewport de la slide).
@@ -180,7 +177,7 @@ function CistellComandaContent({ cartItems, setCartItems, onFinalizeOrder }) {
   const META = { fontFamily: 'Roboto Condensed, sans-serif', fontWeight: 400, color: '#7D8895' };
   const VAL  = { fontFamily: 'Roboto Condensed, sans-serif', fontWeight: 500, color: '#475059' };
 
-  const { zoneInfo } = useShippingCosts('es_peninsula');
+  useShippingCosts('es_peninsula');
 
   const isEmpty = CART_ITEMS.length === 0;
 

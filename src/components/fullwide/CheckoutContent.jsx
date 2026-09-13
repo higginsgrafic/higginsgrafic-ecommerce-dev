@@ -98,21 +98,12 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
   // reparteixen amb space-between dins un cos de 322px: (322 - 8*34) / 7 = 7,16.
   const FIELD_GAP = 7;
 
-  // Alçada real del bloc de camps de l'enviament: 8 camps de 34px + 7 junts.
-  // Derivada, perquè si retoca FIELD_GAP l'alineament de baix la segueixi.
-  const FIELD_STRIDE = 34 + FIELD_GAP;                 // 41px entre caps de camp
-  const FORMS_H = 8 * 34 + 7 * FIELD_GAP;              // 321px
 
   // Aire entre la banda dels títols de columna (fa 29px) i la fila de contingut.
   // Únic número a retocar; no mou l'amplada de les columnes ni els seus junts.
   const TITLE_GAP = 10;
 
 
-  // Pujada del conjunt (banda dels títols + fila de contingut) sobre el centre.
-  // El bloc es centra amb justify-content:center dins l'arrel, així que es
-  // desplalla afegint padding-bottom a l'arrel: puja la meitat del valor.
-  // El títol PAGAMENT no es mou perquè penja del cap de la franja (TITLE_Y).
-  const CONJUNT_LIFT = 0;
 
   // ===== VERTICAL (2 columnes) =====
   // Números propis, als mateixos valors inicials que l'horitzontal perquè és la
@@ -122,8 +113,6 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
   // El titol PAGAMENT de la vertical. Aquest es l'unic numero que el mou
   // (moure'l tambe a l'escriptori o a l'apaisada vol un valor propi).
   const P_TITLE_Y = 1.85;
-  // El vertical encara no el pujem: es queda exactament al centre.
-  const P_CONJUNT_LIFT = 0;
   // Aire entre la filera de dalt (comanda + enviament) i la de baix
   // (dades de pagament + acceptació i botó).
   const P_ROW_GAP = 14;
@@ -159,9 +148,6 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
   // P_BUTTON_TOP_ADJ separa el NIVELL de l'ALÇADA: serveix per afinar el cap del
   const P_BUTTON_H = P_CARD_FIELD_H;
 
-  // Palanca del conjunt centrat, com el CONJUNT_LIFT de les tauletes: va com a
-  // padding-bottom de l'arrel i puja el bloc la meitat del valor. 0 = centrat.
-  const D_CONJUNT_LIFT = 0;
 
   // ===== TAU LETA APAÏSADA (retocs propis) =====
   // Aquesta és l'ÚNICA versió on el repartiment vertical està retocat a mà.
@@ -244,9 +230,6 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
   const fieldGap = isPortraitTablet ? P_FIELD_GAP : FIELD_GAP;
   const titleGap = isLandscapeTablet ? TITLE_GAP : (isPortraitTablet ? P_TITLE_GAP : undefined);
   const titleY = isLandscapeTablet ? `${L_TITLE_Y}px` : (isPortraitTablet ? `${P_TITLE_Y}px` : `${TITLE_Y}px`);
-  const liftPad = isLandscapeTablet
-    ? `${CONJUNT_LIFT * 2}px`
-    : (isPortraitTablet ? `${P_CONJUNT_LIFT * 2}px` : `${D_CONJUNT_LIFT * 2}px`);
   // A la tauleta apaïsada, el llistat de productes puja 25px (entra dins l'aire
   // de la franja buida, que no pinta res) i les columnes de dades arrenquen amb
   // el marge curt. A la resta de mides, tot igual que sempre.
@@ -315,10 +298,6 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
   const ivaAmount = Math.round((totalFinal - transport - subtotalNet) * 100) / 100;
 
   const fmt = (n) => n.toFixed(2).replace('.', ',') + '€';
-  const splitPrice = (n) => {
-    const [intPart, decPart = '00'] = n.toFixed(2).split('.');
-    return { intPart, decPart };
-  };
 
   const HEAD = { fontFamily: 'Oswald, sans-serif', fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.4px', color: '#475059' };
   const INPUT = { fontFamily: 'Roboto Condensed, sans-serif', fontWeight: 400, color: '#4A5057', fontSize: '10.5pt', outline: 'none' };

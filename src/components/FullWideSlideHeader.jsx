@@ -24,20 +24,11 @@ import useUrlActiveCollection from '@/hooks/useUrlActiveCollection';
 import useMegaStripeDebugVars from '@/hooks/useMegaStripeDebugVars';
 import useMegaTileSelectorDrag from '@/hooks/useMegaTileSelectorDrag';
 
-const STRIPE_DARK_SHIRT_COLORS = new Set([
-  'royal', 'purple', 'navy', 'red', 'irish-green', 'military-green', 'forest-green', 'black',
-]);
 
 // Plantilla independent de l'acordió del CISTELL — taula pròpia sobre la pauta
 
 
 function FullWideSlideHeader({
-  cartItemCount,
-  onCartClick,
-  onUserClick,
-  ignoreStripeDebugFromUrl = false,
-  stripeItemLeftOffsetPxByIndex,
-  redistributeStripeBetweenFirstAndLast = false,
   contained = false,
   portalContainer,
   manualEnabledOverride,
@@ -45,11 +36,8 @@ function FullWideSlideHeader({
   navItems,
   megaConfig,
   showStripe = true,
-  showCatalogPanel = true,
   isPortraitTablet = false,
   isLandscapeTablet = false,
-  viewportWidth = 0,
-  viewportHeight = 0,
 }) {
   const location = useLocation();
   const navigate = useNavigate();
@@ -150,16 +138,6 @@ function FullWideSlideHeader({
   }, [contextProducts, searchQuery]);
 
 
-  const searchSuggestions = useMemo(
-    () => [
-      'Samarreta Gildan 64000',
-      'Dibuixos',
-      'Logotips',
-      'Bosses',
-      'Papereria',
-    ],
-    []
-  );
   const [, setSearchGridScale] = useState(1);
   const [, setSearchCaretVisible] = useState(true);
   const [megaPage, setMegaPage] = usePersistentState('HG_MEGA_PAGE', 1);
@@ -343,10 +321,6 @@ function FullWideSlideHeader({
     return () => window.removeEventListener('keydown', handleEsc);
   }, [megaFullScreen]);
 
-  const disableCatalogPanel =
-    typeof window !== 'undefined' && new URLSearchParams(window.location.search).has('noCatalogPanel');
-  const wsEnabled =
-    typeof window !== 'undefined' && import.meta.env.DEV && new URLSearchParams(window.location.search).has('ws');
   const gridCalibFromUrl = typeof window !== 'undefined' && new URLSearchParams(window.location.search).has('gridCalib');
 
   const bleedGuardDebug = typeof window !== 'undefined'
@@ -701,6 +675,7 @@ function FullWideSlideHeader({
       else if (allowed.black) setFirstContactVariant('black');
       else if (allowed.color) setFirstContactVariant('color');
     } catch {
+      /* s'ignora a posta */
     }
   }, [active, stripeVariantVisibility, firstContactVariant, austenSubcollection]);
 
@@ -769,6 +744,7 @@ function FullWideSlideHeader({
       else if (allowed.black) setFirstContactVariantP2('black');
       else if (allowed.color) setFirstContactVariantP2('color');
     } catch {
+      /* s'ignora a posta */
     }
   }, [active, stripeVariantVisibility, firstContactVariantP2, austenSubcollection]);
 
@@ -911,7 +887,6 @@ function FullWideSlideHeader({
     megaStripeRef2SrcLocal,
     megaStripeSpriteEnabledLocal,
     megaShirtDrawingEnabledLocal,
-    drawingOverlaySrcLocal,
     drawingOverlaySrcEffective,
     tileGapPxLocal,
   } = useMegaStripeDebugVars(normalizeOverlaySrc, 'p1');
@@ -2087,7 +2062,6 @@ function FullWideSlideHeader({
       // ignore
     }
   }, [active, megaPage, megaTileSize]);
-  const mobileHumanScrollRef = useRef(null);
   const logoMarkRef = useRef(null);
   const accountButtonRef = useRef(null);
   const searchGridRowRef = useRef(null);
@@ -2137,7 +2111,7 @@ function FullWideSlideHeader({
 
   useEffect(() => {
     const openUserTab = (e) => {
-      const { tab } = (e && e.detail) || {};
+      (e && e.detail) || {};
       setMegaPage(4);
       setAcordioExpandedPage4(true);
       setManualOverrideClosed(false);
@@ -2149,11 +2123,6 @@ function FullWideSlideHeader({
   }, [setMegaPage, setAcordioExpandedPage4]);
 
 
-  const scrollSearchGridBy = (deltaPx) => {
-    const el = searchGridScrollRef.current;
-    if (!el) return;
-    el.scrollBy({ left: deltaPx, behavior: 'smooth' });
-  };
 
   useLayoutEffect(() => {
     if (!active) return undefined;
@@ -2290,150 +2259,11 @@ function FullWideSlideHeader({
     return () => window.clearInterval(id);
   }, [active, megaPage]);
 
-  const selectedColorHex = useMemo(
-    () => ({
-      white: '#ffffff',
-      'light-blue': '#1f6feb',
-      royal: '#2d6cff',
-      purple: '#6b21a8',
-      navy: '#1f2a44',
-      daisy: '#facc15',
-      gold: '#caa24d',
-      'light-pink': '#f9a8d4',
-      red: '#d11a2a',
-      kiwi: '#84cc16',
-      'irish-green': '#1f6f3a',
-      'military-green': '#556b2f',
-      'forest-green': '#0b3d2e',
-      black: '#111111',
-    }),
-    []
-  );
 
-  const getSlugLuminance = useMemo(() => {
-    const hexToRgb = (hex) => {
-      if (!hex || typeof hex !== 'string') return null;
-      const m = hex.trim().match(/^#?([0-9a-f]{6})$/i);
-      if (!m) return null;
-      const v = m[1];
-      const r = Number.parseInt(v.slice(0, 2), 16);
-      const g = Number.parseInt(v.slice(2, 4), 16);
-      const b = Number.parseInt(v.slice(4, 6), 16);
-      return { r, g, b };
-    };
 
-    const srgbToLinear = (c) => {
-      const x = c / 255;
-      return x <= 0.04045 ? x / 12.92 : Math.pow((x + 0.055) / 1.055, 2.4);
-    };
 
-    return (slug) => {
-      const hex = selectedColorHex?.[slug];
-      const rgb = hexToRgb(hex);
-      if (!rgb) return null;
-      const r = srgbToLinear(rgb.r);
-      const g = srgbToLinear(rgb.g);
-      const b = srgbToLinear(rgb.b);
-      return 0.2126 * r + 0.7152 * g + 0.0722 * b;
-    };
-  }, [selectedColorHex]);
 
-  const colorLabelBySlug = useMemo(() => {
-    const colors = Array.isArray(gildan64000Catalog?.colors) ? gildan64000Catalog.colors : [];
-    const out = {};
-    for (const c of colors) {
-      if (!c?.slug) continue;
-      out[c.slug] = c.label || c.slug;
-    }
-    return out;
-  }, [gildan64000Catalog]);
 
-  const selectedColorOrder = useMemo(
-    () => [
-      'white',
-      'light-blue',
-      'royal',
-      'purple',
-      'navy',
-      'daisy',
-      'gold',
-      'light-pink',
-      'red',
-      'kiwi',
-      'irish-green',
-      'military-green',
-      'forest-green',
-      'black',
-    ],
-    []
-  );
-
-  const resolveStripeOverlaySrcForTile = useCallback(
-    (src, idx) => {
-      try {
-        if (!src || typeof src !== 'string') return src;
-        const lower = src.toLowerCase();
-        const safeIdx = Number.isFinite(Number(idx)) ? Number(idx) : 0;
-        const maxIdx = Array.isArray(selectedColorOrder) && selectedColorOrder.length > 0
-          ? Math.max(0, selectedColorOrder.length - 1)
-          : 13;
-        const isFirst = safeIdx === 0;
-        const isLast = safeIdx === maxIdx;
-
-        const hasMultiLight = lower.includes('-multi-light-');
-        const hasMultiDark = lower.includes('-multi-dark-');
-        if (hasMultiLight || hasMultiDark) {
-          if (isFirst) return hasMultiDark ? src : src.replace(/-multi-light-/i, '-multi-dark-');
-          return hasMultiLight ? src : src.replace(/-multi-dark-/i, '-multi-light-');
-        }
-
-        const hasWhiteInk = /-w(?=[-.])/i.test(src) || lower.includes('/white/');
-        const hasBlackInk = /-b(?=[-.])/i.test(src) || lower.includes('/black/');
-        if (!hasWhiteInk && !hasBlackInk) return src;
-
-        const toBlack = (s) => {
-          let out = s;
-          out = out.replace(/\/white\//i, '/black/');
-          out = out.replace(/-w(?=[-.])/i, '-b');
-          return out;
-        };
-        const toWhite = (s) => {
-          let out = s;
-          out = out.replace(/\/black\//i, '/white/');
-          out = out.replace(/-b(?=[-.])/i, '-w');
-          return out;
-        };
-
-        if (hasWhiteInk) {
-          return isFirst ? toBlack(src) : src;
-        }
-        return isLast ? toWhite(src) : src;
-      } catch {
-        return src;
-      }
-    },
-    [selectedColorOrder]
-  );
-
-  const colorButtonSrcBySlug = useMemo(
-    () => ({
-      white: '/placeholders/t-shirt_buttons/1.webp',
-      'light-pink': '/placeholders/t-shirt_buttons/selector-color-light-pink.webp',
-      'light-blue': '/placeholders/t-shirt_buttons/selector-color-light-blue.webp',
-      daisy: '/placeholders/t-shirt_buttons/selector-color-daisy.webp',
-      gold: '/placeholders/t-shirt_buttons/selector-color-gold.webp',
-      red: '/placeholders/t-shirt_buttons/selector-color-red.webp',
-      purple: '/placeholders/t-shirt_buttons/selector-color-purple.webp',
-      royal: '/placeholders/t-shirt_buttons/selector-color-blue-royal.webp',
-      navy: '/placeholders/t-shirt_buttons/selector-color-blue-navy.webp',
-      'military-green': '/placeholders/t-shirt_buttons/selector-color-military-green.webp',
-      'forest-green': '/placeholders/t-shirt_buttons/selector-color-forest-green.webp',
-      'irish-green': '/placeholders/t-shirt_buttons/selector-color-irish-green.webp',
-      kiwi: '/placeholders/t-shirt_buttons/selector-color-kiwi.webp',
-      black: '/placeholders/t-shirt_buttons/selector-color-black.webp',
-    }),
-    []
-  );
 
   const defaultNav = useMemo(
     () => [
@@ -2477,25 +2307,6 @@ function FullWideSlideHeader({
     return out;
   }, [defaultNav, navItems]);
 
-  const allowStripeV4UrlParams = useMemo(() => {
-    try {
-      if (typeof window === 'undefined') return false;
-      const p = new URLSearchParams(location?.search || window.location.search || '');
-      const wantsStripeDebug = Boolean(
-        p.has('debugStripeHit')
-        || p.has('stripeCalib')
-        || p.has('debugV4OverlayCalib')
-        || Array.from(p.keys()).some((k) => (k || '').toString().startsWith('v4'))
-      );
-      if (!wantsStripeDebug) return false;
-
-      if (import.meta.env.DEV) return true;
-      const host = (window.location?.hostname || '').toLowerCase();
-      return host === 'localhost' || host === '127.0.0.1';
-    } catch {
-      return false;
-    }
-  }, [location?.search]);
 
   const thinDrawings = useMemo(
     () => [
@@ -2653,6 +2464,7 @@ function FullWideSlideHeader({
         });
       }
     } catch {
+      /* s'ignora a posta */
     }
 
     // Garantir que the_human_inside sempre utilitza la finestra lliscant (thinWindowItems) per evitar desbordaments
@@ -2667,6 +2479,7 @@ function FullWideSlideHeader({
         });
       }
     } catch {
+      /* s'ignora a posta */
     }
 
     if (gridCalibFromUrl) {
@@ -2891,12 +2704,6 @@ function FullWideSlideHeader({
 
   const canUseDom = typeof document !== 'undefined';
 
-  const scrollMobileHumanByTiles = (dir) => {
-    const el = mobileHumanScrollRef.current;
-    if (!el) return;
-    const step = 120 * 3 + 12 * 3;
-    el.scrollBy({ left: dir * step, behavior: 'smooth' });
-  };
 
   return (
     <header
@@ -3223,7 +3030,7 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
 
       {canUseDom && active && ReactDOM.createPortal(
         <button
-          onClick={(e) => {
+          onClick={() => {
             if (lockDragRef.current.dragged) {
               lockDragRef.current.dragged = false;
               return;
