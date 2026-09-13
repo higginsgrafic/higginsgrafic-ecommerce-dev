@@ -498,16 +498,16 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
   // a l'horitzontal van dins la columna de la targeta, al vertical formen la
   // cel·la dreta, sota les dades d'enviament.
   //
-  // Alineació amb el camp del correu (només a l'horitzontal): el botó va clavat
-  // al final de la columna i el Telèfon acaba exactament al mateix nivell, així
-  // que el centre del camp del correu cau 58 px per sobre del final de la
-  // columna (34 del Telèfon + 7 del junt + 17 de mig correu). Com que el bloc de
-  // termes fa 16 px, el seu fons ha de quedar 58 − 8 = 50 px per sobre del final,
-  // i el botó n'ocupa els darrers 34: entre els termes i el botó hi van 16 px.
-  // Aquests 16 px són els que centren la casella amb el correu. Si es toca
-  // FIELD_GAP, aquest número es mou igual: són FIELD_GAP + 9.
+  // Alineació amb el FONS del camp del correu (només a l'horitzontal): el botó
+  // va clavat al final de la columna i el Telèfon acaba exactament al mateix
+  // nivell, així que el fons del correu queda 41 px per sobre del final de la
+  // columna (34 del Telèfon + 7 del junt). El botó n'ocupa els darrers 34, o
+  // sigui que entre el fons dels termes i el cap del botó hi ha d'haver
+  // exactament el mateix que separa dos camps: FIELD_GAP. Per això el número no
+  // és fix sinó que surt de FIELD_GAP: si mai es canvia el junt, l'alineament
+  // amb el correu es manté tot sol.
   const termsBlock = (
-    <div style={{ marginTop: isPortraitTablet ? '18px' : undefined, marginBottom: isPortraitTablet ? undefined : '16px' }}>
+    <div style={{ marginTop: isPortraitTablet ? '18px' : undefined, marginBottom: isPortraitTablet ? undefined : `${FIELD_GAP}px` }}>
       <label style={{ display:'flex', alignItems:'flex-start', gap:'8px', fontSize:'9.5pt', lineHeight:1.25, fontWeight:300 }}>
         <input type="checkbox" checked={acceptTerms} onChange={(e) => setAcceptTerms(e.target.checked)} style={{ marginTop:'1px' }} />
         <span>Accepto els <a href="/terms" style={{ color:'#4A5057', textDecoration:'underline' }}>Termes del Servei</a>, la <a href="/privacy" style={{ color:'#4A5057', textDecoration:'underline' }}>Política de Privacitat</a> i la <a href="/shipping" style={{ color:'#4A5057', textDecoration:'underline' }}>Política d'enviaments</a>.</span>
