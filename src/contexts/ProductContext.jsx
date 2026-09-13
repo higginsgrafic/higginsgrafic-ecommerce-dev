@@ -276,15 +276,15 @@ export const ProductProvider = ({ children }) => {
 
       const title = (variant?.title || '').toString();
       const knownColors = [
-        { re: /\b(militar|military|army|olive|khaki)\b/i, value: 'Militar' },
-        { re: /\b(forest)\b/i, value: 'Forest' },
+        { re: /\b(militar|military|army|olive|khaki)\b/i, value: 'Military Green' },
+        { re: /\b(forest)\b/i, value: 'Forest Green' },
         { re: /\b(royal)\b/i, value: 'Royal' },
         { re: /\b(navy|marina)\b/i, value: 'Navy' },
-        { re: /\b(vermell|red|rojo)\b/i, value: 'Vermell' },
-        { re: /\b(blau|blue|azul)\b/i, value: 'Blau' },
-        { re: /\b(verd|green)\b/i, value: 'Verd' },
-        { re: /\b(negre|black|negro)\b/i, value: 'Negre' },
-        { re: /\b(blanc|white|blanco)\b/i, value: 'Blanc' }
+        { re: /\b(vermell|red|rojo)\b/i, value: 'Red' },
+        { re: /\b(blau|blue|azul)\b/i, value: 'Blue' },
+        { re: /\b(verd|green)\b/i, value: 'Green' },
+        { re: /\b(negre|black|negro)\b/i, value: 'Black' },
+        { re: /\b(blanc|white|blanco)\b/i, value: 'White' }
       ];
       for (const c of knownColors) {
         if (c.re.test(title)) return c.value;

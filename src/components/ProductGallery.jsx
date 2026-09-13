@@ -65,15 +65,15 @@ const ProductGallery = ({
       .trim();
 
     if (!v) return null;
-    if (v === 'blanc' || v === 'white') return 'Blanc';
-    if (v === 'negre' || v === 'black') return 'Negre';
-    if (v === 'vermell' || v === 'red') return 'Vermell';
-    if (v === 'verd' || v === 'green') return 'Verd';
-    if (v.includes('militar') || v.includes('military') || v.includes('army')) return 'Militar';
-    if (v.includes('forest')) return 'Forest';
+    if (v === 'blanc' || v === 'white') return 'White';
+    if (v === 'negre' || v === 'black') return 'Black';
+    if (v === 'vermell' || v === 'red') return 'Red';
+    if (v === 'verd' || v === 'green') return 'Green';
+    if (v.includes('militar') || v.includes('military') || v.includes('army')) return 'Military Green';
+    if (v.includes('forest')) return 'Forest Green';
     if (v.includes('royal')) return 'Royal';
     if (v.includes('navy') || v.includes('marina')) return 'Navy';
-    if (v === 'blau' || v === 'blue' || v === 'azul') return 'Blau';
+    if (v === 'blau' || v === 'blue' || v === 'azul') return 'Blue';
     return null;
   };
 
@@ -752,7 +752,7 @@ const ProductGallery = ({
                   const canonical = normalizeToCanonicalColor(raw) || raw;
                   const hex = normalizeHexColor(item?.hex || fallbackHexByCanonicalColor[canonical] || null);
                   const isWhite =
-                    normalizeLoose(canonical) === normalizeLoose('Blanc') ||
+                    normalizeLoose(canonical) === normalizeLoose('White') ||
                     normalizeLoose(hex) === normalizeLoose('#ffffff');
                   return isWhite ? '#f3f4f6' : (hex || '#f9fafb');
                 })(),
@@ -771,7 +771,7 @@ const ProductGallery = ({
                   const canonical = normalizeToCanonicalColor(raw) || raw;
                   const hex = normalizeHexColor(item?.hex || fallbackHexByCanonicalColor[canonical] || null);
                   const isWhite =
-                    normalizeLoose(canonical) === normalizeLoose('Blanc') ||
+                    normalizeLoose(canonical) === normalizeLoose('White') ||
                     normalizeLoose(hex) === normalizeLoose('#ffffff');
                   return isWhite ? '1px solid #e5e7eb' : 'none';
                 })()
@@ -1053,7 +1053,7 @@ const ProductGallery = ({
                               const canonical = normalizeToCanonicalColor(raw) || raw;
                               const hex = item?.hex || fallbackHexByCanonicalColor[canonical] || null;
                               const isWhite =
-                                normalizeLoose(canonical) === normalizeLoose('Blanc') ||
+                                normalizeLoose(canonical) === normalizeLoose('White') ||
                                 normalizeLoose(hex) === normalizeLoose('#ffffff');
                               return isWhite ? '#f3f4f6' : (hex || '#f9fafb');
                             })(),
@@ -1072,7 +1072,7 @@ const ProductGallery = ({
                               const canonical = normalizeToCanonicalColor(raw) || raw;
                               const hex = item?.hex || fallbackHexByCanonicalColor[canonical] || null;
                               const isWhite =
-                                normalizeLoose(canonical) === normalizeLoose('Blanc') ||
+                                normalizeLoose(canonical) === normalizeLoose('White') ||
                                 normalizeLoose(hex) === normalizeLoose('#ffffff');
                               return isWhite ? '1px solid #e5e7eb' : 'none';
                             })()

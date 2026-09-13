@@ -88,11 +88,19 @@ const ProductDetailPage = ({ onAddToCart, cartItems = [], language = 'ca' }) => 
 
     if (!vv) return null;
 
-    if (vv === 'blanc' || vv === 'white') return 'Blanc';
-    if (vv === 'negre' || vv === 'black') return 'Negre';
-    if (vv === 'vermell' || vv === 'red') return 'Vermell';
-    if (vv === 'green' || vv.includes('militar') || vv.includes('military') || vv.includes('army')) return 'Militar';
-    if (vv.includes('forest')) return 'Forest';
+    // Els noms de color es mostren TAL COM SÓN AL CATÀLEG (en anglès): són els
+    // noms que fa servir Gelato per fabricar la peça.
+    //
+    // Abans es traduïen cinc colors al català ('Black'→'Negre', 'White'→
+    // 'Blanc'...) i això va arribar a trencar el pagament: la fitxa enviava al
+    // servidor el nom traduït, el catàleg no tenia cap color 'Negre' i la
+    // compra fallava amb "no s'ha pogut identificar la variant". Es va decidir
+    // deixar-los tots en anglès, com el proveïdor.
+    if (vv === 'white' || vv === 'blanc') return 'White';
+    if (vv === 'black' || vv === 'negre') return 'Black';
+    if (vv === 'red' || vv === 'vermell') return 'Red';
+    if (vv === 'green' || vv.includes('militar') || vv.includes('military') || vv.includes('army')) return 'Military Green';
+    if (vv.includes('forest')) return 'Forest Green';
     if (vv.includes('royal')) return 'Royal';
     if (vv.includes('navy') || vv.includes('marina')) return 'Navy';
 
@@ -162,7 +170,7 @@ const ProductDetailPage = ({ onAddToCart, cartItems = [], language = 'ca' }) => 
   const availableColors = useMemo(() => {
     if (validVariants.length === 0) return [];
 
-    const defaultPreferredOrder = ['Blanc', 'Vermell', 'Militar', 'Forest', 'Royal', 'Navy', 'Negre'];
+    const defaultPreferredOrder = ['White', 'Red', 'Military Green', 'Forest Green', 'Royal', 'Navy', 'Black'];
     const normalizeKey = (value) => {
       return (value || '')
         .toString()
@@ -179,7 +187,7 @@ const ProductDetailPage = ({ onAddToCart, cartItems = [], language = 'ca' }) => 
     const isColorDesign = collectionKey === 'austen' || collectionKey === 'cube' || designKey === 'dj-vader';
 
     const inkColor = inferDesignInkColor(product);
-    const excludedCanonical = isColorDesign ? null : (inkColor === 'white' ? 'Blanc' : 'Negre');
+    const excludedCanonical = isColorDesign ? null : (inkColor === 'white' ? 'White' : 'Black');
 
     const byColor = new Map();
     for (const v of validVariants) {
@@ -226,20 +234,20 @@ const ProductDetailPage = ({ onAddToCart, cartItems = [], language = 'ca' }) => 
 
     const rawColors = Array.from(byColor.values());
 
-    const hasBlanc = rawColors.some((c) => normalizeKey(c?.color) === normalizeKey('Blanc'));
-    const hasNegre = rawColors.some((c) => normalizeKey(c?.color) === normalizeKey('Negre'));
+    const hasWhite = rawColors.some((c) => normalizeKey(c?.color) === normalizeKey('White'));
+    const hasBlack = rawColors.some((c) => normalizeKey(c?.color) === normalizeKey('Black'));
 
     let preferredOrder = defaultPreferredOrder;
     let filteredColors = rawColors;
 
-    // Heurística per dissenys monocrom: si hi ha Negre i no hi ha Blanc -> dibuix blanc
-    // si hi ha Blanc i no hi ha Negre -> dibuix negre
-    if (hasNegre && !hasBlanc) {
-      preferredOrder = ['Vermell', 'Militar', 'Forest', 'Royal', 'Navy', 'Negre'];
-      filteredColors = rawColors.filter((c) => normalizeKey(c?.color) !== normalizeKey('Blanc'));
-    } else if (hasBlanc && !hasNegre) {
-      preferredOrder = ['Blanc', 'Vermell', 'Militar', 'Forest', 'Royal', 'Navy'];
-      filteredColors = rawColors.filter((c) => normalizeKey(c?.color) !== normalizeKey('Negre'));
+    // Heurística per dissenys monocroms: si la peça només existeix en negre,
+    // el dibuix ha de ser blanc (i a l'inrevés).
+    if (hasBlack && !hasWhite) {
+      preferredOrder = ['Red', 'Military Green', 'Forest Green', 'Royal', 'Navy', 'Black'];
+      filteredColors = rawColors.filter((c) => normalizeKey(c?.color) !== normalizeKey('White'));
+    } else if (hasWhite && !hasBlack) {
+      preferredOrder = ['White', 'Red', 'Military Green', 'Forest Green', 'Royal', 'Navy'];
+      filteredColors = rawColors.filter((c) => normalizeKey(c?.color) !== normalizeKey('Black'));
     }
 
     const orderedPreferred = preferredOrder
@@ -441,8 +449,8 @@ const ProductDetailPage = ({ onAddToCart, cartItems = [], language = 'ca' }) => 
       return null;
     };
 
-    const preferredRow1 = ['Negre', 'Vermell', 'Militar', 'Forest', 'Royal', 'Navy'];
-    const preferredRow2 = ['Blanc', 'Vermell', 'Militar', 'Forest', 'Royal', 'Navy'];
+    const preferredRow1 = ['Black', 'Red', 'Military Green', 'Forest Green', 'Royal', 'Navy'];
+    const preferredRow2 = ['White', 'Red', 'Military Green', 'Forest Green', 'Royal', 'Navy'];
 
     const normalizeLoose = (value) => {
       return (value || '')
@@ -471,11 +479,11 @@ const ProductDetailPage = ({ onAddToCart, cartItems = [], language = 'ca' }) => 
     );
 
     const fallbackHexByCanonical = new Map([
-      ['Blanc', '#FFFFFF'],
-      ['Negre', '#000000'],
-      ['Vermell', '#D00000'],
-      ['Militar', '#556B2F'],
-      ['Forest', '#0B3D2E'],
+      ['White', '#FFFFFF'],
+      ['Black', '#000000'],
+      ['Red', '#D00000'],
+      ['Military Green', '#556B2F'],
+      ['Forest Green', '#0B3D2E'],
       ['Royal', '#0052CC'],
       ['Navy', '#001F3F']
     ]);
@@ -485,8 +493,8 @@ const ProductDetailPage = ({ onAddToCart, cartItems = [], language = 'ca' }) => 
       const fromFallback = normalizeHexColor(fallbackHexByCanonical.get(color) || null);
 
       // Guard: some sources incorrectly provide '#FFFFFF' for all colors.
-      // If color is NOT Blanc and data is white, ignore it.
-      const isNonWhiteColor = normalizeLoose(color) !== normalizeLoose('Blanc');
+      // If the color is NOT White and the data says white, ignore the data.
+      const isNonWhiteColor = normalizeLoose(color) !== normalizeLoose('White');
       const isDataWhite = normalizeLoose(fromData) === normalizeLoose('#ffffff');
       if (isNonWhiteColor && isDataWhite) return fromFallback;
 
@@ -533,7 +541,7 @@ const ProductDetailPage = ({ onAddToCart, cartItems = [], language = 'ca' }) => 
       const parts = normalizedUrl.split('/').filter(Boolean);
       const folderBeforeFile = parts.length >= 2 ? parts[parts.length - 2] : null;
       const baseCanonical = normalizeToCanonicalColor(folderBeforeFile);
-      if (baseCanonical === 'Blanc' || baseCanonical === 'Negre') {
+      if (baseCanonical === 'White' || baseCanonical === 'Black') {
         if (!byShirtBase.has(baseCanonical)) byShirtBase.set(baseCanonical, new Map());
         const baseMap = byShirtBase.get(baseCanonical);
         if (!baseMap.has(canonicalColor)) baseMap.set(canonicalColor, url);
@@ -552,16 +560,16 @@ const ProductDetailPage = ({ onAddToCart, cartItems = [], language = 'ca' }) => 
 
       // Special cases where filename contains both ink + shirt color tokens.
       // Example: '...-white-black.webp' means white ink on black shirt => Negre shirt.
-      if (file.includes('white-black')) return 'Negre';
-      if (file.includes('black-white')) return 'Blanc';
+      if (file.includes('white-black')) return 'Black';
+      if (file.includes('black-white')) return 'White';
 
-      if (file.includes('forest')) return 'Forest';
+      if (file.includes('forest')) return 'Forest Green';
       if (file.includes('royal')) return 'Royal';
       if (file.includes('navy')) return 'Navy';
-      if (file.includes('red') || file.includes('vermell')) return 'Vermell';
-      if (file.includes('militar') || file.includes('military') || file.includes('-green') || file.includes(' green')) return 'Militar';
-      if (file.includes('white') || file.includes('blanc')) return 'Blanc';
-      if (file.includes('black') || file.includes('negre')) return 'Negre';
+      if (file.includes('red') || file.includes('vermell')) return 'Red';
+      if (file.includes('militar') || file.includes('military') || file.includes('-green') || file.includes(' green')) return 'Military Green';
+      if (file.includes('white') || file.includes('blanc')) return 'White';
+      if (file.includes('black') || file.includes('negre')) return 'Black';
 
       return null;
     };
@@ -574,7 +582,7 @@ const ProductDetailPage = ({ onAddToCart, cartItems = [], language = 'ca' }) => 
 
       const folderBeforeFile = parts[parts.length - 2] || null;
       const baseCanonical = normalizeToCanonicalColor(folderBeforeFile);
-      if (baseCanonical !== 'Blanc' && baseCanonical !== 'Negre') continue;
+      if (baseCanonical !== 'White' && baseCanonical !== 'Black') continue;
 
       const design = extractDesignFromImageUrl(imgUrl);
       if (!design) continue;
@@ -597,16 +605,16 @@ const ProductDetailPage = ({ onAddToCart, cartItems = [], language = 'ca' }) => 
     const collectionKey = normalizeSlugKey(product?.collection);
     const hasMiscellaniaBases =
       collectionKey === 'miscellania' &&
-      byShirtBase.has('Negre') &&
-      byShirtBase.has('Blanc') &&
-      ((byShirtBase.get('Negre') || new Map()).size > 0 || (byShirtBase.get('Blanc') || new Map()).size > 0);
+      byShirtBase.has('Black') &&
+      byShirtBase.has('White') &&
+      ((byShirtBase.get('Black') || new Map()).size > 0 || (byShirtBase.get('White') || new Map()).size > 0);
 
     if (hasMiscellaniaBases) {
       const buildBaseRow = (baseCanonical, colorOrder, keyPrefix) => {
         const map = byShirtBase.get(baseCanonical) || new Map();
         return colorOrder.map((color) => {
           const url = map.get(color) || null;
-          const label = color === 'Militar' ? 'Green' : color;
+          const label = color; // el nom del catàleg, tal qual
           return {
             key: `${keyPrefix}-${color}`,
             color,
@@ -619,8 +627,8 @@ const ProductDetailPage = ({ onAddToCart, cartItems = [], language = 'ca' }) => 
 
       // Row 1 (starts with Negre) is the white-ink set => folder 'Blanc'
       // Row 2 (starts with Blanc) is the black-ink set => folder 'Negre'
-      const rowForWhiteInk = buildBaseRow('Blanc', preferredRow1, 'ink-white');
-      const rowForBlackInk = buildBaseRow('Negre', preferredRow2, 'ink-black');
+      const rowForWhiteInk = buildBaseRow('White', preferredRow1, 'ink-white');
+      const rowForBlackInk = buildBaseRow('Black', preferredRow2, 'ink-black');
 
       const ordered = [];
       const seen = new Set();
@@ -678,8 +686,8 @@ const ProductDetailPage = ({ onAddToCart, cartItems = [], language = 'ca' }) => 
     for (const d of designs) {
       if (whiteDesign && blackDesign) break;
       const map = byDesign.get(d) || new Map();
-      const hasBlanc = map.has('Blanc');
-      const hasNegre = map.has('Negre');
+      const hasBlanc = map.has('White');
+      const hasNegre = map.has('Black');
       if (hasNegre && !hasBlanc && !whiteDesign) whiteDesign = d;
       if (hasBlanc && !hasNegre && !blackDesign) blackDesign = d;
     }
@@ -729,8 +737,8 @@ const ProductDetailPage = ({ onAddToCart, cartItems = [], language = 'ca' }) => 
         ? new Set(Array.from(soleMap.keys()))
         : new Set(candidates.map((u) => extractCanonicalColorFromImageUrl(u)).filter(Boolean));
 
-      const hasBlanc = presentCanonicals.has('Blanc');
-      const hasNegre = presentCanonicals.has('Negre');
+      const hasBlanc = presentCanonicals.has('White');
+      const hasNegre = presentCanonicals.has('Black');
 
       // If only one of Blanc/Negre is present, force the row to start with that
       // to match the intended fixed-order grids.
@@ -743,7 +751,7 @@ const ProductDetailPage = ({ onAddToCart, cartItems = [], language = 'ca' }) => 
           ? (soleMap.get(color) || null)
           : (candidates.find((u) => extractCanonicalColorFromImageUrl(u) === color) || null);
         const idx = url ? candidates.indexOf(url) : -1;
-        const label = color === 'Militar' ? 'Green' : color;
+        const label = color; // el nom del catàleg, tal qual
         return {
           key: `${color}`,
           color,
@@ -789,7 +797,7 @@ const ProductDetailPage = ({ onAddToCart, cartItems = [], language = 'ca' }) => 
           ? (hasVariantMap ? (soleMap.get(color) || null) : (candidates.find((u) => extractCanonicalColorFromImageUrl(u) === color) || null))
           : null;
         const idx = url ? candidates.indexOf(url) : -1;
-        const label = color === 'Militar' ? 'Green' : color;
+        const label = color; // el nom del catàleg, tal qual
         return {
           key: `ink-white-${color}`,
           color,
@@ -805,7 +813,7 @@ const ProductDetailPage = ({ onAddToCart, cartItems = [], language = 'ca' }) => 
           ? (hasVariantMap ? (soleMap.get(color) || null) : (candidates.find((u) => extractCanonicalColorFromImageUrl(u) === color) || null))
           : null;
         const idx = url ? candidates.indexOf(url) : -1;
-        const label = color === 'Militar' ? 'Green' : color;
+        const label = color; // el nom del catàleg, tal qual
         return {
           key: `ink-black-${color}`,
           color,
@@ -827,7 +835,7 @@ const ProductDetailPage = ({ onAddToCart, cartItems = [], language = 'ca' }) => 
       const map = byDesign.get(designKey) || new Map();
       return colorOrder.map((color) => {
         const url = map.get(color) || null;
-        const label = color === 'Militar' ? 'Green' : color;
+        const label = color; // el nom del catàleg, tal qual
         return {
           key: `${designKey}-${color}`,
           color,

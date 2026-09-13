@@ -10,7 +10,7 @@ import {
 } from '../data/mockups.js';
 
 const COLLECTION_IDS = ['first_contact', 'the_human_inside', 'cube'];
-const VARIANT_LABELS = { black: 'Negre', white: 'Blanc', color: 'Color' };
+const VARIANT_LABELS = { black: 'Black', white: 'White', color: 'Color' };
 
 const NAV_HEIGHT = 56; // BottomTabBar h-14
 const HANDLE_HEIGHT = 44;

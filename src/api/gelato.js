@@ -510,13 +510,13 @@ const mapGelatoSize = (gelatoSize) => {
  */
 const mapGelatoColor = (gelatoColor) => {
   const colorMap = {
-    'white': { id: 'white', label: 'Blanc', hex: '#FFFFFF' },
-    'black': { id: 'black', label: 'Negre', hex: '#181818' },
-    'navy': { id: 'blue', label: 'Blau', hex: '#2563EB' },
-    'green': { id: 'green', label: 'Verd', hex: '#10B981' },
-    'red': { id: 'red', label: 'Vermell', hex: '#DC2626' }
+    'white': { id: 'white', label: 'White', hex: '#FFFFFF' },
+    'black': { id: 'black', label: 'Black', hex: '#181818' },
+    'navy': { id: 'blue', label: 'Blue', hex: '#2563EB' },
+    'green': { id: 'green', label: 'Green', hex: '#10B981' },
+    'red': { id: 'red', label: 'Red', hex: '#DC2626' }
   };
-  return colorMap[gelatoColor.toLowerCase()] || { id: 'white', label: 'Blanc', hex: '#FFFFFF' };
+  return colorMap[gelatoColor.toLowerCase()] || { id: 'white', label: 'White', hex: '#FFFFFF' };
 };
 
 // ==================== SINCRONITZACIÓ ====================

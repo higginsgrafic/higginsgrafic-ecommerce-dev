@@ -89,9 +89,9 @@ export function FirstContactDibuix00Buttons({
   compact = false,
 }) {
   const buttons = [];
-  if (showWhite) buttons.push({ key: 'white', label: 'Blanc', onClick: onWhite });
+  if (showWhite) buttons.push({ key: 'white', label: 'White', onClick: onWhite });
   if (showMulti) buttons.push({ key: 'color', label: 'Color', onClick: onMulti });
-  if (showBlack) buttons.push({ key: 'black', label: 'Negre', onClick: onBlack });
+  if (showBlack) buttons.push({ key: 'black', label: 'Black', onClick: onBlack });
 
   if (!buttons.length) return null;
 

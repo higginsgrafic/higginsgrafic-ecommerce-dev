@@ -61,31 +61,31 @@ export const SIZES = {
 export const COLORS = {
   WHITE: {
     id: 'white',
-    label: 'Blanc',
+    label: 'White',
     hex: '#FFFFFF',
     image: '/tshirt-white.webp'
   },
   BLACK: {
     id: 'black',
-    label: 'Negre',
+    label: 'Black',
     hex: '#181818',
     image: '/tshirt-black.webp'
   },
   BLUE: {
     id: 'blue',
-    label: 'Blau',
+    label: 'Blue',
     hex: '#2563EB',
     image: '/tshirt-blue.webp'
   },
   GREEN: {
     id: 'green',
-    label: 'Verd',
+    label: 'Green',
     hex: '#10B981',
     image: '/tshirt-green.webp'
   },
   RED: {
     id: 'red',
-    label: 'Vermell',
+    label: 'Red',
     hex: '#DC2626',
     image: '/tshirt-red.webp'
   }
