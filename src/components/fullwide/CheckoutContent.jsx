@@ -129,9 +129,9 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
   // mateixa recepta; d'aquí en endavant cada variant se'n retoca per separado.
   const P_FIELD_GAP = 5;
   const P_TITLE_GAP = 10;
-  // El titol PAGAMENT de la vertical va 10px mes amunt que a la resta.
-  // Aquest es l'unic numero que el mou.
-  const P_TITLE_Y = 11.85;
+  // El titol PAGAMENT de la vertical. Aquest es l'unic numero que el mou
+  // (moure'l tambe a l'escriptori o a l'apaisada vol un valor propi).
+  const P_TITLE_Y = 1.85;
   // El vertical encara no el pujem: es queda exactament al centre.
   const P_CONJUNT_LIFT = 0;
   // Aire entre la filera de dalt (comanda + enviament) i la de baix
