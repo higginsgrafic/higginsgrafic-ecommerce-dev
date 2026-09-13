@@ -232,6 +232,19 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
   // glifs ocupen de 3,5 a 17,5).
   const D_INVOICE_FIELDS_LIFT = 0;
 
+  // ===== TAU LETA APAÏSADA (retocs propis) =====
+  // Dues pujades demanades expressament per a aquesta mida:
+  //  · L_PRODUCTES_LIFT: el bloc de productes (llistat + subtotals) puja 25px.
+  //  · L_FORM_LIFT: els dos blocs de dades (enviament i pagament) pugen 50px.
+  // Com que el formulari va a sota del llistat, quan el llistat puja 25px el
+  // formulari ja puja aquests mateixos 25; els 25 que falten fins a 50 surten
+  // de retallar el marge de dalt de les columnes (L_COLUMNES_TOP).
+  const L_PRODUCTES_LIFT = 25;
+  const L_FORM_LIFT = 50;
+  // Marge de creació de les dues columnes (el que les separa dels productes).
+  const COLUMNES_TOP = 90;
+  const L_COLUMNES_TOP = COLUMNES_TOP - (L_FORM_LIFT - L_PRODUCTES_LIFT); // 65
+
   // Valors derivats segons la variant que es renderitza: l'horitzontal dona
   // exactament els mateixos números que donava abans, l'escriptori res.
   const fieldGap = isPortraitTablet ? P_FIELD_GAP : FIELD_GAP;
@@ -243,6 +256,13 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
   const bodyH = isLandscapeTablet ? `${FORMS_H}px` : (isPortraitTablet ? undefined : `${D_BODY_H}px`);
   const groupW = isPortraitTablet ? P_GROUP_W : undefined;
   const groupX = isPortraitTablet ? P_SHIFT_X : undefined;
+  // A la tauleta apaïsada, el llistat de productes puja 25px (entra dins l'aire
+  // de la franja buida, que no pinta res) i les columnes de dades arrenquen amb
+  // el marge curt. A la resta de mides, tot igual que sempre.
+  const productesLift = isLandscapeTablet ? `-${L_PRODUCTES_LIFT}px` : undefined;
+  const columnesTop = isPhone
+    ? undefined
+    : (isLandscapeTablet ? `${L_COLUMNES_TOP}px` : `${COLUMNES_TOP}px`);
 
   const ROW_H = 32.8;
   const V_GUTTER = 2.8;
@@ -707,7 +727,7 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
           píxel. Els 34px de dalt són els que aparten el contingut del títol
           PAGAMENT, que va posicionat absolut i no ocupa lloc. */}
       <div style={{ marginTop:'34px', width: groupW, marginLeft: groupX, flexShrink:0, minHeight: isTabletRecipe ? '29px' : '24px', marginBottom: isTabletRecipe ? `${titleGap}px` : undefined }} />
-      <div style={{ display:'grid', gridTemplateColumns: isPortraitTablet ? '1fr 1fr' : '1fr 1fr 1fr 1fr', columnGap:'24px', rowGap: isPortraitTablet ? `${P_ROW_GAP}px` : '18px', width: groupW, marginLeft: groupX, flex: '0 0 auto', minHeight:0, transform: shiftColsX }}>
+      <div style={{ display:'grid', gridTemplateColumns: isPortraitTablet ? '1fr 1fr' : '1fr 1fr 1fr 1fr', columnGap:'24px', rowGap: isPortraitTablet ? `${P_ROW_GAP}px` : '18px', width: groupW, marginLeft: groupX, marginTop: productesLift, flex: '0 0 auto', minHeight:0, transform: shiftColsX }}>
         {/* COL 1: Cistell + Totals. Ara ocupa tota la fila de dalt. */}
         <div style={{ gridColumn:'1 / -1', display:'flex', flexDirection:'column', minHeight:0 }}>
           <div style={{ flex:'1 1 auto', overflowY:'auto', minHeight:0, maxHeight: isPortraitTablet ? '195px' : undefined }}>
@@ -744,7 +764,7 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
         {/* COL 2: Dades d'enviament. Baixa a la fila de sota i ocupa mitja
             amplada. El títol va DINS de la columna (primera peça): així sempre
             queda just a sobre de la seva columna, es mogui on es mogui. */}
-        <div style={{ gridColumn:'span 2', marginTop: isPhone ? undefined : '90px', display:'flex', flexDirection:'column', minHeight:0, overflow:'visible', justifyContent: 'flex-start', gap: fieldGap }}>
+        <div style={{ gridColumn:'span 2', marginTop: columnesTop, display:'flex', flexDirection:'column', minHeight:0, overflow:'visible', justifyContent: 'flex-start', gap: fieldGap }}>
           {/* 15px de marge + els 5px de junt de la columna = 20px fins al primer camp */}
           <div style={{ fontSize:'12pt', fontWeight:500, marginBottom:'15px' }}>Dades d'enviament</div>
           <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', columnGap:'10px' }}>
@@ -768,7 +788,7 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
             una cel·la pròpia, sota les dades d'enviament. */}
         {/* Mateix marge que la columna d'enviament: així el bloc de la targeta
             queda alineat pel capdamunt amb el camp del client. */}
-        <div style={{ gridColumn:'span 2', marginTop: isPhone ? undefined : '90px', display:'flex', flexDirection:'column', minHeight:0, overflow:'visible', position: isPortraitTablet ? undefined : 'relative', gap: isNarrowForm ? '1px' : undefined }}>
+        <div style={{ gridColumn:'span 2', marginTop: columnesTop, display:'flex', flexDirection:'column', minHeight:0, overflow:'visible', position: isPortraitTablet ? undefined : 'relative', gap: isNarrowForm ? '1px' : undefined }}>
           <div style={{ fontSize:'12pt', fontWeight:500, marginBottom:'20px' }}>Dades de pagament</div>
           <div style={{ display:'flex', flexDirection:'column', flex:'1 1 auto', gap: isNarrowForm ? '1px' : undefined }}>
             {/* Pagament */}
