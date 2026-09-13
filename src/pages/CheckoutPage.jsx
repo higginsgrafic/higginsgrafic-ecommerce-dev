@@ -73,10 +73,27 @@ export default function CheckoutPage() {
         description="Completa la compra de la teva comanda a Higgins GRÀFIC."
       />
 
-      {/* El contingut va per sota de la capçalera del mega-slide: el marge de
-          dalt el posa App (--appHeaderOffset) i aquí hi afegim una mica d'aire
-          perquè el formulari quedi clarament dessota. */}
-      <div style={{ minHeight: '60vh', width: '100%', maxWidth: '1120px', margin: '0 auto', padding: '28px 24px 48px', boxSizing: 'border-box' }}>
+      {/* L'amplada no és un número inventat: és exactament la franja que fa
+          servir la capçalera per al seu contingut, del logo a la icona de
+          l'usuari. La capçalera s'ancora a `--site-xL` (el marc del lloc) i
+          després hi aplica el seu coixí lateral; aquí fem el mateix, amb les
+          mateixes classes de coixí que ella (px-4 / sm:px-6 / lg:px-10), així
+          que a qualsevol amplada el formulari comença on comença el logo i
+          acaba on acaba la icona de l'usuari. Res no pot sobresortir-ne: el
+          marc del lloc ja deixa 16px de marge als costats.
+          El marge de dalt el posa App (--appHeaderOffset) i aquí hi afegim una
+          mica d'aire perquè el formulari quedi clarament dessota. */}
+      <div
+        className="px-4 sm:px-6 lg:px-10"
+        style={{
+          minHeight: '60vh',
+          width: 'var(--site-w, 100%)',
+          marginLeft: 'calc(var(--site-xL, 0px) - var(--rulerInset, 0px))',
+          paddingTop: '28px',
+          paddingBottom: '48px',
+          boxSizing: 'border-box',
+        }}
+      >
         <CheckoutContent
           cartItems={cartItems}
           setCartItems={setCartItems}
