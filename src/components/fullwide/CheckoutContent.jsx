@@ -679,20 +679,13 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
           Els elements no s'han redibuixat: són els mateixos, amb els seus
           estils i les seves mides. Només ha canviat la fila on seuen. */}
       <span style={{ ...HEAD, fontSize:'18pt', fontWeight:600, position:'absolute', top:titleY, left: isPortraitTablet ? P_SHIFT_X : SHIFT_X, transform:'translateY(-50%)' }}>PAGAMENT</span>
-      <div style={{ display:'grid', gridTemplateColumns: isPortraitTablet ? '1fr 1fr' : '1fr 1fr 1fr 1fr', columnGap:'24px', rowGap:'18px', padding:0, width: groupW, marginLeft: groupX, marginBottom: isTabletRecipe ? `${titleGap}px` : undefined, flexShrink:0, minHeight: isTabletRecipe ? '29px' : undefined, alignItems:'center' }}>
+      {/* La banda de dades comença sota el títol PAGAMENT (que va absolut), per
+          no trepitjar-lo. */}
+      <div style={{ display:'grid', gridTemplateColumns: isPortraitTablet ? '1fr 1fr' : '1fr 1fr 1fr 1fr', columnGap:'24px', rowGap:'18px', padding:0, width: groupW, marginLeft: groupX, marginTop:'34px', marginBottom: isTabletRecipe ? `${titleGap}px` : undefined, flexShrink:0, minHeight: isTabletRecipe ? '29px' : undefined, alignItems:'center' }}>
         {/* La teva comanda: tota la fila de dalt */}
         <div style={{ gridColumn:'1 / -1', display:'flex', alignItems:'center', justifyContent:'flex-start', transform: shiftColsX }}>
           <span style={{ fontSize:'12pt', fontWeight:500 }}>La teva comanda</span>
         </div>
-        {/* Dades d'enviament i dades de pagament: les dues columnes de sota */}
-        <div style={{ gridColumn:'span 2', display:'flex', alignItems:'center', justifyContent:'flex-start', transform: shiftColsX }}>
-          <span style={{ fontSize:'12pt', fontWeight:500 }}>Dades d'enviament</span>
-        </div>
-        {!isPortraitTablet && (
-          <div style={{ gridColumn:'span 2', display:'flex', alignItems:'center', justifyContent:'flex-start', transform: shiftColsX }}>
-            <span style={{ fontSize:'12pt', fontWeight:500 }}>Dades de pagament</span>
-          </div>
-        )}
       </div>
       <div style={{ display:'grid', gridTemplateColumns: isPortraitTablet ? '1fr 1fr' : '1fr 1fr 1fr 1fr', columnGap:'24px', rowGap: isPortraitTablet ? `${P_ROW_GAP}px` : '18px', width: groupW, marginLeft: groupX, flex: '0 0 auto', minHeight:0, transform: shiftColsX, alignItems:'start' }}>
         {/* COL 1: Cistell + Totals. Ara ocupa tota la fila de dalt. */}
@@ -728,10 +721,11 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
             <div style={{ display:'flex', justifyContent:'space-between', fontSize:'13pt', fontWeight:500, padding:'8px 0 0', borderTop:'1px solid #E6E8EC', marginTop:'4px' }}><span>Total</span><span style={{ fontVariantNumeric:'tabular-nums' }}>{totalFinal.toFixed(2).replace('.',',')}€</span></div>
           </div>
         </div>
-        {/* COL 2: Dades d'enviament. Baixa a la fila de sota, ocupa mitja
-            amplada i va 200px més avall perquè quedi per sota del mega-slide
-            quan el panell és obert. */}
+        {/* COL 2: Dades d'enviament. Baixa a la fila de sota i ocupa mitja
+            amplada. El títol va DINS de la columna (primera peça): així sempre
+            queda just a sobre de la seva columna, es mogui on es mogui. */}
         <div style={{ gridColumn:'span 2', marginTop: isPhone ? undefined : '125px', display:'flex', flexDirection:'column', minHeight:0, overflow:'visible', justifyContent: 'flex-start', gap: fieldGap }}>
+          <div style={{ fontSize:'12pt', fontWeight:500 }}>Dades d'enviament</div>
           <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', columnGap:'10px' }}>
             <div><input type="text" name="firstName" value={formData.firstName} onChange={handleChange} placeholder="Nom" style={inputStyle} />{formErrors.firstName && <div style={errorStyle}>{formErrors.firstName}</div>}</div>
             <div><input type="text" name="lastName" value={formData.lastName} onChange={handleChange} placeholder="Cognoms" style={inputStyle} />{formErrors.lastName && <div style={errorStyle}>{formErrors.lastName}</div>}</div>
@@ -752,10 +746,8 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
             segona filera (sota la comanda); termes + botó hi van al costat, en
             una cel·la pròpia, sota les dades d'enviament. */}
         <div style={{ gridColumn:'span 2', marginTop: isPhone ? undefined : '125px', display:'flex', flexDirection:'column', minHeight:0, overflow:'visible', position: isPortraitTablet ? undefined : 'relative', gap: isNarrowForm ? '1px' : undefined }}>
+          <div style={{ fontSize:'12pt', fontWeight:500 }}>Dades de pagament</div>
           <div style={{ display:'flex', flexDirection:'column', gap: isNarrowForm ? '1px' : undefined }}>
-            {/* Al vertical només hi ha dues columnes de títols, així que aquest
-                penja del seu bloc, no de la banda de dalt. */}
-            {isPortraitTablet && <span style={{ fontSize:'12pt', fontWeight:500, marginBottom:`${P_TITLE_GAP}px` }}>Dades de pagament</span>}
             {/* Pagament */}
             <div style={{ display:'grid', rowGap: '8px' }}>
               <div style={{ background:'#FFFFFF', overflow:'hidden' }}>
