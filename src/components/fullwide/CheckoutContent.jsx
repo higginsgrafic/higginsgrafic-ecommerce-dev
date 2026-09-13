@@ -895,13 +895,13 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
               );
             })}
           </div>
-          {/* Targeta dels totals: opaca, i amb la mateixa linia de 2px que la
-              cinta a la vora esquerra (abans una ombra difusa), perquè es vegi
-              que les fitxes li passen per sota.
+          {/* Targeta dels totals: opaca, sense contorn (la delimita la linia
+              d'1px de l'esquerra) perquè es vegi que les fitxes li passen per
+              sota.
               La disposicio interior es la mateixa que la de la vertical: en
               Roboto, els conceptes aplegats a baix (flex-end) amb un junt de
               2px i a 11pt, i TOT PLEGAT FA en Roboto Condensed a 12.5pt. */}
-          <div style={{ position:'absolute', top:0, bottom:0, right:0, width:`${TOTALS_W}px`, boxSizing:'border-box', display:'flex', flexDirection:'column', fontFamily:'Roboto, sans-serif', justifyContent:'flex-end', gap:'2px', padding:'10px 12px', background:'#FFFFFF', border:'1px solid #E6E8EC', borderRadius:'6px' }}>
+          <div style={{ position:'absolute', top:0, bottom:0, right:0, width:`${TOTALS_W}px`, boxSizing:'border-box', display:'flex', flexDirection:'column', fontFamily:'Roboto, sans-serif', justifyContent:'flex-end', gap:'2px', padding:'10px 12px', background:'#FFFFFF', border:'none', borderRadius:'6px' }}>
             {/* Linia fixa d'1px a la vora esquerra, del mateix gris que la linia
                 gruixuda de la cinta (#98A2B4). A diferencia d'aquella, aquesta
                 hi es sempre. */}
