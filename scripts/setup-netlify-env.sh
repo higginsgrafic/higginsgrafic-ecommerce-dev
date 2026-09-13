@@ -62,6 +62,15 @@ get_env_value() {
     | sed -e 's/^["'\'']//' -e 's/["'\'']$//' -e 's/[[:space:]]*$//'
 }
 
+# Fer servir el netlify-cli instal·lat al projecte és molt més ràpid que
+# cridar `npx` a cada variable (npx comprova el registre cada cop i triga
+# uns 10 segons per crida: amb 15 variables, quasi tres minuts).
+if [ -x "./node_modules/.bin/netlify" ]; then
+  NETLIFY="./node_modules/.bin/netlify"
+else
+  NETLIFY="npx --yes netlify-cli"
+fi
+
 echo "📦 Pujant variables d'entorn a Netlify (context: $CONTEXT)"
 echo "   Origen: $ENV_FILE"
 echo ""
@@ -90,9 +99,15 @@ for name in "${VARS[@]}"; do
       ;;
   esac
 
-  npx --yes netlify-cli env:set "$name" "$value" --context "$CONTEXT" >/dev/null
-  echo "  ✅ $name"
-  pujades=$((pujades + 1))
+  printf '  pujant %s... ' "$name"
+  if $NETLIFY env:set "$name" "$value" --context "$CONTEXT" > /tmp/netlify-env-out.txt 2>&1; then
+    echo "✅"
+    pujades=$((pujades + 1))
+  else
+    echo "❌"
+    echo "     $(tail -2 /tmp/netlify-env-out.txt | tr '\n' ' ')"
+    avisos=$((avisos + 1))
+  fi
 done
 
 echo ""
