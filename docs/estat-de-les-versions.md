@@ -50,3 +50,17 @@ feina**: el component i la línia que l'importa a `CheckoutPage.jsx`.
 **No es puja res ni es desplega res si no ho demana explícitament.** La feina es
 queda committed al despatx local i s'hi acumula; quan digui que sí, es puja i es
 desplega tot de cop i es verifica contra el lloc publicat.
+
+## Pendents apuntats
+
+- **Esborrar les dades de prova**: el cistell i les comandes de proves fetes
+  durant el desenvolupament (productes NX-01 / CYLON-78 / WORMHOLE, comandes de
+  test a Supabase, etc.). Cal netejar-ho abans de publicar de debò.
+
+- **El rebot del mega-slide** (apaisada i escriptori): l'alçada del panell surt
+  d'una mesura del contingut de la columna 1 que va canviant mentre les imatges
+  de la franja carreguen (428 -> 405 -> 365). El rebot no és el panell, sinó el
+  header, que creix amb cada mesura. La vertical no el té perquè la seva alçada
+  és fixa (269px). Solucions possibles: (a) esperar que les imatges de la franja
+  estiguin carregades abans d'obrir, (b) guardar l'última alçada bona i fer-la
+  servir des del primer fotograma.
