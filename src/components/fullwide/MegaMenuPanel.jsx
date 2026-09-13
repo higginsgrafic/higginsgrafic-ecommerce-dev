@@ -15,12 +15,13 @@ const P1_STRIPE_BOTTOM_GAP = 30;
 // Memoria de l'alcada bona del panell. El mega-slide es munta i es desmunta cada
 // cop que s'obre, i la mesura del contingut de la pagina 1 triga una estona a
 // arribar i va canviant (476 -> 456 -> 417): allo es veia com un rebot. Guardant
-// l'ultima alcada bona, a partir de la segona obertura el panell ja neix amb
-// l'alcada correcta. Es per mida de finestra, perque l'alcada en depen.
-const KEY_ALCADA = 'hg.megaPanelHeight';
+// l'ultima alcada bona al navegador, el panell ja neix amb l'alcada correcta
+// tambe despres de recarregar la pagina. Es per mida de finestra, perque
+// l'alcada en depen.
+const KEY_ALCADA = 'hg.megaPanelHeight.v1';
 function llegirAlcadaDesada() {
   try {
-    const cru = window.sessionStorage.getItem(KEY_ALCADA);
+    const cru = window.localStorage.getItem(KEY_ALCADA);
     if (!cru) return null;
     const d = JSON.parse(cru);
     if (d && d.w === window.innerWidth && d.h === window.innerHeight && typeof d.px === 'string') return d.px;
@@ -29,7 +30,7 @@ function llegirAlcadaDesada() {
 }
 function desarAlcada(px) {
   try {
-    window.sessionStorage.setItem(KEY_ALCADA, JSON.stringify({ w: window.innerWidth, h: window.innerHeight, px }));
+    window.localStorage.setItem(KEY_ALCADA, JSON.stringify({ w: window.innerWidth, h: window.innerHeight, px }));
   } catch { /* ignore */ }
 }
 
