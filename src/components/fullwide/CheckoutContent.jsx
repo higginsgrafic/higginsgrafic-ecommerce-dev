@@ -868,9 +868,10 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
               );
             })}
           </div>
-          {/* Targeta dels totals: opaca i amb una ombra cap a l'esquerra, perquè
-              es vegi que les fitxes li passen per sota. */}
-          <div style={{ position:'absolute', top:0, bottom:0, right:0, width:`${TOTALS_W}px`, boxSizing:'border-box', display:'flex', flexDirection:'column', fontFamily: isPortraitTablet ? 'Roboto, sans-serif' : undefined, justifyContent: isPortraitTablet ? 'flex-end' : 'space-between', gap: isPortraitTablet ? '2px' : undefined, padding:'10px 12px', background:'#FFFFFF', border:'1px solid #E6E8EC', borderRadius:'6px', boxShadow:'-12px 0 16px -12px rgba(16,24,40,0.20)' }}>
+          {/* Targeta dels totals: opaca, i amb la mateixa linia de 2px que la
+              cinta a la vora esquerra (abans una ombra difusa), perquè es vegi
+              que les fitxes li passen per sota. */}
+          <div style={{ position:'absolute', top:0, bottom:0, right:0, width:`${TOTALS_W}px`, boxSizing:'border-box', display:'flex', flexDirection:'column', fontFamily: isPortraitTablet ? 'Roboto, sans-serif' : undefined, justifyContent: isPortraitTablet ? 'flex-end' : 'space-between', gap: isPortraitTablet ? '2px' : undefined, padding:'10px 12px', background:'#FFFFFF', border:'1px solid #E6E8EC', borderLeft:'2px solid #98A2B4', borderRadius:'6px' }}>
             {/* Els totals són una suma: cada concepte a la seva ratlla, el nom a
                 l'esquerra i la xifra a la dreta, com una columna de números.
                 El Subtotal és el preu de la peça sense transport i sense IVA;
