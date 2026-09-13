@@ -909,10 +909,10 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
             en flux a P_TERMS_TOP i el botó penjat a P_BUTTON_TOP. Com que la
             factura i el botó penjen absoluts, no mouen els termes en absolut. */}
         {isPortraitTablet && (
-          // Aquesta cel·la ocupa tota la fila: els termes i el botó de pagar han
-          // d'anar d'una banda a l'altra del contingut (del logo a la icona de
-          // l'usuari), com la resta de blocs.
-          <div style={{ gridColumn:'1 / -1', display:'flex', flexDirection:'column', minHeight:0, position:'relative' }}>
+          // Aquesta cel·la va a la SEGONA columna (la de pagament), o sigui que
+          // els termes i el botó de pagar queden davall la targeta, amb el
+          // mateix cap d'esquerra i la mateixa amplada que els camps.
+          <div style={{ gridColumn:'2', display:'flex', flexDirection:'column', minHeight:0, position:'relative' }}>
             {invoiceBlock}
             {termsBlock}
             {buttonBlock}
