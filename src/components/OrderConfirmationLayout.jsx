@@ -29,9 +29,8 @@ const OrderConfirmationLayout = ({
   const items = orderData.items || [];
   const itemTotal = items.reduce((sum, item) => sum + (parseFloat(item.price) || 0) * (item.quantity || 1), 0);
   const shipping = orderData.shipping || 0;
-  const ivaAmount = orderData.iva || 0;
   const totalPlegat = orderData.total || itemTotal;
-  const subtotal = orderData.subtotal != null ? orderData.subtotal : (totalPlegat - shipping - ivaAmount);
+  const subtotal = orderData.subtotal != null ? orderData.subtotal : totalPlegat;
   const discountAmount = discountEnabled ? subtotal * discountRate : 0;
   const maxScroll = Math.max(0, items.length - VISIBLE_ROWS);
 
@@ -163,7 +162,7 @@ const OrderConfirmationLayout = ({
         {/* Transport */}
         <div />
         <div style={{ padding: '0 20px', fontWeight: 400, opacity: 0.7, textAlign: 'left', whiteSpace: 'nowrap', display: 'flex', alignItems: 'center', minHeight: 0, overflow: 'hidden', gridColumn: '2 / 4' }}>Transport</div>
-        <div style={{ padding: '0 20px', fontWeight: 400, opacity: 0.7, textAlign: 'right', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', minHeight: 0, overflow: 'hidden', }}>{formatPrice(shipping)}</div>
+        <div style={{ padding: '0 20px', fontWeight: 400, opacity: 0.7, textAlign: 'right', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', minHeight: 0, overflow: 'hidden', }}>{shipping > 0 ? formatPrice(shipping) : 'Inclòs'}</div>
         {/* L'IVA no és una ratlla que se sumi: els preus de la botiga ja el porten
             inclòs, i si el poséssim aquí la columna no quadraría (Preu +
             Transport + IVA donaria més que el total). */}

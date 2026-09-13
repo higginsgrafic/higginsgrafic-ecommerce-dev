@@ -4,7 +4,7 @@ import { Elements, CardNumberElement, CardExpiryElement, CardCvcElement, useStri
 import { Check } from 'lucide-react';
 import { validateEmail, validateRequired, validatePostalCode, validateForm } from '@/utils/validation';
 import { trackBeginCheckout, trackPurchase } from '@/utils/analytics';
-import { useShippingCosts, normalizeCountry } from '@/hooks/useShippingCosts';
+import { normalizeCountry } from '@/hooks/useShippingCosts';
 import { createMockOrder, MOCK_CLIENT } from '@/lib/mockOrderStore';
 import { useAuth } from '@/contexts/AuthContext';
 import { drawingStripePath } from '@/lib/drawingPaths';
@@ -242,7 +242,7 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
   //     el llistat, queda 90px més amunt del que era a l'origen. Baixar-lo =
   //     apujar aquest número; apujar-lo = abaixar-lo.
   const L_PRODUCTES_LIFT = 25;
-  const L_COLUMNES_TOP = 25;
+  const L_COLUMNES_TOP = 75;
 
   // Marge de creació de les dues columnes de dades (el que les separa del bloc
   // de productes). El fan servir l'escriptori i la tauleta vertical, tal qual.
@@ -258,7 +258,7 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
   // els productes que faci, i el formulari de pagament no es mou mai de lloc.
   // L'aire de sota el bloc NO es toca: és on acaba el mega-slide quan s'obre el
   // cistell, i ha de quedar net.
-  const FITXA_W = 132;     // amplada d'una fitxa de producte
+  const FITXA_W = 118;     // amplada d'una fitxa (estreta: la fitxa es vertical)
   const GAP_FITXES = 10;   // separació entre fitxes
   const TOTALS_W = 250;    // amplada de la targeta dels totals
   const TOTALS_GAP = 28;   // aire entre l'última fitxa i la targeta dels totals
@@ -325,10 +325,11 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
   const preu = grossSum;
   const descompte = discountEnabled ? preu * discountRate : 0;
   const totalArticles = preu - descompte;
-  const totalQuantity = activeItems.reduce((acc, it) => acc + (it.qty || 1), 0);
-  const { getCost, zoneInfo } = useShippingCosts(formData.country || 'ES');
-  const shipping = getCost(formData.country || 'ES', totalQuantity, totalArticles);
-  const totalFinal = totalArticles + shipping;
+  // El transport va INCLÒS dins del preu de la botiga: no s'afegeix mai al
+  // total. El total final és la suma dels preus dels articles, de manera que el
+  // client paga exactament el que ha vist a la botiga.
+  const shipping = 0;
+  const totalFinal = totalArticles;
   const baseImponible = totalFinal / 1.21;
   const ivaAmount = totalFinal - baseImponible;
   const total = totalFinal;
@@ -680,8 +681,8 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
             {descompte > 0 && (
               <div style={{ display: 'flex', justifyContent: 'space-between', color: '#0A7A46' }}><span>Descompte</span><span>-{fmt(descompte)}</span></div>
             )}
-            <div style={{ display: 'flex', justifyContent: 'space-between' }}><span>Transport</span><span>{shipping === 0 ? 'Gratuït' : fmt(shipping)}</span></div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', ...HEAD, fontSize: '12pt', marginTop: '8px' }}><span>Total</span><span>{fmt(totalFinal)}</span></div>
+            <div style={{ display: 'flex', justifyContent: 'space-between' }}><span>Transport</span><span>Inclòs</span></div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', ...HEAD, fontSize: '12pt', marginTop: '8px' }}><span>Tot plegat fa</span><span>{fmt(totalFinal)}</span></div>
             <div style={{ textAlign: 'right', color: '#98A2B4', fontSize: '8.5pt' }}>IVA 21% inclòs en el total: {fmt(ivaAmount)}</div>
           </div>
         </div>
@@ -809,7 +810,7 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
               const q = item.qty||1;
               return (
                 <div key={`c-${item.id}-${idx}`} style={{ flex:'0 0 auto', width:`${FITXA_W}px`, boxSizing:'border-box', display:'flex', flexDirection:'column', alignItems:'center', gap:'4px', border:'1px solid #E6E8EC', borderRadius:'6px', background:'#FFFFFF', padding:'8px' }}>
-                  <div style={{ width:'100%', height:'52px', borderRadius:'4px', background:'#F3F4F6', overflow:'hidden', flexShrink:0, display:'flex', alignItems:'center', justifyContent:'center' }}>
+                  <div style={{ width:'100%', height:'68px', overflow:'hidden', flexShrink:0, display:'flex', alignItems:'center', justifyContent:'center' }}>
                     <img src={imatgeArticle(item)} alt="" loading="lazy" decoding="async" style={{ width:'100%', height:'100%', objectFit:'contain' }} />
                   </div>
                   <div style={{ width:'100%', fontSize:'9pt', lineHeight:1.2, textAlign:'center', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{item.title||item.name||'Producte'}</div>
@@ -826,8 +827,8 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
                 l'esquerra i la xifra a la dreta, com una columna de números. */}
             <div style={{ display:'flex', justifyContent:'space-between', alignItems:'baseline', fontSize:'9.5pt', lineHeight:1.2, color:'#667085' }}><span>Subtotal</span><span style={{ fontVariantNumeric:'tabular-nums' }}>{totalArticles.toFixed(2).replace('.',',')}€</span></div>
             {discountEnabled && <div style={{ display:'flex', justifyContent:'space-between', alignItems:'baseline', fontSize:'9.5pt', lineHeight:1.2, color:'#667085' }}><span>Descompte (-{offersConfig.discountRate}%)</span><span style={{ fontVariantNumeric:'tabular-nums' }}>-{descompte.toFixed(2).replace('.',',')}€</span></div>}
-            <div style={{ display:'flex', justifyContent:'space-between', alignItems:'baseline', fontSize:'9.5pt', lineHeight:1.2, color:'#667085' }}><span>Transport</span><span style={{ fontVariantNumeric:'tabular-nums' }}>{shipping === 0 ? 'Gratuït' : `${shipping.toFixed(2).replace('.',',')}€`}</span></div>
-            <div style={{ display:'flex', justifyContent:'space-between', alignItems:'baseline', fontSize:'12.5pt', fontWeight:500, lineHeight:1.2, paddingTop:'6px', borderTop:'1px solid #E6E8EC' }}><span>Total</span><span style={{ fontVariantNumeric:'tabular-nums' }}>{totalFinal.toFixed(2).replace('.',',')}€</span></div>
+            <div style={{ display:'flex', justifyContent:'space-between', alignItems:'baseline', fontSize:'9.5pt', lineHeight:1.2, color:'#667085' }}><span>Transport</span><span>Inclòs</span></div>
+            <div style={{ display:'flex', justifyContent:'space-between', alignItems:'baseline', fontSize:'12.5pt', fontWeight:500, lineHeight:1.2, paddingTop:'6px', borderTop:'1px solid #E6E8EC' }}><span>Tot plegat fa</span><span style={{ fontVariantNumeric:'tabular-nums' }}>{totalFinal.toFixed(2).replace('.',',')}€</span></div>
             {/* L'IVA no és un concepte que se sumi: els preus de la botiga ja el
                 porten inclòs. Va aquí sota, com a nota, perquè la columna de
                 números quadri: Subtotal + Transport = Total. */}
