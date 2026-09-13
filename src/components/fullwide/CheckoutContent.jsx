@@ -497,8 +497,16 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
   // tauletes els puguin col·locar en llocs diferents sense duplicar-ne el dibuix:
   // a l'horitzontal van dins la columna de la targeta, al vertical formen la
   // cel·la dreta, sota les dades d'enviament.
+  //
+  // Alineació amb el camp del correu (només a l'horitzontal): el botó va clavat
+  // al final de la columna i el Telèfon acaba exactament al mateix nivell, així
+  // que el centre del camp del correu cau 56 px per sobre del final de la
+  // columna (34 del Telèfon + 5 del junt + 17 de mig correu). Com que el bloc de
+  // termes fa 16 px, el seu fons ha de quedar 56 − 8 = 48 px per sobre del final,
+  // i el botó n'ocupa els darrers 34: entre els termes i el botó hi van 14 px.
+  // Aquests 14 px són els que centren la casella amb el correu.
   const termsBlock = (
-    <div style={{ marginTop: '18px' }}>
+    <div style={{ marginTop: isPortraitTablet ? '18px' : undefined, marginBottom: isPortraitTablet ? undefined : '14px' }}>
       <label style={{ display:'flex', alignItems:'flex-start', gap:'8px', fontSize:'9.5pt', lineHeight:1.25, fontWeight:300 }}>
         <input type="checkbox" checked={acceptTerms} onChange={(e) => setAcceptTerms(e.target.checked)} style={{ marginTop:'1px' }} />
         <span>Accepto els <a href="/terms" style={{ color:'#4A5057', textDecoration:'underline' }}>Termes del Servei</a>, la <a href="/privacy" style={{ color:'#4A5057', textDecoration:'underline' }}>Política de Privacitat</a> i la <a href="/shipping" style={{ color:'#4A5057', textDecoration:'underline' }}>Política d'enviaments</a>.</span>
