@@ -184,11 +184,9 @@ function CistellComandaContent({ cartItems, setCartItems, onFinalizeOrder }) {
 
   const isEmpty = CART_ITEMS.length === 0;
 
-  const finalizeBtnRef = useRef(null);
-  // L'ultima fila visible del cistell: el bloc flotant del total s'hi ha de
-  // posar just a sota. Abans es mesurava el boto invisible de la graella, que
-  // cau una filera sencera mes avall, i per aixo el total quedava 117px per
-  // sota de l'ultima linia a l'escriptori.
+  // L'ultima fila visible del cistell: el bloc flotant del total s'hi posa just
+  // a sota. Abans es mesurava un boto invisible de la graella que cau una filera
+  // sencera mes avall, i per aixo el total quedava 117px mes avall.
   const ultimaFilaRef = useRef(null);
   const [overlayTop, setOverlayTop] = useState(null);
   const [overlayLeft, setOverlayLeft] = useState(null);
@@ -208,7 +206,7 @@ function CistellComandaContent({ cartItems, setCartItems, onFinalizeOrder }) {
     if (isEmpty) return;
     let raf = 0;
     const measure = () => {
-      const btn = ultimaFilaRef.current || finalizeBtnRef.current;
+      const btn = ultimaFilaRef.current;
       if (!btn) return;
       const r = btn.getBoundingClientRect();
       // El bloc flotant es ancorat pel seu centre (translate -50%), aixi que
@@ -642,48 +640,11 @@ function CistellComandaContent({ cartItems, setCartItems, onFinalizeOrder }) {
           gap: `${GUTTER}px`,
           justifyItems: 'center',
         }}>
-          <button
-            id="stripe-guide-finalize-order"
-            ref={finalizeBtnRef}
-            type="button"
-            // Aquest botó és NOMÉS una marca de mesura: el botó que es veu i es
-            // clica és el que es dibuixa a sobre (el "Tot plegat fa … /
-            // FINALITZA LA COMANDA" flotant), i es col·loca calculant el centre
-            // d'aquest. Abans era visible i clicable, i per tant hi havia dos
-            // botons iguals alhora: un a sobre de l'altre, i el de sota quedava
-            // tapat per la línia del carretó. Ara queda invisible i fora de
-            // l'abast del teclat i dels lectors de pantalla, però conserva
-            // exactament la mateixa mida i posició perquè el botó de debò no
-            // es mogui ni un píxel.
-            tabIndex={-1}
-            aria-hidden="true"
-            onClick={handleFinalizeOrder}
-            aria-label="Finalitza la comanda"
-            style={{
-              fontFamily: 'Oswald, sans-serif',
-              fontWeight: 500,
-              fontSize: '14.553pt',
-              textTransform: 'uppercase',
-              letterSpacing: '0.4px',
-              color: '#F4F6F8',
-              backgroundColor: '#474F59',
-              border: 'none',
-              borderRadius: '3px',
-              boxSizing: 'border-box',
-              cursor: 'pointer',
-              padding: 0,
-              height: '100%',
-              width: 'calc(100% - 40px)',
-              margin: '0 auto',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              visibility: 'hidden',
-              pointerEvents: 'none',
-            }}
-          >
-            FINALITZA LA COMANDA
-          </button>
+          {/* Aqui hi havia un boto invisible ("FINALITZA LA COMANDA") que
+              nome s servia de marca de mesura per col·locar el bloc flotant del
+              total. Ara el bloc es mesura des de l'ultima fila visible, aixi que
+              el boto ja no cal. La cel·la es queda: forma part de la graella i
+              treure-la canviaria l'alcada del panell. */}
         </div>
       </div>
       </>
