@@ -184,3 +184,22 @@
   from = "/higginsgrafic.com/*"
   to = "/index.html"
   status = 200
+
+# ---------------------------------------------------------------------------
+# Atrapa-ho tot (imprescindible): la botiga és una aplicació d'una sola pàgina
+# (React). Les adreces les gestiona el navegador, no el servidor, i sense
+# aquesta regla QUALSEVOL adreça directa responia amb la pàgina "Page not
+# found" de Netlify en comptes de carregar la botiga:
+#   - un enllaç de producte compartit per WhatsApp o xarxes,
+#   - l'enllaç de seguiment de comanda que rep el client per correu (/track),
+#   - prémer F5 o el botó de tornar enrere en una fitxa de producte,
+#   - qualsevol cerca de Google que apunti a una pàgina concreta.
+#
+# Va a l'ÚLTIM lloc a posta: les regles de dalt (/api/*, /video/*, ...) han de
+# tenir prioritat. Els fitxers estàtics (imatges, /assets/...) es continuen
+# servint directament perquè Netlify només aplica aquesta regla quan no troba
+# cap fitxer que coincideixi.
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
