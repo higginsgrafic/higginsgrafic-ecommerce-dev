@@ -18,7 +18,7 @@ import { useEffect, useState } from 'react';
  * mesura quan el troba i es guarda l'últim valor bo.
  */
 const CLAU = 'hg.megaslideGuide.enabled';
-const CLAU_ALCADA = 'hg.megaslideGuide.bottom';
+const CLAU_ALCADA = 'hg.megaslideGuide.bottom.v2';
 const SELECTOR = '[data-mega-page-viewport="3"]';
 
 function activadaAlQuery() {
@@ -68,7 +68,19 @@ export default function MegaslideEndGuide() {
       if (el) {
         const r = el.getBoundingClientRect();
         if (r.height > 0) {
-          const bottom = Math.round(r.bottom);
+          // El panell no acaba on acaba la caixa del contingut del cistell: a
+          // sota seu hi ha el peu del panell (uns 33px). Pugem pels pares fins
+          // a trobar la vora de debò, que és la que porta el border-bottom.
+          let panell = el;
+          let pare = el.parentElement;
+          while (pare) {
+            if (getComputedStyle(pare).borderBottomWidth !== '0px') {
+              panell = pare;
+              break;
+            }
+            pare = pare.parentElement;
+          }
+          const bottom = Math.round(panell.getBoundingClientRect().bottom);
           setAlcada((prev) => {
             if (prev === bottom) return prev;
             try { window.localStorage.setItem(CLAU_ALCADA, String(bottom)); } catch { /* ignore */ }
