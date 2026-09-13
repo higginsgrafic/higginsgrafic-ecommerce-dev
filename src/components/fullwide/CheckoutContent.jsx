@@ -90,6 +90,9 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
   // primera filera de producte del cistell és 2*23,867 - 2,037 - 2 = 43,70px,
   // així que el seu centre és a 21,85px. TITLE_Y és l'únic número a retocar.
   const TITLE_Y = 21.85;
+  // La tauleta apaïsada porta el títol 10px més amunt (retoc propi d'aquesta
+  // versio; l'escriptori i la vertical es queden amb el valor de sempre).
+  const L_TITLE_Y = TITLE_Y - 10;
 
   // A l'horitzontal el formulari d'enviament s'obre amb gaps: FIELD_GAP és
   // l'únic número a retocar (7 junts entre els 8 blocs de camps).
@@ -272,7 +275,7 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
   // exactament els mateixos números que donava abans, l'escriptori res.
   const fieldGap = isPortraitTablet ? P_FIELD_GAP : FIELD_GAP;
   const titleGap = isLandscapeTablet ? TITLE_GAP : (isPortraitTablet ? P_TITLE_GAP : undefined);
-  const titleY = isLandscapeTablet ? `${TITLE_Y}px` : (isPortraitTablet ? `${P_TITLE_Y}px` : `${TITLE_Y}px`);
+  const titleY = isLandscapeTablet ? `${L_TITLE_Y}px` : (isPortraitTablet ? `${P_TITLE_Y}px` : `${TITLE_Y}px`);
   const liftPad = isLandscapeTablet
     ? `${CONJUNT_LIFT * 2}px`
     : (isPortraitTablet ? `${P_CONJUNT_LIFT * 2}px` : `${D_CONJUNT_LIFT * 2}px`);
