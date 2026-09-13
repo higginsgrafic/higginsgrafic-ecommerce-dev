@@ -193,9 +193,15 @@ export default function MegaMenuPanel({
   // deixa el formulari just a sota) el cistell no tapa res i, de passada, en
   // obrir-lo no es veu cap ajust d'alçada.
   const esCheckout = typeof window !== 'undefined' && window.location.pathname === '/checkout';
+  // La variant la detectem aqui: les props isPortraitTablet/isLandscapeTablet
+  // existeixen pero el header no les hi passa, aixi que sempre valen false.
+  const w = typeof window !== 'undefined' ? window.innerWidth : 0;
+  const h = typeof window !== 'undefined' ? window.innerHeight : 0;
+  const esVerticalAqui = w >= 768 && w <= 1366 && h > w;
+  const esApaissadaAqui = w >= 768 && w <= 1366 && w >= h;
   // 270px de panell a l'apaisada i 330 a l'escriptori: son les alcades que
   // deixen el formulari just a sota. A la vertical no cal limit.
-  const CHECKOUT_GUARD_H = isPortraitTablet ? null : (isLandscapeTablet ? 206 : 266);
+  const CHECKOUT_GUARD_H = esVerticalAqui ? null : (esApaissadaAqui ? 206 : 266);
   const guardHeightPx = paymentFillsScreen
     ? guardHeightPxDefault
     : isPortraitTablet
