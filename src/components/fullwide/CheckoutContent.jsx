@@ -725,7 +725,8 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
             amplada. El títol va DINS de la columna (primera peça): així sempre
             queda just a sobre de la seva columna, es mogui on es mogui. */}
         <div style={{ gridColumn:'span 2', marginTop: isPhone ? undefined : '90px', display:'flex', flexDirection:'column', minHeight:0, overflow:'visible', justifyContent: 'flex-start', gap: fieldGap }}>
-          <div style={{ fontSize:'12pt', fontWeight:500, marginBottom:'20px' }}>Dades d'enviament</div>
+          {/* 15px de marge + els 5px de junt de la columna = 20px fins al primer camp */}
+          <div style={{ fontSize:'12pt', fontWeight:500, marginBottom:'15px' }}>Dades d'enviament</div>
           <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', columnGap:'10px' }}>
             <div><input type="text" name="firstName" value={formData.firstName} onChange={handleChange} placeholder="Nom" style={inputStyle} />{formErrors.firstName && <div style={errorStyle}>{formErrors.firstName}</div>}</div>
             <div><input type="text" name="lastName" value={formData.lastName} onChange={handleChange} placeholder="Cognoms" style={inputStyle} />{formErrors.lastName && <div style={errorStyle}>{formErrors.lastName}</div>}</div>
