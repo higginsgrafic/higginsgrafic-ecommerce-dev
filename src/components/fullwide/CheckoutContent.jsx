@@ -272,6 +272,9 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
   // La roda del ratolí també desplaça la cinta. Sense això, amb ratolí només es
   // pot moure amb Majúscules + roda, que gairebé ningú no endevina.
   const cintaRef = useRef(null);
+  // Per la sombra del marge esquerre: nome s'ha de veure si realment hi ha
+  // fitxes amagades en aquesta banda.
+  const [cintaAmbMes, setCintaAmbMes] = useState(false);
   useEffect(() => {
     const el = cintaRef.current;
     if (!el) return undefined;
@@ -321,6 +324,22 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
   useEffect(() => {
     const el = cintaRef.current;
     if (el) el.scrollLeft = el.scrollWidth;
+  }, [activeItems.length]);
+
+  // La sombra del marge esquerre de la cinta: surt quan hi ha fitxes que no es
+  // veuen per l'esquerra (la cinta arrenca enganxada a la dreta i va creixent cap
+  // a l'esquerra, aixi que les que no hi caben queden enfora d'aquest costat).
+  useEffect(() => {
+    const el = cintaRef.current;
+    if (!el) return undefined;
+    const update = () => setCintaAmbMes(el.scrollLeft > 1 && el.scrollWidth > el.clientWidth + 1);
+    update();
+    el.addEventListener('scroll', update, { passive: true });
+    window.addEventListener('resize', update);
+    return () => {
+      el.removeEventListener('scroll', update);
+      window.removeEventListener('resize', update);
+    };
   }, [activeItems.length]);
 
   const grossSum = activeItems.reduce((acc, it) => {
@@ -828,6 +847,9 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
               així sempre creixen cap a l'esquerra, des de la targeta dels
               totals. El coixí de la dreta fa l'amplada de la targeta més el
               marge, de manera que l'última fitxa sempre es pot treure de sota. */}
+          {/* Sombra al marge esquerre: nome s surt si hi ha fitxes amagades en
+              aquesta banda, i serveix per indicar que la cinta continua. */}
+          <div aria-hidden="true" style={{ position:'absolute', left:0, top:0, bottom:0, width:'26px', pointerEvents:'none', opacity: cintaAmbMes ? 1 : 0, transition:'opacity 160ms ease', background:'linear-gradient(to right, rgba(16,24,40,0.12), rgba(16,24,40,0))', zIndex:2 }} />
           <div ref={cintaRef} style={{ flex:'1 1 auto', minWidth:0, display:'flex', alignItems:'stretch', gap:`${GAP_FITXES}px`, overflowX:'auto', overflowY:'hidden', paddingRight:`${TOTALS_W + TOTALS_GAP}px`, scrollbarWidth:'thin' }}>
             <div style={{ flex:'1 1 auto', minWidth:0 }} />
             {activeItems.map((item, idx) => {
