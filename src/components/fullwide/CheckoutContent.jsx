@@ -562,13 +562,18 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
     const ink = resolveInk(item.collectionSlug, color, item.finish);
     return getMockupPath({ collection: item.collectionSlug, design, shirtColor: color, ink });
   };
-  // La imatge de la fitxa del cistell: primer la foto real de la peça (la que ja
-  // porta l'article), després el mockup del disseny i, si no, una samarreta
-  // neutra. Així mai no queda una icona d'imatge trencada.
-  // Compte amb '/placeholder-product.svg': és un fitxer que no existeix i que
-  // alguns productes porten com a imatge; si el féssim servir, sortiria trencada.
+  // La imatge de la fitxa del cistell: primer la foto real de la peça (només si
+  // és un fitxer nostre; les de Gelato són URLs signades que caduquen i al cap
+  // d'unes hores sortirien trencades), després el mockup del disseny i, si no,
+  // una samarreta neutra en el color de la peça.
+  // '/placeholder-product.svg' és un fitxer que no existeix i que alguns
+  // productes porten com a imatge: també s'ha d'ignorar.
   const imatgeArticle = (item) => {
-    const propia = item.image && item.image !== '/placeholder-product.svg' ? item.image : null;
+    const propia = item.image
+      && String(item.image).startsWith('/')
+      && item.image !== '/placeholder-product.svg'
+      ? item.image
+      : null;
     return propia || mockupSrc(item) || tshirtSrc(item.color);
   };
 
