@@ -3216,10 +3216,10 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
             borderTop: '1px solid #E6E8EC',
           }}
         >
-          {/* Els enllaços baixen 3px. El marge de baix negatiu compensa el de
+          {/* Els enllaços baixen 4px. El marge de baix negatiu compensa el de
               dalt perque l'alcada del header no canviï: si creixés, el panell
               del mega-slide i tot el checkout es desplaçarien. */}
-          <nav className="flex items-center justify-center gap-6 px-10 py-2 flex-nowrap overflow-x-auto" style={{ scrollbarWidth: 'none', marginTop: '13px', marginBottom: '-3px' }}>
+          <nav className="flex items-center justify-center gap-6 px-10 py-2 flex-nowrap overflow-x-auto" style={{ scrollbarWidth: 'none', marginTop: '14px', marginBottom: '-4px' }}>
             {resolvedNav.map((item) => {
               const open = active === item.id && megaPage === 1;
               return (
