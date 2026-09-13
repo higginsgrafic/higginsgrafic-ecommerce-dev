@@ -128,8 +128,10 @@ export default function CheckoutPage() {
       </div>
       {/* Guia de desenvolupament: dibuixa una línia allà on acaba el mega-slide
           quan s'obre el cistell. No la veu mai cap client: només surt en
-          desenvolupament o si s'afegeix ?megaslide=1 a l'adreça. */}
-      <MegaslideEndGuide />
+          desenvolupament o si s'afegeix ?megaslide=1 a l'adreça.
+          A la vertical va desactivada: aquella versió ja està congelada i les
+          guies hi feien nosa. */}
+      {!esVertical && <MegaslideEndGuide />}
     </motion.div>
   );
 }
