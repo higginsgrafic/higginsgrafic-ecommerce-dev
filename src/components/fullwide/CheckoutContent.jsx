@@ -821,14 +821,14 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
           </div>
           {/* Targeta dels totals: opaca i amb una ombra cap a l'esquerra, perquè
               es vegi que les fitxes li passen per sota. */}
-          <div style={{ position:'absolute', top:0, bottom:0, right:0, width:`${TOTALS_W}px`, boxSizing:'border-box', display:'flex', flexDirection:'column', justifyContent:'center', gap:'4px', padding:'8px 12px', background:'#FFFFFF', border:'1px solid #E6E8EC', borderRadius:'6px', boxShadow:'-12px 0 16px -12px rgba(16,24,40,0.20)' }}>
-            <div style={{ display:'flex', flexWrap:'wrap', alignItems:'baseline', columnGap:'12px', rowGap:'2px', fontSize:'9.5pt', lineHeight:1.25, color:'#667085' }}>
-              <span>Subtotal <span style={{ fontVariantNumeric:'tabular-nums' }}>{totalArticles.toFixed(2).replace('.',',')}€</span></span>
-              {discountEnabled && <span>Descompte (-{offersConfig.discountRate}%) <span style={{ fontVariantNumeric:'tabular-nums' }}>-{descompte.toFixed(2).replace('.',',')}€</span></span>}
-              <span>Transport <span style={{ fontVariantNumeric:'tabular-nums' }}>{shipping === 0 ? 'Gratuït' : `${shipping.toFixed(2).replace('.',',')}€`}</span></span>
-              <span>IVA 21% (inclòs) <span style={{ fontVariantNumeric:'tabular-nums' }}>{ivaAmount.toFixed(2).replace('.',',')}€</span></span>
-            </div>
-            <div style={{ display:'flex', justifyContent:'space-between', fontSize:'12.5pt', fontWeight:500, lineHeight:1.2, paddingTop:'5px', borderTop:'1px solid #E6E8EC' }}><span>Total</span><span style={{ fontVariantNumeric:'tabular-nums' }}>{totalFinal.toFixed(2).replace('.',',')}€</span></div>
+          <div style={{ position:'absolute', top:0, bottom:0, right:0, width:`${TOTALS_W}px`, boxSizing:'border-box', display:'flex', flexDirection:'column', justifyContent:'space-between', padding:'10px 12px', background:'#FFFFFF', border:'1px solid #E6E8EC', borderRadius:'6px', boxShadow:'-12px 0 16px -12px rgba(16,24,40,0.20)' }}>
+            {/* Els totals són una suma: cada concepte a la seva ratlla, el nom a
+                l'esquerra i la xifra a la dreta, com una columna de números. */}
+            <div style={{ display:'flex', justifyContent:'space-between', alignItems:'baseline', fontSize:'9.5pt', lineHeight:1.2, color:'#667085' }}><span>Subtotal</span><span style={{ fontVariantNumeric:'tabular-nums' }}>{totalArticles.toFixed(2).replace('.',',')}€</span></div>
+            {discountEnabled && <div style={{ display:'flex', justifyContent:'space-between', alignItems:'baseline', fontSize:'9.5pt', lineHeight:1.2, color:'#667085' }}><span>Descompte (-{offersConfig.discountRate}%)</span><span style={{ fontVariantNumeric:'tabular-nums' }}>-{descompte.toFixed(2).replace('.',',')}€</span></div>}
+            <div style={{ display:'flex', justifyContent:'space-between', alignItems:'baseline', fontSize:'9.5pt', lineHeight:1.2, color:'#667085' }}><span>Transport</span><span style={{ fontVariantNumeric:'tabular-nums' }}>{shipping === 0 ? 'Gratuït' : `${shipping.toFixed(2).replace('.',',')}€`}</span></div>
+            <div style={{ display:'flex', justifyContent:'space-between', alignItems:'baseline', fontSize:'9.5pt', lineHeight:1.2, color:'#667085' }}><span>IVA 21% (inclòs)</span><span style={{ fontVariantNumeric:'tabular-nums' }}>{ivaAmount.toFixed(2).replace('.',',')}€</span></div>
+            <div style={{ display:'flex', justifyContent:'space-between', alignItems:'baseline', fontSize:'12.5pt', fontWeight:500, lineHeight:1.2, paddingTop:'6px', borderTop:'1px solid #E6E8EC' }}><span>Total</span><span style={{ fontVariantNumeric:'tabular-nums' }}>{totalFinal.toFixed(2).replace('.',',')}€</span></div>
           </div>
         </div>
         {/* COL 2: Dades d'enviament. Baixa a la fila de sota i ocupa mitja
