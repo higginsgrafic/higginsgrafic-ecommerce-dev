@@ -223,10 +223,15 @@ async function calculateServerSideTotal(supabase, items, shippingZone) {
   const totalQuantity = validatedItems.reduce((n, item) => n + item.quantity, 0);
   const shippingCost = quoteShipping(shippingZone, totalQuantity, subtotal);
 
+  // El transport va INCLÒS dins del preu de la botiga: no s'afegeix mai al
+  // total. Es continua cotitzant (i es desa a part, com a dada informativa)
+  // perquè saber quant costaria enviar-ho és útil, però el que es cobra és
+  // exactament la suma dels preus dels articles.
   // Preus i transport són PVP (IVA 21% inclòs). No afegim IVA a sobre del total.
   const subtotalPvp = Math.round(subtotal * 100) / 100;
-  const shippingPvp = Math.round(shippingCost * 100) / 100;
-  const totalEur = Math.round((subtotalPvp + shippingPvp) * 100) / 100;
+  const shippingPvp = 0;
+  const shippingCotitzat = Math.round(shippingCost * 100) / 100;
+  const totalEur = Math.round(subtotalPvp * 100) / 100;
   const totalCents = Math.round(totalEur * 100);
 
   // Desglossament d'IVA 21% (base imposable + quota d'IVA)
@@ -240,6 +245,7 @@ async function calculateServerSideTotal(supabase, items, shippingZone) {
   return {
     subtotal: subtotalPvp,
     shippingCost: shippingPvp,
+    shippingQuoted: shippingCotitzat,
     baseImponible,
     iva,
     total: totalCents,
@@ -371,6 +377,7 @@ export async function handler(event, context) {
       trackingToken: rawTrackingToken,
       subtotal: calc.subtotal,
       shippingCost: calc.shippingCost,
+      shippingQuoted: calc.shippingQuoted,
       baseImponible: calc.baseImponible,
       iva: calc.iva,
       total: calc.total / 100,

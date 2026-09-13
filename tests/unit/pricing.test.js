@@ -142,23 +142,22 @@ describe('create-payment-intent — server-side pricing', () => {
 
     // subtotal PVP = 15.50*2 + 18.00*1 = 49.00
     expect(body.subtotal).toBe(49.00);
-    // shipping PVP = 4.29 + 2*1.39 = 7.07 (3 articles, Espanya).
-    // Ha de coincidir EXACTAMENT amb el que mostra el client
-    // (src/hooks/useShippingCosts.js). Abans el servidor aplicava un 4.95
-    // pla perquè la zona del formulari no coincidia amb cap fila de
-    // shipping_config: el comprador veia un import i se li'n cobrava un altre.
-    expect(body.shippingCost).toBe(7.07);
-    // base imposable = (49.00 + 7.07) / 1.21 = 46.34
-    expect(body.baseImponible).toBe(46.34);
-    // iva 21% desglossat = 56.07 - 46.34 = 9.73
-    expect(body.iva).toBe(9.73);
-    // total = (49.00 + 7.07) = 56.07 EUR
-    expect(body.total).toBe(56.07);
+    // El transport va INCLÒS dins del preu: no s'afegeix al total. Es continua
+    // cotitzant i es desa a part com a dada informativa (= 4.29 + 2*1.39 = 7.07
+    // per a 3 articles a Espanya), però el que es cobra és la suma dels preus.
+    expect(body.shippingCost).toBe(0);
+    expect(body.shippingQuoted).toBe(7.07);
+    // base imposable = 49.00 / 1.21 = 40.50
+    expect(body.baseImponible).toBe(40.50);
+    // iva 21% desglossat = 49.00 - 40.50 = 8.50
+    expect(body.iva).toBe(8.50);
+    // total = 49.00 EUR (sense transport)
+    expect(body.total).toBe(49.00);
 
     // Verify Stripe was called with exact PVP total in cents
     expect(mockStripeCreate).toHaveBeenCalledWith(
       expect.objectContaining({
-        amount: 5607,
+        amount: 4900,
         currency: 'eur',
       })
     );

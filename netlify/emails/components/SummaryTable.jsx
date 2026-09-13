@@ -41,7 +41,7 @@ export function SummaryTable({ order }) {
             Transport
           </td>
           <td style={{ padding: '0 0 4px', fontFamily: "'Roboto', Helvetica, Arial, sans-serif", fontSize: '14px', color: '#141414', textAlign: 'right' }}>
-            {shipping}
+            {Number(order.shipping_cost) > 0 ? shipping : 'Inclòs'}
           </td>
         </tr>
         <tr>
