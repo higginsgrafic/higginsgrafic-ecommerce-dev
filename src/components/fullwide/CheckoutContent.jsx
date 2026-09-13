@@ -830,7 +830,9 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
             {discountEnabled && <div style={{ display:'flex', justifyContent:'space-between', alignItems:'baseline', fontSize: isPortraitTablet ? '11pt' : '9.5pt', lineHeight:1.2, color:'#667085' }}><span>Descompte (-{offersConfig.discountRate}%)</span><span style={{ fontVariantNumeric:'tabular-nums' }}>-{descompte.toFixed(2).replace('.',',')}€</span></div>}
             <div style={{ display:'flex', justifyContent:'space-between', alignItems:'baseline', fontSize: isPortraitTablet ? '11pt' : '9.5pt', lineHeight:1.2, color:'#667085' }}><span>Transport</span><span style={{ fontVariantNumeric:'tabular-nums' }}>{transport === 0 ? 'Gratuït' : `${transport.toFixed(2).replace('.',',')}€`}</span></div>
             <div style={{ display:'flex', justifyContent:'space-between', alignItems:'baseline', fontSize: isPortraitTablet ? '11pt' : '9.5pt', lineHeight:1.2, color:'#667085' }}><span>IVA 21%</span><span style={{ fontVariantNumeric:'tabular-nums' }}>{ivaAmount.toFixed(2).replace('.',',')}€</span></div>
-            <div style={{ display:'flex', justifyContent:'space-between', alignItems:'baseline', fontSize:'12.5pt', fontWeight:500, lineHeight:1.2, paddingTop:'6px', borderTop:'1px solid #E6E8EC' }}><span>TOT PLEGAT FA</span><span style={{ fontVariantNumeric:'tabular-nums' }}>{totalFinal.toFixed(2).replace('.',',')}€</span></div>
+            {/* TOT PLEGAT FA es queda en Roboto Condensed encara que la resta
+                de la targeta vagi en Roboto. */}
+            <div style={{ display:'flex', justifyContent:'space-between', alignItems:'baseline', fontFamily:'Roboto Condensed, sans-serif', fontSize:'12.5pt', fontWeight:500, lineHeight:1.2, paddingTop:'6px', borderTop:'1px solid #E6E8EC' }}><span>TOT PLEGAT FA</span><span style={{ fontVariantNumeric:'tabular-nums' }}>{totalFinal.toFixed(2).replace('.',',')}€</span></div>
           </div>
         </div>
         {/* COL 2: Dades d'enviament. Baixa a la fila de sota i ocupa mitja
