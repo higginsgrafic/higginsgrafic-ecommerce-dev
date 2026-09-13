@@ -78,8 +78,6 @@ export default function MegaMenuPanel({
   setActive,
   austenSubcollection,
   setAustenSubcollection,
-  cercadorSelectedColor,
-  setCercadorSelectedColor,
   firstContactSelectedItem,
   humanInsideSelectedItem,
   selectedItemByCollection,
@@ -138,9 +136,6 @@ export default function MegaMenuPanel({
   const page1SelectedItem = active === 'first_contact' ? firstContactSelectedItem
     : active === 'the_human_inside' ? humanInsideSelectedItem
     : (selectedItemByCollection?.[active] ?? null);
-  const portraitLandscapeWidth = typeof window !== 'undefined'
-    ? Math.min(1350, window.innerHeight - 15)
-    : 1024;
   const defaultBleedGuardHeight = effectiveMegaTileSize
     ? `${Math.round(effectiveMegaTileSize * 2 + 37 + Math.max(0, stripeRowPadPx))}px`
     : undefined;
