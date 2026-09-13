@@ -15,7 +15,10 @@ config();
 // Variables d'entorn
 const SUPABASE_URL = process.env.VITE_SUPABASE_URL;
 const SUPABASE_ANON_KEY = process.env.VITE_SUPABASE_ANON_KEY;
-const GELATO_API_KEY = process.env.VITE_GELATO_API_KEY;
+// La clau de Gelato és un secret de servidor i es diu GELATO_API_KEY.
+// (Abans es llegia VITE_GELATO_API_KEY: el prefix VITE_ faria que Vite
+// l'incrustés dins del JavaScript que baixa el navegador.)
+const GELATO_API_KEY = process.env.GELATO_API_KEY || process.env.VITE_GELATO_API_KEY;
 const GELATO_STORE_ID = process.env.VITE_GELATO_STORE_ID;
 
 console.log('🔧 Configuració:');
