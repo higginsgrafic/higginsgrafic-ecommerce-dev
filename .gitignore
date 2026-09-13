@@ -67,3 +67,6 @@ public/contact-sheet/
 public/placeholders/apparel/mockups/**/*.zip
 backup-complet-*.bundle
 lighthouse-report*
+
+# Prova local de comparacio de logos (no es publica ni es versiona)
+docs/comparacio/
