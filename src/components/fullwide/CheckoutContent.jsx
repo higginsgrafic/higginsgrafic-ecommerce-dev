@@ -563,6 +563,7 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
         <h1 style={{ ...HEAD, fontSize: '20pt', margin: '0 0 18px' }}>Pagament</h1>
 
         <div style={bloc}>
+          <div style={titol}>La teva comanda</div>
           {activeItems.map((it, i) => (
             <div key={it.id || i} style={{ display: 'flex', justifyContent: 'space-between', gap: '10px', padding: '6px 0', borderBottom: '1px solid #F0F2F6' }}>
               <span style={{ fontSize: '10.5pt' }}>
@@ -584,6 +585,7 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
         </div>
 
         <div style={bloc}>
+          <div style={titol}>Dades d'enviament</div>
           <div style={{ display: 'grid', gap: '10px' }}>
             {campsEnviament.map(([nom, textEtiqueta]) => (
               <div key={nom}>
@@ -615,6 +617,7 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
         </div>
 
         <div style={bloc}>
+          <div style={titol}>Dades de pagament</div>
           <div style={{ display: 'grid', gap: '10px' }}>
             <div style={capsaTargeta}>
               <CardNumberElement options={estilTargeta} />
@@ -676,7 +679,22 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
           Els elements no s'han redibuixat: són els mateixos, amb els seus
           estils i les seves mides. Només ha canviat la fila on seuen. */}
       <span style={{ ...HEAD, fontSize:'18pt', fontWeight:600, position:'absolute', top:titleY, left: isPortraitTablet ? P_SHIFT_X : SHIFT_X, transform:'translateY(-50%)' }}>PAGAMENT</span>
-      <div style={{ display:'grid', gridTemplateColumns: isPortraitTablet ? '1fr 1fr' : '1fr 1fr 1fr 1fr', columnGap:'24px', rowGap: isPortraitTablet ? `${P_ROW_GAP}px` : '18px', width: groupW, marginLeft: groupX, marginTop: '30px', flex: '0 0 auto', minHeight:0, transform: shiftColsX, alignItems:'start' }}>
+      <div style={{ display:'grid', gridTemplateColumns: isPortraitTablet ? '1fr 1fr' : '1fr 1fr 1fr 1fr', columnGap:'24px', rowGap:'18px', padding:0, width: groupW, marginLeft: groupX, marginBottom: isTabletRecipe ? `${titleGap}px` : undefined, flexShrink:0, minHeight: isTabletRecipe ? '29px' : undefined, alignItems:'center' }}>
+        {/* La teva comanda: tota la fila de dalt */}
+        <div style={{ gridColumn:'1 / -1', display:'flex', alignItems:'center', justifyContent:'flex-start', transform: shiftColsX }}>
+          <span style={{ fontSize:'12pt', fontWeight:500 }}>La teva comanda</span>
+        </div>
+        {/* Dades d'enviament i dades de pagament: les dues columnes de sota */}
+        <div style={{ gridColumn:'span 2', display:'flex', alignItems:'center', justifyContent:'flex-start', transform: shiftColsX }}>
+          <span style={{ fontSize:'12pt', fontWeight:500 }}>Dades d'enviament</span>
+        </div>
+        {!isPortraitTablet && (
+          <div style={{ gridColumn:'span 2', display:'flex', alignItems:'center', justifyContent:'flex-start', transform: shiftColsX }}>
+            <span style={{ fontSize:'12pt', fontWeight:500 }}>Dades de pagament</span>
+          </div>
+        )}
+      </div>
+      <div style={{ display:'grid', gridTemplateColumns: isPortraitTablet ? '1fr 1fr' : '1fr 1fr 1fr 1fr', columnGap:'24px', rowGap: isPortraitTablet ? `${P_ROW_GAP}px` : '18px', width: groupW, marginLeft: groupX, flex: '0 0 auto', minHeight:0, transform: shiftColsX, alignItems:'start' }}>
         {/* COL 1: Cistell + Totals. Ara ocupa tota la fila de dalt. */}
         <div style={{ gridColumn:'1 / -1', display:'flex', flexDirection:'column', minHeight:0 }}>
           <div style={{ flex:'1 1 auto', overflowY:'auto', minHeight:0, maxHeight: isPortraitTablet ? '195px' : undefined }}>
