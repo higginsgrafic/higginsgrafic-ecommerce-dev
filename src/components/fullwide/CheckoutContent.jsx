@@ -268,7 +268,7 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
   // Amplada de la targeta dels totals. Ha anat baixant a cop de retocs: 250
   // (valor original), 240 i 220. Es la unica xifra que la mana.
   const TOTALS_W = 220;
-  const TOTALS_GAP = 28;   // aire entre l'última fitxa i la targeta dels totals
+  const TOTALS_GAP = 14;   // aire entre l'última fitxa i la targeta dels totals (abans 28, la meitat)
   // La roda del ratolí també desplaça la cinta. Sense això, amb ratolí només es
   // pot moure amb Majúscules + roda, que gairebé ningú no endevina.
   const cintaRef = useRef(null);
