@@ -3,6 +3,19 @@
   publish = "dist"
   functions = "netlify/functions"
 
+# Empaquetador de les funcions de servidor.
+#
+# PER QUÈ ESBULD I NO EL QUE HI HAVIA PER DEFECTE (nft)
+#
+# Amb l'empaquetador per defecte, els fitxers que una funció importa
+# indirectament no arribaven al servidor i, sobretot, les plantilles de
+# correu (.jsx) es copiaven SENSE transformar. Node no sap llegir JSX, així
+# que el sistema de correu no podia funcionar mai.
+#
+# Esbuild sí que entén JSX i ho deixa tot en un sol fitxer per funció.
+[functions]
+  node_bundler = "esbuild"
+
 [[headers]]
   for = "/sw.js"
   [headers.values]

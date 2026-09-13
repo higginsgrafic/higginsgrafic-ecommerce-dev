@@ -94,26 +94,26 @@ describe('Tracking token — inputs maliciosos a orders.js', () => {
   // no trobarà res → 404, no 500 ni crash.
 
   it('hashToken no petar amb caràcters especials', async () => {
-    const { hashToken } = await import('../../netlify/functions/_token.js');
+    const { hashToken } = await import('../../netlify/lib/token.js');
     const weird = '!!!@#$%^&*()_+{}[]|\\:";\'<>?,./~`';
     expect(() => hashToken(weird)).not.toThrow();
     expect(hashToken(weird)).toMatch(/^[0-9a-f]{64}$/);
   });
 
   it('hashToken no petar amb string molt llarg', async () => {
-    const { hashToken } = await import('../../netlify/functions/_token.js');
+    const { hashToken } = await import('../../netlify/lib/token.js');
     const long = 'a'.repeat(100000);
     expect(() => hashToken(long)).not.toThrow();
   });
 
   it('hashToken no petar amb unicode/emoticones', async () => {
-    const { hashToken } = await import('../../netlify/functions/_token.js');
+    const { hashToken } = await import('../../netlify/lib/token.js');
     const unicode = '🦄🎉🔥\u0000\uFFFF';
     expect(() => hashToken(unicode)).not.toThrow();
   });
 
   it('hashToken amb null/undefined retorna hash vàlid (no crash)', async () => {
-    const { hashToken } = await import('../../netlify/functions/_token.js');
+    const { hashToken } = await import('../../netlify/lib/token.js');
     // hashToken(null) → hashToken("null") perquè update() converteix a string
     expect(() => hashToken(null)).not.toThrow();
     expect(() => hashToken(undefined)).not.toThrow();
@@ -122,7 +122,7 @@ describe('Tracking token — inputs maliciosos a orders.js', () => {
 
 describe('buildTrackingLink — validació d\'URL', () => {
   it('no permet javascript: scheme com a siteUrl', async () => {
-    const { buildTrackingLink } = await import('../../netlify/functions/_token.js');
+    const { buildTrackingLink } = await import('../../netlify/lib/token.js');
     // Si un atacant pot controlar SITE_URL, podria injectar javascript:
     // Nota: això és un test que documenta el risc — actualment buildTrackingLink
     // no valida l'scheme. Si falla, és una vulnerabilitat real.
@@ -135,7 +135,7 @@ describe('buildTrackingLink — validació d\'URL', () => {
   });
 
   it('siteUrl amb path s\'adjunta correctament', async () => {
-    const { buildTrackingLink } = await import('../../netlify/functions/_token.js');
+    const { buildTrackingLink } = await import('../../netlify/lib/token.js');
     const link = buildTrackingLink('https://example.com/base', 'tok');
     expect(link).toContain('trackingToken=tok');
   });

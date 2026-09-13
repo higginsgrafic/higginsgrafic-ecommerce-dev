@@ -1,9 +1,9 @@
 import Stripe from 'stripe';
 import { createClient } from '@supabase/supabase-js';
-import { checkRateLimit } from './_rate-limit.js';
-import { generateTrackingToken, hashToken, getTokenExpiry, buildTrackingLink } from './_token.js';
-import { jsonResponse } from './_cors.js';
-import { quoteShipping } from './_shipping.js';
+import { checkRateLimit } from '../lib/rate-limit.js';
+import { generateTrackingToken, hashToken, getTokenExpiry, buildTrackingLink } from '../lib/token.js';
+import { jsonResponse } from '../lib/cors.js';
+import { quoteShipping } from '../lib/shipping.js';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 

@@ -55,11 +55,11 @@ vi.mock('@supabase/supabase-js', () => ({
   }),
 }));
 
-vi.mock('../../netlify/functions/_gelato.js', () => ({
+vi.mock('../../netlify/lib/gelato.js', () => ({
   createGelatoOrderServer: mockGelatoCreate,
 }));
 
-vi.mock('../../netlify/functions/_email.js', () => ({
+vi.mock('../../netlify/lib/email.js', () => ({
   sendOrderEmail: mockSendOrderEmail,
 }));
 

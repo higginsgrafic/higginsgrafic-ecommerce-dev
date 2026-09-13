@@ -1,9 +1,9 @@
 import { createClient } from '@supabase/supabase-js';
-import { sendOrderEmail } from './_notify.js';
-import { verifyAdmin, verifyUser } from './_auth.js';
-import { checkRateLimit } from './_rate-limit.js';
-import { hashToken, isTokenExpired } from './_token.js';
-import { jsonResponse } from './_cors.js';
+import { sendOrderEmail } from '../lib/notify.js';
+import { verifyAdmin, verifyUser } from '../lib/auth.js';
+import { checkRateLimit } from '../lib/rate-limit.js';
+import { hashToken, isTokenExpired } from '../lib/token.js';
+import { jsonResponse } from '../lib/cors.js';
 
 const SUPABASE_URL = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
 const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -186,7 +186,7 @@ export async function handler(event, context) {
     }
   }
 
-  // PATCH: Update order status (Admin only — via _auth.js staff table lookup)
+  // PATCH: Update order status (Admin only — via netlify/lib/auth.js staff table lookup)
   if (method === 'PATCH') {
     try {
       const { authorized, error: authError } = await verifyAdmin(event);

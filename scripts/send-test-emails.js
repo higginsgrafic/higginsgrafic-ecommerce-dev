@@ -1,7 +1,7 @@
 import dotenv from 'dotenv';
 dotenv.config();
 
-import { sendOrderEmail } from '../netlify/functions/_email.js';
+import { sendOrderEmail } from '../netlify/lib/email.js';
 
 const RECIPIENT = 'higginsgrafic@gmail.com';
 
