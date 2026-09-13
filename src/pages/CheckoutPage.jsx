@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import SEO from '@/components/SEO';
 import CheckoutContent from '@/components/fullwide/CheckoutContent';
+import MegaslideEndGuide from '@/components/dev/MegaslideEndGuide';
 import { useCart } from '@/contexts/CartContext';
 
 /**
@@ -125,6 +126,10 @@ export default function CheckoutPage() {
           isPortraitTablet={esVertical}
         />
       </div>
+      {/* Guia de desenvolupament: dibuixa una línia allà on acaba el mega-slide
+          quan s'obre el cistell. No la veu mai cap client: només surt en
+          desenvolupament o si s'afegeix ?megaslide=1 a l'adreça. */}
+      <MegaslideEndGuide />
     </motion.div>
   );
 }
