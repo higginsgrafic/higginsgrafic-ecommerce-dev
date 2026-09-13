@@ -713,7 +713,7 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
         {/* COL 2: Dades d'enviament. Baixa a la fila de sota, ocupa mitja
             amplada i va 200px més avall perquè quedi per sota del mega-slide
             quan el panell és obert. */}
-        <div style={{ gridColumn:'span 2', marginTop: isPhone ? undefined : '200px', display:'flex', flexDirection:'column', minHeight:0, overflow:'visible', justifyContent: 'flex-start', gap: fieldGap }}>
+        <div style={{ gridColumn:'span 2', marginTop: isPhone ? undefined : '150px', display:'flex', flexDirection:'column', minHeight:0, overflow:'visible', justifyContent: 'flex-start', gap: fieldGap }}>
           <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', columnGap:'10px' }}>
             <div><input type="text" name="firstName" value={formData.firstName} onChange={handleChange} placeholder="Nom" style={inputStyle} />{formErrors.firstName && <div style={errorStyle}>{formErrors.firstName}</div>}</div>
             <div><input type="text" name="lastName" value={formData.lastName} onChange={handleChange} placeholder="Cognoms" style={inputStyle} />{formErrors.lastName && <div style={errorStyle}>{formErrors.lastName}</div>}</div>
@@ -733,7 +733,7 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
         {/* COL 3: Pagament + Factura. Al vertical és la cel·la esquerra de la
             segona filera (sota la comanda); termes + botó hi van al costat, en
             una cel·la pròpia, sota les dades d'enviament. */}
-        <div style={{ gridColumn:'span 2', marginTop: isPhone ? undefined : '200px', display:'flex', flexDirection:'column', minHeight:0, overflow:'visible', position: isPortraitTablet ? undefined : 'relative', gap: isNarrowForm ? '1px' : undefined }}>
+        <div style={{ gridColumn:'span 2', marginTop: isPhone ? undefined : '150px', display:'flex', flexDirection:'column', minHeight:0, overflow:'visible', position: isPortraitTablet ? undefined : 'relative', gap: isNarrowForm ? '1px' : undefined }}>
           <div style={{ display:'flex', flexDirection:'column', gap: isNarrowForm ? '1px' : undefined }}>
             {/* Al vertical només hi ha dues columnes de títols, així que aquest
                 penja del seu bloc, no de la banda de dalt. */}
