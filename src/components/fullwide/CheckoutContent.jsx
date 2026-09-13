@@ -248,16 +248,18 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
   // de productes). El fan servir l'escriptori i la tauleta vertical, tal qual.
   const COLUMNES_TOP = 90;
 
-  // ===== LLISTAT DE PRODUCTES DEL CISTELL =====
-  // El cistell no ha de manar sobre el formulari: la llista té files compactes
-  // (36px de miniatura + 6px de coixí a dalt i a baix + 1px de ratlla = 49px) i
-  // un sostre de dues files. Amb més productes, la llista es desplaça per dins
-  // i el formulari de pagament no es mou mai de lloc.
-  // L'aire que queda entre aquest bloc i el formulari NO es toca: és on acaba
-  // el mega-slide quan s'obre el cistell, i ha de quedar net.
-  const ALCADA_FILA = 49;
-  const FILES_VISIBLES = 2;
-  const ALCADA_LLISTAT = ALCADA_FILA * FILES_VISIBLES;
+  // ===== CISTELL DEL CHECKOUT: FITXES EN CINTA =====
+  // El cistell no és una llista vertical (que creixia cap avall i empenyia el
+  // formulari) sinó una cinta de fitxes que es desplaça de costat, amb la
+  // targeta dels totals clavada a la dreta. Les fitxes hi passen per sota.
+  // Amb aquest mecanisme el cistell ocupa una sola franja d'alçada fixa, faci
+  // els productes que faci, i el formulari de pagament no es mou mai de lloc.
+  // L'aire de sota el bloc NO es toca: és on acaba el mega-slide quan s'obre el
+  // cistell, i ha de quedar net.
+  const FITXA_W = 196;     // amplada d'una fitxa de producte
+  const FITXA_H = 62;      // 44px de miniatura + 8px de coixí a dalt i a baix + 2px de vores
+  const TOTALS_W = 250;    // amplada de la targeta dels totals
+  const CINTA_H = FITXA_H + 4;  // la franja: la fitxa més un pèl d'aire
 
   // Valors derivats segons la variant que es renderitza: l'horitzontal dona
   // exactament els mateixos números que donava abans, l'escriptori res.
@@ -742,16 +744,21 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
           PAGAMENT, que va posicionat absolut i no ocupa lloc. */}
       <div style={{ marginTop:'34px', width: groupW, marginLeft: groupX, flexShrink:0, minHeight: isTabletRecipe ? '29px' : '24px', marginBottom: isTabletRecipe ? `${titleGap}px` : undefined }} />
       <div style={{ display:'grid', gridTemplateColumns: isPortraitTablet ? '1fr 1fr' : '1fr 1fr 1fr 1fr', columnGap:'24px', rowGap: isPortraitTablet ? `${P_ROW_GAP}px` : '18px', width: groupW, marginLeft: groupX, marginTop: productesLift, flex: '0 0 auto', minHeight:0, transform: shiftColsX }}>
-        {/* COL 1: Cistell + Totals. Ara ocupa tota la fila de dalt. */}
-        <div style={{ gridColumn:'1 / -1', display:'flex', flexDirection:'column', minHeight:0 }}>
-          <div style={{ position:'relative', flex:'0 0 auto', minHeight:0 }}>
-            <div style={{ overflowY:'auto', minHeight:0, maxHeight:`${ALCADA_LLISTAT}px` }}>
+        {/* COL 1: el cistell. Una cinta de fitxes que es desplaça de costat amb
+            la targeta dels totals clavada a la dreta, per sobre de les fitxes
+            (que hi passen per sota). Ocupa una franja d'alçada fixa: el
+            formulari de pagament no es mou mai, faci els productes que faci. */}
+        <div style={{ gridColumn:'1 / -1', position:'relative', display:'flex', minHeight:0 }}>
+          {/* Cinta de fitxes. El coixí de la dreta fa l'amplada de la targeta
+              dels totals: sense ell, l'últim producte quedaria sempre a sota
+              i no s'hi podria arribar mai. */}
+          <div style={{ flex:'1 1 auto', minWidth:0, display:'flex', alignItems:'center', gap:'10px', minHeight:`${CINTA_H}px`, overflowX:'auto', overflowY:'hidden', paddingRight:`${TOTALS_W + 10}px`, scrollbarWidth:'thin' }}>
             {activeItems.map((item, idx) => {
               const ip = parseFloat(String(item.price).replace('€','').replace(/\s/g,'').replace(',','.'))||0;
               const q = item.qty||1;
               return (
-                <div key={`c-${item.id}-${idx}`} style={{ display:'grid', gridTemplateColumns:'36px 1fr auto', columnGap:'10px', alignItems:'center', padding:'6px 0', borderBottom:'1px solid #EEF0F3' }}>
-                  <div style={{ width:'36px', height:'36px', borderRadius:'4px', background:'#F3F4F6', overflow:'hidden', flexShrink:0, display:'flex', alignItems:'center', justifyContent:'center' }}>
+                <div key={`c-${item.id}-${idx}`} style={{ flex:'0 0 auto', width:`${FITXA_W}px`, height:`${FITXA_H}px`, boxSizing:'border-box', display:'flex', alignItems:'center', gap:'10px', border:'1px solid #E6E8EC', borderRadius:'6px', background:'#FFFFFF', padding:'8px 10px' }}>
+                  <div style={{ width:'44px', height:'44px', borderRadius:'4px', background:'#F3F4F6', overflow:'hidden', flexShrink:0, display:'flex', alignItems:'center', justifyContent:'center' }}>
                     {(() => {
                       const mockup = mockupSrc(item);
                       return mockup
@@ -759,30 +766,25 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
                         : <img src={tshirtSrc(item.color)} alt="" loading="lazy" decoding="async" style={{ width:'85%', height:'85%', objectFit:'contain' }} />;
                     })()}
                   </div>
-                  <div style={{ overflow:'hidden' }}>
-                    <div style={{ fontSize:'10.5pt', lineHeight:1.2, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{item.title||item.name||'Producte'}</div>
-                    <div style={{ fontSize:'9pt', lineHeight:1.2, color:'#667085' }}>Talla: {item.size||'-'} · Qty: {q}</div>
+                  <div style={{ minWidth:0, flex:'1 1 auto' }}>
+                    <div style={{ fontSize:'10pt', lineHeight:1.2, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{item.title||item.name||'Producte'}</div>
+                    <div style={{ fontSize:'8.5pt', lineHeight:1.3, color:'#667085' }}>Talla {item.size||'-'} · {q} u.</div>
+                    <div style={{ fontSize:'10.5pt', lineHeight:1.3, fontVariantNumeric:'tabular-nums' }}>{(ip*q).toFixed(2).replace('.',',')}€</div>
                   </div>
-                  <div style={{ fontSize:'10.5pt', lineHeight:1.2, fontVariantNumeric:'tabular-nums', whiteSpace:'nowrap' }}>{(ip*q).toFixed(2).replace('.',',')}€</div>
                 </div>
               );
             })}
-            </div>
-            {/* Si hi ha més productes dels que es veuen, un degradat suaument
-                blanc avisa que la llista continua. Sense aquest senyal, algú
-                podria pensar que només té dues coses al cistell. */}
-            {activeItems.length > FILES_VISIBLES && (
-              <div style={{ position:'absolute', left:0, right:0, bottom:0, height:'16px', background:'linear-gradient(to bottom, rgba(255,255,255,0), #FFFFFF)', pointerEvents:'none' }} />
-            )}
           </div>
-          <div style={{ flexShrink:0, paddingTop:'12px', borderTop:'1px solid #E6E8EC', marginTop:'8px' }}>
-            <div style={{ display:'flex', flexWrap:'wrap', alignItems:'baseline', columnGap:'14px', rowGap:'2px', fontSize:'10pt', lineHeight:1.25, color:'#667085' }}>
+          {/* Targeta dels totals: opaca i amb una ombra cap a l'esquerra, perquè
+              es vegi que les fitxes li passen per sota. */}
+          <div style={{ position:'absolute', top:0, bottom:0, right:0, width:`${TOTALS_W}px`, boxSizing:'border-box', display:'flex', flexDirection:'column', justifyContent:'center', gap:'4px', padding:'8px 12px', background:'#FFFFFF', border:'1px solid #E6E8EC', borderRadius:'6px', boxShadow:'-12px 0 16px -12px rgba(16,24,40,0.20)' }}>
+            <div style={{ display:'flex', flexWrap:'wrap', alignItems:'baseline', columnGap:'12px', rowGap:'2px', fontSize:'9.5pt', lineHeight:1.25, color:'#667085' }}>
               <span>Subtotal <span style={{ fontVariantNumeric:'tabular-nums' }}>{totalArticles.toFixed(2).replace('.',',')}€</span></span>
               {discountEnabled && <span>Descompte (-{offersConfig.discountRate}%) <span style={{ fontVariantNumeric:'tabular-nums' }}>-{descompte.toFixed(2).replace('.',',')}€</span></span>}
               <span>Transport <span style={{ fontVariantNumeric:'tabular-nums' }}>{shipping === 0 ? 'Gratuït' : `${shipping.toFixed(2).replace('.',',')}€`}</span></span>
               <span>IVA 21% (inclòs) <span style={{ fontVariantNumeric:'tabular-nums' }}>{ivaAmount.toFixed(2).replace('.',',')}€</span></span>
             </div>
-            <div style={{ display:'flex', justifyContent:'space-between', fontSize:'13pt', fontWeight:500, lineHeight:1.2, padding:'6px 0 0', borderTop:'1px solid #E6E8EC', marginTop:'5px' }}><span>Total</span><span style={{ fontVariantNumeric:'tabular-nums' }}>{totalFinal.toFixed(2).replace('.',',')}€</span></div>
+            <div style={{ display:'flex', justifyContent:'space-between', fontSize:'12.5pt', fontWeight:500, lineHeight:1.2, paddingTop:'5px', borderTop:'1px solid #E6E8EC' }}><span>Total</span><span style={{ fontVariantNumeric:'tabular-nums' }}>{totalFinal.toFixed(2).replace('.',',')}€</span></div>
           </div>
         </div>
         {/* COL 2: Dades d'enviament. Baixa a la fila de sota i ocupa mitja
