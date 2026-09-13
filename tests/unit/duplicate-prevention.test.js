@@ -31,7 +31,7 @@ vi.mock('@supabase/supabase-js', () => ({
   createClient: () => ({
     from: (table) => {
       if (table === 'processed_stripe_events') {
-        const chain = { eq: () => chain, single: () => Promise.resolve(_eventsSelectResult) };
+        const chain = { eq: () => chain, single: () => Promise.resolve(_eventsSelectResult), maybeSingle: () => Promise.resolve(_eventsSelectResult) };
         return {
           select: () => chain,
           insert: (payload) => {
@@ -45,13 +45,14 @@ vi.mock('@supabase/supabase-js', () => ({
       const ordersChain = {
         eq: () => ordersChain,
         single: () => Promise.resolve(_ordersSelectResult),
+        maybeSingle: () => Promise.resolve(_ordersSelectResult),
         select: () => ordersChain,
       };
       return {
         select: () => ordersChain,
         update: () => ({
           eq: () => ({
-            select: () => ({ single: () => Promise.resolve(_ordersUpdateResult) }),
+            select: () => ({ single: () => Promise.resolve(_ordersUpdateResult), maybeSingle: () => Promise.resolve(_ordersUpdateResult) }),
             then: (resolve) => resolve(_ordersUpdateResult),
           }),
         }),

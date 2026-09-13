@@ -137,11 +137,14 @@ export async function handler(event, context) {
 
   // Idempotency: check if this event has already been processed
   if (supabase) {
+    // maybeSingle(): la primera vegada no hi ha cap fila i això és normal, no
+    // un error. Amb single() Supabase peta i el codi depenia d'ignorar
+    // l'error per funcionar.
     const { data: existingEvent } = await supabase
       .from('processed_stripe_events')
       .select('id, result')
       .eq('event_id', stripeEvent.id)
-      .single();
+      .maybeSingle();
 
     if (existingEvent) {
       console.log('[stripe-webhook] Event already processed:', stripeEvent.id, '— skip');
@@ -158,12 +161,17 @@ export async function handler(event, context) {
         console.log('[stripe-webhook] Payment succeeded:', paymentIntent.id);
 
         if (supabase) {
+          // maybeSingle(): si no hi ha cap comanda amb aquest pagament, no és
+          // cap error, simplement no n'hi ha. Amb single() Supabase peta amb
+          // "Cannot coerce the result to a single JSON object", la funció
+          // responia 500 i Stripe tornava a enviar l'avís una i una altra
+          // vegada durant dies, sense poder-lo resoldre mai.
           const { data, error } = await supabase
             .from('orders')
             .update({ status: 'confirmada' })
             .eq('payment_intent_id', paymentIntent.id)
             .select()
-            .single();
+            .maybeSingle();
 
           if (error) {
             console.error('[stripe-webhook] Error updating order:', error.message);
@@ -203,14 +211,16 @@ export async function handler(event, context) {
             console.error('[stripe-webhook] Error updating failed order:', failError.message);
           } else {
             console.log('[stripe-webhook] Order marked as cancel_lada for PI:', paymentIntent.id);
-          const { data: failData } = await supabase
-            .from('orders')
-            .select()
-            .eq('payment_intent_id', paymentIntent.id)
-            .single();
-          if (failData) {
-            await sendOrderEmail('order_failed', failData);
-          }
+            // maybeSingle() pel mateix motiu que més amunt: potser no hi ha
+            // cap comanda amb aquest pagament, i això no és cap error.
+            const { data: failData } = await supabase
+              .from('orders')
+              .select()
+              .eq('payment_intent_id', paymentIntent.id)
+              .maybeSingle();
+            if (failData) {
+              await sendOrderEmail('order_failed', failData);
+            }
           }
         }
         break;
