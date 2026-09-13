@@ -61,7 +61,9 @@ export default function CheckoutPage() {
       style={{
         minHeight: '100%',
         width: '100%',
-        backgroundColor: '#F4F6F8',
+        // Sense fons propi: la pàgina és blanca com la resta del lloc. Abans hi
+        // havia un gris (#F4F6F8) que feia de marc per a les targetes blanques,
+        // però el formulari ja es distingeix pels contorns de cada camp.
         position: 'relative',
         overflowX: 'hidden',
       }}
