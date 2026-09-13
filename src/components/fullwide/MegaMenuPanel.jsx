@@ -154,6 +154,31 @@ export default function MegaMenuPanel({
     ? `${Math.max(0, Math.round(p1ContentBottomPx + P1_STRIPE_BOTTOM_GAP - 64))}px`
     : guardHeightPxDefault;
 
+  // El rebot en obrir: l'alcada de dalt nome s es bona quan ja hi ha la mesura del
+  // contingut de la pagina 1. Mentre no hi es, el panell s'ensenyava amb l'alcada
+  // de reserva i DESPRES canviava (428 -> 405 -> 365): allo es veia com un rebot.
+  // Solucio: el panell es munta pero no es veu fins que la mesura hi es, aixi que
+  // apareix directament amb l'alcada bona, com fa la vertical amb els seus 269px.
+  const [mesuraLlista, setMesuraLlista] = useState(false);
+  useEffect(() => {
+    if (isPortraitTablet || paymentFillsScreen) {
+      setMesuraLlista(true);
+      return undefined;
+    }
+    if (p1ContentBottomPx == null) return undefined;
+    // La mesura no arriba d'un sol cop: a l'apaïsada fa 428 -> 405 -> 365. Nome s
+    // la donem per bona quan fa estona que no canvia; cada mesura nova reinicia
+    // el comptador.
+    const t = window.setTimeout(() => setMesuraLlista(true), 160);
+    return () => window.clearTimeout(t);
+  }, [isPortraitTablet, paymentFillsScreen, p1ContentBottomPx]);
+
+  // Xarxa de seguretat: si alguna cosa falla, el panell s'acaba mostrant.
+  useEffect(() => {
+    const t = window.setTimeout(() => setMesuraLlista(true), 900);
+    return () => window.clearTimeout(t);
+  }, []);
+
   return (
     <div className="relative">
       <div
@@ -162,6 +187,7 @@ export default function MegaMenuPanel({
         style={{
           overflow: 'visible',
           backgroundColor: '#ffffff',
+          visibility: mesuraLlista ? 'visible' : 'hidden',
           ...(megaFullScreen ? {
             minHeight: '100vh',
           } : {})
