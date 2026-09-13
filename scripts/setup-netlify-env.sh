@@ -71,6 +71,19 @@ else
   NETLIFY="npx --yes netlify-cli"
 fi
 
+# Comprovació prèvia. Si no hi ha sessió de Netlify, el CLI obre un diàleg
+# interactiu i l'script es quedaria parat sense dir res.
+echo "🔎 Comprovant la sessió de Netlify..."
+if ! $NETLIFY status > /tmp/netlify-status-out.txt 2>&1; then
+  echo "❌ El CLI de Netlify no ha respost correctament:"
+  tail -5 /tmp/netlify-status-out.txt | sed 's/^/     /'
+  echo ""
+  echo "   Solució: comprova que el projecte està enllaçat i que has iniciat sessió:"
+  echo "     ./node_modules/.bin/netlify login"
+  echo "     ./node_modules/.bin/netlify link"
+  exit 1
+fi
+
 echo "📦 Pujant variables d'entorn a Netlify (context: $CONTEXT)"
 echo "   Origen: $ENV_FILE"
 echo ""
@@ -99,8 +112,13 @@ for name in "${VARS[@]}"; do
       ;;
   esac
 
+  # --force és OBLIGATORI en aquest script.
+  # Sense --force, el CLI detecta que la variable ja existeix a Netlify i
+  # obre un diàleg interactiu ("Do you want to overwrite it? (y/N)").
+  # Com que l'script s'executa en bucle, es quedava parat a la primera
+  # variable que ja existia esperant una tecla. Amb --force no pregunta res.
   printf '  pujant %s... ' "$name"
-  if $NETLIFY env:set "$name" "$value" --context "$CONTEXT" > /tmp/netlify-env-out.txt 2>&1; then
+  if $NETLIFY env:set "$name" "$value" --context "$CONTEXT" --force > /tmp/netlify-env-out.txt 2>&1; then
     echo "✅"
     pujades=$((pujades + 1))
   else
