@@ -252,6 +252,24 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
   // de productes). El fan servir l'escriptori i la tauleta vertical, tal qual.
   const COLUMNES_TOP = 90;
 
+  // ===== FRANJA DE FITXES: MATEIX CRITERI QUE A LA VERTICAL =====
+  // A la vertical la franja va de la guia verda (titol + 20) a la blava (final
+  // del mega-slide - 20) i te una alcada fixa. Aqui es construeix amb el mateix
+  // criteri: alcada fixa, presa a la mida de referencia de cada format.
+  //   apaisada 1024x768:   guies 138 i 316   -> 178px, comenca a 138 (7px mes
+  //                        avall d'on naixia, que era 131)
+  //   escriptori 1440x1000: guies 161 i 397  -> 236px, comenca a 161 (5px mes
+  //                        amunt d'on naixia, que era 166)
+  // I el formulari es queda on era: del seu marge se'n treu el que ha crescut la
+  // franja (24px a l'apaisada, 70px a l'escriptori).
+  const L_FITXA_H = 178;
+  const L_FRANJA_TOP = 7;
+  const L_FRANJA_CREIX = 24;
+  const D_FITXA_H = 236;
+  const D_FRANJA_TOP = -5;
+  const D_FRANJA_CREIX = 70;
+  const D_COLUMNES_TOP = COLUMNES_TOP - D_FRANJA_CREIX;
+
   // ===== CISTELL DEL CHECKOUT: FITXES EN CINTA =====
   // El cistell no és una llista vertical (que creixia cap avall i empenyia el
   // formulari) sinó una cinta de fitxes verticals (imatge a dalt, informació a
@@ -310,7 +328,9 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
   const productesLift = isLandscapeTablet ? `-${L_PRODUCTES_LIFT}px` : undefined;
   const columnesTop = isPhone
     ? undefined
-    : (isLandscapeTablet ? `${L_COLUMNES_TOP}px` : `${COLUMNES_TOP}px`);
+    : (isLandscapeTablet
+      ? `${L_COLUMNES_TOP - L_FRANJA_CREIX}px`
+      : (isPortraitTablet ? `${COLUMNES_TOP}px` : `${D_COLUMNES_TOP}px`));
 
   const ROW_H = 32.8;
   const V_GUTTER = 2.8;
@@ -849,7 +869,7 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
             La franja porta un degradat de #F9FAFB (a l'esquerra) a #FFFFFF,
             d'una banda a l'altra del contingut (del logo a la icona de
             l'usuari), a totes les versions. */}
-        <div style={{ gridColumn:'1 / -1', position:'relative', display:'flex', minHeight:0, background:'linear-gradient(to right, #F9FAFB 0%, #FFFFFF 100%)' }}>
+        <div style={{ gridColumn:'1 / -1', position:'relative', display:'flex', minHeight:0, marginTop: isPortraitTablet ? undefined : (isLandscapeTablet ? `${L_FRANJA_TOP}px` : `${D_FRANJA_TOP}px`), background:'linear-gradient(to right, #F9FAFB 0%, #FFFFFF 100%)' }}>
           {/* Cinta de fitxes. L'espaiador del davant empeny les fitxes cap a la
               dreta (quan n'hi ha poques) i s'arronsa a zero quan no hi caben:
               així sempre creixen cap a l'esquerra, des de la targeta dels
@@ -865,8 +885,8 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
               const ip = parseFloat(String(item.price).replace('€','').replace(/\s/g,'').replace(',','.'))||0;
               const q = item.qty||1;
               return (
-                <div key={`c-${item.id}-${idx}`} style={{ flex:'0 0 auto', width:`${FITXA_W}px`, height: isPortraitTablet ? `${P_FITXA_H}px` : undefined, boxSizing:'border-box', display:'flex', flexDirection:'column', alignItems:'center', gap:'4px', border:'1px solid #E6E8EC', borderRadius:'6px', background:'#FFFFFF', padding:'8px' }}>
-                  <div style={{ width:'100%', height: isPortraitTablet ? undefined : '88px', flex: isPortraitTablet ? '1 1 auto' : '0 0 auto', minHeight:0, overflow:'hidden', flexShrink:0, display:'flex', alignItems:'center', justifyContent:'center' }}>
+                <div key={`c-${item.id}-${idx}`} style={{ flex:'0 0 auto', width:`${FITXA_W}px`, height: isPortraitTablet ? `${P_FITXA_H}px` : (isLandscapeTablet ? `${L_FITXA_H}px` : `${D_FITXA_H}px`), boxSizing:'border-box', display:'flex', flexDirection:'column', alignItems:'center', gap:'4px', border:'1px solid #E6E8EC', borderRadius:'6px', background:'#FFFFFF', padding:'8px' }}>
+                  <div style={{ width:'100%', height: undefined, flex:'1 1 auto', minHeight:0, overflow:'hidden', flexShrink:0, display:'flex', alignItems:'center', justifyContent:'center' }}>
                     <img src={imatgeArticle(item)} alt="" loading="lazy" decoding="async" style={{ width:'100%', height:'100%', objectFit:'contain' }} />
                   </div>
                   <div style={{ width:'100%', fontSize:'9pt', lineHeight:1.2, textAlign:'center', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{item.title||item.name||'Producte'}</div>
