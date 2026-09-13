@@ -250,6 +250,7 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
   // cistell, i ha de quedar net.
   const FITXA_W = 118;     // amplada d'una fitxa (estreta: la fitxa es vertical)
   const GAP_FITXES = 10;   // separació entre fitxes
+  const P_FITXA_H = 228;   // alcada de la fitxa a la vertical: la que hi ha entre la guia verda i la blava
   const TOTALS_W = 250;    // amplada de la targeta dels totals
   const TOTALS_GAP = 28;   // aire entre l'última fitxa i la targeta dels totals
   // La roda del ratolí també desplaça la cinta. Sense això, amb ratolí només es
@@ -787,7 +788,7 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
           tauletes), de manera que tot el que hi ha a sota no es mou ni un
           píxel. Els 34px de dalt són els que aparten el contingut del títol
           PAGAMENT, que va posicionat absolut i no ocupa lloc. */}
-      <div style={{ marginTop:'34px', flexShrink:0, minHeight: isTabletRecipe ? '29px' : '24px', marginBottom: isTabletRecipe ? `${titleGap}px` : undefined }} />
+      <div style={{ marginTop:'34px', flexShrink:0, minHeight: isPortraitTablet ? 0 : (isTabletRecipe ? '29px' : '24px'), marginBottom: isPortraitTablet ? 0 : (isTabletRecipe ? `${titleGap}px` : undefined) }} />
       <div style={{ display:'grid', gridTemplateColumns: isPortraitTablet ? '1fr 1fr' : '1fr 1fr 1fr 1fr', columnGap:'24px', rowGap: isPortraitTablet ? `${P_ROW_GAP}px` : '18px', marginTop: productesLift, flex: '0 0 auto', minHeight:0, transform: shiftColsX }}>
         {/* COL 1: el cistell. Una cinta de fitxes que es desplaça de costat amb
             la targeta dels totals clavada a la dreta, per sobre de les fitxes
@@ -805,8 +806,8 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
               const ip = parseFloat(String(item.price).replace('€','').replace(/\s/g,'').replace(',','.'))||0;
               const q = item.qty||1;
               return (
-                <div key={`c-${item.id}-${idx}`} style={{ flex:'0 0 auto', width:`${FITXA_W}px`, boxSizing:'border-box', display:'flex', flexDirection:'column', alignItems:'center', gap:'4px', border:'1px solid #E6E8EC', borderRadius:'6px', background:'#FFFFFF', padding:'8px' }}>
-                  <div style={{ width:'100%', height:'88px', overflow:'hidden', flexShrink:0, display:'flex', alignItems:'center', justifyContent:'center' }}>
+                <div key={`c-${item.id}-${idx}`} style={{ flex:'0 0 auto', width:`${FITXA_W}px`, height: isPortraitTablet ? `${P_FITXA_H}px` : undefined, boxSizing:'border-box', display:'flex', flexDirection:'column', alignItems:'center', gap:'4px', border:'1px solid #E6E8EC', borderRadius:'6px', background:'#FFFFFF', padding:'8px' }}>
+                  <div style={{ width:'100%', height: isPortraitTablet ? undefined : '88px', flex: isPortraitTablet ? '1 1 auto' : '0 0 auto', minHeight:0, overflow:'hidden', flexShrink:0, display:'flex', alignItems:'center', justifyContent:'center' }}>
                     <img src={imatgeArticle(item)} alt="" loading="lazy" decoding="async" style={{ width:'100%', height:'100%', objectFit:'contain' }} />
                   </div>
                   <div style={{ width:'100%', fontSize:'9pt', lineHeight:1.2, textAlign:'center', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{item.title||item.name||'Producte'}</div>
