@@ -59,7 +59,7 @@ export default function CheckoutPage() {
       exit={{ x: '100%' }}
       transition={{ type: 'tween', ease: [0.32, 0.72, 0, 1], duration: 0.42 }}
       style={{
-        minHeight: '100vh',
+        minHeight: '100%',
         width: '100%',
         backgroundColor: '#F4F6F8',
         position: 'relative',
@@ -71,35 +71,10 @@ export default function CheckoutPage() {
         description="Completa la compra de la teva comanda a Higgins GRÀFIC."
       />
 
-      {/* La capçalera del mega-slide queda amagada mentre es paga (vegeu
-          App.jsx): aquí dalt hi ha només una manera discreta de tornar. */}
-      <button
-        type="button"
-        onClick={() => navigate('/')}
-        style={{
-          position: 'fixed',
-          top: '18px',
-          left: '18px',
-          zIndex: 50,
-          display: 'inline-flex',
-          alignItems: 'center',
-          gap: '8px',
-          padding: '8px 14px',
-          border: '1px solid #E6E8EC',
-          borderRadius: '4px',
-          backgroundColor: '#FFFFFF',
-          color: '#4A5057',
-          fontFamily: 'Oswald, sans-serif',
-          fontSize: '11pt',
-          textTransform: 'uppercase',
-          letterSpacing: '0.4px',
-          cursor: 'pointer',
-        }}
-      >
-        ← Tornar a la botiga
-      </button>
-
-      <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: '72px 24px 32px' }}>
+      {/* El contingut va per sota de la capçalera del mega-slide: el marge de
+          dalt el posa App (--appHeaderOffset) i aquí hi afegim una mica d'aire
+          perquè el formulari quedi clarament dessota. */}
+      <div style={{ minHeight: '60vh', width: '100%', maxWidth: '1120px', margin: '0 auto', padding: '28px 24px 48px', boxSizing: 'border-box' }}>
         <CheckoutContent
           cartItems={cartItems}
           setCartItems={setCartItems}
