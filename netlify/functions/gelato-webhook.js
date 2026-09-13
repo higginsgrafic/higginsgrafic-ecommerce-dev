@@ -25,7 +25,7 @@
  */
 
 import { createClient } from '@supabase/supabase-js';
-import { sendOrderEmail } from './_email.js';
+import { sendOrderEmail } from './_notify.js';
 import { jsonResponse } from './_cors.js';
 
 const SUPABASE_URL = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;

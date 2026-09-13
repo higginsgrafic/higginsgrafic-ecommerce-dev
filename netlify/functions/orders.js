@@ -1,5 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
-import { sendOrderEmail } from './_email.js';
+import { sendOrderEmail } from './_notify.js';
 import { verifyAdmin, verifyUser } from './_auth.js';
 import { checkRateLimit } from './_rate-limit.js';
 import { hashToken, isTokenExpired } from './_token.js';
