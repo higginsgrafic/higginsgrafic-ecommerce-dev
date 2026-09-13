@@ -768,7 +768,9 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
           <div style={{ display:'flex', flexDirection:'column', flex:'1 1 auto', gap: isNarrowForm ? '1px' : undefined }}>
             {/* Pagament */}
             <div style={{ display:'grid', rowGap: '8px' }}>
-              <div style={{ background:'#FFFFFF', overflow:'hidden' }}>
+              {/* El bloc de la targeta porta contorn propi: des que la pàgina és
+                  blanca, sense la vora no es distingiria del fons. */}
+              <div style={{ background:'#FFFFFF', border:'1px solid #D8DDE3', borderRadius:'6px', overflow:'hidden' }}>
                 <div style={{ padding: isNarrowForm ? '6px 10px' : '10px 12px', display:'flex', alignItems:'center', gap:'8px', fontSize: isNarrowForm ? '9pt' : '11pt', fontWeight:500, color:'#4A5057' }}>
                   <span style={{ width:'13px', height:'10px', border:'1px solid #4A5057', borderRadius:'2px', display:'inline-block' }} />
                   <span>Targeta</span>
