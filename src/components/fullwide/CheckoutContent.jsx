@@ -237,10 +237,12 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
   // L'escriptori, la tauleta vertical i els telèfons es queden amb els números
   // de creació i cap d'aquests retocs no els toca.
   //   · L_PRODUCTES_LIFT: el bloc de productes (llistat + subtotals) puja 25px.
-  //   · L_COLUMNES_TOP: el formulari arrenca 75px abans del marge de creació
-  //     (90), o sigui que puja aquests 75px més els 25 que ja puja el llistat.
+  //   · L_COLUMNES_TOP: el formulari va amb 25px de marge en comptes dels 90 de
+  //     creació, o sigui que puja 65px pel seu compte; amb els 25 que ja puja
+  //     el llistat, queda 90px més amunt del que era a l'origen. Baixar-lo =
+  //     apujar aquest número; apujar-lo = abaixar-lo.
   const L_PRODUCTES_LIFT = 25;
-  const L_COLUMNES_TOP = 15;
+  const L_COLUMNES_TOP = 25;
 
   // Marge de creació de les dues columnes de dades (el que les separa del bloc
   // de productes). El fan servir l'escriptori i la tauleta vertical, tal qual.
