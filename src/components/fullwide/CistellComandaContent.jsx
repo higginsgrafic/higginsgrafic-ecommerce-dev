@@ -185,6 +185,11 @@ function CistellComandaContent({ cartItems, setCartItems, onFinalizeOrder }) {
   const isEmpty = CART_ITEMS.length === 0;
 
   const finalizeBtnRef = useRef(null);
+  // L'ultima fila visible del cistell: el bloc flotant del total s'hi ha de
+  // posar just a sota. Abans es mesurava el boto invisible de la graella, que
+  // cau una filera sencera mes avall, i per aixo el total quedava 117px per
+  // sota de l'ultima linia a l'escriptori.
+  const ultimaFilaRef = useRef(null);
   const [overlayTop, setOverlayTop] = useState(null);
   const [overlayLeft, setOverlayLeft] = useState(null);
   useEffect(() => {
@@ -203,10 +208,12 @@ function CistellComandaContent({ cartItems, setCartItems, onFinalizeOrder }) {
     if (isEmpty) return;
     let raf = 0;
     const measure = () => {
-      const btn = finalizeBtnRef.current;
+      const btn = ultimaFilaRef.current || finalizeBtnRef.current;
       if (!btn) return;
       const r = btn.getBoundingClientRect();
-      const nextY = Math.round(r.top + r.height / 2);
+      // El bloc flotant es ancorat pel seu centre (translate -50%), aixi que
+      // perque quedi just SOTA la fila cal el fons de la fila, no el centre.
+      const nextY = Math.round(r.bottom);
       const nextX = Math.round(r.left + r.width / 2);
       setOverlayTop((prev) => (prev === nextY ? prev : nextY));
       setOverlayLeft((prev) => (prev === nextX ? prev : nextX));
@@ -287,9 +294,11 @@ function CistellComandaContent({ cartItems, setCartItems, onFinalizeOrder }) {
         // fons es queden ancorades a 0..N i només canvia el contingut
         // que apareix a sobre quan es fa scroll. Patró del /checkout.
         const i = scrollRow + rowIndex;
+        const filesRenderitzades = Math.min(VISIBLE_ITEMS, CART_ITEMS.length - scrollRow);
+        const esUltimaFila = rowIndex === filesRenderitzades - 1;
         const colBg = { backgroundColor: 'transparent', height: '100%', boxSizing: 'border-box' };
         return (
-        <div key={i} className="cart-row" style={{
+        <div key={i} ref={esUltimaFila ? ultimaFilaRef : undefined} className="cart-row" style={{
           position: 'absolute',
           top: `${rowIndex * ITEM_STRIDE}px`,
           left: `${SLIDE_OFFSET_X}px`,
