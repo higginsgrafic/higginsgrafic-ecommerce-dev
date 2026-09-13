@@ -17,7 +17,6 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
   const elements = useElements();
   const { user } = useAuth();
   const navigate = useNavigate();
-  const isDev = import.meta.env.DEV;
   const offersConfig = useOffersConfig();
   const discountEnabled = offersConfig.discountEnabled;
   const discountRate = offersConfig.discountRate / 100;
@@ -38,7 +37,6 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
   });
   const [formErrors, setFormErrors] = useState({});
   const [isProcessing, setIsProcessing] = useState(false);
-  const [paymentDetailsOpen, setPaymentDetailsOpen] = useState(isDev && !user);
   const [needsInvoice, setNeedsInvoice] = useState(false);
   const [acceptTerms, setAcceptTerms] = useState(false);
 
@@ -223,7 +221,7 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
   const [cintaAmbMes, setCintaAmbMes] = useState(false);
   // I la del marge dret (la vora de la targeta dels totals): nome s surt si hi
   // ha fitxes amagades en aquesta banda, o sigui si no som al final de la cinta.
-  const [cintaAmbMesDreta, setCintaAmbMesDreta] = useState(false);
+  const [, setCintaAmbMesDreta] = useState(false);
   useEffect(() => {
     const el = cintaRef.current;
     if (!el) return undefined;
@@ -321,13 +319,8 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
     const [intPart, decPart = '00'] = n.toFixed(2).split('.');
     return { intPart, decPart };
   };
-  const preuParts = splitPrice(preu);
-  const descompteParts = splitPrice(descompte);
-  const ivaParts = splitPrice(ivaAmount);
-  const totalParts = splitPrice(totalFinal);
 
   const HEAD = { fontFamily: 'Oswald, sans-serif', fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.4px', color: '#475059' };
-  const LABEL = { fontFamily: 'Roboto Condensed, sans-serif', fontWeight: 400, color: '#667085', fontSize: '10pt' };
   const INPUT = { fontFamily: 'Roboto Condensed, sans-serif', fontWeight: 400, color: '#4A5057', fontSize: '10.5pt', outline: 'none' };
 
   const handleChange = (e) => {
@@ -404,7 +397,7 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
         }
 
         const piResponse = await createPaymentIntent(
-          activeItems.map((item, idx) => ({
+          activeItems.map((item) => ({
             // El cistell del mega-slide no guarda la variant de Gelato: treballa
             // amb la ruta del disseny, la talla i el color. Enviem el slug del
             // producte perquè el servidor pugui resoldre la variant contra la
@@ -452,7 +445,7 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
         const { clientSecret, paymentIntentId, orderNumber: serverOrderNumber, trackingToken: apiTrackingToken } = piResponse;
         trackingToken = apiTrackingToken || null;
 
-        const { error: stripeError, paymentIntent } = await stripe.confirmCardPayment(
+        const { error: stripeError } = await stripe.confirmCardPayment(
           clientSecret,
           {
             payment_method: {

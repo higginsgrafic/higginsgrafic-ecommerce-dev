@@ -1,56 +1,22 @@
-import React, { memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import * as ReactDOM from 'react-dom';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { ChevronDown, ChevronLeft, ChevronRight, ChevronUp, User, LogIn, X, Clock, Truck, AlertCircle, MoreHorizontal, Loader2, Eye, EyeOff, LayoutGrid, Layers, Lock, Unlock, Search } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { ChevronDown, User, LogIn, Lock, Unlock, Search } from 'lucide-react';
 import { useProductContext } from '@/contexts/ProductContext';
 import { useAdmin } from '@/contexts/AdminContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { useCart } from '@/contexts/CartContext';
 import { useOrders } from '@/hooks/useOrders';
 import { getGildan64000Catalog } from '../utils/placeholders.js';
-import {
-  AUSTEN_QUOTES_ASSETS,
-  resolveAustenQuoteAssetId,
-  resolveAustenQuoteThumbFromPath,
-  resolveAustenQuoteOriginalFromPath,
-} from '../utils/austenQuotesAssets.js';
-import FullWideSlideDemoHumanInsideSlider from './FullWideSlideDemoHumanInsideSlider.jsx';
-import MegaHeroSlider from './MegaHeroSlider.jsx';
-import Pauta4ColsOverlay from './pauta/Pauta4ColsOverlay';
-import { UserProfileTabs, UserProfileContent } from './UserProfileTabs.jsx';
+import { AUSTEN_QUOTES_ASSETS, resolveAustenQuoteAssetId, resolveAustenQuoteOriginalFromPath } from '../utils/austenQuotesAssets.js';
 import { getSafeBelt, clampNumber } from '@/utils/layoutMetrics';
-import {
-  FIRST_CONTACT_MEDIA,
-  FIRST_CONTACT_MEDIA_WHITE,
-  FIRST_CONTACT_MEDIA_COLOR,
-  THE_HUMAN_INSIDE_MEDIA,
-  THE_HUMAN_INSIDE_MEDIA_WHITE,
-  CUBE_MEDIA,
-} from './fullwide/megaSlideMedia.js';
-import {
-  MEGA_PUBLIC_LAST_ACTIVITY_AT_KEY,
-  MEGA_PUBLIC_SELECTOR_STATE_KEY,
-  touchMegaPublicActivity,
-  readMegaPublicSelectorState,
-  writeMegaPublicSelectorState,
-  getMegaPublicSelectorFor,
-  setMegaPublicSelectorFor,
-} from './fullwide/megaPublicSelectorState.js';
-import OptimizedImg from './fullwide/OptimizedImg.jsx';
+import { FIRST_CONTACT_MEDIA, FIRST_CONTACT_MEDIA_WHITE, FIRST_CONTACT_MEDIA_COLOR, CUBE_MEDIA } from './fullwide/megaSlideMedia.js';
+import { touchMegaPublicActivity, getMegaPublicSelectorFor, setMegaPublicSelectorFor } from './fullwide/megaPublicSelectorState.js';
 import IconButton from './fullwide/MegaIconButton.jsx';
 import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
 import RegisterOverlay from './fullwide/RegisterOverlay.jsx';
 import usePersistentState from '@/hooks/usePersistentState';
-import {
-  FirstContactStripeMockupPanel,
-  FirstContactDibuix00Buttons,
-  FirstContactDibuix09Buttons,
-} from './fullwide/firstContactPanels.jsx';
-import MegaColumn, {
-  CONTROL_TILE_BN,
-  CONTROL_TILE_ARROWS,
-} from './fullwide/MegaColumn.jsx';
+import { CONTROL_TILE_BN, CONTROL_TILE_ARROWS } from './fullwide/MegaColumn.jsx';
 import MegaMenuPanel from './fullwide/MegaMenuPanel.jsx';
 import { CERCADOR_COLORS } from './fullwide/CercadorTopBar.jsx';
 import useMegaPublicIdleReset from '@/hooks/useMegaPublicIdleReset';
@@ -109,7 +75,7 @@ function FullWideSlideHeader({
     return false;
   };
   const dblClickDelayMs = 0;
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, ] = useState('');
 
   // El cistell és ÚNIC per a tota la botiga i viu a CartContext. Abans aquest
   // component en tenia un de propi, i per això afegir un producte des d'una
@@ -183,8 +149,6 @@ function FullWideSlideHeader({
       });
   }, [contextProducts, searchQuery]);
 
-  const searchAccent = '#ef4444';
-  const searchTopLinks = useMemo(() => ['Novetats', 'Samarretes', 'Bosses', 'Promocions'], []);
 
   const searchSuggestions = useMemo(
     () => [
@@ -196,8 +160,8 @@ function FullWideSlideHeader({
     ],
     []
   );
-  const [searchGridScale, setSearchGridScale] = useState(1);
-  const [searchCaretVisible, setSearchCaretVisible] = useState(true);
+  const [, setSearchGridScale] = useState(1);
+  const [, setSearchCaretVisible] = useState(true);
   const [megaPage, setMegaPage] = usePersistentState('HG_MEGA_PAGE', 1);
   const [megaFullScreen, setMegaFullScreen] = useState(false);
   const [megaHeroRowHeight, setMegaHeroRowHeight] = useState(38);
@@ -216,7 +180,6 @@ function FullWideSlideHeader({
       return false;
     }
   });
-  const [activeUserTab, setActiveUserTab] = usePersistentState('HG_ACTIVE_USER_TAB', '1');
   const [firstContactSelectedItem, setFirstContactSelectedItem] = useState(null);
   const [humanInsideSelectedItem, setHumanInsideSelectedItem] = useState(null);
   const [selectedItemByCollection, setSelectedItemByCollection] = useState({});
@@ -384,7 +347,6 @@ function FullWideSlideHeader({
     typeof window !== 'undefined' && new URLSearchParams(window.location.search).has('noCatalogPanel');
   const wsEnabled =
     typeof window !== 'undefined' && import.meta.env.DEV && new URLSearchParams(window.location.search).has('ws');
-  const effectiveDisableCatalogPanel = disableCatalogPanel || showCatalogPanel === false;
   const gridCalibFromUrl = typeof window !== 'undefined' && new URLSearchParams(window.location.search).has('gridCalib');
 
   const bleedGuardDebug = typeof window !== 'undefined'
@@ -704,7 +666,6 @@ function FullWideSlideHeader({
     }
   }, [navigate, resolvePdpUrl, displayedShirtColorP2, firstContactVariantP2, humanInsideVariantP2]);
 
-  const [selectedColorSlug, setSelectedColorSlug] = useState('white');
   const [thinStartIndex, setThinStartIndex] = useState(0);
   const [gildan64000Catalog, setGildan64000Catalog] = useState(null);
 
@@ -1745,12 +1706,7 @@ function FullWideSlideHeader({
   }, [overlayStorageKey, resolvedOverlaySrc, stripeOverlayOverrideActive]);
   const [megaTileSize, setMegaTileSize] = useState(null);
   const effectiveMegaTileSize = megaTileSize || 120;
-  // Stub local per al menú mobile: la implementació real viu a `MegaColumn`
-  // amb closures sobre el seu estat. Aquí sempre retornem null perquè els
-  // callers facin servir el fallback `|| FIRST_CONTACT_MEDIA[it]`, que era
-  // el comportament efectiu abans de modularitzar.
-  const resolveGridThumbSrc = () => null;
-  const [rootRemPx, setRootRemPx] = useState(16);
+  const [, setRootRemPx] = useState(16);
   const [megaTileSelectorParams, setMegaTileSelectorParams] = useState(() => {
     try {
       if (typeof window === 'undefined') {
@@ -2134,10 +2090,9 @@ function FullWideSlideHeader({
   const mobileHumanScrollRef = useRef(null);
   const logoMarkRef = useRef(null);
   const accountButtonRef = useRef(null);
-  const searchHeaderRowRef = useRef(null);
   const searchGridRowRef = useRef(null);
   const searchGridScrollRef = useRef(null);
-  const [megaInsetsPx, setMegaInsetsPx] = useState({ left: 0, right: 0 });
+  const [, setMegaInsetsPx] = useState({ left: 0, right: 0 });
   const [bleedGuardExpandPx, setBleedGuardExpandPx] = useState({ left: 0, right: 0 });
   const [accordionPautaScale, setAccordionPautaScale] = useState(1);
 
