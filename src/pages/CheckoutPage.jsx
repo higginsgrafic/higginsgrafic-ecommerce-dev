@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import SEO from '@/components/SEO';
@@ -31,6 +31,20 @@ export default function CheckoutPage() {
   // comprovació s'activaria i enviaria el client a l'inici, trepitjant la
   // navegació cap a la pàgina de confirmació (passava exactament això).
   const buitEnEntrar = useRef(getTotalItems() === 0).current;
+
+  // El formulari de pagament té tres dissenys: ordinador, tauleta apaïsada i
+  // tauleta vertical. Als mòbils (menys de 768 px) s'ha de fer servir la
+  // recepta vertical: amb la d'ordinador les quatre columnes no hi caben i el
+  // formulari surt tallat.
+  const [esVertical, setEsVertical] = useState(
+    () => typeof window !== 'undefined' && window.innerWidth < 1366 && window.innerHeight >= window.innerWidth
+  );
+
+  useEffect(() => {
+    const onResize = () => setEsVertical(window.innerWidth < 1366 && window.innerHeight >= window.innerWidth);
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, []);
 
   useEffect(() => {
     if (buitEnEntrar) navigate('/', { replace: true });
@@ -94,7 +108,7 @@ export default function CheckoutPage() {
           // la pàgina de confirmació. Si aquí tanquéssim o navegéssim, ens
           // menjaríem aquesta navegació.
           onCloseMegaSlide={() => {}}
-          isPortraitTablet={false}
+          isPortraitTablet={esVertical}
         />
       </div>
     </motion.div>

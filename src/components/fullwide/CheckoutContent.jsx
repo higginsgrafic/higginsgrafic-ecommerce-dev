@@ -47,11 +47,20 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
       && window.innerWidth <= 1366
       && window.innerWidth >= window.innerHeight
   );
+
+  // Telèfon: menys de 768 px d'amplada. Necessita una disposició pròpia (una
+  // sola columna): les tres columnes de la recepta d'escriptori no hi caben i
+  // el formulari sortia tallat, amb el botó de pagar fora de la pantalla.
+  const [isPhone, setIsPhone] = useState(
+    () => typeof window !== 'undefined' && window.innerWidth < 768
+  );
+
   useEffect(() => {
     const onResize = () => {
       const w = window.innerWidth;
       const h = window.innerHeight;
       setIsLandscapeTablet(w >= 768 && w <= 1366 && w >= h);
+      setIsPhone(w < 768);
     };
     window.addEventListener('resize', onResize);
     return () => window.removeEventListener('resize', onResize);
@@ -535,6 +544,138 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
       )}
     </div>
   );
+
+  // ---------------------------------------------------------------------
+  // TELÈFON
+  //
+  // Una sola columna, de dalt a baix i amb desplaçament vertical. Reaprofita
+  // exactament la mateixa lògica de pagament (estat del formulari, validació i
+  // handleSubmit): aquí només canvia com es dibuixa, no què fa.
+  // ---------------------------------------------------------------------
+  if (isPhone) {
+    const camp = { width: '100%', height: '40px', border: '1px solid #D8DDE3', borderRadius: '6px', padding: '0 12px', fontFamily: 'Roboto Condensed, sans-serif', fontSize: '11pt', color: '#4A5057', backgroundColor: '#FFFFFF', boxSizing: 'border-box', outline: 'none' };
+    const bloc = { backgroundColor: '#FFFFFF', border: '1px solid #E6E8EC', borderRadius: '8px', padding: '16px', marginBottom: '14px' };
+    const titol = { ...HEAD, fontSize: '13pt', marginBottom: '12px' };
+    const etiqueta = { display: 'block', fontFamily: 'Roboto Condensed, sans-serif', fontSize: '9.5pt', color: '#667085', marginBottom: '4px' };
+
+    const estilTargeta = { style: { base: { color: '#4A5057', fontFamily: 'Roboto Condensed, sans-serif', fontSize: '14px', '::placeholder': { color: '#98A2B4' } }, invalid: { color: '#ef4444' } } };
+    const capsaTargeta = { border: '1px solid #D8DDE3', borderRadius: '6px', backgroundColor: '#FFFFFF', padding: '12px' };
+
+    const campsEnviament = [
+      ['firstName', 'Nom'], ['lastName', 'Cognoms'], ['address', 'Adreça (carrer i número)'],
+      ['address2', 'Pis, porta'], ['postalCode', 'Codi postal'], ['city', 'Ciutat'], ['province', 'Província'],
+    ];
+
+    return (
+      <div style={{ width: '100%', maxWidth: '560px', margin: '0 auto', fontFamily: 'Roboto Condensed, sans-serif', color: '#4A5057' }}>
+        <h1 style={{ ...HEAD, fontSize: '20pt', margin: '0 0 18px' }}>Pagament</h1>
+
+        <div style={bloc}>
+          <div style={titol}>La teva comanda</div>
+          {activeItems.map((it, i) => (
+            <div key={it.id || i} style={{ display: 'flex', justifyContent: 'space-between', gap: '10px', padding: '6px 0', borderBottom: '1px solid #F0F2F6' }}>
+              <span style={{ fontSize: '10.5pt' }}>
+                {it.title || it.name}
+                <span style={{ color: '#98A2B4' }}> · Talla {it.size} · {it.qty || 1} u.</span>
+              </span>
+              <span style={{ whiteSpace: 'nowrap' }}>{it.price}</span>
+            </div>
+          ))}
+          <div style={{ marginTop: '10px', fontSize: '10.5pt' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between' }}><span>Subtotal</span><span>{fmt(preu)}</span></div>
+            {descompte > 0 && (
+              <div style={{ display: 'flex', justifyContent: 'space-between', color: '#0A7A46' }}><span>Descompte</span><span>-{fmt(descompte)}</span></div>
+            )}
+            <div style={{ display: 'flex', justifyContent: 'space-between' }}><span>Transport</span><span>{shipping === 0 ? 'Gratuït' : fmt(shipping)}</span></div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', color: '#667085' }}><span>IVA 21% (inclòs)</span><span>{fmt(ivaAmount)}</span></div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', ...HEAD, fontSize: '12pt', marginTop: '8px' }}><span>Total</span><span>{fmt(totalFinal)}</span></div>
+          </div>
+        </div>
+
+        <div style={bloc}>
+          <div style={titol}>Dades d'enviament</div>
+          <div style={{ display: 'grid', gap: '10px' }}>
+            {campsEnviament.map(([nom, textEtiqueta]) => (
+              <div key={nom}>
+                <label style={etiqueta} htmlFor={`m-${nom}`}>{textEtiqueta}</label>
+                <input id={`m-${nom}`} type="text" name={nom} value={formData[nom] || ''} onChange={handleChange} style={camp} />
+                {formErrors[nom] && <div style={errorStyle}>{formErrors[nom]}</div>}
+              </div>
+            ))}
+            <div>
+              <label style={etiqueta} htmlFor="m-country">País</label>
+              <select id="m-country" name="country" value={formData.country || ''} onChange={handleChange} style={camp}>
+                <option value="" disabled>País</option>
+                <option value="Espanya">Espanya</option>
+                <option value="França">França</option>
+                <option value="Andorra">Andorra</option>
+              </select>
+            </div>
+            <div>
+              <label style={etiqueta} htmlFor="m-email">Correu electrònic</label>
+              <input id="m-email" type="email" name="email" value={formData.email || ''} onChange={handleChange} style={camp} />
+              {formErrors.email && <div style={errorStyle}>{formErrors.email}</div>}
+            </div>
+            <div>
+              <label style={etiqueta} htmlFor="m-phone">Telèfon</label>
+              <input id="m-phone" type="tel" name="phone" value={formData.phone || ''} onChange={handleChange} style={camp} />
+              {formErrors.phone && <div style={errorStyle}>{formErrors.phone}</div>}
+            </div>
+          </div>
+        </div>
+
+        <div style={bloc}>
+          <div style={titol}>Dades de pagament</div>
+          <div style={{ display: 'grid', gap: '10px' }}>
+            <div style={capsaTargeta}>
+              <CardNumberElement options={estilTargeta} />
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+              <div style={capsaTargeta}><CardExpiryElement options={estilTargeta} /></div>
+              <div style={capsaTargeta}><CardCvcElement options={estilTargeta} /></div>
+            </div>
+          </div>
+
+          <label style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', marginTop: '14px', fontSize: '9.5pt', lineHeight: 1.3 }}>
+            <input type="checkbox" checked={needsInvoice} onChange={(e) => setNeedsInvoice(e.target.checked)} style={{ marginTop: '2px' }} />
+            <span>Necessites factura?</span>
+          </label>
+          {needsInvoice && (
+            <div style={{ display: 'grid', gap: '10px', marginTop: '10px' }}>
+              <input type="text" name="company" placeholder="Nom de l'empresa" value={formData.company || ''} onChange={handleChange} style={camp} />
+              <input type="text" name="taxId" placeholder="CIF (ex: ESA12345672)" value={formData.taxId || ''} onChange={handleChange} style={camp} />
+            </div>
+          )}
+
+          <label style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', marginTop: '16px', fontSize: '9.5pt', lineHeight: 1.3 }}>
+            <input type="checkbox" checked={acceptTerms} onChange={(e) => setAcceptTerms(e.target.checked)} style={{ marginTop: '2px' }} />
+            <span>
+              Accepto els <a href="/terms" style={{ color: '#4A5057', textDecoration: 'underline' }}>Termes del Servei</a>, la{' '}
+              <a href="/privacy" style={{ color: '#4A5057', textDecoration: 'underline' }}>Política de Privacitat</a> i la{' '}
+              <a href="/shipping" style={{ color: '#4A5057', textDecoration: 'underline' }}>Política d'enviaments</a>.
+            </span>
+          </label>
+
+          {paymentError && (
+            <div style={{ marginTop: '12px', color: '#D04B4B', fontSize: '10pt', textAlign: 'center' }}>{paymentError}</div>
+          )}
+
+          <button
+            type="button"
+            onClick={handleSubmit}
+            disabled={isProcessing}
+            style={{ width: '100%', height: '48px', marginTop: '16px', border: 'none', borderRadius: '6px', backgroundColor: isProcessing ? '#8FE8B9' : '#00D66F', color: '#063B21', fontFamily: 'Roboto Condensed, sans-serif', fontSize: '12pt', fontWeight: 600, cursor: isProcessing ? 'not-allowed' : 'pointer' }}
+          >
+            {isProcessing ? 'Processant…' : 'Confirma la compra'}
+          </button>
+        </div>
+
+        <p style={{ textAlign: 'center', fontSize: '9pt', color: '#98A2B4', marginBottom: '24px' }}>
+          Pagament segur amb Stripe
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div style={{ width:'100%', height:'100%', position: isTabletRecipe ? 'relative' : undefined, display:'flex', flexDirection:'column', justifyContent:'center', fontFamily:'Roboto Condensed, sans-serif', color:'#4A5057', overflow:'visible', padding:0, paddingBottom: liftPad, marginTop: isTabletRecipe ? 0 : '-30px' }}>
