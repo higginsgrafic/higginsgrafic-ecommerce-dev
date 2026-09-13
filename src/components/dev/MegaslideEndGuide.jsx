@@ -54,6 +54,36 @@ function llegirAlcadaDesada() {
   }
 }
 
+/**
+ * Límits REALS de les lletres d'un element (no la seva caixa).
+ *
+ * getBoundingClientRect() dóna la caixa de la línia, que inclou l'espai que
+ * deixa la interlineació: per a un text de 24px dins d'una línia de 36px, la
+ * caixa sobresurt uns quants píxels per dalt i per baix. Per calibrar
+ * distàncies òptiques cal el límit de la tinta, i això s'obté amb les mètriques
+ * de la font que dóna el canvas.
+ */
+function limitsDeLaTinta(el) {
+  const s = getComputedStyle(el);
+  const box = el.getBoundingClientRect();
+  try {
+    const ctx = document.createElement('canvas').getContext('2d');
+    ctx.font = `${s.fontStyle} ${s.fontWeight} ${s.fontSize} ${s.fontFamily}`;
+    const m = ctx.measureText(el.textContent || '');
+    const lh = parseFloat(s.lineHeight) || parseFloat(s.fontSize) * 1.2;
+    const fAscent = m.fontBoundingBoxAscent ?? parseFloat(s.fontSize) * 0.8;
+    const fDescent = m.fontBoundingBoxDescent ?? parseFloat(s.fontSize) * 0.2;
+    const mig = (lh - (fAscent + fDescent)) / 2;      // espai repartit per la interlineació
+    const base = box.top + mig + fAscent;             // línia de base de les lletres
+    return {
+      top: Math.round(base - (m.actualBoundingBoxAscent ?? fAscent)),
+      bottom: Math.round(base + (m.actualBoundingBoxDescent ?? fDescent)),
+    };
+  } catch {
+    return { top: Math.round(box.top), bottom: Math.round(box.bottom) };
+  }
+}
+
 export default function MegaslideEndGuide() {
   const [activat, setActivat] = useState(llegirActivat);
   const [megaFinal, setMegaFinal] = useState(llegirAlcadaDesada);
@@ -88,10 +118,11 @@ export default function MegaslideEndGuide() {
           });
         }
       }
-      // El títol PAGAMENT, en canvi, sempre hi és.
+      // El títol PAGAMENT, en canvi, sempre hi és. En mesurem la tinta (les
+      // lletres de debò), no la caixa de la línia.
       const titol = [...document.querySelectorAll('span')].find((s) => s.textContent.trim() === 'PAGAMENT');
       if (titol) {
-        const bottom = Math.round(titol.getBoundingClientRect().bottom) + 20;
+        const bottom = limitsDeLaTinta(titol).bottom + 20;
         setTitolFinal((prev) => (prev === bottom ? prev : bottom));
       }
       raf = requestAnimationFrame(mesura);
