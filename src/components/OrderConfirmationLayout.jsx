@@ -168,7 +168,7 @@ const OrderConfirmationLayout = ({
             Transport + IVA donaria més que el total). */}
         {/* Tot plegat fa */}
         <div />
-        <div style={{ padding: '0 20px', fontFamily: 'Oswald, sans-serif', fontSize: '17.5px', fontWeight: 400, textAlign: 'left', whiteSpace: 'nowrap', display: 'flex', alignItems: 'center', minHeight: 0, overflow: 'hidden', gridColumn: '2 / 4' }}>Tot plegat fa</div>
+        <div style={{ padding: '0 20px', fontFamily: 'Oswald, sans-serif', fontSize: '17.5px', fontWeight: 400, textAlign: 'left', whiteSpace: 'nowrap', display: 'flex', alignItems: 'center', minHeight: 0, overflow: 'hidden', gridColumn: '2 / 4' }}>TOT PLEGAT FA</div>
         <div style={{ padding: '0 20px', fontFamily: 'Oswald, sans-serif', fontSize: '17.5px', fontWeight: 400, textAlign: 'right', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', minHeight: 0, overflow: 'hidden', }}>{formatPrice(totalPlegat)}</div>
       </div>
 
