@@ -2,7 +2,10 @@ import React from 'react';
 import { EmailLayout } from '../components/EmailLayout.jsx';
 import { Img } from '@react-email/components';
 
-const EXPLANATION_IMG = 'https://raw.githubusercontent.com/higginsgrafic/higginsgrafic-ecommerce-dev/main/public/emails/assets/imatge-explicativa.png';
+// Ruta relativa a la pròpia botiga: `_email.js` la converteix en adreça
+// absoluta abans d'enviar el correu. Abans apuntava a GitHub i el fitxer ni
+// tan sols existia (donava 404), així que la imatge no es veia mai.
+const EXPLANATION_IMG = '/emails/assets/imatge-explicativa.png';
 
 export function WelcomeEmail({ user = {} }) {
   const clientName = user.first_name || user.fullName || user.name || 'Maria';

@@ -1,3 +1,4 @@
+import { existsSync } from 'fs';
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { createElement } from 'react';
 import { render as renderReactEmail } from '@react-email/render';
@@ -90,6 +91,9 @@ beforeEach(() => {
   enviats = [];
   process.env.RESEND_API_KEY = 're_test_key';
   process.env.RESEND_FROM_EMAIL = 'comandes@higginsgrafic.com';
+  // Base fixa perquè la prova sigui determinista: en producció això ho omple
+  // Netlify tot sol (vegeu getSiteBase() a netlify/lib/email.js).
+  process.env.SITE_URL = 'https://exemple.test';
   vi.stubGlobal('fetch', async (url, options) => {
     enviats.push({ url, body: JSON.parse(options.body) });
     return {
@@ -105,6 +109,7 @@ afterEach(() => {
   vi.unstubAllGlobals();
   delete process.env.RESEND_API_KEY;
   delete process.env.RESEND_FROM_EMAIL;
+  delete process.env.SITE_URL;
 });
 
 describe('Correus transaccionals', () => {
@@ -131,13 +136,49 @@ describe('Correus transaccionals', () => {
 
       it('el HTML és equivalent al del renderitzador oficial', async () => {
         await sendOrderEmail(key, payload);
-        const nostre = enviats[0].body.html;
+        // Les rutes relatives (/emails/assets/...) s'han convertit en adreces
+        // absolutes; per comparar amb el renderitzador oficial les traiem.
+        const nostre = enviats[0].body.html.split('https://exemple.test').join('');
         const oficial = await renderReactEmail(createElement(Component, { [propName]: payload }));
 
         expect(normalize(nostre)).toBe(normalize(oficial));
       });
     });
   }
+
+  // Aquesta prova existeix per un error real: el logo dels correus apuntava a
+  // un fitxer de GitHub que no existia i no es veia mai. Ara comprovem que
+  // cada imatge del correu correspon a un fitxer que existeix de debò.
+  it("totes les imatges dels correus existeixen a public/", async () => {
+    const vistes = new Set();
+
+    for (const [key, , , , payload] of TEMPLATES) {
+      enviats = [];
+      await sendOrderEmail(key, payload);
+
+      const urls = [...enviats[0].body.html.matchAll(/src="(https?:\/\/[^"]+)"/g)].map((m) => m[1]);
+      for (const url of urls) {
+        expect(url.startsWith('https://exemple.test/'), `imatge fora de la botiga: ${url}`).toBe(true);
+        const ruta = `public${url.slice('https://exemple.test'.length)}`;
+        expect(existsSync(ruta), `la imatge ${ruta} (al correu "${key}") no existeix`).toBe(true);
+        vistes.add(ruta);
+      }
+    }
+
+    // Si això fallés voldria dir que cap correu porta imatges, i la prova no
+    // estaria comprovant res.
+    expect(vistes.size).toBeGreaterThan(0);
+  });
+
+  it('cap correu no penja imatges de GitHub', async () => {
+    for (const [key, , , , payload] of TEMPLATES) {
+      enviats = [];
+      await sendOrderEmail(key, payload);
+      expect(enviats[0].body.html, `el correu "${key}" encara apunta a GitHub`).not.toContain(
+        'raw.githubusercontent.com'
+      );
+    }
+  });
 
   it('notify.js també envia (importació estàtica)', async () => {
     const resultat = await sendOrderEmailAmbProteccio('order_confirmed', ORDER);

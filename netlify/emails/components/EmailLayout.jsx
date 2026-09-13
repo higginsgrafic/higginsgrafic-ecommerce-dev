@@ -1,7 +1,16 @@
 import React from 'react';
 import { Html, Head, Body, Img, Link } from '@react-email/components';
 
-const LOGO_URL = 'https://raw.githubusercontent.com/higginsgrafic/higginsgrafic-ecommerce-dev/main/public/custom_logos/brand/HIGGINS%20GRAFIC%20NEGRE.png';
+// El logo del correu viu a la pròpia botiga (a `public/emails/assets/`).
+//
+// Abans apuntava a raw.githubusercontent.com i el fitxer no existia: el logo
+// no es veia mai als correus. Penjar-lo de GitHub també és mala idea per a un
+// correu (GitHub pot limitar les peticions i molts clients el bloquegen).
+//
+// És una ruta RELATIVA a posta: `_email.js` la converteix en adreça absoluta
+// cap a la botiga abans d'enviar. I és PNG, no WEBP, perquè Outlook (Windows)
+// no sap veure WEBP i el logo sortiria buit.
+const LOGO_URL = '/emails/assets/logo-higgins-grafic.png';
 
 export function EmailLayout({
   statusText = "Actualització d'estat",
