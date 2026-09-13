@@ -4,6 +4,7 @@ import SEO from '@/components/SEO';
 import Breadcrumbs from '@/components/Breadcrumbs';
 import { formatPrice } from '@/utils/formatters';
 import { fetchMockOrder, MOCK_CLIENT } from '@/lib/mockOrderStore';
+import { STATUS_TO_STAGE as STATUS_TO_STAGE_MAP, avisDEstatAnormal } from '@/lib/orderStatus';
 
 const OrderTrackingPage = () => {
   const [searchParams] = useSearchParams();
@@ -18,17 +19,10 @@ const OrderTrackingPage = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  // Mapeig d'estats de Supabase a les etapes de seguiment
-  const STATUS_TO_STAGE = {
-    'pendent': 'created',
-    'confirmada': 'created',
-    'en_preparacio': 'processing',
-    'seguiment': 'processing',
-    'en_repartiment': 'shipped',
-    'aturada': 'processing',
-    'cancel_lada': 'created',
-    'entregada': 'delivered',
-  };
+  // Estats de la comanda (a la base de dades) → etapes que veu el client.
+  // Viu a src/lib/orderStatus.js, amb proves automàtiques pròpies, perquè
+  // aquesta informació ha de dir la veritat i ja va estar malament.
+  const STATUS_TO_STAGE = STATUS_TO_STAGE_MAP;
 
   // Buscar comanda
   const handleTrackOrder = async (e) => {
@@ -50,7 +44,10 @@ const OrderTrackingPage = () => {
         setOrder({
           id: mockOrder.order_number || mockOrder.id,
           createdAt: mockOrder.created_at,
-          status: 'created',
+          // El status de la comanda de prova es respecta (abans sempre es
+          // posava 'created' i no es podia veure cap altre estat en local).
+          status: STATUS_TO_STAGE[mockOrder.status] || 'created',
+          rawStatus: mockOrder.status || null,
           totalPrice: parseFloat(mockOrder.total) || 0,
           email: mockOrder.email,
           items: items.map((item, idx) => ({
@@ -103,6 +100,9 @@ const OrderTrackingPage = () => {
         id: o.order_number || o.id,
         createdAt: o.created_at,
         status: STATUS_TO_STAGE[o.status] || 'created',
+        // Estat original, per poder avisar de comandes cancel·lades o aturades
+        // en comptes de dibuixar-les com si anessin bé.
+        rawStatus: o.status || null,
         totalPrice: parseFloat(o.total) || 0,
         email: o.email,
         items: items.map((item, idx) => ({
@@ -181,6 +181,11 @@ const OrderTrackingPage = () => {
     const index = orderStages.findIndex(s => s.key === status);
     return index >= 0 ? index : 0;
   };
+
+  // Comandes que no segueixen el recorregut normal. No es poden dibuixar com un
+  // punt de la barra de progrés sense enganyar el client, així que es mostren
+  // amb un avís propi i sense barra.
+  const estatAnormal = avisDEstatAnormal(order?.rawStatus);
 
   return (
     <>
@@ -289,7 +294,20 @@ const OrderTrackingPage = () => {
                   </div>
                 </div>
 
+                {/* Avís de comanda cancel·lada o aturada. En aquests casos NO
+                    es dibuixa la barra de progrés: una comanda cancel·lada no
+                    està "en camí" ni "processant-se". */}
+                {estatAnormal && (
+                  <div className={`mb-8 p-5 border rounded-lg ${estatAnormal.classes}`}>
+                    <div className="font-oswald text-xl font-bold uppercase mb-2">
+                      {estatAnormal.titol}
+                    </div>
+                    <p className="text-sm font-roboto leading-relaxed">{estatAnormal.text}</p>
+                  </div>
+                )}
+
                 {/* Progress bar */}
+                {!estatAnormal && (
                 <div className="mb-8">
                   <div className="relative">
                     {/* Línia de fons */}
@@ -342,6 +360,7 @@ const OrderTrackingPage = () => {
                     </div>
                   </div>
                 </div>
+                )}
 
                 {/* Tracking info */}
                 {order.tracking && (
