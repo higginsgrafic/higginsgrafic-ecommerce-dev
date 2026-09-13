@@ -282,7 +282,10 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
   // la vertical: anar de la guia verda (títol + 20) a la blava (final del
   // mega-slide - 20). Alla l'alçada del mega-slide és fixa, pero aqui es fluida,
   // aixi que la mesurem quan el panell es obert i la guardem.
-  const [franjaMides, setFranjaMides] = useState({ marge: null, altura: null });
+  const [franjaMides, setFranjaMides] = useState({ marge: null, altura: null, creixement: 0 });
+  // El fons de la franja abans de calibrar: serveix per saber quant ha crescut i
+  // descomptar-ho del marge del formulari, perque el formulari no es mogui.
+  const franjaBaseRef = useRef(null);
   useEffect(() => {
     const el = cintaRef.current;
     if (!el) return undefined;
@@ -313,9 +316,17 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
   // de la franja buida, que no pinta res) i les columnes de dades arrenquen amb
   // el marge curt. A la resta de mides, tot igual que sempre.
   const productesLift = isLandscapeTablet ? `-${L_PRODUCTES_LIFT}px` : undefined;
-  const columnesTop = isPhone
+  // El formulari no s'ha de moure quan la franja de fitxes creix cap al
+  // mega-slide: li escurcem el marge de dalt els mateixos pixels que ha baixat el
+  // fons de la franja. Si la franja creix més que el marge, el formulari baixa
+  // nome s el que sobra.
+  const franjaCreix = franjaMides.creixement || 0;
+  const columnesTopBase = isPhone
     ? undefined
-    : (isLandscapeTablet ? `${L_COLUMNES_TOP}px` : `${COLUMNES_TOP}px`);
+    : (isLandscapeTablet ? L_COLUMNES_TOP : COLUMNES_TOP);
+  const columnesTop = columnesTopBase == null
+    ? undefined
+    : `${Math.max(0, columnesTopBase - franjaCreix)}px`;
 
   const ROW_H = 32.8;
   const V_GUTTER = 2.8;
@@ -390,11 +401,18 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
         // Amb la zona morta d'1px no balla.
         const altura = blava - verda;
         const franjaTop = Math.round(franjaEl.getBoundingClientRect().top);
+        const franjaBottom = Math.round(franjaEl.getBoundingClientRect().bottom);
         setFranjaMides((prev) => {
+          let base = franjaBaseRef.current;
+          if (base == null || prev.altura == null) {
+            // Encara sense calibrar: aquest es el fons de referencia.
+            if (prev.altura == null) { franjaBaseRef.current = franjaBottom; base = franjaBottom; }
+          }
           const correccio = verda - franjaTop;
           const marge = Math.abs(correccio) <= 1 ? (prev.marge ?? 0) : (prev.marge ?? 0) + correccio;
-          if (prev.marge === marge && prev.altura === altura) return prev;
-          return { marge, altura };
+          const creixement = base == null ? 0 : Math.max(0, franjaBottom - base);
+          if (prev.marge === marge && prev.altura === altura && prev.creixement === creixement) return prev;
+          return { marge, altura, creixement };
         });
       }
       raf = requestAnimationFrame(mesura);
