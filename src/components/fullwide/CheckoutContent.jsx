@@ -912,7 +912,10 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
           // Aquesta cel·la va a la SEGONA columna (la de pagament), o sigui que
           // els termes i el botó de pagar queden davall la targeta, amb el
           // mateix cap d'esquerra i la mateixa amplada que els camps.
-          <div style={{ gridColumn:'2', display:'flex', flexDirection:'column', minHeight:0, position:'relative' }}>
+          // El marge negatiu la puja fins al capdamunt del camp del telèfon
+          // (874 -> 826): la fila comença just sota la columna d'enviament, i
+          // el telèfon n'és l'últim camp.
+          <div style={{ gridColumn:'2', marginTop: isPortraitTablet ? '-48px' : undefined, display:'flex', flexDirection:'column', minHeight:0, position:'relative' }}>
             {invoiceBlock}
             {termsBlock}
             {buttonBlock}
