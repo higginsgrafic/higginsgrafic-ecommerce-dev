@@ -17,27 +17,39 @@ import { AdminProvider } from '@/contexts/AdminContext';
 import { AdminToolsProvider } from '@/contexts/AdminToolsContext';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { GridDebugProvider } from '@/contexts/GridDebugContext';
+// TooltipProvider ve de Radix i és OBLIGATORI: sense ell, qualsevol component
+// que faci servir un <Tooltip> peta amb "Tooltip must be used within
+// TooltipProvider" i la pàgina sencera cau a la pantalla d'error.
+//
+// Aquest proveïdor hi faltava. Per això la portada de la botiga publicada
+// deia "Alguna cosa no va alhora" mentre que a l'ordinador de desenvolupament
+// es veia bé: hi ha DOS fitxers d'arrencada i aquest no el tenia. Es va
+// descobrir el dia que es va desactivar el mode "en construcció" i la botiga
+// es va poder veure de debò.
+import { TooltipProvider } from '@/components/ui/tooltip';
 import App from '@/App';
 import '@/index.css';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <BrowserRouter>
-    <AuthProvider>
-      <AdminProvider>
-        <GridDebugProvider>
-          <CartProvider>
-            <WishlistProvider>
-              <ProductProvider>
-                <AdminToolsProvider>
-                  <ToastProvider>
-                    <App />
-                  </ToastProvider>
-                </AdminToolsProvider>
-              </ProductProvider>
-            </WishlistProvider>
-          </CartProvider>
-        </GridDebugProvider>
-      </AdminProvider>
-    </AuthProvider>
+    <TooltipProvider delayDuration={200} skipDelayDuration={0}>
+      <AuthProvider>
+        <AdminProvider>
+          <GridDebugProvider>
+            <CartProvider>
+              <WishlistProvider>
+                <ProductProvider>
+                  <AdminToolsProvider>
+                    <ToastProvider>
+                      <App />
+                    </ToastProvider>
+                  </AdminToolsProvider>
+                </ProductProvider>
+              </WishlistProvider>
+            </CartProvider>
+          </GridDebugProvider>
+        </AdminProvider>
+      </AuthProvider>
+    </TooltipProvider>
   </BrowserRouter>
 );
