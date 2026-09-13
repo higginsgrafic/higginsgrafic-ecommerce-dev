@@ -882,17 +882,6 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
           <div style={{ position:'absolute', top:0, bottom:0, right:0, width:`${TOTALS_W}px`, boxSizing:'border-box', display:'flex', flexDirection:'column', fontFamily: isPortraitTablet ? 'Roboto, sans-serif' : undefined, justifyContent: isPortraitTablet ? 'flex-end' : 'space-between', gap: isPortraitTablet ? '2px' : undefined, padding:'10px 12px', background:'#FFFFFF', border:'1px solid #E6E8EC', borderRadius:'6px' }}>
             {/* La mateixa linia de 2px que la cinta, a la vora esquerra, i amb el mateix comportament: nome s surt si hi ha fitxes amagades en aquesta banda. */}
             <div aria-hidden="true" style={{ position:'absolute', left:0, top:0, bottom:0, width:'2px', pointerEvents:'none', opacity: cintaAmbMesDreta ? 1 : 0, transition:'opacity 160ms ease', background:'#98A2B4', borderRadius:'6px 0 0 6px' }} />
-            {/* Logo de Grup Higgins, nome s a la vertical, com a marca d'aigua
-                del bloc de totals. Va amb màscara per poder-lo tenyir: el SVG
-                nome s aporta la forma. El marge de baix automatic empeny els
-                totals cap avall, aixi que el logo queda a dalt. El marge
-                esquerre el centra en X amb el retol TOT PLEGAT FA: el retol
-                ocupa de 13 a 116 dins la targeta (centre a 65) i el logo fa
-                69px, o sigui que ha d'arrencar a 30,5, 17,5 mes enlla del
-                marge interior de la targeta. */}
-            {isPortraitTablet && (
-              <div aria-hidden="true" style={{ alignSelf:'flex-start', marginLeft:'17.5px', width:'69px', height:'69px', marginBottom:'auto', backgroundColor:'#F9FAFB', WebkitMaskImage:'url(/custom_logos/brand/grup-higgins-logo.svg)', maskImage:'url(/custom_logos/brand/grup-higgins-logo.svg)', WebkitMaskRepeat:'no-repeat', maskRepeat:'no-repeat', WebkitMaskPosition:'center', maskPosition:'center', WebkitMaskSize:'contain', maskSize:'contain' }} />
-            )}
             {/* Els totals són una suma: cada concepte a la seva ratlla, el nom a
                 l'esquerra i la xifra a la dreta, com una columna de números.
                 El Subtotal és el preu de la peça sense transport i sense IVA;
