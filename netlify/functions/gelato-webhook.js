@@ -20,11 +20,14 @@
  *
  * Configuració necessària a Netlify:
  *   GELATO_WEBHOOK_SECRET — secret compartit per verificar que l'avís ve de
- *                           Gelato. Si no està configurat, s'accepten els
- *                           avisos però es registra un avís a la consola.
+ *                           Gelato. ÉS OBLIGATORI: sense això la funció
+ *                           rebutja tots els avisos (500) i l'estat de les
+ *                           comandes no s'actualitza. És el mal menor: val més
+ *                           no actualitzar que acceptar avisos de qualsevol.
  */
 
 import { createClient } from '@supabase/supabase-js';
+import { timingSafeEqual } from 'crypto';
 import { sendOrderEmail } from '../lib/notify.js';
 import { jsonResponse } from '../lib/cors.js';
 
@@ -60,13 +63,24 @@ const STATUS_MAP = {
 
 /**
  * Verifica que l'avís ve realment de Gelato.
- * Accepta el secret per capçalera o per paràmetre de l'adreça.
+ *
+ * Accepta el secret de tres maneres, perquè no tots els panells el poden
+ * enviar igual:
+ *   - capçalera `x-gelato-secret`
+ *   - capçalera `Authorization` (amb o sense la paraula "Bearer" al davant)
+ *   - paràmetre `?secret=` a l'adreça
+ *
+ * FAIL CLOSED: si no hi ha secret configurat, NO s'accepta res.
+ *
+ * Abans, si faltava el secret, s'acceptaven tots els avisos "per no trencar
+ * res". Era un forat: els números de comanda són curts i endevinables, així
+ * que qualsevol persona podia enviar un avís fals i aconseguir que un client
+ * rebés un correu autèntic de la botiga dient que la comanda s'ha enviat, amb
+ * un enllaç de seguiment inventat per l'atacant. Un correu de la botiga amb un
+ * enllaç fraudulent és una estafa perfecta.
  */
 function verifyWebhook(event) {
-  if (!WEBHOOK_SECRET) {
-    console.warn('[gelato-webhook] GELATO_WEBHOOK_SECRET no configurat: avís acceptat sense verificar');
-    return true;
-  }
+  if (!WEBHOOK_SECRET) return false;
 
   const headers = event.headers || {};
   const enviat =
@@ -78,7 +92,20 @@ function verifyWebhook(event) {
     '';
 
   const net = String(enviat).replace(/^Bearer\s+/i, '').trim();
-  return net === WEBHOOK_SECRET;
+  return comparacioSegura(net, WEBHOOK_SECRET);
+}
+
+/**
+ * Compara dos textos sense filtrar informació pel temps que triga a respondre.
+ * Amb una comparació normal, el programa surt al primer caràcter que no
+ * coincideix: mesurant temps es pot anar endevinant el secret caràcter a
+ * caràcter.
+ */
+function comparacioSegura(a, b) {
+  const un = Buffer.from(String(a ?? ''));
+  const altre = Buffer.from(String(b ?? ''));
+  if (un.length !== altre.length) return false;
+  return timingSafeEqual(un, altre);
 }
 
 export async function handler(event) {
@@ -88,6 +115,11 @@ export async function handler(event) {
 
   if (event.httpMethod !== 'POST') {
     return jsonResponse(event, 405, { error: 'Mètode no permès' }, { methods: 'POST, OPTIONS' });
+  }
+
+  if (!WEBHOOK_SECRET) {
+    console.error('[gelato-webhook] GELATO_WEBHOOK_SECRET no configurat: avís REBUTJAT');
+    return jsonResponse(event, 500, { error: 'Webhook no configurat' });
   }
 
   if (!verifyWebhook(event)) {
