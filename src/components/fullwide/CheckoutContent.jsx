@@ -154,10 +154,20 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
   const P_TERMS_TOP = 0;
   // "Necessites factura?" també va a la cel·la dreta (la del Telèfon) i penja
   // ABSOLUT, com el botó: així es pot alinear amb el camp de Província de la
-  // columna del costat (-117, o sigui 709 en pantalla) sense empenyir els
-  // termes ni el botó, que es queden al capdamunt de la cel·la. Positiu = baixa
-  // la factura. Únic número a retocar per al seu nivell.
-  const P_INVOICE_TOP = -117;
+  // columna del costat (-78, o sigui 709 en pantalla) sense empenyir els
+  // termes ni el botó. Positiu = baixa la factura.
+  const P_INVOICE_TOP = -78;
+  // Marge de dalt de la cel·la dels termes dins la graella. -87 la deixa de
+  // manera que el BOTÓ de pagar acabi exactament al mateix nivell que el camp
+  // del telèfon (860). Si es canvia, P_INVOICE_TOP s'ha d'ajustar perquè la
+  // factura continuï al nivell del camp de Província (709).
+  const P_CELL_LIFT = -87;
+  // Posició del botó de pagar dins la cel·la (top absolut). Amb 34 el botó
+  // acaba exactament al mateix nivell que el camp del telèfon (860), i com que
+  // penja absolut no depèn de quantes línies ocupin els termes: a les columnes
+  // estretes el text dels termes fa més línies i, en flux, empenyia el botó
+  // 16px més avall.
+  const P_BUTTON_ABS = 34;
   // Alçada d'UNA capsa de camp de targeta (número, caducitat i CVC en fan la
   // mateixa): vores 1+1 + padding 10+10 + l'interior que posa l'iframe de Stripe.
   // L'interior no ve del nostre codi, així que el 42 d'abans era ESTIMAT i el botó
@@ -590,7 +600,10 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
   // és fix sinó que surt de FIELD_GAP: si mai es canvia el junt, l'alineament
   // amb el correu es manté tot sol.
   const termsBlock = (
-    <div style={{ marginTop: isPortraitTablet ? '18px' : undefined, marginBottom: isPortraitTablet ? undefined : `${FIELD_GAP}px` }}>
+    // A la vertical, 2px i no 18: amb 18 els termes queien sobre el botó (que
+    // va clavat al fons del camp del telèfon) quan el text fa dues línies,
+    // com passa a les columnes estretes (820 i 769).
+    <div style={{ marginTop: isPortraitTablet ? '2px' : undefined, marginBottom: isPortraitTablet ? undefined : `${FIELD_GAP}px` }}>
       <label style={{ display:'flex', alignItems:'flex-start', gap:'8px', fontSize:'9.5pt', lineHeight:1.25, fontWeight:300 }}>
         <input type="checkbox" checked={acceptTerms} onChange={(e) => setAcceptTerms(e.target.checked)} style={{ marginTop:'1px' }} />
         <span>Accepto els <a href="/terms" style={{ color:'#4A5057', textDecoration:'underline' }}>Termes del Servei</a>, la <a href="/privacy" style={{ color:'#4A5057', textDecoration:'underline' }}>Política de Privacitat</a> i la <a href="/shipping" style={{ color:'#4A5057', textDecoration:'underline' }}>Política d'enviaments</a>.</span>
@@ -605,7 +618,7 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
     // Telèfon). Així no cal cap número calculat a mà: si demà canvia un camp,
     // l'alineació es manté tota sola. La línia "Powered by Stripe" va posicionada
     // absoluta i, per tant, queda fora del flux i no desplaça res.
-    <div style={{ marginTop: 'auto' }}>
+    <div style={{ marginTop: isPortraitTablet ? undefined : 'auto', position: isPortraitTablet ? 'absolute' : undefined, top: isPortraitTablet ? `${P_BUTTON_ABS}px` : undefined, left: isPortraitTablet ? 0 : undefined, right: isPortraitTablet ? 0 : undefined }}>
       <button onClick={handleSubmit} disabled={isProcessing} style={{ width:'100%', height: isPortraitTablet ? `${P_BUTTON_H}px` : (isNarrowForm ? '28px' : '34px'), border:'none', borderRadius:'4px', backgroundColor: isProcessing?'#8FE8B9':'#00D66F', color:'#063B21', fontFamily:'Roboto Condensed, sans-serif', fontSize:'10.5pt', fontWeight:600, boxShadow:'0 1px 2px rgba(16,24,40,0.08)', cursor: isProcessing?'not-allowed':'pointer', display:'flex', alignItems:'center', justifyContent:'center', gap:'8px' }}>
         {isProcessing ? 'Processant…' : (<><Check size={14} strokeWidth={2} /> Confirma la compra</>)}
       </button>
@@ -913,10 +926,10 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
           // Aquesta cel·la va a la SEGONA columna (la de pagament), o sigui que
           // els termes i el botó de pagar queden davall la targeta, amb el
           // mateix cap d'esquerra i la mateixa amplada que els camps.
-          // El marge negatiu la puja fins al capdamunt del camp del telèfon
-          // (874 -> 826): la fila comença just sota la columna d'enviament, i
-          // el telèfon n'és l'últim camp.
-          <div style={{ gridColumn:'2', marginTop: isPortraitTablet ? '-48px' : undefined, display:'flex', flexDirection:'column', minHeight:0, position:'relative' }}>
+          // El marge negatiu la puja perquè el BOTÓ acabi al mateix nivell que el
+          // camp del telèfon: la fila comença just sota la columna d'enviament,
+          // i el telèfon n'és l'últim camp.
+          <div style={{ gridColumn:'2', marginTop: isPortraitTablet ? `${P_CELL_LIFT}px` : undefined, display:'flex', flexDirection:'column', minHeight:0, position:'relative' }}>
             {invoiceBlock}
             {termsBlock}
             {buttonBlock}
