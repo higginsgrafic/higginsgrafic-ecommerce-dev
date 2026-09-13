@@ -16,7 +16,7 @@ export function OrderDeliveredEmail({ order = {} }) {
         </span>
       }
       ctaText="Si tens cap dubte o consulta, contacta'ns >"
-      ctaUrl="https://higginsgrafic.com"
+      ctaUrl="/"
     >
       {/* Order Number Box (E, 16) to (T, 19) */}
       <div

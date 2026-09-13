@@ -3,7 +3,7 @@ import { EmailLayout } from '../components/EmailLayout.jsx';
 
 export function PasswordResetEmail({ data = {} }) {
   const clientName = data.first_name || data.fullName || data.name || 'Maria';
-  const resetUrl = data.reset_url || 'https://higginsgrafic.com/reset-password';
+  const resetUrl = data.reset_url || '/reset-password';
 
   return (
     <EmailLayout
@@ -19,7 +19,7 @@ export function PasswordResetEmail({ data = {} }) {
         </span>
       }
       ctaText="Torna a la botiga >"
-      ctaUrl="https://higginsgrafic.com"
+      ctaUrl="/"
     >
       {/* Reset password button box (E, 16) to (T, 19) */}
       <div style={{ margin: '0 auto 16px auto', width: '100%', maxWidth: '346.67px', textAlign: 'center' }}>

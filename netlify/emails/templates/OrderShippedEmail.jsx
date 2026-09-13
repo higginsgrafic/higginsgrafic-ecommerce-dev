@@ -16,7 +16,7 @@ export function OrderShippedEmail({ order = {} }) {
         </span>
       }
       ctaText="Torna a la botiga >"
-      ctaUrl="https://higginsgrafic.com"
+      ctaUrl="/"
     >
       {/* Tracking Box (E, 16) to (T, 19) */}
       <div

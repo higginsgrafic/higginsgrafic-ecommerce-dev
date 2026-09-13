@@ -15,7 +15,7 @@ export function OrderFailedEmail({ order = {} }) {
         </span>
       }
       ctaText="Torna a la botiga >"
-      ctaUrl="https://higginsgrafic.com"
+      ctaUrl="/"
     >
       <div style={{ textAlign: 'center', margin: '18px 0 12px 0' }}>
         {/* Email link */}

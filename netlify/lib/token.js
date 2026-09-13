@@ -1,4 +1,5 @@
 import crypto from 'node:crypto';
+import { getSiteBase } from './site-url.js';
 
 const TOKEN_BYTES = 32;
 const DEFAULT_EXPIRY_DAYS = 90;
@@ -27,7 +28,7 @@ export function isTokenExpired(expiresAt) {
 }
 
 export function buildTrackingLink(siteUrl, rawToken) {
-  const base = siteUrl || process.env.SITE_URL || 'https://higginsgrafic.com';
+  const base = siteUrl || getSiteBase();
   // La ruta de seguiment de l'aplicació és /track (vegeu AppRoutes.jsx).
   // Abans apuntava a /comanda, que no existeix: l'enllaç "Segueix la teva
   // comanda" de tots els correus portava a una pàgina de "no trobat".
