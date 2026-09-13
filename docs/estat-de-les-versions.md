@@ -40,7 +40,7 @@ producte, la tipografia dels títols), cal tornar a comprovar la vertical.
 ## Guies de color (temporals)
 
 `src/components/dev/MegaslideEndGuide.jsx` dibuixa tres línies de referència al
-checkout (títol + 20, mega-slide − 20 i el final del mega-slide). Surt sempre en
-desenvolupament i, al lloc publicat, només amb `?megaslide=1`. A la vertical va
-desactivada. **S'ha d'esborrar quan s'acabi la feina**: el component i la línia
-que l'importa a `CheckoutPage.jsx`.
+checkout (títol + 20, mega-slide − 20 i el final del mega-slide). Estan
+**apagades per defecte**: només surten amb `?megaslide=1` a l'adreça o prement
+Alt+M. A la vertical no s'hi apliquen. **S'han d'esborrar quan s'acabi la
+feina**: el component i la línia que l'importa a `CheckoutPage.jsx`.
