@@ -557,6 +557,9 @@ function CistellComandaContent({ cartItems, setCartItems, onFinalizeOrder }) {
             const isDesktop = orientation === 'desktop';
             return createPortal((
               <div style={{
+                // Fins que no hi ha mesura, el bloc no es veu: si no, sortia a la
+                // meitat de la pantalla i tot seguit saltava a lloc seu.
+                visibility: overlayTop != null && overlayLeft != null ? 'visible' : 'hidden',
                 position: 'fixed',
                 top: overlayTop != null ? `${overlayTop + (isPortrait ? 26 : 25)}px` : `calc(50% + ${isPortrait ? 26 : 25}px)`,
                 left: overlayLeft != null ? `${overlayLeft - (isPortrait ? 106 : 0) + 5}px` : 'calc(50vw + 5px)',
