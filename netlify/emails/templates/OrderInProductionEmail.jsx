@@ -1,3 +1,4 @@
+import React from 'react';
 import { EmailLayout } from '../components/EmailLayout.jsx';
 
 export function OrderInProductionEmail({ order = {} }) {
@@ -62,5 +63,3 @@ export function OrderInProductionEmail({ order = {} }) {
 export const orderInProductionMeta = {
   subject: (order) => `Comanda en producció #${order?.order_number || order?.id || ''}`,
 };
-
-

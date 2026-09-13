@@ -1,3 +1,4 @@
+import React from 'react';
 import { Html, Head, Body, Img, Link } from '@react-email/components';
 
 const LOGO_URL = 'https://raw.githubusercontent.com/higginsgrafic/higginsgrafic-ecommerce-dev/main/public/custom_logos/brand/HIGGINS%20GRAFIC%20NEGRE.png';
@@ -227,5 +228,3 @@ export function EmailLayout({
     </Html>
   );
 }
-
-
