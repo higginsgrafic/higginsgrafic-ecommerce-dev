@@ -631,6 +631,18 @@ function CistellComandaContent({ cartItems, setCartItems, onCloseMegaSlide, onFi
           <button
             id="stripe-guide-finalize-order"
             ref={finalizeBtnRef}
+            type="button"
+            // Aquest botó és NOMÉS una marca de mesura: el botó que es veu i es
+            // clica és el que es dibuixa a sobre (el "Tot plegat fa … /
+            // FINALITZA LA COMANDA" flotant), i es col·loca calculant el centre
+            // d'aquest. Abans era visible i clicable, i per tant hi havia dos
+            // botons iguals alhora: un a sobre de l'altre, i el de sota quedava
+            // tapat per la línia del carretó. Ara queda invisible i fora de
+            // l'abast del teclat i dels lectors de pantalla, però conserva
+            // exactament la mateixa mida i posició perquè el botó de debò no
+            // es mogui ni un píxel.
+            tabIndex={-1}
+            aria-hidden="true"
             onClick={isOnCheckoutRoute
               ? () => { if (typeof onCloseMegaSlide === 'function') onCloseMegaSlide(); }
               : handleFinalizeOrder}
@@ -654,6 +666,8 @@ function CistellComandaContent({ cartItems, setCartItems, onCloseMegaSlide, onFi
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
+              visibility: 'hidden',
+              pointerEvents: 'none',
             }}
           >
             {isOnCheckoutRoute
