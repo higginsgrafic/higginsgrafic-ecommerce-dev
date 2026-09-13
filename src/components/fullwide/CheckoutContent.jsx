@@ -903,7 +903,7 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
               2px i a 11pt, i TOT PLEGAT FA en Roboto Condensed a 12.5pt. */}
           <div style={{ position:'absolute', top:0, bottom:0, right:0, width:`${TOTALS_W}px`, boxSizing:'border-box', display:'flex', flexDirection:'column', fontFamily:'Roboto, sans-serif', justifyContent:'flex-end', gap:'2px', padding:'10px 12px', background:'#FFFFFF', border:'1px solid #E6E8EC', borderRadius:'6px' }}>
             {/* La mateixa linia de 2px que la cinta, a la vora esquerra, i amb el mateix comportament: nome s surt si hi ha fitxes amagades en aquesta banda. */}
-            <div aria-hidden="true" style={{ position:'absolute', left:0, top:0, bottom:0, width:'2px', pointerEvents:'none', opacity: cintaAmbMesDreta ? 1 : 0, transition:'opacity 160ms ease', background:'#98A2B4', borderRadius:'6px 0 0 6px' }} />
+            <div aria-hidden="true" style={{ position:'absolute', left:0, top:0, bottom:0, width:'1px', pointerEvents:'none', opacity: cintaAmbMesDreta ? 1 : 0, transition:'opacity 160ms ease', background:'#98A2B4', borderRadius:'6px 0 0 6px' }} />
             {/* Els totals són una suma: cada concepte a la seva ratlla, el nom a
                 l'esquerra i la xifra a la dreta, com una columna de números.
                 El Subtotal és el preu de la peça sense transport i sense IVA;
