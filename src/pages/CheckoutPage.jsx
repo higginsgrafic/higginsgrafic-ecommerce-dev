@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import SEO from '@/components/SEO';
@@ -26,15 +26,17 @@ export default function CheckoutPage() {
   const { cartItems, setCartItems, getTotalItems } = useCart();
   const navigate = useNavigate();
 
-  const buit = getTotalItems() === 0;
+  // Important: només mirem si el cistell és buit EN ENTRAR. Si ho féssim de
+  // manera contínua, en buidar-se el cistell just després de pagar aquesta
+  // comprovació s'activaria i enviaria el client a l'inici, trepitjant la
+  // navegació cap a la pàgina de confirmació (passava exactament això).
+  const buitEnEntrar = useRef(getTotalItems() === 0).current;
 
-  // Sense res al cistell no hi ha res a pagar: tornem a la botiga en comptes
-  // d'ensenyar un formulari de pagament buit.
   useEffect(() => {
-    if (buit) navigate('/', { replace: true });
-  }, [buit, navigate]);
+    if (buitEnEntrar) navigate('/', { replace: true });
+  }, [buitEnEntrar, navigate]);
 
-  if (buit) return null;
+  if (buitEnEntrar) return null;
 
   return (
     <motion.div
