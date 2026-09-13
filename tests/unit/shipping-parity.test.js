@@ -14,7 +14,7 @@ import {
   SHIPPING_RATES as SERVER_RATES,
   normalizeCountry as serverNormalize,
   quoteShipping,
-} from '../../netlify/functions/_shipping.js';
+} from '../../netlify/lib/shipping.js';
 
 // Rèplica exacta de calculate() de src/hooks/useShippingCosts.js
 function clientShipping(country, quantity, subtotal) {

@@ -4,9 +4,9 @@ vi.stubEnv('SITE_URL', 'https://test.higginsgrafic.com');
 vi.stubEnv('TRACKING_TOKEN_EXPIRY_DAYS', '90');
 
 const { generateTrackingToken, hashToken, getTokenExpiry, isTokenExpired, buildTrackingLink } =
-  await import('../../netlify/functions/_token.js');
+  await import('../../netlify/lib/token.js');
 
-describe('_token.js — tracking token utilities', () => {
+describe('netlify/lib/token.js — tracking token utilities', () => {
   describe('generateTrackingToken', () => {
     it('generates a 64-char hex string (32 bytes)', () => {
       const token = generateTrackingToken();

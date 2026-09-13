@@ -1,5 +1,5 @@
 import 'dotenv/config';
-import { sendOrderEmail } from '../netlify/functions/_email.js';
+import { sendOrderEmail } from '../netlify/lib/email.js';
 
 const sample8Items = [
   { name: 'First Contact', size: 'M', quantity: 1, price: 18.5 },

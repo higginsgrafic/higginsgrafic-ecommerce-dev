@@ -1,6 +1,6 @@
-import { sendOrderEmail } from './_notify.js';
-import { checkRateLimit } from './_rate-limit.js';
-import { jsonResponse } from './_cors.js';
+import { sendOrderEmail } from '../lib/notify.js';
+import { checkRateLimit } from '../lib/rate-limit.js';
+import { jsonResponse } from '../lib/cors.js';
 
 function escapeHtml(str) {
   return String(str)

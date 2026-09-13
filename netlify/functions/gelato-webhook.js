@@ -16,7 +16,7 @@
  *       shipmentMethodName, ... }
  *
  * `orderReferenceId` és el NOSTRE número de comanda (order_number), perquè és
- * el que li vam enviar nosaltres en crear-la (vegeu _gelato.js).
+ * el que li vam enviar nosaltres en crear-la (vegeu netlify/lib/gelato.js).
  *
  * Configuració necessària a Netlify:
  *   GELATO_WEBHOOK_SECRET — secret compartit per verificar que l'avís ve de
@@ -25,8 +25,8 @@
  */
 
 import { createClient } from '@supabase/supabase-js';
-import { sendOrderEmail } from './_notify.js';
-import { jsonResponse } from './_cors.js';
+import { sendOrderEmail } from '../lib/notify.js';
+import { jsonResponse } from '../lib/cors.js';
 
 const SUPABASE_URL = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
 const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;

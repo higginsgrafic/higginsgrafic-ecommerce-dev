@@ -4,7 +4,7 @@ import { supabase } from '@/api/supabase-products';
  * Capçaleres HTTP amb el token de sessió de Supabase.
  *
  * Els endpoints `/api/orders` exigeixen `Authorization: Bearer <token>`
- * (vegeu netlify/functions/_auth.js). Sense aquesta capçalera responen 401,
+ * (vegeu netlify/lib/auth.js). Sense aquesta capçalera responen 401,
  * i com que els hooks silenciaven l'error, l'historial de comandes de
  * l'usuari sortia SEMPRE buit tot i tenir comandes.
  *

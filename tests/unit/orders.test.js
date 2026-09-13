@@ -52,7 +52,7 @@ vi.mock('@supabase/supabase-js', () => ({
   }),
 }));
 
-vi.mock('../../netlify/functions/_email.js', () => ({
+vi.mock('../../netlify/lib/email.js', () => ({
   sendOrderEmail: vi.fn().mockResolvedValue({ id: 'email-1' }),
 }));
 

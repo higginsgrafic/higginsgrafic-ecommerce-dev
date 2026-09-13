@@ -8,7 +8,22 @@
  *   RESEND_FROM_EMAIL   — remitent verificat (comandes@higginsgrafic.com)
  */
 
-import { render } from '@react-email/render';
+// NO es fa servir `@react-email/render` aquí.
+//
+// Per què: `@react-email/render` v2 té tres builds (browser / node / edge) i
+// el seu build de node arrossega `prettier` i `html-to-text`. L'empaquetador
+// de Netlify n'incloïa uns fitxers i no uns altres, i en arrencar la funció
+// petava amb:
+//   Cannot find module '/var/task/node_modules/@react-email/render/dist/node/index.cjs'
+// Com que aquest fitxer s'importa a dalt de tot, la funció SENCERA no
+// arrencava (502), inclòs el webhook de Stripe: es podia cobrar un client i
+// no confirmar mai la comanda.
+//
+// `renderToStaticMarkup` de `react-dom/server` fa exactament la feina que
+// necessitem (convertir components React en HTML) i ve amb React, que ja hi
+// és. El resultat és el mateix HTML; només canvia que no s'embelleix amb
+// prettier, cosa irrellevant per a un correu.
+import { renderToStaticMarkup } from 'react-dom/server';
 import { createElement } from 'react';
 import { OrderConfirmedEmail, orderConfirmedMeta } from '../emails/templates/OrderConfirmedEmail.jsx';
 import { OrderInProductionEmail, orderInProductionMeta } from '../emails/templates/OrderInProductionEmail.jsx';
@@ -21,6 +36,12 @@ import { PasswordResetEmail, passwordResetMeta } from '../emails/templates/Passw
 import { ContactReceivedEmail, contactReceivedMeta } from '../emails/templates/ContactReceivedEmail.jsx';
 
 const RESEND_API = 'https://api.resend.com/emails';
+
+// `renderToStaticMarkup` no afegeix el doctype; `@react-email/render` sí que
+// ho feia. Els clients de correu necessiten el doctype per no entrar en mode
+// "quirks", així que l'afegim nosaltres. És exactament el mateix que posava
+// el renderitzador anterior.
+const DOCTYPE = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">';
 
 function getFrom() {
   const from = process.env.RESEND_FROM_EMAIL || 'onboarding@resend.dev';
@@ -60,7 +81,9 @@ export async function sendOrderEmail(templateKey, payload) {
 
   const { Component, meta, propName } = template;
   const element = createElement(Component, { [propName]: payload });
-  const rawHtml = await render(element);
+  // Antigament: await render(element) de @react-email/render (vegeu la nota
+  // de dalt). renderToStaticMarkup és síncron i retorna el mateix HTML.
+  const rawHtml = DOCTYPE + renderToStaticMarkup(element);
   const html = rawHtml
     .replace(/src="\/([^"]+)"/g, 'src="https://higginsgrafic.com/$1"')
     .replace(/url\('\/([^']+)'\)/g, "url('https://higginsgrafic.com/$1')");

@@ -19,9 +19,9 @@ vi.mock('@supabase/supabase-js', () => ({
   }),
 }));
 
-const { verifyAdmin, verifyUser } = await import('../../netlify/functions/_auth.js');
+const { verifyAdmin, verifyUser } = await import('../../netlify/lib/auth.js');
 
-describe('_auth.js — verifyAdmin', () => {
+describe('netlify/lib/auth.js — verifyAdmin', () => {
   beforeEach(() => {
     vi.resetAllMocks();
   });
@@ -81,7 +81,7 @@ describe('_auth.js — verifyAdmin', () => {
   });
 });
 
-describe('_auth.js — verifyUser', () => {
+describe('netlify/lib/auth.js — verifyUser', () => {
   beforeEach(() => {
     vi.resetAllMocks();
   });

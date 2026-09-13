@@ -15,9 +15,9 @@ vi.mock('@supabase/supabase-js', () => ({
   }),
 }));
 
-const { checkRateLimit } = await import('../../netlify/functions/_rate-limit.js');
+const { checkRateLimit } = await import('../../netlify/lib/rate-limit.js');
 
-describe('_rate-limit.js — checkRateLimit', () => {
+describe('netlify/lib/rate-limit.js — checkRateLimit', () => {
   beforeEach(() => {
     vi.resetAllMocks();
   });

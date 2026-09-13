@@ -1,7 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
-import { verifyAdmin } from './_auth.js';
-import { checkRateLimit } from './_rate-limit.js';
-import { jsonResponse } from './_cors.js';
+import { verifyAdmin } from '../lib/auth.js';
+import { checkRateLimit } from '../lib/rate-limit.js';
+import { jsonResponse } from '../lib/cors.js';
 
 const SUPABASE_URL = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
 const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
