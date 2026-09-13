@@ -578,7 +578,10 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
         <h1 style={{ ...HEAD, fontSize: '20pt', margin: '0 0 18px' }}>Pagament</h1>
 
         <div style={bloc}>
-          <div style={titol}>La teva comanda</div>
+          {/* Sense el retol "La teva comanda": el contingut ja es veu que és la
+              comanda i la targeta no en necessita el títol (el bloc de dades
+              d'enviament i el de pagament sí que en duen, perquè allà sí que
+              cal saber què és cada cosa). */}
           {activeItems.map((it, i) => (
             <div key={it.id || i} style={{ display: 'flex', justifyContent: 'space-between', gap: '10px', padding: '6px 0', borderBottom: '1px solid #F0F2F6' }}>
               <span style={{ fontSize: '10.5pt' }}>
@@ -696,12 +699,14 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
       <span style={{ ...HEAD, fontSize:'18pt', fontWeight:600, position:'absolute', top:titleY, left: isPortraitTablet ? P_SHIFT_X : SHIFT_X, transform:'translateY(-50%)' }}>PAGAMENT</span>
       {/* La banda de dades comença sota el títol PAGAMENT (que va absolut), per
           no trepitjar-lo. */}
-      <div style={{ display:'grid', gridTemplateColumns: isPortraitTablet ? '1fr 1fr' : '1fr 1fr 1fr 1fr', columnGap:'24px', rowGap:'18px', padding:0, width: groupW, marginLeft: groupX, marginTop:'34px', marginBottom: isTabletRecipe ? `${titleGap}px` : undefined, flexShrink:0, minHeight: isTabletRecipe ? '29px' : undefined, alignItems:'center' }}>
-        {/* La teva comanda: tota la fila de dalt */}
-        <div style={{ gridColumn:'1 / -1', display:'flex', alignItems:'center', justifyContent:'flex-start', transform: shiftColsX }}>
-          <span style={{ fontSize:'12pt', fontWeight:500 }}>La teva comanda</span>
-        </div>
-      </div>
+      {/* Aquí hi havia el títol "La teva comanda". S'ha tret perquè és
+          redundant: la pàgina ja es diu PAGAMENT i el que ve a sota és,
+          precisament, la comanda. La franja, però, es queda amb la mateixa
+          alçada que tenia (els 24px de la línia del títol; 29 a les
+          tauletes), de manera que tot el que hi ha a sota no es mou ni un
+          píxel. Els 34px de dalt són els que aparten el contingut del títol
+          PAGAMENT, que va posicionat absolut i no ocupa lloc. */}
+      <div style={{ marginTop:'34px', width: groupW, marginLeft: groupX, flexShrink:0, minHeight: isTabletRecipe ? '29px' : '24px', marginBottom: isTabletRecipe ? `${titleGap}px` : undefined }} />
       <div style={{ display:'grid', gridTemplateColumns: isPortraitTablet ? '1fr 1fr' : '1fr 1fr 1fr 1fr', columnGap:'24px', rowGap: isPortraitTablet ? `${P_ROW_GAP}px` : '18px', width: groupW, marginLeft: groupX, flex: '0 0 auto', minHeight:0, transform: shiftColsX }}>
         {/* COL 1: Cistell + Totals. Ara ocupa tota la fila de dalt. */}
         <div style={{ gridColumn:'1 / -1', display:'flex', flexDirection:'column', minHeight:0 }}>
