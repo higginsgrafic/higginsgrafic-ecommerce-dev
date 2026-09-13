@@ -4,8 +4,11 @@ function formatPrice(n) {
 }
 
 export function SummaryTable({ order }) {
-  const subtotalNum =
-    (Number(order.total) || 0) - (Number(order.shipping_cost) || 0);
+  // El subtotal que desa la comanda és la base imposable: el preu de la peça
+  // sense transport i sense IVA. Les tres xifres sumen el total.
+  const subtotalNum = order.subtotal != null
+    ? Number(order.subtotal)
+    : (Number(order.total) || 0) - (Number(order.shipping_cost) || 0) - (Number(order.iva) || 0);
   const subtotal = formatPrice(subtotalNum);
   const shipping = formatPrice(order.shipping_cost || 0);
   const iva = formatPrice(order.iva || 0);
@@ -41,7 +44,15 @@ export function SummaryTable({ order }) {
             Transport
           </td>
           <td style={{ padding: '0 0 4px', fontFamily: "'Roboto', Helvetica, Arial, sans-serif", fontSize: '14px', color: '#141414', textAlign: 'right' }}>
-            {Number(order.shipping_cost) > 0 ? shipping : 'Inclòs'}
+            {Number(order.shipping_cost) > 0 ? shipping : 'Gratuït'}
+          </td>
+        </tr>
+        <tr>
+          <td style={{ padding: '0 0 4px', fontFamily: "'Roboto', Helvetica, Arial, sans-serif", fontSize: '14px', color: '#141414' }}>
+            IVA 21%
+          </td>
+          <td style={{ padding: '0 0 4px', fontFamily: "'Roboto', Helvetica, Arial, sans-serif", fontSize: '14px', color: '#141414', textAlign: 'right' }}>
+            {iva}
           </td>
         </tr>
         <tr>
@@ -53,14 +64,6 @@ export function SummaryTable({ order }) {
           </td>
           <td style={{ padding: '0 0 4px', fontFamily: "'Roboto', Helvetica, Arial, sans-serif", fontSize: '15px', fontWeight: 700, color: '#141414', textAlign: 'right' }}>
             <div style={{ marginTop: '2px' }}>{total}</div>
-          </td>
-        </tr>
-        {/* L'IVA no és un concepte que se sumi: els preus de la botiga ja el
-            porten inclòs, i si el poséssim com una ratlla més la suma donaria
-            més que el total. Va aquí sota, com a nota. */}
-        <tr>
-          <td colSpan="2" style={{ padding: '2px 0 0', fontFamily: "'Roboto', Helvetica, Arial, sans-serif", fontSize: '11px', color: '#98A2B4', textAlign: 'right' }}>
-            IVA 21% inclòs en el total: {iva}
           </td>
         </tr>
       </tbody>

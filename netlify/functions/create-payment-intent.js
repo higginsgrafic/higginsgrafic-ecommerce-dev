@@ -224,28 +224,32 @@ async function calculateServerSideTotal(supabase, items, shippingZone) {
   const shippingCost = quoteShipping(shippingZone, totalQuantity, subtotal);
 
   // El transport va INCLÒS dins del preu de la botiga: no s'afegeix mai al
-  // total. Es continua cotitzant (i es desa a part, com a dada informativa)
-  // perquè saber quant costaria enviar-ho és útil, però el que es cobra és
-  // exactament la suma dels preus dels articles.
+  // total. Es continua cotitzant perquè forma part del desglossament (és una de
+  // les ratlles que veu el client al checkout).
   // Preus i transport són PVP (IVA 21% inclòs). No afegim IVA a sobre del total.
   const subtotalPvp = Math.round(subtotal * 100) / 100;
-  const shippingPvp = 0;
-  const shippingCotitzat = Math.round(shippingCost * 100) / 100;
+  const shippingPvp = Math.round(shippingCost * 100) / 100;
   const totalEur = Math.round(subtotalPvp * 100) / 100;
   const totalCents = Math.round(totalEur * 100);
 
-  // Desglossament d'IVA 21% (base imposable + quota d'IVA)
-  const baseImponible = Math.round((totalEur / 1.21) * 100) / 100;
-  const iva = Math.round((totalEur - baseImponible) * 100) / 100;
+  // Desglossament EXACTAMENT igual que al client (CheckoutContent): del total en
+  // traiem primer el transport i després l'IVA del que queda:
+  //   base = (total − transport) / 1,21
+  //   iva  = total − transport − base
+  // Així base + transport + iva = total, i el que es cobra no canvia mai.
+  const baseImponible = Math.round(((totalEur - shippingPvp) / 1.21) * 100) / 100;
+  const iva = Math.round((totalEur - shippingPvp - baseImponible) * 100) / 100;
 
   if (totalCents < 50 || totalCents > 500000) {
     return { error: 'Total fora del rang permès (0.50€ - 5000.00€)' };
   }
 
   return {
-    subtotal: subtotalPvp,
-    shippingCost: shippingPvp,
-    shippingQuoted: shippingCotitzat,
+    // El que es desa a la comanda: les tres parts sumen el total.
+    subtotal: baseImponible,        // sense transport i sense IVA
+    shippingCost: shippingPvp,      // el transport que va dins del preu
+    subtotalPvp,                    // la suma dels preus de la botiga
+    shippingQuoted: shippingPvp,
     baseImponible,
     iva,
     total: totalCents,
@@ -376,6 +380,7 @@ export async function handler(event, context) {
       orderNumber: order.order_number,
       trackingToken: rawTrackingToken,
       subtotal: calc.subtotal,
+      subtotalPvp: calc.subtotalPvp,
       shippingCost: calc.shippingCost,
       shippingQuoted: calc.shippingQuoted,
       baseImponible: calc.baseImponible,

@@ -192,11 +192,11 @@ describe('create-payment-intent — resiliència', () => {
 
       expect(res.statusCode).toBe(200);
       const body = JSON.parse(res.body);
-      // El transport va inclòs dins del preu: el que es cobra és 0, però la
-      // cotització es continua calculant i es desa a part. Mateixa tarifa que
-      // mostrava el client per a un país desconegut: Espanya, 1 article -> 4.29
-      // (abans s'aplicava un 4.95 pla que el client no ensenyava mai).
-      expect(body.shippingCost).toBe(0);
+      // El transport va inclòs dins del preu i és una de les ratlles del
+      // desglossament. Mateixa tarifa que mostrava el client per a un país
+      // desconegut: Espanya, 1 article -> 4.29 (abans s'aplicava un 4.95 pla
+      // que el client no ensenyava mai).
+      expect(body.shippingCost).toBe(4.29);
       expect(body.shippingQuoted).toBe(4.29);
     });
   });
