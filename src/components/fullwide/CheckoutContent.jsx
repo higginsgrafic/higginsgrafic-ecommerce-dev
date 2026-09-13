@@ -885,9 +885,13 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
             {/* Logo de Grup Higgins, nome s a la vertical, com a marca d'aigua
                 del bloc de totals. Va amb màscara per poder-lo tenyir: el SVG
                 nome s aporta la forma. El marge de baix automatic empeny els
-                totals cap avall, aixi que el logo queda a dalt. */}
+                totals cap avall, aixi que el logo queda a dalt. El marge
+                esquerre el centra en X amb el retol TOT PLEGAT FA: el retol
+                ocupa de 13 a 116 dins la targeta (centre a 65) i el logo fa
+                69px, o sigui que ha d'arrencar a 30,5, 17,5 mes enlla del
+                marge interior de la targeta. */}
             {isPortraitTablet && (
-              <div aria-hidden="true" style={{ alignSelf:'center', width:'92px', height:'92px', marginBottom:'auto', backgroundColor:'#F9FAFB', WebkitMaskImage:'url(/custom_logos/brand/grup-higgins-logo.svg)', maskImage:'url(/custom_logos/brand/grup-higgins-logo.svg)', WebkitMaskRepeat:'no-repeat', maskRepeat:'no-repeat', WebkitMaskPosition:'center', maskPosition:'center', WebkitMaskSize:'contain', maskSize:'contain' }} />
+              <div aria-hidden="true" style={{ alignSelf:'flex-start', marginLeft:'17.5px', width:'69px', height:'69px', marginBottom:'auto', backgroundColor:'#F9FAFB', WebkitMaskImage:'url(/custom_logos/brand/grup-higgins-logo.svg)', maskImage:'url(/custom_logos/brand/grup-higgins-logo.svg)', WebkitMaskRepeat:'no-repeat', maskRepeat:'no-repeat', WebkitMaskPosition:'center', maskPosition:'center', WebkitMaskSize:'contain', maskSize:'contain' }} />
             )}
             {/* Els totals són una suma: cada concepte a la seva ratlla, el nom a
                 l'esquerra i la xifra a la dreta, com una columna de números.
