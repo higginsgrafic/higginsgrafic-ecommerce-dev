@@ -1,5 +1,4 @@
-import React, { lazy, Suspense, useRef, useEffect, useCallback, useState } from 'react';
-import { clampNumber } from '@/utils/layoutMetrics';
+import { lazy, Suspense, useRef, useEffect, useCallback, useState } from 'react';
 import MegaStripeBleedGuard from './MegaStripeBleedGuard.jsx';
 import MegaStripePanelP1 from './MegaStripePanelP1.jsx';
 import MegaslidePagina2 from '../megaslide/MegaslidePagina2.jsx';
@@ -139,12 +138,9 @@ export default function MegaMenuPanel({
   const page1SelectedItem = active === 'first_contact' ? firstContactSelectedItem
     : active === 'the_human_inside' ? humanInsideSelectedItem
     : (selectedItemByCollection?.[active] ?? null);
-  const portraitPage2TileSize = `${effectiveMegaTileSize || 120}px`;
   const portraitLandscapeWidth = typeof window !== 'undefined'
     ? Math.min(1350, window.innerHeight - 15)
     : 1024;
-  const portraitTileCap = effectiveMegaTileSize || 120;
-  const portraitPage1TileSize = effectiveMegaTileSize || 120;
   const defaultBleedGuardHeight = effectiveMegaTileSize
     ? `${Math.round(effectiveMegaTileSize * 2 + 37 + Math.max(0, stripeRowPadPx))}px`
     : undefined;
