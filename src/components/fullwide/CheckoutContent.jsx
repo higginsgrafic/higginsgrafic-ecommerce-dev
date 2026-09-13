@@ -154,9 +154,12 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
   const P_TERMS_TOP = 0;
   // "Necessites factura?" també va a la cel·la dreta (la del Telèfon) i penja
   // ABSOLUT, com el botó: així es pot alinear amb la columna del costat sense
-  // empenyir els termes ni el botó. Amb -124 el seu FONS cau on cau el fons
-  // del camp de Ciutat (724). Positiu = baixa la factura.
-  const P_INVOICE_TOP = -124;
+  // empenyir els termes ni el botó. Amb -133 el TEXT de la ratlla queda a
+  // 699-710, exactament on cau el text del camp de Ciutat (699-710): no
+  // s'alineen les caixes, que enganyen, sinó la tinta de les lletres.
+  // El junt intern del bloc (18px) manté el CIF al fons del camp de Pais.
+  // Positiu = baixa la factura.
+  const P_INVOICE_TOP = -133;
   // Marge de dalt de la cel·la dels termes dins la graella. -87 la deixa de
   // manera que el BOTÓ de pagar acabi exactament al mateix nivell que el camp
   // del telèfon (860). Si es canvia, P_INVOICE_TOP s'ha d'ajustar perquè la
@@ -637,7 +640,7 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
   // columna de la targeta i el vertical la penja a la cel·la dreta, a la pista del
   // Telèfon i al nivell del retol "Dades de pagament" (P_INVOICE_TOP).
   const invoiceBlock = (
-    <div style={{ display:'grid', rowGap: isPortraitTablet ? '9px' : '8px', marginTop: isPortraitTablet ? 0 : '16px', position: isPortraitTablet ? 'absolute' : undefined, top: isPortraitTablet ? `${P_INVOICE_TOP}px` : undefined, left: isPortraitTablet ? 0 : undefined, right: isPortraitTablet ? 0 : undefined }}>
+    <div style={{ display:'grid', rowGap: isPortraitTablet ? '18px' : '8px', marginTop: isPortraitTablet ? 0 : '16px', position: isPortraitTablet ? 'absolute' : undefined, top: isPortraitTablet ? `${P_INVOICE_TOP}px` : undefined, left: isPortraitTablet ? 0 : undefined, right: isPortraitTablet ? 0 : undefined }}>
       <label style={{ display:'flex', alignItems:'center', gap:'8px', fontSize: isNarrowForm ? '9pt' : '10.5pt', fontWeight:300 }}>
         <input type="checkbox" checked={needsInvoice} onChange={(e) => setNeedsInvoice(e.target.checked)} />
         <span>Necessites factura?</span>
