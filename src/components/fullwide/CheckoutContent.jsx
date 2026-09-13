@@ -256,15 +256,14 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
   // A la vertical la franja va de la guia verda (titol + 20) a la blava (final
   // del mega-slide - 20) i te una alcada fixa. Aqui es construeix amb el mateix
   // criteri: alcada fixa, presa a la mida de referencia de cada format.
-  //   apaisada 1024x768:   guies 138 i 316   -> 178px, comenca a 138 (7px mes
-  //                        avall d'on naixia, que era 131)
-  //   escriptori 1440x1000: guies 161 i 397  -> 236px, comenca a 161 (5px mes
-  //                        amunt d'on naixia, que era 166)
-  // I el formulari es queda on era: del seu marge se'n treu el que ha crescut la
-  // franja (24px a l'apaisada, 70px a l'escriptori).
-  const L_FITXA_H = 178;
+  //   apaisada: guies 122 i 336 -> 214px (mesurat a la finestra de treball)
+  //   escriptori 1440x1000: guies 161 i 397 -> 236px
+  // El marge de dalt el posa a la guia verda (131 -> 138 a l'apaisada de
+  // referencia; 166 -> 161 a l'escriptori). I del marge del formulari se'n treu
+  // el que ha crescut la franja, perque el formulari es quedi on era.
+  const L_FITXA_H = 214;
   const L_FRANJA_TOP = 7;
-  const L_FRANJA_CREIX = 24;
+  const L_FRANJA_CREIX = 60;
   const D_FITXA_H = 236;
   const D_FRANJA_TOP = -5;
   const D_FRANJA_CREIX = 70;
