@@ -6,10 +6,17 @@
  * de la comanda no s'actualitzava mai sol: només passava a "en_preparacio"
  * quan Gelato acceptava la comanda, i després es quedava aturat per sempre.
  *
- * Dades que envia Gelato (verificat amb les proves del seu panell):
+ * Dades que envia Gelato. Els exemples de sota són els REALS, copiats de la
+ * prova del panell de Gelato (els valors entre {{...}} els substitueix Gelato
+ * en enviar-los de debò):
  *
  *   order_status_updated
  *     { event, orderId, orderReferenceId, fulfillmentStatus, items: [...] }
+ *
+ *   order_item_status_updated
+ *     { event, id, itemReferenceId, orderReferenceId, orderId, storeId,
+ *       fulfillmentCountry, fulfillmentStateProvince, fulfillmentFacilityId,
+ *       status, comment, created }
  *
  *   order_item_tracking_code_updated
  *     { event, orderId, orderReferenceId, trackingCode, trackingUrl,
@@ -17,6 +24,10 @@
  *
  * `orderReferenceId` és el NOSTRE número de comanda (order_number), perquè és
  * el que li vam enviar nosaltres en crear-la (vegeu netlify/lib/gelato.js).
+ *
+ * ATENCIÓ: l'estat de la comanda arriba per DOS camins diferents —a
+ * `fulfillmentStatus` (avis de comanda) o a `status` (avis d'article)— i els
+ * dos s'han de gestionar. Vegeu-ho més avall.
  *
  * Configuració necessària a Netlify:
  *   GELATO_WEBHOOK_SECRET — secret compartit per verificar que l'avís ve de
@@ -178,81 +189,108 @@ export async function handler(event) {
       return jsonResponse(event, 200, { received: true, order: 'not_found' });
     }
 
-    // --- Número de seguiment ---
+    // --- Recollim què ens diu aquest avís ---
+    const canvis = {};
+
+    // Número de seguiment. Pot arribar sol (order_item_tracking_code_updated)
+    // o dins d'un avís d'estat.
     if (tipus === 'order_item_tracking_code_updated') {
-      const canvis = {};
       if (payload.trackingCode) canvis.tracking_number = payload.trackingCode;
       if (payload.trackingUrl) canvis.tracking_url = payload.trackingUrl;
       if (payload.shipmentMethodName) canvis.tracking_carrier = payload.shipmentMethodName;
-
-      if (Object.keys(canvis).length > 0) {
-        const { error } = await supabase.from('orders').update(canvis).eq('id', order.id);
-        if (error) {
-          console.error('[gelato-webhook] Error desant el seguiment:', error.message);
-          return jsonResponse(event, 500, { error: 'Error desant el seguiment' });
-        }
-        console.log('[gelato-webhook] Seguiment desat:', canvis.tracking_number);
-      }
-
-      return jsonResponse(event, 200, { received: true, updated: 'tracking' });
     }
 
-    // --- Canvi d'estat de la comanda ---
-    if (tipus === 'order_status_updated') {
-      const gelatoStatus = String(payload.fulfillmentStatus || '').toLowerCase();
-      const nouEstat = STATUS_MAP[gelatoStatus];
+    // Estat de la comanda. Gelato el envia de DUES maneres diferents:
+    //
+    //   order_status_updated      → l'estat ve al camp `fulfillmentStatus`
+    //                               (estat de tota la comanda)
+    //   order_item_status_updated → l'estat ve al camp `status`
+    //                               (estat article a article)
+    //
+    // Tots dos ens serveixen igual, perquè la botiga té un sol estat per
+    // comanda. Aquesta segona forma es va descobrir provant el webhook des del
+    // panell de Gelato: si no es gestionava, l'estat no s'actualitzava mai.
+    const esCanviDEstat =
+      tipus === 'order_status_updated' || tipus === 'order_item_status_updated';
+
+    if (esCanviDEstat) {
+      const estatGelato = String(payload.fulfillmentStatus || payload.status || '').toLowerCase();
+      const nouEstat = STATUS_MAP[estatGelato];
 
       if (!nouEstat) {
-        console.warn('[gelato-webhook] Estat de Gelato no reconegut:', gelatoStatus, '— no es canvia res');
-        return jsonResponse(event, 200, { received: true, ignored: gelatoStatus });
-      }
-
-      const canvis = {};
-
-      // No fem retrocedir una comanda ja entregada o cancel·lada.
-      const finals = ['entregada', 'cancel_lada'];
-      if (!finals.includes(order.status)) {
-        canvis.status = nouEstat;
-      }
-
-      // Aprofitem per desar el seguiment si ve dins dels items.
-      const primer = payload.items?.[0]?.fulfillments?.[0];
-      if (primer) {
-        if (primer.trackingCode) canvis.tracking_number = primer.trackingCode;
-        if (primer.trackingUrl) canvis.tracking_url = primer.trackingUrl;
-        if (primer.shipmentMethodName) canvis.tracking_carrier = primer.shipmentMethodName;
-      }
-
-      if (Object.keys(canvis).length === 0) {
-        return jsonResponse(event, 200, { received: true, unchanged: true });
-      }
-
-      const { error } = await supabase.from('orders').update(canvis).eq('id', order.id);
-      if (error) {
-        console.error('[gelato-webhook] Error actualitzant l\'estat:', error.message);
-        return jsonResponse(event, 500, { error: 'Error actualitzant l\'estat' });
-      }
-
-      console.log('[gelato-webhook] Estat actualitzat:', order.status, '→', canvis.status || order.status);
-
-      // Correu d'enviament: només quan la comanda passa a "seguiment" i no
-      // s'havia enviat abans. Abans això depenia d'un canvi manual que ningú
-      // no feia, així que el correu no s'enviava mai.
-      const esNouEnviament = canvis.status === 'seguiment' && order.status !== 'seguiment';
-      if (esNouEnviament) {
-        try {
-          await sendOrderEmail('order_shipped', { ...order, ...canvis });
-        } catch (err) {
-          console.error('[gelato-webhook] Error enviant el correu d\'enviament:', err.message);
+        // No inventem res: si no reconeixem l'estat, es queda com estava.
+        console.warn('[gelato-webhook] Estat de Gelato no reconegut:', estatGelato);
+        if (Object.keys(canvis).length === 0) {
+          return jsonResponse(event, 200, { received: true, ignored: estatGelato });
+        }
+      } else {
+        // No fem retrocedir una comanda ja entregada o cancel·lada.
+        const finals = ['entregada', 'cancel_lada'];
+        if (!finals.includes(order.status)) {
+          canvis.status = nouEstat;
         }
       }
-
-      return jsonResponse(event, 200, { received: true, status: canvis.status || order.status });
     }
 
-    // Altres avisos (catàleg de productes, etc.): s'accepten i s'ignoren.
-    console.log('[gelato-webhook] Avís no gestionat:', tipus);
-    return jsonResponse(event, 200, { received: true, ignored: tipus });
+    // Aprofitem per desar el seguiment si ve dins dels items.
+    const primer = payload.items?.[0]?.fulfillments?.[0];
+    if (primer) {
+      if (primer.trackingCode) canvis.tracking_number = primer.trackingCode;
+      if (primer.trackingUrl) canvis.tracking_url = primer.trackingUrl;
+      if (primer.shipmentMethodName) canvis.tracking_carrier = primer.shipmentMethodName;
+    }
+
+    // Si l'avís no ens aporta res nou, no toquem la base de dades.
+    if (Object.keys(canvis).length === 0) {
+      if (!esCanviDEstat) {
+        console.log('[gelato-webhook] Avís no gestionat:', tipus);
+      }
+      return jsonResponse(event, 200, { received: true, unchanged: true });
+    }
+
+    const { error } = await supabase.from('orders').update(canvis).eq('id', order.id);
+    if (error) {
+      console.error('[gelato-webhook] Error actualitzant la comanda:', error.message);
+      return jsonResponse(event, 500, { error: 'Error actualitzant la comanda' });
+    }
+
+    console.log(
+      '[gelato-webhook] Comanda actualitzada:',
+      referencia || gelatoId,
+      '| estat:',
+      order.status,
+      '→',
+      canvis.status || order.status,
+      canvis.tracking_number ? `| seguiment: ${canvis.tracking_number}` : ''
+    );
+
+    // --- Correu d'enviament ---
+    //
+    // S'envia quan la comanda consta com a enviada I tenim número de
+    // seguiment. Calen les dues coses: un correu dient "s'ha enviat" sense el
+    // número de seguiment no serveix de res.
+    //
+    // Gelato envia l'estat i el número en avisos SEPARATS i no sempre en el
+    // mateix ordre, així que no ens fixem en quin avís ha arribat, sinó en el
+    // resultat: si abans no teníem les dues coses i ara sí, s'envia.
+    // D'aquesta manera s'envia exactament una vegada.
+    const estatFinal = canvis.status || order.status;
+    const teSeguiment = canvis.tracking_number || order.tracking_number;
+    const jaAvisat = order.status === 'seguiment' && Boolean(order.tracking_number);
+
+    if (estatFinal === 'seguiment' && teSeguiment && !jaAvisat) {
+      try {
+        await sendOrderEmail('order_shipped', { ...order, ...canvis });
+      } catch (err) {
+        console.error('[gelato-webhook] Error enviant el correu d\'enviament:', err.message);
+      }
+    }
+
+    return jsonResponse(event, 200, {
+      received: true,
+      status: estatFinal,
+      tracking: teSeguiment || null,
+    });
   } catch (error) {
     console.error('[gelato-webhook] Error inesperat:', error);
     return jsonResponse(event, 500, { error: 'Error intern del servidor' });
