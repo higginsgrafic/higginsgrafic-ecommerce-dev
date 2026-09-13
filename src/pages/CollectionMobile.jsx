@@ -9,7 +9,7 @@ const COLLECTIONS_MENU = [
   ['the-human-inside', 'The Human Inside', '/custom_logos/collections/collection-thin-logo.svg'],
   ['austen', 'Austen', '/custom_logos/collections/collection-jean-austen-logo.svg'],
   ['cube', 'Cube', '/custom_logos/collections/collection-cube-logo.svg'],
-  ['miscellania', 'Miscel·lània', '/custom_logos/collections/collection-miscellania-logo.webp'],
+  ['miscellania', 'Miscel·lània', '/custom_logos/collections/collection-miscellania-logo.svg'],
 ];
 
 function shuffle(arr) {

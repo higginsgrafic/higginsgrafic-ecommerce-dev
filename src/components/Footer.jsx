@@ -34,7 +34,7 @@ const Footer = () => {
     { id: 'the-human-inside', name: texts.footer.collections.theHumanInside, path: '/the-human-inside', icon: '/custom_logos/collections/collection-thin-logo.svg' },
     { id: 'austen', name: texts.footer.collections.austen, path: '/austen', icon: '/custom_logos/collections/collection-jean-austen-logo.svg' },
     { id: 'cube', name: texts.footer.collections.cube, path: '/cube', icon: '/custom_logos/collections/collection-cube-logo.svg' },
-    { id: 'miscellania', name: texts.footer.collections.miscellania, path: '/miscellania', icon: '/custom_logos/collections/collection-miscellania-logo.webp' }
+    { id: 'miscellania', name: texts.footer.collections.miscellania, path: '/miscellania', icon: '/custom_logos/collections/collection-miscellania-logo.svg' }
   ];
 
   // Ordre per desktop (5 col·leccions)
@@ -43,7 +43,7 @@ const Footer = () => {
     { id: 'the-human-inside', name: texts.footer.collections.theHumanInside, path: '/the-human-inside', icon: '/custom_logos/collections/collection-thin-logo.svg' },
     { id: 'austen', name: texts.footer.collections.austen, path: '/austen', icon: '/custom_logos/collections/collection-jean-austen-logo.svg' },
     { id: 'cube', name: texts.footer.collections.cube, path: '/cube', icon: '/custom_logos/collections/collection-cube-logo.svg' },
-    { id: 'miscellania', name: texts.footer.collections.miscellania, path: '/miscellania', icon: '/custom_logos/collections/collection-miscellania-logo.webp' }
+    { id: 'miscellania', name: texts.footer.collections.miscellania, path: '/miscellania', icon: '/custom_logos/collections/collection-miscellania-logo.svg' }
   ];
 
   useEffect(() => {
