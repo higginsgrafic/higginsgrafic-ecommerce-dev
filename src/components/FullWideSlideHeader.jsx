@@ -92,10 +92,22 @@ function FullWideSlideHeader({
   const { orders } = useOrders(adminEmail);
   const cartClickTimeoutRef = useRef(null);
   const accountClickTimeoutRef = useRef(null);
-  // Marca de temps de l'últim clic sobre la icona del cistell. Serveix per
-  // ignorar el segon clic d'un clic ràpid doble: sense això, l'acció s'executa
-  // dues vegades seguides (obre i tanca) i la pàgina sembla que reboti enrere.
+  // Marques de temps de l'últim clic sobre cada icona de la capçalera. Serveixen
+  // per ignorar el segon clic d'un clic ràpid doble: sense això, l'acció
+  // s'executa dues vegades seguides (obre i tanca el mega-slide de cop) i la
+  // pàgina sembla que reboti enrere.
   const cartLastClickRef = useRef(0);
+  const searchLastClickRef = useRef(0);
+  const accountLastClickRef = useRef(0);
+  // Retorna true si el clic s'ha d'ignorar perquè arriba massa seguit de
+  // l'anterior. El primer clic passa sempre i fa la feina de seguida: això
+  // només descarta el segon d'un doble clic.
+  const clicRepetit = (ref) => {
+    const ara = Date.now();
+    if (ara - ref.current < 350) return true;
+    ref.current = ara;
+    return false;
+  };
   const dblClickDelayMs = 0;
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -3066,6 +3078,8 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
               <IconButton
                 label="Cercador i catàleg"
                 onClick={() => {
+                  // Un clic ràpid doble obriria i tancaria el mega-slide de cop.
+                  if (clicRepetit(searchLastClickRef)) return;
                   setManualOverrideClosed(false);
                   // Cerca: pestanya única (sense acordió secundari).
                   // Click toggle: si ja som a la pestanya de cerca, la
@@ -3092,12 +3106,8 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
               type="button"
               onClick={(e) => {
                 e.preventDefault();
-                // Un clic ràpid doble executava l'acció dues vegades (obrir i
-                // tancar el mega-slide de cop) i la pàgina saltava endavant i
-                // enrere. Ignorem el segon clic si arriba massa seguit.
-                const ara = Date.now();
-                if (ara - cartLastClickRef.current < 350) return;
-                cartLastClickRef.current = ara;
+                // Un clic ràpid doble obriria i tancaria el mega-slide de cop.
+                if (clicRepetit(cartLastClickRef)) return;
                 if (cartClickTimeoutRef.current) window.clearTimeout(cartClickTimeoutRef.current);
                 cartClickTimeoutRef.current = window.setTimeout(() => {
                   cartClickTimeoutRef.current = null;
@@ -3161,6 +3171,8 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
                 buttonRef={accountButtonRef}
                 onClick={(e) => {
                   e.preventDefault();
+                  // Un clic ràpid doble obriria i tancaria el mega-slide de cop.
+                  if (clicRepetit(accountLastClickRef)) return;
                   if (accountClickTimeoutRef.current) window.clearTimeout(accountClickTimeoutRef.current);
                   accountClickTimeoutRef.current = window.setTimeout(() => {
                     accountClickTimeoutRef.current = null;
