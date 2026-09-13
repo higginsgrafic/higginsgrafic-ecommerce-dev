@@ -133,26 +133,12 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
   // Aire entre la filera de dalt (comanda + enviament) i la de baix
   // (dades de pagament + acceptació i botó).
   const P_ROW_GAP = 14;
-  // ===== VERTICAL: amplada de columna =====
-  // Pista = la mateixa que dona l'horitzontal a 1024x768: (992 - 3*24) / 4 = 230.
-  // Únic número a retocar: l'amplada del grup i el seu desplaçament en deriven.
-  // (L'horitzontal fa 269px a 1180 i 315,5px a 1366; 230px és el valor del seu
-  // 1024x768, que és la tauleta de referència.)
-  const P_COL_W = 230;
-  const P_COL_GAP = 24;                       // els mateixos junts que a l'horitzontal
-  const P_GROUP_PX = 2 * P_COL_W + P_COL_GAP; // 484px
-  // La capsa del vertical fa min(1350, 100vh-32) = 992px dins una pantalla de
-  // 768px i la capa interior s'escala a 0,94: el grup de 484px (abans en feia
-  // 736, l'amplada del cinturó) es veu reduït a 455px en pantalla, o sigui que
-  // hi cap de sobres i queden 156,5px d'aire a cada banda.
-  const P_GROUP_W = `${P_GROUP_PX}px`;
-  // I cal desplaçar-lo perquè quedi centrat a la pantalla: l'escat 0,94 deixa el
-  // cap d'esquerra de la capa a (1 - 0,94)/2 * 992 = 0,03 * 992 = 29,76px de la
-  // vora, i el grup es veu reduït per 0,94 (d'aquí el 0,94 i el 0,47 de la
-  // fórmula). P_SHIFT_ADJ és el retoc manual en px, positiu cap a la dreta
-  // (el desplaçament surt 134,85px a 768x1024; abans, 8,85px).
-  const P_SHIFT_ADJ = 0;
-  const P_SHIFT_X = `calc((50vw - 0.47 * ${P_GROUP_PX}px - 0.03 * min(1350px, 100vh - 32px)) / 0.94 + ${P_SHIFT_ADJ}px)`;
+  // ===== VERTICAL: amplada =====
+  // La vertical ja no té amplada pròpia: fa servir la mateixa franja que la
+  // resta de versions, la que va del logo de la capçalera a la icona de
+  // l'usuari (les mateixes pistes d'1fr i el mateix junt de 24px). Abans
+  // s'encongia a un grup de 484px centrat a la pantalla, i per això el botó de
+  // pagar quedava desalineat respecte del contingut.
   // Cap de l'acceptació de termes, mesurat des del cap de la seva cel·la. L'esquerra
   // no cal tocar-la: termes i botó són a la mateixa pista que la columna
   // d'enviament. El nivell, en canvi, ve d'aquí: 88 = títol "Dades de pagament"
@@ -291,8 +277,6 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
     ? `${CONJUNT_LIFT * 2}px`
     : (isPortraitTablet ? `${P_CONJUNT_LIFT * 2}px` : `${D_CONJUNT_LIFT * 2}px`);
   const bodyH = isLandscapeTablet ? `${FORMS_H}px` : (isPortraitTablet ? undefined : `${D_BODY_H}px`);
-  const groupW = isPortraitTablet ? P_GROUP_W : undefined;
-  const groupX = isPortraitTablet ? P_SHIFT_X : undefined;
   // A la tauleta apaïsada, el llistat de productes puja 25px (entra dins l'aire
   // de la franja buida, que no pinta res) i les columnes de dades arrenquen amb
   // el marge curt. A la resta de mides, tot igual que sempre.
@@ -789,7 +773,7 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
             2. A sota, les dues columnes de sempre: enviament | pagament.
           Els elements no s'han redibuixat: són els mateixos, amb els seus
           estils i les seves mides. Només ha canviat la fila on seuen. */}
-      <span style={{ ...HEAD, fontSize:'18pt', fontWeight:600, position:'absolute', top:titleY, left: isPortraitTablet ? P_SHIFT_X : SHIFT_X, transform:'translateY(-50%)' }}>PAGAMENT</span>
+      <span style={{ ...HEAD, fontSize:'18pt', fontWeight:600, position:'absolute', top:titleY, left: SHIFT_X, transform:'translateY(-50%)' }}>PAGAMENT</span>
       {/* La banda de dades comença sota el títol PAGAMENT (que va absolut), per
           no trepitjar-lo. */}
       {/* Aquí hi havia el títol "La teva comanda". S'ha tret perquè és
@@ -799,8 +783,8 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
           tauletes), de manera que tot el que hi ha a sota no es mou ni un
           píxel. Els 34px de dalt són els que aparten el contingut del títol
           PAGAMENT, que va posicionat absolut i no ocupa lloc. */}
-      <div style={{ marginTop:'34px', width: groupW, marginLeft: groupX, flexShrink:0, minHeight: isTabletRecipe ? '29px' : '24px', marginBottom: isTabletRecipe ? `${titleGap}px` : undefined }} />
-      <div style={{ display:'grid', gridTemplateColumns: isPortraitTablet ? '1fr 1fr' : '1fr 1fr 1fr 1fr', columnGap:'24px', rowGap: isPortraitTablet ? `${P_ROW_GAP}px` : '18px', width: groupW, marginLeft: groupX, marginTop: productesLift, flex: '0 0 auto', minHeight:0, transform: shiftColsX }}>
+      <div style={{ marginTop:'34px', flexShrink:0, minHeight: isTabletRecipe ? '29px' : '24px', marginBottom: isTabletRecipe ? `${titleGap}px` : undefined }} />
+      <div style={{ display:'grid', gridTemplateColumns: isPortraitTablet ? '1fr 1fr' : '1fr 1fr 1fr 1fr', columnGap:'24px', rowGap: isPortraitTablet ? `${P_ROW_GAP}px` : '18px', marginTop: productesLift, flex: '0 0 auto', minHeight:0, transform: shiftColsX }}>
         {/* COL 1: el cistell. Una cinta de fitxes que es desplaça de costat amb
             la targeta dels totals clavada a la dreta, per sobre de les fitxes
             (que hi passen per sota). Ocupa una franja d'alçada fixa: el
@@ -915,7 +899,10 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
             en flux a P_TERMS_TOP i el botó penjat a P_BUTTON_TOP. Com que la
             factura i el botó penjen absoluts, no mouen els termes en absolut. */}
         {isPortraitTablet && (
-          <div style={{ display:'flex', flexDirection:'column', minHeight:0, position:'relative' }}>
+          // Aquesta cel·la ocupa tota la fila: els termes i el botó de pagar han
+          // d'anar d'una banda a l'altra del contingut (del logo a la icona de
+          // l'usuari), com la resta de blocs.
+          <div style={{ gridColumn:'1 / -1', display:'flex', flexDirection:'column', minHeight:0, position:'relative' }}>
             {invoiceBlock}
             {termsBlock}
             {buttonBlock}
