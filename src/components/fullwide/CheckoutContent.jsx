@@ -602,10 +602,11 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
   // és fix sinó que surt de FIELD_GAP: si mai es canvia el junt, l'alineament
   // amb el correu es manté tot sol.
   const termsBlock = (
-    // A la vertical, 2px i no 18: amb 18 els termes queien sobre el botó (que
-    // va clavat al fons del camp del telèfon) quan el text fa dues línies,
-    // com passa a les columnes estretes (820 i 769).
-    <div style={{ marginTop: isPortraitTablet ? '2px' : undefined, marginBottom: isPortraitTablet ? undefined : `${FIELD_GAP}px` }}>
+    // A la vertical, -10px: així l'acceptació de termes queda al mateix nivell
+    // que el capdamunt del camp del correu electrònic. Si no, queia 12px més
+    // avall i, a les columnes estretes (820 i 769), el text de dues línies
+    // passava per sobre del botó.
+    <div style={{ marginTop: isPortraitTablet ? '-10px' : undefined, marginBottom: isPortraitTablet ? undefined : `${FIELD_GAP}px` }}>
       <label style={{ display:'flex', alignItems:'flex-start', gap:'8px', fontSize:'9.5pt', lineHeight:1.25, fontWeight:300 }}>
         <input type="checkbox" checked={acceptTerms} onChange={(e) => setAcceptTerms(e.target.checked)} style={{ marginTop:'1px' }} />
         <span>Accepto els <a href="/terms" style={{ color:'#4A5057', textDecoration:'underline' }}>Termes del Servei</a>, la <a href="/privacy" style={{ color:'#4A5057', textDecoration:'underline' }}>Política de Privacitat</a> i la <a href="/shipping" style={{ color:'#4A5057', textDecoration:'underline' }}>Política d'enviaments</a>.</span>
