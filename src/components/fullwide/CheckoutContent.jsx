@@ -847,9 +847,10 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
               així sempre creixen cap a l'esquerra, des de la targeta dels
               totals. El coixí de la dreta fa l'amplada de la targeta més el
               marge, de manera que l'última fitxa sempre es pot treure de sota. */}
-          {/* Sombra al marge esquerre: nome s surt si hi ha fitxes amagades en
-              aquesta banda, i serveix per indicar que la cinta continua. */}
-          <div aria-hidden="true" style={{ position:'absolute', left:0, top:0, bottom:0, width:'12px', pointerEvents:'none', opacity: cintaAmbMes ? 1 : 0, transition:'opacity 160ms ease', background:'linear-gradient(to right, rgba(16,24,40,0.30), rgba(16,24,40,0))', zIndex:2 }} />
+          {/* Linia fosca al marge esquerre: nome s surt si hi ha fitxes
+              amagades en aquesta banda, i serveix per indicar que la cinta
+              continua. Abans era un degradat; ara es una linia de 3px. */}
+          <div aria-hidden="true" style={{ position:'absolute', left:0, top:0, bottom:0, width:'3px', pointerEvents:'none', opacity: cintaAmbMes ? 1 : 0, transition:'opacity 160ms ease', background:'#141414', zIndex:2 }} />
           <div ref={cintaRef} style={{ flex:'1 1 auto', minWidth:0, display:'flex', alignItems:'stretch', gap:`${GAP_FITXES}px`, overflowX:'auto', overflowY:'hidden', paddingRight:`${TOTALS_W + TOTALS_GAP}px`, scrollbarWidth:'thin' }}>
             <div style={{ flex:'1 1 auto', minWidth:0 }} />
             {activeItems.map((item, idx) => {
