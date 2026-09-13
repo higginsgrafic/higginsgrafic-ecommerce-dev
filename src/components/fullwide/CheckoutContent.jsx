@@ -242,7 +242,7 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
   //     el llistat, queda 90px més amunt del que era a l'origen. Baixar-lo =
   //     apujar aquest número; apujar-lo = abaixar-lo.
   const L_PRODUCTES_LIFT = 25;
-  const L_COLUMNES_TOP = 65;
+  const L_COLUMNES_TOP = 55;
 
   // Marge de creació de les dues columnes de dades (el que les separa del bloc
   // de productes). El fan servir l'escriptori i la tauleta vertical, tal qual.
