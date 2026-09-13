@@ -23,6 +23,23 @@ function getStripe() {
 
 const WEBHOOK_SECRET = process.env.STRIPE_WEBHOOK_SECRET;
 
+/**
+ * Estem en mode de proves de Stripe?
+ *
+ * Les claus de prova comencen per `sk_test_` i les de debò per `sk_live_`.
+ *
+ * PER QUÈ IMPORTA: si s'envia una comanda de prova a Gelato, es crea una
+ * comanda de producció REAL i costa diners de debò (Gelato imprimeix i envia
+ * el producte). Passa molt fàcilment: es fa una compra de prova amb una
+ * targeta de prova, Stripe considera el pagament correcte, dispara aquest
+ * webhook i la comanda acaba a la impremta.
+ *
+ * Per això, amb claus de proves no s'hi envia res. Quan es canviïn les claus
+ * per les de producció, el bloqueig desapareix tot sol: no hi ha cap
+ * interruptor que algú pugui oblidar-se de canviar.
+ */
+const MODE_PROVES_STRIPE = String(process.env.STRIPE_SECRET_KEY || '').startsWith('sk_test_');
+
 const SUPABASE_URL = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
 const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
@@ -39,6 +56,14 @@ function getSupabase() {
  * Retorna 'retry' si cal que Stripe reenviï l'esdeveniment, 'ok' o 'skip' altrament.
  */
 async function fulfillGelato(supabase, order) {
+  if (MODE_PROVES_STRIPE) {
+    console.warn(
+      '[stripe-webhook] MODE DE PROVES (clau sk_test_): la comanda NO s\'envia a Gelato. ' +
+      'Enviar-la crearia una comanda de producció real i costaria diners.'
+    );
+    return 'skip';
+  }
+
   if (order.gelato_order_id) {
     console.log('[stripe-webhook] Comanda ja enviada a Gelato:', order.gelato_order_id, '— skip');
     return 'ok';

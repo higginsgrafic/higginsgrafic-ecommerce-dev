@@ -2,7 +2,10 @@ import { describe, expect, it, vi, beforeEach } from 'vitest';
 
 vi.stubEnv('SUPABASE_URL', 'https://test.supabase.co');
 vi.stubEnv('SUPABASE_SERVICE_ROLE_KEY', 'test-key');
-vi.stubEnv('STRIPE_SECRET_KEY', 'sk_test_fake');
+// Aquests tests comproven el camí de PRODUCCIÓ (enviar la comanda a Gelato),
+// per això fan servir una clau de debò simulada: amb una clau sk_test_ el
+// sistema no hi envia res a posta (vegeu MODE_PROVES_STRIPE).
+vi.stubEnv('STRIPE_SECRET_KEY', 'sk_live_fake');
 vi.stubEnv('STRIPE_WEBHOOK_SECRET', 'whsec_test');
 
 const mockStripeConstruct = vi.fn();
