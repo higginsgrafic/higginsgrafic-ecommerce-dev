@@ -45,7 +45,7 @@ const COLLECTIONS_MENU = [
     id: 'miscellania',
     name: 'Miscel·lània',
     href: '/miscellania',
-    icon: '/custom_logos/collections/collection-miscellania-logo.webp',
+    icon: '/custom_logos/collections/collection-miscellania-logo.svg',
   },
 ];
 
@@ -238,7 +238,7 @@ function CollectionMiscellaniaPage() {
         <CollectionMobile
           collectionSlug="miscellania"
           collectionTitle="Miscel·lània"
-          collectionIcon="/custom_logos/collections/collection-miscellania-logo.webp"
+          collectionIcon="/custom_logos/collections/collection-miscellania-logo.svg"
           products={PRODUCTS}
           colors={TDP_GRID_COLORS}
           posterLines={[{ text: 'MÉS VAL SOL' }, { text: 'QUE MAL' }, { text: 'ACOMPANYAT' }]}
@@ -306,7 +306,7 @@ function CollectionMiscellaniaPage() {
             }}
           >
             <img
-              src="/custom_logos/collections/collection-miscellania-logo.webp"
+              src="/custom_logos/collections/collection-miscellania-logo.svg"
               alt=""
               aria-hidden="true"
               loading="lazy"

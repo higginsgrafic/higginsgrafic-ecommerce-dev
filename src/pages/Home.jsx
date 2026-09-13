@@ -89,7 +89,7 @@ const COLLECTIONS_MENU = [
     id: 'miscellania',
     name: 'Miscel·lània',
     href: '/miscellania',
-    icon: '/custom_logos/collections/collection-miscellania-logo.webp',
+    icon: '/custom_logos/collections/collection-miscellania-logo.svg',
   },
 ];
 
