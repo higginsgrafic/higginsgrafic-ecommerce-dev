@@ -147,9 +147,11 @@ function App() {
   const handleUserClick = useCallback(() => navigate('/perfil'), [navigate]);
   const pageProps = useMemo(() => ({ onAddToCart: handleAddToCart, cartItems, onUpdateQuantity: updateQuantity }), [handleAddToCart, cartItems, updateQuantity]);
 
-  // '/checkout' també és pantalla completa: mentre es paga no volem la
-  // capçalera del mega-slide, perquè ningú no marxi a mig procés sense voler.
-  const isFullScreenRoute = location.pathname === '/checkout' || location.pathname === '/ec-preview' || location.pathname === '/ec-preview-lite' || location.pathname === '/dev/contact-sheet' || location.pathname === '/dev/site-map' || isEmbeddedPreview;
+  // El pagament NO és pantalla completa: volem que la capçalera del mega-slide
+  // segueixi visible (la botiga vol semblar una aplicació i el mega-slide n'és
+  // el marc). La pàgina de pagament entra per sota seu.
+  const isCheckoutRoute = location.pathname === '/checkout';
+  const isFullScreenRoute = location.pathname === '/ec-preview' || location.pathname === '/ec-preview-lite' || location.pathname === '/dev/contact-sheet' || location.pathname === '/dev/site-map' || isEmbeddedPreview;
   const isAdminRoute = ['/admin', '/index', '/promotions', '/ec-config', '/system-messages', '/fulfillment', '/fulfillment-settings', '/admin/media', '/admin-login', '/colleccio-settings', '/user-icon-picker', '/mockups', '/admin/gelato-sync', '/admin/gelato-blank', '/admin/products-overview', '/admin/draft', '/admin/draft/fulfillment-settings', '/admin/draft/mockup-settings', '/admin/draft/ruleta'].includes(location.pathname) || location.pathname.startsWith('/fulfillment/') || location.pathname.startsWith('/admin');
   const isHeroSettingsDevRoute = location.pathname === '/hero-settings';
   const isDevToolsRoute = location.pathname === '/dev-tools' || location.pathname.startsWith('/dev-tools/');
@@ -277,8 +279,9 @@ function App() {
           </Suspense>
         </main>
 
-        {/* Footer - NO mostrar a pàgines full-screen ni admin */}
-        {!isFullScreenRoute && !isAdminRoute && (
+        {/* Footer - NO mostrar a pàgines full-screen, ni a l'admin, ni mentre
+            s'està pagant (aquí no volem convidar ningú a marxar) */}
+        {!isFullScreenRoute && !isAdminRoute && !isCheckoutRoute && (
           isComponentsCatalogTemplateRoute ? (
             null
           ) : (

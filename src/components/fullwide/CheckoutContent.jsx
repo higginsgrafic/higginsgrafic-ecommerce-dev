@@ -83,8 +83,8 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
   // té el seu propi desplaçament (P_SHIFT_X). Va com a `transform` a la banda de
   // títols i a la graella del cos, o sigui que títols i columnes viatgen junts i
   // l'alineament en Y que ja està calibrat no en depèn.
-  const SHIFT_X = 'calc((var(--hg-mega-w, min(1350px, calc(100vw - 32px))) + 24px) / 8)';
-  const shiftColsX = isPortraitTablet ? undefined : `translateX(${SHIFT_X})`;
+  const SHIFT_X = '0px';
+  const shiftColsX = undefined;
 
   // El títol penja del damunt de la franja, no del bloc centrat: l'altura de la
   // primera filera de producte del cistell és 2*23,867 - 2,037 - 2 = 43,70px,
@@ -104,23 +104,23 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
   // El setè bloc (Email) comença a 6·41 = 246px del cap de la columna.
   const FIELD_EMAIL_TOP = 6 * FIELD_STRIDE;
   // Termes: 5px per sota de la línia de l'Email (retoc visual seu).
-  const TERMS_TOP = FIELD_EMAIL_TOP + 5;
+  const TERMS_TOP = FIELD_EMAIL_TOP;
 
   // Aire entre la banda dels títols de columna (fa 29px) i la fila de contingut.
   // Únic número a retocar; no mou l'amplada de les columnes ni els seus junts.
   const TITLE_GAP = 10;
 
   // "Necessites factura?" pujat 11px sobre els 14px originals de creació (6 + 5).
-  const INVOICE_TOP = 14 - 11;
+  const INVOICE_TOP = 0;
   // "Nom d'empresa" + CIF: aire real entre la ratlla del xec i la seva capsa.
   // (Els 8px originals de la graella, menys 7 de pujada.)
-  const INVOICE_FIELDS_GAP = 1;
+  const INVOICE_FIELDS_GAP = 8;
 
   // Pujada del conjunt (banda dels títols + fila de contingut) sobre el centre.
   // El bloc es centra amb justify-content:center dins l'arrel, així que es
   // desplalla afegint padding-bottom a l'arrel: puja la meitat del valor.
   // El títol PAGAMENT no es mou perquè penja del cap de la franja (TITLE_Y).
-  const CONJUNT_LIFT = 50;
+  const CONJUNT_LIFT = 0;
 
   // ===== VERTICAL (2 columnes) =====
   // Números propis, als mateixos valors inicials que l'horitzontal perquè és la
@@ -159,14 +159,14 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
   // (16px * 1,5) + 10 de joc + vora 1 + capçalera "Targeta" (10 + 22 + 10) + seva
   // vora 1 + padding 10 = el cap de la capsa del número de targeta. Aquest número
   // fa d'àncora vertical també per al botó (vegeu P_BUTTON_TOP).
-  const P_TERMS_TOP = 88;
+  const P_TERMS_TOP = 0;
   // "Necessites factura?" també va a la cel·la dreta (pista del Telèfon) i penja
   // ABSOLUT, com el botó: així no pot empènyer els termes cap avall. 0 el posava a
   // la mateixa línia que el retol "Dades de pagament"; demanar-lo de pujar 10px el
   // deixa a -10, o sigui DINS el joc de 14px (P_ROW_GAP) que separa les dues
   // fileres: només li queden 4px fins als camps d'enviament de sobre.
   // Positiu = baixa la factura. Únic número a retocar per al seu nivell.
-  const P_INVOICE_TOP = -10;
+  const P_INVOICE_TOP = 0;
   // Alçada d'UNA capsa de camp de targeta (número, caducitat i CVC en fan la
   // mateixa): vores 1+1 + padding 10+10 + l'interior que posa l'iframe de Stripe.
   // L'interior no ve del nostre codi, així que el 42 d'abans era ESTIMAT i el botó
@@ -206,7 +206,7 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
   // columnes fan la mateixa alçada de fila, i el Telèfon és l'últim camp de
   // l'enviament. D_BUTTON_LIFT és l'únic número per afinar-ho (0 = clavats,
   // positiu = baixa el botó; el peu el segueix perquè penja d'ell).
-  const D_BUTTON_LIFT = 18;
+  const D_BUTTON_LIFT = 0;
   // Termes clavats al cap del camp de l'Email. No és un número fix: els 8 blocs
   // de l'enviament fan 34px i es reparteixen amb `space-between` dins la fila,
   // i la fila fa el que deixa la franja (294px amb finestra ≥1440, 290 a 1366,
@@ -216,13 +216,13 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
   // (positiu = baixa els termes, negatiu = puja'ls). 0 = tall geomètric del cap
   // de l'Email; ara és a 5 (baixats 5px, 2026-09-05), que és just el desplaçament
   // que ell va validar a l'horitzontal (vegeu TERMS_TOP).
-  const D_TERMS_ADJ = 15;
+  const D_TERMS_ADJ = 0;
   const D_TERMS_TOP = `calc(${6 * 34}px + (100% - ${8 * 34}px) * 6 / 7 + ${D_TERMS_ADJ}px)`;
   // "Necessites factura?": va com a marge de dalt del seu bloc, o sigui que es
   // mesura des del peu de la capsa de targeta. 14px originals de creació pujats
   // 10 (2026-09-05). Únic número a retocar. Com que a l'escriptori els termes i
   // el botó ja pengen absoluts, moure-la no els mogui ni un píxel.
-  const D_INVOICE_TOP = 14 - 20;
+  const D_INVOICE_TOP = 0;
   // La capsa dels dos camps (empresa + CIF) seu, a la posició de creació, just
   // després dels 8px de joc (rowGap) que separen del retol "Necessites factura?":
   // cap de la capsa a 21 + 8 = 29px damunt del bloc. Aquest número la puja sobre
@@ -230,13 +230,13 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
   // i les tauletes queden igual que estaven. Amb 10 el cap de la capsa va a 19px,
   // o sigui 1,5px per sota de les lletres del retol (la seva línia fa 21px i els
   // glifs ocupen de 3,5 a 17,5).
-  const D_INVOICE_FIELDS_LIFT = 10;
+  const D_INVOICE_FIELDS_LIFT = 0;
 
   // Valors derivats segons la variant que es renderitza: l'horitzontal dona
   // exactament els mateixos números que donava abans, l'escriptori res.
   const fieldGap = isLandscapeTablet ? FIELD_GAP : (isPortraitTablet ? P_FIELD_GAP : undefined);
   const titleGap = isLandscapeTablet ? TITLE_GAP : (isPortraitTablet ? P_TITLE_GAP : undefined);
-  const titleY = isLandscapeTablet ? `${TITLE_Y}px` : (isPortraitTablet ? `${P_TITLE_Y}px` : undefined);
+  const titleY = isLandscapeTablet ? `${TITLE_Y}px` : (isPortraitTablet ? `${P_TITLE_Y}px` : `${TITLE_Y}px`);
   const liftPad = isLandscapeTablet
     ? `${CONJUNT_LIFT * 2}px`
     : (isPortraitTablet ? `${P_CONJUNT_LIFT * 2}px` : `${D_CONJUNT_LIFT * 2}px`);
@@ -498,11 +498,7 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
   // a l'horitzontal van dins la columna de la targeta, al vertical formen la
   // cel·la dreta, sota les dades d'enviament.
   const termsBlock = (
-    <div style={isLandscapeTablet
-      ? { position:'absolute', top:`${TERMS_TOP}px`, left:0, right:0 }
-      : (isPortraitTablet
-          ? { marginTop: `${P_TERMS_TOP}px` }
-          : { position:'absolute', top: D_TERMS_TOP, left:0, right:0 })}>
+    <div style={{ marginTop: '18px' }}>
       <label style={{ display:'flex', alignItems:'flex-start', gap:'8px', fontSize:'9.5pt', lineHeight:1.25, fontWeight:300 }}>
         <input type="checkbox" checked={acceptTerms} onChange={(e) => setAcceptTerms(e.target.checked)} style={{ marginTop:'1px' }} />
         <span>Accepto els <a href="/terms" style={{ color:'#4A5057', textDecoration:'underline' }}>Termes del Servei</a>, la <a href="/privacy" style={{ color:'#4A5057', textDecoration:'underline' }}>Política de Privacitat</a> i la <a href="/shipping" style={{ color:'#4A5057', textDecoration:'underline' }}>Política d'enviaments</a>.</span>
@@ -511,9 +507,7 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
   );
 
   const buttonBlock = (
-    <div style={isPortraitTablet
-      ? { position:'absolute', top:`${P_BUTTON_TOP}px`, left:`${P_BUTTON_SHIFT_X}px`, width:'100%' }
-      : { flexShrink:0, marginTop:'auto', position:'relative', top: isLandscapeTablet ? undefined : `${D_BUTTON_LIFT}px` }}>
+    <div style={{ marginTop: '18px' }}>
       <button onClick={handleSubmit} disabled={isProcessing} style={{ width:'100%', height: isPortraitTablet ? `${P_BUTTON_H}px` : (isNarrowForm ? '28px' : '34px'), border:'none', borderRadius:'4px', backgroundColor: isProcessing?'#8FE8B9':'#00D66F', color:'#063B21', fontFamily:'Roboto Condensed, sans-serif', fontSize:'10.5pt', fontWeight:600, boxShadow:'0 1px 2px rgba(16,24,40,0.08)', cursor: isProcessing?'not-allowed':'pointer', display:'flex', alignItems:'center', justifyContent:'center', gap:'8px' }}>
         {isProcessing ? 'Processant…' : (<><Check size={14} strokeWidth={2} /> Confirma la compra</>)}
       </button>
@@ -529,15 +523,13 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
   // columna de la targeta i el vertical la penja a la cel·la dreta, a la pista del
   // Telèfon i al nivell del retol "Dades de pagament" (P_INVOICE_TOP).
   const invoiceBlock = (
-    <div style={isPortraitTablet
-      ? { position:'absolute', top:`${P_INVOICE_TOP}px`, left:0, width:'100%', display:'grid', rowGap:'8px' }
-      : { display:'grid', rowGap: isNarrowForm ? '2px' : (isLandscapeTablet ? `${INVOICE_FIELDS_GAP}px` : '8px'), marginTop: isNarrowForm ? '4px' : (isLandscapeTablet ? `${INVOICE_TOP}px` : `${D_INVOICE_TOP}px`) }}>
+    <div style={{ display:'grid', rowGap:'8px', marginTop:'16px' }}>
       <label style={{ display:'flex', alignItems:'center', gap:'8px', fontSize: isNarrowForm ? '9pt' : '10.5pt', fontWeight:300 }}>
         <input type="checkbox" checked={needsInvoice} onChange={(e) => setNeedsInvoice(e.target.checked)} />
         <span>Necessites factura?</span>
       </label>
       {needsInvoice && (
-        <div style={{ border:'1px solid #D8DDE3', borderRadius:'4px', overflow:'hidden', background:'#FFFFFF', marginTop: isTabletRecipe ? undefined : `-${D_INVOICE_FIELDS_LIFT}px` }}>
+        <div style={{ border:'1px solid #D8DDE3', borderRadius:'4px', overflow:'hidden', background:'#FFFFFF' }}>
           <input type="text" name="company" placeholder="Nom de l'empresa" value={formData.company} onChange={handleChange} style={{ width:'100%', height: isNarrowForm ? '26px' : '31px', border:'none', borderBottom:'1px solid #E6E8EC', padding:'0 10px', fontFamily:'Roboto Condensed, sans-serif', fontSize: isNarrowForm ? '9pt' : '10.5pt', color:'#4A5057', outline:'none', boxSizing:'border-box' }} />
           <input type="text" name="taxId" placeholder="CIF (ex: ESA12345672)" value={formData.taxId} onChange={handleChange} style={{ width:'100%', height: isNarrowForm ? '26px' : '31px', border:'none', padding:'0 10px', fontFamily:'Roboto Condensed, sans-serif', fontSize: isNarrowForm ? '9pt' : '10.5pt', color:'#4A5057', outline:'none', boxSizing:'border-box' }} />
         </div>
@@ -678,27 +670,33 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
   }
 
   return (
-    <div style={{ width:'100%', height:'100%', position: isTabletRecipe ? 'relative' : undefined, display:'flex', flexDirection:'column', justifyContent:'center', fontFamily:'Roboto Condensed, sans-serif', color:'#4A5057', overflow:'visible', padding:0, paddingBottom: liftPad, marginTop: isTabletRecipe ? 0 : '-30px' }}>
-      {isTabletRecipe && (
-        <span style={{ ...HEAD, fontSize:'18pt', fontWeight:600, position:'absolute', top:titleY, left: isPortraitTablet ? P_SHIFT_X : SHIFT_X, transform:'translateY(-50%)' }}>PAGAMENT</span>
-      )}
-      <div style={{ display:'grid', gridTemplateColumns: isPortraitTablet ? '1fr 1fr' : '1fr 1fr 1fr 1fr', columnGap:'24px', padding:0, width: groupW, marginLeft: groupX, marginBottom: isTabletRecipe ? `${titleGap}px` : undefined, flexShrink:0, minHeight: isTabletRecipe ? '29px' : undefined, alignItems:'center' }}>
-        <div style={{ display:'flex', alignItems:'center', justifyContent: isTabletRecipe ? 'flex-start' : 'space-between', transform: shiftColsX }}>
-          {!isTabletRecipe && <span style={{ ...HEAD, fontSize:'18pt', fontWeight:600 }}>PAGAMENT</span>}
+    <div style={{ width:'100%', position:'relative', display:'flex', flexDirection:'column', justifyContent:'flex-start', fontFamily:'Roboto Condensed, sans-serif', color:'#4A5057', overflow:'visible', padding:0 }}>
+      {/* AQUESTA DISPOSICIÓ ÉS LA MATEIXA DE SEMPRE, NOMÉS MOVIDA.
+          El pagament viu en una pàgina pròpia que entra per sota del mega-slide.
+          L'ordre nou és:
+            1. El llistat de productes (la columna del cistell), ample i a sobre.
+            2. A sota, les dues columnes de sempre: enviament | pagament.
+          Els elements no s'han redibuixat: són els mateixos, amb els seus
+          estils i les seves mides. Només ha canviat la fila on seuen. */}
+      <span style={{ ...HEAD, fontSize:'18pt', fontWeight:600, position:'absolute', top:titleY, left: isPortraitTablet ? P_SHIFT_X : SHIFT_X, transform:'translateY(-50%)' }}>PAGAMENT</span>
+      <div style={{ display:'grid', gridTemplateColumns: isPortraitTablet ? '1fr 1fr' : '1fr 1fr 1fr 1fr', columnGap:'24px', rowGap:'18px', padding:0, width: groupW, marginLeft: groupX, marginBottom: isTabletRecipe ? `${titleGap}px` : undefined, flexShrink:0, minHeight: isTabletRecipe ? '29px' : undefined, alignItems:'center' }}>
+        {/* La teva comanda: tota la fila de dalt */}
+        <div style={{ gridColumn:'1 / -1', display:'flex', alignItems:'center', justifyContent:'flex-start', transform: shiftColsX }}>
           <span style={{ fontSize:'12pt', fontWeight:500 }}>La teva comanda</span>
         </div>
-        <div style={{ display:'flex', alignItems:'center', justifyContent: isTabletRecipe ? 'flex-start' : 'flex-end', transform: shiftColsX }}>
+        {/* Dades d'enviament i dades de pagament: les dues columnes de sota */}
+        <div style={{ gridColumn:'span 2', display:'flex', alignItems:'center', justifyContent:'flex-start', transform: shiftColsX }}>
           <span style={{ fontSize:'12pt', fontWeight:500 }}>Dades d'enviament</span>
         </div>
         {!isPortraitTablet && (
-          <div style={{ display:'flex', alignItems:'center', justifyContent: isTabletRecipe ? 'flex-start' : 'flex-end', transform: shiftColsX }}>
+          <div style={{ gridColumn:'span 2', display:'flex', alignItems:'center', justifyContent:'flex-start', transform: shiftColsX }}>
             <span style={{ fontSize:'12pt', fontWeight:500 }}>Dades de pagament</span>
           </div>
         )}
       </div>
-      <div style={{ display:'grid', gridTemplateColumns: isPortraitTablet ? '1fr 1fr' : '1fr 1fr 1fr 1fr', columnGap:'24px', rowGap: isPortraitTablet ? `${P_ROW_GAP}px` : undefined, width: groupW, marginLeft: groupX, flex: '0 1 auto', height: bodyH, minHeight:0, transform: shiftColsX }}>
-        {/* COL 1: Cistell + Totals */}
-        <div style={{ display:'flex', flexDirection:'column', minHeight:0 }}>
+      <div style={{ display:'grid', gridTemplateColumns: isPortraitTablet ? '1fr 1fr' : '1fr 1fr 1fr 1fr', columnGap:'24px', rowGap: isPortraitTablet ? `${P_ROW_GAP}px` : '18px', width: groupW, marginLeft: groupX, flex: '0 0 auto', minHeight:0, transform: shiftColsX, alignItems:'start' }}>
+        {/* COL 1: Cistell + Totals. Ara ocupa tota la fila de dalt. */}
+        <div style={{ gridColumn:'1 / -1', display:'flex', flexDirection:'column', minHeight:0 }}>
           <div style={{ flex:'1 1 auto', overflowY:'auto', minHeight:0, maxHeight: isPortraitTablet ? '195px' : undefined }}>
             {activeItems.map((item, idx) => {
               const ip = parseFloat(String(item.price).replace('€','').replace(/\s/g,'').replace(',','.'))||0;
@@ -730,8 +728,8 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
             <div style={{ display:'flex', justifyContent:'space-between', fontSize:'13pt', fontWeight:500, padding:'8px 0 0', borderTop:'1px solid #E6E8EC', marginTop:'4px' }}><span>Total</span><span style={{ fontVariantNumeric:'tabular-nums' }}>{totalFinal.toFixed(2).replace('.',',')}€</span></div>
           </div>
         </div>
-        {/* COL 2: Dades d'enviament */}
-        <div style={{ display:'flex', flexDirection:'column', minHeight:0, overflow:'visible', justifyContent: isTabletRecipe ? 'flex-start' : 'space-between', gap: fieldGap }}>
+        {/* COL 2: Dades d'enviament. Baixa a la fila de sota i ocupa mitja amplada. */}
+        <div style={{ gridColumn:'span 2', display:'flex', flexDirection:'column', minHeight:0, overflow:'visible', justifyContent: 'flex-start', gap: fieldGap }}>
           <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', columnGap:'10px' }}>
             <div><input type="text" name="firstName" value={formData.firstName} onChange={handleChange} placeholder="Nom" style={inputStyle} />{formErrors.firstName && <div style={errorStyle}>{formErrors.firstName}</div>}</div>
             <div><input type="text" name="lastName" value={formData.lastName} onChange={handleChange} placeholder="Cognoms" style={inputStyle} />{formErrors.lastName && <div style={errorStyle}>{formErrors.lastName}</div>}</div>
@@ -751,19 +749,19 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
         {/* COL 3: Pagament + Factura. Al vertical és la cel·la esquerra de la
             segona filera (sota la comanda); termes + botó hi van al costat, en
             una cel·la pròpia, sota les dades d'enviament. */}
-        <div style={{ display:'flex', flexDirection:'column', minHeight:0, overflow:'visible', position: isPortraitTablet ? undefined : 'relative', height: isLandscapeTablet ? `${FORMS_H}px` : undefined, gap: isNarrowForm ? '1px' : undefined }}>
+        <div style={{ gridColumn:'span 2', display:'flex', flexDirection:'column', minHeight:0, overflow:'visible', position: isPortraitTablet ? undefined : 'relative', gap: isNarrowForm ? '1px' : undefined }}>
           <div style={{ display:'flex', flexDirection:'column', gap: isNarrowForm ? '1px' : undefined }}>
             {/* Al vertical només hi ha dues columnes de títols, així que aquest
                 penja del seu bloc, no de la banda de dalt. */}
             {isPortraitTablet && <span style={{ fontSize:'12pt', fontWeight:500, marginBottom:`${P_TITLE_GAP}px` }}>Dades de pagament</span>}
             {/* Pagament */}
-            <div style={{ display:'grid', rowGap: isNarrowForm ? '2px' : '8px', marginTop: isTabletRecipe ? undefined : '-10px' }}>
+            <div style={{ display:'grid', rowGap: '8px' }}>
               <div style={{ background:'#FFFFFF', overflow:'hidden' }}>
                 <div style={{ padding: isNarrowForm ? '6px 10px' : '10px 12px', display:'flex', alignItems:'center', gap:'8px', fontSize: isNarrowForm ? '9pt' : '11pt', fontWeight:500, color:'#4A5057' }}>
                   <span style={{ width:'13px', height:'10px', border:'1px solid #4A5057', borderRadius:'2px', display:'inline-block' }} />
                   <span>Targeta</span>
                 </div>
-                <div style={{ padding: isNarrowForm ? '6px 10px' : '10px 12px', display:'grid', rowGap: isNarrowForm ? '2px' : '8px', marginTop: isTabletRecipe ? undefined : '-20px' }}>
+                <div style={{ padding: '10px 12px', display:'grid', rowGap: '8px' }}>
                   <div style={{ border:'1px solid #D8DDE3', borderRadius:'4px', overflow:'hidden', background:'#FFFFFF', padding: isNarrowForm ? '6px 10px' : '10px 12px' }}>
                     <CardNumberElement options={{ style: { base: { color:'#4A5057', fontFamily:'Roboto Condensed, sans-serif', fontSize: isNarrowForm ? '11px' : '14px', '::placeholder': { color:'#98A2B4' } }, invalid: { color:'#ef4444' } } }} />
                   </div>
