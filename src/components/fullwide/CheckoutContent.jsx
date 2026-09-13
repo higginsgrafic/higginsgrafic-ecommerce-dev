@@ -725,7 +725,7 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
             amplada. El títol va DINS de la columna (primera peça): així sempre
             queda just a sobre de la seva columna, es mogui on es mogui. */}
         <div style={{ gridColumn:'span 2', marginTop: isPhone ? undefined : '125px', display:'flex', flexDirection:'column', minHeight:0, overflow:'visible', justifyContent: 'flex-start', gap: fieldGap }}>
-          <div style={{ fontSize:'12pt', fontWeight:500 }}>Dades d'enviament</div>
+          <div style={{ fontSize:'12pt', fontWeight:500, marginBottom:'20px' }}>Dades d'enviament</div>
           <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', columnGap:'10px' }}>
             <div><input type="text" name="firstName" value={formData.firstName} onChange={handleChange} placeholder="Nom" style={inputStyle} />{formErrors.firstName && <div style={errorStyle}>{formErrors.firstName}</div>}</div>
             <div><input type="text" name="lastName" value={formData.lastName} onChange={handleChange} placeholder="Cognoms" style={inputStyle} />{formErrors.lastName && <div style={errorStyle}>{formErrors.lastName}</div>}</div>
@@ -746,7 +746,7 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
             segona filera (sota la comanda); termes + botó hi van al costat, en
             una cel·la pròpia, sota les dades d'enviament. */}
         <div style={{ gridColumn:'span 2', marginTop: isPhone ? undefined : '125px', display:'flex', flexDirection:'column', minHeight:0, overflow:'visible', position: isPortraitTablet ? undefined : 'relative', gap: isNarrowForm ? '1px' : undefined }}>
-          <div style={{ fontSize:'12pt', fontWeight:500 }}>Dades de pagament</div>
+          <div style={{ fontSize:'12pt', fontWeight:500, marginBottom:'20px' }}>Dades de pagament</div>
           <div style={{ display:'flex', flexDirection:'column', gap: isNarrowForm ? '1px' : undefined }}>
             {/* Pagament */}
             <div style={{ display:'grid', rowGap: '8px' }}>
