@@ -1,6 +1,6 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import CistellComandaContent from '@/components/fullwide/CistellComandaContent';
-import CheckoutContent from '@/components/fullwide/CheckoutContent';
 
 export default function MegaslidePagina3({
   isPortraitTablet = false,
@@ -14,6 +14,7 @@ export default function MegaslidePagina3({
   touchMegaPublicActivity,
   accordionPautaScale,
 }) {
+  const navigate = useNavigate();
   const pageHeight = isPortraitTablet && !acordioExpanded ? '269px' : '100%';
 
   return (
@@ -62,36 +63,23 @@ export default function MegaslidePagina3({
               left: 0,
               width: '100%',
               height: '100%',
-              transform: acordioExpanded ? 'translateX(-100%)' : 'translateX(0)',
-              opacity: acordioExpanded ? 0 : 1,
+              transform: 'translateX(0)',
+              opacity: 1,
               transition: 'transform 350ms ease-in-out, opacity 300ms ease-in-out',
-              pointerEvents: acordioExpanded ? 'none' : 'auto',
+              pointerEvents: 'auto',
             }}>
               <CistellComandaContent
                 cartItems={cartItems}
                 setCartItems={setCartItems}
                 onCloseMegaSlide={() => setActive(null)}
                 onFinalizeOrder={() => {
-                  if (localCartItemCount > 0 && !acordioExpanded) setAcordioExpanded(true);
+                  // El pagament ja no viu aquí dins: és una pàgina pròpia
+                  // (/checkout) que entra lliscant. Tanquem el panell i hi anem.
+                  if (localCartItemCount > 0) {
+                    setActive?.(null);
+                    navigate('/checkout');
+                  }
                 }}
-              />
-            </div>
-            <div style={{
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              width: '100%',
-              height: '100%',
-              transform: acordioExpanded ? 'translateX(0)' : 'translateX(100%)',
-              opacity: acordioExpanded ? 1 : 0,
-              transition: 'transform 350ms ease-in-out, opacity 300ms ease-in-out',
-              pointerEvents: acordioExpanded ? 'auto' : 'none',
-            }}>
-              <CheckoutContent
-                cartItems={cartItems}
-                setCartItems={setCartItems}
-                onCloseMegaSlide={() => setActive(null)}
-                isPortraitTablet={isPortraitTablet}
               />
             </div>
           </div>
