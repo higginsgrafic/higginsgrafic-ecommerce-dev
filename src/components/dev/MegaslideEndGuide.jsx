@@ -8,10 +8,9 @@ import { useEffect, useState } from 'react';
  *   2. Aquest límit − 20 px (el del mega-slide).
  *   3. El límit del mega-slide: on acaba el panell quan s'obre el cistell.
  *
- * Com s'activa:
- *   - En desenvolupament (npm run dev) surt sempre.
- *   - Al lloc publicat, només amb `?megaslide=1` a l'adreça.
- *   - Alt+M l'amaga i el torna a mostrar.
+ * Com s'activa (apagades per defecte):
+ *   - Amb `?megaslide=1` a l'adreca.
+ *   - O amb Alt+M, que les encen i les apaga.
  *
  * El panell del mega-slide només és al DOM mentre és obert: per això la guia
  * mesura quan el troba i es guarda l'últim valor bo.
@@ -37,7 +36,8 @@ function activadaAlQuery() {
 function llegirActivat() {
   const alQuery = activadaAlQuery();
   if (alQuery !== null) return alQuery;
-  if (import.meta.env.DEV) return true;
+  // Apagades per defecte: nome s surten si es demanen expressament amb
+  // ?megaslide=1 o amb Alt+M. Abans s'encenien totes soles en desenvolupament.
   try {
     return window.localStorage.getItem(CLAU) === '1';
   } catch {
