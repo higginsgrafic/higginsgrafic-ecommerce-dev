@@ -313,6 +313,13 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
     setIsProcessing(true);
     try {
       let orderNumber = null;
+      // El token de seguiment s'ha de declarar aquí FORA. Abans es declarava
+      // dins del bloc de producció (const) i després es feia servir aquí, cosa
+      // que llançava "ReferenceError: trackingToken is not defined" just
+      // després de pagar. El resultat: el client pagava, la comanda es creava i
+      // el correu s'enviava, però no s'arribava MAI a la pàgina de confirmació
+      // i el client es quedava sense saber si havia comprat.
+      let trackingToken = null;
 
       if (import.meta.env.DEV) {
         const orderItems = activeItems.map((item, idx) => ({
@@ -385,7 +392,8 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
           }
         );
 
-        const { clientSecret, paymentIntentId, orderNumber: serverOrderNumber, trackingToken } = piResponse;
+        const { clientSecret, paymentIntentId, orderNumber: serverOrderNumber, trackingToken: apiTrackingToken } = piResponse;
+        trackingToken = apiTrackingToken || null;
 
         const { error: stripeError, paymentIntent } = await stripe.confirmCardPayment(
           clientSecret,
