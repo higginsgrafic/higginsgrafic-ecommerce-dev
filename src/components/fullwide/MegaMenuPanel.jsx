@@ -12,6 +12,27 @@ const MegaslidePagina4 = lazy(() => import('../megaslide/MegaslidePagina4.jsx'))
 // inferior del panell. Aquest és el número a retocar si en vol més o menys.
 const P1_STRIPE_BOTTOM_GAP = 30;
 
+// Memoria de l'alcada bona del panell. El mega-slide es munta i es desmunta cada
+// cop que s'obre, i la mesura del contingut de la pagina 1 triga una estona a
+// arribar i va canviant (476 -> 456 -> 417): allo es veia com un rebot. Guardant
+// l'ultima alcada bona, a partir de la segona obertura el panell ja neix amb
+// l'alcada correcta. Es per mida de finestra, perque l'alcada en depen.
+const KEY_ALCADA = 'hg.megaPanelHeight';
+function llegirAlcadaDesada() {
+  try {
+    const cru = window.sessionStorage.getItem(KEY_ALCADA);
+    if (!cru) return null;
+    const d = JSON.parse(cru);
+    if (d && d.w === window.innerWidth && d.h === window.innerHeight && typeof d.px === 'string') return d.px;
+  } catch { /* ignore */ }
+  return null;
+}
+function desarAlcada(px) {
+  try {
+    window.sessionStorage.setItem(KEY_ALCADA, JSON.stringify({ w: window.innerWidth, h: window.innerHeight, px }));
+  } catch { /* ignore */ }
+}
+
 export default function MegaMenuPanel({
   active,
   megaPage,
@@ -146,13 +167,40 @@ export default function MegaMenuPanel({
     setP1ContentBottomPx((prev) => (prev != null && Math.abs(prev - px) < 0.5 ? prev : px));
   }, []);
   const matchesPage1Height = megaPage === 1 || megaPage === 2 || megaPage === 3 || megaPage === 4;
+  // El rebot en obrir: l'alcada del panell surt d'una mesura del contingut de la
+  // pagina 1 que va canviant mentre les imatges de la franja carreguen
+  // (476 -> 456 -> 417). Com que el header creix amb el panell, allo es veu com
+  // un rebot. Mentre la mesura no faci estona que no canvia, el panell es queda
+  // amb l'alcada de reserva; aixi nome s canvia un cop, i no tres.
+  const [alcadaRecordada] = useState(llegirAlcadaDesada);
+  // Sempre arrenca "no estable": encara que tinguem una alcada recordada, cal
+  // esperar que la mesura d'aquesta obertura tambe es quedi quieta. Si no, la
+  // primera mesura (dolenta) s'aplicava de seguida i el panell saltava.
+  const [mesuraEstable, setMesuraEstable] = useState(false);
+  useEffect(() => {
+    if (isPortraitTablet || paymentFillsScreen) {
+      setMesuraEstable(true);
+      return undefined;
+    }
+    if (p1ContentBottomPx == null) return undefined;
+    const t = window.setTimeout(() => setMesuraEstable(true), 220);
+    return () => window.clearTimeout(t);
+  }, [isPortraitTablet, paymentFillsScreen, p1ContentBottomPx]);
+
   const guardHeightPx = paymentFillsScreen
     ? guardHeightPxDefault
     : isPortraitTablet
     ? '269px'
-    : matchesPage1Height && p1ContentBottomPx != null
+    : matchesPage1Height && p1ContentBottomPx != null && mesuraEstable
     ? `${Math.max(0, Math.round(p1ContentBottomPx + P1_STRIPE_BOTTOM_GAP - 64))}px`
-    : guardHeightPxDefault;
+    : (alcadaRecordada || guardHeightPxDefault);
+
+  // Quan l'alcada bona ja es ferma, la guardem per a les properes obertures.
+  useEffect(() => {
+    if (isPortraitTablet || paymentFillsScreen) return;
+    if (!mesuraEstable || p1ContentBottomPx == null) return;
+    desarAlcada(`${Math.max(0, Math.round(p1ContentBottomPx + P1_STRIPE_BOTTOM_GAP - 64))}px`);
+  }, [mesuraEstable, p1ContentBottomPx, isPortraitTablet, paymentFillsScreen]);
 
   return (
     <div className="relative">
