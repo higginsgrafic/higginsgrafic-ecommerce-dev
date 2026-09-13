@@ -263,7 +263,7 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
   // L'aire de sota el bloc NO es toca: és on acaba el mega-slide quan s'obre el
   // cistell, i ha de quedar net.
   const FITXA_W = 118;     // amplada d'una fitxa (estreta: la fitxa es vertical)
-  const GAP_FITXES = 10;   // separació entre fitxes
+  const GAP_FITXES = 5;    // separació entre fitxes (abans 10, la meitat)
   const P_FITXA_H = 228;   // alcada de la fitxa a la vertical: la que hi ha entre la guia verda i la blava
   // Amplada de la targeta dels totals. Ha anat baixant a cop de retocs: 250
   // (valor original), 240 i 220. Es la unica xifra que la mana.
