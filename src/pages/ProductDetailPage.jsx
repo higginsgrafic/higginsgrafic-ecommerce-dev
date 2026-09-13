@@ -938,45 +938,30 @@ const ProductDetailPage = ({ onAddToCart, cartItems = [], language = 'ca' }) => 
       variant: selectedVariant,
       // IMPORTANT: use variant color as source-of-truth for cart, not selectedColor (which can be a UI slot/canonical).
       color: variantColorCanonical || selectedColor,
-      selectedColor: variantColorCanonical || selectedColor
+      selectedColor: variantColorCanonical || selectedColor,
+      // El títol i el preu, en el format que fa servir el carretó.
+      title: product?.name || '',
+      unitPrice: Number(selectedVariant?.price ?? product?.price ?? 0),
+      // La variant de Gelato ha de viatjar amb l'article: és el que permet al
+      // servidor saber exactament quina peça s'ha de fabricar, sense dependre
+      // de com s'escrigui el color ni de cap llista del navegador.
+      gelatoVariantId: selectedVariant?.gelatoVariantId || null,
     };
     trackAddToCart(productToAdd, quantity);
 
-    // El cistell de debò de la botiga viu dins del mega-slide, i s'omple amb
-    // aquest esdeveniment (és el que fan servir la resta de pàgines de la
-    // botiga). Abans aquesta fitxa només cridava onAddToCart, que omple un
-    // cistell diferent que el mega-slide no llegeix: el client afegia un
-    // producte, obria el cistell i el trobava BUIT, i per tant no podia
-    // comprar res des d'una fitxa de producte.
-    //
-    // Hi enviem el preu i, sobretot, `gelatoVariantId` i `productSlug`: amb
-    // això el servidor sap exactament quina variant de Gelato ha de fabricar,
-    // sense dependre de com s'escrigui el color ni de cap llista del client.
+    // Afegim al cistell ÚNIC de la botiga (CartContext). És el mateix cistell
+    // que llegeix el carretó de la pantalla, així que el producte hi apareix
+    // de seguida.
+    onAddToCart(productToAdd, selectedSize, quantity, true);
+
+    // I obrim el carretó perquè el client vegi què hi ha. Aquest esdeveniment,
+    // sense article, només obre el panell: l'article ja l'hem afegit a dalt.
     try {
-      const preu = Number(selectedVariant?.price ?? product?.price ?? 0);
-      window.dispatchEvent(new CustomEvent('hg:open-full-wide-cart', {
-        detail: {
-          source: 'product-detail-add',
-          item: {
-            title: (product?.name || '').toUpperCase(),
-            collection: product?.collection || '',
-            productSlug: product?.slug || null,
-            productRoute: product?.slug || '',
-            gelatoVariantId: selectedVariant?.gelatoVariantId || null,
-            qty: quantity,
-            size: selectedSize,
-            price: `${preu.toFixed(2).replace('.', ',')}€`,
-            color: variantColorCanonical || selectedColor,
-            finish: '',
-            drawing: '',
-            disabled: false,
-          },
-        },
-      }));
+      window.dispatchEvent(new CustomEvent('hg:open-full-wide-cart'));
     } catch {
       // ignore
     }
-    onAddToCart(productToAdd, selectedSize, quantity, true);
+
     success('Producte afegit al cistell');
   };
 
