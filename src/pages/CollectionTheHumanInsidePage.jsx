@@ -21,7 +21,7 @@ const COLLECTIONS_MENU = [
     id: 'first-contact',
     name: 'First Contact',
     href: '/first-contact',
-    icon: '/custom_logos/collections/collection-first-contact-logo.svg',
+    icon: '/custom_logos/collections/collection-first-contact-logo.webp',
   },
   {
     id: 'the-human-inside',
@@ -45,7 +45,7 @@ const COLLECTIONS_MENU = [
     id: 'miscellania',
     name: 'Miscel·lània',
     href: '/miscellania',
-    icon: '/custom_logos/collections/collection-miscellania-logo.svg',
+    icon: '/custom_logos/collections/collection-miscellania-logo.webp',
   },
 ];
 

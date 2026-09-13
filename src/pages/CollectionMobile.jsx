@@ -5,11 +5,11 @@ import { collectionGridImageFor, gridFinishFor } from '@/lib/pdpMockup';
 import MobileFooter from '@/components/MobileFooter';
 
 const COLLECTIONS_MENU = [
-  ['first-contact', 'First Contact', '/custom_logos/collections/collection-first-contact-logo.svg'],
+  ['first-contact', 'First Contact', '/custom_logos/collections/collection-first-contact-logo.webp'],
   ['the-human-inside', 'The Human Inside', '/custom_logos/collections/collection-thin-logo.svg'],
   ['austen', 'Austen', '/custom_logos/collections/collection-jean-austen-logo.svg'],
   ['cube', 'Cube', '/custom_logos/collections/collection-cube-logo.svg'],
-  ['miscellania', 'Miscel·lània', '/custom_logos/collections/collection-miscellania-logo.svg'],
+  ['miscellania', 'Miscel·lània', '/custom_logos/collections/collection-miscellania-logo.webp'],
 ];
 
 function shuffle(arr) {

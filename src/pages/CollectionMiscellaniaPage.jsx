@@ -21,7 +21,7 @@ const COLLECTIONS_MENU = [
     id: 'first-contact',
     name: 'First Contact',
     href: '/first-contact',
-    icon: '/custom_logos/collections/collection-first-contact-logo.svg',
+    icon: '/custom_logos/collections/collection-first-contact-logo.webp',
   },
   {
     id: 'the-human-inside',
@@ -45,7 +45,7 @@ const COLLECTIONS_MENU = [
     id: 'miscellania',
     name: 'Miscel·lània',
     href: '/miscellania',
-    icon: '/custom_logos/collections/collection-miscellania-logo.svg',
+    icon: '/custom_logos/collections/collection-miscellania-logo.webp',
   },
 ];
 
@@ -238,7 +238,7 @@ function CollectionMiscellaniaPage() {
         <CollectionMobile
           collectionSlug="miscellania"
           collectionTitle="Miscel·lània"
-          collectionIcon="/custom_logos/collections/collection-miscellania-logo.svg"
+          collectionIcon="/custom_logos/collections/collection-miscellania-logo.webp"
           products={PRODUCTS}
           colors={TDP_GRID_COLORS}
           posterLines={[{ text: 'MÉS VAL SOL' }, { text: 'QUE MAL' }, { text: 'ACOMPANYAT' }]}
@@ -306,7 +306,7 @@ function CollectionMiscellaniaPage() {
             }}
           >
             <img
-              src="/custom_logos/collections/collection-miscellania-logo.svg"
+              src="/custom_logos/collections/collection-miscellania-logo.webp"
               alt=""
               aria-hidden="true"
               loading="lazy"

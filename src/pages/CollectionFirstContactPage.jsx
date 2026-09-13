@@ -21,7 +21,7 @@ const COLLECTIONS_MENU = [
     id: 'first-contact',
     name: 'First Contact',
     href: '/first-contact',
-    icon: '/custom_logos/collections/collection-first-contact-logo.svg',
+    icon: '/custom_logos/collections/collection-first-contact-logo.webp',
   },
   {
     id: 'the-human-inside',
@@ -45,7 +45,7 @@ const COLLECTIONS_MENU = [
     id: 'miscellania',
     name: 'Miscel·lània',
     href: '/miscellania',
-    icon: '/custom_logos/collections/collection-miscellania-logo.svg',
+    icon: '/custom_logos/collections/collection-miscellania-logo.webp',
   },
 ];
 
@@ -237,7 +237,7 @@ function CollectionFirstContactPage() {
         <CollectionMobile
           collectionSlug="first-contact"
           collectionTitle="First Contact"
-          collectionIcon="/custom_logos/collections/collection-first-contact-logo.svg"
+          collectionIcon="/custom_logos/collections/collection-first-contact-logo.webp"
           products={PRODUCTS}
           colors={TDP_GRID_COLORS}
           posterLines={[{ text: 'CADA' }, { text: 'PERSONA TÉ' }, { text: 'UNA HISTÒRIA' }]}
@@ -305,7 +305,7 @@ function CollectionFirstContactPage() {
             }}
           >
             <img
-              src="/custom_logos/collections/collection-first-contact-logo.svg"
+              src="/custom_logos/collections/collection-first-contact-logo.webp"
               alt=""
               aria-hidden="true"
               loading="lazy"
