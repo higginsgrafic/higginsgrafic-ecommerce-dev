@@ -265,7 +265,9 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
   const FITXA_W = 118;     // amplada d'una fitxa (estreta: la fitxa es vertical)
   const GAP_FITXES = 10;   // separació entre fitxes
   const P_FITXA_H = 228;   // alcada de la fitxa a la vertical: la que hi ha entre la guia verda i la blava
-  const TOTALS_W = 240;    // amplada de la targeta dels totals (abans 250)
+  // Amplada de la targeta dels totals. Ha anat baixant a cop de retocs: 250
+  // (valor original), 240 i 220. Es la unica xifra que la mana.
+  const TOTALS_W = 220;
   const TOTALS_GAP = 28;   // aire entre l'última fitxa i la targeta dels totals
   // La roda del ratolí també desplaça la cinta. Sense això, amb ratolí només es
   // pot moure amb Majúscules + roda, que gairebé ningú no endevina.
