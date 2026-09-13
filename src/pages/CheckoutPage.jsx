@@ -81,15 +81,17 @@ export default function CheckoutPage() {
           que a qualsevol amplada el formulari comença on comença el logo i
           acaba on acaba la icona de l'usuari. Res no pot sobresortir-ne: el
           marc del lloc ja deixa 16px de marge als costats.
-          El marge de dalt el posa App (--appHeaderOffset) i aquí hi afegim una
-          mica d'aire perquè el formulari quedi clarament dessota. */}
+          El marge de dalt el posa App (--appHeaderOffset, l'alçada de la
+          capçalera) i aquí hi afegim l'aire que queda entre la capçalera i el
+          contingut: 3px. Abans eren 28px; s'han retallat 25 perquè tot el
+          contingut de la pàgina (títol, productes i formularis) pugi 25px. */}
       <div
         className="px-4 sm:px-6 lg:px-10"
         style={{
           minHeight: '60vh',
           width: 'var(--site-w, 100%)',
           marginLeft: 'calc(var(--site-xL, 0px) - var(--rulerInset, 0px))',
-          paddingTop: '28px',
+          paddingTop: '3px',
           paddingBottom: '48px',
           boxSizing: 'border-box',
         }}
