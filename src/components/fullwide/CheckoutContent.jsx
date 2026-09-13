@@ -233,24 +233,18 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
   const D_INVOICE_FIELDS_LIFT = 0;
 
   // ===== TAU LETA APAÏSADA (retocs propis) =====
-  // Dues pujades demanades expressament per a aquesta mida:
-  //  · L_PRODUCTES_LIFT: el bloc de productes (llistat + subtotals) puja 25px.
-  //  · L_FORM_LIFT: els dos blocs de dades (enviament i pagament) pugen 50px.
-  // Com que el formulari va a sota del llistat, quan el llistat puja 25px el
-  // formulari ja puja aquests mateixos 25; els 25 que falten fins a 50 surten
-  // de retallar el marge de dalt de les columnes (L_COLUMNES_TOP).
+  // Aquesta és l'ÚNICA versió on el repartiment vertical està retocat a mà.
+  // L'escriptori, la tauleta vertical i els telèfons es queden amb els números
+  // de creació i cap d'aquests retocs no els toca.
+  //   · L_PRODUCTES_LIFT: el bloc de productes (llistat + subtotals) puja 25px.
+  //   · L_COLUMNES_TOP: el formulari arrenca 75px abans del marge de creació
+  //     (90), o sigui que puja aquests 75px més els 25 que ja puja el llistat.
   const L_PRODUCTES_LIFT = 25;
-  const L_FORM_LIFT = 50;
-  // Marge que separa les dues columnes de dades (enviament i pagament) del bloc
-  // de productes. El valor de creació era 90; se n'han tret 50 (25 + 15 + 10)
-  // perquè aquests dos blocs de sota pugin 50px a les tres receptes de pantalla
-  // ampla (escriptori i les dues tauletes). Als telèfons no s'aplica: allà el
-  // formulari va en una columna i no pot pujar sense trepitjar la comanda. Si
-  // puja gaire més, el bloc de dades acabarà trepitjant els subtotals.
-  const COLUMNES_TOP = 40;
-  // A la tauleta apaïsada, a més, el formulari va 50px per sobre del llistat:
-  // com que el llistat ja puja 25px, els 25 que falten surten d'aquest marge.
-  const L_COLUMNES_TOP = COLUMNES_TOP - (L_FORM_LIFT - L_PRODUCTES_LIFT); // 40
+  const L_COLUMNES_TOP = 15;
+
+  // Marge de creació de les dues columnes de dades (el que les separa del bloc
+  // de productes). El fan servir l'escriptori i la tauleta vertical, tal qual.
+  const COLUMNES_TOP = 90;
 
   // Valors derivats segons la variant que es renderitza: l'horitzontal dona
   // exactament els mateixos números que donava abans, l'escriptori res.
