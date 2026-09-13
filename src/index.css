@@ -190,3 +190,15 @@ html.scrollbar-compensate .offers-header-cart-open {
 body.cart-open {
   overflow: hidden !important;
 }
+
+/* La cinta de fitxes del checkout es desplaça amb la rodeta i amb els dits,
+   pero sense barra: el desplaçament s'indica amb les línies dels extrems. */
+.cinta-sense-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.cinta-sense-scrollbar::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
+}
