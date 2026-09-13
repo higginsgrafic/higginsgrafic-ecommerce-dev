@@ -49,7 +49,7 @@ export function SummaryTable({ order }) {
         </tr>
         <tr>
           <td style={{ padding: '0 0 4px', fontFamily: "'Roboto', Helvetica, Arial, sans-serif", fontSize: '15px', fontWeight: 700, color: '#141414' }}>
-            <div style={{ marginTop: '2px' }}>Tot plegat fa</div>
+            <div style={{ marginTop: '2px' }}>TOT PLEGAT FA</div>
           </td>
           <td style={{ padding: '0 0 4px', fontFamily: "'Roboto', Helvetica, Arial, sans-serif", fontSize: '15px', fontWeight: 700, color: '#141414', textAlign: 'right' }}>
             <div style={{ marginTop: '2px' }}>{total}</div>
