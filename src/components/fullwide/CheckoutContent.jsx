@@ -746,7 +746,9 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
         {/* COL 3: Pagament + Factura. Al vertical és la cel·la esquerra de la
             segona filera (sota la comanda); termes + botó hi van al costat, en
             una cel·la pròpia, sota les dades d'enviament. */}
-        <div style={{ gridColumn:'span 2', marginTop: isPhone ? undefined : '125px', display:'flex', flexDirection:'column', minHeight:0, overflow:'visible', position: isPortraitTablet ? undefined : 'relative', gap: isNarrowForm ? '1px' : undefined }}>
+        {/* Mateix marge que la columna d'enviament: així el bloc de la targeta
+            queda alineat pel capdamunt amb el camp del client. */}
+        <div style={{ gridColumn:'span 2', marginTop: isPhone ? undefined : '90px', display:'flex', flexDirection:'column', minHeight:0, overflow:'visible', position: isPortraitTablet ? undefined : 'relative', gap: isNarrowForm ? '1px' : undefined }}>
           <div style={{ fontSize:'12pt', fontWeight:500, marginBottom:'20px' }}>Dades de pagament</div>
           <div style={{ display:'flex', flexDirection:'column', gap: isNarrowForm ? '1px' : undefined }}>
             {/* Pagament */}
