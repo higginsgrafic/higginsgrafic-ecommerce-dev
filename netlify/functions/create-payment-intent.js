@@ -70,13 +70,38 @@ function parseShipping(shipping) {
 // Per això es normalitzen abans de comparar.
 const SIZE_ALIASES = { XXL: '2XL', XXXL: '3XL' };
 
-function normalizeSize(value) {
+/**
+ * Noms de color que ensenya la botiga → noms que fa servir el catàleg.
+ *
+ * La fitxa de producte ensenya els colors en català perquè el client els
+ * entengui ('Negre', 'Blanc', 'Vermell', 'Militar', 'Forest'), però el
+ * catàleg els guarda amb el nom original de Gelato ('Black', 'White', 'Red',
+ * 'Military Green', 'Forest Green').
+ *
+ * Sense aquesta correspondència passava el següent: el client triava 'Negre',
+ * el servidor buscava una variant de color 'Negre', no en trobava cap i el
+ * pagament fallava amb "No s'ha pogut identificar la variant de Gelato".
+ * És a dir: no es podia comprar ni una samarreta negra ni una de blanca.
+ *
+ * Els altres colors del catàleg (Royal, Navy, Daisy, Gold, Purple, Light Blue,
+ * Light Pink, Irish Green, kiwi) ja coincideixen i no necessiten res.
+ */
+const COLOR_ALIASES = {
+  negre: 'black',
+  blanc: 'white',
+  vermell: 'red',
+  militar: 'militarygreen',
+  forest: 'forestgreen',
+};
+
+export function normalizeSize(value) {
   const v = String(value == null ? '' : value).trim().toUpperCase().replace(/\s+/g, '');
   return SIZE_ALIASES[v] || v;
 }
 
-function normalizeColor(value) {
-  return String(value == null ? '' : value).toLowerCase().replace(/[\s_-]+/g, '');
+export function normalizeColor(value) {
+  const base = String(value == null ? '' : value).toLowerCase().replace(/[\s_-]+/g, '');
+  return COLOR_ALIASES[base] || base;
 }
 
 /**
