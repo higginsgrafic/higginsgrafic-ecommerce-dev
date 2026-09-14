@@ -64,3 +64,27 @@ desplega tot de cop i es verifica contra el lloc publicat.
   és fixa (269px). Solucions possibles: (a) esperar que les imatges de la franja
   estiguin carregades abans d'obrir, (b) guardar l'última alçada bona i fer-la
   servir des del primer fotograma.
+
+## Feina pendent
+
+Per ordre d'importància:
+
+1. **Esborrar les dades de prova**. Inventari fet el 14/09 (nomes lectura):
+   - `orders`: **0 files**. No hi ha cap comanda de prova.
+   - `profiles`: 2 comptes.
+   - `addresses`: 2 adreces (Granollers i Barcelona).
+   - Cataleg: 63 productes, 3990 variants, 62 imatges, 152 mockups, 6 colleccions.
+   Cal que en Marc digui quins dels 2 comptes, les 2 adreces i quins productes
+   son de prova abans d'esborrar-hi res. El cistell del navegador tambe es de
+   proves (es buida des del mateix navegador).
+2. **El mega-slide de les col·leccions**: fa un ajust d'alçada en la PRIMERA
+   obertura (347 -> 284 a l'apaisada, 395 -> 336 a l'escriptori). La causa és
+   que la pàgina 1 del panell es munta ~300ms tard i fins llavors el panell fa
+   servir la reserva. La via neta és muntar la pàgina 1 abans d'obrir.
+3. **El mòbil**: el mateix ajust (270 -> 195). Allà el formulari no queda tapat.
+4. **Les targetes clonades del rail** (`TambeRail`): el carrusel ja està fora
+   (sense gestos ni fletxes), però per dins encara fa servir targetes clonades
+   (`CLONE_COUNT = 3`): al DOM hi ha 10 enllaços i només 4 es veuen. Són
+   enllaços duplicats que Google i els lectors de pantalla sí que veuen.
+5. **Avisos antics de lint** que no s'han tocat: `react-hooks` (ordre i
+   dependències dels efectes) i quatre apòstrofs sense escapar al checkout.
