@@ -2726,7 +2726,11 @@ function FullWideSlideHeader({
 top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right: 0 }
       }
     >
-      <div className={`${isPortraitTablet ? '' : 'border-b border-transparent'} bg-background`}>
+      {/* La linia de sota la capcalera: a la vertical ve del nav que hi ha a
+          sota, pero a l'escriptori i a l'apaisada el nav va dins la barra i el
+          border-b era transparent, aixi que no es veia. Li posem el mateix
+          color que fa servir la vertical (#E6E8EC). */}
+      <div className={`${isPortraitTablet ? '' : 'border-b'} bg-background`} style={isPortraitTablet ? undefined : { borderBottomColor: '#E6E8EC' }}>
         <div
           className="flex h-20 items-center gap-3 px-4 sm:px-6 lg:h-20 lg:px-10"
           style={{
