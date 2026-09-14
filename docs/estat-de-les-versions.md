@@ -78,9 +78,18 @@ Per ordre d'importància:
    son de prova abans d'esborrar-hi res. El cistell del navegador tambe es de
    proves (es buida des del mateix navegador).
 2. **El mega-slide de les col·leccions**: fa un ajust d'alçada en la PRIMERA
-   obertura (347 -> 284 a l'apaisada, 395 -> 336 a l'escriptori). La causa és
-   que la pàgina 1 del panell es munta ~300ms tard i fins llavors el panell fa
-   servir la reserva. La via neta és muntar la pàgina 1 abans d'obrir.
+   obertura (347 -> 284 a l'apaisada, 395 -> 336 a l'escriptori). La mesura de
+   la pàgina 1 arriba ~300ms tard i fins llavors el panell fa servir la reserva
+   (282, quan la bona és 219).
+
+   Què s'ha provat i NO funciona:
+   - Posar l'alçada fixa: el contingut estira el panell igualment i queda mes alt.
+   - Ajustar la reserva: el mateix, el panell acaba a 365 en comptes de 284.
+   - Preescalfar els trossos diferits (pagines 3 i 4): no hi te res a veure.
+
+   Pista que queda: les imatges de la franja son `complete` de seguida pero
+   triguen a **decodificar-se**, i la mesura es torna a calcular quan ja hi son.
+   Via a provar: preescalfar i decodificar les imatges de la franja abans d'obrir.
 3. **El mòbil**: el mateix ajust (270 -> 195). Allà el formulari no queda tapat.
 4. **Les targetes clonades del rail** (`TambeRail`): el carrusel ja està fora
    (sense gestos ni fletxes), però per dins encara fa servir targetes clonades
