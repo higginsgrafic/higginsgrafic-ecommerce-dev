@@ -48,8 +48,6 @@ const PDP_SIZE_SETTINGS = {
   color: '#475059', textTransform: 'none',
 };
 
-const PRODUCT_DESCRIPTION = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna";
-
 const OFFICIAL_COLORS = [
   'white', 'light-blue', 'royal', 'navy', 'purple', 'light-pink', 'daisy',
   'gold', 'red', 'kiwi', 'irish-green', 'military-green', 'forest-green', 'black',

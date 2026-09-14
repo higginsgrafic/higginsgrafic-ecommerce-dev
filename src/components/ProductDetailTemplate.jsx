@@ -22,11 +22,6 @@ const PDP_COLLECTION_SETTINGS = {
   letterSpacing: 0.2, lineHeight: 1.2, textAlign: 'left', verticalAlign: 'top',
   color: 'rgba(71, 80, 89, 0.7)', textTransform: 'uppercase',
 };
-const PDP_DESCRIPTION_SETTINGS = {
-  x: 0, y: 0, fontFamily: 'Roboto', fontSize: 16, fontWeight: 300, selectedFontWeight: 700,
-  letterSpacing: 0.03, lineHeight: 1.65, textAlign: 'left', verticalAlign: 'top',
-  color: '#111827', textTransform: 'none',
-};
 const PDP_PRICE_SETTINGS = {
   x: 0, y: 0, fontFamily: 'Oswald', fontSize: 24, fontWeight: 200, selectedFontWeight: 700,
   letterSpacing: 0, lineHeight: 1, textAlign: 'left', verticalAlign: 'center',
@@ -42,8 +37,6 @@ const PDP_SIZE_SETTINGS = {
   letterSpacing: 0, lineHeight: 1, textAlign: 'center', verticalAlign: 'center',
   color: '#475059', textTransform: 'none',
 };
-
-const PRODUCT_DESCRIPTION = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna";
 
 const OFFICIAL_COLORS = [
   'white', 'light-blue', 'royal', 'navy', 'purple', 'light-pink', 'daisy',
@@ -201,16 +194,8 @@ export default function ProductDetailTemplate({ product }) {
           style={{ gridColumn: '4 / 5', gridRow: '7 / 8', alignSelf: 'start' }}
         />
 
-        <EditableTextBox
-          id={`${PRODUCT_SLUG}-pdp-product-description`}
-          initialText={PRODUCT_DESCRIPTION}
-          initialSettings={PDP_DESCRIPTION_SETTINGS}
-          presetVersion={PDP_PRESET_VERSION}
-          multiline
-          renderHandle={false}
-          handleRight="-22px"
-          style={{ gridColumn: '4 / 5', gridRow: '9 / 14' }}
-        />
+        {/* El text de descripcio del producte s'ha tret (a peticio): el PDP
+            nome s mostra el titol, la colleccio, les talles i el CTA. */}
 
         <EditableTextBox
           id={`${PRODUCT_SLUG}-pdp-price`}
