@@ -1,6 +1,5 @@
-import React, { useEffect, useLayoutEffect, useMemo, useRef, useState, useImperativeHandle, forwardRef } from 'react';
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import RespescaTitle from '@/pages/productRail/RespescaTitle';
-import CarouselArrows from '@/pages/productRail/CarouselArrows';
 import ProductCard from '@/pages/productRail/ProductCard';
 
 const DEFAULT_IMAGES = [
@@ -20,8 +19,6 @@ const DEFAULT_IMAGES = [
   '/placeholders/apparel/t-shirt/gildan_5000/gildan-5000_t-shirt_crewneck_unisex_heavyWeight_xl_white_gpr-4-0_front.webp',
 ];
 
-const TILE_STYLE = { width: '450px', height: '450px', backgroundColor: '#f5f5f5', position: 'relative', transform: 'scale(0.8822222222)', transformOrigin: 'bottom left', boxShadow: 'none' };
-const TEXT_BLOCK_STYLE = { width: '397px' };
 const CARD_W = 397;
 const CLONE_COUNT = 3;
 
@@ -55,7 +52,6 @@ export default function TambeRail({
   subtitle = 'COSES DIFERENTS',
   initialIndex = 3,
   visibleCards = 4,
-  showInternalArrows = true,
   showTitle = true,
   stabilizeInitialLayout = false,
   stabilizedViewportScale = 1,
@@ -258,11 +254,6 @@ export default function TambeRail({
   const cardW = Math.max(80, (beltWidth - (visibleCards - 1) * PAUTA_GUTTER_X) / visibleCards * (stabilizeInitialLayout ? 1 : 0.94));
   const stepPx = cardW + PAUTA_GUTTER_X;
   const viewportWidthPx = useMemo(() => Math.max(0, stabilizeInitialLayout ? beltWidth : Math.min(beltWidth, cardW * visibleCards + (visibleCards - 1) * PAUTA_GUTTER_X)), [beltWidth, cardW, visibleCards, PAUTA_GUTTER_X, stabilizeInitialLayout]);
-  const arrowsLeftPx = useMemo(() => {
-    const buttonsW = (44 * 2) + 10;
-    const inset = 20;
-    return Math.max(0, viewportWidthPx - inset - buttonsW);
-  }, [viewportWidthPx]);
   const cardImgTopPx = stabilizeInitialLayout ? 0 : 161;
   const cardTextBlockHeightPx = stabilizeInitialLayout ? 0 : 140;
   const renderedCardW = stabilizeInitialLayout ? Math.floor(cardW) : Math.round(cardW);
@@ -398,60 +389,8 @@ export default function TambeRail({
                 touchAction: 'pan-y',
                 minHeight: `${viewportHeightPx}px`,
               }}
-              data-container="carousel-viewport"
-              onPointerDown={(e) => {
-                if (e.target && e.target.closest && e.target.closest('button')) return;
-                const r = dragRef.current;
-                r.active = true;
-                r.pointerId = typeof e.pointerId === 'number' ? e.pointerId : null;
-                r.startX = typeof e.clientX === 'number' ? e.clientX : 0;
-                r.startY = typeof e.clientY === 'number' ? e.clientY : 0;
-                r.lastDx = 0; r.lastDy = 0; r.moved = false; r.consumed = false;
-              }}
-              onPointerMove={(e) => {
-                const r = dragRef.current;
-                if (!r.active) return;
-                const x = typeof e.clientX === 'number' ? e.clientX : r.startX;
-                const y = typeof e.clientY === 'number' ? e.clientY : r.startY;
-                const dx = x - r.startX;
-                const dy = y - r.startY;
-                r.lastDx = dx; r.lastDy = dy;
-                if (Math.abs(dx) > 6 && Math.abs(dx) > Math.abs(dy)) {
-                  r.moved = true;
-                  try { e.preventDefault(); } catch { /* ignore */ }
-                  try {
-                    if (typeof e.currentTarget?.setPointerCapture === 'function' && typeof e.pointerId === 'number') {
-                      e.currentTarget.setPointerCapture(e.pointerId);
-                    }
-                  } catch { /* ignore */ }
-                }
-              }}
-              onPointerUp={(e) => {
-                const r = dragRef.current;
-                r.active = false; r.pointerId = null;
-                try {
-                  if (typeof e.currentTarget?.releasePointerCapture === 'function' && typeof e.pointerId === 'number') {
-                    e.currentTarget.releasePointerCapture(e.pointerId);
-                  }
-                } catch { /* ignore */ }
-                const dx = r.lastDx; const dy = r.lastDy;
-                if (!r.consumed && Math.abs(dx) >= 44 && Math.abs(dx) > Math.abs(dy)) {
-                  r.consumed = true;
-                  if (dx < 0) goNext(); else goPrev();
-                }
-                if (r.moved) {
-                  if (Math.abs(dx) >= 44 && Math.abs(dx) > Math.abs(dy)) {
-                    setTimeout(() => { dragRef.current.moved = false; }, 0);
-                  } else {
-                    r.moved = false;
-                  }
-                }
-              }}
-              onPointerCancel={() => { dragRef.current.active = false; dragRef.current.pointerId = null; }}
+              data-container="rail-estatic"
             >
-              {showInternalArrows && (
-                <CarouselArrows leftPx={arrowsLeftPx} onPrev={goPrev} onNext={goNext} />
-              )}
 
               <div
                 style={{
