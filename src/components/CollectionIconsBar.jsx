@@ -19,8 +19,8 @@ export default function CollectionIconsBar() {
         left: '50%',
         transform: 'translateX(-50%)',
         width: 'fit-content',
-        // 4 px mes amunt.
-        bottom: `${BAR_HEIGHT + 4}px`,
+        // 9 px mes amunt (4 + 5).
+        bottom: `${BAR_HEIGHT + 9}px`,
         zIndex: 50,
         background: '#fff',
         border: '1px solid #e5e7eb',
@@ -30,9 +30,10 @@ export default function CollectionIconsBar() {
         justifyContent: 'center',
         // Dins d'una pill, les icones queden centrades.
         alignItems: 'center',
-        // Pill mes ampla: les icones es reparteixen mes.
-        gap: '24px',
-        padding: '10px 20px',
+        // Pill mes ampla, pero que tambe capiga en pantalles estretes.
+        gap: 'clamp(12px, 6.2vw, 24px)',
+        // Alcada 5 px menys.
+        padding: '7.5px clamp(12px, 6.4vw, 25px)',
         boxSizing: 'border-box',
       }}
     >
