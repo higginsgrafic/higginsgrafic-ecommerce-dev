@@ -316,7 +316,10 @@ function MegaStripePanelP1({
                   width: 'fit-content',
                   display: 'inline-block',
                   transformOrigin: 'top center',
-                  transform: 'translate(var(--megaStripeDx, 0px), var(--megaStripeDy, 0px)) scale(var(--megaStripeScale, 1.2125))',
+                  // A l'apaisada pugem la stripe 10px (les samarretes). El
+                  // desplaçament va amb la resta de la seva posicio, que ve de
+                  // les variables de calibracio.
+                  transform: `translate(var(--megaStripeDx, 0px), calc(var(--megaStripeDy, 0px) + ${(typeof window !== 'undefined' && window.innerWidth >= 768 && window.innerWidth <= 1366 && window.innerWidth >= window.innerHeight) ? -10 : 0}px)) scale(var(--megaStripeScale, 1.2125))`,
                   isolation: 'isolate',
                 }}
               >
