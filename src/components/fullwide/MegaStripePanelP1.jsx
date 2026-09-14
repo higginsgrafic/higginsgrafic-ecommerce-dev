@@ -208,7 +208,11 @@ function MegaStripePanelP1({
     <div
       ref={pageRootRef}
       className="w-full shrink-0"
-      style={{ transform: (!isPortraitTablet && pageLift > 0) ? `translateY(-${pageLift}px)` : undefined }}
+      // A l'apaisada, tota la primera filera de la pagina 1 baixa 10px: es el
+      // pageLift (que apuja el contingut) menys deu.
+      style={{ transform: !isPortraitTablet
+        ? `translateY(${((typeof window !== 'undefined' && window.innerWidth >= 768 && window.innerWidth <= 1366 && window.innerWidth >= window.innerHeight) ? 10 : 0) - pageLift}px)`
+        : undefined }}
     >
       {!hideGrid || reserveGridSpace ? (
         <div
