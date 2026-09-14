@@ -60,8 +60,12 @@ function CollectionTableCard({
   sizeSelectorWidth = '62%',
   sizeSelectorHeight = '34px',
   sizeFontPx,
-  // Mida del text del nom i del preu (al mobil, com el cistell).
+  // Mida del text del nom i del preu (al mobil).
   textFontPx,
+  // Mida de la icona del cistell (per defecte, la de sempre).
+  cartSizePx,
+  // Separacio entre el preu i el cistell (per defecte, la de sempre).
+  priceGap = '34px',
 }) {
   const enllac = href || productHref || collectionHref;
   const [hover, setHover] = useState(false);
@@ -226,7 +230,7 @@ function CollectionTableCard({
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          gap: '34px',
+          gap: priceGap,
           padding: '2px 8px',
         }}
       >
@@ -236,7 +240,13 @@ function CollectionTableCard({
             fontSize: textFontPx ? `${textFontPx}px` : P.fontSize,
             fontWeight: P.fontWeight,
             letterSpacing: `${P.letterSpacing}em`,
-            lineHeight: P.lineHeight,
+            // Amb la caixa de linia igual que la icona del cistell, el preu
+            // queda opticament centrat amb ella.
+            lineHeight: cartSizePx
+              ? `${cartSizePx}px`
+              : (textFontPx ? `${TDP_CART_SIZE_SETTINGS.fontSize}px` : P.lineHeight),
+            display: 'flex',
+            alignItems: 'center',
             color: P.color,
           }}
         >
@@ -254,8 +264,8 @@ function CollectionTableCard({
             aria-hidden="true"
             draggable="false"
             style={{
-              width: `${TDP_CART_SIZE_SETTINGS.fontSize}px`,
-              height: `${TDP_CART_SIZE_SETTINGS.fontSize}px`,
+              width: `${cartSizePx ?? TDP_CART_SIZE_SETTINGS.fontSize}px`,
+              height: `${cartSizePx ?? TDP_CART_SIZE_SETTINGS.fontSize}px`,
               objectFit: 'contain',
             }}
           />
