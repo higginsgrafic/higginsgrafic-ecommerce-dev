@@ -14,7 +14,11 @@ dist-ssr
 *.local
 
 vite.config.js.timestamp-*.mjs
-Icon*
+# Nome s els fitxers 'Icon' que crea el macOS (Icon + retorn de carro).
+# Amb 'Icon*' tambe s'ignorava la carpeta public/custom_logos/icons/ i cap
+# icona del projecte no arribava al desplegament.
+Icon
+Icon
 
 supabase/.temp
 .vscode/*
