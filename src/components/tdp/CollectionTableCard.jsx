@@ -56,6 +56,12 @@ function CollectionTableCard({
   cartCount = 0,
   variantB = false,
   backgroundSrc,
+  // Mides del selector de talles (al mobil es mes ample i amb el text mes gros).
+  sizeSelectorWidth = '62%',
+  sizeSelectorHeight = '34px',
+  sizeFontPx,
+  // Mida del text del nom i del preu (al mobil, com el cistell).
+  textFontPx,
 }) {
   const enllac = href || productHref || collectionHref;
   const [hover, setHover] = useState(false);
@@ -87,13 +93,13 @@ function CollectionTableCard({
           textDecoration: 'none',
           color: N.color,
           fontFamily: `${N.fontFamily}, sans-serif`,
-          fontSize: N.fontSize,
+          fontSize: textFontPx ? `${textFontPx}px` : N.fontSize,
           fontWeight: N.fontWeight,
           letterSpacing: `${N.letterSpacing}em`,
           lineHeight: N.lineHeight,
           textAlign: 'center',
           textTransform: N.textTransform,
-          whiteSpace: 'nowrap',
+          whiteSpace: textFontPx ? 'normal' : 'nowrap',
         }}
       >
         {productName}
@@ -227,7 +233,7 @@ function CollectionTableCard({
         <span
           style={{
             fontFamily: `${P.fontFamily}, sans-serif`,
-            fontSize: P.fontSize,
+            fontSize: textFontPx ? `${textFontPx}px` : P.fontSize,
             fontWeight: P.fontWeight,
             letterSpacing: `${P.letterSpacing}em`,
             lineHeight: P.lineHeight,
@@ -272,9 +278,8 @@ function CollectionTableCard({
             padding: '2px',
             borderRadius: 'clamp(2.81px, 0.8vw, 5.06px)',
             border: '1px solid #e5e7eb',
-            // Mes estret: nome s el 62% de l'amplada de la fitxa.
-            width: '62%',
-            height: '34px',
+            width: sizeSelectorWidth,
+            height: sizeSelectorHeight,
             boxSizing: 'border-box',
           }}
         >
@@ -288,7 +293,7 @@ function CollectionTableCard({
                 style={{
                   flex: 1,
                   fontFamily: `${T.fontFamily}, sans-serif`,
-                  fontSize: `${T.fontSize}pt`,
+                  fontSize: sizeFontPx ? `${sizeFontPx}px` : `${T.fontSize}pt`,
                   fontWeight: isSelected ? T.selectedFontWeight : T.fontWeight,
                   letterSpacing: `${T.letterSpacing}em`,
                   lineHeight: T.lineHeight,
