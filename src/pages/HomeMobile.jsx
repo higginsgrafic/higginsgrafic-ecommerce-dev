@@ -146,7 +146,7 @@ function MobileHero() {
   ) : null;
 
   return (
-    <div style={{ paddingLeft: '16px', paddingRight: '16px', paddingBottom: '40px' }}>
+    <div style={{ paddingLeft: '16px', paddingRight: '16px', paddingTop: '10px', paddingBottom: '40px' }}>
       <div
         style={{
           position: 'relative',
@@ -180,7 +180,8 @@ function MobileHero() {
       </div>
 
       {/* Botó shuffle sota la hero */}
-      <div style={{ display: 'flex', justifyContent: 'center', marginTop: '16px' }}>
+      {/* Boto de shuffle: 10 px mes avall. */}
+      <div style={{ display: 'flex', justifyContent: 'center', marginTop: '26px' }}>
         <button
           onClick={handleShuffle}
           aria-label="Barreja samarretes i dibuixos"
