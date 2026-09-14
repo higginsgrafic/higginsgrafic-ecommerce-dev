@@ -160,7 +160,7 @@ function MegaStripePanelP1({
           // A l'apaisada volem tota la filera 10px mes avall del lloc on
           // l'alineava la calibracio. El desplaçament va aqui, dins l'objectiu:
           // si el posessim al transform, la propia calibracio el desfaria.
-          const desplaçament = (typeof window !== 'undefined' && window.innerWidth >= 768 && window.innerWidth <= 1366 && window.innerWidth >= window.innerHeight) ? 10 : 0;
+          const desplaçament = (typeof window !== 'undefined' && window.innerWidth >= 768 && window.innerWidth <= 1366 && window.innerWidth >= window.innerHeight) ? 20 : 0;
           const delta = (selector.getBoundingClientRect().top - panel.getBoundingClientRect().top) - desplaçament;
           const next = Math.max(0, pageLiftRef.current + delta);
           if (Math.abs(next - pageLiftRef.current) >= 0.5) {
