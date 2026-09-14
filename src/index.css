@@ -66,6 +66,20 @@ html {
   }
 }
 
+/* Calibratge de l'overlay de la samarreta (hero, filera de productes i
+   fitxes). Aquestes variables les publica useMegaStripeDebugState, que va
+   dins del DebugLayer (nome s en DEV o per a admins). Sense valors per
+   defecte, al lloc publicat l'overlay cau a scale(1) i les samarretes es
+   veuen a una escala diferent de la de desenvolupament.
+   Els valors surten de SHIRT_DRAWING_OVERLAY_DEFAULTS
+   (src/config/stripeCalibrations.js). En DEV el DebugLayer els
+   sobreescriu amb els valors calibrats. */
+:root {
+  --hgShirtOverlayDx: 0.5px;
+  --hgShirtOverlayDy: 22.5px;
+  --hgShirtOverlayScale: 0.38;
+}
+
 html.scrollbar-compensate [data-main-header="true"].cart-open,
 html.scrollbar-compensate .offers-header-cart-open {
   padding-right: var(--scrollbar-width, 0);
