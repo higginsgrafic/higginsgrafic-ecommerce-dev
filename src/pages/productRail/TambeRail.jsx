@@ -1,6 +1,7 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import RespescaTitle from '@/pages/productRail/RespescaTitle';
 import ProductCard from '@/pages/productRail/ProductCard';
+import { getSafeBelt } from '@/utils/layoutMetrics';
 
 const DEFAULT_IMAGES = [
   '/placeholders/apparel/t-shirt/gildan_5000/gildan-5000_t-shirt_crewneck_unisex_heavyWeight_xl_black_gpr-4-0_front.webp',
@@ -243,9 +244,15 @@ export default function TambeRail({
   }, [totalCards]);
 
   const left1 = stabilizeInitialLayout ? 0 : (bgMetrics ? bgMetrics.devLeft + 20 : 20);
+  // Les guies `--belt2-xL/xR` només les publica BeltReferenceOverlay, que va
+  // dins de `import.meta.env.DEV`: al lloc publicat no hi són i bgMetrics queda
+  // a null. Abans es queia a `CARD_W * visibleCards` (una filera enorme que
+  // descol·locava les etiquetes). Ara es fa servir getSafeBelt(), que està
+  // pensat justament per a això: si no hi ha guies, torna un belt centrat i
+  // coherent amb el viewport.
   const fallbackBeltWidth = stabilizeInitialLayout && typeof window !== 'undefined'
     ? stabilizedViewportWidth || Math.max(320, window.innerWidth / stabilizedViewportScale)
-    : CARD_W * visibleCards;
+    : (typeof window !== 'undefined' ? getSafeBelt().width : CARD_W * visibleCards);
   const beltWidth = stabilizeInitialLayout ? fallbackBeltWidth : (bgMetrics ? bgMetrics.width : fallbackBeltWidth);
   // Card width = 1 columna de la pauta amb gutter `PAUTA_GUTTER_X` entre cols.
   //   cardW = (belt2Width - (visibleCards - 1) * gutterX) / visibleCards
