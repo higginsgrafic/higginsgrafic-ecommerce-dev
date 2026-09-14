@@ -18,7 +18,8 @@ export default function CollectionIconsBar() {
         // Una pill flotant amb els cinc botons a dins, centrada.
         left: '50%',
         transform: 'translateX(-50%)',
-        width: 'fit-content',
+        // Amplada fixa: la pill no s'estreny quan tanquem el gap de les icones.
+        width: 'min(368px, calc(100vw - 22px))',
         // 9 px mes amunt (4 + 5).
         bottom: `${BAR_HEIGHT + 9}px`,
         zIndex: 50,
@@ -31,9 +32,10 @@ export default function CollectionIconsBar() {
         // Dins d'una pill, les icones queden centrades.
         alignItems: 'center',
         // Pill mes ampla, pero que tambe capiga en pantalles estretes.
-        gap: 'clamp(12px, 6.2vw, 24px)',
+        // Separacio entre icones a la meitat.
+        gap: 'clamp(6px, 3.1vw, 12px)',
         // Alcada 5 px menys.
-        padding: '7.5px clamp(12px, 6.4vw, 25px)',
+        padding: '5px 12px',
         boxSizing: 'border-box',
       }}
     >
