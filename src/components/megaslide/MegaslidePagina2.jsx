@@ -307,6 +307,10 @@ export default function MegaslidePagina2({
         style={{
           width: '100%',
           height: '100%',
+          // A l'apaisada encongim una mica el contingut: les columnes dels
+          // dibuixos, amb el texte a la mida de sempre, no hi cabien i la
+          // ultima s'entaforava dins dels cercles de color.
+          zoom: (typeof window !== 'undefined' && window.innerWidth >= 768 && window.innerWidth <= 1366 && window.innerWidth >= window.innerHeight) ? 0.90 : 1,
           display: 'flex',
           justifyContent: isPortraitTablet ? 'flex-start' : 'center',
           overflowX: isPortraitTablet ? 'auto' : 'visible',
