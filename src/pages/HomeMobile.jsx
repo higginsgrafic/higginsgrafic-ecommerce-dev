@@ -27,7 +27,8 @@ const COLLECTIONS = [
 // Al mobil no hi ha capa de dibuix a sobre: la imatge ja porta el dibuix.
 // Al mobil: el selector mes ample i el nom i el preu una mica mes grossos.
 // El text de les talles no es toca.
-const MIDES_MOBIL = { sizeSelectorWidth: '100%', textFontPx: 20 };
+// Cistell un 10% mes petit: 34,1984 - 10% = 30,78.
+const MIDES_MOBIL = { sizeSelectorWidth: '100%', textFontPx: 20, cartSizePx: 30.78, priceGap: '29px' };
 const TableCardA = (props) => <CollectionTableCard {...props} overlaySrc={undefined} {...MIDES_MOBIL} />;
 const TableCardB = (props) => <CollectionTableCard {...props} variantB overlaySrc={undefined} {...MIDES_MOBIL} />;
 
