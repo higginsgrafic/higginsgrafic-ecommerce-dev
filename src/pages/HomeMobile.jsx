@@ -146,7 +146,7 @@ function MobileHero() {
   ) : null;
 
   return (
-    <div style={{ paddingLeft: '16px', paddingRight: '16px', paddingTop: '30px', paddingBottom: '40px' }}>
+    <div style={{ paddingLeft: '16px', paddingRight: '16px', paddingTop: '50px', paddingBottom: '40px' }}>
       <div
         style={{
           position: 'relative',
