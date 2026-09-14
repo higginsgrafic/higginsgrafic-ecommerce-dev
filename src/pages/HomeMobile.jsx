@@ -2,6 +2,7 @@ import { useState, useMemo, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { Shuffle } from 'lucide-react';
 import TDP1 from '@/components/tdp/TDP1';
+import CollectionTableCard from '@/components/tdp/CollectionTableCard';
 import StoryPosterLink from '@/components/StoryPosterLink';
 import { buildHomeDrawingPlan, buildHeroStripePlan } from '@/components/home/homeDrawings';
 import MobileFooter from '@/components/MobileFooter';
@@ -21,6 +22,11 @@ const COLLECTIONS = [
   { slug: 'cube', title: 'Cube', subtitle: 'TOTS SOM ESTRANYS A ULLS NOSTRES', href: '/cube' },
   { slug: 'miscellania', title: 'MISCEL·LÀNIA', subtitle: 'MÉS VAL SOL QUE MAL ACOMPANYAT', href: '/miscellania' },
 ];
+
+// Fitxa de taula (la mateixa que a l'escriptori): A i B intercalades.
+// Al mobil no hi ha capa de dibuix a sobre: la imatge ja porta el dibuix.
+const TableCardA = (props) => <CollectionTableCard {...props} overlaySrc={undefined} />;
+const TableCardB = (props) => <CollectionTableCard {...props} variantB overlaySrc={undefined} />;
 
 function MobileTdpCard({ Component, slug, index, cardPropsFn, collectionHref, editableIdPrefix }) {
   const [size, setSize] = useState('M');
@@ -243,7 +249,7 @@ export default function HomeMobile() {
   };
 
   // Cada targeta TDP té una alçada fixa per mòbil
-  const CARD_HEIGHT = 520;
+  const CARD_HEIGHT = 322;
   const CARD_GAP = '12px';
 
   return (
@@ -306,7 +312,7 @@ export default function HomeMobile() {
               height: `${CARD_HEIGHT}px`,
             }}>
               <MobileTdpCard
-                Component={TDP1}
+                Component={TableCardA}
                 slug={col.slug}
                 index={0}
                 cardPropsFn={cardProps}
@@ -314,7 +320,7 @@ export default function HomeMobile() {
                 editableIdPrefix={`home-mobile-${colIdx}-tdp-1`}
               />
               <MobileTdpCard
-                Component={TDP1}
+                Component={TableCardB}
                 slug={col.slug}
                 index={1}
                 cardPropsFn={cardProps}
@@ -327,7 +333,9 @@ export default function HomeMobile() {
             <div style={{
               display: 'flex',
               justifyContent: 'center',
-              marginTop: `${20 - (CARD_HEIGHT / 24) * 9}px`,
+              // Amb la fitxa de taula les targetes omplen tota la seva alcada,
+              // aixi que la pill va just a sota (abans anava amagada darrere).
+              marginTop: '20px',
             }}>
               <Link
                 to={col.href}
