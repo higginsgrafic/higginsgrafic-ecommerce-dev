@@ -66,8 +66,9 @@ export default function CollectionIconsBar() {
                 objectFit: 'contain',
                 display: 'block',
                 filter: 'brightness(0)',
-                // La icona de First Contact (la mes alta) va 3 px mes avall.
-                transform: isFirstContact ? 'translateY(3px)' : undefined,
+                // La icona de First Contact va 3 px avall; les altres 4 pugen
+                // per alinear el seu top amb el d'ella.
+                transform: isFirstContact ? 'translateY(3px)' : 'translateY(-4.5px)',
               }}
             />
           </Link>
