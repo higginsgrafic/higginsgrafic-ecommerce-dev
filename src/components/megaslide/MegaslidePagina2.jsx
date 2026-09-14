@@ -337,7 +337,7 @@ export default function MegaslidePagina2({
             data-p2-color-selector
             style={{
             position: 'absolute',
-            top: `calc(var(--hg-cercador-bar-top, 0px) + ${40 + ((typeof window !== 'undefined' && window.innerWidth >= 768 && window.innerWidth <= 1366 && window.innerWidth >= window.innerHeight) ? 5 : 0)}px)`,
+            top: `calc(var(--hg-cercador-bar-top, 0px) + ${40 + ((typeof window !== 'undefined' && window.innerWidth >= 768 && window.innerWidth <= 1366 && window.innerWidth >= window.innerHeight) ? 15 : 0)}px)`,
             left: '27px',
             width: `${bnSliderSize}px`,
             height: `${bnSliderSize}px`,
@@ -363,7 +363,7 @@ export default function MegaslidePagina2({
         {/* CercadorTextRow */}
         <div style={{
           position: 'absolute',
-          top: `calc(var(--hg-cercador-bar-top, 0px) + ${topVisualAlignmentY + (isPortraitTablet ? 20 : (isLandscapeTablet ? 5 : ((typeof window !== 'undefined' && window.innerWidth >= 768 && window.innerWidth <= 1366 && window.innerWidth >= window.innerHeight) ? 35 : 20)))}px)`,
+          top: `calc(var(--hg-cercador-bar-top, 0px) + ${topVisualAlignmentY + (isPortraitTablet ? 20 : (isLandscapeTablet ? 5 : ((typeof window !== 'undefined' && window.innerWidth >= 768 && window.innerWidth <= 1366 && window.innerWidth >= window.innerHeight) ? 45 : 20)))}px)`,
           left: isPortraitTablet ? '0' : '50%',
           transform: isPortraitTablet ? 'scale(var(--hg-cercador-bar-scale, 1))' : 'translateX(-50%) scale(var(--hg-cercador-bar-scale, 1))',
           transformOrigin: 'top center',
