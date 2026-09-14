@@ -157,7 +157,11 @@ function MegaStripePanelP1({
       frame = requestAnimationFrame(() => {
         const selector = root.querySelector('[data-stripe-buttonbar="bn"]');
         if (selector) {
-          const delta = selector.getBoundingClientRect().top - panel.getBoundingClientRect().top;
+          // A l'apaisada volem tota la filera 10px mes avall del lloc on
+          // l'alineava la calibracio. El desplaçament va aqui, dins l'objectiu:
+          // si el posessim al transform, la propia calibracio el desfaria.
+          const desplaçament = (typeof window !== 'undefined' && window.innerWidth >= 768 && window.innerWidth <= 1366 && window.innerWidth >= window.innerHeight) ? 10 : 0;
+          const delta = (selector.getBoundingClientRect().top - panel.getBoundingClientRect().top) - desplaçament;
           const next = Math.max(0, pageLiftRef.current + delta);
           if (Math.abs(next - pageLiftRef.current) >= 0.5) {
             pageLiftRef.current = next;
@@ -208,11 +212,7 @@ function MegaStripePanelP1({
     <div
       ref={pageRootRef}
       className="w-full shrink-0"
-      // A l'apaisada, tota la primera filera de la pagina 1 baixa 10px: es el
-      // pageLift (que apuja el contingut) menys deu.
-      style={{ transform: !isPortraitTablet
-        ? `translateY(${((typeof window !== 'undefined' && window.innerWidth >= 768 && window.innerWidth <= 1366 && window.innerWidth >= window.innerHeight) ? 10 : 0) - pageLift}px)`
-        : undefined }}
+      style={{ transform: (!isPortraitTablet && pageLift > 0) ? `translateY(-${pageLift}px)` : undefined }}
     >
       {!hideGrid || reserveGridSpace ? (
         <div
