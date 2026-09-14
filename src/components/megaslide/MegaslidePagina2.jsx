@@ -227,7 +227,12 @@ export default function MegaslidePagina2({
       const page1Selector = page1Viewport?.querySelector('button[aria-label="Color"]');
       const page2Selector = viewportRef.current?.querySelector('[data-p2-color-selector] button[aria-label="Color"]');
       if (!page1Selector || !page2Selector) return;
-      const delta = page1Selector.getBoundingClientRect().top - page2Selector.getBoundingClientRect().top;
+      // A l'apaisada volem el selector 10px mes avall que el de la pagina 1:
+      // el desplaçament va aqui, perque la calibracio alinea el selector amb
+      // aquest valor objectiu. Si el posessim al transform, la propia
+      // calibracio el tornaria a pujar i no es veuria.
+      const offset = (typeof window !== 'undefined' && window.innerWidth >= 768 && window.innerWidth <= 1366 && window.innerWidth >= window.innerHeight) ? 10 : 0;
+      const delta = (page1Selector.getBoundingClientRect().top + offset) - page2Selector.getBoundingClientRect().top;
       if (Math.abs(delta) < 0.5) return;
       setTopVisualAlignmentY((current) => current + delta);
     };
@@ -363,7 +368,7 @@ export default function MegaslidePagina2({
         {/* CercadorTextRow */}
         <div style={{
           position: 'absolute',
-          top: `calc(var(--hg-cercador-bar-top, 0px) + ${topVisualAlignmentY + (isPortraitTablet ? 20 : (isLandscapeTablet ? 5 : ((typeof window !== 'undefined' && window.innerWidth >= 768 && window.innerWidth <= 1366 && window.innerWidth >= window.innerHeight) ? 35 : 20)))}px)`,
+          top: `calc(var(--hg-cercador-bar-top, 0px) + ${topVisualAlignmentY + (isPortraitTablet ? 20 : (isLandscapeTablet ? 5 : ((typeof window !== 'undefined' && window.innerWidth >= 768 && window.innerWidth <= 1366 && window.innerWidth >= window.innerHeight) ? 45 : 20)))}px)`,
           left: isPortraitTablet ? '0' : '50%',
           transform: isPortraitTablet ? 'scale(var(--hg-cercador-bar-scale, 1))' : 'translateX(-50%) scale(var(--hg-cercador-bar-scale, 1))',
           transformOrigin: 'top center',
