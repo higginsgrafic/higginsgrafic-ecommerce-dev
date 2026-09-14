@@ -14,6 +14,7 @@ import { buildOtherCollectionsImages } from '@/components/home/homeDrawings';
 import useIsMobile from '@/hooks/useIsMobile';
 import PdpMobile from '@/pages/PdpMobile';
 import PageBand from '@/components/layout/PageBand';
+import { getSafeBelt } from '@/utils/layoutMetrics';
 
 const PDP_PRESET_VERSION = 'pdp-layout-2026-06-06-1953';
 
@@ -195,23 +196,23 @@ function PdpDesktop({ product }) {
     };
   }, []);
 
-  // Llegeix belt2 (CSS vars) per alinear el grid del PDP amb el rail de targetes
+  // Alinea el grid del PDP amb el rail de targetes.
+  //
+  // Abans llegia directament les CSS vars `--belt2-xL/xR` i, si no hi eren,
+  // no feia res: es quedava amb beltWidth = null i el grid queia a '100%' sense
+  // desplaçament. Com que aquestes vars només les publica BeltReferenceOverlay
+  // (que va dins de import.meta.env.DEV), al lloc publicat el grid no quedava
+  // alineat amb el rail i els selectors no quadraven amb les fletxes.
+  // Ara fem servir getSafeBelt(), igual que TambeRail: si hi ha guies, les
+  // respecta; si no, torna un belt centrat i coherent amb el viewport.
   useLayoutEffect(() => {
     if (typeof window === 'undefined') return undefined;
-    const readCss = (name) => {
-      try {
-        const raw = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
-        const n = parseFloat(raw);
-        return Number.isFinite(n) ? n : null;
-      } catch { return null; }
-    };
     const measure = () => {
-      const xL = readCss('--belt2-xL');
-      const xR = readCss('--belt2-xR');
-      if (Number.isFinite(xL) && Number.isFinite(xR) && xR > xL) {
-        setBeltWidth(xR - xL);
-        setBeltLeft(xL);
-      }
+      try {
+        const safe = getSafeBelt();
+        setBeltWidth(safe.width);
+        setBeltLeft(safe.left);
+      } catch { /* ignore */ }
     };
     measure();
     const t = setTimeout(measure, 200);
