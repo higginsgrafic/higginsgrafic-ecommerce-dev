@@ -30,8 +30,7 @@ export default function CollectionIconsBar() {
         // Dins d'una pill, les icones queden centrades.
         alignItems: 'center',
         gap: '14px',
-        // Espai lateral de la pill a la meitat.
-        padding: '10px 10px',
+        padding: '10px 20px',
         boxSizing: 'border-box',
       }}
     >
