@@ -15,18 +15,24 @@ export default function CollectionIconsBar() {
     <div
       style={{
         position: 'fixed',
-        left: 0,
-        right: 0,
+        // Una pill flotant amb els cinc botons a dins, centrada.
+        left: '50%',
+        transform: 'translateX(-50%)',
+        width: 'fit-content',
         bottom: `${BAR_HEIGHT}px`,
         zIndex: 50,
         background: '#fff',
-        borderTop: '1px solid #e5e7eb',
-        borderBottom: '1px solid #e5e7eb',
+        border: '1px solid #e5e7eb',
+        borderRadius: '9999px',
+        boxShadow: '0 4px 14px rgba(0, 0, 0, 0.08)',
         display: 'flex',
         justifyContent: 'center',
-        alignItems: 'flex-start',
-        gap: '15.75px',
-        padding: '8px 16px',
+        // Dins d'una pill, les icones queden centrades.
+        alignItems: 'center',
+        gap: '14px',
+        // Espai lateral de la pill a la meitat.
+        padding: '10px 10px',
+        boxSizing: 'border-box',
       }}
     >
       {COLLECTIONS_MENU.map((c) => {
@@ -40,7 +46,7 @@ export default function CollectionIconsBar() {
             className="hover:opacity-100 active:scale-95"
             style={{
               display: 'inline-flex',
-              alignItems: 'flex-start',
+              alignItems: 'center',
               justifyContent: 'center',
               minWidth: '44px',
               minHeight: '44px',
