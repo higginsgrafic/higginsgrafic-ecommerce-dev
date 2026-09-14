@@ -14,10 +14,10 @@ const TDP_TEXT_PRESET_VERSION = 'tdp-layout-2026-05-14-0516';
 // Responsive font helper: scales font size proportionally with belt width.
 // beltWidth ranges from ~320px (narrow) to 1350px (max). At max, scale = 1.
 const BELT_MAX = 1350;
-const responsiveFont = (ptAtMax, minPt) =>
+export const responsiveFont = (ptAtMax, minPt) =>
   `clamp(${minPt}pt, calc((var(--hg-tdp-xR, 1350px) - var(--hg-tdp-xL, 0px)) * ${ptAtMax * 1.333 / BELT_MAX}), ${ptAtMax}pt)`;
 
-const TDP_PRODUCT_NAME_SETTINGS = {
+export const TDP_PRODUCT_NAME_SETTINGS = {
   x: 0,
   y: 0,
   fontFamily: 'Oswald',
@@ -47,7 +47,7 @@ const TDP_PRODUCT_DESCRIPTION_SETTINGS = {
   textTransform: 'none',
 };
 
-const TDP_PRICE_SETTINGS = {
+export const TDP_PRICE_SETTINGS = {
   x: 0,
   y: 0,
   fontFamily: 'Oswald',
@@ -62,7 +62,7 @@ const TDP_PRICE_SETTINGS = {
   textTransform: 'none',
 };
 
-const TDP_SIZE_BUTTON_TEXT_SETTINGS = {
+export const TDP_SIZE_BUTTON_TEXT_SETTINGS = {
   x: 0,
   y: 0,
   fontFamily: 'Oswald',
@@ -77,7 +77,7 @@ const TDP_SIZE_BUTTON_TEXT_SETTINGS = {
   textTransform: 'none',
 };
 
-const TDP_CART_SIZE_SETTINGS = {
+export const TDP_CART_SIZE_SETTINGS = {
   x: 0,
   y: 0,
   fontFamily: 'Oswald',

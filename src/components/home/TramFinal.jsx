@@ -112,7 +112,9 @@ const TramFinal = forwardRef(function TramFinal(
           color: 'rgba(71, 80, 89, 0.7)',
           textAlign: 'left',
           pointerEvents: 'auto',
-          transform: 'translateY(20px) translateX(2px)', // Baixat 1px (abans 19px) i 2px dreta
+          // Alineat amb la primera targeta del rail (la seva esquerra) i a
+          // 20px per sobre seu.
+          transform: 'translateY(113px) translateX(27px)',
         }}
       >
         ALTRES HISTÒRIES
