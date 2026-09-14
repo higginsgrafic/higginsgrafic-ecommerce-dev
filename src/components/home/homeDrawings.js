@@ -380,6 +380,21 @@ export function resolveOverlaySrc(drawing, isDark) {
   return drawing.white || drawing.black || drawing.color || null;
 }
 
+// Generador amb llavor (mulberry32): dona sempre la mateixa sequencia per a la
+// mateixa llavor. Amb la data com a llavor, les recomanacions de "ALTRES
+// HISTORIES" son les mateixes durant tot el dia i canvien l'endema. Aixi no
+// ballen a cada visita (Google i el client veuen sempre el mateix) sense quedar
+// congelades per sempre.
+export function rngDelDia(data = new Date()) {
+  let a = (data.getFullYear() * 10000 + (data.getMonth() + 1) * 100 + data.getDate()) >>> 0;
+  return function () {
+    a = (a + 0x6D2B79F5) >>> 0;
+    let t = Math.imul(a ^ (a >>> 15), 1 | a);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
 function shuffle(arr, rng = Math.random) {
   const a = [...arr];
   for (let i = a.length - 1; i > 0; i -= 1) {
@@ -452,7 +467,6 @@ const STRIPE2_ONLY_IDS = new Set([
   'first_contact/ncc-1701-d',
 ]);
 
-const LIGHT_SHIRT_COLORS = SHIRT_COLORS.filter((c) => !DARK_COLORS.has(c));
 
 // Tintes disponibles per a un dibuix, sense mirar encara el color de samarreta:
 // 'b' negra, 'w' blanca, 'm' color.
@@ -744,7 +758,7 @@ const COLLECTION_DISPLAY_NAMES = {
   'miscellania': 'MISCEL·LÀNIA',
 };
 
-export function buildOtherCollectionsImages(currentSlug, { perCollection = 1, rng = Math.random } = {}) {
+export function buildOtherCollectionsImages(currentSlug, { rng = rngDelDia() } = {}) {
   const plan = buildHomeDrawingPlan({ perCollection: 3, rng });
   const others = HOME_COLLECTIONS_ORDER.filter((s) => s !== currentSlug);
   const shuffled = shuffle(others, rng);
