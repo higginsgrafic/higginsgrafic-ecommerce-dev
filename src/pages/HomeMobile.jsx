@@ -25,8 +25,11 @@ const COLLECTIONS = [
 
 // Fitxa de taula (la mateixa que a l'escriptori): A i B intercalades.
 // Al mobil no hi ha capa de dibuix a sobre: la imatge ja porta el dibuix.
-const TableCardA = (props) => <CollectionTableCard {...props} overlaySrc={undefined} />;
-const TableCardB = (props) => <CollectionTableCard {...props} variantB overlaySrc={undefined} />;
+// Al mobil: el selector mes ample i el nom i el preu a la mida del cistell
+// (34 px, la mateixa que la icona). El text de les talles no es toca.
+const MIDES_MOBIL = { sizeSelectorWidth: '100%', textFontPx: 34 };
+const TableCardA = (props) => <CollectionTableCard {...props} overlaySrc={undefined} {...MIDES_MOBIL} />;
+const TableCardB = (props) => <CollectionTableCard {...props} variantB overlaySrc={undefined} {...MIDES_MOBIL} />;
 
 function MobileTdpCard({ Component, slug, index, cardPropsFn, collectionHref, editableIdPrefix }) {
   const [size, setSize] = useState('M');
