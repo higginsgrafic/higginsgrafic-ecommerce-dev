@@ -253,7 +253,7 @@ export default function HomeMobile() {
   };
 
   // Cada targeta TDP té una alçada fixa per mòbil
-  const CARD_HEIGHT = 322;
+  const CARD_HEIGHT = 282;
   const CARD_GAP = '12px';
 
   return (
