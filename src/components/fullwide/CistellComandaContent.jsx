@@ -174,7 +174,6 @@ function CistellComandaContent({ cartItems, setCartItems, onFinalizeOrder }) {
   };
 
   const HEAD = { fontFamily: 'Oswald, sans-serif', fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.4px', color: '#475059' };
-  const META = { fontFamily: 'Roboto Condensed, sans-serif', fontWeight: 400, color: '#7D8895' };
   const VAL  = { fontFamily: 'Roboto Condensed, sans-serif', fontWeight: 500, color: '#475059' };
 
   useShippingCosts('es_peninsula');
@@ -383,9 +382,6 @@ function CistellComandaContent({ cartItems, setCartItems, onFinalizeOrder }) {
           <div style={{ ...colBg, display: 'flex', flexDirection: 'column', justifyContent: 'center', minWidth: 0, overflow: 'hidden', padding: isNarrowCart ? '0 0 0 4px' : '0 4px', marginRight: isNarrowCart ? '-40px' : undefined }}>
             <div style={{ ...HEAD, fontSize: '11.6424pt', lineHeight: 1.1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
               {item.title}
-            </div>
-            <div style={{ ...META, fontSize: '8.7318pt', fontWeight: 300, marginTop: '2px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-              {item.collection}
             </div>
           </div>
 

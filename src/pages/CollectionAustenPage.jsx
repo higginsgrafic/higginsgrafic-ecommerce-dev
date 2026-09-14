@@ -49,8 +49,6 @@ const COLLECTIONS_MENU = [
   },
 ];
 
-const TDP_DESCRIPTION = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna";
-
 const tdpImage = (color) =>
   `/placeholders/apparel/t-shirt/gildan_5000/gildan-5000_t-shirt_crewneck_unisex_heavyWeight_xl_${color}_gpr-4-0_front.webp`;
 
@@ -472,7 +470,7 @@ function CollectionAustenPage() {
                 gridColumn={`${col} / ${col + 1}`}
                 rowOffset={rowOffset}
                 productName={product.name}
-                description={TDP_DESCRIPTION}
+                description=""
                 price="15,50€"
                 imageSrc={collectionGridImageFor(product.collection, product.route, color, idx)}
                 hoverImages={collectionGridHoverVariantsFor(product.collection, product.route, color, idx)}
