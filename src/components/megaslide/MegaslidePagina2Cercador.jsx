@@ -373,7 +373,8 @@ export default function MegaslidePagina2Cercador({
         {/* CercadorTextRow */}
         <div style={{
           position: 'absolute',
-          top: `calc(var(--hg-cercador-bar-top, 0px) + ${topVisualAlignmentY - 10}px)`,
+          // La filera del cercador va 10px mes avall del que anava.
+          top: `calc(var(--hg-cercador-bar-top, 0px) + ${topVisualAlignmentY}px)`,
           left: 'calc(50% - 64px)',
           transform: `translateX(-50%) scale(var(--hg-cercador-bar-scale, 1))`,
           transformOrigin: 'top center',
