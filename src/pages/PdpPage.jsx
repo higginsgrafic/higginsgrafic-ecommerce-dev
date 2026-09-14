@@ -906,7 +906,14 @@ function PdpDesktop({ product }) {
             justifyContent: 'center',
           }}
         >
-          <StoryPosterLink style={isPortraitTablet ? { marginLeft: '300px' } : undefined} />
+          {/* L'aire de sobre el poster reduit un 25% i despres un altre 25%
+              (queda el 56,25% de l'aire original). */}
+          <StoryPosterLink
+            style={{
+              ...(isPortraitTablet ? { marginLeft: '300px' } : {}),
+              transform: 'translateY(calc((var(--page-band-transition-height) - 211px) * -7 / 32))',
+            }}
+          />
         </PageBand>
       </div>
     </section>

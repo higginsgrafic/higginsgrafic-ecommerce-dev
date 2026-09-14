@@ -5,6 +5,7 @@ import { Shuffle } from 'lucide-react';
 import HeroSlider from '@/components/HeroSlider';
 import TDP1 from '@/components/tdp/TDP1';
 import TDP2 from '@/components/tdp/TDP2';
+import CollectionTableCard from '@/components/tdp/CollectionTableCard';
 import EditableTextBox from '@/components/dev/EditableTextBox';
 import Pauta4ColsOverlay from '@/components/pauta/Pauta4ColsOverlay';
 import { buildHomeDrawingPlan, buildHeroStripePlan } from '@/components/home/homeDrawings';
@@ -202,6 +203,10 @@ const COLLECTION_NAMES = {
   'cube': 'CUBE',
   'miscellania': 'MISCEL·LÀNIA',
 };
+
+// Fitxa de taula: A (nom a dalt) i B (imatge a dalt), intercalades.
+const TableCardA = (props) => <CollectionTableCard {...props} />;
+const TableCardB = (props) => <CollectionTableCard {...props} variantB />;
 
 function HomeTdpCard({ Component, slug, index, cardPropsFn, collectionHref, editableIdPrefix, gridColumn, style, portraitTablet = false }) {
   const [size, setSize] = useState('M');
@@ -626,13 +631,13 @@ function Home() {
               }}
             >
               {/* Columna 1: TDP2 */}
-              <HomeTdpCard Component={TDP2} slug="first-contact" index={0} cardPropsFn={cardProps} portraitTablet={isPortraitTablet} collectionHref="/first-contact" editableIdPrefix="home-row1-tdp-1" gridColumn="1 / 2" style={{ height: '100%', boxSizing: 'border-box' }} />
+              <HomeTdpCard Component={TableCardB} slug="first-contact" index={0} cardPropsFn={cardProps} portraitTablet={isPortraitTablet} collectionHref="/first-contact" editableIdPrefix="home-row1-tdp-1" gridColumn="1 / 2" style={{ aspectRatio: '10 / 13', height: 'auto', boxSizing: 'border-box' }} />
 
               {/* Columna 2: TDP1 */}
-              <HomeTdpCard Component={TDP1} slug="first-contact" index={1} cardPropsFn={cardProps} portraitTablet={isPortraitTablet} collectionHref="/first-contact" editableIdPrefix="home-row1-tdp-2" gridColumn="2 / 3" style={{ height: '100%', boxSizing: 'border-box' }} />
+              <HomeTdpCard Component={TableCardA} slug="first-contact" index={1} cardPropsFn={cardProps} portraitTablet={isPortraitTablet} collectionHref="/first-contact" editableIdPrefix="home-row1-tdp-2" gridColumn="2 / 3" style={{ aspectRatio: '10 / 13', height: 'auto', boxSizing: 'border-box' }} />
 
               {/* Columna 3: TDP2 (Amb imatge a dalt i bloc Nom/Descripció a dota) */}
-              {!isPortraitTablet && <HomeTdpCard Component={TDP2} slug="first-contact" index={2} cardPropsFn={cardProps} portraitTablet={isPortraitTablet} collectionHref="/first-contact" editableIdPrefix="home-row1-tdp-3" gridColumn="3 / 4" style={{ height: '100%', boxSizing: 'border-box' }} />}
+              {!isPortraitTablet && <HomeTdpCard Component={TableCardB} slug="first-contact" index={2} cardPropsFn={cardProps} portraitTablet={isPortraitTablet} collectionHref="/first-contact" editableIdPrefix="home-row1-tdp-3" gridColumn="3 / 4" style={{ aspectRatio: '10 / 13', height: 'auto', boxSizing: 'border-box' }} />}
 
               {/* Indicador de més productes (Pill amb text sota el producte de la tercera columna) */}
               <Link
@@ -640,7 +645,7 @@ function Home() {
                 style={{
                   position: 'absolute',
                   left: '50%',
-                  bottom: '-54px',
+                  bottom: `calc((calc(calc(var(--hg-tdp-xR) - var(--hg-tdp-xL)) * 0.84632 - 231px) - calc(calc(calc(var(--hg-tdp-xR) - var(--hg-tdp-xL)) - 45px) / 3 * 1.3)) / 2 - 14px)`,
                   height: 'auto',
                   width: 'auto',
                   borderRadius: '9999px',
@@ -721,13 +726,13 @@ function Home() {
                 }}
               >
                 {/* Columna 1: TDP1 */}
-                <HomeTdpCard Component={TDP1} slug="the-human-inside" index={0} cardPropsFn={cardProps} portraitTablet={isPortraitTablet} collectionHref="/the-human-inside" editableIdPrefix="home-row2-tdp-1" gridColumn="1 / 2" style={{ height: '100%', boxSizing: 'border-box' }} />
+                <HomeTdpCard Component={TableCardA} slug="the-human-inside" index={0} cardPropsFn={cardProps} portraitTablet={isPortraitTablet} collectionHref="/the-human-inside" editableIdPrefix="home-row2-tdp-1" gridColumn="1 / 2" style={{ aspectRatio: '10 / 13', height: 'auto', boxSizing: 'border-box' }} />
 
                 {/* Columna 2: TDP2 */}
-                <HomeTdpCard Component={TDP2} slug="the-human-inside" index={1} cardPropsFn={cardProps} portraitTablet={isPortraitTablet} collectionHref="/the-human-inside" editableIdPrefix="home-row2-tdp-2" gridColumn="2 / 3" style={{ height: '100%', boxSizing: 'border-box' }} />
+                <HomeTdpCard Component={TableCardB} slug="the-human-inside" index={1} cardPropsFn={cardProps} portraitTablet={isPortraitTablet} collectionHref="/the-human-inside" editableIdPrefix="home-row2-tdp-2" gridColumn="2 / 3" style={{ aspectRatio: '10 / 13', height: 'auto', boxSizing: 'border-box' }} />
 
                 {/* Columna 3: TDP1 */}
-                {!isPortraitTablet && <HomeTdpCard Component={TDP1} slug="the-human-inside" index={2} cardPropsFn={cardProps} portraitTablet={isPortraitTablet} collectionHref="/the-human-inside" editableIdPrefix="home-row2-tdp-3" gridColumn="3 / 4" style={{ height: '100%', boxSizing: 'border-box' }} />}
+                {!isPortraitTablet && <HomeTdpCard Component={TableCardA} slug="the-human-inside" index={2} cardPropsFn={cardProps} portraitTablet={isPortraitTablet} collectionHref="/the-human-inside" editableIdPrefix="home-row2-tdp-3" gridColumn="3 / 4" style={{ aspectRatio: '10 / 13', height: 'auto', boxSizing: 'border-box' }} />}
 
               {/* Indicador de més productes (Pill amb text sota el producte de la tercera columna) */}
               <Link
@@ -735,7 +740,7 @@ function Home() {
                 style={{
                   position: 'absolute',
                   left: '50%',
-                  bottom: '-54px',
+                  bottom: `calc((calc(calc(var(--hg-tdp-xR) - var(--hg-tdp-xL)) * 0.84632 - 231px) - calc(calc(calc(var(--hg-tdp-xR) - var(--hg-tdp-xL)) - 45px) / 3 * 1.3)) / 2 - 14px)`,
                   height: 'auto',
                   width: 'auto',
                   borderRadius: '9999px',
@@ -817,13 +822,13 @@ function Home() {
                 }}
               >
                 {/* Columna 1: TDP2 */}
-                <HomeTdpCard Component={TDP2} slug="austen" index={0} cardPropsFn={cardProps} portraitTablet={isPortraitTablet} collectionHref="/austen" editableIdPrefix="home-row3-tdp-1" gridColumn="1 / 2" style={{ height: '100%', boxSizing: 'border-box' }} />
+                <HomeTdpCard Component={TableCardB} slug="austen" index={0} cardPropsFn={cardProps} portraitTablet={isPortraitTablet} collectionHref="/austen" editableIdPrefix="home-row3-tdp-1" gridColumn="1 / 2" style={{ aspectRatio: '10 / 13', height: 'auto', boxSizing: 'border-box' }} />
 
                 {/* Columna 2: TDP1 */}
-                <HomeTdpCard Component={TDP1} slug="austen" index={1} cardPropsFn={cardProps} portraitTablet={isPortraitTablet} collectionHref="/austen" editableIdPrefix="home-row3-tdp-2" gridColumn="2 / 3" style={{ height: '100%', boxSizing: 'border-box' }} />
+                <HomeTdpCard Component={TableCardA} slug="austen" index={1} cardPropsFn={cardProps} portraitTablet={isPortraitTablet} collectionHref="/austen" editableIdPrefix="home-row3-tdp-2" gridColumn="2 / 3" style={{ aspectRatio: '10 / 13', height: 'auto', boxSizing: 'border-box' }} />
 
                 {/* Columna 3: TDP2 */}
-                {!isPortraitTablet && <HomeTdpCard Component={TDP2} slug="austen" index={2} cardPropsFn={cardProps} portraitTablet={isPortraitTablet} collectionHref="/austen" editableIdPrefix="home-row3-tdp-3" gridColumn="3 / 4" style={{ height: '100%', boxSizing: 'border-box' }} />}
+                {!isPortraitTablet && <HomeTdpCard Component={TableCardB} slug="austen" index={2} cardPropsFn={cardProps} portraitTablet={isPortraitTablet} collectionHref="/austen" editableIdPrefix="home-row3-tdp-3" gridColumn="3 / 4" style={{ aspectRatio: '10 / 13', height: 'auto', boxSizing: 'border-box' }} />}
 
               {/* Indicador de més productes (Pill amb text sota el producte de la tercera columna) */}
               <Link
@@ -831,7 +836,7 @@ function Home() {
                 style={{
                   position: 'absolute',
                   left: '50%',
-                  bottom: '-54px',
+                  bottom: `calc((calc(calc(var(--hg-tdp-xR) - var(--hg-tdp-xL)) * 0.84632 - 231px) - calc(calc(calc(var(--hg-tdp-xR) - var(--hg-tdp-xL)) - 45px) / 3 * 1.3)) / 2 - 14px)`,
                   height: 'auto',
                   width: 'auto',
                   borderRadius: '9999px',
@@ -913,13 +918,13 @@ function Home() {
                 }}
               >
                 {/* Columna 1: TDP1 */}
-                <HomeTdpCard Component={TDP1} slug="cube" index={0} cardPropsFn={cardProps} portraitTablet={isPortraitTablet} collectionHref="/cube" editableIdPrefix="home-row4-tdp-1" gridColumn="1 / 2" style={{ height: '100%', boxSizing: 'border-box' }} />
+                <HomeTdpCard Component={TableCardA} slug="cube" index={0} cardPropsFn={cardProps} portraitTablet={isPortraitTablet} collectionHref="/cube" editableIdPrefix="home-row4-tdp-1" gridColumn="1 / 2" style={{ aspectRatio: '10 / 13', height: 'auto', boxSizing: 'border-box' }} />
 
                 {/* Columna 2: TDP2 */}
-                <HomeTdpCard Component={TDP2} slug="cube" index={1} cardPropsFn={cardProps} portraitTablet={isPortraitTablet} collectionHref="/cube" editableIdPrefix="home-row4-tdp-2" gridColumn="2 / 3" style={{ height: '100%', boxSizing: 'border-box' }} />
+                <HomeTdpCard Component={TableCardB} slug="cube" index={1} cardPropsFn={cardProps} portraitTablet={isPortraitTablet} collectionHref="/cube" editableIdPrefix="home-row4-tdp-2" gridColumn="2 / 3" style={{ aspectRatio: '10 / 13', height: 'auto', boxSizing: 'border-box' }} />
 
                 {/* Columna 3: TDP1 */}
-                {!isPortraitTablet && <HomeTdpCard Component={TDP1} slug="cube" index={2} cardPropsFn={cardProps} portraitTablet={isPortraitTablet} collectionHref="/cube" editableIdPrefix="home-row4-tdp-3" gridColumn="3 / 4" style={{ height: '100%', boxSizing: 'border-box' }} />}
+                {!isPortraitTablet && <HomeTdpCard Component={TableCardA} slug="cube" index={2} cardPropsFn={cardProps} portraitTablet={isPortraitTablet} collectionHref="/cube" editableIdPrefix="home-row4-tdp-3" gridColumn="3 / 4" style={{ aspectRatio: '10 / 13', height: 'auto', boxSizing: 'border-box' }} />}
 
               {/* Indicador de més productes (Pill amb text sota el producte de la tercera columna) */}
               <Link
@@ -927,7 +932,7 @@ function Home() {
                 style={{
                   position: 'absolute',
                   left: '50%',
-                  bottom: '-54px',
+                  bottom: `calc((calc(calc(var(--hg-tdp-xR) - var(--hg-tdp-xL)) * 0.84632 - 231px) - calc(calc(calc(var(--hg-tdp-xR) - var(--hg-tdp-xL)) - 45px) / 3 * 1.3)) / 2 - 14px)`,
                   height: 'auto',
                   width: 'auto',
                   borderRadius: '9999px',
@@ -1009,13 +1014,13 @@ function Home() {
                 }}
               >
                 {/* Columna 1: TDP2 */}
-                <HomeTdpCard Component={TDP2} slug="miscellania" index={0} cardPropsFn={cardProps} portraitTablet={isPortraitTablet} collectionHref="/miscellania" editableIdPrefix="home-row5-tdp-1" gridColumn="1 / 2" style={{ height: '100%', boxSizing: 'border-box' }} />
+                <HomeTdpCard Component={TableCardB} slug="miscellania" index={0} cardPropsFn={cardProps} portraitTablet={isPortraitTablet} collectionHref="/miscellania" editableIdPrefix="home-row5-tdp-1" gridColumn="1 / 2" style={{ aspectRatio: '10 / 13', height: 'auto', boxSizing: 'border-box' }} />
 
                 {/* Columna 2: TDP1 */}
-                <HomeTdpCard Component={TDP1} slug="miscellania" index={1} cardPropsFn={cardProps} portraitTablet={isPortraitTablet} collectionHref="/miscellania" editableIdPrefix="home-row5-tdp-2" gridColumn="2 / 3" style={{ height: '100%', boxSizing: 'border-box' }} />
+                <HomeTdpCard Component={TableCardA} slug="miscellania" index={1} cardPropsFn={cardProps} portraitTablet={isPortraitTablet} collectionHref="/miscellania" editableIdPrefix="home-row5-tdp-2" gridColumn="2 / 3" style={{ aspectRatio: '10 / 13', height: 'auto', boxSizing: 'border-box' }} />
 
                 {/* Columna 3: TDP2 */}
-                {!isPortraitTablet && <HomeTdpCard Component={TDP2} slug="miscellania" index={2} cardPropsFn={cardProps} portraitTablet={isPortraitTablet} collectionHref="/miscellania" editableIdPrefix="home-row5-tdp-3" gridColumn="3 / 4" style={{ height: '100%', boxSizing: 'border-box' }} />}
+                {!isPortraitTablet && <HomeTdpCard Component={TableCardB} slug="miscellania" index={2} cardPropsFn={cardProps} portraitTablet={isPortraitTablet} collectionHref="/miscellania" editableIdPrefix="home-row5-tdp-3" gridColumn="3 / 4" style={{ aspectRatio: '10 / 13', height: 'auto', boxSizing: 'border-box' }} />}
 
               {/* Indicador de més productes (Pill amb text sota el producte de la tercera columna) */}
               <Link
@@ -1023,7 +1028,7 @@ function Home() {
                 style={{
                   position: 'absolute',
                   left: '50%',
-                  bottom: '-54px',
+                  bottom: `calc((calc(calc(var(--hg-tdp-xR) - var(--hg-tdp-xL)) * 0.84632 - 231px) - calc(calc(calc(var(--hg-tdp-xR) - var(--hg-tdp-xL)) - 45px) / 3 * 1.3)) / 2 - 14px)`,
                   height: 'auto',
                   width: 'auto',
                   borderRadius: '9999px',

@@ -7,6 +7,7 @@ import { collectionGridImageFor, gridFinishFor, collectionGridHoverVariantsFor }
 import HeroSlider from '@/components/HeroSlider';
 import CollectionProductCard from '@/components/tdp/CollectionProductCard';
 import CollectionProductCardV5 from '@/components/tdp/CollectionProductCardV5';
+import CollectionTableCard from '@/components/tdp/CollectionTableCard';
 import CollectionTdpCard from '@/components/tdp/CollectionTdpCard';
 import TramFinal from '@/components/home/TramFinal';
 import { buildOtherCollectionsImages } from '@/components/home/homeDrawings';
@@ -14,7 +15,13 @@ import Breadcrumbs from '@/components/Breadcrumbs';
 import useIsMobile from '@/hooks/useIsMobile';
 import CollectionMobile from '@/pages/CollectionMobile';
 
-const COLLECTION_BG_SRC = '/tmp/PAGINES/PAGINES TIPUS/00 COLLECCIO.webp';
+// Alcada de la franja blanca de la hero.
+const BAND_HEIGHT = 'clamp(120px, 26vh, 260px)';
+
+const HERO_BACKGROUND_SRC = '/placeholders/hero/placeholder-noia.jpg';
+const TDP_MOVE_PX = 120;
+
+const COLLECTION_BG_SRC = '/placeholders/tots_els_fons/fons_colleccio/00-colleccio.webp';
 
 const COLLECTIONS_MENU = [
   {
@@ -149,6 +156,19 @@ function CollectionFirstContactPage() {
   const [overlayState, setOverlayState] = useState(loadOverlayState);
   const [zeroLeftOffsetPx, setZeroLeftOffsetPx] = useState(0);
   const [rowHeight, setRowHeight] = useState(38);
+
+  // La franja blanca ha de tocar el separador del header sense quedar-s'hi a
+  // sota. Com que la hero no comenca exactament al separador, mesurem on acaba
+  // el header i on comenca la hero, i hi posem la franja just al mig.
+  const heroRef = useRef(null);
+  const bandRef = useRef(null);
+  const [heroBandTopPx, setHeroBandTopPx] = useState(0);
+  const [heroIconsTopPx, setHeroIconsTopPx] = useState(null);
+  const [heroBottomBandTopPx, setHeroBottomBandTopPx] = useState(null);
+  const [heroHeightPx, setHeroHeightPx] = useState(null);
+  // Quan la imatge (alcada de finestra) sobrepassa l'espai que la graella li
+  // reserva, baixem el contingut el mateix tros perque no se solapi.
+  const [pushDownPx, setPushDownPx] = useState(0);
   const [isLandscapeTablet, setIsLandscapeTablet] = useState(
     typeof window !== 'undefined'
       && window.innerWidth >= 1024
@@ -221,6 +241,47 @@ function CollectionFirstContactPage() {
     };
   }, []);
 
+  useLayoutEffect(() => {
+    const mesura = () => {
+      const hero = heroRef.current;
+      if (!hero) return;
+      const cap = document.querySelector('header');
+      const headerBottom = cap ? cap.getBoundingClientRect().bottom : 0;
+      const heroTop = hero.getBoundingClientRect().top;
+      setHeroBandTopPx(Math.max(0, Math.round(headerBottom - heroTop)));
+      // Les icones es queden a la MATEIXA posicio de pantalla que tenien
+      // (centrades on era la franja blanca de sota), encara que la imatge
+      // torni a omplir tota l'alcada.
+      const band = bandRef.current;
+      const bandH = band ? band.getBoundingClientRect().height : 0;
+      setHeroIconsTopPx(Math.round(window.innerHeight - bandH / 2 - heroTop));
+      // Franja blanca de baix, on abans hi havia el retall.
+      setHeroBottomBandTopPx(Math.round(window.innerHeight - bandH - heroTop));
+      // La imatge acaba exactament on acaba la franja blanca de baix.
+      setHeroHeightPx(Math.round(window.innerHeight - heroTop));
+      // Baixem el contingut el que calgui perque la primera targeta quedi
+      // SEMPRE per sota de la imatge. Ho calculem sobre la posicio "base"
+      // (sense el desplaçament ja aplicat) per no entrar en bucle.
+      const heroBottom = hero.getBoundingClientRect().bottom;
+      const tdp0 = document.querySelector('[aria-label="TDP taula"]') || document.querySelector('[aria-label="TDP rectangle"]');
+      if (tdp0) {
+        const topActual = tdp0.getBoundingClientRect().top;
+        setPushDownPx((prev) => {
+          const base = topActual - prev;
+          const cal = Math.max(0, Math.round(heroBottom + 24 - base));
+          return Math.abs(cal - prev) < 1 ? prev : cal;
+        });
+      }
+    };
+    mesura();
+    window.addEventListener('resize', mesura);
+    const t = window.setTimeout(mesura, 300);
+    return () => {
+      window.removeEventListener('resize', mesura);
+      window.clearTimeout(t);
+    };
+  }, []);
+
   return (
     <section className="bg-background">
       <Helmet>
@@ -267,129 +328,184 @@ function CollectionFirstContactPage() {
         </div>
         )}
 
-        {/* Títol col·lecció (fila 3 / 7) */}
+        {/* Hero de la colleccio: 1) imatge de fons a pantalla completa
+            (un dia sera una animacio), 2) franja blanca al 50% enmig,
+            3) icona i nom de la colleccio sobre la franja. Les icones de
+            colleccio van a sota. */}
         <div
-          aria-label="Títol col·lecció"
+          data-hero="1"
+          ref={heroRef}
           style={{
             gridColumn: '1 / 4',
-            gridRow: '3 / 7',
-            alignSelf: 'center',
+            gridRow: '3 / 25',
             position: 'relative',
-            zIndex: 10,
-            width: '100%',
-            height: '100%',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            pointerEvents: 'none',
-            transform: 'translateY(-26px)',
-          }}
-        >
-          <h1
-            style={{
-              margin: 0,
-              fontFamily: 'Oswald, sans-serif',
-              fontWeight: 300,
-              fontSize: 'clamp(2.5rem, 8.5vw, 125px)',
-              letterSpacing: '0.02em',
-              lineHeight: 0.9,
-              color: '#0b0d10',
-              textTransform: 'uppercase',
-              display: 'inline-flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '0.35em',
-              whiteSpace: 'nowrap',
-            }}
-          >
-            <img
-              src="/custom_logos/collections/collection-first-contact-logo.webp"
-              alt=""
-              aria-hidden="true"
-              loading="lazy"
-              style={{
-                width: '0.718em',
-                height: 'auto',
-                objectFit: 'contain',
-                display: 'inline-block',
-                flexShrink: 0,
-                transform: 'translateY(calc(0.152em + 5px))',
-              }}
-            />
-            <span>FIRST CONTACT</span>
-          </h1>
-        </div>
-
-        <div
-          style={{
-            gridColumn: '1 / 4',
-            gridRow: '10 / 25',
-            position: 'relative',
-            top: `calc(-5px - ${rowHeight / 2}px)`,
-            width: 'calc(100% + 1px)',
-            height: 'calc(100% + 2px)',
-            transform: 'scale(0.94)',
-            transformOrigin: 'center center',
+            // Plena: de banda a banda del viewport i tota l'alcada de la
+            // finestra menys el header, enganxada just a sota.
+            top: `calc(-5px - ${rowHeight / 2}px - 144px)`,
+            width: '100vw',
+            marginLeft: 'calc(50% - 50vw)',
+            // La imatge acaba just on acaba la franja blanca de baix.
+            height: heroHeightPx != null ? `${heroHeightPx}px` : `calc(100vh - 62px)`,
             zIndex: 1,
           }}
         >
-          <HeroSlider
-            slides={HERO_SLIDES}
-            autoplay
-            autoplayIntervalMs={8000}
-            className="h-full"
-            flush
+          <img
+            src={HERO_BACKGROUND_SRC}
+            alt=""
+            aria-hidden="true"
+            draggable={false}
+            style={{
+              position: 'absolute',
+              inset: 0,
+              width: '100%',
+              height: '100%',
+              objectFit: 'cover',
+              objectPosition: 'center',
+              display: 'block',
+              pointerEvents: 'none',
+            }}
           />
+
+          <div
+            aria-hidden="true"
+            data-hero-band="1"
+            ref={bandRef}
+            style={{
+              position: 'absolute',
+              left: 0,
+              right: 0,
+              // Just sota el separador del header (mesurat).
+              top: `${heroBandTopPx}px`,
+              height: BAND_HEIGHT,
+              background: 'rgba(255, 255, 255, 0.5)',
+              pointerEvents: 'none',
+            }}
+          />
+
+          {/* Icona + nom, centrats sobre la franja */}
+          <div
+            aria-label="Títol col·lecció"
+            style={{
+              position: 'absolute',
+              top: `${heroBandTopPx}px`,
+              left: 0,
+              right: 0,
+              height: BAND_HEIGHT,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              zIndex: 2,
+              pointerEvents: 'none',
+            }}
+          >
+              <h1
+                style={{
+                  margin: 0,
+                  fontFamily: 'Oswald, sans-serif',
+                  fontWeight: 300,
+                  fontSize: 'clamp(2.5rem, 8.5vw, 125px)',
+                  letterSpacing: '0.02em',
+                  lineHeight: 0.9,
+                  color: '#0b0d10',
+                  textTransform: 'uppercase',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '0.35em',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                <img
+                  src="/custom_logos/collections/collection-first-contact-logo.webp"
+                  alt=""
+                  aria-hidden="true"
+                  loading="lazy"
+                  style={{
+                    width: '0.718em',
+                    height: 'auto',
+                    objectFit: 'contain',
+                    display: 'inline-block',
+                    flexShrink: 0,
+                    transform: 'translateY(calc(0.152em + 5px))',
+                  }}
+                />
+                <span>FIRST CONTACT</span>
+              </h1>
+          </div>
+
+          {/* Franja blanca de baix (on abans hi havia el retall), amb la
+              mateixa alcada que la de dalt i un 20% de transparencia. */}
+          <div
+            aria-hidden="true"
+            data-hero-band-bottom="1"
+            style={{
+              position: 'absolute',
+              left: 0,
+              right: 0,
+              top: heroBottomBandTopPx != null ? `${heroBottomBandTopPx}px` : `calc(100vh - ${BAND_HEIGHT} - 62px)`,
+              height: BAND_HEIGHT,
+              background: 'rgba(255, 255, 255, 0.8)',
+              pointerEvents: 'none',
+            }}
+          />
+
+          {/* Icones de colleccio: FORA de la imatge, a la part blanca de sota */}
+          <div
+            style={{
+              position: 'absolute',
+              // Mateixa posicio de pantalla que abans (centrades on era la
+              // franja blanca de sota).
+              top: heroIconsTopPx != null ? `${heroIconsTopPx}px` : `calc(100vh - (${BAND_HEIGHT}) / 2)`,
+              left: 0,
+              right: 0,
+              transform: 'translateY(-50%)',
+              display: 'flex',
+              // Alineades PEL TOP: la icona mes alta marca la linia de dalt.
+              alignItems: 'flex-start',
+              justifyContent: 'center',
+              gap: '44px',
+              zIndex: 20,
+              pointerEvents: 'auto',
+            }}
+          >
+  {COLLECTIONS_MENU.map((c) => {
+                    const isFirstContact = c.id === 'first-contact';
+                    return (
+                      <Link
+                        key={c.id}
+                        to={c.href}
+                        title={c.name}
+                        aria-label={c.name}
+                        style={{
+                          display: 'inline-flex',
+                          alignItems: 'flex-start',
+                          justifyContent: 'center',
+                          transition: 'transform 0.15s ease, opacity 0.15s ease',
+                        }}
+                        className="hover:scale-110 active:scale-95"
+                      >
+                        <img
+                          src={c.icon}
+                          alt={c.name}
+                          loading="lazy"
+                          decoding="async"
+                          style={{
+                            // Un 25% mes grosses que abans (44 -> 55, 42.1 -> 52.6).
+                            width: isFirstContact ? '52.6px' : 'auto',
+                            height: isFirstContact ? 'auto' : '55px',
+                            objectFit: 'contain',
+                            display: 'block',
+                            filter: 'brightness(0)',
+                          }}
+                        />
+                      </Link>
+                    );
+                  })}
+          </div>
+
         </div>
       </Pauta4ColsOverlay>
 
-      {/* Menú de col·leccions sota la Hero */}
-      <div
-        style={{
-          position: 'relative',
-          zIndex: 20,
-          width: '100%',
-          display: 'flex',
-          alignItems: 'flex-start',
-          justifyContent: 'center',
-          gap: '44px',
-          padding: '20px 0',
-          pointerEvents: 'auto',
-        }}
-      >
-        {COLLECTIONS_MENU.map((c) => {
-          const isFirstContact = c.id === 'first-contact';
-          return (
-            <Link
-              key={c.id}
-              to={c.href}
-              title={c.name}
-              aria-label={c.name}
-              style={{
-                display: 'inline-flex',
-                alignItems: 'flex-start',
-                justifyContent: 'center',
-                transition: 'transform 0.15s ease, opacity 0.15s ease',
-              }}
-              className="hover:scale-110 active:scale-95"
-            >
-              <img
-                src={c.icon}
-                alt={c.name}
-                loading="lazy"
-                decoding="async"
-                style={{
-                  width: isFirstContact ? '42.1px' : 'auto',
-                  height: isFirstContact ? 'auto' : '44px',
-                  objectFit: 'contain',
-                  display: 'block',
-                  filter: 'brightness(0)',
-                }}
-              />
-            </Link>
-          );
-        })}
-      </div>
 
       <Pauta4ColsOverlay
         pautaEnabled={false}
@@ -402,36 +518,23 @@ function CollectionFirstContactPage() {
         style={{
           // Puja tot el contingut sota el hero 12 files de la taula (41 → 29).
           // Alçada d'1 fila = ampladaBelt × 6708/2642/90; 12 files ≈ 0.3385 × amplada.
-          marginTop: `calc((var(--hg-tdp-xL, 0px) - var(--hg-tdp-xR, 0px)) * 0.3385${isLandscapeTablet ? ' - 30px' : ''}${isPortraitTablet ? ' - 120px' : ''})`,
+          marginTop: `calc((var(--hg-tdp-xL, 0px) - var(--hg-tdp-xR, 0px)) * 0.3385${isLandscapeTablet ? ' - 30px' : ''}${isPortraitTablet ? ' - 120px' : ''} + ${pushDownPx}px)`,
+          // Desplaçament vertical NOME S de les TDP.
+          translate: `0 ${-TDP_MOVE_PX}px`,
+          // El bloc te marge negatiu i queda per sobre de la hero: si no fos
+          // transparent als clics, s'empassaria els de les icones de colleccio.
+          pointerEvents: 'none',
         }}
       >
-        <img
-          src={COLLECTION_BG_SRC}
-          alt=""
-          aria-hidden="true"
-          loading="lazy"
-          draggable={false}
-          onError={(e) => { e.currentTarget.style.display = 'none'; }}
-          style={{
-            position: 'absolute',
-            inset: 0,
-            width: '100%',
-            height: '100%',
-            objectFit: 'fill',
-            opacity: backgroundOpacity,
-            pointerEvents: 'none',
-            userSelect: 'none',
-            zIndex: 0,
-          }}
-        />
+        {/* El fons de la pagina es BLANC: el degradat va a cada fitxa. */}
         {[0, 1, 2, 3].flatMap((rowIdx) =>
           ((isPortraitTablet || isLandscapeTablet) ? [0, 1, 2] : [0, 1, 2, 3]).map((colIdx) => {
             const color = TDP_GRID_COLORS[rowIdx][colIdx];
             if (!color) return null;
-            const isV5 = (rowIdx + colIdx) % 2 === 1;
-            const Card = isV5 ? CollectionProductCardV5 : CollectionProductCard;
+            const Card = CollectionTableCard;
+            const variantB = (rowIdx + colIdx) % 2 === 1;
             const col = colIdx + 1;
-            const rowOffset = 10 + rowIdx * 20;
+            const rowOffset = 10 + rowIdx * 13;
             const productName = productAt(rowIdx, colIdx).name;
             const { imageTranslateY, productNameTranslateY, descriptionTranslateY } = getCardLayout(colIdx);
             return (
@@ -439,6 +542,9 @@ function CollectionFirstContactPage() {
                 key={`tdp-card-r${rowIdx}-c${colIdx}`}
                 Component={Card}
                 gridColumn={`${col} / ${col + 1}`}
+                gridRow={`${6 + rowOffset} / ${17 + rowOffset}`}
+                variantB={variantB}
+                backgroundSrc={COLLECTION_BG_SRC}
                 rowOffset={rowOffset}
                 productName={productName}
                 description=""
@@ -470,7 +576,7 @@ function CollectionFirstContactPage() {
       <TramFinal
         posterLines={[{ text: 'CADA' }, { text: 'PERSONA TÉ' }, { text: 'UNA HISTÒRIA' }]}
         tambeImages={otherImages}
-        marginTop={isPortraitTablet ? '-350px' : '-552px'}
+        marginTop={isPortraitTablet ? '-1341px' : '-1543px'}
         visibleCards={(isPortraitTablet || isLandscapeTablet) ? 3 : 4}
       />
         </>
