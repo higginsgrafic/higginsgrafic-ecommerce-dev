@@ -8,7 +8,7 @@
 
 import { createClient } from '@supabase/supabase-js';
 import { config } from 'dotenv';
-import { SELLING_PRICE } from '../src/config/pricing.js';
+import { SELLING_PRICE, GELATO_PLUS_DISCOUNT } from '../src/config/pricing.js';
 
 // Carregar variables d'entorn
 config();
@@ -26,12 +26,19 @@ const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
 // l'incrustés dins del JavaScript que baixa el navegador.)
 const GELATO_API_KEY = process.env.GELATO_API_KEY || process.env.VITE_GELATO_API_KEY;
 const GELATO_STORE_ID = process.env.VITE_GELATO_STORE_ID;
+// Cost de reserva si Gelato no ens dona el preu (abans era 5,91).
+const GELATO_COST_FALLBACK = 5.91;
+
+// Talles que no venem: no les sincronitzem. La 3XL encareix el producte i no
+// la fem servir, i a mes distorsiona la mitjana de costos.
+const SIZES_EXCLOSES = new Set(['3XL']);
 
 console.log('🔧 Configuració:');
 console.log('  SUPABASE_URL:', SUPABASE_URL ? '✅' : '❌');
 console.log('  SUPABASE_ANON_KEY:', SUPABASE_ANON_KEY ? '✅' : '❌');
 console.log('  SUPABASE_SERVICE_ROLE_KEY:', SUPABASE_SERVICE_ROLE_KEY ? '✅ (escriure)' : '❌ (sense ella no es pot escriure)');
 console.log('  PREU DE VENDA:', SELLING_PRICE, '€');
+console.log('  DESCOMPTE GELATO PLUS:', (GELATO_PLUS_DISCOUNT * 100) + '%');
 console.log('  GELATO_API_KEY:', GELATO_API_KEY ? '✅' : '❌');
 console.log('  GELATO_STORE_ID:', GELATO_STORE_ID || 'No configurat');
 console.log('');
@@ -168,7 +175,34 @@ function mapColorToHex(colorName) {
   return colorMap[color] || '#FFFFFF';
 }
 
-function transformStoreVariants(storeProduct, mockupUrl) {
+/**
+ * Preu real d'una variant a Gelato.
+ *
+ * L'API de preus exigeix el `productUid` (un identificador llarg que porta la
+ * talla i el color a dins), NO el `productId`. Abans s'hi enviava el productId,
+ * l'API responia error i el cost quedava sempre amb la constant de reserva.
+ */
+async function fetchVariantCost(productUid) {
+  if (!productUid) return null;
+  try {
+    const url = new URL(edgeFunctionUrl);
+    url.searchParams.set('action', 'prices');
+    url.searchParams.set('productId', productUid);
+    const res = await fetch(url.toString(), {
+      headers: { 'Authorization': `Bearer ${SUPABASE_ANON_KEY}`, 'apikey': SUPABASE_ANON_KEY },
+    });
+    if (!res.ok) return null;
+    const data = await res.json();
+    const entrada = Array.isArray(data) ? data[0] : (data?.data?.[0] || data?.prices?.[0]);
+    const preu = entrada && (entrada.price ?? entrada.value);
+    const n = Number(preu);
+    return Number.isFinite(n) && n > 0 ? n : null;
+  } catch {
+    return null;
+  }
+}
+
+function transformStoreVariants(storeProduct, mockupUrl, costs) {
   const variants = (storeProduct.variants || []).map(v => {
     const variantTitle = v.title || '';
 
@@ -190,13 +224,40 @@ function transformStoreVariants(storeProduct, mockupUrl) {
       color: color,
       color_hex: mapColorToHex(color),
       price: SELLING_PRICE,
+      // Cost real de Gelato per a aquesta variant (amb el descompte del pla).
+      // Si no s'ha pogut llegir, es queda el de reserva.
+      gelato_cost: costs && costs.get(v.id) != null ? costs.get(v.id) : GELATO_COST_FALLBACK,
       stock: 999,
       is_available: true,
       image_url: v.mockupUrl || mockupUrl
     };
   });
 
-  return variants;
+  // Les talles que no venem no s'arriben a desar mai.
+  return variants.filter((v) => !SIZES_EXCLOSES.has(v.size));
+}
+
+/**
+ * Costos reals de totes les variants d'un producte.
+ *
+ * Es consulta UNA vegada per talla (no per variant): el preu de Gelato nome s
+ * depen del producte i la talla, no del color. Amb 70 variants per producte,
+ * aixo estalvia 64 consultes de cada 70.
+ */
+async function resolveVariantCosts(storeProduct) {
+  const costs = new Map();
+  const perTalla = new Map();   // talla -> promesa del preu
+  const variants = storeProduct.variants || [];
+  const feines = [];
+  for (const v of variants) {
+    const parts = String(v.title || '').split(' - ').map((x) => x.trim()).filter(Boolean);
+    const talla = parts.length >= 2 ? parts[parts.length - 2] : '';
+    const clau = `${storeProduct.id}|${talla}`;
+    if (!perTalla.has(clau)) perTalla.set(clau, fetchVariantCost(v.productUid));
+    feines.push(perTalla.get(clau).then((preu) => { if (preu != null) costs.set(v.id, Math.round(preu * (1 - GELATO_PLUS_DISCOUNT) * 100) / 100); }));
+  }
+  await Promise.all(feines);
+  return costs;
 }
 
 async function syncProductToSupabase(product, variants, images) {
@@ -229,10 +290,13 @@ async function syncProductToSupabase(product, variants, images) {
     console.log(`  ✅ Producte ${product.name} sincronitzat (ID: ${productId})`);
 
     // 2. Eliminar imatges antigues i inserir noves
-    await supabase
+    const { error: delImgError } = await supabase
       .from('product_images')
       .delete()
       .eq('product_id', productId);
+    if (delImgError) {
+      console.warn(`  ⚠️ No s'han pogut esborrar les imatges antigues:`, delImgError.message);
+    }
 
     if (images.length > 0) {
       const imageRecords = images.map((url, index) => ({
@@ -253,10 +317,15 @@ async function syncProductToSupabase(product, variants, images) {
     }
 
     // 3. Eliminar variants antigues i inserir noves
-    await supabase
+    // L'error s'ha de comprovar: si falla, les variants velles es queden a la
+    // base de dades i no ens n'adonem (es va quedar una 3XL antiga per aixo).
+    const { error: delVarError } = await supabase
       .from('product_variants')
       .delete()
       .eq('product_id', productId);
+    if (delVarError) {
+      console.warn(`  ⚠️ No s'han pogut esborrar les variants antigues:`, delVarError.message);
+    }
 
     if (variants.length > 0) {
       const variantRecords = variants.map(v => ({
@@ -314,7 +383,10 @@ async function main() {
         const mockupUrl = storeProduct.mockupUrl || storeProduct.previewUrl || storeProduct.imageUrl;
 
         // Transformar variants reals del producte
-        const variants = transformStoreVariants(storeProduct, mockupUrl);
+        const costs = await resolveVariantCosts(storeProduct);
+        const ambPreu = costs.size;
+        const variants = transformStoreVariants(storeProduct, mockupUrl, costs);
+        if (ambPreu) console.log(`  💰 Cost real llegit per a ${ambPreu} variants`);
         console.log(`  📦 ${variants.length} variants trobades`);
 
         // Obtenir imatges
