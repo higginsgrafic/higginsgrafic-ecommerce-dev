@@ -33,10 +33,15 @@ export async function verifyAdmin(event) {
       return { authorized: false, error: 'Token invàlid' };
     }
 
+    // Cal comprovar el ROL, no nome s que sigui actiu. La funcio `is_admin()`
+    // de la base de dades tambe ho fa (`role = 'admin'`), i si aixo no hi fos,
+    // qualsevol membre de `staff` amb un rol menor tindria acces complet a
+    // l'administracio: emetre factures, veure totes les comandes i canviar preus.
     const { data: staff, error: staffError } = await supabase
       .from('staff')
       .select('id, role, is_active')
       .eq('user_id', user.id)
+      .eq('role', 'admin')
       .eq('is_active', true)
       .single();
 
