@@ -150,7 +150,8 @@
     font-family: 'Oswald', sans-serif;
     font-size: 11pt;
   }
-  tbody td .mes { color: var(--clar); margin: 0 1px; }
+  tbody td .mes { color: var(--clar); margin: 0 3px; }
+  tbody td.soma { font-size: 10pt; }
   tbody td.fort { font-family: 'Oswald', sans-serif; font-weight: 500; font-size: 11pt; color: var(--tinta); }
   tbody tr.subtotal td .nota {
     display: block;
@@ -218,7 +219,34 @@
   }
   tbody tr.subtotal td:first-child { padding-left: 12px; }
 
-  /* ---------- Resum esquematic del recorregut ---------- */
+  /* ---------- Resum: la suma que dona el total ---------- */
+  .suma { width: 78mm; margin-left: auto; }
+  .suma .linia {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 5px 0;
+    font-size: 10pt;
+    color: var(--gris);
+  }
+  .suma .linia span:last-child { font-variant-numeric: tabular-nums; color: var(--fosc); }
+  .suma .total {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    margin-top: 6px;
+    padding-top: 9px;
+    border-top: 2px solid var(--tinta);
+    font-family: 'Oswald', sans-serif;
+    font-weight: 500;
+    font-size: 13pt;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--tinta);
+  }
+  .suma .total span:last-child { font-variant-numeric: tabular-nums; }
+
+  /* ---------- Resum esquematic (no s'usa) ---------- */
   .resum {
     display: grid;
     grid-template-columns: 1fr 14px 1fr 14px 1.45fr;
@@ -400,9 +428,7 @@
       <tr>
         <th>Producte</th>
         <th class="num">Quantitat</th>
-        <th class="num">Base&nbsp;+&nbsp;IVA</th>
-        <th class="op">+</th>
-        <th class="num">Transport&nbsp;+&nbsp;IVA</th>
+        <th class="num">Cost&nbsp;+&nbsp;Transport&nbsp;+&nbsp;IVA</th>
         <th class="num">Preu</th>
       </tr>
     </thead>
@@ -410,29 +436,23 @@
       <tr>
         <td class="titol">1 · Samarreta «The Phoenix»<span class="detall">First Contact · talla M · blanc</span></td>
         <td class="num">x1</td>
-        <td class="num">9,26 € <span class="mes">+</span> 1,95 €</td>
-        <td class="op">+</td>
-        <td class="num">3,55 € <span class="mes">+</span> 0,74 €</td>
+        <td class="num soma">9,26 € <span class="mes">+</span> 3,55 € <span class="mes">+</span> 2,69 €</td>
         <td class="num fort">15,50 €</td>
       </tr>
       <tr>
         <td class="titol">2 · Samarreta «Wormhole»<span class="detall">First Contact · talla L · negre</span></td>
         <td class="num">x1</td>
-        <td class="num">11,66 € <span class="mes">+</span> 2,45 €</td>
-        <td class="op">+</td>
-        <td class="num">1,15 € <span class="mes">+</span> 0,24 €</td>
+        <td class="num soma">11,66 € <span class="mes">+</span> 1,15 € <span class="mes">+</span> 2,69 €</td>
         <td class="num fort">15,50 €</td>
       </tr>
       <tr>
         <td class="titol">3 · Samarreta «Vulcan's End»<span class="detall">First Contact · talla M · blau</span></td>
         <td class="num">x1</td>
-        <td class="num">11,66 € <span class="mes">+</span> 2,45 €</td>
-        <td class="op">+</td>
-        <td class="num">1,15 € <span class="mes">+</span> 0,24 €</td>
+        <td class="num soma">11,66 € <span class="mes">+</span> 1,15 € <span class="mes">+</span> 2,69 €</td>
         <td class="num fort">15,50 €</td>
       </tr>
       <tr class="subtotal">
-        <td colspan="5">Total factura <span class="nota">cada peça val 15,50 € · el que canvia és com es reparteix entre la samarreta i el seu enviament</span></td>
+        <td colspan="3">Total factura <span class="nota">cada peça val 15,50 € · el cost és la samarreta sense IVA, el transport és el seu enviament sense IVA, i l'IVA és el 21% de tots dos</span></td>
         <td class="num">46,50 €</td>
       </tr>
     </tbody>
@@ -449,26 +469,13 @@
       el transport i l'IVA; aquí es desglossa per conceptes. Operació subjecta al règim
       general d'IVA.
     </div>
-    <div class="resum">
-      <div class="caixa">
-        <div class="k">Samarretes (3)</div>
-        <div class="v">39,43 €</div>
-        <div class="d">base 32,58 + IVA 6,85</div>
-      </div>
-      <div class="signe">+</div>
-      <div class="caixa">
-        <div class="k">Enviament</div>
-        <div class="v">7,07 €</div>
-        <div class="d">base 5,85 + IVA 1,22</div>
-      </div>
-      <div class="signe">=</div>
-      <div class="caixa final">
-        <div class="k">Total factura</div>
-        <div class="v">46,50 €</div>
-        <div class="d">base 38,43 + IVA 8,07</div>
-      </div>
+    <div class="suma">
+      <div class="linia"><span>Cost de les samarretes</span><span>32,58 €</span></div>
+      <div class="linia"><span>Transport</span><span>5,85 €</span></div>
+      <div class="linia"><span>IVA 21% (de tots dos)</span><span>8,07 €</span></div>
+      <div class="total"><span>Total factura</span><span>46,50 €</span></div>
+          </div>
     </div>
-  </div>
 
   <!-- ══════════ PEU LEGAL ══════════ -->
   <div class="legal">
