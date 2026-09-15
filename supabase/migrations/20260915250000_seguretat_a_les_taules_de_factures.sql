@@ -1,3 +1,9 @@
+-- ⚠️ CORRECCIÓ (15/09/2026): aquesta migració NO calia.
+-- Les dues taules JA tenien la seguretat activada des del principi. Els
+-- càlculs que van motivar-la eren una falsa alarma: una consulta buida es va
+-- interpretar com una taula oberta. Vegeu `docs/nota-falsa-alarma-seguretat.md`.
+-- Es conserva perquè ja s'ha executat; no fa res.
+--
 -- ============================================================
 -- Seguretat: tancar les taules noves de factures
 -- ============================================================
