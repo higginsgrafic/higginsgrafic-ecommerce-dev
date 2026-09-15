@@ -132,24 +132,25 @@
   thead th {
     font-family: 'Oswald', sans-serif;
     font-weight: 400;
-    font-size: 8pt;
-    letter-spacing: 0.16em;
+    font-size: 7pt;
+    letter-spacing: 0.12em;
     text-transform: uppercase;
     color: var(--gris);
     text-align: left;
-    padding: 0 0 8px;
+    padding: 0 0 7px;
     border-bottom: 1px solid var(--clar);
+    white-space: nowrap;
   }
   thead th.num { text-align: right; }
   tbody td {
-    padding: 11px 0;
-    font-size: 10.5pt;
+    padding: 9px 0;
+    font-size: 9.5pt;
     color: var(--fosc);
     border-bottom: 1px solid var(--molt-clar);
     vertical-align: top;
   }
-  tbody td.num { text-align: right; font-variant-numeric: tabular-nums; }
-  tbody td .detall { display: block; font-size: 9pt; color: var(--gris); margin-top: 2px; }
+  tbody td.num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  tbody td .detall { display: block; font-size: 8pt; color: var(--gris); margin-top: 2px; }
   tbody td.titol { color: var(--tinta); }
 
   /* ---------- Totals ---------- */
@@ -160,7 +161,7 @@
     margin-top: 8mm;
   }
   .notes { font-size: 8.5pt; line-height: 1.6; color: var(--gris); }
-  .notes strong {
+  .notes .etq {
     display: block;
     font-family: 'Oswald', sans-serif;
     font-weight: 400;
@@ -264,28 +265,78 @@
       <tr>
         <th>Descripció</th>
         <th class="num">Quantitat</th>
-        <th class="num">Preu unitari</th>
-        <th class="num">Import</th>
+        <th class="num">Preu unitari<br>(sense IVA)</th>
+        <th class="num">Base<br>imposable</th>
+        <th class="num">IVA<br>21%</th>
+        <th class="num">Total</th>
       </tr>
     </thead>
     <tbody>
       <tr>
         <td class="titol">
           Samarreta «The Phoenix»
-          <span class="detall">First Contact · talla M · blanc · impressió DTG sota demanda</span>
+          <span class="detall">First Contact · talla M · blanc</span>
         </td>
         <td class="num">1</td>
-        <td class="num">9,26 €</td>
-        <td class="num">9,26 €</td>
+        <td class="num">10,86 €</td>
+        <td class="num">10,86 €</td>
+        <td class="num">2,28 €</td>
+        <td class="num">13,14 €</td>
       </tr>
       <tr>
         <td class="titol">
-          Enviament a domicili
-          <span class="detall">Espanya peninsular</span>
+          Samarreta «Wormhole»
+          <span class="detall">First Contact · talla L · negre</span>
+        </td>
+        <td class="num">1</td>
+        <td class="num">10,86 €</td>
+        <td class="num">10,86 €</td>
+        <td class="num">2,28 €</td>
+        <td class="num">13,14 €</td>
+      </tr>
+      <tr>
+        <td class="titol">
+          Samarreta «Vulcan's End»
+          <span class="detall">First Contact · talla M · blau</span>
+        </td>
+        <td class="num">1</td>
+        <td class="num">10,87 €</td>
+        <td class="num">10,87 €</td>
+        <td class="num">2,28 €</td>
+        <td class="num">13,15 €</td>
+      </tr>
+      <tr>
+        <td class="titol">
+          Enviament · 1a unitat
+          <span class="detall">Espanya peninsular · tarifa de la primera peça</span>
         </td>
         <td class="num">1</td>
         <td class="num">3,55 €</td>
         <td class="num">3,55 €</td>
+        <td class="num">0,75 €</td>
+        <td class="num">4,30 €</td>
+      </tr>
+      <tr>
+        <td class="titol">
+          Enviament · 2a unitat
+          <span class="detall">Espanya peninsular · tarifa de cada peça addicional</span>
+        </td>
+        <td class="num">1</td>
+        <td class="num">1,15 €</td>
+        <td class="num">1,15 €</td>
+        <td class="num">0,24 €</td>
+        <td class="num">1,39 €</td>
+      </tr>
+      <tr>
+        <td class="titol">
+          Enviament · 3a unitat
+          <span class="detall">Espanya peninsular · tarifa de cada peça addicional</span>
+        </td>
+        <td class="num">1</td>
+        <td class="num">1,14 €</td>
+        <td class="num">1,14 €</td>
+        <td class="num">0,24 €</td>
+        <td class="num">1,38 €</td>
       </tr>
     </tbody>
   </table>
@@ -293,16 +344,22 @@
   <!-- ══════════ TOTALS I NOTES ══════════ -->
   <div class="peu">
     <div class="notes">
-      <strong>Informació</strong>
-      Producte fabricat sota demanda. El termini de producció és de 2 a 4 dies
-      feiners i el de lliurament, de 3 a 6 dies feiners addicionals.<br><br>
-      Tots els imports d'aquesta factura són en euros. El preu inclou l'IVA
-      aplicable. Operació subjecta al règim general d'IVA.
+      <span class="etq">Informació</span>
+      Producte fabricat sota demanda amb impressió <strong>DTF</strong> (Direct-to-Film).
+      El termini de producció és de 2 a 4 dies feiners i el de lliurament, de 3 a 6 dies
+      feiners addicionals.<br><br>
+      Tots els imports d'aquesta factura són en euros. El preu de la botiga ja inclou
+      el transport i l'IVA; aquí es desglossa per conceptes. Operació subjecta al règim
+      general d'IVA.
     </div>
     <div class="totals">
-      <div class="fila"><span>Base imponible</span><span>12,81 €</span></div>
-      <div class="fila"><span>IVA 21%</span><span>2,69 €</span></div>
-      <div class="total"><span>Total</span><span>15,50 €</span></div>
+      <div class="fila"><span>Base imposable — productes</span><span>32,59 €</span></div>
+      <div class="fila"><span>Base imposable — enviament</span><span>5,84 €</span></div>
+      <div class="fila"><span>Base imposable total</span><span>38,43 €</span></div>
+      <div class="fila"><span>IVA 21% sobre productes</span><span>6,84 €</span></div>
+      <div class="fila"><span>IVA 21% sobre enviament</span><span>1,23 €</span></div>
+      <div class="fila"><span>Total IVA</span><span>8,07 €</span></div>
+      <div class="total"><span>Total</span><span>46,50 €</span></div>
     </div>
   </div>
 

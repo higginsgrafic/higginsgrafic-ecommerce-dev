@@ -49,7 +49,7 @@ const SPECS = [
   { label: 'Material', value: '100% cotó pentinat de 150 g/m²', row: 9 },
   { label: 'Tall', value: 'Coll rodó', row: 11 },
   { label: 'Procedència', value: <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}><Flag code="HN" size={16} /><Flag code="DO" size={16} /><Flag code="NI" size={16} /><Flag code="BD" size={16} /><Flag code="US" size={16} /></span>, row: 13 },
-  { label: 'Estampació', value: 'Impressió DTG', row: 15 },
+  { label: 'Estampació', value: 'Impressió DTF', row: 15 },
   { label: 'Cura', value: 'Renta-la al revés i a 30°C', row: 17 },
   { label: 'Garantia', value: 'Devolució 14 dies', row: 19 },
 ];

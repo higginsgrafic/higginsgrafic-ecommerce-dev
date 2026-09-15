@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo, useRef, useLayoutEffect } from 're
 import Breadcrumbs from '@/components/Breadcrumbs';
 import { formatPrice } from '@/utils/formatters';
 import { useShippingCosts } from '@/hooks/useShippingCosts';
+import { IVA_RATE } from '@/config/pricing';
 
 const PAUTA_ROWS = 33;
 const PAUTA_FIRST_ROW_SCALE = 0.7;
@@ -59,8 +60,11 @@ const LlistaCheckout = ({ items, onBreadcrumbClick, country = 'Espanya' }) => {
   const totalQuantity = checkoutRenderItems.reduce((total, item) => total + (item.quantity || 1), 0);
   const shipping = getCost(country, totalQuantity, itemTotal);
   const total = itemTotal;
-  const baseImponible = (total - shipping) / 1.21;
-  const ivaAmount = (total - shipping) - baseImponible;
+  // Mateix calcul que al checkout: el transport tambe porta IVA, aixi que
+  // es desglossa sense IVA i la ratlla d'IVA inclou l'IVA de tot.
+  const transportNet = Math.round((shipping / (1 + IVA_RATE)) * 100) / 100;
+  const baseImponible = Math.round(((total - shipping) / (1 + IVA_RATE)) * 100) / 100;
+  const ivaAmount = Math.round((total - baseImponible - transportNet) * 100) / 100;
   const subtotal = baseImponible;
   const displayPrice = (value) => formatPrice(value).replace(/\u00a0/g, ' ').replace(/\s+/g, '').replace(/\s*€\s*$/, '€');
 
@@ -469,7 +473,7 @@ const LlistaCheckout = ({ items, onBreadcrumbClick, country = 'Espanya' }) => {
               <div style={{ gridColumn: '1 / 5', gridRow: '1 / 2' }} />
               {[
                 ['SUBTOTAL', displayPrice(subtotal), false],
-                ['TRANSPORT', displayPrice(shipping), true],
+                ['TRANSPORT', displayPrice(transportNet), true],
                 ['IVA 21%', displayPrice(ivaAmount), false],
                 ['TOT PLEGAT FA', displayPrice(total), false],
               ].flatMap(([label, amount, strikeAmount], index) => ([

@@ -17,6 +17,10 @@
 
 export const SELLING_PRICE = 15.5;
 
+// Tipus general d'IVA aplicable (21%). El preu de venda ja el porta inclòs,
+// tambe el de l'enviament.
+export const IVA_RATE = 0.21;
+
 /** Preu de venda ja format per mostrar: "15,50€" */
 export const SELLING_PRICE_LABEL = `${SELLING_PRICE.toFixed(2).replace('.', ',')}€`;
 

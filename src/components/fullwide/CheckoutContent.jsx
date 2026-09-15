@@ -11,6 +11,7 @@ import { getMockupPath, INK_BLACK, INK_WHITE, COLLECTIONS } from '@/lib/mockupPa
 import { useOffersConfig } from '@/hooks/useOffersConfig';
 import { getStripe, createPaymentIntent } from '@/api/stripe';
 import { PDP_REGISTRY_BY_ROUTE } from '@/data/pdpRegistry';
+import { IVA_RATE } from '@/config/pricing';
 
 function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPortraitTablet = false }) {
   const stripe = useStripe();
@@ -294,8 +295,16 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
   const transport = getCost(formData.country || 'ES', totalQuantity, totalArticles);
   const shipping = 0;
   const totalFinal = totalArticles;
-  const subtotalNet = Math.round(((totalFinal - transport) / 1.21) * 100) / 100;
-  const ivaAmount = Math.round((totalFinal - transport - subtotalNet) * 100) / 100;
+  // El preu porta l'IVA inclòs, TAMBÉ el de l'enviament. Per això la base
+  // imponible es calcula sobre el total i el transport també es desglossa
+  // sense IVA: així la ratlla d'IVA inclou l'IVA de tot (producte + enviament)
+  // i les ratlles sumen exactament el total.
+  //   base      = total / 1,21
+  //   transport = transport / 1,21   (el que es mostra)
+  //   iva       = total − base
+  const transportNet = Math.round((transport / (1 + IVA_RATE)) * 100) / 100;
+  const subtotalNet = Math.round(((totalFinal - transport) / (1 + IVA_RATE)) * 100) / 100;
+  const ivaAmount = Math.round((totalFinal - subtotalNet - transportNet) * 100) / 100;
 
   const fmt = (n) => n.toFixed(2).replace('.', ',') + '€';
 
@@ -362,7 +371,7 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
         const mockOrder = createMockOrder({
           items: orderItems,
           subtotal: subtotalNet,
-          shipping: transport,
+          shipping: transportNet,
           iva: ivaAmount,
           total: totalFinal,
           formData,
@@ -641,7 +650,7 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
             {descompte > 0 && (
               <div style={{ display: 'flex', justifyContent: 'space-between', color: '#0A7A46' }}><span>Descompte</span><span>-{fmt(descompte)}</span></div>
             )}
-            <div style={{ display: 'flex', justifyContent: 'space-between' }}><span>Transport</span><span>{transport === 0 ? 'Gratuït' : fmt(transport)}</span></div>
+            <div style={{ display: 'flex', justifyContent: 'space-between' }}><span>Transport</span><span>{transport === 0 ? 'Gratuït' : fmt(transportNet)}</span></div>
             <div style={{ display: 'flex', justifyContent: 'space-between' }}><span>IVA 21%</span><span>{fmt(ivaAmount)}</span></div>
             <div style={{ display: 'flex', justifyContent: 'space-between', ...HEAD, fontSize: '12pt', marginTop: '8px' }}><span>TOT PLEGAT FA</span><span>{fmt(totalFinal)}</span></div>
           </div>
@@ -809,7 +818,7 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
                 exactament TOT PLEGAT FA. */}
             <div style={{ display:'flex', justifyContent:'space-between', alignItems:'baseline', fontSize:'11pt', lineHeight:1.2, color:'#667085' }}><span>Subtotal</span><span style={{ fontVariantNumeric:'tabular-nums' }}>{subtotalNet.toFixed(2).replace('.',',')}€</span></div>
             {discountEnabled && <div style={{ display:'flex', justifyContent:'space-between', alignItems:'baseline', fontSize:'11pt', lineHeight:1.2, color:'#667085' }}><span>Descompte (-{offersConfig.discountRate}%)</span><span style={{ fontVariantNumeric:'tabular-nums' }}>-{descompte.toFixed(2).replace('.',',')}€</span></div>}
-            <div style={{ display:'flex', justifyContent:'space-between', alignItems:'baseline', fontSize:'11pt', lineHeight:1.2, color:'#667085' }}><span>Transport</span><span style={{ fontVariantNumeric:'tabular-nums' }}>{transport === 0 ? 'Gratuït' : `${transport.toFixed(2).replace('.',',')}€`}</span></div>
+            <div style={{ display:'flex', justifyContent:'space-between', alignItems:'baseline', fontSize:'11pt', lineHeight:1.2, color:'#667085' }}><span>Transport</span><span style={{ fontVariantNumeric:'tabular-nums' }}>{transport === 0 ? 'Gratuït' : `${transportNet.toFixed(2).replace('.',',')}€`}</span></div>
             <div style={{ display:'flex', justifyContent:'space-between', alignItems:'baseline', fontSize:'11pt', lineHeight:1.2, color:'#667085' }}><span>IVA 21%</span><span style={{ fontVariantNumeric:'tabular-nums' }}>{ivaAmount.toFixed(2).replace('.',',')}€</span></div>
             {/* TOT PLEGAT FA es queda en Roboto Condensed encara que la resta
                 de la targeta vagi en Roboto. */}

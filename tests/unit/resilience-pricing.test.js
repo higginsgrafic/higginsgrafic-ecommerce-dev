@@ -192,12 +192,14 @@ describe('create-payment-intent — resiliència', () => {
 
       expect(res.statusCode).toBe(200);
       const body = JSON.parse(res.body);
-      // El transport va inclòs dins del preu i és una de les ratlles del
+      // El transport va inclòs dins el preu i és una de les ratlles del
       // desglossament. Mateixa tarifa que mostrava el client per a un país
-      // desconegut: Espanya, 1 article -> 4.29 (abans s'aplicava un 4.95 pla
-      // que el client no ensenyava mai).
-      expect(body.shippingCost).toBe(4.29);
-      expect(body.shippingQuoted).toBe(4.29);
+      // desconegut: Espanya, 1 article -> 4.29 amb IVA (abans s'aplicava un
+      // 4.95 pla que el client no ensenyava mai). La ratlla del desglossament
+      // va sense IVA: 4.29 / 1.21 = 3.55.
+      expect(body.shippingPvp).toBe(4.29);
+      expect(body.shippingCost).toBe(3.55);
+      expect(body.shippingQuoted).toBe(3.55);
     });
   });
 
