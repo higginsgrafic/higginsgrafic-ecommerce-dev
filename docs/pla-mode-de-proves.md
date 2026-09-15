@@ -40,6 +40,24 @@ que corregeix una prova, i que a sobre gasta un número `FR`) o al revés.
 
 Ara un disparador ho impedeix en tots dos sentits.
 
+### Base de dades — `supabase/migrations/20260916150000_el_mur_tracta_null_com_a_de_debo.sql`
+
+Correcció d'un error de la migració anterior, detectat repassant el codi abans
+d'executar-lo. La comprovació del mur era:
+
+```sql
+IF es_prova IS DISTINCT FROM NEW.is_test THEN
+```
+
+Si `NEW.is_test` és `NULL` —una fila creada abans que la columna existís—
+`false IS DISTINCT FROM NULL` és **cert**, i la funció hauria aturat l'emissió
+d'una **factura de debò**. O sigui que la protecció de les proves hauria fet
+exactament el contrari del que ha de fer.
+
+La regla bona: **NULL vol dir «no és cap prova»**. Ara els dos costats es
+normalitzen amb `COALESCE(..., false)` abans de comparar. No s'ha editat la
+migració donada: una migració donada no es reescriu mai.
+
 ### Codi
 
 | Fitxer | Què hi ha |
