@@ -122,6 +122,35 @@ enviar-los que enviar-los a un client de debò.
 
 ---
 
+## Com s'instal·la (per al propietari)
+
+**Un sol fitxer, una sola execució:**
+
+1. Obre `docs/sql-pas1/EXECUTA-LES-MIGRACIONS.sql`
+2. Copia-ho **tot**
+3. Supabase → SQL Editor → finestra nova → enganxa → Run
+4. Al terminal: `npm run verifica:proves`
+
+El fitxer porta les quatre migracions en ordre i cada bloc va dins d'una
+transacció: o s'aplica, o no s'aplica. No pot quedar a mitges.
+
+**Es genera tot sol**, no s'edita a mà:
+
+```bash
+npm run genera:sql-proves
+```
+
+La font són els fitxers de `supabase/migrations/`. Un test comprova que el
+fitxer generat no s'hagi quedat enrere respecte d'ells.
+
+I una variable d'entorn a Netlify:
+
+```
+TEST_EMAIL = higginsgrafic@gmail.com
+```
+
+---
+
 ## Com es comprova
 
 **Contra la base de dades de debò**, que és el que compta:
