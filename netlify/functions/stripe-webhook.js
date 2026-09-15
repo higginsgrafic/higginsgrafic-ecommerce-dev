@@ -162,6 +162,17 @@ export async function createInvoice(supabase, order) {
 }
 
 async function fulfillGelato(supabase, order) {
+  // Una comanda de prova no s'envia mai a Gelato: crearia una comanda de
+  // producció REAL i costaria diners de debò. Es retorna 'skip' (i no un error)
+  // perquè Stripe no hagi de reintentar res: la comanda està bé tal com està.
+  if (order?.is_test === true) {
+    console.warn(
+      '[stripe-webhook] Comanda de PROVA: no s\'envia a Gelato. ' +
+      'El correu ja ha sortit cap a l\'adreça de proves.'
+    );
+    return 'skip';
+  }
+
   if (MODE_PROVES_STRIPE) {
     console.warn(
       '[stripe-webhook] MODE DE PROVES (clau sk_test_): la comanda NO s\'envia a Gelato. ' +

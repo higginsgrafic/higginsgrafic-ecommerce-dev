@@ -215,3 +215,37 @@ describe('stripe-webhook — Gelato fulfillment retries', () => {
     expect(mockGelatoCreate).not.toHaveBeenCalled();
   });
 });
+
+describe('stripe-webhook — una comanda de prova no va a Gelato', () => {
+  beforeEach(() => {
+    vi.resetAllMocks();
+    _ordersSelectResult = { data: null, error: 'not found' };
+    _ordersUpdateResult = { data: null, error: null };
+    _eventsSelectResult = { data: null, error: 'not found' };
+    _eventsInsertResult = { error: null };
+
+    mockStripeConstruct.mockReturnValue({
+      id: 'evt_prova_001',
+      type: 'payment_intent.succeeded',
+      data: { object: { id: 'pi_test_prova' } },
+    });
+    mockGelatoCreate.mockResolvedValue({ orderId: 'gelato-1', status: 'created' });
+    mockSendOrderEmail.mockResolvedValue({ id: 'email-1' });
+  });
+
+  it('la comanda es confirma, s’avisa per correu i NO es crea cap comanda a Gelato', async () => {
+    setEventsSelect(null, 'not found');
+    setOrdersUpdate({
+      id: 'order-prova', order_number: 'GRF-PROVA-1', email: 'client@example.com',
+      items: '[]', gelato_order_id: null, is_test: true,
+    });
+
+    const res = await handler(makeWebhookEvent());
+
+    expect(res.statusCode).toBe(200);
+    // El correu surt (cap a l'adreça de proves, ho decideix email.js)...
+    expect(mockSendOrderEmail).toHaveBeenCalled();
+    // ...i Gelato no es toca: enviar-hi una prova costaria diners de debò.
+    expect(mockGelatoCreate).not.toHaveBeenCalled();
+  });
+});

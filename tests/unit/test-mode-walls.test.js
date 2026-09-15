@@ -171,3 +171,26 @@ describe('Gelato i les comandes de prova', () => {
     await expect(createGelatoOrderServer({ id: 'ord-2' })).rejects.toThrow(/GELATO_API_KEY/);
   });
 });
+
+describe('El guard de Gelato, amb clau configurada', () => {
+  /**
+   * Aquest és el cas que importa de debò: si hi ha clau de Gelato, una comanda
+   * de prova NO ha de provocar cap crida a la xarxa. Enviar-la voldria dir que
+   * s'imprimeix i s'envia una samarreta de veritat.
+   */
+  it('no arriba a fer cap crida a la xarxa', async () => {
+    vi.stubEnv('GELATO_API_KEY', 'clau-de-prova');
+    const fetchOriginal = globalThis.fetch;
+    let crides = 0;
+    globalThis.fetch = async () => { crides++; return { ok: true, json: async () => ({}) }; };
+    try {
+      vi.resetModules();
+      const { createGelatoOrderServer } = await import('../../netlify/lib/gelato.js');
+      await expect(createGelatoOrderServer({ id: 'ord-1', is_test: true })).rejects.toMatchObject({ code: 'TEST_ORDER' });
+      expect(crides).toBe(0);
+    } finally {
+      globalThis.fetch = fetchOriginal;
+      vi.unstubAllEnvs();
+    }
+  });
+});
