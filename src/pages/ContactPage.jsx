@@ -35,7 +35,7 @@ function ContactPage() {
         </>
       ),
       contact: [
-        'Higgins GRÀFIC',
+        'Marc Freixas Casanovas (Higgins GRÀFIC)',
         'NIF: 52161740V',
         'Carrer Convent, 11',
         'Cardedeu 08440, Barcelona',

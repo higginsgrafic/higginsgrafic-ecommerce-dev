@@ -14,7 +14,7 @@ function TermsPage() {
     {
       bullet: '1. Identificació de l\'Empresa',
       contact: [
-        'Higgins GRÀFIC',
+        'Marc Freixas Casanovas (Higgins GRÀFIC)',
         'NIF: 52161740V',
         'Carrer Convent, 11, Cardedeu 08440, Barcelona',
         'higginsgrafic@gmail.com (provisional)',
