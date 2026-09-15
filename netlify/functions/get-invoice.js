@@ -55,5 +55,15 @@ export async function handler(event) {
     return jsonResponse(event, 404, { error: 'Factura no trobada' });
   }
 
-  return jsonResponse(event, 200, { invoice: data });
+  let invoice = data;
+  if (data.rectifies_invoice_id) {
+    const { data: original } = await supabase
+      .from('invoices')
+      .select('number, issued_at')
+      .eq('id', data.rectifies_invoice_id)
+      .maybeSingle();
+    invoice = { ...data, rectified_invoice_number: original?.number || null, rectified_invoice_date: original?.issued_at || null };
+  }
+
+  return jsonResponse(event, 200, { invoice });
 }

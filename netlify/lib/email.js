@@ -35,6 +35,7 @@ import { OrderFailedEmail, orderFailedMeta } from '../emails/templates/OrderFail
 import { WelcomeEmail, welcomeMeta } from '../emails/templates/WelcomeEmail.jsx';
 import { PasswordResetEmail, passwordResetMeta } from '../emails/templates/PasswordResetEmail.jsx';
 import { ContactReceivedEmail, contactReceivedMeta } from '../emails/templates/ContactReceivedEmail.jsx';
+import { InvoiceAvailableEmail, invoiceAvailableMeta } from '../emails/templates/InvoiceAvailableEmail.jsx';
 
 const RESEND_API = 'https://api.resend.com/emails';
 
@@ -59,6 +60,7 @@ const TEMPLATES = {
   welcome: { Component: WelcomeEmail, meta: welcomeMeta, propName: 'user' },
   password_reset: { Component: PasswordResetEmail, meta: passwordResetMeta, propName: 'data' },
   contact_received: { Component: ContactReceivedEmail, meta: contactReceivedMeta, propName: 'data' },
+  invoice_available: { Component: InvoiceAvailableEmail, meta: invoiceAvailableMeta, propName: 'invoice' },
 };
 
 export async function sendOrderEmail(templateKey, payload) {

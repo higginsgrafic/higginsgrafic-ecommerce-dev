@@ -3,15 +3,15 @@ import React from 'react';
 /**
  * INFORME DEL SISTEMA DE FACTURES — Higgins GRÀFIC
  *
- * Document de traspàs per a una IA que ha de començar la interfície de gestió
- * de factures. Es pot llegir com a codi o renderitzar com a pàgina.
+ * Document de traspàs del sistema i la interfície de gestió de factures.
+ * Es pot llegir com a codi o renderitzar com a pàgina.
  *
  * Per veure'l a la botiga:
  *   src/routes/lazyPages.js   → export const InformeFacturesPage = lazy(() => import('@/pages/InformeFacturesPage'));
  *   src/routes/AppRoutes.jsx  → <Route path="informe-factures" element={<InformeFacturesPage />} />
  *
- * Estat: el sistema de factures funciona i té 243 tests verds. Res no està
- * desplegat. Els commits són del 43210af al 0e64480.
+ * Estat: el sistema i la interfície funcionen i hi ha 248 tests verds. Totes
+ * les migracions estan executades. Res no està desplegat.
  */
 
 // ---------------------------------------------------------------------------
@@ -113,18 +113,17 @@ export function InformeSistemaFactures() {
           Sistema de factures<br />Higgins GRÀFIC
         </h1>
         <p className="text-[13px] text-gray-500 mt-3">
-          Per a una IA que ha de començar la interfície de gestió de factures.
-          El sistema que genera, numera, desa i mostra les factures ja existeix i funciona;
-          el que falta és la capa de gestió.
+          El sistema genera, numera, desa i mostra les factures, i l’administració permet
+          preparar esborranys, emetre factures manuals, rectificar, exportar i reenviar.
         </p>
       </header>
 
       {/* ─────────────────────────────────────────────── */}
       <H2>01 · Què se't demana</H2>
       <P>
-        Construir una <Strong>interfície per gestionar les factures</Strong> de la botiga. Aquest
-        document descriu què hi ha, per què està fet així i què falta, perquè no hagis de
-        reconstruir res ni contradir decisions ja preses.
+        Mantenir la <Strong>interfície de gestió de factures</Strong> de la botiga. Aquest document
+        descriu què hi ha, per què està fet així i què queda pendent, perquè no hagis de reconstruir
+        res ni contradir decisions ja preses.
       </P>
 
       {/* ─────────────────────────────────────────────── */}
@@ -183,8 +182,9 @@ Stripe envia l'avís ──► stripe-webhook
         Viu <Strong>a la base de dades</Strong>, no a la web: dos compradors simultanis no poden
         rebre el mateix número, i un comptador al navegador sí que podria repetir-lo.
       </P>
-      <Codi>{`public.invoice_counters (year int PRIMARY KEY, last_number int NOT NULL)
-public.next_invoice_number() RETURNS text   -- "2026-000001"`}</Codi>
+      <Codi>{`public.invoice_series_counters (series text, year int, last_number int)
+public.next_invoice_number(series) RETURNS text
+-- FO-2026-000001 · FS-2026-000001 · FR-2026-000001`}</Codi>
       <Llista
         items={[
           <>El número <Strong>només s'agafa quan la factura s'emet de debò</Strong>. Com que la comanda es crea abans de pagar, numerar-la allà deixaria un forat per cada intent abandonat — i la sèrie fiscal no pot tenir forats.</>,
@@ -196,8 +196,12 @@ public.next_invoice_number() RETURNS text   -- "2026-000001"`}</Codi>
       {/* ─────────────────────────────────────────────── */}
       <H2>05 · La taula invoices</H2>
       <Codi>{`id                    uuid PRIMARY KEY DEFAULT gen_random_uuid()
-number                text NOT NULL UNIQUE          -- 2026-000001
+number                text NOT NULL UNIQUE          -- FO/FS/FR-2026-000001
 invoice_type          text NOT NULL                 -- 'full' | 'simplified'
+document_kind         text NOT NULL                 -- 'invoice' | 'rectification'
+rectifies_invoice_id  uuid REFERENCES invoices(id)
+correction_reason     text
+source                text NOT NULL                 -- 'order' | 'manual'
 order_id              uuid REFERENCES orders(id) ON DELETE RESTRICT
 order_number          text
 user_id               uuid
@@ -226,7 +230,7 @@ created_at            timestamptz`}</Codi>
         <div className="mt-2">
           <Strong>2. És immutable.</Strong> Un disparador impedeix modificar-la o esborrar-la. Per
           corregir una errada cal una <Strong>factura rectificativa</Strong>, que és una factura
-          nova. Aquesta és la funcionalitat principal que falta.
+          nova de la sèrie FR. La interfície crea primer un esborrany editable i l&apos;original es conserva.
         </div>
       </Bloc>
       <Codi>{`CREATE TRIGGER invoices_no_update
@@ -252,7 +256,7 @@ created_at            timestamptz`}</Codi>
       {/* ─────────────────────────────────────────────── */}
       <H2>06 · Fitxers del sistema</H2>
 
-      <H3>Migracions (totes ja executades a Supabase)</H3>
+      <H3>Migracions (totes executades a Supabase)</H3>
       <Taula
         capcalera={['Fitxer', 'Què fa']}
         files={[
@@ -261,6 +265,7 @@ created_at            timestamptz`}</Codi>
           ['20260915210000_numeracio_de_factures.sql', 'invoice_counters + next_invoice_number()'],
           ['20260915220000_taula_factures.sql', 'La taula invoices + immutabilitat + RLS'],
           ['20260915230000_testimoni_dacces_a_les_factures.sql', 'access_token'],
+          ['20260915240000_gestio_i_series_de_factures.sql', 'Sèries FO/FS/FR, esborranys i emissió manual atòmica'],
         ]}
       />
       <Bloc>
@@ -276,7 +281,9 @@ created_at            timestamptz`}</Codi>
           ['create-payment-intent.js', 'Crea la comanda. Desa empresa i CIF i calcula invoice_type'],
           ['stripe-webhook.js', 'En confirmar-se el pagament, crida createInvoice() (exportada per poder-la testejar)'],
           ['get-invoice.js', 'Retorna UNA factura pel seu testimoni. Valida el format abans de tocar la base'],
-          ['admin-invoices.js', 'Totes les factures, amb filtres, cerca i totals'],
+          ['admin-invoices.js', 'Totes les factures, amb filtres, cerca, detall i totals'],
+          ['admin-invoice-drafts.js', 'Crea, modifica, elimina i emet esborranys'],
+          ['admin-invoice-actions.js', 'Reenvia una factura per correu'],
         ]}
       />
 
@@ -286,7 +293,8 @@ created_at            timestamptz`}</Codi>
         files={[
           ['src/pages/InvoicePage.jsx', '/factura/:token', 'El client, sense compte. Imprimible en A4'],
           ['src/pages/MyInvoicesPage.jsx', '/compte/factures', 'El client amb compte. Llistat agrupat per any'],
-          ['src/pages/AdminInvoicesPage.jsx', '/admin/factures', 'L\'administrador. Taula, filtres i totals per trimestre'],
+          ['src/pages/AdminInvoicesPage.jsx', '/admin/factures', 'L\'administrador. Factures, esborranys, filtres, CSV i accions'],
+          ['src/pages/AdminInvoiceEditorPage.jsx', '/admin/factures/nova', 'Creació manual i rectificatives abans d’emetre'],
         ]}
       />
 
@@ -307,7 +315,7 @@ created_at            timestamptz`}</Codi>
       <Taula
         capcalera={['Decisió', 'Motiu']}
         files={[
-          ['Una sola sèrie (2026-000001) amb el camp invoice_type', 'La llei exigeix numeració correlativa, però no obliga a sèries separades'],
+          ['Sèries FO, FS i FR separades', 'La normativa exigeix separar ordinàries, simplificades i rectificatives quan conviuen el mateix any'],
           ['El número s\'agafa en emetre, no en comprar', 'Els intents abandonats deixarien forats a la sèrie'],
           ['Còpia en comptes de referència', 'Un document fiscal no pot canviar quan canvia la comanda'],
           ['Immutabilitat per disparador', 'Per corregir cal rectificativa; l\'original es conserva'],
@@ -323,7 +331,7 @@ created_at            timestamptz`}</Codi>
       <H3>Verificat</H3>
       <Llista
         items={[
-          <>243 tests passant i <B>npm run build</B> sense errors</>,
+          <>248 tests passant i <B>npm run build</B> sense errors</>,
           <>L'esquema de la base de dades, comprovat des de fora: les columnes existeixen i responen</>,
           <>La numeració: crides simultànies donen números diferents; un visitant anònim rep «permís denegat»</>,
           <>La suma de les línies quadra amb el total en tots els casos provats</>,
@@ -333,20 +341,20 @@ created_at            timestamptz`}</Codi>
       <Llista
         items={[
           <><Strong>El circuit complet amb un pagament real.</Strong> Cap comanda no hi ha passat mai, perquè la botiga encara no ha venut res. Només es pot comprovar amb una comanda de prova (targeta <B>4242 4242 4242 4242</B>)</>,
-          <>No s'ha creat cap factura de prova, <Strong>a posta</Strong>: el bloqueig d'immutabilitat no permet esborrar-la i hauria gastat el número 2026-000001, que ha de ser el de la primera factura de veritat</>,
+          <>No s'ha creat cap factura de prova, <Strong>a posta</Strong>: el bloqueig d'immutabilitat no permet esborrar-la i gastaria el primer número de la sèrie corresponent</>,
           <>Res no està desplegat a producció</>,
         ]}
       />
 
       {/* ─────────────────────────────────────────────── */}
-      <H2>09 · Què falta (la teva feina)</H2>
+      <H2>09 · Estat de la interfície de gestió</H2>
 
-      <H3>Imprescindible</H3>
+      <H3>Implementat</H3>
       <Numerada
         items={[
-          <><Strong>Factura rectificativa.</Strong> Per corregir una factura emesa. És el forat més gran: ara mateix, si una factura surt malament, no hi ha manera d'arreglar-ho des de la interfície. Cal decidir la sèrie (habitualment R-2026-000001), referenciar l'original i desar-la amb signe contrari</>,
-          <><Strong>Emetre una factura a mà</Strong>, per a vendes que no passen per la botiga</>,
-          <><Strong>Reenviar una factura</Strong> per correu, si el client la demana</>,
+          <><Strong>Factura rectificativa.</Strong> Es crea com a esborrany vinculat a l&apos;original i s&apos;emet amb la sèrie FR</>,
+          <><Strong>Factura manual.</Strong> Es pot desar incompleta i editar fins al moment d&apos;emetre-la</>,
+          <><Strong>Reenviament i exportació.</Strong> L&apos;administrador pot reenviar l&apos;enllaç i exportar el conjunt filtrat en CSV</>,
         ]}
       />
 
@@ -389,8 +397,8 @@ npx eslint <fitxer>         # comprovar un fitxer
 npm run build               # comprovar que compila`}</Codi>
       <P>
         <Strong>Provar la factura de debò:</Strong> cal una comanda amb la targeta de prova de
-        Stripe. Un cop feta, la factura apareixerà a <B>/admin/factures</B> amb el número
-        2026-000001.
+        Stripe. Un cop feta, la factura apareixerà a <B>/admin/factures</B> amb un número
+        de la sèrie FO o FS.
       </P>
       <P>
         <Strong>Referència de disseny:</Strong> <B>docs/model-factura.html</B> és el model que va

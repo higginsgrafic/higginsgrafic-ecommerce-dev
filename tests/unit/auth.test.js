@@ -24,6 +24,15 @@ const { verifyAdmin, verifyUser } = await import('../../netlify/lib/auth.js');
 describe('netlify/lib/auth.js — verifyAdmin', () => {
   beforeEach(() => {
     vi.resetAllMocks();
+    vi.stubEnv('CONTEXT', 'test');
+  });
+
+  it('permet el bypass només a Netlify Dev en localhost', async () => {
+    vi.stubEnv('CONTEXT', 'dev');
+    const local = await verifyAdmin({ headers: { host: 'localhost:8888' } });
+    const remot = await verifyAdmin({ headers: { host: 'exemple.test' } });
+    expect(local.authorized).toBe(true);
+    expect(remot.authorized).toBe(false);
   });
 
   it('returns unauthorized when no Bearer token', async () => {

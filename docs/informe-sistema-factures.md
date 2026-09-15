@@ -1,6 +1,6 @@
 # Informe per continuar el sistema de factures — Higgins GRÀFIC
 
-**Per a:** una IA que ha de començar la interfície de gestió de factures
+**Per a:** una IA que ha de mantenir i ampliar la interfície de gestió de factures
 **Data:** setembre de 2026
 **Projecte:** botiga en línia `higginsgrafic-ecommerce-dev`
 
@@ -8,9 +8,9 @@
 
 ## 1. Què se't demana
 
-Construir una **interfície per gestionar les factures** de la botiga. El sistema que genera, numera, desa i mostra les factures **ja existeix i funciona**; el que falta és la capa de gestió: pantalles per revisar-les, corregir errades, emetre rectificatives, exportar i enviar.
+Mantenir la **interfície de gestió de factures** de la botiga. El sistema permet revisar factures emeses, preparar esborranys, emetre factures manuals, crear rectificatives, exportar i reenviar.
 
-Aquest document descriu **què hi ha**, **per què està fet així** i **què falta**, perquè no hagis de reconstruir res ni contradir decisions ja preses.
+Aquest document descriu **què hi ha**, **per què està fet així** i **què queda pendent**, perquè no hagis de reconstruir res ni contradir decisions ja preses.
 
 ---
 
@@ -62,11 +62,12 @@ Stripe envia l'avís ──► stripe-webhook
 Viu **a la base de dades**, no a la web. Raó: dues compradors simultanis no poden rebre el mateix número, i un comptador a la web sí que podria repetir-lo.
 
 ```sql
--- Taula comptadora, una fila per any
-public.invoice_counters (year int PRIMARY KEY, last_number int NOT NULL)
+-- Taula comptadora, una fila per sèrie i any
+public.invoice_series_counters (series text, year int, last_number int)
 
--- Funció que dona el número següent
-public.next_invoice_number() RETURNS text   -- "2026-000001"
+-- Funció que dona el número següent de FO, FS o FR
+public.next_invoice_number(series) RETURNS text
+-- FO-2026-000001 · FS-2026-000001 · FR-2026-000001
 ```
 
 Detalls importants:
@@ -79,8 +80,12 @@ Detalls importants:
 
 ```sql
 id                    uuid PRIMARY KEY DEFAULT gen_random_uuid()
-number                text NOT NULL UNIQUE          -- 2026-000001
+number                text NOT NULL UNIQUE          -- FO/FS/FR-2026-000001
 invoice_type          text NOT NULL                 -- 'full' | 'simplified'
+document_kind         text NOT NULL                 -- 'invoice' | 'rectification'
+rectifies_invoice_id  uuid REFERENCES invoices(id)
+correction_reason     text
+source                text NOT NULL                 -- 'order' | 'manual'
 order_id              uuid REFERENCES orders(id) ON DELETE RESTRICT
 order_number          text
 user_id               uuid
@@ -111,7 +116,7 @@ CREATE TRIGGER invoices_no_update
   FOR EACH ROW EXECUTE FUNCTION public.invoices_immutable();
 ```
 
-Per corregir una errada cal una **factura rectificativa**, que és una factura nova. **Aquesta és la funcionalitat principal que falta** i on la interfície de gestió té més feina.
+Per corregir una errada cal una **factura rectificativa**, que és una factura nova de la sèrie FR. La interfície la crea com a esborrany vinculat a l’original.
 
 ### 4.4 Seguretat
 
@@ -125,7 +130,7 @@ Per corregir una errada cal una **factura rectificativa**, que és una factura n
 
 ### Base de dades (migracions)
 
-Totes a `supabase/migrations/`, i **totes ja executades** al projecte de Supabase:
+Totes a `supabase/migrations/`, i totes executades al projecte de Supabase:
 
 | Fitxer | Què fa |
 |---|---|
@@ -134,6 +139,7 @@ Totes a `supabase/migrations/`, i **totes ja executades** al projecte de Supabas
 | `20260915210000_numeracio_de_factures.sql` | `invoice_counters` + `next_invoice_number()` |
 | `20260915220000_taula_factures.sql` | La taula `invoices` + immutabilitat + RLS |
 | `20260915230000_testimoni_dacces_a_les_factures.sql` | `access_token` |
+| `20260915240000_gestio_i_series_de_factures.sql` | Sèries FO/FS/FR, esborranys i emissió manual atòmica |
 
 **Convenció:** cada migració porta un comentari que explica *per què* cal, i acaba amb una consulta de comprovació. S'executen **a mà** al SQL Editor de Supabase (vegeu §9).
 
@@ -144,7 +150,9 @@ Totes a `supabase/migrations/`, i **totes ja executades** al projecte de Supabas
 | `netlify/functions/create-payment-intent.js` | Crea la comanda. Desa empresa i CIF, i calcula `invoice_type` |
 | `netlify/functions/stripe-webhook.js` | En confirmar-se el pagament, crida **`createInvoice()`** (exportada per poder-la testejar) |
 | `netlify/functions/get-invoice.js` | Retorna **una** factura pel seu testimoni. Valida el format abans de tocar la base |
-| `netlify/functions/admin-invoices.js` | Totes les factures, amb filtres, cerca i totals. Exporta `sanitizeSearch`, `parseYear`, `parseType`, `totalsByPeriod` |
+| `netlify/functions/admin-invoices.js` | Totes les factures, amb filtres, cerca, detall i totals |
+| `netlify/functions/admin-invoice-drafts.js` | Crea, modifica, elimina i emet esborranys |
+| `netlify/functions/admin-invoice-actions.js` | Reenvia una factura per correu |
 
 ### Pàgines
 
@@ -152,7 +160,8 @@ Totes a `supabase/migrations/`, i **totes ja executades** al projecte de Supabas
 |---|---|---|
 | `src/pages/InvoicePage.jsx` | `/factura/:token` | El client, sense compte. Imprimible en A4 |
 | `src/pages/MyInvoicesPage.jsx` | `/compte/factures` | El client, amb compte. Llistat agrupat per any |
-| `src/pages/AdminInvoicesPage.jsx` | `/admin/factures` | L'administrador. Taula, filtres i totals per trimestre |
+| `src/pages/AdminInvoicesPage.jsx` | `/admin/factures` | Factures, esborranys, filtres, CSV i accions |
+| `src/pages/AdminInvoiceEditorPage.jsx` | `/admin/factures/nova` | Creació manual i rectificatives abans d’emetre |
 
 ### Configuració i registre de rutes
 
@@ -166,7 +175,7 @@ Totes a `supabase/migrations/`, i **totes ja executades** al projecte de Supabas
 
 ### Tests
 
-`tests/unit/`, 30 fitxers, **243 tests que passen**. Els nous:
+`tests/unit/`, 31 fitxers, **248 tests que passen**. Els nous:
 
 | Fitxer | Què comprova |
 |---|---|
@@ -182,7 +191,7 @@ Totes a `supabase/migrations/`, i **totes ja executades** al projecte de Supabas
 
 | Decisió | Motiu |
 |---|---|
-| **Una sola sèrie** (`2026-000001`) amb el camp `invoice_type` | La llei exigeix numeració correlativa, però no obliga a sèries separades. Una sèrie i un senyal és més simple i no té forats |
+| **Sèries FO, FS i FR separades** | La normativa exigeix separar ordinàries, simplificades i rectificatives quan conviuen el mateix any |
 | El número s'agafa **en emitir**, no en comprar | Els intents abandonats deixarien forats a la sèrie |
 | **Còpia** en comptes de referència | Un document fiscal no pot canviar quan canvia la comanda |
 | **Immutabilitat** per disparador | Per corregir cal rectificativa; el document original es conserva |
@@ -197,7 +206,7 @@ Totes a `supabase/migrations/`, i **totes ja executades** al projecte de Supabas
 
 **Verificat amb eines:**
 
-- 243 tests passant i `npm run build` sense errors.
+- 248 tests passant i `npm run build` sense errors.
 - L'esquema de la base de dades, comprovat des de fora (les columnes existeixen i responen).
 - La numeració: crides simultànies donen números diferents; un visitant anònim rep "permís denegat".
 - La suma de les línies quadra amb el total en els casos provats.
@@ -205,18 +214,18 @@ Totes a `supabase/migrations/`, i **totes ja executades** al projecte de Supabas
 **NO verificat:**
 
 - **El circuit complet amb un pagament real.** Cap comanda ha passat mai pel sistema, perquè la botiga encara no ha venut res. El pas final només es pot comprovar amb una comanda de prova (Stripe, targeta `4242 4242 4242 4242`).
-- No s'ha creat cap factura de prova a la base de dades, **a posta**: el bloqueig d'immutabilitat no permet esborrar-la i hauria gastat el número `2026-000001`, que ha de ser el de la primera factura de veritat.
+- No s'ha creat cap factura de prova a la base de dades, **a posta**: el bloqueig d'immutabilitat no permet esborrar-la i gastaria el primer número de la sèrie corresponent.
 - Res no està desplegat a producció (vegeu §9).
 
 ---
 
-## 8. Què falta (la feina de la interfície)
+## 8. Estat de la interfície de gestió
 
-### Imprescindible
+### Implementat
 
-1. **Factura rectificativa.** Per corregir una factura emesa. És el forat més gran: ara mateix, si una factura surt malament, no hi ha manera d'arreglar-ho des de la interfície. Cal decidir la sèrie (habitualment `R-2026-000001`), referenciar la factura original i desar-la amb signe contrari.
-2. **Emetre una factura a mà.** Per a vendes que no passen per la botiga.
-3. **Reenviar una factura** per correu, si el client la demana.
+1. **Factura rectificativa.** Es crea com a esborrany vinculat a l’original i s’emet amb la sèrie `FR`.
+2. **Factura manual.** Es pot desar incompleta i editar fins al moment d’emetre-la.
+3. **Reenviament i exportació.** L’administrador pot reenviar l’enllaç i exportar el conjunt filtrat en CSV.
 
 ### Important
 
@@ -252,7 +261,7 @@ npx eslint <fitxer>         # comprovar un fitxer
 npm run build               # comprovar que compila
 ```
 
-**Provar la factura de debò:** cal una comanda de pagament amb la targeta de prova de Stripe. Un cop feta, la factura apareixerà a `/admin/factures` amb el número `2026-000001`.
+**Provar la factura de debò:** cal una comanda de pagament amb la targeta de prova de Stripe. Un cop feta, la factura apareixerà a `/admin/factures` amb un número de la sèrie `FO` o `FS`.
 
 **Fitxers de referència per al disseny:** `docs/model-factura.html` és el model de factura que va servir per dissenyar la pàgina; inclou un selector per veure les dues versions (amb CIF / sense).
 

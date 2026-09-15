@@ -11,9 +11,10 @@ vi.mock('stripe', () => ({ default: function Stripe() { this.webhooks = { constr
 
 // Estat que controla cada test.
 let taulaExisteix = true;
-let numeroSeguent = '2026-000001';
+let numeroSeguent = 'FS-2026-000001';
 let insertPayload = null;
 let rpcCrides = 0;
+let serieDemanada = null;
 
 function clientFals() {
   return {
@@ -31,7 +32,7 @@ function clientFals() {
         insert: (payload) => { insertPayload = payload; return { select: () => chain }; },
       };
     },
-    rpc: () => { rpcCrides++; return Promise.resolve({ data: numeroSeguent, error: null }); },
+    rpc: (_name, args) => { rpcCrides++; serieDemanada = args?.p_series; return Promise.resolve({ data: numeroSeguent, error: null }); },
   };
 }
 
@@ -49,13 +50,14 @@ function comanda(extra = {}) {
 }
 
 describe('Generació de factures', () => {
-  beforeEach(() => { taulaExisteix = true; numeroSeguent = '2026-000001'; insertPayload = null; rpcCrides = 0; });
+  beforeEach(() => { taulaExisteix = true; numeroSeguent = 'FS-2026-000001'; insertPayload = null; rpcCrides = 0; serieDemanada = null; });
 
   it('crea la factura amb el número correlatiu i les dades del client', async () => {
     const inv = await createInvoice(clientFals(), comanda());
     expect(rpcCrides).toBe(1);
     expect(inv.id).toBe('inv-1');
-    expect(insertPayload.number).toBe('2026-000001');
+    expect(insertPayload.number).toBe('FS-2026-000001');
+    expect(serieDemanada).toBe('FS');
     expect(insertPayload.customer_name).toBe('Joan Puig');
     expect(insertPayload.customer_city).toBe('Barcelona');
     expect(insertPayload.base_products).toBe(9.26);
@@ -73,6 +75,7 @@ describe('Generació de factures', () => {
   it('amb CIF la factura és normal i el CIF queda desat', async () => {
     await createInvoice(clientFals(), comanda({ invoice_tax_id: 'B12345678', invoice_company: 'Empresa SL' }));
     expect(insertPayload.invoice_type).toBe('full');
+    expect(serieDemanada).toBe('FO');
     expect(insertPayload.customer_tax_id).toBe('B12345678');
     expect(insertPayload.customer_company).toBe('Empresa SL');
   });
