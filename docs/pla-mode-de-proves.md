@@ -169,6 +169,13 @@ per fet que una transacció es desfaria sense comprovar-ho.
 Si les columnes no hi són, el guió ho diu i surt amb codi d'error: serveix per
 saber si les migracions estan executades sense haver de llegir cap document.
 
+**L'estructura del SQL**, abans d'executar-lo: un test comprova que els
+delimitadors de dòlar dels 50 fitxers de `supabase/migrations/` estiguin
+aparellats, que cap transacció quedi sense el seu `COMMIT`, i que el fitxer que
+s'ha d'engantxar porti les quatre migracions. No valida la semàntica (això només
+ho pot fer Postgres): valida que el SQL no estigui trencat quan arribi a les
+mans del propietari.
+
 1. **Automàtic:** `npx vitest run`. Els tests del mode de proves són
    `tests/unit/test-mode-invoice.test.js`, `tests/unit/test-mode-walls.test.js`,
    `tests/unit/test-mode-test-order.test.js` i
