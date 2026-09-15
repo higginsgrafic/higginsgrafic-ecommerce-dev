@@ -36,7 +36,7 @@ function ContactPage() {
       ),
       contact: [
         'Higgins GRÀFIC',
-        '52161740 V',
+        'NIF: 52161740V',
         'Carrer Convent, 11',
         'Cardedeu 08440, Barcelona',
         '+34 000 000 000',
