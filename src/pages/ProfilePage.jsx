@@ -1,10 +1,10 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { UserProfileTabs } from '@/components/UserProfileTabs';
 import SEO from '@/components/SEO';
 import Breadcrumbs from '@/components/Breadcrumbs';
-import { LogOut } from 'lucide-react';
+import { LogOut, ReceiptText } from 'lucide-react';
 
 export default function ProfilePage() {
   const { user, signOut } = useAuth();
@@ -27,6 +27,13 @@ export default function ProfilePage() {
             <div>
               <h1 className="text-2xl font-bold text-neutral-900">El meu perfil</h1>
               <p className="text-neutral-500 text-sm mt-1">{user?.email}</p>
+              <Link
+                to="/compte/factures"
+                className="inline-flex items-center gap-1.5 text-sm text-neutral-600 hover:text-neutral-900 underline decoration-neutral-300 hover:decoration-neutral-900 mt-2 transition-colors"
+              >
+                <ReceiptText className="w-4 h-4" />
+                Les meves factures
+              </Link>
             </div>
             <button
               onClick={handleSignOut}
