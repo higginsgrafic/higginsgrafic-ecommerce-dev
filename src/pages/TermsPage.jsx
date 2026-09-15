@@ -20,7 +20,7 @@ function TermsPage() {
         'higginsgrafic@gmail.com (provisional)',
         'higginsgrafic.com',
       ],
-      paragraph: 'Higgins GRÀFIC és una marca de roba que comercialitza samarretes i productes tèxtils amb dibuixos de caràcter emocional fabricats sota demanda mitjançant tecnologia d\'impressió digital, DTG.',
+      paragraph: 'Higgins GRÀFIC és una marca de roba que comercialitza samarretes i productes tèxtils amb dibuixos de caràcter emocional fabricats sota demanda mitjançant tecnologia d\'impressió digital DTF (Direct-to-Film).',
     },
     {
       bullet: '2. Objecte i Acceptació',

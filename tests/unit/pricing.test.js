@@ -144,15 +144,20 @@ describe('create-payment-intent — server-side pricing', () => {
     // inclòs). El transport va DINS d'aquest preu: no s'hi afegeix mai.
     expect(body.subtotalPvp).toBe(49.00);
     // El transport que va inclòs al preu: 4.29 + 2*1.39 = 7.07 (3 articles a
-    // Espanya). És una de les ratlles del desglossament, no un càrrec extra.
-    expect(body.shippingCost).toBe(7.07);
-    expect(body.shippingQuoted).toBe(7.07);
-    // Desglossament: primer es treu el transport i després l'IVA del que queda.
-    //   base = (49.00 − 7.07) / 1.21 = 34.65
-    //   iva  = 49.00 − 7.07 − 34.65 = 7.28
+    // Espanya), amb IVA. Com que es una de les ratlles del desglossament i
+    // les ratlles han de sumar el total, es desglossa SENSE IVA:
+    //   transport = 7.07 / 1.21 = 5.84
+    expect(body.shippingPvp).toBe(7.07);      // el transport amb IVA
+    expect(body.shippingCost).toBe(5.84);     // sense IVA (la ratlla del desglossament)
+    expect(body.shippingQuoted).toBe(5.84);
+    // Desglossament: el preu porta l'IVA inclòs, tambe el de l'enviament.
+    //   base      = (49.00 − 7.07) / 1.21 = 34.65
+    //   transport = 7.07 / 1.21           =  5.84
+    //   iva       = 49.00 − 34.65 − 5.84  =  8.51
+    // I l'IVA total es el 21% de 49.00: 49.00 * 0.21 / 1.21 = 8.50.
     expect(body.subtotal).toBe(34.65);      // el que es desa com a subtotal
     expect(body.baseImponible).toBe(34.65);
-    expect(body.iva).toBe(7.28);
+    expect(body.iva).toBe(8.51);
     // total = 49.00 EUR (el mateix que mostra la botiga)
     expect(body.total).toBe(49.00);
     // I les tres ratlles sumen exactament el total
