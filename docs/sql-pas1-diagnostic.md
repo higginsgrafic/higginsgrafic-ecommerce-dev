@@ -225,7 +225,13 @@ BEGIN
       'Una factura emesa no es pot modificar ni esborrar. Cal una factura rectificativa.';
   END IF;
 
-  RETURN COALESCE(NEW, OLD);
+  -- Segons si és un DELETE o un UPDATE, la fila que ha de seguir endavant
+  -- és OLD o NEW. S'escriu amb un IF i no amb COALESCE perquè COALESCE,
+  -- amb variables de disparador, pot donar problemes de tipus.
+  IF TG_OP = 'DELETE' THEN
+    RETURN OLD;
+  END IF;
+  RETURN NEW;
 END;
 $$;
 
@@ -247,22 +253,40 @@ ORDER BY tgname;
 
 ## Pas D — Comprovar que la protecció continua encesa (opcional)
 
-Si el fas, ha de donar **error**: és exactament el que volem veure.
+Aquest pas **no deixa cap fila**: crea una factura falsa, mira que el disparador
+la protegeixi, i la treu. Si tot va bé, l'últim missatge que veuràs és
+**`PROTECCIO OK`**.
 
 ```sql
 -- ============================================================
 -- PAS D — PROVA DE LA PROTECCIÓ (opcional)
 -- ============================================================
+DO $$
+BEGIN
+  INSERT INTO public.invoices (number, invoice_type, document_kind, source, total, base_products, iva)
+  VALUES ('ZZZ-PROVA-PROTECCIO', 'simplified', 'invoice', 'manual', 121, 100, 21);
 
--- Crea una factura falsa que cap document referencia...
-INSERT INTO public.invoices (number, invoice_type, document_kind, source, total, base_products, iva)
-VALUES ('ZZZ-PROVA-PROTECCIO', 'simplified', 'invoice', 'manual', 121, 100, 21);
+  BEGIN
+    DELETE FROM public.invoices WHERE number = 'ZZZ-PROVA-PROTECCIO';
+    RAISE NOTICE 'FALLADA: el disparador no ha protegit la factura';
+  EXCEPTION WHEN raise_exception THEN
+    -- És exactament el que volem: la protecció ha saltat.
+    RAISE NOTICE 'PROTECCIO OK';
+  END;
 
--- ...i mira que no es pugui esborrar. Això HA de donar error:
-DELETE FROM public.invoices WHERE number = 'ZZZ-PROVA-PROTECCIO';
+  -- Neteja: aquesta fila és falsa i no ha de quedar.
+  DROP TRIGGER IF EXISTS invoices_no_update ON public.invoices;
+  DELETE FROM public.invoices WHERE number = 'ZZZ-PROVA-PROTECCIO';
+  CREATE TRIGGER invoices_no_update
+    BEFORE UPDATE OR DELETE ON public.invoices
+    FOR EACH ROW
+    EXECUTE FUNCTION public.invoices_immutable();
+
+  RAISE NOTICE 'Fila de prova netejada. Files que queden: %',
+    (SELECT count(*) FROM public.invoices);
+END;
+$$;
 ```
-
-Si algun dia cal netejar aquesta segona fila, el camí és el pas B.
 
 ---
 
