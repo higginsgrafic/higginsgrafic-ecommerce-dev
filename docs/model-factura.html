@@ -104,6 +104,7 @@
 
   /* ---------- Barra de dades de la factura ---------- */
   .dades {
+    margin-top: 7mm;
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     background: var(--fons);
@@ -356,8 +357,15 @@
     <img src="../public/custom_logos/brand/grup-higgins-logo.svg" alt="Higgins GRÀFIC">
     <div>
       <div class="etiqueta" id="titolFactura">Factura</div>
-      <div class="numero">Núm. <strong>2026-0001</strong> &nbsp;·&nbsp; 14 de setembre de 2026</div>
     </div>
+  </div>
+
+  <!-- ══════════ DADES DE LA FACTURA ══════════ -->
+  <div class="dades">
+    <div><div class="k">Número</div><div class="v">2026-0001</div></div>
+    <div><div class="k">Data d'emissió</div><div class="v">14/09/2026</div></div>
+    <div><div class="k">Comanda</div><div class="v">[HG-4471]</div></div>
+    <div><div class="k">Forma de pagament</div><div class="v">Targeta</div></div>
   </div>
 
   <!-- ══════════ EMISSOR I CLIENT ══════════ -->
@@ -384,14 +392,6 @@
         [Correu electrònic]
       </p>
     </div>
-  </div>
-
-  <!-- ══════════ DADES DE LA FACTURA ══════════ -->
-  <div class="dades">
-    <div><div class="k">Número</div><div class="v">2026-0001</div></div>
-    <div><div class="k">Data d'emissió</div><div class="v">14/09/2026</div></div>
-    <div><div class="k">Comanda</div><div class="v">[HG-2026-0001]</div></div>
-    <div><div class="k">Forma de pagament</div><div class="v">Targeta</div></div>
   </div>
 
   <!-- ══════════ CONCEPTES ══════════ -->
