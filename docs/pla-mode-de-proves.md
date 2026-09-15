@@ -123,6 +123,22 @@ enviar-los que enviar-los a un client de debò.
 
 ## Com es comprova
 
+**Contra la base de dades de debò**, que és el que compta:
+
+```bash
+npm run verifica:proves
+```
+
+Aquest guió pregunta a la base de dades si el mode de proves hi és: les
+columnes, el comptador, que la sèrie fiscal estigui intacta, i que els murs
+rebutgin el que han de rebutjar. Cada prova que toca dades va dins d'una
+transacció que s'ha de desfer, i **el guió comprova que s'ha desfet de debò**
+—— perquè el 16/09/2026 una fila de prova es va quedar a `invoices` per donar
+per fet que una transacció es desfaria sense comprovar-ho.
+
+Si les columnes no hi són, el guió ho diu i surt amb codi d'error: serveix per
+saber si les migracions estan executades sense haver de llegir cap document.
+
 1. **Automàtic:** `npx vitest run`. Els tests del mode de proves són
    `tests/unit/test-mode-invoice.test.js`, `tests/unit/test-mode-walls.test.js`,
    `tests/unit/test-mode-test-order.test.js` i

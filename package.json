@@ -31,7 +31,8 @@
     "test:e2e:update": "playwright test --update-snapshots",
     "test:e2e:ui": "playwright test --ui",
     "contact-sheet:capture": "node scripts/contact-sheet-capture.mjs",
-    "site-map:build": "node scripts/build-site-map.mjs"
+    "site-map:build": "node scripts/build-site-map.mjs",
+    "verifica:proves": "node scripts/verifica-mode-de-proves.mjs"
   },
   "dependencies": {
     "@radix-ui/react-dialog": "^1.1.4",
