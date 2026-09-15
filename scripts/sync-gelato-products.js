@@ -15,6 +15,11 @@ config();
 // Variables d'entorn
 const SUPABASE_URL = process.env.VITE_SUPABASE_URL;
 const SUPABASE_ANON_KEY = process.env.VITE_SUPABASE_ANON_KEY;
+// Per ESCRITURE cal la clau de servei: la taula `products` te activades les
+// politiques de seguretat (RLS) i amb la clau anonima Supabase rebutja les
+// insercions ("new row violates row-level security policy"). Aquesta clau
+// nome s fa servir aqui, en un script local; mai no arriba al navegador.
+const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
 // La clau de Gelato és un secret de servidor i es diu GELATO_API_KEY.
 // (Abans es llegia VITE_GELATO_API_KEY: el prefix VITE_ faria que Vite
 // l'incrustés dins del JavaScript que baixa el navegador.)
@@ -24,6 +29,7 @@ const GELATO_STORE_ID = process.env.VITE_GELATO_STORE_ID;
 console.log('🔧 Configuració:');
 console.log('  SUPABASE_URL:', SUPABASE_URL ? '✅' : '❌');
 console.log('  SUPABASE_ANON_KEY:', SUPABASE_ANON_KEY ? '✅' : '❌');
+console.log('  SUPABASE_SERVICE_ROLE_KEY:', SUPABASE_SERVICE_ROLE_KEY ? '✅ (escriure)' : '❌ (sense ella no es pot escriure)');
 console.log('  GELATO_API_KEY:', GELATO_API_KEY ? '✅' : '❌');
 console.log('  GELATO_STORE_ID:', GELATO_STORE_ID || 'No configurat');
 console.log('');
@@ -39,7 +45,7 @@ if (!GELATO_API_KEY) {
 }
 
 // Client de Supabase
-const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY || SUPABASE_ANON_KEY);
 
 // Client de Gelato
 const edgeFunctionUrl = `${SUPABASE_URL}/functions/v1/gelato-proxy`;
