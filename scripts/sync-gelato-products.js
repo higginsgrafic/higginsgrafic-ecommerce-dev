@@ -8,6 +8,7 @@
 
 import { createClient } from '@supabase/supabase-js';
 import { config } from 'dotenv';
+import { SELLING_PRICE } from '../src/config/pricing.js';
 
 // Carregar variables d'entorn
 config();
@@ -30,6 +31,7 @@ console.log('🔧 Configuració:');
 console.log('  SUPABASE_URL:', SUPABASE_URL ? '✅' : '❌');
 console.log('  SUPABASE_ANON_KEY:', SUPABASE_ANON_KEY ? '✅' : '❌');
 console.log('  SUPABASE_SERVICE_ROLE_KEY:', SUPABASE_SERVICE_ROLE_KEY ? '✅ (escriure)' : '❌ (sense ella no es pot escriure)');
+console.log('  PREU DE VENDA:', SELLING_PRICE, '€');
 console.log('  GELATO_API_KEY:', GELATO_API_KEY ? '✅' : '❌');
 console.log('  GELATO_STORE_ID:', GELATO_STORE_ID || 'No configurat');
 console.log('');
@@ -124,7 +126,9 @@ function transformStoreProduct(storeProduct, index) {
   const mockupUrl = storeProduct.mockupUrl || storeProduct.previewUrl || storeProduct.imageUrl;
   const images = mockupUrl ? [mockupUrl] : ['/placeholder-product.svg'];
 
-  const basePrice = storeProduct.price || 29.99;
+  // SEMPRE el preu de venda: el de Gelato es el cost, no el que cobrem.
+  // (Abans s'hi posava storeProduct.price, que es el cost de Gelato: 29,99.)
+  const basePrice = SELLING_PRICE;
 
   return {
     gelato_product_id: storeProduct.id?.toString() || `store-${index}`,
@@ -180,7 +184,7 @@ function transformStoreVariants(storeProduct, mockupUrl) {
       size: size,
       color: color,
       color_hex: mapColorToHex(color),
-      price: v.price || storeProduct.price || 29.99,
+      price: SELLING_PRICE,
       stock: 999,
       is_available: true,
       image_url: v.mockupUrl || mockupUrl

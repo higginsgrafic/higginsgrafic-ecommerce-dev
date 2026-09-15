@@ -1,5 +1,6 @@
 import React from 'react';
 import TdpConstructorProduct from '@/components/tdp/TdpConstructorProduct';
+import { SELLING_PRICE_LABEL } from '@/config/pricing';
 
 const PAUTA_GUTTER_Y = '3px';
 const PAUTA_FIRST_ROW_SCALE = 0.7;
@@ -14,7 +15,7 @@ function TDP1({
   gridColumn,
   productName = 'NOM DE PRODUCTE',
   description = DEFAULT_DESCRIPTION,
-  price = '15,50€',
+  price = SELLING_PRICE_LABEL,
   imageSrc = DEFAULT_IMAGE_SRC,
   imageAlt = 'Product Image',
   sizes = ['S', 'M', 'L', 'XL', 'XXL'],

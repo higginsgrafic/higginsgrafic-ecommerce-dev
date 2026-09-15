@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import EditableTextBox from '@/components/dev/EditableTextBox';
+import { SELLING_PRICE_LABEL } from '@/config/pricing';
 
 let pdpPrefetched = false;
 function prefetchPdpChunk() {
@@ -103,7 +104,7 @@ function TdpConstructorProduct({
   rowOffset = 0,
   productName = 'NOM DE PRODUCTE',
   description,
-  price = '15,50€',
+  price = SELLING_PRICE_LABEL,
   imageSrc,
   imageAlt = '',
   sizes = ['S', 'M', 'L', 'XL', 'XXL'],

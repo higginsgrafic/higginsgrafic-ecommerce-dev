@@ -6,6 +6,7 @@ import CollectionProductCard from '@/components/tdp/CollectionProductCard';
 import CollectionProductCardV5 from '@/components/tdp/CollectionProductCardV5';
 import CollectionTdpCard from '@/components/tdp/CollectionTdpCard';
 import TramFinal from '@/components/home/TramFinal';
+import { SELLING_PRICE_LABEL } from '@/config/pricing';
 
 const COLLECTION_BG_SRC = '/tmp/PAGINES/PAGINES TIPUS/00 COLLECCIO.webp';
 
@@ -263,7 +264,7 @@ function ConstructorColleccioPage() {
                 cartCount={0}
                 onAddToCart={(size) => {
                   window.dispatchEvent(new CustomEvent('hg:open-full-wide-cart', {
-                    detail: { source: 'collection-tdp-cta', firstPartOnly: true, item: { title: productName.toUpperCase(), collection: 'COL·LECCIÓ', qty: 1, size, price: '15,50€', color, drawing: '', disabled: false } },
+                    detail: { source: 'collection-tdp-cta', firstPartOnly: true, item: { title: productName.toUpperCase(), collection: 'COL·LECCIÓ', qty: 1, size, price: SELLING_PRICE_LABEL, color, drawing: '', disabled: false } },
                   }));
                 }}
                 editableIdPrefix="constructor-colleccio-tdp-col2"

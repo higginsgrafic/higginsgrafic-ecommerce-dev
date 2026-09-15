@@ -1,6 +1,7 @@
 import React from 'react';
 import CartIcon from '@/components/ui/CartIcon';
 import SizeButton from '@/components/ui/SizeButton';
+import { SELLING_PRICE_LABEL } from '@/config/pricing';
 
 const TDP_CARD_WIDTH = 350;
 const TDP_CARD_HEIGHT = (TDP_CARD_WIDTH * 2130) / 1538;
@@ -18,7 +19,7 @@ function ProductTdpCard({
   frameImageSrc,
   frameImageAlt = '',
   frameImageStyle,
-  price = '15,50',
+  price = SELLING_PRICE_LABEL,
   currency = '€',
   sizes = ['S', 'M', 'L', 'XL', 'XXL'],
   selectedSize = 'M',

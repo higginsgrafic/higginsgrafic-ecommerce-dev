@@ -14,6 +14,7 @@ import { buildOtherCollectionsImages } from '@/components/home/homeDrawings';
 import Breadcrumbs from '@/components/Breadcrumbs';
 import useIsMobile from '@/hooks/useIsMobile';
 import CollectionMobile from '@/pages/CollectionMobile';
+import { SELLING_PRICE_LABEL } from '@/config/pricing';
 
 // Alcada de la franja blanca de la hero.
 const BAND_HEIGHT = 'clamp(120px, 26vh, 260px)';
@@ -568,7 +569,7 @@ function CollectionTheHumanInsidePage() {
                 rowOffset={rowOffset}
                 productName={productName}
                 description=""
-                price="15,50€"
+                price={SELLING_PRICE_LABEL}
                 imageSrc={collectionGridImageFor('the-human-inside', productAt(rowIdx, colIdx).route, color, rowIdx * 4 + colIdx)}
                 hoverImages={collectionGridHoverVariantsFor('the-human-inside', productAt(rowIdx, colIdx).route, color, rowIdx * 4 + colIdx)}
                 imageAlt={`Samarreta Gildan 64000 ${color}`}
@@ -576,7 +577,7 @@ function CollectionTheHumanInsidePage() {
                 cartCount={0}
                 onAddToCart={(size) => {
                   window.dispatchEvent(new CustomEvent('hg:open-full-wide-cart', {
-                    detail: { source: 'collection-tdp-cta', firstPartOnly: true, item: { title: productName.toUpperCase(), collection: 'THE HUMAN INSIDE', collectionSlug: 'the-human-inside', productRoute: productAt(rowIdx, colIdx).route, qty: 1, size, price: '15,50€', color, finish: gridFinishFor('the-human-inside', color, rowIdx * 4 + colIdx), drawing: '', disabled: false } },
+                    detail: { source: 'collection-tdp-cta', firstPartOnly: true, item: { title: productName.toUpperCase(), collection: 'THE HUMAN INSIDE', collectionSlug: 'the-human-inside', productRoute: productAt(rowIdx, colIdx).route, qty: 1, size, price: SELLING_PRICE_LABEL, color, finish: gridFinishFor('the-human-inside', color, rowIdx * 4 + colIdx), drawing: '', disabled: false } },
                   }));
                 }}
                 editableIdPrefix="constructor-colleccio-copy3-tdp-col2"

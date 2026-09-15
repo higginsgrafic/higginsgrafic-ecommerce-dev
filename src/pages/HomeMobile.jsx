@@ -6,6 +6,7 @@ import CollectionTableCard from '@/components/tdp/CollectionTableCard';
 import StoryPosterLink from '@/components/StoryPosterLink';
 import { buildHomeDrawingPlan, buildHeroStripePlan } from '@/components/home/homeDrawings';
 import MobileFooter from '@/components/MobileFooter';
+import { SELLING_PRICE_LABEL } from '@/config/pricing';
 
 const COLLECTION_NAMES = {
   'first-contact': 'FIRST CONTACT',
@@ -239,7 +240,7 @@ export default function HomeMobile() {
                 productRoute,
                 qty: 1,
                 size: size,
-                price: '15,50€',
+                price: SELLING_PRICE_LABEL,
                 color: item.color,
                 drawing: '',
                 disabled: false,

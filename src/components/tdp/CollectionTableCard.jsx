@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { SELLING_PRICE_LABEL } from '@/config/pricing';
 import {
   TDP_PRODUCT_NAME_SETTINGS,
   TDP_PRICE_SETTINGS,
@@ -47,7 +48,7 @@ function CollectionTableCard({
   overlayTranslateX,
   overlayTranslateY,
   overlayOpacity = 1,
-  price = '15,50€',
+  price = SELLING_PRICE_LABEL,
   sizes = ['S', 'M', 'L', 'XL', 'XXL'],
   style,
   selectedSize,

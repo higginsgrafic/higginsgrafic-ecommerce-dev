@@ -3,7 +3,7 @@ import productsService from './supabase-products';
 import { supabase } from './supabase-products';
 
 const GELATO_COST_PRICE = 5.91;
-const SELLING_PRICE = 15.50;
+import { SELLING_PRICE } from '@/config/pricing';
 const GELATO_PLUS_DISCOUNT = 0.20;
 
 function calculateSellingPrice() {
@@ -211,7 +211,7 @@ function transformStoreProductForSupabase(storeProduct) {
       size: size,
       color: color,
       color_hex: mapColorToHex(color),
-      price: v.price || storeProduct.price || calculateSellingPrice(),
+      price: calculateSellingPrice(),
       gelato_cost: v.cost || GELATO_COST_PRICE,
       stock: 999,
       is_available: true,
@@ -231,7 +231,7 @@ function transformStoreProductForSupabase(storeProduct) {
       if (normalizeComparable(raw) === normalizeComparable(productTitle)) return '';
       return raw;
     })(),
-    price: storeProduct.price || calculateSellingPrice(),
+    price: calculateSellingPrice(),
     currency: 'EUR',
     category: 'apparel',
     collection: collection,
