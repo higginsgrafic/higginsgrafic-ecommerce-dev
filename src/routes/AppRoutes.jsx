@@ -66,6 +66,7 @@ import {
   AdminInvoicesPage,
   AdminInvoiceEditorPage,
   AdminInvoiceTestEditorPage,
+  AdminTestToolsPage,
   ColleccioSettingsPage,
   MockupsManagerPage,
   AdminUploadPage,
@@ -199,6 +200,7 @@ export default function AppRoutes({ location, pageProps, pautaEnabled, tableEnab
           {/* Pantalla de proves, separada a posta: aqui no es pot enviar res
               a cap client ni gastar un numero de la serie fiscal. */}
           <Route path="factures/proves" element={<AdminInvoicesPage />} />
+          <Route path="factures/proves/eines" element={<AdminTestToolsPage />} />
           <Route path="factures/proves/nova" element={<AdminInvoiceTestEditorPage />} />
           <Route path="factures/proves/esborrany/:id" element={<AdminInvoiceTestEditorPage />} />
           <Route path="collections" element={<ColleccioSettingsPage {...pageProps} />} />

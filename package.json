@@ -15,6 +15,7 @@
     "prepare": "husky",
     "preview": "vite preview --host 0.0.0.0 --port 3003",
     "prod": "vite --open index-prod.html --host 0.0.0.0 --port 3004",
+    "proves": "netlify dev --port 8888",
     "site-map:build": "node scripts/build-site-map.mjs",
     "sync-gelato": "node --experimental-modules scripts/sync-gelato-products.js",
     "task:finish": "node scripts/task.js finish",
