@@ -122,15 +122,28 @@ Sense aquesta pàgina, provar era endevinar: les comandes de prova no surten
 enlloc (a posta, perquè no compten) i no hi havia manera de veure'n el resultat.
 
 > **Important, i és el motiu pel qual durant setmanes les eines no funcionaven
-> en local:** `npm run dev` arrenca **només Vite**, i Vite no serveix les
-> funcions de servidor. Totes les eines d'administració responen 404. Per provar
-> de debò cal servir-ho tot:
+> en local:** `npm run dev` arrenca **només Vite**, i Vite **no serveix les
+> funcions de servidor**. Totes les eines d'administració responen 404. Per
+> provar de debò cal servir també les funcions:
 >
 > ```bash
-> npm run proves      # netlify dev: la web I les funcions, al port 8888
+> npm run proves
 > ```
 >
-> A producció això no passa: Netlify serveix les funcions sempre.
+> **Els ports, i per què són dos:**
+>
+> | | Port | Què hi ha |
+> |---|---|---|
+> | On treballes | **3003** | La web, com sempre (`npm run dev` també hi és) |
+> | On viuen les funcions | **8888** | El proxy de `netlify dev`; aquí hi ha `/api/...` |
+>
+> Vite no es pot moure del 3003 sense canviar la manera de treballar de l'amo,
+> i el proxy de `netlify dev` no pot compartir el port amb Vite. Per això el
+> 8888: **obrir les eines d'administració des del 8888**, allà `/api/...`
+> funciona. La resta del dia, el 3003.
+>
+> A producció això no passa: Netlify serveix les funcions sempre, i tot és al
+> mateix domini.
 
 **El camí de la targeta de prova**, pas a pas:
 
