@@ -132,8 +132,11 @@ export default defineConfig({
   },
   server: {
     host: '0.0.0.0',
+    // El 3003 de sempre. `strictPort: false` perquè, si el port està ocupat,
+    // Vite passi al següent en comptes de petar: amb `npm run proves`, el
+    // `netlify dev` també vol aixecar server i poden coincidir un moment.
     port: 3003,
-    strictPort: true,
+    strictPort: false,
     headers: {
       'Cache-Control': 'no-store',
     },
