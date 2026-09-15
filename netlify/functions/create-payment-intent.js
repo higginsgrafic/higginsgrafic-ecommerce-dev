@@ -4,6 +4,7 @@ import { checkRateLimit } from '../lib/rate-limit.js';
 import { generateTrackingToken, hashToken, getTokenExpiry, buildTrackingLink } from '../lib/token.js';
 import { jsonResponse } from '../lib/cors.js';
 import { quoteShipping } from '../lib/shipping.js';
+import { verifyAdmin } from '../lib/auth.js';
 
 // El client de Stripe es crea quan realment es necessita, no en carregar el
 // fitxer. Si es creava a dalt de tot i faltava STRIPE_SECRET_KEY, la funció
@@ -292,10 +293,22 @@ export async function handler(event, context) {
       metadata = {},
       shipping = {},
       invoice = {},
+      is_test: isTestPeticio = false,
     } = JSON.parse(event.body || '{}');
 
     if (!items || !Array.isArray(items) || items.length === 0) {
       return jsonResponse(event, 400, { error: 'Falten items' });
+    }
+
+    // Una comanda de prova només la pot demanar un administrador. Sense aquesta
+    // comprovació, qualsevol visitant podria marcar la seva compra com a prova
+    // i quedaria una venda sense factura fiscal.
+    const esProva = isTestPeticio === true;
+    if (esProva) {
+      const { authorized } = await verifyAdmin(event);
+      if (!authorized) {
+        return jsonResponse(event, 403, { error: 'Només un administrador pot crear comandes de prova' });
+      }
     }
 
     const normCurrency = String(currency).toLowerCase().trim();
@@ -346,6 +359,9 @@ export async function handler(event, context) {
       idempotency_key: idempotencyKey,
       tracking_token_hash: trackingTokenHash,
       tracking_token_expires_at: trackingTokenExpiresAt,
+      // Marca de prova: el webhook no gastarà cap número de la sèrie fiscal i
+      // els avisos aniran a l'adreça de prova. Vegeu `docs/pla-mode-de-proves.md`.
+      is_test: esProva,
       ...dadesFactura,
       ...parseShipping(shipping),
     };
@@ -358,6 +374,20 @@ export async function handler(event, context) {
       .insert(dadesComanda)
       .select()
       .single();
+
+    // `is_test` només es treu si la columna encara no existeix I la comanda no
+    // és una prova: una comanda de prova sense la marca acabaria gastant un
+    // número fiscal, i això no es pot permetre de cap manera.
+    if (orderError && !esProva && /is_test/i.test(orderError.message || '')) {
+      console.warn('[create-payment-intent] La columna is_test encara no existeix; es desa la comanda sense la marca.');
+      const senseMarca = { ...dadesComanda };
+      delete senseMarca.is_test;
+      ({ data: order, error: orderError } = await supabase
+        .from('orders')
+        .insert(senseMarca)
+        .select()
+        .single());
+    }
 
     if (orderError && /invoice_company|invoice_tax_id|invoice_type/i.test(orderError.message || '')) {
       console.warn('[create-payment-intent] Les columnes de factura encara no existeixen; es desa la comanda sense empresa ni CIF.');
@@ -394,6 +424,8 @@ export async function handler(event, context) {
         ...(cleanText(invoice?.company, 150) ? { invoice_company: cleanText(invoice.company, 150) } : {}),
         ...(cleanText(invoice?.taxId, 40) ? { invoice_tax_id: cleanText(invoice.taxId, 40) } : {}),
         ...metadata,
+        // Que es vegi al panell de Stripe que aquesta comanda és una prova.
+        ...(esProva ? { is_test: 'true' } : {}),
       },
     });
 

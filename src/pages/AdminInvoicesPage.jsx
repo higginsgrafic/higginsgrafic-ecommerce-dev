@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Download, Eye, FilePlus2, Mail, Pencil, RotateCcw } from 'lucide-react';
+import { ArrowLeft, Download, Eye, FilePlus2, FlaskConical, Mail, Pencil, RotateCcw } from 'lucide-react';
 import { authHeaders } from '@/api/authHeaders';
 
 /**
@@ -47,7 +47,17 @@ function csvCell(value) {
   return `"${String(value ?? '').replaceAll('"', '""')}"`;
 }
 
-export default function AdminInvoicesPage() {
+/**
+ * `mode`:
+ *   'live'  les factures de debò, amb els totals que serveixen per declarar
+ *   'test'  les proves, en una pantalla separada on no hi ha cap total fiscal
+ *
+ * La separació no és estètica: a la pantalla de proves no s'hi mostren
+ * declaracions perquè una prova no compta, i el correu de reenviament no pot
+ * sortir cap a un client.
+ */
+export default function AdminInvoicesPage({ mode = 'live' }) {
+  const esProva = mode === 'test';
   const [estat, setEstat] = useState('carregant');
   const [dades, setDades] = useState({ invoices: [], totals: { perAny: [], perTrimestre: [] }, truncated: false });
   const [drafts, setDrafts] = useState([]);
@@ -68,10 +78,11 @@ export default function AdminInvoicesPage() {
         if (anyFiltre) params.set('year', anyFiltre);
         if (tipusFiltre) params.set('type', tipusFiltre);
         if (cercaAplicada) params.set('q', cercaAplicada);
+        if (esProva) params.set('test', 'true');
         const headers = await authHeaders();
         const [invoiceResponse, draftResponse] = await Promise.all([
           fetch(`/api/admin-invoices?${params.toString()}`, { headers }),
-          fetch('/api/admin-invoice-drafts', { headers }),
+          fetch(`/api/admin-invoice-drafts${esProva ? '?mode=test' : ''}`, { headers }),
         ]);
         if (!viu) return;
         if (!invoiceResponse.ok || !draftResponse.ok) { setEstat('error'); return; }
@@ -89,7 +100,7 @@ export default function AdminInvoicesPage() {
       }
     })();
     return () => { viu = false; };
-  }, [anyFiltre, tipusFiltre, cercaAplicada]);
+  }, [anyFiltre, tipusFiltre, cercaAplicada, esProva]);
 
   // Els anys que apareixen a les factures, per al desplegable.
   const anys = useMemo(() => dades.totals.perAny.map((a) => a.year), [dades]);
@@ -102,7 +113,11 @@ export default function AdminInvoicesPage() {
   );
 
   const resend = async (invoice) => {
-    if (!invoice.customer_email || !window.confirm(`Vols reenviar ${invoice.number} a ${invoice.customer_email}?`)) return;
+    const esFacturaProva = invoice.is_test === true;
+    const desti = esFacturaProva
+      ? 'l’adreça de proves'
+      : invoice.customer_email;
+    if (!desti || !window.confirm(`Vols reenviar ${invoice.number} a ${desti}?`)) return;
     setMissatge('Enviant la factura…');
     const headers = await authHeaders({ 'Content-Type': 'application/json' });
     const response = await fetch('/api/admin-invoice-actions', {
@@ -132,18 +147,49 @@ export default function AdminInvoicesPage() {
 
   return (
     <div className="p-6 max-w-[1400px] mx-auto">
+      {esProva && (
+        <div className="mb-6 flex flex-wrap items-center gap-3 border-2 border-amber-500 bg-amber-50 px-4 py-3">
+          <span className="font-oswald text-sm uppercase tracking-[0.16em] text-amber-800">Mode de proves</span>
+          <span className="text-sm text-amber-800">
+            Aquestes factures no són cap document fiscal: no toquen la sèrie FO/FS/FR, no surten al compte
+            de cap client i es poden esborrar. Els avisos de correu van a l’adreça de proves.
+          </span>
+          <Link to="/admin/factures" className="ml-auto inline-flex items-center gap-2 border border-amber-600 px-3 py-1.5 text-xs uppercase tracking-wider text-amber-800 hover:bg-amber-100">
+            <ArrowLeft className="h-3.5 w-3.5" /> Anar a les factures de debò
+          </Link>
+        </div>
+      )}
+
       <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
         <div>
-          <h1 className="font-oswald text-2xl tracking-[0.04em] uppercase mb-1">Factures</h1>
-          <p className="text-sm text-gray-500">Crea, emet, consulta i rectifica les factures de la botiga.</p>
+          <h1 className="font-oswald text-2xl tracking-[0.04em] uppercase mb-1">
+            {esProva ? 'Factures de prova' : 'Factures'}
+          </h1>
+          <p className="text-sm text-gray-500">
+            {esProva
+              ? 'Proves del circuit sencer. No compten enlloc i no es poden confondre amb una factura de debò.'
+              : 'Crea, emet, consulta i rectifica les factures de la botiga.'}
+          </p>
         </div>
         <div className="flex gap-2">
-          <button type="button" onClick={exportCsv} disabled={!dades.invoices.length} className="inline-flex items-center gap-2 border border-gray-300 bg-white px-4 py-2 text-xs uppercase tracking-wider hover:border-black disabled:opacity-40">
-            <Download className="h-4 w-4" /> Exportar CSV
-          </button>
-          <Link to="/admin/factures/nova" className="inline-flex items-center gap-2 bg-gray-900 px-4 py-2 text-xs uppercase tracking-wider text-white hover:bg-black">
-            <FilePlus2 className="h-4 w-4" /> Nova factura
-          </Link>
+          {!esProva && (
+            <>
+              <button type="button" onClick={exportCsv} disabled={!dades.invoices.length} className="inline-flex items-center gap-2 border border-gray-300 bg-white px-4 py-2 text-xs uppercase tracking-wider hover:border-black disabled:opacity-40">
+                <Download className="h-4 w-4" /> Exportar CSV
+              </button>
+              <Link to="/admin/factures/proves" className="inline-flex items-center gap-2 border border-amber-500 bg-amber-50 px-4 py-2 text-xs uppercase tracking-wider text-amber-800 hover:bg-amber-100">
+                <FlaskConical className="h-4 w-4" /> Proves
+              </Link>
+              <Link to="/admin/factures/nova" className="inline-flex items-center gap-2 bg-gray-900 px-4 py-2 text-xs uppercase tracking-wider text-white hover:bg-black">
+                <FilePlus2 className="h-4 w-4" /> Nova factura
+              </Link>
+            </>
+          )}
+          {esProva && (
+            <Link to="/admin/factures/proves/nova" className="inline-flex items-center gap-2 bg-amber-600 px-4 py-2 text-xs uppercase tracking-wider text-white hover:bg-amber-700">
+              <FilePlus2 className="h-4 w-4" /> Nova prova
+            </Link>
+          )}
         </div>
       </div>
 
@@ -186,8 +232,9 @@ export default function AdminInvoicesPage() {
       {estat === 'ok' && vista === 'issued' && (
         <>
           {dades.truncated && <div className="text-sm text-amber-700 border border-amber-200 bg-amber-50 px-4 py-3 mb-5">Hi ha més factures de les que es poden mostrar. Estreta la cerca perquè els totals siguin complets.</div>}
-          {/* Totals per trimestre */}
-          {dades.totals.perTrimestre.length > 0 && (
+          {/* Els totals són per a les declaracions: una prova no hi compta, i
+              per tant a la pantalla de proves no s'hi mostren. */}
+          {!esProva && dades.totals.perTrimestre.length > 0 && (
             <section className="mb-8">
               <h2 className="font-oswald text-[11px] tracking-[0.18em] uppercase text-gray-400 mb-3">Totals per trimestre</h2>
               <div className="overflow-x-auto">
@@ -212,14 +259,17 @@ export default function AdminInvoicesPage() {
               <tbody>
                 {dades.invoices.map((invoice) => (
                   <tr key={invoice.id || invoice.number} className="border-b border-gray-100 hover:bg-gray-50">
-                    <td className="px-3 py-3 font-oswald">{invoice.number}</td><td className="px-3 py-3 text-gray-500">{fmtDate(invoice.issued_at)}</td>
+                    <td className="px-3 py-3 font-oswald">
+                      {invoice.number}
+                      {invoice.is_test === true && <span className="ml-2 border border-amber-400 bg-amber-50 px-1.5 py-0.5 text-[10px] uppercase tracking-wider text-amber-700">Prova</span>}
+                    </td><td className="px-3 py-3 text-gray-500">{fmtDate(invoice.issued_at)}</td>
                     <td className="px-3 py-3"><div>{invoice.customer_name || '—'}</div>{invoice.customer_company && <div className="text-[11px] text-gray-400">{invoice.customer_company}</div>}</td>
                     <td className="px-3 py-3 text-gray-500">{invoice.customer_tax_id || '—'}</td><td className="px-3 py-3 text-xs uppercase tracking-wider text-gray-500">{tipusFactura(invoice)}</td>
                     <td className="px-3 py-3 text-right tabular-nums">{eur(invoice.total)}</td>
                     <td className="px-3 py-3"><div className="flex justify-end gap-2">
                       {invoice.access_token && <Link to={`/factura/${invoice.access_token}`} className="inline-flex items-center gap-1 border border-gray-200 px-2 py-1 text-[10px] uppercase tracking-wider hover:border-black"><Eye className="h-3.5 w-3.5" /> Veure</Link>}
                       {invoice.customer_email && <button type="button" onClick={() => resend(invoice)} className="inline-flex items-center gap-1 border border-gray-200 px-2 py-1 text-[10px] uppercase tracking-wider hover:border-black"><Mail className="h-3.5 w-3.5" /> Reenviar</button>}
-                      <Link to={`/admin/factures/nova?rectifies=${encodeURIComponent(invoice.id)}`} className="inline-flex items-center gap-1 border border-gray-200 px-2 py-1 text-[10px] uppercase tracking-wider hover:border-black"><RotateCcw className="h-3.5 w-3.5" /> Rectificar</Link>
+                      {invoice.is_test !== true && <Link to={`/admin/factures/nova?rectifies=${encodeURIComponent(invoice.id)}`} className="inline-flex items-center gap-1 border border-gray-200 px-2 py-1 text-[10px] uppercase tracking-wider hover:border-black"><RotateCcw className="h-3.5 w-3.5" /> Rectificar</Link>}
                     </div></td>
                   </tr>
                 ))}
@@ -237,7 +287,10 @@ export default function AdminInvoicesPage() {
               {['Actualitzat', 'Client', 'Document', 'Comanda', 'Total', ''].map((header) => <th key={header} className="px-3 py-3 text-left font-oswald font-normal text-[10px] uppercase tracking-[0.14em] text-gray-400">{header}</th>)}
             </tr></thead>
             <tbody>
-              {drafts.map((draft) => <tr key={draft.id} className="border-b border-gray-100"><td className="px-3 py-3 text-gray-500">{fmtDate(draft.updated_at)}</td><td className="px-3 py-3">{draft.customer_name || 'Sense nom'}</td><td className="px-3 py-3 text-xs uppercase tracking-wider text-gray-500">{tipusFactura(draft)}</td><td className="px-3 py-3 text-gray-500">{draft.order_number || '—'}</td><td className="px-3 py-3 tabular-nums">{eur(draft.total)}</td><td className="px-3 py-3 text-right"><Link to={`/admin/factures/esborrany/${draft.id}`} className="inline-flex items-center gap-1 border border-gray-200 px-3 py-1.5 text-[10px] uppercase tracking-wider hover:border-black"><Pencil className="h-3.5 w-3.5" /> Editar</Link></td></tr>)}
+              {drafts.map((draft) => <tr key={draft.id} className="border-b border-gray-100"><td className="px-3 py-3 text-gray-500">{fmtDate(draft.updated_at)}</td><td className="px-3 py-3">
+                  {draft.customer_name || 'Sense nom'}
+                  {draft.is_test === true && <span className="ml-2 border border-amber-400 bg-amber-50 px-1.5 py-0.5 text-[10px] uppercase tracking-wider text-amber-700">Prova</span>}
+                </td><td className="px-3 py-3 text-xs uppercase tracking-wider text-gray-500">{tipusFactura(draft)}</td><td className="px-3 py-3 text-gray-500">{draft.order_number || '—'}</td><td className="px-3 py-3 tabular-nums">{eur(draft.total)}</td><td className="px-3 py-3 text-right"><Link to={draft.is_test === true ? `/admin/factures/proves/esborrany/${draft.id}` : `/admin/factures/esborrany/${draft.id}`} className="inline-flex items-center gap-1 border border-gray-200 px-3 py-1.5 text-[10px] uppercase tracking-wider hover:border-black"><Pencil className="h-3.5 w-3.5" /> Editar</Link></td></tr>)}
               {!drafts.length && <tr><td colSpan="6" className="py-10 text-center text-gray-400">No hi ha cap esborrany pendent.</td></tr>}
             </tbody>
           </table>

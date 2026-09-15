@@ -10,13 +10,20 @@ import { verifyAdmin } from '../lib/auth.js';
  * comprovar que qui ho demana és administrador. Es fa al servidor, amb la clau
  * de servei, perquè la clau no surti mai del servidor.
  *
+ * MODE DE PROVES
+ *
+ * Les factures de prova (`is_test = true`) NO compten mai als totals: els
+ * totals serveixen per a les declaracions d'IVA, i una prova no és cap
+ * operació. El filtre és sempre EXPLÍCIT (`is_test = false`), mai implícit,
+ * com mana `docs/pla-mode-de-proves.md`.
+ *
+ * Es veuen al llistat (marcades), perquè l'amo ha de poder esborrar-les; el
+ * que no fan és comptar.
+ *
  * Paràmetres:
  *   year  2026            filtra per any d'emissió
  *   type  full|simplified filtra pel tipus de document
  *   q     text            cerca per número, client, CIF o número de comanda
- *
- * Retorna les factures i els totals del conjunt filtrat (per any i per
- * trimestre), que és el que fa falta per a les declaracions d'IVA.
  */
 
 const SUPABASE_URL = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
@@ -30,7 +37,7 @@ const r2 = (n) => Math.round((Number(n) || 0) * 100) / 100;
 /**
  * Neteja el text de cerca abans de passar-lo a la consulta.
  *
- * Els filtres de PostgREST es composen amb comes i parèntesis, així que un
+ * Els filtres de PostgREST es componen amb comes i parèntesis, així que un
  * text que els porti podria alterar la consulta. Ens hi quedem només amb
  * lletres, xifres, espais i els guions dels números de factura i de CIF.
  */
@@ -50,11 +57,25 @@ export function parseType(value) {
   return value === 'full' || value === 'simplified' || value === 'rectification' ? value : null;
 }
 
-/** Agrupa els imports per any i per trimestre. */
+/**
+ * Agrupa els imports per any i per trimestre.
+ *
+ * NOMÉS compten les factures de debò: les proves es queden fora, i es compten
+ * a part perquè l'amo sàpiga que n'hi ha i no es pensi que els totals ballen.
+ */
 export function totalsByPeriod(invoices) {
   const perAny = {};
   const perTrimestre = {};
+  let proves = 0;
+
   for (const f of invoices) {
+    // Filtre explícit. Si el camp no hi fos (migració pendent), no és una
+    // prova: la factura de debò ha de comptar sempre.
+    if (f.is_test === true) {
+      proves++;
+      continue;
+    }
+
     const d = new Date(f.issued_at);
     if (Number.isNaN(d.getTime())) continue;
     const any = d.getFullYear();
@@ -76,9 +97,11 @@ export function totalsByPeriod(invoices) {
     perTrimestre[clau].base = r2(perTrimestre[clau].base + base);
     perTrimestre[clau].iva = r2(perTrimestre[clau].iva + iva);
   }
+
   return {
     perAny: Object.values(perAny).sort((a, b) => b.year - a.year),
     perTrimestre: Object.values(perTrimestre).sort((a, b) => b.period.localeCompare(a.period)),
+    proves,
   };
 }
 
@@ -101,6 +124,7 @@ export async function handler(event) {
   const year = parseYear(params.year);
   const type = parseType(params.type);
   const search = sanitizeSearch(params.q);
+  const nomesProves = params.test === 'true';
 
   const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY);
 
@@ -114,9 +138,17 @@ export async function handler(event) {
 
   let query = supabase
     .from('invoices')
-    .select('id, number, invoice_type, document_kind, rectifies_invoice_id, correction_reason, source, issued_at, order_number, customer_name, customer_company, customer_tax_id, customer_email, base_products, base_shipping, iva, total, access_token')
+    .select('id, number, invoice_type, document_kind, rectifies_invoice_id, correction_reason, source, issued_at, order_number, customer_name, customer_company, customer_tax_id, customer_email, base_products, base_shipping, iva, total, access_token, is_test')
     .order('issued_at', { ascending: false })
     .limit(MAX_FILES);
+
+  // El filtre de les proves és explícit, en tots dos sentits: la vista de debò
+  // no les vol comptades, i la llista de proves les vol NOMÉS a elles.
+  //
+  // A la vista de debò s'hi inclou `is_test = null` a posta: si algun dia hi
+  // hagués factures anteriors a aquesta columna, no han de desaparèixer de la
+  // llista. Una factura de debò no es pot amagar mai.
+  query = nomesProves ? query.eq('is_test', true) : query.or('is_test.eq.false,is_test.is.null');
 
   if (year) {
     query = query.gte('issued_at', `${year}-01-01T00:00:00.000Z`).lt('issued_at', `${year + 1}-01-01T00:00:00.000Z`);
@@ -146,5 +178,6 @@ export async function handler(event) {
     count: invoices.length,
     // Si s'ha arribat al límit, els totals són dels primers trossos, no de tot.
     truncated: invoices.length >= MAX_FILES,
+    testMode: nomesProves,
   });
 }

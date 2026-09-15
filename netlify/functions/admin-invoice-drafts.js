@@ -53,6 +53,11 @@ export function normalizeDraft(input = {}) {
     iva,
     total,
     items,
+    // La marca de prova ve SEMPRE del cos de la petició, mai es dedueix del
+    // contingut: si es deduís, un esborrany amb el correu «de prova» d'algú
+    // podria acabar sense número fiscal. I l'endpoint comprova abans que qui
+    // ho demana és administrador.
+    is_test: input.is_test === true,
     updated_at: new Date().toISOString(),
   };
 }
@@ -77,14 +82,19 @@ export async function handler(event) {
 
   const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY);
   const id = event.queryStringParameters?.id;
+  // Mode de proves: la pantalla de proves demana els seus esborranys i la de
+  // debò els seus. El filtre és explícit en tots dos sentits, i per defecte es
+  // treballa en mode de debò: mai es barregen.
+  const modeProves = event.queryStringParameters?.mode === 'test';
 
   if (event.httpMethod === 'GET') {
     let query = supabase.from('invoice_drafts').select('*').order('updated_at', { ascending: false });
     if (id) query = query.eq('id', id).maybeSingle();
-    else query = query.eq('status', 'draft').limit(500);
+    // Els esborranys antics (anteriors a la columna) compten com de debò.
+    else query = (modeProves ? query.eq('is_test', true) : query.or('is_test.eq.false,is_test.is.null')).eq('status', 'draft').limit(500);
     const { data, error } = await query;
     if (error) return jsonResponse(event, 500, { error: 'No s’han pogut carregar els esborranys' });
-    return jsonResponse(event, 200, id ? { draft: data } : { drafts: data || [] });
+    return jsonResponse(event, 200, id ? { draft: data } : { drafts: data || [], testMode: modeProves });
   }
 
   const body = parseBody(event);
@@ -112,6 +122,9 @@ export async function handler(event) {
     if (!UUID_RE.test(String(id || ''))) return jsonResponse(event, 400, { error: 'Esborrany no vàlid' });
     try {
       const payload = normalizeDraft(body);
+      // Un esborrany de prova no es pot convertir en un de debò editant-lo, ni
+      // al revés: la marca no es toca des d'aquí. Es conserva la que ja tenia.
+      delete payload.is_test;
       const { data, error } = await supabase.from('invoice_drafts').update(payload).eq('id', id).eq('status', 'draft').select().maybeSingle();
       if (error || !data) return jsonResponse(event, 404, { error: 'Esborrany no trobat o ja emès' });
       return jsonResponse(event, 200, { draft: data });

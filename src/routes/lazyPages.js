@@ -78,3 +78,4 @@ export const InvoicePage = lazy(() => import('@/pages/InvoicePage'));
 export const MyInvoicesPage = lazy(() => import('@/pages/MyInvoicesPage'));
 export const AdminInvoicesPage = lazy(() => import('@/pages/AdminInvoicesPage'));
 export const AdminInvoiceEditorPage = lazy(() => import('@/pages/AdminInvoiceEditorPage'));
+export const AdminInvoiceTestEditorPage = lazy(() => import('@/pages/AdminInvoiceTestEditorPage'));
