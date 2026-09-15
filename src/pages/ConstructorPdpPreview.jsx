@@ -11,6 +11,7 @@ import EditableTextBox from '@/components/dev/EditableTextBox';
 import { useDebugOverlays } from '@/hooks/useDebugOverlays';
 import StoryPosterLink from '@/components/StoryPosterLink';
 import { Flag } from './ShippingPage';
+import { SELLING_PRICE_LABEL } from '@/config/pricing';
 
 const PDP_PRESET_VERSION = 'pdp-layout-2026-06-06-1953';
 
@@ -360,7 +361,7 @@ function ConstructorPdpPreview() {
                     collection: 'CONSTRUCTOR',
                     qty: 1,
                     size: selectedSize,
-                    price: '15,50€',
+                    price: SELLING_PRICE_LABEL,
                     color: mainVariantColor,
                     drawing: '',
                     disabled: false,

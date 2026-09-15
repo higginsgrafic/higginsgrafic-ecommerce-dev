@@ -12,6 +12,7 @@ import { buildHomeDrawingPlan, buildHeroStripePlan } from '@/components/home/hom
 import StoryPosterLink from '@/components/StoryPosterLink';
 import useIsMobile from '@/hooks/useIsMobile';
 import HomeMobile from '@/pages/HomeMobile';
+import { SELLING_PRICE_LABEL } from '@/config/pricing';
 
 const HERO_SLIDES = [
   {
@@ -291,7 +292,7 @@ function Home() {
                 productRoute,
                 qty: 1,
                 size: size,
-                price: '15,50€',
+                price: SELLING_PRICE_LABEL,
                 color: item.color,
                 drawing: '',
                 disabled: false,

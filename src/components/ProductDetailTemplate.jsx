@@ -9,6 +9,7 @@ import { tdpImageFor, availableFinishesFor, defaultFinishFor } from '@/lib/pdpMo
 import EditableTextBox from '@/components/dev/EditableTextBox';
 import StoryPosterLink from '@/components/StoryPosterLink';
 import { Flag } from '../pages/ShippingPage';
+import { SELLING_PRICE_LABEL } from '@/config/pricing';
 
 const PDP_PRESET_VERSION = 'pdp-layout-2026-06-06-1953';
 
@@ -199,7 +200,7 @@ export default function ProductDetailTemplate({ product }) {
 
         <EditableTextBox
           id={`${PRODUCT_SLUG}-pdp-price`}
-          initialText="15,50€"
+          initialText={SELLING_PRICE_LABEL}
           initialSettings={PDP_PRICE_SETTINGS}
           presetVersion={PDP_PRESET_VERSION}
           renderHandle={false}
@@ -286,7 +287,7 @@ export default function ProductDetailTemplate({ product }) {
           onClick={() => {
             try {
               window.dispatchEvent(new CustomEvent('hg:open-full-wide-cart', {
-                detail: { source: 'product-pdp-cta', firstPartOnly: true, item: { title: productName.toUpperCase(), collection: COLLECTION_NAME, collectionSlug: IMAGE_COLLECTION, productRoute: PRODUCT_ROUTE, qty: 1, size: selectedSize, price: '15,50€', color: mainVariantColor, finish: selectedFinish, drawing: '', disabled: false } },
+                detail: { source: 'product-pdp-cta', firstPartOnly: true, item: { title: productName.toUpperCase(), collection: COLLECTION_NAME, collectionSlug: IMAGE_COLLECTION, productRoute: PRODUCT_ROUTE, qty: 1, size: selectedSize, price: SELLING_PRICE_LABEL, color: mainVariantColor, finish: selectedFinish, drawing: '', disabled: false } },
               }));
             } catch {
               // ignore

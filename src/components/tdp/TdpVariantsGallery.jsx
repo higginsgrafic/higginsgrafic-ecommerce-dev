@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import TdpConstructorProduct from '@/components/tdp/TdpConstructorProduct';
+import { SELLING_PRICE_LABEL } from '@/config/pricing';
 
 const PAUTA_GUTTER_X = '22.5px';
 const PAUTA_GUTTER_Y = '3px';
@@ -20,7 +21,7 @@ function TdpVariantsGallery({
   variants = DEFAULT_VARIANTS,
   productName = 'NOM DE PRODUCTE',
   description = DEFAULT_DESCRIPTION,
-  price = '15,50€',
+  price = SELLING_PRICE_LABEL,
   imageSrc = DEFAULT_IMAGE_SRC,
   imageAlt = 'Mostra de producte',
   sizes = ['S', 'M', 'L', 'XL', 'XXL'],

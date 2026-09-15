@@ -15,6 +15,7 @@ import useIsMobile from '@/hooks/useIsMobile';
 import PdpMobile from '@/pages/PdpMobile';
 import PageBand from '@/components/layout/PageBand';
 import { getSafeBelt } from '@/utils/layoutMetrics';
+import { SELLING_PRICE_LABEL } from '@/config/pricing';
 
 const PDP_PRESET_VERSION = 'pdp-layout-2026-06-06-1953';
 
@@ -825,7 +826,7 @@ function PdpDesktop({ product }) {
               onClick={() => {
                 try {
                   window.dispatchEvent(new CustomEvent('hg:open-full-wide-cart', {
-                    detail: { source: 'product-pdp-cta', firstPartOnly: true, item: { title: productName.toUpperCase(), collection: COLLECTION_NAME, collectionSlug: IMAGE_COLLECTION, productRoute: PRODUCT_ROUTE, qty: 1, size: selectedSize, price: '15,50€', color: mainVariantColor, finish: selectedFinish, drawing: '', disabled: false } },
+                    detail: { source: 'product-pdp-cta', firstPartOnly: true, item: { title: productName.toUpperCase(), collection: COLLECTION_NAME, collectionSlug: IMAGE_COLLECTION, productRoute: PRODUCT_ROUTE, qty: 1, size: selectedSize, price: SELLING_PRICE_LABEL, color: mainVariantColor, finish: selectedFinish, drawing: '', disabled: false } },
                   }));
                 } catch {
                   // ignore

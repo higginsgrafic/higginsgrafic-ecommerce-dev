@@ -20,6 +20,7 @@
 
 import { getMockupPath } from '@/lib/mockupPaths';
 import { collectionGridHoverVariantsFor } from '@/lib/pdpMockup';
+import { SELLING_PRICE_LABEL } from '@/config/pricing';
 
 const STRIPE_BASE = '/custom_logos/drawings/images_stripe';
 
@@ -770,7 +771,7 @@ export function buildOtherCollectionsImages(currentSlug, { rng = rngDelDia() } =
       src: pick.mockupSrc,
       brand: COLLECTION_DISPLAY_NAMES[slug] || slug.toUpperCase(),
       title: pick.productName,
-      price: '15,50€',
+      price: SELLING_PRICE_LABEL,
       href: pick.productHref,
       overlaySrc: pick.overlaySrc || null,
       overlayEnabled: Boolean(pick.overlaySrc),
