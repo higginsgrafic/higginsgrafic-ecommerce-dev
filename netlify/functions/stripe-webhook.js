@@ -75,11 +75,33 @@ export async function createInvoice(supabase, order) {
       return null;
     }
 
+    // Una comanda marcada com a prova NO pot gastar un número de la sèrie
+    // fiscal. La marca ve SEMPRE de la comanda (`orders.is_test`), mai de les
+    // claus de Stripe: si es deduís de la clau, el dia que hi hagi claus de
+    // producció una compra feta amb una targeta de prova deixaria una venda de
+    // debò sense factura, i una venda sense factura és pitjor que un número
+    // gastat.
+    const esProva = order.is_test === true;
     const series = order.invoice_tax_id ? 'FO' : 'FS';
-    const { data: number, error: numError } = await supabase.rpc('next_invoice_number', { p_series: series });
-    if (numError || !number) {
-      console.warn('[stripe-webhook] No s\'ha pogut obtenir el número de factura:', numError?.message);
-      return null;
+
+    let number;
+    if (esProva) {
+      const { data, error } = await supabase.rpc('next_test_invoice_number');
+      if (error || !data) {
+        // Si el comptador de proves encara no hi és (migració pendent), NO es
+        // cau cap enrere cap al número fiscal: es prefereix no tenir factura
+        // que cremar un número de la sèrie de debò.
+        console.warn('[stripe-webhook] No hi ha comptador de proves; no es genera la factura de prova:', error?.message);
+        return null;
+      }
+      number = data;
+    } else {
+      const { data, error } = await supabase.rpc('next_invoice_number', { p_series: series });
+      if (error || !data) {
+        console.warn('[stripe-webhook] No s\'ha pogut obtenir el número de factura:', error?.message);
+        return null;
+      }
+      number = data;
     }
 
     let items = order.items;
@@ -121,6 +143,7 @@ export async function createInvoice(supabase, order) {
         iva,
         total,
         items,
+        is_test: esProva,
       })
       .select()
       .single();
@@ -130,7 +153,7 @@ export async function createInvoice(supabase, order) {
       return null;
     }
 
-    console.log('[stripe-webhook] Factura creada:', number);
+    console.log('[stripe-webhook] Factura creada:', number, esProva ? '(de prova)' : '');
     return invoice;
   } catch (err) {
     console.warn('[stripe-webhook] Error creant la factura:', err?.message);

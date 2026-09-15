@@ -140,8 +140,23 @@ Totes a `supabase/migrations/`, i totes executades al projecte de Supabase:
 | `20260915220000_taula_factures.sql` | La taula `invoices` + immutabilitat + RLS |
 | `20260915230000_testimoni_dacces_a_les_factures.sql` | `access_token` |
 | `20260915240000_gestio_i_series_de_factures.sql` | Sèries FO/FS/FR, esborranys i emissió manual atòmica |
+| `20260915260000_validacions_dels_imports.sql` | Validació d'imports... **no es va executar mai** (vegeu la nota) |
+| `20260916120000_la_validacio_dimports_endarrerida.sql` | La mateixa validació, en un sol bloc i amb la prova a dins |
+| `20260916130000_mode_de_proves.sql` | Mode de proves: `is_test`, comptador PROVA i el mur que impedeix promoure una prova |
 
 **Convenció:** cada migració porta un comentari que explica *per què* cal, i acaba amb una consulta de comprovació. S'executen **a mà** al SQL Editor de Supabase (vegeu §9).
+
+**Atenció, i és una lliçó apresa:** una migració escrita **no vol dir** una
+migració executada. La de `20260915260000` tenia quatre instruccions separades i
+en aquest entorn només se n'executava l'última: la funció i el disparador no es
+van crear mai, i com que l'última instrucció era una comprovació que no donava
+error, ningú no se'n va adonar. Es va detectar el 16/09/2026 provant la base de
+dades de debò.
+
+Per això, les migracions noves **van dins d'un sol bloc** (`DO` o
+`BEGIN`/`COMMIT`) i, quan es pot, **es validen elles mateixes** amb una prova a
+dins. I per això, abans de confiar en una columna o un disparador, es comprova
+contra la base de dades.
 
 ### Funcions de servidor
 
@@ -226,18 +241,56 @@ Totes a `supabase/migrations/`, i totes executades al projecte de Supabase:
 1. **Factura rectificativa.** Es crea com a esborrany vinculat a l’original i s’emet amb la sèrie `FR`.
 2. **Factura manual.** Es pot desar incompleta i editar fins al moment d’emetre-la.
 3. **Reenviament i exportació.** L’administrador pot reenviar l’enllaç i exportar el conjunt filtrat en CSV.
+4. **Mode de proves i editor dedicat.** Vegeu §8bis.
+5. **Validació d'imports a la base de dades.** El motor atura una factura amb imports que no quadren.
 
 ### Important
 
-4. **Exportar** (CSV o Excel) el conjunt filtrat, per a la gestoria.
-5. **Generar el PDF** com a fitxer, no només com a pàgina imprimible. Avui la factura és una pàgina HTML que s'imprimeix des del navegador; un PDF desat permetria adjuntar-lo al correu.
-6. **Paginar** la pantalla d'admin. Ara té un límit de 1.000 files i **avisa quan l'assoleix** perquè els totals deixarien de ser de tot el conjunt.
+6. **Generar el PDF** com a fitxer, no només com a pàgina imprimible. Avui la factura és una pàgina HTML que s'imprimeix des del navegador; un PDF desat permetria adjuntar-lo al correu.
+7. **Paginar** la pantalla d'admin. Ara té un límit de 1.000 files i **avisa quan l'assoleix** perquè els totals deixarien de ser de tot el conjunt.
 
 ### Desitjable
 
-7. **Enllaç a la factura a la pàgina de seguiment de la comanda** (`/track`), perquè el client la trobi des d'allà.
-8. **Filtres de data** (a més de l'any) i **per client**.
-9. **Resum anual** pensat per a la declaració: vendes, IVA repercutit i nombre de factures.
+8. **Enllaç a la factura a la pàgina de seguiment de la comanda** (`/track`), perquè el client la trobi des d'allà.
+9. **Filtres de data** (a més de l'any) i **per client**.
+10. **Resum anual** pensat per a la declaració: vendes, IVA repercutit i nombre de factures.
+
+---
+
+## 8bis. El mode de proves
+
+Detall complet a `docs/pla-mode-de-proves.md`.
+
+**Què és.** Poder fer el circuit sencer —comanda, factura i correu— sense gastar
+cap número de la sèrie fiscal, sense enviar res a Gelato i sense que res compti
+a les declaracions.
+
+**Dues pantalles separades, i per què.**
+
+| | De debò | Proves |
+|---|---|---|
+| Editor | `/admin/factures/nova` | `/admin/factures/proves/nova` |
+| Llista | `/admin/factures` | `/admin/factures/proves` |
+
+L'amo ho va demanar així amb un motiu concret: «la diferència entre enviar una
+factura o no, poden ser 3 cm». En un editor compartit, desar un esborrany i
+emetre una factura de debò queden a tocar.
+
+**Els murs no són la pantalla.** Una pantalla diferent no atura res: un error de
+programació la pot saltar. Els murs de debò són a la base de dades:
+
+- `invoice_drafts_coherencia`: un esborrany de prova no pot emetre una factura
+  real, ni al revés.
+- `invoices_test_number_check`: un número `PROVA-` no pot acabar en una factura
+  de debò, ni un número fiscal en una prova.
+- La política RLS del client filtra amb `is_test = false` **explícit**.
+
+I al servidor: el correu d'una prova només va a `TEST_EMAIL`, i si `TEST_EMAIL`
+no està configurada no s'envia enlloc. Reenviar una factura de prova no pot
+enviar res a un client.
+
+**El que no es pot fer, mai:** promoure una prova a factura de debò. Si cal una
+factura de debò, s'emet una de nova.
 
 ---
 

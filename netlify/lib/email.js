@@ -50,6 +50,31 @@ function getFrom() {
   return from.replace(/^["']|["']$/g, '').trim();
 }
 
+function netejaAdreca(valor) {
+  return String(valor || '').replace(/^["']|["']$/g, '').trim();
+}
+
+/**
+ * A qui s'envia el correu.
+ *
+ * PER QUÈ AIXÒ VIU AQUÍ I NO A CADA PUNT D'ENVIAMENT
+ *
+ * Tots els avisos de la botiga passen per aquesta funció (comandes, factures,
+ * benvinguda, contacte). Si el desviament de les proves es fes a cada lloc,
+ * n'hi hauria prou que un se n'oblidés perquè un correu de prova arribés a un
+ * client de debò. Aquí és un sol lloc i no es pot oblidar.
+ *
+ * REGLA: un correu de prova NOMÉS va a TEST_EMAIL. Si TEST_EMAIL no està
+ * configurada, no s'envia res. Mai a un client, ni tan sols si la factura de
+ * prova porta el correu d'un client.
+ */
+export function adrecaDestinataria(payload) {
+  if (payload?.is_test === true) {
+    return netejaAdreca(process.env.TEST_EMAIL) || null;
+  }
+  return netejaAdreca(payload?.email || payload?.to) || null;
+}
+
 const TEMPLATES = {
   order_confirmed: { Component: OrderConfirmedEmail, meta: orderConfirmedMeta, propName: 'order' },
   order_in_production: { Component: OrderInProductionEmail, meta: orderInProductionMeta, propName: 'order' },
@@ -76,9 +101,15 @@ export async function sendOrderEmail(templateKey, payload) {
     return { error: 'unknown_template' };
   }
 
-  const to = payload.email || payload.to;
+  const to = adrecaDestinataria(payload);
   if (!to) {
-    console.warn('[_email] Destinatari sense email — skip');
+    // Un correu de prova sense TEST_EMAIL configurada no s'envia enlloc: val
+    // més no enviar-lo que enviar-lo a un client de debò.
+    if (payload?.is_test === true) {
+      console.warn('[_email] Correu de prova sense TEST_EMAIL configurada — no s\'envia');
+    } else {
+      console.warn('[_email] Destinatari sense email — skip');
+    }
     return { skipped: true };
   }
 
