@@ -130,3 +130,24 @@ describe('Els totals de l’administració', () => {
     expect(totals.perAny[0].total).toBe(50);
   });
 });
+
+describe('El mur de les proves i els documents antics', () => {
+  /**
+   * Aquest cas es va detectar repassant el codi abans d'executar la migració:
+   * `false IS DISTINCT FROM NULL` és CERT, i la comparació original hauria
+   * aturat l'emissió d'una factura de debò si l'esborrany no portava la marca
+   * (una fila creada abans que la columna existís). La regla bona és que NULL
+   * vol dir «no és cap prova».
+   */
+  it('la versió corregida tracta NULL com a «de debò»', async () => {
+    const { readFileSync } = await import('node:fs');
+    const { resolve } = await import('node:path');
+    const correcció = readFileSync(
+      resolve(process.cwd(), 'supabase/migrations/20260916150000_el_mur_tracta_null_com_a_de_debo.sql'),
+      'utf8',
+    );
+    // Ha de normalitzar els dos costats amb COALESCE abans de comparar.
+    expect(correcció).toMatch(/COALESCE\(factura_es_prova, false\)/);
+    expect(correcció).toMatch(/COALESCE\(NEW\.is_test, false\)/);
+  });
+});
