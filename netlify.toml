@@ -203,3 +203,9 @@
   from = "/*"
   to = "/index.html"
   status = 200
+
+[dev]
+  # Vite ja escolta al 3003 (el port de sempre). netlify dev no ha d'arrencar
+  # una segona instancia: se li diu on es, i el seu proxy escolta al 8888.
+  targetPort = 3003
+  port = 8888

@@ -74,3 +74,7 @@ lighthouse-report*
 
 # Prova local de comparacio de logos (no es publica ni es versiona)
 docs/comparacio/
+
+# Caché local de `netlify dev` (Sol la redirigeix aquí per no embrutar el home)
+.tmp-config/
+.tmp-home/
