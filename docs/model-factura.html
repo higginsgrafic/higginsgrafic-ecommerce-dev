@@ -311,7 +311,30 @@
   }
   .legal strong { color: var(--fosc); font-weight: 700; }
 
+  /* ---------- Selector de tipus (nome s per veure el model) ---------- */
+  .controls {
+    width: 210mm;
+    margin: 0 auto 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 10pt;
+    color: var(--fosc);
+    background: #fff;
+    border: 1px solid var(--molt-clar);
+    border-radius: 4px;
+    padding: 10px 14px;
+  }
+  .controls input { width: 16px; height: 16px; accent-color: #111827; cursor: pointer; }
+  .controls label { cursor: pointer; }
+  .controls .ajut { margin-left: auto; color: var(--gris); font-size: 9pt; }
+
+  /* Versio simplificada: sense CIF i amb el titol mes llarg */
+  body.simplificada .cifClient { display: none; }
+  body.simplificada .cap .etiqueta { font-size: 19pt; letter-spacing: 0.04em; }
+
   @media print {
+    .controls { display: none !important; }
     body { background: #fff; padding: 0; }
     .full { width: auto; min-height: auto; padding: 14mm 12mm; }
     @page { size: A4; margin: 0; }
@@ -319,13 +342,20 @@
 </style>
 </head>
 <body>
+
+<div class="controls">
+  <input type="checkbox" id="ambCif" checked>
+  <label for="ambCif">El client ha demanat factura (té CIF)</label>
+  <span class="ajut">Aixo nome s es per veure les dues versions. No surt en imprimir.</span>
+</div>
+
 <div class="full">
 
   <!-- ══════════ CAPÇALERA ══════════ -->
   <div class="cap">
     <img src="../public/custom_logos/brand/grup-higgins-logo.svg" alt="Higgins GRÀFIC">
     <div>
-      <div class="etiqueta">Factura</div>
+      <div class="etiqueta" id="titolFactura">Factura</div>
       <div class="numero">Núm. <strong>2026-0001</strong> &nbsp;·&nbsp; 14 de setembre de 2026</div>
     </div>
   </div>
@@ -350,7 +380,7 @@
         [Adreça de lliurament]<br>
         [Codi postal i població]<br>
         [País]<br>
-        <span class="pendent">CIF: [només si ha demanat factura]</span><br>
+        <span class="pendent cifClient">CIF: [només si ha demanat factura]</span><br>
         [Correu electrònic]
       </p>
     </div>
@@ -448,5 +478,22 @@
   </div>
 
 </div>
+
+<script>
+  // Nome s per al model: canvia el titol i amaga el CIF segons el cas.
+  // Al programa de debò aixo ho decidira el codi, segons si el client ha
+  // demanat factura amb CIF o no.
+  (function () {
+    var chk = document.getElementById('ambCif');
+    var titol = document.getElementById('titolFactura');
+    function aplica() {
+      var ambCif = chk.checked;
+      titol.textContent = ambCif ? 'Factura' : 'Factura simplificada';
+      document.body.classList.toggle('simplificada', !ambCif);
+    }
+    chk.addEventListener('change', aplica);
+    aplica();
+  })();
+</script>
 </body>
 </html>
