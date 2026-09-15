@@ -31,6 +31,7 @@ export default function AdminMegaMenu({ className = '' }) {
         title: 'Catàleg / Assets',
         items: [
           { label: 'Media', path: '/admin/media' },
+          { label: 'Factures', path: '/admin/factures' },
           { label: 'Mockups', path: '/admin/mockups' },
           { label: 'Upload', path: '/admin/upload' },
         ],

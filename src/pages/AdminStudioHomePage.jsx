@@ -247,6 +247,7 @@ export default function AdminStudioHomePage() {
       ],
       assets: [
         { label: 'Media', path: '/admin/media' },
+        { label: 'Factures', path: '/admin/factures' },
         { label: 'Mockups', path: '/admin/mockups' },
         { label: 'Upload', path: '/admin/upload' },
       ],
