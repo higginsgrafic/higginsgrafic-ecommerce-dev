@@ -159,6 +159,15 @@ export default function InvoiceEditor({ mode = 'live' }) {
           setDraft({ ...emptyDraft, ...data.draft, items: data.draft?.items?.length ? data.draft.items : [emptyLine()] });
         } else {
           const original = data.invoice;
+          // Una rectificativa no pot creuar el mur de les proves: ni una prova
+          // que rectifiqui una factura de debò, ni al revés. La base de dades
+          // ho atura (migració 20260916140000); això ho atura abans, perquè
+          // qui ho intenta ho entengui en comptes de veure un error de motor.
+          if ((original.is_test === true) !== esProva) {
+            setDraft({ ...emptyDraft, ...original });
+            setStatus('mode-equivocat');
+            return;
+          }
           setDraft({
             ...emptyDraft,
             invoice_type: original.invoice_type,
@@ -269,10 +278,14 @@ export default function InvoiceEditor({ mode = 'live' }) {
   if (status === 'loading') return <div className="p-8 text-sm text-gray-500">Carregant l’esborrany…</div>;
 
   if (status === 'mode-equivocat') {
+    // Pot ser un esborrany (que porta el seu id) o una factura que es volia
+    // rectificar (que encara no és cap esborrany). En els dos casos, el que té
+    // la marca de prova és el document que s'ha obert.
     const esDeProva = draft.is_test === true;
+    const idObert = draft.id || draft.rectifies_invoice_id || draftId;
     const desti = esDeProva
-      ? `/admin/factures/proves/esborrany/${draftId}`
-      : `/admin/factures/esborrany/${draftId}`;
+      ? `/admin/factures/proves/esborrany/${idObert}`
+      : `/admin/factures/esborrany/${idObert}`;
     return (
       <div className="mx-auto max-w-2xl p-8">
         <div className="border-2 border-amber-500 bg-amber-50 p-6">

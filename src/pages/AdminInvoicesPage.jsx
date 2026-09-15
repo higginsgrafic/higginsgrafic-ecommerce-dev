@@ -67,6 +67,9 @@ export default function AdminInvoicesPage({ mode = 'live' }) {
   const [cerca, setCerca] = useState('');
   const [cercaAplicada, setCercaAplicada] = useState('');
   const [missatge, setMissatge] = useState('');
+  const [generant, setGenerant] = useState(false);
+  // Pujar aquest número torna a fer la consulta, sense recarregar la pàgina.
+  const [refresc, setRefresc] = useState(0);
 
   // La consulta es fa aquí i es repeteix sola quan canvia qualsevol filtre: el
   // formulari només actualitza l'estat i aquest effect se n'encarrega.
@@ -100,7 +103,7 @@ export default function AdminInvoicesPage({ mode = 'live' }) {
       }
     })();
     return () => { viu = false; };
-  }, [anyFiltre, tipusFiltre, cercaAplicada, esProva]);
+  }, [anyFiltre, tipusFiltre, cercaAplicada, esProva, refresc]);
 
   // Els anys que apareixen a les factures, per al desplegable.
   const anys = useMemo(() => dades.totals.perAny.map((a) => a.year), [dades]);
@@ -125,6 +128,34 @@ export default function AdminInvoicesPage({ mode = 'live' }) {
     });
     const result = await response.json();
     setMissatge(response.ok ? 'Factura enviada.' : result.error || 'No s’ha pogut enviar la factura.');
+  };
+
+  /**
+   * Genera una comanda de prova sencera: comanda, factura PROVA- i correu.
+   * No passa per Stripe i no toca cap número de la sèrie fiscal.
+   */
+  const generarProva = async () => {
+    if (!window.confirm('Es crearà una comanda de prova, amb la seva factura PROVA- i el seu correu. No es cobra res i no s’envia res a Gelato. Continuar?')) return;
+    setGenerant(true);
+    setMissatge('Generant la prova…');
+    try {
+      const headers = await authHeaders({ 'Content-Type': 'application/json' });
+      const response = await fetch('/api/admin-test-order', {
+        method: 'POST', headers, body: JSON.stringify({ quantity: 1 }),
+      });
+      const result = await response.json();
+      if (!response.ok) {
+        setMissatge(result.error || 'No s’ha pogut generar la prova.');
+        return;
+      }
+      setMissatge(`Prova creada: ${result.invoice?.number}. ${result.correuEnviat ? 'El correu ha sortit cap a l’adreça de proves.' : `No s’ha enviat cap correu${result.correuMotiu ? ` (${result.correuMotiu})` : ''}.`}`);
+      // Es torna a fer la consulta perquè la prova nova surti a la llista.
+      setRefresc((n) => n + 1);
+    } catch {
+      setMissatge('No s’ha pogut generar la prova.');
+    } finally {
+      setGenerant(false);
+    }
   };
 
   const exportCsv = () => {
@@ -186,9 +217,19 @@ export default function AdminInvoicesPage({ mode = 'live' }) {
             </>
           )}
           {esProva && (
-            <Link to="/admin/factures/proves/nova" className="inline-flex items-center gap-2 bg-amber-600 px-4 py-2 text-xs uppercase tracking-wider text-white hover:bg-amber-700">
-              <FilePlus2 className="h-4 w-4" /> Nova prova
-            </Link>
+            <>
+              <button
+                type="button"
+                onClick={generarProva}
+                disabled={generant}
+                className="inline-flex items-center gap-2 border border-amber-600 bg-white px-4 py-2 text-xs uppercase tracking-wider text-amber-700 hover:bg-amber-50 disabled:opacity-50"
+              >
+                <FlaskConical className="h-4 w-4" /> {generant ? 'Generant…' : 'Generar una prova'}
+              </button>
+              <Link to="/admin/factures/proves/nova" className="inline-flex items-center gap-2 bg-amber-600 px-4 py-2 text-xs uppercase tracking-wider text-white hover:bg-amber-700">
+                <FilePlus2 className="h-4 w-4" /> Nova prova a mà
+              </Link>
+            </>
           )}
         </div>
       </div>

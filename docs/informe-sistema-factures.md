@@ -143,6 +143,7 @@ Totes a `supabase/migrations/`, i totes executades al projecte de Supabase:
 | `20260915260000_validacions_dels_imports.sql` | Validació d'imports... **no es va executar mai** (vegeu la nota) |
 | `20260916120000_la_validacio_dimports_endarrerida.sql` | La mateixa validació, en un sol bloc i amb la prova a dins |
 | `20260916130000_mode_de_proves.sql` | Mode de proves: `is_test`, comptador PROVA i el mur que impedeix promoure una prova |
+| `20260916140000_rectificatives_del_mateix_tipus.sql` | Una rectificativa no pot creuar el mur de les proves |
 
 **Convenció:** cada migració porta un comentari que explica *per què* cal, i acaba amb una consulta de comprovació. S'executen **a mà** al SQL Editor de Supabase (vegeu §9).
 
@@ -290,7 +291,13 @@ no està configurada no s'envia enlloc. Reenviar una factura de prova no pot
 enviar res a un client.
 
 **El que no es pot fer, mai:** promoure una prova a factura de debò. Si cal una
-factura de debò, s'emet una de nova.
+factura de debò, s'emet una de nova. Ni una rectificativa pot creuar el mur: una
+de prova no pot rectificar una factura de debò, ni al revés.
+
+**El botó «Generar una prova»** (`/admin/factures/proves`) fa el circuit sencer
+d'una tirada —comanda, factura `PROVA-` i correu— sense passar per Stripe ni
+enviar res a Gelato. Si la migració no està executada, respon amb un error i no
+crea res.
 
 ---
 
