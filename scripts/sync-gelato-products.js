@@ -92,18 +92,33 @@ function transformStoreProduct(storeProduct, index) {
     'human inside': 'the-human-inside',
     'cube': 'cube',
     'outcasted': 'outcasted',
-    'dj vader': 'first-contact'
+    // Les cites son d'Austen i Miscel·lania es una colleccio propia. Sense
+    // aquestes entrades, tots dos grups queien al valor per defecte i
+    // s'assignaven a First Contact (era el bug: 17 a first-contact, 0 a
+    // miscellania i 22 a austen, quan han de ser 7, 5 i 27).
+    'quotes': 'austen',
+    'miscel·lània': 'miscellania',
+    'miscellania': 'miscellania',
+    'miscel·lania': 'miscellania',
+    'miscellània': 'miscellania',
   };
 
   const productTitle = storeProduct.title || storeProduct.name || `Producte ${index + 1}`;
   const productTitleLower = productTitle.toLowerCase();
 
   let collection = 'first-contact';
+  let reconegut = false;
   for (const [key, value] of Object.entries(collectionMap)) {
     if (productTitleLower.includes(key)) {
       collection = value;
+      reconegut = true;
       break;
     }
+  }
+  if (!reconegut) {
+    // Avis visible: si mai arriba un producte amb un nom nou, volem saber-ho
+    // en comptes de veure'l apareixer sense avisar a First Contact.
+    console.warn(`  ⚠️  Colleccio no reconeguda a "${productTitle}" -> s'assigna a first-contact`);
   }
 
   const mockupUrl = storeProduct.mockupUrl || storeProduct.previewUrl || storeProduct.imageUrl;
