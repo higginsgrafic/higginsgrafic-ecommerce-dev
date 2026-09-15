@@ -324,9 +324,13 @@ export async function handler(event, context) {
     // També van a les metadades de Stripe, però el generador de factures
     // llegeix aquesta taula: amb això sap si el títol ha de dir "FACTURA" o
     // "FACTURA SIMPLIFICADA" i quin CIF hi ha de sortir.
+    const cifFactura = cleanText(invoice?.taxId, 40);
     const dadesFactura = {
       invoice_company: cleanText(invoice?.company, 150) || null,
-      invoice_tax_id: cleanText(invoice?.taxId, 40) || null,
+      invoice_tax_id: cifFactura || null,
+      // Tipus de document, explicit: amb CIF es factura normal; sense, la
+      // simplificada que toca a tota venda. Aixi el generador no ho ha de deduir.
+      invoice_type: cifFactura ? 'full' : 'simplified',
     };
 
     const dadesComanda = {
@@ -355,11 +359,12 @@ export async function handler(event, context) {
       .select()
       .single();
 
-    if (orderError && /invoice_company|invoice_tax_id/i.test(orderError.message || '')) {
+    if (orderError && /invoice_company|invoice_tax_id|invoice_type/i.test(orderError.message || '')) {
       console.warn('[create-payment-intent] Les columnes de factura encara no existeixen; es desa la comanda sense empresa ni CIF.');
       const senseFactura = { ...dadesComanda };
       delete senseFactura.invoice_company;
       delete senseFactura.invoice_tax_id;
+      delete senseFactura.invoice_type;
       ({ data: order, error: orderError } = await supabase
         .from('orders')
         .insert(senseFactura)
