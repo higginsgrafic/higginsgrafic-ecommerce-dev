@@ -146,6 +146,16 @@ export default function InvoiceEditor({ mode = 'live' }) {
         const data = await response.json();
         if (!active) return;
         if (id) {
+          // Cada pantalla té els seus esborranys. Si s'obre una prova des de la
+          // pantalla de debò (o al revés), s'atura aquí i s'hi porta: deixar-lo
+          // passar voldria dir ensenyar una prova amb l'aspecte d'una factura
+          // de debò, que és exactament el que es vol evitar.
+          const esEsborranyDeProva = data.draft?.is_test === true;
+          if (esEsborranyDeProva !== esProva) {
+            setDraft({ ...emptyDraft, ...data.draft, items: data.draft?.items?.length ? data.draft.items : [emptyLine()] });
+            setStatus('mode-equivocat');
+            return;
+          }
           setDraft({ ...emptyDraft, ...data.draft, items: data.draft?.items?.length ? data.draft.items : [emptyLine()] });
         } else {
           const original = data.invoice;
@@ -257,6 +267,33 @@ export default function InvoiceEditor({ mode = 'live' }) {
   };
 
   if (status === 'loading') return <div className="p-8 text-sm text-gray-500">Carregant l’esborrany…</div>;
+
+  if (status === 'mode-equivocat') {
+    const esDeProva = draft.is_test === true;
+    const desti = esDeProva
+      ? `/admin/factures/proves/esborrany/${draftId}`
+      : `/admin/factures/esborrany/${draftId}`;
+    return (
+      <div className="mx-auto max-w-2xl p-8">
+        <div className="border-2 border-amber-500 bg-amber-50 p-6">
+          <h1 className="font-oswald text-lg uppercase tracking-[0.06em] text-amber-900">
+            Aquest esborrany és {esDeProva ? 'una prova' : 'una factura de debò'}
+          </h1>
+          <p className="mt-2 text-sm text-amber-800">
+            {esDeProva
+              ? 'Les proves s’editen a la pantalla de proves, perquè no es puguin confondre amb una factura de debò.'
+              : 'Les factures de debò s’editen a la pantalla de factures. Aquí només s’hi fan proves.'}
+          </p>
+          <Link
+            to={desti}
+            className="mt-4 inline-flex items-center gap-2 bg-amber-600 px-4 py-2 text-xs uppercase tracking-wider text-white hover:bg-amber-700"
+          >
+            Obrir-ho a la pantalla que toca
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="mx-auto max-w-[1200px] p-6">
