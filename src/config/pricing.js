@@ -21,6 +21,10 @@ export const SELLING_PRICE = 15.5;
 // tambe el de l'enviament.
 export const IVA_RATE = 0.21;
 
+// Descompte del pla "Gelato Plus" sobre el preu de cataleg de Gelato. El cost
+// que guardem es el que realment paguem, es a dir amb aquest descompte aplicat.
+export const GELATO_PLUS_DISCOUNT = 0.2;
+
 /** Preu de venda ja format per mostrar: "15,50€" */
 export const SELLING_PRICE_LABEL = `${SELLING_PRICE.toFixed(2).replace('.', ',')}€`;
 
