@@ -172,11 +172,16 @@ function transformStoreVariants(storeProduct, mockupUrl) {
   const variants = (storeProduct.variants || []).map(v => {
     const variantTitle = v.title || '';
 
-    const colorMatch = variantTitle.match(/Color\s*-?\s*Talla\s+([^,]+)/i) || variantTitle.match(/Color\s+([^,]+)/i);
-    const sizeMatch = variantTitle.match(/Talla\s+(\w+)/i);
-
-    const color = colorMatch ? colorMatch[1].trim() : 'Default';
-    const size = sizeMatch ? sizeMatch[1].trim() : 'M';
+    // El titol de les variants de Gelato te aquesta forma:
+    //   "Navy - 2XL - DTG (Direct-to-garment)"
+    // es a dir: COLOR - TALLA - TECNICA.
+    //
+    // Abans es buscava "Color - Talla XL" i "Talla XL", que no hi encaixen mai:
+    // per aixo TOTES les variants quedaven amb color "Default" i talla "M"
+    // (3.990 variants, totes M). Ara es llegeix la posicio.
+    const parts = String(variantTitle).split(' - ').map((x) => x.trim()).filter(Boolean);
+    const size = parts.length >= 2 ? parts[parts.length - 2] : 'M';
+    const color = parts.length >= 3 ? parts.slice(0, -2).join(' - ') : (parts[0] || 'Default');
 
     return {
       gelato_variant_id: v.id?.toString() || v.variantId?.toString() || '',
