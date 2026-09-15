@@ -8,6 +8,7 @@ export function OrderConfirmedEmail({ order = {} }) {
   const clientName = order.first_name || 'Maria';
   const items = parseItems(order);
   const trackingLink = sanitizeTrackingLink(order.tracking_link);
+  const invoiceLink = sanitizeTrackingLink(order.invoice_link);
 
   return (
     <EmailLayout
@@ -16,7 +17,7 @@ export function OrderConfirmedEmail({ order = {} }) {
       clientName={clientName}
       messageContent={
         <span>
-          Aquí tens el resum de la teva comanda. Aviat rebràs el nombre de comanda per a poder seguir l'evolució més còmodament.
+          Aquí tens el resum de la teva comanda. Aviat rebràs el nombre de comanda per a poder seguir l&apos;evolució més còmodament.
         </span>
       }
       showCta={false}
@@ -41,6 +42,21 @@ export function OrderConfirmedEmail({ order = {} }) {
               }}
             >
               Segueix la teva comanda →
+            </Link>
+          </div>
+        )}
+        {invoiceLink && (
+          <div style={{ marginTop: '14px', textAlign: 'center' }}>
+            <Link
+              href={invoiceLink}
+              style={{
+                color: '#6B7280',
+                fontFamily: "'Roboto Condensed', 'Roboto', Helvetica, Arial, sans-serif",
+                fontSize: '10pt',
+                textDecoration: 'underline',
+              }}
+            >
+              Veure la factura
             </Link>
           </div>
         )}

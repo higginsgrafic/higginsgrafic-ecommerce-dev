@@ -259,10 +259,14 @@ export async function handler(event, context) {
           } else if (data) {
             console.log('[stripe-webhook] Order updated to confirmada:', data.order_number || data.id);
             const factura = await createInvoice(supabase, data);
+            const siteUrl = String(process.env.SITE_URL || '').replace(/\/+$/, '');
             const enrichedData = {
               ...data,
               tracking_link: paymentIntent.metadata?.tracking_link || null,
               invoice: factura || null,
+              // Enllac public de la factura. Nome s si hi ha testimoni d'acces:
+              // sense ell l'enllac no portaria enlloc.
+              invoice_link: factura?.access_token ? `${siteUrl}/factura/${factura.access_token}` : null,
             };
             await sendOrderEmail('order_confirmed', enrichedData);
             const result = await fulfillGelato(supabase, enrichedData);
