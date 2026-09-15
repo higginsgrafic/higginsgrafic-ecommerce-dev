@@ -30,6 +30,16 @@ a Gelato. Una compra de prova amb la targeta `4242` hauria cremat un número
 
 La migració va tota dins d'una transacció: o s'aplica tota, o no s'aplica res.
 
+### Base de dades — `supabase/migrations/20260916140000_rectificatives_del_mateix_tipus.sql`
+
+Tanca un forat que quedava obert: una **rectificativa** també pot creuar el mur.
+La restricció que hi havia només comprovava que portés motiu i factura original,
+no que les dues fossin del mateix tipus. O sigui que es podia fer una
+rectificativa de debò que assenyalés una factura de prova (un document fiscal
+que corregeix una prova, i que a sobre gasta un número `FR`) o al revés.
+
+Ara un disparador ho impedeix en tots dos sentits.
+
 ### Codi
 
 | Fitxer | Què hi ha |
@@ -40,6 +50,7 @@ La migració va tota dins d'una transacció: o s'aplica tota, o no s'aplica res.
 | `netlify/functions/admin-invoices.js` | `is_test = false` explícit als totals, i `?test=true` per veure només les proves |
 | `netlify/functions/admin-invoice-actions.js` | Reenviar una prova **no envia res a un client** |
 | `netlify/lib/email.js` | `adrecaDestinataria()`: un correu de prova només va a `TEST_EMAIL`; sense `TEST_EMAIL`, no s'envia |
+| `netlify/functions/admin-test-order.js` | Genera una prova sencera: comanda, factura i correu |
 | `src/components/admin/InvoiceEditor.jsx` | L'editor, amb dos modes |
 | `src/pages/AdminInvoiceTestEditorPage.jsx` | La pantalla de proves, dedicada |
 
@@ -60,6 +71,22 @@ La migració va tota dins d'una transacció: o s'aplica tota, o no s'aplica res.
 error de programació la pot saltar. Els murs de debò són a la base de dades
 (`invoice_drafts_coherencia`, `invoices_test_number_check`) i al servidor.
 
+### El botó «Generar una prova»
+
+A `/admin/factures/proves` hi ha un botó que fa el circuit sencer d'una tirada:
+agafa una peça real del catàleg, calcula els imports amb les mateixes regles que
+el checkout, crea la comanda marcada com a prova, emet la factura `PROVA-` i
+envia el correu a `TEST_EMAIL`. **No passa per Stripe i no envia res a Gelato.**
+
+Serveix per provar-ho tot sense targeta. Per provar el circuit **amb Stripe**, el
+camí és el de sempre: la comanda de prova es crea amb la targeta
+`4242 4242 4242 4242` i el webhook li dona un número `PROVA-` perquè la comanda
+neix amb `is_test = true`.
+
+**Detall important:** si la migració no està executada, el botó respon amb un
+error i **no crea res**. Sense la marca `is_test` a `orders`, la factura hauria
+gastat un número de la sèrie fiscal, i això no es pot permetre.
+
 ---
 
 ## Configuració que cal
@@ -78,7 +105,8 @@ enviar-los que enviar-los a un client de debò.
 ## Com es comprova
 
 1. **Automàtic:** `npx vitest run`. Els tests del mode de proves són
-   `tests/unit/test-mode-invoice.test.js` i `tests/unit/test-mode-walls.test.js`.
+   `tests/unit/test-mode-invoice.test.js`, `tests/unit/test-mode-walls.test.js` i
+   `tests/unit/test-mode-test-order.test.js`.
 2. **La sèrie fiscal, intacta:** després de fer proves,
    `SELECT * FROM public.invoice_series_counters;` ha de continuar **buit**.
 3. **El mur:** intentar emetre un esborrany de prova i comprovar que la factura
