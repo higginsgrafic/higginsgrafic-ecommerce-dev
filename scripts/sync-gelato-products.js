@@ -33,6 +33,18 @@ const GELATO_COST_FALLBACK = 5.91;
 // la fem servir, i a mes distorsiona la mitjana de costos.
 const SIZES_EXCLOSES = new Set(['3XL']);
 
+// COSTOS REALS DE LA GILDAN 64000 (amb el descompte Gelato+ ja aplicat).
+//
+// ATENCIO: la botiga de Gelato esta muntada amb la Gildan 5000, i l'API ens en
+// dona els preus d'ella (7,39 / 7,79). Pero el que venem es la 64000, i el que
+// Gelato ens cobra de debò son aquests imports, llegits del seu checkout.
+//
+// Quan es refacin les fitxes de Gelato amb la 64000, aquesta taula es pot
+// treure i deixar que el preu vingui de l'API.
+const COSTOS_REALS = {
+  S: 3.78, M: 3.78, L: 3.78, XL: 4.95, '2XL': 5.22,
+};
+
 console.log('🔧 Configuració:');
 console.log('  SUPABASE_URL:', SUPABASE_URL ? '✅' : '❌');
 console.log('  SUPABASE_ANON_KEY:', SUPABASE_ANON_KEY ? '✅' : '❌');
@@ -226,7 +238,9 @@ function transformStoreVariants(storeProduct, mockupUrl, costs) {
       price: SELLING_PRICE,
       // Cost real de Gelato per a aquesta variant (amb el descompte del pla).
       // Si no s'ha pogut llegir, es queda el de reserva.
-      gelato_cost: costs && costs.get(v.id) != null ? costs.get(v.id) : GELATO_COST_FALLBACK,
+      gelato_cost: COSTOS_REALS[size] != null
+        ? COSTOS_REALS[size]
+        : (costs && costs.get(v.id) != null ? costs.get(v.id) : GELATO_COST_FALLBACK),
       stock: 999,
       is_available: true,
       image_url: v.mockupUrl || mockupUrl
