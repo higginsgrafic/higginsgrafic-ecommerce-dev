@@ -107,6 +107,17 @@ export function buildGelatoOrderPayload(order) {
  * crida a Gelato falla (SÍ que s'ha de reintentar).
  */
 export async function createGelatoOrderServer(order) {
+  // Una comanda de prova NO s'envia mai a Gelato. Enviar-la crearia una comanda
+  // de producció REAL i costaria diners de debò: Gelato imprimeix i envia la
+  // peça. El webhook ja ho atura quan les claus de Stripe són de prova
+  // (`MODE_PROVES_STRIPE`), però això és una segona barrera: si algú crida
+  // aquesta funció per un altre camí, tampoc no hi passa.
+  if (order?.is_test === true) {
+    const err = new Error('Una comanda de prova no s\'envia a Gelato');
+    err.code = 'TEST_ORDER';
+    throw err;
+  }
+
   const apiKey = process.env.GELATO_API_KEY;
   if (!apiKey) {
     const err = new Error('GELATO_API_KEY no configurada');
