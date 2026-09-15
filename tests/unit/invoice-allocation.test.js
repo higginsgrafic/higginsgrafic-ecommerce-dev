@@ -1,5 +1,7 @@
 import { describe, it, expect } from 'vitest';
-import { reparteixTransport } from '@/pages/InvoicePage';
+// El repartiment viu amb el full de factura: la pàgina de debò i l'editor el
+// fan servir tots dos, i així no n'hi ha dues versions.
+import { reparteixTransport } from '@/components/invoice/InvoiceSheet';
 
 const suma = (a) => Math.round(a.reduce((x, y) => x + y, 0) * 100) / 100;
 

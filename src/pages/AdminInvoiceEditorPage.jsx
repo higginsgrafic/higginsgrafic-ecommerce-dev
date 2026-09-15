@@ -2,9 +2,8 @@ import { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { ArrowLeft, ChevronDown, Eye, Plus, Save, Send, Trash2, X } from 'lucide-react';
 import { authHeaders } from '@/api/authHeaders';
-import { ISSUER, issuerLine } from '@/config/issuer';
+import InvoiceSheet, { IVA_RATE, eur, liniesDelDocument, r2 } from '@/components/invoice/InvoiceSheet';
 
-const IVA_RATE = 0.21;
 const ISSUE_CONFIRMATION = 'VALIDA LA FACTURA';
 const COUNTRIES = [
   'Alemanya', 'Andorra', 'Austràlia', 'Àustria', 'Bèlgica', 'Brasil', 'Bulgària', 'Canadà',
@@ -14,10 +13,6 @@ const COUNTRIES = [
   'Països Baixos', 'Polònia', 'Portugal', 'Regne Unit', 'Rep. Txeca', 'Romania', 'Singapur',
   'Suècia', 'Suïssa', 'Xipre',
 ];
-const r2 = (value) => Math.round((Number(value) || 0) * 100) / 100;
-const eur = (value) => new Intl.NumberFormat('ca-ES', {
-  style: 'currency', currency: 'EUR', minimumFractionDigits: 2,
-}).format(r2(value));
 const inputClass = 'w-full border border-gray-200 bg-white px-3 py-2 text-sm focus:border-gray-900 focus:outline-none';
 const emptyLine = () => ({ name: '', description: '', quantity: 1, product_price: 0 });
 const addressLabels = { floor: 'Pis', door: 'Porta', staircase: 'Escala', block: 'Bloc', other: 'Altres' };
@@ -62,99 +57,33 @@ function Field({ label, children, className = '' }) {
   );
 }
 
-function InvoicePreview({ draft, totals, onClose }) {
+function InvoicePreview({ draft, onClose, isTest = false }) {
   const title = draft.document_kind === 'rectification'
     ? 'Factura rectificativa'
     : draft.invoice_type === 'full' ? 'Factura ordinària' : 'Factura simplificada';
   const series = draft.document_kind === 'rectification' ? 'FR' : draft.invoice_type === 'full' ? 'FO' : 'FS';
-  const date = new Intl.DateTimeFormat('ca-ES').format(new Date());
+  const linies = liniesDelDocument(draft);
 
   return (
     <div className="fixed inset-0 z-[40000] overflow-y-auto bg-black/60 p-4" role="dialog" aria-modal="true" aria-label="Previsualització de la factura">
-      <div className="mx-auto mb-4 flex max-w-[210mm] justify-end">
+      <div className="mx-auto mb-4 flex max-w-[210mm] items-center justify-between gap-3">
+        <div className="font-oswald text-xs uppercase tracking-[0.16em] text-white/80">
+          {title} · {linies.length} {linies.length === 1 ? 'línia' : 'línies'}
+        </div>
         <button type="button" onClick={onClose} className="inline-flex items-center gap-2 bg-white px-4 py-2 text-xs uppercase tracking-wider text-gray-700 shadow hover:text-black">
           <X className="h-4 w-4" /> Tancar
         </button>
       </div>
-      <article className="mx-auto min-h-[297mm] w-[210mm] max-w-full bg-white p-[14mm] text-gray-900 shadow-2xl">
-        <header className="flex items-start justify-between gap-6 border-b-2 border-gray-900 pb-4">
-          <img src="/custom_logos/brand/grup-higgins-logo.svg" alt={ISSUER.tradeName} className="h-10" />
-          <div className="text-right">
-            <div className="font-oswald text-[26px] uppercase leading-none tracking-[0.04em]">{title}</div>
-            <div className="mt-2 text-[11px] uppercase tracking-wider text-gray-400">Previsualització · {series}-AAAA-000000</div>
-          </div>
-        </header>
 
-        <div className="my-6 grid grid-cols-4 gap-3 text-[12px]">
-          {[['Número', 'Sense emetre'], ['Data', date], ['Referència', draft.order_number || '—'], ['Forma de pagament', '—']].map(([label, value]) => (
-            <div key={label} className="border border-gray-200 bg-gray-50 px-3 py-2">
-              <div className="font-oswald text-[9px] uppercase tracking-[0.16em] text-gray-400">{label}</div>
-              <div className="mt-1">{value}</div>
-            </div>
-          ))}
-        </div>
-
-        {draft.document_kind === 'rectification' && (
-          <div className="mb-6 border border-gray-900 px-4 py-3 text-[12px]">
-            <div className="font-oswald text-[9px] uppercase tracking-[0.16em] text-gray-400">Motiu de la rectificació</div>
-            <div className="mt-1">{draft.correction_reason || 'Pendent d’indicar'}</div>
-          </div>
-        )}
-
-        <div className="mb-8 grid grid-cols-2 gap-10 text-[12px] leading-relaxed">
-          <div>
-            <div className="font-oswald text-[9px] uppercase tracking-[0.18em] text-gray-400">Emissor</div>
-            <div className="mt-2 font-oswald text-[15px] uppercase">{ISSUER.name}</div>
-            <div>{ISSUER.tradeName}</div><div>{ISSUER.address}</div>
-            <div>{ISSUER.postalCode} {ISSUER.city}, {ISSUER.province}</div>
-            <div>NIF: {ISSUER.taxId}</div><div>{ISSUER.email}</div>
-          </div>
-          <div>
-            <div className="font-oswald text-[9px] uppercase tracking-[0.18em] text-gray-400">Client</div>
-            <div className="mt-2 font-oswald text-[15px] uppercase">{draft.customer_name || 'Sense nom'}</div>
-            {draft.customer_company && <div>{draft.customer_company}</div>}
-            {draft.customer_address && <div>{draft.customer_address}</div>}
-            {draft.customer_address2 && <div>{draft.customer_address2}</div>}
-            <div>{[draft.customer_postal_code, draft.customer_city].filter(Boolean).join(' ') || '—'}</div>
-            <div>{draft.customer_country || '—'}</div>
-            {draft.customer_tax_id && <div>NIF: {draft.customer_tax_id}</div>}
-            {draft.customer_email && <div>{draft.customer_email}</div>}
-          </div>
-        </div>
-
-        <table className="w-full border-collapse text-[12px]">
-          <thead><tr className="border-b border-gray-900">
-            <th className="py-2 text-left font-oswald text-[9px] font-normal uppercase tracking-[0.16em] text-gray-400">Concepte</th>
-            <th className="w-20 py-2 text-center font-oswald text-[9px] font-normal uppercase tracking-[0.16em] text-gray-400">Quantitat</th>
-            <th className="w-28 py-2 text-right font-oswald text-[9px] font-normal uppercase tracking-[0.16em] text-gray-400">Preu unitari</th>
-            <th className="w-28 py-2 text-right font-oswald text-[9px] font-normal uppercase tracking-[0.16em] text-gray-400">Import</th>
-          </tr></thead>
-          <tbody>
-            {draft.items.filter((item) => item.name).map((item, index) => (
-              <tr key={`${item.name}-${index}`} className="border-b border-gray-100 align-top">
-                <td className="py-3 pr-3"><div>{item.name}</div>{item.description && <div className="mt-1 text-[11px] text-gray-400">{item.description}</div>}</td>
-                <td className="py-3 text-center">{item.quantity}</td>
-                <td className="py-3 text-right tabular-nums">{eur(item.product_price)}</td>
-                <td className="py-3 text-right tabular-nums">{eur(r2(item.product_price * item.quantity))}</td>
-              </tr>
-            ))}
-            {!draft.items.some((item) => item.name) && <tr><td colSpan="4" className="py-8 text-center text-gray-400">Encara no hi ha cap concepte.</td></tr>}
-          </tbody>
-        </table>
-
-        <div className="ml-auto mt-8 w-72 space-y-2 text-[12px] tabular-nums">
-          <div className="flex justify-between"><span className="text-gray-500">Productes</span><span>{eur(totals.products)}</span></div>
-          <div className="flex justify-between"><span className="text-gray-500">Transport</span><span>{eur(totals.shipping)}</span></div>
-          <div className="flex justify-between"><span className="text-gray-500">Base imposable</span><span>{eur(totals.base)}</span></div>
-          <div className="flex justify-between"><span className="text-gray-500">IVA 21%</span><span>{eur(totals.iva)}</span></div>
-          <div className="flex justify-between border-t-2 border-gray-900 pt-3 font-oswald text-[17px]"><span>Total</span><span>{eur(totals.total)}</span></div>
-        </div>
-
-        <footer className="mt-16 border-t border-gray-200 pt-4 text-center text-[10px] text-gray-400">
-          <div>{issuerLine()}</div>
-          <div className="mt-1">Previsualització d’un esborrany sense validesa fiscal.</div>
-        </footer>
-      </article>
+      <div className="shadow-2xl">
+        <InvoiceSheet
+          doc={{ ...draft, issued_at: new Date() }}
+          numero={`Sense emetre · sèrie ${series}`}
+          blocClient="nom"
+          linies={linies}
+          isTest={isTest}
+        />
+      </div>
     </div>
   );
 }
@@ -430,7 +359,7 @@ export default function AdminInvoiceEditorPage() {
         </aside>
       </div>
 
-      {previewOpen && <InvoicePreview draft={draft} totals={totals} onClose={() => setPreviewOpen(false)} />}
+      {previewOpen && <InvoicePreview draft={draft} onClose={() => setPreviewOpen(false)} />}
     </div>
   );
 }
