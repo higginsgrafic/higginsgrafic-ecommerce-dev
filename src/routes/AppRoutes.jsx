@@ -17,6 +17,7 @@ import {
   OrderConfirmationPage,
   CheckoutPage,
   OrderTrackingPage,
+  InvoicePage,
   AboutPage,
   ContactPage,
   FAQPage,
@@ -165,6 +166,8 @@ export default function AppRoutes({ location, pageProps, pautaEnabled, tableEnab
         <Route path="/layout-builder" element={<ProtectedRoute><Navigate to="/proves/layout-builder" replace /></ProtectedRoute>} />
         <Route path="/status" element={<Navigate to="/track" replace />} />
         <Route path="/track" element={<OrderTrackingPage />} />
+        {/* Factura: s'obre amb el testimoni d'acces que el client rep per correu. */}
+        <Route path="/factura/:token" element={<InvoicePage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/perfil" element={<ClientProtectedRoute><ProfilePage /></ClientProtectedRoute>} />
