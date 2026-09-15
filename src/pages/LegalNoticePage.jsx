@@ -15,7 +15,7 @@ function LegalNoticePage() {
       bullet: '1. Titular del Lloc Web',
       contact: [
         'Higgins GRÀFIC',
-        'NIF: (a determinar)',
+        'NIF: 52161740V',
         'Carrer Convent, 11, Cardedeu 08440, Barcelona',
         'higginsgrafic@gmail.com',
         'higginsgrafic.com',

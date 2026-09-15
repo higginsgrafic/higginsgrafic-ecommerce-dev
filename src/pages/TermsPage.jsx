@@ -15,7 +15,7 @@ function TermsPage() {
       bullet: '1. Identificació de l\'Empresa',
       contact: [
         'Higgins GRÀFIC',
-        '52161740 V',
+        'NIF: 52161740V',
         'Carrer Convent, 11, Cardedeu 08440, Barcelona',
         'higginsgrafic@gmail.com (provisional)',
         'higginsgrafic.com',
