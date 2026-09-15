@@ -63,6 +63,7 @@ import {
   PromotionsManagerPage,
   ECConfigPage,
   AdminMediaPage,
+  AdminInvoicesPage,
   ColleccioSettingsPage,
   MockupsManagerPage,
   AdminUploadPage,
@@ -190,6 +191,7 @@ export default function AppRoutes({ location, pageProps, pautaEnabled, tableEnab
           <Route path="promotions" element={<PromotionsManagerPage />} />
           <Route path="ec-config" element={<ECConfigPage />} />
           <Route path="media" element={<AdminMediaPage />} />
+          <Route path="factures" element={<AdminInvoicesPage />} />
           <Route path="collections" element={<ColleccioSettingsPage {...pageProps} />} />
           <Route path="mockups" element={<MockupsManagerPage />} />
           <Route path="upload" element={<AdminUploadPage />} />
