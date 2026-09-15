@@ -320,25 +320,52 @@ export async function handler(event, context) {
     const trackingTokenExpiresAt = getTokenExpiry(parseInt(process.env.TRACKING_TOKEN_EXPIRY_DAYS || '90', 10));
     const trackingLink = buildTrackingLink(process.env.SITE_URL, rawTrackingToken);
 
-    const { data: order, error: orderError } = await supabase
+    // Dades de facturació (empresa i CIF), si el client ha demanat factura.
+    // També van a les metadades de Stripe, però el generador de factures
+    // llegeix aquesta taula: amb això sap si el títol ha de dir "FACTURA" o
+    // "FACTURA SIMPLIFICADA" i quin CIF hi ha de sortir.
+    const dadesFactura = {
+      invoice_company: cleanText(invoice?.company, 150) || null,
+      invoice_tax_id: cleanText(invoice?.taxId, 40) || null,
+    };
+
+    const dadesComanda = {
+      email: email || null,
+      user_id: userId || null,
+      status: 'pendent',
+      items: JSON.stringify(calc.validatedItems),
+      subtotal: calc.subtotal,
+      shipping_cost: calc.shippingCost,
+      iva: calc.iva,
+      total: calc.total / 100,
+      shipping_zone: shippingZone,
+      idempotency_key: idempotencyKey,
+      tracking_token_hash: trackingTokenHash,
+      tracking_token_expires_at: trackingTokenExpiresAt,
+      ...dadesFactura,
+      ...parseShipping(shipping),
+    };
+
+    // Si la migració de les columnes de factura encara no s'ha executat, la
+    // inserció fallaria i el client no podria pagar. En aquest cas es repeteix
+    // sense aquestes dues dades: es perd el CIF, però la venda no es trenca.
+    let { data: order, error: orderError } = await supabase
       .from('orders')
-      .insert({
-        email: email || null,
-        user_id: userId || null,
-        status: 'pendent',
-        items: JSON.stringify(calc.validatedItems),
-        subtotal: calc.subtotal,
-        shipping_cost: calc.shippingCost,
-        iva: calc.iva,
-        total: calc.total / 100,
-        shipping_zone: shippingZone,
-        idempotency_key: idempotencyKey,
-        tracking_token_hash: trackingTokenHash,
-        tracking_token_expires_at: trackingTokenExpiresAt,
-        ...parseShipping(shipping),
-      })
+      .insert(dadesComanda)
       .select()
       .single();
+
+    if (orderError && /invoice_company|invoice_tax_id/i.test(orderError.message || '')) {
+      console.warn('[create-payment-intent] Les columnes de factura encara no existeixen; es desa la comanda sense empresa ni CIF.');
+      const senseFactura = { ...dadesComanda };
+      delete senseFactura.invoice_company;
+      delete senseFactura.invoice_tax_id;
+      ({ data: order, error: orderError } = await supabase
+        .from('orders')
+        .insert(senseFactura)
+        .select()
+        .single());
+    }
 
     if (orderError) {
       console.error('[create-payment-intent] Order creation error:', orderError.message);
@@ -357,8 +384,8 @@ export async function handler(event, context) {
         tracking_link: trackingLink,
         // Dades de facturació B2B: el checkout les demanava (empresa i CIF) i
         // s'acabaven llençant, així que el comerciant no podia emetre factura.
-        // `orders` no té columnes per a això, de manera que les desem a les
-        // metadades del PaymentIntent i es veuen al panell de Stripe.
+        // Ara també es desen a la comanda (`invoice_company` i `invoice_tax_id`);
+        // aquí es dupliquen perquè es vegin al panell de Stripe.
         ...(cleanText(invoice?.company, 150) ? { invoice_company: cleanText(invoice.company, 150) } : {}),
         ...(cleanText(invoice?.taxId, 40) ? { invoice_tax_id: cleanText(invoice.taxId, 40) } : {}),
         ...metadata,
