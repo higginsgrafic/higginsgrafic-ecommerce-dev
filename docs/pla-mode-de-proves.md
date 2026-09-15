@@ -65,7 +65,7 @@ migració donada: una migració donada no es reescriu mai.
 | `netlify/lib/gelato.js` | **Refusa enviar una comanda de prova a Gelato.** Segona barrera: el webhook ja ho atura amb les claus de prova, però així tampoc no hi passa cap altre camí |
 | `netlify/functions/stripe-webhook.js` | `createInvoice()` no crida mai `next_invoice_number()` si la comanda és una prova |
 | `netlify/functions/create-payment-intent.js` | Marca la comanda, i **només un administrador** pot demanar una comanda de prova |
-| `netlify/functions/admin-invoice-drafts.js` | Separació de proves i documents de debò; la marca no es pot canviar editant |
+| `netlify/functions/admin-invoice-drafts.js` | Separació de proves i documents de debò: un esborrany només s'edita, s'emet i s'esborra des de la seva pantalla (si no, respon 409 i ho explica); la marca no es pot canviar editant |
 | `netlify/functions/admin-invoices.js` | `is_test = false` explícit als totals, i `?test=true` per veure només les proves |
 | `netlify/functions/admin-invoice-actions.js` | Reenviar una prova **no envia res a un client** |
 | `netlify/lib/email.js` | `adrecaDestinataria()`: un correu de prova només va a `TEST_EMAIL`; sense `TEST_EMAIL`, no s'envia |
@@ -124,8 +124,9 @@ enviar-los que enviar-los a un client de debò.
 ## Com es comprova
 
 1. **Automàtic:** `npx vitest run`. Els tests del mode de proves són
-   `tests/unit/test-mode-invoice.test.js`, `tests/unit/test-mode-walls.test.js` i
-   `tests/unit/test-mode-test-order.test.js`.
+   `tests/unit/test-mode-invoice.test.js`, `tests/unit/test-mode-walls.test.js`,
+   `tests/unit/test-mode-test-order.test.js` i
+   `tests/unit/test-mode-drafts-separation.test.js`.
 2. **La sèrie fiscal, intacta:** després de fer proves,
    `SELECT * FROM public.invoice_series_counters;` ha de continuar **buit**.
 3. **El mur:** intentar emetre un esborrany de prova i comprovar que la factura

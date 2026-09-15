@@ -219,7 +219,9 @@ export default function InvoiceEditor({ mode = 'live' }) {
       const headers = await authHeaders({ 'Content-Type': 'application/json' });
       const base = esProva ? '/admin/factures/proves' : '/admin/factures';
       const response = await fetch(
-        draftId ? `/api/admin-invoice-drafts?id=${encodeURIComponent(draftId)}` : '/api/admin-invoice-drafts',
+        draftId
+          ? `/api/admin-invoice-drafts?id=${encodeURIComponent(draftId)}${esProva ? '&mode=test' : ''}`
+          : '/api/admin-invoice-drafts',
         // En crear, la marca de prova surt d'aquí i no es pot canviar després.
         { method: draftId ? 'PATCH' : 'POST', headers, body: JSON.stringify({ ...draft, is_test: esProva }) }
       );
@@ -255,7 +257,7 @@ export default function InvoiceEditor({ mode = 'live' }) {
     setStatus('issuing');
     try {
       const headers = await authHeaders({ 'Content-Type': 'application/json' });
-      const response = await fetch('/api/admin-invoice-drafts', {
+      const response = await fetch(`/api/admin-invoice-drafts${esProva ? '?mode=test' : ''}`, {
         method: 'POST', headers, body: JSON.stringify({ action: 'issue', id: savedId }),
       });
       const data = await response.json();
@@ -270,7 +272,7 @@ export default function InvoiceEditor({ mode = 'live' }) {
   const discard = async () => {
     if (!draftId || !window.confirm('Vols eliminar aquest esborrany?')) return;
     const headers = await authHeaders();
-    const response = await fetch(`/api/admin-invoice-drafts?id=${encodeURIComponent(draftId)}`, { method: 'DELETE', headers });
+    const response = await fetch(`/api/admin-invoice-drafts?id=${encodeURIComponent(draftId)}${esProva ? '&mode=test' : ''}`, { method: 'DELETE', headers });
     if (response.ok) navigate(esProva ? '/admin/factures/proves' : '/admin/factures');
     else setMessage('No s’ha pogut eliminar l’esborrany.');
   };

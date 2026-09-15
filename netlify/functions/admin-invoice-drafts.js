@@ -100,8 +100,39 @@ export async function handler(event) {
   const body = parseBody(event);
   if (!body) return jsonResponse(event, 400, { error: 'Cos de la petició no vàlid' });
 
+  /**
+   * Comprova que un esborrany sigui del tipus que la pantalla espera.
+   *
+   * Les pantalles ja estan separades, i la base de dades impedeix emetre una
+   * factura de debò des d'un esborrany de prova (`invoice_drafts_coherencia`).
+   * Però si l'endpoint de debò rep un esborrany de prova, l'error que surt és el
+   * del motor, que no explica res. Aquí es digue qui és i on ha d'anar.
+   *
+   * Retorna una resposta si hi ha error, o null si tot està bé.
+   */
+  const comprovaMode = async (draftId) => {
+    const { data, error } = await supabase
+      .from('invoice_drafts')
+      .select('id, is_test, status')
+      .eq('id', draftId)
+      .maybeSingle();
+    if (error) return jsonResponse(event, 500, { error: 'No s’ha pogut comprovar l’esborrany' });
+    if (!data) return jsonResponse(event, 404, { error: 'Esborrany no trobat' });
+    const esDeProva = data.is_test === true;
+    if (esDeProva !== modeProves) {
+      return jsonResponse(event, 409, {
+        error: esDeProva
+          ? 'Aquest esborrany és una prova: s’ha d’emetre des de la pantalla de proves.'
+          : 'Aquest esborrany és una factura de debò: s’ha d’emetre des de la pantalla de factures.',
+      });
+    }
+    return null;
+  };
+
   if (event.httpMethod === 'POST' && body.action === 'issue') {
     if (!UUID_RE.test(String(body.id || ''))) return jsonResponse(event, 400, { error: 'Esborrany no vàlid' });
+    const errorMode = await comprovaMode(body.id);
+    if (errorMode) return errorMode;
     const { data, error } = await supabase.rpc('issue_invoice_draft', { p_draft_id: body.id });
     if (error) return jsonResponse(event, 400, { error: error.message || 'No s’ha pogut emetre la factura' });
     return jsonResponse(event, 200, { invoice: data });
@@ -120,6 +151,10 @@ export async function handler(event) {
 
   if (event.httpMethod === 'PATCH') {
     if (!UUID_RE.test(String(id || ''))) return jsonResponse(event, 400, { error: 'Esborrany no vàlid' });
+    // Un esborrany només s'edita des de la seva pantalla. Si no, es podria
+    // canviar una prova des de la pantalla de debò i no veure-ho mai.
+    const errorMode = await comprovaMode(id);
+    if (errorMode) return errorMode;
     try {
       const payload = normalizeDraft(body);
       // Un esborrany de prova no es pot convertir en un de debò editant-lo, ni
@@ -135,6 +170,8 @@ export async function handler(event) {
 
   if (event.httpMethod === 'DELETE') {
     if (!UUID_RE.test(String(id || ''))) return jsonResponse(event, 400, { error: 'Esborrany no vàlid' });
+    const errorMode = await comprovaMode(id);
+    if (errorMode) return errorMode;
     const { data, error } = await supabase.from('invoice_drafts').delete().eq('id', id).eq('status', 'draft').select('id').maybeSingle();
     if (error || !data) return jsonResponse(event, 404, { error: 'Esborrany no trobat o ja emès' });
     return jsonResponse(event, 200, { deleted: true });
