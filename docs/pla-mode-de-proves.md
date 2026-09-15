@@ -62,6 +62,7 @@ migració donada: una migració donada no es reescriu mai.
 
 | Fitxer | Què hi ha |
 |---|---|
+| `netlify/lib/gelato.js` | **Refusa enviar una comanda de prova a Gelato.** Segona barrera: el webhook ja ho atura amb les claus de prova, però així tampoc no hi passa cap altre camí |
 | `netlify/functions/stripe-webhook.js` | `createInvoice()` no crida mai `next_invoice_number()` si la comanda és una prova |
 | `netlify/functions/create-payment-intent.js` | Marca la comanda, i **només un administrador** pot demanar una comanda de prova |
 | `netlify/functions/admin-invoice-drafts.js` | Separació de proves i documents de debò; la marca no es pot canviar editant |

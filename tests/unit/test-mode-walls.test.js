@@ -151,3 +151,23 @@ describe('El mur de les proves i els documents antics', () => {
     expect(correcció).toMatch(/COALESCE\(NEW\.is_test, false\)/);
   });
 });
+
+describe('Gelato i les comandes de prova', () => {
+  /**
+   * Enviar una comanda de prova a Gelato crearia una comanda de producció REAL
+   * i costaria diners de debò. El webhook ja ho atura quan les claus de Stripe
+   * són de prova; això és la segona barrera, per si algú crida la funció per un
+   * altre camí.
+   */
+  it('la funció que envia a Gelato refusa una comanda de prova', async () => {
+    const { createGelatoOrderServer } = await import('../../netlify/lib/gelato.js');
+    await expect(createGelatoOrderServer({ id: 'ord-1', is_test: true })).rejects.toThrow(/prova/i);
+  });
+
+  it('i no refusa una comanda de debò pel fet de no ser prova', async () => {
+    const { createGelatoOrderServer } = await import('../../netlify/lib/gelato.js');
+    // Sense GELATO_API_KEY ha de petar per la clau, no pel filtre de proves:
+    // vol dir que la comanda de debò ha passat el guard.
+    await expect(createGelatoOrderServer({ id: 'ord-2' })).rejects.toThrow(/GELATO_API_KEY/);
+  });
+});
