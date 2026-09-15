@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+<meta charset="UTF-8">
+<title>Factura simplificada — Higgins GRÀFIC</title>
+<style>
+  /* ==========================================================================
+     Aquesta pagina nome s serveix per VEURE la factura en versio simplificada
+     (sense CIF). El model de debò es l'altre fitxer: model-factura.html.
+     Aqui nome s hi ha un marc que el carrega amb la versio simplificada posada.
+     ========================================================================== */
+  html, body { margin: 0; height: 100%; background: #EDEFF2; }
+  body { display: flex; flex-direction: column; font-family: 'Roboto Condensed', sans-serif; }
+  .avis {
+    padding: 9px 16px;
+    background: #111827;
+    color: #fff;
+    font-size: 10pt;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .avis strong { font-family: 'Oswald', sans-serif; font-weight: 400; letter-spacing: 0.12em; text-transform: uppercase; }
+  .avis a { color: #fff; margin-left: auto; font-size: 9pt; opacity: 0.75; }
+  iframe { flex: 1; width: 100%; border: 0; background: #EDEFF2; }
+  @media print { .avis { display: none; } iframe { height: auto; } }
+</style>
+</head>
+<body>
+  <div class="avis">
+    <strong>Factura simplificada</strong>
+    <span>Versió per a particulars, sense CIF. És el mateix model amb el títol canviat.</span>
+    <a href="model-factura.html">Veure la versió completa →</a>
+  </div>
+  <iframe src="model-factura.html#simplificada" title="Factura simplificada"></iframe>
+</body>
+</html>

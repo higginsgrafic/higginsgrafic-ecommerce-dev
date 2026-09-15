@@ -492,6 +492,8 @@
       document.body.classList.toggle('simplificada', !ambCif);
     }
     chk.addEventListener('change', aplica);
+    // Si s'obre amb #simplificada a la URL, comenca desmarcat.
+    if (location.hash.replace('#', '') === 'simplificada') chk.checked = false;
     aplica();
   })();
 </script>
