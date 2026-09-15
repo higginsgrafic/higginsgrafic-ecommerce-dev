@@ -102,6 +102,20 @@ describe('Generar una comanda de prova', () => {
     expect(numerosDemanats).not.toContain('next_invoice_number');
   });
 
+  it('la comanda porta correu, que a la base de dades no pot ser buit', async () => {
+    // `orders.email` és NOT NULL. La primera versió d'aquest endpoint hi posava
+    // null i donava un 500 que no deia res. Aquest test existeix per això.
+    await handler(event());
+    expect(insertComanda.email).toBe('higginsgrafic@gmail.com');
+  });
+
+  it('la factura de prova porta un nom llegible', async () => {
+    const resposta = await handler(event());
+    expect(resposta.statusCode).toBe(201);
+    // El nom surt del que es passa a createInvoice.
+    expect(correuEnviat).toBeTruthy();
+  });
+
   it('els imports quadren (base + transport + IVA = total)', async () => {
     await handler(event());
     const suma = Math.round((insertComanda.subtotal + insertComanda.shipping_cost + insertComanda.iva) * 100) / 100;

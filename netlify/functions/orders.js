@@ -135,6 +135,31 @@ export async function handler(event, context) {
       // Admin: can query by email or orderNumber
       const { authorized: isAdmin } = await verifyAdmin(event);
       if (isAdmin) {
+        // Llistat per a l'administració. Serveix per veure les comandes de
+        // prova: sense això, una prova que no fos a la safata del correu era
+        // invisible, perquè no hi havia cap pantalla de comandes.
+        //   ?list=1          les darreres comandes (de prova i de debò)
+        //   ?list=1&test=1   només les de prova
+        //   ?list=1&test=0   només les de debò
+        if (params.list === '1') {
+          let consulta = supabase
+            .from('orders')
+            .select('id, order_number, status, total, email, is_test, created_at, payment_intent_id, gelato_order_id')
+            .order('created_at', { ascending: false })
+            .limit(50);
+          if (params.test === '1') consulta = consulta.eq('is_test', true);
+          else if (params.test === '0') consulta = consulta.or('is_test.eq.false,is_test.is.null');
+
+          const { data, error } = await consulta;
+          if (error) {
+            console.error('[orders] Admin list error:', error);
+            return jsonResponse(event, 500, { error: 'Error consultant les comandes' });
+          }
+          return jsonResponse(event, 200, {
+            orders: (data || []).map((o) => ({ ...o, statusLabel: STATUS_LABELS[o.status] || o.status })),
+          });
+        }
+
         if (orderNumber) {
           const { data, error } = await supabase
             .from('orders')
@@ -176,7 +201,7 @@ export async function handler(event, context) {
           return jsonResponse(event, 200, { orders: formatted });
         }
 
-        return jsonResponse(event, 400, { error: 'Cal proporcionar email, orderNumber o trackingToken' });
+        return jsonResponse(event, 400, { error: 'Cal proporcionar email, orderNumber, trackingToken o list=1' });
       }
 
       return jsonResponse(event, 401, { error: 'Cal autenticació o token de seguiment' });

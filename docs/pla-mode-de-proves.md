@@ -86,6 +86,8 @@ migració donada: una migració donada no es reescriu mai.
 | `netlify/functions/admin-invoice-actions.js` | Reenviar una prova **no envia res a un client** |
 | `netlify/lib/email.js` | `adrecaDestinataria()`: un correu de prova només va a `TEST_EMAIL`; sense `TEST_EMAIL`, no s'envia |
 | `netlify/functions/admin-test-order.js` | Genera una prova sencera: comanda, factura i correu |
+| `netlify/functions/orders.js` | `?list=1` perquè l'administració pugui veure les comandes (de prova o totes) |
+| `src/pages/AdminTestToolsPage.jsx` | La pàgina d'eines de prova |
 | `src/components/admin/InvoiceEditor.jsx` | L'editor, amb dos modes |
 | `src/pages/AdminInvoiceTestEditorPage.jsx` | La pantalla de proves, dedicada |
 
@@ -105,6 +107,38 @@ migració donada: una migració donada no es reescriu mai.
 **Els murs no són només visuals.** Una pantalla diferent no n'hi hauria prou: un
 error de programació la pot saltar. Els murs de debò són a la base de dades
 (`invoice_drafts_coherencia`, `invoices_test_number_check`) i al servidor.
+
+### Com es prova, amb què
+
+**La pàgina d'eines: `/admin/factures/proves/eines`.** Des d'allà es pot:
+
+* **engegar i aturar el mode de proves** per a les compres amb targeta
+* veure les **dades de la targeta de prova** de Stripe (4242 4242 4242 4242)
+* **generar una prova** sense targeta, amb un sol clic
+* **veure què ha passat**: les darreres comandes i factures de prova, amb
+  l'enllaç a la factura i si s'ha enviat res a Gelato
+
+Sense aquesta pàgina, provar era endevinar: les comandes de prova no surten
+enlloc (a posta, perquè no compten) i no hi havia manera de veure'n el resultat.
+
+> **Important, i és el motiu pel qual durant setmanes les eines no funcionaven
+> en local:** `npm run dev` arrenca **només Vite**, i Vite no serveix les
+> funcions de servidor. Totes les eines d'administració responen 404. Per provar
+> de debò cal servir-ho tot:
+>
+> ```bash
+> npm run proves      # netlify dev: la web I les funcions, al port 8888
+> ```
+>
+> A producció això no passa: Netlify serveix les funcions sempre.
+
+**El camí de la targeta de prova**, pas a pas:
+
+1. `npm run proves` i obrir `http://localhost:8888`
+2. Entrar com a administrador
+3. Anar a `/admin/factures/proves/eines` i engegar el mode de proves
+4. Comprar com un client normal, pagant amb la targeta de prova
+5. Tornar a la pàgina d'eines: la comanda i la factura `PROVA-` hi són
 
 ### El botó «Generar una prova»
 

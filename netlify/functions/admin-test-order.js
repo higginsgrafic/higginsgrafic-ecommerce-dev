@@ -37,6 +37,15 @@ const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
 const IVA_RATE = 0.21;
 const r2 = (n) => Math.round((Number(n) || 0) * 100) / 100;
 
+/**
+ * L'adreça de proves, la mateixa que fa servir `netlify/lib/email.js` per
+ * desviar-hi tots els avisos. Serveix per omplir el camp `email` de la
+ * comanda, que a la base de dades no pot ser buit.
+ */
+function adrecaProves() {
+  return String(process.env.TEST_EMAIL || '').replace(/^["']|["']$/g, '').trim();
+}
+
 async function triaUnaVariants(supabase) {
   // Es prefereix una variant disponible i amb preu: una peça que es podria
   // vendre de debò.
@@ -121,7 +130,18 @@ export async function handler(event) {
     const { data: order, error: orderError } = await supabase
       .from('orders')
       .insert({
-        email: null,
+        // `orders.email` és NOT NULL a la base de dades. S'hi posa l'adreça de
+        // proves: és la mateixa a la qual aniran tots els avisos, i així la
+        // comanda no queda amb un camp buit que trencaria la inserció.
+        // (Això va fer fallar la primera versió d'aquest endpoint amb un
+        // 500 «No s'ha pogut crear la comanda de prova» que no deia res.)
+        email: adrecaProves() || 'prova@higginsgrafic.local',
+        first_name: 'Comanda',
+        last_name: 'de prova',
+        address: 'Adreça de proves',
+        city: 'Cardedeu',
+        postal_code: '08440',
+        country: 'Espanya',
         status: 'confirmada',
         items: JSON.stringify(items),
         subtotal: baseProducts,
@@ -145,6 +165,10 @@ export async function handler(event) {
           : 'No s\'ha pogut crear la comanda de prova',
       });
     }
+
+    // El nom del client surt al capdamunt de la factura. Si no s'hi posa, la
+    // factura de prova sortiria sense nom i no es podria llegir.
+    order.customer_name = 'Comanda de prova';
 
     const factura = await createInvoice(supabase, order);
     if (!factura) {

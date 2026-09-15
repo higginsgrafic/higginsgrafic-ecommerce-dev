@@ -9,7 +9,7 @@ import { createMockOrder } from '@/lib/mockOrderStore';
 import { useAuth } from '@/contexts/AuthContext';
 import { getMockupPath, INK_BLACK, INK_WHITE, COLLECTIONS } from '@/lib/mockupPaths';
 import { useOffersConfig } from '@/hooks/useOffersConfig';
-import { getStripe, createPaymentIntent } from '@/api/stripe';
+import { getStripe, createPaymentIntent, modeProvesActiu } from '@/api/stripe';
 import { PDP_REGISTRY_BY_ROUTE } from '@/data/pdpRegistry';
 import { IVA_RATE } from '@/config/pricing';
 
@@ -38,6 +38,9 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
   });
   const [formErrors, setFormErrors] = useState({});
   const [isProcessing, setIsProcessing] = useState(false);
+  // Mode de proves: si està engegat, aquesta compra quedarà marcada com a
+  // prova. Es llegeix un sol cop, en muntar, perquè no canviï a mitja compra.
+  const [modeProves] = useState(() => modeProvesActiu());
   const [needsInvoice, setNeedsInvoice] = useState(false);
   const [acceptTerms, setAcceptTerms] = useState(false);
 
@@ -751,6 +754,15 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
           Els elements no s'han redibuixat: són els mateixos, amb els seus
           estils i les seves mides. Només ha canviat la fila on seuen. */}
       <span style={{ ...HEAD, fontSize:'18pt', fontWeight:600, position:'absolute', top:titleY, left: SHIFT_X, transform:'translateY(-50%)' }}>PAGAMENT</span>
+      {/* Avís de mode de proves. És aquí a dalt i ben visible perquè, si està
+          engegat, aquesta compra NO serà una venda de debò: la factura serà
+          PROVA-, el correu anirà a l'adreça de proves i no s'enviarà res a
+          Gelato. Sense aquest avís es podria confondre amb una compra real. */}
+      {modeProves && (
+        <div style={{ margin:`${titleY + 44}px ${SHIFT_X}px 0`, padding:'10px 14px', border:'2px solid #B45309', backgroundColor:'#FFFBEB', color:'#92400E', fontFamily:'Oswald, sans-serif', fontSize:'11pt', letterSpacing:'0.08em', textTransform:'uppercase', textAlign:'center' }}>
+          Mode de proves · aquesta compra no és una venda de debò
+        </div>
+      )}
       {/* La banda de dades comença sota el títol PAGAMENT (que va absolut), per
           no trepitjar-lo. */}
       {/* Aquí hi havia el títol "La teva comanda". S'ha tret perquè és

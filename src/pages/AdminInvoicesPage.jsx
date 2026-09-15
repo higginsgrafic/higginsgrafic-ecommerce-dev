@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowLeft, Download, Eye, FilePlus2, FlaskConical, Mail, Pencil, RotateCcw } from 'lucide-react';
+import { ArrowLeft, Download, Eye, FilePlus2, FlaskConical, Mail, Pencil, RotateCcw, Wrench } from 'lucide-react';
 import { authHeaders } from '@/api/authHeaders';
 
 /**
@@ -218,6 +218,9 @@ export default function AdminInvoicesPage({ mode = 'live' }) {
           )}
           {esProva && (
             <>
+              <Link to="/admin/factures/proves/eines" className="inline-flex items-center gap-2 border border-gray-300 bg-white px-4 py-2 text-xs uppercase tracking-wider hover:border-black">
+                <Wrench className="h-4 w-4" /> Eines de prova
+              </Link>
               <button
                 type="button"
                 onClick={generarProva}
