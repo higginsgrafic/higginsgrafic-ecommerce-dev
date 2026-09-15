@@ -94,9 +94,15 @@ async function provaRebuig(taula, cos, descripcio, missatgeEsperat) {
   }
 
   if (resposta.status >= 400) {
-    const coincideix = !missatgeEsperat || new RegExp(missatgeEsperat, 'i').test(text);
-    if (coincideix) be(`${descripcio} (rebutjada, i no ha quedat cap fila)`);
-    else avis(`${descripcio}: rebutjada, però amb un missatge inesperat: ${text.slice(0, 160)}`);
+    // Es considera ben rebutjada si ho fa el disparador (missatge propi) o una
+    // restricció de la taula (23514, check_violation). Qualsevol altre motiu
+    // surt com a avís: vol dir que no ha estat el guard que ens pensàvem.
+    let codi = null;
+    try { codi = JSON.parse(text).code; } catch { codi = null; }
+    const pelDisparador = missatgeEsperat && new RegExp(missatgeEsperat, 'i').test(text);
+    if (pelDisparador) be(`${descripcio} (rebutjada pel disparador, i no ha quedat cap fila)`);
+    else if (codi === '23514') be(`${descripcio} (rebutjada per una restricció de la taula, i no ha quedat cap fila)`);
+    else avis(`${descripcio}: rebutjada, però per un motiu inesperat (codi ${codi}): ${text.slice(0, 160)}`);
   } else {
     // Acceptada, però la transacció s'ha desfet: el guard no hi és o no mira
     // el que hauria de mirar.

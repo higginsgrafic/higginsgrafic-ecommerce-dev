@@ -1,8 +1,23 @@
 # Pla: mode de proves — FET
 
-**Estat: implementat el 16 de setembre de 2026.** Aquest document ja no és un
-pla: és el resum del que es va fer i de com es comprova. Es conserva perquè
-explica **per què** cada peça és com és.
+**Estat: implementat i verificat contra la base de dades el 16 de setembre de
+2026.** Aquest document ja no és un pla: és el resum del que es va fer i de com
+es comprova. Es conserva perquè explica **per què** cada peça és com és.
+
+**Les quatre migracions estan executades** a Supabase, i el circuit sencer s'ha
+provat de debò:
+
+| Comprovació | Resultat |
+|---|---|
+| Un esborrany de prova s'emet | número `PROVA-2026-000001`, `is_test = true` |
+| La sèrie `FO`/`FS`/`FR` després d'emetre | **buida: cap número gastat** |
+| El client anònim demana factures | `401 permission denied` (no en veu cap) |
+| L'administració | ve la prova |
+| Esborrar una prova | funciona (l'immutabilitat deixa passar les proves) |
+| Esborrar-la amb un esborrany que la referencia | `409`, aturat per la clau forana |
+| Una prova amb número fiscal | rebutjada |
+| Una factura de debò amb número `PROVA-` | rebutjada pel disparador |
+| Una factura amb imports que no quadren | rebutjada pel disparador |
 
 **Per què calia.** No es podia provar res de debò sense fer una venda real. I una
 venda real gasta un número de la sèrie fiscal, que no es pot recuperar.
@@ -111,7 +126,8 @@ gastat un número de la sèrie fiscal, i això no es pot permetre.
 
 ## Configuració que cal
 
-A Netlify, una variable d'entorn:
+A Netlify, una variable d'entorn (**pendent de comprovar pel propietari**: no es
+pot llegir des del repositori):
 
 ```
 TEST_EMAIL = higginsgrafic@gmail.com
