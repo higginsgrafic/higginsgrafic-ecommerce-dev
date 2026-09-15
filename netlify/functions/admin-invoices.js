@@ -23,6 +23,7 @@ const SUPABASE_URL = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
 const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
 const MAX_FILES = 1000;
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 const r2 = (n) => Math.round((Number(n) || 0) * 100) / 100;
 
@@ -46,7 +47,7 @@ export function parseYear(value) {
 }
 
 export function parseType(value) {
-  return value === 'full' || value === 'simplified' ? value : null;
+  return value === 'full' || value === 'simplified' || value === 'rectification' ? value : null;
 }
 
 /** Agrupa els imports per any i per trimestre. */
@@ -103,16 +104,25 @@ export async function handler(event) {
 
   const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY);
 
+  if (params.id) {
+    if (!UUID_RE.test(params.id)) return jsonResponse(event, 400, { error: 'Factura no vàlida' });
+    const { data, error } = await supabase.from('invoices').select('*').eq('id', params.id).maybeSingle();
+    if (error) return jsonResponse(event, 500, { error: 'Error consultant la factura' });
+    if (!data) return jsonResponse(event, 404, { error: 'Factura no trobada' });
+    return jsonResponse(event, 200, { invoice: data });
+  }
+
   let query = supabase
     .from('invoices')
-    .select('number, invoice_type, issued_at, order_number, customer_name, customer_company, customer_tax_id, customer_email, base_products, base_shipping, iva, total, access_token')
+    .select('id, number, invoice_type, document_kind, rectifies_invoice_id, correction_reason, source, issued_at, order_number, customer_name, customer_company, customer_tax_id, customer_email, base_products, base_shipping, iva, total, access_token')
     .order('issued_at', { ascending: false })
     .limit(MAX_FILES);
 
   if (year) {
     query = query.gte('issued_at', `${year}-01-01T00:00:00.000Z`).lt('issued_at', `${year + 1}-01-01T00:00:00.000Z`);
   }
-  if (type) query = query.eq('invoice_type', type);
+  if (type === 'rectification') query = query.eq('document_kind', 'rectification');
+  else if (type) query = query.eq('invoice_type', type).eq('document_kind', 'invoice');
   if (search) {
     query = query.or(
       ['number', 'order_number', 'customer_name', 'customer_company', 'customer_tax_id', 'customer_email']

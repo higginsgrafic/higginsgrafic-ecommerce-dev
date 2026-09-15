@@ -75,7 +75,8 @@ export async function createInvoice(supabase, order) {
       return null;
     }
 
-    const { data: number, error: numError } = await supabase.rpc('next_invoice_number');
+    const series = order.invoice_tax_id ? 'FO' : 'FS';
+    const { data: number, error: numError } = await supabase.rpc('next_invoice_number', { p_series: series });
     if (numError || !number) {
       console.warn('[stripe-webhook] No s\'ha pogut obtenir el número de factura:', numError?.message);
       return null;
@@ -101,6 +102,8 @@ export async function createInvoice(supabase, order) {
       .insert({
         number,
         invoice_type: order.invoice_tax_id ? 'full' : 'simplified',
+        document_kind: 'invoice',
+        source: 'order',
         order_id: order.id,
         order_number: order.order_number || null,
         user_id: order.user_id || null,

@@ -77,3 +77,4 @@ export const ResetPasswordPage = lazy(() => import('@/pages/ResetPasswordPage'))
 export const InvoicePage = lazy(() => import('@/pages/InvoicePage'));
 export const MyInvoicesPage = lazy(() => import('@/pages/MyInvoicesPage'));
 export const AdminInvoicesPage = lazy(() => import('@/pages/AdminInvoicesPage'));
+export const AdminInvoiceEditorPage = lazy(() => import('@/pages/AdminInvoiceEditorPage'));

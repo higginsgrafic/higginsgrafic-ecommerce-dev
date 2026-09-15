@@ -8,17 +8,12 @@ const AdminContext = createContext();
 // `localhost`/`127.0.0.1`, perquè puguis veure el panell admin sense passar
 // per l'autenticació de Supabase. Mai s'activa en producció, perquè el build
 // de producció té `import.meta.env.DEV === false`.
-// Per desactivar-lo a local: `localStorage.setItem('HG_DEV_FORCE_ADMIN','false')`.
 // ─────────────────────────────────────────────────────────────────────────
 const DEV_FORCE_ADMIN = (() => {
   try {
-    if (!import.meta?.env?.DEV) return false;
+    if (!import.meta.env.DEV) return false;
     const host = (typeof window !== 'undefined') ? window.location.hostname : '';
-    const isLocal = host === 'localhost' || host === '127.0.0.1';
-    if (!isLocal) return false;
-    const flag = (typeof window !== 'undefined') ? window.localStorage.getItem('HG_DEV_FORCE_ADMIN') : null;
-    if (flag === 'false') return false; // permet desactivar-lo explícitament
-    return true;
+    return host === 'localhost' || host === '127.0.0.1';
   } catch {
     return false;
   }
@@ -26,7 +21,7 @@ const DEV_FORCE_ADMIN = (() => {
 
 const DEV_FORCE_ADMIN_EMAIL = (() => {
   try {
-    const raw = (import.meta?.env?.VITE_ADMIN_EMAILS || '').toString().trim();
+    const raw = (import.meta.env.VITE_ADMIN_EMAILS || '').toString().trim();
     const first = raw.split(',').map((x) => x.trim()).filter(Boolean)[0];
     return first || 'dev-admin@localhost';
   } catch {
@@ -62,7 +57,7 @@ export function AdminProvider({ children }) {
   });
 
   const allowedAdminEmails = (() => {
-    const raw = (import.meta?.env?.VITE_ADMIN_EMAILS || '').toString().trim();
+    const raw = (import.meta.env.VITE_ADMIN_EMAILS || '').toString().trim();
     if (!raw) return null;
     const parts = raw
       .split(',')

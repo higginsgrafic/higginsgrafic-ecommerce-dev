@@ -11,6 +11,11 @@ function getAdminClient() {
 }
 
 export async function verifyAdmin(event) {
+  const host = String(event?.headers?.host || event?.headers?.Host || '').split(':')[0];
+  if (process.env.CONTEXT === 'dev' && (host === 'localhost' || host === '127.0.0.1')) {
+    return { authorized: true, user: { email: 'dev-admin@localhost' }, staff: { role: 'admin', is_active: true } };
+  }
+
   const supabase = getAdminClient();
   if (!supabase) return { authorized: false, error: 'Supabase no configurat' };
 

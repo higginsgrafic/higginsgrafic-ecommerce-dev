@@ -104,15 +104,21 @@ export default function InvoicePage() {
 
     return items.map((item, idx) => {
       const qty = quantitats[idx];
+      const transport = r2(transports[idx]);
+      const esManual = item.product_price != null;
+      const preuProducte = r2(item.product_price ?? 0);
       const preuUnitari = r2(item.price ?? item.unitPrice ?? 0);
-      const transport = r2(transports[idx] / qty);
+      const preu = esManual
+        ? r2(preuProducte * qty + transport * (1 + IVA_RATE))
+        : r2(preuUnitari * qty);
 
       // El preu de la botiga ja porta l'IVA a dins; aquí es desglossa.
-      const baseLinia = r2(preuUnitari / (1 + IVA_RATE));
-      const ivaLinia = r2(preuUnitari - baseLinia);
-      const baseProducte = r2(baseLinia - transport);
+      const baseProducte = esManual
+        ? r2((preuProducte * qty) / (1 + IVA_RATE))
+        : r2(preu / (1 + IVA_RATE) - transport);
+      const ivaLinia = r2(preu - baseProducte - transport);
 
-      const detalls = [item.collection, item.size ? `talla ${item.size}` : null, item.color]
+      const detalls = [item.description, item.collection, item.size ? `talla ${item.size}` : null, item.color]
         .filter(Boolean).join(' · ');
 
       return {
@@ -123,8 +129,8 @@ export default function InvoicePage() {
         baseProducte,
         transport,
         iva: ivaLinia,
-        preu: r2(preuUnitari * qty),
-        preuUnitari,
+        preu,
+        preuUnitari: esManual ? preuProducte : preuUnitari,
       };
     });
   }, [factura]);
@@ -143,6 +149,7 @@ export default function InvoicePage() {
     );
   }
 
+  const esRectificativa = factura.document_kind === 'rectification';
   const esSimplificada = factura.invoice_type !== 'full';
   const totalBase = r2(r2(factura.base_products) + r2(factura.base_shipping));
   const sumaBases = r2(linies.reduce((a, l) => a + l.baseProducte, 0));
@@ -157,7 +164,7 @@ export default function InvoicePage() {
           <img src="/custom_logos/brand/grup-higgins-logo.svg" alt={ISSUER.tradeName} className="h-10" />
           <div className="text-right">
             <div className="font-oswald text-[26px] leading-none tracking-[0.04em] uppercase">
-              {esSimplificada ? 'Factura simplificada' : 'Factura'}
+              {esRectificativa ? 'Factura rectificativa' : esSimplificada ? 'Factura simplificada' : 'Factura'}
             </div>
           </div>
         </div>
@@ -176,6 +183,14 @@ export default function InvoicePage() {
             </div>
           ))}
         </div>
+
+        {esRectificativa && (
+          <div className="mb-6 border border-gray-900 px-4 py-3 text-[12px]">
+            <div className="font-oswald text-[9px] uppercase tracking-[0.16em] text-gray-400">Document rectificat</div>
+            <div className="mt-1 font-oswald text-[14px]">{factura.rectified_invoice_number || 'Factura original'}</div>
+            <div className="mt-1 text-gray-600">{factura.correction_reason}</div>
+          </div>
+        )}
 
         {/* Emissor i client */}
         <div className="grid grid-cols-2 gap-10 mb-8">

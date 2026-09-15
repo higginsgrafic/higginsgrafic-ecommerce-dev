@@ -64,6 +64,7 @@ import {
   ECConfigPage,
   AdminMediaPage,
   AdminInvoicesPage,
+  AdminInvoiceEditorPage,
   ColleccioSettingsPage,
   MockupsManagerPage,
   AdminUploadPage,
@@ -192,6 +193,8 @@ export default function AppRoutes({ location, pageProps, pautaEnabled, tableEnab
           <Route path="ec-config" element={<ECConfigPage />} />
           <Route path="media" element={<AdminMediaPage />} />
           <Route path="factures" element={<AdminInvoicesPage />} />
+          <Route path="factures/nova" element={<AdminInvoiceEditorPage />} />
+          <Route path="factures/esborrany/:id" element={<AdminInvoiceEditorPage />} />
           <Route path="collections" element={<ColleccioSettingsPage {...pageProps} />} />
           <Route path="mockups" element={<MockupsManagerPage />} />
           <Route path="upload" element={<AdminUploadPage />} />
