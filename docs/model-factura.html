@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+<meta charset="UTF-8">
+<title>Model de factura — Higgins GRÀFIC</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@200;300;400;500&family=Roboto+Condensed:wght@300;400;700&display=swap" rel="stylesheet">
+<style>
+  /* ==========================================================================
+     MODEL DE FACTURA — Higgins GRÀFIC
+     --------------------------------------------------------------------------
+     Format A4 (210 × 297 mm), preparat per imprimir o generar un PDF.
+     Els colors i les tipografies són els de la botiga.
+     El text que va entre [ ] és el que s'ha d'omplir amb dades reals.
+     ========================================================================== */
+
+  :root {
+    --tinta:      #111827;   /* text principal        */
+    --fosc:       #475059;   /* el gris de la botiga  */
+    --gris:       #667085;   /* text secundari        */
+    --clar:       #98A2B4;   /* línies                */
+    --molt-clar:  #E6E8EC;   /* vores suaus           */
+    --fons:       #F7F8FA;   /* fons de blocs         */
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    padding: 24px;
+    background: #EDEFF2;
+    font-family: 'Roboto Condensed', sans-serif;
+    color: var(--tinta);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .full {
+    width: 210mm;
+    min-height: 297mm;
+    margin: 0 auto;
+    background: #fff;
+    padding: 18mm 16mm 14mm;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ---------- Capçalera ---------- */
+  .cap {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 24px;
+    padding-bottom: 8mm;
+    border-bottom: 2px solid var(--tinta);
+  }
+  .cap img { height: 26px; width: auto; display: block; }
+  .cap .etiqueta {
+    font-family: 'Oswald', sans-serif;
+    font-weight: 500;
+    font-size: 26pt;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    line-height: 1;
+    text-align: right;
+    color: var(--tinta);
+  }
+  .cap .numero {
+    margin-top: 4px;
+    text-align: right;
+    font-size: 10pt;
+    letter-spacing: 0.08em;
+    color: var(--gris);
+    text-transform: uppercase;
+  }
+
+  /* ---------- Blocs de dades ---------- */
+  .blocs {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12mm;
+    padding: 8mm 0 7mm;
+  }
+  .bloc h3 {
+    font-family: 'Oswald', sans-serif;
+    font-weight: 400;
+    font-size: 8.5pt;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--gris);
+    margin: 0 0 6px;
+  }
+  .bloc .nom {
+    font-family: 'Oswald', sans-serif;
+    font-weight: 500;
+    font-size: 12pt;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    color: var(--tinta);
+    margin-bottom: 4px;
+  }
+  .bloc p { margin: 0; font-size: 10pt; line-height: 1.5; color: var(--fosc); }
+  .bloc .pendent { color: #B42318; font-weight: 700; }
+
+  /* ---------- Barra de dades de la factura ---------- */
+  .dades {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    background: var(--fons);
+    border: 1px solid var(--molt-clar);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .dades div {
+    padding: 9px 12px;
+    border-right: 1px solid var(--molt-clar);
+  }
+  .dades div:last-child { border-right: 0; }
+  .dades .k {
+    font-family: 'Oswald', sans-serif;
+    font-weight: 400;
+    font-size: 7.5pt;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--gris);
+    margin-bottom: 3px;
+  }
+  .dades .v { font-size: 10.5pt; color: var(--tinta); }
+
+  /* ---------- Taula de conceptes ---------- */
+  table { width: 100%; border-collapse: collapse; margin-top: 9mm; }
+  thead th {
+    font-family: 'Oswald', sans-serif;
+    font-weight: 400;
+    font-size: 8pt;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--gris);
+    text-align: left;
+    padding: 0 0 8px;
+    border-bottom: 1px solid var(--clar);
+  }
+  thead th.num { text-align: right; }
+  tbody td {
+    padding: 11px 0;
+    font-size: 10.5pt;
+    color: var(--fosc);
+    border-bottom: 1px solid var(--molt-clar);
+    vertical-align: top;
+  }
+  tbody td.num { text-align: right; font-variant-numeric: tabular-nums; }
+  tbody td .detall { display: block; font-size: 9pt; color: var(--gris); margin-top: 2px; }
+  tbody td.titol { color: var(--tinta); }
+
+  /* ---------- Totals ---------- */
+  .peu {
+    display: grid;
+    grid-template-columns: 1fr 78mm;
+    gap: 12mm;
+    margin-top: 8mm;
+  }
+  .notes { font-size: 8.5pt; line-height: 1.6; color: var(--gris); }
+  .notes strong {
+    display: block;
+    font-family: 'Oswald', sans-serif;
+    font-weight: 400;
+    font-size: 8pt;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--fosc);
+    margin-bottom: 4px;
+  }
+  .totals { font-size: 10.5pt; }
+  .totals .fila {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 6px 0;
+    color: var(--gris);
+  }
+  .totals .fila span:last-child { font-variant-numeric: tabular-nums; color: var(--fosc); }
+  .totals .total {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-top: 6px;
+    padding-top: 10px;
+    border-top: 2px solid var(--tinta);
+    font-family: 'Oswald', sans-serif;
+    font-weight: 500;
+    font-size: 13pt;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--tinta);
+  }
+
+  /* ---------- Peu de pàgina ---------- */
+  .legal {
+    margin-top: auto;
+    padding-top: 7mm;
+    border-top: 1px solid var(--molt-clar);
+    font-size: 8pt;
+    line-height: 1.6;
+    color: var(--gris);
+    text-align: center;
+  }
+  .legal strong { color: var(--fosc); font-weight: 700; }
+
+  @media print {
+    body { background: #fff; padding: 0; }
+    .full { width: auto; min-height: auto; padding: 14mm 12mm; }
+    @page { size: A4; margin: 0; }
+  }
+</style>
+</head>
+<body>
+<div class="full">
+
+  <!-- ══════════ CAPÇALERA ══════════ -->
+  <div class="cap">
+    <img src="../public/custom_logos/brand/grup-higgins-logo.svg" alt="Higgins GRÀFIC">
+    <div>
+      <div class="etiqueta">Factura</div>
+      <div class="numero">Núm. <strong>2026-0001</strong> &nbsp;·&nbsp; 14 de setembre de 2026</div>
+    </div>
+  </div>
+
+  <!-- ══════════ EMISSOR I CLIENT ══════════ -->
+  <div class="blocs">
+    <div class="bloc">
+      <h3>Emissor</h3>
+      <div class="nom">Higgins GRÀFIC</div>
+      <p>
+        Carrer Convent, 11<br>
+        08440 Cardedeu, Barcelona<br>
+        <span class="pendent">NIF: [pendent de posar]</span><br>
+        higginsgrafic@gmail.com
+      </p>
+    </div>
+    <div class="bloc">
+      <h3>Client</h3>
+      <div class="nom">[Nom i cognoms]</div>
+      <p>
+        [Adreça de lliurament]<br>
+        [Codi postal i població]<br>
+        [País]<br>
+        <span class="pendent">CIF: [només si ha demanat factura]</span><br>
+        [Correu electrònic]
+      </p>
+    </div>
+  </div>
+
+  <!-- ══════════ DADES DE LA FACTURA ══════════ -->
+  <div class="dades">
+    <div><div class="k">Número</div><div class="v">2026-0001</div></div>
+    <div><div class="k">Data d'emissió</div><div class="v">14/09/2026</div></div>
+    <div><div class="k">Comanda</div><div class="v">[HG-2026-0001]</div></div>
+    <div><div class="k">Forma de pagament</div><div class="v">Targeta</div></div>
+  </div>
+
+  <!-- ══════════ CONCEPTES ══════════ -->
+  <table>
+    <thead>
+      <tr>
+        <th>Descripció</th>
+        <th class="num">Quantitat</th>
+        <th class="num">Preu unitari</th>
+        <th class="num">Import</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="titol">
+          Samarreta «The Phoenix»
+          <span class="detall">First Contact · talla M · blanc · impressió DTG sota demanda</span>
+        </td>
+        <td class="num">1</td>
+        <td class="num">9,26 €</td>
+        <td class="num">9,26 €</td>
+      </tr>
+      <tr>
+        <td class="titol">
+          Enviament a domicili
+          <span class="detall">Espanya peninsular</span>
+        </td>
+        <td class="num">1</td>
+        <td class="num">3,55 €</td>
+        <td class="num">3,55 €</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- ══════════ TOTALS I NOTES ══════════ -->
+  <div class="peu">
+    <div class="notes">
+      <strong>Informació</strong>
+      Producte fabricat sota demanda. El termini de producció és de 2 a 4 dies
+      feiners i el de lliurament, de 3 a 6 dies feiners addicionals.<br><br>
+      Tots els imports d'aquesta factura són en euros. El preu inclou l'IVA
+      aplicable. Operació subjecta al règim general d'IVA.
+    </div>
+    <div class="totals">
+      <div class="fila"><span>Base imponible</span><span>12,81 €</span></div>
+      <div class="fila"><span>IVA 21%</span><span>2,69 €</span></div>
+      <div class="total"><span>Total</span><span>15,50 €</span></div>
+    </div>
+  </div>
+
+  <!-- ══════════ PEU LEGAL ══════════ -->
+  <div class="legal">
+    <strong>Higgins GRÀFIC</strong> · Carrer Convent, 11 · 08440 Cardedeu (Barcelona) ·
+    higginsgrafic.com<br>
+    Factura emesa electrònicament. Conserva aquest document com a justificant de compra.
+  </div>
+
+</div>
+</body>
+</html>
