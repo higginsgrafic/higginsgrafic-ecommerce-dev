@@ -142,6 +142,25 @@
     white-space: nowrap;
   }
   thead th.num { text-align: right; }
+  thead th.op, tbody td.op {
+    text-align: center;
+    width: 22px;
+    color: var(--clar);
+    font-family: 'Oswald', sans-serif;
+    font-size: 11pt;
+  }
+  tbody td .mes { color: var(--clar); margin: 0 1px; }
+  tbody td.fort { font-family: 'Oswald', sans-serif; font-weight: 500; font-size: 11pt; color: var(--tinta); }
+  tbody tr.subtotal td .nota {
+    display: block;
+    margin-top: 3px;
+    font-family: 'Roboto Condensed', sans-serif;
+    font-weight: 400;
+    font-size: 8pt;
+    letter-spacing: 0;
+    text-transform: none;
+    color: var(--gris);
+  }
   tbody td {
     padding: 9px 0;
     font-size: 9.5pt;
@@ -226,7 +245,7 @@
     line-height: 1;
     color: var(--tinta);
   }
-  .resum .caixa .d { margin-top: 4px; font-size: 8.5pt; color: var(--gris); }
+  .resum .caixa .d { margin-top: 4px; font-size: 8.5pt; color: var(--gris); white-space: nowrap; }
   .resum .signe {
     display: flex;
     align-items: center;
@@ -349,57 +368,42 @@
   <table>
     <thead>
       <tr>
-        <th>Descripció</th>
+        <th>Producte</th>
         <th class="num">Quantitat</th>
-        <th class="num">Preu unitari<br>(sense IVA)</th>
-        <th class="num">Base<br>imposable</th>
-        <th class="num">IVA<br>21%</th>
-        <th class="num">Total</th>
+        <th class="num">Base&nbsp;+&nbsp;IVA</th>
+        <th class="op">+</th>
+        <th class="num">Transport&nbsp;+&nbsp;IVA</th>
+        <th class="num">Preu</th>
       </tr>
     </thead>
     <tbody>
-      <tr class="grup">
-        <td colspan="6"><span class="n">1</span><span class="t">Productes</span><span class="sub">samarretes impreses amb DTF</span></td>
+      <tr>
+        <td class="titol">1 · Samarreta «The Phoenix»<span class="detall">First Contact · talla M · blanc</span></td>
+        <td class="num">x1</td>
+        <td class="num">10,86 € <span class="mes">+</span> 2,28 €</td>
+        <td class="op">+</td>
+        <td class="num">3,55 € <span class="mes">+</span> 0,75 €</td>
+        <td class="num fort">17,44 €</td>
       </tr>
       <tr>
-        <td class="titol">Samarreta «The Phoenix»<span class="detall">First Contact · talla M · blanc</span></td>
-        <td class="num">1</td><td class="num">10,86 €</td><td class="num">10,86 €</td><td class="num">2,28 €</td><td class="num">13,14 €</td>
+        <td class="titol">2 · Samarreta «Wormhole»<span class="detall">First Contact · talla L · negre</span></td>
+        <td class="num">x1</td>
+        <td class="num">10,86 € <span class="mes">+</span> 2,28 €</td>
+        <td class="op">+</td>
+        <td class="num">1,15 € <span class="mes">+</span> 0,24 €</td>
+        <td class="num fort">14,53 €</td>
       </tr>
       <tr>
-        <td class="titol">Samarreta «Wormhole»<span class="detall">First Contact · talla L · negre</span></td>
-        <td class="num">1</td><td class="num">10,86 €</td><td class="num">10,86 €</td><td class="num">2,28 €</td><td class="num">13,14 €</td>
-      </tr>
-      <tr>
-        <td class="titol">Samarreta «Vulcan's End»<span class="detall">First Contact · talla M · blau</span></td>
-        <td class="num">1</td><td class="num">10,87 €</td><td class="num">10,87 €</td><td class="num">2,28 €</td><td class="num">13,15 €</td>
+        <td class="titol">3 · Samarreta «Vulcan's End»<span class="detall">First Contact · talla M · blau</span></td>
+        <td class="num">x1</td>
+        <td class="num">10,87 € <span class="mes">+</span> 2,28 €</td>
+        <td class="op">+</td>
+        <td class="num">1,14 € <span class="mes">+</span> 0,24 €</td>
+        <td class="num fort">14,53 €</td>
       </tr>
       <tr class="subtotal">
-        <td colspan="3">Subtotal productes</td>
-        <td class="num">32,59 €</td>
-        <td class="num">6,84 €</td>
-        <td class="num">39,43 €</td>
-      </tr>
-
-      <tr class="grup">
-        <td colspan="6"><span class="n">2</span><span class="t">Serveis</span><span class="sub">enviament: primera peça i peces addicionals</span></td>
-      </tr>
-      <tr>
-        <td class="titol">Enviament · 1a unitat<span class="detall">Espanya peninsular · primera peça</span></td>
-        <td class="num">1</td><td class="num">3,55 €</td><td class="num">3,55 €</td><td class="num">0,75 €</td><td class="num">4,30 €</td>
-      </tr>
-      <tr>
-        <td class="titol">Enviament · 2a unitat<span class="detall">Espanya peninsular · peça addicional</span></td>
-        <td class="num">1</td><td class="num">1,15 €</td><td class="num">1,15 €</td><td class="num">0,24 €</td><td class="num">1,39 €</td>
-      </tr>
-      <tr>
-        <td class="titol">Enviament · 3a unitat<span class="detall">Espanya peninsular · peça addicional</span></td>
-        <td class="num">1</td><td class="num">1,14 €</td><td class="num">1,14 €</td><td class="num">0,24 €</td><td class="num">1,38 €</td>
-      </tr>
-      <tr class="subtotal">
-        <td colspan="3">Subtotal serveis</td>
-        <td class="num">5,84 €</td>
-        <td class="num">1,23 €</td>
-        <td class="num">7,07 €</td>
+        <td colspan="5">Total factura <span class="nota">l'enviament de la primera peça i el de les addicionals</span></td>
+        <td class="num">46,50 €</td>
       </tr>
     </tbody>
   </table>
@@ -417,21 +421,21 @@
     </div>
     <div class="resum">
       <div class="caixa">
-        <div class="k">1 · Productes</div>
+        <div class="k">Samarretes (3)</div>
         <div class="v">39,43 €</div>
-        <div class="d">base 32,59 € + IVA 6,84 €</div>
+        <div class="d">base 32,59 + IVA 6,84</div>
       </div>
       <div class="signe">+</div>
       <div class="caixa">
-        <div class="k">2 · Serveis</div>
+        <div class="k">Enviament</div>
         <div class="v">7,07 €</div>
-        <div class="d">base 5,84 € + IVA 1,23 €</div>
+        <div class="d">base 5,84 + IVA 1,23</div>
       </div>
       <div class="signe">=</div>
       <div class="caixa final">
         <div class="k">Total factura</div>
         <div class="v">46,50 €</div>
-        <div class="d">base 38,43 € + IVA 8,07 €</div>
+        <div class="d">base 38,43 + IVA 8,07</div>
       </div>
     </div>
   </div>
