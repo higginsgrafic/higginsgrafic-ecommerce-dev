@@ -18,6 +18,7 @@ import {
   CheckoutPage,
   OrderTrackingPage,
   InvoicePage,
+  MyInvoicesPage,
   AboutPage,
   ContactPage,
   FAQPage,
@@ -171,6 +172,7 @@ export default function AppRoutes({ location, pageProps, pautaEnabled, tableEnab
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/perfil" element={<ClientProtectedRoute><ProfilePage /></ClientProtectedRoute>} />
+        <Route path="/compte/factures" element={<ClientProtectedRoute><MyInvoicesPage /></ClientProtectedRoute>} />
         <Route path="/ruleta-demo" element={<Navigate to="/admin/draft/ruleta" replace />} />
 
         <Route path="/ec-preview" element={<motion.div {...fadeIn}><ECPreviewPage /></motion.div>} />
