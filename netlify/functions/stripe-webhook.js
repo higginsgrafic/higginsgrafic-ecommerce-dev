@@ -55,6 +55,86 @@ function getSupabase() {
  * Idempotent: si ja hi ha gelato_order_id, no fa res.
  * Retorna 'retry' si cal que Stripe reenviï l'esdeveniment, 'ok' o 'skip' altrament.
  */
+/**
+ * Crea la factura de la comanda, amb el seu número correlatiu.
+ *
+ * Desa una COPIA del que surt al document (client, línies i imports): si demà
+ * canvia l'adreça del client o el preu d'un producte, la factura d'avui
+ * continua dient el mateix. El número ve de `next_invoice_number()`, que és
+ * correlatiu i no repeteix mai.
+ *
+ * Retorna null si no s'ha pogut crear (i la venda continua endavant igualment:
+ * una factura es pot refer, una venda perduda no).
+ */
+export async function createInvoice(supabase, order) {
+  try {
+    // Si la taula encara no existeix (migració pendent), no cremem cap número.
+    const { error: taulaError } = await supabase.from('invoices').select('id').limit(1);
+    if (taulaError) {
+      console.warn('[stripe-webhook] La taula de factures encara no existeix; no es genera factura.');
+      return null;
+    }
+
+    const { data: number, error: numError } = await supabase.rpc('next_invoice_number');
+    if (numError || !number) {
+      console.warn('[stripe-webhook] No s\'ha pogut obtenir el número de factura:', numError?.message);
+      return null;
+    }
+
+    let items = order.items;
+    if (typeof items === 'string') {
+      try { items = JSON.parse(items); } catch { items = []; }
+    }
+    if (!Array.isArray(items)) items = [];
+
+    const total = Number(order.total) || 0;
+    const iva = Number(order.iva) || 0;
+    const baseShipping = Number(order.shipping_cost) || 0;
+    const baseProducts = order.subtotal != null
+      ? Number(order.subtotal)
+      : Math.round((total - iva - baseShipping) * 100) / 100;
+
+    const nom = [order.first_name, order.last_name].filter(Boolean).join(' ').trim();
+
+    const { data: invoice, error: insError } = await supabase
+      .from('invoices')
+      .insert({
+        number,
+        invoice_type: order.invoice_tax_id ? 'full' : 'simplified',
+        order_id: order.id,
+        order_number: order.order_number || null,
+        user_id: order.user_id || null,
+        customer_name: nom || null,
+        customer_email: order.email || null,
+        customer_tax_id: order.invoice_tax_id || null,
+        customer_company: order.invoice_company || null,
+        customer_address: order.address || null,
+        customer_address2: order.address2 || null,
+        customer_city: order.city || null,
+        customer_postal_code: order.postal_code || null,
+        customer_country: order.country || null,
+        base_products: baseProducts,
+        base_shipping: baseShipping,
+        iva,
+        total,
+        items,
+      })
+      .select()
+      .single();
+
+    if (insError) {
+      console.warn('[stripe-webhook] Error desant la factura:', insError.message);
+      return null;
+    }
+
+    console.log('[stripe-webhook] Factura creada:', number);
+    return invoice;
+  } catch (err) {
+    console.warn('[stripe-webhook] Error creant la factura:', err?.message);
+    return null;
+  }
+}
+
 async function fulfillGelato(supabase, order) {
   if (MODE_PROVES_STRIPE) {
     console.warn(
@@ -178,9 +258,11 @@ export async function handler(event, context) {
             processResult = { ok: false, error: error.message };
           } else if (data) {
             console.log('[stripe-webhook] Order updated to confirmada:', data.order_number || data.id);
+            const factura = await createInvoice(supabase, data);
             const enrichedData = {
               ...data,
               tracking_link: paymentIntent.metadata?.tracking_link || null,
+              invoice: factura || null,
             };
             await sendOrderEmail('order_confirmed', enrichedData);
             const result = await fulfillGelato(supabase, enrichedData);
