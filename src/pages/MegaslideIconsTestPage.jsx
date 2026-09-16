@@ -48,6 +48,20 @@ const EXCEPCIONS = {
 };
 
 /**
+ * Dibuixos que no són a la carpeta de la graella i s'han de buscar a part.
+ * Són els quatre que faltaven; l'amo els va trobar a `images_originals/stripe`.
+ *
+ * NOTA: el producte del catàleg es diu `pink-solid` i el fitxer `fuchsia-solid`.
+ * És el mateix dibuix amb dos noms; si algun dia es renombra, es treu d'aquí.
+ */
+const DIBUIXOS_A_PART = {
+  'austen-looking-for-my-darcy-pink-solid': '/custom_logos/drawings/images_originals/stripe/austen/looking_for_my_darcy/color/solid/fuchsia-solid-stripe.webp',
+  'austen-looking-for-my-darcy-yellow-pink-frame': '/custom_logos/drawings/images_originals/stripe/austen/looking_for_my_darcy/color/frame/fuchsia-frame-stripe.webp',
+  'austen-i-admire-and-love-you': '/custom_logos/drawings/images_originals/stripe/austen/quotes/black/i-admire-and-love-you-b-stripe.webp',
+  'austen-you-have-bewitched-me': '/custom_logos/drawings/images_originals/stripe/austen/quotes/black/you-have-bewitched-me-b-stripe.webp',
+};
+
+/**
  * Clau per comparar noms de producte amb noms de fitxer.
  * `austen-looking-for-my-darcy-blue-solid` i `blue-solid-grid.webp` han de
  * donar la mateixa clau.
@@ -63,6 +77,8 @@ function clau(valor) {
 
 /** El dibuix que li toca a un producte, o null si no n'hi ha. */
 function dibuixDelProducte(producte, index) {
+  // Primers els que s'han de buscar a part.
+  if (DIBUIXOS_A_PART[producte.slug]) return DIBUIXOS_A_PART[producte.slug];
   const carpeta = CARPETA[producte.collection];
   const candidats = index[carpeta] || [];
   const k = EXCEPCIONS[producte.slug] || clau(String(producte.slug).replace(/^(austen|first-contact|the-human-inside|cube|miscellania)-/, ''));
