@@ -32,8 +32,8 @@
     "thumbs:all:force": "npm run thumbs:grid:force && npm run thumbs:stripe:force",
     "thumbs:grid": "node scripts/generate-grid-thumbs.mjs --kind grid --in public/custom_logos/drawings/images_originals/grid --out public/custom_logos/drawings/images_grid --width 320 --quality 72 --incremental",
     "thumbs:grid:force": "node scripts/generate-grid-thumbs.mjs --kind grid --in public/custom_logos/drawings/images_originals/grid --out public/custom_logos/drawings/images_grid --width 320 --quality 72 --incremental --force",
-    "thumbs:stripe": "node scripts/generate-grid-thumbs.mjs --kind stripe --in public/custom_logos/drawings/images_originals/stripe --out public/custom_logos/drawings/images_stripe --width 512 --quality 80 --incremental",
-    "thumbs:stripe:force": "node scripts/generate-grid-thumbs.mjs --kind stripe --in public/custom_logos/drawings/images_originals/stripe --out public/custom_logos/drawings/images_stripe --width 512 --quality 80 --incremental --force",
+    "thumbs:stripe": "node scripts/generate-grid-thumbs.mjs --kind stripe --in public/custom_logos/drawings/images_originals/stripe --out public/custom_logos/drawings/images_stripe --width 256 --quality 78 --incremental",
+    "thumbs:stripe:force": "node scripts/generate-grid-thumbs.mjs --kind stripe --in public/custom_logos/drawings/images_originals/stripe --out public/custom_logos/drawings/images_stripe --width 256 --quality 78 --incremental --force",
     "verifica:proves": "node scripts/verifica-mode-de-proves.mjs"
   },
   "dependencies": {
