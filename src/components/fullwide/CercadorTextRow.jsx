@@ -50,11 +50,32 @@ const INK = '#2B2B2B';
 const INK_HOVER = INK;
 const INK_SELECTED = '#000000';
 
-// Mida del dibuix a la graella de dibuixos (que substitueix els noms).
+// Mida del dibuix a la graella de dibuixos, segons la pantalla. Proporcional a
+// la mida de text de la resta de la UI: 11px text a desktop, 8 a landscape i 7
+// a portrait -> 25 / 20 / 16.
 const DIBUIX_PX = 25;
-// Separacions entre dibuixos: horitzontal (entre columnes) i vertical (entre files).
+const DIBUIX_PX_LANDSCAPE = 20;
+const DIBUIX_PX_PORTRAIT = 16;
+// Separacions entre dibuixos. La horitzontal escala amb la mida; la vertical
+// es manté petita (és l'interlineat de les files).
 const DIBUIX_GAP_H = 25;
+const DIBUIX_GAP_H_LANDSCAPE = 20;
+const DIBUIX_GAP_H_PORTRAIT = 16;
 const DIBUIX_GAP_V = 3;
+
+/** La mida de dibuix que toca per a aquesta pantalla. */
+function midaDibuix(isPortraitTablet, isLandscapeTablet) {
+  if (isPortraitTablet) return DIBUIX_PX_PORTRAIT;
+  if (isLandscapeTablet) return DIBUIX_PX_LANDSCAPE;
+  return DIBUIX_PX;
+}
+
+/** La separació horitzontal que toca per a aquesta pantalla. */
+function gapHorizontal(isPortraitTablet, isLandscapeTablet) {
+  if (isPortraitTablet) return DIBUIX_GAP_H_PORTRAIT;
+  if (isLandscapeTablet) return DIBUIX_GAP_H_LANDSCAPE;
+  return DIBUIX_GAP_H;
+}
 
 // Mapping: text label -> stripe item ID (per seleccionar el disseny a la franja)
 const STRIPE_MAP = {
@@ -325,6 +346,8 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
       stripeItem: STRIPE_MAP[label],
     }))));
     const numColumns = 16;
+    const dibuixPx = midaDibuix(isPortraitTablet, isLandscapeTablet);
+    const gapH = gapHorizontal(isPortraitTablet, isLandscapeTablet);
     const activeKey = activeCollection === 'austen' ? `austen:${activeSubcollection || ''}` : activeCollection;
 
     return (
@@ -341,7 +364,7 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
           pointerEvents: 'auto',
         }}
       >
-        <div style={{ display: 'grid', gridTemplateColumns: `repeat(${numColumns}, ${DIBUIX_PX}px)`, gap: `${DIBUIX_GAP_V}px ${DIBUIX_GAP_H}px`, width: '100%', minWidth: 0 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: `repeat(${numColumns}, ${dibuixPx}px)`, gap: `${DIBUIX_GAP_V}px ${gapH}px`, width: '100%', minWidth: 0 }}>
           {items.map(({ label, collection, subcollection, stripeItem }) => {
             const dimmed = activeCollection && collection !== activeCollection
               ? true
@@ -361,8 +384,8 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  width: `${DIBUIX_PX}px`,
-                  height: `${DIBUIX_PX}px`,
+                  width: `${dibuixPx}px`,
+                  height: `${dibuixPx}px`,
                   padding: 0,
                   border: 0,
                   background: 'transparent',
@@ -378,8 +401,8 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
                     alt={label}
                     loading="lazy"
                     style={{
-                      height: `${DIBUIX_PX}px`,
-                      width: `${DIBUIX_PX}px`,
+                      height: `${dibuixPx}px`,
+                      width: `${dibuixPx}px`,
                       objectFit: 'contain',
                       display: 'block',
                     }}
