@@ -45,18 +45,26 @@ import useMegaTileSelectorDrag from '@/hooks/useMegaTileSelectorDrag';
  * arribaven es veia l'espai en blanc i despres apareixien de cop, que es
  * exactament el que es veia.
  *
- * Son 31 fitxers i 0,8 MB en total: val la pena demanar-los amb la resta de
- * la pagina i tenir-los a la memoria cau abans que calguin.
+ * COM ES DEMANEN, I PER QUE AIXI
+ *
+ * Totes juntes son 31 fitxers i 0,8 MB. Amb una connexio lenta aixo no arriba
+ * a temps i es torna a veure l'espai en blanc, aixi que no es poden demanar
+ * totes de cop: es demanen PRIMER les de la colleccio que es veura de seguida
+ * (7 fitxers, uns 180 KB) i la resta quan el navegador esta tranquil.
  */
-const IMATGES_FRANJA = [
-  ...new Set([
-    ...Object.values(FIRST_CONTACT_MEDIA),
-    ...Object.values(FIRST_CONTACT_MEDIA_WHITE),
-    ...Object.values(FIRST_CONTACT_MEDIA_COLOR),
-    ...Object.values(THE_HUMAN_INSIDE_MEDIA),
-    ...Object.values(CUBE_MEDIA),
-  ].filter((v) => typeof v === 'string' && v.startsWith('/'))),
-];
+const neteja = (mapes) => [...new Set(
+  mapes.flatMap((m) => Object.values(m)).filter((v) => typeof v === 'string' && v.startsWith('/'))
+)];
+
+// Les de la primera colleccio, que es la que surt en obrir el calaix.
+const IMATGES_FRANJA_PRIORITARIES = neteja([FIRST_CONTACT_MEDIA, THE_HUMAN_INSIDE_MEDIA]);
+
+// Tota la resta: es demanen mes tard, sense pressa.
+const IMATGES_FRANJA_LA_RESTA = neteja([
+  FIRST_CONTACT_MEDIA_WHITE,
+  FIRST_CONTACT_MEDIA_COLOR,
+  CUBE_MEDIA,
+]).filter((src) => !IMATGES_FRANJA_PRIORITARIES.includes(src));
 
 function FullWideSlideHeader({
   contained = false,
@@ -127,6 +135,12 @@ function FullWideSlideHeader({
   };
   const dblClickDelayMs = 0;
   const [searchQuery, ] = useState('');
+  /**
+   * La resta d'imatges de franja, que es demanen quan el navegador esta
+   * tranquil. Aixi la pagina carrega abans i, quan l'usuari obre el calaix,
+   * les de la seva colleccio ja hi son.
+   */
+  const [imatgesFranjaResta, setImatgesFranjaResta] = useState([]);
 
   // El cistell és ÚNIC per a tota la botiga i viu a CartContext. Abans aquest
   // component en tenia un de propi, i per això afegir un producte des d'una
@@ -2751,6 +2765,24 @@ function FullWideSlideHeader({
   }, [contained, active]);
 
   useEffect(() => {
+    // Les imatges que no son de la primera colleccio es demanen quan el
+    // navegador no te res mes a fer, perque no competeixin amb el que es veu.
+    const demanaLaResta = () => setImatgesFranjaResta(IMATGES_FRANJA_LA_RESTA);
+    let idleId = 0;
+    let timeoutId = 0;
+    if (typeof window === 'undefined') return undefined;
+    if (typeof window.requestIdleCallback === 'function') {
+      idleId = window.requestIdleCallback(demanaLaResta, { timeout: 2500 });
+    } else {
+      timeoutId = window.setTimeout(demanaLaResta, 1500);
+    }
+    return () => {
+      if (idleId && typeof window.cancelIdleCallback === 'function') window.cancelIdleCallback(idleId);
+      if (timeoutId) window.clearTimeout(timeoutId);
+    };
+  }, []);
+
+  useEffect(() => {
     const recompute = () => {
       try {
         const px = parseFloat(window.getComputedStyle(document.documentElement).fontSize);
@@ -2792,9 +2824,15 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
       {/* Precarrega de les imatges de les franges de samarretes.
           No es veuen: nomes serveixen perque el navegador les tingui a la
           memoria cau abans que s'obri el calaix. Sense aixo, en obrir-lo es
-          veia l'espai en blanc i les samarretes apareixien de cop. */}
+          veia l'espai en blanc i les samarretes apareixien de cop.
+
+          Primer nomes les de la colleccio que es veura de seguida; la resta,
+          quan el navegador no te res mes a fer. */}
       <div aria-hidden="true" style={{ position: 'absolute', width: 0, height: 0, overflow: 'hidden', opacity: 0, pointerEvents: 'none' }}>
-        {IMATGES_FRANJA.map((src) => (
+        {IMATGES_FRANJA_PRIORITARIES.map((src) => (
+          <img key={src} src={src} alt="" loading="eager" decoding="async" fetchPriority="high" />
+        ))}
+        {imatgesFranjaResta.map((src) => (
           <img key={src} src={src} alt="" loading="eager" decoding="async" />
         ))}
       </div>
