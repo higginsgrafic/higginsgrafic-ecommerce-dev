@@ -198,7 +198,7 @@ const COLUMNS = [
   [{ bullet: true, collection: 'the_human_inside', subcollection: null, items: ['Afrodita-A', 'C3-P0', 'Cyberman', "Cylon '03", "Cylon '78", "Iron Man '08", "Iron Man '68", 'Maschinenmensch', 'Mazinger-Z', 'R2-D2'] }],
   // 3 · THE HUMAN INSIDE (continuació) + AUSTEN (Pemberley + Keep Calm)
   [
-    { bullet: false, collection: 'the_human_inside', subcollection: null, items: ['Robbie The Robot', 'Robocop', 'The Dalek', 'Vader'] },
+    { bullet: false, collection: 'the_human_inside', subcollection: null, items: ['Robbie The Robot', 'Robocop', 'Terminator', 'The Dalek', 'Vader'] },
     { bullet: true, collection: 'austen', subcollection: 'pemberley', items: ['Pemberley House'] },
     { bullet: true, collection: 'austen', subcollection: 'keep_calm', items: ['Keep Calm'] },
   ],
