@@ -93,6 +93,10 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY || SUPABAS
 // Client de Gelato
 const edgeFunctionUrl = `${SUPABASE_URL}/functions/v1/gelato-proxy`;
 
+// Els `gelato_product_id` que ja existeixen a la base de dades. S'omple a
+// `main()` abans de sincronitzar.
+let slugsExistents = new Set();
+
 async function fetchStoreProducts() {
   try {
     console.log('🏪 Obtenint productes de la teva botiga Gelato...');
@@ -171,18 +175,48 @@ function transformStoreProduct(storeProduct, index) {
   // (Abans s'hi posava storeProduct.price, que es el cost de Gelato: 29,99.)
   const basePrice = SELLING_PRICE;
 
+  const gelatoId = storeProduct.id?.toString() || `store-${index}`;
+
+  // El `slug` és el que fa que un producte sigui a la botiga: sense ell no té
+  // adreça i no surt enlloc. Abans no es generava mai i els productes nous hi
+  // entraven amb el slug buit (va passar amb el C3-P0 i l'Afrodita A nous).
+  //
+  // NOMÉS s'hi posa als productes que encara no hi són: canviar el slug d'un
+  // producte que ja existeix li canviaria l'adreça i trencaria els enllaços.
+  const jaExisteix = slugsExistents.has(gelatoId);
+
   return {
-    gelato_product_id: storeProduct.id?.toString() || `store-${index}`,
+    gelato_product_id: gelatoId,
     name: productTitle,
     description: storeProduct.description || productTitle,
     price: basePrice,
     currency: 'EUR',
     category: 'apparel',
     collection: collection,
-    sku: storeProduct.sku || storeProduct.id?.toString() || '',
+    sku: storeProduct.sku || gelatoId || '',
     is_active: true,
-    image: images[0]
+    image: images[0],
+    ...(jaExisteix ? {} : { slug: slugDelTitol(productTitle) }),
   };
+}
+
+/**
+ * Converteix el titol d'un producte de Gelato en un slug.
+ *
+ *   "The Human Inside - c3p0 - n"    -> "the-human-inside-c3p0"
+ *   "Cube - Afrodita-C - c"          -> "cube-afrodita-c"
+ *
+ * Treu el sufix d'estat final (`- b`, `- n`, `- c`), que es el color
+ * d'impressio i no forma part del disseny.
+ */
+function slugDelTitol(titol) {
+  return String(titol)
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')   // accents
+    .replace(/\s*-\s*(b|n|c|w)\s*$/i, '') // sufix d'impressio
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
 }
 
 function mapColorToHex(colorName) {
@@ -309,7 +343,9 @@ async function syncProductToSupabase(product, variants, images) {
         category: product.category,
         collection: product.collection,
         sku: product.sku,
-        is_active: product.is_active
+        is_active: product.is_active,
+        // Nomes els productes NOUS porten slug; els que ja hi son el conserven.
+        ...(product.slug ? { slug: product.slug } : {}),
       }, {
         onConflict: 'gelato_product_id'
       })
@@ -399,6 +435,15 @@ async function main() {
     }
 
     console.log(`\n📊 Sincronitzant ${storeProducts.length} productes...\n`);
+
+    // Quins productes ja son a la base de dades? Serveix per no canviar mai el
+    // slug d'un producte existent (li canviariem l'adreça).
+    const { data: existents, error: errExistents } = await supabase
+      .from('products')
+      .select('gelato_product_id');
+    if (errExistents) throw new Error(errExistents.message);
+    slugsExistents = new Set((existents || []).map((p) => String(p.gelato_product_id)));
+    console.log(`   ${slugsExistents.size} productes ja eren a la base de dades\n`);
 
     let successCount = 0;
     let errorCount = 0;
