@@ -50,6 +50,12 @@ const INK = '#2B2B2B';
 const INK_HOVER = INK;
 const INK_SELECTED = '#000000';
 
+// Mida del dibuix a la graella de dibuixos (que substitueix els noms).
+const DIBUIX_PX = 50;
+// Separacions entre dibuixos: horitzontal (entre columnes) i vertical (entre files).
+const DIBUIX_GAP_H = 25;
+const DIBUIX_GAP_V = 3;
+
 // Mapping: text label -> stripe item ID (per seleccionar el disseny a la franja)
 const STRIPE_MAP = {
   // FIRST CONTACT
@@ -128,6 +134,60 @@ const STRIPE_MAP = {
   'Pont Del Diable': '/custom_logos/drawings/images_grid/miscellania/pont-del-diable-b-grid.webp',
   'R2D2 Quote': '/custom_logos/drawings/images_grid/miscellania/r2d2-quote-b-grid.webp',
 };
+
+/**
+ * El dibuix (fitxer de graella) de cada nom, per a la graella de dibuixos.
+ *
+ * A la graella de dibuixos, en comptes del NOM es mostra el DIBUIX. Cada nom
+ * té un fitxer a `images_grid`; aquí s'hi lliga, mantenint el mateix ordre de
+ * col·leccions que la taula de noms (vegeu COLUMNS).
+ *
+ * Les col·leccions AUSTEN i MISCEL·LÀNIA ja tenen el camí directe a STRIPE_MAP;
+ * les altres tres s'hi afegeixen aquí, amb els seus fitxers de graella.
+ */
+const GRID_MAP = {
+  // FIRST CONTACT (carpeta black)
+  'NX-01': '/custom_logos/drawings/images_grid/first_contact/black/nx-01-b-grid.webp',
+  'NCC-1701': '/custom_logos/drawings/images_grid/first_contact/black/ncc-1701-b-grid.webp',
+  'NCC-1701-D': '/custom_logos/drawings/images_grid/first_contact/black/ncc1701-d-b-grid.webp',
+  Wormhole: '/custom_logos/drawings/images_grid/first_contact/black/wormhole-b-grid.webp',
+  'The Phoenix': '/custom_logos/drawings/images_grid/first_contact/black/the-phoenix-b-grid.webp',
+  'Vulcans End': '/custom_logos/drawings/images_grid/first_contact/black/vulcans-end-b-grid.webp',
+  'Plasma Escape': '/custom_logos/drawings/images_grid/first_contact/black/plasma-escape-b-grid.webp',
+  // THE HUMAN INSIDE
+  'Afrodita-A': '/custom_logos/drawings/images_grid/the_human_inside/afrodita-a-b-grid.webp',
+  'C3-P0': '/custom_logos/drawings/images_grid/the_human_inside/c3-p0-b-grid.webp',
+  Cyberman: '/custom_logos/drawings/images_grid/the_human_inside/cyberman-b-grid.webp',
+  "Cylon '03": '/custom_logos/drawings/images_grid/the_human_inside/cylon-03-b-grid.webp',
+  "Cylon '78": '/custom_logos/drawings/images_grid/the_human_inside/cylon-78-b-grid.webp',
+  "Iron Man '08": '/custom_logos/drawings/images_grid/the_human_inside/iron-man-08-b-grid.webp',
+  "Iron Man '68": '/custom_logos/drawings/images_grid/the_human_inside/iron-man-68-b-grid.webp',
+  Maschinenmensch: '/custom_logos/drawings/images_grid/the_human_inside/maschinenmensch-b-grid.webp',
+  'Mazinger-Z': '/custom_logos/drawings/images_grid/the_human_inside/mazinger-z-b-grid.webp',
+  'R2-D2': '/custom_logos/drawings/images_grid/the_human_inside/r2-d2-b-grid.webp',
+  'Robbie The Robot': '/custom_logos/drawings/images_grid/the_human_inside/robby-the-robot-b-grid.webp',
+  Robocop: '/custom_logos/drawings/images_grid/the_human_inside/robocop-b-grid.webp',
+  Terminator: '/custom_logos/drawings/images_grid/the_human_inside/terminator-b-grid.webp',
+  'The Dalek': '/custom_logos/drawings/images_grid/the_human_inside/the-dalek-b-grid.webp',
+  Vader: '/custom_logos/drawings/images_grid/the_human_inside/vader-b-grid.webp',
+  // CUBE
+  'Afrodita-C': '/custom_logos/drawings/images_grid/cube/afrodita-c-grid.webp',
+  '3cube-P0': '/custom_logos/drawings/images_grid/cube/3cube-p0-grid.webp',
+  'Cyber Cube': '/custom_logos/drawings/images_grid/cube/cybercube-grid.webp',
+  "Cylon Cube '03": '/custom_logos/drawings/images_grid/cube/cylon-cube-grid.webp',
+  'Darth Cube': '/custom_logos/drawings/images_grid/cube/darth-cube-grid.webp',
+  "Iron Cube '08": '/custom_logos/drawings/images_grid/cube/iron-kong-grid.webp',
+  "Iron Cube '68": '/custom_logos/drawings/images_grid/cube/iron-cube-grid.webp',
+  Maschinencube: '/custom_logos/drawings/images_grid/cube/maschinencube-grid.webp',
+  'Mazinger-C': '/custom_logos/drawings/images_grid/cube/mazinger-c-grid.webp',
+  Robocube: '/custom_logos/drawings/images_grid/cube/robocube-grid.webp',
+  // La resta (AUSTEN i MISCEL·LÀNIA) ve del STRIPE_MAP, que ja té el camí.
+};
+
+/** El dibuix d'un nom, sigui quin sigui el fitxer on visqui. */
+function dibuixDelNom(label) {
+  return GRID_MAP[label] || STRIPE_MAP[label] || null;
+}
 
 // 8 columnes -> grups -> ítems. bullet=true mostra bullet+stub al primer ítem.
 // Cada grup té una clau de col·lecció per poder filtrar/marcar segons el botó actiu.
@@ -250,15 +310,16 @@ function Group({ group, isFirst, dimmed, clickable, selectedStripeItem, hoveredS
 
 function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripeItem, hoveredStripeItem, onSelectGroup, onHoverItem, onHoverLeave, compact = false, selectedColor = 'white', onSelectColor, onSelectCollection, isPortraitTablet = false, isLandscapeTablet = false, leftOffset = 0, uniformColumns = false, fontBoost = 0 }) {
   if (compact) {
-    const items = COLUMNS.flatMap((groups) => groups.flatMap((group) => group.items.map((label) => ({
+    // Cada columna conserva els seus grups i l'ordre de col·lecció. Abans es
+    // feia un flatMap i es repartia per mida, cosa que barrejava col·leccions
+    // a la mateixa columna; ara cada columna de COLUMNS es dibuixa sencera.
+    const columns = COLUMNS.map((groups) => groups.flatMap((group) => group.items.map((label) => ({
       label,
       collection: group.collection,
       subcollection: group.subcollection,
       stripeItem: STRIPE_MAP[label],
     }))));
-    const numColumns = 8;
-    const perColumn = Math.ceil(items.length / numColumns);
-    const columns = Array.from({ length: numColumns }, (_, index) => items.slice(index * perColumn, index * perColumn + perColumn));
+    const numColumns = columns.length;
     const activeKey = activeCollection === 'austen' ? `austen:${activeSubcollection || ''}` : activeCollection;
 
     return (
@@ -275,46 +336,56 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
           pointerEvents: 'auto',
         }}
       >
-        <div style={{ display: isPortraitTablet ? 'grid' : 'flex', gridTemplateColumns: uniformColumns ? 'none' : `repeat(${numColumns}, minmax(0, 1fr))`, columnGap: uniformColumns ? '0px' : '5px',
-          // A l'escriptori i a l'apaisada les columnes es reparteixen amb
-          // space-between: aixi el forat que ES VEU queda igual entre totes,
-          // perque cada columna nome s fa de ample com el seu texte.
-          justifyContent: (!isPortraitTablet && !uniformColumns) ? 'space-between' : undefined,
-          width: '100%', minWidth: 0, }}>
+        <div style={{ display: 'flex', gap: `${DIBUIX_GAP_H}px`, width: '100%', minWidth: 0 }}>
           {columns.map((column, columnIndex) => (
-            <div key={columnIndex} style={{ minWidth: 0, flex: uniformColumns ? '1 1 0' : (isPortraitTablet ? undefined : '0 0 auto'), overflow: uniformColumns ? 'hidden' : undefined, transform: uniformColumns ? `translateX(${-25 + columnIndex * (125 / 7) - (columnIndex >= 1 && columnIndex <= 4 ? 20 : 0) - (columnIndex >= 2 && columnIndex <= 4 ? 10 : 0) - (columnIndex === 5 ? 20 : 0) - (columnIndex === 7 ? 20 : 0)}px)` : 'none' }}>
+            <div key={columnIndex} style={{ width: `${DIBUIX_PX}px`, flex: '0 0 auto', display: 'flex', flexDirection: 'column', gap: `${DIBUIX_GAP_V}px` }}>
               {column.map(({ label, collection, subcollection, stripeItem }) => {
               const dimmed = activeCollection && collection !== activeCollection
                 ? true
                 : activeCollection === 'austen' && collection === 'austen' && activeSubcollection && subcollection !== activeSubcollection;
               const emphasized = stripeItem && (stripeItem === selectedStripeItem || stripeItem === hoveredStripeItem);
+              const dibuix = dibuixDelNom(label);
               return (
                 <button
                   key={label}
                   type="button"
+                  title={label}
+                  aria-label={label}
                   onClick={() => onSelectGroup?.(collection, subcollection, stripeItem)}
                   onMouseEnter={() => stripeItem && onHoverItem?.(stripeItem, collection)}
                   onMouseLeave={onHoverLeave}
-                  className="font-roboto-condensed"
                   style={{
-                    display: 'block',
-                    width: '100%',
-                    minHeight: '12px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'flex-start',
+                    width: `${DIBUIX_PX}px`,
+                    height: `${DIBUIX_PX}px`,
                     padding: 0,
                     border: 0,
                     background: 'transparent',
-                    color: '#2B2B2B',
                     opacity: dimmed ? 0.24 : 1,
-                    fontSize: `${(isPortraitTablet ? 7 : (isLandscapeTablet ? 8 : 11)) + fontBoost}px`,
-                    fontWeight: emphasized ? 700 : 300,
-                    lineHeight: `${(isPortraitTablet ? 10 : (isLandscapeTablet ? 12 : 15)) + fontBoost}px`,
-                    textAlign: 'left',
-                    whiteSpace: 'nowrap',
-                    overflow: uniformColumns ? 'hidden' : 'visible',
                     cursor: 'pointer',
+                    outline: emphasized ? '1px solid rgba(0,0,0,0.5)' : 'none',
+                    outlineOffset: '1px',
                   }}
                 >
-                  {label.replace(/^Looking For My Darcy/, 'LFMD')}
+                  {dibuix ? (
+                    <img
+                      src={dibuix}
+                      alt={label}
+                      loading="lazy"
+                      style={{
+                        height: `${DIBUIX_PX}px`,
+                        width: `${DIBUIX_PX}px`,
+                        objectFit: 'contain',
+                        display: 'block',
+                      }}
+                    />
+                  ) : (
+                    <span style={{ color: '#2B2B2B', fontSize: `${(isPortraitTablet ? 7 : (isLandscapeTablet ? 8 : 11)) + fontBoost}px`, whiteSpace: 'nowrap' }}>
+                      {label.replace(/^Looking For My Darcy/, 'LFMD')}
+                    </span>
+                  )}
                 </button>
               );
               })}
