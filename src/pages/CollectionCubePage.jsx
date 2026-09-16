@@ -116,7 +116,7 @@ const HERO_TDP_GAP_PX = '-41px';
 const HERO_TDP_GAP_TABLET_PX = '338px';
 // La tauleta horitzontal es mes curta: la graella ja hi te menys recorregut,
 // aixi que el valor ha de ser diferent per donar la mateixa distancia.
-const HERO_TDP_GAP_LANDSCAPE_PX = '-335px';
+const HERO_TDP_GAP_LANDSCAPE_PX = '-240px';
 
 // Imatge de fons de la hero (de moment un placeholder; un dia sera una animacio).
 const HERO_BACKGROUND_SRC = '/placeholders/hero/placeholder-noia.jpg';
