@@ -129,6 +129,7 @@ function MegaStripePanelP1({
   calibrationOverrides,
   compactLandscape = false,
   onP1ContentBottomChange,
+  onPageLiftChange,
   isPortraitTablet = false,
 }) {
   const emptyShirtMaskUrl = useEmptyShirtMask(emptyTileIndices, shirtColor);
@@ -152,36 +153,46 @@ function MegaStripePanelP1({
     if (!root || !panel) return undefined;
 
     let frame = 0;
+    const applyMeasurement = () => {
+      const selector = root.querySelector('[data-stripe-buttonbar="bn"]');
+      if (isPortraitTablet) {
+        if (pageLiftRef.current !== 0) {
+          pageLiftRef.current = 0;
+          setPageLift(0);
+        }
+        onPageLiftChange?.(0);
+      } else if (selector) {
+        // A l'apaisada volem tota la filera 10px mes avall del lloc on
+        // l'alineava la calibracio. El desplaçament va aqui, dins l'objectiu:
+        // si el posessim al transform, la propia calibracio el desfaria.
+        const desplaçament = (typeof window !== 'undefined' && window.innerWidth >= 768 && window.innerWidth <= 1366 && window.innerWidth >= window.innerHeight) ? 10 : 0;
+        const delta = (selector.getBoundingClientRect().top - panel.getBoundingClientRect().top) - desplaçament;
+        const next = Math.max(0, pageLiftRef.current + delta);
+        if (Math.abs(next - pageLiftRef.current) >= 0.5) {
+          pageLiftRef.current = next;
+          setPageLift(next);
+          onPageLiftChange?.(next);
+        }
+      }
+      // Bottom visual de les samarretes (ja inclou l'escala interna de la
+      // franja i el pageLift) mesurat des del capdamunt del panell: el pare
+      // el fa servir per retallar l'alçada de la pàgina 1 sense números màgics.
+      if (typeof onP1ContentBottomChange === 'function') {
+        const stripeContent = root.querySelector('[data-stripe-visual-content="1"]');
+        if (stripeContent) {
+          const bottom = stripeContent.getBoundingClientRect().bottom - panel.getBoundingClientRect().top;
+          if (Number.isFinite(bottom) && bottom > 0) onP1ContentBottomChange(bottom);
+        }
+      }
+    };
     const measure = () => {
       cancelAnimationFrame(frame);
-      frame = requestAnimationFrame(() => {
-        const selector = root.querySelector('[data-stripe-buttonbar="bn"]');
-        if (selector) {
-          // A l'apaisada volem tota la filera 10px mes avall del lloc on
-          // l'alineava la calibracio. El desplaçament va aqui, dins l'objectiu:
-          // si el posessim al transform, la propia calibracio el desfaria.
-          const desplaçament = (typeof window !== 'undefined' && window.innerWidth >= 768 && window.innerWidth <= 1366 && window.innerWidth >= window.innerHeight) ? 10 : 0;
-          const delta = (selector.getBoundingClientRect().top - panel.getBoundingClientRect().top) - desplaçament;
-          const next = Math.max(0, pageLiftRef.current + delta);
-          if (Math.abs(next - pageLiftRef.current) >= 0.5) {
-            pageLiftRef.current = next;
-            setPageLift(next);
-          }
-        }
-        // Bottom visual de les samarretes (ja inclou l'escala interna de la
-        // franja i el pageLift) mesurat des del capdamunt del panell: el pare
-        // el fa servir per retallar l'alçada de la pàgina 1 sense números màgics.
-        if (typeof onP1ContentBottomChange === 'function') {
-          const stripeContent = root.querySelector('[data-stripe-visual-content="1"]');
-          if (stripeContent) {
-            const bottom = stripeContent.getBoundingClientRect().bottom - panel.getBoundingClientRect().top;
-            if (Number.isFinite(bottom) && bottom > 0) onP1ContentBottomChange(bottom);
-          }
-        }
-      });
+      frame = requestAnimationFrame(applyMeasurement);
     };
 
-    measure();
+    // La primera mesura no espera cap frame: useLayoutEffect encara és abans
+    // de pintar i així la pàgina ja neix a la posició bona, sense salt visible.
+    applyMeasurement();
     const observer = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(measure) : null;
     observer?.observe(panel);
     observer?.observe(root);
@@ -191,7 +202,7 @@ function MegaStripePanelP1({
       observer?.disconnect();
       window.removeEventListener('resize', measure);
     };
-  }, [active, megaTileSize, onP1ContentBottomChange]);
+  }, [active, isPortraitTablet, megaTileSize, onP1ContentBottomChange, onPageLiftChange, pageLift]);
 
   useEffect(() => {
     const handler = (ev) => {

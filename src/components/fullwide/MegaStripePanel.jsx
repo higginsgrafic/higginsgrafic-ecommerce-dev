@@ -172,6 +172,8 @@ function MegaStripePanel({
               onStartSelectorDrag={onStartSelectorDrag}
               megaTileSize={megaTileSize}
               compactLandscape={compactLandscape}
+              hideLabels
+              hideSelectorBackground
               humanInsideVariant={humanInsideVariant}
               items={active === 'austen' ? reorderAustenQuotes(col.items) : col.items}
               row={true}

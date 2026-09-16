@@ -53,6 +53,7 @@ function FullWideSlideHeader({
   const cartLastClickRef = useRef(0);
   const searchLastClickRef = useRef(0);
   const accountLastClickRef = useRef(0);
+  const collectionLastClickRefs = useRef(new Map());
   /**
    * Retorna true si el clic s'ha d'ignorar.
    *
@@ -74,6 +75,9 @@ function FullWideSlideHeader({
    * l'hora: l'accio la fa qui crida la funcio.
    */
   const clicRepetit = (ref, duracioAccioMs = 350) => {
+    // `Date.now()` directament fa que el lint digui que la funcio no es pura,
+    // pero aixo nomes s'executa en clicar, no en pintar.
+    // eslint-disable-next-line react-hooks/purity
     const ara = Date.now();
     // El primer clic no te hora: passa sempre.
     if (!ref.current) {
@@ -84,6 +88,12 @@ function FullWideSlideHeader({
     if (ara - ref.current < duracioAccioMs) return true;
     ref.current = ara;
     return false;
+  };
+  const clicColleccioRepetit = (collectionId) => {
+    if (!collectionLastClickRefs.current.has(collectionId)) {
+      collectionLastClickRefs.current.set(collectionId, { current: 0 });
+    }
+    return clicRepetit(collectionLastClickRefs.current.get(collectionId), 620);
   };
   const dblClickDelayMs = 0;
   const [searchQuery, ] = useState('');
@@ -2834,6 +2844,7 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
                   style={(isPortraitTablet || isLandscapeTablet) ? { letterSpacing: isPortraitTablet ? '0.04em' : '0.04em', fontSize: isPortraitTablet ? '11.5px' : '12px', whiteSpace: 'nowrap' } : { whiteSpace: 'nowrap' }}
                   aria-expanded={open ? 'true' : 'false'}
                   onClick={() => {
+                    if (clicColleccioRepetit(item.id)) return;
                     setManualOverrideClosed(false);
                     setMegaFullScreen(false);
                     // Toggle només si ja som a la col·lecció i a la
@@ -3022,6 +3033,7 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
                   className={`inline-flex items-center gap-1 text-xs font-semibold tracking-[0.18em] uppercase whitespace-nowrap ${open ? 'text-foreground' : 'text-muted-foreground hover:text-foreground'}`}
                   aria-expanded={open ? 'true' : 'false'}
                   onClick={() => {
+                    if (clicColleccioRepetit(item.id)) return;
                     setManualOverrideClosed(false);
                     setMegaFullScreen(false);
                     if (active === item.id && megaPage === 1) {
