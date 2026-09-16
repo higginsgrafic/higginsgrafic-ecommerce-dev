@@ -75,9 +75,16 @@ const DIBUIXOS_A_PART = {
   'austen-you-have-bewitched-me': '/custom_logos/drawings/images_originals/stripe/austen/quotes/black/you-have-bewitched-me-b-stripe.webp',
 };
 
-/** Interruptor: `?megaGrid=dibuixos` mana sobre el que hi hagi desat. */
+/**
+ * L'interruptor: graella de dibuixos o graella de noms.
+ *
+ * Es desa i s'exporta amb un esdeveniment, perque tots els components que el
+ * fan servir canviin alhora, sense recarregar la pagina.
+ */
 const CLAU_LOCAL = 'hg-mega-grid-dibuixos';
+const ESDEVENIMENT = 'hg-mega-grid-canviada';
 
+/** Llegeix l'estat desat. Tambe es pot forçar amb l'adreca (`?megaGrid=`). */
 export function graellaDeDibuixosActiva() {
   if (typeof window === 'undefined') return false;
   const param = new URLSearchParams(window.location.search).get('megaGrid');
@@ -86,10 +93,18 @@ export function graellaDeDibuixosActiva() {
   return window.localStorage.getItem(CLAU_LOCAL) === '1';
 }
 
+/** Canvia l'estat i avisa tothom. No recarrega la pagina. */
 export function activaGraellaDeDibuixos(activa) {
   if (typeof window === 'undefined') return;
   window.localStorage.setItem(CLAU_LOCAL, activa ? '1' : '0');
-  window.location.reload();
+  window.dispatchEvent(new Event(ESDEVENIMENT));
+}
+
+/** Per escoltar els canvis des d'un component. */
+export function escoltaGraellaDeDibuixos(quanCanvia) {
+  if (typeof window === 'undefined') return () => {};
+  window.addEventListener(ESDEVENIMENT, quanCanvia);
+  return () => window.removeEventListener(ESDEVENIMENT, quanCanvia);
 }
 
 /**
