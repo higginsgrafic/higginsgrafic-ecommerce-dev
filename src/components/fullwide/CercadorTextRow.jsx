@@ -357,7 +357,7 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
                   style={{
                     display: 'flex',
                     alignItems: 'center',
-                    justifyContent: 'flex-start',
+                    justifyContent: 'center',
                     width: `${DIBUIX_PX}px`,
                     height: `${DIBUIX_PX}px`,
                     padding: 0,
