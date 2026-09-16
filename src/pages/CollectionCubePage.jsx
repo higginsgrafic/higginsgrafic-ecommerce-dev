@@ -112,7 +112,7 @@ const TDP_MOVE_PX = 0;
 // Separació entre la hero i la primera fila de fitxes, per orientació.
 // A la tauleta vertical les fitxes començaven enganxades a la vora de la hero.
 // A la tauleta horitzontal NO s'hi aplica res: allà ja hi havia prou aire.
-const HERO_TDP_GAP_PX = '-220px';
+const HERO_TDP_GAP_PX = '-41px';
 const HERO_TDP_GAP_TABLET_PX = '338px';
 // La tauleta horitzontal es mes curta: la graella ja hi te menys recorregut,
 // aixi que el valor ha de ser diferent per donar la mateixa distancia.
