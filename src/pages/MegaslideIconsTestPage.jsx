@@ -188,7 +188,11 @@ export default function MegaslideIconsTestPage() {
                 onClick={() => setSeleccionat(actiu ? null : f.slug)}
                 style={{
                   appearance: 'none',
-                  border: actiu ? '1px solid #000000' : '1px solid transparent',
+                  // Sense `border`: el contorn se'n menja 1 px de cada costat i
+                  // el dibuix quedaria de 48 px en comptes de 50. El senyal de
+                  // seleccionat es fa amb `boxShadow`, que no ocupa espai.
+                  border: 'none',
+                  boxShadow: actiu ? 'inset 0 0 0 1px #000000' : undefined,
                   background: 'transparent',
                   cursor: 'pointer',
                   padding: 0,
