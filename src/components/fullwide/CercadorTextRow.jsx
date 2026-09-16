@@ -51,7 +51,7 @@ const INK_HOVER = INK;
 const INK_SELECTED = '#000000';
 
 // Mida del dibuix a la graella de dibuixos (que substitueix els noms).
-const DIBUIX_PX = 50;
+const DIBUIX_PX = 25;
 // Separacions entre dibuixos: horitzontal (entre columnes) i vertical (entre files).
 const DIBUIX_GAP_H = 25;
 const DIBUIX_GAP_V = 3;
