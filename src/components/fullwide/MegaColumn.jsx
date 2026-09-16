@@ -19,6 +19,7 @@ import {
   touchMegaPublicActivity,
 } from './megaPublicSelectorState.js';
 import OptimizedImg from './OptimizedImg.jsx';
+import MegaGridDibuixos, { graellaDeDibuixosActiva, activaGraellaDeDibuixos, escoltaGraellaDeDibuixos } from './MegaGridDibuixos.jsx';
 import {
   FirstContactDibuix00Buttons,
   FirstContactDibuix09Buttons,
@@ -59,6 +60,10 @@ function MegaColumn({
   const [tileSize, setTileSize] = useState(null);
   const humanInsideEnabled = Boolean(isHumanInside);
   const effectiveTileSize = megaTileSize || tileSize;
+
+  // Graella de dibuixos o de noms, viu: el boto ho canvia sense recarregar.
+  const [dibuixosActius, setDibuixosActius] = useState(graellaDeDibuixosActiva);
+  useEffect(() => escoltaGraellaDeDibuixos(() => setDibuixosActius(graellaDeDibuixosActiva())), []);
   const selectorTilePitchPx = (Number(effectiveTileSize) || 120) + 12;
   const selectorSizePx = Math.round(Number(megaTileSelectorParams?.sizePx) || 200);
   const selectorStrokePx = Math.min(80, Math.max(0, Number(megaTileSelectorParams?.strokePx) || 0));
@@ -1081,8 +1086,40 @@ function MegaColumn({
   };
 
   return (
-    <div className="min-w-0">
+    <div className="min-w-0" style={{ position: 'relative' }}>
+      {/* El boto per canviar entre dibuixos i noms. Nomes surt a la graella. */}
       {row ? (
+        <button
+          type="button"
+          onClick={() => activaGraellaDeDibuixos(!dibuixosActius)}
+          title={dibuixosActius ? 'Tornar a la graella de noms' : 'Veure la graella de dibuixos'}
+          style={{
+            position: 'absolute',
+            right: 0,
+            top: -18,
+            zIndex: 60,
+            appearance: 'none',
+            cursor: 'pointer',
+            border: '1px solid rgba(0,0,0,0.18)',
+            background: dibuixosActius ? '#111827' : '#FFFFFF',
+            color: dibuixosActius ? '#FFFFFF' : '#111827',
+            borderRadius: 4,
+            padding: '1px 8px',
+            fontFamily: 'Roboto, sans-serif',
+            fontSize: 9,
+            letterSpacing: '0.08em',
+            textTransform: 'uppercase',
+          }}
+        >
+          {dibuixosActius ? 'Dibuixos' : 'Noms'}
+        </button>
+      ) : null}
+      {row && dibuixosActius ? (
+        /* PROVA: en comptes de la taula de noms, la graella de dibuixos.
+           Surt exactament al mateix lloc, perque substitueix el mateix bloc.
+           S'activa amb el boto de sota o amb `?megaGrid=dibuixos`. */
+        <MegaGridDibuixos active={collectionId} items={items} />
+      ) : row ? (
         <div className="grid w-full grid-cols-9 gap-x-3">
           {rowItems.map((it, idx) => (
             <div
