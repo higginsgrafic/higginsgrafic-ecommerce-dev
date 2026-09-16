@@ -132,6 +132,14 @@ export default defineConfig({
   },
   server: {
     host: '0.0.0.0',
+    // Les funcions de servidor no les serveix Vite: les serveix `netlify dev`
+    // al 8888. Amb aquest proxy, `/api/...` funciona DES DEL 3003, que és on
+    // treballa l'amo. Si el 8888 no està aixecat, la petició dona error de
+    // connexió, i prou: la web continua funcionant.
+    proxy: {
+      '/api': { target: 'http://127.0.0.1:8888', changeOrigin: true },
+      '/.netlify/functions': { target: 'http://127.0.0.1:8888', changeOrigin: true },
+    },
     // El 3003 de sempre. `strictPort: false` perquè, si el port està ocupat,
     // Vite passi al següent en comptes de petar: amb `npm run proves`, el
     // `netlify dev` també vol aixecar server i poden coincidir un moment.

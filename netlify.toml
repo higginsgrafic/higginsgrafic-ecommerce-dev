@@ -205,15 +205,16 @@
   status = 200
 
 [dev]
-  # `npm run proves` serveix les funcions de servidor, que en local Vite no té.
+  # `npm run proves` serveix la web I les funcions de servidor.
   #
   #     netlify dev --offline --port 8888 --target-port 3003
   #
-  # Vite continua al 3003 (el port de sempre, on es treballa) i el proxy de
-  # `netlify dev` escolta al 8888. Des del navegador es treballa al 3003 com
-  # sempre; el 8888 és per cridar `/api/...`, que és el que Vite no serveix.
+  # Vite escolta al 3003 (el port de sempre) i el proxy de `netlify dev`, que
+  # és qui serveix les funcions, al 8888. Vite té un proxy a `/api` i a
+  # `/.netlify/functions` cap al 8888 (vegeu vite.config.js), de manera que
+  # TOT es pot fer des del 3003: la web i les eines d'administració.
   #
-  # Els ports han d'anar a la comanda i no només aquí: el CLI detecta Vite i
-  # n'arrenca una instància pel seu compte, i amb la configuració sola xocaven.
+  # Els ports van a la comanda i no només aquí: el CLI detecta Vite i
+  # n'arrenca una instància pel seu compte.
   targetPort = 3003
   port = 8888
