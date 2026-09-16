@@ -103,18 +103,9 @@ function colorToProductName(color) {
 // Alcada de la franja blanca de la hero.
 const BAND_HEIGHT = 'clamp(120px, 26vh, 260px)';
 
-// Desplaçament vertical de les TDP, només elles.
-//
-// ERA -120: el bloc sencer pujava 120 px i les primeres fitxes quedaven a
-// sobre de la hero. El `marginTop` del costat ja les baixa prou; aquesta
-// empenta les hi tornava a ficar. Ara és 0: les fitxes comencen sota la hero.
-const TDP_MOVE_PX = 0;
-
-// Separació entre la hero i la primera fila de fitxes. Abans les fitxes
-// començaven enganxades a la vora de la hero (a la tauleta vertical, fins i
-// tot tocant-hi). Aquests valors les separen.
-const HERO_TDP_GAP_PX = '0px';
-const HERO_TDP_GAP_TABLET_PX = '450px';
+// Desplaçament vertical de les TDP, nome s elles (en px; es converteix a files
+// de graella amb rowHeight perque es moguin nome s les targetes).
+const TDP_MOVE_PX = 120;
 
 // Imatge de fons de la hero (de moment un placeholder; un dia sera una animacio).
 const HERO_BACKGROUND_SRC = '/placeholders/hero/placeholder-noia.jpg';
@@ -509,7 +500,7 @@ function CollectionCubePage() {
         style={{
           // Puja tot el contingut sota el hero 12 files de la taula (41 → 29).
           // Alçada d'1 fila = ampladaBelt × 6708/2642/90; 12 files ≈ 0.3385 × amplada.
-          marginTop: `calc((var(--hg-tdp-xL, 0px) - var(--hg-tdp-xR, 0px)) * 0.3385 + ${pushDownPx}px${isLandscapeTablet ? ' - 30px' : ''}${isPortraitTablet ? ' - 120px' : ''} + ${(isPortraitTablet || isLandscapeTablet) ? HERO_TDP_GAP_TABLET_PX : HERO_TDP_GAP_PX})`,
+          marginTop: `calc((var(--hg-tdp-xL, 0px) - var(--hg-tdp-xR, 0px)) * 0.3385 + ${pushDownPx}px${isLandscapeTablet ? ' - 30px' : ''}${isPortraitTablet ? ' - 120px' : ''})`,
           // Desplaçament vertical NOME S de les TDP. Va amb `translate` (no
           // `transform`) perque la graella ja fa servir transform per centrar-se
           // i `translate` s'hi suma sense trepitjar-lo.

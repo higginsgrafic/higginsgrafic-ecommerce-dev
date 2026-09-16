@@ -21,17 +21,7 @@ import { SELLING_PRICE_LABEL } from '@/config/pricing';
 const BAND_HEIGHT = 'clamp(120px, 26vh, 260px)';
 
 const HERO_BACKGROUND_SRC = '/placeholders/hero/placeholder-noia.jpg';
-// Desplaçament vertical de les TDP, només elles.
-//
-// ERA -120: el bloc sencer pujava 120 px i les primeres fitxes quedaven a
-// sobre de la hero. El `marginTop` del costat ja les baixa prou; aquesta
-// empenta les hi tornava a ficar. Ara és 0: les fitxes comencen sota la hero.
-const TDP_MOVE_PX = 0;
-// Separació entre la hero i la primera fila de fitxes. Abans les fitxes
-// començaven enganxades a la vora de la hero (a la tauleta vertical, fins i
-// tot tocant-hi). Aquests valors les separen.
-const HERO_TDP_GAP_PX = '0px';
-const HERO_TDP_GAP_TABLET_PX = '450px';
+const TDP_MOVE_PX = 120;
 
 const COLLECTION_BG_SRC = '/placeholders/tots_els_fons/fons_colleccio/00-colleccio.webp';
 
@@ -561,7 +551,7 @@ function CollectionAustenPage() {
         style={{
           // Puja tot el contingut sota el hero 12 files de la taula (41 → 29).
           // Alçada d'1 fila = ampladaBelt × 6708/2642/90; 12 files ≈ 0.3385 × amplada.
-          marginTop: `calc((var(--hg-tdp-xL, 0px) - var(--hg-tdp-xR, 0px)) * 0.3385${isLandscapeTablet ? ' - 30px' : ''}${isPortraitTablet ? ' - 120px' : ''} + ${pushDownPx}px + ${(isPortraitTablet || isLandscapeTablet) ? HERO_TDP_GAP_TABLET_PX : HERO_TDP_GAP_PX})`,
+          marginTop: `calc((var(--hg-tdp-xL, 0px) - var(--hg-tdp-xR, 0px)) * 0.3385${isLandscapeTablet ? ' - 30px' : ''}${isPortraitTablet ? ' - 120px' : ''} + ${pushDownPx}px)`,
           // Desplaçament vertical NOME S de les TDP.
           translate: `0 ${-TDP_MOVE_PX}px`,
           // El bloc te marge negatiu i queda per sobre de la hero: si no fos
