@@ -230,7 +230,10 @@ function MegaStripePanelP1({
               S'activa amb l'interruptor (`?megaGrid=dibuixos`); si no, es veu
               el megaslide de sempre. Vegeu MegaGridDibuixos.jsx. */}
           {graellaDeDibuixosActiva() ? (
-            <MegaGridDibuixos active={active} />
+            <MegaGridDibuixos
+              active={active}
+              items={(resolvedMega[active] || [])[0]?.items}
+            />
           ) : (resolvedMega[active] || []).map((col, idx) => (
             <MegaColumn
               key={`${active}-${idx}`}

@@ -121,7 +121,7 @@ function dibuixDelProducte(producte, index) {
   return trobat?.ruta || null;
 }
 
-export default function MegaGridDibuixos({ active, className }) {
+export default function MegaGridDibuixos({ active, className, items: itemsDelMega }) {
   const [manifest, setManifest] = useState(null);
   const [productes, setProductes] = useState(null);
 
@@ -152,15 +152,47 @@ export default function MegaGridDibuixos({ active, className }) {
     return idx;
   }, [manifest]);
 
-  // Nomes els dibuixos de la colleccio activa.
-  const dibuixos = useMemo(() => {
-    if (!productes) return [];
+  // Els dibuixos de la colleccio activa, amb el seu producte.
+  const perClau = useMemo(() => {
+    if (!productes) return new Map();
     const clauActiva = COLLECCIO_AL_CATALEG[active] || active;
-    return productes
-      .filter((p) => p.collection === clauActiva)
-      .map((p) => ({ ...p, dibuix: dibuixDelProducte(p, index) }))
-      .filter((p) => p.dibuix);
+    const mapa = new Map();
+    for (const p of productes) {
+      if (p.collection !== clauActiva) continue;
+      const dibuix = dibuixDelProducte(p, index);
+      if (!dibuix) continue;
+      // La clau del fitxer, per aparellar-lo amb la llista del megaslide.
+      mapa.set(clau(dibuix.split('/').pop()), { ...p, dibuix });
+    }
+    return mapa;
   }, [productes, index, active]);
+
+  /**
+   * L'ORDRE.
+   *
+   * Mana la llista d'items del megaslide (`itemsDelMega`), que és la que l'amo
+   * veu a la graella de noms. Així els dibuixos surten exactament al mateix
+   * lloc on hi havia cada nom, i no pas en ordre alfabètic com abans.
+   *
+   * Si un item no troba el seu dibuix, es descarta; i si un producte no és a
+   * la llista, s'afegeix al final perquè no desaparegui mai.
+   */
+  const dibuixos = useMemo(() => {
+    const ordenats = [];
+    const usats = new Set();
+    for (const it of Array.isArray(itemsDelMega) ? itemsDelMega : []) {
+      if (typeof it !== 'string') continue;
+      if (it === 'botonera-bn' || it === 'botonera-fletxes') continue;
+      const k = clau(it.split('/').pop());
+      const trobat = perClau.get(k) || [...perClau.entries()].find(([kk]) => kk.includes(k) || k.includes(kk))?.[1];
+      if (!trobat) continue;
+      ordenats.push(trobat);
+      usats.add(trobat.slug);
+    }
+    // Els que no surten a la llista del megaslide, al final.
+    for (const p of perClau.values()) if (!usats.has(p.slug)) ordenats.push(p);
+    return ordenats;
+  }, [itemsDelMega, perClau]);
 
   // Mentre no hi hagi dades, no pinto res: aixi no balla.
   if (!manifest || !productes || dibuixos.length === 0) return null;
