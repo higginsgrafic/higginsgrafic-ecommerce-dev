@@ -421,6 +421,39 @@ async function syncProductToSupabase(product, variants, images) {
   }
 }
 
+/**
+ * Desactiva els productes del cataleg que ja no son a la botiga de Gelato.
+ *
+ * No s'esborren: es desactiven, perque poden tenir comandes o factures que hi
+ * apunten. Nomes surten de la venda.
+ *
+ * @param {Set<string>} aGelato identificadors que SI que son a Gelato
+ * @returns {Promise<string[]>} noms dels productes desactivats
+ */
+async function desactivaElQueJaNoHiEs(aGelato) {
+  const { data: alCataleg, error } = await supabase
+    .from('products')
+    .select('gelato_product_id, name')
+    .eq('is_active', true);
+  if (error) {
+    console.warn('  ⚠️  No he pogut comprovar les fitxes velles:', error.message);
+    return [];
+  }
+
+  const morts = (alCataleg || []).filter((p) => !aGelato.has(String(p.gelato_product_id)));
+  if (morts.length === 0) return [];
+
+  const { error: errPatch } = await supabase
+    .from('products')
+    .update({ is_active: false })
+    .in('gelato_product_id', morts.map((p) => p.gelato_product_id));
+  if (errPatch) {
+    console.warn('  ⚠️  No he pogut desactivar les fitxes velles:', errPatch.message);
+    return [];
+  }
+  return morts.map((p) => p.name);
+}
+
 async function main() {
   console.log('🚀 Sincronitzant productes de la teva botiga Gelato...\n');
 
@@ -485,10 +518,25 @@ async function main() {
       }
     }
 
+    // 3. Desactivar les fitxes que ja no existeixen a Gelato.
+    //
+    // Quan s'esborra un producte a Gelato i es torna a penjar, Gelato li dona
+    // un identificador NOU. El guio sincronitza per identificador, aixi que
+    // crea la fila nova... i la vella s'hi queda per sempre, activa i apuntant
+    // a un producte que ja no existeix. Si algu hi compressin, la comanda
+    // fallaria a Gelato. Per aixo, despres de sincronitzar, es desactiva tot
+    // allo que ja no sigui a la botiga.
+    const aGelato = new Set(storeProducts.map((sp) => sp.id?.toString()).filter(Boolean));
+    const desactivats = await desactivaElQueJaNoHiEs(aGelato);
+
     console.log('\n' + '='.repeat(60));
     console.log('✨ Sincronització completada!');
     console.log(`  ✅ Productes sincronitzats: ${successCount}`);
     console.log(`  ❌ Errors: ${errorCount}`);
+    if (desactivats.length) {
+      console.log(`  🗑️  Desactivats (ja no són a Gelato): ${desactivats.length}`);
+      for (const nom of desactivats) console.log(`      - ${nom}`);
+    }
     console.log('='.repeat(60) + '\n');
 
     if (successCount > 0) {
