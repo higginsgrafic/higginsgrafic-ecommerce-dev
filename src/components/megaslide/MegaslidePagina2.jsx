@@ -12,6 +12,28 @@ import {
 import { FirstContactDibuix00Buttons } from '../fullwide/firstContactPanels.jsx';
 import { computeStripeTileOverlaySrcs, computeStripeTileItems } from '@/utils/resolveStripeTile.js';
 
+/**
+ * INSISTIR FINS QUE QUEDI QUIET
+ *
+ * Els dos ajustos verticals d'aquesta pagina (la stripe i la fila de dalt) van
+ * encadenats: la correccio de la stripe depen de la posicio de la fila, i la
+ * fila s'ajusta DESPRES. Si la stripe mesura mentre la fila encara es mou,
+ * calcula sobre una posicio que encara canviara, i el resultat queda desplacat
+ * (es veu a escriptori i a horitzontal; a la vertical queda retallat).
+ *
+ * Per aixo no n'hi ha prou de mesurar un cop: es repeteix unes quantes vegades,
+ * amb un temps entre mig, i cada passada s'acosta una mica mes. Quan ja no cal
+ * correccio, les passades no fan res.
+ *
+ * @param {() => void} tick la funcio que mesura i corregeix
+ * @param {number[]} ids on desar els identificadors, per poder aturar-ho
+ */
+function insistirFinsQueQuediQuiet(tick, ids) {
+  for (let intents = 0; intents < 10; intents += 1) {
+    ids.push(window.setTimeout(tick, 120 + intents * 110));
+  }
+}
+
 export default function MegaslidePagina2({
   active,
   isPortraitTablet = false,
@@ -204,17 +226,38 @@ export default function MegaslidePagina2({
       if (Math.abs(delta) < 0.5) return;
       setStripeVisualAlignmentY((current) => current + delta);
     };
+    /**
+     * QUAN CAL MESURAR
+     *
+     * El calaix llisca amb una animacio de 320 ms (vegeu MegaMenuPanel). Si es
+     * mesura mentre llisca, la diferencia surt falsa i l'element queda
+     * desplacat; a mes, com que la correccio s'acumula, unes vegades queda be
+     * i unes altres no.
+     *
+     * Per aixo: es mesura de seguida (per si el calaix ja es obert), al cap de
+     * 180 ms (per si hi ha canvis de contingut) i, sobretot, QUAN L'ANIMACIO
+     * HA ACABAT. El senyal bo es `transitionend`.
+     */
     const schedule = () => {
       cancelAnimationFrame(frame);
       frame = requestAnimationFrame(alignToPage1);
     };
 
+    // El contenidor que llisca es el pare del viewport d'aquesta pagina.
+    const carril = viewportRef.current?.parentElement || null;
+
     schedule();
-    settleTimer = window.setTimeout(schedule, 180);
+    settleTimer = window.setTimeout(schedule, 360);
+    const insistencia = [];
+    insistirFinsQueQuediQuiet(schedule, insistencia);
+
+    if (carril) carril.addEventListener('transitionend', schedule);
     window.addEventListener('resize', schedule);
     return () => {
       cancelAnimationFrame(frame);
       window.clearTimeout(settleTimer);
+      for (const id of insistencia) window.clearTimeout(id);
+      if (carril) carril.removeEventListener('transitionend', schedule);
       window.removeEventListener('resize', schedule);
     };
   }, [active, compactMegaTileSize, compactStripePreviewHPx, isPortraitTablet]);
@@ -241,12 +284,22 @@ export default function MegaslidePagina2({
       frame = requestAnimationFrame(alignTopRowToPage1);
     };
 
+    // Mateix raonament que a la stripe: insistir, perque la correccio de la
+    // stripe depen d'aquesta i si mesurem un sol cop queda a mig cami.
+    const carril = viewportRef.current?.parentElement || null;
+
     schedule();
-    settleTimer = window.setTimeout(schedule, 180);
+    settleTimer = window.setTimeout(schedule, 360);
+    const insistencia = [];
+    insistirFinsQueQuediQuiet(schedule, insistencia);
+
+    if (carril) carril.addEventListener('transitionend', schedule);
     window.addEventListener('resize', schedule);
     return () => {
       cancelAnimationFrame(frame);
       window.clearTimeout(settleTimer);
+      for (const id of insistencia) window.clearTimeout(id);
+      if (carril) carril.removeEventListener('transitionend', schedule);
       window.removeEventListener('resize', schedule);
     };
   }, [active, bnSliderSize, isPortraitTablet, stripeVisualAlignmentY]);
