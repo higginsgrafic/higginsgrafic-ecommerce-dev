@@ -35,6 +35,7 @@ import {
   ProfilePage,
   NotFoundPage,
   FullWideSlidePage,
+  MegaslideIconsTestPage,
   ConstructorColleccioPage,
   PdpRoute,
   PdpPage,
@@ -133,6 +134,10 @@ export default function AppRoutes({ location, pageProps, pautaEnabled, tableEnab
 
         <Route path="/full-wide-slide" element={<FullWideSlidePage pautaEnabled={false} tableEnabled={false} />} />
         <Route path="/constructor/full-wide-slide" element={<FullWideSlidePage pautaEnabled={false} tableEnabled={false} />} />
+        {/* PROVA: la graella de dibuixos de la pàgina 2 del megaslide, amb dibuixos
+            en comptes de noms. És una pàgina a part perquè l'amo ho pugui veure
+            abans de canviar el megaslide. */}
+        <Route path="/constructor/megaslide-icons" element={<MegaslideIconsTestPage />} />
         <Route path="/plantilla-cataleg-components" element={<ProtectedRoute><PlantillaCatalegComponentsPage /></ProtectedRoute>} />
 
         {/* Pàgina de pagament pròpia. Abans això era una redirecció a l'inici:
