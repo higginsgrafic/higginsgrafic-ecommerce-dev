@@ -53,12 +53,35 @@ function FullWideSlideHeader({
   const cartLastClickRef = useRef(0);
   const searchLastClickRef = useRef(0);
   const accountLastClickRef = useRef(0);
-  // Retorna true si el clic s'ha d'ignorar perquè arriba massa seguit de
-  // l'anterior. El primer clic passa sempre i fa la feina de seguida: això
-  // només descarta el segon d'un doble clic.
-  const clicRepetit = (ref) => {
+  /**
+   * Retorna true si el clic s'ha d'ignorar.
+   *
+   * PER QUE NO ES POT MIRAR NOMES EL TEMPS
+   *
+   * Abans es descartava qualsevol clic que arribes menys de 350 ms despres de
+   * l'anterior. L'obertura i el tancament del calaix duren 320 ms cada un, i
+   * qui clica al seu ritme natural cau dins d'aquella finestra sovint: el clic
+   * s'ignorava en silenci i la pestanya semblava que s'obris i es tanques
+   * tota sola.
+   *
+   * QUAN S'HA D'IGNORAR
+   *
+   * Nomes mentre l'accio anterior ENCARA S'ESTA FENT (l'animacio del calaix).
+   * Passat aquest temps, el clic sempre val: si ja s'ha acabat d'obrir, el
+   * proxim clic ha de poder tancar.
+   *
+   * El primer clic tambe passa sempre, pero aquest no fa res mes que apuntar
+   * l'hora: l'accio la fa qui crida la funcio.
+   */
+  const clicRepetit = (ref, duracioAccioMs = 350) => {
     const ara = Date.now();
-    if (ara - ref.current < 350) return true;
+    // El primer clic no te hora: passa sempre.
+    if (!ref.current) {
+      ref.current = ara;
+      return false;
+    }
+    // Encara s'esta fent l'accio anterior: aixo si que es un doble clic.
+    if (ara - ref.current < duracioAccioMs) return true;
     ref.current = ara;
     return false;
   };
@@ -2845,7 +2868,9 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
                 label="Cercador i catàleg"
                 onClick={() => {
                   // Un clic ràpid doble obriria i tancaria el mega-slide de cop.
-                  if (clicRepetit(searchLastClickRef)) return;
+                  // 620 ms: el calaix triga 320 ms a obrir-se o tancar-se, i
+                  // mentre es mou un segon clic el faria rebotar.
+                  if (clicRepetit(searchLastClickRef, 620)) return;
                   setManualOverrideClosed(false);
                   // Cerca: pestanya única (sense acordió secundari).
                   // Click toggle: si ja som a la pestanya de cerca, la
