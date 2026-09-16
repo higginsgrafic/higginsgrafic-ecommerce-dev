@@ -35,46 +35,6 @@ import useMegaTileSelectorDrag from '@/hooks/useMegaTileSelectorDrag';
 // Plantilla independent de l'acordió del CISTELL — taula pròpia sobre la pauta
 
 
-/**
- * Totes les imatges de les franges de samarretes, per precarregar-les.
- *
- * PER QUE CAL
- *
- * Aquestes imatges no existeixen al DOM fins que el calaix s'obre (son dins
- * d'un carrusel de pagines que es munten a demanda). Com que son
- * `loading="lazy"`, el navegador no les demanava fins llavors: mentre
- * arribaven es veia l'espai en blanc i despres apareixien de cop, que es
- * exactament el que es veia.
- *
- * COM ES DEMANEN, I PER QUE AIXI
- *
- * Totes juntes son 31 fitxers i 0,8 MB. Amb una connexio lenta aixo no arriba
- * a temps i es torna a veure l'espai en blanc, aixi que no es poden demanar
- * ABANS ES DEMANAVEN EN DOS TORNS, I ERA PITJOR
- *
- * Primer es demanaven les de la primera colleccio i la resta quan el navegador
- * estava tranquil. Pero nome s cal canviar de colleccio de seguida (que es el
- * que fa tothom) perque les seves imatges encara no hagin arribat: es veien
- * les caselles buides i despres apareixien de cop.
- *
- * Ara es demanen TOTES amb la pagina, i el navegador les ordena soles: les de
- * la primera colleccio amb prioritat alta i la resta amb prioritat baixa. Aixi
- * no hi ha cap moment sense imatges.
- */
-const neteja = (mapes) => [...new Set(
-  mapes.flatMap((m) => Object.values(m)).filter((v) => typeof v === 'string' && v.startsWith('/'))
-)];
-
-// Les de la primera colleccio: aquestes primer.
-const IMATGES_FRANJA_PRIORITARIES = neteja([FIRST_CONTACT_MEDIA, THE_HUMAN_INSIDE_MEDIA]);
-
-// Tota la resta: tambe amb la pagina, pero el navegador les deixa per despres.
-const IMATGES_FRANJA_LA_RESTA = neteja([
-  FIRST_CONTACT_MEDIA_WHITE,
-  FIRST_CONTACT_MEDIA_COLOR,
-  CUBE_MEDIA,
-]).filter((src) => !IMATGES_FRANJA_PRIORITARIES.includes(src));
-
 function FullWideSlideHeader({
   contained = false,
   portalContainer,
@@ -150,24 +110,6 @@ function FullWideSlideHeader({
   // component en tenia un de propi, i per això afegir un producte des d'una
   // fitxa omplia un cistell que aquí no es veia (el carretó sortia buit).
   const { cartItems, setCartItems, addToCart, getTotalItems } = useCart();
-
-  /**
-   * Les imatges dels articles del cistell, per precarregar-les.
-   *
-   * El cistell es una altra pagina del carrusel del calaix: les seves imatges
-   * no existeixen al DOM fins que hi vas, i amb `loading="lazy"` el navegador
-   * no les demanava fins llavors. Mentre arribaven es veia l'espai en blanc.
-   *
-   * Fa servir la MATEIXA funcio que el cistell de debò, aixi que la imatge que
-   * es precarrega es exactament la que despres es veura.
-   */
-  const imatgesDelCistell = [
-    ...new Set(
-      (Array.isArray(cartItems) ? cartItems : [])
-        .map((item) => imatgeArticle(item))
-        .filter((src) => typeof src === 'string' && src.startsWith('/')),
-    ),
-  ];
 
   const localCartItemCount = getTotalItems();
 
@@ -2825,25 +2767,6 @@ function FullWideSlideHeader({
 top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right: 0 }
       }
     >
-      {/* Precarrega de les imatges de les franges de samarretes.
-          No es veuen: nomes serveixen perque el navegador les tingui a la
-          memoria cau abans que s'obri el calaix. Sense aixo, en obrir-lo es
-          veia l'espai en blanc i les samarretes apareixien de cop.
-
-          Primer nomes les de la colleccio que es veura de seguida; la resta,
-          quan el navegador no te res mes a fer. */}
-      <div aria-hidden="true" style={{ position: 'absolute', width: 0, height: 0, overflow: 'hidden', opacity: 0, pointerEvents: 'none' }}>
-        {IMATGES_FRANJA_PRIORITARIES.map((src) => (
-          <img key={src} src={src} alt="" loading="eager" decoding="async" fetchPriority="high" />
-        ))}
-        {IMATGES_FRANJA_LA_RESTA.map((src) => (
-          <img key={src} src={src} alt="" loading="eager" decoding="async" fetchPriority="low" />
-        ))}
-        {/* I les del cistell, que tambe es munten a demanda. */}
-        {imatgesDelCistell.map((src) => (
-          <img key={src} src={src} alt="" loading="eager" decoding="async" fetchPriority="low" />
-        ))}
-      </div>
 
       {/* La linia de sota la capcalera: a la vertical ve del nav que hi ha a
           sota, pero a l'escriptori i a l'apaisada el nav va dins la barra i el
