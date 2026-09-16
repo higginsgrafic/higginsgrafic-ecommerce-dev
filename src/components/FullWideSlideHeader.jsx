@@ -10,7 +10,13 @@ import { useOrders } from '@/hooks/useOrders';
 import { getGildan64000Catalog } from '../utils/placeholders.js';
 import { AUSTEN_QUOTES_ASSETS, resolveAustenQuoteAssetId, resolveAustenQuoteOriginalFromPath } from '../utils/austenQuotesAssets.js';
 import { getSafeBelt, clampNumber } from '@/utils/layoutMetrics';
-import { FIRST_CONTACT_MEDIA, FIRST_CONTACT_MEDIA_WHITE, FIRST_CONTACT_MEDIA_COLOR, CUBE_MEDIA } from './fullwide/megaSlideMedia.js';
+import {
+  FIRST_CONTACT_MEDIA,
+  FIRST_CONTACT_MEDIA_WHITE,
+  FIRST_CONTACT_MEDIA_COLOR,
+  THE_HUMAN_INSIDE_MEDIA,
+  CUBE_MEDIA,
+} from './fullwide/megaSlideMedia.js';
 import { touchMegaPublicActivity, getMegaPublicSelectorFor, setMegaPublicSelectorFor } from './fullwide/megaPublicSelectorState.js';
 import IconButton from './fullwide/MegaIconButton.jsx';
 import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
@@ -27,6 +33,30 @@ import useMegaTileSelectorDrag from '@/hooks/useMegaTileSelectorDrag';
 
 // Plantilla independent de l'acordió del CISTELL — taula pròpia sobre la pauta
 
+
+/**
+ * Totes les imatges de les franges de samarretes, per precarregar-les.
+ *
+ * PER QUE CAL
+ *
+ * Aquestes imatges no existeixen al DOM fins que el calaix s'obre (son dins
+ * d'un carrusel de pagines que es munten a demanda). Com que son
+ * `loading="lazy"`, el navegador no les demanava fins llavors: mentre
+ * arribaven es veia l'espai en blanc i despres apareixien de cop, que es
+ * exactament el que es veia.
+ *
+ * Son 31 fitxers i 0,8 MB en total: val la pena demanar-los amb la resta de
+ * la pagina i tenir-los a la memoria cau abans que calguin.
+ */
+const IMATGES_FRANJA = [
+  ...new Set([
+    ...Object.values(FIRST_CONTACT_MEDIA),
+    ...Object.values(FIRST_CONTACT_MEDIA_WHITE),
+    ...Object.values(FIRST_CONTACT_MEDIA_COLOR),
+    ...Object.values(THE_HUMAN_INSIDE_MEDIA),
+    ...Object.values(CUBE_MEDIA),
+  ].filter((v) => typeof v === 'string' && v.startsWith('/'))),
+];
 
 function FullWideSlideHeader({
   contained = false,
@@ -2759,6 +2789,16 @@ function FullWideSlideHeader({
 top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right: 0 }
       }
     >
+      {/* Precarrega de les imatges de les franges de samarretes.
+          No es veuen: nomes serveixen perque el navegador les tingui a la
+          memoria cau abans que s'obri el calaix. Sense aixo, en obrir-lo es
+          veia l'espai en blanc i les samarretes apareixien de cop. */}
+      <div aria-hidden="true" style={{ position: 'absolute', width: 0, height: 0, overflow: 'hidden', opacity: 0, pointerEvents: 'none' }}>
+        {IMATGES_FRANJA.map((src) => (
+          <img key={src} src={src} alt="" loading="eager" decoding="async" />
+        ))}
+      </div>
+
       {/* La linia de sota la capcalera: a la vertical ve del nav que hi ha a
           sota, pero a l'escriptori i a l'apaisada el nav va dins la barra i el
           border-b era transparent, aixi que no es veia. Li posem el mateix
