@@ -115,9 +115,6 @@ const TDP_MOVE_PX = 0;
 // tot tocant-hi). Aquests valors les separen.
 const HERO_TDP_GAP_PX = '0px';
 const HERO_TDP_GAP_TABLET_PX = '450px';
-// La tauleta horitzontal es mes curta: amb la mateixa separacio hi quedava
-// massa forat, perque la graella ja hi te menys recorregut.
-const HERO_TDP_GAP_LANDSCAPE_PX = '-100px';
 
 // Imatge de fons de la hero (de moment un placeholder; un dia sera una animacio).
 const HERO_BACKGROUND_SRC = '/placeholders/hero/placeholder-noia.jpg';
@@ -512,7 +509,7 @@ function CollectionCubePage() {
         style={{
           // Puja tot el contingut sota el hero 12 files de la taula (41 → 29).
           // Alçada d'1 fila = ampladaBelt × 6708/2642/90; 12 files ≈ 0.3385 × amplada.
-          marginTop: `calc((var(--hg-tdp-xL, 0px) - var(--hg-tdp-xR, 0px)) * 0.3385 + ${pushDownPx}px${isLandscapeTablet ? ' - 30px' : ''}${isPortraitTablet ? ' - 120px' : ''} + ${isLandscapeTablet ? HERO_TDP_GAP_LANDSCAPE_PX : (isPortraitTablet ? HERO_TDP_GAP_TABLET_PX : HERO_TDP_GAP_PX)})`,
+          marginTop: `calc((var(--hg-tdp-xL, 0px) - var(--hg-tdp-xR, 0px)) * 0.3385 + ${pushDownPx}px${isLandscapeTablet ? ' - 30px' : ''}${isPortraitTablet ? ' - 120px' : ''} + ${(isPortraitTablet || isLandscapeTablet) ? HERO_TDP_GAP_TABLET_PX : HERO_TDP_GAP_PX})`,
           // Desplaçament vertical NOME S de les TDP. Va amb `translate` (no
           // `transform`) perque la graella ja fa servir transform per centrar-se
           // i `translate` s'hi suma sense trepitjar-lo.
