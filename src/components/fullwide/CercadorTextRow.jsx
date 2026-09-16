@@ -50,12 +50,23 @@ const INK = '#2B2B2B';
 const INK_HOVER = INK;
 const INK_SELECTED = '#000000';
 
-// Mida del dibuix a la graella de dibuixos, segons la pantalla.
-//   - Tauleta (horitzontal i vertical): iguals, 20 px (ens guiem per la landscape).
-//   - Desktop: escala al 43% de 50 = 21,5 px.
-const DIBUIX_PX = 21.5;
-const DIBUIX_PX_LANDSCAPE = 20;
-const DIBUIX_PX_PORTRAIT = 20;
+// ============================================================
+// ESCALA DE LA GRAELLA DE DIBUIXOS
+// ============================================================
+// La mida base (escala 1:1) del dibuix és 50 px, que és la mida natural del
+// fitxer de dibuix (la que surt a /constructor/megaslide-icons).
+//
+// TOTS els percentatges es calculen SOBRE aquesta base 1:1 de 50 px:
+//   100% = 50 px | 55% = 27,5 px | 45% = 22,5 px | 43% = 21,5 px
+// ============================================================
+const DIBUIX_BASE = 50;
+
+// Desktop: escala al 43% de la base 1:1.
+const DIBUIX_PX = DIBUIX_BASE * 0.43;          // 21,5 px
+// Tauleta (horitzontal i vertical, de moment iguals): 40% de la base 1:1.
+const DIBUIX_PX_LANDSCAPE = DIBUIX_BASE * 0.40; // 20 px
+const DIBUIX_PX_PORTRAIT = DIBUIX_BASE * 0.40;  // 20 px
+
 // Separacions entre dibuixos. La horitzontal escala amb la mida; la vertical
 // es manté petita (és l'interlineat de les files).
 const DIBUIX_GAP_H = 25;
