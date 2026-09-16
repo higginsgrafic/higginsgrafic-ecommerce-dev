@@ -1995,9 +1995,11 @@ function FullWideSlideHeader({
 
     const measure = () => {
       try {
-        const stripe = el.querySelector('[data-stripe-bottom]') || el.firstElementChild;
-        if (stripe) {
-          const rect = stripe.getBoundingClientRect();
+        // El cadenat va sobre la LINIA del megaslide (la vora inferior de la
+        // superficie), no sobre la franja. Aixi queda encavalcat al cantell.
+        const surface = document.querySelector('[data-mega-panel-surface="1"]');
+        if (surface) {
+          const rect = surface.getBoundingClientRect();
           setLockBtnTop((prev) => (prev === rect.bottom ? prev : rect.bottom));
         }
       } catch { /* ignore */ }
@@ -3113,7 +3115,7 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
           }}
           className="fixed z-[10001] left-1/2 -translate-x-1/2 flex h-10 w-10 items-center justify-center rounded-full border border-border bg-background shadow-lg transition-colors hover:bg-muted"
           style={{
-            top: lockBtnTop != null ? `${lockBtnTop + 8}px` : '16px',
+            top: lockBtnTop != null ? `${lockBtnTop - 20}px` : '16px',
             transform: isPortraitTablet && megaPage !== 3
               ? `translateX(calc(-50% + ${(lockBtnScrollProgress - 0.5) * 160}px))`
               : undefined,

@@ -50,17 +50,17 @@ const INK = '#2B2B2B';
 const INK_HOVER = INK;
 const INK_SELECTED = '#000000';
 
-// Mida del dibuix a la graella de dibuixos, segons la pantalla. Proporcional a
-// la mida de text de la resta de la UI: 11px text a desktop, 8 a landscape i 7
-// a portrait -> 25 / 20 / 16.
-const DIBUIX_PX = 25;
+// Mida del dibuix a la graella de dibuixos, segons la pantalla.
+//   - Tauleta (horitzontal i vertical): iguals, 20 px (ens guiem per la landscape).
+//   - Desktop: 55% de 25 = 14 px.
+const DIBUIX_PX = 14;
 const DIBUIX_PX_LANDSCAPE = 20;
-const DIBUIX_PX_PORTRAIT = 16;
+const DIBUIX_PX_PORTRAIT = 20;
 // Separacions entre dibuixos. La horitzontal escala amb la mida; la vertical
 // es manté petita (és l'interlineat de les files).
 const DIBUIX_GAP_H = 25;
 const DIBUIX_GAP_H_LANDSCAPE = 20;
-const DIBUIX_GAP_H_PORTRAIT = 16;
+const DIBUIX_GAP_H_PORTRAIT = 20;
 const DIBUIX_GAP_V = 3;
 
 /** La mida de dibuix que toca per a aquesta pantalla. */
