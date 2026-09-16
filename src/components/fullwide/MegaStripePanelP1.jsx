@@ -1,5 +1,6 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import MegaColumn from './MegaColumn.jsx';
+import MegaGridDibuixos, { graellaDeDibuixosActiva } from './MegaGridDibuixos.jsx';
 import ClicAreaOverlayP1 from './ClicAreaOverlayP1.jsx';
 import { CERCADOR_COLORS } from './CercadorTopBar.jsx';
 import { STRIPE_DRAWING_CALIBRATIONS } from '../../config/stripeCalibrations';
@@ -225,7 +226,12 @@ function MegaStripePanelP1({
           }}
           aria-hidden={reserveGridSpace ? true : undefined}
         >
-          {(resolvedMega[active] || []).map((col, idx) => (
+          {/* PROVA: la graella de dibuixos, que substitueix la fila de noms.
+              S'activa amb l'interruptor (`?megaGrid=dibuixos`); si no, es veu
+              el megaslide de sempre. Vegeu MegaGridDibuixos.jsx. */}
+          {graellaDeDibuixosActiva() ? (
+            <MegaGridDibuixos active={active} />
+          ) : (resolvedMega[active] || []).map((col, idx) => (
             <MegaColumn
               key={`${active}-${idx}`}
               title={col.title}
