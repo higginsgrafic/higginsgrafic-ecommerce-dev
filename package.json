@@ -14,6 +14,7 @@
     "prebuild": "npm run thumbs:all",
     "prepare": "husky",
     "preview": "vite preview --host 0.0.0.0 --port 3003",
+    "rapid": "npm run build && vite preview --host 0.0.0.0 --port 3003",
     "prod": "vite --open index-prod.html --host 0.0.0.0 --port 3004",
     "proves": "netlify dev --offline --port 8888 --target-port 3003",
     "site-map:build": "node scripts/build-site-map.mjs",
