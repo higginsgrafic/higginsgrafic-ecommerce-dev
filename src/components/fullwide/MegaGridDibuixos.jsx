@@ -1,0 +1,206 @@
+import { useEffect, useMemo, useState } from 'react';
+import { supabase } from '@/api/supabase-products';
+
+/**
+ * La graella de DIBUIXOS de la pagina 2 del megaslide.
+ *
+ * QUE ES
+ *
+ * Substitueix la fila de noms (NX-01, NCC-1701...) per una graella de dibuixos.
+ * Ocupa el mateix espai: les mateixes 1269 px d'ample que tenien les 9 columnes
+ * de text, pero repartits en 16 columnes.
+ *
+ * COM ESTA FETA
+ *
+ * Les mides son en `fr` (repartiment automatic de l'ample) i la casella es
+ * quadrada (`aspect-square`). Aixo vol dir que s'adapta a l'amplada que li
+ * doni el megaslide, sigui quina sigui, sense numeros fixos.
+ *
+ * ENCARA NO ESTA ACTIVADA
+ *
+ * S'activa amb l'interruptor de sota (o amb `?megaGrid=dibuixos` a l'adreca).
+ * Mentre no s'activi, el megaslide es veu exactament com sempre.
+ *
+ * D'ON SURTEN ELS DIBUIXOS
+ *
+ * Dels PRODUCTES DEL CATALEG (la base de dades). L'aparellament entre el
+ * producte i el fitxer del dibuix es fa pel nom, amb les excepcions que es
+ * van comprovar a ma (vegeu `EXCEPCIONS`).
+ */
+
+const CARPETA = {
+  'first-contact': 'first_contact',
+  'the-human-inside': 'the_human_inside',
+  austen: 'austen',
+  cube: 'cube',
+  miscellania: 'miscellania',
+};
+
+/**
+ * El megaslide anomena les colleccions amb guio baix (`first_contact`) i el
+ * cataleg amb guio (`first-contact`). Sense aquesta conversio el filtre no
+ * trobava cap producte i la graella sortia buida.
+ */
+const COLLECCIO_AL_CATALEG = {
+  first_contact: 'first-contact',
+  the_human_inside: 'the-human-inside',
+  austen: 'austen',
+  cube: 'cube',
+  miscellania: 'miscellania',
+};
+
+const ORDRE_COLLECCIONS = ['first-contact', 'the-human-inside', 'austen', 'cube', 'miscellania'];
+
+const NOM_COLLECCIO = {
+  'first-contact': 'First Contact',
+  'the-human-inside': 'The Human Inside',
+  austen: 'Austen',
+  cube: 'Cube',
+  miscellania: 'Miscel·lània',
+};
+
+// Productes el dibuix dels quals te un altre nom al fitxer. Comprovat a ma.
+const EXCEPCIONS = {
+  'cube-cyberman': 'cybercube',
+  'cube-iron-kong-2': 'ironkong',
+  'cube-maschinenmensch': 'maschinencube',
+  'the-human-inside-robbie-the-robot': 'robbytherobot',
+};
+
+// Dibuixos que no son a la carpeta de la graella i s'han de buscar a part.
+const DIBUIXOS_A_PART = {
+  'austen-looking-for-my-darcy-pink-solid': '/custom_logos/drawings/images_originals/stripe/austen/looking_for_my_darcy/color/solid/fuchsia-solid-stripe.webp',
+  'austen-looking-for-my-darcy-yellow-pink-frame': '/custom_logos/drawings/images_originals/stripe/austen/looking_for_my_darcy/color/frame/fuchsia-frame-stripe.webp',
+  'austen-i-admire-and-love-you': '/custom_logos/drawings/images_originals/stripe/austen/quotes/black/i-admire-and-love-you-b-stripe.webp',
+  'austen-you-have-bewitched-me': '/custom_logos/drawings/images_originals/stripe/austen/quotes/black/you-have-bewitched-me-b-stripe.webp',
+};
+
+/** Interruptor: `?megaGrid=dibuixos` mana sobre el que hi hagi desat. */
+const CLAU_LOCAL = 'hg-mega-grid-dibuixos';
+
+export function graellaDeDibuixosActiva() {
+  if (typeof window === 'undefined') return false;
+  const param = new URLSearchParams(window.location.search).get('megaGrid');
+  if (param === 'dibuixos') return true;
+  if (param === 'noms') return false;
+  return window.localStorage.getItem(CLAU_LOCAL) === '1';
+}
+
+export function activaGraellaDeDibuixos(activa) {
+  if (typeof window === 'undefined') return;
+  window.localStorage.setItem(CLAU_LOCAL, activa ? '1' : '0');
+  window.location.reload();
+}
+
+/**
+ * Clau per comparar noms de producte amb noms de fitxer.
+ *
+ * El sufix d'impressio (`-b`, `-w`) s'ha de treure ABANS de llevar els guions:
+ * `nx-01-b-grid.webp` ha de donar `nx01`, no `nx01b`, perque el producte es
+ * diu `first-contact-nx-01`.
+ */
+function clau(valor) {
+  return String(valor).toLowerCase()
+    .replace(/\.(webp|png|jpg|jpeg)$/, '')
+    .replace(/-(b|w)-(grid|stripe)$/, '')
+    .replace(/-(grid|stripe)$/, '')
+    .replace(/^quotes-/, '')
+    .replace(/^looking-for-my-darcy-/, '')
+    .replace(/[-_]/g, '');
+}
+
+/** El dibuix que li toca a un producte, o null. */
+function dibuixDelProducte(producte, index) {
+  if (DIBUIXOS_A_PART[producte.slug]) return DIBUIXOS_A_PART[producte.slug];
+  const carpeta = CARPETA[producte.collection];
+  const candidats = index[carpeta] || [];
+  const k = EXCEPCIONS[producte.slug]
+    || clau(String(producte.slug).replace(/^(austen|first-contact|the-human-inside|cube|miscellania)-/, ''));
+  const trobat = candidats.find((f) => f.k === k)
+    || candidats.find((f) => f.k.includes(k) || k.includes(f.k));
+  return trobat?.ruta || null;
+}
+
+export default function MegaGridDibuixos({ active, className }) {
+  const [manifest, setManifest] = useState(null);
+  const [productes, setProductes] = useState(null);
+
+  useEffect(() => {
+    let viu = true;
+    Promise.all([
+      fetch('/drawings.grid.json', { cache: 'no-store' }).then((r) => (r.ok ? r.json() : {})),
+      supabase.from('products').select('name, slug, collection').eq('is_active', true).order('name'),
+    ])
+      .then(([m, res]) => {
+        if (!viu) return;
+        setManifest(m || {});
+        setProductes(res.data || []);
+      })
+      .catch(() => { if (viu) { setManifest({}); setProductes([]); } });
+    return () => { viu = false; };
+  }, []);
+
+  const index = useMemo(() => {
+    const idx = {};
+    for (const [carpeta, llista] of Object.entries(manifest || {})) {
+      idx[carpeta] = llista
+        // Els dibuixos d'impressio blanca son el mateix dibuix: no els volem
+        // duplicats a la graella.
+        .filter((r) => !/\/white\//i.test(r) && !/-w-grid|w-stripe/i.test(r))
+        .map((ruta) => ({ ruta, k: clau(ruta.split('/').pop()) }));
+    }
+    return idx;
+  }, [manifest]);
+
+  // Nomes els dibuixos de la colleccio activa.
+  const dibuixos = useMemo(() => {
+    if (!productes) return [];
+    const clauActiva = COLLECCIO_AL_CATALEG[active] || active;
+    return productes
+      .filter((p) => p.collection === clauActiva)
+      .map((p) => ({ ...p, dibuix: dibuixDelProducte(p, index) }))
+      .filter((p) => p.dibuix);
+  }, [productes, index, active]);
+
+  // Mentre no hi hagi dades, no pinto res: aixi no balla.
+  if (!manifest || !productes || dibuixos.length === 0) return null;
+
+  return (
+    <div className={className}>
+      <div
+        style={{
+          display: 'grid',
+          // Les columnes es reparteixen l'ample que els doni el megaslide.
+          gridTemplateColumns: 'repeat(16, minmax(0, 1fr))',
+          gap: '6px',
+          alignItems: 'center',
+        }}
+        aria-label={`Dibuixos de ${NOM_COLLECCIO[dibuixos[0]?.collection] || ''}`}
+      >
+        {dibuixos.map((p) => (
+          <div
+            key={p.slug}
+            title={p.name}
+            style={{
+              aspectRatio: '1 / 1',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              overflow: 'hidden',
+            }}
+          >
+            <img
+              src={p.dibuix}
+              alt=""
+              loading="lazy"
+              style={{ width: '100%', height: '100%', objectFit: 'contain', display: 'block' }}
+            />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/** Ordre de les colleccions, per si mes endavant es mostra mes d'una. */
+export { ORDRE_COLLECCIONS };
