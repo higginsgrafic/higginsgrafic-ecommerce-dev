@@ -61,8 +61,8 @@ const INK_SELECTED = '#000000';
 // ============================================================
 const DIBUIX_BASE = 50;
 
-// Desktop: escala al 43% de la base 1:1.
-const DIBUIX_PX = DIBUIX_BASE * 0.43;          // 21,5 px
+// Desktop: escala al 40% de la base 1:1.
+const DIBUIX_PX = DIBUIX_BASE * 0.40;          // 20 px
 // Tauleta (horitzontal i vertical, de moment iguals): 40% de la base 1:1.
 const DIBUIX_PX_LANDSCAPE = DIBUIX_BASE * 0.40; // 20 px
 const DIBUIX_PX_PORTRAIT = DIBUIX_BASE * 0.40;  // 20 px
