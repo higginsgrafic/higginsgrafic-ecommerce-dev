@@ -28,11 +28,15 @@ const OptimizedImg = React.forwardRef(function OptimizedImg(
   const originalSrc = normalizeSrc(src);
   const webpSrc = originalSrc.replace(/\.(png|jpe?g)(?=([?#]|$))/i, '.webp');
   const [currentSrc, setCurrentSrc] = useState(webpSrc);
+  const [carregada, setCarregada] = useState(false);
   const triedFallbackRef = useRef(false);
 
   useEffect(() => {
     triedFallbackRef.current = false;
     setCurrentSrc(webpSrc);
+    // Quan canvia la imatge, torna a començar transparent. Si es deixés,
+    // es veuria un parpelleig en canviar de colleccio.
+    setCarregada(false);
   }, [webpSrc]);
 
   return (
@@ -41,9 +45,16 @@ const OptimizedImg = React.forwardRef(function OptimizedImg(
       src={currentSrc ? encodeURI(currentSrc) : undefined}
       alt={alt}
       className={className}
-      style={style}
+      style={{
+        ...style,
+        // Es fon quan es carrega. Aixi, quan es canvia de colleccio, les
+        // imatges noves apareixen suaument en comptes de fer-ho de cop.
+        opacity: carregada ? 1 : 0,
+        transition: 'opacity 160ms ease-out',
+      }}
       loading={rest?.loading || 'lazy'}
       decoding="async"
+      onLoad={() => setCarregada(true)}
       onError={() => {
         if (import.meta.env.DEV) {
           const s = (currentSrc || originalSrc || src || '').toString();
