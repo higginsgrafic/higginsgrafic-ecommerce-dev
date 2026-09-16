@@ -83,7 +83,13 @@ function InvoicePreview({ draft, onClose, isTest = false }) {
   const linies = liniesDelDocument(draft);
 
   return (
-    <div className="fixed inset-0 z-[40000] overflow-y-auto bg-black/60 p-4" role="dialog" aria-modal="true" aria-label="Previsualització de la factura">
+    <div
+      className="fixed inset-0 z-[40000] overflow-y-auto bg-black/60 p-4"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Previsualització de la factura"
+      onPointerDown={(event) => { if (event.target === event.currentTarget) onClose(); }}
+    >
       <div className="mx-auto mb-4 flex max-w-[210mm] items-center justify-between gap-3">
         <div className="font-oswald text-xs uppercase tracking-[0.16em] text-white/80">
           {title} · {linies.length} {linies.length === 1 ? 'línia' : 'línies'}
