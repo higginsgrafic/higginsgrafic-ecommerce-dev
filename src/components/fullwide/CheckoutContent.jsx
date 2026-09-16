@@ -8,6 +8,7 @@ import { useShippingCosts, normalizeCountry } from '@/hooks/useShippingCosts';
 import { createMockOrder } from '@/lib/mockOrderStore';
 import { useAuth } from '@/contexts/AuthContext';
 import { getMockupPath, INK_BLACK, INK_WHITE, COLLECTIONS } from '@/lib/mockupPaths';
+import { imatgeArticle as imatgeArticleCompartida } from '@/lib/cartImage';
 import { useOffersConfig } from '@/hooks/useOffersConfig';
 import { getStripe, createPaymentIntent, modeProvesActiu } from '@/api/stripe';
 import { PDP_REGISTRY_BY_ROUTE } from '@/data/pdpRegistry';
@@ -531,20 +532,15 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
     const ink = resolveInk(item.collectionSlug, color, item.finish);
     return getMockupPath({ collection: item.collectionSlug, design, shirtColor: color, ink });
   };
+  // La imatge de la fitxa viu a `@/lib/cartImage`, perque la capcalera tambe la
+  // fa servir per precarregar-la. Aixi les dues son exactament la mateixa.
   // La imatge de la fitxa del cistell: primer la foto real de la peça (només si
   // és un fitxer nostre; les de Gelato són URLs signades que caduquen i al cap
   // d'unes hores sortirien trencades), després el mockup del disseny i, si no,
   // una samarreta neutra en el color de la peça.
   // '/placeholder-product.svg' és un fitxer que no existeix i que alguns
   // productes porten com a imatge: també s'ha d'ignorar.
-  const imatgeArticle = (item) => {
-    const propia = item.image
-      && String(item.image).startsWith('/')
-      && item.image !== '/placeholder-product.svg'
-      ? item.image
-      : null;
-    return propia || mockupSrc(item) || tshirtSrc(item.color);
-  };
+  const imatgeArticle = (item) => imatgeArticleCompartida(item) || tshirtSrc(item.color);
 
   // L'acceptació de termes i el botó de confirmar, definits aquí perquè les dues
   // tauletes els puguin col·locar en llocs diferents sense duplicar-ne el dibuix:
@@ -802,7 +798,17 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
               return (
                 <div key={`c-${item.id}-${idx}`} style={{ flex:'0 0 auto', width:`${FITXA_W}px`, height: isPortraitTablet ? `${P_FITXA_H}px` : (isLandscapeTablet ? `${L_FITXA_H}px` : `${D_FITXA_H}px`), boxSizing:'border-box', display:'flex', flexDirection:'column', alignItems:'center', gap:'4px', border:'1px solid #E6E8EC', borderRadius:'6px', background:'#FFFFFF', padding:'8px' }}>
                   <div style={{ width:'100%', height: undefined, flex:'1 1 auto', minHeight:0, overflow:'hidden', flexShrink:0, display:'flex', alignItems:'center', justifyContent:'center' }}>
-                    <img src={imatgeArticle(item)} alt="" loading="lazy" decoding="async" style={{ width:'100%', height:'100%', objectFit:'contain' }} />
+                    <img
+                      src={imatgeArticle(item)}
+                      alt=""
+                      // El cistell es una altra pagina del carrusel del calaix, i
+                      // queda fora de pantalla fins que hi vas. Amb `lazy` el
+                      // navegador no demanava la imatge fins llavors i es veia
+                      // l'espai en blanc mentre arribava.
+                      loading="eager"
+                      decoding="async"
+                      style={{ width:'100%', height:'100%', objectFit:'contain' }}
+                    />
                   </div>
                   <div style={{ width:'100%', fontSize:'9pt', lineHeight:1.2, textAlign:'center', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{item.title||item.name||'Producte'}</div>
                   <div style={{ fontSize:'8pt', lineHeight:1.2, color:'#667085', textAlign:'center' }}>Talla {item.size||'-'} · {q} u.</div>
