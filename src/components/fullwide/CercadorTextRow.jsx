@@ -186,7 +186,12 @@ const GRID_MAP = {
 
 /** El dibuix d'un nom, sigui quin sigui el fitxer on visqui. */
 function dibuixDelNom(label) {
-  return GRID_MAP[label] || STRIPE_MAP[label] || null;
+  const ruta = GRID_MAP[label] || STRIPE_MAP[label] || null;
+  if (!ruta) return null;
+  // Es fa servir la versió retallada (sense marge transparent), perquè el que
+  // faci 50 px sigui el dibuix i no el fitxer sencer. Les originals es mantenen
+  // intactes per a la resta de llocs que en depenen.
+  return ruta.replace('/custom_logos/drawings/images_grid/', '/custom_logos/drawings/images_grid_trim/');
 }
 
 // 8 columnes -> grups -> ítems. bullet=true mostra bullet+stub al primer ítem.
@@ -310,16 +315,16 @@ function Group({ group, isFirst, dimmed, clickable, selectedStripeItem, hoveredS
 
 function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripeItem, hoveredStripeItem, onSelectGroup, onHoverItem, onHoverLeave, compact = false, selectedColor = 'white', onSelectColor, onSelectCollection, isPortraitTablet = false, isLandscapeTablet = false, leftOffset = 0, uniformColumns = false, fontBoost = 0 }) {
   if (compact) {
-    // Cada columna conserva els seus grups i l'ordre de col·lecció. Abans es
-    // feia un flatMap i es repartia per mida, cosa que barrejava col·leccions
-    // a la mateixa columna; ara cada columna de COLUMNS es dibuixa sencera.
-    const columns = COLUMNS.map((groups) => groups.flatMap((group) => group.items.map((label) => ({
+    // La graella de dibuixos és de 16 columnes × 4 files (64 dibuixos). Els
+    // dibuixos s'aplanen per ordre de col·lecció i es reparteixen en files de
+    // 16, de manera que la col·lecció sempre queda seguida.
+    const items = COLUMNS.flatMap((groups) => groups.flatMap((group) => group.items.map((label) => ({
       label,
       collection: group.collection,
       subcollection: group.subcollection,
       stripeItem: STRIPE_MAP[label],
     }))));
-    const numColumns = columns.length;
+    const numColumns = 16;
     const activeKey = activeCollection === 'austen' ? `austen:${activeSubcollection || ''}` : activeCollection;
 
     return (
@@ -336,61 +341,57 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
           pointerEvents: 'auto',
         }}
       >
-        <div style={{ display: 'flex', gap: `${DIBUIX_GAP_H}px`, width: '100%', minWidth: 0 }}>
-          {columns.map((column, columnIndex) => (
-            <div key={columnIndex} style={{ width: `${DIBUIX_PX}px`, flex: '0 0 auto', display: 'flex', flexDirection: 'column', gap: `${DIBUIX_GAP_V}px` }}>
-              {column.map(({ label, collection, subcollection, stripeItem }) => {
-              const dimmed = activeCollection && collection !== activeCollection
-                ? true
-                : activeCollection === 'austen' && collection === 'austen' && activeSubcollection && subcollection !== activeSubcollection;
-              const emphasized = stripeItem && (stripeItem === selectedStripeItem || stripeItem === hoveredStripeItem);
-              const dibuix = dibuixDelNom(label);
-              return (
-                <button
-                  key={label}
-                  type="button"
-                  title={label}
-                  aria-label={label}
-                  onClick={() => onSelectGroup?.(collection, subcollection, stripeItem)}
-                  onMouseEnter={() => stripeItem && onHoverItem?.(stripeItem, collection)}
-                  onMouseLeave={onHoverLeave}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    width: `${DIBUIX_PX}px`,
-                    height: `${DIBUIX_PX}px`,
-                    padding: 0,
-                    border: 0,
-                    background: 'transparent',
-                    opacity: dimmed ? 0.24 : 1,
-                    cursor: 'pointer',
-                    outline: emphasized ? '1px solid rgba(0,0,0,0.5)' : 'none',
-                    outlineOffset: '1px',
-                  }}
-                >
-                  {dibuix ? (
-                    <img
-                      src={dibuix}
-                      alt={label}
-                      loading="lazy"
-                      style={{
-                        height: `${DIBUIX_PX}px`,
-                        width: `${DIBUIX_PX}px`,
-                        objectFit: 'contain',
-                        display: 'block',
-                      }}
-                    />
-                  ) : (
-                    <span style={{ color: '#2B2B2B', fontSize: `${(isPortraitTablet ? 7 : (isLandscapeTablet ? 8 : 11)) + fontBoost}px`, whiteSpace: 'nowrap' }}>
-                      {label.replace(/^Looking For My Darcy/, 'LFMD')}
-                    </span>
-                  )}
-                </button>
-              );
-              })}
-            </div>
-          ))}
+        <div style={{ display: 'grid', gridTemplateColumns: `repeat(${numColumns}, ${DIBUIX_PX}px)`, gap: `${DIBUIX_GAP_V}px ${DIBUIX_GAP_H}px`, width: '100%', minWidth: 0 }}>
+          {items.map(({ label, collection, subcollection, stripeItem }) => {
+            const dimmed = activeCollection && collection !== activeCollection
+              ? true
+              : activeCollection === 'austen' && collection === 'austen' && activeSubcollection && subcollection !== activeSubcollection;
+            const emphasized = stripeItem && (stripeItem === selectedStripeItem || stripeItem === hoveredStripeItem);
+            const dibuix = dibuixDelNom(label);
+            return (
+              <button
+                key={label}
+                type="button"
+                title={label}
+                aria-label={label}
+                onClick={() => onSelectGroup?.(collection, subcollection, stripeItem)}
+                onMouseEnter={() => stripeItem && onHoverItem?.(stripeItem, collection)}
+                onMouseLeave={onHoverLeave}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  width: `${DIBUIX_PX}px`,
+                  height: `${DIBUIX_PX}px`,
+                  padding: 0,
+                  border: 0,
+                  background: 'transparent',
+                  opacity: dimmed ? 0.24 : 1,
+                  cursor: 'pointer',
+                  outline: emphasized ? '1px solid rgba(0,0,0,0.5)' : 'none',
+                  outlineOffset: '1px',
+                }}
+              >
+                {dibuix ? (
+                  <img
+                    src={dibuix}
+                    alt={label}
+                    loading="lazy"
+                    style={{
+                      height: `${DIBUIX_PX}px`,
+                      width: `${DIBUIX_PX}px`,
+                      objectFit: 'contain',
+                      display: 'block',
+                    }}
+                  />
+                ) : (
+                  <span style={{ color: '#2B2B2B', fontSize: `${(isPortraitTablet ? 7 : (isLandscapeTablet ? 8 : 11)) + fontBoost}px`, whiteSpace: 'nowrap' }}>
+                    {label.replace(/^Looking For My Darcy/, 'LFMD')}
+                  </span>
+                )}
+              </button>
+            );
+          })}
         </div>
 
         <div style={{ display: 'grid', gridTemplateColumns: `repeat(4, ${isPortraitTablet ? '16px' : (isLandscapeTablet ? '19px' : '25px')})`, gridAutoRows: isPortraitTablet ? '16px' : (isLandscapeTablet ? '19px' : '25px'), gap: isPortraitTablet ? '4px' : (isLandscapeTablet ? '6px' : '8px'), transform: uniformColumns ? 'translateX(85px)' : ((isLandscapeTablet || (typeof window !== 'undefined' && window.innerWidth >= 768 && window.innerWidth <= 1366 && window.innerWidth >= window.innerHeight)) ? 'translateX(10px)' : 'translateX(-10px)'), marginTop: uniformColumns ? '5px' : undefined }}>
