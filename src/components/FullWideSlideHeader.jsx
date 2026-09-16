@@ -49,17 +49,25 @@ import useMegaTileSelectorDrag from '@/hooks/useMegaTileSelectorDrag';
  *
  * Totes juntes son 31 fitxers i 0,8 MB. Amb una connexio lenta aixo no arriba
  * a temps i es torna a veure l'espai en blanc, aixi que no es poden demanar
- * totes de cop: es demanen PRIMER les de la colleccio que es veura de seguida
- * (7 fitxers, uns 180 KB) i la resta quan el navegador esta tranquil.
+ * ABANS ES DEMANAVEN EN DOS TORNS, I ERA PITJOR
+ *
+ * Primer es demanaven les de la primera colleccio i la resta quan el navegador
+ * estava tranquil. Pero nome s cal canviar de colleccio de seguida (que es el
+ * que fa tothom) perque les seves imatges encara no hagin arribat: es veien
+ * les caselles buides i despres apareixien de cop.
+ *
+ * Ara es demanen TOTES amb la pagina, i el navegador les ordena soles: les de
+ * la primera colleccio amb prioritat alta i la resta amb prioritat baixa. Aixi
+ * no hi ha cap moment sense imatges.
  */
 const neteja = (mapes) => [...new Set(
   mapes.flatMap((m) => Object.values(m)).filter((v) => typeof v === 'string' && v.startsWith('/'))
 )];
 
-// Les de la primera colleccio, que es la que surt en obrir el calaix.
+// Les de la primera colleccio: aquestes primer.
 const IMATGES_FRANJA_PRIORITARIES = neteja([FIRST_CONTACT_MEDIA, THE_HUMAN_INSIDE_MEDIA]);
 
-// Tota la resta: es demanen mes tard, sense pressa.
+// Tota la resta: tambe amb la pagina, pero el navegador les deixa per despres.
 const IMATGES_FRANJA_LA_RESTA = neteja([
   FIRST_CONTACT_MEDIA_WHITE,
   FIRST_CONTACT_MEDIA_COLOR,
@@ -135,12 +143,7 @@ function FullWideSlideHeader({
   };
   const dblClickDelayMs = 0;
   const [searchQuery, ] = useState('');
-  /**
-   * La resta d'imatges de franja, que es demanen quan el navegador esta
-   * tranquil. Aixi la pagina carrega abans i, quan l'usuari obre el calaix,
-   * les de la seva colleccio ja hi son.
-   */
-  const [imatgesFranjaResta, setImatgesFranjaResta] = useState([]);
+
 
   // El cistell és ÚNIC per a tota la botiga i viu a CartContext. Abans aquest
   // component en tenia un de propi, i per això afegir un producte des d'una
@@ -2765,24 +2768,6 @@ function FullWideSlideHeader({
   }, [contained, active]);
 
   useEffect(() => {
-    // Les imatges que no son de la primera colleccio es demanen quan el
-    // navegador no te res mes a fer, perque no competeixin amb el que es veu.
-    const demanaLaResta = () => setImatgesFranjaResta(IMATGES_FRANJA_LA_RESTA);
-    let idleId = 0;
-    let timeoutId = 0;
-    if (typeof window === 'undefined') return undefined;
-    if (typeof window.requestIdleCallback === 'function') {
-      idleId = window.requestIdleCallback(demanaLaResta, { timeout: 2500 });
-    } else {
-      timeoutId = window.setTimeout(demanaLaResta, 1500);
-    }
-    return () => {
-      if (idleId && typeof window.cancelIdleCallback === 'function') window.cancelIdleCallback(idleId);
-      if (timeoutId) window.clearTimeout(timeoutId);
-    };
-  }, []);
-
-  useEffect(() => {
     const recompute = () => {
       try {
         const px = parseFloat(window.getComputedStyle(document.documentElement).fontSize);
@@ -2832,8 +2817,8 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
         {IMATGES_FRANJA_PRIORITARIES.map((src) => (
           <img key={src} src={src} alt="" loading="eager" decoding="async" fetchPriority="high" />
         ))}
-        {imatgesFranjaResta.map((src) => (
-          <img key={src} src={src} alt="" loading="eager" decoding="async" />
+        {IMATGES_FRANJA_LA_RESTA.map((src) => (
+          <img key={src} src={src} alt="" loading="eager" decoding="async" fetchPriority="low" />
         ))}
       </div>
 
