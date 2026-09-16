@@ -380,7 +380,6 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
             const dimmed = activeCollection && collection !== activeCollection
               ? true
               : activeCollection === 'austen' && collection === 'austen' && activeSubcollection && subcollection !== activeSubcollection;
-            const emphasized = stripeItem && (stripeItem === selectedStripeItem || stripeItem === hoveredStripeItem);
             const dibuix = dibuixDelNom(label);
             return (
               <button
@@ -402,8 +401,6 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
                   background: 'transparent',
                   opacity: dimmed ? 0.24 : 1,
                   cursor: 'pointer',
-                  outline: emphasized ? '1px solid rgba(0,0,0,0.5)' : 'none',
-                  outlineOffset: '1px',
                 }}
               >
                 {dibuix ? (
