@@ -6,6 +6,7 @@ import { useProductContext } from '@/contexts/ProductContext';
 import { useAdmin } from '@/contexts/AdminContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { useCart } from '@/contexts/CartContext';
+import { imatgeArticle } from '@/lib/cartImage';
 import { useOrders } from '@/hooks/useOrders';
 import { getGildan64000Catalog } from '../utils/placeholders.js';
 import { AUSTEN_QUOTES_ASSETS, resolveAustenQuoteAssetId, resolveAustenQuoteOriginalFromPath } from '../utils/austenQuotesAssets.js';
@@ -149,6 +150,24 @@ function FullWideSlideHeader({
   // component en tenia un de propi, i per això afegir un producte des d'una
   // fitxa omplia un cistell que aquí no es veia (el carretó sortia buit).
   const { cartItems, setCartItems, addToCart, getTotalItems } = useCart();
+
+  /**
+   * Les imatges dels articles del cistell, per precarregar-les.
+   *
+   * El cistell es una altra pagina del carrusel del calaix: les seves imatges
+   * no existeixen al DOM fins que hi vas, i amb `loading="lazy"` el navegador
+   * no les demanava fins llavors. Mentre arribaven es veia l'espai en blanc.
+   *
+   * Fa servir la MATEIXA funcio que el cistell de debò, aixi que la imatge que
+   * es precarrega es exactament la que despres es veura.
+   */
+  const imatgesDelCistell = [
+    ...new Set(
+      (Array.isArray(cartItems) ? cartItems : [])
+        .map((item) => imatgeArticle(item))
+        .filter((src) => typeof src === 'string' && src.startsWith('/')),
+    ),
+  ];
 
   const localCartItemCount = getTotalItems();
 
@@ -2818,6 +2837,10 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
           <img key={src} src={src} alt="" loading="eager" decoding="async" fetchPriority="high" />
         ))}
         {IMATGES_FRANJA_LA_RESTA.map((src) => (
+          <img key={src} src={src} alt="" loading="eager" decoding="async" fetchPriority="low" />
+        ))}
+        {/* I les del cistell, que tambe es munten a demanda. */}
+        {imatgesDelCistell.map((src) => (
           <img key={src} src={src} alt="" loading="eager" decoding="async" fetchPriority="low" />
         ))}
       </div>
