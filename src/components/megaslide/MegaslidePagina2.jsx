@@ -352,6 +352,7 @@ export default function MegaslidePagina2({
         }}>
           <CercadorTextRow
             compact
+            leftOffset={20}
             isPortraitTablet={isPortraitTablet}
             isLandscapeTablet={isLandscapeTablet}
             activeCollection={active}
