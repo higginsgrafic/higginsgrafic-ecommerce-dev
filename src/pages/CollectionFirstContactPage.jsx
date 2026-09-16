@@ -31,6 +31,9 @@ const TDP_MOVE_PX = 0;
 // tot tocant-hi). Aquests valors les separen.
 const HERO_TDP_GAP_PX = '0px';
 const HERO_TDP_GAP_TABLET_PX = '450px';
+// La tauleta horitzontal es mes curta: amb la mateixa separacio hi quedava
+// massa forat, perque la graella ja hi te menys recorregut.
+const HERO_TDP_GAP_LANDSCAPE_PX = '-100px';
 
 const COLLECTION_BG_SRC = '/placeholders/tots_els_fons/fons_colleccio/00-colleccio.webp';
 
@@ -529,7 +532,7 @@ function CollectionFirstContactPage() {
         style={{
           // Puja tot el contingut sota el hero 12 files de la taula (41 → 29).
           // Alçada d'1 fila = ampladaBelt × 6708/2642/90; 12 files ≈ 0.3385 × amplada.
-          marginTop: `calc((var(--hg-tdp-xL, 0px) - var(--hg-tdp-xR, 0px)) * 0.3385${isLandscapeTablet ? ' - 30px' : ''}${isPortraitTablet ? ' - 120px' : ''} + ${pushDownPx}px + ${(isPortraitTablet || isLandscapeTablet) ? HERO_TDP_GAP_TABLET_PX : HERO_TDP_GAP_PX})`,
+          marginTop: `calc((var(--hg-tdp-xL, 0px) - var(--hg-tdp-xR, 0px)) * 0.3385${isLandscapeTablet ? ' - 30px' : ''}${isPortraitTablet ? ' - 120px' : ''} + ${pushDownPx}px + ${isLandscapeTablet ? HERO_TDP_GAP_LANDSCAPE_PX : (isPortraitTablet ? HERO_TDP_GAP_TABLET_PX : HERO_TDP_GAP_PX)})`,
           // Desplaçament vertical NOME S de les TDP.
           translate: `0 ${-TDP_MOVE_PX}px`,
           // El bloc te marge negatiu i queda per sobre de la hero: si no fos
