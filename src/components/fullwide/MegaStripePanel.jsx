@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import MegaColumn from './MegaColumn.jsx';
-import MegaGridDibuixos, { graellaDeDibuixosActiva } from './MegaGridDibuixos.jsx';
+import MegaGridDibuixos, { graellaDeDibuixosActiva, activaGraellaDeDibuixos, escoltaGraellaDeDibuixos } from './MegaGridDibuixos.jsx';
 import ClicAreaOverlay from './ClicAreaOverlay.jsx';
 import { CERCADOR_COLORS } from './CercadorTopBar.jsx';
 import { STRIPE_DRAWING_CALIBRATIONS } from '../../config/stripeCalibrations';
@@ -133,6 +133,11 @@ function MegaStripePanel({
 }) {
   const emptyShirtMaskUrl = useEmptyShirtMask(emptyTileIndices, shirtColor);
 
+  // Graella de dibuixos o de noms. Es llegeix de cop i s'escolten els canvis,
+  // perque el boto pugui canviar-ho sense recarregar la pagina.
+  const [dibuixosActius, setDibuixosActius] = useState(graellaDeDibuixosActiva);
+  useEffect(() => escoltaGraellaDeDibuixos(() => setDibuixosActius(graellaDeDibuixosActiva())), []);
+
   useEffect(() => {
     const handler = (ev) => {
       if (typeof onShirtClick !== 'function') return;
@@ -163,7 +168,35 @@ function MegaStripePanel({
           {/* PROVA: la graella de dibuixos, que substitueix la fila de noms.
               S'activa amb l'interruptor (`?megaGrid=dibuixos`); si no, es veu
               el megaslide de sempre. Vegeu MegaGridDibuixos.jsx. */}
-          {graellaDeDibuixosActiva() ? (
+          {/* El boto per canviar entre dibuixos i noms, dins del requadre. */}
+          {!hideGrid && !reserveGridSpace ? (
+            <button
+              type="button"
+              onClick={() => activaGraellaDeDibuixos(!dibuixosActius)}
+              title={dibuixosActius ? 'Tornar a la graella de noms' : 'Veure la graella de dibuixos'}
+              style={{
+                position: 'absolute',
+                left: 0,
+                top: -22,
+                zIndex: 60,
+                appearance: 'none',
+                cursor: 'pointer',
+                border: '1px solid rgba(0,0,0,0.18)',
+                background: dibuixosActius ? '#111827' : '#FFFFFF',
+                color: dibuixosActius ? '#FFFFFF' : '#111827',
+                borderRadius: 4,
+                padding: '2px 10px',
+                fontFamily: 'Roboto, sans-serif',
+                fontSize: 10,
+                letterSpacing: '0.08em',
+                textTransform: 'uppercase',
+              }}
+            >
+              {dibuixosActius ? 'Dibuixos' : 'Noms'}
+            </button>
+          ) : null}
+
+          {dibuixosActius ? (
             <MegaGridDibuixos active={active} />
           ) : (resolvedMega[active] || []).map((col, idx) => (
             <MegaColumn
