@@ -37,6 +37,7 @@ export default function MegaslidePagina2({
   stripeBaseImageSrc,
   page1MegaTileSize,
   page1StripePreviewHPx,
+  page1PageLift = 0,
   resolvedMegaFiltered,
   showStripe,
   stripeOverlayLoadState,
@@ -83,7 +84,6 @@ export default function MegaslidePagina2({
   const compactMegaTileSize = page1MegaTileSize || (isPortraitTablet ? portraitMegaTileSize : megaTileSize);
   const compactStripePreviewHPx = page1StripePreviewHPx || stripePreviewHPx;
   const bnSliderSize = (compactMegaTileSize || 120) * ((isPortraitTablet || isLandscapeTablet) ? 0.94 : 1) * (isPortraitTablet ? 0.7 : 1);
-  const [stripeVisualAlignmentY, setStripeVisualAlignmentY] = useState(0);
   const [topVisualAlignmentY, setTopVisualAlignmentY] = useState(0);
   const snapTimerRef = useRef(0);
   const neutralGammaRef = useRef(null);
@@ -196,32 +196,6 @@ export default function MegaslidePagina2({
   useLayoutEffect(() => {
     let frame = 0;
     let settleTimer = 0;
-    const alignToPage1 = () => {
-      const page1Stripe = document.querySelector('[data-stripe-visual-content="1"]');
-      const page2Stripe = viewportRef.current?.querySelector('[data-stripe-visual-content="2"]');
-      if (!page1Stripe || !page2Stripe) return;
-      const delta = page1Stripe.getBoundingClientRect().top - page2Stripe.getBoundingClientRect().top;
-      if (Math.abs(delta) < 0.5) return;
-      setStripeVisualAlignmentY((current) => current + delta);
-    };
-    const schedule = () => {
-      cancelAnimationFrame(frame);
-      frame = requestAnimationFrame(alignToPage1);
-    };
-
-    schedule();
-    settleTimer = window.setTimeout(schedule, 180);
-    window.addEventListener('resize', schedule);
-    return () => {
-      cancelAnimationFrame(frame);
-      window.clearTimeout(settleTimer);
-      window.removeEventListener('resize', schedule);
-    };
-  }, [active, compactMegaTileSize, compactStripePreviewHPx, isPortraitTablet]);
-
-  useLayoutEffect(() => {
-    let frame = 0;
-    let settleTimer = 0;
     const alignTopRowToPage1 = () => {
       const page1Viewport = document.querySelector('[data-mega-page-viewport="1"]');
       const page1Selector = page1Viewport?.querySelector('button[aria-label="Color"]');
@@ -249,7 +223,7 @@ export default function MegaslidePagina2({
       window.clearTimeout(settleTimer);
       window.removeEventListener('resize', schedule);
     };
-  }, [active, bnSliderSize, isPortraitTablet, stripeVisualAlignmentY]);
+  }, [active, bnSliderSize, isPortraitTablet, page1PageLift]);
 
   const variant = active === 'the_human_inside' ? humanInsideVariant : firstContactVariant;
 
@@ -440,7 +414,7 @@ export default function MegaslidePagina2({
             stripeRowPadPx={stripeRowPadPx}
             stripeRowPadXPx={stripeRowPadXPx}
             stripePreviewHPx={compactStripePreviewHPx}
-            visualOffsetY={stripeVisualAlignmentY}
+            visualOffsetY={-page1PageLift + (isLandscapeTablet ? -10 : 0)}
             stripeOverlayLoadState={stripeOverlayLoadState}
             resolvedOverlaySrc={resolvedOverlaySrc}
             stripeOverlayDebug={stripeOverlayDebug}

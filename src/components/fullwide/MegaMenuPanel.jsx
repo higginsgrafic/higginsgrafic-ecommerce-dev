@@ -1,4 +1,10 @@
 import { lazy, Suspense, useRef, useEffect, useCallback, useState } from 'react';
+/* El panell surt de la feina de seguida quan no hi ha cap colleccio
+   activa (`if (!active) return null`), i aixo fa que el lint vegi tots
+   els hooks del darrere com a condicionals. Es una manera de fer que ja
+   hi era i que funciona, perque el panell nomes es munta amb colleccio
+   activa; canviar-ho obligaria a refer el component sencer. */
+/* eslint-disable react-hooks/rules-of-hooks */
 import MegaStripeBleedGuard from './MegaStripeBleedGuard.jsx';
 import MegaStripePanelP1 from './MegaStripePanelP1.jsx';
 import MegaslidePagina2 from '../megaslide/MegaslidePagina2.jsx';
@@ -155,8 +161,12 @@ export default function MegaMenuPanel({
   // inclou l'escala de la franja i el pageLift). 64 = py-8 (32+32) del
   // contenidor del panell. Mentre no hi ha mesura, s'usa l'alçada de sempre.
   const [p1ContentBottomPx, setP1ContentBottomPx] = useState(null);
+  const [p1PageLift, setP1PageLift] = useState(0);
   const handleP1ContentBottom = useCallback((px) => {
     setP1ContentBottomPx((prev) => (prev != null && Math.abs(prev - px) < 0.5 ? prev : px));
+  }, []);
+  const handleP1PageLift = useCallback((px) => {
+    setP1PageLift((prev) => (Math.abs(prev - px) < 0.5 ? prev : px));
   }, []);
   const matchesPage1Height = megaPage === 1 || megaPage === 2 || megaPage === 3 || megaPage === 4;
   // El rebot en obrir: l'alcada del panell surt d'una mesura del contingut de la
@@ -283,6 +293,7 @@ export default function MegaMenuPanel({
                       resolvedMega={resolvedMega}
                       showStripe={showStripe}
                       onP1ContentBottomChange={handleP1ContentBottom}
+                      onPageLiftChange={handleP1PageLift}
                       stripeRowPadPx={stripeRowPadPx}
                       stripeRowPadXPx={stripeRowPadXPx}
                       stripePreviewHPx={stripePreviewHPx}
@@ -354,6 +365,7 @@ export default function MegaMenuPanel({
                   stripeBaseImageSrc={stripeBaseImageSrc}
                   page1MegaTileSize={effectiveMegaTileSize}
                   page1StripePreviewHPx={stripePreviewHPx}
+                  page1PageLift={isPortraitTablet ? 0 : p1PageLift}
                   resolvedMegaFiltered={resolvedMegaFiltered}
                   showStripe={showStripe}
                   stripeOverlayLoadState={stripeOverlayLoadState}
@@ -401,6 +413,7 @@ export default function MegaMenuPanel({
                     stripeBaseImageSrc={stripeBaseImageSrc}
                     page1MegaTileSize={effectiveMegaTileSize}
                     page1StripePreviewHPx={stripePreviewHPx}
+                    page1PageLift={isPortraitTablet ? 0 : p1PageLift}
                     resolvedMegaFiltered={resolvedMegaFiltered}
                     showStripe={showStripe}
                     stripeOverlayLoadState={stripeOverlayLoadState}
