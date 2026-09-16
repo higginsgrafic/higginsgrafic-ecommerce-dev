@@ -1,242 +1,230 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
+import { supabase } from '@/api/supabase-products';
 
 /**
- * PROVA: la graella de la pàgina 2 del megaslide, amb els DIBUIXOS en comptes
- * dels noms.
+ * PROVA: la graella de 4×16 amb els dibuixos dels 63 productes.
  *
  * QUÈ ÉS
  *
- * A la pàgina 2 del megaslide hi ha una graella amb el nom de cada dibuix
- * (NX-01, NCC-1701…). Aquesta pàgina és la mateixa graella, però amb el
- * dibuix a cada casella, i res més: ni samarretes ni noms.
+ * Una graella de 4 columnes per 16 files (64 caselles) amb el dibuix de cada
+ * producte del catàleg, i res més: ni noms, ni samarretes, ni rodones. Les
+ * caselles que no tenen dibuix queden amb un cercle gris, perquè es vegi que
+ * hi falta.
  *
- * COM ESTÀ FETA
+ * D'ON SURT LA LLISTA
  *
- * Rodones de 50 px, en una graella de 4 columnes, amb el dibuix a dins a mida
- * completa. La rodona és del mateix diàmetre que el dibuix, com a la graella
- * de colors del megaslide.
+ * Dels PRODUCTES DEL CATALEG (la base de dades), que és la font de veritat:
+ * són els 63 productes que es venen. Els dibuixos s'aparellen pel nom del
+ * fitxer.
  *
  * PER QUÈ ÉS UNA PÀGINA A PART
  *
  * Per veure-ho abans de canviar el megaslide de debò. No toca res.
  *
  *     http://localhost:3003/constructor/megaslide-icons
- *
- * D'ON SURT LA LLISTA DE DIBUIXOS
- *
- * El navegador no pot llistar carpetes: la llista viu a
- * `public/drawings.grid.json`, generada amb:
- *
- *     node scripts/genera-llista-dibuixos.mjs
  */
 
-const MIDA = 50;                 // diàmetre de la rodona, en px
-const COLUMNES = 4;              // la graella que ha demanat l'amo
-const SEPARACIO = 10;            // separació entre rodones, en px
-const CONTORN = '0.5px solid rgba(0,0,0,0.22)';
+const COLUMNES = 16;
+const FILES = 4;
+const COSTAT = 50;      // costat de cada casella, en px
+const SEPARACIO = 10;   // separació entre caselles, en px
 
-const COLLECCIONS = [
-  { carpeta: 'first_contact', nom: 'First Contact' },
-  { carpeta: 'the_human_inside', nom: 'The Human Inside' },
-  { carpeta: 'austen', nom: 'Austen' },
-  { carpeta: 'cube', nom: 'Cube' },
-  { carpeta: 'miscellania', nom: 'Miscel·lània' },
-];
+const CARPETA = {
+  'first-contact': 'first_contact',
+  'the-human-inside': 'the_human_inside',
+  austen: 'austen',
+  cube: 'cube',
+  miscellania: 'miscellania',
+};
 
-/** El nom del disseny, tal com surt al filename (`nx-01-b-grid` → `nx-01`). */
-function dissenyDelDibuix(ruta) {
-  const base = ruta.split('/').pop() || ruta;
-  return base
-    .replace(/\.(webp|png|jpg|jpeg)$/i, '')
-    .replace(/-b-grid$/i, '').replace(/-w-grid$/i, '')
-    .replace(/-grid$/i, '').replace(/-stripe$/i, '')
-    .replace(/-b$/i, '').replace(/-w$/i, '');
+// Productes el dibuix dels quals té un altre nom al fitxer. Comprovat a mà.
+const EXCEPCIONS = {
+  'cube-cyberman': 'cybercube',
+  'cube-iron-kong-2': 'ironkong',
+  'cube-maschinenmensch': 'maschinencube',
+  'the-human-inside-robbie-the-robot': 'robbytherobot',
+};
+
+/**
+ * Clau per comparar noms de producte amb noms de fitxer.
+ * `austen-looking-for-my-darcy-blue-solid` i `blue-solid-grid.webp` han de
+ * donar la mateixa clau.
+ */
+function clau(valor) {
+  return String(valor).toLowerCase()
+    .replace(/\.(webp|png|jpg|jpeg)$/, '')
+    .replace(/[-_]/g, '')
+    .replace(/grid$|stripe$/, '')
+    .replace(/^quotes/, '')
+    .replace(/^lookingformydarcy/, '');
 }
 
-function etiquetaDelDibuix(ruta) {
-  return dissenyDelDibuix(ruta).replace(/[-_]+/g, ' ').toUpperCase();
-}
-
-function esDibuixBlanc(ruta) {
-  return /\/white\//i.test(ruta);
+/** El dibuix que li toca a un producte, o null si no n'hi ha. */
+function dibuixDelProducte(producte, index) {
+  const carpeta = CARPETA[producte.collection];
+  const candidats = index[carpeta] || [];
+  const k = EXCEPCIONS[producte.slug] || clau(String(producte.slug).replace(/^(austen|first-contact|the-human-inside|cube|miscellania)-/, ''));
+  const trobat = candidats.find((f) => f.k === k) || candidats.find((f) => f.k.includes(k) || k.includes(f.k));
+  return trobat?.ruta || null;
 }
 
 export default function MegaslideIconsTestPage() {
   const [manifest, setManifest] = useState(null);
+  const [productes, setProductes] = useState(null);
   const [error, setError] = useState('');
-  const [colleccio, setColleccio] = useState('first_contact');
   const [seleccionat, setSeleccionat] = useState(null);
 
   useEffect(() => {
-    fetch('/drawings.grid.json', { cache: 'no-store' })
-      .then((r) => (r.ok ? r.json() : Promise.reject(new Error(`HTTP ${r.status}`))))
-      .then(setManifest)
+    Promise.all([
+      fetch('/drawings.grid.json', { cache: 'no-store' }).then((r) => (r.ok ? r.json() : Promise.reject(new Error(`HTTP ${r.status}`)))),
+      supabase.from('products').select('name, slug, collection').order('collection').order('name'),
+    ])
+      .then(([m, res]) => {
+        if (res.error) throw new Error(res.error.message);
+        setManifest(m);
+        setProductes(res.data || []);
+      })
       .catch((e) => setError(e.message));
   }, []);
 
-  const dibuixos = useMemo(() => {
-    const llista = manifest?.[colleccio] || [];
-    // Un dibuix per disseny: les carpetes black/ i white/ dupliquen el mateix
-    // dibuix en dos colors d'impressió.
-    const perDisseny = new Map();
-    for (const ruta of llista) {
-      const disseny = dissenyDelDibuix(ruta);
-      if (!perDisseny.has(disseny)) perDisseny.set(disseny, ruta);
+  // Index de dibuixos per col·lecció, amb la clau normalitzada.
+  const index = useMemo(() => {
+    const idx = {};
+    for (const [carpeta, llista] of Object.entries(manifest || {})) {
+      idx[carpeta] = llista
+        // Els dibuixos d'impressió blanca són el mateix dibuix: no els volem
+        // duplicats a la graella.
+        .filter((r) => !/\/white\//i.test(r) && !/-w-grid|w-stripe/i.test(r))
+        .map((ruta) => ({ ruta, k: clau(ruta.split('/').pop()) }));
     }
-    return [...perDisseny.entries()].map(([disseny, ruta]) => ({
-      disseny,
-      nom: etiquetaDelDibuix(ruta),
-      ruta,
-      blanc: esDibuixBlanc(ruta),
-    }));
-  }, [manifest, colleccio]);
+    return idx;
+  }, [manifest]);
+
+  const files = useMemo(() => {
+    if (!productes) return [];
+    return productes.map((p) => ({ ...p, dibuix: dibuixDelProducte(p, index) }));
+  }, [productes, index]);
+
+  const sense = files.filter((f) => !f.dibuix);
 
   if (error) {
     return (
       <div className="mx-auto max-w-3xl p-8">
         <div className="border border-red-200 bg-red-50 p-5 text-sm text-red-700">
-          No s&apos;ha pogut carregar la llista de dibuixos ({error}).
-          <div className="mt-2">Genera-la amb: <code>node scripts/genera-llista-dibuixos.mjs</code></div>
+          No s&apos;ha pogut carregar la graella ({error}).
         </div>
       </div>
     );
   }
 
+  const carregant = !manifest || !productes;
+
   return (
     <div className="mx-auto max-w-[1500px] p-6">
       {/* Capçalera */}
-      <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
-        <div>
-          <Link to="/constructor/full-wide-slide" className="mb-3 inline-flex items-center gap-2 text-xs uppercase tracking-[0.12em] text-gray-500 hover:text-black">
-            <ArrowLeft className="h-3.5 w-3.5" /> Tornar al megaslide
-          </Link>
-          <h1 className="font-oswald text-2xl uppercase tracking-[0.04em]">Dibuixos de la pàgina 2 (prova)</h1>
-          <p className="mt-1 text-sm text-gray-500">
-            La graella de la pàgina 2, amb els dibuixos en comptes dels noms. <strong>No toca el megaslide.</strong>
-          </p>
-        </div>
+      <div className="mb-6">
+        <Link to="/constructor/full-wide-slide" className="mb-3 inline-flex items-center gap-2 text-xs uppercase tracking-[0.12em] text-gray-500 hover:text-black">
+          <ArrowLeft className="h-3.5 w-3.5" /> Tornar al megaslide
+        </Link>
+        <h1 className="font-oswald text-2xl uppercase tracking-[0.04em]">Dibuixos · graella {COLUMNES}×{FILES} (prova)</h1>
+        <p className="mt-1 text-sm text-gray-500">
+          El dibuix de cada producte del catàleg. <strong>No toca el megaslide.</strong>
+        </p>
       </div>
 
-      {/* Col·leccions */}
-      <div className="mb-6 flex flex-wrap gap-2 border-b border-gray-200 pb-4">
-        {COLLECCIONS.map((c) => (
-          <button
-            key={c.carpeta}
-            type="button"
-            onClick={() => setColleccio(c.carpeta)}
-            className={`px-3 py-1.5 text-[11px] uppercase tracking-wider ${colleccio === c.carpeta ? 'bg-gray-900 text-white' : 'border border-gray-200 bg-white hover:border-black'}`}
-          >
-            {c.nom}
-          </button>
-        ))}
-      </div>
-
-      {/* LA GRAELLA: 4 columnes de rodones de 50 px, amb el dibuix a dins */}
       <section className="border border-gray-200 bg-white p-6">
-        <div className="mb-5 flex items-baseline justify-between">
+        <div className="mb-5 flex flex-wrap items-baseline justify-between gap-2">
           <h2 className="font-oswald text-[10px] uppercase tracking-[0.16em] text-gray-400">
-            Dibuixos · {COLLECCIONS.find((c) => c.carpeta === colleccio)?.nom}
+            {carregant ? 'Carregant…' : `${files.length} productes · ${files.length - sense.length} amb dibuix · ${sense.length} sense`}
           </h2>
           <span className="text-[10px] uppercase tracking-wider text-gray-400">
-            {dibuixos.length} dibuixos · {COLUMNES} columnes · rodones de {MIDA} px
+            caselles de {COSTAT} px · {COLUMNES} columnes × {FILES} files
           </span>
         </div>
 
-        {!manifest && <div className="py-8 text-center text-sm text-gray-400">Carregant els dibuixos…</div>}
-
-        {manifest && (
-          <div style={{
+        <div
+          style={{
             display: 'grid',
-            gridTemplateColumns: `repeat(${COLUMNES}, ${MIDA}px)`,
+            gridTemplateColumns: `repeat(${COLUMNES}, ${COSTAT}px)`,
+            gridTemplateRows: `repeat(${FILES}, ${COSTAT}px)`,
             gap: SEPARACIO,
             justifyContent: 'start',
-          }}>
-            {dibuixos.map((d) => {
-              const actiu = seleccionat === d.disseny;
+          }}
+        >
+          {Array.from({ length: COLUMNES * FILES }).map((_, idx) => {
+            const f = files[idx] || null;
+
+            // Casella sense producte (o mentre carrega): buida.
+            if (!f) return <span key={`buit-${idx}`} aria-hidden="true" />;
+
+            // Producte sense dibuix: un cercle gris, perquè es vegi que falta.
+            if (!f.dibuix) {
               return (
-                <button
-                  key={d.disseny}
-                  type="button"
-                  title={d.nom}
-                  aria-label={d.nom}
-                  onClick={() => setSeleccionat(actiu ? null : d.disseny)}
+                <span
+                  key={f.slug}
+                  title={`${f.name} — sense dibuix`}
                   style={{
-                    appearance: 'none',
-                    border: 'none',
-                    background: 'transparent',
-                    cursor: 'pointer',
-                    position: 'relative',
-                    width: MIDA,
-                    height: MIDA,
-                    padding: 0,
+                    width: COSTAT,
+                    height: COSTAT,
+                    borderRadius: '50%',
+                    backgroundColor: '#E8EAED',
+                    border: '0.5px solid rgba(0,0,0,0.22)',
+                    boxSizing: 'border-box',
                     display: 'block',
                   }}
-                >
-                  <span
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      width: MIDA,
-                      height: MIDA,
-                      borderRadius: '50%',
-                      backgroundColor: '#E8EAED',
-                      border: CONTORN,
-                      boxSizing: 'border-box',
-                      overflow: 'hidden',
-                    }}
-                  >
-                    <img
-                      src={d.ruta}
-                      alt=""
-                      loading="lazy"
-                      style={{
-                        width: MIDA,
-                        height: MIDA,
-                        objectFit: 'contain',
-                        display: 'block',
-                        // Els dibuixos d'impressió blanca, sobre fons clar, no
-                        // es veurien: s'inverteixen.
-                        filter: d.blanc ? 'invert(1)' : undefined,
-                      }}
-                    />
-                  </span>
-
-                  {actiu && (
-                    <span
-                      aria-hidden="true"
-                      style={{
-                        position: 'absolute',
-                        inset: 0,
-                        borderRadius: '50%',
-                        border: '1px solid #000000',
-                        boxSizing: 'border-box',
-                        pointerEvents: 'none',
-                      }}
-                    />
-                  )}
-                </button>
+                />
               );
-            })}
-          </div>
-        )}
+            }
+
+            const actiu = seleccionat === f.slug;
+            return (
+              <button
+                key={f.slug}
+                type="button"
+                title={f.name}
+                aria-label={f.name}
+                onClick={() => setSeleccionat(actiu ? null : f.slug)}
+                style={{
+                  appearance: 'none',
+                  border: actiu ? '1px solid #000000' : '1px solid transparent',
+                  background: 'transparent',
+                  cursor: 'pointer',
+                  padding: 0,
+                  width: COSTAT,
+                  height: COSTAT,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  boxSizing: 'border-box',
+                }}
+              >
+                <img
+                  src={f.dibuix}
+                  alt=""
+                  loading="lazy"
+                  style={{ width: '100%', height: '100%', objectFit: 'contain', display: 'block' }}
+                />
+              </button>
+            );
+          })}
+        </div>
       </section>
 
-      {/* Els noms, a part, per poder comprovar que cada dibuix és el que toca */}
-      {manifest && (
-        <section className="mt-6 border border-gray-200 bg-white p-6">
-          <h2 className="mb-4 font-oswald text-[10px] uppercase tracking-[0.16em] text-gray-400">
-            Noms, en el mateix ordre (per comprovar)
+      {/* La llista dels que falten, per buscar-los */}
+      {!carregant && sense.length > 0 && (
+        <section className="mt-6 border border-amber-300 bg-amber-50 p-6">
+          <h2 className="mb-3 font-oswald text-[10px] uppercase tracking-[0.16em] text-amber-800">
+            Sense dibuix ({sense.length}) — els cercles grisos de la graella
           </h2>
-          <div style={{ display: 'grid', gridTemplateColumns: `repeat(${COLUMNES}, ${MIDA}px)`, gap: SEPARACIO }}>
-            {dibuixos.map((d) => (
-              <span key={d.disseny} className="truncate text-center font-oswald text-[8px] uppercase tracking-[0.06em] text-gray-400" title={d.nom}>
-                {d.nom}
-              </span>
+          <ul className="space-y-1 text-sm text-amber-900">
+            {sense.map((f) => (
+              <li key={f.slug} className="font-mono text-xs">
+                {f.slug} <span className="text-amber-700">· {f.name}</span>
+              </li>
             ))}
-          </div>
+          </ul>
         </section>
       )}
     </div>
