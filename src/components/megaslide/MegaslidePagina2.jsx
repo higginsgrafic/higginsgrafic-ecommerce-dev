@@ -106,19 +106,6 @@ export default function MegaslidePagina2({
   const compactStripePreviewHPx = page1StripePreviewHPx || stripePreviewHPx;
   const bnSliderSize = (compactMegaTileSize || 120) * ((isPortraitTablet || isLandscapeTablet) ? 0.94 : 1) * (isPortraitTablet ? 0.7 : 1);
   const [stripeVisualAlignmentY, setStripeVisualAlignmentY] = useState(0);
-  /**
-   * El contingut no es fa visible fins que les posicions estan ajustades.
-   *
-   * PER QUE: els elements d'aquesta pagina no existeixen al DOM fins que el
-   * calaix s'obre, aixi que no es poden mesurar abans. L'ajust sempre arriba
-   * uns 500 ms DESPRES d'obrir-se, i si el contingut ja es veu, l'ull percep
-   * el salt (amunt i despres avall).
-   *
-   * Solucio: mentre s'ajusta, el contingut esta transparent; quan ja esta
-   * quiet, apareix suaument. El calaix llisca igual, pero no es veu res
-   * moure's de lloc.
-   */
-  const [p2Ajustat, setP2Ajustat] = useState(false);
   const [topVisualAlignmentY, setTopVisualAlignmentY] = useState(0);
   const snapTimerRef = useRef(0);
   const neutralGammaRef = useRef(null);
@@ -264,26 +251,11 @@ export default function MegaslidePagina2({
     const insistencia = [];
     insistirFinsQueQuediQuiet(schedule, insistencia);
 
-    /**
-     * QUAN ES POT VEURE
-     *
-     * No n'hi ha prou de fer-ho visible al primer ajust: el segon (la fila de
-     * dalt) arriba uns 200 ms mes tard, i si ja es veu, es percep el salt.
-     * Per aixo s'espera una mica mes que la ultima passada del bucle (que
-     * acaba cap als 700 ms).
-     */
-    const mostrar = window.setTimeout(() => setP2Ajustat(true), 820);
-    // Si per qualsevol cosa no s'arriba a ajustar, es mostra igualment: mes
-    // val veure'l una mica desplacat que no pas no veure'l.
-    const xarxaSeguretat = window.setTimeout(() => setP2Ajustat(true), 1600);
-
     if (carril) carril.addEventListener('transitionend', schedule);
     window.addEventListener('resize', schedule);
     return () => {
       cancelAnimationFrame(frame);
       window.clearTimeout(settleTimer);
-      window.clearTimeout(xarxaSeguretat);
-      window.clearTimeout(mostrar);
       for (const id of insistencia) window.clearTimeout(id);
       if (carril) carril.removeEventListener('transitionend', schedule);
       window.removeEventListener('resize', schedule);
@@ -414,9 +386,6 @@ export default function MegaslidePagina2({
           maxWidth: 'none',
           position: 'relative',
           height: '100%',
-          // No es veu fins que les posicions estan ajustades (vegeu p2Ajustat).
-          opacity: p2Ajustat ? 1 : 0,
-          transition: 'opacity 140ms ease-out',
           paddingLeft: '0px',
           paddingRight: '0px',
         }}>
