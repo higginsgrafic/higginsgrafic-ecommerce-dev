@@ -52,8 +52,8 @@ const INK_SELECTED = '#000000';
 
 // Mida del dibuix a la graella de dibuixos, segons la pantalla.
 //   - Tauleta (horitzontal i vertical): iguals, 20 px (ens guiem per la landscape).
-//   - Desktop: escala al 45% de 25 = 11 px.
-const DIBUIX_PX = 11;
+//   - Desktop: escala al 43% de 50 = 21,5 px.
+const DIBUIX_PX = 21.5;
 const DIBUIX_PX_LANDSCAPE = 20;
 const DIBUIX_PX_PORTRAIT = 20;
 // Separacions entre dibuixos. La horitzontal escala amb la mida; la vertical
