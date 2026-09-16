@@ -95,7 +95,8 @@ export default function MegaslideIconsTestPage() {
   useEffect(() => {
     Promise.all([
       fetch('/drawings.grid.json', { cache: 'no-store' }).then((r) => (r.ok ? r.json() : Promise.reject(new Error(`HTTP ${r.status}`)))),
-      supabase.from('products').select('name, slug, collection').order('collection').order('name'),
+      // Nomes els actius: els desactivats (fitxes velles de Gelato) no es venen.
+      supabase.from('products').select('name, slug, collection').eq('is_active', true).order('collection').order('name'),
     ])
       .then(([m, res]) => {
         if (res.error) throw new Error(res.error.message);
