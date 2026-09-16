@@ -60,19 +60,26 @@ const INK_SELECTED = '#000000';
 //   100% = 50 px | 55% = 27,5 px | 45% = 22,5 px | 43% = 21,5 px
 // ============================================================
 const DIBUIX_BASE = 50;
+const DIBUIX_GAP_H_BASE = 25;
+const DIBUIX_GAP_V_BASE = 3;
 
-// Desktop: escala 1:1 (la mida natural).
-const DIBUIX_PX = DIBUIX_BASE * 1.0;           // 50 px
+// Desktop: la graella NO va a escala 1:1. NX-01 (1a columna) queda fix on és i
+// la graella sencera es redueix proporcionalment fins que l'últim dibuix de la
+// fila (col·lumna 16) acaba on acabava Cylon '78 (col·lumna 12) a escala 1:1,
+// que és just abans de les columnes de color:
+//   12 columnes = 12 × 50 + 11 × 25 =  875 px
+//   16 columnes = 16 × 50 + 15 × 25 = 1175 px
+//   factor = 875 / 1175 = 0,744681
+const GRAELLA_FACTOR_DESKTOP = 875 / 1175;
+
+const DIBUIX_PX = DIBUIX_BASE * GRAELLA_FACTOR_DESKTOP;            // 37,23 px
+const DIBUIX_GAP_H = DIBUIX_GAP_H_BASE * GRAELLA_FACTOR_DESKTOP;   // 18,62 px
+const DIBUIX_GAP_V = DIBUIX_GAP_V_BASE * GRAELLA_FACTOR_DESKTOP;   //  2,23 px
 // Tauleta (horitzontal i vertical, de moment iguals): 40% de la base 1:1.
 const DIBUIX_PX_LANDSCAPE = DIBUIX_BASE * 0.40; // 20 px
 const DIBUIX_PX_PORTRAIT = DIBUIX_BASE * 0.40;  // 20 px
-
-// Separacions entre dibuixos. La horitzontal escala amb la mida; la vertical
-// es manté petita (és l'interlineat de les files).
-const DIBUIX_GAP_H = 25;
 const DIBUIX_GAP_H_LANDSCAPE = 20;
 const DIBUIX_GAP_H_PORTRAIT = 20;
-const DIBUIX_GAP_V = 3;
 
 /** La mida de dibuix que toca per a aquesta pantalla. */
 function midaDibuix(isPortraitTablet, isLandscapeTablet) {
@@ -86,6 +93,12 @@ function gapHorizontal(isPortraitTablet, isLandscapeTablet) {
   if (isPortraitTablet) return DIBUIX_GAP_H_PORTRAIT;
   if (isLandscapeTablet) return DIBUIX_GAP_H_LANDSCAPE;
   return DIBUIX_GAP_H;
+}
+
+/** La separació vertical que toca per a aquesta pantalla. */
+function gapVertical(isPortraitTablet, isLandscapeTablet) {
+  if (isPortraitTablet || isLandscapeTablet) return DIBUIX_GAP_V_BASE;
+  return DIBUIX_GAP_V;
 }
 
 // Mapping: text label -> stripe item ID (per seleccionar el disseny a la franja)
@@ -359,6 +372,7 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
     const numColumns = 16;
     const dibuixPx = midaDibuix(isPortraitTablet, isLandscapeTablet);
     const gapH = gapHorizontal(isPortraitTablet, isLandscapeTablet);
+    const gapV = gapVertical(isPortraitTablet, isLandscapeTablet);
     const activeKey = activeCollection === 'austen' ? `austen:${activeSubcollection || ''}` : activeCollection;
 
     return (
@@ -375,7 +389,7 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
           pointerEvents: 'auto',
         }}
       >
-        <div style={{ display: 'grid', gridTemplateColumns: `repeat(${numColumns}, ${dibuixPx}px)`, gap: `${DIBUIX_GAP_V}px ${gapH}px`, width: '100%', minWidth: 0 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: `repeat(${numColumns}, ${dibuixPx}px)`, gap: `${gapV}px ${gapH}px`, width: '100%', minWidth: 0 }}>
           {items.map(({ label, collection, subcollection, stripeItem }) => {
             const dimmed = activeCollection && collection !== activeCollection
               ? true
