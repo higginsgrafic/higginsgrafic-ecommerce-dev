@@ -652,6 +652,10 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
               className="font-roboto-condensed"
               style={{
                 display: 'block',
+                // Els botons, per defecte, s'ajusten al text: sense amplada
+                // plena, l'alineacio (esquerra o dreta) no es pot veure.
+                width: '100%',
+                boxSizing: 'border-box',
                 height: (isPortraitTablet || isLandscapeTablet) ? '11px' : `${alcadaFilaLlista}px`,
                 padding: 0,
                 border: 0,
