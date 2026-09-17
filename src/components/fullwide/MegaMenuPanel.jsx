@@ -144,7 +144,10 @@ export default function MegaMenuPanel({
   const defaultBleedGuardHeight = effectiveMegaTileSize
     ? `${Math.round(effectiveMegaTileSize * 2 + 37 + Math.max(0, stripeRowPadPx))}px`
     : undefined;
-  const bleedGuardHeight = isPortraitTablet ? '269px' : defaultBleedGuardHeight;
+  // A vertical el contingut te la mateixa alcada que a horitzontal: el que
+  // s'allarga el panell es la capcalera, que alla fa dues fileres. Ja no hi ha
+  // una alcada propia del vertical.
+  const bleedGuardHeight = defaultBleedGuardHeight;
 
   // El formulari de pagament necessita alçada per centrar-s'hi: a les dues
   // tauletes, obrir l'acordió estira la franja fins al peu de pantalla.
@@ -206,8 +209,6 @@ export default function MegaMenuPanel({
   const CHECKOUT_GUARD_H = (esVerticalAqui || esMobilAqui) ? null : (esApaissadaAqui ? 206 : 266);
   const guardHeightPx = paymentFillsScreen
     ? guardHeightPxDefault
-    : isPortraitTablet
-    ? '269px'
     : esCheckout && CHECKOUT_GUARD_H != null
     ? `${CHECKOUT_GUARD_H}px`
     : matchesPage1Height && p1ContentBottomPx != null && mesuraEstable
@@ -272,10 +273,10 @@ export default function MegaMenuPanel({
                   transition: 'transform 320ms cubic-bezier(0.32, 0.72, 0, 1)',
                 }}
               >
-                <div style={{ width: '25%', flexShrink: 0, display: 'block', height: isPortraitTablet ? '269px' : '100%', position: 'relative', overflow: isPortraitTablet ? 'hidden' : 'visible' }}>
+                <div style={{ width: '25%', flexShrink: 0, display: 'block', height: '100%', position: 'relative', overflow: isPortraitTablet ? 'hidden' : 'visible' }}>
                   <div ref={viewport1Ref} data-mega-page-viewport="1" style={{
                     width: '100%',
-                    height: isPortraitTablet ? '269px' : '100%',
+                    height: '100%',
                     display: 'flex',
                     justifyContent: isPortraitTablet ? 'flex-start' : 'center',
                     overflowX: isPortraitTablet ? 'auto' : 'visible',
