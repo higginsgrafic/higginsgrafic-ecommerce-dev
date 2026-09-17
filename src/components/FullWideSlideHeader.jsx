@@ -2000,7 +2000,12 @@ function FullWideSlideHeader({
         const surface = document.querySelector('[data-mega-panel-surface="1"]');
         if (surface) {
           const rect = surface.getBoundingClientRect();
-          setLockBtnTop((prev) => (prev === rect.bottom ? prev : rect.bottom));
+          // El separador és la vora inferior (border-b) de la superfície del
+          // panell: el cadenat es centra sobre la LINIA, no sobre la caixa,
+          // així que descomptem mig gruix de la vora.
+          const gruixVora = parseFloat(getComputedStyle(surface).borderBottomWidth) || 0;
+          const linia = rect.bottom - gruixVora / 2;
+          setLockBtnTop((prev) => (prev === linia ? prev : linia));
         }
       } catch { /* ignore */ }
     };
