@@ -3095,9 +3095,9 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
         )}
 
       {/* El cadenat no es munta fins que no hi ha la primera mesura: així no
-          apareix a la posició de reserva (a dalt de tot) i, amb la transició de
-          `top`, els ajustos finals del panell es veuen com un lliscament. */}
-      {canUseDom && active && lockBtnTop != null && ReactDOM.createPortal(
+          apareix a la posició de reserva (a dalt de tot). I a la pàgina del
+          cistell (3) no hi surt: allà no cal bloquejar el megaslide. */}
+      {canUseDom && active && megaPage !== 3 && lockBtnTop != null && ReactDOM.createPortal(
         <button
           onClick={() => {
             if (lockDragRef.current.dragged) {
