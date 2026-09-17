@@ -2058,10 +2058,12 @@ function FullWideSlideHeader({
       const cs = window.getComputedStyle(el);
       const pl = parseFloat(cs.paddingLeft || '0') || 0;
       const pr = parseFloat(cs.paddingRight || '0') || 0;
-      // En portrait tablet, el contingut del mega-slide té amplada landscape (1350px)
-      // dins d'un viewport scrollable. Calculem el tile amb aquesta amplada.
+      // El vertical es la mateixa pagina que l'apaisada d'un iPad (1024): el
+      // contingut te 992 px d'amplada i el que no hi cap s'hi arriba
+      // desplacant. D'aquesta amplada en surten les mides del selector i de la
+      // franja, aixi que ha de coincidir amb la de l'apaisada.
       const contentW = isPortraitTablet
-        ? 1350 - pl - pr
+        ? 992 - pl - pr
         : w - pl - pr;
       if (!contentW) return;
       const totalGaps = (COLS - 1) * GAP_PX;
@@ -2239,7 +2241,7 @@ function FullWideSlideHeader({
       // s'alineïn amb belt2 quan és vàlid, i caiguin a fallback si està contaminat.
       try {
         const root = document.documentElement;
-        root.style.setProperty('--hg-mega-w', `${beltWidth}px`);
+        root.style.setProperty('--hg-mega-w', `${isPortraitTablet ? 992 : beltWidth}px`);
         root.style.setProperty('--hg-mega-x', `${belt.left}px`);
       } catch {
         // ignore

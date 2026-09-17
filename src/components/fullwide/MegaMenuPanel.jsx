@@ -290,7 +290,12 @@ export default function MegaMenuPanel({
                     flex: isPortraitTablet ? '0 0 0px' : '1 1 auto',
                   }} />
 
-                  <div style={{ flex: '0 0 auto', width: isPortraitTablet ? '1350px' : 'var(--hg-mega-w, min(1350px, calc(100vw - 32px)))', maxWidth: 'none', position: 'relative', height: '100%', paddingLeft: '0px', paddingRight: '0px', zoom: isPortraitTablet ? 0.868 : 1 }}>
+                  {/* A vertical, la pagina es la mateixa que a l'apaisada
+                      d'un iPad (1024): el tauler fa 992 px i no es zoomat, i
+                      el que no hi cap s'hi arriba desplacant. D'aquesta
+                      amplada en surt la calibracio (megaTileSize), aixi que
+                      les mides del selector i de la franja tambe coincideixen. */}
+                  <div style={{ flex: '0 0 auto', width: isPortraitTablet ? '992px' : 'var(--hg-mega-w, min(1350px, calc(100vw - 32px)))', maxWidth: 'none', position: 'relative', height: '100%', paddingLeft: '0px', paddingRight: '0px' }}>
                     <MegaStripePanelP1
                       active={active}
                       resolvedMega={resolvedMega}
