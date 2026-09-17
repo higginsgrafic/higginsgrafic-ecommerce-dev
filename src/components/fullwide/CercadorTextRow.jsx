@@ -92,11 +92,12 @@ const DIBUIX_PX = 30;
 const DIBUIX_GAP_H = (GRAELLA_AMPLADA - GRAELLA_COLUMNES * DIBUIX_PX) / (GRAELLA_COLUMNES - 1);
 const DIBUIX_GAP_V = DIBUIX_GAP_V_BASE * (DIBUIX_PX / DIBUIX_BASE);
 // Tauleta (horitzontal i vertical, de moment iguals): 40% de la base 1:1.
-const DIBUIX_PX_LANDSCAPE = DIBUIX_BASE * 0.40; // 20 px
-const DIBUIX_PX_PORTRAIT = DIBUIX_BASE * 0.40;  // 20 px
+const ESCALA_TAULETA = 0.99; // 1% mes petit (ho demana el disseny)
+const DIBUIX_PX_LANDSCAPE = DIBUIX_BASE * 0.40 * ESCALA_TAULETA;
+const DIBUIX_PX_PORTRAIT = DIBUIX_BASE * 0.40 * ESCALA_TAULETA;
 // Tauleta horitzontal: la separacio horitzontal va un 10% mes estreta que la
 // base de 20 px, perque la graella no arribi tan endins de la columna de color.
-const DIBUIX_GAP_H_LANDSCAPE = 18;
+const DIBUIX_GAP_H_LANDSCAPE = 18 * ESCALA_TAULETA;
 const DIBUIX_GAP_H_PORTRAIT = DIBUIX_GAP_H_LANDSCAPE; // 18: el vertical es la mateixa pagina
 
 /** La mida de dibuix que toca per a aquesta pantalla. */
@@ -121,13 +122,13 @@ function gapHorizontal(isPortraitTablet, isLandscapeTablet) {
 function colorMida(isPortraitTablet, isLandscapeTablet) {
   // Tauleta vertical i horitzontal: la mateixa mesura, perque son la mateixa
   // pagina; el vertical nomes s'hi desplaca.
-  if (isPortraitTablet || isLandscapeTablet) return 19;
+  if (isPortraitTablet || isLandscapeTablet) return 19 * ESCALA_TAULETA;
   return 25;
 }
 
 /** Separacio entre cercles de color. */
 function colorGap(isPortraitTablet, isLandscapeTablet) {
-  if (isPortraitTablet || isLandscapeTablet) return 6;
+  if (isPortraitTablet || isLandscapeTablet) return 6 * ESCALA_TAULETA;
   return 8;
 }
 
