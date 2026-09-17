@@ -238,6 +238,18 @@ body.cart-open {
    invisible: si no, es veu a través del panell translúcid i sembla que surti
    abans que la pestanya. Per això l'opacitat no puja fins passat el primer
    terç de l'animació. */
+/* Al vertical el cadenat no pot fer l'animacio de sortir de sota (el mateix
+   transform el fa servir per arrossegar-lo), aixi que s'hi entra amb un fos:
+   queda invisible mentre el panell encaixa la seva alcada i apareix despres. */
+@keyframes mega-cadenat-apareix {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
 @keyframes mega-cadenat-surt {
   from {
     opacity: 0;

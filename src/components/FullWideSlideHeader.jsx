@@ -3141,8 +3141,11 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
             transform: isPortraitTablet && megaPage !== 3
               ? `translateX(calc(-50% + ${(lockBtnScrollProgress - 0.5) * 160}px))`
               : undefined,
+            // Vertical: nomes un fos, amb retard suficient perque el panell ja
+            // hagi encaixat la seva alcada (el transform es seu, per
+            // arrossegar-lo, i no pot fer l'animacio de sortir de sota).
             animation: isPortraitTablet && megaPage !== 3
-              ? undefined
+              ? 'mega-cadenat-apareix 200ms ease-out 380ms both'
               : 'mega-cadenat-surt 320ms cubic-bezier(0.22, 1, 0.36, 1) 360ms both',
             transition: 'transform 120ms ease-out, background-color 150ms',
             cursor: isPortraitTablet && megaPage !== 3 ? 'grab' : 'pointer',
