@@ -388,7 +388,7 @@ function Home() {
             gap: '44px',
             pointerEvents: 'auto',
             // Al vertical, el menu d'icones de col·leccions va 25 px mes amunt.
-            transform: `translateY(${isPortraitTablet ? '84px' : '-26px'})`,
+            transform: `translateY(${isPortraitTablet ? '84px' : (isLandscapeTablet ? '24px' : '-26px')})`,
           }}
         >
           {COLLECTIONS_MENU.map((c) => {
@@ -430,7 +430,7 @@ function Home() {
             gridColumn: '1 / 4',
             gridRow: '10 / 25',
             position: 'relative',
-            top: `calc(-5px - ${rowHeight / 2}px${isLandscapeTablet ? ' - 50px' : ''} - 50px${isLandscapeTablet ? ' + 50px' : ''}${isPortraitTablet ? ' + 150px' : ''})`,
+            top: `calc(-5px - ${rowHeight / 2}px${isLandscapeTablet ? ' - 50px' : ''} - 50px${isLandscapeTablet ? ' + 50px' : ''}${isPortraitTablet ? ' + 150px' : ''}${isLandscapeTablet ? ' + 25px' : ''})`,
             width: 'calc(100% + 1px)',
             height: isPortraitTablet ? '430px' : 'calc(100% + 2px)',
             transform: 'scale(0.705)',
