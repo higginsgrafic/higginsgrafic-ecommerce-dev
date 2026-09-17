@@ -575,7 +575,7 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
           })}
         </div>
 
-        <div data-p2-color-grid style={{ display: 'grid', gridTemplateColumns: `repeat(4, ${isPortraitTablet ? '16px' : (isLandscapeTablet ? '19px' : '25px')})`, gridAutoRows: isPortraitTablet ? '16px' : (isLandscapeTablet ? '19px' : '25px'), gap: isPortraitTablet ? '4px' : (isLandscapeTablet ? '6px' : '8px'), transform: uniformColumns ? 'translateX(85px)' : ((isLandscapeTablet || (typeof window !== 'undefined' && window.innerWidth >= 768 && window.innerWidth <= 1366 && window.innerWidth >= window.innerHeight)) ? 'translateX(10px)' : 'translateX(-10px)'), marginTop: uniformColumns ? '5px' : undefined }}>
+        <div data-p2-color-grid style={{ display: 'grid', gridTemplateColumns: `repeat(4, ${isPortraitTablet ? '16px' : (isLandscapeTablet ? '19px' : '25px')})`, gridAutoRows: isPortraitTablet ? '16px' : (isLandscapeTablet ? '19px' : '25px'), gap: isPortraitTablet ? '4px' : (isLandscapeTablet ? '6px' : '8px'), transform: uniformColumns ? 'translateX(85px)' : (isLandscapeTablet ? 'translateX(20px)' : ((typeof window !== 'undefined' && window.innerWidth >= 768 && window.innerWidth <= 1366 && window.innerWidth >= window.innerHeight) ? 'translateX(10px)' : 'translateX(-10px)')), marginTop: uniformColumns ? '5px' : undefined }}>
           {CERCADOR_COLORS.map(({ slug, hex }) => {
             const selected = slug === selectedColor;
             return (
