@@ -4,6 +4,14 @@ import ClicAreaOverlayP1 from './ClicAreaOverlayP1.jsx';
 import { CERCADOR_COLORS } from './CercadorTopBar.jsx';
 import { STRIPE_DRAWING_CALIBRATIONS } from '../../config/stripeCalibrations';
 
+// La franja de samarretes de la pàgina 1 tendeix a quedar-se uns 10 px més avall
+// del que toca: l'alçada del contenidor de la pàgina es calcula a partir del
+// bottom mesurat de la franja i el pageLift es calibra amb el selector, de
+// manera que el resultat depèn de l'ordre de les mesures. Amb aquest ajust la
+// franja torna a la seva posició, i la pàgina 2 el fa servir perquè les dues
+// franges quedin a la mateixa alçada.
+export const FRANJA_AJUST_PX = 10;
+
 function canonicalKey(rawSrc) {
   try {
     const s = String(rawSrc || '').trim();
@@ -136,12 +144,10 @@ function MegaStripePanelP1({
   const pageRootRef = useRef(null);
   const pageLiftRef = useRef(0);
   const [pageLift, setPageLift] = useState(0);
-  // La franja de samarretes d'aquesta pàgina tendeix a quedar-se uns 10 px més
-  // avall del que toca: l'alçada del contenidor de la pàgina es calcula a partir
-  // del bottom mesurat de la franja, i el pageLift es calibra amb el selector,
-  // de manera que el resultat depèn de l'ordre de les mesures. Amb aquest ajust
-  // la franja torna a la posició de sempre.
-  const FRANJA_AJUST_PX = 10;
+  // Franja estreta (768-1366 en horitzontal): hi ha ajustos propis de 10 px i
+  // l'ajust general de la franja no s'hi aplica.
+  const esEstenyFins1366 = typeof window !== 'undefined'
+    && window.innerWidth >= 768 && window.innerWidth <= 1366 && window.innerWidth >= window.innerHeight;
 
   // En portrait tablet, la stripe està dins d'un viewport scrollable amb
   // overflowY hidden. Reduïm l'escala de la stripe perquè no es talli.
@@ -285,7 +291,9 @@ function MegaStripePanelP1({
         <div
           className="relative z-0"
           style={{
-            marginTop: compactLandscape ? '16px' : `${stripeRowPadPx - ((!isPortraitTablet && !compactLandscape) ? FRANJA_AJUST_PX : 0)}px`,
+            // A la franja estreta (768-1366) la pàgina ja té els seus propis
+            // ajustos de 10 px i l'ajust general no s'hi ha d'aplicar.
+            marginTop: compactLandscape ? '16px' : `${stripeRowPadPx - ((!isPortraitTablet && !compactLandscape && !esEstenyFins1366) ? FRANJA_AJUST_PX : 0)}px`,
             paddingBottom: compactLandscape ? '8px' : `${stripeRowPadPx}px`,
             paddingLeft: `${stripeRowPadXPx?.left || 0}px`,
             paddingRight: `${stripeRowPadXPx?.right || 0}px`,
