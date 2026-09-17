@@ -234,10 +234,10 @@ export default function MegaslidePagina2({
   }, [active, bnSliderSize, isPortraitTablet, page1PageLift, selectorCentratgeY]);
 
   // El selector Blanc/Color/Negre es centra verticalment amb la graella de
-  // colors (la columna dels cercles). Només desktop: a tauleta el selector
-  // manté la posició que tenia.
+  // colors (la columna dels cercles). S'aplica a totes les pantalles: a desktop
+  // i a tauleta el selector queda centrat amb la seva graella de colors.
   useLayoutEffect(() => {
-    if (!active || isPortraitTablet || isLandscapeTablet) return undefined;
+    if (!active) return undefined;
     let frame = 0;
     let settleTimer = 0;
     const centraAmbLaGraellaDeColors = () => {
