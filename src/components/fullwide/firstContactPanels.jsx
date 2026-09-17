@@ -88,10 +88,12 @@ export function FirstContactDibuix00Buttons({
   sliderSideInset = null,
   compact = false,
 }) {
+  // Els noms dels acabats són els catalans (Blanc/Color/Negre) i es mostren en
+  // majúscules; la resta de la botiga també els anomena així.
   const buttons = [];
-  if (showWhite) buttons.push({ key: 'white', label: 'White', onClick: onWhite });
+  if (showWhite) buttons.push({ key: 'white', label: 'Blanc', onClick: onWhite });
   if (showMulti) buttons.push({ key: 'color', label: 'Color', onClick: onMulti });
-  if (showBlack) buttons.push({ key: 'black', label: 'Black', onClick: onBlack });
+  if (showBlack) buttons.push({ key: 'black', label: 'Negre', onClick: onBlack });
 
   if (!buttons.length) return null;
 

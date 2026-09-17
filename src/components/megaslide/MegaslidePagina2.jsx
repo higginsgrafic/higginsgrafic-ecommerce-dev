@@ -85,6 +85,10 @@ export default function MegaslidePagina2({
   const compactStripePreviewHPx = page1StripePreviewHPx || stripePreviewHPx;
   const bnSliderSize = (compactMegaTileSize || 120) * ((isPortraitTablet || isLandscapeTablet) ? 0.94 : 1) * (isPortraitTablet ? 0.7 : 1);
   const [topVisualAlignmentY, setTopVisualAlignmentY] = useState(0);
+  // Desplaçament propi del selector Blanc/Color/Negre perquè quedi centrat amb
+  // la graella de colors. Va a part de topVisualAlignmentY (que alinea el
+  // selector amb el de la pàgina 1): així els dos ajustos no es trepitgen.
+  const [selectorCentratgeY, setSelectorCentratgeY] = useState(0);
   const snapTimerRef = useRef(0);
   const neutralGammaRef = useRef(null);
   const tiltDeltaRef = useRef(0);
@@ -206,7 +210,10 @@ export default function MegaslidePagina2({
       // aquest valor objectiu. Si el posessim al transform, la propia
       // calibracio el tornaria a pujar i no es veuria.
       const offset = (typeof window !== 'undefined' && window.innerWidth >= 768 && window.innerWidth <= 1366 && window.innerWidth >= window.innerHeight) ? 10 : 0;
-      const delta = (page1Selector.getBoundingClientRect().top + offset) - page2Selector.getBoundingClientRect().top;
+      // El centratge del selector (selectorCentratgeY) no ha de comptar aquí:
+      // el que volem és que el selector quedi on toca respecte de la pàgina 1 i
+      // que el centratge amb la graella de colors hi vagi a sobre.
+      const delta = (page1Selector.getBoundingClientRect().top + offset) - (page2Selector.getBoundingClientRect().top - selectorCentratgeY);
       if (Math.abs(delta) < 0.5) return;
       setTopVisualAlignmentY((current) => current + delta);
     };
@@ -223,7 +230,39 @@ export default function MegaslidePagina2({
       window.clearTimeout(settleTimer);
       window.removeEventListener('resize', schedule);
     };
-  }, [active, bnSliderSize, isPortraitTablet, page1PageLift]);
+  }, [active, bnSliderSize, isPortraitTablet, page1PageLift, selectorCentratgeY]);
+
+  // El selector Blanc/Color/Negre es centra verticalment amb la graella de
+  // colors (la columna dels cercles). Només desktop: a tauleta el selector
+  // manté la posició que tenia.
+  useLayoutEffect(() => {
+    if (!active || isPortraitTablet || isLandscapeTablet) return undefined;
+    let frame = 0;
+    let settleTimer = 0;
+    const centraAmbLaGraellaDeColors = () => {
+      const selector = viewportRef.current?.querySelector('[data-p2-color-selector] [data-stripe-buttonbar="bn"]');
+      const graella = viewportRef.current?.querySelector('[data-p2-color-grid]');
+      if (!selector || !graella) return;
+      const s = selector.getBoundingClientRect();
+      const g = graella.getBoundingClientRect();
+      const delta = (g.top + g.height / 2) - (s.top + s.height / 2);
+      if (Math.abs(delta) < 0.5) return;
+      setSelectorCentratgeY((current) => current + delta);
+    };
+    const schedule = () => {
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(centraAmbLaGraellaDeColors);
+    };
+
+    schedule();
+    settleTimer = window.setTimeout(schedule, 180);
+    window.addEventListener('resize', schedule);
+    return () => {
+      cancelAnimationFrame(frame);
+      window.clearTimeout(settleTimer);
+      window.removeEventListener('resize', schedule);
+    };
+  }, [active, bnSliderSize, isPortraitTablet, isLandscapeTablet]);
 
   const variant = active === 'the_human_inside' ? humanInsideVariant : firstContactVariant;
 
@@ -325,7 +364,7 @@ export default function MegaslidePagina2({
             alignItems: 'center',
             justifyContent: 'center',
           }}>
-            <div style={{ width: '100%', height: '100%', transform: `translateY(${topVisualAlignmentY}px)` }}>
+            <div style={{ width: '100%', height: '100%', transform: `translateY(${topVisualAlignmentY + selectorCentratgeY}px)` }}>
               <FirstContactDibuix00Buttons
                 onWhite={() => { setStripeOverlayOverrideActive(false); active === 'the_human_inside' ? setHumanInsideVariant('white') : setFirstContactVariant('white'); }}
                 onBlack={() => { setStripeOverlayOverrideActive(false); active === 'the_human_inside' ? setHumanInsideVariant('black') : setFirstContactVariant('black'); }}
