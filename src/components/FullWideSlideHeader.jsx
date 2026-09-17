@@ -3108,7 +3108,7 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
             // queda just a sota del separador. L'animacio va a fora i el
             // transform de dins queda lliure per arrossegar-lo al vertical.
             top: `${lockBtnTop + CADE_BAIXADA_PX}px`,
-            animation: 'mega-cadenat-surt 80ms cubic-bezier(0.22, 1, 0.36, 1) 360ms both',
+            animation: 'mega-cadenat-surt 250ms cubic-bezier(0.22, 1, 0.36, 1) 360ms both',
             // Per sota del panell (z-[10000]) perque el cadenat en surti de sota.
             zIndex: 9999,
             pointerEvents: 'none',
@@ -3150,7 +3150,7 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
             className="flex h-10 w-10 items-center justify-center rounded-full border border-border bg-background shadow-lg transition-colors hover:bg-muted"
             style={{
               // L'ombra del panell sobre el cadenat mentre creua el seu contorn.
-              animation: 'mega-cadenat-ombra 80ms ease-out 360ms both',
+              animation: 'mega-cadenat-ombra 250ms ease-out 360ms both',
               transform: isPortraitTablet && megaPage !== 3
                 ? `translateX(${(lockBtnScrollProgress - 0.5) * 160}px)`
                 : undefined,
