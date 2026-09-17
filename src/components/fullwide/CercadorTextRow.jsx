@@ -93,7 +93,9 @@ const DIBUIX_GAP_V = DIBUIX_GAP_V_BASE * (DIBUIX_PX / DIBUIX_BASE);
 // Tauleta (horitzontal i vertical, de moment iguals): 40% de la base 1:1.
 const DIBUIX_PX_LANDSCAPE = DIBUIX_BASE * 0.40; // 20 px
 const DIBUIX_PX_PORTRAIT = DIBUIX_BASE * 0.40;  // 20 px
-const DIBUIX_GAP_H_LANDSCAPE = 20;
+// Tauleta horitzontal: la separacio horitzontal va un 10% mes estreta que la
+// base de 20 px, perque la graella no arribi tan endins de la columna de color.
+const DIBUIX_GAP_H_LANDSCAPE = 18;
 const DIBUIX_GAP_H_PORTRAIT = 20;
 
 /** La mida de dibuix que toca per a aquesta pantalla. */
