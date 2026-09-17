@@ -62,17 +62,30 @@ const INK_SELECTED = '#000000';
 const DIBUIX_BASE = 50;
 const DIBUIX_GAP_V_BASE = 3;
 
-// Desktop: dibuix de 35 px (70% de la base 1:1) i 21 px de separació
-// horitzontal. La graella fa exactament la mateixa amplada de referència que
-// amb el dibuix a 1:1, o sigui que l'últim dibuix de la fila (col·lumna 16)
-// acaba on acabava Cylon '78 (col·lumna 12) a escala 1:1, just abans de les
-// columnes de color:
-//   12 columnes a 1:1 = 12 × 50 + 11 × 25 =  875 px
-//   16 columnes ara    = 16 × 35 + 15 × 21 =  875 px
+// La graella de dibuixos fa 16 columnes × 4 files.
+const GRAELLA_COLUMNES = 16;
+const GRAELLA_FILES = 4;
+// Amplada de referència de la graella: la que ocupaven les 12 primeres
+// columnes a escala 1:1 (12 × 50 + 11 × 25 = 875 px), o sigui que l'últim
+// dibuix de la fila (col·lumna 16) acaba on acabava Cylon '78 (col·lumna 12) a
+// escala 1:1, just abans de les columnes de color.
+const GRAELLA_AMPLADA = 875;
+// Marge entre l'última fila de dibuixos i el capdamunt de la franja.
+const GRAELLA_MARGE_FRANJA = 2;
+// La graella va 8 px més amunt que la resta de columnes del cercador (les de
+// color i la llista es queden al seu lloc).
+const GRAELLA_AIXECAMENT_PX = 8;
+
+// Desktop: dibuix de 30 px (60% de la base 1:1). La separació horitzontal és
+// la que fa que les 16 columnes continuïn ocupant els 875 px de referència:
+//   16 × 30 + 15 × 26,33 = 875 px
 // Com que el dibuix és més petit, la separació entre dibuixos és més gran.
-const DIBUIX_PX = 35;
-const DIBUIX_GAP_H = 21;
-const DIBUIX_GAP_V = 2.1;
+// La separació vertical no és fixa: CercadorTextRow la calcula segons l'espai
+// que hi hagi fins a la franja de samarretes (DIBUIX_GAP_V és el valor de
+// reserva quan encara no s'ha pogut mesurar).
+const DIBUIX_PX = 30;
+const DIBUIX_GAP_H = (GRAELLA_AMPLADA - GRAELLA_COLUMNES * DIBUIX_PX) / (GRAELLA_COLUMNES - 1);
+const DIBUIX_GAP_V = DIBUIX_GAP_V_BASE * (DIBUIX_PX / DIBUIX_BASE);
 // Tauleta (horitzontal i vertical, de moment iguals): 40% de la base 1:1.
 const DIBUIX_PX_LANDSCAPE = DIBUIX_BASE * 0.40; // 20 px
 const DIBUIX_PX_PORTRAIT = DIBUIX_BASE * 0.40;  // 20 px
@@ -98,18 +111,6 @@ function gapVertical(isPortraitTablet, isLandscapeTablet) {
   if (isPortraitTablet || isLandscapeTablet) return DIBUIX_GAP_V_BASE;
   return DIBUIX_GAP_V;
 }
-
-// La graella de dibuixos fa 16 columnes × 4 files. Al desktop s'ha d'ajustar a
-// l'espai real de la pàgina 2: no pot sortir de la columna on viu (amplada) ni
-// pot trepitjar la filera de samarretes que hi ha just a sota (alçada).
-const GRAELLA_COLUMNES = 16;
-const GRAELLA_FILES = 4;
-// Marge entre l'última fila de dibuixos i el capdamunt de la franja.
-const GRAELLA_MARGE_FRANJA = 2;
-// Els dibuixos a 35 px deixen 8 px de marge vertical respecte de la mida
-// anterior (37,23 px). Els aprofitem per pujar la graella cap amunt: només la
-// graella, no les columnes de color ni la llista, que es queden al seu lloc.
-const GRAELLA_AIXECAMENT_PX = 8;
 
 // Mapping: text label -> stripe item ID (per seleccionar el disseny a la franja)
 const STRIPE_MAP = {
@@ -409,24 +410,23 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
       let gapH = gapHBase * factorAmple;
       let gapV = gapVBase * factorAmple;
 
-      // 2) Alçada: la graella no pot trepitjar la franja de samarretes. Primer
-      //    cedim la separació vertical (que gairebé no es veu, perquè els
-      //    dibuixos ja queden centrats dins la seva casella) i només si encara
-      //    no hi cap reduïm el dibuix, mantenint la proporció amb la separació
-      //    horitzontal perquè la graella no quedi deformada.
+      // 2) Alçada: la graella ha de cabre entre el seu capdamunt i el
+      //    capdamunt de la franja de samarretes. Si els dibuixos ja hi caben,
+      //    la separació vertical creix fins a omplir l'espai que queda (sense
+      //    passar de la separació horitzontal, perquè la graella no quedi
+      //    descompensada); si no hi caben, reduïm el dibuix mantenint la
+      //    proporció amb la separació horitzontal.
       if (sostre != null) {
         const altDisp = sostre - dalt - GRAELLA_MARGE_FRANJA;
         if (altDisp > 0) {
           const altDibuixos = GRAELLA_FILES * dibuix;
-          if (altDibuixos + (GRAELLA_FILES - 1) * gapV > altDisp) {
-            if (altDibuixos <= altDisp) {
-              gapV = Math.max(0, (altDisp - altDibuixos) / (GRAELLA_FILES - 1));
-            } else {
-              const factorAlt = altDisp / altDibuixos;
-              dibuix *= factorAlt;
-              gapH *= factorAlt;
-              gapV = 0;
-            }
+          if (altDibuixos > altDisp) {
+            const factorAlt = altDisp / altDibuixos;
+            dibuix *= factorAlt;
+            gapH *= factorAlt;
+            gapV = 0;
+          } else {
+            gapV = Math.min(gapH, (altDisp - altDibuixos) / (GRAELLA_FILES - 1));
           }
         }
       }
