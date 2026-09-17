@@ -4,6 +4,13 @@ import ClicAreaOverlayP1 from './ClicAreaOverlayP1.jsx';
 import { CERCADOR_COLORS } from './CercadorTopBar.jsx';
 import { STRIPE_DRAWING_CALIBRATIONS } from '../../config/stripeCalibrations';
 
+// La graella de dissenys de la pàgina 1 (la filera de tiles) va 10 px més avall,
+// com el conjunt del cercador de la pàgina 2. Es fa amb un transform perquè no
+// arrossegui la franja de samarretes que té a sota. Les dues calibracions que
+// miren el selector Blanc/Color/Negre (el pageLift d'aquesta pàgina i
+// l'alineació amb la pàgina 2) descompten aquest valor per no desfer-lo.
+export const TILES_BAIXADA_PX = 10;
+
 function canonicalKey(rawSrc) {
   try {
     const s = String(rawSrc || '').trim();
@@ -166,7 +173,9 @@ function MegaStripePanelP1({
         // l'alineava la calibracio. El desplaçament va aqui, dins l'objectiu:
         // si el posessim al transform, la propia calibracio el desfaria.
         const desplaçament = (typeof window !== 'undefined' && window.innerWidth >= 768 && window.innerWidth <= 1366 && window.innerWidth >= window.innerHeight) ? 10 : 0;
-        const delta = (selector.getBoundingClientRect().top - panel.getBoundingClientRect().top) - desplaçament;
+        // La graella va TILES_BAIXADA_PX mes avall (transform), i aquesta
+        // calibracio no ho ha de desfer: per aixo el descomptem de l'objectiu.
+        const delta = (selector.getBoundingClientRect().top - panel.getBoundingClientRect().top) - desplaçament - TILES_BAIXADA_PX;
         const next = Math.max(0, pageLiftRef.current + delta);
         if (Math.abs(next - pageLiftRef.current) >= 0.5) {
           pageLiftRef.current = next;
@@ -249,6 +258,7 @@ function MegaStripePanelP1({
               onStartSelectorDrag={onStartSelectorDrag}
               megaTileSize={megaTileSize}
               compactLandscape={compactLandscape}
+              tilesOffsetY={(!isPortraitTablet && !compactLandscape) ? TILES_BAIXADA_PX : 0}
               hideLabels
               hideSelectorBackground
               humanInsideVariant={humanInsideVariant}
@@ -279,7 +289,9 @@ function MegaStripePanelP1({
         <div
           className="relative z-0"
           style={{
-            marginTop: compactLandscape ? '16px' : `${stripeRowPadPx}px`,
+            // La graella baixa TILES_BAIXADA_PX, però la franja de samarretes
+            // s'ha de quedar on era: descomptem el mateix valor del marge.
+            marginTop: compactLandscape ? '16px' : `${stripeRowPadPx - ((!isPortraitTablet && !compactLandscape) ? TILES_BAIXADA_PX : 0)}px`,
             paddingBottom: compactLandscape ? '8px' : `${stripeRowPadPx}px`,
             paddingLeft: `${stripeRowPadXPx?.left || 0}px`,
             paddingRight: `${stripeRowPadXPx?.right || 0}px`,

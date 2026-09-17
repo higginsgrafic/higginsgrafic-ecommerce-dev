@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useSta
 import { CERCADOR_COLORS } from '../fullwide/CercadorTopBar.jsx';
 import CercadorTextRow from '../fullwide/CercadorTextRow.jsx';
 import MegaStripePanel from '../fullwide/MegaStripePanel.jsx';
+import { TILES_BAIXADA_PX } from '../fullwide/MegaStripePanelP1.jsx';
 import MegaHeroSlider from '../MegaHeroSlider.jsx';
 import Pauta4ColsOverlay from '../pauta/Pauta4ColsOverlay';
 import useMegaslideCalibration from '@/hooks/useMegaslideCalibration';
@@ -217,8 +218,9 @@ export default function MegaslidePagina2({
       const offset = (typeof window !== 'undefined' && window.innerWidth >= 768 && window.innerWidth <= 1366 && window.innerWidth >= window.innerHeight) ? 10 : 0;
       // El centratge del selector (selectorCentratgeY) no ha de comptar aquí:
       // el que volem és que el selector quedi on toca respecte de la pàgina 1 i
-      // que el centratge amb la graella de colors hi vagi a sobre.
-      const delta = (page1Selector.getBoundingClientRect().top + offset) - (page2Selector.getBoundingClientRect().top - selectorCentratgeY);
+      // que el centratge amb la graella de colors hi vagi a sobre. Tampoc no hi
+      // ha de comptar la baixada de la graella de la pàgina 1 (TILES_BAIXADA_PX).
+      const delta = (page1Selector.getBoundingClientRect().top + offset - TILES_BAIXADA_PX) - (page2Selector.getBoundingClientRect().top - selectorCentratgeY);
       if (Math.abs(delta) < 0.5) return;
       setTopVisualAlignmentY((current) => current + delta);
     };
