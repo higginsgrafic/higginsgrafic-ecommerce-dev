@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useSta
 import { CERCADOR_COLORS } from '../fullwide/CercadorTopBar.jsx';
 import CercadorTextRow from '../fullwide/CercadorTextRow.jsx';
 import MegaStripePanel from '../fullwide/MegaStripePanel.jsx';
+import { FRANJA_AJUST_PX } from '../fullwide/MegaStripePanelP1.jsx';
 import MegaHeroSlider from '../MegaHeroSlider.jsx';
 import Pauta4ColsOverlay from '../pauta/Pauta4ColsOverlay';
 import useMegaslideCalibration from '@/hooks/useMegaslideCalibration';
@@ -454,7 +455,11 @@ export default function MegaslidePagina2({
             stripeRowPadPx={stripeRowPadPx}
             stripeRowPadXPx={stripeRowPadXPx}
             stripePreviewHPx={compactStripePreviewHPx}
-            visualOffsetY={-page1PageLift + (isLandscapeTablet ? -10 : 0)}
+            // La franja ha de quedar a la mateixa alçada que la de la pàgina 1.
+            // L'ajust de la pàgina 1 (FRANJA_AJUST_PX a MegaStripePanelP1) no
+            // s'aplica a la franja estreta (768-1366), però aquí sí que cal per
+            //quedar-hi alineats.
+            visualOffsetY={-page1PageLift + (isLandscapeTablet ? -10 : 0) - ((isPortraitTablet || isLandscapeTablet) ? 0 : FRANJA_AJUST_PX)}
             stripeOverlayLoadState={stripeOverlayLoadState}
             resolvedOverlaySrc={resolvedOverlaySrc}
             stripeOverlayDebug={stripeOverlayDebug}
