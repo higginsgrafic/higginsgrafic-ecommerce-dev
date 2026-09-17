@@ -3100,64 +3100,69 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
           apareix a la posició de reserva (a dalt de tot). I a la pàgina del
           cistell (3) no hi surt: allà no cal bloquejar el megaslide. */}
       {canUseDom && active && megaPage !== 3 && lockBtnTop != null && ReactDOM.createPortal(
-        <button
-          onClick={() => {
-            if (lockDragRef.current.dragged) {
-              lockDragRef.current.dragged = false;
-              return;
-            }
-            setMegaLocked((v) => !v);
-          }}
-          onPointerDown={(e) => {
-            if (!isPortraitTablet || megaPage === 3) return;
-            const btn = e.currentTarget;
-            const startX = e.clientX;
-            const viewport = document.querySelector('[data-mega-page-viewport="1"]');
-            if (!viewport) return;
-            const maxScroll = Math.max(1, viewport.scrollWidth - viewport.clientWidth);
-            lockDragRef.current = { dragged: false, startX, viewport, maxScroll };
-            btn.setPointerCapture(e.pointerId);
-            const onMove = (ev) => {
-              const dx = ev.clientX - startX;
-              if (Math.abs(dx) > 3) lockDragRef.current.dragged = true;
-              const progress = Math.max(0, Math.min(1, 0.5 + dx / 320));
-              viewport.scrollLeft = progress * maxScroll;
-            };
-            const onUp = (ev) => {
-              btn.releasePointerCapture(ev.pointerId);
-              btn.removeEventListener('pointermove', onMove);
-              btn.removeEventListener('pointerup', onUp);
-              btn.removeEventListener('pointercancel', onUp);
-            };
-            btn.addEventListener('pointermove', onMove);
-            btn.addEventListener('pointerup', onUp);
-            btn.addEventListener('pointercancel', onUp);
-          }}
-          className="fixed left-1/2 -translate-x-1/2 flex h-10 w-10 items-center justify-center rounded-full border border-border bg-background shadow-lg transition-colors hover:bg-muted"
+        <div
           style={{
-            // El cadenat surt de sota del megaslide (vegeu mega-cadenat-surt) i
-            // queda just a sota del separador, no encavalcat a la linia.
-            top: lockBtnTop != null ? `${lockBtnTop + CADE_BAIXADA_PX}px` : '16px',
-            transform: isPortraitTablet && megaPage !== 3
-              ? `translateX(calc(-50% + ${(lockBtnScrollProgress - 0.5) * 160}px))`
-              : undefined,
-            // Vertical: nomes un fos, amb retard suficient perque el panell ja
-            // hagi encaixat la seva alcada (el transform es seu, per
-            // arrossegar-lo, i no pot fer l'animacio de sortir de sota).
-            animation: isPortraitTablet && megaPage !== 3
-              ? 'mega-cadenat-apareix 200ms ease-out 380ms both'
-              : 'mega-cadenat-surt 320ms cubic-bezier(0.22, 1, 0.36, 1) 360ms both',
-            transition: 'transform 120ms ease-out, background-color 150ms',
-            cursor: isPortraitTablet && megaPage !== 3 ? 'grab' : 'pointer',
-            touchAction: isPortraitTablet && megaPage !== 3 ? 'none' : undefined,
-            // Per sota del panell (z-[10000]) perquè el cadenat en surti de sota.
+            position: 'fixed',
+            left: '50%',
+            // El cadenat surt de sota el panell (vegeu mega-cadenat-surt) i
+            // queda just a sota del separador. L'animacio va a fora i el
+            // transform de dins queda lliure per arrossegar-lo al vertical.
+            top: `${lockBtnTop + CADE_BAIXADA_PX}px`,
+            animation: 'mega-cadenat-surt 320ms cubic-bezier(0.22, 1, 0.36, 1) 360ms both',
+            // Per sota del panell (z-[10000]) perque el cadenat en surti de sota.
             zIndex: 9999,
+            pointerEvents: 'none',
           }}
-          title={megaLocked ? 'Desbloca el megaslide' : 'Bloca el megaslide'}
-          aria-label={megaLocked ? 'Desbloca el megaslide' : 'Bloca el megaslide'}
         >
-          {megaLocked ? <Lock size={18} /> : <Unlock size={18} />}
-        </button>,
+          <button
+            onClick={() => {
+              if (lockDragRef.current.dragged) {
+                lockDragRef.current.dragged = false;
+                return;
+              }
+              setMegaLocked((v) => !v);
+            }}
+            onPointerDown={(e) => {
+              if (!isPortraitTablet || megaPage === 3) return;
+              const btn = e.currentTarget;
+              const startX = e.clientX;
+              const viewport = document.querySelector('[data-mega-page-viewport="1"]');
+              if (!viewport) return;
+              const maxScroll = Math.max(1, viewport.scrollWidth - viewport.clientWidth);
+              lockDragRef.current = { dragged: false, startX, viewport, maxScroll };
+              btn.setPointerCapture(e.pointerId);
+              const onMove = (ev) => {
+                const dx = ev.clientX - startX;
+                if (Math.abs(dx) > 3) lockDragRef.current.dragged = true;
+                const progress = Math.max(0, Math.min(1, 0.5 + dx / 320));
+                viewport.scrollLeft = progress * maxScroll;
+              };
+              const onUp = (ev) => {
+                btn.releasePointerCapture(ev.pointerId);
+                btn.removeEventListener('pointermove', onMove);
+                btn.removeEventListener('pointerup', onUp);
+                btn.removeEventListener('pointercancel', onUp);
+              };
+              btn.addEventListener('pointermove', onMove);
+              btn.addEventListener('pointerup', onUp);
+              btn.addEventListener('pointercancel', onUp);
+            }}
+            className="flex h-10 w-10 items-center justify-center rounded-full border border-border bg-background shadow-lg transition-colors hover:bg-muted"
+            style={{
+              transform: isPortraitTablet && megaPage !== 3
+                ? `translateX(${(lockBtnScrollProgress - 0.5) * 160}px)`
+                : undefined,
+              transition: 'transform 120ms ease-out, background-color 150ms',
+              cursor: isPortraitTablet && megaPage !== 3 ? 'grab' : 'pointer',
+              touchAction: isPortraitTablet && megaPage !== 3 ? 'none' : undefined,
+              pointerEvents: 'auto',
+            }}
+            title={megaLocked ? 'Desbloca el megaslide' : 'Bloca el megaslide'}
+            aria-label={megaLocked ? 'Desbloca el megaslide' : 'Bloca el megaslide'}
+          >
+            {megaLocked ? <Lock size={18} /> : <Unlock size={18} />}
+          </button>
+        </div>,
         document.body
       )}
 
