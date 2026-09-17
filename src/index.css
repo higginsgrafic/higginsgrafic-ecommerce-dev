@@ -233,12 +233,24 @@ body.cart-open {
 /* El cadenat surt de sota del megaslide: comença amagat darrere el panell
    (que té fons opac i va per sobre) i baixa fins a quedar just a sota del
    separador. Com que surt quan el panell ja s'ha desplegat, el petit ajust
-   d'alçada del panell queda amagat i el cadenat no es veu moure. */
+   d'alçada del panell queda amagat i el cadenat no es veu moure.
+   Mentre el panell s'està fonent (opacity 0 -> 1) el cadenat ha de ser
+   invisible: si no, es veu a través del panell translúcid i sembla que surti
+   abans que la pestanya. Per això l'opacitat no puja fins passat el primer
+   terç de l'animació. */
 @keyframes mega-cadenat-surt {
   from {
+    opacity: 0;
     transform: translate(-50%, -64px);
   }
+  35% {
+    opacity: 0;
+  }
+  60% {
+    opacity: 1;
+  }
   to {
+    opacity: 1;
     transform: translate(-50%, 0);
   }
 }
