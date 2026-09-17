@@ -303,6 +303,8 @@ function FullWideSlideHeader({
   const [showRegisterOverlay, setShowRegisterOverlay] = useState(false);
   const [megaLocked, setMegaLocked] = useState(false);
   const [lockBtnTop, setLockBtnTop] = useState(null);
+  // El cadenat només es veu quan la seva posició ja és estable.
+  const [lockBtnVisible, setLockBtnVisible] = useState(false);
   const [lockBtnScrollProgress, setLockBtnScrollProgress] = useState(0.5);
   const lockDragRef = useRef({ dragged: false });
   const { user } = useAuth();
@@ -1993,6 +1995,7 @@ function FullWideSlideHeader({
     const el = megaMenuRef.current;
     if (!el) return undefined;
 
+    let quietTimer = 0;
     const measure = () => {
       try {
         // El cadenat va sobre la LINIA del megaslide (la vora inferior de la
@@ -2001,15 +2004,20 @@ function FullWideSlideHeader({
         if (surface) {
           const rect = surface.getBoundingClientRect();
           setLockBtnTop((prev) => (prev === rect.bottom ? prev : rect.bottom));
+          // El panell triga a encaixar (la seva alcada surt del contingut de la
+          // pagina 1, que es mesura uns quants cops): mentre es mou, el cadenat
+          // s'amaga, i nomes es veu quan la mesura fa 150 ms que no canvia.
+          // Si s'ensenyés abans, apareixeria a la posicio vella i després
+          // saltaria a la bona.
+          window.clearTimeout(quietTimer);
+          quietTimer = window.setTimeout(() => setLockBtnVisible(true), 150);
         }
       } catch { /* ignore */ }
     };
 
     measure();
     const raf = requestAnimationFrame(measure);
-    // El panell acaba de mesurar-se després (l'alçada ve del contingut de la
-    // pàgina 1), així que tornem a mesurar uns quants cops perquè el cadenat no
-    // quedi desplaçat ni es mogui quan el panell acaba d'encaixar.
+    // Reintents per si el panell acaba d'encaixar mes tard.
     const timers = [180, 500, 1200].map((ms) => window.setTimeout(measure, ms));
     window.addEventListener('resize', measure);
     const ro = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(measure) : null;
@@ -2021,8 +2029,10 @@ function FullWideSlideHeader({
     return () => {
       cancelAnimationFrame(raf);
       timers.forEach((t) => window.clearTimeout(t));
+      window.clearTimeout(quietTimer);
       window.removeEventListener('resize', measure);
       ro?.disconnect();
+      setLockBtnVisible(false);
     };
   }, [active]);
 
@@ -3125,6 +3135,7 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
           className="fixed z-[10001] left-1/2 -translate-x-1/2 flex h-10 w-10 items-center justify-center rounded-full border border-border bg-background shadow-lg transition-colors hover:bg-muted"
           style={{
             top: lockBtnTop != null ? `${lockBtnTop - 20}px` : '16px',
+            visibility: lockBtnVisible ? undefined : 'hidden',
             transform: isPortraitTablet && megaPage !== 3
               ? `translateX(calc(-50% + ${(lockBtnScrollProgress - 0.5) * 160}px))`
               : undefined,
