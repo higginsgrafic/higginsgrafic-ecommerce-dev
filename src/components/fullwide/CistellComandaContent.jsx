@@ -40,6 +40,9 @@ function CistellComandaContent({ cartItems, setCartItems, onFinalizeOrder }) {
   const GUTTER = 5.457;        // gutter horitzontal entre columnes
   const V_GUTTER = 2.037;      // gutter vertical entre files
   const TOP_OFFSET = 0; // al contenidor del carrusel la llista comença a dalt
+  // Marge entre el bloc del total (amb FINALITZA LA COMPRA) i el fons del
+  // megaslide: el bloc hi va fix, no surant darrere de l'última fila.
+  const OVERLAY_MARGE = 24;
   const ROWS = 21;
   const TABLE_WIDTH = 1350;
 
@@ -205,9 +208,11 @@ function CistellComandaContent({ cartItems, setCartItems, onFinalizeOrder }) {
       const btn = ultimaFilaRef.current;
       if (!btn) return;
       const r = btn.getBoundingClientRect();
-      // El bloc flotant es ancorat pel seu centre (translate -50%), aixi que
-      // perque quedi just SOTA la fila cal el fons de la fila, no el centre.
-      const nextY = Math.round(r.bottom);
+      // El bloc del total + FINALITZA LA COMPRA no ha de surar seguint l'última
+      // fila del cistell: va fix al fons de la pestanya, ancorat al fons del
+      // megaslide (el bloc es col·loca per la seva vora inferior).
+      const panell = document.querySelector('[data-mega-panel-surface="1"]');
+      const nextY = Math.round(panell ? panell.getBoundingClientRect().bottom : r.bottom + 25);
       const nextX = Math.round(r.left + r.width / 2);
       setOverlayTop((prev) => (prev === nextY ? prev : nextY));
       setOverlayLeft((prev) => (prev === nextX ? prev : nextX));
@@ -553,9 +558,11 @@ function CistellComandaContent({ cartItems, setCartItems, onFinalizeOrder }) {
                 // meitat de la pantalla i tot seguit saltava a lloc seu.
                 visibility: overlayTop != null && overlayLeft != null ? 'visible' : 'hidden',
                 position: 'fixed',
-                top: overlayTop != null ? `${overlayTop + (isPortrait ? 26 : 25)}px` : `calc(50% + ${isPortrait ? 26 : 25}px)`,
+                // El bloc va fix al fons de la pestanya: la seva vora inferior
+                // queda OVERLAY_MARGE px per sobre del fons del megaslide.
+                top: overlayTop != null ? `${overlayTop - OVERLAY_MARGE}px` : '50%',
                 left: overlayLeft != null ? `${overlayLeft - (isPortrait ? 106 : 0) + 5}px` : 'calc(50vw + 5px)',
-                transform: 'translate(-50%, -50%)',
+                transform: 'translate(-50%, -100%)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
