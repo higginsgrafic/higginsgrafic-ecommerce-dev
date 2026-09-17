@@ -51,6 +51,29 @@ ESPERA_WEB=150         # segons que esperem que el 3003 respongui
 # shellcheck source=/dev/null
 [ -f "$SESSIO_DIR/config.sh" ] && . "$SESSIO_DIR/config.sh"
 
+# --- Assegurem que hi hagi node/npm al PATH -----------------------------------
+# Una finestra oberta des del Finder no sempre hereta el PATH del terminal, i
+# `npm run proves` necessita l'ordre `npm`. /etc/paths ja inclou /usr/local/bin,
+# però ho comprovem igualment per si mai canvia la instal·lació de Node.
+prepara_path() {
+  local d
+  for d in /usr/local/bin /opt/homebrew/bin "$HOME/.volta/bin" "$HOME/.bun/bin"; do
+    [ -d "$d" ] || continue
+    case ":$PATH:" in
+      *":$d:"*) ;;
+      *) PATH="$d:$PATH" ;;
+    esac
+  done
+  # nvm deixa els binaris a ~/.nvm/versions/node/<versió>/bin
+  if ! command -v npm >/dev/null 2>&1 && [ -d "$HOME/.nvm/versions/node" ]; then
+    local n
+    n="$(ls -td "$HOME"/.nvm/versions/node/*/bin 2>/dev/null | head -1)"
+    [ -n "$n" ] && PATH="$n:$PATH"
+  fi
+  export PATH
+}
+prepara_path
+
 # --- Estat i registres (tot dins del projecte, mai fora) ----------------------
 STATE_DIR="$SESSIO_DIR/.state"
 LOG_DIR="$STATE_DIR/logs"
@@ -243,6 +266,11 @@ engega_dsh() {
 engega_proves() {
   if port_escolta "$PROVES_PORT"; then
     fet "El servidor de proves ja escolta al $PROVES_PORT."
+    return 1
+  fi
+
+  if ! command -v npm >/dev/null 2>&1; then
+    err "No trobo l'ordre «npm» al PATH. Node hauria de ser a /usr/local/bin."
     return 1
   fi
 
