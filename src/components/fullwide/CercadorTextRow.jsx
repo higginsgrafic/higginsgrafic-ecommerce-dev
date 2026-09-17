@@ -92,7 +92,7 @@ const DIBUIX_PX = 30;
 const DIBUIX_GAP_H = (GRAELLA_AMPLADA - GRAELLA_COLUMNES * DIBUIX_PX) / (GRAELLA_COLUMNES - 1);
 const DIBUIX_GAP_V = DIBUIX_GAP_V_BASE * (DIBUIX_PX / DIBUIX_BASE);
 // Tauleta (horitzontal i vertical, de moment iguals): 40% de la base 1:1.
-const ESCALA_TAULETA = 0.99; // 1% mes petit (ho demana el disseny)
+const ESCALA_TAULETA = 0.98; // 2% mes petit (ho demana el disseny)
 const DIBUIX_PX_LANDSCAPE = DIBUIX_BASE * 0.40 * ESCALA_TAULETA;
 const DIBUIX_PX_PORTRAIT = DIBUIX_BASE * 0.40 * ESCALA_TAULETA;
 // Tauleta horitzontal: la separacio horitzontal va un 10% mes estreta que la
