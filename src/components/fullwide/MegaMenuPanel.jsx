@@ -8,7 +8,6 @@ import { lazy, Suspense, useRef, useEffect, useCallback, useState } from 'react'
 import MegaStripeBleedGuard from './MegaStripeBleedGuard.jsx';
 import MegaStripePanelP1 from './MegaStripePanelP1.jsx';
 import MegaslidePagina2 from '../megaslide/MegaslidePagina2.jsx';
-import MegaslidePagina2Cercador from '../megaslide/MegaslidePagina2Cercador.jsx';
 
 const MegaslidePagina3 = lazy(() => import('../megaslide/MegaslidePagina3.jsx'));
 const MegaslidePagina4 = lazy(() => import('../megaslide/MegaslidePagina4.jsx'));
@@ -343,19 +342,18 @@ export default function MegaMenuPanel({
                   </div>
                 </div>
 
-                {isPortraitTablet ? (
-                  <MegaslidePagina2Cercador
-                    active={active}
-                    isPortraitTablet={isPortraitTablet}
-                    isLandscapeTablet={isLandscapeTablet}
-                    setActive={setActive}
-                    austenSubcollection={austenSubcollection}
-                    setAustenSubcollection={setAustenSubcollection}
-                    cercadorSelectedColor={cercadorSelectedColorP2}
-                    setCercadorSelectedColor={setCercadorSelectedColorP2}
-                    firstContactSelectedItem={firstContactSelectedItem}
-                    humanInsideSelectedItem={humanInsideSelectedItem}
-                    selectedItemByCollection={selectedItemByCollection}
+                <MegaslidePagina2
+                  active={active}
+                  isPortraitTablet={isPortraitTablet}
+                  isLandscapeTablet={isLandscapeTablet}
+                  setActive={setActive}
+                  austenSubcollection={austenSubcollection}
+                  setAustenSubcollection={setAustenSubcollection}
+                  cercadorSelectedColor={cercadorSelectedColorP2}
+                  setCercadorSelectedColor={setCercadorSelectedColorP2}
+                  firstContactSelectedItem={firstContactSelectedItem}
+                  humanInsideSelectedItem={humanInsideSelectedItem}
+                  selectedItemByCollection={selectedItemByCollection}
                   hoveredStripeItem={hoveredStripeItem}
                   setHoveredStripeItem={setHoveredStripeItem}
                   hoveredStripeItemCollection={hoveredStripeItemCollection}
@@ -391,55 +389,6 @@ export default function MegaMenuPanel({
                   thinDrawings={thinDrawings}
                   megaMenuRef={megaMenuRef}
                 />
-                ) : (
-                  <MegaslidePagina2
-                    active={active}
-                    isPortraitTablet={isPortraitTablet}
-                    isLandscapeTablet={isLandscapeTablet}
-                    setActive={setActive}
-                    austenSubcollection={austenSubcollection}
-                    setAustenSubcollection={setAustenSubcollection}
-                    cercadorSelectedColor={cercadorSelectedColorP2}
-                    setCercadorSelectedColor={setCercadorSelectedColorP2}
-                    firstContactSelectedItem={firstContactSelectedItem}
-                    humanInsideSelectedItem={humanInsideSelectedItem}
-                    selectedItemByCollection={selectedItemByCollection}
-                    hoveredStripeItem={hoveredStripeItem}
-                    setHoveredStripeItem={setHoveredStripeItem}
-                    hoveredStripeItemCollection={hoveredStripeItemCollection}
-                    setHoveredStripeItemCollection={setHoveredStripeItemCollection}
-                    setStripeOverlayOverrideActive={setStripeOverlayOverrideActive}
-                    setFirstContactSelectedItem={setFirstContactSelectedItem}
-                    setHumanInsideSelectedItem={setHumanInsideSelectedItem}
-                    setSelectedItemByCollection={setSelectedItemByCollection}
-                    megaHeroGridRef={megaHeroGridRef}
-                    megaHeroRowHeight={megaHeroRowHeight}
-                    stripeBaseImageSrc={stripeBaseImageSrc}
-                    page1MegaTileSize={effectiveMegaTileSize}
-                    page1StripePreviewHPx={stripePreviewHPx}
-                    page1PageLift={isPortraitTablet ? 0 : p1PageLift}
-                    resolvedMegaFiltered={resolvedMegaFiltered}
-                    showStripe={showStripe}
-                    stripeOverlayLoadState={stripeOverlayLoadState}
-                    resolvedOverlaySrc={resolvedOverlaySrc}
-                    stripeOverlayDebug={stripeOverlayDebug}
-                    stripeMaskDebugRectsPct={stripeMaskDebugRectsPct}
-                    stripeMaskTileRectsRawPct={stripeMaskTileRectsRawPct}
-                    drawingOverlayDebug={drawingOverlayDebug}
-                    humanInsideVariant={humanInsideVariantP2}
-                    firstContactVariant={firstContactVariantP2}
-                    reorderAustenQuotes={reorderAustenQuotes}
-                    austenSelectedDisableMulti={austenSelectedDisableMulti}
-                    stripeVariantVisibility={stripeVariantVisibility}
-                    setFirstContactVariant={setFirstContactVariantP2}
-                    setHumanInsideVariant={setHumanInsideVariantP2}
-                    setThinStartIndex={setThinStartIndex}
-                    displayedShirtColor={displayedShirtColorP2}
-                    onShirtClick={onShirtClickP2}
-                    thinDrawings={thinDrawings}
-                    megaMenuRef={megaMenuRef}
-                  />
-                )}
 
                 <Suspense fallback={null}>
                   <MegaslidePagina3
