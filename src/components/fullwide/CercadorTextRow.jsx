@@ -660,7 +660,7 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
                 fontSize: (isPortraitTablet || isLandscapeTablet) ? '8px' : '11px',
                 fontWeight: key === activeKey ? 700 : 300,
                 lineHeight: (isPortraitTablet || isLandscapeTablet) ? '11px' : `${alcadaFilaLlista}px`,
-                textAlign: 'left',
+                textAlign: 'right',
                 whiteSpace: 'nowrap',
                 cursor: 'pointer',
               }}
