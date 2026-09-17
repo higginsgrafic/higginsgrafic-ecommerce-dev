@@ -112,9 +112,26 @@ function gapHorizontal(isPortraitTablet, isLandscapeTablet) {
   return DIBUIX_GAP_H;
 }
 
+/** Pas vertical de la graella de colors (cercle + separació), per pantalla. */
+// És el que ha de fer la graella de dibuixos perquè cada fila caigui a
+// l'alçada de la seva fila de cercles: 20 px a vertical (16 + 4), 25 a
+// horitzontal (19 + 6) i 33 a desktop (25 + 8).
+function colorPas(isPortraitTablet, isLandscapeTablet) {
+  if (isPortraitTablet) return 16 + 4;
+  if (isLandscapeTablet) return 19 + 6;
+  return 25 + 8;
+}
+
 /** La separació vertical que toca per a aquesta pantalla. */
 function gapVertical(isPortraitTablet, isLandscapeTablet) {
-  if (isPortraitTablet || isLandscapeTablet) return DIBUIX_GAP_V_BASE;
+  // A les tauletes, les files de dibuixos s'alineen amb les files de la graella
+  // de colors: el pas vertical és el de la graella de colors (cercle més
+  // separació) menys la mida del dibuix, de manera que cada fila de dibuixos
+  // cau exactament a l'alçada de la seva fila de cercles. A desktop aquest pas
+  // el calcula el calibratge dins del component (que pot reduir la graella).
+  if (isPortraitTablet || isLandscapeTablet) {
+    return Math.max(0, colorPas(isPortraitTablet, isLandscapeTablet) - midaDibuix(isPortraitTablet, isLandscapeTablet));
+  }
   return DIBUIX_GAP_V;
 }
 
