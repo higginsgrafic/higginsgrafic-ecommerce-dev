@@ -15,6 +15,7 @@
  * Es pot canviar la URL amb HG_URL i sortir nomes amb el resum amb HG_BREU=1.
  */
 import { chromium } from '@playwright/test';
+import { spawn } from 'node:child_process';
 
 const BASE = process.env.HG_URL || 'http://127.0.0.1:3003';
 // Diferencies tolerades (px): el soroll de mesura i la diferencia de caixa
@@ -62,6 +63,33 @@ const mesura = () => {
     filesColors: filesColors.slice(0, 4),
   };
 };
+
+// Mirem si ja hi ha el preview engegat; si no, l'engeguem nosaltres i el
+// tanquem en acabar, aixi n'hi ha prou amb aquesta ordre.
+const viu = async () => {
+  try {
+    const r = await fetch(BASE, { method: 'HEAD' });
+    return r.ok || r.status < 500;
+  } catch {
+    return false;
+  }
+};
+let servidor = null;
+if (!(await viu())) {
+  console.log(`Engegant el preview a ${BASE}...`);
+  servidor = spawn('npx', ['vite', 'preview', '--host', '127.0.0.1', '--port', '3003'], {
+    stdio: 'ignore',
+    detached: false,
+  });
+  for (let i = 0; i < 40 && !(await viu()); i++) await new Promise((r) => setTimeout(r, 500));
+  if (!(await viu())) {
+    console.log('No s\'ha pogut engegar el preview al 3003. Fes un npm run build i torna-ho a provar.');
+    process.exit(1);
+  }
+}
+const tancar = () => { if (servidor) servidor.kill('SIGTERM'); };
+process.on('exit', tancar);
+process.on('SIGINT', () => { tancar(); process.exit(130); });
 
 const navegador = await chromium.launch();
 const resultats = {};
@@ -157,6 +185,8 @@ if (notes.length) {
 if (fallades.length) {
   console.log('LES VISTES NO QUADREN:');
   for (const f of fallades) console.log('  - ' + f);
+  tancar();
   process.exit(1);
 }
 console.log(`OK: vertical i horitzontal donen les mateixes mides i alineacions (tolerancia ${TOL_MIDES}/${TOL_ALINEACIO} px).`);
+tancar();
