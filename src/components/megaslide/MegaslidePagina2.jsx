@@ -455,7 +455,17 @@ export default function MegaslidePagina2({
         </div>
 
         {/* MegaStripePanel */}
-        <div style={{ position: 'relative', zIndex: 1, width: (isPortraitTablet || isLandscapeTablet) ? '99.9%' : '100%', left: (isPortraitTablet || isLandscapeTablet) ? '-1px' : undefined }}>
+        <div style={{
+          position: 'relative',
+          zIndex: 1,
+          width: '100%',
+          left: (isPortraitTablet || isLandscapeTablet) ? '-1px' : undefined,
+          // A tauleta, la franja va un 0,1% mes petita amb una escala uniforme
+          // (ample i alt alhora), perque no es deformin els dibuixos. L'origen
+          // es la cantonada esquerra: la reduccio entra per la dreta.
+          transform: (isPortraitTablet || isLandscapeTablet) ? 'scale(0.999)' : undefined,
+          transformOrigin: 'left top',
+        }}>
           <MegaStripePanel
             active={active}
             reserveGridSpace
