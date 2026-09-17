@@ -3147,7 +3147,7 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
               btn.addEventListener('pointerup', onUp);
               btn.addEventListener('pointercancel', onUp);
             }}
-            className="relative flex h-10 w-10 items-center justify-center overflow-hidden rounded-full border border-border bg-background shadow-lg transition-colors hover:bg-muted"
+            className="flex h-10 w-10 items-center justify-center rounded-full border border-border bg-background shadow-lg transition-colors hover:bg-muted"
             style={{
               transform: isPortraitTablet && megaPage !== 3
                 ? `translateX(${(lockBtnScrollProgress - 0.5) * 160}px)`
@@ -3160,22 +3160,6 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
             title={megaLocked ? 'Desbloca el megaslide' : 'Bloca el megaslide'}
             aria-label={megaLocked ? 'Desbloca el megaslide' : 'Bloca el megaslide'}
           >
-            {/* L'ombra del panell: una banda fixa a la seva vora, retallada pel
-                contorn del boto. El boto la travessa i, mentre ho fa, se li
-                projecta a sobre; abans i despres queda tapada pel propi boto. */}
-            <span
-              aria-hidden
-              style={{
-                position: 'absolute',
-                left: 0,
-                right: 0,
-                top: `${-CADE_BAIXADA_PX}px`,
-                height: '6px',
-                background: 'linear-gradient(to bottom, rgba(17, 24, 39, 0.55), rgba(17, 24, 39, 0))',
-                animation: 'mega-cadenat-ombra-fixa 500ms cubic-bezier(0.22, 1, 0.36, 1) 360ms both',
-                pointerEvents: 'none',
-              }}
-            />
             {megaLocked ? <Lock size={18} /> : <Unlock size={18} />}
           </button>
         </div>,
