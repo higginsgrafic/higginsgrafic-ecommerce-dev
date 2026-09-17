@@ -2000,9 +2000,13 @@ function FullWideSlideHeader({
     if (!el) return undefined;
 
     let raf = 0;
-    // El cadenat va enganxat al cantell del panell: li llegim la vora a cada
-    // fotograma i l'escrivim directament al DOM. Aixi segueix el panell sense
-    // els saltets que feia quan la posicio passava per l'estat de React.
+    // El cadenat va enganxat al cantell del panell, pero amb una mica d'alisada:
+    // el panell tambe fixa la seva alcada per estat i mentre encaixa fa graons
+    // (fins a 35 px d'un fotograma a l'altre). Aqui llegim la vora a cada
+    // fotograma i ens hi acostem com a maxim 4 px per fotograma, aixi els
+    // graons es converteixen en un lliccament i no en saltets.
+    const PAS_MAX_PX = 4;
+    let pintat = null;
     const seguiment = () => {
       try {
         const surface = document.querySelector('[data-mega-panel-surface="1"]');
@@ -2011,11 +2015,19 @@ function FullWideSlideHeader({
           const rect = surface.getBoundingClientRect();
           // La linia es la vora inferior (border-b): en descomptem mig gruix.
           const gruixVora = parseFloat(getComputedStyle(surface).borderBottomWidth) || 0;
-          const linia = rect.bottom - gruixVora / 2;
+          const objectiu = rect.bottom - gruixVora / 2 + CADE_BAIXADA_PX;
+          if (pintat == null) {
+            pintat = objectiu;
+          } else {
+            const delta = objectiu - pintat;
+            pintat += Math.abs(delta) <= 0.05
+              ? delta
+              : Math.max(-PAS_MAX_PX, Math.min(PAS_MAX_PX, delta * 0.25));
+          }
           // El contenidor nomes hi es quan el cadenat ja s'ha muntat: fins
           // llavors nomes cal desar la mesura perque es munti.
-          if (wrap) wrap.style.top = `${linia + CADE_BAIXADA_PX}px`;
-          setLockBtnTop((prev) => (prev == null ? linia : prev));
+          if (wrap) wrap.style.top = `${pintat}px`;
+          setLockBtnTop((prev) => (prev == null ? objectiu - CADE_BAIXADA_PX : prev));
         }
       } catch { /* ignore */ }
       raf = requestAnimationFrame(seguiment);
