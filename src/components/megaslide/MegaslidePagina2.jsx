@@ -81,13 +81,12 @@ export default function MegaslidePagina2({
     normalizeOverlaySrc,
   } = cal;
 
-  const portraitMegaTileSize = Math.min((1350 - (8 * 12)) / 9, 144);
-  const compactMegaTileSize = page1MegaTileSize || (isPortraitTablet ? portraitMegaTileSize : megaTileSize);
-  // Valors propis del vertical (abans vivien al component MegaslidePagina2Cercador).
-  const compactStripePreviewHPx = page1StripePreviewHPx || (isPortraitTablet ? 117 : stripePreviewHPx);
-  const bnSliderSize = isPortraitTablet
-    ? 123
-    : (compactMegaTileSize || 120) * ((isPortraitTablet || isLandscapeTablet) ? 0.94 : 1) * (isPortraitTablet ? 0.7 : 1);
+  const compactMegaTileSize = page1MegaTileSize || megaTileSize;
+  const compactStripePreviewHPx = page1StripePreviewHPx || stripePreviewHPx;
+  // El vertical fa servir exactament les mateixes mides que l'apaisada: la
+  // pagina es la mateixa, nomes que a vertical no s'hi veu sencera i cal
+  // desplacar-la horitzontalment.
+  const bnSliderSize = (compactMegaTileSize || 120) * ((isPortraitTablet || isLandscapeTablet) ? 0.94 : 1);
   const [topVisualAlignmentY, setTopVisualAlignmentY] = useState(0);
   // Desplaçament propi del selector Blanc/Color/Negre perquè quedi centrat amb
   // la graella de colors. Va a part de topVisualAlignmentY (que alinea el
@@ -136,14 +135,6 @@ export default function MegaslidePagina2({
     return () => cancelAnimationFrame(frame);
   }, [active, isPortraitTablet, scrollToProgress]);
 
-  // A vertical, la franja de samarretes es pinta una mica mes gran.
-  useLayoutEffect(() => {
-    if (!isPortraitTablet) return undefined;
-    const root = viewportRef.current;
-    if (!root) return undefined;
-    root.style.setProperty('--megaStripeScale', '1.17');
-    return () => { root.style.removeProperty('--megaStripeScale'); };
-  }, [isPortraitTablet]);
 
   useEffect(() => {
     if (!isPortraitTablet || !active) return undefined;
@@ -339,15 +330,12 @@ export default function MegaslidePagina2({
 
   return (
     <div style={{ width: '25%', flexShrink: 0, display: isPortraitTablet ? 'block' : 'flex', height: '100%', position: 'relative', justifyContent: 'center', overflow: isPortraitTablet ? 'hidden' : 'visible' }}>
-      {/* El vertical conserva el seu propi nom de viewport (2-cercador): el
-          cercador de la pagina 2 hi viu sol i el calibratge de CercadorTextRow
-          cau al document quan no el troba. */}
       <div
         ref={viewportRef}
-        data-mega-page-viewport={isPortraitTablet ? '2-cercador' : '2'}
+        data-mega-page-viewport="2"
         style={{
           width: '100%',
-          height: isPortraitTablet ? '269px' : '100%',
+          height: '100%',
           display: 'flex',
           justifyContent: isPortraitTablet ? 'flex-start' : 'center',
           overflowX: isPortraitTablet ? 'auto' : 'visible',
@@ -355,8 +343,7 @@ export default function MegaslidePagina2({
           overscrollBehaviorX: isPortraitTablet ? 'contain' : undefined,
           WebkitOverflowScrolling: isPortraitTablet ? 'touch' : undefined,
           scrollbarWidth: isPortraitTablet ? 'none' : undefined,
-          touchAction: isPortraitTablet ? 'pan-x' : undefined,
-          pointerEvents: isPortraitTablet ? 'auto' : undefined,
+          touchAction: isPortraitTablet ? 'pan-x pinch-zoom' : undefined,
         }}
       >
         <div style={{
@@ -366,7 +353,7 @@ export default function MegaslidePagina2({
         <div
           style={{
           flex: '0 0 auto',
-          width: isPortraitTablet ? '1350px' : 'var(--hg-mega-w, min(1350px, calc(100vw - 32px)))',
+          width: isPortraitTablet ? '992px' : 'var(--hg-mega-w, min(1350px, calc(100vw - 32px)))',
           maxWidth: 'none',
           position: 'relative',
           height: '100%',
@@ -379,10 +366,8 @@ export default function MegaslidePagina2({
             data-p2-color-selector
             style={{
             position: 'absolute',
-            top: isPortraitTablet
-              ? 'calc(var(--hg-cercador-bar-top, 0px) + 10px)'
-              : `calc(var(--hg-cercador-bar-top, 0px) + ${40 + ((typeof window !== 'undefined' && window.innerWidth >= 768 && window.innerWidth <= 1366 && window.innerWidth >= window.innerHeight) ? 5 : 0)}px)`,
-            left: isPortraitTablet ? '44px' : '27px',
+            top: `calc(var(--hg-cercador-bar-top, 0px) + ${40 + ((typeof window !== 'undefined' && window.innerWidth >= 768 && window.innerWidth <= 1366 && window.innerWidth >= window.innerHeight) ? 5 : 0)}px)`,
+            left: '27px',
             width: `${bnSliderSize}px`,
             height: `${bnSliderSize}px`,
             zIndex: 4,
@@ -407,8 +392,8 @@ export default function MegaslidePagina2({
         {/* CercadorTextRow */}
         <div style={{
           position: 'absolute',
-          top: `calc(var(--hg-cercador-bar-top, 0px) + ${topVisualAlignmentY + (isPortraitTablet ? 0 : (isLandscapeTablet ? 5 : ((typeof window !== 'undefined' && window.innerWidth >= 768 && window.innerWidth <= 1366 && window.innerWidth >= window.innerHeight) ? 45 : 20)))}px)`,
-          left: isPortraitTablet ? 'calc(50% - 64px)' : '50%',
+          top: `calc(var(--hg-cercador-bar-top, 0px) + ${topVisualAlignmentY + (isLandscapeTablet ? 5 : ((typeof window !== 'undefined' && window.innerWidth >= 768 && window.innerWidth <= 1366 && window.innerWidth >= window.innerHeight) ? 45 : 20))}px)`,
+          left: '50%',
           transform: `translateX(-50%) scale(var(--hg-cercador-bar-scale, 1))`,
           transformOrigin: 'top center',
           width: 'var(--hg-cercador-bar-width, 94%)',
@@ -417,14 +402,9 @@ export default function MegaslidePagina2({
         }}>
           <CercadorTextRow
             compact
-            // El vertical fa servir el joc de valors propi (abans anava amb els
-            // d'apaisada i uniformColumns): amplada de columna 140 i lletra mes
-            // gran.
-            leftOffset={isPortraitTablet ? 140 : 30}
-            isPortraitTablet={false}
-            isLandscapeTablet={isPortraitTablet ? true : isLandscapeTablet}
-            uniformColumns={isPortraitTablet ? true : undefined}
-            fontBoost={isPortraitTablet ? 2.5 : undefined}
+            leftOffset={30}
+            isPortraitTablet={isPortraitTablet}
+            isLandscapeTablet={isLandscapeTablet}
             activeCollection={active}
             activeSubcollection={austenSubcollection}
             selectedColor={cercadorSelectedColor}
@@ -475,7 +455,7 @@ export default function MegaslidePagina2({
         </div>
 
         {/* MegaStripePanel */}
-        <div style={{ position: 'relative', zIndex: 1, width: '100%', height: isPortraitTablet ? '310px' : undefined, left: isPortraitTablet ? '2px' : undefined }}>
+        <div style={{ position: 'relative', zIndex: 1, width: '100%' }}>
           <MegaStripePanel
             active={active}
             reserveGridSpace

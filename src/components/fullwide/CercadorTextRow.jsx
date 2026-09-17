@@ -96,7 +96,7 @@ const DIBUIX_PX_PORTRAIT = DIBUIX_BASE * 0.40;  // 20 px
 // Tauleta horitzontal: la separacio horitzontal va un 10% mes estreta que la
 // base de 20 px, perque la graella no arribi tan endins de la columna de color.
 const DIBUIX_GAP_H_LANDSCAPE = 18;
-const DIBUIX_GAP_H_PORTRAIT = 20;
+const DIBUIX_GAP_H_PORTRAIT = DIBUIX_GAP_H_LANDSCAPE; // 18: el vertical es la mateixa pagina
 
 /** La mida de dibuix que toca per a aquesta pantalla. */
 function midaDibuix(isPortraitTablet, isLandscapeTablet) {
@@ -575,7 +575,7 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
           })}
         </div>
 
-        <div data-p2-color-grid style={{ display: 'grid', gridTemplateColumns: `repeat(4, ${isPortraitTablet ? '16px' : (isLandscapeTablet ? '19px' : '25px')})`, gridAutoRows: isPortraitTablet ? '16px' : (isLandscapeTablet ? '19px' : '25px'), gap: isPortraitTablet ? '4px' : (isLandscapeTablet ? '6px' : '8px'), transform: uniformColumns ? 'translateX(85px)' : (isLandscapeTablet ? 'translateX(20px)' : ((typeof window !== 'undefined' && window.innerWidth >= 768 && window.innerWidth <= 1366 && window.innerWidth >= window.innerHeight) ? 'translateX(10px)' : 'translateX(-10px)')), marginTop: uniformColumns ? '5px' : undefined }}>
+        <div data-p2-color-grid style={{ display: 'grid', gridTemplateColumns: `repeat(4, ${(isPortraitTablet || isLandscapeTablet) ? '19px' : '25px'})`, gridAutoRows: (isPortraitTablet || isLandscapeTablet) ? '19px' : '25px', gap: (isPortraitTablet || isLandscapeTablet) ? '6px' : '8px', transform: uniformColumns ? 'translateX(85px)' : ((isLandscapeTablet || isPortraitTablet) ? 'translateX(20px)' : ((typeof window !== 'undefined' && window.innerWidth >= 768 && window.innerWidth <= 1366 && window.innerWidth >= window.innerHeight) ? 'translateX(10px)' : 'translateX(-10px)')), marginTop: uniformColumns ? '5px' : undefined }}>
           {CERCADOR_COLORS.map(({ slug, hex }) => {
             const selected = slug === selectedColor;
             return (
@@ -585,8 +585,8 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
                 aria-label={slug}
                 onClick={() => onSelectColor?.(slug)}
                 style={{
-                  width: isPortraitTablet ? '16px' : (isLandscapeTablet ? '19px' : '25px'),
-                  height: isPortraitTablet ? '16px' : (isLandscapeTablet ? '19px' : '25px'),
+                  width: (isPortraitTablet || isLandscapeTablet) ? '19px' : '25px',
+                  height: (isPortraitTablet || isLandscapeTablet) ? '19px' : '25px',
                   padding: 0,
                   borderRadius: '50%',
                   border: selected ? '0.5px solid rgba(0,0,0,0.22)' : '0.5px solid rgba(0,0,0,0.22)',
