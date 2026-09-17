@@ -460,10 +460,10 @@ export default function MegaslidePagina2({
           zIndex: 1,
           width: '100%',
           left: (isPortraitTablet || isLandscapeTablet) ? '-1px' : undefined,
-          // A tauleta, la franja va un 0,1% mes petita amb una escala uniforme
+          // A tauleta, la franja va un 0,2% mes petita amb una escala uniforme
           // (ample i alt alhora), perque no es deformin els dibuixos. L'origen
           // es la cantonada esquerra: la reduccio entra per la dreta.
-          transform: (isPortraitTablet || isLandscapeTablet) ? 'scale(0.999)' : undefined,
+          transform: (isPortraitTablet || isLandscapeTablet) ? 'scale(0.998)' : undefined,
           transformOrigin: 'left top',
         }}>
           <MegaStripePanel
