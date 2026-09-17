@@ -580,7 +580,7 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
                     }}
                   />
                 ) : (
-                  <span style={{ color: '#2B2B2B', fontSize: `${(isPortraitTablet ? 7 : (isLandscapeTablet ? 8 : 11)) + fontBoost}px`, whiteSpace: 'nowrap' }}>
+                  <span style={{ color: '#2B2B2B', fontSize: `${((isPortraitTablet || isLandscapeTablet) ? 8 : 11) + fontBoost}px`, whiteSpace: 'nowrap' }}>
                     {label.replace(/^Looking For My Darcy/, 'LFMD')}
                   </span>
                 )}
@@ -631,7 +631,7 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
               className="font-oswald"
               style={{
                 fontWeight: 700,
-                fontSize: isPortraitTablet ? '7px' : (isLandscapeTablet ? '8px' : '11px'),
+                fontSize: (isPortraitTablet || isLandscapeTablet) ? '8px' : '11px',
                 lineHeight: 1,
                 letterSpacing: '0.04em',
                 color: '#2B2B2B',
@@ -652,14 +652,14 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
               className="font-roboto-condensed"
               style={{
                 display: 'block',
-                height: isPortraitTablet ? '8px' : (isLandscapeTablet ? '11px' : `${alcadaFilaLlista}px`),
+                height: (isPortraitTablet || isLandscapeTablet) ? '11px' : `${alcadaFilaLlista}px`,
                 padding: 0,
                 border: 0,
                 background: 'transparent',
                 color: '#2B2B2B',
-                fontSize: isPortraitTablet ? '7px' : (isLandscapeTablet ? '8px' : '11px'),
+                fontSize: (isPortraitTablet || isLandscapeTablet) ? '8px' : '11px',
                 fontWeight: key === activeKey ? 700 : 300,
-                lineHeight: isPortraitTablet ? '8px' : (isLandscapeTablet ? '11px' : `${alcadaFilaLlista}px`),
+                lineHeight: (isPortraitTablet || isLandscapeTablet) ? '11px' : `${alcadaFilaLlista}px`,
                 textAlign: 'left',
                 whiteSpace: 'nowrap',
                 cursor: 'pointer',
