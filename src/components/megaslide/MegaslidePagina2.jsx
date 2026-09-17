@@ -372,7 +372,6 @@ export default function MegaslidePagina2({
           height: '100%',
           paddingLeft: '0px',
           paddingRight: '0px',
-          zoom: isPortraitTablet ? 0.868 : 1,
         }}>
         {/* Slider B/N/C vertical — cantó esquerre, alçada barra grisa */}
         {active ? (
