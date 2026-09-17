@@ -3141,7 +3141,7 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
               : undefined,
             animation: isPortraitTablet && megaPage !== 3
               ? undefined
-              : 'mega-cadenat-surt 320ms cubic-bezier(0.22, 1, 0.36, 1) 260ms both',
+              : 'mega-cadenat-surt 320ms cubic-bezier(0.22, 1, 0.36, 1) 360ms both',
             transition: 'transform 120ms ease-out, background-color 150ms',
             cursor: isPortraitTablet && megaPage !== 3 ? 'grab' : 'pointer',
             touchAction: isPortraitTablet && megaPage !== 3 ? 'none' : undefined,
