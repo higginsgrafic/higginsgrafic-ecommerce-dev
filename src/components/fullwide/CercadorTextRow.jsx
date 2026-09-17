@@ -106,6 +106,10 @@ const GRAELLA_COLUMNES = 16;
 const GRAELLA_FILES = 4;
 // Marge entre l'última fila de dibuixos i el capdamunt de la franja.
 const GRAELLA_MARGE_FRANJA = 2;
+// Els dibuixos a 35 px deixen 8 px de marge vertical respecte de la mida
+// anterior (37,23 px). Els aprofitem per pujar la graella cap amunt: només la
+// graella, no les columnes de color ni la llista, que es queden al seu lloc.
+const GRAELLA_AIXECAMENT_PX = 8;
 
 // Mapping: text label -> stripe item ID (per seleccionar el disseny a la franja)
 const STRIPE_MAP = {
@@ -490,7 +494,7 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
           pointerEvents: 'auto',
         }}
       >
-        <div ref={graellaRef} style={{ display: 'grid', gridTemplateColumns: `repeat(${numColumns}, ${dibuixPx}px)`, gap: `${gapV}px ${gapH}px`, width: '100%', minWidth: 0 }}>
+        <div ref={graellaRef} style={{ display: 'grid', gridTemplateColumns: `repeat(${numColumns}, ${dibuixPx}px)`, gap: `${gapV}px ${gapH}px`, width: '100%', minWidth: 0, marginTop: (isPortraitTablet || isLandscapeTablet) ? 0 : `-${GRAELLA_AIXECAMENT_PX}px` }}>
           {items.map(({ label, collection, subcollection, stripeItem }) => {
             const dimmed = activeCollection && collection !== activeCollection
               ? true
