@@ -72,8 +72,9 @@ const GRAELLA_FILES = 4;
 const GRAELLA_AMPLADA = 875;
 // Marge entre l'última fila de dibuixos i el capdamunt de la franja.
 const GRAELLA_MARGE_FRANJA = 2;
-// A tauleta horitzontal, la graella de dibuixos va 20 px més a l'esquerra (les
-// columnes de color i la llista es queden al seu lloc).
+// A tauleta (horitzontal i vertical, que han de ser la mateixa pagina), la
+// graella de dibuixos va 20 px mes a l'esquerra (les columnes de color i la
+// llista es queden al seu lloc).
 const GRAELLA_ESQUERRA_LANDSCAPE = 20;
 // Pas vertical de la graella de colors (la columna dels cercles): 25 px de
 // cercle + 8 px de separació. La graella de dibuixos fa servir el mateix pas
@@ -525,7 +526,7 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
           pointerEvents: 'auto',
         }}
       >
-        <div ref={graellaRef} style={{ display: 'grid', gridTemplateColumns: `repeat(${numColumns}, ${dibuixPx}px)`, gap: `${gapV}px ${gapH}px`, width: '100%', minWidth: 0, marginLeft: isLandscapeTablet ? -GRAELLA_ESQUERRA_LANDSCAPE : 0 }}>
+        <div ref={graellaRef} style={{ display: 'grid', gridTemplateColumns: `repeat(${numColumns}, ${dibuixPx}px)`, gap: `${gapV}px ${gapH}px`, width: '100%', minWidth: 0, marginLeft: (isLandscapeTablet || isPortraitTablet) ? -GRAELLA_ESQUERRA_LANDSCAPE : 0 }}>
           {items.map(({ label, collection, subcollection, stripeItem }) => {
             const dimmed = activeCollection && collection !== activeCollection
               ? true
