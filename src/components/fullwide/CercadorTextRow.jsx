@@ -72,9 +72,10 @@ const GRAELLA_FILES = 4;
 const GRAELLA_AMPLADA = 875;
 // Marge entre l'última fila de dibuixos i el capdamunt de la franja.
 const GRAELLA_MARGE_FRANJA = 2;
-// La graella va 8 px més amunt que la resta de columnes del cercador (les de
-// color i la llista es queden al seu lloc).
-const GRAELLA_AIXECAMENT_PX = 8;
+// Pas vertical de la graella de colors (la columna dels cercles): 25 px de
+// cercle + 8 px de separació. La graella de dibuixos fa servir el mateix pas
+// perquè cada fila de dibuixos quedi alineada amb la seva fila de colors.
+const GRAELLA_PAS_COLORS = 33;
 
 // Desktop: dibuix de 30 px (60% de la base 1:1). La separació horitzontal és
 // la que fa que les 16 columnes continuïn ocupant els 875 px de referència:
@@ -410,23 +411,26 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
       let gapH = gapHBase * factorAmple;
       let gapV = gapVBase * factorAmple;
 
-      // 2) Alçada: la graella ha de cabre entre el seu capdamunt i el
-      //    capdamunt de la franja de samarretes. Si els dibuixos ja hi caben,
-      //    la separació vertical creix fins a omplir l'espai que queda (sense
-      //    passar de la separació horitzontal, perquè la graella no quedi
-      //    descompensada); si no hi caben, reduïm el dibuix mantenint la
-      //    proporció amb la separació horitzontal.
+      // 2) Alçada: les files de dibuixos han de quedar alineades amb les files
+      //    de la graella de colors (mateix pas vertical). Si amb aquest pas la
+      //    graella no hi cap fins a la franja de samarretes, es redueix la
+      //    separació vertical i, si encara no hi cap, el dibuix (mantenint la
+      //    proporció amb la separació horitzontal).
       if (sostre != null) {
         const altDisp = sostre - dalt - GRAELLA_MARGE_FRANJA;
         if (altDisp > 0) {
-          const altDibuixos = GRAELLA_FILES * dibuix;
-          if (altDibuixos > altDisp) {
-            const factorAlt = altDisp / altDibuixos;
-            dibuix *= factorAlt;
-            gapH *= factorAlt;
-            gapV = 0;
-          } else {
-            gapV = Math.min(gapH, (altDisp - altDibuixos) / (GRAELLA_FILES - 1));
+          gapV = Math.max(0, GRAELLA_PAS_COLORS - dibuix);
+          const altNecessaria = GRAELLA_FILES * dibuix + (GRAELLA_FILES - 1) * gapV;
+          if (altNecessaria > altDisp) {
+            const altDibuixos = GRAELLA_FILES * dibuix;
+            if (altDibuixos > altDisp) {
+              const factorAlt = altDisp / altDibuixos;
+              dibuix *= factorAlt;
+              gapH *= factorAlt;
+              gapV = 0;
+            } else {
+              gapV = (altDisp - altDibuixos) / (GRAELLA_FILES - 1);
+            }
           }
         }
       }
@@ -494,7 +498,7 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
           pointerEvents: 'auto',
         }}
       >
-        <div ref={graellaRef} style={{ display: 'grid', gridTemplateColumns: `repeat(${numColumns}, ${dibuixPx}px)`, gap: `${gapV}px ${gapH}px`, width: '100%', minWidth: 0, marginTop: (isPortraitTablet || isLandscapeTablet) ? 0 : `-${GRAELLA_AIXECAMENT_PX}px` }}>
+        <div ref={graellaRef} style={{ display: 'grid', gridTemplateColumns: `repeat(${numColumns}, ${dibuixPx}px)`, gap: `${gapV}px ${gapH}px`, width: '100%', minWidth: 0 }}>
           {items.map(({ label, collection, subcollection, stripeItem }) => {
             const dimmed = activeCollection && collection !== activeCollection
               ? true
