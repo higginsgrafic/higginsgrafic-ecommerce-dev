@@ -213,7 +213,7 @@ export default function MegaslidePagina2({
       // el desplaçament va aqui, perque la calibracio alinea el selector amb
       // aquest valor objectiu. Si el posessim al transform, la propia
       // calibracio el tornaria a pujar i no es veuria.
-      const offset = (typeof window !== 'undefined' && window.innerWidth >= 768 && window.innerWidth <= 1366 && window.innerWidth >= window.innerHeight) ? 10 : 0;
+      const offset = isLandscapeTablet ? 10 : 0;
       // El centratge del selector (selectorCentratgeY) no ha de comptar aquí:
       // el que volem és que el selector quedi on toca respecte de la pàgina 1 i
       // que el centratge amb la graella de colors hi vagi a sobre.
@@ -366,7 +366,7 @@ export default function MegaslidePagina2({
             data-p2-color-selector
             style={{
             position: 'absolute',
-            top: `calc(var(--hg-cercador-bar-top, 0px) + ${40 + ((typeof window !== 'undefined' && window.innerWidth >= 768 && window.innerWidth <= 1366 && window.innerWidth >= window.innerHeight) ? 5 : 0)}px)`,
+            top: `calc(var(--hg-cercador-bar-top, 0px) + ${40 + (isLandscapeTablet ? 5 : 0)}px)`,
             left: '27px',
             width: `${bnSliderSize}px`,
             height: `${bnSliderSize}px`,
@@ -392,7 +392,7 @@ export default function MegaslidePagina2({
         {/* CercadorTextRow */}
         <div style={{
           position: 'absolute',
-          top: `calc(var(--hg-cercador-bar-top, 0px) + ${topVisualAlignmentY + (isLandscapeTablet ? 5 : ((typeof window !== 'undefined' && window.innerWidth >= 768 && window.innerWidth <= 1366 && window.innerWidth >= window.innerHeight) ? 45 : 20))}px)`,
+          top: `calc(var(--hg-cercador-bar-top, 0px) + ${topVisualAlignmentY + (isLandscapeTablet ? 5 : 20)}px)`,
           left: '50%',
           transform: `translateX(-50%) scale(var(--hg-cercador-bar-scale, 1))`,
           transformOrigin: 'top center',
