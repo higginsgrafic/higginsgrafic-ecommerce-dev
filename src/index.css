@@ -222,7 +222,7 @@ body.cart-open {
 @keyframes mega-panel-desplega {
   from {
     opacity: 0;
-    transform: translateY(-14px);
+    transform: translateY(-26px);
   }
   to {
     opacity: 1;

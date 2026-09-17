@@ -233,7 +233,7 @@ export default function MegaMenuPanel({
           // El megaslide apareixia de cop i es veia com s'anava muntant el
           // contingut. Amb aquesta animacio es desplega suaument (baixa i es
           // fon alhora), i l'ull ja no percep que les imatges arriben.
-          animation: 'mega-panel-desplega 280ms cubic-bezier(0.22, 1, 0.36, 1)',
+          animation: 'mega-panel-desplega 340ms cubic-bezier(0.22, 1, 0.36, 1)',
           ...(megaFullScreen ? {
             minHeight: '100vh',
           } : {})
