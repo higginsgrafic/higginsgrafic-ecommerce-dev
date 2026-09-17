@@ -54,7 +54,6 @@ function MegaColumn({
   compactLandscape = false,
   hideLabels = false,
   hideSelectorBackground = false,
-  tilesOffsetY = 0,
 }) {
   const tileSizeRef = useRef(null);
   const [tileSize, setTileSize] = useState(null);
@@ -1084,10 +1083,7 @@ function MegaColumn({
   return (
     <div className="min-w-0">
       {row ? (
-        <div
-          className="grid w-full grid-cols-9 gap-x-3"
-          style={tilesOffsetY ? { transform: `translateY(${tilesOffsetY}px)` } : undefined}
-        >
+        <div className="grid w-full grid-cols-9 gap-x-3">
           {rowItems.map((it, idx) => (
             <div
               key={`${it}-${idx}`}
