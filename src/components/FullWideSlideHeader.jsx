@@ -304,8 +304,8 @@ function FullWideSlideHeader({
   const [megaLocked, setMegaLocked] = useState(false);
   const [lockBtnTop, setLockBtnTop] = useState(null);
   // El cadenat no queda encavalcat al separador: en surt de sota i queda
-  // 15 px per sota de la linia del megaslide.
-  const CADE_BAIXADA_PX = 15;
+  // 10 px per sota de la linia del megaslide.
+  const CADE_BAIXADA_PX = 10;
   const [lockBtnScrollProgress, setLockBtnScrollProgress] = useState(0.5);
   const lockDragRef = useRef({ dragged: false });
   const { user } = useAuth();
