@@ -459,7 +459,7 @@ export default function MegaslidePagina2({
           position: 'relative',
           zIndex: 1,
           width: '100%',
-          left: (isPortraitTablet || isLandscapeTablet) ? '-3px' : undefined,
+          left: (isPortraitTablet || isLandscapeTablet) ? '-3.5px' : undefined,
           // A tauleta, la franja va un 0,2% mes petita amb una escala uniforme
           // (ample i alt alhora), perque no es deformin els dibuixos. L'origen
           // es la cantonada esquerra: la reduccio entra per la dreta.
