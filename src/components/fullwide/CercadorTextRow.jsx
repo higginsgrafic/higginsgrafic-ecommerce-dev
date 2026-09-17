@@ -72,61 +72,45 @@ const GRAELLA_FILES = 4;
 const GRAELLA_AMPLADA = 875;
 // Marge entre l'última fila de dibuixos i el capdamunt de la franja.
 const GRAELLA_MARGE_FRANJA = 2;
+// Pas vertical de la graella de colors (la columna dels cercles): 25 px de
+// cercle + 8 px de separació. La graella de dibuixos fa servir el mateix pas
+// perquè cada fila de dibuixos quedi alineada amb la seva fila de colors.
+const GRAELLA_PAS_COLORS = 33;
 
-// Base del dibuix (la mateixa a totes les pantalles): 30 px (60% de la base
-// 1:1). La separació horitzontal és la que fa que les 16 columnes ocupin els
-// 875 px de referència:
+// Desktop: dibuix de 30 px (60% de la base 1:1). La separació horitzontal és
+// la que fa que les 16 columnes continuïn ocupant els 875 px de referència:
 //   16 × 30 + 15 × 26,33 = 875 px
-// A desktop això ja hi cap; a tauleta el calibratge ho redueix tot
-// proporcionalment fins que hi cap, i la separació vertical la fixa
-// l'alineació amb la graella de colors (DIBUIX_GAP_V és el valor de reserva
-// quan encara no s'ha pogut mesurar).
+// Com que el dibuix és més petit, la separació entre dibuixos és més gran.
+// La separació vertical no és fixa: CercadorTextRow la calcula segons l'espai
+// que hi hagi fins a la franja de samarretes (DIBUIX_GAP_V és el valor de
+// reserva quan encara no s'ha pogut mesurar).
 const DIBUIX_PX = 30;
 const DIBUIX_GAP_H = (GRAELLA_AMPLADA - GRAELLA_COLUMNES * DIBUIX_PX) / (GRAELLA_COLUMNES - 1);
 const DIBUIX_GAP_V = DIBUIX_GAP_V_BASE * (DIBUIX_PX / DIBUIX_BASE);
+// Tauleta (horitzontal i vertical, de moment iguals): 40% de la base 1:1.
+const DIBUIX_PX_LANDSCAPE = DIBUIX_BASE * 0.40; // 20 px
+const DIBUIX_PX_PORTRAIT = DIBUIX_BASE * 0.40;  // 20 px
+const DIBUIX_GAP_H_LANDSCAPE = 20;
+const DIBUIX_GAP_H_PORTRAIT = 20;
 
 /** La mida de dibuix que toca per a aquesta pantalla. */
-// La mida base és la de desktop a totes les pantalles: el calibratge de sota
-// (ajust a l'espai disponible + alineació amb la graella de colors) ja la
-// redueix on calgui, així que tauleta i desktop comparteixen el mateix dibuix
-// de disseny, només escalat.
-// eslint-disable-next-line no-unused-vars
 function midaDibuix(isPortraitTablet, isLandscapeTablet) {
+  if (isPortraitTablet) return DIBUIX_PX_PORTRAIT;
+  if (isLandscapeTablet) return DIBUIX_PX_LANDSCAPE;
   return DIBUIX_PX;
 }
 
 /** La separació horitzontal que toca per a aquesta pantalla. */
-// eslint-disable-next-line no-unused-vars
 function gapHorizontal(isPortraitTablet, isLandscapeTablet) {
+  if (isPortraitTablet) return DIBUIX_GAP_H_PORTRAIT;
+  if (isLandscapeTablet) return DIBUIX_GAP_H_LANDSCAPE;
   return DIBUIX_GAP_H;
 }
 
 /** La separació vertical que toca per a aquesta pantalla. */
-// eslint-disable-next-line no-unused-vars
 function gapVertical(isPortraitTablet, isLandscapeTablet) {
+  if (isPortraitTablet || isLandscapeTablet) return DIBUIX_GAP_V_BASE;
   return DIBUIX_GAP_V;
-}
-
-// --- Graella de colors (la columna dels cercles) -----------------------------
-// El pas vertical d'aquesta graella és el que fa servir la graella de dibuixos
-// per alinear-hi les files. Canvia per pantalla.
-/** Diàmetre del cercle de color. */
-function colorMida(isPortraitTablet, isLandscapeTablet) {
-  if (isPortraitTablet) return 16;
-  if (isLandscapeTablet) return 19;
-  return 25;
-}
-
-/** Separació entre cercles de color. */
-function colorGap(isPortraitTablet, isLandscapeTablet) {
-  if (isPortraitTablet) return 4;
-  if (isLandscapeTablet) return 6;
-  return 8;
-}
-
-/** Pas vertical de la graella de colors (cercle + separació). */
-function colorPas(isPortraitTablet, isLandscapeTablet) {
-  return colorMida(isPortraitTablet, isLandscapeTablet) + colorGap(isPortraitTablet, isLandscapeTablet);
 }
 
 // Mapping: text label -> stripe item ID (per seleccionar el disseny a la franja)
@@ -396,10 +380,7 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
   const [midesGraella, setMidesGraella] = useState(null);
 
   useLayoutEffect(() => {
-    // El calibratge s'aplica a totes les pantalles: a desktop la graella de
-    // referència ja hi cap i no es toca; a tauleta es redueix fins a cabre-hi i
-    // les files s'alineen amb les de la graella de colors.
-    if (!compact) {
+    if (!compact || isPortraitTablet || isLandscapeTablet) {
       if (midesRef.current !== null) {
         midesRef.current = null;
         setMidesGraella(null);
@@ -438,7 +419,7 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
       if (sostre != null) {
         const altDisp = sostre - dalt - GRAELLA_MARGE_FRANJA;
         if (altDisp > 0) {
-          gapV = Math.max(0, colorPas(isPortraitTablet, isLandscapeTablet) - dibuix);
+          gapV = Math.max(0, GRAELLA_PAS_COLORS - dibuix);
           const altNecessaria = GRAELLA_FILES * dibuix + (GRAELLA_FILES - 1) * gapV;
           if (altNecessaria > altDisp) {
             const altDibuixos = GRAELLA_FILES * dibuix;
@@ -572,7 +553,7 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
           })}
         </div>
 
-        <div data-p2-color-grid style={{ display: 'grid', gridTemplateColumns: `repeat(4, ${colorMida(isPortraitTablet, isLandscapeTablet)}px)`, gridAutoRows: `${colorMida(isPortraitTablet, isLandscapeTablet)}px`, gap: `${colorGap(isPortraitTablet, isLandscapeTablet)}px`, transform: uniformColumns ? 'translateX(85px)' : ((isLandscapeTablet || (typeof window !== 'undefined' && window.innerWidth >= 768 && window.innerWidth <= 1366 && window.innerWidth >= window.innerHeight)) ? 'translateX(10px)' : 'translateX(-10px)'), marginTop: uniformColumns ? '5px' : undefined }}>
+        <div data-p2-color-grid style={{ display: 'grid', gridTemplateColumns: `repeat(4, ${isPortraitTablet ? '16px' : (isLandscapeTablet ? '19px' : '25px')})`, gridAutoRows: isPortraitTablet ? '16px' : (isLandscapeTablet ? '19px' : '25px'), gap: isPortraitTablet ? '4px' : (isLandscapeTablet ? '6px' : '8px'), transform: uniformColumns ? 'translateX(85px)' : ((isLandscapeTablet || (typeof window !== 'undefined' && window.innerWidth >= 768 && window.innerWidth <= 1366 && window.innerWidth >= window.innerHeight)) ? 'translateX(10px)' : 'translateX(-10px)'), marginTop: uniformColumns ? '5px' : undefined }}>
           {CERCADOR_COLORS.map(({ slug, hex }) => {
             const selected = slug === selectedColor;
             return (
@@ -582,8 +563,8 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
                 aria-label={slug}
                 onClick={() => onSelectColor?.(slug)}
                 style={{
-                  width: `${colorMida(isPortraitTablet, isLandscapeTablet)}px`,
-                  height: `${colorMida(isPortraitTablet, isLandscapeTablet)}px`,
+                  width: isPortraitTablet ? '16px' : (isLandscapeTablet ? '19px' : '25px'),
+                  height: isPortraitTablet ? '16px' : (isLandscapeTablet ? '19px' : '25px'),
                   padding: 0,
                   borderRadius: '50%',
                   border: selected ? '0.5px solid rgba(0,0,0,0.22)' : '0.5px solid rgba(0,0,0,0.22)',
@@ -635,14 +616,14 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
               className="font-roboto-condensed"
               style={{
                 display: 'block',
-                height: `${alcadaFilaLlista}px`,
+                height: isPortraitTablet ? '8px' : (isLandscapeTablet ? '11px' : `${alcadaFilaLlista}px`),
                 padding: 0,
                 border: 0,
                 background: 'transparent',
                 color: '#2B2B2B',
                 fontSize: isPortraitTablet ? '7px' : (isLandscapeTablet ? '8px' : '11px'),
                 fontWeight: key === activeKey ? 700 : 300,
-                lineHeight: `${alcadaFilaLlista}px`,
+                lineHeight: isPortraitTablet ? '8px' : (isLandscapeTablet ? '11px' : `${alcadaFilaLlista}px`),
                 textAlign: 'left',
                 whiteSpace: 'nowrap',
                 cursor: 'pointer',
