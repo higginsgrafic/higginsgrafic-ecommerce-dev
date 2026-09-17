@@ -51,7 +51,26 @@ function App() {
     isMobile,
     viewportWidth,
     viewportHeight,
+    isTouch,
   } = useDeviceLayout();
+
+  // Grup desktop: la pagina es compon sempre a la mida de disseny (1350) i
+  // s'escala segons el format de la pantalla. Aixi un portatil de 1280 veu el
+  // mateix desktop, una mica mes petit, en comptes d'una versio adaptada a
+  // mitges. Les tauletes (touch) en queden fora i fan el seu propi disseny.
+  useEffect(() => {
+    const REFERENCIA = 1350;
+    const aplica = () => {
+      const ample = window.innerWidth;
+      const k = (!isTouch && ample < REFERENCIA + 32)
+        ? Math.max(0.85, ample / (REFERENCIA + 32))
+        : 1;
+      document.documentElement.style.zoom = k === 1 ? '' : String(k);
+    };
+    aplica();
+    window.addEventListener('resize', aplica);
+    return () => window.removeEventListener('resize', aplica);
+  }, [isTouch]);
 
   const fullWideSlideConfig = componentCatalogConfig?.components?.fullWideSlide;
   const fullWideMegaMenuConfig = fullWideSlideConfig?.megaMenu;
