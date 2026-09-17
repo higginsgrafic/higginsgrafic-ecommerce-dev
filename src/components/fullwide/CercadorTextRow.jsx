@@ -445,6 +445,7 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
       //    reduïm tot proporcionalment.
       const factorAmple = ample > 0 && ampleBase > 0 ? Math.min(1, ample / ampleBase) : 1;
       let dibuix = base * factorAmple;
+      const factorDibuixEff = base > 0 ? dibuix / base : 1;
       let gapH = gapHBase * factorAmple;
       let gapV = gapVBase * factorAmple;
 
@@ -456,7 +457,7 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
       if (sostre != null) {
         const altDisp = sostre - dalt - GRAELLA_MARGE_FRANJA;
         if (altDisp > 0) {
-          gapV = Math.max(0, GRAELLA_PAS_COLORS - dibuix);
+          gapV = Math.max(0, colorPas(isPortraitTablet, isLandscapeTablet) * factorDibuixEff - dibuix);
           const altNecessaria = GRAELLA_FILES * dibuix + (GRAELLA_FILES - 1) * gapV;
           if (altNecessaria > altDisp) {
             const altDibuixos = GRAELLA_FILES * dibuix;
@@ -517,6 +518,14 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
     // Mides efectives: les mesurades perquè la graella capigui a l'espai
     // disponible (només desktop) o les base de la pantalla.
     const dibuixPx = midesGraella?.dibuix ?? midaDibuix(isPortraitTablet, isLandscapeTablet);
+    // Els cercles de color es calibren amb el mateix factor que els dibuixos:
+    // si la graella s'encongeix (mobil, desktop estret), els cercles
+    // l'acompanyen i les files continuen caient les unes sobre les altres.
+    const factorDibuix = (midesGraella && midesGraella.dibuix != null)
+      ? midesGraella.dibuix / midaDibuix(isPortraitTablet, isLandscapeTablet)
+      : 1;
+    const cerclePx = colorMida(isPortraitTablet, isLandscapeTablet) * factorDibuix;
+    const colorGapPx = colorGap(isPortraitTablet, isLandscapeTablet) * factorDibuix;
     const gapH = midesGraella?.gapH ?? gapHorizontal(isPortraitTablet, isLandscapeTablet);
     const gapV = midesGraella?.gapV ?? gapVertical(isPortraitTablet, isLandscapeTablet);
     // La columna de col·leccions (la de la dreta de la graella de colors)
@@ -590,7 +599,7 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
           })}
         </div>
 
-        <div data-p2-color-grid style={{ display: 'grid', gridTemplateColumns: `repeat(4, ${colorMida(isPortraitTablet, isLandscapeTablet)}px)`, gridAutoRows: `${colorMida(isPortraitTablet, isLandscapeTablet)}px`, gap: `${colorGap(isPortraitTablet, isLandscapeTablet)}px`, transform: uniformColumns ? 'translateX(85px)' : ((isLandscapeTablet || isPortraitTablet) ? 'translateX(20px)' : ((typeof window !== 'undefined' && window.innerWidth >= 768 && window.innerWidth <= 1366 && window.innerWidth >= window.innerHeight) ? 'translateX(10px)' : 'translateX(-10px)')), marginTop: uniformColumns ? '5px' : undefined }}>
+        <div data-p2-color-grid style={{ display: 'grid', gridTemplateColumns: `repeat(4, ${cerclePx}px)`, gridAutoRows: `${cerclePx}px`, gap: `${colorGapPx}px`, transform: uniformColumns ? 'translateX(85px)' : ((isLandscapeTablet || isPortraitTablet) ? 'translateX(20px)' : ((typeof window !== 'undefined' && window.innerWidth >= 768 && window.innerWidth <= 1366 && window.innerWidth >= window.innerHeight) ? 'translateX(10px)' : 'translateX(-10px)')), marginTop: uniformColumns ? '5px' : undefined }}>
           {CERCADOR_COLORS.map(({ slug, hex }) => {
             const selected = slug === selectedColor;
             return (
@@ -600,8 +609,8 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
                 aria-label={slug}
                 onClick={() => onSelectColor?.(slug)}
                 style={{
-                  width: `${colorMida(isPortraitTablet, isLandscapeTablet)}px`,
-                  height: `${colorMida(isPortraitTablet, isLandscapeTablet)}px`,
+                  width: `${cerclePx}px`,
+                  height: `${cerclePx}px`,
                   padding: 0,
                   borderRadius: '50%',
                   border: selected ? '0.5px solid rgba(0,0,0,0.22)' : '0.5px solid rgba(0,0,0,0.22)',
