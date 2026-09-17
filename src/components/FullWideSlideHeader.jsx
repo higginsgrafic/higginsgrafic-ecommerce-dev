@@ -303,6 +303,9 @@ function FullWideSlideHeader({
   const [showRegisterOverlay, setShowRegisterOverlay] = useState(false);
   const [megaLocked, setMegaLocked] = useState(false);
   const [lockBtnTop, setLockBtnTop] = useState(null);
+  // Contenidor del cadenat: la seva posicio s'hi escriu directament a cada
+  // fotograma, sense passar per l'estat de React (que feia saltets).
+  const lockWrapRef = useRef(null);
   // El cadenat no queda encavalcat al separador: en surt de sota i queda
   // 8 px per sota de la linia del megaslide.
   const CADE_BAIXADA_PX = 8;
@@ -1996,40 +1999,29 @@ function FullWideSlideHeader({
     const el = megaMenuRef.current;
     if (!el) return undefined;
 
-    const measure = () => {
+    let raf = 0;
+    // El cadenat va enganxat al cantell del panell: li llegim la vora a cada
+    // fotograma i l'escrivim directament al DOM. Aixi segueix el panell sense
+    // els saltets que feia quan la posicio passava per l'estat de React.
+    const seguiment = () => {
       try {
-        // El cadenat va sobre la LINIA del megaslide (la vora inferior de la
-        // superficie), no sobre la franja. Aixi queda encavalcat al cantell.
         const surface = document.querySelector('[data-mega-panel-surface="1"]');
+        const wrap = lockWrapRef.current;
         if (surface) {
           const rect = surface.getBoundingClientRect();
-          // El separador és la vora inferior (border-b) de la superfície del
-          // panell: el cadenat es centra sobre la LINIA, no sobre la caixa,
-          // així que descomptem mig gruix de la vora.
+          // La linia es la vora inferior (border-b): en descomptem mig gruix.
           const gruixVora = parseFloat(getComputedStyle(surface).borderBottomWidth) || 0;
           const linia = rect.bottom - gruixVora / 2;
-          setLockBtnTop((prev) => (prev === linia ? prev : linia));
+          // El contenidor nomes hi es quan el cadenat ja s'ha muntat: fins
+          // llavors nomes cal desar la mesura perque es munti.
+          if (wrap) wrap.style.top = `${linia + CADE_BAIXADA_PX}px`;
+          setLockBtnTop((prev) => (prev == null ? linia : prev));
         }
       } catch { /* ignore */ }
+      raf = requestAnimationFrame(seguiment);
     };
-
-    measure();
-    const raf = requestAnimationFrame(measure);
-    // Reintents per si el panell acaba d'encaixar mes tard.
-    const timers = [180, 500, 1200].map((ms) => window.setTimeout(measure, ms));
-    window.addEventListener('resize', measure);
-    const ro = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(measure) : null;
-    ro?.observe(el);
-    // Observem també la superfície del panell: és el seu bottom el que fixa la
-    // posició del cadenat.
-    const surfaceEl = document.querySelector('[data-mega-panel-surface="1"]');
-    if (surfaceEl) ro?.observe(surfaceEl);
-    return () => {
-      cancelAnimationFrame(raf);
-      timers.forEach((t) => window.clearTimeout(t));
-      window.removeEventListener('resize', measure);
-      ro?.disconnect();
-    };
+    raf = requestAnimationFrame(seguiment);
+    return () => cancelAnimationFrame(raf);
   }, [active]);
 
   useLayoutEffect(() => {
@@ -3101,6 +3093,7 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
           cistell (3) no hi surt: allà no cal bloquejar el megaslide. */}
       {canUseDom && active && megaPage !== 3 && lockBtnTop != null && ReactDOM.createPortal(
         <div
+          ref={lockWrapRef}
           style={{
             position: 'fixed',
             left: '50%',
