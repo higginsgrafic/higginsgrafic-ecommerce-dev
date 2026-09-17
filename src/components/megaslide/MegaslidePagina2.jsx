@@ -455,7 +455,7 @@ export default function MegaslidePagina2({
         </div>
 
         {/* MegaStripePanel */}
-        <div style={{ position: 'relative', zIndex: 1, width: '100%' }}>
+        <div style={{ position: 'relative', zIndex: 1, width: '100%', left: (isPortraitTablet || isLandscapeTablet) ? '-1px' : undefined }}>
           <MegaStripePanel
             active={active}
             reserveGridSpace
