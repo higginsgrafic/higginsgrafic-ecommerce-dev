@@ -2007,13 +2007,22 @@ function FullWideSlideHeader({
 
     measure();
     const raf = requestAnimationFrame(measure);
+    // El panell acaba de mesurar-se després (l'alçada ve del contingut de la
+    // pàgina 1), així que tornem a mesurar uns quants cops perquè el cadenat no
+    // quedi desplaçat ni es mogui quan el panell acaba d'encaixar.
+    const timers = [180, 500, 1200].map((ms) => window.setTimeout(measure, ms));
     window.addEventListener('resize', measure);
-    const ro = new ResizeObserver(measure);
-    ro.observe(el);
+    const ro = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(measure) : null;
+    ro?.observe(el);
+    // Observem també la superfície del panell: és el seu bottom el que fixa la
+    // posició del cadenat.
+    const surfaceEl = document.querySelector('[data-mega-panel-surface="1"]');
+    if (surfaceEl) ro?.observe(surfaceEl);
     return () => {
       cancelAnimationFrame(raf);
+      timers.forEach((t) => window.clearTimeout(t));
       window.removeEventListener('resize', measure);
-      ro.disconnect();
+      ro?.disconnect();
     };
   }, [active]);
 
