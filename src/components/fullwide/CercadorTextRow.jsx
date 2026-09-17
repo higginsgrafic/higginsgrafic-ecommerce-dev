@@ -60,21 +60,19 @@ const INK_SELECTED = '#000000';
 //   100% = 50 px | 55% = 27,5 px | 45% = 22,5 px | 43% = 21,5 px
 // ============================================================
 const DIBUIX_BASE = 50;
-const DIBUIX_GAP_H_BASE = 25;
 const DIBUIX_GAP_V_BASE = 3;
 
-// Desktop: la graella NO va a escala 1:1. NX-01 (1a columna) queda fix on és i
-// la graella sencera es redueix proporcionalment fins que l'últim dibuix de la
-// fila (col·lumna 16) acaba on acabava Cylon '78 (col·lumna 12) a escala 1:1,
-// que és just abans de les columnes de color:
-//   12 columnes = 12 × 50 + 11 × 25 =  875 px
-//   16 columnes = 16 × 50 + 15 × 25 = 1175 px
-//   factor = 875 / 1175 = 0,744681
-const GRAELLA_FACTOR_DESKTOP = 875 / 1175;
-
-const DIBUIX_PX = DIBUIX_BASE * GRAELLA_FACTOR_DESKTOP;            // 37,23 px
-const DIBUIX_GAP_H = DIBUIX_GAP_H_BASE * GRAELLA_FACTOR_DESKTOP;   // 18,62 px
-const DIBUIX_GAP_V = DIBUIX_GAP_V_BASE * GRAELLA_FACTOR_DESKTOP;   //  2,23 px
+// Desktop: dibuix de 35 px (70% de la base 1:1) i 21 px de separació
+// horitzontal. La graella fa exactament la mateixa amplada de referència que
+// amb el dibuix a 1:1, o sigui que l'últim dibuix de la fila (col·lumna 16)
+// acaba on acabava Cylon '78 (col·lumna 12) a escala 1:1, just abans de les
+// columnes de color:
+//   12 columnes a 1:1 = 12 × 50 + 11 × 25 =  875 px
+//   16 columnes ara    = 16 × 35 + 15 × 21 =  875 px
+// Com que el dibuix és més petit, la separació entre dibuixos és més gran.
+const DIBUIX_PX = 35;
+const DIBUIX_GAP_H = 21;
+const DIBUIX_GAP_V = 2.1;
 // Tauleta (horitzontal i vertical, de moment iguals): 40% de la base 1:1.
 const DIBUIX_PX_LANDSCAPE = DIBUIX_BASE * 0.40; // 20 px
 const DIBUIX_PX_PORTRAIT = DIBUIX_BASE * 0.40;  // 20 px
