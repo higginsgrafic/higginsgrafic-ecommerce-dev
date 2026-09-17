@@ -85,11 +85,6 @@ export default function MegaslidePagina2({
   const compactMegaTileSize = page1MegaTileSize || (isPortraitTablet ? portraitMegaTileSize : megaTileSize);
   const compactStripePreviewHPx = page1StripePreviewHPx || stripePreviewHPx;
   const bnSliderSize = (compactMegaTileSize || 120) * ((isPortraitTablet || isLandscapeTablet) ? 0.94 : 1) * (isPortraitTablet ? 0.7 : 1);
-  // El conjunt del cercador (graella de dibuixos + graella de colors + llista
-  // de col·leccions) va 10 px més avall. El selector Blanc/Color/Negre segueix
-  // centrat amb la graella de colors perquè el centratge es mesura al
-  // navegador i s'hi adapta.
-  const CERCADOR_BAIXADA_PX = 10;
   const [topVisualAlignmentY, setTopVisualAlignmentY] = useState(0);
   // Desplaçament propi del selector Blanc/Color/Negre perquè quedi centrat amb
   // la graella de colors. Va a part de topVisualAlignmentY (que alinea el
@@ -388,7 +383,7 @@ export default function MegaslidePagina2({
         {/* CercadorTextRow */}
         <div style={{
           position: 'absolute',
-          top: `calc(var(--hg-cercador-bar-top, 0px) + ${topVisualAlignmentY + (isPortraitTablet ? 20 : (isLandscapeTablet ? 5 : ((typeof window !== 'undefined' && window.innerWidth >= 768 && window.innerWidth <= 1366 && window.innerWidth >= window.innerHeight) ? 45 : 20 + CERCADOR_BAIXADA_PX)))}px)`,
+          top: `calc(var(--hg-cercador-bar-top, 0px) + ${topVisualAlignmentY + (isPortraitTablet ? 20 : (isLandscapeTablet ? 5 : ((typeof window !== 'undefined' && window.innerWidth >= 768 && window.innerWidth <= 1366 && window.innerWidth >= window.innerHeight) ? 45 : 20)))}px)`,
           left: isPortraitTablet ? '0' : '50%',
           transform: isPortraitTablet ? 'scale(var(--hg-cercador-bar-scale, 1))' : 'translateX(-50%) scale(var(--hg-cercador-bar-scale, 1))',
           transformOrigin: 'top center',
