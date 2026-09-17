@@ -482,6 +482,11 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
     const dibuixPx = midesGraella?.dibuix ?? midaDibuix(isPortraitTablet, isLandscapeTablet);
     const gapH = midesGraella?.gapH ?? gapHorizontal(isPortraitTablet, isLandscapeTablet);
     const gapV = midesGraella?.gapV ?? gapVertical(isPortraitTablet, isLandscapeTablet);
+    // La columna de col·leccions (la de la dreta de la graella de colors)
+    // reparteix les seves línies al llarg de tota l'alçada de la graella, de
+    // manera que acaba exactament al mateix bottom que els dibuixos.
+    const alcadaGraella = GRAELLA_FILES * dibuixPx + (GRAELLA_FILES - 1) * gapV;
+    const alcadaFilaLlista = alcadaGraella / (CERCADOR_COLLECTIONS.length || 1);
     const activeKey = activeCollection === 'austen' ? `austen:${activeSubcollection || ''}` : activeCollection;
 
     return (
@@ -611,14 +616,14 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
               className="font-roboto-condensed"
               style={{
                 display: 'block',
-                height: isPortraitTablet ? '8px' : (isLandscapeTablet ? '11px' : '13px'),
+                height: isPortraitTablet ? '8px' : (isLandscapeTablet ? '11px' : `${alcadaFilaLlista}px`),
                 padding: 0,
                 border: 0,
                 background: 'transparent',
                 color: '#2B2B2B',
                 fontSize: isPortraitTablet ? '7px' : (isLandscapeTablet ? '8px' : '11px'),
                 fontWeight: key === activeKey ? 700 : 300,
-                lineHeight: isPortraitTablet ? '8px' : (isLandscapeTablet ? '11px' : '13px'),
+                lineHeight: isPortraitTablet ? '8px' : (isLandscapeTablet ? '11px' : `${alcadaFilaLlista}px`),
                 textAlign: 'left',
                 whiteSpace: 'nowrap',
                 cursor: 'pointer',
