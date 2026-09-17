@@ -144,11 +144,6 @@ function MegaStripePanelP1({
   const pageRootRef = useRef(null);
   const pageLiftRef = useRef(0);
   const [pageLift, setPageLift] = useState(0);
-  // Franja estreta (768-1366 en horitzontal): hi ha ajustos propis de 10 px i
-  // l'ajust general de la franja no s'hi aplica.
-  const esEstenyFins1366 = typeof window !== 'undefined'
-    && window.innerWidth >= 768 && window.innerWidth <= 1366 && window.innerWidth >= window.innerHeight;
-
   // En portrait tablet, la stripe està dins d'un viewport scrollable amb
   // overflowY hidden. Reduïm l'escala de la stripe perquè no es talli.
   useLayoutEffect(() => {
@@ -177,7 +172,7 @@ function MegaStripePanelP1({
         // A l'apaisada volem tota la filera 10px mes avall del lloc on
         // l'alineava la calibracio. El desplaçament va aqui, dins l'objectiu:
         // si el posessim al transform, la propia calibracio el desfaria.
-        const desplaçament = (typeof window !== 'undefined' && window.innerWidth >= 768 && window.innerWidth <= 1366 && window.innerWidth >= window.innerHeight) ? 10 : 0;
+        const desplaçament = compactLandscape ? 10 : 0;
         const delta = (selector.getBoundingClientRect().top - panel.getBoundingClientRect().top) - desplaçament;
         const next = Math.max(0, pageLiftRef.current + delta);
         if (Math.abs(next - pageLiftRef.current) >= 0.5) {
@@ -293,7 +288,7 @@ function MegaStripePanelP1({
           style={{
             // A la franja estreta (768-1366) la pàgina ja té els seus propis
             // ajustos de 10 px i l'ajust general no s'hi ha d'aplicar.
-            marginTop: compactLandscape ? '16px' : `${stripeRowPadPx - ((!isPortraitTablet && !compactLandscape && !esEstenyFins1366) ? FRANJA_AJUST_PX : 0)}px`,
+            marginTop: compactLandscape ? '16px' : `${stripeRowPadPx - ((!isPortraitTablet && !compactLandscape) ? FRANJA_AJUST_PX : 0)}px`,
             paddingBottom: compactLandscape ? '8px' : `${stripeRowPadPx}px`,
             paddingLeft: `${stripeRowPadXPx?.left || 0}px`,
             paddingRight: `${stripeRowPadXPx?.right || 0}px`,
@@ -344,7 +339,7 @@ function MegaStripePanelP1({
                   // A l'apaisada pugem la stripe 10px (les samarretes). El
                   // desplaçament va amb la resta de la seva posicio, que ve de
                   // les variables de calibracio.
-                  transform: `translate(var(--megaStripeDx, 0px), calc(var(--megaStripeDy, 0px) + ${(typeof window !== 'undefined' && window.innerWidth >= 768 && window.innerWidth <= 1366 && window.innerWidth >= window.innerHeight) ? -10 : 0}px)) scale(var(--megaStripeScale, 1.2125))`,
+                  transform: `translate(var(--megaStripeDx, 0px), calc(var(--megaStripeDy, 0px) + ${compactLandscape ? -10 : 0}px)) scale(var(--megaStripeScale, 1.2125))`,
                   isolation: 'isolate',
                 }}
               >
