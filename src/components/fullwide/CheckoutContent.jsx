@@ -183,8 +183,8 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
   const L_FRANJA_TOP = 7;
   const L_FRANJA_CREIX = 60;
   const D_FITXA_H = 236;
-  // La franja de productes va 30 px mes amunt del que anava (abans -5).
-  const D_FRANJA_TOP = -35;
+  // La franja de productes va 35 px mes amunt del que anava (abans -5).
+  const D_FRANJA_TOP = -40;
   const D_FRANJA_CREIX = 70;
   const D_COLUMNES_TOP = COLUMNES_TOP - D_FRANJA_CREIX;
 
