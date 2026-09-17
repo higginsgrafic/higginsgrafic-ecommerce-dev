@@ -3149,6 +3149,8 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
             }}
             className="flex h-10 w-10 items-center justify-center rounded-full border border-border bg-background shadow-lg transition-colors hover:bg-muted"
             style={{
+              // L'ombra del panell sobre el cadenat mentre creua el seu contorn.
+              animation: 'mega-cadenat-ombra 80ms ease-out 360ms both',
               transform: isPortraitTablet && megaPage !== 3
                 ? `translateX(${(lockBtnScrollProgress - 0.5) * 160}px)`
                 : undefined,
