@@ -3108,7 +3108,9 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
             // queda just a sota del separador. L'animacio va a fora i el
             // transform de dins queda lliure per arrossegar-lo al vertical.
             top: `${lockBtnTop + CADE_BAIXADA_PX}px`,
-            animation: 'mega-cadenat-surt 500ms cubic-bezier(0.22, 1, 0.36, 1) 360ms both',
+            // La sortida dura el mateix que l'ultim tram del panell i comença de
+            // seguida, aixi el cadenat i la pestanya hi arriben alhora.
+            animation: 'mega-cadenat-surt 250ms cubic-bezier(0.22, 1, 0.36, 1) 0ms both',
             // Per sota del panell (z-[10000]) perque el cadenat en surti de sota.
             zIndex: 9999,
             pointerEvents: 'none',
