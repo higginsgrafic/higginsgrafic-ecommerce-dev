@@ -78,3 +78,6 @@ docs/comparacio/
 # Caché local de `netlify dev` (Sol la redirigeix aquí per no embrutar el home)
 .tmp-config/
 .tmp-home/
+
+# Estat i registres del llançador de sessió (tools/sessio/sessio.sh)
+tools/sessio/.state/
