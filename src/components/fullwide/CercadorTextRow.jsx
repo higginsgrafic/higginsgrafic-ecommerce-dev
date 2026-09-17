@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useLayoutEffect, useRef, useState } from 'react';
 import { CERCADOR_COLLECTIONS, CERCADOR_COLORS } from './CercadorTopBar.jsx';
 
 /**
@@ -100,6 +100,14 @@ function gapVertical(isPortraitTablet, isLandscapeTablet) {
   if (isPortraitTablet || isLandscapeTablet) return DIBUIX_GAP_V_BASE;
   return DIBUIX_GAP_V;
 }
+
+// La graella de dibuixos fa 16 columnes × 4 files. Al desktop s'ha d'ajustar a
+// l'espai real de la pàgina 2: no pot sortir de la columna on viu (amplada) ni
+// pot trepitjar la filera de samarretes que hi ha just a sota (alçada).
+const GRAELLA_COLUMNES = 16;
+const GRAELLA_FILES = 4;
+// Marge entre l'última fila de dibuixos i el capdamunt de la franja.
+const GRAELLA_MARGE_FRANJA = 2;
 
 // Mapping: text label -> stripe item ID (per seleccionar el disseny a la franja)
 const STRIPE_MAP = {
@@ -359,6 +367,99 @@ function Group({ group, isFirst, dimmed, clickable, selectedStripeItem, hoveredS
 }
 
 function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripeItem, hoveredStripeItem, onSelectGroup, onHoverItem, onHoverLeave, compact = false, selectedColor = 'white', onSelectColor, onSelectCollection, isPortraitTablet = false, isLandscapeTablet = false, leftOffset = 0, uniformColumns = false, fontBoost = 0 }) {
+  // Ajust de la graella compacta a l'espai disponible (només desktop: les
+  // tauletes mantenen la mida fixa de moment). Mesurem l'amplada de la columna
+  // i el capdamunt de la franja de samarretes, i guardem la mida de dibuix i
+  // les separacions que fan que la graella hi càpiga.
+  const graellaRef = useRef(null);
+  const midesRef = useRef(null);
+  const [midesGraella, setMidesGraella] = useState(null);
+
+  useLayoutEffect(() => {
+    if (!compact || isPortraitTablet || isLandscapeTablet) {
+      if (midesRef.current !== null) {
+        midesRef.current = null;
+        setMidesGraella(null);
+      }
+      return undefined;
+    }
+
+    const el = graellaRef.current;
+    if (!el) return undefined;
+
+    let frame = 0;
+    const aplicar = () => {
+      const ample = el.clientWidth;
+      const dalt = el.getBoundingClientRect().top;
+      const pagina = el.closest('[data-mega-page-viewport="2"]') || document;
+      const franja = pagina.querySelector('[data-stripe-visual-content="2"]');
+      const sostre = franja ? franja.getBoundingClientRect().top : null;
+
+      const base = midaDibuix(isPortraitTablet, isLandscapeTablet);
+      const gapHBase = gapHorizontal(isPortraitTablet, isLandscapeTablet);
+      const gapVBase = gapVertical(isPortraitTablet, isLandscapeTablet);
+      const ampleBase = GRAELLA_COLUMNES * base + (GRAELLA_COLUMNES - 1) * gapHBase;
+
+      // 1) Amplada: si la columna és més estreta que la graella de referència,
+      //    reduïm tot proporcionalment.
+      const factorAmple = ample > 0 && ampleBase > 0 ? Math.min(1, ample / ampleBase) : 1;
+      let dibuix = base * factorAmple;
+      let gapH = gapHBase * factorAmple;
+      let gapV = gapVBase * factorAmple;
+
+      // 2) Alçada: la graella no pot trepitjar la franja de samarretes. Primer
+      //    cedim la separació vertical (que gairebé no es veu, perquè els
+      //    dibuixos ja queden centrats dins la seva casella) i només si encara
+      //    no hi cap reduïm el dibuix, mantenint la proporció amb la separació
+      //    horitzontal perquè la graella no quedi deformada.
+      if (sostre != null) {
+        const altDisp = sostre - dalt - GRAELLA_MARGE_FRANJA;
+        if (altDisp > 0) {
+          const altDibuixos = GRAELLA_FILES * dibuix;
+          if (altDibuixos + (GRAELLA_FILES - 1) * gapV > altDisp) {
+            if (altDibuixos <= altDisp) {
+              gapV = Math.max(0, (altDisp - altDibuixos) / (GRAELLA_FILES - 1));
+            } else {
+              const factorAlt = altDisp / altDibuixos;
+              dibuix *= factorAlt;
+              gapH *= factorAlt;
+              gapV = 0;
+            }
+          }
+        }
+      }
+
+      const next = { dibuix, gapH, gapV };
+      const previ = midesRef.current;
+      const igual = previ
+        && Math.abs(previ.dibuix - next.dibuix) < 0.01
+        && Math.abs(previ.gapH - next.gapH) < 0.01
+        && Math.abs(previ.gapV - next.gapV) < 0.01;
+      if (!igual) {
+        midesRef.current = next;
+        setMidesGraella(next);
+      }
+    };
+    const mesura = () => {
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(aplicar);
+    };
+
+    // La primera mesura és immediata (useLayoutEffect encara és abans de
+    // pintar): així la graella neix ja a la mida bona i no fa cap salt.
+    aplicar();
+    const observer = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(mesura) : null;
+    observer?.observe(el);
+    const pagina = el.closest('[data-mega-page-viewport="2"]');
+    if (pagina) observer?.observe(pagina);
+    window.addEventListener('resize', mesura);
+    return () => {
+      cancelAnimationFrame(frame);
+      observer?.disconnect();
+      window.removeEventListener('resize', mesura);
+    };
+  }, [compact, isPortraitTablet, isLandscapeTablet]);
+
   if (compact) {
     // La graella de dibuixos és de 16 columnes × 4 files (64 dibuixos). Els
     // dibuixos s'aplanen per ordre de col·lecció i es reparteixen en files de
@@ -369,10 +470,12 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
       subcollection: group.subcollection,
       stripeItem: STRIPE_MAP[label],
     }))));
-    const numColumns = 16;
-    const dibuixPx = midaDibuix(isPortraitTablet, isLandscapeTablet);
-    const gapH = gapHorizontal(isPortraitTablet, isLandscapeTablet);
-    const gapV = gapVertical(isPortraitTablet, isLandscapeTablet);
+    const numColumns = GRAELLA_COLUMNES;
+    // Mides efectives: les mesurades perquè la graella capigui a l'espai
+    // disponible (només desktop) o les base de la pantalla.
+    const dibuixPx = midesGraella?.dibuix ?? midaDibuix(isPortraitTablet, isLandscapeTablet);
+    const gapH = midesGraella?.gapH ?? gapHorizontal(isPortraitTablet, isLandscapeTablet);
+    const gapV = midesGraella?.gapV ?? gapVertical(isPortraitTablet, isLandscapeTablet);
     const activeKey = activeCollection === 'austen' ? `austen:${activeSubcollection || ''}` : activeCollection;
 
     return (
@@ -389,7 +492,7 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
           pointerEvents: 'auto',
         }}
       >
-        <div style={{ display: 'grid', gridTemplateColumns: `repeat(${numColumns}, ${dibuixPx}px)`, gap: `${gapV}px ${gapH}px`, width: '100%', minWidth: 0 }}>
+        <div ref={graellaRef} style={{ display: 'grid', gridTemplateColumns: `repeat(${numColumns}, ${dibuixPx}px)`, gap: `${gapV}px ${gapH}px`, width: '100%', minWidth: 0 }}>
           {items.map(({ label, collection, subcollection, stripeItem }) => {
             const dimmed = activeCollection && collection !== activeCollection
               ? true
