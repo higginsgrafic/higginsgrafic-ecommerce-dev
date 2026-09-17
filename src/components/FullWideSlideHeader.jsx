@@ -2066,9 +2066,11 @@ function FullWideSlideHeader({
       // contingut te 992 px d'amplada i el que no hi cap s'hi arriba
       // desplacant. D'aquesta amplada en surten les mides del selector i de la
       // franja, aixi que ha de coincidir amb la de l'apaisada.
+      // A tauleta, el contingut va un 1% mes petit (ho demana el disseny);
+      // desktop es queda igual.
       const contentW = isPortraitTablet
-        ? 992 - pl - pr
-        : w - pl - pr;
+        ? 992 * 0.99 - pl - pr
+        : (isLandscapeTablet ? w * 0.99 - pl - pr : w - pl - pr);
       if (!contentW) return;
       const totalGaps = (COLS - 1) * GAP_PX;
       const colW = (contentW - totalGaps) / COLS;

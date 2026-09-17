@@ -168,8 +168,12 @@ for (const nom of tauletes.slice(1)) {
   } else if (difFranja > TOL_FRANJA) {
     notes.push(`la stripe de samarretes fa ${b.samarretesH} px a ${nom} i ${a.samarretesH} a ${referencia}: creix amb el viewport, la resta de peces no`);
   }
-  const patro = (r) => JSON.stringify(r.filesColors.map((y) => +(y - r.filesColors[0]).toFixed(1)));
-  if (patro(a) !== patro(b)) fallades.push(`patro de files: ${referencia} vs ${nom} no coincideixen`);
+  // El patro de files es compara amb marge: els decimals ballen una decima.
+  const patro = (r) => r.filesColors.map((y) => +(y - r.filesColors[0]).toFixed(1));
+  const pa = patro(a);
+  const pb = patro(b);
+  const patroDiferent = pa.length !== pb.length || pa.some((y, i) => Math.abs(y - pb[i]) > TOL_MIDES);
+  if (patroDiferent) fallades.push(`patro de files: ${referencia} ${JSON.stringify(pa)} vs ${nom} ${JSON.stringify(pb)}`);
 }
 
 if (!process.env.HG_BREU) {
