@@ -2247,7 +2247,14 @@ function FullWideSlideHeader({
       // s'alineïn amb belt2 quan és vàlid, i caiguin a fallback si està contaminat.
       try {
         const root = document.documentElement;
-        root.style.setProperty('--hg-mega-w', `${isPortraitTablet ? 992 : beltWidth}px`);
+        // Forcat de vista desktop: en una pantalla sense touch mes estreta que
+        // la mida de disseny, el mega-slide es compon a 1350 i la pantalla el
+        // pot desplacar, en comptes d'encongir-ho tot (que es el que feia que
+        // un portatil de 1280 semblés una tauleta).
+        const forcatDesktop = !isPortraitTablet && !isLandscapeTablet
+          && (window.navigator.maxTouchPoints || 0) === 0
+          && window.innerWidth < 1382;
+        root.style.setProperty('--hg-mega-w', `${isPortraitTablet ? 992 : (forcatDesktop ? 1350 : beltWidth)}px`);
         root.style.setProperty('--hg-mega-x', `${belt.left}px`);
       } catch {
         // ignore
