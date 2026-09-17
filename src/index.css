@@ -229,3 +229,16 @@ body.cart-open {
     transform: translateY(0);
   }
 }
+
+/* El cadenat surt de sota del megaslide: comença amagat darrere el panell
+   (que té fons opac i va per sobre) i baixa fins a quedar just a sota del
+   separador. Com que surt quan el panell ja s'ha desplegat, el petit ajust
+   d'alçada del panell queda amagat i el cadenat no es veu moure. */
+@keyframes mega-cadenat-surt {
+  from {
+    transform: translate(-50%, -64px);
+  }
+  to {
+    transform: translate(-50%, 0);
+  }
+}

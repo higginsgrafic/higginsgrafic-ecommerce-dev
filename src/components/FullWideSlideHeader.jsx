@@ -303,6 +303,9 @@ function FullWideSlideHeader({
   const [showRegisterOverlay, setShowRegisterOverlay] = useState(false);
   const [megaLocked, setMegaLocked] = useState(false);
   const [lockBtnTop, setLockBtnTop] = useState(null);
+  // El cadenat no queda encavalcat al separador: en surt de sota i queda
+  // 15 px per sota de la linia del megaslide.
+  const CADE_BAIXADA_PX = 15;
   const [lockBtnScrollProgress, setLockBtnScrollProgress] = useState(0.5);
   const lockDragRef = useRef({ dragged: false });
   const { user } = useAuth();
@@ -3128,16 +3131,22 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
             btn.addEventListener('pointerup', onUp);
             btn.addEventListener('pointercancel', onUp);
           }}
-          className="fixed z-[10001] left-1/2 -translate-x-1/2 flex h-10 w-10 items-center justify-center rounded-full border border-border bg-background shadow-lg transition-colors hover:bg-muted"
+          className="fixed left-1/2 -translate-x-1/2 flex h-10 w-10 items-center justify-center rounded-full border border-border bg-background shadow-lg transition-colors hover:bg-muted"
           style={{
-            top: lockBtnTop != null ? `${lockBtnTop - 20}px` : '16px',
+            // El cadenat surt de sota del megaslide (vegeu mega-cadenat-surt) i
+            // queda just a sota del separador, no encavalcat a la linia.
+            top: lockBtnTop != null ? `${lockBtnTop + CADE_BAIXADA_PX}px` : '16px',
             transform: isPortraitTablet && megaPage !== 3
               ? `translateX(calc(-50% + ${(lockBtnScrollProgress - 0.5) * 160}px))`
               : undefined,
+            animation: isPortraitTablet && megaPage !== 3
+              ? undefined
+              : 'mega-cadenat-surt 320ms cubic-bezier(0.22, 1, 0.36, 1) 260ms both',
             transition: 'transform 120ms ease-out, background-color 150ms',
             cursor: isPortraitTablet && megaPage !== 3 ? 'grab' : 'pointer',
             touchAction: isPortraitTablet && megaPage !== 3 ? 'none' : undefined,
-            zIndex: 100001,
+            // Per sota del panell (z-[10000]) perquè el cadenat en surti de sota.
+            zIndex: 9999,
           }}
           title={megaLocked ? 'Desbloca el megaslide' : 'Bloca el megaslide'}
           aria-label={megaLocked ? 'Desbloca el megaslide' : 'Bloca el megaslide'}
