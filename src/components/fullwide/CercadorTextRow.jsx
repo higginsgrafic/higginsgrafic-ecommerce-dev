@@ -117,10 +117,23 @@ function gapHorizontal(isPortraitTablet, isLandscapeTablet) {
 // És el que ha de fer la graella de dibuixos perquè cada fila caigui a
 // l'alçada de la seva fila de cercles: 20 px a vertical (16 + 4), 25 a
 // horitzontal (19 + 6) i 33 a desktop (25 + 8).
+/** Diametre del cercle de color. */
+function colorMida(isPortraitTablet, isLandscapeTablet) {
+  // Tauleta vertical i horitzontal: la mateixa mesura, perque son la mateixa
+  // pagina; el vertical nomes s'hi desplaca.
+  if (isPortraitTablet || isLandscapeTablet) return 19;
+  return 25;
+}
+
+/** Separacio entre cercles de color. */
+function colorGap(isPortraitTablet, isLandscapeTablet) {
+  if (isPortraitTablet || isLandscapeTablet) return 6;
+  return 8;
+}
+
+/** Pas vertical de la graella de colors (cercle + separacio). */
 function colorPas(isPortraitTablet, isLandscapeTablet) {
-  if (isPortraitTablet) return 16 + 4;
-  if (isLandscapeTablet) return 19 + 6;
-  return 25 + 8;
+  return colorMida(isPortraitTablet, isLandscapeTablet) + colorGap(isPortraitTablet, isLandscapeTablet);
 }
 
 /** La separació vertical que toca per a aquesta pantalla. */
@@ -576,7 +589,7 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
           })}
         </div>
 
-        <div data-p2-color-grid style={{ display: 'grid', gridTemplateColumns: `repeat(4, ${(isPortraitTablet || isLandscapeTablet) ? '19px' : '25px'})`, gridAutoRows: (isPortraitTablet || isLandscapeTablet) ? '19px' : '25px', gap: (isPortraitTablet || isLandscapeTablet) ? '6px' : '8px', transform: uniformColumns ? 'translateX(85px)' : ((isLandscapeTablet || isPortraitTablet) ? 'translateX(20px)' : ((typeof window !== 'undefined' && window.innerWidth >= 768 && window.innerWidth <= 1366 && window.innerWidth >= window.innerHeight) ? 'translateX(10px)' : 'translateX(-10px)')), marginTop: uniformColumns ? '5px' : undefined }}>
+        <div data-p2-color-grid style={{ display: 'grid', gridTemplateColumns: `repeat(4, ${colorMida(isPortraitTablet, isLandscapeTablet)}px)`, gridAutoRows: `${colorMida(isPortraitTablet, isLandscapeTablet)}px`, gap: `${colorGap(isPortraitTablet, isLandscapeTablet)}px`, transform: uniformColumns ? 'translateX(85px)' : ((isLandscapeTablet || isPortraitTablet) ? 'translateX(20px)' : ((typeof window !== 'undefined' && window.innerWidth >= 768 && window.innerWidth <= 1366 && window.innerWidth >= window.innerHeight) ? 'translateX(10px)' : 'translateX(-10px)')), marginTop: uniformColumns ? '5px' : undefined }}>
           {CERCADOR_COLORS.map(({ slug, hex }) => {
             const selected = slug === selectedColor;
             return (
@@ -586,8 +599,8 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
                 aria-label={slug}
                 onClick={() => onSelectColor?.(slug)}
                 style={{
-                  width: (isPortraitTablet || isLandscapeTablet) ? '19px' : '25px',
-                  height: (isPortraitTablet || isLandscapeTablet) ? '19px' : '25px',
+                  width: `${colorMida(isPortraitTablet, isLandscapeTablet)}px`,
+                  height: `${colorMida(isPortraitTablet, isLandscapeTablet)}px`,
                   padding: 0,
                   borderRadius: '50%',
                   border: selected ? '0.5px solid rgba(0,0,0,0.22)' : '0.5px solid rgba(0,0,0,0.22)',
