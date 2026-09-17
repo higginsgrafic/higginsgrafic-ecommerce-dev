@@ -238,15 +238,17 @@ body.cart-open {
    invisible: si no, es veu a través del panell translúcid i sembla que surti
    abans que la pestanya. Per això l'opacitat no puja fins passat el primer
    terç de l'animació. */
-/* Ombra que el panell projecta sobre el cadenat mentre aquest passa per sota
-   del seu contorn. Va pintada dins del propi boto (inset), aixi nomes afecta
-   el boto i no la pàgina, i s'esvaeix quan el cadenat ja ha sortit. */
-@keyframes mega-cadenat-ombra {
+/* L'ombra del panell sobre el cadenat. No pertany al boto: esta fixa a la
+   vora del panell, i el boto hi passa per sota. Per aixo aquesta animacio es
+   exactament la inversa de mega-cadenat-surt: el boto baixa i la banda puja el
+   mateix, de manera que a l'espai no es mou; el boto, que te el contorn
+   retallat, la va tapant i descobrint. */
+@keyframes mega-cadenat-ombra-fixa {
   from {
-    box-shadow: inset 0 10px 10px -8px rgba(17, 24, 39, 0.55), 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+    transform: translateY(64px);
   }
   to {
-    box-shadow: inset 0 10px 10px -8px rgba(17, 24, 39, 0), 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+    transform: translateY(0);
   }
 }
 
