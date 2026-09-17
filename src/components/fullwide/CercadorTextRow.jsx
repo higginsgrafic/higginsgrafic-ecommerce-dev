@@ -643,7 +643,10 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
           </div>
         </div>
 
-        <div style={{ transform: uniformColumns ? 'translateX(120px)' : 'translateX(45px)' }}>
+        {/* La columna s'ajusta al nom mes llarg (fit-content): aixi el nom
+            mes llarg comença on començava i els curts s'hi enrasen per la
+            dreta, sense que el conjunt es desplaci. */}
+        <div style={{ width: 'fit-content', transform: uniformColumns ? 'translateX(120px)' : 'translateX(45px)' }}>
           {CERCADOR_COLLECTIONS.map(({ key, label }) => (
             <button
               key={key}
