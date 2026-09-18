@@ -114,6 +114,11 @@ export default function MegaslidePagina2({
   // la graella de colors. Va a part de topVisualAlignmentY (que alinea el
   // selector amb el de la pàgina 1): així els dos ajustos no es trepitgen.
   const [selectorCentratgeY, setSelectorCentratgeY] = useState(0);
+  // Els mateixos valors en refs: l'efecte de calibratge els necessita per
+  // arrencar del que ja hi ha aplicat sense dependre de l'estat (que el faria
+  // realimentar-se).
+  const alignRefY = useRef(0);
+  const centraRefY = useRef(0);
   const snapTimerRef = useRef(0);
   const neutralGammaRef = useRef(null);
   const tiltDeltaRef = useRef(0);
@@ -223,71 +228,70 @@ export default function MegaslidePagina2({
     };
   }, [isPortraitTablet]);
 
-  useLayoutEffect(() => {
-    let frame = 0;
-    let settleTimer = 0;
-    const alignTopRowToPage1 = () => {
-      const page1Viewport = document.querySelector('[data-mega-page-viewport="1"]');
-      const page1Selector = page1Viewport?.querySelector('button[aria-label="Color"]');
-      const page2Selector = viewportRef.current?.querySelector('[data-p2-color-selector] button[aria-label="Color"]');
-      if (!page1Selector || !page2Selector) return;
-      // A l'apaisada volem el selector 10px mes avall que el de la pagina 1:
-      // el desplaçament va aqui, perque la calibracio alinea el selector amb
-      // aquest valor objectiu. Si el posessim al transform, la propia
-      // calibracio el tornaria a pujar i no es veuria.
-      const offset = (typeof window !== 'undefined' && window.innerWidth >= 768 && window.innerWidth <= 1366 && window.innerWidth >= window.innerHeight) ? 10 : 0;
-      // El centratge del selector (selectorCentratgeY) no ha de comptar aquí:
-      // el que volem és que el selector quedi on toca respecte de la pàgina 1 i
-      // que el centratge amb la graella de colors hi vagi a sobre.
-      const delta = (page1Selector.getBoundingClientRect().top + offset) - (page2Selector.getBoundingClientRect().top - selectorCentratgeY);
-      if (Math.abs(delta) < 0.5) return;
-      setTopVisualAlignmentY((current) => current + delta);
-    };
-    const schedule = () => {
-      cancelAnimationFrame(frame);
-      frame = requestAnimationFrame(alignTopRowToPage1);
-    };
-
-    schedule();
-    settleTimer = window.setTimeout(schedule, 180);
-    window.addEventListener('resize', schedule);
-    return () => {
-      cancelAnimationFrame(frame);
-      window.clearTimeout(settleTimer);
-      window.removeEventListener('resize', schedule);
-    };
-  }, [active, bnSliderSize, isPortraitTablet, page1PageLift, selectorCentratgeY]);
-
-  // El selector Blanc/Color/Negre es centra verticalment amb la graella de
-  // colors (la columna dels cercles). S'aplica a totes les pantalles: a desktop
-  // i a tauleta el selector queda centrat amb la seva graella de colors.
+  // Alineació de la filera de dalt de la pàgina 2 amb la de la pàgina 1, i
+  // centratge del selector amb la graella de colors.
+  //
+  // Eren DOS efectes que es donaven suport: el d'alineació llegia
+  // `selectorCentratgeY` i el de centratge el reescrivia, i tots dos es
+  // tornaven a executar al cap de 180 ms. El resultat depenia de l'ordre i del
+  // nombre d'iteracions.
+  //
+  // Aquí els dos càlculs viuen en el MATEIX efecte i s'apliquen en una sola
+  // actualització, però es mantenen les dues fórmules originals tal qual (i
+  // l'ordre: primer alineació, després centratge). Les refs serveixen per
+  // arrencar del valor aplicat sense dependre de l'estat, que és el que feia
+  // que l'efecte es realimentés.
   useLayoutEffect(() => {
     if (!active) return undefined;
     let frame = 0;
     let settleTimer = 0;
-    const centraAmbLaGraellaDeColors = () => {
-      // A vertical el cercador viu en un altre viewport (2-cercador), així que
-      // no podem buscar dins del viewport de la pàgina 2: agafem el primer
-      // selector i la primera graella de colors que tinguin mida real.
-      const ambMida = (sel) => [...document.querySelectorAll(sel)].find((e) => {
-        const r = e.getBoundingClientRect();
-        return r.width > 0 && r.height > 0;
-      });
-      const selector = ambMida('[data-p2-color-selector] [data-stripe-buttonbar="bn"]');
-      const graella = ambMida('[data-p2-color-grid]');
-      if (!selector || !graella) return;
-      const s = selector.getBoundingClientRect();
-      const g = graella.getBoundingClientRect();
-      const delta = (g.top + g.height / 2) - (s.top + s.height / 2);
-      if (Math.abs(delta) < 0.5) return;
-      setSelectorCentratgeY((current) => current + delta);
-    };
-    const schedule = () => {
-      cancelAnimationFrame(frame);
-      frame = requestAnimationFrame(centraAmbLaGraellaDeColors);
+
+    const ajusta = () => {
+      const page1Viewport = document.querySelector('[data-mega-page-viewport="1"]');
+      const page1Selector = page1Viewport?.querySelector('button[aria-label="Color"]');
+      const page2Selector = viewportRef.current?.querySelector('[data-p2-color-selector] button[aria-label="Color"]');
+      if (!page1Selector || !page2Selector) return;
+
+      const alignAplicat = alignRefY.current;
+      const centraAplicat = centraRefY.current;
+      const p1Top = page1Selector.getBoundingClientRect().top;
+      const p2Top = page2Selector.getBoundingClientRect().top;
+
+      // 1) ALINEACIÓ (fórmula original): l'objectiu és el selector de la pàgina 1
+      //    més l'offset; el centratge no hi compta perquè va a sobre.
+      const offset = (typeof window !== 'undefined' && window.innerWidth >= 768 && window.innerWidth <= 1366 && window.innerWidth >= window.innerHeight) ? 10 : 0;
+      const deltaAlign = (p1Top + offset) - (p2Top - centraAplicat);
+
+      // 2) CENTRATGE (fórmula original): el centre del selector ha de coincidir
+      //    amb el de la graella. Es treballa sobre la posició que tindrà DESPRÉS
+      //    de l'alineació, que és el que fa el bucle original quan corre tot
+      //    seguit de l'altre.
+      const graella = document.querySelector('[data-p2-color-grid]');
+      let deltaCentra = 0;
+      if (graella) {
+        const g = graella.getBoundingClientRect();
+        const s = page2Selector.getBoundingClientRect();
+        const centreGraella = g.top + g.height / 2;
+        const centreSelector = (s.top + deltaAlign) + s.height / 2;
+        deltaCentra = centreGraella - centreSelector;
+      }
+
+      if (Math.abs(deltaAlign) >= 0.5) {
+        alignRefY.current = alignAplicat + deltaAlign;
+        setTopVisualAlignmentY(alignRefY.current);
+      }
+      if (Math.abs(deltaCentra) >= 0.5) {
+        centraRefY.current = centraAplicat + deltaCentra;
+        setSelectorCentratgeY(centraRefY.current);
+      }
     };
 
-    schedule();
+    const schedule = () => {
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(ajusta);
+    };
+
+    ajusta();
     settleTimer = window.setTimeout(schedule, 180);
     window.addEventListener('resize', schedule);
     return () => {
@@ -295,7 +299,12 @@ export default function MegaslidePagina2({
       window.clearTimeout(settleTimer);
       window.removeEventListener('resize', schedule);
     };
-  }, [active, bnSliderSize, isPortraitTablet, isLandscapeTablet]);
+  }, [active, bnSliderSize, isPortraitTablet, isLandscapeTablet, page1PageLift, esBandaEstreta]);
+
+  // (El centratge del selector amb la graella de colors s'ha fusionat amb
+  // l'efecte de dalt. Era un segon bucle que reescrivia el valor que el primer
+  // llegia, i per això l'ordre i el nombre d'iteracions en canviaven el
+  // resultat.)
 
   const variant = active === 'the_human_inside' ? humanInsideVariant : firstContactVariant;
 
