@@ -131,6 +131,42 @@ export function clampNumber(value, min, max, fallback = min) {
 }
 
 /**
+ * Referència de la composició del megaslide: la mida a la qual està calibrat
+ * tot el contingut (dibuixos, franja, selector, coordenades).
+ */
+export const MEGASLIDE_REFERENCIA_PX = 1350;
+
+/**
+ * Factor d'escala del megaslide respecte de la seva composició de 1350 px.
+ *
+ * Aquesta és l'ÚNICA font de l'escala: la graella de dibuixos ja s'hi adapta
+ * (mesura l'amplada de la seva columna), pero la franja de samarretes i les
+ * coordenades del panell no. Mentre no surtin totes del mateix factor, les
+ * peces no escalen juntes i les proporcions es trenquen.
+ *
+ * @param {number} beltWidth amplada del belt, en px
+ * @returns {number} factor (1 = composicio completa, 0,75 = tres quartes parts)
+ */
+export function escalaMegaslide(beltWidth) {
+  if (!Number.isFinite(beltWidth) || beltWidth <= 0) return 1;
+  return beltWidth / MEGASLIDE_REFERENCIA_PX;
+}
+
+/**
+ * Amplada de la finestra que es pren com a referencia del disseny.
+ */
+export const MEGASLIDE_VISTA_REFERENCIA_PX = 1920;
+
+/**
+ * Amplada del belt per a una finestra donada: la mateixa part de la pantalla
+ * que a la referencia (1350 sobre 1920).
+ */
+export function getBeltWidth(vw = getLayoutViewportWidth()) {
+  if (!Number.isFinite(vw) || vw <= 0) return MEGASLIDE_REFERENCIA_PX;
+  return Math.round(vw * (MEGASLIDE_REFERENCIA_PX / MEGASLIDE_VISTA_REFERENCIA_PX));
+}
+
+/**
  * Amplada segura per a contenidors centrats tipus "belt".
  * Equival a:
  *   min(maxContent, viewportWidth - 2 * sideMargin)
@@ -143,15 +179,18 @@ export function clampNumber(value, min, max, fallback = min) {
  * @returns {number}
  */
 export function getSafeContentWidth({
-  maxContent = 1350,
+  maxContent = MEGASLIDE_REFERENCIA_PX,
   sideMargin = 16,
   minContent = 320,
 } = {}) {
   const vw = getLayoutViewportWidth();
   if (vw <= 0) return maxContent;
+  // El sostre es la proporcio de la finestra quan es tracta de la referencia
+  // del megaslide: a 1920 dona 1350 i a 1440 en dona 1013.
+  const cap = maxContent === MEGASLIDE_REFERENCIA_PX ? getBeltWidth(vw) : maxContent;
   const available = vw - sideMargin * 2;
-  const target = Math.min(maxContent, available);
-  return clampNumber(target, minContent, maxContent, minContent);
+  const target = Math.min(cap, available);
+  return clampNumber(target, minContent, cap, minContent);
 }
 
 /**
@@ -189,7 +228,7 @@ export function readRootCssNumber(varName, fallback = NaN) {
  * Mai retorna valors absurds: és segur fer-lo servir per layouts productius.
  */
 export function getSafeBelt({
-  maxContent = 1350,
+  maxContent = MEGASLIDE_REFERENCIA_PX,
   sideMargin = 16,
   minContent = 320,
   varLeft = '--belt2-xL',
@@ -210,7 +249,7 @@ export function getSafeBelt({
     xLraw >= 0 &&
     xRraw <= vw + 1 &&
     xRraw - xLraw >= minContent &&
-    xRraw - xLraw <= maxContent + 2;
+    xRraw - xLraw <= safeWidth + 2;
 
   if (!beltOk) {
     return {

@@ -9,7 +9,7 @@ import { useCart } from '@/contexts/CartContext';
 import { useOrders } from '@/hooks/useOrders';
 import { getGildan64000Catalog } from '../utils/placeholders.js';
 import { AUSTEN_QUOTES_ASSETS, resolveAustenQuoteAssetId, resolveAustenQuoteOriginalFromPath } from '../utils/austenQuotesAssets.js';
-import { getSafeBelt, clampNumber } from '@/utils/layoutMetrics';
+import { getSafeBelt, clampNumber, escalaMegaslide } from '@/utils/layoutMetrics';
 import {
   FIRST_CONTACT_MEDIA,
   FIRST_CONTACT_MEDIA_WHITE,
@@ -2247,7 +2247,14 @@ function FullWideSlideHeader({
       // s'alineïn amb belt2 quan és vàlid, i caiguin a fallback si està contaminat.
       try {
         const root = document.documentElement;
-        root.style.setProperty('--hg-mega-w', `${isPortraitTablet ? 992 : beltWidth}px`);
+        // La tauleta te les seves alcades calibrades i el seu belt de 992: no
+        // s'escala mai. L'escriptori (inclosa la banda estreta) si.
+        const beltFinal = (isPortraitTablet || isLandscapeTablet) ? 992 : beltWidth;
+        root.style.setProperty('--hg-mega-w', `${beltFinal}px`);
+        // L'UNICA font de l'escala del megaslide. La fan servir la franja i,
+        // mes endavant, les coordenades del panell. La graella de dibuixos ja
+        // s'hi adapta sola (mesura l'amplada de la seva columna).
+        root.style.setProperty('--hg-escala-mega', String((isPortraitTablet || isLandscapeTablet) ? 1 : escalaMegaslide(beltWidth)));
         root.style.setProperty('--hg-mega-x', `${belt.left}px`);
       } catch {
         // ignore
