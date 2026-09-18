@@ -8,6 +8,7 @@ import { lazy, Suspense, useRef, useEffect, useCallback, useState } from 'react'
 import MegaStripeBleedGuard from './MegaStripeBleedGuard.jsx';
 import MegaStripePanelP1 from './MegaStripePanelP1.jsx';
 import { factorAlcadaMegaslide } from './midesMegaslide.js';
+import { alcadaPanellMegaslide } from '../../utils/mesuraMegaslide.js';
 import MegaslidePagina2 from '../megaslide/MegaslidePagina2.jsx';
 
 const MegaslidePagina3 = lazy(() => import('../megaslide/MegaslidePagina3.jsx'));
@@ -139,7 +140,10 @@ export default function MegaMenuPanel({
   // S'aplica tant a la mesura com a la reserva, perquè el panell no faci cap
   // salt entre l'estat inicial i el calibrat.
   const margeExtraDesktop = (esVerticalAqui || esApaissadaAqui || esMobilAqui) ? 0 : MARGE_EXTRA_DESKTOP_PX;
-  const arrodonirAlcadaGuard = (px) => `${Math.max(0, Math.round(px + margeExtraDesktop))}px`;
+  // L'alçada del panell a partir de la mesura de la pàgina 1: el càlcul viu a
+  // mesuraMegaslide.js (funció pura, comprovable). Aquí només s'hi afegeix el
+  // marge extra de l'escriptori i el format en px.
+  const alcadaGuard = (p1Bottom) => alcadaPanellMegaslide({ p1ContentBottom: p1Bottom, gap: P1_STRIPE_BOTTOM_GAP, margeExtra: margeExtraDesktop });
 
   const viewport1Ref = useRef(null);
   const handlePortraitScroll1 = useCallback(() => {
@@ -170,7 +174,7 @@ export default function MegaMenuPanel({
     isPortraitTablet || isLandscapeTablet,
   );
   const defaultBleedGuardHeight = effectiveMegaTileSize
-    ? `${Math.round((effectiveMegaTileSize * 2 + 37 + Math.max(0, stripeRowPadPx)) * fitAlcada)}px`
+    ? `${Math.round((effectiveMegaTileSize * 2 + 37 + Math.max(0, stripeRowPadPx)) * fitAlcada) + margeExtraDesktop}px`
     : undefined;
   // A vertical el contingut te la mateixa alcada que a horitzontal: el que
   // s'allarga el panell es la capcalera, que alla fa dues fileres. Ja no hi ha
@@ -233,14 +237,14 @@ export default function MegaMenuPanel({
     : esCheckout && CHECKOUT_GUARD_H != null
     ? `${CHECKOUT_GUARD_H}px`
     : matchesPage1Height && p1ContentBottomPx != null && mesuraEstable
-    ? arrodonirAlcadaGuard(p1ContentBottomPx + P1_STRIPE_BOTTOM_GAP - 64)
+    ? `${alcadaGuard(p1ContentBottomPx)}px`
     : (alcadaRecordada || guardHeightPxDefault);
 
   // Quan l'alcada bona ja es ferma, la guardem per a les properes obertures.
   useEffect(() => {
     if (isPortraitTablet || paymentFillsScreen) return;
     if (!mesuraEstable || p1ContentBottomPx == null) return;
-    desarAlcada(arrodonirAlcadaGuard(p1ContentBottomPx + P1_STRIPE_BOTTOM_GAP - 64));
+    desarAlcada(`${alcadaGuard(p1ContentBottomPx)}px`);
   }, [mesuraEstable, p1ContentBottomPx, isPortraitTablet, paymentFillsScreen, margeExtraDesktop]);
 
   return (

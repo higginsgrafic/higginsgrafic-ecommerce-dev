@@ -3,7 +3,7 @@ import {
   midesGraellaCompacta, midaDibuix, gapHorizontal, gapVertical, colorPas,
   GRAELLA_COLUMNES, GRAELLA_FILES, GRAELLA_MARGE_FRANJA,
 } from '../../src/components/fullwide/midesGraella.js';
-import { deltaObjectiuPageLift } from '../../src/utils/mesuraMegaslide.js';
+import { deltaObjectiuPageLift, alcadaPanellMegaslide } from '../../src/utils/mesuraMegaslide.js';
 
 // Aquesta prova existeix perquè el càlcul de les mides de la graella de
 // dibuixos vivia DINS d'un efecte de CercadorTextRow, barrejat amb la lectura
@@ -113,5 +113,29 @@ describe('deltaObjectiuPageLift', () => {
     // perquè quedi a 0); a la banda estreta, 0 (ja hi és, a 10).
     expect(deltaObjectiuPageLift({ selectorTop: 150, panelTop: 140, ample: 1440, alt: 900 })).toBe(10);
     expect(deltaObjectiuPageLift({ selectorTop: 150, panelTop: 140, ample: 1280, alt: 706 })).toBe(0);
+  });
+});
+
+describe('alcadaPanellMegaslide', () => {
+  // L'alçada del panell surt de la mesura del contingut de la pàgina 1. El
+  // càlcul vivia dins d'una expressió de set línies amb tres condicions
+  // enganxades a MegaMenuPanel.
+  it('descompta el py-8 del panell (32+32) i suma el gap', () => {
+    // Mesura 400, gap 30, sense marge extra: 400 + 30 - 64 = 366.
+    expect(alcadaPanellMegaslide({ p1ContentBottom: 400, gap: 30 })).toBe(366);
+  });
+
+  it("hi afegeix el marge extra de l'escriptori", () => {
+    expect(alcadaPanellMegaslide({ p1ContentBottom: 400, gap: 30, margeExtra: 20 })).toBe(386);
+  });
+
+  it('mai no dona una alçada negativa', () => {
+    expect(alcadaPanellMegaslide({ p1ContentBottom: 10, gap: 0 })).toBe(0);
+    expect(alcadaPanellMegaslide({ p1ContentBottom: -100, gap: 0 })).toBe(0);
+  });
+
+  it('sense mesura valida retorna 0 (i el panell fa servir la reserva)', () => {
+    expect(alcadaPanellMegaslide({ p1ContentBottom: null })).toBe(0);
+    expect(alcadaPanellMegaslide({ p1ContentBottom: NaN })).toBe(0);
   });
 });
