@@ -120,7 +120,12 @@ html.scrollbar-compensate .offers-header-cart-open {
     --ring: 0 100% 50%;
 
     --radius: 0.5rem;
-    --page-band-belt-width: min(1350px, calc(100vw - 32px));
+    /* El belt es una PROPORCIO de la finestra: 1350 sobre 1920 = 70,3125%.
+       Abans era `min(1350px, 100vw - 32px)`, amb un sostre fix, i per aixo les
+       proporcions no es mantenien entre formats. El 70,3vw es la mateixa
+       formula que `getBeltWidth()` de layoutMetrics.js, aqui en CSS perque
+       aquestes alcades son calculs de CSS. */
+    --page-band-belt-width: min(calc(100vw - 32px), 70.3vw);
     --page-band-collection-intro-height: calc(76px + var(--page-band-belt-width) * 1780 / 2642);
     --page-band-title-height: calc(76px + var(--page-band-belt-width) * 1780 / 2642 * 9 / 24);
     --page-band-hero-height: calc(var(--page-band-belt-width) * 1780 / 2642 * 15 / 24);
