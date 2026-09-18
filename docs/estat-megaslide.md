@@ -163,6 +163,8 @@ Conseqüències:
   lloc que ocupava el reserva un fill amb `aspect-ratio` (vegeu punt 6).
 - **Franja de la banda estreta**: el `translateY(-15px)` era el que partia la
   graella de colors en dues meitats a 1025-1366 px (vegeu punt 6.bis).
+- **Franja ajustada a l'alçada**: en finestres curtes s'encongeix per no
+  menjar-se el panell (vegeu punt 6.ter).
 
 ### Comprovat el 18/9 (abans de tancar el testimoni)
 
@@ -318,11 +320,52 @@ que és **tauleta apaisada** (dibuix 19,89), no la banda estreta de desktop
 
 ---
 
+## 6.ter. La franja s'ajusta a l'alçada de la finestra — FET
+
+**El símptoma** (overt, 18/9): «el header i el megaslide són de la mateixa mida
+en un espai més petit». Amb una finestra de 706 px el panell feia 265 px (38%
+de la finestra) i el que hi ha a sota ja no hi cabia.
+
+**La causa**: tot el megaslide escala a partir de l'**amplada** (el belt de
+1350) i **res no mirava l'alçada de la finestra**. La franja de samarretes, que
+és la peça més alta, es quedava amb la mida de disseny dins d'un espai més
+petit.
+
+**La correcció** (`midesMegaslide.js`):
+
+```js
+factorAlcadaMegaslide(alcadaFinestra, esTauleta)  // 1 si tauleta; si no, clamp(alcada/800, 0.8, 1)
+```
+
+- S'aplica a l'**escala de la franja** i al seu **coixí de sota**, a les DUES
+  pàgines amb el mateix valor.
+- L'alçada del panell la segueix tota sola (surt del contingut de la pàgina 1) i
+  també la reserva (`defaultBleedGuardHeight`), que es multiplica pel factor.
+- **La detecció de tauleta es rep del dispositiu** (`isPortraitTablet ||
+  isLandscapeTablet` de `useDeviceLayout`), NO s'inventa amb amplades i
+  alçades: el primer intent la inferia i s'empassava el desktop (1280×800
+  compleix `h ≤ 1100 && w > h`), i a més separava les dues tauletes.
+
+**Mesures**:
+
+| mida | franja | panell | panell / finestra |
+|---|---|---|---|
+| 1280×706 | 132,2 → **116,6** | 265 → **249** | 38% → **35%** |
+| 1280×768 | 132,2 → **126,9** | 265 → **259** | 35% → **34%** |
+| 1280×800 | 132,2 | 265 | 33% (igual) |
+| 1366×768 | 141,9 → **136,2** | 284 → **278** | 37% → 36% |
+| 1440×900 / 1920×1080 | 141,9 | 261 | igual |
+| 1024×768 i 768×1024 tauleta | 100,4 / 101,6 | 205 / 227 | **identics** |
+
+- `node scripts/compara-vistes.mjs` → OK amb les xifres originals;
+  `npx vitest run` → 439 proves; `npx vite build` → OK.
+
+---
+
 ## 7. Pendents
 
-1. **Pujar els commits**: n'hi ha **9** de pendents (`git log --oneline origin/main..HEAD`),
-   més el canvi del punt 6 i el del 6.bis (aquests dos ja comesos localment) i
-   aquest testimoni.
+1. **Pujar els commits**: n'hi ha **12** de pendents (`git log --oneline origin/main..HEAD`),
+   més aquest testimoni.
    Inclouen la feina bona del cercador, la home i l'escala de tauleta, més els
    reverts de l'escala de desktop. **Demanar-ho abans de fer-ho.**
 2. **El mòbil**, que es farà a part (l'amo ho va dir així).
@@ -334,7 +377,6 @@ que és **tauleta apaisada** (dibuix 19,89), no la banda estreta de desktop
    (`resolvedMega`, `megaTileSelectorParams`, `onStartSelectorDrag`,
    `reorderAustenQuotes`, `austenSelectedDisableMulti`…). No fan cap mal, però
    es poden retallar quan es torni a la pàgina 2.
-5. **El «sobredimensionat» de la banda estreta** (overt, 18/9): l'amo diu que a
-   1280 el **header i el megaslide** li semblen massa grossos. Pendent
-   d'atacar; les peces interiors a 1280 són més petites que a 1440, així que la
-   sospita és la lletra i la densitat del panell.
+5. **El «sobredimensionat»**: el primer pas està fet (punt 6.ter: la franja
+   s'ajusta a l'alçada). Si encara es veu gros, les palanques que queden són la
+   mida de la graella (avui només depèn de l'amplada) i el nombre de files.
