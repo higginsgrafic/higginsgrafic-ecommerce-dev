@@ -419,9 +419,53 @@ tot sol. El contenidor viu a `CercadorTextRow` i es controla amb la prop
 
 ---
 
-## 7. Pendents
+## 8. El sistema de mesura, unificat (18/9, sessió llarga)
 
-1. **Pujar els commits**: n'hi ha **14** de pendents (`git log --oneline origin/main..HEAD`),
+**El problema de fons** (que va fer impossible el canvi de «baixa-ho 20 px»):
+la posició de les peces del megaslide no la decidia cap estil, sinó **sis bucles
+de retroalimentació** que es llegien i es reescrivien els uns als altres
+(`pageLift`, `alignTopRowToPage1`, `centraAmbLaGraellaDeColors`, `midesGraella`,
+`p1ContentBottomPx`, `guardHeightPx`). Cap peça tenia posició pròpia i el
+resultat depenia de l'ordre i del moment en què arribaven les mesures. Tres
+intents de tocar-ho van acabar pitjor que no tocar res.
+
+**El que s'ha fet** (4 commits, cada un verificat):
+
+| | què | on |
+|---|---|---|
+| Fase 0 | mòdul de mesura única + script de regressió + baseline de **833 xifres** | `src/utils/mesuraMegaslide.js`, `scripts/mesura-megaslide.mjs`, `tests/baseline-megaslide.json` |
+| Fase 1.1 | el càlcul de la graella (43 línies) surt de l'efecte i és **funció pura** | `src/components/fullwide/midesGraella.js` |
+| Fase 1.2 | els **dos bucles de la pàgina 2** (alineació + centratge) són **un sol efecte** | `MegaslidePagina2.jsx` |
+| Fase 1.3 | objectiu del `pageLift` i **alçada del panell**, funcions pures | `mesuraMegaslide.js` |
+
+**Ordres noves**:
+```bash
+npm run mesura:megaslide           # comprova les 833 xifres contra la baseline
+npm run mesura:megaslide:captura   # desa la baseline
+npm run mesura:megaslide:detall    # imprimeix totes les xifres
+```
+
+**Mètode que funciona** (i el que no): els bucles **no es poden traduir a una
+fórmula d'una passada** — convergeixen per iteracions, i el seu resultat depèn
+de l'ordre. Cal **traduir-los fidelment** (mateixes fórmules, mateix ordre,
+mateix llindar de 0,5 px) i deixar que el detector digui si és equivalent. Els
+dos intents de «fer-ho més net d'una passada» van donar desviacions de 10 a
+100 px.
+
+**El que queda bé**: tota la lògica de mesura viu ara en funcions pures amb
+**15 proves d'unitat** que la fixen. Els components només mesuren el DOM i hi
+criden.
+
+**El que es queda expressament**: el valor d'alçada desat al `localStorage`
+(`hg.megaPanelHeight.v1`). És un pegat per evitar el «rebot» en obrir (la mesura
+del contingut va canviant: 476 → 456 → 417). Treure'l canviaria un pegat per un
+salt visible, que és pitjor. Està documentat al codi.
+
+---
+
+## 9. Pendents
+
+1. **Pujar els commits**: n'hi ha **23** de pendents (`git log --oneline origin/main..HEAD`),
    més aquest testimoni.
    Inclouen la feina bona del cercador, la home i l'escala de tauleta, més els
    reverts de l'escala de desktop. **Demanar-ho abans de fer-ho.**
@@ -437,3 +481,6 @@ tot sol. El contenidor viu a `CercadorTextRow` i es controla amb la prop
 5. **El «sobredimensionat»**: el primer pas està fet (punt 6.ter: la franja
    s'ajusta a l'alçada). Si encara es veu gros, les palanques que queden són la
    mida de la graella (avui només depèn de l'amplada) i el nombre de files.
+6. **Els 20 px de marge a la banda estreta** (el canvi que va obrir tota aquesta
+   feina): amb el sistema ja unificat, ara hauria de ser factible. Cal mesurar
+   quin efecte té sobre les dues files i la franja, i validar-ho amb l'amo.
