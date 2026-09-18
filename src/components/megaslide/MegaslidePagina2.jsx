@@ -88,6 +88,13 @@ export default function MegaslidePagina2({
   // El vertical fa servir exactament les mateixes mides que l'apaisada: la
   // pagina es la mateixa, nomes que a vertical no s'hi veu sencera i cal
   // desplacar-la horitzontalment.
+  //
+  // PENDENT: aquesta mida encara no s'escala amb el belt (a 1280 fa 121 px i el
+  // selector de la pagina 1 en fa 84). No es pot escalar aixi com aixi: el
+  // bucle `alignTopRowToPage1` alinea el boto Color de les dues pagines i el
+  // desplaçament que hi aplica (`topVisualAlignmentY`) tambe mou la filera de
+  // dibuixos de la pagina 2; si el selector s'encongeix, la filera baixa 11 px
+  // i deixa de quadrar amb la de la pagina 1 (vegeu el punt 6.quater).
   const bnSliderSize = (compactMegaTileSize || 120) * ((isPortraitTablet || isLandscapeTablet) ? 0.94 : 1);
   // A la banda estreta, la filera de dalt de la pàgina 2 (el selector
   // Blanc/Color/Negre i la graella de colors) cau 38 px més avall que la de la

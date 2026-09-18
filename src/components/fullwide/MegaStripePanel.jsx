@@ -1,8 +1,9 @@
 import React, { useEffect, useState, useMemo } from 'react';
-import MegaColumn from './MegaColumn.jsx';
+import MegaColumn, { GAP_X_PX } from './MegaColumn.jsx';
 import ClicAreaOverlay from './ClicAreaOverlay.jsx';
 import { CERCADOR_COLORS } from './CercadorTopBar.jsx';
 import { STRIPE_DRAWING_CALIBRATIONS } from '../../config/stripeCalibrations';
+import { cssEscalaMega } from '../../utils/layoutMetrics.js';
 
 /**
  * Reserva d'espai de la graella vella a la pàgina 2.
@@ -20,7 +21,12 @@ import { STRIPE_DRAWING_CALIBRATIONS } from '../../config/stripeCalibrations';
  * El transform `scale(0.94)` del contenidor no canvia la geometria del flux;
  * per això la reserva es mesura amb la mida escalada del contenidor.
  */
-const RESERVA_ASPECTE = '8.77 / 1';
+// Alçada de la reserva de la graella de la pàgina 2 = la de la filera de la
+// pàgina 1. És la fórmula del MegaColumn, no un `aspect-ratio`: el tile és
+// `(belt − 8 separacions) / 9`, i a sobre hi van el marge de dalt del botó
+// (8 px) i el descendent de la seva línia (~5,96 px). Tot en px de LAYOUT (el
+// contenidor els escala al 0,94 en pintar-los).
+const RESERVA_ALCADA = `calc((var(--hg-mega-w, 1350px) - ${8 * GAP_X_PX}px * var(--hg-escala-mega, 1)) / 9 + 13.96px)`;
 
 /**
  * Banda estreta del megaslide: el desktop que no arriba al belt de 1350.
@@ -197,8 +203,14 @@ function MegaStripePanel({
           aria-hidden={reserveGridSpace ? true : undefined}
         >
           {reserveGridSpace ? (
-            /* Només reserva: el MegaColumn vell ja no s'ha de dibuixar (pàgina 2). */
-            <div style={{ width: '100%', aspectRatio: RESERVA_ASPECTE }} />
+            /* Només reserva: el MegaColumn vell ja no s'ha de dibuixar (pàgina 2).
+               L'alçada ha de ser EXACTAMENT la de la filera de la pàgina 1,
+               perquè la franja arrenqui a la mateixa alçada a les dues pàgines.
+               Es reprodueix la fórmula del MegaColumn (vegeu `RESERVA_ALCADA`),
+               que no és proporcional al belt: la separació de 12 px i el marge
+               de dalt de 8 px s'escalen amb el belt i el descendent de la línia
+               del botó (~5,1 px) no. */
+            <div style={{ width: '100%', height: RESERVA_ALCADA }} />
           ) : (
             (resolvedMega[active] || []).map((col, idx) => (
               <MegaColumn
@@ -264,7 +276,7 @@ function MegaStripePanel({
               id="stripe-guide-stripe-row"
               className="relative inline-block"
               style={{
-                height: `${stripePreviewHPx}px`,
+                height: cssEscalaMega(stripePreviewHPx),
                 width: 'auto',
               }}
             >
@@ -304,7 +316,10 @@ function MegaStripePanel({
                   // en una finestra curta, la seva mida de disseny no hi cap i es
                   // menja el panell. MegaStripePanelP1 (pagina 1) fa el mateix
                   // amb el mateix factor, perque les dues franges quedin igual.
-                  transform: `translate(var(--megaStripeDx, 0px), calc(var(--megaStripeDy, 0px) + ${visualOffsetY}px)) scale(calc(var(--megaStripeScale, 1.2125) * ${fitAlcada} * var(--hg-escala-mega, 1)))`,
+                  // El desplaçament ve de les variables de calibracio i NO
+                  // s'escala (el `translate` va abans de l'`scale`: és en px del
+                  // pare). El que s'escala és la mida de la filera.
+                  transform: `translate(var(--megaStripeDx, 0px), calc(var(--megaStripeDy, 0px) + ${visualOffsetY}px)) scale(calc(var(--megaStripeScale, 1.2125) * ${fitAlcada}))`,
                   isolation: 'isolate',
                 }}
               >
