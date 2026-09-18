@@ -2247,10 +2247,9 @@ function FullWideSlideHeader({
       // s'alineïn amb belt2 quan és vàlid, i caiguin a fallback si està contaminat.
       try {
         const root = document.documentElement;
-        // Forcat de vista desktop: en una pantalla sense touch mes estreta que
-        // la mida de disseny, el mega-slide es compon a 1350 i la pantalla el
-        // pot desplacar, en comptes d'encongir-ho tot (que es el que feia que
-        // un portatil de 1280 semblés una tauleta).
+        // Grup desktop: el mega-slide es compon a la mida de disseny (1350) i
+        // la seva propia escala l'encaixa a la pantalla. Aixi un portatil de
+        // 1280 veu el desktop sencer, una mica mes petit.
         const forcatDesktop = !isPortraitTablet && !isLandscapeTablet
           && (window.navigator.maxTouchPoints || 0) === 0
           && window.innerWidth < 1382;
