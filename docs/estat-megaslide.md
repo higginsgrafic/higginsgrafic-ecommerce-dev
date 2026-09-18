@@ -165,6 +165,9 @@ Conseqüències:
   graella de colors en dues meitats a 1025-1366 px (vegeu punt 6.bis).
 - **Franja ajustada a l'alçada**: en finestres curtes s'encongeix per no
   menjar-se el panell (vegeu punt 6.ter).
+- **Filera de dalt quadrada amb la pàgina 1**: el selector i els cercles de la
+  pàgina 2 queden a la mateixa alçada que els de la 1 a la banda estreta
+  (vegeu punt 6.quater).
 
 ### Comprovat el 18/9 (abans de tancar el testimoni)
 
@@ -362,9 +365,60 @@ factorAlcadaMegaslide(alcadaFinestra, esTauleta)  // 1 si tauleta; si no, clamp(
 
 ---
 
+## 6.quater. La filera de dalt, quadrada amb la pàgina 1 — FET
+
+**El símptoma** (overt, 18/9): en canviar entre la pàgina 1 i la 2, el selector
+Blanc/Color/Negre i els cercles de color no quedaven a la mateixa alçada.
+
+**Les xifres** (1280×706, pàgina 1 vs pàgina 2):
+
+| | pàgina 1 | pàgina 2 | diferència |
+|---|---|---|---|
+| selector (botó COLOR) | 171,1 | 209,1 | **+38,0 px** |
+| selector a 1366×768 | 174,1 | 212,9 | +38,8 |
+| selector a 1440×900 | 164,7 | 173,4 | +8,7 |
+
+**La causa**: a la pàgina 1 la filera de dalt viu dins del `MegaColumn` i a la 2
+en blocs absoluts propis, i el `top` de partida és 38 px més baix.
+
+**El parany (important per al proper cop)**: la posició d'aquesta filera **no la
+decideix cap `top`**, la decideixen dos bucles d'auto-calibratge:
+
+1. `alignTopRowToPage1` (`MegaslidePagina2.jsx:208`) iguala el selector de la 2
+   amb el de la 1.
+2. `centraAmbLaGraellaDeColors` (línia 247) centra el selector amb la graella
+   de colors.
+
+El segon mana: el selector acaba clavat al centre de la graella de colors.
+**Desplaçar el `top` del `CercadorTextRow` no serveix** — el primer bucle ho
+compensa i la filera torna al mateix lloc (comprovat: el contenidor es movia de
+132,8 a 170,8 i la graella no es movia de 172,8).
+
+**La solució**: desplaçar **el contenidor de la graella de colors** (40 → 2 px
+a la banda estreta). La graella puja, i el segon bucle hi centra el selector
+tot sol. El contenidor viu a `CercadorTextRow` i es controla amb la prop
+`desplacamentVertical`.
+
+**Verificació**:
+
+| mida | delta del selector | franja | panell |
+|---|---|---|---|
+| 1280×706 | **0,0 px** | 287,8 (=) | 249 (=) |
+| 1280×800 | **0,0** | 287,8 (=) | 265 (=) |
+| 1366×768 | **0,8** | 297,6 (=) | 278 (=) |
+| 1440 / 1920 | 8,7 (igual que abans) | 274,4 | 261 |
+| 1024×768 i 768×1024 tauleta | igual que abans | igual | igual |
+
+- Comparador **OK**, 439 proves, build OK.
+- **`isLandscapeTablet` s'ha d'excloure a posta**: 1024×768 també compleix
+  «ample ≥ alt» i és tauleta; incloure-hi-la li baixava la filera 38 px (el
+  comparador no ho caça perquè no mira aquesta alçada, però es veu a l'ull).
+
+---
+
 ## 7. Pendents
 
-1. **Pujar els commits**: n'hi ha **12** de pendents (`git log --oneline origin/main..HEAD`),
+1. **Pujar els commits**: n'hi ha **14** de pendents (`git log --oneline origin/main..HEAD`),
    més aquest testimoni.
    Inclouen la feina bona del cercador, la home i l'escala de tauleta, més els
    reverts de l'escala de desktop. **Demanar-ho abans de fer-ho.**
