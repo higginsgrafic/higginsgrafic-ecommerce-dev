@@ -262,6 +262,7 @@ export default function MegaslidePagina2({
     if (!active) return undefined;
     let frame = 0;
     let settleTimer = 0;
+    let settleTimer2 = 0;
 
     const ajusta = () => {
       const page1Viewport = document.querySelector('[data-mega-page-viewport="1"]');
@@ -309,11 +310,16 @@ export default function MegaslidePagina2({
     };
 
     ajusta();
+    // Dues passades de repas: la segona torna a mesurar amb el DOM ja pintat.
+    // Amb una de sola, si el fila es pinta despres del timer, el bucle es quedava
+    // amb un residu d'1,8 px que canviava d'una execucio a l'altra.
     settleTimer = window.setTimeout(schedule, 180);
+    settleTimer2 = window.setTimeout(schedule, 600);
     window.addEventListener('resize', schedule);
     return () => {
       cancelAnimationFrame(frame);
       window.clearTimeout(settleTimer);
+      window.clearTimeout(settleTimer2);
       window.removeEventListener('resize', schedule);
     };
   }, [active, bnSliderSize, isPortraitTablet, isLandscapeTablet, page1PageLift, esBandaEstreta]);
@@ -415,10 +421,11 @@ export default function MegaslidePagina2({
             style={{
             position: 'absolute',
             top: `calc(var(--hg-cercador-bar-top, 0px) + ${40 + ((typeof window !== 'undefined' && window.innerWidth >= 768 && window.innerWidth <= 1366 && window.innerWidth >= window.innerHeight) ? 5 : 0)}px)`,
-            // Dins el carril: 27 px de disseny a l'esquerra i la mida del tile
-            // del carril (`carrilPx`). Abans eren px de la finestra i a 1280 el
-            // selector feia 121 px mentre el de la pagina 1 en feia 87.
-            left: carrilLane(27),
+            // El selector arrenca on arrenca el logo del header: la franja
+            // central es [left del logo, right de la icona d'usuari] i el seu
+            // marge es el coixi de la fila del header (40 px de disseny, el
+            // mateix `carrilPx(40)` que fa servir alla).
+            left: carrilPx(40),
             width: carrilPx(bnSliderSize),
             height: carrilPx(bnSliderSize),
             zIndex: 4,

@@ -52,15 +52,17 @@ export const GRAELLA_PAS_COLORS = 33;
 // filera es doncs la del disseny, amb la mateixa proporcio del carril a cada
 // banda:
 //
-//   13% (175,5 px: el marge del selector son 2% + el 10% de la filera) i
-//    3% (40,5 px) a la dreta, o sigui el conjunt queda amb ~27 px a cada banda
-//   (27 el selector, ~28 la llista: el nom mes llarg el fixa la font).
+// El marge dret es el mateix coixi de 40 px que fa servir la fila del header:
+// la llista s'enrasa a la dreta de la seva columna, de manera que el text acaba
+// exactament on acaba la columna, que es on acaba la icona d'usuari.
+//
+//   13% (175,5 px) a l'esquerra i 40 px a la dreta.
 //
 // Son proporcions DEL CARRIL (1350 px de referencia): a CercadorTextRow es
 // passen a `% del carril`.
 export const BLOC_DRETA_DIBUIXOS_ESCRIPTORI_PX = 240;
 export const MARGE_ESQUERRA_DIBUIXOS_ESCRIPTORI_PX = 175.5;
-export const MARGE_DRET_FILERA_ESCRIPTORI_PX = 40.5;
+export const MARGE_DRET_FILERA_ESCRIPTORI_PX = 40;
 
 // Desktop: dibuix de 30 px (60% de la base 1:1). La separació horitzontal és
 // la que fa que les 16 columnes continuïn ocupant els 875 px de referència:

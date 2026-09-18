@@ -102,18 +102,21 @@ describe('centratge del conjunt de la pagina 2', () => {
     expect(BLOC_DRETA_DIBUIXOS_ESCRIPTORI_PX).toBe(78 + 10 + 142 + 10);
   });
 
-  it("al carril de 1350, el conjunt queda amb el mateix marge a cada banda", () => {
+  it('al carril de 1350 la composicio encaixa a la franja central del header', () => {
     const carril = 1350;
     const ampleDibuixos = carril - MARGE_ESQUERRA_DIBUIXOS_ESCRIPTORI_PX
       - BLOC_DRETA_DIBUIXOS_ESCRIPTORI_PX - MARGE_DRET_FILERA_ESCRIPTORI_PX;
-    expect(ampleDibuixos).toBeCloseTo(894, 5);
-    // El marge de l'esquerra del conjunt es el del selector (2% del carril).
-    expect(carril * 0.02).toBeCloseTo(27, 5);
-    // I el de la dreta, el que queda fins a la llista (142 de columna menys
-    // 114,2 que ocupa el nom mes llarg + el seu desplaçament de 45).
-    const dret = MARGE_DRET_FILERA_ESCRIPTORI_PX + 142 - (109.2 + 45);
-    expect(dret).toBeCloseTo(28.3, 1);
-    expect(Math.abs(dret - carril * 0.02)).toBeLessThan(2);
+    // La columna dels dibuixos queda una mica mes estreta que el contingut de
+    // la graella (875 px): els dibuixos no s'encongirien perque el factor
+    // d'amplada esta limitat a 1.
+    expect(ampleDibuixos).toBeCloseTo(894.5, 1);
+    expect(ampleDibuixos).toBeGreaterThanOrEqual(875);
+    // El marge esquerre de la filera es mes gran que el de la franja: qui
+    // arrenca a la franja del header es el selector (40 px de disseny).
+    expect(MARGE_ESQUERRA_DIBUIXOS_ESCRIPTORI_PX).toBeGreaterThan(40);
+    // La llista s'enrasa a la dreta de la seva columna, aixi que el marge dret
+    // de la composicio es exactament el de la filera: el coixi del header.
+    expect(MARGE_DRET_FILERA_ESCRIPTORI_PX).toBe(40);
   });
 });
 

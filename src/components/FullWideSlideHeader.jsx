@@ -2844,7 +2844,12 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
             // logo. A tauleta es queden les classes (el seu disseny es a part).
             paddingLeft: esTauleta ? undefined : carrilPx(40),
             paddingRight: esTauleta ? undefined : carrilPx(40),
-            columnGap: esTauleta ? undefined : carrilPx(12),
+            // El gap es tambe una mida del carril, i es el que fa que el nav hi
+            // cabi: a 1280 el seu contingut demanava 5,5 px mes del que li
+            // deixaven logo i icones, i la icona d'usuari queia 5,5 px mes
+            // enlla de la franja. Com que el nav va centrat, el gap no es veu:
+            // nomes li canvia l'espai disponible.
+            columnGap: esTauleta ? undefined : carrilPx(6),
           }}
         >
           <div className="flex items-center gap-2 lg:gap-2">
