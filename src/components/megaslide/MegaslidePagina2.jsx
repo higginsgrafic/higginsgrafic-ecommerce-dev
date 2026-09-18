@@ -88,6 +88,27 @@ export default function MegaslidePagina2({
   // pagina es la mateixa, nomes que a vertical no s'hi veu sencera i cal
   // desplacar-la horitzontalment.
   const bnSliderSize = (compactMegaTileSize || 120) * ((isPortraitTablet || isLandscapeTablet) ? 0.94 : 1);
+  // A la banda estreta, la filera de dalt de la pàgina 2 (el selector
+  // Blanc/Color/Negre i la graella de colors) cau 38 px més avall que la de la
+  // pàgina 1: allà la filera viu dins del MegaColumn i aquí en blocs propis.
+  // El senyal visible és que el selector i els cercles no queden a la mateixa
+  // alçada que els de la pàgina 1 en canviar de pàgina.
+  //
+  // El desplaçament va al contenidor de la graella de colors (40 -> 2 px), i
+  // NO al `top` del CercadorTextRow: aquell el reescriu el bucle
+  // `alignTopRowToPage1`, que el compensaria. El selector segueix la graella
+  // tot sol, perquè `centraAmbLaGraellaDeColors` el centra amb ella.
+  //
+  // La franja de samarretes no es mou: depèn del contingut de la pàgina 1.
+  //
+  // El `!isLandscapeTablet` és imprescindible: 1024×768 també compleix
+  // «ample ≥ alt» i NO és la banda estreta, és la tauleta apaisada. Si hi
+  // entra, se li baixa la filera 38 px i se li desquadra el selector.
+  const esBandaEstreta = typeof window !== 'undefined'
+    && !isLandscapeTablet
+    && window.innerWidth >= 768 && window.innerWidth <= 1366
+    && window.innerWidth >= window.innerHeight;
+  const topGraellaColors = 40 - (esBandaEstreta ? 38 : 0);
   const [topVisualAlignmentY, setTopVisualAlignmentY] = useState(0);
   // Desplaçament propi del selector Blanc/Color/Negre perquè quedi centrat amb
   // la graella de colors. Va a part de topVisualAlignmentY (que alinea el
@@ -404,6 +425,7 @@ export default function MegaslidePagina2({
           <CercadorTextRow
             compact
             leftOffset={30}
+            desplacamentVertical={40 - topGraellaColors}
             isPortraitTablet={isPortraitTablet}
             isLandscapeTablet={isLandscapeTablet}
             activeCollection={active}

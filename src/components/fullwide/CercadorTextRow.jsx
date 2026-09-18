@@ -407,7 +407,7 @@ function Group({ group, isFirst, dimmed, clickable, selectedStripeItem, hoveredS
   );
 }
 
-function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripeItem, hoveredStripeItem, onSelectGroup, onHoverItem, onHoverLeave, compact = false, selectedColor = 'white', onSelectColor, onSelectCollection, isPortraitTablet = false, isLandscapeTablet = false, leftOffset = 0, uniformColumns = false, fontBoost = 0 }) {
+function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripeItem, hoveredStripeItem, onSelectGroup, onHoverItem, onHoverLeave, compact = false, selectedColor = 'white', onSelectColor, onSelectCollection, isPortraitTablet = false, isLandscapeTablet = false, leftOffset = 0, uniformColumns = false, fontBoost = 0, desplacamentVertical = 0 }) {
   // Ajust de la graella compacta a l'espai disponible (només desktop: les
   // tauletes mantenen la mida fixa de moment). Mesurem l'amplada de la columna
   // i el capdamunt de la franja de samarretes, i guardem la mida de dibuix i
@@ -539,7 +539,11 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
       <div
         style={{
           position: 'absolute',
-          top: '40px',
+          // `desplacamentVertical` el fa servir la pàgina 2 per quadrar aquesta
+          // filera amb la de la pàgina 1 a la banda estreta. El selector
+          // Blanc/Color/Negre la segueix tot sol (es centra amb la graella de
+          // colors), i la franja de samarretes no es mou perquè no en depèn.
+          top: `${40 - desplacamentVertical}px`,
           left: `calc(${isPortraitTablet ? '93px' : (isLandscapeTablet ? '93px' : '105px')} + ${leftOffset}px)`,
           right: '0px',
           display: 'grid',
