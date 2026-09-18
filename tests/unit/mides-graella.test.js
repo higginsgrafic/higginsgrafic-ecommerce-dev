@@ -35,25 +35,27 @@ describe('midesGraellaCompacta', () => {
     expect(m.gapV).toBeCloseTo(colorPas(false, false) - m.dibuix, 5);
   });
 
-  it("si la columna és més estreta que la referència, redueix tot proporcionalment", () => {
-    // 798 px és el que té la columna de la graella a 1280x706, el cas que
-    // durant setmanes va quedar desquadrat.
+  it("si la columna és més estreta que la referència, primer s'encongeixen les separacions", () => {
+    // 798 px és el que té la columna de la graella a 1280x706. El dibuix es
+    // queda a la seva mida de disseny escalada amb el carril (30) i el que es
+    // comprimeix són els gaps: és el que evita que, a 1440/1280, la columna de
+    // col·leccions caigui sobre la graella de colors.
     const m = midesGraellaCompacta({ ampleAmple: 798, sostre: 400, daltGraella: 100 });
-    const factor = 798 / AMPLE_BASE_DESKTOP();
-    expect(m.dibuix).toBeCloseTo(30 * factor, 5);
-    expect(m.gapH).toBeCloseTo(gapHorizontal(false, false) * factor, 5);
-    // El resultat clau: 27,36 px de dibuix, que és el que es veu al navegador.
-    expect(m.dibuix).toBeCloseTo(27.36, 2);
+    expect(m.dibuix).toBeCloseTo(30, 5);
+    expect(m.gapH).toBeCloseTo((798 - GRAELLA_COLUMNES * 30) / (GRAELLA_COLUMNES - 1), 5);
+    // El pas vertical no pot ser més gran que la separació horitzontal.
+    expect(m.gapV).toBeLessThanOrEqual(m.gapH);
   });
 
   it("si l'alçada no hi cap, primer es redueix el pas vertical (fins a 0)", () => {
-    // 138 px d'espai: hi caben els 4 dibuixos de 27,36 (109,4) però no amb el
-    // pas dels cercles (131,4). S'ha de reduir el pas, no el dibuix.
     const ample = 798;
-    const m = midesGraellaCompacta({ ampleAmple: ample, sostre: 240, daltGraella: 100 });
+    // Amb els dibuixos a 30, les quatre files fan 120 px i el pas dels cercles
+    // (3) en demana 9 més. Amb 126 px d'espai el pas s'ha d'encongir, però el
+    // dibuix no s'ha de tocar.
+    const m = midesGraellaCompacta({ ampleAmple: ample, sostre: 228, daltGraella: 100 });
     expect(m.gapV).toBeGreaterThanOrEqual(0);
     expect(m.gapV).toBeLessThan(3);
-    expect(alçadaGraella(m)).toBeLessThanOrEqual(240 - 100 - GRAELLA_MARGE_FRANJA + 0.001);
+    expect(alçadaGraella(m)).toBeLessThanOrEqual(228 - 100 - GRAELLA_MARGE_FRANJA + 0.001);
     // El dibuix no s'ha de tocar: és el mateix que sense límit d'alçada.
     const senseLimit = midesGraellaCompacta({ ampleAmple: ample, sostre: 400, daltGraella: 100 });
     expect(m.dibuix).toBeCloseTo(senseLimit.dibuix, 5);
@@ -67,11 +69,10 @@ describe('midesGraellaCompacta', () => {
 
   it('sense sostre (franja no mesurada) no toca res: deixa les mides de la pantalla', () => {
     // Sense sostre no s'aplica ni el pas dels cercles: queden les mides de
-    // reserva (el pas base escalat per l'amplada), que és el que fa que la
+    // reserva (el pas base escalat amb el carril), que és el que fa que la
     // graella neixi raonable abans que la franja estigui mesurada.
     const m = midesGraellaCompacta({ ampleAmple: 798, sostre: null, daltGraella: 100 });
-    const factor = 798 / AMPLE_BASE_DESKTOP();
-    expect(m.gapV).toBeCloseTo(gapVertical(false, false) * factor, 5);
+    expect(m.gapV).toBeCloseTo(gapVertical(false, false), 5);
   });
 
   it('a tauleta fa servir les mides de tauleta, no les de desktop', () => {

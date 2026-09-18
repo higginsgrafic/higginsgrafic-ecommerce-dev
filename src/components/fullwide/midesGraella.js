@@ -149,19 +149,36 @@ export function gapVertical(isPortraitTablet, isLandscapeTablet) {
  * @param {boolean} entrada.isLandscapeTablet
  * @returns {{dibuix:number, gapH:number, gapV:number}}
  */
-export function midesGraellaCompacta({ ampleAmple, sostre, daltGraella, isPortraitTablet = false, isLandscapeTablet = false }) {
+export function midesGraellaCompacta({ ampleAmple, sostre, daltGraella, isPortraitTablet = false, isLandscapeTablet = false, escala = 1 }) {
   const base = midaDibuix(isPortraitTablet, isLandscapeTablet);
   const gapHBase = gapHorizontal(isPortraitTablet, isLandscapeTablet);
   const gapVBase = gapVertical(isPortraitTablet, isLandscapeTablet);
-  const ampleBase = GRAELLA_COLUMNES * base + (GRAELLA_COLUMNES - 1) * gapHBase;
 
-  // 1) Amplada: si la columna és més estreta que la graella de referència,
-  //    reduïm tot proporcionalment.
-  const factorAmple = ampleAmple > 0 && ampleBase > 0 ? Math.min(1, ampleAmple / ampleBase) : 1;
-  let dibuix = base * factorAmple;
+  // 1) Amplada. El dibuix té la seva mida de disseny escalada amb el carril
+  //    (`base x escala`) i el que s'encongeix PRIMER són les separacions: quan
+  //    l'espai va just, els dibuixos mantenen la mida i els gaps es
+  //    comprimeixen. Només si les separacions arriben a zero es redueix el
+  //    dibuix. (Ho va demanar l'amo: a 1440/1280 la columna de col·leccions
+  //    queia sobre la graella de colors i el que ha de cedir és el dibuix.)
+  let dibuix = base * escala;
+  let gapH = gapHBase * escala;
+  let gapV = gapVBase * escala;
+  if (ampleAmple > 0) {
+    const ampleNecessari = GRAELLA_COLUMNES * dibuix + (GRAELLA_COLUMNES - 1) * gapH;
+    if (ampleNecessari > ampleAmple) {
+      const gapNecessari = (ampleAmple - GRAELLA_COLUMNES * dibuix) / (GRAELLA_COLUMNES - 1);
+      if (gapNecessari >= 0) {
+        gapH = gapNecessari;
+        gapV = Math.min(gapV, gapH);
+      } else {
+        // Ni sense separacions: s'encongeix el dibuix.
+        gapH = 0;
+        gapV = 0;
+        dibuix = ampleAmple / GRAELLA_COLUMNES;
+      }
+    }
+  }
   const factorDibuixEff = base > 0 ? dibuix / base : 1;
-  let gapH = gapHBase * factorAmple;
-  let gapV = gapVBase * factorAmple;
 
   // 2) Alçada: les files de dibuixos han de quedar alineades amb les files de
   //    la graella de colors (mateix pas vertical). Si amb aquest pas la graella

@@ -8,7 +8,7 @@ import {
   midesGraellaCompacta,
   MARGE_ESQUERRA_DIBUIXOS_ESCRIPTORI_PX, MARGE_DRET_FILERA_ESCRIPTORI_PX,
 } from './midesGraella.js';
-import { carrilPct, carrilLane, carrilPx } from '../../utils/layoutMetrics.js';
+import { carrilPct, carrilLane, carrilPx, readRootCssNumber } from '../../utils/layoutMetrics.js';
 
 /**
  * CercadorTextRow
@@ -348,7 +348,7 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
 
       // El càlcul viu a midesGraella.js (funció pura, comprovable sense
       // navegador). Aquí només se li passen les mesures de la pantalla.
-      const next = midesGraellaCompacta({ ampleAmple, sostre, daltGraella, isPortraitTablet, isLandscapeTablet });
+      const next = midesGraellaCompacta({ ampleAmple, sostre, daltGraella, isPortraitTablet, isLandscapeTablet, escala: readRootCssNumber('--hg-escala-mega', 1) });
 
       const previ = midesRef.current;
       const igual = previ
@@ -566,7 +566,20 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
             sigui el nom mes llarg ni del cos de lletra. Abans la columna era
             `fit-content` i el conjunt es desplaçava 45 px, i per aixo el text
             acaba 12 px mes enlla de la franja. */}
-        <div style={{ width: '100%', transform: uniformColumns ? 'translateX(120px)' : undefined }}>
+        <div
+          style={{
+            width: '100%',
+            transform: uniformColumns ? 'translateX(120px)' : undefined,
+            // La graella de colors te la seva columna (78) i el seu contingut
+            // (4 cercles i 3 separacions) en surt: aquest coixí es la part que
+            // sobresurt, perque la llista no hi caigui a sobre. La filera es
+            // qui cedeix espai (vegeu midesGraellaCompacta: s'encongeixen
+            // primer les separacions dels dibuixos).
+            // (A la banda estreta els cercles van 10 px a la dreta, o sigui que
+            // tambe compten per al coixi.)
+            paddingLeft: `max(0px, calc(${4 * cerclePx + 3 * colorGapPx}px + ${esBandaEstreta ? carrilLane(10) : '0px'} - ${carrilLane(78)} - ${carrilLane(10)}))`,
+          }}
+        >
           {CERCADOR_COLLECTIONS.map(({ key, label }) => (
             <button
               key={key}
