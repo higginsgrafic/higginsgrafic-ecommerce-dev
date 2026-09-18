@@ -41,21 +41,26 @@ export const GRAELLA_PAS_COLORS = 33;
 // ============================================================
 // CENTRATGE HORITZONTAL DEL BLOC DE DIBUIXOS (nomes escriptori)
 // ============================================================
-// El bloc de dibuixos s'ha de veure centrat dins el belt. A la seva dreta hi ha
-// la columna de colors i la llista de col·leccions, que sumen 240 px:
+// La filera de la pagina 2 te, a la dreta dels dibuixos, la columna de colors
+// i la llista de col·leccions, que sumen 240 px:
 //
 //   BLOC_DRETA = 78 (cercles) + 10 + 142 (llista) + 10 (separacio) = 240
 //
-// Perque el bloc quedi centrat, el marge esquerre i el desbordament dret del
-// seu contenidor han de SUMAR aquests 240 px:
+// El que ha de quedar centrat dins el carril es el CONJUNT (selector -> llista),
+// no els dibuixos: amb els dibuixos centrats, les 240 px de la dreta empenyien
+// el conjunt cap a la dreta i la llista sortia del carril. La posicio de la
+// filera es doncs la del disseny, amb la mateixa proporcio del carril a cada
+// banda:
 //
-//   228 (marge esquerre del carril) + 12 (desbordament dret) = 240
+//   13% (175,5 px: el marge del selector son 2% + el 10% de la filera) i
+//    3% (40,5 px) a la dreta, o sigui el conjunt queda amb ~27 px a cada banda
+//   (27 el selector, ~28 la llista: el nom mes llarg el fixa la font).
 //
-// Son proporcions DEL CARRIL (1350 px de referencia), no px de cap format: a
-// CercadorTextRow es passen a `% del carril`.
+// Son proporcions DEL CARRIL (1350 px de referencia): a CercadorTextRow es
+// passen a `% del carril`.
 export const BLOC_DRETA_DIBUIXOS_ESCRIPTORI_PX = 240;
-export const MARGE_ESQUERRA_DIBUIXOS_ESCRIPTORI_PX = 228;
-export const DESBORDAMENT_DRET_DIBUIXOS_ESCRIPTORI_PX = 12;
+export const MARGE_ESQUERRA_DIBUIXOS_ESCRIPTORI_PX = 175.5;
+export const MARGE_DRET_FILERA_ESCRIPTORI_PX = 40.5;
 
 // Desktop: dibuix de 30 px (60% de la base 1:1). La separació horitzontal és
 // la que fa que les 16 columnes continuïn ocupant els 875 px de referència:

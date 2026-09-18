@@ -3,7 +3,7 @@ import {
   midesGraellaCompacta, midaDibuix, gapHorizontal, gapVertical, colorPas,
   GRAELLA_COLUMNES, GRAELLA_FILES, GRAELLA_MARGE_FRANJA,
   BLOC_DRETA_DIBUIXOS_ESCRIPTORI_PX, MARGE_ESQUERRA_DIBUIXOS_ESCRIPTORI_PX,
-  DESBORDAMENT_DRET_DIBUIXOS_ESCRIPTORI_PX,
+  MARGE_DRET_FILERA_ESCRIPTORI_PX,
 } from '../../src/components/fullwide/midesGraella.js';
 import { deltaObjectiuPageLift, alcadaPanellMegaslide, desplacamentFranjaEscriptori } from '../../src/utils/mesuraMegaslide.js';
 
@@ -88,33 +88,32 @@ describe('midesGraellaCompacta', () => {
   });
 });
 
-describe('centratge del bloc de dibuixos', () => {
-  // El bloc de dibuixos ha de quedar centrat dins el belt. Com que a la seva
-  // dreta hi ha la columna de colors i la llista de col·leccions, el bloc
-  // només queda centrat si el marge esquerre i el desbordament dret del seu
-  // contenidor SUMEN l'amplada d'aquella columna.
-  it('el marge esquerre i el desbordament dret sumen la columna de la dreta', () => {
-    expect(MARGE_ESQUERRA_DIBUIXOS_ESCRIPTORI_PX + DESBORDAMENT_DRET_DIBUIXOS_ESCRIPTORI_PX)
-      .toBeCloseTo(BLOC_DRETA_DIBUIXOS_ESCRIPTORI_PX, 5);
+describe('centratge del conjunt de la pagina 2', () => {
+  // El que ha de quedar centrat dins el carril es el conjunt (selector ->
+  // llista de col·leccions), no els dibuixos: a la dreta dels dibuixos hi ha la
+  // columna de colors i la llista, que sumen 240 px.
+  it('la filera i el bloc de la dreta deixen el carril quadrat', () => {
+    expect(MARGE_ESQUERRA_DIBUIXOS_ESCRIPTORI_PX + BLOC_DRETA_DIBUIXOS_ESCRIPTORI_PX
+      + MARGE_DRET_FILERA_ESCRIPTORI_PX).toBeLessThanOrEqual(1350);
   });
 
-  it('la columna de la dreta és la dels cercles i la llista més les separacions', () => {
-    // 4 columnes de 78 + la llista de 142 + les dues separacions de 10.
+  it('el bloc de la dreta és la columna de colors i la llista més les separacions', () => {
+    // 78 de cercles + 10 + 142 de llista + 10.
     expect(BLOC_DRETA_DIBUIXOS_ESCRIPTORI_PX).toBe(78 + 10 + 142 + 10);
   });
 
-  it('al carril de 1350 el bloc queda amb els dos marges iguals', () => {
-    // El carril fa 1350 px de referencia i la filera hi viu a dins: arrenca al
-    // marge esquerre i el desbordament dret la deixa 12 px mes enlla (per la
-    // columna de colors i la llista). Els numeros de referencia: el bloc de
-    // dibuixos fa 894 px i queda amb 228 px a cada banda del carril.
+  it("al carril de 1350, el conjunt queda amb el mateix marge a cada banda", () => {
     const carril = 1350;
-    const esquerraBloc = MARGE_ESQUERRA_DIBUIXOS_ESCRIPTORI_PX;
-    const dretaBloc = carril + DESBORDAMENT_DRET_DIBUIXOS_ESCRIPTORI_PX;
-    const ampleDibuixos = dretaBloc - esquerraBloc - BLOC_DRETA_DIBUIXOS_ESCRIPTORI_PX;
-    expect(esquerraBloc).toBeCloseTo(228, 5);
+    const ampleDibuixos = carril - MARGE_ESQUERRA_DIBUIXOS_ESCRIPTORI_PX
+      - BLOC_DRETA_DIBUIXOS_ESCRIPTORI_PX - MARGE_DRET_FILERA_ESCRIPTORI_PX;
     expect(ampleDibuixos).toBeCloseTo(894, 5);
-    expect(carril - (esquerraBloc + ampleDibuixos)).toBeCloseTo(esquerraBloc, 5);
+    // El marge de l'esquerra del conjunt es el del selector (2% del carril).
+    expect(carril * 0.02).toBeCloseTo(27, 5);
+    // I el de la dreta, el que queda fins a la llista (142 de columna menys
+    // 114,2 que ocupa el nom mes llarg + el seu desplaçament de 45).
+    const dret = MARGE_DRET_FILERA_ESCRIPTORI_PX + 142 - (109.2 + 45);
+    expect(dret).toBeCloseTo(28.3, 1);
+    expect(Math.abs(dret - carril * 0.02)).toBeLessThan(2);
   });
 });
 

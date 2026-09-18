@@ -6,7 +6,7 @@ import {
   GRAELLA_COLUMNES, GRAELLA_FILES, GRAELLA_ESQUERRA_LANDSCAPE,
   midaDibuix, gapHorizontal, gapVertical, colorMida, colorGap,
   midesGraellaCompacta,
-  MARGE_ESQUERRA_DIBUIXOS_ESCRIPTORI_PX, DESBORDAMENT_DRET_DIBUIXOS_ESCRIPTORI_PX,
+  MARGE_ESQUERRA_DIBUIXOS_ESCRIPTORI_PX, MARGE_DRET_FILERA_ESCRIPTORI_PX,
 } from './midesGraella.js';
 import { carrilPct, carrilPx } from '../../utils/layoutMetrics.js';
 
@@ -427,13 +427,12 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
           // colors), i la franja de samarretes no es mou perquè no en depèn.
           top: `${40 - desplacamentVertical}px`,
           // TOT el que hi ha dins el carril son proporcions SEVES (1350 px de
-          // referencia, vegeu `carrilPct`): el bloc de dibuixos queda centrat
-          // (marge esquerre + desbordament dret = els 240 px de la columna de
-          // colors i la llista) i les columnes i separacions tambe. Aixi el
-          // mateix carril serveix a tots els formats.
+          // referencia, vegeu `carrilPct`): la posicio de la filera i les seves
+          // columnes i separacions. Aixi el mateix carril serveix a tots els
+          // formats.
           // Les tauletes son un disseny a part i mantenen els seus px.
           left: esTauleta ? '123px' : carrilPct(MARGE_ESQUERRA_DIBUIXOS_ESCRIPTORI_PX),
-          right: esTauleta ? '0px' : carrilPct(-DESBORDAMENT_DRET_DIBUIXOS_ESCRIPTORI_PX),
+          right: esTauleta ? '0px' : carrilPct(MARGE_DRET_FILERA_ESCRIPTORI_PX),
           display: 'grid',
           // Les columnes i la separacio son mides del carril (78, 142 i 10 px
           // de 1350): `carrilPx` les encongeix amb ell. En `%` no hi valen
