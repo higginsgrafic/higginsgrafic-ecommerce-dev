@@ -1,0 +1,340 @@
+# Estat del megaslide — testimoni per a la propera sessió
+
+Data: 18 de setembre de 2026 (nit). Aquest document és un **testimoni**: explica
+on és la feina, què funciona, què no s'ha de tocar i on s'ha de continuar.
+Es pot esborrar quan s'hagi tancat el tema.
+
+---
+
+## 1. Com treballa l'amo (important)
+
+- Tot en **català**: codi, comentaris, commits i conversa.
+- **No fer push** sense que ho demani. Els commits es fan locals i ell decideix
+  quan pugen.
+- **Abans de dir que una cosa està feta**: `npx vitest run` i `npm run build`.
+- Cada canvi, **verificat amb captures seves o amb el comparador**; commits
+  petits i reversibles.
+- **Mai aturar el servidor sense avisar-lo abans.** La seva aplicació
+  d'arrencada (a `tools/sessio/`) engega el build i el preview; si se li atura,
+  es queda sense pestanya.
+
+### Trampa que ja ens ha mossegat
+
+**No fer mai** `lsof -ti :3003 | xargs kill`: `lsof -ti` llista també els
+**clients** (el seu Firefox), i mata el navegador. Si mai cal aturar el
+servidor, només el que escolta:
+
+```bash
+lsof -nP -iTCP:3003 -sTCP:LISTEN -t | xargs -r kill
+```
+
+I normalment **no cal aturar-lo**: el servidor del 3003 és el Vite de
+desenvolupament, llegeix `src/` i amb HMR ja et mostra els canvis.
+
+Ara bé: el comparador **no reinicia** el servidor que troba viu (només n'engega
+un si no n'hi ha cap, i llavors és un `vite preview` de `dist/`). Si les xifres
+que dona no quadren amb el codi que acabes de canviar, mira primer si el 3003
+és el servidor de sempre (dev) o un preview vell.
+
+---
+
+## 2. Ordres útils
+
+```bash
+npm run build                     # compila (i refà les miniatures dels dibuixos)
+npx vite build                    # compila sense el prebuild de miniatures (més ràpid)
+npm run rapid                     # build + preview al 3003 — NO mentre el 3003 estigui ocupat
+node scripts/compara-vistes.mjs   # comparador de vistes (engega un preview només si el 3003 està apagat)
+npx vitest run                    # proves d'unitat (439)
+```
+
+El **comparador** (`scripts/compara-vistes.mjs`) és la xarxa de seguretat: obre
+les quatre mides del megaslide (768×1024 vertical, 1024×768 i 1366×768
+horitzontals, 1440×900 desktop), mesura les xifres clau i **falla si les vistes
+de tauleta se separen**. És el primer que s'ha de passar després de tocar res.
+Contra el servidor de sempre no cal compilar: mesura `src/` amb HMR.
+
+Estat del servidor: el **3003 no és un `preview`**. L'aplicació d'arrencada
+(`tools/sessio/sessio.sh`) engega `npm run proves` = `netlify dev` al 8888, i
+aquest arrenca la instància de **Vite de desenvolupament** al 3003 (proxy de
+`/api` i `/.netlify/functions` cap al 8888). Per tant:
+
+- El que veu l'amo surt de `src/`, amb **HMR**; el `dist/` no hi té res a veure.
+- El seu entorn de desenvolupament és **Firefox**.
+- El **comparador va amb Chromium** (Playwright) contra aquest mateix 3003, i
+  per això tampoc no cal compilar per passar-lo.
+- No engeguis `npm run rapid` ni un `vite preview` al 3003 mentre duri: xocarien
+  amb el servidor que ja hi és.
+
+---
+
+## 3. Arquitectura rellevant
+
+### Components principals
+
+| Fitxer | Què fa |
+|---|---|
+| `src/components/FullWideSlideHeader.jsx` | Capçalera, botons, cadenat, mesura del belt i calibració de la pàgina 1 |
+| `src/components/fullwide/MegaMenuPanel.jsx` | El panell que s'obre; conté les 4 pàgines i el tauler |
+| `src/components/megaslide/MegaslidePagina2.jsx` | Pàgina 2 (el cercador), des del 17/9 un sol component per a desktop, horitzontal i vertical |
+| `src/components/fullwide/CercadorTextRow.jsx` | La graella de 16×4 dibuixos, la columna de colors i la llista de col·leccions |
+| `src/components/fullwide/MegaStripePanel.jsx` | La franja de samarretes (la fan servir les pàgines) |
+| `src/components/fullwide/MegaStripePanelP1.jsx` | La franja de la pàgina 1 |
+| `src/components/fullwide/MegaColumn.jsx` | **Les 8 columnes velles**; la pàgina 2 ja no les dibuixa (només en reserva el lloc), la pàgina 1 sí |
+| `src/components/fullwide/firstContactPanels.jsx` | El selector Blanc/Color/Negre (`data-stripe-buttonbar="bn"`) |
+| `src/hooks/useDeviceLayout.js` | Retorna `isMobile`, `isPortraitTablet`, `isLandscapeTablet`, `isDesktop`, `isTouch`, `viewportWidth/Height` |
+| `src/hooks/useMegaslideCalibration.js` | Mesura el contenidor i en treu la mida de fitxa i de la franja |
+
+### Números clau (no inventar-ne de nous)
+
+| | Desktop | Tauleta horitzontal | Tauleta vertical |
+|---|---|---|---|
+| Belt (`--hg-mega-w`) | 1350 | 992 | 992 |
+| Dibuix de la graella | 30 px | 19,89 | 19,89 |
+| Cercle de color | 25 px | 18,89 | 18,89 |
+| Franja de samarretes (alçada) | ~141,9 | ~100,4 (1024) / ~141,6 (1366) | ~101,6 |
+
+- L'escala de tauleta surt d'**un sol número**: `ESCALA_TAULETA = 0,995` a
+  `CercadorTextRow.jsx:95`, aparellada amb la calibració de la pàgina 1
+  (`992 * 0,995` a `FullWideSlideHeader.jsx:2072` per al vertical, i
+  `w * 0,995` a la línia 2073 per a l'apaisada).
+- Llindar de **1382 px**: per sota, el belt s'encongeix perquè viu de
+  `--belt2-xL/xR` i cau a `100vw - 32px` (`getSafeBelt`, `src/utils/layoutMetrics.js:191`);
+  a partir de 1382 el belt torna a ser 1350. **No és** el llindar de
+  `isDesktop`: `useDeviceLayout.js` dona `isDesktop` a partir de 1024 i
+  tauleta (tàctil) per sobre de 600.
+- Comprovat amb el comparador el 18/9 (Chromium): dibuix 30 / 19,89, cercle
+  25 / 18,89, franja 141,9 (1440), 141,6 (1366), 100,4 (1024), 101,6 (768).
+  Atenció: **la franja creix amb el viewport** a 1366 (mateixa alçada que
+  desktop), mentre la resta de peces no; el comparador ho treu com a nota, no
+  com a error.
+
+### El mapa del DOM del megaslide (traçat el 18/9)
+
+```
+dibuixos de la graella:  button → … → div.mx-auto.max-w-[1350px]
+                                       → div.relative.z-[10000]   ← superfície del panell
+
+selector Blanc/Color/Negre:
+  el visible (pàgina 2)   div[data-p2-color-selector] [position absolute, z=4]
+  reserva de la graella   div.relative.z-10.grid.grid-cols-1 [visibility hidden]
+                          → div [aspect-ratio 8.77/1]
+
+cadenat:                  button → div [position fixed] → body [overflow hidden] → html
+```
+
+El DOM traçat el 18/9 deia que el `grid-cols-9` del `MegaColumn` anava de
+`[1326, 2499]` a 1280. El que es va tornar a mesurar és `[45,9, 1219,1]`
+(1173,1 px d'ample, amb el `scale(0.94)`), i la còpia del carrusel,
+`[-1234,1, -60,9]`. Des del canvi del punt 6, a la pàgina 2 **no hi ha cap
+`grid-cols-9`**.
+
+Conseqüències:
+- El selector i els dibuixos viuen **a la mateixa cadena**: si s'escala el
+  megaslide, s'escalen tots dos.
+- El **`body` té `overflow: hidden`**: tot el que surt de la pantalla es
+  retalla, no es pot desplaçar.
+- El **cadenat viu fora** de la composició (penja del `body`), per això sempre
+  s'ha hagut de posicionar a part.
+
+---
+
+## 4. Què està fet i funciona
+
+- **Fusió dels components de la pàgina 2**: `MegaslidePagina2Cercador` ja no
+  existeix; les particularitats del vertical són branques `isPortraitTablet`.
+  Verificat amb 44 mètriques idèntiques a les quatre mides.
+- **Graella de dibuixos de la pàgina 2**: 16×4, amb la mida calibrada, files
+  alineades amb les files de colors, i la llista de col·leccions repartida fins
+  al bottom.
+- **Selector Blanc/Color/Negre**: centrat verticalment amb la graella de colors
+  (a totes les pantalles) i amb els noms en català.
+- **Columna de col·leccions**: alineada a la dreta (amb amplada plena, si no
+  l'alineació no es veu) i ajustada al nom més llarg (`fit-content`).
+- **Home**: la hero i el menú d'icones, 25 px amunt al vertical i 50 px avall a
+  l'horitzontal (respecte de l'original).
+- **Cadenat**: surt de sota el panell amb una animació de 250 ms, sincronitzada
+  amb l'acabament de la pàgina; al vertical fa el mateix (l'animació va en un
+  contenidor exterior perquè el `transform` de dins és per arrossegar-lo). No
+  surt a la pàgina del cistell. La seva posició se segueix a cada fotograma amb
+  una alisada de 4 px per fotograma.
+- **Comparador de vistes** i ordre `npm run compara-vistes`.
+- **MegaColumn fora de la pàgina 2**: el `MegaStripePanel` ja no el dibuixa; el
+  lloc que ocupava el reserva un fill amb `aspect-ratio` (vegeu punt 6).
+- **Franja de la banda estreta**: el `translateY(-15px)` era el que partia la
+  graella de colors en dues meitats a 1025-1366 px (vegeu punt 6.bis).
+
+### Comprovat el 18/9 (abans de tancar el testimoni)
+
+- `npx vitest run` → **439 proves passades** (37 fitxers).
+- `npx vite build` → OK.
+- `node scripts/compara-vistes.mjs` → **OK**, amb les mides del punt 3.
+- Sondes a 1024/1280/1366/1440/1920 (Chromium, contra el 3003 viu, que és el
+  Vite de desenvolupament sobre `src/`): cap selector dins de la finestra no
+  surt per la dreta.
+- Mesures A/B del canvi del punt 6: la franja es mou **menys de 0,6 px** a
+  1280/1920/1024.
+
+---
+
+## 5. El que NO s'ha de tocar
+
+- **Desktop**: funciona i és la referència. El belt fa 1350 px des de **1382**;
+  per sota s'encongeix (`100vw - 32px`) i no s'ha de «corregir» (vegeu
+  l'experiment fallit).
+- **Tauleta horitzontal i vertical**: funcionen; el comparador dona OK. Les
+  seves mides estan apuntades al punt 3.
+- **La banda «estreta»** (768-1366 sense touch) existeix al codi i **es va
+  intentar treure**: es va revertir perquè empitjorava el 1280.
+
+### L'experiment que va fallar (18/9)
+
+Es va intentar el que l'amo demanava: **veure el desktop amb una correcció
+d'escala** al 1280. Es va provar de tres maneres i totes es van revertir:
+
+1. Belt forçat a 1350 + `zoom` al tauler del megaslide.
+2. `zoom` al `document.documentElement` per a tota la pàgina.
+3. Les dues coses alhora.
+
+**Per què va fallar**: el megaslide viu en contenidors `position: fixed` que
+**no hereten l'escala del document**, i a més hi ha peces posicionades amb
+coordenades fixes de la composició de 1350. El resultat era un megaslide mig
+escalat: unes peces bé i unes altres fora de la pantalla.
+
+**La conclusió** (que l'amo va proposar i és la bona): fer com a la **TDP**,
+posar les peces dins d'una graella perquè **les seves posicions surtin de la
+graella** i escalar sigui una sola operació.
+
+---
+
+## 6. El MegaColumn de la pàgina 2 — FET
+
+**El problema**: la pàgina 2 encara passava pel **`MegaColumn`** (les 8 columnes
+velles de text) dins del `MegaStripePanel`. Quan es va substituir per la graella
+de dibuixos, la graella nova s'hi va posar però **la vella no es va treure**:
+quedava dins del panell, invisible, ocupant lloc.
+
+- On era: `src/components/fullwide/MegaStripePanel.jsx:163`. La pàgina 1
+  (`MegaStripePanelP1.jsx:252`) té el seu propi `MegaColumn` i **no s'ha tocat**.
+- La pàgina 2 el cridava amb `reserveGridSpace` (`MegaslidePagina2.jsx:471`).
+
+**El que s'ha fet (18/9 a la nit)**: el `MegaStripePanel` ja **no importa ni
+dibuixa** el `MegaColumn`. Com que la pàgina 2 és l'**únic** consumidor del
+component, el camí del `MegaColumn` hi queda mort. L'espai de reserva es manté
+amb un fill únic amb `aspect-ratio: 8.77 / 1` (`RESERVA_ASPECTE`), calibrat per
+donar la mateixa alçada que el `MegaColumn` de debò.
+
+**Per què `aspect-ratio` i no una alçada fixa**: la reserva **no** pot ser un
+número. L'alçada del `MegaColumn` no escala igual a tot arreu (142 px a 1280,
+142,5 a 1366, 144,1 a 1440, 113,6 a tauleta) perquè a desktop el belt s'encongeix
+per sota de 1382. Un `aspect-ratio` sobre l'amplada del belt ho segueix sol.
+
+**Verificació** (Chromium contra el 3003 viu, A/B amb el codi vell i el nou):
+
+| | franja `top` vella → nova | desviació |
+|---|---|---|
+| 1280×800 | 272,48 → 272,78 | **+0,30 px** |
+| 1920×1080 | 273,82 → 274,40 | **+0,58 px** |
+| 1024×768 | 244,04 → 243,59 | **−0,45 px** |
+
+- La graella de colors, el selector i les seves alçades no es mouen.
+- `node scripts/compara-vistes.mjs` → **OK** (mateixes xifres que abans).
+- `npx vitest run` → 439 proves; `npx vite build` → OK.
+- A 1280 el contenidor de reserva medeix 133,76 px (abans 133,48) i té **1**
+  fill; `grid-cols-9` dins de la pàgina 2: **0**.
+
+**Atenció amb les captures**: el carrusel de la samarreta gran de sota canvia
+d'estat segons el moment de la captura (dues execucions donen samarretes
+diferents), i això contamina qualsevol comparació de píxels A/B. Per comparar
+codi vell i nou, feu servir **mesures de geometria**, no imatges.
+
+**Què s'ha mesurat de debò** (Chromium, contra el 3003 viu):
+
+- El símptoma descrit («els selectors entren a la pantalla tallats a la
+  dreta», x=1326 a 1280) **no s'ha pogut reproduir** a 1024, 1280, 1366, 1440
+  ni 1920: cap selector dins de la finestra no passa de `window.innerWidth`.
+  A 1280 hi havia **tres** còpies de `[data-stripe-buttonbar="bn"]`:
+  - `x ∈ [35,5, 156,5]` — la de la pàgina 2 (`[data-p2-color-selector]`), visible;  - `x ∈ [45,9, 166,3]` — la del `MegaColumn` de la pàgina 2, `visibility: hidden`;
+  - `x ∈ [-1234,1, -1113,7]` — una pàgina del carrusel muntada fora de pantalla.
+
+  Amb el canvi fet, la del `MegaColumn` **ja no hi és** (`[data-stripe-buttonbar="bn"]`
+  dins de la pàgina 2: només la visible).
+- La sonda de sota **sola no val**: la còpia del carrusel té `right` negatiu i,
+  amb `right > vw` sol, dona positiu fals. Cal filtrar per
+  `visibility !== 'hidden'` **i** comprovar el costat esquerre.
+
+```js
+[...document.querySelectorAll('[data-stripe-buttonbar="bn"]')]
+  .filter((e) => getComputedStyle(e).visibility !== 'hidden')
+  .map((e) => e.getBoundingClientRect())
+  .filter((r) => r.right > window.innerWidth && r.left > 0)
+```
+
+---
+
+## 6.bis. La franja que partia la graella a la banda estreta — FET
+
+**El símptoma** (el va veure l'amo a 1280×768): la graella de colors quedava
+partida en dues meitats, amb els cercles a dalt i el COLOR/NEGRE dins de la
+banda de samarretes, i tot arrambat a la franja.
+
+**La causa**: el `transform: translateY(-15px)` de la franja, duplicat a
+`MegaStripePanel.jsx` i `MegaStripePanelP1.jsx`. A la banda estreta el belt
+s'ha encongit (1248 en comptes de 1350) i tot el bloc és més baix, però la
+franja no; aquells 15 px deixaven el seu `top` **1,2 px per damunt** del
+`bottom` de la graella de colors.
+
+**La correcció**: el desplaçament passa a ser condicional:
+
+```js
+transform: (compactLandscape || esFranjaEstenya) ? 'none' : 'translateY(-15px)',
+```
+
+amb `esFranjaEstenya` = `innerWidth > 1024 && innerWidth <= 1366 && innerWidth >= innerHeight`.
+
+**El llindar és 1025 i no 768 a posta**: 1024×768 també compleix «ample ≥ alt»
+però és la tauleta apaisada, i la tauleta no s'ha de tocar. La primera versió
+del predicat la incloïa i movia la franja 15 px a la tauleta; cal no repetir-ho.
+
+**Verificació** (Chromium, A/B amb el codi vell i el nou; el Firefox de l'amo
+dona les mateixes xifres que el Chromium, comprovat):
+
+| mida | franjaTop | marge colors→franja | resultat |
+|---|---|---|---|
+| 768×1024 tauleta vertical | 292,8 | 15,0 | idèntic |
+| 1024×768 tauleta apaisada | 243,4 | 14,6 | idèntic |
+| 1280×800 | 272,8 → **287,8** | −1,2 → **+2,0** | arreglat |
+| 1366×768 | 282,6 → **297,6** | −1,5 → **+1,0** | arreglat |
+| 1381 / 1382 / 1440 / 1920 | 274,4 | 17,2 | idèntic |
+
+- `npx vitest run` → 439 proves; `npx vite build` → OK;
+  `node scripts/compara-vistes.mjs` → OK amb les mateixes xifres que abans.
+- A la banda estreta els dibuixos surten una mica més grans (24,4 → 27,4 px a
+  1280) perquè el recàlcul de l'escala aprofita l'espai alliberat.
+
+**Atenció en mesurar**: el comparador prova el cas «1366» amb `hasTouch: true`,
+que és **tauleta apaisada** (dibuix 19,89), no la banda estreta de desktop
+(que fa 30). No són el mateix estat i no s'hi val comparar-los.
+
+---
+
+## 7. Pendents
+
+1. **Pujar els commits**: n'hi ha **9** de pendents (`git log --oneline origin/main..HEAD`),
+   més el canvi del punt 6 i el del 6.bis (aquests dos ja comesos localment) i
+   aquest testimoni.
+   Inclouen la feina bona del cercador, la home i l'escala de tauleta, més els
+   reverts de l'escala de desktop. **Demanar-ho abans de fer-ho.**
+2. **El mòbil**, que es farà a part (l'amo ho va dir així).
+3. **El cistell i el checkout** tenen la seva pròpia detecció de tauleta per
+   amplada (`CistellComandaContent.jsx`, `CheckoutContent.jsx`,
+   `CheckoutPage.jsx`, `MegaMenuPanel.jsx`): es va decidir no tocar-ho encara.
+4. **Deixalla petita**: després del punt 6, el `MegaslidePagina2` encara passa al
+   `MegaStripePanel` una colla de props que només feia servir el `MegaColumn`
+   (`resolvedMega`, `megaTileSelectorParams`, `onStartSelectorDrag`,
+   `reorderAustenQuotes`, `austenSelectedDisableMulti`…). No fan cap mal, però
+   es poden retallar quan es torni a la pàgina 2.
+5. **El «sobredimensionat» de la banda estreta** (overt, 18/9): l'amo diu que a
+   1280 el **header i el megaslide** li semblen massa grossos. Pendent
+   d'atacar; les peces interiors a 1280 són més petites que a 1440, així que la
+   sospita és la lletra i la densitat del panell.
