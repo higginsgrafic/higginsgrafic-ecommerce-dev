@@ -165,6 +165,7 @@ function MegaStripePanel({
   calibrationOverrides,
   visualOffsetY = 0,
   compactLandscape = false,
+  fitAlcada = 1,
 }) {
   const emptyShirtMaskUrl = useEmptyShirtMask(emptyTileIndices, shirtColor);
 
@@ -244,7 +245,9 @@ function MegaStripePanel({
           className="relative z-0"
           style={{
             marginTop: compactLandscape ? '16px' : `${stripeRowPadPx}px`,
-            paddingBottom: compactLandscape ? '8px' : `${stripeRowPadPx}px`,
+            // El coixí de sota tambe s'ajusta a l'alcada de la finestra (vegeu
+            // fitAlcada): si no, la franja s'encongiria pero el panell no.
+            paddingBottom: compactLandscape ? '8px' : `${stripeRowPadPx * fitAlcada}px`,
             paddingLeft: `${stripeRowPadXPx?.left || 0}px`,
             paddingRight: `${stripeRowPadXPx?.right || 0}px`,
             // A la banda estreta la franja NO s'ha de pujar: el belt s'ha
@@ -297,7 +300,11 @@ function MegaStripePanel({
                   width: 'fit-content',
                   display: 'inline-block',
                   transformOrigin: 'top center',
-                  transform: `translate(var(--megaStripeDx, 0px), calc(var(--megaStripeDy, 0px) + ${visualOffsetY}px)) scale(var(--megaStripeScale, 1.2125))`,
+                  // La franja s'ajusta tambe a l'alcada de la finestra (fitAlcada):
+                  // en una finestra curta, la seva mida de disseny no hi cap i es
+                  // menja el panell. MegaStripePanelP1 (pagina 1) fa el mateix
+                  // amb el mateix factor, perque les dues franges quedin igual.
+                  transform: `translate(var(--megaStripeDx, 0px), calc(var(--megaStripeDy, 0px) + ${visualOffsetY}px)) scale(calc(var(--megaStripeScale, 1.2125) * ${fitAlcada}))`,
                   isolation: 'isolate',
                 }}
               >

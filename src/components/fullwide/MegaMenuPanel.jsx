@@ -7,6 +7,7 @@ import { lazy, Suspense, useRef, useEffect, useCallback, useState } from 'react'
 /* eslint-disable react-hooks/rules-of-hooks */
 import MegaStripeBleedGuard from './MegaStripeBleedGuard.jsx';
 import MegaStripePanelP1 from './MegaStripePanelP1.jsx';
+import { factorAlcadaMegaslide } from './midesMegaslide.js';
 import MegaslidePagina2 from '../megaslide/MegaslidePagina2.jsx';
 
 const MegaslidePagina3 = lazy(() => import('../megaslide/MegaslidePagina3.jsx'));
@@ -141,8 +142,16 @@ export default function MegaMenuPanel({
   const page1SelectedItem = active === 'first_contact' ? firstContactSelectedItem
     : active === 'the_human_inside' ? humanInsideSelectedItem
     : (selectedItemByCollection?.[active] ?? null);
+  // Factor d'alçada: encongeix la franja (i la seva reserva) a les finestres
+  // baixes. Va a les DUES pàgines amb el mateix valor; si una el portés i
+  // l'altra no, les franges es desquadrarien. A tauleta val 1 (vegeu
+  // midesMegaslide.js): les dues orientacions han de donar la mateixa franja.
+  const fitAlcada = factorAlcadaMegaslide(
+    typeof window !== 'undefined' ? window.innerHeight : 0,
+    isPortraitTablet || isLandscapeTablet,
+  );
   const defaultBleedGuardHeight = effectiveMegaTileSize
-    ? `${Math.round(effectiveMegaTileSize * 2 + 37 + Math.max(0, stripeRowPadPx))}px`
+    ? `${Math.round((effectiveMegaTileSize * 2 + 37 + Math.max(0, stripeRowPadPx)) * fitAlcada)}px`
     : undefined;
   // A vertical el contingut te la mateixa alcada que a horitzontal: el que
   // s'allarga el panell es la capcalera, que alla fa dues fileres. Ja no hi ha
@@ -301,6 +310,7 @@ export default function MegaMenuPanel({
                       active={active}
                       resolvedMega={resolvedMega}
                       showStripe={showStripe}
+                      fitAlcada={fitAlcada}
                       onP1ContentBottomChange={handleP1ContentBottom}
                       onPageLiftChange={handleP1PageLift}
                       stripeRowPadPx={stripeRowPadPx}
@@ -374,6 +384,7 @@ export default function MegaMenuPanel({
                   page1MegaTileSize={effectiveMegaTileSize}
                   page1StripePreviewHPx={stripePreviewHPx}
                   page1PageLift={isPortraitTablet ? 0 : p1PageLift}
+                  fitAlcada={fitAlcada}
                   resolvedMegaFiltered={resolvedMegaFiltered}
                   showStripe={showStripe}
                   stripeOverlayLoadState={stripeOverlayLoadState}
