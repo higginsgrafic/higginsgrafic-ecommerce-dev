@@ -4,7 +4,7 @@ import ClicAreaOverlayP1 from './ClicAreaOverlayP1.jsx';
 import { CERCADOR_COLORS } from './CercadorTopBar.jsx';
 import { STRIPE_DRAWING_CALIBRATIONS } from '../../config/stripeCalibrations';
 import { deltaObjectiuPageLift, desplacamentFranjaEscriptori } from '../../utils/mesuraMegaslide.js';
-import { cssEscalaMega } from '../../utils/layoutMetrics.js';
+import { carrilPx } from '../../utils/layoutMetrics.js';
 
 // La franja de samarretes de la pàgina 1 tendeix a quedar-se uns 10 px més avall
 // del que toca: l'alçada del contenidor de la pàgina es calcula a partir del
@@ -265,7 +265,7 @@ function MegaStripePanelP1({
             // desplaçament les desquadraria.
             transform: (isPortraitTablet || isLandscapeTablet)
               ? 'scale(var(--hgGridFitScale, 0.94))'
-              : `translateX(${cssEscalaMega(45.25)}) scale(var(--hgGridFitScale, 0.94))`,
+              : `translateX(${carrilPx(45.25)}) scale(var(--hgGridFitScale, 0.94))`,
             transformOrigin: 'top center',
             visibility: reserveGridSpace ? 'hidden' : undefined,
             pointerEvents: reserveGridSpace ? 'none' : undefined,
@@ -342,7 +342,7 @@ function MegaStripePanelP1({
               id="stripe-guide-stripe-row-p1"
               className="relative inline-block"
               style={{
-                height: cssEscalaMega(stripePreviewHPx),
+                height: carrilPx(stripePreviewHPx),
                 width: 'auto',
                 // La filera NO s'ha d'encongir per encabir-se al contenidor: la
                 // franja te una mida de disseny i es escala amb `transform`

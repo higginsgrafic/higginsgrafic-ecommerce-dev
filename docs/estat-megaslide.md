@@ -779,15 +779,80 @@ després la 2):
   d'alçada visible que no són ni el marge ni el tile: és el que feia que la
   reserva no quadrés.
 
+### El carril (10.3) — FET a la pàgina 2
+
+L'amo ho va dir així: «la meva intenció era que tot estigués en un carril central
+amb uns marges als costats per poder-se adaptar als diferents formats». El carril
+ja existia (el belt, 70,3vw, centrat), però **les peces no en sortien**: cada
+posició era un px calibrat a 1920 i cada format portava el seu pedaç. Ara hi ha
+dues funcions que ho expressen (`layoutMetrics.js`):
+
+```js
+carrilPct(px)  // per a propietats de layout quan el contenidor ja és el carril
+carrilPx(px)   // per a la resta (transforms, marges, alçades): calc(px × escala)
+```
+
+`carrilPx` i `carrilPct` són la mateixa cosa dit de dues maneres (`px ×
+belt/1350`), i a tauleta valen 1 perquè **el seu disseny és a part** (992 px
+calibrats a mà: el seu tile fa 0,0943 del carril, no 0,097).
+
+**Què s'ha passat al carril** (abans px de la finestra):
+
+| peça | abans | ara |
+|---|---|---|
+| contenidor de la filera (p2) | 94% del belt | **100% del carril** |
+| marge esquerre dels dibuixos | 187,5 px dins del 94% | **16,8889% del carril** (228) |
+| desbordament dret | -52,5 px | **-0,8889%** (-12) |
+| columnes (colors i llista) | 78 px / 142 px | `carrilPx` (5,78% / 10,52%) |
+| separació de columnes | 10 px | `carrilPx` (0,74%) |
+| selector B/N/C (p2): x i mida | 27 px i `megaTileSize` del panell | `carrilPx` (2% i 9,66%) |
+| tile dels dos selectors | sortia de l'amplada del panell | `megaTileSize` de DISSENY (1350) |
+
+**Resultat** (tot en % del carril, Chromium contra el 3003 viu):
+
+| vista | tile p1 | selector p2 | graella de dibuixos p2 | dibuix p2 |
+|---|---|---|---|---|
+| 1920 | 0,097 | 0,0966 | 0,6622 | 30 |
+| 1440 | 0,097 | 0,0966 | 0,6623 | **23** (abans 19,78) |
+| 1366 | 0,097 | 0,0966 | 0,6623 | 22,3 |
+| 1280 | 0,097 | 0,0966 | 0,6623 | **20,4** (abans 16,14) |
+
+- **A 1920 i a tauleta no es mou res** (0 de les 833 xifres): 1920 és la
+  referència i les tauletes tenen el seu disseny.
+- El selector de la pàgina 2 s'encongeix amb el carril: a 1280 fa 87 px (abans
+  121) i queda **2,7 px** del de la pàgina 1 (abans 23 px de diferència).
+- El dibuix de la pàgina 2 ja fa el que toca a 1280 (20,4 en comptes de 16,14:
+  el punt 10.3 que quedava pendent).
+- El comparador fallava per **una dècima** en la comparació de files de dibuixos
+  i de colors: ara aquella comprovació té tolerància de 0,5 px (les files surten
+  de fórmules distintes i, en escalar-se, l'arrodoniment les separa dècimes).
+
+**El que NO s'ha passat al carril (i per què)**:
+
+- **Els offsets verticals** (40, 20, 45, 5, 8, 10, 15 px) i el `top` del
+  selector. S'hi va provar i es va revertir: el bucle `alignTopRowToPage1`
+  alinea el botó Color de les dues pàgines amb `topVisualAlignmentY`, que
+  **també mou la filera de dibuixos**; si el selector s'encongeix d'una manera i
+  la filera d'una altra, la filera baixa 11 px i deixa de quadrar. Cal separar
+  primer les dues coses (una variable per al selector i una per a la filera).
+  Parany del camí: la condició de «banda estreta» dins `MegaslidePagina2`
+  (`esBandaEstreta`) **exclou** la tauleta apaisada, però l'expressió original
+  d'aquells `top` no ho feia; fer-les servir indistintament movia la tauleta
+  5 px.
+- Les **tipografies** (14 px del selector, 11 px de les llistes) no s'escalen
+  (ho va triar l'amo: el text es queda a la seva mida).
+
 **El que queda** (properes passes, ja més fines):
 1. **El contingut que no passa per les bandes** encara té el 1350 literal:
    `CistellComandaContent` (`TABLE_WIDTH = 1350`), `UserComandesContent`
    (`width: '1350px'`, tres cops) i `SiteFrame`
    (`SITE_FRAME_MAX_WIDTH = 1350`).
-2. **La pàgina 2**: el selector (vegeu més amunt) i les mides internes de la
-   filera de dibuixos (`187,5` / `27` / `78` / `142` són px, no proporcions del
-   belt: a 1280 el dibuix fa 16,14 px quan la proporció de 1920 en demanaria
-   ~20, i la graella fa el 52% del belt en comptes del 66%).
+2. **Els offsets verticals del carril** (vegeu més amunt): separar el bucle que
+   alinea el selector del que col·loca la filera, i passar al carril el `top`
+   del selector, el marge de dalt dels tiles (8 px) i els desplaçaments de la
+   franja (-15/+20/10 px) amb el seu `FRANJA_AJUST_PX`. La franja ja
+   s'encongeix amb el carril (punt 10.2); el que queda són les posicions
+   verticals.
 
 **Parany après**: els intents d'escalar amb un `transform: scale` a sobre del
 belt escalat **empitjoren** (el contingut se'n va cap endins i els marges queden

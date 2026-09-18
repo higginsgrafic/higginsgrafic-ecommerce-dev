@@ -47,16 +47,15 @@ export const GRAELLA_PAS_COLORS = 33;
 //   BLOC_DRETA = 78 (cercles) + 10 + 142 (llista) + 10 (separacio) = 240
 //
 // Perque el bloc quedi centrat, el marge esquerre i el desbordament dret del
-// seu contenidor han de SUMAR aquests 240 px. Amb el marge original de 135 px
-// (105 + els 30 de `leftOffset`) els dibuixos anaven 105 px massa a l'esquerra
-// (a 1920: 168 px de marge a l'esquerra del belt i 288 a la dreta). Repartint
-// la diferencia, el bloc es desplaça 52,5 px a la dreta i queda amb 228 px a
-// cada banda, sense canviar cap mida:
+// seu contenidor han de SUMAR aquests 240 px:
 //
-//   187,5 (marge esquerre) + 52,5 (desbordament dret) = 240
+//   228 (marge esquerre del carril) + 12 (desbordament dret) = 240
+//
+// Son proporcions DEL CARRIL (1350 px de referencia), no px de cap format: a
+// CercadorTextRow es passen a `% del carril`.
 export const BLOC_DRETA_DIBUIXOS_ESCRIPTORI_PX = 240;
-export const MARGE_ESQUERRA_DIBUIXOS_ESCRIPTORI_PX = 187.5;
-export const DESBORDAMENT_DRET_DIBUIXOS_ESCRIPTORI_PX = 52.5;
+export const MARGE_ESQUERRA_DIBUIXOS_ESCRIPTORI_PX = 228;
+export const DESBORDAMENT_DRET_DIBUIXOS_ESCRIPTORI_PX = 12;
 
 // Desktop: dibuix de 30 px (60% de la base 1:1). La separació horitzontal és
 // la que fa que les 16 columnes continuïn ocupant els 875 px de referència:

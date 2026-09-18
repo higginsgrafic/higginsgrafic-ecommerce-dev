@@ -4,6 +4,7 @@ import CercadorTextRow from '../fullwide/CercadorTextRow.jsx';
 import MegaStripePanel from '../fullwide/MegaStripePanel.jsx';
 import { FRANJA_AJUST_PX } from '../fullwide/MegaStripePanelP1.jsx';
 import { desplacamentFranjaEscriptori } from '../../utils/mesuraMegaslide.js';
+import { carrilPx } from '../../utils/layoutMetrics.js';
 import MegaHeroSlider from '../MegaHeroSlider.jsx';
 import Pauta4ColsOverlay from '../pauta/Pauta4ColsOverlay';
 import useMegaslideCalibration from '@/hooks/useMegaslideCalibration';
@@ -89,12 +90,12 @@ export default function MegaslidePagina2({
   // pagina es la mateixa, nomes que a vertical no s'hi veu sencera i cal
   // desplacar-la horitzontalment.
   //
-  // PENDENT: aquesta mida encara no s'escala amb el belt (a 1280 fa 121 px i el
-  // selector de la pagina 1 en fa 84). No es pot escalar aixi com aixi: el
-  // bucle `alignTopRowToPage1` alinea el boto Color de les dues pagines i el
+  // Mida de DISSENY del selector (el tile del carril): es pinta amb `carrilPx`,
+  // aixi que s'encongeix amb el carril com el de la pagina 1. El bucle
+  // `alignTopRowToPage1` alinea el boto Color de les dues pagines i el
   // desplaçament que hi aplica (`topVisualAlignmentY`) tambe mou la filera de
-  // dibuixos de la pagina 2; si el selector s'encongeix, la filera baixa 11 px
-  // i deixa de quadrar amb la de la pagina 1 (vegeu el punt 6.quater).
+  // dibuixos de la pagina 2: per aixo tots dos (selector i filera) s'han
+  // d'encongir amb el MATEIX factor, i per aixo tots dos surten del carril.
   const bnSliderSize = (compactMegaTileSize || 120) * ((isPortraitTablet || isLandscapeTablet) ? 0.94 : 1);
   // A la banda estreta, la filera de dalt de la pàgina 2 (el selector
   // Blanc/Color/Negre i la graella de colors) cau 38 px més avall que la de la
@@ -414,9 +415,12 @@ export default function MegaslidePagina2({
             style={{
             position: 'absolute',
             top: `calc(var(--hg-cercador-bar-top, 0px) + ${40 + ((typeof window !== 'undefined' && window.innerWidth >= 768 && window.innerWidth <= 1366 && window.innerWidth >= window.innerHeight) ? 5 : 0)}px)`,
-            left: '27px',
-            width: `${bnSliderSize}px`,
-            height: `${bnSliderSize}px`,
+            // Dins el carril: 27 px de disseny a l'esquerra i la mida del tile
+            // del carril (`carrilPx`). Abans eren px de la finestra i a 1280 el
+            // selector feia 121 px mentre el de la pagina 1 en feia 87.
+            left: carrilPx(27),
+            width: carrilPx(bnSliderSize),
+            height: carrilPx(bnSliderSize),
             zIndex: 4,
             display: 'flex',
             alignItems: 'center',
@@ -443,7 +447,10 @@ export default function MegaslidePagina2({
           left: '50%',
           transform: `translateX(-50%) scale(var(--hg-cercador-bar-scale, 1))`,
           transformOrigin: 'top center',
-          width: 'var(--hg-cercador-bar-width, 94%)',
+          // El contenidor de la filera ES el carril a l'escriptori: tot el que
+          // hi ha a dins son proporcions seves (`carrilPct` a CercadorTextRow).
+          // A tauleta es queda el 94% de sempre (el seu disseny es a part).
+          width: (isPortraitTablet || isLandscapeTablet) ? 'var(--hg-cercador-bar-width, 94%)' : '100%',
           zIndex: 3,
           containerType: 'inline-size',
         }}>

@@ -103,18 +103,18 @@ describe('centratge del bloc de dibuixos', () => {
     expect(BLOC_DRETA_DIBUIXOS_ESCRIPTORI_PX).toBe(78 + 10 + 142 + 10);
   });
 
-  it('a 1920 el bloc queda amb els dos marges iguals', () => {
-    // Belt de 1350 dins la filera del 94% (el contenidor de CercadorTextRow).
-    // Els números de referència del disseny: el bloc de dibuixos fa 894 px i
-    // ha de quedar amb 228 px a cada banda del belt.
-    const belt = 1350;
-    const margeContenidor = belt * 0.03;            // 40,5 (el 94% centrat)
-    const esquerraBloc = margeContenidor + MARGE_ESQUERRA_DIBUIXOS_ESCRIPTORI_PX; // 228
-    const dretaBloc = belt * 0.97 + DESBORDAMENT_DRET_DIBUIXOS_ESCRIPTORI_PX;    // 1362
+  it('al carril de 1350 el bloc queda amb els dos marges iguals', () => {
+    // El carril fa 1350 px de referencia i la filera hi viu a dins: arrenca al
+    // marge esquerre i el desbordament dret la deixa 12 px mes enlla (per la
+    // columna de colors i la llista). Els numeros de referencia: el bloc de
+    // dibuixos fa 894 px i queda amb 228 px a cada banda del carril.
+    const carril = 1350;
+    const esquerraBloc = MARGE_ESQUERRA_DIBUIXOS_ESCRIPTORI_PX;
+    const dretaBloc = carril + DESBORDAMENT_DRET_DIBUIXOS_ESCRIPTORI_PX;
     const ampleDibuixos = dretaBloc - esquerraBloc - BLOC_DRETA_DIBUIXOS_ESCRIPTORI_PX;
     expect(esquerraBloc).toBeCloseTo(228, 5);
     expect(ampleDibuixos).toBeCloseTo(894, 5);
-    expect(belt - (esquerraBloc + ampleDibuixos)).toBeCloseTo(esquerraBloc, 5);
+    expect(carril - (esquerraBloc + ampleDibuixos)).toBeCloseTo(esquerraBloc, 5);
   });
 });
 

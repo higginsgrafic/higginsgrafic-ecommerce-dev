@@ -3,7 +3,7 @@ import MegaColumn, { GAP_X_PX } from './MegaColumn.jsx';
 import ClicAreaOverlay from './ClicAreaOverlay.jsx';
 import { CERCADOR_COLORS } from './CercadorTopBar.jsx';
 import { STRIPE_DRAWING_CALIBRATIONS } from '../../config/stripeCalibrations';
-import { cssEscalaMega } from '../../utils/layoutMetrics.js';
+import { carrilPx } from '../../utils/layoutMetrics.js';
 
 /**
  * Reserva d'espai de la graella vella a la pàgina 2.
@@ -276,7 +276,7 @@ function MegaStripePanel({
               id="stripe-guide-stripe-row"
               className="relative inline-block"
               style={{
-                height: cssEscalaMega(stripePreviewHPx),
+                height: carrilPx(stripePreviewHPx),
                 width: 'auto',
               }}
             >

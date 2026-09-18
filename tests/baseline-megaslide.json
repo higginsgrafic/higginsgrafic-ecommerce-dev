@@ -408,24 +408,24 @@
         "relBottom": 78.19
       },
       "p2": {
-        "top": 146.97,
-        "bottom": 187.3,
-        "left": 217,
-        "right": 338,
-        "width": 121,
-        "height": 40.33,
-        "relTop": 25.97,
-        "relBottom": 66.3
+        "top": 172.82,
+        "bottom": 201.8,
+        "left": 208,
+        "right": 294.95,
+        "width": 86.95,
+        "height": 28.98,
+        "relTop": 51.82,
+        "relBottom": 80.8
       },
       "contenidorP2": {
         "top": 198,
-        "bottom": 319,
-        "left": 217,
-        "right": 338,
-        "width": 121,
-        "height": 121,
+        "bottom": 284.95,
+        "left": 208,
+        "right": 294.95,
+        "width": 86.95,
+        "height": 86.95,
         "relTop": 77,
-        "relBottom": 198
+        "relBottom": 163.95
       },
       "barraP1": {
         "top": 141,
@@ -438,25 +438,25 @@
         "relBottom": 107.3
       },
       "barraP2": {
-        "top": 106.64,
-        "bottom": 227.64,
-        "left": 217,
-        "right": 338,
-        "width": 121,
-        "height": 121,
-        "relTop": -14.36,
-        "relBottom": 106.64
+        "top": 143.84,
+        "bottom": 230.79,
+        "left": 208,
+        "right": 294.95,
+        "width": 86.95,
+        "height": 86.95,
+        "relTop": 22.84,
+        "relBottom": 109.79
       }
     },
     "colors": {
-      "top": 133.78,
-      "bottom": 200.48,
-      "left": 895.5,
-      "right": 973.5,
-      "width": 78,
-      "height": 66.7,
-      "relTop": 12.78,
-      "relBottom": 79.48
+      "top": 145.13,
+      "bottom": 229.5,
+      "left": 951.35,
+      "right": 1003.35,
+      "width": 52,
+      "height": 84.38,
+      "relTop": 24.13,
+      "relBottom": 108.5
     },
     "malla9P1": {
       "top": 133.48,
@@ -501,7 +501,7 @@
       "--hg-cercador-bar-scale": null
     },
     "deltes": {
-      "selectorP2menysP1": -23.13,
+      "selectorP2menysP1": 2.72,
       "franjaP2menysP1": -0.05,
       "colorsMenysSelectorP2": 0
     }
@@ -577,24 +577,24 @@
         "relBottom": 78.19
       },
       "p2": {
-        "top": 146.97,
-        "bottom": 187.3,
-        "left": 217,
-        "right": 338,
-        "width": 121,
-        "height": 40.33,
-        "relTop": 25.97,
-        "relBottom": 66.3
+        "top": 172.82,
+        "bottom": 201.8,
+        "left": 208,
+        "right": 294.95,
+        "width": 86.95,
+        "height": 28.98,
+        "relTop": 51.82,
+        "relBottom": 80.8
       },
       "contenidorP2": {
         "top": 198,
-        "bottom": 319,
-        "left": 217,
-        "right": 338,
-        "width": 121,
-        "height": 121,
+        "bottom": 284.95,
+        "left": 208,
+        "right": 294.95,
+        "width": 86.95,
+        "height": 86.95,
         "relTop": 77,
-        "relBottom": 198
+        "relBottom": 163.95
       },
       "barraP1": {
         "top": 141,
@@ -607,25 +607,25 @@
         "relBottom": 107.3
       },
       "barraP2": {
-        "top": 106.64,
-        "bottom": 227.64,
-        "left": 217,
-        "right": 338,
-        "width": 121,
-        "height": 121,
-        "relTop": -14.36,
-        "relBottom": 106.64
+        "top": 143.84,
+        "bottom": 230.79,
+        "left": 208,
+        "right": 294.95,
+        "width": 86.95,
+        "height": 86.95,
+        "relTop": 22.84,
+        "relBottom": 109.79
       }
     },
     "colors": {
-      "top": 133.78,
-      "bottom": 200.48,
-      "left": 895.5,
-      "right": 973.5,
-      "width": 78,
-      "height": 66.7,
-      "relTop": 12.78,
-      "relBottom": 79.48
+      "top": 145.13,
+      "bottom": 229.5,
+      "left": 951.35,
+      "right": 1003.35,
+      "width": 52,
+      "height": 84.38,
+      "relTop": 24.13,
+      "relBottom": 108.5
     },
     "malla9P1": {
       "top": 133.48,
@@ -670,7 +670,7 @@
       "--hg-cercador-bar-scale": null
     },
     "deltes": {
-      "selectorP2menysP1": -23.13,
+      "selectorP2menysP1": 2.72,
       "franjaP2menysP1": -0.05,
       "colorsMenysSelectorP2": 0
     }
@@ -746,24 +746,24 @@
         "relBottom": 82.07
       },
       "p2": {
-        "top": 148.16,
-        "bottom": 191.63,
-        "left": 230,
-        "right": 360.44,
-        "width": 130.44,
-        "height": 43.47,
-        "relTop": 27.16,
-        "relBottom": 70.63
+        "top": 174.72,
+        "bottom": 205.63,
+        "left": 222.19,
+        "right": 314.94,
+        "width": 92.75,
+        "height": 30.91,
+        "relTop": 53.72,
+        "relBottom": 84.63
       },
       "contenidorP2": {
         "top": 198,
-        "bottom": 328.44,
-        "left": 230,
-        "right": 360.44,
-        "width": 130.44,
-        "height": 130.44,
+        "bottom": 290.75,
+        "left": 222.19,
+        "right": 314.94,
+        "width": 92.75,
+        "height": 92.75,
         "relTop": 77,
-        "relBottom": 207.44
+        "relBottom": 169.75
       },
       "barraP1": {
         "top": 141,
@@ -776,25 +776,25 @@
         "relBottom": 113.13
       },
       "barraP2": {
-        "top": 104.69,
-        "bottom": 235.13,
-        "left": 230,
-        "right": 360.44,
-        "width": 130.44,
-        "height": 130.44,
-        "relTop": -16.31,
-        "relBottom": 114.13
+        "top": 143.81,
+        "bottom": 236.56,
+        "left": 222.19,
+        "right": 314.94,
+        "width": 92.75,
+        "height": 92.75,
+        "relTop": 22.81,
+        "relBottom": 115.56
       }
     },
     "colors": {
-      "top": 132.58,
-      "bottom": 207.2,
-      "left": 966.7,
-      "right": 1044.7,
-      "width": 78,
-      "height": 74.63,
-      "relTop": 11.58,
-      "relBottom": 86.2
+      "top": 145.14,
+      "bottom": 235.2,
+      "left": 1015.11,
+      "right": 1070.56,
+      "width": 55.45,
+      "height": 90.06,
+      "relTop": 24.14,
+      "relBottom": 114.2
     },
     "malla9P1": {
       "top": 133.48,
@@ -839,7 +839,7 @@
       "--hg-cercador-bar-scale": null
     },
     "deltes": {
-      "selectorP2menysP1": -23.88,
+      "selectorP2menysP1": 2.68,
       "franjaP2menysP1": -0.06,
       "colorsMenysSelectorP2": 0
     }
@@ -915,24 +915,24 @@
         "relBottom": 85.51
       },
       "p2": {
-        "top": 161.43,
-        "bottom": 204.9,
-        "left": 240.5,
-        "right": 370.94,
-        "width": 130.44,
-        "height": 43.47,
-        "relTop": 40.43,
-        "relBottom": 83.9
+        "top": 184.35,
+        "bottom": 216.96,
+        "left": 233.75,
+        "right": 331.63,
+        "width": 97.88,
+        "height": 32.61,
+        "relTop": 63.35,
+        "relBottom": 95.96
       },
       "contenidorP2": {
         "top": 193,
-        "bottom": 323.44,
-        "left": 240.5,
-        "right": 370.94,
-        "width": 130.44,
-        "height": 130.44,
+        "bottom": 290.88,
+        "left": 233.75,
+        "right": 331.63,
+        "width": 97.88,
+        "height": 97.88,
         "relTop": 72,
-        "relBottom": 202.44
+        "relBottom": 169.88
       },
       "barraP1": {
         "top": 141,
@@ -945,25 +945,25 @@
         "relBottom": 118.27
       },
       "barraP2": {
-        "top": 117.96,
-        "bottom": 248.4,
-        "left": 240.5,
-        "right": 370.94,
-        "width": 130.44,
-        "height": 130.44,
-        "relTop": -3.04,
-        "relBottom": 127.4
+        "top": 151.74,
+        "bottom": 249.62,
+        "left": 233.75,
+        "right": 331.63,
+        "width": 97.88,
+        "height": 97.88,
+        "relTop": 30.74,
+        "relBottom": 128.62
       }
     },
     "colors": {
-      "top": 142.3,
-      "bottom": 224.03,
-      "left": 1008.61,
-      "right": 1086.61,
-      "width": 78,
-      "height": 81.73,
-      "relTop": 21.3,
-      "relBottom": 103.03
+      "top": 153.16,
+      "bottom": 248.16,
+      "left": 1055.43,
+      "right": 1113.95,
+      "width": 58.52,
+      "height": 95,
+      "relTop": 32.16,
+      "relBottom": 127.16
     },
     "malla9P1": {
       "top": 133.48,
@@ -1008,7 +1008,7 @@
       "--hg-cercador-bar-scale": null
     },
     "deltes": {
-      "selectorP2menysP1": -12.32,
+      "selectorP2menysP1": 10.6,
       "franjaP2menysP1": -0.06,
       "colorsMenysSelectorP2": 0
     }

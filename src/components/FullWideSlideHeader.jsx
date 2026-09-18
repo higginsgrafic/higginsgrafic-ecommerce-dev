@@ -22,7 +22,7 @@ import IconButton from './fullwide/MegaIconButton.jsx';
 import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
 import RegisterOverlay from './fullwide/RegisterOverlay.jsx';
 import usePersistentState from '@/hooks/usePersistentState';
-import { CONTROL_TILE_BN, CONTROL_TILE_ARROWS, GAP_X_PX } from './fullwide/MegaColumn.jsx';
+import { CONTROL_TILE_BN, CONTROL_TILE_ARROWS } from './fullwide/MegaColumn.jsx';
 import MegaMenuPanel from './fullwide/MegaMenuPanel.jsx';
 import { CERCADOR_COLORS } from './fullwide/CercadorTopBar.jsx';
 import useMegaPublicIdleReset from '@/hooks/useMegaPublicIdleReset';
@@ -1954,21 +1954,11 @@ function FullWideSlideHeader({
     };
   }, []);
 
-  // Alcada de DISSENY de la filera de la franja (les samarretes): 9 columnes a
-  // escala 0,94 sobre el belt de referencia (1350) donen un tile de 130,33 px, i
-  // la franja fa 0,9 vegades aixo (117).
-  //
-  // A l'escriptori aquest valor ha de ser SEMPRE el del disseny: la franja
-  // s'encongeix amb el belt on es pinta (`cssEscalaMega` a MegaStripePanel i
-  // MegaStripePanelP1). Si sortis de l'amplada del panell (que es queda a 1350
-  // fins que la finestra baixa de ~1430 px), a 1280 faria 109 px i la franja no
-  // escalaria: feia el 98% del belt a 1920 i nomes el 74% a 1280.
-  //
-  // A tauleta es manté la calibració pròpia (megaTileSize), que ja està feta
-  // per al belt de 992.
-  const stripePreviewHPx = (isPortraitTablet || isLandscapeTablet)
-    ? Math.round((effectiveMegaTileSize || 240) * 0.9)
-    : Math.round((((MEGASLIDE_REFERENCIA_PX * 0.94) - (9 - 1) * GAP_X_PX) / 9) * 0.9);
+  // Alcada de la filera de la franja (les samarretes): 0,9 vegades el tile. El
+  // tile ja és una mida de DISSENY del carril (vegeu `contentW` més amunt), així
+  // que la franja s'encongeix amb el carril on es pinta (`carrilPx` a
+  // MegaStripePanel i MegaStripePanelP1) i no abans.
+  const stripePreviewHPx = Math.round((effectiveMegaTileSize || 240) * 0.9);
 
   useLayoutEffect(() => {
     try {
@@ -2082,9 +2072,14 @@ function FullWideSlideHeader({
       // franja, aixi que ha de coincidir amb la de l'apaisada.
       // A tauleta, el contingut va un 0,5% mes petit (ho demana el disseny);
       // desktop es queda igual.
+      // A l'escriptori el tile surt del CARRIL (1350 px de referencia), no de
+      // l'amplada del panell: el panell es queda a 1350 fins que la finestra
+      // baixa de ~1430, i si el tile en sortis, a 1280 faria 121 px (com si el
+      // carril fes 1350) i ni la franja ni el selector del megaslide
+      // s'encongirien amb el carril. A tauleta es manté la seva calibració.
       const contentW = isPortraitTablet
         ? 992 * 0.995 - pl - pr
-        : (isLandscapeTablet ? w * 0.995 - pl - pr : w - pl - pr);
+        : (isLandscapeTablet ? w * 0.995 - pl - pr : MEGASLIDE_REFERENCIA_PX - pl - pr);
       if (!contentW) return;
       const totalGaps = (COLS - 1) * GAP_PX;
       const colW = (contentW - totalGaps) / COLS;

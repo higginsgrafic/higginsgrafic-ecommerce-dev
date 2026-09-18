@@ -135,8 +135,17 @@ for (const c of CASES) {
   const desviament = (arr) => arr.map((y) => +(y - base).toFixed(1));
   const a = desviament(r.filesDibuixos);
   const b = desviament(r.filesColors);
-  if (JSON.stringify(a) !== JSON.stringify(b)) {
-    fallades.push(`${c.nom}: les files de dibuixos ${JSON.stringify(a)} no cauen a les de colors ${JSON.stringify(b)}`);
+  // Tolerància per fila (px): les files de dibuixos i de colors surten de
+  // fórmules distintes (dibuix + pas contra cercle + separació) i, quan les
+  // mides s'escalen amb el carril, l'arrodoniment del navegador les separa
+  // dècimes. Abans es comparaven amb igualtat exacta i una dècima les feia
+  // fallar.
+  const TOL_FILES = 0.5;
+  const maxDesv = a.length === b.length
+    ? a.reduce((m, y, i) => Math.max(m, Math.abs(y - b[i])), 0)
+    : Infinity;
+  if (maxDesv > TOL_FILES) {
+    fallades.push(`${c.nom}: les files de dibuixos ${JSON.stringify(a)} no cauen a les de colors ${JSON.stringify(b)} (${maxDesv.toFixed(2)} px)`);
   }
   if (Math.abs(r.selectorDelta) > TOL_ALINEACIO) {
     fallades.push(`${c.nom}: el selector no esta centrat amb la graella de colors (${r.selectorDelta} px)`);
