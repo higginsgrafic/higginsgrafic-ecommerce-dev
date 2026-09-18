@@ -19,6 +19,10 @@ import { SELLING_PRICE_LABEL } from '@/config/pricing';
 
 const PDP_PRESET_VERSION = 'pdp-layout-2026-06-06-1953';
 
+// Quan s'ha de pujar tota la PDP a la tauleta vertical (768-1024 d'ample i
+// mes alta que ampla). Es el numero a retocar si en cal mes o menys.
+const AJUST_PDP_VERTICAL_PX = 40;
+
 const PDP_TITLE_SETTINGS = {
   x: 0, y: 0, fontFamily: 'Oswald', fontSize: 24, fontWeight: 300, selectedFontWeight: 700,
   letterSpacing: 0.003, lineHeight: 1, textAlign: 'left', verticalAlign: 'bottom',
@@ -354,6 +358,10 @@ function PdpDesktop({ product }) {
       style={{
         position: 'relative',
         visibility: isLayoutReady ? 'visible' : 'hidden',
+        // A la tauleta VERTICAL tota la PDP va mes avall del que toca: es
+        // desplaça la secció sencera cap amunt (vegeu l'ajust, mes avall).
+        // A la resta d'orientacions, res.
+        transform: isPortraitTablet ? `translateY(-${AJUST_PDP_VERTICAL_PX}px)` : undefined,
       }}
     >
       <Helmet>
