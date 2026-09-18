@@ -461,6 +461,34 @@ criden.
 del contingut va canviant: 476 → 456 → 417). Treure'l canviaria un pegat per un
 salt visible, que és pitjor. Està documentat al codi.
 
+### El senyal d'èxit, comprovat
+
+Amb el sistema unificat, **els 20 px ja són un sol número**. Canviant l'objectiu
+del `pageLift` de 10 a 30 a la banda estreta, totes les peces baixen exactament
+20 px alhora i les relacions internes es conserven:
+
+| | abans | objectiu +20 |
+|---|---|---|
+| selector p1 | 50,10 | 70,10 |
+| selector p2 | 50,13 | 70,13 |
+| graella de colors | 13,78 | 33,78 |
+| franja p1 | 166,48 | 186,48 |
+| franja p2 | 166,78 | 186,78 |
+| panell | 314 | 334 |
+| deltes | 0,04 / 0,30 / 0 | **iguals** |
+
+**Però atenció**: aquesta palanca **també mou la tauleta apaisada** (1024×768
+compleix «ample ≥ alt»), i allà la franja i el panell no quadren amb la resta.
+Si es volen els 20 px, cal protegir la tauleta amb `esTauleta` (la detecció del
+dispositiu) **i** passar la prop `isLandscapeTablet` a `MegaStripePanelP1`, que
+avui no la rep. Aquella via es va provar i movia l'alçada del panell de la
+tauleta; cal una altra via per a ella.
+
+**Parany que el detector ha caigut sol**: fer servir `isLandscapeTablet` a
+`MegaStripePanelP1` sense que la prop existeixi trenca l'aplicació sencera
+(«isLandscapeTablet is not defined»). El detector ho va caçar de seguida perquè
+la mesura sortia tota buida a 1920.
+
 ---
 
 ## 9. Pendents
