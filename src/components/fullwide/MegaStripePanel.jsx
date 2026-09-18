@@ -4,6 +4,42 @@ import ClicAreaOverlay from './ClicAreaOverlay.jsx';
 import { CERCADOR_COLORS } from './CercadorTopBar.jsx';
 import { STRIPE_DRAWING_CALIBRATIONS } from '../../config/stripeCalibrations';
 
+/**
+ * Reserva d'espai de la graella vella a la pàgina 2.
+ *
+ * La pàgina 2 ja no dibuixa les 8 columnes de text: la graella de dibuixos viu
+ * a CercadorTextRow. Però el lloc que ocupava el MegaColumn encara s'ha de
+ * reservar, perquè la franja de samarretes no pugi.
+ *
+ * El buit és un fill únic amb `aspect-ratio`, que reprodueix la mida de la
+ * graella vella a partir de l'amplada del belt (no pas una alçada fixa: a
+ * desktop el belt s'encongeix per sota de 1382 i l'alçada l'ha de seguir).
+ * Calibrat contra el MegaColumn de debò: 8,77 dona la mateixa alçada a
+ * 768/1024/1280/1366/1440/1920 amb una desviació de dècimes de px.
+ *
+ * El transform `scale(0.94)` del contenidor no canvia la geometria del flux;
+ * per això la reserva es mesura amb la mida escalada del contenidor.
+ */
+const RESERVA_ASPECTE = '8.77 / 1';
+
+/**
+ * Banda estreta del megaslide: el desktop que no arriba al belt de 1350.
+ *
+ * El belt no arriba als 1350 i tot el bloc s'ha encongit, però la franja de
+ * samarretes no (la seva mida va lligada a l'amplada de la pàgina). Per això
+ * aquí no se li ha d'aplicar el desplaçament de -15 px.
+ *
+ * El llindar inferior és 1025 i no 768 a posta: 1024×768 és la tauleta
+ * apaisada, que també compleix «ample ≥ alt» i que NO s'ha de tocar. Com que
+ * a 1024 la franja ja té 29 px de coixí, deixar-la fora no costa res.
+ *
+ * S'ha de mantenir idèntic a MegaStripePanelP1 (`esEstenyFins1366`): si una
+ * pàgina el baixa i l'altra no, les dues franges es desquadren.
+ */
+const esFranjaEstenya = typeof window !== 'undefined'
+  && window.innerWidth > 1024 && window.innerWidth <= 1366
+  && window.innerWidth >= window.innerHeight;
+
 function canonicalKey(rawSrc) {
   try {
     const s = String(rawSrc || '').trim();
@@ -159,42 +195,47 @@ function MegaStripePanel({
           }}
           aria-hidden={reserveGridSpace ? true : undefined}
         >
-          {(resolvedMega[active] || []).map((col, idx) => (
-            <MegaColumn
-              key={`${active}-${idx}`}
-              title={col.title}
-              isFirstContact={active === 'first_contact' || active === 'austen' || active === 'cube' || active === 'miscellania'}
-              isHumanInside={active === 'the_human_inside'}
-              collectionId={active}
-              disableMulti={active === 'austen' && austenSelectedDisableMulti}
-              stripeVariantVisibility={stripeVariantVisibility}
-              megaTileSelectorParams={megaTileSelectorParams}
-              onStartSelectorDrag={onStartSelectorDrag}
-              megaTileSize={megaTileSize}
-              compactLandscape={compactLandscape}
-              hideLabels
-              hideSelectorBackground
-              humanInsideVariant={humanInsideVariant}
-              items={active === 'austen' ? reorderAustenQuotes(col.items) : col.items}
-              row={true}
-              firstContactVariant={firstContactVariant}
-              onFirstContactWhite={() => { setStripeOverlayOverrideActive(false); setFirstContactVariant('white'); }}
-              onFirstContactBlack={() => { setStripeOverlayOverrideActive(false); setFirstContactVariant('black'); }}
-              onFirstContactMulti={() => { setStripeOverlayOverrideActive(false); setFirstContactVariant('color'); }}
-              onHumanWhite={() => { setStripeOverlayOverrideActive(false); setHumanInsideVariant('white'); }}
-              onHumanBlack={() => { setStripeOverlayOverrideActive(false); setHumanInsideVariant('black'); }}
-              onHumanMulti={() => { setStripeOverlayOverrideActive(false); setHumanInsideVariant('color'); }}
-              onHumanPrev={() => setThinStartIndex((v) => v - 1)}
-              onHumanNext={() => setThinStartIndex((v) => v + 1)}
-              onSelectItem={(it) => {
-                setStripeOverlayOverrideActive(false);
-                if (active === 'first_contact') setFirstContactSelectedItem(it);
-                else if (active === 'the_human_inside') setHumanInsideSelectedItem(it);
-                else setSelectedItemByCollection((prev) => ({ ...prev, [active]: it }));
-                if (typeof onShirtClick === 'function') onShirtClick(active, it);
-              }}
-            />
-          ))}
+          {reserveGridSpace ? (
+            /* Només reserva: el MegaColumn vell ja no s'ha de dibuixar (pàgina 2). */
+            <div style={{ width: '100%', aspectRatio: RESERVA_ASPECTE }} />
+          ) : (
+            (resolvedMega[active] || []).map((col, idx) => (
+              <MegaColumn
+                key={`${active}-${idx}`}
+                title={col.title}
+                isFirstContact={active === 'first_contact' || active === 'austen' || active === 'cube' || active === 'miscellania'}
+                isHumanInside={active === 'the_human_inside'}
+                collectionId={active}
+                disableMulti={active === 'austen' && austenSelectedDisableMulti}
+                stripeVariantVisibility={stripeVariantVisibility}
+                megaTileSelectorParams={megaTileSelectorParams}
+                onStartSelectorDrag={onStartSelectorDrag}
+                megaTileSize={megaTileSize}
+                compactLandscape={compactLandscape}
+                hideLabels
+                hideSelectorBackground
+                humanInsideVariant={humanInsideVariant}
+                items={active === 'austen' ? reorderAustenQuotes(col.items) : col.items}
+                row={true}
+                firstContactVariant={firstContactVariant}
+                onFirstContactWhite={() => { setStripeOverlayOverrideActive(false); setFirstContactVariant('white'); }}
+                onFirstContactBlack={() => { setStripeOverlayOverrideActive(false); setFirstContactVariant('black'); }}
+                onFirstContactMulti={() => { setStripeOverlayOverrideActive(false); setFirstContactVariant('color'); }}
+                onHumanWhite={() => { setStripeOverlayOverrideActive(false); setHumanInsideVariant('white'); }}
+                onHumanBlack={() => { setStripeOverlayOverrideActive(false); setHumanInsideVariant('black'); }}
+                onHumanMulti={() => { setStripeOverlayOverrideActive(false); setHumanInsideVariant('color'); }}
+                onHumanPrev={() => setThinStartIndex((v) => v - 1)}
+                onHumanNext={() => setThinStartIndex((v) => v + 1)}
+                onSelectItem={(it) => {
+                  setStripeOverlayOverrideActive(false);
+                  if (active === 'first_contact') setFirstContactSelectedItem(it);
+                  else if (active === 'the_human_inside') setHumanInsideSelectedItem(it);
+                  else setSelectedItemByCollection((prev) => ({ ...prev, [active]: it }));
+                  if (typeof onShirtClick === 'function') onShirtClick(active, it);
+                }}
+              />
+            ))
+          )}
         </div>
       ) : null}
 
@@ -206,7 +247,13 @@ function MegaStripePanel({
             paddingBottom: compactLandscape ? '8px' : `${stripeRowPadPx}px`,
             paddingLeft: `${stripeRowPadXPx?.left || 0}px`,
             paddingRight: `${stripeRowPadXPx?.right || 0}px`,
-            transform: compactLandscape ? 'none' : 'translateY(-15px)',
+            // A la banda estreta la franja NO s'ha de pujar: el belt s'ha
+            // encongit i aquests -15 px deixaven el seu top 1,2 px per damunt
+            // del bottom de la graella de colors, que quedava partida en dues
+            // meitats (els cercles a dalt i el COLOR/NEGRE dins les samarretes).
+            // El mateix ajust va a MegaStripePanelP1 perquè les dues pàgines
+            // quedin a la mateixa alçada.
+            transform: (compactLandscape || esFranjaEstenya) ? 'none' : 'translateY(-15px)',
           }}
         >
           <div className="w-full flex justify-center bg-transparent">
