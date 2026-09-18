@@ -489,6 +489,34 @@ tauleta; cal una altra via per a ella.
 («isLandscapeTablet is not defined»). El detector ho va caçar de seguida perquè
 la mesura sortia tota buida a 1920.
 
+### Els 20 px, aplicats (i la tauleta estabilitzada)
+
+Fet amb **un sol número** a `deltaObjectiuPageLift`, que ara distingeix tres
+casos:
+
+| cas | desplaçament |
+|---|---|
+| banda estreta de desktop | 10 + 20 de marge = **30 px** |
+| les dues tauletes | **10 px** (com sempre) |
+| resta de desktop | **0** |
+
+`esTauleta` arriba del dispositiu via la prop `isLandscapeTablet`, que
+`MegaStripePanelP1` no rebia (això era el que impedia protegir la tauleta).
+
+Resultat a la banda estreta (1280×706): selector de les dues pàgines, graella
+de colors i les dues franges baixen **exactament 20 px** alhora, i els deltes es
+conserven. El panell passa de 314 a 334 px.
+
+**La tauleta no es mou gens**: 768×1024 i 1024×768 donen les mateixes xifres
+que abans del canvi (comprovat xifra a xifra contra la baseline anterior).
+
+**Parany d'aquesta passa**: `esTauleta` no arribava a la funció pura perquè els
+meus `git checkout` de proves la van deixar sense el paràmetre, i el cridador
+sí que el passava. Símptoma: la tauleta es movia igual. Amb una **sonda
+temporal** dins l'efecte (que ara ja no hi és) es va veure que la prop sí que
+arribava i que el problema era la signatura de la funció. Conclusió: quan una
+prop «no fa res», comprovar que la funció la rep abans de culpar el component.
+
 ---
 
 ## 9. Pendents
