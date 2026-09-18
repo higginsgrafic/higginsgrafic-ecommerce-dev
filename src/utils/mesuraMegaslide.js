@@ -189,9 +189,11 @@ export function deltaObjectiuPageLift({ selectorTop, panelTop, ample, alt, esTau
   // tauletes (es el que hi havia abans); el que canvia es que a la tauleta no
   // s'hi ha d'afegir cap marge extra.
   const bandaEstreta = ample >= 768 && ample <= 1366 && ample >= alt;
-  // Tres casos: la banda estreta de desktop porta 10 + 20 de marge; les dues
-  // tauletes, 10; la resta de desktop, 0.
-  const desplacament = esTauleta ? 10 : (bandaEstreta ? 30 : 0);
+  // Tres casos:
+  //   banda estreta de desktop -> 10 + 20 = 30 (els 20 del marge de la filera)
+  //   desktop ample            -> 0 + 20 = 20 (nomes els 20 de la franja)
+  //   les dues tauletes        -> 10 (com sempre)
+  const desplacament = esTauleta ? 10 : (bandaEstreta ? 30 : 20);
   return (selectorTop - panelTop) - desplacament;
 }
 
@@ -215,4 +217,31 @@ export function deltaObjectiuPageLift({ selectorTop, panelTop, ample, alt, esTau
 export function alcadaPanellMegaslide({ p1ContentBottom, gap = 30, margeExtra = 0 }) {
   if (!Number.isFinite(p1ContentBottom)) return 0;
   return Math.max(0, Math.round(p1ContentBottom + gap - 64 + margeExtra));
+}
+
+/**
+ * Desplaçament cap avall de les franges de samarretes a l'escriptori, en px.
+ *
+ * Compensa els 20 px de marge que s'han afegit a l'alçada de la pestanya: si no
+ * s'hi apliquessin, el buit quedaria tot a sota la franja i el contingut no
+ * baixaria. Va a les DUES franges (pàgina 1 i 2) amb el mateix valor, perquè
+ * han de quedar a la mateixa alçada.
+ *
+ * NOMÉS escriptori: a les tauletes les alçades són les seves.
+ *
+ * @param {object} e
+ * @param {number} e.ample
+ * @param {number} e.alt
+ * @param {boolean} [e.esTauleta]
+ * @returns {number} px (0 o 20)
+ */
+export const DESPLACAMENT_FRANJA_ESCRIPTORI_PX = 20;
+
+export function desplacamentFranjaEscriptori({ ample, alt, esTauleta = false }) {
+  if (esTauleta || ample < 768) return 0;
+  // A la banda estreta la filera ja baixa 20 px (amb l'objectiu del pageLift) i
+  // la franja la segueix: sumar-hi 20 mes la deixaria 10 px de l'aire de sota.
+  const bandaEstreta = ample <= 1366 && ample >= alt;
+  if (bandaEstreta) return 0;
+  return DESPLACAMENT_FRANJA_ESCRIPTORI_PX;
 }

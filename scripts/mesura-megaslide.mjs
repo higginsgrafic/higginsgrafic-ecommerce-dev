@@ -81,7 +81,12 @@ async function mesuraEstable(page, { intents = 14, espera = 400 } = {}) {
   for (let i = 0; i < intents; i++) {
     const ara = await page.evaluate((codi) => {
       // eslint-disable-next-line no-new-func
-      const factory = new Function(`${codi.replace(/export function/g, 'function').replace(/export default[^\n]*/g, '')}; return mesuraMegaslide;`);
+      // El modul es ESM: per injectar-lo a la pagina cal treure'n les paraules
+      // `export` (i la linea del default). Amb `export const` tambe.
+      const codiNet = codi
+        .replace(/export default[^\n]*/g, '')
+        .replace(/export /g, '');
+      const factory = new Function(`${codiNet}; return mesuraMegaslide;`);
       return factory()(document, window);
     }, modul);
     // Si encara no hi ha les peces clau (a vertical el selector viu en un altre

@@ -3,6 +3,7 @@ import { CERCADOR_COLORS } from '../fullwide/CercadorTopBar.jsx';
 import CercadorTextRow from '../fullwide/CercadorTextRow.jsx';
 import MegaStripePanel from '../fullwide/MegaStripePanel.jsx';
 import { FRANJA_AJUST_PX } from '../fullwide/MegaStripePanelP1.jsx';
+import { desplacamentFranjaEscriptori } from '../../utils/mesuraMegaslide.js';
 import MegaHeroSlider from '../MegaHeroSlider.jsx';
 import Pauta4ColsOverlay from '../pauta/Pauta4ColsOverlay';
 import useMegaslideCalibration from '@/hooks/useMegaslideCalibration';
@@ -109,6 +110,14 @@ export default function MegaslidePagina2({
     && window.innerWidth >= 768 && window.innerWidth <= 1366
     && window.innerWidth >= window.innerHeight;
   const topGraellaColors = 40 - (esBandaEstreta ? 38 : 0);
+  // Desplaçament de la franja a l'escriptori, per repartir el marge afegit a
+  // l'alçada de la pestanya (vegeu midesMegaslide.js). Va tambe a la franja de
+  // la pagina 1, amb el mateix valor, perque han de quedar a la mateixa alçada.
+  const desplacamentFranja = desplacamentFranjaEscriptori({
+    ample: typeof window !== 'undefined' ? window.innerWidth : 0,
+    alt: typeof window !== 'undefined' ? window.innerHeight : 0,
+    esTauleta: isPortraitTablet || isLandscapeTablet,
+  });
   const [topVisualAlignmentY, setTopVisualAlignmentY] = useState(0);
   // Desplaçament propi del selector Blanc/Color/Negre perquè quedi centrat amb
   // la graella de colors. Va a part de topVisualAlignmentY (que alinea el
@@ -511,7 +520,7 @@ export default function MegaslidePagina2({
             // L'ajust de la pàgina 1 (FRANJA_AJUST_PX a MegaStripePanelP1) no
             // s'aplica a la franja estreta (768-1366), però aquí sí que cal per
             //quedar-hi alineats.
-            visualOffsetY={-page1PageLift + (isLandscapeTablet ? -10 : 0) - ((isPortraitTablet || isLandscapeTablet) ? 0 : FRANJA_AJUST_PX)}
+            visualOffsetY={-page1PageLift + (isLandscapeTablet ? -10 : 0) - ((isPortraitTablet || isLandscapeTablet) ? 0 : FRANJA_AJUST_PX) + desplacamentFranja}
             fitAlcada={fitAlcada}
             stripeOverlayLoadState={stripeOverlayLoadState}
             resolvedOverlaySrc={resolvedOverlaySrc}

@@ -3,7 +3,7 @@ import {
   midesGraellaCompacta, midaDibuix, gapHorizontal, gapVertical, colorPas,
   GRAELLA_COLUMNES, GRAELLA_FILES, GRAELLA_MARGE_FRANJA,
 } from '../../src/components/fullwide/midesGraella.js';
-import { deltaObjectiuPageLift, alcadaPanellMegaslide } from '../../src/utils/mesuraMegaslide.js';
+import { deltaObjectiuPageLift, alcadaPanellMegaslide, desplacamentFranjaEscriptori } from '../../src/utils/mesuraMegaslide.js';
 
 // Aquesta prova existeix perquè el càlcul de les mides de la graella de
 // dibuixos vivia DINS d'un efecte de CercadorTextRow, barrejat amb la lectura
@@ -103,9 +103,11 @@ describe('deltaObjectiuPageLift', () => {
     expect(delta).toBe(60 - 10);
   });
 
-  it('a desktop ample el desplaçament és 0', () => {
+  it('a desktop ample el desplaçament és 20 (nomes el marge de la franja)', () => {
+    // Al desktop ample la filera no porta el marge de la banda estreta, pero si
+    // els 20 px de la franja: el selector hi ha de quedar 20 px mes avall.
     const delta = deltaObjectiuPageLift({ selectorTop: 200, panelTop: 140, ample: 1440, alt: 900 });
-    expect(delta).toBe(60);
+    expect(delta).toBe(60 - 20);
   });
 
   it('la tauleta vertical tambe es queda amb 10', () => {
@@ -117,7 +119,7 @@ describe('deltaObjectiuPageLift', () => {
 
   it('retorna el desnivell menys el desplaçament', () => {
     // selector 10 px sota el panell.
-    expect(deltaObjectiuPageLift({ selectorTop: 150, panelTop: 140, ample: 1440, alt: 900 })).toBe(10);   // desplaçament 0
+    expect(deltaObjectiuPageLift({ selectorTop: 150, panelTop: 140, ample: 1440, alt: 900 })).toBe(-10);  // desplaçament 20
     expect(deltaObjectiuPageLift({ selectorTop: 150, panelTop: 140, ample: 1280, alt: 706 })).toBe(-20);  // desplaçament 30
   });
 });
@@ -143,5 +145,29 @@ describe('alcadaPanellMegaslide', () => {
   it('sense mesura valida retorna 0 (i el panell fa servir la reserva)', () => {
     expect(alcadaPanellMegaslide({ p1ContentBottom: null })).toBe(0);
     expect(alcadaPanellMegaslide({ p1ContentBottom: NaN })).toBe(0);
+  });
+});
+
+describe('desplacamentFranjaEscriptori', () => {
+  // Els 20 px de marge que s'han afegit a l'alçada de la pestanya s'han de
+  // repartir: la franja baixa 20 px a l'escriptori ample, pero NO a la banda
+  // estreta (on la filera ja hi baixa) ni a les tauletes.
+  it("a la banda estreta és 0 (la filera ja hi baixa, i la franja la segueix)", () => {
+    expect(desplacamentFranjaEscriptori({ ample: 1280, alt: 768 })).toBe(0);
+    expect(desplacamentFranjaEscriptori({ ample: 1366, alt: 768 })).toBe(0);
+  });
+
+  it("a l'escriptori ample és 20", () => {
+    expect(desplacamentFranjaEscriptori({ ample: 1440, alt: 900 })).toBe(20);
+    expect(desplacamentFranjaEscriptori({ ample: 1920, alt: 1080 })).toBe(20);
+  });
+
+  it('a les tauletes és 0', () => {
+    expect(desplacamentFranjaEscriptori({ ample: 1024, alt: 768, esTauleta: true })).toBe(0);
+    expect(desplacamentFranjaEscriptori({ ample: 768, alt: 1024, esTauleta: true })).toBe(0);
+  });
+
+  it('al mobil és 0', () => {
+    expect(desplacamentFranjaEscriptori({ ample: 500, alt: 800 })).toBe(0);
   });
 });
