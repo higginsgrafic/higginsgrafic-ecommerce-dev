@@ -9,7 +9,7 @@ import { useCart } from '@/contexts/CartContext';
 import { useOrders } from '@/hooks/useOrders';
 import { getGildan64000Catalog } from '../utils/placeholders.js';
 import { AUSTEN_QUOTES_ASSETS, resolveAustenQuoteAssetId, resolveAustenQuoteOriginalFromPath } from '../utils/austenQuotesAssets.js';
-import { getSafeBelt, clampNumber, escalaMegaslide } from '@/utils/layoutMetrics';
+import { getSafeBelt, clampNumber, escalaMegaslide, MEGASLIDE_REFERENCIA_PX } from '@/utils/layoutMetrics';
 import {
   FIRST_CONTACT_MEDIA,
   FIRST_CONTACT_MEDIA_WHITE,
@@ -22,7 +22,7 @@ import IconButton from './fullwide/MegaIconButton.jsx';
 import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
 import RegisterOverlay from './fullwide/RegisterOverlay.jsx';
 import usePersistentState from '@/hooks/usePersistentState';
-import { CONTROL_TILE_BN, CONTROL_TILE_ARROWS } from './fullwide/MegaColumn.jsx';
+import { CONTROL_TILE_BN, CONTROL_TILE_ARROWS, GAP_X_PX } from './fullwide/MegaColumn.jsx';
 import MegaMenuPanel from './fullwide/MegaMenuPanel.jsx';
 import { CERCADOR_COLORS } from './fullwide/CercadorTopBar.jsx';
 import useMegaPublicIdleReset from '@/hooks/useMegaPublicIdleReset';
@@ -1954,7 +1954,21 @@ function FullWideSlideHeader({
     };
   }, []);
 
-  const stripePreviewHPx = Math.round((effectiveMegaTileSize || 240) * 0.9);
+  // Alcada de DISSENY de la filera de la franja (les samarretes): 9 columnes a
+  // escala 0,94 sobre el belt de referencia (1350) donen un tile de 130,33 px, i
+  // la franja fa 0,9 vegades aixo (117).
+  //
+  // A l'escriptori aquest valor ha de ser SEMPRE el del disseny: la franja
+  // s'encongeix amb el belt on es pinta (`cssEscalaMega` a MegaStripePanel i
+  // MegaStripePanelP1). Si sortis de l'amplada del panell (que es queda a 1350
+  // fins que la finestra baixa de ~1430 px), a 1280 faria 109 px i la franja no
+  // escalaria: feia el 98% del belt a 1920 i nomes el 74% a 1280.
+  //
+  // A tauleta es manté la calibració pròpia (megaTileSize), que ja està feta
+  // per al belt de 992.
+  const stripePreviewHPx = (isPortraitTablet || isLandscapeTablet)
+    ? Math.round((effectiveMegaTileSize || 240) * 0.9)
+    : Math.round((((MEGASLIDE_REFERENCIA_PX * 0.94) - (9 - 1) * GAP_X_PX) / 9) * 0.9);
 
   useLayoutEffect(() => {
     try {

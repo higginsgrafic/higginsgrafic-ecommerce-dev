@@ -153,6 +153,21 @@ export function escalaMegaslide(beltWidth) {
 }
 
 /**
+ * Converteix una mida del disseny del megaslide (la de 1920 = belt 1350) en una
+ * mesura CSS que s'encongeix amb el belt.
+ *
+ * Amb aixo les peces que tenien px fixos (separacions, coixins, desplacaments de
+ * la franja) escalen com la resta de la composicio. A 1920 i a tauleta
+ * `--hg-escala-mega` val 1, aixi que es un no-op i la referencia no es toca.
+ *
+ * @param {number} px mida de disseny, en px
+ * @returns {string} mesura CSS (`calc(...)`)
+ */
+export function cssEscalaMega(px) {
+  return `calc(${px}px * var(--hg-escala-mega, 1))`;
+}
+
+/**
  * Amplada de la finestra que es pren com a referencia del disseny.
  */
 export const MEGASLIDE_VISTA_REFERENCIA_PX = 1920;

@@ -19,6 +19,7 @@ import {
   touchMegaPublicActivity,
 } from './megaPublicSelectorState.js';
 import OptimizedImg from './OptimizedImg.jsx';
+import { cssEscalaMega } from '../../utils/layoutMetrics.js';
 import {
   FirstContactDibuix00Buttons,
   FirstContactDibuix09Buttons,
@@ -26,6 +27,9 @@ import {
 
 const CONTROL_TILE_BN = 'botonera-bn';
 const CONTROL_TILE_ARROWS = 'botonera-fletxes';
+// Separació entre les 9 columnes de la filera (era `gap-x-3` = 12 px). És una
+// mida de disseny del belt de 1350: s'escala amb `cssEscalaMega`.
+export const GAP_X_PX = 12;
 
 function MegaColumn({
   title,
@@ -54,6 +58,7 @@ function MegaColumn({
   compactLandscape = false,
   hideLabels = false,
   hideSelectorBackground = false,
+  selectorShiftPx = 0,
 }) {
   const tileSizeRef = useRef(null);
   const [tileSize, setTileSize] = useState(null);
@@ -1083,16 +1088,35 @@ function MegaColumn({
   return (
     <div className="min-w-0">
       {row ? (
-        <div className="grid w-full grid-cols-9 gap-x-3">
+        <div
+          className="grid w-full grid-cols-9 gap-x-3"
+          // La separacio entre columnes es una mida de DISSENY (12 px a 1350):
+          // s'encongeix amb el belt, com la resta de la composicio. Sense aixo
+          // les 9 columnes no escalaven igual i el tile quedava un 4% mes petit
+          // a 1280 (84 px en comptes de 87,3).
+          style={{ columnGap: cssEscalaMega(GAP_X_PX) }}
+        >
           {rowItems.map((it, idx) => (
             <div
               key={`${it}-${idx}`}
               className="min-w-0 relative z-10 self-start"
-              style={compactLandscape ? {
-                width: `${megaTileSize || 80}px`,
-                maxWidth: '100%',
-                justifySelf: 'center',
-              } : undefined}
+              style={{
+                ...(compactLandscape ? {
+                  width: `${megaTileSize || 80}px`,
+                  maxWidth: '100%',
+                  justifySelf: 'center',
+                } : null),
+                // La botonera Blanc/Color/Negre ha de caure on cau la de la
+                // pagina 2 (27 px del belt), no on la deixa la graella
+                // desplaçada: aixi les dues pagines tenen el selector al mateix
+                // lloc i la mateixa distancia fins als dibuixos. Va amb
+                // `transform` (no amb `margin`: un marge negatiu en una graella
+                // engrandeix la cel·la). El `scale(0,94)` del contenidor ja
+                // l'aplica, com a la resta de la composicio.
+                ...(it === CONTROL_TILE_BN && selectorShiftPx
+                  ? { transform: `translateX(${cssEscalaMega(-selectorShiftPx)})` }
+                  : null),
+              }}
             >
               {(() => {
                 const isSelected = Boolean(
