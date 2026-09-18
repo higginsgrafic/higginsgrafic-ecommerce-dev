@@ -188,6 +188,7 @@ function MegaStripePanelP1({
           ample: window.innerWidth,
           alt: window.innerHeight,
           esTauleta: isPortraitTablet || isLandscapeTablet,
+          esPortraitTablet: isPortraitTablet,
         });
         const next = Math.max(0, pageLiftRef.current + delta);
         if (Math.abs(next - pageLiftRef.current) >= 0.5) {
@@ -365,7 +366,7 @@ function MegaStripePanelP1({
                   // La franja s'ajusta tambe a l'alcada de la finestra (fitAlcada):
                   // en una finestra curta, la seva mida de disseny no hi cap i es
                   // menja el panell. MegaStripePanel (pagina 2) fa el mateix.
-                  transform: `translate(var(--megaStripeDx, 0px), calc(var(--megaStripeDy, 0px) + ${(typeof window !== 'undefined' && window.innerWidth >= 768 && window.innerWidth <= 1366 && window.innerWidth >= window.innerHeight) ? -10 : 0}px + ${desplacamentFranjaEscriptori({ ample: typeof window !== 'undefined' ? window.innerWidth : 0, alt: typeof window !== 'undefined' ? window.innerHeight : 0, esTauleta: isPortraitTablet || isLandscapeTablet })}px)) scale(calc(var(--megaStripeScale, 1.2125) * ${fitAlcada}))`,
+                  transform: `translate(var(--megaStripeDx, 0px), calc(var(--megaStripeDy, 0px) + ${(typeof window !== 'undefined' && window.innerWidth >= 768 && window.innerWidth <= 1366 && window.innerWidth >= window.innerHeight) ? -10 : 0}px + ${desplacamentFranjaEscriptori({ ample: typeof window !== 'undefined' ? window.innerWidth : 0, alt: typeof window !== 'undefined' ? window.innerHeight : 0, esTauleta: isPortraitTablet || isLandscapeTablet, esPortraitTablet: isPortraitTablet })}px)) scale(calc(var(--megaStripeScale, 1.2125) * ${fitAlcada}))`,
                   isolation: 'isolate',
                 }}
               >
