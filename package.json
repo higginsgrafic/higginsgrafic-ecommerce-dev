@@ -36,7 +36,10 @@
     "thumbs:stripe": "node scripts/generate-grid-thumbs.mjs --kind stripe --in public/custom_logos/drawings/images_originals/stripe --out public/custom_logos/drawings/images_stripe --width 256 --quality 78 --incremental",
     "thumbs:stripe:force": "node scripts/generate-grid-thumbs.mjs --kind stripe --in public/custom_logos/drawings/images_originals/stripe --out public/custom_logos/drawings/images_stripe --width 256 --quality 78 --incremental --force",
     "verifica:proves": "node scripts/verifica-mode-de-proves.mjs",
-    "compara-vistes": "node scripts/compara-vistes.mjs"
+    "compara-vistes": "node scripts/compara-vistes.mjs",
+    "mesura:megaslide": "node scripts/mesura-megaslide.mjs",
+    "mesura:megaslide:captura": "node scripts/mesura-megaslide.mjs --captura",
+    "mesura:megaslide:detall": "node scripts/mesura-megaslide.mjs --detall"
   },
   "dependencies": {
     "@radix-ui/react-dialog": "^1.1.4",
