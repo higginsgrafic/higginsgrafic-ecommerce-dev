@@ -185,3 +185,25 @@ export function deltaObjectiuPageLift({ selectorTop, panelTop, ample, alt }) {
   const desplacament = bandaEstreta ? 10 : 0;
   return (selectorTop - panelTop) - desplacament;
 }
+
+/**
+ * Alçada del panell del megaslide a partir de la mesura del contingut de la
+ * pàgina 1.
+ *
+ * El panell acaba `gap` px sota el bottom visible de les samarretes. El `-64`
+ * és el `py-8` del contenidor del panell (32 + 32), que la mesura ja inclou i
+ * per tant s'ha de descomptar.
+ *
+ * Vivia dins de MegaMenuPanel, dins d'una expressió de set línies amb tres
+ * condicions enganxades (checkout, mesura estable, valor recordat).
+ *
+ * @param {object} e
+ * @param {number} e.p1ContentBottom  bottom de la franja de la pàgina 1, en px des del capdamunt del panell
+ * @param {number} [e.gap]            espai que queda sota les samarretes (P1_STRIPE_BOTTOM_GAP)
+ * @param {number} [e.margeExtra]     marge extra de l'escriptori
+ * @returns {number} alçada del panell en px (mai negativa)
+ */
+export function alcadaPanellMegaslide({ p1ContentBottom, gap = 30, margeExtra = 0 }) {
+  if (!Number.isFinite(p1ContentBottom)) return 0;
+  return Math.max(0, Math.round(p1ContentBottom + gap - 64 + margeExtra));
+}

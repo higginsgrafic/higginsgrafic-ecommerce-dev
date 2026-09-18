@@ -84,8 +84,11 @@ async function mesuraEstable(page, { intents = 14, espera = 400 } = {}) {
       const factory = new Function(`${codi.replace(/export function/g, 'function').replace(/export default[^\n]*/g, '')}; return mesuraMegaslide;`);
       return factory()(document, window);
     }, modul);
+    // Si encara no hi ha les peces clau (a vertical el selector viu en un altre
+    // viewport i pot trigar a tenir mida), no és una mesura valida: s'espera.
+    const tePeces = ara?.selector?.p2 && ara?.colors && ara?.franja?.p2;
     const clau = (m) => JSON.stringify([m.deltes, m.franja.p2?.relTop, m.selector.p2?.relTop, m.colors?.relTop, m.guarda?.height]);
-    if (anterior && clau(anterior) === clau(ara)) return ara;
+    if (tePeces && anterior && clau(anterior) === clau(ara)) return ara;
     anterior = ara;
     await page.waitForTimeout(espera);
   }
