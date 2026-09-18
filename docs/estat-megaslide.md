@@ -952,6 +952,35 @@ passada de repàs (600 ms): abans oscil·lava 1,8 px entre execucions i la mesur
 fallava de manera intermitent; ara el selector queda clavat al centre de la
 graella de colors (delta 0) sempre.
 
+### Els gaps dels dibuixos cedeixen l'espai (10.7) — FET
+
+A 1440 i 1280 la columna de col·leccions queia sobre la graella de colors. El que
+ha de cedir és el dibuix, no la llista (ho va dir l'amo):
+
+- **`midesGraellaCompacta`**: el dibuix té la mida de disseny escalada amb el
+  carril (`base x escala`) i el que s'encongeix **primer** són les separacions;
+  només si arriben a zero es redueix el dibuix. Abans es reduïen totes dues
+  coses alhora, i per això a 1280 el dibuix queia a 19,67 en comptes de 20 i els
+  gaps quedaven grans.
+- **La llista** rep un coixí per l'esquerra igual al que la graella de colors
+  sobreïx de la seva columna (més el desplaçament de +10 px de la banda estreta),
+  de manera que el text no hi cau a sobre encara que la seva columna sigui justa
+  la mida del text.
+
+| vista | dibuix | gapH | solapament cercles → llista |
+|---|---|---|---|
+| 1920 | 30 | 26,33 | −10 |
+| 1440 | 22,5 | 18,78 | −7,5 |
+| 1366 | 21,33 | 16,91 | 0 |
+| 1280 | 20 | 15,39 | 0 |
+| tauleta | 19,89 | 17,91 | −7,4 |
+
+(negatiu = els cercles acaben abans que comenci el text; a 1366/1280 es toquen)
+
+A 1920 i a tauleta no es mou res: el dibuix i el gap de disseny (30 i 26,33) i
+els de tauleta (19,89 i 17,91) queden igual. Les proves d'`midesGraellaCompacta`
+s'han actualitzat a la regla nova (les separacions primer).
+
 **El que NO s'ha passat al carril (i per què)**:
 
 - **Els offsets verticals** (40, 20, 45, 5, 8, 10, 15 px) i el `top` del
