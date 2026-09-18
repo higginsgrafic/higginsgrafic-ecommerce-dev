@@ -569,3 +569,60 @@ abans que jo.
 6. **Els 20 px de marge a la banda estreta** (el canvi que va obrir tota aquesta
    feina): amb el sistema ja unificat, ara hauria de ser factible. Cal mesurar
    quin efecte té sobre les dues files i la franja, i validar-ho amb l'amo.
+
+---
+
+## 10. L'escala proporcional del megaslide (18/9, sessió llarga)
+
+**La idea de l'amo**: 1920×1080 és la versió principal, i la resta de formats
+n'han de ser una **adaptació escalada**. El mòbil es fa a part. Si el belt és
+una proporció de la finestra, tot el que en depèn escala sol.
+
+**El que hi havia**: tres fonts de mida que no parlaven entre elles.
+- la graella de dibuixos mesurava l'amplada de la seva columna (s'adaptava);
+- la franja de samarretes sortia de `megaTileSize` (no s'adaptava);
+- el belt era `min(1350px, vw - 32px)`, amb un sostre fix.
+
+**El que s'ha fet** (`6fc126f` i `3484719`):
+- `escalaMegaslide(beltWidth)` i `getBeltWidth(vw)` a `layoutMetrics.js`: **una
+  sola font**. El belt és el 70,3% de la finestra (1350 sobre 1920).
+- `--hg-escala-mega` es publica des de `FullWideSlideHeader` (qui mesura el
+  belt) i la franja el multiplica a la seva escala, a les DUES pàgines.
+- `--page-band-belt-width` i el fallback de l'amplada dels panells ja no tenen
+  el 1350 fix: son `70.3vw`.
+- **La tauleta no s'escala mai** (té les seves alçades i el seu belt de 992). La
+  decisió es pren amb `isPortraitTablet || isLandscapeTablet` (el dispositiu),
+  **no amb l'amplada**: 1280×768 és desktop i també compleix «ample ≥ alt», i la
+  primera versió de la condició li aplicava la branca de tauleta.
+
+**Les proporcions, que és el que es volia**:
+
+| vista | belt | franja alt | franja ÷ belt | dibuix |
+|---|---|---|---|---|
+| 1920×1080 | 1350 | 141,9 | **0,105** | 30 |
+| 1440×864 | 1013 | 106,4 | **0,105** | 19,78 |
+| 1280×768 | 900 | 84,6 | 0,094 | 16,14 |
+| 1024×768 tauleta | 992 | 100,4 | 0,101 | 19,89 |
+
+Les bandes de pàgina també escalen (related: 417 → 332 → 303; transition:
+819 → 476 → 362).
+
+**El que queda** (properes passes, ja més fines):
+1. **Els marges interns del megaslide no són simètrics**: a 1920 el marge
+   esquerre dels dibuixos és 168 i el dret 288. Els offsets interns (`105px` a
+   `CercadorTextRow:421`, `27px` a `MegaslidePagina2:410`, el `left: 50%` de la
+   franja) ja escalen però no quadren exactament amb el belt.
+2. **El contingut que no passa per les bandes** encara té el 1350 literal:
+   `CistellComandaContent` (`TABLE_WIDTH = 1350`), `UserComandesContent`
+   (`width: '1350px'`, tres cops) i `SiteFrame`
+   (`SITE_FRAME_MAX_WIDTH = 1350`).
+3. **Reescalar el contingut de les pàgines** en la mateixa proporció (ho va
+   demanar explícitament; les bandes ja ho fan, la resta no).
+
+**Parany après**: els intents d'escalar amb un `transform: scale` a sobre del
+belt escalat **empitjoren** (el contingut se'n va cap endins i els marges queden
+irregulars). Cal escalar **les mides i les coordenades**, no pintar-les més
+petites.
+
+**Eines**: `npm run mesura:megaslide` (833 xifres de regressió a 7 mides),
+`npm run compara-vistes`, 459 proves, `npx vite build`.
