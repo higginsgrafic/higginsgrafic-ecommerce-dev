@@ -24,6 +24,7 @@ const P1_STRIPE_BOTTOM_GAP = 30;
 // té la seva pròpia alçada de guarda) ni al mòbil.
 const MARGE_EXTRA_DESKTOP_PX = 20;
 
+
 // Memoria de l'alcada bona del panell. El mega-slide es munta i es desmunta cada
 // cop que s'obre, i la mesura del contingut de la pagina 1 triga una estona a
 // arribar i va canviant (476 -> 456 -> 417): allo es veia com un rebot. Guardant
@@ -287,7 +288,7 @@ export default function MegaMenuPanel({
               transform: 'translateX(-50%)',
               width: '100vw',
               height: '100%',
-              overflow: 'visible'
+              overflow: 'visible',
             }}>
               <div
                 style={{
