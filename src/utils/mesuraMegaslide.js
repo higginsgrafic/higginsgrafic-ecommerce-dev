@@ -162,3 +162,26 @@ export function mesuraMegaslide(doc = typeof document !== 'undefined' ? document
 }
 
 export default mesuraMegaslide;
+
+/**
+ * Objectiu del `pageLift` de la pàgina 1.
+ *
+ * La pàgina 1 apuja tota la seva filera perquè el selector Blanc/Color/Negre
+ * quedi a l'alçada que toca: `desplaçament` px sota el capdamunt del panell
+ * (10 px a la banda estreta de desktop, 0 a la resta).
+ *
+ * Retorna el DELTA que s'ha de sumar al lift actual. Vivia dins de l'efecte de
+ * MegaStripePanelP1, barrejat amb la lectura del DOM.
+ *
+ * @param {object} e
+ * @param {number} e.selectorTop  `top` del selector, en px de finestra
+ * @param {number} e.panelTop     `top` del panell, en px de finestra
+ * @param {number} e.ample        amplada de la finestra
+ * @param {number} e.alt          alçada de la finestra
+ * @returns {number} delta del lift
+ */
+export function deltaObjectiuPageLift({ selectorTop, panelTop, ample, alt }) {
+  const bandaEstreta = ample >= 768 && ample <= 1366 && ample >= alt;
+  const desplacament = bandaEstreta ? 10 : 0;
+  return (selectorTop - panelTop) - desplacament;
+}
