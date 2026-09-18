@@ -862,6 +862,28 @@ mira peces del megaslide) ni el comparador miren el header. La comprovació
 d'aquesta passa ha estat una sonda pròpia i captures a 1280 i 1440
 (`docs/comparacio/megaslide-header-*.png`).
 
+**Correcció (mateixa nit)**: el conjunt que s'ha de centrar dins el carril és
+el de la pàgina 2 **sencer** (selector → llista de col·leccions), no els
+dibuixos. Amb els dibuixos centrats (228/228), les 240 px de la columna de
+colors i la llista empenyien tot el bloc cap a la dreta: la llista sortia del
+carril (12 px la seva columna i 24 px el text) i la meitat esquerra quedava
+buida. La filera ha tornat a la posició del disseny, expressada com a proporció
+del carril: **13% a l'esquerra i 3% a la dreta**, o sigui el selector a 27 px i
+la llista a ~28 px de l'altre extrem, tot dins el carril.
+
+I a la **pàgina 1** s'ha tret el `translateX(45,25 px)` que quadrava la seva
+graella amb la de la pàgina 2: movia tota la filera (dibuixos, colors i
+col·leccions) cap a la dreta. Ara la graella fa el 94% del carril centrat i
+prou; el bloc arrenca al 13% del carril, que és on arrenca també el de la
+pàgina 2 (7 px de diferència, com al disseny). El selector de la pàgina 1 torna
+a la seva columna (3% del carril), i el de la 2 es queda al 2%.
+
+Conseqüència que queda apuntada: com que **el text no s'escala** (ho va triar
+l'amo), a 1280 i 1366 la llista de col·leccions fa 17 i 11 px més que la seva
+columna i el seu text surt una mica del carril. Per tancar-ho caldria donar a
+aquella columna una amplada mínima (i llavors la graella de dibuixos s'encongiria
+una mica en aquelles mides) o escalar el text.
+
 **El que NO s'ha passat al carril (i per què)**:
 
 - **Els offsets verticals** (40, 20, 45, 5, 8, 10, 15 px) i el `top` del

@@ -252,20 +252,13 @@ function MegaStripePanelP1({
         <div
           className="relative z-10 grid grid-cols-1 gap-10"
           style={{
-            // El bloc de dibuixos de la pàgina 1 ha de caure al mateix lloc que
-            // el de la pàgina 2. La graella fa el 100% del belt i es pinta al
-            // 94% (centrada), i el bloc arrenca a la segona columna; amb el
-            // desplaçament de sota la segona columna cau a 228 px del belt, que
-            // és on arrenca la graella de dibuixos de la pàgina 2 a 1920.
-            // (`translate` va abans del `scale`: és en px del pare, per això no
-            // el multiplica el 0,94.)
-            //
-            // A tauleta no s'hi aplica: allà la filera de la pàgina 2 ja
-            // arrenca on arrenca la de la pàgina 1 (queden a 2 px) i el
-            // desplaçament les desquadraria.
-            transform: (isPortraitTablet || isLandscapeTablet)
-              ? 'scale(var(--hgGridFitScale, 0.94))'
-              : `translateX(${carrilPx(45.25)}) scale(var(--hgGridFitScale, 0.94))`,
+            // La graella fa el 100% del carril i es pinta al 94% (centrada): el
+            // bloc de dibuixos arrenca a la segona columna, o sigui al 13% del
+            // carril, que es on arrenca tambe la filera de la pagina 2.
+            // Sense desplaçaments: quan se li afegia un `translateX` per
+            // quadrar-lo amb la pagina 2, tota la filera (dibuixos, colors i
+            // colleccions) marxava cap a la dreta.
+            transform: 'scale(var(--hgGridFitScale, 0.94))',
             transformOrigin: 'top center',
             visibility: reserveGridSpace ? 'hidden' : undefined,
             pointerEvents: reserveGridSpace ? 'none' : undefined,
@@ -285,11 +278,6 @@ function MegaStripePanelP1({
               onStartSelectorDrag={onStartSelectorDrag}
               megaTileSize={megaTileSize}
               compactLandscape={compactLandscape}
-              // La botonera B/N/C ha de caure a 27 px del belt, com la de la
-              // pagina 2: la graella va desplaçada 45,25 px per quadrar els
-              // dibuixos, i el selector s'ha de desfer aquell desplaçament (45,25
-              // + els 17,25 que ja tenia de mes respecte de la pagina 2).
-              selectorShiftPx={(isPortraitTablet || isLandscapeTablet) ? 0 : 62.5}
               hideLabels
               hideSelectorBackground
               humanInsideVariant={humanInsideVariant}

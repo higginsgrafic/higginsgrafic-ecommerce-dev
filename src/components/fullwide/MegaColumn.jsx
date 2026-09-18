@@ -58,7 +58,6 @@ function MegaColumn({
   compactLandscape = false,
   hideLabels = false,
   hideSelectorBackground = false,
-  selectorShiftPx = 0,
 }) {
   const tileSizeRef = useRef(null);
   const [tileSize, setTileSize] = useState(null);
@@ -1106,16 +1105,6 @@ function MegaColumn({
                   maxWidth: '100%',
                   justifySelf: 'center',
                 } : null),
-                // La botonera Blanc/Color/Negre ha de caure on cau la de la
-                // pagina 2 (27 px del belt), no on la deixa la graella
-                // desplaçada: aixi les dues pagines tenen el selector al mateix
-                // lloc i la mateixa distancia fins als dibuixos. Va amb
-                // `transform` (no amb `margin`: un marge negatiu en una graella
-                // engrandeix la cel·la). El `scale(0,94)` del contenidor ja
-                // l'aplica, com a la resta de la composicio.
-                ...(it === CONTROL_TILE_BN && selectorShiftPx
-                  ? { transform: `translateX(${carrilPx(-selectorShiftPx)})` }
-                  : null),
               }}
             >
               {(() => {
