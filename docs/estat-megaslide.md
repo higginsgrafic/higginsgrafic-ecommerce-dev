@@ -519,6 +519,35 @@ prop «no fa res», comprovar que la funció la rep abans de culpar el component
 
 ---
 
+### El marge de 20 px, final (i el doble comptatge)
+
+L'amo va veure a l'ull que la pestanya havia crescut més del compte: passava de
+346 a 386 px, no a 366. **Els 20 px es comptaven dues vegades**: el marge
+s'aplicava a l'alçada del panell I el desplaçament del contingut també feia 20.
+Com que la mesura del contingut de la pàgina 1 es pren DESPRÉS del
+desplaçament, el panell creixia 20 per la filera i 20 més pel marge.
+
+Arreglat traient el marge de la fórmula de l'alçada. I el desplaçament s'ha
+simplificat a **una sola regla**: el contingut (filera i franja, a les dues
+pàgines) baixa 20 px a **tot l'escriptori**, i 0 a les tauletes i al mòbil.
+
+| mida | panell | aire sota la franja | delta franges |
+|---|---|---|---|
+| 1280×768 | 354 | 30,3 | 0,3 |
+| 1440×900 | 366 | 30,7 | 0,6 |
+| 1920×1080 | 366 | 30,7 | 0,6 |
+| tauletes | igual que sempre | igual | igual |
+
+**Lliçó**: quan una mesura es pren *després* d'un desplaçament, el desplaçament
+ja hi és a dins. Sumar-lo també a la fórmula el compta dues vegades.
+
+**I una altra lliçó, d'aquesta tanda**: les mesures **relatives al panell** no
+serveixen per comprovar si el contingut s'ha mogut, perquè el panell es mou amb
+ell. Cal mesurar en **coordenades absolutes de finestra**. L'amo ho va veure
+abans que jo.
+
+---
+
 ## 9. Pendents
 
 1. **Pujar els commits**: n'hi ha **23** de pendents (`git log --oneline origin/main..HEAD`),
