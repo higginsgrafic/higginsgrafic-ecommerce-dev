@@ -17,6 +17,12 @@ const MegaslidePagina4 = lazy(() => import('../megaslide/MegaslidePagina4.jsx'))
 // inferior del panell. Aquest és el número a retocar si en vol més o menys.
 const P1_STRIPE_BOTTOM_GAP = 30;
 
+// Marge extra de la pestanya del megaslide a l'escriptori: les graelles de la
+// banda estreta s'han menjat el coixí que quedava sota les samarretes i cal
+// deixar-hi 20 px més d'aire. NO s'aplica a la tauleta apaisada (768-1366, que
+// té la seva pròpia alçada de guarda) ni al mòbil.
+const MARGE_EXTRA_DESKTOP_PX = 20;
+
 // Memoria de l'alcada bona del panell. El mega-slide es munta i es desmunta cada
 // cop que s'obre, i la mesura del contingut de la pagina 1 triga una estona a
 // arribar i va canviant (476 -> 456 -> 417): allo es veia com un rebot. Guardant
@@ -122,6 +128,19 @@ export default function MegaMenuPanel({
 }) {
   if (!active) return null;
 
+  // Dimensions i format de la finestra. Es calculen aquí dalt perquè els fan
+  // servir tant la reserva d'alçada del panell com el càlcul de la guarda.
+  const w = typeof window !== 'undefined' ? window.innerWidth : 0;
+  const h = typeof window !== 'undefined' ? window.innerHeight : 0;
+  const esVerticalAqui = w >= 768 && w <= 1366 && h > w;
+  const esApaissadaAqui = w >= 768 && w <= 1366 && w >= h;
+  const esMobilAqui = w < 768;
+  // Marge extra de la pestanya a l'escriptori (vegeu MARGE_EXTRA_DESKTOP_PX).
+  // S'aplica tant a la mesura com a la reserva, perquè el panell no faci cap
+  // salt entre l'estat inicial i el calibrat.
+  const margeExtraDesktop = (esVerticalAqui || esApaissadaAqui || esMobilAqui) ? 0 : MARGE_EXTRA_DESKTOP_PX;
+  const arrodonirAlcadaGuard = (px) => `${Math.max(0, Math.round(px + margeExtraDesktop))}px`;
+
   const viewport1Ref = useRef(null);
   const handlePortraitScroll1 = useCallback(() => {
     const viewport = viewport1Ref.current;
@@ -205,31 +224,24 @@ export default function MegaMenuPanel({
   // deixa el formulari just a sota) el cistell no tapa res i, de passada, en
   // obrir-lo no es veu cap ajust d'alçada.
   const esCheckout = typeof window !== 'undefined' && window.location.pathname === '/checkout';
-  // La variant la detectem aqui: les props isPortraitTablet/isLandscapeTablet
-  // existeixen pero el header no les hi passa, aixi que sempre valen false.
-  const w = typeof window !== 'undefined' ? window.innerWidth : 0;
-  const h = typeof window !== 'undefined' ? window.innerHeight : 0;
-  const esVerticalAqui = w >= 768 && w <= 1366 && h > w;
-  const esApaissadaAqui = w >= 768 && w <= 1366 && w >= h;
   // 270px de panell a l'apaisada i 330 a l'escriptori: son les alcades que
   // deixen el formulari just a sota. A la vertical i al mobil no cal limit
   // (al mobil el mega-slide ja es baixet i el limit li tapava el formulari).
-  const esMobilAqui = w < 768;
   const CHECKOUT_GUARD_H = (esVerticalAqui || esMobilAqui) ? null : (esApaissadaAqui ? 206 : 266);
   const guardHeightPx = paymentFillsScreen
     ? guardHeightPxDefault
     : esCheckout && CHECKOUT_GUARD_H != null
     ? `${CHECKOUT_GUARD_H}px`
     : matchesPage1Height && p1ContentBottomPx != null && mesuraEstable
-    ? `${Math.max(0, Math.round(p1ContentBottomPx + P1_STRIPE_BOTTOM_GAP - 64))}px`
+    ? arrodonirAlcadaGuard(p1ContentBottomPx + P1_STRIPE_BOTTOM_GAP - 64)
     : (alcadaRecordada || guardHeightPxDefault);
 
   // Quan l'alcada bona ja es ferma, la guardem per a les properes obertures.
   useEffect(() => {
     if (isPortraitTablet || paymentFillsScreen) return;
     if (!mesuraEstable || p1ContentBottomPx == null) return;
-    desarAlcada(`${Math.max(0, Math.round(p1ContentBottomPx + P1_STRIPE_BOTTOM_GAP - 64))}px`);
-  }, [mesuraEstable, p1ContentBottomPx, isPortraitTablet, paymentFillsScreen]);
+    desarAlcada(arrodonirAlcadaGuard(p1ContentBottomPx + P1_STRIPE_BOTTOM_GAP - 64));
+  }, [mesuraEstable, p1ContentBottomPx, isPortraitTablet, paymentFillsScreen, margeExtraDesktop]);
 
   return (
     <div className="relative">
