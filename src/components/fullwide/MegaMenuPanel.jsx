@@ -296,14 +296,7 @@ export default function MegaMenuPanel({
                       el que no hi cap s'hi arriba desplacant. D'aquesta
                       amplada en surt la calibracio (megaTileSize), aixi que
                       les mides del selector i de la franja tambe coincideixen. */}
-                  <div style={{ flex: '0 0 auto', width: isPortraitTablet ? '992px' : 'var(--hg-mega-w, min(1350px, calc(100vw - 32px)))', maxWidth: 'none', position: 'relative', height: '100%', paddingLeft: '0px', paddingRight: '0px',
-                    // Vista desktop escalada: el mega-slide es compon a la seva
-                    // mida de disseny (1350) i despres s'escala per encabir-se a
-                    // la pantalla. Aixi un portatil de 1280 veu exactament el
-                    // desktop, nomes que una mica mes petit.
-                    zoom: (!isPortraitTablet && !isLandscapeTablet)
-                      ? Math.min(1, ((typeof window !== 'undefined' ? window.innerWidth : 1382) - 32) / 1350)
-                      : undefined }}>
+                  <div style={{ flex: '0 0 auto', width: isPortraitTablet ? '992px' : 'var(--hg-mega-w, min(1350px, calc(100vw - 32px)))', maxWidth: 'none', position: 'relative', height: '100%', paddingLeft: '0px', paddingRight: '0px' }}>
                     <MegaStripePanelP1
                       active={active}
                       resolvedMega={resolvedMega}
