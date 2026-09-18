@@ -304,7 +304,7 @@ function MegaStripePanel({
                   // en una finestra curta, la seva mida de disseny no hi cap i es
                   // menja el panell. MegaStripePanelP1 (pagina 1) fa el mateix
                   // amb el mateix factor, perque les dues franges quedin igual.
-                  transform: `translate(var(--megaStripeDx, 0px), calc(var(--megaStripeDy, 0px) + ${visualOffsetY}px)) scale(calc(var(--megaStripeScale, 1.2125) * ${fitAlcada}))`,
+                  transform: `translate(var(--megaStripeDx, 0px), calc(var(--megaStripeDy, 0px) + ${visualOffsetY}px)) scale(calc(var(--megaStripeScale, 1.2125) * ${fitAlcada} * var(--hg-escala-mega, 1)))`,
                   isolation: 'isolate',
                 }}
               >
