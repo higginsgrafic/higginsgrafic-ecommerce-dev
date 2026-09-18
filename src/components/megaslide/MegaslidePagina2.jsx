@@ -4,7 +4,7 @@ import CercadorTextRow from '../fullwide/CercadorTextRow.jsx';
 import MegaStripePanel from '../fullwide/MegaStripePanel.jsx';
 import { FRANJA_AJUST_PX } from '../fullwide/MegaStripePanelP1.jsx';
 import { desplacamentFranjaEscriptori } from '../../utils/mesuraMegaslide.js';
-import { carrilPx } from '../../utils/layoutMetrics.js';
+import { carrilPx, carrilLane } from '../../utils/layoutMetrics.js';
 import MegaHeroSlider from '../MegaHeroSlider.jsx';
 import Pauta4ColsOverlay from '../pauta/Pauta4ColsOverlay';
 import useMegaslideCalibration from '@/hooks/useMegaslideCalibration';
@@ -418,7 +418,7 @@ export default function MegaslidePagina2({
             // Dins el carril: 27 px de disseny a l'esquerra i la mida del tile
             // del carril (`carrilPx`). Abans eren px de la finestra i a 1280 el
             // selector feia 121 px mentre el de la pagina 1 en feia 87.
-            left: carrilPx(27),
+            left: carrilLane(27),
             width: carrilPx(bnSliderSize),
             height: carrilPx(bnSliderSize),
             zIndex: 4,
@@ -447,10 +447,10 @@ export default function MegaslidePagina2({
           left: '50%',
           transform: `translateX(-50%) scale(var(--hg-cercador-bar-scale, 1))`,
           transformOrigin: 'top center',
-          // El contenidor de la filera ES el carril a l'escriptori: tot el que
-          // hi ha a dins son proporcions seves (`carrilPct` a CercadorTextRow).
-          // A tauleta es queda el 94% de sempre (el seu disseny es a part).
-          width: (isPortraitTablet || isLandscapeTablet) ? 'var(--hg-cercador-bar-width, 94%)' : '100%',
+          // El contenidor de la filera ES el carril: tot el que hi ha a dins
+          // son proporcions seves (`carrilPct` i `carrilLane` a
+          // CercadorTextRow), tambe a tauleta.
+          width: '100%',
           zIndex: 3,
           containerType: 'inline-size',
         }}>
