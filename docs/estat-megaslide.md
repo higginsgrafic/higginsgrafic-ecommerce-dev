@@ -677,23 +677,117 @@ l'esquerra del belt i 288 a la dreta. No és que «no quadrés amb el belt»: er
   de dibuixos, els cercles i la llista. La baseline s'ha tornat a capturar.
 - El conjunt de la filera (selector → llista) queda ara 25,5 px a la dreta del
   centre de la finestra: és el preu de centrar els dibuixos amb la llista a la
-  seva dreta. **Conseqüència a l'ull**: el selector Blanc/Color/Negre queda a
-  ~70 px del primer dibuix (abans ~18). Si es vol més estret, cal desplaçar
-  també el selector (27 px a `MegaslidePagina2:410`).
+  seva dreta. El selector de la pàgina 2 es va quedar a 27 px del belt i els
+  dibuixos a 228 (una separació de 70 px); a la pàgina 1 s'hi ha fet el mateix
+  (punt 10.2).
 - Les tauletes només es desplacen els 7,5 px de la reserva (a vertical, a més,
   recuperen els 7,5 px que quedaven tallats a l'esquerra); les seves mides i
   alineacions no es mouen, i el comparador segueix donant OK.
+
+### La pàgina 1, proporcional (10.2) — FET
+
+L'amo ho va demanar abans de continuar amb la pàgina 2: «has de fer la pàgina 1
+ben feta a tots els formats». El que hi havia:
+
+- La **graella de 9 columnes** (el MegaColumn de la pàgina 1) ja escalava: fa el
+  94% del belt i el tile passava de 131 px (1920) a 84 (1280). Però la
+  **separació de 12 px** entre columnes era fixa i es menjava el 4% del tile a
+  1280 (84 en comptes de 87,3).
+- La **franja de colors** (les samarretes) era el gros: feia el **98% del belt a
+  1920 i només el 74% a 1280**, i a 1440-1366 la de la pàgina 1 era **més
+  estreta que la de la pàgina 2** (820 contra 1017 px a 1280).
+- El bloc de dibuixos de la pàgina 1 arrencava a 182,7 px del belt; el de la
+  pàgina 2, a 228. En canviar de pàgina, el bloc saltava 45 px.
+
+**Què s'ha fet**:
+
+1. **La franja s'escala per la seva mida, no pel `transform`.** La filera de la
+   franja té l'alçada de disseny (`stripePreviewHPx` = 117, el tile de 1350 per
+   0,9) i el seu `transform` només hi aplica `megaStripeScale × fitAlcada`; la
+   mida de DISSENY s'escala amb `cssEscalaMega` (`calc(px ×
+   var(--hg-escala-mega))`, nou a `layoutMetrics.js`). Abans l'escala anava dins
+   del `transform`: la franja es veia bé però la seva caixa de layout no
+   s'encongia i el panell quedava 8-31 px massa alt.
+   - `stripePreviewHPx` ja no surt de l'amplada del panell (que es queda a 1350
+     fins que la finestra baixa de ~1430): a l'escriptori és sempre el valor de
+     disseny. A tauleta es manté la calibració pròpia.
+   - La filera de la pàgina 1 no s'ha d'encongir per encabir-se al contenidor
+     (`flexShrink: 0`): era el que la deixava a 820 px a 1280 quan la de la
+     pàgina 2 en feia 1017.
+2. **La separació de les 9 columnes** és `calc(12px × escala)` (`GAP_X_PX`).
+3. **El bloc de dibuixos cau on cau el de la pàgina 2**: la graella es
+   desplaça 45,25 px (escalats) a la dreta. La botonera Blanc/Color/Negre, que
+   viu dins la graella, es desfà aquell desplaçament i torna a 27 px del belt,
+   com la de la pàgina 2 (abans quedava a 40,5 i 13,5 px a la dreta).
+4. **La reserva de la pàgina 2** (el buit que substitueix el MegaColumn) passa
+   de `aspect-ratio: 8,77` a una alçada calculada amb la fórmula del MegaColumn
+   (`RESERVA_ALCADA`): el tile és `(belt − 8 separacions) / 9`, més el marge de
+   dalt del botó (8 px) i el descendent de la seva línia (~5,96 px). Amb
+   l'`aspect-ratio` fix, en escalar-se la separació la reserva quedava 4 px
+   curta i les franges de les dues pàgines es desquadraven.
+
+**Xifres** (Chromium contra el 3003 viu, tot en % del belt):
+
+| vista | tile | franja ample | franja alt | delta franja p2−p1 |
+|---|---|---|---|---|
+| 1920 | 0,097 | 0,981 | 0,105 | **−0,06** |
+| 1440 | 0,097 | 0,981 | 0,105 | **−0,06** |
+| 1366 | 0,097 | 0,942 | 0,101 | **−0,06** |
+| 1280×800 | 0,097 | 0,981 | 0,105 | **−0,05** |
+| 1280×706 | 0,097 | 0,981 | 0,093 | **−0,05** |
+| 1024 i 768 tauleta | 0,094 | 0,947 / 0,925 | 0,101 | −15,2 / −0,3 |
+
+- La franja de 1366 i de 1280×706 queda curta perquè hi actua `fitAlcada` (la
+  finestra fa 768 i 706 px): és l'ajust d'alçada volgut, no un desescalat.
+- El delta franja p2−p1 passa de −0,7/+0,6 a **−0,06 a totes les mides**.
+- El panell creix el que ha de créixer (la franja és més gran): 1280×800 passa
+  de 277 a 287 px.
+- **A 1920 només es mouen dues coses**: el bloc de dibuixos (+45,3 px, el que
+  es volia) i el selector (−13,5 px, de 40,5 a 27 px del belt). La resta de les
+  833 xifres no es mouen. **A tauleta, cap**: 0 xifres.
+- Baseline tornada a capturar; comparador OK amb les xifres de sempre.
+
+**El que encara no s'ha tocat de la pàgina 1** (ho ha dit l'amo: primer la 1,
+després la 2):
+
+- El **selector de la pàgina 2** no s'escala (a 1280 fa 121 px i el de la
+  pàgina 1 en fa 87). No es pot escalar sense tocar el bucle
+  `alignTopRowToPage1`: alinea el botó Color de les dues pàgines amb
+  `topVisualAlignmentY`, que **també mou la filera de dibuixos de la pàgina 2**;
+  en encongir-se el selector, la filera baixa 11 px i deixa de quadrar amb la de
+  la pàgina 1. Cal separar les dues coses primer.
+- Els **espais verticals** de la pàgina 1 (el `mt-2` de 8 px dels tiles, els
+  -15/+20 px de la franja, `FRANJA_AJUST_PX`): són px fixos i, a 1280, deixen
+  ~10 px més d'aire entre els dibuixos i la franja del que tocaria. No s'han
+  escalat perquè el `FRANJA_AJUST_PX` i el `visualOffsetY` són compensacions
+  entre les dues pàgines (tocar-los desquadra les franges) i el `mt-2` canvia
+  l'alçada de la filera, que la reserva ha de seguir.
+- Les **tipografies** (14 px del selector, 11 px de les llistes) no s'escalen.
+
+**Paranys apresos (pàgina 1)**:
+
+- `transform: translate(a) scale(s)`: el `translate` va **abans** del `scale`, o
+  sigui en px del pare. Per això el desplaçament de 45,25 px no el multiplica el
+  0,94 del contenidor, i en canvi el `marginTop` de 8 px dels tiles sí.
+- Un **marge negatiu en una cel·la de graella l'engrandeix** (la cel·la del
+  selector va passar de 131 a 189,7 px). Per desplaçar-la sense deformar-la,
+  `transform`.
+- La **reserva** de la pàgina 2 va dins del contenidor escalat al 0,94: la seva
+  alçada s'ha d'expressar en px de layout (si s'hi posa l'alçada visible, queda
+  0,94 vegades curta).
+- El **descendent de la línia** del botó (`inline-block`) afegeix ~5,1 px
+  d'alçada visible que no són ni el marge ni el tile: és el que feia que la
+  reserva no quadrés.
 
 **El que queda** (properes passes, ja més fines):
 1. **El contingut que no passa per les bandes** encara té el 1350 literal:
    `CistellComandaContent` (`TABLE_WIDTH = 1350`), `UserComandesContent`
    (`width: '1350px'`, tres cops) i `SiteFrame`
    (`SITE_FRAME_MAX_WIDTH = 1350`).
-2. **Reescalar el contingut de les pàgines** en la mateixa proporció (ho va
-   demanar explícitament; les bandes ja ho fan, la resta no). Els offsets
-   interns encara són px (`187,5` / `27` / `78` / `142`), no proporcions del
+2. **La pàgina 2**: el selector (vegeu més amunt) i les mides internes de la
+   filera de dibuixos (`187,5` / `27` / `78` / `142` són px, no proporcions del
    belt: a 1280 el dibuix fa 16,14 px quan la proporció de 1920 en demanaria
-   ~20.
+   ~20, i la graella fa el 52% del belt en comptes del 66%).
 
 **Parany après**: els intents d'escalar amb un `transform: scale` a sobre del
 belt escalat **empitjoren** (el contingut se'n va cap endins i els marges queden
