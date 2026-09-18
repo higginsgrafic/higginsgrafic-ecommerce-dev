@@ -8,7 +8,10 @@ Es pot esborrar quan s'hagi tancat el tema.
 
 ## 1. Com treballa l'amo (important)
 
-- Tot en **català**: codi, comentaris, commits i conversa.
+- Tot en **català**: codi, comentaris, commits i conversa. **Les normes de
+  llengua que manen són al punt 9.bis** (llegeix-lo abans d'escriure text
+  d'interfície: botons en imperatiu singular, segona persona del singular, mai
+  el pronom *tu*).
 - **No fer push** sense que ho demani. Els commits es fan locals i ell decideix
   quan pugen.
 - **Abans de dir que una cosa està feta**: `npx vitest run` i `npm run build`.
@@ -569,6 +572,32 @@ abans que jo.
 6. **Els 20 px de marge a la banda estreta** (el canvi que va obrir tota aquesta
    feina): amb el sistema ja unificat, ara hauria de ser factible. Cal mesurar
    quin efecte té sobre les dues files i la franja, i validar-ho amb l'amo.
+
+---
+
+## 9.bis. La llengua: quins documents manen
+
+**Ordre de prioritat** (el mes nou mana). Si dos documents es contradiuen, guanya
+el de data mes recent:
+
+| data | document | que hi ha |
+|---|---|---|
+| **2026-09-15** | `docs/guia-pronoms-febles.md` | pronoms febles: formes, posicio, combinacio i errors frequents |
+| **2026-09-13** | `docs/norma-linguistica-vigent.md` | **LA NORMA VIGENT**: tractament al client, botons, idioma, subjecte eliptic, llenguatge tecnic, convencio d'adreces |
+| 2026-01-23 | `project-logs/LANGUAGE/ortografia-gramatica-catala.v1.2.yml` | memoria operativa d'ortografia i gramatica (IECC), per carregar al principi de sessio |
+| 2026-01 | `project-logs/LANGUAGE/2026-01-*.md` | quatre registres de treball de llengua |
+
+**Substitueixen** aquests dos, que es conserven nomes com a historial i **no
+s'han d'aplicar**:
+- `norma_tu_vos_catala.txt` i `ux_norma_ellipsis_imperatius.txt`: contenien
+  regles d'us de «vos» i de botons en imperatiu plural que **no s'apliquen**.
+
+**Els tres punts que mes es trenquen** (de `norma-linguistica-vigent.md`):
+1. **Segona persona del SINGULAR**, i mai el pronom *tu* ni cap subjecte
+   explicit: *«La teva comanda»* si, *«Tu tens 14 dies»* no.
+2. **Botons en imperatiu SINGULAR**, mai infinitiu: *Desa* (no *Desar*),
+   *Confirma* (no *Confirmar*), *Afegeix* (no *Afegir*).
+3. **Nomes catala**, sense castellanismes ni els disfressats.
 
 ---
 
