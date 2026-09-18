@@ -981,6 +981,32 @@ A 1920 i a tauleta no es mou res: el dibuix i el gap de disseny (30 i 26,33) i
 els de tauleta (19,89 i 17,91) queden igual. Les proves d'`midesGraellaCompacta`
 s'han actualitzat a la regla nova (les separacions primer).
 
+### Els textos del megaslide, al carril (10.8) — FET
+
+Amb els gaps comprimits (10.7) els dibuixos quedaven més apretats del que toca.
+L'amo va dir que també es podia ajustar la mida del text: ara els textos del
+megaslide s'encongeixen amb el carril (`carrilPx`, o sigui `px x escala`):
+
+- la **llista de col·leccions** i les **etiquetes dels dibuixos**: 11 px a 1920,
+  8,25 a 1440, 7,33 a 1280;
+- la **pastilla COLOR** (11 px) i els botons **Blanc/Color/Negre** (14 px).
+
+A tauleta es queden a 8 px i 14 px (el seu disseny), i a 1920, igual.
+
+**Resultat**: amb el text escalat, els gaps dels dibuixos ja no s'han d'apretar i
+queden a la proporció del disseny a totes les mides:
+
+| vista | text de la llista | dibuix | gapH (disseny: 26,33 x escala) | solapament |
+|---|---|---|---|---|
+| 1920 | 11 px | 30 | 26,33 | −10 |
+| 1440 | 8,25 px | 22,5 | 19,75 (=) | −7,5 |
+| 1366 | 7,82 px | 21,33 | 18,72 (=) | 0 |
+| 1280 | 7,33 px | 20 | 17,55 (=) | 0 |
+| tauleta | 8 px | 19,89 | 17,91 | −7,4 |
+
+La regla de 10.7 (les separacions s'encongeixen abans que el dibuix) es queda com
+a xarxa: només entra si, tot i escalar el text, l'espai no arriba.
+
 **El que NO s'ha passat al carril (i per què)**:
 
 - **Els offsets verticals** (40, 20, 45, 5, 8, 10, 15 px) i el `top` del
