@@ -9,7 +9,7 @@ import { useCart } from '@/contexts/CartContext';
 import { useOrders } from '@/hooks/useOrders';
 import { getGildan64000Catalog } from '../utils/placeholders.js';
 import { AUSTEN_QUOTES_ASSETS, resolveAustenQuoteAssetId, resolveAustenQuoteOriginalFromPath } from '../utils/austenQuotesAssets.js';
-import { getSafeBelt, clampNumber, escalaMegaslide, MEGASLIDE_REFERENCIA_PX } from '@/utils/layoutMetrics';
+import { getSafeBelt, clampNumber, escalaMegaslide, MEGASLIDE_REFERENCIA_PX, carrilPx } from '@/utils/layoutMetrics';
 import {
   FIRST_CONTACT_MEDIA,
   FIRST_CONTACT_MEDIA_WHITE,
@@ -45,6 +45,15 @@ function FullWideSlideHeader({
   isPortraitTablet = false,
   isLandscapeTablet = false,
 }) {
+  // Les dues tauletes son el mateix disseny a part (vegeu el punt 10 del
+  // testimoni): el carril de 1350 no s'hi aplica.
+  const esTauleta = isPortraitTablet || isLandscapeTablet;
+  // La banda estreta del megaslide (768-1366 sense tauleta): la mateixa
+  // definicio que a MegaslidePagina2.
+  const esBandaEstreta = typeof window !== 'undefined'
+    && !isLandscapeTablet
+    && window.innerWidth >= 768 && window.innerWidth <= 1366
+    && window.innerWidth >= window.innerHeight;
   const location = useLocation();
   const navigate = useNavigate();
   const { products: contextProducts } = useProductContext();
@@ -2817,11 +2826,25 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
           className="flex h-20 items-center gap-3 px-4 sm:px-6 lg:h-20 lg:px-10"
           style={{
             height: isPortraitTablet ? '80px' : undefined,
-            // Ancorat exactament a SiteFrame (=belt2) per evitar discrepàncies
-            // de centratge causades per scrollbar-gutter, rulerInset i el fet
-            // que el `<header>` és `position: fixed` (`right: 0` viewport).
-            width: 'var(--site-w, 100%)',
-            marginLeft: 'calc(var(--site-xL, 0px) - var(--rulerInset, 0px))',
+            // La capçalera viu al MATEIX carril que el megaslide i les bandes
+            // (70,3vw, centrat): a 1440 el marc del lloc feia 1350 px i el
+            // carril 1013, i el logo quedava 128 px a l'esquerra del contingut
+            // del megaslide.
+            //
+            // A tauleta es manté el marc del lloc (`--site-w`): allà el carril
+            // fa 992 px i es més ample que la pantalla, i la capçalera no es
+            // pot desplaçar.
+            width: esTauleta ? 'var(--site-w, 100%)' : 'var(--hg-mega-w, 70.3vw)',
+            marginLeft: esTauleta
+              ? 'calc(var(--site-xL, 0px) - var(--rulerInset, 0px))'
+              : 'calc(var(--hg-mega-x, 0px) - var(--rulerInset, 0px))',
+            // El coixí i la separació de la fila tambe son mides del carril
+            // (40 i 12 px de 1350): amb el coixí fix, a 1280 el nav no hi
+            // cabia dins el carril (li faltaven 31 px) i s'amagava sota el
+            // logo. A tauleta es queden les classes (el seu disseny es a part).
+            paddingLeft: esTauleta ? undefined : carrilPx(40),
+            paddingRight: esTauleta ? undefined : carrilPx(40),
+            columnGap: esTauleta ? undefined : carrilPx(12),
           }}
         >
           <div className="flex items-center gap-2 lg:gap-2">
@@ -2878,7 +2901,15 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
             />
           </Link>
 
-          <nav className={`hidden md:flex flex-1 items-center justify-center gap-1 lg:gap-4 flex-nowrap overflow-hidden ${isPortraitTablet ? 'md:hidden' : ''}`} style={(isPortraitTablet || isLandscapeTablet) ? { gap: isLandscapeTablet ? '1rem' : '0.25rem', minWidth: 0, justifyContent: 'flex-start', marginLeft: isPortraitTablet ? '-60px' : undefined } : { transform: 'translateX(-5%)' }}>
+          <nav className={`hidden md:flex flex-1 items-center justify-center gap-1 lg:gap-4 flex-nowrap ${esTauleta ? 'overflow-hidden' : ''} ${isPortraitTablet ? 'md:hidden' : ''}`} style={(isPortraitTablet || isLandscapeTablet) ? { gap: isLandscapeTablet ? '1rem' : '0.25rem', minWidth: 0, justifyContent: 'flex-start', marginLeft: isPortraitTablet ? '-60px' : undefined } : {
+              // El -5% és un ajust òptic del nav (el desplaça cap a l'esquerra).
+              // Dins el carril, a la banda estreta (768-1366) el nav no té marge
+              // per a aquest desplaçament: el seu contingut ja hi va just i el
+              // -5% el posava sota el logo (la «F» de FIRST CONTACT quedava
+              // tallada a 1280).
+              transform: esBandaEstreta ? 'none' : 'translateX(-5%)',
+              columnGap: carrilPx(16),
+            }}>
             {resolvedNav.map((item) => {
               // L'indicador d'obert (fletxa rotada + color) només s'ha
               // d'activar quan realment veiem la col·lecció (megaPage=1).
@@ -3062,6 +3093,8 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
           style={{
             position: 'relative',
             zIndex: 10001,
+            // Aquest segon header només surt a la tauleta vertical: es queda
+            // amb el marc del lloc (vegeu el primer).
             width: 'var(--site-w, 100%)',
             marginLeft: 'calc(var(--site-xL, 0px) - var(--rulerInset, 0px))',
             borderTop: '1px solid #E6E8EC',
