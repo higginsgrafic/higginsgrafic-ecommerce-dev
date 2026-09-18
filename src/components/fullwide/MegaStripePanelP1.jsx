@@ -136,6 +136,7 @@ function MegaStripePanelP1({
   stripeEmptyMaskSrc,
   calibrationOverrides,
   compactLandscape = false,
+  fitAlcada = 1,
   onP1ContentBottomChange,
   onPageLiftChange,
   isPortraitTablet = false,
@@ -294,10 +295,18 @@ function MegaStripePanelP1({
             // A la franja estreta (768-1366) la pàgina ja té els seus propis
             // ajustos de 10 px i l'ajust general no s'hi ha d'aplicar.
             marginTop: compactLandscape ? '16px' : `${stripeRowPadPx - ((!isPortraitTablet && !compactLandscape && !esEstenyFins1366) ? FRANJA_AJUST_PX : 0)}px`,
-            paddingBottom: compactLandscape ? '8px' : `${stripeRowPadPx}px`,
+            // El coixí de sota tambe s'ajusta a l'alcada de la finestra (vegeu
+            // fitAlcada a MegaMenuPanel): si no, la franja s'encongiria pero el
+            // panell no. Ha de coincidir amb MegaStripePanel (pàgina 2).
+            paddingBottom: compactLandscape ? '8px' : `${stripeRowPadPx * fitAlcada}px`,
             paddingLeft: `${stripeRowPadXPx?.left || 0}px`,
             paddingRight: `${stripeRowPadXPx?.right || 0}px`,
-            transform: compactLandscape ? 'none' : 'translateY(-15px)',
+            // La franja estreta (768-1366) no ha de pujar: el belt s'ha
+            // encongit, la graella de colors ha quedat 17 px més curta i
+            // aquests -15 px la partien en dues meitats (els cercles a dalt i
+            // el COLOR/NEGRE dins de les samarretes). Ha de coincidir amb el
+            // mateix ajust de MegaStripePanel (pàgina 2).
+            transform: (compactLandscape || esEstenyFins1366) ? 'none' : 'translateY(-15px)',
           }}
         >
           <div className="w-full flex justify-center bg-transparent">
@@ -344,7 +353,10 @@ function MegaStripePanelP1({
                   // A l'apaisada pugem la stripe 10px (les samarretes). El
                   // desplaçament va amb la resta de la seva posicio, que ve de
                   // les variables de calibracio.
-                  transform: `translate(var(--megaStripeDx, 0px), calc(var(--megaStripeDy, 0px) + ${(typeof window !== 'undefined' && window.innerWidth >= 768 && window.innerWidth <= 1366 && window.innerWidth >= window.innerHeight) ? -10 : 0}px)) scale(var(--megaStripeScale, 1.2125))`,
+                  // La franja s'ajusta tambe a l'alcada de la finestra (fitAlcada):
+                  // en una finestra curta, la seva mida de disseny no hi cap i es
+                  // menja el panell. MegaStripePanel (pagina 2) fa el mateix.
+                  transform: `translate(var(--megaStripeDx, 0px), calc(var(--megaStripeDy, 0px) + ${(typeof window !== 'undefined' && window.innerWidth >= 768 && window.innerWidth <= 1366 && window.innerWidth >= window.innerHeight) ? -10 : 0}px)) scale(calc(var(--megaStripeScale, 1.2125) * ${fitAlcada}))`,
                   isolation: 'isolate',
                 }}
               >

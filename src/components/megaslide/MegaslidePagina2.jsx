@@ -39,6 +39,7 @@ export default function MegaslidePagina2({
   page1MegaTileSize,
   page1StripePreviewHPx,
   page1PageLift = 0,
+  fitAlcada = 1,
   resolvedMegaFiltered,
   showStripe,
   stripeOverlayLoadState,
@@ -480,6 +481,7 @@ export default function MegaslidePagina2({
             // s'aplica a la franja estreta (768-1366), però aquí sí que cal per
             //quedar-hi alineats.
             visualOffsetY={-page1PageLift + (isLandscapeTablet ? -10 : 0) - ((isPortraitTablet || isLandscapeTablet) ? 0 : FRANJA_AJUST_PX)}
+            fitAlcada={fitAlcada}
             stripeOverlayLoadState={stripeOverlayLoadState}
             resolvedOverlaySrc={resolvedOverlaySrc}
             stripeOverlayDebug={stripeOverlayDebug}
