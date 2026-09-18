@@ -1,3 +1,4 @@
+import { carrilPx } from '../../utils/layoutMetrics.js';
 import React from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import OptimizedImg from './OptimizedImg.jsx';
@@ -151,7 +152,7 @@ export function FirstContactDibuix00Buttons({
             <span
               className="font-oswald"
               style={{
-                fontSize: '14px',
+                fontSize: carrilPx(14),
                 fontWeight: 400,
                 textTransform: 'uppercase',
                 color: selectedIndex === i ? '#1A1A1A' : '#6B7280',

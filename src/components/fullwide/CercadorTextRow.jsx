@@ -495,7 +495,7 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
                     }}
                   />
                 ) : (
-                  <span style={{ color: '#2B2B2B', fontSize: `${((isPortraitTablet || isLandscapeTablet) ? 8 : 11) + fontBoost}px`, whiteSpace: 'nowrap' }}>
+                  <span style={{ color: '#2B2B2B', fontSize: (isPortraitTablet || isLandscapeTablet) ? `${8 + fontBoost}px` : carrilPx(11 + fontBoost), whiteSpace: 'nowrap' }}>
                     {label.replace(/^Looking For My Darcy/, 'LFMD')}
                   </span>
                 )}
@@ -546,7 +546,7 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
               className="font-oswald"
               style={{
                 fontWeight: 700,
-                fontSize: (isPortraitTablet || isLandscapeTablet) ? '8px' : '11px',
+                fontSize: (isPortraitTablet || isLandscapeTablet) ? '8px' : carrilPx(11),
                 lineHeight: 1,
                 letterSpacing: '0.04em',
                 color: '#2B2B2B',
@@ -597,7 +597,11 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
                 border: 0,
                 background: 'transparent',
                 color: '#2B2B2B',
-                fontSize: (isPortraitTablet || isLandscapeTablet) ? '8px' : '11px',
+                // El text tambe s'encongeix amb el carril: es el que fa que la
+                // columna de la llista no demani sempre la mida del text de
+                // 1920, i que per tant els gaps dels dibuixos no s'hagin
+                // d'apretar tant. A tauleta es queda a 8 px (el seu disseny).
+                fontSize: (isPortraitTablet || isLandscapeTablet) ? '8px' : carrilPx(11),
                 fontWeight: key === activeKey ? 700 : 300,
                 lineHeight: (isPortraitTablet || isLandscapeTablet) ? '11px' : `${alcadaFilaLlista}px`,
                 textAlign: 'right',
