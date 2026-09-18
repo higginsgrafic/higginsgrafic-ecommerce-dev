@@ -1,0 +1,86 @@
+import { describe, it, expect } from 'vitest';
+import {
+  midesGraellaCompacta, midaDibuix, gapHorizontal, gapVertical, colorPas,
+  GRAELLA_COLUMNES, GRAELLA_FILES, GRAELLA_MARGE_FRANJA,
+} from '../../src/components/fullwide/midesGraella.js';
+
+// Aquesta prova existeix perquè el càlcul de les mides de la graella de
+// dibuixos vivia DINS d'un efecte de CercadorTextRow, barrejat amb la lectura
+// del DOM. Allà no es podia comprovar sense navegador, i per això qualsevol
+// canvi al sistema de mesura era a cegues.
+//
+// Ara el càlcul és una funció pura a midesGraella.js i aquí es fixen les
+// seves regles, que són les que fan que les files de dibuixos caiguin a les
+// files dels cercles de color.
+
+const AMPLE_BASE_DESKTOP = () => {
+  const base = midaDibuix(false, false);
+  const gapH = gapHorizontal(false, false);
+  return GRAELLA_COLUMNES * base + (GRAELLA_COLUMNES - 1) * gapH; // 875
+};
+
+const alçadaGraella = (m) => GRAELLA_FILES * m.dibuix + (GRAELLA_FILES - 1) * m.gapV;
+
+describe('midesGraellaCompacta', () => {
+  it('amb espai de sobres fa servir les mides base de desktop', () => {
+    const m = midesGraellaCompacta({ ampleAmple: 1200, sostre: 400, daltGraella: 100 });
+    expect(m.dibuix).toBeCloseTo(30, 5);
+    expect(m.gapH).toBeCloseTo((875 - 16 * 30) / 15, 5);
+    // Amb espai de sobres el pas vertical NO és el de reserva: és el pas dels
+    // cercles menys el dibuix (33 - 30 = 3), que és el que fa caure cada fila
+    // de dibuixos a la seva fila de cercles.
+    expect(m.gapV).toBeCloseTo(colorPas(false, false) - m.dibuix, 5);
+  });
+
+  it("si la columna és més estreta que la referència, redueix tot proporcionalment", () => {
+    // 798 px és el que té la columna de la graella a 1280x706, el cas que
+    // durant setmanes va quedar desquadrat.
+    const m = midesGraellaCompacta({ ampleAmple: 798, sostre: 400, daltGraella: 100 });
+    const factor = 798 / AMPLE_BASE_DESKTOP();
+    expect(m.dibuix).toBeCloseTo(30 * factor, 5);
+    expect(m.gapH).toBeCloseTo(gapHorizontal(false, false) * factor, 5);
+    // El resultat clau: 27,36 px de dibuix, que és el que es veu al navegador.
+    expect(m.dibuix).toBeCloseTo(27.36, 2);
+  });
+
+  it("si l'alçada no hi cap, primer es redueix el pas vertical (fins a 0)", () => {
+    // 138 px d'espai: hi caben els 4 dibuixos de 27,36 (109,4) però no amb el
+    // pas dels cercles (131,4). S'ha de reduir el pas, no el dibuix.
+    const ample = 798;
+    const m = midesGraellaCompacta({ ampleAmple: ample, sostre: 240, daltGraella: 100 });
+    expect(m.gapV).toBeGreaterThanOrEqual(0);
+    expect(m.gapV).toBeLessThan(3);
+    expect(alçadaGraella(m)).toBeLessThanOrEqual(240 - 100 - GRAELLA_MARGE_FRANJA + 0.001);
+    // El dibuix no s'ha de tocar: és el mateix que sense límit d'alçada.
+    const senseLimit = midesGraellaCompacta({ ampleAmple: ample, sostre: 400, daltGraella: 100 });
+    expect(m.dibuix).toBeCloseTo(senseLimit.dibuix, 5);
+  });
+
+  it("si encara no hi cap, es redueix el dibuix i el pas queda a 0", () => {
+    const m = midesGraellaCompacta({ ampleAmple: 798, sostre: 150, daltGraella: 100 });
+    expect(m.gapV).toBe(0);
+    expect(alçadaGraella(m)).toBeLessThanOrEqual(150 - 100 - GRAELLA_MARGE_FRANJA + 0.001);
+  });
+
+  it('sense sostre (franja no mesurada) no toca res: deixa les mides de la pantalla', () => {
+    // Sense sostre no s'aplica ni el pas dels cercles: queden les mides de
+    // reserva (el pas base escalat per l'amplada), que és el que fa que la
+    // graella neixi raonable abans que la franja estigui mesurada.
+    const m = midesGraellaCompacta({ ampleAmple: 798, sostre: null, daltGraella: 100 });
+    const factor = 798 / AMPLE_BASE_DESKTOP();
+    expect(m.gapV).toBeCloseTo(gapVertical(false, false) * factor, 5);
+  });
+
+  it('a tauleta fa servir les mides de tauleta, no les de desktop', () => {
+    const m = midesGraellaCompacta({ ampleAmple: 2000, sostre: 400, daltGraella: 100, isLandscapeTablet: true });
+    expect(m.dibuix).toBeCloseTo(midaDibuix(false, true), 5);
+    expect(m.gapH).toBeCloseTo(gapHorizontal(false, true), 5);
+  });
+
+  it('el pas vertical de desktop és el dels cercles menys el dibuix', () => {
+    // És la regla que fa que cada fila de dibuixos caigui a la seva fila de
+    // cercles: dibuix + pas = pas dels cercles.
+    const m = midesGraellaCompacta({ ampleAmple: 875, sostre: 400, daltGraella: 100 });
+    expect(m.dibuix + m.gapV).toBeCloseTo(colorPas(false, false), 5);
+  });
+});

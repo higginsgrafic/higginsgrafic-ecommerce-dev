@@ -68,6 +68,30 @@ process.on('SIGINT', () => { tancar(); process.exit(130); });
 // El codi del mòdul s'executa DINS la pàgina, perquè és on hi ha el DOM.
 const modul = readFileSync(resolve(ARREL, 'src/utils/mesuraMegaslide.js'), 'utf8');
 
+/**
+ * Espera que la posició de les peces s'estabilitzi i retorna la mesura.
+ *
+ * No n'hi ha prou amb un `waitForTimeout` fix: si la maquina va carregada, la
+ * calibracio del megaslide triga mes i una mesura massa aviat dona xifres a mig
+ * fer (fins a 30 px de diferencia). Aqui es mesura en bucle fins que dues
+ * mesures seguides coincideixen.
+ */
+async function mesuraEstable(page, { intents = 14, espera = 400 } = {}) {
+  let anterior = null;
+  for (let i = 0; i < intents; i++) {
+    const ara = await page.evaluate((codi) => {
+      // eslint-disable-next-line no-new-func
+      const factory = new Function(`${codi.replace(/export function/g, 'function').replace(/export default[^\n]*/g, '')}; return mesuraMegaslide;`);
+      return factory()(document, window);
+    }, modul);
+    const clau = (m) => JSON.stringify([m.deltes, m.franja.p2?.relTop, m.selector.p2?.relTop, m.colors?.relTop, m.guarda?.height]);
+    if (anterior && clau(anterior) === clau(ara)) return ara;
+    anterior = ara;
+    await page.waitForTimeout(espera);
+  }
+  return anterior;
+}
+
 const navegador = await chromium.launch();
 const actual = {};
 for (const c of CASES) {
@@ -80,12 +104,8 @@ for (const c of CASES) {
   await page.goto(`${BASE}/?active=first_contact`, { waitUntil: 'load', timeout: 45000 });
   await page.waitForTimeout(2500);
   await page.click('button:has(svg.lucide-search)').catch(() => {});
-  await page.waitForTimeout(6000);
-  actual[c.nom] = await page.evaluate((codi) => {
-    // eslint-disable-next-line no-new-func
-    const factory = new Function(`${codi.replace(/export function/g, 'function').replace(/export default[^\n]*/g, '')}; return mesuraMegaslide;`);
-    return factory()(document, window);
-  }, modul);
+  await page.waitForTimeout(2500);
+  actual[c.nom] = await mesuraEstable(page);
   await ctx.close();
 }
 await navegador.close();
