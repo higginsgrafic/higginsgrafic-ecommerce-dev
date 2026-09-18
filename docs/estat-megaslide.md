@@ -827,6 +827,41 @@ calibrats a mà: el seu tile fa 0,0943 del carril, no 0,097).
   i de colors: ara aquella comprovació té tolerància de 0,5 px (les files surten
   de fórmules distintes i, en escalar-se, l'arrodoniment les separa dècimes).
 
+### El header, al carril (10.4) — FET
+
+El header era l'única peça que no hi era: la seva fila s'ancorava al **marc del
+lloc** (`--site-w` = `min(1350, 100vw − 32)`) i no al carril (70,3vw). A 1440 el
+marc feia 1350 px i el carril 1013 → el logo queia **128 px a l'esquerra** del
+contingut del megaslide; a 1280, 1264 contra 900.
+
+Ara la fila del header fa `width: var(--hg-mega-w)` i
+`marginLeft: var(--hg-mega-x)`, i el seu coixí (40 px), la separació de la fila
+(12 px) i la del nav (16 px) són mides del carril (`carrilPx`). A tauleta es
+queda amb el marc del lloc: allà el carril fa 992 px, és més ample que la
+pantalla i el header no s'hi pot desplaçar.
+
+| vista | carril | fila del header (abans) | logo |
+|---|---|---|---|
+| 1920 | [285, 1635] | [285, 1635] (=) | 325 (=) |
+| 1440 | [213,5, 1226,5] | [45, 1395] → **[214, 1227]** | 85 → **244** |
+| 1366 | [203, 1163] | [16, 1350] → **[203, 1163]** | 56 → **231** |
+| 1280 | [190, 1090] | [16, 1264] → **[190, 1090]** | 56 → **217** |
+| 1024 i 768 tauleta | 992 / 992 | igual | igual |
+
+Dos ajustos que calien perquè el text del nav (que **no** s'escala) hi cabés:
+
+- El nav porta un `translateX(-5%)` d'ajust òptic. Dins el carril, a la banda
+  estreta (768-1366) no hi té marge i el posava sota el logo (la «F» de FIRST
+  CONTACT quedava tallada a 1280). Allà el desplaçament és `none`.
+- El nav tenia `overflow-hidden`: a l'escriptori se li ha tret, perquè quan el
+  contingut va 2 px just no es talli la primera lletra (no arriba a tocar ni el
+  logo ni les icones, que tenen 5 px de coixí).
+
+**Forat de les eines**: ni el mesurador (`npm run mesura:megaslide`, que només
+mira peces del megaslide) ni el comparador miren el header. La comprovació
+d'aquesta passa ha estat una sonda pròpia i captures a 1280 i 1440
+(`docs/comparacio/megaslide-header-*.png`).
+
 **El que NO s'ha passat al carril (i per què)**:
 
 - **Els offsets verticals** (40, 20, 45, 5, 8, 10, 15 px) i el `top` del
@@ -845,8 +880,8 @@ calibrats a mà: el seu tile fa 0,0943 del carril, no 0,097).
 **El que queda** (properes passes, ja més fines):
 1. **El contingut que no passa per les bandes** encara té el 1350 literal:
    `CistellComandaContent` (`TABLE_WIDTH = 1350`), `UserComandesContent`
-   (`width: '1350px'`, tres cops) i `SiteFrame`
-   (`SITE_FRAME_MAX_WIDTH = 1350`).
+   (`width: '1350px'`, tres cops), `SiteFrame` (`SITE_FRAME_MAX_WIDTH = 1350`,
+   que encara fa servir el checkout) i l'ancoratge del `CheckoutPage`.
 2. **Els offsets verticals del carril** (vegeu més amunt): separar el bucle que
    alinea el selector del que col·loca la filera, i passar al carril el `top`
    del selector, el marge de dalt dels tiles (8 px) i els desplaçaments de la
