@@ -8,7 +8,7 @@ import {
   midesGraellaCompacta,
   MARGE_ESQUERRA_DIBUIXOS_ESCRIPTORI_PX, MARGE_DRET_FILERA_ESCRIPTORI_PX,
 } from './midesGraella.js';
-import { carrilPct, carrilPx } from '../../utils/layoutMetrics.js';
+import { carrilPct, carrilLane } from '../../utils/layoutMetrics.js';
 
 /**
  * CercadorTextRow
@@ -384,7 +384,7 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
     // Dins el carril, tot el que es pinta son proporcions seves; les tauletes
     // (un disseny a part) i la banda estreta tenen les seves excepcions.
     const esTauleta = isPortraitTablet || isLandscapeTablet;
-    const esBandaEstreta = typeof window !== 'undefined'
+    const esBandaEstreta = typeof window !== 'undefined' && !esTauleta
       && window.innerWidth >= 768 && window.innerWidth <= 1366
       && window.innerWidth >= window.innerHeight;
     // La graella de dibuixos és de 16 columnes × 4 files (64 dibuixos). Els
@@ -427,25 +427,25 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
           // colors), i la franja de samarretes no es mou perquè no en depèn.
           top: `${40 - desplacamentVertical}px`,
           // TOT el que hi ha dins el carril son proporcions SEVES (1350 px de
-          // referencia, vegeu `carrilPct`): la posicio de la filera i les seves
-          // columnes i separacions. Aixi el mateix carril serveix a tots els
-          // formats.
-          // Les tauletes son un disseny a part i mantenen els seus px.
-          left: esTauleta ? '123px' : carrilPct(MARGE_ESQUERRA_DIBUIXOS_ESCRIPTORI_PX),
-          right: esTauleta ? '0px' : carrilPct(MARGE_DRET_FILERA_ESCRIPTORI_PX),
+          // referencia, vegeu `carrilPct` i `carrilLane`): la posicio de la
+          // filera, les seves columnes i les separacions. Aixi el mateix carril
+          // serveix a tots els formats, tambe a les tauletes.
+          left: carrilPct(MARGE_ESQUERRA_DIBUIXOS_ESCRIPTORI_PX),
+          right: carrilPct(MARGE_DRET_FILERA_ESCRIPTORI_PX),
           display: 'grid',
           // Les columnes i la separacio son mides del carril (78, 142 i 10 px
-          // de 1350): `carrilPx` les encongeix amb ell. En `%` no hi valen
-          // perque el seu contenidor es la filera, no el carril.
-          gridTemplateColumns: esTauleta
-            ? 'minmax(0, 1fr) 78px 142px'
-            : `minmax(0, 1fr) ${carrilPx(78)} ${carrilPx(142)}`,
-          columnGap: esTauleta ? '10px' : carrilPx(10),
+          // de 1350). Amb `carrilLane` (no `carrilPx`) tambe s'encongeixen a
+          // tauleta: en `%` no hi valen perque el seu contenidor es la filera,
+          // no el carril.
+          gridTemplateColumns: `minmax(0, 1fr) ${carrilLane(78)} ${carrilLane(142)}`,
+          columnGap: carrilLane(10),
           alignItems: 'start',
           pointerEvents: 'auto',
         }}
       >
-        <div ref={graellaRef} style={{ display: 'grid', gridTemplateColumns: `repeat(${numColumns}, ${dibuixPx}px)`, gap: `${gapV}px ${gapH}px`, width: '100%', minWidth: 0, marginLeft: (isLandscapeTablet || isPortraitTablet) ? -GRAELLA_ESQUERRA_LANDSCAPE : 0 }}>
+        {/* Sense desplaçament propi de tauleta: la graella arrenca on arrenca a
+            l'escriptori (13% del carril). */}
+        <div ref={graellaRef} style={{ display: 'grid', gridTemplateColumns: `repeat(${numColumns}, ${dibuixPx}px)`, gap: `${gapV}px ${gapH}px`, width: '100%', minWidth: 0 }}>
           {items.map(({ label, collection, subcollection, stripeItem }) => {
             const dimmed = activeCollection && collection !== activeCollection
               ? true
@@ -495,7 +495,7 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
           })}
         </div>
 
-        <div data-p2-color-grid style={{ display: 'grid', gridTemplateColumns: `repeat(4, ${cerclePx}px)`, gridAutoRows: `${cerclePx}px`, gap: `${colorGapPx}px`, transform: uniformColumns ? 'translateX(85px)' : (esTauleta ? 'translateX(20px)' : (esBandaEstreta ? `translateX(${carrilPx(10)})` : `translateX(${carrilPx(-10)})`)), marginTop: uniformColumns ? '5px' : undefined }}>
+        <div data-p2-color-grid style={{ display: 'grid', gridTemplateColumns: `repeat(4, ${cerclePx}px)`, gridAutoRows: `${cerclePx}px`, gap: `${colorGapPx}px`, transform: uniformColumns ? 'translateX(85px)' : (esBandaEstreta ? `translateX(${carrilLane(10)})` : `translateX(${carrilLane(-10)})`), marginTop: uniformColumns ? '5px' : undefined }}>
           {CERCADOR_COLORS.map(({ slug, hex }) => {
             const selected = slug === selectedColor;
             return (
@@ -552,7 +552,7 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
         {/* La columna s'ajusta al nom mes llarg (fit-content): aixi el nom
             mes llarg comença on començava i els curts s'hi enrasen per la
             dreta, sense que el conjunt es desplaci. */}
-        <div style={{ width: 'fit-content', transform: uniformColumns ? 'translateX(120px)' : `translateX(${carrilPx(45)})` }}>
+        <div style={{ width: 'fit-content', transform: uniformColumns ? 'translateX(120px)' : `translateX(${carrilLane(45)})` }}>
           {CERCADOR_COLLECTIONS.map(({ key, label }) => (
             <button
               key={key}

@@ -884,6 +884,36 @@ columna i el seu text surt una mica del carril. Per tancar-ho caldria donar a
 aquella columna una amplada mínima (i llavors la graella de dibuixos s'encongiria
 una mica en aquelles mides) o escalar el text.
 
+### La filera de la pàgina 2, al carril també a tauleta (10.5) — FET
+
+L'amo ho va veure: a la tauleta horitzontal la graella de la pàgina 1 «és una
+mica més ampla». No ho era (fa el 94% del carril a tots els formats i les seves
+columnes cauen al 13,5%-86,5% igual que a 1920): el que passava és que **la
+filera de la pàgina 2 tenia el seu propi pedaç a tauleta** (les columnes
+78/142/10 px no s'encongien amb el carril, i el contenidor era el 94%), de
+manera que la seva graella de dibuixos feia el **57% del carril** en comptes del
+66,2% i la llista acabava al 95,2% en comptes del 97,9%. Vist així, la graella
+de la 1 «sobrava» 17 px per la dreta.
+
+Ara la filera de la 2 surt del carril **també a tauleta**: `carrilLane(px)`
+(`layoutMetrics.js`) és com `carrilPx` però sempre proporcional al carril
+(`calc(var(--hg-mega-w) × px/1350)`), i el contenidor és el carril sencer a tots
+els formats. Les mides que tenen calibració pròpia de tauleta (els dibuixos, el
+selector, la franja) **no** es toquen: es continuen pintant amb `carrilPx`.
+
+| pàgina 2, % del carril | 1920 | 1024/768 tauleta (abans) | tauleta ara |
+|---|---|---|---|
+| selector | 2% | 2,7% | **2%** |
+| graella de dibuixos | 13% / 66,2% | 13,4% / 57,4% | **13% / 66,2%** |
+| dibuix (mida) | 30 | 19,89 | 19,89 (=) |
+| columna de colors | 79,2% | 75,8% | **79,2%** |
+| llista, final | 97,9% | 95,2% | **97,8%** |
+
+A l'escriptori no es mou res (allà `carrilLane` i `carrilPx` són la mateixa
+cosa). Les dues orientacions de tauleta donen xifres idèntiques, el comparador
+segueix OK amb les mateixes mides (dibuix 19,89, cercle 18,89) i la baseline s'ha
+tornat a capturar.
+
 **El que NO s'ha passat al carril (i per què)**:
 
 - **Els offsets verticals** (40, 20, 45, 5, 8, 10, 15 px) i el `top` del

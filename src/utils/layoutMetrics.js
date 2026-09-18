@@ -173,6 +173,18 @@ export function carrilPx(px) {
 }
 
 /**
+ * La mateixa idea, pero SEMPRE proporcional al carril: tambe a tauleta, on
+ * `--hg-escala-mega` val 1 i `carrilPx` no encongeix res. Es per a les peces
+ * que han de seguir el carril tambe alla (les columnes de la filera de la
+ * pagina 2), no per a les que tenen la seva propia calibracio (la franja, el
+ * selector, els dibuixos).
+ */
+export function carrilLane(px) {
+  const factor = (px / MEGASLIDE_REFERENCIA_PX).toFixed(6);
+  return `calc(var(--hg-mega-w, ${MEGASLIDE_REFERENCIA_PX}px) * ${factor})`;
+}
+
+/**
  * Amplada de la finestra que es pren com a referencia del disseny.
  */
 export const MEGASLIDE_VISTA_REFERENCIA_PX = 1920;
