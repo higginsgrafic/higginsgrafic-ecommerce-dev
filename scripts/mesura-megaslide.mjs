@@ -86,7 +86,9 @@ async function mesuraEstable(page, { intents = 14, espera = 400 } = {}) {
     }, modul);
     // Si encara no hi ha les peces clau (a vertical el selector viu en un altre
     // viewport i pot trigar a tenir mida), no és una mesura valida: s'espera.
-    const tePeces = ara?.selector?.p2 && ara?.colors && ara?.franja?.p2;
+    // Cal exigir TOTES les peces que entren als deltes, no nomes les posicions.
+    const tePeces = ara?.selector?.p1 && ara?.selector?.p2 && ara?.colors && ara?.franja?.p1 && ara?.franja?.p2
+      && ara.deltes.colorsMenysSelectorP2 !== null;
     const clau = (m) => JSON.stringify([m.deltes, m.franja.p2?.relTop, m.selector.p2?.relTop, m.colors?.relTop, m.guarda?.height]);
     if (tePeces && anterior && clau(anterior) === clau(ara)) return ara;
     anterior = ara;
