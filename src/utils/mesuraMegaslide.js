@@ -180,7 +180,7 @@ export default mesuraMegaslide;
  * @param {number} e.alt          alçada de la finestra
  * @returns {number} delta del lift
  */
-export function deltaObjectiuPageLift({ selectorTop, panelTop, ample, alt, esTauleta = false, esPortraitTablet = false }) {
+export function deltaObjectiuPageLift({ selectorTop, panelTop, ample, alt, esTauleta = false }) {
   // `esTauleta` arriba del dispositiu (useDeviceLayout) i NO es pot deduir de
   // les mides: 1024x768 compleix «ample >= alt» com la banda estreta, pero la
   // tauleta no ha de portar aquest desplacament. Si no s'hi passa, la tauleta
@@ -190,12 +190,9 @@ export function deltaObjectiuPageLift({ selectorTop, panelTop, ample, alt, esTau
   // s'hi ha d'afegir cap marge extra.
   const bandaEstreta = ample >= 768 && ample <= 1366 && ample >= alt;
   // El contingut baixa 20 px a TOT l'escriptori (banda estreta i desktop
-  // ample), que son els 20 px de marge que s'han afegit a la pesta­nya.
-  //
-  // A la tauleta VERTICAL el contingut ha de PUJAR 20 px: alla la filera va
-  // 20 px mes avall del que toca. El desplaçament negatiu fa que el pageLift
-  // apugi la filera.
-  const desplacament = esPortraitTablet ? -20 : (esTauleta ? 10 : 20);
+  // ample), que son els 20 px de marge que s'han afegit a la pesta­nya. Les
+  // tauletes es queden amb el seu desplacament de sempre.
+  const desplacament = esTauleta ? 10 : 20;
   return (selectorTop - panelTop) - desplacament;
 }
 
@@ -239,12 +236,9 @@ export function alcadaPanellMegaslide({ p1ContentBottom, gap = 30, margeExtra = 
  */
 export const DESPLACAMENT_FRANJA_ESCRIPTORI_PX = 20;
 
-export function desplacamentFranjaEscriptori({ ample, alt, esTauleta = false, esPortraitTablet = false }) {
-  // A la tauleta vertical la franja tambe puja els mateixos 20 px que la resta
-  // del contingut.
-  if (esPortraitTablet) return -DESPLACAMENT_FRANJA_ESCRIPTORI_PX;
-  // A la resta, la franja baixa els 20 px del marge de la pestanya, a tot
-  // l'escriptori. A l'apaisada i al mobil, 0.
+export function desplacamentFranjaEscriptori({ ample, alt, esTauleta = false }) {
+  // La franja baixa els mateixos 20 px que la resta del contingut, a TOT
+  // l'escriptori. A les tauletes i al mobil, 0.
   if (esTauleta || ample < 768) return 0;
   return DESPLACAMENT_FRANJA_ESCRIPTORI_PX;
 }
