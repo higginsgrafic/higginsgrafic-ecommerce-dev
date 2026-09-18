@@ -327,6 +327,7 @@ export default function MegaMenuPanel({
                       resolvedMega={resolvedMega}
                       showStripe={showStripe}
                       fitAlcada={fitAlcada}
+                      isLandscapeTablet={isLandscapeTablet}
                       onP1ContentBottomChange={handleP1ContentBottom}
                       onPageLiftChange={handleP1PageLift}
                       stripeRowPadPx={stripeRowPadPx}
