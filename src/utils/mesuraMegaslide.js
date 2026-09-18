@@ -180,9 +180,18 @@ export default mesuraMegaslide;
  * @param {number} e.alt          alçada de la finestra
  * @returns {number} delta del lift
  */
-export function deltaObjectiuPageLift({ selectorTop, panelTop, ample, alt }) {
+export function deltaObjectiuPageLift({ selectorTop, panelTop, ample, alt, esTauleta = false }) {
+  // `esTauleta` arriba del dispositiu (useDeviceLayout) i NO es pot deduir de
+  // les mides: 1024x768 compleix «ample >= alt» com la banda estreta, pero la
+  // tauleta no ha de portar aquest desplacament. Si no s'hi passa, la tauleta
+  // apaisada es tracta com a banda estreta i se li mou tota la filera.
+  // El desplaçament de 10 px el porten TANT la banda estreta com les dues
+  // tauletes (es el que hi havia abans); el que canvia es que a la tauleta no
+  // s'hi ha d'afegir cap marge extra.
   const bandaEstreta = ample >= 768 && ample <= 1366 && ample >= alt;
-  const desplacament = bandaEstreta ? 10 : 0;
+  // Tres casos: la banda estreta de desktop porta 10 + 20 de marge; les dues
+  // tauletes, 10; la resta de desktop, 0.
+  const desplacament = esTauleta ? 10 : (bandaEstreta ? 30 : 0);
   return (selectorTop - panelTop) - desplacament;
 }
 
