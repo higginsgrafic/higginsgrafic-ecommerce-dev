@@ -141,6 +141,7 @@ function MegaStripePanelP1({
   onP1ContentBottomChange,
   onPageLiftChange,
   isPortraitTablet = false,
+  isLandscapeTablet = false,
 }) {
   const emptyShirtMaskUrl = useEmptyShirtMask(emptyTileIndices, shirtColor);
   const pageRootRef = useRef(null);
@@ -181,7 +182,13 @@ function MegaStripePanelP1({
         // navegador. La fórmula és la mateixa.
         const selectorTop = selector.getBoundingClientRect().top;
         const panelTop = panel.getBoundingClientRect().top;
-        const delta = deltaObjectiuPageLift({ selectorTop, panelTop, ample: window.innerWidth, alt: window.innerHeight });
+        const delta = deltaObjectiuPageLift({
+          selectorTop,
+          panelTop,
+          ample: window.innerWidth,
+          alt: window.innerHeight,
+          esTauleta: isPortraitTablet || isLandscapeTablet,
+        });
         const next = Math.max(0, pageLiftRef.current + delta);
         if (Math.abs(next - pageLiftRef.current) >= 0.5) {
           pageLiftRef.current = next;
@@ -217,7 +224,7 @@ function MegaStripePanelP1({
       observer?.disconnect();
       window.removeEventListener('resize', measure);
     };
-  }, [active, isPortraitTablet, megaTileSize, onP1ContentBottomChange, onPageLiftChange, pageLift]);
+  }, [active, isPortraitTablet, isLandscapeTablet, megaTileSize, onP1ContentBottomChange, onPageLiftChange, pageLift]);
 
   useEffect(() => {
     const handler = (ev) => {
