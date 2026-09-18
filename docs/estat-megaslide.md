@@ -168,6 +168,9 @@ Conseqüències:
 - **Filera de dalt quadrada amb la pàgina 1**: el selector i els cercles de la
   pàgina 2 queden a la mateixa alçada que els de la 1 a la banda estreta
   (vegeu punt 6.quater).
+- **20 px més d'alçada de pestanya a l'escriptori**: les graelles s'havien
+  menjat el coixí de sota les samarretes i la pestanya quedava justa
+  (`MARGE_EXTRA_DESKTOP_PX` a `MegaMenuPanel.jsx`; només escriptori).
 
 ### Comprovat el 18/9 (abans de tancar el testimoni)
 
