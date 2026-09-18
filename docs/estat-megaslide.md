@@ -48,7 +48,7 @@ npm run build                     # compila (i refà les miniatures dels dibuixo
 npx vite build                    # compila sense el prebuild de miniatures (més ràpid)
 npm run rapid                     # build + preview al 3003 — NO mentre el 3003 estigui ocupat
 node scripts/compara-vistes.mjs   # comparador de vistes (engega un preview només si el 3003 està apagat)
-npx vitest run                    # proves d'unitat (439)
+npx vitest run                    # proves d'unitat (462)
 ```
 
 El **comparador** (`scripts/compara-vistes.mjs`) és la xarxa de seguretat: obre
@@ -636,22 +636,75 @@ una proporció de la finestra, tot el que en depèn escala sol.
 Les bandes de pàgina també escalen (related: 417 → 332 → 303; transition:
 819 → 476 → 362).
 
+### Els marges interns (10.1) — FET
+
+**El símptoma**: a 1920 el bloc de dibuixos quedava amb 168 px de marge a
+l'esquerra del belt i 288 a la dreta. No és que «no quadrés amb el belt»: eren
+**dues** desalineacions que se sumaven.
+
+1. **El bloc de dibuixos anava 52,5 px massa a l'esquerra.** La filera té, a la
+   dreta dels dibuixos, la columna de colors i la llista de col·leccions, que
+   fan 240 px (78 + 10 + 142 + 10). Amb el marge esquerre de 135 px (105 + els
+   30 de `leftOffset`) el bloc mai no podia quedar centrat: la diferència era
+   exactament 240 − 135 = 105 px. La regla és **marge esquerre + desbordament
+   dret = 240**, i ara són 187,5 + 52,5 a
+   `midesGraella.js` (`MARGE_ESQUERRA_DIBUIXOS_ESCRIPTORI_PX`,
+   `DESBORDAMENT_DRET_DIBUIXOS_ESCRIPTORI_PX`), amb una prova d'unitat que ho
+   fixa. El `leftOffset` de `CercadorTextRow` s'ha retirat (només el passava
+   `MegaslidePagina2` amb un 30 constant).
+2. **El belt del megaslide anava 7,5 px a l'esquerra del belt de la pàgina.**
+   `scrollbar-gutter: stable` a `<html>` reserva l'amplada de la barra de
+   desplaçament (15 px) encara que no n'hi hagi: el cos fa 1905 px i la
+   finestra 1920. El marc del lloc (`SiteFrame`, `belt2`, `--site-xL`) es
+   centra sobre la **finestra**; la capa del megaslide es penja d'un contenidor
+   centrat al **cos** (`MegaStripeBleedGuard`, dins del `mx-auto max-w-[1350px]`)
+   i queia mitja reserva a l'esquerra. `SiteFrame` publica ara
+   `--site-gutter-mig` (mitja reserva) i la capa la suma:
+   `left: calc(50% + var(--site-gutter-mig, 0px))`.
+
+**Xifres** (Chromium, contra el 3003 viu; belt del megaslide = `--hg-mega-x`):
+
+| vista | belt | dibuixos (abans) | marges ara | llista, més enllà del belt |
+|---|---|---|---|---|
+| 1920 | 1350 | [453, 1347] | **228 / 228** | 24 px (245 de la vora) |
+| 1440 | 1013 | [371, 949] | **217,9 / 217,9** | 34 px |
+| 1280 | 900 | [344,5, 815,5] | **214,5 / 214,5** | 38 px |
+| tauletes | 992 | igual | igual | igual |
+
+- **Cap mida no canvia**: dibuix 30 / 19,78 / 16,14; cap `top`, `bottom`,
+  `height` ni `width` es mou. El diff de les 833 xifres és **només**
+  horitzontal: +7,5 px a tot (la reserva) i +60 px (= 52,5 + 7,5) a la graella
+  de dibuixos, els cercles i la llista. La baseline s'ha tornat a capturar.
+- El conjunt de la filera (selector → llista) queda ara 25,5 px a la dreta del
+  centre de la finestra: és el preu de centrar els dibuixos amb la llista a la
+  seva dreta. **Conseqüència a l'ull**: el selector Blanc/Color/Negre queda a
+  ~70 px del primer dibuix (abans ~18). Si es vol més estret, cal desplaçar
+  també el selector (27 px a `MegaslidePagina2:410`).
+- Les tauletes només es desplacen els 7,5 px de la reserva (a vertical, a més,
+  recuperen els 7,5 px que quedaven tallats a l'esquerra); les seves mides i
+  alineacions no es mouen, i el comparador segueix donant OK.
+
 **El que queda** (properes passes, ja més fines):
-1. **Els marges interns del megaslide no són simètrics**: a 1920 el marge
-   esquerre dels dibuixos és 168 i el dret 288. Els offsets interns (`105px` a
-   `CercadorTextRow:421`, `27px` a `MegaslidePagina2:410`, el `left: 50%` de la
-   franja) ja escalen però no quadren exactament amb el belt.
-2. **El contingut que no passa per les bandes** encara té el 1350 literal:
+1. **El contingut que no passa per les bandes** encara té el 1350 literal:
    `CistellComandaContent` (`TABLE_WIDTH = 1350`), `UserComandesContent`
    (`width: '1350px'`, tres cops) i `SiteFrame`
    (`SITE_FRAME_MAX_WIDTH = 1350`).
-3. **Reescalar el contingut de les pàgines** en la mateixa proporció (ho va
-   demanar explícitament; les bandes ja ho fan, la resta no).
+2. **Reescalar el contingut de les pàgines** en la mateixa proporció (ho va
+   demanar explícitament; les bandes ja ho fan, la resta no). Els offsets
+   interns encara són px (`187,5` / `27` / `78` / `142`), no proporcions del
+   belt: a 1280 el dibuix fa 16,14 px quan la proporció de 1920 en demanaria
+   ~20.
 
 **Parany après**: els intents d'escalar amb un `transform: scale` a sobre del
 belt escalat **empitjoren** (el contingut se'n va cap endins i els marges queden
 irregulars). Cal escalar **les mides i les coordenades**, no pintar-les més
 petites.
 
+**Parany après (2)**: la capa del megaslide **no** té el panell com a
+contenidor de posicionament, sinó el `MegaStripeBleedGuard` (que va dins del
+`mx-auto max-w-[1350px] px-4 sm:px-6 lg:px-10`). Per això `left: 0` la deixava a
+317,5 px a 1920 i va caldre la compensació de la reserva. La posició del
+contenidor de debò es va veure amb una sonda que puja la cadena d'ancestres.
+
 **Eines**: `npm run mesura:megaslide` (833 xifres de regressió a 7 mides),
-`npm run compara-vistes`, 459 proves, `npx vite build`.
+`npm run compara-vistes`, 462 proves, `npx vite build`.
