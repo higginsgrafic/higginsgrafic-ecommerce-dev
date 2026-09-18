@@ -110,6 +110,10 @@ export default function MegaslidePagina2({
     && window.innerWidth >= 768 && window.innerWidth <= 1366
     && window.innerWidth >= window.innerHeight;
   const topGraellaColors = 40 - (esBandaEstreta ? 38 : 0);
+  // A la tauleta VERTICAL el contingut ha de pujar 20 px (a la resta de mides
+  // el bucle del pageLift ja el mou, pero alla retorna a zero a posta). El
+  // selector la segueix tot sol, perque es centra amb la graella de colors.
+  const desplacamentVertical = isPortraitTablet ? -20 : 0;
   // Desplaçament de la franja a l'escriptori, per repartir el marge afegit a
   // l'alçada de la pestanya (vegeu midesMegaslide.js). Va tambe a la franja de
   // la pagina 1, amb el mateix valor, perque han de quedar a la mateixa alçada.
@@ -117,6 +121,7 @@ export default function MegaslidePagina2({
     ample: typeof window !== 'undefined' ? window.innerWidth : 0,
     alt: typeof window !== 'undefined' ? window.innerHeight : 0,
     esTauleta: isPortraitTablet || isLandscapeTablet,
+    esPortraitTablet: isPortraitTablet,
   });
   const [topVisualAlignmentY, setTopVisualAlignmentY] = useState(0);
   // Desplaçament propi del selector Blanc/Color/Negre perquè quedi centrat amb
@@ -432,7 +437,7 @@ export default function MegaslidePagina2({
         {/* CercadorTextRow */}
         <div style={{
           position: 'absolute',
-          top: `calc(var(--hg-cercador-bar-top, 0px) + ${topVisualAlignmentY + (isLandscapeTablet ? 5 : ((typeof window !== 'undefined' && window.innerWidth >= 768 && window.innerWidth <= 1366 && window.innerWidth >= window.innerHeight) ? 45 : 20))}px)`,
+          top: `calc(var(--hg-cercador-bar-top, 0px) + ${topVisualAlignmentY + desplacamentVertical + (isLandscapeTablet ? 5 : ((typeof window !== 'undefined' && window.innerWidth >= 768 && window.innerWidth <= 1366 && window.innerWidth >= window.innerHeight) ? 45 : 20))}px)`,
           left: '50%',
           transform: `translateX(-50%) scale(var(--hg-cercador-bar-scale, 1))`,
           transformOrigin: 'top center',
