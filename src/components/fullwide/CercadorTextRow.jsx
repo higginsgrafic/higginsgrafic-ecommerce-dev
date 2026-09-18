@@ -8,7 +8,7 @@ import {
   midesGraellaCompacta,
   MARGE_ESQUERRA_DIBUIXOS_ESCRIPTORI_PX, MARGE_DRET_FILERA_ESCRIPTORI_PX,
 } from './midesGraella.js';
-import { carrilPct, carrilLane } from '../../utils/layoutMetrics.js';
+import { carrilPct, carrilLane, carrilPx } from '../../utils/layoutMetrics.js';
 
 /**
  * CercadorTextRow
@@ -431,13 +431,22 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
           // filera, les seves columnes i les separacions. Aixi el mateix carril
           // serveix a tots els formats, tambe a les tauletes.
           left: carrilPct(MARGE_ESQUERRA_DIBUIXOS_ESCRIPTORI_PX),
-          right: carrilPct(MARGE_DRET_FILERA_ESCRIPTORI_PX),
+          // El marge dret va amb `carrilPx` (no `%`): es el MATEIX coixi que la
+          // fila del header, que a l'escriptori s'encongeix amb el carril i a
+          // tauleta son 40 px fixos (les seves classes). Amb `%` la filera no
+          // quadrava amb el header a tauleta (40 px hi son el 4% del carril,
+          // no el 3%).
+          right: carrilPx(MARGE_DRET_FILERA_ESCRIPTORI_PX),
           display: 'grid',
           // Les columnes i la separacio son mides del carril (78, 142 i 10 px
           // de 1350). Amb `carrilLane` (no `carrilPx`) tambe s'encongeixen a
           // tauleta: en `%` no hi valen perque el seu contenidor es la filera,
           // no el carril.
-          gridTemplateColumns: `minmax(0, 1fr) ${carrilLane(78)} ${carrilLane(142)}`,
+          // La columna de la llista no pot ser mes estreta que el seu contingut
+          // (el nom mes llarg): si ho fos, el text s'endinsaria a la columna de
+          // colors. Amb `min-content` creix a la mida del text i la seva dreta
+          // queda clavada a la dreta de la filera (o sigui a la franja).
+          gridTemplateColumns: `minmax(0, 1fr) ${carrilLane(78)} minmax(min-content, ${carrilLane(142)})`,
           columnGap: carrilLane(10),
           alignItems: 'start',
           pointerEvents: 'auto',
@@ -552,7 +561,12 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
         {/* La columna s'ajusta al nom mes llarg (fit-content): aixi el nom
             mes llarg comença on començava i els curts s'hi enrasen per la
             dreta, sense que el conjunt es desplaci. */}
-        <div style={{ width: 'fit-content', transform: uniformColumns ? 'translateX(120px)' : `translateX(${carrilLane(45)})` }}>
+        {/* La llista s'enrasa a la DRETA de la seva columna: d'aquesta manera el
+            text acaba sempre on acaba la columna, sense dependre de com de llarg
+            sigui el nom mes llarg ni del cos de lletra. Abans la columna era
+            `fit-content` i el conjunt es desplaçava 45 px, i per aixo el text
+            acaba 12 px mes enlla de la franja. */}
+        <div style={{ width: '100%', transform: uniformColumns ? 'translateX(120px)' : undefined }}>
           {CERCADOR_COLLECTIONS.map(({ key, label }) => (
             <button
               key={key}

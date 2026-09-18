@@ -72,8 +72,8 @@
       "p2": {
         "top": 216.42,
         "bottom": 245.77,
-        "left": 19.83,
-        "right": 107.88,
+        "left": 40,
+        "right": 128.05,
         "width": 88.05,
         "height": 29.34,
         "relTop": 85.42,
@@ -82,8 +82,8 @@
       "contenidorP2": {
         "top": 203,
         "bottom": 291.05,
-        "left": 19.83,
-        "right": 107.88,
+        "left": 40,
+        "right": 128.05,
         "width": 88.05,
         "height": 88.05,
         "relTop": 72,
@@ -102,8 +102,8 @@
       "barraP2": {
         "top": 187.08,
         "bottom": 275.13,
-        "left": 19.83,
-        "right": 107.88,
+        "left": 40,
+        "right": 128.05,
         "width": 88.05,
         "height": 88.05,
         "relTop": 56.08,
@@ -113,8 +113,8 @@
     "colors": {
       "top": 184.36,
       "bottom": 277.83,
-      "left": 785.92,
-      "right": 843.23,
+      "left": 775.67,
+      "right": 832.98,
       "width": 57.31,
       "height": 93.47,
       "relTop": 53.36,
@@ -241,8 +241,8 @@
       "p2": {
         "top": 167.7,
         "bottom": 196.52,
-        "left": 35.83,
-        "right": 122.3,
+        "left": 56,
+        "right": 142.47,
         "width": 86.47,
         "height": 28.81,
         "relTop": 46.7,
@@ -251,8 +251,8 @@
       "contenidorP2": {
         "top": 198,
         "bottom": 284.47,
-        "left": 35.83,
-        "right": 122.3,
+        "left": 56,
+        "right": 142.47,
         "width": 86.47,
         "height": 86.47,
         "relTop": 77,
@@ -271,8 +271,8 @@
       "barraP2": {
         "top": 138.89,
         "bottom": 225.36,
-        "left": 35.83,
-        "right": 122.3,
+        "left": 56,
+        "right": 142.47,
         "width": 86.47,
         "height": 86.47,
         "relTop": 17.89,
@@ -282,8 +282,8 @@
     "colors": {
       "top": 135.38,
       "bottom": 228.84,
-      "left": 801.92,
-      "right": 859.23,
+      "left": 791.67,
+      "right": 848.98,
       "width": 57.31,
       "height": 93.47,
       "relTop": 14.38,
@@ -408,20 +408,20 @@
         "relBottom": 78.19
       },
       "p2": {
-        "top": 172.82,
-        "bottom": 201.8,
-        "left": 208,
-        "right": 294.95,
+        "top": 171.85,
+        "bottom": 200.84,
+        "left": 216.66,
+        "right": 303.61,
         "width": 86.95,
         "height": 28.98,
-        "relTop": 51.82,
-        "relBottom": 80.8
+        "relTop": 50.85,
+        "relBottom": 79.84
       },
       "contenidorP2": {
         "top": 198,
         "bottom": 284.95,
-        "left": 208,
-        "right": 294.95,
+        "left": 216.66,
+        "right": 303.61,
         "width": 86.95,
         "height": 86.95,
         "relTop": 77,
@@ -438,25 +438,25 @@
         "relBottom": 107.3
       },
       "barraP2": {
-        "top": 143.84,
-        "bottom": 230.79,
-        "left": 208,
-        "right": 294.95,
+        "top": 142.87,
+        "bottom": 229.82,
+        "left": 216.66,
+        "right": 303.61,
         "width": 86.95,
         "height": 86.95,
-        "relTop": 22.84,
-        "relBottom": 109.79
+        "relTop": 21.87,
+        "relBottom": 108.82
       }
     },
     "colors": {
       "top": 145.13,
-      "bottom": 229.5,
-      "left": 916.35,
-      "right": 968.35,
+      "bottom": 227.56,
+      "left": 902.2,
+      "right": 954.2,
       "width": 52,
-      "height": 84.38,
+      "height": 82.44,
       "relTop": 24.13,
-      "relBottom": 108.5
+      "relBottom": 106.56
     },
     "malla9P1": {
       "top": 133.48,
@@ -501,7 +501,7 @@
       "--hg-cercador-bar-scale": null
     },
     "deltes": {
-      "selectorP2menysP1": 2.72,
+      "selectorP2menysP1": 1.76,
       "franjaP2menysP1": -0.05,
       "colorsMenysSelectorP2": 0
     }
@@ -577,20 +577,20 @@
         "relBottom": 78.19
       },
       "p2": {
-        "top": 172.82,
-        "bottom": 201.8,
-        "left": 208,
-        "right": 294.95,
+        "top": 171.85,
+        "bottom": 200.84,
+        "left": 216.66,
+        "right": 303.61,
         "width": 86.95,
         "height": 28.98,
-        "relTop": 51.82,
-        "relBottom": 80.8
+        "relTop": 50.85,
+        "relBottom": 79.84
       },
       "contenidorP2": {
         "top": 198,
         "bottom": 284.95,
-        "left": 208,
-        "right": 294.95,
+        "left": 216.66,
+        "right": 303.61,
         "width": 86.95,
         "height": 86.95,
         "relTop": 77,
@@ -607,25 +607,25 @@
         "relBottom": 107.3
       },
       "barraP2": {
-        "top": 143.84,
-        "bottom": 230.79,
-        "left": 208,
-        "right": 294.95,
+        "top": 142.87,
+        "bottom": 229.82,
+        "left": 216.66,
+        "right": 303.61,
         "width": 86.95,
         "height": 86.95,
-        "relTop": 22.84,
-        "relBottom": 109.79
+        "relTop": 21.87,
+        "relBottom": 108.82
       }
     },
     "colors": {
       "top": 145.13,
-      "bottom": 229.5,
-      "left": 916.35,
-      "right": 968.35,
+      "bottom": 227.56,
+      "left": 902.2,
+      "right": 954.2,
       "width": 52,
-      "height": 84.38,
+      "height": 82.44,
       "relTop": 24.13,
-      "relBottom": 108.5
+      "relBottom": 106.56
     },
     "malla9P1": {
       "top": 133.48,
@@ -670,7 +670,7 @@
       "--hg-cercador-bar-scale": null
     },
     "deltes": {
-      "selectorP2menysP1": 2.72,
+      "selectorP2menysP1": 1.76,
       "franjaP2menysP1": -0.05,
       "colorsMenysSelectorP2": 0
     }
@@ -746,20 +746,20 @@
         "relBottom": 82.07
       },
       "p2": {
-        "top": 174.72,
-        "bottom": 205.63,
-        "left": 222.19,
-        "right": 314.94,
+        "top": 174.16,
+        "bottom": 205.07,
+        "left": 231.44,
+        "right": 324.19,
         "width": 92.75,
         "height": 30.91,
-        "relTop": 53.72,
-        "relBottom": 84.63
+        "relTop": 53.16,
+        "relBottom": 84.07
       },
       "contenidorP2": {
         "top": 198,
         "bottom": 290.75,
-        "left": 222.19,
-        "right": 314.94,
+        "left": 231.44,
+        "right": 324.19,
         "width": 92.75,
         "height": 92.75,
         "relTop": 77,
@@ -776,25 +776,25 @@
         "relBottom": 113.13
       },
       "barraP2": {
-        "top": 143.81,
-        "bottom": 236.56,
-        "left": 222.19,
-        "right": 314.94,
+        "top": 143.26,
+        "bottom": 236.01,
+        "left": 231.44,
+        "right": 324.19,
         "width": 92.75,
         "height": 92.75,
-        "relTop": 22.81,
-        "relBottom": 115.56
+        "relTop": 22.26,
+        "relBottom": 115.01
       }
     },
     "colors": {
       "top": 145.14,
-      "bottom": 235.2,
-      "left": 977.78,
-      "right": 1033.24,
+      "bottom": 234.09,
+      "left": 969.95,
+      "right": 1025.41,
       "width": 55.45,
-      "height": 90.06,
+      "height": 88.95,
       "relTop": 24.14,
-      "relBottom": 114.2
+      "relBottom": 113.09
     },
     "malla9P1": {
       "top": 133.48,
@@ -839,7 +839,7 @@
       "--hg-cercador-bar-scale": null
     },
     "deltes": {
-      "selectorP2menysP1": 2.68,
+      "selectorP2menysP1": 2.13,
       "franjaP2menysP1": -0.06,
       "colorsMenysSelectorP2": 0
     }
@@ -915,20 +915,20 @@
         "relBottom": 85.51
       },
       "p2": {
-        "top": 184.35,
-        "bottom": 216.96,
-        "left": 233.75,
-        "right": 331.63,
+        "top": 184.23,
+        "bottom": 216.84,
+        "left": 243.5,
+        "right": 341.38,
         "width": 97.88,
         "height": 32.61,
-        "relTop": 63.35,
-        "relBottom": 95.96
+        "relTop": 63.23,
+        "relBottom": 95.84
       },
       "contenidorP2": {
         "top": 193,
         "bottom": 290.88,
-        "left": 233.75,
-        "right": 331.63,
+        "left": 243.5,
+        "right": 341.38,
         "width": 97.88,
         "height": 97.88,
         "relTop": 72,
@@ -945,25 +945,25 @@
         "relBottom": 118.27
       },
       "barraP2": {
-        "top": 151.74,
-        "bottom": 249.62,
-        "left": 233.75,
-        "right": 331.63,
+        "top": 151.63,
+        "bottom": 249.5,
+        "left": 243.5,
+        "right": 341.38,
         "width": 97.88,
         "height": 97.88,
-        "relTop": 30.74,
-        "relBottom": 128.62
+        "relTop": 30.63,
+        "relBottom": 128.5
       }
     },
     "colors": {
       "top": 153.16,
-      "bottom": 248.16,
-      "left": 1016.06,
-      "right": 1074.57,
+      "bottom": 247.92,
+      "left": 1013.82,
+      "right": 1072.34,
       "width": 58.52,
-      "height": 95,
+      "height": 94.77,
       "relTop": 32.16,
-      "relBottom": 127.16
+      "relBottom": 126.92
     },
     "malla9P1": {
       "top": 133.48,
@@ -1008,7 +1008,7 @@
       "--hg-cercador-bar-scale": null
     },
     "deltes": {
-      "selectorP2menysP1": 10.6,
+      "selectorP2menysP1": 10.48,
       "franjaP2menysP1": -0.06,
       "colorsMenysSelectorP2": 0
     }
@@ -1086,8 +1086,8 @@
       "p2": {
         "top": 193.45,
         "bottom": 236.92,
-        "left": 312,
-        "right": 442.44,
+        "left": 325,
+        "right": 455.44,
         "width": 130.44,
         "height": 43.47,
         "relTop": 72.45,
@@ -1096,8 +1096,8 @@
       "contenidorP2": {
         "top": 193,
         "bottom": 323.44,
-        "left": 312,
-        "right": 442.44,
+        "left": 325,
+        "right": 455.44,
         "width": 130.44,
         "height": 130.44,
         "relTop": 72,
@@ -1116,8 +1116,8 @@
       "barraP2": {
         "top": 149.98,
         "bottom": 280.42,
-        "left": 312,
-        "right": 442.44,
+        "left": 325,
+        "right": 455.44,
         "width": 130.44,
         "height": 130.44,
         "relTop": 28.98,
@@ -1127,8 +1127,8 @@
     "colors": {
       "top": 153.19,
       "bottom": 277.19,
-      "left": 1354.53,
-      "right": 1432.53,
+      "left": 1355.03,
+      "right": 1433.03,
       "width": 78,
       "height": 124,
       "relTop": 32.19,

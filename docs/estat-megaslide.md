@@ -914,6 +914,44 @@ cosa). Les dues orientacions de tauleta donen xifres idèntiques, el comparador
 segueix OK amb les mateixes mides (dibuix 19,89, cercle 18,89) i la baseline s'ha
 tornat a capturar.
 
+### La franja central del header (10.6) — FET
+
+L'amo la va definir: **la fila del selector, les graelles i la columna de
+col·leccions han d'encaixar exactament entre el `left` del logo del header i el
+`right` de la icona d'usuari**, a totes les vistes menys la vertical i el mòbil.
+La franja és doncs el contingut de la fila del header: [325, 1595] a 1920, amb
+el coixí de 40 px de disseny a cada banda.
+
+- **El selector** arrenca amb el mateix coixí que la fila del header
+  (`carrilPx(40)`): el `left` del logo i el del selector coincideixen a totes
+  les mides (0 px de diferència).
+- **La llista** s'enrasa a la dreta de la seva columna. Abans la columna era
+  `fit-content` i el conjunt es desplaçava 45 px, i per això el text acabava
+  12 px més enllà de la franja. Ara el text acaba exactament on acaba la
+  columna, i la columna no s'encongeix més que el nom més llarg
+  (`minmax(min-content, …)`: qui cedeix espai, si cal, és la graella de
+  dibuixos).
+- **El marge dret de la filera** és el mateix coixí (`carrilPx(40)`, no `%`: a
+  tauleta 40 px són el 4% del carril i no el 3%, i amb `%` no quadrava).
+- **El gap de la fila del header** baixa de 12 a 6 px de disseny: a 1280 el nav
+  demanava 5,5 px més dels que li deixaven el logo i les icones, i la icona
+  d'usuari queia 5,5 px més enllà de la franja. Com que el nav va centrat, el
+  gap no es veu: només li canvia l'espai disponible.
+
+| vista | franja del header | selector vs logo | llista vs icona |
+|---|---|---|---|
+| 1920 | [325, 1595] | 0 | 0 |
+| 1440 | [244, 1197] | −0,5 | +0,5 |
+| 1366 | [231,4, 1134,6] | 0 | 0 |
+| 1280 | [216,7, 1063,3] | 0 | 0 |
+| 1024 tauleta apaisada | [56, 968] | 0 | 0 |
+| 768 tauleta vertical (exclosa) | [40, 728] | 0 | −224 |
+
+Tambe s'ha **estabilitzat el bucle `centraAmbLaGraellaDeColors`** amb una segona
+passada de repàs (600 ms): abans oscil·lava 1,8 px entre execucions i la mesura
+fallava de manera intermitent; ara el selector queda clavat al centre de la
+graella de colors (delta 0) sempre.
+
 **El que NO s'ha passat al carril (i per què)**:
 
 - **Els offsets verticals** (40, 20, 45, 5, 8, 10, 15 px) i el `top` del
