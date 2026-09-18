@@ -50,21 +50,27 @@ function compute() {
   const w = Math.max(0, Math.min(SITE_FRAME_MAX_WIDTH, available - SITE_FRAME_MIN_GUTTER * 2));
   const xL = Math.round(inset + (available - w) / 2);
   const xR = xL + w;
-  return { xL, xR, w };
+  // Mitja reserva de la barra de desplaçament (o del seu lloc): el marc es
+  // centra sobre la FINESTRA, però el cos és `gutter` px més estret. Les capes
+  // que es pengen d'un contenidor centrat al COS (el megaslide) necessiten
+  // aquesta meitat per caure al mateix lloc que el marc.
+  const gutter = Math.max(0, (window.innerWidth || 0) - (document.body?.clientWidth || 0));
+  return { xL, xR, w, gutterMig: gutter / 2 };
 }
 
 export default function SiteFrame() {
   useLayoutEffect(() => {
     const root = document.documentElement;
-    let last = { xL: NaN, xR: NaN, w: NaN };
+    let last = { xL: NaN, xR: NaN, w: NaN, gutterMig: NaN };
     const apply = () => {
       const next = compute();
       if (!next) return;
-      if (next.xL === last.xL && next.xR === last.xR && next.w === last.w) return;
+      if (next.xL === last.xL && next.xR === last.xR && next.w === last.w && next.gutterMig === last.gutterMig) return;
       last = next;
       root.style.setProperty('--site-xL', `${next.xL}px`);
       root.style.setProperty('--site-xR', `${next.xR}px`);
       root.style.setProperty('--site-w', `${next.w}px`);
+      root.style.setProperty('--site-gutter-mig', `${next.gutterMig}px`);
     };
     apply();
     window.addEventListener('resize', apply);

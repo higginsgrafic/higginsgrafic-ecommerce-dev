@@ -2,6 +2,8 @@ import { describe, it, expect } from 'vitest';
 import {
   midesGraellaCompacta, midaDibuix, gapHorizontal, gapVertical, colorPas,
   GRAELLA_COLUMNES, GRAELLA_FILES, GRAELLA_MARGE_FRANJA,
+  BLOC_DRETA_DIBUIXOS_ESCRIPTORI_PX, MARGE_ESQUERRA_DIBUIXOS_ESCRIPTORI_PX,
+  DESBORDAMENT_DRET_DIBUIXOS_ESCRIPTORI_PX,
 } from '../../src/components/fullwide/midesGraella.js';
 import { deltaObjectiuPageLift, alcadaPanellMegaslide, desplacamentFranjaEscriptori } from '../../src/utils/mesuraMegaslide.js';
 
@@ -83,6 +85,36 @@ describe('midesGraellaCompacta', () => {
     // cercles: dibuix + pas = pas dels cercles.
     const m = midesGraellaCompacta({ ampleAmple: 875, sostre: 400, daltGraella: 100 });
     expect(m.dibuix + m.gapV).toBeCloseTo(colorPas(false, false), 5);
+  });
+});
+
+describe('centratge del bloc de dibuixos', () => {
+  // El bloc de dibuixos ha de quedar centrat dins el belt. Com que a la seva
+  // dreta hi ha la columna de colors i la llista de col·leccions, el bloc
+  // només queda centrat si el marge esquerre i el desbordament dret del seu
+  // contenidor SUMEN l'amplada d'aquella columna.
+  it('el marge esquerre i el desbordament dret sumen la columna de la dreta', () => {
+    expect(MARGE_ESQUERRA_DIBUIXOS_ESCRIPTORI_PX + DESBORDAMENT_DRET_DIBUIXOS_ESCRIPTORI_PX)
+      .toBeCloseTo(BLOC_DRETA_DIBUIXOS_ESCRIPTORI_PX, 5);
+  });
+
+  it('la columna de la dreta és la dels cercles i la llista més les separacions', () => {
+    // 4 columnes de 78 + la llista de 142 + les dues separacions de 10.
+    expect(BLOC_DRETA_DIBUIXOS_ESCRIPTORI_PX).toBe(78 + 10 + 142 + 10);
+  });
+
+  it('a 1920 el bloc queda amb els dos marges iguals', () => {
+    // Belt de 1350 dins la filera del 94% (el contenidor de CercadorTextRow).
+    // Els números de referència del disseny: el bloc de dibuixos fa 894 px i
+    // ha de quedar amb 228 px a cada banda del belt.
+    const belt = 1350;
+    const margeContenidor = belt * 0.03;            // 40,5 (el 94% centrat)
+    const esquerraBloc = margeContenidor + MARGE_ESQUERRA_DIBUIXOS_ESCRIPTORI_PX; // 228
+    const dretaBloc = belt * 0.97 + DESBORDAMENT_DRET_DIBUIXOS_ESCRIPTORI_PX;    // 1362
+    const ampleDibuixos = dretaBloc - esquerraBloc - BLOC_DRETA_DIBUIXOS_ESCRIPTORI_PX;
+    expect(esquerraBloc).toBeCloseTo(228, 5);
+    expect(ampleDibuixos).toBeCloseTo(894, 5);
+    expect(belt - (esquerraBloc + ampleDibuixos)).toBeCloseTo(esquerraBloc, 5);
   });
 });
 

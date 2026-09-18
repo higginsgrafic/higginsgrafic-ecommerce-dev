@@ -6,6 +6,7 @@ import {
   GRAELLA_COLUMNES, GRAELLA_FILES, GRAELLA_ESQUERRA_LANDSCAPE,
   midaDibuix, gapHorizontal, gapVertical, colorMida, colorGap,
   midesGraellaCompacta,
+  MARGE_ESQUERRA_DIBUIXOS_ESCRIPTORI_PX, DESBORDAMENT_DRET_DIBUIXOS_ESCRIPTORI_PX,
 } from './midesGraella.js';
 
 /**
@@ -315,7 +316,7 @@ function Group({ group, isFirst, dimmed, clickable, selectedStripeItem, hoveredS
   );
 }
 
-function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripeItem, hoveredStripeItem, onSelectGroup, onHoverItem, onHoverLeave, compact = false, selectedColor = 'white', onSelectColor, onSelectCollection, isPortraitTablet = false, isLandscapeTablet = false, leftOffset = 0, uniformColumns = false, fontBoost = 0, desplacamentVertical = 0 }) {
+function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripeItem, hoveredStripeItem, onSelectGroup, onHoverItem, onHoverLeave, compact = false, selectedColor = 'white', onSelectColor, onSelectCollection, isPortraitTablet = false, isLandscapeTablet = false, uniformColumns = false, fontBoost = 0, desplacamentVertical = 0 }) {
   // Ajust de la graella compacta a l'espai disponible (només desktop: les
   // tauletes mantenen la mida fixa de moment). Mesurem l'amplada de la columna
   // i el capdamunt de la franja de samarretes, i guardem la mida de dibuix i
@@ -418,8 +419,17 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
           // Blanc/Color/Negre la segueix tot sol (es centra amb la graella de
           // colors), i la franja de samarretes no es mou perquè no en depèn.
           top: `${40 - desplacamentVertical}px`,
-          left: `calc(${isPortraitTablet ? '93px' : (isLandscapeTablet ? '93px' : '105px')} + ${leftOffset}px)`,
-          right: '0px',
+          // A l'escriptori el bloc de dibuixos ha de quedar centrat dins el
+          // belt: el marge esquerre i el desbordament dret sumen els 240 px de
+          // la columna de colors i la llista (vegeu midesGraella.js). A les
+          // tauletes els marges son els seus i no es toquen: 93 + 30, que eren
+          // els 93 px de la branca de tauleta mes l'antic `leftOffset` de 30.
+          left: (isPortraitTablet || isLandscapeTablet)
+            ? '123px'
+            : `${MARGE_ESQUERRA_DIBUIXOS_ESCRIPTORI_PX}px`,
+          right: (isPortraitTablet || isLandscapeTablet)
+            ? '0px'
+            : `-${DESBORDAMENT_DRET_DIBUIXOS_ESCRIPTORI_PX}px`,
           display: 'grid',
           gridTemplateColumns: 'minmax(0, 1fr) 78px 142px',
           columnGap: '10px',
