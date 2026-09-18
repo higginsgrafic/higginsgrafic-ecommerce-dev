@@ -91,9 +91,9 @@ describe('deltaObjectiuPageLift', () => {
   // selector ha de quedar `desplaçament` px sota el capdamunt del panell
   // (10 px a la banda estreta i a les tauletes; 20 px mes de marge demanat,
   // nomes a la banda estreta de desktop).
-  it("a la banda estreta de desktop l'objectiu és 30 px (10 + 20 de marge)", () => {
+  it("a la banda estreta de desktop l'objectiu és 20 px (els 20 del marge)", () => {
     const delta = deltaObjectiuPageLift({ selectorTop: 200, panelTop: 140, ample: 1280, alt: 706 });
-    expect(delta).toBe(60 - 30);
+    expect(delta).toBe(60 - 20);
   });
 
   it("a la banda estreta, si s'hi passa esTauleta, es queda amb el desplaçament de 10", () => {
@@ -103,9 +103,8 @@ describe('deltaObjectiuPageLift', () => {
     expect(delta).toBe(60 - 10);
   });
 
-  it('a desktop ample el desplaçament és 20 (nomes el marge de la franja)', () => {
-    // Al desktop ample la filera no porta el marge de la banda estreta, pero si
-    // els 20 px de la franja: el selector hi ha de quedar 20 px mes avall.
+  it('a desktop ample el desplaçament també és 20', () => {
+    // El contingut baixa els mateixos 20 px a tot l'escriptori.
     const delta = deltaObjectiuPageLift({ selectorTop: 200, panelTop: 140, ample: 1440, alt: 900 });
     expect(delta).toBe(60 - 20);
   });
@@ -118,9 +117,9 @@ describe('deltaObjectiuPageLift', () => {
   });
 
   it('retorna el desnivell menys el desplaçament', () => {
-    // selector 10 px sota el panell.
-    expect(deltaObjectiuPageLift({ selectorTop: 150, panelTop: 140, ample: 1440, alt: 900 })).toBe(-10);  // desplaçament 20
-    expect(deltaObjectiuPageLift({ selectorTop: 150, panelTop: 140, ample: 1280, alt: 706 })).toBe(-20);  // desplaçament 30
+    // selector 10 px sota el panell: a tot l'escriptori el desplaçament és 20.
+    expect(deltaObjectiuPageLift({ selectorTop: 150, panelTop: 140, ample: 1440, alt: 900 })).toBe(-10);
+    expect(deltaObjectiuPageLift({ selectorTop: 150, panelTop: 140, ample: 1280, alt: 706 })).toBe(-10);
   });
 });
 
@@ -149,12 +148,12 @@ describe('alcadaPanellMegaslide', () => {
 });
 
 describe('desplacamentFranjaEscriptori', () => {
-  // Els 20 px de marge que s'han afegit a l'alçada de la pestanya s'han de
-  // repartir: la franja baixa 20 px a l'escriptori ample, pero NO a la banda
-  // estreta (on la filera ja hi baixa) ni a les tauletes.
-  it("a la banda estreta és 0 (la filera ja hi baixa, i la franja la segueix)", () => {
-    expect(desplacamentFranjaEscriptori({ ample: 1280, alt: 768 })).toBe(0);
-    expect(desplacamentFranjaEscriptori({ ample: 1366, alt: 768 })).toBe(0);
+  // La franja baixa els 20 px del marge afegit a la pestanya, a tot
+  // l'escriptori; a les tauletes i al mobil, 0.
+  it('a la banda estreta també és 20', () => {
+    // La franja baixa els mateixos 20 px que la resta del contingut.
+    expect(desplacamentFranjaEscriptori({ ample: 1280, alt: 768 })).toBe(20);
+    expect(desplacamentFranjaEscriptori({ ample: 1366, alt: 768 })).toBe(20);
   });
 
   it("a l'escriptori ample és 20", () => {

@@ -144,7 +144,11 @@ export default function MegaMenuPanel({
   // L'alçada del panell a partir de la mesura de la pàgina 1: el càlcul viu a
   // mesuraMegaslide.js (funció pura, comprovable). Aquí només s'hi afegeix el
   // marge extra de l'escriptori i el format en px.
-  const alcadaGuard = (p1Bottom) => alcadaPanellMegaslide({ p1ContentBottom: p1Bottom, gap: P1_STRIPE_BOTTOM_GAP, margeExtra: margeExtraDesktop });
+  // Sense `margeExtra`: els 20 px de marge ja els compensa el desplaçament del
+  // contingut (que fa que la mesura de la pagina 1 sigui 20 px mes gran). Si
+  // s'hi sumessin tambe aqui, es comptarien DUES vegades i el panell creixeria
+  // 40 px en comptes de 20.
+  const alcadaGuard = (p1Bottom) => alcadaPanellMegaslide({ p1ContentBottom: p1Bottom, gap: P1_STRIPE_BOTTOM_GAP });
 
   const viewport1Ref = useRef(null);
   const handlePortraitScroll1 = useCallback(() => {
