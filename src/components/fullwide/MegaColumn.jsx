@@ -19,7 +19,7 @@ import {
   touchMegaPublicActivity,
 } from './megaPublicSelectorState.js';
 import OptimizedImg from './OptimizedImg.jsx';
-import { cssEscalaMega } from '../../utils/layoutMetrics.js';
+import { carrilPx } from '../../utils/layoutMetrics.js';
 import {
   FirstContactDibuix00Buttons,
   FirstContactDibuix09Buttons,
@@ -28,7 +28,7 @@ import {
 const CONTROL_TILE_BN = 'botonera-bn';
 const CONTROL_TILE_ARROWS = 'botonera-fletxes';
 // Separació entre les 9 columnes de la filera (era `gap-x-3` = 12 px). És una
-// mida de disseny del belt de 1350: s'escala amb `cssEscalaMega`.
+// mida de disseny del belt de 1350: s'escala amb `carrilPx`.
 export const GAP_X_PX = 12;
 
 function MegaColumn({
@@ -1094,7 +1094,7 @@ function MegaColumn({
           // s'encongeix amb el belt, com la resta de la composicio. Sense aixo
           // les 9 columnes no escalaven igual i el tile quedava un 4% mes petit
           // a 1280 (84 px en comptes de 87,3).
-          style={{ columnGap: cssEscalaMega(GAP_X_PX) }}
+          style={{ columnGap: carrilPx(GAP_X_PX) }}
         >
           {rowItems.map((it, idx) => (
             <div
@@ -1114,7 +1114,7 @@ function MegaColumn({
                 // engrandeix la cel·la). El `scale(0,94)` del contenidor ja
                 // l'aplica, com a la resta de la composicio.
                 ...(it === CONTROL_TILE_BN && selectorShiftPx
-                  ? { transform: `translateX(${cssEscalaMega(-selectorShiftPx)})` }
+                  ? { transform: `translateX(${carrilPx(-selectorShiftPx)})` }
                   : null),
               }}
             >

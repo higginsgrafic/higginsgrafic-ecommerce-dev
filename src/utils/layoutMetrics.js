@@ -153,17 +153,22 @@ export function escalaMegaslide(beltWidth) {
 }
 
 /**
- * Converteix una mida del disseny del megaslide (la de 1920 = belt 1350) en una
- * mesura CSS que s'encongeix amb el belt.
+ * El CARRIL del megaslide: 1350 px de disseny (1920). Tot el que hi ha dins la
+ * composicio son proporcions SEVES, no px de cap format. Aquestes dues funcions
+ * son les que ho fan:
  *
- * Amb aixo les peces que tenien px fixos (separacions, coixins, desplacaments de
- * la franja) escalen com la resta de la composicio. A 1920 i a tauleta
- * `--hg-escala-mega` val 1, aixi que es un no-op i la referencia no es toca.
+ *   - `carrilPct(px)` per a propietats de layout (`left`, `width`, `gap`...) quan
+ *     el contenidor ja es el carril.
+ *   - `carrilPx(px)` per a la resta (transforms, marges, alcades): dona una
+ *     longitud CSS. A tauleta val 1 (el seu disseny es propi i no s'escala).
  *
- * @param {number} px mida de disseny, en px
- * @returns {string} mesura CSS (`calc(...)`)
+ * @param {number} px mida de disseny del carril, en px
  */
-export function cssEscalaMega(px) {
+export function carrilPct(px) {
+  return `${((px / MEGASLIDE_REFERENCIA_PX) * 100).toFixed(4)}%`;
+}
+
+export function carrilPx(px) {
   return `calc(${px}px * var(--hg-escala-mega, 1))`;
 }
 
