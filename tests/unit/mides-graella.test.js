@@ -3,6 +3,7 @@ import {
   midesGraellaCompacta, midaDibuix, gapHorizontal, gapVertical, colorPas,
   GRAELLA_COLUMNES, GRAELLA_FILES, GRAELLA_MARGE_FRANJA,
 } from '../../src/components/fullwide/midesGraella.js';
+import { deltaObjectiuPageLift } from '../../src/utils/mesuraMegaslide.js';
 
 // Aquesta prova existeix perquè el càlcul de les mides de la graella de
 // dibuixos vivia DINS d'un efecte de CercadorTextRow, barrejat amb la lectura
@@ -82,5 +83,35 @@ describe('midesGraellaCompacta', () => {
     // cercles: dibuix + pas = pas dels cercles.
     const m = midesGraellaCompacta({ ampleAmple: 875, sostre: 400, daltGraella: 100 });
     expect(m.dibuix + m.gapV).toBeCloseTo(colorPas(false, false), 5);
+  });
+});
+
+describe('deltaObjectiuPageLift', () => {
+  // El càlcul vivia dins de l'efecte de MegaStripePanelP1. La regla: el
+  // selector ha de quedar `desplaçament` px sota el capdamunt del panell.
+  it('a la banda estreta de desktop l\'objectiu és 10 px', () => {
+    // selector a 60 px del panell i finestra 1280x706: cal apujar 50 px.
+    const delta = deltaObjectiuPageLift({ selectorTop: 200, panelTop: 140, ample: 1280, alt: 706 });
+    expect(delta).toBe(60 - 10);
+  });
+
+  it('a desktop ample l\'objectiu és 0', () => {
+    const delta = deltaObjectiuPageLift({ selectorTop: 200, panelTop: 140, ample: 1440, alt: 900 });
+    expect(delta).toBe(60);
+  });
+
+  it('a la tauleta apaisada (1024x768) l\'objectiu és 0', () => {
+    // Compleix «ample >= alt» com la banda estreta, però no és la banda estreta.
+    // Aquí sí que s'hi aplica el desplaçament perquè la condició és només
+    // geomètrica: 1024 >= 768 i 1024 entre 768 i 1366.
+    const delta = deltaObjectiuPageLift({ selectorTop: 200, panelTop: 140, ample: 1024, alt: 768 });
+    expect(delta).toBe(60 - 10);
+  });
+
+  it('retorna el desnivell menys el desplaçament', () => {
+    // selector 10 px sota el panell: a desktop ample el delta és 10 (cal apujar
+    // perquè quedi a 0); a la banda estreta, 0 (ja hi és, a 10).
+    expect(deltaObjectiuPageLift({ selectorTop: 150, panelTop: 140, ample: 1440, alt: 900 })).toBe(10);
+    expect(deltaObjectiuPageLift({ selectorTop: 150, panelTop: 140, ample: 1280, alt: 706 })).toBe(0);
   });
 });

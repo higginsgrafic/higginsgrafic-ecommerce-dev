@@ -3,6 +3,7 @@ import MegaColumn from './MegaColumn.jsx';
 import ClicAreaOverlayP1 from './ClicAreaOverlayP1.jsx';
 import { CERCADOR_COLORS } from './CercadorTopBar.jsx';
 import { STRIPE_DRAWING_CALIBRATIONS } from '../../config/stripeCalibrations';
+import { deltaObjectiuPageLift } from '../../utils/mesuraMegaslide.js';
 
 // La franja de samarretes de la pàgina 1 tendeix a quedar-se uns 10 px més avall
 // del que toca: l'alçada del contenidor de la pàgina es calcula a partir del
@@ -175,11 +176,12 @@ function MegaStripePanelP1({
         }
         onPageLiftChange?.(0);
       } else if (selector) {
-        // A l'apaisada volem tota la filera 10px mes avall del lloc on
-        // l'alineava la calibracio. El desplaçament va aqui, dins l'objectiu:
-        // si el posessim al transform, la propia calibracio el desfaria.
-        const desplaçament = (typeof window !== 'undefined' && window.innerWidth >= 768 && window.innerWidth <= 1366 && window.innerWidth >= window.innerHeight) ? 10 : 0;
-        const delta = (selector.getBoundingClientRect().top - panel.getBoundingClientRect().top) - desplaçament;
+        // L'objectiu del pageLift és una funció pura (midesMegaslide.js): el
+        // càlcul vivia aquí dins de l'efecte i no es podia comprovar sense
+        // navegador. La fórmula és la mateixa.
+        const selectorTop = selector.getBoundingClientRect().top;
+        const panelTop = panel.getBoundingClientRect().top;
+        const delta = deltaObjectiuPageLift({ selectorTop, panelTop, ample: window.innerWidth, alt: window.innerHeight });
         const next = Math.max(0, pageLiftRef.current + delta);
         if (Math.abs(next - pageLiftRef.current) >= 0.5) {
           pageLiftRef.current = next;
