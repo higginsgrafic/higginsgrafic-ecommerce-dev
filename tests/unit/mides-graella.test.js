@@ -88,31 +88,37 @@ describe('midesGraellaCompacta', () => {
 
 describe('deltaObjectiuPageLift', () => {
   // El càlcul vivia dins de l'efecte de MegaStripePanelP1. La regla: el
-  // selector ha de quedar `desplaçament` px sota el capdamunt del panell.
-  it('a la banda estreta de desktop l\'objectiu és 10 px', () => {
-    // selector a 60 px del panell i finestra 1280x706: cal apujar 50 px.
+  // selector ha de quedar `desplaçament` px sota el capdamunt del panell
+  // (10 px a la banda estreta i a les tauletes; 20 px mes de marge demanat,
+  // nomes a la banda estreta de desktop).
+  it("a la banda estreta de desktop l'objectiu és 30 px (10 + 20 de marge)", () => {
     const delta = deltaObjectiuPageLift({ selectorTop: 200, panelTop: 140, ample: 1280, alt: 706 });
+    expect(delta).toBe(60 - 30);
+  });
+
+  it("a la banda estreta, si s'hi passa esTauleta, es queda amb el desplaçament de 10", () => {
+    // 1024x768 compleix «ample >= alt» com la banda estreta, pero es tauleta:
+    // no ha de portar el marge extra de 20 px.
+    const delta = deltaObjectiuPageLift({ selectorTop: 200, panelTop: 140, ample: 1024, alt: 768, esTauleta: true });
     expect(delta).toBe(60 - 10);
   });
 
-  it('a desktop ample l\'objectiu és 0', () => {
+  it('a desktop ample el desplaçament és 0', () => {
     const delta = deltaObjectiuPageLift({ selectorTop: 200, panelTop: 140, ample: 1440, alt: 900 });
     expect(delta).toBe(60);
   });
 
-  it('a la tauleta apaisada (1024x768) l\'objectiu és 0', () => {
-    // Compleix «ample >= alt» com la banda estreta, però no és la banda estreta.
-    // Aquí sí que s'hi aplica el desplaçament perquè la condició és només
-    // geomètrica: 1024 >= 768 i 1024 entre 768 i 1366.
-    const delta = deltaObjectiuPageLift({ selectorTop: 200, panelTop: 140, ample: 1024, alt: 768 });
+  it('la tauleta vertical tambe es queda amb 10', () => {
+    const delta = deltaObjectiuPageLift({ selectorTop: 200, panelTop: 140, ample: 768, alt: 1024, esTauleta: true });
+    // 768x1024 no compleix «ample >= alt», aixi que bandaEstreta es falsa; pero
+    // el desplacament de les tauletes es 10.
     expect(delta).toBe(60 - 10);
   });
 
   it('retorna el desnivell menys el desplaçament', () => {
-    // selector 10 px sota el panell: a desktop ample el delta és 10 (cal apujar
-    // perquè quedi a 0); a la banda estreta, 0 (ja hi és, a 10).
-    expect(deltaObjectiuPageLift({ selectorTop: 150, panelTop: 140, ample: 1440, alt: 900 })).toBe(10);
-    expect(deltaObjectiuPageLift({ selectorTop: 150, panelTop: 140, ample: 1280, alt: 706 })).toBe(0);
+    // selector 10 px sota el panell.
+    expect(deltaObjectiuPageLift({ selectorTop: 150, panelTop: 140, ample: 1440, alt: 900 })).toBe(10);   // desplaçament 0
+    expect(deltaObjectiuPageLift({ selectorTop: 150, panelTop: 140, ample: 1280, alt: 706 })).toBe(-20);  // desplaçament 30
   });
 });
 
