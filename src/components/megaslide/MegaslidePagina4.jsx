@@ -341,7 +341,7 @@ export default function MegaslidePagina4({
 
       <div style={{
         flex: '0 0 auto',
-        width: isPortraitTablet ? 'min(1350px, calc(100vh - 32px))' : 'var(--hg-mega-w, min(1350px, calc(100vw - 32px)))',
+        width: isPortraitTablet ? 'min(100vh - 32px, 70.3vw)' : 'var(--hg-mega-w, 70.3vw)',
         maxWidth: 'none',
         position: 'relative',
         height: '100%',
