@@ -351,7 +351,11 @@ export default function MegaslidePagina4({
         paddingRight: '0px',
       }}>
         <div style={{
-          transform: isLandscapeTablet ? 'scale(0.92)' : 'scale(0.94)',
+          // Igual que la pagina 3: el disseny es 0,92/0,94 i, per sota de
+          // 1920, mana l'escala del carril.
+          transform: isLandscapeTablet
+            ? 'scale(min(0.92, var(--hg-escala-mega, 1)))'
+            : 'scale(min(0.94, var(--hg-escala-mega, 1)))',
           transformOrigin: 'top center',
           width: '100%',
           height: '100%',
