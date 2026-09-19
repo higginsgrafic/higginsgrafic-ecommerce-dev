@@ -1606,9 +1606,12 @@ tal qual:
 - **`MegaGridDibuixos.jsx`** (la graella de dibuixos): interfície neta,
   `MegaGridDibuixos({ active, className, items })`, i les mides en `fr` amb
   caselles quadrades (`aspect-square`). O sigui que **s'adapta a l'amplada que
-  li doni el contenidor** sense números fixos: a la vertical n'hi ha prou de
-  muntar-la amb l'amplada del carril. És la peça que fa el paradigma més fàcil
-  del que semblava.
+  li doni el contenidor** sense números fixos. I un detall important: avui
+  **no es munta enlloc** (`grep` de `MegaGridDibuixos` i de `megaGrid` no troba
+  cap ús fora del seu fitxer; el seu propi comentari diu que s'havia d'activar
+  amb un interruptor o amb `?megaGrid=dibuixos`, i aquell camí ja no hi és). És,
+  doncs, codi mort: una peça acabada i sense lligams, perfecta per estrenar-la
+  a la composició nova de la vertical.
 - **`MegaColumn.jsx`** (les col·leccions): és una funció interna del fitxer, i la
   pàgina 1 la munta a la línia 269 de `MegaStripePanelP1.jsx`. Caldrà veure què
   necessita exactament (estat i callbacks) abans de reubicar-la.
