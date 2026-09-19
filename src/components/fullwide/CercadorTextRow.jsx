@@ -317,7 +317,7 @@ function Group({ group, isFirst, dimmed, clickable, selectedStripeItem, hoveredS
   );
 }
 
-function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripeItem, hoveredStripeItem, onSelectGroup, onHoverItem, onHoverLeave, compact = false, selectedColor = 'white', onSelectColor, onSelectCollection, isPortraitTablet = false, isLandscapeTablet = false, uniformColumns = false, fontBoost = 0, desplacamentVertical = 0 }) {
+function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripeItem, hoveredStripeItem, onSelectGroup, onHoverItem, onHoverLeave, compact = false, selectedColor = 'white', onSelectColor, onSelectCollection, isPortraitTablet = false, isLandscapeTablet = false, uniformColumns = false, fontBoost = 0, desplacamentVertical = 0, esquerra }) {
   // Ajust de la graella compacta a l'espai disponible (només desktop: les
   // tauletes mantenen la mida fixa de moment). Mesurem l'amplada de la columna
   // i el capdamunt de la franja de samarretes, i guardem la mida de dibuix i
@@ -348,7 +348,10 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
 
       // El càlcul viu a midesGraella.js (funció pura, comprovable sense
       // navegador). Aquí només se li passen les mesures de la pantalla.
-      const next = midesGraellaCompacta({ ampleAmple, sostre, daltGraella, isPortraitTablet, isLandscapeTablet, escala: readRootCssNumber('--hg-escala-mega', 1) });
+      const next = midesGraellaCompacta({
+        ampleAmple, sostre, daltGraella, isPortraitTablet, isLandscapeTablet,
+        escala: readRootCssNumber('--hg-escala-mega', 1),
+      });
 
       const previ = midesRef.current;
       const igual = previ
@@ -430,7 +433,10 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
           // referencia, vegeu `carrilPct` i `carrilLane`): la posicio de la
           // filera, les seves columnes i les separacions. Aixi el mateix carril
           // serveix a tots els formats, tambe a les tauletes.
-          left: carrilPct(MARGE_ESQUERRA_DIBUIXOS_ESCRIPTORI_PX),
+          // La filera arrenca on acaba el bloc del selector mes 10 px (vegeu
+          // MegaSlidePagina2). Si no s'hi passa res, es queda a la posicio de
+          // disseny (13% del carril).
+          left: esquerra || carrilPct(MARGE_ESQUERRA_DIBUIXOS_ESCRIPTORI_PX),
           // El marge dret va amb `carrilPx` (no `%`): es el MATEIX coixi que la
           // fila del header, que a l'escriptori s'encongeix amb el carril i a
           // tauleta son 40 px fixos (les seves classes). Amb `%` la filera no
@@ -447,7 +453,9 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
           // colors. Amb `min-content` creix a la mida del text i la seva dreta
           // queda clavada a la dreta de la filera (o sigui a la franja).
           gridTemplateColumns: `minmax(0, 1fr) ${carrilLane(78)} minmax(min-content, ${carrilLane(142)})`,
-          columnGap: carrilLane(10),
+          // 10 px FIXES entre blocs (no escalats): es el que fa que totes les
+          // mides quadrin, perque el que cedeix es el gap intern dels dibuixos.
+          columnGap: '10px',
           alignItems: 'start',
           pointerEvents: 'auto',
         }}
@@ -504,7 +512,7 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
           })}
         </div>
 
-        <div data-p2-color-grid style={{ display: 'grid', gridTemplateColumns: `repeat(4, ${cerclePx}px)`, gridAutoRows: `${cerclePx}px`, gap: `${colorGapPx}px`, transform: uniformColumns ? 'translateX(85px)' : (esBandaEstreta ? `translateX(${carrilLane(10)})` : `translateX(${carrilLane(-10)})`), marginTop: uniformColumns ? '5px' : undefined }}>
+        <div data-p2-color-grid style={{ display: 'grid', gridTemplateColumns: `repeat(4, ${cerclePx}px)`, gridAutoRows: `${cerclePx}px`, gap: `${colorGapPx}px`, transform: uniformColumns ? 'translateX(85px)' : undefined, marginTop: uniformColumns ? '5px' : undefined }}>
           {CERCADOR_COLORS.map(({ slug, hex }) => {
             const selected = slug === selectedColor;
             return (
@@ -577,7 +585,7 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
             // primer les separacions dels dibuixos).
             // (A la banda estreta els cercles van 10 px a la dreta, o sigui que
             // tambe compten per al coixi.)
-            paddingLeft: `max(0px, calc(${4 * cerclePx + 3 * colorGapPx}px + ${esBandaEstreta ? carrilLane(10) : '0px'} - ${carrilLane(78)} - ${carrilLane(10)}))`,
+            paddingLeft: `max(0px, calc(${4 * cerclePx + 3 * colorGapPx}px - ${carrilLane(78)}))`,
           }}
         >
           {CERCADOR_COLLECTIONS.map(({ key, label }) => (
