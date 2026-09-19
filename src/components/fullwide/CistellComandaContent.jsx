@@ -277,7 +277,10 @@ function CistellComandaContent({ cartItems, setCartItems, onFinalizeOrder }) {
           // filera quedava tallada pel sostre del panell: la llista semblava
           // desplaçada.
           top: `${TOP_OFFSET}px`,
-          left: isNarrowCart ? '0' : `calc(50% - ${ROW_W / 2}px)`,
+          // Centrada, tambe a la vertical: abans hi arrencava a 0 i, amb el
+          // contenidor mes ample que la pantalla, la filera i el bloc del total
+          // queien a l'esquerra del centre.
+          left: `calc(50% - ${ROW_W / 2}px)`,
           width: `${ROW_W}px`,
           height: `${VISIBLE_HEIGHT}px`,
           overflow: 'hidden',
@@ -569,7 +572,11 @@ function CistellComandaContent({ cartItems, setCartItems, onFinalizeOrder }) {
                 // El bloc va fix al fons de la pestanya: la seva vora inferior
                 // queda OVERLAY_MARGE px per sobre del fons del megaslide.
                 top: overlayTop != null ? `${overlayTop - OVERLAY_MARGE}px` : '50%',
-                left: overlayLeft != null ? `${overlayLeft - (isPortrait ? 106 : 0) + 5}px` : 'calc(50vw + 5px)',
+                // El bloc va centrat sobre l'ultima filera del cistell (i, amb
+                // el contenidor dins la pantalla, sobre el centre d'aquesta).
+                // Abans hi havia un `- 106` propi de la vertical que el
+                // desplaçava.
+                left: overlayLeft != null ? `${overlayLeft + 5}px` : 'calc(50vw + 5px)',
                 transform: 'translate(-50%, -100%)',
                 display: 'flex',
                 alignItems: 'center',

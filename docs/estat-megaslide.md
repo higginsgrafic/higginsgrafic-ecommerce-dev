@@ -1469,6 +1469,14 @@ Arreglat:
 Captura: `docs/comparacio/cistell-vertical-768t.png`. El preu queda just a tocar
 de la paperera: és un número de disseny i es pot separar quan calgui.
 
+I el bloc del total + FINALITZA LA COMANDO no quedava centrat a la pantalla: es
+col·loca amb `overlayLeft` (el centre de l'última filera) menys un `-106` propi
+de la vertical, i a sobre la finestra de les files hi arrencava a `left: 0`. Amb
+el contenidor dins la pantalla (`min(carril, 100vw)`) i la finestra centrada,
+tot hi cau: el centre de la filera i el del bloc són 384 a la vertical, 512 a
+l'apaisada i 960 a 1920 (el bloc, 5 px més enllà pel desplaçament de disseny).
+Captura: `docs/comparacio/cistell-boto-768t.png`.
+
 **El que NO s'ha passat al carril (i per què)**:
 
 - **Els offsets verticals** (40, 20, 45, 5, 8, 10, 15 px) i el `top` del
