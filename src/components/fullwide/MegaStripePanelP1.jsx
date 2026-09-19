@@ -6,6 +6,20 @@ import { STRIPE_DRAWING_CALIBRATIONS } from '../../config/stripeCalibrations';
 import { deltaObjectiuPageLift, desplacamentFranjaEscriptori } from '../../utils/mesuraMegaslide.js';
 import { carrilPx } from '../../utils/layoutMetrics.js';
 
+/**
+ * La FRANJA CURTA de la vertical (7+7): les 14 samarretes en un sol fitxer, amb
+ * cada samarreta dins la seva casella. Es la base de la franja de la composicio
+ * vertical de la pagina 2: allo que a l'horitzontal fa la imatge de la filera
+ * amb el `transform` del belt, aqui ho fa aquesta imatge partida en 14 caselles
+ * (7 columnes x 2 files).
+ *
+ * L'original viu a `public/placeholders/tablet vertical/stripe-curta-7+7.png`,
+ * pero els servidors estatics no el serveixen (l'espai i el `+` de l'adreca
+ * tornen l'HTML de la pagina en comptes de la imatge). Per aixo hi ha una copia
+ * amb un nom segur a `tablet-vertical/`: son el mateix fitxer.
+ */
+export const FRANJA_VERTICAL_SRC = '/placeholders/tablet-vertical/stripe-curta-7x7.png';
+
 // La franja de samarretes de la pàgina 1 tendeix a quedar-se uns 10 px més avall
 // del que toca: l'alçada del contenidor de la pàgina es calcula a partir del
 // bottom mesurat de la franja i el pageLift es calibra amb el selector, de

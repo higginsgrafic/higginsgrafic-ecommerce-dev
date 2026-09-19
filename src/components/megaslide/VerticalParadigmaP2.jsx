@@ -3,6 +3,7 @@ import MegaGridDibuixos from '../fullwide/MegaGridDibuixos.jsx';
 import { FirstContactDibuix00Buttons } from '../fullwide/firstContactPanels.jsx';
 import { CercadorColorsGrid } from '../fullwide/CercadorTextRow.jsx';
 import { CERCADOR_COLLECTIONS } from '../fullwide/CercadorTopBar.jsx';
+import { FRANJA_VERTICAL_SRC } from '../fullwide/MegaStripePanelP1.jsx';
 import { CONTROL_TILE_ARROWS, CONTROL_TILE_BN } from '../fullwide/MegaColumn.jsx';
 import { colorGap, colorMida } from '../fullwide/midesGraella.js';
 import { computeStripeTileItems, computeStripeTileOverlaySrcs } from '@/utils/resolveStripeTile.js';
@@ -382,7 +383,11 @@ export default function VerticalParadigmaP2({
             />
           </div>
 
-          {/* Columna 3: la franja, 14 samarretes en 2 files de 7, sense scroll */}
+          {/* Columna 3: la franja, 14 samarretes en 2 files de 7, sense scroll.
+              La BASE es la franja curta de la vertical (`FRANJA_VERTICAL_SRC`):
+              un sol fitxer amb les 14 samarretes blanques, una per casella. Cada
+              casella ensenya la seva part de la imatge amb `background-position`
+              (7 columnes x 2 files) i, a sobre, el dibuix de la variant. */}
           <div
             data-vertical-franja="1"
             data-stripe-visual-content="2"
@@ -393,12 +398,18 @@ export default function VerticalParadigmaP2({
               columnGap: `${GAP_FRANJA_PX}px`,
               rowGap: `${GAP_FRANJA_VERTICAL_PX}px`,
               minWidth: 0,
+              // `isolate`: la franja te caselles amb `mix-blend-mode` (el color
+              // de la samarreta) i sense aixo el `multiply` es mesclava amb el
+              // fons de la pagina i deixava una banda blanca fins a la dreta.
+              isolation: 'isolate',
             }}
           >
             {Array.from({ length: 14 }).map((_, idx) => {
               const src = stripeTileOverlaySrcs?.[idx] || null;
               const item = stripeTileItems?.[idx] || null;
               const esSeleccionat = Boolean(item && selectedItem === item);
+              const col = idx % 7;
+              const fila = Math.floor(idx / 7);
               return (
                 <button
                   key={`vertical-samarreta-${idx}`}
@@ -406,19 +417,24 @@ export default function VerticalParadigmaP2({
                   data-vertical-samarreta={idx}
                   aria-label={typeof item === 'string' ? item : undefined}
                   onClick={() => seleccionaSamarreta(idx)}
-                  disabled={!src}
                   style={{
                     appearance: 'none',
                     padding: 0,
                     position: 'relative',
                     width: '100%',
-                    aspectRatio: '1 / 1',
+                    height: 'auto',
+                    // Cada casella te la forma de la seva part de la imatge
+                    // (7 columnes x 2 files sobre 1379x593).
+                    aspectRatio: '2 / 3',
                     overflow: 'hidden',
                     border: esSeleccionat ? '1px solid #C9CDD2' : '1px solid transparent',
                     borderRadius: '2px',
-                    background: 'transparent',
-                    cursor: src ? 'pointer' : 'default',
+                    cursor: item ? 'pointer' : 'default',
                     boxSizing: 'border-box',
+                    backgroundImage: `url("${FRANJA_VERTICAL_SRC}")`,
+                    backgroundSize: '700% 200%',
+                    backgroundPosition: `${(col / 6) * 100}% ${(fila / 1) * 100}%`,
+                    backgroundRepeat: 'no-repeat',
                   }}
                 >
                   {src ? (
