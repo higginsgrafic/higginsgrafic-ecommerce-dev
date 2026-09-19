@@ -1651,6 +1651,35 @@ l'amplada del carril a 768.
 Quan la composició de debò estigui muntada dins del megaslide, aquesta pàgina
 s'ha d'esborrar.
 
+### Traslladar la maqueta dins del megaslide (32) — PENDENT (pla accionable)
+
+La maqueta de `/lab/vertical` ja valida l'estructura. El que queda és portar-la
+dins del megaslide i treure-hi el belt a la vertical. Punts de toc, perquè la
+propera sessió no els hagi de buscar:
+
+1. **L'alçada del panell**: `MegaMenuPanel.jsx` decideix l'alçada del panell
+   (`bleedGuardHeight` i el `guardHeightPx`). A la vertical, la pàgina 1 ha de
+   demanar l'alçada de la composició nova, no la del belt (avui 292 px).
+2. **La disposició**: `MegaStripePanelP1.jsx` (1094 línies) és on viu la pàgina 1
+   sencera: la columna de col·leccions es munta a la línia 269 i la franja
+   comenc,a a la 307, totes dues dins d'una maquetació de belt. Cal una branca
+   `isPortraitTablet` que munti la composició nova (o, millor, un component de
+   vertical a part, per no seguir omplint de branques les peces compartides).
+3. **La graella**: `MegaGridDibuixos`, cinc instàncies (una per col·lecció), com
+   a la maqueta. El component ja és `fr` i `aspect-square`: no cal tocar-lo.
+4. **La franja amb les samarretes de debò**: és la part delicada. Avui depèn del
+   belt (`--megaStripeDx/Dy/Scale` i el `transform` de la línia 386). Per a la
+   vertical cal la llista de samarretes sense belt, en 2×7, amb els `items` de la
+   col·lecció seleccionada.
+5. **El scroll vertical** del conjunt dins del carril.
+6. **Verificació**: comparador, mesura del megaslide, tests i build a cada pas;
+   i comprovar que a 1280/1024/1440/1920 no es mou res (la vertical és l'única
+   que canvia).
+
+**Preguntes encara obertes**: (a) la graella manté les cinc files de col·lecció
+(la maqueta ho proposa així) o només la seleccionada; (b) si una col·lecció té
+més de 14 samarretes, la franja fa scroll o s'hi afegeixen files.
+
 **El que NO s'ha passat al carril (i per què)**:
 
 - **Els offsets verticals** (40, 20, 45, 5, 8, 10, 15 px) i el `top` del
