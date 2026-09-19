@@ -13,6 +13,7 @@ import StoryPosterLink from '@/components/StoryPosterLink';
 import useIsMobile from '@/hooks/useIsMobile';
 import HomeMobile from '@/pages/HomeMobile';
 import { SELLING_PRICE_LABEL } from '@/config/pricing';
+import { esTauletaApaisada } from '@/utils/layoutMetrics';
 
 const HERO_SLIDES = [
   {
@@ -241,12 +242,7 @@ function Home() {
       && window.innerWidth <= 1024
       && window.innerHeight > window.innerWidth
   );
-  const [isLandscapeTablet, setIsLandscapeTablet] = useState(
-    typeof window !== 'undefined'
-      && window.innerWidth >= 1024
-      && window.innerWidth <= 1366
-      && window.innerHeight < window.innerWidth
-  );
+  const [isLandscapeTablet, setIsLandscapeTablet] = useState(esTauletaApaisada());
   const isTablet = isPortraitTablet || isLandscapeTablet;
 
   // Pla de franges per l'hero: 5 colors + 5 dibuixos aleatoris
@@ -314,11 +310,7 @@ function Home() {
           && window.innerWidth <= 1024
           && window.innerHeight > window.innerWidth
       );
-      setIsLandscapeTablet(
-        window.innerWidth >= 1024
-          && window.innerWidth <= 1366
-          && window.innerHeight < window.innerWidth
-      );
+      setIsLandscapeTablet(esTauletaApaisada());
       const gridEl = pautaGridRef.current;
       if (!gridEl) return;
       const rect = gridEl.getBoundingClientRect();

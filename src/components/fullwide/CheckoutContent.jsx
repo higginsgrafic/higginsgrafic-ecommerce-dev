@@ -13,6 +13,7 @@ import { useOffersConfig } from '@/hooks/useOffersConfig';
 import { getStripe, createPaymentIntent, modeProvesActiu } from '@/api/stripe';
 import { PDP_REGISTRY_BY_ROUTE } from '@/data/pdpRegistry';
 import { IVA_RATE } from '@/config/pricing';
+import { esTauletaApaisada } from '@/utils/layoutMetrics';
 
 function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPortraitTablet = false }) {
   const stripe = useStripe();
@@ -45,12 +46,7 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
   const [needsInvoice, setNeedsInvoice] = useState(false);
   const [acceptTerms, setAcceptTerms] = useState(false);
 
-  const [isLandscapeTablet, setIsLandscapeTablet] = useState(
-    typeof window !== 'undefined'
-      && window.innerWidth >= 768
-      && window.innerWidth <= 1366
-      && window.innerWidth >= window.innerHeight
-  );
+  const [isLandscapeTablet, setIsLandscapeTablet] = useState(esTauletaApaisada());
 
   // Telèfon: menys de 768 px d'amplada. Necessita una disposició pròpia (una
   // sola columna): les tres columnes de la recepta d'escriptori no hi caben i
@@ -63,7 +59,7 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
     const onResize = () => {
       const w = window.innerWidth;
       const h = window.innerHeight;
-      setIsLandscapeTablet(w >= 768 && w <= 1366 && w >= h);
+      setIsLandscapeTablet(esTauletaApaisada({ ample: w, alt: h }));
       setIsPhone(w < 768);
     };
     window.addEventListener('resize', onResize);

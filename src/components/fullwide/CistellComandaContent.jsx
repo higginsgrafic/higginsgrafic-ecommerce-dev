@@ -4,6 +4,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { ChevronDown, ChevronUp, Trash2 } from 'lucide-react';
 import { useShippingCosts } from '@/hooks/useShippingCosts';
 import { drawingStripePath } from '@/lib/drawingPaths';
+import { esTauletaApaisada } from '@/utils/layoutMetrics';
 
 function CistellComandaContent({ cartItems, setCartItems, onFinalizeOrder }) {
   const navigate = useNavigate();
@@ -25,12 +26,7 @@ function CistellComandaContent({ cartItems, setCartItems, onFinalizeOrder }) {
       && window.innerWidth <= 1366
       && window.innerHeight > window.innerWidth
   );
-  const [isLandscapeTablet, setIsLandscapeTablet] = useState(
-    typeof window !== 'undefined'
-      && window.innerWidth >= 768
-      && window.innerWidth <= 1366
-      && window.innerWidth >= window.innerHeight
-  );
+  const [isLandscapeTablet, setIsLandscapeTablet] = useState(esTauletaApaisada());
 
   // Micro-retocs propis de la vertical (ancoratge a l'esquerra, junts i
   // compensacions de text). L'horitzontal en conserva els d'escriptori.
@@ -196,7 +192,7 @@ function CistellComandaContent({ cartItems, setCartItems, onFinalizeOrder }) {
       const portrait = w >= 768 && w <= 1366 && h > w;
       setIsTablet(w >= 768 && w <= 1366);
       setIsPortraitTablet(portrait);
-      setIsLandscapeTablet(w >= 768 && w <= 1366 && w >= h);
+      setIsLandscapeTablet(esTauletaApaisada({ ample: w, alt: h }));
     };
     window.addEventListener('resize', onResize);
     return () => window.removeEventListener('resize', onResize);
