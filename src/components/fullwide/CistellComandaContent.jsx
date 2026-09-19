@@ -93,6 +93,35 @@ function CistellComandaContent({ cartItems, setCartItems, onFinalizeOrder, onAmp
   // l'escriptori i a la vertical segueix sent la taula de 1350px.
   const ROW_W = isCompactCart ? (4 * COL2 + 3 * SLIDE_GAP) : CART_VIEWPORT;
 
+  // ---------------------------------------------------------------------------
+  // TOTES les mides de la filera, en un sol lloc.
+  //
+  // L'estructura es la mateixa a les tres families (escriptori, apaisada i
+  // vertical), pero la unitat no: a la vertical la tipografia es mes gran en
+  // proporcio, i per aixo el disseny sencer no es pot escalar (els textos
+  // caurien a 6 pt). Per consequencia, cada familia te el seu joc de numeros,
+  // pero TOTS son aqui i en les mateixes unitats, en comptes d'escampats per
+  // les fileres.
+  // ---------------------------------------------------------------------------
+  const MIDES = {
+    // Desplac,ament horitzontal del bloc de la talla dins la seva casella.
+    dxTalla: isPortraitTablet ? 62 : (isNarrowCart ? 50 : 23),
+    // Desplac,ament del cubell d'esborrar (negatiu = cap a l'esquerra).
+    dxCubell: isPortraitTablet ? -6 : (isNarrowCart ? -8 : -20),
+    // Desplac,ament del preu dins de la seva casella.
+    dxPreu: isPortraitTablet ? '0px' : (isNarrowCart ? '-12px' : '-36px'),
+    // Graella interna de la columna del preu: etiqueta oculta, buit, cubell,
+    // part entera i part decimal.
+    gridPreu: isPortraitTablet ? '0px 40px 40px auto auto' : 'auto 40px 40px 70px 70px',
+    // El marge de la part decimal ha de compensar el junt de caselles, si no
+    // el preu es llegeix «15, 50€».
+    margeDecimal: isPortraitTablet ? '-10px' : (isNarrowCart ? '-4px' : '-8px'),
+    gapCellesPreu: isPortraitTablet ? '10px' : (isNarrowCart ? '4px' : '8px'),
+    // Junts dins dels grups de la quantitat i de la talla.
+    gapQty: isNarrowCart ? '6px' : '14px',
+    gapTalla: isNarrowCart ? '4px' : '10px',
+  };
+
   // La pagina 3 escala el cistell perque faci la franja central: li cal saber
   // quina es l'amplada natural del contingut.
   useEffect(() => {
@@ -426,15 +455,15 @@ function CistellComandaContent({ cartItems, setCartItems, onFinalizeOrder, onAmp
           {/* Col 3: QUANTITAT + TALLATGE (cadascun centrat amb el slot del carrusel del damunt) */}
           <div style={{ ...colBg, display: 'grid', gridTemplateColumns: `${SLOT_W}px ${SLOT_W}px`, gridTemplateRows: `${ROW_H - V_GUTTER}px ${ROW_H - V_GUTTER}px`, columnGap: `${SLIDE_GAP}px`, rowGap: `${V_GUTTER}px`, alignItems: 'center', justifyItems: 'center',  }}>
             <div style={{ gridRow: 2, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '4px', transform: `translateY(${-0.5 * ROW_H}px)` }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: isNarrowCart ? '6px' : '14px', ...VAL, fontSize: '11.6424pt' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: MIDES.gapQty, ...VAL, fontSize: '11.6424pt' }}>
                 <button onClick={() => changeQty(i, -1)} onMouseEnter={(e) => { e.currentTarget.style.color = '#475059'; e.currentTarget.style.fontSize = '12pt'; e.currentTarget.style.transform = 'scale(1.3)'; }} onMouseLeave={(e) => { e.currentTarget.style.color = '#C3C8CD'; e.currentTarget.style.fontSize = '8.7318pt'; e.currentTarget.style.transform = 'scale(1)'; }} style={{ width: `${(ROW_H - V_GUTTER) * 1.25}px`, height: `${(ROW_H - V_GUTTER) * 1.25}px`, border: '1px solid #C9D0D9', borderRadius: '50%', backgroundColor: 'transparent', color: '#C3C8CD', cursor: 'pointer', fontSize: '8.7318pt', lineHeight: 1, padding: 0, transition: 'color 0.15s ease, transform 0.15s ease, font-size 0.15s ease' }}>−</button>
                 <span style={{ minWidth: '20px', textAlign: 'center', fontWeight: 600 }}>{item.qty}</span>
                 <button onClick={() => changeQty(i, +1)} onMouseEnter={(e) => { e.currentTarget.style.color = '#475059'; e.currentTarget.style.fontSize = '12pt'; e.currentTarget.style.transform = 'scale(1.3)'; }} onMouseLeave={(e) => { e.currentTarget.style.color = '#C3C8CD'; e.currentTarget.style.fontSize = '8.7318pt'; e.currentTarget.style.transform = 'scale(1)'; }} style={{ width: `${(ROW_H - V_GUTTER) * 1.25}px`, height: `${(ROW_H - V_GUTTER) * 1.25}px`, border: '1px solid #C9D0D9', borderRadius: '50%', backgroundColor: 'transparent', color: '#C3C8CD', cursor: 'pointer', fontSize: '8.7318pt', lineHeight: 1, padding: 0, transition: 'color 0.15s ease, transform 0.15s ease, font-size 0.15s ease' }}>+</button>
               </div>
             </div>
             <div style={{ gridRow: 2, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '4px', // A la vertical, la talla tambe s'allunya de la quantitat.
-              transform: `translate(${isPortraitTablet ? 62 : (isNarrowCart ? 50 : 23)}px, ${-0.5 * ROW_H}px)` }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: isNarrowCart ? '4px' : '10px', ...VAL, fontSize: '11.6424pt' }}>
+              transform: `translate(${MIDES.dxTalla}px, ${-0.5 * ROW_H}px)` }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: MIDES.gapTalla, ...VAL, fontSize: '11.6424pt' }}>
                 <button onClick={() => changeSize(i, -1)} onMouseEnter={(e) => { e.currentTarget.style.color = '#7D8895'; e.currentTarget.style.transform = 'scale(1.3)'; }} onMouseLeave={(e) => { e.currentTarget.style.color = '#C3C8CD'; e.currentTarget.style.transform = 'scale(1)'; }} style={{ width: `${ROW_H - V_GUTTER}px`, height: `${ROW_H - V_GUTTER}px`, border: 'none', background: 'transparent', color: '#C3C8CD', cursor: 'pointer', padding: 0, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', transition: 'color 0.15s ease, transform 0.15s ease' }}><ChevronDown size={19.64655} strokeWidth={2.5} /></button>
                 <span style={{ minWidth: '32px', textAlign: 'center', fontWeight: 600 }}>{item.size}</span>
                 <button onClick={() => changeSize(i, +1)} onMouseEnter={(e) => { e.currentTarget.style.color = '#7D8895'; e.currentTarget.style.transform = 'scale(1.3)'; }} onMouseLeave={(e) => { e.currentTarget.style.color = '#C3C8CD'; e.currentTarget.style.transform = 'scale(1)'; }} style={{ width: `${ROW_H - V_GUTTER}px`, height: `${ROW_H - V_GUTTER}px`, border: 'none', background: 'transparent', color: '#C3C8CD', cursor: 'pointer', padding: 0, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', transition: 'color 0.15s ease, transform 0.15s ease' }}><ChevronUp size={19.64655} strokeWidth={2.5} /></button>
@@ -449,11 +478,11 @@ function CistellComandaContent({ cartItems, setCartItems, onFinalizeOrder, onAmp
               {/* A la vertical la columna es estreta (162 px): l'etiqueta
                   oculta no hi pot ocupar lloc i les caselles van justes, si no
                   el preu se'n va mes enlla de la filera i queda tallat. */}
-              <div style={{ display: 'grid', gridTemplateColumns: isPortraitTablet ? '0px 40px 40px auto auto' : 'auto 40px 40px 70px 70px', alignItems: 'center', columnGap: isPortraitTablet ? '10px' : (isNarrowCart ? '4px' : '8px') }}>
+              <div style={{ display: 'grid', gridTemplateColumns: MIDES.gridPreu, alignItems: 'center', columnGap: MIDES.gapCellesPreu }}>
                 <span style={{ ...HEAD, fontSize: '10.1871pt', fontWeight: 400, color: '#7D8895', marginRight: isPortraitTablet ? 0 : (isNarrowCart ? '8px' : '24px'), visibility: 'hidden', transform: `translateY(${ROW_H}px)` }}>TOT PLEGAT FA</span>
                 <span />
                 <button onClick={() => removeItem(i)} onMouseEnter={(e) => { e.currentTarget.style.color = '#475059'; e.currentTarget.querySelector('svg').setAttribute('width', '25.5'); e.currentTarget.querySelector('svg').setAttribute('height', '25.5'); }} onMouseLeave={(e) => { e.currentTarget.style.color = '#000'; e.currentTarget.querySelector('svg').setAttribute('width', '19.64655'); e.currentTarget.querySelector('svg').setAttribute('height', '19.64655'); }} style={{ width: '40px', height: '40px', border: 'none', background: 'transparent', color: '#000', cursor: 'pointer', padding: 0, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', justifySelf: 'center', // A la vertical, el cubell tambe s'allunya una mica mes del preu.
-                  transform: `translate(${isPortraitTablet ? -6 : (isNarrowCart ? -8 : -20)}px, 0.5px)`, transition: 'color 0.15s ease' }}>
+                  transform: `translate(${MIDES.dxCubell}px, 0.5px)`, transition: 'color 0.15s ease' }}>
                   <Trash2 size={19.64655} strokeWidth={2.5} />
                 </button>
                 {(() => {
@@ -464,12 +493,12 @@ function CistellComandaContent({ cartItems, setCartItems, onFinalizeOrder, onAmp
                   // A la vertical, el preu no s'ha d'acostar a la paperera: la
                   // seva casella ja va a la dreta del tot. El -12px hi feia que
                   // el cubell d'esborrar toques el preu.
-                  const priceColumnOffsetX = isPortraitTablet ? '0px' : (isNarrowCart ? '-12px' : '-36px');
+                  const priceColumnOffsetX = MIDES.dxPreu;
                   if (!total) return <><span style={{ ...priceStyle, justifySelf: 'end' }}>{item.price}</span><span /></>;
                   return (
                     <>
                       <span style={{ ...priceStyle, justifySelf: 'end', whiteSpace: 'nowrap', transform: `translateX(${priceColumnOffsetX})` }}>{intPart},</span>
-                      <span style={{ ...priceStyle, justifySelf: 'start', whiteSpace: 'nowrap', marginLeft: isPortraitTablet ? '-10px' : (isNarrowCart ? '-4px' : '-8px'), transform: `translateX(${priceColumnOffsetX})` }}>{decPart}€</span>
+                      <span style={{ ...priceStyle, justifySelf: 'start', whiteSpace: 'nowrap', marginLeft: MIDES.margeDecimal, transform: `translateX(${priceColumnOffsetX})` }}>{decPart}€</span>
                     </>
                   );
                 })()}

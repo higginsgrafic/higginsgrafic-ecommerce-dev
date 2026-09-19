@@ -1497,11 +1497,23 @@ vertical surten de la franja. Resultat: la filera fa la franja exacta a
 alçades de filera intactes.
 
 **El deute que va assenyalar l'amo**: he estat afinant amb nombres individuals
-per vista (el `-10`, el `62`, el `-6`, el `-12`…). Cal fer-ho **proporcional**:
-una sola unitat per vista i totes les separacions expressades en aquesta unitat,
-com fa la versió horitzontal. Les mesures d'ara (vertical): quantitat→talla
-64,5 px, talla→cubell 15,7, cubell→preu 44,7. Captura:
-`docs/comparacio/cistell-columnes-768t.png`.
+per vista (el `-10`, el `62`, el `-6`, el `-12`…). Cal fer-ho **proporcional**.
+
+**Pas 1 (fet)**: totes les mides de la filera són en un sol bloc, `MIDES`, al
+capdamunt de `CistellComandaContent`: el desplaçament de la talla, el del cubell,
+el del preu, la graella interna del preu, el marge de la part decimal, els junts
+de caselles i els junts dels grups de quantitat i talla. Verificat que el canvi
+**no mou res**: filera [325, 1595] a 1920, [243,5, 1196,5] a 1440, [45,5, 978,5] a
+1024 i [40, 728] a 768, i les separacions idèntiques.
+
+**Pas 2 (pendent)**: derivar-les d'una sola unitat per vista. Matís important: el
+disseny sencer NO es pot escalar de l'horitzontal a la vertical, perquè allà la
+tipografia és més gran en proporció (escalar-la donaria textos de ~6 pt). Per
+tant la unitat és per família, però amb els multiplicadors compartits i declarats
+una sola vegada.
+
+Mesures d'ara a la vertical: quantitat→talla 64,5 px, talla→cubell 15,7,
+cubell→preu 35,1. Captura: `docs/comparacio/cistell-columnes-768t.png`.
 
 **El que NO s'ha passat al carril (i per què)**:
 
