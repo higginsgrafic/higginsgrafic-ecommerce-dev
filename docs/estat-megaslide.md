@@ -1275,6 +1275,29 @@ Comprovat: 375,3 → **425,3** a 1280, 390,6 → **440,6** a 1366 i 329,9 → **
 a la tauleta de 1024. A la vertical (514), a 1440 (439,8) i a 1920 (505) no es
 mou res.
 
+### Tauleta i 1280: dibuixos una mica més grossos i colors/llista 10 px a l'esquerra (21) — FET
+
+Dos retocs a l'apaisada (1024, 1280 i 1366; la vertical, com sempre, a part):
+
+- **Els dibuixos de la graella, una mica més grossos**: de `DIBUIX_BASE * 0,40`
+  a `* 0,42` (19,89 → **20,89 px**, un 5% més). Es va provar amb 0,45 (22,38) i
+  era massa. Les separacions es queden com estaven (18, un 10% menys que la base
+  de 20), que amb 20,89 encara hi cap: el conjunt fa 603 px i la columna de la
+  graella en fa 637 a la tauleta.
+- **La columna de col·leccions i la graella de colors, 10 px a l'esquerra** a
+  l'apaisada: el text i els cercles acaben 10 px abans que abans (la resta de la
+  composició no es mou).
+
+| vista | dibuix | gap | cercles (esquerra) | llista (dreta) |
+|---|---|---|---|---|
+| 1920 | 30 | 24,39 | 1341,9 | 1595 |
+| 1280 | **20,89** | 17,91 | **903,7** (abans 913,7) | **1096,6** (abans 1106,6) |
+| 1024 tauleta | **20,89** | 17,91 | **775,7** (abans 785,7) | **968,6** (abans 978,6) |
+| 768 vertical | 20,89 | 17,91 | 759,1 | 952 |
+
+Les dues tauletes segueixen donant les mateixes mides i alineacions (el
+comparador ho comprova).
+
 **El que NO s'ha passat al carril (i per què)**:
 
 - **Els offsets verticals** (40, 20, 45, 5, 8, 10, 15 px) i el `top` del

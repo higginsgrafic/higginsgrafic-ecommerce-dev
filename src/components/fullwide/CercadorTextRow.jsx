@@ -511,7 +511,16 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
           })}
         </div>
 
-        <div data-p2-color-grid style={{ display: 'grid', gridTemplateColumns: `repeat(4, ${cerclePx}px)`, gridAutoRows: `${cerclePx}px`, gap: `${colorGapPx}px`, transform: uniformColumns ? 'translateX(85px)' : undefined, marginTop: uniformColumns ? '5px' : undefined }}>
+        <div data-p2-color-grid style={{
+          display: 'grid',
+          gridTemplateColumns: `repeat(4, ${cerclePx}px)`,
+          gridAutoRows: `${cerclePx}px`,
+          gap: `${colorGapPx}px`,
+          // A l'apaisada la graella de colors va 10 px mes a l'esquerra (ho va
+          // demanar l'amo, igual que la columna de colleccions).
+          transform: uniformColumns ? 'translateX(85px)' : (isLandscapeTablet ? 'translateX(-10px)' : undefined),
+          marginTop: uniformColumns ? '5px' : undefined,
+        }}>
           {CERCADOR_COLORS.map(({ slug, hex }) => {
             const selected = slug === selectedColor;
             return (
@@ -578,7 +587,11 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
         <div
           style={{
             width: '100%',
-            transform: uniformColumns ? 'translateX(120px)' : undefined,
+            // A l'apaisada (1024 i 1280) la llista va 10 px mes a l'esquerra,
+            // ho va demanar l'amo.
+            transform: uniformColumns
+              ? 'translateX(120px)'
+              : (isLandscapeTablet ? 'translateX(-10px)' : undefined),
             // La graella de colors te la seva columna (78) i el seu contingut
             // (4 cercles i 3 separacions) en surt: aquest coixí es la part que
             // sobresurt, perque la llista no hi caigui a sobre. La filera es

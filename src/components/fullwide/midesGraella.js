@@ -74,10 +74,11 @@ export const MARGE_DRET_FILERA_ESCRIPTORI_PX = 40;
 export const DIBUIX_PX = 30;
 export const DIBUIX_GAP_H = (GRAELLA_AMPLADA - GRAELLA_COLUMNES * DIBUIX_PX) / (GRAELLA_COLUMNES - 1);
 export const DIBUIX_GAP_V = DIBUIX_GAP_V_BASE * (DIBUIX_PX / DIBUIX_BASE);
-// Tauleta (horitzontal i vertical, de moment iguals): 40% de la base 1:1.
+// Tauleta (horitzontal i vertical, de moment iguals): 42% de la base 1:1 (eren
+// el 40%: l'amo els vol "una mica" mes grossos; amb el 45% eren massa).
 export const ESCALA_TAULETA = 0.995; // 0,5% mes petit (ho demana el disseny)
-export const DIBUIX_PX_LANDSCAPE = DIBUIX_BASE * 0.40 * ESCALA_TAULETA;
-export const DIBUIX_PX_PORTRAIT = DIBUIX_BASE * 0.40 * ESCALA_TAULETA;
+export const DIBUIX_PX_LANDSCAPE = DIBUIX_BASE * 0.42 * ESCALA_TAULETA;
+export const DIBUIX_PX_PORTRAIT = DIBUIX_BASE * 0.42 * ESCALA_TAULETA;
 // Tauleta horitzontal: la separacio horitzontal va un 10% mes estreta que la
 // base de 20 px, perque la graella no arribi tan endins de la columna de color.
 export const DIBUIX_GAP_H_LANDSCAPE = 18 * ESCALA_TAULETA;
