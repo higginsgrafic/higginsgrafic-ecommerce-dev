@@ -14,7 +14,7 @@ import { buildOtherCollectionsImages } from '@/components/home/homeDrawings';
 import useIsMobile from '@/hooks/useIsMobile';
 import PdpMobile from '@/pages/PdpMobile';
 import PageBand from '@/components/layout/PageBand';
-import { getSafeBelt, carrilPx, esTauletaApaisada } from '@/utils/layoutMetrics';
+import { getSafeBelt, carrilPx, esTauletaApaisada , readRootCssNumber } from '@/utils/layoutMetrics';
 import { SELLING_PRICE_LABEL } from '@/config/pricing';
 
 const PDP_PRESET_VERSION = 'pdp-layout-2026-06-06-1953';
@@ -488,11 +488,13 @@ function PdpDesktop({ product }) {
               stabilizedViewportScale={1}
               stabilizedViewportWidth={portraitRailViewportWidth}
               stabilizedGutterX={isPortraitTablet ? portraitRailGutterX : PAUTA_GUTTER_X}
-              // El rail, dins el carril central (la mateixa amplada que la
-              // fila de la capcalera) NOMES a l'escriptori: les tauletes tenen
-              // la seva propia calibracio (a l'apaisada el carril de 70,3 vw
-              // donaria 720 px i les seves targetes han de fer 230).
-              beltWidthOverride={(isPortraitTablet || isLandscapeTablet) ? null : (beltWidth ?? null)}
+              // El rail, dins el CARRIL central: el mateix `--hg-mega-w` que la
+              // fila de la capcalera i el megaslide. Es el que fa que a 1280
+              // (on el carril es el de tauleta, 992) les seves targetes facin
+              // 230 i no 290: abans el rail anava amb el marc del lloc (1248)
+              // i la pagina barrejava dues mides. A la vertical mana la seva
+              // propia estabilitzacio.
+              beltWidthOverride={isPortraitTablet ? null : readRootCssNumber('--hg-mega-w', beltWidth ?? 0) || null}
             />
           </div>
         </PageBand>
