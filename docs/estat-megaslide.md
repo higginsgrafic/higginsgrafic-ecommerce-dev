@@ -1353,7 +1353,7 @@ quedava). El mateix número (`baixadaHero`) alimenta el `top` de l'hero i el
 El 1280 va 5 px més amunt que el 1366 (retoc de l'amo), i la vertical i el 1920
 no s'hi toquen.
 
-### El cadenat: més gros, seguiment i arrossegament (24) — FET (a validar)
+### El cadenat: més gros, seguiment i arrossegament (24) — FET i validat
 
 Tres coses de la llista de l'amo:
 
@@ -1370,8 +1370,8 @@ Tres coses de la llista de l'amo:
   arrossega el mateix element que el mou a ell. Nomes a la vertical
   (`isPortraitTablet`), com abans.
 
-**Pendent de validar amb l'amo** (són coses de mà, no de mesura): si el rebot
-desapareix del tot i si l'arrossegament es comporta com l'invers del scroll.
+**Validat per l'amo** (2026-09-19): els tres canvis són correctes. Eren coses de
+mà, no de mesura, i per això es van demanar expressament.
 
 **El que NO s'ha passat al carril (i per què)**:
 
