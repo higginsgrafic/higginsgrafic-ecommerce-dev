@@ -47,7 +47,10 @@ export default function MegaslidePagina3({
       }}>
 
         <div style={{
-          transform: 'scale(0.94)',
+          // 0,94 es l'ajust de disseny a 1920; per sota, l'escala del carril
+          // (`--hg-escala-mega`): el cistell fa 1350 px de disseny i ha de
+          // cabre dins el carril central com la resta de la composicio.
+          transform: 'scale(min(0.94, var(--hg-escala-mega, 1)))',
           transformOrigin: 'top center',
           width: '100%',
           height: '100%',

@@ -1077,6 +1077,25 @@ marge no es divideix).
 | 1024 tauleta apaisada | 36 · 270,6 · 739,8 | t1 36 · t2 270,6 · t4 739,8 |
 | 768 tauleta vertical | 16 (2 columnes) · 510 | t1 16 (t1+t2) · t3 510 |
 
+### La informació de les pàgines, dins el carril (12) — FET
+
+El cistell, les comandes i el pagament també han d'encaixar dins el carril
+central. Els tres venien d'un disseny de 1350 px i no en sabien res:
+
+- **Pàgines 3 i 4 del megaslide** (cistell i comandes): l'escala era fixa
+  (0,94; 0,92 a la tauleta apaisada). Ara és `scale(min(0,94, var(--hg-escala-mega,
+  1)))`: a 1920 no es mou res i, per sota, el contingut s'encongeix amb el
+  carril. Escales resultants: 0,94 a 1920, 0,750 a 1440, 0,667 a 1280 i 0,533 a
+  1024; el cistell (1350 de disseny) fa doncs 1350 / 1013 / 900 / 720, exactament
+  el carril.
+- **Checkout**: la pàgina anava amb `--site-w` (el marc del lloc, 1350 a 1440)
+  i `--site-xL`. Ara va amb `--hg-mega-w` i `--hg-mega-x`, les mateixes que la
+  fila de la capçalera. Comprovat: la seva caixa és [285, 1635] a 1920 i
+  [214, 1227] a 1440, és a dir el carril exacte, igual que la fila del header.
+
+A tauleta no es mou res (allà `--hg-escala-mega` val 1 i el cistell té la seva
+pròpia calibració).
+
 **El que NO s'ha passat al carril (i per què)**:
 
 - **Els offsets verticals** (40, 20, 45, 5, 8, 10, 15 px) i el `top` del

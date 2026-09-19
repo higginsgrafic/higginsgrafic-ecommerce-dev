@@ -108,8 +108,12 @@ export default function CheckoutPage() {
         className="px-4 sm:px-6 lg:px-10"
         style={{
           minHeight: '60vh',
-          width: 'var(--site-w, 100%)',
-          marginLeft: 'calc(var(--site-xL, 0px) - var(--rulerInset, 0px))',
+          // El carril central, exactament com la fila de la capcalera (que va
+          // amb `--hg-mega-w` i `--hg-mega-x`): del logo a la icona d'usuari.
+          // Abans anava amb `--site-w` i, a 1440, el formulari feia 1350 px
+          // mentre el carril en fa 1013.
+          width: 'var(--hg-mega-w, 100%)',
+          marginLeft: 'calc(var(--hg-mega-x, 0px) - var(--rulerInset, 0px))',
           paddingTop: esApaïsat ? '3px' : '28px',
           paddingBottom: '48px',
           boxSizing: 'border-box',
