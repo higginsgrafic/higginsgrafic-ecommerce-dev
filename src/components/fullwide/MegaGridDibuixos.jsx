@@ -137,39 +137,17 @@ function dibuixDelProducte(producte, index) {
 }
 
 /**
- * El dibuix d'un item de la llista del megaslide, buscant-lo directament al
- * manifest.
- *
- * `perClau` només té els dibuixos dels productes del catàleg, i n'hi ha que no
- * hi són (o que s'hi diuen d'una altra manera). Sense aquesta segona via, la
- * graella de la composició vertical perdia items de la llista i les files no
- * omplien les 16 columnes.
+ * @param {object} props
+ * @param {string} props.active    colleccio activa (clau del megaslide)
+ * @param {string} [props.className]
+ * @param {string[]} [props.items] llista d'items del megaslide (mana l'ordre)
+ * @param {number} [props.cellPx]  mida de la casella en px. Si no s'hi passa,
+ *   les 16 columnes es reparteixen l'ample del contenidor (es el que fa la
+ *   graella de la composicio vertical, que ha de fer l'amplada del carril).
+ *   Amb un valor fix, les caselles fan exactament aquella mida i el que no hi
+ *   cap queda a la dreta sense pintar, com a la filera del cercador.
  */
-function dibuixDeLlista(it, carpeta, index, perNormalitzat) {
-  const k = clau(it);
-  if (!k) return null;
-  // Els noms de la llista del megaslide porten espais, apostrofs i guions
-  // ("The Phoenix", "Vulcan's End", "Afrodita") i els fitxers tambe
-  // ("the-phoenix-b-grid", "afrodita-a-b-grid"): per aparellar-los s'han de
-  // comparar sense res que no sigui lletra o xifra.
-  const pla = (v) => String(v).replace(/[^a-z0-9]/gi, '');
-  const kp = pla(k);
-  const candidats = index[carpeta] || [];
-  const exacte = candidats.find((f) => f.k === k)
-    || (kp ? candidats.find((f) => pla(f.k) === kp) : null);
-  if (exacte) return exacte.ruta;
-  // Segona via: el dibuix pot ser en una carpeta que no es la de la colleccio
-  // (l'austen te les subcolleccions i la llista del megaslide les barreja).
-  if (kp) {
-    const aTothom = perNormalitzat?.get(kp);
-    if (aTothom) return aTothom;
-    const perPrefix = perNormalitzat?.get(`~${kp}`);
-    if (perPrefix) return perPrefix;
-  }
-  return null;
-}
-
-export default function MegaGridDibuixos({ active, className, items: itemsDelMega, nomesElsDeLaLlista = false }) {
+export default function MegaGridDibuixos({ active, className, items: itemsDelMega, cellPx }) {
   const [manifest, setManifest] = useState(null);
   const [productes, setProductes] = useState(null);
 
@@ -200,36 +178,6 @@ export default function MegaGridDibuixos({ active, className, items: itemsDelMeg
     return idx;
   }, [manifest]);
 
-  /**
-   * El mateix index, pero amb la clau sense res que no sigui lletra o xifra.
-   *
-   * Serveix per aparellar noms de la llista del megaslide amb fitxers que no
-   * coincideixen lletra a lletra ("Afrodita" amb `afrodita-a`, "Vulcan's End"
-   * amb `vulcans-end`). Tambe hi ha una clau amb `~` per al cas contrari: el
-   * fitxer comenca pel nom de l'item.
-   */
-  const perNormalitzat = useMemo(() => {
-    const pla = (v) => String(v).replace(/[^a-z0-9]/gi, '');
-    const mapa = new Map();
-    const prefixos = [];
-    for (const llista of Object.values(index)) {
-      for (const f of llista) {
-        const kp = pla(f.k);
-        if (!kp) continue;
-        if (!mapa.has(kp)) mapa.set(kp, f.ruta);
-        prefixos.push([kp, f.ruta]);
-      }
-    }
-    // El fitxer que comenca pel nom de l'item ("afrodita" + "a").
-    for (const [kp, ruta] of prefixos) {
-      for (let tall = Math.min(kp.length, 24); tall >= 4; tall -= 1) {
-        const clauPrefix = `~${kp.slice(0, tall)}`;
-        if (!mapa.has(clauPrefix)) mapa.set(clauPrefix, ruta);
-      }
-    }
-    return mapa;
-  }, [index]);
-
   // Els dibuixos de la colleccio activa, amb el seu producte.
   const perClau = useMemo(() => {
     if (!productes) return new Map();
@@ -254,54 +202,23 @@ export default function MegaGridDibuixos({ active, className, items: itemsDelMeg
    *
    * Si un item no troba el seu dibuix, es descarta; i si un producte no és a
    * la llista, s'afegeix al final perquè no desaparegui mai.
-   *
-   * Un item de la llista que no tingui producte al catàleg SÍ que surt, amb el
-   * dibuix buscat directament al manifest (`dibuixDeLlista`): la llista del
-   * megaslide és la font de l'ordre i del nombre d'items, i la graella de la
-   * composició vertical ha de mostrar-la sencera.
-   *
-   * Amb `nomesElsDeLaLlista` no s'hi afegeixen els productes que no són a la
-   * llista: la composició vertical fa una fila per col·lecció i les que sobren
-   * fan una segona fila que desquadra les cinc files del paradigma.
    */
   const dibuixos = useMemo(() => {
     const ordenats = [];
     const usats = new Set();
-    // El manifest va per carpeta de dibuixos: la clau es la de `CARPETA`
-    // (`first-contact` -> `first_contact`), no pas la del cataleg.
-    const carpeta = CARPETA[active] || COLLECCIO_AL_CATALEG[active] || active;
     for (const it of Array.isArray(itemsDelMega) ? itemsDelMega : []) {
       if (typeof it !== 'string') continue;
       if (it === 'botonera-bn' || it === 'botonera-fletxes') continue;
-      // La clau surt del cami SENCER i no nomes del nom del fitxer: dos items
-      // de colleccions distintes es poden dir igual (`looking-for-my-darcy` te
-      // un `fuchsia-solid-grid` i un `fuchsia-frame-grid`) i amb el nom sol
-      // s'hi aparellaven malament.
-      const k = clau(it);
+      const k = clau(it.split('/').pop());
       const trobat = perClau.get(k) || [...perClau.entries()].find(([kk]) => kk.includes(k) || k.includes(kk))?.[1];
-      if (trobat) {
-        // El dibuix pot sortir repetit (dos items que apunten al mateix
-        // producte): només es pinta un cop.
-        if (usats.has(trobat.dibuix)) continue;
-        usats.add(trobat.dibuix);
-        ordenats.push(trobat);
-        continue;
-      }
-      const ruta = dibuixDeLlista(it, carpeta, index, perNormalitzat);
-      if (!ruta || usats.has(ruta)) continue;
-      usats.add(ruta);
-      ordenats.push({ slug: `__mega__${k || it}`, name: it, collection: active, dibuix: ruta });
+      if (!trobat) continue;
+      ordenats.push(trobat);
+      usats.add(trobat.slug);
     }
     // Els que no surten a la llista del megaslide, al final.
-    if (!nomesElsDeLaLlista) {
-      for (const p of perClau.values()) {
-        if (usats.has(p.dibuix)) continue;
-        usats.add(p.dibuix);
-        ordenats.push(p);
-      }
-    }
+    for (const p of perClau.values()) if (!usats.has(p.slug)) ordenats.push(p);
     return ordenats;
-  }, [itemsDelMega, perClau, nomesElsDeLaLlista, active, index, perNormalitzat]);
+  }, [itemsDelMega, perClau]);
 
   // Mentre no hi hagi dades, no pinto res: aixi no balla.
   if (!manifest || !productes || dibuixos.length === 0) return null;
@@ -311,14 +228,11 @@ export default function MegaGridDibuixos({ active, className, items: itemsDelMeg
       <div
         style={{
           display: 'grid',
-          // Les columnes es reparteixen l'ample que els doni el megaslide.
-          gridTemplateColumns: 'repeat(16, minmax(0, 1fr))',
+          // Les columnes es reparteixen l'ample que els doni el megaslide; amb
+          // `cellPx` tenen la mida de disseny i el que sobra queda a la dreta.
+          gridTemplateColumns: cellPx ? `repeat(16, ${cellPx}px)` : 'repeat(16, minmax(0, 1fr))',
           gap: '6px',
-          // `stretch` i no `center`: la graella ha d'omplir l'ample que li dona
-          // el contenidor. Amb `center`, la primera fila (la que no te un
-          // component de control que l'estiri) s'encongia a l'amplada d'una
-          // casella i la graella queia en picat.
-          alignItems: 'stretch',
+          alignItems: 'center',
         }}
         aria-label={`Dibuixos de ${NOM_COLLECCIO[dibuixos[0]?.collection] || ''}`}
       >
@@ -327,9 +241,7 @@ export default function MegaGridDibuixos({ active, className, items: itemsDelMeg
             key={p.slug}
             title={p.name}
             style={{
-              aspectRatio: '1 / 1',
-              minHeight: 0,
-              minWidth: 0,
+              ...(cellPx ? { width: `${cellPx}px`, height: `${cellPx}px` } : { aspectRatio: '1 / 1' }),
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -340,7 +252,7 @@ export default function MegaGridDibuixos({ active, className, items: itemsDelMeg
               src={p.dibuix}
               alt=""
               loading="lazy"
-              style={{ width: '100%', height: '100%', minWidth: 0, minHeight: 0, objectFit: 'contain', display: 'block' }}
+              style={{ width: '100%', height: '100%', objectFit: 'contain', display: 'block' }}
             />
           </div>
         ))}

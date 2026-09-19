@@ -317,6 +317,100 @@ function Group({ group, isFirst, dimmed, clickable, selectedStripeItem, hoveredS
   );
 }
 
+/**
+ * La GRAELLA DE COLORS del cercador, tal com era.
+ *
+ * Viu aquí perquè és la mateixa peça que la de la filera: la composició
+ * vertical del megaslide també l'ha de fer servir, i si se'n fes una còpia les
+ * dues s'acabarien separant. Els cercles, la separació, l'anell del color triat
+ * i la pastilla COLOR són exactament els d'abans.
+ *
+ * @param {object} e
+ * @param {string} e.selectedColor  slug del color triat
+ * @param {(slug: string) => void} [e.onSelectColor]
+ * @param {number} e.cerclePx       diàmetre del cercle, en px
+ * @param {number} e.colorGapPx     separació entre cercles, en px
+ * @param {boolean} [e.isPortraitTablet]
+ * @param {boolean} [e.isLandscapeTablet]
+ * @param {object} [e.style]        estil extra per al contenidor
+ */
+export function CercadorColorsGrid({
+  selectedColor = 'white',
+  onSelectColor,
+  cerclePx,
+  colorGapPx,
+  isPortraitTablet = false,
+  isLandscapeTablet = false,
+  style,
+}) {
+  return (
+    <div
+      data-p2-color-grid
+      style={{
+        display: 'grid',
+        gridTemplateColumns: `repeat(4, ${cerclePx}px)`,
+        gridAutoRows: `${cerclePx}px`,
+        gap: `${colorGapPx}px`,
+        ...style,
+      }}
+    >
+      {CERCADOR_COLORS.map(({ slug, hex }) => {
+        const selected = slug === selectedColor;
+        return (
+          <button
+            key={slug}
+            type="button"
+            aria-label={slug}
+            onClick={() => onSelectColor?.(slug)}
+            style={{
+              width: `${cerclePx}px`,
+              height: `${cerclePx}px`,
+              padding: 0,
+              borderRadius: '50%',
+              border: selected ? '0.5px solid rgba(0,0,0,0.22)' : '0.5px solid rgba(0,0,0,0.22)',
+              // L'indicador del color triat: la meitat de gruix (1 px en
+              // comptes de 2).
+              outline: selected ? '1px solid #111827' : 'none',
+              outlineOffset: '3px',
+              backgroundColor: hex,
+              boxSizing: 'border-box',
+              cursor: 'pointer',
+            }}
+          />
+        );
+      })}
+      <div
+        style={{
+          gridColumn: 'span 2',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          height: isPortraitTablet ? '18px' : (isLandscapeTablet ? '21px' : '28px'),
+          padding: isPortraitTablet ? '0 5px' : (isLandscapeTablet ? '0 6px' : '0 8px'),
+          borderRadius: isPortraitTablet ? '9px' : (isLandscapeTablet ? '10.5px' : '14px'),
+          backgroundColor: '#FFFFFF',
+          border: '0.5px solid rgba(0,0,0,0.22)',
+          boxSizing: 'border-box',
+        }}
+      >
+        <span
+          className="font-oswald"
+          style={{
+            fontWeight: 700,
+            fontSize: (isPortraitTablet || isLandscapeTablet) ? '8px' : carrilPx(11),
+            lineHeight: 1,
+            letterSpacing: '0.04em',
+            color: '#2B2B2B',
+            whiteSpace: 'nowrap',
+          }}
+        >
+          COLOR
+        </span>
+      </div>
+    </div>
+  );
+}
+
 function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripeItem, hoveredStripeItem, onSelectGroup, onHoverItem, onHoverLeave, compact = false, selectedColor = 'white', onSelectColor, onSelectCollection, isPortraitTablet = false, isLandscapeTablet = false, uniformColumns = false, fontBoost = 0, desplacamentVertical = 0, esquerra }) {
   // Ajust de la graella compacta a l'espai disponible (només desktop: les
   // tauletes mantenen la mida fixa de moment). Mesurem l'amplada de la columna
@@ -511,70 +605,20 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
           })}
         </div>
 
-        <div data-p2-color-grid style={{
-          display: 'grid',
-          gridTemplateColumns: `repeat(4, ${cerclePx}px)`,
-          gridAutoRows: `${cerclePx}px`,
-          gap: `${colorGapPx}px`,
-          // A l'apaisada la graella de colors va 10 px mes a l'esquerra (ho va
-          // demanar l'amo, igual que la columna de colleccions).
-          transform: uniformColumns ? 'translateX(85px)' : ((isPortraitTablet || isLandscapeTablet) ? 'translateX(-10px)' : undefined),
-          marginTop: uniformColumns ? '5px' : undefined,
-        }}>
-          {CERCADOR_COLORS.map(({ slug, hex }) => {
-            const selected = slug === selectedColor;
-            return (
-              <button
-                key={slug}
-                type="button"
-                aria-label={slug}
-                onClick={() => onSelectColor?.(slug)}
-                style={{
-                  width: `${cerclePx}px`,
-                  height: `${cerclePx}px`,
-                  padding: 0,
-                  borderRadius: '50%',
-                  border: selected ? '0.5px solid rgba(0,0,0,0.22)' : '0.5px solid rgba(0,0,0,0.22)',
-                  // L'indicador del color triat: la meitat de gruix (1 px en
-                  // comptes de 2).
-                  outline: selected ? '1px solid #111827' : 'none',
-                  outlineOffset: '3px',
-                  backgroundColor: hex,
-                  boxSizing: 'border-box',
-                  cursor: 'pointer',
-                }}
-              />
-            );
-          })}
-          <div
-            style={{
-              gridColumn: 'span 2',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              height: isPortraitTablet ? '18px' : (isLandscapeTablet ? '21px' : '28px'),
-              padding: isPortraitTablet ? '0 5px' : (isLandscapeTablet ? '0 6px' : '0 8px'),
-              borderRadius: isPortraitTablet ? '9px' : (isLandscapeTablet ? '10.5px' : '14px'),
-              backgroundColor: '#FFFFFF',
-              border: '0.5px solid rgba(0,0,0,0.22)',
-              boxSizing: 'border-box',
-            }}
-          >
-            <span
-              className="font-oswald"
-              style={{
-                fontWeight: 700,
-                fontSize: (isPortraitTablet || isLandscapeTablet) ? '8px' : carrilPx(11),
-                lineHeight: 1,
-                letterSpacing: '0.04em',
-                color: '#2B2B2B',
-                whiteSpace: 'nowrap',
-              }}
-            >
-              COLOR
-            </span>
-          </div>
-        </div>
+        <CercadorColorsGrid
+          selectedColor={selectedColor}
+          onSelectColor={onSelectColor}
+          cerclePx={cerclePx}
+          colorGapPx={colorGapPx}
+          isPortraitTablet={isPortraitTablet}
+          isLandscapeTablet={isLandscapeTablet}
+          style={{
+            // A l'apaisada la graella de colors va 10 px mes a l'esquerra (ho va
+            // demanar l'amo, igual que la columna de colleccions).
+            transform: uniformColumns ? 'translateX(85px)' : ((isPortraitTablet || isLandscapeTablet) ? 'translateX(-10px)' : undefined),
+            marginTop: uniformColumns ? '5px' : undefined,
+          }}
+        />
 
         {/* La columna s'ajusta al nom mes llarg (fit-content): aixi el nom
             mes llarg comença on començava i els curts s'hi enrasen per la
