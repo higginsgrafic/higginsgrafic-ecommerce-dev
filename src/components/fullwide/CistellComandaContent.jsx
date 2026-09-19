@@ -6,7 +6,7 @@ import { useShippingCosts } from '@/hooks/useShippingCosts';
 import { drawingStripePath } from '@/lib/drawingPaths';
 import { esTauletaApaisada , readRootCssNumber } from '@/utils/layoutMetrics';
 
-function CistellComandaContent({ cartItems, setCartItems, onFinalizeOrder }) {
+function CistellComandaContent({ cartItems, setCartItems, onFinalizeOrder, onAmpleNatural }) {
   const navigate = useNavigate();
   const location = useLocation();
   // Si l'usuari ja ha passat pel pagament (és a /checkout) i torna a obrir el
@@ -92,6 +92,12 @@ function CistellComandaContent({ cartItems, setCartItems, onFinalizeOrder }) {
   // contingut (4 columnes + 3 junts) perquè no sobrepassi el viewport; a
   // l'escriptori i a la vertical segueix sent la taula de 1350px.
   const ROW_W = isCompactCart ? (4 * COL2 + 3 * SLIDE_GAP) : CART_VIEWPORT;
+
+  // La pagina 3 escala el cistell perque faci la franja central: li cal saber
+  // quina es l'amplada natural del contingut.
+  useEffect(() => {
+    if (typeof onAmpleNatural === 'function') onAmpleNatural(ROW_W);
+  }, [onAmpleNatural, ROW_W]);
 
 
   const TSHIRT_BASE = '/placeholders/apparel/t-shirt/gildan_5000/gildan-5000_t-shirt_crewneck_unisex_heavyWeight_xl_';
@@ -426,7 +432,8 @@ function CistellComandaContent({ cartItems, setCartItems, onFinalizeOrder }) {
                 <button onClick={() => changeQty(i, +1)} onMouseEnter={(e) => { e.currentTarget.style.color = '#475059'; e.currentTarget.style.fontSize = '12pt'; e.currentTarget.style.transform = 'scale(1.3)'; }} onMouseLeave={(e) => { e.currentTarget.style.color = '#C3C8CD'; e.currentTarget.style.fontSize = '8.7318pt'; e.currentTarget.style.transform = 'scale(1)'; }} style={{ width: `${(ROW_H - V_GUTTER) * 1.25}px`, height: `${(ROW_H - V_GUTTER) * 1.25}px`, border: '1px solid #C9D0D9', borderRadius: '50%', backgroundColor: 'transparent', color: '#C3C8CD', cursor: 'pointer', fontSize: '8.7318pt', lineHeight: 1, padding: 0, transition: 'color 0.15s ease, transform 0.15s ease, font-size 0.15s ease' }}>+</button>
               </div>
             </div>
-            <div style={{ gridRow: 2, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '4px', transform: `translate(${isNarrowCart ? 50 : 23}px, ${-0.5 * ROW_H}px)` }}>
+            <div style={{ gridRow: 2, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '4px', // A la vertical, la talla tambe s'allunya de la quantitat.
+              transform: `translate(${isPortraitTablet ? 62 : (isNarrowCart ? 50 : 23)}px, ${-0.5 * ROW_H}px)` }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: isNarrowCart ? '4px' : '10px', ...VAL, fontSize: '11.6424pt' }}>
                 <button onClick={() => changeSize(i, -1)} onMouseEnter={(e) => { e.currentTarget.style.color = '#7D8895'; e.currentTarget.style.transform = 'scale(1.3)'; }} onMouseLeave={(e) => { e.currentTarget.style.color = '#C3C8CD'; e.currentTarget.style.transform = 'scale(1)'; }} style={{ width: `${ROW_H - V_GUTTER}px`, height: `${ROW_H - V_GUTTER}px`, border: 'none', background: 'transparent', color: '#C3C8CD', cursor: 'pointer', padding: 0, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', transition: 'color 0.15s ease, transform 0.15s ease' }}><ChevronDown size={19.64655} strokeWidth={2.5} /></button>
                 <span style={{ minWidth: '32px', textAlign: 'center', fontWeight: 600 }}>{item.size}</span>
@@ -445,7 +452,8 @@ function CistellComandaContent({ cartItems, setCartItems, onFinalizeOrder }) {
               <div style={{ display: 'grid', gridTemplateColumns: isPortraitTablet ? '0px 40px 40px auto auto' : 'auto 40px 40px 70px 70px', alignItems: 'center', columnGap: isPortraitTablet ? '10px' : (isNarrowCart ? '4px' : '8px') }}>
                 <span style={{ ...HEAD, fontSize: '10.1871pt', fontWeight: 400, color: '#7D8895', marginRight: isPortraitTablet ? 0 : (isNarrowCart ? '8px' : '24px'), visibility: 'hidden', transform: `translateY(${ROW_H}px)` }}>TOT PLEGAT FA</span>
                 <span />
-                <button onClick={() => removeItem(i)} onMouseEnter={(e) => { e.currentTarget.style.color = '#475059'; e.currentTarget.querySelector('svg').setAttribute('width', '25.5'); e.currentTarget.querySelector('svg').setAttribute('height', '25.5'); }} onMouseLeave={(e) => { e.currentTarget.style.color = '#000'; e.currentTarget.querySelector('svg').setAttribute('width', '19.64655'); e.currentTarget.querySelector('svg').setAttribute('height', '19.64655'); }} style={{ width: '40px', height: '40px', border: 'none', background: 'transparent', color: '#000', cursor: 'pointer', padding: 0, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', justifySelf: 'center', transform: `translate(${isPortraitTablet ? 0 : (isNarrowCart ? -8 : -20)}px, 0.5px)`, transition: 'color 0.15s ease' }}>
+                <button onClick={() => removeItem(i)} onMouseEnter={(e) => { e.currentTarget.style.color = '#475059'; e.currentTarget.querySelector('svg').setAttribute('width', '25.5'); e.currentTarget.querySelector('svg').setAttribute('height', '25.5'); }} onMouseLeave={(e) => { e.currentTarget.style.color = '#000'; e.currentTarget.querySelector('svg').setAttribute('width', '19.64655'); e.currentTarget.querySelector('svg').setAttribute('height', '19.64655'); }} style={{ width: '40px', height: '40px', border: 'none', background: 'transparent', color: '#000', cursor: 'pointer', padding: 0, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', justifySelf: 'center', // A la vertical, el cubell tambe s'allunya una mica mes del preu.
+                  transform: `translate(${isPortraitTablet ? -6 : (isNarrowCart ? -8 : -20)}px, 0.5px)`, transition: 'color 0.15s ease' }}>
                   <Trash2 size={19.64655} strokeWidth={2.5} />
                 </button>
                 {(() => {
@@ -453,7 +461,10 @@ function CistellComandaContent({ cartItems, setCartItems, onFinalizeOrder }) {
                   const total = Number.isNaN(unit) ? null : (unit * (item.qty || 1)).toFixed(2);
                   const [intPart, decPart] = total ? total.split('.') : ['', ''];
                   const priceStyle = { ...HEAD, fontSize: '14.553pt', fontWeight: 350, color: '#474F59', letterSpacing: '0.6px' };
-                  const priceColumnOffsetX = isNarrowCart ? '-12px' : '-36px';
+                  // A la vertical, el preu no s'ha d'acostar a la paperera: la
+                  // seva casella ja va a la dreta del tot. El -12px hi feia que
+                  // el cubell d'esborrar toques el preu.
+                  const priceColumnOffsetX = isPortraitTablet ? '0px' : (isNarrowCart ? '-12px' : '-36px');
                   if (!total) return <><span style={{ ...priceStyle, justifySelf: 'end' }}>{item.price}</span><span /></>;
                   return (
                     <>
