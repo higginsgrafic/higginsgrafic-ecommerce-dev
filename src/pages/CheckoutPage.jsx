@@ -113,7 +113,9 @@ export default function CheckoutPage() {
           // Abans anava amb `--site-w` i, a 1440, el formulari feia 1350 px
           // mentre el carril en fa 1013.
           width: 'var(--hg-mega-w, 100%)',
-          marginLeft: 'calc(var(--hg-mega-x, 0px) - var(--rulerInset, 0px))',
+          // Centrat: el carril sempre ho esta (a tauleta `--hg-mega-x` val 152
+          // perque ve del belt de 70,3 vw, i a sobre el marc del lloc es 16).
+          margin: '0 auto',
           paddingTop: esApaïsat ? '3px' : '28px',
           paddingBottom: '48px',
           boxSizing: 'border-box',

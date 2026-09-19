@@ -1096,6 +1096,35 @@ central. Els tres venien d'un disseny de 1350 px i no en sabien res:
 A tauleta no es mou res (allà `--hg-escala-mega` val 1 i el cistell té la seva
 pròpia calibració).
 
+### La informació de les pàgines de producte, dins el carril (13) — FET (PDP)
+
+El rail "Altres històries" i, per tant, tota la informació de la PDP (les
+columnes 1+2+1, que hi van enganxades) anaven amb el **marc del lloc** (belt2:
+1350 px a 1440), no amb el carril central (1013). A 1440 les targetes anaven de
+73 a 1346 i la informació quedava fora del carril.
+
+- El rail viu ara **dins un contenidor que fa el carril** (`width:
+  var(--hg-mega-w)`, centrat) i rep `beltWidthOverride` amb l'amplada del carril,
+  així que les seves targetes es reparteixen dins seu.
+- Amb `beltWidthOverride`, el marge esquerre del rail és el de disseny (20 px),
+  perquè el contenidor ja és el carril.
+- **Les tauletes NO es toquen**: l'override només s'aplica a l'escriptori. Sense
+  aquesta exclusió, a la tauleta apaïsada el carril de 70,3 vw dona 720 px i les
+  seves targetes queien de 230 a 166 px. Amb l'exclusió queden igual que abans
+  (230 a l'apaïsada, 242 a la vertical).
+
+| vista | carril | targetes del rail | informació (columnes) |
+|---|---|---|---|
+| 1920 | [285, 1635] | 313,5 → 1586 | 313,5 · 637,4 · 1285,2 |
+| 1440 | [214, 1227] | 226 → 1182 | 226 · 470,7 · 960,1 |
+| 1280 | [190, 1090] | 202,5 → 1049 | 202,5 · 415,5 · 841,4 |
+| 1024 tauleta apaisada | — | 36 → 970 (230 px, intacte) | 36 · 270,6 · 739,8 |
+| 768 tauleta vertical | — | 16 → 752 (242 px, intacte) | 16 · 510 |
+
+Pendent: la **pàgina TDP** (`/constructor/tdp`), que també és de producte i té
+els panells d'informació fora del carril (a 1440, [38,472] i [952,1387]), perquè
+va amb `--belt2-*` i posicions absolutes de 1350.
+
 **El que NO s'ha passat al carril (i per què)**:
 
 - **Els offsets verticals** (40, 20, 45, 5, 8, 10, 15 px) i el `top` del

@@ -458,7 +458,14 @@ function PdpDesktop({ product }) {
         )}
 
         <PageBand type="related" fluid={isPortraitTablet} style={{ display: 'flex', alignItems: isPortraitTablet ? 'flex-start' : 'center', overflow: 'hidden' }}>
-          <div style={{ width: '100%', transform: `translateY(${isLandscapeTablet ? '-52px' : (isPortraitTablet ? '0px' : '-72px')})` }}>
+          <div
+            style={{
+              // El rail viu dins el carril central (a la vertical, el seu).
+              width: isPortraitTablet ? '100%' : 'var(--hg-mega-w, 100%)',
+              margin: isPortraitTablet ? undefined : '0 auto',
+              transform: `translateY(${isLandscapeTablet ? '-52px' : (isPortraitTablet ? '0px' : '-72px')})`,
+            }}
+          >
             <TambeRail
               images={otherImages}
               showTitle={false}
@@ -468,6 +475,11 @@ function PdpDesktop({ product }) {
               stabilizedViewportScale={1}
               stabilizedViewportWidth={portraitRailViewportWidth}
               stabilizedGutterX={isPortraitTablet ? portraitRailGutterX : PAUTA_GUTTER_X}
+              // El rail, dins el carril central (la mateixa amplada que la
+              // fila de la capcalera) NOMES a l'escriptori: les tauletes tenen
+              // la seva propia calibracio (a l'apaisada el carril de 70,3 vw
+              // donaria 720 px i les seves targetes han de fer 230).
+              beltWidthOverride={(isPortraitTablet || isLandscapeTablet) ? null : (beltWidth ?? null)}
             />
           </div>
         </PageBand>

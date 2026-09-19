@@ -53,6 +53,7 @@ export default function TambeRail({
   subtitle = 'COSES DIFERENTS',
   initialIndex = 3,
   visibleCards = 4,
+  beltWidthOverride = null,
   showTitle = true,
   stabilizeInitialLayout = false,
   stabilizedViewportScale = 1,
@@ -243,7 +244,12 @@ export default function TambeRail({
     return [...base.slice(-CLONE_COUNT), ...base, ...base.slice(0, CLONE_COUNT)];
   }, [totalCards]);
 
-  const left1 = stabilizeInitialLayout ? 0 : (bgMetrics ? bgMetrics.devLeft + 20 : 20);
+  // Amb `beltWidthOverride` el rail viu DINS un contenidor que ja fa el carril
+  // (vegeu la PDP), aixi que el marge esquerre es el de disseny (20 px) i no
+  // cal sumar-hi la posicio del marc del lloc.
+  const left1 = stabilizeInitialLayout
+    ? 0
+    : (beltWidthOverride != null ? 20 : (bgMetrics ? bgMetrics.devLeft + 20 : 20));
   // Les guies `--belt2-xL/xR` només les publica BeltReferenceOverlay, que va
   // dins de `import.meta.env.DEV`: al lloc publicat no hi són i bgMetrics queda
   // a null. Abans es queia a `CARD_W * visibleCards` (una filera enorme que
@@ -253,7 +259,12 @@ export default function TambeRail({
   const fallbackBeltWidth = stabilizeInitialLayout && typeof window !== 'undefined'
     ? stabilizedViewportWidth || Math.max(320, window.innerWidth / stabilizedViewportScale)
     : (typeof window !== 'undefined' ? getSafeBelt().width : CARD_W * visibleCards);
-  const beltWidth = stabilizeInitialLayout ? fallbackBeltWidth : (bgMetrics ? bgMetrics.width : fallbackBeltWidth);
+  // `beltWidthOverride` el fan servir les pagines de producte perqui el rail
+  // ha de fer el CARRIL central (el mateix ample que la fila de la capcalera) i
+  // no el marc del lloc, que a 1440 fa 1350 px i deixa les targetes fora.
+  const beltWidth = beltWidthOverride != null
+    ? beltWidthOverride
+    : (stabilizeInitialLayout ? fallbackBeltWidth : (bgMetrics ? bgMetrics.width : fallbackBeltWidth));
   // Card width = 1 columna de la pauta amb gutter `PAUTA_GUTTER_X` entre cols.
   //   cardW = (belt2Width - (visibleCards - 1) * gutterX) / visibleCards
   //   stepPx = cardW + gutterX
