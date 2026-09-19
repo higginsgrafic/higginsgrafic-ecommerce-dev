@@ -553,10 +553,19 @@ abans que jo.
 
 ## 9. Pendents
 
-1. **Pujar els commits**: n'hi ha **23** de pendents (`git log --oneline origin/main..HEAD`),
-   més aquest testimoni.
-   Inclouen la feina bona del cercador, la home i l'escala de tauleta, més els
-   reverts de l'escala de desktop. **Demanar-ho abans de fer-ho.**
+0. **Fet**: els commits ja són a `origin/main` (27, fins a `f906099`), i l'amo
+   ha demanat explícitament que es pugessin.
+1. **Demà (llista de l'amo, 2026-09-19)**:
+   1. **Pàgines 3 i 4** del megaslide (cistell i comandes): la feina que s'hi ha
+      fet és la meitat (segueixen el carril i s'escalen amb ell), però han de
+      rebre el mateix tracte que les pàgines 1 i 2: composició dins el carril,
+      proporcions i alineació amb la fila 1.
+   2. **Rebots en obrir la pestanya i amb el cadenat**: hi ha salts visuals quan
+      s'obre la pestanya del megaslide i quan intervé el cadenat.
+   3. **El cadenat, més gros.**
+   4. **El cadenat ha de poder moure l'scroll** igual que l'scroll el mou a ell
+      (interacció en dos sentits), a la **versió vertical**.
+   I el que vagi sortint.
 2. **El mòbil**, que es farà a part (l'amo ho va dir així).
 3. **El cistell i el checkout** tenen la seva pròpia detecció de tauleta per
    amplada (`CistellComandaContent.jsx`, `CheckoutContent.jsx`,
