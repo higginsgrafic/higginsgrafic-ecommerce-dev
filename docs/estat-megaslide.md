@@ -1147,6 +1147,30 @@ Dos retocs d'afinació de la PDP, tots dos a l'escriptori estret (fins a 1440):
 | 1440 | 244 | 243,5 | −0,5 |
 | 1280 | — | (no es mostren: allà mana la tauleta) | — |
 
+### La franja de la pàgina 2, a la mateixa alçada que la de la 1 (15) — FET
+
+L'amo ho va veure a la tauleta apaïsada: la franja (stripe) de la pàgina 2 no
+queia on la de la pàgina 1. Comparades: a 1024 la de la pàgina 1 era a 259 i la
+de la 2 a 243,8 (15,2 px més amunt).
+
+**Causa**: les dues franges decideixen si són «franja estreta» amb condicions
+diferents. `MegaStripePanelP1` fa servir `>= 768 && <= 1366 && ample >= alt`
+(inclou el 1024) i `MegaStripePanel` feia `> 1024 && <= 1366 && ample >= alt`
+(excloïa el 1024). Quan la condició és certa, la fila no porta el
+`translateY(-15px)`: una pàgina el baixava i l'altra no.
+
+Ara les dues condicions són la mateixa. Comprovat (alçada de la franja):
+
+| vista | pàgina 1 | pàgina 2 |
+|---|---|---|
+| 1920 | 313,8 | 313,8 |
+| 1440 | 279 | 279 |
+| 1024 tauleta apaïsada | 259 | **258,8** (abans 243,8) |
+| 1366 | 259 | **258,8** |
+
+La mesura ho tenia fitxat: `deltes.franjaP2menysP1` a la tauleta apaïsada passa
+de −15,24 a −0,27.
+
 **El que NO s'ha passat al carril (i per què)**:
 
 - **Els offsets verticals** (40, 20, 45, 5, 8, 10, 15 px) i el `top` del

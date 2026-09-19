@@ -42,8 +42,12 @@ const RESERVA_ALCADA = `calc((var(--hg-mega-w, 1350px) - ${8 * GAP_X_PX}px * var
  * S'ha de mantenir idèntic a MegaStripePanelP1 (`esEstenyFins1366`): si una
  * pàgina el baixa i l'altra no, les dues franges es desquadren.
  */
+// Mateixa condicio que `esEstenyFins1366` de MegaStripePanelP1 (inclou el
+// 1024): si una pagina el baixa i l'altra no, les dues franges es desquadren.
+// Abans aixo deia `> 1024`, i a la tauleta apaisada de 1024 la franja de la
+// pagina 2 queia 15 px mes amunt que la de la pagina 1.
 const esFranjaEstenya = typeof window !== 'undefined'
-  && window.innerWidth > 1024 && window.innerWidth <= 1366
+  && window.innerWidth >= 768 && window.innerWidth <= 1366
   && window.innerWidth >= window.innerHeight;
 
 function canonicalKey(rawSrc) {

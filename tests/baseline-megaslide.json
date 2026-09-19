@@ -311,14 +311,14 @@
         "relBottom": 238.68
       },
       "p2": {
-        "top": 243.8,
-        "bottom": 344.23,
+        "top": 258.77,
+        "bottom": 359.2,
         "left": 38.7,
         "right": 976.32,
         "width": 937.62,
         "height": 100.44,
-        "relTop": 122.8,
-        "relBottom": 223.23
+        "relTop": 137.77,
+        "relBottom": 238.2
       }
     },
     "variables": {
@@ -333,7 +333,7 @@
     },
     "deltes": {
       "selectorP2menysP1": 5.52,
-      "franjaP2menysP1": -15.24,
+      "franjaP2menysP1": -0.27,
       "colorsMenysSelectorP2": 0
     }
   },
