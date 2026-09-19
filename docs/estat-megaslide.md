@@ -1552,6 +1552,16 @@ dibuixos a dalt i a tot l'ample; (4) les tres columnes a sota; (5) la stripe en
 2×7; (6) verificar amb les mesures, el comparador, la mesura del megaslide, els
 tests i el build a cada pas.
 
+**Pas 1 (fet) — la referència, mesurada a 768**: la franja fa 688 i el carril
+992; el panell fa [0, 131, 753, 292] o sigui que **avui és una banda de 292 px**
+dalt de tot, amb la pàgina 1 a dins. Hi conviuen 94 imatges: 84 de la graella de
+dibuixos i 9 de grans; les samarretes de la franja fan 94 px d'amplada i n'hi
+caben 7 per fila. Captura: `docs/comparacio/vertical-abans-768t.png`.
+
+Conseqüència per al pas 2: la composició nova (graella a dalt + tres columnes) no
+hi cap en 292 px, així que la pàgina 1 de la vertical haurà de demanar **més
+alçada** (com fa avui l'acordió del cistell, que desplega el panell).
+
 **Per confirmar**: si la graella manté les 5 files de col·lecció o només la
 seleccionada, i si la stripe fa scroll quan la col·lecció té més de 14
 samarretes.
