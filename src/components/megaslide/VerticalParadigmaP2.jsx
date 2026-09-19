@@ -291,11 +291,11 @@ export default function VerticalParadigmaP2({
         color: '#4A5057',
       }}
     >
-      {/* 1) La graella de dibuixos, amplada de carril i a dalt de tot: una fila
-          per colleccio (les cinc files del paradigma).
+      {/* 1) La graella de dibuixos, amplada de carril i a dalt de tot.
           Es la graella ORIGINAL (`MegaGridDibuixos`), amb els items de la
           filera del cercador i amb la casella calibrada perque les 16 columnes
-          facin l'amplada del carril. */}
+          facin l'amplada del carril. Les cinc colleccions hi munten una fila
+          cadascuna. */}
       <div style={{ width: '100%' }} data-vertical-graella="1">
         {COLLECCIONS_DE_LA_GRAELLA.map((c) => (
           <MegaGridDibuixos
