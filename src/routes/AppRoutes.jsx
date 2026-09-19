@@ -1,3 +1,4 @@
+import VerticalParadigmaPreview from '@/pages/VerticalParadigmaPreview';
 import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -113,6 +114,7 @@ export default function AppRoutes({ location, pageProps, pautaEnabled, tableEnab
         } />
 
         <Route path="/lab" element={<ProtectedRoute><LabHomePage /></ProtectedRoute>} />
+        <Route path="/lab/vertical" element={<VerticalParadigmaPreview />} />
         <Route path="/lab/demos" element={<ProtectedRoute><LabDemosPage /></ProtectedRoute>} />
         <Route path="/lab/wip" element={<ProtectedRoute><LabWipPage /></ProtectedRoute>} />
 

@@ -1624,6 +1624,33 @@ Ordre de treball proposat: (a) muntar la graella amb l'amplada del carril
 (c) els botons d'acció i la paleta, (d) la franja en 2×7, i (e) alçada i scroll
 vertical del conjunt.
 
+### Maqueta del paradigma vertical (31) — FET (per validar)
+
+Hi ha una pàgina de proves amb l'estructura nova, sense tocar res del megaslide:
+**`/lab/vertical`** (`src/pages/VerticalParadigmaPreview.jsx`).
+
+Fa exactament el que demana el paradigma: el contenidor amb l'amplada del carril
+(`min(var(--hg-band-w), 100vw)`, 688 a 768) i, a dins:
+
+- **Fila A**: la graella de dibuixos amb el component real
+  (`MegaGridDibuixos`), a tota l'amplada del carril.
+- **Fila B**: tres columnes amb les proporcions 19 / 15 / 63: la llista de
+  col·leccions, els botons BLANC/COLOR/NEGRE amb la paleta, i la franja en dues
+  files de 7 (les samarretes hi són com a caselles buides: les autèntiques
+  depenen del belt, que és justament el que aquesta vista no ha de fer servir).
+
+Captura: `docs/comparacio/vertical-paradigma-maqueta.png`.
+
+**Què s'hi veu i què no**: les tres columnes hi són a lloc, amb les proporcions
+bones. La graella, en canvi, encara no omple la fila: amb 688 px i el seu
+repartiment en `fr` hi hauria d'haver unes 16 caselles per fila i n'hi surten
+poques. És el proper detall a ajustar (el nombre de columnes de la graella a la
+vertical), i no afecta l'estructura.
+
+**Nota**: la ruta és oberta (les altres de `/lab` van amb `ProtectedRoute`).
+Quan la composició de debò estigui muntada dins del megaslide, aquesta pàgina
+s'ha d'esborrar.
+
 **El que NO s'ha passat al carril (i per què)**:
 
 - **Els offsets verticals** (40, 20, 45, 5, 8, 10, 15 px) i el `top` del
