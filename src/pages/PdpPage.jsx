@@ -14,7 +14,7 @@ import { buildOtherCollectionsImages } from '@/components/home/homeDrawings';
 import useIsMobile from '@/hooks/useIsMobile';
 import PdpMobile from '@/pages/PdpMobile';
 import PageBand from '@/components/layout/PageBand';
-import { getSafeBelt } from '@/utils/layoutMetrics';
+import { getSafeBelt, carrilPx } from '@/utils/layoutMetrics';
 import { SELLING_PRICE_LABEL } from '@/config/pricing';
 
 const PDP_PRESET_VERSION = 'pdp-layout-2026-06-06-1953';
@@ -382,6 +382,12 @@ function PdpDesktop({ product }) {
   //   col4 (info) = targeta 4
   // Tant portrait com landscape tablet fan servir la mateixa mida compacta
   const isCompactTablet = isLandscapeTablet || isPortraitTablet;
+  // Escriptori estret (fins a 1440): l'amo hi vol la graella de targetes i la
+  // tdp 20 px mes avall. A 1920 i a les tauletes no es toca res.
+  const esEscriptoriEstret = !isCompactTablet
+    && typeof window !== 'undefined'
+    && window.innerWidth > 0 && window.innerWidth <= 1440
+    && window.innerWidth >= window.innerHeight;
   const PAUTA_GUTTER_X = isPortraitTablet
     ? (portraitRailGutterX ?? 5)
     : (isLandscapeTablet ? 5 : 22.5);
@@ -447,7 +453,25 @@ function PdpDesktop({ product }) {
         }}
       >
         {!isTablet && (
-          <div style={{ position: 'absolute', top: 0, left: '36px', zIndex: 10 }}>
+          <div
+            style={{
+              // Els breadcrumbs s'alineen amb el logo del header: el carril
+              // central, centrat, amb el mateix coixi que la seva fila.
+              position: 'absolute',
+              top: 0,
+              // El contenidor de la pagina esta centrat a la FINESTRA, i el
+              // carril a l'espai de maquetacio (sense la barra de desplacament):
+              // es compensa amb la meitat del seu gruix, que es el que publica
+              // SiteFrame, perque el breadcrumb caigui on cau el logo.
+              left: 'calc(50% + var(--site-gutter-mig, 0px))',
+              transform: 'translateX(-50%)',
+              width: 'var(--hg-mega-w, 100%)',
+              paddingLeft: carrilPx(40),
+              boxSizing: 'border-box',
+              zIndex: 10,
+              pointerEvents: 'none',
+            }}
+          >
             <Breadcrumbs
               items={[
                 { label: COLLECTION_NAME, link: `/${COLLECTION_SLUG}` },
@@ -463,7 +487,7 @@ function PdpDesktop({ product }) {
               // El rail viu dins el carril central (a la vertical, el seu).
               width: isPortraitTablet ? '100%' : 'var(--hg-mega-w, 100%)',
               margin: isPortraitTablet ? undefined : '0 auto',
-              transform: `translateY(${isLandscapeTablet ? '-52px' : (isPortraitTablet ? '0px' : '-72px')})`,
+              transform: `translateY(${isLandscapeTablet || esEscriptoriEstret ? '-52px' : (isPortraitTablet ? '0px' : '-72px')})`,
             }}
           >
             <TambeRail
@@ -490,7 +514,7 @@ function PdpDesktop({ product }) {
           style={{
             height: isLandscapeTablet && Number.isFinite(tdpAvailableHeight) ? `${tdpRenderedHeight}px` : undefined,
             overflow: isLandscapeTablet && Number.isFinite(tdpAvailableHeight) ? 'hidden' : undefined,
-            marginTop: isPortraitTablet ? '100px' : '-32px',
+            marginTop: isPortraitTablet ? '100px' : (esEscriptoriEstret ? '-12px' : '-32px'),
             marginBottom: '32px',
           }}
         >
