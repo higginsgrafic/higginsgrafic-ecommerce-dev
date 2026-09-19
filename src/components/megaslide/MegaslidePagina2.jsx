@@ -466,7 +466,7 @@ export default function MegaslidePagina2({
             // La filera arrenca 10 px a la dreta del selector: els blocs de la
             // composicio son [selector] 10 [graella de dibuixos i colors] 10
             // [columna de colleccions].
-            esquerra={bnSliderSize ? `calc(${carrilPx(40)} + ${carrilPx(bnSliderSize)} + 10px)` : undefined}
+            esquerra={bnSliderSize ? `calc(${carrilPx(40)} + ${carrilPx(bnSliderSize)} + 20px)` : undefined}
             desplacamentVertical={40 - topGraellaColors}
             isPortraitTablet={isPortraitTablet}
             isLandscapeTablet={isLandscapeTablet}
