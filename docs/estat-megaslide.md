@@ -1406,12 +1406,16 @@ cistell) i capturat a 1920, 1440, 1024 i 768 (vegeu
 
 El que es veu:
 
-1. **La llista, muntada al revés**: la filera del producte surt aixafada a dalt
-   del panell (~40 px d'alçada) i la resta del cos queda buida. La filera es
-   pinta amb `ROW_H`/`ROW_W`, que surten de `ROWS = 21` i de l'alçada del
-   panell (`pageHeight`), i el fons de cada filera és la imatge
-   `fons-cistell-compra.webp` pintada a 1350 px. Cal mirar per què l'alçada de
-   la filera i la del fons no quadren amb la del panell.
+1. **La llista de productes desplaçada** — **FET**. La finestra de les files
+   del cistell arrencava a `TOP_OFFSET - ROW_H - 20` a l'escriptori i a
+   l'apaisada (per l'efecte d'entrada en fer scroll; la vertical ja feia servir
+   `TOP_OFFSET`), i amb això la primera filera quedava **tallada pel sostre del
+   panell**: mesurada, començava a 111,8 quan el panell comença a 121.
+
+   Arreglat: totes les vistes arrenquen a `TOP_OFFSET`. La primera filera passa
+   de 111,8 a **153** (el sostre del viewport de la pàgina 3), sencera i amb el
+   seu dibuix. Captura: `docs/comparacio/cistell-llista-1920.png`.
+
 2. **Els dibuixos sortien com un nom** — **FET**. No era el fons (ho va
    corregir l'amo): quan la imatge no carrega, el navegador pinta l'`alt`, que és
    el nom del producte. I la causa era **de Cube**: el `STRIPE_DESIGN_MAP` de
@@ -1440,8 +1444,7 @@ El que es veu:
    (apaisada), ben endins de la pantalla; el 1920 no es mou (366, com abans).
    Captura: `docs/comparacio/cistell-acordi-1024t.png`.
 
-**Fet**: el dibuix de les files (punt 2) i l'alçada de l'acordió a les tauletes
-(punt 3). **Per fer**: 1 (la posició de la llista).
+**Fets**: els tres punts de la llista (1, 2 i 3).
 
 **El que NO s'ha passat al carril (i per què)**:
 

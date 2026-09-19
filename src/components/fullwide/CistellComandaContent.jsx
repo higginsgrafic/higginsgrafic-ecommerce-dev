@@ -267,7 +267,12 @@ function CistellComandaContent({ cartItems, setCartItems, onFinalizeOrder }) {
         onTouchCancel={handleCartTouchEnd}
         style={{
           position: 'absolute',
-          top: `${isPortraitTablet ? TOP_OFFSET : TOP_OFFSET - ROW_H - 20}px`,
+          // Totes les vistes comencen a dalt. Abans, l'escriptori i
+          // l'apaisada arrencaven una filera i 20 px mes amunt (`- ROW_H -
+          // 20`) per l'efecte d'entrada en fer scroll, i amb aixo la primera
+          // filera quedava tallada pel sostre del panell: la llista semblava
+          // desplaçada.
+          top: `${TOP_OFFSET}px`,
           left: isNarrowCart ? '0' : `calc(50% - ${ROW_W / 2}px)`,
           width: `${ROW_W}px`,
           height: `${VISIBLE_HEIGHT}px`,
