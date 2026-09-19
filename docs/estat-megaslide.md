@@ -1259,6 +1259,11 @@ costats de la fila (l'esquerra del selector i el marge dret) van amb
 El 1280 i el 1024 fan la mateixa amplada (933,2), i la vertical es queda com
 estava.
 
+### L'indicador de color, la meitat de gruix (19) — FET
+
+La graella de colors marca el color triat amb un contorn (`outline`) de 2 px.
+Ara en fa **1 px** (la meitat), amb el mateix `outlineOffset` de 3 px.
+
 **El que NO s'ha passat al carril (i per què)**:
 
 - **Els offsets verticals** (40, 20, 45, 5, 8, 10, 15 px) i el `top` del
