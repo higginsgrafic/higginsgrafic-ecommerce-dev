@@ -1446,6 +1446,29 @@ El que es veu:
 
 **Fets**: els tres punts de la llista (1, 2 i 3).
 
+### Cistell a la vertical: la filera tallada per la dreta (27) — FET
+
+A la vertical la filera de producte quedava tallada per la dreta. Mesurat: el
+contenidor del cistell feia **540 px** (`min(100vh - 32px, 70.3vw)` hi dona
+70,3 vw = 540) i la filera **1269** (els números d'escriptori, 1350 de disseny
+amb l'escala 0,94): se n'anava 745 px enllà.
+
+Arreglat:
+
+- El contenidor de la pàgina 3 fa el **carril** (`--hg-mega-w`, 992) a totes
+  les vistes, com la resta del megaslide.
+- La filera de les **dues** tauletes fa l'amplada del seu contingut
+  (`isCompactCart`, 4 columnes i 3 junts), com ja feia l'apaisada: a la vertical
+  passa de 1269 a **615** i cau dins del viewport (30 → 645).
+- La columna del preu (una graella interna de 5 caselles pensada per a
+  l'escriptori: etiqueta oculta + paperera + preu) no hi cabia i el preu se
+  n'anava fora: a la vertical l'etiqueta oculta ja no ocupa lloc i les caselles
+  són les de la paperera i el preu. El preu passa de 677-706 a **605-633**,
+  dins de la filera.
+
+Captura: `docs/comparacio/cistell-vertical-768t.png`. El preu queda just a tocar
+de la paperera: és un número de disseny i es pot separar quan calgui.
+
 **El que NO s'ha passat al carril (i per què)**:
 
 - **Els offsets verticals** (40, 20, 45, 5, 8, 10, 15 px) i el `top` del

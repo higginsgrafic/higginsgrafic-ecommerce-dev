@@ -69,7 +69,11 @@ function CistellComandaContent({ cartItems, setCartItems, onFinalizeOrder }) {
   // Amplada real d'una fila del cistell. A l'horitzontal ve donada pel seu
   // contingut (4 columnes + 3 junts) perquè no sobrepassi el viewport; a
   // l'escriptori i a la vertical segueix sent la taula de 1350px.
-  const ROW_W = isLandscapeTablet ? (4 * COL2 + 3 * SLIDE_GAP) : CART_VIEWPORT;
+  // Les DUES tauletes fan la filera tan ampla com el seu contingut (4 columnes
+  // i 3 junts): amb els numeros d'escriptori (1350) la filera se'n va molt mes
+  // enlla del contenidor i queda tallada per la dreta. L'escriptori conserva
+  // els seus.
+  const ROW_W = isCompactCart ? (4 * COL2 + 3 * SLIDE_GAP) : CART_VIEWPORT;
 
   const TSHIRT_BASE = '/placeholders/apparel/t-shirt/gildan_5000/gildan-5000_t-shirt_crewneck_unisex_heavyWeight_xl_';
   const TSHIRT_SUFFIX = '_gpr-4-0_front.webp';
@@ -413,10 +417,13 @@ function CistellComandaContent({ cartItems, setCartItems, onFinalizeOrder }) {
           <div style={{ ...colBg, display: 'grid', gridTemplateRows: `${ROW_H - V_GUTTER}px ${ROW_H - V_GUTTER}px`, rowGap: `${V_GUTTER}px`, padding: 0, justifyItems: 'end',  }}>
             <div />
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', transform: `translateY(${-0.5 * ROW_H}px)` }}>
-              <div style={{ display: 'grid', gridTemplateColumns: 'auto 40px 40px 70px 70px', alignItems: 'center', columnGap: isNarrowCart ? '4px' : '8px' }}>
-                <span style={{ ...HEAD, fontSize: '10.1871pt', fontWeight: 400, color: '#7D8895', marginRight: isNarrowCart ? '8px' : '24px', visibility: 'hidden', transform: `translateY(${ROW_H}px)` }}>TOT PLEGAT FA</span>
+              {/* A la vertical la columna es estreta (162 px): l'etiqueta
+                  oculta no hi pot ocupar lloc i les caselles van justes, si no
+                  el preu se'n va mes enlla de la filera i queda tallat. */}
+              <div style={{ display: 'grid', gridTemplateColumns: isPortraitTablet ? '0px 40px 40px auto auto' : 'auto 40px 40px 70px 70px', alignItems: 'center', columnGap: isPortraitTablet ? '2px' : (isNarrowCart ? '4px' : '8px') }}>
+                <span style={{ ...HEAD, fontSize: '10.1871pt', fontWeight: 400, color: '#7D8895', marginRight: isPortraitTablet ? 0 : (isNarrowCart ? '8px' : '24px'), visibility: 'hidden', transform: `translateY(${ROW_H}px)` }}>TOT PLEGAT FA</span>
                 <span />
-                <button onClick={() => removeItem(i)} onMouseEnter={(e) => { e.currentTarget.style.color = '#475059'; e.currentTarget.querySelector('svg').setAttribute('width', '25.5'); e.currentTarget.querySelector('svg').setAttribute('height', '25.5'); }} onMouseLeave={(e) => { e.currentTarget.style.color = '#000'; e.currentTarget.querySelector('svg').setAttribute('width', '19.64655'); e.currentTarget.querySelector('svg').setAttribute('height', '19.64655'); }} style={{ width: '40px', height: '40px', border: 'none', background: 'transparent', color: '#000', cursor: 'pointer', padding: 0, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', justifySelf: 'center', transform: `translate(${isNarrowCart ? -8 : -20}px, 0.5px)`, transition: 'color 0.15s ease' }}>
+                <button onClick={() => removeItem(i)} onMouseEnter={(e) => { e.currentTarget.style.color = '#475059'; e.currentTarget.querySelector('svg').setAttribute('width', '25.5'); e.currentTarget.querySelector('svg').setAttribute('height', '25.5'); }} onMouseLeave={(e) => { e.currentTarget.style.color = '#000'; e.currentTarget.querySelector('svg').setAttribute('width', '19.64655'); e.currentTarget.querySelector('svg').setAttribute('height', '19.64655'); }} style={{ width: '40px', height: '40px', border: 'none', background: 'transparent', color: '#000', cursor: 'pointer', padding: 0, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', justifySelf: 'center', transform: `translate(${isPortraitTablet ? 0 : (isNarrowCart ? -8 : -20)}px, 0.5px)`, transition: 'color 0.15s ease' }}>
                   <Trash2 size={19.64655} strokeWidth={2.5} />
                 </button>
                 {(() => {
