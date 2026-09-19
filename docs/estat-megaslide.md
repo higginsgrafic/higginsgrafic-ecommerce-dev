@@ -1522,6 +1522,40 @@ Comprovat amb el cistell obert: la filera fa la franja (1270 / 953 / 933 / 933 /
 hi havia el valor retocat a mà (quantitat→talla 64,5) ara n'hi ha 15,1. És
 l'esperat: la vertical és la propera a refer, i ara ja surt d'una sola unitat.
 
+### Nou paradigma de la vista vertical (29) — EN CURS
+
+L'amo ha definit com ha de ser la vertical (768). No és un retoc: és una
+composició pròpia, no un carrusel horitzontal miniaturitzat.
+
+1. **El header no es toca.**
+2. **La graella de dibuixos ocupa tota l'amplada del carril** (de 40 a 728 a
+   768). Deixa de ser una peça del carrusel i passa a ser la capçalera de la
+   composició.
+3. **A sota, tres columnes** dins del mateix carril:
+
+   | columna | contingut | amplada aprox. |
+   |---|---|---|
+   | Col·leccions | la llista de botons (First Contact … Miscel·lània) | ~19% |
+   | Botons d'acció | BLANC / COLOR / NEGRE i, a sota, la paleta amb la pastilla COLOR | ~15% |
+   | Stripe | les samarretes, partides en **dues files de 7** | ~63% |
+
+Amb scroll vertical. Les mides surten de la unitat, com al cistell després del
+pas 2, en comptes de nombres per vista.
+
+**On viu avui**: `MegaStripePanelP1.jsx` (pàgina 1) amb les peces
+`MegaGridDibuixos.jsx` (graella), `MegaColumn.jsx` (col·leccions) i la franja de
+samarretes; les mides compartides amb la pàgina 2 són a `midesMegaslide.js`.
+
+**Pla**: (1) mesurar la composició actual a 768 com a referència; (2) portar el
+contenidor de la pàgina 1 a l'amplada del carril a la vertical; (3) graella de
+dibuixos a dalt i a tot l'ample; (4) les tres columnes a sota; (5) la stripe en
+2×7; (6) verificar amb les mesures, el comparador, la mesura del megaslide, els
+tests i el build a cada pas.
+
+**Per confirmar**: si la graella manté les 5 files de col·lecció o només la
+seleccionada, i si la stripe fa scroll quan la col·lecció té més de 14
+samarretes.
+
 **El que NO s'ha passat al carril (i per què)**:
 
 - **Els offsets verticals** (40, 20, 45, 5, 8, 10, 15 px) i el `top` del
