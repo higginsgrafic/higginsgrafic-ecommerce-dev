@@ -429,7 +429,7 @@ export default function MegaslidePagina2({
             // (`carrilLane(40)`): aixi el selector arrenca on arrenca el logo i
             // la fila 1 fa exactament l'amplada de la franja del header, tambe
             // a tauleta (alla `carrilPx(40)` son 40 i el 3% en son 29,4).
-            left: isPortraitTablet ? carrilPx(40) : carrilLane(40),
+            left: carrilLane(40),
             width: carrilPx(bnSliderSize),
             height: carrilPx(bnSliderSize),
             zIndex: 4,
@@ -470,7 +470,7 @@ export default function MegaslidePagina2({
             // La filera arrenca 10 px a la dreta del selector: els blocs de la
             // composicio son [selector] 10 [graella de dibuixos i colors] 10
             // [columna de colleccions].
-            esquerra={bnSliderSize ? `calc(${isPortraitTablet ? carrilPx(40) : carrilLane(40)} + ${carrilPx(bnSliderSize)} + 20px)` : undefined}
+            esquerra={bnSliderSize ? `calc(${carrilLane(40)} + ${carrilPx(bnSliderSize)} + 20px)` : undefined}
             desplacamentVertical={40 - topGraellaColors}
             isPortraitTablet={isPortraitTablet}
             isLandscapeTablet={isLandscapeTablet}
