@@ -257,6 +257,12 @@ function Home() {
     && !isPortraitTablet && !isLandscapeTablet
     && window.innerWidth > 0 && window.innerWidth <= 1440
     && window.innerWidth >= window.innerHeight;
+  // La baixada de l'hero, en un sol numero: la fa servir l'hero I la resta de
+  // la home (la seccio de sota), perque quan l'hero baixa la resta tambe ho ha
+  // de fer.
+  const baixadaHero = (esEscriptoriEstret ? 25 : 0)
+    + (esApaissadaAmpla ? 70 : 0)
+    + ((isLandscapeTablet && !esApaissadaAmpla) ? 125 : 0);
   const [heroPlans, setHeroPlans] = useState({ current: buildHeroStripePlan(), prev: null });
   const [heroCycle, setHeroCycle] = useState(0);
 
@@ -431,7 +437,7 @@ function Home() {
             gridColumn: '1 / 4',
             gridRow: '10 / 25',
             position: 'relative',
-            top: `calc(-5px - ${rowHeight / 2}px${isLandscapeTablet ? ' - 50px' : ''} - 50px${isLandscapeTablet ? ' + 50px' : ''}${isPortraitTablet ? ' + 150px' : ''}${isLandscapeTablet ? ' + 25px' : ''}${esEscriptoriEstret ? ' + 25px' : ''}${esApaissadaAmpla ? ' + 25px' : ''}${(isLandscapeTablet && !esApaissadaAmpla) ? ' + 50px' : ''})`,
+            top: `calc(-5px - ${rowHeight / 2}px${isLandscapeTablet ? ' - 50px' : ''} - 50px${isLandscapeTablet ? ' + 50px' : ''}${isPortraitTablet ? ' + 150px' : ''}${isLandscapeTablet ? ' + 25px' : ''} + ${baixadaHero}px)`,
             width: 'calc(100% + 1px)',
             height: isPortraitTablet ? '430px' : 'calc(100% + 2px)',
             transform: 'scale(0.705)',
@@ -600,7 +606,7 @@ function Home() {
 
       {isPortraitTablet && <div style={{ height: '120px' }} />}
 
-      <section className="bg-background text-foreground" style={{ transform: 'scale(0.94)', transformOrigin: 'center top', marginTop: isPortraitTablet ? '75px' : (isLandscapeTablet ? '-60px' : undefined) }}>
+      <section className="bg-background text-foreground" style={{ transform: 'scale(0.94)', transformOrigin: 'center top', marginTop: `calc(${isPortraitTablet ? '75px' : (isLandscapeTablet ? '-60px' : '0px')} + ${baixadaHero}px)` }}>
         <div className="mx-auto max-w-[1400px] px-4 pt-[60px] pb-[174px] sm:px-6 lg:px-10" style={isTablet ? { paddingTop: '30px' } : undefined}>
             <CollectionTitle
             index=""

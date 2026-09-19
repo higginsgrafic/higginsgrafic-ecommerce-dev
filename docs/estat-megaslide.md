@@ -1334,22 +1334,24 @@ Tres causes:
 El comparador també ho veu: les tres tauletes (768, 1024 i 1366) donen ara
 `samarretes 101,6` i `selector 0`.
 
-### L'hero, 25 px més avall a l'escriptori estret (23) — FET
+### L'hero, més avall, i la resta de la home amb ell (23) — FET
 
-L'hero de la home (les 5 franges) va més avall, amb tres valors:
+L'hero de la home (les 5 franges) va més avall, i **la resta de la home baixa
+amb ell** (l'amo ho va veure: només baixava l'hero i la secció de sota es
+quedava). El mateix número (`baixadaHero`) alimenta el `top` de l'hero i el
+`marginTop` de la secció de les col·leccions.
 
-| vista | abans | ara |
-|---|---|---|
-| 1920 | 555,7 | 555,7 (igual) |
-| 1440 | 452,8 | **477,8** (+25) |
-| 1366 | 407,7 | **432,7** (+25) |
-| 1280 | 389,4 | **414,4** (+25) |
-| 1024 tauleta | 334,4 | **384,4** (+50) |
-| 768 vertical | 486,3 | 486,3 (igual) |
+| vista | baixada | hero (top) | resta (marginTop) |
+|---|---|---|---|
+| 1920 | 0 | 555,7 (igual) | 0 px (igual) |
+| 1440 | +25 | **477,8** | **25 px** |
+| 1366 | +70 | **477,6** | **10 px** (−60 + 70) |
+| 1280 | +70 | **459,3** | **10 px** (−60 + 70) |
+| 1024 tauleta | +125 | **459,4** | **65 px** (−60 + 125) |
+| 768 vertical | 0 | 486,3 (igual) | 75 px (igual) |
 
-El `top` hi suma `+25px` a l'escriptori estret (fins a 1440) i a l'apaisada
-ampla (1280 i 1366), i `+50px` a la tauleta de 1024. La vertical i el 1920 no
-s'hi toquen.
+El 1280 va 5 px més amunt que el 1366 (retoc de l'amo), i la vertical i el 1920
+no s'hi toquen.
 
 **El que NO s'ha passat al carril (i per què)**:
 
