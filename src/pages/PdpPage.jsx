@@ -14,7 +14,7 @@ import { buildOtherCollectionsImages } from '@/components/home/homeDrawings';
 import useIsMobile from '@/hooks/useIsMobile';
 import PdpMobile from '@/pages/PdpMobile';
 import PageBand from '@/components/layout/PageBand';
-import { getSafeBelt, carrilPx } from '@/utils/layoutMetrics';
+import { getSafeBelt, carrilPx, esTauletaApaisada } from '@/utils/layoutMetrics';
 import { SELLING_PRICE_LABEL } from '@/config/pricing';
 
 const PDP_PRESET_VERSION = 'pdp-layout-2026-06-06-1953';
@@ -163,13 +163,7 @@ function PdpDesktop({ product }) {
       && window.innerWidth <= 1024
       && window.innerHeight > window.innerWidth
   );
-  const [isLandscapeTablet, setIsLandscapeTablet] = useState(
-    typeof window !== 'undefined'
-      && window.innerWidth >= 768
-      && window.innerWidth <= 1366
-      && window.innerHeight >= 480
-      && window.innerHeight < window.innerWidth
-  );
+  const [isLandscapeTablet, setIsLandscapeTablet] = useState(esTauletaApaisada());
 
   useLayoutEffect(() => {
     if (typeof window === 'undefined') return undefined;
@@ -178,12 +172,7 @@ function PdpDesktop({ product }) {
         && window.innerWidth <= 1024
         && window.innerHeight > window.innerWidth;
       setIsPortraitTablet(portraitTablet);
-      setIsLandscapeTablet(
-        window.innerWidth >= 768
-          && window.innerWidth <= 1366
-          && window.innerHeight >= 480
-          && window.innerHeight < window.innerWidth
-      );
+      setIsLandscapeTablet(esTauletaApaisada());
     };
 
     let settleTimer = 0;

@@ -179,6 +179,29 @@ export function carrilPx(px) {
  * pagina 2), no per a les que tenen la seva propia calibracio (la franja, el
  * selector, els dibuixos).
  */
+/**
+ * Tauleta apaïsada: la MATEIXA detecció que `useDeviceLayout` (la que fa
+ * servir App, i per tant el header i el megaslide). Demana PANTALLA TACTIL:
+ * sense touch, una finestra de 1280x800 es un escriptori estret i ha de fer
+ * la maquetacio d'escriptori. Les pagines es calculaven la seva propia versio
+ * nomes amb mides i, a 1280, mig lloc feia la maquetacio de tauleta i mig la
+ * d'escriptori.
+ */
+export function esTauletaApaisada({ ample, alt } = {}) {
+  const w = ample ?? (typeof window !== 'undefined' ? window.innerWidth : 0);
+  const h = alt ?? (typeof window !== 'undefined' ? window.innerHeight : 0);
+  const touch = typeof window !== 'undefined'
+    && ((typeof navigator !== 'undefined' && navigator.maxTouchPoints > 0) || 'ontouchstart' in window);
+  return !!touch && w >= 600 && h < w && h > 0 && h <= 1100;
+}
+
+/** Tauleta vertical: la deteccio de `useDeviceLayout`. */
+export function esTauletaVertical({ ample, alt } = {}) {
+  const w = ample ?? (typeof window !== 'undefined' ? window.innerWidth : 0);
+  const h = alt ?? (typeof window !== 'undefined' ? window.innerHeight : 0);
+  return w >= 600 && w <= 1024 && h > w;
+}
+
 export function carrilLane(px) {
   const factor = (px / MEGASLIDE_REFERENCIA_PX).toFixed(6);
   return `calc(var(--hg-mega-w, ${MEGASLIDE_REFERENCIA_PX}px) * ${factor})`;

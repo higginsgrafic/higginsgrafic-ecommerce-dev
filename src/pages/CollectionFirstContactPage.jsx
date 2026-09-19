@@ -15,6 +15,7 @@ import Breadcrumbs from '@/components/Breadcrumbs';
 import useIsMobile from '@/hooks/useIsMobile';
 import CollectionMobile from '@/pages/CollectionMobile';
 import { SELLING_PRICE_LABEL } from '@/config/pricing';
+import { esTauletaApaisada } from '@/utils/layoutMetrics';
 
 // Alcada de la franja blanca de la hero.
 const BAND_HEIGHT = 'clamp(120px, 26vh, 260px)';
@@ -179,12 +180,7 @@ function CollectionFirstContactPage() {
   // Quan la imatge (alcada de finestra) sobrepassa l'espai que la graella li
   // reserva, baixem el contingut el mateix tros perque no se solapi.
   const [pushDownPx, setPushDownPx] = useState(0);
-  const [isLandscapeTablet, setIsLandscapeTablet] = useState(
-    typeof window !== 'undefined'
-      && window.innerWidth >= 1024
-      && window.innerWidth <= 1366
-      && window.innerHeight < window.innerWidth
-  );
+  const [isLandscapeTablet, setIsLandscapeTablet] = useState(esTauletaApaisada());
   const [isPortraitTablet, setIsPortraitTablet] = useState(
     typeof window !== 'undefined'
       && window.innerWidth >= 768
@@ -210,11 +206,7 @@ function CollectionFirstContactPage() {
     let raf = 0;
     const measure = () => {
       if (cancelled) return;
-      setIsLandscapeTablet(
-        window.innerWidth >= 1024
-          && window.innerWidth <= 1366
-          && window.innerHeight < window.innerWidth
-      );
+      setIsLandscapeTablet(esTauletaApaisada());
       setIsPortraitTablet(
         window.innerWidth >= 768
           && window.innerWidth <= 1024

@@ -2860,8 +2860,10 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
                 ref={logoMarkRef}
                 aria-hidden="true"
                 data-brand-logo="1"
-                className="h-8 w-[140px] block text-foreground"
+                className="block text-foreground"
                 style={{
+                  width: carrilPx(140),
+                  height: carrilPx(32),
                   backgroundColor: 'currentColor',
                   WebkitMaskImage: 'url(/custom_logos/brand/marca-grafic-logo.svg)',
                   maskImage: 'url(/custom_logos/brand/marca-grafic-logo.svg)',
@@ -2925,8 +2927,10 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
                 <button
                   key={item.id}
                   type="button"
-                  className={`inline-flex items-center gap-1 whitespace-nowrap text-[11px] lg:text-[11px] font-semibold tracking-[0.04em] lg:tracking-[0.18em] uppercase ${open ? 'text-foreground' : 'text-muted-foreground hover:text-foreground'}`}
-                  style={(isPortraitTablet || isLandscapeTablet) ? { letterSpacing: isPortraitTablet ? '0.04em' : '0.04em', fontSize: isPortraitTablet ? '11.5px' : '12px', whiteSpace: 'nowrap' } : { whiteSpace: 'nowrap' }}
+                  className={`inline-flex items-center gap-1 whitespace-nowrap font-semibold tracking-[0.04em] lg:tracking-[0.18em] uppercase ${open ? 'text-foreground' : 'text-muted-foreground hover:text-foreground'}`}
+                  // A l'escriptori la mida del nav tambe va amb el carril (com
+                  // la resta del megaslide); a tauleta, la seva.
+                  style={(isPortraitTablet || isLandscapeTablet) ? { letterSpacing: '0.04em', fontSize: isPortraitTablet ? '11.5px' : '12px', whiteSpace: 'nowrap' } : { whiteSpace: 'nowrap', fontSize: carrilPx(11) }}
                   aria-expanded={open ? 'true' : 'false'}
                   onClick={() => {
                     if (clicColleccioRepetit(item.id)) return;

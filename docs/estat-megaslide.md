@@ -1171,6 +1171,40 @@ Ara les dues condicions són la mateixa. Comprovat (alçada de la franja):
 La mesura ho tenia fitxat: `deltes.franjaP2menysP1` a la tauleta apaïsada passa
 de −15,24 a −0,27.
 
+### La incoherència d'escalat a 1280 (16) — FET
+
+L'amo va veure que a 1280 la pàgina barrejava dues maquetacions. La causa era
+que **la detecció de tauleta estava duplicada amb regles diferents**:
+
+- `useDeviceLayout` (el que fa servir l'App, i per tant el header i el
+  megaslide): `isLandscapeTablet = isTouch && w >= 600 && h < w && h <= 1100`
+  → **demana pantalla tàctil**.
+- Les pàgines (PDP, Home, les cinc de col·lecció, `CistellComandaContent` i
+  `CheckoutContent`) se la calculaven soles, només amb mides:
+  `w >= 768/1024 && w <= 1366 && h < w` → **a 1280×800 sense touch es creien
+  que eren una tauleta**.
+
+Per això, a 1280, el header i el megaslide feien la maquetació d'escriptori
+(carril de 900, logo escalat) i la PDP feia la de tauleta (rail amb el marc del
+lloc: targetes de 290 px, o sigui 1,39× el carril).
+
+Ara hi ha **un sol criteri**, exportat de `layoutMetrics` (`esTauletaApaisada`,
+`esTauletaVertical`) i amb la mateixa regla que l'App: les nou peces que se la
+calculaven soles ja la fan servir.
+
+| vista | carril | targeta | logo |
+|---|---|---|---|
+| 1920 | 1350 | 301 | 140 |
+| 1440 | 1013 | 222 | 105 |
+| **1280 (escriptori)** | **900** | **196** | **93** |
+| 1280 amb touch | 992 | 290 | 140 |
+| 1024 tàctil | 992 | 230 | 140 |
+
+I el **header també s'escala** ara amb el carril: el logo (140×32 de disseny) i
+la mida del nav (11 px) van amb `carrilPx`, com la resta del megaslide; a
+tauleta es queden igual (140 i 12 px). Abans el logo feia 140×32 a totes les
+mides mentre tot el demás s'encongia.
+
 **El que NO s'ha passat al carril (i per què)**:
 
 - **Els offsets verticals** (40, 20, 45, 5, 8, 10, 15 px) i el `top` del

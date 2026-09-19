@@ -2,7 +2,7 @@ import { useEffect, useLayoutEffect, useState, useRef, useMemo } from 'react';
 import { Helmet } from 'react-helmet';
 import { Link } from 'react-router-dom';
 import Pauta4ColsOverlay from '@/components/pauta/Pauta4ColsOverlay';
-import { getSafeBelt } from '@/utils/layoutMetrics';
+import { getSafeBelt, esTauletaApaisada } from '@/utils/layoutMetrics';
 import { useCollectionCardLayout } from '@/hooks/useCollectionCardLayout';
 import { collectionGridImageFor, gridFinishFor, collectionGridHoverVariantsFor } from '@/lib/pdpMockup';
 import HeroSlider from '@/components/HeroSlider';
@@ -206,12 +206,7 @@ function CollectionAustenPage() {
   // Austen te mes files de TDP que les altres colleccions, aixi que el poster
   // queda mes avall. Ajustem el marge perque l'aire de sobre sigui el mateix.
   const [posterExtraPx, setPosterExtraPx] = useState(0);
-  const [isLandscapeTablet, setIsLandscapeTablet] = useState(
-    typeof window !== "undefined"
-      && window.innerWidth >= 1024
-      && window.innerWidth <= 1366
-      && window.innerHeight < window.innerWidth
-  );
+  const [isLandscapeTablet, setIsLandscapeTablet] = useState(esTauletaApaisada());
   const [isPortraitTablet, setIsPortraitTablet] = useState(
     typeof window !== "undefined"
       && window.innerWidth >= 768
@@ -239,11 +234,7 @@ function CollectionAustenPage() {
     let cancelled = false;
     const measure = () => {
       if (cancelled) return;
-      setIsLandscapeTablet(
-        window.innerWidth >= 1024
-          && window.innerWidth <= 1366
-          && window.innerHeight < window.innerWidth
-      );
+      setIsLandscapeTablet(esTauletaApaisada());
       setIsPortraitTablet(
         window.innerWidth >= 768
           && window.innerWidth <= 1024
