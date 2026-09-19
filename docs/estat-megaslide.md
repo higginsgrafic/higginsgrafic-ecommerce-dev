@@ -1007,6 +1007,39 @@ queden a la proporció del disseny a totes les mides:
 La regla de 10.7 (les separacions s'encongeixen abans que el dibuix) es queda com
 a xarxa: només entra si, tot i escalar el text, l'espai no arriba.
 
+### Els quatre blocs i els 10 px (10.9) — FET
+
+L'amo ho va precisar: la composició són quatre blocs amb **10 px entre
+cadascun**:
+
+`[selector b/c/n] 10 [graella de dibuixos] 10 [graella de colors] 10 [columna de col·leccions]`
+
+- El gap entre blocs és de **10 px fixes** (`columnGap: '10px'`, no escalat): és
+  el que fa que totes les mides quadrin, perquè el que cedeix és el gap intern
+  dels dibuixos.
+- La filera arrenca on acaba el bloc del selector més 10 px (`esquerra` =
+  `carrilPx(40) + carrilPx(bnSliderSize) + 10px`). A 1920 el dibuix passa de
+  175,5 a 180,4 px.
+- S'ha **tret el desplaçament de ±10 px de la graella de colors**
+  (`translateX`): trencava precisament el gap del mig (quedava a 0 a
+  l'escriptori i a 20 a la banda estreta).
+- La columna de la llista porta un **coixí per l'esquerra** igual al que la
+  graella de colors sobreïx de la seva columna, de manera que el text comença
+  10 px després de l'últim cercle.
+
+| vista | selector→dibuixos | dibuixos→colors | colors→col·leccions | text vs cercles |
+|---|---|---|---|---|
+| 1920 | 10 | 10 | 10 | 10 |
+| 1440 | 10 | 10 | 10 | 10 |
+| 1366 | 10 | 10 | 10 | 10 |
+| 1280 | 10 | 10 | 10 | 10 |
+| tauleta (1024/768) | 10 | 10 | 10 | 10 |
+
+Els gaps **interns** dels dibuixos: 26,33 px a 1920 (el disseny) i 19,31 / 18,23
+/ 16,92 a 1440 / 1366 / 1280, una mica per sota del proporcional (19,75 / 18,72
+/ 17,55): és el que costen els 10 px fixes. A tauleta queden intactes (17,91 amb
+el dibuix a 19,89).
+
 **El que NO s'ha passat al carril (i per què)**:
 
 - **Els offsets verticals** (40, 20, 45, 5, 8, 10, 15 px) i el `top` del
