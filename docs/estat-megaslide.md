@@ -1236,6 +1236,29 @@ Resultat: el logo i la icona d'usuari cauen exactament sobre les vores de la
 fila 1: a 1280, logo 173,4 i graella 173,8; a 1440, 244 i 244; a 1920, 325 i
 325,5.
 
+### La fila 1 fa l'amplada de la franja del header (18) — FET
+
+La fila 1 (selector + graelles + columna de col·leccions) ha de fer exactament
+l'amplada de la franja del header (del logo a la icona d'usuari) a totes les
+vistes, i el 1280 i el 1024 la mateixa.
+
+El coixí de la fila era `carrilPx(40)`: 40 px fixos a tauleta, que **no** són el
+3% del carril (en són 29,4). El header ja anava amb `carrilLane(40)` (el 3%), i
+per això la fila quedava 10,6 px curta a cada banda a 1024 i a 1280. Ara els dos
+costats de la fila (l'esquerra del selector i el marge dret) van amb
+`carrilLane(40)`, com el header.
+
+| vista | franja del header | fila 1 |
+|---|---|---|
+| 1920 | 1270 | **1270** |
+| 1440 | 953 | **953** |
+| 1280 | 933,2 | **933,2** |
+| 1024 tauleta | 933,2 | **933,2** |
+| 768 vertical | 688 | 912 (la seva, sense tocar) |
+
+El 1280 i el 1024 fan la mateixa amplada (933,2), i la vertical es queda com
+estava.
+
 **El que NO s'ha passat al carril (i per què)**:
 
 - **Els offsets verticals** (40, 20, 45, 5, 8, 10, 15 px) i el `top` del

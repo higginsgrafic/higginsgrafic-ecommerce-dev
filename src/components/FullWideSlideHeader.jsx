@@ -2086,9 +2086,16 @@ function FullWideSlideHeader({
       // baixa de ~1430, i si el tile en sortis, a 1280 faria 121 px (com si el
       // carril fes 1350) i ni la franja ni el selector del megaslide
       // s'encongirien amb el carril. A tauleta es manté la seva calibració.
+      // A l'apaisada la calibracio es la de la tauleta de 1024, tambe si la
+      // finestra es mes ampla: si el tile sortis de `w`, a 1280 en faria 122 i
+      // la franja 131 px d'alcada (enorme) mentre les graelles del megaslide
+      // fan el carril de 992 (tile 93,6). Amb `Math.min(w, 1024)` la tauleta no
+      // es toca i el 1280 fa exactament la seva mida.
       const contentW = isPortraitTablet
         ? 992 * 0.995 - pl - pr
-        : (isLandscapeTablet ? w * 0.995 - pl - pr : MEGASLIDE_REFERENCIA_PX - pl - pr);
+        : (isLandscapeTablet
+          ? Math.min(w, 1024) * 0.995 - pl - pr
+          : MEGASLIDE_REFERENCIA_PX - pl - pr);
       if (!contentW) return;
       const totalGaps = (COLS - 1) * GAP_PX;
       const colW = (contentW - totalGaps) / COLS;
