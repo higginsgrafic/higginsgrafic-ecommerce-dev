@@ -1506,14 +1506,21 @@ de caselles i els junts dels grups de quantitat i talla. Verificat que el canvi
 **no mou res**: filera [325, 1595] a 1920, [243,5, 1196,5] a 1440, [45,5, 978,5] a
 1024 i [40, 728] a 768, i les separacions idèntiques.
 
-**Pas 2 (pendent)**: derivar-les d'una sola unitat per vista. Matís important: el
-disseny sencer NO es pot escalar de l'horitzontal a la vertical, perquè allà la
-tipografia és més gran en proporció (escalar-la donaria textos de ~6 pt). Per
-tant la unitat és per família, però amb els multiplicadors compartits i declarats
-una sola vegada.
+**Pas 2 (fet)**: totes les mides de `MIDES` surten d'**una sola unitat**, `U =
+SLOT_W` (l'amplada d'un dels 8 slots de la filera), amb els multiplicadors de
+l'escriptori (23/155, −20/155, −36/155, 40/155, 70/155, 14/155, 10/155…). Ja no
+hi ha cap nombre per vista dins de `MIDES`; només canvia `U`.
 
-Mesures d'ara a la vertical: quantitat→talla 64,5 px, talla→cubell 15,7,
-cubell→preu 35,1. Captura: `docs/comparacio/cistell-columnes-768t.png`.
+L'alçada (`ROW_H`) i la tipografia (11,6 pt) NO en surten: són valors propis de
+cada família. Escalar-ho tot donaria textos de ~6 pt a la vertical, i per això el
+disseny sencer no es pot escalar.
+
+Comprovat amb el cistell obert: la filera fa la franja (1270 / 953 / 933 / 933 /
+688) i el preu cau dins de la seva columna a les cinc vistes.
+
+**Conseqüència a la vertical**: els junts passen a ser proporcionals, i on abans
+hi havia el valor retocat a mà (quantitat→talla 64,5) ara n'hi ha 15,1. És
+l'esperat: la vertical és la propera a refer, i ara ja surt d'una sola unitat.
 
 **El que NO s'ha passat al carril (i per què)**:
 

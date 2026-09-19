@@ -103,23 +103,38 @@ function CistellComandaContent({ cartItems, setCartItems, onFinalizeOrder, onAmp
   // pero TOTS son aqui i en les mateixes unitats, en comptes d'escampats per
   // les fileres.
   // ---------------------------------------------------------------------------
+  // ---------------------------------------------------------------------------
+  // TOTES les mides de la filera surten d'UNA SOLA UNITAT.
+  //
+  // La unitat es l'amplada d'un dels 8 slots de la filera (4 columnes de 2
+  // slots): la filera fa 8 slots i 7 junts. Els multiplicadors son els de
+  // l'escriptori, que es la font de veritat del disseny (155 px de slot); les
+  // altres families nomes canvia la unitat.
+  //
+  // Alc,ada i tipografia NO en surten: son valors propis de cada familia
+  // (l'escriptori fa 11,6 pt i la vertical tambe, pero amb un slot mes petit:
+  // escalar-ho tot donaria textos de 6 pt).
+  // ---------------------------------------------------------------------------
+  const U = SLOT_W;
   const MIDES = {
     // Desplac,ament horitzontal del bloc de la talla dins la seva casella.
-    dxTalla: isPortraitTablet ? 62 : (isNarrowCart ? 50 : 23),
+    dxTalla: 0.1484 * U,
     // Desplac,ament del cubell d'esborrar (negatiu = cap a l'esquerra).
-    dxCubell: isPortraitTablet ? -6 : (isNarrowCart ? -8 : -20),
+    dxCubell: -0.1290 * U,
     // Desplac,ament del preu dins de la seva casella.
-    dxPreu: isPortraitTablet ? '0px' : (isNarrowCart ? '-12px' : '-36px'),
-    // Graella interna de la columna del preu: etiqueta oculta, buit, cubell,
-    // part entera i part decimal.
-    gridPreu: isPortraitTablet ? '0px 40px 40px auto auto' : 'auto 40px 40px 70px 70px',
-    // El marge de la part decimal ha de compensar el junt de caselles, si no
-    // el preu es llegeix «15, 50€».
-    margeDecimal: isPortraitTablet ? '-10px' : (isNarrowCart ? '-4px' : '-8px'),
-    gapCellesPreu: isPortraitTablet ? '10px' : (isNarrowCart ? '4px' : '8px'),
+    dxPreu: `${-0.2323 * U}px`,
+    // Graella interna de la columna del preu: etiqueta (oculta), buit, cubell i
+    // les dues parts del preu. A la vertical l'etiqueta oculta no hi ocupa lloc.
+    gridPreu: isPortraitTablet
+      ? `0px ${0.2581 * U}px ${0.2581 * U}px auto auto`
+      : `auto ${0.2581 * U}px ${0.2581 * U}px ${0.4516 * U}px ${0.4516 * U}px`,
+    gapCellesPreu: `${0.0516 * U}px`,
+    // El marge de la part decimal ha de compensar el junt de caselles, si no el
+    // preu es llegeix «15, 50€».
+    margeDecimal: `${-0.0516 * U}px`,
     // Junts dins dels grups de la quantitat i de la talla.
-    gapQty: isNarrowCart ? '6px' : '14px',
-    gapTalla: isNarrowCart ? '4px' : '10px',
+    gapQty: `${0.0903 * U}px`,
+    gapTalla: `${0.0645 * U}px`,
   };
 
   // La pagina 3 escala el cistell perque faci la franja central: li cal saber
