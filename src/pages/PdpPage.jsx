@@ -371,6 +371,11 @@ function PdpDesktop({ product }) {
   //   col4 (info) = targeta 4
   // Tant portrait com landscape tablet fan servir la mateixa mida compacta
   const isCompactTablet = isLandscapeTablet || isPortraitTablet;
+  // L'apaisada amb finestra ampla (1280 i 1366) porta una tdp propia (50 px
+  // mes avall que la tauleta de 1024).
+  const esApaissadaAmpla = isLandscapeTablet
+    && typeof window !== 'undefined'
+    && window.innerWidth > 1024;
   // Escriptori estret (fins a 1440): l'amo hi vol la graella de targetes i la
   // tdp 20 px mes avall. A 1920 i a les tauletes no es toca res.
   const esEscriptoriEstret = !isCompactTablet
@@ -505,7 +510,7 @@ function PdpDesktop({ product }) {
           style={{
             height: isLandscapeTablet && Number.isFinite(tdpAvailableHeight) ? `${tdpRenderedHeight}px` : undefined,
             overflow: isLandscapeTablet && Number.isFinite(tdpAvailableHeight) ? 'hidden' : undefined,
-            marginTop: isPortraitTablet ? '100px' : (esEscriptoriEstret ? '-12px' : '-32px'),
+            marginTop: isPortraitTablet ? '100px' : (esApaissadaAmpla ? '18px' : (isLandscapeTablet ? '68px' : (esEscriptoriEstret ? '-12px' : '-32px'))),
             marginBottom: '32px',
           }}
         >
