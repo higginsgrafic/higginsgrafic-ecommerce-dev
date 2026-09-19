@@ -174,13 +174,13 @@
       },
       "franja": {
         "top": 409.25,
-        "bottom": 532.41,
+        "bottom": 589.97,
         "left": 288.94,
         "right": 727.98,
         "width": 439.05,
-        "height": 123.16,
+        "height": 180.72,
         "relTop": 278.25,
-        "relBottom": 401.41
+        "relBottom": 458.97
       },
       "samarretes": 14,
       "samarretesAmbImatge": 7,
@@ -210,13 +210,13 @@
       },
       "p2": {
         "top": 409.25,
-        "bottom": 532.41,
+        "bottom": 589.97,
         "left": 288.94,
         "right": 727.98,
         "width": 439.05,
-        "height": 123.16,
+        "height": 180.72,
         "relTop": 278.25,
-        "relBottom": 401.41
+        "relBottom": 458.97
       }
     },
     "variables": {

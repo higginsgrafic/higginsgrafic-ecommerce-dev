@@ -53,6 +53,11 @@ const mesura = () => {
     const franja = document.querySelector('[data-vertical-franja="1"]');
     const samarretesV = [...vertical.querySelectorAll('[data-vertical-samarreta]')];
     const cv = r(vertical);
+    // Les caselles de la franja tenen la forma de la imatge de la franja curta
+    // (7+7), que no es quadrada: el que s'ha de comprovar es que totes siguin
+    // iguals i que la franja sencera tingui la proporcio de la imatge.
+    const mides = samarretesV.map((b) => r(b));
+    const primera = mides[0];
     return {
       vista: 'vertical',
       carrilW: +cv.width.toFixed(2),
@@ -62,12 +67,8 @@ const mesura = () => {
       tiles: samarretesV.length,
       tilesAmbImatge: samarretesV.filter((b) => b.querySelector('img')).length,
       tilesDins: samarretesV.every((b) => b.getBoundingClientRect().right <= cv.right + 1),
-      // La franja ha de tenir exactament 2 files de 7 caselles.
-      tilesQuadrades: samarretesV.every((b) => {
-        const t = b.getBoundingClientRect();
-        return Math.abs(t.width - t.height) <= 1;
-      }),
-      samarretesH: samarretesV[0] ? +samarretesV[0].getBoundingClientRect().height.toFixed(2) : null,
+      tilesIguals: Boolean(primera) && mides.every((m) => Math.abs(m.width - primera.width) <= 0.5 && Math.abs(m.height - primera.height) <= 0.5),
+      samarretesH: primera ? +primera.height.toFixed(2) : null,
     };
   }
 
@@ -169,8 +170,8 @@ for (const c of CASES) {
   if (!r.tilesDins) {
     fallades.push(`${c.nom}: alguna samarreta de la franja surt del carril`);
   }
-  if (!r.tilesQuadrades) {
-    fallades.push(`${c.nom}: les caselles de la franja no son quadrades`);
+  if (!r.tilesIguals) {
+    fallades.push(`${c.nom}: les caselles de la franja no son totes iguals`);
   }
   if (r.graellaFiles !== 5) {
     fallades.push(`${c.nom}: la graella de dibuixos ha de tenir 5 files (les cinc colleccions) i en te ${r.graellaFiles}`);

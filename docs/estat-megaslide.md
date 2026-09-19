@@ -1688,9 +1688,18 @@ endavant.
    caselles de control i **retallats a 16** (l'austen en té 25 i en feia dues
    files). S'hi ha afegit `nomesElsDeLaLlista` al component perquè no hi afegeixi
    els productes que no són a la llista.
-3. **La franja**: 14 samarretes en **2×7**, sense scroll i sense belt. Les
-   imatges són les de debò, resoltes amb `computeStripeTileOverlaySrcs` (la
-   mateixa funció que fa servir el cercador): 57,58 px de casella a 768.
+3. **La franja**: 14 samarretes en **2×7**, sense scroll i sense belt, amb la
+   **imatge de la franja curta** que va passar l'amo
+   (`public/placeholders/tablet-vertical/stripe-curta-7x7.png`, 1379×593): un
+   sol fitxer amb les 14 samarretes, una per casella, que cada tile ensenya amb
+   `background-position` (7 columnes × 2 files). A sobre hi va el dibuix de la
+   variant, resolt amb `computeStripeTileOverlaySrcs` (la mateixa funció que fa
+   servir el cercador). Casella de **57,6 × 86,4 px** (2:3, la proporció de la
+   imatge) a 768; la franja fa 180,7 px d'alt.
+   **Parany**: l'original és a `public/placeholders/tablet vertical/` i els
+   servidors estàtics **no el serveixen** (l'espai i el `+` de l'adreça tornen
+   l'HTML de la pàgina): per això hi ha una còpia amb nom segur a
+   `tablet-vertical/`.
 4. **L'alçada del panell**: `VerticalParadigmaP2` publica l'alçada natural de la
    composició i `MegaMenuPanel` la fa servir de `guardHeightPx` (mesura, no
    número). A 768 el panell passa de **292 a 542 px**.
