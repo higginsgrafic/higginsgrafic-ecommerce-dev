@@ -323,7 +323,7 @@
     },
     "variables": {
       "--hg-mega-w": "992px",
-      "--hg-mega-x": "152px",
+      "--hg-mega-x": "16px",
       "--hgGridFitScale": "0.94",
       "--megaStripeScale": "1.2125",
       "--megaStripeDy": "0px",
@@ -492,7 +492,7 @@
     },
     "variables": {
       "--hg-mega-w": "992px",
-      "--hg-mega-x": "190px",
+      "--hg-mega-x": "144px",
       "--hgGridFitScale": "0.94",
       "--megaStripeScale": "1.2125",
       "--megaStripeDy": "0px",
@@ -661,7 +661,7 @@
     },
     "variables": {
       "--hg-mega-w": "992px",
-      "--hg-mega-x": "190px",
+      "--hg-mega-x": "144px",
       "--hgGridFitScale": "0.94",
       "--megaStripeScale": "1.2125",
       "--megaStripeDy": "0px",
@@ -830,7 +830,7 @@
     },
     "variables": {
       "--hg-mega-w": "992px",
-      "--hg-mega-x": "203px",
+      "--hg-mega-x": "187px",
       "--hgGridFitScale": "0.94",
       "--megaStripeScale": "1.2125",
       "--megaStripeDy": "0px",

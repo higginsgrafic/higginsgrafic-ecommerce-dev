@@ -1209,6 +1209,33 @@ megaslide feia el carril (992): d'aquí les targetes de 290 px (1,39× el carril
 
 Les dues files de 1280 són idèntiques, i les tauletes queden com estaven.
 
+### La fila 1 del megaslide, entre el logo i la icona d'usuari (17) — FET
+
+Amb la 1280 unificada (punt 16) la fila 1 del megaslide encara no encaixava
+entre el logo i la icona d'usuari: a 1280 el logo era a 219 i la graella a 174.
+
+**Causa**: el header i el megaslide anaven amb referències diferents:
+
+- El `width` del header a l'apaisada era el **marc del lloc** (`--site-w`, 1248
+  a 1280) i el megaslide el **carril** (992).
+- I `--hg-mega-x` venia de `belt.left`, que a 1280 és el del marc del lloc (16),
+  mentre que `--hg-mega-w` ja era el carril de 992 (centrat a 144).
+
+**Solució**:
+
+1. El header va amb el carril tambe a l'apaisada (`--hg-mega-w` i
+   `--hg-mega-x`); només la vertical es queda el marc del lloc, perquè allà el
+   carril (992) és més ample que la pantalla.
+2. Quan el carril té amplada pròpia (tauleta: 992), la seva posició també:
+   **centrat a l'espai de maquetació** (a 1280, 144 en comptes de 190; a 1366,
+   187 en comptes de 203). A la vertical no s'hi toca.
+3. El coixí del header passa a `carrilLane(40)` (el mateix 3% del carril que
+   deixen les graelles del megaslide) en comptes de `carrilPx(40)`.
+
+Resultat: el logo i la icona d'usuari cauen exactament sobre les vores de la
+fila 1: a 1280, logo 173,4 i graella 173,8; a 1440, 244 i 244; a 1920, 325 i
+325,5.
+
 **El que NO s'ha passat al carril (i per què)**:
 
 - **Els offsets verticals** (40, 20, 45, 5, 8, 10, 15 px) i el `top` del

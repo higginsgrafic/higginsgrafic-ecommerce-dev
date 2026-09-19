@@ -9,7 +9,7 @@ import { useCart } from '@/contexts/CartContext';
 import { useOrders } from '@/hooks/useOrders';
 import { getGildan64000Catalog } from '../utils/placeholders.js';
 import { AUSTEN_QUOTES_ASSETS, resolveAustenQuoteAssetId, resolveAustenQuoteOriginalFromPath } from '../utils/austenQuotesAssets.js';
-import { getSafeBelt, clampNumber, escalaMegaslide, MEGASLIDE_REFERENCIA_PX, carrilPx } from '@/utils/layoutMetrics';
+import { getSafeBelt, clampNumber, escalaMegaslide, MEGASLIDE_REFERENCIA_PX, carrilPx, carrilLane } from '@/utils/layoutMetrics';
 import {
   FIRST_CONTACT_MEDIA,
   FIRST_CONTACT_MEDIA_WHITE,
@@ -2269,11 +2269,19 @@ function FullWideSlideHeader({
         // s'escala mai. L'escriptori (inclosa la banda estreta) si.
         const beltFinal = (isPortraitTablet || isLandscapeTablet) ? 992 : beltWidth;
         root.style.setProperty('--hg-mega-w', `${beltFinal}px`);
+        // Quan el carril te una amplada propia (tauleta: 992) la seva posicio
+        // tambe: CENTRAT a l'espai de maquetacio. El `belt.left` es el del marc
+        // del lloc (a 1280, 16) i amb 992 el carril no hi queia: la fila 1 del
+        // megaslide anava a 174 i el logo del header a 219.
+        const vpLayout = Math.max(0, (document.documentElement.clientWidth || window.innerWidth || 0));
+        const xFinal = (beltFinal !== beltWidth && !isPortraitTablet)
+          ? Math.max(0, Math.round((vpLayout - beltFinal) / 2))
+          : belt.left;
+        root.style.setProperty('--hg-mega-x', `${xFinal}px`);
         // L'UNICA font de l'escala del megaslide. La fan servir la franja i,
         // mes endavant, les coordenades del panell. La graella de dibuixos ja
         // s'hi adapta sola (mesura l'amplada de la seva columna).
         root.style.setProperty('--hg-escala-mega', String((isPortraitTablet || isLandscapeTablet) ? 1 : escalaMegaslide(beltWidth)));
-        root.style.setProperty('--hg-mega-x', `${belt.left}px`);
       } catch {
         // ignore
       }
@@ -2831,19 +2839,23 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
             // carril 1013, i el logo quedava 128 px a l'esquerra del contingut
             // del megaslide.
             //
-            // A tauleta es manté el marc del lloc (`--site-w`): allà el carril
-            // fa 992 px i es més ample que la pantalla, i la capçalera no es
-            // pot desplaçar.
-            width: esTauleta ? 'var(--site-w, 100%)' : 'var(--hg-mega-w, 70.3vw)',
-            marginLeft: esTauleta
+            // Nomes a la VERTICAL es queda el marc del lloc (`--site-w`): alla
+            // el carril fa 992 px i es mes ample que la pantalla, i la
+            // capcalera no s'hi pot desplacar. A l'escriptori I a l'apaisada
+            // va amb el carril: a 1280 el marc del lloc fa 1248 i el carril
+            // 992, i el logo (i la fila 1 del megaslide) no encaixaven.
+            width: isPortraitTablet ? 'var(--site-w, 100%)' : 'var(--hg-mega-w, 70.3vw)',
+            marginLeft: isPortraitTablet
               ? 'calc(var(--site-xL, 0px) - var(--rulerInset, 0px))'
               : 'calc(var(--hg-mega-x, 0px) - var(--rulerInset, 0px))',
             // El coixí i la separació de la fila tambe son mides del carril
             // (40 i 12 px de 1350): amb el coixí fix, a 1280 el nav no hi
             // cabia dins el carril (li faltaven 31 px) i s'amagava sota el
-            // logo. A tauleta es queden les classes (el seu disseny es a part).
-            paddingLeft: esTauleta ? undefined : carrilPx(40),
-            paddingRight: esTauleta ? undefined : carrilPx(40),
+            // logo. Amb `carrilLane` el coixí es el MATEIX 3% del carril que
+            // deixen les graelles del megaslide, aixi la fila 1 hi encaixa
+            // exactament. A la vertical es queden les classes.
+            paddingLeft: isPortraitTablet ? undefined : carrilLane(40),
+            paddingRight: isPortraitTablet ? undefined : carrilLane(40),
             // El gap es tambe una mida del carril, i es el que fa que el nav hi
             // cabi: a 1280 el seu contingut demanava 5,5 px mes del que li
             // deixaven logo i icones, i la icona d'usuari queia 5,5 px mes
