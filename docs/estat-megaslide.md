@@ -1264,6 +1264,17 @@ estava.
 La graella de colors marca el color triat amb un contorn (`outline`) de 2 px.
 Ara en fa **1 px** (la meitat), amb el mateix `outlineOffset` de 3 px.
 
+### La tdp, més avall a l'apaisada (20) — FET
+
+A l'apaisada la tdp va més avall, amb dos valors: **+18 px** a la finestra ampla
+(1280 i 1366) i **+68 px** a la tauleta de 1024. Com que el marge és NEGATIU,
+baixar vol dir fer-lo menys negatiu (al revés —−57— el que fa és pujar-la, que
+és l'error que vaig cometre primer).
+
+Comprovat: 375,3 → **425,3** a 1280, 390,6 → **440,6** a 1366 i 329,9 → **429,9**
+a la tauleta de 1024. A la vertical (514), a 1440 (439,8) i a 1920 (505) no es
+mou res.
+
 **El que NO s'ha passat al carril (i per què)**:
 
 - **Els offsets verticals** (40, 20, 45, 5, 8, 10, 15 px) i el `top` del
