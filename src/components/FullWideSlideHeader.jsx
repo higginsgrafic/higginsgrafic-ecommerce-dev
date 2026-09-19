@@ -2288,6 +2288,19 @@ function FullWideSlideHeader({
           ? Math.max(0, Math.round((vpLayout - beltFinal) / 2))
           : belt.left;
         root.style.setProperty('--hg-mega-x', `${xFinal}px`);
+        // La FRANJA central: del left del logo al right de la icona d'usuari.
+        // Es la mesura que han de fer servir les peces que hi han d'encaixar
+        // (la fila 1 del megaslide i, ara, el cistell).
+        try {
+          const logoEl = document.querySelector('#stripe-guide-header-logo-anchor');
+          const fila = logoEl ? logoEl.closest('div.flex.h-20') : null;
+          const fills = fila ? [...fila.children].filter((c) => c.getBoundingClientRect().width > 0) : [];
+          const iconesEl = fills.length ? fills[fills.length - 1] : null;
+          if (logoEl && iconesEl) {
+            const franja = iconesEl.getBoundingClientRect().right - logoEl.getBoundingClientRect().left;
+            if (franja > 0) root.style.setProperty('--hg-band-w', `${Math.round(franja)}px`);
+          }
+        } catch { /* ignore */ }
         // L'UNICA font de l'escala del megaslide. La fan servir la franja i,
         // mes endavant, les coordenades del panell. La graella de dibuixos ja
         // s'hi adapta sola (mesura l'amplada de la seva columna).
