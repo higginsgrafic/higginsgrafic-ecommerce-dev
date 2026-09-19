@@ -1398,6 +1398,34 @@ Ara:
 | 1024 tauleta | 290,2 | 289,8 | −0,4 |
 | 768 vertical | 324,6 | 324,6 | 0 |
 
+### Pàgina 3 (el cistell): diagnòstic (26) — PENDENT
+
+Reproduït amb un article al cistell (PDP → AFEGEIX AL CISTELL → icona del
+cistell) i capturat a 1920, 1440, 1024 i 768 (vegeu
+`docs/comparacio/cistell-1920.png` i `cistell-768t.png`).
+
+El que es veu:
+
+1. **La llista, muntada al revés**: la filera del producte surt aixafada a dalt
+   del panell (~40 px d'alçada) i la resta del cos queda buida. La filera es
+   pinta amb `ROW_H`/`ROW_W`, que surten de `ROWS = 21` i de l'alçada del
+   panell (`pageHeight`), i el fons de cada filera és la imatge
+   `fons-cistell-compra.webp` pintada a 1350 px. Cal mirar per què l'alçada de
+   la filera i la del fons no quadren amb la del panell.
+2. **Els dibuixos, invisibles**: la imatge hi és i carrega
+   (`drawingStripePath(...)` dona `pont-del-diable-multi-light…`), però és la
+   **tinta clara** (la de la samarreta blanca) i sobre el fons blanc del panell
+   no es veu. Al disseny va a sobre la banda del fons de l'acordió, que és el
+   que ara no es pinta. Els punts 1 i 2 són, doncs, el mateix problema.
+3. **A les tauletes queda enganxat a baix**: `MegaslidePagina3` fa
+   `pageHeight = isPortraitTablet && !acordioExpanded ? '269px' : '100%'`: amb
+   l'acordió desplegat la pàgina demana el 100% de l'alçada i el panell creix
+   fins al final. És exactament el que descriu el comentari que hi ha a la
+   icona del cistell («feia créixer el panell fins a baix de tot»).
+
+**Fet**: la diagnosi i les captures. **Per fer**: 1 i 2 alhora (l'alçada de la
+filera i el fons), i 3 a part (l'alçada de la pàgina 3 a la vertical).
+
 **El que NO s'ha passat al carril (i per què)**:
 
 - **Els offsets verticals** (40, 20, 45, 5, 8, 10, 15 px) i el `top` del
