@@ -248,6 +248,10 @@ function Home() {
   // Pla de franges per l'hero: 5 colors + 5 dibuixos aleatoris
   // Només es regenera quan l'usuari clica el botó shuffle.
   // Es manté el pla anterior perquè les velles surtin mentre les noves entren.
+  // L'apaisada amb finestra ampla (1280/1366) i la tauleta de 1024: l'amo hi
+  // vol l'hero mes avall, amb valors propis.
+  const esApaissadaAmpla = typeof window !== 'undefined'
+    && isLandscapeTablet && window.innerWidth > 1024;
   // Escriptori estret (fins a 1440): l'amo hi vol l'hero 25 px mes avall.
   const esEscriptoriEstret = typeof window !== 'undefined'
     && !isPortraitTablet && !isLandscapeTablet
@@ -427,7 +431,7 @@ function Home() {
             gridColumn: '1 / 4',
             gridRow: '10 / 25',
             position: 'relative',
-            top: `calc(-5px - ${rowHeight / 2}px${isLandscapeTablet ? ' - 50px' : ''} - 50px${isLandscapeTablet ? ' + 50px' : ''}${isPortraitTablet ? ' + 150px' : ''}${isLandscapeTablet ? ' + 25px' : ''}${esEscriptoriEstret ? ' + 25px' : ''})`,
+            top: `calc(-5px - ${rowHeight / 2}px${isLandscapeTablet ? ' - 50px' : ''} - 50px${isLandscapeTablet ? ' + 50px' : ''}${isPortraitTablet ? ' + 150px' : ''}${isLandscapeTablet ? ' + 25px' : ''}${esEscriptoriEstret ? ' + 25px' : ''}${esApaissadaAmpla ? ' + 25px' : ''}${(isLandscapeTablet && !esApaissadaAmpla) ? ' + 50px' : ''})`,
             width: 'calc(100% + 1px)',
             height: isPortraitTablet ? '430px' : 'calc(100% + 2px)',
             transform: 'scale(0.705)',

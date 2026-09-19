@@ -1336,9 +1336,20 @@ El comparador també ho veu: les tres tauletes (768, 1024 i 1366) donen ara
 
 ### L'hero, 25 px més avall a l'escriptori estret (23) — FET
 
-A l'escriptori estret (fins a 1440) l'hero de la home (les 5 franges) va 25 px
-més avall: el seu `top` hi suma `+25px`. Comprovat: a 1440 passa de 452,8 a
-**477,8**. A 1920 (555,7) i a les tauletes no s'hi toca.
+L'hero de la home (les 5 franges) va més avall, amb tres valors:
+
+| vista | abans | ara |
+|---|---|---|
+| 1920 | 555,7 | 555,7 (igual) |
+| 1440 | 452,8 | **477,8** (+25) |
+| 1366 | 407,7 | **432,7** (+25) |
+| 1280 | 389,4 | **414,4** (+25) |
+| 1024 tauleta | 334,4 | **384,4** (+50) |
+| 768 vertical | 486,3 | 486,3 (igual) |
+
+El `top` hi suma `+25px` a l'escriptori estret (fins a 1440) i a l'apaisada
+ampla (1280 i 1366), i `+50px` a la tauleta de 1024. La vertical i el 1920 no
+s'hi toquen.
 
 **El que NO s'ha passat al carril (i per què)**:
 
