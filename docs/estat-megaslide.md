@@ -566,6 +566,15 @@ abans que jo.
    4. **El cadenat ha de poder moure l'scroll** igual que l'scroll el mou a ell
       (interacció en dos sentits), a la **versió vertical**.
    I el que vagi sortint.
+1.bis **La vista vertical, nou paradigma** (seccions 29 a 32): la feina grossa
+   que queda. L'amo ja ha validat l'estructura i ha respost les dues preguntes
+   (graella de **5 files**; franja de **14 samarretes en 2×7, sense scroll**).
+   El que resta és traslladar la maqueta de `/lab/vertical` dins del megaslide i
+   treure-hi el belt: alçada del panell (`MegaMenuPanel.jsx`), disposició
+   (`MegaStripePanelP1.jsx`, línies 269 i 307), la franja sense
+   `--megaStripeDx/Dy/Scale` i el scroll vertical. **Començar per aquí** quan
+   l'amo digui de reprendre-ho; demana una sessió amb marge.
+
 2. **El mòbil**, que es farà a part (l'amo ho va dir així).
 3. **El cistell i el checkout** tenen la seva pròpia detecció de tauleta per
    amplada (`CistellComandaContent.jsx`, `CheckoutContent.jsx`,
