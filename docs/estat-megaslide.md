@@ -1571,10 +1571,28 @@ retallant-les. La captura de referència ho ensenya: es veuen els botons
 BLANC/COLOR/NEGRE, la fila de dibuixos i la de samarretes, totes dues tallades.
 
 Per tant el pas 2 no és ajustar amplades: és **deixar de fer servir el belt a la
-vertical** i muntar-hi la composició estàtica dins del carril. L'estructura que
-demana l'amo és la mateixa que ja existeix a la pàgina 2 de l'apaisada (graella
-de dibuixos a dalt + col·leccions + colors + franja), i per això el camí més curt
-és portar aquella composició a la vertical en comptes d'inventar-ne una.
+vertical** i muntar-hi la composició estàtica dins del carril.
+
+**Correcció important** (ho he comprovat a la ronda 3): la composició que demana
+l'amo NO existeix encara enlloc, ni tan sols a la pàgina 2. Mesurada a 768, la
+pàgina 2 també és la geometria horitzontal: el seu viewport fa [0, 163, 768, 227]
+i la graella de dibuixos hi va a **32 imatges per fila** (als y 200 i 240), o
+sigui de ~15 px, dins d'una caixa de 227 px d'alçada. No hi ha cap pàgina del
+megaslide que avui apili la graella a dalt i les tres columnes a sota: la
+vertical és, a totes les pàgines, l'horitzontal retallat.
+
+Per tant el paradigma és una **disposició nova** per a la vertical, que s'ha de
+muntar de zero:
+- la graella de dibuixos, amplada de carril i a dalt de tot;
+- a sota, les tres columnes (col·leccions, botons d'acció + paleta, franja en
+  2×7);
+- tot dins del carril i amb scroll vertical.
+
+On toca: el contenidor de la pàgina 1 (`MegaStripePanelP1.jsx`, que és on viuen
+la columna de col·leccions a la línia 269 i la franja a la 307) i, per a la
+graella, la peça que avui la munta a la pàgina 2. Caldrà decidir si la vertical
+fa servir un sol component amb la disposició nova o si es condiciona per
+`isPortraitTablet`.
 
 **Per confirmar**: si la graella manté les 5 files de col·lecció o només la
 seleccionada, i si la stripe fa scroll quan la col·lecció té més de 14
