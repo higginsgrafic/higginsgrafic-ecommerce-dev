@@ -437,12 +437,11 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
           // MegaSlidePagina2). Si no s'hi passa res, es queda a la posicio de
           // disseny (13% del carril).
           left: esquerra || carrilPct(MARGE_ESQUERRA_DIBUIXOS_ESCRIPTORI_PX),
-          // El marge dret va amb `carrilPx` (no `%`): es el MATEIX coixi que la
-          // fila del header, que a l'escriptori s'encongeix amb el carril i a
-          // tauleta son 40 px fixos (les seves classes). Amb `%` la filera no
-          // quadrava amb el header a tauleta (40 px hi son el 4% del carril,
-          // no el 3%).
-          right: carrilPx(MARGE_DRET_FILERA_ESCRIPTORI_PX),
+          // El marge dret es el MATEIX 3% del carril que el coixi del header
+          // (`carrilLane`, no `carrilPx`): a tauleta 40 px fixos no son el 3%
+          // del carril (en son 29,4) i la fila 1 no encaixava amb la franja del
+          // header. Amb `carrilLane` l'amplada es la mateixa a 1024 i a 1280.
+          right: isPortraitTablet ? carrilPx(MARGE_DRET_FILERA_ESCRIPTORI_PX) : carrilLane(MARGE_DRET_FILERA_ESCRIPTORI_PX),
           display: 'grid',
           // Les columnes i la separacio son mides del carril (78, 142 i 10 px
           // de 1350). Amb `carrilLane` (no `carrilPx`) tambe s'encongeixen a
