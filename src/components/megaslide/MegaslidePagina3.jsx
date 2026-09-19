@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import CistellComandaContent from '@/components/fullwide/CistellComandaContent';
 
@@ -15,6 +15,31 @@ export default function MegaslidePagina3({
   accordionPautaScale,
 }) {
   const navigate = useNavigate();
+  const [ampleNatural, setAmpleNatural] = useState(null);
+  const [franja, setFranja] = useState(null);
+  useEffect(() => {
+    const read = () => {
+      const raw = typeof window !== 'undefined'
+        ? getComputedStyle(document.documentElement).getPropertyValue('--hg-band-w')
+        : '';
+      const v = parseFloat(raw) || 0;
+      setFranja((prev) => (v > 0 && Math.abs((prev ?? 0) - v) > 0.5 ? v : prev));
+    };
+    read();
+    const t1 = window.setTimeout(read, 250);
+    const t2 = window.setTimeout(read, 900);
+    window.addEventListener('resize', read);
+    return () => {
+      window.clearTimeout(t1);
+      window.clearTimeout(t2);
+      window.removeEventListener('resize', read);
+    };
+  }, []);
+  // El cistell te una amplada natural de disseny; l'escala el fa fer exactament
+  // la franja central. Mai cap amunt: a la vertical l'amplada natural ja surt
+  // de la franja (vegeu CistellComandaContent), aixi que l'escala queda <= 1 i
+  // les alcades de filera no es toquen.
+  const escalaCistell = (franja && ampleNatural) ? Math.min(1, franja / ampleNatural) : null;
   const pageHeight = isPortraitTablet && !acordioExpanded ? '269px' : '100%';
 
   return (
@@ -59,7 +84,7 @@ export default function MegaslidePagina3({
           // 0,94 es l'ajust de disseny a 1920; per sota, l'escala del carril
           // (`--hg-escala-mega`). Escalar el cistell perque faci la franja
           // exacta engrandia les files a la vertical (1,052) i es va descartar.
-          transform: 'scale(min(0.94, var(--hg-escala-mega, 1)))',
+          transform: escalaCistell ? `scale(${escalaCistell})` : 'scale(min(0.94, var(--hg-escala-mega, 1)))',
           transformOrigin: 'top center',
           width: '100%',
           height: '100%',
@@ -81,6 +106,7 @@ export default function MegaslidePagina3({
               pointerEvents: 'auto',
             }}>
               <CistellComandaContent
+                onAmpleNatural={setAmpleNatural}
                 cartItems={cartItems}
                 setCartItems={setCartItems}
                 onCloseMegaSlide={() => setActive(null)}

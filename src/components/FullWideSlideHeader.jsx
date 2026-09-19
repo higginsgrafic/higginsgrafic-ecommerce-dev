@@ -2290,16 +2290,39 @@ function FullWideSlideHeader({
         root.style.setProperty('--hg-mega-x', `${xFinal}px`);
         // La FRANJA central: del left del logo al right de la icona d'usuari.
         // Es la mesura que han de fer servir les peces que hi han d'encaixar
-        // (la fila 1 del megaslide i, ara, el cistell).
+        // (la fila 1 del megaslide i el cistell).
+        //
+        // COMPTE: mesurar-la del DOM es fragil. La primera versio buscava
+        // `#stripe-guide-header-logo-anchor` a tot el document i trobava una
+        // copia dins del megaslide: a 768 publicava 1302 px i el cistell se
+        // n'anava a 1302 en una pantalla de 768. Ara: (1) es busca NOMES dins
+        // del `header`; (2) es descarta qualsevol mesura que surti de la
+        // pantalla; (3) si no n'hi ha cap de bona, es calcula: la fila del
+        // header fa el carril menys els seus coixins (40/1350 per banda), i a
+        // la vertical fa el marc del lloc menys els coixins de 24.
         try {
-          const logoEl = document.querySelector('#stripe-guide-header-logo-anchor');
+          let franja = 0;
+          const headerEl = document.querySelector('header');
+          const logoEl = headerEl ? headerEl.querySelector('#stripe-guide-header-logo-anchor') : null;
           const fila = logoEl ? logoEl.closest('div.flex.h-20') : null;
           const fills = fila ? [...fila.children].filter((c) => c.getBoundingClientRect().width > 0) : [];
           const iconesEl = fills.length ? fills[fills.length - 1] : null;
           if (logoEl && iconesEl) {
-            const franja = iconesEl.getBoundingClientRect().right - logoEl.getBoundingClientRect().left;
-            if (franja > 0) root.style.setProperty('--hg-band-w', `${Math.round(franja)}px`);
+            const l = logoEl.getBoundingClientRect();
+            const r = iconesEl.getBoundingClientRect();
+            const mesura = r.right - l.left;
+            // Ha de cabre a la pantalla i comenc,ar-hi a dins.
+            if (l.left >= -1 && r.right <= vpLayout + 1 && mesura > 0 && mesura <= vpLayout) franja = mesura;
           }
+          if (!franja) {
+            if (isPortraitTablet) {
+              const siteW = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--site-w')) || 0;
+              franja = Math.max(0, (siteW > 0 ? siteW : Math.min(736, vpLayout)) - 48);
+            } else {
+              franja = beltFinal * (1 - 80 / 1350);
+            }
+          }
+          if (franja > 0) root.style.setProperty('--hg-band-w', `${Math.round(franja)}px`);
         } catch { /* ignore */ }
         // L'UNICA font de l'escala del megaslide. La fan servir la franja i,
         // mes endavant, les coordenades del panell. La graella de dibuixos ja

@@ -1477,37 +1477,31 @@ tot hi cau: el centre de la filera i el del bloc són 384 a la vertical, 512 a
 l'apaisada i 960 a 1920 (el bloc, 5 px més enllà pel desplaçament de disseny).
 Captura: `docs/comparacio/cistell-boto-768t.png`.
 
-### El cistell fa la franja central, sense escalar (28) — FET
+### El cistell i la franja central (28) — FET (i un deute pendent)
 
-La llista de productes del cistell havia d'encaixar a la mateixa mesura que la
-fila 1: del `left` del logo al `right` de la icona d'usuari. Abans: 1920 i 1024
-ja hi encaixaven, i a 1440 (1013 en comptes de 953) i a la vertical (615 en
-comptes de 688) no.
+La llista de productes del cistell ha d'encaixar a la mateixa mesura que la fila
+1: del `left` del logo al `right` de la icona d'usuari.
 
-**El primer intent (escalar) es va descartar**: escalar el cistell perque fes
-`franja / amplada natural` encaixava la filera, pero a la vertical l'escala era
-1,052 —cap amunt— i les files es veien mes altes.
+**La causa de fons era el publicador de la franja.** La primera versió buscava
+`#stripe-guide-header-logo-anchor` a tot el document i trobava una còpia dins
+del megaslide: a 768 publicava **1302 px** en una pantalla de 768, i el cistell
+se n'anava a 1302. Ara: (1) es busca només dins del `header`; (2) es descarta
+tota mesura que surti de la pantalla; (3) si no n'hi ha cap de bona, es calcula
+(el carril menys els coixins de 40/1350 per banda; a la vertical, el marc del
+lloc menys 48).
 
-**Com s'ha fet, doncs**: sense escalar res.
+Amb la franja bona, la pàgina 3 fa el contenidor d'aquesta amplada i escala el
+contingut per `franja / amplada natural` (mai cap amunt), i els slots de la
+vertical surten de la franja. Resultat: la filera fa la franja exacta a
+**1920 (1270), 1440 (953), 1280 (933), 1024 (933) i 768 (688)**, amb les
+alçades de filera intactes.
 
-- El header publica `--hg-band-w` (la franja), la mesura bona per a qualsevol
-  peça que hi hagi d'encaixar.
-- La pàgina 3 fa el contenidor d'aquesta amplada (mai mes que la pantalla) i el
-  centra.
-- **A la vertical, els slots surten de la franja** (`(franja / 0,94 - 7 junts) /
-  8`): la filera fa la franja exacta i, com que `ROW_H` es un valor fix, les
-  alcades no es toquen.
-- La separació entre el preu i la paperera (10 px) es fa amb el `columnGap`, i
-  el marge de la part decimal el compensa (`-10px`): si no, es llegia «15, 50€»
-  amb la coma separada.
-
-| vista | franja | filera | alçada de filera |
-|---|---|---|---|
-| 1920 | [325, 1595] | [325,5, 1594,5] | 41,1 |
-| 1024 | [45,4, 978,6] | [46,7, 977,3] | 41,1 |
-| 768 vertical | [40, 728] | **[40, 728]** | **41,1** |
-
-Captura: `docs/comparacio/cistell-franja-768t.png`.
+**El deute que va assenyalar l'amo**: he estat afinant amb nombres individuals
+per vista (el `-10`, el `62`, el `-6`, el `-12`…). Cal fer-ho **proporcional**:
+una sola unitat per vista i totes les separacions expressades en aquesta unitat,
+com fa la versió horitzontal. Les mesures d'ara (vertical): quantitat→talla
+64,5 px, talla→cubell 15,7, cubell→preu 44,7. Captura:
+`docs/comparacio/cistell-columnes-768t.png`.
 
 **El que NO s'ha passat al carril (i per què)**:
 
