@@ -180,22 +180,21 @@ export function carrilPx(px) {
  * selector, els dibuixos).
  */
 /**
- * Tauleta apaïsada: la MATEIXA detecció que `useDeviceLayout` (la que fa
- * servir App, i per tant el header i el megaslide). Demana PANTALLA TACTIL:
- * sense touch, una finestra de 1280x800 es un escriptori estret i ha de fer
- * la maquetacio d'escriptori. Les pagines es calculaven la seva propia versio
- * nomes amb mides i, a 1280, mig lloc feia la maquetacio de tauleta i mig la
- * d'escriptori.
+ * Tauleta apaïsada i tauleta vertical: NOMES amb mides, mai amb el touch.
+ *
+ * L'amo ho va demanar aixi: la mida ha de ser la mateixa en un aparell tactil i
+ * en un que no ho es, perque si no la mateixa finestra dona dues
+ * maquetacions. Son les regles que ja feia servir `useDeviceLayout` pero sense
+ * el `isTouch` (que deixava el 1280x800 d'escriptori com a escriptori i el
+ * d'una tauleta com a tauleta).
  */
 export function esTauletaApaisada({ ample, alt } = {}) {
   const w = ample ?? (typeof window !== 'undefined' ? window.innerWidth : 0);
   const h = alt ?? (typeof window !== 'undefined' ? window.innerHeight : 0);
-  const touch = typeof window !== 'undefined'
-    && ((typeof navigator !== 'undefined' && navigator.maxTouchPoints > 0) || 'ontouchstart' in window);
-  return !!touch && w >= 600 && h < w && h > 0 && h <= 1100;
+  return w >= 768 && w <= 1366 && h < w && h > 0 && h <= 1100;
 }
 
-/** Tauleta vertical: la deteccio de `useDeviceLayout`. */
+/** Tauleta vertical: la regla de `useDeviceLayout`, tambe sense touch. */
 export function esTauletaVertical({ ample, alt } = {}) {
   const w = ample ?? (typeof window !== 'undefined' ? window.innerWidth : 0);
   const h = alt ?? (typeof window !== 'undefined' ? window.innerHeight : 0);

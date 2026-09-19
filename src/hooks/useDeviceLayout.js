@@ -8,14 +8,13 @@ import { useState, useEffect } from 'react';
  *      es classifiquessin com a desktop.
  *   2. Les mides hardcoded per 1024×768 no escalaven a altres viewports.
  *
- * Criteri de detecció:
- *   - isTouch:        navigator.maxTouchPoints > 0 (fallback ontouchstart).
- *   - isMobile:       width < 768 i NO és tablet tàctil vertical.
- *   - isPortraitTablet: (touch + width >= 600 + height > width) O (768 ≤ width ≤ 1024 + height > width).
- *   - isLandscapeTablet: width ≥ 600 + height < width + height ≤ 1100.
- *                       (L'alçada ≤ 1100 separa tablet de monitor desktop.
- *                        No hi ha cap superior d'amplada: una tablet de 1600px
- *                        entra correctament.)
+ * Criteri de detecció (NOMES MIDES: el touch no hi entra, perque la mateixa
+ * finestra ha de donar sempre la mateixa maquetacio):
+ *   - isTouch:        navigator.maxTouchPoints > 0 (fallback ontouchstart). Nomes informatiu.
+ *   - isMobile:       width < 600.
+ *   - isPortraitTablet: 600 ≤ width ≤ 1024 + height > width.
+ *   - isLandscapeTablet: 768 ≤ width ≤ 1366 + height < width + height ≤ 1100.
+ *                       (L'alçada ≤ 1100 separa tablet de monitor desktop.)
  *   - isDesktop:      !tablet + width ≥ 1024.
  *
  * Retorna a més viewportWidth i viewportHeight per a càlculs fluids.
@@ -45,10 +44,13 @@ export default function useDeviceLayout() {
     const vh = window.innerHeight || 0;
 
     const isMobile = vw < 600;
+    // Mateixes regles que les pagines (vegeu `esTauletaApaisada` a
+    // layoutMetrics): NOMES mides, sense touch. Si el touch hi entra, la
+    // mateixa finestra dona dues maquetacions diferents.
     const isPortraitTablet =
       vw >= 600 && vw <= 1024 && vh > vw;
     const isLandscapeTablet =
-      isTouch && vw >= 600 && vh < vw && vh > 0 && vh <= 1100;
+      vw >= 768 && vw <= 1366 && vh < vw && vh > 0 && vh <= 1100;
     const isDesktop =
       (!isPortraitTablet && !isLandscapeTablet && vw >= 1024);
 

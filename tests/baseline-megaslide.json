@@ -346,152 +346,152 @@
     },
     "panell": {
       "top": 121,
-      "bottom": 397,
+      "bottom": 421,
       "left": 0,
       "right": 1265,
       "width": 1265,
-      "height": 276,
+      "height": 300,
       "relTop": 0,
-      "relBottom": 276
+      "relBottom": 300
     },
     "guarda": {
       "top": 153,
-      "bottom": 364,
+      "bottom": 388,
       "left": 40,
       "right": 1225,
       "width": 1185,
-      "height": 211,
+      "height": 235,
       "relTop": 32,
-      "relBottom": 243
+      "relBottom": 267
     },
     "carril": {
       "top": 153,
-      "bottom": 364,
+      "bottom": 388,
       "left": -1280,
       "right": 3840,
       "width": 5120,
-      "height": 211,
+      "height": 235,
       "relTop": 32,
-      "relBottom": 243
+      "relBottom": 267
     },
     "vistes": {
       "p1": {
         "top": 153,
-        "bottom": 364,
+        "bottom": 388,
         "left": -1280,
         "right": 0,
         "width": 1280,
-        "height": 211,
+        "height": 235,
         "relTop": 32,
-        "relBottom": 243
+        "relBottom": 267
       },
       "p2": {
         "top": 153,
-        "bottom": 364,
+        "bottom": 388,
         "left": 0,
         "right": 1280,
         "width": 1280,
-        "height": 211,
+        "height": 235,
         "relTop": 32,
-        "relBottom": 243
+        "relBottom": 267
       }
     },
     "selector": {
       "p1": {
-        "top": 170.1,
-        "bottom": 199.19,
-        "left": -1063,
-        "right": -975.7,
-        "width": 87.3,
-        "height": 29.1,
-        "relTop": 49.1,
-        "relBottom": 78.19
+        "top": 162.18,
+        "bottom": 193.36,
+        "left": -1106.24,
+        "right": -1012.67,
+        "width": 93.57,
+        "height": 31.18,
+        "relTop": 41.18,
+        "relBottom": 72.36
       },
       "p2": {
-        "top": 171.94,
-        "bottom": 200.92,
-        "left": 216.66,
-        "right": 303.61,
-        "width": 86.95,
-        "height": 28.98,
-        "relTop": 50.94,
-        "relBottom": 79.92
+        "top": 154.39,
+        "bottom": 192.08,
+        "left": 184,
+        "right": 297.08,
+        "width": 113.08,
+        "height": 37.69,
+        "relTop": 33.39,
+        "relBottom": 71.08
       },
       "contenidorP2": {
         "top": 198,
-        "bottom": 284.95,
-        "left": 216.66,
-        "right": 303.61,
-        "width": 86.95,
-        "height": 86.95,
+        "bottom": 311.08,
+        "left": 184,
+        "right": 297.08,
+        "width": 113.08,
+        "height": 113.08,
         "relTop": 77,
-        "relBottom": 163.95
+        "relBottom": 190.08
       },
       "barraP1": {
-        "top": 141,
-        "bottom": 228.3,
-        "left": -1063,
-        "right": -975.7,
-        "width": 87.3,
-        "height": 87.3,
-        "relTop": 20,
-        "relBottom": 107.3
+        "top": 131,
+        "bottom": 224.57,
+        "left": -1106.24,
+        "right": -1012.67,
+        "width": 93.57,
+        "height": 93.57,
+        "relTop": 10,
+        "relBottom": 103.57
       },
       "barraP2": {
-        "top": 142.95,
-        "bottom": 229.91,
-        "left": 216.66,
-        "right": 303.61,
-        "width": 86.95,
-        "height": 86.95,
-        "relTop": 21.95,
-        "relBottom": 108.91
+        "top": 116.7,
+        "bottom": 229.78,
+        "left": 184,
+        "right": 297.08,
+        "width": 113.08,
+        "height": 113.08,
+        "relTop": -4.3,
+        "relBottom": 108.78
       }
     },
     "colors": {
-      "top": 145.13,
-      "bottom": 227.73,
-      "left": 887.95,
-      "right": 939.95,
-      "width": 52,
-      "height": 82.61,
-      "relTop": 24.13,
-      "relBottom": 106.73
+      "top": 126.5,
+      "bottom": 219.97,
+      "left": 903.09,
+      "right": 960.41,
+      "width": 57.31,
+      "height": 93.47,
+      "relTop": 5.5,
+      "relBottom": 98.97
     },
     "malla9P1": {
-      "top": 133.48,
-      "bottom": 233.96,
-      "left": -1063,
-      "right": -217,
-      "width": 846,
-      "height": 100.48,
-      "relTop": 12.48,
-      "relBottom": 112.96
+      "top": 123.48,
+      "bottom": 230.23,
+      "left": -1106.24,
+      "right": -173.76,
+      "width": 932.48,
+      "height": 106.75,
+      "relTop": 2.48,
+      "relBottom": 109.23
     },
     "franja": {
       "p1": {
-        "top": 282.37,
-        "bottom": 365.83,
-        "left": -1029.57,
-        "right": -250.43,
-        "width": 779.15,
-        "height": 83.46,
-        "relTop": 161.37,
-        "relBottom": 244.83
+        "top": 259.04,
+        "bottom": 389.99,
+        "left": -1251.23,
+        "right": -28.75,
+        "width": 1222.48,
+        "height": 130.95,
+        "relTop": 138.04,
+        "relBottom": 268.99
       },
       "p2": {
-        "top": 282.32,
-        "bottom": 365.79,
-        "left": 250.43,
-        "right": 1029.57,
-        "width": 779.15,
-        "height": 83.46,
-        "relTop": 161.32,
-        "relBottom": 244.79
+        "top": 258.77,
+        "bottom": 389.46,
+        "left": 25.5,
+        "right": 1245.54,
+        "width": 1220.04,
+        "height": 130.69,
+        "relTop": 137.77,
+        "relBottom": 268.46
       }
     },
     "variables": {
-      "--hg-mega-w": "900px",
+      "--hg-mega-w": "992px",
       "--hg-mega-x": "190px",
       "--hgGridFitScale": "0.94",
       "--megaStripeScale": "1.2125",
@@ -501,8 +501,8 @@
       "--hg-cercador-bar-scale": null
     },
     "deltes": {
-      "selectorP2menysP1": 1.84,
-      "franjaP2menysP1": -0.05,
+      "selectorP2menysP1": -7.79,
+      "franjaP2menysP1": -0.27,
       "colorsMenysSelectorP2": 0
     }
   },
@@ -515,152 +515,152 @@
     },
     "panell": {
       "top": 121,
-      "bottom": 408,
+      "bottom": 421,
       "left": 0,
       "right": 1265,
       "width": 1265,
-      "height": 287,
+      "height": 300,
       "relTop": 0,
-      "relBottom": 287
+      "relBottom": 300
     },
     "guarda": {
       "top": 153,
-      "bottom": 375,
+      "bottom": 388,
       "left": 40,
       "right": 1225,
       "width": 1185,
-      "height": 222,
+      "height": 235,
       "relTop": 32,
-      "relBottom": 254
+      "relBottom": 267
     },
     "carril": {
       "top": 153,
-      "bottom": 375,
+      "bottom": 388,
       "left": -1280,
       "right": 3840,
       "width": 5120,
-      "height": 222,
+      "height": 235,
       "relTop": 32,
-      "relBottom": 254
+      "relBottom": 267
     },
     "vistes": {
       "p1": {
         "top": 153,
-        "bottom": 375,
+        "bottom": 388,
         "left": -1280,
         "right": 0,
         "width": 1280,
-        "height": 222,
+        "height": 235,
         "relTop": 32,
-        "relBottom": 254
+        "relBottom": 267
       },
       "p2": {
         "top": 153,
-        "bottom": 375,
+        "bottom": 388,
         "left": 0,
         "right": 1280,
         "width": 1280,
-        "height": 222,
+        "height": 235,
         "relTop": 32,
-        "relBottom": 254
+        "relBottom": 267
       }
     },
     "selector": {
       "p1": {
-        "top": 170.1,
-        "bottom": 199.19,
-        "left": -1063,
-        "right": -975.7,
-        "width": 87.3,
-        "height": 29.1,
-        "relTop": 49.1,
-        "relBottom": 78.19
+        "top": 162.18,
+        "bottom": 193.36,
+        "left": -1106.24,
+        "right": -1012.67,
+        "width": 93.57,
+        "height": 31.18,
+        "relTop": 41.18,
+        "relBottom": 72.36
       },
       "p2": {
-        "top": 171.94,
-        "bottom": 200.92,
-        "left": 216.66,
-        "right": 303.61,
-        "width": 86.95,
-        "height": 28.98,
-        "relTop": 50.94,
-        "relBottom": 79.92
+        "top": 154.39,
+        "bottom": 192.08,
+        "left": 184,
+        "right": 297.08,
+        "width": 113.08,
+        "height": 37.69,
+        "relTop": 33.39,
+        "relBottom": 71.08
       },
       "contenidorP2": {
         "top": 198,
-        "bottom": 284.95,
-        "left": 216.66,
-        "right": 303.61,
-        "width": 86.95,
-        "height": 86.95,
+        "bottom": 311.08,
+        "left": 184,
+        "right": 297.08,
+        "width": 113.08,
+        "height": 113.08,
         "relTop": 77,
-        "relBottom": 163.95
+        "relBottom": 190.08
       },
       "barraP1": {
-        "top": 141,
-        "bottom": 228.3,
-        "left": -1063,
-        "right": -975.7,
-        "width": 87.3,
-        "height": 87.3,
-        "relTop": 20,
-        "relBottom": 107.3
+        "top": 131,
+        "bottom": 224.57,
+        "left": -1106.24,
+        "right": -1012.67,
+        "width": 93.57,
+        "height": 93.57,
+        "relTop": 10,
+        "relBottom": 103.57
       },
       "barraP2": {
-        "top": 142.95,
-        "bottom": 229.91,
-        "left": 216.66,
-        "right": 303.61,
-        "width": 86.95,
-        "height": 86.95,
-        "relTop": 21.95,
-        "relBottom": 108.91
+        "top": 116.7,
+        "bottom": 229.78,
+        "left": 184,
+        "right": 297.08,
+        "width": 113.08,
+        "height": 113.08,
+        "relTop": -4.3,
+        "relBottom": 108.78
       }
     },
     "colors": {
-      "top": 145.13,
-      "bottom": 227.73,
-      "left": 887.95,
-      "right": 939.95,
-      "width": 52,
-      "height": 82.61,
-      "relTop": 24.13,
-      "relBottom": 106.73
+      "top": 126.5,
+      "bottom": 219.97,
+      "left": 903.09,
+      "right": 960.41,
+      "width": 57.31,
+      "height": 93.47,
+      "relTop": 5.5,
+      "relBottom": 98.97
     },
     "malla9P1": {
-      "top": 133.48,
-      "bottom": 233.96,
-      "left": -1063,
-      "right": -217,
-      "width": 846,
-      "height": 100.48,
-      "relTop": 12.48,
-      "relBottom": 112.96
+      "top": 123.48,
+      "bottom": 230.23,
+      "left": -1106.24,
+      "right": -173.76,
+      "width": 932.48,
+      "height": 106.75,
+      "relTop": 2.48,
+      "relBottom": 109.23
     },
     "franja": {
       "p1": {
-        "top": 282.37,
-        "bottom": 376.95,
-        "left": -1081.44,
-        "right": -198.56,
-        "width": 882.89,
-        "height": 94.58,
-        "relTop": 161.37,
-        "relBottom": 255.95
+        "top": 259.04,
+        "bottom": 389.99,
+        "left": -1251.23,
+        "right": -28.75,
+        "width": 1222.48,
+        "height": 130.95,
+        "relTop": 138.04,
+        "relBottom": 268.99
       },
       "p2": {
-        "top": 282.32,
-        "bottom": 376.9,
-        "left": 198.56,
-        "right": 1081.44,
-        "width": 882.89,
-        "height": 94.58,
-        "relTop": 161.32,
-        "relBottom": 255.9
+        "top": 258.77,
+        "bottom": 389.46,
+        "left": 25.5,
+        "right": 1245.54,
+        "width": 1220.04,
+        "height": 130.69,
+        "relTop": 137.77,
+        "relBottom": 268.46
       }
     },
     "variables": {
-      "--hg-mega-w": "900px",
+      "--hg-mega-w": "992px",
       "--hg-mega-x": "190px",
       "--hgGridFitScale": "0.94",
       "--megaStripeScale": "1.2125",
@@ -670,8 +670,8 @@
       "--hg-cercador-bar-scale": null
     },
     "deltes": {
-      "selectorP2menysP1": 1.84,
-      "franjaP2menysP1": -0.05,
+      "selectorP2menysP1": -7.79,
+      "franjaP2menysP1": -0.27,
       "colorsMenysSelectorP2": 0
     }
   },
@@ -684,152 +684,152 @@
     },
     "panell": {
       "top": 121,
-      "bottom": 416,
+      "bottom": 432,
       "left": 0,
       "right": 1351,
       "width": 1351,
-      "height": 295,
+      "height": 311,
       "relTop": 0,
-      "relBottom": 295
+      "relBottom": 311
     },
     "guarda": {
       "top": 153,
-      "bottom": 383,
+      "bottom": 399,
       "left": 40.5,
       "right": 1310.5,
       "width": 1270,
-      "height": 230,
+      "height": 246,
       "relTop": 32,
-      "relBottom": 262
+      "relBottom": 278
     },
     "carril": {
       "top": 153,
-      "bottom": 383,
+      "bottom": 399,
       "left": -1366,
       "right": 4098,
       "width": 5464,
-      "height": 230,
+      "height": 246,
       "relTop": 32,
-      "relBottom": 262
+      "relBottom": 278
     },
     "vistes": {
       "p1": {
         "top": 153,
-        "bottom": 383,
+        "bottom": 399,
         "left": -1366,
         "right": 0,
         "width": 1366,
-        "height": 230,
+        "height": 246,
         "relTop": 32,
-        "relBottom": 262
+        "relBottom": 278
       },
       "p2": {
         "top": 153,
-        "bottom": 383,
+        "bottom": 399,
         "left": 0,
         "right": 1366,
         "width": 1366,
-        "height": 230,
+        "height": 246,
         "relTop": 32,
-        "relBottom": 262
+        "relBottom": 278
       }
     },
     "selector": {
       "p1": {
-        "top": 172.03,
-        "bottom": 203.07,
-        "left": -1134.2,
-        "right": -1041.07,
-        "width": 93.13,
-        "height": 31.03,
-        "relTop": 51.03,
-        "relBottom": 82.07
+        "top": 162.18,
+        "bottom": 193.36,
+        "left": -1149.24,
+        "right": -1055.67,
+        "width": 93.57,
+        "height": 31.18,
+        "relTop": 41.18,
+        "relBottom": 72.36
       },
       "p2": {
-        "top": 173.75,
-        "bottom": 204.66,
-        "left": 231.44,
-        "right": 324.19,
-        "width": 92.75,
-        "height": 30.91,
-        "relTop": 52.75,
-        "relBottom": 83.66
+        "top": 149.98,
+        "bottom": 190.61,
+        "left": 227,
+        "right": 348.91,
+        "width": 121.91,
+        "height": 40.63,
+        "relTop": 28.98,
+        "relBottom": 69.61
       },
       "contenidorP2": {
         "top": 198,
-        "bottom": 290.75,
-        "left": 231.44,
-        "right": 324.19,
-        "width": 92.75,
-        "height": 92.75,
+        "bottom": 319.91,
+        "left": 227,
+        "right": 348.91,
+        "width": 121.91,
+        "height": 121.91,
         "relTop": 77,
-        "relBottom": 169.75
+        "relBottom": 198.91
       },
       "barraP1": {
-        "top": 141,
-        "bottom": 234.13,
-        "left": -1134.2,
-        "right": -1041.07,
-        "width": 93.13,
-        "height": 93.13,
-        "relTop": 20,
-        "relBottom": 113.13
+        "top": 131,
+        "bottom": 224.57,
+        "left": -1149.24,
+        "right": -1055.67,
+        "width": 93.57,
+        "height": 93.57,
+        "relTop": 10,
+        "relBottom": 103.57
       },
       "barraP2": {
-        "top": 142.84,
-        "bottom": 235.59,
-        "left": 231.44,
-        "right": 324.19,
-        "width": 92.75,
-        "height": 92.75,
-        "relTop": 21.84,
-        "relBottom": 114.59
+        "top": 109.36,
+        "bottom": 231.27,
+        "left": 227,
+        "right": 348.91,
+        "width": 121.91,
+        "height": 121.91,
+        "relTop": -11.64,
+        "relBottom": 110.27
       }
     },
     "colors": {
-      "top": 145.14,
-      "bottom": 233.27,
-      "left": 948.81,
-      "right": 1004.27,
-      "width": 55.45,
-      "height": 88.13,
-      "relTop": 24.14,
-      "relBottom": 112.27
+      "top": 123.56,
+      "bottom": 217.03,
+      "left": 946.09,
+      "right": 1003.41,
+      "width": 57.31,
+      "height": 93.47,
+      "relTop": 2.56,
+      "relBottom": 96.03
     },
     "malla9P1": {
-      "top": 133.48,
-      "bottom": 239.79,
-      "left": -1134.2,
-      "right": -231.8,
-      "width": 902.4,
-      "height": 106.31,
-      "relTop": 12.48,
-      "relBottom": 118.79
+      "top": 123.48,
+      "bottom": 230.23,
+      "left": -1149.24,
+      "right": -216.76,
+      "width": 932.48,
+      "height": 106.75,
+      "relTop": 2.48,
+      "relBottom": 109.23
     },
     "franja": {
       "p1": {
-        "top": 288.57,
-        "bottom": 385.4,
-        "left": -1134.98,
-        "right": -231.02,
-        "width": 903.96,
-        "height": 96.83,
-        "relTop": 167.57,
-        "relBottom": 264.4
+        "top": 259.04,
+        "bottom": 400.9,
+        "left": -1345.18,
+        "right": -20.82,
+        "width": 1324.35,
+        "height": 141.86,
+        "relTop": 138.04,
+        "relBottom": 279.9
       },
       "p2": {
-        "top": 288.51,
-        "bottom": 385.34,
-        "left": 231.02,
-        "right": 1134.98,
-        "width": 903.96,
-        "height": 96.83,
-        "relTop": 167.51,
-        "relBottom": 264.34
+        "top": 258.77,
+        "bottom": 400.35,
+        "left": 17.66,
+        "right": 1339.36,
+        "width": 1321.7,
+        "height": 141.58,
+        "relTop": 137.77,
+        "relBottom": 279.35
       }
     },
     "variables": {
-      "--hg-mega-w": "960px",
+      "--hg-mega-w": "992px",
       "--hg-mega-x": "203px",
       "--hgGridFitScale": "0.94",
       "--megaStripeScale": "1.2125",
@@ -839,8 +839,8 @@
       "--hg-cercador-bar-scale": null
     },
     "deltes": {
-      "selectorP2menysP1": 1.72,
-      "franjaP2menysP1": -0.06,
+      "selectorP2menysP1": -12.2,
+      "franjaP2menysP1": -0.27,
       "colorsMenysSelectorP2": 0
     }
   },
