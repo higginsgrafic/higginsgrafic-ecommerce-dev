@@ -1562,6 +1562,20 @@ Conseqüència per al pas 2: la composició nova (graella a dalt + tres columnes
 hi cap en 292 px, així que la pàgina 1 de la vertical haurà de demanar **més
 alçada** (com fa avui l'acordió del cistell, que desplega el panell).
 
+**Pas 2 (en curs) — per què avui la vertical no és una composició sinó un
+retall**: mesurat a 768, la fila de dibuixos viu dins d'un contenidor de **917 px
+d'ample** dins d'un panell de 753. És el *belt* horitzontal (el carril de 992
+escalat), és a dir que a la vertical el megaslide continua sent el carrusel
+horitzontal, amb les peces sortint de la pantalla per la dreta i el panell
+retallant-les. La captura de referència ho ensenya: es veuen els botons
+BLANC/COLOR/NEGRE, la fila de dibuixos i la de samarretes, totes dues tallades.
+
+Per tant el pas 2 no és ajustar amplades: és **deixar de fer servir el belt a la
+vertical** i muntar-hi la composició estàtica dins del carril. L'estructura que
+demana l'amo és la mateixa que ja existeix a la pàgina 2 de l'apaisada (graella
+de dibuixos a dalt + col·leccions + colors + franja), i per això el camí més curt
+és portar aquella composició a la vertical en comptes d'inventar-ne una.
+
 **Per confirmar**: si la graella manté les 5 files de col·lecció o només la
 seleccionada, i si la stripe fa scroll quan la col·lecció té més de 14
 samarretes.
