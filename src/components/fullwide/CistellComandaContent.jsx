@@ -4,7 +4,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { ChevronDown, ChevronUp, Trash2 } from 'lucide-react';
 import { useShippingCosts } from '@/hooks/useShippingCosts';
 import { drawingStripePath } from '@/lib/drawingPaths';
-import { esTauletaApaisada } from '@/utils/layoutMetrics';
+import { esTauletaApaisada , readRootCssNumber } from '@/utils/layoutMetrics';
 
 function CistellComandaContent({ cartItems, setCartItems, onFinalizeOrder }) {
   const navigate = useNavigate();
@@ -33,6 +33,22 @@ function CistellComandaContent({ cartItems, setCartItems, onFinalizeOrder }) {
   const isNarrowCart = isPortraitTablet;
 
   const ROW_H = 23.867;        // alçada d'una fila de la pauta
+  const [franjaPx, setFranjaPx] = useState(null);
+  useEffect(() => {
+    const read = () => {
+      const v = readRootCssNumber('--hg-band-w', 0);
+      setFranjaPx((prev) => (v > 0 && Math.abs((prev ?? 0) - v) > 0.5 ? v : prev));
+    };
+    read();
+    const t1 = window.setTimeout(read, 300);
+    const t2 = window.setTimeout(read, 900);
+    window.addEventListener('resize', read);
+    return () => {
+      window.clearTimeout(t1);
+      window.clearTimeout(t2);
+      window.removeEventListener('resize', read);
+    };
+  }, []);
   const GUTTER = 5.457;        // gutter horitzontal entre columnes
   const V_GUTTER = 2.037;      // gutter vertical entre files
   const TOP_OFFSET = 0; // al contenidor del carrusel la llista comença a dalt
@@ -54,7 +70,13 @@ function CistellComandaContent({ cartItems, setCartItems, onFinalizeOrder }) {
   const L_SLOT_W = 122; // ← amplada de slot de l'horitzontal
   const L_GAP = 2;      // ← separació entre slots de l'horitzontal
   const isCompactCart = isPortraitTablet || isLandscapeTablet;
-  const SLOT_W = isPortraitTablet ? 80 : (isLandscapeTablet ? L_SLOT_W : 144 + 11);
+  // A la vertical, els slots surten de la FRANJA central (la que publica el
+  // header): aixi la filera fa exactament la franja sense escalar res, i les
+  // alcades (ROW_H es fixa) no es toquen. 7 junts de 2 px i 8 slots (4
+  // columnes de 2 slots).
+  const SLOT_W = isPortraitTablet
+    ? (franjaPx ? Math.max(80, (franjaPx / 0.94 - 7 * 2) / 8) : 80)
+    : (isLandscapeTablet ? L_SLOT_W : 144 + 11);
   const SLIDE_GAP = isPortraitTablet ? 2 : (isLandscapeTablet ? L_GAP : 3);
   const SLIDE_OFFSET_X = 0;
   // Columnes: 2+2+2+(2 + porci\u00f3 visible del 9\u00e8 slot).
@@ -436,7 +458,7 @@ function CistellComandaContent({ cartItems, setCartItems, onFinalizeOrder }) {
                   return (
                     <>
                       <span style={{ ...priceStyle, justifySelf: 'end', whiteSpace: 'nowrap', transform: `translateX(${priceColumnOffsetX})` }}>{intPart},</span>
-                      <span style={{ ...priceStyle, justifySelf: 'start', whiteSpace: 'nowrap', marginLeft: isNarrowCart ? '-4px' : '-8px', transform: `translateX(${priceColumnOffsetX})` }}>{decPart}€</span>
+                      <span style={{ ...priceStyle, justifySelf: 'start', whiteSpace: 'nowrap', marginLeft: isPortraitTablet ? '-10px' : (isNarrowCart ? '-4px' : '-8px'), transform: `translateX(${priceColumnOffsetX})` }}>{decPart}€</span>
                     </>
                   );
                 })()}
