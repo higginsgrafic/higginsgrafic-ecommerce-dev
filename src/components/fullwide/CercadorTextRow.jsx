@@ -526,7 +526,9 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
                   padding: 0,
                   borderRadius: '50%',
                   border: selected ? '0.5px solid rgba(0,0,0,0.22)' : '0.5px solid rgba(0,0,0,0.22)',
-                  outline: selected ? '2px solid #111827' : 'none',
+                  // L'indicador del color triat: la meitat de gruix (1 px en
+                  // comptes de 2).
+                  outline: selected ? '1px solid #111827' : 'none',
                   outlineOffset: '3px',
                   backgroundColor: hex,
                   boxSizing: 'border-box',
