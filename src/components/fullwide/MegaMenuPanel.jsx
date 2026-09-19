@@ -205,6 +205,18 @@ export default function MegaMenuPanel({
   // contenidor del panell. Mentre no hi ha mesura, s'usa l'alçada de sempre.
   const [p1ContentBottomPx, setP1ContentBottomPx] = useState(null);
   const [p1PageLift, setP1PageLift] = useState(0);
+  // A la VERTICAL, la pagina 2 ja no es el cercador de 992 px del belt: es la
+  // composicio propia (graella de dibuixos a dalt i tres columnes a sota), i la
+  // seva alcada es la que ha de tenir el panell. La mesura la publica
+  // `VerticalParadigmaP2`; es l'equivalent del `p1ContentBottom` de la franja.
+  const [verticalContentPx, setVerticalContentPx] = useState(null);
+  const handleVerticalContent = useCallback((px) => {
+    setVerticalContentPx((prev) => {
+      if (px == null) return null;
+      if (prev != null && Math.abs(prev - px) < 0.5) return prev;
+      return px;
+    });
+  }, []);
   const handleP1ContentBottom = useCallback((px) => {
     setP1ContentBottomPx((prev) => (prev != null && Math.abs(prev - px) < 0.5 ? prev : px));
   }, []);
@@ -241,10 +253,17 @@ export default function MegaMenuPanel({
   // deixen el formulari just a sota. A la vertical i al mobil no cal limit
   // (al mobil el mega-slide ja es baixet i el limit li tapava el formulari).
   const CHECKOUT_GUARD_H = (esVerticalAqui || esMobilAqui) ? null : (esApaissadaAqui ? 206 : 266);
-  const guardHeightPx = paymentFillsScreen
+  // A la vertical l'alçada del panell es la de la composicio nova: la mesura
+  // del contingut mes el `py-8` (32+32) del contenidor del panell, que la
+  // mesura no inclou perquè `VerticalParadigmaP2` mesura el seu propi bloc.
+  const guardHeightVertical = verticalContentPx != null
+    ? `${Math.round(verticalContentPx + 64)}px`
+    : null;  const guardHeightPx = paymentFillsScreen
     ? guardHeightPxDefault
     : esCheckout && CHECKOUT_GUARD_H != null
     ? `${CHECKOUT_GUARD_H}px`
+    : guardHeightVertical
+    ? guardHeightVertical
     : matchesPage1Height && p1ContentBottomPx != null && mesuraEstable
     ? `${alcadaGuard(p1ContentBottomPx)}px`
     : (alcadaRecordada || guardHeightPxDefault);
@@ -438,6 +457,7 @@ export default function MegaMenuPanel({
                   onShirtClick={onShirtClickP2}
                   thinDrawings={thinDrawings}
                   megaMenuRef={megaMenuRef}
+                  onVerticalContentChange={handleVerticalContent}
                 />
 
                 <Suspense fallback={null}>
