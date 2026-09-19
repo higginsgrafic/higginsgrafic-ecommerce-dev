@@ -146,6 +146,14 @@ function PdpDesktop({ product }) {
 
   const [isLayoutReady, setIsLayoutReady] = useState(true);
   const productRowRef = useRef(null);
+  const containerRef = useRef(null);
+  // Geometria REAL de les targetes visibles del rail "Altres histories". El
+  // PDP la calculava pel seu compte (belt + gutter) i a les vistes on el rail
+  // no fa servir el mateix belt (tauleta apaisada i escriptoris estrets, on la
+  // pauta es la del lloc i no la del megaslide) les columnes quedaven
+  // desalineades. Mesurant les targetes, l'alineacio es exacta per
+  // construccio.
+  const [railGeo, setRailGeo] = useState(null);
   const [tdpAvailableHeight, setTdpAvailableHeight] = useState(null);
   const [beltWidth, setBeltWidth] = useState(null);
   const [beltLeft, setBeltLeft] = useState(null);
@@ -200,6 +208,52 @@ function PdpDesktop({ product }) {
       cancelAnimationFrame(settleFrame);
     };
   }, []);
+
+  // Mesura les targetes visibles del rail (les 4 dels formats grans, les 3 de
+  // la tauleta vertical).
+  useLayoutEffect(() => {
+    if (typeof window === 'undefined') return undefined;
+    let frame = 0;
+    const measure = () => {
+      const rects = [...document.querySelectorAll('[data-component="product-card"]')]
+        .map((c) => c.getBoundingClientRect())
+        .filter((r) => r.width > 0 && r.right > 0 && r.left >= -1 && r.left < window.innerWidth)
+        .sort((a, b) => a.left - b.left);
+      const visibles = rects.slice(0, isPortraitTablet ? 3 : 4);
+      if (visibles.length < 2) {
+        setRailGeo(null);
+        return;
+      }
+      const gap = Math.max(0, visibles[1].left - visibles[0].right);
+      const left = visibles[0].left;
+      const grid = visibles[visibles.length - 1].right - left;
+      const amples = visibles.map((r) => r.width);
+      const cont = containerRef.current;
+      const contLeft = cont ? cont.getBoundingClientRect().left + 16 : left;
+      setRailGeo((prev) => (
+        prev
+        && Math.abs(prev.grid - grid) < 0.5
+        && Math.abs(prev.left - left) < 0.5
+        && Math.abs(prev.gap - gap) < 0.5
+        && prev.amples.length === amples.length
+        && prev.amples.every((w, i) => Math.abs(w - amples[i]) < 0.5)
+          && Math.abs(prev.marge - (left - contLeft)) < 0.5
+          ? prev
+          : { n: visibles.length, amples, gap, left, grid, marge: left - contLeft }
+      ));
+    };
+    const schedule = () => { cancelAnimationFrame(frame); frame = requestAnimationFrame(measure); };
+    schedule();
+    const t1 = window.setTimeout(schedule, 250);
+    const t2 = window.setTimeout(schedule, 900);
+    window.addEventListener('resize', schedule);
+    return () => {
+      cancelAnimationFrame(frame);
+      window.clearTimeout(t1);
+      window.clearTimeout(t2);
+      window.removeEventListener('resize', schedule);
+    };
+  }, [isPortraitTablet]);
 
   // Alinea el grid del PDP amb el rail de targetes.
   //
@@ -331,8 +385,6 @@ function PdpDesktop({ product }) {
   const PAUTA_GUTTER_X = isPortraitTablet
     ? (portraitRailGutterX ?? 5)
     : (isLandscapeTablet ? 5 : 22.5);
-  const colGap = `${PAUTA_GUTTER_X}px`;
-  const tdpGridTemplate = `repeat(4, 1fr)`;
   // Aligna el right del fons de la imatge de producte amb el right de la 3a targeta
   // del rail d'Altres històries. El rail fa servir targetes al 94% + 20px offset.
   const railCardW = beltWidth != null
@@ -345,6 +397,18 @@ function PdpDesktop({ product }) {
     ? Math.min(1, tdpAvailableHeight / tdpBaseHeight)
     : 1;
   const tdpRenderedHeight = Math.round(tdpBaseHeight * tdpFitScale);
+
+  // Si tenim la geometria del rail, les columnes son exactament les seves
+  // amplades i la separacio es la seva. Si no (encara no mesurat, mobil), es
+  // queda el calcul de sempre.
+  // Amb `tdpFitScale` la filera es transforma sencera: les amplades i la
+  // separacio es divideixen per l'escala perque, DESPRES de l'escala, tornin a
+  // coincidir amb les targetes (l'origen es el cantó de dalt a l'esquerra, aixi
+  // que el marge no s'ha de dividir).
+  const colGap = railGeo ? `${railGeo.gap / tdpFitScale}px` : `${PAUTA_GUTTER_X}px`;
+  const tdpGridTemplate = railGeo
+    ? railGeo.amples.map((w) => `${w / tdpFitScale}px`).join(' ')
+    : `repeat(4, 1fr)`;
   const titleSettings = isCompactTablet ? { ...PDP_TITLE_SETTINGS, fontSize: 19, lineHeight: 0.95 } : PDP_TITLE_SETTINGS;
   const collectionSettings = isCompactTablet ? { ...PDP_COLLECTION_SETTINGS, fontSize: 14, lineHeight: 1 } : PDP_COLLECTION_SETTINGS;
   const descriptionSettings = isCompactTablet
@@ -374,6 +438,7 @@ function PdpDesktop({ product }) {
       <SEOProductSchema product={{ name: PRODUCT_NAME, description: `${PRODUCT_NAME} — ${COLLECTION_NAME}`, image: TDP_IMAGE(product.colors?.[0], DEFAULT_FINISH), slug: PRODUCT_SLUG, collection: COLLECTION_SLUG }} url={`/${PRODUCT_ROUTE}`} />
 
       <div
+        ref={containerRef}
         style={{
           maxWidth: containerMaxWidth,
           margin: '0 auto',
@@ -421,14 +486,22 @@ function PdpDesktop({ product }) {
             ref={productRowRef}
             style={{
               display: 'grid',
-              gridTemplateColumns: isPortraitTablet && portraitHorizontalCardWidth
-                ? `repeat(3, ${portraitHorizontalCardWidth}px)`
-                : (isPortraitTablet ? 'repeat(3, 1fr)' : tdpGridTemplate),
+              gridTemplateColumns: railGeo
+                ? tdpGridTemplate
+                : (isPortraitTablet && portraitHorizontalCardWidth
+                  ? `repeat(3, ${portraitHorizontalCardWidth}px)`
+                  : (isPortraitTablet ? 'repeat(3, 1fr)' : tdpGridTemplate)),
               gap: colGap,
               alignItems: 'stretch',
-              width: tdpFitScale < 1 ? `${100 / tdpFitScale}%` : (isPortraitTablet && portraitRailViewportWidth ? `${portraitRailViewportWidth}px` : (railGridW ? `${railGridW}px` : (beltWidth ? `${beltWidth}px` : '100%'))),
+              width: railGeo
+                ? `${railGeo.grid / tdpFitScale}px`
+                : (tdpFitScale < 1 ? `${100 / tdpFitScale}%` : (isPortraitTablet && portraitRailViewportWidth ? `${portraitRailViewportWidth}px` : (railGridW ? `${railGridW}px` : (beltWidth ? `${beltWidth}px` : '100%')))),
               height: `${tdpBaseHeight}px`,
-              margin: railGridW ? `0 0 0 ${railLeftOffset}px` : (beltWidth ? '0 auto' : undefined),
+              // El marge esquerre es el que calgui perque la primera columna
+              // caigui sobre la primera targeta visibles del rail.
+              margin: railGeo
+                ? `0 0 0 ${railGeo.marge}px`
+                : (railGridW ? `0 0 0 ${railLeftOffset}px` : (beltWidth ? '0 auto' : undefined)),
               transform: tdpFitScale < 1 ? `scale(${tdpFitScale})` : undefined,
               transformOrigin: 'top left',
             }}

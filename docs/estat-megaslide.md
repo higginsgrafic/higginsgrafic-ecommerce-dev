@@ -1045,6 +1045,38 @@ Els gaps **interns** dels dibuixos: 24,39 px a 1920 (el disseny són 26,33) i
 / 17,55): és el que costen els 20 px fixes. El dibuix no es toca (30 / 22,5 /
 21,33 / 20). A tauleta queden intactes (17,91 amb el dibuix a 19,89).
 
+### La PDP: les columnes alineades amb les targetes (11) — FET
+
+L'amo ho va veure: a la PDP, les 4 columnes agrupades 1+2+1 (especificacions |
+imatge | informació, amb la imatge ocupant dues) han d'anar alineades amb les
+targetes del rail "Altres històries". Al desktop (1920) i a la tauleta vertical
+ja hi anaven; a la tauleta apaisada i als escriptoris estrets, no. A la vertical
+el rail porta 3 targetes i les columnes s'agrupen 2+1 (dues de imatge, una
+d'informació).
+
+**Causa**: el PDP calculava l'ample de la seva graella pel seu compte, amb
+`getSafeBelt()`, que cau al carril del megaslide (70,3 vw) quan les guies
+`--belt2-*` no passen la seva validació; el rail, en canvi, fa servir la pauta
+del lloc (`bgMetrics`, la franja del SiteFrame). A 1920 coincideixen (1350), però
+a 1366 el rail va amb 1334 i el PDP amb 960, i a la tauleta apaisada amb 992 i
+720: per això les columnes no queien sobre les targetes.
+
+**Solució**: el PDP **mesura les targetes reals** del rail
+(`[data-component="product-card"]`, les visibles) i en treu les amplades, la
+separació i el marge esquerre. Així l'alineació és exacta per construcció, passi
+el que passi amb el belt. Si encara no hi ha mesura (mòbil), es queda el càlcul
+de sempre. A la tauleta apaisada, a més, les amplades i la separació es
+divideixen per `tdpFitScale`, perquè després de l'escala tornin a coincidir amb
+les targetes (l'origen de l'escala és el cantó de dalt a l'esquerra, així que el
+marge no es divideix).
+
+| vista | columnes del PDP | targetes del rail |
+|---|---|---|
+| 1920 | 313,5 · 637,4 · 1285,2 | t1 313,5 · t2 637,4 · t4 1285,2 |
+| 1366 | 36,5 · 351,5 · 981,4 | t1 36,5 · t2 351,5 · t4 981,4 |
+| 1024 tauleta apaisada | 36 · 270,6 · 739,8 | t1 36 · t2 270,6 · t4 739,8 |
+| 768 tauleta vertical | 16 (2 columnes) · 510 | t1 16 (t1+t2) · t3 510 |
+
 **El que NO s'ha passat al carril (i per què)**:
 
 - **Els offsets verticals** (40, 20, 45, 5, 8, 10, 15 px) i el `top` del
