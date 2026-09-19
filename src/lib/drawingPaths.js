@@ -117,10 +117,14 @@ export function drawingStripePath(collectionSlug, productRoute, shirtColor, fini
   const ink = resolveInk(collectionSlug, shirtColor, finish);
   if (!ink) return null;
 
-  // Cube: no hi ha subcarpeta d'ink ni codi d'ink
+  // Cube: no hi ha subcarpeta d'ink ni codi d'ink. Compte: els noms del
+  // STRIPE_DESIGN_MAP de Cube JA porten `-stripe` (afrodita-c-stripe,
+  // cube-3-p0-stripe...), i abans s'hi tornava a afegir: la ruta quedava
+  // `afrodita-c-stripe-stripe.webp`, que no existeix, i al cistell hi sortia
+  // l'`alt` (el nom) en comptes del dibuix. Nomes l'afegim si no hi es.
   if (collectionSlug === 'cube') {
     const design = resolveStripeDesign(collectionSlug, productRoute);
-    return `${STRIPE_BASE}/${stripeDir}/${design}-stripe.webp`;
+    return `${STRIPE_BASE}/${stripeDir}/${design.endsWith('-stripe') ? design : `${design}-stripe`}.webp`;
   }
 
   // LFMD: només color, amb subcarpetes solid/frame

@@ -1412,24 +1412,28 @@ El que es veu:
    panell (`pageHeight`), i el fons de cada filera és la imatge
    `fons-cistell-compra.webp` pintada a 1350 px. Cal mirar per què l'alçada de
    la filera i la del fons no quadren amb la del panell.
-2. **Els dibuixos surten com un nom** (corregit per l'amo: **no** és el fons):
-   quan la imatge no carrega, el navegador pinta l'`alt`, que és el nom del
-   producte. La filera fa
-   `src={(item.collectionSlug && item.productRoute ? drawingStripePath(...) : item.drawing) || ''}`:
-   si l'article no porta `collectionSlug`/`productRoute` (o el disseny no es
-   resol), el `src` queda **buit** i surt el nom. Els camins que hi entren sense
-   aquests camps són `ConstructorColleccioPage` (`constructor-tdp-cta`?) i
-   `ConstructorPdpPreview` (`constructor-pdp-cta`); la PDP, les col·leccions i la
-   home sí que els porten. Amb un article de la PDP, comprovat: la imatge hi és
-   i carrega (256×263, cap 404).
+2. **Els dibuixos sortien com un nom** — **FET**. No era el fons (ho va
+   corregir l'amo): quan la imatge no carrega, el navegador pinta l'`alt`, que és
+   el nom del producte. I la causa era **de Cube**: el `STRIPE_DESIGN_MAP` de
+   Cube ja porta el sufix als noms (`afrodita-c-stripe`, `cube-3-p0-stripe`…) i
+   la branca de Cube de `drawingStripePath` n'hi afegia un altre, així que
+   demanava `afrodita-c-stripe-stripe.webp`, que no existeix. Amb Miscel·lània
+   no passava perquè el seu camí és el genèric.
+
+   Arreglat a `src/lib/drawingPaths.js`: només s'hi afegeix `-stripe` si no hi
+   és. Comprovat amb les deu rutes de Cube (totes resolen a un fitxer que
+   existeix) i al navegador amb tres articles al cistell (AFRODITA-C, ROBOCUBE i
+   3CUBE-P0): les tres imatges carreguen (256 px) i cap resposta ≥400. Captura:
+   `docs/comparacio/cistell-cube.png`.
+
 3. **A les tauletes queda enganxat a baix**: `MegaslidePagina3` fa
    `pageHeight = isPortraitTablet && !acordioExpanded ? '269px' : '100%'`: amb
    l'acordió desplegat la pàgina demana el 100% de l'alçada i el panell creix
    fins al final. És exactament el que descriu el comentari que hi ha a la
    icona del cistell («feia créixer el panell fins a baix de tot»).
 
-**Fet**: la diagnosi i les captures. **Per fer**: 1 i 2 alhora (l'alçada de la
-filera i el fons), i 3 a part (l'alçada de la pàgina 3 a la vertical).
+**Fet**: el dibuix de les files (punt 2). **Per fer**: 1 (la posició de la
+llista) i 3 (l'alçada de la pàgina 3 a la vertical).
 
 **El que NO s'ha passat al carril (i per què)**:
 
