@@ -1353,6 +1353,26 @@ quedava). El mateix número (`baixadaHero`) alimenta el `top` de l'hero i el
 El 1280 va 5 px més amunt que el 1366 (retoc de l'amo), i la vertical i el 1920
 no s'hi toquen.
 
+### El cadenat: més gros, seguiment i arrossegament (24) — FET (a validar)
+
+Tres coses de la llista de l'amo:
+
+- **Més gros**: el botó passa de 40 a **48 px** i la icona de 18 a 22. El
+  cadenat viu en un portal `position: fixed` i fa 48×48 a totes les vistes.
+- **El rebot en obrir la pestanya**: el cadenat va enganxat a la vora inferior
+  del panell, i el panell fixa la seva alçada per estat i fa graons de fins a
+  35 px mentre s'obre. El seguiment ja els suavitzava, però a 4 px per fotograma
+  trigava ~150 ms a arribar-hi i es veia el llast. Ara el pas màxim és de 18 px
+  i la correcció del 50% per fotograma: hi arriba en dos o tres fotogrames.
+- **Arrossegar-lo ha de moure l'scroll**: el gest ja hi era, però escrivia el
+  `scrollLeft` del viewport de la **pàgina 1** mentre que el progrés que mou el
+  cadenat (`mega-portrait-scroll`) surt del viewport de la **pàgina 2**. Ara
+  arrossega el mateix element que el mou a ell. Nomes a la vertical
+  (`isPortraitTablet`), com abans.
+
+**Pendent de validar amb l'amo** (són coses de mà, no de mesura): si el rebot
+desapareix del tot i si l'arrossegament es comporta com l'invers del scroll.
+
 **El que NO s'ha passat al carril (i per què)**:
 
 - **Els offsets verticals** (40, 20, 45, 5, 8, 10, 15 px) i el `top` del

@@ -2018,7 +2018,7 @@ function FullWideSlideHeader({
     // (fins a 35 px d'un fotograma a l'altre). Aqui llegim la vora a cada
     // fotograma i ens hi acostem com a maxim 4 px per fotograma, aixi els
     // graons es converteixen en un lliccament i no en saltets.
-    const PAS_MAX_PX = 4;
+    const PAS_MAX_PX = 18;
     let pintat = null;
     const seguiment = () => {
       try {
@@ -2035,7 +2035,7 @@ function FullWideSlideHeader({
             const delta = objectiu - pintat;
             pintat += Math.abs(delta) <= 0.05
               ? delta
-              : Math.max(-PAS_MAX_PX, Math.min(PAS_MAX_PX, delta * 0.25));
+              : Math.max(-PAS_MAX_PX, Math.min(PAS_MAX_PX, delta * 0.5));
           }
           // El contenidor nomes hi es quan el cadenat ja s'ha muntat: fins
           // llavors nomes cal desar la mesura perque es munti.
@@ -3215,7 +3215,10 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
               if (!isPortraitTablet || megaPage === 3) return;
               const btn = e.currentTarget;
               const startX = e.clientX;
-              const viewport = document.querySelector('[data-mega-page-viewport="1"]');
+              // El mateix element que fa servir el megaslide per moure el
+              // cadenat (`mega-portrait-scroll` surt d'aquest viewport): si
+              // s'arrossega un altre, el cadenat no es mou.
+              const viewport = document.querySelector('[data-mega-page-viewport="2"]');
               if (!viewport) return;
               const maxScroll = Math.max(1, viewport.scrollWidth - viewport.clientWidth);
               lockDragRef.current = { dragged: false, startX, viewport, maxScroll };
@@ -3236,7 +3239,7 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
               btn.addEventListener('pointerup', onUp);
               btn.addEventListener('pointercancel', onUp);
             }}
-            className="flex h-10 w-10 items-center justify-center rounded-full border border-border bg-background shadow-lg transition-colors hover:bg-muted"
+            className="flex h-12 w-12 items-center justify-center rounded-full border border-border bg-background shadow-lg transition-colors hover:bg-muted"
             style={{
               transform: isPortraitTablet && megaPage !== 3
                 ? `translateX(${(lockBtnScrollProgress - 0.5) * 160}px)`
@@ -3249,7 +3252,7 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
             title={megaLocked ? 'Desbloca el megaslide' : 'Bloca el megaslide'}
             aria-label={megaLocked ? 'Desbloca el megaslide' : 'Bloca el megaslide'}
           >
-            {megaLocked ? <Lock size={18} /> : <Unlock size={18} />}
+            {megaLocked ? <Lock size={22} /> : <Unlock size={22} />}
           </button>
         </div>,
         document.body
