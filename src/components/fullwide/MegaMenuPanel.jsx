@@ -191,9 +191,13 @@ export default function MegaMenuPanel({
   // 112px = capçalera (80px) + padding vertical del panell (32px).
   // S'usa la prop isLandscapeTablet (detecció centralitzada a useDeviceLayout).
   const paymentFillsScreen = (isPortraitTablet || isLandscapeTablet) && megaPage === 3 && acordioExpanded;
-  const guardHeightPxDefault = paymentFillsScreen
-    ? 'calc(100vh - var(--globalHeaderTopOffset, 0px) - 112px)'
-    : bleedGuardHeight;
+  // L'acordió desplegat NO ha d'estirar el panell fins al peu de pantalla (ho
+  // va veure l'amo: a les tauletes el megaslide quedava enganxat a baix de tot,
+  // i fins i tot se n'anava mes enllà: 937 px en una pantalla de 1024 a la
+  // vertical i 681 en una de 768 a l'apaisada). Amb l'alçada de sempre, el
+  // panell es queda on toca i el contingut de l'acordió s'hi ajusta a dins.
+  // `paymentFillsScreen` es conserva per a la resta d'usos (mesuraEstable).
+  const guardHeightPxDefault = bleedGuardHeight;
 
   // Retall de la pàgina 1: el panell acaba P1_STRIPE_BOTTOM_GAP px sota el
   // bottom visible de les samarretes. La mesura ve de MegaStripePanelP1 (ja hi

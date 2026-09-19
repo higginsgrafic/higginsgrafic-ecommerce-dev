@@ -1426,14 +1426,22 @@ El que es veu:
    3CUBE-P0): les tres imatges carreguen (256 px) i cap resposta ≥400. Captura:
    `docs/comparacio/cistell-cube.png`.
 
-3. **A les tauletes queda enganxat a baix**: `MegaslidePagina3` fa
-   `pageHeight = isPortraitTablet && !acordioExpanded ? '269px' : '100%'`: amb
-   l'acordió desplegat la pàgina demana el 100% de l'alçada i el panell creix
-   fins al final. És exactament el que descriu el comentari que hi ha a la
-   icona del cistell («feia créixer el panell fins a baix de tot»).
+3. **A les tauletes, el megaslide a baix de tot** — **FET**. El mecanisme: quan
+   el **cadenat** està actiu i la pestanya torna en primer pla (`focus`,
+   `pageshow` o `visibilitychange`) amb el cistell obert i articles a dins,
+   `FullWideSlideHeader` desplega l'acordió (`setAcordioExpanded(true)`). A
+   tauleta, `MegaMenuPanel` hi responia amb
+   `guardHeightPxDefault = 'calc(100vh - var(--globalHeaderTopOffset) - 112px)'`,
+   i el panell se n'anava més enllà del peu de pantalla: **937 px en una pantalla
+   de 1024** (vertical) i **681 en una de 768** (apaisada).
 
-**Fet**: el dibuix de les files (punt 2). **Per fer**: 1 (la posició de la
-llista) i 3 (l'alçada de la pàgina 3 a la vertical).
+   Arreglat: l'acordió desplegat fa servir l'alçada de sempre
+   (`bleedGuardHeight`). Ara el panell fa 321 px i acaba a 452 (vertical) i 442
+   (apaisada), ben endins de la pantalla; el 1920 no es mou (366, com abans).
+   Captura: `docs/comparacio/cistell-acordi-1024t.png`.
+
+**Fet**: el dibuix de les files (punt 2) i l'alçada de l'acordió a les tauletes
+(punt 3). **Per fer**: 1 (la posició de la llista).
 
 **El que NO s'ha passat al carril (i per què)**:
 
