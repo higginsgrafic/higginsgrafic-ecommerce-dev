@@ -1373,6 +1373,31 @@ Tres coses de la llista de l'amo:
 **Validat per l'amo** (2026-09-19): els tres canvis són correctes. Eren coses de
 mà, no de mesura, i per això es van demanar expressament.
 
+### Les icones de col·lecció de la home, centrades en y (25) — FET
+
+A la home, les icones de col·lecció (el bloc on era el logo) no estaven
+centrades en el buit entre la capçalera i l'hero: el seu centre hi cau 35-62 px
+per sobre, segons la vista. I la de First Contact —el Phoenix, 99 px d'alçada—
+anava 18 px més avall que la resta (70,4), perquè el desplaçament de −18 px
+s'aplicava a totes menys a ella.
+
+Ara:
+
+- El Phoenix també porta el −18 px, o sigui que **les cinc comparteixen centre**
+  i la referència de volum és el grup de l'Austen (70,4), no el Phoenix.
+- El bloc es desplaça el que cal perquè aquest centre caigui **al mig del buit
+  entre la capçalera i l'hero**: `+9 px` a l'escriptori, `+66` a l'apaisada
+  ampla (1280/1366), `+86` a la tauleta de 1024 i `+89` a la vertical (abans
+  −26 / +24 / +24 / +84).
+
+| vista | mig del buit | centre de les icones | diferència |
+|---|---|---|---|
+| 1920 | 338,3 | 337,6 | −0,7 |
+| 1440 | 299,4 | 299,7 | +0,3 |
+| 1280 | 290,2 | 290,0 | −0,2 |
+| 1024 tauleta | 290,2 | 289,8 | −0,4 |
+| 768 vertical | 324,6 | 324,6 | 0 |
+
 **El que NO s'ha passat al carril (i per què)**:
 
 - **Els offsets verticals** (40, 20, 45, 5, 8, 10, 15 px) i el `top` del
