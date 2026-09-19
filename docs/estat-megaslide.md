@@ -1412,11 +1412,16 @@ El que es veu:
    panell (`pageHeight`), i el fons de cada filera és la imatge
    `fons-cistell-compra.webp` pintada a 1350 px. Cal mirar per què l'alçada de
    la filera i la del fons no quadren amb la del panell.
-2. **Els dibuixos, invisibles**: la imatge hi és i carrega
-   (`drawingStripePath(...)` dona `pont-del-diable-multi-light…`), però és la
-   **tinta clara** (la de la samarreta blanca) i sobre el fons blanc del panell
-   no es veu. Al disseny va a sobre la banda del fons de l'acordió, que és el
-   que ara no es pinta. Els punts 1 i 2 són, doncs, el mateix problema.
+2. **Els dibuixos surten com un nom** (corregit per l'amo: **no** és el fons):
+   quan la imatge no carrega, el navegador pinta l'`alt`, que és el nom del
+   producte. La filera fa
+   `src={(item.collectionSlug && item.productRoute ? drawingStripePath(...) : item.drawing) || ''}`:
+   si l'article no porta `collectionSlug`/`productRoute` (o el disseny no es
+   resol), el `src` queda **buit** i surt el nom. Els camins que hi entren sense
+   aquests camps són `ConstructorColleccioPage` (`constructor-tdp-cta`?) i
+   `ConstructorPdpPreview` (`constructor-pdp-cta`); la PDP, les col·leccions i la
+   home sí que els porten. Amb un article de la PDP, comprovat: la imatge hi és
+   i carrega (256×263, cap 404).
 3. **A les tauletes queda enganxat a baix**: `MegaslidePagina3` fa
    `pageHeight = isPortraitTablet && !acordioExpanded ? '269px' : '100%'`: amb
    l'acordió desplegat la pàgina demana el 100% de l'alçada i el panell creix
