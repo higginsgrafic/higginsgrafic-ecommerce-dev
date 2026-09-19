@@ -426,6 +426,8 @@ export default function MegaslidePagina2({
             resolvedMega={resolvedMegaFiltered}
             showStripe={showStripe}
             stripeVariantVisibility={stripeVariantVisibility}
+            cercadorSelectedColor={cercadorSelectedColor}
+            onSelectColor={setCercadorSelectedColor}
             humanInsideVariant={humanInsideVariant}
             firstContactVariant={firstContactVariant}
             displayedShirtColor={displayedShirtColor}

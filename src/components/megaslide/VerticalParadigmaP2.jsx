@@ -1,8 +1,10 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import MegaGridDibuixos from '../fullwide/MegaGridDibuixos.jsx';
 import { FirstContactDibuix00Buttons } from '../fullwide/firstContactPanels.jsx';
-import { CERCADOR_COLLECTIONS, CERCADOR_COLORS } from '../fullwide/CercadorTopBar.jsx';
+import { CercadorColorsGrid } from '../fullwide/CercadorTextRow.jsx';
+import { CERCADOR_COLLECTIONS } from '../fullwide/CercadorTopBar.jsx';
 import { CONTROL_TILE_ARROWS, CONTROL_TILE_BN } from '../fullwide/MegaColumn.jsx';
+import { colorGap, colorMida } from '../fullwide/midesGraella.js';
 import { computeStripeTileItems, computeStripeTileOverlaySrcs } from '@/utils/resolveStripeTile.js';
 import {
   GAP_COLUMNES_PX,
@@ -71,6 +73,8 @@ export default function VerticalParadigmaP2({
   austenSelectedDisableMulti = false,
   selectedItem,
   onSelectCollectionKey,
+  cercadorSelectedColor = 'white',
+  onSelectColor,
   setStripeOverlayOverrideActive,
   setFirstContactVariant,
   setHumanInsideVariant,
@@ -160,20 +164,26 @@ export default function VerticalParadigmaP2({
   /**
    * Els items d'una colleccio, sense les caselles de control de la filera.
    *
-   * Es retallen a les 16 columnes de la graella: la composicio vertical son
-   * CINC files (una per colleccio) i una fila que empeny mes enlla de les 16
-   * columnes en fa dues, que es el que desquadrava la graella (l'austen en te
-   * 25 i la fila en feia dues). El que no hi cap es veu desplac,ant la filera
-   * a la pagina 2 horitzontal.
+   * Són els MATEIXOS que els de la filera del cercador: la graella de dibuixos
+   * es la peça original i no s'hi ha de filtrar res.
    */
   const itemsDeColleccio = useCallback((colleccio) => {
     const cols = resolvedMega?.[colleccio];
     if (!Array.isArray(cols) || cols.length === 0) return [];
     const items = cols[0]?.items || [];
-    return items
-      .filter((it) => it && it !== CONTROL_TILE_BN && it !== CONTROL_TILE_ARROWS)
-      .slice(0, GRAELLA_COLUMNES_VERTICAL);
+    return items.filter((it) => it && it !== CONTROL_TILE_BN && it !== CONTROL_TILE_ARROWS);
   }, [resolvedMega]);
+
+  /**
+   * La mida de la casella de la GRAELLA DE DIBUIXOS: la que fa que les 16
+   * columnes omplin l'amplada del carril (`GRAELLA_COLUMNES_VERTICAL` caselles
+   * i 15 separacions de 6 px), que es el que demana el paradigma: la graella
+   * fa tota l'amplada del carril.
+   */
+  const casellaDibuix = useMemo(() => {
+    if (!ampleCarril) return undefined;
+    return (ampleCarril - (GRAELLA_COLUMNES_VERTICAL - 1) * 6) / GRAELLA_COLUMNES_VERTICAL;
+  }, [ampleCarril]);
 
   /**
    * Les 14 samarretes de la franja, amb la seva imatge de debò.
@@ -212,6 +222,20 @@ export default function VerticalParadigmaP2({
     if (typeof onSelectCollectionKey !== 'function') return;
     onSelectCollectionKey(key);
   }, [onSelectCollectionKey]);
+
+  /**
+   * Tria un color de la paleta.
+   *
+   * Fa el mateix que a la filera del cercador: canvia el color triat de la
+   * pagina 2 (que es qui mana a la franja) i, de passada, posa la variant
+   * multicolor, que es la que ensenya el dibuix de color.
+   */
+  const triaColor = useCallback((slug) => {
+    if (typeof onSelectColor === 'function') onSelectColor(slug);
+    setStripeOverlayOverrideActive?.(false);
+    if (active === 'the_human_inside') setHumanInsideVariant?.('color');
+    else setFirstContactVariant?.('color');
+  }, [onSelectColor, setStripeOverlayOverrideActive, active, setHumanInsideVariant, setFirstContactVariant]);
 
   /**
    * Tria una samarreta de la franja.
@@ -269,10 +293,9 @@ export default function VerticalParadigmaP2({
     >
       {/* 1) La graella de dibuixos, amplada de carril i a dalt de tot: una fila
           per colleccio (les cinc files del paradigma).
-          A cada fila s'hi passen els items SENSE les caselles de control: la
-          graella del megaslide les dibuixa amb el seu propi component (la
-          botonera i les fletxes), i aquí ocupaven una columna de les 16 i
-          deixaven les caselles quadrades a 37 px en comptes de 39,5. */}
+          Es la graella ORIGINAL (`MegaGridDibuixos`), amb els items de la
+          filera del cercador i amb la casella calibrada perque les 16 columnes
+          facin l'amplada del carril. */}
       <div style={{ width: '100%' }} data-vertical-graella="1">
         {COLLECCIONS_DE_LA_GRAELLA.map((c) => (
           <MegaGridDibuixos
@@ -280,7 +303,7 @@ export default function VerticalParadigmaP2({
             active={c}
             className="w-full"
             items={itemsDeColleccio(c)}
-            nomesElsDeLaLlista
+            cellPx={casellaDibuix}
           />
         ))}
       </div>
@@ -345,54 +368,18 @@ export default function VerticalParadigmaP2({
               />
             </div>
 
-            {/* La paleta: els 14 colors en dues files de 7, i la pastilla COLOR
-                a sota (es la que diu que la variant es la multicolor). */}
-            <div
-              style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(7, minmax(0, 1fr))',
-                gap: '4px',
-                width: '100%',
-                marginTop: '2px',
-              }}
-            >
-              {CERCADOR_COLORS.map(({ slug, hex }) => (
-                <button
-                  key={slug}
-                  type="button"
-                  aria-label={slug}
-                  onClick={() => {
-                    setStripeOverlayOverrideActive?.(false);
-                    if (active === 'the_human_inside') setHumanInsideVariant?.('color');
-                    else setFirstContactVariant?.('color');
-                  }}
-                  style={{
-                    appearance: 'none',
-                    padding: 0,
-                    width: '100%',
-                    aspectRatio: '1 / 1',
-                    borderRadius: '9999px',
-                    background: hex,
-                    border: '1px solid #E6E8EC',
-                    cursor: 'pointer',
-                    boxSizing: 'border-box',
-                  }}
-                />
-              ))}
-            </div>
-            <div
-              style={{
-                alignSelf: 'center',
-                padding: '2px 10px',
-                fontSize: '8pt',
-                border: '1px solid #E6E8EC',
-                borderRadius: '9999px',
-                color: '#4A5057',
-                lineHeight: 1.2,
-              }}
-            >
-              COLOR
-            </div>
+            {/* La paleta: la GRAELLA DE COLORS del cercador, la mateixa peça
+                (`CercadorColorsGrid`): els mateixos cercles, la mateixa
+                separació, el mateix anell del color triat i la pastilla COLOR.
+                Les mides són les de la filera del cercador. */}
+            <CercadorColorsGrid
+              selectedColor={cercadorSelectedColor}
+              onSelectColor={triaColor}
+              cerclePx={colorMida(true, false)}
+              colorGapPx={colorGap(true, false)}
+              isPortraitTablet
+              style={{ marginTop: '6px' }}
+            />
           </div>
 
           {/* Columna 3: la franja, 14 samarretes en 2 files de 7, sense scroll */}
