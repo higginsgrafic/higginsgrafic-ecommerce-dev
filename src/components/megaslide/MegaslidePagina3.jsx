@@ -37,7 +37,10 @@ export default function MegaslidePagina3({
         flex: '0 0 auto',
         // El carril, tambe a la vertical: abans `min(100vh - 32px, 70.3vw)` hi
         // donava 540 px i la filera del cistell (1269) hi quedava tallada.
-        width: 'var(--hg-mega-w, 70.3vw)',
+        // El carril, pero mai mes ample que la pantalla: a la vertical el carril
+        // fa 992 i la pantalla 768, i el contingut (i el bloc del total) queia
+        // fora del centre.
+        width: 'min(var(--hg-mega-w, 70.3vw), 100vw)',
         maxWidth: 'none',
         position: 'relative',
         height: '100%',
