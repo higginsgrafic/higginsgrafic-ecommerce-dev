@@ -566,14 +566,12 @@ abans que jo.
    4. **El cadenat ha de poder moure l'scroll** igual que l'scroll el mou a ell
       (interacció en dos sentits), a la **versió vertical**.
    I el que vagi sortint.
-1.bis **La vista vertical, nou paradigma** (seccions 29 a 32): la feina grossa
-   que queda. L'amo ja ha validat l'estructura i ha respost les dues preguntes
-   (graella de **5 files**; franja de **14 samarretes en 2×7, sense scroll**).
-   El que resta és traslladar la maqueta de `/lab/vertical` dins del megaslide i
-   treure-hi el belt: alçada del panell (`MegaMenuPanel.jsx`), disposició
-   (`MegaStripePanelP1.jsx`, línies 269 i 307), la franja sense
-   `--megaStripeDx/Dy/Scale` i el scroll vertical. **Començar per aquí** quan
-   l'amo digui de reprendre-ho; demana una sessió amb marge.
+1.bis **La vista vertical, nou paradigma** (seccions 29 a 32): **FET** (secció 32).
+   L'amo ja ha validat l'estructura i ha respost les dues preguntes (graella de
+   **5 files**; franja de **14 samarretes en 2×7, sense scroll**). La composició
+   ja és dins del megaslide, **a la pàgina 2** (el cercador), i el belt no s'hi
+   fa servir. El que queda és la maqueta de la **pàgina 1**, que l'amo passarà
+   més endavant.
 
 2. **El mòbil**, que es farà a part (l'amo ho va dir així).
 3. **El cistell i el checkout** tenen la seva pròpia detecció de tauleta per
@@ -1633,10 +1631,12 @@ Ordre de treball proposat: (a) muntar la graella amb l'amplada del carril
 (c) els botons d'acció i la paleta, (d) la franja en 2×7, i (e) alçada i scroll
 vertical del conjunt.
 
-### Maqueta del paradigma vertical (31) — FET (per validar)
+### Maqueta del paradigma vertical (31) — FET (i ja esborrada)
 
-Hi ha una pàgina de proves amb l'estructura nova, sense tocar res del megaslide:
-**`/lab/vertical`** (`src/pages/VerticalParadigmaPreview.jsx`).
+Hi havia una pàgina de proves amb l'estructura nova, sense tocar res del
+megaslide: **`/lab/vertical`** (`src/pages/VerticalParadigmaPreview.jsx`). Va
+complir la seva feina i **s'ha esborrat** quan la composició de debò s'ha muntat
+dins del megaslide (vegeu la secció 32).
 
 Fa exactament el que demana el paradigma: el contenidor amb l'amplada del carril
 (`min(var(--hg-band-w), 100vw)`, 688 a 768) i, a dins:
@@ -1656,34 +1656,77 @@ de sèrie el component en mostra una) i, a sota, les tres columnes amb les
 proporcions 19 / 15 / 63. La graella ocupa [33, 276, **688**, 514]: exactament
 l'amplada del carril a 768.
 
-**Nota**: la ruta és oberta (les altres de `/lab` van amb `ProtectedRoute`).
-Quan la composició de debò estigui muntada dins del megaslide, aquesta pàgina
-s'ha d'esborrar.
+**Nota**: la ruta era oberta (les altres de `/lab` van amb `ProtectedRoute`).
+Quan la composició de debò estigués muntada dins del megaslide, aquesta pàgina
+s'havia d'esborrar; ja s'ha fet.
 
-### Traslladar la maqueta dins del megaslide (32) — PENDENT (pla accionable)
+### Traslladar la maqueta dins del megaslide (32) — FET (a la pàgina 2)
 
-La maqueta de `/lab/vertical` ja valida l'estructura. El que queda és portar-la
-dins del megaslide i treure-hi el belt a la vertical. Punts de toc, perquè la
-propera sessió no els hagi de buscar:
+**Correcció de destí (2026-09-20)**: la composició **no** va a la pàgina 1 sinó a
+la **pàgina 2** (el cercador). Ho va precisar l'amo: *«el disseny que t'he passat
+és per la pàgina 2»*, i va triar que **substitueixi el cercador sencer** (la
+barra grisa, la graella de colors 16×4, el selector Blanc/Color/Negre del cantó
+esquerre i la franja del belt). El disseny de la **pàgina 1** el passarà més
+endavant.
 
-1. **L'alçada del panell**: `MegaMenuPanel.jsx` decideix l'alçada del panell
-   (`bleedGuardHeight` i el `guardHeightPx`). A la vertical, la pàgina 1 ha de
-   demanar l'alçada de la composició nova, no la del belt (avui 292 px).
-2. **La disposició**: `MegaStripePanelP1.jsx` (1094 línies) és on viu la pàgina 1
-   sencera: la columna de col·leccions es munta a la línia 269 i la franja
-   comenc,a a la 307, totes dues dins d'una maquetació de belt. Cal una branca
-   `isPortraitTablet` que munti la composició nova (o, millor, un component de
-   vertical a part, per no seguir omplint de branques les peces compartides).
-3. **La graella**: `MegaGridDibuixos`, cinc instàncies (una per col·lecció), com
-   a la maqueta. El component ja és `fr` i `aspect-square`: no cal tocar-lo.
-4. **La franja amb les samarretes de debò**: és la part delicada. Avui depèn del
-   belt (`--megaStripeDx/Dy/Scale` i el `transform` de la línia 386). Per a la
-   vertical cal la llista de samarretes sense belt, en 2×7, amb els `items` de la
-   col·lecció seleccionada.
-5. **El scroll vertical** del conjunt dins del carril.
-6. **Verificació**: comparador, mesura del megaslide, tests i build a cada pas;
-   i comprovar que a 1280/1024/1440/1920 no es mou res (la vertical és l'única
-   que canvia).
+**On viu ara**
+
+| peça | fitxer |
+|---|---|
+| la composició | `src/components/megaslide/VerticalParadigmaP2.jsx` |
+| les proporcions (funció pura, amb proves) | `src/components/fullwide/paradigmaVertical.js` |
+| la branca (nomes a la vertical) | `MegaslidePagina2.jsx`, abans del `return` del cercador |
+| l'alçada del panell | `MegaMenuPanel.jsx` (`verticalContentPx` → `guardHeightVertical`) |
+
+**Com funciona**
+
+1. **L'amplada del carril**: `min(992, finestra − 80)`. A 768 són **688 px**
+   (`768 − 2×40`), i creix fins als 992 de la tauleta de 1024. La composició viu
+   dins del carril, no dins del tauler de 992 del belt.
+2. **La graella**: cinc instàncies de `MegaGridDibuixos`, una per col·lecció
+   (les **cinc files**). La fila rep els items de la col·lecció sense les
+   caselles de control i **retallats a 16** (l'austen en té 25 i en feia dues
+   files). S'hi ha afegit `nomesElsDeLaLlista` al component perquè no hi afegeixi
+   els productes que no són a la llista.
+3. **La franja**: 14 samarretes en **2×7**, sense scroll i sense belt. Les
+   imatges són les de debò, resoltes amb `computeStripeTileOverlaySrcs` (la
+   mateixa funció que fa servir el cercador): 57,58 px de casella a 768.
+4. **L'alçada del panell**: `VerticalParadigmaP2` publica l'alçada natural de la
+   composició i `MegaMenuPanel` la fa servir de `guardHeightPx` (mesura, no
+   número). A 768 el panell passa de **292 a 542 px**.
+5. **El scroll**: la composició té el seu propi contenidor amb `overflow-y:
+   auto` i l'alçada que queda sota el panell. A 768 hi cap tota (413 px en 477
+   disponibles): el scroll no s'activa.
+
+**Verificació (2026-09-20)**
+
+- `npx vitest run` → **471 proves** (39 fitxers; 9 són noves de
+  `tests/unit/paradigma-vertical.test.js`).
+- `npx vite build` → OK.
+- `node scripts/compara-vistes.mjs` → **OK**, amb la branca nova: a la vertical
+  mesura la composició (carril 688, graella 5 files, franja 14 caselles
+  quadrades dins del carril) i a les altres mides el cercador de sempre.
+- `npm run mesura:megaslide` → **888 xifres** a 7 mides. Contra la baseline
+  anterior, **només** es mouen les 42 xifres de la tauleta vertical 768; a
+  **1024 / 1280 / 1366 / 1440 / 1920 no es mou res**.
+- Captura: `docs/comparacio/vertical-p2-composicio-768t.png`.
+
+**Pendent i conegut**
+
+- **7 de les 14 caselles de la franja surten buides** amb `first_contact`, que
+  només té 7 dibuixos al manifest d'stripe: és el mateix que fa la franja
+  horitzontal. Decisió de l'amo.
+- La **maqueta `/lab/vertical`** ja s'ha esborrat (complia el que deia la nota
+  de la secció 31).
+
+**El pla antic (es guarda com a historial)**
+
+Els punts de toc que es van fer servir: (1) l'alçada del panell a
+`MegaMenuPanel.jsx`; (2) la disposició en un component de vertical a part, per no
+omplir de branques les peces compartides; (3) la graella, cinc instàncies de
+`MegaGridDibuixos`; (4) la franja sense `--megaStripeDx/Dy/Scale`; (5) el scroll
+vertical del conjunt; (6) verificació amb el comparador, la mesura, els tests i
+el build.
 
 **Respostes de l'amo (2026-09-19), ja tancades**:
 
@@ -1731,5 +1774,7 @@ contenidor de posicionament, sinó el `MegaStripeBleedGuard` (que va dins del
 317,5 px a 1920 i va caldre la compensació de la reserva. La posició del
 contenidor de debò es va veure amb una sonda que puja la cadena d'ancestres.
 
-**Eines**: `npm run mesura:megaslide` (833 xifres de regressió a 7 mides),
-`npm run compara-vistes`, 462 proves, `npx vite build`.
+**Eines**: `npm run mesura:megaslide` (888 xifres de regressió a 7 mides),
+`npm run compara-vistes`, 471 proves, `npx vite build`,
+`node scripts/sonda-vertical.mjs` (mesura la composició vertical amb detall i en
+pot fer una captura amb `--captura`).

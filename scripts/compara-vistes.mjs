@@ -42,6 +42,35 @@ const mesura = () => {
   const cg = ambMida('[data-p2-color-grid]');
   const sel = ambMida('[data-p2-color-selector] [data-stripe-buttonbar="bn"]');
   const samarretes = document.querySelector('[data-stripe-visual-content="2"]');
+
+  // La composicio de la VERTICAL (pagina 2): la graella de dibuixos a dalt i
+  // les tres columnes a sota. Si hi es, mana ella: el cercador de la pagina 2
+  // ja no es munta a la vertical.
+  const vertical = document.querySelector('[data-vertical-composicio="1"]');
+  if (vertical) {
+    const r = (el) => (el ? el.getBoundingClientRect() : null);
+    const graella = document.querySelector('[data-vertical-graella="1"]');
+    const franja = document.querySelector('[data-vertical-franja="1"]');
+    const samarretesV = [...vertical.querySelectorAll('[data-vertical-samarreta]')];
+    const cv = r(vertical);
+    return {
+      vista: 'vertical',
+      carrilW: +cv.width.toFixed(2),
+      graellaH: graella ? +r(graella).height.toFixed(2) : null,
+      graellaFiles: graella ? graella.children.length : null,
+      franjaH: franja ? +r(franja).height.toFixed(2) : null,
+      tiles: samarretesV.length,
+      tilesAmbImatge: samarretesV.filter((b) => b.querySelector('img')).length,
+      tilesDins: samarretesV.every((b) => b.getBoundingClientRect().right <= cv.right + 1),
+      // La franja ha de tenir exactament 2 files de 7 caselles.
+      tilesQuadrades: samarretesV.every((b) => {
+        const t = b.getBoundingClientRect();
+        return Math.abs(t.width - t.height) <= 1;
+      }),
+      samarretesH: samarretesV[0] ? +samarretesV[0].getBoundingClientRect().height.toFixed(2) : null,
+    };
+  }
+
   if (!nx || !mz || !ncc || !cg || !sel) return null;
 
   const cy = (e) => { const b = e.getBoundingClientRect(); return (b.top + b.bottom) / 2; };
@@ -51,6 +80,7 @@ const mesura = () => {
   const filesColors = files(cg);
   const grid = nx.parentElement;
   return {
+    vista: 'cercador',
     dibuix: +mz.getBoundingClientRect().width.toFixed(2),
     gapH: +((ncc.getBoundingClientRect().left - nx.getBoundingClientRect().left)
       - mz.getBoundingClientRect().width).toFixed(2),
@@ -116,21 +146,51 @@ const files = [];
 for (const c of CASES) {
   const r = resultats[c.nom];
   if (!r) {
-    fallades.push(`${c.nom}: no s'ha trobat la graella (megaslide tancat o build vell?)`);
+    fallades.push(`${c.nom}: no s'ha trobat ni el cercador ni la composicio vertical (megaslide tancat o build vell?)`);
     files.push(`${c.nom.padEnd(18)}  sense dades`);
     continue;
   }
-  files.push(`${c.nom.padEnd(18)}  dibuix ${String(r.dibuix).padStart(6)}  gap ${String(r.gapH).padStart(6)}  cercle ${String(r.cercle).padStart(5)}  pas ${String(r.pasColors).padStart(5)}  selector ${String(r.selectorDelta).padStart(6)}  files ${String(r.dibuixosDelta).padStart(5)}  samarretes ${String(r.samarretesH).padStart(6)}`);
+  if (r.vista === 'vertical') {
+    files.push(`${c.nom.padEnd(18)}  VERTICAL  carril ${String(r.carrilW).padStart(6)}  graella ${String(r.graellaH).padStart(6)} (${r.graellaFiles} files)  franja ${String(r.franjaH).padStart(6)}  tiles ${r.tiles} (${r.tilesAmbImatge} amb imatge) de ${r.samarretesH}`);
+    continue;
+  }
+  files.push(`${c.nom.padEnd(18)}  cercador  dibuix ${String(r.dibuix).padStart(6)}  gap ${String(r.gapH).padStart(6)}  cercle ${String(r.cercle).padStart(5)}  pas ${String(r.pasColors).padStart(5)}  selector ${String(r.selectorDelta).padStart(6)}  files ${String(r.dibuixosDelta).padStart(5)}  samarretes ${String(r.samarretesH).padStart(6)}`);
 }
 
-const tauletes = CASES.filter((c) => c.tauleta).map((c) => c.nom);
+// (a-vertical) La composicio vertical s'ha de comprovar ella sola: la franja
+// ha de ser de 14 samarretes en 2x7 caselles quadrades, totes dins del carril,
+// i la graella de dibuixos ha de tenir les cinc files de colleccio.
+for (const c of CASES) {
+  const r = resultats[c.nom];
+  if (!r || r.vista !== 'vertical') continue;
+  if (r.tiles !== 14) {
+    fallades.push(`${c.nom}: la franja ha de tenir 14 samarretes i en te ${r.tiles}`);
+  }
+  if (!r.tilesDins) {
+    fallades.push(`${c.nom}: alguna samarreta de la franja surt del carril`);
+  }
+  if (!r.tilesQuadrades) {
+    fallades.push(`${c.nom}: les caselles de la franja no son quadrades`);
+  }
+  if (r.graellaFiles !== 5) {
+    fallades.push(`${c.nom}: la graella de dibuixos ha de tenir 5 files (les cinc colleccions) i en te ${r.graellaFiles}`);
+  }
+  if (r.samarretesH != null && (r.samarretesH < 30 || r.samarretesH > 140)) {
+    notes.push(`la casella de samarreta fa ${r.samarretesH} px a ${c.nom}`);
+  }
+  if (r.tilesAmbImatge < r.tiles) {
+    notes.push(`${r.tiles - r.tilesAmbImatge} de les 14 caselles de ${c.nom} no tenen dibuix a la colleccio activa`);
+  }
+}
+
+const tauletes = CASES.filter((c) => c.tauleta && resultats[c.nom] && resultats[c.nom].vista === 'cercador').map((c) => c.nom);
 const referencia = tauletes[0];
 
 // (a) Dins de cada pantalla: les files de dibuixos han de caure a les mateixes
 // alcades que les de colors, i el selector ha d'estar centrat amb la graella.
 for (const c of CASES) {
   const r = resultats[c.nom];
-  if (!r) continue;
+  if (!r || r.vista !== 'cercador') continue;
   const base = r.filesColors[0];
   const desviament = (arr) => arr.map((y) => +(y - base).toFixed(1));
   const a = desviament(r.filesDibuixos);
@@ -152,8 +212,9 @@ for (const c of CASES) {
   }
 }
 
-// (b) Entre tauletes: les mateixes mides, el mateix patro de files i les
-// mateixes alineacions.
+// (b) Entre tauletes que fan servir el MATEIX disseny (el cercador): les
+// mateixes mides, el mateix patro de files i les mateixes alineacions. La
+// vertical ja no hi entra: fa la composicio propia.
 for (const nom of tauletes.slice(1)) {
   const a = resultats[referencia];
   const b = resultats[nom];
