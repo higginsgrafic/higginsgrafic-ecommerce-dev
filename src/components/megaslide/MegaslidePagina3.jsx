@@ -35,7 +35,9 @@ export default function MegaslidePagina3({
 
       <div style={{
         flex: '0 0 auto',
-        width: isPortraitTablet ? 'min(100vh - 32px, 70.3vw)' : 'var(--hg-mega-w, 70.3vw)',
+        // El carril, tambe a la vertical: abans `min(100vh - 32px, 70.3vw)` hi
+        // donava 540 px i la filera del cistell (1269) hi quedava tallada.
+        width: 'var(--hg-mega-w, 70.3vw)',
         maxWidth: 'none',
         position: 'relative',
         height: '100%',
