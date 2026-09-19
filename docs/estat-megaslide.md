@@ -1594,9 +1594,9 @@ graella, la peça que avui la munta a la pàgina 2. Caldrà decidir si la vertic
 fa servir un sol component amb la disposició nova o si es condiciona per
 `isPortraitTablet`.
 
-**Per confirmar**: si la graella manté les 5 files de col·lecció o només la
-seleccionada, i si la stripe fa scroll quan la col·lecció té més de 14
-samarretes.
+**Confirmat per l'amo**: la graella manté **les 5 files** de col·lecció, i la
+stripe és de **14 samarretes** partides en **2×7**, sense scroll (partir-la en
+dues files no en canvia el nombre).
 
 ### El paradigma vertical: peces reaprofitables (30) — reconeixença
 
@@ -1676,9 +1676,13 @@ propera sessió no els hagi de buscar:
    i comprovar que a 1280/1024/1440/1920 no es mou res (la vertical és l'única
    que canvia).
 
-**Preguntes encara obertes**: (a) la graella manté les cinc files de col·lecció
-(la maqueta ho proposa així) o només la seleccionada; (b) si una col·lecció té
-més de 14 samarretes, la franja fa scroll o s'hi afegeixen files.
+**Respostes de l'amo (2026-09-19), ja tancades**:
+
+- **La graella manté les cinc files** de col·lecció (és el que fa la maqueta amb
+  cinc instàncies de `MegaGridDibuixos`).
+- **La franja no fa scroll.** És de **14 samarretes**, i partir-la en dues files
+  de 7 no en canvia el nombre: sempre són les mateixes 14, en 2×7 i totes
+  visibles.
 
 **El que NO s'ha passat al carril (i per què)**:
 
