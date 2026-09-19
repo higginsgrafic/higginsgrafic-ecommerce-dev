@@ -1598,6 +1598,29 @@ fa servir un sol component amb la disposició nova o si es condiciona per
 seleccionada, i si la stripe fa scroll quan la col·lecció té més de 14
 samarretes.
 
+### El paradigma vertical: peces reaprofitables (30) — reconeixença
+
+Abans de muntar la disposició nova, he mirat quines peces es poden reaprofitar
+tal qual:
+
+- **`MegaGridDibuixos.jsx`** (la graella de dibuixos): interfície neta,
+  `MegaGridDibuixos({ active, className, items })`, i les mides en `fr` amb
+  caselles quadrades (`aspect-square`). O sigui que **s'adapta a l'amplada que
+  li doni el contenidor** sense números fixos: a la vertical n'hi ha prou de
+  muntar-la amb l'amplada del carril. És la peça que fa el paradigma més fàcil
+  del que semblava.
+- **`MegaColumn.jsx`** (les col·leccions): és una funció interna del fitxer, i la
+  pàgina 1 la munta a la línia 269 de `MegaStripePanelP1.jsx`. Caldrà veure què
+  necessita exactament (estat i callbacks) abans de reubicar-la.
+- La franja de samarretes: viu dins de `MegaStripePanelP1.jsx` a partir de la
+  línia 307, amb `transform` i `--megaStripeDx/Dy/Scale`; és la peça més lligada
+  al belt i, per tant, la que més caldrà separar de la maquetació horitzontal.
+
+Ordre de treball proposat: (a) muntar la graella amb l'amplada del carril
+—és la peça que ja s'adapta—, (b) reubicar-hi la columna de col·leccions,
+(c) els botons d'acció i la paleta, (d) la franja en 2×7, i (e) alçada i scroll
+vertical del conjunt.
+
 **El que NO s'ha passat al carril (i per què)**:
 
 - **Els offsets verticals** (40, 20, 45, 5, 8, 10, 15 px) i el `top` del
