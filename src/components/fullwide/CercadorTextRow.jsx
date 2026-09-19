@@ -455,7 +455,7 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
           gridTemplateColumns: `minmax(0, 1fr) ${carrilLane(78)} minmax(min-content, ${carrilLane(142)})`,
           // 10 px FIXES entre blocs (no escalats): es el que fa que totes les
           // mides quadrin, perque el que cedeix es el gap intern dels dibuixos.
-          columnGap: '10px',
+          columnGap: '20px',
           alignItems: 'start',
           pointerEvents: 'auto',
         }}
