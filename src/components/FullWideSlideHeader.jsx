@@ -2091,11 +2091,14 @@ function FullWideSlideHeader({
       // la franja 131 px d'alcada (enorme) mentre les graelles del megaslide
       // fan el carril de 992 (tile 93,6). Amb `Math.min(w, 1024)` la tauleta no
       // es toca i el 1280 fa exactament la seva mida.
-      const contentW = isPortraitTablet
-        ? 992 * 0.995 - pl - pr
-        : (isLandscapeTablet
-          ? Math.min(w, 1024) * 0.995 - pl - pr
-          : MEGASLIDE_REFERENCIA_PX - pl - pr);
+      // Les DUES tauletes fan servir la mateixa amplada de contingut: la d'un
+      // iPad de 1024 en apaisada amb el coixí de disseny (40+40), no el que es
+      // mesura a cada orientacio (a la vertical el panell en te 48 i el tile en
+      // sortia 97,2 en comptes de 93,7). La vertical es la mateixa pagina que
+      // l'apaisada i, si no, el selector i la franja no coincidien.
+      const contentW = (isPortraitTablet || isLandscapeTablet)
+        ? 1024 * 0.995 - 80
+        : MEGASLIDE_REFERENCIA_PX - pl - pr;
       if (!contentW) return;
       const totalGaps = (COLS - 1) * GAP_PX;
       const colW = (contentW - totalGaps) / COLS;

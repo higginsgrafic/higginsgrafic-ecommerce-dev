@@ -441,7 +441,7 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
           // (`carrilLane`, no `carrilPx`): a tauleta 40 px fixos no son el 3%
           // del carril (en son 29,4) i la fila 1 no encaixava amb la franja del
           // header. Amb `carrilLane` l'amplada es la mateixa a 1024 i a 1280.
-          right: isPortraitTablet ? carrilPx(MARGE_DRET_FILERA_ESCRIPTORI_PX) : carrilLane(MARGE_DRET_FILERA_ESCRIPTORI_PX),
+          right: carrilLane(MARGE_DRET_FILERA_ESCRIPTORI_PX),
           display: 'grid',
           // Les columnes i la separacio son mides del carril (78, 142 i 10 px
           // de 1350). Amb `carrilLane` (no `carrilPx`) tambe s'encongeixen a
@@ -518,7 +518,7 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
           gap: `${colorGapPx}px`,
           // A l'apaisada la graella de colors va 10 px mes a l'esquerra (ho va
           // demanar l'amo, igual que la columna de colleccions).
-          transform: uniformColumns ? 'translateX(85px)' : (isLandscapeTablet ? 'translateX(-10px)' : undefined),
+          transform: uniformColumns ? 'translateX(85px)' : ((isPortraitTablet || isLandscapeTablet) ? 'translateX(-10px)' : undefined),
           marginTop: uniformColumns ? '5px' : undefined,
         }}>
           {CERCADOR_COLORS.map(({ slug, hex }) => {
@@ -591,7 +591,7 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
             // ho va demanar l'amo.
             transform: uniformColumns
               ? 'translateX(120px)'
-              : (isLandscapeTablet ? 'translateX(-10px)' : undefined),
+              : ((isPortraitTablet || isLandscapeTablet) ? 'translateX(-10px)' : undefined),
             // La graella de colors te la seva columna (78) i el seu contingut
             // (4 cercles i 3 separacions) en surt: aquest coixí es la part que
             // sobresurt, perque la llista no hi caigui a sobre. La filera es

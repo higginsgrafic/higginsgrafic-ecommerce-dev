@@ -1298,6 +1298,33 @@ Dos retocs a l'apaisada (1024, 1280 i 1366; la vertical, com sempre, a part):
 Les dues tauletes segueixen donant les mateixes mides i alineacions (el
 comparador ho comprova).
 
+### La pàgina 2, idèntica a la vertical i a l'apaisada (22) — FET
+
+L'amo ho va preguntar i tenia raó: la vertical ha de ser la mateixa pàgina que
+l'apaisada, i la pàgina 2 no ho era. Comparades (posicions relatives al carril,
+que fa 992 a totes dues):
+
+| peça | vertical (abans) | horitzontal (abans) | ara les dues |
+|---|---|---|---|
+| selector | 40 → 128 | 29,4 → 115,9 | **29,4 → 117,4** |
+| dibuixos | 148 → 739,1 | 135,9 → 749,7 | **137,4 → 749,7** |
+| colors | 759,1 → 816,4 | 759,7 → 817 | **759,7 → 817** |
+| col·leccions | 872,6 → 952 | 873,2 → 952,6 | **873,2 → 952,6** |
+
+Tres causes:
+
+1. El coixí del selector i el marge dret de la filera tenien una excepció per a
+   la vertical (`carrilPx(40)` en comptes de `carrilLane(40)`): fora.
+2. El **tile** de les tauletes sortia de l'amplada del panell mesurada (a la
+   vertical en té 48 de coixí i a l'apaisada 80): ara les dues fan servir el
+   coixí de disseny (40+40) sobre la referència de 1024, i el tile fa 93,7 a
+   totes dues.
+3. El desplaçament de −10 px de la graella de colors i de la columna de
+   col·leccions només s'aplicava a l'apaisada: ara a les dues.
+
+El comparador també ho veu: les tres tauletes (768, 1024 i 1366) donen ara
+`samarretes 101,6` i `selector 0`.
+
 **El que NO s'ha passat al carril (i per què)**:
 
 - **Els offsets verticals** (40, 20, 45, 5, 8, 10, 15 px) i el `top` del
