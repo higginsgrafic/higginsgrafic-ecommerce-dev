@@ -1,7 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import CistellComandaContent from '@/components/fullwide/CistellComandaContent';
-import { readRootCssNumber } from '@/utils/layoutMetrics';
 
 export default function MegaslidePagina3({
   isPortraitTablet = false,
@@ -17,35 +16,6 @@ export default function MegaslidePagina3({
 }) {
   const navigate = useNavigate();
   const pageHeight = isPortraitTablet && !acordioExpanded ? '269px' : '100%';
-  // L'amplada natural del contingut del cistell (1350 a l'escriptori, la seva
-  // als altres): la mida del disseny, que despres s'escala a la franja.
-  const [ampleNatural, setAmpleNatural] = useState(null);
-  // L'amplada de la franja central, que publica el header a `--hg-band-w`.
-  // `scale()` vol un NUMERO, no una longitud: el `calc(var(--band) / n)` donava
-  // una longitud i el navegador descartava la transformacio.
-  const [franja, setFranja] = useState(null);
-  useEffect(() => {
-    const read = () => {
-      const v = readRootCssNumber('--hg-band-w', 0);
-      setFranja((prev) => (Math.abs((prev ?? 0) - v) < 0.5 ? prev : (v > 0 ? v : null)));
-    };
-    read();
-    const t1 = window.setTimeout(read, 250);
-    const t2 = window.setTimeout(read, 800);
-    let mo = null;
-    try {
-      mo = new MutationObserver(read);
-      mo.observe(document.documentElement, { attributes: true, attributeFilter: ['style'] });
-    } catch { /* ignore */ }
-    window.addEventListener('resize', read);
-    return () => {
-      window.clearTimeout(t1);
-      window.clearTimeout(t2);
-      if (mo) mo.disconnect();
-      window.removeEventListener('resize', read);
-    };
-  }, []);
-  const escalaCistell = (franja && ampleNatural) ? franja / ampleNatural : null;
 
   return (
     <div style={{ width: '25%', flexShrink: 0, display: 'block', height: pageHeight, position: 'relative', overflow: isPortraitTablet ? 'hidden' : 'visible', boxShadow: isPortraitTablet ? 'inset 8px 0 0 #ffffff, inset -8px 0 0 #ffffff' : undefined }}>
@@ -86,10 +56,10 @@ export default function MegaslidePagina3({
       }}>
 
         <div style={{
-          // El cistell te una amplada natural de disseny (1350 a l'escriptori,
-          // la seva als altres): s'escala perque faci EXACTAMENT la franja
-          // central, com la fila 1 del megaslide.
-          transform: escalaCistell ? `scale(${escalaCistell})` : 'none',
+          // 0,94 es l'ajust de disseny a 1920; per sota, l'escala del carril
+          // (`--hg-escala-mega`). Escalar el cistell perque faci la franja
+          // exacta engrandia les files a la vertical (1,052) i es va descartar.
+          transform: 'scale(min(0.94, var(--hg-escala-mega, 1)))',
           transformOrigin: 'top center',
           width: '100%',
           height: '100%',
@@ -111,7 +81,6 @@ export default function MegaslidePagina3({
               pointerEvents: 'auto',
             }}>
               <CistellComandaContent
-                onAmpleNatural={setAmpleNatural}
                 cartItems={cartItems}
                 setCartItems={setCartItems}
                 onCloseMegaSlide={() => setActive(null)}
