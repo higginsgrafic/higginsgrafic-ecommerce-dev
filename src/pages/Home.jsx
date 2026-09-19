@@ -394,8 +394,9 @@ function Home() {
             justifyContent: 'center',
             gap: '44px',
             pointerEvents: 'auto',
-            // Al vertical, el menu d'icones de col·leccions va 25 px mes amunt.
-            transform: `translateY(${isPortraitTablet ? '84px' : (isLandscapeTablet ? '24px' : '-26px')})`,
+            // Centrat entre la capcalera i l'hero (en y): els valors surten de
+            // mesurar el centre d'Austen i el mig del buit a cada vista.
+            transform: `translateY(${isPortraitTablet ? '89px' : (esApaissadaAmpla ? '66px' : (isLandscapeTablet ? '86px' : '9px'))})`,
           }}
         >
           {COLLECTIONS_MENU.map((c) => {
@@ -410,7 +411,10 @@ function Home() {
                   display: 'inline-flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  transform: isFirstContact ? undefined : 'translateY(-18px)',
+                  // El Phoenix (First Contact) es mes alt (99 px) que la resta
+                  // (70,4) i quedava 18 px mes avall: s'alinea amb el grup
+                  // d'Austen, que es la referencia de volum.
+                  transform: 'translateY(-18px)',
                   transition: 'transform 0.15s ease',
                 }}
                 className="hover:scale-110 active:scale-95"
