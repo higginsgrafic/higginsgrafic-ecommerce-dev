@@ -1334,6 +1334,12 @@ Tres causes:
 El comparador també ho veu: les tres tauletes (768, 1024 i 1366) donen ara
 `samarretes 101,6` i `selector 0`.
 
+### L'hero, 25 px més avall a l'escriptori estret (23) — FET
+
+A l'escriptori estret (fins a 1440) l'hero de la home (les 5 franges) va 25 px
+més avall: el seu `top` hi suma `+25px`. Comprovat: a 1440 passa de 452,8 a
+**477,8**. A 1920 (555,7) i a les tauletes no s'hi toca.
+
 **El que NO s'ha passat al carril (i per què)**:
 
 - **Els offsets verticals** (40, 20, 45, 5, 8, 10, 15 px) i el `top` del
