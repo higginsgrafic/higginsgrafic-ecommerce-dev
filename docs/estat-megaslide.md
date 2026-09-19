@@ -1125,6 +1125,28 @@ Pendent: la **pàgina TDP** (`/constructor/tdp`), que també és de producte i t
 els panells d'informació fora del carril (a 1440, [38,472] i [952,1387]), perquè
 va amb `--belt2-*` i posicions absolutes de 1350.
 
+### PDP: 20 px més avall a 1440 i breadcrumbs amb el logo (14) — FET
+
+Dos retocs d'afinació de la PDP, tots dos a l'escriptori estret (fins a 1440):
+
+- **Les targetes del rail i la tdp, 20 px més avall**: el rail passa de
+  `translateY(-72px)` a `-52px` i la tdp de `margin-top: -32px` a `-12px`.
+  Comprovat: la targeta passa de 143,4 a 163,4 i la tdp de 419,8 a 439,8, o
+  sigui +20 exactes a les dues. A 1920 (146,5 / 505) i a les tauletes no es mou
+  res.
+- **Els breadcrumbs, alineats amb el logo del header**: anaven a `left: 36px`
+  dins del contenidor de la pàgina (a 1920, 317,5 en comptes de 325). Ara viuen
+  en un contenidor que fa el carril, centrat, amb el mateix coixí que la fila
+  del header (`carrilPx(40)`) i compensant la meitat de la barra de
+  desplaçament que publica `SiteFrame` (`--site-gutter-mig`): el contenidor de
+  la pàgina està centrat a la FINESTRA i el carril a l'espai de maquetació.
+
+| vista | logo del header | breadcrumbs | diferència |
+|---|---|---|---|
+| 1920 | 325 | 325 | 0 |
+| 1440 | 244 | 243,5 | −0,5 |
+| 1280 | — | (no es mostren: allà mana la tauleta) | — |
+
 **El que NO s'ha passat al carril (i per què)**:
 
 - **Els offsets verticals** (40, 20, 45, 5, 8, 10, 15 px) i el `top` del
