@@ -1477,36 +1477,30 @@ tot hi cau: el centre de la filera i el del bloc són 384 a la vertical, 512 a
 l'apaisada i 960 a 1920 (el bloc, 5 px més enllà pel desplaçament de disseny).
 Captura: `docs/comparacio/cistell-boto-768t.png`.
 
-### El cistell fa la franja central (28) — FET (cami A)
+### El cistell i la franja central (28) — REVERTIT (cami A descartat)
 
-La llista de productes del cistell ha d'encaixar a la mateixa mesura que la fila
-1: del `left` del logo al `right` de la icona d'usuari. Mesurat abans:
+La llista de productes del cistell hauria d'encaixar a la mateixa mesura que la
+fila 1 (del `left` del logo al `right` de la icona d'usuari). Abans: 1920 i 1024
+ja hi encaixaven, i a 1440 (1013 en comptes de 953) i a la vertical (615 en
+comptes de 688) no.
 
-| vista | franja | filera (abans) |
-|---|---|---|
-| 1920 | 1270 | 1269 ✓ |
-| 1440 | 953 | **1013** ✗ |
-| 1024 | 933,2 | 930,6 ✓ |
-| 768 vertical | 688 | **615** ✗ |
+Es va provar el **cami A** (escalar el cistell perque fes la franja exacta:
+`franja / amplada natural`): la filera hi encaixava (1270 / 953 / 933 / 688),
+pero a la vertical l'escala era 1,052 —cap amunt— i les files es veien mes
+altes. **Descartat i revertit**: el cistell torna a la seva escala de sempre
+(0,94 a l'escriptori i `--hg-escala-megaa` a sota) i les files fan 41,1 px a
+totes les vistes.
 
-S'ha fet el **cami A**: el cistell es pinta amb la seva amplada natural de
-disseny (1350 a l'escriptori; la compacta a les tauletes) i s'escala per fer
-EXACTAMENT la franja.
+Es conserva, aixi:
 
-- El header publica `--hg-band-w` (la franja: del left del logo al right de la
-  icona d'usuari), la mateixa mesura que fa servir la fila 1.
-- La pàgina 3 fa el contenidor d'aquesta amplada (mai més que la pantalla), el
-  centra, i escala el contingut per `franja / amplada natural`. L'amplada
-  natural la publica el propi cistell (`onAmpleNatural`).
-- Compte amb `scale()`: vol un **número**. Amb `calc(var(--band) / n)` donava una
-  longitud i el navegador descartava la transformació (la filera es quedava a
-  1350).
+- El header publica `--hg-band-w` (la franja), que es la mesura bona per a
+  qualsevol peça que hi hagi d'encaixar.
+- El contenidor de la pàgina 3 fa aquesta amplada (mai mes que la pantalla) i
+  centra el contingut.
+- La separacio entre el preu i la paperera a la vertical (10 px, abans 2).
 
-Resultat: la filera fa 1270 a 1920, 953 a 1440, 933 a 1024 i 688 a la vertical,
-i cau exactament sobre la franja (a 1440 el cistell s'encongeix un 6%).
-
-Tambe s'ha separat el preu de la paperera a la vertical (10 px de separació entre
-caselles, abans 2). Captura: `docs/comparacio/cistell-franja-768t.png`.
+Pendent: fer que la filera faci la franja **sense escalar** (dimensionant les
+columnes/slots a partir de la franja), que es la manera que no toca les alcades.
 
 **El que NO s'ha passat al carril (i per què)**:
 

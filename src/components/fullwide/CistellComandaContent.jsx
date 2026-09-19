@@ -6,7 +6,7 @@ import { useShippingCosts } from '@/hooks/useShippingCosts';
 import { drawingStripePath } from '@/lib/drawingPaths';
 import { esTauletaApaisada } from '@/utils/layoutMetrics';
 
-function CistellComandaContent({ cartItems, setCartItems, onFinalizeOrder, onAmpleNatural }) {
+function CistellComandaContent({ cartItems, setCartItems, onFinalizeOrder }) {
   const navigate = useNavigate();
   const location = useLocation();
   // Si l'usuari ja ha passat pel pagament (és a /checkout) i torna a obrir el
@@ -71,11 +71,6 @@ function CistellComandaContent({ cartItems, setCartItems, onFinalizeOrder, onAmp
   // l'escriptori i a la vertical segueix sent la taula de 1350px.
   const ROW_W = isCompactCart ? (4 * COL2 + 3 * SLIDE_GAP) : CART_VIEWPORT;
 
-  // La pagina 3 escala el cistell perque faci la franja central: li cal saber
-  // quina es l'amplada natural del contingut.
-  useEffect(() => {
-    if (typeof onAmpleNatural === 'function') onAmpleNatural(ROW_W);
-  }, [onAmpleNatural, ROW_W]);
 
   const TSHIRT_BASE = '/placeholders/apparel/t-shirt/gildan_5000/gildan-5000_t-shirt_crewneck_unisex_heavyWeight_xl_';
   const TSHIRT_SUFFIX = '_gpr-4-0_front.webp';
