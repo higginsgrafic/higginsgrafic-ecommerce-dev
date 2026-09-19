@@ -1641,11 +1641,11 @@ Fa exactament el que demana el paradigma: el contenidor amb l'amplada del carril
 
 Captura: `docs/comparacio/vertical-paradigma-maqueta.png`.
 
-**Què s'hi veu i què no**: les tres columnes hi són a lloc, amb les proporcions
-bones. La graella, en canvi, encara no omple la fila: amb 688 px i el seu
-repartiment en `fr` hi hauria d'haver unes 16 caselles per fila i n'hi surten
-poques. És el proper detall a ajustar (el nombre de columnes de la graella a la
-vertical), i no afecta l'estructura.
+**Ja s'hi veu el paradigma sencer**: la graella amb **les cinc files** de
+col·lecció (es munten cinc instàncies de `MegaGridDibuixos`, una per col·lecció:
+de sèrie el component en mostra una) i, a sota, les tres columnes amb les
+proporcions 19 / 15 / 63. La graella ocupa [33, 276, **688**, 514]: exactament
+l'amplada del carril a 768.
 
 **Nota**: la ruta és oberta (les altres de `/lab` van amb `ProtectedRoute`).
 Quan la composició de debò estigui muntada dins del megaslide, aquesta pàgina

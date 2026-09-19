@@ -34,8 +34,12 @@ export default function VerticalParadigmaPreview() {
           color: '#4A5057',
         }}
       >
-        {/* FILA A — la graella de dibuixos, amplada de carril */}
-        <MegaGridDibuixos active="first_contact" className="w-full" />
+        {/* FILA A — la graella de dibuixos, amplada de carril.
+            Es munten les cinc colleccions (una graella per colleccio) per veure
+            les cinc files del paradigma; el component, de si, en mostra una. */}
+        {['first_contact', 'the_human_inside', 'austen', 'cube', 'miscellania'].map((c) => (
+          <MegaGridDibuixos key={c} active={c} className="w-full" />
+        ))}
 
         {/* FILA B — tres columnes: colleccions · botons d'accio · franja 2x7 */}
         <div style={{ display: 'grid', gridTemplateColumns: '19fr 15fr 63fr', columnGap: '2%', marginTop: '16px', alignItems: 'start' }}>
