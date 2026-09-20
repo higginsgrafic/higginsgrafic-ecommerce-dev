@@ -323,7 +323,7 @@ export default function MegaMenuPanel({
                     width: '100%',
                     height: '100%',
                     display: 'flex',
-                    justifyContent: isPortraitTablet ? 'flex-start' : 'center',
+                    justifyContent: 'center',
                     overflowX: isPortraitTablet ? 'auto' : 'visible',
                     overflowY: isPortraitTablet ? 'hidden' : 'visible',
                     overscrollBehaviorX: isPortraitTablet ? 'contain' : undefined,
@@ -341,7 +341,7 @@ export default function MegaMenuPanel({
                       el que no hi cap s'hi arriba desplacant. D'aquesta
                       amplada en surt la calibracio (megaTileSize), aixi que
                       les mides del selector i de la franja tambe coincideixen. */}
-                  <div style={{ flex: '0 0 auto', width: isPortraitTablet ? '992px' : 'var(--hg-mega-w, 70.3vw)', maxWidth: 'none', position: 'relative', height: '100%', paddingLeft: '0px', paddingRight: '0px' }}>
+                  <div style={{ flex: '0 0 auto', width: isPortraitTablet ? '100%' : 'var(--hg-mega-w, 70.3vw)', maxWidth: 'none', position: 'relative', height: '100%', paddingLeft: '0px', paddingRight: '0px' }}>
                     <MegaStripePanelP1
                       active={active}
                       resolvedMega={resolvedMega}

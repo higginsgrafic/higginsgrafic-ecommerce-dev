@@ -16,7 +16,7 @@ export default function GraellaFletxes({
   tilePx = 44,
   columnes = 5,
   files = 3,
-  gapPx = 6,
+  gapPx = 0,
   style,
 }) {
   const total = columnes * files;
