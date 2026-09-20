@@ -702,22 +702,39 @@ export default function MegaslidePagina2({
               />
             )}
             colors={(
-              <CercadorColorsGrid
-                selectedColor={cercadorSelectedColor}
-                onSelectColor={setCercadorSelectedColor}
-                cerclePx={colorMida(true, false)}
-                colorGapPx={colorGap(true, false)}
-                isPortraitTablet={isPortraitTablet}
-              />
+              /* Els cercles, 1 px mes petits, amb el TOP de la graella quiet
+                 (per aixo va enganxada a dalt amb el mateix marge de sempre). */
+              <div style={{ marginTop: '21px' }}>
+                <CercadorColorsGrid
+                  selectedColor={cercadorSelectedColor}
+                  onSelectColor={setCercadorSelectedColor}
+                  cerclePx={colorMida(true, false) - 1}
+                  colorGapPx={colorGap(true, false)}
+                  isPortraitTablet={isPortraitTablet}
+                />
+              </div>
             )}
             stripe={(
               <img
                 src="/placeholders/tablet vertical/stripe-curta-7+7.png"
                 alt=""
-                style={{ width: 'calc(100% + 26px)', height: 'auto', display: 'block', flexShrink: 0, maxWidth: 'none', marginLeft: '-4px' }}
+                style={{
+                  width: 'calc(100% + 26px)',
+                  height: 'auto',
+                  display: 'block',
+                  flexShrink: 0,
+                  maxWidth: 'none',
+                  marginLeft: '-4px',
+                  // El top de la franja, alineat amb el top de la graella de
+                  // colors (que va centrada a la seva casella).
+                  marginTop: '21px',
+                }}
               />
             )}
             selector={(
+              /* El selector, un 10% mes petit (la peça agafa l'amplada del seu
+                 contenidor). */
+              <div style={{ width: '90%' }}>
               <FirstContactDibuix00Buttons
                 onWhite={() => {
                   setFirstContactVariant?.('white');
@@ -736,6 +753,7 @@ export default function MegaslidePagina2({
                 showMulti={stripeVariantVisibility?.color !== false}
                 selectedVariant={active === 'the_human_inside' ? humanInsideVariant : firstContactVariant}
               />
+              </div>
             )}
           />
         </CapaTaulaVertical>
