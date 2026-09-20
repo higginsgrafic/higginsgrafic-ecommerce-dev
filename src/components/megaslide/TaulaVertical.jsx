@@ -24,6 +24,11 @@ export function ampladaCarril(ampleFinestra) {
 export const COLUMNES_TAULA = 5;
 export const FILES_TAULA = 3;
 
+/** L'alçada de la taula, en px, per a una amplada de finestra donada. */
+export function alturaTaulaVertical(ampleFinestra) {
+  return Math.ceil((ampladaCarril(ampleFinestra) * FILES_TAULA) / COLUMNES_TAULA);
+}
+
 export default function TaulaVertical({ columnes = COLUMNES_TAULA, files = FILES_TAULA }) {
   // El contorn d'una CEL·LA: la línia que dibuixa la taula.
   const cela = {
@@ -40,7 +45,9 @@ export default function TaulaVertical({ columnes = COLUMNES_TAULA, files = FILES
         gridTemplateColumns: `repeat(${columnes}, 1fr)`,
         gridTemplateRows: `repeat(${files}, 1fr)`,
         width: '100%',
-        height: '100%',
+        // LES CASELLES SON QUADRADES: l'alcada de la taula surt de la mateixa
+        // proporcio que les columnes (una retícula de 5x3 fa 3/5 d'alcada).
+        aspectRatio: `${columnes} / ${files}`,
         minHeight: 0,
       }}
     >
