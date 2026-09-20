@@ -108,6 +108,9 @@ function MegaStripePanelP1({
   megaShirtDrawingEnabledLocal,
   drawingOverlaySrcEffective,
   stripeMaskTileRectsRawPct,
+  // A la vista vertical la franja son dues fileres i la mascara de la
+  // samarreta (pensada per a una) les retalla: amb aixo no s'hi posa.
+  senseMascaraSamarreta = false,
   drawingOverlayDebug,
   tileGapPxLocal,
   humanInsideVariant,
@@ -462,12 +465,16 @@ function MegaStripePanelP1({
                     display: 'inline-block',
                     position: 'relative',
                     zIndex: 1,
-                    WebkitMaskImage: emptyShirtMaskUrl
-                      ? `url("${emptyShirtMaskUrl}")`
-                      : 'url(/placeholders/t-shirt_buttons/v5/full-clic-area-5.svg)',
-                    maskImage: emptyShirtMaskUrl
-                      ? `url("${emptyShirtMaskUrl}")`
-                      : 'url(/placeholders/t-shirt_buttons/v5/full-clic-area-5.svg)',
+                    WebkitMaskImage: senseMascaraSamarreta
+                      ? 'none'
+                      : (emptyShirtMaskUrl
+                        ? `url("${emptyShirtMaskUrl}")`
+                        : 'url(/placeholders/t-shirt_buttons/v5/full-clic-area-5.svg)'),
+                    maskImage: senseMascaraSamarreta
+                      ? 'none'
+                      : (emptyShirtMaskUrl
+                        ? `url("${emptyShirtMaskUrl}")`
+                        : 'url(/placeholders/t-shirt_buttons/v5/full-clic-area-5.svg)'),
                     WebkitMaskRepeat: 'no-repeat',
                     maskRepeat: 'no-repeat',
                     WebkitMaskSize: '103% 100%',
