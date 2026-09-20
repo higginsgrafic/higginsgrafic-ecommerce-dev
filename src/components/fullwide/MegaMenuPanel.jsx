@@ -6,7 +6,6 @@ import { lazy, Suspense, useRef, useEffect, useCallback, useState } from 'react'
    activa; canviar-ho obligaria a refer el component sencer. */
 /* eslint-disable react-hooks/rules-of-hooks */
 import MegaStripeBleedGuard from './MegaStripeBleedGuard.jsx';
-import GraellaFletxes from '../megaslide/GraellaFletxes.jsx';
 import MegaStripePanelP1 from './MegaStripePanelP1.jsx';
 import { factorAlcadaMegaslide } from './midesMegaslide.js';
 import { alcadaPanellMegaslide } from '../../utils/mesuraMegaslide.js';
@@ -317,13 +316,10 @@ export default function MegaMenuPanel({
               >
                 <div style={{ width: '25%', flexShrink: 0, display: 'block', height: '100%', position: 'relative', overflow: isPortraitTablet ? 'hidden' : 'visible' }}>
                   <div ref={viewport1Ref} data-mega-page-viewport="1" style={{
-                    // El CONTINGUT de la pagina 1 queda AMAGAT.
-                    visibility: 'hidden',
-                    pointerEvents: 'none',
                     width: '100%',
                     height: '100%',
                     display: 'flex',
-                    justifyContent: 'center',
+                    justifyContent: isPortraitTablet ? 'flex-start' : 'center',
                     overflowX: isPortraitTablet ? 'auto' : 'visible',
                     overflowY: isPortraitTablet ? 'hidden' : 'visible',
                     overscrollBehaviorX: isPortraitTablet ? 'contain' : undefined,
@@ -341,7 +337,7 @@ export default function MegaMenuPanel({
                       el que no hi cap s'hi arriba desplacant. D'aquesta
                       amplada en surt la calibracio (megaTileSize), aixi que
                       les mides del selector i de la franja tambe coincideixen. */}
-                  <div style={{ flex: '0 0 auto', width: isPortraitTablet ? '100%' : 'var(--hg-mega-w, 70.3vw)', maxWidth: 'none', position: 'relative', height: '100%', paddingLeft: '0px', paddingRight: '0px' }}>
+                  <div style={{ flex: '0 0 auto', width: isPortraitTablet ? '992px' : 'var(--hg-mega-w, 70.3vw)', maxWidth: 'none', position: 'relative', height: '100%', paddingLeft: '0px', paddingRight: '0px' }}>
                     <MegaStripePanelP1
                       active={active}
                       resolvedMega={resolvedMega}
@@ -349,7 +345,6 @@ export default function MegaMenuPanel({
                       fitAlcada={fitAlcada}
                       isLandscapeTablet={isLandscapeTablet}
                       onP1ContentBottomChange={handleP1ContentBottom}
-                      graellaFletxes={isPortraitTablet ? <GraellaFletxes /> : null}
                       onPageLiftChange={handleP1PageLift}
                       stripeRowPadPx={stripeRowPadPx}
                       stripeRowPadXPx={stripeRowPadXPx}
