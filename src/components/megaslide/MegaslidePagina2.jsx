@@ -14,6 +14,7 @@ import {
 } from '../fullwide/MegaColumn.jsx';
 import { FirstContactDibuix00Buttons } from '../fullwide/firstContactPanels.jsx';
 import { computeStripeTileOverlaySrcs, computeStripeTileItems, resolveForItem } from '@/utils/resolveStripeTile.js';
+import ContornsVertical, { contornsActius } from './ContornsVertical.jsx';
 import {
   GAP_PX,
   VerticalColleccions,
@@ -450,6 +451,7 @@ export default function MegaslidePagina2({
           <div
             data-vertical-megaslide="2"
             style={{
+              position: 'relative',
               width: carril ? `${Math.round(carril)}px` : '100%',
               maxWidth: '100%',
               margin: '0 auto',
@@ -464,6 +466,11 @@ export default function MegaslidePagina2({
               color: '#4A5057',
             }}
           >
+            {/* ELS CONTORNS de la reticula (nomes amb ?contornsVertical=1). */}
+            {contornsActius() ? (
+              <ContornsVertical carril={carril} columnes={[19, 34]} />
+            ) : null}
+
             {/* FILA 1: la graella de dibuixos, a tot el carril. */}
             <div style={{ gridColumn: '1 / -1' }} data-vertical-graella="1">
               <VerticalGraellaDibuixos active={active} />
