@@ -147,6 +147,17 @@ function MegaStripePanelP1({
   isPortraitTablet = false,
   isLandscapeTablet = false,
 }) {
+  // A la vista vertical la franja son DUES fileres de 7: les 14 posicions de
+  // la mascara es reparteixen 7 a dalt i 7 a baix (a l'apaisada van en una
+  // sola filera).
+  const rectsMascara = (Array.isArray(stripeMaskTileRectsRawPct) && stripeMaskTileRectsRawPct.length === 14 && isPortraitTablet)
+    ? stripeMaskTileRectsRawPct.map((r, idx) => ({
+      left: (idx % 7) * (100 / 7),
+      width: 100 / 7,
+      top: idx < 7 ? 0 : 50,
+      height: 50,
+    }))
+    : stripeMaskTileRectsRawPct;
   const emptyShirtMaskUrl = useEmptyShirtMask(emptyTileIndices, shirtColor);
   const pageRootRef = useRef(null);
   const pageLiftRef = useRef(0);
@@ -571,8 +582,8 @@ function MegaStripePanelP1({
                   {Array.isArray(emptyTileIndices) && emptyTileIndices.length > 0 ? (
                     <div className="absolute inset-0" aria-hidden="true" style={{ pointerEvents: 'none', zIndex: 10 }}>
                       {emptyTileIndices.map((idx) => {
-                        const r = Array.isArray(stripeMaskTileRectsRawPct) && stripeMaskTileRectsRawPct.length === 14
-                          ? stripeMaskTileRectsRawPct[idx]
+                        const r = Array.isArray(rectsMascara) && rectsMascara.length === 14
+                          ? rectsMascara[idx]
                           : null;
                         const leftPct = r ? Number(r.left) || 0 : (idx / 14) * 100;
                         const widthPct = r ? Number(r.width) || 0 : (1 / 14) * 100;
@@ -610,8 +621,8 @@ function MegaStripePanelP1({
                         background: 'transparent',
                       }}
                     >
-                      {Array.isArray(stripeMaskTileRectsRawPct) && stripeMaskTileRectsRawPct.length === 14
-                        ? stripeMaskTileRectsRawPct.map((r, idx) => {
+                      {Array.isArray(rectsMascara) && rectsMascara.length === 14
+                        ? rectsMascara.map((r, idx) => {
                           if (Array.isArray(stripeTileOverlaySrcs) && !stripeTileOverlaySrcs[idx]) {
                             return null;
                           }
@@ -782,7 +793,9 @@ function MegaStripePanelP1({
                                 boxSizing: 'border-box',
                                 background: drawingOverlayDebug ? 'rgba(217,70,239,0.06)' : 'transparent',
                                 border: drawingOverlayDebug ? '1px solid rgba(217,70,239,0.35)' : '0px solid transparent',
-                                transform: tileGapPxLocal ? `translateX(${idx * tileGapPxLocal}px)` : 'none',
+                                // El desplacament del gap va DINS de cada filera: a la vista vertical
+                                // (dues fileres de 7) la posicio dins la filera es idx % 7.
+                                transform: tileGapPxLocal ? `translateX(${(isPortraitTablet ? (idx % 7) : idx) * tileGapPxLocal}px)` : 'none',
                               }}
                             >
                               {drawingOverlayDebug ? (
@@ -1016,7 +1029,9 @@ function MegaStripePanelP1({
                                 width: `${(1 / 14) * 100}%`,
                                 overflow: 'hidden',
                                 boxSizing: 'border-box',
-                                transform: tileGapPxLocal ? `translateX(${idx * tileGapPxLocal}px)` : 'none',
+                                // El desplacament del gap va DINS de cada filera: a la vista vertical
+                                // (dues fileres de 7) la posicio dins la filera es idx % 7.
+                                transform: tileGapPxLocal ? `translateX(${(isPortraitTablet ? (idx % 7) : idx) * tileGapPxLocal}px)` : 'none',
                               }}
                             >
                               <img
@@ -1060,8 +1075,8 @@ function MegaStripePanelP1({
                 </div>
 
                 <div className="absolute inset-0" aria-hidden="true" style={{ pointerEvents: 'none', zIndex: 40 }}>
-                  {(Array.isArray(stripeMaskTileRectsRawPct) && stripeMaskTileRectsRawPct.length === 14
-                    ? stripeMaskTileRectsRawPct.map((r, idx) => ({
+                  {(Array.isArray(rectsMascara) && rectsMascara.length === 14
+                    ? rectsMascara.map((r, idx) => ({
                       idx,
                       cx: (Number(r?.left) || 0) + (Number(r?.width) || 0) / 2,
                     }))
