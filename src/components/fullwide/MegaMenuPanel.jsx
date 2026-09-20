@@ -463,10 +463,13 @@ export default function MegaMenuPanel({
                            (el mateix centre vertical). */
                         fletxes={(
                           <div style={{ width: '75.9%', position: 'relative', top: '-7.6px' }}>
+                          /* Les fletxes paginen la franja: el mateix mecanisme
+                             que fa servir el panell de la filera
+                             (setThinStartIndex). */
                           <FirstContactDibuix09Buttons
                             tileSize={96.8}
-                            onPrev={() => { touchMegaPublicActivity?.(); }}
-                            onNext={() => { touchMegaPublicActivity?.(); }}
+                            onPrev={() => { touchMegaPublicActivity?.(); setThinStartIndex?.((v) => v - 1); }}
+                            onNext={() => { touchMegaPublicActivity?.(); setThinStartIndex?.((v) => v + 1); }}
                           />
                           </div>
                         )}
