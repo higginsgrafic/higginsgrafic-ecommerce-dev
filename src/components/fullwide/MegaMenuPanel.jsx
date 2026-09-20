@@ -446,8 +446,10 @@ export default function MegaMenuPanel({
                             style={{ width: 'calc(100% + 16px)', height: 'auto', display: 'block', flexShrink: 0, maxWidth: 'none' }}
                           />
                         )}
+                        /* Les fletxes, alineades verticalment amb el selector
+                           (el mateix centre vertical). */
                         fletxes={(
-                          <div style={{ width: '75.9%' }}>
+                          <div style={{ width: '75.9%', position: 'relative', top: '-7.6px' }}>
                           <FirstContactDibuix09Buttons
                             tileSize={96.8}
                             onPrev={() => { touchMegaPublicActivity?.(); }}
