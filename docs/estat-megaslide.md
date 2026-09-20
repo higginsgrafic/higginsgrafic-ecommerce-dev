@@ -1683,12 +1683,12 @@ endavant.
 1. **L'amplada del carril**: `min(992, finestra − 80)`. A 768 són **688 px**
    (`768 − 2×40`), i creix fins als 992 de la tauleta de 1024. La composició viu
    dins del carril, no dins del tauler de 992 del belt.
-2. **La graella**: `MegaGridDibuixos` (la peça original) en **un sol bloc de
-   16 columnes × 4 files** (64 caselles) amb els dibuixos de la col·lecció
-   activa i les caselles que no tenen dibuix **buides** (`bloc16x4`). La peça
-   també ha recuperat la segona via per resoldre el dibuix d'un item que no és
-   al catàleg (`dibuixDeLlista`): abans els descartava i les files quedaven
-   curtes. Amb `cellPx`, les 16 columnes fan l'amplada del carril.
+2. **La graella**: `MegaGridDibuixos`, la peça **original i sense cap canvi**
+   (l'amo ho va demanar així: *«les graelles les podies aprofitar tal com eren»*).
+   Les seves 16 columnes es reparteixen l'ample del carril i fa **una fila**
+   mentre els dibuixos de la col·lecció activa hi caben; amb `items` s'hi passen
+   els de la col·lecció activa. Els intents d'afegir-hi `cellPx` i `bloc16x4`
+   (per forçar un bloc de 16×4) es van revertir: el component queda com era.
 3. **La franja**: 14 samarretes en **2×7**, sense scroll i sense belt, amb la
    **imatge de la franja curta** que va passar l'amo
    (`public/placeholders/tablet-vertical/stripe-curta-7x7.png`, 1379×593): un
@@ -1716,12 +1716,12 @@ endavant.
   `tests/unit/paradigma-vertical.test.js`).
 - `npx vite build` → OK.
 - `node scripts/compara-vistes.mjs` → **OK**, amb la branca nova: a la vertical
-  mesura la composició (carril 688, graella **16×4**, franja de 14 caselles
-  iguals dins del carril) i a les altres mides el cercador de sempre.
+  mesura la composició (carril 688, graella de **16 columnes**, franja de 14
+  caselles iguals dins del carril) i a les altres mides el cercador de sempre.
 - `npm run mesura:megaslide` → **897 xifres** a 7 mides. Contra la baseline
   anterior, **només** es mouen les xifres de la tauleta vertical 768; a
   **1024 / 1280 / 1366 / 1440 / 1920 no es mou res**.
-- Captures: `docs/comparacio/vertical-p2-16x4-768t.png` (la composició) i
+- Captures: `docs/comparacio/vertical-p2-graella-revertida-768t.png` i
   `vertical-p2-stripe-curta-768t.png` (la franja).
 
 **Pendent i conegut**

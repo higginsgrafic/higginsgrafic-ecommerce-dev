@@ -8,54 +8,54 @@
     },
     "panell": {
       "top": 131,
-      "bottom": 662,
+      "bottom": 531,
       "left": 0,
       "right": 753,
       "width": 753,
-      "height": 531,
+      "height": 400,
       "relTop": 0,
-      "relBottom": 531
+      "relBottom": 400
     },
     "guarda": {
       "top": 163,
-      "bottom": 629,
+      "bottom": 498,
       "left": 24,
       "right": 729,
       "width": 705,
-      "height": 466,
+      "height": 335,
       "relTop": 32,
-      "relBottom": 498
+      "relBottom": 367
     },
     "carril": {
       "top": 163,
-      "bottom": 629,
+      "bottom": 498,
       "left": -768,
       "right": 2304,
       "width": 3072,
-      "height": 466,
+      "height": 335,
       "relTop": 32,
-      "relBottom": 498
+      "relBottom": 367
     },
     "vistes": {
       "p1": {
         "top": 163,
-        "bottom": 629,
+        "bottom": 498,
         "left": -768,
         "right": 0,
         "width": 768,
-        "height": 466,
+        "height": 335,
         "relTop": 32,
-        "relBottom": 498
+        "relBottom": 367
       },
       "p2": {
         "top": 163,
-        "bottom": 629,
+        "bottom": 498,
         "left": 0,
         "right": 768,
         "width": 768,
-        "height": 466,
+        "height": 335,
         "relTop": 32,
-        "relBottom": 498
+        "relBottom": 367
       }
     },
     "selector": {
@@ -102,14 +102,14 @@
       }
     },
     "colors": {
-      "top": 471.03,
-      "bottom": 564.5,
+      "top": 340.91,
+      "bottom": 434.38,
       "left": 178.41,
       "right": 282.94,
       "width": 104.53,
       "height": 93.47,
-      "relTop": 340.03,
-      "relBottom": 433.5
+      "relTop": 209.91,
+      "relBottom": 303.38
     },
     "malla9P1": {
       "top": 163,
@@ -124,77 +124,77 @@
     "vertical": {
       "composicio": {
         "top": 163,
-        "bottom": 564.5,
+        "bottom": 434.38,
         "left": 40,
         "right": 728,
         "width": 688,
-        "height": 401.5,
+        "height": 271.38,
         "relTop": 32,
-        "relBottom": 433.5
+        "relBottom": 303.38
       },
       "scroll": {
         "top": 163,
-        "bottom": 565,
+        "bottom": 434,
         "left": 40,
         "right": 728,
         "width": 688,
-        "height": 402,
+        "height": 271,
         "relTop": 32,
-        "relBottom": 434
+        "relBottom": 303
       },
       "graella": {
         "top": 163,
-        "bottom": 330.5,
+        "bottom": 200.38,
         "left": 40,
         "right": 728,
         "width": 688,
-        "height": 167.5,
+        "height": 37.38,
         "relTop": 32,
-        "relBottom": 199.5
+        "relBottom": 69.38
       },
       "colleccions": {
-        "top": 346.5,
-        "bottom": 556.31,
+        "top": 216.38,
+        "bottom": 426.19,
         "left": 40,
         "right": 172.41,
         "width": 132.41,
         "height": 209.81,
-        "relTop": 215.5,
-        "relBottom": 425.31
+        "relTop": 85.38,
+        "relBottom": 295.19
       },
       "botons": {
-        "top": 346.5,
-        "bottom": 564.5,
+        "top": 216.38,
+        "bottom": 434.38,
         "left": 178.41,
         "right": 282.94,
         "width": 104.53,
         "height": 218,
-        "relTop": 215.5,
-        "relBottom": 433.5
+        "relTop": 85.38,
+        "relBottom": 303.38
       },
       "franja": {
-        "top": 346.5,
-        "bottom": 527.22,
+        "top": 216.38,
+        "bottom": 397.09,
         "left": 288.94,
         "right": 727.98,
         "width": 439.05,
         "height": 180.72,
-        "relTop": 215.5,
-        "relBottom": 396.22
+        "relTop": 85.38,
+        "relBottom": 266.09
       },
       "samarretes": 14,
       "samarretesAmbImatge": 7,
       "midaSamarreta": 57.58,
       "files": 1,
       "botoSelector": {
-        "top": 403.97,
-        "bottom": 429.05,
+        "top": 273.84,
+        "bottom": 298.92,
         "left": 178.41,
         "right": 282.94,
         "width": 104.53,
         "height": 25.08,
-        "relTop": 272.97,
-        "relBottom": 298.05
+        "relTop": 142.84,
+        "relBottom": 167.92
       }
     },
     "franja": {
@@ -209,14 +209,14 @@
         "relBottom": 260.84
       },
       "p2": {
-        "top": 346.5,
-        "bottom": 527.22,
+        "top": 216.38,
+        "bottom": 397.09,
         "left": 288.94,
         "right": 727.98,
         "width": 439.05,
         "height": 180.72,
-        "relTop": 215.5,
-        "relBottom": 396.22
+        "relTop": 85.38,
+        "relBottom": 266.09
       }
     },
     "variables": {
@@ -231,8 +231,8 @@
     },
     "deltes": {
       "selectorP2menysP1": 0,
-      "franjaP2menysP1": 52.94,
-      "colorsMenysSelectorP2": 300.47
+      "franjaP2menysP1": -77.19,
+      "colorsMenysSelectorP2": 170.35
     }
   },
   "tauleta apaisada 1024": {

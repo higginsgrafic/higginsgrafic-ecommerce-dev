@@ -53,9 +53,10 @@ const mesura = () => {
     const franja = document.querySelector('[data-vertical-franja="1"]');
     const samarretesV = [...vertical.querySelectorAll('[data-vertical-samarreta]')];
     const cv = r(vertical);
-    // La graella de dibuixos es UN bloc de 16 columnes x 4 files. L'estructura
-    // es wrapper > div (del component) > div (la graella de 64 caselles), i per
-    // aixo es baixa fill a fill: un selector de descendents cauria al wrapper.
+    // La graella de dibuixos: 16 columnes. Les files depenen dels dibuixos de
+    // la colleccio activa. L'estructura es wrapper > div (del component) > div
+    // (la graella), i per aixo es baixa fill a fill: un selector de descendents
+    // cauria al wrapper.
     const gridIntern = graella && graella.firstElementChild ? graella.firstElementChild.firstElementChild : null;
     const casellesGraella = gridIntern ? gridIntern.children.length : null;
     const columnesGraella = gridIntern ? getComputedStyle(gridIntern).gridTemplateColumns.split(' ').length : null;
@@ -180,9 +181,9 @@ for (const c of CASES) {
   if (!r.tilesIguals) {
     fallades.push(`${c.nom}: les caselles de la franja no son totes iguals`);
   }
-  // La graella de dibuixos ha de ser un bloc de 16 columnes x 4 files.
-  if (r.graellaColumnes !== 16 || r.graellaCaselles !== 64) {
-    fallades.push(`${c.nom}: la graella de dibuixos ha de ser de 16x4 (${r.graellaColumnes} columnes, ${r.graellaCaselles} caselles)`);
+  // La graella de dibuixos ha de tenir 16 columnes.
+  if (r.graellaColumnes !== 16) {
+    fallades.push(`${c.nom}: la graella de dibuixos ha de tenir 16 columnes i en te ${r.graellaColumnes}`);
   }
   if (r.samarretesH != null && (r.samarretesH < 30 || r.samarretesH > 140)) {
     notes.push(`la casella de samarreta fa ${r.samarretesH} px a ${c.nom}`);
