@@ -5,7 +5,7 @@ import MegaStripePanel from '../fullwide/MegaStripePanel.jsx';
 import { FRANJA_AJUST_PX } from '../fullwide/MegaStripePanelP1.jsx';
 import { desplacamentFranjaEscriptori } from '../../utils/mesuraMegaslide.js';
 import { carrilPx, carrilLane } from '../../utils/layoutMetrics.js';
-import TaulaVertical, { ampladaCarril } from './TaulaVertical.jsx';
+import { CapaTaulaVertical, TaulaVerticalP2 } from './TaulaVertical.jsx';
 import MegaHeroSlider from '../MegaHeroSlider.jsx';
 import Pauta4ColsOverlay from '../pauta/Pauta4ColsOverlay';
 import useMegaslideCalibration from '@/hooks/useMegaslideCalibration';
@@ -383,11 +383,6 @@ export default function MegaslidePagina2({
 
   const stripeEmptyMaskSrc = null;
 
-  // L'amplada del carril a la VERTICAL: es la que fa la taula dibuixada.
-  const carrilVertical = typeof window !== 'undefined' && window.innerWidth > 0
-    ? Math.round(ampladaCarril(window.innerWidth))
-    : 0;
-
   return (
     <div style={{ width: '25%', flexShrink: 0, display: isPortraitTablet ? 'block' : 'flex', height: '100%', position: 'relative', justifyContent: 'center', overflow: isPortraitTablet ? 'hidden' : 'visible' }}>
       <div
@@ -657,23 +652,9 @@ export default function MegaslidePagina2({
           que s'hi veu es la TAULA dibuixada (5 columnes x 3 files), a
           l'amplada del carril. Es una capa absoluta: no mou res del layout. */}
       {isPortraitTablet ? (
-        <div
-          data-megaslide-taula="2"
-          style={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            display: 'flex',
-            justifyContent: 'center',
-            pointerEvents: 'none',
-          }}
-        >
-          <div style={{ width: carrilVertical ? `${carrilVertical}px` : '100%', maxWidth: '100%', height: '100%' }}>
-            <TaulaVertical />
-          </div>
-        </div>
+        <CapaTaulaVertical pagina={2}>
+          <TaulaVerticalP2 />
+        </CapaTaulaVertical>
       ) : null}
 
     </div>

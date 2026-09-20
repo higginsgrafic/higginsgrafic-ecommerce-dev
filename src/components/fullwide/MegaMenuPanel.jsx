@@ -10,7 +10,7 @@ import MegaStripePanelP1 from './MegaStripePanelP1.jsx';
 import { factorAlcadaMegaslide } from './midesMegaslide.js';
 import { alcadaPanellMegaslide } from '../../utils/mesuraMegaslide.js';
 import MegaslidePagina2 from '../megaslide/MegaslidePagina2.jsx';
-import { alturaTaulaVertical } from '../megaslide/TaulaVertical.jsx';
+import { alturaTaulaVertical, CapaTaulaVertical, TaulaVerticalP1 } from '../megaslide/TaulaVertical.jsx';
 
 const MegaslidePagina3 = lazy(() => import('../megaslide/MegaslidePagina3.jsx'));
 const MegaslidePagina4 = lazy(() => import('../megaslide/MegaslidePagina4.jsx'));
@@ -325,6 +325,11 @@ export default function MegaMenuPanel({
               >
                 <div style={{ width: '25%', flexShrink: 0, display: 'block', height: '100%', position: 'relative', overflow: isPortraitTablet ? 'hidden' : 'visible' }}>
                   <div ref={viewport1Ref} data-mega-page-viewport="1" style={{
+                    // A la VERTICAL, el contingut de debò de la pagina 1 queda
+                    // AMAGAT i el que s'hi veu es la TAULA dibuixada (la
+                    // mateixa que a la pagina 2). A la resta de formats no es
+                    // toca res.
+                    visibility: isPortraitTablet ? 'hidden' : undefined,
                     width: '100%',
                     height: '100%',
                     display: 'flex',
@@ -398,6 +403,14 @@ export default function MegaMenuPanel({
                     flex: isPortraitTablet ? '0 0 0px' : '1 1 auto',
                   }} />
                   </div>
+
+                  {/* La TAULA de la pagina 1: la mateixa capa que la de la
+                      pagina 2 (absoluta, centrada i a l'amplada del carril). */}
+                  {isPortraitTablet ? (
+                    <CapaTaulaVertical pagina={1}>
+                      <TaulaVerticalP1 />
+                    </CapaTaulaVertical>
+                  ) : null}
                 </div>
 
                 <MegaslidePagina2
