@@ -6,6 +6,8 @@ import { FRANJA_AJUST_PX } from '../fullwide/MegaStripePanelP1.jsx';
 import { desplacamentFranjaEscriptori } from '../../utils/mesuraMegaslide.js';
 import { carrilPx, carrilLane } from '../../utils/layoutMetrics.js';
 import { CapaTaulaVertical, TaulaVerticalP2 } from './TaulaVertical.jsx';
+import MegaGridDibuixos from '../fullwide/MegaGridDibuixos.jsx';
+import { CercadorColleccions, CercadorColors } from '../fullwide/CercadorTopBar.jsx';
 import MegaHeroSlider from '../MegaHeroSlider.jsx';
 import Pauta4ColsOverlay from '../pauta/Pauta4ColsOverlay';
 import useMegaslideCalibration from '@/hooks/useMegaslideCalibration';
@@ -653,7 +655,45 @@ export default function MegaslidePagina2({
           l'amplada del carril. Es una capa absoluta: no mou res del layout. */}
       {isPortraitTablet ? (
         <CapaTaulaVertical pagina={2}>
-          <TaulaVerticalP2 />
+          <TaulaVerticalP2
+            /* Les peces de debò, una per casella. */
+            graella={<MegaGridDibuixos active={active} className="w-full" />}
+            colleccions={<CercadorColleccions activeKey={active} onSelect={setActive} vertical />}
+            colors={(
+              <CercadorColors
+                selectedColor={cercadorSelectedColor}
+                onSelectColor={setCercadorSelectedColor}
+                columnes={4}
+              />
+            )}
+            stripe={(
+              <img
+                src="/placeholders/tablet vertical/stripe-curta-7+7.png"
+                alt=""
+                style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+              />
+            )}
+            selector={(
+              <FirstContactDibuix00Buttons
+                onWhite={() => {
+                  setFirstContactVariant?.('white');
+                  setHumanInsideVariant?.('white');
+                }}
+                onBlack={() => {
+                  setFirstContactVariant?.('black');
+                  setHumanInsideVariant?.('black');
+                }}
+                onMulti={() => {
+                  setFirstContactVariant?.('color');
+                  setHumanInsideVariant?.('color');
+                }}
+                showWhite={stripeVariantVisibility?.white !== false}
+                showBlack={stripeVariantVisibility?.black !== false}
+                showMulti={stripeVariantVisibility?.color !== false}
+                selectedVariant={active === 'the_human_inside' ? humanInsideVariant : firstContactVariant}
+              />
+            )}
+          />
         </CapaTaulaVertical>
       ) : null}
 

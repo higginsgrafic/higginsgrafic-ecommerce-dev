@@ -100,7 +100,7 @@ export function TaulaVerticalP1({ grid = null, stripe = null, fletxes = null, se
  * La 6 i l'11 son la MATEIXA casella, i els blocs 8-10 i 13-15 tambe (les dues
  * fusionades de dalt a baix). Cada casella porta escrit el nom del que hi anira.
  */
-export function TaulaVerticalP2() {
+export function TaulaVerticalP2({ graella = null, colleccions = null, colors = null, selector = null, stripe = null }) {
   return (
     <div
       data-taula-vertical="2"
@@ -114,11 +114,11 @@ export function TaulaVerticalP2() {
         minHeight: 0,
       }}
     >
-      <div data-taula-cela="1-5" style={{ ...CELA, gridColumn: '1 / -1', gridRow: '1' }}>Graella dibuixos 16x4</div>
-      <div data-taula-cela="6-11" style={{ ...CELA, gridColumn: '1', gridRow: '2 / 4' }}>Col·leccions</div>
-      <div data-taula-cela="7" style={{ ...CELA, gridColumn: '2', gridRow: '2' }}>Graella colors 4x4</div>
-      <div data-taula-cela="8-10+13-15" style={{ ...CELA, gridColumn: '3 / 6', gridRow: '2 / 4' }}>Stripe</div>
-      <div data-taula-cela="12" style={{ ...CELA, gridColumn: '2', gridRow: '3' }}>Selector b/c/n</div>
+      <div data-taula-cela="1-5" style={{ ...CELA, gridColumn: '1 / -1', gridRow: '1' }}>{graella || 'Graella dibuixos 16x4'}</div>
+      <div data-taula-cela="6-11" style={{ ...CELA, gridColumn: '1', gridRow: '2 / 4' }}>{colleccions || 'Col·leccions'}</div>
+      <div data-taula-cela="7" style={{ ...CELA, gridColumn: '2', gridRow: '2' }}>{colors || 'Graella colors 4x4'}</div>
+      <div data-taula-cela="8-10+13-15" style={{ ...CELA, gridColumn: '3 / 6', gridRow: '2 / 4' }}>{stripe || 'Stripe'}</div>
+      <div data-taula-cela="12" style={{ ...CELA, gridColumn: '2', gridRow: '3' }}>{selector || 'Selector b/c/n'}</div>
     </div>
   );
 }
