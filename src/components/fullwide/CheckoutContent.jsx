@@ -110,6 +110,11 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
   // Números propis, als mateixos valors inicials que l'horitzontal perquè és la
   // mateixa recepta; d'aquí en endavant cada variant se'n retoca per separado.
   const P_FIELD_GAP = 5;
+  // Alçada dels CAMPS de text de la vertical (els 10 inputs i el selector de
+  // pais). Mes baixos que a la resta de formats: l'amo els vol mes curts.
+  // Nomes els camps: el botó de pagar i les capses de la targeta (que van amb
+  // l'iframe de Stripe) es queden amb la seva alçada.
+  const P_FIELD_H = 32;
   const P_TITLE_GAP = 10;
   // El titol PAGAMENT de la vertical. Aquest es l'unic numero que el mou
   // (moure'l tambe a l'escriptori o a l'apaisada vol un valor propi).
@@ -487,9 +492,9 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
 
   const inputStyle = {
     width: '100%',
-    // A la vertical els camps fan la mateixa alçada que el botó de pagar
-    // (39px), que és la del camp de la targeta.
-    height: isPortraitTablet ? `${P_CARD_FIELD_H}px` : (isNarrowForm ? '28px' : '34px'),
+    // A la vertical els camps de text son mes baixos que a la resta de formats
+    // (P_FIELD_H); el botó de pagar i les capses de la targeta no es toquen.
+    height: isPortraitTablet ? `${P_FIELD_H}px` : (isNarrowForm ? '28px' : '34px'),
     border: '1px solid #D8DDE3',
     borderRadius: '4px',
     padding: '0 10px',
