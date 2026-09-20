@@ -483,9 +483,8 @@ export default function MegaMenuPanel({
                            (el mateix centre vertical). */
                         fletxes={(
                           <div style={{ width: '75.9%', position: 'relative', top: '-7.6px' }}>
-                          /* Les fletxes paginen la franja: el mateix mecanisme
-                             que fa servir el panell de la filera
-                             (setThinStartIndex). */
+                          {/* Les fletxes paginen la graella: setPaginaGraella mou
+                              la pagina de 7 dibuixos. */}
                           <FirstContactDibuix09Buttons
                             tileSize={96.8}
                             onPrev={() => { touchMegaPublicActivity?.(); setPaginaGraella((v) => v - 1); }}
