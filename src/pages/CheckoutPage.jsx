@@ -5,6 +5,8 @@ import SEO from '@/components/SEO';
 import CheckoutContent from '@/components/fullwide/CheckoutContent';
 import MegaslideEndGuide from '@/components/dev/MegaslideEndGuide';
 import { useCart } from '@/contexts/CartContext';
+import useDeviceLayout from '@/hooks/useDeviceLayout';
+import { ampladaCarril } from '@/components/megaslide/TaulaVertical.jsx';
 
 /**
  * Pàgina de pagament.
@@ -26,6 +28,15 @@ import { useCart } from '@/contexts/CartContext';
 export default function CheckoutPage() {
   const { cartItems, setCartItems, getTotalItems } = useCart();
   const navigate = useNavigate();
+
+  // La TAULA del megaslide (l'amplada del carril). A la VERTICAL la pagina del
+  // checkout hi ha d'encaixar: amb `--hg-mega-w` (992, la mida de l'horitzontal)
+  // el formulari se surt de la pantalla i la columna de pagament queda tallada.
+  // A la resta de formats no es toca res.
+  const { isPortraitTablet, viewportWidth } = useDeviceLayout();
+  const ampleTaula = isPortraitTablet && viewportWidth > 0
+    ? Math.round(ampladaCarril(viewportWidth))
+    : 0;
 
   // Important: només mirem si el cistell és buit EN ENTRAR. Si ho féssim de
   // manera contínua, en buidar-se el cistell just després de pagar aquesta
@@ -110,9 +121,10 @@ export default function CheckoutPage() {
           minHeight: '60vh',
           // El carril central, exactament com la fila de la capcalera (que va
           // amb `--hg-mega-w` i `--hg-mega-x`): del logo a la icona d'usuari.
+          // A la VERTICAL mana la TAULA del megaslide (el carril, 688 a 768).
           // Abans anava amb `--site-w` i, a 1440, el formulari feia 1350 px
           // mentre el carril en fa 1013.
-          width: 'var(--hg-mega-w, 100%)',
+          width: ampleTaula ? `${ampleTaula}px` : 'var(--hg-mega-w, 100%)',
           // Centrat: el carril sempre ho esta (a tauleta `--hg-mega-x` val 152
           // perque ve del belt de 70,3 vw, i a sobre el marc del lloc es 16).
           margin: '0 auto',
