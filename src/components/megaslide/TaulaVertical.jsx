@@ -91,14 +91,14 @@ export function TaulaVerticalP1({ grid = null, stripe = null, fletxes = null, se
       }}
     >
       <div data-taula-cela="1-5" style={{ ...CELA, gridColumn: '1 / -1', gridRow: '1' }}>{grid || 'Grid'}</div>
-      <div data-taula-cela="6" style={{ ...CELA, gridColumn: '1', gridRow: '2', marginRight: '20px' }} />
+      <div data-taula-cela="6" style={{ ...CELA, gridColumn: '1', gridRow: '2', marginRight: '20px', alignItems: 'flex-end' }}>{selector || null}</div>
       <div data-taula-cela="7-9+12-14" style={{ ...CELA, gridColumn: '2 / 5', gridRow: '2 / 4', justifyContent: 'center', alignItems: 'flex-end', marginLeft: '-20px', marginRight: '-20px' }}>{stripe || 'Stripe'}</div>
       <div data-taula-cela="10" style={{ ...CELA, gridColumn: '5', gridRow: '2', marginLeft: '20px' }}>{fletxes || 'Fletxes'}</div>
       <div data-taula-cela="11" style={{ ...CELA, gridColumn: '1', gridRow: '3', marginRight: '20px' }} />
       {/* La casella del selector, exactament com la de la pagina 2: els
           mateixos marges (20 a la dreta) i la mateixa correguda (10 a
           l'esquerra), i el selector al bottom. */}
-      <div data-taula-cela="15" style={{ ...CELA, gridColumn: '5', gridRow: '3', marginLeft: '20px', alignItems: 'flex-end' }}>{selector || 'Selector b/c/n'}</div>
+      <div data-taula-cela="15" style={{ ...CELA, gridColumn: '5', gridRow: '3', marginLeft: '20px' }} />
     </div>
   );
 }
