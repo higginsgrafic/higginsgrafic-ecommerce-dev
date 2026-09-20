@@ -511,7 +511,8 @@ function PdpDesktop({ product }) {
           style={{
             height: isLandscapeTablet && Number.isFinite(tdpAvailableHeight) ? `${tdpRenderedHeight}px` : undefined,
             overflow: isLandscapeTablet && Number.isFinite(tdpAvailableHeight) ? 'hidden' : undefined,
-            marginTop: isPortraitTablet ? '200px' : (esApaissadaAmpla ? '18px' : (isLandscapeTablet ? '68px' : (esEscriptoriEstret ? '-12px' : '-32px'))),
+            // 100 px d'aire entre 'Altres histories' i la TDP.
+            marginTop: isPortraitTablet ? '300px' : (esApaissadaAmpla ? '18px' : (isLandscapeTablet ? '68px' : (esEscriptoriEstret ? '-12px' : '-32px'))),
             marginBottom: '32px',
           }}
         >
