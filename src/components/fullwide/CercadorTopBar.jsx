@@ -1,4 +1,5 @@
 import React from 'react';
+import { colorGap, colorMida } from './midesGraella.js';
 
 /**
  * CercadorTopBar
@@ -63,69 +64,65 @@ const C_COLLECTIONS_WIDTH = '58cqw';
 const C_COLLECTIONS_LEFT = 'calc(0.155cqw + 15px)';
 const C_COLLECTIONS_FONT = '7pt';
 
-function CercadorTopBar({
-  activeCollection,
-  activeSubcollection,
-  onSelectCollection,
-  selectedColor = 'white',
-  onSelectColor,
-  barBg = '#F8F8F8',
-}) {
-  const activeKey = activeCollection === 'austen'
-    ? `austen:${activeSubcollection || ''}`
-    : activeCollection;
+/** La zona de COL·LECCIONS de la barra del cercador. En fila (horitzontal,
+ * com a la barra) o en columna (`vertical`, per a la taula del megaslide). */
+export function CercadorColleccions({ activeKey, onSelect, vertical = false }) {
   return (
     <div
+      data-cercador-colleccions="1"
       style={{
         display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        width: '100%',
-        backgroundColor: barBg,
-        borderRadius: 0,
-        padding: 0,
-        height: 38,
-        boxSizing: 'border-box',
-        gap: 12,
-        containerType: 'inline-size',
+        flexDirection: vertical ? 'column' : 'row',
+        alignItems: vertical ? 'stretch' : 'center',
+        justifyContent: vertical ? 'flex-start' : 'space-between',
+        width: vertical ? '100%' : C_COLLECTIONS_WIDTH,
+        marginLeft: vertical ? undefined : C_COLLECTIONS_LEFT,
+        height: vertical ? undefined : '100%',
+        flexShrink: 0,
       }}
     >
-      {/* Zona de col·leccions: 5 cel·les iguals (10cqw c/u, 50cqw total),
-          text centrat; el seleccionat mostra un rectangle blanc inset. */}
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          width: C_COLLECTIONS_WIDTH,
-          marginLeft: C_COLLECTIONS_LEFT,
-          height: '100%',
-          flexShrink: 0,
-        }}
-      >
-        {CERCADOR_COLLECTIONS.map(({ key, label }) => {
-          const isActive = key === activeKey;
-          return (
-            <button
-              key={key}
-              type="button"
-              onClick={() => {
-                if (typeof onSelectCollection === 'function') onSelectCollection(key);
-              }}
-              style={{
-                appearance: 'none',
-                border: 'none',
-                background: 'transparent',
-                cursor: 'pointer',
-                position: 'relative',
-                flex: '0 0 auto',
-                height: '100%',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                padding: 0,
-              }}
-            >
+      {CERCADOR_COLLECTIONS.map(({ key, label }) => {
+        const isActive = key === activeKey;
+        return (
+          <button
+            key={key}
+            type="button"
+            onClick={() => {
+              if (typeof onSelect === 'function') onSelect(key);
+            }}
+            aria-current={vertical && isActive ? 'true' : undefined}
+            style={{
+              appearance: 'none',
+              border: 'none',
+              background: vertical ? (isActive ? '#F1F3F5' : 'transparent') : 'transparent',
+              borderRadius: vertical ? '2px' : undefined,
+              cursor: 'pointer',
+              position: 'relative',
+              flex: '0 0 auto',
+              height: vertical ? undefined : '100%',
+              width: vertical ? '100%' : undefined,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: vertical ? 'flex-start' : 'center',
+              padding: vertical ? '3px 6px' : 0,
+              textAlign: vertical ? 'left' : undefined,
+            }}
+          >
+            {vertical ? (
+              <span
+                className="font-roboto-condensed"
+                style={{
+                  whiteSpace: 'nowrap',
+                  fontSize: '9.5pt',
+                  fontWeight: isActive ? 700 : 300,
+                  letterSpacing: '0.02em',
+                  lineHeight: 1.15,
+                  color: '#3A3A3A',
+                }}
+              >
+                {label}
+              </span>
+            ) : (
               <span style={{ position: 'relative', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>
                 <span
                   className="font-roboto-condensed"
@@ -158,71 +155,121 @@ function CercadorTopBar({
                   {label}
                 </span>
               </span>
-            </button>
-          );
-        })}
-      </div>
+            )}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
 
-      {/* Zona de colors */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: C_COLORS_GAP, flexShrink: 0, paddingRight: C_COLORS_PAD_RIGHT }}>
-        {CERCADOR_COLORS.map(({ slug, hex }) => {
-          const isSelected = slug === selectedColor;
-          return (
-            <button
-              key={slug}
-              type="button"
-              aria-label={slug}
-              onClick={() => {
-                if (typeof onSelectColor === 'function') onSelectColor(slug);
-              }}
+/** La zona de COLORS de la barra del cercador. En fila (horitzontal, com a la
+ * barra) o en graella de `columnes` columnes (per a la taula del megaslide). */
+export function CercadorColors({ selectedColor, onSelectColor, columnes = 0 }) {
+  const enGraella = columnes > 0;
+  const cerclePx = enGraella ? colorMida(true, false) : null;
+  const gapPx = enGraella ? colorGap(true, false) : null;
+  const ample = enGraella ? `${cerclePx}px` : C_CIRCLE;
+  const ampleAnell = enGraella ? `${cerclePx}px` : C_RING_OUTER;
+  return (
+    <div
+      data-cercador-colors="1"
+      style={enGraella
+        ? { display: 'grid', gridTemplateColumns: `repeat(${columnes}, ${cerclePx}px)`, gridAutoRows: `${cerclePx}px`, gap: `${gapPx}px`, flexShrink: 0 }
+        : { display: 'flex', alignItems: 'center', gap: C_COLORS_GAP, flexShrink: 0, paddingRight: C_COLORS_PAD_RIGHT }}
+    >
+      {CERCADOR_COLORS.map(({ slug, hex }) => {
+        const isSelected = slug === selectedColor;
+        return (
+          <button
+            key={slug}
+            type="button"
+            aria-label={slug}
+            onClick={() => {
+              if (typeof onSelectColor === 'function') onSelectColor(slug);
+            }}
+            style={{
+              appearance: 'none',
+              border: 'none',
+              background: 'transparent',
+              cursor: 'pointer',
+              position: 'relative',
+              width: ampleAnell,
+              height: ampleAnell,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              padding: 0,
+            }}
+          >
+            <span
               style={{
-                appearance: 'none',
-                border: 'none',
-                background: 'transparent',
-                cursor: 'pointer',
-                position: 'relative',
-                width: C_RING_OUTER,
-                height: C_RING_OUTER,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                padding: 0,
+                display: 'block',
+                width: ample,
+                height: ample,
+                borderRadius: '50%',
+                backgroundColor: hex,
+                border: C_OUTLINE,
+                boxSizing: 'border-box',
               }}
-            >
+            />
+            {isSelected ? (
               <span
+                aria-hidden="true"
                 style={{
-                  display: 'block',
-                  width: C_CIRCLE,
-                  height: C_CIRCLE,
+                  position: 'absolute',
+                  top: '50%',
+                  left: '50%',
+                  transform: 'translate(-50%, -50%)',
+                  width: ampleAnell,
+                  height: ampleAnell,
                   borderRadius: '50%',
-                  backgroundColor: hex,
-                  border: C_OUTLINE,
+                  borderStyle: 'solid',
+                  borderColor: '#000000',
+                  borderWidth: C_RING_THICKNESS,
                   boxSizing: 'border-box',
+                  pointerEvents: 'none',
                 }}
               />
-              {isSelected ? (
-                <span
-                  aria-hidden="true"
-                  style={{
-                    position: 'absolute',
-                    top: '50%',
-                    left: '50%',
-                    transform: 'translate(-50%, -50%)',
-                    width: C_RING_OUTER,
-                    height: C_RING_OUTER,
-                    borderRadius: '50%',
-                    borderStyle: 'solid',
-                    borderColor: '#000000',
-                    borderWidth: C_RING_THICKNESS,
-                    boxSizing: 'border-box',
-                    pointerEvents: 'none',
-                  }}
-                />
-              ) : null}
-            </button>
-          );
-        })}
-      </div>
+            ) : null}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+function CercadorTopBar({
+  activeCollection,
+  activeSubcollection,
+  onSelectCollection,
+  selectedColor = 'white',
+  onSelectColor,
+  barBg = '#F8F8F8',
+}) {
+  const activeKey = activeCollection === 'austen'
+    ? `austen:${activeSubcollection || ''}`
+    : activeCollection;
+  return (
+    <div
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        width: '100%',
+        backgroundColor: barBg,
+        borderRadius: 0,
+        padding: 0,
+        height: 38,
+        boxSizing: 'border-box',
+        gap: 12,
+        containerType: 'inline-size',
+      }}
+    >
+      {/* Zona de col·leccions i zona de colors: les MATEIXES peces que fa
+          servir la taula de la vista vertical (aqui, en fila). */}
+      <CercadorColleccions activeKey={activeKey} onSelect={onSelectCollection} />
+      <CercadorColors selectedColor={selectedColor} onSelectColor={onSelectColor} />
     </div>
   );
 }
