@@ -399,10 +399,10 @@ export function CercadorDibuixosGraella({
                 alt={label}
                 loading="lazy"
                 style={{
-                  // En manera d'omplir, el dibuix va un 10% mes petit que la
+                  // En manera d'omplir, el dibuix va un 20% mes petit que la
                   // seva casella (la retícula queda igual).
-                  height: omple ? '90%' : costat,
-                  width: omple ? '90%' : costat,
+                  height: omple ? '80%' : costat,
+                  width: omple ? '80%' : costat,
                   objectFit: 'contain',
                   display: 'block',
                 }}
@@ -552,11 +552,13 @@ export function CercadorColleccionsColumna({
               minHeight: 0,
               padding: '0 6px',
               borderRadius: '3px',
-              backgroundColor: '#F1F3F5',
+              // El SELECTOR es la pastilla de fons: nomes la porta la colleccio
+              // activa. Cap negreta.
+              backgroundColor: key === activeKey ? '#F1F3F5' : 'transparent',
               color: '#2B2B2B',
               fontFamily: 'inherit',
               fontSize: '8.5pt',
-              fontWeight: key === activeKey ? 700 : 400,
+              fontWeight: 400,
               whiteSpace: 'nowrap',
               overflow: 'hidden',
               textOverflow: 'ellipsis',
