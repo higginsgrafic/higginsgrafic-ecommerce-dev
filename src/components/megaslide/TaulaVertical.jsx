@@ -36,9 +36,10 @@ export function alturaTaulaVertical(ampleFinestra) {
   return Math.ceil((ampladaCarril(ampleFinestra) * 3) / 5) - 43.8;
 }
 
-/** L'estil d'una casella: el contorn dibuixat i el número centrat. */
+/** L'estil d'una casella. El contorn es transparent (no `none`) perque la
+ * geometria de les caselles no es mogui en amagar-lo. */
 const CELA = {
-  border: '1px solid rgba(0, 0, 0, 0.35)',
+  border: '1px solid transparent',
   boxSizing: 'border-box',
   minWidth: 0,
   minHeight: 0,
