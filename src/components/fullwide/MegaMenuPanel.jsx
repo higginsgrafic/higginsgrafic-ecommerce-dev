@@ -267,6 +267,11 @@ export default function MegaMenuPanel({
     desarAlcada(`${alcadaGuard(p1ContentBottomPx)}px`);
   }, [mesuraEstable, p1ContentBottomPx, isPortraitTablet, paymentFillsScreen, margeExtraDesktop]);
 
+  // La graella de dibuixos de la taula ensenya 7 dibuixos alhora (com la
+  // columna de l'horitzontal) i les fletxes passen de pagina.
+  const [paginaGraella, setPaginaGraella] = useState(0);
+  const DIBUIXOS_PER_PAGINA = 7;
+
   // Les props compartides de la franja de la pagina 1: les fan servir la
   // instancia de la filera (horitzontal) i la de la casella de la taula
   // (vertical). Les que son de layout NOMES van a la de la filera.
@@ -423,7 +428,10 @@ export default function MegaMenuPanel({
                         grid={(() => {
                           // Les tiles de la graella, de la mida de la casella: la
                           // graella omple tota l'amplada i l'alcada de la casella.
-                          const items = dibuixosGraella16x4().filter((it) => it.collection === active);
+                          const tots = dibuixosGraella16x4().filter((it) => it.collection === active);
+                          const pagines = Math.max(1, Math.ceil(tots.length / DIBUIXOS_PER_PAGINA));
+                          const pagina = ((paginaGraella % pagines) + pagines) % pagines;
+                          const items = tots.slice(pagina * DIBUIXOS_PER_PAGINA, pagina * DIBUIXOS_PER_PAGINA + DIBUIXOS_PER_PAGINA);
                           const n = items.length || 1;
                           return (
                             // Les tiles, un 15% mes petites, pero amb els
@@ -438,6 +446,17 @@ export default function MegaMenuPanel({
                               tilesPercent={85}
                               activeCollection={active}
                               isPortraitTablet
+                              /* El tap en un dibuix el tria, igual que a la
+                                 filera de la pagina 2. */
+                              onSelectGroup={(collection, subcollection, firstStripeItem) => {
+                                if (collection !== active) setActive?.(collection);
+                                setStripeOverlayOverrideActive?.(false);
+                                if (firstStripeItem) {
+                                  if (collection === 'first_contact') setFirstContactSelectedItem?.(firstStripeItem);
+                                  else if (collection === 'the_human_inside') setHumanInsideSelectedItem?.(firstStripeItem);
+                                  else setSelectedItemByCollection?.((prev) => ({ ...prev, [collection]: firstStripeItem }));
+                                }
+                              }}
                             />
                           );
                         })()}
@@ -468,8 +487,8 @@ export default function MegaMenuPanel({
                              (setThinStartIndex). */
                           <FirstContactDibuix09Buttons
                             tileSize={96.8}
-                            onPrev={() => { touchMegaPublicActivity?.(); setThinStartIndex?.((v) => v - 1); }}
-                            onNext={() => { touchMegaPublicActivity?.(); setThinStartIndex?.((v) => v + 1); }}
+                            onPrev={() => { touchMegaPublicActivity?.(); setPaginaGraella((v) => v - 1); }}
+                            onNext={() => { touchMegaPublicActivity?.(); setPaginaGraella((v) => v + 1); }}
                           />
                           </div>
                         )}
