@@ -1,11 +1,12 @@
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import MegaColumn from './MegaColumn.jsx';
-import { ampladaCarril } from '../megaslide/VerticalPieces.jsx';
 import ClicAreaOverlayP1 from './ClicAreaOverlayP1.jsx';
 import { CERCADOR_COLORS } from './CercadorTopBar.jsx';
 import { STRIPE_DRAWING_CALIBRATIONS } from '../../config/stripeCalibrations';
 import { deltaObjectiuPageLift, desplacamentFranjaEscriptori } from '../../utils/mesuraMegaslide.js';
 import { carrilPx } from '../../utils/layoutMetrics.js';
+import TaulaVertical from '../megaslide/TaulaVertical.jsx';
+import { ampladaCarril } from '../megaslide/VerticalPieces.jsx';
 
 // La franja de samarretes de la pàgina 1 tendeix a quedar-se uns 10 px més avall
 // del que toca: l'alçada del contenidor de la pàgina es calcula a partir del
@@ -249,26 +250,25 @@ function MegaStripePanelP1({
     return () => window.removeEventListener('mega-stripe-full-hit-p1', handler);
   }, [onShirtClick, selectedItem, stripeTileItems, active, shirtColor]);
 
-  // A la VERTICAL, el contingut de la pagina 1 queda AMAGAT i, si se'ns passa,
-  // hi ha la graella de les caselles de les fletxes.
-  if (isPortraitTablet && graellaFletxes) {
+  // A la VERTICAL, el contingut de la pagina 1 queda AMAGAT i s'hi munta la
+  // TAULA de la pagina, amb la graella de 5x3 dins de la cel·la del carrusel.
+  if (isPortraitTablet) {
+    const carril = ampladaCarril(typeof window !== 'undefined' ? window.innerWidth : 0);
     return (
-      <div
-        ref={pageRootRef}
-        data-megaslide-graella="1"
-        style={{
-          // Centrada a la VISTA i enganxada pel BAIX al segon header: es puja
-          // la propia alcada de la graella (132 px) mes el que ja hi era.
-          position: 'relative',
-          top: '-128px',
-          width: '100%',
-          padding: 0,
-          display: 'flex',
-          justifyContent: 'center',
-          pointerEvents: 'auto',
-        }}
-      >
-        {graellaFletxes}
+      <div ref={pageRootRef} className="w-full shrink-0">
+        <div
+          data-megaslide-taula="1"
+          style={{
+            width: carril ? `${Math.round(carril)}px` : '100%',
+            maxWidth: '100%',
+            margin: '0 auto',
+            boxSizing: 'border-box',
+            minHeight: '420px',
+            display: 'flex',
+          }}
+        >
+          <TaulaVertical etiquetes graellaCarrusel={graellaFletxes} />
+        </div>
       </div>
     );
   }
