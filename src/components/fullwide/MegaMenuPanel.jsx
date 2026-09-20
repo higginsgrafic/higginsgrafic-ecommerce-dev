@@ -267,6 +267,52 @@ export default function MegaMenuPanel({
     desarAlcada(`${alcadaGuard(p1ContentBottomPx)}px`);
   }, [mesuraEstable, p1ContentBottomPx, isPortraitTablet, paymentFillsScreen, margeExtraDesktop]);
 
+  // Les props compartides de la franja de la pagina 1: les fan servir la
+  // instancia de la filera (horitzontal) i la de la casella de la taula
+  // (vertical). Les que son de layout NOMES van a la de la filera.
+  const propsFranjaP1 = {
+    active: active,
+    resolvedMega: resolvedMega,
+    showStripe: showStripe,
+    fitAlcada: fitAlcada,
+    isLandscapeTablet: isLandscapeTablet,
+    stripeRowPadPx: stripeRowPadPx,
+    stripeRowPadXPx: stripeRowPadXPx,
+    stripePreviewHPx: stripePreviewHPx,
+    stripeOverlayLoadState: stripeOverlayLoadState,
+    resolvedOverlaySrc: resolvedOverlaySrc,
+    stripeOverlayDebug: stripeOverlayDebug,
+    stripeMaskDebugRectsPct: stripeMaskDebugRectsPct,
+    megaStripeSpriteEnabledLocal: megaStripeSpriteEnabledLocal,
+    megaStripeRefEnabledLocal: megaStripeRefEnabledLocal,
+    megaStripeRefSrcLocal: megaStripeRefSrcLocal,
+    megaStripeRef2EnabledLocal: megaStripeRef2EnabledLocal,
+    megaStripeRef2SrcLocal: megaStripeRef2SrcLocal,
+    megaShirtDrawingEnabledLocal: megaShirtDrawingEnabledLocal,
+    drawingOverlaySrcEffective: drawingOverlaySrcEffective,
+    stripeMaskTileRectsRawPct: stripeMaskTileRectsRawPct,
+    drawingOverlayDebug: drawingOverlayDebug,
+    tileGapPxLocal: tileGapPxLocal,
+    humanInsideVariant: humanInsideVariant,
+    firstContactVariant: firstContactVariant,
+    reorderAustenQuotes: reorderAustenQuotes,
+    austenSelectedDisableMulti: austenSelectedDisableMulti,
+    stripeVariantVisibility: stripeVariantVisibility,
+    megaTileSelectorParams: megaTileSelectorParams,
+    onStartSelectorDrag: onStartSelectorDrag,
+    megaTileSize: megaTileSize,
+    setStripeOverlayOverrideActive: setStripeOverlayOverrideActive,
+    setFirstContactVariant: setFirstContactVariant,
+    setHumanInsideVariant: setHumanInsideVariant,
+    setThinStartIndex: setThinStartIndex,
+    setFirstContactSelectedItem: setFirstContactSelectedItem,
+    setHumanInsideSelectedItem: setHumanInsideSelectedItem,
+    setSelectedItemByCollection: setSelectedItemByCollection,
+    normalizeOverlaySrc: normalizeOverlaySrc,
+    onShirtClick: onShirtClick,
+    selectedItem: page1SelectedItem,
+    isPortraitTablet: isPortraitTablet,
+  };
   return (
     <div className="relative">
       <div
@@ -355,52 +401,9 @@ export default function MegaMenuPanel({
                       les mides del selector i de la franja tambe coincideixen. */}
                   <div style={{ flex: '0 0 auto', width: isPortraitTablet ? '992px' : 'var(--hg-mega-w, 70.3vw)', maxWidth: 'none', position: 'relative', height: '100%', paddingLeft: '0px', paddingRight: '0px' }}>
                     <MegaStripePanelP1
-                      /* A la vista vertical la franja es la imatge de dues
-                         fileres de 7 (7+7); a l'apaisada, la de sempre. */
-                      stripeImageSrc={isPortraitTablet ? '/placeholders/tablet vertical/stripe-curta-7+7.png' : undefined}
-                      active={active}
-                      resolvedMega={resolvedMega}
-                      showStripe={showStripe}
-                      fitAlcada={fitAlcada}
-                      isLandscapeTablet={isLandscapeTablet}
+                      {...propsFranjaP1}
                       onP1ContentBottomChange={handleP1ContentBottom}
                       onPageLiftChange={handleP1PageLift}
-                      stripeRowPadPx={stripeRowPadPx}
-                      stripeRowPadXPx={stripeRowPadXPx}
-                      stripePreviewHPx={stripePreviewHPx}
-                      stripeOverlayLoadState={stripeOverlayLoadState}
-                      resolvedOverlaySrc={resolvedOverlaySrc}
-                      stripeOverlayDebug={stripeOverlayDebug}
-                      stripeMaskDebugRectsPct={stripeMaskDebugRectsPct}
-                      megaStripeSpriteEnabledLocal={megaStripeSpriteEnabledLocal}
-                      megaStripeRefEnabledLocal={megaStripeRefEnabledLocal}
-                      megaStripeRefSrcLocal={megaStripeRefSrcLocal}
-                      megaStripeRef2EnabledLocal={megaStripeRef2EnabledLocal}
-                      megaStripeRef2SrcLocal={megaStripeRef2SrcLocal}
-                      megaShirtDrawingEnabledLocal={megaShirtDrawingEnabledLocal}
-                      drawingOverlaySrcEffective={drawingOverlaySrcEffective}
-                      stripeMaskTileRectsRawPct={stripeMaskTileRectsRawPct}
-                      drawingOverlayDebug={drawingOverlayDebug}
-                      tileGapPxLocal={tileGapPxLocal}
-                      humanInsideVariant={humanInsideVariant}
-                      firstContactVariant={firstContactVariant}
-                      reorderAustenQuotes={reorderAustenQuotes}
-                      austenSelectedDisableMulti={austenSelectedDisableMulti}
-                      stripeVariantVisibility={stripeVariantVisibility}
-                      megaTileSelectorParams={megaTileSelectorParams}
-                      onStartSelectorDrag={onStartSelectorDrag}
-                      megaTileSize={megaTileSize}
-                      setStripeOverlayOverrideActive={setStripeOverlayOverrideActive}
-                      setFirstContactVariant={setFirstContactVariant}
-                      setHumanInsideVariant={setHumanInsideVariant}
-                      setThinStartIndex={setThinStartIndex}
-                      setFirstContactSelectedItem={setFirstContactSelectedItem}
-                      setHumanInsideSelectedItem={setHumanInsideSelectedItem}
-                      setSelectedItemByCollection={setSelectedItemByCollection}
-                      normalizeOverlaySrc={normalizeOverlaySrc}
-                      onShirtClick={onShirtClick}
-                      selectedItem={page1SelectedItem}
-                      isPortraitTablet={isPortraitTablet}
                     />
                   </div>
 
@@ -443,11 +446,18 @@ export default function MegaMenuPanel({
                            i el selector tambe (96,8 de costat, com el selector de la
                            pagina 2). */
                         stripe={(
-                          <img
-                            src="/placeholders/tablet vertical/stripe-curta-7+7.png"
-                            alt=""
-                            style={{ width: 'calc(100% + 16px)', height: 'auto', display: 'block', flexShrink: 0, maxWidth: 'none' }}
-                          />
+                          /* La franja de debò: el mateix panell que la filera,
+                             amb la imatge de dues fileres (7+7), escalat per
+                             encaixar a la casella. */
+                          <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+                            <div style={{ height: '100%', transform: 'translateY(51px) scale(2.148)', transformOrigin: 'center center' }}>
+                              <MegaStripePanelP1
+                                {...propsFranjaP1}
+                                isPortraitTablet
+                                stripeImageSrc="/placeholders/tablet vertical/stripe-curta-7+7.png"
+                              />
+                            </div>
+                          </div>
                         )}
                         /* Les fletxes, alineades verticalment amb el selector
                            (el mateix centre vertical). */
