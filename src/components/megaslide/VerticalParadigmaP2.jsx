@@ -12,7 +12,6 @@ import {
   GAP_FRANJA_PX,
   GAP_FRANJA_VERTICAL_PX,
   GAP_GRAELLA_PX,
-  GRAELLA_COLUMNES_VERTICAL,
   ampladaCarrilVertical,
   columnesVertical,
 } from '../fullwide/paradigmaVertical.js';
@@ -135,17 +134,6 @@ export default function VerticalParadigmaP2({
   }, [resolvedMega]);
 
   /**
-   * La mida de la casella de la GRAELLA DE DIBUIXOS: la que fa que les 16
-   * columnes omplin l'amplada del carril (`GRAELLA_COLUMNES_VERTICAL` caselles
-   * i 15 separacions de 6 px), que es el que demana el paradigma: la graella
-   * fa tota l'amplada del carril.
-   */
-  const casellaDibuix = useMemo(() => {
-    if (!ampleCarril) return undefined;
-    return (ampleCarril - (GRAELLA_COLUMNES_VERTICAL - 1) * 6) / GRAELLA_COLUMNES_VERTICAL;
-  }, [ampleCarril]);
-
-  /**
    * Les 14 samarretes de la franja, amb la seva imatge de debò.
    *
    * Els items dibuixables surten de la colleccio activa (sense les caselles de
@@ -253,18 +241,15 @@ export default function VerticalParadigmaP2({
         color: '#4A5057',
       }}
     >
-      {/* 1) La graella de dibuixos, amplada de carril i a dalt de tot.
-          Es la graella ORIGINAL (`MegaGridDibuixos`) i es UN SOL BLOC de
-          16 columnes x 4 files (64 caselles), amb els dibuixos de la colleccio
-          activa: es el 16x4 de sempre. Les caselles que no tenen dibuix hi son
-          buides i el que no hi cap no es mostra. */}
+      {/* 1) La graella de dibuixos, a dalt de tot.
+          Es la graella ORIGINAL (`MegaGridDibuixos`), sense cap canvi: les
+          seves 16 columnes es reparteixen l'ample del carril i te tantes files
+          com calen pels dibuixos de la colleccio activa. */}
       <div style={{ width: '100%' }} data-vertical-graella="1">
         <MegaGridDibuixos
           active={active}
           className="w-full"
           items={itemsDeColleccio(active)}
-          cellPx={casellaDibuix}
-          bloc16x4
         />
       </div>
 
