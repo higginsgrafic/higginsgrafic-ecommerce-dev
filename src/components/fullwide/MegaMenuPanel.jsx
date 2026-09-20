@@ -415,21 +415,28 @@ export default function MegaMenuPanel({
                            dibuixos, la imatge de la franja, la tile de les
                            fletxes i la tile del selector. */
                         grid={<MegaGridDibuixos active={active} className="w-full" />}
+                        /* Les mides de la pagina 1, igualades a les de la pagina 2:
+                           la franja fa el mateix (458,8 x 213,9 a 768), les fletxes
+                           i el selector tambe (96,8 de costat, com el selector de la
+                           pagina 2). */
                         stripe={(
                           <img
                             src="/placeholders/tablet vertical/stripe-curta-7+7.png"
                             alt=""
-                            style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+                            style={{ width: 'calc(100% + 56px)', height: 'auto', display: 'block', flexShrink: 0, maxWidth: 'none' }}
                           />
                         )}
                         fletxes={(
+                          <div style={{ width: '75.9%' }}>
                           <FirstContactDibuix09Buttons
-                            tileSize={megaTileSize}
+                            tileSize={96.8}
                             onPrev={() => { touchMegaPublicActivity?.(); }}
                             onNext={() => { touchMegaPublicActivity?.(); }}
                           />
+                          </div>
                         )}
                         selector={(
+                          <div style={{ width: '75.9%' }}>
                           <FirstContactDibuix00Buttons
                             onWhite={() => {
                               setStripeOverlayOverrideActive?.(false);
@@ -451,6 +458,7 @@ export default function MegaMenuPanel({
                             showMulti={stripeVariantVisibility?.color !== false}
                             selectedVariant={active === 'the_human_inside' ? humanInsideVariant : firstContactVariant}
                           />
+                          </div>
                         )}
                       />
                     </CapaTaulaVertical>
