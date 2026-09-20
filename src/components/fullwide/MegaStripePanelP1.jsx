@@ -253,7 +253,20 @@ function MegaStripePanelP1({
   // hi ha la graella de les caselles de les fletxes.
   if (isPortraitTablet && graellaFletxes) {
     return (
-      <div ref={pageRootRef} className="w-full shrink-0" data-megaslide-graella="1" style={{ paddingTop: '24px' }}>
+      <div
+        ref={pageRootRef}
+        data-megaslide-graella="1"
+        style={{
+          // Centrada a la VISTA (a la vertical la pagina 1 ja no fa el tauler
+          // de 992 del belt).
+          position: 'relative',
+          width: '100%',
+          padding: 0,
+          display: 'flex',
+          justifyContent: 'center',
+          pointerEvents: 'auto',
+        }}
+      >
         {graellaFletxes}
       </div>
     );
