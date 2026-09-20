@@ -11,6 +11,8 @@ import { factorAlcadaMegaslide } from './midesMegaslide.js';
 import { alcadaPanellMegaslide } from '../../utils/mesuraMegaslide.js';
 import MegaslidePagina2 from '../megaslide/MegaslidePagina2.jsx';
 import { alturaTaulaVertical, CapaTaulaVertical, TaulaVerticalP1 } from '../megaslide/TaulaVertical.jsx';
+import MegaGridDibuixos from './MegaGridDibuixos.jsx';
+import { FirstContactDibuix00Buttons, FirstContactDibuix09Buttons } from './firstContactPanels.jsx';
 
 const MegaslidePagina3 = lazy(() => import('../megaslide/MegaslidePagina3.jsx'));
 const MegaslidePagina4 = lazy(() => import('../megaslide/MegaslidePagina4.jsx'));
@@ -408,7 +410,49 @@ export default function MegaMenuPanel({
                       pagina 2 (absoluta, centrada i a l'amplada del carril). */}
                   {isPortraitTablet ? (
                     <CapaTaulaVertical pagina={1}>
-                      <TaulaVerticalP1 />
+                      <TaulaVerticalP1
+                        /* Les peces de debò, una per casella: la graella de
+                           dibuixos, la imatge de la franja, la tile de les
+                           fletxes i la tile del selector. */
+                        grid={<MegaGridDibuixos active={active} className="w-full" />}
+                        stripe={(
+                          <img
+                            src="/placeholders/tablet vertical/stripe-curta-7+7.png"
+                            alt=""
+                            style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+                          />
+                        )}
+                        fletxes={(
+                          <FirstContactDibuix09Buttons
+                            tileSize={megaTileSize}
+                            onPrev={() => { touchMegaPublicActivity?.(); }}
+                            onNext={() => { touchMegaPublicActivity?.(); }}
+                          />
+                        )}
+                        selector={(
+                          <FirstContactDibuix00Buttons
+                            onWhite={() => {
+                              setStripeOverlayOverrideActive?.(false);
+                              if (active === 'the_human_inside') setHumanInsideVariant?.('white');
+                              else setFirstContactVariant?.('white');
+                            }}
+                            onBlack={() => {
+                              setStripeOverlayOverrideActive?.(false);
+                              if (active === 'the_human_inside') setHumanInsideVariant?.('black');
+                              else setFirstContactVariant?.('black');
+                            }}
+                            onMulti={() => {
+                              setStripeOverlayOverrideActive?.(false);
+                              if (active === 'the_human_inside') setHumanInsideVariant?.('color');
+                              else setFirstContactVariant?.('color');
+                            }}
+                            showWhite={stripeVariantVisibility?.white !== false}
+                            showBlack={stripeVariantVisibility?.black !== false}
+                            showMulti={stripeVariantVisibility?.color !== false}
+                            selectedVariant={active === 'the_human_inside' ? humanInsideVariant : firstContactVariant}
+                          />
+                        )}
+                      />
                     </CapaTaulaVertical>
                   ) : null}
                 </div>
