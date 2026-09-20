@@ -698,6 +698,7 @@ export default function MegaslidePagina2({
                 activeKey={active}
                 onSelect={setActive}
                 alcadaFilaLlista={midesTaula.alcadaFilaLlista}
+                caixes
               />
             )}
             colors={(

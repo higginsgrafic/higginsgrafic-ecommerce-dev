@@ -501,7 +501,72 @@ export function CercadorColleccionsColumna({
   transform,
   isPortraitTablet = false,
   isLandscapeTablet = false,
+  caixes = false,
 }) {
+  // Amb `caixes` (la taula de la vista vertical) cada nom va dins la seva caixa
+  // grisa, enrasat a la dreta i repartides per tota l'alcada; sense, es la
+  // llista de sempre de la filera de la pagina 2.
+  if (caixes) {
+    // Els noms de la taula: la colleccio d'Austen hi es com una entrada propia
+    // (AUSTEN/COL·LECCIO) i els seus temes porten el prefix AUSTEN/.
+    const llista = [
+      { key: 'first_contact', label: 'FIRST CONTACT' },
+      { key: 'the_human_inside', label: 'THE HUMAN INSIDE' },
+      { key: 'austen', label: 'AUSTEN/COL·LECCIÓ' },
+      { key: 'austen:pemberley', label: 'AUSTEN/PEMBERLEY' },
+      { key: 'austen:keep_calm', label: 'AUSTEN/KEEP CALM' },
+      { key: 'austen:quotes', label: 'AUSTEN/QUOTES' },
+      { key: 'austen:crosswords', label: 'AUSTEN/CROSSWORDS' },
+      { key: 'austen:looking_for_my_darcy', label: 'AUSTEN/LFMD' },
+      { key: 'cube', label: 'CUBE' },
+      { key: 'miscellania', label: 'MISCEL·LÀNIA' },
+    ];
+    return (
+      <div
+        data-colleccions-caixes="1"
+        style={{
+          width: '100%',
+          height: '100%',
+          display: 'grid',
+          gridTemplateRows: `repeat(${llista.length}, 1fr)`,
+          rowGap: '3px',
+          minHeight: 0,
+        }}
+      >
+        {llista.map(({ key, label }) => (
+          <button
+            key={key}
+            type="button"
+            onClick={() => onSelect?.(key)}
+            className="font-roboto-condensed"
+            aria-current={key === activeKey ? 'true' : undefined}
+            style={{
+              appearance: 'none',
+              border: 0,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'flex-end',
+              width: '100%',
+              minHeight: 0,
+              padding: '0 6px',
+              borderRadius: '3px',
+              backgroundColor: '#F1F3F5',
+              color: '#2B2B2B',
+              fontFamily: 'inherit',
+              fontSize: '9.5pt',
+              fontWeight: key === activeKey ? 700 : 400,
+              whiteSpace: 'nowrap',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              cursor: 'pointer',
+            }}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+    );
+  }
   return (
     <div style={{ width: '100%', transform, paddingLeft }}>
       {CERCADOR_COLLECTIONS.map(({ key, label }) => (
