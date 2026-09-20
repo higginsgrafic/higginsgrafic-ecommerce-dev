@@ -441,8 +441,7 @@ function PdpDesktop({ product }) {
         ref={containerRef}
         style={{
           maxWidth: containerMaxWidth,
-          // El contingut de la PDP, 100 px mes avall.
-          margin: '100px auto 0',
+          margin: '0 auto',
           padding: '0 16px',
           position: 'relative',
         }}
@@ -476,7 +475,7 @@ function PdpDesktop({ product }) {
           </div>
         )}
 
-        <PageBand type="related" fluid={isPortraitTablet} style={{ display: 'flex', alignItems: isPortraitTablet ? 'flex-start' : 'center', overflow: 'hidden', marginTop: '-100px' }}>
+        <PageBand type="related" fluid={isPortraitTablet} style={{ display: 'flex', alignItems: isPortraitTablet ? 'flex-start' : 'center', overflow: 'hidden' }}>
           <div
             style={{
               // El rail viu dins el carril central (a la vertical, el seu).
@@ -511,8 +510,7 @@ function PdpDesktop({ product }) {
           style={{
             height: isLandscapeTablet && Number.isFinite(tdpAvailableHeight) ? `${tdpRenderedHeight}px` : undefined,
             overflow: isLandscapeTablet && Number.isFinite(tdpAvailableHeight) ? 'hidden' : undefined,
-            // 200 px d'aire entre 'Altres histories' i la TDP.
-            marginTop: isPortraitTablet ? '300px' : (esApaissadaAmpla ? '18px' : (isLandscapeTablet ? '68px' : (esEscriptoriEstret ? '-12px' : '-32px'))),
+            marginTop: isPortraitTablet ? '100px' : (esApaissadaAmpla ? '18px' : (isLandscapeTablet ? '68px' : (esEscriptoriEstret ? '-12px' : '-32px'))),
             marginBottom: '32px',
           }}
         >

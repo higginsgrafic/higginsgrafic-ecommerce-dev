@@ -136,42 +136,7 @@ function dibuixDelProducte(producte, index) {
   return trobat?.ruta || null;
 }
 
-/**
- * El dibuix d'un item de la llista del megaslide, buscant-lo directament al
- * manifest.
- *
- * `perClau` només té els dibuixos dels productes del catàleg, i n'hi ha que no
- * hi són (o que s'hi diuen d'una altra manera). Sense aquesta segona via, la
- * graella perdia items de la llista i les files quedaven curtes.
- */
-function dibuixDeLlista(it, carpeta, index) {
-  const k = clau(it);
-  if (!k) return null;
-  // Els noms de la llista porten espais, apostrofs i guions ("The Phoenix",
-  // "Vulcan's End") i els fitxers tambe: per aparellar-los s'han de comparar
-  // sense res que no sigui lletra o xifra.
-  const pla = (v) => String(v).replace(/[^a-z0-9]/gi, '');
-  const kp = pla(k);
-  const candidats = index[carpeta] || [];
-  const exacte = candidats.find((f) => f.k === k)
-    || (kp ? candidats.find((f) => pla(f.k) === kp) : null);
-  if (exacte) return exacte.ruta;
-  return candidats.find((f) => f.k.includes(k) || k.includes(f.k))?.ruta || null;
-}
-
-/**
- * @param {object} props
- * @param {string} props.active    colleccio activa (clau del megaslide)
- * @param {string} [props.className]
- * @param {string[]} [props.items] llista d'items del megaslide (mana l'ordre)
- * @param {number} [props.cellPx]  mida de la casella en px. Si no s'hi passa,
- *   les 16 columnes es reparteixen l'ample del contenidor.
- * @param {boolean} [props.bloc16x4] pinta sempre les 64 caselles (16 columnes x
- *   4 files): les que no tenen dibuix hi son buides i el que no hi cap no es
- *   mostra. Es el que fa que la graella sigui un bloc de 16x4 i no una fila de
- *   llargada variable.
- */
-export default function MegaGridDibuixos({ active, className, items: itemsDelMega, cellPx, bloc16x4 = false }) {
+export default function MegaGridDibuixos({ active, className, items: itemsDelMega }) {
   const [manifest, setManifest] = useState(null);
   const [productes, setProductes] = useState(null);
 
@@ -224,69 +189,47 @@ export default function MegaGridDibuixos({ active, className, items: itemsDelMeg
    * veu a la graella de noms. Així els dibuixos surten exactament al mateix
    * lloc on hi havia cada nom, i no pas en ordre alfabètic com abans.
    *
-   * Un item que no tingui producte al catàleg SÍ que surt, amb el dibuix buscat
-   * directament al manifest (`dibuixDeLlista`): la llista mana el nombre
-   * d'items i la graella l'ha de mostrar sencera.
+   * Si un item no troba el seu dibuix, es descarta; i si un producte no és a
+   * la llista, s'afegeix al final perquè no desaparegui mai.
    */
   const dibuixos = useMemo(() => {
     const ordenats = [];
     const usats = new Set();
-    const carpeta = CARPETA[active] || COLLECCIO_AL_CATALEG[active] || active;
     for (const it of Array.isArray(itemsDelMega) ? itemsDelMega : []) {
       if (typeof it !== 'string') continue;
       if (it === 'botonera-bn' || it === 'botonera-fletxes') continue;
-      const k = clau(it);
+      const k = clau(it.split('/').pop());
       const trobat = perClau.get(k) || [...perClau.entries()].find(([kk]) => kk.includes(k) || k.includes(kk))?.[1];
-      if (trobat) {
-        if (usats.has(trobat.dibuix)) continue;
-        usats.add(trobat.dibuix);
-        ordenats.push(trobat);
-        continue;
-      }
-      const ruta = dibuixDeLlista(it, carpeta, index);
-      if (!ruta || usats.has(ruta)) continue;
-      usats.add(ruta);
-      ordenats.push({ slug: `__mega__${k || it}`, name: it, collection: active, dibuix: ruta });
+      if (!trobat) continue;
+      ordenats.push(trobat);
+      usats.add(trobat.slug);
     }
     // Els que no surten a la llista del megaslide, al final.
-    for (const p of perClau.values()) {
-      if (usats.has(p.dibuix)) continue;
-      usats.add(p.dibuix);
-      ordenats.push(p);
-    }
+    for (const p of perClau.values()) if (!usats.has(p.slug)) ordenats.push(p);
     return ordenats;
-  }, [itemsDelMega, perClau, active, index]);
+  }, [itemsDelMega, perClau]);
 
   // Mentre no hi hagi dades, no pinto res: aixi no balla.
   if (!manifest || !productes || dibuixos.length === 0) return null;
-
-  // Amb `bloc16x4` la graella son sempre les mateixes 64 caselles (16 columnes
-  // x 4 files): les que no tenen dibuix es pinten buides i el que no hi cap no
-  // es mostra. Aixi la graella es un bloc de 16x4 i no una fila de llargada
-  // variable.
-  const CASELLES_BLOC = 16 * 4;
-  const perPintar = bloc16x4 ? dibuixos.slice(0, CASELLES_BLOC) : dibuixos;
-  const buides = bloc16x4 ? Math.max(0, CASELLES_BLOC - perPintar.length) : 0;
 
   return (
     <div className={className}>
       <div
         style={{
           display: 'grid',
-          // Les columnes es reparteixen l'ample que els doni el megaslide; amb
-          // `cellPx` tenen la mida de disseny i el que sobra queda a la dreta.
-          gridTemplateColumns: cellPx ? `repeat(16, ${cellPx}px)` : 'repeat(16, minmax(0, 1fr))',
+          // Les columnes es reparteixen l'ample que els doni el megaslide.
+          gridTemplateColumns: 'repeat(16, minmax(0, 1fr))',
           gap: '6px',
           alignItems: 'center',
         }}
         aria-label={`Dibuixos de ${NOM_COLLECCIO[dibuixos[0]?.collection] || ''}`}
       >
-        {perPintar.map((p) => (
+        {dibuixos.map((p) => (
           <div
             key={p.slug}
             title={p.name}
             style={{
-              ...(cellPx ? { width: `${cellPx}px`, height: `${cellPx}px` } : { aspectRatio: '1 / 1' }),
+              aspectRatio: '1 / 1',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -300,15 +243,6 @@ export default function MegaGridDibuixos({ active, className, items: itemsDelMeg
               style={{ width: '100%', height: '100%', objectFit: 'contain', display: 'block' }}
             />
           </div>
-        ))}
-        {Array.from({ length: buides }).map((_, i) => (
-          <div
-            key={`buida-${i}`}
-            aria-hidden="true"
-            style={{
-              ...(cellPx ? { width: `${cellPx}px`, height: `${cellPx}px` } : { aspectRatio: '1 / 1' }),
-            }}
-          />
         ))}
       </div>
     </div>

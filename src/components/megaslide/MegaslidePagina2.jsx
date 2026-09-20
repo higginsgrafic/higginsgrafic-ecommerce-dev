@@ -13,7 +13,7 @@ import {
   CONTROL_TILE_ARROWS,
 } from '../fullwide/MegaColumn.jsx';
 import { FirstContactDibuix00Buttons } from '../fullwide/firstContactPanels.jsx';
-import { computeStripeTileOverlaySrcs, computeStripeTileItems, resolveForItem } from '@/utils/resolveStripeTile.js';
+import { computeStripeTileOverlaySrcs, computeStripeTileItems } from '@/utils/resolveStripeTile.js';
 
 export default function MegaslidePagina2({
   active,
@@ -382,64 +382,12 @@ export default function MegaslidePagina2({
 
   const stripeEmptyMaskSrc = null;
 
-  // La collecció activa a la llista: a l'austen mana la subcol·lecció.
-  const clauColleccions = active === 'austen' ? `austen:${austenSubcollection || ''}` : active;
-
-  /** Tria una collecció (o una subcollecció de l'austen) de la llista. */
-  const triaColleccio = useCallback((key) => {
-    const raw = typeof key === 'string' ? key : '';
-    if (!raw) return;
-    if (raw.includes(':')) {
-      const [collection, subcollection] = raw.split(':');
-      setActive(collection);
-      setAustenSubcollection?.(subcollection || null);
-    } else {
-      setActive(raw);
-      setAustenSubcollection?.(null);
-    }
-  }, [setActive, setAustenSubcollection]);
-
-  /** Tria un color de la paleta: mana el color de tota la franja. */
-  const triaColor = useCallback((slug) => {
-    setCercadorSelectedColor?.(slug);
-  }, [setCercadorSelectedColor]);
-
-  /**
-   * Tria una samarreta de la franja. Fa el mateix que triar-la a la filera
-   * horitzontal: deixa la samarreta triada a la colleccio activa.
-   */
-  const seleccionaSamarreta = useCallback((idx) => {
-    const item = stripeTileItems?.[idx];
-    if (!item) return;
-    setStripeOverlayOverrideActive?.(false);
-    if (active === 'first_contact') setFirstContactSelectedItem?.(item);
-    else if (active === 'the_human_inside') setHumanInsideSelectedItem?.(item);
-    else setSelectedItemByCollection?.((prev) => ({ ...prev, [active]: item }));
-  }, [active, stripeTileItems, setStripeOverlayOverrideActive, setFirstContactSelectedItem, setHumanInsideSelectedItem, setSelectedItemByCollection]);
-
-  /**
-   * LA VERTICAL: la composicio propia de la pagina 2.
-   *
-   * Tres files dins del carril:
-   *   fila 1: la graella de dibuixos (tots els dibuixos del cataleg)
-   *   fila 2: colleccions + graella de colors + stripe
-   *   fila 3: colleccions + selector + stripe
-   *
-   * La franja es d'un sol color i el mana la graella de colors: el dibuix de
-   * cada casella es el negre de sempre i el color hi va a sobre, de manera que
-   * totes les caselles canvien de color amb la paleta.
-   */
-  // A la VERTICAL, el contingut de la pagina 2 queda AMAGAT.
-
   return (
     <div style={{ width: '25%', flexShrink: 0, display: isPortraitTablet ? 'block' : 'flex', height: '100%', position: 'relative', justifyContent: 'center', overflow: isPortraitTablet ? 'hidden' : 'visible' }}>
       <div
         ref={viewportRef}
         data-mega-page-viewport="2"
         style={{
-          // El CONTINGUT de la pagina 2 queda AMAGAT.
-          visibility: 'hidden',
-          pointerEvents: 'none',
           width: '100%',
           height: '100%',
           display: 'flex',
