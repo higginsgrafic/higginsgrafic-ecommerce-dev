@@ -399,8 +399,10 @@ export function CercadorDibuixosGraella({
                 alt={label}
                 loading="lazy"
                 style={{
-                  height: costat,
-                  width: costat,
+                  // En manera d'omplir, el dibuix va un 10% mes petit que la
+                  // seva casella (la retícula queda igual).
+                  height: omple ? '90%' : costat,
+                  width: omple ? '90%' : costat,
                   objectFit: 'contain',
                   display: 'block',
                 }}
