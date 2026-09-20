@@ -34,12 +34,18 @@ const CASES = [
 const mesura = () => {
   const ambMida = (sel) => [...document.querySelectorAll(sel)]
     .find((e) => e.getBoundingClientRect().width > 0);
-  const pel = (etiqueta) => [...document.querySelectorAll('button[aria-label]')]
+  // Les peces que mesurem son les de la PAGINA 2. Amb la vista vertical nova
+  // (les taules), els dibuixos tambe son a la graella de la pagina 1, que va
+  // abans al DOM: cal buscar-los dins la pagina 2 o en comptes d'ella en
+  // mesurariem la graella de la taula.
+  const cg0 = ambMida('[data-p2-color-grid]');
+  const arrel = (cg0 && cg0.closest('[data-mega-page-viewport="2"]')) || document;
+  const pel = (etiqueta) => [...arrel.querySelectorAll('button[aria-label]')]
     .find((x) => x.getAttribute('aria-label') === etiqueta);
   const nx = pel('NX-01');
   const mz = pel('Mazinger-Z');
   const ncc = pel('NCC-1701');
-  const cg = ambMida('[data-p2-color-grid]');
+  const cg = cg0;
   const sel = ambMida('[data-p2-color-selector] [data-stripe-buttonbar="bn"]');
   const samarretes = document.querySelector('[data-stripe-visual-content="2"]');
   if (!nx || !mz || !ncc || !cg || !sel) return null;
