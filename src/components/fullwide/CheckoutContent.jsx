@@ -163,16 +163,8 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
   const L_COLUMNES_TOP = 55;
 
   // Marge de creació de les dues columnes de dades (el que les separa del bloc
-  // de productes). El fa servir l'escriptori tal qual; la tauleta vertical hi
-  // afegeix el seu propi (vegeu P_COLUMNES_TOP).
+  // de productes). El fan servir l'escriptori i la tauleta vertical, tal qual.
   const COLUMNES_TOP = 90;
-
-  // Marge de dalt de les DUES columnes de dades de la VERTICAL, el que col·loca
-  // els titols "Dades d'enviament" i "Dades de pagament". A la vertical el
-  // megaslide es mes alt que a l'apaisada (mana la taula de 5x3) i els titols hi
-  // quedaven TAPATS: 70 px mes que el marge de creacio els deixa per sota del
-  // megaslide (10 px d'aire a 768). Positiu = baixa els titols.
-  const P_COLUMNES_TOP = COLUMNES_TOP + 70;
 
   // ===== FRANJA DE FITXES: MATEIX CRITERI QUE A LA VERTICAL =====
   // A la vertical la franja va de la guia verda (titol + 20) a la blava (final
@@ -248,7 +240,7 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
     ? undefined
     : (isLandscapeTablet
       ? `${L_COLUMNES_TOP - L_FRANJA_CREIX}px`
-      : (isPortraitTablet ? `${P_COLUMNES_TOP}px` : `${D_COLUMNES_TOP}px`));
+      : (isPortraitTablet ? `${COLUMNES_TOP}px` : `${D_COLUMNES_TOP}px`));
 
 
   const activeItems = useMemo(
