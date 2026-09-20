@@ -410,6 +410,60 @@ export default function MegaslidePagina2({
     };
   })();
 
+  // Les props compartides de la franja de la pagina 2 (vegeu la pagina 1).
+  const propsFranjaP2 = {
+    active: active,
+    reserveGridSpace: true,
+    resolvedMega: resolvedMegaFiltered,
+    showStripe: showStripe,
+    stripeRowPadPx: stripeRowPadPx,
+    stripeRowPadXPx: stripeRowPadXPx,
+    stripePreviewHPx: compactStripePreviewHPx,
+    fitAlcada: fitAlcada,
+    stripeOverlayLoadState: stripeOverlayLoadState,
+    resolvedOverlaySrc: resolvedOverlaySrc,
+    stripeOverlayDebug: stripeOverlayDebug,
+    stripeMaskDebugRectsPct: stripeMaskDebugRectsPct,
+    megaStripeSpriteEnabledLocal: megaStripeSpriteEnabledLocal,
+    megaStripeRefEnabledLocal: megaStripeRefEnabledLocal,
+    megaStripeRefSrcLocal: megaStripeRefSrcLocal,
+    megaStripeRef2EnabledLocal: megaStripeRef2EnabledLocal,
+    megaStripeRef2SrcLocal: megaStripeRef2SrcLocal,
+    megaShirtDrawingEnabledLocal: megaShirtDrawingEnabledLocal,
+    drawingOverlaySrcEffective: drawingOverlaySrcEffective,
+    stripeMaskTileRectsRawPct: stripeMaskTileRectsRawPct,
+    drawingOverlayDebug: drawingOverlayDebug,
+    tileGapPxLocal: tileGapPxLocal,
+    humanInsideVariant: humanInsideVariant,
+    firstContactVariant: firstContactVariant,
+    reorderAustenQuotes: reorderAustenQuotes,
+    austenSelectedDisableMulti: austenSelectedDisableMulti,
+    stripeVariantVisibility: stripeVariantVisibility,
+    megaTileSelectorParams: megaTileSelectorParams,
+    onStartSelectorDrag: onStartSelectorDrag,
+    megaTileSize: compactMegaTileSize,
+    setStripeOverlayOverrideActive: setStripeOverlayOverrideActive,
+    setFirstContactVariant: setFirstContactVariant,
+    setHumanInsideVariant: setHumanInsideVariant,
+    setThinStartIndex: setThinStartIndex,
+    setFirstContactSelectedItem: setFirstContactSelectedItem,
+    setHumanInsideSelectedItem: setHumanInsideSelectedItem,
+    setSelectedItemByCollection: setSelectedItemByCollection,
+    normalizeOverlaySrc: normalizeOverlaySrc,
+    shirtColor: CERCADOR_COLORS.find((c) => c.slug === displayedShirtColor)?.overlayHex,
+    onShirtClick: onShirtClick,
+    selectedItem: 
+              active === 'first_contact' ? firstContactSelectedItem
+              : active === 'the_human_inside' ? humanInsideSelectedItem
+              : (selectedItemByCollection?.[active] ?? null)
+            ,
+    stripeTileOverlaySrcs: stripeTileOverlaySrcs,
+    stripeTileItems: stripeTileItems,
+    clicAreaHighlightIndices: clicAreaHighlightIndices,
+    neckDotIndices: neckDotIndices,
+    emptyTileIndices: emptyTileIndices,
+    stripeEmptyMaskSrc: stripeEmptyMaskSrc,
+  };
   return (
     <div style={{ width: '25%', flexShrink: 0, display: isPortraitTablet ? 'block' : 'flex', height: '100%', position: 'relative', justifyContent: 'center', overflow: isPortraitTablet ? 'hidden' : 'visible' }}>
       <div
@@ -567,63 +621,10 @@ export default function MegaslidePagina2({
           transformOrigin: 'left top',
         }}>
           <MegaStripePanel
-            active={active}
-            reserveGridSpace
+            {...propsFranjaP2}
             stripeImageSrc={isPortraitTablet ? '/placeholders/tablet vertical/stripe-curta-7+7.png' : stripeBaseImageSrc}
-            resolvedMega={resolvedMegaFiltered}
-            showStripe={showStripe}
-            stripeRowPadPx={stripeRowPadPx}
-            stripeRowPadXPx={stripeRowPadXPx}
-            stripePreviewHPx={compactStripePreviewHPx}
-            // La franja ha de quedar a la mateixa alçada que la de la pàgina 1.
-            // L'ajust de la pàgina 1 (FRANJA_AJUST_PX a MegaStripePanelP1) no
-            // s'aplica a la franja estreta (768-1366), però aquí sí que cal per
-            //quedar-hi alineats.
+            // La franja ha de quedar a la mateixa alcada que la de la pagina 1.
             visualOffsetY={-page1PageLift + (isLandscapeTablet ? -10 : 0) - ((isPortraitTablet || isLandscapeTablet) ? 0 : FRANJA_AJUST_PX) + desplacamentFranja}
-            fitAlcada={fitAlcada}
-            stripeOverlayLoadState={stripeOverlayLoadState}
-            resolvedOverlaySrc={resolvedOverlaySrc}
-            stripeOverlayDebug={stripeOverlayDebug}
-            stripeMaskDebugRectsPct={stripeMaskDebugRectsPct}
-            megaStripeSpriteEnabledLocal={megaStripeSpriteEnabledLocal}
-            megaStripeRefEnabledLocal={megaStripeRefEnabledLocal}
-            megaStripeRefSrcLocal={megaStripeRefSrcLocal}
-            megaStripeRef2EnabledLocal={megaStripeRef2EnabledLocal}
-            megaStripeRef2SrcLocal={megaStripeRef2SrcLocal}
-            megaShirtDrawingEnabledLocal={megaShirtDrawingEnabledLocal}
-            drawingOverlaySrcEffective={drawingOverlaySrcEffective}
-            stripeMaskTileRectsRawPct={stripeMaskTileRectsRawPct}
-            drawingOverlayDebug={drawingOverlayDebug}
-            tileGapPxLocal={tileGapPxLocal}
-            humanInsideVariant={humanInsideVariant}
-            firstContactVariant={firstContactVariant}
-            reorderAustenQuotes={reorderAustenQuotes}
-            austenSelectedDisableMulti={austenSelectedDisableMulti}
-            stripeVariantVisibility={stripeVariantVisibility}
-            megaTileSelectorParams={megaTileSelectorParams}
-            onStartSelectorDrag={onStartSelectorDrag}
-            megaTileSize={compactMegaTileSize}
-            setStripeOverlayOverrideActive={setStripeOverlayOverrideActive}
-            setFirstContactVariant={setFirstContactVariant}
-            setHumanInsideVariant={setHumanInsideVariant}
-            setThinStartIndex={setThinStartIndex}
-            setFirstContactSelectedItem={setFirstContactSelectedItem}
-            setHumanInsideSelectedItem={setHumanInsideSelectedItem}
-            setSelectedItemByCollection={setSelectedItemByCollection}
-            normalizeOverlaySrc={normalizeOverlaySrc}
-            shirtColor={CERCADOR_COLORS.find((c) => c.slug === displayedShirtColor)?.overlayHex}
-            onShirtClick={onShirtClick}
-            selectedItem={
-              active === 'first_contact' ? firstContactSelectedItem
-              : active === 'the_human_inside' ? humanInsideSelectedItem
-              : (selectedItemByCollection?.[active] ?? null)
-            }
-            stripeTileOverlaySrcs={stripeTileOverlaySrcs}
-            stripeTileItems={stripeTileItems}
-            clicAreaHighlightIndices={clicAreaHighlightIndices}
-            neckDotIndices={neckDotIndices}
-            emptyTileIndices={emptyTileIndices}
-            stripeEmptyMaskSrc={stripeEmptyMaskSrc}
           />
         </div>
 
@@ -715,21 +716,18 @@ export default function MegaslidePagina2({
               </div>
             )}
             stripe={(
-              <img
-                src="/placeholders/tablet vertical/stripe-curta-7+7.png"
-                alt=""
-                style={{
-                  width: 'calc(100% + 26px)',
-                  height: 'auto',
-                  display: 'block',
-                  flexShrink: 0,
-                  maxWidth: 'none',
-                  marginLeft: '-4px',
-                  // El top de la franja, alineat amb el top de la graella de
-                  // colors (que va centrada a la seva casella).
-                  marginTop: '21px',
-                }}
-              />
+              /* La franja de debò: el mateix panell que la filera, amb la imatge
+                 de dues fileres (7+7), escalat per encaixar a la casella. */
+              <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+                <div style={{ height: '100%', transform: 'translateY(-130.45px) scale(2.027)', transformOrigin: 'center center', '--megaStripeDx': '0px', '--megaStripeDy': '0px' }}>
+                  <MegaStripePanel
+                    {...propsFranjaP2}
+                    isPortraitTablet
+                    stripeImageSrc="/placeholders/tablet vertical/stripe-curta-7+7.png"
+                    visualOffsetY={0}
+                  />
+                </div>
+              </div>
             )}
             selector={(
               /* El selector, un 10% mes petit (la peça agafa l'amplada del seu
