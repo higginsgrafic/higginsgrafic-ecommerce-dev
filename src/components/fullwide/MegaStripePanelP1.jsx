@@ -1,5 +1,15 @@
-import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import MegaColumn from './MegaColumn.jsx';
+import { computeStripeTileItems, computeStripeTileOverlaySrcs, resolveForItem } from '../../utils/resolveStripeTile.js';
+import {
+  GAP_PX,
+  VerticalColleccions,
+  VerticalFletxes,
+  VerticalGraellaDibuixos,
+  VerticalSelector,
+  VerticalStripeFranja,
+  ampladaCarril,
+} from '../megaslide/VerticalPieces.jsx';
 import ClicAreaOverlayP1 from './ClicAreaOverlayP1.jsx';
 import { CERCADOR_COLORS } from './CercadorTopBar.jsx';
 import { STRIPE_DRAWING_CALIBRATIONS } from '../../config/stripeCalibrations';
@@ -13,6 +23,11 @@ import { carrilPx } from '../../utils/layoutMetrics.js';
 // franja torna a la seva posició, i la pàgina 2 el fa servir perquè les dues
 // franges quedin a la mateixa alçada.
 export const FRANJA_AJUST_PX = 10;
+
+// Les caselles de control de la filera (la botonera i les fletxes): no son
+// dibuixos i no han d'entrar ni a la graella ni a la franja de la vertical.
+const CONTROL_TILE_BN = 'botonera-bn';
+const CONTROL_TILE_ARROWS = 'botonera-fletxes';
 
 function canonicalKey(rawSrc) {
   try {
@@ -241,6 +256,101 @@ function MegaStripePanelP1({
     window.addEventListener('mega-stripe-full-hit-p1', handler);
     return () => window.removeEventListener('mega-stripe-full-hit-p1', handler);
   }, [onShirtClick, selectedItem, stripeTileItems, active, shirtColor]);
+
+  /* LA VERTICAL: la composicio propia de la pagina 1.
+     Tres files dins del carril:
+       fila 1: la filera de dibuixos (el carrusel)
+       fila 2: la stripe + les fletxes
+       fila 3: la stripe + el selector Blanc/Color/Negre
+     La franja es la MULTICOLOR: es fan servir les mateixes funcions que la
+     resta del megaslide amb la variant de color. */
+  const itemsFila = useMemo(() => {
+    const cols = resolvedMega?.[active] || [];
+    const items = cols[0]?.items || [];
+    return items.filter((it) => it && it !== CONTROL_TILE_BN && it !== CONTROL_TILE_ARROWS);
+  }, [resolvedMega, active]);
+
+  const stripeVertical = useMemo(() => {
+    if (itemsFila.length === 0) return { srcs: null, items: null };
+    return {
+      srcs: computeStripeTileOverlaySrcs({
+        drawable: itemsFila,
+        variant: 'color',
+        active,
+        displayedShirtColor: 'white',
+        resolvedOverlaySrc,
+      }),
+      items: computeStripeTileItems(itemsFila),
+    };
+  }, [itemsFila, active, resolvedOverlaySrc]);
+
+  if (isPortraitTablet && active) {
+    const carril = ampladaCarril(typeof window !== 'undefined' ? window.innerWidth : 0);
+    const variantActual = active === 'the_human_inside' ? humanInsideVariant : firstContactVariant;
+    return (
+      <div ref={pageRootRef} className="w-full shrink-0">
+        <div
+          data-vertical-megaslide="1"
+          style={{
+            width: carril ? `${Math.round(carril)}px` : '100%',
+            maxWidth: '100%',
+            margin: '0 auto',
+            boxSizing: 'border-box',
+            display: 'flex',
+            flexDirection: 'column',
+            fontFamily: 'Roboto Condensed, sans-serif',
+            color: '#4A5057',
+          }}
+        >
+          {/* FILA 1: la filera de dibuixos (el carrusel). */}
+          <div data-vertical-graella="1">
+            <VerticalGraellaDibuixos active={active} items={itemsFila} />
+          </div>
+
+          {/* FILA 2: la stripe i, a la dreta, les fletxes. */}
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: `minmax(0, 1fr) ${Math.round(carril * 0.19)}px`,
+              columnGap: `${GAP_PX * 4}px`,
+              marginTop: `${GAP_PX * 3}px`,
+              alignItems: 'start',
+            }}
+          >
+            <VerticalStripeFranja
+              srcs={stripeVertical.srcs}
+              items={stripeVertical.items}
+              selectedItem={selectedItem}
+              onSelect={(idx) => {
+                const it = stripeVertical.items?.[idx];
+                if (!it) return;
+                setStripeOverlayOverrideActive?.(false);
+                if (active === 'first_contact') setFirstContactSelectedItem?.(it);
+                else if (active === 'the_human_inside') setHumanInsideSelectedItem?.(it);
+                else setSelectedItemByCollection?.((prev) => ({ ...prev, [active]: it }));
+              }}
+            />
+            <VerticalFletxes
+              tileSize={Math.round(carril * 0.19 * 0.9)}
+              onPrev={() => setThinStartIndex?.((v) => v - 1)}
+              onNext={() => setThinStartIndex?.((v) => v + 1)}
+            />
+          </div>
+
+          {/* FILA 3: el selector Blanc/Color/Negre. */}
+          <div style={{ marginTop: `${GAP_PX * 3}px`, width: `${Math.round(carril * 0.34)}px` }}>
+            <VerticalSelector
+              variant={variantActual}
+              visibility={stripeVariantVisibility}
+              onWhite={() => { setStripeOverlayOverrideActive?.(false); if (active === 'the_human_inside') setHumanInsideVariant?.('white'); else setFirstContactVariant?.('white'); }}
+              onBlack={() => { setStripeOverlayOverrideActive?.(false); if (active === 'the_human_inside') setHumanInsideVariant?.('black'); else setFirstContactVariant?.('black'); }}
+              onMulti={() => { setStripeOverlayOverrideActive?.(false); if (active === 'the_human_inside') setHumanInsideVariant?.('color'); else setFirstContactVariant?.('color'); }}
+            />
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div
