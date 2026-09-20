@@ -25,10 +25,8 @@ import {
   FirstContactDibuix09Buttons,
 } from './firstContactPanels.jsx';
 
-// Les caselles de control de la filera (la botonera i les fletxes). S'exporten
-// perque la composicio vertical de la pagina 1 ha de filtrar-les igual.
-export const CONTROL_TILE_BN = 'botonera-bn';
-export const CONTROL_TILE_ARROWS = 'botonera-fletxes';
+const CONTROL_TILE_BN = 'botonera-bn';
+const CONTROL_TILE_ARROWS = 'botonera-fletxes';
 // Separació entre les 9 columnes de la filera (era `gap-x-3` = 12 px). És una
 // mida de disseny del belt de 1350: s'escala amb `carrilPx`.
 export const GAP_X_PX = 12;
@@ -1407,4 +1405,6 @@ function MegaColumn({
     </div>
   );
 }
+export { CONTROL_TILE_BN, CONTROL_TILE_ARROWS };
+
 export default MegaColumn;

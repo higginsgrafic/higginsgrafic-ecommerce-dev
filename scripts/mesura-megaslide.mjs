@@ -24,11 +24,7 @@ import { dirname, resolve } from 'node:path';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ARREL = resolve(__dirname, '..');
-// Es pot desar/Comparar contra una altra baseline amb `HG_BASELINE` (útil per
-// comparar dues branques sense trepitjar la de referència del repositori).
-const BASELINE = process.env.HG_BASELINE
-  ? resolve(ARREL, process.env.HG_BASELINE)
-  : resolve(ARREL, 'tests/baseline-megaslide.json');
+const BASELINE = resolve(ARREL, 'tests/baseline-megaslide.json');
 const BASE = process.env.HG_URL || 'http://127.0.0.1:3003';
 
 // Tolerància en px: per sota d'això és soroll de mesura.
@@ -128,7 +124,6 @@ await navegador.close();
 if (process.argv.includes('--captura')) {
   writeFileSync(BASELINE, `${JSON.stringify(actual, null, 2)}\n`);
   console.log(`Baseline desada a ${BASELINE}`);
-  console.log(`  (la de referencia del repositori es tests/baseline-megaslide.json)`);
   tancar();
   process.exit(0);
 }
@@ -178,10 +173,6 @@ if (process.argv.includes('--detall')) {
     console.log(`  selector p1 ${m.selector.p1 && m.selector.p1.relTop}   p2 ${m.selector.p2 && m.selector.p2.relTop}`);
     console.log(`  colors   ${m.colors && m.colors.relTop}`);
     console.log(`  franja   p1 ${m.franja.p1 && m.franja.p1.relTop}   p2 ${m.franja.p2 && m.franja.p2.relTop}`);
-    if (m.vertical && m.vertical.composicio) {
-      console.log(`  vertical composicio ${JSON.stringify([m.vertical.composicio.left, m.vertical.composicio.relTop, m.vertical.composicio.width, m.vertical.composicio.height])}`);
-      console.log(`           graella ${m.vertical.graella && m.vertical.graella.height}  franja ${m.vertical.franja && m.vertical.franja.height}  samarretes ${m.vertical.samarretes} (${m.vertical.samarretesAmbImatge} amb imatge) de ${m.vertical.midaSamarreta} px  files ${m.vertical.files}`);
-    }
     console.log(`  deltes   ${JSON.stringify(m.deltes)}`);
     console.log(`  vars     ${JSON.stringify(m.variables)}`);
   }

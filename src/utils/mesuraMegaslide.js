@@ -40,15 +40,6 @@ const SELECTORS = {
   mallaP1: '.grid-cols-9',
   franjaP1: '[data-stripe-visual-content="1"]',
   franjaP2: '[data-stripe-visual-content="2"]',
-  // La composicio de la VERTICAL (pagina 2): graella de dibuixos, les tres
-  // columnes i la franja de 14 samarretes en 2x7, sense belt.
-  vertical: '[data-vertical-composicio="1"]',
-  verticalScroll: '[data-vertical-scroll="1"]',
-  verticalGraella: '[data-vertical-graella="1"]',
-  verticalColleccions: '[data-vertical-colleccions="1"]',
-  verticalBotons: '[data-vertical-botons="1"]',
-  verticalFranja: '[data-vertical-franja="1"]',
-  verticalSamarreta: '[data-vertical-samarreta]',
 };
 
 /** Variables CSS que governen la calibració. */
@@ -126,26 +117,8 @@ export function mesuraMegaslide(doc = typeof document !== 'undefined' ? document
   const franjaP1 = q(SELECTORS.franjaP1);
   const franjaP2 = q(SELECTORS.franjaP2);
 
-  // La composicio de la VERTICAL (seccions 29-32 del testimoni): substitueix
-  // el cercador de la pagina 2 i no te res del belt. Aquestes peces nomes hi
-  // son a la vertical; a la resta de mides son `null`.
-  const vertical = q(SELECTORS.vertical);
-  const verticalScroll = q(SELECTORS.verticalScroll);
-  const verticalGraella = q(SELECTORS.verticalGraella);
-  const verticalColleccions = q(SELECTORS.verticalColleccions);
-  const verticalBotons = q(SELECTORS.verticalBotons);
-  const verticalFranja = q(SELECTORS.verticalFranja);
-  const samarretesVertical = vertical ? vertical.querySelectorAll(SELECTORS.verticalSamarreta) : [];
-
   // El carril i les vistes del carrusel
   const carril = guarda ? guarda.querySelector('div[style*="width: 400%"]') : null;
-
-  // El botó del selector de la composició vertical: la primera instància que
-  // tingui mida DINS la composició (a la pàgina 1 n'hi ha una altra, la del
-  // MegaColumn, que pot estar fora de la vista).
-  const botoVertical = vertical
-    ? [...vertical.querySelectorAll(SELECTORS.botoSelector)].find((e) => e.getBoundingClientRect().width > 0) || null
-    : null;
 
   const r = {
     finestra: {
@@ -171,27 +144,9 @@ export function mesuraMegaslide(doc = typeof document !== 'undefined' ? document
     },
     colors: rect(graellaColors, panell),
     malla9P1: rect(mallaP1, panell),
-    // Les peces de la composicio vertical (nomes a la vertical).
-    vertical: {
-      composicio: rect(vertical, panell),
-      scroll: rect(verticalScroll, panell),
-      graella: rect(verticalGraella, panell),
-      colleccions: rect(verticalColleccions, panell),
-      botons: rect(verticalBotons, panell),
-      franja: rect(verticalFranja, panell),
-      samarretes: samarretesVertical.length,
-      samarretesAmbImatge: [...samarretesVertical].filter((b) => b.querySelector('img')).length,
-      midaSamarreta: samarretesVertical[0]
-        ? rodona(samarretesVertical[0].getBoundingClientRect().width)
-        : null,
-      files: vertical ? vertical.querySelectorAll('[data-vertical-graella="1"] > div').length : null,
-      botoSelector: rect(botoVertical, panell),
-    },
     franja: {
       p1: rect(franjaP1, panell),
-      // A la vertical, la franja de la pagina 2 es la de la composicio
-      // (`data-vertical-franja`), que tambe porta `data-stripe-visual-content="2"`.
-      p2: rect(franjaP2, panell) || (verticalFranja ? rect(verticalFranja, panell) : null),
+      p2: rect(franjaP2, panell),
     },
     variables: variables(win),
     // Derivats: les diferències que els bucles volen mantenir a zero

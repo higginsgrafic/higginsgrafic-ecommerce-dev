@@ -14,7 +14,6 @@ import {
 } from '../fullwide/MegaColumn.jsx';
 import { FirstContactDibuix00Buttons } from '../fullwide/firstContactPanels.jsx';
 import { computeStripeTileOverlaySrcs, computeStripeTileItems } from '@/utils/resolveStripeTile.js';
-import VerticalParadigmaP2 from './VerticalParadigmaP2.jsx';
 
 export default function MegaslidePagina2({
   active,
@@ -63,7 +62,6 @@ export default function MegaslidePagina2({
   onShirtClick,
   thinDrawings,
   megaMenuRef,
-  onVerticalContentChange,
 }) {
   const viewportRef = useRef(null);
   const calibrationRef = megaMenuRef;
@@ -383,84 +381,6 @@ export default function MegaslidePagina2({
   }, [stripeTileItems, hoveredStripeItem]);
 
   const stripeEmptyMaskSrc = null;
-
-  /**
-   * LA VERTICAL DE LA PÀGINA 2: la composició pròpia, sense belt.
-   *
-   * Substitueix el cercador sencer (la barra grisa, la graella de colors 16×4,
-   * el selector Blanc/Color/Negre del cantó esquerre i la franja de 14
-   * samarretes del belt): a la vertical, la pàgina 2 és la graella de dibuixos
-   * a dalt (les cinc col·leccions) i, a sota, la llista de col·leccions, els
-   * botons d'acció amb la paleta i la franja en 2×7.
-   *
-   * Aquí dalt de tot i no dins del JSX de més avall perquè la composició viu
-   * DINS del carril i no ha de heretar ni la mesura del tauler de 992 px ni cap
-   * dels bucles de calibratge del cercador (alignTopRowToPage1, el centratge
-   * del selector amb la graella de colors...), que aquí no tenen res a
-   * alinear.
-   */
-  if (isPortraitTablet && active) {
-    return (
-      <div
-        style={{
-          width: '25%',
-          flexShrink: 0,
-          display: 'block',
-          height: '100%',
-          position: 'relative',
-          overflow: 'hidden',
-        }}
-      >
-        <div
-          data-mega-page-viewport="2"
-          style={{
-            width: '100%',
-            height: '100%',
-            display: 'flex',
-            justifyContent: 'center',
-            overflow: 'hidden',
-          }}
-        >
-          <VerticalParadigmaP2
-            active={active}
-            resolvedMega={resolvedMegaFiltered}
-            showStripe={showStripe}
-            stripeVariantVisibility={stripeVariantVisibility}
-            cercadorSelectedColor={cercadorSelectedColor}
-            onSelectColor={setCercadorSelectedColor}
-            humanInsideVariant={humanInsideVariant}
-            firstContactVariant={firstContactVariant}
-            displayedShirtColor={displayedShirtColor}
-            resolvedOverlaySrc={resolvedOverlaySrc}
-            selectedItem={
-              active === 'first_contact' ? firstContactSelectedItem
-              : active === 'the_human_inside' ? humanInsideSelectedItem
-              : (selectedItemByCollection?.[active] ?? null)
-            }
-            onSelectCollectionKey={(key) => {
-              const raw = typeof key === 'string' ? key : '';
-              if (!raw) return;
-              if (raw.includes(':')) {
-                const [collection, subcollection] = raw.split(':');
-                setActive(collection);
-                setAustenSubcollection(subcollection || null);
-              } else {
-                setActive(raw);
-                setAustenSubcollection(null);
-              }
-            }}
-            setStripeOverlayOverrideActive={setStripeOverlayOverrideActive}
-            setFirstContactVariant={setFirstContactVariant}
-            setHumanInsideVariant={setHumanInsideVariant}
-            setFirstContactSelectedItem={setFirstContactSelectedItem}
-            setHumanInsideSelectedItem={setHumanInsideSelectedItem}
-            setSelectedItemByCollection={setSelectedItemByCollection}
-            onAlcadaContingut={onVerticalContentChange}
-          />
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div style={{ width: '25%', flexShrink: 0, display: isPortraitTablet ? 'block' : 'flex', height: '100%', position: 'relative', justifyContent: 'center', overflow: isPortraitTablet ? 'hidden' : 'visible' }}>

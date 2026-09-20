@@ -8,54 +8,54 @@
     },
     "panell": {
       "top": 131,
-      "bottom": 531,
+      "bottom": 423,
       "left": 0,
       "right": 753,
       "width": 753,
-      "height": 400,
+      "height": 292,
       "relTop": 0,
-      "relBottom": 400
+      "relBottom": 292
     },
     "guarda": {
       "top": 163,
-      "bottom": 498,
+      "bottom": 390,
       "left": 24,
       "right": 729,
       "width": 705,
-      "height": 335,
+      "height": 227,
       "relTop": 32,
-      "relBottom": 367
+      "relBottom": 259
     },
     "carril": {
       "top": 163,
-      "bottom": 498,
+      "bottom": 390,
       "left": -768,
       "right": 2304,
       "width": 3072,
-      "height": 335,
+      "height": 227,
       "relTop": 32,
-      "relBottom": 367
+      "relBottom": 259
     },
     "vistes": {
       "p1": {
         "top": 163,
-        "bottom": 498,
+        "bottom": 390,
         "left": -768,
         "right": 0,
         "width": 768,
-        "height": 335,
+        "height": 227,
         "relTop": 32,
-        "relBottom": 367
+        "relBottom": 259
       },
       "p2": {
         "top": 163,
-        "bottom": 498,
+        "bottom": 390,
         "left": 0,
         "right": 768,
         "width": 768,
-        "height": 335,
+        "height": 227,
         "relTop": 32,
-        "relBottom": 367
+        "relBottom": 259
       }
     },
     "selector": {
@@ -70,16 +70,25 @@
         "relBottom": 101.88
       },
       "p2": {
-        "top": 201.7,
-        "bottom": 232.88,
-        "left": -738.24,
-        "right": -644.67,
-        "width": 93.57,
-        "height": 31.18,
-        "relTop": 70.7,
-        "relBottom": 101.88
+        "top": 216.42,
+        "bottom": 245.77,
+        "left": 29.39,
+        "right": 117.42,
+        "width": 88.03,
+        "height": 29.34,
+        "relTop": 85.42,
+        "relBottom": 114.77
       },
-      "contenidorP2": null,
+      "contenidorP2": {
+        "top": 203,
+        "bottom": 291.03,
+        "left": 29.39,
+        "right": 117.42,
+        "width": 88.03,
+        "height": 88.03,
+        "relTop": 72,
+        "relBottom": 160.03
+      },
       "barraP1": {
         "top": 170.52,
         "bottom": 264.09,
@@ -91,25 +100,25 @@
         "relBottom": 133.09
       },
       "barraP2": {
-        "top": 170.52,
-        "bottom": 264.09,
-        "left": -738.24,
-        "right": -644.67,
-        "width": 93.57,
-        "height": 93.57,
-        "relTop": 39.52,
-        "relBottom": 133.09
+        "top": 187.08,
+        "bottom": 275.11,
+        "left": 29.39,
+        "right": 117.42,
+        "width": 88.03,
+        "height": 88.03,
+        "relTop": 56.08,
+        "relBottom": 144.11
       }
     },
     "colors": {
-      "top": 340.91,
-      "bottom": 434.38,
-      "left": 178.41,
-      "right": 282.94,
-      "width": 104.53,
+      "top": 184.36,
+      "bottom": 277.83,
+      "left": 759.7,
+      "right": 817.02,
+      "width": 57.31,
       "height": 93.47,
-      "relTop": 209.91,
-      "relBottom": 303.38
+      "relTop": 53.36,
+      "relBottom": 146.83
     },
     "malla9P1": {
       "top": 163,
@@ -120,82 +129,6 @@
       "height": 106.75,
       "relTop": 32,
       "relBottom": 138.75
-    },
-    "vertical": {
-      "composicio": {
-        "top": 163,
-        "bottom": 434.38,
-        "left": 40,
-        "right": 728,
-        "width": 688,
-        "height": 271.38,
-        "relTop": 32,
-        "relBottom": 303.38
-      },
-      "scroll": {
-        "top": 163,
-        "bottom": 434,
-        "left": 40,
-        "right": 728,
-        "width": 688,
-        "height": 271,
-        "relTop": 32,
-        "relBottom": 303
-      },
-      "graella": {
-        "top": 163,
-        "bottom": 200.38,
-        "left": 40,
-        "right": 728,
-        "width": 688,
-        "height": 37.38,
-        "relTop": 32,
-        "relBottom": 69.38
-      },
-      "colleccions": {
-        "top": 216.38,
-        "bottom": 426.19,
-        "left": 40,
-        "right": 172.41,
-        "width": 132.41,
-        "height": 209.81,
-        "relTop": 85.38,
-        "relBottom": 295.19
-      },
-      "botons": {
-        "top": 216.38,
-        "bottom": 434.38,
-        "left": 178.41,
-        "right": 282.94,
-        "width": 104.53,
-        "height": 218,
-        "relTop": 85.38,
-        "relBottom": 303.38
-      },
-      "franja": {
-        "top": 216.38,
-        "bottom": 397.09,
-        "left": 288.94,
-        "right": 727.98,
-        "width": 439.05,
-        "height": 180.72,
-        "relTop": 85.38,
-        "relBottom": 266.09
-      },
-      "samarretes": 14,
-      "samarretesAmbImatge": 7,
-      "midaSamarreta": 57.58,
-      "files": 1,
-      "botoSelector": {
-        "top": 273.84,
-        "bottom": 298.92,
-        "left": 178.41,
-        "right": 282.94,
-        "width": 104.53,
-        "height": 25.08,
-        "relTop": 142.84,
-        "relBottom": 167.92
-      }
     },
     "franja": {
       "p1": {
@@ -209,14 +142,14 @@
         "relBottom": 260.84
       },
       "p2": {
-        "top": 216.38,
-        "bottom": 397.09,
-        "left": 288.94,
-        "right": 727.98,
-        "width": 439.05,
-        "height": 180.72,
-        "relTop": 85.38,
-        "relBottom": 266.09
+        "top": 293.24,
+        "bottom": 394.89,
+        "left": 17.05,
+        "right": 965.95,
+        "width": 948.91,
+        "height": 101.65,
+        "relTop": 162.24,
+        "relBottom": 263.89
       }
     },
     "variables": {
@@ -230,9 +163,9 @@
       "--hg-cercador-bar-scale": null
     },
     "deltes": {
-      "selectorP2menysP1": 0,
-      "franjaP2menysP1": -77.19,
-      "colorsMenysSelectorP2": 170.35
+      "selectorP2menysP1": 14.72,
+      "franjaP2menysP1": -0.32,
+      "colorsMenysSelectorP2": 0
     }
   },
   "tauleta apaisada 1024": {
@@ -365,19 +298,6 @@
       "height": 106.75,
       "relTop": 2.48,
       "relBottom": 109.23
-    },
-    "vertical": {
-      "composicio": null,
-      "scroll": null,
-      "graella": null,
-      "colleccions": null,
-      "botons": null,
-      "franja": null,
-      "samarretes": 0,
-      "samarretesAmbImatge": 0,
-      "midaSamarreta": null,
-      "files": null,
-      "botoSelector": null
     },
     "franja": {
       "p1": {
@@ -548,19 +468,6 @@
       "relTop": 2.48,
       "relBottom": 109.23
     },
-    "vertical": {
-      "composicio": null,
-      "scroll": null,
-      "graella": null,
-      "colleccions": null,
-      "botons": null,
-      "franja": null,
-      "samarretes": 0,
-      "samarretesAmbImatge": 0,
-      "midaSamarreta": null,
-      "files": null,
-      "botoSelector": null
-    },
     "franja": {
       "p1": {
         "top": 259.04,
@@ -729,19 +636,6 @@
       "height": 106.75,
       "relTop": 2.48,
       "relBottom": 109.23
-    },
-    "vertical": {
-      "composicio": null,
-      "scroll": null,
-      "graella": null,
-      "colleccions": null,
-      "botons": null,
-      "franja": null,
-      "samarretes": 0,
-      "samarretesAmbImatge": 0,
-      "midaSamarreta": null,
-      "files": null,
-      "botoSelector": null
     },
     "franja": {
       "p1": {
@@ -912,19 +806,6 @@
       "relTop": 2.48,
       "relBottom": 109.23
     },
-    "vertical": {
-      "composicio": null,
-      "scroll": null,
-      "graella": null,
-      "colleccions": null,
-      "botons": null,
-      "franja": null,
-      "samarretes": 0,
-      "samarretesAmbImatge": 0,
-      "midaSamarreta": null,
-      "files": null,
-      "botoSelector": null
-    },
     "franja": {
       "p1": {
         "top": 259.04,
@@ -1094,19 +975,6 @@
       "relTop": 12.48,
       "relBottom": 123.93
     },
-    "vertical": {
-      "composicio": null,
-      "scroll": null,
-      "graella": null,
-      "colleccions": null,
-      "botons": null,
-      "franja": null,
-      "samarretes": 0,
-      "samarretesAmbImatge": 0,
-      "midaSamarreta": null,
-      "files": null,
-      "botoSelector": null
-    },
     "franja": {
       "p1": {
         "top": 279.04,
@@ -1275,19 +1143,6 @@
       "height": 144.14,
       "relTop": 12.48,
       "relBottom": 156.62
-    },
-    "vertical": {
-      "composicio": null,
-      "scroll": null,
-      "graella": null,
-      "colleccions": null,
-      "botons": null,
-      "franja": null,
-      "samarretes": 0,
-      "samarretesAmbImatge": 0,
-      "midaSamarreta": null,
-      "files": null,
-      "botoSelector": null
     },
     "franja": {
       "p1": {
