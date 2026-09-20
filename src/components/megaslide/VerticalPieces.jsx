@@ -74,17 +74,25 @@ export function VerticalStripeFranja({
   selectedItem,
   onSelect,
   shirtColor = null,
+  width,
 }) {
   return (
     <div
       data-vertical-franja="1"
+      data-contorn-bloc="2"
       style={{
         display: 'grid',
+        width: width ? `${width}px` : '100%',
+        maxWidth: '100%',
         gridTemplateColumns: `repeat(${FRANJA_COLUMNES}, minmax(0, 1fr))`,
         gridTemplateRows: `repeat(${FRANJA_FILES}, auto)`,
         columnGap: `${GAP_PX}px`,
         rowGap: '8px',
+        // La franja s'encabir sempre dins del seu espai: les caselles es
+        // reparteixen l'ample que els dona el pare (mai el sobrepassen).
+        width: '100%',
         minWidth: 0,
+        maxWidth: '100%',
         // La franja te caselles amb `mix-blend-mode`: sense aillar-la, el
         // `multiply` es mesclaria amb el fons de la pagina.
         isolation: 'isolate',
