@@ -436,7 +436,7 @@ export default function MegaMenuPanel({
                           </div>
                         )}
                         selector={(
-                          <div style={{ width: '75.9%' }}>
+                          <div style={{ width: '90%' }}>
                           <FirstContactDibuix00Buttons
                             onWhite={() => {
                               setStripeOverlayOverrideActive?.(false);
