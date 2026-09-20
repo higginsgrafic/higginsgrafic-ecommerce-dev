@@ -6,8 +6,14 @@ import { FRANJA_AJUST_PX } from '../fullwide/MegaStripePanelP1.jsx';
 import { desplacamentFranjaEscriptori } from '../../utils/mesuraMegaslide.js';
 import { carrilPx, carrilLane } from '../../utils/layoutMetrics.js';
 import { CapaTaulaVertical, TaulaVerticalP2 } from './TaulaVertical.jsx';
-import GraellaDibuixos16x4 from './GraellaDibuixos16x4.jsx';
-import { CercadorColleccions, CercadorColors } from '../fullwide/CercadorTopBar.jsx';
+import {
+  CercadorColleccionsColumna,
+  CercadorColorsGrid,
+  CercadorDibuixosGraella,
+  dibuixosGraella16x4,
+} from '../fullwide/CercadorTextRow.jsx';
+import { colorGap, colorMida } from '../fullwide/midesGraella.js';
+import { ampladaCarril } from './TaulaVertical.jsx';
 import MegaHeroSlider from '../MegaHeroSlider.jsx';
 import Pauta4ColsOverlay from '../pauta/Pauta4ColsOverlay';
 import useMegaslideCalibration from '@/hooks/useMegaslideCalibration';
@@ -385,6 +391,25 @@ export default function MegaslidePagina2({
 
   const stripeEmptyMaskSrc = null;
 
+  // Les mides de la taula de la vista vertical: el carril i les seves caselles.
+  // La filera de dalt fa carril/5 d'alcada (les caselles son quadrades) i la
+  // graella hi ha de cabre en 16 columnes i 4 files.
+  const carrilTaula = typeof window !== 'undefined' && window.innerWidth > 0
+    ? ampladaCarril(window.innerWidth)
+    : 0;
+  const gapDibuixos = 3;
+  const midesTaula = (() => {
+    if (!carrilTaula) return { dibuixPx: 32, gapDibuixos, alcadaFilaLlista: 30 };
+    const alcadaCella = carrilTaula / 5;
+    const perAmplada = (carrilTaula - 15 * gapDibuixos) / 16;
+    const perAlcada = (alcadaCella - 3 * gapDibuixos) / 4;
+    return {
+      dibuixPx: Math.floor(Math.min(perAmplada, perAlcada) * 100) / 100,
+      gapDibuixos,
+      alcadaFilaLlista: Math.floor(((4 * Math.min(perAmplada, perAlcada)) / 9) * 100) / 100,
+    };
+  })();
+
   return (
     <div style={{ width: '25%', flexShrink: 0, display: isPortraitTablet ? 'block' : 'flex', height: '100%', position: 'relative', justifyContent: 'center', overflow: isPortraitTablet ? 'hidden' : 'visible' }}>
       <div
@@ -657,13 +682,31 @@ export default function MegaslidePagina2({
         <CapaTaulaVertical pagina={2}>
           <TaulaVerticalP2
             /* Les peces de debò, una per casella. */
-            graella={<GraellaDibuixos16x4 active={active} />}
-            colleccions={<CercadorColleccions activeKey={active} onSelect={setActive} vertical />}
+            graella={(
+              <CercadorDibuixosGraella
+                items={dibuixosGraella16x4()}
+                dibuixPx={midesTaula.dibuixPx}
+                gapH={midesTaula.gapDibuixos}
+                gapV={midesTaula.gapDibuixos}
+                numColumns={16}
+                activeCollection={active}
+                isPortraitTablet={isPortraitTablet}
+              />
+            )}
+            colleccions={(
+              <CercadorColleccionsColumna
+                activeKey={active}
+                onSelect={setActive}
+                alcadaFilaLlista={midesTaula.alcadaFilaLlista}
+              />
+            )}
             colors={(
-              <CercadorColors
+              <CercadorColorsGrid
                 selectedColor={cercadorSelectedColor}
                 onSelectColor={setCercadorSelectedColor}
-                columnes={4}
+                cerclePx={colorMida(true, false)}
+                colorGapPx={colorGap(true, false)}
+                isPortraitTablet={isPortraitTablet}
               />
             )}
             stripe={(

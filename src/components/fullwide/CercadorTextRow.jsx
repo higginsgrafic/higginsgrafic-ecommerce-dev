@@ -317,6 +317,206 @@ function Group({ group, isFirst, dimmed, clickable, selectedStripeItem, hoveredS
   );
 }
 
+/**
+ * Els dibuixos de la graella 16x4, aplanats per colleccio (el MATEIX joc que fa
+ * servir la pagina 2): el consumeix la taula de la vista vertical.
+ */
+export function dibuixosGraella16x4() {
+  return COLUMNS.flatMap((groups) => groups.flatMap((group) => group.items.map((label) => ({
+    label,
+    collection: group.collection,
+    subcollection: group.subcollection,
+    stripeItem: STRIPE_MAP[label],
+  }))));
+}
+
+/** La GRAELLA DE DIBUIXOS 16x4 de la pagina 2 (una casella per dibuix). */
+export function CercadorDibuixosGraella({
+  graellaRef = null,
+  items,
+  dibuixPx,
+  gapH,
+  gapV,
+  numColumns,
+  activeCollection,
+  activeSubcollection,
+  onSelectGroup,
+  onHoverItem,
+  onHoverLeave,
+  isPortraitTablet = false,
+  isLandscapeTablet = false,
+  fontBoost = 0,
+}) {
+  return (
+    <div ref={graellaRef} style={{ display: 'grid', gridTemplateColumns: `repeat(${numColumns}, ${dibuixPx}px)`, gap: `${gapV}px ${gapH}px`, width: '100%', minWidth: 0 }}>
+      {items.map(({ label, collection, subcollection, stripeItem }) => {
+        const dimmed = activeCollection && collection !== activeCollection
+          ? true
+          : activeCollection === 'austen' && collection === 'austen' && activeSubcollection && subcollection !== activeSubcollection;
+        const dibuix = dibuixDelNom(label);
+        return (
+          <button
+            key={label}
+            type="button"
+            title={label}
+            aria-label={label}
+            onClick={() => onSelectGroup?.(collection, subcollection, stripeItem)}
+            onMouseEnter={() => stripeItem && onHoverItem?.(stripeItem, collection)}
+            onMouseLeave={onHoverLeave}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: `${dibuixPx}px`,
+              height: `${dibuixPx}px`,
+              padding: 0,
+              border: 0,
+              background: 'transparent',
+              opacity: dimmed ? 0.24 : 1,
+              cursor: 'pointer',
+            }}
+          >
+            {dibuix ? (
+              <img
+                src={dibuix}
+                alt={label}
+                loading="lazy"
+                style={{
+                  height: `${dibuixPx}px`,
+                  width: `${dibuixPx}px`,
+                  objectFit: 'contain',
+                  display: 'block',
+                }}
+              />
+            ) : (
+              <span style={{ color: '#2B2B2B', fontSize: (isPortraitTablet || isLandscapeTablet) ? `${8 + fontBoost}px` : carrilPx(11 + fontBoost), whiteSpace: 'nowrap' }}>
+                {label.replace(/^Looking For My Darcy/, 'LFMD')}
+              </span>
+            )}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+/** La GRAELLA DE COLORS (4x4) de la pagina 2, amb la pastilla COLOR. */
+export function CercadorColorsGrid({
+  selectedColor,
+  onSelectColor,
+  cerclePx,
+  colorGapPx,
+  transform,
+  marginTop,
+  isPortraitTablet = false,
+  isLandscapeTablet = false,
+}) {
+  return (
+    <div data-p2-color-grid style={{
+      display: 'grid',
+      gridTemplateColumns: `repeat(4, ${cerclePx}px)`,
+      gridAutoRows: `${cerclePx}px`,
+      gap: `${colorGapPx}px`,
+      transform,
+      marginTop,
+    }}>
+      {CERCADOR_COLORS.map(({ slug, hex }) => {
+        const selected = slug === selectedColor;
+        return (
+          <button
+            key={slug}
+            type="button"
+            aria-label={slug}
+            onClick={() => onSelectColor?.(slug)}
+            style={{
+              width: `${cerclePx}px`,
+              height: `${cerclePx}px`,
+              padding: 0,
+              borderRadius: '50%',
+              border: selected ? '0.5px solid rgba(0,0,0,0.22)' : '0.5px solid rgba(0,0,0,0.22)',
+              outline: selected ? '1px solid #111827' : 'none',
+              outlineOffset: '3px',
+              backgroundColor: hex,
+              boxSizing: 'border-box',
+              cursor: 'pointer',
+            }}
+          />
+        );
+      })}
+      <div
+        style={{
+          gridColumn: 'span 2',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          height: isPortraitTablet ? '18px' : (isLandscapeTablet ? '21px' : '28px'),
+          padding: isPortraitTablet ? '0 5px' : (isLandscapeTablet ? '0 6px' : '0 8px'),
+          borderRadius: isPortraitTablet ? '9px' : (isLandscapeTablet ? '10.5px' : '14px'),
+          backgroundColor: '#FFFFFF',
+          border: '0.5px solid rgba(0,0,0,0.22)',
+          boxSizing: 'border-box',
+        }}
+      >
+        <span
+          className="font-oswald"
+          style={{
+            fontWeight: 700,
+            fontSize: (isPortraitTablet || isLandscapeTablet) ? '8px' : carrilPx(11),
+            lineHeight: 1,
+            letterSpacing: '0.04em',
+            color: '#2B2B2B',
+            whiteSpace: 'nowrap',
+          }}
+        >
+          COLOR
+        </span>
+      </div>
+    </div>
+  );
+}
+
+/** La COLUMNA DE COLLECCIONS de la pagina 2. */
+export function CercadorColleccionsColumna({
+  activeKey,
+  onSelect,
+  alcadaFilaLlista,
+  paddingLeft,
+  transform,
+  isPortraitTablet = false,
+  isLandscapeTablet = false,
+}) {
+  return (
+    <div style={{ width: '100%', transform, paddingLeft }}>
+      {CERCADOR_COLLECTIONS.map(({ key, label }) => (
+        <button
+          key={key}
+          type="button"
+          onClick={() => onSelect?.(key)}
+          className="font-roboto-condensed"
+          style={{
+            display: 'block',
+            width: '100%',
+            boxSizing: 'border-box',
+            height: (isPortraitTablet || isLandscapeTablet) ? '11px' : `${alcadaFilaLlista}px`,
+            padding: 0,
+            border: 0,
+            background: 'transparent',
+            color: '#2B2B2B',
+            fontSize: (isPortraitTablet || isLandscapeTablet) ? '8px' : carrilPx(11),
+            fontWeight: key === activeKey ? 700 : 300,
+            lineHeight: (isPortraitTablet || isLandscapeTablet) ? '11px' : `${alcadaFilaLlista}px`,
+            textAlign: 'right',
+            whiteSpace: 'nowrap',
+            cursor: 'pointer',
+          }}
+        >
+          {label}
+        </button>
+      ))}
+    </div>
+  );
+}
+
 function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripeItem, hoveredStripeItem, onSelectGroup, onHoverItem, onHoverLeave, compact = false, selectedColor = 'white', onSelectColor, onSelectCollection, isPortraitTablet = false, isLandscapeTablet = false, uniformColumns = false, fontBoost = 0, desplacamentVertical = 0, esquerra }) {
   // Ajust de la graella compacta a l'espai disponible (només desktop: les
   // tauletes mantenen la mida fixa de moment). Mesurem l'amplada de la columna
@@ -461,120 +661,35 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
       >
         {/* Sense desplaçament propi de tauleta: la graella arrenca on arrenca a
             l'escriptori (13% del carril). */}
-        <div ref={graellaRef} style={{ display: 'grid', gridTemplateColumns: `repeat(${numColumns}, ${dibuixPx}px)`, gap: `${gapV}px ${gapH}px`, width: '100%', minWidth: 0 }}>
-          {items.map(({ label, collection, subcollection, stripeItem }) => {
-            const dimmed = activeCollection && collection !== activeCollection
-              ? true
-              : activeCollection === 'austen' && collection === 'austen' && activeSubcollection && subcollection !== activeSubcollection;
-            const dibuix = dibuixDelNom(label);
-            return (
-              <button
-                key={label}
-                type="button"
-                title={label}
-                aria-label={label}
-                onClick={() => onSelectGroup?.(collection, subcollection, stripeItem)}
-                onMouseEnter={() => stripeItem && onHoverItem?.(stripeItem, collection)}
-                onMouseLeave={onHoverLeave}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  width: `${dibuixPx}px`,
-                  height: `${dibuixPx}px`,
-                  padding: 0,
-                  border: 0,
-                  background: 'transparent',
-                  opacity: dimmed ? 0.24 : 1,
-                  cursor: 'pointer',
-                }}
-              >
-                {dibuix ? (
-                  <img
-                    src={dibuix}
-                    alt={label}
-                    loading="lazy"
-                    style={{
-                      height: `${dibuixPx}px`,
-                      width: `${dibuixPx}px`,
-                      objectFit: 'contain',
-                      display: 'block',
-                    }}
-                  />
-                ) : (
-                  <span style={{ color: '#2B2B2B', fontSize: (isPortraitTablet || isLandscapeTablet) ? `${8 + fontBoost}px` : carrilPx(11 + fontBoost), whiteSpace: 'nowrap' }}>
-                    {label.replace(/^Looking For My Darcy/, 'LFMD')}
-                  </span>
-                )}
-              </button>
-            );
-          })}
-        </div>
+        <CercadorDibuixosGraella
+          graellaRef={graellaRef}
+          items={items}
+          dibuixPx={dibuixPx}
+          gapH={gapH}
+          gapV={gapV}
+          numColumns={numColumns}
+          activeCollection={activeCollection}
+          activeSubcollection={activeSubcollection}
+          onSelectGroup={onSelectGroup}
+          onHoverItem={onHoverItem}
+          onHoverLeave={onHoverLeave}
+          isPortraitTablet={isPortraitTablet}
+          isLandscapeTablet={isLandscapeTablet}
+          fontBoost={fontBoost}
+        />
 
-        <div data-p2-color-grid style={{
-          display: 'grid',
-          gridTemplateColumns: `repeat(4, ${cerclePx}px)`,
-          gridAutoRows: `${cerclePx}px`,
-          gap: `${colorGapPx}px`,
+        <CercadorColorsGrid
+          selectedColor={selectedColor}
+          onSelectColor={onSelectColor}
+          cerclePx={cerclePx}
+          colorGapPx={colorGapPx}
           // A l'apaisada la graella de colors va 10 px mes a l'esquerra (ho va
           // demanar l'amo, igual que la columna de colleccions).
-          transform: uniformColumns ? 'translateX(85px)' : ((isPortraitTablet || isLandscapeTablet) ? 'translateX(-10px)' : undefined),
-          marginTop: uniformColumns ? '5px' : undefined,
-        }}>
-          {CERCADOR_COLORS.map(({ slug, hex }) => {
-            const selected = slug === selectedColor;
-            return (
-              <button
-                key={slug}
-                type="button"
-                aria-label={slug}
-                onClick={() => onSelectColor?.(slug)}
-                style={{
-                  width: `${cerclePx}px`,
-                  height: `${cerclePx}px`,
-                  padding: 0,
-                  borderRadius: '50%',
-                  border: selected ? '0.5px solid rgba(0,0,0,0.22)' : '0.5px solid rgba(0,0,0,0.22)',
-                  // L'indicador del color triat: la meitat de gruix (1 px en
-                  // comptes de 2).
-                  outline: selected ? '1px solid #111827' : 'none',
-                  outlineOffset: '3px',
-                  backgroundColor: hex,
-                  boxSizing: 'border-box',
-                  cursor: 'pointer',
-                }}
-              />
-            );
-          })}
-          <div
-            style={{
-              gridColumn: 'span 2',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              height: isPortraitTablet ? '18px' : (isLandscapeTablet ? '21px' : '28px'),
-              padding: isPortraitTablet ? '0 5px' : (isLandscapeTablet ? '0 6px' : '0 8px'),
-              borderRadius: isPortraitTablet ? '9px' : (isLandscapeTablet ? '10.5px' : '14px'),
-              backgroundColor: '#FFFFFF',
-              border: '0.5px solid rgba(0,0,0,0.22)',
-              boxSizing: 'border-box',
-            }}
-          >
-            <span
-              className="font-oswald"
-              style={{
-                fontWeight: 700,
-                fontSize: (isPortraitTablet || isLandscapeTablet) ? '8px' : carrilPx(11),
-                lineHeight: 1,
-                letterSpacing: '0.04em',
-                color: '#2B2B2B',
-                whiteSpace: 'nowrap',
-              }}
-            >
-              COLOR
-            </span>
-          </div>
-        </div>
+          transform={uniformColumns ? 'translateX(85px)' : ((isPortraitTablet || isLandscapeTablet) ? 'translateX(-10px)' : undefined)}
+          marginTop={uniformColumns ? '5px' : undefined}
+          isPortraitTablet={isPortraitTablet}
+          isLandscapeTablet={isLandscapeTablet}
+        />
 
         {/* La columna s'ajusta al nom mes llarg (fit-content): aixi el nom
             mes llarg comença on començava i els curts s'hi enrasen per la
@@ -584,57 +699,20 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
             sigui el nom mes llarg ni del cos de lletra. Abans la columna era
             `fit-content` i el conjunt es desplaçava 45 px, i per aixo el text
             acaba 12 px mes enlla de la franja. */}
-        <div
-          style={{
-            width: '100%',
-            // A l'apaisada (1024 i 1280) la llista va 10 px mes a l'esquerra,
-            // ho va demanar l'amo.
-            transform: uniformColumns
-              ? 'translateX(120px)'
-              : ((isPortraitTablet || isLandscapeTablet) ? 'translateX(-10px)' : undefined),
-            // La graella de colors te la seva columna (78) i el seu contingut
-            // (4 cercles i 3 separacions) en surt: aquest coixí es la part que
-            // sobresurt, perque la llista no hi caigui a sobre. La filera es
-            // qui cedeix espai (vegeu midesGraellaCompacta: s'encongeixen
-            // primer les separacions dels dibuixos).
-            // (A la banda estreta els cercles van 10 px a la dreta, o sigui que
-            // tambe compten per al coixi.)
-            paddingLeft: `max(0px, calc(${4 * cerclePx + 3 * colorGapPx}px - ${carrilLane(78)}))`,
-          }}
-        >
-          {CERCADOR_COLLECTIONS.map(({ key, label }) => (
-            <button
-              key={key}
-              type="button"
-              onClick={() => onSelectCollection?.(key)}
-              className="font-roboto-condensed"
-              style={{
-                display: 'block',
-                // Els botons, per defecte, s'ajusten al text: sense amplada
-                // plena, l'alineacio (esquerra o dreta) no es pot veure.
-                width: '100%',
-                boxSizing: 'border-box',
-                height: (isPortraitTablet || isLandscapeTablet) ? '11px' : `${alcadaFilaLlista}px`,
-                padding: 0,
-                border: 0,
-                background: 'transparent',
-                color: '#2B2B2B',
-                // El text tambe s'encongeix amb el carril: es el que fa que la
-                // columna de la llista no demani sempre la mida del text de
-                // 1920, i que per tant els gaps dels dibuixos no s'hagin
-                // d'apretar tant. A tauleta es queda a 8 px (el seu disseny).
-                fontSize: (isPortraitTablet || isLandscapeTablet) ? '8px' : carrilPx(11),
-                fontWeight: key === activeKey ? 700 : 300,
-                lineHeight: (isPortraitTablet || isLandscapeTablet) ? '11px' : `${alcadaFilaLlista}px`,
-                textAlign: 'right',
-                whiteSpace: 'nowrap',
-                cursor: 'pointer',
-              }}
-            >
-              {label}
-            </button>
-          ))}
-        </div>
+        <CercadorColleccionsColumna
+          activeKey={activeKey}
+          onSelect={onSelectCollection}
+          alcadaFilaLlista={alcadaFilaLlista}
+          // A l'apaisada (1024 i 1280) la llista va 10 px mes a l'esquerra, ho
+          // va demanar l'amo.
+          transform={uniformColumns ? 'translateX(120px)' : ((isPortraitTablet || isLandscapeTablet) ? 'translateX(-10px)' : undefined)}
+          // La graella de colors te la seva columna (78) i el seu contingut
+          // (4 cercles i 3 separacions) en surt: aquest coixí es la part que
+          // sobresurt, perque la llista no hi caigui a sobre.
+          paddingLeft={`max(0px, calc(${4 * cerclePx + 3 * colorGapPx}px - ${carrilLane(78)}))`}
+          isPortraitTablet={isPortraitTablet}
+          isLandscapeTablet={isLandscapeTablet}
+        />
       </div>
     );
   }
