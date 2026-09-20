@@ -606,8 +606,10 @@ function MegaStripePanel({
                             try {
                               if (!src || typeof src !== 'string') return src;
                               const safeIdx = Number.isFinite(Number(idx)) ? Number(idx) : 0;
-                              const isFirst = safeIdx === 0;
-                              const isLast = safeIdx === 13;
+                              // A la vista vertical la franja son DUES fileres de 7: la samarreta
+                              // sencera (i el seu dibuix) es la de l'extrem de CADA filera.
+                              const isFirst = isPortraitTablet ? safeIdx % 7 === 0 : safeIdx === 0;
+                              const isLast = isPortraitTablet ? safeIdx % 7 === 6 : safeIdx === 13;
                               const useEdgeOverride = active === 'first_contact' || active === 'the_human_inside' || active === 'miscellania' || isAustenPemberley || isAustenKeepCalm;
                               const mode = useEdgeOverride && isFirst
                                 ? (baseMode === 'color' ? 'color' : 'black')
@@ -850,8 +852,10 @@ function MegaStripePanel({
                             try {
                               if (!src || typeof src !== 'string') return src;
                               const safeIdx = Number.isFinite(Number(idx)) ? Number(idx) : 0;
-                              const isFirst = safeIdx === 0;
-                              const isLast = safeIdx === 13;
+                              // A la vista vertical la franja son DUES fileres de 7: la samarreta
+                              // sencera (i el seu dibuix) es la de l'extrem de CADA filera.
+                              const isFirst = isPortraitTablet ? safeIdx % 7 === 0 : safeIdx === 0;
+                              const isLast = isPortraitTablet ? safeIdx % 7 === 6 : safeIdx === 13;
                               const useEdgeOverride = active === 'first_contact' || active === 'the_human_inside' || active === 'miscellania' || isAustenPemberley || isAustenKeepCalm;
                               const mode = useEdgeOverride && isFirst
                                 ? (baseMode === 'color' ? 'color' : 'black')
