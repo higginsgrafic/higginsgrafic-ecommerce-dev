@@ -6,7 +6,7 @@ import { FRANJA_AJUST_PX } from '../fullwide/MegaStripePanelP1.jsx';
 import { desplacamentFranjaEscriptori } from '../../utils/mesuraMegaslide.js';
 import { carrilPx, carrilLane } from '../../utils/layoutMetrics.js';
 import { CapaTaulaVertical, TaulaVerticalP2 } from './TaulaVertical.jsx';
-import MegaGridDibuixos from '../fullwide/MegaGridDibuixos.jsx';
+import GraellaDibuixos16x4 from './GraellaDibuixos16x4.jsx';
 import { CercadorColleccions, CercadorColors } from '../fullwide/CercadorTopBar.jsx';
 import MegaHeroSlider from '../MegaHeroSlider.jsx';
 import Pauta4ColsOverlay from '../pauta/Pauta4ColsOverlay';
@@ -657,7 +657,7 @@ export default function MegaslidePagina2({
         <CapaTaulaVertical pagina={2}>
           <TaulaVerticalP2
             /* Les peces de debò, una per casella. */
-            graella={<MegaGridDibuixos active={active} className="w-full" />}
+            graella={<GraellaDibuixos16x4 active={active} />}
             colleccions={<CercadorColleccions activeKey={active} onSelect={setActive} vertical />}
             colors={(
               <CercadorColors
