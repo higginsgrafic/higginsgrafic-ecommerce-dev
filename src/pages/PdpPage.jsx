@@ -3,6 +3,7 @@ import { useLocation, Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 import TambeRail from '@/pages/productRail/TambeRail';
 import CarouselArrows from '@/pages/productRail/CarouselArrows';
+import GraellaFletxes from '@/components/megaslide/GraellaFletxes.jsx';
 import Breadcrumbs from '@/components/Breadcrumbs';
 import { tdpImageFor, availableFinishesFor, defaultFinishFor } from '@/lib/pdpMockup';
 import EditableTextBox from '@/components/dev/EditableTextBox';
@@ -1011,6 +1012,14 @@ function PdpDesktop({ product }) {
             />
           </div>
           </div>
+        </PageBand>
+
+        <PageBand
+          type="graella"
+          fluid
+          style={{ marginTop: '100px', marginBottom: '32px' }}
+        >
+          <GraellaFletxes />
         </PageBand>
 
         <PageBand
