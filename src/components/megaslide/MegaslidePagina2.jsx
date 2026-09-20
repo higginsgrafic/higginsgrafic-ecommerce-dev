@@ -569,7 +569,7 @@ export default function MegaslidePagina2({
           <MegaStripePanel
             active={active}
             reserveGridSpace
-            stripeImageSrc={stripeBaseImageSrc}
+            stripeImageSrc={isPortraitTablet ? '/placeholders/tablet vertical/stripe-curta-7+7.png' : stripeBaseImageSrc}
             resolvedMega={resolvedMegaFiltered}
             showStripe={showStripe}
             stripeRowPadPx={stripeRowPadPx}

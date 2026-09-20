@@ -355,6 +355,9 @@ export default function MegaMenuPanel({
                       les mides del selector i de la franja tambe coincideixen. */}
                   <div style={{ flex: '0 0 auto', width: isPortraitTablet ? '992px' : 'var(--hg-mega-w, 70.3vw)', maxWidth: 'none', position: 'relative', height: '100%', paddingLeft: '0px', paddingRight: '0px' }}>
                     <MegaStripePanelP1
+                      /* A la vista vertical la franja es la imatge de dues
+                         fileres de 7 (7+7); a l'apaisada, la de sempre. */
+                      stripeImageSrc={isPortraitTablet ? '/placeholders/tablet vertical/stripe-curta-7+7.png' : undefined}
                       active={active}
                       resolvedMega={resolvedMega}
                       showStripe={showStripe}
