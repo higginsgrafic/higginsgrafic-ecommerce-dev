@@ -316,6 +316,9 @@ export default function MegaMenuPanel({
               >
                 <div style={{ width: '25%', flexShrink: 0, display: 'block', height: '100%', position: 'relative', overflow: isPortraitTablet ? 'hidden' : 'visible' }}>
                   <div ref={viewport1Ref} data-mega-page-viewport="1" style={{
+                    // El CONTINGUT de la pagina 1 queda AMAGAT.
+                    visibility: 'hidden',
+                    pointerEvents: 'none',
                     width: '100%',
                     height: '100%',
                     display: 'flex',

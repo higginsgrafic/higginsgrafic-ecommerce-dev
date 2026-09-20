@@ -14,16 +14,6 @@ import {
 } from '../fullwide/MegaColumn.jsx';
 import { FirstContactDibuix00Buttons } from '../fullwide/firstContactPanels.jsx';
 import { computeStripeTileOverlaySrcs, computeStripeTileItems, resolveForItem } from '@/utils/resolveStripeTile.js';
-import ContornsVertical, { contornsActius } from './ContornsVertical.jsx';
-import {
-  GAP_PX,
-  VerticalColleccions,
-  VerticalColorsGrid,
-  VerticalGraellaDibuixos,
-  VerticalSelector,
-  VerticalStripeFranja,
-  ampladaCarril,
-} from './VerticalPieces.jsx';
 
 export default function MegaslidePagina2({
   active,
@@ -439,83 +429,7 @@ export default function MegaslidePagina2({
    * cada casella es el negre de sempre i el color hi va a sobre, de manera que
    * totes les caselles canvien de color amb la paleta.
    */
-  if (isPortraitTablet && active) {
-    const carril = ampladaCarril(typeof window !== 'undefined' ? window.innerWidth : 0);
-    const colorSlug = cercadorSelectedColor || 'white';
-    const srcsFranja = (Array.isArray(stripeTileItems) ? stripeTileItems : []).map((it) => (
-      it ? resolveForItem(it, 'black', { active }) : null
-    ));
-    return (
-      <div style={{ width: '25%', flexShrink: 0, display: 'block', height: '100%', position: 'relative', overflow: 'hidden' }}>
-        <div data-mega-page-viewport="2" style={{ width: '100%', height: '100%', display: 'flex', justifyContent: 'center', overflow: 'hidden' }}>
-          <div
-            data-vertical-megaslide="2"
-            style={{
-              position: 'relative',
-              width: carril ? `${Math.round(carril)}px` : '100%',
-              maxWidth: '100%',
-              margin: '0 auto',
-              boxSizing: 'border-box',
-              display: 'grid',
-              gridTemplateColumns: `${Math.round(carril * 0.19)}px ${Math.round(carril * 0.15)}px minmax(0, 1fr)`,
-              gridTemplateRows: 'auto auto auto',
-              columnGap: `${GAP_PX}px`,
-              rowGap: `${GAP_PX}px`,
-              alignItems: 'start',
-              fontFamily: 'Roboto Condensed, sans-serif',
-              color: '#4A5057',
-            }}
-          >
-            {/* ELS CONTORNS de la reticula (nomes amb ?contornsVertical=1). */}
-            {contornsActius() ? (
-              <ContornsVertical carril={carril} columnes={[19, 34]} />
-            ) : null}
-
-            {/* FILA 1: la graella de dibuixos, a tot el carril. */}
-            <div style={{ gridColumn: '1 / -1' }} data-vertical-graella="1">
-              <VerticalGraellaDibuixos active={active} carril={carril} />
-            </div>
-
-            {/* FILA 2: colleccions + graella de colors + stripe. */}
-            <VerticalColleccions
-              activeKey={clauColleccions}
-              onSelect={triaColleccio}
-              style={{ gridColumn: '1', gridRow: '2 / 4' }}
-            />
-            <div style={{ gridColumn: '2', gridRow: '2' }}>
-              <VerticalColorsGrid selectedColor={colorSlug} onSelectColor={triaColor} />
-            </div>
-
-            {/* UNA SOLA FRANJA, a la dreta i ocupant les files 2 i 3. */}
-            <div style={{ gridColumn: '3', gridRow: '2 / 4', alignSelf: 'stretch', display: 'flex', flexDirection: 'column' }}>
-              <VerticalStripeFranja
-                srcs={srcsFranja}
-                items={stripeTileItems}
-                selectedItem={
-                  active === 'first_contact' ? firstContactSelectedItem
-                  : active === 'the_human_inside' ? humanInsideSelectedItem
-                  : (selectedItemByCollection?.[active] ?? null)
-                }
-                onSelect={seleccionaSamarreta}
-                shirtColor={CERCADOR_COLORS.find((c) => c.slug === colorSlug)?.overlayHex || null}
-              />
-            </div>
-
-            {/* FILA 3: selector a la columna del mig. */}
-            <div style={{ gridColumn: '2', gridRow: '3' }}>
-              <VerticalSelector
-                variant={variant}
-                visibility={stripeVariantVisibility}
-                onWhite={() => { setStripeOverlayOverrideActive?.(false); if (active === 'the_human_inside') setHumanInsideVariant?.('white'); else setFirstContactVariant?.('white'); }}
-                onBlack={() => { setStripeOverlayOverrideActive?.(false); if (active === 'the_human_inside') setHumanInsideVariant?.('black'); else setFirstContactVariant?.('black'); }}
-                onMulti={() => { setStripeOverlayOverrideActive?.(false); if (active === 'the_human_inside') setHumanInsideVariant?.('color'); else setFirstContactVariant?.('color'); }}
-              />
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  // A la VERTICAL, el contingut de la pagina 2 queda AMAGAT.
 
   return (
     <div style={{ width: '25%', flexShrink: 0, display: isPortraitTablet ? 'block' : 'flex', height: '100%', position: 'relative', justifyContent: 'center', overflow: isPortraitTablet ? 'hidden' : 'visible' }}>
@@ -523,6 +437,9 @@ export default function MegaslidePagina2({
         ref={viewportRef}
         data-mega-page-viewport="2"
         style={{
+          // El CONTINGUT de la pagina 2 queda AMAGAT.
+          visibility: 'hidden',
+          pointerEvents: 'none',
           width: '100%',
           height: '100%',
           display: 'flex',
