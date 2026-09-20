@@ -337,42 +337,37 @@ function MegaStripePanelP1({
             <VerticalGraellaDibuixos active={active} items={itemsFila} />
           </div>
 
-          {/* FILA 2: la stripe i, a la dreta, les fletxes. */}
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: `minmax(0, 1fr) ${Math.round(carril * 0.19)}px`,
-              columnGap: `${GAP_PX * 4}px`,
-              marginTop: `${GAP_PX * 3}px`,
-              alignItems: 'start',
-            }}
-          >
-            <div data-contorn-bloc="2">
-            <VerticalStripeFranja
-              srcs={stripeVertical.srcs}
-              items={stripeVertical.items}
-              selectedItem={selectedItem}
-              onSelect={(idx) => {
-                const it = stripeVertical.items?.[idx];
-                if (!it) return;
-                setStripeOverlayOverrideActive?.(false);
-                if (active === 'first_contact') setFirstContactSelectedItem?.(it);
-                else if (active === 'the_human_inside') setHumanInsideSelectedItem?.(it);
-                else setSelectedItemByCollection?.((prev) => ({ ...prev, [active]: it }));
-              }}
-            />
+          {/* FILA 2: la stripe i, a la dreta, les fletxes. La stripe ocupa dues
+              files de la retícula; les fletxes i el selector van a la columna
+              de la dreta, una a cada fila. */}
+          <div style={{ display: 'flex', gap: `${GAP_PX * 4}px`, marginTop: `${GAP_PX * 3}px`, alignItems: 'flex-start' }}>
+            <div style={{ flex: '1 1 0%', minWidth: 0, maxWidth: '100%', overflow: 'hidden' }} data-contorn-bloc="2">
+              <VerticalStripeFranja
+                width={Math.max(0, Math.round(carril) - Math.round(carril * 0.19) - GAP_PX * 4)}
+                srcs={stripeVertical.srcs}
+                items={stripeVertical.items}
+                selectedItem={selectedItem}
+                onSelect={(idx) => {
+                  const it = stripeVertical.items?.[idx];
+                  if (!it) return;
+                  setStripeOverlayOverrideActive?.(false);
+                  if (active === 'first_contact') setFirstContactSelectedItem?.(it);
+                  else if (active === 'the_human_inside') setHumanInsideSelectedItem?.(it);
+                  else setSelectedItemByCollection?.((prev) => ({ ...prev, [active]: it }));
+                }}
+              />
             </div>
-            <div data-contorn-bloc="3">
-            <VerticalFletxes
-              tileSize={Math.round(carril * 0.19 * 0.9)}
-              onPrev={() => setThinStartIndex?.((v) => v - 1)}
-              onNext={() => setThinStartIndex?.((v) => v + 1)}
-            />
-            </div>
-          </div>
 
-          {/* FILA 3: el selector Blanc/Color/Negre. */}
-          <div data-contorn-bloc="4" style={{ marginTop: `${GAP_PX * 3}px`, width: `${Math.round(carril * 0.34)}px` }}>
+            {/* La columna de la dreta: les fletxes (fila 2) i el selector (fila 3). */}
+            <div style={{ flex: `0 0 ${Math.round(carril * 0.19)}px`, display: 'flex', flexDirection: 'column', gap: `${GAP_PX * 3}px` }}>
+              <div data-contorn-bloc="3">
+                <VerticalFletxes
+                  tileSize={Math.round(carril * 0.19 * 0.9)}
+                  onPrev={() => setThinStartIndex?.((v) => v - 1)}
+                  onNext={() => setThinStartIndex?.((v) => v + 1)}
+                />
+              </div>
+              <div data-contorn-bloc="4">
             <VerticalSelector
               variant={variantActual}
               visibility={stripeVariantVisibility}
@@ -380,6 +375,8 @@ function MegaStripePanelP1({
               onBlack={() => { setStripeOverlayOverrideActive?.(false); if (active === 'the_human_inside') setHumanInsideVariant?.('black'); else setFirstContactVariant?.('black'); }}
               onMulti={() => { setStripeOverlayOverrideActive?.(false); if (active === 'the_human_inside') setHumanInsideVariant?.('color'); else setFirstContactVariant?.('color'); }}
             />
+              </div>
+            </div>
           </div>
         </div>
       </div>
