@@ -24,7 +24,7 @@ export const FILES_VERTICAL = ['1fr', '1.05fr', '1fr'];
 /** Les columnes de les files 2 i 3 (36-303-519-652-728 sobre 688). */
 export const COLUMNES_VERTICAL = ['303fr', '216fr', '133fr', '76fr'];
 
-export default function TaulaVertical({ etiquetes = false }) {
+export default function TaulaVertical({ etiquetes = false, graellaCarrusel = null }) {
   const C = 'rgba(220, 38, 38, 0.9)';
   const c = 'rgba(0,0,0,0.35)';
   const opt = {
@@ -53,9 +53,9 @@ export default function TaulaVertical({ etiquetes = false }) {
         minHeight: 0,
       }}
     >
-      {/* FILA 1: una sola cel·la, a tot el carril. */}
+      {/* FILA 1: una sola cel·la, a tot el carril. Hi va la graella de 5x3. */}
       <div style={{ ...vermell, gridColumn: '1 / -1', gridRow: '1' }}>
-        {etiquetes ? 'Carrusel' : null}
+        {graellaCarrusel || (etiquetes ? 'Carrusel' : null)}
       </div>
       {/* FILA 2: stripe (dues cel·les) i el bloc de la dreta. */}
       <div style={{ ...vermell, gridColumn: '1 / 3', gridRow: '2 / 4' }}>
