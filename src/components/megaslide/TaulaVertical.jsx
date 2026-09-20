@@ -28,7 +28,11 @@ export function ampladaCarril(ampleFinestra) {
  * dimensionar la pestanya.
  */
 export function alturaTaulaVertical(ampleFinestra) {
-  return Math.ceil((ampladaCarril(ampleFinestra) * 3) / 5);
+  // La pestanya del megaslide es dimensiona amb la taula de la pagina 1 (5x3
+  // amb caselles quadrades), pero la taula de la pagina 2 s'acaba ABANS: al ras
+  // de la imatge de la franja (58,95 px mes amunt a 768: el bottom de la taula
+  // toca el de la imatge). Es la mes curta, que es la que mana.
+  return Math.ceil((ampladaCarril(ampleFinestra) * 3) / 5) - 58.95;
 }
 
 /** L'estil d'una casella: el contorn dibuixat i el número centrat. */
@@ -109,8 +113,9 @@ export function TaulaVerticalP2({ graella = null, colleccions = null, colors = n
         gridTemplateColumns: 'repeat(5, 1fr)',
         gridTemplateRows: 'repeat(3, 1fr)',
         width: '100%',
-        // Les caselles son quadrades: 3 files sobre 5 columnes = 3/5 d'alcada.
-        aspectRatio: '5 / 3',
+        // La taula omple la banda de la seva pagina (que va 25 px mes curta que
+        // la de la pagina 1: ho fixa `alturaTaulaVertical`).
+        height: '100%',
         minHeight: 0,
       }}
     >
@@ -118,14 +123,20 @@ export function TaulaVerticalP2({ graella = null, colleccions = null, colors = n
       {/* Les caselles veïnes s'ajusten a la correguda de 10 px: la de
           colleccions s'encongeix i la franja s'eixampla, perque les vores
           tornin a tocar-se. */}
-      <div data-taula-cela="6-11" style={{ ...CELA, gridColumn: '1', gridRow: '2 / 4', marginRight: '10px' }}>{colleccions || 'Col·leccions'}</div>
+      <div data-taula-cela="6-11" style={{ ...CELA, gridColumn: '1', gridRow: '2 / 4', marginRight: '10px' }}>
+        {/* La llista de colleccions va del TOP del selector (301,2) al BOTTOM
+            de la graella de colors (516). */}
+        <div style={{ width: '100%', height: '100%', boxSizing: 'border-box', paddingTop: '19.2px', paddingBottom: '0px' }}>
+          {colleccions || 'Col·leccions'}
+        </div>
+      </div>
       {/* La graella de colors i el selector (i la seva casella, amb el
           contorn) van 10 px a l'esquerra. */}
-      <div data-taula-cela="7" style={{ ...CELA, gridColumn: '2', gridRow: '2', transform: 'translateX(-10px)', marginRight: '20px', alignItems: 'flex-start' }}>{colors || 'Graella colors 4x4'}</div>
+      <div data-taula-cela="7" style={{ ...CELA, gridColumn: '2', gridRow: '2', transform: 'translateX(-10px)', marginRight: '20px', alignItems: 'flex-end' }}>{selector || 'Selector b/c/n'}</div>
       {/* La franja: la imatge va enganxada a l'esquerra de la casella i s'eixampla
           20 px cap a la dreta, mantenint la seva proporcio (alcada automatica). */}
       <div data-taula-cela="8-10+13-15" style={{ ...CELA, gridColumn: '3 / 6', gridRow: '2 / 4', marginLeft: '-30px', justifyContent: 'flex-start', alignItems: 'flex-start' }}>{stripe || 'Stripe'}</div>
-      <div data-taula-cela="12" style={{ ...CELA, gridColumn: '2', gridRow: '3', transform: 'translateX(-10px)', marginRight: '20px' }}>{selector || 'Selector b/c/n'}</div>
+      <div data-taula-cela="12" style={{ ...CELA, gridColumn: '2', gridRow: '3', transform: 'translateX(-10px)', marginRight: '20px', alignItems: 'flex-end' }}>{colors || 'Graella colors 4x4'}</div>
     </div>
   );
 }
