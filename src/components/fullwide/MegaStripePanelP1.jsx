@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import MegaColumn from './MegaColumn.jsx';
 import { computeStripeTileItems, computeStripeTileOverlaySrcs, resolveForItem } from '../../utils/resolveStripeTile.js';
+import ContornsFlex, { contornsActius } from '../megaslide/ContornsVertical.jsx';
 import {
   GAP_PX,
   VerticalColleccions,
@@ -284,14 +285,42 @@ function MegaStripePanelP1({
     };
   }, [itemsFila, active, resolvedOverlaySrc]);
 
+  // Els blocs de la vertical, mesurats, per poder-ne pintar els contorns.
+  const contornsRef = useRef(null);
+  const [contornsBlocs, setContornsBlocs] = useState([]);
+  useLayoutEffect(() => {
+    if (!isPortraitTablet || !contornsActius()) { setContornsBlocs([]); return undefined; }
+    const mesura = () => {
+      const arrel = contornsRef.current;
+      if (!arrel) return;
+      const base = arrel.getBoundingClientRect();
+      const blocs = [...arrel.querySelectorAll('[data-contorn-bloc]')].map((el) => {
+        const b = el.getBoundingClientRect();
+        return {
+          left: `${Math.round(b.left - base.left)}px`,
+          top: `${Math.round(b.top - base.top)}px`,
+          width: `${Math.round(b.width)}px`,
+          height: `${Math.round(b.height)}px`,
+        };
+      });
+      setContornsBlocs(blocs);
+    };
+    mesura();
+    const t = window.setTimeout(mesura, 400);
+    window.addEventListener('resize', mesura);
+    return () => { window.clearTimeout(t); window.removeEventListener('resize', mesura); };
+  }, [isPortraitTablet]);
+
   if (isPortraitTablet && active) {
     const carril = ampladaCarril(typeof window !== 'undefined' ? window.innerWidth : 0);
     const variantActual = active === 'the_human_inside' ? humanInsideVariant : firstContactVariant;
     return (
       <div ref={pageRootRef} className="w-full shrink-0">
         <div
+          ref={contornsRef}
           data-vertical-megaslide="1"
           style={{
+            position: 'relative',
             width: carril ? `${Math.round(carril)}px` : '100%',
             maxWidth: '100%',
             margin: '0 auto',
@@ -302,8 +331,9 @@ function MegaStripePanelP1({
             color: '#4A5057',
           }}
         >
+          {contornsActius() ? <ContornsFlex blocs={contornsBlocs} /> : null}
           {/* FILA 1: la filera de dibuixos (el carrusel). */}
-          <div data-vertical-graella="1">
+          <div data-vertical-graella="1" data-contorn-bloc="1">
             <VerticalGraellaDibuixos active={active} items={itemsFila} />
           </div>
 
@@ -317,6 +347,7 @@ function MegaStripePanelP1({
               alignItems: 'start',
             }}
           >
+            <div data-contorn-bloc="2">
             <VerticalStripeFranja
               srcs={stripeVertical.srcs}
               items={stripeVertical.items}
@@ -330,15 +361,18 @@ function MegaStripePanelP1({
                 else setSelectedItemByCollection?.((prev) => ({ ...prev, [active]: it }));
               }}
             />
+            </div>
+            <div data-contorn-bloc="3">
             <VerticalFletxes
               tileSize={Math.round(carril * 0.19 * 0.9)}
               onPrev={() => setThinStartIndex?.((v) => v - 1)}
               onNext={() => setThinStartIndex?.((v) => v + 1)}
             />
+            </div>
           </div>
 
           {/* FILA 3: el selector Blanc/Color/Negre. */}
-          <div style={{ marginTop: `${GAP_PX * 3}px`, width: `${Math.round(carril * 0.34)}px` }}>
+          <div data-contorn-bloc="4" style={{ marginTop: `${GAP_PX * 3}px`, width: `${Math.round(carril * 0.34)}px` }}>
             <VerticalSelector
               variant={variantActual}
               visibility={stripeVariantVisibility}
