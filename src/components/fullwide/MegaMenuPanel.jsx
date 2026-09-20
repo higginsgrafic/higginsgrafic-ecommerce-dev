@@ -10,6 +10,7 @@ import MegaStripePanelP1 from './MegaStripePanelP1.jsx';
 import { factorAlcadaMegaslide } from './midesMegaslide.js';
 import { alcadaPanellMegaslide } from '../../utils/mesuraMegaslide.js';
 import MegaslidePagina2 from '../megaslide/MegaslidePagina2.jsx';
+import { alturaTaulaVertical } from '../megaslide/TaulaVertical.jsx';
 
 const MegaslidePagina3 = lazy(() => import('../megaslide/MegaslidePagina3.jsx'));
 const MegaslidePagina4 = lazy(() => import('../megaslide/MegaslidePagina4.jsx'));
@@ -241,13 +242,21 @@ export default function MegaMenuPanel({
   // deixen el formulari just a sota. A la vertical i al mobil no cal limit
   // (al mobil el mega-slide ja es baixet i el limit li tapava el formulari).
   const CHECKOUT_GUARD_H = (esVerticalAqui || esMobilAqui) ? null : (esApaissadaAqui ? 206 : 266);
-  const guardHeightPx = paymentFillsScreen
-    ? guardHeightPxDefault
-    : esCheckout && CHECKOUT_GUARD_H != null
+  // L'alcada de la TAULA dibuixada de la pagina 2 (les caselles son quadrades):
+  // es la que fa creixer la pestanya del megaslide a la vertical.
+  const alturaTaulaPx = isPortraitTablet && typeof window !== 'undefined' && window.innerWidth > 0
+    ? alturaTaulaVertical(window.innerWidth)
+    : 0;
+  const guardHeightBase = esCheckout && CHECKOUT_GUARD_H != null
     ? `${CHECKOUT_GUARD_H}px`
     : matchesPage1Height && p1ContentBottomPx != null && mesuraEstable
     ? `${alcadaGuard(p1ContentBottomPx)}px`
     : (alcadaRecordada || guardHeightPxDefault);
+  const guardHeightPx = paymentFillsScreen
+    ? guardHeightPxDefault
+    : (isPortraitTablet && alturaTaulaPx > 0)
+    ? `${Math.max(parseFloat(guardHeightBase) || 0, alturaTaulaPx)}px`
+    : guardHeightBase;
 
   // Quan l'alcada bona ja es ferma, la guardem per a les properes obertures.
   useEffect(() => {
