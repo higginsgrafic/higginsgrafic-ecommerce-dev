@@ -51,8 +51,10 @@ const CELA = {
  * caselles fusionades que ha demanat l'amo:
  *
  *   fila 1: [ 1-5 ]
- *   fila 2: [ 6 ][ 7-9 ][ 10 ]
- *   fila 3: [ 11 ][ 12-14 ][ 15 ]
+ *   fila 2: [ 6 ][ 7-9 · 12-14 ][ 10 ]
+ *   fila 3: [ 11 ][      "       ][ 15 ]
+ *
+ * Els blocs 7-9 i 12-14 son la MATEIXA casella, fusionada de dalt a baix.
  *
  * Cada casella porta escrit el numero (o el rang) de les caselles originals que
  * cobreix, per poder validar l'estructura.
@@ -73,10 +75,9 @@ export function TaulaVerticalP1() {
     >
       <div data-taula-cela="1-5" style={{ ...CELA, gridColumn: '1 / -1', gridRow: '1' }}>1-5</div>
       <div data-taula-cela="6" style={{ ...CELA, gridColumn: '1', gridRow: '2' }}>6</div>
-      <div data-taula-cela="7-9" style={{ ...CELA, gridColumn: '2 / 5', gridRow: '2' }}>7-9</div>
+      <div data-taula-cela="7-9+12-14" style={{ ...CELA, gridColumn: '2 / 5', gridRow: '2 / 4' }}>7-9 · 12-14</div>
       <div data-taula-cela="10" style={{ ...CELA, gridColumn: '5', gridRow: '2' }}>10</div>
       <div data-taula-cela="11" style={{ ...CELA, gridColumn: '1', gridRow: '3' }}>11</div>
-      <div data-taula-cela="12-14" style={{ ...CELA, gridColumn: '2 / 5', gridRow: '3' }}>12-14</div>
       <div data-taula-cela="15" style={{ ...CELA, gridColumn: '5', gridRow: '3' }}>15</div>
     </div>
   );
