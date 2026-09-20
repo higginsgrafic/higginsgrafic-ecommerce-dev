@@ -3,9 +3,9 @@ import React from 'react';
 /**
  * TaulaVertical — la TAULA de la vista vertical del megaslide, DIBUIXADA.
  * -----------------------------------------------------------------------------
- * Una reticula de 5 columnes x 3 files amb els contorns dibuixats i sense cap
- * contingut de debò: serveix per veure i validar l'estructura abans de posar-hi
- * les peces.
+ * Una reticula de 5 columnes x 3 files amb els contorns dibuixats, les caselles
+ * NUMERADES (1..15) i sense cap contingut de debò: serveix per veure i validar
+ * l'estructura abans de posar-hi les peces.
  *
  * Viu DINS del carril del megaslide: la referencia es la de la tauleta (1024
  * amb coixos de 40), mai mes ampla que la finestra menys els coixos.
@@ -30,12 +30,20 @@ export function alturaTaulaVertical(ampleFinestra) {
 }
 
 export default function TaulaVertical({ columnes = COLUMNES_TAULA, files = FILES_TAULA }) {
-  // El contorn d'una CEL·LA: la línia que dibuixa la taula.
+  // El contorn d'una CEL·LA: la línia que dibuixa la taula. El número hi va
+  // centrat, amb la mateixa lletra que feien servir les taules dibuixades.
   const cela = {
     border: '1px solid rgba(0, 0, 0, 0.35)',
     boxSizing: 'border-box',
     minWidth: 0,
     minHeight: 0,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    fontFamily: 'Oswald, Roboto Condensed, sans-serif',
+    fontSize: '13px',
+    letterSpacing: '0.06em',
+    color: '#1A1A1A',
   };
   return (
     <div
@@ -52,7 +60,9 @@ export default function TaulaVertical({ columnes = COLUMNES_TAULA, files = FILES
       }}
     >
       {Array.from({ length: columnes * files }).map((_, i) => (
-        <div key={`cela-${i}`} data-taula-cela={i} style={cela} />
+        <div key={`cela-${i}`} data-taula-cela={i} style={cela}>
+          {i + 1}
+        </div>
       ))}
     </div>
   );
