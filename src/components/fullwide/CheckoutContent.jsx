@@ -110,6 +110,16 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
   // Números propis, als mateixos valors inicials que l'horitzontal perquè és la
   // mateixa recepta; d'aquí en endavant cada variant se'n retoca per separado.
   const P_FIELD_GAP = 5;
+  // Alçada dels CAMPS de text de la vertical (els 10 inputs i el selector de
+  // pais): mes baixos que a la resta de formats. El que es treu d'alcada es
+  // compensa als marges P_COLUMNES_TOP_* perque el bottom de cada formulari
+  // no es mogui.
+  const P_FIELD_H = 32;
+  // Coixí vertical de les capses de camp de la targeta a la vertical: amb
+  // l'iframe de Stripe (16,8) i les vores (1+1) dona 32, la mateixa alcada que
+  // els camps de text. Es coixí i no alcada fixa perque l'iframe de Stripe no
+  // es pot tocar (si se li canvia el `display`, es queda sense amplada).
+  const P_CARD_BOX_PAD_Y = 6.6;
   const P_TITLE_GAP = 10;
   // El titol PAGAMENT de la vertical. Aquest es l'unic numero que el mou
   // (moure'l tambe a l'escriptori o a l'apaisada vol un valor propi).
@@ -163,8 +173,19 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
   const L_COLUMNES_TOP = 55;
 
   // Marge de creació de les dues columnes de dades (el que les separa del bloc
-  // de productes). El fan servir l'escriptori i la tauleta vertical, tal qual.
+  // de productes). El fa servir l'escriptori tal qual; la tauleta vertical hi
+  // afegeix el seu propi (vegeu P_COLUMNES_TOP_*).
   const COLUMNES_TOP = 90;
+
+  // Marge de dalt de les DUES columnes de dades de la VERTICAL. Els camps hi
+  // son MES BAIXOS (P_FIELD_H) i el que es treu d'alcada a cada columna es
+  // torna a posar al seu capdamunt: aixi els dos formularis queden mes curts
+  // PEL CAP i el BOTTOM DE CADA UN queda exactament on era (i tot el que hi
+  // penja —la factura, els termes i el botó— no es mou).
+  //   enviament: les 8 fileres de camps x 7 px (39 - 32) = 56
+  //   pagament:  les 2 fileres de capses de targeta x 6,8 px = 13,6
+  const P_COLUMNES_TOP_ENVIAMENT = COLUMNES_TOP + 56;
+  const P_COLUMNES_TOP_PAGAMENT = COLUMNES_TOP + 13.6;
 
   // ===== FRANJA DE FITXES: MATEIX CRITERI QUE A LA VERTICAL =====
   // A la vertical la franja va de la guia verda (titol + 20) a la blava (final
@@ -240,7 +261,10 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
     ? undefined
     : (isLandscapeTablet
       ? `${L_COLUMNES_TOP - L_FRANJA_CREIX}px`
-      : (isPortraitTablet ? `${COLUMNES_TOP}px` : `${D_COLUMNES_TOP}px`));
+      : `${D_COLUMNES_TOP}px`);
+  // A la vertical cada columna porta el seu marge (vegeu P_COLUMNES_TOP_*).
+  const columnesTopEnviament = isPortraitTablet ? `${P_COLUMNES_TOP_ENVIAMENT}px` : columnesTop;
+  const columnesTopPagament = isPortraitTablet ? `${P_COLUMNES_TOP_PAGAMENT}px` : columnesTop;
 
 
   const activeItems = useMemo(
@@ -487,14 +511,28 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
 
   const inputStyle = {
     width: '100%',
-    // A la vertical els camps fan la mateixa alçada que el botó de pagar
-    // (39px), que és la del camp de la targeta.
-    height: isPortraitTablet ? `${P_CARD_FIELD_H}px` : (isNarrowForm ? '28px' : '34px'),
+    // A la vertical els camps de text son mes baixos (P_FIELD_H); les capses de
+    // la targeta s'hi igualen amb el seu coixí (vegeu `capsaTargeta`).
+    height: isPortraitTablet ? `${P_FIELD_H}px` : (isNarrowForm ? '28px' : '34px'),
     border: '1px solid #D8DDE3',
     borderRadius: '4px',
     padding: '0 10px',
     boxSizing: 'border-box',
     ...INPUT,
+  };
+
+  // Les capses dels camps de la targeta (número, caducitat i CVC). A la
+  // vertical fan la MATEIXA alcada que els camps de text (P_FIELD_H); a la
+  // resta de formats es queden com eren. Nomes se'n toca el coixí: canviar-ne
+  // el `display` deixa l'iframe de Stripe sense amplada.
+  const capsaTargeta = {
+    border: '1px solid #D8DDE3',
+    borderRadius: '4px',
+    overflow: 'hidden',
+    background: '#FFFFFF',
+    padding: isPortraitTablet
+      ? `${P_CARD_BOX_PAD_Y}px 12px`
+      : (isNarrowForm ? '6px 10px' : '10px 12px'),
   };
 
   const errorStyle = {
@@ -843,7 +881,7 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
         {/* COL 2: Dades d'enviament. Baixa a la fila de sota i ocupa mitja
             amplada. El títol va DINS de la columna (primera peça): així sempre
             queda just a sobre de la seva columna, es mogui on es mogui. */}
-        <div style={{ gridColumn: isPortraitTablet ? 'span 1' : 'span 2', marginTop: columnesTop, display:'flex', flexDirection:'column', minHeight:0, overflow:'visible', justifyContent: 'flex-start', gap: fieldGap }}>
+        <div style={{ gridColumn: isPortraitTablet ? 'span 1' : 'span 2', marginTop: columnesTopEnviament, display:'flex', flexDirection:'column', minHeight:0, overflow:'visible', justifyContent: 'flex-start', gap: fieldGap }}>
           {/* 15px de marge + els 5px de junt de la columna = 20px fins al primer camp */}
           <div style={{ fontSize:'12pt', fontWeight:500, marginTop: isLandscapeTablet ? '10px' : undefined, marginBottom: isLandscapeTablet ? '5px' : '15px' }}>Dades d'enviament</div>
           <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', columnGap:'10px' }}>
@@ -865,9 +903,14 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
         {/* COL 3: Pagament + Factura. Al vertical és la cel·la esquerra de la
             segona filera (sota la comanda); termes + botó hi van al costat, en
             una cel·la pròpia, sota les dades d'enviament. */}
-        {/* Mateix marge que la columna d'enviament: així el bloc de la targeta
-            queda alineat pel capdamunt amb el camp del client. */}
-        <div style={{ gridColumn: isPortraitTablet ? 'span 1' : 'span 2', marginTop: columnesTop, display:'flex', flexDirection:'column', minHeight:0, overflow:'visible', position: isPortraitTablet ? undefined : 'relative', gap: isNarrowForm ? '1px' : undefined }}>
+        {/* A la vertical aquesta columna porta el SEU marge (P_COLUMNES_TOP_PAGAMENT,
+            mes petit que el de la d'enviament): cada formulari compensa la seva
+            propia alcada, així que els dos bottoms queden on eren pero els dos
+            retols ja no queden al mateix nivell. A l'horitzontal i a
+            l'escriptori el marge es el mateix que el de la columna d'enviament
+            (així el bloc de la targeta queda alineat pel capdamunt amb el camp
+            del client). */}
+        <div style={{ gridColumn: isPortraitTablet ? 'span 1' : 'span 2', marginTop: columnesTopPagament, display:'flex', flexDirection:'column', minHeight:0, overflow:'visible', position: isPortraitTablet ? undefined : 'relative', gap: isNarrowForm ? '1px' : undefined }}>
           <div style={{ fontSize:'12pt', fontWeight:500, marginTop: isLandscapeTablet ? '10px' : undefined, marginBottom: isLandscapeTablet ? '10px' : '20px' }}>Dades de pagament</div>
           <div style={{ display:'flex', flexDirection:'column', flex:'1 1 auto', gap: isNarrowForm ? '1px' : undefined }}>
             {/* Pagament */}
@@ -880,14 +923,14 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
                   <span>Targeta</span>
                 </div>
                 <div style={{ padding: '10px 12px', display:'grid', rowGap: '8px' }}>
-                  <div style={{ border:'1px solid #D8DDE3', borderRadius:'4px', overflow:'hidden', background:'#FFFFFF', padding: isNarrowForm ? '6px 10px' : '10px 12px' }}>
+                  <div style={capsaTargeta}>
                     <CardNumberElement options={{ style: { base: { color:'#4A5057', fontFamily:'Roboto Condensed, sans-serif', fontSize: isNarrowForm ? '11px' : '14px', '::placeholder': { color:'#98A2B4' } }, invalid: { color:'#ef4444' } } }} />
                   </div>
                   <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', columnGap:'8px' }}>
-                    <div style={{ border:'1px solid #D8DDE3', borderRadius:'4px', overflow:'hidden', background:'#FFFFFF', padding: isNarrowForm ? '6px 10px' : '10px 12px' }}>
+                    <div style={capsaTargeta}>
                       <CardExpiryElement options={{ style: { base: { color:'#4A5057', fontFamily:'Roboto Condensed, sans-serif', fontSize: isNarrowForm ? '11px' : '14px', '::placeholder': { color:'#98A2B4' } }, invalid: { color:'#ef4444' } } }} />
                     </div>
-                    <div style={{ border:'1px solid #D8DDE3', borderRadius:'4px', overflow:'hidden', background:'#FFFFFF', padding: isNarrowForm ? '6px 10px' : '10px 12px' }}>
+                    <div style={capsaTargeta}>
                       <CardCvcElement options={{ style: { base: { color:'#4A5057', fontFamily:'Roboto Condensed, sans-serif', fontSize: isNarrowForm ? '11px' : '14px', '::placeholder': { color:'#98A2B4' } }, invalid: { color:'#ef4444' } } }} />
                     </div>
                   </div>
