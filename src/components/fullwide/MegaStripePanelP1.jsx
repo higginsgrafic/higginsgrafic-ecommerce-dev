@@ -257,9 +257,10 @@ function MegaStripePanelP1({
         ref={pageRootRef}
         data-megaslide-graella="1"
         style={{
-          // Centrada a la VISTA (a la vertical la pagina 1 ja no fa el tauler
-          // de 992 del belt).
+          // Centrada a la VISTA i enganxada pel BAIX al segon header: es puja
+          // la propia alcada de la graella (132 px) mes el que ja hi era.
           position: 'relative',
+          top: '-128px',
           width: '100%',
           padding: 0,
           display: 'flex',
