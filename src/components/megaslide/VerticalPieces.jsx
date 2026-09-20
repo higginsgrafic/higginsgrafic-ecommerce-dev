@@ -85,7 +85,12 @@ export function VerticalStripeFranja({
         width: width ? `${width}px` : '100%',
         maxWidth: '100%',
         gridTemplateColumns: `repeat(${FRANJA_COLUMNES}, minmax(0, 1fr))`,
-        gridTemplateRows: `repeat(${FRANJA_FILES}, auto)`,
+        // Les dues files es reparteixen l'alçada que els dona la retícula: la
+        // franja ha d'omplir les DUES files, no tenir l'alçada propia de 2x7.
+        gridTemplateRows: 'repeat(2, minmax(0, 1fr))',
+        flex: '1 1 0%',
+        minHeight: 0,
+        height: '100%',
         columnGap: `${GAP_PX}px`,
         rowGap: '8px',
         // La franja s'encabir sempre dins del seu espai: les caselles es
