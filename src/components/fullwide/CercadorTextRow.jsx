@@ -553,7 +553,7 @@ export function CercadorColleccionsColumna({
               backgroundColor: '#F1F3F5',
               color: '#2B2B2B',
               fontFamily: 'inherit',
-              fontSize: '9.5pt',
+              fontSize: '8.5pt',
               fontWeight: key === activeKey ? 700 : 400,
               whiteSpace: 'nowrap',
               overflow: 'hidden',
