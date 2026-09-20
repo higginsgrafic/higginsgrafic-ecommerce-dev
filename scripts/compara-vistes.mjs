@@ -53,6 +53,12 @@ const mesura = () => {
     const franja = document.querySelector('[data-vertical-franja="1"]');
     const samarretesV = [...vertical.querySelectorAll('[data-vertical-samarreta]')];
     const cv = r(vertical);
+    // La graella de dibuixos es UN bloc de 16 columnes x 4 files. L'estructura
+    // es wrapper > div (del component) > div (la graella de 64 caselles), i per
+    // aixo es baixa fill a fill: un selector de descendents cauria al wrapper.
+    const gridIntern = graella && graella.firstElementChild ? graella.firstElementChild.firstElementChild : null;
+    const casellesGraella = gridIntern ? gridIntern.children.length : null;
+    const columnesGraella = gridIntern ? getComputedStyle(gridIntern).gridTemplateColumns.split(' ').length : null;
     // Les caselles de la franja tenen la forma de la imatge de la franja curta
     // (7+7), que no es quadrada: el que s'ha de comprovar es que totes siguin
     // iguals i que la franja sencera tingui la proporcio de la imatge.
@@ -62,7 +68,8 @@ const mesura = () => {
       vista: 'vertical',
       carrilW: +cv.width.toFixed(2),
       graellaH: graella ? +r(graella).height.toFixed(2) : null,
-      graellaFiles: graella ? graella.children.length : null,
+      graellaCaselles: casellesGraella,
+      graellaColumnes: columnesGraella,
       franjaH: franja ? +r(franja).height.toFixed(2) : null,
       tiles: samarretesV.length,
       tilesAmbImatge: samarretesV.filter((b) => b.querySelector('img')).length,
@@ -152,7 +159,7 @@ for (const c of CASES) {
     continue;
   }
   if (r.vista === 'vertical') {
-    files.push(`${c.nom.padEnd(18)}  VERTICAL  carril ${String(r.carrilW).padStart(6)}  graella ${String(r.graellaH).padStart(6)} (${r.graellaFiles} files)  franja ${String(r.franjaH).padStart(6)}  tiles ${r.tiles} (${r.tilesAmbImatge} amb imatge) de ${r.samarretesH}`);
+    files.push(`${c.nom.padEnd(18)}  VERTICAL  carril ${String(r.carrilW).padStart(6)}  graella ${String(r.graellaColumnes)}x${r.graellaCaselles / r.graellaColumnes} de ${String(r.graellaH).padStart(6)}  franja ${String(r.franjaH).padStart(6)}  tiles ${r.tiles} (${r.tilesAmbImatge} amb imatge) de ${r.samarretesH}`);
     continue;
   }
   files.push(`${c.nom.padEnd(18)}  cercador  dibuix ${String(r.dibuix).padStart(6)}  gap ${String(r.gapH).padStart(6)}  cercle ${String(r.cercle).padStart(5)}  pas ${String(r.pasColors).padStart(5)}  selector ${String(r.selectorDelta).padStart(6)}  files ${String(r.dibuixosDelta).padStart(5)}  samarretes ${String(r.samarretesH).padStart(6)}`);
@@ -173,8 +180,9 @@ for (const c of CASES) {
   if (!r.tilesIguals) {
     fallades.push(`${c.nom}: les caselles de la franja no son totes iguals`);
   }
-  if (r.graellaFiles !== 5) {
-    fallades.push(`${c.nom}: la graella de dibuixos ha de tenir 5 files (les cinc colleccions) i en te ${r.graellaFiles}`);
+  // La graella de dibuixos ha de ser un bloc de 16 columnes x 4 files.
+  if (r.graellaColumnes !== 16 || r.graellaCaselles !== 64) {
+    fallades.push(`${c.nom}: la graella de dibuixos ha de ser de 16x4 (${r.graellaColumnes} columnes, ${r.graellaCaselles} caselles)`);
   }
   if (r.samarretesH != null && (r.samarretesH < 30 || r.samarretesH > 140)) {
     notes.push(`la casella de samarreta fa ${r.samarretesH} px a ${c.nom}`);

@@ -1,4 +1,4 @@
-import { lazy, Suspense, useRef, useEffect, useCallback, useState } from 'react';
+import { lazy, Suspense, useRef, useEffect, useLayoutEffect, useCallback, useState } from 'react';
 /* El panell surt de la feina de seguida quan no hi ha cap colleccio
    activa (`if (!active) return null`), i aixo fa que el lint vegi tots
    els hooks del darrere com a condicionals. Es una manera de fer que ja
@@ -217,6 +217,25 @@ export default function MegaMenuPanel({
       return px;
     });
   }, []);
+  // El que queda de pantalla sota el megaslide. El panell no hi ha de créixer
+  // mes enlla: a la vertical, quan la composicio es mes alta que la finestra, el
+  // que s'ha de desplac,ar es la composicio, no la pagina.
+  const [disponibleVerticalPx, setDisponibleVerticalPx] = useState(null);
+  const panelSurfaceRef = useRef(null);
+  useLayoutEffect(() => {
+    const mesura = () => {
+      const el = panelSurfaceRef.current;
+      if (!el) return;
+      const top = el.getBoundingClientRect().top;
+      const disponible = window.innerHeight - top;
+      if (Number.isFinite(disponible) && disponible > 0) {
+        setDisponibleVerticalPx((prev) => (prev != null && Math.abs(prev - disponible) < 1 ? prev : disponible));
+      }
+    };
+    mesura();
+    window.addEventListener('resize', mesura);
+    return () => window.removeEventListener('resize', mesura);
+  }, []);
   const handleP1ContentBottom = useCallback((px) => {
     setP1ContentBottomPx((prev) => (prev != null && Math.abs(prev - px) < 0.5 ? prev : px));
   }, []);
@@ -256,8 +275,11 @@ export default function MegaMenuPanel({
   // A la vertical l'alçada del panell es la de la composicio nova: la mesura
   // del contingut mes el `py-8` (32+32) del contenidor del panell, que la
   // mesura no inclou perquè `VerticalParadigmaP2` mesura el seu propi bloc.
+  // Pero MAI mes alta que el que queda de pantalla sota el panell: si el
+  // contingut es mes alt, el megaslide no ha de creixer mes enlla de la
+  // finestra (llavors el que es desplac,a es la composicio, a dins seu).
   const guardHeightVertical = verticalContentPx != null
-    ? `${Math.round(verticalContentPx + 64)}px`
+    ? `${Math.round(Math.min(verticalContentPx + 64, disponibleVerticalPx ?? Infinity))}px`
     : null;  const guardHeightPx = paymentFillsScreen
     ? guardHeightPxDefault
     : esCheckout && CHECKOUT_GUARD_H != null
@@ -278,6 +300,7 @@ export default function MegaMenuPanel({
   return (
     <div className="relative">
       <div
+        ref={panelSurfaceRef}
         data-mega-panel-surface="1"
         className="relative z-[10000] block border-b border-border"
         style={{
