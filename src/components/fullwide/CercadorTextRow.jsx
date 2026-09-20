@@ -333,6 +333,7 @@ export function dibuixosGraella16x4() {
 /** La GRAELLA DE DIBUIXOS 16x4 de la pagina 2 (una casella per dibuix). */
 export function CercadorDibuixosGraella({
   graellaRef = null,
+  tilesPercent = null,
   items,
   dibuixPx,
   gapH,
@@ -384,6 +385,11 @@ export function CercadorDibuixosGraella({
               justifyContent: 'center',
               width: costat,
               height: costat,
+              // Amb `tilesPercent` la tile s'encongeix dins la seva casella
+              // (el centre no es mou).
+              ...(tilesPercent && omple
+                ? { width: `${tilesPercent}%`, height: `${tilesPercent}%`, justifySelf: 'center', alignSelf: 'center' }
+                : null),
               minWidth: 0,
               minHeight: 0,
               padding: 0,

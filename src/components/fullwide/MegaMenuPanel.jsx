@@ -11,7 +11,7 @@ import { factorAlcadaMegaslide } from './midesMegaslide.js';
 import { alcadaPanellMegaslide } from '../../utils/mesuraMegaslide.js';
 import MegaslidePagina2 from '../megaslide/MegaslidePagina2.jsx';
 import { alturaTaulaVertical, CapaTaulaVertical, TaulaVerticalP1 } from '../megaslide/TaulaVertical.jsx';
-import MegaGridDibuixos from './MegaGridDibuixos.jsx';
+import { CercadorDibuixosGraella, dibuixosGraella16x4 } from './CercadorTextRow.jsx';
 import { FirstContactDibuix00Buttons, FirstContactDibuix09Buttons } from './firstContactPanels.jsx';
 
 const MegaslidePagina3 = lazy(() => import('../megaslide/MegaslidePagina3.jsx'));
@@ -414,7 +414,27 @@ export default function MegaMenuPanel({
                         /* Les peces de debò, una per casella: la graella de
                            dibuixos, la imatge de la franja, la tile de les
                            fletxes i la tile del selector. */
-                        grid={<MegaGridDibuixos active={active} className="w-full" />}
+                        grid={(() => {
+                          // Les tiles de la graella, de la mida de la casella: la
+                          // graella omple tota l'amplada i l'alcada de la casella.
+                          const items = dibuixosGraella16x4().filter((it) => it.collection === active);
+                          const n = items.length || 1;
+                          return (
+                            // Les tiles, un 15% mes petites, pero amb els
+                            // centres de la distribucio anterior (s'encongeixen
+                            // dins la seva casella, no la graella sencera).
+                            <CercadorDibuixosGraella
+                              items={items}
+                              dibuixPx={null}
+                              gapH={0}
+                              gapV={0}
+                              numColumns={n}
+                              tilesPercent={85}
+                              activeCollection={active}
+                              isPortraitTablet
+                            />
+                          );
+                        })()}
                         /* Les mides de la pagina 1, igualades a les de la pagina 2:
                            la franja fa el mateix (458,8 x 213,9 a 768), les fletxes
                            i el selector tambe (96,8 de costat, com el selector de la
