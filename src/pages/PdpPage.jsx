@@ -441,7 +441,8 @@ function PdpDesktop({ product }) {
         ref={containerRef}
         style={{
           maxWidth: containerMaxWidth,
-          margin: '0 auto',
+          // El contingut de la PDP va 100 px mes avall.
+          margin: '100px auto 0',
           padding: '0 16px',
           position: 'relative',
         }}
