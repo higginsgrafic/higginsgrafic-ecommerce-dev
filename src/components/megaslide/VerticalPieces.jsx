@@ -298,7 +298,7 @@ export function VerticalFletxes({ tileSize, onPrev, onNext }) {
 }
 
 /** La GRAELLA DE DIBUIXOS: tots els dibuixos del cataleg, en ordre del manifest. */
-export function VerticalGraellaDibuixos({ active, items }) {
+export function VerticalGraellaDibuixos({ active, items, carril }) {
   const [manifest, setManifest] = useState(null);
   useEffect(() => {
     let viu = true;
@@ -316,7 +316,18 @@ export function VerticalGraellaDibuixos({ active, items }) {
     }
     return out;
   }, [items, manifest]);
-  return <MegaGridDibuixos active={active} className="w-full" items={dibuixos} />;
+  // La casella: les 16 columnes i les 15 separacions del carril. Amb
+  // `bloc16x4` la graella son sempre 64 caselles (16 x 4).
+  const cellPx = carril ? (carril - 15 * GAP_PX) / 16 : undefined;
+  return (
+    <MegaGridDibuixos
+      active={active}
+      className="w-full"
+      items={dibuixos}
+      cellPx={cellPx}
+      bloc16x4
+    />
+  );
 }
 
 /** Utilitat per a les composicions: la reticula de tres files dins del carril. */
