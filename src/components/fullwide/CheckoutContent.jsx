@@ -109,10 +109,11 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
   // ===== VERTICAL (2 columnes) =====
   // Números propis, als mateixos valors inicials que l'horitzontal perquè és la
   // mateixa recepta; d'aquí en endavant cada variant se'n retoca per separado.
-  // Aire entre els camps del formulari d'enviament a la vertical. Son 5 px
-  // menys el que cal perque el formulari baixi 10,6 px (fins a igualar-se amb
-  // el de la targeta) sense moure'n el bottom: 8 junts x 1,325 = 10,6.
-  const P_FIELD_GAP = 3.675;
+  // Aire entre els camps del formulari d'enviament a la vertical. Es el que
+  // cal perque el BOTTOM no es mogui: el formulari baixa 10,6 px (per igualar
+  // el primer camp amb la capsa de la targeta) i els 8 junts en perden 11,925
+  // (10,6 + 1,325 del marge del retol).
+  const P_FIELD_GAP = 3.509;
   // Alçada dels CAMPS de text de la vertical (els 10 inputs i el selector de
   // pais): mes baixos que a la resta de formats. El que es treu d'alcada es
   // compensa als marges P_COLUMNES_TOP_* perque el bottom de cada formulari
@@ -188,8 +189,14 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
   //   enviament: les 8 fileres de camps x 7 px (39 - 32) = 56
   //   pagament:  les 2 fileres de capses de targeta x 6,8 px = 13,6
   // Enviament: els 56 px que s'ha aprimat + 10,6 per IGUALAR el formulari amb
-  // el de la targeta (el primer camp de cada un queda al mateix nivell).
-  const P_COLUMNES_TOP_ENVIAMENT = COLUMNES_TOP + 66.6;
+  // el de la targeta (el primer camp de cada un queda al mateix nivell), menys
+  // els 43 px que PUJA el retol per quedar al nivell del de "Dades de pagament"
+  // (aquests 43 es tornen a posar a P_TITOL_ENVIAMENT_MB, sota el retol).
+  const P_COLUMNES_TOP_ENVIAMENT = COLUMNES_TOP + 23.6;
+  // Marge de sota del retol "Dades d'enviament" a la vertical: els 15 px de
+  // sempre + els 43 que ha pujat el retol + 1,325 perque el PRIMER CAMP quedi
+  // exactament al nivell de la primera capsa de la targeta (659,6).
+  const P_TITOL_ENVIAMENT_MB = 59.325;
   const P_COLUMNES_TOP_PAGAMENT = COLUMNES_TOP + 13.6;
 
   // ===== FRANJA DE FITXES: MATEIX CRITERI QUE A LA VERTICAL =====
@@ -887,8 +894,11 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
             amplada. El títol va DINS de la columna (primera peça): així sempre
             queda just a sobre de la seva columna, es mogui on es mogui. */}
         <div style={{ gridColumn: isPortraitTablet ? 'span 1' : 'span 2', marginTop: columnesTopEnviament, display:'flex', flexDirection:'column', minHeight:0, overflow:'visible', justifyContent: 'flex-start', gap: fieldGap }}>
-          {/* 15px de marge + els 5px de junt de la columna = 20px fins al primer camp */}
-          <div style={{ fontSize:'12pt', fontWeight:500, marginTop: isLandscapeTablet ? '10px' : undefined, marginBottom: isLandscapeTablet ? '5px' : '15px' }}>Dades d'enviament</div>
+          {/* A la vertical el retol queda al nivell del de "Dades de pagament"
+              (572,6) i el primer camp al nivell de la primera capsa de la
+              targeta (659,6): 64,3px fins al primer camp, dels quals 43 son el
+              desnivell que ha pujat el retol. A l'escriptori, 15px. */}
+          <div style={{ fontSize:'12pt', fontWeight:500, marginTop: isLandscapeTablet ? '10px' : undefined, marginBottom: isLandscapeTablet ? '5px' : (isPortraitTablet ? `${P_TITOL_ENVIAMENT_MB}px` : '15px') }}>Dades d'enviament</div>
           <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', columnGap:'10px' }}>
             <div><input type="text" name="firstName" value={formData.firstName} onChange={handleChange} placeholder="Nom" style={inputStyle} />{formErrors.firstName && <div style={errorStyle}>{formErrors.firstName}</div>}</div>
             <div><input type="text" name="lastName" value={formData.lastName} onChange={handleChange} placeholder="Cognoms" style={inputStyle} />{formErrors.lastName && <div style={errorStyle}>{formErrors.lastName}</div>}</div>
