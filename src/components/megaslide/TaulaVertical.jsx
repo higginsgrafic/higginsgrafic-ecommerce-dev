@@ -115,10 +115,15 @@ export function TaulaVerticalP2({ graella = null, colleccions = null, colors = n
       }}
     >
       <div data-taula-cela="1-5" style={{ ...CELA, gridColumn: '1 / -1', gridRow: '1' }}>{graella || 'Graella dibuixos 16x4'}</div>
-      <div data-taula-cela="6-11" style={{ ...CELA, gridColumn: '1', gridRow: '2 / 4' }}>{colleccions || 'Col·leccions'}</div>
-      <div data-taula-cela="7" style={{ ...CELA, gridColumn: '2', gridRow: '2' }}>{colors || 'Graella colors 4x4'}</div>
-      <div data-taula-cela="8-10+13-15" style={{ ...CELA, gridColumn: '3 / 6', gridRow: '2 / 4' }}>{stripe || 'Stripe'}</div>
-      <div data-taula-cela="12" style={{ ...CELA, gridColumn: '2', gridRow: '3' }}>{selector || 'Selector b/c/n'}</div>
+      {/* Les caselles veïnes s'ajusten a la correguda de 10 px: la de
+          colleccions s'encongeix i la franja s'eixampla, perque les vores
+          tornin a tocar-se. */}
+      <div data-taula-cela="6-11" style={{ ...CELA, gridColumn: '1', gridRow: '2 / 4', marginRight: '10px' }}>{colleccions || 'Col·leccions'}</div>
+      {/* La graella de colors i el selector (i la seva casella, amb el
+          contorn) van 10 px a l'esquerra. */}
+      <div data-taula-cela="7" style={{ ...CELA, gridColumn: '2', gridRow: '2', transform: 'translateX(-10px)' }}>{colors || 'Graella colors 4x4'}</div>
+      <div data-taula-cela="8-10+13-15" style={{ ...CELA, gridColumn: '3 / 6', gridRow: '2 / 4', marginLeft: '-10px' }}>{stripe || 'Stripe'}</div>
+      <div data-taula-cela="12" style={{ ...CELA, gridColumn: '2', gridRow: '3', transform: 'translateX(-10px)' }}>{selector || 'Selector b/c/n'}</div>
     </div>
   );
 }
