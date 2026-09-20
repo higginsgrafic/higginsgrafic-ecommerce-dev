@@ -53,14 +53,16 @@ const CELA = {
  * caselles fusionades que ha demanat l'amo:
  *
  *   fila 1: [ Grid ..................................... ]
- *   fila 2: [6][ Stripe ..................][ Fletxes ]
- *   fila 3: [11][        "                ][ Selector b/c/n ]
+ *   fila 2: [6-11][ Stripe .......][ Fletxes ][16-17]
+ *   fila 3: [ "  ][      "       ][ Selector b/c/n ][  " ]
  *
- * Els blocs 7-9 i 12-14 son la MATEIXA casella, fusionada de dalt a baix.
+ * Els blocs 7-9 i 12-14 son la MATEIXA casella, fusionada de dalt a baix, i les
+ * caselles 6-11 i 16-17 tambe.
  *
  * La reticula va amb MITGES columnes (10) perque el conjunt de Stripe +
- * Fletxes + Selector va MOGUT MITJA CEL·LA A L'ESQUERRA: per aixo les caselles
- * 6 i 11 (sense nom) nomes fan mitja casella, que es el que queda lliure.
+ * Fletxes + Selector va MOGUT MITJA CEL·LA A L'ESQUERRA. D'aqui en surten les
+ * caselles 16-17 (la mitja columna de la dreta) i, a l'esquerra, la 6-11 es
+ * queda amb mitja casella d'amplada.
  */
 export function TaulaVerticalP1() {
   return (
@@ -78,11 +80,11 @@ export function TaulaVerticalP1() {
       }}
     >
       <div data-taula-cela="1-5" style={{ ...CELA, gridColumn: '1 / 11', gridRow: '1' }}>Grid</div>
-      <div data-taula-cela="6" style={{ ...CELA, gridColumn: '1 / 2', gridRow: '2' }} />
-      <div data-taula-cela="11" style={{ ...CELA, gridColumn: '1 / 2', gridRow: '3' }} />
+      <div data-taula-cela="6-11" style={{ ...CELA, gridColumn: '1 / 2', gridRow: '2 / 4' }} />
       <div data-taula-cela="7-9+12-14" style={{ ...CELA, gridColumn: '2 / 8', gridRow: '2 / 4' }}>Stripe</div>
       <div data-taula-cela="10" style={{ ...CELA, gridColumn: '8 / 10', gridRow: '2' }}>Fletxes</div>
       <div data-taula-cela="15" style={{ ...CELA, gridColumn: '8 / 10', gridRow: '3' }}>Selector b/c/n</div>
+      <div data-taula-cela="16-17" style={{ ...CELA, gridColumn: '10 / 11', gridRow: '2 / 4' }}>16-17</div>
     </div>
   );
 }
