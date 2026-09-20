@@ -1,13 +1,15 @@
 import React from 'react';
 
 /**
- * TaulaVertical — la TAULA de la vista vertical del megaslide, DIBUIXADA.
+ * TaulaVertical — les DUES taules dibuixades de la vista vertical del megaslide.
  * -----------------------------------------------------------------------------
- * Una reticula de 5 columnes x 3 files amb els contorns dibuixats, les caselles
- * NUMERADES (1..15) i sense cap contingut de debò: serveix per veure i validar
- * l'estructura abans de posar-hi les peces.
+ * Una per PAGINA, i INDEPENDENTS: cada una te la seva reticula, el seu nombre
+ * de caselles i el seu numero, i es pot canviar sense tocar l'altra. Avui totes
+ * dues son una reticula de 5 columnes x 3 files amb els contorns dibuixats i
+ * les caselles numerades (1..15), sense cap contingut de debò: serveixen per
+ * veure i validar l'estructura abans de posar-hi les peces.
  *
- * Viu DINS del carril del megaslide: la referencia es la de la tauleta (1024
+ * Viuen DINS del carril del megaslide: la referencia es la de la tauleta (1024
  * amb coixos de 40), mai mes ampla que la finestra menys els coixos.
  */
 
@@ -20,50 +22,115 @@ export function ampladaCarril(ampleFinestra) {
   return Math.max(0, Math.min(CARRIL_TAULETA_PX, w - 80));
 }
 
-/** Les columnes i les files de la taula. */
-export const COLUMNES_TAULA = 5;
-export const FILES_TAULA = 3;
-
-/** L'alçada de la taula, en px, per a una amplada de finestra donada. */
+/**
+ * L'alcada que demana la mes alta de les dues taules (avui totes dues son de
+ * 5x3, amb les caselles quadrades): es la que fa servir el megaslide per
+ * dimensionar la pestanya.
+ */
 export function alturaTaulaVertical(ampleFinestra) {
-  return Math.ceil((ampladaCarril(ampleFinestra) * FILES_TAULA) / COLUMNES_TAULA);
+  return Math.ceil((ampladaCarril(ampleFinestra) * 3) / 5);
 }
 
-export default function TaulaVertical({ columnes = COLUMNES_TAULA, files = FILES_TAULA }) {
-  // El contorn d'una CEL·LA: la línia que dibuixa la taula. El número hi va
-  // centrat, amb la mateixa lletra que feien servir les taules dibuixades.
-  const cela = {
-    border: '1px solid rgba(0, 0, 0, 0.35)',
-    boxSizing: 'border-box',
-    minWidth: 0,
-    minHeight: 0,
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    fontFamily: 'Oswald, Roboto Condensed, sans-serif',
-    fontSize: '13px',
-    letterSpacing: '0.06em',
-    color: '#1A1A1A',
-  };
+/** L'estil d'una casella: el contorn dibuixat i el número centrat. */
+const CELA = {
+  border: '1px solid rgba(0, 0, 0, 0.35)',
+  boxSizing: 'border-box',
+  minWidth: 0,
+  minHeight: 0,
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  fontFamily: 'Oswald, Roboto Condensed, sans-serif',
+  fontSize: '13px',
+  letterSpacing: '0.06em',
+  color: '#1A1A1A',
+};
+
+/**
+ * TaulaVerticalP1 — la taula de la PAGINA 1: 5 columnes x 3 files, caselles
+ * quadrades i numerades 1..15 (d'esquerra a dreta i de dalt a baix).
+ */
+export function TaulaVerticalP1() {
+  return (
+    <div
+      data-taula-vertical="1"
+      style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(5, 1fr)',
+        gridTemplateRows: 'repeat(3, 1fr)',
+        width: '100%',
+        // Les caselles son quadrades: 3 files sobre 5 columnes = 3/5 d'alcada.
+        aspectRatio: '5 / 3',
+        minHeight: 0,
+      }}
+    >
+      {Array.from({ length: 15 }).map((_, i) => (
+        <div key={`p1-cela-${i}`} data-taula-cela={i} style={CELA}>
+          {i + 1}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+/**
+ * TaulaVerticalP2 — la taula de la PAGINA 2: 5 columnes x 3 files, caselles
+ * quadrades i numerades 1..15 (d'esquerra a dreta i de dalt a baix).
+ */
+export function TaulaVerticalP2() {
   return (
     <div
       data-taula-vertical="2"
       style={{
         display: 'grid',
-        gridTemplateColumns: `repeat(${columnes}, 1fr)`,
-        gridTemplateRows: `repeat(${files}, 1fr)`,
+        gridTemplateColumns: 'repeat(5, 1fr)',
+        gridTemplateRows: 'repeat(3, 1fr)',
         width: '100%',
-        // LES CASELLES SON QUADRADES: l'alcada de la taula surt de la mateixa
-        // proporcio que les columnes (una retícula de 5x3 fa 3/5 d'alcada).
-        aspectRatio: `${columnes} / ${files}`,
+        // Les caselles son quadrades: 3 files sobre 5 columnes = 3/5 d'alcada.
+        aspectRatio: '5 / 3',
         minHeight: 0,
       }}
     >
-      {Array.from({ length: columnes * files }).map((_, i) => (
-        <div key={`cela-${i}`} data-taula-cela={i} style={cela}>
+      {Array.from({ length: 15 }).map((_, i) => (
+        <div key={`p2-cela-${i}`} data-taula-cela={i} style={CELA}>
           {i + 1}
         </div>
       ))}
+    </div>
+  );
+}
+
+/**
+ * CapaTaulaVertical — la CAPA que munta la taula d'una pagina damunt del seu
+ * viewport, a la vista vertical. Es absoluta (no mou res del layout), va
+ * centrada i fa l'amplada del carril. La taula hi entra com a filla, aixi cada
+ * pagina porta la SEVA.
+ *
+ * @param {object} props
+ * @param {number} props.pagina  la pagina del megaslide (1 o 2)
+ * @param {React.ReactNode} props.children  la taula d'aquella pagina
+ */
+export function CapaTaulaVertical({ pagina, children }) {
+  const ample = typeof window !== 'undefined' && window.innerWidth > 0
+    ? Math.round(ampladaCarril(window.innerWidth))
+    : 0;
+  return (
+    <div
+      data-megaslide-taula={pagina}
+      style={{
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        display: 'flex',
+        justifyContent: 'center',
+        pointerEvents: 'none',
+      }}
+    >
+      <div style={{ width: ample ? `${ample}px` : '100%', maxWidth: '100%', height: '100%' }}>
+        {children}
+      </div>
     </div>
   );
 }
