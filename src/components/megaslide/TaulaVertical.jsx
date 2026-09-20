@@ -47,8 +47,15 @@ const CELA = {
 };
 
 /**
- * TaulaVerticalP1 — la taula de la PAGINA 1: 5 columnes x 3 files, caselles
- * quadrades i numerades 1..15 (d'esquerra a dreta i de dalt a baix).
+ * TaulaVerticalP1 — la taula de la PAGINA 1: 5 columnes x 3 files amb les
+ * caselles fusionades que ha demanat l'amo:
+ *
+ *   fila 1: [ 1-5 ]
+ *   fila 2: [ 6 ][ 7-9 ][ 10 ]
+ *   fila 3: [ 11 ][ 12-14 ][ 15 ]
+ *
+ * Cada casella porta escrit el numero (o el rang) de les caselles originals que
+ * cobreix, per poder validar l'estructura.
  */
 export function TaulaVerticalP1() {
   return (
@@ -64,18 +71,27 @@ export function TaulaVerticalP1() {
         minHeight: 0,
       }}
     >
-      {Array.from({ length: 15 }).map((_, i) => (
-        <div key={`p1-cela-${i}`} data-taula-cela={i} style={CELA}>
-          {i + 1}
-        </div>
-      ))}
+      <div data-taula-cela="1-5" style={{ ...CELA, gridColumn: '1 / -1', gridRow: '1' }}>1-5</div>
+      <div data-taula-cela="6" style={{ ...CELA, gridColumn: '1', gridRow: '2' }}>6</div>
+      <div data-taula-cela="7-9" style={{ ...CELA, gridColumn: '2 / 5', gridRow: '2' }}>7-9</div>
+      <div data-taula-cela="10" style={{ ...CELA, gridColumn: '5', gridRow: '2' }}>10</div>
+      <div data-taula-cela="11" style={{ ...CELA, gridColumn: '1', gridRow: '3' }}>11</div>
+      <div data-taula-cela="12-14" style={{ ...CELA, gridColumn: '2 / 5', gridRow: '3' }}>12-14</div>
+      <div data-taula-cela="15" style={{ ...CELA, gridColumn: '5', gridRow: '3' }}>15</div>
     </div>
   );
 }
 
 /**
- * TaulaVerticalP2 — la taula de la PAGINA 2: 5 columnes x 3 files, caselles
- * quadrades i numerades 1..15 (d'esquerra a dreta i de dalt a baix).
+ * TaulaVerticalP2 — la taula de la PAGINA 2: 5 columnes x 3 files amb les
+ * caselles fusionades que ha demanat l'amo:
+ *
+ *   fila 1: [ 1-5 ]
+ *   fila 2: [ 6-11 ][ 7 ][ 8-10 ]
+ *   fila 3: [ 6-11 ][ 12 ][ 13-15 ]
+ *
+ * (La 6 i l'11 son la MATEIXA casella, fusionada de dalt a baix.) Cada casella
+ * porta escrit el numero (o el rang) de les caselles originals que cobreix.
  */
 export function TaulaVerticalP2() {
   return (
@@ -91,11 +107,12 @@ export function TaulaVerticalP2() {
         minHeight: 0,
       }}
     >
-      {Array.from({ length: 15 }).map((_, i) => (
-        <div key={`p2-cela-${i}`} data-taula-cela={i} style={CELA}>
-          {i + 1}
-        </div>
-      ))}
+      <div data-taula-cela="1-5" style={{ ...CELA, gridColumn: '1 / -1', gridRow: '1' }}>1-5</div>
+      <div data-taula-cela="6-11" style={{ ...CELA, gridColumn: '1', gridRow: '2 / 4' }}>6-11</div>
+      <div data-taula-cela="7" style={{ ...CELA, gridColumn: '2', gridRow: '2' }}>7</div>
+      <div data-taula-cela="8-10" style={{ ...CELA, gridColumn: '3 / 6', gridRow: '2' }}>8-10</div>
+      <div data-taula-cela="12" style={{ ...CELA, gridColumn: '2', gridRow: '3' }}>12</div>
+      <div data-taula-cela="13-15" style={{ ...CELA, gridColumn: '3 / 6', gridRow: '3' }}>13-15</div>
     </div>
   );
 }
