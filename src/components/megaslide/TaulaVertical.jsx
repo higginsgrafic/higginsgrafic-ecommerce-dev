@@ -70,26 +70,32 @@ const CELA = {
  * queda amb mitja casella d'amplada.
  */
 export function TaulaVerticalP1({ grid = null, stripe = null, fletxes = null, selector = null }) {
+  // Les caseslles son TOTES SENCILLES (5 columnes senceres, sense mitges
+  // caselles ni talls): la filera de dalt sencera per a la graella, la
+  // franja a les columnes 2-4 de les fileres 2 i 3, i la columna 5 per a les
+  // fletxes (filera 2) i el selector (filera 3).
   return (
     <div
       data-taula-vertical="1"
       style={{
         display: 'grid',
-        // 10 mitges columnes: aixi el conjunt de la dreta pot anar mig desplacat.
-        gridTemplateColumns: 'repeat(10, 1fr)',
+        gridTemplateColumns: 'repeat(5, 1fr)',
         gridTemplateRows: 'repeat(3, 1fr)',
         width: '100%',
-        // Les caselles son quadrades: 3 files sobre 5 columnes = 3/5 d'alcada.
-        aspectRatio: '5 / 3',
+        // Les caselles, de la MATEIXA mida que les de la pagina 2: la taula fa
+        // la mateixa alcada (la banda menys els 15 px del marge) i les files
+        // queden igual.
+        height: 'calc(100% - 15px)',
+        marginTop: '15px',
         minHeight: 0,
       }}
     >
-      <div data-taula-cela="1-5" style={{ ...CELA, gridColumn: '1 / 11', gridRow: '1' }}>{grid || 'Grid'}</div>
-      <div data-taula-cela="6-11" style={{ ...CELA, gridColumn: '1 / 2', gridRow: '2 / 4' }} />
-      <div data-taula-cela="7-9+12-14" style={{ ...CELA, gridColumn: '2 / 8', gridRow: '2 / 4', justifyContent: 'flex-start', alignItems: 'flex-start' }}>{stripe || 'Stripe'}</div>
-      <div data-taula-cela="10" style={{ ...CELA, gridColumn: '8 / 10', gridRow: '2' }}>{fletxes || 'Fletxes'}</div>
-      <div data-taula-cela="15" style={{ ...CELA, gridColumn: '8 / 10', gridRow: '3' }}>{selector || 'Selector b/c/n'}</div>
-      <div data-taula-cela="16-17" style={{ ...CELA, gridColumn: '10 / 11', gridRow: '2 / 4' }}>16-17</div>
+      <div data-taula-cela="1-5" style={{ ...CELA, gridColumn: '1 / -1', gridRow: '1' }}>{grid || 'Grid'}</div>
+      <div data-taula-cela="6" style={{ ...CELA, gridColumn: '1', gridRow: '2' }} />
+      <div data-taula-cela="7-9+12-14" style={{ ...CELA, gridColumn: '2 / 5', gridRow: '2 / 4', justifyContent: 'flex-start', alignItems: 'flex-start' }}>{stripe || 'Stripe'}</div>
+      <div data-taula-cela="10" style={{ ...CELA, gridColumn: '5', gridRow: '2' }}>{fletxes || 'Fletxes'}</div>
+      <div data-taula-cela="11" style={{ ...CELA, gridColumn: '1', gridRow: '3' }} />
+      <div data-taula-cela="15" style={{ ...CELA, gridColumn: '5', gridRow: '3' }}>{selector || 'Selector b/c/n'}</div>
     </div>
   );
 }
