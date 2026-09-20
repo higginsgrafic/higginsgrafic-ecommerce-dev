@@ -64,7 +64,7 @@ const CELA = {
  * caselles 16-17 (la mitja columna de la dreta) i, a l'esquerra, la 6-11 es
  * queda amb mitja casella d'amplada.
  */
-export function TaulaVerticalP1() {
+export function TaulaVerticalP1({ grid = null, stripe = null, fletxes = null, selector = null }) {
   return (
     <div
       data-taula-vertical="1"
@@ -79,11 +79,11 @@ export function TaulaVerticalP1() {
         minHeight: 0,
       }}
     >
-      <div data-taula-cela="1-5" style={{ ...CELA, gridColumn: '1 / 11', gridRow: '1' }}>Grid</div>
+      <div data-taula-cela="1-5" style={{ ...CELA, gridColumn: '1 / 11', gridRow: '1' }}>{grid || 'Grid'}</div>
       <div data-taula-cela="6-11" style={{ ...CELA, gridColumn: '1 / 2', gridRow: '2 / 4' }} />
-      <div data-taula-cela="7-9+12-14" style={{ ...CELA, gridColumn: '2 / 8', gridRow: '2 / 4' }}>Stripe</div>
-      <div data-taula-cela="10" style={{ ...CELA, gridColumn: '8 / 10', gridRow: '2' }}>Fletxes</div>
-      <div data-taula-cela="15" style={{ ...CELA, gridColumn: '8 / 10', gridRow: '3' }}>Selector b/c/n</div>
+      <div data-taula-cela="7-9+12-14" style={{ ...CELA, gridColumn: '2 / 8', gridRow: '2 / 4' }}>{stripe || 'Stripe'}</div>
+      <div data-taula-cela="10" style={{ ...CELA, gridColumn: '8 / 10', gridRow: '2' }}>{fletxes || 'Fletxes'}</div>
+      <div data-taula-cela="15" style={{ ...CELA, gridColumn: '8 / 10', gridRow: '3' }}>{selector || 'Selector b/c/n'}</div>
       <div data-taula-cela="16-17" style={{ ...CELA, gridColumn: '10 / 11', gridRow: '2 / 4' }}>16-17</div>
     </div>
   );
