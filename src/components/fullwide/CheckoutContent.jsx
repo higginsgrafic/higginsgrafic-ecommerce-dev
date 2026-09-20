@@ -109,7 +109,10 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
   // ===== VERTICAL (2 columnes) =====
   // Números propis, als mateixos valors inicials que l'horitzontal perquè és la
   // mateixa recepta; d'aquí en endavant cada variant se'n retoca per separado.
-  const P_FIELD_GAP = 5;
+  // Aire entre els camps del formulari d'enviament a la vertical. Son 5 px
+  // menys el que cal perque el formulari baixi 10,6 px (fins a igualar-se amb
+  // el de la targeta) sense moure'n el bottom: 8 junts x 1,325 = 10,6.
+  const P_FIELD_GAP = 3.675;
   // Alçada dels CAMPS de text de la vertical (els 10 inputs i el selector de
   // pais): mes baixos que a la resta de formats. El que es treu d'alcada es
   // compensa als marges P_COLUMNES_TOP_* perque el bottom de cada formulari
@@ -184,7 +187,9 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
   // penja —la factura, els termes i el botó— no es mou).
   //   enviament: les 8 fileres de camps x 7 px (39 - 32) = 56
   //   pagament:  les 2 fileres de capses de targeta x 6,8 px = 13,6
-  const P_COLUMNES_TOP_ENVIAMENT = COLUMNES_TOP + 56;
+  // Enviament: els 56 px que s'ha aprimat + 10,6 per IGUALAR el formulari amb
+  // el de la targeta (el primer camp de cada un queda al mateix nivell).
+  const P_COLUMNES_TOP_ENVIAMENT = COLUMNES_TOP + 66.6;
   const P_COLUMNES_TOP_PAGAMENT = COLUMNES_TOP + 13.6;
 
   // ===== FRANJA DE FITXES: MATEIX CRITERI QUE A LA VERTICAL =====
@@ -911,7 +916,10 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
             (així el bloc de la targeta queda alineat pel capdamunt amb el camp
             del client). */}
         <div style={{ gridColumn: isPortraitTablet ? 'span 1' : 'span 2', marginTop: columnesTopPagament, display:'flex', flexDirection:'column', minHeight:0, overflow:'visible', position: isPortraitTablet ? undefined : 'relative', gap: isNarrowForm ? '1px' : undefined }}>
-          <div style={{ fontSize:'12pt', fontWeight:500, marginTop: isLandscapeTablet ? '10px' : undefined, marginBottom: isLandscapeTablet ? '10px' : '20px' }}>Dades de pagament</div>
+          {/* A la vertical el retol baixa 10 px: son els 10 px que es treuen
+              del marge de sota (10 a dalt i 10 a baix en comptes de 0 i 20),
+              aixi el bloc de la targeta no es mou. */}
+          <div style={{ fontSize:'12pt', fontWeight:500, marginTop: (isLandscapeTablet || isPortraitTablet) ? '10px' : undefined, marginBottom: (isLandscapeTablet || isPortraitTablet) ? '10px' : '20px' }}>Dades de pagament</div>
           <div style={{ display:'flex', flexDirection:'column', flex:'1 1 auto', gap: isNarrowForm ? '1px' : undefined }}>
             {/* Pagament */}
             <div style={{ display:'grid', rowGap: '8px' }}>
