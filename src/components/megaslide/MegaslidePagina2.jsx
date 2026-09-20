@@ -388,6 +388,9 @@ export default function MegaslidePagina2({
         ref={viewportRef}
         data-mega-page-viewport="2"
         style={{
+          // A la VERTICAL, el contingut de la pagina 2 queda AMAGAT (l'espai
+          // es conserva). A l'apaisada i a l'escriptori no es toca res.
+          visibility: isPortraitTablet ? 'hidden' : undefined,
           width: '100%',
           height: '100%',
           display: 'flex',
