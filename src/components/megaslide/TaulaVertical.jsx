@@ -78,7 +78,10 @@ export function TaulaVerticalP1({ grid = null, stripe = null, fletxes = null, se
   return (
     <div
       data-taula-vertical="1"
+      /* La capa de la taula es `pointer-events: none`; la taula el torna a
+         activar perque les seves peces rebin els tocs (tap i clic). */
       style={{
+        pointerEvents: 'auto',
         display: 'grid',
         gridTemplateColumns: 'repeat(5, 1fr)',
         gridTemplateRows: 'repeat(3, 1fr)',
@@ -120,6 +123,7 @@ export function TaulaVerticalP2({ graella = null, colleccions = null, colors = n
     <div
       data-taula-vertical="2"
       style={{
+        pointerEvents: 'auto',
         display: 'grid',
         gridTemplateColumns: 'repeat(5, 1fr)',
         gridTemplateRows: 'repeat(3, 1fr)',
