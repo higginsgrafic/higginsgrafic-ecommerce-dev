@@ -485,7 +485,9 @@ export default function MegaslidePagina2({
             <div style={{ gridColumn: '2', gridRow: '2' }}>
               <VerticalColorsGrid selectedColor={colorSlug} onSelectColor={triaColor} />
             </div>
-            <div style={{ gridColumn: '3', gridRow: '2' }}>
+
+            {/* UNA SOLA FRANJA, a la dreta i ocupant les files 2 i 3. */}
+            <div style={{ gridColumn: '3', gridRow: '2 / 4' }}>
               <VerticalStripeFranja
                 srcs={srcsFranja}
                 items={stripeTileItems}

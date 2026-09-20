@@ -353,10 +353,22 @@ function MegaStripePanelP1({
             <VerticalGraellaDibuixos active={active} items={itemsFila} />
           </div>
 
-          {/* FILA 2: la FRANJA a les dues primeres cel·les i les FLETXES a la
-              tercera, com a l'estructura de la pagina 1. */}
-          <div style={graellaFiles}>
-            <div style={{ gridColumn: '1 / 3' }} data-contorn-bloc="2">
+          {/* LES DUES FILES: UNA SOLA FRANJA (a les dues primeres cel·les,
+              ocupant les dues files) i, a la dreta, les FLETXES a la fila 2 i
+              el SELECTOR a la fila 3. */}
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: `${c1 + c2 + GAP_PX}px ${c3}px ${c4}px`,
+              gridTemplateRows: 'auto auto',
+              columnGap: `${GAP_PX}px`,
+              rowGap: `${GAP_PX * 3}px`,
+              marginTop: `${GAP_PX * 3}px`,
+              width: '100%',
+              alignItems: 'start',
+            }}
+          >
+            <div style={{ gridColumn: '1', gridRow: '1 / 3' }} data-contorn-bloc="2">
               <VerticalStripeFranja
                 srcs={stripeVertical.srcs}
                 items={stripeVertical.items}
@@ -364,28 +376,14 @@ function MegaStripePanelP1({
                 onSelect={triaSamarreta}
               />
             </div>
-            <div style={{ gridColumn: '3' }} data-contorn-bloc="3">
+            <div style={{ gridColumn: '2', gridRow: '1' }} data-contorn-bloc="3">
               <VerticalFletxes
                 tileSize={Math.round(c3 * 0.9)}
                 onPrev={() => setThinStartIndex?.((v) => v - 1)}
                 onNext={() => setThinStartIndex?.((v) => v + 1)}
               />
             </div>
-            <div style={{ gridColumn: '4' }} />
-          </div>
-
-          {/* FILA 3: la FRANJA a les dues primeres cel·les i el SELECTOR a la
-              tercera. */}
-          <div style={graellaFiles}>
-            <div style={{ gridColumn: '1 / 3' }}>
-              <VerticalStripeFranja
-                srcs={stripeVertical.srcs}
-                items={stripeVertical.items}
-                selectedItem={selectedItem}
-                onSelect={triaSamarreta}
-              />
-            </div>
-            <div style={{ gridColumn: '3' }} data-contorn-bloc="4">
+            <div style={{ gridColumn: '2', gridRow: '2' }} data-contorn-bloc="4">
               <VerticalSelector
                 variant={variantActual}
                 visibility={stripeVariantVisibility}
@@ -394,7 +392,7 @@ function MegaStripePanelP1({
                 onMulti={() => { setStripeOverlayOverrideActive?.(false); if (active === 'the_human_inside') setHumanInsideVariant?.('color'); else setFirstContactVariant?.('color'); }}
               />
             </div>
-            <div style={{ gridColumn: '4' }} />
+            <div style={{ gridColumn: '3', gridRow: '1 / 3' }} />
           </div>
         </div>
       </div>
