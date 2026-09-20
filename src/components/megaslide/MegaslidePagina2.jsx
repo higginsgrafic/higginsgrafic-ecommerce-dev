@@ -685,9 +685,9 @@ export default function MegaslidePagina2({
             graella={(
               <CercadorDibuixosGraella
                 items={dibuixosGraella16x4()}
-                dibuixPx={midesTaula.dibuixPx}
-                gapH={midesTaula.gapDibuixos}
-                gapV={midesTaula.gapDibuixos}
+                dibuixPx={null}
+                gapH={0}
+                gapV={0}
                 numColumns={16}
                 activeCollection={active}
                 isPortraitTablet={isPortraitTablet}

@@ -347,8 +347,23 @@ export function CercadorDibuixosGraella({
   isLandscapeTablet = false,
   fontBoost = 0,
 }) {
+  // Amb `dibuixPx` les caselles tenen mida fixa (la filera de la pagina 2);
+  // sense (`dibuixPx` nul) la graella S'EXPANDEIX per omplir tota la superficie
+  // del seu contenidor: les columnes i les files es reparteixen l'espai i cada
+  // dibuix s'hi ajusta sencer (`object-fit: contain`).
+  const omple = !(dibuixPx > 0);
+  const files = Math.max(1, Math.ceil((items?.length || 0) / (numColumns || 1)));
+  const costat = omple ? '100%' : `${dibuixPx}px`;
   return (
-    <div ref={graellaRef} style={{ display: 'grid', gridTemplateColumns: `repeat(${numColumns}, ${dibuixPx}px)`, gap: `${gapV}px ${gapH}px`, width: '100%', minWidth: 0 }}>
+    <div ref={graellaRef} style={{
+      display: 'grid',
+      gridTemplateColumns: omple ? `repeat(${numColumns}, 1fr)` : `repeat(${numColumns}, ${dibuixPx}px)`,
+      gridTemplateRows: omple ? `repeat(${files}, 1fr)` : undefined,
+      gap: `${gapV}px ${gapH}px`,
+      width: '100%',
+      height: omple ? '100%' : undefined,
+      minWidth: 0,
+    }}>
       {items.map(({ label, collection, subcollection, stripeItem }) => {
         const dimmed = activeCollection && collection !== activeCollection
           ? true
@@ -367,8 +382,10 @@ export function CercadorDibuixosGraella({
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              width: `${dibuixPx}px`,
-              height: `${dibuixPx}px`,
+              width: costat,
+              height: costat,
+              minWidth: 0,
+              minHeight: 0,
               padding: 0,
               border: 0,
               background: 'transparent',
@@ -382,8 +399,8 @@ export function CercadorDibuixosGraella({
                 alt={label}
                 loading="lazy"
                 style={{
-                  height: `${dibuixPx}px`,
-                  width: `${dibuixPx}px`,
+                  height: costat,
+                  width: costat,
                   objectFit: 'contain',
                   display: 'block',
                 }}
