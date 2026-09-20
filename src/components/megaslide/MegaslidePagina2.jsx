@@ -714,7 +714,7 @@ export default function MegaslidePagina2({
               <img
                 src="/placeholders/tablet vertical/stripe-curta-7+7.png"
                 alt=""
-                style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+                style={{ width: 'calc(100% + 24px)', height: 'auto', display: 'block', flexShrink: 0, maxWidth: 'none', marginLeft: '-4px' }}
               />
             )}
             selector={(
