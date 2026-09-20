@@ -724,6 +724,7 @@ export default function MegaslidePagina2({
                     {...propsFranjaP2}
                     isPortraitTablet
                     stripeImageSrc="/placeholders/tablet vertical/stripe-curta-7+7.png"
+                    senseMascaraSamarreta
                     visualOffsetY={0}
                   />
                 </div>
