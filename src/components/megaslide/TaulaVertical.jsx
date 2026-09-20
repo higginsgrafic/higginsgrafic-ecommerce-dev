@@ -52,14 +52,15 @@ const CELA = {
  * TaulaVerticalP1 — la taula de la PAGINA 1: 5 columnes x 3 files amb les
  * caselles fusionades que ha demanat l'amo:
  *
- *   fila 1: [ Grid ]
- *   fila 2: [      ][ Stripe ][ Fletxes ]
- *   fila 3: [      ][   "    ][ Selector b/c/n ]
+ *   fila 1: [ Grid ..................................... ]
+ *   fila 2: [6][ Stripe ..................][ Fletxes ]
+ *   fila 3: [11][        "                ][ Selector b/c/n ]
  *
  * Els blocs 7-9 i 12-14 son la MATEIXA casella, fusionada de dalt a baix.
  *
- * Cada casella porta escrit el nom del que hi anira; les caselles 6 i 11 no
- * tenen nom.
+ * La reticula va amb MITGES columnes (10) perque el conjunt de Stripe +
+ * Fletxes + Selector va MOGUT MITJA CEL·LA A L'ESQUERRA: per aixo les caselles
+ * 6 i 11 (sense nom) nomes fan mitja casella, que es el que queda lliure.
  */
 export function TaulaVerticalP1() {
   return (
@@ -67,7 +68,8 @@ export function TaulaVerticalP1() {
       data-taula-vertical="1"
       style={{
         display: 'grid',
-        gridTemplateColumns: 'repeat(5, 1fr)',
+        // 10 mitges columnes: aixi el conjunt de la dreta pot anar mig desplacat.
+        gridTemplateColumns: 'repeat(10, 1fr)',
         gridTemplateRows: 'repeat(3, 1fr)',
         width: '100%',
         // Les caselles son quadrades: 3 files sobre 5 columnes = 3/5 d'alcada.
@@ -75,12 +77,12 @@ export function TaulaVerticalP1() {
         minHeight: 0,
       }}
     >
-      <div data-taula-cela="1-5" style={{ ...CELA, gridColumn: '1 / -1', gridRow: '1' }}>Grid</div>
-      <div data-taula-cela="6" style={{ ...CELA, gridColumn: '1', gridRow: '2' }} />
-      <div data-taula-cela="7-9+12-14" style={{ ...CELA, gridColumn: '2 / 5', gridRow: '2 / 4' }}>Stripe</div>
-      <div data-taula-cela="10" style={{ ...CELA, gridColumn: '5', gridRow: '2' }}>Fletxes</div>
-      <div data-taula-cela="11" style={{ ...CELA, gridColumn: '1', gridRow: '3' }} />
-      <div data-taula-cela="15" style={{ ...CELA, gridColumn: '5', gridRow: '3' }}>Selector b/c/n</div>
+      <div data-taula-cela="1-5" style={{ ...CELA, gridColumn: '1 / 11', gridRow: '1' }}>Grid</div>
+      <div data-taula-cela="6" style={{ ...CELA, gridColumn: '1 / 2', gridRow: '2' }} />
+      <div data-taula-cela="11" style={{ ...CELA, gridColumn: '1 / 2', gridRow: '3' }} />
+      <div data-taula-cela="7-9+12-14" style={{ ...CELA, gridColumn: '2 / 8', gridRow: '2 / 4' }}>Stripe</div>
+      <div data-taula-cela="10" style={{ ...CELA, gridColumn: '8 / 10', gridRow: '2' }}>Fletxes</div>
+      <div data-taula-cela="15" style={{ ...CELA, gridColumn: '8 / 10', gridRow: '3' }}>Selector b/c/n</div>
     </div>
   );
 }
