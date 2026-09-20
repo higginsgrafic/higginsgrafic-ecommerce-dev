@@ -447,7 +447,7 @@ export default function MegaMenuPanel({
                           />
                         )}
                         fletxes={(
-                          <div style={{ width: '75.9%' }}>
+                          <div style={{ width: '90%' }}>
                           <FirstContactDibuix09Buttons
                             tileSize={96.8}
                             onPrev={() => { touchMegaPublicActivity?.(); }}
