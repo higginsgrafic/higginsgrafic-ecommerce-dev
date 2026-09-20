@@ -13,7 +13,16 @@ import {
   CONTROL_TILE_ARROWS,
 } from '../fullwide/MegaColumn.jsx';
 import { FirstContactDibuix00Buttons } from '../fullwide/firstContactPanels.jsx';
-import { computeStripeTileOverlaySrcs, computeStripeTileItems } from '@/utils/resolveStripeTile.js';
+import { computeStripeTileOverlaySrcs, computeStripeTileItems, resolveForItem } from '@/utils/resolveStripeTile.js';
+import {
+  GAP_PX,
+  VerticalColleccions,
+  VerticalColorsGrid,
+  VerticalGraellaDibuixos,
+  VerticalSelector,
+  VerticalStripeFranja,
+  ampladaCarril,
+} from './VerticalPieces.jsx';
 
 export default function MegaslidePagina2({
   active,
@@ -381,6 +390,123 @@ export default function MegaslidePagina2({
   }, [stripeTileItems, hoveredStripeItem]);
 
   const stripeEmptyMaskSrc = null;
+
+  // La collecció activa a la llista: a l'austen mana la subcol·lecció.
+  const clauColleccions = active === 'austen' ? `austen:${austenSubcollection || ''}` : active;
+
+  /** Tria una collecció (o una subcollecció de l'austen) de la llista. */
+  const triaColleccio = useCallback((key) => {
+    const raw = typeof key === 'string' ? key : '';
+    if (!raw) return;
+    if (raw.includes(':')) {
+      const [collection, subcollection] = raw.split(':');
+      setActive(collection);
+      setAustenSubcollection?.(subcollection || null);
+    } else {
+      setActive(raw);
+      setAustenSubcollection?.(null);
+    }
+  }, [setActive, setAustenSubcollection]);
+
+  /** Tria un color de la paleta: mana el color de tota la franja. */
+  const triaColor = useCallback((slug) => {
+    setCercadorSelectedColor?.(slug);
+  }, [setCercadorSelectedColor]);
+
+  /**
+   * Tria una samarreta de la franja. Fa el mateix que triar-la a la filera
+   * horitzontal: deixa la samarreta triada a la colleccio activa.
+   */
+  const seleccionaSamarreta = useCallback((idx) => {
+    const item = stripeTileItems?.[idx];
+    if (!item) return;
+    setStripeOverlayOverrideActive?.(false);
+    if (active === 'first_contact') setFirstContactSelectedItem?.(item);
+    else if (active === 'the_human_inside') setHumanInsideSelectedItem?.(item);
+    else setSelectedItemByCollection?.((prev) => ({ ...prev, [active]: item }));
+  }, [active, stripeTileItems, setStripeOverlayOverrideActive, setFirstContactSelectedItem, setHumanInsideSelectedItem, setSelectedItemByCollection]);
+
+  /**
+   * LA VERTICAL: la composicio propia de la pagina 2.
+   *
+   * Tres files dins del carril:
+   *   fila 1: la graella de dibuixos (tots els dibuixos del cataleg)
+   *   fila 2: colleccions + graella de colors + stripe
+   *   fila 3: colleccions + selector + stripe
+   *
+   * La franja es d'un sol color i el mana la graella de colors: el dibuix de
+   * cada casella es el negre de sempre i el color hi va a sobre, de manera que
+   * totes les caselles canvien de color amb la paleta.
+   */
+  if (isPortraitTablet && active) {
+    const carril = ampladaCarril(typeof window !== 'undefined' ? window.innerWidth : 0);
+    const colorSlug = cercadorSelectedColor || 'white';
+    const srcsFranja = (Array.isArray(stripeTileItems) ? stripeTileItems : []).map((it) => (
+      it ? resolveForItem(it, 'black', { active }) : null
+    ));
+    return (
+      <div style={{ width: '25%', flexShrink: 0, display: 'block', height: '100%', position: 'relative', overflow: 'hidden' }}>
+        <div data-mega-page-viewport="2" style={{ width: '100%', height: '100%', display: 'flex', justifyContent: 'center', overflow: 'hidden' }}>
+          <div
+            data-vertical-megaslide="2"
+            style={{
+              width: carril ? `${Math.round(carril)}px` : '100%',
+              maxWidth: '100%',
+              margin: '0 auto',
+              boxSizing: 'border-box',
+              display: 'grid',
+              gridTemplateColumns: `${Math.round(carril * 0.19)}px ${Math.round(carril * 0.15)}px minmax(0, 1fr)`,
+              gridTemplateRows: 'auto auto auto',
+              columnGap: `${GAP_PX}px`,
+              rowGap: `${GAP_PX}px`,
+              alignItems: 'start',
+              fontFamily: 'Roboto Condensed, sans-serif',
+              color: '#4A5057',
+            }}
+          >
+            {/* FILA 1: la graella de dibuixos, a tot el carril. */}
+            <div style={{ gridColumn: '1 / -1' }} data-vertical-graella="1">
+              <VerticalGraellaDibuixos active={active} />
+            </div>
+
+            {/* FILA 2: colleccions + graella de colors + stripe. */}
+            <VerticalColleccions
+              activeKey={clauColleccions}
+              onSelect={triaColleccio}
+              style={{ gridColumn: '1', gridRow: '2 / 4' }}
+            />
+            <div style={{ gridColumn: '2', gridRow: '2' }}>
+              <VerticalColorsGrid selectedColor={colorSlug} onSelectColor={triaColor} />
+            </div>
+            <div style={{ gridColumn: '3', gridRow: '2' }}>
+              <VerticalStripeFranja
+                srcs={srcsFranja}
+                items={stripeTileItems}
+                selectedItem={
+                  active === 'first_contact' ? firstContactSelectedItem
+                  : active === 'the_human_inside' ? humanInsideSelectedItem
+                  : (selectedItemByCollection?.[active] ?? null)
+                }
+                onSelect={seleccionaSamarreta}
+                shirtColor={CERCADOR_COLORS.find((c) => c.slug === colorSlug)?.overlayHex || null}
+              />
+            </div>
+
+            {/* FILA 3: selector a la columna del mig. */}
+            <div style={{ gridColumn: '2', gridRow: '3' }}>
+              <VerticalSelector
+                variant={variant}
+                visibility={stripeVariantVisibility}
+                onWhite={() => { setStripeOverlayOverrideActive?.(false); if (active === 'the_human_inside') setHumanInsideVariant?.('white'); else setFirstContactVariant?.('white'); }}
+                onBlack={() => { setStripeOverlayOverrideActive?.(false); if (active === 'the_human_inside') setHumanInsideVariant?.('black'); else setFirstContactVariant?.('black'); }}
+                onMulti={() => { setStripeOverlayOverrideActive?.(false); if (active === 'the_human_inside') setHumanInsideVariant?.('color'); else setFirstContactVariant?.('color'); }}
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div style={{ width: '25%', flexShrink: 0, display: isPortraitTablet ? 'block' : 'flex', height: '100%', position: 'relative', justifyContent: 'center', overflow: isPortraitTablet ? 'hidden' : 'visible' }}>
