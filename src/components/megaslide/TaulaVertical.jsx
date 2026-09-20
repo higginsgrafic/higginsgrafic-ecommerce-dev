@@ -30,9 +30,10 @@ export function ampladaCarril(ampleFinestra) {
 export function alturaTaulaVertical(ampleFinestra) {
   // La pestanya del megaslide es dimensiona amb la taula de la pagina 1 (5x3
   // amb caselles quadrades), pero la taula de la pagina 2 s'acaba ABANS: al ras
-  // de la imatge de la franja (58,95 px mes amunt a 768: el bottom de la taula
-  // toca el de la imatge). Es la mes curta, que es la que mana.
-  return Math.ceil((ampladaCarril(ampleFinestra) * 3) / 5) - 58.95;
+  // de la imatge de la franja, i baixa 15 px mes (43,8 px mes curta a 768: el
+  // bottom de la taula toca el de la imatge). Es la mes curta, que es la que
+  // mana.
+  return Math.ceil((ampladaCarril(ampleFinestra) * 3) / 5) - 43.8;
 }
 
 /** L'estil d'una casella: el contorn dibuixat i el número centrat. */
@@ -116,9 +117,11 @@ export function TaulaVerticalP2({ graella = null, colleccions = null, colors = n
         gridTemplateColumns: 'repeat(5, 1fr)',
         gridTemplateRows: 'repeat(3, 1fr)',
         width: '100%',
-        // La taula omple la banda de la seva pagina (que va 25 px mes curta que
-        // la de la pagina 1: ho fixa `alturaTaulaVertical`).
-        height: '100%',
+        // La taula va 15 px mes avall que la banda de la seva pagina i fa
+        // l'alcada de sempre (la banda es mes curta: ho fixa
+        // `alturaTaulaVertical`).
+        height: 'calc(100% - 15px)',
+        marginTop: '15px',
         minHeight: 0,
       }}
     >
