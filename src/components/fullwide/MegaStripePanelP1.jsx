@@ -837,7 +837,17 @@ function MegaStripePanelP1({
                                     const cal = getTileCalibration(picked, calibrationOverrides);
                                     const isPemberleyHouse = active === 'austen' && typeof picked === 'string' && /\/austen\/pemberley_house\//i.test(picked);
                                     const extraDx = isPemberleyHouse ? -2 : 0;
-                                    return `translate(${cal.dx + extraDx}px, calc(${cal.dy}px + var(--hgStripeDrawingExtraDy, -5px))) scale(calc(${cal.scale} * var(--hgStripeDrawingExtraScale, 1)))`;
+                                    // El calibratge es d'una filera: a la vista vertical
+                                    // la casella es 1/7 d'amplada (en comptes de la de la
+                                    // filera), i els desplacaments en px s'han d'escalar amb
+                                    // la casella perque el dibuix caigui al mateix lloc.
+                                    const fA = (() => {
+                                      const original = Array.isArray(stripeMaskTileRectsRawPct) ? stripeMaskTileRectsRawPct[idx] : null;
+                                      const w1 = Number(original?.width) || 0;
+                                      const w2 = Number(rectsMascara?.[idx]?.width) || 0;
+                                      return (w1 > 0 && w2 > 0) ? w1 / w2 : 1;
+                                    })();
+                                    return `translate(calc(${cal.dx + extraDx}px * ${fA}), calc(${cal.dy}px * ${fA} + var(--hgStripeDrawingExtraDy, -5px))) scale(calc(${cal.scale} * var(--hgStripeDrawingExtraScale, 1)))`;
                                   })(),
                                   filter: (() => {
                                     const isPemberley = active === 'austen' && typeof picked === 'string' && /\/austen\/pemberley_house\//i.test(picked);
@@ -1055,7 +1065,17 @@ function MegaStripePanelP1({
                                     const cal = getTileCalibration(picked, calibrationOverrides);
                                     const isPemberleyHouse = active === 'austen' && typeof picked === 'string' && /\/austen\/pemberley_house\//i.test(picked);
                                     const extraDx = isPemberleyHouse ? -2 : 0;
-                                    return `translate(${cal.dx + extraDx}px, calc(${cal.dy}px + var(--hgStripeDrawingExtraDy, -5px))) scale(calc(${cal.scale} * var(--hgStripeDrawingExtraScale, 1)))`;
+                                    // El calibratge es d'una filera: a la vista vertical
+                                    // la casella es 1/7 d'amplada (en comptes de la de la
+                                    // filera), i els desplacaments en px s'han d'escalar amb
+                                    // la casella perque el dibuix caigui al mateix lloc.
+                                    const fA = (() => {
+                                      const original = Array.isArray(stripeMaskTileRectsRawPct) ? stripeMaskTileRectsRawPct[idx] : null;
+                                      const w1 = Number(original?.width) || 0;
+                                      const w2 = Number(rectsMascara?.[idx]?.width) || 0;
+                                      return (w1 > 0 && w2 > 0) ? w1 / w2 : 1;
+                                    })();
+                                    return `translate(calc(${cal.dx + extraDx}px * ${fA}), calc(${cal.dy}px * ${fA} + var(--hgStripeDrawingExtraDy, -5px))) scale(calc(${cal.scale} * var(--hgStripeDrawingExtraScale, 1)))`;
                                   })(),
                                   filter: (() => {
                                     const isPemberley = active === 'austen' && typeof resolvedOverlaySrc === 'string' && /\/austen\/pemberley_house\//i.test(resolvedOverlaySrc);
