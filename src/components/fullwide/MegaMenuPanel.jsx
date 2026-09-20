@@ -6,6 +6,7 @@ import { lazy, Suspense, useRef, useEffect, useCallback, useState } from 'react'
    activa; canviar-ho obligaria a refer el component sencer. */
 /* eslint-disable react-hooks/rules-of-hooks */
 import MegaStripeBleedGuard from './MegaStripeBleedGuard.jsx';
+import GraellaFletxes from '../megaslide/GraellaFletxes.jsx';
 import MegaStripePanelP1 from './MegaStripePanelP1.jsx';
 import { factorAlcadaMegaslide } from './midesMegaslide.js';
 import { alcadaPanellMegaslide } from '../../utils/mesuraMegaslide.js';
@@ -348,6 +349,7 @@ export default function MegaMenuPanel({
                       fitAlcada={fitAlcada}
                       isLandscapeTablet={isLandscapeTablet}
                       onP1ContentBottomChange={handleP1ContentBottom}
+                      graellaFletxes={isPortraitTablet ? <GraellaFletxes /> : null}
                       onPageLiftChange={handleP1PageLift}
                       stripeRowPadPx={stripeRowPadPx}
                       stripeRowPadXPx={stripeRowPadXPx}

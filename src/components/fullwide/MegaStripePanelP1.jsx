@@ -149,6 +149,7 @@ function MegaStripePanelP1({
   onPageLiftChange,
   isPortraitTablet = false,
   isLandscapeTablet = false,
+  graellaFletxes = null,
 }) {
   const emptyShirtMaskUrl = useEmptyShirtMask(emptyTileIndices, shirtColor);
   const pageRootRef = useRef(null);
@@ -248,7 +249,15 @@ function MegaStripePanelP1({
     return () => window.removeEventListener('mega-stripe-full-hit-p1', handler);
   }, [onShirtClick, selectedItem, stripeTileItems, active, shirtColor]);
 
-  // A la VERTICAL, el contingut de la pagina 1 queda AMAGAT.
+  // A la VERTICAL, el contingut de la pagina 1 queda AMAGAT i, si se'ns passa,
+  // hi ha la graella de les caselles de les fletxes.
+  if (isPortraitTablet && graellaFletxes) {
+    return (
+      <div ref={pageRootRef} className="w-full shrink-0" data-megaslide-graella="1" style={{ paddingTop: '24px' }}>
+        {graellaFletxes}
+      </div>
+    );
+  }
 
   return (
     <div
