@@ -46,21 +46,6 @@ import {
  * Les proporcions son a `paradigmaVertical.js` (funcio pura, amb proves). A la
  * vertical `--hg-escala-mega` val 1, aixi que les mides de disseny son px.
  */
-/**
- * L'ORDRE DE LES CINC FILES de la graella: una per colleccio.
- *
- * Es l'ordre de les colleccions del megaslide, que es tambe el de la llista de
- * sota. Cada fila es una instancia de `MegaGridDibuixos` amb els items de la
- * seva colleccio.
- */
-const COLLECCIONS_DE_LA_GRAELLA = [
-  'first_contact',
-  'the_human_inside',
-  'austen',
-  'cube',
-  'miscellania',
-];
-
 export default function VerticalParadigmaP2({
   active,
   resolvedMega,
@@ -111,16 +96,21 @@ export default function VerticalParadigmaP2({
   const columnes = useMemo(() => columnesVertical(ampleCarril), [ampleCarril]);
 
   // L'alçada NATURAL de la composicio: la fa servir el pare per decidir
-  // l'alçada del panell (l'equivalent del `p1ContentBottom` de l'horitzontal).
-  // La mesura no depen de l'amplada del contenidor, perquè la composicio es
-  // mesura a ella mateixa i la seva amplada es del carril.
+  // l'alçada del panell (l'equivalent del `p1ContentBottom` de l'horitzontal) i
+  // tambe es l'alçada del contenidor del desplacament. Nomes depen del
+  // contingut, no de l'espai que queda: sense aixo el bucle entre les dues
+  // alçades les deixava oscil·lant un px.
+  const [alcadaNaturalPx, setAlcadaNaturalPx] = useState(null);
   useEffect(() => {
-    if (typeof onAlcadaContingut !== 'function') return undefined;
     const el = rootRef.current;
     if (!el) return undefined;
     const mesura = () => {
       const alt = el.getBoundingClientRect().height;
-      if (Number.isFinite(alt) && alt > 0) onAlcadaContingut(alt);
+      if (Number.isFinite(alt) && alt > 0) {
+        const arrodonida = Math.round(alt);
+        setAlcadaNaturalPx((prev) => (prev != null && Math.abs(prev - arrodonida) < 1 ? prev : arrodonida));
+        if (typeof onAlcadaContingut === 'function') onAlcadaContingut(arrodonida);
+      }
     };
     mesura();
     if (typeof ResizeObserver === 'undefined') return undefined;
@@ -128,37 +118,6 @@ export default function VerticalParadigmaP2({
     ro.observe(el);
     return () => ro.disconnect();
   }, [onAlcadaContingut]);
-
-  /**
-   * L'ALÇADA DISPONIBLE: el que queda de finestra sota el panell.
-   *
-   * Si la composicio no hi cap, el desplazament ha de ser VERTICAL i dins del
-   * megaslide (no ha d'arrossegar la pàgina de sota). El contenidor del
-   * desplaçament té aquesta alçada, i la composicio hi viu a dins.
-   */
-  const [alcadaDisponible, setAlcadaDisponible] = useState(null);
-  useLayoutEffectSafe(() => {
-    const mesura = () => {
-      const cap = rootRef.current;
-      if (!cap) return;
-      const guarda = cap.closest('[data-stripe-bottom]');
-      if (!guarda) return;
-      const caixa = guarda.getBoundingClientRect();
-      // El `py-8` (32+32) del contenidor del panell no pot comptar com a espai
-      // util: si l'alçada disponible l'inclogués, la composicio no hi cabria.
-      const disponible = caixa.height - 64;
-      if (Number.isFinite(disponible) && disponible > 0) setAlcadaDisponible(disponible);
-    };
-    mesura();
-    window.addEventListener('resize', mesura);
-    const guarda = rootRef.current?.closest('[data-stripe-bottom]');
-    const ro = (typeof ResizeObserver !== 'undefined' && guarda) ? new ResizeObserver(mesura) : null;
-    try { ro?.observe(guarda); } catch { /* ignore */ }
-    return () => {
-      window.removeEventListener('resize', mesura);
-      ro?.disconnect();
-    };
-  }, []);
 
   const variant = active === 'the_human_inside' ? humanInsideVariant : firstContactVariant;
 
@@ -263,12 +222,14 @@ export default function VerticalParadigmaP2({
         width: '100%',
         // L'amplada NO es la del contenidor (a la vertical fa 992 px, que es el
         // tauler de l'apaisada): la composicio viu dins del CARRIL, que es el
-        // que dona la mida a tot el que hi ha a dins. El pare tambe es el
-        // carril (vegeu MegaMenuPanel), pero el contenidor del desplacament
-        // s'estira amb ell i no ha de decidir cap amplada.
+        // que dona la mida a tot el que hi ha a dins.
         maxWidth: ampleCarril ? `${ampleCarril}px` : '100%',
         margin: '0 auto',
-        height: alcadaDisponible ? `${Math.round(alcadaDisponible)}px` : undefined,
+        // L'alçada es la NATURAL de la composicio, no la que queda de pantalla:
+        // si fos la disponible, l'alçada de la composicio en depengués i el
+        // bucle es quedava oscil·lant un px. El que no hi cap ho retalla el
+        // viewport del panell, que es qui te l'alçada de la pantalla.
+        height: alcadaNaturalPx ? `${Math.round(alcadaNaturalPx)}px` : undefined,
         overflowY: 'auto',
         overflowX: 'hidden',
         overscrollBehaviorY: 'contain',
@@ -293,20 +254,18 @@ export default function VerticalParadigmaP2({
       }}
     >
       {/* 1) La graella de dibuixos, amplada de carril i a dalt de tot.
-          Es la graella ORIGINAL (`MegaGridDibuixos`), amb els items de la
-          filera del cercador i amb la casella calibrada perque les 16 columnes
-          facin l'amplada del carril. Les cinc colleccions hi munten una fila
-          cadascuna. */}
+          Es la graella ORIGINAL (`MegaGridDibuixos`) i es UN SOL BLOC de
+          16 columnes x 4 files (64 caselles), amb els dibuixos de la colleccio
+          activa: es el 16x4 de sempre. Les caselles que no tenen dibuix hi son
+          buides i el que no hi cap no es mostra. */}
       <div style={{ width: '100%' }} data-vertical-graella="1">
-        {COLLECCIONS_DE_LA_GRAELLA.map((c) => (
-          <MegaGridDibuixos
-            key={c}
-            active={c}
-            className="w-full"
-            items={itemsDeColleccio(c)}
-            cellPx={casellaDibuix}
-          />
-        ))}
+        <MegaGridDibuixos
+          active={active}
+          className="w-full"
+          items={itemsDeColleccio(active)}
+          cellPx={casellaDibuix}
+          bloc16x4
+        />
       </div>
 
       {/* 2) Les tres columnes, a sota la graella. */}

@@ -1683,11 +1683,12 @@ endavant.
 1. **L'amplada del carril**: `min(992, finestra − 80)`. A 768 són **688 px**
    (`768 − 2×40`), i creix fins als 992 de la tauleta de 1024. La composició viu
    dins del carril, no dins del tauler de 992 del belt.
-2. **La graella**: cinc instàncies de `MegaGridDibuixos`, una per col·lecció
-   (les **cinc files**). La fila rep els items de la col·lecció sense les
-   caselles de control i **retallats a 16** (l'austen en té 25 i en feia dues
-   files). S'hi ha afegit `nomesElsDeLaLlista` al component perquè no hi afegeixi
-   els productes que no són a la llista.
+2. **La graella**: `MegaGridDibuixos` (la peça original) en **un sol bloc de
+   16 columnes × 4 files** (64 caselles) amb els dibuixos de la col·lecció
+   activa i les caselles que no tenen dibuix **buides** (`bloc16x4`). La peça
+   també ha recuperat la segona via per resoldre el dibuix d'un item que no és
+   al catàleg (`dibuixDeLlista`): abans els descartava i les files quedaven
+   curtes. Amb `cellPx`, les 16 columnes fan l'amplada del carril.
 3. **La franja**: 14 samarretes en **2×7**, sense scroll i sense belt, amb la
    **imatge de la franja curta** que va passar l'amo
    (`public/placeholders/tablet-vertical/stripe-curta-7x7.png`, 1379×593): un
@@ -1702,10 +1703,12 @@ endavant.
    `tablet-vertical/`.
 4. **L'alçada del panell**: `VerticalParadigmaP2` publica l'alçada natural de la
    composició i `MegaMenuPanel` la fa servir de `guardHeightPx` (mesura, no
-   número). A 768 el panell passa de **292 a 542 px**.
-5. **El scroll**: la composició té el seu propi contenidor amb `overflow-y:
-   auto` i l'alçada que queda sota el panell. A 768 hi cap tota (413 px en 477
-   disponibles): el scroll no s'activa.
+   número), **limitada al que queda de pantalla** perquè el megaslide no creixi
+   més enllà de la finestra. A 768 el panell passa de **292 a 530 px**.
+5. **El scroll**: el contenidor de la composició fa la seva **alçada natural**
+   (no la que queda de pantalla: si en depengués, el bucle entre les dues
+   alçades les deixava oscil·lant 1 px). El que no hi cap ho retalla el viewport
+   del panell, que és qui té l'alçada de la finestra.
 
 **Verificació (2026-09-20)**
 
@@ -1713,12 +1716,13 @@ endavant.
   `tests/unit/paradigma-vertical.test.js`).
 - `npx vite build` → OK.
 - `node scripts/compara-vistes.mjs` → **OK**, amb la branca nova: a la vertical
-  mesura la composició (carril 688, graella 5 files, franja 14 caselles
-  quadrades dins del carril) i a les altres mides el cercador de sempre.
-- `npm run mesura:megaslide` → **888 xifres** a 7 mides. Contra la baseline
-  anterior, **només** es mouen les 42 xifres de la tauleta vertical 768; a
+  mesura la composició (carril 688, graella **16×4**, franja de 14 caselles
+  iguals dins del carril) i a les altres mides el cercador de sempre.
+- `npm run mesura:megaslide` → **897 xifres** a 7 mides. Contra la baseline
+  anterior, **només** es mouen les xifres de la tauleta vertical 768; a
   **1024 / 1280 / 1366 / 1440 / 1920 no es mou res**.
-- Captura: `docs/comparacio/vertical-p2-composicio-768t.png`.
+- Captures: `docs/comparacio/vertical-p2-16x4-768t.png` (la composició) i
+  `vertical-p2-stripe-curta-768t.png` (la franja).
 
 **Pendent i conegut**
 
