@@ -473,7 +473,7 @@ export default function MegaslidePagina2({
 
             {/* FILA 1: la graella de dibuixos, a tot el carril. */}
             <div style={{ gridColumn: '1 / -1' }} data-vertical-graella="1">
-              <VerticalGraellaDibuixos active={active} />
+              <VerticalGraellaDibuixos active={active} carril={carril} />
             </div>
 
             {/* FILA 2: colleccions + graella de colors + stripe. */}
