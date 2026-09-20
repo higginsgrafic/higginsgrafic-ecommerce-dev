@@ -423,7 +423,7 @@ export default function MegaMenuPanel({
                           <img
                             src="/placeholders/tablet vertical/stripe-curta-7+7.png"
                             alt=""
-                            style={{ width: 'calc(100% + 56px)', height: 'auto', display: 'block', flexShrink: 0, maxWidth: 'none' }}
+                            style={{ width: 'calc(100% + 16px)', height: 'auto', display: 'block', flexShrink: 0, maxWidth: 'none' }}
                           />
                         )}
                         fletxes={(
