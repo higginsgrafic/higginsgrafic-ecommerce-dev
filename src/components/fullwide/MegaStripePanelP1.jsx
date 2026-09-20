@@ -314,6 +314,22 @@ function MegaStripePanelP1({
   if (isPortraitTablet && active) {
     const carril = ampladaCarril(typeof window !== 'undefined' ? window.innerWidth : 0);
     const variantActual = active === 'the_human_inside' ? humanInsideVariant : firstContactVariant;
+    // Les quatre cel·les de les files 2 i 3 (proporcions de l'estructura de
+    // l'amo: 36-303-519-652-728 sobre 688).
+    const ampleNet = Math.max(0, Math.round(carril) - GAP_PX * 3);
+    const c1 = Math.round(ampleNet * 0.395);
+    const c2 = Math.round(ampleNet * 0.32);
+    const c3 = Math.round(ampleNet * 0.19);
+    const c4 = Math.max(0, ampleNet - c1 - c2 - c3);
+    const graellaFiles = { display: 'grid', gridTemplateColumns: `${c1}px ${c2}px ${c3}px ${c4}px`, columnGap: `${GAP_PX}px`, marginTop: `${GAP_PX * 3}px`, width: '100%', alignItems: 'start' };
+    const triaSamarreta = (idx) => {
+      const it = stripeVertical.items?.[idx];
+      if (!it) return;
+      setStripeOverlayOverrideActive?.(false);
+      if (active === 'first_contact') setFirstContactSelectedItem?.(it);
+      else if (active === 'the_human_inside') setHumanInsideSelectedItem?.(it);
+      else setSelectedItemByCollection?.((prev) => ({ ...prev, [active]: it }));
+    };
     return (
       <div ref={pageRootRef} className="w-full shrink-0">
         <div
@@ -337,46 +353,48 @@ function MegaStripePanelP1({
             <VerticalGraellaDibuixos active={active} items={itemsFila} />
           </div>
 
-          {/* FILA 2: la stripe i, a la dreta, les fletxes. La stripe ocupa dues
-              files de la retícula; les fletxes i el selector van a la columna
-              de la dreta, una a cada fila. */}
-          <div style={{ display: 'flex', gap: `${GAP_PX * 4}px`, marginTop: `${GAP_PX * 3}px`, alignItems: 'flex-start' }}>
-            <div style={{ flex: '1 1 0%', minWidth: 0, maxWidth: '100%', overflow: 'hidden' }} data-contorn-bloc="2">
+          {/* FILA 2: la FRANJA a les dues primeres cel·les i les FLETXES a la
+              tercera, com a l'estructura de la pagina 1. */}
+          <div style={graellaFiles}>
+            <div style={{ gridColumn: '1 / 3' }} data-contorn-bloc="2">
               <VerticalStripeFranja
-                width={Math.max(0, Math.round(carril) - Math.round(carril * 0.19) - GAP_PX * 4)}
                 srcs={stripeVertical.srcs}
                 items={stripeVertical.items}
                 selectedItem={selectedItem}
-                onSelect={(idx) => {
-                  const it = stripeVertical.items?.[idx];
-                  if (!it) return;
-                  setStripeOverlayOverrideActive?.(false);
-                  if (active === 'first_contact') setFirstContactSelectedItem?.(it);
-                  else if (active === 'the_human_inside') setHumanInsideSelectedItem?.(it);
-                  else setSelectedItemByCollection?.((prev) => ({ ...prev, [active]: it }));
-                }}
+                onSelect={triaSamarreta}
               />
             </div>
-
-            {/* La columna de la dreta: les fletxes (fila 2) i el selector (fila 3). */}
-            <div style={{ flex: `0 0 ${Math.round(carril * 0.19)}px`, display: 'flex', flexDirection: 'column', gap: `${GAP_PX * 3}px` }}>
-              <div data-contorn-bloc="3">
-                <VerticalFletxes
-                  tileSize={Math.round(carril * 0.19 * 0.9)}
-                  onPrev={() => setThinStartIndex?.((v) => v - 1)}
-                  onNext={() => setThinStartIndex?.((v) => v + 1)}
-                />
-              </div>
-              <div data-contorn-bloc="4">
-            <VerticalSelector
-              variant={variantActual}
-              visibility={stripeVariantVisibility}
-              onWhite={() => { setStripeOverlayOverrideActive?.(false); if (active === 'the_human_inside') setHumanInsideVariant?.('white'); else setFirstContactVariant?.('white'); }}
-              onBlack={() => { setStripeOverlayOverrideActive?.(false); if (active === 'the_human_inside') setHumanInsideVariant?.('black'); else setFirstContactVariant?.('black'); }}
-              onMulti={() => { setStripeOverlayOverrideActive?.(false); if (active === 'the_human_inside') setHumanInsideVariant?.('color'); else setFirstContactVariant?.('color'); }}
-            />
-              </div>
+            <div style={{ gridColumn: '3' }} data-contorn-bloc="3">
+              <VerticalFletxes
+                tileSize={Math.round(c3 * 0.9)}
+                onPrev={() => setThinStartIndex?.((v) => v - 1)}
+                onNext={() => setThinStartIndex?.((v) => v + 1)}
+              />
             </div>
+            <div style={{ gridColumn: '4' }} />
+          </div>
+
+          {/* FILA 3: la FRANJA a les dues primeres cel·les i el SELECTOR a la
+              tercera. */}
+          <div style={graellaFiles}>
+            <div style={{ gridColumn: '1 / 3' }}>
+              <VerticalStripeFranja
+                srcs={stripeVertical.srcs}
+                items={stripeVertical.items}
+                selectedItem={selectedItem}
+                onSelect={triaSamarreta}
+              />
+            </div>
+            <div style={{ gridColumn: '3' }} data-contorn-bloc="4">
+              <VerticalSelector
+                variant={variantActual}
+                visibility={stripeVariantVisibility}
+                onWhite={() => { setStripeOverlayOverrideActive?.(false); if (active === 'the_human_inside') setHumanInsideVariant?.('white'); else setFirstContactVariant?.('white'); }}
+                onBlack={() => { setStripeOverlayOverrideActive?.(false); if (active === 'the_human_inside') setHumanInsideVariant?.('black'); else setFirstContactVariant?.('black'); }}
+                onMulti={() => { setStripeOverlayOverrideActive?.(false); if (active === 'the_human_inside') setHumanInsideVariant?.('color'); else setFirstContactVariant?.('color'); }}
+              />
+            </div>
+            <div style={{ gridColumn: '4' }} />
           </div>
         </div>
       </div>
