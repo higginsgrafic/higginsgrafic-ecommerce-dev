@@ -5,6 +5,7 @@ import MegaStripePanel from '../fullwide/MegaStripePanel.jsx';
 import { FRANJA_AJUST_PX } from '../fullwide/MegaStripePanelP1.jsx';
 import { desplacamentFranjaEscriptori } from '../../utils/mesuraMegaslide.js';
 import { carrilPx, carrilLane } from '../../utils/layoutMetrics.js';
+import FranjaEscalada from './FranjaEscalada.jsx';
 import { CapaTaulaVertical, TaulaVerticalP2 } from './TaulaVertical.jsx';
 import {
   CercadorColleccionsColumna,
@@ -718,17 +719,15 @@ export default function MegaslidePagina2({
             stripe={(
               /* La franja de debò: el mateix panell que la filera, amb la imatge
                  de dues fileres (7+7), escalat per encaixar a la casella. */
-              <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
-                <div style={{ height: '100%', transform: 'translateY(-130.45px) scale(2.027)', transformOrigin: 'center center', '--megaStripeDx': '0px', '--megaStripeDy': '0px' }}>
-                  <MegaStripePanel
-                    {...propsFranjaP2}
-                    isPortraitTablet
-                    stripeImageSrc="/placeholders/tablet vertical/full-white-stripe-doble.webp"
-                    senseMascaraSamarreta
-                    visualOffsetY={0}
-                  />
-                </div>
-              </div>
+              <FranjaEscalada>
+                <MegaStripePanel
+                  {...propsFranjaP2}
+                  isPortraitTablet
+                  stripeImageSrc="/placeholders/tablet vertical/full-white-stripe-doble.webp"
+                  senseMascaraSamarreta
+                  visualOffsetY={0}
+                />
+              </FranjaEscalada>
             )}
             selector={(
               /* El selector, un 10% mes petit (la peça agafa l'amplada del seu
