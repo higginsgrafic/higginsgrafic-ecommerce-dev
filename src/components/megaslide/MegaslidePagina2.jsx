@@ -465,7 +465,7 @@ export default function MegaslidePagina2({
     stripeEmptyMaskSrc: stripeEmptyMaskSrc,
   };
   return (
-    <div style={{ width: '25%', flexShrink: 0, display: isPortraitTablet ? 'block' : 'flex', height: '100%', position: 'relative', justifyContent: 'center', overflow: isPortraitTablet ? 'hidden' : 'visible' }}>
+    <div style={{ width: '25%', flexShrink: 0, display: isPortraitTablet ? 'block' : 'flex', height: '100%', position: 'relative', justifyContent: 'center', overflow: 'visible' }}>
       <div
         ref={viewportRef}
         data-mega-page-viewport="2"
