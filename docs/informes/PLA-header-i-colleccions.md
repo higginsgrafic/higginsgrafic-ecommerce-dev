@@ -232,7 +232,7 @@ L'objectiu estarà acomplert quan, a les traces del punt 5, **cap element tingui
 
 ---
 
-## 7. Coses que vull que revisi el revisor
+## 7. Preguntes al revisor (RESPOSTES a la seccio 8)
 
 1. **L'ordre de les etapes** (A → B → C). Alternativa: B abans d'A, perquè B toca codi més fàcil i A és més fina.
 2. **El disseny del model** (`utils/layoutModel.js`): funcions pures + publicació amb `useLayoutEffect` a App. És raonable, o hi ha una manera més robusta de garantir que el primer pintat ja tingui els números bons quan hi ha ofertes i banners (que depenen de dades)?
@@ -269,3 +269,107 @@ A les cinc pàgines de col·lecció, `carrilAmple` ve de `getSafeBelt().width` a
 - **Etapa B**: resoldre abans la relació amb `CollectionPage.jsx` + `config/collections.js` (8.2).
 - **Etapa C**: afegir-hi l'eliminació (o arxiu explícit) de `MainHeader.jsx` (8.1).
 - **Punt 7 (preguntes al revisor)**: la pregunta 3 hauria d'incloure la decisió de 8.2; i n'apareix una de nova: què fem amb el codi mort (`MainHeader.jsx`, `useRouteLayout.js`)?
+
+---
+
+## 8. Revisió externa (GLM 5.3 flash) i pla d'execució
+
+**Veredicte**: PLA APROVAT amb **4 esmenes obligatòries** i 2 recomanacions. Les
+sis causes del punt 2 són reals i el document i el codi quadren. Ordre A → B → C
+confirmat. Les esmenes afegeixen feina, no la substitueixen.
+
+### 8.1 Respostes a les preguntes del punt 7
+
+1. **Ordre A → B → C: confirmat.** Fer B primer obligaria a tornar a tocar la
+   pàgina acabada de fusionar (les cinc llegirien encara `getSafeBelt()` i les
+   variables tardanes).
+2. **Model: aprovat amb matís.** Ofertes i banners són **estats asíncrons**: la
+   solució és reservar l'espai (pitjor cas o *skeleton* de la mateixa alçada) i
+   acceptar **un sol recol·locament, sense transicions** — mai avançar la
+   publicació abans de React (ja provat i descartat, correctament). Cal afegir
+   `laneForViewport(vw)` i que **cap codi de producció llegeixi mai més
+   `--belt2-*`** (esmena A1).
+3. **Fusió: aprovada amb dues decisions prèvies** (B1 i B2).
+4. **Header: neteja per passos confirmada** (no reescriptura), amb l'esmena C1.
+5. **Estats pendents: conversió selectiva** (vegeu 8.3).
+
+### 8.2 Esmenes obligatòries
+
+- **A1 — `laneForViewport`.** `getSafeBelt()` prioritza `--belt2-*` (només DEV):
+  és el mateix tipus de bug que el 2.1 i avui encara fa `dev != producció` al
+  `rowHeight` i a la posició de la hero de les cinc col·leccions. Convertir-ho al
+  model i no llegir mai més aquestes variables. **FET** (commit `d2e87b2`),
+  amb l'equivalència verificada a 768/1024/1280/1440/1920 px (risc R1).
+- **B1 — `CollectionPage.jsx` no és la base.** És viva, però **només** a
+  `/lab/proves` (`SupabaseCollectionRoute`, `AppRoutes.jsx:131`): no és ruta
+  pública i no té hero, pauta, `TdpPage` ni `TramFinal`. L'Etapa B es fa sobre
+  **codi nou** i **no toca `/lab/proves`** (abast separat).
+- **B2 — `CollectionMobile` fora de la fusió.** Les cinc pàgines el renderitzen
+  per a mòbil; ja és únic i parametritzat. La fusió és de la **vista vertical**.
+  Cal parametritzar també les diferències per vista que el pla no esmentava:
+  els marges `-30px` / `-120px` del `marginTop` de la graella segons
+  `esTauletaApaisada` / vertical.
+- **C1 — `MainHeader.jsx` mort.** 1.116 línies sense cap import: eliminar-lo en
+  un commit propi **abans** de començar l'Etapa C. **FET** (commit `040ce4f`),
+  juntament amb `useRouteLayout.js`.
+
+### 8.3 Conversió selectiva dels estats (pregunta 5)
+
+Es converteix a càlcul el que és **geometria pura** (només viewport i carril) i
+es deixa **mesurat amb `useLayoutEffect`** el que depèn del contingut real:
+
+| estat | decisió |
+|---|---|
+| `rowHeight` | fet (càlcul) |
+| `carrilAmple` | **convertit al model** (A1, fet) |
+| `heroBandTopPx`, `heroIconsTopPx`, `heroBottomBandTopPx` | convertir a `calc()` sobre `--appHeaderOffset` i `100vh` |
+| `posterExtraPx`, `pushDownPx` | convertir a càlcul sobre el nombre de files (dada del config); el bucle de punt fix amb `setTimeout` desapareix |
+| `zeroLeftOffsetPx` | **es queda mesurat**, però amb `useLayoutEffect` (depèn de la posició real del logotip) |
+
+### 8.4 Riscos nous que afegeix la revisió
+
+- **R1** — Migrar `carrilAmple` toca el `rowHeight` de les cinc pàgines alhora:
+  verificar l'equivalència a cinc mides **abans** del canvi i fer-ho en un commit
+  revertible. **Mitigat** (valors idèntics a les cinc mides).
+- **R2** — La fusió (B) amb framer-motion: les animacions i els *delays* han de
+  quedar **per col·lecció com a paràmetre**, no duplicats; si no, el primer
+  commit de B treu diferències visuals que el "compara-captures" no detecta (són
+  transicions, no estats finals).
+- **R3** — El criteri "un sol estat" no mesura el **temps**: dues passades
+  idèntiques a 100 ms compleixen el criteri i l'ull encara veu el salt. A les
+  traces cal **enregistrar el timestamp** de cada canvi i exigir que, un cop
+  estabilitzat, no n'hi hagi cap després del primer frame (~50 ms).
+
+### 8.5 Checklist d'execució
+
+```
+Pre-etapes
+  [x] E1. Eliminar MainHeader.jsx i useRouteLayout.js            (040ce4f)
+  [ ] E2. Decidir el desti de /lab/proves i CollectionPage.jsx
+          (es queda com a eina de lab o s'elimina; NO es base de B)
+
+Etapa A (cua ampliada)
+  [x] A1. laneForViewport(vw) al model + carrilAmple de les 5     (d2e87b2)
+  [ ] A2. heroBandTopPx / heroIconsTopPx / heroBottomBandTopPx -> calc()
+  [ ] A3. pushDownPx / posterExtraPx -> calcul sobre nombre de files
+  [ ] A4. zeroLeftOffsetPx -> useLayoutEffect
+  (El punt 3 del pla, "passar el header al model", passa a ser
+   l'inici de l'Etapa C, no de l'A.)
+
+Etapa B
+  [ ] B1. Component unic nou amb parametres; sense tocar /lab/proves
+  [ ] B2. CollectionMobile fora de l'abast
+  [ ] B3. Animacions i delays com a parametres per colleccio (R2)
+  [ ] Ordre: Cube -> First Contact -> Miscellania -> The Human Inside -> Austen
+
+Etapa C (header, per passos)
+  [ ] C1. setMegaHeroRowHeight  -> model (mateixa formula que rowHeight)
+  [ ] C2. setRootRemPx          -> model
+  [ ] C3. setBleedGuardExpandPx -> model
+  [ ] C4. setMegaInsetsPx       -> model
+  [ ] C5. setStripeRowPadPx / setStripeRowPadXPx / setLockBtnTop
+          -> useLayoutEffect (abans del pintat)
+  [ ] C6. Neteja d'efectes morts; avaluacio final de reescriptura
+
+Verificacio a cada pas: protocol del punt 5 + traces amb timestamps (R3).
+```
