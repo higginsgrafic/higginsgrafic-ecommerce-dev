@@ -1,0 +1,278 @@
+# REVISIO DEL PLA: header i pagina de colleccio
+# Revisor: GLM 5.3 flash (extern)
+# Data: 22 de setembre de 2026
+# Document revisat: docs/informes/PLA-header-i-colleccions.txt (versio amb seccio 8)
+# Veredicte global: PLA APROVAT amb 4 esmenes obligatories i 2 recomanacions.
+
+====================================================================
+0. RESUM DEL VEREDICTE
+====================================================================
+
+El pla es SOLID, ben fonamentat amb mesures i amb una disciplina de
+verificacio exemplar (traces, criteri "un sol estat", commits per causa).
+Les sis causes descrites al punt 2 son reals i estan arreglades; la
+verificacio independent (seccio 8) confirma que el document i el codi
+quadren.
+
+El pla, AIXI COM ESTA, NO s'ha d'executar encara: hi ha tres forats
+(documentats a la seccio 8) que, si no es resolen ABANS, podrien fer
+trabar inutilment part de l'Etapa B i deixar dev != produccio al rowHeight.
+Les esmenes son petites i no canvien l'arquitectura: afegeixen feina,
+no la substitueixen.
+
+Veredicte per etapes:
+  Etapa A (model unic)          -> APROVADA, amb esmena A1 (getSafeBelt).
+  Etapa B (una sola pagina)     -> APROVADA amb esmenes B1 (CollectionPage)
+                                   i B2 (CollectionMobile).
+  Etapa C (el header)           -> APROVADA amb esmena C1 (MainHeader mort).
+
+Ordre: mantenir A -> B -> C. Els arguments per invertir-ho no sostenen
+el risc que elimina l'A (vegeu punt 1).
+
+====================================================================
+1. PREGUNTA 1: L'ORDRE DE LES ETAPES (A -> B -> C) — CONFIRMAT
+====================================================================
+
+Es manté A -> B -> C. Raons:
+
+- L'Etapa A no es "codi fi": es la font de veritat que B i C consumeixen.
+  Si es fa B primer, les cinc pagines fusionades continuarien llegint
+  getSafeBelt() i les variables tardanes, i l'Etapa A hauria de tornar a
+  tocar la pagina acabada de fusionar: doble feina i doble risc.
+- El criteri d'exit ("un sol estat") es mesurable a cada etapa; fent A
+  primer, cada estat que es treu a la pagina fusionada ja te on aterrar
+  (el model), i la fusio de B neix neta.
+- L'argument "B es mes facil" es cert, pero es exactament per aixo que
+  B no aporta informacio sobre si el model funciona: es un refactoring
+  de codi, no de sistema. La part dificil (el header, C) es mes segura
+  amb A i B validats.
+
+MATIS: l'etapa A te una cua ("queden 6 estats mesurats"). No cal
+esgotar-la: vegeu punt 5.
+
+====================================================================
+2. PREGUNTA 2: EL DISSENY DEL MODEL — APROVAT AMB UNA MATISACO
+====================================================================
+
+El disseny (funcions pures + publicacio amb useLayoutEffect a App) es
+correcte i es el patro adequat. La publicacio amb useLayoutEffect es
+l'unic punt d'acoplament amb React i es suficient: React executa els
+useLayoutEffect de tot l'arbre ABANS del pintat del navegador, aixi que
+el primer frame ja porta els numeros bons.
+
+MATIS IMPORTANT sobre ofertes/banners: el problema real no es "el model
+no pot saber si hi ha ofertes"; es que offersHeader i adminBanner son
+ESTATS ASINCRONS (arriben de dades). La solucio correcta no es adelantar
+la publicacio (ja provat i descartat, correctament), sino:
+
+  (a) Reservar l'espai al primer render amb el valor "pitjor cas" o amb
+      un skeleton de la mateixa alcada, si el banner/oferta es veu a la
+      primera carrega.
+  (b) Acceptar que, quan arriba la dada, hi ha UN recollocament — pero
+      que sigui un sol pas, sense transicions, i identic en dev i prod.
+
+El que NO es pot permetre es que el valor canviï per CAUSES DE DEV
+(vegeu esmena A1). Recomanacio concreta: el model ha d'incorporar una
+funcio laneForViewport(vw) que retorni el carril amb la MATEIXA formula
+que avui usa getSafeBelt quan no hi ha guies (min(vw-32, 1350) centrat),
+i que cap codi de produccio llegeixi mai mes --belt2-*.
+
+====================================================================
+3. PREGUNTA 3: LA FUSIO DE PAGINES — APROVADA, AMB DOS DECISIONS PREVIES
+====================================================================
+
+Un sol component amb parametres es l'opcio correcta. Un sistema
+"component base + variants" reintroduiria la divergencia que es vol
+matar. Pero ABANS de fusionar cal tancar dues decisions:
+
+  DECISIO B1 — La relacio amb CollectionPage.jsx (punt 8.2 del pla).
+  Verificat: CollectionPage.jsx ES VIVA, pero nomes a traves de
+  SupabaseCollectionRoute, a la ruta /lab/proves (AppRoutes.jsx:131),
+  una pagina de laboratori. NO es una ruta publica.
+  Recomanacio: NO fusionar sobre aquesta base. Les cinc pagines publiques
+  fan servir hero + pauta + TdpPage + TramFinal, que CollectionPage no
+  te; ampliar-la per arribar-hi seria reescriure-la igualment. El cami:
+  crear el component nou (Etapa B), i un cop les cinc pagines publiques
+  el facin servir, decidir si /lab/proves passa al component nou o si
+  SupabaseCollectionRoute/CollectionPage es queda com eina de lab.
+  IMPORTANT: l'Etapa B NO ha de tocar /lab/proves. Scope separat.
+
+  DECISIO B2 — El mobil. Les cinc pagines renderitzen CollectionMobile
+  (isMobile ? CollectionMobile : vista vertical). El pla de fusio ha de
+  dir explicitament si CollectionMobile es queda com es (probablement si,
+  es independent i mes simple) o entra a la fusio. Recomanacio: es queda
+  fora de l'Etapa B; la fusio es de la VISTA VERTICAL de les cinc pagines,
+  i CollectionMobile ja es unic i parametritzat amb slug/titol.
+
+  Sobre el que s'ha de conservar: la llista del pla es correcta i hi
+  afegiria una cosa que el pla no menciona: la branca isMobile i
+  esTauletaApaisada de cada pagina (els marges -30px/-120px del marginTop
+  de la graella). Son diferencies per vista que la fusio ha de
+  parametritzar o unificar amb dades, no copiar.
+
+====================================================================
+4. PREGUNTA 4: EL HEADER — CONFIRMAT: NETEJA PER PASSOS
+====================================================================
+
+Confirmo el pla: neteja per passos, no reescriptura. Raons:
+
+- El header funciona avui i te 8 usos (App, LoadingScreen, les cinc
+  colleccions, constructor, plantilles). Una reescriptura "de zero" amb
+  aquesta superficie de clients es el escenari de risc maxim: qualsevol
+  diferencia de geometria es converteix en regressio visible a vuit
+  llocs alhora.
+- L'inventari de la ronda 11 ja demostra que el problema es ACOTAT:
+  4 mesures calculables i 3 dependents de contingut. Aixo no exigeix
+  reescriure 3.340 linies; exigeix treure 4 estats i mudar-ne 3 abans
+  del pintat.
+- La reescriptura nomes es justificaria si, un cop trets els estats,
+  el fitxer segueix sent il-legible. Aixo es una decisio per al FINAL
+  de C, no per a l'inici (el pla ja ho diu al seu pas 4: correcte).
+
+Afcant a l'Etapa C (esmena C1): abans de tocar res, decidir el desti
+ de MainHeader.jsx (1.116 linies, cap import a tot el projecte: codi
+mort). Recomanacio: eliminar-lo en un commit propi ABANS de comencar
+l'Etapa C, amb el missatge citant aquesta revisio. Un segon header mort
+al codi es una trampa permanent (el mateix argument que el pla ja fa
+servir per useRouteLayout.js al punt 2.5). Si es vol conservar el codi
+per referencia, es guarda a docs/ o a una branca, no a src/.
+
+====================================================================
+5. PREGUNTA 5: ELS 6 ESTATS QUE QUEDEN — CONVERSIO SELECTIVA
+====================================================================
+
+No, no tots. Criteri: es converteix a calcul el que es GEOMETRIA pura
+(depen nomes de viewport + carril) i es queda mesurat (amb
+useLayoutEffect) el que depen del CONTINGUT real del DOM.
+
+Cada estat:
+  - rowHeight: JA calculat. Be.
+  - carrilAmple (via getSafeBelt): CONVERTIR AL MODEL. Aquest es el
+    prioritari, i de fet es el forat 8.3: getSafeBelt() prioritza
+    --belt2-* de dev, aixi que avui el rowHeight (i la posicio de la
+    hero) pot diferir entre dev i produccio. Es una migracio trivial
+    (laneForViewport) i tanca el "dev != prod" que el punt 2.1 va
+    arreglar nomes al rail.
+  - heroBandTopPx / heroIconsTopPx / heroBottomBandTopPx: CONVERTIR a
+    calc() sobre --appHeaderOffset i 100vh, igual que s'ha fet amb la
+    hero. Son posicions derivades del marc, no del contingut.
+  - posterExtraPx / pushDownPx: CONVERTIR. El pla ja ho diu be: depenen
+    del nombre de files, que es dada del config, no del DOM. El bucle
+    de punt fix amb setTimeout desapareix; substituir-ho per una
+    expressio calc() unica. Si el calcul exacte resulta dependre d'una
+    mida real de la graella (imatges amb aspect ratio no conegut),
+    deixar-ho mesurat amb useLayoutEffect i documentar-ho.
+  - zeroLeftOffsetPx: MESURAT, pero amb useLayoutEffect (avui mesura
+    amb efecte normal). Depen de la posicio real del logotip dins la
+    graella; es contingut. Limitar-se a moure la mesura abans del
+    pintat.
+
+Recomanacio d'ordre dins l'Etapa A restant:
+  1. laneForViewport al model + migrar carrilAmple de les cinc pagines.
+  2. heroBandTopPx / heroIconsTopPx / heroBottomBandTopPx a calc().
+  3. pushDownPx / posterExtraPx a calcul sobre files.
+  4. zeroLeftOffsetPx a useLayoutEffect.
+Cada pas: traces "un sol estat" + 462 proves + compara-vistes, com diu
+el punt 5 del pla.
+
+====================================================================
+6. RESOLUCIO DE LA SECCIO 8 (verificacio independent del pla)
+====================================================================
+
+8.1 (MainHeader.jsx mort)  ACCEPTAT -> esmena C1 (punt 4): eliminar
+     en un commit propi abans de l'Etapa C.
+
+8.2 (CollectionPage generica) ACLARIDA: es viu pero nomes a /lab/proves
+     (ruta de lab). NO es base per a la fusio (DECISIO B1). La pregunta
+     3 del punt 7 del pla queda aixi: un sol component amb parametres,
+     NOU, per a les cinc pagines publiques; CollectionPage es queda
+     com eina de lab o s'elimina en una decisio separada.
+
+8.3 (getSafeBelt residual) ACCEPTAT I PRIORITZAT -> esmena A1: es el
+     PRIMER pas de la cua de l'Etapa A (punt 5). Es el mateix tipus de
+     bug que el 2.1 i avui encara fa dev != produccio a les cinc
+     pagines.
+
+====================================================================
+7. RISCOS NOUS QUE LA REVISIO AFEGEIX
+====================================================================
+
+Tractats be pel pla (sense canvis): risc de regressio per etapa
+(mitigacio amb captures), descart de la publicacio pre-React, codi
+mort documentat.
+
+Riscos nous:
+
+  R1 — La migracio de carrilAmple (A1) toca el rowHeight de les cinc
+       pagines ALHORA. Si laneForViewport no dona exactament el mateix
+       numero que getSafeBelt() sense guies, les cinc pagines es mouen
+       de cop. Mitigacio: verificar l'equivalencia a 768/1024/1280/
+       1440/1920 ABANS del canvi, i fer-ho en un unic commit revertible.
+
+  R2 — La fusio (Etapa B) amb framer-motion: les cinc pagines tenen
+       animacions propies (delays, variants). En fusionar, els delays
+       han de quedar per-colleccio com a parametre, no per codi
+       duplicat. Si no, el primer commit de B ja treu diferencies
+       visuals que el "compara-captures" pot no detectar (son
+       transicions, no estats finals).
+
+  R3 — El criteri "un sol estat" no mesura el TEMPS: dues passades
+       identiques a 100 ms de distancia compleixen el criteri pero
+       l'ull encara veu el salt. Recomanacio: a les traces, a mes de
+       contar estats, registrar el TIMESTAMP de cada canvi i exigir
+       que, en estabilitzat, no hi hagi cap canvi despres del primer
+       frame (~50 ms del paint inicial).
+
+====================================================================
+8. CHECKLIST D'EXECUCIO RECOMANAT
+====================================================================
+
+Pre-etapes (noves, d'aquesta revisio):
+  [ ] E1. Eliminar MainHeader.jsx i useRouteLayout.js (codi mort).
+  [ ] E2. Decidir el desti de SupabaseCollectionRoute /lab/proves i
+          CollectionPage.jsx (es queda com lab o s'elimina; NO es base
+          de l'Etapa B).
+
+Etapa A (cua ampliada):
+  [ ] A1. laneForViewport(vw) al layoutModel + migrar carrilAmple de
+          les cinc pagines (equivalencia verificada a 5 mides).
+  [ ] A2. heroBandTopPx / heroIconsTopPx / heroBottomBandTopPx -> calc().
+  [ ] A3. pushDownPx / posterExtraPx -> calcul sobre nombre de files.
+  [ ] A4. zeroLeftOffsetPx -> useLayoutEffect.
+  (El punt 3 del pla, "passar el header al model", passa a ser l'inici
+  de l'Etapa C, no de l'A.)
+
+Etapa B:
+  [ ] B1. Component unic amb parametres (interficie del pla, sense
+          canvis), sobre codi NOU, sense tocar /lab/proves.
+  [ ] B2. CollectionMobile fora de l'abast (es queda com es).
+  [ ] B3. Animacions i delays: parametres per colleccio (risc R2).
+  [ ] Per colleccio: Cube -> First Contact -> Miscellania ->
+      The Human Inside -> Austen (de la mes simple a la mes complexa).
+
+Etapa C (header, per passos com diu el pla):
+  [ ] C1. setMegaHeroRowHeight  -> model (mateixa formula rowHeight).
+  [ ] C2. setRootRemPx          -> model.
+  [ ] C3. setBleedGuardExpandPx -> model.
+  [ ] C4. setMegaInsetsPx       -> model.
+  [ ] C5. setStripeRowPadPx / setStripeRowPadXPx / setLockBtnTop ->
+          useLayoutEffect (abans del pintat).
+  [ ] C6. Neteja d'efectes morts; avaluacio final de reescriptura.
+
+Verificacio a cada pas: protocol del punt 5 del pla + traces amb
+timestamps (risc R3).
+
+====================================================================
+9. RESPOSTES CURTES (TL;DR)
+====================================================================
+
+1. Ordre A -> B -> C: SI, mantenir.
+2. Model layoutModel: BE; amb laneForViewport() nou i mai mes --belt2-*
+   a produccio.
+3. Fusio: un sol component amb parametres, sobre codi NOU; /lab/proves
+   fora de scope; CollectionMobile fora de la fusio.
+4. Header: neteja per passos (no reescriptura); eliminar els codis
+   morts abans de comencar.
+5. Estats pendents: conversio selectiva — convertits els 5 de geometria
+   (carril, bandes, pushDown, posterExtra), mesurat amb useLayoutEffect
+   nomes zeroLeftOffsetPx.
