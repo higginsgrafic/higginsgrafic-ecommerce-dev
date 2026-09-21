@@ -275,15 +275,8 @@ export const VEL_SAMARRETA_BUIDA_ALFA = 0.85;
 export const VEL_SAMARRETA_BUIDA_ALFA_BLANCA = 0.6;
 
 /**
- * Dibuixos girats (mirall horitzontal, en X amb eix a Y) a la vista vertical.
- * S'hi posa la clau canonica del dibuix, una entrada per dibuix, per poder-los
- * girar d'un en un. Exemple:
- *   export const STRIPE_DRAWING_GIRAT_VERTICAL = {
- *     'austen/pride-and-prejudice-3/nx-01-stripe.webp': true,
- *   };
+ * ELS DIBUIXOS NO ES GIREN MAI. La lectura occidental es sempre d'esquerra a
+ * dreta, i un mirall deixa els textos i els logos del revés. El mirall de la
+ * segona filera s'aplica a les siluetes de les samarretes (el vel), no a les
+ * estampes.
  */
-export const STRIPE_DRAWING_GIRAT_VERTICAL = {
-  // Dibuixos que van girats a la segona filera de la franja vertical.
-  'Mazinger C': true,
-  RoboCube: true,
-};

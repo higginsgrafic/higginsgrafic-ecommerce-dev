@@ -12,7 +12,6 @@ import {
   STRIPE_DRAWING_DY_VERTICAL,
   STRIPE_DRAWING_ESCALA_VERTICAL,
   STRIPE_DRAWING_DX_VERTICAL,
-  STRIPE_DRAWING_GIRAT_VERTICAL,
   VEL_SAMARRETA_BUIDA_ALFA_BLANCA,
 } from '../../config/stripeCalibrationsVertical';
 import { carrilPx } from '../../utils/layoutMetrics.js';
