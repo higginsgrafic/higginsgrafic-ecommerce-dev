@@ -693,7 +693,19 @@ export default function MegaslidePagina2({
             colleccions={(
               <CercadorColleccionsColumna
                 activeKey={active}
-                onSelect={setActive}
+                // La clau pot portar subcolleccio ('austen:pemberley'): s'ha de
+                // partir. Amb setActive directe quedava com a colleccio sencera,
+                // no existia i la franja queia a repetir un sol dibuix.
+                onSelect={(key) => {
+                  if (typeof key === 'string' && key.includes(':')) {
+                    const [collection, subcollection] = key.split(':');
+                    setActive(collection);
+                    setAustenSubcollection(subcollection);
+                  } else {
+                    setActive(key);
+                    setAustenSubcollection(null);
+                  }
+                }}
                 alcadaFilaLlista={midesTaula.alcadaFilaLlista}
                 caixes
               />
