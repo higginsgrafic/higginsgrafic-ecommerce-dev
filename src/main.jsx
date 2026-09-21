@@ -8,6 +8,7 @@ injectPlausible();
 
 console.log('🚀 main.jsx is loading...');
 
+
 const __HG_FATAL_OVERLAY_ID__ = '__HG_FATAL_OVERLAY__';
 
 function showFatalOverlay(title, details) {

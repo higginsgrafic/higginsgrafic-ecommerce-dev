@@ -1,0 +1,144 @@
+import { getLayoutViewportWidth } from './layoutMetrics';
+
+/**
+ * layoutModel — model ÚNIC de les mides de layout del lloc.
+ *
+ * Per què existeix:
+ *   Les mateixes mides estaven calculades a més d'un lloc i amb fórmules
+ *   divergents (App.jsx feia `isPortraitTablet ? 116 : ...` i
+ *   useRouteLayout.js feia `isLargeScreen ? 80 : 64`), o sigui que la mateixa
+ *   finestra podia donar dos valors diferents segons qui preguntés. I com que
+ *   aquests números són la base de la capçalera, la hero i els paddings, qualsevol
+ *   divergència es veu com un salt de tot el contingut.
+ *
+ * Com s'ha de fer servir:
+ *   - A dins de React: `computeLayoutModel({ offersHeaderHeight, ... })` amb les
+ *     banderes de ruta, i publicar amb `publishLayoutModel(model)`.
+ *   - A fora de React (mòdul, abans del primer pintat): `publishEarlyLayoutModel()`.
+ *   - Mai no s'ha de mesurar el DOM per obtenir aquests números: són funcions
+ *     pures de l'amplada i l'alçada de la finestra.
+ */
+
+const MIDA_MOVIL = 600;
+const MIDA_TAULETA_VERTICAL_MAX = 1024;
+const MIDA_TAULETA_APAISADA_MIN = 768;
+const MIDA_TAULETA_APAISADA_MAX = 1366;
+const ALCADA_TAULETA_APAISADA_MAX = 1100;
+const ALCADA_CAPCALERA_ESCRIPTORI = 80;
+const ALCADA_CAPCALERA_MOBIL = 80;
+const ALCADA_CAPCALERA_ESTRETA = 64;
+const ALCADA_CAPCALERA_TAULETA_VERTICAL = 116;
+
+/**
+ * Classificació del dispositiu a partir de les mides de la finestra.
+ * NOMES mides: el touch no hi entra, perque la mateixa finestra ha de donar
+ * sempre la mateixa maquetacio.
+ */
+export function deviceLayoutFromViewport(vw, vh) {
+  const ample = Number.isFinite(vw) && vw > 0 ? vw : 0;
+  const alt = Number.isFinite(vh) && vh > 0 ? vh : 0;
+
+  const isMobile = ample > 0 && ample < MIDA_MOVIL;
+  const isPortraitTablet = ample >= MIDA_MOVIL && ample <= MIDA_TAULETA_VERTICAL_MAX && alt > ample;
+  const isLandscapeTablet =
+    ample >= MIDA_TAULETA_APAISADA_MIN &&
+    ample <= MIDA_TAULETA_APAISADA_MAX &&
+    alt < ample &&
+    alt > 0 &&
+    alt <= ALCADA_TAULETA_APAISADA_MAX;
+  const isDesktop = !isPortraitTablet && !isLandscapeTablet && ample >= MIDA_TAULETA_VERTICAL_MAX;
+
+  return {
+    isMobile,
+    isPortraitTablet,
+    isLandscapeTablet,
+    isDesktop,
+    // Compat: hi ha consumidors que fan servir isLargeScreen com a "escriptori".
+    isLargeScreen: isDesktop,
+    viewportWidth: ample,
+    viewportHeight: alt,
+  };
+}
+
+/** Alçada de la capçalera per tipus de dispositiu. */
+export function headerHeightFor(deviceLayout) {
+  if (deviceLayout.isPortraitTablet) return ALCADA_CAPCALERA_TAULETA_VERTICAL;
+  if (deviceLayout.isLargeScreen) return ALCADA_CAPCALERA_ESCRIPTORI;
+  if (deviceLayout.isMobile) return ALCADA_CAPCALERA_MOBIL;
+  return ALCADA_CAPCALERA_ESTRETA;
+}
+
+/**
+ * Marc horitzontal del lloc: el mateix càlcul que SiteFrame publica com a
+ * `--site-xL/xR/w`. És la font de veritat horitzontal de tot el projecte.
+ */
+export function siteFrameForViewport({ vw, vh, rulerInset = 0 } = {}) {
+  const ample = Number.isFinite(vw) && vw > 0 ? vw : getLayoutViewportWidth();
+  if (!Number.isFinite(ample) || ample <= 0) return null;
+  const disponible = Math.max(0, ample - rulerInset);
+  const ampleMarc = Math.max(0, Math.min(1350, disponible - 16 * 2));
+  const xL = Math.round(rulerInset + (disponible - ampleMarc) / 2);
+  return { xL, xR: xL + ampleMarc, width: ampleMarc };
+}
+
+/**
+ * Tots els números de layout d'una tacada.
+ *
+ * @param {object} opts
+ * @param {object} [opts.deviceLayout]  resultat de deviceLayoutFromViewport; si no es passa, es calcula
+ * @param {boolean} [opts.teCapcaleraDev] rutes amb la capçalera de desenvolupament
+ * @param {number} [opts.alcadaOfertesPx=0]
+ * @param {number} [opts.alcadaBannerAdminPx=0]
+ * @param {number} [opts.rulerInsetPx=0]
+ */
+export function computeLayoutModel({
+  deviceLayout,
+  teCapcaleraDev = false,
+  alcadaOfertesPx = 0,
+  alcadaBannerAdminPx = 0,
+  rulerInsetPx = 0,
+} = {}) {
+  const layout = deviceLayout || deviceLayoutFromViewport(
+    typeof window !== 'undefined' ? window.innerWidth : 0,
+    typeof window !== 'undefined' ? window.innerHeight : 0,
+  );
+  const alcadaCapcalera = headerHeightFor(layout);
+  // L'offset de capcalera sempre compta l'alcada base; el que canvia per ruta
+  // es qui la publica (capcalera de dev o del lloc), no el número.
+  const offsetCapcalera = alcadaCapcalera + alcadaOfertesPx + alcadaBannerAdminPx + rulerInsetPx;
+  const offsetGlobal = alcadaOfertesPx + alcadaBannerAdminPx + rulerInsetPx;
+
+  return {
+    ...layout,
+    headerHeight: alcadaCapcalera,
+    appHeaderOffset: `${offsetCapcalera}px`,
+    globalHeaderTopOffset: `${offsetGlobal}px`,
+    rulerInset: `${rulerInsetPx}px`,
+    siteFrame: siteFrameForViewport({
+      vw: layout.viewportWidth || (typeof window !== 'undefined' ? window.innerWidth : 0),
+      vh: layout.viewportHeight,
+      rulerInset: rulerInsetPx,
+    }),
+  };
+}
+
+/** Publica el model a `<html>` com a CSS vars. */
+export function publishLayoutModel(model) {
+  if (typeof document === 'undefined' || !model) return;
+  try {
+    const root = document.documentElement;
+    root.style.setProperty('--appHeaderOffset', model.appHeaderOffset);
+    root.style.setProperty('--globalHeaderTopOffset', model.globalHeaderTopOffset);
+    root.style.setProperty('--rulerInset', model.rulerInset);
+  } catch {
+    // ignore
+  }
+}
+
+/**
+ * NOTA (mesurada): NO s'ha de publicar el model abans que React sàpiga si hi
+ * ha ofertes o banners. Es va provar i pitjorava les coses: publicava 116 px
+ * (sense ofertes) i el valor bo era 156 px, o sigui que creava un salt de
+ * 40 px que abans no hi era. El publica App amb useLayoutEffect, que ja va
+ * abans del primer pintat.
+ */
