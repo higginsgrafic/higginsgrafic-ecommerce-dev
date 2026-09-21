@@ -622,7 +622,7 @@ export default function MegaslidePagina2({
         }}>
           <MegaStripePanel
             {...propsFranjaP2}
-            stripeImageSrc={isPortraitTablet ? '/placeholders/tablet vertical/stripe-curta-7+7.png' : stripeBaseImageSrc}
+            stripeImageSrc={isPortraitTablet ? '/placeholders/tablet vertical/full-white-stripe-doble.webp' : stripeBaseImageSrc}
             // La franja ha de quedar a la mateixa alcada que la de la pagina 1.
             visualOffsetY={-page1PageLift + (isLandscapeTablet ? -10 : 0) - ((isPortraitTablet || isLandscapeTablet) ? 0 : FRANJA_AJUST_PX) + desplacamentFranja}
           />
@@ -723,7 +723,7 @@ export default function MegaslidePagina2({
                   <MegaStripePanel
                     {...propsFranjaP2}
                     isPortraitTablet
-                    stripeImageSrc="/placeholders/tablet vertical/stripe-curta-7+7.png"
+                    stripeImageSrc="/placeholders/tablet vertical/full-white-stripe-doble.webp"
                     senseMascaraSamarreta
                     visualOffsetY={0}
                   />
