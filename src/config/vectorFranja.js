@@ -99,3 +99,34 @@ export const VECTOR_FRANJA_VIEWBOX_OBERT = {
   width: 1487,
   height: 694.05 + VECTOR_FRANJA_FRANJA_OBERTA,
 };
+
+/**
+ * Les arees de clic dels fitxers de l'amo, amb la transformacio dels grups
+ * niats que porten. L'estreta es clic-area-1 (242) i l'ampla clic-area-2 (306).
+ */
+export const CLIC_AREA_ESTRETA = { d: "M68.344,35.722c16.859,-9.144 33.039,-16.684 48.026,-21.479l70.284,0c11.808,4.249 40.856,17.508 61,27.59c18.931,15.101 37.429,30.455 55.499,46.058l-47.583,55.726l-11.816,-7.705l0.426,181.943l-179.967,0l-0.624,-54.202l-0.236,-100.782l65.382,-75.906c-19.622,-17.335 -39.793,-34.395 -60.391,-51.242Z", transform: "matrix(1.007953,0,0,1.007953,-152.201309,-31.323603)", ample: 242, alt: 307, x0: -88.2, y0: -16.9 };
+export const CLIC_AREA_AMPLA = { x0: -1.67, d: "M64.214,317.854l-2.089,-181.389l-15.091,9.01l-47.034,-55.965l57.377,-47.678c20.812,-11.884 40.782,-21.763 58.993,-27.59l70.284,0c11.808,4.249 40.856,17.508 61,27.59c18.931,15.101 37.429,30.455 55.499,46.058l-47.583,55.726l-11.816,-7.705l0.426,181.943l-179.967,0Z", transform: "matrix(1.007953,0,0,1.007952,-1.673765,-32.494595)", ample: 306, alt: 307, y0: -18.1 };
+
+/**
+ * Les arees de clic de la vista vertical, una per samarreta, en coordenades del
+ * panell. Nomes la forma ampla (clic-area-2) per ara, centrada a cada casella.
+ */
+export function areesClicAmpla() {
+  return VECTOR_FRANJA_CAIXES.map((c) => ({
+    d: CLIC_AREA_AMPLA.d,
+    transform: CLIC_AREA_AMPLA.transform,
+    // Alineada al top i a l'esquerra de la silueta del vector.
+    tx: c.x - (CLIC_AREA_AMPLA.x0 || 0),
+    ty: c.y - (CLIC_AREA_AMPLA.y0 || 0),
+  }));
+}
+
+/** Les arees de clic amb la forma estreta (clic-area-1), una per casella. */
+export function areesClicEstreta() {
+  return VECTOR_FRANJA_CAIXES.map((c) => ({
+    d: CLIC_AREA_ESTRETA.d,
+    transform: CLIC_AREA_ESTRETA.transform,
+    tx: c.x - (CLIC_AREA_ESTRETA.x0 || 0),
+    ty: c.y - (CLIC_AREA_ESTRETA.y0 || 0),
+  }));
+}
