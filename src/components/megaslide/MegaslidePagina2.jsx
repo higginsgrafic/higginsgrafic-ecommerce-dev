@@ -729,7 +729,7 @@ export default function MegaslidePagina2({
             colors={(
               /* Els cercles, 1 px mes petits, amb el TOP de la graella quiet
                  (per aixo va enganxada a dalt amb el mateix marge de sempre). */
-              <div style={{ marginTop: '16px', marginBottom: '7px' }}>
+              <div style={{ marginTop: '21px' }}>
                 <CercadorColorsGrid
                   selectedColor={cercadorSelectedColor}
                   onSelectColor={setCercadorSelectedColor}
