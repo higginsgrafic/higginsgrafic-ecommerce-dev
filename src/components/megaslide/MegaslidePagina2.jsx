@@ -622,7 +622,7 @@ export default function MegaslidePagina2({
         }}>
           <MegaStripePanel
             {...propsFranjaP2}
-            stripeImageSrc={isPortraitTablet ? '/placeholders/tablet vertical/stripe-curta-7+7.png' : stripeBaseImageSrc}
+            stripeImageSrc={isPortraitTablet ? '/placeholders/tablet vertical/full-white-stripe-doble.webp' : stripeBaseImageSrc}
             // La franja ha de quedar a la mateixa alcada que la de la pagina 1.
             visualOffsetY={-page1PageLift + (isLandscapeTablet ? -10 : 0) - ((isPortraitTablet || isLandscapeTablet) ? 0 : FRANJA_AJUST_PX) + desplacamentFranja}
           />
@@ -719,11 +719,11 @@ export default function MegaslidePagina2({
               /* La franja de debò: el mateix panell que la filera, amb la imatge
                  de dues fileres (7+7), escalat per encaixar a la casella. */
               <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <div style={{ height: '100%', transform: 'translateY(-122.93px) scale(2.100)', transformOrigin: 'center center', '--megaStripeDx': '0px', '--megaStripeDy': '0px' }}>
+                <div style={{ height: '100%', transform: 'translateY(-118.03px) scale(2.183)', transformOrigin: 'center center', '--megaStripeDx': '0px', '--megaStripeDy': '0px' }}>
                   <MegaStripePanel
                     {...propsFranjaP2}
                     isPortraitTablet
-                    stripeImageSrc="/placeholders/tablet vertical/stripe-curta-7+7.png"
+                    stripeImageSrc="/placeholders/tablet vertical/full-white-stripe-doble.webp"
                     senseMascaraSamarreta
                     visualOffsetY={0}
                   />
