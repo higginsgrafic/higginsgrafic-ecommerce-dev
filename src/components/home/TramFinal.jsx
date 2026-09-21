@@ -127,8 +127,7 @@ const TramFinal = forwardRef(function TramFinal(
           gridRow: '37 / 54',
           alignSelf: 'start',
           width: '100%',
-          // Les targetes, 10 px mes avall del que estaven.
-          marginTop: '-18px',
+          marginTop: '-28px', // Baixat 1px (abans -29px)
           pointerEvents: 'auto',
         }}
       >
