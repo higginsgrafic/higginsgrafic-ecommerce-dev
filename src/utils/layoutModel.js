@@ -166,3 +166,25 @@ export function publishEarlyBeltVars() {
     // ignore
   }
 }
+
+/**
+ * Amplada del carril per a una amplada de finestra donada.
+ *
+ * Es la MATEIXA formula que `getSafeBelt()` fa servir quan no hi ha guies de
+ * desenvolupament, pero pura: no llegeix cap CSS var. Serveix perque cap codi
+ * de produccio hagi de dependre de `--belt2-*` (que nomes les publica
+ * `BeltReferenceOverlay`, en DEV, i sempre mes tard): aixo era el que feia que
+ * dev i produccio pintessin mides diferents.
+ */
+export function laneForViewport(vw = getLayoutViewportWidth()) {
+  const ample = Number.isFinite(vw) && vw > 0 ? vw : 0;
+  if (ample <= 0) return 1350;
+  // El sostre es la proporcio de la finestra respecte de la referencia del
+  // megaslide (a 1920 dona 1350 i a 1440 en dona 1013).
+  const sostre = Math.round(ample * (1350 / 1920));
+  const disponible = ample - 16 * 2;
+  const objectiu = Math.min(sostre, disponible);
+  const min = 320;
+  const ambMinim = Math.max(objectiu, min);
+  return Math.max(min, Math.min(ambMinim, sostre));
+}
