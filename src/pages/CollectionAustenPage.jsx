@@ -189,7 +189,14 @@ function CollectionAustenPage() {
   const isMobile = useIsMobile();
   const [overlayState, setOverlayState] = useState(loadOverlayState);
   const [zeroLeftOffsetPx, setZeroLeftOffsetPx] = useState(0);
-  const [rowHeight, setRowHeight] = useState(38);
+  // Alcada d'una fila de la graella de logotips. Es proporcional a l'amplada
+  // del carril (mesurat a 540, 720 i 900 px: 12,28 / 17,34 / 22,39), aixi que
+  // NO cal mesurar-la: calculant-la, la hero no es mou quan la mesura
+  // s'assenta (abans el `top` de la hero depenia d'aquest estat).
+  const [carrilAmple, setCarrilAmple] = useState(() => {
+    try { return getSafeBelt().width; } catch { return 540; }
+  });
+  const rowHeight = Math.max(1, carrilAmple * 0.0280625 - 2.875);
 
   // La franja blanca ha de tocar el separador del header sense quedar-s'hi a
   // sota. Com que la hero no comenca exactament al separador, mesurem on acaba
@@ -251,10 +258,7 @@ function CollectionAustenPage() {
       const offset = Math.max(0, logoRect.left - gridRect.left);
       setZeroLeftOffsetPx((prev) => (Math.abs(prev - offset) < 0.5 ? prev : offset));
 
-      const numRows = 24;
-      const rowGap = 3;
-      const singleRowH = (gridRect.height - (numRows - 1) * rowGap) / numRows;
-      setRowHeight((prev) => (Math.abs(prev - singleRowH) < 0.1 ? prev : singleRowH));
+      // L'alcada de fila es calcula (vegeu `rowHeight`), no es mesura.
     };
     measure();
     const onResize = () => {
