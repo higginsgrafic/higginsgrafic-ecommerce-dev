@@ -65,9 +65,32 @@ El `<main>` porta `transition-[padding-top] duration-[350ms]`. Qualsevol canvi d
 
 Dues fórmules diferents per al mateix número. `useRouteLayout.js` **no s'usa enlloc** (codi mort), així que avui no fa mal, però és una trampa per al futur.
 
-### 2.6 El que encara no està explicat
+### 2.6 El residu que queda (mesurat a fons)
 
-Al punt on som, el moviment de la col·lecció ha baixat de 40 px a 0-10 px segons la vista, i **queda un desplaçament vertical residual** que encara no he sabut atribuir amb certesa (el rail té l'alçada fixa, 658 px, i tot i així puja 40 px en dos passos perquè un bloc de sobre seu s'encongeix 30 px). Aquest és el candidat número u a investigar a l'Etapa A.
+Amb els quatre arreglaments aplicats, a la pàgina de col·lecció a 768 px el moviment ja **no és de 40 px, sinó de passos petits d'1 a 8 px**. Traça a `/austen` (mostreig cada 120 ms, elements identificats):
+
+```
+--- canvi a 1680 ms
+    main      753x3045 -> 753x3058
+    seccio    161 -> 156
+    TramFinal 2166 -> 2174
+    fill.0    "CADA DIBUIX TÉ UNA HISTÒRIA"  2533 -> 2541
+    fill.1    "ALTRES HISTÒRIES"             2854 -> 2862
+    fill.2 / rail (658 px d'alçada, no canvia) 2689 -> 2697
+    graella   660 -> 668
+--- canvi a 1800 ms
+    rail 2697 -> 2696
+```
+
+Llegit: la **graella** i tot el que ve després es desplacen ±8 px, i el `top` de la secció oscil·la 5 px. L'alçada de res no canvia (la graella fa 3310 px i el rail 658 px en tots els estats): el que canvia és **el punt on comença el contingut**, o sigui `padding-top` del `<main>` o l'alçada de la hero.
+
+Com que `--appHeaderOffset` val 156 px estable a 768 px, la sospita principal és:
+
+- **`rulerInset`**: val 0 px a les mostres, però el `<main>` també en rep el valor com a `padding-left`. Si el publica tard alguna ruta de dev, mouria 18 px.
+- **L'alçada de la hero**: ara és `calc(100vh - var(--appHeaderOffset))`. Si la finestra o el `--appHeaderOffset` canvien dins dels primers 2 s (per exemple per la barra d'ofertes), la hero canvia i ho arrossega tot.
+- **El `Pauta4ColsOverlay`**: té un `MutationObserver` sobre l'atribut `style` de `<html>` que el fa recalcular quan canvia qualsevol variable del root. Com que ell mateix n'escriu, qualsevol altra escriptura el torna a fer córrer.
+
+És el punt número u a atacar a l'Etapa A, i **no l'he volgut tocar sense el vistiplau** perquè afecta el sistema de pauta compartit per totes les pàgines.
 
 ---
 
