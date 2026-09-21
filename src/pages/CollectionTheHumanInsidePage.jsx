@@ -193,7 +193,6 @@ function CollectionTheHumanInsidePage() {
   const [heroBandTopPx, setHeroBandTopPx] = useState(0);
   const [heroIconsTopPx, setHeroIconsTopPx] = useState(null);
   const [heroBottomBandTopPx, setHeroBottomBandTopPx] = useState(null);
-  const [heroHeightPx, setHeroHeightPx] = useState(null);
   // Quan la imatge (alcada de finestra) sobrepassa l'espai que la graella li
   // reserva, baixem el contingut el mateix tros perque no se solapi.
   const [pushDownPx, setPushDownPx] = useState(0);
@@ -280,7 +279,6 @@ function CollectionTheHumanInsidePage() {
       // Franja blanca de baix, on abans hi havia el retall.
       setHeroBottomBandTopPx(Math.round(window.innerHeight - bandH - heroTop));
       // La imatge acaba exactament on acaba la franja blanca de baix.
-      setHeroHeightPx(Math.round(window.innerHeight - heroTop));
       // Baixem el contingut el que calgui perque la primera targeta quedi
       // SEMPRE per sota de la imatge. Ho calculem sobre la posicio "base"
       // (sense el desplaçament ja aplicat) per no entrar en bucle.
@@ -367,7 +365,10 @@ function CollectionTheHumanInsidePage() {
             width: '100vw',
             marginLeft: 'calc(50% - 50vw)',
             // La imatge acaba just on acaba la franja blanca de baix.
-            height: heroHeightPx != null ? `${heroHeightPx}px` : `calc(100vh - 62px)`,
+            // Alcada CSS pura: del sostre de la capcalera al fons de la
+            // finestra. Abans es mesurava amb JS (innerHeight - heroTop) i la
+            // hero canviava de mida en dos o tres passos, i ho movia tot.
+            height: 'calc(100vh - var(--appHeaderOffset, 62px))',
             zIndex: 1,
           }}
         >
