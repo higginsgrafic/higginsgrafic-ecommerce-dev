@@ -275,8 +275,10 @@ export const VEL_SAMARRETA_BUIDA_ALFA = 0.85;
 export const VEL_SAMARRETA_BUIDA_ALFA_BLANCA = 0.6;
 
 /**
- * ELS DIBUIXOS NO ES GIREN MAI. La lectura occidental es sempre d'esquerra a
- * dreta, i un mirall deixa els textos i els logos del revés. El mirall de la
- * segona filera s'aplica a les siluetes de les samarretes (el vel), no a les
- * estampes.
+ * CAP DIBUIX PORTA MIRALL, MAI, si no es demana de forma expressa.
+ *
+ * Gairebe tots els dibuixos trenquen la simetria a posta, i a mes la lectura
+ * occidental es sempre d'esquerra a dreta: un mirall deixa els textos i els
+ * logos del revés. El mirall de la segona filera s'aplica a les siluetes de
+ * les samarretes (el vel), que no son dibuixos.
  */
