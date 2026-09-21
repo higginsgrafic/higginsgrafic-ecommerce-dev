@@ -710,8 +710,7 @@ export default function ProductDetailTemplate({ product }) {
             gridRow: '48 / 65',
             alignSelf: 'start',
             width: '100%',
-            // Les targetes d'ALTRES HISTORIES, 10 px mes avall.
-            marginTop: '-38px',
+            marginTop: '-48px',
           }}
         >
           <TambeRail cardHref={`/${COLLECTION_SLUG}/${PRODUCT_ROUTE}`} title="cada dibuix té una història" showInternalArrows={false} showTitle={false} />
