@@ -487,8 +487,8 @@ function PdpDesktop({ product }) {
               // El rail viu dins el carril central (a la vertical, el seu).
               width: isPortraitTablet ? '100%' : 'var(--hg-mega-w, 100%)',
               margin: isPortraitTablet ? undefined : '0 auto',
-              // A la vertical, el rail de recomanats va 15 px mes avall.
-              transform: `translateY(${isLandscapeTablet || esEscriptoriEstret ? '-52px' : (isPortraitTablet ? '15px' : '-72px')})`,
+              // A la vertical, el rail de recomanats va 10 px mes avall.
+              transform: `translateY(${isLandscapeTablet || esEscriptoriEstret ? '-52px' : (isPortraitTablet ? '10px' : '-72px')})`,
             }}
           >
             <TambeRail
