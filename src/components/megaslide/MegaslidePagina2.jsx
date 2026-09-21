@@ -721,11 +721,11 @@ export default function MegaslidePagina2({
               <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 {/* La stripe de la pagina 1, a sobre de la de la 2, per comparar-les. */}
                 <div style={{ position: 'absolute', inset: 0, height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', pointerEvents: 'none', zIndex: 50 }}>
-                  <div style={{ height: '100%', transform: 'translateY(-114.99px) scale(2.029)', transformOrigin: 'center center' }}>
+                  <div style={{ height: '100%', transform: 'translateY(-126.35px) scale(2.098)', transformOrigin: 'center center' }}>
                     <img
                       src="/placeholders/tablet vertical/full-color-stripe-doble.webp"
                       alt=""
-                      style={{ height: '101.9px', width: 'auto', display: 'block', transform: 'translate(60.3px, 230.8px)', opacity: 0.5 }}
+                      style={{ height: '101.9px', width: 'auto', display: 'block', transform: 'translate(58.35px, 229.75px)', opacity: 0.5 }}
                     />
                   </div>
                 </div>
