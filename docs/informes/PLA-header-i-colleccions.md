@@ -96,6 +96,25 @@ marginTop: `calc((var(--hg-tdp-xL) - var(--hg-tdp-xR)) * 0.3385 ... + ${pushDown
 
 O sigui que hi ha **dues** coses millorables:
 
+0. **ARREL TROBADA (ronda 6)**: traçant la cadena d'ancestres de la hero
+   s'acaba de veure d'on ve el residu. El `top` de la pagina sencera arrenca a
+   **166 px** i s'assenta a **156**, en dos passos:
+
+   ```
+   117h868 <- 242h364 <- 166h440 <- 166   (top de la pagina)
+   112h868 <- 236h364 <- 160h440 <- 160
+   108h868 <- 232h364 <- 156h440 <- 156
+   ```
+
+   Son **10 px de `--appHeaderOffset`** (que acaba valent 156). Es a dir: el
+   residu no el crea ni la hero ni la pauta ni el `pushDownPx`; el crea que
+   **l'offset de capcalera neix 10 px mes gran del que acabara valent**. Els
+   quatre termes que el composen son `baseHeaderHeight` (116 en vertical),
+   `offersHeaderHeight` (40 si hi ha ofertes), `adminBannerHeight` (40 si hi ha
+   banner d'admin) i `rulerInset` (18 si els rulers de dev son actius). Cal
+   instrumentar quins d'aquests quatre canvia (i quan) per tancar-ho; cap dels
+   quatre no hauria de canviar despres del primer render.
+
 0. **Mesurat amb instrumentacio (ronda 5)**: posant un registre a cada
    passada de `mesura()` a la pagina d'Austen, nome s'executa **dues vegades** i
    els valors diuen on es el problema:
