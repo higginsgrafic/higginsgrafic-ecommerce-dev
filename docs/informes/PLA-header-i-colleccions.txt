@@ -239,3 +239,57 @@ L'objectiu estarà acomplert quan, a les traces del punt 5, **cap element tingui
 3. **La fusió de les cinc pàgines de col·lecció**: un sol component amb paràmetres, o millor un component base + variants? Hi ha risc de perdre diferències subtils entre col·leccions.
 4. **El header**: reescriure'l o netejar-lo per passos? El meu pla diu per passos (punt 4, Etapa C); vull confirmació o correcció.
 5. **El que queda de l'Etapa A**: dels set estats de mesura de cada pàgina de col·lecció, `rowHeight` ja està calculat; els altres sis (`heroBandTopPx`, `heroIconsTopPx`, `heroBottomBandTopPx`, `posterExtraPx`, `pushDownPx`, `zeroLeftOffsetPx`) encara es mesuren. Val la pena convertir-los tots, o n'hi ha que és més sa deixar mesurats (mesurant sempre abans del pintat)?
+
+---
+
+## 8. Verificació independent del pla (22/09/2026)
+
+El codi s'ha tornat a verificar punt per punt contra aquest document. Resultat:
+tots els commits citats existeixen i totes les correccions descrites són
+aplicades (model layoutModel.js present, heroHeightPx eliminat i CSS pur a les
+cinc pàgines, pageTransition sense desplaçament, rowHeight calculat amb
+carril * 0.0280625 - 2.875 a les cinc pàgines, FullWideSlideHeader.jsx amb
+3.340 línies). La comparació, però, ha destapat tres forats que el pla no
+cobreix:
+
+### 8.1 Hi ha un segon header mort: MainHeader.jsx (1.116 línies)
+
+El pla parla del FullWideSlideHeader com l'únic header a refer, però
+src/components/MainHeader.jsx no és importat enlloc del projecte: és codi mort,
+igual que useRouteLayout.js (punt 2.5). Abans de començar l'Etapa C cal decidir
+si s'esborra: si algú el "reviu", tornaria a portar mesures propies i
+duplicaria el sistema de mides.
+
+### 8.2 Ja existeix una pàgina de col·lecció genèrica, i l'Etapa B no en parla
+
+src/pages/CollectionPage.jsx (285 línies) + src/config/collections.js (les 5
+col·leccions amb collectionSlug, productSlugs, texts i SEO) + ProductGrid és,
+de facto, la versió anterior del component amb paràmetres que l'Etapa B proposa
+crear. Cal decidir:
+
+1. Si aquesta ruta encara és viva o és un altre codi mort.
+2. Si la fusió de les cinc pàgines es fa SOBRE aquesta base (ampliant-la amb
+   hero/pauta/TramFinal) o si se n'ignora i es crea de nou.
+
+És una decisió que afecta directament la pregunta 3 del punt 7 i que el revisor
+hauria de tenir al abast.
+
+### 8.3 Risc residual no documentat: getSafeBelt() a les pàgines
+
+A les cinc pàgines de col·lecció, carrilAmple ve de getSafeBelt().width amb
+try/catch i fallback 540. Però getSafeBelt() prioritza --belt2-* (les variables
+que només publica l'overlay de dev) quan són vàlides — el mateix problema del
+punt 2.1, però ara a nivell de pàgina en lloc de dins del rail: el rowHeight
+(i per tant la posició de la hero) pot diferir entre dev i producció. És el
+candidat següent a migrar al layoutModel, abans o dins de l'Etapa A.
+
+### Conseqüències per al pla
+
+- Etapa A: afegir-hi la migració de carrilAmple/getSafeBelt() de les cinc
+  pàgines al model (8.3).
+- Etapa B: resoldre abans la relació amb CollectionPage.jsx +
+  config/collections.js (8.2).
+- Etapa C: afegir-hi l'eliminació (o arxiu explícit) de MainHeader.jsx (8.1).
+- Punt 7 (preguntes al revisor): la pregunta 3 hauria d'incloure la decisió de
+  8.2; i n'apareix una de nova: què fem amb el codi mort (MainHeader.jsx,
+  useRouteLayout.js)?
