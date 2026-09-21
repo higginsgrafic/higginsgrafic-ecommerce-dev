@@ -2857,7 +2857,13 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
           sota, pero a l'escriptori i a l'apaisada el nav va dins la barra i el
           border-b era transparent, aixi que no es veia. Li posem el mateix
           color que fa servir la vertical (#E6E8EC). */}
-      <div className={`${isPortraitTablet ? '' : 'border-b'} bg-background`} style={isPortraitTablet ? undefined : { borderBottomColor: '#E6E8EC' }}>
+      {/* A la vertical el megaslide viu DINS d'aquest header i, com que va
+          despres al DOM, es pintava per damunt de la barra i es menjava els
+          clics de la lupa. La barra va un punt per sobre. */}
+      <div
+        className={`${isPortraitTablet ? '' : 'border-b'} relative bg-background`}
+        style={{ zIndex: isPortraitTablet ? 10001 : undefined, ...(isPortraitTablet ? {} : { borderBottomColor: '#E6E8EC' }) }}
+      >
         <div
           className="flex h-20 items-center gap-3 px-4 sm:px-6 lg:h-20 lg:px-10"
           style={{

@@ -520,7 +520,8 @@ export default function ProductDetailTemplate({ product }) {
             color: 'rgba(71, 80, 89, 0.7)',
             textAlign: 'left',
             pointerEvents: 'auto',
-            transform: 'translateX(2px)',
+            // Baixat 10 px a la vista vertical.
+            transform: 'translate(2px, 10px)',
           }}
         >
           ALTRES HISTÒRIES

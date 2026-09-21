@@ -95,7 +95,8 @@ function ClicAreaOverlay({ src, highlightAll, highlightIndices, tshirtColor, dis
       <div
         ref={containerRef}
         className={`clic-area-overlay${highlightAll ? ' highlight-all' : ''}`}
-        style={{ '--hg-outline-color': outlineColor }}
+        // Per damunt de la franja: si no, el seu div tapa les arees de clic.
+        style={{ '--hg-outline-color': outlineColor, zIndex: 100 }}
         aria-hidden="true"
         onPointerDown={handlePointerDown}
         dangerouslySetInnerHTML={{ __html: markup }}
