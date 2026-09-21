@@ -3,7 +3,7 @@
 **Data**: 22 de setembre de 2026
 **Autor**: l'agent
 **Per a**: revisió externa (GLM 5.3 flash) abans de continuar
-**Objectiu**: refer de zero el header (`FullWideSlideHeader` i el seu sistema de mides) i la pàgina de col·lecció (hero + graella + TramFinal), mantenint el resultat visual i les funcions actuals, i eliminant les causes del moviment del layout.
+**Objectiu**: refer de zero el header (`FullWideSlideHeader` i el seu sistema de mides) i la pàgina de col·lecció (hero + graella + TramFinal), mantenint el resultat visual i les funcions actuals, i eliminant les causes del moviment del layout (mesures tardanes, estats que arriben després del pintat i transicions al muntatge).
 
 ---
 
@@ -134,8 +134,8 @@ Els 7 estats de mesura de cada pàgina de col·lecció: `heroBandTopPx`, `heroBo
 
 **Què queda per fer a l'Etapa A**:
 
-1. Migrar els 7 estats de mesura de cada pàgina de col·lecció al model (o eliminar-los si el càlcul és directe). Candidats clars: `rowHeight` (es pot derivar de l'amplada del marc), `heroBandTopPx`, `heroIconsTopPx` i `heroBottomBandTopPx` (es poden expressar amb `calc()` sobre `--appHeaderOffset` i l'alçada de la finestra, com ja s'ha fet amb la hero), `posterExtraPx` i `pushDownPx` (depenen de quantes files té la graella: és un càlcul, no una mesura), `zeroLeftOffsetPx`.
-2. Esbrinar el desplaçament residual de 30 px del bloc de sobre del rail (punt 2.6).
+1. Migrar els 7 estats de mesura de cada pàgina de col·lecció al model (o eliminar-los si el càlcul és directe). Ja fets: `rowHeight` (calculat a les cinc pàgines, `carril x 0.0280625 - 2.875`). Candidats que queden: `heroBandTopPx`, `heroIconsTopPx` i `heroBottomBandTopPx` (es poden expressar amb `calc()` sobre `--appHeaderOffset` i l'alçada de la finestra, com ja s'ha fet amb la hero), `posterExtraPx` i `pushDownPx` (depenen de quantes files té la graella: és un càlcul, no una mesura), `zeroLeftOffsetPx`.
+2. ~~Esbrinar el desplaçament residual~~ **FET**: era la transició de pàgina (punt 2.6).
 3. Passar el header a llegir el model (les seves 8 mesures) — això és el pont cap a l'Etapa C.
 
 **Risc**: mitjà. Cada estat que es treu és un càlcul que ha de donar exactament el mateix número. La mitigació és verificar vista per vista amb traces (vegeu el punt 5).
@@ -238,4 +238,4 @@ L'objectiu estarà acomplert quan, a les traces del punt 5, **cap element tingui
 2. **El disseny del model** (`utils/layoutModel.js`): funcions pures + publicació amb `useLayoutEffect` a App. És raonable, o hi ha una manera més robusta de garantir que el primer pintat ja tingui els números bons quan hi ha ofertes i banners (que depenen de dades)?
 3. **La fusió de les cinc pàgines de col·lecció**: un sol component amb paràmetres, o millor un component base + variants? Hi ha risc de perdre diferències subtils entre col·leccions.
 4. **El header**: reescriure'l o netejar-lo per passos? El meu pla diu per passos (punt 4, Etapa C); vull confirmació o correcció.
-5. **El punt 2.6** (el residual de 30 px): tinc la sospita que ve del `Pauta4ColsOverlay`, però no ho he confirmat. Qualsevol idea de per on atacar-ho serà benvinguda.
+5. **El que queda de l'Etapa A**: dels set estats de mesura de cada pàgina de col·lecció, `rowHeight` ja està calculat; els altres sis (`heroBandTopPx`, `heroIconsTopPx`, `heroBottomBandTopPx`, `posterExtraPx`, `pushDownPx`, `zeroLeftOffsetPx`) encara es mesuren. Val la pena convertir-los tots, o n'hi ha que és més sa deixar mesurats (mesurant sempre abans del pintat)?
