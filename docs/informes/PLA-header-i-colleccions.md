@@ -96,6 +96,34 @@ marginTop: `calc((var(--hg-tdp-xL) - var(--hg-tdp-xR)) * 0.3385 ... + ${pushDown
 
 O sigui que hi ha **dues** coses millorables:
 
+0. **RESOLT (ronda 8)**: la causa dels 10 px era la **transicio de pagina** de
+   `src/routes/AppRoutes.jsx`:
+
+   ```js
+   const pageTransition = {
+     initial: { opacity: 0, y: 10 },   // <-- aquests 10 px
+     animate: { opacity: 1, y: 0 },
+     exit:    { opacity: 0, y: -10 },
+   };
+   ```
+
+   Cada ruta es muntava 10 px avall i hi lliscava (framer-motion ho escriu com
+   `opacity: 0; transform: translateY(10px); transition: all`), i allo movia
+   TOT el contingut a cada muntatge, tambe a la PDP i a l'inici. S'ha tret el
+   desplaçament i s'ha deixat el fons (opacitat): mateixa sensacio d'entrada,
+   zero moviment.
+
+   Verificat amb traces (24 mostres cada 120 ms) que **cada pagina te un sol
+   estat**:
+
+   | vista | abans | ara |
+   |---|---|---|
+   | colleccio 768 | 3 estats | **1** (156h2902) |
+   | colleccio 1280 | 3 | **1** (104h4810) |
+   | colleccio 1440 | 3 | **1** (120h3908) |
+   | pdp 768 | 3 | **1** (116h1180) |
+   | inici 768 | 3 | **1** (156h6381) |
+
 0. **ARREL ACOTADA (rondes 6 i 7)**: la cadena d'ancestres de la hero i la
    instrumentacio de l'offset donen el quadre seguent:
 

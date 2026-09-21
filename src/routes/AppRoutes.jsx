@@ -85,10 +85,14 @@ import {
   ResetPasswordPage,
 } from './lazyPages';
 
+// Sense desplaçament vertical: la transicio de pagina feia `y: 10` a
+// l'entrada i `y: -10` a la sortida, i aixo movia TOT el contingut 10 px a
+// cada muntatge (i es veia com si el layout s'assentés). El fons (opacitat)
+// es queda, que es el que dona la sensacio de entrada sense moure res.
 const pageTransition = {
-  initial: { opacity: 0, y: 10 },
-  animate: { opacity: 1, y: 0 },
-  exit: { opacity: 0, y: -10 },
+  initial: { opacity: 0 },
+  animate: { opacity: 1 },
+  exit: { opacity: 0 },
   transition: { duration: 0.3, ease: 'easeInOut' },
 };
 
