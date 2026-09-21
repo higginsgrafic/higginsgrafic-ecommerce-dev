@@ -622,7 +622,7 @@ export default function MegaslidePagina2({
         }}>
           <MegaStripePanel
             {...propsFranjaP2}
-            stripeImageSrc={isPortraitTablet ? '/placeholders/tablet vertical/full-white-stripe-doble.webp' : stripeBaseImageSrc}
+            stripeImageSrc={isPortraitTablet ? '/placeholders/tablet vertical/stripe-curta-7+7.png' : stripeBaseImageSrc}
             // La franja ha de quedar a la mateixa alcada que la de la pagina 1.
             visualOffsetY={-page1PageLift + (isLandscapeTablet ? -10 : 0) - ((isPortraitTablet || isLandscapeTablet) ? 0 : FRANJA_AJUST_PX) + desplacamentFranja}
           />
@@ -718,18 +718,12 @@ export default function MegaslidePagina2({
             stripe={(
               /* La franja de debò: el mateix panell que la filera, amb la imatge
                  de dues fileres (7+7), escalat per encaixar a la casella. */
-              <div style={{ position: 'relative', width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
-                {/* La imatge anterior, a sobre de l'actual. */}
-                <img
-                  src="/placeholders/tablet vertical/stripe-curta-7+7.png"
-                  alt=""
-                  style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'contain', pointerEvents: 'none' }}
-                />
-                <div style={{ height: '100%', transform: 'translate(12px, -127.18px) scale(2.110)', transformOrigin: 'center center', '--megaStripeDx': '0px', '--megaStripeDy': '0px' }}>
+              <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+                <div style={{ height: '100%', transform: 'translateY(-130.45px) scale(2.027)', transformOrigin: 'center center', '--megaStripeDx': '0px', '--megaStripeDy': '0px' }}>
                   <MegaStripePanel
                     {...propsFranjaP2}
                     isPortraitTablet
-                    stripeImageSrc="/placeholders/tablet vertical/full-white-stripe-doble.webp"
+                    stripeImageSrc="/placeholders/tablet vertical/stripe-curta-7+7.png"
                     senseMascaraSamarreta
                     visualOffsetY={0}
                   />
