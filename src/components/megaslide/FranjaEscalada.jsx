@@ -33,11 +33,20 @@ export default function FranjaEscalada({ children }) {
       // l'escala i es el que falta perque quedi centrada a la casella.
       const escala = prev.escala * (ampleCaixa / r.width);
       const previ = prev.escala || 1;
-      const topActual = (r.top - caixa.getBoundingClientRect().top) / previ;
-      const alcadaContingut = r.height / previ;
-      const dy = (alcadaCaixa / previ - alcadaContingut) / 2 - topActual;
-      const igual = Math.abs(prev.escala - escala) < 0.002 && Math.abs(prev.dy - dy) < 0.5;
-      return igual ? prev : { escala, dy };
+      // L'alcada de la imatge, en l'espai previ a l'escala: el contenidor
+      // interior s'hi ajusta i el flex el centra a la casella.
+      const alcada = r.height / previ;
+      // I la franja no arrenca a dalt del panell (te el coixi de la filera):
+      // cal pujar-la el que hi ha entre el panell i la imatge.
+      const arrel = caixa.firstElementChild;
+      const topImatge = arrel
+        ? (r.top - arrel.getBoundingClientRect().top) / previ
+        : 0;
+      const dy = -topImatge;
+      const igual = Math.abs(prev.escala - escala) < 0.002
+        && Math.abs((prev.alcada || 0) - alcada) < 0.5
+        && Math.abs((prev.dy || 0) - dy) < 0.5;
+      return igual ? prev : { escala, alcada, dy };
     });
   }, []);
 
@@ -70,15 +79,15 @@ export default function FranjaEscalada({ children }) {
         width: '100%',
         height: '100%',
         display: 'flex',
-        alignItems: 'flex-start',
+        alignItems: 'center',
         justifyContent: 'center',
         overflow: 'hidden',
       }}
     >
       <div
         style={{
-          height: '100%',
-          transform: `translateY(${mides.dy}px) scale(${mides.escala})`,
+          height: mides.alcada ? `${mides.alcada}px` : '100%',
+          transform: `translateY(${mides.dy || 0}px) scale(${mides.escala})`,
           transformOrigin: 'top center',
           // Els desplaçaments de calibracio de la filera horitzontal no hi son.
           '--megaStripeDx': '0px',
