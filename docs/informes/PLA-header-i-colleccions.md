@@ -96,6 +96,23 @@ marginTop: `calc((var(--hg-tdp-xL) - var(--hg-tdp-xR)) * 0.3385 ... + ${pushDown
 
 O sigui que hi ha **dues** coses millorables:
 
+0. **Mesurat amb instrumentacio (ronda 5)**: posant un registre a cada
+   passada de `mesura()` a la pagina d'Austen, nome s'executa **dues vegades** i
+   els valors diuen on es el problema:
+
+   | passada | t | headerBottom | hero top | hero bottom | tdp top | marge aplicat |
+   |---|---|---|---|---|---|---|
+   | 1 | 2376 ms | 163 | **105** | 973 | 972 | 35 |
+   | 2 | 2765 ms | 163 | **115** | 983 | 994 | 59 |
+
+   El `headerBottom` no es mou i l'alcada de la hero es constant (868 a les
+   dues). El que canvia es que **la hero baixa 10 px tota sola** entre les dues
+   passades, i aleshores el `pushDownPx` la compensa (+24) i arrossega la
+   graella 22 px. Es a dir: el residu no el crea el bucle de punt fix, el crea
+   **allo que mou la hero**. El seguent pas es identificar que la mou: els
+   candidats son la carrega dels recursos de la hero (imatge o tipografia) i
+   alguna cosa de la capcalera que canvia d'alcada entre 2,4 s i 2,8 s.
+
 0. **Provat i descartat**: canviar el `setTimeout(mesura, 300)` per un
    `requestAnimationFrame(mesura)` (que s'executa abans del pintat) **no ho
    arregla**: la traça segueix donant tres estats (hero 105 → 111 → 107, graella
