@@ -96,6 +96,24 @@ marginTop: `calc((var(--hg-tdp-xL) - var(--hg-tdp-xR)) * 0.3385 ... + ${pushDown
 
 O sigui que hi ha **dues** coses millorables:
 
+0. **ARREL ACOTADA (rondes 6 i 7)**: la cadena d'ancestres de la hero i la
+   instrumentacio de l'offset donen el quadre seguent:
+
+   - `--appHeaderOffset` val **156 px des del primer render i no canvia mai**
+     (instrumentats els seus quatre termes: base 116, ofertes 0, banner 40,
+     ruler 0, tots estables des de t=534 ms).
+   - `main` te `padding-top: 156px` **constant**.
+   - Pero el **fill de `main` arrenca a 166 px i llisca fins a 156** en dos
+     passos (166 -> 160 -> 156), i arrossega tota la pagina.
+
+   O sigui: ni l'offset ni el padding son el problema; ho es **el fill de
+   `main`, que arrenca 10 px mes avall i s'hi anima**. Els passos (10, 6, 4)
+   tenen la forma d'una transicio, i `main` porta `transition-[padding-top]
+   duration-[350ms]`. El seguent pas es trobar qui aplica aquests 10 px al fill
+   (candidats: `OverlayUnderHeader`, la franja d'ofertes/banner, o un
+   `translateY` d'algun embolcall de pagina). Amb aixo es tanca el moviment de
+   la colleccio.
+
 0. **ARREL TROBADA (ronda 6)**: traçant la cadena d'ancestres de la hero
    s'acaba de veure d'on ve el residu. El `top` de la pagina sencera arrenca a
    **166 px** i s'assenta a **156**, en dos passos:
