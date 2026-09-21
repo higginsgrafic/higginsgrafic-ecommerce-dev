@@ -729,7 +729,7 @@ export default function MegaslidePagina2({
                     />
                   </div>
                 </div>
-                <div style={{ height: '100%', transform: 'translateY(-114.99px) scale(2.029)', transformOrigin: 'center center', '--megaStripeDx': '0px', '--megaStripeDy': '0px' }}>
+                <div style={{ height: '100%', transform: 'translateY(-126.35px) scale(2.098)', transformOrigin: 'center center', '--megaStripeDx': '0px', '--megaStripeDy': '0px' }}>
                   <MegaStripePanel
                     {...propsFranjaP2}
                     isPortraitTablet
