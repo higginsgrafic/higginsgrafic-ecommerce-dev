@@ -236,8 +236,13 @@ function MegaStripePanel({
     const handler = (ev) => {
       if (typeof onShirtClick !== 'function') return;
       const x = ev.detail?.x;
+      const y = ev.detail?.y;
       if (typeof x !== 'number') return;
-      const tileIdx = Math.min(13, Math.max(0, Math.floor(x * 14)));
+      // A la vertical la franja son DUES fileres de 7: la casella surt de la
+      // columna (x) I de la filera (y). A l'apaisada van totes en una filera.
+      const tileIdx = (isPortraitTablet && typeof y === 'number')
+        ? Math.min(13, Math.max(0, (y < 0.5 ? 0 : 7) + Math.min(6, Math.max(0, Math.floor(x * 7)))))
+        : Math.min(13, Math.max(0, Math.floor(x * 14)));
       const item = stripeTileItems?.[tileIdx] || selectedItem || stripeTileItems?.[0];
       if (!item) return;
       onShirtClick(active, item, shirtColor);
