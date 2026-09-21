@@ -96,6 +96,13 @@ marginTop: `calc((var(--hg-tdp-xL) - var(--hg-tdp-xR)) * 0.3385 ... + ${pushDown
 
 O sigui que hi ha **dues** coses millorables:
 
+0. **Provat i descartat**: canviar el `setTimeout(mesura, 300)` per un
+   `requestAnimationFrame(mesura)` (que s'executa abans del pintat) **no ho
+   arregla**: la traça segueix donant tres estats (hero 105 → 111 → 107, graella
+   665 → 659 → 655). O sigui que el `pushDownPx` no es l'unic que mou la
+   graella; hi ha alguna altra cosa que es torna a mesurar mes tard (candidats:
+   `posterExtraPx`, la franja `heroBandTopPx` o el propi `Pauta4ColsOverlay`).
+   Caldrà instrumentar-ho abans de tocar res mes.
 1. **La convergencia s'ha de fer abans del pintat**: dins d'un `useLayoutEffect` i iterant sincronament (les actualitzacions d'estat dins d'un layout effect es resolen abans que el navegador pinti), i sense el `setTimeout` de 300 ms.
 2. **Millor encara, treure el bucle**: l'objectiu del càlcul es "que la graella comenci 24 px sota la hero", i tant la posicio de la hero com el marge base de la graella ja son expressions CSS conegudes (la hero es `calc(100vh - var(--appHeaderOffset))` i el marge porta el terme `0.3385 × carril`). Es a dir, `pushDownPx` es podria escriure directament com un `calc()` i no caldria cap mesura ni cap iteracio.
 
