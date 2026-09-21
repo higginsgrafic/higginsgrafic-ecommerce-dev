@@ -1,4 +1,4 @@
-import { getLayoutViewportWidth } from './layoutMetrics';
+import { getLayoutViewportWidth, getSafeBelt } from './layoutMetrics';
 
 /**
  * layoutModel — model ÚNIC de les mides de layout del lloc.
@@ -142,3 +142,27 @@ export function publishLayoutModel(model) {
  * 40 px que abans no hi era. El publica App amb useLayoutEffect, que ja va
  * abans del primer pintat.
  */
+
+/**
+ * Publica les variables del carril de la pauta (`--hg-tdp-xL/xR`) ABANS que
+ * cap pagina les necessiti.
+ *
+ * Per que cal: el marge de la graella de les colleccions es calcula amb
+ * `calc((var(--hg-tdp-xL) - var(--hg-tdp-xR)) * 0.3385 ...)`. Aquestes
+ * variables les publica el modul `Pauta4ColsOverlay`, que viatja en un chunk
+ * que es carrega mandrosament: a la practica apareixien cap a 1,2 s, DESPRES
+ * del primer pintat, i la graella (i tot el que arrossega) es desplaçava uns
+ * quants px. Com que `getSafeBelt()` es una funcio pura de la finestra, es pot
+ * publicar a l'arrencada i el valor ja es el bo des del principi.
+ */
+export function publishEarlyBeltVars() {
+  if (typeof window === 'undefined' || typeof document === 'undefined') return;
+  try {
+    const belt = getSafeBelt({ maxContent: 1350, sideMargin: 16, minContent: 320 });
+    const root = document.documentElement;
+    root.style.setProperty('--hg-tdp-xL', `${belt.left}px`);
+    root.style.setProperty('--hg-tdp-xR', `${belt.right}px`);
+  } catch {
+    // ignore
+  }
+}

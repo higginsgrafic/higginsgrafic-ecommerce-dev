@@ -65,32 +65,41 @@ El `<main>` porta `transition-[padding-top] duration-[350ms]`. Qualsevol canvi d
 
 Dues fórmules diferents per al mateix número. `useRouteLayout.js` **no s'usa enlloc** (codi mort), així que avui no fa mal, però és una trampa per al futur.
 
-### 2.6 El residu que queda (mesurat a fons)
+### 2.6 El residu: causa trobada (bucle de punt fix)
 
-Amb els quatre arreglaments aplicats, a la pàgina de col·lecció a 768 px el moviment ja **no és de 40 px, sinó de passos petits d'1 a 8 px**. Traça a `/austen` (mostreig cada 120 ms, elements identificats):
+Amb els quatre arreglaments aplicats, a 768 px el moviment de la col·lecció ja no és de 40 px sinó de passos d'1 a 10 px. Traça a `/austen` (cada 100 ms):
 
 ```
---- canvi a 1680 ms
-    main      753x3045 -> 753x3058
-    seccio    161 -> 156
-    TramFinal 2166 -> 2174
-    fill.0    "CADA DIBUIX TÉ UNA HISTÒRIA"  2533 -> 2541
-    fill.1    "ALTRES HISTÒRIES"             2854 -> 2862
-    fill.2 / rail (658 px d'alçada, no canvia) 2689 -> 2697
-    graella   660 -> 668
---- canvi a 1800 ms
-    rail 2697 -> 2696
+offset 156px  ruler 0px  pt 156px   (ESTABLES tota l'estona)
+hero   top 105  h868 -> top 108  h868 -> top 107  h868     (l'alcada NO canvia)
+graella top 665 h3310 -> top 655 h3310 -> top 668 h3310    (l'alcada NO canvia)
 ```
 
-Llegit: la **graella** i tot el que ve després es desplacen ±8 px, i el `top` de la secció oscil·la 5 px. L'alçada de res no canvia (la graella fa 3310 px i el rail 658 px en tots els estats): el que canvia és **el punt on comença el contingut**, o sigui `padding-top` del `<main>` o l'alçada de la hero.
+Cap alçada no canvia mai: el que balla és **on comença el contingut**. I la causa és a `CollectionAustenPage.jsx` (i igual a les altres quatre), a `pushDownPx`:
 
-Com que `--appHeaderOffset` val 156 px estable a 768 px, la sospita principal és:
+```js
+setPushDownPx((prev) => {
+  const base = topActual - prev;                       // posicio sense el desplaçament actual
+  const cal = Math.max(0, Math.round(heroBottom + 24 - base));
+  return Math.abs(cal - prev) < 1 ? prev : cal;        // convergeix quan la diferencia es < 1 px
+});
+// ...
+mesura();
+const t = window.setTimeout(mesura, 300);              // <-- segona passada DESPRES del pintat
+```
 
-- **`rulerInset`**: val 0 px a les mostres, però el `<main>` també en rep el valor com a `padding-left`. Si el publica tard alguna ruta de dev, mouria 18 px.
-- **L'alçada de la hero**: ara és `calc(100vh - var(--appHeaderOffset))`. Si la finestra o el `--appHeaderOffset` canvien dins dels primers 2 s (per exemple per la barra d'ofertes), la hero canvia i ho arrossega tot.
-- **El `Pauta4ColsOverlay`**: té un `MutationObserver` sobre l'atribut `style` de `<html>` que el fa recalcular quan canvia qualsevol variable del root. Com que ell mateix n'escriu, qualsevol altra escriptura el torna a fer córrer.
+Es un **bucle de punt fix**: cada passada mou la graella una mica fins que la diferencia es inferior a 1 px. Com que la segona passada va dins d'un `setTimeout` de 300 ms, cau **després del pintat** i el moviment es veu. El marge que ajusta es el de la graella:
 
-És el punt número u a atacar a l'Etapa A, i **no l'he volgut tocar sense el vistiplau** perquè afecta el sistema de pauta compartit per totes les pàgines.
+```js
+marginTop: `calc((var(--hg-tdp-xL) - var(--hg-tdp-xR)) * 0.3385 ... + ${pushDownPx}px ...)`
+```
+
+O sigui que hi ha **dues** coses millorables:
+
+1. **La convergencia s'ha de fer abans del pintat**: dins d'un `useLayoutEffect` i iterant sincronament (les actualitzacions d'estat dins d'un layout effect es resolen abans que el navegador pinti), i sense el `setTimeout` de 300 ms.
+2. **Millor encara, treure el bucle**: l'objectiu del càlcul es "que la graella comenci 24 px sota la hero", i tant la posicio de la hero com el marge base de la graella ja son expressions CSS conegudes (la hero es `calc(100vh - var(--appHeaderOffset))` i el marge porta el terme `0.3385 × carril`). Es a dir, `pushDownPx` es podria escriure directament com un `calc()` i no caldria cap mesura ni cap iteracio.
+
+Tambe s'ha provat una cosa relacionada: `--hg-tdp-xL/xR` (que el marge de la graella tambe fa servir) les publica el modul `Pauta4ColsOverlay`, que viatja en un chunk mandros. S'ha afegit la publicacio a l'arrencada (`publishEarlyBeltVars` a `utils/layoutModel.js`, cridada des de `main.jsx`) perque el valor hi sigui des del principi. No ha canviat el residu (la seva causa es `pushDownPx`), pero elimina una font de variacio i no fa mal.
 
 ---
 

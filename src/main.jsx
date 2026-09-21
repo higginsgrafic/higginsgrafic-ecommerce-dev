@@ -1,5 +1,6 @@
 import { initSentry } from '@/lib/sentry';
 import { injectPlausible } from '@/lib/analytics';
+import { publishEarlyBeltVars } from '@/utils/layoutModel';
 
 // Inicialitzem Sentry el més aviat possible per capturar tots els errors
 initSentry();
@@ -7,6 +8,11 @@ initSentry();
 injectPlausible();
 
 console.log('🚀 main.jsx is loading...');
+
+// El carril de la pauta es una funcio pura de la finestra: el publiquem abans
+// que cap pagina el necessiti. Si no, apareix quan es carrega el chunk de la
+// pauta (cap a 1,2 s) i la graella de les colleccions es desplaça.
+publishEarlyBeltVars();
 
 
 const __HG_FATAL_OVERLAY_ID__ = '__HG_FATAL_OVERLAY__';
