@@ -2,6 +2,7 @@ import React, { useState, useEffect, useLayoutEffect, useMemo, useCallback, useT
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 import { useProductContext } from '@/contexts/ProductContext';
+import { computeLayoutModel, headerHeightFor } from '@/utils/layoutModel';
 import { useAdmin } from '@/contexts/AdminContext';
 import { useOffersConfig } from '@/hooks/useOffersConfig';
 import { useGlobalRedirect } from '@/hooks/useGlobalRedirect';
@@ -166,7 +167,13 @@ function App() {
 
   const offersHeaderVisible = !isAdminRoute && !isFullScreenRoute && !isDevLayoutRoute && !isHomeRoute && offersEnabled && !offersLoading;
 
-  const baseHeaderHeight = isPortraitTablet ? 116 : (isLargeScreen ? 80 : (isMobile ? 80 : 64));
+  // L'alcada base de capcalera surt del model unic (`utils/layoutModel`).
+  // Nomes depen de les mides de la finestra, aixi que es pot calcular aqui
+  // dalt; els offsets que hi sumen ofertes i banners es calculen mes avall,
+  // quan ja se sap si es veuen.
+  const baseHeaderHeight = headerHeightFor({
+    isMobile, isPortraitTablet, isLargeScreen, isDesktop: isLargeScreen,
+  });
   // La transicio del `padding-top` del <main> serveix per acompanyar els
   // canvis de capcalera (obrir el megaslide, banners). Al PRIMER pintat, pero,
   // el layout encara s'assenta i la transicio convertia aquell assentament en
@@ -187,9 +194,21 @@ function App() {
 
   const isPrivacyRoute = location.pathname === '/privacy';
 
+  // Ara ja se sap tot el que influeix en els offsets (ofertes, banners, rulers).
+  const layoutModel = useMemo(() => computeLayoutModel({
+    deviceLayout: {
+      isMobile, isPortraitTablet, isLandscapeTablet,
+      isDesktop: isLargeScreen, isLargeScreen,
+      viewportWidth, viewportHeight,
+    },
+    alcadaOfertesPx: offersHeaderHeight,
+    alcadaBannerAdminPx: adminBannerHeight,
+    rulerInsetPx: rulerInset,
+  }), [isMobile, isPortraitTablet, isLandscapeTablet, isLargeScreen, viewportWidth, viewportHeight, offersHeaderHeight, adminBannerHeight, rulerInset]);
+
   const adminRouteOffset = `${adminBannerHeight + adminRouteDevHeaderHeight + rulerInset}px`;
-  const appHeaderOffset = `${(isDevHeaderRoute ? heroSettingsDevHeaderHeight : baseHeaderHeight) + offersHeaderHeight + adminBannerHeight + rulerInset}px`;
-  const globalHeaderTopOffset = `${offersHeaderHeight + adminBannerHeight + rulerInset}px`;
+  const appHeaderOffset = layoutModel.appHeaderOffset;
+  const globalHeaderTopOffset = layoutModel.globalHeaderTopOffset;
   const demoHeaderOffset = `${adminBannerHeight + rulerInset}px`;
 
   // useLayoutEffect i no useEffect: aquestes variables son la base de tot el

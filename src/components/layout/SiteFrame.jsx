@@ -1,5 +1,6 @@
 import { useLayoutEffect } from 'react';
 import { getLayoutViewportWidth } from '@/utils/layoutMetrics';
+import { siteFrameForViewport } from '@/utils/layoutModel';
 
 /**
  * SiteFrame — referència estructural transversal del lloc.
@@ -35,27 +36,16 @@ function readRulerInset() {
 
 export function computeSiteFrame() {
   if (typeof window === 'undefined' || typeof document === 'undefined') return null;
-  // Usem la font de veritat unificada de `layoutMetrics.js`, que resta
-  // l'amplada real de la scrollbar del sistema. Això garanteix que tant la
-  // Pauta com SiteFrame calculen EXACTAMENT les mateixes coordenades de
-  // centratge horitzontal a totes les pàgines (amb scrollbar o sense).
   const vw = getLayoutViewportWidth();
   if (!Number.isFinite(vw) || vw <= 0) return null;
-  // El `<main>` aplica `paddingLeft: var(--rulerInset)` a l'esquerra (per
-  // deixar lloc als rulers de dev). El contingut útil de la pàgina és
-  // [rulerInset, vw]. Centrem el frame en aquest interval perquè coincideixi
-  // amb com es centra la Pauta i la resta de layouts productius.
-  const inset = readRulerInset();
-  const available = Math.max(0, vw - inset);
-  const w = Math.max(0, Math.min(SITE_FRAME_MAX_WIDTH, available - SITE_FRAME_MIN_GUTTER * 2));
-  const xL = Math.round(inset + (available - w) / 2);
-  const xR = xL + w;
+  const marc = siteFrameForViewport({ vw, rulerInset: readRulerInset() });
+  if (!marc) return null;
   // Mitja reserva de la barra de desplaçament (o del seu lloc): el marc es
-  // centra sobre la FINESTRA, però el cos és `gutter` px més estret. Les capes
+  // centra sobre la FINESTRA, pero el cos es `gutter` px mes estret. Les capes
   // que es pengen d'un contenidor centrat al COS (el megaslide) necessiten
   // aquesta meitat per caure al mateix lloc que el marc.
   const gutter = Math.max(0, (window.innerWidth || 0) - (document.body?.clientWidth || 0));
-  return { xL, xR, w, gutterMig: gutter / 2 };
+  return { xL: marc.xL, xR: marc.xR, w: marc.width, gutterMig: gutter / 2 };
 }
 
 export default function SiteFrame() {
