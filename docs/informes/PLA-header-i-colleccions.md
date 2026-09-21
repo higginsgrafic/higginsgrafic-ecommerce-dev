@@ -267,7 +267,21 @@ Els 7 estats de mesura de cada pàgina de col·lecció: `heroBandTopPx`, `heroBo
 
 **Com, en passos petits (no una reescriptura de 3.340 línies d'un cop)**:
 
-1. Inventariar les 8 mesures i classificar-les: (a) les que es poden calcular (passar al model), (b) les que depenen de contingut de veritat (text de l'usuari, imatge) i per tant s'han de quedar.
+1. Inventariar les mesures i classificar-les. **FET (ronda 11)**. N'hi ha set, i aquesta es la classificacio:
+
+   | mesura | linia | que es | classe |
+   |---|---|---|---|
+   | `setMegaHeroRowHeight` | 2235 | alcada de la fila de la hero del megaslide (24 files sobre l'alcada d'una graella) | **(a) calculable** (mateixa formula que `rowHeight` de les colleccions: carril x 0.0280625 - 2.875) |
+   | `setMegaInsetsPx` | 2362 | marges interiors del megaslide | **(a) calculable** (deriva del carril i del marc) |
+   | `setBleedGuardExpandPx` | 417 | expansio esquerra/dreta del "bleed guard" | **(a) calculable** (deriva del marc del lloc) |
+   | `setRootRemPx` | 2820 | mida base `rem` de l'aplicacio | **(a) calculable** (es una funcio de l'amplada; de fet ja te el fallback 16) |
+   | `setStripeRowPadPx` | 1967 | padding vertical de la filera de la franja | **(b) depen de contingut** (alcada real de les targetes) |
+   | `setStripeRowPadXPx` | 1970 | padding horitzontal de la filera de la franja | **(b) depen de contingut** |
+   | `setLockBtnTop` | 2025 | posicio vertical del cadenat | **(b) depen de posicio** (penja d'un ancoratge del DOM) |
+
+   Es a dir: **quatre de les set son calculables** i son les candidates a passar al
+   model; les tres restants depenen de contingut o d'ancoratges i s'han de quedar
+   (pero s'han de poder mesurar **abans del pintat**, amb `useLayoutEffect`).
 2. Substituir les de tipus (a) pel model, una a una, verificant.
 3. Un cop no en quedi cap, simplificar el JSX que les consumia i treure els efectes morts.
 4. Al final, avaluar si val la pena reescriure el fitxer sencer o si ja ha quedat net.
