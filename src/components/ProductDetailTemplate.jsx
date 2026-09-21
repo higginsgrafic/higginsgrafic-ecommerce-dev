@@ -505,28 +505,6 @@ export default function ProductDetailTemplate({ product }) {
           </div>
         </div>
 
-        {/* Subtítol "ALTRES HISTÒRIES" */}
-        <div
-          style={{
-            gridColumn: '1 / 3',
-            gridRow: '50 / 51',
-            alignSelf: 'center',
-            fontFamily: 'Roboto Condensed, sans-serif',
-            fontWeight: 400,
-            fontSize: '15pt',
-            lineHeight: 1.2,
-            letterSpacing: '0.2em',
-            textTransform: 'uppercase',
-            color: 'rgba(71, 80, 89, 0.7)',
-            textAlign: 'left',
-            pointerEvents: 'auto',
-            // Baixat 10 px a la vista vertical.
-            transform: 'translate(2px, 10px)',
-          }}
-        >
-          ALTRES HISTÒRIES
-        </div>
-
         {/* Fletxes També et pot interessar */}
         <div
           style={{
@@ -710,7 +688,8 @@ export default function ProductDetailTemplate({ product }) {
             gridRow: '48 / 65',
             alignSelf: 'start',
             width: '100%',
-            marginTop: '-48px',
+            // Les targetes del rail de recomanats, 50 px mes avall.
+            marginTop: '12px',
           }}
         >
           <TambeRail cardHref={`/${COLLECTION_SLUG}/${PRODUCT_ROUTE}`} title="cada dibuix té una història" showInternalArrows={false} showTitle={false} />
