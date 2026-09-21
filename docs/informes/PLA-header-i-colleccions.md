@@ -276,6 +276,27 @@ Els 7 estats de mesura de cada pàgina de col·lecció: `heroBandTopPx`, `heroBo
 
 ---
 
+### Estat de la verificacio (ronda 10)
+
+Traces fetes amb 20-24 mostres cada 120 ms a 768 px. **Un sol estat vol dir que
+la pagina no es mou.** Resultat actual:
+
+| vista | estats |
+|---|---|
+| colleccio /austen | 1 |
+| colleccio /cube | 1 |
+| colleccio /first-contact | 1 |
+| colleccio /miscellania | 1 |
+| colleccio /the-human-inside | 1 |
+| PDP /austen/keep-calm | 1 |
+| inici / | 1 |
+| megaslide (austen i cube) | 1 |
+| constructor/colleccio | 1 |
+
+I tambe a 1280 i 1440 px a la colleccio. O sigui: **el moviment del layout esta
+eliminat** a tot allo que s'ha pogut mesurar. El que queda de l'objectiu es
+refer (etapes B i C), no arreglar moviment.
+
 ## 5. Protocol de verificació (igual a cada etapa)
 
 1. `npx vitest run` → 462 proves, 38 fitxers, tot verd.
