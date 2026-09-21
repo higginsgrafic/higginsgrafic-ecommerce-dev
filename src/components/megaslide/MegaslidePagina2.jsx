@@ -692,6 +692,26 @@ export default function MegaslidePagina2({
                 numColumns={16}
                 activeCollection={active}
                 isPortraitTablet={isPortraitTablet}
+                /* El tap en un dibuix tambe tria la seva colleccio, com a la
+                   filera (onSelectGroup). */
+                onSelectGroup={(collection, subcollection, firstStripeItem) => {
+                  if (collection !== active) setActive(collection);
+                  if (collection === 'austen') {
+                    setAustenSubcollection(subcollection);
+                  } else {
+                    setAustenSubcollection(null);
+                  }
+                  setStripeOverlayOverrideActive(false);
+                  if (firstStripeItem) {
+                    if (collection === 'first_contact') {
+                      setFirstContactSelectedItem(firstStripeItem);
+                    } else if (collection === 'the_human_inside') {
+                      setHumanInsideSelectedItem(firstStripeItem);
+                    } else {
+                      setSelectedItemByCollection((prev) => ({ ...prev, [collection]: firstStripeItem }));
+                    }
+                  }
+                }}
               />
             )}
             colleccions={(
