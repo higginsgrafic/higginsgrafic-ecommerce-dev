@@ -719,6 +719,16 @@ export default function MegaslidePagina2({
               /* La franja de debò: el mateix panell que la filera, amb la imatge
                  de dues fileres (7+7), escalat per encaixar a la casella. */
               <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                {/* La stripe de la pagina 1, a sobre de la de la 2, per comparar-les. */}
+                <div style={{ position: 'absolute', inset: 0, height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', pointerEvents: 'none', zIndex: 50 }}>
+                  <div style={{ height: '100%', transform: 'translateY(-114.99px) scale(2.029)', transformOrigin: 'center center' }}>
+                    <img
+                      src="/placeholders/tablet vertical/full-color-stripe-doble.webp"
+                      alt=""
+                      style={{ height: '101.9px', width: 'auto', display: 'block', transform: 'translate(60.3px, 230.8px)', opacity: 0.5 }}
+                    />
+                  </div>
+                </div>
                 <div style={{ height: '100%', transform: 'translateY(-114.99px) scale(2.029)', transformOrigin: 'center center', '--megaStripeDx': '0px', '--megaStripeDy': '0px' }}>
                   <MegaStripePanel
                     {...propsFranjaP2}
