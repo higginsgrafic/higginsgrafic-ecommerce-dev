@@ -167,6 +167,17 @@ function App() {
   const offersHeaderVisible = !isAdminRoute && !isFullScreenRoute && !isDevLayoutRoute && !isHomeRoute && offersEnabled && !offersLoading;
 
   const baseHeaderHeight = isPortraitTablet ? 116 : (isLargeScreen ? 80 : (isMobile ? 80 : 64));
+  // La transicio del `padding-top` del <main> serveix per acompanyar els
+  // canvis de capcalera (obrir el megaslide, banners). Al PRIMER pintat, pero,
+  // el layout encara s'assenta i la transicio convertia aquell assentament en
+  // un llimac de 350 ms: es veia moure tota la pagina. L'activem un cop
+  // pintat, aixi el muntatge inicial es quiet i la resta segueix animant-se.
+  const [transicionsLayoutActives, setTransicionsLayoutActives] = useState(false);
+  useEffect(() => {
+    const id = requestAnimationFrame(() => setTransicionsLayoutActives(true));
+    return () => cancelAnimationFrame(id);
+  }, []);
+
   const heroSettingsDevHeaderHeight = isDevHeaderRoute ? baseHeaderHeight : 0;
   const offersHeaderHeight = offersHeaderVisible ? 40 : 0;
   const adminBannerVisible = (isAdmin || isDevDemoRoute || isAdminRoute) && !isEmbeddedPreview;
@@ -262,7 +273,7 @@ function App() {
 
         <main
           id="main-content"
-          className={`flex-grow ${isAdminRoute ? 'overflow-y-auto' : ''} ${!isFullScreenRoute ? 'transition-[padding-top] duration-[350ms] ease-[cubic-bezier(0.32,0.72,0,1)]' : ''} ${layoutInspectorActive ? 'debug-containers' : ''}`}
+          className={`flex-grow ${isAdminRoute ? 'overflow-y-auto' : ''} ${(!isFullScreenRoute && transicionsLayoutActives) ? 'transition-[padding-top] duration-[350ms] ease-[cubic-bezier(0.32,0.72,0,1)]' : ''} ${layoutInspectorActive ? 'debug-containers' : ''}`}
           style={!isFullScreenRoute ? (
             isAdminRoute
               ? { paddingTop: adminRouteOffset, paddingLeft: `${rulerInset}px`, '--appHeaderOffset': adminRouteOffset, '--rulerInset': `${rulerInset}px` }
