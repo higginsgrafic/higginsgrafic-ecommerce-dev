@@ -13,6 +13,7 @@ import {
   STRIPE_DRAWING_ESCALA_VERTICAL,
   STRIPE_DRAWING_DX_VERTICAL,
   STRIPE_DRAWING_GIRAT_VERTICAL,
+  VEL_SAMARRETA_BUIDA_ALFA_BLANCA,
 } from '../../config/stripeCalibrationsVertical';
 import { carrilPx } from '../../utils/layoutMetrics.js';
 import {
@@ -592,18 +593,17 @@ function MegaStripePanel({
                           const ajustGir = extrem ? 302.2 : 65.3;
                           // El vel, 0,5 px mes amunt (en unitats del panell).
                           const AJUST_VEL_Y = 1.6767;
+                          const esBlanca = shirtColor === '#FFFFFF';
                           return (
                             <path
                               key={`hg-vel-${idx}`}
                               id={`hg-vel-${idx}`}
                               d={a.d}
                               transform={`translate(${a.tx}, ${a.ty - AJUST_VEL_Y})${girar ? ` translate(${ajustGir}, 0) scale(-1, 1)` : ''} ${a.transform}`}
-                              // Gris en comptes de blanc: sobre la samarreta blanca
-                              // el blanc no es veia i no es podia comprovar res.
-                              // Sobre samarreta blanca cal un gris perque es vegi;
-                              // sobre un color, el que cal es atenuar de debo: blanc.
-                              fill={shirtColor === '#FFFFFF' ? 'var(--hgStripeEmptyVeilFill, #DCDCDC)' : '#FFFFFF'}
-                              fillOpacity="var(--hgStripeEmptyVeilAlpha, 0.6)"
+                              // Blanc pla, sense cap efecte: la samarreta
+                              // s'aclareix cap al fons conservant el seu to.
+                              fill="#FFFFFF"
+                              fillOpacity={esBlanca ? VEL_SAMARRETA_BUIDA_ALFA_BLANCA : 'var(--hgStripeEmptyVeilAlpha, 0.85)'}
                               clipRule="evenodd"
                             />
                           );
