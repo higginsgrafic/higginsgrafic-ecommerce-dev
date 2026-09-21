@@ -473,7 +473,7 @@ export default function MegaMenuPanel({
                               <MegaStripePanelP1
                                 {...propsFranjaP1}
                                 isPortraitTablet
-                                stripeImageSrc="/placeholders/tablet vertical/stripe-curta-7+7.png"
+                                stripeImageSrc="/placeholders/tablet vertical/full-color-stripe-doble.webp"
                                 senseMascaraSamarreta
                               />
                             </div>
