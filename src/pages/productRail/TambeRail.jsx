@@ -59,6 +59,8 @@ export default function TambeRail({
   stabilizedViewportScale = 1,
   stabilizedViewportWidth = null,
   stabilizedGutterX = null,
+  // Distancia del bloc de text al fons de la targeta.
+  textBottomPx = 8,
 }) {
   const [shirtDrawingEnabled, setShirtDrawingEnabled] = useState(() => {
     try {
@@ -443,7 +445,7 @@ export default function TambeRail({
                       href={cardLink}
                       imageSrc={img}
                       topPx={cardImgTopPx}
-                      textBottomPx={8}
+                      textBottomPx={textBottomPx}
                       imgPaddingPx={48}
                       leftPx={leftPx}
                       tileStyle={dynamicTileStyle}

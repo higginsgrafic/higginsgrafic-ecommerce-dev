@@ -496,6 +496,8 @@ function PdpDesktop({ product }) {
               showTitle={false}
               showInternalArrows={false}
               visibleCards={isPortraitTablet ? 3 : 4}
+              // A la vertical, els textos de les targetes 10 px mes amunt.
+              textBottomPx={isPortraitTablet ? 18 : 8}
               stabilizeInitialLayout={isPortraitTablet}
               stabilizedViewportScale={1}
               stabilizedViewportWidth={portraitRailViewportWidth}
