@@ -282,4 +282,8 @@ export const VEL_SAMARRETA_BUIDA_ALFA_BLANCA = 0.6;
  *     'austen/pride-and-prejudice-3/nx-01-stripe.webp': true,
  *   };
  */
-export const STRIPE_DRAWING_GIRAT_VERTICAL = {};
+export const STRIPE_DRAWING_GIRAT_VERTICAL = {
+  // Dibuixos que van girats a la segona filera de la franja vertical.
+  'Mazinger C': true,
+  RoboCube: true,
+};
