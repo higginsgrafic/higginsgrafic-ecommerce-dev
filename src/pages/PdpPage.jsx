@@ -23,6 +23,12 @@ const PDP_PRESET_VERSION = 'pdp-layout-2026-06-06-1953';
 // mes alta que ampla). Es el numero a retocar si en cal mes o menys.
 const AJUST_PDP_VERTICAL_PX = 40;
 
+// Quan ha de baixar el bloc de les tres columnes (la filera de la PDP:
+// miniatures, samarreta i informacio) a la tauleta vertical, a mes del marge
+// de 100 px que ja porta. Nomes mou aquest bloc; el rail de dalt i la resta
+// de la pagina no es desplacen. Es el numero a retocar si en cal mes o menys.
+const BAIXADA_BLOC_PDP_VERTICAL_PX = 150;
+
 const PDP_TITLE_SETTINGS = {
   x: 0, y: 0, fontFamily: 'Oswald', fontSize: 24, fontWeight: 300, selectedFontWeight: 700,
   letterSpacing: 0.003, lineHeight: 1, textAlign: 'left', verticalAlign: 'bottom',
@@ -510,7 +516,9 @@ function PdpDesktop({ product }) {
           style={{
             height: isLandscapeTablet && Number.isFinite(tdpAvailableHeight) ? `${tdpRenderedHeight}px` : undefined,
             overflow: isLandscapeTablet && Number.isFinite(tdpAvailableHeight) ? 'hidden' : undefined,
-            marginTop: isPortraitTablet ? '100px' : (esApaissadaAmpla ? '18px' : (isLandscapeTablet ? '68px' : (esEscriptoriEstret ? '-12px' : '-32px'))),
+            // A la tauleta vertical, el bloc de les tres columnes va 150 px
+            // mes avall del marge de sempre (100 px).
+            marginTop: isPortraitTablet ? `${100 + BAIXADA_BLOC_PDP_VERTICAL_PX}px` : (esApaissadaAmpla ? '18px' : (isLandscapeTablet ? '68px' : (esEscriptoriEstret ? '-12px' : '-32px'))),
             marginBottom: '32px',
           }}
         >

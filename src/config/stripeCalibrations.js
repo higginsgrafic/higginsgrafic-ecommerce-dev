@@ -209,9 +209,11 @@ export const STRIPE_DRAWING_CALIBRATIONS = {
   '/custom_logos/drawings/images_stripe/austen/keep_calm/color/keep-calm-multi-thru-light-stripe.webp': { dx: 1.25, dy: 28, scale: 0.26 },
   '/custom_logos/drawings/images_stripe/austen/quotes/white/i-prefer-to-be-w-stripe.webp': { dx: 3.75, dy: 16.75, scale: 0.34 },
   '/custom_logos/drawings/images_stripe/austen/crosswords/white/persuasion-1-w-stripe.webp': { dx: 0.75, dy: 30, scale: 0.29 },
-  '/custom_logos/drawings/images_stripe/austen/pemberley_house/color/pemberley-house-multi-light-stripe.webp': { dx: 4.5, dy: 21.5, scale: 0.33 },
-  '/custom_logos/drawings/images_stripe/austen/pemberley_house/white/pemberley-house-w-stripe.webp': { dx: 4.5, dy: 21.5, scale: 0.33 },
-  '/custom_logos/drawings/images_stripe/austen/pemberley_house/black/pemberley-house-b-stripe.webp': { dx: 4.5, dy: 21.5, scale: 0.33 },
+  // Pemberley House: el dx porta incorporat el -2 px que abans s'aplicava
+  // des del codi dels panells (era un pedac de codi, ara es nomes aixo).
+  '/custom_logos/drawings/images_stripe/austen/pemberley_house/color/pemberley-house-multi-light-stripe.webp': { dx: 2.5, dy: 21.5, scale: 0.33 },
+  '/custom_logos/drawings/images_stripe/austen/pemberley_house/white/pemberley-house-w-stripe.webp': { dx: 2.5, dy: 21.5, scale: 0.33 },
+  '/custom_logos/drawings/images_stripe/austen/pemberley_house/black/pemberley-house-b-stripe.webp': { dx: 2.5, dy: 21.5, scale: 0.33 },
   '/custom_logos/drawings/images_stripe/austen/crosswords/white/sense-and-sensibility-4-w-stripe.webp': { dx: 0.75, dy: 30, scale: 0.29 },
   '/custom_logos/drawings/images_stripe/austen/crosswords/white/persuasion-4-w-stripe.webp': { dx: 0.75, dy: 30, scale: 0.29 },
   '/custom_logos/drawings/images_stripe/austen/crosswords/white/persuasion-3-w-stripe.webp': { dx: 0.75, dy: 30, scale: 0.29 },
@@ -291,6 +293,29 @@ export const STRIPE_LAYOUT_DEFAULTS = {
   nudgeStep: 50,
   tileGapPx: 0,
 };
+
+/**
+ * El gap lateral entre els dibuixos de sobre les samarretes A LA VISTA VERTICAL:
+ *
+ *   - PASSOS_ESCALA_GAP_DIBUIX_VERTICAL: cada pas fa el dibuix mes gran el que
+ *     cal perque el gap (la casella menys el dibuix) quedi 0,9^passos del que
+ *     era. CONGELAT: a partir d'aqui les imatges no s'han de fer mes grans.
+ *   - GAP_MOVIMENT_DIBUIX_VERTICAL: el gap que queda respecte del que hi hauria
+ *     sense moure res, desplacant els dibuixos amb el primer de cada filera de 7
+ *     fix. 0,9 = un 10% mes estret; 1,05 = un 5% mes ample. Es el numero a
+ *     retocar si en cal mes o menys.
+ *
+ * A la resta de vistes no s'hi aplica res d'aixo.
+ */
+export const PASSOS_ESCALA_GAP_DIBUIX_VERTICAL = 2;
+
+/**
+ * Mida dels dibuixos de la franja A LA VISTA VERTICAL, respecte del seu
+ * calibratge (1 = la mida del calibratge). L'amo els vol un 20% mes petits.
+ * Tambe es la mida amb que s'ha calculat STRIPE_DRAWING_DY_VERTICAL.
+ */
+export const ESCALA_DIBUIX_VERTICAL = 0.8;
+export const GAP_MOVIMENT_DIBUIX_VERTICAL = 0.8806;
 
 /**
  * Resol la calibració per a un overlay key, prioritzant: localStorage map →
