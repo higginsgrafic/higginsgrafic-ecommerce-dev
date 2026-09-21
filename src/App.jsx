@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useCallback, useTransition, Suspense, lazy } from 'react';
+import React, { useState, useEffect, useLayoutEffect, useMemo, useCallback, useTransition, Suspense, lazy } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 import { useProductContext } from '@/contexts/ProductContext';
@@ -181,7 +181,11 @@ function App() {
   const globalHeaderTopOffset = `${offersHeaderHeight + adminBannerHeight + rulerInset}px`;
   const demoHeaderOffset = `${adminBannerHeight + rulerInset}px`;
 
-  useEffect(() => {
+  // useLayoutEffect i no useEffect: aquestes variables son la base de tot el
+  // layout (la capcalera, la hero i els paddings hi pengen). Publicant-les
+  // DESPRES del pintat, la pagina es pintava amb el valor vell i es
+  // recol-locava al segon pas, i es veia moure tot.
+  useLayoutEffect(() => {
     try {
       if (isFullScreenRoute) return;
       const nextOffset = isAdminRoute ? adminRouteOffset : (isDemoStyleLayoutRoute ? demoHeaderOffset : appHeaderOffset);
