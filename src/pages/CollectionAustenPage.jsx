@@ -3,6 +3,7 @@ import { Helmet } from 'react-helmet';
 import { Link } from 'react-router-dom';
 import Pauta4ColsOverlay from '@/components/pauta/Pauta4ColsOverlay';
 import { getSafeBelt, esTauletaApaisada } from '@/utils/layoutMetrics';
+import { laneForViewport } from '@/utils/layoutModel';
 import { useCollectionCardLayout } from '@/hooks/useCollectionCardLayout';
 import { collectionGridImageFor, gridFinishFor, collectionGridHoverVariantsFor } from '@/lib/pdpMockup';
 import HeroSlider from '@/components/HeroSlider';
@@ -193,9 +194,10 @@ function CollectionAustenPage() {
   // del carril (mesurat a 540, 720 i 900 px: 12,28 / 17,34 / 22,39), aixi que
   // NO cal mesurar-la: calculant-la, la hero no es mou quan la mesura
   // s'assenta (abans el `top` de la hero depenia d'aquest estat).
-  const [carrilAmple, setCarrilAmple] = useState(() => {
-    try { return getSafeBelt().width; } catch { return 540; }
-  });
+  // Del model unic, no de `getSafeBelt()`: aixo tanca el `dev != produccio`
+  // que encara hi havia aqui (getSafeBelt prioritza les guies `--belt2-*`, que
+  // nomes existeixen en desenvolupament).
+  const [carrilAmple] = useState(() => laneForViewport());
   const rowHeight = Math.max(1, carrilAmple * 0.0280625 - 2.875);
 
   // La franja blanca ha de tocar el separador del header sense quedar-s'hi a

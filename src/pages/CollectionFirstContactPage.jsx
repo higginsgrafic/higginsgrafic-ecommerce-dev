@@ -16,6 +16,7 @@ import useIsMobile from '@/hooks/useIsMobile';
 import CollectionMobile from '@/pages/CollectionMobile';
 import { SELLING_PRICE_LABEL } from '@/config/pricing';
 import { esTauletaApaisada, getSafeBelt } from '@/utils/layoutMetrics';
+import { laneForViewport } from '@/utils/layoutModel';
 
 // Alcada de la franja blanca de la hero.
 const BAND_HEIGHT = 'clamp(120px, 26vh, 260px)';
@@ -170,9 +171,10 @@ function CollectionFirstContactPage() {
   // del carril (mesurat a 540, 720 i 900 px), aixi que es calcula en lloc de
   // mesurar-la. El `top` de la hero depen d'aquest numero: si es mesura, la
   // hero es mou quan la mesura s'assenta.
-  const [carrilAmple, setCarrilAmple] = useState(() => {
-    try { return getSafeBelt().width; } catch { return 540; }
-  });
+  // Del model unic, no de `getSafeBelt()`: aixo tanca el `dev != produccio`
+  // que encara hi havia aqui (getSafeBelt prioritza les guies `--belt2-*`, que
+  // nomes existeixen en desenvolupament).
+  const [carrilAmple] = useState(() => laneForViewport());
   const rowHeight = Math.max(1, carrilAmple * 0.0280625 - 2.875);
 
   // La franja blanca ha de tocar el separador del header sense quedar-s'hi a
