@@ -692,7 +692,9 @@ export default function MegaslidePagina2({
             )}
             colleccions={(
               <CercadorColleccionsColumna
-                activeKey={active}
+                // La pastilla grisa es marca amb la clau composta, com a la
+                // resta de la casa: 'austen:pemberley'.
+                activeKey={active === 'austen' ? `austen:${austenSubcollection || ''}` : active}
                 // La clau pot portar subcolleccio ('austen:pemberley'): s'ha de
                 // partir. Amb setActive directe quedava com a colleccio sencera,
                 // no existia i la franja queia a repetir un sol dibuix.
