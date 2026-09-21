@@ -1045,12 +1045,6 @@ function MegaStripePanel({
                                     // desplaçaments (en px, dins l'embolcall escalat) no
                                     // s'encongeixin amb ella.
                                     const factorEscalaFranja = 1.027683;
-                                    // Dibuix girat en horitzontal (mirall en X, eix a Y).
-                                    // Giren els dibuixos marcats a la llista i, de moment,
-                                    // tots els de la segona filera.
-                                    const giratDibuix = !!STRIPE_DRAWING_GIRAT_VERTICAL[canonicalKey(picked)]
-                                      || !!STRIPE_DRAWING_GIRAT_VERTICAL[picked]
-                                      || (isPortraitTablet && idx >= 7);
                                     const dyDibuix = isPortraitTablet
                                       ? (STRIPE_DRAWING_DY_VERTICAL[canonicalKey(picked)] ?? STRIPE_DRAWING_DY_VERTICAL[picked] ?? cal.dy) * factorEscalaFranja
                                       : cal.dy;
@@ -1069,7 +1063,7 @@ function MegaStripePanel({
                                     const dxDibuix = isPortraitTablet
                                       ? (cal.dx + (STRIPE_DRAWING_DX_VERTICAL[canonicalKey(picked)] ?? STRIPE_DRAWING_DX_VERTICAL[picked] ?? 0)) * factorEscalaFranja
                                       : cal.dx;
-                                    return `translate(calc(${dxDibuix}px * ${fA} + ${desplacamentGap}% + var(--hgStripeDrawingExtraDx, 0px)), calc(${dyDibuix}px + var(--hgStripeDrawingExtraDy, -5px)${idx < 7 ? ' + var(--hgStripeDrawingExtraDyFilaDalt, 0px)' : ''})) scale(calc(${escalaDibuix} * var(--hgStripeDrawingExtraScale, 1)))${giratDibuix ? ' scaleX(-1)' : ''}`;
+                                    return `translate(calc(${dxDibuix}px * ${fA} + ${desplacamentGap}% + var(--hgStripeDrawingExtraDx, 0px)), calc(${dyDibuix}px + var(--hgStripeDrawingExtraDy, -5px)${idx < 7 ? ' + var(--hgStripeDrawingExtraDyFilaDalt, 0px)' : ''})) scale(calc(${escalaDibuix} * var(--hgStripeDrawingExtraScale, 1)))`;
                                   })(),
                                   filter: (() => {
                                     const baseFx = drawingOverlayDebug
@@ -1314,12 +1308,6 @@ function MegaStripePanel({
                                     // desplaçaments (en px, dins l'embolcall escalat) no
                                     // s'encongeixin amb ella.
                                     const factorEscalaFranja = 1.027683;
-                                    // Dibuix girat en horitzontal (mirall en X, eix a Y).
-                                    // Giren els dibuixos marcats a la llista i, de moment,
-                                    // tots els de la segona filera.
-                                    const giratDibuix = !!STRIPE_DRAWING_GIRAT_VERTICAL[canonicalKey(picked)]
-                                      || !!STRIPE_DRAWING_GIRAT_VERTICAL[picked]
-                                      || (isPortraitTablet && idx >= 7);
                                     const dyDibuix = isPortraitTablet
                                       ? (STRIPE_DRAWING_DY_VERTICAL[canonicalKey(picked)] ?? STRIPE_DRAWING_DY_VERTICAL[picked] ?? cal.dy) * factorEscalaFranja
                                       : cal.dy;
@@ -1338,7 +1326,7 @@ function MegaStripePanel({
                                     const dxDibuix = isPortraitTablet
                                       ? (cal.dx + (STRIPE_DRAWING_DX_VERTICAL[canonicalKey(picked)] ?? STRIPE_DRAWING_DX_VERTICAL[picked] ?? 0)) * factorEscalaFranja
                                       : cal.dx;
-                                    return `translate(calc(${dxDibuix}px * ${fA} + ${desplacamentGap}% + var(--hgStripeDrawingExtraDx, 0px)), calc(${dyDibuix}px + var(--hgStripeDrawingExtraDy, -5px)${idx < 7 ? ' + var(--hgStripeDrawingExtraDyFilaDalt, 0px)' : ''})) scale(calc(${escalaDibuix} * var(--hgStripeDrawingExtraScale, 1)))${giratDibuix ? ' scaleX(-1)' : ''}`;
+                                    return `translate(calc(${dxDibuix}px * ${fA} + ${desplacamentGap}% + var(--hgStripeDrawingExtraDx, 0px)), calc(${dyDibuix}px + var(--hgStripeDrawingExtraDy, -5px)${idx < 7 ? ' + var(--hgStripeDrawingExtraDyFilaDalt, 0px)' : ''})) scale(calc(${escalaDibuix} * var(--hgStripeDrawingExtraScale, 1)))`;
                                   })(),
                                   filter: (() => {
                                     return 'none';
