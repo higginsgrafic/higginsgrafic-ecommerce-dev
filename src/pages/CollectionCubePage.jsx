@@ -14,7 +14,7 @@ import Breadcrumbs from '@/components/Breadcrumbs';
 import useIsMobile from '@/hooks/useIsMobile';
 import CollectionMobile from '@/pages/CollectionMobile';
 import { SELLING_PRICE_LABEL } from '@/config/pricing';
-import { esTauletaApaisada } from '@/utils/layoutMetrics';
+import { esTauletaApaisada, getSafeBelt } from '@/utils/layoutMetrics';
 
 const COLLECTION_BG_SRC = '/placeholders/tots_els_fons/fons_colleccio/00-colleccio.webp';
 
@@ -145,7 +145,14 @@ function CollectionCubePage() {
   const isMobile = useIsMobile();
   const [overlayState, setOverlayState] = useState(loadOverlayState);
   const [zeroLeftOffsetPx, setZeroLeftOffsetPx] = useState(0);
-  const [rowHeight, setRowHeight] = useState(38);
+  // Alcada d'una fila de la graella de logotips: es proporcional a l'amplada
+  // del carril (mesurat a 540, 720 i 900 px), aixi que es calcula en lloc de
+  // mesurar-la. El `top` de la hero depen d'aquest numero: si es mesura, la
+  // hero es mou quan la mesura s'assenta.
+  const [carrilAmple, setCarrilAmple] = useState(() => {
+    try { return getSafeBelt().width; } catch { return 540; }
+  });
+  const rowHeight = Math.max(1, carrilAmple * 0.0280625 - 2.875);
   // La franja blanca ha de tocar el separador del header sense quedar-s'hi a
   // sota. Com que la hero no comenca exactament al separador, mesurem on acaba
   // el header i on comenca la hero, i hi posem la franja just al mig.
@@ -203,10 +210,7 @@ function CollectionCubePage() {
       const offset = Math.max(0, logoRect.left - gridRect.left);
       setZeroLeftOffsetPx((prev) => (Math.abs(prev - offset) < 0.5 ? prev : offset));
 
-      const numRows = 24;
-      const rowGap = 3;
-      const singleRowH = (gridRect.height - (numRows - 1) * rowGap) / numRows;
-      setRowHeight((prev) => (Math.abs(prev - singleRowH) < 0.1 ? prev : singleRowH));
+      // L'alcada de fila es calcula (vegeu `rowHeight`), no es mesura.
     };
     measure();
     const onResize = () => {
