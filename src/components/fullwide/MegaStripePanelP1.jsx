@@ -519,6 +519,21 @@ function MegaStripePanelP1({
                         opacity: 0.9,
                         pointerEvents: 'none',
                         zIndex: 5,
+                        // A la vista vertical la franja te dues fileres i la
+                        // mascara de contorn del panell es d'una: el tint es
+                        // retalla amb la MATEIXA imatge de la stripe (el seu
+                        // canal alfa es el contorn de les samarretes), aixi no
+                        // tenyeix el rectangle de fons.
+                        ...((isPortraitTablet && stripeImageSrc)
+                          ? {
+                            WebkitMaskImage: `url("${encodeURI(stripeImageSrc)}")`,
+                            maskImage: `url("${encodeURI(stripeImageSrc)}")`,
+                            WebkitMaskSize: '100% 100%',
+                            maskSize: '100% 100%',
+                            WebkitMaskRepeat: 'no-repeat',
+                            maskRepeat: 'no-repeat',
+                          }
+                          : null),
                       }}
                     />
                   ) : null}
