@@ -718,8 +718,8 @@ export default function MegaslidePagina2({
             stripe={(
               /* La franja de debò: el mateix panell que la filera, amb la imatge
                  de dues fileres (7+7), escalat per encaixar a la casella. */
-              <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
-                <div style={{ height: '100%', transform: 'translateY(-130.45px) scale(2.027)', transformOrigin: 'center center', '--megaStripeDx': '0px', '--megaStripeDy': '0px' }}>
+              <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <div style={{ height: '100%', transform: 'translateY(-130.45px) scale(2.100)', transformOrigin: 'center center', '--megaStripeDx': '0px', '--megaStripeDy': '0px' }}>
                   <MegaStripePanel
                     {...propsFranjaP2}
                     isPortraitTablet
