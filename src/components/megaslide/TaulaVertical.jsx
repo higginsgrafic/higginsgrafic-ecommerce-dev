@@ -94,7 +94,7 @@ export function TaulaVerticalP1({ grid = null, stripe = null, fletxes = null, se
         minHeight: 0,
       }}
     >
-      <div data-taula-cela="1-5" style={{ ...CELA, gridColumn: '1 / -1', gridRow: '1' }}>{grid || 'Grid'}</div>
+      <div data-taula-cela="1-5" style={{ ...CELA, gridColumn: '1 / -1', gridRow: '1', position: 'relative', zIndex: 20 }}>{grid || 'Grid'}</div>
       <div data-taula-cela="6" style={{ ...CELA, gridColumn: '1', gridRow: '2', marginRight: '20px', alignItems: 'flex-end' }}>{selector || null}</div>
       <div data-taula-cela="7-9+12-14" style={{ ...CELA, gridColumn: '2 / 5', gridRow: '2 / 4', justifyContent: 'center', alignItems: 'flex-end', marginLeft: '-20px', marginRight: '-20px' }}>{stripe || 'Stripe'}</div>
       <div data-taula-cela="10" style={{ ...CELA, gridColumn: '5', gridRow: '2', marginLeft: '20px', alignItems: 'flex-end' }}>{fletxes || 'Fletxes'}</div>
@@ -136,7 +136,7 @@ export function TaulaVerticalP2({ graella = null, colleccions = null, colors = n
         minHeight: 0,
       }}
     >
-      <div data-taula-cela="1-5" style={{ ...CELA, gridColumn: '1 / -1', gridRow: '1' }}>{graella || 'Graella dibuixos 16x4'}</div>
+      <div data-taula-cela="1-5" style={{ ...CELA, gridColumn: '1 / -1', gridRow: '1', position: 'relative', zIndex: 20 }}>{graella || 'Graella dibuixos 16x4'}</div>
       {/* Les caselles veïnes s'ajusten a la correguda de 10 px: la de
           colleccions s'encongeix i la franja s'eixampla, perque les vores
           tornin a tocar-se. */}

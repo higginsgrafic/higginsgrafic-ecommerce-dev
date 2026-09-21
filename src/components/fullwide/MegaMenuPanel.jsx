@@ -383,6 +383,10 @@ export default function MegaMenuPanel({
                     // mateixa que a la pagina 2). A la resta de formats no es
                     // toca res.
                     visibility: isPortraitTablet ? 'hidden' : undefined,
+          // A mes, el contingut de l'horitzontal no ha de rebre tocs a la vista
+          // vertical: el seu overlay de clic quedaría per sobre de les taules i
+          // s'empassaria els clics (dibuixos i samarretes).
+          pointerEvents: isPortraitTablet ? 'none' : undefined,
                     width: '100%',
                     height: '100%',
                     display: 'flex',
