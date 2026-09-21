@@ -725,6 +725,7 @@ export default function MegaslidePagina2({
                     isPortraitTablet
                     stripeImageSrc="/placeholders/tablet vertical/full-white-stripe-doble.webp"
                     senseMascaraSamarreta
+                    hideGrid
                     visualOffsetY={0}
                   />
                 </div>

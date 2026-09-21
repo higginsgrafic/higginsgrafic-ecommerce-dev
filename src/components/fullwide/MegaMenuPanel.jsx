@@ -475,6 +475,9 @@ export default function MegaMenuPanel({
                                 isPortraitTablet
                                 stripeImageSrc="/placeholders/tablet vertical/full-color-stripe-doble.webp"
                                 senseMascaraSamarreta
+                                /* La graella de dibuixos de la vista vertical es a la
+                                   seva casella de la taula: aqui no hi ha de ser. */
+                                hideGrid
                               />
                             </div>
                           </div>
