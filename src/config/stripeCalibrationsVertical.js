@@ -266,4 +266,14 @@ export const GRAELLA_DIBUIXOS_ESCALA_VERTICAL = {
  * samarreta surt sencera, 1 = queda blanca del tot. Amb valors baixos la
  * samarreta conserva el seu color esmorteit.
  */
-export const VEL_SAMARRETA_BUIDA_ALFA = 0.45;
+export const VEL_SAMARRETA_BUIDA_ALFA = 0.75;
+
+/**
+ * Dibuixos girats (mirall horitzontal, en X amb eix a Y) a la vista vertical.
+ * S'hi posa la clau canonica del dibuix, una entrada per dibuix, per poder-los
+ * girar d'un en un. Exemple:
+ *   export const STRIPE_DRAWING_GIRAT_VERTICAL = {
+ *     'austen/pride-and-prejudice-3/nx-01-stripe.webp': true,
+ *   };
+ */
+export const STRIPE_DRAWING_GIRAT_VERTICAL = {};

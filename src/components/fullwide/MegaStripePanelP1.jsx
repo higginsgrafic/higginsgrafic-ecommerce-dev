@@ -566,9 +566,8 @@ function MegaStripePanelP1({
                           id={`hgSamarreta-${k}`}
                           d={d}
                           fill="none"
-                          stroke="#2B2B2B"
-                          strokeWidth="0.1"
-                          vectorEffect="non-scaling-stroke"
+                          // El contorn de la stripe vectorial, amagat.
+                          stroke="none"
                         />
                       ))}
                     </svg>
