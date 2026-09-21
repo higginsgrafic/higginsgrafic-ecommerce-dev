@@ -9,6 +9,7 @@ import {
   MARGE_ESQUERRA_DIBUIXOS_ESCRIPTORI_PX, MARGE_DRET_FILERA_ESCRIPTORI_PX,
 } from './midesGraella.js';
 import { carrilPct, carrilLane, carrilPx, readRootCssNumber } from '../../utils/layoutMetrics.js';
+import { GRAELLA_DIBUIXOS_ESCALA_VERTICAL } from '../../config/stripeCalibrationsVertical.js';
 
 /**
  * CercadorTextRow
@@ -370,6 +371,9 @@ export function CercadorDibuixosGraella({
           ? true
           : activeCollection === 'austen' && collection === 'austen' && activeSubcollection && subcollection !== activeSubcollection;
         const dibuix = dibuixDelNom(label);
+        // A la vista vertical, alguns dibuixos es pinten mes grans o mes
+        // petits dins la seva casella (GRAELLA_DIBUIXOS_ESCALA_VERTICAL).
+        const factorGraella = isPortraitTablet ? (GRAELLA_DIBUIXOS_ESCALA_VERTICAL[label] ?? 1) : 1;
         return (
           <button
             key={label}
@@ -406,9 +410,10 @@ export function CercadorDibuixosGraella({
                 loading="lazy"
                 style={{
                   // En manera d'omplir, el dibuix va un 20% mes petit que la
-                  // seva casella (la retícula queda igual).
-                  height: omple ? '80%' : costat,
-                  width: omple ? '80%' : costat,
+                  // seva casella (la retícula queda igual), amb el factor propi
+                  // del dibuix si en te.
+                  height: omple ? `${80 * factorGraella}%` : costat,
+                  width: omple ? `${80 * factorGraella}%` : costat,
                   objectFit: 'contain',
                   display: 'block',
                 }}

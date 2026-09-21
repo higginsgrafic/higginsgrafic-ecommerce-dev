@@ -1,9 +1,32 @@
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useId, useMemo, useState } from 'react';
 import MegaColumn, { GAP_X_PX } from './MegaColumn.jsx';
 import ClicAreaOverlay from './ClicAreaOverlay.jsx';
 import { CERCADOR_COLORS } from './CercadorTopBar.jsx';
-import { STRIPE_DRAWING_CALIBRATIONS } from '../../config/stripeCalibrations';
+import {
+  STRIPE_DRAWING_CALIBRATIONS,
+  PASSOS_ESCALA_GAP_DIBUIX_VERTICAL,
+  GAP_MOVIMENT_DIBUIX_VERTICAL,
+  ESCALA_DIBUIX_VERTICAL,
+} from '../../config/stripeCalibrations';
+import {
+  STRIPE_DRAWING_DY_VERTICAL,
+  STRIPE_DRAWING_ESCALA_VERTICAL,
+  STRIPE_DRAWING_DX_VERTICAL,
+} from '../../config/stripeCalibrationsVertical';
 import { carrilPx } from '../../utils/layoutMetrics.js';
+import {
+  VECTOR_FRANJA_SAMARRETES,
+  VECTOR_FRANJA_SAMARRETES_01,
+  VECTOR_FRANJA_CAIXES,
+  VECTOR_FRANJA_VIEWBOX,
+  VECTOR_FRANJA_VIEWBOX_OBERT,
+  VECTOR_FRANJA_CONTINGUT,
+  VECTOR_FRANJA_SAMARRETA,
+  VECTOR_FRANJA_SAMARRETA_01,
+  VECTOR_FRANJA_IMPRESSIO_01,
+  VECTOR_FRANJA_MIDA_SENCERA,
+  VECTOR_FRANJA_MIDA_IMPRESSIO,
+} from '../../config/vectorFranja.js';
 
 /**
  * Reserva d'espai de la graella vella a la pàgina 2.
@@ -176,11 +199,15 @@ function MegaStripePanel({
   neckDotIndices,
   emptyTileIndices,
   stripeEmptyMaskSrc,
+  indicesSamarretesBuides,
   calibrationOverrides,
   visualOffsetY = 0,
   compactLandscape = false,
   fitAlcada = 1,
 }) {
+  // Id unic per al retall dels dibuixos: els dos panells conviuen al DOM i
+  // amb un id repetit la referencia url(#...) no resolia.
+  const idRetall = `hgRetallSamarretes-${useId().replace(/:/g, '')}`;
   // A la vista vertical la franja son DUES fileres de 7: les 14 posicions de
   // la mascara es reparteixen 7 a dalt i 7 a baix (a l'apaisada van en una
   // sola filera).
@@ -192,6 +219,13 @@ function MegaStripePanel({
       height: 50,
     }))
     : stripeMaskTileRectsRawPct;
+  // Estat de pas per al desplaçament dels dibuixos de la franja a la vista
+  // vertical: el primer dibuix de cada filera de 7 no es mou i la resta es
+  // desplacen cap a l'esquerra el 10% de l'espai buit que tenen a l'esquerra.
+  // S'acumula mentre es pinten les caselles (en ordre), o sigui que son
+  // variables de render, no d'estat.
+  let gapDibuixAcumulat = 0;
+  let gapDibuixEscalaAnterior = null;
   const emptyShirtMaskUrl = useEmptyShirtMask(emptyTileIndices, shirtColor);
 
   useEffect(() => {
@@ -275,6 +309,9 @@ function MegaStripePanel({
         <div
           className="relative z-0"
           style={{
+            // A la vista vertical, la meitat del coixi a dalt i el coixi
+            // sencer a baix deixaven la franja enganxada al fons de la
+            // casella (semblava tallada). Amb mig coixi a dalt queda centrada.
             marginTop: compactLandscape ? '16px' : `${stripeRowPadPx}px`,
             // El coixí de sota tambe s'ajusta a l'alcada de la finestra (vegeu
             // fitAlcada): si no, la franja s'encongiria pero el panell no.
@@ -328,8 +365,8 @@ function MegaStripePanel({
                 data-stripe-visual-content="2"
                 style={{
                   height: '100%',
-                  width: 'fit-content',
-                  display: 'inline-block',
+                  width: '100%',
+                  display: 'block',
                   transformOrigin: 'top center',
                   // La franja s'ajusta tambe a l'alcada de la finestra (fitAlcada):
                   // en una finestra curta, la seva mida de disseny no hi cap i es
@@ -413,8 +450,12 @@ function MegaStripePanel({
                   className="relative"
                   style={{
                     height: '100%',
-                    width: 'fit-content',
-                    display: 'inline-block',
+                    width: '100%',
+                    // La franja s'hi centra: amb l'amplada fixa i l'alcada per
+                    // l'aspecte, si no, quedava enganxada i semblava tallada.
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
                     position: 'relative',
                     zIndex: 1,
                     WebkitMaskImage: senseMascaraSamarreta
@@ -435,7 +476,7 @@ function MegaStripePanel({
                     maskPosition: '50% 0',
                   }}
                 >
-                  {megaStripeSpriteEnabledLocal ? (
+                  {megaStripeSpriteEnabledLocal && !isPortraitTablet ? (
                     <img
                       src={stripeImageSrc || '/placeholders/t-shirt_buttons/v5/full-color-stripe-5.webp?v=2866'}
                       alt=""
@@ -450,7 +491,66 @@ function MegaStripePanel({
                     />
                   ) : null}
 
-                  {shirtColor && shirtColor !== '#FFFFFF' ? (
+                  {/* EL VECTOR DE LES DUES FRANGES. Mateixa caixa i mateix aspecte
+                      que la imatge (viewBox 0 0 1487 694,05): les 14 siluetes de
+                      les dues fileres. Cada path porta un id perque els sandboxos
+                      de cada samarreta (clipPath) s'hi puguin referenciar. */}
+                  {isPortraitTablet ? (
+                    <svg
+                      viewBox={`0 0 ${VECTOR_FRANJA_VIEWBOX_OBERT.width} ${VECTOR_FRANJA_VIEWBOX_OBERT.height}`}
+                      preserveAspectRatio="none"
+                      aria-hidden="true"
+                      style={{
+                        // Exactament el mateix que la imatge de la franja (mateixa
+                        // mida i mateix aspecte): alcada del contenidor i amplada
+                        // per l'aspecte del viewBox.
+                        // Com la imatge de la franja: alcada del contenidor i
+                        // amplada per l'aspecte del viewBox.
+                        position: 'relative',
+                        height: '100%',
+                        width: 'auto',
+                        maxWidth: 'none',
+                        display: 'block',
+                        pointerEvents: 'none',
+                        zIndex: 4,
+                      }}
+                    >
+                      {/* La imatge de la franja, DINS del perimetre vectorial: el
+                          clipPath son les 14 siluetes, aixi la imatge nomes es veu
+                          a dins de les samarretes. */}
+                      <defs>
+                        <clipPath id={`hgFranjaImatge-${idRetall}`} clipPathUnits="userSpaceOnUse">
+                          {VECTOR_FRANJA_SAMARRETES.map((d, k) => (
+                            <path key={`hg-clip-${k}`} d={d} />
+                          ))}
+                        </clipPath>
+                      </defs>
+                      {stripeImageSrc ? (
+                        <image
+                          href={stripeImageSrc}
+                          x={0}
+                          y={0}
+                          width={VECTOR_FRANJA_VIEWBOX.width}
+                          height={VECTOR_FRANJA_CONTINGUT}
+                          preserveAspectRatio="none"
+                          clipPath={`url(#hgFranjaImatge-${idRetall})`}
+                        />
+                      ) : null}
+                      {VECTOR_FRANJA_SAMARRETES.map((d, k) => (
+                        <path
+                          key={`hg-samarreta-${k}`}
+                          id={`hgSamarreta-${k}`}
+                          d={d}
+                          fill="none"
+                          stroke="#2B2B2B"
+                          strokeWidth="0.1"
+                          vectorEffect="non-scaling-stroke"
+                        />
+                      ))}
+                    </svg>
+                  ) : null}
+
+                  {shirtColor && shirtColor !== '#FFFFFF' && !isPortraitTablet ? (
                     <div
                       aria-hidden="true"
                       style={{
@@ -458,7 +558,9 @@ function MegaStripePanel({
                         inset: 0,
                         backgroundColor: shirtColor,
                         mixBlendMode: 'multiply',
-                        opacity: 0.9,
+                        // Les arrugues es marquen amb el tint (multiply) al maxim:
+                        // no cal cap filtre d'enfocament.
+                        opacity: 1,
                         pointerEvents: 'none',
                         zIndex: 5,
                         // A la vista vertical la franja te dues fileres i la
@@ -480,7 +582,7 @@ function MegaStripePanel({
                     />
                   ) : null}
 
-                  {megaStripeRefEnabledLocal && megaStripeRefSrcLocal ? (
+                  {megaStripeRefEnabledLocal && megaStripeRefSrcLocal && !isPortraitTablet ? (
                     <img
                       src={megaStripeRefSrcLocal}
                       alt=""
@@ -499,7 +601,7 @@ function MegaStripePanel({
                     />
                   ) : null}
 
-                  {megaStripeRef2EnabledLocal && megaStripeRef2SrcLocal ? (
+                  {megaStripeRef2EnabledLocal && megaStripeRef2SrcLocal && !isPortraitTablet ? (
                     <img
                       src={megaStripeRef2SrcLocal}
                       alt=""
@@ -576,7 +678,21 @@ function MegaStripePanel({
                     </div>
                   ) : null}
 
-                  {megaShirtDrawingEnabledLocal && drawingOverlaySrcEffective ? (
+                  {/* Silueta de les 14 samarretes (coordenades 0-1) per retallar-hi
+                      els dibuixos i que no trepitgin el blanc entre samarretes. */}
+                  {isPortraitTablet ? (
+                    <svg width="100%" height="100%" aria-hidden="true" style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }}>
+                      <clipPath id={idRetall} clipPathUnits="objectBoundingBox">
+                        {/* Les siluetes de les 14 samarretes, tal com son al vector
+                            de la franja (cada una a la seva casella). */}
+                        {VECTOR_FRANJA_SAMARRETES_01.map((camiK, k) => (
+                          <path key={`retall-${k}`} d={camiK} clipRule="evenodd" />
+                        ))}
+                      </clipPath>
+                    </svg>
+                  ) : null}
+
+                  {megaShirtDrawingEnabledLocal && drawingOverlaySrcEffective && !isPortraitTablet ? (
                     <div
                       className="absolute inset-0"
                       style={{
@@ -585,6 +701,13 @@ function MegaStripePanel({
                         transformOrigin: 'top center',
                         transform: 'none',
                         background: 'transparent',
+                        // El dibuix no ha de trepitjar el blanc entre samarretes:
+                        // es retalla amb la silueta vectorial de les 14 samarretes.
+                        // El dibuix no ha de trepitjar el blanc entre samarretes: es
+                        // retalla amb la silueta vectorial de les 14 samarretes
+                        // (clipPath mes avall; amb la imatge com a mascara no
+                        // s'hi va aplicar el canal alfa i el dibuix quedava fluix).
+                        clipPath: `url(#${idRetall})`,
                       }}
                     >
                       {Array.isArray(rectsMascara) && rectsMascara.length === 14
@@ -812,8 +935,6 @@ function MegaStripePanel({
                                   transformOrigin: 'top center',
                                   transform: (() => {
                                     const cal = getTileCalibration(picked, calibrationOverrides);
-                                    const isPemberleyHouse = active === 'austen' && typeof picked === 'string' && /\/austen\/pemberley_house\//i.test(picked);
-                                    const extraDx = isPemberleyHouse ? -2 : 0;
                                     // El calibratge es d'una filera: a la vista vertical
                                     // la casella es 1/7 d'amplada (en comptes de la de la
                                     // filera), i els desplacaments en px s'han d'escalar amb
@@ -824,10 +945,43 @@ function MegaStripePanel({
                                       const w2 = Number(rectsMascara?.[idx]?.width) || 0;
                                       return (w1 > 0 && w2 > 0) ? w1 / w2 : 1;
                                     })();
-                                    return `translate(calc(${cal.dx + extraDx}px * ${fA}), calc(${cal.dy}px * ${fA} + var(--hgStripeDrawingExtraDy, -5px))) scale(calc(${cal.scale} * var(--hgStripeDrawingExtraScale, 1)))`;
+                                    // A la vista vertical el dibuix no canvia de mida
+                                    // (PASSOS_ESCALA_GAP_DIBUIX_VERTICAL es congelat) i el
+                                    // gap s'estreta MOVENT: el dibuix de l'esquerra de la
+                                    // filera no es mou i la resta es desplacen el 10% de
+                                    // l'espai buit que tenen a l'esquerra
+                                    // (GAP_MOVIMENT_DIBUIX_VERTICAL).
+                                    const factorGap = 0.9 ** PASSOS_ESCALA_GAP_DIBUIX_VERTICAL;
+                                    const escalaGap = isPortraitTablet ? 1 - factorGap * (1 - cal.scale) : cal.scale;
+                                    // La mida dels dibuixos a la vertical (un 20% menys).
+                                    const factorEscalaDibuix = isPortraitTablet
+                                      ? (STRIPE_DRAWING_ESCALA_VERTICAL[canonicalKey(picked)] ?? STRIPE_DRAWING_ESCALA_VERTICAL[picked] ?? 1)
+                                      : 1;
+                                    const escalaDibuix = isPortraitTablet ? escalaGap * ESCALA_DIBUIX_VERTICAL * factorEscalaDibuix : escalaGap;
+                                    // A la vista vertical el dy es el propi de la
+                                    // vertical (la base de la impressio, alineada amb
+                                    // THE HUMAN INSIDE); a la resta de vistes, el de sempre.
+                                    const dyDibuix = isPortraitTablet
+                                      ? (STRIPE_DRAWING_DY_VERTICAL[canonicalKey(picked)] ?? STRIPE_DRAWING_DY_VERTICAL[picked] ?? cal.dy)
+                                      : cal.dy;
+                                    if (idx % 7 === 0) {
+                                      gapDibuixAcumulat = 0;
+                                      gapDibuixEscalaAnterior = null;
+                                    }
+                                    if (isPortraitTablet) {
+                                      if (gapDibuixEscalaAnterior != null) {
+                                        const gapAmbAnterior = 1 - (gapDibuixEscalaAnterior + escalaDibuix) / 2;
+                                        gapDibuixAcumulat += (1 - GAP_MOVIMENT_DIBUIX_VERTICAL) * gapAmbAnterior;
+                                      }
+                                      gapDibuixEscalaAnterior = escalaDibuix;
+                                    }
+                                    const desplacamentGap = isPortraitTablet ? -100 * gapDibuixAcumulat : 0;
+                                    const dxDibuix = isPortraitTablet
+                                      ? cal.dx + (STRIPE_DRAWING_DX_VERTICAL[canonicalKey(picked)] ?? STRIPE_DRAWING_DX_VERTICAL[picked] ?? 0)
+                                      : cal.dx;
+                                    return `translate(calc(${dxDibuix}px * ${fA} + ${desplacamentGap}% + var(--hgStripeDrawingExtraDx, 0px)), calc(${dyDibuix}px + var(--hgStripeDrawingExtraDy, -5px)${idx < 7 ? ' + var(--hgStripeDrawingExtraDyFilaDalt, 0px)' : ''})) scale(calc(${escalaDibuix} * var(--hgStripeDrawingExtraScale, 1)))`;
                                   })(),
                                   filter: (() => {
-                                    const isPemberley = active === 'austen' && typeof picked === 'string' && /\/austen\/pemberley_house\//i.test(picked);
                                     const baseFx = drawingOverlayDebug
                                       ? 'drop-shadow(0 0 2px rgba(0,0,0,0.65))'
                                       : active === 'austen'
@@ -835,8 +989,6 @@ function MegaStripePanel({
                                             && picked.toLowerCase().includes('/austen/keep_calm/')
                                             && picked.toLowerCase().endsWith('keep-calm-w-stripe.webp')
                                           ? 'drop-shadow(0 0 2px rgba(0,0,0,0.75))'
-                                        : isPemberley
-                                          ? 'drop-shadow(0 0 0px rgba(0,0,0,0.85))'
                                         : 'none';
                                     return baseFx;
                                   })(),
@@ -1041,8 +1193,6 @@ function MegaStripePanel({
                                   transformOrigin: 'top center',
                                   transform: (() => {
                                     const cal = getTileCalibration(picked, calibrationOverrides);
-                                    const isPemberleyHouse = active === 'austen' && typeof picked === 'string' && /\/austen\/pemberley_house\//i.test(picked);
-                                    const extraDx = isPemberleyHouse ? -2 : 0;
                                     // El calibratge es d'una filera: a la vista vertical
                                     // la casella es 1/7 d'amplada (en comptes de la de la
                                     // filera), i els desplacaments en px s'han d'escalar amb
@@ -1053,12 +1203,44 @@ function MegaStripePanel({
                                       const w2 = Number(rectsMascara?.[idx]?.width) || 0;
                                       return (w1 > 0 && w2 > 0) ? w1 / w2 : 1;
                                     })();
-                                    return `translate(calc(${cal.dx + extraDx}px * ${fA}), calc(${cal.dy}px * ${fA} + var(--hgStripeDrawingExtraDy, -5px))) scale(calc(${cal.scale} * var(--hgStripeDrawingExtraScale, 1)))`;
+                                    // A la vista vertical el dibuix no canvia de mida
+                                    // (PASSOS_ESCALA_GAP_DIBUIX_VERTICAL es congelat) i el
+                                    // gap s'estreta MOVENT: el dibuix de l'esquerra de la
+                                    // filera no es mou i la resta es desplacen el 10% de
+                                    // l'espai buit que tenen a l'esquerra
+                                    // (GAP_MOVIMENT_DIBUIX_VERTICAL).
+                                    const factorGap = 0.9 ** PASSOS_ESCALA_GAP_DIBUIX_VERTICAL;
+                                    const escalaGap = isPortraitTablet ? 1 - factorGap * (1 - cal.scale) : cal.scale;
+                                    // La mida dels dibuixos a la vertical (un 20% menys).
+                                    const factorEscalaDibuix = isPortraitTablet
+                                      ? (STRIPE_DRAWING_ESCALA_VERTICAL[canonicalKey(picked)] ?? STRIPE_DRAWING_ESCALA_VERTICAL[picked] ?? 1)
+                                      : 1;
+                                    const escalaDibuix = isPortraitTablet ? escalaGap * ESCALA_DIBUIX_VERTICAL * factorEscalaDibuix : escalaGap;
+                                    // A la vista vertical el dy es el propi de la
+                                    // vertical (la base de la impressio, alineada amb
+                                    // THE HUMAN INSIDE); a la resta de vistes, el de sempre.
+                                    const dyDibuix = isPortraitTablet
+                                      ? (STRIPE_DRAWING_DY_VERTICAL[canonicalKey(picked)] ?? STRIPE_DRAWING_DY_VERTICAL[picked] ?? cal.dy)
+                                      : cal.dy;
+                                    if (idx % 7 === 0) {
+                                      gapDibuixAcumulat = 0;
+                                      gapDibuixEscalaAnterior = null;
+                                    }
+                                    if (isPortraitTablet) {
+                                      if (gapDibuixEscalaAnterior != null) {
+                                        const gapAmbAnterior = 1 - (gapDibuixEscalaAnterior + escalaDibuix) / 2;
+                                        gapDibuixAcumulat += (1 - GAP_MOVIMENT_DIBUIX_VERTICAL) * gapAmbAnterior;
+                                      }
+                                      gapDibuixEscalaAnterior = escalaDibuix;
+                                    }
+                                    const desplacamentGap = isPortraitTablet ? -100 * gapDibuixAcumulat : 0;
+                                    const dxDibuix = isPortraitTablet
+                                      ? cal.dx + (STRIPE_DRAWING_DX_VERTICAL[canonicalKey(picked)] ?? STRIPE_DRAWING_DX_VERTICAL[picked] ?? 0)
+                                      : cal.dx;
+                                    return `translate(calc(${dxDibuix}px * ${fA} + ${desplacamentGap}% + var(--hgStripeDrawingExtraDx, 0px)), calc(${dyDibuix}px + var(--hgStripeDrawingExtraDy, -5px)${idx < 7 ? ' + var(--hgStripeDrawingExtraDyFilaDalt, 0px)' : ''})) scale(calc(${escalaDibuix} * var(--hgStripeDrawingExtraScale, 1)))`;
                                   })(),
                                   filter: (() => {
-                                    const isPemberley = active === 'austen' && typeof resolvedOverlaySrc === 'string' && /\/austen\/pemberley_house\//i.test(resolvedOverlaySrc);
-                                    const baseFx = isPemberley ? 'drop-shadow(0 0 0px rgba(0,0,0,0.85))' : 'none';
-                                    return baseFx;
+                                    return 'none';
                                   })(),
                                 }}
                                 loading={idx === 0 ? 'eager' : 'lazy'}
@@ -1076,6 +1258,78 @@ function MegaStripePanel({
                       events and coordinate mismatches. */}
 
                 </div>
+
+                {/* Samarretes sense dibuix atenuades: un vel blanc amb la forma
+                    de la samarreta (la mascara de contorn) sobre les caselles
+                    buides. Nomes ho demana la vista vertical. */}
+                {!isPortraitTablet && Array.isArray(indicesSamarretesBuides) && indicesSamarretesBuides.length > 0
+                  && Array.isArray(rectsMascara) && rectsMascara.length === 14 ? (
+                  <div className="absolute inset-0" aria-hidden="true" style={{ pointerEvents: 'none', zIndex: 11 }}>
+                    {indicesSamarretesBuides.map((idx) => {
+                      const col = idx % 7;
+                      const caixa = VECTOR_FRANJA_CAIXES[idx];
+                      const mida = VECTOR_FRANJA_MIDA_SENCERA;   // 306 x 307
+                      const cami = VECTOR_FRANJA_SAMARRETA;
+                      const cx = caixa.x + caixa.width / 2;
+                      const cy = caixa.y + caixa.height / 2;
+                      const x0 = cx - mida.width / 2;
+                      const y0 = cy - mida.height / 2;
+                      // Descomptem la samarreta del costat DRET, que es la que a
+                      // la imatge queda per sobre: aixi l'encavalcament no rep dues
+                      // capes de vel.
+                      const vei = col === 6 || idx + 1 >= VECTOR_FRANJA_CAIXES.length ? null : VECTOR_FRANJA_CAIXES[idx + 1];
+                      const dxVei = vei ? (vei.x + vei.width / 2) - cx : 0;
+                      const dyVei = vei ? (vei.y + vei.height / 2) - cy : 0;
+                      return (
+                        <svg
+                          key={`vel-samarreta-${idx}`}
+                          viewBox={`${x0} ${y0} ${mida.width} ${mida.height}`}
+                          preserveAspectRatio="none"
+                          style={{
+                            position: 'absolute',
+                            left: `${(x0 / VECTOR_FRANJA_VIEWBOX.width) * 100}%`,
+                            top: `${(y0 / VECTOR_FRANJA_CONTINGUT) * 100}%`,
+                            width: `${(mida.width / VECTOR_FRANJA_VIEWBOX.width) * 100}%`,
+                            height: `${(mida.height / VECTOR_FRANJA_CONTINGUT) * 100}%`,
+                            overflow: 'visible',
+                            pointerEvents: 'none',
+                          }}
+                        >
+                          <defs>
+                            <mask
+                              id={`vel-samarreta-mask-${idx}`}
+                              maskType="luminance"
+                              style={{ maskType: 'luminance' }}
+                              maskUnits="userSpaceOnUse"
+                              x={x0}
+                              y={y0}
+                              width={mida.width}
+                              height={mida.height}
+                            >
+                              <path d={cami} transform={`translate(${x0}, ${y0})`} fill="white" />
+                              {vei ? (
+                                <path
+                                  d={VECTOR_FRANJA_SAMARRETA}
+                                  transform={`translate(${x0 + dxVei}, ${y0 + dyVei})`}
+                                  fill="black"
+                                />
+                              ) : null}
+                            </mask>
+                          </defs>
+                          <rect
+                            x={x0}
+                            y={y0}
+                            width={mida.width}
+                            height={mida.height}
+                            fill="white"
+                            fillOpacity="var(--hgStripeEmptyVeilAlpha, 0.45)"
+                            mask={`url(#vel-samarreta-mask-${idx})`}
+                          />
+                        </svg>
+                      );
+                    })}
+                  </div>
+                ) : null}
 
                 {/* Cercle fosc sobre el coll de cada samarreta, situat al gap
                     superior (fora de la imatge), alineat amb el centre de cada

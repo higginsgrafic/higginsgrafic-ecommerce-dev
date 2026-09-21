@@ -22,6 +22,7 @@ import {
   CONTROL_TILE_ARROWS,
 } from '../fullwide/MegaColumn.jsx';
 import { FirstContactDibuix00Buttons } from '../fullwide/firstContactPanels.jsx';
+import { VEL_SAMARRETA_BUIDA_ALFA } from '../../config/stripeCalibrationsVertical.js';
 import { computeStripeTileOverlaySrcs, computeStripeTileItems } from '@/utils/resolveStripeTile.js';
 
 export default function MegaslidePagina2({
@@ -146,8 +147,6 @@ export default function MegaslidePagina2({
   const alignRefY = useRef(0);
   const centraRefY = useRef(0);
   const snapTimerRef = useRef(0);
-  const neutralGammaRef = useRef(null);
-  const tiltDeltaRef = useRef(0);
 
 
   const scrollToProgress = useCallback((progress, behavior = 'smooth') => {
@@ -166,7 +165,6 @@ export default function MegaslidePagina2({
       window.dispatchEvent(new CustomEvent('mega-portrait-scroll', { detail: { progress } }));
     }
     snapTimerRef.current = window.setTimeout(() => {
-      if (Math.abs(tiltDeltaRef.current) > 3) return;
       if (!viewport) return;
       const maxScroll = Math.max(0, viewport.scrollWidth - viewport.clientWidth);
       if (maxScroll <= 0) return;
@@ -213,46 +211,6 @@ export default function MegaslidePagina2({
 
   useEffect(() => () => window.clearTimeout(snapTimerRef.current), []);
 
-  useEffect(() => {
-    if (!isPortraitTablet) return undefined;
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return undefined;
-
-    // Sol·licita permís per a deviceorientation a iOS
-    const OrientationEvent = window.DeviceOrientationEvent;
-    if (OrientationEvent && typeof OrientationEvent.requestPermission === 'function') {
-      OrientationEvent.requestPermission().catch(() => {});
-    }
-
-    neutralGammaRef.current = null;
-    tiltDeltaRef.current = 0;
-    let frame = 0;
-    const handleOrientation = (event) => {
-      if (!Number.isFinite(event.gamma)) return;
-      if (neutralGammaRef.current == null) neutralGammaRef.current = event.gamma;
-      tiltDeltaRef.current = event.gamma - neutralGammaRef.current;
-    };
-    const tick = () => {
-      const viewport = viewportRef.current;
-      const delta = tiltDeltaRef.current;
-      if (viewport && Math.abs(delta) > 3) {
-        const velocity = Math.sign(delta) * Math.min(10, (Math.abs(delta) - 3) * 0.45);
-        viewport.scrollLeft += velocity;
-        const maxScroll = Math.max(0, viewport.scrollWidth - viewport.clientWidth);
-        const progress = maxScroll > 0 ? viewport.scrollLeft / maxScroll : 0;
-        window.dispatchEvent(new CustomEvent('mega-portrait-scroll', { detail: { progress } }));
-      }
-      frame = requestAnimationFrame(tick);
-    };
-
-    window.addEventListener('deviceorientation', handleOrientation);
-    frame = requestAnimationFrame(tick);
-    return () => {
-      window.removeEventListener('deviceorientation', handleOrientation);
-      cancelAnimationFrame(frame);
-      neutralGammaRef.current = null;
-      tiltDeltaRef.current = 0;
-    };
-  }, [isPortraitTablet]);
 
   // Alineació de la filera de dalt de la pàgina 2 amb la de la pàgina 1, i
   // centratge del selector amb la graella de colors.
@@ -365,6 +323,20 @@ export default function MegaslidePagina2({
     if (drawable.length === 0) return null;
     return computeStripeTileItems(drawable);
   }, [drawable]);
+
+  // Quantes caselles porten dibuix: les altres son samarretes buides i a la
+  // vista vertical s'atenuen amb un vel blanc.
+  const quantsDibuixosFranja = useMemo(() => (
+    Array.isArray(stripeTileOverlaySrcs) ? stripeTileOverlaySrcs.filter(Boolean).length : 0
+  ), [stripeTileOverlaySrcs]);
+
+  // Caselles de la franja que queden sense dibuix: a la vista vertical
+  // s'atenuen amb un vel blanc amb la forma de la samarreta.
+  const indicesSamarretesBuidesFranja = useMemo(() => (
+    quantsDibuixosFranja > 0 && quantsDibuixosFranja < 14
+      ? Array.from({ length: 14 }, (_, i) => i).filter((i) => i >= quantsDibuixosFranja)
+      : []
+  ), [quantsDibuixosFranja]);
 
   const emptyTileIndices = useMemo(() => {
     if (!Array.isArray(stripeTileItems)) return [];
@@ -626,7 +598,7 @@ export default function MegaslidePagina2({
         }}>
           <MegaStripePanel
             {...propsFranjaP2}
-            stripeImageSrc={isPortraitTablet ? '/placeholders/tablet vertical/full-white-stripe-doble.webp' : stripeBaseImageSrc}
+            stripeImageSrc={isPortraitTablet ? '/placeholders/tablet vertical/full-white-stripe-doble.png' : stripeBaseImageSrc}
             // La franja ha de quedar a la mateixa alcada que la de la pagina 1.
             visualOffsetY={-page1PageLift + (isLandscapeTablet ? -10 : 0) - ((isPortraitTablet || isLandscapeTablet) ? 0 : FRANJA_AJUST_PX) + desplacamentFranja}
           />
@@ -741,16 +713,26 @@ export default function MegaslidePagina2({
             )}
             stripe={(
               /* La franja de debò: el mateix panell que la filera, amb la imatge
-                 de dues fileres (7+7), escalat per encaixar a la casella. */
+                 de dues fileres (7+7), escalat per encaixar a la casella.
+                 El DIBUIX de sobre les samarretes va 14 px visibles a la dreta
+                 i 29 px amunt; la samarreta no es mou. A mes, els 7 de la
+                 FILERA DE DALT van 12,8 px mes amunt
+                 (--hgStripeDrawingExtraDyFilaDalt): la imatge talla les
+                 samarretes de dalt i, sense aixo, les impressions hi quedaven
+                 mes avall que a la de baix. Com que el dibuix viu
+                 dins el panell escalat, 1 px d'aquest calibratge fa 2,566 px
+                 visibles a 768: 14 / 2,566 = 5,46, i -16,31 es el -5 de sempre
+                 menys 11,31 (els 29 px de dalt). */
               <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <div style={{ height: '100%', transform: 'translate(4.48px, -126.35px) scale(2.116)', transformOrigin: 'center center', '--megaStripeDx': '0px', '--megaStripeDy': '0px' }}>
+                <div style={{ height: '100%', transform: 'translate(130px, -119.3px) scale(2.059)', transformOrigin: 'right center', '--megaStripeDx': '0px', '--megaStripeDy': '0px', '--hgStripeDrawingExtraDx': '5.46px', '--hgStripeDrawingExtraDy': '-17.55px', '--hgStripeDrawingExtraDyFilaDalt': '-5.26px', '--hgStripeEmptyVeilAlpha': String(VEL_SAMARRETA_BUIDA_ALFA) }}>
                   <MegaStripePanel
                     {...propsFranjaP2}
                     isPortraitTablet
-                    stripeImageSrc="/placeholders/tablet vertical/full-white-stripe-doble.webp"
+                    stripeImageSrc="/placeholders/tablet vertical/full-white-stripe-doble.png"
                     senseMascaraSamarreta
                     hideGrid
                     visualOffsetY={0}
+                    indicesSamarretesBuides={indicesSamarretesBuidesFranja}
                   />
                 </div>
               </div>

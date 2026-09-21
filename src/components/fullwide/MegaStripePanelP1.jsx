@@ -1,8 +1,19 @@
-import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { useEffect, useId, useLayoutEffect, useRef, useState } from 'react';
 import MegaColumn from './MegaColumn.jsx';
 import ClicAreaOverlayP1 from './ClicAreaOverlayP1.jsx';
 import { CERCADOR_COLORS } from './CercadorTopBar.jsx';
-import { STRIPE_DRAWING_CALIBRATIONS } from '../../config/stripeCalibrations';
+import {
+  STRIPE_DRAWING_CALIBRATIONS,
+  PASSOS_ESCALA_GAP_DIBUIX_VERTICAL,
+  GAP_MOVIMENT_DIBUIX_VERTICAL,
+  ESCALA_DIBUIX_VERTICAL,
+} from '../../config/stripeCalibrations';
+import {
+  STRIPE_DRAWING_DY_VERTICAL,
+  STRIPE_DRAWING_ESCALA_VERTICAL,
+  STRIPE_DRAWING_DX_VERTICAL,
+} from '../../config/stripeCalibrationsVertical';
+import { VECTOR_FRANJA_SAMARRETES, VECTOR_FRANJA_SAMARRETES_01, VECTOR_FRANJA_VIEWBOX, VECTOR_FRANJA_VIEWBOX_OBERT, VECTOR_FRANJA_CONTINGUT } from '../../config/vectorFranja.js';
 import { deltaObjectiuPageLift, desplacamentFranjaEscriptori } from '../../utils/mesuraMegaslide.js';
 import { carrilPx } from '../../utils/layoutMetrics.js';
 
@@ -147,6 +158,9 @@ function MegaStripePanelP1({
   isPortraitTablet = false,
   isLandscapeTablet = false,
 }) {
+  // Id unic per al retall dels dibuixos: els dos panells conviuen al DOM i
+  // amb un id repetit la referencia url(#...) no resolia.
+  const idRetall = `hgRetallSamarretes-${useId().replace(/:/g, '')}`;
   // A la vista vertical la franja son DUES fileres de 7: les 14 posicions de
   // la mascara es reparteixen 7 a dalt i 7 a baix (a l'apaisada van en una
   // sola filera).
@@ -158,6 +172,13 @@ function MegaStripePanelP1({
       height: 50,
     }))
     : stripeMaskTileRectsRawPct;
+  // Estat de pas per al desplaçament dels dibuixos de la franja a la vista
+  // vertical: el primer dibuix de cada filera de 7 no es mou i la resta es
+  // desplacen cap a l'esquerra el 10% de l'espai buit que tenen a l'esquerra.
+  // S'acumula mentre es pinten les caselles (en ordre), o sigui que son
+  // variables de render, no d'estat.
+  let gapDibuixAcumulat = 0;
+  let gapDibuixEscalaAnterior = null;
   const emptyShirtMaskUrl = useEmptyShirtMask(emptyTileIndices, shirtColor);
   const pageRootRef = useRef(null);
   const pageLiftRef = useRef(0);
@@ -324,7 +345,7 @@ function MegaStripePanelP1({
           style={{
             // A la franja estreta (768-1366) la pàgina ja té els seus propis
             // ajustos de 10 px i l'ajust general no s'hi ha d'aplicar.
-            marginTop: compactLandscape ? '16px' : `${stripeRowPadPx - ((!isPortraitTablet && !compactLandscape && !esEstenyFins1366) ? FRANJA_AJUST_PX : 0)}px`,
+            marginTop: compactLandscape ? '16px' : `${stripeRowPadPx}px`,
             // El coixí de sota tambe s'ajusta a l'alcada de la finestra (vegeu
             // fitAlcada a MegaMenuPanel): si no, la franja s'encongiria pero el
             // panell no. Ha de coincidir amb MegaStripePanel (pàgina 2).
@@ -384,8 +405,8 @@ function MegaStripePanelP1({
                 data-stripe-visual-content="1"
                 style={{
                   height: '100%',
-                  width: 'fit-content',
-                  display: 'inline-block',
+                  width: '100%',
+                  display: 'block',
                   transformOrigin: 'top center',
                   // A l'apaisada pugem la stripe 10px (les samarretes). El
                   // desplaçament va amb la resta de la seva posicio, que ve de
@@ -472,8 +493,12 @@ function MegaStripePanelP1({
                   className="relative"
                   style={{
                     height: '100%',
-                    width: 'fit-content',
-                    display: 'inline-block',
+                    width: '100%',
+                    // La franja s'hi centra: amb l'amplada fixa i l'alcada per
+                    // l'aspecte, si no, quedava enganxada i semblava tallada.
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
                     position: 'relative',
                     zIndex: 1,
                     WebkitMaskImage: senseMascaraSamarreta
@@ -494,7 +519,62 @@ function MegaStripePanelP1({
                     maskPosition: '50% 0',
                   }}
                 >
-                  {megaStripeSpriteEnabledLocal ? (
+                  {isPortraitTablet ? (
+                    <svg
+                      viewBox={`0 0 ${VECTOR_FRANJA_VIEWBOX_OBERT.width} ${VECTOR_FRANJA_VIEWBOX_OBERT.height}`}
+                      preserveAspectRatio="none"
+                      aria-hidden="true"
+                      style={{
+                        // Exactament el mateix que la imatge de la franja (mateixa
+                        // mida i mateix aspecte): alcada del contenidor i amplada
+                        // per l'aspecte del viewBox.
+                        // Com la imatge de la franja: alcada del contenidor i
+                        // amplada per l'aspecte del viewBox.
+                        position: 'relative',
+                        height: '100%',
+                        width: 'auto',
+                        maxWidth: 'none',
+                        display: 'block',
+                        pointerEvents: 'none',
+                        zIndex: 4,
+                      }}
+                    >
+                      {/* La imatge de la franja, DINS del perimetre vectorial: el
+                          clipPath son les 14 siluetes, aixi la imatge nomes es veu
+                          a dins de les samarretes. */}
+                      <defs>
+                        <clipPath id={`hgFranjaImatge-${idRetall}`} clipPathUnits="userSpaceOnUse">
+                          {VECTOR_FRANJA_SAMARRETES.map((d, k) => (
+                            <path key={`hg-clip-${k}`} d={d} />
+                          ))}
+                        </clipPath>
+                      </defs>
+                      {stripeImageSrc ? (
+                        <image
+                          href={stripeImageSrc}
+                          x={0}
+                          y={0}
+                          width={VECTOR_FRANJA_VIEWBOX.width}
+                          height={VECTOR_FRANJA_CONTINGUT}
+                          preserveAspectRatio="none"
+                          clipPath={`url(#hgFranjaImatge-${idRetall})`}
+                        />
+                      ) : null}
+                      {VECTOR_FRANJA_SAMARRETES.map((d, k) => (
+                        <path
+                          key={`hg-samarreta-${k}`}
+                          id={`hgSamarreta-${k}`}
+                          d={d}
+                          fill="none"
+                          stroke="#2B2B2B"
+                          strokeWidth="0.1"
+                          vectorEffect="non-scaling-stroke"
+                        />
+                      ))}
+                    </svg>
+                  ) : null}
+
+                  {megaStripeSpriteEnabledLocal && !isPortraitTablet ? (
                     <img
                       src={stripeImageSrc || '/placeholders/t-shirt_buttons/v5/full-color-stripe-5.webp'}
                       alt=""
@@ -508,7 +588,7 @@ function MegaStripePanelP1({
                     />
                   ) : null}
 
-                  {shirtColor && shirtColor !== '#FFFFFF' ? (
+                  {shirtColor && shirtColor !== '#FFFFFF' && !isPortraitTablet ? (
                     <div
                       aria-hidden="true"
                       style={{
@@ -538,7 +618,7 @@ function MegaStripePanelP1({
                     />
                   ) : null}
 
-                  {megaStripeRefEnabledLocal && megaStripeRefSrcLocal ? (
+                  {megaStripeRefEnabledLocal && megaStripeRefSrcLocal && !isPortraitTablet ? (
                     <img
                       src={megaStripeRefSrcLocal}
                       alt=""
@@ -556,7 +636,7 @@ function MegaStripePanelP1({
                     />
                   ) : null}
 
-                  {megaStripeRef2EnabledLocal && megaStripeRef2SrcLocal ? (
+                  {megaStripeRef2EnabledLocal && megaStripeRef2SrcLocal && !isPortraitTablet ? (
                     <img
                       src={megaStripeRef2SrcLocal}
                       alt=""
@@ -625,7 +705,17 @@ function MegaStripePanelP1({
                     </div>
                   ) : null}
 
-                  {megaShirtDrawingEnabledLocal && drawingOverlaySrcEffective ? (
+                  {/* Silueta de les 14 samarretes (coordenades 0-1) per retallar-hi
+                      els dibuixos i que no trepitgin el blanc entre samarretes. */}
+                  {isPortraitTablet ? (
+                    <svg width="100%" height="100%" aria-hidden="true" style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }}>
+                      <clipPath id={idRetall} clipPathUnits="objectBoundingBox">
+                        <path d={VECTOR_FRANJA_SAMARRETES_01.join(' ')} clipRule="evenodd" />
+                      </clipPath>
+                    </svg>
+                  ) : null}
+
+                  {megaShirtDrawingEnabledLocal && drawingOverlaySrcEffective && !isPortraitTablet ? (
                     <div
                       className="absolute inset-0"
                       style={{
@@ -634,6 +724,13 @@ function MegaStripePanelP1({
                         transformOrigin: 'top center',
                         transform: 'none',
                         background: 'transparent',
+                        // El dibuix no ha de trepitjar el blanc entre samarretes:
+                        // es retalla amb la silueta vectorial de les 14 samarretes.
+                        // El dibuix no ha de trepitjar el blanc entre samarretes: es
+                        // retalla amb la silueta vectorial de les 14 samarretes
+                        // (clipPath mes avall; amb la imatge com a mascara no
+                        // s'hi va aplicar el canal alfa i el dibuix quedava fluix).
+                        clipPath: `url(#${idRetall})`,
                       }}
                     >
                       {Array.isArray(rectsMascara) && rectsMascara.length === 14
@@ -850,8 +947,6 @@ function MegaStripePanelP1({
                                   transformOrigin: 'top center',
                                   transform: (() => {
                                     const cal = getTileCalibration(picked, calibrationOverrides);
-                                    const isPemberleyHouse = active === 'austen' && typeof picked === 'string' && /\/austen\/pemberley_house\//i.test(picked);
-                                    const extraDx = isPemberleyHouse ? -2 : 0;
                                     // El calibratge es d'una filera: a la vista vertical
                                     // la casella es 1/7 d'amplada (en comptes de la de la
                                     // filera), i els desplacaments en px s'han d'escalar amb
@@ -862,10 +957,43 @@ function MegaStripePanelP1({
                                       const w2 = Number(rectsMascara?.[idx]?.width) || 0;
                                       return (w1 > 0 && w2 > 0) ? w1 / w2 : 1;
                                     })();
-                                    return `translate(calc(${cal.dx + extraDx}px * ${fA}), calc(${cal.dy}px * ${fA} + var(--hgStripeDrawingExtraDy, -5px))) scale(calc(${cal.scale} * var(--hgStripeDrawingExtraScale, 1)))`;
+                                    // A la vista vertical el dibuix no canvia de mida
+                                    // (PASSOS_ESCALA_GAP_DIBUIX_VERTICAL es congelat) i el
+                                    // gap s'estreta MOVENT: el dibuix de l'esquerra de la
+                                    // filera no es mou i la resta es desplacen el 10% de
+                                    // l'espai buit que tenen a l'esquerra
+                                    // (GAP_MOVIMENT_DIBUIX_VERTICAL).
+                                    const factorGap = 0.9 ** PASSOS_ESCALA_GAP_DIBUIX_VERTICAL;
+                                    const escalaGap = isPortraitTablet ? 1 - factorGap * (1 - cal.scale) : cal.scale;
+                                    // La mida dels dibuixos a la vertical (un 20% menys).
+                                    const factorEscalaDibuix = isPortraitTablet
+                                      ? (STRIPE_DRAWING_ESCALA_VERTICAL[canonicalKey(picked)] ?? STRIPE_DRAWING_ESCALA_VERTICAL[picked] ?? 1)
+                                      : 1;
+                                    const escalaDibuix = isPortraitTablet ? escalaGap * ESCALA_DIBUIX_VERTICAL * factorEscalaDibuix : escalaGap;
+                                    // A la vista vertical el dy es el propi de la
+                                    // vertical (la base de la impressio, alineada amb
+                                    // THE HUMAN INSIDE); a la resta de vistes, el de sempre.
+                                    const dyDibuix = isPortraitTablet
+                                      ? (STRIPE_DRAWING_DY_VERTICAL[canonicalKey(picked)] ?? STRIPE_DRAWING_DY_VERTICAL[picked] ?? cal.dy)
+                                      : cal.dy;
+                                    if (idx % 7 === 0) {
+                                      gapDibuixAcumulat = 0;
+                                      gapDibuixEscalaAnterior = null;
+                                    }
+                                    if (isPortraitTablet) {
+                                      if (gapDibuixEscalaAnterior != null) {
+                                        const gapAmbAnterior = 1 - (gapDibuixEscalaAnterior + escalaDibuix) / 2;
+                                        gapDibuixAcumulat += (1 - GAP_MOVIMENT_DIBUIX_VERTICAL) * gapAmbAnterior;
+                                      }
+                                      gapDibuixEscalaAnterior = escalaDibuix;
+                                    }
+                                    const desplacamentGap = isPortraitTablet ? -100 * gapDibuixAcumulat : 0;
+                                    const dxDibuix = isPortraitTablet
+                                      ? cal.dx + (STRIPE_DRAWING_DX_VERTICAL[canonicalKey(picked)] ?? STRIPE_DRAWING_DX_VERTICAL[picked] ?? 0)
+                                      : cal.dx;
+                                    return `translate(calc(${dxDibuix}px * ${fA} + ${desplacamentGap}% + var(--hgStripeDrawingExtraDx, 0px)), calc(${dyDibuix}px + var(--hgStripeDrawingExtraDy, -5px)${idx < 7 ? ' + var(--hgStripeDrawingExtraDyFilaDalt, 0px)' : ''})) scale(calc(${escalaDibuix} * var(--hgStripeDrawingExtraScale, 1)))`;
                                   })(),
                                   filter: (() => {
-                                    const isPemberley = active === 'austen' && typeof picked === 'string' && /\/austen\/pemberley_house\//i.test(picked);
                                     const baseFx = drawingOverlayDebug
                                       ? 'drop-shadow(0 0 2px rgba(0,0,0,0.65))'
                                       : active === 'austen'
@@ -873,8 +1001,6 @@ function MegaStripePanelP1({
                                             && picked.toLowerCase().includes('/austen/keep_calm/')
                                             && picked.toLowerCase().endsWith('keep-calm-w-stripe.webp')
                                           ? 'drop-shadow(0 0 2px rgba(0,0,0,0.75))'
-                                        : isPemberley
-                                          ? 'drop-shadow(0 0 0px rgba(0,0,0,0.85))'
                                         : 'none';
                                     return baseFx;
                                   })(),
@@ -1078,8 +1204,6 @@ function MegaStripePanelP1({
                                   transformOrigin: 'top center',
                                   transform: (() => {
                                     const cal = getTileCalibration(picked, calibrationOverrides);
-                                    const isPemberleyHouse = active === 'austen' && typeof picked === 'string' && /\/austen\/pemberley_house\//i.test(picked);
-                                    const extraDx = isPemberleyHouse ? -2 : 0;
                                     // El calibratge es d'una filera: a la vista vertical
                                     // la casella es 1/7 d'amplada (en comptes de la de la
                                     // filera), i els desplacaments en px s'han d'escalar amb
@@ -1090,12 +1214,44 @@ function MegaStripePanelP1({
                                       const w2 = Number(rectsMascara?.[idx]?.width) || 0;
                                       return (w1 > 0 && w2 > 0) ? w1 / w2 : 1;
                                     })();
-                                    return `translate(calc(${cal.dx + extraDx}px * ${fA}), calc(${cal.dy}px * ${fA} + var(--hgStripeDrawingExtraDy, -5px))) scale(calc(${cal.scale} * var(--hgStripeDrawingExtraScale, 1)))`;
+                                    // A la vista vertical el dibuix no canvia de mida
+                                    // (PASSOS_ESCALA_GAP_DIBUIX_VERTICAL es congelat) i el
+                                    // gap s'estreta MOVENT: el dibuix de l'esquerra de la
+                                    // filera no es mou i la resta es desplacen el 10% de
+                                    // l'espai buit que tenen a l'esquerra
+                                    // (GAP_MOVIMENT_DIBUIX_VERTICAL).
+                                    const factorGap = 0.9 ** PASSOS_ESCALA_GAP_DIBUIX_VERTICAL;
+                                    const escalaGap = isPortraitTablet ? 1 - factorGap * (1 - cal.scale) : cal.scale;
+                                    // La mida dels dibuixos a la vertical (un 20% menys).
+                                    const factorEscalaDibuix = isPortraitTablet
+                                      ? (STRIPE_DRAWING_ESCALA_VERTICAL[canonicalKey(picked)] ?? STRIPE_DRAWING_ESCALA_VERTICAL[picked] ?? 1)
+                                      : 1;
+                                    const escalaDibuix = isPortraitTablet ? escalaGap * ESCALA_DIBUIX_VERTICAL * factorEscalaDibuix : escalaGap;
+                                    // A la vista vertical el dy es el propi de la
+                                    // vertical (la base de la impressio, alineada amb
+                                    // THE HUMAN INSIDE); a la resta de vistes, el de sempre.
+                                    const dyDibuix = isPortraitTablet
+                                      ? (STRIPE_DRAWING_DY_VERTICAL[canonicalKey(picked)] ?? STRIPE_DRAWING_DY_VERTICAL[picked] ?? cal.dy)
+                                      : cal.dy;
+                                    if (idx % 7 === 0) {
+                                      gapDibuixAcumulat = 0;
+                                      gapDibuixEscalaAnterior = null;
+                                    }
+                                    if (isPortraitTablet) {
+                                      if (gapDibuixEscalaAnterior != null) {
+                                        const gapAmbAnterior = 1 - (gapDibuixEscalaAnterior + escalaDibuix) / 2;
+                                        gapDibuixAcumulat += (1 - GAP_MOVIMENT_DIBUIX_VERTICAL) * gapAmbAnterior;
+                                      }
+                                      gapDibuixEscalaAnterior = escalaDibuix;
+                                    }
+                                    const desplacamentGap = isPortraitTablet ? -100 * gapDibuixAcumulat : 0;
+                                    const dxDibuix = isPortraitTablet
+                                      ? cal.dx + (STRIPE_DRAWING_DX_VERTICAL[canonicalKey(picked)] ?? STRIPE_DRAWING_DX_VERTICAL[picked] ?? 0)
+                                      : cal.dx;
+                                    return `translate(calc(${dxDibuix}px * ${fA} + ${desplacamentGap}% + var(--hgStripeDrawingExtraDx, 0px)), calc(${dyDibuix}px + var(--hgStripeDrawingExtraDy, -5px)${idx < 7 ? ' + var(--hgStripeDrawingExtraDyFilaDalt, 0px)' : ''})) scale(calc(${escalaDibuix} * var(--hgStripeDrawingExtraScale, 1)))`;
                                   })(),
                                   filter: (() => {
-                                    const isPemberley = active === 'austen' && typeof resolvedOverlaySrc === 'string' && /\/austen\/pemberley_house\//i.test(resolvedOverlaySrc);
-                                    const baseFx = isPemberley ? 'drop-shadow(0 0 0px rgba(0,0,0,0.85))' : 'none';
-                                    return baseFx;
+                                    return 'none';
                                   })(),
                                 }}
                                 loading={idx === 0 ? 'eager' : 'lazy'}

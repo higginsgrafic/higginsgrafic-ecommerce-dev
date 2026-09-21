@@ -471,13 +471,23 @@ export default function MegaMenuPanel({
                         stripe={(
                           /* La franja de debò: el mateix panell que la filera,
                              amb la imatge de dues fileres (7+7), escalat per
-                             encaixar a la casella. */
+                             encaixar a la casella.
+                             El DIBUIX de sobre les samarretes va 14 px visibles
+                             a la dreta i 29 px amunt; la samarreta no es mou.
+                             A mes, els 7 de la FILERA DE DALT van 12,8 px mes
+                             amunt (--hgStripeDrawingExtraDyFilaDalt): la imatge
+                             talla les samarretes de dalt i, sense aixo, les
+                             impressions hi quedaven mes avall que a la de baix.
+                             Com que el dibuix viu dins el panell escalat, 1 px
+                             d'aquest calibratge fa 2,546 px visibles a 768:
+                             14 / 2,546 = 5,50, i -16,40 es el -5 de sempre
+                             menys 11,40 (els 29 px de dalt). */
                           <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                            <div style={{ height: '100%', transform: 'translateY(119.95px) scale(2.177)', transformOrigin: 'center center', '--megaStripeDx': '0px', '--megaStripeDy': '0px' }}>
+                            <div style={{ height: '100%', transform: 'translateY(119.95px) scale(2.177)', transformOrigin: 'center center', '--megaStripeDx': '0px', '--megaStripeDy': '0px', '--hgStripeDrawingExtraDx': '5.50px', '--hgStripeDrawingExtraDy': '-17.60px', '--hgStripeDrawingExtraDyFilaDalt': '-5.11px' }}>
                               <MegaStripePanelP1
                                 {...propsFranjaP1}
                                 isPortraitTablet
-                                stripeImageSrc="/placeholders/tablet vertical/full-color-stripe-doble.webp"
+                                stripeImageSrc="/placeholders/tablet vertical/full-color-stripe-doble.png"
                                 senseMascaraSamarreta
                                 /* La graella de dibuixos de la vista vertical es a la
                                    seva casella de la taula: aqui no hi ha de ser. */
