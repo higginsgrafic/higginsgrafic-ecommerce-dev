@@ -266,7 +266,13 @@ export const GRAELLA_DIBUIXOS_ESCALA_VERTICAL = {
  * samarreta surt sencera, 1 = queda blanca del tot. Amb valors baixos la
  * samarreta conserva el seu color esmorteit.
  */
-export const VEL_SAMARRETA_BUIDA_ALFA = 0.75;
+export const VEL_SAMARRETA_BUIDA_ALFA = 0.85;
+
+/**
+ * Opacitat del vel quan la samarreta es blanca. Amb el blanc sobre blanc la
+ * samarreta desapareixia, aixi que hi va mes fluix.
+ */
+export const VEL_SAMARRETA_BUIDA_ALFA_BLANCA = 0.6;
 
 /**
  * Dibuixos girats (mirall horitzontal, en X amb eix a Y) a la vista vertical.
