@@ -1,6 +1,7 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import RespescaTitle from '@/pages/productRail/RespescaTitle';
 import ProductCard from '@/pages/productRail/ProductCard';
+import { computeSiteFrame } from '@/components/layout/SiteFrame';
 import { getSafeBelt } from '@/utils/layoutMetrics';
 
 const DEFAULT_IMAGES = [
@@ -129,9 +130,16 @@ export default function TambeRail({
       const pr = pageEl.getBoundingClientRect();
       const pageWidth = Math.max(0, Math.round(pr.width));
 
-      // 1) Prioritzem belt2 (CSS vars `--belt2-xL/xR`, coords de viewport).
-      const beltXL = readCssNumber('--belt2-xL');
-      const beltXR = readCssNumber('--belt2-xR');
+      // 1) El marc del lloc, CALCULAT aqui mateix amb la mateixa formula que
+      // SiteFrame. Abans aixo llegia les CSS vars `--belt2-xL/xR`, que nomes
+      // les publica BeltReferenceOverlay (DEV) i sempre mes tard: el rail
+      // s'ancorava amb el belt de reserva i es tornava a ancorar quan
+      // arribaven les guies, i es veia saltar tota la filera. Calculant-lo,
+      // el valor es el mateix des del primer pintat i no depen de qui
+      // publiqui cap variable.
+      const marc = computeSiteFrame();
+      const beltXL = marc ? marc.xL : null;
+      const beltXR = marc ? marc.xR : null;
       const beltOk = Number.isFinite(beltXL) && Number.isFinite(beltXR) && beltXR > beltXL;
 
       if (beltOk) {
@@ -182,8 +190,8 @@ export default function TambeRail({
       if (user) ro.observe(user);
       if (containerRef.current) ro.observe(containerRef.current);
     } catch { /* ignore */ }
-    // Observa canvis a les CSS vars `--belt2-xL/xR` al :root (publish dinàmic
-    // des de BeltReferenceOverlay) per a recomputar l'ancoratge.
+    // Observa canvis de les CSS vars del marc al :root (publish dinàmic
+    // des de SiteFrame) per a recomputar l'ancoratge.
     try {
       mo = new MutationObserver(schedule);
       mo.observe(document.documentElement, { attributes: true, attributeFilter: ['style'] });

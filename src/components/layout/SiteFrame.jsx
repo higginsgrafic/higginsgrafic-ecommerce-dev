@@ -33,7 +33,7 @@ function readRulerInset() {
   }
 }
 
-function compute() {
+export function computeSiteFrame() {
   if (typeof window === 'undefined' || typeof document === 'undefined') return null;
   // Usem la font de veritat unificada de `layoutMetrics.js`, que resta
   // l'amplada real de la scrollbar del sistema. Això garanteix que tant la
@@ -63,7 +63,7 @@ export default function SiteFrame() {
     const root = document.documentElement;
     let last = { xL: NaN, xR: NaN, w: NaN, gutterMig: NaN };
     const apply = () => {
-      const next = compute();
+      const next = computeSiteFrame();
       if (!next) return;
       if (next.xL === last.xL && next.xR === last.xR && next.w === last.w && next.gutterMig === last.gutterMig) return;
       last = next;
