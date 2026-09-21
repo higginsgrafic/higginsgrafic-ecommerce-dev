@@ -15,6 +15,8 @@ import {
 } from '../../config/stripeCalibrationsVertical';
 import { carrilPx } from '../../utils/layoutMetrics.js';
 import {
+  areesClicAmpla,
+  areesClicEstreta,
   VECTOR_FRANJA_SAMARRETES,
   VECTOR_FRANJA_SAMARRETES_01,
   VECTOR_FRANJA_CAIXES,
@@ -536,6 +538,66 @@ function MegaStripePanel({
                           clipPath={`url(#hgFranjaImatge-${idRetall})`}
                         />
                       ) : null}
+                      {/* Una copia de l'area de clic del fitxer clic-area-2.svg,
+                          damunt de la primera casella, per comprovar on cau. */}
+                      {isPortraitTablet ? (() => {
+                        const arees = areesClicAmpla();
+                        const a = arees[0];
+                        // Una copia de la forma estreta a cada casella de la filera
+                        // de dalt, menys la primera (que ja te la forma ampla).
+                        const estretes = areesClicEstreta().slice(1, 7);
+                        return (
+                          <>
+                            <path
+                              id="hgClicAreaCopia"
+                              d={a.d}
+                              transform={`translate(${a.tx}, ${a.ty}) ${a.transform}`}
+                              fill="rgba(225,6,0,0.12)"
+                              stroke="none"
+                              clipRule="evenodd"
+                            />
+                            {estretes.map((e, k) => (
+                              <path
+                                key={`hg-clic-estreta-${k}`}
+                                id={`hgClicAreaCopiaEstreta-${k + 1}`}
+                                d={e.d}
+                                transform={`translate(${e.tx}, ${e.ty}) ${e.transform}`}
+                                fill="rgba(0,90,225,0.14)"
+                                stroke="none"
+                                clipRule="evenodd"
+                              />
+                            ))}
+                            {areesClicAmpla().slice(0, 1).map((e, k) => {
+                              const m = areesClicAmpla()[13];
+                              return (
+                                <path
+                                  key={`hg-clic-mirall-ampla-${k}`}
+                                  id="hgClicAreaMirallAmpla"
+                                  d={e.d}
+                                  transform={`translate(${m.tx}, ${m.ty}) translate(302.2, 0) scale(-1, 1) ${e.transform}`}
+                                  fill="rgba(225,6,0,0.12)"
+                                  stroke="none"
+                                  clipRule="evenodd"
+                                />
+                              );
+                            })}
+                            {areesClicEstreta().slice(1, 7).map((e, k) => {
+                              const m = areesClicEstreta()[13 - (k + 1)];
+                              return (
+                                <path
+                                  key={`hg-clic-mirall-estreta-${k}`}
+                                  id={`hgClicAreaMirallEstreta-${k + 1}`}
+                                  d={e.d}
+                                  transform={`translate(${m.tx}, ${m.ty}) translate(65.3, 0) scale(-1, 1) ${e.transform}`}
+                                  fill="rgba(0,90,225,0.14)"
+                                  stroke="none"
+                                  clipRule="evenodd"
+                                />
+                              );
+                            })}
+                          </>
+                        );
+                      })() : null}
                       {VECTOR_FRANJA_SAMARRETES.map((d, k) => (
                         <path
                           key={`hg-samarreta-${k}`}
