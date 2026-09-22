@@ -20,20 +20,34 @@
    valor de disseny.
    ========================================================================== */
 
+/* 1rem = 16 unitats de disseny. EL `font-size` VIU AL MARC, NO A L'ARREL.
+   (`--escala` es publica a l'arrel perque el megaslide la pugui llegir.)
+
+   PER QUE NO A L'ARREL, si `rem` tambe escalaria:
+   El lloc actual te 142 fitxers i 383 usos de `rem`, i la majoria de text en
+   HERETA el `font-size`. Canviar-lo a l'arrel mou el lloc SENCER de cop:
+   mesurat, les pagines s'escurcen fins a 159 px i les 18 captures de referencia
+   canvien. A mes, el megaslide esta calibrat sobre un llenç de disseny FIX, i
+   una arrel que depengui de la pantalla el descalibraria a tot arreu.
+
+   La diferencia amb tenir-ho a l'arrel es NOMES qui ho hereta: a dins del marc
+   nou mana igual (1rem = 16 unitats de disseny), i fora no toca res. Quan tot
+   el lloc estigui migrat, es trasllada a l'arrel en una linia. */
 :root {
   --disseny-amplada: 1920;
-  --escala: 0.6667;                 /* terra (1280 px de disseny) */
-  --u: 10.6667px;                   /* 1 unitat de disseny amb el terra */
+  --terra-escala: 0.6667;             /* 1280 px de disseny */
+
+  /* La unitat de disseny i l'escala, com a valors, per al megaslide i per a
+     qualsevol component que les necessiti. */
+  --u: 1rem;
+  --escala: 0.6667;
 }
 
-/* OJO: ha de ser `:root`, no `html`. `:root` te mes especificitat que `html`
-   (es una pseudo-classe), i com que la base tambe es `:root`, una media query
-   amb `html` no guanyaria mai. */
-@media (min-width: 1280px) {
-  :root {
-    --escala: calc(100vw / 1920);
-    --u: calc(100vw / 1920);        /* 1 unitat = 1 px de disseny a 1920 */
-  }
+/* El `font-size` del marc: aqui es on viu la unitat de disseny. El terra es
+   0,6667 (1280 px de disseny): per sota d'aqui la pagina no s'encongeix mes.
+   `clamp` i no una media query, per no tenir problemes d'especificitat. */
+.hg-marc {
+  font-size: clamp(calc(16px * 0.6667), 0.8333vw, 1e6px);   /* 16/1920 = 0.8333vw */
 }
 
 /* ---------------------------------------------------------------------------
@@ -42,17 +56,20 @@
    disseny, i per tant escalen sols. S'hi afegeixen els que calguin, amb nom;
    mai un número solt dins d'un component.
    ------------------------------------------------------------------------- */
-:root {
-  --esp-1: calc(var(--u) * 0.5);    /*   8 unitats: dins d'un element        */
-  --esp-2: var(--u);                /*  16 unitats: entre elements germans   */
-  --esp-3: calc(var(--u) * 2.5);    /*  40 unitats: entre seccions           */
-  --esp-4: calc(var(--u) * 7.5);    /* 120 unitats: els aires grans          */
+.hg-marc {
+  /* EN `em`, NO EN `rem`: `rem` mira SEMPRE l'arrel (que es queda a 16 px per no
+     moure el lloc vell), i per tant no escalaria. `em` mira el `font-size` del
+     propi element, que es el del marc, i per tant escala amb la unitat. */
+  --esp-1: 0.5em;     /*   8 unitats: dins d'un element        */
+  --esp-2: 1em;       /*  16 unitats: entre elements germans   */
+  --esp-3: 2.5em;     /*  40 unitats: entre seccions           */
+  --esp-4: 7.5em;     /* 120 unitats: els aires grans          */
 
   /* Marges laterals del lloc: declarats, no repartits per components. */
   --marge-lateral: var(--esp-3);
 
   /* L'amplada màxima del contingut (el "carril" del disseny). */
-  --contingut-max: calc(var(--u) * 1350);
+  --contingut-max: 84.375em;    /* 1350 unitats */
 }
 
 /* ---------------------------------------------------------------------------
