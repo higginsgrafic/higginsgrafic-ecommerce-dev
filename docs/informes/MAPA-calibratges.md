@@ -279,10 +279,12 @@ Per això quan es mesura una geometria cal dir *quina* peça és, no només on �
 ## 7. Ordre de treball proposat
 
 1. **Aquest mapa** — fet.
-2. **Declarar els paràmetres del llenç en un sol lloc** — fet a mitges: el mòdul
-   existeix (`src/config/llencos.js`) i té proves, però **cap component el fa
-   servir encara**. El que falta és **substituir els números escrits pels
-   derivats, d'un en un, mesurant que no es mogui cap píxel.**
+2. **Declarar els paràmetres del llenç en un sol lloc** — el mòdul existeix
+   (`src/config/llencos.js`) amb 12 proves, i la **primera substitució ja està
+   feta** (`7650fca`): el `0,3385` de `CollectionVerticalPage` i
+   `ConstructorColleccioPage` es deriva de `LLENCOS.colleccio.coef`.
+   **Mou 0,042 px com a màxim** (submil·lèsim), mesurat a les cinc mides.
+   Falta la resta de números escrits.
 3. **Mesurar els PENDENT** que queden: el `− 231`, el `430px` de la hero, el
    `752px` de la graella d'inici, i els 135 del megaslide.
 4. **Separar `--escala` de `--escala-text`** a `foundation.css`, que és el que
