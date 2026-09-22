@@ -121,49 +121,85 @@ del derivat (`0,02807217`).
 | `CercadorTextRow.jsx:23-24` | mockup **4512 px** = 100cqw, factor `1/45,12` | el llenç del cercador; d'aquí surten `LINE_H`, `LINE_THICK`, `BULLET_D`, `BULLET_CX`, `TEXT_X` |
 | `layoutMetrics.js:137/212` | `1350` sobre `1920` | el carril del lloc |
 
-### 2.4 El `− 231`: la història d'un pedaç, amb dates
+### 2.4 El `− 231`: resolt, i amb una conclusió meva que era falsa
 
-No és cap fila ni cap sobrant. És el residu d'un valor **fix** que es va
-convertir en fórmula perquè quadrès a unes mides i no a altres.
+El `− 231` **no és cap fila ni cap sobrant**, i tampoc és el residu d'un valor fix
+que calgui treure, com vaig escriure primer. La història i la conclusió bona són
+a **§2.4 bis**. Aquest apartat es deixa perquè el rastre de com es va arribar a
+la conclusió equivocada és part de la feina.
 
-**Què hi havia abans.** El commit `de798da` (14/09/2026, «Fitxa de producte en
-format taula») va canviar la posició de la píndola «en vols saber més?»:
+**El que sí que és cert, i està comprovat:**
 
-```diff
-- bottom: '-54px',
-+ bottom: `calc((calc(carril * 0.84632 - 231px) - calc((carril - 45px) / 3 * 1.3)) / 2 - 14px)`,
-```
-
-O sigui: hi havia un píndol a 54 px sota la caixa, i la fórmula nova es va
-construir **per reproduir aquell 54** amb l'amplada del carril a dins.
-
-**Què és cada tros (mesurat a 1920, carril 1350):**
-
-| tros | valor | què és |
+| tros de la fórmula | valor a 1920 | què és |
 |---|---|---|
-| `carril × 0,84632` | 1142,5 | **30 files** del llenç: l'alçada de la graella **sense** el `− 231` |
-| `− 231` | 231 | la meitat de la píndola (39 px) i el forat fins a 54... **en realitat, un número de rescat** |
+| `carril × 0,84632` | 1142,5 | **30 files** del llenç (`30 × 74,533 / 2642 = 0,846328`) |
+| `− 231` | 231 | un número pla: no és cap fila (6,07 a 1920, 11,37 a 1024) ni cap sobrant (510 a 1920, 97 a 1024) |
 | `(carril − 45) / 3 × 1,3` | 565,5 | una columna de la graella, la imatge 1,3 cops més alta |
-| `/2 − 14` | | la meitat del bloc de descripció, menys 14 px |
+| `/2 − 14` | | **mig grup menys mig bloc de descripció, més 14 px** |
 
-**I per què és un rescat, amb el número.** El `0,84632` és **exactament 30 files**
-del llenç (`30 × 74,533 / 2642 = 0,846328`), o sigui una alçada **fixa** en
-proporció al carril. Però el contingut que hi va a dins **no té aquesta alçada**:
-mesurat a les cinc mides, l'alçada natural de la columna (targeta + píndola) és
-**401 px a 1920, 295 a 1440, 356 a 1280 i 281 a 1024**. La diferència entre el
-que la graella ofereix i el que el contingut necessita no és constant, i per tant
-**cap número fix no la pot corregir bé a totes les mides**. El `− 231` ho intenta
-i, per això, la píndola queda a una distància diferent de la caixa a cada mida.
-
-**El `− 231` no s'ha de desenrevessar: s'ha de treure.** El propi codi ho diu, a
-`collectionVertical.js`: «clavar els 25 px exactes a totes les mides demanaria
-deixar la graella de files i passar a un flex amb `gap`». Aquesta graella, a més,
-**no és una graella: és una fila**. Fer-la servir per repartir alçada és el que
-obliga a tenir un número de rescat.
+I va néixer amb la galeria: commit `9557360` (12/07/2026), dins de l'alçada del
+grup, sense cap més context que el número. El candidat més versemblant és que
+l'alçada del grup es calibrés a **1440** perquè la píndola caigués on tocava:
+`1013 × 0,84632 − 231 = 626,3`, i a 1440 el grup mesura 625,9.
 
 ---
 
-### 2.5 Proporcions de la pròpia peça (ja són bones)
+### 2.4 bis Què és el `− 231` de debò: no és un pedaç
+
+**La conclusió anterior meva («s'ha de treure») era falsa.** Vaig suposar que la
+píndola havia d'estar a una distància fixa de la caixa, i **no ho està**.
+
+**Mesurat: l'aire entre la caixa de la targeta i la píndola no és constant.**
+
+| mida | alçada de la caixa (targeta blanca) | píndola y | **aire caixa → píndola** |
+|---|---|---|---|
+| 1920 | 401 | 2178,8 | **312,5** |
+| 1440 | 295 | 1742,6 | **202,6** |
+| 1280 | 356 | 1470,8 | **69,6** |
+| 1024 | 281 | 1279,8 | **29,4** |
+| 768 | 324 | 1865,8 | **397,2** |
+
+De 29 px a 397 px. Cap `gap` fix pot reproduir això, i per tant **passar a `flex`
+amb `gap` no és una reparació: és un altre disseny.**
+
+**I on és clavada, doncs?** La fórmula es llegeix així:
+
+```
+bottom = (alçada_del_grup − alçada_de_la_descripció) / 2 − 14
+```
+
+que vol dir: **el centre de la píndola cau al mig del bloc de descripció de la
+columna, 14 px més avall.** Comprovat a 1920: el centre del bloc de descripció és
+a 1825,2, i el de la píndola a 2198,3 = **401 × 1,5 + 14,3** (mig grup + 14).
+A 1440 i a 1280 també surt «mig grup + 14»; a 1024 en surt 33. La regla és
+doncs coherent: **la píndola va penjada del mig del bloc de descripció**, i això
+és un disseny, no un pedaç.
+
+**Llavors, què és el `− 231`?** És un número pla que va néixer amb la galeria
+(commit `9557360`, 12/07/2026) dins de l'alçada del grup, i que **no es pot
+descompondre**: no és cap fila (6,07 a 1920 i 11,37 a 1024), no és cap sobrant
+(510 px a 1920 i 97 a 1024) i no és cap alçada de naturalesa. El candidat més
+versemblant és que l'alçada del grup es va calibrar a 1440 per fer caure la
+píndola on tocava: `1013 × 0,84632 − 231 = 626,3`, i a 1440 el grup mesura
+625,9.
+
+**El que això implica, i és una decisió que no em toca prendre:**
+
+1. **Conservar el dibuix** i, com a molt, donar nom a cada tros. A 1440 el
+   dibuix mouria **mig píxel** (de 1013 a 1012,5), perquè el carril exacte és
+   1012,5 i el JavaScript l'arrodonia.
+2. **Posar la píndola en un lloc previsible** (per exemple una distància fixa
+   sota la caixa), que és el que fa **tota** la resta del lloc i que és
+   clarament millor, però que **canvia el dibuix** de manera visible.
+3. **Deixar-ho en flux** (`flex` amb `gap`), que és el que el comentari de
+   `collectionVertical.js` proposa per a una altra cosa (les files de fitxes) i
+   que aquí canviaria totes dues coses alhora. **La meva recomanació és no
+   fer-ho:** barrejar la reparació amb el redisseny és com no se sap què ha
+   mogut què.
+
+---
+
+### 2.6 Proporcions de la pròpia peça (ja són bones)
 
 Aquests no cal tocar-los: es mesuren contra la peça, no contra la pantalla.
 
@@ -172,7 +208,7 @@ Aquests no cal tocar-los: es mesuren contra la peça, no contra la pantalla.
 | `CollectionVerticalPage:158-163` | `× 0.72 / 0.2 / 0.07 / 0.095 / 0.15 / 0.1` | amplada del selector, alçada, font de talla, font de text, cistell, gap del preu — **tot sobre l'amplada de la fitxa** | CLAR |
 | `tdpMida.js` | columnes per amplada, alçada 5:4 | la font única de la mida de la fitxa | CLAR |
 
-### 2.6 Desplaçaments de rescat (no escalen, i són el que ha de marxar)
+### 2.7 Desplaçaments de rescat (no escalen, i són el que ha de marxar)
 
 | on | valor | què compensa | estat |
 |---|---|---|---|
@@ -187,7 +223,7 @@ Aquests no cal tocar-los: es mesuren contra la peça, no contra la pantalla.
 | `collectionVertical.js:60` | `clamp(120px, 26vh, 260px)` | l'alçada de la franja | rescat |
 | megaslide | terres de **10 px** i **12 px** | llegibilitat del text quan l'escala baixa | rescat |
 
-### 2.7 Números que semblen calibradors i no ho són
+### 2.8 Números que semblen calibradors i no ho són
 
 | on | valor | què és |
 |---|---|---|
@@ -330,10 +366,11 @@ Per això quan es mesura una geometria cal dir *quina* peça és, no només on �
    `ConstructorColleccioPage` es deriva de `LLENCOS.colleccio.coef`.
    **Mou 0,042 px com a màxim** (submil·lèsim), mesurat a les cinc mides.
    Falta la resta de números escrits.
-3. **Treure el `− 231`** en comptes de desenrevessar-lo: la graella de la galeria
-   no és una graella sinó **una fila**, i el que cal és el `flex` amb `gap` que
-   el mateix codi ja proposa a `collectionVertical.js`. Això sí que mou el
-   disseny, i per tant és una decisió, no una nomenclatura.
+3. **Decidir què es fa amb la píndola de la galeria** (§2.4 bis). No és una
+   nomenclatura: la píndola va penjada del mig del bloc de descripció, i l'aire
+   fins a la caixa va de 29 a 397 px. Les tres opcions són conservar el dibuix,
+   posar-la a una distància fixa, o deixar-ho en flux. **Les dues últimes
+   canvien el dibuix i són una decisió de l'amo.**
 4. **Mesurar els PENDENT** que queden: el `430px` de la hero, el `752px` de la
    graella d'inici, i els 135 del megaslide.
 5. **Separar `--escala` de `--escala-text`** a `foundation.css`, que és el que
