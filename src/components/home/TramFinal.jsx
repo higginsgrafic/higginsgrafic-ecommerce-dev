@@ -102,7 +102,11 @@ const TramFinal = forwardRef(function TramFinal(
       {/* Subtítol "ALTRES HISTÒRIES" (Fila local 45 / 46 - correspon a global 245 / 246) */}
       <div
         style={{
-          gridColumn: '1 / 3',
+          // El titol ocupa tota l'amplada i va centrat: abans ocupava mitja
+          // graella i el text quedava a l'esquerra (arribava a estar 317 px
+          // desviat del centre a 1920), i a sobre el desplaçavem amb
+          // `translateX(27px)`, cosa que el feia sortir del seu lloc.
+          gridColumn: '1 / 5',
           gridRow: '39 / 40',
           alignSelf: 'center',
           fontFamily: 'Roboto Condensed, sans-serif',
@@ -112,11 +116,10 @@ const TramFinal = forwardRef(function TramFinal(
           letterSpacing: '0.2em',
           textTransform: 'uppercase',
           color: 'rgba(71, 80, 89, 0.7)',
-          textAlign: 'left',
+          textAlign: 'center',
           pointerEvents: 'auto',
-          // Alineat amb la primera targeta del rail (la seva esquerra) i a
-          // 20px per sobre seu.
-          transform: 'translateY(113px) translateX(27px)',
+          // Només el desplaçament vertical.
+          transform: 'translateY(123px)',
         }}
       >
         ALTRES HISTÒRIES
@@ -134,6 +137,11 @@ const TramFinal = forwardRef(function TramFinal(
         }}
       >
         <TambeRail
+          // El rail ha de començar per la PRIMERA targeta. El valor per defecte
+          // del component es 3 (el carrousel te clones al davant i arrencava
+          // desplaçat tres targetes), i a les fulles de colleccio aixo feia que
+          // el rail sortis desviat a l'esquerra i es talles a la dreta.
+          initialIndex={0}
           cardHref={tambeHref}
           title={tambeTitle}
           images={tambeImages}

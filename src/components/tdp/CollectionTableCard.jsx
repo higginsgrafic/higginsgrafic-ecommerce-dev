@@ -34,7 +34,14 @@ const cartIconSrc = (count) => {
 function CollectionTableCard({
   gridColumn,
   gridRow,
+  // Posicionament explicit (opcional). Si hi es, mana sobre gridColumn/gridRow.
+  cardGeometry,
+  // Gira el fons degradat (es feia servir per a la variant B).
+  gradientGirat = false,
   productName,
+  // Noms que s'han de partir en linies concretes (no on caigui el salt
+  // automatic). Si hi es, mana sobre `productName`.
+  productNameLines,
   imageSrc,
   imageAlt = '',
   hoverImages = [],
@@ -76,11 +83,19 @@ function CollectionTableCard({
   const P = TDP_PRICE_SETTINGS;
   const T = TDP_SIZE_BUTTON_TEXT_SETTINGS;
 
+  // Alcada FIXA de dues linies. Si la fila del nom creix amb el text, la
+  // imatge de sota es queda amb menys espai i les samarretes surten de mides
+  // diferents segons si el nom te una linia o dues (136 px contra 120 a 768).
+  // Amb l'alcada fixa, totes les samarretes tenen el mateix espai.
+  const alcadaFilaNom = Math.round((textFontPx || 16) * 2 + 4);
+
   const filaNom = (
     <div
       key="nom"
       style={{
         flex: '0 0 auto',
+        height: `${alcadaFilaNom}px`,
+        boxSizing: 'border-box',
         borderBottom: LINE,
         display: 'flex',
         alignItems: 'center',
@@ -91,7 +106,11 @@ function CollectionTableCard({
       <Link
         to={enllac || '#'}
         style={{
+          // Amb les linies explicites, l'enllac ha de ser una COLUMNA: si es
+          // una fila, les linies surten una al costat de l'altra en comptes
+          // d'una sota l'altra.
           display: 'flex',
+          flexDirection: productNameLines?.length ? 'column' : 'row',
           alignItems: 'center',
           justifyContent: 'center',
           width: '100%',
@@ -102,12 +121,21 @@ function CollectionTableCard({
           fontWeight: N.fontWeight,
           letterSpacing: `${N.letterSpacing}em`,
           lineHeight: N.lineHeight,
-          textAlign: 'center',
+          // El nom va a l'ESQUERRA de la fitxa.
+          textAlign: 'left',
           textTransform: N.textTransform,
-          whiteSpace: textFontPx ? 'normal' : 'nowrap',
+          // Amb les linies explicites no volem que tambe parti sol.
+          whiteSpace: productNameLines?.length ? 'nowrap' : (textFontPx ? 'normal' : 'nowrap'),
         }}
       >
-        {productName}
+        {productNameLines?.length
+          ? productNameLines.map((linia, i) => (
+            <span key={linia}>
+              {i > 0 ? <br /> : null}
+              {linia}
+            </span>
+          ))
+          : productName}
       </Link>
     </div>
   );
@@ -170,14 +198,25 @@ function CollectionTableCard({
     </div>
   );
 
-  return (
-    <div
-      aria-label="TDP taula"
-      style={{
+  // Posicionament explicit (opcional): quan es passa `cardGeometry`, la fitxa
+  // deixa de ser una fila de la graella i es col·loca amb `top`/`left` en px.
+  // Es el que permet separar les files una distancia EXACTA, perque la fila de
+  // la graella no es proporcional a l'alcada de la fitxa (240 px de fitxa en
+  // una fila de 19,09 px a 768) i cap multiple enter dona la separacio volguda.
+  const posicionament = cardGeometry
+    ? { position: 'absolute', top: `${cardGeometry.top}px`, left: `${cardGeometry.left}px`, width: `${cardGeometry.amplada}px`, height: `${cardGeometry.alcada}px` }
+    : {
         gridColumn,
         gridRow,
         // El fons de la graella es absolute: cal anar-hi per sobre.
         position: 'relative',
+      };
+
+  return (
+    <div
+      aria-label="TDP taula"
+      style={{
+        ...posicionament,
         zIndex: 2,
         display: 'flex',
         flexDirection: 'column',
@@ -203,8 +242,9 @@ function CollectionTableCard({
             backgroundSize: 'cover',
             backgroundPosition: 'center',
             backgroundRepeat: 'no-repeat',
-            // A la variant B el degradat va invertit (girat verticalment).
-            transform: variantB ? 'scaleY(-1)' : undefined,
+            // El degradat pot anar invertit (girat verticalment) per fer
+            // contrast entre columnes; es independent de la variant de fitxa.
+            transform: gradientGirat ? 'scaleY(-1)' : undefined,
             zIndex: -1,
             pointerEvents: 'none',
           }}

@@ -86,19 +86,43 @@ export const HERO_TDP_SEPARACIO_PX = 150;
 /**
  * Separacio VERTICAL entre files de fitxes.
  *
- * El pitch vertical de la graella son 13 files; una fitxa n'ocupa 11 i les 2 que
- * sobren son aquesta separacio. Amb 12 files en queda una, que es el minim
- * possible amb aquesta graella. NO es pot fixar en un numero exacte de px: la
- * fila fa entre 22 i 39 px segons l'amplada, perque l'alcada de la fitxa es
- * proporcional a l'ample del carril, no a l'alcada de la fila.
+ * El fons degradat de cada fitxa es un fill ABSOLUT que sobresurt 30 px a dalt i
+ * 30 a baix (`CollectionTableCard`, esta fet a posta). La separacio entre dues
+ * files, doncs, es:
+ *
+ *     30 px  (bleed de baix de la fitxa de dalt)
+ *   + 25 px  (aire entre els dos fons)          <- el que es veu
+ *   + 30 px  (bleed de dalt de la fitxa de baix)
+ *   ------
+ *     85 px  entre les caixes blanques
+ *
+ * El pitch de la graella hauria de ser l'alcada de la fitxa mes aquests 85 px.
+ * Com que la fila de la graella NO es proporcional a l'alcada de la fitxa, el
+ * pitch en px depen de l'amplada (14,1 files a 768 i 13,2 a 1920), i amb un
+ * pitch fix de 15 files la separacio entre fons queda aixi:
+ *
+ *     ample   buit caixes   buit FONS
+ *      768        91 px       31 px
+ *     1024       121         61
+ *     1280       150         90
+ *     1440       117         57
+ *     1920       155         95
+ *
+ * Amb 14 files el buit entre fons queia a 9 px a 768 (massa just); amb 15 es
+ * queda entre 31 i 95 px. Clavar els 25 px exactes a totes les mides demanaria
+ * deixar la graella de files i passar a un flex amb `gap`.
  */
-export const TDP_PITCH_FILES = 12;
+export const TDP_PITCH_FILES = 15;
+/** Aire entre els fons de dues files. Es el que es veu. */
+export const TDP_SEPARACIO_FONS_PX = 15;
+/** Quant sobresurt el fons degradat de la fitxa, a dalt i a baix. */
+export const TDP_FONS_BLEED_PX = 30;
 
 /**
  * Separacio entre l'ultima fila de fitxes i el text del poster del bloc final.
  * El marge del bloc es calcula per deixar exactament aquesta distancia.
  */
-export const TDP_POSTER_SEPARACIO_PX = 48;
+export const TDP_POSTER_SEPARACIO_PX = 200;
 
 export const HERO_TDP_GAP_TABLET_PX = '338px';
 export const HERO_TDP_GAP_LANDSCAPE_PX = '-240px';
@@ -189,11 +213,11 @@ const THE_HUMAN_INSIDE_PRODUCTS = [
 const AUSTEN_PRODUCTS = [
   { collection: 'austen-keep-calm', route: 'keep-calm', name: 'KEEP CALM' },
   { collection: 'austen-pemberley', route: 'pemberley-house', name: 'PEMBERLEY HOUSE' },
-  { collection: 'austen-quotes', route: 'quotes-half-agony-half-hope', name: 'HALF AGONY HALF HOPE' },
+  { collection: 'austen-quotes', route: 'quotes-half-agony-half-hope', name: 'HALF AGONY HALF HOPE', nomLinies: ['HALF AGONY', 'HALF HOPE'] },
   { collection: 'austen-quotes', route: 'quotes-i-admire-and-love-you', name: 'I ADMIRE AND LOVE YOU' },
   { collection: 'austen-quotes', route: 'quotes-it-is-a-truth', name: 'IT IS A TRUTH' },
-  { collection: 'austen-quotes', route: 'quotes-unsociable-and-taciturn', name: 'UNSOCIABLE AND TACITURN' },
-  { collection: 'austen-quotes', route: 'quotes-you-have-bewitched-me', name: 'YOU HAVE BEWITCHED ME' },
+  { collection: 'austen-quotes', route: 'quotes-unsociable-and-taciturn', name: 'UNSOCIABLE AND TACITURN', nomLinies: ['UNSOCIABLE', 'AND TACITURN'] },
+  { collection: 'austen-quotes', route: 'quotes-you-have-bewitched-me', name: 'YOU HAVE BEWITCHED ME', nomLinies: ['YOU HAVE', 'BEWITCHED ME'] },
   { collection: 'austen-crosswords', route: 'persuasion-1', name: 'PERSUASION 1' },
   { collection: 'austen-crosswords', route: 'persuasion-2', name: 'PERSUASION 2' },
   { collection: 'austen-crosswords', route: 'persuasion-3', name: 'PERSUASION 3' },
@@ -206,14 +230,14 @@ const AUSTEN_PRODUCTS = [
   { collection: 'austen-crosswords', route: 'sense-and-sensibility-2', name: 'SENSE & SENSIBILITY 2' },
   { collection: 'austen-crosswords', route: 'sense-and-sensibility-3', name: 'SENSE & SENSIBILITY 3' },
   { collection: 'austen-crosswords', route: 'sense-and-sensibility-4', name: 'SENSE & SENSIBILITY 4' },
-  { collection: 'austen-looking-for-my-darcy', route: 'looking-for-my-darcy-blue-solid', name: 'LOOKING FOR MY DARCY' },
-  { collection: 'austen-looking-for-my-darcy', route: 'looking-for-my-darcy-pink-solid', name: 'LOOKING FOR MY DARCY' },
-  { collection: 'austen-looking-for-my-darcy', route: 'looking-for-my-darcy-pink-yellow-frame', name: 'LOOKING FOR MY DARCY' },
-  { collection: 'austen-looking-for-my-darcy', route: 'looking-for-my-darcy-red-solid', name: 'LOOKING FOR MY DARCY' },
-  { collection: 'austen-looking-for-my-darcy', route: 'looking-for-my-darcy-red-yellow-frame', name: 'LOOKING FOR MY DARCY' },
-  { collection: 'austen-looking-for-my-darcy', route: 'looking-for-my-darcy-yellow-blue-frame', name: 'LOOKING FOR MY DARCY' },
-  { collection: 'austen-looking-for-my-darcy', route: 'looking-for-my-darcy-yellow-pink-frame', name: 'LOOKING FOR MY DARCY' },
-  { collection: 'austen-looking-for-my-darcy', route: 'looking-for-my-darcy-yellow-solid', name: 'LOOKING FOR MY DARCY' },
+  { collection: 'austen-looking-for-my-darcy', route: 'looking-for-my-darcy-blue-solid', name: 'LOOKING FOR MY DARCY', nomLinies: ['LOOKING FOR', 'MY DARCY'] },
+  { collection: 'austen-looking-for-my-darcy', route: 'looking-for-my-darcy-pink-solid', name: 'LOOKING FOR MY DARCY', nomLinies: ['LOOKING FOR', 'MY DARCY'] },
+  { collection: 'austen-looking-for-my-darcy', route: 'looking-for-my-darcy-pink-yellow-frame', name: 'LOOKING FOR MY DARCY', nomLinies: ['LOOKING FOR', 'MY DARCY'] },
+  { collection: 'austen-looking-for-my-darcy', route: 'looking-for-my-darcy-red-solid', name: 'LOOKING FOR MY DARCY', nomLinies: ['LOOKING FOR', 'MY DARCY'] },
+  { collection: 'austen-looking-for-my-darcy', route: 'looking-for-my-darcy-red-yellow-frame', name: 'LOOKING FOR MY DARCY', nomLinies: ['LOOKING FOR', 'MY DARCY'] },
+  { collection: 'austen-looking-for-my-darcy', route: 'looking-for-my-darcy-yellow-blue-frame', name: 'LOOKING FOR MY DARCY', nomLinies: ['LOOKING FOR', 'MY DARCY'] },
+  { collection: 'austen-looking-for-my-darcy', route: 'looking-for-my-darcy-yellow-pink-frame', name: 'LOOKING FOR MY DARCY', nomLinies: ['LOOKING FOR', 'MY DARCY'] },
+  { collection: 'austen-looking-for-my-darcy', route: 'looking-for-my-darcy-yellow-solid', name: 'LOOKING FOR MY DARCY', nomLinies: ['LOOKING FOR', 'MY DARCY'] },
 ];
 
 /**

@@ -26,6 +26,8 @@ import {
   HERO_TDP_GAP_LANDSCAPE_PX,
   HERO_TDP_SEPARACIO_PX,
   TDP_PITCH_FILES,
+  TDP_SEPARACIO_FONS_PX,
+  TDP_FONS_BLEED_PX,
   TDP_POSTER_SEPARACIO_PX,
 } from '@/config/collectionVertical';
 import { readOverlayState, writeOverlayState } from '@/utils/collectionOverlayState';
@@ -119,6 +121,39 @@ function CollectionVerticalPage({ slug }) {
   const { pautaOpacity, tableOpacity, backgroundOpacity } = overlayState;
   const otherImages = useMemo(() => buildOtherCollectionsImages(slug), [slug]);
   const getCardLayout = useCollectionCardLayout({ isPortraitTablet, isLandscapeTablet });
+
+  // Geometria de les fitxes. La seva alcada NO es proporcional a l'alcada de
+  // fila de la graella (240 px de fitxa en una fila de 19,09 px a 768), aixi
+  // que no es pot posicionar per files: es calcula i es col·loca amb `top`.
+  //
+  // Les proporcions son mesurades a 768/1024/1280/1366/1440/1920:
+  // alcada = carril x 0,4446 (tauleta) o x 0,308 (escriptori).
+  // Entre files: 30 px de bleed de baix + 15 px d'aire + 30 px de bleed de dalt.
+  const esTauleta = isPortraitTablet || isLandscapeTablet;
+  const alcadaFitxa = Math.round(carrilAmple * (esTauleta ? 0.4446 : 0.308));
+  const separacioFiles = TDP_SEPARACIO_FONS_PX + 2 * TDP_FONS_BLEED_PX; // 15 + 60
+  const numColumnes = esTauleta ? 3 : 4;
+  // El GUTTER horitzontal de la pauta: 22,5 px per columna (es el que separen
+  // les columnes, i sense ell les fitxes quedaven enganxades lateralment).
+  const gutterX = 22.5;
+  const ampladaFitxa = Math.round((carrilAmple - (numColumnes - 1) * gutterX) / numColumnes);
+  const pasColumna = ampladaFitxa + gutterX;
+  const ampladaUtilitzada = ampladaFitxa * numColumnes + (numColumnes - 1) * gutterX;
+  const margeEsquerre = Math.round((carrilAmple - ampladaUtilitzada) / 2);
+  const alcadaFila = alcadaFitxa + separacioFiles;
+
+  // Mides interiors de la fitxa, proporcionals a la SEVA amplada. Abans el
+  // cistell era fix (34 px) i el preu depenia de la finestra
+  // (`responsiveFont(24, 9)`), aixi que a 768 el cistell era mes ample que el
+  // text del preu i el selector de talles quedava comprimit.
+  const midesFitxa = {
+    sizeSelectorWidth: `${Math.round(ampladaFitxa * 0.72)}px`,
+    sizeSelectorHeight: `${Math.round(ampladaFitxa * 0.2)}px`,
+    sizeFontPx: Math.round(ampladaFitxa * 0.07),
+    textFontPx: Math.round(ampladaFitxa * 0.095),
+    cartSizePx: Math.round(ampladaFitxa * 0.15),
+    priceGap: `${Math.round(ampladaFitxa * 0.1)}px`,
+  };
 
   // Desplaçament de la graella perque la primera fitxa quedi sota la hero.
   const [pushDownPx, setPushDownPx] = useState(0);
@@ -508,22 +543,35 @@ function CollectionVerticalPage({ slug }) {
             if (!color || !producte) return null;
             const col = colIdx + 1;
             const Card = CollectionTableCard;
-            const variantB = (rowIdx + colIdx) % 2 === 1;
+            // Totes les fitxes son EXACTAMENT com la primera: nom a sobre la
+            // samarreta i el fons sense girar. Fora, doncs, l'alternanca de
+            // variants que hi havia (abans alternava en escacs per
+            // `(rowIdx + colIdx) % 2`).
+            const variantB = false;
+            const gradientGirat = false;
             // Files de 11 espais + 2 de separacio: el gap entre files de fitxes
             // queda a la meitat.
             const rowOffset = 10 + rowIdx * TDP_PITCH_FILES;
+            const cardGeometry = {
+              top: rowIdx * alcadaFila,
+              left: Math.round(margeEsquerre + colIdx * pasColumna),
+              amplada: ampladaFitxa,
+              alcada: alcadaFitxa,
+            };
             const productName = producte.name;
             const { imageTranslateY, productNameTranslateY, descriptionTranslateY } = getCardLayout(colIdx);
             return (
               <CollectionTdpCard
                 key={`tdp-card-r${rowIdx}-c${colIdx}`}
                 Component={Card}
-                gridColumn={`${col} / ${col + 1}`}
-                gridRow={`${6 + rowOffset} / ${17 + rowOffset}`}
+                cardGeometry={cardGeometry}
+                {...midesFitxa}
                 variantB={variantB}
+                gradientGirat={gradientGirat}
                 backgroundSrc={COLLECTION_BG_SRC}
                 rowOffset={rowOffset}
                 productName={productName}
+                productNameLines={producte.nomLinies}
                 description=""
                 price={SELLING_PRICE_LABEL}
                 imageSrc={collectionGridImageFor(producte.collection || slug, producte.route, color, idx)}
