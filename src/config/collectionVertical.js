@@ -93,6 +93,18 @@ const TDP_GRID_COLORS = [
  */
 const TDP_GRID_COLORS_FLAT = TDP_GRID_COLORS.flat();
 
+/**
+ * Austen tenia la seva propia paleta: 14 colors plans, indexats amb
+ * `idx % length`. Amb la graella 4x4 (nomes 4 files) les fitxes de la 5a fila
+ * en endavant quedaven sense color i no es pintaven: 16 fitxes en comptes de 28.
+ */
+const CANON_COLORS = [
+  'white', 'light-blue', 'royal', 'purple',
+  'navy', 'daisy', 'gold', 'light-pink',
+  'red', 'kiwi', 'irish-green', 'military-green',
+  'forest-green', 'black',
+];
+
 /** Productes de Cube (s'assignen a les cel·les ciclicament). */
 const CUBE_PRODUCTS = [
   { route: 'afrodita-c', name: 'AFRODITA-C' },
@@ -187,12 +199,16 @@ const AUSTEN_PRODUCTS = [
  *   (`idx % length` sobre la llista plana). Fa resultats diferents.
  * - `gridRows` / `gridAspect`: quantes files te la pauta gran i la seva
  *   proporcio. Austen en te mes perque te mes productes.
+ * - `filesDeFitxes`: quantes files de fitxes pinta la graella. NO es dedueix
+ *   del nombre de productes (Cube en te 10 i en pintava 16, repetint-los): es
+ *   el que tenia cada pagina, i canviar-lo trauria o afegiria fitxes.
  * - `posterExtra`: nomes Austen te mes files de TDP, i el poster ha de baixar
  *   per mantenir el mateix aire a sobre.
  * - `copy`: el numero de copia de la pagina. Determina les claus d'estat.
  */
 const CONFIGURACIONS = {
   'cube': {
+    filesDeFitxes: 4,
     slug: 'cube',
     nom: 'CUBE',
     nomMenu: 'Cube',
@@ -205,6 +221,7 @@ const CONFIGURACIONS = {
     copy: 5,
   },
   'first-contact': {
+    filesDeFitxes: 4,
     slug: 'first-contact',
     nom: 'FIRST CONTACT',
     nomMenu: 'First Contact',
@@ -227,6 +244,7 @@ const CONFIGURACIONS = {
     },
   },
   'miscellania': {
+    filesDeFitxes: 4,
     slug: 'miscellania',
     nom: 'MISCEL·LÀNIA',
     nomMenu: 'Miscel·lània',
@@ -239,6 +257,7 @@ const CONFIGURACIONS = {
     copy: 6,
   },
   'the-human-inside': {
+    filesDeFitxes: 4,
     slug: 'the-human-inside',
     nom: 'THE HUMAN INSIDE',
     nomMenu: 'The Human Inside',
@@ -253,6 +272,7 @@ const CONFIGURACIONS = {
     colorStrategy: 'plana',
   },
   'austen': {
+    filesDeFitxes: 7,
     slug: 'austen',
     nom: 'AUSTEN',
     nomMenu: 'Austen',
@@ -260,7 +280,11 @@ const CONFIGURACIONS = {
     seoTitle: 'Austen · Constructor | Higgins Gràfic',
     seoDescription: 'Plantilla de construcció de col·lecció amb header global, pauta de 4 columnes i footers globals.',
     products: AUSTEN_PRODUCTS,
-    colors: TDP_GRID_COLORS,
+    colors: CANON_COLORS,
+    // Els colors surten de la seva llista plana de 14, no de la graella 4x4:
+    // amb la graella, la 5a fila de fitxes quedava sense color i no es pintava
+    // (16 fitxes en comptes de 28).
+    colorStrategy: 'plana',
     posterLines: [{ text: 'CADA' }, { text: 'DIBUIX TÉ' }, { text: 'UNA MIRADA' }],
     copy: 4,
     gridRows: 150,
