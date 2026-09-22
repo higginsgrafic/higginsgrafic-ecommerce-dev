@@ -134,6 +134,29 @@ export const TDP_POSTER_PADDING_TOP_PX = 50;
  */
 export const TDP_PEUSEPARACIO_PX = 24;
 
+/**
+ * Aire entre el titol d'una colleccio i la seva primera fila de fitxes, a la
+ * pagina d'inici.
+ *
+ * ERA DUES COSES: les quatre ultimes colleccions feien servir 150 px
+ * (75 a tauleta) i la PRIMERA en feia 75 (37 a tauleta). Com que la distancia
+ * efectiva es `marge + 87 px` a escriptori i `marge + 38/39` a tauleta, la
+ * primera colleccio quedava 88 px mes a prop de les seves fitxes que les
+ * altres, i algu ho havia compensat amb un `top` negatiu propi de cada galeria
+ * (-13, 0, -22, -6, -13), que desplaçava el dibuix en comptes d'ajustar el
+ * marge. Un `top` per galeria es un pedaç: el que mana es el marge, i es un
+ * de sol.
+ */
+export const HOME_TITOL_TDP_MARGIN_PX = { escriptori: 150, tauleta: 75 };
+
+/**
+ * Desplaçament propi de cada galeria de l'inici. JA NO SE N'HA DE FER SERVIR
+ * CAP: existeix perque el marge era diferent a cada colleccio i algu ho
+ * compensava movent el dibuix. Es deixa declarat a zero perque quedi escrit
+ * que el numero que hi havia (-13, 0, -22, -6, -13) no era dissseny.
+ */
+export const HOME_GALERIA_TOP_PX = 0;
+
 export const HERO_TDP_GAP_TABLET_PX = '338px';
 export const HERO_TDP_GAP_LANDSCAPE_PX = '-240px';
 

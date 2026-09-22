@@ -13,6 +13,7 @@ import StoryPosterLink from '@/components/StoryPosterLink';
 import useIsMobile from '@/hooks/useIsMobile';
 import HomeMobile from '@/pages/HomeMobile';
 import { SELLING_PRICE_LABEL } from '@/config/pricing';
+import { HOME_TITOL_TDP_MARGIN_PX, HOME_GALERIA_TOP_PX } from '@/config/collectionVertical';
 import { esTauletaApaisada } from '@/utils/layoutMetrics';
 import { laneForViewport } from '@/utils/layoutModel';
 import { tdpMidaFitxa } from '@/utils/tdpMida';
@@ -729,12 +730,12 @@ function Home() {
             subtitleOffsetY={0}
             collectionHref="/first-contact"
           />
-          <div style={{ marginTop: isTablet ? '37px' : '75px' }}>
+          <div style={{ marginTop: isTablet ? `${HOME_TITOL_TDP_MARGIN_PX.tauleta}px` : `${HOME_TITOL_TDP_MARGIN_PX.escriptori}px` }}>
             <div
               style={{
                 position: 'relative',
                 left: '50%',
-                top: '-13px', // Mogut 1 fila cap amunt (abans 25px, reduït 38px)
+                top: `${HOME_GALERIA_TOP_PX}px`,
                 transform: 'translateX(-50%)',
                 width: 'calc(var(--hg-tdp-xR) - var(--hg-tdp-xL))',
                 height: 'calc(calc(calc(var(--hg-tdp-xR) - var(--hg-tdp-xL)) * 0.84632) - 231px)',
@@ -826,12 +827,12 @@ function Home() {
                 collectionHref="/the-human-inside"
               />
             </div>
-            <div style={{ marginTop: isTablet ? '75px' : '150px' }}>
+            <div style={{ marginTop: isTablet ? `${HOME_TITOL_TDP_MARGIN_PX.tauleta}px` : `${HOME_TITOL_TDP_MARGIN_PX.escriptori}px` }}>
               <div
                 style={{
                   position: 'relative',
                   left: '50%',
-                  top: '0px', // Mogut 1 fila cap amunt (abans 38px, reduït 38px)
+                  top: `${HOME_GALERIA_TOP_PX}px`,
                   transform: 'translateX(-50%)',
                   width: 'calc(var(--hg-tdp-xR) - var(--hg-tdp-xL))',
                   height: 'calc(calc(calc(var(--hg-tdp-xR) - var(--hg-tdp-xL)) * 0.84632) - 231px)',
@@ -924,12 +925,12 @@ function Home() {
                 collectionHref="/austen"
               />
             </div>
-            <div style={{ marginTop: isTablet ? '75px' : '150px' }}>
+            <div style={{ marginTop: isTablet ? `${HOME_TITOL_TDP_MARGIN_PX.tauleta}px` : `${HOME_TITOL_TDP_MARGIN_PX.escriptori}px` }}>
               <div
                 style={{
                   position: 'relative',
                   left: '50%',
-                  top: '-22px', // Mogut 9px més cap amunt (abans -13px)
+                  top: `${HOME_GALERIA_TOP_PX}px`,
                   transform: 'translateX(-50%)',
                   width: 'calc(var(--hg-tdp-xR) - var(--hg-tdp-xL))',
                   height: 'calc(calc(calc(var(--hg-tdp-xR) - var(--hg-tdp-xL)) * 0.84632) - 231px)',
@@ -1022,12 +1023,12 @@ function Home() {
                 collectionHref="/cube"
               />
             </div>
-            <div style={{ marginTop: isTablet ? '75px' : '150px' }}>
+            <div style={{ marginTop: isTablet ? `${HOME_TITOL_TDP_MARGIN_PX.tauleta}px` : `${HOME_TITOL_TDP_MARGIN_PX.escriptori}px` }}>
               <div
                 style={{
                   position: 'relative',
                   left: '50%',
-                  top: '-6px', // Mogut 1 fila cap amunt (abans 32px, reduït 38px)
+                  top: `${HOME_GALERIA_TOP_PX}px`,
                   transform: 'translateX(-50%)',
                   width: 'calc(var(--hg-tdp-xR) - var(--hg-tdp-xL))',
                   height: 'calc(calc(calc(var(--hg-tdp-xR) - var(--hg-tdp-xL)) * 0.84632) - 231px)',
@@ -1120,12 +1121,12 @@ function Home() {
                 collectionHref="/miscellania"
               />
             </div>
-            <div style={{ marginTop: isTablet ? '75px' : '150px' }}>
+            <div style={{ marginTop: isTablet ? `${HOME_TITOL_TDP_MARGIN_PX.tauleta}px` : `${HOME_TITOL_TDP_MARGIN_PX.escriptori}px` }}>
               <div
                 style={{
                   position: 'relative',
                   left: '50%',
-                  top: '-13px', // Mogut 1 fila cap amunt (abans 25px, reduït 38px)
+                  top: `${HOME_GALERIA_TOP_PX}px`,
                   transform: 'translateX(-50%)',
                   width: 'calc(var(--hg-tdp-xR) - var(--hg-tdp-xL))',
                   height: 'calc(calc(calc(var(--hg-tdp-xR) - var(--hg-tdp-xL)) * 0.84632) - 231px)',
