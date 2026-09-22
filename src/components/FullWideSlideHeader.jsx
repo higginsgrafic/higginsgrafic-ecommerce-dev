@@ -2821,9 +2821,16 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
                   key={item.id}
                   type="button"
                   className={`inline-flex items-center gap-1 whitespace-nowrap font-semibold tracking-[0.04em] lg:tracking-[0.18em] uppercase ${open ? 'text-foreground' : 'text-muted-foreground hover:text-foreground'}`}
-                  // A l'escriptori la mida del nav tambe va amb el carril (com
-                  // la resta del megaslide); a tauleta, la seva.
-                  style={(isPortraitTablet || isLandscapeTablet) ? { letterSpacing: '0.04em', fontSize: isPortraitTablet ? '11.5px' : '12px', whiteSpace: 'nowrap' } : { whiteSpace: 'nowrap', fontSize: carrilPx(11) }}
+                  // A l'escriptori la mida del nav va amb el carril, com la
+                  // resta del megaslide... pero amb un TERRA de 12 px: l'escala
+                  // del megaslide es per al seu llenç, no per decidir si un
+                  // menu es pot llegir. A 1440 l'escala val 0,75 i el text
+                  // quedava a 8,25 px.
+                  style={
+                    (isPortraitTablet || isLandscapeTablet)
+                      ? { letterSpacing: '0.04em', fontSize: isPortraitTablet ? '11.5px' : '12px', whiteSpace: 'nowrap' }
+                      : { whiteSpace: 'nowrap', fontSize: `max(12px, ${carrilPx(11)})` }
+                  }
                   aria-expanded={open ? 'true' : 'false'}
                   onClick={() => {
                     if (clicColleccioRepetit(item.id)) return;
