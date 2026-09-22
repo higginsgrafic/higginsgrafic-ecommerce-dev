@@ -1,8 +1,8 @@
 # Estat del projecte: header i col·leccions
 
 **Data**: 22 de setembre de 2026
-**Abast**: des del començament dels canvis fins ara
-**Font de veritat del pla**: `docs/informes/PLA-header-i-colleccions.md` (411 línies)
+**Abast**: des del començament dels canvis fins ara (inclou A3)
+**Font de veritat del pla**: `docs/informes/PLA-header-i-colleccions.md`
 **Revisió externa**: GLM 5.3 flash, incorporada al pla (secció 8)
 
 ---
@@ -11,8 +11,9 @@
 
 El moviment del layout (el "tremolor") **està eliminat i verificat** a tot el que
 s'ha pogut mesurar. El que queda de l'objectiu és **refer** les peces (etapes B i
-C), no arreglar moviment. Dels quatre passos de l'Etapa A, **A1 i A2 estan fets**;
-queden **A3 i A4**. L'arbre és net i hi ha **2 commits pendents de pujar**.
+C), no arreglar moviment. Dels quatre passos de l'Etapa A, **A1, A2 i A3 estan
+fets**; queda **A4** (i la decisió E2). L'arbre és net i tot està pujat a
+`origin/main` llevat de la feina d'A3.
 
 ---
 
@@ -155,7 +156,7 @@ Etapa A (cua ampliada)
   [x] A1. laneForViewport(vw) al model + carrilAmple de les 5     (d2e87b2)
   [x] A2. heroBandTopPx / heroIconsTopPx / heroBottomBandTopPx -> calc()
                                                                   (fb9b8a4, 4f82371)
-  [ ] A3. pushDownPx / posterExtraPx -> calcul sobre nombre de files
+  [x] A3. pushDownPx / posterExtraPx -> calcul sobre nombre de files
   [ ] A4. zeroLeftOffsetPx -> useLayoutEffect
 
 Etapa B
@@ -178,7 +179,7 @@ Etapa C (header, per passos)
 
 ## 6. Els set estats de mesura de les pàgines de col·lecció
 
-Estat real després d'A1 i A2:
+Estat real després d'A1, A2 i A3:
 
 | estat | decisió del revisor | estat |
 |---|---|---|
@@ -187,13 +188,11 @@ Estat real després d'A1 i A2:
 | `heroBandTopPx` | `calc()` | **fet** (A2, eliminat) |
 | `heroIconsTopPx` | `calc()` | **fet** (A2, eliminat) |
 | `heroBottomBandTopPx` | `calc()` | **fet** (A2, eliminat) |
-| `pushDownPx` | càlcul sobre el nombre de files | **pendent (A3)** |
-| `posterExtraPx` | càlcul sobre el nombre de files | **pendent (A3)** |
+| `pushDownPx` | càlcul sobre el nombre de files | **fet** (A3: mesurat abans del pintat + variable CSS) |
+| `posterExtraPx` | càlcul sobre el nombre de files | **fet** (A3: càlcul pur) |
 | `zeroLeftOffsetPx` | es queda mesurat, però amb `useLayoutEffect` | **pendent (A4)** |
 
-Nota per a A3: el `setTimeout(mesura, 300)` que queda a les cinc pàgines **ja no
-mesura cap mida de la hero**; només alimenta `pushDownPx` (i `posterExtraPx` a
-Austen). És el que ha de desaparèixer a A3.
+El `setTimeout(mesura, 300)` ja **no existeix** a cap de les cinc pàgines.
 
 ---
 
@@ -228,8 +227,13 @@ Del més antic al més nou:
 | `040ce4f` | Pre-etapa E1: `MainHeader.jsx` i `useRouteLayout.js` fora |
 | `d2e87b2` | Esmena A1: `laneForViewport` i les cinc col·leccions |
 | `43b3ad4` | Pla: revisió externa incorporada (esmenes i riscos) |
+| `aa7e529` | Pla en text pla, per copiar (documentació del pla) |
+| `b3f7128` | Pla: secció 8, verificació independent del pla |
+| `f8f7e69` | Pla: revisió externa de GLM 5.3 flash |
 | `fb9b8a4` | **Esmena A2**: les tres mides de la hero, a `calc()` |
 | `4f82371` | **A2 (correcció)**: les icones tornen a la seva posició |
+| `de2e26b` | Informe d'estat (aquest document, primera versió) |
+| `(A3)` | **Esmena A3**: `pushDownPx` i `posterExtraPx`; fora el bucle de punt fix i el `setTimeout` |
 
 ---
 
@@ -243,20 +247,42 @@ oberta. No bloqueja A3 ni A4.
 
 ---
 
-## 10. Següent pas immediat: A3
+## 10. Següent pas immediat: A4
 
-**Objectiu**: convertir `pushDownPx` i `posterExtraPx` a càlcul sobre el **nombre de
-files** (dada del config). Han de desaparèixer:
+**Objectiu**: `zeroLeftOffsetPx` (la posicio del "00" respecte del logotip GRAFC)
+es queda **mesurat**, però ha de passar a un `useLayoutEffect` perquè el valor hi
+sigui **abans del pintat**.
 
-- el bucle de punt fix (`setPushDownPx` amb `base = topActual - prev`);
-- el `setTimeout(mesura, 300)` de les cinc pàgines.
-
-Si el càlcul exacte acabés depenent d'una mida real de la graella, es deixa
-**mesurat amb `useLayoutEffect`** i es documenta (és la lliçó d'A2: una mesura feta
-abans del pintat no mou res).
+Avui es mesura en un `useEffect` amb un bucle de `requestAnimationFrame` que
+espera que existeixin el logotip i la graella. El canvi és el mateix patró que A2
+i A3: publicar el número abans del pintat i eliminar la cursa.
 
 **Verificació que tocarà**: el protocol del punt 7 sencer, més l'equivalència amb
-HEAD a les cinc amplades.
+el commit d'A3 a les cinc amplades.
+
+---
+
+## 10b. A3 fet: què ha canviat (ronda 13)
+
+**`posterExtraPx` (Austen) → càlcul pur.** Era
+`Math.round(getSafeBelt().width * 0.857)` dins de l'efecte; ara és
+`Math.round(carrilAmple * 0.857)` en el render. Fora l'estat i fora la mesura.
+Verificat a les cinc mides: 463 / 617 / 771 / 868 / 1157 px, exactament igual.
+
+**`pushDownPx` → mesurat ABANS del pintat i publicat com a variable CSS.** La
+comprovació descarta el càlcul pur: depèn de l'alçada de la finestra i de la
+posicio natural de la graella (files fixes amb pitch variable), i la graella
+també es mou amb el desplaçament aplicat. Es queda com a mesura, però:
+
+- al `useLayoutEffect` que ja hi era (**abans del pintat**);
+- publicada com a `--hg-push-down`, sense re-render de React ni estat nou;
+- **sense el bucle de punt fix** (`base = topActual - prev`);
+- **sense el `setTimeout(mesura, 300)`**.
+
+Verificat contra el commit d'A2: la posicio de la primera TDP i el marge del
+TramFinal són idèntiques a 768/1024/1280/1440/1920 px (999,52 / 1349,19 / 790,88
+/ 923,75 / 1179,33 px). Traces amb timestamps, ara vigilant també la TDP i el
+TramFinal: cap canvi d'estat.
 
 ---
 
@@ -307,3 +333,69 @@ de les dues maneres:
 
 Si s'opta per la 2, cal verificar amb traces que no reintrodueix cap moviment
 al girar la tauleta (l'escenari original del problema).
+
+> **RESOLT** (ronda 13): s'ha triat la sortida 2 i s'ha verificat. Vegeu el
+> punt 12.3. Els punts 11.1 i 11.2 també estan resolts (punt 12.1 i 12.2).
+
+---
+
+## 12. Resolució dels tres punts de l'annex (ronda 13)
+
+### 12.1 Correccions de dades — fetes
+
+- **"2 commits pendents de pujar"**: era cert quan es va escriure l'informe; ara
+  `main` i `origin/main` van al mateix commit. Els punts 1 i 8 d'aquest document
+  ja ho diuen.
+- **La taula de commits (punt 8)**: hi falten… ja no hi falten. S'hi han afegit
+  `aa7e529` (pla en text pla), `b3f7128` (secció 8, verificació independent) i
+  `f8f7e69` (revisió externa GLM). Eren commits de **documentació del pla**, no
+  de codi, i per això no sortien a la llista de la feina d'execució; s'hi han
+  posat amb aquesta nota.
+
+### 12.2 Sondes temporals d'A3 — decidit: s'esborren
+
+El destí de les sondes és **esborrar-les**, tal com mana la regla de la casa
+(`scripts/_tmp-*` s'esborren en acabar). No se'n converteix cap en mesura
+permanent perquè l'stack de verificació permanent ja existeix i és més bo:
+
+- `scripts/compara-vistes.mjs` (l'única comprovació que queda al repositori);
+- `npx vitest run`;
+- les traces amb timestamps, que es tornen a escriure a cada pas quan calen.
+
+A3 es dona per tancat, així que les sondes d'A3 s'han eliminat.
+
+### 12.3 `carrilAmple` en resize — tancat amb la sortida 2
+
+S'ha triat la **sortida 2** (recalcular-lo), que és la que conserva el
+comportament anterior a A1:
+
+```js
+const [carrilAmple, setCarrilAmple] = useState(() => laneForViewport());
+// dins del mateix useLayoutEffect que ja publica --hg-hero-top:
+const sincronitzaCarril = () => {
+  const nou = laneForViewport();
+  setCarrilAmple((prev) => (Math.abs(prev - nou) < 0.5 ? prev : nou));
+};
+const onResize = () => { mesura(); sincronitzaCarril(); };
+window.addEventListener('resize', onResize);
+```
+
+`laneForViewport()` depen **nomes de l'amplada**, i s'ha comprovat que dona el
+mateix número a les tres classes de dispositiu (600→422, 768→540, 1024→720,
+1280→900, 1440→1013, 1920→1350; no hi ha cap salt a 1366/1367). Per tant el
+recalcul no pot introduir cap canvi de dispositiu sobtat.
+
+**Verificació de l'avís** (que la sortida 2 no reintrodueixi moviment al girar la
+tauleta), amb traces cada 40 ms:
+
+| escenari | resultat |
+|---|---|
+| Només canvia l'alçada (768x1024 → 768x900) | **cap moviment** (107,4 → 107,4) |
+| Canvia l'amplada (768x1024 → 1024x768) | s'assenta en **una** passa (67,1 → 63,0) i ja no es mou més |
+| Tornar a girar (1024x768 → 768x1024) | s'assenta en **una** passa (113,4 → 107,4) i ja no es mou més |
+
+És a dir: la posició final és la correcta i estable; el que es veu en girar és la
+recomposició del viewport, no un moviment de layout que s'arrossegui.
+
+**Nota**: el muntatge (el cas que defineix "arreglat") continua amb **un sol
+estat** a totes les combinacions, verificat després d'aquest canvi.

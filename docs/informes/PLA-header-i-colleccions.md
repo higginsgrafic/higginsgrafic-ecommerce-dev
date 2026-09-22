@@ -233,6 +233,47 @@ resta `--hg-hero-top`. Les icones conserven la formula que ja tenien
 
 ---
 
+### A3 — `pushDownPx` i `posterExtraPx` (ronda 13)
+
+**`posterExtraPx` (Austen): convertit a calcul.** El valor era
+`Math.round(getSafeBelt().width * 0.857)` dins de l'efecte. Com que
+`getSafeBelt()` i `laneForViewport()` donen la mateixa amplada de carril, ara es
+`Math.round(carrilAmple * 0.857)` i es calcula en el render: fora l'estat, fora
+la mesura i fora l'efecte. Verificat a les cinc mides, dona exactament el mateix
+(463 / 617 / 771 / 868 / 1157 px).
+
+**`pushDownPx`: NO es pot calcular, i queda mesurat abans del pintat.** La
+comprovacio ho descarta com a funcio del carril:
+
+| amplada | alçada | sobreix de la hero | `pushDownPx` |
+|---|---|---|---|
+| 768 | 1024 | −0,1 px | 0 |
+| 1024 | 1366 | −0,2 px | 0 |
+| 1280 | 800 | −0,3 px | 0 |
+| 1440 | 900 | 28,4 px | 28 |
+| 1920 | 1080 | 89,8 px | 90 |
+
+Depen de **l'alçada de la finestra** i de la posicio natural de la graella
+(files fixes amb pitch variable), i a mes a mes la graella tambe es mou amb el
+`pushDownPx` aplicat. Es queda, doncs, com a mesura, pero:
+
+- es fa al `useLayoutEffect` que ja hi era (**abans del pintat**);
+- es publica com a variable CSS (`--hg-push-down`), aixi que **no cal cap
+  re-render de React ni cap estat nou**;
+- **desapareix el bucle de punt fix** (`base = topActual - prev`): el calcul
+  equivalent sobre la posicio base del primer intent dona el mateix resultat,
+  perque aplicar-lo mou el top de la TDP exactament el mateix;
+- **desapareix el `setTimeout(mesura, 300)`** de les cinc pagines: no queda res
+  per mesurar tard.
+
+**Verificacio**: comparat amb el commit d'A2 a les cinc amplades i a `/cube` i
+`/austen`, la posicio de la primera TDP i el marge del TramFinal son
+**identiques** (999,52 / 1349,19 / 790,88 / 923,75 / 1179,33 px). Traces amb
+timestamps: cap canvi d'estat, ara tambe vigilant la posicio de la TDP i el
+marge del TramFinal.
+
+---
+
 ### Estat de la verificacio (ronda 10)
 
 Traces fetes amb 20-24 mostres cada 120 ms a 768 px. **Un sol estat vol dir que
@@ -387,7 +428,8 @@ Pre-etapes
 Etapa A (cua ampliada)
   [x] A1. laneForViewport(vw) al model + carrilAmple de les 5     (d2e87b2)
   [x] A2. heroBandTopPx / heroIconsTopPx / heroBottomBandTopPx -> calc()
-  [ ] A3. pushDownPx / posterExtraPx -> calcul sobre nombre de files
+                                                                  (fb9b8a4, 4f82371)
+  [x] A3. pushDownPx / posterExtraPx -> calcul sobre nombre de files
   [ ] A4. zeroLeftOffsetPx -> useLayoutEffect
   (El punt 3 del pla, "passar el header al model", passa a ser
    l'inici de l'Etapa C, no de l'A.)

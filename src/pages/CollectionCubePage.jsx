@@ -14,7 +14,7 @@ import Breadcrumbs from '@/components/Breadcrumbs';
 import useIsMobile from '@/hooks/useIsMobile';
 import CollectionMobile from '@/pages/CollectionMobile';
 import { SELLING_PRICE_LABEL } from '@/config/pricing';
-import { esTauletaApaisada, getSafeBelt } from '@/utils/layoutMetrics';
+import { esTauletaApaisada } from '@/utils/layoutMetrics';
 import { laneForViewport } from '@/utils/layoutModel';
 
 const COLLECTION_BG_SRC = '/placeholders/tots_els_fons/fons_colleccio/00-colleccio.webp';
@@ -153,7 +153,7 @@ function CollectionCubePage() {
   // Del model unic, no de `getSafeBelt()`: aixo tanca el `dev != produccio`
   // que encara hi havia aqui (getSafeBelt prioritza les guies `--belt2-*`, que
   // nomes existeixen en desenvolupament).
-  const [carrilAmple] = useState(() => laneForViewport());
+  const [carrilAmple, setCarrilAmple] = useState(() => laneForViewport());
   const rowHeight = Math.max(1, carrilAmple * 0.0280625 - 2.875);
   // La franja blanca ha de tocar el separador del header. Abans es mesurava
   // cada mida (header.bottom - hero.top, alçada de la franja...) amb un
@@ -182,7 +182,12 @@ function CollectionCubePage() {
   const heroBandTop = 'calc(var(--hg-header-bottom, 163px) - var(--hg-hero-top, 107px))';
   const heroBottomBandTop = `calc(100vh - ${BAND_HEIGHT} - var(--hg-hero-top, 107px))`;
   const heroIconsTop = `calc(100vh - (${BAND_HEIGHT}) / 2 - var(--hg-hero-top, 107px))`;
-  const [pushDownPx, setPushDownPx] = useState(0);
+  // Quan la imatge (alçada de finestra) sobrepassa l'espai que la graella li
+  // reserva, baixem el contingut el mateix tros perque no se solapi. No es pot
+  // calcular: depen de l'alçada de la finestra i de la posicio natural de la
+  // graella (files fixes amb pitch variable). Es mesura en un `useLayoutEffect`
+  // (ABANS del pintat) i es publica com a variable CSS, aixi no cal ni cap
+  // re-render ni cap bucle de punt fix ni cap `setTimeout`.
   // Quan la imatge (alcada de finestra) sobrepassa l'espai que la graella li
   // reserva, baixem el contingut el mateix tros perque no se solapi.
   const [isLandscapeTablet, setIsLandscapeTablet] = useState(esTauletaApaisada());
@@ -262,27 +267,33 @@ function CollectionCubePage() {
         const headerBottom = Math.round(cap.getBoundingClientRect().bottom);
         document.documentElement.style.setProperty('--hg-header-bottom', `${headerBottom}px`);
       }
-      // La imatge acaba exactament on acaba la franja blanca de baix.
-      // Baixem el contingut el que calgui perque la primera targeta quedi
-      // SEMPRE per sota de la imatge. Ho calculem sobre la posicio "base"
-      // (sense el desplaçament ja aplicat) per no entrar en bucle.
-      const heroBottom = hero.getBoundingClientRect().bottom;
+      // La imatge acaba exactament on acaba la franja blanca de baix: baixem
+      // la graella el que calgui perque la primera targeta quedi SEMPRE per
+      // sota. El calcul és el MATEIX d'abans, pero sobre la posicio base del
+      // primer intent (quan el desplaçament encara es 0), sense bucle de punt
+      // fix: aplicar-lo canvia el top de la TDP exactament el mateix que el
+      // desplaçament, aixi que el resultat no depen de quantes vegades es faci.
       const tdp0 = document.querySelector('[aria-label="TDP taula"]') || document.querySelector('[aria-label="TDP rectangle"]');
       if (tdp0) {
-        const topActual = tdp0.getBoundingClientRect().top;
-        setPushDownPx((prev) => {
-          const base = topActual - prev;
-          const cal = Math.max(0, Math.round(heroBottom + 24 - base));
-          return Math.abs(cal - prev) < 1 ? prev : cal;
-        });
+        const pushDown = Math.max(0, Math.round(hero.getBoundingClientRect().bottom + 24 - tdp0.getBoundingClientRect().top));
+        document.documentElement.style.setProperty('--hg-push-down', `${pushDown}px`);
       }
     };
     mesura();
-    window.addEventListener('resize', mesura);
-    const t = window.setTimeout(mesura, 300);
+    // El carril nomes depen de l'amplada de la finestra: es recalcula en
+    // resize perque `rowHeight` (i el `top` de la hero) no es quedin
+    // congelats al valor del primer render. Abans d'A1 tambe es recalculava.
+    const sincronitzaCarril = () => {
+      const nou = laneForViewport();
+      setCarrilAmple((prev) => (Math.abs(prev - nou) < 0.5 ? prev : nou));
+    };
+    const onResize = () => {
+      mesura();
+      sincronitzaCarril();
+    };
+    window.addEventListener('resize', onResize);
     return () => {
-      window.removeEventListener('resize', mesura);
-      window.clearTimeout(t);
+      window.removeEventListener('resize', onResize);
     };
   }, []);
 
@@ -525,7 +536,7 @@ function CollectionCubePage() {
         style={{
           // Puja tot el contingut sota el hero 12 files de la taula (41 → 29).
           // Alçada d'1 fila = ampladaBelt × 6708/2642/90; 12 files ≈ 0.3385 × amplada.
-          marginTop: `calc((var(--hg-tdp-xL, 0px) - var(--hg-tdp-xR, 0px)) * 0.3385 + ${pushDownPx}px${isLandscapeTablet ? ' - 30px' : ''}${isPortraitTablet ? ' - 120px' : ''}${isLandscapeTablet ? ` + ${HERO_TDP_GAP_LANDSCAPE_PX}` : (isPortraitTablet ? ` + ${HERO_TDP_GAP_TABLET_PX}` : ` + ${HERO_TDP_GAP_PX}`)})`,
+          marginTop: `calc((var(--hg-tdp-xL, 0px) - var(--hg-tdp-xR, 0px)) * 0.3385 + var(--hg-push-down, 0px)${isLandscapeTablet ? ' - 30px' : ''}${isPortraitTablet ? ' - 120px' : ''}${isLandscapeTablet ? ` + ${HERO_TDP_GAP_LANDSCAPE_PX}` : (isPortraitTablet ? ` + ${HERO_TDP_GAP_TABLET_PX}` : ` + ${HERO_TDP_GAP_PX}`)})`,
           // Desplaçament vertical NOME S de les TDP. Va amb `translate` (no
           // `transform`) perque la graella ja fa servir transform per centrar-se
           // i `translate` s'hi suma sense trepitjar-lo.
