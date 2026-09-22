@@ -10,27 +10,11 @@ function LabDemosPage() {
             <div className="text-[11px] font-semibold tracking-[0.18em] uppercase text-muted-foreground">LAB</div>
             <h1 className="mt-2 text-3xl font-black tracking-tight text-foreground sm:text-4xl">Demos</h1>
             <p className="mt-3 max-w-prose text-sm leading-relaxed text-muted-foreground">
-              Demos i eines de desenvolupament. Proves (col·lecció LAB) segueix a{' '}
-              <Link to="/lab/proves" className="font-semibold text-foreground/80 underline underline-offset-4 hover:text-foreground">
-                /lab/proves
-              </Link>
-              .
+              Demos i eines de desenvolupament.
             </p>
           </div>
 
           <div className="flex items-center gap-2">
-            <Link
-              to="/lab/proves"
-              className="h-10 shrink-0 rounded-full border border-border bg-background px-4 text-xs font-semibold tracking-[0.18em] uppercase text-foreground/70 hover:bg-muted"
-            >
-              LAB Proves
-            </Link>
-            <Link
-              to="/lab/proves"
-              className="h-10 shrink-0 rounded-full border border-border bg-background px-4 text-xs font-semibold tracking-[0.18em] uppercase text-foreground/70 hover:bg-muted"
-            >
-              Anar a col·lecció
-            </Link>
           </div>
         </div>
 

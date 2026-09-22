@@ -422,8 +422,8 @@ es deixa **mesurat amb `useLayoutEffect`** el que depèn del contingut real:
 ```
 Pre-etapes
   [x] E1. Eliminar MainHeader.jsx i useRouteLayout.js            (040ce4f)
-  [ ] E2. Decidir el desti de /lab/proves i CollectionPage.jsx
-          (es queda com a eina de lab o s'elimina; NO es base de B)
+  [x] E2. Decidit: /lab/proves, CollectionPage.jsx i companyia FORA
+          (no era base de B; s'ha eliminat)
 
 Etapa A (cua ampliada)
   [x] A1. laneForViewport(vw) al model + carrilAmple de les 5     (d2e87b2)
