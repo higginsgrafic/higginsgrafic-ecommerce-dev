@@ -14,6 +14,7 @@ import CollectionMobile from '@/pages/CollectionMobile';
 import { SELLING_PRICE_LABEL } from '@/config/pricing';
 import { esTauletaApaisada } from '@/utils/layoutMetrics';
 import { laneForViewport } from '@/utils/layoutModel';
+import { tdpMidaFitxa, tdpMargeEsquerre } from '@/utils/tdpMida';
 import {
   getCollectionVerticalConfig,
   COLLECTIONS_MENU,
@@ -132,16 +133,17 @@ function CollectionVerticalPage({ slug }) {
   // alcada = carril x 0,4446 (tauleta) o x 0,308 (escriptori).
   // Entre files: 30 px de bleed de baix + 15 px d'aire + 30 px de bleed de dalt.
   const esTauleta = isPortraitTablet || isLandscapeTablet;
-  const alcadaFitxa = Math.round(carrilAmple * (esTauleta ? 0.4446 : 0.308));
+  // La mida de la fitxa surt de `tdpMidaFitxa`, que es l'UNICA font de veritat
+  // i que tambe fa servir la pagina d'inici. Aixi les dues no es poden
+  // desincronitzar.
+  const midaTdp = tdpMidaFitxa(carrilAmple, esTauleta);
+  const alcadaFitxa = midaTdp.alcada;
+  const ampladaFitxa = midaTdp.amplada;
+  const numColumnes = midaTdp.columnes;
+  const gutterX = midaTdp.gutter;
+  const pasColumna = midaTdp.pas;
+  const margeEsquerre = tdpMargeEsquerre(carrilAmple, midaTdp);
   const separacioFiles = TDP_SEPARACIO_FONS_PX + 2 * TDP_FONS_BLEED_PX; // 15 + 60
-  const numColumnes = esTauleta ? 3 : 4;
-  // El GUTTER horitzontal de la pauta: 22,5 px per columna (es el que separen
-  // les columnes, i sense ell les fitxes quedaven enganxades lateralment).
-  const gutterX = 22.5;
-  const ampladaFitxa = Math.round((carrilAmple - (numColumnes - 1) * gutterX) / numColumnes);
-  const pasColumna = ampladaFitxa + gutterX;
-  const ampladaUtilitzada = ampladaFitxa * numColumnes + (numColumnes - 1) * gutterX;
-  const margeEsquerre = Math.round((carrilAmple - ampladaUtilitzada) / 2);
   const alcadaFila = alcadaFitxa + separacioFiles;
 
   // Mides interiors de la fitxa, proporcionals a la SEVA amplada. Abans el
