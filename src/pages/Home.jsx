@@ -414,7 +414,9 @@ function Home() {
   const portraitTabletTdpGridStyle = isPortraitTablet
     ? {
         width: 'calc(var(--hg-tdp-xR) - var(--hg-tdp-xL))',
-        height: '752px',
+        // Sense alcada fixa: la mana el contingut, com a la resta de mides.
+        // El `752px` era una alcada propia d'aquesta vista i feia que la
+        // pindola quedés a 397 px de la caixa (mesurat).
         gridTemplateColumns: tdpGridColumns,
       }
     : {};
@@ -737,7 +739,12 @@ function Home() {
                 top: '-13px', // Mogut 1 fila cap amunt (abans 25px, reduït 38px)
                 transform: 'translateX(-50%)',
                 width: 'calc(var(--hg-tdp-xR) - var(--hg-tdp-xL))',
-                height: 'calc(calc(calc(var(--hg-tdp-xR) - var(--hg-tdp-xL)) * 0.84632) - 231px)',
+                // L'alcada la mana el CONTINGUT (les targetes), no una formula.
+                // Abans era `carril * 0.84632 - 231px`, i el -231 era un numero
+                // pla que calibrava l'alcada a 1440 perque la pindola caigues on
+                // tocava; a la resta de mides la pindola quedava a una distancia
+                // diferent de la caixa (29 px a 1024 i 397 px a 768, mesurat).
+                height: 'auto',
                 display: 'grid',
                 gridTemplateColumns: tdpGridColumns,
                 columnGap: '22.5px',
@@ -761,7 +768,12 @@ function Home() {
                 style={{
                   position: 'absolute',
                   left: '50%',
-                  bottom: `calc((calc(calc(var(--hg-tdp-xR) - var(--hg-tdp-xL)) * 0.84632 - 231px) - calc(calc(calc(var(--hg-tdp-xR) - var(--hg-tdp-xL)) - 45px) / 3 * 1.3)) / 2 - 14px)`,
+                  // A 25 px del fons de la caixa de la targeta, sempre. Abans era
+                  // una formula amb el -231 que la ponia al mig del bloc de
+                  // descripcio: la distancia a la caixa anava de 29 px a 397 px
+                  // segons la mida (mesurat a les cinc). 25 es l'aire «entre
+                  // fons» del lloc (`TDP_SEPARACIO_FONS_PX`).
+                  top: 'calc(100% + 25px)',
                   height: 'auto',
                   width: 'auto',
                   borderRadius: '9999px',
@@ -858,7 +870,12 @@ function Home() {
                 style={{
                   position: 'absolute',
                   left: '50%',
-                  bottom: `calc((calc(calc(var(--hg-tdp-xR) - var(--hg-tdp-xL)) * 0.84632 - 231px) - calc(calc(calc(var(--hg-tdp-xR) - var(--hg-tdp-xL)) - 45px) / 3 * 1.3)) / 2 - 14px)`,
+                  // A 25 px del fons de la caixa de la targeta, sempre. Abans era
+                  // una formula amb el -231 que la ponia al mig del bloc de
+                  // descripcio: la distancia a la caixa anava de 29 px a 397 px
+                  // segons la mida (mesurat a les cinc). 25 es l'aire «entre
+                  // fons» del lloc (`TDP_SEPARACIO_FONS_PX`).
+                  top: 'calc(100% + 25px)',
                   height: 'auto',
                   width: 'auto',
                   borderRadius: '9999px',
@@ -956,7 +973,12 @@ function Home() {
                 style={{
                   position: 'absolute',
                   left: '50%',
-                  bottom: `calc((calc(calc(var(--hg-tdp-xR) - var(--hg-tdp-xL)) * 0.84632 - 231px) - calc(calc(calc(var(--hg-tdp-xR) - var(--hg-tdp-xL)) - 45px) / 3 * 1.3)) / 2 - 14px)`,
+                  // A 25 px del fons de la caixa de la targeta, sempre. Abans era
+                  // una formula amb el -231 que la ponia al mig del bloc de
+                  // descripcio: la distancia a la caixa anava de 29 px a 397 px
+                  // segons la mida (mesurat a les cinc). 25 es l'aire «entre
+                  // fons» del lloc (`TDP_SEPARACIO_FONS_PX`).
+                  top: 'calc(100% + 25px)',
                   height: 'auto',
                   width: 'auto',
                   borderRadius: '9999px',
@@ -1054,7 +1076,12 @@ function Home() {
                 style={{
                   position: 'absolute',
                   left: '50%',
-                  bottom: `calc((calc(calc(var(--hg-tdp-xR) - var(--hg-tdp-xL)) * 0.84632 - 231px) - calc(calc(calc(var(--hg-tdp-xR) - var(--hg-tdp-xL)) - 45px) / 3 * 1.3)) / 2 - 14px)`,
+                  // A 25 px del fons de la caixa de la targeta, sempre. Abans era
+                  // una formula amb el -231 que la ponia al mig del bloc de
+                  // descripcio: la distancia a la caixa anava de 29 px a 397 px
+                  // segons la mida (mesurat a les cinc). 25 es l'aire «entre
+                  // fons» del lloc (`TDP_SEPARACIO_FONS_PX`).
+                  top: 'calc(100% + 25px)',
                   height: 'auto',
                   width: 'auto',
                   borderRadius: '9999px',
@@ -1152,7 +1179,12 @@ function Home() {
                 style={{
                   position: 'absolute',
                   left: '50%',
-                  bottom: `calc((calc(calc(var(--hg-tdp-xR) - var(--hg-tdp-xL)) * 0.84632 - 231px) - calc(calc(calc(var(--hg-tdp-xR) - var(--hg-tdp-xL)) - 45px) / 3 * 1.3)) / 2 - 14px)`,
+                  // A 25 px del fons de la caixa de la targeta, sempre. Abans era
+                  // una formula amb el -231 que la ponia al mig del bloc de
+                  // descripcio: la distancia a la caixa anava de 29 px a 397 px
+                  // segons la mida (mesurat a les cinc). 25 es l'aire «entre
+                  // fons» del lloc (`TDP_SEPARACIO_FONS_PX`).
+                  top: 'calc(100% + 25px)',
                   height: 'auto',
                   width: 'auto',
                   borderRadius: '9999px',
