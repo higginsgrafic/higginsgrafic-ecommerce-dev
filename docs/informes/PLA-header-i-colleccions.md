@@ -197,6 +197,46 @@ Els 7 estats de mesura de cada pàgina de col·lecció: `heroBandTopPx`, `heroBo
 
 ---
 
+### A2 — Les tres mides de la hero, fetes (ronda 12)
+
+Les cinc pagines de colleccio ja no mesuren res de la hero amb `setTimeout`.
+Abans, un efecte de 300 ms hi posava tres estats (`heroBandTopPx`,
+`heroIconsTopPx`, `heroBottomBandTopPx`); ara nomes es publiquen **dues
+variables** amb el `useLayoutEffect` que ja hi era (o sigui ABANS del pintat):
+
+| variable | que es | per que no es pot calcular en CSS |
+|---|---|---|
+| `--hg-hero-top` | posicio de la hero a la pantalla | depen de la fila de la graella i del seu `top` |
+| `--hg-header-bottom` | costat de baix de la capcalera | depen del nombre de files d'ofertes i de banners |
+
+I les tres mides surten d'aquestes dues amb `calc()`:
+
+```
+franja de dalt (pantalla) = --hg-header-bottom
+franja de baix (pantalla) = fons de la finestra
+icones (pantalla)         = --hg-header-bottom   (dins de la franja, a dalt)
+```
+
+Com que les franges viuen dins del contenidor de la hero, a cada expressio s'hi
+resta `--hg-hero-top`.
+
+**Verificacio** (768/1024/1280/1440/1920 px a les cinc colleccions):
+
+- la franja de dalt cau al separador de la capcalera (desviacio maxima 0,5 px),
+  i la de baix acaba al fons de la finestra (0,5 px);
+- les icones queden DINS de la franja de dalt;
+- traces amb timestamps: cap element canvia d'estat despres del primer frame,
+  a 35 combinacions (7 rutes x 5 amplades);
+- `npx vitest run` (462), `npm run compara-vistes` i `npx vite build`, verds.
+
+**Desviacio conscient respecte del pla**: la icona de colleccio tambe movia el
+seu contingut amb `translateY(-50%)`, i a 768 px la filera quedava 600 px mes
+avall (fora de la franja, sobre la graella). S'ha tret aquest desplacament i la
+filera ara comença a la vora de dalt de la franja: es la posicio que li toca i
+deixa de dependre de l'alçada real de les icones.
+
+---
+
 ### Estat de la verificacio (ronda 10)
 
 Traces fetes amb 20-24 mostres cada 120 ms a 768 px. **Un sol estat vol dir que
@@ -350,7 +390,7 @@ Pre-etapes
 
 Etapa A (cua ampliada)
   [x] A1. laneForViewport(vw) al model + carrilAmple de les 5     (d2e87b2)
-  [ ] A2. heroBandTopPx / heroIconsTopPx / heroBottomBandTopPx -> calc()
+  [x] A2. heroBandTopPx / heroIconsTopPx / heroBottomBandTopPx -> calc()
   [ ] A3. pushDownPx / posterExtraPx -> calcul sobre nombre de files
   [ ] A4. zeroLeftOffsetPx -> useLayoutEffect
   (El punt 3 del pla, "passar el header al model", passa a ser
