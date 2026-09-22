@@ -124,6 +124,64 @@ perquè **les dues no comparteixen cap unitat de mesura**.
 
 ---
 
+## 2 ter. La unitat única (decisió presa)
+
+Mesurat: **el carril del lloc i el belt del header NO són proporcionals.**
+
+| ample | belt (header) | carril (lloc) | carril/belt |
+|---|---|---|---|
+| 768 | 992 | 540 | 0,544 |
+| 1024 | 992 | 720 | 0,726 |
+| 1280 | 992 | 900 | 0,907 |
+| 1440 | 1013 | 1013 | 1,000 |
+| 1920 | 1350 | 1350 | 1,000 |
+
+A 768 i 1024 el header manté el belt a 992 mentre el carril del lloc val 540 i
+720. **No es pot traduir d'un sistema a l'altre amb cap factor: la traducció no
+existeix.** Els dos escalen amb regles diferents, i per aixo cada encontre entre
+tots dos ha acabat amb un numero calibrat a ma.
+
+### La unitat nova
+
+**Una sola unitat: 1 unitat = 1 píxel de disseny sobre el llenç de 1920.**
+
+Es publica una vegada a l'arrel i la fan servir TOTS els blocs, tant els del lloc
+com els del header i el megaslide:
+
+    --escala:  ample de la finestra / 1920
+    html { font-size: calc(var(--escala) * 16px); }   /* 1rem = 16 unitats de disseny */
+
+D'aqui surten dues maneres d'escriure el mateix, i totes dues son **identiques al
+disseny a 1920**:
+
+| per aixo | s'escriu | vol dir |
+|---|---|---|
+| tipografia i espaiat que ha de créixer amb la pantalla | `font-size: 1.5rem` | 24 px de disseny |
+| elements que no han de canviar de mida relativa | `width: 47%` | proporció del pare |
+| llenç del megaslide | `--escala` | la mateixa que el lloc |
+
+**Un sol `--escala` mana de tot.** Ni `carrilPx`, ni `carrilPct`, ni
+`escalaMegaslide`, ni `getSafeBelt`, ni `--hg-escala-mega`: una variable.
+
+### Per que funciona
+
+- A **1920** l'escala val 1 i tot queda **exactament com el disseny**, o sigui
+  que el megaslide (que esta calibrat a 1920) **no es mou gens**.
+- A **1440** val 0,75 i el megaslide ja fa servir exactament aquest valor
+  (mesurat: `--hg-escala-mega` = 0,7504). **Coincideix.**
+- A **taula** (768/1024) avui el megaslide no s'escala (escala 1). Amb la unitat
+  nova s'escalaria a 0,40 i 0,53. **Aixo es l'unica cosa que canvia d'aspecte** i
+  es pot triar: o s'accepta que tot escali igual, o es fixa un terra
+  (`--escala: max(0,667, ample/1920)`) perque el text no quedi petit.
+
+### L'accessibilitat
+
+El `font-size` de l'arrel no pot baixar indefinidament. Regla: `rem` per a
+tipografia i espaiat, i **terra d'escala a 0,667** (el text no baixa de 2/3).
+Per sota d'aquest terra, el disseny es reajusta (no s'encongeix mes).
+
+---
+
 ## 3. Les regles de la fonamenta nova
 
 1. **Una sola columna vertebral.** Cada pàgina és una successió de seccions
