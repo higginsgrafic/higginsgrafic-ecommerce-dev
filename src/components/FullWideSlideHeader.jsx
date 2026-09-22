@@ -2040,7 +2040,6 @@ function FullWideSlideHeader({
   const accountButtonRef = useRef(null);
   const searchGridRowRef = useRef(null);
   const searchGridScrollRef = useRef(null);
-  const [, setMegaInsetsPx] = useState({ left: 0, right: 0 });
   // Expansio del "bleed guard" de la franja: es el PADDING horitzontal del seu
   // pare (24 px a 768 i menys, 40 px a partir d'aqui). Son dos valors i tots dos
   // es coneixen per la mida de la finestra, aixi que no cal mesurar-los:
@@ -2228,40 +2227,6 @@ function FullWideSlideHeader({
       return false;
     }
   };
-
-  useLayoutEffect(() => {
-    if (!active) return undefined;
-
-    const logoEl = logoMarkRef.current;
-    const accountEl = accountButtonRef.current;
-    const megaEl = megaMenuRef.current;
-    if (!logoEl || !accountEl || !megaEl) return undefined;
-
-    const measure = () => {
-      const megaRect = megaEl.getBoundingClientRect();
-      const logoRect = logoEl.getBoundingClientRect();
-      const accountRect = accountEl.getBoundingClientRect();
-
-      const left = Math.max(0, Math.round(logoRect.right - megaRect.left));
-      const right = Math.max(0, Math.round(megaRect.right - accountRect.left));
-
-      setMegaInsetsPx((prev) => {
-        if (prev.left === left && prev.right === right) return prev;
-        return { left, right };
-      });
-    };
-
-    measure();
-    const ro = new ResizeObserver(measure);
-    ro.observe(logoEl);
-    ro.observe(accountEl);
-    ro.observe(megaEl);
-    window.addEventListener('resize', measure);
-    return () => {
-      window.removeEventListener('resize', measure);
-      ro.disconnect();
-    };
-  }, [active]);
 
   useEffect(() => {
     if (!active || megaPage !== 2) return undefined;
