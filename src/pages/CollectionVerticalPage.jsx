@@ -602,7 +602,9 @@ function CollectionVerticalPage({ slug }) {
         posterLines={posterLines}
         tambeImages={otherImages}
         // El marge es calcula per deixar sempre la mateixa distancia entre
-        // l'ultima fila de fitxes i el poster (vegeu `margeTramFinal`).
+        // l'ultima fila de fitxes i el poster (vegeu `margeTramFinal`), i el
+        // primer bloc (poster + rail) es desplaça perque el rail quedi sempre
+        // sota el TEXT del poster i no a sobre.
         marginTop={`${margeTramFinal}px`}
         visibleCards={(isPortraitTablet || isLandscapeTablet) ? 3 : 4}
       />
