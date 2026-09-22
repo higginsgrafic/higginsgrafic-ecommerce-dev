@@ -401,6 +401,12 @@ function Home() {
       }
     : {};
 
+  // El nombre de columnes de la graella de fitxes, de la MATEIXA font que la
+  // mida: `midaTdpHome.columnes` (3 a tauleta, tambe apaïsada; 4 a escriptori).
+  // Abans la graella fixava 3 columnes sempre i a escriptori en sortien 3 en
+  // comptes de 4.
+  const tdpGridColumns = `repeat(${midaTdpHome.columnes}, minmax(0, calc((100% - ${(midaTdpHome.columnes - 1) * midaTdpHome.gutter}px) / ${midaTdpHome.columnes})))`;
+
   return (
     <>
       <Helmet>
@@ -662,7 +668,7 @@ function Home() {
           les fitxes un 6% i les feia diferents de les de les pagines de
           colleccio. Ara la mida surt de `tdpMidaFitxa`, que es l'unica font de
           veritat, i el bloc no ha d'encongir res. */}
-      <section className="bg-background text-foreground" style={{ marginTop: `calc(${isPortraitTablet ? '175px' : (isLandscapeTablet ? '40px' : '100px')} + ${baixadaHero}px)` }}>
+      <section className="bg-background text-foreground" style={{ marginTop: `calc(${isPortraitTablet ? '435px' : (isLandscapeTablet ? '40px' : '100px')} + ${baixadaHero}px)` }}>
         <div className="mx-auto max-w-[1400px] px-4 pt-[60px] pb-[174px] sm:px-6 lg:px-10" style={isTablet ? { paddingTop: '30px' } : undefined}>
             <CollectionTitle
             index=""
@@ -690,7 +696,7 @@ function Home() {
                 width: 'calc(var(--hg-tdp-xR) - var(--hg-tdp-xL))',
                 height: 'calc(calc(calc(var(--hg-tdp-xR) - var(--hg-tdp-xL)) * 0.84632) - 231px)',
                 display: 'grid',
-                gridTemplateColumns: `repeat(3, minmax(0, calc((100% - ${2 * 22.5}px) / 3)))`,
+                gridTemplateColumns: tdpGridColumns,
                 columnGap: '22.5px',
                 ...portraitTabletTdpGridStyle,
               }}
@@ -702,7 +708,7 @@ function Home() {
               <HomeTdpCard Component={TableCardA} slug="first-contact" index={1} cardPropsFn={cardProps} portraitTablet={isPortraitTablet} collectionHref="/first-contact" editableIdPrefix="home-row1-tdp-2" gridColumn="2 / 3" style={{ width: `${midaTdpHome.amplada}px`, height: `${midaTdpHome.alcada}px`, boxSizing: 'border-box', justifySelf: 'center' }} />
 
               {/* Columna 3: TDP2 (Amb imatge a dalt i bloc Nom/Descripció a dota) */}
-              {!isPortraitTablet && <HomeTdpCard Component={TableCardB} slug="first-contact" index={2} cardPropsFn={cardProps} portraitTablet={isPortraitTablet} collectionHref="/first-contact" editableIdPrefix="home-row1-tdp-3" gridColumn="3 / 4" style={{ width: `${midaTdpHome.amplada}px`, height: `${midaTdpHome.alcada}px`, boxSizing: 'border-box', justifySelf: 'center' }} />}
+              <HomeTdpCard Component={TableCardB} slug="first-contact" index={2} cardPropsFn={cardProps} portraitTablet={isPortraitTablet} collectionHref="/first-contact" editableIdPrefix="home-row1-tdp-3" gridColumn="3 / 4" style={{ width: `${midaTdpHome.amplada}px`, height: `${midaTdpHome.alcada}px`, boxSizing: 'border-box', justifySelf: 'center' }} />
 
               {/* Indicador de més productes (Pill amb text sota el producte de la tercera columna) */}
               <Link
@@ -785,7 +791,7 @@ function Home() {
                   width: 'calc(var(--hg-tdp-xR) - var(--hg-tdp-xL))',
                   height: 'calc(calc(calc(var(--hg-tdp-xR) - var(--hg-tdp-xL)) * 0.84632) - 231px)',
                   display: 'grid',
-                  gridTemplateColumns: `repeat(3, minmax(0, calc((100% - ${2 * 22.5}px) / 3)))`,
+                  gridTemplateColumns: tdpGridColumns,
                   columnGap: '22.5px',
                   ...portraitTabletTdpGridStyle,
                 }}
@@ -797,7 +803,7 @@ function Home() {
                 <HomeTdpCard Component={TableCardB} slug="the-human-inside" index={1} cardPropsFn={cardProps} portraitTablet={isPortraitTablet} collectionHref="/the-human-inside" editableIdPrefix="home-row2-tdp-2" gridColumn="2 / 3" style={{ width: `${midaTdpHome.amplada}px`, height: `${midaTdpHome.alcada}px`, boxSizing: 'border-box', justifySelf: 'center' }} />
 
                 {/* Columna 3: TDP1 */}
-                {!isPortraitTablet && <HomeTdpCard Component={TableCardA} slug="the-human-inside" index={2} cardPropsFn={cardProps} portraitTablet={isPortraitTablet} collectionHref="/the-human-inside" editableIdPrefix="home-row2-tdp-3" gridColumn="3 / 4" style={{ width: `${midaTdpHome.amplada}px`, height: `${midaTdpHome.alcada}px`, boxSizing: 'border-box', justifySelf: 'center' }} />}
+                <HomeTdpCard Component={TableCardA} slug="the-human-inside" index={2} cardPropsFn={cardProps} portraitTablet={isPortraitTablet} collectionHref="/the-human-inside" editableIdPrefix="home-row2-tdp-3" gridColumn="3 / 4" style={{ width: `${midaTdpHome.amplada}px`, height: `${midaTdpHome.alcada}px`, boxSizing: 'border-box', justifySelf: 'center' }} />
 
               {/* Indicador de més productes (Pill amb text sota el producte de la tercera columna) */}
               <Link
@@ -881,7 +887,7 @@ function Home() {
                   width: 'calc(var(--hg-tdp-xR) - var(--hg-tdp-xL))',
                   height: 'calc(calc(calc(var(--hg-tdp-xR) - var(--hg-tdp-xL)) * 0.84632) - 231px)',
                   display: 'grid',
-                  gridTemplateColumns: `repeat(3, minmax(0, calc((100% - ${2 * 22.5}px) / 3)))`,
+                  gridTemplateColumns: tdpGridColumns,
                   columnGap: '22.5px',
                   ...portraitTabletTdpGridStyle,
                 }}
@@ -893,7 +899,7 @@ function Home() {
                 <HomeTdpCard Component={TableCardA} slug="austen" index={1} cardPropsFn={cardProps} portraitTablet={isPortraitTablet} collectionHref="/austen" editableIdPrefix="home-row3-tdp-2" gridColumn="2 / 3" style={{ width: `${midaTdpHome.amplada}px`, height: `${midaTdpHome.alcada}px`, boxSizing: 'border-box', justifySelf: 'center' }} />
 
                 {/* Columna 3: TDP2 */}
-                {!isPortraitTablet && <HomeTdpCard Component={TableCardB} slug="austen" index={2} cardPropsFn={cardProps} portraitTablet={isPortraitTablet} collectionHref="/austen" editableIdPrefix="home-row3-tdp-3" gridColumn="3 / 4" style={{ width: `${midaTdpHome.amplada}px`, height: `${midaTdpHome.alcada}px`, boxSizing: 'border-box', justifySelf: 'center' }} />}
+                <HomeTdpCard Component={TableCardB} slug="austen" index={2} cardPropsFn={cardProps} portraitTablet={isPortraitTablet} collectionHref="/austen" editableIdPrefix="home-row3-tdp-3" gridColumn="3 / 4" style={{ width: `${midaTdpHome.amplada}px`, height: `${midaTdpHome.alcada}px`, boxSizing: 'border-box', justifySelf: 'center' }} />
 
               {/* Indicador de més productes (Pill amb text sota el producte de la tercera columna) */}
               <Link
@@ -977,7 +983,7 @@ function Home() {
                   width: 'calc(var(--hg-tdp-xR) - var(--hg-tdp-xL))',
                   height: 'calc(calc(calc(var(--hg-tdp-xR) - var(--hg-tdp-xL)) * 0.84632) - 231px)',
                   display: 'grid',
-                  gridTemplateColumns: `repeat(3, minmax(0, calc((100% - ${2 * 22.5}px) / 3)))`,
+                  gridTemplateColumns: tdpGridColumns,
                   columnGap: '22.5px',
                   ...portraitTabletTdpGridStyle,
                 }}
@@ -989,7 +995,7 @@ function Home() {
                 <HomeTdpCard Component={TableCardB} slug="cube" index={1} cardPropsFn={cardProps} portraitTablet={isPortraitTablet} collectionHref="/cube" editableIdPrefix="home-row4-tdp-2" gridColumn="2 / 3" style={{ width: `${midaTdpHome.amplada}px`, height: `${midaTdpHome.alcada}px`, boxSizing: 'border-box', justifySelf: 'center' }} />
 
                 {/* Columna 3: TDP1 */}
-                {!isPortraitTablet && <HomeTdpCard Component={TableCardA} slug="cube" index={2} cardPropsFn={cardProps} portraitTablet={isPortraitTablet} collectionHref="/cube" editableIdPrefix="home-row4-tdp-3" gridColumn="3 / 4" style={{ width: `${midaTdpHome.amplada}px`, height: `${midaTdpHome.alcada}px`, boxSizing: 'border-box', justifySelf: 'center' }} />}
+                <HomeTdpCard Component={TableCardA} slug="cube" index={2} cardPropsFn={cardProps} portraitTablet={isPortraitTablet} collectionHref="/cube" editableIdPrefix="home-row4-tdp-3" gridColumn="3 / 4" style={{ width: `${midaTdpHome.amplada}px`, height: `${midaTdpHome.alcada}px`, boxSizing: 'border-box', justifySelf: 'center' }} />
 
               {/* Indicador de més productes (Pill amb text sota el producte de la tercera columna) */}
               <Link
@@ -1073,7 +1079,7 @@ function Home() {
                   width: 'calc(var(--hg-tdp-xR) - var(--hg-tdp-xL))',
                   height: 'calc(calc(calc(var(--hg-tdp-xR) - var(--hg-tdp-xL)) * 0.84632) - 231px)',
                   display: 'grid',
-                  gridTemplateColumns: `repeat(3, minmax(0, calc((100% - ${2 * 22.5}px) / 3)))`,
+                  gridTemplateColumns: tdpGridColumns,
                   columnGap: '22.5px',
                   ...portraitTabletTdpGridStyle,
                 }}
@@ -1085,7 +1091,7 @@ function Home() {
                 <HomeTdpCard Component={TableCardA} slug="miscellania" index={1} cardPropsFn={cardProps} portraitTablet={isPortraitTablet} collectionHref="/miscellania" editableIdPrefix="home-row5-tdp-2" gridColumn="2 / 3" style={{ width: `${midaTdpHome.amplada}px`, height: `${midaTdpHome.alcada}px`, boxSizing: 'border-box', justifySelf: 'center' }} />
 
                 {/* Columna 3: TDP2 */}
-                {!isPortraitTablet && <HomeTdpCard Component={TableCardB} slug="miscellania" index={2} cardPropsFn={cardProps} portraitTablet={isPortraitTablet} collectionHref="/miscellania" editableIdPrefix="home-row5-tdp-3" gridColumn="3 / 4" style={{ width: `${midaTdpHome.amplada}px`, height: `${midaTdpHome.alcada}px`, boxSizing: 'border-box', justifySelf: 'center' }} />}
+                <HomeTdpCard Component={TableCardB} slug="miscellania" index={2} cardPropsFn={cardProps} portraitTablet={isPortraitTablet} collectionHref="/miscellania" editableIdPrefix="home-row5-tdp-3" gridColumn="3 / 4" style={{ width: `${midaTdpHome.amplada}px`, height: `${midaTdpHome.alcada}px`, boxSizing: 'border-box', justifySelf: 'center' }} />
 
               {/* Indicador de més productes (Pill amb text sota el producte de la tercera columna) */}
               <Link
