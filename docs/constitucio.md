@@ -150,4 +150,39 @@ I si es toca la base de dades, **comprovar l'esquema de debò**, no suposar-lo.
 
 ---
 
+## 15. Pedaços, si es poden evitar, no
+
+**La regla.** Un pedaç no és una solució. Si la causa d'un problema es pot arreglar
+de debò, **s'arregla la causa**. Un pedaç només s'accepta quan la causa no es pot
+tocar encara, i llavors s'escriu al costat **quin pedaç és i quina causa tapa**.
+
+**Per què.** Aquest projecte està ple de pedaços que van funcionar el dia que es
+van posar i que avui són el problema: el terra de 10 px i el de 12 px al
+megaslide tapen que el text i les files es mesuren amb dos sistemes diferents; el
+desplaçament mesurat des de JavaScript a la hero de l'inici tapa que la seva
+posició no està declarada enlloc. Cap d'aquests pedaços és incorrecte: tots dos
+arriben al número bo. El problema és que **no hi ha manera de saber si el número
+bo és el que toca**, perquè no està escrit enlloc.
+
+**El cost, mesurat.** El bucle de correcció de la hero (`Home.jsx`) mesura,
+s'ajusta i torna a mesurar. La correcció aplica l'error sencer, o sigui que la
+passada següent el torna a tenir, canviat de signe: **oscil·la entre dos valors
+separats 20 px**, i quin dels dos queda depèn de si el navegador ha repintat
+abans de la tercera mesura. Tots dos compleixen la tolerància d'1 px que el propi
+codi es dona. Un pedaç no només amaga la causa: **tampoc no és estable**.
+
+**Com es reconeix un pedaç.**
+
+- Un número que no se sap d'on surt, i que si es canvia una altra cosa deixa de
+  quadrar.
+- Una mesura del DOM per decidir una posició o un aire que es podria declarar.
+- Una segona regla per a un cas concret quan la primera ja hauria de valer.
+- Un terra, un topall o un `+ 2px` que compensa una altra regla.
+
+**Què es fa en lloc seu.** Es busca la causa, es diu en veu alta, i es proposa el
+canvi de debò. Si el canvi de debò és gran, **es diu que és gran** i es fa sencer
+o no es fa. El que no es fa és deixar el pedaç i dir que ja està.
+
+---
+
 *Si has de trencar alguna d'aquestes regles, para i pregunta. Cap d'elles és negociable sense el propietari.*
