@@ -45,22 +45,6 @@ const PNG_NEUTRE = Buffer.from(
   'base64',
 );
 
-/**
- * Apaga l'inspector de disposicio i les guies. Si estan activats, la pagina
- * surt amb un contorn fi a TOTS els contenidors (`debug-containers`) i la
- * captura no serveix com a referencia.
- */
-async function apagaInstruments(page) {
-  await page.evaluate(() => {
-    document.body.classList.remove('debug-containers');
-    for (const el of [document.body, document.documentElement]) {
-      el.classList.remove('debug-containers', 'debug-guies', 'debug-belt2');
-    }
-    // I que no es tornin a activar durant la captura.
-    window.__HG_CAPTURA_NETA__ = true;
-  });
-}
-
 /** Substitueix les fotos de `/placeholders/` per una imatge neutra. */
 async function neutralitzaPlaceholders(page) {
   await page.route('**/placeholders/**', (route) => route.fulfill({
@@ -70,34 +54,12 @@ async function neutralitzaPlaceholders(page) {
   }));
 }
 
-/**
- * Espera que la pagina estigui ESTABLE, que es el que fa que la captura sigui
- * reproduible:
- *   1. que el contingut mandros hagi muntat
- *   2. que TOTES les imatges hagin carregat (si en falta una, l'alcada canvia
- *      uns px i la captura sencera queda desplacada: es veia com un 15% de
- *      pixels diferents entre dues passades del MATEIX codi)
- *   3. un marge perque s'aturin animacions
- */
+/** Espera que la pagina hagi muntat el contingut (les rutes son mandroses). */
 async function esperaMuntada(page) {
   await page
     .waitForFunction(() => document.documentElement.scrollHeight > window.innerHeight * 2, { timeout: 25000 })
     .catch(() => {});
-  // Totes les imatges, carregades i descodificades.
-  await page
-    .waitForFunction(() => [...document.images].every((i) => i.complete || i.getAttribute('src') === null), { timeout: 25000 })
-    .catch(() => {});
-  await page.evaluate(() => Promise.all(
-    [...document.images].map((i) => (i.decode ? i.decode().catch(() => {}) : Promise.resolve())),
-  )).catch(() => {});
-  // Que no quedi cap imatge mandrosa pendent.
-  await page.evaluate(() => {
-    for (const img of document.images) img.loading = 'eager';
-  });
-  // OJO: NO es pot esperar `networkidle` en un servidor de desenvolupament:
-  // Vite hi manté una connexio oberta pel hot reload i no s'assoleix MAI (es
-  // quedava penjat sense escriure cap fitxer). N'hi ha prou amb el marge.
-  await page.waitForTimeout(2000);
+  await page.waitForTimeout(2500);
 }
 
 const navegador = await chromium.launch();
@@ -115,8 +77,6 @@ for (const { w, h } of MIDES) {
     await neutralitzaPlaceholders(page);
     await page.goto(`${BASE}${ruta}`, { waitUntil: 'load', timeout: 60000 }).catch(() => {});
     await esperaMuntada(page);
-    await apagaInstruments(page);
-    await page.waitForTimeout(300);
 
     // Alcada real de la pagina. La captura es fa amb `fullPage: true`:
     // `clip` no pot excedir la finestra i tallava la imatge a 1024 px.
