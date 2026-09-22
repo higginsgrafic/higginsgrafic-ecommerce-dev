@@ -104,13 +104,7 @@ function CollectionVerticalPage({ slug }) {
   // segon estat i res no es mou.
   const heroRef = useRef(null);
   const heroBandTop = 'calc(var(--hg-header-bottom, 163px) - var(--hg-hero-top, 107px))';
-  // La franja de baix s'ancora al FONS DE LA HERO (no al de la finestra): la
-  // hero comença a `--hg-hero-top`, aixi que `100vh - heroTop` es la seva
-  // alcada. Abans no es comptava aquest desplaçament i la franja quedava 107 px
-  // massa avall, tallada pel fons de la finestra, i no es veia la seva vora.
-  // El `- 56px` es la MATEIXA distancia que te la franja de dalt respecte del
-  // sostre de la hero, perque les dues es vegin igual.
-  const heroBottomBandTop = `calc(100vh - var(--hg-hero-top, 107px) - ${BAND_HEIGHT} - 56px)`;
+  const heroBottomBandTop = `calc(100vh - ${BAND_HEIGHT} - var(--hg-hero-top, 107px))`;
   const heroIconsTop = `calc(100vh - (${BAND_HEIGHT}) / 2 - var(--hg-hero-top, 107px))`;
   // Quan la imatge (alçada de finestra) sobrepassa l'espai que la graella li
   // reserva, baixem el contingut el mateix tros perque no se solapi. No es pot
