@@ -493,7 +493,7 @@ export function CercadorColorsGrid({
             fontWeight: 700,
             // Una mica mes petit a l'escriptori (11 px) i amb aire entre
             // linies: amb `lineHeight: 1` les linies quedaven juntes.
-            fontSize: (isPortraitTablet || isLandscapeTablet) ? 'max(11px, 8px)' : `max(11px, ${carrilPx(11)})`,
+            fontSize: (isPortraitTablet || isLandscapeTablet) ? 'max(10px, 8px)' : `max(10px, ${carrilPx(11)})`,
             lineHeight: 1.5,
             letterSpacing: '0.04em',
             color: '#2B2B2B',
@@ -599,7 +599,7 @@ export function CercadorColleccionsColumna({
             border: 0,
             background: 'transparent',
             color: '#2B2B2B',
-            fontSize: (isPortraitTablet || isLandscapeTablet) ? 'max(11px, 8px)' : `max(11px, ${carrilPx(11)})`,
+            fontSize: (isPortraitTablet || isLandscapeTablet) ? 'max(10px, 8px)' : `max(10px, ${carrilPx(11)})`,
             fontWeight: key === activeKey ? 700 : 300,
             lineHeight: (isPortraitTablet || isLandscapeTablet) ? '11px' : `${alcadaFilaLlista}px`,
             textAlign: 'right',
