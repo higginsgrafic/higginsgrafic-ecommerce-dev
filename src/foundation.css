@@ -1,0 +1,87 @@
+/* ============================================================================
+   FONAMENTA DE LA PAGINA  ·  la unitat única
+   ============================================================================
+
+   Una sola unitat per a tot el lloc (pàgina, header i megaslide):
+
+       1 unitat de disseny = 1 px sobre el llenç de 1920
+
+   `--u` és aquesta unitat, en píxels. A 1920 val 1 px i tot queda exactament
+   com el disseny; a 1440 val 0,75; a 1280 val 0,6667.
+
+   PER QUÈ `--u` I NO EL `font-size` DE L'ARREL:
+   El lloc actual té 315 fitxers que fan servir `rem`. Canviar el `font-size`
+   de l'arrel els mouria tots de cop. Aquesta fonamenta és additiva: no toca
+   res del que hi ha, i la faran servir les pàgines noves. Quan tot el lloc
+   estigui migrat, es podrà traslladar a l'arrel si convé.
+
+   TERRA: per sota de 1280 px la pàgina no s'encongeix més (0,6667). Això
+   protegeix la llegibilitat: el text no es fa mai més petit de 2/3 del seu
+   valor de disseny.
+   ========================================================================== */
+
+:root {
+  --disseny-amplada: 1920;
+  --escala: 0.6667;                 /* terra (1280 px de disseny) */
+  --u: 10.6667px;                   /* 1 unitat de disseny amb el terra */
+}
+
+/* OJO: ha de ser `:root`, no `html`. `:root` te mes especificitat que `html`
+   (es una pseudo-classe), i com que la base tambe es `:root`, una media query
+   amb `html` no guanyaria mai. */
+@media (min-width: 1280px) {
+  :root {
+    --escala: calc(100vw / 1920);
+    --u: calc(100vw / 1920);        /* 1 unitat = 1 px de disseny a 1920 */
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   L'ESCALA D'ESPAIAT
+   Quatre números en un sol lloc per a tota la pàgina. Estan en unitats de
+   disseny, i per tant escalen sols. S'hi afegeixen els que calguin, amb nom;
+   mai un número solt dins d'un component.
+   ------------------------------------------------------------------------- */
+:root {
+  --esp-1: calc(var(--u) * 0.5);    /*   8 unitats: dins d'un element        */
+  --esp-2: var(--u);                /*  16 unitats: entre elements germans   */
+  --esp-3: calc(var(--u) * 2.5);    /*  40 unitats: entre seccions           */
+  --esp-4: calc(var(--u) * 7.5);    /* 120 unitats: els aires grans          */
+
+  /* Marges laterals del lloc: declarats, no repartits per components. */
+  --marge-lateral: var(--esp-3);
+
+  /* L'amplada màxima del contingut (el "carril" del disseny). */
+  --contingut-max: calc(var(--u) * 1350);
+}
+
+/* ---------------------------------------------------------------------------
+   EL MARC DE LA PÀGINA
+   Una sola columna vertebral: les seccions van en flux, en ordre, i la seva
+   alçada la mana el contingut. Res es col·loca amb `top` fix ni amb marge
+   negatiu.
+   ------------------------------------------------------------------------- */
+.hg-marc {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-height: 100%;
+  background: hsl(var(--background));
+}
+
+.hg-marc__contingut {
+  width: 100%;
+  max-width: var(--contingut-max);
+  margin-inline: auto;
+  padding-inline: var(--marge-lateral);
+}
+
+/* Una secció del marc. L'alçada, la del contingut. */
+.hg-seccio {
+  width: 100%;
+}
+
+/* Els aires entre seccions, amb nom. */
+.hg-seccio--esp-3 { margin-block-start: var(--esp-3); }
+.hg-seccio--esp-4 { margin-block-start: var(--esp-4); }
+
