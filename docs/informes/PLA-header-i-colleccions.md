@@ -473,11 +473,17 @@ Etapa A (cua ampliada)
   (El punt 3 del pla, "passar el header al model", passa a ser
    l'inici de l'Etapa C, no de l'A.)
 
-Etapa B
-  [ ] B1. Component unic nou amb parametres; sense tocar /lab/proves
-  [ ] B2. CollectionMobile fora de l'abast
-  [ ] B3. Animacions i delays com a parametres per colleccio (R2)
-  [ ] Ordre: Cube -> First Contact -> Miscellania -> The Human Inside -> Austen
+Etapa B (TANCADA)
+  [x] B1. Component unic nou amb parametres; sense tocar /lab/proves
+          (`CollectionVerticalPage.jsx` 541 linies + `config/collectionVertical.js`;
+           les cinc pagines son embolcalls de 12 linies)
+  [x] B2. CollectionMobile fora de l'abast (es fa servir tal qual)
+  [x] B3. Animacions i delays per colleccio: NO N'HI HA CAP. Verificat que les
+          cinc pagines originals tenien zero usos de framer-motion, motion.,
+          initial=, animate= i @keyframes; no hi ha res a parametritzar.
+  [x] Ordre: Cube -> First Contact -> Miscellania -> The Human Inside -> Austen
+  [x] Acabament: el poster ja no cau sobre l'ultima fila de fitxes (48 px de
+      buit a totes les mides, abans hi havia fins a 351 px de solapament)
 
 Etapa C (header, per passos)
   [ ] C1. setMegaHeroRowHeight  -> model (mateixa formula que rowHeight)
