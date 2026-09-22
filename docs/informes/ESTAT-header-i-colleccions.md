@@ -257,3 +257,53 @@ abans del pintat no mou res).
 
 **Verificació que tocarà**: el protocol del punt 7 sencer, més l'equivalència amb
 HEAD a les cinc amplades.
+
+---
+
+## 11. Annex: observacions de la verificació independent (22/09/2026)
+
+Aquest annex afegeix el que la segona revisió del codi (contra aquest document)
+ha trobat. No canvia cap conclusió: el progrés descrit és real i el quadre del
+punt 5 és exacte.
+
+### 11.1 Correccions de dades
+
+1. **"2 commits pendents de pujar" ja no és cert.** En el moment d'escriure
+   l'informe ho era; ara `main` i `origin/main` estan al mateix commit
+   (`de2e26b`): tot pujat. Aquest document inclòs.
+2. **La taula de commits (punt 8) omet tres commits d'aquesta tongada**:
+   `aa7e529` (pla en text pla), `b3f7128` (secció 8 del pla, verificació
+   independent) i `f8f7e69` (revisió externa GLM).
+
+### 11.2 A3 ja està començat: fitxers temporals sense tracció
+
+Hi ha sis fitxers temporals nous al workspace, no commitejats:
+`scripts/_tmp-a3-base.mjs`, `_tmp-a3-deriva.mjs`, `_tmp-a3-poster.mjs`,
+`_tmp-a3-poster2.mjs`, `_tmp-a3.cssvar.mjs` i `_tmp-mesura-a3.mjs`. Són sondes
+de mesura per a A3 (el treball ja ha començat). Quan A3 es tanqui cal
+decidir-ne el destí: netejar-los o convertir-ne algun en mesura permanent.
+
+### 11.3 Risc tècnic nou d'A1, pendent de tancar a A3: `carrilAmple` en resize
+
+El codi nou d'A1 a les cinc pàgines és:
+
+```js
+const [carrilAmple] = useState(() => laneForViewport());
+```
+
+Abans `carrilAmple` es recalculava (l'efecte de mesura escoltava el resize);
+ara **queda congelat al valor del primer render**: no hi ha setter ni
+observador. En redimensionar la finestra (o girar una tauleta), `rowHeight` i la
+posició de la hero no s'actualitzaran fins a una recàrrega.
+
+Potser és una decisió deliberada (el resize complet pot recarregar la vista
+vertical), però no està documentada. **A3 l'ha de tancar explícitament**, d'una
+de les dues maneres:
+
+1. Documentar que `carrilAmple` és intencionadament fix (i per què), o
+2. Derivar-lo d'una variable que sí que s'actualitza (per exemple recalcular
+   dins el mateix `useLayoutEffect` que ja publica `--hg-hero-top`, que sí que
+   s'executa en resize).
+
+Si s'opta per la 2, cal verificar amb traces que no reintrodueix cap moviment
+al girar la tauleta (l'escenari original del problema).
