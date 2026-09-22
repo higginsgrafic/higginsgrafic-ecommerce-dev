@@ -1725,7 +1725,6 @@ function FullWideSlideHeader({
   }, [overlayStorageKey, resolvedOverlaySrc, stripeOverlayOverrideActive]);
   const [megaTileSize, setMegaTileSize] = useState(null);
   const effectiveMegaTileSize = megaTileSize || 120;
-  const [, setRootRemPx] = useState(16);
   const [megaTileSelectorParams, setMegaTileSelectorParams] = useState(() => {
     try {
       if (typeof window === 'undefined') {
@@ -2795,21 +2794,6 @@ function FullWideSlideHeader({
       document.body.style.overflow = prev;
     };
   }, [contained, active]);
-
-  useEffect(() => {
-    const recompute = () => {
-      try {
-        const px = parseFloat(window.getComputedStyle(document.documentElement).fontSize);
-        if (Number.isFinite(px) && px > 0) setRootRemPx(px);
-      } catch {
-        setRootRemPx(16);
-      }
-    };
-
-    recompute();
-    window.addEventListener('resize', recompute);
-    return () => window.removeEventListener('resize', recompute);
-  }, []);
 
   const canUseDom = typeof document !== 'undefined';
 
