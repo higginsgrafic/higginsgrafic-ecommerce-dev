@@ -25,6 +25,7 @@ import {
   HERO_TDP_GAP_TABLET_PX,
   HERO_TDP_GAP_LANDSCAPE_PX,
   HERO_TDP_SEPARACIO_PX,
+  TDP_PITCH_FILES,
 } from '@/config/collectionVertical';
 import { readOverlayState, writeOverlayState } from '@/utils/collectionOverlayState';
 
@@ -490,7 +491,7 @@ function CollectionVerticalPage({ slug }) {
             const variantB = (rowIdx + colIdx) % 2 === 1;
             // Files de 11 espais + 2 de separacio: el gap entre files de fitxes
             // queda a la meitat.
-            const rowOffset = 10 + rowIdx * 13;
+            const rowOffset = 10 + rowIdx * TDP_PITCH_FILES;
             const productName = producte.name;
             const { imageTranslateY, productNameTranslateY, descriptionTranslateY } = getCardLayout(colIdx);
             return (

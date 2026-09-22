@@ -79,10 +79,21 @@ export const HERO_TDP_GAP_PX = '-41px';
  *
  * El numero efectiu surt d'aqui: el desplaçament de la graella es calcula
  * exactament per deixar aquesta distancia. Amb 24 px les fitxes quedaven
- * enganxades a la imatge en tauleta; amb 60 tenen aire i a escriptori tambe
- * (a 1024x1366 la separacio era la MATEIXA de justa).
+ * enganxades a la imatge en tauleta (i a 1024 calien 293 px de desplaçament per
+ * arribar-hi); amb 150 respiren de sobres.
  */
-export const HERO_TDP_SEPARACIO_PX = 60;
+export const HERO_TDP_SEPARACIO_PX = 150;
+/**
+ * Separacio VERTICAL entre files de fitxes.
+ *
+ * El pitch vertical de la graella son 13 files; una fitxa n'ocupa 11 i les 2 que
+ * sobren son aquesta separacio. Amb 12 files en queda una, que es el minim
+ * possible amb aquesta graella. NO es pot fixar en un numero exacte de px: la
+ * fila fa entre 22 i 39 px segons l'amplada, perque l'alcada de la fitxa es
+ * proporcional a l'ample del carril, no a l'alcada de la fila.
+ */
+export const TDP_PITCH_FILES = 12;
+
 export const HERO_TDP_GAP_TABLET_PX = '338px';
 export const HERO_TDP_GAP_LANDSCAPE_PX = '-240px';
 
