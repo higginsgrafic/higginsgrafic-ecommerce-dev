@@ -209,6 +209,9 @@ A tauleta no coincideixen perquè el megaslide té disseny propi i no s'escala
 9. **No tocar el megaslide** sense que ho demani: està calibrat a un llenç de
    1920 i es descalibra fàcilment.
 10. **No tocar el `font-size` de l'arrel**: 315 fitxers fan servir `rem`.
+11. **Pedaços, si es poden evitar, no**: és la regla 15 de
+    `docs/constitucio.md`. Un pedaç només s'accepta si la causa no es pot tocar
+    encara, i llavors s'escriu al costat quina causa tapa.
 
 ## 7. Com treballa l'usuari (après aquesta sessió)
 
