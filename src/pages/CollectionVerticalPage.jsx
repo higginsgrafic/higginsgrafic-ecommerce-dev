@@ -122,6 +122,8 @@ function CollectionVerticalPage({ slug }) {
   // queda mes avall. L'ajust es proporcional a l'amplada del carril (que ja ve
   // del model), aixi que es calcula: no cal cap mesura ni cap estat.
   const posterExtraPx = posterExtra ? Math.round(carrilAmple * 0.857) : 0;
+  // Desplaçament de la graella perque la primera fitxa quedi sota la hero.
+  const [pushDownPx, setPushDownPx] = useState(0);
 
 
 
@@ -181,17 +183,25 @@ function CollectionVerticalPage({ slug }) {
       }
       // La imatge acaba exactament on acaba la franja blanca de baix: baixem
       // la graella el que calgui perque la primera targeta quedi SEMPRE per
-      // sota. El calcul és el MATEIX d'abans, pero sobre la posicio base del
-      // primer intent (quan el desplaçament encara es 0), sense bucle de punt
-      // fix: aplicar-lo canvia el top de la TDP exactament el mateix que el
-      // desplaçament, aixi que el resultat no depen de quantes vegades es faci.
+      // sota. Es calcula sobre la posicio BASE (la del primer intent, quan el
+      // desplaçament encara es 0) perque aplicar-lo mou la fitxa exactament el
+      // mateix: aixo el fa idempotent i no depen de quantes vegades es mesuri.
       const tdp0 = document.querySelector('[aria-label="TDP taula"]') || document.querySelector('[aria-label="TDP rectangle"]');
       if (tdp0) {
-        const pushDown = Math.max(0, Math.round(hero.getBoundingClientRect().bottom + 24 - tdp0.getBoundingClientRect().top));
-        document.documentElement.style.setProperty('--hg-push-down', `${pushDown}px`);
+        const heroBottom = hero.getBoundingClientRect().bottom;
+        setPushDownPx((prev) => {
+          const base = tdp0.getBoundingClientRect().top - prev;
+          const cal = Math.max(0, Math.round(heroBottom + 24 - base));
+          return Math.abs(cal - prev) < 1 ? prev : cal;
+        });
       }
     };
     mesura();
+    // La graella de fitxes i la hero s'acaben d'assentar DESPRES del primer
+    // mesurament (les fitxes i les seves imatges arriben mes tard): es torna a
+    // mesurar passat el pic de carrega. Aquest es el `setTimeout` que ja hi
+    // havia al codi original, i es el que fa convergir el calcul.
+    const t = window.setTimeout(mesura, 300);
     // El carril nomes depen de l'amplada de la finestra: es recalcula en
     // resize perque `rowHeight` (i el `top` de la hero) no es quedin
     // congelats al valor del primer render.
@@ -205,6 +215,7 @@ function CollectionVerticalPage({ slug }) {
     };
     window.addEventListener('resize', onResize);
     return () => {
+      window.clearTimeout(t);
       window.removeEventListener('resize', onResize);
     };
   }, []);
@@ -448,7 +459,7 @@ function CollectionVerticalPage({ slug }) {
         style={{
           // Puja tot el contingut sota el hero 12 files de la taula (41 → 29).
           // Alçada d'1 fila = ampladaBelt × 6708/2642/90; 12 files ≈ 0.3385 × amplada.
-          marginTop: `calc((var(--hg-tdp-xL, 0px) - var(--hg-tdp-xR, 0px)) * 0.3385${isLandscapeTablet ? ' - 30px' : ''}${isPortraitTablet ? ' - 120px' : ''} + var(--hg-push-down, 0px)${isLandscapeTablet ? ` + ${HERO_TDP_GAP_LANDSCAPE_PX}` : (isPortraitTablet ? ` + ${HERO_TDP_GAP_TABLET_PX}` : ` + ${HERO_TDP_GAP_PX}`)})`,
+          marginTop: `calc((var(--hg-tdp-xL, 0px) - var(--hg-tdp-xR, 0px)) * 0.3385${isLandscapeTablet ? ' - 30px' : ''}${isPortraitTablet ? ' - 120px' : ''} + ${pushDownPx}px${isLandscapeTablet ? ` + ${HERO_TDP_GAP_LANDSCAPE_PX}` : (isPortraitTablet ? ` + ${HERO_TDP_GAP_TABLET_PX}` : ` + ${HERO_TDP_GAP_PX}`)})`,
           // Desplaçament vertical NOMES de les TDP. Va amb `translate` (no
           // `transform`) perque la graella ja fa servir transform per centrar-se
           // i `translate` s'hi suma sense trepitjar-lo.
