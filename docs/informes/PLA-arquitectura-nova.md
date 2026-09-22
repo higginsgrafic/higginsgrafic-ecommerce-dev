@@ -328,3 +328,65 @@ intentar-ho, i cada correcció en trencava una altra.
 **NO s'ha de fer a estones.** Cada intent parcial ha trencat la pàgina (el títol
 de col·lecció ha arribat a quedar 214 px endins de la hero, i la taula de dues
 files ha quedat 225 px desplaçada). És una tasca amb principi i final.
+
+---
+
+## 10. Informe de la sessió del 22/09/2026 (tarda-vespre)
+
+### Què s'ha fet
+
+**Fase 0 — la referència congelada.** Eina permanent
+`scripts/captures-referencia.mjs`: una imatge de pàgina sencera per ruta i mida
+de les 6 rutes a refer, a 768/1024/1440. Dues coses que va caldre arreglar-hi:
+`clip` no pot excedir la finestra (cal `fullPage`), i bloquejar les fotos amb
+`abort` feia petar l'aplicació (ara es responen amb una imatge neutra).
+
+**Fase 1 — la unitat única.** `src/foundation.css`:
+- `--u`: 1 unitat = 1 px de disseny sobre el llenç de 1920, amb terra a 0,6667.
+- L'escala d'espaiat: `--esp-1` a `--esp-4`, quatre números en un sol lloc.
+- El marc de pàgina (`.hg-marc`, `.hg-seccio`).
+- **No toca el `font-size` de l'arrel** (315 fitxers fan servir `rem`), i el
+  `font-size` viu al marc. Troballa del camí: dins una media query, `html` NO
+  pot sobreescriure un valor de `:root` (té menys especificitat).
+
+**El que s'ha arreglat de debò, amb la causa de cada cosa:**
+
+| què | causa |
+|---|---|
+| La capçalera quedava tallada | la pàgina desbordava horitzontalment: el `TambeRail` fa més amplada que la seva cel·la (694 dins 540), i la pàgina es podia desplaçar 68 px. `overflow-x: clip` al `main`. Preexistent. |
+| La franja de baix de la hero no arribava al fons | l'alçada de la hero era `100vh − offset de la capçalera` i la hero comença més avall: la franja en sortia 49 px. |
+| Les TDP es cavalcaven sobre la hero | el desplaçament deixava només 24 px. Sense el desplaçament, la primera fitxa cau 62 px SOBRE la hero a 768 i 233 px a 1024. |
+| El pòster queia sobre l'última fila de fitxes | el `marginTop` del bloc final era fix i el pòster depèn de l'amplada del carril. Preexistent (pitjor abans de la fusió). |
+| El peu no era a la distància del marge lateral | `marginTop` fix de 236 px a App.jsx. El peu depèn del seu propi marge (el `main` l'absorbeix), així que es corregeix iterativament. |
+| El títol «Altres històries» no s'alineava | el títol es dimensiona pel contenidor (540) i les fitxes pel carril (736): dues amplades diferents. |
+| Les fitxes de l'inici no eren com les de col·lecció | cada pàgina calculava la mida pel seu compte (`aspect-ratio 10/13` contra geometria), i a sobre la secció portava `scale(0.94)`. |
+| La distribució de fitxes no coincidia | depenia del tipus de dispositiu i no de l'amplada. Ara és una regla d'amplada (`tdpColumnes`): 2 a 768, 3 a 1024/1280, 4 a 1440/1920. |
+| El text del menú a 1440 feia 8,25 px | el `font-size` era `carrilPx(11)`, lligat a l'escala del megaslide (0,75 a 1440). Terra de 12 px. |
+
+### L'estat, mesurat
+
+- **Fitxes idèntiques** a l'inici i a col·lecció: 165×240 a 768, 225×281 a 1024,
+  285×356 a 1280, 236×295 a 1440, 321×401 a 1920.
+- **Distribució**: 2/3/3/4/4 per fila, com es va demanar.
+- **Capçalera**: 81 px amb una fila en horitzontal, 123 px amb files de 61/62 a
+  la vertical (el separador al mig, contingut centrat).
+- **462 proves**, `compara-vistes` OK, `build` OK.
+
+### Què queda, i per què no s'ha fet
+
+**La migració (fases 2 a 7).** El fonament existeix pero **encara no té cap
+consumidor**: `--u` i `--esp-*` només es fan servir dins `foundation.css`. Migrar
+vol dir refer cada pàgina perquè els faci servir, i això és una sessió per
+pàgina.
+
+**La hero de l'inici.** Documentada a la secció 9. Té **tres factors d'escala**
+encadenats (el `scale(0.705)` de la hero, un `transform` al contenidor que trenca
+`fixed`, i un tercer factor en un ancestre que fa que la compensació surti al
+doble). S'hi ha provat **quatre vegades** i cada intent parcial ha trencat la
+pàgina. Funciona, però amb una mesura des de JavaScript.
+
+**Quan les dues escales coincideixen:** a **1920 i 1440** l'escala del megaslide
+i `--u` són **el mateix nombre** (1,0 i 0,75). A tauleta no, perquè el megaslide
+té disseny propi i no s'escala mentre el sistema nou hi té un terra. O sigui que
+la unificació ja és feta a escriptori; el que falta és que el lloc la faci
+servir.
