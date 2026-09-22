@@ -40,6 +40,10 @@ export default function ProductCard({
   onNavigateBlocked,
   cardIndex,
   positionKey,
+  // Amb `enFlux` la targeta no es col·loca amb top/left sino que va en el flux
+  // (es fa servir al rail en mode estatic, on les targetes van en una fila
+  // centrada en comptes d'un carrousel).
+  enFlux = false,
 }) {
   const overlayHref = overlayEnabled && overlaySrc ? normalizeOverlaySrc(overlaySrc) : null;
 
@@ -64,9 +68,9 @@ export default function ProductCard({
         }
       }}
       style={{
-        position: 'absolute',
-        top: `${topPx}px`,
-        left: `${leftPx}px`,
+        ...(enFlux
+          ? { position: 'relative', flex: '0 0 auto' }
+          : { position: 'absolute', top: `${topPx}px`, left: `${leftPx}px` }),
         userSelect: 'none',
         WebkitUserDrag: 'none',
       }}

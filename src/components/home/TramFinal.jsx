@@ -67,14 +67,21 @@ const TramFinal = forwardRef(function TramFinal(
       {/* TEXT POSTER GRAN (Fila local 27 / 33 - correspon a global 227 / 233) */}
       <div
         data-poster-text="1"
+        data-poster-block="1"
         style={{
           gridColumn: '1 / 5',
-          gridRow: '25 / 31',
+          // El bloc del poster ocupa MES files que abans (25/31): el text es
+          // fix (60pt) i amb 6 files no hi cap, i se n'anava cap amunt fins a
+          // tapar el titol del rail (46 px a 768).
+          gridRow: '22 / 34',
+          // Ancorat a DALT: el text es fix (60pt, unes 9 files) i amb el
+          // centrat vertical se n'anava cap amunt, fins a tapar el titol del
+          // rail. Amb `flex-start` nomes pot créixer cap avall.
           paddingTop: '50px',
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
-          justifyContent: 'center',
+          justifyContent: 'flex-start',
           pointerEvents: 'auto',
         }}
       >
@@ -99,40 +106,17 @@ const TramFinal = forwardRef(function TramFinal(
         </div>
       </div>
 
-      {/* Subtítol "ALTRES HISTÒRIES" (Fila local 45 / 46 - correspon a global 245 / 246) */}
-      <div
-        style={{
-          // El titol ocupa tota l'amplada i va centrat: abans ocupava mitja
-          // graella i el text quedava a l'esquerra (arribava a estar 317 px
-          // desviat del centre a 1920), i a sobre el desplaçavem amb
-          // `translateX(27px)`, cosa que el feia sortir del seu lloc.
-          gridColumn: '1 / 5',
-          gridRow: '39 / 40',
-          alignSelf: 'center',
-          fontFamily: 'Roboto Condensed, sans-serif',
-          fontWeight: 400,
-          fontSize: '15pt',
-          lineHeight: 1.2,
-          letterSpacing: '0.2em',
-          textTransform: 'uppercase',
-          color: 'rgba(71, 80, 89, 0.7)',
-          textAlign: 'center',
-          pointerEvents: 'auto',
-          // Només el desplaçament vertical.
-          transform: 'translateY(123px)',
-        }}
-      >
-        ALTRES HISTÒRIES
-      </div>
-
       {/* També et pot interessar Rail (Fila local 43 / 60 - correspon a global 243 / 260) */}
       <div
         style={{
           gridColumn: '1 / 5',
           gridRow: '37 / 54',
           alignSelf: 'start',
+          // El rail ha d'ocupar l'amplada del bloc perque el titol pugui
+          // alinear-se amb la primera targeta i les targetes hi càpiguen.
           width: '100%',
-          marginTop: '-28px', // Baixat 1px (abans -29px)
+          justifySelf: 'stretch',
+          marginTop: '180px',
           pointerEvents: 'auto',
         }}
       >
@@ -142,11 +126,17 @@ const TramFinal = forwardRef(function TramFinal(
           // desplaçat tres targetes), i a les fulles de colleccio aixo feia que
           // el rail sortis desviat a l'esquerra i es talles a la dreta.
           initialIndex={0}
+          // No es un carrousel: es un bloc estatic amb totes les targetes i el
+          // titol, centrat al viewport.
+          estatic
           cardHref={tambeHref}
-          title={tambeTitle}
+          title="ALTRES HISTÒRIES"
           images={tambeImages}
           showInternalArrows={false}
-          showTitle={false}
+          // El titol forma part del MATEIX bloc que les targetes: el pinta el
+          // rail, perque dins la graella els dos no es poden posicionar per
+          // separat sense trepitjar-se.
+          showTitle
           visibleCards={visibleCards}
         />
       </div>

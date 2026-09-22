@@ -51,8 +51,13 @@ export default function TambeRail({
   images = DEFAULT_IMAGES,
   cardHref = '/',
   title = 'també et pot interessar',
-  subtitle = 'COSES DIFERENTS',
+  subtitle = 'COSES PECULIARS',
   initialIndex = 3,
+  // Mode ESTATIC: sense carrousel. Les targetes es mostren totes en una fila
+  // centrada al viewport, amb el titol, com un bloc.
+  estatic = false,
+  // Quantes targetes es mostren en mode estatic.
+  estaticCards = 3,
   visibleCards = 4,
   beltWidthOverride = null,
   showTitle = true,
@@ -106,6 +111,8 @@ export default function TambeRail({
   const [carouselAnimate, setCarouselAnimate] = useState(true);
   const containerRef = useRef(null);
   const respescaRef = useRef(null);
+  // Amplada real del contenidor de les targetes (es mesura al layout effect).
+  const [ampladaContenidorPx, setAmpladaContenidorPx] = useState(0);
   const dragRef = useRef({ active: false, pointerId: null, startX: 0, startY: 0, lastDx: 0, lastDy: 0, moved: false, consumed: false });
   const isAnimRef = useRef(false);
   const pendingRef = useRef(0);
@@ -279,7 +286,12 @@ export default function TambeRail({
   //   cardW = (belt2Width - (visibleCards - 1) * gutterX) / visibleCards
   //   stepPx = cardW + gutterX
   const PAUTA_GUTTER_X = stabilizedGutterX ?? 22.5;
-  const cardW = Math.max(80, (beltWidth - (visibleCards - 1) * PAUTA_GUTTER_X) / visibleCards * (stabilizeInitialLayout ? 1 : 0.94));
+  // En mode estatic les targetes es reparteixen l'amplada del CONTENIDOR del
+  // rail (el del bloc final), no la del carril: si es fa amb el carril, les
+  // targetes fan mes amplada que el contenidor i en surten pels costats.
+  const filesEstatic = estatic ? Math.min(estaticCards, totalCards) : visibleCards;
+  const ampladaContenidor = estatic && ampladaContenidorPx > 0 ? ampladaContenidorPx : beltWidth;
+  const cardW = Math.max(80, (ampladaContenidor - (filesEstatic - 1) * PAUTA_GUTTER_X) / filesEstatic * (estatic ? 1 : (stabilizeInitialLayout ? 1 : 0.94)));
   const stepPx = cardW + PAUTA_GUTTER_X;
   const viewportWidthPx = useMemo(() => Math.max(0, stabilizeInitialLayout ? beltWidth : Math.min(beltWidth, cardW * visibleCards + (visibleCards - 1) * PAUTA_GUTTER_X)), [beltWidth, cardW, visibleCards, PAUTA_GUTTER_X, stabilizeInitialLayout]);
   const cardImgTopPx = stabilizeInitialLayout ? 0 : 161;
@@ -297,6 +309,21 @@ export default function TambeRail({
     boxSizing: 'border-box',
   }), [renderedCardW, imgPaddingPx]);
   const dynamicTextBlockStyle = useMemo(() => ({ width: `${renderedCardW}px` }), [renderedCardW]);
+
+  // Amplada del contenidor de les targetes, abans del pintat. En mode estatic
+  // la necessitem per repartir les targetes dins seu (i no fer-les mes amples
+  // que el contenidor).
+  useLayoutEffect(() => {
+    if (!estatic) return undefined;
+    const mesura = () => {
+      const el = respescaRef.current;
+      const ample = el ? el.clientWidth : 0;
+      if (ample > 0) setAmpladaContenidorPx((prev) => (Math.abs(prev - ample) < 0.5 ? prev : ample));
+    };
+    mesura();
+    window.addEventListener('resize', mesura);
+    return () => window.removeEventListener('resize', mesura);
+  }, [estatic]);
 
   useLayoutEffect(() => {
     setCarouselAnimate(false);
@@ -399,44 +426,58 @@ export default function TambeRail({
         style={respescaMinHeightPx ? { minHeight: `${respescaMinHeightPx}px` } : undefined}
       >
         {showTitle && (
-          <RespescaTitle leftPx={left1} title={title} subtitle={subtitle} />
+          // En mode estatic el titol no es posiciona amb el desplaçament del
+          // carrousel (`left1`): va en el flux, a sobre de les targetes.
+          <RespescaTitle leftPx={estatic ? 0 : left1} title={title} subtitle={subtitle} enFlux={estatic} />
         )}
 
         <div
           className="w-full"
           data-container="cards-row"
-          style={{ paddingTop: stabilizeInitialLayout ? '56px' : '100px', paddingBottom: stabilizeInitialLayout ? 0 : '40px' }}
+          // En mode estatic cal una mica mes d'aire a dalt: el text del poster
+          // del bloc final es fix (60pt) i el seu bloc de graella no el pot
+          // contenir, aixi que en surt i arriba a tapar el titol (46 px a 768).
+          style={{ paddingTop: estatic ? '72px' : (stabilizeInitialLayout ? '56px' : '100px'), paddingBottom: stabilizeInitialLayout ? 0 : '40px' }}
         >
           <div style={{ position: 'relative', minHeight: `${viewportHeightPx}px` }}>
             <div
               style={{
                 position: 'relative',
-                marginLeft: `${left1}px`,
-                width: `${viewportWidthPx}px`,
-                overflow: 'hidden',
-                touchAction: 'pan-y',
-                minHeight: `${viewportHeightPx}px`,
+                // En mode estatic el bloc va CENTRAT al viewport i sense
+                // retallar: les targetes son totes visibles.
+                ...(estatic
+                  ? { width: '100%', display: 'flex', justifyContent: 'center' }
+                  : {
+                    marginLeft: `${left1}px`,
+                    width: `${viewportWidthPx}px`,
+                    overflow: 'hidden',
+                    touchAction: 'pan-y',
+                    minHeight: `${viewportHeightPx}px`,
+                  }),
               }}
               data-container="rail-estatic"
             >
 
               <div
-                style={{
-                  position: 'relative',
-                  transform: `translateX(${-safeStart * stepPx}px)`,
-                  transition: carouselAnimate ? 'transform 420ms cubic-bezier(0.22, 1, 0.36, 1)' : 'none',
-                  willChange: 'transform',
-                }}
+                style={estatic
+                  ? { display: 'flex', gap: `${PAUTA_GUTTER_X}px`, position: 'relative' }
+                  : {
+                    position: 'relative',
+                    transform: `translateX(${-safeStart * stepPx}px)`,
+                    transition: carouselAnimate ? 'transform 420ms cubic-bezier(0.22, 1, 0.36, 1)' : 'none',
+                    willChange: 'transform',
+                  }}
                 data-container="carousel-track"
                 onTransitionEnd={() => {
+                  if (estatic) return;
                   if (safeStart >= upper) { snapWithoutAnimation(safeStart - totalCards); return; }
                   if (safeStart < CLONE_COUNT) { snapWithoutAnimation(safeStart + totalCards); return; }
                   settleQueuedNav();
                 }}
               >
-                {extendedCards.map((card, pos) => {
+                {(estatic ? images.slice(0, estaticCards).map((_, idx) => ({ idx })) : extendedCards).map((card, pos) => {
                   const idx = card.idx;
-                  const leftPx = pos * stepPx;
+                  const leftPx = estatic ? 0 : pos * stepPx;
                   const item = images[idx] || null;
                   const isObj = item && typeof item === 'object' && !Array.isArray(item);
                   const img = isObj ? item.src : item;
@@ -452,7 +493,8 @@ export default function TambeRail({
                       positionKey={`${pos}-${idx}`}
                       href={cardLink}
                       imageSrc={img}
-                      topPx={cardImgTopPx}
+                      enFlux={estatic}
+                      topPx={estatic ? 0 : cardImgTopPx}
                       textBottomPx={textBottomPx}
                       imgPaddingPx={48}
                       leftPx={leftPx}
