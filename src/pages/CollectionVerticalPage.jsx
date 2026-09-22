@@ -29,6 +29,7 @@ import {
   TDP_SEPARACIO_FONS_PX,
   TDP_FONS_BLEED_PX,
   TDP_POSTER_SEPARACIO_PX,
+  TDP_POSTER_PADDING_TOP_PX,
   TDP_PEUSEPARACIO_PX,
 } from '@/config/collectionVertical';
 import { readOverlayState, writeOverlayState } from '@/utils/collectionOverlayState';
@@ -261,6 +262,11 @@ function CollectionVerticalPage({ slug }) {
             .map((c) => c.getBoundingClientRect().bottom))
           : tdp0.getBoundingClientRect().bottom;
         const posterRelatiu = posterTop - tramTop;
+        // El text del poster va DINS d'un bloc amb `paddingTop`, aixi que l'aire
+        // de dalt i el de baix no son iguals si es mesura la caixa. El mesurem
+        // amb el text, que es el que es veu.
+        const posterTextEl = poster.firstElementChild || poster;
+        const alcadaPoster = posterTextEl.getBoundingClientRect().height;
         // L'exces que desborda el contingut del bloc final (i del seu
         // contenidor): el peu ha de quedar DESPRES del contingut, no de la
         // caixa, que es mes curta.
@@ -298,15 +304,22 @@ function CollectionVerticalPage({ slug }) {
           const embolcallPeu = peu ? peu.parentElement : null;
           if (embolcallPeu) {
             const margeActual = parseFloat(getComputedStyle(embolcallPeu).marginTop) || 0;
-            const topActual = embolcallPeu.getBoundingClientRect().top;
-            const objectiu = targetesBottom + TDP_PEUSEPARACIO_PX;
-            const desajust = Math.round(objectiu - topActual);
+            // L'aire REAL entre les targetes i el peu (no entre el `main` i el
+            // peu: el `main` pot acabar abans que les targetes).
+            const aireActual = peu.getBoundingClientRect().top - targetesBottom;
+            const desajust = Math.round(TDP_PEUSEPARACIO_PX - aireActual);
             if (Math.abs(desajust) > 1) {
               setMargePeu((prev) => (prev === margeActual + desajust ? prev : Math.round(margeActual + desajust)));
             }
           }
         }
+        // El marge es calcula perque el TEXT del poster quedi a
+        // `TDP_POSTER_SEPARACIO_PX` del final de les fitxes (el seu aire de
+        // dalt). El de baix el fixa el titol, que va al mateix bloc.
         const cal = Math.round(ultimaFitxaBottom + TDP_POSTER_SEPARACIO_PX - posterRelatiu - tramNatural);
+        // El titol ha de quedar a la MATEIXA distancia del poster que de les
+        // targetes. Es calcula des del text del poster i es fixa (no acumula).
+
         setMargeTramFinal((prev) => (prev === cal ? prev : cal));
       }
     };
