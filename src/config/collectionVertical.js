@@ -94,6 +94,12 @@ export const HERO_TDP_SEPARACIO_PX = 150;
  */
 export const TDP_PITCH_FILES = 12;
 
+/**
+ * Separacio entre l'ultima fila de fitxes i el text del poster del bloc final.
+ * El marge del bloc es calcula per deixar exactament aquesta distancia.
+ */
+export const TDP_POSTER_SEPARACIO_PX = 48;
+
 export const HERO_TDP_GAP_TABLET_PX = '338px';
 export const HERO_TDP_GAP_LANDSCAPE_PX = '-240px';
 
@@ -223,8 +229,6 @@ const AUSTEN_PRODUCTS = [
  * - `filesDeFitxes`: quantes files de fitxes pinta la graella. NO es dedueix
  *   del nombre de productes (Cube en te 10 i en pintava 16, repetint-los): es
  *   el que tenia cada pagina, i canviar-lo trauria o afegiria fitxes.
- * - `posterExtra`: nomes Austen te mes files de TDP, i el poster ha de baixar
- *   per mantenir el mateix aire a sobre.
  * - `copy`: el numero de copia de la pagina. Determina les claus d'estat.
  */
 const CONFIGURACIONS = {
@@ -314,7 +318,6 @@ const CONFIGURACIONS = {
     // servir els mockups i el `finish`), i la darrera fila es completa
     // repetint productes des del principi.
     perProductCollection: true,
-    posterExtra: true,
   },
 };
 

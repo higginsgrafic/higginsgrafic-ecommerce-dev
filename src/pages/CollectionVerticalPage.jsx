@@ -26,6 +26,7 @@ import {
   HERO_TDP_GAP_LANDSCAPE_PX,
   HERO_TDP_SEPARACIO_PX,
   TDP_PITCH_FILES,
+  TDP_POSTER_SEPARACIO_PX,
 } from '@/config/collectionVertical';
 import { readOverlayState, writeOverlayState } from '@/utils/collectionOverlayState';
 
@@ -60,7 +61,6 @@ function CollectionVerticalPage({ slug }) {
     filesDeFitxes,
     gridRows = 90,
     gridAspect = { tablet: 9717, escriptori: 6708 },
-    posterExtra = false,
     copy,
   } = config;
 
@@ -120,12 +120,13 @@ function CollectionVerticalPage({ slug }) {
   const otherImages = useMemo(() => buildOtherCollectionsImages(slug), [slug]);
   const getCardLayout = useCollectionCardLayout({ isPortraitTablet, isLandscapeTablet });
 
-  // Austen te mes files de TDP que les altres colleccions, aixi que el poster
-  // queda mes avall. L'ajust es proporcional a l'amplada del carril (que ja ve
-  // del model), aixi que es calcula: no cal cap mesura ni cap estat.
-  const posterExtraPx = posterExtra ? Math.round(carrilAmple * 0.857) : 0;
   // Desplaçament de la graella perque la primera fitxa quedi sota la hero.
   const [pushDownPx, setPushDownPx] = useState(0);
+  // Marge del bloc final (el poster gran). El seu valor fix deixava el poster
+  // DAMUNT de l'ultima fila de fitxes a unes mides i no a d'altres, perque tant
+  // l'alcada del bloc com la posicio del poster dins seu depenen de l'amplada
+  // del carril. Es calcula a partir de la posicio REAL del poster.
+  const [margeTramFinal, setMargeTramFinal] = useState(0);
 
 
 
@@ -196,6 +197,25 @@ function CollectionVerticalPage({ slug }) {
           const cal = Math.max(0, Math.round(heroBottom + HERO_TDP_SEPARACIO_PX - base));
           return Math.abs(cal - prev) < 1 ? prev : cal;
         });
+      }
+      // El marge del bloc final: el poster ha de quedar sempre a la MATEIXA
+      // distancia del final de l'ultima fila de fitxes. Es calcula amb la
+      // posicio real del poster i la posicio natural (sense marge) del bloc.
+      const tram = document.querySelector('[data-tram-final="1"]');
+      const poster = tram ? tram.querySelector('[data-poster-text="1"]') : null;
+      if (tram && poster && tdp0) {
+        const margeActual = parseFloat(getComputedStyle(tram).marginTop) || 0;
+        const tramTop = tram.getBoundingClientRect().top;
+        const posterTop = poster.getBoundingClientRect().top;
+        const tramNatural = tramTop - margeActual;
+        const ultimaFitxaBottom = tdp0.parentElement
+          ? Math.max(...[...tdp0.parentElement.children]
+            .filter((c) => c.getAttribute('aria-label') === 'TDP taula')
+            .map((c) => c.getBoundingClientRect().bottom))
+          : tdp0.getBoundingClientRect().bottom;
+        const posterRelatiu = posterTop - tramTop;
+        const cal = Math.round(ultimaFitxaBottom + TDP_POSTER_SEPARACIO_PX - posterRelatiu - tramNatural);
+        setMargeTramFinal((prev) => (prev === cal ? prev : cal));
       }
     };
     mesura();
@@ -533,9 +553,9 @@ function CollectionVerticalPage({ slug }) {
       <TramFinal
         posterLines={posterLines}
         tambeImages={otherImages}
-        // El 75% de l'aire que hi havia entre l'ultima fitxa i la frase del
-        // poster ja no hi es (abans -552 / -350).
-        marginTop={isPortraitTablet ? `${-1341 - posterExtraPx}px` : `${-1543 - posterExtraPx}px`}
+        // El marge es calcula per deixar sempre la mateixa distancia entre
+        // l'ultima fila de fitxes i el poster (vegeu `margeTramFinal`).
+        marginTop={`${margeTramFinal}px`}
         visibleCards={(isPortraitTablet || isLandscapeTablet) ? 3 : 4}
       />
         </>

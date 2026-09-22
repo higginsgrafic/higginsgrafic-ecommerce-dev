@@ -43,6 +43,7 @@ const TramFinal = forwardRef(function TramFinal(
   return (
     <div
       ref={pautaGridRef}
+      data-tram-final="1"
       style={{
         display: 'grid',
         gridTemplateColumns: `repeat(4, minmax(0, calc((100% - ${3 * 22.5}px) / 4)))`,
@@ -65,6 +66,7 @@ const TramFinal = forwardRef(function TramFinal(
     >
       {/* TEXT POSTER GRAN (Fila local 27 / 33 - correspon a global 227 / 233) */}
       <div
+        data-poster-text="1"
         style={{
           gridColumn: '1 / 5',
           gridRow: '25 / 31',
