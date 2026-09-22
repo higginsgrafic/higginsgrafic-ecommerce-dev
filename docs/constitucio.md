@@ -164,12 +164,20 @@ posició no està declarada enlloc. Cap d'aquests pedaços és incorrecte: tots 
 arriben al número bo. El problema és que **no hi ha manera de saber si el número
 bo és el que toca**, perquè no està escrit enlloc.
 
-**El cost, mesurat.** El bucle de correcció de la hero (`Home.jsx`) mesura,
-s'ajusta i torna a mesurar. La correcció aplica l'error sencer, o sigui que la
-passada següent el torna a tenir, canviat de signe: **oscil·la entre dos valors
-separats 20 px**, i quin dels dos queda depèn de si el navegador ha repintat
-abans de la tercera mesura. Tots dos compleixen la tolerància d'1 px que el propi
-codi es dona. Un pedaç no només amaga la causa: **tampoc no és estable**.
+**El cost, mesurat.** El desplaçament de la hero (`Home.jsx`) és un bucle que
+mesura, s'ajusta i torna a mesurar. Mesurat a 768×1024 amb vuit càrregues i 245
+mostres durant el muntatge, **surt sempre el mateix número** (305,95 px, i el
+fons a 19,9 px). No és inestable. El problema és un altre i és pitjor: **aquell
+número no està declarat enlloc**. El bucle hi arriba perquè mesura la pantalla, i
+per això ningú no pot saber si 305,95 és el valor de disseny o el resultat d'un
+accident que avui quadra. Si demà canvia l'alçada de la capçalera, el número
+canvia sol i ningú no ho sabrà llegir.
+
+**Correcció d'una afirmació meva.** A la primera versió d'aquesta regla hi deia
+que el bucle «oscil·la entre dos valors separats 20 px». Era una deducció feta
+llegint el codi, no una mesura, i és **falsa**. Es deixa escrit perquè forma part
+de la regla: una afirmació sense mesura no es pot fer servir per justificar res,
+ni tan sols una regla que sigui certa.
 
 **Com es reconeix un pedaç.**
 
