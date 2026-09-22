@@ -262,3 +262,69 @@ complir-la.
 | el megaslide no encaixa a la pàgina nova | se li dona un forat net i no es toca per dins |
 | el treball s'allarga i queda a mitges | cada fase deixa el projecte **en un estat millor o igual** |
 | es perd el que s'ha après avui | tot el que hem après és aquí, com a regles |
+
+---
+
+## 9. La hero de la pàgina d'inici: estat documentat
+
+Mesurat el 22/09/2026, abans de tocar-la. **La hero funciona**: a 768 queda a 20 px
+del fons de la pantalla, que és el que es volia. El que té és que ho aconsegueix
+amb dues coses que volem treure.
+
+### Com està feta ara
+
+```
+<div gridColumn="1 / 4" gridRow="10 / 25"
+     top="calc(-5px - rowHeight/2 - 50px + 25px + baixadaHero + heroOffsetPx)"
+     height="430px" (a la vista vertical)
+     transform="scale(0.705)" transformOrigin="center center">
+```
+
+- **`transform: scale(0.705)`**: la mida VISIBLE és el 70,5 % de la mida de la
+  caixa. O sigui que el `scale` no és un ajust fi: **és qui defineix la mida de
+  la hero**. Treure'l sense compensar-lo la faria un 42 % més gran.
+- **`heroOffsetPx`**: un desplaçament **mesurat des de JavaScript** (un
+  `useLayoutEffect` amb correcció iterativa) perquè el fons caigui a 20 px del
+  fons de la pantalla. És el pedaç.
+- **`top` amb cinc sumands** calibrats.
+
+### Mides mesurades
+
+| mida | hero visible | mida de la caixa | alçada de la caixa | aire al fons |
+|---|---|---|---|---|
+| 1920×1080 | 952×401 | 1351×569 | `calc(100% + 2px)` | 124 px |
+| 1440×900 | 715×301 | 1014×427 | `calc(100% + 2px)` | 121 px |
+| 1280×720 | 635×268 | 901×380 | `calc(100% + 2px)` | **−7 px** |
+| 1024×768 | 508×214 | 721×304 | `calc(100% + 2px)` | 95 px |
+| 768×1024 | 381×303 | 541×430 | **430 px, fixa** | **20 px** |
+
+### El bloc contenidor no és el viewport
+
+Els avantpassats de la hero, cap amunt:
+
+```
+0  hero                    relative   tf = scale(0.705)
+1  cel·la de la graella    relative
+2  contenidor              relative   tf = translateX(-270)   <- TRENCA `fixed`
+3  div                     static
+4  main                    static
+```
+
+`position: fixed` **no serveix** (l'avantpassat 2 té `transform`). I posicionar
+amb `top: calc(100vh - ...)` dóna un resultat desplaçat, perquè el bloc
+contenidor no és el viewport: **es va mesurar un desplaçament de 225 px** en
+intentar-ho, i cada correcció en trencava una altra.
+
+### El que caldrà fer
+
+1. **Compensar el `scale`**: la caixa ha de fer `1 / 0,705` del que fa ara si es
+   treu la transformació, o bé escalar-ne el contingut.
+2. **Fer que l'alçada surti de la capçalera** en comptes de la cel·la de la
+   graella: `100vh − fons de la capçalera`.
+3. **Treure la mesura de JavaScript** i el `top` de cinc sumands.
+4. Verificar a les cinc mides: que el fons quedi a 20 px del fons de la pantalla
+   i que la mida visual no canviï.
+
+**NO s'ha de fer a estones.** Cada intent parcial ha trencat la pàgina (el títol
+de col·lecció ha arribat a quedar 214 px endins de la hero, i la taula de dues
+files ha quedat 225 px desplaçada). És una tasca amb principi i final.
