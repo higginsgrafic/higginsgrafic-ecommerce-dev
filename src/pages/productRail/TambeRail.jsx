@@ -111,7 +111,8 @@ export default function TambeRail({
   const [carouselAnimate, setCarouselAnimate] = useState(true);
   const containerRef = useRef(null);
   const respescaRef = useRef(null);
-  // Amplada real del contenidor de les targetes (es mesura al layout effect).
+  // Amplada real del contenidor del rail (les targetes en surten, perque son
+  // mes amples que ell): la mesurem per alinear-hi el titol.
   const [ampladaContenidorPx, setAmpladaContenidorPx] = useState(0);
   const dragRef = useRef({ active: false, pointerId: null, startX: 0, startY: 0, lastDx: 0, lastDy: 0, moved: false, consumed: false });
   const isAnimRef = useRef(false);
@@ -286,13 +287,24 @@ export default function TambeRail({
   //   cardW = (belt2Width - (visibleCards - 1) * gutterX) / visibleCards
   //   stepPx = cardW + gutterX
   const PAUTA_GUTTER_X = stabilizedGutterX ?? 22.5;
-  // En mode estatic les targetes es reparteixen l'amplada del CONTENIDOR del
-  // rail (el del bloc final), no la del carril: si es fa amb el carril, les
-  // targetes fan mes amplada que el contenidor i en surten pels costats.
+  // La mida de la targeta es CONSERVA la que tenia el carrousel: es reparteix
+  // l'amplada del carril entre les columnes visibles. En mode estatic tambe,
+  // perque el bloc ha de mantenir exactament la mateixa mida de targeta.
+  const cardW = Math.max(80, (beltWidth - (visibleCards - 1) * PAUTA_GUTTER_X) / visibleCards * (stabilizeInitialLayout ? 1 : 0.94));
+  // Quantes targetes es mostren (en estatic, les primeres `estaticCards`).
   const filesEstatic = estatic ? Math.min(estaticCards, totalCards) : visibleCards;
-  const ampladaContenidor = estatic && ampladaContenidorPx > 0 ? ampladaContenidorPx : beltWidth;
-  const cardW = Math.max(80, (ampladaContenidor - (filesEstatic - 1) * PAUTA_GUTTER_X) / filesEstatic * (estatic ? 1 : (stabilizeInitialLayout ? 1 : 0.94)));
   const stepPx = cardW + PAUTA_GUTTER_X;
+  // Desplaçament del titol per alinear-lo amb la PRIMERA targeta. El bloc de
+  // targetes es posa centrat dins del contenidor del rail, i el contenidor del
+  // rail ocupa l'amplada del viewport menys el marge lateral (`estatic`), o el
+  // carril en el carrousel.
+  // El titol ha de començar on comença la primera targeta. El bloc de targetes
+  // te l'amplada `ampladaBloc` i esta centrat dins del contenidor del rail
+  // (`ampladaRail`), aixi que la primera targeta cau a
+  // `(ampladaRail - ampladaBloc) / 2`.
+  const ampladaBloc = filesEstatic * cardW + (filesEstatic - 1) * PAUTA_GUTTER_X;
+  const ampladaRail = estatic ? (ampladaContenidorPx || beltWidth) : beltWidth;
+  const titolOffsetX = estatic ? Math.round((ampladaRail - ampladaBloc) / 2) : 0;
   const viewportWidthPx = useMemo(() => Math.max(0, stabilizeInitialLayout ? beltWidth : Math.min(beltWidth, cardW * visibleCards + (visibleCards - 1) * PAUTA_GUTTER_X)), [beltWidth, cardW, visibleCards, PAUTA_GUTTER_X, stabilizeInitialLayout]);
   const cardImgTopPx = stabilizeInitialLayout ? 0 : 161;
   const cardTextBlockHeightPx = stabilizeInitialLayout ? 0 : 140;
@@ -310,14 +322,13 @@ export default function TambeRail({
   }), [renderedCardW, imgPaddingPx]);
   const dynamicTextBlockStyle = useMemo(() => ({ width: `${renderedCardW}px` }), [renderedCardW]);
 
-  // Amplada del contenidor de les targetes, abans del pintat. En mode estatic
-  // la necessitem per repartir les targetes dins seu (i no fer-les mes amples
-  // que el contenidor).
+  // Amplada del contenidor del rail, abans del pintat.
   useLayoutEffect(() => {
     if (!estatic) return undefined;
     const mesura = () => {
       const el = respescaRef.current;
-      const ample = el ? el.clientWidth : 0;
+      if (!el) return;
+      const ample = el.clientWidth;
       if (ample > 0) setAmpladaContenidorPx((prev) => (Math.abs(prev - ample) < 0.5 ? prev : ample));
     };
     mesura();
@@ -428,7 +439,7 @@ export default function TambeRail({
         {showTitle && (
           // En mode estatic el titol no es posiciona amb el desplaçament del
           // carrousel (`left1`): va en el flux, a sobre de les targetes.
-          <RespescaTitle leftPx={estatic ? 0 : left1} title={title} subtitle={subtitle} enFlux={estatic} />
+          <RespescaTitle leftPx={estatic ? titolOffsetX : left1} title={title} subtitle={subtitle} enFlux={estatic} />
         )}
 
         <div
@@ -437,9 +448,12 @@ export default function TambeRail({
           // En mode estatic cal una mica mes d'aire a dalt: el text del poster
           // del bloc final es fix (60pt) i el seu bloc de graella no el pot
           // contenir, aixi que en surt i arriba a tapar el titol (46 px a 768).
-          style={{ paddingTop: estatic ? '72px' : (stabilizeInitialLayout ? '56px' : '100px'), paddingBottom: stabilizeInitialLayout ? 0 : '40px' }}
+          style={{
+            paddingTop: estatic ? '16px' : (stabilizeInitialLayout ? '56px' : '100px'),
+            paddingBottom: estatic ? '0px' : (stabilizeInitialLayout ? 0 : '40px'),
+          }}
         >
-          <div style={{ position: 'relative', minHeight: `${viewportHeightPx}px` }}>
+          <div style={{ position: 'relative', minHeight: estatic ? undefined : `${viewportHeightPx}px` }}>
             <div
               style={{
                 position: 'relative',
