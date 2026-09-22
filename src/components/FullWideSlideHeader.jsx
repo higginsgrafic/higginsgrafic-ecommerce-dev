@@ -1850,6 +1850,14 @@ function FullWideSlideHeader({
   // MegaStripePanel i MegaStripePanelP1) i no abans.
   const stripePreviewHPx = Math.round((effectiveMegaTileSize || 240) * 0.9);
 
+  // AQUESTA MESURA ES QUEDA, i es fa abans del pintat.
+  //
+  // El pla la proposava convertir al model, pero el valor es el `padding` del
+  // panell del megaslide, que depen de les seves classes responsives: mesurat a
+  // 768/1024/1280/1366/1440/1920 dona 32/32/38/38/32/32, o sigui que no es cap
+  // funcio neta de l'amplada. Com que depen del contingut real, es queda
+  // mesurat amb `useLayoutEffect` (ABANS del pintat), que es exactament el que
+  // demanava la revisio externa per a les mesures de classe (b).
   useLayoutEffect(() => {
     try {
       if (!active) return undefined;
