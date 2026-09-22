@@ -1,6 +1,5 @@
 import { initSentry } from '@/lib/sentry';
 import { injectPlausible } from '@/lib/analytics';
-import { publishEarlyBeltVars } from '@/utils/layoutModel';
 
 // Inicialitzem Sentry el més aviat possible per capturar tots els errors
 initSentry();
@@ -9,10 +8,11 @@ injectPlausible();
 
 console.log('🚀 main.jsx is loading...');
 
-// El carril de la pauta es una funcio pura de la finestra: el publiquem abans
-// que cap pagina el necessiti. Si no, apareix quan es carrega el chunk de la
-// pauta (cap a 1,2 s) i la graella de les colleccions es desplaça.
-publishEarlyBeltVars();
+// El carril de la pauta ja NO es publica des d'aquí: el declara `foundation.css`
+// amb `--contingut-max: min(70.3125vw, 1350px)`. Aquella publicacio existia
+// perque el carril es calculava amb `getSafeBelt()` i arribava tard, quan es
+// carregava el chunk de la pauta (cap a 1,2 s). Un full de estils no arriba
+// tard: les variables hi son abans que es pinti res.
 
 
 const __HG_FATAL_OVERLAY_ID__ = '__HG_FATAL_OVERLAY__';

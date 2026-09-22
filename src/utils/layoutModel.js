@@ -1,4 +1,4 @@
-import { getLayoutViewportWidth, getSafeBelt } from './layoutMetrics';
+import { getLayoutViewportWidth } from './layoutMetrics';
 
 /**
  * layoutModel — model ÚNIC de les mides de layout del lloc.
@@ -144,28 +144,15 @@ export function publishLayoutModel(model) {
  */
 
 /**
- * Publica les variables del carril de la pauta (`--hg-tdp-xL/xR`) ABANS que
- * cap pagina les necessiti.
+ * El carril de la pauta ja NO es publica des de JavaScript.
  *
- * Per que cal: el marge de la graella de les colleccions es calcula amb
- * `calc((var(--hg-tdp-xL) - var(--hg-tdp-xR)) * 0.3385 ...)`. Aquestes
- * variables les publica el modul `Pauta4ColsOverlay`, que viatja en un chunk
- * que es carrega mandrosament: a la practica apareixien cap a 1,2 s, DESPRES
- * del primer pintat, i la graella (i tot el que arrossega) es desplaçava uns
- * quants px. Com que `getSafeBelt()` es una funcio pura de la finestra, es pot
- * publicar a l'arrencada i el valor ja es el bo des del principi.
+ * Aqui hi havia `publishEarlyBeltVars()`, que calculava `getSafeBelt()` i
+ * escrivia `--hg-tdp-xL/xR` a l'arrel abans del primer pintat, perque el
+ * calcul arribava tard (quan es carregava el chunk de la pauta, cap a 1,2 s) i
+ * la graella de les colleccions es desplaçava. El carril es, pero, una regla de
+ * tres —1350/1920 de la finestra, amb sostre a 1350— i ara viu a
+ * `src/foundation.css` com a `--contingut-max`, declarada abans que res.
  */
-export function publishEarlyBeltVars() {
-  if (typeof window === 'undefined' || typeof document === 'undefined') return;
-  try {
-    const belt = getSafeBelt({ maxContent: 1350, sideMargin: 16, minContent: 320 });
-    const root = document.documentElement;
-    root.style.setProperty('--hg-tdp-xL', `${belt.left}px`);
-    root.style.setProperty('--hg-tdp-xR', `${belt.right}px`);
-  } catch {
-    // ignore
-  }
-}
 
 /**
  * Amplada del carril per a una amplada de finestra donada.
