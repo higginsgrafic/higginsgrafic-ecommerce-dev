@@ -55,6 +55,7 @@ function CollectionVerticalPage({ slug }) {
     posterLines,
     logoStyle,
     colorStrategy = 'graella',
+    filesDeFitxes,
     gridRows = 90,
     gridAspect = { tablet: 9717, escriptori: 6708 },
     posterExtra = false,
@@ -121,6 +122,8 @@ function CollectionVerticalPage({ slug }) {
   // queda mes avall. L'ajust es proporcional a l'amplada del carril (que ja ve
   // del model), aixi que es calcula: no cal cap mesura ni cap estat.
   const posterExtraPx = posterExtra ? Math.round(carrilAmple * 0.857) : 0;
+
+
 
   useEffect(() => {
     writeOverlayState(copy, overlayState);
@@ -456,27 +459,23 @@ function CollectionVerticalPage({ slug }) {
         }}
       >
         {/* El fons de la pagina es BLANC: el degradat va a cada fitxa. */}
-        {Array.from({ length: Math.ceil(products.length / 4) }).flatMap((_, rowIdx) =>
+        {Array.from({ length: filesDeFitxes }).flatMap((_, rowIdx) =>
           ((isPortraitTablet || isLandscapeTablet) ? [0, 1, 2] : [0, 1, 2, 3]).map((colIdx) => {
             const idx = rowIdx * 4 + colIdx;
-            // Sense files incompletes: la darrera fila es completa repetint
-            // productes des del principi (index ciclic sobre la llista).
+            // Sense files incompletes: quan els productes s'acaben, la graella
+            // continua repetint-los des del principi (index ciclic). La mida de
+            // la graella es la que tenia cada pagina, no la que demanaria el
+            // nombre de productes: canviar-la trauria fitxes.
             const producte = products[idx % products.length];
             const color = colorAt(rowIdx, colIdx);
             if (!color || !producte) return null;
             const col = colIdx + 1;
-            // La fitxa de taula es unica, aixi que totes les targetes queden
-            // iguals (abans s'alternaven la normal i la V5).
             const Card = CollectionTableCard;
             const variantB = (rowIdx + colIdx) % 2 === 1;
             // Files de 11 espais + 2 de separacio: el gap entre files de fitxes
             // queda a la meitat.
             const rowOffset = 10 + rowIdx * 13;
             const productName = producte.name;
-            // Austen dona a cada producte el seu propi prefix de colleccio
-            // (el fan servir els mockups i el `finish`); les altres, el slug.
-            const prefixColleccio = producte.collection || slug;
-            const finish = gridFinishFor(prefixColleccio, color, idx);
             const { imageTranslateY, productNameTranslateY, descriptionTranslateY } = getCardLayout(colIdx);
             return (
               <CollectionTdpCard
@@ -490,19 +489,19 @@ function CollectionVerticalPage({ slug }) {
                 productName={productName}
                 description=""
                 price={SELLING_PRICE_LABEL}
-                imageSrc={collectionGridImageFor(prefixColleccio, producte.route, color, idx)}
-                hoverImages={collectionGridHoverVariantsFor(prefixColleccio, producte.route, color, idx)}
+                imageSrc={collectionGridImageFor(producte.collection || slug, producte.route, color, idx)}
+                hoverImages={collectionGridHoverVariantsFor(producte.collection || slug, producte.route, color, idx)}
                 imageAlt={`Samarreta Gildan 64000 ${color}`}
                 sizes={sizes}
                 cartCount={0}
                 onAddToCart={(size) => {
                   window.dispatchEvent(new CustomEvent('hg:open-full-wide-cart', {
-                    detail: { source: 'collection-tdp-cta', firstPartOnly: true, item: { title: productName.toUpperCase(), collection: nom, collectionSlug: prefixColleccio, productRoute: producte.route, qty: 1, size, price: SELLING_PRICE_LABEL, color, finish, drawing: '', disabled: false } },
+                    detail: { source: 'collection-tdp-cta', firstPartOnly: true, item: { title: productName.toUpperCase(), collection: nom, collectionSlug: slug, productRoute: producte.route, qty: 1, size, price: SELLING_PRICE_LABEL, color, finish: gridFinishFor(producte.collection || slug, color, idx), drawing: '', disabled: false } },
                   }));
                 }}
                 editableIdPrefix={`constructor-colleccio-copy${copy}-tdp-col2`}
                 presetVersion={`constructor-colleccio-copy${copy}-tdp-cart-34-v9`}
-                collectionHref={`/${slug}/${producte.route}?color=${color}&finish=${finish}`}
+                collectionHref={`/${slug}/${producte.route}?color=${color}&finish=${gridFinishFor(producte.collection || slug, color, idx)}`}
                 productNamePlain
                 editable={false}
                 imageTranslateY={imageTranslateY}
