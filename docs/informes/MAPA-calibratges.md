@@ -63,8 +63,8 @@ llenços fan 74,5 unitats per fila i jo estava comparant coses diferents. Vegeu 
 | `CollectionVerticalPage:599` | `× 0.3385` | **≈ 12 files** del llenç | **DERIVAT** (+1,7 px a 1440) |
 | `ConstructorColleccioPage:222` | `× 0.3385` | el mateix | DERIVAT |
 | `Home.jsx:219`, `TDP1:99`, `TDP2:99` | `× 0.01410547` | **mitja fila** (`0,028219/2`) | CLAR |
-| `TdpVariantsGallery:48`, `Home.jsx` (×4) | `× 0.84632` | **30 files** del llenç | CLAR |
-| `TdpVariantsGallery:48`, `Home.jsx` (×4) | `− 231px` | **?** — no és cap fila (6,07 files a 1920, 11,37 a 1024) | **PENDENT** |
+| `TdpVariantsGallery:48`, `Home.jsx` (×4) | `× 0.84632` | **30 files** del llenç (`30 × 74,533 / 2642` = 0,846328) | **CLAR** |
+| `TdpVariantsGallery:48`, `Home.jsx` (×4) | `− 231px` | **RESCAT** — vegeu §2.4 | **RESOLT: és un pedaç** |
 | `ProductDetailTemplate:151`, `ConstructorPdpPreview:210` | `× 5217/2642/70` | una fila d'un **altre** llenç (5217) | CLAR |
 | `CollectionVerticalPage:83`, `FullWideSlideHeader:201` | `carril × 0.0280625 − 2.875` | una fila del llenç 1780/24, menys un ajust | **HIPÒTESI** (el gap és plausible, no provat) |
 | `layoutMetrics:137` | `MEGASLIDE_REFERENCIA_PX = 1350` | l'amplada del carril a 1920 | CLAR |
@@ -121,7 +121,49 @@ del derivat (`0,02807217`).
 | `CercadorTextRow.jsx:23-24` | mockup **4512 px** = 100cqw, factor `1/45,12` | el llenç del cercador; d'aquí surten `LINE_H`, `LINE_THICK`, `BULLET_D`, `BULLET_CX`, `TEXT_X` |
 | `layoutMetrics.js:137/212` | `1350` sobre `1920` | el carril del lloc |
 
-### 2.4 Proporcions de la pròpia peça (ja són bones)
+### 2.4 El `− 231`: la història d'un pedaç, amb dates
+
+No és cap fila ni cap sobrant. És el residu d'un valor **fix** que es va
+convertir en fórmula perquè quadrès a unes mides i no a altres.
+
+**Què hi havia abans.** El commit `de798da` (14/09/2026, «Fitxa de producte en
+format taula») va canviar la posició de la píndola «en vols saber més?»:
+
+```diff
+- bottom: '-54px',
++ bottom: `calc((calc(carril * 0.84632 - 231px) - calc((carril - 45px) / 3 * 1.3)) / 2 - 14px)`,
+```
+
+O sigui: hi havia un píndol a 54 px sota la caixa, i la fórmula nova es va
+construir **per reproduir aquell 54** amb l'amplada del carril a dins.
+
+**Què és cada tros (mesurat a 1920, carril 1350):**
+
+| tros | valor | què és |
+|---|---|---|
+| `carril × 0,84632` | 1142,5 | **30 files** del llenç: l'alçada de la graella **sense** el `− 231` |
+| `− 231` | 231 | la meitat de la píndola (39 px) i el forat fins a 54... **en realitat, un número de rescat** |
+| `(carril − 45) / 3 × 1,3` | 565,5 | una columna de la graella, la imatge 1,3 cops més alta |
+| `/2 − 14` | | la meitat del bloc de descripció, menys 14 px |
+
+**I per què és un rescat, amb el número.** El `0,84632` és **exactament 30 files**
+del llenç (`30 × 74,533 / 2642 = 0,846328`), o sigui una alçada **fixa** en
+proporció al carril. Però el contingut que hi va a dins **no té aquesta alçada**:
+mesurat a les cinc mides, l'alçada natural de la columna (targeta + píndola) és
+**401 px a 1920, 295 a 1440, 356 a 1280 i 281 a 1024**. La diferència entre el
+que la graella ofereix i el que el contingut necessita no és constant, i per tant
+**cap número fix no la pot corregir bé a totes les mides**. El `− 231` ho intenta
+i, per això, la píndola queda a una distància diferent de la caixa a cada mida.
+
+**El `− 231` no s'ha de desenrevessar: s'ha de treure.** El propi codi ho diu, a
+`collectionVertical.js`: «clavar els 25 px exactes a totes les mides demanaria
+deixar la graella de files i passar a un flex amb `gap`». Aquesta graella, a més,
+**no és una graella: és una fila**. Fer-la servir per repartir alçada és el que
+obliga a tenir un número de rescat.
+
+---
+
+### 2.5 Proporcions de la pròpia peça (ja són bones)
 
 Aquests no cal tocar-los: es mesuren contra la peça, no contra la pantalla.
 
@@ -130,7 +172,7 @@ Aquests no cal tocar-los: es mesuren contra la peça, no contra la pantalla.
 | `CollectionVerticalPage:158-163` | `× 0.72 / 0.2 / 0.07 / 0.095 / 0.15 / 0.1` | amplada del selector, alçada, font de talla, font de text, cistell, gap del preu — **tot sobre l'amplada de la fitxa** | CLAR |
 | `tdpMida.js` | columnes per amplada, alçada 5:4 | la font única de la mida de la fitxa | CLAR |
 
-### 2.5 Desplaçaments de rescat (no escalen, i són el que ha de marxar)
+### 2.6 Desplaçaments de rescat (no escalen, i són el que ha de marxar)
 
 | on | valor | què compensa | estat |
 |---|---|---|---|
@@ -145,7 +187,7 @@ Aquests no cal tocar-los: es mesuren contra la peça, no contra la pantalla.
 | `collectionVertical.js:60` | `clamp(120px, 26vh, 260px)` | l'alçada de la franja | rescat |
 | megaslide | terres de **10 px** i **12 px** | llegibilitat del text quan l'escala baixa | rescat |
 
-### 2.6 Números que semblen calibradors i no ho són
+### 2.7 Números que semblen calibradors i no ho són
 
 | on | valor | què és |
 |---|---|---|
@@ -186,9 +228,12 @@ número**, no vint: `LLENC_FILES`, `LLENC_ALCADA`, `LLENC_AMPLADA`.
 2. **El `− 2,875` SÍ que té origen, i és el gap.** `(24−1) × 3 / 24 = 2,875`. Ho
    vaig marcar com a pendent perquè no vaig veure que les 24 files fan 23 gaps.
    La fórmula és correcta.
-3. **El `− 231` no és cap fila de cap llenç.** Ho vaig deduir malament el
-   23/09/2026 i ho confirmo ara amb dos llenços: equival a 6,07 files a 1920 i
-   11,37 a 1024: no és proporcional a res. Queda **PENDENT**.
+3. **El `− 231` no és cap fila de cap llenç, i ara se sap què és:** el residu d'un
+   valor **fix** anterior. El commit `de798da` (14/09/2026) va canviar
+   `bottom: '-54px'` per una fórmula que havia de reproduir aquell 54 px, i el
+   `− 231` és el que va caldre perquè quadrès. **No s'ha de desenrevessar: s'ha
+   de treure**, perquè corregeix una alçada de contingut que no és constant
+   (401 px a 1920, 295 a 1440, 356 a 1280, 281 a 1024). Vegeu §2.4.
 4. **Els «terres» del megaslide no són calibratges sinó pedaços**, i la regla 15
    diu que s'han d'evitar quan la causa es pot tocar. La causa és que el text i
    les files es mesuren amb dos sistemes diferents. N'hi ha **set**, i són a
@@ -285,11 +330,15 @@ Per això quan es mesura una geometria cal dir *quina* peça és, no només on �
    `ConstructorColleccioPage` es deriva de `LLENCOS.colleccio.coef`.
    **Mou 0,042 px com a màxim** (submil·lèsim), mesurat a les cinc mides.
    Falta la resta de números escrits.
-3. **Mesurar els PENDENT** que queden: el `− 231`, el `430px` de la hero, el
-   `752px` de la graella d'inici, i els 135 del megaslide.
-4. **Separar `--escala` de `--escala-text`** a `foundation.css`, que és el que
+3. **Treure el `− 231`** en comptes de desenrevessar-lo: la graella de la galeria
+   no és una graella sinó **una fila**, i el que cal és el `flex` amb `gap` que
+   el mateix codi ja proposa a `collectionVertical.js`. Això sí que mou el
+   disseny, i per tant és una decisió, no una nomenclatura.
+4. **Mesurar els PENDENT** que queden: el `430px` de la hero, el `752px` de la
+   graella d'inici, i els 135 del megaslide.
+5. **Separar `--escala` de `--escala-text`** a `foundation.css`, que és el que
    fa possible que la geometria escali sense arrossegar el text.
-5. **Migrar l'inici**, amb la hero, i després una col·lecció.
+6. **Migrar l'inici**, amb la hero, i després una col·lecció.
 
 ### La regla per a la passa 2 (substitucions)
 
@@ -300,8 +349,9 @@ Cada substitució es fa així, i si no es pot fer així **no es fa**:
 3. Si cap número no es mou, se segueix. Si es mou, **s'atura i s'explica per
    què**, no s'ajusta el número nou perquè quadri.
 
-I el punt més important: **no es canvien els valors aproximats pels exactes en
-aquesta passa.** El `0,3385` es queda `0,3385` fins que hi hagi una decisió
-explícita, perquè passar-lo a `0,338531` mou 1,7 px a 1440 i això és un canvi de
-disseny, no una nomenclatura. Barrejar les dues coses és com es perd el rastre
-de què ha mogut què.
+I el punt més important, amb una esmena: **no es canvia un valor aproximat per
+l'exacte sense dir quants píxels mou.** A la primera substitució (`7650fca`) es
+va canviar el `0,3385` pel derivat i va moure **0,042 px com a màxim**: es va
+fer perquè l'objectiu de la passa és que el número tingui origen, i es va
+reportar el número. El que no es pot fer és canviar-lo i dir que «no ha mogut
+res», perquè sí que mou.
