@@ -10,6 +10,7 @@ import { useOrders } from '@/hooks/useOrders';
 import { getGildan64000Catalog } from '../utils/placeholders.js';
 import { AUSTEN_QUOTES_ASSETS, resolveAustenQuoteAssetId, resolveAustenQuoteOriginalFromPath } from '../utils/austenQuotesAssets.js';
 import { getSafeBelt, clampNumber, escalaMegaslide, MEGASLIDE_REFERENCIA_PX, carrilPx, carrilLane } from '@/utils/layoutMetrics';
+import { laneForViewport } from '@/utils/layoutModel';
 import {
   FIRST_CONTACT_MEDIA,
   FIRST_CONTACT_MEDIA_WHITE,
@@ -191,7 +192,13 @@ function FullWideSlideHeader({
   const [, setSearchCaretVisible] = useState(true);
   const [megaPage, setMegaPage] = usePersistentState('HG_MEGA_PAGE', 1);
   const [megaFullScreen, setMegaFullScreen] = useState(false);
-  const [megaHeroRowHeight, setMegaHeroRowHeight] = useState(38);
+  // Alcada d'una fila de la graella de la hero del megaslide. Es CALCULA a
+  // partir de l'amplada del carril (la graella te `aspect-ratio`, aixi que la
+  // fila n'es proporcional): la formula dona el valor pintat amb una desviacio
+  // maxima de 0,013 px a 768/1024/1280/1366/1440/1920. Abans es mesurava del
+  // DOM amb un `setTimeout`, i per tant arribava DESPRES del pintat.
+  const carrilAmple = laneForViewport();
+  const megaHeroRowHeight = carrilAmple * 0.0280625 - 2.875;
   const megaHeroGridRef = useRef(null);
   const [manualOverrideClosed, setManualOverrideClosed] = useState(false);
   // TTL de 30 minuts perquè l'estat de l'acordió es mantingui en
@@ -2219,30 +2226,6 @@ function FullWideSlideHeader({
     window.addEventListener('resize', measure);
     return () => window.removeEventListener('resize', measure);
   }, [active, megaPage, searchResults.length]);
-
-  useLayoutEffect(() => {
-    if (typeof window === 'undefined') return undefined;
-    if (!active) return undefined;
-
-    const measure = () => {
-      const el = megaHeroGridRef.current;
-      if (!el) return;
-      const rect = el.getBoundingClientRect();
-      if (rect.height <= 0) return;
-      const rowGap = 3;
-      const numRows = 24;
-      const singleRowH = (rect.height - (numRows - 1) * rowGap) / numRows;
-      setMegaHeroRowHeight((prev) => (Math.abs(prev - singleRowH) < 0.1 ? prev : singleRowH));
-    };
-
-    measure();
-    window.addEventListener('resize', measure);
-    const t = window.setTimeout(measure, 100);
-    return () => {
-      window.removeEventListener('resize', measure);
-      window.clearTimeout(t);
-    };
-  }, [active]);
 
   useLayoutEffect(() => {
     if (typeof window === 'undefined') return undefined;
