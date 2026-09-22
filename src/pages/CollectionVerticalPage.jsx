@@ -286,10 +286,14 @@ function CollectionVerticalPage({ slug }) {
             top: `calc(-5px - ${rowHeight / 2}px - 144px)`,
             width: '100vw',
             marginLeft: 'calc(50% - 50vw)',
-            // La imatge acaba just on acaba la franja blanca de baix.
-            // Alcada CSS pura: del sostre de la capcalera al fons de la
-            // finestra.
-            height: 'calc(100vh - var(--appHeaderOffset, 62px))',
+            // La imatge ha d'acabar exactament al fons de la finestra, que es
+            // on acaba la franja blanca de baix. La hero NO comença al sostre
+            // de la capcalera sino una mica mes avall (depen de la fila de la
+            // graella), aixi que l'alcada ha de ser `100vh` menys la SEVA
+            // posicio, no menys l'offset de la capcalera: amb l'offset, la
+            // franja de baix sortia 49 px per fora de la caixa de la hero i la
+            // imatge s'acabava abans que la franja.
+            height: 'calc(100vh - var(--hg-hero-top, 107px))',
             zIndex: 1,
           }}
         >
