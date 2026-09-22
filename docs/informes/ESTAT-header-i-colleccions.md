@@ -361,3 +361,32 @@ deixar tres punts. Tots tres estan tancats:
 3. **`carrilAmple` congelat en resize** — resolt amb la sortida 2 (recalcular-lo),
    dins el mateix `useLayoutEffect` que publica `--hg-hero-top`, i verificat amb
    traces que no reintrodueix moviment al girar la tauleta (punt 4.4).
+
+---
+
+## 12. Segona verificació independent (22/09/2026, després del tancament de l'A)
+
+Aquest document s'ha tornat a contrastar punt per punt contra el codi
+(`47b13fc`). **Resultat: el 100% de les afirmacions es completen.**
+
+| afirmació del document | verificació al codi |
+|---|---|
+| A3: fora `setTimeout` i el bucle de punt fix | ✔ cap `setPushDownPx` ni `setTimeout` a cap de les cinc pàgines; el push-down és ara la variable `--hg-push-down`, publicada dins d'un `useLayoutEffect` i consumida amb `calc()` al `marginTop` |
+| A3: `posterExtraPx` a càlcul | ✔ `Math.round(carrilAmple * 0.857)` a Austen, amb l'equivalència documentada (463/617/771/868/1157 px a les cinc mides) |
+| A4: `zeroLeftOffsetPx` amb `useLayoutEffect` | ✔ línia 274 d'Austen i equivalents; sense bucle rAF |
+| E2: `/lab/proves` fora | ✔ `CollectionPage.jsx`, `SupabaseCollectionRoute.jsx` i `config/collections.js` esborrats de `src/` |
+| Sondes temporals esborrades | ✔ cap `scripts/_tmp*` |
+| Arbre net, tot pujat | ✔ `main` sincronitzada amb `origin/main` |
+
+### Observacions per a l'Etapa B (no bloquegen res)
+
+1. **Punt de partida ideal**: les cinc pàgines comparteixen ara la mateixa
+   estructura (dos números mesurats abans del pintat + la resta en `calc()`),
+   que és exactament el que el component únic haurà de parametritzar.
+2. **Artefactes velts**: `dist-prod/` i `test-results/lighthouse/` encara
+   referencien els fitxers esborrats per E2. No fan mal (són generats), però al
+   proper `vite build` es refrescaran; no confondre'ls amb codi viu en cerques.
+3. **Captures de referència abans de fusionar**: el projecte està estable i el
+   layout quiet — és el moment ideal per desar la captura «abans» de cada
+   col·lecció (les cinc, a les cinc amplades) a `docs/comparacio/`, perquè cada
+   pas de la fusió tingui una referència visual fixa, a més de les traces.
