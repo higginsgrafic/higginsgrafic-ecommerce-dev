@@ -383,113 +383,6 @@ function FullWideSlideHeader({
 
   const gridCalibFromUrl = typeof window !== 'undefined' && new URLSearchParams(window.location.search).has('gridCalib');
 
-  const bleedGuardDebug = typeof window !== 'undefined'
-    && import.meta.env.DEV
-    && new URLSearchParams(window.location.search).has('bleedGuardDebug');
-
-  useLayoutEffect(() => {
-    if (typeof window === 'undefined') return undefined;
-
-    const getTargetEl = () => {
-      try {
-        const main = document.querySelector('main#main-content');
-        if (!main) return null;
-        const exact = main.querySelector(
-          ':scope > div:nth-child(1) > header:nth-of-type(1) > div:nth-child(1) > div:nth-child(1)'
-        );
-        if (exact) return exact;
-        const el = (node, idx) => (node?.children && node.children[idx]) ? node.children[idx] : null;
-        const div0 = el(main, 0);
-        const header0 = div0 ? div0.querySelector('header') : null;
-        if (!header0) return null;
-        const border0 = el(header0, 0);
-        const row0 = border0 ? el(border0, 0) : null;
-        return row0 || null;
-      } catch {
-        return null;
-      }
-    };
-
-    const read = () => {
-      try {
-        const megaEl = megaMenuRef.current;
-        const targetEl = getTargetEl();
-        if (!megaEl || !targetEl) return;
-        const megaRect = megaEl.getBoundingClientRect();
-        const targetRect = targetEl.getBoundingClientRect();
-        const leftRaw = megaRect.left - targetRect.left;
-        const rightRaw = targetRect.right - megaRect.right;
-        const left = Math.max(0, Math.round(leftRaw * 100) / 100);
-        const right = Math.max(0, Math.round(rightRaw * 100) / 100);
-        setBleedGuardExpandPx((prev) => (prev.left === left && prev.right === right ? prev : { left, right }));
-
-        if (bleedGuardDebug) {
-          const round2 = (v) => Math.round(v * 100) / 100;
-          window.__HG_BLEED_GUARD_DEBUG__ = {
-            left,
-            right,
-            leftRaw: round2(leftRaw),
-            rightRaw: round2(rightRaw),
-            megaRect: {
-              left: round2(megaRect.left),
-              right: round2(megaRect.right),
-              width: round2(megaRect.width),
-            },
-            targetRect: {
-              left: round2(targetRect.left),
-              right: round2(targetRect.right),
-              width: round2(targetRect.width),
-            },
-          };
-        }
-
-        window.__MEASURE_MEGA_BELT2_V2__ = () => {
-          const round2 = (v) => Math.round(v * 100) / 100;
-          const rootStyle = window.getComputedStyle(document.documentElement);
-          const xL = parseFloat(rootStyle.getPropertyValue('--belt2-xL'));
-          const xR = parseFloat(rootStyle.getPropertyValue('--belt2-xR'));
-          const track = [...document.querySelectorAll('div')]
-            .map((el) => ({ el, rect: el.getBoundingClientRect() }))
-            .filter(({ el, rect }) => el.style?.width === '400%' && rect.width > 0 && rect.height > 0)
-            .sort((a, b) => b.rect.width - a.rect.width)[0]?.el || null;
-          const activeSlide = track?.children?.[Math.max(0, Math.min(3, megaPage - 1))] || null;
-          const activeContent = [...(activeSlide?.querySelectorAll?.('div') || [])]
-            .find((el) => el.style?.width === '1400px' || el.style?.width?.includes?.('1400px')) || null;
-          const visibleMega = track?.parentElement?.parentElement?.parentElement || megaEl;
-          const toRect = (el) => {
-            const r = el?.getBoundingClientRect?.();
-            return r ? { left: round2(r.left), right: round2(r.right), width: round2(r.width) } : null;
-          };
-          const result = {
-            viewport: { width: round2(window.innerWidth), visualWidth: round2(window.visualViewport?.width ?? window.innerWidth) },
-            belt2: { xL: round2(xL), xR: round2(xR), width: round2(xR - xL) },
-            track: toRect(track),
-            mega: toRect(visibleMega),
-            target: toRect(targetEl),
-            activeSlide: toRect(activeSlide),
-            activeContent: toRect(activeContent),
-          };
-          console.table(result);
-          return result;
-        };
-      } catch {
-        // ignore
-      }
-    };
-
-    read();
-    window.addEventListener('resize', read);
-    window.addEventListener('scroll', read, true);
-    const t1 = window.setTimeout(read, 50);
-    const t2 = window.setTimeout(read, 250);
-    return () => {
-      window.removeEventListener('resize', read);
-      window.removeEventListener('scroll', read, true);
-      window.clearTimeout(t1);
-      window.clearTimeout(t2);
-    };
-  }, [active]);
-
   useEffect(() => {
     if (typeof window === 'undefined') return undefined;
     const readLocked = () => {
@@ -2148,7 +2041,18 @@ function FullWideSlideHeader({
   const searchGridRowRef = useRef(null);
   const searchGridScrollRef = useRef(null);
   const [, setMegaInsetsPx] = useState({ left: 0, right: 0 });
-  const [bleedGuardExpandPx, setBleedGuardExpandPx] = useState({ left: 0, right: 0 });
+  // Expansio del "bleed guard" de la franja: es el PADDING horitzontal del seu
+  // pare (24 px a 768 i menys, 40 px a partir d'aqui). Son dos valors i tots dos
+  // es coneixen per la mida de la finestra, aixi que no cal mesurar-los:
+  // mesurat a 768/1024/1280/1366/1440/1920 dona 24/40/40/40/40/40 i amb el
+  // valor bo el guard acaba exactament al marc del pare.
+  //
+  // Abans es calculava comparant el marc del megaslide amb el de la capcalera,
+  // amb resize, scroll i dos setTimeouts; el resultat arribava despres del
+  // pintat i obligava a un estat que provocava re-renders del header.
+  const ampladaFinestra = typeof window !== 'undefined' ? window.innerWidth : 0;
+  const expansioBleed = ampladaFinestra > 768 ? 40 : 24;
+  const bleedGuardExpandPx = { left: expansioBleed, right: expansioBleed };
   const [accordionPautaScale, setAccordionPautaScale] = useState(1);
 
   const ensureMegaOpen = () => {
