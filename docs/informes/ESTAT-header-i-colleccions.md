@@ -12,7 +12,7 @@
 El moviment del layout (el "tremolor") **està eliminat i verificat** a tot el que
 s'ha pogut mesurar. El que queda de l'objectiu és **refer** les peces (etapes B i
 C), no arreglar moviment. Dels quatre passos de l'Etapa A, **A1, A2 i A3 estan
-fets**; queda **A4** (i la decisió E2). L'arbre és net i tot està pujat a
+fets** i **E2 està decidit**. Queda **A4**. L'arbre és net i tot està pujat a
 `origin/main` llevat de la feina d'A3.
 
 ---
@@ -56,8 +56,8 @@ obligatòries** i **3 riscos nous**. L'ordre A → B → C va quedar confirmat.
 
 - **A1** — `laneForViewport(vw)` al model; cap codi de producció ha de llegir mai
   més `--belt2-*`. → **FET** (`d2e87b2`)
-- **B1** — `CollectionPage.jsx` **no** és la base de la fusió: només viu a
-  `/lab/proves`. L'Etapa B es fa sobre codi nou. → pendent de decidir (E2)
+- **B1** — `CollectionPage.jsx` **no** és la base de la fusió: només vivia a
+  `/lab/proves`. L'Etapa B es fa sobre codi nou. → **E2 decidit: eliminat**
 - **B2** — `CollectionMobile` queda fora de l'abast (la fusió és de la vista vertical).
 - **C1** — `MainHeader.jsx` (1.116 línies, mort) fora. → **FET** (`040ce4f`)
 
@@ -149,7 +149,7 @@ perquè expliquen la causa.
 ```
 Pre-etapes
   [x] E1. Eliminar MainHeader.jsx i useRouteLayout.js            (040ce4f)
-  [ ] E2. Decidir el desti de /lab/proves i CollectionPage.jsx
+  [x] E2. Decidit: /lab/proves, CollectionPage.jsx i companyia FORA
           (es queda com a eina de lab o s'elimina; NO es base de B)
 
 Etapa A (cua ampliada)
@@ -237,13 +237,34 @@ Del més antic al més nou:
 
 ---
 
-## 9. Decisió pendent del revisor (E2)
+## 9. E2 — Decidit: `/lab/proves` i companyia, FORA (ronda 13)
 
-`src/pages/CollectionPage.jsx` (285 línies) + `src/config/collections.js` és, de
-facto, una versió anterior del component parametritzat que l'Etapa B proposa
-crear. El revisor diu que **no és base de la fusió** i que queda **fora d'abast**,
-però la decisió de si es conserva com a eina de laboratori o s'elimina encara és
-oberta. No bloqueja A3 ni A4.
+`src/pages/CollectionPage.jsx` (285 línies) era una pàgina de col·lecció genèrica
+que no tenia hero, ni pauta, ni `TdpPage`, ni `TramFinal`: una llista de catàleg
+que llegia la col·lecció de Supabase. El revisor va dir que **no és base de la
+fusió**, i la decisió presa és **eliminar-la**:
+
+| què | estat |
+|---|---|
+| `src/pages/SupabaseCollectionRoute.jsx` | **esborrat** |
+| `src/pages/CollectionPage.jsx` | **esborrat** |
+| `src/config/collections.js` | **esborrat** |
+| ruta `/lab/proves` | **fora** d'`AppRoutes.jsx` |
+| redirecció `/proves` → `/lab/proves` | **fora** |
+| entrada de `/lab/proves` a `pagesManifest.js` | **fora** |
+| enllaços des de `/lab`, `/lab/demos` i `/lab/wip` | **fora** |
+
+Comprovat abans d'esborrar que res mes no en penjava: `ProductGrid` i
+`FullBleedUnderHeader` (que `CollectionPage` feia servir) tenen consumidors propis
+i es queden. Efecte col·lateral positiu: el bundle principal baixa
+d'aproximadament 514 kB a 479 kB.
+
+**Verificacio**: 462 proves / 38 fitxers, `compara-vistes` OK, `vite build` OK, i
+rutes comprovades al navegador (`/lab`, `/lab/demos` i `/lab/wip` responen;
+`/lab/proves` i `/proves` ja no existeixen; cap error de consola).
+
+**Nota**: la ruta `/lab/proves` no passava per `ProtectedRoute` (era pública a
+produccio). Amb l'eliminacio, aquest forat desapareix tambe.
 
 ---
 

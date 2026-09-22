@@ -14,11 +14,6 @@ function LabHomePage() {
         </div>
 
         <div className="mt-10 grid gap-3">
-          <Link to="/lab/proves" className="rounded-xl border border-black/10 p-4 hover:bg-black/[0.03]">
-            <div className="text-sm font-semibold text-black">Proves</div>
-            <div className="mt-1 text-xs text-black/60">/lab/proves</div>
-          </Link>
-
           <Link to="/lab/demos" className="rounded-xl border border-black/10 p-4 hover:bg-black/[0.03]">
             <div className="text-sm font-semibold text-black">Demos</div>
             <div className="mt-1 text-xs text-black/60">/lab/demos</div>
@@ -28,14 +23,6 @@ function LabHomePage() {
             <div className="text-sm font-semibold text-black">WIP</div>
             <div className="mt-1 text-xs text-black/60">/lab/wip</div>
           </Link>
-        </div>
-
-        <div className="mt-10 rounded-xl border border-black/10 bg-black/[0.02] p-4 text-sm text-black/60">
-          La col·lecció LAB es manté a{' '}
-          <Link to="/lab/proves" className="font-semibold text-black/80 underline underline-offset-4 hover:text-black">
-            /lab/proves
-          </Link>
-          .
         </div>
       </div>
     </div>

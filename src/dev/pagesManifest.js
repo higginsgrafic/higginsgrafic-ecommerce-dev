@@ -59,7 +59,6 @@ export const PAGES_MANIFEST = [
   { path: '/lab', label: 'Lab Home', group: 'Lab/Proves', tag: 'dev-only' },
   { path: '/lab/demos', label: 'Lab · Demos', group: 'Lab/Proves', tag: 'dev-only' },
   { path: '/lab/wip', label: 'Lab · WIP', group: 'Lab/Proves', tag: 'dev-only' },
-  { path: '/lab/proves', label: 'Lab · Proves', group: 'Lab/Proves', tag: 'dev-only' },
   { path: '/proves/dev-links', label: 'Dev Links', group: 'Lab/Proves', tag: 'dev-only' },
   { path: '/proves/dev-components', label: 'Dev Components Catalog', group: 'Lab/Proves', tag: 'dev-only' },
   { path: '/proves/layout-builder', label: 'Layout Builder', group: 'Lab/Proves', tag: 'dev-only' },
@@ -109,7 +108,6 @@ export const DYNAMIC_ROUTES = [
 
 // Redireccions documentades (no es renderitzen a la Contact Sheet).
 export const REDIRECTS = [
-  { from: '/proves', to: '/lab/proves' },
   { from: '/tdp', to: '/constructor/tdp' },
   { from: '/dev-links', to: '/proves/dev-links' },
   { from: '/dev-components', to: '/proves/dev-components' },

@@ -22,12 +22,6 @@ function LabWipPage() {
             >
               LAB Demos
             </Link>
-            <Link
-              to="/lab/proves"
-              className="h-10 shrink-0 rounded-full border border-black/15 bg-white px-4 text-xs font-semibold tracking-[0.18em] uppercase text-black/70 hover:bg-black/5"
-            >
-              LAB Proves
-            </Link>
           </div>
         </div>
 

@@ -3,7 +3,6 @@ import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import { PDP_REGISTRY } from '@/data/pdpRegistry';
-import SupabaseCollectionRoute from '@/pages/SupabaseCollectionRoute.jsx';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import ClientProtectedRoute from '@/components/ClientProtectedRoute';
 import {
@@ -128,8 +127,6 @@ export default function AppRoutes({ location, pageProps, pautaEnabled, tableEnab
         <Route path="/cube" element={<MotionDiv><CollectionCubePage pautaEnabled={false} tableEnabled={false} {...pageProps} /></MotionDiv>} />
         <Route path="/miscellania" element={<MotionDiv><CollectionMiscellaniaPage pautaEnabled={false} tableEnabled={false} {...pageProps} /></MotionDiv>} />
 
-        <Route path="/lab/proves" element={<MotionDiv><SupabaseCollectionRoute collectionKey="proves" {...pageProps} /></MotionDiv>} />
-        <Route path="/proves" element={<ProtectedRoute><Navigate to="/lab/proves" replace /></ProtectedRoute>} />
         <Route path="/proves/dev-links" element={<ProtectedRoute><DevLinksPage /></ProtectedRoute>} />
         <Route path="/proves/dev-components" element={<ProtectedRoute><DevComponentsCatalogPage /></ProtectedRoute>} />
         <Route path="/proves/layout-builder" element={<ProtectedRoute><DevLayoutBuilderPage /></ProtectedRoute>} />
