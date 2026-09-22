@@ -58,6 +58,9 @@ export default function TambeRail({
   estatic = false,
   // Quantes targetes es mostren en mode estatic.
   estaticCards = 3,
+  // Desplaçament vertical del titol en mode estatic (per encaixar-lo entre el
+  // poster i les targetes). El calcula el pare, que sap on acaba el poster.
+  desplacamentTitolPx = 0,
   visibleCards = 4,
   beltWidthOverride = null,
   showTitle = true,
@@ -439,7 +442,7 @@ export default function TambeRail({
         {showTitle && (
           // En mode estatic el titol no es posiciona amb el desplaçament del
           // carrousel (`left1`): va en el flux, a sobre de les targetes.
-          <RespescaTitle leftPx={estatic ? titolOffsetX : left1} title={title} subtitle={subtitle} enFlux={estatic} />
+          <RespescaTitle leftPx={estatic ? titolOffsetX : left1} title={title} subtitle={subtitle} enFlux={estatic} desplacamentY={desplacamentTitolPx} />
         )}
 
         <div

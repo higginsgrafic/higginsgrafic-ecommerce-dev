@@ -122,7 +122,12 @@ export const TDP_FONS_BLEED_PX = 30;
  * Separacio entre l'ultima fila de fitxes i el text del poster del bloc final.
  * El marge del bloc es calcula per deixar exactament aquesta distancia.
  */
-export const TDP_POSTER_SEPARACIO_PX = 200;
+export const TDP_POSTER_SEPARACIO_PX = 90;
+/**
+ * `paddingTop` del bloc del poster (vegeu `TramFinal`): el seu text no arrenca
+ * a dalt del bloc, i per calcular l'aire visible cal comptar-lo.
+ */
+export const TDP_POSTER_PADDING_TOP_PX = 50;
 
 /**
  * Aire entre les targetes del rail i el peu de pagina.

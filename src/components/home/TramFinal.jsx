@@ -33,6 +33,9 @@ const TramFinal = forwardRef(function TramFinal(
     tambeTitle = 'cada dibuix té una història',
     tambeHref = '/constructor/pdp',
     marginTop = '-552px',
+    // Desplaçament vertical del titol del rail (per encaixar-lo entre el poster
+    // i les targetes). El calcula la pagina, que sap on acaba el poster.
+    desplacamentTitolPx = 0,
     posterTextAlign = 'left',
     tambeImages,
     visibleCards,
@@ -129,6 +132,7 @@ const TramFinal = forwardRef(function TramFinal(
           // No es un carrousel: es un bloc estatic amb totes les targetes i el
           // titol, centrat al viewport.
           estatic
+          desplacamentTitolPx={desplacamentTitolPx}
           cardHref={tambeHref}
           title="ALTRES HISTÒRIES"
           images={tambeImages}
