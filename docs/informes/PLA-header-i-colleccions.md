@@ -214,26 +214,22 @@ I les tres mides surten d'aquestes dues amb `calc()`:
 ```
 franja de dalt (pantalla) = --hg-header-bottom
 franja de baix (pantalla) = fons de la finestra
-icones (pantalla)         = --hg-header-bottom   (dins de la franja, a dalt)
+icones (pantalla)         = fons de la finestra - alçada / 2
 ```
 
 Com que les franges viuen dins del contenidor de la hero, a cada expressio s'hi
-resta `--hg-hero-top`.
+resta `--hg-hero-top`. Les icones conserven la formula que ja tenien
+(`innerHeight - alçada/2 - heroTop`), ara escrita amb `calc()`.
 
 **Verificacio** (768/1024/1280/1440/1920 px a les cinc colleccions):
 
 - la franja de dalt cau al separador de la capcalera (desviacio maxima 0,5 px),
   i la de baix acaba al fons de la finestra (0,5 px);
-- les icones queden DINS de la franja de dalt;
+- les icones i les franges son **identiques a HEAD**, comprovat amb els dos
+  servidors alhora a 768/1024/1280/1440/1920 px;
 - traces amb timestamps: cap element canvia d'estat despres del primer frame,
   a 35 combinacions (7 rutes x 5 amplades);
 - `npx vitest run` (462), `npm run compara-vistes` i `npx vite build`, verds.
-
-**Desviacio conscient respecte del pla**: la icona de colleccio tambe movia el
-seu contingut amb `translateY(-50%)`, i a 768 px la filera quedava 600 px mes
-avall (fora de la franja, sobre la graella). S'ha tret aquest desplacament i la
-filera ara comença a la vora de dalt de la franja: es la posicio que li toca i
-deixa de dependre de l'alçada real de les icones.
 
 ---
 

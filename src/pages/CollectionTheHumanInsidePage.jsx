@@ -206,11 +206,11 @@ function CollectionTheHumanInsidePage() {
   //
   //   franja de dalt (pantalla) = --hg-header-bottom   (just al separador)
   //   franja de baix (pantalla) = fons de la finestra
-  //   icones (pantalla)         = franja de dalt + un terç de l'alçada
+  //   icones (pantalla)         = fons de la finestra - alçada/2
   //
-  // Les icones van DINS de la franja blanca (a la seva vora superior), per
-  // sobre del títol de la col·lecció: es la posicio que ja tenien pensada i
-  // que el titol tambe fa servir.
+  // Les icones conserven EXACTAMENT la posicio de pantalla que tenien (la
+  // formula `innerHeight - alçada/2 - heroTop` d'abans, ara escrita amb
+  // `calc()`), independentment de l'alçada real de les icones.
   //
   // Com que les franges viuen dins del contenidor de la hero, a cada expressio
   // s'hi resta la posicio de la hero. Les dues mesures son inevitables (la
@@ -220,7 +220,7 @@ function CollectionTheHumanInsidePage() {
   const heroRef = useRef(null);
   const heroBandTop = 'calc(var(--hg-header-bottom, 163px) - var(--hg-hero-top, 107px))';
   const heroBottomBandTop = `calc(100vh - ${BAND_HEIGHT} - var(--hg-hero-top, 107px))`;
-  const heroIconsTop = 'calc(var(--hg-header-bottom, 163px) - var(--hg-hero-top, 107px))';
+  const heroIconsTop = `calc(100vh - (${BAND_HEIGHT}) / 2 - var(--hg-hero-top, 107px))`;
   // Quan la imatge (alcada de finestra) sobrepassa l'espai que la graella li
   // reserva, baixem el contingut el mateix tros perque no se solapi.
   const [pushDownPx, setPushDownPx] = useState(0);
@@ -495,15 +495,15 @@ function CollectionTheHumanInsidePage() {
             }}
           />
 
-          {/* Icones de colleccio: dins de la franja blanca de dalt, a la seva
-              vora superior. La capsa NO es desplaça: el seu `top` ja és on ha
-              de començar la filera, aixi que el centre visual hi queda sol. */}
+          {/* Icones de colleccio: mateixa posicio de pantalla que tenien
+              (centrades on era la franja blanca de sota). */}
           <div
             style={{
               position: 'absolute',
               top: heroIconsTop,
               left: 0,
               right: 0,
+              transform: 'translateY(-50%)',
               display: 'flex',
               // Alineades PEL TOP: la icona mes alta marca la linia de dalt.
               alignItems: 'flex-start',
