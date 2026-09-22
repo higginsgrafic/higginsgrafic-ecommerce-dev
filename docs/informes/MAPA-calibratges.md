@@ -64,7 +64,7 @@ llenços fan 74,5 unitats per fila i jo estava comparant coses diferents. Vegeu 
 | `ConstructorColleccioPage:222` | `× 0.3385` | el mateix | DERIVAT |
 | `Home.jsx:219`, `TDP1:99`, `TDP2:99` | `× 0.01410547` | **mitja fila** (`0,028219/2`) | CLAR |
 | `TdpVariantsGallery:48`, `Home.jsx` (×4) | `× 0.84632` | **30 files** del llenç (`30 × 74,533 / 2642` = 0,846328) | **CLAR** |
-| `TdpVariantsGallery:48`, `Home.jsx` (×4) | `− 231px` | **RESCAT** — vegeu §2.4 | **RESOLT: és un pedaç** |
+| `TdpVariantsGallery:48`, `Home.jsx` (×4) | `− 231px` | **RESCAT** — vegeu §2.4 | **TREURE (fet a Home, `e0a2161`); queda `TdpVariantsGallery`** |
 | `ProductDetailTemplate:151`, `ConstructorPdpPreview:210` | `× 5217/2642/70` | una fila d'un **altre** llenç (5217) | CLAR |
 | `CollectionVerticalPage:83`, `FullWideSlideHeader:201` | `carril × 0.0280625 − 2.875` | una fila del llenç 1780/24, menys un ajust | **HIPÒTESI** (el gap és plausible, no provat) |
 | `layoutMetrics:137` | `MEGASLIDE_REFERENCIA_PX = 1350` | l'amplada del carril a 1920 | CLAR |
@@ -183,19 +183,16 @@ versemblant és que l'alçada del grup es va calibrar a 1440 per fer caure la
 píndola on tocava: `1013 × 0,84632 − 231 = 626,3`, i a 1440 el grup mesura
 625,9.
 
-**El que això implica, i és una decisió que no em toca prendre:**
+**La decisió presa (23/09/2026): opció 2, feta.** La píndola està ara a
+**25 px de la caixa sempre** (`TDP_SEPARACIO_FONS_PX`, l'aire «entre fons» del
+lloc), l'alçada del grup la mana el contingut, i el `− 231` ha desaparegut. A la
+vista vertical també s'ha tret el `752px`, que era el mateix pedaç amb un altre
+número. Commit `e0a2161`.
 
-1. **Conservar el dibuix** i, com a molt, donar nom a cada tros. A 1440 el
-   dibuix mouria **mig píxel** (de 1013 a 1012,5), perquè el carril exacte és
-   1012,5 i el JavaScript l'arrodonia.
-2. **Posar la píndola en un lloc previsible** (per exemple una distància fixa
-   sota la caixa), que és el que fa **tota** la resta del lloc i que és
-   clarament millor, però que **canvia el dibuix** de manera visible.
-3. **Deixar-ho en flux** (`flex` amb `gap`), que és el que el comentari de
-   `collectionVertical.js` proposa per a una altra cosa (les files de fitxes) i
-   que aquí canviaria totes dues coses alhora. **La meva recomanació és no
-   fer-ho:** barrejar la reparació amb el redisseny és com no se sap què ha
-   mogut què.
+I **la pàgina es mou**, que és el preu de l'opció 2: el contingut de sota la
+galeria puja 97 px a 1024, 175 a 1280, 331 a 1440, 511 a 1920 i 2.532 a 768. És
+l'espai buit que la graella reservava i no feia servir (feia 911,5 px amb una
+fitxa de 401 a 1920).
 
 ---
 
@@ -217,7 +214,6 @@ Aquests no cal tocar-los: es mesuren contra la peça, no contra la pantalla.
 | `Home.jsx:493` | `translateY(89 / 66 / 86 / 9px)` | centrar les icones, un número per dispositiu | rescat |
 | `Home.jsx:545` | `height: 430px` a vertical | la mida de la hero a tauleta, deslligada de l'escala | **PENDENT** |
 | `Home.jsx:714` | `marginTop: 435 / 40 / 100px` | la secció de sota la hero, un número per dispositiu | rescat |
-| `Home.jsx:417` | `height: 752px` | l'alçada de la graella a vertical | **PENDENT** |
 | `collectionVertical.js:137-138` | `338px`, `−240px` | el gap hero→TDP a tauleta | rescat |
 | `collectionVertical.js:75` | `−41px` | el mateix a escriptori | rescat |
 | `collectionVertical.js:60` | `clamp(120px, 26vh, 260px)` | l'alçada de la franja | rescat |
@@ -366,13 +362,11 @@ Per això quan es mesura una geometria cal dir *quina* peça és, no només on �
    `ConstructorColleccioPage` es deriva de `LLENCOS.colleccio.coef`.
    **Mou 0,042 px com a màxim** (submil·lèsim), mesurat a les cinc mides.
    Falta la resta de números escrits.
-3. **Decidir què es fa amb la píndola de la galeria** (§2.4 bis). No és una
-   nomenclatura: la píndola va penjada del mig del bloc de descripció, i l'aire
-   fins a la caixa va de 29 a 397 px. Les tres opcions són conservar el dibuix,
-   posar-la a una distància fixa, o deixar-ho en flux. **Les dues últimes
-   canvien el dibuix i són una decisió de l'amo.**
-4. **Mesurar els PENDENT** que queden: el `430px` de la hero, el `752px` de la
-   graella d'inici, i els 135 del megaslide.
+3. **La píndola de la galeria** — decidit i fet a l'inici (`e0a2161`): 25 px de
+   la caixa i alçada pel contingut. **Falta el mateix a `TdpVariantsGallery`**,
+   que encara té la fórmula amb el `− 231`.
+4. **Mesurar els PENDENT** que queden: el `430px` de la hero i els 135 del
+   megaslide. (El `752px` s'ha jubilat amb la píndola.)
 5. **Separar `--escala` de `--escala-text`** a `foundation.css`, que és el que
    fa possible que la geometria escali sense arrossegar el text.
 6. **Migrar l'inici**, amb la hero, i després una col·lecció.
