@@ -73,6 +73,57 @@ en flux i es veu bé; les pàgines llegals, el checkout i les eines també. El p
 
 ---
 
+## 2 bis. La troballa que ho explica tot: són dos projectes en un
+
+Mesurat (22/09/2026):
+
+| | línies |
+|---|---|
+| **Projecte HEADER**: `FullWideSlideHeader`, `MegaStripeHud`, tot `fullwide/` i `megaslide/`, `layoutMetrics`, `useMegaStripeDebugState` | **20.647** |
+| **La pàgina de col·lecció sencera** (config, fitxa, rail, bloc final) | **2.471** |
+| Total del projecte | 86.616 |
+| **El header és** | **23,8 %** |
+
+I la comunicació entre els dos:
+
+- El **header** publica 7 variables CSS: `--hg-hero-top`, `--hg-header-bottom`,
+  `--hg-mega-w`, `--hg-escala-mega`, `--hg-band-w`, `--hg-mega-x`,
+  `--hg-tdp-xL/xR`.
+- La **pàgina de col·lecció** en consumeix 4 per decidir on va la hero
+  (`--hg-hero-top`, `--hg-header-bottom`) i on van les fitxes (`--hg-tdp-xL/xR`).
+
+**Son dos sistemes de coordenades diferents que es parlen per variables CSS.**
+
+- **El del lloc**: carril → pauta (files de 12,28 px a 768) → fitxes.
+- **El del header**: `belt` → `--hg-escala-mega` → megaslide (calibrat sobre un
+  llenç de disseny de 1920×1080).
+
+El header no és una peça del lloc: és **una segona aplicació allotjada a dins**
+(un configurator amb el seu propi llenç, la seva calibració i la seva
+instrumentació de desenvolupament). La pàgina de col·lecció no hi pot encaixar
+perquè **les dues no comparteixen cap unitat de mesura**.
+
+### Què implica per al pla
+
+1. **El problema del header no és de mida: és de frontera.** No cal
+   "racionalitzar 3.184 línies"; cal donar-li **una interfície petita**:
+   que publiqui la seva alçada i prou.
+2. **La pàgina nova no ha de dependre de cap de les 4 variables.** Ha de tenir
+   la seva pròpia columna vertebral i, com a molt, llegir una única dada
+   (l'alçada del header) per començar més avall.
+3. **El megaslide es conserva com una capa pròpia**, amb el seu estat i la seva
+   calibració, muntada a sobre de la pàgina però **sense participar-hi**. És el
+   que ja fa, però ara quedarà escrit.
+4. **Per això la fase 7 (el header) és viable**: quan la pàgina no en depengui,
+   el header només ha de pintar la seva franja i publicar la seva alçada.
+
+> Aquesta és la raó de fons de l'orfebreria: **cada cop que el llenguatge del
+> disseny (el llenç del megaslide) i el llenguatge de la pàgina (el flux del
+> contingut) s'han de tocar, algú hi ha posat un número**. Aquells números són
+> els 61 `top` fixos i els 10 marges negatius.
+
+---
+
 ## 3. Les regles de la fonamenta nova
 
 1. **Una sola columna vertebral.** Cada pàgina és una successió de seccions
