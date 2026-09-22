@@ -152,7 +152,7 @@ export function FirstContactDibuix00Buttons({
             <span
               className="font-oswald"
               style={{
-                fontSize: carrilPx(14),
+                fontSize: `max(12px, ${carrilPx(14)})`,
                 fontWeight: 400,
                 textTransform: 'uppercase',
                 color: selectedIndex === i ? '#1A1A1A' : '#6B7280',

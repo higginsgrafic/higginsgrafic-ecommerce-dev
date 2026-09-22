@@ -419,7 +419,7 @@ export function CercadorDibuixosGraella({
                 }}
               />
             ) : (
-              <span style={{ color: '#2B2B2B', fontSize: (isPortraitTablet || isLandscapeTablet) ? `${8 + fontBoost}px` : carrilPx(11 + fontBoost), whiteSpace: 'nowrap' }}>
+              <span style={{ color: '#2B2B2B', fontSize: (isPortraitTablet || isLandscapeTablet) ? `max(12px, ${8 + fontBoost}px)` : `max(12px, ${carrilPx(11 + fontBoost)})`, whiteSpace: 'nowrap' }}>
                 {label.replace(/^Looking For My Darcy/, 'LFMD')}
               </span>
             )}
@@ -491,8 +491,10 @@ export function CercadorColorsGrid({
           className="font-oswald"
           style={{
             fontWeight: 700,
-            fontSize: (isPortraitTablet || isLandscapeTablet) ? '8px' : carrilPx(11),
-            lineHeight: 1,
+            // Una mica mes petit a l'escriptori (11 px) i amb aire entre
+            // linies: amb `lineHeight: 1` les linies quedaven juntes.
+            fontSize: (isPortraitTablet || isLandscapeTablet) ? 'max(11px, 8px)' : `max(11px, ${carrilPx(11)})`,
+            lineHeight: 1.5,
             letterSpacing: '0.04em',
             color: '#2B2B2B',
             whiteSpace: 'nowrap',
@@ -597,7 +599,7 @@ export function CercadorColleccionsColumna({
             border: 0,
             background: 'transparent',
             color: '#2B2B2B',
-            fontSize: (isPortraitTablet || isLandscapeTablet) ? '8px' : carrilPx(11),
+            fontSize: (isPortraitTablet || isLandscapeTablet) ? 'max(11px, 8px)' : `max(11px, ${carrilPx(11)})`,
             fontWeight: key === activeKey ? 700 : 300,
             lineHeight: (isPortraitTablet || isLandscapeTablet) ? '11px' : `${alcadaFilaLlista}px`,
             textAlign: 'right',
