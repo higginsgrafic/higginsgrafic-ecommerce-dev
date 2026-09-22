@@ -265,6 +265,28 @@ no s'ajusta el nou perquè quadri. I **no es canvien els aproximats pels exactes
 en aquesta passa (el `0,3385` mou 1,7 px a 1440: això és disseny, no
 nomenclatura).
 
+### El que s'ha intentat i S'HA REVERTIT (`e0a2161` → revertit a `d9630f6`)
+
+Es va posar la píndola de la galeria de l'inici a **25 px de la caixa** (abans
+anava de 29 a 397 px segons la mida) i es va treure l'alçada de la graella.
+**Va trencar el ritme de la pàgina**: el títol de la segona col·lecció va pujar
+**510 px** a 1920 i 428 a 768, i la pàgina va passar de 9473 a 6920 px.
+
+**La causa, que és el que cal recordar:** l'espai que es va treure **no era
+buit, era el que separa les col·leccions.** La mesura que s'havia fet (l'aire
+caixa→píndola) era certa, però **no era la que calia mirar**.
+
+**La lliçó, que s'afegeix a la manera de verificar:** quan es toca una alçada,
+**no n'hi ha prou de mesurar la peça que es toca**. Cal mesurar també **les
+posicions dels elements que venen després** (els títols de les altres
+col·leccions, l'alçada total de la pàgina), perquè una alçada que es treu sol
+ser un aire que algú altre aprofitava.
+
+I un avís per a la propera sessió: **la galeria de l'inici té dues menes
+d'alçada al mateix fitxer** (una com a literal de plantilla i quatre amb
+interpolació), i buscar i substituir només n'agafa una. Va passar, i es va veure
+a la captura abans de veure's a les mesures.
+
 ---
 
 ## 8. Com treballa l'usuari (après aquesta sessió)
