@@ -296,7 +296,22 @@ function App() {
           style={!isFullScreenRoute ? (
             isAdminRoute
               ? { paddingTop: adminRouteOffset, paddingLeft: `${rulerInset}px`, '--appHeaderOffset': adminRouteOffset, '--rulerInset': `${rulerInset}px` }
-              : { paddingTop: isDemoStyleLayoutRoute ? demoHeaderOffset : appHeaderOffset, paddingLeft: `${rulerInset}px`, paddingBottom: isMobile && !isAdminRoute ? (isHomeRoute ? '152px' : '64px') : undefined, '--appHeaderOffset': isDemoStyleLayoutRoute ? demoHeaderOffset : appHeaderOffset, '--rulerInset': `${rulerInset}px` }
+              : {
+                paddingTop: isDemoStyleLayoutRoute ? demoHeaderOffset : appHeaderOffset,
+                paddingLeft: `${rulerInset}px`,
+                paddingBottom: isMobile && !isAdminRoute ? (isHomeRoute ? '152px' : '64px') : undefined,
+                '--appHeaderOffset': isDemoStyleLayoutRoute ? demoHeaderOffset : appHeaderOffset,
+                '--rulerInset': `${rulerInset}px`,
+                // Les fulles de colleccio tenen un rail horitzontal mes ample
+                // que la seva cel·la (el `TambeRail` de `TramFinal`): el seu
+                // contingut ja es retalla dins seu, pero la seva CAIXA feia
+                // desbordar la pagina (fins a 98 px a 1280 i 1440). Amb aixo la
+                // pagina no es pot desplaçar lateralment i la capcalera fixa
+                // deixa de quedar tallada a la dreta. `clip` i no `hidden`
+                // perque no crea cap contenidor de desplaçament ni toca res
+                // vertical.
+                overflowX: 'clip',
+              }
           ) : {}}
           tabIndex={-1}
         >
