@@ -66,6 +66,8 @@ const TDP_GRID_COLORS = [
 // Rutes de les PDP de producte de CUBE, en ordre.
 // S'assignen a les 16 cel·les de la graella de forma cíclica.
 const COLLECTION_SLUG = 'cube';
+const collectionTitle = 'Cube';
+const COLLECTION_ICON = '/custom_logos/collections/collection-cube-logo.svg';
 const PRODUCTS = [
   { route: 'afrodita-c', name: 'AFRODITA-C' },
   { route: 'mazinger-c', name: 'MAZINGER-C' },
@@ -306,9 +308,9 @@ function CollectionCubePage() {
 
       {isMobile ? (
         <CollectionMobile
-          collectionSlug="cube"
-          collectionTitle="Cube"
-          collectionIcon="/custom_logos/collections/collection-cube-logo.svg"
+          collectionSlug={COLLECTION_SLUG}
+          collectionTitle={collectionTitle}
+          collectionIcon={COLLECTION_ICON}
           products={PRODUCTS}
           colors={TDP_GRID_COLORS}
           posterLines={[{ text: 'CADA' }, { text: 'DIBUIX TÉ' }, { text: 'UNA MIRADA' }]}
@@ -556,7 +558,10 @@ function CollectionCubePage() {
             // Files de 11 espais + 2 de separacio (abans n'hi havia 4): el gap
             // entre files de fitxes queda a la meitat.
             const rowOffset = 10 + rowIdx * 13;
-            const productName = productAt(rowIdx, colIdx).name;
+            const indexGraella = rowIdx * 4 + colIdx;
+            const producte = productAt(rowIdx, colIdx);
+            const productName = producte.name;
+            const finish = gridFinishFor(COLLECTION_SLUG, color, indexGraella);
             const { imageTranslateY, productNameTranslateY, descriptionTranslateY } = getCardLayout(colIdx);
             return (
               <CollectionTdpCard
@@ -570,19 +575,19 @@ function CollectionCubePage() {
                 productName={productName}
                 description=""
                 price={SELLING_PRICE_LABEL}
-                imageSrc={collectionGridImageFor('cube', productAt(rowIdx, colIdx).route, color, rowIdx * 4 + colIdx)}
-                hoverImages={collectionGridHoverVariantsFor('cube', productAt(rowIdx, colIdx).route, color, rowIdx * 4 + colIdx)}
+                imageSrc={collectionGridImageFor(COLLECTION_SLUG, producte.route, color, indexGraella)}
+                hoverImages={collectionGridHoverVariantsFor(COLLECTION_SLUG, producte.route, color, indexGraella)}
                 imageAlt={`Samarreta Gildan 64000 ${color}`}
                 sizes={sizes}
                 cartCount={0}
                 onAddToCart={(size) => {
                   window.dispatchEvent(new CustomEvent('hg:open-full-wide-cart', {
-                    detail: { source: 'collection-tdp-cta', firstPartOnly: true, item: { title: productName.toUpperCase(), collection: 'CUBE', collectionSlug: 'cube', productRoute: productAt(rowIdx, colIdx).route, qty: 1, size, price: SELLING_PRICE_LABEL, color, finish: gridFinishFor('cube', color, rowIdx * 4 + colIdx), drawing: '', disabled: false } },
+                    detail: { source: 'collection-tdp-cta', firstPartOnly: true, item: { title: productName.toUpperCase(), collection: collectionTitle.toUpperCase(), collectionSlug: COLLECTION_SLUG, productRoute: producte.route, qty: 1, size, price: SELLING_PRICE_LABEL, color, finish, drawing: '', disabled: false } },
                   }));
                 }}
                 editableIdPrefix="constructor-colleccio-copy5-tdp-col2"
                 presetVersion="constructor-colleccio-copy5-tdp-cart-34-v9"
-                collectionHref={`${productHref(rowIdx, colIdx)}?color=${color}&finish=${gridFinishFor('cube', color, rowIdx * 4 + colIdx)}`}
+                collectionHref={`${productHref(rowIdx, colIdx)}?color=${color}&finish=${finish}`}
                 productNamePlain
                 editable={false}
                 imageTranslateY={imageTranslateY}

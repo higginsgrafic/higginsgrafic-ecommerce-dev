@@ -15,6 +15,13 @@
  * de pagina sencera a posta: el que es compara entre passos es el layout de
  * dalt, que es on viuen les mesures, i una captura sencera arrossega imatges
  * carregades de manera mandrosa i fa el diff sorollos.
+ *
+ * DETERMINISME (per que el diff sigui net): les fotografies de fons es
+ * descarten (es bloquegen les peticions d'imatge). La foto del placeholder es
+ * renderitza amb un biaix de pixel diferent a cada passada, i a 1440 px fa que
+ * dues captures del MATEIX codi donin milers de pixels diferents. Bloquejant-la,
+ * el que queda a la imatge son les franges, les icones, el titol i la graella:
+ * o sigui, el layout, que es el que volem comparar.
  */
 import { chromium } from '@playwright/test';
 import { mkdirSync } from 'node:fs';
@@ -22,6 +29,11 @@ import { mkdirSync } from 'node:fs';
 const BASE = process.env.HG_URL || 'http://127.0.0.1:3003';
 const ETIQUETA = process.argv[2] || 'referencia';
 const ALCADA_CAPTURA = 1000;
+// Les imatges del projecte son /placeholders/... i /custom_logos/...: bloquem
+// les primeres (fotos) i deixem les segones (logotips, que son plans i no
+// tenen soroll).
+const BLOQUEJA_FOTOS = process.env.HG_AMB_FOTOS !== '1';
+const PATRO_FOTOS = /\/placeholders\//;
 
 const CASES = [
   { nom: '768x1024', ample: 768, alt: 1024, touch: true },
@@ -52,6 +64,11 @@ for (const c of CASES) {
     deviceScaleFactor: 1,
   });
   const page = await ctx.newPage();
+  if (BLOQUEJA_FOTOS) {
+    // Descartem les fotos: el diff ha de mesurar el layout, no el renderitzat
+    // d'una fotografia (que balla d'una passada a l'altra).
+    await page.route(PATRO_FOTOS, (ruta) => ruta.abort());
+  }
   for (const { slug, ruta } of RUTES) {
     await page.goto(`${BASE}${ruta}`, { waitUntil: 'networkidle', timeout: 60000 });
     // El logo i la graella arriben amb el chunk de la capcalera (~1,1 s): esperem
