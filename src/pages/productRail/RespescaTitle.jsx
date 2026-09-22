@@ -6,7 +6,7 @@ export default function RespescaTitle({ leftPx = 0, title = 'també et pot inter
   const finalStyle = style || (enFlux
     // El titol va alineat a l'ESQUERRA de les targetes: el seu bloc comença on
     // comença la primera targeta (el contenidor del rail, que ja va centrat).
-    ? { position: 'relative', textAlign: 'left', boxSizing: 'border-box', paddingLeft: `${leftPx}px` }
+    ? { position: 'relative', textAlign: 'left', boxSizing: 'border-box', transform: `translateX(${leftPx}px)` }
     : {
       position: 'absolute',
       top: '64px',
