@@ -257,6 +257,21 @@ function Home() {
     typeof window !== 'undefined' ? window.innerHeight : 0,
   );
 
+  // Les mides INTERIORS de la fitxa, proporcionals a la seva amplada. Son les
+  // MATEIXES que fa servir la pagina de colleccio (`CollectionVerticalPage`):
+  // si no s'hi passen, la fitxa cau als valors per defecte (selector del 62 %
+  // d'amplada i 34 px d'alcada FIXA, text de talla a 7 pt), i el mateix
+  // component surt amb un selector la meitat de gran que a les colleccions:
+  // 36,6 x 28 px a l'inici contra 45 x 58 a la colleccio, amb la mateixa caixa.
+  const midesFitxaHome = {
+    sizeSelectorWidth: `${Math.round(midaTdpHome.amplada * 0.72)}px`,
+    sizeSelectorHeight: `${Math.round(midaTdpHome.amplada * 0.2)}px`,
+    sizeFontPx: Math.round(midaTdpHome.amplada * 0.07),
+    textFontPx: Math.round(midaTdpHome.amplada * 0.095),
+    cartSizePx: Math.round(midaTdpHome.amplada * 0.15),
+    priceGap: `${Math.round(midaTdpHome.amplada * 0.1)}px`,
+  };
+
 // El nombre de columnes de la graella de fitxes, de la MATEIXA font que la
   // mida: `midaTdpHome.columnes` (3 a tauleta, tambe apaïsada; 4 a escriptori).
   // Abans la graella fixava 3 columnes sempre i a escriptori en sortien 3 en
@@ -344,6 +359,8 @@ function Home() {
       imageAlt: `Samarreta ${item.color}`,
       overlaySrc: item.overlaySrc,
       overlayAlt: item.overlayAlt,
+      // Les mides interiors proporcionals, les mateixes que a les colleccions.
+      ...midesFitxaHome,
       ...(item.hoverImages ? { hoverImages: item.hoverImages } : {}),
       ...(item.productHref ? { productHref: item.productHref } : {}),
       ...(item.overlayScale != null ? { overlayScale: item.overlayScale } : {}),
