@@ -12,7 +12,7 @@
 El moviment del layout (el "tremolor") **està eliminat i verificat** a tot el que
 s'ha pogut mesurar. El que queda de l'objectiu és **refer** les peces (etapes B i
 C), no arreglar moviment. Dels quatre passos de l'Etapa A, **A1, A2 i A3 estan
-fets** i **E2 està decidit**. Queda **A4**. L'arbre és net i tot està pujat a
+fets** i **E2 està decidit**: l'Etapa A està tancada. L'arbre és net i tot està pujat a
 `origin/main` llevat de la feina d'A3.
 
 ---
@@ -157,7 +157,7 @@ Etapa A (cua ampliada)
   [x] A2. heroBandTopPx / heroIconsTopPx / heroBottomBandTopPx -> calc()
                                                                   (fb9b8a4, 4f82371)
   [x] A3. pushDownPx / posterExtraPx -> calcul sobre nombre de files
-  [ ] A4. zeroLeftOffsetPx -> useLayoutEffect
+  [x] A4. zeroLeftOffsetPx -> useLayoutEffect abans del pintat
 
 Etapa B
   [ ] B1. Component unic nou amb parametres; sense tocar /lab/proves
@@ -190,7 +190,7 @@ Estat real després d'A1, A2 i A3:
 | `heroBottomBandTopPx` | `calc()` | **fet** (A2, eliminat) |
 | `pushDownPx` | càlcul sobre el nombre de files | **fet** (A3: mesurat abans del pintat + variable CSS) |
 | `posterExtraPx` | càlcul sobre el nombre de files | **fet** (A3: càlcul pur) |
-| `zeroLeftOffsetPx` | es queda mesurat, però amb `useLayoutEffect` | **pendent (A4)** |
+| `zeroLeftOffsetPx` | es queda mesurat, però amb `useLayoutEffect` | **fet** (A4, eliminat el bucle rAF) |
 
 El `setTimeout(mesura, 300)` ja **no existeix** a cap de les cinc pàgines.
 
@@ -268,18 +268,31 @@ produccio). Amb l'eliminacio, aquest forat desapareix tambe.
 
 ---
 
-## 10. Següent pas immediat: A4
+## 10. Etapa A tancada: següent pas, Etapa B
 
-**Objectiu**: `zeroLeftOffsetPx` (la posicio del "00" respecte del logotip GRAFC)
-es queda **mesurat**, però ha de passar a un `useLayoutEffect` perquè el valor hi
-sigui **abans del pintat**.
+Amb A4 fet, **l'Etapa A queda tancada sencera** (A1, A2, A3 i A4). El proper pas
+del pla és l'**Etapa B**: un component únic per a la vista vertical de les cinc
+pàgines de col·lecció, amb les animacions i els *delays* de framer-motion com a
+paràmetre per col·lecció (risc R2), i en aquest ordre: **Cube → First Contact →
+Miscellania → The Human Inside → Austen**.
 
-Avui es mesura en un `useEffect` amb un bucle de `requestAnimationFrame` que
-espera que existeixin el logotip i la graella. El canvi és el mateix patró que A2
-i A3: publicar el número abans del pintat i eliminar la cursa.
+### A4 fet: què ha canviat (ronda 14)
 
-**Verificació que tocarà**: el protocol del punt 7 sencer, més l'equivalència amb
-el commit d'A3 a les cinc amplades.
+`zeroLeftOffsetPx` **no era codi mort**, com hauria semblat mesurant només
+tauleta: val 0 a 768/1024/1280, però **38 px a 1440 i 47,5 px a 1920**, i és el
+que fa que el breadcrumb caigui exactament al `left` del logo GRAFC. Es queda
+mesurat, però:
+
+- passa a `useLayoutEffect` (abans del pintat quan els elements hi són);
+- **fora el bucle de `requestAnimationFrame`** que reintentava indefinidament;
+- el substitueix un `MutationObserver` que mesura quan apareix la graella i es
+  desconnecta (el logo i la graella arriben amb el chunk de la capçalera,
+  ~1,1 s després del `load`);
+- es deixa d'escoltar el `scroll`; el `resize` es queda.
+
+Verificat contra el commit d'A3 a les 25 combinacions (cinc pàgines × cinc
+amplades): offset, `left` del breadcrumb, hero i TDP idèntics; cap canvi d'estat
+a les traces.
 
 ---
 
