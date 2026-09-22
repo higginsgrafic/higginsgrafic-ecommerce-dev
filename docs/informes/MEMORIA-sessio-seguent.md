@@ -213,7 +213,61 @@ A tauleta no coincideixen perquè el megaslide té disseny propi i no s'escala
     `docs/constitucio.md`. Un pedaç només s'accepta si la causa no es pot tocar
     encara, i llavors s'escriu al costat quina causa tapa.
 
-## 7. Com treballa l'usuari (après aquesta sessió)
+---
+
+## 7. Què s'ha fet el 23/09/2026 (aquesta sessió), amb la causa
+
+### La belt jubilada (`fc264d8`)
+
+**El carril de la pauta no era una mesura: era una regla de tres.**
+`getSafeBelt()`, `useReactiveBelt`, un `MutationObserver`, una publicació
+primerenca i un `useLayoutEffect` que esborrava les variables en desmuntar-se
+`TdpPage`. Tot plegat calculava `1350 × (amplada / 1920)` amb sostre a 1350,
+que és `min(70.3125vw, 1350px)`. Ara viu a `foundation.css` com a
+`--contingut-max`, amb `--hg-tdp-xL/xR` com els seus dos extrems. **−137/+58
+línies.** Verificat: carril, hero, títol, graella i `scrollWidth` idèntics a
+les cinc mides. **Un sol número canvia**: a 1440 el carril passa de 1013 a
+1012,5, perquè el JS arrodonia a px sencers i després el CSS en derivava els
+extrems (les variables deien 1013 i la graella feia 1012,5).
+
+### La regla 15 i una correcció meva (`b0553e5`, `33052a7`)
+
+Es va afegir la regla 15 a la constitució. **I es va haver de corregir**: hi
+deia que el bucle de la hero «oscil·la entre dos valors separats 20 px». Era una
+deducció llegint codi, no una mesura, i és falsa: **8 càrregues i 245 mostres
+donen sempre 305,95 px.** El bucle és estable; el problema és que el número bo
+no està declarat enlloc.
+
+### El mapa dels calibratges (`275372e`, `52ff8af`) — `docs/informes/MAPA-calibratges.md`
+
+El llenç de disseny **ja existia al codi** (2642 d'amplada, alçades 6708/9717/
+1780/3950/5217, 90/53/24 files, gap 3) però no era qui manava. Els coeficients
+misteriosos són el llenç: `0.3385` = 12 files, `0.01410547` = mitja fila,
+`0.84632` = 30 files. **El `−2,875` és aritmètica del gap** (`(24−1)×3/24`),
+però això queda marcat com a **hipòtesi**: dues expressions que donen el mateix
+número no proven que una expliqui l'altra. El `−231` de les galeries **no té
+origen llegible** i queda PENDENT. I l'inventari del megaslide dona **257
+calibradors, dels quals 135 són NO DEDUÏBLE**.
+
+### El mòdul del llenç (`62ff34c`) — `src/config/llencos.js`
+
+Els paràmetres del llenç tenen un lloc i 12 proves (`tests/unit/llencos.test.js`,
+**474 proves en total**). **Aquesta passa no mou cap píxel**: el mòdul no
+substitueix cap número del codi, només els dona nom i valor derivat. I la
+mesura que el justifica: **les tres graelles del lloc surten del seu llenç de
+manera exacta** (0,028072 / 0,028209 / 0,028211, teòric = pintat a les tres).
+
+### El que ve després
+
+Substituir els números escrits pels derivats **d'un en un i mesurant**, amb la
+regla de `MAPA-calibratges.md` §7: si un número es mou, **s'atura i s'explica**;
+no s'ajusta el nou perquè quadri. I **no es canvien els aproximats pels exactes**
+en aquesta passa (el `0,3385` mou 1,7 px a 1440: això és disseny, no
+nomenclatura).
+
+---
+
+## 8. Com treballa l'usuari (après aquesta sessió)
 
 - **Detecta les incoherències de proporcions a ull** i té raó: quan diu «el
   selector sembla diferent a cada versió», hi ha una causa tècnica darrere.
