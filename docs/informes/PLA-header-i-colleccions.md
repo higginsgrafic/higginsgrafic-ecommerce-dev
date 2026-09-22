@@ -485,7 +485,32 @@ Etapa B (TANCADA)
   [x] Acabament: el poster ja no cau sobre l'ultima fila de fitxes (48 px de
       buit a totes les mides, abans hi havia fins a 351 px de solapament)
 
-Etapa C (header, per passos)
+Etapa C (header, per passos) — ESTAT REAL
+  [x] C1. setMegaHeroRowHeight  -> calculat (carril x 0,0280625 - 2,875; la
+          formula dona el valor pintat amb 0,013 px de desviacio maxima)
+  [x] C2. setRootRemPx          -> FORA: era un estat que ningu llegia, amb un
+          setState al muntatge i a cada resize
+  [x] C3. setBleedGuardExpandPx -> calculat (24 px a 768 i menys, 40 a partir
+          d'aqui; es el padding del pare)
+  [x] C4. setMegaInsetsPx       -> FORA: estat que ningu llegia, amb un
+          ResizeObserver observant tres elements per a res
+  [~] C5. setStripeRowPadPx / setStripeRowPadXPx / setLockBtnTop -> ES QUEDEN
+          MESURATS, amb el motiu escrit al codi:
+            - els paddings depenen de classes responsives (32/32/38/38/32/32),
+              no son cap funcio neta de l'amplada (classe (b) del punt 4)
+            - el cadenat segueix el panell a cada fotograma I LLISCA cap a la
+              posicio (maxim 18 px per fotograma) perque els graons d'encaix
+              (fins a 35 px) no es vegin com a saltets: un `useLayoutEffect`
+              d'un sol cop trencaria aquesta funcio deliberada
+  [x] C6. Neteja d'efectes morts: fets C2 i C4; el fitxer passa de 3.377 a
+          3.184 linies. Queda un efecte de mesura (banda i escala del megaslide)
+          que NO es toca: depen de les variables `--belt2-*`, que a 1440 nomes
+          existeixen en desenvolupament, i es exactament el risc que la revisio
+          marcava. Esta documentat.
+  [ ] Avaluacio final de reescriure el fitxer sencer: PENDENT (el fitxer te
+          15 errors d'eslint preexistents i 3.184 linies)
+
+Etapa C (header, per passos) — pla original
   [ ] C1. setMegaHeroRowHeight  -> model (mateixa formula que rowHeight)
   [ ] C2. setRootRemPx          -> model
   [ ] C3. setBleedGuardExpandPx -> model
