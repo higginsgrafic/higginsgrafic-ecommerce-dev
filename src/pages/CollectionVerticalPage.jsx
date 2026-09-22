@@ -15,6 +15,7 @@ import { SELLING_PRICE_LABEL } from '@/config/pricing';
 import { esTauletaApaisada } from '@/utils/layoutMetrics';
 import { laneForViewport } from '@/utils/layoutModel';
 import { tdpMidaFitxa, tdpMargeEsquerre } from '@/utils/tdpMida';
+import { LLENCOS } from '@/config/llencos';
 import {
   getCollectionVerticalConfig,
   COLLECTIONS_MENU,
@@ -595,8 +596,11 @@ function CollectionVerticalPage({ slug }) {
         bottomPadding="0px"
         style={{
           // Puja tot el contingut sota el hero 12 files de la taula (41 → 29).
-          // Alçada d'1 fila = ampladaBelt × 6708/2642/90; 12 files ≈ 0.3385 × amplada.
-          marginTop: `calc((var(--hg-tdp-xL, 0px) - var(--hg-tdp-xR, 0px)) * 0.3385${isLandscapeTablet ? ' - 30px' : ''}${isPortraitTablet ? ' - 120px' : ''} + ${pushDownPx}px${isLandscapeTablet ? ` + ${HERO_TDP_GAP_LANDSCAPE_PX}` : (isPortraitTablet ? ` + ${HERO_TDP_GAP_TABLET_PX}` : ` + ${HERO_TDP_GAP_PX}`)})`,
+          // El `0.3385` era 12 files del llenç escrit amb quatre decimals:
+          // 12 × (6708/90) / 2642 = 0.33853141559424677. Ara es deriva, perque
+          // un número que no se sap d'on surt no es pot mantenir.
+          // MOU: 0 px a 1920 i com a maxim 0,032 px a 1440 (submil·lesim).
+          marginTop: `calc((var(--hg-tdp-xL, 0px) - var(--hg-tdp-xR, 0px)) * ${12 * LLENCOS.colleccio.coef}${isLandscapeTablet ? ' - 30px' : ''}${isPortraitTablet ? ' - 120px' : ''} + ${pushDownPx}px${isLandscapeTablet ? ` + ${HERO_TDP_GAP_LANDSCAPE_PX}` : (isPortraitTablet ? ` + ${HERO_TDP_GAP_TABLET_PX}` : ` + ${HERO_TDP_GAP_PX}`)})`,
           // Desplaçament vertical NOMES de les TDP. Va amb `translate` (no
           // `transform`) perque la graella ja fa servir transform per centrar-se
           // i `translate` s'hi suma sense trepitjar-lo.
