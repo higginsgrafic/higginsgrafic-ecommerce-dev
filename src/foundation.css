@@ -51,8 +51,25 @@
   /* Marges laterals del lloc: declarats, no repartits per components. */
   --marge-lateral: var(--esp-3);
 
-  /* L'amplada màxima del contingut (el "carril" del disseny). */
-  --contingut-max: calc(var(--u) * 1350);
+  /* L'amplada del contingut (el carril del disseny): 1350 unitats sobre 1920,
+     o sigui el 70,3125 % de la finestra, amb un sostre de 1350 px.
+
+     PER QUE NO `calc(var(--u) * 1350)`: `--u` te un terra de 0,6667 perque el
+     TEXT no es faci petit, pero el carril NO en te. A 768 el carril fa 540
+     (0,4 de 1920) i `--u` val 0,6667: si el carril sortis de `--u` faria 900
+     i la pagina s'eixamplaria 360 px. Son dues escales diferents i per aixo
+     el carril es declara amb la seva propia mesura.
+
+     Aquesta es la formula que fins ara calculava `getSafeBelt()` des de
+     JavaScript, amb el seu `useReactiveBelt`, el seu `MutationObserver` i la
+     seva publicacio primerenca: una regla de tres de 1.350/1.920. */
+  --contingut-max: min(70.3125vw, 1350px);
+
+  /* El carril, expressat pels seus dos extrems. Son els noms que el lloc ja
+     fa servir a 20 llocs; es conserven perque la migracio es faci d'una en
+     una. Quan cap pagina no els llegeixi, s'esborren. */
+  --hg-tdp-xL: calc((100vw - var(--contingut-max)) / 2);
+  --hg-tdp-xR: calc((100vw + var(--contingut-max)) / 2);
 }
 
 /* ---------------------------------------------------------------------------

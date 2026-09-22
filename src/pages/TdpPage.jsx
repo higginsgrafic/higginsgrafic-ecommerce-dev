@@ -1,7 +1,6 @@
-import React, { useLayoutEffect, useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { Helmet } from 'react-helmet';
 import TdpConstructorProduct from '@/components/tdp/TdpConstructorProduct';
-import { getSafeBelt } from '@/utils/layoutMetrics';
 
 const PAUTA_ROWS = 33;
 const PAUTA_COLS = 3;
@@ -15,13 +14,10 @@ const TDP_PAGE_TOP_OFFSET = '33px';
 const TDP_PAGE_LEFT_OFFSET = '0px';
 const tdpEditableDescription = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna";
 
-if (typeof window !== 'undefined' && typeof document !== 'undefined') {
-  try {
-    const belt = getSafeBelt({ maxContent: 1350, sideMargin: 16, minContent: 320 });
-    document.documentElement.style.setProperty('--hg-tdp-xL', `${belt.left}px`);
-    document.documentElement.style.setProperty('--hg-tdp-xR', `${belt.right}px`);
-  } catch (_) {}
-}
+// El carril (`--hg-tdp-xL/xR`) el declara `src/foundation.css`. Aqui hi havia
+// una publicacio propia, feta amb `getSafeBelt()`, i un `useLayoutEffect` que a
+// mes l'esborrava en desmuntar la pagina: si es visitava una altra ruta tot
+// seguit, el carril desapareixia fins que es tornava a muntar la pauta.
 
 
 function TdpPage({ pautaEnabled = false, tableEnabled = false }) {
@@ -70,35 +66,6 @@ function TdpPage({ pautaEnabled = false, tableEnabled = false }) {
     zIndex: 4,
   };
 
-
-  useLayoutEffect(() => {
-    if (typeof window === 'undefined') return undefined;
-
-    const root = document.documentElement;
-
-    const apply = () => {
-      const belt = getSafeBelt({ maxContent: 1350, sideMargin: 16, minContent: 320 });
-      root.style.setProperty('--hg-tdp-xL', `${belt.left}px`);
-      root.style.setProperty('--hg-tdp-xR', `${belt.right}px`);
-    };
-
-    apply();
-
-    let raf = 0;
-    const schedule = () => {
-      cancelAnimationFrame(raf);
-      raf = requestAnimationFrame(apply);
-    };
-
-    window.addEventListener('resize', schedule);
-
-    return () => {
-      window.removeEventListener('resize', schedule);
-      cancelAnimationFrame(raf);
-      root.style.removeProperty('--hg-tdp-xL');
-      root.style.removeProperty('--hg-tdp-xR');
-    };
-  }, []);
 
   return (
     <main className="relative min-h-screen bg-background">

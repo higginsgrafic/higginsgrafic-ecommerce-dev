@@ -1,17 +1,23 @@
-import { useLayoutEffect, useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { DEV_LAYER_Z } from '@/components/dev/DevPortal';
-import { getSafeBelt } from '@/utils/layoutMetrics';
 
 // =============================================================================
 //  Pauta 4 columnes — overlay reutilitzable
 // =============================================================================
 //
-//  Renderitza la pauta de 4 columnes encaixada exactament dins de belt2:
-//    left  = var(--belt2-xL)   (fallback: --hg-tdp-xL → safe-belt)
-//    right = var(--belt2-xR)   (fallback: --hg-tdp-xR → safe-belt)
+//  Renderitza la pauta de 4 columnes encaixada exactament dins del carril:
+//    left  = --hg-tdp-xL
+//    right = --hg-tdp-xR
 //
-//  La graella interna (4 cols × N files) ocupa el 100% de l'amplada del belt:
+//  Aquestes dues variables NO es calculen aqui: les declara
+//  `src/foundation.css` a partir de `--contingut-max`, que es
+//  `min(70.3125vw, 1350px)`. Abans les publicava aquest fitxer amb
+//  `getSafeBelt()` i un `MutationObserver`, i el resultat era el mateix numero
+//  (1350/1920 de la finestra) amb una mica mes de codi i una mica menys de
+//  certesa.
+//
+//  La graella interna (4 cols × N files) ocupa el 100% de l'amplada del carril:
 //    cols = repeat(4, (100% - 3·gutterX) / 4)
 //    files = primera fila = firstRowScale·fr; la resta 1fr.
 //
@@ -35,63 +41,11 @@ const PAUTA4_DEFAULTS = {
   leftOffset: '0px',
 };
 
-// Inicialitza les CSS vars `--hg-tdp-xL/xR` el més aviat possible perquè
-// qualsevol consumidor (incloent aquest mateix overlay) pugui caure-hi si
-// `--belt2-xL/xR` no estan publicades.
-if (typeof window !== 'undefined' && typeof document !== 'undefined') {
-  try {
-    const belt = getSafeBelt({ maxContent: 1350, sideMargin: 16, minContent: 320 });
-    document.documentElement.style.setProperty('--hg-tdp-xL', `${belt.left}px`);
-    document.documentElement.style.setProperty('--hg-tdp-xR', `${belt.right}px`);
-  } catch {
-    // ignore: les vars es recalculen al muntar el primer overlay.
-  }
-}
-
-// Mesura reactiva del belt segur. La pauta NO depèn de cap CSS var de belt2;
-// fa la seva pròpia mesura amb getSafeBelt() i la refresca al resize.
-// Continua publicant `--hg-tdp-xL/xR` per compatibilitat amb consumidors externs.
-function useReactiveBelt() {
-  const compute = () => {
-    if (typeof window === 'undefined') return { left: 0, right: 0 };
-    return getSafeBelt({ maxContent: 1350, sideMargin: 16, minContent: 320 });
-  };
-  const [belt, setBelt] = useState(compute);
-
-  useLayoutEffect(() => {
-    if (typeof window === 'undefined') return undefined;
-    const root = document.documentElement;
-
-    const apply = () => {
-      const next = getSafeBelt({ maxContent: 1350, sideMargin: 16, minContent: 320 });
-      setBelt((prev) => {
-        if (prev.left === next.left && prev.right === next.right) return prev;
-        root.style.setProperty('--hg-tdp-xL', `${next.left}px`);
-        root.style.setProperty('--hg-tdp-xR', `${next.right}px`);
-        return next;
-      });
-    };
-
-    apply();
-    let raf = 0;
-    const schedule = () => {
-      cancelAnimationFrame(raf);
-      raf = requestAnimationFrame(apply);
-    };
-    window.addEventListener('resize', schedule);
-
-    const mo = new MutationObserver(schedule);
-    mo.observe(root, { attributes: true, attributeFilter: ['style'] });
-
-    return () => {
-      window.removeEventListener('resize', schedule);
-      cancelAnimationFrame(raf);
-      mo.disconnect();
-    };
-  }, []);
-
-  return belt;
-}
+// El carril ja no es mesura des d'aquí. Es declara a `src/foundation.css`:
+//   --contingut-max: min(70.3125vw, 1350px)
+//   --hg-tdp-xL: calc((100vw - var(--contingut-max)) / 2)
+//   --hg-tdp-xR: calc((100vw + var(--contingut-max)) / 2)
+// Aquest fitxer només les llegeix, i per tant no cal cap efecte ni cap estat.
 
 /**
  * Pauta 4 columnes — encaix exacte dins belt2.
@@ -128,9 +82,10 @@ export default function Pauta4ColsOverlay({
   children,
   innerRef, // Ref per exposar el contenidor del grid
 }) {
-  const belt = useReactiveBelt();
-
-  // 3 gutters entre 4 cols. Si numCols canvia, recalculem.
+  // Belt L/R: les variables declarades a `foundation.css`. Abans eren una
+  // mesura feta des de JavaScript; ara són dues expressions del full d'estils.
+  const beltLeft = 'var(--hg-tdp-xL)';
+  const beltWidth = 'var(--contingut-max)';
   const gutterCount = numCols - 1;
   const totalGutterCalc = `calc(${gutterCount} * ${gutterX})`;
   const columnsTemplate = `repeat(${numCols}, minmax(0, calc((100% - ${totalGutterCalc}) / ${numCols})))`;
@@ -152,11 +107,6 @@ export default function Pauta4ColsOverlay({
       col: (index % numCols) + 1,
     }));
   }, [numCols, numRows, tableEnabled]);
-
-  // Belt L/R: mesura pròpia (independent de belt2). Belt2 segueix existint com a
-  // overlay de debug, però no influeix en aquesta pauta.
-  const beltLeft = `${belt.left}px`;
-  const beltWidth = `${Math.max(0, belt.right - belt.left)}px`;
 
   // Posicionament:
   //   - overlay  → ancorat al viewport (fixed + left/width), independent del
