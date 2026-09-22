@@ -23,24 +23,37 @@
 export const TDP_GUTTER_X = 22.5;
 
 /**
- * Quantes columnes de fitxes hi ha segons el dispositiu.
- * @param {boolean} esTauleta
+ * Quantes fitxes per fila, segons l'AMPLE de la finestra.
+ *
+ * Es una regla d'AMPLE i prou: no depen del tipus de dispositiu. Aixo evita
+ * que la mateixa amplada doni una distribucio diferent segons com es classifica
+ * el dispositiu, que es el que passava abans.
+ *
+ *   1920, 1440 -> 4
+ *   1280, 1024 -> 3   (1024 es la tauleta apaïsada)
+ *          768 -> 2   (la tauleta que controlem, vertical)
  */
-export function tdpColumnes(esTauleta) {
-  return esTauleta ? 3 : 4;
+export function tdpColumnes(ampleFinestra) {
+  if (ampleFinestra > 1366) return 4;
+  if (ampleFinestra >= 1024) return 3;
+  return 2;
 }
 
 /**
  * La mida d'una fitxa.
  *
- * @param {number} carrilAmple  amplada del carril, en px
- * @param {boolean} esTauleta
+ * @param {number} carrilAmple     amplada del carril, en px
+ * @param {number} ampleFinestra   amplada de la finestra, en px
+ * @param {number} alcadaFinestra  alcada de la finestra, en px
  * @returns {{amplada: number, alcada: number, columnes: number, gutter: number, pas: number}}
  */
-export function tdpMidaFitxa(carrilAmple, esTauleta) {
-  const columnes = tdpColumnes(esTauleta);
+export function tdpMidaFitxa(carrilAmple, ampleFinestra, alcadaFinestra = 0) {
+  const columnes = tdpColumnes(ampleFinestra);
   const amplada = Math.round((carrilAmple - (columnes - 1) * TDP_GUTTER_X) / columnes);
-  const alcada = Math.round(carrilAmple * (esTauleta ? 0.4446 : 0.308));
+  // L'alcada es proporcional a l'AMPLADA de la fitxa (5:4), que es com es veu
+  // igual a totes les amplades. Abans es calculava del carril, i per aixo la
+  // proporcio canviava entre mides.
+  const alcada = Math.round(amplada * 1.25);
   return {
     amplada,
     alcada,
