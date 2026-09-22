@@ -29,6 +29,7 @@ import {
   TDP_SEPARACIO_FONS_PX,
   TDP_FONS_BLEED_PX,
   TDP_POSTER_SEPARACIO_PX,
+  TDP_PEUSEPARACIO_PX,
 } from '@/config/collectionVertical';
 import { readOverlayState, writeOverlayState } from '@/utils/collectionOverlayState';
 
@@ -162,6 +163,17 @@ function CollectionVerticalPage({ slug }) {
   // l'alcada del bloc com la posicio del poster dins seu depenen de l'amplada
   // del carril. Es calcula a partir de la posicio REAL del poster.
   const [margeTramFinal, setMargeTramFinal] = useState(0);
+  // Marge del peu (es corregeix iterativament; vegeu mes avall).
+  const [margePeu, setMargePeu] = useState(null);
+  // Es publica com a variable CSS perque el peu el pinta `App.jsx`.
+  useEffect(() => {
+    if (margePeu == null) return;
+    document.documentElement.style.setProperty('--hg-marge-peu', `${margePeu}px`);
+  }, [margePeu]);
+  // L'exces que el contingut del bloc final desborda de la seva caixa. La
+  // graella del bloc te `aspect-ratio` fix i el contingut (poster + rail
+  // estatic) no hi cap: la caixa no el conte i el peu queda mes avall del
+  // compte. Amb aquest numero s'allarga el `section` perque el peu quedi on toca.
 
 
 
@@ -249,6 +261,51 @@ function CollectionVerticalPage({ slug }) {
             .map((c) => c.getBoundingClientRect().bottom))
           : tdp0.getBoundingClientRect().bottom;
         const posterRelatiu = posterTop - tramTop;
+        // L'exces que desborda el contingut del bloc final (i del seu
+        // contenidor): el peu ha de quedar DESPRES del contingut, no de la
+        // caixa, que es mes curta.
+        const railEl = tram.querySelector('[data-component="tambe-rail"]');
+        const seccio = tram.parentElement;
+        if (railEl && seccio) {
+          // On acaba REALMENT el contingut de la pagina (el rail pot desbordar
+          // la seva caixa, que te `aspect-ratio` fix).
+          // El rail conte tambe la banda grisa i el titol: el que ha de quedar
+          // a la distancia del marge lateral son les TARGETES.
+          const targetes = [...railEl.querySelectorAll('a')]
+            .filter((a) => a.getBoundingClientRect().width > 50);
+          const targetesBottom = targetes.length
+            ? Math.max(...targetes.map((a) => a.getBoundingClientRect().bottom))
+            : railEl.getBoundingClientRect().bottom;
+          const contingutBottom = Math.max(
+            tram.getBoundingClientRect().bottom,
+            targetesBottom,
+          );
+          // La graella del bloc final te `aspect-ratio` fix i no conte el
+          // contingut (que en surt, i el `main` el retalla). Li fixem una alcada
+          // que correspongui a les files que ocupa el contingut, aixi el bloc
+          // acaba on acaba el contingut i el peu queda a la distancia volguda.
+          // Files de la graella del bloc que ocupen el poster i el rail, i una
+          // mes de coixi perque el contingut no quedi just al caire.
+          // El peu queda despres del `main`, i l'alcada del `main` no conte els
+          // fills absoluts del bloc final. El marge del peu es calcula des del
+          // FINAL DEL `MAIN` (que no depen del marge, i per tant no oscil·la):
+          // aixi el peu queda a la distancia volguda de les targetes.
+          // El peu depen del seu propi marge (el `main` l'absorbeix), aixi que
+          // no es pot calcular d'una sola passada: es corregeix el que hi ha
+          // fins que queda al lloc. Dues o tres passades en tenen prou i, com
+          // que l'estat nomes canvia si el numero canvia, no pot entrar en bucle.
+          const peu = document.querySelector('footer');
+          const embolcallPeu = peu ? peu.parentElement : null;
+          if (embolcallPeu) {
+            const margeActual = parseFloat(getComputedStyle(embolcallPeu).marginTop) || 0;
+            const topActual = embolcallPeu.getBoundingClientRect().top;
+            const objectiu = targetesBottom + TDP_PEUSEPARACIO_PX;
+            const desajust = Math.round(objectiu - topActual);
+            if (Math.abs(desajust) > 1) {
+              setMargePeu((prev) => (prev === margeActual + desajust ? prev : Math.round(margeActual + desajust)));
+            }
+          }
+        }
         const cal = Math.round(ultimaFitxaBottom + TDP_POSTER_SEPARACIO_PX - posterRelatiu - tramNatural);
         setMargeTramFinal((prev) => (prev === cal ? prev : cal));
       }

@@ -15,6 +15,7 @@ import OffersHeader from '@/components/OffersHeader';
 import AdminBanner from '@/components/AdminBanner';
 import ScrollToTop from '@/components/ScrollToTop';
 import Footer from '@/components/Footer';
+import { COLLECTIONS_MENU } from '@/config/collectionVertical';
 import SiteFrame from '@/components/layout/SiteFrame.jsx';
 import useComponentCatalogConfig from '@/hooks/useComponentCatalogConfig';
 import AppRoutes from '@/routes/AppRoutes';
@@ -110,6 +111,9 @@ function App() {
     safeProductContext;
 
   const isHomeRoute = location.pathname === '/';
+  // Fulles de colleccio: son les que tenen el bloc final amb el rail estatic, i
+  // on el peu s'ha de posar a la distancia del marge lateral.
+  const isCollectionRoute = COLLECTIONS_MENU.some((c) => c.href === location.pathname || location.pathname.startsWith(`${c.href}/`));
   const isPreview = location.pathname === '/ec-preview' || location.pathname === '/ec-preview-lite';
   const isDemoStyleLayoutRoute = (isFullWideSlideDemoRoute || isFullWideSlideRoute);
   const isDevDemoRoute = isFullWideSlideDemoRoute || isFullWideSlideRoute;
@@ -335,7 +339,14 @@ function App() {
             null
           ) : (
             !isDevLayoutRoute && (
-              <div style={isHomeRoute ? { marginTop: '-832px', position: 'relative', zIndex: 50 } : (isPortraitTablet ? { marginTop: '236px' } : (isLandscapeTablet ? { marginTop: '120px' } : undefined))}>
+              <div style={isHomeRoute
+                ? { marginTop: '-832px', position: 'relative', zIndex: 50 }
+                : (isCollectionRoute
+                  // A les fulles de colleccio el contingut acaba amb el rail i la
+                  // pagina publica `--hg-marge-peu` (la distancia que falta perque
+                  // el peu quedi a la mateixa distancia que el marge lateral).
+                  ? { marginTop: 'var(--hg-marge-peu, 24px)' }
+                  : (isPortraitTablet ? { marginTop: '236px' } : (isLandscapeTablet ? { marginTop: '120px' } : undefined)))}>
                 <Footer />
               </div>
             )
