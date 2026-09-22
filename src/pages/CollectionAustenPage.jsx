@@ -200,14 +200,33 @@ function CollectionAustenPage() {
   const [carrilAmple] = useState(() => laneForViewport());
   const rowHeight = Math.max(1, carrilAmple * 0.0280625 - 2.875);
 
-  // La franja blanca ha de tocar el separador del header sense quedar-s'hi a
-  // sota. Com que la hero no comenca exactament al separador, mesurem on acaba
-  // el header i on comenca la hero, i hi posem la franja just al mig.
+  // La franja blanca ha de tocar el separador del header. Abans es mesurava
+  // cada mida (header.bottom - hero.top, alçada de la franja...) amb un
+  // `setTimeout` de 300 ms, i els números arribaven DESPRES del pintat: la
+  // franja saltava de lloc al muntar.
+  //
+  // Ara només es publica la posicio de la hero i la de la capçalera
+  // (`--hg-hero-top` i `--hg-header-bottom`, al mateix `useLayoutEffect`, o
+  // sigui ABANS del pintat). Amb aquests dos números, les tres mides són
+  // `calc()` i les tres són exactes:
+  //
+  //   franja de dalt (pantalla) = --hg-header-bottom   (just al separador)
+  //   franja de baix (pantalla) = fons de la finestra
+  //   icones (pantalla)         = franja de dalt + un terç de l'alçada
+  //
+  // Les icones van DINS de la franja blanca (a la seva vora superior), per
+  // sobre del títol de la col·lecció: es la posicio que ja tenien pensada i
+  // que el titol tambe fa servir.
+  //
+  // Com que les franges viuen dins del contenidor de la hero, a cada expressio
+  // s'hi resta la posicio de la hero. Les dues mesures son inevitables (la
+  // posicio de la hero depen de la fila de la graella, i la de la capçalera
+  // del nombre de files d'ofertes), pero es fan ABANS del pintat: no hi ha cap
+  // segon estat i res no es mou.
   const heroRef = useRef(null);
-  const bandRef = useRef(null);
-  const [heroBandTopPx, setHeroBandTopPx] = useState(0);
-  const [heroIconsTopPx, setHeroIconsTopPx] = useState(null);
-  const [heroBottomBandTopPx, setHeroBottomBandTopPx] = useState(null);
+  const heroBandTop = 'calc(var(--hg-header-bottom, 163px) - var(--hg-hero-top, 107px))';
+  const heroBottomBandTop = `calc(100vh - ${BAND_HEIGHT} - var(--hg-hero-top, 107px))`;
+  const heroIconsTop = 'calc(var(--hg-header-bottom, 163px) - var(--hg-hero-top, 107px))';
   // Quan la imatge (alcada de finestra) sobrepassa l'espai que la graella li
   // reserva, baixem el contingut el mateix tros perque no se solapi.
   const [pushDownPx, setPushDownPx] = useState(0);
@@ -281,18 +300,16 @@ function CollectionAustenPage() {
     const mesura = () => {
       const hero = heroRef.current;
       if (!hero) return;
+      // Publica la posicio de la hero i la de la capçalera ABANS del pintat.
+      // La franja de dalt, la de baix i les icones en pengen amb `calc()`
+      // (vegeu més amunt).
+      const heroTop = Math.round(hero.getBoundingClientRect().top);
+      document.documentElement.style.setProperty('--hg-hero-top', `${heroTop}px`);
       const cap = document.querySelector('header');
-      const headerBottom = cap ? cap.getBoundingClientRect().bottom : 0;
-      const heroTop = hero.getBoundingClientRect().top;
-      setHeroBandTopPx(Math.max(0, Math.round(headerBottom - heroTop)));
-      // Les icones es queden a la MATEIXA posicio de pantalla que tenien
-      // (centrades on era la franja blanca de sota), encara que la imatge
-      // torni a omplir tota l'alcada.
-      const band = bandRef.current;
-      const bandH = band ? band.getBoundingClientRect().height : 0;
-      setHeroIconsTopPx(Math.round(window.innerHeight - bandH / 2 - heroTop));
-      // Franja blanca de baix, on abans hi havia el retall.
-      setHeroBottomBandTopPx(Math.round(window.innerHeight - bandH - heroTop));
+      if (cap) {
+        const headerBottom = Math.round(cap.getBoundingClientRect().bottom);
+        document.documentElement.style.setProperty('--hg-header-bottom', `${headerBottom}px`);
+      }
       // La imatge acaba exactament on acaba la franja blanca de baix.
       // Baixem el contingut el que calgui perque la primera targeta quedi
       // SEMPRE per sota de la imatge. Ho calculem sobre la posicio "base"
@@ -409,13 +426,12 @@ function CollectionAustenPage() {
           <div
             aria-hidden="true"
             data-hero-band="1"
-            ref={bandRef}
             style={{
               position: 'absolute',
               left: 0,
               right: 0,
-              // Just sota el separador del header (mesurat).
-              top: `${heroBandTopPx}px`,
+              // Just sota el separador del header (calculat, vegeu més amunt).
+              top: heroBandTop,
               height: BAND_HEIGHT,
               background: 'rgba(255, 255, 255, 0.5)',
               pointerEvents: 'none',
@@ -427,7 +443,7 @@ function CollectionAustenPage() {
             aria-label="Títol col·lecció"
             style={{
               position: 'absolute',
-              top: `${heroBandTopPx}px`,
+              top: heroBandTop,
               left: 0,
               right: 0,
               height: BAND_HEIGHT,
@@ -482,23 +498,22 @@ function CollectionAustenPage() {
               position: 'absolute',
               left: 0,
               right: 0,
-              top: heroBottomBandTopPx != null ? `${heroBottomBandTopPx}px` : `calc(100vh - ${BAND_HEIGHT} - 62px)`,
+              top: heroBottomBandTop,
               height: BAND_HEIGHT,
               background: 'rgba(255, 255, 255, 0.8)',
               pointerEvents: 'none',
             }}
           />
 
-          {/* Icones de colleccio: FORA de la imatge, a la part blanca de sota */}
+          {/* Icones de colleccio: dins de la franja blanca de dalt, a la seva
+              vora superior. La capsa NO es desplaça: el seu `top` ja és on ha
+              de començar la filera, aixi que el centre visual hi queda sol. */}
           <div
             style={{
               position: 'absolute',
-              // Mateixa posicio de pantalla que abans (centrades on era la
-              // franja blanca de sota).
-              top: heroIconsTopPx != null ? `${heroIconsTopPx}px` : `calc(100vh - (${BAND_HEIGHT}) / 2)`,
+              top: heroIconsTop,
               left: 0,
               right: 0,
-              transform: 'translateY(-50%)',
               display: 'flex',
               // Alineades PEL TOP: la icona mes alta marca la linia de dalt.
               alignItems: 'flex-start',
