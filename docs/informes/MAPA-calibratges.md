@@ -44,6 +44,9 @@ El coeficient del megaslide és **el mateix número que jo havia mesurat com a
 «pintat» al llenç de 90 files**. No és coincidència que embarollés: els dos
 llenços fan 74,5 unitats per fila i jo estava comparant coses diferents. Vegeu §4.
 
+> Aquests paràmetres ja tenen un lloc amb nom i proves:
+> **`src/config/llencos.js`** i **`tests/unit/llencos.test.js`**. Vegeu §6.
+
 ---
 
 ## 2. El mapa
@@ -63,25 +66,30 @@ llenços fan 74,5 unitats per fila i jo estava comparant coses diferents. Vegeu 
 | `TdpVariantsGallery:48`, `Home.jsx` (×4) | `× 0.84632` | **30 files** del llenç | CLAR |
 | `TdpVariantsGallery:48`, `Home.jsx` (×4) | `− 231px` | **?** — no és cap fila (6,07 files a 1920, 11,37 a 1024) | **PENDENT** |
 | `ProductDetailTemplate:151`, `ConstructorPdpPreview:210` | `× 5217/2642/70` | una fila d'un **altre** llenç (5217) | CLAR |
-| `CollectionVerticalPage:83`, `FullWideSlideHeader:201` | `carril × 0.0280625 − 2.875` | una fila del llenç **1780/24**, menys el gap | **CLAR** |
+| `CollectionVerticalPage:83`, `FullWideSlideHeader:201` | `carril × 0.0280625 − 2.875` | una fila del llenç 1780/24, menys un ajust | **HIPÒTESI** (el gap és plausible, no provat) |
 | `layoutMetrics:137` | `MEGASLIDE_REFERENCIA_PX = 1350` | l'amplada del carril a 1920 | CLAR |
 
-**El `− 2,875` no és un calibratge: és el gap.** Amb 24 files hi ha 23 gaps de
-3 px, i `(24−1) × 3 / 24 = 2,875` és el que cal descomptar de cada fila perquè el
-gap no infli l'alçada. **La fórmula és correcta i es pot escriure com el que és**
-(era `PENDENT` en la primera versió d'aquest mapa).
+**El coeficient de fila, per llenç** (mesurat al navegador a 1920, carril 1350):
 
-**Els tres coeficients germans de la fila** (el pou de debò): el llenç de 90
-files dona `0,028211`, el codi n'escriu `0,0282194`, i el navegador **pinta**
-`0,028072`. Tres xifres, totes tres diferents, totes tres «la fila». Per això
-aquests coeficients s'han de derivar del llenç i no escriure's: **cap de les tres
-escriptures és la bona del tot**, i la que governa el que veus és la tercera.
+| llenç | files | coef teòric | coef pintat | coincideixen |
+|---|---|---|---|---|
+| 1780 | 24 | 0,028072 | **0,028072** | **sí** |
+| 3950 | 53 | 0,028209 | **0,028209** | **sí** |
+
+O sigui que, a l'inici, **el llenç explica exactament el que es veu**. Això és la
+bona notícia: el llenç no és una hipòtesi meva, és el que governa la pàgina. El
+que **no** està provat és que el llenç de 90 files governi la col·lecció de la
+mateixa manera: allà la mesura dona `0,028072`, que és el coeficient del llenç de
+**24**, no el de 90. **Aquesta comparació queda pendent** (vegeu §4).
 
 ### 2.2 El megaslide té el SEU llenç: 2642 × 1780 (24 files)
 
 El megaslide no comparteix el llenç de les col·leccions. El seu és **2642 × 1780**,
-o sigui **24 files de 74,17 unitats** amb gap de 3 px, i la prova és la fórmula
-de la fila del hero del header:
+o sigui **24 files de 74,17 unitats** amb gap de 3 px.
+
+**El que està comprovat (mesurat al navegador):** la graella de 24 files de
+l'inici pinta files de **37,8971 px** amb carril de 1350, o sigui un coeficient
+de **0,028072**, i la divisió del llenç prediu **0,028072**. **Coincideix.**
 
 ```js
 // FullWideSlideHeader.jsx:201
@@ -90,15 +98,20 @@ megaHeroRowHeight = carrilAmple * 0.0280625 - 2.875
 //        1780 / 2642 / 24 = 0.02807217        (24-1) * 3 / 24 = 2.875
 ```
 
-**Comprovat**: a 1920 dona `1350 × 0,0280625 − 2,875 = 35,009`, i la fila que el
-navegador pinta és **37,897**. El coeficient escrit (`0,0280625`) té una
-desviació de **0,013 px** respecte del derivat exacte: és la mateixa mena de
-deriva que el `0,3385`.
+**El que NO està comprovat:** que el `− 2,875` sigui la correcció del gap.
+`(24−1) × 3 / 24 = 2,875` és aritmètica correcta i el número és idèntic, però
+**dues expressions que donen el mateix número no proven que una expliqui
+l'altra.** Aquesta associació és una **hipòtesi**, i queda marcada com a tal. El
+que sí que és cert és que el valor escrit (`0,0280625`) es desvia **0,013 px**
+del derivat (`0,02807217`).
 
-I el **`− 2,875` no és un calibratge: és la correcció del gap.** Amb 24 files hi
-ha 23 gaps de 3 px, i `23 × 3 / 24 = 2,875` és el que cal descomptar de cada fila
-perquè el gap no es mengi l'alçada. **Això vol dir que la fórmula és correcta i
-no un pedaç**, i que es pot escriure com el que és.
+> **Correcció del 23/09/2026.** En una versió anterior d'aquest mapa hi deia que
+> `0,028072` era «el coeficient que el navegador pinta al llenç de 90 files», i
+> que les tres xifres de §2.1 eren «germanes». **Les dues coses són falses:**
+> 0,028072 és el coeficient del llenç de **24 files**, i les tres xifres eren de
+> **llenços diferents**. El llenç de 53 files pinta **0,028209**, que sí que és
+> el seu valor teòric. La conclusió de fons —els coeficients s'han de derivar—
+> no canvia, però l'argument amb què la vaig defensar era incorrecte.
 
 ### 2.3 Altres llenços i referències del megaslide
 
@@ -207,7 +220,6 @@ la resposta del subagent del 23/09/2026; aquí només hi ha el recompte i el que
 cal per decidir. **No s'ha incorporat fila a fila a propòsit**: 135 files
 «NO DEDUÏBLE» són un pou que no s'ha d'arrossegar com a document, sinó que cal
 anar buidant quan es toqui cada peça.
-
 ### 5.1 incoherències entre el comentari i el codi
 
 Val la pena tenir-les juntes, perquè totes cinc són el mateix símptoma: algú va
@@ -223,13 +235,71 @@ canviar el número i no el comentari (o al revés).
 
 ---
 
-## 6. Ordre de treball proposat
+## 6. El llenç declarat (passa 1 feta)
 
-1. **Aquest mapa** (fet).
-2. **Declarar els paràmetres del llenç en un sol lloc**, amb nom, i fer que les
-   fórmules els llegeixin. Zero canvi de píxel; es verifica amb el comparador.
+Els paràmetres del llenç ja tenen un lloc on viure: **`src/config/llencos.js`**,
+amb les seves proves a **`tests/unit/llencos.test.js`** (12 proves).
+
+Aquesta primera passa **no mou cap píxel**: el mòdul no substitueix cap número
+del codi, només els dona nom i valor derivat, i deixa els valors escrits al
+costat per poder-los comparar. Cada substitució es farà després, d'una en una,
+mesurant que no mogui res.
+
+### El que el llenç explica, mesurat
+
+A 1920 amb carril de 1350, les tres graelles del lloc:
+
+| graella | llenç | files | coef teòric | coef **pintat** | |
+|---|---|---|---|---|---|
+| hero de l'inici | 2642 × 1780 | 24 | 0,028072 | **0,028072** | ✓ |
+| graella de fitxes de l'inici | 2642 × 3950 | 53 | 0,028209 | **0,028209** | ✓ |
+| pauta de la col·lecció | 2642 × 6708 | 90 | 0,028211 | **0,028211** | ✓ |
+
+**El llenç governa les tres graelles de manera exacta.** No és una hipòtesi: és
+la divisió `alçada / files / 2642` comparada amb el que el navegador pinta, i
+coincideix fins al sisè decimal a les tres.
+
+I a la col·lecció, la fila de 90 files pinta **38,085 px** mentre la de 24 en
+pinta **37,897**: la diferència no és un calibratge, és que el llenç de la
+col·lecció és més alt.
+
+### Una confusió que val la pena deixar escrita
+
+A `/cube` hi ha **dues graelles** (la del hero i la de la col·lecció). Quan vaig
+mesurar-ne una de sola vaig agafar la del hero i vaig concloure que la fila de la
+col·lecció feia `0,028072`. **Era la del hero.** La de la col·lecció fa
+`0,028211`, que és el seu valor teòric.
+
+És la tercera vegada en dos dies que una mesura meva ha resultat ser d'una altra
+cosa. El patró és sempre el mateix: **un selector que sembla únic i no ho és.**
+Per això quan es mesura una geometria cal dir *quina* peça és, no només on és.
+
+---
+
+## 7. Ordre de treball proposat
+
+1. **Aquest mapa** — fet.
+2. **Declarar els paràmetres del llenç en un sol lloc** — fet a mitges: el mòdul
+   existeix (`src/config/llencos.js`) i té proves, però **cap component el fa
+   servir encara**. El que falta és **substituir els números escrits pels
+   derivats, d'un en un, mesurant que no es mogui cap píxel.**
 3. **Mesurar els PENDENT** que queden: el `− 231`, el `430px` de la hero, el
    `752px` de la graella d'inici, i els 135 del megaslide.
 4. **Separar `--escala` de `--escala-text`** a `foundation.css`, que és el que
    fa possible que la geometria escali sense arrossegar el text.
 5. **Migrar l'inici**, amb la hero, i després una col·lecció.
+
+### La regla per a la passa 2 (substitucions)
+
+Cada substitució es fa així, i si no es pot fer així **no es fa**:
+
+1. Es canvia **un** número d'**un** lloc.
+2. Es mesura la peça afectada a les cinc mides, abans i després.
+3. Si cap número no es mou, se segueix. Si es mou, **s'atura i s'explica per
+   què**, no s'ajusta el número nou perquè quadri.
+
+I el punt més important: **no es canvien els valors aproximats pels exactes en
+aquesta passa.** El `0,3385` es queda `0,3385` fins que hi hagi una decisió
+explícita, perquè passar-lo a `0,338531` mou 1,7 px a 1440 i això és un canvi de
+disseny, no una nomenclatura. Barrejar les dues coses és com es perd el rastre
+de què ha mogut què.
