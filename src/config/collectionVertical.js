@@ -124,6 +124,11 @@ export const TDP_FONS_BLEED_PX = 30;
  */
 export const TDP_POSTER_SEPARACIO_PX = 200;
 
+/**
+ * Aire entre les targetes del rail i el peu de pagina.
+ */
+export const TDP_PEUSEPARACIO_PX = 24;
+
 export const HERO_TDP_GAP_TABLET_PX = '338px';
 export const HERO_TDP_GAP_LANDSCAPE_PX = '-240px';
 
