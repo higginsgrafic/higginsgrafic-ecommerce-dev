@@ -274,6 +274,45 @@ marge del TramFinal.
 
 ---
 
+### A4 — `zeroLeftOffsetPx` (ronda 14)
+
+**Que fa.** Alinea el breadcrumb amb el `left` del logo GRAFC. El breadcrumb viu
+dins la cel·la de la graella, i el seu contenidor comença mes a l'esquerra que el
+logo: la diferencia es l'offset. Els valors reals, mesurats:
+
+| amplada | `logoLeft − gridLeft` | offset aplicat |
+|---|---|---|
+| 768 | −66,5 | **0** (el clamp guanya) |
+| 1024 | −88,5 | **0** |
+| 1280 | −9,1 | **0** |
+| 1440 | 38 | **38** |
+| 1920 | 47,5 | **47,5** |
+
+I amb l'offset aplicat, el breadcrumb cau exactament al `left` del logo
+(1440: 244 → 244; 1920: 325 → 325). **No era codi mort**, com hauria semblat
+mesurant nomes tauleta.
+
+**Que ha canviat.** Es queda mesurat (depen de la posicio real del logotip dins la
+capcalera), pero:
+
+- passa a `useLayoutEffect` (**abans del pintat** quan els elements hi son);
+- **desapareix el bucle de `requestAnimationFrame`** que reintentava
+  indefinidament mentre el logo o la graella no existissin. El substitueix un
+  `MutationObserver` sobre `document.body` que mesura **quan apareix la graella**
+  i es desconnecta tot seguit. El `scroll` deixa d'escoltar-se; el `resize` es
+  queda.
+
+**Per que cal esperar.** El logo i la graella arriben amb el chunk de la
+capcalera, cap a 1,1 s despres del `load`: no existeixen al primer pintat. Es per
+aixo que la mesura no pot ser un unic intent.
+
+**Verificacio**: comparat amb el commit d'A3 a 768/1024/1280/1440/1920 px i a les
+cinc colleccions, l'offset aplicat, el `left` del breadcrumb, la hero i la TDP
+son **identiques** (25 de 25 combinacions). Traces amb timestamps: cap canvi
+d'estat. `vitest` (462), `compara-vistes` i `vite build`, verds.
+
+---
+
 ### Estat de la verificacio (ronda 10)
 
 Traces fetes amb 20-24 mostres cada 120 ms a 768 px. **Un sol estat vol dir que
@@ -430,7 +469,7 @@ Etapa A (cua ampliada)
   [x] A2. heroBandTopPx / heroIconsTopPx / heroBottomBandTopPx -> calc()
                                                                   (fb9b8a4, 4f82371)
   [x] A3. pushDownPx / posterExtraPx -> calcul sobre nombre de files
-  [ ] A4. zeroLeftOffsetPx -> useLayoutEffect
+  [x] A4. zeroLeftOffsetPx -> useLayoutEffect abans del pintat
   (El punt 3 del pla, "passar el header al model", passa a ser
    l'inici de l'Etapa C, no de l'A.)
 

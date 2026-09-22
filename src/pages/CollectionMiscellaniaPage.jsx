@@ -231,47 +231,44 @@ function CollectionMiscellaniaPage() {
     }
   }, [overlayState]);
 
-  // Alinea el "00" amb el left del logo GRAFC del header.
-  useEffect(() => {
+  // Alinea el breadcrumb amb el left del logo GRAFC del header: el seu
+  // contenidor (la graella) comença mes a l'esquerra, i aquesta diferencia es
+  // l'offset. A tauleta el clamp la deixa a 0; a escriptori val 38 / 47,5 px.
+  //
+  // El logo i la graella arriben amb el chunk de la capcalera, mes tard que el
+  // primer pintat, aixi que no n'hi ha prou de mesurar un cop: un
+  // MutationObserver espera que aparegui la graella (abans hi havia un bucle de
+  // requestAnimationFrame que reintentava indefinidament). Quan apareix es
+  // mesura, i el resize cobreix els canvis d'amplada.
+  useLayoutEffect(() => {
     if (typeof window === 'undefined') return undefined;
-    let raf = 0;
-    let cancelled = false;
-    const measure = () => {
-      if (cancelled) return;
-      setIsLandscapeTablet(esTauletaApaisada());
-      setIsPortraitTablet(
-        window.innerWidth >= 768
-          && window.innerWidth <= 1024
-          && window.innerHeight > window.innerWidth
-      );
+    let observer = null;
+    const mesura = () => {
       const logo = document.querySelector('[data-brand-logo="1"]')
         || document.getElementById('stripe-guide-header-logo-anchor');
       const grid = document.querySelector('[data-pauta-grid]');
-      if (!logo || !grid) {
-        raf = requestAnimationFrame(measure);
-        return;
-      }
-      const logoRect = logo.getBoundingClientRect();
-      const gridRect = grid.getBoundingClientRect();
-      const offset = Math.max(0, logoRect.left - gridRect.left);
+      if (!logo || !grid) return false;
+      const offset = Math.max(0, logo.getBoundingClientRect().left - grid.getBoundingClientRect().left);
       setZeroLeftOffsetPx((prev) => (Math.abs(prev - offset) < 0.5 ? prev : offset));
-
-      // L'alcada de fila es calcula (vegeu `rowHeight`), no es mesura.
+      return true;
     };
-    measure();
-    const onResize = () => {
-      cancelAnimationFrame(raf);
-      raf = requestAnimationFrame(measure);
-    };
+    if (!mesura()) {
+      observer = new MutationObserver(() => {
+        if (mesura()) {
+          observer.disconnect();
+          observer = null;
+        }
+      });
+      observer.observe(document.body, { childList: true, subtree: true });
+    }
+    const onResize = () => { mesura(); };
     window.addEventListener('resize', onResize);
-    window.addEventListener('scroll', onResize, { passive: true });
     return () => {
-      cancelled = true;
-      cancelAnimationFrame(raf);
+      if (observer) observer.disconnect();
       window.removeEventListener('resize', onResize);
-      window.removeEventListener('scroll', onResize);
     };
   }, []);
+
 
   useLayoutEffect(() => {
     const mesura = () => {
