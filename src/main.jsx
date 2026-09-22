@@ -83,6 +83,9 @@ import { TooltipProvider } from '@/components/ui/tooltip';
 import App from '@/App';
 import BranchBadge from '@/components/dev/BranchBadge';
 import '@/index.css';
+// La fonamenta nova (la unitat unica i l'escala d'espaiat). Es additiva: no
+// toca cap regla del lloc actual.
+import '@/foundation.css';
 import { onLCP, onCLS, onINP, onFCP, onTTFB } from 'web-vitals';
 if (import.meta.env.DEV) {
   import('@/debug.css');
