@@ -136,7 +136,11 @@ function CollectionVerticalPage({ slug }) {
   // La mida de la fitxa surt de `tdpMidaFitxa`, que es l'UNICA font de veritat
   // i que tambe fa servir la pagina d'inici. Aixi les dues no es poden
   // desincronitzar.
-  const midaTdp = tdpMidaFitxa(carrilAmple, esTauleta);
+  const midaTdp = tdpMidaFitxa(
+    carrilAmple,
+    typeof window !== 'undefined' ? window.innerWidth : carrilAmple,
+    typeof window !== 'undefined' ? window.innerHeight : 0,
+  );
   const alcadaFitxa = midaTdp.alcada;
   const ampladaFitxa = midaTdp.amplada;
   const numColumnes = midaTdp.columnes;
@@ -604,7 +608,10 @@ function CollectionVerticalPage({ slug }) {
       >
         {/* El fons de la pagina es BLANC: el degradat va a cada fitxa. */}
         {Array.from({ length: filesDeFitxes }).flatMap((_, rowIdx) =>
-          ((isPortraitTablet || isLandscapeTablet) ? [0, 1, 2] : [0, 1, 2, 3]).map((colIdx) => {
+          // Les columnes surten de la MATEIXA font que la mida de la fitxa
+          // (2 a 768, 3 a 1024/1280, 4 a 1440/1920). Abans estaven escrites a
+          // ma i no coincidien amb la distribucio de la pagina d'inici.
+          Array.from({ length: midaTdp.columnes }, (_, i) => i).map((colIdx) => {
             const idx = rowIdx * 4 + colIdx;
             // Sense files incompletes: quan els productes s'acaben, la graella
             // continua repetint-los des del principi (index ciclic). La mida de
