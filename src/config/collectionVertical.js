@@ -73,6 +73,16 @@ export const TDP_MOVE_PX = 0;
  * per donar la mateixa distancia.
  */
 export const HERO_TDP_GAP_PX = '-41px';
+
+/**
+ * Aire entre el fons de la hero i la primera fila de fitxes.
+ *
+ * El numero efectiu surt d'aqui: el desplaçament de la graella es calcula
+ * exactament per deixar aquesta distancia. Amb 24 px les fitxes quedaven
+ * enganxades a la imatge en tauleta; amb 60 tenen aire i a escriptori tambe
+ * (a 1024x1366 la separacio era la MATEIXA de justa).
+ */
+export const HERO_TDP_SEPARACIO_PX = 60;
 export const HERO_TDP_GAP_TABLET_PX = '338px';
 export const HERO_TDP_GAP_LANDSCAPE_PX = '-240px';
 

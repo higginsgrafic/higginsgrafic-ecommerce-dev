@@ -24,6 +24,7 @@ import {
   HERO_TDP_GAP_PX,
   HERO_TDP_GAP_TABLET_PX,
   HERO_TDP_GAP_LANDSCAPE_PX,
+  HERO_TDP_SEPARACIO_PX,
 } from '@/config/collectionVertical';
 import { readOverlayState, writeOverlayState } from '@/utils/collectionOverlayState';
 
@@ -191,7 +192,7 @@ function CollectionVerticalPage({ slug }) {
         const heroBottom = hero.getBoundingClientRect().bottom;
         setPushDownPx((prev) => {
           const base = tdp0.getBoundingClientRect().top - prev;
-          const cal = Math.max(0, Math.round(heroBottom + 24 - base));
+          const cal = Math.max(0, Math.round(heroBottom + HERO_TDP_SEPARACIO_PX - base));
           return Math.abs(cal - prev) < 1 ? prev : cal;
         });
       }
