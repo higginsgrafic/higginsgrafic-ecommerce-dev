@@ -2,7 +2,7 @@ import { useEffect, useLayoutEffect, useState, useRef, useMemo } from 'react';
 import { Helmet } from 'react-helmet';
 import { Link } from 'react-router-dom';
 import Pauta4ColsOverlay from '@/components/pauta/Pauta4ColsOverlay';
-import { getSafeBelt, esTauletaApaisada } from '@/utils/layoutMetrics';
+import { esTauletaApaisada } from '@/utils/layoutMetrics';
 import { laneForViewport } from '@/utils/layoutModel';
 import { useCollectionCardLayout } from '@/hooks/useCollectionCardLayout';
 import { collectionGridImageFor, gridFinishFor, collectionGridHoverVariantsFor } from '@/lib/pdpMockup';
@@ -197,7 +197,7 @@ function CollectionAustenPage() {
   // Del model unic, no de `getSafeBelt()`: aixo tanca el `dev != produccio`
   // que encara hi havia aqui (getSafeBelt prioritza les guies `--belt2-*`, que
   // nomes existeixen en desenvolupament).
-  const [carrilAmple] = useState(() => laneForViewport());
+  const [carrilAmple, setCarrilAmple] = useState(() => laneForViewport());
   const rowHeight = Math.max(1, carrilAmple * 0.0280625 - 2.875);
 
   // La franja blanca ha de tocar el separador del header. Abans es mesurava
@@ -229,10 +229,18 @@ function CollectionAustenPage() {
   const heroIconsTop = `calc(100vh - (${BAND_HEIGHT}) / 2 - var(--hg-hero-top, 107px))`;
   // Quan la imatge (alcada de finestra) sobrepassa l'espai que la graella li
   // reserva, baixem el contingut el mateix tros perque no se solapi.
-  const [pushDownPx, setPushDownPx] = useState(0);
+  // Quan la imatge (alçada de finestra) sobrepassa l'espai que la graella li
+  // reserva, baixem el contingut el mateix tros perque no se solapi. No es pot
+  // calcular: depen de l'alçada de la finestra i de la posicio natural de la
+  // graella (files fixes amb pitch variable). Es mesura en un `useLayoutEffect`
+  // (ABANS del pintat) i es publica com a variable CSS, aixi no cal ni cap
+  // re-render ni cap bucle de punt fix ni cap `setTimeout`.
   // Austen te mes files de TDP que les altres colleccions, aixi que el poster
-  // queda mes avall. Ajustem el marge perque l'aire de sobre sigui el mateix.
-  const [posterExtraPx, setPosterExtraPx] = useState(0);
+  // queda mes avall. L'ajust es proporcional a l'amplada del carril (que ja ve
+  // del model), aixi que es calcula: no cal cap mesura ni cap estat. Verificat
+  // a 768/1024/1280/1440/1920 px: dona exactament el mateix que la mesura
+  // anterior (463/617/771/868/1157 px).
+  const posterExtraPx = Math.round(carrilAmple * 0.857);
   const [isLandscapeTablet, setIsLandscapeTablet] = useState(esTauletaApaisada());
   const [isPortraitTablet, setIsPortraitTablet] = useState(
     typeof window !== "undefined"
@@ -310,29 +318,33 @@ function CollectionAustenPage() {
         const headerBottom = Math.round(cap.getBoundingClientRect().bottom);
         document.documentElement.style.setProperty('--hg-header-bottom', `${headerBottom}px`);
       }
-      // La imatge acaba exactament on acaba la franja blanca de baix.
-      // Baixem el contingut el que calgui perque la primera targeta quedi
-      // SEMPRE per sota de la imatge. Ho calculem sobre la posicio "base"
-      // (sense el desplaçament ja aplicat) per no entrar en bucle.
-      // Correccio del poster d'Austen: proporcional a l'amplada de la graella.
-      setPosterExtraPx(Math.round(getSafeBelt().width * 0.857));
-      const heroBottom = hero.getBoundingClientRect().bottom;
+      // La imatge acaba exactament on acaba la franja blanca de baix: baixem
+      // la graella el que calgui perque la primera targeta quedi SEMPRE per
+      // sota. El calcul és el MATEIX d'abans, pero sobre la posicio base del
+      // primer intent (quan el desplaçament encara es 0), sense bucle de punt
+      // fix: aplicar-lo canvia el top de la TDP exactament el mateix que el
+      // desplaçament, aixi que el resultat no depen de quantes vegades es faci.
       const tdp0 = document.querySelector('[aria-label="TDP taula"]') || document.querySelector('[aria-label="TDP rectangle"]');
       if (tdp0) {
-        const topActual = tdp0.getBoundingClientRect().top;
-        setPushDownPx((prev) => {
-          const base = topActual - prev;
-          const cal = Math.max(0, Math.round(heroBottom + 24 - base));
-          return Math.abs(cal - prev) < 1 ? prev : cal;
-        });
+        const pushDown = Math.max(0, Math.round(hero.getBoundingClientRect().bottom + 24 - tdp0.getBoundingClientRect().top));
+        document.documentElement.style.setProperty('--hg-push-down', `${pushDown}px`);
       }
     };
     mesura();
-    window.addEventListener('resize', mesura);
-    const t = window.setTimeout(mesura, 300);
+    // El carril nomes depen de l'amplada de la finestra: es recalcula en
+    // resize perque `rowHeight` (i el `top` de la hero) no es quedin
+    // congelats al valor del primer render. Abans d'A1 tambe es recalculava.
+    const sincronitzaCarril = () => {
+      const nou = laneForViewport();
+      setCarrilAmple((prev) => (Math.abs(prev - nou) < 0.5 ? prev : nou));
+    };
+    const onResize = () => {
+      mesura();
+      sincronitzaCarril();
+    };
+    window.addEventListener('resize', onResize);
     return () => {
-      window.removeEventListener('resize', mesura);
-      window.clearTimeout(t);
+      window.removeEventListener('resize', onResize);
     };
   }, []);
 
@@ -573,7 +585,7 @@ function CollectionAustenPage() {
         style={{
           // Puja tot el contingut sota el hero 12 files de la taula (41 → 29).
           // Alçada d'1 fila = ampladaBelt × 6708/2642/90; 12 files ≈ 0.3385 × amplada.
-          marginTop: `calc((var(--hg-tdp-xL, 0px) - var(--hg-tdp-xR, 0px)) * 0.3385${isLandscapeTablet ? ' - 30px' : ''}${isPortraitTablet ? ' - 120px' : ''} + ${pushDownPx}px${isLandscapeTablet ? ` + ${HERO_TDP_GAP_LANDSCAPE_PX}` : (isPortraitTablet ? ` + ${HERO_TDP_GAP_TABLET_PX}` : ` + ${HERO_TDP_GAP_PX}`)})`,
+          marginTop: `calc((var(--hg-tdp-xL, 0px) - var(--hg-tdp-xR, 0px)) * 0.3385${isLandscapeTablet ? ' - 30px' : ''}${isPortraitTablet ? ' - 120px' : ''} + var(--hg-push-down, 0px)${isLandscapeTablet ? ` + ${HERO_TDP_GAP_LANDSCAPE_PX}` : (isPortraitTablet ? ` + ${HERO_TDP_GAP_TABLET_PX}` : ` + ${HERO_TDP_GAP_PX}`)})`,
           // Desplaçament vertical NOME S de les TDP.
           translate: `0 ${-TDP_MOVE_PX}px`,
           // El bloc te marge negatiu i queda per sobre de la hero: si no fos
