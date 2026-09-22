@@ -2711,7 +2711,10 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
         <div
           className="flex h-20 items-center gap-3 px-4 sm:px-6 lg:h-20 lg:px-10"
           style={{
-            height: isPortraitTablet ? '80px' : undefined,
+            // A la vertical el separador ha de quedar AL MIG de l'espai que
+            // ocupen les dues capçaleres (123 px): 61 px a dalt i 62 a baix.
+            // El contingut es centra dins el seu tros amb `items-center`.
+            height: isPortraitTablet ? '61px' : undefined,
             // La capçalera viu al MATEIX carril que el megaslide i les bandes
             // (70,3vw, centrat): a 1440 el marc del lloc feia 1350 px i el
             // carril 1013, i el logo quedava 128 px a l'esquerra del contingut
@@ -2988,7 +2991,7 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
       {/* Segon header per portrait tablet — enllaços de col·leccions */}
       {isPortraitTablet && (
         <div
-          className="bg-background"
+          className="bg-background flex items-center"
           style={{
             position: 'relative',
             zIndex: 10001,
@@ -2997,14 +3000,16 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
             width: 'var(--site-w, 100%)',
             marginLeft: 'calc(var(--site-xL, 0px) - var(--rulerInset, 0px))',
             borderTop: '1px solid #E6E8EC',
+            // Els 62 px que queden dels 123, amb el contingut centrat.
+            height: '62px',
           }}
         >
-          {/* Els enllaços baixen 4px, i ho fan amb un transform i no amb un
-              marge: el marge movia tambe el panell del mega-slide (que va
-              darrere del nav dins el header) i desquadrava el bloc de
-              productes amb la guia blava. Amb transform nome s mouen les
-              lletres. */}
-          <nav className="flex items-center justify-center gap-6 px-10 py-2 flex-nowrap overflow-x-auto" style={{ scrollbarWidth: 'none', marginTop: '10px', transform: 'translateY(4px)' }}>
+          {/* Sense desplaçament propi: el `nav` es centra dins la seva fila
+              amb el `flex items-center` del contenidor. Abans portava
+              `marginTop: 10px` i `translateY(4px)`, que eren per a l'alçada
+              antiga de la fila (43 px); ara la fila fa 62 px i el contingut
+              s'hi centra, aixi que aquests 14 px el descol·locaven. */}
+          <nav className="flex items-center justify-center gap-6 px-10 py-2 flex-nowrap overflow-x-auto" style={{ scrollbarWidth: 'none' }}>
             {resolvedNav.map((item) => {
               const open = active === item.id && megaPage === 1;
               return (
