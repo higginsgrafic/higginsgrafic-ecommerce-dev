@@ -610,7 +610,7 @@ function Home() {
 
       {isPortraitTablet && <div style={{ height: '120px' }} />}
 
-      <section className="bg-background text-foreground" style={{ transform: 'scale(0.94)', transformOrigin: 'center top', marginTop: `calc(${isPortraitTablet ? '75px' : (isLandscapeTablet ? '-60px' : '0px')} + ${baixadaHero}px)` }}>
+      <section className="bg-background text-foreground" style={{ transform: 'scale(0.94)', transformOrigin: 'center top', marginTop: `calc(${isPortraitTablet ? '175px' : (isLandscapeTablet ? '40px' : '100px')} + ${baixadaHero}px)` }}>
         <div className="mx-auto max-w-[1400px] px-4 pt-[60px] pb-[174px] sm:px-6 lg:px-10" style={isTablet ? { paddingTop: '30px' } : undefined}>
             <CollectionTitle
             index=""
