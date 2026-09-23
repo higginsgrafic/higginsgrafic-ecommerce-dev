@@ -147,7 +147,7 @@ export const TDP_PEUSEPARACIO_PX = 24;
  * marge. Un `top` per galeria es un pedaç: el que mana es el marge, i es un
  * de sol.
  */
-export const HOME_TITOL_TDP_MARGIN_PX = { escriptori: 150, tauleta: 75 };
+export const HOME_TITOL_TDP_MARGIN_PX = { escriptori: 130, tauleta: 130 };
 
 /**
  * Desplaçament propi de cada galeria de l'inici. JA NO SE N'HA DE FER SERVIR
@@ -171,9 +171,9 @@ export const HOME_GALERIA_TOP_PX = 0;
  *     seu ajust), i aixo DEMANA 40 px menys;
  *   - la pindola va 80 px sota la caixa (30 dels quals tapen el degradat), i
  *     aixo en DEMANA 30 mes.
- * Amb 90, el buit VISIBLE de la pindola al titol es de 100 px.
+ * Amb 190, el buit VISIBLE de la pindola al titol es de 150 px.
  */
-export const HOME_GALERIA_AIRE_SOTA_PX = 90;
+export const HOME_GALERIA_AIRE_SOTA_PX = 190;
 
 /**
  * El marge de dalt de cada bloc de colleccio de l'inici, amb el seu nom.

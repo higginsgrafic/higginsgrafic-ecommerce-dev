@@ -801,7 +801,7 @@ function Home() {
                   // fons de la caixa. Han de ser 80 i no 50 perque el fons
                   // degradat SOBRESURT 30 px per sota de la caixa: el buit
                   // VISIBLE fins a la pindola es de 50 px.
-                  top: 'calc(100% + 80px)',
+                  top: 'calc(100% + 130px)',
                   height: 'auto',
                   width: 'auto',
                   borderRadius: '9999px',
@@ -907,7 +907,7 @@ function Home() {
                   // fons de la caixa. Han de ser 80 i no 50 perque el fons
                   // degradat SOBRESURT 30 px per sota de la caixa: el buit
                   // VISIBLE fins a la pindola es de 50 px.
-                  top: 'calc(100% + 80px)',
+                  top: 'calc(100% + 130px)',
                   height: 'auto',
                   width: 'auto',
                   borderRadius: '9999px',
@@ -1014,7 +1014,7 @@ function Home() {
                   // fons de la caixa. Han de ser 80 i no 50 perque el fons
                   // degradat SOBRESURT 30 px per sota de la caixa: el buit
                   // VISIBLE fins a la pindola es de 50 px.
-                  top: 'calc(100% + 80px)',
+                  top: 'calc(100% + 130px)',
                   height: 'auto',
                   width: 'auto',
                   borderRadius: '9999px',
@@ -1121,7 +1121,7 @@ function Home() {
                   // fons de la caixa. Han de ser 80 i no 50 perque el fons
                   // degradat SOBRESURT 30 px per sota de la caixa: el buit
                   // VISIBLE fins a la pindola es de 50 px.
-                  top: 'calc(100% + 80px)',
+                  top: 'calc(100% + 130px)',
                   height: 'auto',
                   width: 'auto',
                   borderRadius: '9999px',
@@ -1228,7 +1228,7 @@ function Home() {
                   // fons de la caixa. Han de ser 80 i no 50 perque el fons
                   // degradat SOBRESURT 30 px per sota de la caixa: el buit
                   // VISIBLE fins a la pindola es de 50 px.
-                  top: 'calc(100% + 80px)',
+                  top: 'calc(100% + 130px)',
                   height: 'auto',
                   width: 'auto',
                   borderRadius: '9999px',
