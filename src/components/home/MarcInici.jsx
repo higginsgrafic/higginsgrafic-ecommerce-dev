@@ -43,7 +43,7 @@
 import { useEffect, useRef, useState } from 'react';
 
 /** El repartiment inicial, abans del primer mesurament. */
-const REPARTIMENT_INICIAL = { aire: 0, alcada: null };
+const REPARTIMENT_INICIAL = { buit: 0, mig: 0, alcada: null };
 
 function MarcInici({ seccions }) {
   const [primera, segona, ...resta] = seccions;
@@ -153,13 +153,16 @@ function MarcInici({ seccions }) {
       // de les icones pel seu costat de baix i un que posa la de la hero pel
       // seu costat de dalt. Per aixo cada cella en posa la MEITAT.
       const buit = Math.max(0, (window.innerHeight - capcalera - icones - natural) / 3);
-      const aire = buit / 2;
+      // Entre les icones i la hero n'hi ha DOS de buits (un que posa cada
+      // cella), i per aixo cada cella n'hi posa la meitat. El de dalt, en canvi,
+      // es sencer: nomes el posa la cella de les icones.
+      const mig = buit / 2;
       const alcada = natural;
       // El numero que decideix si ja hi som: si no s'ha mogut, s'atura.
-      const ara = `${Math.round(zonaAlcada * 4) / 4}|${Math.round(alcada * 4) / 4}|${Math.round(aire * 4) / 4}`;
+      const ara = `${Math.round(zonaAlcada * 4) / 4}|${Math.round(alcada * 4) / 4}|${Math.round(buit * 4) / 4}`;
       if (ara === anterior) return;
       anterior = ara;
-        setRepartiment({ aire, alcada, finsLinia, linia });
+        setRepartiment({ buit, mig, alcada, finsLinia, linia });
       raf = requestAnimationFrame(reparteix);
     };
 
@@ -204,7 +207,8 @@ function MarcInici({ seccions }) {
           flexDirection: 'column',
           // El repartiment, publicat com a variables de CSS. Els valors surten
           // de l'estat i per tant cap render de React se'ls pot emportar.
-          '--inici-buit': `${repartiment.aire}px`,
+          '--inici-buit': `${repartiment.buit ?? 0}px`,
+          '--inici-mig': `${repartiment.mig ?? 0}px`,
           '--inici-dalt': `${(repartiment.finsLinia ?? 0)}px`,
           '--inici-frontera': `${repartiment.linia ?? 0}px`,
           // La flexio no ha de repartir l'espai que sobra: els aires son
@@ -218,8 +222,10 @@ function MarcInici({ seccions }) {
           data-cella="1"
           data-cella-de={primera.id}
           style={{
-            // Un buit a dalt (entre la capçalera i les icones) i un a baix.
-            paddingBlock: 'var(--inici-buit, 0px)',
+            // El buit sencer a dalt (de la capçalera a les icones) i la meitat
+            // a baix (que amb la meitat de la cella de la hero fa el buit del
+            // mig sencer).
+            paddingBlock: 'var(--inici-buit, 0px) var(--inici-mig, 0px)',
             display: 'flex',
             flexDirection: 'column',
             // ANCORADA A BAIX. Cada cella porta el seu aire a dalt i a baix, i
@@ -237,9 +243,9 @@ function MarcInici({ seccions }) {
           data-cella="2"
           data-cella-de={segona.id}
           style={{
-            // Un buit a dalt (entre les icones i la hero) i un a baix (de la
+            // La meitat del buit del mig a dalt i el buit sencer a baix (de la
             // hero al fons).
-            paddingBlock: 'var(--inici-buit, 0px)',
+            paddingBlock: 'var(--inici-mig, 0px) var(--inici-buit, 0px)',
             display: 'flex',
             flexDirection: 'column',
             justifyContent: 'flex-start',
