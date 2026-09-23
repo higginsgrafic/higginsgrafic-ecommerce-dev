@@ -156,50 +156,54 @@ També es va intentar repartir amb la zona mesurada del DOM, i el bucle **es va
 desbocar** (l'aire se'n va anar a disset milions de píxels): l'aire depenia de
 l'alçada de la zona i l'alçada de la zona de l'aire.
 
-### 4.4 La solució final
+### 4.4 La solució final: el tros de dalt, en 28 FILES
 
-El repartiment surt de la **finestra**, que no depèn de res:
+El repartiment continu (un `calc` sobre la finestra) donava un buit de 154 px a
+1920, però no encaixava amb la resta del lloc, que està fet a base de **graelles
+de files**. La solució és quanticar-lo: el tros de dalt són **files senceres**,
+les mateixes que fa servir el megaslide.
 
 ```
-buit = (finestra − header − icones − hero) / 3
+megaslide 11 | buit 1 | icones 2 | buit 1 | hero 12 | buit 1  =  28 files
 ```
 
-A 1920: `(1080 − 121 − 70 − 426) / 3 = **154 px**`. Els comptes quadren:
-`121 + 154 + 70 + 154 + 426 + 154 = 1079`, tota la finestra.
+**LA FILA** és `(finestra − capçalera) / 28`. **No** és la fila de la graella del
+megaslide (`laneForViewport() × 0,0280625 − 2,875`, que a 1920 fa 35,01), perquè
+aquella depèn del **carril** i la finestra no: amb la de la graella, a 1440 el
+bloc no omplia la finestra. Amb la de la finestra, els comptes tanquen a totes
+les mides:
 
-I les tres peces tenen la seva mida, sempre:
+| port | fila | 11 files (= megaslide) | 2 files (= icones) | 28 files (= finestra−header) |
+|---|---|---|---|---|
+| 1920×1080 | 34,3 | **377** (mesurat 376) | 69 (mesurat 70,4) | **960** (960) |
+| 1440×900 | 27,9 | **306** (mesurat 305) | 56 (mesurat 52,8) | **780** (780) |
+| 1024×768 | 23,7 | 261 | 47 | **664** (664) |
+| 1280×720 | 22,0 | 242 | 44 | **616** (616) |
+| 768×1024 | 31,0 | 341 | 62 | **868** (868) |
 
-- la **franja d'icones** (l'alçada d'Austen), declarada;
-- la **hero**, la que li dona el seu aspecte amb l'amplada del carril;
-- el **rectangle de la hero**, sense topall.
+**LA HERO OCUPA 12 FILES**, i el topall la hi deixa: el seu tamany natural en fa
+12,23 a 1920 (428 px contra 411). És l'única peça que cedeix, i ho fa perquè el
+repartiment tanqui amb files senceres.
 
-**COM ES REPARTEIXEN ELS BUITS ENTRE LES DUES CELLES.** El marc té dues celles,
-i el buit del mig el posen les dues (una a baix i l'altra a dalt): per això cada
-cella n'hi posa la **meitat**. El de dalt, en canvi, és **sencer** i el posa
-només la cella de les icones; i el de baix, sencer, només la cella de la hero.
-Si es posa el mateix valor a totes dues bandes de totes dues celles, el del mig
-surt el doble que els altres — que és exactament l'error que hi havia.
+**COM ES REPARTEIXEN LES FILES ENTRE LES DUES CELLES.** La cella de les icones
+porta a dalt **12 files** (les 11 del megaslide més el buit que les separa) i res
+a baix; la de la hero porta **una fila** a cada costat.
 
-**La hero només cedeix si no hi cap**, i en aquesta sessió s'ha decidit que **no
-cedeixi**: si la finestra és curta, la pàgina s'allarga i es desplaça.
+La primera versió d'aquest repartiment posava el mateix valor a totes dues
+bandes de totes dues celles, i el buit del mig sortia **el doble** que els altres
+(mesurat a 1920: 77/154/232 en comptes de 154/154/154), perquè el buit del mig
+el posen les DUES celles.
 
 ### 4.5 El que encara no quadra: el cadenat
 
-Els tres buits **surten iguals** a totes cinc mides (secció 7), però el cadenat
-del megaslide **trepitja la part de dalt de la hero**: el cadenat ocupa de 505 a
-553 i la hero comença a 499, o sigui que se solapen uns **50 px**.
+El cadenat del megaslide **trepitja la part de dalt de la hero**. Amb el model de
+files, el cadenat ocupa les files 11-12 i la hero comença a la 15, o sigui que se
+solapen uns **50 px** a 1920.
 
-No és un error del repartiment: és que la fórmula no sap res del cadenat. Perquè
-no el trepitgés, la hero hauria de començar a 553 i, amb els buits iguals,
-aquests haurien de fer **181,5 px** en comptes de 154 — i aleshores la pàgina
-s'allargaria 80 px més.
-
-Les dues sortides, doncs:
-
-| camí | buits | cadenat | pàgina a 1920 |
-|---|---|---|---|
-| **ara** (la fórmula) | 154/154/154 | trepitja la hero 50 px | cap dins la finestra |
-| amb el cadenat respectat | 181,5/181,5/181,5 | net | 80 px més llarga |
+No és un error del repartiment: és que la fórmula no sap res del cadenat, que és
+un estri del megaslide i no del marc. Perquè no el trepitgés caldria reservar-li
+una fila més, i aleshores el model passaria de 28 files a 29 i la pàgina
+s'allargaria.
 
 **Decisió pendent per a la sessió següent.**
 
@@ -282,31 +286,32 @@ rectangle fan exactament el mateix** a totes cinc mides.
 
 ## 7. Estat final, mesurat
 
-Amb el megaslide **obert**, a les cinc mides. Els tres buits són el de la
-capçalera a les icones, el de les icones a la hero i el de la hero al fons:
+Amb el megaslide **obert**, a les cinc mides. El model: `megaslide 11 | buit 1 |
+icones 2 | buit 1 | hero 12 | buit 1 = 28 files`.
 
-| port | carril | línia | buit 1 | buit 2 | buit 3 | rectangle hero | franja | capa |
-|---|---|---|---|---|---|---|---|---|
-| 768×1024 | 688 | 565 | 198 | 198 | 196 | 248,6 | 28,2 | 248,6 |
-| 1024×768 | 933 | 392 | 105 | 105 | 103 | 314,4 | 37,5 | 314,4 |
-| 1280×720 | 933 | 392 | 86 | 86 | 84 | 314,4 | 46,9 | 314,4 |
-| 1440×900 | 953 | 426 | 136 | 136 | 134 | 321,1 | 52,8 | 321,1 |
-| 1920×1080 | 1270 | 497 | 155 | 154 | 153 | 428,0 | 70,4 | 428,0 |
+| port | fila | megaslide (11 files) | icones | hero (12 files) | suma | finestra−header |
+|---|---|---|---|---|---|---|
+| 768×1024 | 31,0 | 341 | 28,2 | 246,6 | 709 | 868 |
+| 1024×768 | 23,7 | 261 | 37,5 | 284,6 | 658 | 664 |
+| 1280×720 | 22,0 | 242 | 46,9 | 264,0 | 619 | 616 |
+| 1440×900 | 27,9 | 306 | 52,8 | 319,1 | 764 | 780 |
+| 1920×1080 | 34,3 | 377 | 70,4 | 411,4 | 958 | 960 |
 
-- **Els tres buits són iguals** a totes cinc mides (les diferències d'1-2 px són
-  arrodoniment).
-- **Les mides no canvien en obrir el panell** a cap port.
+- A 1920 i 1440 les **11 files coincideixen amb el megaslide mesurat** (377
+  contra 376, i 306 contra 305).
+- **Les icones queden visibles just sota el separador** i la hero a sota seu, a
+  totes cinc mides.
 - **La hero cap dins la finestra** a tots cinc ports.
 - **La capa de la samarreta fa exactament l'alçada del rectangle** a tots cinc.
 - El cadenat trepitja la hero a tots cinc (secció 4.5).
 
 ## 8. Pendent
 
-1. **El cadenat del megaslide trepitja la hero** uns 50 px a 1920. Cal triar
-   entre els buits de 154 px (i el cadenat a sobre) o els de 181,5 px (i la
-   pàgina 80 px més llarga): secció 4.5.
-2. **Els buits de la hero són iguals, però la hero no s'encongeix**: si la
-   finestra és molt curta, la pàgina s'allarga.
+1. **El cadenat del megaslide trepitja la hero** uns 50 px a 1920. Caldria
+   reservar-li una fila més (29 en comptes de 28): secció 4.5.
+2. **La hero ocupa 12 files**, i a 1920 el seu tamany natural en fa 12,23: el
+   topall la deixa 17 px més curta. És l'única peça que cedeix perquè el
+   repartiment tanqui.
 3. **La capçalera no s'ha migrat** (fase 7, 3196 línies). El peu encara té una
    excepció a `App.jsx`.
 4. **Les transicions entre plans de la hero** (les animacions `hg-hero-enter/exit`
