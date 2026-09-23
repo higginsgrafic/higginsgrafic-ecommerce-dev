@@ -796,11 +796,12 @@ function Home() {
                 style={{
                   position: 'absolute',
                   left: '50%',
-                  // 25 px sota la caixa de la targeta, DECLARAT: el bloc de la
-                  // galeria fa l'alcada de la fitxa, i per tant `100%` es el fons de
-                  // la caixa. Abans aixo era una formula amb el -231 mes una mesura
-                  // des de JavaScript.
-                  top: 'calc(100% + 50px)',
+                  // 80 px sota la caixa de la targeta, DECLARAT: el bloc de la
+                  // galeria fa l'alcada de la fitxa, i per tant `100%` es el
+                  // fons de la caixa. Han de ser 80 i no 50 perque el fons
+                  // degradat SOBRESURT 30 px per sota de la caixa: el buit
+                  // VISIBLE fins a la pindola es de 50 px.
+                  top: 'calc(100% + 80px)',
                   height: 'auto',
                   width: 'auto',
                   borderRadius: '9999px',
@@ -901,11 +902,12 @@ function Home() {
                 style={{
                   position: 'absolute',
                   left: '50%',
-                  // 25 px sota la caixa de la targeta, DECLARAT: el bloc de la
-                  // galeria fa l'alcada de la fitxa, i per tant `100%` es el fons de
-                  // la caixa. Abans aixo era una formula amb el -231 mes una mesura
-                  // des de JavaScript.
-                  top: 'calc(100% + 50px)',
+                  // 80 px sota la caixa de la targeta, DECLARAT: el bloc de la
+                  // galeria fa l'alcada de la fitxa, i per tant `100%` es el
+                  // fons de la caixa. Han de ser 80 i no 50 perque el fons
+                  // degradat SOBRESURT 30 px per sota de la caixa: el buit
+                  // VISIBLE fins a la pindola es de 50 px.
+                  top: 'calc(100% + 80px)',
                   height: 'auto',
                   width: 'auto',
                   borderRadius: '9999px',
@@ -1007,11 +1009,12 @@ function Home() {
                 style={{
                   position: 'absolute',
                   left: '50%',
-                  // 25 px sota la caixa de la targeta, DECLARAT: el bloc de la
-                  // galeria fa l'alcada de la fitxa, i per tant `100%` es el fons de
-                  // la caixa. Abans aixo era una formula amb el -231 mes una mesura
-                  // des de JavaScript.
-                  top: 'calc(100% + 50px)',
+                  // 80 px sota la caixa de la targeta, DECLARAT: el bloc de la
+                  // galeria fa l'alcada de la fitxa, i per tant `100%` es el
+                  // fons de la caixa. Han de ser 80 i no 50 perque el fons
+                  // degradat SOBRESURT 30 px per sota de la caixa: el buit
+                  // VISIBLE fins a la pindola es de 50 px.
+                  top: 'calc(100% + 80px)',
                   height: 'auto',
                   width: 'auto',
                   borderRadius: '9999px',
@@ -1113,11 +1116,12 @@ function Home() {
                 style={{
                   position: 'absolute',
                   left: '50%',
-                  // 25 px sota la caixa de la targeta, DECLARAT: el bloc de la
-                  // galeria fa l'alcada de la fitxa, i per tant `100%` es el fons de
-                  // la caixa. Abans aixo era una formula amb el -231 mes una mesura
-                  // des de JavaScript.
-                  top: 'calc(100% + 50px)',
+                  // 80 px sota la caixa de la targeta, DECLARAT: el bloc de la
+                  // galeria fa l'alcada de la fitxa, i per tant `100%` es el
+                  // fons de la caixa. Han de ser 80 i no 50 perque el fons
+                  // degradat SOBRESURT 30 px per sota de la caixa: el buit
+                  // VISIBLE fins a la pindola es de 50 px.
+                  top: 'calc(100% + 80px)',
                   height: 'auto',
                   width: 'auto',
                   borderRadius: '9999px',
@@ -1219,11 +1223,12 @@ function Home() {
                 style={{
                   position: 'absolute',
                   left: '50%',
-                  // 25 px sota la caixa de la targeta, DECLARAT: el bloc de la
-                  // galeria fa l'alcada de la fitxa, i per tant `100%` es el fons de
-                  // la caixa. Abans aixo era una formula amb el -231 mes una mesura
-                  // des de JavaScript.
-                  top: 'calc(100% + 50px)',
+                  // 80 px sota la caixa de la targeta, DECLARAT: el bloc de la
+                  // galeria fa l'alcada de la fitxa, i per tant `100%` es el
+                  // fons de la caixa. Han de ser 80 i no 50 perque el fons
+                  // degradat SOBRESURT 30 px per sota de la caixa: el buit
+                  // VISIBLE fins a la pindola es de 50 px.
+                  top: 'calc(100% + 80px)',
                   height: 'auto',
                   width: 'auto',
                   borderRadius: '9999px',
