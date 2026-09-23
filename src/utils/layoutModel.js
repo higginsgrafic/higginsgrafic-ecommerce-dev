@@ -60,9 +60,21 @@ export function deviceLayoutFromViewport(vw, vh) {
   };
 }
 
-/** Alçada de la capçalera per tipus de dispositiu. */
+/**
+ * Alçada de la capçalera per tipus de dispositiu.
+ *
+ * LES DUES TAULETES PORTEN LA MATEIXA CAPÇALERA. La vertical la té de dues
+ * files (el logo i les icones, i el menu a sota) i fa 116 px; l'apaisada en
+ * feia una de sola de 64. L'amo les vol iguals: la capçalera de l'apaisada es
+ * la de la vertical, amb les seves dues files.
+ *
+ * La `ESTRETA` queda per al que no es cap de les tres coses (vegeu
+ * `deviceLayoutFromViewport`), que avui no es dona enlloc.
+ */
 export function headerHeightFor(deviceLayout) {
-  if (deviceLayout.isPortraitTablet) return ALCADA_CAPCALERA_TAULETA_VERTICAL;
+  if (deviceLayout.isPortraitTablet || deviceLayout.isLandscapeTablet) {
+    return ALCADA_CAPCALERA_TAULETA_VERTICAL;
+  }
   if (deviceLayout.isLargeScreen) return ALCADA_CAPCALERA_ESCRIPTORI;
   if (deviceLayout.isMobile) return ALCADA_CAPCALERA_MOBIL;
   return ALCADA_CAPCALERA_ESTRETA;
