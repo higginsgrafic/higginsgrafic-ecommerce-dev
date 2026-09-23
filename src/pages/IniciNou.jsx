@@ -7,6 +7,7 @@ import { buildHomeDrawingPlan } from '@/components/home/homeDrawings';
 import HomeColleccio from '@/components/home/HomeColleccio';
 import HeroInici from '@/components/home/HeroInici';
 import IconsColleccions from '@/components/home/IconsColleccions';
+import MarcInici from '@/components/home/MarcInici';
 import useIsMobile from '@/hooks/useIsMobile';
 import { SELLING_PRICE_LABEL } from '@/config/pricing';
 import { laneForViewport } from '@/utils/layoutModel';
@@ -191,34 +192,30 @@ function IniciNou() {
         </div>
       ) : (
         <div className="hg-marc" data-inici-nou="1">
-          {/* LA TAULA INVISIBLE DE DUES FILES.
-              Es un element PROPI, i no el marc de la pagina: el marc conte tambe
-              les galeries i el poster, i si la graella hi fos a sobre les files
-              no podrien ser iguals, perque l'alcada del marc es el contingut
-              sencer (mesurat: 7.278 px amb una finestra de 1.080).
-              Aquesta taula fa NOMES l'alcada de la finestra menys la capçalera,
-              que la capçalera ja publica, i te dues files iguals al 50 %. */}
-          <div
-            className="hg-taula-inici"
-            data-taula-inici="1"
-            style={{
-              height: 'calc(100vh - var(--appHeaderOffset, 0px))',
-              display: 'flex',
-              flexDirection: 'column',
-            }}
-          >
-            <div className="hg-marc__contingut" style={{ flex: '1 1 50%', minHeight: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <section className="hg-seccio" data-seccio="icones" aria-label="Col·leccions" style={{ width: '100%' }}>
-                <IconsColleccions />
-              </section>
-            </div>
-
-            <div className="hg-carril" style={{ flex: '1 1 50%', minHeight: 0, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-              <section className="hg-seccio" data-seccio="hero" aria-label="Hero">
-                <HeroInici />
-              </section>
-            </div>
-          </div>
+          <MarcInici
+            seccions={[
+              {
+                id: 'icones',
+                node: (
+                  <div className="hg-marc__contingut">
+                    <section className="hg-seccio" data-seccio="icones" aria-label="Col·leccions">
+                      <IconsColleccions />
+                    </section>
+                  </div>
+                ),
+              },
+              {
+                id: 'hero',
+                node: (
+                  <div className="hg-carril">
+                    <section className="hg-seccio" data-seccio="hero" aria-label="Hero">
+                      <HeroInici />
+                    </section>
+                  </div>
+                ),
+              },
+            ]}
+          />
 
           <div className="hg-marc__contingut">
             {/* 02 a 06 · LES CINC GALERIES. */}
