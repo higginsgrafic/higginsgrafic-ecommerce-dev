@@ -190,7 +190,24 @@ function IniciNou() {
           <p>Aquesta pàgina encara no té la vista mòbil: es construeix sobre l&apos;escriptori.</p>
         </div>
       ) : (
-        <div className="hg-marc" data-inici-nou="1">
+        <div
+          className="hg-marc"
+          data-inici-nou="1"
+          style={{
+            // UNA TAULA INVISIBLE DE DUES FILES IGUALS.
+            //
+            // Del fons de la capçalera al fons de la finestra hi ha dues files
+            // de la mateixa alcada (`1fr 1fr`): a dalt les icones i a baix la
+            // hero, cada una CENTRADA dins de la seva cella. El que ve despres
+            // (les galeries i el poster) queda avall, en flux, com sempre.
+            //
+            // L'alcada de la taula es `100vh − --appHeaderOffset`: la finestra
+            // menys el que ocupa la capçalera, que la capçalera ja publica.
+            minHeight: 'calc(100vh - var(--appHeaderOffset, 0px))',
+            display: 'grid',
+            gridTemplateRows: '1fr 1fr',
+          }}
+        >
           {/* 00 · LES ICONES DE COLLECCIO, al principi de tot.
               El seu aire es declara, com el de la resta: `--esp-4` a sobre i a
               sota, i el bloc va dins del contingut amb marge (les icones son
@@ -200,7 +217,7 @@ function IniciNou() {
               className="hg-seccio"
               data-seccio="icones"
               aria-label="Col·leccions"
-              style={{ paddingBlock: 'var(--esp-4)' }}
+              style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
             >
               <IconsColleccions />
             </section>
@@ -211,7 +228,7 @@ function IniciNou() {
               percentatge, i un percentatge de padding es mesura sobre
               l'amplada del PARE. Amb el carril de pare, el 70,5 % de 1350 dona
               952; amb la seccio de pare (tota la finestra) en donava 1.200. */}
-          <div className="hg-carril">
+          <div className="hg-carril" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
             <section className="hg-seccio" data-seccio="hero" aria-label="Hero">
               <HeroInici />
             </section>
