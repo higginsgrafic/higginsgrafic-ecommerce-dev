@@ -200,9 +200,13 @@ export const TDP_MIDES_INTERIOR = {
   // cistella plana) i a ull semblava petit. Amb 0,125 el dibuix fa uns 30 px i
   // es veu del tamany del text.
   //
+  // 0,1118 = requadre de 37 px a 1920, i el DIBUIX en fa 28,0.
+  // El requadre s'arrodoneix a px sencer, i per aixo en aquesta zona nomes hi
+  // ha dos valors possibles: 28,0 (amb 0,1118) o 29,5 (amb 0,1169). L'amo
+  // prefereix 28.
   // ATENCIO: els altres dos SVG (`v3-ple-1` i `v3-ple-2`) tenen NOMES un 6 %
   // de marge, aixi que amb el carreto ple el dibuix surt mes gran que el buit.
-  cistell: 0.125,
+  cistell: 0.1118,
   preuGap: 0.1,
 };
 
