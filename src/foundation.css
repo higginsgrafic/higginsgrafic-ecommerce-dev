@@ -51,15 +51,29 @@
    DISSENY (`--u`), i per tant escalen sols. S'hi afegeixen els que calguin,
    amb nom; mai un número solt dins d'un component.
 
-   ATENCIÓ, CORRECCIÓ: aquests quatre valors estaven escrits amb el
-   multiplicador invertit. `--u` val 1 px de disseny (a 1920, 1 px), i per tant
-   el multiplicador ha de ser DIRECTAMENT el nombre d'unitats del comentari:
-   `--esp-1` son 8 unitats i el multiplicador es 8, no 0,5. Amb els valors
-   antics, `--esp-3` feia 2,5 px en comptes de 40 i `--marge-lateral` deixava
-   la pàgina sense marge lateral.
+   ATENCIÓ, TRES CORRECCIONS, i totes tres les ha destapat el PRIMER consumidor
+   (ho diu el pla §10: la fonamenta no en tenia cap):
 
-   No s'havia vist perquè la fonamenta no tenia CAP consumidor (ho diu el pla,
-   §10). Amb el primer consumidor, el primer mesurament l'ha destapat.
+   1. ELS MULTIPLICADORS ESTAVEN INVERTITS. `--u` val 1 px de disseny (a 1920,
+      1 px), i per tant el multiplicador ha de ser DIRECTAMENT el nombre
+      d'unitats del comentari: `--esp-1` son 8 unitats i el multiplicador es 8,
+      no 0,5. Amb els valors antics, `--esp-3` feia 2,5 px en comptes de 40 i
+      `--marge-lateral` deixava la pàgina sense marge lateral.
+
+   2. EL TERRA ERA DEL TEXT I S'APLICAVA A LA GEOMETRIA. Amb `--u` a 10,6667 px
+      fixos per sota de 1280, `--esp-4` a 768 feia 1.280 px en comptes de 48.
+
+   3. PER TANT, L'ESCALA D'ESPAIAT NO TE TERRA, com tampoc no en te el carril ni
+      `--u`: es `finestra / 1920` sempre. El terra del text viu a `--escala`, que
+      es la del TEXT i no la de la geometria, i quan el text tingui escala propia
+      sera `--escala-text`.
+
+   PER QUE ES IMPORTANT QUE NO EN TINGUI. L'aire visible entre galeries es
+   `marge − sobreeixit del titol`, i el sobreeixit va sobre el carril. Si els dos
+   costats de la resta tenen terres diferents, la resta no es constant: mesurat,
+   amb el terra donava 262 unitats de carril a 1920 i 105 px... i amb
+   l'expressio exacta, l'aire sortia NEGATIU a 1024 i 768 (la pindola cau a sobre
+   del titol). Sense terra, els dos costats escalen igual.
    ------------------------------------------------------------------------- */
 :root {
   --esp-1: calc(var(--u) * 8);      /*   8 unitats: dins d'un element        */
