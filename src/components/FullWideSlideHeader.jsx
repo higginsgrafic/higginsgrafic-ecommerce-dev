@@ -1,7 +1,7 @@
 import { memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import * as ReactDOM from 'react-dom';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { ChevronDown, User, LogIn, Lock, Unlock, Search } from 'lucide-react';
+import { ChevronDown, User, LogIn, Lock, Unlock, Search, LayoutDashboard } from 'lucide-react';
 import { useProductContext } from '@/contexts/ProductContext';
 import { useAdmin } from '@/contexts/AdminContext';
 import { useAuth } from '@/contexts/AuthContext';
@@ -61,7 +61,7 @@ function FullWideSlideHeader({
   const location = useLocation();
   const navigate = useNavigate();
   const { products: contextProducts } = useProductContext();
-  const { adminEmail } = useAdmin();
+  const { adminEmail, isAdmin } = useAdmin();
   const { orders } = useOrders(adminEmail);
   const cartClickTimeoutRef = useRef(null);
   const accountClickTimeoutRef = useRef(null);
@@ -2779,7 +2779,38 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
             columnGap: esTauleta ? undefined : carrilPx(6),
           }}
         >
-          <div className="flex items-center gap-2 lg:gap-2">
+          <div className="relative flex items-center gap-2 lg:gap-2">
+            {/* L'ACCES A L'ADMINISTRACIO, DINS LA CAPÇALERA.
+                Abans hi havia la barra de desenvolupament (la franja vermella
+                de 40 px) i era alla on hi havia el boto d'Administracio. La
+                barra desplaçava tota la pagina, aixi que s'ha tret de les
+                pagines del lloc; aquesta icona fa la mateixa feina.
+
+                VA POSICIONADA A SOBRE, no es un element de la filera: `right:
+                100%` la deixa a l'esquerra del logo i, com que es absoluta, no
+                entra ni al `gap` de la filera ni al calcul de l'amplada. Per
+                aixo la filera es `relative`: es el seu unic fill posicionat, i
+                aixi la icona no mou ni el logo ni el nav ni les icones (que es
+                el que mesura `--hg-band-w`).
+
+                Només per a l'administrador, com ho era la barra: un visitant no
+                hi ha de veure cap entrada a /admin.
+
+                Cap a l'esquerra hi te el coixi de la filera (`carrilLane(40)`,
+                40 px a 1920 i 29 a 1024): 18 px d'icona + 3 de marge hi caben
+                sense sortir de la capçalera. */}
+            {isAdmin && (
+              <Link
+                to="/admin"
+                data-admin-icona="1"
+                aria-label="Administració"
+                title="Administració"
+                className="absolute top-1/2 inline-flex -translate-y-1/2 items-center justify-center rounded text-foreground transition-colors hover:bg-black/5 hover:text-muted-foreground focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                style={{ right: '100%', marginRight: '3px', width: '18px', height: '18px', zIndex: 30 }}
+              >
+                <LayoutDashboard className="h-[18px] w-[18px]" strokeWidth={2} aria-hidden="true" />
+              </Link>
+            )}
             {/* Logo a l'esquerra (desktop + tablet vertical) */}
             <Link id="stripe-guide-header-logo-anchor" to="/" aria-label="Higgins GRÀFIC - Pàgina d'inici" onClick={() => { if (active) closeMegaExplicitly(); }} className="relative z-10 pointer-events-auto hidden md:flex items-center gap-2 font-black tracking-tight text-foreground">
               <span

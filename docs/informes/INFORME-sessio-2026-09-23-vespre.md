@@ -113,6 +113,15 @@ La pàgina nova repartia el seu tros de dalt contra **`--appHeaderOffset`**, que
 | 1024×768 | 104 | **392** | +288 |
 | 768×1024 | 156 | **565** | +409 |
 
+> **Nota afegida després (barra de desenvolupament fora).** Aquests offsets
+> comptaven la **barra de desenvolupament** de 40 px, que només veia
+> l'administrador: la pàgina no s'estava mesurant mai a la seva alçada de
+> veritat. Ja no surt a les pàgines del lloc, així que avui `--appHeaderOffset`
+> val **80 px** a 1920 i 1440, i **116 px** a 1280, 1024 i 768 (els 104 i 156
+> de la taula també són vells: les dues tauletes ja porten la mateixa
+> capçalera). La vora del panell baixa els mateixos 40 px. La xifra que no
+> canvia és la diferència: continua sent l'alçada del panell.
+
 Conseqüències mesurades: **el cadenat trepitjava la hero a tots cinc ports** (48
 px a 1920, 38 a 1440, 48 a 1280 i 1024, 43 a 768) i **la hero no es movia gens**
 en obrir el panell (498 → 498).
