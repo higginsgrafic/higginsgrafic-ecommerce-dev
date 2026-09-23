@@ -21,11 +21,26 @@ function IconsColleccions() {
     <div
       data-icones-colleccions="1"
       style={{
+        // L'ALCADA DE LA FRANJA ES LA D'AUSTEN, no la de la icona mes alta.
+        // Austen es la referencia de volum del grup, i First Contact (99) es mes
+        // gran que la resta (70,4): amb la franja de 70,4, First Contact
+        // sobresurt per dalt i per baix, i les altres quatre queden centrades.
+        // Es `height` i no `minHeight` perque la icona mes alta, si no, tornaria
+        // a manar sobre l'alcada.
+        height: u(ICONA_ALCADA_U),
         display: 'flex',
+        // Les icones s'alineen per la BASE (bottom), i aixo, amb l'alcada de la
+        // franja a la mida d'Austen, les deixa centrades: la base comuna es el
+        // fons de la franja, i el centre de la franja es el centre d'Austen.
+        // Amb `center` el grup quedava 14,3 unitats desviat, perque la icona
+        // mes alta desborda la franja i arrossega el centre visual.
         alignItems: 'center',
         justifyContent: 'center',
         flexWrap: 'wrap',
-        gap: u(20),
+        // El buit entre icones es UN COS: la mida de referencia de la propia
+        // icona (`ICONA_ALCADA_U`). Abans eren 20 unitats, o sigui molt menys
+        // d'un cos, i per aixo es veien enganxades.
+        gap: u(ICONA_ALCADA_U),
       }}
     >
       {ICONES_COLLECCIONS.map((c) => {
