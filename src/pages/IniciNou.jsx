@@ -6,6 +6,7 @@ import { TDP_MIDES_INTERIOR, COLLECTION_BG_SRC } from '@/config/collectionVertic
 import { buildHomeDrawingPlan } from '@/components/home/homeDrawings';
 import HomeColleccio from '@/components/home/HomeColleccio';
 import HeroInici from '@/components/home/HeroInici';
+import IconsColleccions from '@/components/home/IconsColleccions';
 import useIsMobile from '@/hooks/useIsMobile';
 import { SELLING_PRICE_LABEL } from '@/config/pricing';
 import { laneForViewport } from '@/utils/layoutModel';
@@ -190,6 +191,21 @@ function IniciNou() {
         </div>
       ) : (
         <div className="hg-marc" data-inici-nou="1">
+          {/* 00 · LES ICONES DE COLLECCIO, al principi de tot.
+              El seu aire es declara, com el de la resta: `--esp-4` a sobre i a
+              sota, i el bloc va dins del contingut amb marge (les icones son
+              text i dibuix, no graella de fitxes). */}
+          <div className="hg-marc__contingut">
+            <section
+              className="hg-seccio"
+              data-seccio="icones"
+              aria-label="Col·leccions"
+              style={{ paddingBlock: 'var(--esp-4)' }}
+            >
+              <IconsColleccions />
+            </section>
+          </div>
+
           {/* 01 · LA HERO, al carril sencer. El carril ha d'ENVOLTAR el bloc de
               la hero i no ser-ne el pare: el seu aire es un `paddingInline` en
               percentatge, i un percentatge de padding es mesura sobre

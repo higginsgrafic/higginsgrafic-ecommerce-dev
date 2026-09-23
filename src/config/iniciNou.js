@@ -208,3 +208,24 @@ export const TITOL_MIDA_ESP4 = TITOL_MIDA_U / 1350;
  * l'inici del bloc, que es exactament el que hi havia abans del canvi.
  */
 export const TITOL_CARDS_FACTOR = 76.8 / 120;
+
+/**
+ * LES ICONES DE COLLECCIO.
+ *
+ * Son les cinc mateixes que la pagina vella dibuixa amb un `filter:
+ * brightness(0)`, o sigui en negre, i amb la mida del grup d'Austen (70,4 px
+ * d'alcada) com a referencia de volum. El dibuix de First Contact es mes ample
+ * que alt i es mes gran (99 px), i per aixo porta la seva propia mida.
+ */
+export const ICONES_COLLECCIONS = [
+  { id: 'first-contact', name: 'First Contact', href: '/first-contact', icon: '/custom_logos/collections/collection-first-contact-logo.webp' },
+  { id: 'the-human-inside', name: 'The Human Inside', href: '/the-human-inside', icon: '/custom_logos/collections/collection-thin-logo.svg' },
+  { id: 'austen', name: 'Austen', href: '/austen', icon: '/custom_logos/collections/collection-jean-austen-logo.svg' },
+  { id: 'cube', name: 'Cube', href: '/cube', icon: '/custom_logos/collections/collection-cube-logo.svg' },
+  { id: 'miscellania', name: 'Miscel·lània', href: '/miscellania', icon: '/custom_logos/collections/collection-miscellania-logo.svg' },
+];
+
+/** L'alcada de referencia de les icones, en unitats de disseny. */
+export const ICONA_ALCADA_U = 70.4;
+/** First Contact es mes ample que alt i es dibuixa mes gran. */
+export const ICONA_ALCADA_FC_U = 99;
