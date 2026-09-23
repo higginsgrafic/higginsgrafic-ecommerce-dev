@@ -3,6 +3,7 @@ import { Shuffle } from 'lucide-react';
 import { buildHeroStripePlan, DARK_COLORS } from '@/components/home/homeDrawings';
 import { CERCADOR_COLORS } from '@/data/collections';
 import useIsMobile from '@/hooks/useIsMobile';
+import { deviceLayoutFromViewport } from '@/utils/layoutModel';
 import { HERO_DIBUIX_MIDA, HERO_DIBUIX_MIDA_DEFECTE } from '@/config/iniciNou';
 
 /** El color de cada samarreta, de la taula canonica del lloc. */
@@ -35,6 +36,12 @@ function HeroInici() {
   const esTauleta = typeof window !== 'undefined'
     && window.innerWidth >= 768
     && window.innerWidth <= 1366;
+  // A la tauleta VERTICAL la hero va a tot el carril: alla la pantalla es mes
+  // curta i el bloc de sota te mes espai que la propia hero (mesurat: el bloc
+  // en fa 403 i la hero 249 al 80 %). Amb el carril sencer en fa 311, que es
+  // gairebe la mida que te a 1440 (321).
+  const esVertical = typeof window !== 'undefined'
+    && deviceLayoutFromViewport(window.innerWidth, window.innerHeight).isPortraitTablet;
   const [plan, setPlan] = useState(() => buildHeroStripePlan());
   const franges = useMemo(() => plan, [plan]);
 
@@ -45,14 +52,13 @@ function HeroInici() {
       style={{
         display: 'flex',
         flexDirection: 'column',
-        // LA HERO AL 80 % DEL CARRIL. L'amo la vol un 20 % mes petita.
+        // LA HERO AL 80 % DEL CARRIL, I AL 100 % A LA VERTICAL.
         //
         // El percentatge va al BLOC i no a la caixa perque el padding d'un
         // percentatge es mesura sobre l'amplada del PARE, que es el carril:
-        // aixi la caixa fa el 20 % del CARRIL i queda centrada.
-        //
-        // L'aire es reparteix a parts iguals a cada costat.
-        paddingInline: '10%',
+        // aixi la caixa fa el 20 % del CARRIL i queda centrada. L'aire es
+        // reparteix a parts iguals a cada costat, i a la vertical no n'hi ha.
+        paddingInline: esVertical ? 0 : '10%',
       }}
     >
       <div
