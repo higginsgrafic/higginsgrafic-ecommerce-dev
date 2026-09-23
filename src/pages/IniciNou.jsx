@@ -190,48 +190,34 @@ function IniciNou() {
           <p>Aquesta pàgina encara no té la vista mòbil: es construeix sobre l&apos;escriptori.</p>
         </div>
       ) : (
-        <div
-          className="hg-marc"
-          data-inici-nou="1"
-          style={{
-            // UNA TAULA INVISIBLE DE DUES FILES IGUALS.
-            //
-            // Del fons de la capçalera al fons de la finestra hi ha dues files
-            // de la mateixa alcada (`1fr 1fr`): a dalt les icones i a baix la
-            // hero, cada una CENTRADA dins de la seva cella. El que ve despres
-            // (les galeries i el poster) queda avall, en flux, com sempre.
-            //
-            // L'alcada de la taula es `100vh − --appHeaderOffset`: la finestra
-            // menys el que ocupa la capçalera, que la capçalera ja publica.
-            minHeight: 'calc(100vh - var(--appHeaderOffset, 0px))',
-            display: 'grid',
-            gridTemplateRows: '1fr 1fr',
-          }}
-        >
-          {/* 00 · LES ICONES DE COLLECCIO, al principi de tot.
-              El seu aire es declara, com el de la resta: `--esp-4` a sobre i a
-              sota, i el bloc va dins del contingut amb marge (les icones son
-              text i dibuix, no graella de fitxes). */}
-          <div className="hg-marc__contingut">
-            <section
-              className="hg-seccio"
-              data-seccio="icones"
-              aria-label="Col·leccions"
-              style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-            >
-              <IconsColleccions />
-            </section>
-          </div>
+        <div className="hg-marc" data-inici-nou="1">
+          {/* LA TAULA INVISIBLE DE DUES FILES.
+              Es un element PROPI, i no el marc de la pagina: el marc conte tambe
+              les galeries i el poster, i si la graella hi fos a sobre les files
+              no podrien ser iguals, perque l'alcada del marc es el contingut
+              sencer (mesurat: 7.278 px amb una finestra de 1.080).
+              Aquesta taula fa NOMES l'alcada de la finestra menys la capçalera,
+              que la capçalera ja publica, i te dues files iguals al 50 %. */}
+          <div
+            className="hg-taula-inici"
+            data-taula-inici="1"
+            style={{
+              height: 'calc(100vh - var(--appHeaderOffset, 0px))',
+              display: 'flex',
+              flexDirection: 'column',
+            }}
+          >
+            <div className="hg-marc__contingut" style={{ flex: '1 1 50%', minHeight: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <section className="hg-seccio" data-seccio="icones" aria-label="Col·leccions" style={{ width: '100%' }}>
+                <IconsColleccions />
+              </section>
+            </div>
 
-          {/* 01 · LA HERO, al carril sencer. El carril ha d'ENVOLTAR el bloc de
-              la hero i no ser-ne el pare: el seu aire es un `paddingInline` en
-              percentatge, i un percentatge de padding es mesura sobre
-              l'amplada del PARE. Amb el carril de pare, el 70,5 % de 1350 dona
-              952; amb la seccio de pare (tota la finestra) en donava 1.200. */}
-          <div className="hg-carril" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-            <section className="hg-seccio" data-seccio="hero" aria-label="Hero">
-              <HeroInici />
-            </section>
+            <div className="hg-carril" style={{ flex: '1 1 50%', minHeight: 0, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+              <section className="hg-seccio" data-seccio="hero" aria-label="Hero">
+                <HeroInici />
+              </section>
+            </div>
           </div>
 
           <div className="hg-marc__contingut">
@@ -242,24 +228,6 @@ function IniciNou() {
                 className="hg-seccio"
                 data-seccio={colleccio.id}
                 aria-label={colleccio.label}
-                // L'AIRE ENTRE GALERIES. El marge de la seccio NO es l'aire
-                // que es veu: la pindola es `absolute` i baixa 169 unitats del
-                // seu bloc, i aixo ho compensa `reservaPindola`; i el TEXT del
-                // titol comença 27 unitats abans de la seva caixa.
-                //
-                // L'AIRE DE SOBRE D'AQUESTA SECCIO.
-                //
-                // Les galeries 2 a 6 van separades pel doble de l'`--esp-4`, i
-                // la 1 va a la MEITAT, perque l'amo la vol mes a prop de la
-                // hero. Es el parametre que governa l'espai entre la hero i la
-                // primera colleccio.
-                //
-                // MESURAT: 271,9 px a 1920 amb el marge sencer, i 136,0 amb
-                // aquest, que es la meitat exacta. I ho es a les cinc mides
-                // (279,9->106,0 / 282,5->96,0 / 286,8->80,0 / 291,0->64,0).
-                //
-                // El marge es `--esp-4 + 16px` i no `--esp-4 / 2` perque la
-                // cadena te una part que no escala (la formula de sota).
                 style={{
                   // L'AIRE DE SOBRE. La primera galeria va mes a prop de la
                   // hero que les altres entre elles: l'amo demana la meitat de
@@ -290,7 +258,7 @@ function IniciNou() {
                   backgroundSrc={COLLECTION_BG_SRC}
                   marginBlockStart="0px"
                   reservaPindola
-                  titolAire="calc(2 * var(--esp-4))"
+                  titolAire="calc(var(--esp-4) / 2)"
                   {...(index === COLLECCIONS_INICI.length - 1 ? { zIndex: 30 } : {})}
                 />
               </section>
