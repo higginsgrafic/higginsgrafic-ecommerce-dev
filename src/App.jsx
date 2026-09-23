@@ -25,6 +25,7 @@ import CollectionIconsBar from '@/components/CollectionIconsBar';
 import { MobileCercadorSheet } from '@/components/MobileCercadorSheet';
 
 const DebugLayer = lazy(() => import('@/components/DebugLayer'));
+const MarcNavegador = lazy(() => import('@/components/dev/MarcNavegador'));
 
 
 function App() {
@@ -407,6 +408,12 @@ function App() {
             />
           </Suspense>
         )}
+
+        {/* EL MARC DEL NAVEGADOR, si l'URL el demana (`?navegador=1`). Es una
+            peça del DOM per poder-la seleccionar i ajustar des del DevTools. */}
+        <Suspense fallback={null}>
+          <MarcNavegador />
+        </Suspense>
       </>
     )}
     </ErrorBoundary>
