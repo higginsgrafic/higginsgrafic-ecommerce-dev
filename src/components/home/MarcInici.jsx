@@ -111,16 +111,30 @@ function MarcInici({ seccions }) {
       const linia = (() => {
         cala.style.width = 'var(--hg-mega-bottom, 0px)';
         const publicada = parseFloat(getComputedStyle(cala).width) || 0;
-        if (publicada > 0) return publicada;
+        // Nomes val si es de la mida d'ara: el panell es desmunta en canviar de
+        // mida i la variable es queda amb el valor de la mida anterior.
+        cala.style.width = 'var(--hg-mega-bottom-ample, 0px)';
+        const amplePublicada = parseFloat(getComputedStyle(cala).width) || 0;
+        const fresca = publicada > 0 && Math.abs(amplePublicada - window.innerWidth) < 2;
+        if (fresca) return publicada;
         cala.style.width = 'var(--inici-nou-carril, 0px)';
         const carril = parseFloat(getComputedStyle(cala).width) || 0;
-        // L'alcada del panell segons el carril, amb els punts mesurats.
-        let alcada;
-        if (carril >= 1100) alcada = 0.45 * carril - 195;      // 1270 -> 376
-        else if (carril >= 950) alcada = 1.7 * carril - 1145;  //  953 -> 305
-        else if (carril >= 750) alcada = 271;                  //  933 -> 271
-        else alcada = -2.4 * carril + 2202;                    //  688 -> 565
-        return capcalera + Math.max(0, alcada);
+        // ON CAU LA LINIA SEGONS EL CARRIL, amb els quatre punts mesurats:
+        //
+        //   carril   linia (vora del panell)
+        //    688      565   (768x1024)
+        //    933      392   (1024x768, 1280x720 i 1366x768)
+        //    953      426   (1440x900)
+        //   1270      497   (1920x1080)
+        //
+        // ES LA LINIA, NO L'ALCADA DEL PANELL. El panell no arrenca a la
+        // capçalera: a 1024 comença a 121 i la capçalera acaba a 104. Estimar
+        // l'alcada i sumar-l'hi fallava disset px.
+        let liniaEstimada;
+        if (carril >= 953) liniaEstimada = 0.224 * carril + 212.6;       //  953 -> 426, 1270 -> 497
+        else if (carril >= 933) liniaEstimada = 1.7 * carril - 1194.1;   //  933 -> 392,  953 -> 426
+        else liniaEstimada = -0.7061 * carril + 1050.8;                  //  688 -> 565,  933 -> 392
+        return Math.max(capcalera, liniaEstimada);
       })();
       // L'ALCADA DE LA ZONA: la finestra menys la linia del megaslide.
       const zonaAlcada = window.innerHeight - linia;
@@ -160,17 +174,15 @@ function MarcInici({ seccions }) {
       // files cauen a 497,1 quan el separador del megaslide es a 497: la
       // frontera del model i la del megaslide coincideixen.
       const fila = (window.innerHeight - capcalera) / FILES_TOTAL;
-      // EL BLOC DEL MEGASLIDE NO POT SER MES PETIT QUE EL MEGASLIDE.
-      //
-      // Les 11 files son la mesura del megaslide, pero nomes coincideixen amb
-      // el seu separador quan el seu alcada escala amb la finestra. A 1366 no:
-      // el panell acaba a 392 i les 11 files cauen a 365, de manera que el
-      // cadenat (392+56 = 448) quedava damunt la hero. El bloc, doncs, es el
-      // mes gran de les dues coses, i tambe ha de deixar passar el cadenat.
-      const blocMega = Math.max(FILES_MEGASLIDE * fila, linia + CADE_BAIXADA - capcalera);
-      // LA PAGINA DE SOTA, la resta, pero amb l'alcada de la hero com a minim:
-      // si la finestra es molt curta, la zona creix i la pagina s'allarga.
-      const blocPagina = Math.max((window.innerHeight - capcalera) - blocMega, natural);
+      // EL BLOC DEL MEGASLIDE ES LA SEVA AREA: les 11 files, i com a minim la
+      // seva vora de veritat. Les 11 files nomes coincideixen amb el separador
+      // quan la seva alcada escala amb la finestra; a 1024 i 1366 el panell
+      // acaba una mica mes avall, i el bloc l'ha de cobrir.
+      const blocMega = Math.max(FILES_MEGASLIDE * fila, linia - capcalera);
+      // LA PAGINA DE SOTA es la resta. El CADENAT, pero, penja 56 px dins seu i
+      // per tant no es pot fer servir per centrar-hi la hero: el seu bloc es el
+      // que queda DESPRES del cadenat.
+      const blocPagina = Math.max((window.innerHeight - capcalera) - blocMega, CADE_BAIXADA + natural);
       const alcada = natural;
       // El numero que decideix si ja hi som: si no s'ha mogut, s'atura.
       const ara = `${Math.round(blocMega * 4) / 4}|${Math.round(blocPagina * 4) / 4}|${Math.round(alcada * 4) / 4}`;
@@ -198,10 +210,19 @@ function MarcInici({ seccions }) {
     // la hero quedava sota el panell.
     const obsArrel = new MutationObserver(programa);
     obsArrel.observe(document.documentElement, { attributes: true, attributeFilter: ['style'] });
+    // LA FINESTRA TAMBÉ, I NOMES PER L'ALCADA. El repartiment depen de
+    // `window.innerHeight`, i si nomeś canvia l'alcada no es mou res de dins
+    // de la zona: ni la hero, ni les icones, ni la vora del megaslide (que
+    // depen del carril). El `ResizeObserver`, doncs, no es desperta i el
+    // repartiment es quedava amb les xifres de la mida anterior.
+    window.addEventListener('resize', programa);
+    window.addEventListener('orientationchange', programa);
     return () => {
       cancelAnimationFrame(raf);
       obs.disconnect();
       obsArrel.disconnect();
+      window.removeEventListener('resize', programa);
+      window.removeEventListener('orientationchange', programa);
       cala.remove();
     };
   }, []);
@@ -248,6 +269,10 @@ function MarcInici({ seccions }) {
           data-cella-de={segona.id}
           style={{
             height: 'var(--inici-bloc-pagina, 0px)',
+            // El cadenat del megaslide penja 56 px dins d'aquest bloc: la hero
+            // es centra en el que queda DESPRES seu, no en el bloc sencer.
+            paddingBlockStart: `${CADE_BAIXADA}px`,
+            boxSizing: 'border-box',
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
