@@ -168,6 +168,31 @@ export const HOME_GALERIA_TOP_PX = 0;
  */
 export const HOME_PILL_AIRE_FACTOR = 0.5;
 
+/**
+ * Les mides interiors de la fitxa de taula, proporcionals a la SEVA amplada.
+ *
+ * Son aqui perque les fan servir DUES pagines (l'inici i les colleccions) i
+ * abans estaven escrites a cadascuna: si una canvia i l'altra no, les fitxes
+ * divergeixen tot i sortir del mateix component.
+ *
+ * `selectorAlcada` era 0,2 i `cistell` 0,15:
+ *  - Amb la fila de la imatge quadrada la fitxa va creixer i el selector
+ *    quedava massa alt (231 x 64 px a 1920, amb els botons mes alts que amples).
+ *  - El cistell feia 48 px, el DOBLE del cos del text del preu. Mesurat amb les
+ *    metriques de la font: els digits de «15,50€» fan 24,30 px d'alcada a 30 px
+ *    de cos (la coma en baixa 3,48 mes, i no s'ha de comptar). Com que el text
+ *    es el 9,5 % de l'amplada de la fitxa, el cistell ha de ser
+ *    0,095 x (24,30/30) = 0,077, que son 24,7 px a 1920.
+ */
+export const TDP_MIDES_INTERIOR = {
+  selectorAmplada: 0.72,
+  selectorAlcada: 0.12,
+  selectorFont: 0.07,
+  text: 0.095,
+  cistell: 0.077,
+  preuGap: 0.1,
+};
+
 export const HERO_TDP_GAP_TABLET_PX = '338px';
 export const HERO_TDP_GAP_LANDSCAPE_PX = '-240px';
 

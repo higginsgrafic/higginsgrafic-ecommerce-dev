@@ -148,11 +148,24 @@ function CollectionTableCard({
       style={{
         flex: '1 1 auto',
         minHeight: 0,
+        // La fila de la imatge es QUADRADA, perque els mockups son quadrats
+        // (800x800). Sense aixo la fila es mes baixa que ampla i la imatge,
+        // que te `maxHeight: 100%`, queda limitada per l'alcada: no arriba mai
+        // a l'amplada i la samarreta es veu petita (mesurat: ocupava el 62 %
+        // de l'amplada de la fila a 1920). Amb la fila quadrada n'ocupa el 94 %,
+        // que es exactament el que la samarreta ocupa dins del mockup.
+        aspectRatio: '1 / 1',
         borderBottom: LINE,
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        padding: '6px 10px',
+        // L'aire de dalt i de baix de la imatge. Es el que separa la samarreta
+        // del nom i del preu: les files van enganxades (buit 0) i tota la
+        // separacio la fa aquest padding. Amb 6 px l'aire era de 27 px a 1920,
+        // dels quals 17 son marge propi del mockup (la samarreta ocupa el 93 %
+        // del seu quadre). Puja'l si cal mes aire; a canvi la imatge encongeix,
+        // perque la fila es quadrada i l'amplada menys el padding mana.
+        padding: '8px 12px',
         position: 'relative',
       }}
     >
