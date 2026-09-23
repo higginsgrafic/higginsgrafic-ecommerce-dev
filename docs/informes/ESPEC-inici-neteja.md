@@ -208,20 +208,35 @@ Cada canvi es verifica amb el mateix invariant, a les cinc mides
 
 ---
 
-## 8. Les passes
+## 8. Les passes, i on són
 
-| # | què | per què en aquest ordre |
+| # | què | estat |
 |---|---|---|
-| 1 | **El títol, amb la caixa que conté el text** (`line-height: normal`) i `--titol-cards` a 103 perquè el text no es mogui | és la causa d'origen; sense això, res més no es pot simplificar |
-| 2 | **La píndola al flux**, i fora `reservaPindola` i `titolAire` | és la segona causa; el bloc passa a contenir el que es veu |
-| 3 | **La galeria al carril sencer** (sense `left: 50%`), i el text al contingut | cada peça, un contenidor |
-| 4 | **La fórmula de l'aire, fora**; `margin-block-start: var(--esp-4)` | és la conseqüència de 1, 2 i 3 |
-| 5 | Una sola escala d'aires per a tota la pàgina | el punt 5 del pla |
+| 1 | **El títol amb la caixa que conté el text** (`line-height: normal`) i `--titol-cards` a 76,8 | **FETA** (`074744b`): sobreeixit 0,0 a les cinc mides, i els desplaçaments per col·lecció, fora |
+| 2 | **La píndola al flux**, i fora la reserva i el voladís | **FETA** (`9140f21`): fora `reservaPindola`, `PINDOLA_VOLADIS` i el `position: relative` del bloc. Els absoluts de la pàgina baixen de 30 a 25, i els 25 que queden són dibuix |
+| 3 | **La galeria al carril sencer** | **FETA** (`71db3c4`) |
+| 4 | **Fora la fórmula de l'aire**; `margin-block-start: var(--esp-4)` | **PENDENT**: el marge encara és `calc(var(--esp-4) + 151,9px − 0,0708·vw)` |
+| 5 | **Una sola escala d'aires** | **PENDENT**, i és la que necessita la decisió de les proporcions |
+| — | **El marc de pàgina** (fase 1 del pla) | **FETA** per a l'inici (`911fc25`): `MarcInici`, 67 línies, i la pàgina comença al fons de la capçalera sense cap excepció |
 
-Cada passa es verifica contra §7 abans de la següent. **Si l'invariant no es
-compleix, s'atura i s'explica per què**: no s'ajusta el número nou perquè quadri.
+### El que la passa 2 ha deixat a la vista
 
----
+Un cop la píndola és al flux, **el marge de la secció ÉS l'aire** que es veu, i per
+tant la fórmula de la passa 4 ja no cal: `--esp-4` donaria l'aire exacte. El que
+passa és que l'aire baixaria de 283,3 a 271,9 px a 1920, perquè fins ara el marge
+es gastava part en compensar el voladís. **És la decisió que queda per al
+propietari**: quants d'aire vol entre col·leccions.
+
+### Les passes que falten, i el que costen
+
+- **Passa 4**: traure la fórmula i deixar `--esp-4`. Petit, però depèn de la
+  decisió de dalt.
+- **Passa 5**: separar `--escala` de `--escala-text` i decidir si la pàgina escala
+  amb el carril o amb la finestra. És la decisió de les proporcions que el
+  propietari va deixar per més endavant, i **bloqueja** l'alçada de la taula i la
+  mida dels textos a les mides petites.
+- **La capçalera** (fase 7 del pla): 3.196 línies, i és l'única peça que encara
+  no comparteix les unitats de la pàgina.
 
 ## 9. El que això no és
 
