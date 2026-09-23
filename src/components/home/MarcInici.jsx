@@ -2,43 +2,46 @@
  * EL MARC DE LA PAGINA D'INICI.
  *
  * NOMES es l'estructura: rep una llista de seccions i les munta en ordre de
- * document. Les dues primeres (les icones i la hero) es reparteixen L'ESPAI QUE
- * QUEDA DESPRES DEL MEGASLIDE amb tres aires iguals.
+ * document. Les dues primeres (les icones i la hero) es reparteixen EL TROS DE
+ * DALT en FILES de la graella.
  *
- * ON CAU LA LINIA DEL MEGASLIDE. No on acaba la capçalera: a 1920 la capçalera
- * fa 120 px i el panell del megaslide n'acaba 497; a 1440, 426; a 1024 i 1280,
- * 392; a 768, 565. El megaslide publica aquesta vora com a `--hg-mega-bottom`,
- * i d'aqui surt `--inici-frontera` (vegeu `foundation.css`). Aquest marc no sap
- * res mes del megaslide.
+ * (Als identificadors del codi aquestes caixes es diuen `cella`, sense punt
+ * volat, per comoditat; a la prosa son `cel·les`.)
  *
- * EL REPARTIMENT. De la linia al fons de la finestra hi ha d'haver, per aquest
- * ordre:
+ * EL REPARTIMENT, EN 28 FILES. De la capçalera al fons de la finestra hi ha
+ * d'haver, per aquest ordre:
  *
- *   cadenat | aire | icones | aire | hero | aire
+ *   megaslide 11 | buit 1 | icones 2 | buit 1 | hero 12 | buit 1  =  28 files
  *
- * El cadenat i les dues peces tenen mida propia i NO es toquen: la franja
- * d'icones es una alcada declarada, i la hero surt del seu aspecte amb
- * l'amplada del carril. El que es reparteix es nomes l'espai que sobra, i es
- * reparteix en tres aires iguals:
+ * La fila es `(finestra − capçalera) / 28`. NO es la fila de la graella del
+ * megaslide (`laneForViewport() × 0,0280625 − 2,875`, que a 1920 fa 35,01),
+ * perque aquella depen del CARRIL i la finestra no: amb la de la graella, a
+ * 1440 el bloc no omplia la finestra. Amb la de la finestra els comptes tanquen
+ * a totes les mides: a 1920 dona 34,29 px, i 11 files fan 377,1 quan el
+ * megaslide mesura 376.
  *
- *   aire = (zona − resguard − icones − hero) / 3
+ * LES DUES CEL·LES. La de les icones porta a dalt les 11 files del megaslide
+ * mes el buit que les separa (12 en total) i res a baix; la de la hero porta una
+ * fila a cada costat. El buit del mig el posen les DUES, i per aixo no es pot
+ * posar el mateix valor a totes dues bandes de totes dues: el del mig sortiria
+ * el doble (mesurat: 77/154/232 en comptes de 154/154/154).
  *
- * SI LA FINESTRA ES CURTA, l'aire queda a zero i prou: la pagina s'allarga i
- * s'ha de desplaçar. Es deliberat. Encongir la hero per encabir-hi tot faria
- * que la peça canviés de mida segons la pantalla, i allo que es vol es que
- * quedi com esta.
- *
- * PER QUE RES ES MOU EN OBRIR EL PANELL. L'aire surt de l'alcada de la zona, i
- * la zona surt de la linia del megaslide: com que la linia es publica sempre
- * amb el mateix valor, obrir i tancar el panell no canvia cap numero. Abans es
- * repartia contra `--appHeaderOffset`, i aleshores el cadenat queia damunt la
- * hero (48 px a 1920, 38 a 1440, 48 a 1280 i 1024, 43 a 768).
+ * LA HERO OCUPA 12 FILES. El seu tamany natural en fa 12,23 a 1920 (428 px
+ * contra 411), i el topall la hi deixa: es l'unica peça que cedeix, i ho fa
+ * perque el repartiment tanqui amb files senceres.
  *
  * PER QUE ES CALCULA AQUI I NO AMB `calc`. Una variable de CSS hereva el valor
  * que te ON S'HA DECLARAT: el `calc` no viatja, el que viatja es el resultat.
  * Declarat a `:root` es resolia amb la zona a `100vh` perque la xifra bona la
- * publica el marc mes avall, i el resultat baixava congelat. El que cal es
- * mesurar, i mesurar es cosa d'aquest component.
+ * publica el marc mes avall, i el resultat baixava congelat. I els valors han
+ * d'anar a l'ESTAT i sortir pel `style`, no escriure's amb `setProperty`: React
+ * reescriu l'atribut `style` sencer a cada render i els esborra.
+ *
+ * LA LINIA DEL MEGASLIDE. No on acaba la capçalera: a 1920 la capçalera fa
+ * 120 px i el panell n'acaba 497; a 1440, 426; a 1024 i 1280, 392; a 768, 565.
+ * El megaslide publica aquesta vora com a `--hg-mega-bottom`, i quan el panell
+ * no es al DOM (es desmunta en tancar-se) s'estima amb el carril. Aquest marc no
+ * sap res mes del megaslide.
  */
 import { useEffect, useRef, useState } from 'react';
 
@@ -224,8 +227,8 @@ function MarcInici({ seccions }) {
         }}
       >
         <div
-          data-cel·la="1"
-          data-cel·la-de={primera.id}
+          data-cella="1"
+          data-cella-de={primera.id}
           style={{
             // Les 11 files del megaslide mes el buit que el separa de les
             // icones, a dalt; i res a baix (el buit del mig el posa la cel·la de
@@ -245,8 +248,8 @@ function MarcInici({ seccions }) {
           {primera.node}
         </div>
         <div
-          data-cel·la="2"
-          data-cel·la-de={segona.id}
+          data-cella="2"
+          data-cella-de={segona.id}
           style={{
             // El buit del mig a dalt i el de sota la hero a baix: una fila
             // cada un.
