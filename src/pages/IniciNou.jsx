@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { Helmet } from 'react-helmet';
 import { Link } from 'react-router-dom';
-import { SECCIONS_INICI, COLLECCIONS_INICI } from '@/config/iniciNou';
+import { SECCIONS_INICI, COLLECCIONS_INICI, TITOL_MIDA_ESP4 } from '@/config/iniciNou';
 import { TDP_MIDES_INTERIOR, COLLECTION_BG_SRC } from '@/config/collectionVertical';
 import { buildHomeDrawingPlan } from '@/components/home/homeDrawings';
 import HomeColleccio from '@/components/home/HomeColleccio';
@@ -128,7 +128,15 @@ function IniciNou() {
         <div className="relative flex flex-col gap-3 w-full">
           <h2
             className="relative font-light uppercase leading-[0.85] tracking-[-0.02em] text-foreground"
-            style={{ fontFamily: 'Oswald, sans-serif', fontSize: '4.4vw', width: '100%', textAlign: 'center' }}
+            style={{
+              fontFamily: 'Oswald, sans-serif',
+              // La mida va sobre el CARRIL i no sobre la finestra: es el que fa
+              // que el sobreeixit del text (27 unitats) sigui el mateix a totes
+              // les mides, i que l'aire entre galeries sigui constant.
+              fontSize: `calc(var(--esp-4) * ${(TITOL_MIDA_ESP4 * 11.25).toFixed(4)})`,
+              width: '100%',
+              textAlign: 'center',
+            }}
           >
             <span
               aria-hidden="true"
@@ -187,13 +195,26 @@ function IniciNou() {
                 className="hg-seccio"
                 data-seccio={colleccio.id}
                 aria-label={colleccio.label}
-                // L'AIRE DE LA SECCIO GOVERNA EL TITOL, NO EL MARGE. El marge
-                // d'aquesta seccio nomes ha de tornar a deixar el bloc on era
-                // (la reserva de `reservaPindola` l'ha baixat 169 unitats): la
-                // resta es el marge NEGATIU del titol, que es qui declara l'aire
-                // de debò. Aixi l'aire (144 unitats) es el mateix a tot arreu,
-                // perque no depen de l'amplada del carril ni del terra de
-                // l'escala.
+                // L'AIRE ENTRE GALERIES, amb el seu nom i el seu calcul.
+                //
+                // El marge de la seccio NO es l'aire que es veu: pel mig hi ha
+                // dues coses que el titol i la pindola hi posen pel seu compte:
+                //   - la pindola es `absolute` i baixa 169 unitats del bloc, o
+                //     sigui que la seccio acaba 169 unitats abans del que es veu
+                //     (aixo ho arregla `reservaPindola`, que les reserva dins);
+                //   - el TEXT del titol comença 27 unitats ABANS de la seva
+                //     caixa, per `line-height: 0.85`.
+                // O sigui: visible = marge + 169 (reserva) − 169 (voladis) − 27
+                // (sobreeixit) ... i el que queda es el marge menys 27 unitats.
+                //
+                // Amb `--esp-4` (120 unitats) l'aire visible son 93 unitats de
+                // carril. MESURAT a les cinc mides, i CONSTANT: 262 / 261 / 262 /
+                // 261 / 262 carril units entre el text de la pindola i el text
+                // del titol, que es el que es veu (a 1920, 262 px).
+                //
+                // PER QUE NO SON 144: 144 era l'aire de la hero, que no te ni
+                // pindola ni titol a sota. Aqui l'aire el governen tres peces, i
+                // el numero que en surt es el que es veu.
                 style={{ marginBlockStart: 'calc(169px + var(--esp-4))' }}
               >
                 <HomeColleccio

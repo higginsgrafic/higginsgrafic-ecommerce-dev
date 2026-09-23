@@ -198,7 +198,11 @@ function HomeColleccio({
         marginBlockStart,
         // El que la pindola baixa: 130 unitats (el seu `top`) + la seva alcada
         // (39) = 169, sobre el carril.
-        ...(reservaPindola ? { paddingBottom: `${(PINDOLA_VOLADIS / 1350) * 100}%` } : {}),
+        // El percentatge es calcula sobre l'amplada del BLOC, que no es el
+        // carril: el bloc es dins del contingut amb marge i en fa 40 unitats
+        // menys. Mesurat: 12,5185 % del bloc (1270) donava 159 px en comptes de
+        // 169. El factor es (1 − 80/1350).
+        ...(reservaPindola ? { paddingBottom: `${(PINDOLA_VOLADIS / (1350 - 80)) * 100}%` } : {}),
         ...(zIndex ? { position: 'relative', zIndex } : {}),
       }}
     >
@@ -215,7 +219,10 @@ function HomeColleccio({
       </div>
       <div style={{
         marginTop: portraitTablet ? `${HOME_TITOL_TDP_MARGIN_PX.tauleta}px` : `${HOME_TITOL_TDP_MARGIN_PX.escriptori}px`,
-        ...(titolAire ? { marginTop: `calc(${titolAire} - ${PINDOLA_VOLADIS}px)` } : {}),
+        // El `mt-[27px]` del component del titol S'HI SUMA, i per aixo el
+        // primer terme el neutralitza abans de restar-hi el voladis: el que ha
+        // de quedar es `aire − voladis`, i no `aire − voladis + 27`.
+        ...(titolAire ? { marginTop: `calc(${titolAire} - ${PINDOLA_VOLADIS}px - 27px)` } : {}),
       }}>
         <div
           style={{
