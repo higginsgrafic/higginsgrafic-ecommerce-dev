@@ -209,9 +209,11 @@ const COLLECTION_NAMES = {
   'miscellania': 'MISCEL·LÀNIA',
 };
 
-// Fitxa de taula: A (nom a dalt) i B (imatge a dalt), intercalades.
+// Fitxa de taula: NOMES la variant A (nom a dalt). La B (imatge a dalt) s'ha
+// tret per decisio de l'amo: les dues variants donaven alcades de fitxa
+// diferents i el ritme de les galeries no era estable. Totes les pagines fan
+// servir ara la del nom a dalt.
 const TableCardA = (props) => <CollectionTableCard {...props} />;
-const TableCardB = (props) => <CollectionTableCard {...props} variantB />;
 
 function HomeTdpCard({ Component, slug, index, cardPropsFn, collectionHref, editableIdPrefix, gridColumn, style, portraitTablet = false }) {
   const [size, setSize] = useState('M');
@@ -814,13 +816,13 @@ function Home() {
               }}
             >
               {/* Columna 1: TDP2 */}
-              <HomeTdpCard Component={TableCardB} slug="first-contact" index={0} cardPropsFn={cardProps} portraitTablet={isPortraitTablet} collectionHref="/first-contact" editableIdPrefix="home-row1-tdp-1" gridColumn="1 / 2" style={{ width: '100%', alignSelf: 'start', boxSizing: 'border-box' }} />
+              <HomeTdpCard Component={TableCardA} slug="first-contact" index={0} cardPropsFn={cardProps} portraitTablet={isPortraitTablet} collectionHref="/first-contact" editableIdPrefix="home-row1-tdp-1" gridColumn="1 / 2" style={{ width: '100%', alignSelf: 'start', boxSizing: 'border-box' }} />
 
               {/* Columna 2: TDP1 */}
               <HomeTdpCard Component={TableCardA} slug="first-contact" index={1} cardPropsFn={cardProps} portraitTablet={isPortraitTablet} collectionHref="/first-contact" editableIdPrefix="home-row1-tdp-2" gridColumn="2 / 3" style={{ width: '100%', alignSelf: 'start', boxSizing: 'border-box' }} />
 
               {/* Columna 3: TDP2 (Amb imatge a dalt i bloc Nom/Descripció a dota) */}
-              {midaTdpHome.columnes >= 3 && <HomeTdpCard Component={TableCardB} slug="first-contact" index={2} cardPropsFn={cardProps} portraitTablet={isPortraitTablet} collectionHref="/first-contact" editableIdPrefix="home-row1-tdp-3" gridColumn="3 / 4" style={{ width: '100%', alignSelf: 'start', boxSizing: 'border-box' }} />}
+              {midaTdpHome.columnes >= 3 && <HomeTdpCard Component={TableCardA} slug="first-contact" index={2} cardPropsFn={cardProps} portraitTablet={isPortraitTablet} collectionHref="/first-contact" editableIdPrefix="home-row1-tdp-3" gridColumn="3 / 4" style={{ width: '100%', alignSelf: 'start', boxSizing: 'border-box' }} />}
               {/* Columna 4 (nomes a escriptori, on la graella en te 4) */}
               {midaTdpHome.columnes > 3 && <HomeTdpCard Component={TableCardA} slug="first-contact" index={3} cardPropsFn={cardProps} portraitTablet={isPortraitTablet} collectionHref="/first-contact" editableIdPrefix="home-row1-tdp-4" gridColumn="4 / 5" style={{ width: '100%', alignSelf: 'start', boxSizing: 'border-box' }} />}
 
@@ -922,12 +924,12 @@ function Home() {
                 <HomeTdpCard Component={TableCardA} slug="the-human-inside" index={0} cardPropsFn={cardProps} portraitTablet={isPortraitTablet} collectionHref="/the-human-inside" editableIdPrefix="home-row2-tdp-1" gridColumn="1 / 2" style={{ width: '100%', alignSelf: 'start', boxSizing: 'border-box' }} />
 
                 {/* Columna 2: TDP2 */}
-                <HomeTdpCard Component={TableCardB} slug="the-human-inside" index={1} cardPropsFn={cardProps} portraitTablet={isPortraitTablet} collectionHref="/the-human-inside" editableIdPrefix="home-row2-tdp-2" gridColumn="2 / 3" style={{ width: '100%', alignSelf: 'start', boxSizing: 'border-box' }} />
+                <HomeTdpCard Component={TableCardA} slug="the-human-inside" index={1} cardPropsFn={cardProps} portraitTablet={isPortraitTablet} collectionHref="/the-human-inside" editableIdPrefix="home-row2-tdp-2" gridColumn="2 / 3" style={{ width: '100%', alignSelf: 'start', boxSizing: 'border-box' }} />
 
                 {/* Columna 3: TDP1 */}
                 {midaTdpHome.columnes >= 3 && <HomeTdpCard Component={TableCardA} slug="the-human-inside" index={2} cardPropsFn={cardProps} portraitTablet={isPortraitTablet} collectionHref="/the-human-inside" editableIdPrefix="home-row2-tdp-3" gridColumn="3 / 4" style={{ width: '100%', alignSelf: 'start', boxSizing: 'border-box' }} />}
                 {/* Columna 4 (nomes a escriptori, on la graella en te 4) */}
-                {midaTdpHome.columnes > 3 && <HomeTdpCard Component={TableCardB} slug="the-human-inside" index={3} cardPropsFn={cardProps} portraitTablet={isPortraitTablet} collectionHref="/the-human-inside" editableIdPrefix="home-row2-tdp-4" gridColumn="4 / 5" style={{ width: '100%', alignSelf: 'start', boxSizing: 'border-box' }} />}
+                {midaTdpHome.columnes > 3 && <HomeTdpCard Component={TableCardA} slug="the-human-inside" index={3} cardPropsFn={cardProps} portraitTablet={isPortraitTablet} collectionHref="/the-human-inside" editableIdPrefix="home-row2-tdp-4" gridColumn="4 / 5" style={{ width: '100%', alignSelf: 'start', boxSizing: 'border-box' }} />}
 
               {/* Indicador de més productes (Pill amb text sota el producte de la tercera columna) */}
               <Link
@@ -1024,13 +1026,13 @@ function Home() {
                 }}
               >
                 {/* Columna 1: TDP2 */}
-                <HomeTdpCard Component={TableCardB} slug="austen" index={0} cardPropsFn={cardProps} portraitTablet={isPortraitTablet} collectionHref="/austen" editableIdPrefix="home-row3-tdp-1" gridColumn="1 / 2" style={{ width: '100%', alignSelf: 'start', boxSizing: 'border-box' }} />
+                <HomeTdpCard Component={TableCardA} slug="austen" index={0} cardPropsFn={cardProps} portraitTablet={isPortraitTablet} collectionHref="/austen" editableIdPrefix="home-row3-tdp-1" gridColumn="1 / 2" style={{ width: '100%', alignSelf: 'start', boxSizing: 'border-box' }} />
 
                 {/* Columna 2: TDP1 */}
                 <HomeTdpCard Component={TableCardA} slug="austen" index={1} cardPropsFn={cardProps} portraitTablet={isPortraitTablet} collectionHref="/austen" editableIdPrefix="home-row3-tdp-2" gridColumn="2 / 3" style={{ width: '100%', alignSelf: 'start', boxSizing: 'border-box' }} />
 
                 {/* Columna 3: TDP2 */}
-                {midaTdpHome.columnes >= 3 && <HomeTdpCard Component={TableCardB} slug="austen" index={2} cardPropsFn={cardProps} portraitTablet={isPortraitTablet} collectionHref="/austen" editableIdPrefix="home-row3-tdp-3" gridColumn="3 / 4" style={{ width: '100%', alignSelf: 'start', boxSizing: 'border-box' }} />}
+                {midaTdpHome.columnes >= 3 && <HomeTdpCard Component={TableCardA} slug="austen" index={2} cardPropsFn={cardProps} portraitTablet={isPortraitTablet} collectionHref="/austen" editableIdPrefix="home-row3-tdp-3" gridColumn="3 / 4" style={{ width: '100%', alignSelf: 'start', boxSizing: 'border-box' }} />}
                 {/* Columna 4 (nomes a escriptori, on la graella en te 4) */}
                 {midaTdpHome.columnes > 3 && <HomeTdpCard Component={TableCardA} slug="austen" index={3} cardPropsFn={cardProps} portraitTablet={isPortraitTablet} collectionHref="/austen" editableIdPrefix="home-row3-tdp-4" gridColumn="4 / 5" style={{ width: '100%', alignSelf: 'start', boxSizing: 'border-box' }} />}
 
@@ -1132,12 +1134,12 @@ function Home() {
                 <HomeTdpCard Component={TableCardA} slug="cube" index={0} cardPropsFn={cardProps} portraitTablet={isPortraitTablet} collectionHref="/cube" editableIdPrefix="home-row4-tdp-1" gridColumn="1 / 2" style={{ width: '100%', alignSelf: 'start', boxSizing: 'border-box' }} />
 
                 {/* Columna 2: TDP2 */}
-                <HomeTdpCard Component={TableCardB} slug="cube" index={1} cardPropsFn={cardProps} portraitTablet={isPortraitTablet} collectionHref="/cube" editableIdPrefix="home-row4-tdp-2" gridColumn="2 / 3" style={{ width: '100%', alignSelf: 'start', boxSizing: 'border-box' }} />
+                <HomeTdpCard Component={TableCardA} slug="cube" index={1} cardPropsFn={cardProps} portraitTablet={isPortraitTablet} collectionHref="/cube" editableIdPrefix="home-row4-tdp-2" gridColumn="2 / 3" style={{ width: '100%', alignSelf: 'start', boxSizing: 'border-box' }} />
 
                 {/* Columna 3: TDP1 */}
                 {midaTdpHome.columnes >= 3 && <HomeTdpCard Component={TableCardA} slug="cube" index={2} cardPropsFn={cardProps} portraitTablet={isPortraitTablet} collectionHref="/cube" editableIdPrefix="home-row4-tdp-3" gridColumn="3 / 4" style={{ width: '100%', alignSelf: 'start', boxSizing: 'border-box' }} />}
                 {/* Columna 4 (nomes a escriptori, on la graella en te 4) */}
-                {midaTdpHome.columnes > 3 && <HomeTdpCard Component={TableCardB} slug="cube" index={3} cardPropsFn={cardProps} portraitTablet={isPortraitTablet} collectionHref="/cube" editableIdPrefix="home-row4-tdp-4" gridColumn="4 / 5" style={{ width: '100%', alignSelf: 'start', boxSizing: 'border-box' }} />}
+                {midaTdpHome.columnes > 3 && <HomeTdpCard Component={TableCardA} slug="cube" index={3} cardPropsFn={cardProps} portraitTablet={isPortraitTablet} collectionHref="/cube" editableIdPrefix="home-row4-tdp-4" gridColumn="4 / 5" style={{ width: '100%', alignSelf: 'start', boxSizing: 'border-box' }} />}
 
               {/* Indicador de més productes (Pill amb text sota el producte de la tercera columna) */}
               <Link
@@ -1234,13 +1236,13 @@ function Home() {
                 }}
               >
                 {/* Columna 1: TDP2 */}
-                <HomeTdpCard Component={TableCardB} slug="miscellania" index={0} cardPropsFn={cardProps} portraitTablet={isPortraitTablet} collectionHref="/miscellania" editableIdPrefix="home-row5-tdp-1" gridColumn="1 / 2" style={{ width: '100%', alignSelf: 'start', boxSizing: 'border-box' }} />
+                <HomeTdpCard Component={TableCardA} slug="miscellania" index={0} cardPropsFn={cardProps} portraitTablet={isPortraitTablet} collectionHref="/miscellania" editableIdPrefix="home-row5-tdp-1" gridColumn="1 / 2" style={{ width: '100%', alignSelf: 'start', boxSizing: 'border-box' }} />
 
                 {/* Columna 2: TDP1 */}
                 <HomeTdpCard Component={TableCardA} slug="miscellania" index={1} cardPropsFn={cardProps} portraitTablet={isPortraitTablet} collectionHref="/miscellania" editableIdPrefix="home-row5-tdp-2" gridColumn="2 / 3" style={{ width: '100%', alignSelf: 'start', boxSizing: 'border-box' }} />
 
                 {/* Columna 3: TDP2 */}
-                {midaTdpHome.columnes >= 3 && <HomeTdpCard Component={TableCardB} slug="miscellania" index={2} cardPropsFn={cardProps} portraitTablet={isPortraitTablet} collectionHref="/miscellania" editableIdPrefix="home-row5-tdp-3" gridColumn="3 / 4" style={{ width: '100%', alignSelf: 'start', boxSizing: 'border-box' }} />}
+                {midaTdpHome.columnes >= 3 && <HomeTdpCard Component={TableCardA} slug="miscellania" index={2} cardPropsFn={cardProps} portraitTablet={isPortraitTablet} collectionHref="/miscellania" editableIdPrefix="home-row5-tdp-3" gridColumn="3 / 4" style={{ width: '100%', alignSelf: 'start', boxSizing: 'border-box' }} />}
                 {/* Columna 4 (nomes a escriptori, on la graella en te 4) */}
                 {midaTdpHome.columnes > 3 && <HomeTdpCard Component={TableCardA} slug="miscellania" index={3} cardPropsFn={cardProps} portraitTablet={isPortraitTablet} collectionHref="/miscellania" editableIdPrefix="home-row5-tdp-4" gridColumn="4 / 5" style={{ width: '100%', alignSelf: 'start', boxSizing: 'border-box' }} />}
 
