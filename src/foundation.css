@@ -239,14 +239,6 @@
   --contingut-max: var(--inici-nou-carril);
 }
 
-/* EL TOPALL DE LA CAIXA DE LA HERO.
-   La hero fa la mida que li dona el seu aspecte amb l'amplada del carril, i
-   nomes s'encongeix quan la finestra es tan curta que el cadenat hi entraria a
-   sobre. El numero el publica el marc, que mesura la zona i les peces. */
-.hg-hero-caixa {
-  max-height: var(--inici-hero-sostre, none);
-}
-
 
 
 /* ---------------------------------------------------------------------------
@@ -309,14 +301,6 @@
    ------------------------------------------------------------------------- */
 [data-inici-nou="1"] {
   --contingut-max: var(--inici-nou-carril);
-}
-
-/* EL TOPALL DE LA CAIXA DE LA HERO.
-   La hero fa la mida que li dona el seu aspecte amb l'amplada del carril, i
-   nomes s'encongeix quan la finestra es tan curta que el cadenat hi entraria a
-   sobre. El numero el publica el marc, que mesura la zona i les peces. */
-.hg-hero-caixa {
-  max-height: var(--inici-hero-sostre, none);
 }
 
 
