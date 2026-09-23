@@ -3,6 +3,7 @@ import { Shuffle } from 'lucide-react';
 import { buildHeroStripePlan, DARK_COLORS } from '@/components/home/homeDrawings';
 import { CERCADOR_COLORS } from '@/data/collections';
 import useIsMobile from '@/hooks/useIsMobile';
+import { HERO_DIBUIX_MIDA, HERO_DIBUIX_MIDA_DEFECTE } from '@/config/iniciNou';
 
 /** El color de cada samarreta, de la taula canonica del lloc. */
 const HEX_SAMARRETA = Object.fromEntries(CERCADOR_COLORS.map((c) => [c.slug, c.hex]));
@@ -29,6 +30,11 @@ const HEX_SAMARRETA = Object.fromEntries(CERCADOR_COLORS.map((c) => [c.slug, c.h
  */
 function HeroInici() {
   const isMobile = useIsMobile();
+  // La finestra es de tauleta? Es el que tria entre els dos valors del mapa de
+  // mides del dibuix.
+  const esTauleta = typeof window !== 'undefined'
+    && window.innerWidth >= 768
+    && window.innerWidth <= 1366;
   const [plan, setPlan] = useState(() => buildHeroStripePlan());
   const franges = useMemo(() => plan, [plan]);
 
@@ -89,7 +95,9 @@ function HeroInici() {
                   pointerEvents: 'none',
                 }}
               />
-              {/* EL DIBUIX de la colleccio, a sobre. */}
+              {/* EL DIBUIX de la colleccio, a sobre. La seva mida surt del mapa
+                  de la hero (`HERO_DIBUIX_MIDA`), i NO de l'`overlayScale` de
+                  la fitxa: son dos sistemes diferents. */}
               {band.overlaySrc ? (
                 <div
                   aria-hidden="true"
@@ -100,7 +108,13 @@ function HeroInici() {
                     top: 0,
                     height: '500%',
                     backgroundImage: `url(${band.overlaySrc})`,
-                    backgroundSize: `auto ${(band.overlayScale || 0.345) * 100}%`,
+                    backgroundSize: `auto ${(() => {
+                      // La clau es el final de la ruta de la imatge.
+                      const fitxer = (band.overlaySrc || '').split('/images_stripe/')[1] || '';
+                      const mida = HERO_DIBUIX_MIDA[fitxer];
+                      if (!mida) return HERO_DIBUIX_MIDA_DEFECTE;
+                      return esTauleta ? mida.tauleta : mida.escriptori;
+                    })()}%`,
                     backgroundPosition: 'center 35%',
                     backgroundRepeat: 'no-repeat',
                     transform: `translateY(-${i * 20}%)`,
