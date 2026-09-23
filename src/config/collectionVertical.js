@@ -158,42 +158,52 @@ export const HOME_TITOL_TDP_MARGIN_PX = { escriptori: 130, tauleta: 130 };
 export const HOME_GALERIA_TOP_PX = 0;
 
 /**
- * Aire entre el final d'una galeria de l'inici i el titol de la colleccio
- * seguent.
+ * El marge de dalt del bloc de cada galeria de l'inici: el que separa una
+ * colleccio de la seguent.
  *
- * ERA implicit: l'alcada de mes del bloc (la formula del -231, que a 1920 en
- * feia 368) era el que separava les colleccions, i quedava a 65 px de la
- * pindola. Amb el bloc a l'alcada del contingut, l'aire es declara aqui, que
- * es l'unic lloc on es pot tocar.
+ * ERA QUATRE NUMEROS. `[129, 162, 104, 124]`, calibrats a ma un per galeria i
+ * escampats pel JSX, sumats aleshores a un `HOME_GALERIA_AIRE_SOTA_PX` de 190
+ * per fer 319, 352, 294 i 314 px. El seu efecte era que la distancia entre
+ * blocs fos diferent a cada colleccio. Ara hi ha un sol numero i la distancia
+ * es la mateixa a totes.
  *
- * El numero es 90 i no 100 per dos motius que es compensen:
- *   - el titol te 40 px propis entremig (27 de marge del seu bloc mes 13 del
- *     seu ajust), i aixo DEMANA 40 px menys;
- *   - la pindola va 80 px sota la caixa (30 dels quals tapen el degradat), i
- *     aixo en DEMANA 30 mes.
- * Amb 190, el buit VISIBLE de la pindola al titol es de 150 px.
+ * PER QUE 220 I NO ELS 190 QUE EL CODI DEIA QUE VOLIA. El 190 venia de quan
+ * l'alcada del bloc de la galeria era `carril x 0,84632 - 231`, que a 1920
+ * feia 843 px i sobre-reservava 368 px per sota de les fitxes. Quan l'alcada
+ * del bloc va passar a ser la del contingut (commit `0842d20`), el bloc va
+ * quedar NOMES 60 px mes alt que la caixa de la fitxa, i els quatre marges no
+ * es van recalcular. Amb 190, mesurat a 1920, la pindola hi cau DINS:
+ *
+ *     caixa de la fitxa -> pindola (layout)        130
+ *     alcada de la pindola                         +39
+ *     -> fons de la pindola                         169 px sota la caixa
+ *     marge del bloc                                +190
+ *     -> comença la seguent galeria                  21 px sota la pindola
+ *
+ *     I el TEXT del titol d'aquella galeria comença 27 px ABANS de la seva
+ *     caixa (`line-height: 0.85` amb un cos de 4,4vw sobre un numero de fons
+ *     de fins a 26rem): la pindola quedava 6 px a DINS del text, a les cinc
+ *     mides.
+ *
+ * A mes, la galeria seguent hi afegeix 27 px propis de marge i 3 px de marge
+ * de text, aixi que l'aire de debò son 30 px mes. El calcul queda:
+ *
+ *     130 + 39 + aire_visible + 30 = marge     ->     marge = 199 + aire_visible
+ *
+ * Amb 190 l'aire es NEGATIU (-9, i per aixo la pindola toca el text). Amb 220
+ * en fa 21, i MESURAT a les cinc mides en dona 24 a 1920 i de 34 a 38 a la
+ * resta. Amb 210 en feia 14, que es veu enganxat per a un text de 4,4vw.
+ * O sigui: el minim perque no es toquin es 199, i el valor pres es 220.
+ *
+ * I PER QUE UN VALOR FIX. L'aire necessari depen del sobreeixit del text, que
+ * a 1920 es de 27 px i a 768 d'11: el pitjor cas es la pantalla gran, i a les
+ * altres el marge de 220 encara en sobra. Fer-lo escalar amb el carril es la
+ * feina de proporcions, que esta mesurada i documentada pero no es fa en
+ * aquesta passa: si s'escalés sol, a 768 cauria a 88 px.
+ *
+ * AVIS: aixo mou les colleccions verticalment, i es una decisio presa.
  */
-export const HOME_GALERIA_AIRE_SOTA_PX = 190;
-
-/**
- * El marge de dalt de cada bloc de colleccio de l'inici, amb el seu nom.
- *
- * ESTAVEN CALIBRATS A MA i escampats pel JSX (129, 162, 104 i 124 px), sense
- * cap motiu escrit. Son el que separa una colleccio de la seguent, juntament
- * amb `HOME_GALERIA_AIRE_SOTA_PX`, que s'hi suma.
- */
-export const HOME_COLLECCIO_MARGIN_PX = [129, 162, 104, 124];
-
-/**
- * Quina part de l'aire de sobre es conserva a la pindola «en vols saber mes?»
- * de la pagina d'inici.
- *
- * 0,5 vol dir que la pindola PUJA fins a deixar la meitat de l'aire que tenia
- * sobre la caixa de la targeta. L'aire depen del padding del bloc que conte la
- * pindola i canvia amb la mida, i per aixo es MESURA i no es calcula:
- * intentar-ho amb una formula donava 20 px d'error a 1920 i 189 a 768.
- */
-export const HOME_PILL_AIRE_FACTOR = 0.5;
+export const HOME_COLLECCIO_MARGIN_PX = 220;
 
 /**
  * Les mides interiors de la fitxa de taula, proporcionals a la SEVA amplada.
