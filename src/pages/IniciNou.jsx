@@ -257,7 +257,7 @@ function IniciNou() {
                     // ES UN PEDAC, I SE SAP QUIN TAPA: els 151,9 son consequencia
                     // que el titol no arrenqui a l'inici del seu bloc. Quan hi
                     // arrenqui, l'aire sera `--esp-4` i prou.
-                    : 'calc(2 * (var(--esp-4) + 151.9px - 0.0708 * 100vw))',
+                    : 'calc(2 * (var(--esp-4) - 0.0708 * 100vw) + 303.8px)',
                 }}
               >
                 <HomeColleccio
@@ -276,6 +276,7 @@ function IniciNou() {
                   backgroundSrc={COLLECTION_BG_SRC}
                   marginBlockStart="0px"
                   pindolaAlFlux
+                  titolAPrincipi
                   titolAire="var(--esp-4)"
                   {...(index === COLLECCIONS_INICI.length - 1 ? { zIndex: 30 } : {})}
                 />

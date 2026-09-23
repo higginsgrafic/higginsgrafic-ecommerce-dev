@@ -187,6 +187,15 @@ function HomeColleccio({
   // La pagina vella NO l'activa: alla la pindola es `absolute` i el seu marge
   // de 220 px la compensa. Canviar-ho li mouria les colleccions.
   pindolaAlFlux = false,
+  // EL TITOL, A L'INICI DEL SEU BLOC. El component del titol te un marge propi
+  // (`mt-[27px]`) i la seva caixa s'hi afegeix, de manera que el TEXT arrenca
+  // 76,8 unitats DESPRES de l'inici del bloc. Amb aixo, el marge de la seccio no
+  // pot ser l'aire que es veu: sempre n'hi ha 151,9 de mes.
+  //
+  // Amb `titolAPrincipi`, el marge propi es neutralitza i el text arrenca a
+  // l'inici. L'amo ho decideix per pagina: la vella no ho activa (te els seus
+  // marges calibrats), la nova si.
+  titolAPrincipi = false,
 }) {
   // Les columnes 3 i 4 nomes existeixen si la graella en te tantes. La 1 i la 2
   // hi son sempre: a 768 la graella en te 2.
@@ -203,7 +212,15 @@ function HomeColleccio({
         ...(zIndex ? { zIndex } : {}),
       }}
     >
-      <div style={{ position: 'relative', left: '50%', transform: 'translateX(-50%)', width: 'calc(var(--hg-tdp-xR) - var(--hg-tdp-xL))' }}>
+      <div style={{
+        position: 'relative',
+        left: '50%',
+        transform: 'translateX(-50%)',
+        width: 'calc(var(--hg-tdp-xR) - var(--hg-tdp-xL))',
+        // El `mt-[27px]` del component del titol; a zero, el text arrenca a
+        // l'inici del bloc.
+        ...(titolAPrincipi ? { marginBlockStart: '0px' } : {}),
+      }}>
         <Titol
           index=""
           kicker="Col·lecció"
@@ -222,6 +239,8 @@ function HomeColleccio({
         // La pagina vella en fa 130 i a mes neutralitza el `mt-[27px]` del
         // component del titol (que s'hi suma) restant-li el voladis de la
         // pindola. Tot aixo eren consequencies del desbordament.
+        // El marge entre l'inici del bloc i les fitxes. `titolAire` es el que
+        // fa la pagina nova; el valor fix es el de la vella.
         marginTop: titolAire
           ? `calc(${titolAire} * ${TITOL_CARDS_FACTOR.toFixed(4)})`
           : (portraitTablet ? `${HOME_TITOL_TDP_MARGIN_PX.tauleta}px` : `${HOME_TITOL_TDP_MARGIN_PX.escriptori}px`),
