@@ -158,6 +158,26 @@ export const HOME_TITOL_TDP_MARGIN_PX = { escriptori: 150, tauleta: 75 };
 export const HOME_GALERIA_TOP_PX = 0;
 
 /**
+ * Aire entre el final d'una galeria de l'inici i el titol de la colleccio
+ * seguent.
+ *
+ * ERA implicit: l'alcada de mes del bloc (la formula del -231, que a 1920 en
+ * feia 368) era el que separava les colleccions, i quedava a 65 px de la
+ * pindola. Amb el bloc a l'alcada del contingut, l'aire es declara aqui, que
+ * es l'unic lloc on es pot tocar.
+ */
+export const HOME_GALERIA_AIRE_SOTA_PX = 110;
+
+/**
+ * El marge de dalt de cada bloc de colleccio de l'inici, amb el seu nom.
+ *
+ * ESTAVEN CALIBRATS A MA i escampats pel JSX (129, 162, 104 i 124 px), sense
+ * cap motiu escrit. Son el que separa una colleccio de la seguent, juntament
+ * amb `HOME_GALERIA_AIRE_SOTA_PX`, que s'hi suma.
+ */
+export const HOME_COLLECCIO_MARGIN_PX = [129, 162, 104, 124];
+
+/**
  * Quina part de l'aire de sobre es conserva a la pindola «en vols saber mes?»
  * de la pagina d'inici.
  *

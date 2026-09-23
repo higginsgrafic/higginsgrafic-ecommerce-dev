@@ -13,7 +13,7 @@ import StoryPosterLink from '@/components/StoryPosterLink';
 import useIsMobile from '@/hooks/useIsMobile';
 import HomeMobile from '@/pages/HomeMobile';
 import { SELLING_PRICE_LABEL } from '@/config/pricing';
-import { HOME_TITOL_TDP_MARGIN_PX, HOME_GALERIA_TOP_PX, TDP_MIDES_INTERIOR, COLLECTION_BG_SRC } from '@/config/collectionVertical';
+import { HOME_TITOL_TDP_MARGIN_PX, HOME_GALERIA_TOP_PX, HOME_GALERIA_AIRE_SOTA_PX, HOME_COLLECCIO_MARGIN_PX, TDP_MIDES_INTERIOR, COLLECTION_BG_SRC } from '@/config/collectionVertical';
 import { esTauletaApaisada } from '@/utils/layoutMetrics';
 import { laneForViewport } from '@/utils/layoutModel';
 import { tdpMidaFitxa } from '@/utils/tdpMida';
@@ -230,6 +230,11 @@ function HomeTdpCard({ Component, slug, index, cardPropsFn, collectionHref, edit
     <Component
       backgroundSrc={backgroundSrc}
       {...midesFitxa}
+      // El fons degradat s'INTERCALA amunt i avall: la fitxa senar el porta
+      // girat verticalment (`scaleY(-1)` al fons). Com que l'index es la
+      // columna dins la fila, la 1a i la 3a el porten d'una manera i la 2a i
+      // la 4a de l'altra.
+      gradientGirat={index % 2 === 1}
       gridColumn={gridColumn}
       editableIdPrefix={editableIdPrefix}
       {...cardPropsFn(slug, index, size)}
@@ -835,7 +840,7 @@ function Home() {
           </div>
 
           {/* Col·lecció 02: The Human Inside (Distància de 5 files / 190px + 15px avall - 1 fila amunt) */}
-          <div style={{ marginTop: '129px' }}>
+          <div style={{ marginTop: `calc(${HOME_COLLECCIO_MARGIN_PX[0]}px + ${HOME_GALERIA_AIRE_SOTA_PX}px)` }}>
             <div
               style={{
                 position: 'relative',
@@ -941,7 +946,7 @@ function Home() {
           </div>
 
           {/* Col·lecció 03: Austen (Distància de 5 files / 190px) */}
-          <div style={{ marginTop: '162px' }}>
+          <div style={{ marginTop: `calc(${HOME_COLLECCIO_MARGIN_PX[1]}px + ${HOME_GALERIA_AIRE_SOTA_PX}px)` }}>
             <div
               style={{
                 position: 'relative',
@@ -1047,7 +1052,7 @@ function Home() {
           </div>
 
           {/* Col·lecció 04: Cube (Distància de 5 files / 190px - 1 fila amunt) */}
-          <div style={{ marginTop: '104px' }}>
+          <div style={{ marginTop: `calc(${HOME_COLLECCIO_MARGIN_PX[2]}px + ${HOME_GALERIA_AIRE_SOTA_PX}px)` }}>
             <div
               style={{
                 position: 'relative',
@@ -1153,7 +1158,7 @@ function Home() {
           </div>
 
           {/* Col·lecció 05: MISC (Distància de 5 files / 190px - 1 fila amunt + 20px avall) */}
-          <div style={{ marginTop: '124px', position: 'relative', zIndex: 30 }}>
+          <div style={{ marginTop: `calc(${HOME_COLLECCIO_MARGIN_PX[3]}px + ${HOME_GALERIA_AIRE_SOTA_PX}px)`, position: 'relative', zIndex: 30 }}>
             <div
               style={{
                 position: 'relative',
