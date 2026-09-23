@@ -254,8 +254,8 @@ function IniciNou() {
                   midesFitxa={midesFitxa}
                   backgroundSrc={COLLECTION_BG_SRC}
                   marginBlockStart="0px"
-                  reservaPindola
-                  titolAire="calc(var(--esp-4) / 2)"
+                  pindolaAlFlux
+                  titolAire="var(--esp-4)"
                   {...(index === COLLECCIONS_INICI.length - 1 ? { zIndex: 30 } : {})}
                 />
               </section>
