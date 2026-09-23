@@ -136,9 +136,10 @@ function IniciNou() {
               // tota la geometria de l'inici (ESPEC-inici-neteja.md §0).
               lineHeight: 'normal',
               // LES LLETRES. Era `tracking-[-0.02em]`, que son -1,69 px a 1920:
-              // el titol estava COMPRIMIT un 22 %. El que es vol es treure la
-              // compressio i afegir-hi el 100 % de distancia, o sigui 1em.
-              letterSpacing: '1em',
+              // el titol estava COMPRIMIT un 22 %. S'ha tret la compressio i
+              // s'hi ha afegit distancia; el valor te el seu nom aquí perque es
+              // el parametre que regula com de separades van les lletres.
+              letterSpacing: '0.5em',
               // La mida va sobre el CARRIL i no sobre la finestra: es el que fa
               // que el sobreeixit del text (27 unitats) sigui el mateix a totes
               // les mides, i que l'aire entre galeries sigui constant.

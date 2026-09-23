@@ -185,27 +185,3 @@
     aspect-ratio: 952 / 430;
   }
 }
-
-/* ---------------------------------------------------------------------------
-   L'ENQUADERNAMENT DE LES SECCIONS
-   Quan es gira la roda del ratoli, el viewport es mou i s'atura amb el TITOL
-   d'una colleccio enquadrat a dalt, de manera que es vegi del titol a la
-   pindola. Es `scroll-snap`: no es mou contingut, es mou la finestra.
-
-   `scroll-margin-block-start` es el que deixa el titol a sota de la capçalera
-   en comptes de sota seu. Es llegeix de `--appHeaderOffset`, que la capçalera ja
-   publica; si no hi es, s'agafa `--esp-3` com a terra.
-
-   L'enquadernament va a l'ARREL perque el scroll el fa la finestra (comprovat:
-   cap ancestre de la pagina te `overflow-y` propi).
-   ------------------------------------------------------------------------- */
-html:has([data-inici-nou="1"]) {
-  scroll-snap-type: y proximity;
-}
-
-[data-seccio="hero"],
-[data-seccio^="colleccio-"],
-[data-seccio="poster"] {
-  scroll-snap-align: start;
-  scroll-margin-block-start: var(--appHeaderOffset, var(--esp-3));
-}
