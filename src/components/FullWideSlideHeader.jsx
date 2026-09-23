@@ -55,9 +55,10 @@ function FullWideSlideHeader({
   //
   // Va arribar a portar la de dues files (commit `17291eb`) i s'ha tornat
   // enrere. EL QUE ES MOU: a les mides de l'apaisada (1024x768, 1280x720,
-  // 1366x768...) l'offset de capçalera passa de 116 a 80 px i les pagines
-  // guanyen 36 px d'alcada util. Si algú les torna a unificar, ha de refer el
-  // repartiment de dalt de `/nova/inici`, que es calcula amb aquest offset.
+  // 1366x768...) l'offset de capçalera passa a 80 px i les pagines guanyen
+  // 36 px d'alcada util (abans era el de la vertical, que ara en fa 123). Si
+  // algú les torna a unificar, ha de refer el repartiment de dalt de
+  // `/nova/inici`, que es calcula amb aquest offset.
   //
   // La banda estreta del megaslide (768-1366 sense tauleta): la mateixa
   // definicio que a MegaslidePagina2.

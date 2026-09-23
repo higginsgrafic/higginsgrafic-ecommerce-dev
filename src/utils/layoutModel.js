@@ -27,7 +27,21 @@ const ALCADA_TAULETA_APAISADA_MAX = 1100;
 const ALCADA_CAPCALERA_ESCRIPTORI = 80;
 const ALCADA_CAPCALERA_MOBIL = 80;
 const ALCADA_CAPCALERA_ESTRETA = 64;
-const ALCADA_CAPCALERA_TAULETA_VERTICAL = 116;
+/**
+ * La capçalera de DUES FILES de la tauleta vertical: 61 px la fila del logo i
+ * les icones + 62 px la fila del menu de colleccions.
+ *
+ * SON 123, NO 116. Amb 116 el layout reservava 7 px menys del que la capçalera
+ * ocupa de veritat, i els primers 7 px de la pagina queien sota seu (invisible
+ * mentre allo es buit, pero es una trampa: qualsevol cosa que s'hi posi
+ * desapareix). El megaslide ja hi penjava dels 123 —el panell arrenca on acaba
+ * la capçalera—, aixi que ara la pagina i el panell comencen al mateix lloc.
+ *
+ * Es la xifra MES DESFAVORABLE de les dues que quadraven els comptes: l'altra
+ * era deixar la fila 2 en 55 px perque 61 + 55 fessin 116, i allo li treia 7 px
+ * al menu (que ja va just a les mides petites) per no moure la pagina.
+ */
+const ALCADA_CAPCALERA_TAULETA_VERTICAL = 123;
 
 /**
  * Classificació del dispositiu a partir de les mides de la finestra.
@@ -63,14 +77,16 @@ export function deviceLayoutFromViewport(vw, vh) {
 /**
  * Alçada de la capçalera per tipus de dispositiu.
  *
- * LA CAPÇALERA DE DUES FILES ES NOMES DE LA TAULETA VERTICAL: el logo i les
- * icones (61 px) i el menu de colleccions a sota (62). L'apaisada porta la
- * d'una fila de 80 px, com l'escriptori.
+ * LES DUES RESERVES SON EL QUE LA CAPÇALERA OCUPA DE VERITAT, no una xifra
+ * rodona: 123 px a la tauleta vertical (les dues files) i 80 px a la resta
+ * (l'apaisada, l'escriptori i el mobil porten una fila de 80; el que canvia
+ * entre ells es el contingut, no l'alçada).
  *
- * Va arribar a portar la de dues files (commit `17291eb`, que li donava 116) i
- * s'ha tornat enrere. NO es torna a 64 (la `ESTRETA` vella): la fila de
- * l'apaisada fa 80 px de veritat, i reservar-ne 64 deixava 16 px de pagina sota
- * la capçalera. Amb 80 la pagina comença on toca, com a l'escriptori.
+ * LA CAPÇALERA DE DUES FILES ES NOMES DE LA TAULETA VERTICAL: el logo i les
+ * icones (61 px) i el menu de colleccions a sota (62). L'apaisada la va portar
+ * un temps (commit `17291eb`) i s'ha tornat enrere; li toca la de 80, com a
+ * l'escriptori. NO es torna a 64 (la `ESTRETA` vella): la seva fila fa 80 px, i
+ * reservar-ne 64 deixava 16 px de pagina sota la capçalera.
  *
  * La `ESTRETA` queda per al que no es cap de les tres coses (vegeu
  * `deviceLayoutFromViewport`), que avui no es dona enlloc.
