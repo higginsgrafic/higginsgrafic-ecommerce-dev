@@ -236,22 +236,11 @@ function IniciNou() {
                   // part que no escala de la formula.
                   marginBlockStart: index === 0
                     ? 'calc(var(--esp-4) + 16px)'
-                    // El marge de les galeries.
-                    //
-                    // NO es l'aire que es veu, i el que hi sobra NO es cap
-                    // pedac: son les 151,9 unitats que fa el propi TITOL (el
-                    // text mes la seva caixa). El titol arrenca a l'inici del
-                    // seu bloc, i el que ve al darrere ha de passar per sobre
-                    // seu; per tant el marge es l'aire MES el titol.
-                    //
-                    //   var(--esp-4)   l'aire base (i el 2 el dobla: decisio de l'amo)
-                    //   − 0,0708 vw    resta de quan la mida del titol anava amb
-                    //                  la finestra en comptes del carril
-                    //   + 303,8px      2 x 151,9, que es el titol sencer
-                    //
-                    // MESURAT a les cinc mides: 271,9 / 279,9 / 282,5 / 286,8 /
-                    // 291,0 px, exactament on eren abans del canvi.
-                    : 'calc(2 * (var(--esp-4) - 0.0708 * 100vw) + 303.8px)',
+                    // L'AIRE ENTRE GALERIES: `--esp-4`, i prou. Ara que la
+                    // unitat de l'espaiat surt del CARRIL (i no de la finestra)
+                    // i que el titol arrenca a l'inici del seu bloc, el marge ES
+                    // l'aire que es veu. Ja no cal cap formula.
+                    : 'var(--esp-4)',
                 }}
               >
                 <HomeColleccio
@@ -271,7 +260,7 @@ function IniciNou() {
                   marginBlockStart="0px"
                   pindolaAlFlux
                   titolAPrincipi
-                  titolAire="var(--esp-4)"
+                  titolAire="calc(var(--esp-4) * 0.64)"
                   {...(index === COLLECCIONS_INICI.length - 1 ? { zIndex: 30 } : {})}
                 />
               </section>
