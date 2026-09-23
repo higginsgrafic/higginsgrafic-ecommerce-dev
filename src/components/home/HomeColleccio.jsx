@@ -12,31 +12,16 @@ import { TITOL_CARDS_FACTOR } from '@/config/iniciNou';
  * EL QUE LA PINDOLA BAIXA DE LA SEVA SECCIO, en unitats de disseny sobre el
  * carril de 1350.
  *
- * `PINDOLA_TOP` es el seu `top: calc(100% + 130px)` i `PINDOLA_ALCADA_U` la seva
- * alcada mesurada (39 px a 1920). Com que es `position: absolute`, NO fa créixer
- * el pare: la seccio acaba 169 unitats mes amunt del que es veu.
+ * `PINDOLA_TOP` es el seu `top: calc(100% + 130px)` QUAN ES ABSOLUTA, que es com
+ * la fa servir la pagina vella, i `PINDOLA_ALCADA_U` es la seva alcada mesurada
+ * (39 unitats a 1920).
  *
- * La pagina vella compensa aixo amb els seus 220 px de marge, calibrats
- * comptant-los. La pagina nova ho fa explicit: reserva aquestes unitats dins del
- * bloc (`reservaPindola`) i el marge de la seccio passa a ser, literalment,
- * l'aire que es veu.
+ * LA PAGINA NOVA LA POSA AL FLUX (`pindolaAlFlux`), i aixo es el que estalvia
+ * tota la comptabilitat: essent un element mes de la columna, el bloc la conte
+ * per construccio, i el marge de la seccio passa a ser l'aire que es veu.
  */
 const PINDOLA_TOP = 130;
 const PINDOLA_ALCADA_U = 39;
-/**
- * El que la pindola baixa del seu bloc, MESURAT: 130 (el seu `top`) + 39 (la
- * seva alcada) + 11,4 = 180,4 unitats.
- *
- * Els 11,4 no surten de cap formula: son el que la pindola sobreïx del bloc
- * despres de la reserva, i es veuen quan es mesura la seccio sencera
- * (1443,8 − 1274,8 = 169 reservats, i la pindola acaba a 1455,2). Es van
- * trobar mesurant el buit real entre dues seccions i restant-li el marge.
- *
- * Sense comptar-los, reserva i voladis no es cancel·len i l'aire entre
- * galeries depen de la mida (mesurat: 262 / 261 / 262 / 261 / 262 unitats de
- * carril, quan el que es declara es 120).
- */
-const PINDOLA_VOLADIS = PINDOLA_TOP + PINDOLA_ALCADA_U + 11.4;
 
 /**
  * Una galeria de la pagina d'inici: el titol d'una colleccio i la seva fila de
@@ -118,14 +103,16 @@ function HomeTdpCard({ slug, index, cardPropsFn, collectionHref, editableIdPrefi
  * per sota de la caixa: el buit VISIBLE fins a la pindola es de 100 px, iguals
  * a les cinc mides (TESTIMONI §4, trampa 1).
  */
-function PindolaColleccio({ href }) {
+function PindolaColleccio({ href, alFlux = false }) {
   return (
     <Link
       to={href}
       style={{
-        position: 'absolute',
-        left: '50%',
-        top: `calc(100% + ${PINDOLA_TOP}px)`,
+        // Amb la pindola al flux no hi ha `absolute`, ni `left`, ni `top`: es
+        // un element mes de la columna, i el seu lloc el dona el pare.
+        ...(alFlux
+          ? { position: 'static' }
+          : { position: 'absolute', left: '50%', top: `calc(100% + ${PINDOLA_TOP}px)`, transform: 'translateX(-50%)' }),
         height: 'auto',
         width: 'auto',
         borderRadius: '9999px',
@@ -140,7 +127,6 @@ function PindolaColleccio({ href }) {
         zIndex: 20,
         transition: 'all 200ms ease',
         textDecoration: 'none',
-        transform: 'translateX(-50%)',
       }}
       className="hover:shadow-md hover:border-neutral-400 active:scale-95 group"
       title="Veure tota la col·lecció"
@@ -183,14 +169,6 @@ function HomeColleccio({
   // declarat a `collectionVertical.js`); la pagina nova hi passa un `--esp-*`,
   // que es el seu sistema d'aires.
   marginBlockStart = `${HOME_COLLECCIO_MARGIN_PX}px`,
-  // Reserva dins del bloc l'espai que la pindola hi baixa a sota. La pindola es
-  // `position: absolute` i NO fa créixer el pare, o sigui que sense reserva el
-  // bloc acaba 169 unitats mes amunt del que es veu, i el marge de la seccio
-  // següent no es l'aire que es veu sino `marge − 169`.
-  //
-  // La pagina vella NO ho pot fer: te els seus 220 px calibrats comptant
-  // l'excés, i canviar-ho li mouria les colleccions. La pagina nova ho activa.
-  reservaPindola = false,
   // Quant s'ha de PUJAR el titol perque l'aire de sobre del bloc sigui el que es
   // veu, i no `aire − el que el titol te de propi`. El titol te 27 unitats de
   // marge propi i 3 mes del text; el seu `font-size` de 4,4vw es el pitjor
@@ -201,6 +179,14 @@ function HomeColleccio({
   // Per aixo el marge de la seccio no pot governar l'aire de la pagina nova. El
   // titol es qui el governa, i el marge se'n DERIVA.
   titolAire = null,
+  // LA PINDOLA, AL FLUX. Quan s'activa, la pindola deixa de ser `absolute` i
+  // passa a ser el tercer element de la columna (titol, fitxes, pindola). Aixo
+  // es el que fa que el bloc la contingui: sense reserva, sense voladis i sense
+  // cap formula que ho compensi.
+  //
+  // La pagina vella NO l'activa: alla la pindola es `absolute` i el seu marge
+  // de 220 px la compensa. Canviar-ho li mouria les colleccions.
+  pindolaAlFlux = false,
 }) {
   // Les columnes 3 i 4 nomes existeixen si la graella en te tantes. La 1 i la 2
   // hi son sempre: a 768 la graella en te 2.
@@ -210,21 +196,10 @@ function HomeColleccio({
     <div
       style={{
         marginBlockStart,
-        // El que la pindola baixa: 130 unitats (el seu `top`) + la seva alcada
-        // (39) = 169, sobre el carril.
-        // El percentatge es calcula sobre l'amplada del BLOC, i el bloc es
-        // `carril − 2 x --marge-lateral`. MESURAT: el bloc fa 1270 a 1920, 952,5
-        // a 1440, 846,7 a 1280, 677,3 a 1024 i 508 a 768, o sigui exactament el
-        // 94,07 % del carril. I el voladis, en canvi, va sobre el CARRIL. Per
-        // tant el percentatge es `180,4 / 1270` i no `180,4 / 1350`.
-        ...(reservaPindola ? { paddingBottom: `${(PINDOLA_VOLADIS / 1270) * 100}%` } : {}),
-        // El bloc es el CONTAINING BLOCK de la pindola, i aixo es el que fa que
-        // la reserva serveixi per a alguna cosa. Sense aixo, el `position:
-        // relative` mes proper es el del GRID, i la pindola segueix el fons del
-        // grid: com que el grid tambe creix quan el bloc creix, la pindola
-        // baixava amb la reserva i les dues coses no es cancel·laven mai.
-        // (TESTIMONI §4, trampa 7.)
-        position: 'relative',
+        // El bloc es el CONTAINING BLOCK de la pindola QUAN es absoluta (la
+        // pagina vella). Amb la pindola al flux no cal, i per aixo s'activa
+        // nomes quan toca.
+        ...(pindolaAlFlux ? {} : { position: 'relative' }),
         ...(zIndex ? { zIndex } : {}),
       }}
     >
@@ -284,9 +259,17 @@ function HomeColleccio({
               style={{ width: '100%', alignSelf: 'start', boxSizing: 'border-box' }}
             />
           ))}
-          <PindolaColleccio href={href} />
+          {!pindolaAlFlux && <PindolaColleccio href={href} />}
         </div>
       </div>
+      {pindolaAlFlux && (
+        // EL TERCER ELEMENT DE LA COLUMNA. El seu aire es `--esp-4`, el mateix
+        // token que governa la resta de la pagina, i no cal cap reserva ni cap
+        // correccio: el bloc conte el que es veu.
+        <div style={{ marginBlockStart: 'var(--esp-4)', display: 'flex', justifyContent: 'center' }}>
+          <PindolaColleccio href={href} alFlux />
+        </div>
+      )}
     </div>
   );
 }
