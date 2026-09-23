@@ -44,29 +44,50 @@
  * sap res mes del megaslide.
  */
 import { useEffect, useRef, useState } from 'react';
-import { deviceLayoutFromViewport } from '@/utils/layoutModel';
 
 /** El repartiment inicial, abans del primer mesurament. */
 const REPARTIMENT_INICIAL = { blocMega: 0, blocPagina: 0, alcada: null };
-/**
- * LES FILES DEL TROS DE DALT.
- *
- * Son les que surten de traduir la pantalla a files de la graella del
- * megaslide, i la frontera entre les dues pagines hi cau a sobre. NO son les
- * mateixes a totes les mides: a la tauleta vertical la pantalla es mes curta i
- * en surten menys.
- *
- *   escriptori i apaisada   11 + 17 = 28   (a 1920: 11 files fan 377 i el
- *                                           megaslide en fa 376)
- *   tauleta vertical         7 +  8 = 15   (a 768x1024)
- */
-const FILES_TOTAL = 28;
-const FILES_MEGASLIDE = 11;
-const FILES_TOTAL_VERTICAL = 15;
-const FILES_MEGASLIDE_VERTICAL = 7;
-const FILES_PAGINA = FILES_TOTAL - FILES_MEGASLIDE;
 /** El que penja el cadenat del megaslide sota la seva linia. */
 const CADE_BAIXADA = 56;
+/** Files, com a molt i com a minim, quan es busquen les divisions. */
+const FILES_MIN = 8;
+const FILES_MAX = 32;
+/** Error maxim, en px, que s'accepta en encaixar la linia en una fila. */
+const ERROR_FILES_PX = 1;
+
+/**
+ * LES DIVISIONS DEL TROS DE DALT, CALCULADES.
+ *
+ * NO son un numero fix. La part que ocupa el megaslide depen de l'alcada de la
+ * finestra, i l'alcada de la finestra no es la de la pantalla: la barra de
+ * desenvolupament se'n menja 40 px, i cada navegador se'n menja els seus. Amb un
+ * numero escrit a ma, doncs, el repartiment nomes es correcte en una finestra
+ * concreta — la que es va fer servir per comptar-lo.
+ *
+ * Es busca la fraccio `k/N` mes propera a la del megaslide amb el N mes petit
+ * que hi encaixi dins d'un px. A 1920 amb la barra dev dona 11/28; sense la
+ * barra, 3/8; a 768x1024, 8/17.
+ *
+ * @returns {{k: number, N: number}} k files per al megaslide i N en total
+ */
+function divisionsDeLaLinia(linia, capcalera, finestra) {
+  const zona = finestra - capcalera;
+  if (zona <= 0) return { k: 1, N: 1 };
+  const fraccio = Math.max(0, Math.min(1, (linia - capcalera) / zona));
+  let millor = { k: Math.round(fraccio * FILES_MIN) || 1, N: FILES_MIN };
+  let millorError = Infinity;
+  for (let N = FILES_MIN; N <= FILES_MAX; N += 1) {
+    const k = Math.round(fraccio * N);
+    if (k < 1 || k >= N) continue;
+    const error = Math.abs(k / N - fraccio) * zona;
+    if (error < millorError) {
+      millor = { k, N };
+      millorError = error;
+    }
+    if (error <= ERROR_FILES_PX) break;
+  }
+  return millor;
+}
 
 function MarcInici({ seccions }) {
   const [primera, segona, ...resta] = seccions;
@@ -178,11 +199,9 @@ function MarcInici({ seccions }) {
       // LA FILA es `(finestra − capçalera) / 28`. A 1920 dona 34,29 px, i 11
       // files cauen a 497,1 quan el separador del megaslide es a 497: la
       // frontera del model i la del megaslide coincideixen.
-      // A la tauleta vertical la pantalla es mes curta i el tros de dalt son
-      // 15 files en comptes de 28.
-      const dispositiu = deviceLayoutFromViewport(window.innerWidth, window.innerHeight);
-      const total = dispositiu.isPortraitTablet ? FILES_TOTAL_VERTICAL : FILES_TOTAL;
-      const megaFiles = dispositiu.isPortraitTablet ? FILES_MEGASLIDE_VERTICAL : FILES_MEGASLIDE;
+      // LES DIVISIONS, de la geometria d'ara: depenen de l'alcada de la finestra
+      // (barra dev i navegador inclosos).
+      const { k: megaFiles, N: total } = divisionsDeLaLinia(linia, capcalera, window.innerHeight);
       const fila = (window.innerHeight - capcalera) / total;
       // EL BLOC DEL MEGASLIDE ES LA SEVA AREA: les 11 files, i com a minim la
       // seva vora de veritat. Les 11 files nomes coincideixen amb el separador
