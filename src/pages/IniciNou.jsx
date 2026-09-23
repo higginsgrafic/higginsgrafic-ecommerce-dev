@@ -127,7 +127,7 @@ function IniciNou() {
       <div className="relative mb-10 mt-[27px] lg:mb-14 w-full">
         <div className="relative flex flex-col gap-3 w-full">
           <h2
-            className="relative font-light uppercase tracking-[-0.02em] text-foreground"
+            className="relative font-light uppercase text-foreground"
             style={{
               fontFamily: 'Oswald, sans-serif',
               // LA CAIXA CONTE EL TEXT. Era `leading-[0.85]`, i amb aixo la
@@ -135,6 +135,10 @@ function IniciNou() {
               // 26 per baix FORA de la seva caixa. Era el defecte d'origen de
               // tota la geometria de l'inici (ESPEC-inici-neteja.md §0).
               lineHeight: 'normal',
+              // LES LLETRES. Era `tracking-[-0.02em]`, que son -1,69 px a 1920:
+              // el titol estava COMPRIMIT un 22 %. El que es vol es treure la
+              // compressio i afegir-hi el 100 % de distancia, o sigui 1em.
+              letterSpacing: '1em',
               // La mida va sobre el CARRIL i no sobre la finestra: es el que fa
               // que el sobreeixit del text (27 unitats) sigui el mateix a totes
               // les mides, i que l'aire entre galeries sigui constant.
@@ -236,7 +240,7 @@ function IniciNou() {
                 // cap dels dos participa del flux. La solucio de debò es fer-los
                 // participar-hi, i es la mateixa feina que el punt 5 del pla
                 // (separar l'escala de la geometria de la del text).
-                style={{ marginBlockStart: 'calc(var(--esp-4) + 151.9px - 0.0708 * 100vw)' }}
+                style={{ marginBlockStart: 'calc(2 * (var(--esp-4) + 151.9px - 0.0708 * 100vw))' }}
               >
                 <HomeColleccio
                   Titol={Titol}
@@ -254,7 +258,7 @@ function IniciNou() {
                   backgroundSrc={COLLECTION_BG_SRC}
                   marginBlockStart="0px"
                   reservaPindola
-                  titolAire="var(--esp-4)"
+                  titolAire="calc(2 * var(--esp-4))"
                   {...(index === COLLECCIONS_INICI.length - 1 ? { zIndex: 30 } : {})}
                 />
               </section>
