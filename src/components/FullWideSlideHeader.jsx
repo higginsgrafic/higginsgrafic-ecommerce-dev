@@ -1944,9 +1944,11 @@ function FullWideSlideHeader({
           // divisio que es veu, i el cadenat es un estri d'aquest bucle. Qui
           // hagi de deixar-hi lloc ja comptara el cadenat pel seu compte.
           //
-          // Nomes s'hi escriu quan el numero canvia. Es un efecte de l'obertura
-          // del panell, i aixo ningu ho ha de saber: en desmuntar-se, la
-          // variable s'esborra i el `var()` que la llegeixi cau a la reserva.
+          // NO S'ESBORRA EN TANCAR. El panell es desmunta del tot quan esta
+          // tancat, i aleshores la seva vora no es pot mesurar: si la variable
+          // s'esborres, tot el que s'hi reparteix es mouria a cada obrir i
+          // tancar. Es queda amb l'ultim valor conegut, i nomes canvia quan
+          // canvia la disposicio.
           const vora = Math.round(objectiu - CADE_BAIXADA_PX);
           if (vora !== voraPublicada) {
             voraPublicada = vora;
@@ -1959,12 +1961,7 @@ function FullWideSlideHeader({
       raf = requestAnimationFrame(seguiment);
     };
     raf = requestAnimationFrame(seguiment);
-    return () => {
-      cancelAnimationFrame(raf);
-      try {
-        document.documentElement.style.removeProperty('--hg-mega-bottom');
-      } catch { /* ignore */ }
-    };
+    return () => cancelAnimationFrame(raf);
   }, [active]);
 
   useLayoutEffect(() => {

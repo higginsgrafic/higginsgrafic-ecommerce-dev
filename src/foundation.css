@@ -221,16 +221,6 @@
   border: 1px solid hsl(var(--border));
 }
 
-/* LA HERO NO POT SORTIR DE LA PANTALLA.
-   La seva alcada surt de l'amplada (la proporcio 952/401), i la seva amplada es
-   el carril: en una pantalla curta, la hero es mes alta que l'espai que queda
-   entre la divisio del megaslide i el fons de la finestra.
-   Amb el topall, la caixa s'encongeix MANTENINT la proporcio (ho fa
-   l'`aspect-ratio`), i per tant tambe es fa mes estreta. */
-.hg-hero-caixa {
-  max-height: var(--inici-hero-sostre);
-}
-
 @media (orientation: portrait) {
   .hg-hero-caixa {
     /* La hero vertical es un pèl mes alta que ampla: 541 x 430. */
@@ -248,6 +238,16 @@
 [data-inici-nou="1"] {
   --contingut-max: var(--inici-nou-carril);
 }
+
+/* EL TOPALL DE LA CAIXA DE LA HERO.
+   La hero fa la mida que li dona el seu aspecte amb l'amplada del carril, i
+   nomes s'encongeix quan la finestra es tan curta que el cadenat hi entraria a
+   sobre. El numero el publica el marc, que mesura la zona i les peces. */
+.hg-hero-caixa {
+  max-height: var(--inici-hero-sostre, none);
+}
+
+
 
 /* ---------------------------------------------------------------------------
    LA DIVISIO DE DALT DE LA PAGINA NOVA: ON COMENÇA EL CONTINGUT
@@ -287,16 +287,19 @@
 :root {
   --inici-frontera: max(var(--hg-mega-bottom, 0px), var(--appHeaderOffset, 0px));
   --inici-resguard: calc(var(--inici-frontera) + 56px);
+  /* LA MATEIXA FRONTERA, EN NUMERO. `MutationObserver` deixa observar
+     l'atribut `style` de l'arrel, i el marc l'observa per saber quan ha
+     canviat la linia del megaslide. Llegir una variable de CSS no es pot
+     observar, i un `calc` no dona cap numero que es pugui comparar. */
+  --inici-frontera-px: var(--hg-mega-bottom, 0px);
   /* L'alcada de la franja d'icones: es una alcada declarada, i per tant aquesta
      si que la pot saber el `calc`. */
   --inici-icones-alcada: calc(var(--u) * 70.4);
   /* LES RESERVES DEL PRIMER PINTAT. Els calcula el marc i els publica ell; el
      que hi ha aquí es el que val abans que ho faci.
 
-       --inici-buit        l'aire de sota la divisio i el del mig
-       --inici-buit-doble  el de la cella de les icones, que en porta dos
-       --inici-hero-sostre el topall de la caixa de la hero */
+       --inici-buit         cada un dels tres aires
+       --inici-hero-sostre  el topall de la caixa de la hero */
   --inici-buit: 0px;
-  --inici-buit-doble: 0px;
-  --inici-hero-sostre: 100vh;
+  --inici-hero-sostre: none;
 }
