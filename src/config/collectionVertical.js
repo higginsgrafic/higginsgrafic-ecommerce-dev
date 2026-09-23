@@ -157,6 +157,17 @@ export const HOME_TITOL_TDP_MARGIN_PX = { escriptori: 150, tauleta: 75 };
  */
 export const HOME_GALERIA_TOP_PX = 0;
 
+/**
+ * Quina part de l'aire de sobre es conserva a la pindola «en vols saber mes?»
+ * de la pagina d'inici.
+ *
+ * 0,5 vol dir que la pindola PUJA fins a deixar la meitat de l'aire que tenia
+ * sobre la caixa de la targeta. L'aire depen del padding del bloc que conte la
+ * pindola i canvia amb la mida, i per aixo es MESURA i no es calcula:
+ * intentar-ho amb una formula donava 20 px d'error a 1920 i 189 a 768.
+ */
+export const HOME_PILL_AIRE_FACTOR = 0.5;
+
 export const HERO_TDP_GAP_TABLET_PX = '338px';
 export const HERO_TDP_GAP_LANDSCAPE_PX = '-240px';
 
