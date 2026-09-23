@@ -15,15 +15,24 @@
    res del que hi ha, i la faran servir les pàgines noves. Quan tot el lloc
    estigui migrat, es podrà traslladar a l'arrel si convé.
 
-   TERRA: per sota de 1280 px la pàgina no s'encongeix més (0,6667). Això
-   protegeix la llegibilitat: el text no es fa mai més petit de 2/3 del seu
-   valor de disseny.
+   TERRA: les DUES ESCALES NO EN TENEN EL MATEIX, i aixo es una correcció.
+
+   La geometria (`--u`) NO te terra: 1 unitat es, sempre, `finestra / 1920`. Es
+   el que fa el carril (`--contingut-max` es `min(70.3125vw, 1350px)`, sense
+   terra), i es l'escala que el testimoni del 23/09 te mesurada: 1,00 / 0,75 /
+   0,667 / 0,533 / 0,40. Amb un terra de 0,6667 a la geometria, `--esp-4` a 768
+   feia 1.280 px en comptes de 48.
+
+   El TEXT si que n'ha de tenir, per no baixar de 2/3. Pero aixo no es `--u`:
+   es una escala propia de tipografia (`--escala-text`), que encara no existeix
+   perque `--escala` no te cap consumidor. Quan se n'hi posi un, el terra va
+   alla i no aqui.
    ========================================================================== */
 
 :root {
   --disseny-amplada: 1920;
-  --escala: 0.6667;                 /* terra (1280 px de disseny) */
-  --u: 10.6667px;                   /* 1 unitat de disseny amb el terra */
+  --escala: 0.6667;                 /* terra per al TEXT (1280 px de disseny) */
+  --u: calc(100vw / 1920);          /* la GEOMETRIA, sense terra */
 }
 
 /* OJO: ha de ser `:root`, no `html`. `:root` te mes especificitat que `html`
@@ -38,18 +47,28 @@
 
 /* ---------------------------------------------------------------------------
    L'ESCALA D'ESPAIAT
-   Quatre números en un sol lloc per a tota la pàgina. Estan en unitats de
-   disseny, i per tant escalen sols. S'hi afegeixen els que calguin, amb nom;
-   mai un número solt dins d'un component.
+   Quatre números en un sol lloc per a tota la pàgina. Estan en UNITATS DE
+   DISSENY (`--u`), i per tant escalen sols. S'hi afegeixen els que calguin,
+   amb nom; mai un número solt dins d'un component.
+
+   ATENCIÓ, CORRECCIÓ: aquests quatre valors estaven escrits amb el
+   multiplicador invertit. `--u` val 1 px de disseny (a 1920, 1 px), i per tant
+   el multiplicador ha de ser DIRECTAMENT el nombre d'unitats del comentari:
+   `--esp-1` son 8 unitats i el multiplicador es 8, no 0,5. Amb els valors
+   antics, `--esp-3` feia 2,5 px en comptes de 40 i `--marge-lateral` deixava
+   la pàgina sense marge lateral.
+
+   No s'havia vist perquè la fonamenta no tenia CAP consumidor (ho diu el pla,
+   §10). Amb el primer consumidor, el primer mesurament l'ha destapat.
    ------------------------------------------------------------------------- */
 :root {
-  --esp-1: calc(var(--u) * 0.5);    /*   8 unitats: dins d'un element        */
-  --esp-2: var(--u);                /*  16 unitats: entre elements germans   */
-  --esp-3: calc(var(--u) * 2.5);    /*  40 unitats: entre seccions           */
-  --esp-4: calc(var(--u) * 7.5);    /* 120 unitats: els aires grans          */
+  --esp-1: calc(var(--u) * 8);      /*   8 unitats: dins d'un element        */
+  --esp-2: calc(var(--u) * 16);     /*  16 unitats: entre elements germans   */
+  --esp-3: calc(var(--u) * 40);     /*  40 unitats: entre seccions           */
+  --esp-4: calc(var(--u) * 120);    /* 120 unitats: els aires grans          */
 
   /* Marges laterals del lloc: declarats, no repartits per components. */
-  --marge-lateral: var(--esp-3);
+  --marge-lateral: calc(var(--u) * 40);
 
   /* L'amplada del contingut (el carril del disseny): 1350 unitats sobre 1920,
      o sigui el 70,3125 % de la finestra, amb un sostre de 1350 px.
