@@ -189,13 +189,7 @@ export const TDP_MIDES_INTERIOR = {
   selectorAlcada: 0.12,
   selectorFont: 0.07,
   text: 0.095,
-  // El cistell: el seu SVG te el DIBUIX a la part de baix del requadre. El
-  // `viewBox` es `0 0 70 69` i el dibuix comenca a y=12, o sigui que nomes
-  // ocupa el 78 % de l'alcada del requadre (mesurat amb el fitxer; el ple-1 i
-  // el ple-2 en fan el 94 %). Amb 0,077 el requadre feia 25 px i el cistell
-  // PINTAT nomes 19,5, contra 24,5 dels digits del preu: per aixo es veia
-  // petit. Amb 0,098 el dibuix fa l'alcada dels digits.
-  cistell: 0.098,
+  cistell: 0.077,
   preuGap: 0.1,
 };
 
