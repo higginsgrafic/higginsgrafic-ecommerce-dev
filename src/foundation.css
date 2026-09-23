@@ -221,6 +221,19 @@
   border: 1px solid hsl(var(--border));
 }
 
+/* LA HERO NO POT SORTIR DE LA PANTALLA.
+   La seva alcada surt de l'amplada (la proporcio 952/401), i la seva amplada es
+   el carril: en una pantalla curta, la hero es mes alta que l'espai que queda
+   sota les icones. MESURAT: en sortia 27 px a 1920x1080, 43 a 1280x720 i 31 a
+   1024x768.
+   Amb el topall, la caixa s'encongeix MANTENINT la proporcio (ho fa
+   l'`aspect-ratio`), i per tant tambe es fa mes estreta.
+   L'espai que queda es la finestra menys la capçalera, menys les icones, menys
+   els aires de les dues peces. */
+.hg-hero-caixa {
+  max-height: calc(100vh - var(--appHeaderOffset, 0px) - var(--esp-3) * 3);
+}
+
 @media (orientation: portrait) {
   .hg-hero-caixa {
     /* La hero vertical es un pèl mes alta que ampla: 541 x 430. */

@@ -53,6 +53,10 @@ function HeroInici() {
           flexDirection: 'column',
           gap: '2px',
           overflow: 'hidden',
+          // EL BOTO DE BARREJAR S'HI ANÇORA. Sense aixo la caixa es `static`, i
+          // un `absolute` de dins agafa el primer ancestre posicionat, que es el
+          // `main`: el boto anava a mig PAGINA en comptes de a mig HERO.
+          position: 'relative',
         }}
       >
         {franges.map((band, i) => {
@@ -144,10 +148,10 @@ function HeroInici() {
             </a>
           );
         })}
-      </div>
 
-      {/* EL BOTO DE BARREJAR. */}
-      <button
+        {/* EL BOTO DE BARREJAR, DINS de la caixa: si va a l'envolcall, que
+            no esta posicionat, cau a la pagina i queda fora de la hero. */}
+        <button
         type="button"
         onClick={() => setPlan(buildHeroStripePlan())}
         aria-label="Barreja samarretes i dibuixos"
@@ -169,9 +173,11 @@ function HeroInici() {
           backdropFilter: 'blur(4px)',
         }}
         className="hover:bg-white transition-colors"
-      >
+        >
         <Shuffle size={50} color="#475059" />
-      </button>
+        </button>
+      </div>
+
     </div>
   );
 }
