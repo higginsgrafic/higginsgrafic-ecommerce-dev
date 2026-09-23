@@ -7,6 +7,7 @@ import ProtectedRoute from '@/components/ProtectedRoute';
 import ClientProtectedRoute from '@/components/ClientProtectedRoute';
 import {
   Home,
+  IniciNou,
   CollectionFirstContactPage,
   CollectionTheHumanInsidePage,
   CollectionAustenPage,
@@ -113,6 +114,15 @@ export default function AppRoutes({ location, pageProps, pautaEnabled, tableEnab
         <Route path="/" element={
           <motion.div {...pageTransition}>
             <Home />
+          </motion.div>
+        } />
+
+        {/* L'inici NOU, al costat del vell (PLA-arquitectura-nova.md §6). Es
+            prova aquí sense tocar la botiga; quan compleixi la porta de
+            sortida, la ruta `/` es canvia en un sol commit. */}
+        <Route path="/nova/inici" element={
+          <motion.div {...pageTransition}>
+            <IniciNou />
           </motion.div>
         } />
 
