@@ -123,19 +123,37 @@ function MarcInici({ seccions }) {
       // tant el primer que s'hi ha de posar es aquest tros.
       const zonaRect = zona.getBoundingClientRect();
       const finsLinia = Math.max(0, linia - zonaRect.top);
-      // ELS AIRES, EN PROPORCIO DE LA ZONA.
+      // ELS TRES BUITS, IGUALS.
       //
-      // A 1920 el bloc queda equidistant dins de la zona (de la linia del
-      // megaslide al fons de la finestra) i la hero n'ocupa el 73 %. Pero allo
-      // que no escala es la resta: el carril te un sostre de 1350 px i la
-      // finestra no, i per aixo a 1024 i 1280 la hero es queda amb el 83 % i el
-      // 95 % de la zona. Expressar-ho en proporcio de la zona es el que fa que
-      // el bloc es reparteixi igual a totes les mides.
+      // De dalt a baix: la capçalera, un buit, les icones (Austen), un altre
+      // buit, la hero i un tercer buit. El que sobra de la finestra despres de
+      // les tres peces es reparteix en els tres buits:
       //
-      // L'AIRE ES UNA PROPORCIO DE LA ZONA: el 5 % (a 1920, 29 px), i n'hi ha
-      // quatre: un a sobre les icones, dos entre les icones i la hero, i un
-      // sota la hero.
-      const aire = Math.max(0, 0.05 * zonaAlcada);
+      //   buit = (finestra − header − icones − hero) / 3
+      //
+      // i a 1920 dona (1080 − 121 − 70 − 426) / 3 = 154 px. Els comptes
+      // quadren: 121 + 154 + 70 + 154 + 426 + 154 = 1079, tota la finestra.
+      //
+      // PER QUE ES LA FINESTRA I NO LA ZONA. La zona depen de la linia del
+      // megaslide, i la linia canvia de lloc segons la mida; amb el repartiment
+      // lligat a la zona, el bloc quedava col·locat de maneres diferents a cada
+      // mida (mesurat: la hero passava del 73 % de la zona a 1920 al 95 % a
+      // 1280). La finestra no depen de res.
+      cala.style.width = 'var(--appHeaderOffset, 0px)';
+      const capcalera = parseFloat(getComputedStyle(cala).width) || 0;
+      // LES TRES DISTANCIES SON IGUALS: de la capçalera a les icones, de les
+      // icones a la hero i de la hero al fons. El seu valor es:
+      //
+      //   buit = (finestra − header − icones − hero) / 3
+      //
+      // i a 1920 dona (1080 − 121 − 70 − 426) / 3 = 154 px, que es el que
+      // mesura la referencia.
+      //
+      // ENTRE LES ICONES I LA HERO N'HI HA DOS, de buits: un que posa la cella
+      // de les icones pel seu costat de baix i un que posa la de la hero pel
+      // seu costat de dalt. Per aixo cada cella en posa la MEITAT.
+      const buit = Math.max(0, (window.innerHeight - capcalera - icones - natural) / 3);
+      const aire = buit / 2;
       const alcada = natural;
       // El numero que decideix si ja hi som: si no s'ha mogut, s'atura.
       const ara = `${Math.round(zonaAlcada * 4) / 4}|${Math.round(alcada * 4) / 4}|${Math.round(aire * 4) / 4}`;
@@ -201,9 +219,8 @@ function MarcInici({ seccions }) {
           data-cella="1"
           data-cella-de={primera.id}
           style={{
-            // A dalt, tot el que queda fins a la linia del megaslide mes un
-            // aire; a baix, el primer dels dos aires del mig.
-            paddingBlock: 'var(--inici-dalt, 0px) var(--inici-buit, 0px)',
+            // Un buit a dalt (entre la capçalera i les icones) i un a baix.
+            paddingBlock: 'var(--inici-buit, 0px)',
             display: 'flex',
             flexDirection: 'column',
             // ANCORADA A BAIX. Cada cella porta el seu aire a dalt i a baix, i
@@ -221,7 +238,9 @@ function MarcInici({ seccions }) {
           data-cella="2"
           data-cella-de={segona.id}
           style={{
-            paddingBlock: 'var(--inici-buit, 0px) 0',
+            // Un buit a dalt (entre les icones i la hero) i un a baix (de la
+            // hero al fons).
+            paddingBlock: 'var(--inici-buit, 0px)',
             display: 'flex',
             flexDirection: 'column',
             justifyContent: 'flex-start',
