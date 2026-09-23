@@ -180,7 +180,11 @@ function IniciNou() {
         </div>
       ) : (
         <div className="hg-marc" data-inici-nou="1">
-          {/* 01 · LA HERO, al carril sencer. */}
+          {/* 01 · LA HERO, al carril sencer. El carril ha d'ENVOLTAR el bloc de
+              la hero i no ser-ne el pare: el seu aire es un `paddingInline` en
+              percentatge, i un percentatge de padding es mesura sobre
+              l'amplada del PARE. Amb el carril de pare, el 70,5 % de 1350 dona
+              952; amb la seccio de pare (tota la finestra) en donava 1.200. */}
           <div className="hg-carril">
             <section className="hg-seccio" data-seccio="hero" aria-label="Hero">
               <HeroInici />
