@@ -253,7 +253,21 @@ const info = document.getElementById('info');
 const escala1 = document.getElementById('escala1');
 
 let overlayVisible = true;
-let escalaUn = false;
+/**
+ * L'ESCALA ES RECORDA ENTRE REFRESCOS.
+ *
+ * Es una preferencia de treball, no un estat de la sessio: qui treballa a mida
+ * real hi treballa tota l'estona, i haver-la de tornar a marcar a cada
+ * recarrega es una molestia. Es desa al `localStorage` del propi overlay (es
+ * una pagina de `/public`, no te res a veure amb l'aplicacio).
+ */
+const CLAU_ESCALA = 'hg-overlay-escala-1a1';
+const escalaDesada = (() => {
+  try { return localStorage.getItem(CLAU_ESCALA) === '1'; } catch { return false; }
+})();
+let escalaUn = escalaDesada;
+escala1.checked = escalaDesada;
+
 let actiu = 'desktop';
 /** Els marcs ja muntats: `clau -> { el, iframe, overlay, top, bottom }`. */
 const muntats = new Map();
@@ -378,6 +392,7 @@ document.getElementById('toggle-overlay').addEventListener('click', () => {
 });
 escala1.addEventListener('change', (e) => {
   escalaUn = e.target.checked;
+  try { localStorage.setItem(CLAU_ESCALA, escalaUn ? '1' : '0'); } catch { /* ignore */ }
   // L'escala val per a TOTES les pestanyes: canviar-la no ha de fer que unes
   // quantes quedin a una mida i les altres a una altra.
   for (const clau of muntats.keys()) aplicaMida(clau);
