@@ -34,8 +34,16 @@
   --escala: 0.6667;                 /* terra per al TEXT (1280 px de disseny) */
 
   /* L'amplada del contingut (el carril del disseny): 1350 unitats sobre 1920,
-     o sigui el 70,3125 % de la finestra, amb un sostre de 1350 px. Es declara
-     ABANS que `--u` perque `--u` en surt.
+     EL CARRIL DEL LLOC ES EL TRAM DEL LOGO A LA ICONA D'USUARI DE LA CAPÇALERA.
+     MESURAT a 1920: el logo comença a 325,0 i la icona d'usuari acaba a 1.589,5,
+     o sigui 1.264,5 px, que son el 65,86 % de la finestra. Es declara ABANS que
+     `--u` perque `--u` en surt.
+
+     ABANS ERA EL 70,3125 % (1350 px a 1920), que no coincidia amb la capçalera:
+     el contingut sobresortia 85,5 px per cada costat del tram que la capçalera
+     dibuixa. I a 1280 i 1024 la diferencia era mes gran, perque el tram de la
+     capçalera NO es proporcional a la finestra (fa 927,7 tant a 1280 com a
+     1024): alla el contingut en feia 900 i 960.
 
      PER QUE NO surt de `--u`: a 768 el carril fa 540 (0,4 de 1920) i si sortis
      d'una unitat amb terra faria 900, i la pagina s'eixamplaria 360 px. Son dues
@@ -44,7 +52,19 @@
      Aquesta es la formula que fins ara calculava `getSafeBelt()` des de
      JavaScript, amb el seu `useReactiveBelt`, el seu `MutationObserver` i la
      seva publicacio primerenca: una regla de tres de 1.350/1.920. */
-  --contingut-max: min(70.3125vw, 1350px);
+  /* EL CARRIL EL PUBLICA LA CAPÇALERA. `--hg-band-w` es el tram del logo a la
+     icona d'usuari, i la capçalera el calcula i el publica a l'arrel: 1270 a
+     1920, 953 a 1440, 933 a 1280 i 1024, i 688 a 768. La pagina NO el deriva: el
+     llegeix, i aixi el contingut i la capçalera comencen i acaben al mateix lloc
+     a TOTES les vistes.
+
+     El valor de reserva (el `min(...)`) es nomes per al primer pintat, abans que
+     la capçalera publiqui el seu: a 1920 dona 1.264,5, que es el tram mesurat.
+
+     ABANS el carril era `min(70.3125vw, 1350px)` i no coincidia amb la
+     capçalera: el contingut en sobresortia 85,5 px per banda a 1920, i a 1280 i
+     1024 la diferencia era mes gran encara (900 i 960 contra 933). */
+  --contingut-max: var(--hg-band-w, min(65.86vw, 1264.5px));
 
   /* LA UNITAT, SOBRE EL CARRIL. `--u` es la unitat de disseny, i val el carril
      dividit per 1350: a 1920, 1 px.
@@ -133,7 +153,12 @@
   width: 100%;
   max-width: var(--contingut-max);
   margin-inline: auto;
-  padding-inline: var(--marge-lateral);
+  /* SENSE MARGE LATERAL. El carril ja es el tram del logo a la icona d'usuari
+     de la capçalera, i per tant el contingut hi ha d'arribar: amb
+     `--marge-lateral` a dins quedava 28 px mes estret que la hero i que la
+     graella, que son les altres dues peces que fan el carril sencer.
+     Era `padding-inline: var(--marge-lateral)`. */
+  padding-inline: 0;
 }
 
 /* El carril PUR, sense marge lateral.
@@ -193,30 +218,5 @@
   .hg-hero-caixa {
     /* La hero vertical es un pèl mes alta que ampla: 541 x 430. */
     aspect-ratio: 952 / 430;
-  }
-}
-
-/* ---------------------------------------------------------------------------
-   EL CARRIL A TAUETA, NOMES A LA PAGINA NOVA
-   El carril del disseny es el 70,3125 % de la finestra (1350 sobre 1920). A
-   tauleta aixo deixa massa aire a dalt i a baix de la taula: a 768 el carril fa
-   540 i la hero, que te l'amplada lligada al carril i l'alcada lligada a
-   l'amplada, fa 381 x 172 dins d'una cella de 434. Li sobra el 30 % de l'alcada.
-
-   Aqui el carril s'eixampla fins al 93,75 % de la finestra (720 sobre 768), i
-   amb ell creixen la hero, el titol i les icones, que tots van amb la variable
-   que el carril publica.
-
-   PER QUE NOMES A LA PAGINA NOVA. El carril es compartit amb la pagina vella, i
-   alla la mida de la FITXA surt del carril: eixamplar-lo li canviava les fitxes
-   (mesurat: de 259 x 418 a 720 x 917 a 768) i li movia la pagina sencera. La
-   pagina vella no es toca; aquesta regla viu dins del seu marc.
-
-   A partir de 1280 el carril del disseny ja dona 900 px, i alla no cal tocar-lo.
-   ------------------------------------------------------------------------- */
-@media (min-width: 768px) and (max-width: 1279px) {
-  [data-inici-nou="1"] .hg-carril,
-  [data-inici-nou="1"] .hg-marc__contingut {
-    max-width: min(93.75vw, 1350px);
   }
 }

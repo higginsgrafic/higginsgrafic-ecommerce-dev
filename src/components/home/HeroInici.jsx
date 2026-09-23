@@ -1,4 +1,4 @@
-import { HERO_AIRE_CARRIL } from '@/config/iniciNou';
+
 
 /**
  * LA HERO DE L'INICI NOU.
@@ -33,15 +33,19 @@ import { HERO_AIRE_CARRIL } from '@/config/iniciNou';
  */
 function HeroInici() {
   return (
-    // L'aire: un 29,48 % del carril, repartit a parts iguals. Es el complement
-    // del 70,5 % de la caixa, i per aixo es declara com una sola xifra.
+    // LA HERO OMPLE EL CARRIL SENCER, sense aire interior.
     //
-    // El bloc es `hg-carril` perque l'alcada de la vista vertical es un
-    // PERCENTATGE DEL CARRIL, i aixo nomes te sentit si ell es el carril.
+    // ABANS HI HAVIA UN AIRE INTERIOR del 14,74 % a cada costat: el complement
+    // del `scale(0.705)` de la pagina vella, que feia que la caixa nomes en fos
+    // el 70,5 %. L'amo demana que la hero arribi a les dues vores del carril, i
+    // per tant l'aire marxa.
+    //
+    // El bloc es `hg-carril`: l'amplada la mana el carril (que la capçalera
+    // publica) i l'alcada surt de la proporcio de la caixa.
     <div
       data-hero-inici="1"
       className="hg-carril"
-      style={{ paddingInline: `${(HERO_AIRE_CARRIL * 100) / 2}%`, display: 'flex', flexDirection: 'column' }}
+      style={{ display: 'flex', flexDirection: 'column' }}
     >
       <div
         data-hero-caixa="1"
