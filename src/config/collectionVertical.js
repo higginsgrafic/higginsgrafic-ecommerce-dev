@@ -166,11 +166,14 @@ export const HOME_GALERIA_TOP_PX = 0;
  * pindola. Amb el bloc a l'alcada del contingut, l'aire es declara aqui, que
  * es l'unic lloc on es pot tocar.
  *
- * El numero es 60 i no 100 perque el titol te 40 px propis entremig (el seu
- * bloc en te 27 de marge a dalt mes 13 del seu propi ajust): amb 100 el buit
- * REAL fins al titol sortia de 140.
+ * El numero es 90 i no 100 per dos motius que es compensen:
+ *   - el titol te 40 px propis entremig (27 de marge del seu bloc mes 13 del
+ *     seu ajust), i aixo DEMANA 40 px menys;
+ *   - la pindola va 80 px sota la caixa (30 dels quals tapen el degradat), i
+ *     aixo en DEMANA 30 mes.
+ * Amb 90, el buit VISIBLE de la pindola al titol es de 100 px.
  */
-export const HOME_GALERIA_AIRE_SOTA_PX = 60;
+export const HOME_GALERIA_AIRE_SOTA_PX = 90;
 
 /**
  * El marge de dalt de cada bloc de colleccio de l'inici, amb el seu nom.
