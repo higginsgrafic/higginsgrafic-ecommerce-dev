@@ -3,9 +3,7 @@ import { Helmet } from 'react-helmet';
 import { Link } from 'react-router-dom';
 import { Shuffle } from 'lucide-react';
 import HeroSlider from '@/components/HeroSlider';
-import TDP1 from '@/components/tdp/TDP1';
-import TDP2 from '@/components/tdp/TDP2';
-import CollectionTableCard from '@/components/tdp/CollectionTableCard';
+import HomeColleccio from '@/components/home/HomeColleccio';
 import EditableTextBox from '@/components/dev/EditableTextBox';
 import Pauta4ColsOverlay from '@/components/pauta/Pauta4ColsOverlay';
 import { buildHomeDrawingPlan, buildHeroStripePlan } from '@/components/home/homeDrawings';
@@ -13,7 +11,7 @@ import StoryPosterLink from '@/components/StoryPosterLink';
 import useIsMobile from '@/hooks/useIsMobile';
 import HomeMobile from '@/pages/HomeMobile';
 import { SELLING_PRICE_LABEL } from '@/config/pricing';
-import { HOME_TITOL_TDP_MARGIN_PX, HOME_GALERIA_TOP_PX, HOME_GALERIA_AIRE_SOTA_PX, HOME_COLLECCIO_MARGIN_PX, TDP_MIDES_INTERIOR, COLLECTION_BG_SRC } from '@/config/collectionVertical';
+import { TDP_MIDES_INTERIOR, COLLECTION_BG_SRC } from '@/config/collectionVertical';
 import { esTauletaApaisada } from '@/utils/layoutMetrics';
 import { laneForViewport } from '@/utils/layoutModel';
 import { tdpMidaFitxa } from '@/utils/tdpMida';
@@ -209,44 +207,6 @@ const COLLECTION_NAMES = {
   'miscellania': 'MISCEL·LÀNIA',
 };
 
-// Fitxa de taula: NOMES la variant A (nom a dalt). La B (imatge a dalt) s'ha
-// tret per decisio de l'amo: les dues variants donaven alcades de fitxa
-// diferents i el ritme de les galeries no era estable. Totes les pagines fan
-// servir ara la del nom a dalt.
-const TableCardA = (props) => <CollectionTableCard {...props} />;
-
-function HomeTdpCard({ Component, slug, index, cardPropsFn, collectionHref, editableIdPrefix, gridColumn, style, portraitTablet = false, backgroundSrc, midesFitxa }) {
-  const [size, setSize] = useState('M');
-  const portraitAdjustment = portraitTablet
-    ? Component === TDP2
-      ? { imageTranslateY: 'calc(-44px + calc(calc(var(--hg-tdp-xR) - var(--hg-tdp-xL)) * 0.01410547))', descriptionLineHeight: 1.2 }
-      : { descriptionTranslateY: 'calc(-5px - 10%)', descriptionLineHeight: 1.2 }
-    : {};
-  return (
-    // El fons i les mides interiors van ABANS de `cardPropsFn` perque aquest
-    // torna `{}` quan no te dades del producte (la ultima fitxa de cada
-    // galeria): sense aixo, aquella fitxa quedava sense fons i amb les mides
-    // per defecte del component.
-    <Component
-      backgroundSrc={backgroundSrc}
-      {...midesFitxa}
-      // El fons degradat s'INTERCALA amunt i avall: la fitxa senar el porta
-      // girat verticalment (`scaleY(-1)` al fons). Com que l'index es la
-      // columna dins la fila, la 1a i la 3a el porten d'una manera i la 2a i
-      // la 4a de l'altra.
-      gradientGirat={index % 2 === 1}
-      gridColumn={gridColumn}
-      editableIdPrefix={editableIdPrefix}
-      {...cardPropsFn(slug, index, size)}
-      collectionHref={collectionHref}
-      selectedSize={size}
-      onSizeChange={setSize}
-      copyMode={true}
-      style={style}
-      {...portraitAdjustment}
-    />
-  );
-}
 
 function Home() {
   const isMobile = useIsMobile();
@@ -744,529 +704,122 @@ function Home() {
           veritat, i el bloc no ha d'encongir res. */}
       <section className="bg-background text-foreground" style={{ marginTop: `calc(${isPortraitTablet ? '435px' : (isLandscapeTablet ? '40px' : '100px')} + ${baixadaHero}px)` }}>
         <div className="mx-auto max-w-[1400px] px-4 pt-[60px] pb-[174px] sm:px-6 lg:px-10" style={isTablet ? { paddingTop: '30px' } : undefined}>
-            <CollectionTitle
-            index=""
-            kicker="Col·lecció"
+          {/* LES CINC GALERIES DE COLLECCIO. Eren cinc blocs copiats (107 linies
+              x 4 i 148 el cinque) amb el mateix embolcall, el mateix bloc de
+              titol, els mateixos quatre `gridColumn` i la mateixa pindola. Ara
+              son cinc crides a la mateixa peca (`HomeColleccio`), i el que
+              canvia d'una a l'altra es nomes aixo: el titol, el subtitol, la
+              ruta, l'slug i els desplaçaments del numero de fons i del titol.
+
+              ELS DESPLAÇAMENTS SON DISSENY, NO PEDACOS. Cada colleccio te el
+              seu dibuix del titol, i per aixo cada una te els seus offsets
+              escrits. El que S'HA TREF, perque era un pedaç, son els quatre
+              marges calibrats a ma ([129, 162, 104, 124]): ara el marge es un
+              de sol (`HOME_COLLECCIO_MARGIN_PX`, 190 px). */}
+          <HomeColleccio
+            Titol={CollectionTitle}
             title="First Contact"
             subtitle="LA CIÈNCIA FICCIÓ QUE MIRA ENDINS"
-            align="center"
-            titleTextAlign="center"
-            numberAlign="left"
-            titleOffsetX={0}
-            titleOffsetY={5}
-            numberOffsetX={-36}
+            href="/first-contact"
+            slug="first-contact"
+            editableIdPrefix="home-row1"
+            tdpGridColumns={tdpGridColumns}
+            columnes={midaTdpHome.columnes}
+            cardPropsFn={cardProps}
+            midesFitxa={midesFitxaHome}
+            backgroundSrc={COLLECTION_BG_SRC}
+            portraitTablet={isPortraitTablet}
+            portraitTabletTdpGridStyle={portraitTabletTdpGridStyle}
+          />
+
+          <HomeColleccio
+            Titol={CollectionTitle}
+            title="THE HUMAN INSIDE"
+            subtitle="EN EL TEU RACÓ MÉS PROFUND HI HA UN HEROI"
+            href="/the-human-inside"
+            slug="the-human-inside"
+            editableIdPrefix="home-row2"
+            titleOffsetY={-1}
+            numberAlign="right"
+            numberOffsetX={1}
             numberOffsetY={-4}
             subtitleOffsetX={0}
             subtitleOffsetY={0}
-            collectionHref="/first-contact"
+            tdpGridColumns={tdpGridColumns}
+            columnes={midaTdpHome.columnes}
+            cardPropsFn={cardProps}
+            midesFitxa={midesFitxaHome}
+            backgroundSrc={COLLECTION_BG_SRC}
+            portraitTablet={isPortraitTablet}
+            portraitTabletTdpGridStyle={portraitTabletTdpGridStyle}
           />
-          <div style={{ marginTop: isTablet ? `${HOME_TITOL_TDP_MARGIN_PX.tauleta}px` : `${HOME_TITOL_TDP_MARGIN_PX.escriptori}px` }}>
-            <div
-              style={{
-                position: 'relative',
-                left: '50%',
-                top: `${HOME_GALERIA_TOP_PX}px`,
-                transform: 'translateX(-50%)',
-                width: 'calc(var(--hg-tdp-xR) - var(--hg-tdp-xL))',
-                // L'alcada la mana el CONTINGUT (les fitxes). ERA la formula
-                // `carril * 0.84632 - 231`, que no te res a veure amb la mida de
-                // la fitxa: a 1280 i 1024 era MES CURTA que la fitxa i la pindola
-                // hi quedava A SOBRE (28 i 58 px de xoc).
-                height: 'auto',
-                display: 'grid',
-                gridTemplateColumns: tdpGridColumns,
-                columnGap: '22.5px',
-                ...portraitTabletTdpGridStyle,
-              }}
-            >
-              {/* Columna 1: TDP2 */}
-              <HomeTdpCard Component={TableCardA} backgroundSrc={COLLECTION_BG_SRC} midesFitxa={midesFitxaHome} slug="first-contact" index={0} cardPropsFn={cardProps} portraitTablet={isPortraitTablet} collectionHref="/first-contact" editableIdPrefix="home-row1-tdp-1" gridColumn="1 / 2" style={{ width: '100%', alignSelf: 'start', boxSizing: 'border-box' }} />
 
-              {/* Columna 2: TDP1 */}
-              <HomeTdpCard Component={TableCardA} backgroundSrc={COLLECTION_BG_SRC} midesFitxa={midesFitxaHome} slug="first-contact" index={1} cardPropsFn={cardProps} portraitTablet={isPortraitTablet} collectionHref="/first-contact" editableIdPrefix="home-row1-tdp-2" gridColumn="2 / 3" style={{ width: '100%', alignSelf: 'start', boxSizing: 'border-box' }} />
+          <HomeColleccio
+            Titol={CollectionTitle}
+            title="Austen"
+            subtitle="DIGUIS EL QUE DIGUIS, FES-HO AMB ELEGÀNCIA"
+            href="/austen"
+            slug="austen"
+            editableIdPrefix="home-row3"
+            titleOffsetX={0}
+            titleOffsetY={-4}
+            numberAlign="left"
+            numberOffsetX={-22}
+            numberOffsetY={-17}
+            subtitleOffsetY={0}
+            tdpGridColumns={tdpGridColumns}
+            columnes={midaTdpHome.columnes}
+            cardPropsFn={cardProps}
+            midesFitxa={midesFitxaHome}
+            backgroundSrc={COLLECTION_BG_SRC}
+            portraitTablet={isPortraitTablet}
+            portraitTabletTdpGridStyle={portraitTabletTdpGridStyle}
+          />
 
-              {/* Columna 3: TDP2 (Amb imatge a dalt i bloc Nom/Descripció a dota) */}
-              {midaTdpHome.columnes >= 3 && <HomeTdpCard Component={TableCardA} backgroundSrc={COLLECTION_BG_SRC} midesFitxa={midesFitxaHome} slug="first-contact" index={2} cardPropsFn={cardProps} portraitTablet={isPortraitTablet} collectionHref="/first-contact" editableIdPrefix="home-row1-tdp-3" gridColumn="3 / 4" style={{ width: '100%', alignSelf: 'start', boxSizing: 'border-box' }} />}
-              {/* Columna 4 (nomes a escriptori, on la graella en te 4) */}
-              {midaTdpHome.columnes > 3 && <HomeTdpCard Component={TableCardA} backgroundSrc={COLLECTION_BG_SRC} midesFitxa={midesFitxaHome} slug="first-contact" index={3} cardPropsFn={cardProps} portraitTablet={isPortraitTablet} collectionHref="/first-contact" editableIdPrefix="home-row1-tdp-4" gridColumn="4 / 5" style={{ width: '100%', alignSelf: 'start', boxSizing: 'border-box' }} />}
+          <HomeColleccio
+            Titol={CollectionTitle}
+            title="Cube"
+            subtitle="TOTS SOM ESTRANYS A ULLS NOSTRES"
+            href="/cube"
+            slug="cube"
+            editableIdPrefix="home-row4"
+            titleOffsetX={0}
+            titleOffsetY={13}
+            numberAlign="right"
+            numberOffsetX={19}
+            numberOffsetY={0}
+            subtitleOffsetY={1}
+            tdpGridColumns={tdpGridColumns}
+            columnes={midaTdpHome.columnes}
+            cardPropsFn={cardProps}
+            midesFitxa={midesFitxaHome}
+            backgroundSrc={COLLECTION_BG_SRC}
+            portraitTablet={isPortraitTablet}
+            portraitTabletTdpGridStyle={portraitTabletTdpGridStyle}
+          />
 
-              {/* Indicador de més productes (Pill amb text sota el producte de la tercera columna) */}
-              <Link
-                to="/first-contact"
-                style={{
-                  position: 'absolute',
-                  left: '50%',
-                  // 80 px sota la caixa de la targeta, DECLARAT: el bloc de la
-                  // galeria fa l'alcada de la fitxa, i per tant `100%` es el
-                  // fons de la caixa. Han de ser 80 i no 50 perque el fons
-                  // degradat SOBRESURT 30 px per sota de la caixa: el buit
-                  // VISIBLE fins a la pindola es de 50 px.
-                  top: 'calc(100% + 130px)',
-                  height: 'auto',
-                  width: 'auto',
-                  borderRadius: '9999px',
-                  backgroundColor: '#ffffff',
-                  border: '1px solid #e5e7eb',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  padding: '6px 14px',
-                  boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
-                  cursor: 'pointer',
-                  zIndex: 20,
-                  transition: 'all 200ms ease',
-                  textDecoration: 'none',
-                  transform: 'translateX(-50%)',
-                }}
-                className="hover:shadow-md hover:border-neutral-400 active:scale-95 group"
-                title="Veure tota la col·lecció"
-              >
-                <span
-                  style={{ 
-                    fontFamily: 'Oswald, sans-serif',
-                    fontWeight: 300,
-                    fontSize: '12px',
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.05em',
-                    color: '#475059',
-                    lineHeight: 1,
-                  }}
-                  className="group-hover:text-neutral-900"
-                >
-                  <span style={{ display: 'inline-block', transform: 'translateY(3px)' }}>SI EN VOLS SABER</span>{' '}
-                  <span style={{ display: 'inline-block', fontSize: '25px', fontWeight: 100, lineHeight: 1, verticalAlign: 'middle', transform: 'translateY(1px)' }}>+</span>
-                </span>
-              </Link>
-            </div>
-          </div>
-
-          {/* Col·lecció 02: The Human Inside (Distància de 5 files / 190px + 15px avall - 1 fila amunt) */}
-          <div style={{ marginTop: `calc(${HOME_COLLECCIO_MARGIN_PX[0]}px + ${HOME_GALERIA_AIRE_SOTA_PX}px)` }}>
-            <div
-              style={{
-                position: 'relative',
-                left: '50%',
-                transform: 'translateX(-50%)',
-                width: 'calc(var(--hg-tdp-xR) - var(--hg-tdp-xL))',
-              }}
-            >
-              <CollectionTitle
-                index=""
-                kicker="Col·lecció"
-                title="THE HUMAN INSIDE"
-                subtitle="EN EL TEU RACÓ MÉS PROFUND HI HA UN HEROI"
-                align="center"
-                numberAlign="right"
-                titleTextAlign="center"
-                titleOffsetY={-1}
-                numberOffsetX={1} // Mogut 4px més a l'esquerra (abans 5)
-                numberOffsetY={-4}
-                subtitleOffsetX={0} // Centrat en X
-                subtitleOffsetY={0} // Pujat 18px (abans 18)
-                collectionHref="/the-human-inside"
-              />
-            </div>
-            <div style={{ marginTop: isTablet ? `${HOME_TITOL_TDP_MARGIN_PX.tauleta}px` : `${HOME_TITOL_TDP_MARGIN_PX.escriptori}px` }}>
-              <div
-                style={{
-                  position: 'relative',
-                  left: '50%',
-                  top: `${HOME_GALERIA_TOP_PX}px`,
-                  transform: 'translateX(-50%)',
-                  width: 'calc(var(--hg-tdp-xR) - var(--hg-tdp-xL))',
-                  // L'alcada la mana el CONTINGUT (les fitxes). ERA la formula
-                  // `carril * 0.84632 - 231`, que no te res a veure amb la mida de
-                  // la fitxa: a 1280 i 1024 era MES CURTA que la fitxa i la pindola
-                  // hi quedava A SOBRE (28 i 58 px de xoc).
-                  height: 'auto',
-                  display: 'grid',
-                  gridTemplateColumns: tdpGridColumns,
-                  columnGap: '22.5px',
-                  ...portraitTabletTdpGridStyle,
-                }}
-              >
-                {/* Columna 1: TDP1 */}
-                <HomeTdpCard Component={TableCardA} backgroundSrc={COLLECTION_BG_SRC} midesFitxa={midesFitxaHome} slug="the-human-inside" index={0} cardPropsFn={cardProps} portraitTablet={isPortraitTablet} collectionHref="/the-human-inside" editableIdPrefix="home-row2-tdp-1" gridColumn="1 / 2" style={{ width: '100%', alignSelf: 'start', boxSizing: 'border-box' }} />
-
-                {/* Columna 2: TDP2 */}
-                <HomeTdpCard Component={TableCardA} backgroundSrc={COLLECTION_BG_SRC} midesFitxa={midesFitxaHome} slug="the-human-inside" index={1} cardPropsFn={cardProps} portraitTablet={isPortraitTablet} collectionHref="/the-human-inside" editableIdPrefix="home-row2-tdp-2" gridColumn="2 / 3" style={{ width: '100%', alignSelf: 'start', boxSizing: 'border-box' }} />
-
-                {/* Columna 3: TDP1 */}
-                {midaTdpHome.columnes >= 3 && <HomeTdpCard Component={TableCardA} backgroundSrc={COLLECTION_BG_SRC} midesFitxa={midesFitxaHome} slug="the-human-inside" index={2} cardPropsFn={cardProps} portraitTablet={isPortraitTablet} collectionHref="/the-human-inside" editableIdPrefix="home-row2-tdp-3" gridColumn="3 / 4" style={{ width: '100%', alignSelf: 'start', boxSizing: 'border-box' }} />}
-                {/* Columna 4 (nomes a escriptori, on la graella en te 4) */}
-                {midaTdpHome.columnes > 3 && <HomeTdpCard Component={TableCardA} backgroundSrc={COLLECTION_BG_SRC} midesFitxa={midesFitxaHome} slug="the-human-inside" index={3} cardPropsFn={cardProps} portraitTablet={isPortraitTablet} collectionHref="/the-human-inside" editableIdPrefix="home-row2-tdp-4" gridColumn="4 / 5" style={{ width: '100%', alignSelf: 'start', boxSizing: 'border-box' }} />}
-
-              {/* Indicador de més productes (Pill amb text sota el producte de la tercera columna) */}
-              <Link
-                to="/the-human-inside"
-                style={{
-                  position: 'absolute',
-                  left: '50%',
-                  // 80 px sota la caixa de la targeta, DECLARAT: el bloc de la
-                  // galeria fa l'alcada de la fitxa, i per tant `100%` es el
-                  // fons de la caixa. Han de ser 80 i no 50 perque el fons
-                  // degradat SOBRESURT 30 px per sota de la caixa: el buit
-                  // VISIBLE fins a la pindola es de 50 px.
-                  top: 'calc(100% + 130px)',
-                  height: 'auto',
-                  width: 'auto',
-                  borderRadius: '9999px',
-                  backgroundColor: '#ffffff',
-                  border: '1px solid #e5e7eb',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  padding: '6px 14px',
-                  boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
-                  cursor: 'pointer',
-                  zIndex: 20,
-                  transition: 'all 200ms ease',
-                  textDecoration: 'none',
-                  transform: 'translateX(-50%)',
-                }}
-                className="hover:shadow-md hover:border-neutral-400 active:scale-95 group"
-                title="Veure tota la col·lecció"
-              >
-                <span
-                  style={{ 
-                    fontFamily: 'Oswald, sans-serif',
-                    fontWeight: 300,
-                    fontSize: '12px',
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.05em',
-                    color: '#475059',
-                    lineHeight: 1,
-                  }}
-                  className="group-hover:text-neutral-900"
-                >
-                  <span style={{ display: 'inline-block', transform: 'translateY(3px)' }}>SI EN VOLS SABER</span>{' '}
-                  <span style={{ display: 'inline-block', fontSize: '25px', fontWeight: 100, lineHeight: 1, verticalAlign: 'middle', transform: 'translateY(1px)' }}>+</span>
-                </span>
-              </Link>
-              </div>
-            </div>
-          </div>
-
-          {/* Col·lecció 03: Austen (Distància de 5 files / 190px) */}
-          <div style={{ marginTop: `calc(${HOME_COLLECCIO_MARGIN_PX[1]}px + ${HOME_GALERIA_AIRE_SOTA_PX}px)` }}>
-            <div
-              style={{
-                position: 'relative',
-                left: '50%',
-                transform: 'translateX(-50%)',
-                width: 'calc(var(--hg-tdp-xR) - var(--hg-tdp-xL))',
-              }}
-            >
-              <CollectionTitle
-                index=""
-                kicker="Col·lecció"
-                title="Austen"
-                subtitle="DIGUIS EL QUE DIGUIS, FES-HO AMB ELEGÀNCIA"
-                align="center"
-                numberAlign="left"
-                titleTextAlign="center"
-                titleOffsetX={0}
-                titleOffsetY={-4}
-                numberOffsetX={-22} // Mogut 14px a la dreta (abans -36)
-                numberOffsetY={-17}
-                subtitleOffsetY={0}
-                collectionHref="/austen"
-              />
-            </div>
-            <div style={{ marginTop: isTablet ? `${HOME_TITOL_TDP_MARGIN_PX.tauleta}px` : `${HOME_TITOL_TDP_MARGIN_PX.escriptori}px` }}>
-              <div
-                style={{
-                  position: 'relative',
-                  left: '50%',
-                  top: `${HOME_GALERIA_TOP_PX}px`,
-                  transform: 'translateX(-50%)',
-                  width: 'calc(var(--hg-tdp-xR) - var(--hg-tdp-xL))',
-                  // L'alcada la mana el CONTINGUT (les fitxes). ERA la formula
-                  // `carril * 0.84632 - 231`, que no te res a veure amb la mida de
-                  // la fitxa: a 1280 i 1024 era MES CURTA que la fitxa i la pindola
-                  // hi quedava A SOBRE (28 i 58 px de xoc).
-                  height: 'auto',
-                  display: 'grid',
-                  gridTemplateColumns: tdpGridColumns,
-                  columnGap: '22.5px',
-                  ...portraitTabletTdpGridStyle,
-                }}
-              >
-                {/* Columna 1: TDP2 */}
-                <HomeTdpCard Component={TableCardA} backgroundSrc={COLLECTION_BG_SRC} midesFitxa={midesFitxaHome} slug="austen" index={0} cardPropsFn={cardProps} portraitTablet={isPortraitTablet} collectionHref="/austen" editableIdPrefix="home-row3-tdp-1" gridColumn="1 / 2" style={{ width: '100%', alignSelf: 'start', boxSizing: 'border-box' }} />
-
-                {/* Columna 2: TDP1 */}
-                <HomeTdpCard Component={TableCardA} backgroundSrc={COLLECTION_BG_SRC} midesFitxa={midesFitxaHome} slug="austen" index={1} cardPropsFn={cardProps} portraitTablet={isPortraitTablet} collectionHref="/austen" editableIdPrefix="home-row3-tdp-2" gridColumn="2 / 3" style={{ width: '100%', alignSelf: 'start', boxSizing: 'border-box' }} />
-
-                {/* Columna 3: TDP2 */}
-                {midaTdpHome.columnes >= 3 && <HomeTdpCard Component={TableCardA} backgroundSrc={COLLECTION_BG_SRC} midesFitxa={midesFitxaHome} slug="austen" index={2} cardPropsFn={cardProps} portraitTablet={isPortraitTablet} collectionHref="/austen" editableIdPrefix="home-row3-tdp-3" gridColumn="3 / 4" style={{ width: '100%', alignSelf: 'start', boxSizing: 'border-box' }} />}
-                {/* Columna 4 (nomes a escriptori, on la graella en te 4) */}
-                {midaTdpHome.columnes > 3 && <HomeTdpCard Component={TableCardA} backgroundSrc={COLLECTION_BG_SRC} midesFitxa={midesFitxaHome} slug="austen" index={3} cardPropsFn={cardProps} portraitTablet={isPortraitTablet} collectionHref="/austen" editableIdPrefix="home-row3-tdp-4" gridColumn="4 / 5" style={{ width: '100%', alignSelf: 'start', boxSizing: 'border-box' }} />}
-
-              {/* Indicador de més productes (Pill amb text sota el producte de la tercera columna) */}
-              <Link
-                to="/austen"
-                style={{
-                  position: 'absolute',
-                  left: '50%',
-                  // 80 px sota la caixa de la targeta, DECLARAT: el bloc de la
-                  // galeria fa l'alcada de la fitxa, i per tant `100%` es el
-                  // fons de la caixa. Han de ser 80 i no 50 perque el fons
-                  // degradat SOBRESURT 30 px per sota de la caixa: el buit
-                  // VISIBLE fins a la pindola es de 50 px.
-                  top: 'calc(100% + 130px)',
-                  height: 'auto',
-                  width: 'auto',
-                  borderRadius: '9999px',
-                  backgroundColor: '#ffffff',
-                  border: '1px solid #e5e7eb',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  padding: '6px 14px',
-                  boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
-                  cursor: 'pointer',
-                  zIndex: 20,
-                  transition: 'all 200ms ease',
-                  textDecoration: 'none',
-                  transform: 'translateX(-50%)',
-                }}
-                className="hover:shadow-md hover:border-neutral-400 active:scale-95 group"
-                title="Veure tota la col·lecció"
-              >
-                <span
-                  style={{ 
-                    fontFamily: 'Oswald, sans-serif',
-                    fontWeight: 300,
-                    fontSize: '12px',
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.05em',
-                    color: '#475059',
-                    lineHeight: 1,
-                  }}
-                  className="group-hover:text-neutral-900"
-                >
-                  <span style={{ display: 'inline-block', transform: 'translateY(3px)' }}>SI EN VOLS SABER</span>{' '}
-                  <span style={{ display: 'inline-block', fontSize: '25px', fontWeight: 100, lineHeight: 1, verticalAlign: 'middle', transform: 'translateY(1px)' }}>+</span>
-                </span>
-              </Link>
-              </div>
-            </div>
-          </div>
-
-          {/* Col·lecció 04: Cube (Distància de 5 files / 190px - 1 fila amunt) */}
-          <div style={{ marginTop: `calc(${HOME_COLLECCIO_MARGIN_PX[2]}px + ${HOME_GALERIA_AIRE_SOTA_PX}px)` }}>
-            <div
-              style={{
-                position: 'relative',
-                left: '50%',
-                transform: 'translateX(-50%)',
-                width: 'calc(var(--hg-tdp-xR) - var(--hg-tdp-xL))',
-              }}
-            >
-              <CollectionTitle
-                index=""
-                kicker="Col·lecció"
-                title="Cube"
-                subtitle="TOTS SOM ESTRANYS A ULLS NOSTRES"
-                align="center"
-                numberAlign="right"
-                titleTextAlign="center"
-                titleOffsetX={0}
-                titleOffsetY={13}
-                numberOffsetX={19} // Mogut 4px més a l'esquerra (abans 23)
-                numberOffsetY={0}
-                subtitleOffsetY={1}
-                collectionHref="/cube"
-              />
-            </div>
-            <div style={{ marginTop: isTablet ? `${HOME_TITOL_TDP_MARGIN_PX.tauleta}px` : `${HOME_TITOL_TDP_MARGIN_PX.escriptori}px` }}>
-              <div
-                style={{
-                  position: 'relative',
-                  left: '50%',
-                  top: `${HOME_GALERIA_TOP_PX}px`,
-                  transform: 'translateX(-50%)',
-                  width: 'calc(var(--hg-tdp-xR) - var(--hg-tdp-xL))',
-                  // L'alcada la mana el CONTINGUT (les fitxes). ERA la formula
-                  // `carril * 0.84632 - 231`, que no te res a veure amb la mida de
-                  // la fitxa: a 1280 i 1024 era MES CURTA que la fitxa i la pindola
-                  // hi quedava A SOBRE (28 i 58 px de xoc).
-                  height: 'auto',
-                  display: 'grid',
-                  gridTemplateColumns: tdpGridColumns,
-                  columnGap: '22.5px',
-                  ...portraitTabletTdpGridStyle,
-                }}
-              >
-                {/* Columna 1: TDP1 */}
-                <HomeTdpCard Component={TableCardA} backgroundSrc={COLLECTION_BG_SRC} midesFitxa={midesFitxaHome} slug="cube" index={0} cardPropsFn={cardProps} portraitTablet={isPortraitTablet} collectionHref="/cube" editableIdPrefix="home-row4-tdp-1" gridColumn="1 / 2" style={{ width: '100%', alignSelf: 'start', boxSizing: 'border-box' }} />
-
-                {/* Columna 2: TDP2 */}
-                <HomeTdpCard Component={TableCardA} backgroundSrc={COLLECTION_BG_SRC} midesFitxa={midesFitxaHome} slug="cube" index={1} cardPropsFn={cardProps} portraitTablet={isPortraitTablet} collectionHref="/cube" editableIdPrefix="home-row4-tdp-2" gridColumn="2 / 3" style={{ width: '100%', alignSelf: 'start', boxSizing: 'border-box' }} />
-
-                {/* Columna 3: TDP1 */}
-                {midaTdpHome.columnes >= 3 && <HomeTdpCard Component={TableCardA} backgroundSrc={COLLECTION_BG_SRC} midesFitxa={midesFitxaHome} slug="cube" index={2} cardPropsFn={cardProps} portraitTablet={isPortraitTablet} collectionHref="/cube" editableIdPrefix="home-row4-tdp-3" gridColumn="3 / 4" style={{ width: '100%', alignSelf: 'start', boxSizing: 'border-box' }} />}
-                {/* Columna 4 (nomes a escriptori, on la graella en te 4) */}
-                {midaTdpHome.columnes > 3 && <HomeTdpCard Component={TableCardA} backgroundSrc={COLLECTION_BG_SRC} midesFitxa={midesFitxaHome} slug="cube" index={3} cardPropsFn={cardProps} portraitTablet={isPortraitTablet} collectionHref="/cube" editableIdPrefix="home-row4-tdp-4" gridColumn="4 / 5" style={{ width: '100%', alignSelf: 'start', boxSizing: 'border-box' }} />}
-
-              {/* Indicador de més productes (Pill amb text sota el producte de la tercera columna) */}
-              <Link
-                to="/cube"
-                style={{
-                  position: 'absolute',
-                  left: '50%',
-                  // 80 px sota la caixa de la targeta, DECLARAT: el bloc de la
-                  // galeria fa l'alcada de la fitxa, i per tant `100%` es el
-                  // fons de la caixa. Han de ser 80 i no 50 perque el fons
-                  // degradat SOBRESURT 30 px per sota de la caixa: el buit
-                  // VISIBLE fins a la pindola es de 50 px.
-                  top: 'calc(100% + 130px)',
-                  height: 'auto',
-                  width: 'auto',
-                  borderRadius: '9999px',
-                  backgroundColor: '#ffffff',
-                  border: '1px solid #e5e7eb',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  padding: '6px 14px',
-                  boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
-                  cursor: 'pointer',
-                  zIndex: 20,
-                  transition: 'all 200ms ease',
-                  textDecoration: 'none',
-                  transform: 'translateX(-50%)',
-                }}
-                className="hover:shadow-md hover:border-neutral-400 active:scale-95 group"
-                title="Veure tota la col·lecció"
-              >
-                <span
-                  style={{ 
-                    fontFamily: 'Oswald, sans-serif',
-                    fontWeight: 300,
-                    fontSize: '12px',
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.05em',
-                    color: '#475059',
-                    lineHeight: 1,
-                  }}
-                  className="group-hover:text-neutral-900"
-                >
-                  <span style={{ display: 'inline-block', transform: 'translateY(3px)' }}>SI EN VOLS SABER</span>{' '}
-                  <span style={{ display: 'inline-block', fontSize: '25px', fontWeight: 100, lineHeight: 1, verticalAlign: 'middle', transform: 'translateY(1px)' }}>+</span>
-                </span>
-              </Link>
-              </div>
-            </div>
-          </div>
-
-          {/* Col·lecció 05: MISC (Distància de 5 files / 190px - 1 fila amunt + 20px avall) */}
-          <div style={{ marginTop: `calc(${HOME_COLLECCIO_MARGIN_PX[3]}px + ${HOME_GALERIA_AIRE_SOTA_PX}px)`, position: 'relative', zIndex: 30 }}>
-            <div
-              style={{
-                position: 'relative',
-                left: '50%',
-                transform: 'translateX(-50%)',
-                width: 'calc(var(--hg-tdp-xR) - var(--hg-tdp-xL))',
-              }}
-            >
-              <CollectionTitle
-                index=""
-                kicker="Col·lecció"
-                title="MISCEL·LÀNIA"
-                subtitle="MÉS VAL SOL QUE MAL ACOMPANYAT"
-                align="center"
-                numberAlign="left"
-                titleTextAlign="center"
-                titleOffsetX={0}
-                titleOffsetY={9}
-                numberOffsetX={-22} // Mogut 14px a la dreta (abans -36)
-                numberOffsetY={-4}
-                subtitleOffsetY={1}
-                collectionHref="/miscellania"
-              />
-            </div>
-            <div style={{ marginTop: isTablet ? `${HOME_TITOL_TDP_MARGIN_PX.tauleta}px` : `${HOME_TITOL_TDP_MARGIN_PX.escriptori}px` }}>
-              <div
-                style={{
-                  position: 'relative',
-                  left: '50%',
-                  top: `${HOME_GALERIA_TOP_PX}px`,
-                  transform: 'translateX(-50%)',
-                  width: 'calc(var(--hg-tdp-xR) - var(--hg-tdp-xL))',
-                  // L'alcada la mana el CONTINGUT (les fitxes). ERA la formula
-                  // `carril * 0.84632 - 231`, que no te res a veure amb la mida de
-                  // la fitxa: a 1280 i 1024 era MES CURTA que la fitxa i la pindola
-                  // hi quedava A SOBRE (28 i 58 px de xoc).
-                  height: 'auto',
-                  display: 'grid',
-                  gridTemplateColumns: tdpGridColumns,
-                  columnGap: '22.5px',
-                  ...portraitTabletTdpGridStyle,
-                }}
-              >
-                {/* Columna 1: TDP2 */}
-                <HomeTdpCard Component={TableCardA} backgroundSrc={COLLECTION_BG_SRC} midesFitxa={midesFitxaHome} slug="miscellania" index={0} cardPropsFn={cardProps} portraitTablet={isPortraitTablet} collectionHref="/miscellania" editableIdPrefix="home-row5-tdp-1" gridColumn="1 / 2" style={{ width: '100%', alignSelf: 'start', boxSizing: 'border-box' }} />
-
-                {/* Columna 2: TDP1 */}
-                <HomeTdpCard Component={TableCardA} backgroundSrc={COLLECTION_BG_SRC} midesFitxa={midesFitxaHome} slug="miscellania" index={1} cardPropsFn={cardProps} portraitTablet={isPortraitTablet} collectionHref="/miscellania" editableIdPrefix="home-row5-tdp-2" gridColumn="2 / 3" style={{ width: '100%', alignSelf: 'start', boxSizing: 'border-box' }} />
-
-                {/* Columna 3: TDP2 */}
-                {midaTdpHome.columnes >= 3 && <HomeTdpCard Component={TableCardA} backgroundSrc={COLLECTION_BG_SRC} midesFitxa={midesFitxaHome} slug="miscellania" index={2} cardPropsFn={cardProps} portraitTablet={isPortraitTablet} collectionHref="/miscellania" editableIdPrefix="home-row5-tdp-3" gridColumn="3 / 4" style={{ width: '100%', alignSelf: 'start', boxSizing: 'border-box' }} />}
-                {/* Columna 4 (nomes a escriptori, on la graella en te 4) */}
-                {midaTdpHome.columnes > 3 && <HomeTdpCard Component={TableCardA} backgroundSrc={COLLECTION_BG_SRC} midesFitxa={midesFitxaHome} slug="miscellania" index={3} cardPropsFn={cardProps} portraitTablet={isPortraitTablet} collectionHref="/miscellania" editableIdPrefix="home-row5-tdp-4" gridColumn="4 / 5" style={{ width: '100%', alignSelf: 'start', boxSizing: 'border-box' }} />}
-
-              {/* Indicador de més productes (Pill amb text sota el producte de la tercera columna) */}
-              <Link
-                to="/miscellania"
-                style={{
-                  position: 'absolute',
-                  left: '50%',
-                  // 80 px sota la caixa de la targeta, DECLARAT: el bloc de la
-                  // galeria fa l'alcada de la fitxa, i per tant `100%` es el
-                  // fons de la caixa. Han de ser 80 i no 50 perque el fons
-                  // degradat SOBRESURT 30 px per sota de la caixa: el buit
-                  // VISIBLE fins a la pindola es de 50 px.
-                  top: 'calc(100% + 130px)',
-                  height: 'auto',
-                  width: 'auto',
-                  borderRadius: '9999px',
-                  backgroundColor: '#ffffff',
-                  border: '1px solid #e5e7eb',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  padding: '6px 14px',
-                  boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
-                  cursor: 'pointer',
-                  zIndex: 20,
-                  transition: 'all 200ms ease',
-                  textDecoration: 'none',
-                  transform: 'translateX(-50%)',
-                }}
-                className="hover:shadow-md hover:border-neutral-400 active:scale-95 group"
-                title="Veure tota la col·lecció"
-              >
-                <span
-                  style={{ 
-                    fontFamily: 'Oswald, sans-serif',
-                    fontWeight: 300,
-                    fontSize: '12px',
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.05em',
-                    color: '#475059',
-                    lineHeight: 1,
-                  }}
-                  className="group-hover:text-neutral-900"
-                >
-                  <span style={{ display: 'inline-block', transform: 'translateY(3px)' }}>SI EN VOLS SABER</span>{' '}
-                  <span style={{ display: 'inline-block', fontSize: '25px', fontWeight: 100, lineHeight: 1, verticalAlign: 'middle', transform: 'translateY(1px)' }}>+</span>
-                </span>
-              </Link>
-              </div>
-            </div>
-          </div>
+          <HomeColleccio
+            Titol={CollectionTitle}
+            title="MISCEL·LÀNIA"
+            subtitle="MÉS VAL SOL QUE MAL ACOMPANYAT"
+            href="/miscellania"
+            slug="miscellania"
+            editableIdPrefix="home-row5"
+            titleOffsetX={0}
+            titleOffsetY={9}
+            numberAlign="left"
+            numberOffsetX={-22}
+            numberOffsetY={-4}
+            subtitleOffsetY={1}
+            zIndex={30}
+            tdpGridColumns={tdpGridColumns}
+            columnes={midaTdpHome.columnes}
+            cardPropsFn={cardProps}
+            midesFitxa={midesFitxaHome}
+            backgroundSrc={COLLECTION_BG_SRC}
+            portraitTablet={isPortraitTablet}
+            portraitTabletTdpGridStyle={portraitTabletTdpGridStyle}
+          />
 
           {/* Bloc Copiat des de /pdp (fila 20 a 62) posicionat a la fila global 215 en endavant (Mogut 19 files amunt i 20px més amunt) */}
           <div style={{ marginTop: isPortraitTablet ? '-309px' : '-552px' }}>
