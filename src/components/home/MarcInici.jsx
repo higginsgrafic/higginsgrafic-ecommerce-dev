@@ -42,8 +42,6 @@
  */
 import { useEffect, useRef, useState } from 'react';
 
-/** El tros que ocupa el cadenat just sota la divisio del megaslide. */
-const RESGUARD = 56;
 /** El repartiment inicial, abans del primer mesurament. */
 const REPARTIMENT_INICIAL = { aire: 0, alcada: null };
 
@@ -125,25 +123,19 @@ function MarcInici({ seccions }) {
       // tant el primer que s'hi ha de posar es aquest tros.
       const zonaRect = zona.getBoundingClientRect();
       const finsLinia = Math.max(0, linia - zonaRect.top);
-      // ELS AIRES, EQUIDISTANTS. De la linia del megaslide al fons de la
-      // finestra hi ha d'haver, per aquest ordre:
+      // ELS AIRES, EN PROPORCIO DE LA ZONA.
       //
-      //   cadenat | aire | icones | aire | aire | hero | aire
+      // A 1920 el bloc queda equidistant dins de la zona (de la linia del
+      // megaslide al fons de la finestra) i la hero n'ocupa el 73 %. Pero allo
+      // que no escala es la resta: el carril te un sostre de 1350 px i la
+      // finestra no, i per aixo a 1024 i 1280 la hero es queda amb el 83 % i el
+      // 95 % de la zona. Expressar-ho en proporcio de la zona es el que fa que
+      // el bloc es reparteixi igual a totes les mides.
       //
-      // El cadenat i les dues peces tenen la seva mida: el cadenat 56 px, la
-      // franja d'icones l'alcada declarada i la hero la que li dona el seu
-      // aspecte amb l'amplada del carril. El que es reparteix es NOMES l'espai
-      // que sobra, i es reparteix en quatre trossos iguals:
-      //
-      //   aire = (zona − resguard − icones − hero) / 4
-      //
-      // El bloc sencer (icones + hero) queda equidistant dins de la zona.
-      //
-      // SI LA FINESTRA ES CURTA, la zona creix i la pagina s'allarga. Es
-      // deliberat: encongir la hero per encabir-hi tot faria que la peça
-      // canviés de mida segons la pantalla, i allo que es vol es que quedi com
-      // esta. L'unic terra que hi ha es perque el cadenat no trepitgi la hero.
-      const aire = Math.max(RESGUARD / 2, (zonaAlcada - RESGUARD - icones - natural) / 4);
+      // L'AIRE ES UNA PROPORCIO DE LA ZONA: el 5 % (a 1920, 29 px), i n'hi ha
+      // quatre: un a sobre les icones, dos entre les icones i la hero, i un
+      // sota la hero.
+      const aire = Math.max(0, 0.05 * zonaAlcada);
       const alcada = natural;
       // El numero que decideix si ja hi som: si no s'ha mogut, s'atura.
       const ara = `${Math.round(zonaAlcada * 4) / 4}|${Math.round(alcada * 4) / 4}|${Math.round(aire * 4) / 4}`;
