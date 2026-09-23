@@ -197,7 +197,21 @@ function App() {
 
   const heroSettingsDevHeaderHeight = isDevHeaderRoute ? baseHeaderHeight : 0;
   const offersHeaderHeight = offersHeaderVisible ? 40 : 0;
-  const adminBannerVisible = (isAdmin || isDevDemoRoute || isAdminRoute) && !isEmbeddedPreview;
+  // LA BARRA DE DESENVOLUPAMENT NO ENTRA A LES PAGINES DEL LLOC.
+  //
+  // Era la franja vermella de 40 px enganxada a dalt de tot. Com que nomes la
+  // veu l'administrador — o sigui, nosaltres mentre mesurem —, la pagina no
+  // s'estava mesurant mai a la seva alcada de veritat: a 1920 les divisions de
+  // la inici donaven 11/28 amb la barra i 3/8 sense, i la hero hi perdia 40 px
+  // de lloc. A produccio, un visitant no la te.
+  //
+  // Ara nomes surt a les pagines propies de l'aplicacio (administracio i
+  // eines). A les pagines publiques no hi es. L'acces a /admin, que abans
+  // donava aquesta barra, el porta la icona de la capçalera.
+  const esPaginaDeLloc = !(isAdminRoute || isDevLayoutRoute || isDevHeaderRoute || isFullScreenRoute);
+  const adminBannerVisible = !esPaginaDeLloc
+    && (isAdmin || isAdminRoute || isDevDemoRoute)
+    && !isEmbeddedPreview;
   const adminBannerHeight = adminBannerVisible ? 40 : 0;
   const offersHeaderTop = adminBannerVisible ? adminBannerHeight : 0;
   const adminRouteDevHeaderHeight = (isAdminRoute && devHeaderVisible) ? baseHeaderHeight : 0;
