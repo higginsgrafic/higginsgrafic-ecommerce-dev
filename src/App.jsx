@@ -111,6 +111,11 @@ function App() {
     safeProductContext;
 
   const isHomeRoute = location.pathname === '/';
+  // L'inici NOU, que es construeix al costat (`PLA-arquitectura-nova.md` §6).
+  // Te el seu propi aire de seccions, i el peu no hi pot portar els calibratges
+  // de la pagina vella: alla son `-832px` a la ruta `/` i un numero per
+  // dispositiu a la resta, i el resultat es que el peu toca o tapa el poster.
+  const isNouIniciRoute = location.pathname === '/nova/inici';
   // Fulles de colleccio: son les que tenen el bloc final amb el rail estatic, i
   // on el peu s'ha de posar a la distancia del marge lateral.
   const isCollectionRoute = COLLECTIONS_MENU.some((c) => c.href === location.pathname || location.pathname.startsWith(`${c.href}/`));
@@ -339,7 +344,11 @@ function App() {
             null
           ) : (
             !isDevLayoutRoute && (
-              <div style={isHomeRoute
+              <div style={isNouIniciRoute
+                // L'aire del peu, amb el MATEIX token que les seccions de la
+                // pagina nova.
+                ? { marginBlockStart: 'var(--esp-4)' }
+                : isHomeRoute
                 ? { marginTop: '-832px', position: 'relative', zIndex: 50 }
                 : (isCollectionRoute
                   // A les fulles de colleccio el contingut acaba amb el rail i la
