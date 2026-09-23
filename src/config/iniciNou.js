@@ -113,3 +113,44 @@ export const HERO_AIRE_CARRIL = (1350 - HERO_AMPLADA) / 1350;
 
 /** La ruta on es prova la pàgina nova sense afectar la botiga. */
 export const RUTA_INICI_NOU = '/nova/inici';
+
+/**
+ * LES CINC COLLECCIONS DE L'INICI.
+ *
+ * `titleOffsetY`, `numberAlign` i `numberOffsetX` son el DIBUIX de cada
+ * colleccio: el numero de fons i el titol es mouen per composicio, i cada una
+ * te el seu. Son els MATEIXOS valors que te la pagina vella, perque aquesta
+ * passa no es sobre el dibuix dels titols.
+ */
+export const COLLECCIONS_INICI = [
+  {
+    id: 'colleccio-1', slug: 'first-contact', name: 'FIRST CONTACT', href: '/first-contact',
+    label: 'Galeria 1 · First Contact',
+    title: 'First Contact', subtitle: 'LA CIÈNCIA FICCIÓ QUE MIRA ENDINS',
+    titleOffsetY: 5, numberAlign: 'left', numberOffsetX: -36,
+  },
+  {
+    id: 'colleccio-2', slug: 'the-human-inside', name: 'THE HUMAN INSIDE', href: '/the-human-inside',
+    label: 'Galeria 2 · The Human Inside',
+    title: 'THE HUMAN INSIDE', subtitle: 'EN EL TEU RACÓ MÉS PROFUND HI HA UN HEROI',
+    titleOffsetY: -1, numberAlign: 'right', numberOffsetX: 1,
+  },
+  {
+    id: 'colleccio-3', slug: 'austen', name: 'AUSTEN', href: '/austen',
+    label: 'Galeria 3 · Austen',
+    title: 'Austen', subtitle: 'DIGUIS EL QUE DIGUIS, FES-HO AMB ELEGÀNCIA',
+    titleOffsetY: -4, numberAlign: 'left', numberOffsetX: -22,
+  },
+  {
+    id: 'colleccio-4', slug: 'cube', name: 'CUBE', href: '/cube',
+    label: 'Galeria 4 · Cube',
+    title: 'Cube', subtitle: 'TOTS SOM ESTRANYS A ULLS NOSTRES',
+    titleOffsetY: 13, numberAlign: 'right', numberOffsetX: 19,
+  },
+  {
+    id: 'colleccio-5', slug: 'miscellania', name: 'MISCEL·LÀNIA', href: '/miscellania',
+    label: 'Galeria 5 · Miscel·lània',
+    title: 'MISCEL·LÀNIA', subtitle: 'MÉS VAL SOL QUE MAL ACOMPANYAT',
+    titleOffsetY: 9, numberAlign: 'left', numberOffsetX: -22,
+  },
+];
