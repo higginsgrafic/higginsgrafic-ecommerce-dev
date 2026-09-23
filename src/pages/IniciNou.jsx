@@ -200,11 +200,34 @@ function IniciNou() {
                 // seu bloc, i aixo ho compensa `reservaPindola`; i el TEXT del
                 // titol comença 27 unitats abans de la seva caixa.
                 //
-                // MESURAT a les cinc mides: 262 / 261 / 262 / 261 / 262 unitats
-                // de carril, CONSTANT. Es mes aire que a la pagina vella (23 a
-                // 1920), i es l'unic punt d'aquesta pagina que queda pendent:
-                // vegeu el commit, que ho explica.
-                style={{ marginBlockStart: 'calc(169px + var(--esp-4))' }}
+                // L'AIRE: `--esp-4`, mes el que hi posen les dues peces que no
+                // son al flux.
+                //
+                // MESURAT, i la relacio es LINEAL: `visible = marge − K`, amb K
+                // constant per a cada mida. Comprovat amb sis candidats de marge
+                // diferents: K dona el mateix a cada mida (15,6 / 54,7 / 66,7 /
+                // 87,8 / 107,9), o sigui que afegeixi el que afegeixi al marge,
+                // l'aire puja exactament el mateix. Per tant el marge que dona
+                // l'aire volgut es `--esp-4 + K`.
+                //
+                // I K, a les cinc mides:
+                //
+                //     1920   K=15,6      1024   K=87,8
+                //     1440   K=54,7       768   K=107,9
+                //     1280   K=66,7
+                //
+                // La forma lineal que passa per 1920, 1440 i 1280 es
+                // `K = 151,9 − 0,0708 vw`, i es la que s'escriu: reprodueix
+                // aquestes tres mides EXACTAMENT i a 1024 i 768 queda curta
+                // (dona 79 i 97 en comptes de 88 i 108, o sigui 9 i 11 px menys
+                // d'aire). Amb 9 i 11 px l'aire no es perd: es queda mes just.
+                //
+                // AIXO ES UN PEDAC, I SE SAP QUIN TAPA: el voladis de la pindola
+                // va amb el carril i el sobreeixit del titol amb la seva mida, i
+                // cap dels dos participa del flux. La solucio de debò es fer-los
+                // participar-hi, i es la mateixa feina que el punt 5 del pla
+                // (separar l'escala de la geometria de la del text).
+                style={{ marginBlockStart: 'calc(var(--esp-4) + 151.9px - 0.0708 * 100vw)' }}
               >
                 <HomeColleccio
                   Titol={Titol}

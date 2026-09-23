@@ -22,7 +22,20 @@ import {
  */
 const PINDOLA_TOP = 130;
 const PINDOLA_ALCADA_U = 39;
-const PINDOLA_VOLADIS = PINDOLA_TOP + PINDOLA_ALCADA_U;
+/**
+ * El que la pindola baixa del seu bloc, MESURAT: 130 (el seu `top`) + 39 (la
+ * seva alcada) + 11,4 = 180,4 unitats.
+ *
+ * Els 11,4 no surten de cap formula: son el que la pindola sobreïx del bloc
+ * despres de la reserva, i es veuen quan es mesura la seccio sencera
+ * (1443,8 − 1274,8 = 169 reservats, i la pindola acaba a 1455,2). Es van
+ * trobar mesurant el buit real entre dues seccions i restant-li el marge.
+ *
+ * Sense comptar-los, reserva i voladis no es cancel·len i l'aire entre
+ * galeries depen de la mida (mesurat: 262 / 261 / 262 / 261 / 262 unitats de
+ * carril, quan el que es declara es 120).
+ */
+const PINDOLA_VOLADIS = PINDOLA_TOP + PINDOLA_ALCADA_U + 11.4;
 
 /**
  * Una galeria de la pagina d'inici: el titol d'una colleccio i la seva fila de
@@ -199,12 +212,19 @@ function HomeColleccio({
         // El que la pindola baixa: 130 unitats (el seu `top`) + la seva alcada
         // (39) = 169, sobre el carril.
         // El percentatge es calcula sobre l'amplada del BLOC, i el bloc es
-        // `carril − 2 x --marge-lateral` (mesurat: 1270 a 1920, 508 a 768). El
-        // que s'ha de reservar, en canvi, es `169 x carril / 1350`: el voladis
-        // de la pindola va sobre el CARRIL. Recalculat, el percentatge es
-        // `169 / 1270`, i no `169 / 1350` (que donava 159 px en comptes de 169).
+        // `carril − 2 x --marge-lateral`. MESURAT: el bloc fa 1270 a 1920, 952,5
+        // a 1440, 846,7 a 1280, 677,3 a 1024 i 508 a 768, o sigui exactament el
+        // 94,07 % del carril. I el voladis, en canvi, va sobre el CARRIL. Per
+        // tant el percentatge es `180,4 / 1270` i no `180,4 / 1350`.
         ...(reservaPindola ? { paddingBottom: `${(PINDOLA_VOLADIS / 1270) * 100}%` } : {}),
-        ...(zIndex ? { position: 'relative', zIndex } : {}),
+        // El bloc es el CONTAINING BLOCK de la pindola, i aixo es el que fa que
+        // la reserva serveixi per a alguna cosa. Sense aixo, el `position:
+        // relative` mes proper es el del GRID, i la pindola segueix el fons del
+        // grid: com que el grid tambe creix quan el bloc creix, la pindola
+        // baixava amb la reserva i les dues coses no es cancel·laven mai.
+        // (TESTIMONI §4, trampa 7.)
+        position: 'relative',
+        ...(zIndex ? { zIndex } : {}),
       }}
     >
       <div style={{ position: 'relative', left: '50%', transform: 'translateX(-50%)', width: 'calc(var(--hg-tdp-xR) - var(--hg-tdp-xL))' }}>
