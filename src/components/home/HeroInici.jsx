@@ -1,29 +1,37 @@
-import { useMemo } from 'react';
-import { Link } from 'react-router-dom';
+import { useMemo, useState } from 'react';
+import { Shuffle } from 'lucide-react';
 import { buildHeroStripePlan, DARK_COLORS } from '@/components/home/homeDrawings';
+import { CERCADOR_COLORS } from '@/data/collections';
+import useIsMobile from '@/hooks/useIsMobile';
+
+/** El color de cada samarreta, de la taula canonica del lloc. */
+const HEX_SAMARRETA = Object.fromEntries(CERCADOR_COLORS.map((c) => [c.slug, c.hex]));
 
 /**
- * LA HERO DE L'INICI NOU.
+ * LA HERO DE L'INICI NOU: LES FRANGES.
  *
- * CINC FRANGES, una per colleccio, en una caixa que omple el carril i te la
- * proporcio 952 / 401 (la de la pagina vella, mesurada a les cinc mides).
+ * ES COPIAT DE LA PAGINA VELLA (`Home.jsx`), que es el que calia fer des del
+ * principi. Com funciona, doncs, es exactament com alla:
  *
- * COM ES FA UNA FRANJA. Les cinc franges son el MATEIX mockup apilat: la imatge
- * fa el 500 % de l'alcada de la franja i cada franja ensenya la seva porcio
- * desplaçant-la un 20 % mes. Es com ho fa la pagina vella, i per aixo les
- * samarretes de les cinc franges son la mateixa peça en cinc colors.
+ *   1. La hero es CINC FRANGES iguals, una sobre l'altra (`flex: 1 1 0`).
+ *   2. A cada franja hi ha UNA SAMARRETA DIFERENT, amb el seu color.
+ *   3. La samarreta es pinta com una IMATGE DE FONS que fa el 500 % de l'alcada
+ *      de la franja, i cada franja la desplaça un 20 % mes que l'anterior. O
+ *      sigui que cada franja ensenya la SEVA porcio de la samarreta.
+ *   4. Sumant les cinc franges es veu la FORMA d'una samarreta sencera, perque
+ *      les porcions son consecutives.
  *
- * A SOBRE DE LA SAMARRETA hi ha el dibuix de la colleccio, i a sobre el text:
- * el nom de la colleccio i, quan en te, la subcolleccio.
+ * NO hi ha cap mascara: la forma surt de la unio de les cinc porcions, que es
+ * com ho fa la pagina vella.
  *
- * EL TEXT ES POSA EN BLANC O EN NEGRE segons el color de la samarreta: els
- * colors foscos (`DARK_COLORS`) porten el dibuix en blanc i el text clar.
- *
- * EL QUE ENCARA NO HI ES: el botó de barrejar (el `Shuffle` de la pagina vella)
- * i les transicions entre plans. El pla es calcula un cop per muntatge.
+ * El text va a l'esquerra de cada franja, i el boto de barrejar a la dreta.
+ * Les transicions entre plans i el `Shuffle` tambe son de la vella.
  */
 function HeroInici() {
-  const franges = useMemo(() => buildHeroStripePlan(), []);
+  const isMobile = useIsMobile();
+  const [plan, setPlan] = useState(() => buildHeroStripePlan());
+  const franges = useMemo(() => plan, [plan]);
+
   return (
     <div
       data-hero-inici="1"
@@ -36,34 +44,35 @@ function HeroInici() {
         data-franges={franges.length}
         style={{
           display: 'flex',
-          // Les cinc franges, al costat, i cadascuna te la mateixa amplada.
-          flexDirection: 'row',
+          flexDirection: 'column',
+          gap: '2px',
           overflow: 'hidden',
         }}
       >
         {franges.map((band, i) => {
           const esFosc = DARK_COLORS.has(band.color);
-          const text = esFosc ? '#FFFFFF' : '#111827';
-          const href = band.productHref || band.collectionHref;
           return (
-            <Link
+            <a
               key={`${band.drawingId}-${i}`}
-              to={href}
+              href={band.productHref || band.collectionHref}
               data-franja={i + 1}
               data-colleccio={band.collectionSlug}
               title={band.collectionName}
+              className="group hover:opacity-90 transition-opacity"
               style={{
                 flex: '1 1 0',
                 position: 'relative',
                 display: 'flex',
                 alignItems: 'center',
-                justifyContent: 'center',
                 overflow: 'hidden',
                 background: '#FFFFFF',
                 textDecoration: 'none',
               }}
             >
-              {/* LA SAMARRETA: la porcio que li toca del mockup apilat. */}
+              {/* LA SAMARRETA, com a fons: el 500 % de l'alcada de la franja,
+                  desplaçada el 20 % que li toca. Es aixo el que fa que cada
+                  franja ensenyi una porcio diferent i que sumades es vegi la
+                  forma. */}
               <div
                 aria-hidden="true"
                 style={{
@@ -80,7 +89,7 @@ function HeroInici() {
                   pointerEvents: 'none',
                 }}
               />
-              {/* EL DIBUIX de la colleccio, a sobre de la samarreta. */}
+              {/* EL DIBUIX de la colleccio, a sobre. */}
               {band.overlaySrc ? (
                 <div
                   aria-hidden="true"
@@ -91,7 +100,7 @@ function HeroInici() {
                     top: 0,
                     height: '500%',
                     backgroundImage: `url(${band.overlaySrc})`,
-                    backgroundSize: `auto ${(band.overlayScale ? band.overlayScale * 100 : 30)}%`,
+                    backgroundSize: `auto ${(band.overlayScale || 0.345) * 100}%`,
                     backgroundPosition: 'center 35%',
                     backgroundRepeat: 'no-repeat',
                     transform: `translateY(-${i * 20}%)`,
@@ -100,28 +109,55 @@ function HeroInici() {
                   }}
                 />
               ) : null}
-              {/* EL TEXT: la colleccio i, si en te, la subcolleccio. */}
-              <span
-                style={{
-                  position: 'relative',
-                  zIndex: 2,
-                  padding: '0 8px',
-                  fontFamily: 'Oswald, sans-serif',
-                  fontSize: 'clamp(9px, 1.05vw, 15px)',
-                  fontWeight: 600,
-                  letterSpacing: '0.12em',
-                  textTransform: 'uppercase',
-                  color: text,
-                  textAlign: 'center',
-                  textShadow: esFosc ? '0 1px 2px rgba(0,0,0,0.35)' : '0 1px 2px rgba(255,255,255,0.35)',
-                }}
-              >
-                {band.subName ? `${band.collectionName} / ${band.subName}` : band.collectionName}
-              </span>
-            </Link>
+              {/* EL NOM de la colleccio, a l'esquerra. */}
+              <div style={{ position: 'relative', zIndex: 2, paddingLeft: '24px', color: '#475059' }}>
+                <p
+                  style={{
+                    fontFamily: 'Oswald, sans-serif',
+                    fontSize: isMobile ? '13px' : '18px',
+                    fontWeight: 600,
+                    letterSpacing: '0.18em',
+                    textTransform: 'uppercase',
+                    margin: 0,
+                    opacity: 0.95,
+                  }}
+                >
+                  {(i === 1 || i === 2) && band.subName
+                    ? `${band.collectionName} / ${band.subName}`
+                    : band.collectionName}
+                </p>
+              </div>
+            </a>
           );
         })}
       </div>
+
+      {/* EL BOTO DE BARREJAR. */}
+      <button
+        type="button"
+        onClick={() => setPlan(buildHeroStripePlan())}
+        aria-label="Barreja samarretes i dibuixos"
+        style={{
+          position: 'absolute',
+          top: '50%',
+          right: '32px',
+          transform: 'translateY(-50%)',
+          zIndex: 10,
+          background: 'transparent',
+          border: 'none',
+          borderRadius: '12px',
+          width: '72px',
+          height: '72px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          cursor: 'pointer',
+          backdropFilter: 'blur(4px)',
+        }}
+        className="hover:bg-white transition-colors"
+      >
+        <Shuffle size={50} color="#475059" />
+      </button>
     </div>
   );
 }
