@@ -224,14 +224,11 @@
 /* LA HERO NO POT SORTIR DE LA PANTALLA.
    La seva alcada surt de l'amplada (la proporcio 952/401), i la seva amplada es
    el carril: en una pantalla curta, la hero es mes alta que l'espai que queda
-   sota les icones. MESURAT: en sortia 27 px a 1920x1080, 43 a 1280x720 i 31 a
-   1024x768.
+   entre la divisio del megaslide i el fons de la finestra.
    Amb el topall, la caixa s'encongeix MANTENINT la proporcio (ho fa
-   l'`aspect-ratio`), i per tant tambe es fa mes estreta.
-   L'espai que queda es la finestra menys la capçalera, menys les icones, menys
-   els aires de les dues peces. */
+   l'`aspect-ratio`), i per tant tambe es fa mes estreta. */
 .hg-hero-caixa {
-  max-height: calc(100vh - var(--appHeaderOffset, 0px) - var(--esp-3) * 3);
+  max-height: var(--inici-hero-sostre);
 }
 
 @media (orientation: portrait) {
@@ -250,4 +247,56 @@
    ------------------------------------------------------------------------- */
 [data-inici-nou="1"] {
   --contingut-max: var(--inici-nou-carril);
+}
+
+/* ---------------------------------------------------------------------------
+   LA DIVISIO DE DALT DE LA PAGINA NOVA: ON COMENÇA EL CONTINGUT
+
+   El megaslide no ocupa el que ocupa la capçalera. A 1920 la capçalera fa
+   120 px i el panell n'acaba 497; a 768, 156 i 565. Qui posi contingut a sota
+   seu ha de comptar el megaslide, no la capçalera.
+
+   El megaslide publica la seva vora com a `--hg-mega-bottom` (nomes mentre el
+   panell es obert; en tancar, la variable s'esborra). Aqui es converteix en una
+   sola xifra, que es la que fan servir la hero i el marc:
+
+     --inici-frontera   la divisio del megaslide, o la capçalera si no n'hi ha
+     --inici-resguard   el tros de frontera que ocupa el cadenat, que tambe
+                        s'ha de deixar lliure
+
+   PER QUE ES `max()` I NO NOMES LA VARIABLE. El megaslide publica la vora del
+   SEU panell, i el cadenat hi penja a sota. Pero un `calc` amb `var()` i reserva
+   no distingeix «la variable no hi es» de «la variable val zero», i una vora
+   absent es resoldria a zero: el contingut s'enfilaria a dalt de tot. Amb
+   `max()` la reserva es la capçalera, que es una xifra que SEMPRE es certa i
+   que mai no es mes gran que la divisio real.
+
+   ELS 56 PX DEL CADENAT son el que ocupa el cadenat just sota la linia. El
+   cadenat no es «el megaslide»: es un estri seu, i per aixo no el publica el
+   megaslide, sino que el compta qui ha de deixar-hi lloc.
+
+   EL REPARTIMENT DE LA ZONA (els aires i el topall de la hero) NO ES AQUI. El
+   calcula el marc, que es qui te les dues xifres que hi entren: l'alcada de la
+   zona i l'alcada natural de la caixa de la hero. Cap de les dues no es pot
+   escriure en una expressio de CSS, i les variables de CSS no viatgen: hereten
+   el valor que tenien ON S'HA DECLARAT, i per tant un `calc` escrit aquí es
+   resoldria amb els numbers d'aquí i baixaria congelat. Ja va passar: el topall
+   de la hero es calculava amb una zona de 1080 quan la zona feia 583, i la hero
+   se n'anava a 1296 px i desapareixia de la pantalla.
+   ------------------------------------------------------------------------- */
+:root {
+  --inici-frontera: max(var(--hg-mega-bottom, 0px), var(--appHeaderOffset, 0px));
+  --inici-resguard: calc(var(--inici-frontera) + 56px);
+  /* L'alcada de la franja d'icones: es una alcada declarada, i per tant aquesta
+     si que la pot saber el `calc`. */
+  --inici-icones-alcada: calc(var(--u) * 70.4);
+  /* LES RESERVES DEL PRIMER PINTAT. Els calcula el marc i els publica ell; el
+     que hi ha aquí es el que val abans que ho faci.
+
+       --inici-buit        l'aire de sota la divisio i el del mig
+       --inici-buit-doble  el de la cella de les icones, que en porta dos
+       --inici-hero-sostre el topall de la caixa de la hero */
+  --inici-buit: 0px;
+  --inici-buit-doble: 0px;
+  --inici-hero-sostre: 100vh;
 }

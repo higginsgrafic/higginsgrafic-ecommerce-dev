@@ -1909,6 +1909,9 @@ function FullWideSlideHeader({
     // graons es converteixen en un lliccament i no en saltets.
     const PAS_MAX_PX = 18;
     let pintat = null;
+    // L'ultim valor publicat de la vora del panell, per no reescriure la
+    // variable a cada fotograma.
+    let voraPublicada = null;
     const seguiment = () => {
       try {
         const surface = document.querySelector('[data-mega-panel-surface="1"]');
@@ -1929,13 +1932,39 @@ function FullWideSlideHeader({
           // El contenidor nomes hi es quan el cadenat ja s'ha muntat: fins
           // llavors nomes cal desar la mesura perque es munti.
           if (wrap) wrap.style.top = `${pintat}px`;
+
+          // ON ACABA EL MEGASLIDE, PUBLICAT.
+          //
+          // El megaslide ocupa mes pantalla que la capçalera: a 1920 la
+          // capçalera fa 120 px i el panell n'acaba 497. Fins ara aixo nomes ho
+          // sabia aquest bucle (per posar el cadenat a sota), i la resta del
+          // lloc no tenia cap manera de saber on cau el separador.
+          //
+          // Es publica la VORA DEL PANELL, no la del cadenat: la vora es la
+          // divisio que es veu, i el cadenat es un estri d'aquest bucle. Qui
+          // hagi de deixar-hi lloc ja comptara el cadenat pel seu compte.
+          //
+          // Nomes s'hi escriu quan el numero canvia. Es un efecte de l'obertura
+          // del panell, i aixo ningu ho ha de saber: en desmuntar-se, la
+          // variable s'esborra i el `var()` que la llegeixi cau a la reserva.
+          const vora = Math.round(objectiu - CADE_BAIXADA_PX);
+          if (vora !== voraPublicada) {
+            voraPublicada = vora;
+            document.documentElement.style.setProperty('--hg-mega-bottom', `${vora}px`);
+          }
+
           setLockBtnTop((prev) => (prev == null ? objectiu - CADE_BAIXADA_PX : prev));
         }
       } catch { /* ignore */ }
       raf = requestAnimationFrame(seguiment);
     };
     raf = requestAnimationFrame(seguiment);
-    return () => cancelAnimationFrame(raf);
+    return () => {
+      cancelAnimationFrame(raf);
+      try {
+        document.documentElement.style.removeProperty('--hg-mega-bottom');
+      } catch { /* ignore */ }
+    };
   }, [active]);
 
   useLayoutEffect(() => {
