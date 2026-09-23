@@ -28,7 +28,7 @@ function IconsColleccions() {
         height: u(ICONA_ALCADA_U),
         // EL CENTRE QUE MANA ES EL DE LA FRANJA. Amb el cap alineat, Austen
         // (70,4) omple la franja exactament, i el fenix (98,9) hi comença a dalt
-        // i sobresurt per baix. Es el que fa una cella de taula: el fill
+        // i sobresurt per baix. Es el que fa una cel·la de taula: el fill
         // centrat es la franja, i el que desborda desborda.
         //
         // S'havia provat de centrar el CONJUNT dels cinc dibuixos amb un coixi a

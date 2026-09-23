@@ -157,7 +157,7 @@ function MarcInici({ seccions }) {
       // Els buits: una fila cada un.
       const buit = fila;
       // LA RESERVA DE DALT: les 11 files del megaslide mes el buit que les
-      // separa de les icones. La cella de les icones les porta senceres.
+      // separa de les icones. La cel·la de les icones les porta senceres.
       const reserva = (FILES_MEGASLIDE + 1) * fila;
       // LA HERO OCUPA 12 FILES. El seu tamany natural en fa 12,23, i el topall
       // la deixa a les 12 que li toquen perque el repartiment tanqui.
@@ -217,25 +217,25 @@ function MarcInici({ seccions }) {
           '--inici-dalt': `${(repartiment.finsLinia ?? 0)}px`,
           '--inici-frontera': `${repartiment.linia ?? 0}px`,
           // La flexio no ha de repartir l'espai que sobra: els aires son
-          // `padding` de les celles i han de ser exactament el que s'ha
+          // `padding` de les cel·les i han de ser exactament el que s'ha
           // calculat.
           justifyContent: 'flex-start',
           gap: 0,
         }}
       >
         <div
-          data-cella="1"
-          data-cella-de={primera.id}
+          data-cel·la="1"
+          data-cel·la-de={primera.id}
           style={{
             // Les 11 files del megaslide mes el buit que el separa de les
-            // icones, a dalt; i res a baix (el buit del mig el posa la cella de
+            // icones, a dalt; i res a baix (el buit del mig el posa la cel·la de
             // la hero).
             paddingBlock: 'var(--inici-reserva, 0px) 0',
             display: 'flex',
             flexDirection: 'column',
-            // ANCORADA A BAIX. Cada cella porta el seu aire a dalt i a baix, i
+            // ANCORADA A BAIX. Cada cel·la porta el seu aire a dalt i a baix, i
             // el contingut ha de quedar exactament entre els dos. Amb el
-            // contingut centrat, si es mes baix que la cella (que es el cas de
+            // contingut centrat, si es mes baix que la cel·la (que es el cas de
             // la franja d'icones) el reparteix entre els dos aires i en dobla
             // un: mesurat, la franja pujava 101 px i la hero queia damunt del
             // panell del megaslide.
@@ -245,8 +245,8 @@ function MarcInici({ seccions }) {
           {primera.node}
         </div>
         <div
-          data-cella="2"
-          data-cella-de={segona.id}
+          data-cel·la="2"
+          data-cel·la-de={segona.id}
           style={{
             // El buit del mig a dalt i el de sota la hero a baix: una fila
             // cada un.

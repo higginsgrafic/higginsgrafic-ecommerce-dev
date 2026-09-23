@@ -185,14 +185,14 @@ les mides:
 12,23 a 1920 (428 px contra 411). És l'única peça que cedeix, i ho fa perquè el
 repartiment tanqui amb files senceres.
 
-**COM ES REPARTEIXEN LES FILES ENTRE LES DUES CELLES.** La cella de les icones
+**COM ES REPARTEIXEN LES FILES ENTRE LES DUES CELLES.** La cel·la de les icones
 porta a dalt **12 files** (les 11 del megaslide més el buit que les separa) i res
 a baix; la de la hero porta **una fila** a cada costat.
 
 La primera versió d'aquest repartiment posava el mateix valor a totes dues
-bandes de totes dues celles, i el buit del mig sortia **el doble** que els altres
+bandes de totes dues cel·les, i el buit del mig sortia **el doble** que els altres
 (mesurat a 1920: 77/154/232 en comptes de 154/154/154), perquè el buit del mig
-el posen les DUES celles.
+el posen les DUES cel·les.
 
 ### 4.5 El que encara no quadra: el cadenat
 
@@ -231,7 +231,7 @@ s'allargaria.
   invisible de dues files** per a les icones i la hero.
 - **La píndola de les galeries va al flux**, no `absolute`: com que era
   `absolute`, s'ancorava a la graella i la reserva no cancel·lava mai.
-- **La franja d'icones i Austen al centre de la cella**: la franja té l'alçada
+- **La franja d'icones i Austen al centre de la cel·la**: la franja té l'alçada
   d'Austen (70,4) i les altres icones s'hi alineen pel cap; First Contact
   (98,9) hi sobresurt per baix.
 - **MISCEL·LÀNIA tenia una quarta fitxa buida**: el catàleg només tenia tres
