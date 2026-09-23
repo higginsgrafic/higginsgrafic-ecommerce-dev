@@ -154,3 +154,33 @@ export const COLLECCIONS_INICI = [
     titleOffsetY: 9, numberAlign: 'left', numberOffsetX: -22,
   },
 ];
+
+/**
+ * LA MIDA DE LLETRA DEL TITOL DE COLLECCIO, en unitats de carril.
+ *
+ * MESURAT A LA PAGINA VELLA, i es la troballa que explica per que l'aire entre
+ * galeries no sortia constant:
+ *
+ *     mida     carril   font h2   sobreeixit del text   en UNITATS DE CARRIL
+ *     1920     1350,0     84,5          27,0                   27,0
+ *     1440     1012,5     63,4          21,0                   28,0
+ *     1280      900,0     56,3          18,0                   27,0
+ *     1024      720,0     45,1          15,0                   28,1
+ *      768      540,0     33,8          11,0                   27,5
+ *
+ * El SOBREEIXIT del text (el que el text puja per sobre de la seva caixa, per
+ * `line-height: 0.85`) es constant en unitats de carril: 27. El que no ho es, es
+ * el `font-size`, que estava escrit `4.4vw`: el 4,4 % de la FINESTRA. Com que la
+ * finestra i el carril nomes son proporcionals fins a 1920 (a partir d'alla el
+ * carril te un topall de 1350 i la finestra no), el text del titol es l'unic
+ * element de la galeria que no escala amb el carril.
+ *
+ * Escrivint la mida en unitats de carril, tot el bloc escala junt: el text, el
+ * seu sobreeixit i el voladis de la pindola. I aleshores l'aire entre galeries
+ * es constant de debò, i no cal cap correccio per mida.
+ *
+ * La mida de disseny es 84,5 px sobre 1350, i el carril es `--esp-4 * 11,25`
+ * (1350 / 120): per aixo la mida s'escriu com 84,5 / (120 * 11,25).
+ */
+export const TITOL_MIDA_U = 84.5;
+export const TITOL_MIDA_ESP4 = TITOL_MIDA_U / 1350;
