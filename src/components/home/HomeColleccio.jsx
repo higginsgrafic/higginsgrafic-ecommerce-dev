@@ -8,6 +8,23 @@ import {
 } from '@/config/collectionVertical';
 
 /**
+ * EL QUE LA PINDOLA BAIXA DE LA SEVA SECCIO, en unitats de disseny sobre el
+ * carril de 1350.
+ *
+ * `PINDOLA_TOP` es el seu `top: calc(100% + 130px)` i `PINDOLA_ALCADA_U` la seva
+ * alcada mesurada (39 px a 1920). Com que es `position: absolute`, NO fa créixer
+ * el pare: la seccio acaba 169 unitats mes amunt del que es veu.
+ *
+ * La pagina vella compensa aixo amb els seus 220 px de marge, calibrats
+ * comptant-los. La pagina nova ho fa explicit: reserva aquestes unitats dins del
+ * bloc (`reservaPindola`) i el marge de la seccio passa a ser, literalment,
+ * l'aire que es veu.
+ */
+const PINDOLA_TOP = 130;
+const PINDOLA_ALCADA_U = 39;
+const PINDOLA_VOLADIS = PINDOLA_TOP + PINDOLA_ALCADA_U;
+
+/**
  * Una galeria de la pagina d'inici: el titol d'una colleccio i la seva fila de
  * fitxes amb la pindola «SI EN VOLS SABER» a sota.
  *
@@ -94,7 +111,7 @@ function PindolaColleccio({ href }) {
       style={{
         position: 'absolute',
         left: '50%',
-        top: 'calc(100% + 130px)',
+        top: `calc(100% + ${PINDOLA_TOP}px)`,
         height: 'auto',
         width: 'auto',
         borderRadius: '9999px',
@@ -148,13 +165,43 @@ function HomeColleccio({
   portraitTabletTdpGridStyle = {},
   columnes = 4,
   zIndex,
+  // L'aire de sobre del bloc. Per defecte, el de la pagina vella (un numero
+  // declarat a `collectionVertical.js`); la pagina nova hi passa un `--esp-*`,
+  // que es el seu sistema d'aires.
+  marginBlockStart = `${HOME_COLLECCIO_MARGIN_PX}px`,
+  // Reserva dins del bloc l'espai que la pindola hi baixa a sota. La pindola es
+  // `position: absolute` i NO fa créixer el pare, o sigui que sense reserva el
+  // bloc acaba 169 unitats mes amunt del que es veu, i el marge de la seccio
+  // següent no es l'aire que es veu sino `marge − 169`.
+  //
+  // La pagina vella NO ho pot fer: te els seus 220 px calibrats comptant
+  // l'excés, i canviar-ho li mouria les colleccions. La pagina nova ho activa.
+  reservaPindola = false,
+  // Quant s'ha de PUJAR el titol perque l'aire de sobre del bloc sigui el que es
+  // veu, i no `aire − el que el titol te de propi`. El titol te 27 unitats de
+  // marge propi i 3 mes del text; el seu `font-size` de 4,4vw es el pitjor
+  // d'ells, perque ENGANYA: 4,4 % de la FINESTRA no es 4,4 % del CARRIL, i a
+  // 768 la finestra i el carril no son proporcionals. Mesurat: 27 unitats a
+  // 1920 i 41 a 768 (mes del DOBLE).
+  //
+  // Per aixo el marge de la seccio no pot governar l'aire de la pagina nova. El
+  // titol es qui el governa, i el marge se'n DERIVA.
+  titolAire = null,
 }) {
   // Les columnes 3 i 4 nomes existeixen si la graella en te tantes. La 1 i la 2
   // hi son sempre: a 768 la graella en te 2.
   const indexos = [0, 1, 2, 3].filter((i) => i < columnes);
 
   return (
-    <div style={{ marginTop: `${HOME_COLLECCIO_MARGIN_PX}px`, ...(zIndex ? { position: 'relative', zIndex } : {}) }}>
+    <div
+      style={{
+        marginBlockStart,
+        // El que la pindola baixa: 130 unitats (el seu `top`) + la seva alcada
+        // (39) = 169, sobre el carril.
+        ...(reservaPindola ? { paddingBottom: `${(PINDOLA_VOLADIS / 1350) * 100}%` } : {}),
+        ...(zIndex ? { position: 'relative', zIndex } : {}),
+      }}
+    >
       <div style={{ position: 'relative', left: '50%', transform: 'translateX(-50%)', width: 'calc(var(--hg-tdp-xR) - var(--hg-tdp-xL))' }}>
         <Titol
           index=""
@@ -166,7 +213,10 @@ function HomeColleccio({
           collectionHref={href}
         />
       </div>
-      <div style={{ marginTop: portraitTablet ? `${HOME_TITOL_TDP_MARGIN_PX.tauleta}px` : `${HOME_TITOL_TDP_MARGIN_PX.escriptori}px` }}>
+      <div style={{
+        marginTop: portraitTablet ? `${HOME_TITOL_TDP_MARGIN_PX.tauleta}px` : `${HOME_TITOL_TDP_MARGIN_PX.escriptori}px`,
+        ...(titolAire ? { marginTop: `calc(${titolAire} - ${PINDOLA_VOLADIS}px)` } : {}),
+      }}>
         <div
           style={{
             position: 'relative',
