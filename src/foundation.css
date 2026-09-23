@@ -279,6 +279,9 @@
    ------------------------------------------------------------------------- */
 :root {
   --inici-frontera: var(--appHeaderOffset, 120px);
+  /* Amb quina amplada es va mesurar la vora del megaslide. Serveix per saber si
+     el valor publicat es d'aquesta mida o de l'anterior. */
+  --hg-mega-bottom-ample: 0px;
   --inici-resguard: calc(var(--inici-frontera) + 56px);
   /* L'alcada de la franja d'icones: es una alcada declarada, i per tant aquesta
      si que la pot saber el `calc`. */

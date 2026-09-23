@@ -1953,6 +1953,11 @@ function FullWideSlideHeader({
           if (vora !== voraPublicada) {
             voraPublicada = vora;
             document.documentElement.style.setProperty('--hg-mega-bottom', `${vora}px`);
+            // AMB QUINA AMPLADA S'HA MESURAT. El panell es desmunta en
+            // canviar de mida, i aleshores la vora publicada es queda amb el
+            // valor de la mida anterior: qui la llegeixi no pot saber si es
+            // d'ara o de abans. Amb l'amplada al costat, ho pot comprovar.
+            document.documentElement.style.setProperty('--hg-mega-bottom-ample', `${window.innerWidth}px`);
           }
 
           setLockBtnTop((prev) => (prev == null ? objectiu - CADE_BAIXADA_PX : prev));
