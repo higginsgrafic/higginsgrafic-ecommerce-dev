@@ -1,0 +1,245 @@
+<!doctype html><html lang="ca"><head><meta charset="utf-8">
+<title>Navegador simulat - el mes desfavorable</title>
+<style>
+  body { margin:0; padding:24px; background:#f3f4f6; font-family:-apple-system,system-ui,sans-serif; color:#111827; }
+  h1 { font-size:19px; margin:0 0 4px; }
+  .caps { font-size:12.5px; color:#4b5563; margin-bottom:20px; max-width:780px; line-height:1.55; }
+  .nav { margin-bottom:22px; }
+  .titol { font-size:13.5px; font-weight:600; margin-bottom:6px; }
+  .sub { font-weight:400; color:#6b7280; font-size:11.5px; }
+  .parell { display:flex; gap:16px; align-items:flex-start; }
+  .col { }
+  .eti { font-size:11.5px; color:#374151; margin-bottom:3px; }
+  .eti span { color:#6b7280; }
+  .pantalla { position:relative; background:#fff; border:1.5px solid #111827; border-radius:6px; overflow:hidden; }
+  .chrome { position:absolute; left:0; right:0; top:0; background:#e5e7eb; border-bottom:1px solid #9ca3af; }
+  .pestanyes { position:absolute; top:4px; left:9px; display:flex; gap:4px; }
+  .pestanyes span { display:block; width:44px; height:7px; border-radius:3px; background:#9ca3af; }
+  .adreca { position:absolute; left:9px; right:9px; bottom:5px; height:11px; border-radius:5px; background:#fff; border:1px solid #9ca3af; }
+  .viewport { position:absolute; left:0; right:0; background:#fff; }
+  .dev { position:absolute; left:0; right:0; background:#dc2626; }
+  .cap { position:absolute; left:0; right:0; background:#f9fafb; border-bottom:1px solid #d1d5db; }
+  .mega { position:absolute; left:0; right:0; background:rgba(37,99,235,.16); border-bottom:1.5px solid #2563eb; }
+  .icones { position:absolute; background:#111827; border-radius:2px; }
+  .hero { position:absolute; background:repeating-linear-gradient(180deg,#f59e0b 0 9px,#dc2626 9px 18px,#2563eb 18px 27px,#16a34a 27px 36px,#111827 36px 45px); border:1px solid #374151; }
+  .cadenat { position:absolute; left:50%; width:8px; margin-left:-4px; border-radius:4px; background:#111827; border:1.5px solid #fff; }
+  .plec { position:absolute; left:0; right:0; border-top:1.5px dashed #dc2626; }
+  .fora { position:absolute; left:0; right:0; background:repeating-linear-gradient(45deg,rgba(220,38,38,.3) 0 5px,transparent 5px 10px); }
+  .veredicte { font-size:11.5px; font-weight:600; margin-top:3px; }
+  .nota { font-size:11px; color:#6b7280; margin-top:5px; }
+  .be { color:#16a34a; } .mal { color:#dc2626; }
+</style></head><body>
+<h1>El navegador simulat, el m&eacute;s desfavorable</h1>
+<div class="caps">El navegador que m&eacute;s se'n menja (150 px a escriptori, 130 a tauleta) m&eacute;s els 40 px de la barra de desenvolupament. A <b>escriptori no s'amaga mai</b>; a <b>tauleta s'amaga en fer scroll</b> i la finestra guanya aquells p&iacute;xels, amb el repartiment recalculat. La l&iacute;nia vermella discont&iacute;nua &eacute;s el plec i el ratllat &eacute;s el que queda fora.</div>
+
+  <div class="nav">
+    <div class="titol">1920x1080 <span class="sub">pantalla 1920&times;1080 &middot; navegador &minus;150 px</span></div>
+    <div class="parell">
+      
+    <div class="col">
+      <div class="eti">amb el navegador <span>finestra 930 px</span></div>
+      <div class="pantalla" style="width:780px;height:438.8px">
+        <div class="chrome" style="height:60.9px"><div class="pestanyes"><span></span><span></span><span></span></div><div class="adreca"></div></div>
+        <div class="viewport" style="top:60.9px;height:377.8px">
+          <div class="dev" style="top:0;height:16.2px"></div>
+          <div class="cap" style="top:16.2px;height:32.5px"></div>
+          <div class="mega" style="top:49.2px;height:152.8px"></div>
+          <div class="icones" style="top:111.3px;height:28.4px;left:132.1px;width:515.9px"></div>
+          <div class="hero" style="top:224.7px;height:173.9px;left:183.6px;width:412.8px"></div>
+          <div class="cadenat" style="top:205.2px;height:19.5px"></div>
+        </div>
+        <div class="plec" style="top:377.8px"></div>
+        <div class="fora" style="top:377.8px;height:20.7px"></div>
+      </div>
+      <div class="veredicte mal">la hero se&#8217;n surt 51 px</div>
+    </div>
+      
+    <div class="col">
+      <div class="eti">navegador amagat (a escriptori NO passa) <span>finestra 1080 px</span></div>
+      <div class="pantalla" style="width:780px;height:438.8px">
+        <div class="chrome" style="height:60.9px"><div class="pestanyes"><span></span><span></span><span></span></div><div class="adreca"></div></div>
+        <div class="viewport" style="top:60.9px;height:438.8px">
+          <div class="dev" style="top:0;height:16.2px"></div>
+          <div class="cap" style="top:16.2px;height:32.5px"></div>
+          <div class="mega" style="top:49.2px;height:152.8px"></div>
+          <div class="icones" style="top:110.9px;height:28.4px;left:132.1px;width:515.9px"></div>
+          <div class="hero" style="top:245.0px;height:173.9px;left:183.6px;width:412.8px"></div>
+          <div class="cadenat" style="top:205.2px;height:19.5px"></div>
+        </div>
+        <div class="plec" style="top:438.8px"></div>
+        <div class="fora" style="top:438.8px;height:0.0px"></div>
+      </div>
+      <div class="veredicte be">la hero HI CAP</div>
+    </div>
+    </div>
+    <div class="nota">megaslide <b>376 px</b> &middot; icones <b>70 px</b> &middot; hero <b>428 px</b></div>
+  </div>
+  <div class="nav">
+    <div class="titol">1440x900 <span class="sub">pantalla 1440&times;900 &middot; navegador &minus;150 px</span></div>
+    <div class="parell">
+      
+    <div class="col">
+      <div class="eti">amb el navegador <span>finestra 750 px</span></div>
+      <div class="pantalla" style="width:780px;height:487.5px">
+        <div class="chrome" style="height:81.2px"><div class="pestanyes"><span></span><span></span><span></span></div><div class="adreca"></div></div>
+        <div class="viewport" style="top:81.2px;height:406.2px">
+          <div class="dev" style="top:0;height:21.7px"></div>
+          <div class="cap" style="top:21.7px;height:43.3px"></div>
+          <div class="mega" style="top:65.5px;height:162.0px"></div>
+          <div class="icones" style="top:132.2px;height:28.7px;left:131.9px;width:516.2px"></div>
+          <div class="hero" style="top:257.3px;height:173.9px;left:183.6px;width:412.8px"></div>
+          <div class="cadenat" style="top:231.8px;height:26.0px"></div>
+        </div>
+        <div class="plec" style="top:406.2px"></div>
+        <div class="fora" style="top:406.2px;height:24.9px"></div>
+      </div>
+      <div class="veredicte mal">la hero se&#8217;n surt 46 px</div>
+    </div>
+      
+    <div class="col">
+      <div class="eti">navegador amagat (a escriptori NO passa) <span>finestra 900 px</span></div>
+      <div class="pantalla" style="width:780px;height:487.5px">
+        <div class="chrome" style="height:81.2px"><div class="pestanyes"><span></span><span></span><span></span></div><div class="adreca"></div></div>
+        <div class="viewport" style="top:81.2px;height:487.5px">
+          <div class="dev" style="top:0;height:21.7px"></div>
+          <div class="cap" style="top:21.7px;height:43.3px"></div>
+          <div class="mega" style="top:65.5px;height:165.2px"></div>
+          <div class="icones" style="top:133.8px;height:28.7px;left:131.9px;width:516.2px"></div>
+          <div class="hero" style="top:287.1px;height:173.9px;left:183.6px;width:412.8px"></div>
+          <div class="cadenat" style="top:235.1px;height:26.0px"></div>
+        </div>
+        <div class="plec" style="top:487.5px"></div>
+        <div class="fora" style="top:487.5px;height:0.0px"></div>
+      </div>
+      <div class="veredicte be">la hero HI CAP</div>
+    </div>
+    </div>
+    <div class="nota">megaslide <b>299 px</b> &middot; icones <b>53 px</b> &middot; hero <b>321 px</b></div>
+  </div>
+  <div class="nav">
+    <div class="titol">1280x720 <span class="sub">pantalla 1280&times;720 &middot; navegador &minus;150 px</span></div>
+    <div class="parell">
+      
+    <div class="col">
+      <div class="eti">amb el navegador <span>finestra 570 px</span></div>
+      <div class="pantalla" style="width:780px;height:438.8px">
+        <div class="chrome" style="height:91.4px"><div class="pestanyes"><span></span><span></span><span></span></div><div class="adreca"></div></div>
+        <div class="viewport" style="top:91.4px;height:347.3px">
+          <div class="dev" style="top:0;height:24.4px"></div>
+          <div class="cap" style="top:24.4px;height:70.7px"></div>
+          <div class="mega" style="top:99.9px;height:165.1px"></div>
+          <div class="icones" style="top:166.4px;height:28.6px;left:105.8px;width:568.5px"></div>
+          <div class="hero" style="top:299.2px;height:191.3px;left:162.7px;width:454.6px"></div>
+          <div class="cadenat" style="top:270.0px;height:29.2px"></div>
+        </div>
+        <div class="plec" style="top:347.3px"></div>
+        <div class="fora" style="top:347.3px;height:143.8px"></div>
+      </div>
+      <div class="veredicte mal">la hero se&#8217;n surt 236 px</div>
+    </div>
+      
+    <div class="col">
+      <div class="eti">navegador amagat (a escriptori NO passa) <span>finestra 720 px</span></div>
+      <div class="pantalla" style="width:780px;height:438.8px">
+        <div class="chrome" style="height:91.4px"><div class="pestanyes"><span></span><span></span><span></span></div><div class="adreca"></div></div>
+        <div class="viewport" style="top:91.4px;height:438.8px">
+          <div class="dev" style="top:0;height:24.4px"></div>
+          <div class="cap" style="top:24.4px;height:70.7px"></div>
+          <div class="mega" style="top:99.9px;height:165.1px"></div>
+          <div class="icones" style="top:167.0px;height:28.6px;left:105.8px;width:568.5px"></div>
+          <div class="hero" style="top:300.4px;height:191.3px;left:162.7px;width:454.6px"></div>
+          <div class="cadenat" style="top:270.0px;height:29.2px"></div>
+        </div>
+        <div class="plec" style="top:438.8px"></div>
+        <div class="fora" style="top:438.8px;height:53.0px"></div>
+      </div>
+      <div class="veredicte mal">la hero se&#8217;n surt 87 px</div>
+    </div>
+    </div>
+    <div class="nota">megaslide <b>271 px</b> &middot; icones <b>47 px</b> &middot; hero <b>314 px</b></div>
+  </div>
+  <div class="nav">
+    <div class="titol">1024x768 <span class="sub">pantalla 1024&times;768 &middot; navegador &minus;130 px &middot; i S&#8217;AMAGA en fer scroll</span></div>
+    <div class="parell">
+      
+    <div class="col">
+      <div class="eti">amb el navegador <span>finestra 638 px</span></div>
+      <div class="pantalla" style="width:780px;height:585.0px">
+        <div class="chrome" style="height:99.0px"><div class="pestanyes"><span></span><span></span><span></span></div><div class="adreca"></div></div>
+        <div class="viewport" style="top:99.0px;height:486.0px">
+          <div class="dev" style="top:0;height:30.5px"></div>
+          <div class="cap" style="top:30.5px;height:88.4px"></div>
+          <div class="mega" style="top:124.9px;height:206.4px"></div>
+          <div class="icones" style="top:211.0px;height:28.9px;left:34.6px;width:710.7px"></div>
+          <div class="hero" style="top:373.2px;height:239.2px;left:105.9px;width:568.2px"></div>
+          <div class="cadenat" style="top:337.4px;height:36.6px"></div>
+        </div>
+        <div class="plec" style="top:486.0px"></div>
+        <div class="fora" style="top:486.0px;height:126.4px"></div>
+      </div>
+      <div class="veredicte mal">la hero se&#8217;n surt 166 px</div>
+    </div>
+      
+    <div class="col">
+      <div class="eti">en fer scroll (navegador amagat) <span>finestra 768 px</span></div>
+      <div class="pantalla" style="width:780px;height:585.0px">
+        
+        <div class="viewport" style="top:0.0px;height:585.0px">
+          <div class="dev" style="top:0;height:30.5px"></div>
+          <div class="cap" style="top:30.5px;height:88.4px"></div>
+          <div class="mega" style="top:124.9px;height:206.4px"></div>
+          <div class="icones" style="top:211.0px;height:28.9px;left:34.6px;width:710.7px"></div>
+          <div class="hero" style="top:373.2px;height:239.2px;left:105.9px;width:568.2px"></div>
+          <div class="cadenat" style="top:337.4px;height:36.6px"></div>
+        </div>
+        <div class="plec" style="top:585.0px"></div>
+        <div class="fora" style="top:585.0px;height:27.4px"></div>
+      </div>
+      <div class="veredicte mal">la hero se&#8217;n surt 36 px</div>
+    </div>
+    </div>
+    <div class="nota">megaslide <b>271 px</b> &middot; icones <b>38 px</b> &middot; hero <b>314 px</b></div>
+  </div>
+  <div class="nav">
+    <div class="titol">768x1024 <span class="sub">pantalla 768&times;1024 &middot; navegador &minus;130 px &middot; i S&#8217;AMAGA en fer scroll</span></div>
+    <div class="parell">
+      
+    <div class="col">
+      <div class="eti">amb el navegador <span>finestra 894 px</span></div>
+      <div class="pantalla" style="width:780px;height:1040.0px">
+        <div class="chrome" style="height:132.0px"><div class="pestanyes"><span></span><span></span><span></span></div><div class="adreca"></div></div>
+        <div class="viewport" style="top:132.0px;height:908.0px">
+          <div class="dev" style="top:0;height:40.6px"></div>
+          <div class="cap" style="top:40.6px;height:117.8px"></div>
+          <div class="mega" style="top:133.0px;height:440.8px"></div>
+          <div class="icones" style="top:352.4px;height:28.4px;left:40.6px;width:698.8px"></div>
+          <div class="hero" style="top:630.7px;height:315.9px;left:40.6px;width:698.8px"></div>
+          <div class="cadenat" style="top:582.0px;height:48.8px"></div>
+        </div>
+        <div class="plec" style="top:908.0px"></div>
+        <div class="fora" style="top:908.0px;height:38.6px"></div>
+      </div>
+      <div class="veredicte mal">la hero se&#8217;n surt 38 px</div>
+    </div>
+      
+    <div class="col">
+      <div class="eti">en fer scroll (navegador amagat) <span>finestra 1024 px</span></div>
+      <div class="pantalla" style="width:780px;height:1040.0px">
+        
+        <div class="viewport" style="top:0.0px;height:1040.0px">
+          <div class="dev" style="top:0;height:40.6px"></div>
+          <div class="cap" style="top:40.6px;height:117.8px"></div>
+          <div class="mega" style="top:133.0px;height:440.8px"></div>
+          <div class="icones" style="top:351.4px;height:28.4px;left:40.6px;width:698.8px"></div>
+          <div class="hero" style="top:677.4px;height:315.9px;left:40.6px;width:698.8px"></div>
+          <div class="cadenat" style="top:582.0px;height:48.8px"></div>
+        </div>
+        <div class="plec" style="top:1040.0px"></div>
+        <div class="fora" style="top:1040.0px;height:0.0px"></div>
+      </div>
+      <div class="veredicte be">la hero HI CAP</div>
+    </div>
+    </div>
+    <div class="nota">megaslide <b>434 px</b> &middot; icones <b>28 px</b> &middot; hero <b>311 px</b></div>
+  </div>
+</body></html>
