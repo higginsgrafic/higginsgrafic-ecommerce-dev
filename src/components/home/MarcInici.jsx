@@ -5,54 +5,60 @@
  * document. Les dues primeres (les icones i la hero) es reparteixen L'ESPAI QUE
  * QUEDA DESPRES DEL MEGASLIDE amb tres aires iguals.
  *
- * D'ON ARRENCA LA ZONA. No de la capçalera, del MEGASLIDE. El megaslide no
- * ocupa el que ocupa la capçalera: a 1920 la capçalera fa 120 px i el panell
- * n'acaba 497. La divisio es publica com a `--inici-frontera`, i aquest marc no
- * sap res mes del megaslide.
+ * ON CAU LA LINIA DEL MEGASLIDE. No on acaba la capçalera: a 1920 la capçalera
+ * fa 120 px i el panell del megaslide n'acaba 497; a 1440, 426; a 1024 i 1280,
+ * 392; a 768, 565. El megaslide publica aquesta vora com a `--hg-mega-bottom`,
+ * i d'aqui surt `--inici-frontera` (vegeu `foundation.css`). Aquest marc no sap
+ * res mes del megaslide.
  *
- * EL REPARTIMENT. De la divisio del megaslide al fons de la finestra hi ha
- * d'haver, per aquest ordre:
+ * EL REPARTIMENT. De la linia al fons de la finestra hi ha d'haver, per aquest
+ * ordre:
  *
  *   cadenat | aire | icones | aire | hero | aire
  *
- * Els tres aires son el MATEIX numero, i la suma de tot plegat es la zona. Amb
- * allo que no pot canviar (el cadenat, les icones) i allo que si (la hero),
- * l'equacio te una solucio tancada:
+ * El cadenat i les dues peces tenen mida propia i NO es toquen: la franja
+ * d'icones es una alcada declarada, i la hero surt del seu aspecte amb
+ * l'amplada del carril. El que es reparteix es nomes l'espai que sobra, i es
+ * reparteix en tres aires iguals:
  *
- *   hero = (zona − 3*resguard − icones) / 2      els tres aires son la meitat
+ *   aire = (zona − resguard − icones − hero) / 3
  *
- * I si la hero hi cap amb el seu tamany natural, mana el natural i els aires
- * son mes grans.
+ * SI LA FINESTRA ES CURTA, l'aire queda a zero i prou: la pagina s'allarga i
+ * s'ha de desplaçar. Es deliberat. Encongir la hero per encabir-hi tot faria
+ * que la peça canviés de mida segons la pantalla, i allo que es vol es que
+ * quedi com esta.
  *
- * PER QUE L'AIRE TE UN MINIM. El cadenat ocupa 56 px just sota la divisio (es
- * a `--inici-resguard`, que es frontera + 56). Si l'aire fos mes petit que el
- * cadenat, el cadenat hi entraria i trepitjaria el que hi hagues a sota, que es
- * exactament el que passava. Per aixo l'aire te un minim, i qui cedeix es la
- * hero.
+ * PER QUE RES ES MOU EN OBRIR EL PANELL. L'aire surt de l'alcada de la zona, i
+ * la zona surt de la linia del megaslide: com que la linia es publica sempre
+ * amb el mateix valor, obrir i tancar el panell no canvia cap numero. Abans es
+ * repartia contra `--appHeaderOffset`, i aleshores el cadenat queia damunt la
+ * hero (48 px a 1920, 38 a 1440, 48 a 1280 i 1024, 43 a 768).
  *
  * PER QUE ES CALCULA AQUI I NO AMB `calc`. Una variable de CSS hereva el valor
- * que te ON S'HA DECLARAT: el `calc` no viatja, el que viatja es el resultat. Si
- * es declara a `:root` es resol alla, on `--inici-zona-alcada` encara val
- * `100vh`, i el resultat baixa congelat; declarat al marc passa el mateix. Ja
- * va passar: el topall de la hero es calculava amb una zona de 1080 quan la
- * zona en feia 583, i la hero se n'anava a 1296 px i desapareixia de la
- * pantalla.
- *
- * PER QUE LA HERO POT ENCONGIR-SE I LES ICONES NO. Les icones son una alcada
- * declarada. La hero surt del seu aspecte, i per tant pot encongir-se
- * mantenint-lo. Es l'unica peça que pot absorbir el que el megaslide es menja,
- * i el megaslide no ocupa el mateix a totes les pantalles: a 1920 deixa 583 px
- * i a 1280x720 nomeś 328.
+ * que te ON S'HA DECLARAT: el `calc` no viatja, el que viatja es el resultat.
+ * Declarat a `:root` es resolia amb la zona a `100vh` perque la xifra bona la
+ * publica el marc mes avall, i el resultat baixava congelat. El que cal es
+ * mesurar, i mesurar es cosa d'aquest component.
  */
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 /** El tros que ocupa el cadenat just sota la divisio del megaslide. */
 const RESGUARD = 56;
-/** Terra per a finestres impossibles: sense ell, la hero faria zero. */
-const HERO_MINIM = 46;
+/** El repartiment inicial, abans del primer mesurament. */
+const REPARTIMENT_INICIAL = { aire: 0, alcada: null };
+
 function MarcInici({ seccions }) {
   const [primera, segona, ...resta] = seccions;
   const zonaRef = useRef(null);
+  // EL REPARTIMENT VIU A L'ESTAT, NO AL DOM.
+  //
+  // Es va provar d'escriure'l amb `style.setProperty` des de l'efecte, i no
+  // serveix: React reescriu l'atribut `style` sencer a cada render, i el
+  // megaslide en provoca molts. Les variables s'esborraven tot seguit i el
+  // repartiment no arribava mai a aplicar-se (mesurat: el `setProperty` hi era
+  // i l'atribut quedava net). Amb l'estat, el valor entra pel `style` de React
+  // i cap render no se'l pot emportar.
+  const [repartiment, setRepartiment] = useState(REPARTIMENT_INICIAL);
 
   useEffect(() => {
     const zona = zonaRef.current;
@@ -61,81 +67,92 @@ function MarcInici({ seccions }) {
     const franja = zona.querySelector('[data-icones-colleccions="1"]');
     if (!caixa || !franja) return undefined;
 
+    // Una cala per llegir la frontera: es una variable de CSS, i el seu valor
+    // resolt nomes es pot obtenir amb un element de prova.
+    const cala = document.createElement('div');
+    cala.style.cssText = 'position:absolute;visibility:hidden;height:0;width:1px';
+    zona.appendChild(cala);
+
     let raf = 0;
     let anterior = null;
 
     const reparteix = () => {
-      const z = zona.getBoundingClientRect().height;
+      const linia = (() => {
+        cala.style.width = 'var(--inici-frontera, 0px)';
+        return parseFloat(getComputedStyle(cala).width) || 0;
+      })();
+      // L'ALCADA DE LA ZONA: la finestra menys la linia del megaslide.
+      const zonaAlcada = window.innerHeight - linia;
       const icones = franja.getBoundingClientRect().height;
-      // AL PRINCIPI LES PEÇES ENCARA NO TENEN MIDA. El megaslide s'obre amb una
-      // animacio, i al primer fotograma la caixa val zero. Publicar-ho deixaria
-      // el repartiment amb una hero de zero. Es torna a provar quan
-      // `ResizeObserver` vegi les peces canviar de mida.
-      if (z < 1 || icones < 1) return;
-      // L'ALCADA NATURAL DE LA CAIXA: l'amplada passada per la seva proporcio,
+      // Al primer fotograma les peces encara no tenen mida. Es torna a provar
+      // quan `ResizeObserver` les vegi canviar.
+      if (zonaAlcada < 1 || icones < 1) return;
+      // L'ALCADA NATURAL de la caixa: l'amplada passada per la seva proporcio,
       // menys les dues vores d'1 px que el `aspect-ratio` no compta. Es calcula
-      // i no es mesura perque mesurar-la amb el topall posat dona l'alcada JA
-      // ENCONGIDA, i aleshores la correccio es tornaria a alimentar.
+      // i no es mesura: amb el topall posat, la mesura donaria l'alcada ja
+      // encongida i la correccio es tornaria a alimentar.
       const ample = caixa.getBoundingClientRect().width;
       const parts = (getComputedStyle(caixa).aspectRatio || '').split('/');
       const r = parts.length === 2 ? parseFloat(parts[0]) / parseFloat(parts[1]) : 952 / 401;
       const natural = Number.isFinite(r) && r > 0 ? Math.max(1, ample / r - 2) : 0;
-      // ELS AIRES. De la divisio del megaslide al fons de la finestra hi ha
+      // ON CAU LA LINIA, DINS LA ZONA. La zona comença a dalt de tot del
+      // contingut, i la linia del megaslide cau a dins seu (a 497 px a 1920).
+      // Tot el que hi hagi per sobre de la linia queda sota el panell, i per
+      // tant el primer que s'hi ha de posar es aquest tros.
+      const zonaRect = zona.getBoundingClientRect();
+      const finsLinia = Math.max(0, linia - zonaRect.top);
+      // ELS AIRES. De la linia del megaslide al fons de la finestra hi ha
       // d'haver, per aquest ordre:
       //
-      //   cadenat | aire | icones | aire | hero | aire
+      //   cadenat | aire | icones | aire | aire | hero | aire
       //
-      // i la suma de tot plegat es la zona. Els tres aires son el MATEIX
-      // numero, pero hi ha DUES celles: la de les icones en porta dos (un a
-      // cada costat) i la de la hero un. Per aixo la primera porta dues
-      // vegades l'aire i la segona una.
+      // i tots quatre aires valen el mateix. Les dues peces tenen la seva mida
+      // —la franja es una alcada declarada i la hero surt del seu aspecte— i el
+      // que es reparteix es NOMES l'espai que sobra:
       //
-      // L'aire no pot ser mes petit que el cadenat: si ho fos, el cadenat hi
-      // entraria i trepitjaria el que hi hagues a sota, que es exactament el
-      // que passava. D'aqui surt el sostre de la hero, que es l'unica peca que
-      // pot encongir-se:
+      //   aire = (zona − resguard − icones − hero) / 4
       //
-      //   aire >= resguard   ->   hero <= zona - 3*resguard - icones
-      //
-      // Els tres resguards son el de sobre el primer aire, el del mig i el de
-      // sota la hero.
-      // Amb els tres aires iguals, l'equacio te una solucio tancada:
-      //
-      //   3*aire + icones + hero = zona - resguard
-      //   aire = (zona - resguard - icones - hero) / 3
-      //   ->  hero = (zona - 3*resguard - icones) / 2
-      //
-      // o sigui que la hero val la meitat del que queda despres del cadenat i
-      // les icones, i els tres aires son la meitat de la hero. Quan aixo fa la
-      // hero mes gran del que demana, mana el seu tamany natural.
-      const sostre = Math.max(HERO_MINIM, (z - 3 * RESGUARD - icones) / 2);
-      const hero = Math.min(natural, sostre);
-      const aire = Math.max(RESGUARD, (z - RESGUARD - icones - hero) / 3);
-      zona.style.setProperty('--inici-hero-sostre', `${hero}px`);
-      // La cella de les icones porta l'aire a cada costat (dos), i la de la
-      // hero nomes a dalt (un). Per aixo dues variables i no una.
-      zona.style.setProperty('--inici-buit-doble', `${2 * aire}px`);
-      zona.style.setProperty('--inici-buit', `${aire}px`);
+      // SI LA FINESTRA ES CURTA, l'aire queda a zero i prou: la zona creix i la
+      // pagina s'allarga. Es deliberat, i es el que demana «res no ha de
+      // canviar de mida»: encongir la hero per encabir-hi tot faria que la peça
+      // canviés segons la pantalla.
+      // El terra de l'aire: el cadenat ocupa 56 px just sota la linia, i els
+      // dos aires del mig n'han de sumar com a minim aixo, o el cadenat hi
+      // entraria a sobre. Amb la finestra curta l'aire queda en aquest terra,
+      // la zona creix i la pagina s'allarga.
+      const aire = Math.max(RESGUARD / 2, (zonaAlcada - RESGUARD - icones - natural) / 4);
+      const alcada = natural;
       // El numero que decideix si ja hi som: si no s'ha mogut, s'atura.
-      const ara = `${Math.round(z * 4) / 4}|${Math.round(hero * 4) / 4}`;
+      const ara = `${Math.round(zonaAlcada * 4) / 4}|${Math.round(alcada * 4) / 4}|${Math.round(aire * 4) / 4}`;
       if (ara === anterior) return;
       anterior = ara;
+        setRepartiment({ aire, alcada, finsLinia });
+      raf = requestAnimationFrame(reparteix);
+    };
+
+    const programa = () => {
+      cancelAnimationFrame(raf);
+      anterior = null;
       raf = requestAnimationFrame(reparteix);
     };
 
     reparteix();
 
-    const obs = new ResizeObserver(() => {
-      cancelAnimationFrame(raf);
-      anterior = null;
-      raf = requestAnimationFrame(reparteix);
-    });
+    const obs = new ResizeObserver(programa);
     obs.observe(zona);
     obs.observe(caixa);
     obs.observe(franja);
+    // LA LINIA DEL MEGASLIDE TAMBE CANVIA LA ZONA, i no sempre pel mateix cami:
+    // el panell s'obre i es tanca, i la seva vora es publica a l'atribut `style`
+    // de l'arrel. Sense aixo, l'aire es calculava amb la linia de la capçalera i
+    // la hero quedava sota el panell.
+    const obsArrel = new MutationObserver(programa);
+    obsArrel.observe(document.documentElement, { attributes: true, attributeFilter: ['style'] });
     return () => {
       cancelAnimationFrame(raf);
       obs.disconnect();
+      obsArrel.disconnect();
+      cala.remove();
     };
   }, []);
 
@@ -146,9 +163,16 @@ function MarcInici({ seccions }) {
         className="hg-taula-inici"
         data-taula-inici="1"
         style={{
-          height: 'calc(100vh - var(--inici-frontera))',
+          // L'alcada de la finestra es el MINIM; si les peces no hi caben, la
+          // zona creix i la pagina s'allarga.
+          minHeight: 'calc(100vh - var(--inici-frontera))',
           display: 'flex',
           flexDirection: 'column',
+          // El repartiment, publicat com a variables de CSS. Els valors surten
+          // de l'estat i per tant cap render de React se'ls pot emportar.
+          '--inici-buit': `${repartiment.aire}px`,
+          '--inici-dalt': `${(repartiment.finsLinia ?? 0)}px`,
+          ...(repartiment.alcada == null ? {} : { '--inici-hero-sostre': `${repartiment.alcada}px` }),
           // La flexio no ha de repartir l'espai que sobra: els aires son
           // `padding` de les celles i han de ser exactament el que s'ha
           // calculat.
@@ -160,7 +184,9 @@ function MarcInici({ seccions }) {
           data-cella="1"
           data-cella-de={primera.id}
           style={{
-            paddingBlock: 'var(--inici-buit-doble, 0px)',
+            // A dalt, tot el que queda fins a la linia del megaslide mes un
+            // aire; a baix, el primer dels dos aires del mig.
+            paddingBlock: 'var(--inici-dalt, 0px) var(--inici-buit, 0px)',
             display: 'flex',
             flexDirection: 'column',
             // ANCORADA A BAIX. Cada cella porta el seu aire a dalt i a baix, i
