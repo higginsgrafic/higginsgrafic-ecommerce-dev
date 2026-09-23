@@ -239,13 +239,6 @@
   --contingut-max: var(--inici-nou-carril);
 }
 
-/* EL TOPALL DE LA CAIXA DE LA HERO.
-   La hero ocupa 12 files de la graella de la hero del megaslide. El seu tamany
-   natural en fa 12,23, i el topall la deixa a les 12 que li toquen perque el
-   repartiment tanqui amb files senceres. El numero el publica el marc. */
-.hg-hero-caixa {
-  max-height: var(--inici-hero-sostre, none);
-}
 
 
 
@@ -311,13 +304,6 @@
   --contingut-max: var(--inici-nou-carril);
 }
 
-/* EL TOPALL DE LA CAIXA DE LA HERO.
-   La hero ocupa 12 files de la graella de la hero del megaslide. El seu tamany
-   natural en fa 12,23, i el topall la deixa a les 12 que li toquen perque el
-   repartiment tanqui amb files senceres. El numero el publica el marc. */
-.hg-hero-caixa {
-  max-height: var(--inici-hero-sostre, none);
-}
 
 
 

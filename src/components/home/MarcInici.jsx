@@ -46,11 +46,22 @@
 import { useEffect, useRef, useState } from 'react';
 
 /** El repartiment inicial, abans del primer mesurament. */
-const REPARTIMENT_INICIAL = { buit: 0, reserva: 0, alcada: null };
-/** Les files del tros de dalt, i les que ocupa cada peça. */
+const REPARTIMENT_INICIAL = { blocMega: 0, blocPagina: 0, alcada: null };
+/**
+ * LES FILES DEL TROS DE DALT.
+ *
+ * Son les 28 que surten de traduir la pantalla a files de la graella del
+ * megaslide, i la frontera entre les dues pagines cau a la 11:
+ *
+ *   FILES_MEGASLIDE   11   el megaslide desplegat
+ *   FILES_PAGINA      17   la pagina de sota
+ *   FILES_TOTAL       28
+ */
 const FILES_TOTAL = 28;
 const FILES_MEGASLIDE = 11;
-const FILES_HERO = 12;
+const FILES_PAGINA = FILES_TOTAL - FILES_MEGASLIDE;
+/** El que penja el cadenat del megaslide sota la seva linia. */
+const CADE_BAIXADA = 56;
 
 function MarcInici({ seccions }) {
   const [primera, segona, ...resta] = seccions;
@@ -131,45 +142,41 @@ function MarcInici({ seccions }) {
       // tant el primer que s'hi ha de posar es aquest tros.
       const zonaRect = zona.getBoundingClientRect();
       const finsLinia = Math.max(0, linia - zonaRect.top);
-      // EL REPARTIMENT, EN FILES DE LA GRAELLA DE LA HERO.
+      // DUES PAGINES, UNA SOLA MESURA.
       //
-      // La graella de la hero del megaslide te una fila propia
-      // (`megaHeroRowHeight`, a la capçalera), i amb ella el tros de dalt
-      // sencer son FILES SENCILLES. Mesurat a 1920 (fila = 35,01 px):
+      // La graella de files serveix per mesurar alhora el megaslide i la
+      // pagina: el tros de dalt sencer son 28 files, i la frontera entre les
+      // dues coses cau exactament a la fila 11.
       //
-      //   megaslide    376,0 px = 10,74 files  -> 11
-      //   icones        70,4 px =  2,01 files  ->  2
-      //   hero         428,0 px = 12,23 files  -> 12
-      //   finestra−header 960 px = 27,42 files  -> 28
+      //   files 0..10   (11)  el megaslide desplegat
+      //   files 11..27  (17)  la pagina de sota
       //
-      // I el model tanca exacte:
+      // I aixo dona el marc de referencia per col·locar-hi les peces: les
+      // ICONES es centren dins de les 11 files del megaslide, i la HERO dins de
+      // les 17 de sota. Cap de les dues no s'ha d'encongir: la hero, al seu
+      // tamany natural, cap dins de les 17 files a totes cinc mides.
       //
-      //   megaslide 11 | buit 1 | icones 2 | buit 1 | hero 12 | buit 1  =  28 files
-      //
-      // Son, doncs, divisions horitzontals: les mateixes files que fa servir
-      // el megaslide, i per aixo tot queda alineat amb la seva graella.
-      //
-      // LA FILA: la finestra menys la capçalera, partida per 28. No es la fila
-      // de la graella del megaslide (`laneForViewport() × 0,0280625 − 2,875`,
-      // que a 1920 fa 35,01), perque aquella depen del CARRIL i la finestra no:
-      // amb la de la graella, a 1440 el bloc no omplia la finestra.
-      //
-      // Que la fila sigui aquesta es el que fa que els comptes tanquin: a 1920
-      // dona 34,29 px, i 11 files fan 377,1 quan el megaslide mesura 376.
+      // LA FILA es `(finestra − capçalera) / 28`. A 1920 dona 34,29 px, i 11
+      // files cauen a 497,1 quan el separador del megaslide es a 497: la
+      // frontera del model i la del megaslide coincideixen.
       const fila = (window.innerHeight - capcalera) / FILES_TOTAL;
-      // Els buits: una fila cada un.
-      const buit = fila;
-      // LA RESERVA DE DALT: les 11 files del megaslide mes el buit que les
-      // separa de les icones. La cel·la de les icones les porta senceres.
-      const reserva = (FILES_MEGASLIDE + 1) * fila;
-      // LA HERO OCUPA 12 FILES. El seu tamany natural en fa 12,23, i el topall
-      // la deixa a les 12 que li toquen perque el repartiment tanqui.
-      const alcada = Math.min(natural, FILES_HERO * fila);
+      // EL BLOC DEL MEGASLIDE NO POT SER MES PETIT QUE EL MEGASLIDE.
+      //
+      // Les 11 files son la mesura del megaslide, pero nomes coincideixen amb
+      // el seu separador quan el seu alcada escala amb la finestra. A 1366 no:
+      // el panell acaba a 392 i les 11 files cauen a 365, de manera que el
+      // cadenat (392+56 = 448) quedava damunt la hero. El bloc, doncs, es el
+      // mes gran de les dues coses, i tambe ha de deixar passar el cadenat.
+      const blocMega = Math.max(FILES_MEGASLIDE * fila, linia + CADE_BAIXADA - capcalera);
+      // LA PAGINA DE SOTA, la resta, pero amb l'alcada de la hero com a minim:
+      // si la finestra es molt curta, la zona creix i la pagina s'allarga.
+      const blocPagina = Math.max((window.innerHeight - capcalera) - blocMega, natural);
+      const alcada = natural;
       // El numero que decideix si ja hi som: si no s'ha mogut, s'atura.
-      const ara = `${Math.round(zonaAlcada * 4) / 4}|${Math.round(alcada * 4) / 4}|${Math.round(buit * 4) / 4}`;
+      const ara = `${Math.round(blocMega * 4) / 4}|${Math.round(blocPagina * 4) / 4}|${Math.round(alcada * 4) / 4}`;
       if (ara === anterior) return;
       anterior = ara;
-        setRepartiment({ buit, reserva, alcada, finsLinia, linia });
+        setRepartiment({ blocMega, blocPagina, alcada, finsLinia, linia });
       raf = requestAnimationFrame(reparteix);
     };
 
@@ -206,57 +213,45 @@ function MarcInici({ seccions }) {
         className="hg-taula-inici"
         data-taula-inici="1"
         style={{
-          // L'alcada de la finestra es el MINIM; si les peces no hi caben, la
-          // zona creix i la pagina s'allarga. La linia la publica el marc, que
-          // es qui la sap mesurar.
-          minHeight: `calc(100vh - ${repartiment.linia ?? 0}px)`,
+          // LES DUES PAGINES, UNA SOBRE L'ALTRA: les 11 files del megaslide i
+          // les 17 de la pagina. Les alcades surten de l'estat i per tant cap
+          // render de React no se les pot emportar.
+          height: `${(repartiment.blocMega ?? 0) + (repartiment.blocPagina ?? 0)}px`,
           display: 'flex',
           flexDirection: 'column',
-          // El repartiment, publicat com a variables de CSS. Els valors surten
-          // de l'estat i per tant cap render de React se'ls pot emportar.
-          '--inici-buit': `${repartiment.buit ?? 0}px`,
-          '--inici-reserva': `${repartiment.reserva ?? 0}px`,
-          ...(repartiment.alcada == null ? {} : { '--inici-hero-sostre': `${repartiment.alcada}px` }),
-          '--inici-dalt': `${(repartiment.finsLinia ?? 0)}px`,
-          '--inici-frontera': `${repartiment.linia ?? 0}px`,
-          // La flexio no ha de repartir l'espai que sobra: els aires son
-          // `padding` de les cel·les i han de ser exactament el que s'ha
-          // calculat.
           justifyContent: 'flex-start',
           gap: 0,
+          // Les dues xifres, tambe com a variables de CSS, perque el topall de
+          // la caixa de la hero les pugui llegir.
+          '--inici-bloc-mega': `${repartiment.blocMega ?? 0}px`,
+          '--inici-bloc-pagina': `${repartiment.blocPagina ?? 0}px`,
+          '--inici-frontera': `${repartiment.linia ?? 0}px`,
         }}
       >
+        {/* LES 11 FILES DEL MEGASLIDE, AMB LES ICONES AL CENTRE. */}
         <div
           data-cella="1"
           data-cella-de={primera.id}
           style={{
-            // Les 11 files del megaslide mes el buit que el separa de les
-            // icones, a dalt; i res a baix (el buit del mig el posa la cel·la de
-            // la hero).
-            paddingBlock: 'var(--inici-reserva, 0px) 0',
+            height: 'var(--inici-bloc-mega, 0px)',
             display: 'flex',
             flexDirection: 'column',
-            // ANCORADA A BAIX. Cada cel·la porta el seu aire a dalt i a baix, i
-            // el contingut ha de quedar exactament entre els dos. Amb el
-            // contingut centrat, si es mes baix que la cel·la (que es el cas de
-            // la franja d'icones) el reparteix entre els dos aires i en dobla
-            // un: mesurat, la franja pujava 101 px i la hero queia damunt del
-            // panell del megaslide.
-            justifyContent: 'flex-end',
+            alignItems: 'center',
+            justifyContent: 'center',
           }}
         >
           {primera.node}
         </div>
+        {/* LES 17 FILES DE LA PAGINA, AMB LA HERO AL CENTRE. */}
         <div
           data-cella="2"
           data-cella-de={segona.id}
           style={{
-            // El buit del mig a dalt i el de sota la hero a baix: una fila
-            // cada un.
-            paddingBlock: 'var(--inici-buit, 0px)',
+            height: 'var(--inici-bloc-pagina, 0px)',
             display: 'flex',
             flexDirection: 'column',
-            justifyContent: 'flex-start',
+            alignItems: 'center',
+            justifyContent: 'center',
           }}
         >
           {segona.node}
