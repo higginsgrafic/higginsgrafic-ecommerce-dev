@@ -25,15 +25,6 @@
     border-bottom: 1px solid #333;
   }
   .toolbar h1 { font-size: 14px; margin-right: 8px; white-space: nowrap; }
-  .toolbar select {
-    background: #1a1a3e;
-    color: #fff;
-    border: 1px solid #444;
-    border-radius: 6px;
-    padding: 6px 10px;
-    font-size: 13px;
-    cursor: pointer;
-  }
   .toolbar button {
     background: #1a1a3e;
     color: #fff;
@@ -54,10 +45,44 @@
     font-size: 11px;
     color: #888;
     margin-left: auto;
+    text-align: right;
+    line-height: 1.4;
   }
+
+  /* LES PESTANYES. Una per format, i totes les que s'han obert es queden
+     carregades: canviar de pestanya no torna a carregar res. */
+  .tabs {
+    position: fixed;
+    top: 48px; left: 0; right: 0;
+    background: #12122a;
+    display: flex;
+    align-items: stretch;
+    gap: 2px;
+    padding: 0 8px;
+    z-index: 999;
+    border-bottom: 1px solid #333;
+    overflow-x: auto;
+    overflow-y: hidden;
+  }
+  .tabs button {
+    background: transparent;
+    color: #99a;
+    border: none;
+    border-bottom: 2px solid transparent;
+    padding: 9px 12px;
+    font-size: 12.5px;
+    font-family: inherit;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .tabs button:hover { color: #dde; background: #1a1a3e; }
+  .tabs button.actiu { color: #fff; border-bottom-color: #ff0040; }
+  .tabs button .mida { color: #667; font-size: 11px; margin-left: 6px; }
+  .tabs button.actiu .mida { color: #99a; }
+
   .stage {
     position: fixed;
-    top: 48px; left: 0; right: 0; bottom: 0;
+    top: 84px; left: 0; right: 0; bottom: 0;
     display: flex;
     align-items: flex-start;
     justify-content: center;
@@ -68,6 +93,7 @@
   .device-frame {
     position: relative;
     box-shadow: 0 8px 40px rgba(0,0,0,0.5);
+    flex: 0 0 auto;
   }
   .device-frame iframe {
     position: absolute;
@@ -88,28 +114,28 @@
     z-index: 11;
     pointer-events: none;
   }
-  .device-frame .viewport-marker.bottom {
-    bottom: 0;
-  }
+  .device-frame .viewport-marker.bottom { bottom: 0; }
   .red-line { background: #ff0040; }
-  .green-line { background: #00ff80; }
+  /* El vel de carrega. La pagina triga uns segons a pintar i, sense aixo,
+     el marc surt blanc i sembla que estigui espatllat. */
+  .device-frame .carregant {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #fff;
+    color: #888;
+    font-size: 13px;
+    z-index: 12;
+  }
+  .device-frame.carregat .carregant { display: none; }
 </style>
 </head>
 <body>
 
 <div class="toolbar">
   <h1>Overlay Navegador</h1>
-  <select id="format">
-    <option value="desktop">Desktop Chrome (1920x1080)</option>
-    <option value="desktop-1440">Portàtil Chrome (1440x900)</option>
-    <option value="desktop-1366">Portàtil Chrome (1366x768)</option>
-    <option value="desktop-1280">Portàtil Chrome (1280x720)</option>
-    <option value="tablet-landscape">Tablet Horitzontal Safari (1024x768)</option>
-    <option value="tablet-portrait">Tablet Vertical Safari (768x1024)</option>
-    <option value="mobile-portrait">Mòbil Vertical Safari (390x844)</option>
-    <option value="mobile-landscape">Mòbil Horitzontal Safari (844x390)</option>
-    <option value="pwa">PWA Standalone (390x844)</option>
-  </select>
   <button id="reload">Recarregar</button>
   <button id="toggle-overlay">Amaga/Mostra navegador</button>
   <label class="escala" title="Veure el dispositiu a mida real, sense escalar">
@@ -118,150 +144,247 @@
   <span class="info" id="info"></span>
 </div>
 
-<div class="stage">
-  <div class="device-frame" id="frame">
-    <iframe id="site" src="/"></iframe>
-    <img class="browser-overlay" id="overlay" />
-    <div class="viewport-marker red-line" id="marker-top"></div>
-    <div class="viewport-marker bottom red-line" id="marker-bottom"></div>
-  </div>
-</div>
+<div class="tabs" id="tabs"></div>
+<div class="stage" id="stage"></div>
 
 <script>
+/**
+ * ELS FORMATS.
+ *
+ * `chromeTop`/`chromeBottom` son els pixels que el navegador es menja de la
+ * pantalla, i son el que governa la finestra que rep la pagina:
+ *
+ *     finestra = alcada de la pantalla - chromeTop - chromeBottom
+ *
+ * La `img` es nomes el dibuix del navegador, i per aixo cada format te la seva:
+ * la barra d'un navegador no s'encongeix amb la finestra, i estirar la captura
+ * d'una altra mida la deformaria.
+ *
+ * `scale` es com es veu per defecte; la casella `1:1` el posa a 1.
+ */
 const FORMATS = {
   'desktop': {
     img: '/browser-frames/desktop-chrome.webp',
     w: 1920, h: 1080,
     chromeTop: 134, chromeBottom: 0,
     scale: 0.5,
-    label: 'Chrome: 134px superior · Viewport: 1920x946'
+    label: 'Chrome · finestra 1920x946'
   },
-  // Els portatils son el MATEIX Chrome, amb la barra de 134 px: la barra d'un
-  // navegador no s'encongeix amb la finestra, i per aixo cada mida te la seva
-  // imatge, amb la barra a la seva alcada de debò.
   'desktop-1440': {
     img: '/browser-frames/desktop-chrome-1440x900.webp',
     w: 1440, h: 900,
     chromeTop: 134, chromeBottom: 0,
     scale: 0.75,
-    label: 'Chrome: 134px superior · Viewport: 1440x766'
+    label: 'Chrome · finestra 1440x766'
   },
   'desktop-1366': {
     img: '/browser-frames/desktop-chrome-1366x768.webp',
     w: 1366, h: 768,
     chromeTop: 134, chromeBottom: 0,
     scale: 0.8,
-    label: 'Chrome: 134px superior · Viewport: 1366x634'
+    label: 'Chrome · finestra 1366x634'
   },
   'desktop-1280': {
     img: '/browser-frames/desktop-chrome-1280x720.webp',
     w: 1280, h: 720,
     chromeTop: 134, chromeBottom: 0,
     scale: 0.85,
-    label: 'Chrome: 134px superior · Viewport: 1280x586'
+    label: 'Chrome · finestra 1280x586'
   },
   'tablet-landscape': {
     img: '/browser-frames/tablet-landscape-safari.webp',
     w: 1024, h: 768,
     chromeTop: 78, chromeBottom: 0,
     scale: 0.75,
-    label: 'Safari: 78px superior · Viewport: 1024x690'
+    label: 'Safari · finestra 1024x690'
   },
   'tablet-portrait': {
     img: '/browser-frames/tablet-portrait-safari.webp',
     w: 768, h: 1024,
     chromeTop: 72, chromeBottom: 0,
     scale: 0.65,
-    label: 'Safari: 72px superior · Viewport: 768x952'
+    label: 'Safari · finestra 768x952'
   },
   'mobile-portrait': {
     img: '/browser-frames/mobile-portrait-safari.webp',
     w: 390, h: 844,
     chromeTop: 88, chromeBottom: 44,
     scale: 0.85,
-    label: 'Safari: 88px sup + 44px inf · Viewport: 390x712'
+    label: 'Safari · finestra 390x712'
   },
   'mobile-landscape': {
     img: '/browser-frames/mobile-landscape-safari.webp',
     w: 844, h: 390,
     chromeTop: 50, chromeBottom: 0,
     scale: 0.75,
-    label: 'Safari: 50px superior · Viewport: 844x340'
+    label: 'Safari · finestra 844x340'
   },
   'pwa': {
     img: '/browser-frames/pwa-standalone.webp',
     w: 390, h: 844,
     chromeTop: 14, chromeBottom: 0,
     scale: 0.85,
-    label: 'PWA: 14px status bar · Viewport: 390x830'
+    label: 'PWA · finestra 390x830'
   },
 };
 
-const frame = document.getElementById('frame');
-const iframe = document.getElementById('site');
-const overlay = document.getElementById('overlay');
-const markerTop = document.getElementById('marker-top');
-const markerBottom = document.getElementById('marker-bottom');
+// La pagina que es carrega a dins. Es pot canviar amb `?ruta=/nova/inici`.
+const RUTA = (() => {
+  const sp = new URLSearchParams(window.location.search);
+  const r = (sp.get('ruta') || '/').trim();
+  return r.startsWith('/') ? r : '/' + r;
+})();
+
+const ELS_NOMS = {
+  'desktop': 'Escriptori',
+  'desktop-1440': 'Portàtil 1440',
+  'desktop-1366': 'Portàtil 1366',
+  'desktop-1280': 'Portàtil 1280',
+  'tablet-landscape': 'Tauleta apaïsada',
+  'tablet-portrait': 'Tauleta vertical',
+  'mobile-portrait': 'Mòbil vertical',
+  'mobile-landscape': 'Mòbil apaïsat',
+  'pwa': 'PWA',
+};
+
+const stage = document.getElementById('stage');
+const tabs = document.getElementById('tabs');
 const info = document.getElementById('info');
-const select = document.getElementById('format');
-const reloadBtn = document.getElementById('reload');
-const toggleBtn = document.getElementById('toggle-overlay');
+const escala1 = document.getElementById('escala1');
 
 let overlayVisible = true;
-// A 1:1 el dispostiu es veu a mida real: la finestra es fa gran i l'escenari
-// (que ja te `overflow: auto`) s'hi desplac, en comptes d'encongir-ho tot.
 let escalaUn = false;
+let actiu = 'desktop';
+/** Els marcs ja muntats: `clau -> { el, iframe, overlay, top, bottom }`. */
+const muntats = new Map();
 
-function applyFormat(key) {
-  const fmt = FORMATS[key];
+/** Posa el marc d'un format a la mida que toca, amb l'escala d'ara. */
+function aplicaMida(clau) {
+  const fmt = FORMATS[clau];
+  const m = muntats.get(clau);
+  if (!m) return;
   const s = escalaUn ? 1 : fmt.scale;
   const dw = fmt.w * s;
   const dh = fmt.h * s;
   const ct = fmt.chromeTop * s;
   const cb = fmt.chromeBottom * s;
-
-  frame.style.width = dw + 'px';
-  frame.style.height = dh + 'px';
-
-  overlay.src = fmt.img;
-  overlay.style.width = dw + 'px';
-  overlay.style.height = dh + 'px';
-  overlay.style.display = overlayVisible ? 'block' : 'none';
-
-  // iframe: es renderitza a mida real del dispositiu i s'escala amb transform
-  // El transformOrigin és 0 0 i translateY mou l'iframe sota les barres del navegador
   const vpH = fmt.h - fmt.chromeTop - fmt.chromeBottom;
-  iframe.style.top = '0';
-  iframe.style.left = '0';
-  iframe.style.width = fmt.w + 'px';
-  iframe.style.height = vpH + 'px';
-  iframe.style.transformOrigin = '0 0';
-  iframe.style.transform = `scale(${s})`;
-  // Posicionem l'iframe escalat just sota el chrome
-  iframe.style.position = 'absolute';
-  iframe.style.marginTop = ct + 'px';
 
-  // Red markers showing viewport boundaries
-  markerTop.style.top = ct + 'px';
-  markerTop.style.display = overlayVisible ? 'block' : 'none';
-  markerBottom.style.bottom = cb + 'px';
-  markerBottom.style.display = (overlayVisible && cb > 0) ? 'block' : 'none';
+  m.el.style.width = dw + 'px';
+  m.el.style.height = dh + 'px';
 
-  info.textContent = fmt.label + (escalaUn ? ' · a mida real (1:1)' : ` · escalat ×${fmt.scale}`);
+  // L'iframe es renderitza a la mida REAL del dispositiu i s'escala amb un
+  // `transform`, amb l'origen a dalt a l'esquerra, i se'l desplaça cap avall
+  // els pixels de la barra perque quedi just sota seu.
+  m.iframe.style.position = 'absolute';
+  m.iframe.style.top = '0';
+  m.iframe.style.left = '0';
+  m.iframe.style.width = fmt.w + 'px';
+  m.iframe.style.height = vpH + 'px';
+  m.iframe.style.transformOrigin = '0 0';
+  m.iframe.style.transform = `scale(${s})`;
+  m.iframe.style.marginTop = ct + 'px';
+
+  m.overlay.style.width = dw + 'px';
+  m.overlay.style.height = dh + 'px';
+  m.overlay.style.display = overlayVisible ? 'block' : 'none';
+
+  m.top.style.top = ct + 'px';
+  m.top.style.display = overlayVisible ? 'block' : 'none';
+  m.bottom.style.bottom = cb + 'px';
+  m.bottom.style.display = (overlayVisible && cb > 0) ? 'block' : 'none';
 }
 
-select.addEventListener('change', (e) => applyFormat(e.target.value));
-reloadBtn.addEventListener('click', () => { iframe.src = iframe.src; });
-toggleBtn.addEventListener('click', () => {
-  overlayVisible = !overlayVisible;
-  applyFormat(select.value);
+/** Munta el marc d'un format, si no ho era ja. */
+function muntat(clau) {
+  if (muntats.has(clau)) return muntats.get(clau);
+  const fmt = FORMATS[clau];
+
+  const el = document.createElement('div');
+  el.className = 'device-frame';
+  el.dataset.format = clau;
+
+  const iframe = document.createElement('iframe');
+  iframe.src = RUTA;
+  iframe.title = ELS_NOMS[clau] || clau;
+
+  const overlay = document.createElement('img');
+  overlay.className = 'browser-overlay';
+  overlay.src = fmt.img;
+  overlay.alt = '';
+
+  const top = document.createElement('div');
+  top.className = 'viewport-marker red-line';
+  const bottom = document.createElement('div');
+  bottom.className = 'viewport-marker bottom red-line';
+
+  const carregant = document.createElement('div');
+  carregant.className = 'carregant';
+  carregant.textContent = `Carregant ${ELS_NOMS[clau] || clau}…`;
+
+  el.append(iframe, overlay, top, bottom, carregant);
+  stage.append(el);
+
+  // `load` s'ha de tornar a armar a cada recarrega, i per aixo no el posem
+  // nomes un cop: el recarregar del toolbar torna a deixar el marc en blanc.
+  iframe.addEventListener('load', () => el.classList.add('carregat'));
+  el.classList.remove('carregat');
+
+  const m = { el, iframe, overlay, top, bottom };
+  muntats.set(clau, m);
+  aplicaMida(clau);
+  return m;
+}
+
+/** Amaga el marc d'un format sense desmuntar-lo (es queda carregat). */
+function amaga(clau) {
+  const m = muntats.get(clau);
+  if (m) m.el.style.display = 'none';
+}
+
+/** Ensenya un format, muntant-lo si cal. Els altres es queden carregats. */
+function mostra(clau) {
+  for (const k of muntats.keys()) if (k !== clau) amaga(k);
+  const m = muntat(clau);
+  m.el.style.display = 'block';
+  actiu = clau;
+  for (const b of tabs.querySelectorAll('button')) b.classList.toggle('actiu', b.dataset.format === clau);
+  const fmt = FORMATS[clau];
+  const s = escalaUn ? 1 : fmt.scale;
+  info.textContent = `${fmt.label} · ${escalaUn ? 'a mida real (1:1)' : `escalat ×${s}`} · ${RUTA}`;
+  stage.scrollTo(0, 0);
+}
+
+// LES PESTANYES, una per format.
+for (const clau of Object.keys(FORMATS)) {
+  const b = document.createElement('button');
+  b.dataset.format = clau;
+  b.innerHTML = `${ELS_NOMS[clau] || clau}<span class="mida">${FORMATS[clau].w}×${FORMATS[clau].h}</span>`;
+  b.addEventListener('click', () => mostra(clau));
+  tabs.append(b);
+}
+
+// ELS BOTONS.
+document.getElementById('reload').addEventListener('click', () => {
+  const m = muntats.get(actiu);
+  // Recarrega NOMES la pestanya activa: les altres es queden com estan.
+  if (!m) return;
+  m.el.classList.remove('carregat');
+  m.iframe.src = m.iframe.src;
 });
-document.getElementById('escala1').addEventListener('change', (e) => {
+document.getElementById('toggle-overlay').addEventListener('click', () => {
+  overlayVisible = !overlayVisible;
+  for (const clau of muntats.keys()) aplicaMida(clau);
+});
+escala1.addEventListener('change', (e) => {
   escalaUn = e.target.checked;
-  applyFormat(select.value);
+  // L'escala val per a TOTES les pestanyes: canviar-la no ha de fer que unes
+  // quantes quedin a una mida i les altres a una altra.
+  for (const clau of muntats.keys()) aplicaMida(clau);
+  mostra(actiu);
 });
 
-applyFormat('desktop');
+mostra(actiu);
 </script>
 
 </body>
