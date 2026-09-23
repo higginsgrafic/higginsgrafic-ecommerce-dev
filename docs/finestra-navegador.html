@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="ca">
+<head>
+<meta charset="utf-8">
+<title>Finestra de treball — navegador simulat</title>
+<!--
+  UNA FINESTRA DE TREBALL DE DEBÒ.
+
+  Aquesta pàgina no mesura res: et dona una finestra com la d'un navegador de
+  veritat, per treballar-hi a dins. Dibuixa la barra del navegador (el pitjor
+  cas: 150 px a escriptori, 130 a tauleta) i posa l'aplicació en un `iframe` que
+  ocupa la resta.
+
+  PER QUE SERVEIX. Dins l'iframe, `window.innerHeight` es la finestra menys la
+  barra, que es exactament el que veu el navegador de debò. O sigui que el
+  repartiment de la pàgina es calcula amb la finestra bona, no amb l'alçada de
+  la pantalla.
+
+  COM S'HA DE FER SERVIR. Obre-la, posa el navegador a pantalla completa (F11 o
+  Ctrl+Cmd+F) i tria la barra que toca. Si la pantalla no es la que vols, canvia
+  la mida de la finestra: el que compta es l'alçada que queda sota la barra.
+-->
+<style>
+  :root { --barra: 150px; }
+  html, body { height: 100%; margin: 0; background: #111827; font-family: -apple-system, system-ui, sans-serif; }
+  .marc { position: fixed; inset: 0; display: flex; flex-direction: column; }
+  .barra {
+    flex: 0 0 var(--barra); position: relative; background: #e5e7eb;
+    border-bottom: 1px solid #9ca3af; user-select: none;
+  }
+  .pestanyes { position: absolute; top: 10px; left: 14px; display: flex; gap: 7px; }
+  .pestanyes span { display: block; width: 150px; height: 22px; border-radius: 7px 7px 0 0; background: #cbd5e1; }
+  .pestanyes span:first-child { background: #fff; }
+  .adreca {
+    position: absolute; left: 14px; right: 14px; bottom: 12px; height: 30px;
+    border-radius: 15px; background: #fff; border: 1px solid #9ca3af;
+    display: flex; align-items: center; padding: 0 12px; font-size: 13px; color: #6b7280;
+  }
+  iframe { flex: 1 1 auto; width: 100%; border: 0; background: #fff; display: block; }
+  .controls {
+    position: fixed; right: 10px; top: 10px; z-index: 10; display: flex; gap: 6px;
+    align-items: center; font-size: 12px; color: #374151;
+  }
+  .controls button {
+    font: inherit; padding: 4px 9px; border-radius: 6px; border: 1px solid #9ca3af;
+    background: #fff; cursor: pointer;
+  }
+  .controls button.actiu { background: #111827; color: #fff; border-color: #111827; }
+  .mesura { background: #fff; border: 1px solid #9ca3af; border-radius: 6px; padding: 4px 9px; }
+  body.amagar .barra { display: none; }
+  body.amagar { --barra: 0px; }
+</style>
+</head>
+<body>
+<div class="marc">
+  <div class="barra">
+    <div class="pestanyes"><span></span><span></span><span></span></div>
+    <div class="adreca" id="adreca">http://127.0.0.1:3003/nova/inici</div>
+  </div>
+  <iframe id="app" src="http://127.0.0.1:3003/nova/inici" title="Aplicació"></iframe>
+</div>
+
+<div class="controls">
+  <span class="mesura" id="mesura">—</span>
+  <button data-barra="150" class="actiu">Escriptori 150</button>
+  <button data-barra="130">Tauleta 130</button>
+  <button data-barra="0">Sense barra</button>
+</div>
+
+<script>
+  const body = document.body;
+  const mesura = document.getElementById('mesura');
+  const posa = (px) => {
+    body.classList.toggle('amagar', px === 0);
+    if (px > 0) document.documentElement.style.setProperty('--barra', px + 'px');
+    for (const b of document.querySelectorAll('.controls button')) {
+      b.classList.toggle('actiu', Number(b.dataset.barra) === px);
+    }
+    pinta();
+  };
+  const pinta = () => {
+    const barra = body.classList.contains('amagar') ? 0 : parseInt(getComputedStyle(document.documentElement).getPropertyValue('--barra'), 10) || 0;
+    const finestra = window.innerHeight - barra;
+    mesura.textContent = `pantalla ${window.innerWidth}×${window.innerHeight} · barra ${barra} · finestra de l'aplicació ${window.innerWidth}×${finestra}`;
+  };
+  for (const b of document.querySelectorAll('.controls button')) {
+    b.addEventListener('click', () => posa(Number(b.dataset.barra)));
+  }
+  window.addEventListener('resize', pinta);
+  pinta();
+</script>
+</body>
+</html>
