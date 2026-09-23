@@ -215,7 +215,7 @@ Cada canvi es verifica amb el mateix invariant, a les cinc mides
 | 1 | **El títol amb la caixa que conté el text** (`line-height: normal`) i `--titol-cards` a 76,8 | **FETA** (`074744b`): sobreeixit 0,0 a les cinc mides, i els desplaçaments per col·lecció, fora |
 | 2 | **La píndola al flux**, i fora la reserva i el voladís | **FETA** (`9140f21`): fora `reservaPindola`, `PINDOLA_VOLADIS` i el `position: relative` del bloc. Els absoluts de la pàgina baixen de 30 a 25, i els 25 que queden són dibuix |
 | 3 | **La galeria al carril sencer** | **FETA** (`71db3c4`) |
-| 4 | **Fora la fórmula de l'aire**; `margin-block-start: var(--esp-4)` | **PENDENT**: el marge encara és `calc(var(--esp-4) + 151,9px − 0,0708·vw)` |
+| 4 | **Fora la fórmula de l'aire**; `margin-block-start: var(--esp-4)` | **REFORMULADA** (`28ad56b`): la fórmula NO es pot treure encara. **MESURAT**: `--esp-4` sol dona 120,0 px d'aire a 1920 on ara n'hi ha 271,9, perquè **el text del títol no arrenca a l'inici del seu bloc**. La fórmula queda escrita amb el perquè de cada terme, i desapareixerà quan el títol hi arrenqui |
 | 5 | **Una sola escala d'aires** | **PENDENT**, i és la que necessita la decisió de les proporcions |
 | — | **El marc de pàgina** (fase 1 del pla) | **FETA** per a l'inici (`911fc25`): `MarcInici`, 67 línies, i la pàgina comença al fons de la capçalera sense cap excepció |
 
