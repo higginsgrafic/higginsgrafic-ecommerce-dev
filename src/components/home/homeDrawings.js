@@ -65,9 +65,12 @@ const THE_HUMAN_INSIDE = [
   { collection: 'the-human-inside', design: THI_DESIGN_MAP[n] || n }));
 
 // --- Miscel·lània (negre + blanc) -------------------------------------------
-// Els 3 dibuixos del catàleg coincideixen amb el disc.
+// Eren 3 dibuixos i al disc n'hi ha 5. Els dos que faltaven (`arthur-d-the-second`
+// i `r2d2-quote`) ja existien al cataleg de productes i tenien els seus mockups
+// precomposats i el seu calibratge; nomes no eren en aquesta llista, i per aixo
+// la graella de l'inici, que en demana 4, deixava l'ultima fitxa buida.
 const MISCELLANIA = [
-  'death-star2d2', 'dj-vader', 'pont-del-diable',
+  'arthur-d-the-second', 'death-star2d2', 'dj-vader', 'pont-del-diable', 'r2d2-quote',
 ].map((n) => bw('miscellania', n, 'miscellania', { collection: 'miscellania', design: n }));
 
 // --- Cube (només color) ------------------------------------------------------
@@ -238,9 +241,11 @@ const DRAWING_LABELS = {
   'the_human_inside/the-dalek': 'The Dalek',
   'the_human_inside/vader': 'Vader',
   // Miscel·lània
+  'miscellania/arthur-d-the-second': 'Arthur D The Second',
   'miscellania/death-star2d2': 'Death Star2D2',
   'miscellania/dj-vader': 'DJ Vader',
   'miscellania/pont-del-diable': 'Pont del Diable',
+  'miscellania/r2d2-quote': 'R2D2 Quote',
   // Cube
   'cube/afrodita-c-stripe': 'Afrodita Cube',
   'cube/cube-3-p0-stripe': 'Cube 3-PO',
@@ -336,6 +341,8 @@ const PRODUCT_HREF = {
   'miscellania/pont-del-diable': '/miscellania/pont-del-diable',
   'miscellania/dj-vader': '/miscellania/dj-vader',
   'miscellania/death-star2d2': '/miscellania/death-star2d2',
+  'miscellania/arthur-d-the-second': '/miscellania/arthur-d-the-second',
+  'miscellania/r2d2-quote': '/miscellania/r2d2-quote',
 };
 
 function resolveProductHref(drawing) {
