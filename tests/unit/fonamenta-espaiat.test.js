@@ -98,22 +98,30 @@ describe("l'escala d'espaiat de la fonamenta", () => {
     expect(declaracio('--escala')).toBe('0.6667');
   });
 
-  it('el carril EL PUBLICA LA CAPÇALERA, i la pagina el llegeix', () => {
-    // El carril es el tram del logo a la icona d'usuari, i qui el dibuixa es la
-    // capçalera: la publica com a `--hg-band-w`. La pagina NO el deriva, el
-    // llegeix, i aixi el contingut i la capçalera comencen i acaben al mateix
-    // lloc a TOTES les vistes. Mesurat: 1270 a 1920, 953 a 1440, 933 a 1280 i
-    // 1024, i 688 a 768.
-    const carril = declaracio('--contingut-max');
-    expect(carril).toContain('var(--hg-band-w');
+  it('el carril de la pagina nova EL PUBLICA LA CAPÇALERA, i el llegeix', () => {
+    // El carril de l'inici es el tram del logo a la icona d'usuari, i qui el
+    // dibuixa es la capçalera: el publica com a `--hg-band-w`. La pagina NO el
+    // deriva, el llegeix, i aixi el contingut i la capçalera comencen i acaben
+    // al mateix lloc a TOTES les vistes. Mesurat: 1270 a 1920, 953 a 1440, 933 a
+    // 1280 i 1024, i 688 a 768.
+    expect(declaracio('--inici-nou-carril')).toContain('var(--hg-band-w');
   });
 
-  it('el valor de reserva del carril es el tram mesurat a 1920', () => {
+  it('el valor de reserva del carril de l\'inici es el tram mesurat a 1920', () => {
     // Nomes s'usa abans que la capçalera publiqui el seu. A 1920 el tram fa
     // 1.264,5 px, que son el 65,86 % de la finestra.
-    const carril = declaracio('--contingut-max');
+    const carril = declaracio('--inici-nou-carril');
     expect(carril).toMatch(/65\.86vw/);
     expect(carril).toMatch(/1264\.5px/);
+  });
+
+  it('el carril GLOBAL no es toca: la pagina nova te el seu', () => {
+    // `--contingut-max` el fan servir totes les pagines, i canviar-lo mou el
+    // carril de tot el lloc. Va passar dues vegades, i la segona es va emportar
+    // la pagina vella sencera (alcada de 6932 a 6778, fitxes de 321x505 a
+    // 301x485). El carril de l'inici ha de viure en una variable propia.
+    expect(declaracio('--contingut-max')).toBe('min(70.3125vw, 1350px)');
+    expect(FONAMENTA).toMatch(/\[data-inici-nou="1"\] \{\s*--contingut-max: var\(--inici-nou-carril\);/);
   });
 
   it('el contingut no te marge lateral: arriba a les vores del carril', () => {

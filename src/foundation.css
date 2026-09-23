@@ -52,19 +52,21 @@
      Aquesta es la formula que fins ara calculava `getSafeBelt()` des de
      JavaScript, amb el seu `useReactiveBelt`, el seu `MutationObserver` i la
      seva publicacio primerenca: una regla de tres de 1.350/1.920. */
-  /* EL CARRIL EL PUBLICA LA CAPÇALERA. `--hg-band-w` es el tram del logo a la
-     icona d'usuari, i la capçalera el calcula i el publica a l'arrel: 1270 a
-     1920, 953 a 1440, 933 a 1280 i 1024, i 688 a 768. La pagina NO el deriva: el
-     llegeix, i aixi el contingut i la capçalera comencen i acaben al mateix lloc
-     a TOTES les vistes.
+  --contingut-max: min(70.3125vw, 1350px);
 
-     El valor de reserva (el `min(...)`) es nomes per al primer pintat, abans que
-     la capçalera publiqui el seu: a 1920 dona 1.264,5, que es el tram mesurat.
+  /* EL CARRIL DE LA PAGINA NOVA: EL TRAM DEL LOGO A LA ICONA D'USUARI.
+     La capçalera el publica com a `--hg-band-w` (1270 a 1920, 953 a 1440, 933 a
+     1280 i 1024, i 688 a 768), i la pagina nova el llegeix en comptes de
+     derivar-lo. El valor de reserva nomes s'usa abans que la capçalera el
+     publiqui, i a 1920 dona 1.264,5, que es el tram mesurat.
 
-     ABANS el carril era `min(70.3125vw, 1350px)` i no coincidia amb la
-     capçalera: el contingut en sobresortia 85,5 px per banda a 1920, i a 1280 i
-     1024 la diferencia era mes gran encara (900 i 960 contra 933). */
-  --contingut-max: var(--hg-band-w, min(65.86vw, 1264.5px));
+     PER QUE ES UNA VARIABLE A PART I NO `--contingut-max`. `--contingut-max` es
+     GLOBAL i la fan servir totes les pagines: canviar-la mou el carril de tot el
+     lloc. Ja va passar dues vegades, i la segona es va emportar la pagina vella
+     sencera (alcada de 6932 a 6778, fitxes de 321x505 a 301x485). Posant-ho en
+     una variable propia, la pagina nova mana el seu carril i no toca el dels
+     altres. */
+  --inici-nou-carril: var(--hg-band-w, min(65.86vw, 1264.5px));
 
   /* LA UNITAT, SOBRE EL CARRIL. `--u` es la unitat de disseny, i val el carril
      dividit per 1350: a 1920, 1 px.
@@ -219,4 +221,15 @@
     /* La hero vertical es un pèl mes alta que ampla: 541 x 430. */
     aspect-ratio: 952 / 430;
   }
+}
+
+/* ---------------------------------------------------------------------------
+   EL CARRIL DE LA PAGINA NOVA
+   Dins del seu marc, `--contingut-max` passa a ser el carril de l'inici: el tram
+   del logo a la icona d'usuari. Aixi `.hg-carril` i `.hg-marc__contingut` el
+   fan servir sense que calgui tocar cap classe, i la resta del lloc no se
+   n'assabenta.
+   ------------------------------------------------------------------------- */
+[data-inici-nou="1"] {
+  --contingut-max: var(--inici-nou-carril);
 }
