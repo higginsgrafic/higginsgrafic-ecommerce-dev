@@ -13,9 +13,9 @@ dispositiu a mitges, i **quines fronteres** (breakpoints) els assignen el seu
 disseny. L'objectiu no és triar amplades boniques: és que cap aparell real quedi
 en un forat entre dues regles.
 
-Estat: **46 formats** inventariats i mesurats amb `scripts/mesura-formats.mjs`
+Estat: **48 formats** inventariats i mesurats amb `scripts/mesura-formats.mjs`
 (`node scripts/mesura-formats.mjs` amb el servidor al 3003). D'aquests, **6
-queden avui sense cap manera d'obrir el cistell** i **17 no veuen la pàgina nova
+queden avui sense cap manera d'obrir el cistell** i **18 no veuen la pàgina nova
 perquè encara no tenen vista per sota de 768 px** (els 16 telèfons i les 6
 tauletes de 533 a 744, menys els apaïsats de 832 en amunt).
 
@@ -116,7 +116,14 @@ mesurat són **6 formats sense cap accés al cistell**:
 | 613×981 | Huawei MatePad Pro 12,2" | 123 |
 | 616×1024 | Galaxy Tab S9 Ultra | 123 |
 | 640×1024 | Huawei MatePad Pro 13,2" | 123 |
-| 744×1133 | **iPad mini 6** | 123 |
+| 744×1133 | iPad mini 6 | 123 |
+
+L'iPad mini **sí que té actualitzacions** (el mini 7, amb A17 Pro, és d'octubre
+de 2024 i iPadOS 26 el suporta), però la seva quota és petita i es pot
+desprioritzar. **Això no tanca el forat**, perquè el forat és el RANG 600–767 i
+no un aparell: si es deixa de banda el mini, hi queden els MatePad (613, 640),
+el Tab S9 Ultra (616) en vertical i, sobretot, els **telèfons en apaïsat** —
+l'iPhone SE 2/3, que és a iOS 26, i els Android 16:9.
 
 En apaïsat, a més, aquesta franja no cau en cap de les quatre categories i va a
 petar a `ALCADA_CAPCALERA_ESTRETA = 64`: la capçalera fa 81 px i la pàgina en
@@ -172,7 +179,13 @@ Amplades CSS reals (matriu de dispositius 2025):
 
 **El que això vol dir:**
 
-- **En vertical, 600–767 no és cap telèfon**: és la franja de l'iPad mini (744) i
+- **Compte amb l'alçada del telèfon.** Un Android 20:9 d'avui (360×780 CSS) girat
+fa **780** d'amplada, o sigui que entra a la banda de tauleta apaïsada i té el
+cistell. El que cau al forat és el 16:9 (360×640), que girat fa 640. Mesurat:
+360×780 vertical i 780×360 apaïsat **funcionen**; 360×640 apaïsat i 375×667
+apaïsat (iPhone SE 2/3) **no**.
+
+**En vertical, 600–767 no és cap telèfon**: és la franja de l'iPad mini (744) i
   dels MatePad (613, 640) i Tab S9 Ultra (616). No és inventada.
 - **En apaïsat, 600–767 sí que és un telèfon**: l'iPhone SE/8 girat fa 667×375 i
   l'Android 360 girat 640×360. I són justament els dos que perden el cistell.
@@ -209,10 +222,11 @@ escriptori vol dir tornar a mesurar el nav amb un carril de 900 px.
 
 ## 6. La llista de formats a cobrir (46)
 
-- **Telèfons vertical (9):** 360×640, 375×667, 384×832, 390×844, 393×852,
-  402×874, 412×915, 430×932, 440×956.
-- **Telèfons apaïsat (7):** 640×360, 667×375, 832×384, 844×390, 852×393,
-  915×412, 932×430.
+- **Telèfons vertical (10):** 360×640 (Android 16:9, el mòbil mitjà de sempre),
+  360×780 (Android 20:9 d'avui: Galaxy S25, Xiaomi 14/15), 375×667, 384×832,
+  390×844, 393×852, 402×874, 412×915, 430×932, 440×956.
+- **Telèfons apaïsat (8):** 640×360, **780×360 (el 20:9 girat)**, 667×375,
+  832×384, 844×390, 852×393, 915×412, 932×430.
 - **Tauletes vertical (11):** 533×853, 584×934, 613×981, 616×1024, 640×1024,
   744×1133, 768×1024, 820×1180, 834×1194, 1024×1366, 1032×1376.
 - **Tauletes apaïsades (11):** 853×533, 934×584, 981×613, 1024×616, 1024×640,

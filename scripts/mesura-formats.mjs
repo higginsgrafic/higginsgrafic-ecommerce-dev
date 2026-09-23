@@ -24,7 +24,11 @@ const BASE = process.env.HG_URL || 'http://127.0.0.1:3003';
 // `public/browser-overlay.html`. Alcada de finestra = h - chrome.
 const FORMATS = [
   // --- Telefons, vertical (amplades CSS de la matriu 2025) ---
-  { nom: 'Android 360 (Galaxy S25, Xiaomi)', tipus: 'telefon', w: 360, h: 640, chrome: 132 },
+  // 360x640 es un Android 16:9 (1080x1920 a DPR 3): el mobil mitja de sempre.
+  { nom: 'Android 16:9 360', tipus: 'telefon', w: 360, h: 640, chrome: 132 },
+  // 360x780 es un 20:9 d'avui (1080x2340 a DPR 3: Galaxy S25, Xiaomi 14/15).
+  // La diferencia importa: girat fa 780 d'amplada i NO cau al forat.
+  { nom: 'Android 20:9 360 (Galaxy S25)', tipus: 'telefon', w: 360, h: 780, chrome: 132 },
   { nom: 'iPhone SE/8', tipus: 'telefon', w: 375, h: 667, chrome: 132 },
   { nom: 'Android 384 (Galaxy S24+)', tipus: 'telefon', w: 384, h: 832, chrome: 132 },
   { nom: 'iPhone 12/13/14', tipus: 'telefon', w: 390, h: 844, chrome: 132 },
@@ -34,7 +38,8 @@ const FORMATS = [
   { nom: 'iPhone 15 Plus/Pro Max', tipus: 'telefon', w: 430, h: 932, chrome: 132 },
   { nom: 'iPhone 16/17 Pro Max', tipus: 'telefon', w: 440, h: 956, chrome: 132 },
   // --- Telefons, apaïsat (els mateixos, girats) ---
-  { nom: 'Android 360 apaïsat', tipus: 'telefon-apaïsat', w: 640, h: 360, chrome: 50 },
+  { nom: 'Android 16:9 apaïsat', tipus: 'telefon-apaïsat', w: 640, h: 360, chrome: 50 },
+  { nom: 'Android 20:9 apaïsat (S25)', tipus: 'telefon-apaïsat', w: 780, h: 360, chrome: 50 },
   { nom: 'iPhone SE/8 apaïsat', tipus: 'telefon-apaïsat', w: 667, h: 375, chrome: 50 },
   { nom: 'Android 384 apaïsat', tipus: 'telefon-apaïsat', w: 832, h: 384, chrome: 50 },
   { nom: 'iPhone 12/13/14 apaïsat', tipus: 'telefon-apaïsat', w: 844, h: 390, chrome: 50 },
