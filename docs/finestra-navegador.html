@@ -19,6 +19,15 @@
   COM S'HA DE FER SERVIR. Obre-la, posa el navegador a pantalla completa (F11 o
   Ctrl+Cmd+F) i tria la barra que toca. Si la pantalla no es la que vols, canvia
   la mida de la finestra: el que compta es l'alçada que queda sota la barra.
+
+  I PER INSPECCIONAR-LA AMB EL DEVTOOLS. A `Elements` hi ha un desplegable que
+  diu `top`: tria-hi l'iframe i el DevTools passa a inspeccionar l'aplicacio de
+  dins, amb la finestra de debò. Tambe pots canviar la mida de la barra en
+  directe editant `--barra` a l'element `<html>`.
+
+  PARAMETRES D'URL:
+    ?ruta=/nova/inici   la pagina que es carrega a dins
+    ?barra=150          l'alcada de la barra (130 tauleta, 0 sense barra)
 -->
 <style>
   :root { --barra: 150px; }
@@ -57,7 +66,7 @@
     <div class="pestanyes"><span></span><span></span><span></span></div>
     <div class="adreca" id="adreca">http://127.0.0.1:3003/nova/inici</div>
   </div>
-  <iframe id="app" src="http://127.0.0.1:3003/nova/inici" title="Aplicació"></iframe>
+  <iframe id="app" src="http://127.0.0.1:3003/nova/inici" title="Aplicació" data-finestra-app="1"></iframe>
 </div>
 
 <div class="controls">
@@ -68,6 +77,21 @@
 </div>
 
 <script>
+  const BASE = 'http://127.0.0.1:3003';
+  const sp = new URLSearchParams(window.location.search);
+  const ruta = (() => {
+    const r = (sp.get('ruta') || '/nova/inici').trim();
+    return r.startsWith('/') ? r : '/' + r;
+  })();
+  const barraInicial = (() => {
+    const b = sp.get('barra');
+    if (b === null) return 150;
+    const n = Number(b);
+    return Number.isFinite(n) && n >= 0 ? Math.min(400, n) : 150;
+  })();
+  document.getElementById('app').src = BASE + ruta;
+  document.getElementById('adreca').textContent = BASE + ruta;
+
   const body = document.body;
   const mesura = document.getElementById('mesura');
   const posa = (px) => {
@@ -87,7 +111,7 @@
     b.addEventListener('click', () => posa(Number(b.dataset.barra)));
   }
   window.addEventListener('resize', pinta);
-  pinta();
+  posa(barraInicial);
 </script>
 </body>
 </html>
