@@ -81,3 +81,8 @@ export const AdminInvoiceEditorPage = lazy(() => import('@/pages/AdminInvoiceEdi
 export const AdminInvoiceTestEditorPage = lazy(() => import('@/pages/AdminInvoiceTestEditorPage'));
 export const AdminTestToolsPage = lazy(() => import('@/pages/AdminTestToolsPage'));
 export const MegaslideIconsTestPage = lazy(() => import('@/pages/MegaslideIconsTestPage'));
+
+// L'inici nou: es construeix al costat de `/`, darrere la ruta `/nova/inici`
+// (PLA-arquitectura-nova.md §6). Quan compleixi la porta de sortida es canvia
+// la ruta de `/` en un sol commit.
+export const IniciNou = lazy(() => import('@/pages/IniciNou'));
