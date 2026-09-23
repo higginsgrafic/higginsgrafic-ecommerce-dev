@@ -1,47 +1,30 @@
-
+import { useMemo } from 'react';
+import { Link } from 'react-router-dom';
+import { buildHeroStripePlan, DARK_COLORS } from '@/components/home/homeDrawings';
 
 /**
  * LA HERO DE L'INICI NOU.
  *
- * NOMES LA CAIXA. El contingut (el carrusel de diapositives) encara no hi es:
- * aquesta passa fixa la MIDA i la POSICIO, que es el que la hero vella te
- * resolt amb tres coses que no volem arrossegar:
+ * CINC FRANGES, una per colleccio, en una caixa que omple el carril i te la
+ * proporcio 952 / 401 (la de la pagina vella, mesurada a les cinc mides).
  *
- *   1. `transform: scale(0.705)`: la mida VISIBLE era la caixa multiplicada per
- *      0,705, o sigui que l'escala era qui definia la mida i no la caixa. Aqui
- *      la caixa FA DIRECTAMENT la mida final (952 i no 1351), i l'escala
- *      desapareix amb el seu `transform-origin` i el seu efecte sobre els fills.
- *   2. Una posicio `top: calc(-5px - 19px - 50px ...)` de cinc sumands, i un
- *      `heroOffsetPx` que es mesurava des de JavaScript amb correccio
- *      iterativa. Aqui no hi ha cap `top`: la hero es un bloc en flux.
- *   3. L'alcada presa d'una graella de 24 files de llenç (`gridRow: 10 / 25`).
- *      Aqui l'alcada es la proporcio mesurada de la propia caixa, 952 / 401,
- *      que reprodueix la mida vella a totes les mides d'escriptori.
+ * COM ES FA UNA FRANJA. Les cinc franges son el MATEIX mockup apilat: la imatge
+ * fa el 500 % de l'alcada de la franja i cada franja ensenya la seva porcio
+ * desplaçant-la un 20 % mes. Es com ho fa la pagina vella, i per aixo les
+ * samarretes de les cinc franges son la mateixa peça en cinc colors.
  *
- * VA AL CARRIL, NO DINS DEL CONTINGUT AMB MARGE. L'amplada de la caixa surt del
- * carril de 1350 (952 = el 70,5 %), i aixo nomes es cert si el pare es el carril
- * sencer. Dins de `.hg-marc__contingut`, que te `--marge-lateral` a dins, el
- * pare fa 1270 i la caixa en sortiria 895: MESURAT, i era l'errada que hi havia.
+ * A SOBRE DE LA SAMARRETA hi ha el dibuix de la colleccio, i a sobre el text:
+ * el nom de la colleccio i, quan en te, la subcolleccio.
  *
- * L'ALCADA. A escriptori es la proporcio (952 / 401 = 2,3728, mesurada a 1920,
- * 1440, 1280 i 1024). A la vista vertical NO: alla la caixa fa 541 x 430, una
- * alcada FIXA que no ve de la proporcio, i per aixo te la seva propia regla
- * d'orientacio.
+ * EL TEXT ES POSA EN BLANC O EN NEGRE segons el color de la samarreta: els
+ * colors foscos (`DARK_COLORS`) porten el dibuix en blanc i el text clar.
  *
- * TODO: el contingut (les cinc diapositives amb la franja de color, el titol i
- * les icones), que ha de viure DINS d'aquesta caixa i escalar amb ella.
+ * EL QUE ENCARA NO HI ES: el botó de barrejar (el `Shuffle` de la pagina vella)
+ * i les transicions entre plans. El pla es calcula un cop per muntatge.
  */
 function HeroInici() {
+  const franges = useMemo(() => buildHeroStripePlan(), []);
   return (
-    // LA HERO OMPLE EL CARRIL SENCER, sense aire interior.
-    //
-    // ABANS HI HAVIA UN AIRE INTERIOR del 14,74 % a cada costat: el complement
-    // del `scale(0.705)` de la pagina vella, que feia que la caixa nomes en fos
-    // el 70,5 %. L'amo demana que la hero arribi a les dues vores del carril, i
-    // per tant l'aire marxa.
-    //
-    // El bloc es `hg-carril`: l'amplada la mana el carril (que la capçalera
-    // publica) i l'alcada surt de la proporcio de la caixa.
     <div
       data-hero-inici="1"
       className="hg-carril"
@@ -50,27 +33,94 @@ function HeroInici() {
       <div
         data-hero-caixa="1"
         className="hg-hero-caixa"
+        data-franges={franges.length}
         style={{
-          background: 'hsl(var(--muted))',
           display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          color: 'hsl(var(--muted-foreground))',
-          fontFamily: 'Roboto Condensed, sans-serif',
-          fontSize: '0.875rem',
-          letterSpacing: '0.08em',
-          textTransform: 'uppercase',
-          // L'amplada i l'alcada (la proporcio, amb la seva excepcio vertical)
-          // les declara `foundation.css` a `.hg-hero-caixa`: son geometria, i el
-          // seu lloc es alla.
-          //
-          // Sense `overflow: hidden` ni radi: les dues coses eren de la hero
-          // vella (retallar el contingut escalat, i un radi que canviava per
-          // dispositiu). Son decisions de dibuix, i es prendran amb el
-          // contingut a dins, no abans.
+          // Les cinc franges, al costat, i cadascuna te la mateixa amplada.
+          flexDirection: 'row',
+          overflow: 'hidden',
         }}
       >
-        Hero
+        {franges.map((band, i) => {
+          const esFosc = DARK_COLORS.has(band.color);
+          const text = esFosc ? '#FFFFFF' : '#111827';
+          const href = band.productHref || band.collectionHref;
+          return (
+            <Link
+              key={`${band.drawingId}-${i}`}
+              to={href}
+              data-franja={i + 1}
+              data-colleccio={band.collectionSlug}
+              title={band.collectionName}
+              style={{
+                flex: '1 1 0',
+                position: 'relative',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                overflow: 'hidden',
+                background: '#FFFFFF',
+                textDecoration: 'none',
+              }}
+            >
+              {/* LA SAMARRETA: la porcio que li toca del mockup apilat. */}
+              <div
+                aria-hidden="true"
+                style={{
+                  position: 'absolute',
+                  left: 0,
+                  right: 0,
+                  top: 0,
+                  height: '500%',
+                  backgroundImage: `url(${band.mockupSrc})`,
+                  backgroundSize: 'auto 100%',
+                  backgroundPosition: 'center top',
+                  backgroundRepeat: 'no-repeat',
+                  transform: `translateY(-${i * 20}%)`,
+                  pointerEvents: 'none',
+                }}
+              />
+              {/* EL DIBUIX de la colleccio, a sobre de la samarreta. */}
+              {band.overlaySrc ? (
+                <div
+                  aria-hidden="true"
+                  style={{
+                    position: 'absolute',
+                    left: 0,
+                    right: 0,
+                    top: 0,
+                    height: '500%',
+                    backgroundImage: `url(${band.overlaySrc})`,
+                    backgroundSize: `auto ${(band.overlayScale ? band.overlayScale * 100 : 30)}%`,
+                    backgroundPosition: 'center 35%',
+                    backgroundRepeat: 'no-repeat',
+                    transform: `translateY(-${i * 20}%)`,
+                    pointerEvents: 'none',
+                    opacity: 0.95,
+                  }}
+                />
+              ) : null}
+              {/* EL TEXT: la colleccio i, si en te, la subcolleccio. */}
+              <span
+                style={{
+                  position: 'relative',
+                  zIndex: 2,
+                  padding: '0 8px',
+                  fontFamily: 'Oswald, sans-serif',
+                  fontSize: 'clamp(9px, 1.05vw, 15px)',
+                  fontWeight: 600,
+                  letterSpacing: '0.12em',
+                  textTransform: 'uppercase',
+                  color: text,
+                  textAlign: 'center',
+                  textShadow: esFosc ? '0 1px 2px rgba(0,0,0,0.35)' : '0 1px 2px rgba(255,255,255,0.35)',
+                }}
+              >
+                {band.subName ? `${band.collectionName} / ${band.subName}` : band.collectionName}
+              </span>
+            </Link>
+          );
+        })}
       </div>
     </div>
   );
