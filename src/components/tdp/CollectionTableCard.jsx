@@ -161,11 +161,15 @@ function CollectionTableCard({
         justifyContent: 'center',
         // L'aire de dalt i de baix de la imatge. Es el que separa la samarreta
         // del nom i del preu: les files van enganxades (buit 0) i tota la
-        // separacio la fa aquest padding. Amb 6 px l'aire era de 27 px a 1920,
-        // dels quals 17 son marge propi del mockup (la samarreta ocupa el 93 %
-        // del seu quadre). Puja'l si cal mes aire; a canvi la imatge encongeix,
-        // perque la fila es quadrada i l'amplada menys el padding mana.
+        // separacio la fa aquest padding.
         padding: '8px 12px',
+        // Les files de la fitxa van enganxades (buit 0). L'aire fins al nom i
+        // fins al preu es de 25 px a cada costat (decisio de l'amo), comptat
+        // des de la FILA de la imatge. El marge de baix es 13 i no 25 perque
+        // els 12 px del requadre de la samarreta (el dibuix no arriba al fons
+        // del requadre) ja hi son i no es veuen com a marge.
+        marginTop: 0,
+        marginBottom: '13px',
         position: 'relative',
       }}
     >
