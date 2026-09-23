@@ -16,6 +16,7 @@ import { esTauletaApaisada } from '@/utils/layoutMetrics';
 import { laneForViewport } from '@/utils/layoutModel';
 import { tdpMidaFitxa, tdpMargeEsquerre } from '@/utils/tdpMida';
 import { LLENCOS } from '@/config/llencos';
+import { TDP_MIDES_INTERIOR } from '@/config/collectionVertical';
 import {
   getCollectionVerticalConfig,
   COLLECTIONS_MENU,
@@ -155,13 +156,15 @@ function CollectionVerticalPage({ slug }) {
   // cistell era fix (34 px) i el preu depenia de la finestra
   // (`responsiveFont(24, 9)`), aixi que a 768 el cistell era mes ample que el
   // text del preu i el selector de talles quedava comprimit.
+  // Les mides interiors surten de la constant compartida amb l'inici: son les
+  // MATEIXES proporcions, i per aixo no poden divergir.
   const midesFitxa = {
-    sizeSelectorWidth: `${Math.round(ampladaFitxa * 0.72)}px`,
-    sizeSelectorHeight: `${Math.round(ampladaFitxa * 0.2)}px`,
-    sizeFontPx: Math.round(ampladaFitxa * 0.07),
-    textFontPx: Math.round(ampladaFitxa * 0.095),
-    cartSizePx: Math.round(ampladaFitxa * 0.15),
-    priceGap: `${Math.round(ampladaFitxa * 0.1)}px`,
+    sizeSelectorWidth: `${Math.round(ampladaFitxa * TDP_MIDES_INTERIOR.selectorAmplada)}px`,
+    sizeSelectorHeight: `${Math.round(ampladaFitxa * TDP_MIDES_INTERIOR.selectorAlcada)}px`,
+    sizeFontPx: Math.round(ampladaFitxa * TDP_MIDES_INTERIOR.selectorFont),
+    textFontPx: Math.round(ampladaFitxa * TDP_MIDES_INTERIOR.text),
+    cartSizePx: Math.round(ampladaFitxa * TDP_MIDES_INTERIOR.cistell),
+    priceGap: `${Math.round(ampladaFitxa * TDP_MIDES_INTERIOR.preuGap)}px`,
   };
 
   // Desplaçament de la graella perque la primera fitxa quedi sota la hero.
@@ -635,11 +638,13 @@ function CollectionVerticalPage({ slug }) {
             // Files de 11 espais + 2 de separacio: el gap entre files de fitxes
             // queda a la meitat.
             const rowOffset = 10 + rowIdx * TDP_PITCH_FILES;
+            // Sense `alcada`: la fitxa la treu del seu contingut (la fila de la
+            // imatge es quadrada). Amb una alcada clavada, la fila quedava mes
+            // baixa que ampla i la samarreta no arribava a l'amplada (62 %).
             const cardGeometry = {
               top: rowIdx * alcadaFila,
               left: Math.round(margeEsquerre + colIdx * pasColumna),
               amplada: ampladaFitxa,
-              alcada: alcadaFitxa,
             };
             const productName = producte.name;
             const { imageTranslateY, productNameTranslateY, descriptionTranslateY } = getCardLayout(colIdx);
