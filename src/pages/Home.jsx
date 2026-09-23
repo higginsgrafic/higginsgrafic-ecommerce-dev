@@ -13,7 +13,7 @@ import StoryPosterLink from '@/components/StoryPosterLink';
 import useIsMobile from '@/hooks/useIsMobile';
 import HomeMobile from '@/pages/HomeMobile';
 import { SELLING_PRICE_LABEL } from '@/config/pricing';
-import { HOME_TITOL_TDP_MARGIN_PX, HOME_GALERIA_TOP_PX, HOME_PILL_AIRE_FACTOR, TDP_MIDES_INTERIOR, COLLECTION_BG_SRC } from '@/config/collectionVertical';
+import { HOME_TITOL_TDP_MARGIN_PX, HOME_GALERIA_TOP_PX, TDP_MIDES_INTERIOR, COLLECTION_BG_SRC } from '@/config/collectionVertical';
 import { esTauletaApaisada } from '@/utils/layoutMetrics';
 import { laneForViewport } from '@/utils/layoutModel';
 import { tdpMidaFitxa } from '@/utils/tdpMida';
@@ -289,52 +289,6 @@ function Home() {
   // el contingut de la fitxa era mes ample que la columna.
   const tdpGridColumns = `repeat(${midaTdpHome.columnes}, minmax(0, 1fr))`;
 
-  // Les pindoles «en vols saber mes?»: cada una ha de pujar perque deixi la
-  // MEITAT de l'aire que te sobre la caixa de la seva targeta. L'aire depen del
-  // padding del bloc que les conte i canvia amb la mida, i per aixo es MESURA i
-  // no es calcula: intentar-ho amb una formula donava 20 px d'error a 1920 i
-  // 189 a 768. L'aire es el MATEIX a les cinc galeries (mesurat), aixi que n'hi
-  // ha prou de mesurar-ne una.
-  const pillRef = useRef(null);
-  // L'aire de referencia (el que hi ha SENSE desplaçament). Es guarda perque la
-  // mesura no es torni a comptar a si mateixa cada cop que el desplaçament
-  // canvia: si es recalcula sobre l'aire ja desplaçat, el resultat s'enfonsa.
-  const aireBaseRef = useRef(null);
-  const [pillShiftPx, setPillShiftPx] = useState(0);
-  // El bloc de la galeria s'encongeix el que s'ha tret de sota la pindola, i
-  // aixo es el que APROPA les colleccions: l'aire de sota el recull el bloc,
-  // no la pindola.
-  const [galeriaShrinkPx, setGaleriaShrinkPx] = useState(0);
-
-  useLayoutEffect(() => {
-    const mesura = () => {
-      const pill = pillRef.current;
-      if (!pill) return;
-      const grup = pill.offsetParent;
-      const fitxa = grup ? grup.querySelector('[aria-label="TDP taula"]') : null;
-      if (!fitxa) return;
-      const aire = pill.getBoundingClientRect().y - fitxa.getBoundingClientRect().bottom;
-      // Un aire absurd vol dir que la mesura no es de fiar: no s'aplica res.
-      if (!Number.isFinite(aire) || aire <= 0 || aire > 1200) return;
-      // Nomes es pren la referencia el primer cop de cada disposicio.
-      if (aireBaseRef.current == null) aireBaseRef.current = aire;
-      const base = aireBaseRef.current;
-      const shift = Math.round(base * (1 - HOME_PILL_AIRE_FACTOR));
-      setPillShiftPx((prev) => (Math.abs(prev - shift) < 1 ? prev : shift));
-      // El marge negatiu del bloc es DERIVA del desplaçament de la pindola, que
-      // es l'única mesura estable d'aquesta pantalla. Intentar mesurar l'aire de
-      // sota dona valors inestables (288 o 444 a 1920 segons quan es miri) i el
-      // resultat s'enfonsava fins a fer col·lidir la pindola amb el titol.
-      setGaleriaShrinkPx((prev) => (Math.abs(prev - shift) < 1 ? prev : shift));
-    };
-    mesura();
-    window.addEventListener('resize', mesura);
-    const t = setTimeout(mesura, 300);
-    return () => {
-      window.removeEventListener('resize', mesura);
-      clearTimeout(t);
-    };
-  }, [midaTdpHome.amplada, midaTdpHome.alcada, isTablet]);
 
   // Desplaçament de la hero de l'inici perque el seu fons quedi a 20 px del
   // fons de la finestra, NOMES a la vista vertical. Es mesura un cop, abans del
@@ -487,7 +441,6 @@ function Home() {
   const portraitTabletTdpGridStyle = isPortraitTablet
     ? {
         width: 'calc(var(--hg-tdp-xR) - var(--hg-tdp-xL))',
-        height: '752px',
         gridTemplateColumns: tdpGridColumns,
       }
     : {};
@@ -810,15 +763,15 @@ function Home() {
                 top: `${HOME_GALERIA_TOP_PX}px`,
                 transform: 'translateX(-50%)',
                 width: 'calc(var(--hg-tdp-xR) - var(--hg-tdp-xL))',
-                height: 'calc(calc(calc(var(--hg-tdp-xR) - var(--hg-tdp-xL)) * 0.84632) - 231px)',
+                // L'alcada la mana el CONTINGUT (les fitxes). ERA la formula
+                // `carril * 0.84632 - 231`, que no te res a veure amb la mida de
+                // la fitxa: a 1280 i 1024 era MES CURTA que la fitxa i la pindola
+                // hi quedava A SOBRE (28 i 58 px de xoc).
+                height: 'auto',
                 display: 'grid',
                 gridTemplateColumns: tdpGridColumns,
                 columnGap: '22.5px',
                 ...portraitTabletTdpGridStyle,
-                // El bloc s'encongeix el que s'ha tret de sota la pindola: es
-                // el que APROPA aquesta colleccio de la seguent, perque l'aire
-                // de sota el recull el bloc i no la pindola.
-                marginBottom: galeriaShrinkPx ? `-${galeriaShrinkPx}px` : undefined,
               }}
             >
               {/* Columna 1: TDP2 */}
@@ -835,14 +788,14 @@ function Home() {
               {/* Indicador de més productes (Pill amb text sota el producte de la tercera columna) */}
               <Link
                 to="/first-contact"
-                ref={pillRef}
                 style={{
-                  // El desplaçament mesurat, publicat com a variable perque el
-                  // `bottom` es una expressio `calc()` i no es pot compondre a ma.
-                  '--hg-pill-shift': `${pillShiftPx}px`,
                   position: 'absolute',
                   left: '50%',
-                  bottom: `calc((calc(calc(var(--hg-tdp-xR) - var(--hg-tdp-xL)) * 0.84632 - 231px) - calc(calc(calc(var(--hg-tdp-xR) - var(--hg-tdp-xL)) - 45px) / 3 * 1.3)) / 2 - 14px + var(--hg-pill-shift, 0px))`,
+                  // 25 px sota la caixa de la targeta, DECLARAT: el bloc de la
+                  // galeria fa l'alcada de la fitxa, i per tant `100%` es el fons de
+                  // la caixa. Abans aixo era una formula amb el -231 mes una mesura
+                  // des de JavaScript.
+                  top: 'calc(100% + 25px)',
                   height: 'auto',
                   width: 'auto',
                   borderRadius: '9999px',
@@ -915,15 +868,15 @@ function Home() {
                   top: `${HOME_GALERIA_TOP_PX}px`,
                   transform: 'translateX(-50%)',
                   width: 'calc(var(--hg-tdp-xR) - var(--hg-tdp-xL))',
-                  height: 'calc(calc(calc(var(--hg-tdp-xR) - var(--hg-tdp-xL)) * 0.84632) - 231px)',
+                  // L'alcada la mana el CONTINGUT (les fitxes). ERA la formula
+                  // `carril * 0.84632 - 231`, que no te res a veure amb la mida de
+                  // la fitxa: a 1280 i 1024 era MES CURTA que la fitxa i la pindola
+                  // hi quedava A SOBRE (28 i 58 px de xoc).
+                  height: 'auto',
                   display: 'grid',
                   gridTemplateColumns: tdpGridColumns,
                   columnGap: '22.5px',
                   ...portraitTabletTdpGridStyle,
-                // El bloc s'encongeix el que s'ha tret de sota la pindola: es
-                // el que APROPA aquesta colleccio de la seguent, perque l'aire
-                // de sota el recull el bloc i no la pindola.
-                marginBottom: galeriaShrinkPx ? `-${galeriaShrinkPx}px` : undefined,
                 }}
               >
                 {/* Columna 1: TDP1 */}
@@ -941,12 +894,13 @@ function Home() {
               <Link
                 to="/the-human-inside"
                 style={{
-                  // El desplaçament mesurat, publicat com a variable perque el
-                  // `bottom` es una expressio `calc()` i no es pot compondre a ma.
-                  '--hg-pill-shift': `${pillShiftPx}px`,
                   position: 'absolute',
                   left: '50%',
-                  bottom: `calc((calc(calc(var(--hg-tdp-xR) - var(--hg-tdp-xL)) * 0.84632 - 231px) - calc(calc(calc(var(--hg-tdp-xR) - var(--hg-tdp-xL)) - 45px) / 3 * 1.3)) / 2 - 14px + var(--hg-pill-shift, 0px))`,
+                  // 25 px sota la caixa de la targeta, DECLARAT: el bloc de la
+                  // galeria fa l'alcada de la fitxa, i per tant `100%` es el fons de
+                  // la caixa. Abans aixo era una formula amb el -231 mes una mesura
+                  // des de JavaScript.
+                  top: 'calc(100% + 25px)',
                   height: 'auto',
                   width: 'auto',
                   borderRadius: '9999px',
@@ -1020,15 +974,15 @@ function Home() {
                   top: `${HOME_GALERIA_TOP_PX}px`,
                   transform: 'translateX(-50%)',
                   width: 'calc(var(--hg-tdp-xR) - var(--hg-tdp-xL))',
-                  height: 'calc(calc(calc(var(--hg-tdp-xR) - var(--hg-tdp-xL)) * 0.84632) - 231px)',
+                  // L'alcada la mana el CONTINGUT (les fitxes). ERA la formula
+                  // `carril * 0.84632 - 231`, que no te res a veure amb la mida de
+                  // la fitxa: a 1280 i 1024 era MES CURTA que la fitxa i la pindola
+                  // hi quedava A SOBRE (28 i 58 px de xoc).
+                  height: 'auto',
                   display: 'grid',
                   gridTemplateColumns: tdpGridColumns,
                   columnGap: '22.5px',
                   ...portraitTabletTdpGridStyle,
-                // El bloc s'encongeix el que s'ha tret de sota la pindola: es
-                // el que APROPA aquesta colleccio de la seguent, perque l'aire
-                // de sota el recull el bloc i no la pindola.
-                marginBottom: galeriaShrinkPx ? `-${galeriaShrinkPx}px` : undefined,
                 }}
               >
                 {/* Columna 1: TDP2 */}
@@ -1046,12 +1000,13 @@ function Home() {
               <Link
                 to="/austen"
                 style={{
-                  // El desplaçament mesurat, publicat com a variable perque el
-                  // `bottom` es una expressio `calc()` i no es pot compondre a ma.
-                  '--hg-pill-shift': `${pillShiftPx}px`,
                   position: 'absolute',
                   left: '50%',
-                  bottom: `calc((calc(calc(var(--hg-tdp-xR) - var(--hg-tdp-xL)) * 0.84632 - 231px) - calc(calc(calc(var(--hg-tdp-xR) - var(--hg-tdp-xL)) - 45px) / 3 * 1.3)) / 2 - 14px + var(--hg-pill-shift, 0px))`,
+                  // 25 px sota la caixa de la targeta, DECLARAT: el bloc de la
+                  // galeria fa l'alcada de la fitxa, i per tant `100%` es el fons de
+                  // la caixa. Abans aixo era una formula amb el -231 mes una mesura
+                  // des de JavaScript.
+                  top: 'calc(100% + 25px)',
                   height: 'auto',
                   width: 'auto',
                   borderRadius: '9999px',
@@ -1125,15 +1080,15 @@ function Home() {
                   top: `${HOME_GALERIA_TOP_PX}px`,
                   transform: 'translateX(-50%)',
                   width: 'calc(var(--hg-tdp-xR) - var(--hg-tdp-xL))',
-                  height: 'calc(calc(calc(var(--hg-tdp-xR) - var(--hg-tdp-xL)) * 0.84632) - 231px)',
+                  // L'alcada la mana el CONTINGUT (les fitxes). ERA la formula
+                  // `carril * 0.84632 - 231`, que no te res a veure amb la mida de
+                  // la fitxa: a 1280 i 1024 era MES CURTA que la fitxa i la pindola
+                  // hi quedava A SOBRE (28 i 58 px de xoc).
+                  height: 'auto',
                   display: 'grid',
                   gridTemplateColumns: tdpGridColumns,
                   columnGap: '22.5px',
                   ...portraitTabletTdpGridStyle,
-                // El bloc s'encongeix el que s'ha tret de sota la pindola: es
-                // el que APROPA aquesta colleccio de la seguent, perque l'aire
-                // de sota el recull el bloc i no la pindola.
-                marginBottom: galeriaShrinkPx ? `-${galeriaShrinkPx}px` : undefined,
                 }}
               >
                 {/* Columna 1: TDP1 */}
@@ -1151,12 +1106,13 @@ function Home() {
               <Link
                 to="/cube"
                 style={{
-                  // El desplaçament mesurat, publicat com a variable perque el
-                  // `bottom` es una expressio `calc()` i no es pot compondre a ma.
-                  '--hg-pill-shift': `${pillShiftPx}px`,
                   position: 'absolute',
                   left: '50%',
-                  bottom: `calc((calc(calc(var(--hg-tdp-xR) - var(--hg-tdp-xL)) * 0.84632 - 231px) - calc(calc(calc(var(--hg-tdp-xR) - var(--hg-tdp-xL)) - 45px) / 3 * 1.3)) / 2 - 14px + var(--hg-pill-shift, 0px))`,
+                  // 25 px sota la caixa de la targeta, DECLARAT: el bloc de la
+                  // galeria fa l'alcada de la fitxa, i per tant `100%` es el fons de
+                  // la caixa. Abans aixo era una formula amb el -231 mes una mesura
+                  // des de JavaScript.
+                  top: 'calc(100% + 25px)',
                   height: 'auto',
                   width: 'auto',
                   borderRadius: '9999px',
@@ -1230,15 +1186,15 @@ function Home() {
                   top: `${HOME_GALERIA_TOP_PX}px`,
                   transform: 'translateX(-50%)',
                   width: 'calc(var(--hg-tdp-xR) - var(--hg-tdp-xL))',
-                  height: 'calc(calc(calc(var(--hg-tdp-xR) - var(--hg-tdp-xL)) * 0.84632) - 231px)',
+                  // L'alcada la mana el CONTINGUT (les fitxes). ERA la formula
+                  // `carril * 0.84632 - 231`, que no te res a veure amb la mida de
+                  // la fitxa: a 1280 i 1024 era MES CURTA que la fitxa i la pindola
+                  // hi quedava A SOBRE (28 i 58 px de xoc).
+                  height: 'auto',
                   display: 'grid',
                   gridTemplateColumns: tdpGridColumns,
                   columnGap: '22.5px',
                   ...portraitTabletTdpGridStyle,
-                // El bloc s'encongeix el que s'ha tret de sota la pindola: es
-                // el que APROPA aquesta colleccio de la seguent, perque l'aire
-                // de sota el recull el bloc i no la pindola.
-                marginBottom: galeriaShrinkPx ? `-${galeriaShrinkPx}px` : undefined,
                 }}
               >
                 {/* Columna 1: TDP2 */}
@@ -1256,12 +1212,13 @@ function Home() {
               <Link
                 to="/miscellania"
                 style={{
-                  // El desplaçament mesurat, publicat com a variable perque el
-                  // `bottom` es una expressio `calc()` i no es pot compondre a ma.
-                  '--hg-pill-shift': `${pillShiftPx}px`,
                   position: 'absolute',
                   left: '50%',
-                  bottom: `calc((calc(calc(var(--hg-tdp-xR) - var(--hg-tdp-xL)) * 0.84632 - 231px) - calc(calc(calc(var(--hg-tdp-xR) - var(--hg-tdp-xL)) - 45px) / 3 * 1.3)) / 2 - 14px + var(--hg-pill-shift, 0px))`,
+                  // 25 px sota la caixa de la targeta, DECLARAT: el bloc de la
+                  // galeria fa l'alcada de la fitxa, i per tant `100%` es el fons de
+                  // la caixa. Abans aixo era una formula amb el -231 mes una mesura
+                  // des de JavaScript.
+                  top: 'calc(100% + 25px)',
                   height: 'auto',
                   width: 'auto',
                   borderRadius: '9999px',
