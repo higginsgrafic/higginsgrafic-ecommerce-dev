@@ -321,8 +321,6 @@ function CollectionTableCard({
               width: `${cartSizePx ?? TDP_CART_SIZE_SETTINGS.fontSize}px`,
               height: `${cartSizePx ?? TDP_CART_SIZE_SETTINGS.fontSize}px`,
               objectFit: 'contain',
-              // Tres px mes amunt, a ma (decisio de l'amo).
-              transform: 'translateY(-3px)',
             }}
           />
         </button>

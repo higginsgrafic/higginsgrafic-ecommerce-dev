@@ -192,10 +192,17 @@ export const TDP_MIDES_INTERIOR = {
   // El cistell: el seu SVG te el DIBUIX a la part de baix del requadre. El
   // `viewBox` es `0 0 70 69` i el dibuix comenca a y=12, o sigui que nomes
   // ocupa el 78 % de l'alcada del requadre (mesurat amb el fitxer; el ple-1 i
-  // el ple-2 en fan el 94 %). Amb 0,077 el requadre feia 25 px i el cistell
-  // PINTAT nomes 19,5, contra 24,5 dels digits del preu: per aixo es veia
-  // petit. Amb 0,098 el dibuix fa l'alcada dels digits.
-  cistell: 0.098,
+  // el ple-2 en fan el 94 %).
+  //
+  // El NUMERO diu una cosa i l'ULL una altra, i mana l'ull: amb 0,098 el
+  // dibuix ja feia 24,1 px contra uns 19,4 px d'alcada dels digits, i per tant
+  // era numericament MES ALT que el text. Pero el cistell es baix i ample (una
+  // cistella plana) i a ull semblava petit. Amb 0,125 el dibuix fa uns 30 px i
+  // es veu del tamany del text.
+  //
+  // ATENCIO: els altres dos SVG (`v3-ple-1` i `v3-ple-2`) tenen NOMES un 6 %
+  // de marge, aixi que amb el carreto ple el dibuix surt mes gran que el buit.
+  cistell: 0.125,
   preuGap: 0.1,
 };
 
