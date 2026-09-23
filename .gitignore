@@ -81,3 +81,7 @@ docs/comparacio/
 
 # Estat i registres del llançador de sessió (tools/sessio/sessio.sh)
 tools/sessio/.state/
+
+# Els PNG dels marcs de navegador son el pas intermedi del generador
+# (`scripts/generate-browser-frames.py`): el que es publica es el WebP.
+public/browser-frames/*.png

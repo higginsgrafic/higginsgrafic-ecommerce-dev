@@ -10,6 +10,11 @@ import os
 OUT_DIR = os.path.join(os.path.dirname(__file__), '..', 'public', 'browser-frames')
 os.makedirs(OUT_DIR, exist_ok=True)
 
+# Costat mes llarg de les captures WebP. Totes les que fa servir l'overlay hi
+# capen: les apaisades fan 800 d'amplada i les verticals 800 d'alcada
+# (600×800, 370×800), sempre amb la proporcio del dispositiu.
+COSTAT_WEBP = 800
+
 # Colors
 CHROME_BG = (232, 232, 232, 255)
 TAB_BG = (212, 212, 212, 255)
@@ -109,15 +114,32 @@ def draw_notch(draw, x, y, w, h):
     draw.rounded_rectangle([x, y, x + w, y + h], radius=h//2, fill=NOTCH_BG)
 
 def save_png(img, name):
-    path = os.path.join(OUT_DIR, name)
+    """Escriu la captura a mida de dispositiu (PNG) i el WebP que fa servir l'overlay.
+
+    EL WEBP HA DE CONSERVAR LA TRANSPARENCIA de tot el que hi ha sota la barra.
+    `public/browser-overlay.html` l'estira a la mida del marc i el posa DAMUNT
+    de la pagina: si la part de sota la barra es opaca, tapa la pagina i sembla
+    que no s'hagi renderitzat. Ja va passar amb les tres captures de portatil,
+    que es van generar amb fons blanc.
+    """
+    base = os.path.splitext(name)[0]
+    path = os.path.join(OUT_DIR, base + ".png")
     img.save(path, "PNG")
-    print(f"  ✓ {name} ({img.width}×{img.height})")
+    escala = COSTAT_WEBP / max(img.width, img.height)
+    mida = (round(img.width * escala), round(img.height * escala))
+    img.resize(mida, Image.Resampling.LANCZOS).save(
+        os.path.join(OUT_DIR, base + ".webp"), "WEBP", lossless=True, method=6)
+    print(f"  ✓ {base}.png ({img.width}×{img.height}) + .webp ({mida[0]}×{mida[1]})")
 
 # ═══════════════════════════════════════════════════════════════
-# DESKTOP - Chrome (1920×1080)
+# DESKTOP - Chrome
+#
+# LA BARRA FA SEMPRE 134 px (30 + 36 + 40 + 28), que es el `chromeTop` de
+# l'overlay. El que canvia entre mides es l'alcada de la FINESTRA, i per aixo
+# cada portat te la seva captura: la finestra que rep la pagina es
+# `alcada - 134`, i estirar la captura de 1920 a 1440 deformaria la barra.
 # ═══════════════════════════════════════════════════════════════
-def make_desktop_chrome():
-    W, H = 1920, 1080
+def make_desktop_chrome(W, H, nom):
     img = Image.new("RGBA", (W, H), (0, 0, 0, 0))
     draw = ImageDraw.Draw(img)
     f = get_font(13)
@@ -151,7 +173,15 @@ def make_desktop_chrome():
         draw.point((px, y), fill=(255, 0, 0, 200))
         draw.point((px, y + 1), fill=(255, 0, 0, 200))
 
-    save_png(img, "desktop-chrome.png")
+    save_png(img, nom)
+
+# Les quatre mides d'escriptori que fa servir l'overlay.
+ESCRIPTORIS = [
+    (1920, 1080, "desktop-chrome"),
+    (1440, 900, "desktop-chrome-1440x900"),
+    (1366, 768, "desktop-chrome-1366x768"),
+    (1280, 720, "desktop-chrome-1280x720"),
+]
 
 # ═══════════════════════════════════════════════════════════════
 # TABLET HORIZONTAL - Safari iOS (1024×768)
@@ -183,7 +213,7 @@ def make_tablet_landscape_safari():
         draw.point((px, y), fill=(255, 0, 0, 200))
         draw.point((px, y + 1), fill=(255, 0, 0, 200))
 
-    save_png(img, "tablet-landscape-safari.png")
+    save_png(img, "tablet-landscape-safari")
 
 # ═══════════════════════════════════════════════════════════════
 # TABLET VERTICAL - Safari iOS (768×1024)
@@ -215,7 +245,7 @@ def make_tablet_portrait_safari():
         draw.point((px, y), fill=(255, 0, 0, 200))
         draw.point((px, y + 1), fill=(255, 0, 0, 200))
 
-    save_png(img, "tablet-portrait-safari.png")
+    save_png(img, "tablet-portrait-safari")
 
 # ═══════════════════════════════════════════════════════════════
 # MÒBIL VERTICAL - Safari iOS (390×844)
@@ -255,7 +285,7 @@ def make_mobile_portrait_safari():
         draw.point((px, bottom_y - 1), fill=(255, 0, 0, 200))
         draw.point((px, bottom_y), fill=(255, 0, 0, 200))
 
-    save_png(img, "mobile-portrait-safari.png")
+    save_png(img, "mobile-portrait-safari")
 
 # ═══════════════════════════════════════════════════════════════
 # MÒBIL HORIZONTAL - Safari iOS (844×390)
@@ -287,7 +317,7 @@ def make_mobile_landscape_safari():
         draw.point((px, y), fill=(255, 0, 0, 200))
         draw.point((px, y + 1), fill=(255, 0, 0, 200))
 
-    save_png(img, "mobile-landscape-safari.png")
+    save_png(img, "mobile-landscape-safari")
 
 # ═══════════════════════════════════════════════════════════════
 # PWA STANDALONE - sense navegador (390×844)
@@ -308,13 +338,14 @@ def make_pwa_standalone():
         draw.point((px, 14), fill=(0, 255, 0, 200))
         draw.point((px, 15), fill=(0, 255, 0, 200))
 
-    save_png(img, "pwa-standalone.png")
+    save_png(img, "pwa-standalone")
 
 # ═══════════════════════════════════════════════════════════════
 # Genera tot
 # ═══════════════════════════════════════════════════════════════
 print("Generant PNGs dels navegadors...")
-make_desktop_chrome()
+for (w, h, nom) in ESCRIPTORIS:
+    make_desktop_chrome(w, h, nom)
 make_tablet_landscape_safari()
 make_tablet_portrait_safari()
 make_mobile_portrait_safari()
