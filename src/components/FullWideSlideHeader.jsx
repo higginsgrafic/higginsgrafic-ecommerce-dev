@@ -49,9 +49,16 @@ function FullWideSlideHeader({
   // Les dues tauletes son el mateix disseny a part (vegeu el punt 10 del
   // testimoni): el carril de 1350 no s'hi aplica.
   const esTauleta = isPortraitTablet || isLandscapeTablet;
-  // LES DUES TAULETES PORTEN LA CAPÇALERA DE DUES FILES (el logo i les icones,
-  // i el menu a sota). La vertical ja la tenia; l'apaisada en feia una de sola.
-  const duesFiles = isPortraitTablet || isLandscapeTablet;
+  // LA CAPÇALERA DE DUES FILES ES NOMES DE LA TAULETA VERTICAL: el logo i les
+  // icones (61 px) i el menu de colleccions a sota (62). L'apaisada porta la
+  // d'una fila de 80 px, com l'escriptori.
+  //
+  // Va arribar a portar la de dues files (commit `17291eb`) i s'ha tornat
+  // enrere. EL QUE ES MOU: a les mides de l'apaisada (1024x768, 1280x720,
+  // 1366x768...) l'offset de capçalera passa de 116 a 80 px i les pagines
+  // guanyen 36 px d'alcada util. Si algú les torna a unificar, ha de refer el
+  // repartiment de dalt de `/nova/inici`, que es calcula amb aquest offset.
+  //
   // La banda estreta del megaslide (768-1366 sense tauleta): la mateixa
   // definicio que a MegaslidePagina2.
   const esBandaEstreta = typeof window !== 'undefined'
@@ -2748,7 +2755,7 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
             // A la vertical el separador ha de quedar AL MIG de l'espai que
             // ocupen les dues capçaleres (123 px): 61 px a dalt i 62 a baix.
             // El contingut es centra dins el seu tros amb `items-center`.
-            height: duesFiles ? '61px' : undefined,
+            height: isPortraitTablet ? '61px' : undefined,
             // La capçalera viu al MATEIX carril que el megaslide i les bandes
             // (70,3vw, centrat): a 1440 el marc del lloc feia 1350 px i el
             // carril 1013, i el logo quedava 128 px a l'esquerra del contingut
@@ -2866,7 +2873,7 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
             />
           </Link>
 
-          <nav className={`hidden md:flex flex-1 items-center justify-center gap-1 lg:gap-4 flex-nowrap ${esTauleta ? 'overflow-hidden' : ''} ${duesFiles ? 'md:hidden' : ''}`} style={(isPortraitTablet || isLandscapeTablet) ? { gap: isLandscapeTablet ? '1rem' : '0.25rem', minWidth: 0, justifyContent: 'flex-start', marginLeft: isPortraitTablet ? '-60px' : undefined } : {
+          <nav className={`hidden md:flex flex-1 items-center justify-center gap-1 lg:gap-4 flex-nowrap ${esTauleta ? 'overflow-hidden' : ''} ${isPortraitTablet ? 'md:hidden' : ''}`} style={(isPortraitTablet || isLandscapeTablet) ? { gap: isLandscapeTablet ? '1rem' : '0.25rem', minWidth: 0, justifyContent: 'flex-start', marginLeft: isPortraitTablet ? '-60px' : undefined } : {
               // El -5% és un ajust òptic del nav (el desplaça cap a l'esquerra).
               // Dins el carril, a la banda estreta (768-1366) el nav no té marge
               // per a aquest desplaçament: el seu contingut ja hi va just i el
@@ -3060,20 +3067,17 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
         </div>
       </div>
 
-      {/* Segon header de les tauletes — enllaços de col·leccions */}
-      {duesFiles && (
+      {/* Segon header NOMES de la tauleta VERTICAL — enllaços de colleccions */}
+      {isPortraitTablet && (
         <div
           className="bg-background flex items-center"
           style={{
             position: 'relative',
             zIndex: 10001,
-            // Aquest segon header només surt a les tauletes. A la vertical es
-            // queda amb el marc del lloc; a l'apaisada, amb el carril (vegeu el
-            // primer).
-            width: isPortraitTablet ? 'var(--site-w, 100%)' : 'var(--hg-mega-w, 70.3vw)',
-            marginLeft: isPortraitTablet
-              ? 'calc(var(--site-xL, 0px) - var(--rulerInset, 0px))'
-              : undefined,
+            // Aquest segon header només surt a la tauleta vertical: es queda
+            // amb el marc del lloc (vegeu el primer).
+            width: 'var(--site-w, 100%)',
+            marginLeft: 'calc(var(--site-xL, 0px) - var(--rulerInset, 0px))',
             borderTop: '1px solid #E6E8EC',
             // Els 62 px que queden dels 123, amb el contingut centrat.
             height: '62px',
