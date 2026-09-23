@@ -293,6 +293,10 @@ function Home() {
   // canvia: si es recalcula sobre l'aire ja desplaçat, el resultat s'enfonsa.
   const aireBaseRef = useRef(null);
   const [pillShiftPx, setPillShiftPx] = useState(0);
+  // El bloc de la galeria s'encongeix el que s'ha tret de sota la pindola, i
+  // aixo es el que APROPA les colleccions: l'aire de sota el recull el bloc,
+  // no la pindola.
+  const [galeriaShrinkPx, setGaleriaShrinkPx] = useState(0);
 
   useLayoutEffect(() => {
     const mesura = () => {
@@ -307,10 +311,14 @@ function Home() {
       // Nomes es pren la referencia el primer cop de cada disposicio.
       if (aireBaseRef.current == null) aireBaseRef.current = aire;
       const base = aireBaseRef.current;
-      const nou = Math.round(base * (1 - HOME_PILL_AIRE_FACTOR));
-      setPillShiftPx((prev) => (Math.abs(prev - nou) < 1 ? prev : nou));
+      const shift = Math.round(base * (1 - HOME_PILL_AIRE_FACTOR));
+      setPillShiftPx((prev) => (Math.abs(prev - shift) < 1 ? prev : shift));
+      // El marge negatiu del bloc es DERIVA del desplaçament de la pindola, que
+      // es l'única mesura estable d'aquesta pantalla. Intentar mesurar l'aire de
+      // sota dona valors inestables (288 o 444 a 1920 segons quan es miri) i el
+      // resultat s'enfonsava fins a fer col·lidir la pindola amb el titol.
+      setGaleriaShrinkPx((prev) => (Math.abs(prev - shift) < 1 ? prev : shift));
     };
-    aireBaseRef.current = null;
     mesura();
     window.addEventListener('resize', mesura);
     const t = setTimeout(mesura, 300);
@@ -799,6 +807,10 @@ function Home() {
                 gridTemplateColumns: tdpGridColumns,
                 columnGap: '22.5px',
                 ...portraitTabletTdpGridStyle,
+                // El bloc s'encongeix el que s'ha tret de sota la pindola: es
+                // el que APROPA aquesta colleccio de la seguent, perque l'aire
+                // de sota el recull el bloc i no la pindola.
+                marginBottom: galeriaShrinkPx ? `-${galeriaShrinkPx}px` : undefined,
               }}
             >
               {/* Columna 1: TDP2 */}
@@ -900,6 +912,10 @@ function Home() {
                   gridTemplateColumns: tdpGridColumns,
                   columnGap: '22.5px',
                   ...portraitTabletTdpGridStyle,
+                // El bloc s'encongeix el que s'ha tret de sota la pindola: es
+                // el que APROPA aquesta colleccio de la seguent, perque l'aire
+                // de sota el recull el bloc i no la pindola.
+                marginBottom: galeriaShrinkPx ? `-${galeriaShrinkPx}px` : undefined,
                 }}
               >
                 {/* Columna 1: TDP1 */}
@@ -1001,6 +1017,10 @@ function Home() {
                   gridTemplateColumns: tdpGridColumns,
                   columnGap: '22.5px',
                   ...portraitTabletTdpGridStyle,
+                // El bloc s'encongeix el que s'ha tret de sota la pindola: es
+                // el que APROPA aquesta colleccio de la seguent, perque l'aire
+                // de sota el recull el bloc i no la pindola.
+                marginBottom: galeriaShrinkPx ? `-${galeriaShrinkPx}px` : undefined,
                 }}
               >
                 {/* Columna 1: TDP2 */}
@@ -1102,6 +1122,10 @@ function Home() {
                   gridTemplateColumns: tdpGridColumns,
                   columnGap: '22.5px',
                   ...portraitTabletTdpGridStyle,
+                // El bloc s'encongeix el que s'ha tret de sota la pindola: es
+                // el que APROPA aquesta colleccio de la seguent, perque l'aire
+                // de sota el recull el bloc i no la pindola.
+                marginBottom: galeriaShrinkPx ? `-${galeriaShrinkPx}px` : undefined,
                 }}
               >
                 {/* Columna 1: TDP1 */}
@@ -1203,6 +1227,10 @@ function Home() {
                   gridTemplateColumns: tdpGridColumns,
                   columnGap: '22.5px',
                   ...portraitTabletTdpGridStyle,
+                // El bloc s'encongeix el que s'ha tret de sota la pindola: es
+                // el que APROPA aquesta colleccio de la seguent, perque l'aire
+                // de sota el recull el bloc i no la pindola.
+                marginBottom: galeriaShrinkPx ? `-${galeriaShrinkPx}px` : undefined,
                 }}
               >
                 {/* Columna 1: TDP2 */}
