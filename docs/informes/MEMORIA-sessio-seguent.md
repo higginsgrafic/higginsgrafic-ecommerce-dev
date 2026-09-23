@@ -1,5 +1,17 @@
 # MEMÒRIA PER A LA SESSIÓ SEGÜENT
 
+> **ATENCIÓ — AQUEST DOCUMENT ÉS DE LA SESSIÓ DEL 22/09/2026 I HA QUEDAT ENRERE.**
+> La sessió del **23/09/2026** està documentada a:
+>
+> - **`docs/informes/TESTIMONI-2026-09-23.md`** — què s'ha fet, amb la causa de cada cosa,
+>   i la secció 4 («On NO s'ha de mirar per mesurar»).
+> - **`docs/informes/PROMPT-inici-seguent.md`** — el prompt per començar la sessió nova.
+>
+> D'aquest document, **encara és cert**: les mides de verificació, les regles de la casa
+> i com treballa l'usuari. **Ja no és cert**: l'estat del projecte (l'últim commit ara és
+> `dd60633` i les proves són 474, no 462), i tot el que diu de la hero, de la belt i del
+> carril.
+
 **Data de la sessió que es resumeix:** 22/09/2026 (tarda-vespre)
 **Últim commit:** `c47b094`
 **Projecte:** `higginsgrafic-ecommerce-dev`
