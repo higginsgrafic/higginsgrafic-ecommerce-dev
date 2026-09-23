@@ -185,3 +185,25 @@
     aspect-ratio: 952 / 430;
   }
 }
+
+/* ---------------------------------------------------------------------------
+   EL CARRIL A TAUETA
+   El carril del disseny es el 70,3125 % de la finestra (1350 sobre 1920). A
+   tauleta aixo deixa massa aire: a 768 la pantalla fa 768 i el carril 540, i la
+   hero (que te l'amplada lligada al carril i l'alcada lligada a l'amplada) fa
+   381 x 172 dins d'una cella de 434, o sigui que li sobra el 30 % de l'alcada.
+
+   Aqui el carril s'eixampla fins al 93,75 % de la finestra (720 sobre 768), i
+   amb ell creixen la hero, el titol i les icones, que tots van amb el carril. La
+   resta de la pagina no canvia: els aires son `--esp-*` i ja escalen, i els
+   textos petits (12 i 18 px) son fixos i no en depenen.
+
+   PER QUE AQUEST RANG. De 768 a 1279 es on viuen les tauletes en retrat i en
+   apaissada. A partir de 1280 el carril del disseny ja dona 900 px (el 70,3 %
+   d'una pantalla d'escriptori), i alla no cal tocar-lo.
+   ------------------------------------------------------------------------- */
+@media (min-width: 768px) and (max-width: 1279px) {
+  :root {
+    --contingut-max: min(93.75vw, 1350px);
+  }
+}
