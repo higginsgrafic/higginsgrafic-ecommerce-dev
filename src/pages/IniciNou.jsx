@@ -195,26 +195,15 @@ function IniciNou() {
                 className="hg-seccio"
                 data-seccio={colleccio.id}
                 aria-label={colleccio.label}
-                // L'AIRE ENTRE GALERIES, amb el seu nom i el seu calcul.
+                // L'AIRE ENTRE GALERIES. El marge de la seccio NO es l'aire
+                // que es veu: la pindola es `absolute` i baixa 169 unitats del
+                // seu bloc, i aixo ho compensa `reservaPindola`; i el TEXT del
+                // titol comença 27 unitats abans de la seva caixa.
                 //
-                // El marge de la seccio NO es l'aire que es veu: pel mig hi ha
-                // dues coses que el titol i la pindola hi posen pel seu compte:
-                //   - la pindola es `absolute` i baixa 169 unitats del bloc, o
-                //     sigui que la seccio acaba 169 unitats abans del que es veu
-                //     (aixo ho arregla `reservaPindola`, que les reserva dins);
-                //   - el TEXT del titol comença 27 unitats ABANS de la seva
-                //     caixa, per `line-height: 0.85`.
-                // O sigui: visible = marge + 169 (reserva) − 169 (voladis) − 27
-                // (sobreeixit) ... i el que queda es el marge menys 27 unitats.
-                //
-                // Amb `--esp-4` (120 unitats) l'aire visible son 93 unitats de
-                // carril. MESURAT a les cinc mides, i CONSTANT: 262 / 261 / 262 /
-                // 261 / 262 carril units entre el text de la pindola i el text
-                // del titol, que es el que es veu (a 1920, 262 px).
-                //
-                // PER QUE NO SON 144: 144 era l'aire de la hero, que no te ni
-                // pindola ni titol a sota. Aqui l'aire el governen tres peces, i
-                // el numero que en surt es el que es veu.
+                // MESURAT a les cinc mides: 262 / 261 / 262 / 261 / 262 unitats
+                // de carril, CONSTANT. Es mes aire que a la pagina vella (23 a
+                // 1920), i es l'unic punt d'aquesta pagina que queda pendent:
+                // vegeu el commit, que ho explica.
                 style={{ marginBlockStart: 'calc(169px + var(--esp-4))' }}
               >
                 <HomeColleccio
@@ -247,7 +236,7 @@ function IniciNou() {
                 className="hg-seccio"
                 data-seccio={seccio.id}
                 aria-label={seccio.label}
-                style={{ marginBlockStart: 'calc(169px + var(--esp-4))' }}
+                style={{ marginBlockStart: 'var(--esp-4)' }}
               >
                 <div
                   data-esquelet="1"

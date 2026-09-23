@@ -198,11 +198,12 @@ function HomeColleccio({
         marginBlockStart,
         // El que la pindola baixa: 130 unitats (el seu `top`) + la seva alcada
         // (39) = 169, sobre el carril.
-        // El percentatge es calcula sobre l'amplada del BLOC, que no es el
-        // carril: el bloc es dins del contingut amb marge i en fa 40 unitats
-        // menys. Mesurat: 12,5185 % del bloc (1270) donava 159 px en comptes de
-        // 169. El factor es (1 − 80/1350).
-        ...(reservaPindola ? { paddingBottom: `${(PINDOLA_VOLADIS / (1350 - 80)) * 100}%` } : {}),
+        // El percentatge es calcula sobre l'amplada del BLOC, i el bloc es
+        // `carril − 2 x --marge-lateral` (mesurat: 1270 a 1920, 508 a 768). El
+        // que s'ha de reservar, en canvi, es `169 x carril / 1350`: el voladis
+        // de la pindola va sobre el CARRIL. Recalculat, el percentatge es
+        // `169 / 1270`, i no `169 / 1350` (que donava 159 px en comptes de 169).
+        ...(reservaPindola ? { paddingBottom: `${(PINDOLA_VOLADIS / 1270) * 100}%` } : {}),
         ...(zIndex ? { position: 'relative', zIndex } : {}),
       }}
     >
