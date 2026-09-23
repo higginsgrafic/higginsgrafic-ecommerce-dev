@@ -127,9 +127,14 @@ function IniciNou() {
       <div className="relative mb-10 mt-[27px] lg:mb-14 w-full">
         <div className="relative flex flex-col gap-3 w-full">
           <h2
-            className="relative font-light uppercase leading-[0.85] tracking-[-0.02em] text-foreground"
+            className="relative font-light uppercase tracking-[-0.02em] text-foreground"
             style={{
               fontFamily: 'Oswald, sans-serif',
+              // LA CAIXA CONTE EL TEXT. Era `leading-[0.85]`, i amb aixo la
+              // caixa feia 71,8 px i el text pintat 125: 27 unitats per dalt i
+              // 26 per baix FORA de la seva caixa. Era el defecte d'origen de
+              // tota la geometria de l'inici (ESPEC-inici-neteja.md §0).
+              lineHeight: 'normal',
               // La mida va sobre el CARRIL i no sobre la finestra: es el que fa
               // que el sobreeixit del text (27 unitats) sigui el mateix a totes
               // les mides, i que l'aire entre galeries sigui constant.
@@ -240,7 +245,6 @@ function IniciNou() {
                   href={colleccio.href}
                   slug={colleccio.slug}
                   editableIdPrefix={`nova-${colleccio.id}`}
-                  titleOffsetY={colleccio.titleOffsetY}
                   numberAlign={colleccio.numberAlign}
                   numberOffsetX={colleccio.numberOffsetX}
                   tdpGridColumns={tdpGridColumns}

@@ -184,3 +184,27 @@ export const COLLECCIONS_INICI = [
  */
 export const TITOL_MIDA_U = 84.5;
 export const TITOL_MIDA_ESP4 = TITOL_MIDA_U / 1350;
+
+/**
+ * EL MARGE ENTRE LA CAIXA DEL TITOL I LES FITXES, en unitats de disseny.
+ *
+ * Son 76,8, i no els 130 de la pagina vella, perque **la caixa del titol ha
+ * deixat de desbordar-se**: amb `line-height: normal` la caixa conte el text, i
+ * com que creix cap avall, el marge ha de disminuir exactament el que ha
+ * crescut perque el TEXT quedi on era.
+ *
+ *     marge = 130 − (caixa_normal − caixa_0,85)
+ *
+ * I la diferencia es constant en unitats de disseny, perque la caixa i el cos
+ * del titol escalen tots dos amb la mateixa unitat: 53,2 a 1920 i 40,1 a 1440.
+ *
+ * ES APLICA SOBRE L'AIRE DE LA SECCIO. Amb la caixa que conte el text, el text
+ * del titol arrenca 76,8 unitats DESPRES de l'inici del seu bloc (el marge
+ * propi del titol mes el que la seva caixa hi afegeix). O sigui que el bloc pot
+ * pujar aquestes 76,8 unitats sense que el text es mogui, i el marge de la
+ * seccio les ha de descomptar: `marge = aire × (76,8 / 120)`.
+ *
+ * MESURAT a 1920: marge = 120 × 0,64 = 76,8, i el TEXT queda 106,4 unitats sota
+ * l'inici del bloc, que es exactament el que hi havia abans del canvi.
+ */
+export const TITOL_CARDS_FACTOR = 76.8 / 120;

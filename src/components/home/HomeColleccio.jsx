@@ -6,6 +6,7 @@ import {
   HOME_GALERIA_TOP_PX,
   HOME_COLLECCIO_MARGIN_PX,
 } from '@/config/collectionVertical';
+import { TITOL_CARDS_FACTOR } from '@/config/iniciNou';
 
 /**
  * EL QUE LA PINDOLA BAIXA DE LA SEVA SECCIO, en unitats de disseny sobre el
@@ -239,11 +240,16 @@ function HomeColleccio({
         />
       </div>
       <div style={{
-        marginTop: portraitTablet ? `${HOME_TITOL_TDP_MARGIN_PX.tauleta}px` : `${HOME_TITOL_TDP_MARGIN_PX.escriptori}px`,
-        // El `mt-[27px]` del component del titol S'HI SUMA, i per aixo el
-        // primer terme el neutralitza abans de restar-hi el voladis: el que ha
-        // de quedar es `aire − voladis`, i no `aire − voladis + 27`.
-        ...(titolAire ? { marginTop: `calc(${titolAire} - ${PINDOLA_VOLADIS}px - 27px)` } : {}),
+        // LA CAIXA DEL TITOL I LES FITXES. El marge es declara, i el valor de
+        // la pagina nova es 76,8 unitats de disseny (0,64 de `--esp-4`) perque
+        // la caixa del titol ja conte el text: vegeu `TITOL_CARDS_FACTOR`.
+        //
+        // La pagina vella en fa 130 i a mes neutralitza el `mt-[27px]` del
+        // component del titol (que s'hi suma) restant-li el voladis de la
+        // pindola. Tot aixo eren consequencies del desbordament.
+        marginTop: titolAire
+          ? `calc(${titolAire} * ${TITOL_CARDS_FACTOR.toFixed(4)})`
+          : (portraitTablet ? `${HOME_TITOL_TDP_MARGIN_PX.tauleta}px` : `${HOME_TITOL_TDP_MARGIN_PX.escriptori}px`),
       }}>
         <div
           style={{
