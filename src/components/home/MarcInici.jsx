@@ -44,21 +44,26 @@
  * sap res mes del megaslide.
  */
 import { useEffect, useRef, useState } from 'react';
+import { deviceLayoutFromViewport } from '@/utils/layoutModel';
 
 /** El repartiment inicial, abans del primer mesurament. */
 const REPARTIMENT_INICIAL = { blocMega: 0, blocPagina: 0, alcada: null };
 /**
  * LES FILES DEL TROS DE DALT.
  *
- * Son les 28 que surten de traduir la pantalla a files de la graella del
- * megaslide, i la frontera entre les dues pagines cau a la 11:
+ * Son les que surten de traduir la pantalla a files de la graella del
+ * megaslide, i la frontera entre les dues pagines hi cau a sobre. NO son les
+ * mateixes a totes les mides: a la tauleta vertical la pantalla es mes curta i
+ * en surten menys.
  *
- *   FILES_MEGASLIDE   11   el megaslide desplegat
- *   FILES_PAGINA      17   la pagina de sota
- *   FILES_TOTAL       28
+ *   escriptori i apaisada   11 + 17 = 28   (a 1920: 11 files fan 377 i el
+ *                                           megaslide en fa 376)
+ *   tauleta vertical         7 +  8 = 15   (a 768x1024)
  */
 const FILES_TOTAL = 28;
 const FILES_MEGASLIDE = 11;
+const FILES_TOTAL_VERTICAL = 15;
+const FILES_MEGASLIDE_VERTICAL = 7;
 const FILES_PAGINA = FILES_TOTAL - FILES_MEGASLIDE;
 /** El que penja el cadenat del megaslide sota la seva linia. */
 const CADE_BAIXADA = 56;
@@ -173,12 +178,17 @@ function MarcInici({ seccions }) {
       // LA FILA es `(finestra − capçalera) / 28`. A 1920 dona 34,29 px, i 11
       // files cauen a 497,1 quan el separador del megaslide es a 497: la
       // frontera del model i la del megaslide coincideixen.
-      const fila = (window.innerHeight - capcalera) / FILES_TOTAL;
+      // A la tauleta vertical la pantalla es mes curta i el tros de dalt son
+      // 15 files en comptes de 28.
+      const dispositiu = deviceLayoutFromViewport(window.innerWidth, window.innerHeight);
+      const total = dispositiu.isPortraitTablet ? FILES_TOTAL_VERTICAL : FILES_TOTAL;
+      const megaFiles = dispositiu.isPortraitTablet ? FILES_MEGASLIDE_VERTICAL : FILES_MEGASLIDE;
+      const fila = (window.innerHeight - capcalera) / total;
       // EL BLOC DEL MEGASLIDE ES LA SEVA AREA: les 11 files, i com a minim la
       // seva vora de veritat. Les 11 files nomes coincideixen amb el separador
       // quan la seva alcada escala amb la finestra; a 1024 i 1366 el panell
       // acaba una mica mes avall, i el bloc l'ha de cobrir.
-      const blocMega = Math.max(FILES_MEGASLIDE * fila, linia - capcalera);
+      const blocMega = Math.max(megaFiles * fila, linia - capcalera);
       // LA PAGINA DE SOTA es la resta. El CADENAT, pero, penja 56 px dins seu i
       // per tant no es pot fer servir per centrar-hi la hero: el seu bloc es el
       // que queda DESPRES del cadenat.
