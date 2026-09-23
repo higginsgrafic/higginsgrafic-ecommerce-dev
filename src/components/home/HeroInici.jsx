@@ -42,7 +42,18 @@ function HeroInici() {
     <div
       data-hero-inici="1"
       className="hg-carril"
-      style={{ display: 'flex', flexDirection: 'column' }}
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        // LA HERO AL 80 % DEL CARRIL. L'amo la vol un 20 % mes petita.
+        //
+        // El percentatge va al BLOC i no a la caixa perque el padding d'un
+        // percentatge es mesura sobre l'amplada del PARE, que es el carril:
+        // aixi la caixa fa el 20 % del CARRIL i queda centrada.
+        //
+        // L'aire es reparteix a parts iguals a cada costat.
+        paddingInline: '10%',
+      }}
     >
       <div
         data-hero-caixa="1"
