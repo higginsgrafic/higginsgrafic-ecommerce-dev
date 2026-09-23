@@ -93,22 +93,33 @@ describe("l'escala d'espaiat de la fonamenta", () => {
     expect(iU).toBeGreaterThan(iCarril);
   });
 
-  it("el carril s'eixampla a tauleta NOMES a la pagina nova", () => {
-    // El carril es compartit amb la pagina vella, i alla la mida de la FITXA en
-    // surt: eixamplar-lo a tot el lloc li canviava les fitxes (mesurat, de
-    // 259x418 a 720x917 a 768). La regla ha d'anar abastida.
-    expect(FONAMENTA).toMatch(/@media \(min-width: 768px\) and \(max-width: 1279px\)/);
-    expect(FONAMENTA).toMatch(/\[data-inici-nou="1"\] +\.hg-carril/);
-  });
-
   it('el terra del text viu a --escala, no a --u', () => {
     // `--escala` es la que porta el terra i encara no te cap consumidor.
     expect(declaracio('--escala')).toBe('0.6667');
   });
 
-  it('el carril no te terra (es el model que la geometria ha de seguir)', () => {
+  it('el carril EL PUBLICA LA CAPÇALERA, i la pagina el llegeix', () => {
+    // El carril es el tram del logo a la icona d'usuari, i qui el dibuixa es la
+    // capçalera: la publica com a `--hg-band-w`. La pagina NO el deriva, el
+    // llegeix, i aixi el contingut i la capçalera comencen i acaben al mateix
+    // lloc a TOTES les vistes. Mesurat: 1270 a 1920, 953 a 1440, 933 a 1280 i
+    // 1024, i 688 a 768.
     const carril = declaracio('--contingut-max');
-    expect(carril).toMatch(/70\.3125vw/);
-    expect(carril).toMatch(/1350px/);
+    expect(carril).toContain('var(--hg-band-w');
+  });
+
+  it('el valor de reserva del carril es el tram mesurat a 1920', () => {
+    // Nomes s'usa abans que la capçalera publiqui el seu. A 1920 el tram fa
+    // 1.264,5 px, que son el 65,86 % de la finestra.
+    const carril = declaracio('--contingut-max');
+    expect(carril).toMatch(/65\.86vw/);
+    expect(carril).toMatch(/1264\.5px/);
+  });
+
+  it('el contingut no te marge lateral: arriba a les vores del carril', () => {
+    // Amb `--marge-lateral` a dins, el contingut quedava 28 px mes estret que la
+    // hero i que la graella, que son les altres dues peces que fan el carril
+    // sencer (mesurat a 1440: 925 contra 953).
+    expect(FONAMENTA).toMatch(/\.hg-marc__contingut \{[^}]*padding-inline: 0;/);
   });
 });
