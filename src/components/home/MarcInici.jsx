@@ -207,7 +207,6 @@ function MarcInici({ seccions }) {
           '--inici-buit': `${repartiment.aire}px`,
           '--inici-dalt': `${(repartiment.finsLinia ?? 0)}px`,
           '--inici-frontera': `${repartiment.linia ?? 0}px`,
-          ...(repartiment.alcada == null ? {} : { '--inici-hero-sostre': `${repartiment.alcada}px` }),
           // La flexio no ha de repartir l'espai que sobra: els aires son
           // `padding` de les celles i han de ser exactament el que s'ha
           // calculat.

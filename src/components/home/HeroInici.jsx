@@ -90,10 +90,16 @@ function HeroInici() {
                 textDecoration: 'none',
               }}
             >
-              {/* LA SAMARRETA, com a fons: el 500 % de l'alcada de la franja,
+              {/* LA SAMARRETA, com a fons: l'ALCADA DEL RECTANGLE sencer,
                   desplaçada el 20 % que li toca. Es aixo el que fa que cada
                   franja ensenyi una porcio diferent i que sumades es vegi la
-                  forma. */}
+                  forma.
+
+                  L'alcada es `500% + els gaps` i no `500%`: les franges tenen
+                  2 px de separacio entre elles, i sense comptar-los la capa
+                  quedava mes curta que el rectangle (mesurat a 1920: 418 en
+                  comptes de 428). Amb els gaps, la capa i el rectangle fan
+                  exactament el mateix. */}
               <div
                 aria-hidden="true"
                 style={{
@@ -101,7 +107,7 @@ function HeroInici() {
                   left: 0,
                   right: 0,
                   top: 0,
-                  height: '500%',
+                  height: 'calc(500% + 10px)',
                   backgroundImage: `url(${band.mockupSrc})`,
                   backgroundSize: 'auto 100%',
                   backgroundPosition: 'center top',
@@ -121,7 +127,9 @@ function HeroInici() {
                     left: 0,
                     right: 0,
                     top: 0,
-                    height: '500%',
+                    // El mateix que la capa de la samarreta: l'alcada del
+                    // rectangle, gaps inclosos.
+                    height: 'calc(500% + 10px)',
                     backgroundImage: `url(${band.overlaySrc})`,
                     backgroundSize: `auto ${(() => {
                       // La clau es el final de la ruta de la imatge.
