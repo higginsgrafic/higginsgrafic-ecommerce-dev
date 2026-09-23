@@ -158,6 +158,22 @@ export const HOME_TITOL_TDP_MARGIN_PX = { escriptori: 130, tauleta: 130 };
 export const HOME_GALERIA_TOP_PX = 0;
 
 /**
+ * L'aire VISIBLE entre el final d'una galeria de l'inici i el titol de la
+ * seguent, mesurat des del TEXT PINTAT de la pindola.
+ *
+ * Es el numero que l'amo demana que es vegi, i `HOME_COLLECCIO_MARGIN_PX` se'n
+ * deriva. No es pot fer servir per posicionar res directament: la pindola es
+ * `position: absolute` i NO fa créixer la seva seccio, o sigui que la seccio
+ * acaba 130 px mes amunt del que es veu, i a mes el titol de la seguent te 30 px
+ * propis de marge abans que comenci el text.
+ *
+ * Aquest numero JA VA EXISTIR amb el mateix nom i es va treure quan les cinc
+ * galeries es van unificar; torna perque ara es qui mana, i no un sumand dels
+ * quatre marges calibrats.
+ */
+export const HOME_GALERIA_AIRE_SOTA_PX = 21;
+
+/**
  * El marge de dalt del bloc de cada galeria de l'inici: el que separa una
  * colleccio de la seguent.
  *
@@ -167,39 +183,36 @@ export const HOME_GALERIA_TOP_PX = 0;
  * blocs fos diferent a cada colleccio. Ara hi ha un sol numero i la distancia
  * es la mateixa a totes.
  *
- * PER QUE 220 I NO ELS 190 QUE EL CODI DEIA QUE VOLIA. El 190 venia de quan
+ * COM SE'N DERIVA. El que es veu es l'aire de `HOME_GALERIA_AIRE_SOTA_PX`, i el
+ * marge es el que cal perque surti aquest aire:
+ *
+ *     caixa de la fitxa -> pindola (declarat)      130
+ *     alcada de la pindola                         +39
+ *     -> la pindola penja de la seva seccio         169 px
+ *     el titol de la seguent hi afegeix             +30
+ *     l'aire que es vol veure                       +21
+ *     ------------------------------------------------
+ *     marge                                          220
+ *
+ * PER QUE NO SON ELS 190 QUE EL CODI DEIA QUE VOLIA. El 190 venia de quan
  * l'alcada del bloc de la galeria era `carril x 0,84632 - 231`, que a 1920
  * feia 843 px i sobre-reservava 368 px per sota de les fitxes. Quan l'alcada
  * del bloc va passar a ser la del contingut (commit `0842d20`), el bloc va
  * quedar NOMES 60 px mes alt que la caixa de la fitxa, i els quatre marges no
- * es van recalcular. Amb 190, mesurat a 1920, la pindola hi cau DINS:
+ * es van recalcular. Amb 190 l'aire visible es NEGATIU (-9) i MESURAT a 1920 la
+ * pindola queia 6 px a DINS del text del titol, a les cinc mides. El text
+ * d'aquell titol comença 27 px ABANS de la seva caixa (`line-height: 0.85` amb
+ * un cos de 4,4vw sobre un numero de fons de fins a 26rem).
  *
- *     caixa de la fitxa -> pindola (layout)        130
- *     alcada de la pindola                         +39
- *     -> fons de la pindola                         169 px sota la caixa
- *     marge del bloc                                +190
- *     -> comença la seguent galeria                  21 px sota la pindola
- *
- *     I el TEXT del titol d'aquella galeria comença 27 px ABANS de la seva
- *     caixa (`line-height: 0.85` amb un cos de 4,4vw sobre un numero de fons
- *     de fins a 26rem): la pindola quedava 6 px a DINS del text, a les cinc
- *     mides.
- *
- * A mes, la galeria seguent hi afegeix 27 px propis de marge i 3 px de marge
- * de text, aixi que l'aire de debò son 30 px mes. El calcul queda:
- *
- *     130 + 39 + aire_visible + 30 = marge     ->     marge = 199 + aire_visible
- *
- * Amb 190 l'aire es NEGATIU (-9, i per aixo la pindola toca el text). Amb 220
- * en fa 21, i MESURAT a les cinc mides en dona 24 a 1920 i de 34 a 38 a la
- * resta. Amb 210 en feia 14, que es veu enganxat per a un text de 4,4vw.
- * O sigui: el minim perque no es toquin es 199, i el valor pres es 220.
- *
- * I PER QUE UN VALOR FIX. L'aire necessari depen del sobreeixit del text, que
- * a 1920 es de 27 px i a 768 d'11: el pitjor cas es la pantalla gran, i a les
+ * I PER QUE UN VALOR FIX. L'aire necessari depen del sobreeixit del text, que a
+ * 1920 es de 27 px i a 768 d'11: el pitjor cas es la pantalla gran, i a les
  * altres el marge de 220 encara en sobra. Fer-lo escalar amb el carril es la
  * feina de proporcions, que esta mesurada i documentada pero no es fa en
  * aquesta passa: si s'escalés sol, a 768 cauria a 88 px.
+ *
+ * MESURAT a les cinc mides: 24 px d'aire a 1920 i de 34 a 38 a la resta. La
+ * diferencia amb els 21 de la formula es que alla es compta des de la CAIXA del
+ * text i aqui des del text PINTAT.
  *
  * AVIS: aixo mou les colleccions verticalment, i es una decisio presa.
  */

@@ -11,7 +11,7 @@ import StoryPosterLink from '@/components/StoryPosterLink';
 import useIsMobile from '@/hooks/useIsMobile';
 import HomeMobile from '@/pages/HomeMobile';
 import { SELLING_PRICE_LABEL } from '@/config/pricing';
-import { TDP_MIDES_INTERIOR, COLLECTION_BG_SRC } from '@/config/collectionVertical';
+import { TDP_MIDES_INTERIOR, COLLECTION_BG_SRC, HOME_COLLECCIO_MARGIN_PX } from '@/config/collectionVertical';
 import { esTauletaApaisada } from '@/utils/layoutMetrics';
 import { laneForViewport } from '@/utils/layoutModel';
 import { tdpMidaFitxa } from '@/utils/tdpMida';
@@ -210,8 +210,6 @@ const COLLECTION_NAMES = {
 
 function Home() {
   const isMobile = useIsMobile();
-  const pautaGridRef = useRef(null);
-  const [rowHeight, setRowHeight] = useState(38);
   const [isPortraitTablet, setIsPortraitTablet] = useState(
     typeof window !== 'undefined'
       && window.innerWidth >= 768
@@ -377,15 +375,6 @@ function Home() {
           && window.innerHeight > window.innerWidth
       );
       setIsLandscapeTablet(esTauletaApaisada());
-      const gridEl = pautaGridRef.current;
-      if (!gridEl) return;
-      const rect = gridEl.getBoundingClientRect();
-      const numRows = 73; // Nombre de files per aquest segment (ha de coincidir amb la pauta numRows={73})
-      const rowGap = 3; // gutterY per defecte de Pauta4ColsOverlay
-      // Alçada EXACTA d'una fila (descomptant els gaps entre files), perquè
-      // les fletxes quadrades càpiguen exactament dins d'una sola fila.
-      const singleRowH = (rect.height - (numRows - 1) * rowGap) / numRows;
-      setRowHeight((prev) => (Math.abs(prev - singleRowH) < 0.1 ? prev : singleRowH));
     };
 
     measure();
@@ -531,7 +520,10 @@ function Home() {
             // fons quedi a 20 px del fons de la finestra. Es calcula mesurant
             // on es (el `transform: scale()` fa que la caixa no coincideixi
             // amb el que es veu, aixi que no es pot fer amb `calc()`).
-            top: `calc(-5px - ${rowHeight / 2}px${isLandscapeTablet ? ' - 50px' : ''} - 50px${isLandscapeTablet ? ' + 50px' : ''}${isLandscapeTablet ? ' + 25px' : ''} + ${baixadaHero}px + ${heroOffsetPx}px)`,
+            // Els `19px` eren `rowHeight / 2`, i `rowHeight` tambe era un
+            // estat que ningú no arribava a mesurar: valia sempre 38, o sigui
+            // que la meitat feia sempre 19. S'escriu el numero.
+            top: `calc(-5px - 19px${isLandscapeTablet ? ' - 50px' : ''} - 50px${isLandscapeTablet ? ' + 50px' : ''}${isLandscapeTablet ? ' + 25px' : ''} + ${baixadaHero}px + ${heroOffsetPx}px)`,
             width: 'calc(100% + 1px)',
             height: isPortraitTablet ? '430px' : 'calc(100% + 2px)',
             transform: 'scale(0.705)',
@@ -821,36 +813,38 @@ function Home() {
             portraitTabletTdpGridStyle={portraitTabletTdpGridStyle}
           />
 
-          {/* Bloc Copiat des de /pdp (fila 20 a 62) posicionat a la fila global 215 en endavant (Mogut 19 files amunt i 20px més amunt) */}
-          <div style={{ marginTop: isPortraitTablet ? '-309px' : '-552px' }}>
-            <Pauta4ColsOverlay
-              pautaEnabled={false}
-              tableEnabled={false}
-              numCols={4}
-              numRows={53}
-              canvasAspect={[2642, 3950]}
-              topOffset="0px"
-              bottomPadding="0px"
-              innerRef={pautaGridRef}
-              style={{ position: 'relative' }}
+          {/* EL PÒSTER. NO es un `Pauta4ColsOverlay`: va EN FLUX.
+              ERA el llenç de 2642 x 3950 partit en 53 files, amb el text a la
+              fila 27/33 i un `marginTop` de -552 px per tapar les 26 files
+              buides de sobre. Com que l'alcada del bloc era l'aspecte del
+              llenç i no el contingut, el marge negatiu NO escalava: a 1920 les
+              files buides feien 990 px i a 768 en feien 396, mentre el -552
+              seguia sent 552. El text queia sobre les fitxes a quatre de les
+              cinc mides (de 40 a 472 px de xoc), i a 1024 tambe (43 px).
+              Ara l'aire es declara amb el MATEIX numero que separa una galeria
+              de la seguent: `HOME_COLLECCIO_MARGIN_PX`. */}
+          <div
+            style={{
+              // El marge ha de comptar el que la pindola BAIXA de la seva
+              // seccio: es `position: absolute` i no fa créixer el pare, o
+              // sigui que la seccio acaba 130 px mes amunt. Se li suma el
+              // mateix aire que separa dues galeries, i el poster queda amb el
+              // MATEIX ritme que la resta de la pagina.
+              marginTop: `${HOME_COLLECCIO_MARGIN_PX}px`,
+              display: 'flex',
+              justifyContent: 'center',
+            }}
+          >
+            <div
+              style={{
+                width: 'calc(var(--hg-tdp-xR) - var(--hg-tdp-xL))',
+                display: 'flex',
+                justifyContent: 'center',
+                pointerEvents: 'auto',
+              }}
             >
-              {/* TEXT POSTER GRAN (Fila local 27 / 33 - correspon a global 227 / 233) */}
-              <div
-                style={{
-                  gridColumn: '1 / 5',
-                  gridRow: '27 / 33',
-                  paddingTop: '50px',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  pointerEvents: 'auto',
-                }}
-              >
-                <StoryPosterLink style={isPortraitTablet ? { fontSize: '54pt' } : undefined} />
-              </div>
-            </Pauta4ColsOverlay>
-            {isPortraitTablet && <div style={{ height: '97px' }} />}
+              <StoryPosterLink style={isPortraitTablet ? { fontSize: '54pt' } : undefined} />
+            </div>
           </div>
         </div>
       </section>
