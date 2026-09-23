@@ -1,5 +1,12 @@
 import { describe, it, expect } from 'vitest';
-import { SECCIONS_INICI, RUTA_INICI_NOU } from '@/config/iniciNou.js';
+import {
+  SECCIONS_INICI,
+  RUTA_INICI_NOU,
+  HERO_AMPLADA,
+  HERO_ALCADA,
+  HERO_ALCADA_VERTICAL,
+  HERO_AIRE_CARRIL,
+} from '@/config/iniciNou.js';
 
 /**
  * Aquestes proves fixen L'ESQUELET de la pàgina d'inici nova, no el seu
@@ -41,7 +48,10 @@ describe("l'esquelet de l'inici nou", () => {
       if (seccio.esp !== null) {
         expect(seccio.esp, `la seccio ${seccio.id}`).toMatch(/^--esp-[0-9]+$/);
       }
-      expect(seccio.alcada, `la seccio ${seccio.id}`).toMatch(/^--esp-[0-9]+$/);
+      // `alcada` es `null` a la hero, que ja te la seva propia caixa.
+      if (seccio.alcada !== null) {
+        expect(seccio.alcada, `la seccio ${seccio.id}`).toMatch(/^--esp-[0-9]+$/);
+      }
     }
   });
 
@@ -62,5 +72,42 @@ describe("l'esquelet de l'inici nou", () => {
     for (const seccio of SECCIONS_INICI) {
       expect(seccio.label, `la seccio ${seccio.id}`).toBeTruthy();
     }
+  });
+});
+
+/**
+ * La hero: la seva GEOMETRIA, que es el que s'ha mesurat de la pagina vella.
+ *
+ * El que es fixa aqui no es un valor en pixels sino la RELACIO, perque es el
+ * que la pagina vella te constant a les quatre mides d'escriptori (2,3728 /
+ * 2,3722 / 2,3719 / 2,3711) i el que fa que la caixa nova reprodueixi la vella
+ * amb menys de mig pixel.
+ */
+describe("la hero de l'inici nou", () => {
+  it("l'amplada es el 70,5 % del carril, que era el `scale(0.705)`", () => {
+    // 952 / 1350 = 0,70519. El `scale` era 0,705: la diferencia es de 0,0002,
+    // que son 0,25 px sobre un carril de 1350 i es el que el mesurament te.
+    expect(HERO_AMPLADA / 1350).toBeCloseTo(0.705, 2);
+  });
+
+  it("l'aire es el complement de l'amplada", () => {
+    // 1 − 952/1350 = 0,29481, i es el que dona el mesurament (224,3 px d'aire
+    // a cada costat amb un carril de 1350).
+    expect(HERO_AIRE_CARRIL).toBeCloseTo(1 - HERO_AMPLADA / 1350, 6);
+    expect(HERO_AIRE_CARRIL).toBeCloseTo(0.2948, 3);
+  });
+
+  it("la proporcio de la caixa es la mesurada a la pagina vella", () => {
+    // 952 / 401 = 2,37406. El mesurament dona 2,3728 / 2,3722 / 2,3719 /
+    // 2,3711 a les quatre mides d'escriptori: la diferencia es de 0,0013, o
+    // sigui mig pixel d'alcada sobre 401. La relacio es la bona.
+    for (const mesurat of [2.3728, 2.3722, 2.3719, 2.3711]) {
+      expect(HERO_AMPLADA / HERO_ALCADA).toBeCloseTo(mesurat, 2);
+    }
+  });
+
+  it('a la vista vertical tambe es una proporcio, no un numero fix', () => {
+    // 541 x 430 a la caixa de disseny: la relacio es 952 / 430 = 2,2140.
+    expect(HERO_AMPLADA / HERO_ALCADA_VERTICAL).toBeCloseTo(2.214, 3);
   });
 });
