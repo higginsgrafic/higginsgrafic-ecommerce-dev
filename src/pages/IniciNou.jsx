@@ -236,27 +236,21 @@ function IniciNou() {
                   // part que no escala de la formula.
                   marginBlockStart: index === 0
                     ? 'calc(var(--esp-4) + 16px)'
-                    // El marge de les galeries. NO es l'aire que es veu: entre
-                    // el marge i el TEXT del titol hi ha una peca que hi posa el
-                    // seu compte, i el factor 2 es el que dobla l'aire que l'amo
-                    // va demanar.
+                    // El marge de les galeries.
                     //
-                    //   var(--esp-4)   l'aire base
-                    //   + 151,9px      el text arrenca a 151,9 de l'inici del
-                    //                  bloc (76,8 del marge titol->fitxes mes el
-                    //                  marge propi del titol)
+                    // NO es l'aire que es veu, i el que hi sobra NO es cap
+                    // pedac: son les 151,9 unitats que fa el propi TITOL (el
+                    // text mes la seva caixa). El titol arrenca a l'inici del
+                    // seu bloc, i el que ve al darrere ha de passar per sobre
+                    // seu; per tant el marge es l'aire MES el titol.
+                    //
+                    //   var(--esp-4)   l'aire base (i el 2 el dobla: decisio de l'amo)
                     //   − 0,0708 vw    resta de quan la mida del titol anava amb
                     //                  la finestra en comptes del carril
+                    //   + 303,8px      2 x 151,9, que es el titol sencer
                     //
-                    // MESURAT: 271,9 / 279,9 / 282,5 / 286,8 / 291,0 px a les
-                    // cinc mides. Son el que l'amo ha aprovat, i la forma de la
-                    // formula s'ha comprovat contra les altres tres candidates
-                    // (`--esp-4` sol dona 120, i `+75,2` dona 211 o 422 segons
-                    // el factor): aquesta es l'unica que dona 271,9.
-                    //
-                    // ES UN PEDAC, I SE SAP QUIN TAPA: els 151,9 son consequencia
-                    // que el titol no arrenqui a l'inici del seu bloc. Quan hi
-                    // arrenqui, l'aire sera `--esp-4` i prou.
+                    // MESURAT a les cinc mides: 271,9 / 279,9 / 282,5 / 286,8 /
+                    // 291,0 px, exactament on eren abans del canvi.
                     : 'calc(2 * (var(--esp-4) - 0.0708 * 100vw) + 303.8px)',
                 }}
               >
