@@ -800,7 +800,7 @@ function Home() {
                   // galeria fa l'alcada de la fitxa, i per tant `100%` es el fons de
                   // la caixa. Abans aixo era una formula amb el -231 mes una mesura
                   // des de JavaScript.
-                  top: 'calc(100% + 25px)',
+                  top: 'calc(100% + 50px)',
                   height: 'auto',
                   width: 'auto',
                   borderRadius: '9999px',
@@ -905,7 +905,7 @@ function Home() {
                   // galeria fa l'alcada de la fitxa, i per tant `100%` es el fons de
                   // la caixa. Abans aixo era una formula amb el -231 mes una mesura
                   // des de JavaScript.
-                  top: 'calc(100% + 25px)',
+                  top: 'calc(100% + 50px)',
                   height: 'auto',
                   width: 'auto',
                   borderRadius: '9999px',
@@ -1011,7 +1011,7 @@ function Home() {
                   // galeria fa l'alcada de la fitxa, i per tant `100%` es el fons de
                   // la caixa. Abans aixo era una formula amb el -231 mes una mesura
                   // des de JavaScript.
-                  top: 'calc(100% + 25px)',
+                  top: 'calc(100% + 50px)',
                   height: 'auto',
                   width: 'auto',
                   borderRadius: '9999px',
@@ -1117,7 +1117,7 @@ function Home() {
                   // galeria fa l'alcada de la fitxa, i per tant `100%` es el fons de
                   // la caixa. Abans aixo era una formula amb el -231 mes una mesura
                   // des de JavaScript.
-                  top: 'calc(100% + 25px)',
+                  top: 'calc(100% + 50px)',
                   height: 'auto',
                   width: 'auto',
                   borderRadius: '9999px',
@@ -1223,7 +1223,7 @@ function Home() {
                   // galeria fa l'alcada de la fitxa, i per tant `100%` es el fons de
                   // la caixa. Abans aixo era una formula amb el -231 mes una mesura
                   // des de JavaScript.
-                  top: 'calc(100% + 25px)',
+                  top: 'calc(100% + 50px)',
                   height: 'auto',
                   width: 'auto',
                   borderRadius: '9999px',

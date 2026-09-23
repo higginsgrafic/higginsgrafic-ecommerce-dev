@@ -165,8 +165,12 @@ export const HOME_GALERIA_TOP_PX = 0;
  * feia 368) era el que separava les colleccions, i quedava a 65 px de la
  * pindola. Amb el bloc a l'alcada del contingut, l'aire es declara aqui, que
  * es l'unic lloc on es pot tocar.
+ *
+ * El numero es 60 i no 100 perque el titol te 40 px propis entremig (el seu
+ * bloc en te 27 de marge a dalt mes 13 del seu propi ajust): amb 100 el buit
+ * REAL fins al titol sortia de 140.
  */
-export const HOME_GALERIA_AIRE_SOTA_PX = 110;
+export const HOME_GALERIA_AIRE_SOTA_PX = 60;
 
 /**
  * El marge de dalt de cada bloc de colleccio de l'inici, amb el seu nom.
