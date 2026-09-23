@@ -77,9 +77,33 @@ function MarcInici({ seccions }) {
     let anterior = null;
 
     const reparteix = () => {
+      // ON CAU LA LINIA DEL MEGASLIDE.
+      //
+      // PRIMER, LA VORA DEL PANELL. El megaslide la publica com a
+      // `--hg-mega-bottom` mentre el panell es obert (a 1920, 497; a 1440, 426;
+      // a 1024 i 1280, 392; a 768, 565). Es la xifra bona.
+      //
+      // DESPRES, LA RESERVA. El panell es desmunta del DOM quan esta tancat i
+      // aleshores la seva vora no existeix enlloc. Com que el contingut no es
+      // pot moure a cada obrir i tancar, quan no hi es s'estima amb el carril,
+      // que es l'unic que sempre hi es: el tram del logo a la icona d'usuari de
+      // la capçalera, que ella publica com a `--inici-nou-carril` (1270 a 1920,
+      // 953 a 1440, 933 a 1280 i 1024, 688 a 768).
       const linia = (() => {
-        cala.style.width = 'var(--inici-frontera, 0px)';
-        return parseFloat(getComputedStyle(cala).width) || 0;
+        cala.style.width = 'var(--hg-mega-bottom, 0px)';
+        const publicada = parseFloat(getComputedStyle(cala).width) || 0;
+        if (publicada > 0) return publicada;
+        cala.style.width = 'var(--inici-nou-carril, 0px)';
+        const carril = parseFloat(getComputedStyle(cala).width) || 0;
+        cala.style.width = 'var(--appHeaderOffset, 0px)';
+        const capcalera = parseFloat(getComputedStyle(cala).width) || 0;
+        // L'alcada del panell segons el carril, amb els punts mesurats.
+        let alcada;
+        if (carril >= 1100) alcada = 0.45 * carril - 195;      // 1270 -> 376
+        else if (carril >= 950) alcada = 1.7 * carril - 1145;  //  953 -> 305
+        else if (carril >= 750) alcada = 271;                  //  933 -> 271
+        else alcada = -2.4 * carril + 2202;                    //  688 -> 565
+        return capcalera + Math.max(0, alcada);
       })();
       // L'ALCADA DE LA ZONA: la finestra menys la linia del megaslide.
       const zonaAlcada = window.innerHeight - linia;
@@ -101,32 +125,31 @@ function MarcInici({ seccions }) {
       // tant el primer que s'hi ha de posar es aquest tros.
       const zonaRect = zona.getBoundingClientRect();
       const finsLinia = Math.max(0, linia - zonaRect.top);
-      // ELS AIRES. De la linia del megaslide al fons de la finestra hi ha
-      // d'haver, per aquest ordre:
+      // ELS AIRES, EQUIDISTANTS. De la linia del megaslide al fons de la
+      // finestra hi ha d'haver, per aquest ordre:
       //
       //   cadenat | aire | icones | aire | aire | hero | aire
       //
-      // i tots quatre aires valen el mateix. Les dues peces tenen la seva mida
-      // —la franja es una alcada declarada i la hero surt del seu aspecte— i el
-      // que es reparteix es NOMES l'espai que sobra:
+      // El cadenat i les dues peces tenen la seva mida: el cadenat 56 px, la
+      // franja d'icones l'alcada declarada i la hero la que li dona el seu
+      // aspecte amb l'amplada del carril. El que es reparteix es NOMES l'espai
+      // que sobra, i es reparteix en quatre trossos iguals:
       //
       //   aire = (zona − resguard − icones − hero) / 4
       //
-      // SI LA FINESTRA ES CURTA, l'aire queda a zero i prou: la zona creix i la
-      // pagina s'allarga. Es deliberat, i es el que demana «res no ha de
-      // canviar de mida»: encongir la hero per encabir-hi tot faria que la peça
-      // canviés segons la pantalla.
-      // El terra de l'aire: el cadenat ocupa 56 px just sota la linia, i els
-      // dos aires del mig n'han de sumar com a minim aixo, o el cadenat hi
-      // entraria a sobre. Amb la finestra curta l'aire queda en aquest terra,
-      // la zona creix i la pagina s'allarga.
+      // El bloc sencer (icones + hero) queda equidistant dins de la zona.
+      //
+      // SI LA FINESTRA ES CURTA, la zona creix i la pagina s'allarga. Es
+      // deliberat: encongir la hero per encabir-hi tot faria que la peça
+      // canviés de mida segons la pantalla, i allo que es vol es que quedi com
+      // esta. L'unic terra que hi ha es perque el cadenat no trepitgi la hero.
       const aire = Math.max(RESGUARD / 2, (zonaAlcada - RESGUARD - icones - natural) / 4);
       const alcada = natural;
       // El numero que decideix si ja hi som: si no s'ha mogut, s'atura.
       const ara = `${Math.round(zonaAlcada * 4) / 4}|${Math.round(alcada * 4) / 4}|${Math.round(aire * 4) / 4}`;
       if (ara === anterior) return;
       anterior = ara;
-        setRepartiment({ aire, alcada, finsLinia });
+        setRepartiment({ aire, alcada, finsLinia, linia });
       raf = requestAnimationFrame(reparteix);
     };
 
@@ -164,14 +187,16 @@ function MarcInici({ seccions }) {
         data-taula-inici="1"
         style={{
           // L'alcada de la finestra es el MINIM; si les peces no hi caben, la
-          // zona creix i la pagina s'allarga.
-          minHeight: 'calc(100vh - var(--inici-frontera))',
+          // zona creix i la pagina s'allarga. La linia la publica el marc, que
+          // es qui la sap mesurar.
+          minHeight: `calc(100vh - ${repartiment.linia ?? 0}px)`,
           display: 'flex',
           flexDirection: 'column',
           // El repartiment, publicat com a variables de CSS. Els valors surten
           // de l'estat i per tant cap render de React se'ls pot emportar.
           '--inici-buit': `${repartiment.aire}px`,
           '--inici-dalt': `${(repartiment.finsLinia ?? 0)}px`,
+          '--inici-frontera': `${repartiment.linia ?? 0}px`,
           ...(repartiment.alcada == null ? {} : { '--inici-hero-sostre': `${repartiment.alcada}px` }),
           // La flexio no ha de repartir l'espai que sobra: els aires son
           // `padding` de les celles i han de ser exactament el que s'ha
