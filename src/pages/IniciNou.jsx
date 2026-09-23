@@ -213,34 +213,32 @@ function IniciNou() {
                 // seu bloc, i aixo ho compensa `reservaPindola`; i el TEXT del
                 // titol comença 27 unitats abans de la seva caixa.
                 //
-                // L'AIRE: `--esp-4`, mes el que hi posen les dues peces que no
-                // son al flux.
+                // L'AIRE DE SOBRE D'AQUESTA SECCIO.
                 //
-                // MESURAT, i la relacio es LINEAL: `visible = marge − K`, amb K
-                // constant per a cada mida. Comprovat amb sis candidats de marge
-                // diferents: K dona el mateix a cada mida (15,6 / 54,7 / 66,7 /
-                // 87,8 / 107,9), o sigui que afegeixi el que afegeixi al marge,
-                // l'aire puja exactament el mateix. Per tant el marge que dona
-                // l'aire volgut es `--esp-4 + K`.
+                // Les galeries 2 a 6 van separades pel doble de l'`--esp-4`, i
+                // la 1 va a la MEITAT, perque l'amo la vol mes a prop de la
+                // hero. Es el parametre que governa l'espai entre la hero i la
+                // primera colleccio.
                 //
-                // I K, a les cinc mides:
+                // MESURAT: 271,9 px a 1920 amb el marge sencer, i 136,0 amb
+                // aquest, que es la meitat exacta. I ho es a les cinc mides
+                // (279,9->106,0 / 282,5->96,0 / 286,8->80,0 / 291,0->64,0).
                 //
-                //     1920   K=15,6      1024   K=87,8
-                //     1440   K=54,7       768   K=107,9
-                //     1280   K=66,7
-                //
-                // La forma lineal que passa per 1920, 1440 i 1280 es
-                // `K = 151,9 − 0,0708 vw`, i es la que s'escriu: reprodueix
-                // aquestes tres mides EXACTAMENT i a 1024 i 768 queda curta
-                // (dona 79 i 97 en comptes de 88 i 108, o sigui 9 i 11 px menys
-                // d'aire). Amb 9 i 11 px l'aire no es perd: es queda mes just.
-                //
-                // AIXO ES UN PEDAC, I SE SAP QUIN TAPA: el voladis de la pindola
-                // va amb el carril i el sobreeixit del titol amb la seva mida, i
-                // cap dels dos participa del flux. La solucio de debò es fer-los
-                // participar-hi, i es la mateixa feina que el punt 5 del pla
-                // (separar l'escala de la geometria de la del text).
-                style={{ marginBlockStart: 'calc(2 * (var(--esp-4) + 151.9px - 0.0708 * 100vw))' }}
+                // El marge es `--esp-4 + 16px` i no `--esp-4 / 2` perque la
+                // cadena te una part que no escala (la formula de sota).
+                style={{
+                  // L'AIRE DE SOBRE. La primera galeria va mes a prop de la
+                  // hero que les altres entre elles: l'amo demana la meitat de
+                  // l'espai perque la colleccio no quedi enganxada a la hero.
+                  //
+                  // MESURAT: amb el marge sencer l'aire es 271,9 px a 1920, i
+                  // amb aquest es 135,9, que es la meitat. El marge es
+                  // `--esp-4 + 16` i no `--esp-4 / 2` perque s'hi ha de sumar la
+                  // part que no escala de la formula.
+                  marginBlockStart: index === 0
+                    ? 'calc(var(--esp-4) + 16px)'
+                    : 'calc(2 * (var(--esp-4) + 151.9px - 0.0708 * 100vw))',
+                }}
               >
                 <HomeColleccio
                   Titol={Titol}
