@@ -250,56 +250,74 @@
 
 
 /* ---------------------------------------------------------------------------
-   LA DIVISIO DE DALT DE LA PAGINA NOVA: ON COMENÇA EL CONTINGUT
+   LA LINIA DEL MEGASLIDE: ON COMENÇA EL CONTINGUT DE LA PAGINA NOVA
 
    El megaslide no ocupa el que ocupa la capçalera. A 1920 la capçalera fa
-   120 px i el panell n'acaba 497; a 768, 156 i 565. Qui posi contingut a sota
+   120 px i el panell n'acaba 497; a 1024, 104 i 392. Qui posi contingut a sota
    seu ha de comptar el megaslide, no la capçalera.
 
-   El megaslide publica la seva vora com a `--hg-mega-bottom` (nomes mentre el
-   panell es obert; en tancar, la variable s'esborra). Aqui es converteix en una
-   sola xifra, que es la que fan servir la hero i el marc:
+   PER QUE ES CALCULA I NO ES LLEGEIX DEL MEGASLIDE. El panell es desmunta del
+   DOM quan esta tancat, i aleshores la seva vora no existeix enlloc. El bucle
+   que la mesura nomes hi es mentre el panell es obert, i la pagina no pot
+   dependre d'obrir-lo per saber on ha de començar: el contingut es mouria a
+   cada obrir i tancar.
 
-     --inici-frontera   la divisio del megaslide, o la capçalera si no n'hi ha
-     --inici-resguard   el tros de frontera que ocupa el cadenat, que tambe
-                        s'ha de deixar lliure
+   LA FORMULA. L'alcada del panell surt del contingut de la seva pagina 1, que
+   escala amb el carril. Aqui hi ha els quatre punts que dona el lloc, mesurats
+   amb el panell obert:
 
-   PER QUE ES `max()` I NO NOMES LA VARIABLE. El megaslide publica la vora del
-   SEU panell, i el cadenat hi penja a sota. Pero un `calc` amb `var()` i reserva
-   no distingeix «la variable no hi es» de «la variable val zero», i una vora
-   absent es resoldria a zero: el contingut s'enfilaria a dalt de tot. Amb
-   `max()` la reserva es la capçalera, que es una xifra que SEMPRE es certa i
-   que mai no es mes gran que la divisio real.
+     carril   alçada del panell
+      688      434   (768x1024)
+      933      271   (1024x768 i 1280x720)
+      953      305   (1440x900)
+     1270      376   (1920x1080)
 
-   ELS 56 PX DEL CADENAT son el que ocupa el cadenat just sota la linia. El
-   cadenat no es «el megaslide»: es un estri seu, i per aixo no el publica el
-   megaslide, sino que el compta qui ha de deixar-hi lloc.
+   que és una recta: `alcada = 0,314 · carril + 218`. I el carril es publica com
+   a `--inici-nou-carril` (el tram del logo a la icona d'usuari de la capçalera).
 
-   EL REPARTIMENT DE LA ZONA (els aires i el topall de la hero) NO ES AQUI. El
-   calcula el marc, que es qui te les dues xifres que hi entren: l'alcada de la
-   zona i l'alcada natural de la caixa de la hero. Cap de les dues no es pot
-   escriure en una expressio de CSS, i les variables de CSS no viatgen: hereten
-   el valor que tenien ON S'HA DECLARAT, i per tant un `calc` escrit aquí es
-   resoldria amb els numbers d'aquí i baixaria congelat. Ja va passar: el topall
-   de la hero es calculava amb una zona de 1080 quan la zona feia 583, i la hero
-   se n'anava a 1296 px i desapareixia de la pantalla.
+   PER QUE AL `:root` I COM UN SOL NUMERO. Es una variable normal i corrent, i
+   per tant es propaga; el que no es propagava era el `calc` anterior, que
+   barrejava una variable que nomes existia de vegades. El `max()` és la
+   reserva: si el carril encara no s'ha publicat, val zero, i aleshores mana la
+   capçalera, que es una xifra que sempre és certa.
+
+     --inici-frontera   on cau la linia del megaslide
+     --inici-resguard   el tros que hi ocupa el cadenat (56 px)
    ------------------------------------------------------------------------- */
 :root {
-  --inici-frontera: max(var(--hg-mega-bottom, 0px), var(--appHeaderOffset, 0px));
+  --inici-frontera: var(--appHeaderOffset, 120px);
   --inici-resguard: calc(var(--inici-frontera) + 56px);
-  /* LA MATEIXA FRONTERA, EN NUMERO. `MutationObserver` deixa observar
-     l'atribut `style` de l'arrel, i el marc l'observa per saber quan ha
-     canviat la linia del megaslide. Llegir una variable de CSS no es pot
-     observar, i un `calc` no dona cap numero que es pugui comparar. */
-  --inici-frontera-px: var(--hg-mega-bottom, 0px);
   /* L'alcada de la franja d'icones: es una alcada declarada, i per tant aquesta
      si que la pot saber el `calc`. */
   --inici-icones-alcada: calc(var(--u) * 70.4);
-  /* LES RESERVES DEL PRIMER PINTAT. Els calcula el marc i els publica ell; el
+  /* LES RESERVES DEL PRIMER PINTAT. Les calcula el marc i les publica ell; el
      que hi ha aquí es el que val abans que ho faci.
 
-       --inici-buit         cada un dels tres aires
-       --inici-hero-sostre  el topall de la caixa de la hero */
+       --inici-buit         cada un dels quatre aires
+       --inici-dalt         el primer aire, que arrenca de la línia */
   --inici-buit: 0px;
-  --inici-hero-sostre: none;
+  --inici-dalt: 0px;
 }
+
+
+/* ---------------------------------------------------------------------------
+   EL CARRIL DE LA PAGINA NOVA
+   Dins del seu marc, `--contingut-max` passa a ser el carril de l'inici: el tram
+   del logo a la icona d'usuari. Aixi `.hg-carril` i `.hg-marc__contingut` el
+   fan servir sense que calgui tocar cap classe, i la resta del lloc no se
+   n'assabenta.
+   ------------------------------------------------------------------------- */
+[data-inici-nou="1"] {
+  --contingut-max: var(--inici-nou-carril);
+}
+
+/* EL TOPALL DE LA CAIXA DE LA HERO.
+   La hero fa la mida que li dona el seu aspecte amb l'amplada del carril, i
+   nomes s'encongeix quan la finestra es tan curta que el cadenat hi entraria a
+   sobre. El numero el publica el marc, que mesura la zona i les peces. */
+.hg-hero-caixa {
+  max-height: var(--inici-hero-sostre, none);
+}
+
+
+
