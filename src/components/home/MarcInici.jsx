@@ -43,7 +43,11 @@
 import { useEffect, useRef, useState } from 'react';
 
 /** El repartiment inicial, abans del primer mesurament. */
-const REPARTIMENT_INICIAL = { buit: 0, mig: 0, alcada: null };
+const REPARTIMENT_INICIAL = { buit: 0, reserva: 0, alcada: null };
+/** Les files del tros de dalt, i les que ocupa cada peça. */
+const FILES_TOTAL = 28;
+const FILES_MEGASLIDE = 11;
+const FILES_HERO = 12;
 
 function MarcInici({ seccions }) {
   const [primera, segona, ...resta] = seccions;
@@ -87,14 +91,15 @@ function MarcInici({ seccions }) {
       // que es l'unic que sempre hi es: el tram del logo a la icona d'usuari de
       // la capçalera, que ella publica com a `--inici-nou-carril` (1270 a 1920,
       // 953 a 1440, 933 a 1280 i 1024, 688 a 768).
+      // L'ALCADA DE LA CAPÇALERA, que tambe fa falta per a la fila.
+      cala.style.width = 'var(--appHeaderOffset, 0px)';
+      const capcalera = parseFloat(getComputedStyle(cala).width) || 0;
       const linia = (() => {
         cala.style.width = 'var(--hg-mega-bottom, 0px)';
         const publicada = parseFloat(getComputedStyle(cala).width) || 0;
         if (publicada > 0) return publicada;
         cala.style.width = 'var(--inici-nou-carril, 0px)';
         const carril = parseFloat(getComputedStyle(cala).width) || 0;
-        cala.style.width = 'var(--appHeaderOffset, 0px)';
-        const capcalera = parseFloat(getComputedStyle(cala).width) || 0;
         // L'alcada del panell segons el carril, amb els punts mesurats.
         let alcada;
         if (carril >= 1100) alcada = 0.45 * carril - 195;      // 1270 -> 376
@@ -123,46 +128,45 @@ function MarcInici({ seccions }) {
       // tant el primer que s'hi ha de posar es aquest tros.
       const zonaRect = zona.getBoundingClientRect();
       const finsLinia = Math.max(0, linia - zonaRect.top);
-      // ELS TRES BUITS, IGUALS.
+      // EL REPARTIMENT, EN FILES DE LA GRAELLA DE LA HERO.
       //
-      // De dalt a baix: la capçalera, un buit, les icones (Austen), un altre
-      // buit, la hero i un tercer buit. El que sobra de la finestra despres de
-      // les tres peces es reparteix en els tres buits:
+      // La graella de la hero del megaslide te una fila propia
+      // (`megaHeroRowHeight`, a la capçalera), i amb ella el tros de dalt
+      // sencer son FILES SENCILLES. Mesurat a 1920 (fila = 35,01 px):
       //
-      //   buit = (finestra − header − icones − hero) / 3
+      //   megaslide    376,0 px = 10,74 files  -> 11
+      //   icones        70,4 px =  2,01 files  ->  2
+      //   hero         428,0 px = 12,23 files  -> 12
+      //   finestra−header 960 px = 27,42 files  -> 28
       //
-      // i a 1920 dona (1080 − 121 − 70 − 426) / 3 = 154 px. Els comptes
-      // quadren: 121 + 154 + 70 + 154 + 426 + 154 = 1079, tota la finestra.
+      // I el model tanca exacte:
       //
-      // PER QUE ES LA FINESTRA I NO LA ZONA. La zona depen de la linia del
-      // megaslide, i la linia canvia de lloc segons la mida; amb el repartiment
-      // lligat a la zona, el bloc quedava col·locat de maneres diferents a cada
-      // mida (mesurat: la hero passava del 73 % de la zona a 1920 al 95 % a
-      // 1280). La finestra no depen de res.
-      cala.style.width = 'var(--appHeaderOffset, 0px)';
-      const capcalera = parseFloat(getComputedStyle(cala).width) || 0;
-      // LES TRES DISTANCIES SON IGUALS: de la capçalera a les icones, de les
-      // icones a la hero i de la hero al fons. El seu valor es:
+      //   megaslide 11 | buit 1 | icones 2 | buit 1 | hero 12 | buit 1  =  28 files
       //
-      //   buit = (finestra − header − icones − hero) / 3
+      // Son, doncs, divisions horitzontals: les mateixes files que fa servir
+      // el megaslide, i per aixo tot queda alineat amb la seva graella.
       //
-      // i a 1920 dona (1080 − 121 − 70 − 426) / 3 = 154 px, que es el que
-      // mesura la referencia.
+      // LA FILA: la finestra menys la capçalera, partida per 28. No es la fila
+      // de la graella del megaslide (`laneForViewport() × 0,0280625 − 2,875`,
+      // que a 1920 fa 35,01), perque aquella depen del CARRIL i la finestra no:
+      // amb la de la graella, a 1440 el bloc no omplia la finestra.
       //
-      // ENTRE LES ICONES I LA HERO N'HI HA DOS, de buits: un que posa la cella
-      // de les icones pel seu costat de baix i un que posa la de la hero pel
-      // seu costat de dalt. Per aixo cada cella en posa la MEITAT.
-      const buit = Math.max(0, (window.innerHeight - capcalera - icones - natural) / 3);
-      // Entre les icones i la hero n'hi ha DOS de buits (un que posa cada
-      // cella), i per aixo cada cella n'hi posa la meitat. El de dalt, en canvi,
-      // es sencer: nomes el posa la cella de les icones.
-      const mig = buit / 2;
-      const alcada = natural;
+      // Que la fila sigui aquesta es el que fa que els comptes tanquin: a 1920
+      // dona 34,29 px, i 11 files fan 377,1 quan el megaslide mesura 376.
+      const fila = (window.innerHeight - capcalera) / FILES_TOTAL;
+      // Els buits: una fila cada un.
+      const buit = fila;
+      // LA RESERVA DE DALT: les 11 files del megaslide mes el buit que les
+      // separa de les icones. La cella de les icones les porta senceres.
+      const reserva = (FILES_MEGASLIDE + 1) * fila;
+      // LA HERO OCUPA 12 FILES. El seu tamany natural en fa 12,23, i el topall
+      // la deixa a les 12 que li toquen perque el repartiment tanqui.
+      const alcada = Math.min(natural, FILES_HERO * fila);
       // El numero que decideix si ja hi som: si no s'ha mogut, s'atura.
       const ara = `${Math.round(zonaAlcada * 4) / 4}|${Math.round(alcada * 4) / 4}|${Math.round(buit * 4) / 4}`;
       if (ara === anterior) return;
       anterior = ara;
-        setRepartiment({ buit, mig, alcada, finsLinia, linia });
+        setRepartiment({ buit, reserva, alcada, finsLinia, linia });
       raf = requestAnimationFrame(reparteix);
     };
 
@@ -208,7 +212,8 @@ function MarcInici({ seccions }) {
           // El repartiment, publicat com a variables de CSS. Els valors surten
           // de l'estat i per tant cap render de React se'ls pot emportar.
           '--inici-buit': `${repartiment.buit ?? 0}px`,
-          '--inici-mig': `${repartiment.mig ?? 0}px`,
+          '--inici-reserva': `${repartiment.reserva ?? 0}px`,
+          ...(repartiment.alcada == null ? {} : { '--inici-hero-sostre': `${repartiment.alcada}px` }),
           '--inici-dalt': `${(repartiment.finsLinia ?? 0)}px`,
           '--inici-frontera': `${repartiment.linia ?? 0}px`,
           // La flexio no ha de repartir l'espai que sobra: els aires son
@@ -222,10 +227,10 @@ function MarcInici({ seccions }) {
           data-cella="1"
           data-cella-de={primera.id}
           style={{
-            // El buit sencer a dalt (de la capçalera a les icones) i la meitat
-            // a baix (que amb la meitat de la cella de la hero fa el buit del
-            // mig sencer).
-            paddingBlock: 'var(--inici-buit, 0px) var(--inici-mig, 0px)',
+            // Les 11 files del megaslide mes el buit que el separa de les
+            // icones, a dalt; i res a baix (el buit del mig el posa la cella de
+            // la hero).
+            paddingBlock: 'var(--inici-reserva, 0px) 0',
             display: 'flex',
             flexDirection: 'column',
             // ANCORADA A BAIX. Cada cella porta el seu aire a dalt i a baix, i
@@ -243,9 +248,9 @@ function MarcInici({ seccions }) {
           data-cella="2"
           data-cella-de={segona.id}
           style={{
-            // La meitat del buit del mig a dalt i el buit sencer a baix (de la
-            // hero al fons).
-            paddingBlock: 'var(--inici-mig, 0px) var(--inici-buit, 0px)',
+            // El buit del mig a dalt i el de sota la hero a baix: una fila
+            // cada un.
+            paddingBlock: 'var(--inici-buit, 0px)',
             display: 'flex',
             flexDirection: 'column',
             justifyContent: 'flex-start',
