@@ -214,6 +214,11 @@
 .hg-hero-caixa {
   width: 100%;
   aspect-ratio: 952 / 401;
+  /* EL RECTANGLE DE LA HERO, VISIBLE.
+     La caixa es blanca i les franges tambe, i el limit no es veia. Amb la vora
+     es veu on comença i on acaba la hero, que es el que fa falta per jutjar-ne
+     la mida. Les franges hi van A DINS, i per tant al davant de la vora. */
+  border: 1px solid hsl(var(--border));
 }
 
 @media (orientation: portrait) {
