@@ -112,6 +112,22 @@
   padding-inline: var(--marge-lateral);
 }
 
+/* El carril PUR, sense marge lateral.
+ *
+ * La diferencia amb `.hg-marc__contingut` es que aquest deixa `--marge-lateral`
+ * a dins, i per tant les peces que s'hi posen fan menys amplada que el carril.
+ * N'hi ha que han d'ocupar el carril SENCER i calcular la seva amplada sobre
+ * ell: la hero n'es una, perque el seu 70,5 % surt del carril de 1350 i no de
+ * 1350 menys dos marges.
+ *
+ * Els aires de les peces interiors es posen amb `--esp-*` a dins de la peça,
+ * que es el que fa que l'aire sigui el mateix a dalt i als costats. */
+.hg-carril {
+  width: 100%;
+  max-width: var(--contingut-max);
+  margin-inline: auto;
+}
+
 /* Una secció del marc. L'alçada, la del contingut. */
 .hg-seccio {
   width: 100%;
@@ -121,3 +137,37 @@
 .hg-seccio--esp-3 { margin-block-start: var(--esp-3); }
 .hg-seccio--esp-4 { margin-block-start: var(--esp-4); }
 
+
+/* ---------------------------------------------------------------------------
+   LA HERO DE L'INICI
+   L'amplada surt de l'aire declarat (el complement del 70,5 %), i l'alçada es
+   la PROPORCIO mesurada de la caixa, 952 / 401 = 2,3728. A 1920, 1440, 1280 i
+   1024 la caixa nova reprodueix la de la pàgina vella amb menys de mig píxel.
+
+   A la VISTA VERTICAL no: allà l'alçada és un valor FIX (541 x 430 a la pàgina
+   vella), i no la proporció. Per això la regla va a part.
+
+   LA VISTA VERTICAL ES LA MATEIXA PROPORCIO, amb l'alcada de disseny: alla la
+   caixa fa 541 x 430, o sigui la relacio 952 / 430. Tambe es un
+   `aspect-ratio`, i per aixo no cal cap alcada en pixels ni en percentatge.
+   S'hi ha provat de tres maneres i les tres fallen per la mateixa rao, que val
+   la pena deixar escrita:
+     - `height: calc(var(--u) * 430)`: 172 px en comptes de 303 a 768x1024,
+       perque `--u` NO te el topall de 1350 que te el carril.
+     - `height: 22.3958vw`: 171,98 px al mateix lloc, perque `vw` inclou la
+       barra de desplaçament i el carril no.
+     - `height: 45.1681%`: 21 px, perque un percentatge d'alcada contra un pare
+       d'alcada automatica no te referencia i cau al contingut.
+   Amb `aspect-ratio` l'alcada surt de la PROPRIA amplada, que ja es la bona.
+   ------------------------------------------------------------------------- */
+.hg-hero-caixa {
+  width: 100%;
+  aspect-ratio: 952 / 401;
+}
+
+@media (orientation: portrait) {
+  .hg-hero-caixa {
+    /* La hero vertical es un pèl mes alta que ampla: 541 x 430. */
+    aspect-ratio: 952 / 430;
+  }
+}
