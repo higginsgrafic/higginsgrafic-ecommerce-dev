@@ -321,6 +321,12 @@ function CollectionTableCard({
               width: `${cartSizePx ?? TDP_CART_SIZE_SETTINGS.fontSize}px`,
               height: `${cartSizePx ?? TDP_CART_SIZE_SETTINGS.fontSize}px`,
               objectFit: 'contain',
+              // El dibuix de l'SVG comenca a y=12 del seu `viewBox` de 69, o
+              // sigui que te un 22 % de marge mort a dalt. Sense aixo el cistell
+              // queda mes avall que les xifres del preu (6,8 px a 1920): el
+              // desplacem amunt aquest mateix 22 % perque els dos comencin al
+              // mateix punt.
+              transform: 'translateY(-22%)',
             }}
           />
         </button>
