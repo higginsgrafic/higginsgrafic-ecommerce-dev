@@ -335,6 +335,11 @@ function CollectionTableCard({
           display: 'flex',
           justifyContent: 'center',
           padding: '5px 8px',
+          // Les files de la fitxa van enganxades (buit 0). L'aire VISIBLE entre
+          // el preu i el selector es de 25 px (decisio de l'amo), i per aixo el
+          // marge es 18: els 7 px de padding que ja hi ha (2 del preu i 5 del
+          // selector) s'hi sumen.
+          marginTop: '18px',
         }}
       >
         <div
