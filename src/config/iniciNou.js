@@ -229,3 +229,46 @@ export const ICONES_COLLECCIONS = [
 export const ICONA_ALCADA_U = 70.4;
 /** First Contact es mes ample que alt i es dibuixa mes gran. */
 export const ICONA_ALCADA_FC_U = 99;
+
+/**
+ * LA MIDA DEL DIBUIX DINS DE LA HERO, per a cada dibuix.
+ *
+ * AQUEST MAPA ES DE LA HERO I NO ES `overlayScale`. Son dos sistemes diferents, i
+ * es la rao per la qual els dibuixos de First Contact i de les Quotes d'Austen
+ * sortien desescalats: la hero no fa servir l'`overlayScale` de la fitxa, te el
+ * seu propi mapa, amb valors com el 46,585 % del Phoenix o el 12,16 % de les
+ * Quotes.
+ *
+ * LA CLAU ES EL FINAL DE LA RUTA DE LA IMATGE, no l'`overlayAlt`. La pagina
+ * vella ho consulta amb l'`overlayAlt`, i per als dibuixos de First Contact les
+ * dues coses NO coincideixen (`overlayAlt` es `first_contact/wormhole` i la ruta
+ * es `first_contact/white/wormhole-w-stripe.webp`), i per aixo alla tambe queien
+ * al valor per defecte. La ruta es la que no enganya: es la imatge que es pinta.
+ *
+ * Estan copiats de `Home.jsx`, que es qui els te calibrats. `tauleta` es el
+ * valor quan la finestra fa de 768 a 1366; `escriptori`, la resta.
+ *
+ * PENDENT D'ARREGLAR: aquests numeros son calibratges de la pagina vella, i el
+ * que caldria es que sortissin del llenç com la resta. Es deixen com estan
+ * perque el dibuix quedi on toca.
+ */
+export const HERO_DIBUIX_MIDA = {
+  'first_contact/black/nx-01-b-stripe.webp': { escriptori: 7, tauleta: 7 },
+  'first_contact/black/ncc-1701-b-stripe.webp': { escriptori: 7, tauleta: 7 },
+  'first_contact/black/ncc-1701-d-b-stripe.webp': { escriptori: 3.5, tauleta: 3.5 },
+  'first_contact/white/the-phoenix-w-stripe.webp': { escriptori: 46.585, tauleta: 42.35 },
+  'first_contact/black/the-phoenix-b-stripe.webp': { escriptori: 46.585, tauleta: 42.35 },
+  'austen/it-is-a-truth-b-stripe.webp': { escriptori: 12.16, tauleta: 12.8 },
+  'austen/half-agony-half-hope-b-stripe.webp': { escriptori: 4.8, tauleta: 6 },
+  'austen/unsociable-and-taciturn-b-stripe.webp': { escriptori: 2.4, tauleta: 3 },
+  'austen/i-admire-and-love-you-b-stripe.webp': { escriptori: 12.16, tauleta: 6 },
+  'austen/you-have-bewitched-me-b-stripe.webp': { escriptori: 2.4, tauleta: 3 },
+  'austen/you-must-allow-me-b-stripe.webp': { escriptori: 12.16, tauleta: 12.8 },
+  'austen/looking_for_my_darcy/color/solid/blue-solid-stripe.webp': { escriptori: 19, tauleta: 19 },
+  'austen/looking_for_my_darcy/color/solid/fuchsia-solid-stripe.webp': { escriptori: 19, tauleta: 19 },
+  'austen/looking_for_my_darcy/color/solid/red-solid-stripe.webp': { escriptori: 19, tauleta: 19 },
+  'austen/looking_for_my_darcy/color/solid/yellow-solid-stripe.webp': { escriptori: 19, tauleta: 19 },
+};
+
+/** La mida per defecte del dibuix quan la seva imatge no es al mapa. */
+export const HERO_DIBUIX_MIDA_DEFECTE = 30;
