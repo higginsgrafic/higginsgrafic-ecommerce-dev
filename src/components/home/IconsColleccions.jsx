@@ -22,19 +22,24 @@ function IconsColleccions() {
       data-icones-colleccions="1"
       style={{
         // L'ALCADA DE LA FRANJA ES LA D'AUSTEN, no la de la icona mes alta.
-        // Austen es la referencia de volum del grup, i First Contact (99) es mes
-        // gran que la resta (70,4): amb la franja de 70,4, First Contact
-        // sobresurt per dalt i per baix, i les altres quatre queden centrades.
-        // Es `height` i no `minHeight` perque la icona mes alta, si no, tornaria
-        // a manar sobre l'alcada.
+        // Austen es la referencia de volum del grup, i First Contact (98,9) es
+        // mes gran que la resta (70,4). Es `height` i no `minHeight` perque la
+        // icona mes alta, si no, tornaria a manar sobre l'alcada.
         height: u(ICONA_ALCADA_U),
+        // EL CENTRE QUE MANA ES EL DE LA FRANJA. Amb el cap alineat, Austen
+        // (70,4) omple la franja exactament, i el fenix (98,9) hi comença a dalt
+        // i sobresurt per baix. Es el que fa una cella de taula: el fill
+        // centrat es la franja, i el que desborda desborda.
+        //
+        // S'havia provat de centrar el CONJUNT dels cinc dibuixos amb un coixi a
+        // sota, i el resultat era que la franja pujava 14,3 unitats i a ull es
+        // veia el grup massa amunt. El coixi, fora.
         display: 'flex',
-        // Les icones s'alineen per la BASE (bottom), i aixo, amb l'alcada de la
-        // franja a la mida d'Austen, les deixa centrades: la base comuna es el
-        // fons de la franja, i el centre de la franja es el centre d'Austen.
-        // Amb `center` el grup quedava 14,3 unitats desviat, perque la icona
-        // mes alta desborda la franja i arrossega el centre visual.
-        alignItems: 'center',
+        // L'ALINEACIO. La franja te l'alcada d'Austen (70,4) i les icones
+        // s'alineen pel CAP: aixi Austen, Cube, The Human Inside i Miscellania
+        // (que fan just 70,4) omplen la franja, i First Contact (98,9) hi
+        // comença a dalt i sobresurt per baix.
+        alignItems: 'flex-start',
         justifyContent: 'center',
         flexWrap: 'wrap',
         // El buit entre icones es UN COS: la mida de referencia de la propia
