@@ -228,3 +228,56 @@ compleix, s'atura i s'explica per què**: no s'ajusta el número nou perquè qua
 No és la migració de la resta del lloc. El títol de col·lecció és el mateix
 component a les pàgines de col·lecció, i canviar-lo allà és una decisió del
 propietari. Aquesta especificació es prova a `/nova/inici`, on no toca ningú.
+
+---
+
+## 5 bis. Què vol dir «lleugera i robusta», amb números
+
+La pàgina d'inici és la **columna vertebral** del lloc, i per tant no es pot
+permetre una excepció: si aquí una cosa no està ben construïda, es propaga a
+totes les pàgines que en pengin. Aquests són els criteris, mesurats.
+
+### Lleugera
+
+| mesura | `/` (vella) | `/nova/inici` | objectiu |
+|---|---|---|---|
+| nodes del `main` | 480 | **435** | no créixer |
+| **codi JS de la pàgina** | 21 KB | **5,1 KB** | **no créixer** |
+| absoluts | 51 | 30 | no créixer |
+| `top` en línia | 57 | 36 | no créixer |
+| transformacions | 84 | 61 | no créixer |
+
+**El pes del DOM no és el codi de la pàgina: són les fitxes i la capçalera.** Els
+435 nodes es reparteixen així: 20 fitxes (~16 nodes cada una, ~320), la
+capçalera, i la resta. La columna vertebral pròpiament dita —les set seccions i
+els seus aires— és petita, i per això la pàgina nova pesa **una quarta part** que
+la vella tot i fer el mateix.
+
+**El que això obliga:** cap peça del bloc no pot créixer per resoldre un cas.
+Si una secció necessita una cosa que les altres no, va a la seva configuració,
+no al component.
+
+### Robusta
+
+La prova no és que avui es vegi bé: és que **tocar una cosa no en mogui una
+altra**. Aquesta és la propietat que la pàgina vella no té, i està mesurada:
+tocar la píndola movia les col·leccions, i tocar el títol movia els marges.
+
+L'invariant, verificable a cada passa:
+
+| prova | ha de donar |
+|---|---|
+| canviar l'aire d'**una** secció | la resta de seccions no es mou |
+| canviar el contingut d'**una** fitxa | la seva fila i les altres files no es mouen |
+| la mateixa regla a les cinc mides | el **mateix** valor en unitats de disseny |
+| elements absolut en el flux de la pàgina | **0** (els absoluts son decoració: el fons degradat i el número de fons) |
+| expressions `calc` amb `vw` fora de l'escala | **0** |
+
+**Per què els absoluts no són tots dolents.** Dels 30 que té la pàgina nova, 25
+són dibuix: el fons degradat de cada fitxa (20, que ha de sobresortir de la seva
+caixa) i el número de fons de cada col·lecció (5). Son decoració i no
+participen de la col·locació. Els **5 que són un problema** són les píndoles,
+perquè **sí** que són contingut i han d'ocupar lloc.
+
+**La regla:** un `absolute` només s'accepta si en treure'l de la col·locació no
+es perd res. La píndola no la compleix; el degradat i el número, sí.
