@@ -325,7 +325,10 @@ function CollectionTableCard({
               width: `${cartSizePx ?? TDP_CART_SIZE_SETTINGS.fontSize}px`,
               height: `${cartSizePx ?? TDP_CART_SIZE_SETTINGS.fontSize}px`,
               objectFit: 'contain',
-              // 3 px mes amunt, a ma (decisio de l'amo): 5 i despres 2 mes avall.
+              // 3 px mes amunt, a ma (decisio de l'amo). A la fitxa el cistell es
+              // SEMPRE el buit: cap fitxa rep cap comptador (`cartCount = 0` per
+              // defecte i ningu no el passa), i la nansa del carreto ple nomes
+              // surt al header.
               transform: 'translateY(-3px)',
             }}
           />
