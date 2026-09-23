@@ -69,12 +69,36 @@ describe("l'escala d'espaiat de la fonamenta", () => {
     expect(marge).toMatch(/var\(--u\)\s*\*\s*40/);
   });
 
-  it('la GEOMETRIA no te terra: --u es sempre finestra / 1920', () => {
-    // El terra de 0,6667 es del TEXT. Aplicat a la geometria, a 768 feia que
-    // `--esp-4` valgués 1.280 px en comptes de 48.
-    const u = declaracio('--u');
-    expect(u).toBe('calc(100vw / 1920)');
+  it('la unitat surt del CARRIL, no de la finestra', () => {
+    // Eren `finestra / 1920`, i la finestra i el carril nomes son proporcionals
+    // fins a 1920: a partir d'alla el carril te un sostre de 1350 px, i a
+    // tauleta s'eixampla mes que la finestra. Amb la unitat lligada a la
+    // finestra, l'espaiat i el titol NO creixien quan creixia el carril
+    // (mesurat: la hero passava de 508x214 a 677x285 a 1024 i el titol es
+    // quedava igual).
+    expect(declaracio('--u')).toBe('calc(var(--contingut-max) / 1350)');
+  });
+
+  it('la unitat NO te terra', () => {
+    // El terra de 0,6667 es del TEXT. Aplicat a la unitat, a 768 feia que
+    // `--esp-4` valgues 1.280 px en comptes de 48.
     expect(FONAMENTA).not.toMatch(/--u:\s*10\.6667px/);
+    expect(declaracio('--u')).not.toMatch(/max\(|min\(/);
+  });
+
+  it("el carril es declara ABANS de la unitat, perque la unitat en surt", () => {
+    const iCarril = FONAMENTA.indexOf('--contingut-max:');
+    const iU = FONAMENTA.indexOf('--u: calc(var(--contingut-max)');
+    expect(iCarril).toBeGreaterThan(-1);
+    expect(iU).toBeGreaterThan(iCarril);
+  });
+
+  it("el carril s'eixampla a tauleta NOMES a la pagina nova", () => {
+    // El carril es compartit amb la pagina vella, i alla la mida de la FITXA en
+    // surt: eixamplar-lo a tot el lloc li canviava les fitxes (mesurat, de
+    // 259x418 a 720x917 a 768). La regla ha d'anar abastida.
+    expect(FONAMENTA).toMatch(/@media \(min-width: 768px\) and \(max-width: 1279px\)/);
+    expect(FONAMENTA).toMatch(/\[data-inici-nou="1"\] +\.hg-carril/);
   });
 
   it('el terra del text viu a --escala, no a --u', () => {
