@@ -2208,7 +2208,17 @@ function FullWideSlideHeader({
         const root = document.documentElement;
         // La tauleta te les seves alcades calibrades i el seu belt de 992: no
         // s'escala mai. L'escriptori (inclosa la banda estreta) si.
-        const beltFinal = (isPortraitTablet || isLandscapeTablet) ? 992 : beltWidth;
+        //
+        // EXCEPCIO: l'apaisada amb la finestra MES ESTRETA QUE EL CARRIL. Alla
+        // la filera de la capçalera fa el carril (no `--site-w`, com la
+        // vertical), i amb 992 en una finestra de 768 la fila no hi cap: les
+        // icones de la dreta (cercador, cistell, usuari) queien a x=854 i
+        // quedaven FORA de la pantalla, o sigui que no es podia ni obrir el
+        // cistell. Amb el carril limitat a la finestra, la fila hi cap i les
+        // peces s'encongeixen amb ell (`carrilLane`).
+        const vp = Math.max(0, (document.documentElement.clientWidth || window.innerWidth || 0));
+        const beltTauleta = Math.min(992, Math.max(320, vp - 32));
+        const beltFinal = isPortraitTablet ? 992 : (isLandscapeTablet ? beltTauleta : beltWidth);
         root.style.setProperty('--hg-mega-w', `${beltFinal}px`);
         // Quan el carril te una amplada propia (tauleta: 992) la seva posicio
         // tambe: CENTRAT a l'espai de maquetacio. El `belt.left` es el del marc
