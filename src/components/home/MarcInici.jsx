@@ -229,10 +229,12 @@ function MarcInici({ seccions }) {
       // gairebe mai: en un Mac les finestres per defecte fan 1512, 1728 o 1440,
       // i amb el DevTools acoblat al costat o amb la barra de desplaçament el
       // viewport no fa la xifra rodona ni de bon tros. Amb la franja 1200-1366
-      // hi entren els dos portatils i tot el que hi ha al mig, i en queden fora
-      // la tauleta de 1024 (que no es toca) i l'escriptori de 1440 en amunt.
+      // NOMES hi entren els 1280 i els 1366 (i el que hi ha entremig, que es el
+      // marge que cal perque en un Mac la finestra no cau mai exactament en
+      // aquelles dues xifres). En queden fora la tauleta de 1200 i la de 1024,
+      // que no es toquen, i l'escriptori de 1440 en amunt.
       const ampleFinestra = window.innerWidth;
-      const alFons = ampleFinestra >= 1200 && ampleFinestra <= 1366;
+      const alFons = ampleFinestra >= 1280 && ampleFinestra <= 1366;
       const blocPagina = alFons ? disponible : Math.max(disponible, ambCadenat);
       const alcada = natural;
       // El numero que decideix si ja hi som: si no s'ha mogut, s'atura.
