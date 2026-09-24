@@ -240,10 +240,36 @@ llegeix.
 capçalera fan **614, 820 i 1152 px**, tots cinc el mateix número. La hero fa
 462×195, 617×260 i 867×365.
 
-**I l'objectiu de l'amo, complert:** amb el megaslide obert, **les hero hi caben a
-totes les mides menys una** — 1024×538 (la finestra més curta de totes, el Tab S9
-Ultra apaïssat), que en falla 21,8 i abans en fallava 183,4. A 1024×690, 1280×586
-i 1366×634 (les tres que fallaven) ara hi caben amb 120,6, 15,4 i 41,2 px d'aire.
+**I l'objectiu de l'amo, gairebé complert:** amb el megaslide obert, les hero hi
+caben a totes les mides **menys a les quatre tauletes apaïssades més curtes**.
+Mesurat (finestra, amb el megaslide obert):
+
+| finestra | dispositiu | abans | amb 3/5 |
+|---|---|---|---|
+| 1024×690 | iPad 10.2 apaïssat | NO (−31,4) | **SI** (+120,6 d'aire) |
+| 1280×586 | portàtil 1280×720 | NO | **SI** (+15,4) |
+| 1366×634 | portàtil 1366×768 | NO (−87,4) | **SI** (+41,2) |
+| 1024×562 | MatePad 13.2 apaïssat | — | **SI** (+0,6) |
+| 1133×666 | iPad mini apaïssat | — | **SI** (+38,1) |
+| 981×535 | MatePad 12.2 apaïssat | — | **NO** (−14,2) |
+| 1024×538 | Tab S9 Ultra apaïssat | NO (−183,4) | **NO** (−21,8) |
+| 934×506 | Tab S9+ apaïssat | — | **NO** (−30,8) |
+| 853×455 | Tab S9 apaïssat | NO (−266) | **NO** (−61,4) |
+
+O sigui: **l'objectiu es compleix a les tres que es van estudiar** (1024×690,
+1280×586 i 1366×634) i a les dues següents, però **no a les quatre més curtes**
+(finestres de 455 a 538 px d'alçada), on el fons de la hero queda sota la
+plegada. Allà el que no hi cap és el **conjunt**: el megaslide (218-229 px) + el
+cadenat (56) + una hero de 162-195 px en una finestra de 455-538. No és un
+problema de fracció —amb 4/6 empitjora— sinó de **densitat** (peça 3): en una
+finestra curta el megaslide ha de ser una composició més baixa, o la hero una
+franja.
+
+**L'alternativa 4/6, mesurada i descartada** (24/09): el carril a 2/3 deixa el
+megaslide gairebé sense estirar (a 1920 el panell fa 368 dels 376 px d'abans, un
+98 %, en comptes del 94 % del 3/5), però **perd la hero a 1280×586** (el cap
+queda 20,3 px darrere el panell), deixa 1366×634 amb 2,2 px de marge i empitjora
+les quatre curtes. Es queda a 3/5.
 
 **Qui NO rep el carril declarat, i per què està escrit al codi:** la **tauleta
 vertical** (el seu tauler fa 992 px, més ample que la finestra de 768: és un
