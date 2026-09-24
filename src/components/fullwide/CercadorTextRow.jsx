@@ -949,7 +949,16 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
           // La 4x4 va a la DRETA (columna 2, les dues files) i els enllacos de
           // colleccions son una LINIA a sota del carrusel, entre el selector i la
           // 4x4. Abans eren una columna a la dreta de tot, i la 4x4 anava al mig.
-          gridTemplateColumns: `minmax(0, 1fr) ${carrilLane(78)}`,
+          // LA COLUMNA DE LA DRETA ES LA MIDA DE LA GRAELLA 4x4.
+          //
+          // Abans era `carrilLane(78)` (66 px a 1920) i la graella 4x4 en
+          // necessita 123 (quatre rodones de `cerclePx` i tres gaps): la
+          // columna era 57 px mes estreta que el seu contingut, o sigui que les
+          // dues ultimes columnes de colors queien FORA del carril. Amb
+          // `max-content` la columna fa exactament el que ocupa la graella, i
+          // com que la filera acaba a la vora dreta del carril, la graella
+          // tambe: la seva vora dreta es la del carril.
+          gridTemplateColumns: 'minmax(0, 1fr) max-content',
           gridTemplateRows: 'auto auto',
           // 10 px FIXES entre blocs (no escalats): es el que fa que totes les
           // mides quadrin, perque el que cedeix es el gap intern dels dibuixos.
