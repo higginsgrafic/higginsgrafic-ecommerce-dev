@@ -62,27 +62,30 @@ export function computeSiteFrame() {
     maxAmple: readCarril() ?? SITE_FRAME_MAX_WIDTH,
   });
   if (!marc) return null;
-  // Mitja reserva de la barra de desplaçament (o del seu lloc): el marc es
-  // centra sobre la FINESTRA, pero el cos es `gutter` px mes estret. Les capes
-  // que es pengen d'un contenidor centrat al COS (el megaslide) necessiten
-  // aquesta meitat per caure al mateix lloc que el marc.
-  const gutter = Math.max(0, (window.innerWidth || 0) - (document.body?.clientWidth || 0));
-  return { xL: marc.xL, xR: marc.xR, w: marc.width, gutterMig: gutter / 2 };
+  // Ja no es publica cap compensacio de la barra de desplacament: el marc, el
+  // carril i el megaslide es calculen tots amb l'amplada de MAQUETACIO
+  // (getLayoutViewportWidth, la del cos), o sigui que cauen al mateix lloc
+  // sense desplacaments. La compensacio existia quan el megaslide es mesurava
+  // sobre la finestra (`100vw`), i amb barra classica desalineava 7,5 px.
+  return { xL: marc.xL, xR: marc.xR, w: marc.width, layoutW: vw };
 }
 
 export default function SiteFrame() {
   useLayoutEffect(() => {
     const root = document.documentElement;
-    let last = { xL: NaN, xR: NaN, w: NaN, gutterMig: NaN };
+    let last = { xL: NaN, xR: NaN, w: NaN, layoutW: NaN };
     const apply = () => {
       const next = computeSiteFrame();
       if (!next) return;
-      if (next.xL === last.xL && next.xR === last.xR && next.w === last.w && next.gutterMig === last.gutterMig) return;
+      if (next.xL === last.xL && next.xR === last.xR && next.w === last.w && next.layoutW === last.layoutW) return;
       last = next;
       root.style.setProperty('--site-xL', `${next.xL}px`);
       root.style.setProperty('--site-xR', `${next.xR}px`);
       root.style.setProperty('--site-w', `${next.w}px`);
-      root.style.setProperty('--site-gutter-mig', `${next.gutterMig}px`);
+      // L'amplada de MAQUETACIO, en px: les formulas de `foundation.css` que
+      // abans feien servir `100vw` (que inclou el canal de la barra) l'han de
+      // fer servir per caure on cau el carril.
+      root.style.setProperty('--layout-w', `${next.layoutW}px`);
     };
     apply();
     window.addEventListener('resize', apply);

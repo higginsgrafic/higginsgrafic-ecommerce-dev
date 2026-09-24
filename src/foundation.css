@@ -94,7 +94,7 @@
    amb `html` no guanyaria mai. */
 @media (min-width: 1280px) {
   :root {
-    --escala: calc(100vw / 1920);
+    --escala: calc(var(--layout-w, 100vw) / 1920);
   }
 }
 
@@ -140,8 +140,8 @@
   /* El carril, expressat pels seus dos extrems. Son els noms que el lloc ja
      fa servir a 20 llocs; es conserven perque la migracio es faci d'una en
      una. Quan cap pagina no els llegeixi, s'esborren. */
-  --hg-tdp-xL: calc((100vw - var(--contingut-max)) / 2);
-  --hg-tdp-xR: calc((100vw + var(--contingut-max)) / 2);
+  --hg-tdp-xL: calc((var(--layout-w, 100vw) - var(--contingut-max)) / 2);
+  --hg-tdp-xR: calc((var(--layout-w, 100vw) + var(--contingut-max)) / 2);
 }
 
 /* ---------------------------------------------------------------------------

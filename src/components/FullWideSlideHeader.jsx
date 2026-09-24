@@ -11,6 +11,7 @@ import { getGildan64000Catalog } from '../utils/placeholders.js';
 import { AUSTEN_QUOTES_ASSETS, resolveAustenQuoteAssetId, resolveAustenQuoteOriginalFromPath } from '../utils/austenQuotesAssets.js';
 import { clampNumber, escalaMegaslide, MEGASLIDE_REFERENCIA_PX, carrilPx } from '@/utils/layoutMetrics';
 import { laneForViewport, carrilDeclarat } from '@/utils/layoutModel';
+import { getLayoutViewportWidth } from '@/utils/layoutMetrics';
 import {
   FIRST_CONTACT_MEDIA,
   FIRST_CONTACT_MEDIA_WHITE,
@@ -2230,7 +2231,10 @@ function FullWideSlideHeader({
         // quedaven FORA de la pantalla, o sigui que no es podia ni obrir el
         // cistell. Amb el carril limitat a la finestra, la fila hi cap i les
         // peces s'encongeixen amb ell (`carrilLane`).
-        const vp = Math.max(0, (document.documentElement.clientWidth || window.innerWidth || 0));
+        // L'amplada de MAQUETACIO, la del cos (vegeu getLayoutViewportWidth):
+        // es la unica que val el mateix a tots els navegadors i la mateixa amb
+        // que el CSS centra el contingut.
+        const vp = Math.max(0, getLayoutViewportWidth());
         // EL CARRIL DECLARAT (3/5 de la finestra, amb 1/5 de marge per banda) mana
         // sobre la belt a l'escriptori i a la tauleta apaissada. Es publica com a
         // `--carril` perque el lloc i el marc del lloc el puguin llegir: es la

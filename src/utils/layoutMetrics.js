@@ -59,14 +59,30 @@ export function getNativeScrollbarWidth() {
 }
 
 /**
- * Amplada del layout viewport (sense scrollbar vertical).
- * Per garantir que no hi ha "salts" de centratge horitzontal entre rutes
- * amb scrollbar i rutes sense (com full-wide-slide amb overflow: hidden),
- * usem `window.innerWidth` menys l'amplada física de la scrollbar del sistema.
- * Així el viewport virtual de treball és completament consistent.
+ * Amplada del layout viewport: LA DEL COS, que es l'amplada amb que maqueta el
+ * CSS.
+ *
+ * PER QUE EL COS I NO LA FINESTRA (24/09/2026). `<html>` porta
+ * `scrollbar-gutter: stable`, que RESERVA l'espai de la barra de desplacament
+ * encara que no n'hi hagi: el cos fa sempre 15 px menys que la finestra. Amb
+ * aquesta reserva, `window.innerWidth` i `window.innerWidth - scrollbar` donen
+ * valors DIFERENTS segons el navegador:
+ *
+ *   - Firefox amb ratoli: barra classica de 15 px -> 1920 - 15 = 1905. Coincidia.
+ *   - Chromium: barra superposada (0 px) pero el canal reservat hi es -> 1920.
+ *     El cos, pero, tambe fa 1905. NO coincidia: el carril es calculava 9 px
+ *     mes ample del que el CSS pot maquetar.
+ *
+ * El cos es l'unic valor que val el mateix a tots dos (1905) i el mateix que
+ * fa servir el CSS per centrar. Amb ell, el carril, la fila del header, les
+ * guies i el marc del lloc cauen tots al mateix lloc a qualsevol navegador.
+ *
+ * Es conserva el calcul antic com a recurs per si el cos encara no existeix.
  */
 export function getLayoutViewportWidth() {
   if (!isBrowser()) return 0;
+  const bodyW = document.body ? document.body.clientWidth : 0;
+  if (Number.isFinite(bodyW) && bodyW > 0) return bodyW;
   const winW = window.innerWidth;
   if (!Number.isFinite(winW) || winW <= 0) return 0;
   const sbW = getNativeScrollbarWidth();

@@ -32,6 +32,13 @@ export default function useDeviceLayout() {
         'ontouchstart' in window;
 
     return {
+      // L'AMPLADA DE LA CLASSIFICACIO ES LA DE LA FINESTRA, NO LA DE
+      // MAQUETACIO. Els trencaments del CSS (`@media`) es miren amb la
+      // finestra (inclouen la barra de desplacament): si aqui es fes servir
+      // l'amplada de maquetacio (15 px menys), una finestra just a la vora
+      // cauria en una classe diferent de la que aplica el CSS i es veuria un
+      // layout que no toca. El carril, en canvi, si que va amb l'amplada de
+      // maquetacio (vegeu getLayoutViewportWidth): allo es on es maqueta.
       ...deviceLayoutFromViewport(
         typeof window !== 'undefined' ? window.innerWidth || 0 : 0,
         typeof window !== 'undefined' ? window.innerHeight || 0 : 0,
