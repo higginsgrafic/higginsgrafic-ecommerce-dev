@@ -193,4 +193,29 @@ o no es fa. El que no es fa és deixar el pedaç i dir que ja està.
 
 ---
 
+## 16. Les barres de desplaçament estan prohibides
+
+**La regla.** Cap peça de la interfície del client no ha de mostrar una barra de
+desplaçament. El que no hi cap es resol **declarant** com s'hi arriba —un
+carrusel amb gest i fletxes, un desplaçament propi, un altre repartiment—, no
+deixant que el navegador en pinti una. **Només amb una petició expressa de
+l'amo.**
+
+**Per què.** Ho va demanar l'amo el 24/09/2026, després de veure la barra al
+carrusel de dibuixos del megaslide. Una barra és l'aspecte més evident de «això
+no hi cap», i en aquest projecte el que no hi cap es resol canviant la
+composició: la barra és el pedaç, no la solució (regla 15). I a més, les barres
+del sistema són diferents a cada navegador i a cada aparell: són una mida que no
+es pot declarar.
+
+**Com es reconeix.** Un contenidor de la interfície amb `overflow: auto` o
+`scroll`, o amb `scrollbar-width`/`::-webkit-scrollbar` només per amagar la
+barra. Si cal amagar-la, és que el desplaçament no està declarat.
+
+**Fora d'aquesta regla.** El desplaçament vertical de la pàgina (el del
+`body`/`main`) i les barres de les **eines** (admin, dev i l'overlay de formats),
+que són instrumentació i no interfície del client.
+
+---
+
 *Si has de trencar alguna d'aquestes regles, para i pregunta. Cap d'elles és negociable sense el propietari.*
