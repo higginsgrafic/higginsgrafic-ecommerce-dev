@@ -6,7 +6,7 @@ import {
   GRAELLA_COLUMNES, GRAELLA_FILES, GRAELLA_ESQUERRA_LANDSCAPE,
   midaDibuix, gapHorizontal, gapVertical, colorMida, colorGap,
   midesGraellaCompacta,
-  MARGE_ESQUERRA_DIBUIXOS_ESCRIPTORI_PX, MARGE_DRET_FILERA_ESCRIPTORI_PX,
+  MARGE_ESQUERRA_DIBUIXOS_ESCRIPTORI_PX,
 } from './midesGraella.js';
 import { carrilPct, carrilLane, carrilPx, readRootCssNumber } from '../../utils/layoutMetrics.js';
 import { GRAELLA_DIBUIXOS_ESCALA_VERTICAL } from '../../config/stripeCalibrationsVertical.js';
@@ -653,6 +653,7 @@ export function CercadorColleccionsColumna({
   isPortraitTablet = false,
   isLandscapeTablet = false,
   caixes = false,
+  linia = false,
 }) {
   // Amb `caixes` (la taula de la vista vertical) cada nom va dins la seva caixa
   // grisa, enrasat a la dreta i repartides per tota l'alcada; sense, es la
@@ -718,6 +719,47 @@ export function CercadorColleccionsColumna({
       </div>
     );
   }
+  // LA LINIA DE COLLECCIONS (24/09/2026, ho va demanar l'amo): els mateixos
+  // enllacos que la columna, pero en una fila horitzontal, per anar a sota del
+  // carrusel, entre el selector i la graella 4x4.
+  if (linia) {
+    return (
+      <div
+        data-colleccions-linia="1"
+        style={{
+          width: '100%',
+          display: 'flex',
+          alignItems: 'center',
+          columnGap: carrilLane(18),
+          rowGap: '2px',
+          flexWrap: 'wrap',
+          minWidth: 0,
+        }}
+      >
+        {CERCADOR_COLLECTIONS.map(({ key, label }) => (
+          <button
+            key={key}
+            type="button"
+            onClick={() => onSelect?.(key)}
+            className="font-roboto-condensed"
+            style={{
+              padding: 0,
+              border: 0,
+              background: 'transparent',
+              color: '#2B2B2B',
+              fontSize: (isPortraitTablet || isLandscapeTablet) ? '11px' : `max(10px, ${carrilPx(11)})`,
+              fontWeight: key === activeKey ? 700 : 300,
+              lineHeight: 1.2,
+              whiteSpace: 'nowrap',
+              cursor: 'pointer',
+            }}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+    );
+  }
   return (
     <div style={{ width: '100%', transform, paddingLeft }}>
       {CERCADOR_COLLECTIONS.map(({ key, label }) => (
@@ -750,7 +792,7 @@ export function CercadorColleccionsColumna({
   );
 }
 
-function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripeItem, hoveredStripeItem, onSelectGroup, onHoverItem, onHoverLeave, compact = false, selectedColor = 'white', onSelectColor, onSelectCollection, isPortraitTablet = false, isLandscapeTablet = false, uniformColumns = false, fontBoost = 0, desplacamentVertical = 0, esquerra }) {
+function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripeItem, hoveredStripeItem, onSelectGroup, onHoverItem, onHoverLeave, compact = false, selectedColor = 'white', onSelectColor, onSelectCollection, isPortraitTablet = false, isLandscapeTablet = false, fontBoost = 0, desplacamentVertical = 0, esquerra }) {
   // Ajust de la graella compacta a l'espai disponible (només desktop: les
   // tauletes mantenen la mida fixa de moment). Mesurem l'amplada de la columna
   // i el capdamunt de la franja de samarretes, i guardem la mida de dibuix i
@@ -885,7 +927,11 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
           // (`carrilLane`, no `carrilPx`): a tauleta 40 px fixos no son el 3%
           // del carril (en son 29,4) i la fila 1 no encaixava amb la franja del
           // header. Amb `carrilLane` l'amplada es la mateixa a 1024 i a 1280.
-          right: carrilLane(MARGE_DRET_FILERA_ESCRIPTORI_PX),
+          // LA GRAELLA 4x4 A LA VORA DRETA DEL CARRIL (24/09/2026, ho va demanar
+          // l'amo). Abans el marge dret era el coixí de disseny (40/1350 del
+          // carril); ara es 0, com el logo del header i com el selector, que va
+          // a la vora esquerra.
+          right: 0,
           display: 'grid',
           // Les columnes i la separacio son mides del carril (78, 142 i 10 px
           // de 1350). Amb `carrilLane` (no `carrilPx`) tambe s'encongeixen a
@@ -895,10 +941,20 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
           // (el nom mes llarg): si ho fos, el text s'endinsaria a la columna de
           // colors. Amb `min-content` creix a la mida del text i la seva dreta
           // queda clavada a la dreta de la filera (o sigui a la franja).
-          gridTemplateColumns: `minmax(0, 1fr) ${carrilLane(78)} minmax(min-content, ${carrilLane(142)})`,
+          // DUES COLUMNES I DUES FILES (24/09/2026):
+          //
+          //   fila 1   [ carrusel .................... ] [ 4x4 ]
+          //   fila 2   [ enllacos de colleccions ..... ] [  "  ]
+          //
+          // La 4x4 va a la DRETA (columna 2, les dues files) i els enllacos de
+          // colleccions son una LINIA a sota del carrusel, entre el selector i la
+          // 4x4. Abans eren una columna a la dreta de tot, i la 4x4 anava al mig.
+          gridTemplateColumns: `minmax(0, 1fr) ${carrilLane(78)}`,
+          gridTemplateRows: 'auto auto',
           // 10 px FIXES entre blocs (no escalats): es el que fa que totes les
           // mides quadrin, perque el que cedeix es el gap intern dels dibuixos.
           columnGap: '20px',
+          rowGap: '10px',
           alignItems: 'start',
           pointerEvents: 'auto',
         }}
@@ -923,41 +979,33 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
           fontBoost={fontBoost}
         />
 
-        <CercadorColorsGrid
-          selectedColor={selectedColor}
-          onSelectColor={onSelectColor}
-          cerclePx={cerclePx}
-          colorGapPx={colorGapPx}
-          // A l'apaisada la graella de colors va 10 px mes a l'esquerra (ho va
-          // demanar l'amo, igual que la columna de colleccions).
-          transform={uniformColumns ? 'translateX(85px)' : ((isPortraitTablet || isLandscapeTablet) ? 'translateX(-10px)' : undefined)}
-          marginTop={uniformColumns ? '5px' : undefined}
-          isPortraitTablet={isPortraitTablet}
-          isLandscapeTablet={isLandscapeTablet}
-        />
+        {/* LA GRAELLA 4x4, A LA DRETA DEL CARRIL: columna 2, les dues files.
+            Ja no porta cap desplac,ament: el seu lloc es la vora dreta. */}
+        <div style={{ gridColumn: '2', gridRow: '1 / span 2', minWidth: 0 }}>
+          <CercadorColorsGrid
+            selectedColor={selectedColor}
+            onSelectColor={onSelectColor}
+            cerclePx={cerclePx}
+            colorGapPx={colorGapPx}
+            isPortraitTablet={isPortraitTablet}
+            isLandscapeTablet={isLandscapeTablet}
+          />
+        </div>
 
-        {/* La columna s'ajusta al nom mes llarg (fit-content): aixi el nom
-            mes llarg comença on començava i els curts s'hi enrasen per la
-            dreta, sense que el conjunt es desplaci. */}
-        {/* La llista s'enrasa a la DRETA de la seva columna: d'aquesta manera el
-            text acaba sempre on acaba la columna, sense dependre de com de llarg
-            sigui el nom mes llarg ni del cos de lletra. Abans la columna era
-            `fit-content` i el conjunt es desplaçava 45 px, i per aixo el text
-            acaba 12 px mes enlla de la franja. */}
-        <CercadorColleccionsColumna
-          activeKey={activeKey}
-          onSelect={onSelectCollection}
-          alcadaFilaLlista={alcadaFilaLlista}
-          // A l'apaisada (1024 i 1280) la llista va 10 px mes a l'esquerra, ho
-          // va demanar l'amo.
-          transform={uniformColumns ? 'translateX(120px)' : ((isPortraitTablet || isLandscapeTablet) ? 'translateX(-10px)' : undefined)}
-          // La graella de colors te la seva columna (78) i el seu contingut
-          // (4 cercles i 3 separacions) en surt: aquest coixí es la part que
-          // sobresurt, perque la llista no hi caigui a sobre.
-          paddingLeft={`max(0px, calc(${4 * cerclePx + 3 * colorGapPx}px - ${carrilLane(78)}))`}
-          isPortraitTablet={isPortraitTablet}
-          isLandscapeTablet={isLandscapeTablet}
-        />
+        {/* LA LINIA DE COLLECCIONS, A SOTA DEL CARRUSEL (fila 2 de la primera
+            columna): entre el selector i la graella 4x4. Ja no es una columna a
+            la dreta de tot, i per aixo no porta ni transform ni el coixi que
+            compensava la graella de colors. */}
+        <div style={{ gridColumn: '1', gridRow: '2', minWidth: 0 }}>
+          <CercadorColleccionsColumna
+            linia
+            activeKey={activeKey}
+            onSelect={onSelectCollection}
+            alcadaFilaLlista={alcadaFilaLlista}
+            isPortraitTablet={isPortraitTablet}
+            isLandscapeTablet={isLandscapeTablet}
+          />
+        </div>
       </div>
     );
   }
