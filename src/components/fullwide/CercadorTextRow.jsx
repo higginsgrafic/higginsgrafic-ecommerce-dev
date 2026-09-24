@@ -353,6 +353,9 @@ export function CercadorDibuixosGraella({
   // L'amplada de la columna del selector Blanc/Color/Negre, en unitats del
   // carril: les fletxes del carrusel fan el mateix bloc que el selector.
   midaSelector = 56,
+  // El marge dret que ha de deixar el retall dels dibuixos (les fletxes i el
+  // seu coixi). El calcula la filera.
+  reservaDreta = 0,
 }) {
   // Amb `dibuixPx` les caselles tenen mida fixa (la filera de la pagina 2);
   // sense (`dibuixPx` nul) la graella S'EXPANDEIX per omplir tota la superficie
@@ -519,7 +522,6 @@ export function CercadorDibuixosGraella({
     // queda a la dreta del retall. El retall deixa l'ample de les fletxes mes
     // 10 px, o sigui que la graella viu exactament entre el selector i les
     // fletxes.
-    const ampleFletxes = ambFletxes ? carrilPx(midaSelector / 2) : '0px';
     return (
       <div
         data-carrusel="1"
@@ -544,7 +546,7 @@ export function CercadorDibuixosGraella({
             // no servia de res.
             width: 'auto',
             height: '100%',
-            marginRight: ambFletxes ? `calc(${ampleFletxes} + ${carrilPx(10)})` : 0,
+            marginRight: reservaDreta,
             // SENSE BARRA DE DESPLAÇAMENT: el moviment el fa el gest (i les
             // fletxes al desktop). `pan-y` deixa el desplac,ament vertical de la
             // pagina al navegador i es queda l'horitzontal per al carrusel.
@@ -700,6 +702,10 @@ export function CercadorColleccionsColumna({
   isLandscapeTablet = false,
   caixes = false,
   linia = false,
+  // El marge dret que ha de deixar la linia per acabar on acaba la graella de
+  // dibuixos (les fletxes i el seu coixi). El calcula la filera, que es qui sap
+  // si hi ha fletxes.
+  reservaDreta = 0,
 }) {
   // Amb `caixes` (la taula de la vista vertical) cada nom va dins la seva caixa
   // grisa, enrasat a la dreta i repartides per tota l'alcada; sense, es la
@@ -773,10 +779,25 @@ export function CercadorColleccionsColumna({
       <div
         data-colleccions-linia="1"
         style={{
-          width: '100%',
+          // `width: auto` (i no `100%`) perque el marge dret descompti: amb
+          // `100%` la linia es quedava sencera i no acabava on acaba la graella.
+          width: 'auto',
+          // ELS ENLLACOS OCCUPEN EL MATEIX QUE LA GRAELLA DE DIBUIXOS
+          // (24/09/2026, ho va demanar l'amo): el mateix marge dret que el
+          // retall dels dibuixos (les fletxes i el seu coixi) i repartits
+          // d'extrem a extrem (`space-between`), o sigui que la linia arrenca
+          // on arrenca el carrusel i acaba on acaba.
+          marginRight: reservaDreta || 0,
           display: 'flex',
           alignItems: 'center',
-          columnGap: carrilLane(18),
+          justifyContent: 'space-between',
+          // El gap es el MINIM: amb `space-between` el que sobra es reparteix
+          // sol, i per aixo pugen tots. Amb `wrap` les vistes estretes (on els
+          // enllacos no hi caben en una linia) no es tallen.
+          // El gap MINIM: prou petit perque en cap vista forci un salt de
+          // linia (a 1440 l'amplada es justa i amb un minim gran els enllacos
+          // queien a sota). El que separa de debò es el `space-between`.
+          columnGap: carrilLane(8),
           rowGap: '2px',
           flexWrap: 'wrap',
           minWidth: 0,
@@ -793,7 +814,11 @@ export function CercadorColleccionsColumna({
               border: 0,
               background: 'transparent',
               color: '#2B2B2B',
-              fontSize: (isPortraitTablet || isLandscapeTablet) ? '11px' : `max(10px, ${carrilPx(11)})`,
+              // Mes grossos que la columna (11 -> 13 unitats): omplen la
+              // linia de la graella de dibuixos i es llegeixen millor. El terra
+              // de 10 px es el de sempre: a les finestres estretes, on
+              // l'amplada es justa, el que creix es la separacio, no la lletra.
+              fontSize: (isPortraitTablet || isLandscapeTablet) ? '11px' : `max(10px, ${carrilPx(13)})`,
               fontWeight: key === activeKey ? 700 : 300,
               lineHeight: 1.2,
               whiteSpace: 'nowrap',
@@ -951,6 +976,14 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
     const alcadaGraella = GRAELLA_FILES * dibuixPx + (GRAELLA_FILES - 1) * gapV;
     const alcadaFilaLlista = alcadaGraella / (CERCADOR_COLLECTIONS.length || 1);
     const activeKey = activeCollection === 'austen' ? `austen:${activeSubcollection || ''}` : activeCollection;
+    // L'amplada de les fletxes mes el seu coixi: el marge dret que han de
+    // deixar tant el retall dels dibuixos com la linia de colleccions, perque
+    // tots dos acabin on comencen les fletxes. Es calcula UNA vegada aqui (les
+    // fletxes son al desktop i a la tauleta apaisada, no a la vertical) i el
+    // fan servir els dos.
+    const reservaDreta = (!isPortraitTablet && !isLandscapeTablet)
+      ? `calc(${carrilPx(midaSelector / 2)} + ${carrilPx(10)})`
+      : 0;
 
     return (
       <div
@@ -1005,7 +1038,15 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
           // com que la filera acaba a la vora dreta del carril, la graella
           // tambe: la seva vora dreta es la del carril.
           gridTemplateColumns: 'minmax(0, 1fr) max-content',
-          gridTemplateRows: 'auto auto',
+          // LA FILA 2 ARRIBA AL BAIX DEL SELECTOR (24/09/2026, ho va demanar
+          // l'amo). El baix del selector cau `carrilLane(40)` per sota del
+          // baix de la graella de dibuixos (es el coixi de 40 de la
+          // composicio; el mateix numero alinea el bloc de fletxes). Com que
+          // la fila 2 va `rowGap` (10 px) sota la graella, la seva alçada es
+          // `carrilLane(40) - 10px`, i els enllacos hi van enrasats a baix
+          // (`alignSelf: 'end'`). Amb `minmax(..., auto)` la fila creix si els
+          // enllacos hi van en dues linies (tauleta) en comptes de sortir-se'n.
+          gridTemplateRows: `auto minmax(calc(${carrilLane(40)} - 10px), auto)`,
           // 10 px FIXES entre blocs (no escalats): es el que fa que totes les
           // mides quadrin, perque el que cedeix es el gap intern dels dibuixos.
           columnGap: '20px',
@@ -1024,6 +1065,7 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
           gapV={gapV}
           numColumns={numColumns}
           midaSelector={midaSelector}
+          reservaDreta={reservaDreta}
           carrusel
           activeCollection={activeCollection}
           activeSubcollection={activeSubcollection}
@@ -1052,9 +1094,10 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
             columna): entre el selector i la graella 4x4. Ja no es una columna a
             la dreta de tot, i per aixo no porta ni transform ni el coixi que
             compensava la graella de colors. */}
-        <div style={{ gridColumn: '1', gridRow: '2', minWidth: 0 }}>
+        <div style={{ gridColumn: '1', gridRow: '2', minWidth: 0, alignSelf: 'end' }}>
           <CercadorColleccionsColumna
             linia
+            reservaDreta={reservaDreta}
             activeKey={activeKey}
             onSelect={onSelectCollection}
             alcadaFilaLlista={alcadaFilaLlista}
