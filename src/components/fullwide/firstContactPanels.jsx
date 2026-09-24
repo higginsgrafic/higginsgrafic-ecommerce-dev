@@ -130,9 +130,14 @@ export function FirstContactDibuix00Buttons({
       className="relative mt-2 aspect-[1/2] w-1/2"
       data-stripe-buttonbar="bn"
       style={{
-        border: 'none',
+        // LE REQUADRE DE FONS ORIGINAL (24/09/2026). El selector va néixer amb
+        // fons gris i contorn, i el commit `3f68cf2` (7/09) els va treure
+        // («treu fons gris, contorn selector»): va quedar el slider blanc sol,
+        // que sobre fons blanc no es veu. L'amo els ha demanat de tornada, amb
+        // les proporcions noves (la meitat d'amplada, el doble d'alçada).
+        border: '1px solid #D1D5DB',
         borderRadius: '6px',
-        backgroundColor: 'transparent',
+        backgroundColor: '#F3F4F6',
         boxSizing: 'border-box',
         overflow: 'hidden',
       }}
