@@ -23,10 +23,22 @@ export default function useDebugToggles({ locationSearch }) {
 
   const [copiedDesign, setCopiedDesign] = useState(false);
 
-  const [belt2GuidesEnabled, setBelt2GuidesEnabled] = useState(() => {
+  // `?belt2=1` mana nome's en aquesta obertura: es el que fa servir l'eina de
+  // formats per posar les guies del carril a cada finestra. I per aixo mateix
+  // NO es desa (vegeu l'efecte de sota): si es deses, encendre-les des de l'eina
+  // les deixaria enceses per sempre mes, tambe quan l'eina les apaga.
+  const belt2FromUrl = (() => {
     try {
       const sp = new URLSearchParams(window.location.search);
-      if (sp.has('belt2')) return sp.get('belt2') !== '0';
+      return sp.has('belt2') ? sp.get('belt2') !== '0' : null;
+    } catch {
+      return null;
+    }
+  })();
+
+  const [belt2GuidesEnabled, setBelt2GuidesEnabled] = useState(() => {
+    if (belt2FromUrl !== null) return belt2FromUrl;
+    try {
       const raw = window.localStorage.getItem('HG_BELT2_GUIDES_ENABLED_V1');
       return raw === '1';
     } catch {
@@ -43,12 +55,14 @@ export default function useDebugToggles({ locationSearch }) {
   });
 
   useEffect(() => {
+    // Una decisio que ve de la URL es d'aquesta obertura, no de l'amo.
+    if (belt2FromUrl !== null) return;
     try {
       window.localStorage.setItem('HG_BELT2_GUIDES_ENABLED_V1', belt2GuidesEnabled ? '1' : '0');
     } catch {
       // ignore
     }
-  }, [belt2GuidesEnabled]);
+  }, [belt2GuidesEnabled, belt2FromUrl]);
 
   useEffect(() => {
     try {
