@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import DevPortal, { DEV_LAYER_Z } from '@/components/dev/DevPortal';
 
 /**
@@ -25,6 +26,59 @@ import DevPortal, { DEV_LAYER_Z } from '@/components/dev/DevPortal';
 const COLOR_CARRIL = 'rgba(37, 99, 235, 0.85)';
 
 export default function CarrilGuidesOverlay({ enabled }) {
+  // LA GUIA DE LA DRETA DE LES FLETXES (24/09/2026, ho va demanar l'amo).
+  //
+  // El bloc de fletxes del carrusel es l'ultima cosa que hi ha abans de la
+  // graella 4x4, i la seva vora dreta no es cap de les dues guies del carril.
+  // Es mesura del DOM (`#stripe-guide-right-arrow` es la fletxa de la dreta, i
+  // omple l'ample del bloc) perque el seu lloc depen de la graella de colors,
+  // que es de mida `max-content`.
+  const [xFletxes, setXFletxes] = useState(null);
+  useEffect(() => {
+    if (!enabled) return undefined;
+    const calcula = () => {
+      // L'id `stripe-guide-right-arrow` el porta la fletxa DINS del component,
+      // i el component s'usa en quatre llocs: cal la de la filera de la pagina
+      // 2 i VISIBLE (les altres son d'altres composicions o amagades).
+      const fletxes = [...document.querySelectorAll('[data-carrusel="1"] #stripe-guide-right-arrow')]
+        .filter((el) => el.getBoundingClientRect().width > 0);
+      const fletxa = fletxes[fletxes.length - 1];
+      if (!fletxa) {
+        setXFletxes(null);
+        return;
+      }
+      const x = Math.round(fletxa.getBoundingClientRect().right);
+      setXFletxes((previ) => (previ === x ? previ : x));
+    };
+    // El megaslide s'obre i es tanca: la fletxa no hi es sempre. S'escolta el
+    // canvi de mida del cos I el DOM (l'obertura hi afegeix el panell), amb una
+    // passada per `requestAnimationFrame` perque les animacions del megaslide no
+    // facin mesurar-se a cada mutacio.
+    let frame = 0;
+    const programa = () => {
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(calcula);
+    };
+    calcula();
+    const t1 = window.setTimeout(calcula, 300);
+    const t2 = window.setTimeout(calcula, 900);
+    const observador = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(programa) : null;
+    if (observador) observador.observe(document.body);
+    const observadorDom = typeof MutationObserver !== 'undefined'
+      ? new MutationObserver(programa)
+      : null;
+    if (observadorDom) observadorDom.observe(document.body, { childList: true, subtree: true });
+    window.addEventListener('resize', programa);
+    return () => {
+      window.clearTimeout(t1);
+      window.clearTimeout(t2);
+      cancelAnimationFrame(frame);
+      window.removeEventListener('resize', programa);
+      if (observador) observador.disconnect();
+      if (observadorDom) observadorDom.disconnect();
+    };
+  }, [enabled]);
+
   if (!enabled) return null;
   return (
     <DevPortal
@@ -56,6 +110,19 @@ export default function CarrilGuidesOverlay({ enabled }) {
           borderLeft: `1px solid ${COLOR_CARRIL}`,
         }}
       />
+      {xFletxes !== null ? (
+        <div
+          data-guia-carril="fletxes"
+          style={{
+            position: 'fixed',
+            left: xFletxes,
+            top: 0,
+            height: '100vh',
+            width: 0,
+            borderLeft: `1px solid ${COLOR_CARRIL}`,
+          }}
+        />
+      ) : null}
     </DevPortal>
   );
 }
