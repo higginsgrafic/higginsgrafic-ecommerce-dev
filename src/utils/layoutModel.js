@@ -26,7 +26,6 @@ const MIDA_TAULETA_APAISADA_MAX = 1366;
 const ALCADA_TAULETA_APAISADA_MAX = 1100;
 const ALCADA_CAPCALERA_ESCRIPTORI = 80;
 const ALCADA_CAPCALERA_MOBIL = 80;
-const ALCADA_CAPCALERA_ESTRETA = 64;
 /**
  * La capçalera de DUES FILES de la tauleta vertical: 61 px la fila del logo i
  * les icones + 62 px la fila del menu de colleccions.
@@ -78,25 +77,28 @@ export function deviceLayoutFromViewport(vw, vh) {
  * Alçada de la capçalera per tipus de dispositiu.
  *
  * LES DUES RESERVES SON EL QUE LA CAPÇALERA OCUPA DE VERITAT, no una xifra
- * rodona: 123 px a la tauleta vertical (les dues files) i 80 px a la resta
- * (l'apaisada, l'escriptori i el mobil porten una fila de 80; el que canvia
- * entre ells es el contingut, no l'alçada).
+ * rodona: 123 px a la tauleta vertical (les dues files) i 80 px a tota la
+ * resta, perque la capçalera d'una fila fa 80 px a tot arreu (el que canvia
+ * entre mobils, tauletes apaisades i escriptori es el contingut, no l'alçada).
  *
  * LA CAPÇALERA DE DUES FILES ES NOMES DE LA TAULETA VERTICAL: el logo i les
  * icones (61 px) i el menu de colleccions a sota (62). L'apaisada la va portar
- * un temps (commit `17291eb`) i s'ha tornat enrere; li toca la de 80, com a
- * l'escriptori. NO es torna a 64 (la `ESTRETA` vella): la seva fila fa 80 px, i
- * reservar-ne 64 deixava 16 px de pagina sota la capçalera.
+ * un temps (commit `17291eb`) i s'ha tornat enrere.
  *
- * La `ESTRETA` queda per al que no es cap de les tres coses (vegeu
- * `deviceLayoutFromViewport`), que avui no es dona enlloc.
+ * AQUI HI HAVIA UNA `ESTRETA` DE 64 px que s'enduia la franja de 600 a 767 px
+ * d'amplada en apaisat (els telefons girats: Galaxy S9/S9+, S10/S10+, iPhone
+ * SE). Estava documentada com «avui no es dona enlloc» i sí que es donava: la
+ * capçalera hi fa 81 px i la pagina en reservava 64, o sigui 17 px de contingut
+ * sota la capçalera.
  */
 export function headerHeightFor(deviceLayout) {
   if (deviceLayout.isPortraitTablet) return ALCADA_CAPCALERA_TAULETA_VERTICAL;
   if (deviceLayout.isLandscapeTablet) return ALCADA_CAPCALERA_ESCRIPTORI;
   if (deviceLayout.isLargeScreen) return ALCADA_CAPCALERA_ESCRIPTORI;
   if (deviceLayout.isMobile) return ALCADA_CAPCALERA_MOBIL;
-  return ALCADA_CAPCALERA_ESTRETA;
+  // L'unic que queda son les finestres de 600 a 767 px d'amplada i mes amplades
+  // que altes (vegeu `deviceLayoutFromViewport`): tambe porten la d'una fila.
+  return ALCADA_CAPCALERA_ESCRIPTORI;
 }
 
 /**

@@ -60,6 +60,20 @@ function FullWideSlideHeader({
   // algú les torna a unificar, ha de refer el repartiment de dalt de
   // `/nova/inici`, que es calcula amb aquest offset.
   //
+  // EL LOGO I LES ICONES SURTEN DES DE 600 px, NO DES DE 768 (`md:`), que es el
+  // que feien abans. Son les tres classes `min-[600px]:` d'aquest fitxer: el
+  // logo de l'esquerra, les icones de la dreta i l'amagatall del logo centrat
+  // de mobil.
+  //
+  // PER QUE. Entre 600 i 767 px d'amplada la pagina es de mobil (`useIsMobile`
+  // i el `md:` son 768), pero la capçalera ja es la de tauleta: a la vertical
+  // porta les dues files i a l'apaisada la filera del carril. Amb les icones a
+  // 768, alla no hi havia ni icones a la capçalera ni barra inferior (que
+  // demana menys de 600), i el cistell era INABASTABLE. Passava a cinc
+  // dispositius de la llista del DevTools: Galaxy S9/S9+ i S10/S10+ girats
+  // (658x320 i 760x360), iPhone SE girat (667x375), Galaxy Tab S9 (712x1138) i
+  // iPad Mini 6 (744x1133). Vegeu `docs/informes/FORMATS-desplegament.md`.
+  //
   // La banda estreta del megaslide (768-1366 sense tauleta): la mateixa
   // definicio que a MegaslidePagina2.
   const esBandaEstreta = typeof window !== 'undefined'
@@ -2820,7 +2834,7 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
               </Link>
             )}
             {/* Logo a l'esquerra (desktop + tablet vertical) */}
-            <Link id="stripe-guide-header-logo-anchor" to="/" aria-label="Higgins GRÀFIC - Pàgina d'inici" onClick={() => { if (active) closeMegaExplicitly(); }} className="relative z-10 pointer-events-auto hidden md:flex items-center gap-2 font-black tracking-tight text-foreground">
+            <Link id="stripe-guide-header-logo-anchor" to="/" aria-label="Higgins GRÀFIC - Pàgina d'inici" onClick={() => { if (active) closeMegaExplicitly(); }} className="relative z-10 pointer-events-auto hidden min-[600px]:flex items-center gap-2 font-black tracking-tight text-foreground">
               <span
                 id="stripe-guide-header-logo-mark-anchor"
                 ref={logoMarkRef}
@@ -2849,7 +2863,7 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
             to="/"
             aria-label="Higgins GRÀFIC - Pàgina d'inici"
             onClick={() => { if (active) closeMegaExplicitly(); }}
-            className="md:hidden absolute z-10 pointer-events-auto flex items-center gap-2 font-black tracking-tight text-foreground"
+            className="min-[600px]:hidden absolute z-10 pointer-events-auto flex items-center gap-2 font-black tracking-tight text-foreground"
             style={{
               left: '50vw',
               top: '50%',
@@ -2930,7 +2944,7 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
           </nav>
 
           <div
-            className="ml-auto hidden md:flex items-center"
+            className="ml-auto hidden min-[600px]:flex items-center"
             style={{ gap: '0px' }}
             data-icons-wrap="true"
           >

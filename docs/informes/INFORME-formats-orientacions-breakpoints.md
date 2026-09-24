@@ -240,8 +240,8 @@ apaïsat), que és el que decideix si el contingut hi cap.
 
 ## 7. Decisions obertes
 
-1. **Tancar el forat sense moure cap frontera** (opció C, la meva recomanació
-   després de veure la llista del DevTools):
+1. **Tancar el forat sense moure cap frontera** (opció C). **FET** — vegeu la
+   secció 9. Era això:
    - **Mostrar el logo i les icones de la capçalera des de 600 px** en comptes
      de 768: tres classes de Tailwind (`hidden md:flex` → `hidden
      min-[600px]:flex` al logo i a les icones, `md:hidden` →
@@ -349,3 +349,45 @@ Les amplades dels presets són les de la llista de dispositius del DevTools
 de pantalla són les del dispositiu, i el que el navegador s'hi menja va a part
 (vegeu el punt 1). **Pendent de confirmar al DevTools**: les tres mides
 marcades, que es llegeixen a la fitxa del dispositiu.
+
+
+---
+
+## 9. Opció C, aplicada i mesurada
+
+Dues coses, cap classificació tocada:
+
+1. **El logo i les icones de la capçalera surten des de 600 px** en comptes de
+   768. Són les tres classes `min-[600px]:` de `FullWideSlideHeader.jsx`: el
+   logo de l'esquerra, les icones de la dreta i l'amagatall del logo centrat de
+   mòbil.
+2. **La reserva de la franja sense classificar passa de 64 a 80 px.** La
+   constant `ALCADA_CAPCALERA_ESTRETA` (64) s'ha eliminat de `layoutModel.js`:
+   estava documentada com a «avui no es dona enlloc» i s'enduia tots els
+   telèfons girats de 600 a 767 px.
+
+**Abans i després, als cinc del DevTools** (mesurat al 3003):
+
+| preset | mida | offset abans | offset ara | icones abans | icones ara | cistell |
+|---|---|---|---|---|---|---|
+| Galaxy S9/S9+ girat | 658×320 | 64 | **80** | 0 | **109** | ✗ → **✓** |
+| Galaxy S10/S10+ girat | 760×360 | 64 | **80** | 0 | **109** | ✗ → **✓** |
+| iPhone SE girat | 667×375 | 64 | **80** | 0 | **109** | ✗ → **✓** |
+| Galaxy Tab S9 | 712×1138 | 123 | 123 | 0 | **109** | ✗ → **✓** |
+| iPad Mini 6 | 744×1133 | 123 | 123 | 0 | **109** | ✗ → **✓** |
+
+**I no s'ha mogut res de 768 en amunt.** Comprovat a 599 (mòbil, barra
+inferior), 600 (vertical), 767 (vertical), 768, 780×360, 1024×768, 1280×720,
+1440×900 i 1920×1080: els offsets (80 i 123), les alçades de capçalera (81 i
+123), el nombre d'icones (121 px a escriptori i 109 a tauleta) i el carril
+(`--hg-band-w`: 688 a 768, 933 a 1024-1366, 953 a 1440, 1270 a 1920) són
+exactament els d'abans.
+
+**Efecte secundari que calia:** la banda del carril a 600–767 ja es mesura bé,
+perquè els seus dos extrems (el logo i la icona d'usuari) ara existeixen. Passa
+de 442 a **632 px** a 712, i de 378 a **664 px** a 744. És el carril que li
+falta a la pàgina nova per poder-s'hi pintar.
+
+**El sweep sencer: `SENSE CAP MANERA D'OBRIR EL CISTELL (0 formats)`** dels 48.
+`compara-vistes` OK amb les mateixes xifres, 497 proves, build net i eslint amb
+els 15 errors de sempre.
