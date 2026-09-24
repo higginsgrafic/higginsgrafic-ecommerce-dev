@@ -10,6 +10,7 @@ import {
 } from './midesGraella.js';
 import { carrilPct, carrilLane, carrilPx, readRootCssNumber } from '../../utils/layoutMetrics.js';
 import { GRAELLA_DIBUIXOS_ESCALA_VERTICAL } from '../../config/stripeCalibrationsVertical.js';
+import { FirstContactDibuix09Buttons } from './firstContactPanels.jsx';
 
 /**
  * CercadorTextRow
@@ -374,6 +375,69 @@ export function CercadorDibuixosGraella({
   const ampleTira = carrusel ? (items.length * pas) / 2 + pas : 0;
   const alcadaCarrusel = carrusel ? alcadaFila * 2 - gapV : 0;
 
+  // EL CARRUSEL ES MOU ARROSSEGANT, I AL DESKTOP TAMBE AMB FLETXES.
+  //
+  // LES BARRES DE DESPLAÇAMENT ESTAN PROHIBIDES en aquest projecte (constitucio,
+  // regla 16): o sigui que el contenidor va amb `overflow: hidden` i el
+  // desplac,ament el governa aquest estat. El gest es d'ARROSSEGAR (pointer
+  // events, que tambe son els del dit) i, al desktop, dos botons de fletxa
+  // junts en un costat; a les tauletes no hi son (ho va dir l'amo).
+  const [desplac, setDesplac] = useState(0);
+  const [maxDesplac, setMaxDesplac] = useState(0);
+  const arrossegant = useRef(null);
+  const haArrossegat = useRef(false);
+  const ambFletxes = carrusel && !isPortraitTablet && !isLandscapeTablet;
+  const desplacEf = Math.max(0, Math.min(maxDesplac, desplac));
+  const caixaCarrusel = () => graellaRef?.current || null;
+
+  useLayoutEffect(() => {
+    if (!carrusel) return undefined;
+    const mesura = () => {
+      const el = caixaCarrusel();
+      if (!el) return;
+      setMaxDesplac(Math.max(0, ampleTira - el.clientWidth));
+    };
+    mesura();
+    window.addEventListener('resize', mesura);
+    return () => window.removeEventListener('resize', mesura);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [carrusel, ampleTira]);
+
+  const frena = (v) => Math.max(0, Math.min(maxDesplac, v));
+  const unaPagina = () => Math.max(1, Math.round((caixaCarrusel()?.clientWidth || 0) * 0.8));
+
+  const onPointerDown = (e) => {
+    if (!carrusel) return;
+    // NO es captura el punter aqui. Capturar-lo en tocar fa que el CLIC
+    // s'quedi al contenidor i la fletxa (o la peca) que hi ha sota no el rebi:
+    // es va mesurar, i la fletxa no es movia. La captura comenc,a quan el gest
+    // arrenca de debò, passats uns quants px.
+    arrossegant.current = { x: e.clientX, inici: desplacEf, id: e.pointerId, el: e.currentTarget, capturat: false };
+    haArrossegat.current = false;
+  };
+  const onPointerMove = (e) => {
+    const a = arrossegant.current;
+    if (!a) return;
+    const dx = e.clientX - a.x;
+    if (Math.abs(dx) > 4) {
+      haArrossegat.current = true;
+      if (!a.capturat) {
+        try { a.el.setPointerCapture(a.id); } catch { /* ignore */ }
+        a.capturat = true;
+      }
+    }
+    setDesplac(frena(a.inici - dx));
+  };
+  const onPointerUp = () => { arrossegant.current = null; };
+  // Un arrossegament NO es un clic: si el dit o el ratoli s'ha mogut, la peça
+  // que hi hagi sota no s'ha de triar.
+  const onClickCapture = (e) => {
+    if (!haArrossegat.current) return;
+    haArrossegat.current = false;
+    e.preventDefault();
+    e.stopPropagation();
+  };
+
   const pintaItem = ({ label, collection, subcollection, stripeItem }, i) => {
     const dimmed = activeCollection && collection !== activeCollection
       ? true
@@ -447,22 +511,42 @@ export function CercadorDibuixosGraella({
       <div
         ref={graellaRef}
         data-carrusel="1"
+        onPointerDown={onPointerDown}
+        onPointerMove={onPointerMove}
+        onPointerUp={onPointerUp}
+        onPointerCancel={onPointerUp}
+        onClickCapture={onClickCapture}
         style={{
           position: 'relative',
           width: '100%',
           height: `${alcadaCarrusel}px`,
-          // Es pot desplacar. El gest i les fletxes (nomes al desktop) hi van a
-          // sobre; mentrestant la barra del navegador ja dona acces a totes les
-          // peces, o sigui que cap dibuix queda fora de l'abast.
-          overflowX: 'auto',
-          overflowY: 'hidden',
-          scrollbarWidth: 'thin',
+          // SENSE BARRA DE DESPLAÇAMENT: el moviment el fa el gest (i les
+          // fletxes al desktop). `pan-y` deixa el desplac,ament vertical de la
+          // pagina al navegador i es queda l'horitzontal per al carrusel.
+          overflow: 'hidden',
+          touchAction: 'pan-y',
+          cursor: 'grab',
+          userSelect: 'none',
           minWidth: 0,
         }}
       >
-        <div style={{ position: 'relative', width: `${ampleTira}px`, height: '100%' }}>
+        <div style={{
+          position: 'relative',
+          width: `${ampleTira}px`,
+          height: '100%',
+          transform: `translateX(${-desplacEf}px)`,
+          willChange: 'transform',
+        }}>
           {items.map(pintaItem)}
         </div>
+        {ambFletxes ? (
+          <div style={{ position: 'absolute', right: 0, top: '50%', transform: 'translateY(-50%)', width: carrilPx(56), zIndex: 5 }}>
+            <FirstContactDibuix09Buttons
+              onPrev={() => setDesplac((v) => frena(v - unaPagina()))}
+              onNext={() => setDesplac((v) => frena(v + unaPagina()))}
+            />
+          </div>
+        ) : null}
       </div>
     );
   }
