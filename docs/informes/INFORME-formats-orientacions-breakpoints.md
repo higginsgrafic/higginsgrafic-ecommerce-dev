@@ -240,18 +240,33 @@ apaïsat), que és el que decideix si el contingut hi cap.
 
 ## 7. Decisions obertes
 
-1. **Unificar la frontera de mòbil** (600 vs 768). Tanca els 6 forats i el
+1. **Tancar el forat sense moure cap frontera** (opció C, la meva recomanació
+   després de veure la llista del DevTools):
+   - **Mostrar el logo i les icones de la capçalera des de 600 px** en comptes
+     de 768: tres classes de Tailwind (`hidden md:flex` → `hidden
+     min-[600px]:flex` al logo i a les icones, `md:hidden` →
+     `min-[600px]:hidden` al logo centrat de mòbil). Amb aixo les tauletes de
+     613–744 tenen el cistell i **conserven** la capçalera de dues files, i els
+     telèfons en apaïsat de 640–760 el tenen a la capçalera, sense barra
+     inferior en una finestra de 320 px d'alçada.
+   - **El pedaç de 64 px passa a 80.** La branca sense classificar de
+     `headerHeightFor` (que avui només agafa la franja 600–767 en apaïsat) ha de
+     reservar el que la capçalera fa de debò, que son 80 px i no 64.
+   Cap classificació no canvia: `isMobile` continua a 600 i `useIsMobile` a 768,
+   i per tant les pàgines continuen pintant el que pinten avui.
+
+2. **Unificar la frontera de mòbil** (600 vs 768). Tanca els 6 forats i el
    pedaç de 64 px. Dues opcions: baixar-la a 768 (ràpid, l'iPad mini queda amb
    navegació de mòbil però funciona) o pujar el disseny de tauleta a 600 (cal
    mostrar les icones des de 600 i verificar el megaslide entre 600 i 767, on no
    s'ha provat mai res).
-2. **Declarar `srcset`/`sizes`** a les imatges: les variants ja existeixen.
-3. **1280 i 1366**: decidir si són escriptori (i mesurar-ne el nav) o es
+3. **Declarar `srcset`/`sizes`** a les imatges: les variants ja existeixen.
+4. **1280 i 1366**: decidir si són escriptori (i mesurar-ne el nav) o es
    queden com a tauleta apaïsada.
-4. **L'encaix de la hero** als formats apaïsats de portàtil (1024×690, 1280×666,
+5. **L'encaix de la hero** als formats apaïsats de portàtil (1024×690, 1280×666,
    1366×634): no hi cap amb el megaslide obert. Demana decisió de disseny.
-5. **La pàgina nova per sota de 768**: avui diu «encara no té la vista mòbil».
-6. **El menú de col·leccions de la tauleta vertical** talla per sota de 698 px
+6. **La pàgina nova per sota de 768**: avui diu «encara no té la vista mòbil».
+7. **El menú de col·leccions de la tauleta vertical** talla per sota de 698 px
    d'amplada (49 px per banda a 600): va centrat dins un contenidor més estret
    que el contingut.
 
