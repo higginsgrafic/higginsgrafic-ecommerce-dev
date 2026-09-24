@@ -1,71 +1,42 @@
 import { useState, useEffect } from 'react';
+import { deviceLayoutFromViewport } from '@/utils/layoutModel';
 
 /**
- * useDeviceLayout — Detecció centralitzada i touch-aware del tipus de dispositiu.
+ * useDeviceLayout — el tipus de dispositiu, LLEGIT DEL MODEL UNIC.
  *
- * Aquest hook resol els problemes de la detecció anterior:
- *   1. El tall màgic a 1366px feia que tablets Android 16:10 (fins a 1600px)
- *      es classifiquessin com a desktop.
- *   2. Les mides hardcoded per 1024×768 no escalaven a altres viewports.
+ * AQUEST HOOK JA NO DECIDEIX RES (24/09/2026). Decideix `layoutModel`, en un
+ * sol lloc i amb una sola regla (la matriu d'amplada i alcada); aqui nome's
+ * s'hi afegeix el touch, que es informatiu.
  *
- * Criteri de detecció (NOMES MIDES: el touch no hi entra, perque la mateixa
- * finestra ha de donar sempre la mateixa maquetacio):
- *   - isTouch:        navigator.maxTouchPoints > 0 (fallback ontouchstart). Nomes informatiu.
- *   - isMobile:       width < 600.
- *   - isPortraitTablet: 600 ≤ width ≤ 1024 + height > width.
- *   - isLandscapeTablet: 768 ≤ width ≤ 1366 + height < width + height ≤ 1100.
- *                       (L'alçada ≤ 1100 separa tablet de monitor desktop.)
- *   - isDesktop:      !tablet + width ≥ 1024.
+ * PER QUE. Les regles estaven escrites DUES vegades —una en aquest hook i una
+ * altra a `deviceLayoutFromViewport`— i dues copies de la mateixa regla son
+ * dues regles: el dia que se n'actualitza una, l'altra queda enrere i la
+ * mateixa finestra dona dues maquetacions segons qui pregunti. Ja va passar
+ * amb l'alçada de la capçalera (`116` en un lloc i `123` en un altre).
+ *
+ * Criteri (nomes mides; el touch no hi entra):
+ *   - isMobile:          width < 600, o be mes ample que alt i encara < 768.
+ *   - isPortraitTablet:  height > width i width <= 1024.
+ *   - isLandscapeTablet: height < width, width <= 1366 i height <= 1100.
+ *   - isDesktop:         la resta.
  *
  * Retorna a més viewportWidth i viewportHeight per a càlculs fluids.
  */
 export default function useDeviceLayout() {
   const compute = () => {
-    if (typeof window === 'undefined') {
-      return {
-        isMobile: false,
-        isPortraitTablet: false,
-        isLandscapeTablet: false,
-        isDesktop: true,
-        isLargeScreen: true,
-        isTouch: false,
-        viewportWidth: 0,
-        viewportHeight: 0,
-      };
-    }
-
-    const isTouch =
-      (typeof navigator !== 'undefined' &&
-        typeof navigator.maxTouchPoints === 'number' &&
-        navigator.maxTouchPoints > 0) ||
-      'ontouchstart' in window;
-
-    const vw = window.innerWidth || 0;
-    const vh = window.innerHeight || 0;
-
-    const isMobile = vw < 600;
-    // Mateixes regles que les pagines (vegeu `esTauletaApaisada` a
-    // layoutMetrics): NOMES mides, sense touch. Si el touch hi entra, la
-    // mateixa finestra dona dues maquetacions diferents.
-    const isPortraitTablet =
-      vw >= 600 && vw <= 1024 && vh > vw;
-    const isLandscapeTablet =
-      vw >= 768 && vw <= 1366 && vh < vw && vh > 0 && vh <= 1100;
-    const isDesktop =
-      (!isPortraitTablet && !isLandscapeTablet && vw >= 1024);
-
-    // isLargeScreen manté compat amb consumers existents que l'usen com a "desktop".
-    const isLargeScreen = isDesktop;
+    const isTouch = typeof window === 'undefined'
+      ? false
+      : (typeof navigator !== 'undefined' &&
+          typeof navigator.maxTouchPoints === 'number' &&
+          navigator.maxTouchPoints > 0) ||
+        'ontouchstart' in window;
 
     return {
-      isMobile,
-      isPortraitTablet,
-      isLandscapeTablet,
-      isDesktop,
-      isLargeScreen,
+      ...deviceLayoutFromViewport(
+        typeof window !== 'undefined' ? window.innerWidth || 0 : 0,
+        typeof window !== 'undefined' ? window.innerHeight || 0 : 0,
+      ),
       isTouch,
-      viewportWidth: vw,
-      viewportHeight: vh,
     };
   };
 
@@ -79,7 +50,6 @@ export default function useDeviceLayout() {
       window.removeEventListener('resize', update);
       window.removeEventListener('orientationchange', update);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return state;

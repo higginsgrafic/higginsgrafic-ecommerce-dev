@@ -161,13 +161,36 @@ arrossega el **congelat** de 1024 a 1366 i el **penya-segat** de 1367: no són s
 | tauleta vertical | `min(1350, w − 32) − 48` (el marc del lloc) | 123 |
 | mòbil | `w − 32` | 80 + barra inferior |
 
-### 2.3 La decisió
+### 2.3 La decisió, presa
 
-**Una sola font o dues?** Una sola vol dir que `--hg-mega-w` surti del mateix lloc que
-`--contingut-max`; el preu és que **mou el megaslide sencer** (i `compara-vistes` és la
-xarxa). Dues vol dir escriure la diferència (el sostre de 1350 i el topall `w − 32`) al
-costat de cada regla, i acceptar que el carril de la pàgina nova tingui congelat i
-penya-segat.
+**Un sol carril** (l'amo, 24/09): la belt desapareix com a mecanisme i tothom
+—el lloc, la capçalera, la pàgina nova i el megaslide— llegeix el mateix
+carril. El preu és que **mou el megaslide sencer**, i per tant es fa per passos,
+amb `compara-vistes` i la base de les 833 xifres al davant.
+
+### 2.4 L'objectiu, dit per l'amo (24/09/2026)
+
+> «El que seria ideal és que el carril fos el mateix per a tothom. També pel
+> megaslide.»
+
+Aquesta frase és la peça 2 sencera, i val la pena escriure què implica, perquè
+avui no és així (§2.1, §2.2). El carril ha de ser **una sola regla** i tothom
+l'ha de llegir: el lloc, la capçalera, la pàgina nova **i el megaslide**. La
+belt ha de desaparèixer com a mecanisme (la mesura del DOM, les guies
+`--belt2-*`, els topalls, les tres branques de dispositiu).
+
+I el que **no** canvia és la densitat: el que és diferent a cada classe no és el
+regle, és **què s'hi dibuixa** (peça 3). La prova és el megaslide de la tauleta:
+avui les seves peces estan **clavades** (`--hg-escala-mega` val 1 allà) i el seu
+text té terres de 10 i 12 px **perquè** s'intenta encabir la composició de
+l'escriptori en un carril més estret. Amb un carril de 3/5, a 768 el megaslide
+escalaria al 34 % i el seu text faria 3-4 px: il·legible. Allà el que toca no és
+la composició encongida sinó **una altra composició** — la taula de caselles
+grans de `MAPA-caselles-tauleta.md`, on el text és llegible perquè les caselles
+són grans. I al mòbil, el full.
+
+O sigui: **una mesura, tres densitats.** El carril és el mateix; el que canvia
+és com s'hi reparteixen les decisions.
 
 ---
 
@@ -208,7 +231,7 @@ que no té vista mòbil.
 | pas | què | porta de sortida |
 |---|---|---|
 | **1** | **Aquest paper** | aprovat per l'amo |
-| **2** | **La classificació, una sola** (una funció a `layoutModel`; les altres la llegeixen) | `mesura-formats.mjs` diu **0 formats sense classe** i la resta de xifres no es mouen |
+| **2** | **La classificació, una sola** — **FETA** (24/09): la matriu viu a `deviceLayoutFromViewport` i el hook la llegeix (les regles duplicades s'han tret) | **6 proves noves**, 503 proves, `compara-vistes` OK; mesurat al navegador: només els 2 formats que no tenien classe es mouen |
 | **3** | **El regle únic** (§2.3) | `compara-vistes` OK amb les mateixes xifres; el carril, amb la diferència escrita |
 | **4** | **El full de mòbil** | la pàgina nova funciona per sota de 768 i als sis telèfons girats |
 | **5** | **La densitat, peça per peça** (començant per la taula de la tauleta vertical) | el mapa de caselles, casella per casella |
@@ -221,13 +244,13 @@ alhora: si una mesura es mou, s'atura i s'explica per què.
 
 ## 6. El que queda per decidir (per a l'amo)
 
-1. **La matriu** (§1.1): s'accepta tal com està, o es mou alguna de les quatre cel·les
-   de §1.4?
-2. **El regle** (§2.3): una sola font (mou el megaslide) o dues amb la diferència
-   escrita?
-3. **El full de mòbil**: es fa abans o després de la densitat de la tauleta?
-4. **La tauleta apaïssada**: es queda amb la pauta o li toca la taula quan hi ha alçada?
-5. **Els dos portàtils** (1280 i 1366): es queden com a tauleta apaïssada?
+1. **Les quatre cel·les de §1.4** (els portàtils 1280/1366, el Tab S9, l'iPad Pro 13
+   vertical i els sis telèfons girats). La matriu ja està implementada amb les classes
+   d'avui; moure una cel·la és una línia, però canvia la disposició d'aquells formats.
+2. **El full de mòbil**: es fa abans o després de la densitat de la tauleta?
+3. **La tauleta apaïssada**: es queda amb la pauta o li toca la taula quan hi ha alçada?
+4. **El carril**: quina fracció mana (3/5 segons la proposta de l'amo) i si el marc del
+   lloc i la fila de la capçalera la segueixen.
 
 ---
 
@@ -236,8 +259,17 @@ alhora: si una mesura es mou, s'atura i s'explica per què.
 - **La matriu** (§1.3): aritmètica sobre les 48 finestres de `scripts/mesura-formats.mjs`,
   amb les regles d'avui copiades de `layoutModel.js` i de `useDeviceLayout.js`. Amb un
   guió temporal que **no es commita**.
+- **La classificació, després d'implementar-la** (24/09): mesurat al navegador a 640×310,
+  667×325 (els dos que guanyen classe) i als veïns 780×310, 832×334, 600×900, 768×400,
+  599×900 i 1024×538. **Només es mouen els dos**: guanyen la barra inferior i **conserven
+  el cistell a la capçalera** (2 accessos). La resta, xifra a xifra igual: offset, alçada
+  de capçalera, icones i cistell.
 - **El carril** (§2.2): les xifres són les mesurades al 3003 el 24/09 (1920 → 1270,
   1440 → 953, 1024–1366 → 933, 853 → 772, 768 → 688), amb la mesura del tram
   logo→icones al costat de la fórmula.
-- **Cap fitxer de `src/` tocat.** No hi ha res a compilar ni cap prova que en pugui
-  canviar el resultat, i per tant no s'ha passat la bateria.
+- **Una base caducada, per no confondre**: `npm run mesura:megaslide` canta **271 de 833
+  xifres** mogudes, i totes són estructurals (el panell de 292 a 434 px, offsets de −40 px
+  per la barra de desenvolupament). La base és del **18/09**, d'abans de les taules de la
+  tauleta: no és d'aquest canvi (les quatre vistes que mesura tenen la mateixa classe que
+  abans), i s'haurà de tornar a capturar quan es tanqui el carril.
+

@@ -46,20 +46,46 @@ const ALCADA_CAPCALERA_TAULETA_VERTICAL = 123;
  * Classificació del dispositiu a partir de les mides de la finestra.
  * NOMES mides: el touch no hi entra, perque la mateixa finestra ha de donar
  * sempre la mateixa maquetacio.
+ *
+ * ES UNA MATRIU D'AMPLADA I ALCADA, NO UNA FRONTERA D'AMPLADA (24/09/2026).
+ *
+ * El motiu es mesurat: **un telefon girat no es reconeix per l'amplada**. Un
+ * Android 16:9 girat fa 640x310 i un iPad mini vertical fa 744x1133, i tots dos
+ * cauen a la banda 600-767. Amb una frontera d'amplada sola, o son tots dos
+ * mobil o no ho es cap; amb la matriu, el primer es mobil (es mes ample que
+ * alt i encara no arriba a la tauleta apaissada) i el segon es tauleta.
+ *
+ * Amb aquesta regla, els 48 formats de `scripts/mesura-formats.mjs` tenen tots
+ * classe: abans, els dos telefons girats de 600 a 767 (640x310 i 667x325)
+ * queien a la branca per defecte de `headerHeightFor` i no eren res.
+ *
+ * Les quatre linies, avaluades en ordre, parteixen TOTES les finestres: no hi
+ * ha cap forat i cap finestra cau a dues classes alhora.
+ *
+ *   1. mobil             =  ample < 600  ||  (ample < 768 && alcada < ample)
+ *   2. tauleta vertical  =  alcada > ample  &&  ample <= 1024
+ *   3. tauleta apaissada =  alcada < ample  &&  ample <= 1366  &&  alcada <= 1100
+ *   4. escriptori        =  la resta
+ *
+ * L'alcada de 1100 nomes actua a la banda 1025-1366: es el que separa una
+ * tauleta apaissada d'un monitor. I una finestra exactament quadrada (que no
+ * es dona) cau a escriptori.
  */
 export function deviceLayoutFromViewport(vw, vh) {
   const ample = Number.isFinite(vw) && vw > 0 ? vw : 0;
   const alt = Number.isFinite(vh) && vh > 0 ? vh : 0;
 
-  const isMobile = ample > 0 && ample < MIDA_MOVIL;
-  const isPortraitTablet = ample >= MIDA_MOVIL && ample <= MIDA_TAULETA_VERTICAL_MAX && alt > ample;
+  const isMobile = ample > 0
+    && (ample < MIDA_MOVIL || (ample < MIDA_TAULETA_APAISADA_MIN && alt < ample));
+  const isPortraitTablet = !isMobile && ample > 0 && ample <= MIDA_TAULETA_VERTICAL_MAX && alt > ample;
   const isLandscapeTablet =
-    ample >= MIDA_TAULETA_APAISADA_MIN &&
+    !isMobile &&
+    !isPortraitTablet &&
     ample <= MIDA_TAULETA_APAISADA_MAX &&
-    alt < ample &&
     alt > 0 &&
+    alt < ample &&
     alt <= ALCADA_TAULETA_APAISADA_MAX;
-  const isDesktop = !isPortraitTablet && !isLandscapeTablet && ample >= MIDA_TAULETA_VERTICAL_MAX;
+  const isDesktop = !isMobile && !isPortraitTablet && !isLandscapeTablet;
 
   return {
     isMobile,
