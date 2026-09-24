@@ -4,7 +4,7 @@ import CercadorTextRow from '../fullwide/CercadorTextRow.jsx';
 import MegaStripePanel from '../fullwide/MegaStripePanel.jsx';
 import { FRANJA_AJUST_PX } from '../fullwide/MegaStripePanelP1.jsx';
 import { desplacamentFranjaEscriptori } from '../../utils/mesuraMegaslide.js';
-import { carrilPx, carrilLane } from '../../utils/layoutMetrics.js';
+import { carrilPx } from '../../utils/layoutMetrics.js';
 import { CapaTaulaVertical, TaulaVerticalP2 } from './TaulaVertical.jsx';
 import {
   CercadorColleccionsColumna,
@@ -530,11 +530,16 @@ export default function MegaslidePagina2({
           <CercadorTextRow
             compact
             midaSelector={bnSliderSize}
-            // La filera arrenca 10 px a la dreta del selector: els blocs de la
-            // composicio son [selector] 10 [graella de dibuixos i colors] 10
-            // [columna de colleccions]. I com que el selector ara fa la MEITAT
-            // d'amplada (24/09/2026), la filera hi arrenca abans.
-            esquerra={bnSliderSize ? `calc(${carrilLane(40)} + ${carrilPx(bnSliderSize / 2)} + 20px)` : undefined}
+            // LA FILERA ARRENCA ON ACABA EL SELECTOR (24/09/2026). Els blocs de
+            // la composicio son [selector] 10 [dibuixos] 10 [fletxes] 10
+            // [columna de colleccions], i les fletxes les posa la graella de
+            // dibuixos a la dreta del seu retall.
+            //
+            // Abans hi havia `carrilLane(40)` de mes: era l'amplada del
+            // selector quan era sencer, i quan es va fer la meitat (24/09) va
+            // quedar com a coixi de 34 px, o sigui que els dibuixos no
+            // arrencaven on acaba el selector.
+            esquerra={bnSliderSize ? `calc(${carrilPx(bnSliderSize / 2)} + ${carrilPx(10)})` : undefined}
             desplacamentVertical={40 - topGraellaColors}
             isPortraitTablet={isPortraitTablet}
             isLandscapeTablet={isLandscapeTablet}

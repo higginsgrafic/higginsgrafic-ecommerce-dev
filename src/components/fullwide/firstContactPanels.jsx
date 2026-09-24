@@ -223,6 +223,9 @@ export function FirstContactDibuix09Buttons({
   const hasNextPointerHandlers = typeof onNextPointerDown === 'function' || typeof onNextPointerUp === 'function';
 
   return (
+    // Amb `vertical` la caixa fa la MATEIXA forma que el selector
+    // (`aspect-[1/2]`: meitat d'amplada i el doble d'alçada) i les dues fletxes
+    // s'apilen dins seu, una a dalt i l'altra a baix.
     <div className={`relative mt-2 w-full ${vertical ? 'aspect-[1/2]' : 'aspect-square'}`}>
       <div className="absolute inset-0 overflow-hidden rounded-md bg-muted" id="stripe-guide-right-anchor">
         <button
