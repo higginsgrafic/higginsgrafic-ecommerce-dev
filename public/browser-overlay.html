@@ -286,6 +286,7 @@ function estatInicial() {
     sostre: 8,
     tots: false,
     filtre: 'tots',          // 'tots' | 'vertical' | 'horitzontal'
+    ambNavegador: true,      // ensenyar el dibuix del navegador o tallar a la finestra
     panell: false,
     grupsOberts: ['Portàtil'],
   };
@@ -349,7 +350,23 @@ const candidats = () => (estat.tots && esPrincipal(tabActiva()) ? TOTS : oberts(
 const tauler = document.getElementById('tauler');
 const llenç = document.getElementById('llenç');
 const marcs = new Map();   // formatId -> marc (un per format, com les pestanyes)
-let ullObert = true;
+let ullObert = estat.ambNavegador !== false;   // true = el marc es el dispositiu sencer
+/**
+ * La mida del marc.
+ *
+ * AMB el navegador, el marc fa la mida del DISPOSITIU (1920x1080) i la finestra
+ * que rep la pagina es la de dins (1080 menys la barra).
+ *
+ * SENSE el navegador, el marc queda TALLAT a la FINESTRA: 1920x946. No es nomes
+ * amagar el dibuix; allo deixava una franja blanca a dalt i el marc seguia
+ * ocupant el que ocupava el navegador, que es el que no vols quan estas mirant
+ * la pagina.
+ */
+function midaMarc(fmt) {
+  return ullObert
+    ? { w: fmt.w, h: fmt.h }
+    : { w: fmt.w, h: fmt.h - fmt.ct - fmt.cb };
+}
 let mides = [];            // les mides JA ESCALADES de l'ultim repartiment
 
 const ampleUtil = () => tauler.clientWidth - MARGES * 2;
@@ -365,14 +382,14 @@ function zoomDe(id) {
     return estat.zoomMosaic || 0.15;
   }
   // A la pestanya d'un format, el seu propi zoom.
-  const f = PER_ID[id];
-  if (p.ajust === 'ample') return Math.max(0.05, ampleUtil() / f.w);
-  if (p.ajust === 'alt') return Math.max(0.05, altUtil() / f.h);
-  if (p.ajust === 'tot') return Math.max(0.05, Math.min(ampleUtil() / f.w, altUtil() / f.h));
+  const mm = midaMarc(PER_ID[id]);
+  if (p.ajust === 'ample') return Math.max(0.05, ampleUtil() / mm.w);
+  if (p.ajust === 'alt') return Math.max(0.05, altUtil() / mm.h);
+  if (p.ajust === 'tot') return Math.max(0.05, Math.min(ampleUtil() / mm.w, altUtil() / mm.h));
   if (p.zoom) return p.zoom;
   // Una pestanya nova s'obre a una escala raonable, i MAI per sobre de 1:1: els
   // mobils es veuen a mida real i els escriptoris encongits.
-  return Math.min(1, AMPLE_CELLA / f.w);
+  return Math.min(1, AMPLE_CELLA / mm.w);
 }
 
 function creaMarc(id) {
@@ -386,17 +403,18 @@ function creaMarc(id) {
   const escala = document.createElement('div');
   escala.className = 'escala';
 
+  const mm = midaMarc(fmt);
   const caixa = document.createElement('div');
   caixa.className = 'caixa';
-  caixa.style.width = fmt.w + 'px';
-  caixa.style.height = fmt.h + 'px';
+  caixa.style.width = mm.w + 'px';
+  caixa.style.height = mm.h + 'px';
 
   const iframe = document.createElement('iframe');
   iframe.className = 'finestra';
   iframe.title = fmt.nom;
   iframe.style.width = fmt.w + 'px';
   iframe.style.height = (fmt.h - fmt.ct - fmt.cb) + 'px';
-  iframe.style.marginTop = fmt.ct + 'px';
+  iframe.style.marginTop = (ullObert ? fmt.ct : 0) + 'px';
 
   const parts = [];
   if (fmt.img) {
@@ -442,7 +460,7 @@ function creaMarc(id) {
 
   const etiqueta = document.createElement('div');
   etiqueta.className = 'etiqueta';
-  etiqueta.innerHTML = `<span class="nom"></span><span class="mida">${fmt.w}×${fmt.h}</span><span class="estat"></span>`;
+  etiqueta.innerHTML = `<span class="nom"></span><span class="mida">${mm.w}×${mm.h}</span><span class="estat"></span>`;
   etiqueta.querySelector('.nom').textContent = fmt.nom;
   const recarrega = document.createElement('button');
   recarrega.textContent = '⟳'; recarrega.title = 'Recarregar aquesta vista';
@@ -453,6 +471,8 @@ function creaMarc(id) {
   el.append(escala, etiqueta);
 
   const marc = { el, escala, caixa, iframe, etiqueta, carregant, sensVisita, botoVeure, fmt, viu: false, carregat: false, fixat: false };
+  // El boto de dins de la silueta tambe diu la mida que es veura.
+  contingut.firstElementChild.innerHTML = `${fmt.nom}<br><span style="opacity:.7">${mm.w}×${mm.h}</span>`;
   iframe.addEventListener('load', () => { marc.carregat = true; el.classList.add('carregat'); });
   recarrega.addEventListener('click', (e) => { e.stopPropagation(); recarregaMarc(marc); });
   tanca.addEventListener('click', (e) => { e.stopPropagation(); tancaPestanya(id); });
@@ -462,6 +482,15 @@ function creaMarc(id) {
 
   marcs.set(id, marc);
   return marc;
+}
+
+/** Posa un marc al mode d'ara: amb el navegador, o tallat a la finestra. */
+function aplicaNavegador(marc) {
+  const mm = midaMarc(marc.fmt);
+  marc.caixa.style.height = mm.h + 'px';
+  marc.iframe.style.marginTop = (ullObert ? marc.fmt.ct : 0) + 'px';
+  marc.etiqueta.querySelector('.mida').textContent = `${mm.w}×${mm.h}`;
+  marc.caixa.querySelectorAll('.barra-navegador, .falsa-barra').forEach((b) => { b.style.display = ullObert ? '' : 'none'; });
 }
 
 function muntaMarc(marc, fixa = false) {
@@ -725,7 +754,7 @@ function zQueEncabeix(mides1, mode, eix = 'tot') {
 function zoomMosaicAjustat(eix = 'tot') {
   const ids = visibles();
   if (!ids.length) return 0.15;
-  return zQueEncabeix(ids.map((id) => ({ id, w: PER_ID[id].w, h: PER_ID[id].h })), estat.ordre, eix);
+  return zQueEncabeix(ids.map((id) => ({ id, ...midaMarc(PER_ID[id]) })), estat.ordre, eix);
 }
 
 // ── PINTAR ─────────────────────────────────────────────────────────────────
@@ -735,9 +764,9 @@ function pintaTauler({ guardaScroll = false } = {}) {
   if (guardaScroll && act) act.scroll = { x: tauler.scrollLeft, y: tauler.scrollTop };
   const ids = visibles();
   mides = ids.map((id) => {
-    const f = PER_ID[id];
+    const mm = midaMarc(PER_ID[id]);
     const z = zoomDe(id);
-    return { id, w: Math.round(f.w * z), h: Math.round(f.h * z), z };
+    return { id, w: Math.round(mm.w * z), h: Math.round(mm.h * z), z };
   });
   // A una pestanya de format tambe hi ha d'haver la resta de marcs muntats (son
   // les altres pestanyes): nomes s'amaguen. Destruir-los voldria dir que anar a
@@ -1012,10 +1041,12 @@ document.getElementById('recarrega').addEventListener('click', () => {
 });
 document.getElementById('navegador').addEventListener('click', (e) => {
   ullObert = !ullObert;
+  estat.ambNavegador = ullObert;
+  desa();
   e.target.classList.toggle('actiu', !ullObert);
-  for (const m of marcs.values()) {
-    m.caixa.querySelectorAll('.barra-navegador, .falsa-barra').forEach((b) => { b.style.display = ullObert ? '' : 'none'; });
-  }
+  e.target.textContent = ullObert ? 'Navegador' : 'Tallat a la finestra';
+  for (const m of marcs.values()) aplicaNavegador(m);
+  pintaTauler();
 });
 document.getElementById('sostre').addEventListener('change', (e) => { estat.sostre = Number(e.target.value); desa(); muntaLesQueToca(); actualitzaBarra(); });
 document.getElementById('global').addEventListener('click', () => {
@@ -1045,6 +1076,11 @@ window.addEventListener('resize', () => {
 });
 
 // ── ENGEGAR ───────────────────────────────────────────────────────────────
+{
+  const b = document.getElementById('navegador');
+  b.classList.toggle('actiu', !ullObert);
+  b.textContent = ullObert ? 'Navegador' : 'Tallat a la finestra';
+}
 pintaTot();
 </script>
 </body>
