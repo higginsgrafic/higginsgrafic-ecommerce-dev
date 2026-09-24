@@ -197,6 +197,7 @@
       </optgroup>
     </select>
   </label>
+  <button id="guies" title="Ensenyar les dues verticals blaves de les vores del carril a cada finestra">guies del carril</button>
   <button id="global" title="Al mosaic, ensenyar també els formats que no tenen pestanya">Tots al mosaic</button>
   <button id="recarrega" title="Recarregar TOTES les vistes obertes, tambe les de les altres pestanyes">Recarregar tot</button>
   <button id="navegador" title="Mostrar o amagar el dibuix del navegador">Navegador</button>
@@ -303,6 +304,9 @@ function estatInicial() {
     // falta, `pintaAcordio` no sap quin boto marcar i l'acordio peta.
     filtre: 'tots',          // 'tots' | 'vertical' | 'horitzontal'
     ambNavegador: true,      // ensenyar el dibuix del navegador o tallar a la finestra
+    // Les verticals del carril (vegeu `ambGuies`). Ve ences: qui obra l'eina es
+    // per mesurar, i el que es mesura es si les peces cauen dins del carril.
+    guiesCarril: true,
     panell: false,
     grupsOberts: [...GRUPS],
   };
@@ -322,6 +326,8 @@ function carrega() {
     if (!e.ordre || e.ordre === 'graella') e.ordre = 'mosaic';
     e.tots = false;
     e.filtre = 'tots';
+    // Camp afegit despres: qui ja tenia estat desat no el porta.
+    if (typeof e.guiesCarril !== 'boolean') e.guiesCarril = true;
     // Estats desats quan el defecte era tenir nomes un grup obert: s'obren tots.
     if (!Array.isArray(e.grupsOberts) || !e.grupsOberts.length || (e.grupsOberts.length === 1 && e.grupsOberts[0] === 'Portàtil')) {
       e.grupsOberts = [...GRUPS];
@@ -362,6 +368,26 @@ const RUTA_URL = (() => {
   } catch { return null; }
 })();
 if (RUTA_URL) for (const p of estat.pestanyes) p.ruta = RUTA_URL;
+
+// ── LES GUIES DEL CARRIL ───────────────────────────────────────────────────
+//
+// Les dues verticals blaves que marquen les vores del carril les pinta l'app
+// amb el commutador "Belt 2" (`HG_BELT2_GUIDES_ENABLED_V1`), que ve apagat. En
+// aquesta eina, pero, son la referencia per mesurar: sense guies no es pot
+// veure si una peca cau dins del carril, i s'ha arribat a jutjar una franja que
+// en sortia 50 px per banda sense tenir-hi res per comparar.
+//
+// S'encenen amb el parametre `belt2=1` a la URL de cada finestra, que mana per
+// damunt del que hi hagi desat: l'eina no toca la decisio de l'app, i el boto
+// "guies del carril" les treu quan molestin.
+const ambGuies = (ruta) => {
+  if (!estat.guiesCarril) return ruta;
+  const [senseAncla, ancla] = String(ruta).split('#');
+  const [cami, consulta] = senseAncla.split('?');
+  const p = new URLSearchParams(consulta || '');
+  p.set('belt2', '1');
+  return cami + '?' + p.toString() + (ancla ? '#' + ancla : '');
+};
 
 let desaPendent = null;
 function desa() {
@@ -553,7 +579,7 @@ function muntaMarc(marc, fixa = false) {
   if (fixa) marc.fixat = true;
   marc.el.classList.remove('carregat');
   marc.carregat = false;
-  marc.iframe.src = (tabDe(marc.fmt.id) || {}).ruta || '/';
+  marc.iframe.src = ambGuies((tabDe(marc.fmt.id) || {}).ruta || '/');
   marc.sensVisita.style.display = 'none';
   actualitzaEtiqueta(marc);
 }
@@ -892,6 +918,7 @@ function actualitzaBarra() {
   document.getElementById('ajusta-alt').classList.toggle('actiu', act?.ajust === 'alt');
   document.getElementById('zoom-1').classList.toggle('actiu', act && !act.ajust && Math.abs((act.zoom || 0) - 1) < 0.001);
   document.getElementById('global').classList.toggle('actiu', !!estat.tots);
+  document.getElementById('guies').classList.toggle('actiu', !!estat.guiesCarril);
   document.getElementById('global').disabled = !principal;
   document.getElementById('sostre').value = String(estat.sostre || 8);
   const vius = [...marcs.values()].filter((m) => m.viu).length;
@@ -1096,7 +1123,7 @@ barraRuta.addEventListener('change', () => {
   if (!r.startsWith('/')) r = '/' + r;
   act.ruta = r;
   const m = marcs.get(act.id);
-  if (m && m.viu) { m.el.classList.remove('carregat'); m.carregat = false; m.iframe.src = r; }
+  if (m && m.viu) { m.el.classList.remove('carregat'); m.carregat = false; m.iframe.src = ambGuies(r); }
   desa();
 });
 document.getElementById('recarrega').addEventListener('click', () => {
@@ -1116,6 +1143,20 @@ document.getElementById('navegador').addEventListener('click', (e) => {
   pintaTauler();
 });
 document.getElementById('sostre').addEventListener('change', (e) => { estat.sostre = Number(e.target.value); desa(); muntaLesQueToca(); actualitzaBarra(); });
+document.getElementById('guies').addEventListener('click', () => {
+  estat.guiesCarril = !estat.guiesCarril;
+  // El parametre nomes es llegeix en obrir la pagina, i `recarregaMarc` torna a
+  // demanar la mateixa URL (que ja porta el parametre vell): aqui s'ha de
+  // reconstruir la URL de la ruta de la pestanya.
+  for (const m of marcs.values()) {
+    if (!m.viu) continue;
+    m.el.classList.remove('carregat');
+    m.carregat = false;
+    m.iframe.src = ambGuies((tabDe(m.fmt.id) || {}).ruta || '/');
+  }
+  pintaTauler();
+  desa();
+});
 document.getElementById('global').addEventListener('click', () => {
   estat.tots = !estat.tots;
   estat.activa = PRINCIPAL;   // es una propietat del mosaic
