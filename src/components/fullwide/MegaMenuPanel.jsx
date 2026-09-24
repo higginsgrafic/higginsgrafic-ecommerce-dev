@@ -357,16 +357,26 @@ export default function MegaMenuPanel({
           >
             <div style={{
               position: 'absolute',
-              // El cos no fa l'amplada de la finestra: `scrollbar-gutter:
-              // stable` a <html> reserva l'amplada de la barra de desplaçament
-              // (15 px) encara que no n'hi hagi. El marc del lloc (SiteFrame,
-              // belt2) es centra sobre la FINESTRA, i aquesta capa es centra
-              // sobre el contenidor on viu (el guard, centrat al cos), o sigui
-              // mitja reserva a l'esquerra del lloc que li toca. SiteFrame
-              // publica aquesta meitat i aquí la sumem.
-              left: 'calc(50% + var(--site-gutter-mig, 0px))',
+              // AQUESTA CAPA VA SOBRE L'AMPLADA DE MAQUETACIO, COM TOT LA RESTA.
+              //
+              // Fins al 24/09/2026 feia `width: 100vw` i es desplacava amb
+              // `--site-gutter-mig` (mitja reserva de la barra) perque queia a
+              // sobre de la FINESTRA. Pero el carril, la fila del header i les
+              // guies es calculen amb l'amplada de MAQUETACIO
+              // (`document.documentElement.clientWidth`, que exclou la barra):
+              // amb una barra classica de 15 px (Firefox amb ratoli), la capa
+              // era 15 px mes ampla i, com que va centrada, el carril de dins
+              // queia 7,5 px a la dreta del de les guies. El selector hi sortia
+              // 7,5 px a la dreta i l'amo ho va veure de seguida ("tornem-hi,
+              // alinea el selector a l'esquerra del carril").
+              //
+              // Amb `100%` i sense desplacament, la capa fa l'amplada de
+              // maquetacio i el seu centre es el mateix que el del marc del lloc
+              // (SiteFrame tambe el calcula amb clientWidth): tot cau al mateix
+              // lloc, amb barra i sense.
+              left: '50%',
               transform: 'translateX(-50%)',
-              width: '100vw',
+              width: '100%',
               height: '100%',
               overflow: 'visible',
             }}>

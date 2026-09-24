@@ -459,11 +459,11 @@ function PdpDesktop({ product }) {
               // central, centrat, amb el mateix coixi que la seva fila.
               position: 'absolute',
               top: 0,
-              // El contenidor de la pagina esta centrat a la FINESTRA, i el
-              // carril a l'espai de maquetacio (sense la barra de desplacament):
-              // es compensa amb la meitat del seu gruix, que es el que publica
-              // SiteFrame, perque el breadcrumb caigui on cau el logo.
-              left: 'calc(50% + var(--site-gutter-mig, 0px))',
+              // El contenidor de la pagina esta centrat a l'espai de
+              // MAQUETACIO (`margin: 0 auto`), que es la mateixa referencia que
+              // fa servir el carril (vegeu getLayoutViewportWidth): no cal cap
+              // compensacio, i abans n'hi havia una que ara desalineava 7,5 px.
+              left: '50%',
               transform: 'translateX(-50%)',
               width: 'var(--hg-mega-w, 100%)',
               paddingLeft: carrilPx(40),
