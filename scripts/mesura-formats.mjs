@@ -113,6 +113,29 @@ const mesura = () => {
   };
 };
 
+// LA CLASSE DE DISPOSITIU, LLEGIDA DEL MODUL DE PRODUCCIO.
+//
+// No es una copia de les regles: el navegador importa `/src/utils/layoutModel.js`
+// tal com el fa servir l'aplicacio, i li demana la classe d'aquesta finestra. Es
+// l'unica manera que l'eina digui el que el codi fa i no el que creiem que fa.
+//
+// Si el 3003 no serveix `src/` (un `preview` de `dist/`), la importacio falla i
+// la classe surt com a `?`: la resta de la mesura continua valent.
+const CLASSE_JS = `(async () => {
+  try {
+    const m = await import('/src/utils/layoutModel.js');
+    const d = m.deviceLayoutFromViewport(window.innerWidth, window.innerHeight);
+    const classe = d.isMobile ? 'mobil'
+      : d.isPortraitTablet ? 'tauleta vertical'
+      : d.isLandscapeTablet ? 'tauleta apaissada'
+      : d.isDesktop ? 'escriptori'
+      : 'SENSE CLASSE';
+    return { classe };
+  } catch (e) {
+    return { classe: '?' };
+  }
+})()`;
+
 const navegador = await chromium.launch();
 const files = [];
 for (const f of FORMATS) {
@@ -141,9 +164,12 @@ for (const f of FORMATS) {
   }
   const a = rutes['/'];
   const n = rutes['/nova/inici'];
+  // La classe no depen de la ruta: es llegeix una vegada per format, amb la
+  // finestra ja muntada i el React pintat.
+  const { classe } = await page.evaluate(CLASSE_JS);
   const senseCistell = a.cistellCapcalera === 0 && a.barraInferior === 0;
   files.push({
-    ...f, alcadaFinestra,
+    ...f, alcadaFinestra, classe,
     offset: a.offset, capcalera: a.capcalera, segona: a.segona,
     icones: a.iconesCapcalera, cistellCap: a.cistellCapcalera, barra: a.barraInferior,
     zonaNova: n.zona, desborda: a.desborda || n.desborda,
@@ -157,10 +183,11 @@ await navegador.close();
 
 const ample = (s, n) => String(s ?? '').padEnd(n);
 console.log('\nFORMATS DEL DESPLEGAMENT (mesurat al 3003)\n');
-console.log(`${ample('format', 34)}${ample('finestra', 12)}${ample('offset', 8)}${ample('capç.', 7)}${ample('2a fila', 9)}${ample('icones', 8)}${ample('cistell', 9)}${ample('barra', 7)}${ample('cistell?', 10)}${ample('nova', 8)}desborda`);
+console.log(`${ample('format', 34)}${ample('classe', 18)}${ample('finestra', 12)}${ample('offset', 8)}${ample('capç.', 7)}${ample('2a fila', 9)}${ample('icones', 8)}${ample('cistell', 9)}${ample('barra', 7)}${ample('cistell?', 10)}${ample('nova', 8)}desborda`);
 for (const f of files) {
   console.log(
     ample(f.nom, 34)
+    + ample(f.classe, 18)
     + ample(`${f.w}x${f.alcadaFinestra}`, 12)
     + ample(f.offset, 8)
     + ample(f.capcalera, 7)
@@ -176,6 +203,21 @@ for (const f of files) {
 const forats = files.filter((f) => f.senseCistell);
 console.log(`\nSENSE CAP MANERA D'OBRIR EL CISTELL (${forats.length} formats):`);
 for (const f of forats) console.log(`  - ${f.nom}  (${f.w}x${f.h} CSS, finestra ${f.w}x${f.alcadaFinestra}, offset ${f.offset})`);
+
+// LA CLASSE DE DISPOSITIU: cap format no s'hi pot quedar sense. Es la porta de
+// sortida del pas 2 de `PLA-estructura-general-dispositius.md`.
+const senseClasse = files.filter((f) => f.classe === 'SENSE CLASSE');
+console.log(`\nSENSE CLASSE DE DISPOSITIU (${senseClasse.length} formats):`);
+for (const f of senseClasse) console.log(`  - ${f.nom}  (${f.w}x${f.alcadaFinestra})`);
+
+// La classe i l'offset de capcalera han de dir el mateix: nomes la tauleta
+// vertical en fa 123. Si divergissim, hi hauria dues classificacions al codi.
+const incoherents = files.filter((f) => f.classe !== '?' && (f.classe === 'tauleta vertical') !== (f.offset === 123));
+if (incoherents.length) {
+  console.log(`\nLA CLASSE I L'OFFSET NO DIUEN EL MATEIX (${incoherents.length}):`);
+  for (const f of incoherents) console.log(`  - ${f.nom}: classe ${f.classe}, offset ${f.offset}`);
+}
+
 const desborden = files.filter((f) => f.desborda);
 if (desborden.length) {
   console.log(`\nDESBORDEN HORITZONTALMENT (${desborden.length}):`);
