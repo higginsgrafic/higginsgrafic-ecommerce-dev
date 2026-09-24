@@ -530,8 +530,9 @@ export default function MegaslidePagina2({
             compact
             // La filera arrenca 10 px a la dreta del selector: els blocs de la
             // composicio son [selector] 10 [graella de dibuixos i colors] 10
-            // [columna de colleccions].
-            esquerra={bnSliderSize ? `calc(${carrilLane(40)} + ${carrilPx(bnSliderSize)} + 20px)` : undefined}
+            // [columna de colleccions]. I com que el selector ara fa la MEITAT
+            // d'amplada (24/09/2026), la filera hi arrenca abans.
+            esquerra={bnSliderSize ? `calc(${carrilLane(40)} + ${carrilPx(bnSliderSize / 2)} + 20px)` : undefined}
             desplacamentVertical={40 - topGraellaColors}
             isPortraitTablet={isPortraitTablet}
             isLandscapeTablet={isLandscapeTablet}
