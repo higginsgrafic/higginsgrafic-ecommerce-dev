@@ -211,7 +211,6 @@ function MegaStripePanel({
   calibrationOverrides,
   visualOffsetY = 0,
   compactLandscape = false,
-  fitAlcada = 1,
 }) {
   // Id unic per al retall dels dibuixos: els dos panells conviuen al DOM i
   // amb un id repetit la referencia url(#...) no resolia.
@@ -331,9 +330,7 @@ function MegaStripePanel({
             // sencer a baix deixaven la franja enganxada al fons de la
             // casella (semblava tallada). Amb mig coixi a dalt queda centrada.
             marginTop: compactLandscape ? '16px' : `${stripeRowPadPx}px`,
-            // El coixí de sota tambe s'ajusta a l'alcada de la finestra (vegeu
-            // fitAlcada): si no, la franja s'encongiria pero el panell no.
-            paddingBottom: compactLandscape ? '8px' : `${stripeRowPadPx * fitAlcada}px`,
+            paddingBottom: compactLandscape ? '8px' : `${stripeRowPadPx}px`,
             paddingLeft: `${stripeRowPadXPx?.left || 0}px`,
             paddingRight: `${stripeRowPadXPx?.right || 0}px`,
             // A la banda estreta la franja NO s'ha de pujar: el belt s'ha
@@ -413,16 +410,16 @@ function MegaStripePanel({
                   width: '100%',
                   display: 'block',
                   transformOrigin: 'top center',
-                  // La franja s'ajusta tambe a l'alcada de la finestra (fitAlcada):
-                  // en una finestra curta, la seva mida de disseny no hi cap i es
-                  // menja el panell. MegaStripePanelP1 (pagina 1) fa el mateix
-                  // amb el mateix factor, perque les dues franges quedin igual.
+                  // La franja NO s'ajusta a l'alcada de la finestra: fa el carril
+                  // SEMPRE (vegeu MegaMenuPanel). Abans hi havia un factor
+                  // d'alcada que l'encongia a les finestres baixes i trencava
+                  // l'encaix per les cintures.
                   // El desplaçament ve de les variables de calibracio i NO
                   // s'escala (el `translate` va abans de l'`scale`: és en px del
                   // pare). El que s'escala és la mida de la filera, i l'escala
                   // que la porta al carril la calcula `useEscalaFranjaCarril`
                   // (les manigues hi queden a fora, a la mida del dibuix).
-                  transform: `translate(var(--megaStripeDx, 0px), calc(var(--megaStripeDy, 0px) + ${visualOffsetY}px)) scale(calc(var(--megaStripeScale, 1.2125) * ${factorCarrilFranja} * ${fitAlcada}))`,
+                  transform: `translate(var(--megaStripeDx, 0px), calc(var(--megaStripeDy, 0px) + ${visualOffsetY}px)) scale(calc(var(--megaStripeScale, 1.2125) * ${factorCarrilFranja}))`,
                   isolation: 'isolate',
                 }}
               >
