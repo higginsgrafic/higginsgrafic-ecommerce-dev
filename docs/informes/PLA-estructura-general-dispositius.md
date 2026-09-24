@@ -192,6 +192,34 @@ són grans. I al mòbil, el full.
 O sigui: **una mesura, tres densitats.** El carril és el mateix; el que canvia
 és com s'hi reparteixen les decisions.
 
+### 2.5 El primer tros de la belt, tret (24/09/2026): el regle ja no ve de les guies
+
+La capçalera demanava el carril amb `getSafeBelt()`, que **prioritza les guies
+`--belt2-xL/xR`** quan són vàlides. Aquestes guies les publica
+`BeltReferenceOverlay`, que només viu en desenvolupament i ho fa **més tard** que
+la mesura de la capçalera. Mesurat a 2560×1306:
+
+| moment | `--hg-mega-w` | carril de la pàgina nova | font |
+|---|---|---|---|
+| 1,0 s | **1800** | 1693 | la fórmula pura (2560 × 1350/1920) |
+| 1,5 s i en endavant | **1350** | 1270 | les guies de debug (`--belt2-xL` = 605) |
+
+O sigui: **el regle del lloc canviava sol** mig segon després de carregar, i el
+carril de la pàgina nova queia un 25 %. A 1920 no es veia perquè les dues xifres
+hi coincideixen (1350). Ara la capçalera fa servir `laneForViewport()`, que és la
+mateixa fórmula sense guies: a 1440 i 1920 dona exactament el mateix, i per sobre
+el que la producció ja feia.
+
+**I una segona cosa que el canvi ha destapat:** a la tauleta vertical (768×1024)
+el tauler del megaslide fa **992 px** i la seva posició es calculava amb el carril
+de l'escriptori (**540**), o sigui `x = 114`: el tauler quedava 114 px endinsat i
+en perdia 114 per la dreta. El comentari del codi diu «CENTRAT» i no ho feia. Ara
+`x = 0`, que és el centre del tauler que de debò es publica (992 en una finestra
+de 768 no hi cap centrat, i el que toca és arrencar a la vora). **És l'única xifra
+que es mou de les 834** que mesura `mesura-megaslide` a les seves 7 vistes, i
+s'ha comprovat invertint la comparació: capturada la base amb el canvi posat, el
+codi de sempre se'n desvia exactament en aquesta.
+
 ---
 
 ## 3. Peça 3 — Una densitat per classe
@@ -232,7 +260,7 @@ que no té vista mòbil.
 |---|---|---|
 | **1** | **Aquest paper** | aprovat per l'amo |
 | **2** | **La classificació, una sola** — **FETA** (24/09): la matriu viu a `deviceLayoutFromViewport` i el hook la llegeix (les regles duplicades s'han tret) | **6 proves noves**, 503 proves, `compara-vistes` OK; mesurat al navegador: només els 2 formats que no tenien classe es mouen |
-| **3** | **El regle únic** (§2.3) | `compara-vistes` OK amb les mateixes xifres; el carril, amb la diferència escrita |
+| **3** | **El regle únic** (§2.3) — **COMENÇAT** (24/09): la capçalera ja no llegeix les guies de debug (§2.5) | la resta: `--hg-mega-w` llegint el carril declarat, i les peces del megaslide sense claus ni terres |
 | **4** | **El full de mòbil** | la pàgina nova funciona per sota de 768 i als sis telèfons girats |
 | **5** | **La densitat, peça per peça** (començant per la taula de la tauleta vertical) | el mapa de caselles, casella per casella |
 | **6** | **L'escala separada** (`--escala` / `--escala-text`) | les cinc mides, mateixes xifres |
@@ -267,9 +295,14 @@ alhora: si una mesura es mou, s'atura i s'explica per què.
 - **El carril** (§2.2): les xifres són les mesurades al 3003 el 24/09 (1920 → 1270,
   1440 → 953, 1024–1366 → 933, 853 → 772, 768 → 688), amb la mesura del tram
   logo→icones al costat de la fórmula.
+- **La primera substitució del regle** (§2.5), amb la bateria sencera: 503 proves,
+  `vite build` net, eslint **26 problemes (15 errors, 11 warnings)** a la capçalera
+  —exactament els mateixos que el fitxer original, comprovat— i `compara-vistes`
+  **OK amb les mateixes xifres** (dibuix 20,89, gap 17,91, cercle 18,89, franja 101,6
+  a les tauletes; 22,5 a 1440). Del guardià de 834 xifres, **es mou una**: la
+  posició del tauler a la vertical (§2.5), explicada i mesurada a part.
 - **Una base caducada, per no confondre**: `npm run mesura:megaslide` canta **271 de 833
   xifres** mogudes, i totes són estructurals (el panell de 292 a 434 px, offsets de −40 px
   per la barra de desenvolupament). La base és del **18/09**, d'abans de les taules de la
-  tauleta: no és d'aquest canvi (les quatre vistes que mesura tenen la mateixa classe que
-  abans), i s'haurà de tornar a capturar quan es tanqui el carril.
+  tauleta: no és d'aquests canvis, i s'haurà de tornar a capturar quan es tanqui el carril.
 

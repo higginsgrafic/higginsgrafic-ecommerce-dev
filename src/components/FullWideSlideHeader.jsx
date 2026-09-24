@@ -9,7 +9,7 @@ import { useCart } from '@/contexts/CartContext';
 import { useOrders } from '@/hooks/useOrders';
 import { getGildan64000Catalog } from '../utils/placeholders.js';
 import { AUSTEN_QUOTES_ASSETS, resolveAustenQuoteAssetId, resolveAustenQuoteOriginalFromPath } from '../utils/austenQuotesAssets.js';
-import { getSafeBelt, clampNumber, escalaMegaslide, MEGASLIDE_REFERENCIA_PX, carrilPx, carrilLane } from '@/utils/layoutMetrics';
+import { clampNumber, escalaMegaslide, MEGASLIDE_REFERENCIA_PX, carrilPx, carrilLane } from '@/utils/layoutMetrics';
 import { laneForViewport } from '@/utils/layoutModel';
 import {
   FIRST_CONTACT_MEDIA,
@@ -2197,10 +2197,24 @@ function FullWideSlideHeader({
     if (typeof window === 'undefined') return undefined;
 
     const measure = () => {
-      // Font segura cross-browser (Chromium, WebKit, Firefox).
-      // getSafeBelt valida belt2 i cau a un belt centrat si està contaminat.
-      const belt = getSafeBelt({ maxContent: 1350, sideMargin: 16, minContent: 320 });
-      const beltWidth = Math.max(0, belt.width);
+      // EL CARRIL, DE LA REGLA PURA I NO DE LES GUIES DE DEBUG.
+      //
+      // Aqui hi havia `getSafeBelt({ maxContent: 1350, sideMargin: 16, ... })`,
+      // que PRIORITZA les guies `--belt2-xL/xR` quan son valides. Aquestes
+      // guies les publica `BeltReferenceOverlay`, que nomes viu en desenvolupament
+      // i ho fa **mes tard** que aquesta mesura.
+      //
+      // MESURAT (24/09/2026, 2560x1306): la belt fa 1800 px al primer mesurament
+      // (la formula pura: 2560 x 1350/1920) i **canvia a 1350** cap a 1,5 s,
+      // quan l'overlay publica `--belt2-xL` (605 px). El carril de la pagina nova
+      // passa de 1693 a 1270 pel cami. O sigui: el regle del lloc depenia del
+      // moment en que es publicava una eina de depuracio, i a 1920 no es veia
+      // perque les dues xifres hi coincideixen (1350).
+      //
+      // `laneForViewport()` es la MATEIXA formula que `getSafeBelt` fa servir quan
+      // no hi ha guies, pero pura: no llegeix cap variable de debug. A 1920 i per
+      // sota dona exactament el mateix; per sobre, el que la produccio ja feia.
+      const beltWidth = Math.max(0, laneForViewport());
 
       // Exposem el belt segur com a CSS vars perquè els panells del mega-slide
       // s'alineïn amb belt2 quan és vàlid, i caiguin a fallback si està contaminat.
@@ -2221,13 +2235,13 @@ function FullWideSlideHeader({
         const beltFinal = isPortraitTablet ? 992 : (isLandscapeTablet ? beltTauleta : beltWidth);
         root.style.setProperty('--hg-mega-w', `${beltFinal}px`);
         // Quan el carril te una amplada propia (tauleta: 992) la seva posicio
-        // tambe: CENTRAT a l'espai de maquetacio. El `belt.left` es el del marc
-        // del lloc (a 1280, 16) i amb 992 el carril no hi queia: la fila 1 del
-        // megaslide anava a 174 i el logo del header a 219.
-        const vpLayout = Math.max(0, (document.documentElement.clientWidth || window.innerWidth || 0));
-        const xFinal = (beltFinal !== beltWidth && !isPortraitTablet)
-          ? Math.max(0, Math.round((vpLayout - beltFinal) / 2))
-          : belt.left;
+        // tambe: CENTRAT a l'espai de maquetacio. Abans aixo ho deia `belt.left`
+        // (el left del marc del lloc, a 1280 16 px) i amb 992 el carril no hi
+        // queia: la fila 1 del megaslide anava a 174 i el logo del header a 219.
+        // Centrar les dues amplades es el mateix —`belt.left` també era el
+        // centre del seu propi belt— i no depen de cap mesura.
+        const vpLayout = vp;
+        const xFinal = Math.max(0, Math.round((vpLayout - beltFinal) / 2));
         root.style.setProperty('--hg-mega-x', `${xFinal}px`);
         // La FRANJA central: del left del logo al right de la icona d'usuari.
         // Es la mesura que han de fer servir les peces que hi han d'encaixar
