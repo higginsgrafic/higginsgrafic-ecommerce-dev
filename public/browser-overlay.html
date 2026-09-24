@@ -139,6 +139,7 @@
   .marc .etiqueta .nom { font-weight: 600; overflow: hidden; text-overflow: ellipsis; }
   .marc .etiqueta .mida { color: #b9b9cc; font-variant-numeric: tabular-nums; }
   .marc .etiqueta .estat { color: #b9b9cc; }
+  .marc .etiqueta .hora { color: #8a8a9c; font-variant-numeric: tabular-nums; }
   .marc .etiqueta button { padding: 1px 6px; font-size: 11px; background: rgba(255,255,255,.14); border-color: transparent; color: #fff; }
   .marc .etiqueta button:hover { background: var(--accent); }
   .marc.actiu .caixa { outline: 2px solid var(--accent); }
@@ -489,7 +490,7 @@ function creaMarc(id) {
 
   const etiqueta = document.createElement('div');
   etiqueta.className = 'etiqueta';
-  etiqueta.innerHTML = `<span class="nom"></span><span class="mida">${mm.w}×${mm.h}</span><span class="estat"></span>`;
+  etiqueta.innerHTML = `<span class="nom"></span><span class="mida">${mm.w}×${mm.h}</span><span class="estat"></span><span class="hora"></span>`;
   etiqueta.querySelector('.nom').textContent = fmt.nom;
   const recarrega = document.createElement('button');
   recarrega.textContent = '⟳'; recarrega.title = 'Recarregar aquesta vista';
@@ -502,7 +503,12 @@ function creaMarc(id) {
   const marc = { el, escala, caixa, iframe, etiqueta, carregant, sensVisita, botoVeure, fmt, viu: false, carregat: false, fixat: false };
   // El boto de dins de la silueta tambe diu la mida que es veura.
   contingut.firstElementChild.innerHTML = `${fmt.nom}<br><span style="opacity:.7">${mm.w}×${mm.h}</span>`;
-  iframe.addEventListener('load', () => { marc.carregat = true; el.classList.add('carregat'); });
+  iframe.addEventListener('load', () => {
+    marc.carregat = true;
+    el.classList.add('carregat');
+    // L'hora de carrega, per saber si el marc es la pagina d'ara o una de vella.
+    marc.etiqueta.querySelector('.hora').textContent = new Date().toLocaleTimeString('ca-ES');
+  });
   recarrega.addEventListener('click', (e) => { e.stopPropagation(); recarregaMarc(marc); });
   tanca.addEventListener('click', (e) => { e.stopPropagation(); tancaPestanya(id); });
   botoVeure.addEventListener('click', (e) => { e.stopPropagation(); muntaMarc(marc, true); });
