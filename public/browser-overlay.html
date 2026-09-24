@@ -7,214 +7,185 @@
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   :root {
-    --fons: #12121c;
-    --fons2: #1a1a28;
-    --fons3: #24243a;
-    --vora: #33334d;
-    --text: #e8e8f0;
-    --text2: #9a9ab0;
-    --accent: #ff0040;
-    --marc: 260px;
+    --fons: #12121c; --fons2: #1a1a28; --fons3: #24243a;
+    --vora: #33334d; --text: #e8e8f0; --text2: #9a9ab0; --accent: #ff0040;
+    --rail: 46px;
   }
   body {
-    background: var(--fons);
-    color: var(--text);
-    font-family: -apple-system, system-ui, sans-serif;
-    font-size: 13px;
-    height: 100vh;
-    overflow: hidden;
+    background: var(--fons); color: var(--text);
+    font-family: -apple-system, system-ui, sans-serif; font-size: 13px;
+    height: 100vh; overflow: hidden;
     display: grid;
-    grid-template-columns: var(--marc) 1fr;
+    grid-template-columns: var(--rail) 1fr;
     grid-template-rows: auto auto 1fr;
     grid-template-areas:
-      "marca    barra"
-      "marca    pestanyes"
-      "panell   tauler";
+      "panell barra"
+      "panell pestanyes"
+      "panell tauler";
   }
-
-  /* ── BARRA DE DALT ─────────────────────────────────────────────── */
-  .barra {
-    grid-area: barra;
-    display: flex; align-items: center; gap: 8px;
-    padding: 8px 12px;
-    background: var(--fons2);
-    border-bottom: 1px solid var(--vora);
-    flex-wrap: wrap;
+  /* El panell plegat nomes fa --rail d'ample: l'acordio existeix precisament
+     perque la llista de formats no ocupi pantalla. */
+  body.panell-obert { grid-template-columns: 250px 1fr; }
+  .panell {
+    grid-area: panell; background: var(--fons2); border-right: 1px solid var(--vora);
+    overflow: hidden auto; display: flex; flex-direction: column;
   }
-  .barra .titol { font-weight: 700; letter-spacing: .02em; margin-right: 4px; }
-  button, select, input[type="text"] {
-    font-family: inherit; font-size: 12.5px; color: var(--text);
-    background: var(--fons3); border: 1px solid var(--vora);
-    border-radius: 6px; padding: 6px 10px; cursor: pointer;
+  .panell .cap {
+    display: flex; align-items: center; gap: 8px; padding: 10px 8px;
+    border-bottom: 1px solid var(--vora); position: sticky; top: 0;
+    background: var(--fons2); z-index: 2;
   }
-  button:hover { background: #2f2f4a; }
-  button:disabled { opacity: .4; cursor: default; }
-  button.actiu { background: var(--accent); border-color: var(--accent); color: #fff; }
-  input[type="text"] { cursor: text; width: 150px; }
-  .grup-control { display: flex; align-items: center; gap: 0; }
-  .grup-control button { border-radius: 0; }
-  .grup-control button:first-child { border-radius: 6px 0 0 6px; }
-  .grup-control button:last-child { border-radius: 0 6px 6px 0; }
-  .zoom-num { min-width: 62px; text-align: center; background: var(--fons3); border: 1px solid var(--vora); border-left: none; border-right: none; padding: 6px 4px; }
-  .ajuda { color: var(--text2); font-size: 11.5px; margin-left: auto; text-align: right; }
-  .sostre { display: flex; align-items: center; gap: 6px; color: var(--text2); font-size: 12px; }
-  .sostre select { padding: 5px 6px; }
-
-  /* ── PESTANYES ─────────────────────────────────────────────────── */
-  .pestanyes {
-    grid-area: pestanyes;
-    display: flex; align-items: stretch; gap: 2px;
-    padding: 0 8px; background: #10101a;
-    border-bottom: 1px solid var(--vora);
-    overflow-x: auto; overflow-y: hidden;
-  }
-  .pestanyes .pestanya {
-    display: flex; align-items: center; gap: 6px;
-    background: transparent; border: none; border-bottom: 2px solid transparent;
-    border-radius: 0; padding: 8px 10px; color: var(--text2); white-space: nowrap;
-  }
-  .pestanyes .pestanya:hover { color: var(--text); background: var(--fons3); }
-  .pestanyes .pestanya.activa { color: #fff; border-bottom-color: var(--accent); }
-  .pestanyes .pestanya .compta { font-size: 11px; color: var(--text2); }
-  .pestanyes .pestanya .tanca { color: var(--text2); padding: 0 2px; border-radius: 3px; }
-  .pestanyes .pestanya .tanca:hover { background: var(--accent); color: #fff; }
-  .pestanyes .nova { color: var(--text2); font-size: 16px; padding: 4px 12px; }
-
-  /* ── MARCA (esquerra) ──────────────────────────────────────────── */
-  .marca {
-    grid-area: marca;
-    background: var(--fons2);
-    border-right: 1px solid var(--vora);
-    padding: 10px 12px;
-    display: flex; flex-direction: column; gap: 2px;
-    overflow: hidden;
-  }
-  .marca h1 { font-size: 13px; font-weight: 700; letter-spacing: .02em; }
-  .marca .sub { color: var(--text2); font-size: 11px; margin-bottom: 6px; }
-
-  /* ── PANELL: L'ACORDIÓ ─────────────────────────────────────────── */
-  .panell { grid-area: panell; overflow-y: auto; padding: 6px 0 40px; background: var(--fons2); border-right: 1px solid var(--vora); }
+  .panell .cap h1 { font-size: 13px; white-space: nowrap; }
+  body:not(.panell-obert) .panell .cap h1,
+  body:not(.panell-obert) .panell .grups { display: none; }
+  .grups { padding-bottom: 30px; }
   .grup { border-bottom: 1px solid var(--vora); }
-  .grup > .capçalera {
-    display: flex; align-items: center; gap: 8px; width: 100%;
-    background: transparent; border: none; border-radius: 0;
-    padding: 9px 12px; text-align: left; color: var(--text);
+  .grup > button.capçalera {
+    display: flex; align-items: center; gap: 8px; width: 100%; text-align: left;
+    background: transparent; border: none; border-radius: 0; padding: 9px 10px; color: var(--text);
   }
-  .grup > .capçalera:hover { background: var(--fons3); }
-  .grup > .capçalera .fletxa { transition: transform .15s; color: var(--text2); }
-  .grup.obert > .capçalera .fletxa { transform: rotate(90deg); }
-  .grup > .capçalera .compta { margin-left: auto; color: var(--text2); font-size: 11px; }
-  .grup .llista { display: none; padding: 2px 8px 8px 8px; }
+  .grup > button.capçalera:hover { background: var(--fons3); }
+  .grup > button.capçalera .fletxa { color: var(--text2); transition: transform .15s; }
+  .grup.obert > button.capçalera .fletxa { transform: rotate(90deg); }
+  .grup > button.capçalera .compta { margin-left: auto; color: var(--text2); font-size: 11px; }
+  .grup .llista { display: none; padding: 2px 6px 8px; }
   .grup.obert .llista { display: block; }
-  .opcio {
-    display: flex; align-items: center; gap: 8px;
-    padding: 5px 6px; border-radius: 5px; cursor: pointer;
-  }
+  .opcio { display: flex; align-items: center; gap: 8px; padding: 5px 6px; border-radius: 5px; cursor: pointer; }
   .opcio:hover { background: var(--fons3); }
   .opcio input { accent-color: var(--accent); cursor: pointer; }
   .opcio .nom { flex: 1; }
   .opcio .mida { color: var(--text2); font-size: 11px; font-variant-numeric: tabular-nums; }
-  .opcio .ulls { color: var(--text2); font-size: 12px; padding: 0 2px; border-radius: 3px; }
-  .opcio .ulls:hover { background: var(--accent); color: #fff; }
-  .accions-grup { display: flex; gap: 6px; padding: 4px 6px 2px; }
-  .accions-grup button { padding: 3px 7px; font-size: 11px; }
+
+  /* ── BARRA ─────────────────────────────────────────────────────── */
+  .barra {
+    grid-area: barra; display: flex; align-items: center; gap: 7px; flex-wrap: wrap;
+    padding: 8px 12px; background: var(--fons2); border-bottom: 1px solid var(--vora);
+  }
+  button, select, input[type="text"] {
+    font-family: inherit; font-size: 12.5px; color: var(--text);
+    background: var(--fons3); border: 1px solid var(--vora); border-radius: 6px;
+    padding: 6px 10px; cursor: pointer;
+  }
+  button:disabled { opacity: .45; cursor: default; }
+  button:hover:not(:disabled) { background: #2f2f4a; }
+  button.actiu { background: var(--accent); border-color: var(--accent); color: #fff; }
+  input[type="text"] { cursor: text; width: 140px; }
+  .grup-control { display: flex; }
+  .grup-control button { border-radius: 0; }
+  .grup-control button:first-child { border-radius: 6px 0 0 6px; }
+  .grup-control button:last-child { border-radius: 0 6px 6px 0; }
+  .zoom-num { min-width: 60px; text-align: center; background: var(--fons3); border: 1px solid var(--vora); border-left: none; border-right: none; padding: 6px 4px; }
+  .etiqueta-barra { color: var(--text2); font-size: 12px; }
+  .ajuda { color: var(--text2); font-size: 11.5px; margin-left: auto; text-align: right; }
+  label.amb-select { display: flex; align-items: center; gap: 6px; color: var(--text2); font-size: 12px; }
+  label.amb-select select { padding: 5px 6px; }
+
+  /* ── PESTANYES (una per format obert) ──────────────────────────── */
+  .pestanyes {
+    grid-area: pestanyes; display: flex; align-items: stretch; gap: 2px;
+    padding: 0 8px; background: #10101a; border-bottom: 1px solid var(--vora);
+    overflow-x: auto; overflow-y: hidden;
+  }
+  .pestanyes button.pestanya {
+    display: flex; align-items: center; gap: 7px; background: transparent;
+    border: none; border-bottom: 2px solid transparent; border-radius: 0;
+    padding: 8px 10px; color: var(--text2); white-space: nowrap;
+  }
+  .pestanyes button.pestanya:hover { background: var(--fons3); color: var(--text); }
+  .pestanyes button.pestanya.activa { color: #fff; border-bottom-color: var(--accent); }
+  .pestanyes .pestanya .mida { font-size: 11px; color: var(--text2); font-variant-numeric: tabular-nums; }
+  .pestanyes .pestanya .tanca { padding: 0 3px; border-radius: 3px; }
+  .pestanyes .pestanya .tanca:hover { background: var(--accent); color: #fff; }
+  .pestanyes .buit { color: var(--text2); padding: 8px 4px; font-size: 12px; }
 
   /* ── TAULER ────────────────────────────────────────────────────── */
   .tauler { grid-area: tauler; overflow: auto; position: relative; background: #0d0d14; }
-  .full { position: relative; }
-  .llenç { position: absolute; top: 0; left: 0; transform-origin: 0 0; }
+  .llenç { position: absolute; top: 0; left: 0; }
 
   .marc { position: absolute; }
-  /* L'etiqueta va DINS del marc, a la cantonada de baix a l'esquerra. Fora (a
-     sobre) no hi cap quan el zoom es baix: la separacio entre fileres es en
-     pixels de dispositiu i s'encongeix amb el zoom, i l'etiqueta no. */
-  .marc .etiqueta {
-    position: absolute; left: 0; bottom: 0; z-index: 14;
-    display: flex; align-items: center; gap: 8px; white-space: nowrap;
-    background: rgba(12, 12, 20, .84); color: #fff;
-    padding: 3px 8px; border-radius: 0 5px 0 0;
-    /* Contra-escalat: el llenç va escalat amb el zoom, i l'etiqueta no ha de
-       quedar de 3 px quan mires tots els formats alhora. */
-    transform: scale(var(--inv, 1));
-    transform-origin: left bottom;
-  }
-  .marc .etiqueta { overflow: hidden; }
-  .marc .etiqueta .nom { font-weight: 600; overflow: hidden; text-overflow: ellipsis; }
-  .marc .etiqueta .mida { color: #b9b9cc; font-variant-numeric: tabular-nums; }
-  .marc .etiqueta .estat { color: #b9b9cc; }
-  .marc .etiqueta button {
-    padding: 1px 6px; font-size: 11px;
-    background: rgba(255,255,255,.14); border-color: transparent; color: #fff;
-  }
-  .marc .etiqueta button:hover { background: var(--accent); }
+  .marc .escala { position: absolute; top: 0; left: 0; transform-origin: 0 0; }
   .marc .caixa { position: relative; background: #fff; box-shadow: 0 6px 30px rgba(0,0,0,.55); }
   .marc .finestra { position: absolute; top: 0; left: 0; border: none; background: #fff; }
   .marc .barra-navegador { position: absolute; top: 0; left: 0; pointer-events: none; z-index: 10; }
   .marc .falsa-barra {
-    position: absolute; top: 0; left: 0; right: 0; z-index: 10; pointer-events: none;
+    position: absolute; left: 0; right: 0; z-index: 10; pointer-events: none;
     background: repeating-linear-gradient(135deg, #dcdce4, #dcdce4 6px, #cfcfda 6px, #cfcfda 12px);
-    border-bottom: 1px solid #b9b9c6;
-    display: flex; align-items: center; justify-content: center;
+    border-bottom: 1px solid #b9b9c6; display: flex; align-items: center; justify-content: center;
     color: #55555f; font-size: 10px; letter-spacing: .04em;
   }
   .marc .carregant {
-    position: absolute; inset: 0; z-index: 12;
-    display: flex; align-items: center; justify-content: center;
+    position: absolute; inset: 0; z-index: 12; display: flex; align-items: center; justify-content: center;
     background: #fff; color: #888; font-size: 13px;
   }
   .marc.carregat .carregant { display: none; }
   .marc .sens-visita {
-    position: absolute; inset: 0; z-index: 12;
-    display: flex; align-items: center; justify-content: center;
+    position: absolute; inset: 0; z-index: 12; display: flex; align-items: center; justify-content: center;
     background: #f4f4f7; color: #55555f; text-align: center;
   }
-  .marc .sens-visita .contingut {
-    display: flex; flex-direction: column; align-items: center; gap: 10px;
-    transform: scale(var(--inv, 1));
+  .marc .sens-visita .contingut { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+  .marc .etiqueta {
+    position: absolute; left: 0; bottom: 0; z-index: 14;
+    display: flex; align-items: center; gap: 8px; white-space: nowrap; max-width: 100%;
+    background: rgba(12, 12, 20, .84); color: #fff; padding: 3px 8px; border-radius: 0 5px 0 0;
   }
-  .marc .sens-visita button { font-size: 12px; }
+  .marc .etiqueta .nom { font-weight: 600; overflow: hidden; text-overflow: ellipsis; }
+  .marc .etiqueta .mida { color: #b9b9cc; font-variant-numeric: tabular-nums; }
+  .marc .etiqueta .estat { color: #b9b9cc; }
+  .marc .etiqueta button { padding: 1px 6px; font-size: 11px; background: rgba(255,255,255,.14); border-color: transparent; color: #fff; }
+  .marc .etiqueta button:hover { background: var(--accent); }
+  .marc.actiu .caixa { outline: 2px solid var(--accent); }
   .etiqueta-grup {
-    position: absolute; z-index: 14; color: #d8d8e8; font-size: 12px; letter-spacing: .08em; text-transform: uppercase;
-    background: rgba(12, 12, 20, .88); padding: 2px 9px; border-radius: 5px;
-    transform: scale(var(--inv, 1)); transform-origin: left top;
+    position: absolute; z-index: 14; color: #d8d8e8; font-size: 12px; letter-spacing: .08em;
+    text-transform: uppercase; background: rgba(12, 12, 20, .88); padding: 2px 9px; border-radius: 5px;
   }
+  .sense-res { position: absolute; top: 24px; left: 24px; color: var(--text2); font-size: 13px; max-width: 420px; line-height: 1.5; }
 </style>
 </head>
 <body>
 
-<div class="marca">
-  <h1>Overlay Navegador</h1>
-  <div class="sub">Marca formats a l'acordió per obrir-los a la pestanya activa. Doble clic en un marc per carregar-lo. Les vistes són a escala real: el zoom només mira.</div>
+<div class="panell" id="panell">
+  <div class="cap">
+    <button id="plega" title="Plegar o desplegar la llista de formats">☰</button>
+    <h1>Formats</h1>
+  </div>
+  <div class="grups" id="grups"></div>
 </div>
 
 <div class="barra">
-  <span class="titol">Pestanya:</span>
-  <input type="text" id="nom-pestanya" title="Nom de la pestanya">
-  <span class="titol">Ruta:</span>
-  <input type="text" id="ruta" title="Ruta que es carrega a tots els marcs">
+  <span class="etiqueta-barra">Ruta:</span>
+  <input type="text" id="ruta" title="Ruta de la pestanya activa">
   <div class="grup-control">
-    <button id="zoom-menys" title="Allunyar">−</button>
+    <button id="zoom-menys" title="Allunyar la vista activa">−</button>
     <span class="zoom-num" id="zoom-num">100%</span>
-    <button id="zoom-mes" title="Apropar">+</button>
+    <button id="zoom-mes" title="Apropar la vista activa">+</button>
   </div>
   <button id="zoom-1" title="Escala real (100%)">1:1</button>
-  <button id="ajusta-ample" title="Ajustar a l'amplada de la finestra">↔ ample</button>
-  <button id="ajusta-alt" title="Ajustar a l'alçada de la finestra">↕ alt</button>
-  <button id="ajusta-tot" title="Ajustar-ho tot">⤢ tot</button>
-  <select id="ordre" title="Com s'organitzen els formats">
-    <option value="lliure">Lliure (flux)</option>
-    <option value="graella">Graella</option>
-    <option value="mida">Per mida</option>
-    <option value="files">Files per grup</option>
-    <option value="columnes">Columnes per grup</option>
-    <option value="horitzontal">Una filera</option>
-    <option value="vertical">Una columna</option>
-  </select>
-  <button id="global" title="Veure tots els formats alhora">Vista global</button>
-  <button id="recarrega" title="Recarregar els marcs vius">Recarregar</button>
+  <button id="ajusta-ample" title="Que la vista activa hi capi d'ample">↔ ample</button>
+  <button id="ajusta-alt" title="Que la vista activa hi capi d'alçada">↕ alt</button>
+  <button id="ajusta-tot" title="Totes les vistes obertes a la mateixa escala i encabides">⤢ totes iguals</button>
+  <label class="amb-select">graella
+    <select id="ordre" title="Com es reparteixen els formats a la pantalla">
+      <optgroup label="Graella">
+        <option value="uniforme">Uniforme (cel·les iguals)</option>
+        <option value="mosaic">Mosaic (columnes que s'omplen)</option>
+        <option value="prestatge">Prestatge (files al més just)</option>
+        <option value="iguales">Columnes iguals</option>
+        <option value="quadrada">Quadrada</option>
+      </optgroup>
+      <optgroup label="Altres">
+        <option value="mida">Per mida (esglaons)</option>
+        <option value="files">Files per grup</option>
+        <option value="columnes">Columnes per grup</option>
+        <option value="horitzontal">Una filera</option>
+        <option value="vertical">Una columna</option>
+      </optgroup>
+    </select>
+  </label>
+  <button id="global" title="Veure TOTS els formats, tinguin pestanya o no">Vista global</button>
+  <button id="recarrega" title="Recarregar les vistes">Recarregar</button>
   <button id="navegador" title="Mostrar o amagar el dibuix del navegador">Navegador</button>
-  <label class="sostre" title="Quantes vistes vives alhora. Cada vista es una aplicació sencera carregada: més vistes, més memoria.">vives
-    <select id="sostre">
+  <label class="amb-select">vives
+    <select id="sostre" title="Quantes vistes vives alhora. Cada vista és una aplicació sencera: més vistes, més memòria.">
       <option value="4">4</option>
       <option value="8">8</option>
       <option value="12">12</option>
@@ -226,90 +197,81 @@
 </div>
 
 <div class="pestanyes" id="pestanyes"></div>
-<div class="panell" id="panell"></div>
-<div class="tauler" id="tauler"><div class="full" id="full"><div class="llenç" id="llenç"></div></div></div>
+<div class="tauler" id="tauler"><div class="llenç" id="llenç"></div></div>
 
 <script>
 /* ═══════════════════════════════════════════════════════════════════════════
    OVERLAY DE FORMATS
 
-   Que es aixo
-   -----------
-   Una eina per mirar la web en tots els formats alhora, amb iframes de debò.
+   EL MODEL
+   --------
+   - L'ACORDIO (el panell de l'esquerra) es plega i no ocupa pantalla. Dins hi
+     ha els formats per grups; marcar-ne un OBRE LA SEVA PESTANYA.
+   - UNA PESTANYA PER FORMAT. Cada pestanya te els seus parametres: el seu zoom,
+     el seu ajust, la seva ruta i la seva posicio de scroll. Son independents.
+   - LA PANTALLA PRINCIPAL es una GRAELLA amb els formats que tenen pestanya.
+     Un format sense pestanya no hi surt.
+   - LA VISTA GLOBAL (un boto) es l'excepcio: ensenya TOTS els formats, tinguin
+     pestanya o no, i es on hi ha les miniatures proporcionals.
 
-   LES VISTES SON A ESCALA REAL. Cada marc es un iframe de la mida exacta del
-   dispositiu (1920x1080, 744x1133...), i no s'encongeix mai per si sol. El
-   `zoom` es un transform sobre el LLENÇ sencer: mira de mes lluny o de mes a
-   prop, pero la pagina de dins sempre rep la seva mida de veritat. Aixo vol
-   dir que les media queries, `100vh` i el que el navegador calcula son reals.
+   LES VISTES SON A ESCALA REAL. L'iframe sempre rep la mida exacta del
+   dispositiu; el zoom es un transform sobre la capsa, no una mida falsa. Aixo
+   vol dir que les media queries, el 100vh i el que calcula el navegador de dins
+   son reals, i que el que canvia amb el zoom es com ho mires.
 
-   LES PESTANYES SON INDEPENDENTS. Cada una te els seus formats, el seu zoom, el
-   seu ajust, la seva ordenacio, la seva ruta i la seva posicio de scroll. Els
-   marcs d'una pestanya es QUEDEN MUNTATS quan canvies a una altra (per allo
-   cada pestanya te el seu selector de ruta i no es recarrega res en tornar).
-
-   L'ACORDIO es d'on es trien els formats: marcar-ne un l'obre a la pestanya
-   activa; desmarcar-lo el treu.
+   Cada marc te DOS elements: la capsa (el contingut, a mida de dispositiu de
+   veritat) i l'embolcall, que fa la mida JA ESCALADA. El repartiment treballa
+   amb l'embolcall, i per aixo cada vista pot tenir el seu propi zoom sense que
+   res se superposi.
    ═══════════════════════════════════════════════════════════════════════════ */
 
 // ── ELS FORMATS ────────────────────────────────────────────────────────────
-// `ct`/`cb` son els pixels que el navegador es menja de dalt i de baix, i el
-// que governa la finestra que rep la pagina: finestra = h - ct - cb.
-//
-// `img` es el dibuix del navegador, i nomes el tenen els formats dels quals hi
-// ha captura. Els que no en tenen porten una barra ratllada de la mateixa
-// alcada: val mes una barra honesta que una captura estirada, que deformaria
-// la barra del navegador.
+// `ct`/`cb` son els pixels que el navegador es menja de dalt i de baix:
+// finestra = h - ct - cb. `img` es el dibuix del navegador; els que no en tenen
+// porten una barra ratllada de la mateixa alcada (val mes una barra honesta que
+// una captura estirada, que deformaria la barra).
 const FORMATS = [
-  { id: 'desktop',         nom: 'Escriptori 1920',            grup: 'Escriptori',       w: 1920, h: 1080, ct: 134, cb: 0,  img: '/browser-frames/desktop-chrome.webp' },
-  { id: 'desktop-1440',    nom: 'Portàtil 1440',              grup: 'Portàtil',         w: 1440, h: 900,  ct: 134, cb: 0,  img: '/browser-frames/desktop-chrome-1440x900.webp' },
-  { id: 'desktop-1366',    nom: 'Portàtil 1366',              grup: 'Portàtil',         w: 1366, h: 768,  ct: 134, cb: 0,  img: '/browser-frames/desktop-chrome-1366x768.webp' },
-  { id: 'desktop-1280',    nom: 'Portàtil 1280',              grup: 'Portàtil',         w: 1280, h: 720,  ct: 134, cb: 0,  img: '/browser-frames/desktop-chrome-1280x720.webp' },
-  { id: 'ipad-1180',       nom: 'iPad 10/11a',     grup: 'Tauleta apaïsada', w: 1180, h: 820,  ct: 78,  cb: 0,  img: null },
-  { id: 'tabs9-plus',      nom: 'Galaxy Tab S9+',  grup: 'Tauleta apaïsada', w: 1200, h: 800,  ct: 78,  cb: 0,  img: null },
-  { id: 'tablet-landscape', nom: 'Tauleta apaïsada 1024',     grup: 'Tauleta apaïsada', w: 1024, h: 768,  ct: 78,  cb: 0,  img: '/browser-frames/tablet-landscape-safari.webp' },
-  { id: 'tablet-portrait',  nom: 'Tauleta vertical 768',      grup: 'Tauleta vertical', w: 768,  h: 1024, ct: 72,  cb: 0,  img: '/browser-frames/tablet-portrait-safari.webp' },
-  { id: 'ipad-mini',       nom: 'iPad mini 6',     grup: 'Tauleta vertical', w: 744,  h: 1133, ct: 72,  cb: 0,  img: null },
-  { id: 'tabs9',           nom: 'Galaxy Tab S9',   grup: 'Tauleta vertical', w: 712,  h: 1138, ct: 72,  cb: 0,  img: null },
-  { id: 'mobile-portrait', nom: 'Mòbil vertical 390',         grup: 'Mòbil',            w: 390,  h: 844,  ct: 88,  cb: 44, img: '/browser-frames/mobile-portrait-safari.webp' },
-  { id: 'mobile-landscape', nom: 'Mòbil apaïsat 844',         grup: 'Mòbil',            w: 844,  h: 390,  ct: 50,  cb: 0,  img: '/browser-frames/mobile-landscape-safari.webp' },
-  { id: 'se-landscape',    nom: 'iPhone SE apaïsat', grup: 'Mòbil',           w: 667,  h: 375,  ct: 50,  cb: 0,  img: null },
-  { id: 'android-landscape', nom: 'Android 16:9 apaïsat', grup: 'Mòbil',      w: 640,  h: 360,  ct: 50,  cb: 0,  img: null },
-  { id: 'pwa',             nom: 'PWA 390',  grup: 'PWA',              w: 390,  h: 844,  ct: 14,  cb: 0,  img: '/browser-frames/pwa-standalone.webp' },
+  { id: 'desktop',           nom: 'Escriptori 1920',        grup: 'Escriptori',       w: 1920, h: 1080, ct: 134, cb: 0,  img: '/browser-frames/desktop-chrome.webp' },
+  { id: 'desktop-1440',      nom: 'Portàtil 1440',          grup: 'Portàtil',         w: 1440, h: 900,  ct: 134, cb: 0,  img: '/browser-frames/desktop-chrome-1440x900.webp' },
+  { id: 'desktop-1366',      nom: 'Portàtil 1366',          grup: 'Portàtil',         w: 1366, h: 768,  ct: 134, cb: 0,  img: '/browser-frames/desktop-chrome-1366x768.webp' },
+  { id: 'desktop-1280',      nom: 'Portàtil 1280',          grup: 'Portàtil',         w: 1280, h: 720,  ct: 134, cb: 0,  img: '/browser-frames/desktop-chrome-1280x720.webp' },
+  { id: 'ipad-1180',         nom: 'iPad 10/11a',            grup: 'Tauleta apaïsada', w: 1180, h: 820,  ct: 78,  cb: 0,  img: null },
+  { id: 'tabs9-plus',        nom: 'Galaxy Tab S9+',         grup: 'Tauleta apaïsada', w: 1200, h: 800,  ct: 78,  cb: 0,  img: null },
+  { id: 'tablet-landscape',  nom: 'Tauleta apaïsada 1024',  grup: 'Tauleta apaïsada', w: 1024, h: 768,  ct: 78,  cb: 0,  img: '/browser-frames/tablet-landscape-safari.webp' },
+  { id: 'tablet-portrait',   nom: 'Tauleta vertical 768',   grup: 'Tauleta vertical', w: 768,  h: 1024, ct: 72,  cb: 0,  img: '/browser-frames/tablet-portrait-safari.webp' },
+  { id: 'ipad-mini',         nom: 'iPad mini 6',            grup: 'Tauleta vertical', w: 744,  h: 1133, ct: 72,  cb: 0,  img: null },
+  { id: 'tabs9',             nom: 'Galaxy Tab S9',          grup: 'Tauleta vertical', w: 712,  h: 1138, ct: 72,  cb: 0,  img: null },
+  { id: 'mobile-portrait',   nom: 'Mòbil vertical 390',     grup: 'Mòbil',            w: 390,  h: 844,  ct: 88,  cb: 44, img: '/browser-frames/mobile-portrait-safari.webp' },
+  { id: 'mobile-landscape',  nom: 'Mòbil apaïsat 844',      grup: 'Mòbil',            w: 844,  h: 390,  ct: 50,  cb: 0,  img: '/browser-frames/mobile-landscape-safari.webp' },
+  { id: 'se-landscape',      nom: 'iPhone SE apaïsat',      grup: 'Mòbil',            w: 667,  h: 375,  ct: 50,  cb: 0,  img: null },
+  { id: 'android-landscape', nom: 'Android 16:9 apaïsat',   grup: 'Mòbil',            w: 640,  h: 360,  ct: 50,  cb: 0,  img: null },
+  { id: 'pwa',               nom: 'PWA 390',                grup: 'PWA',              w: 390,  h: 844,  ct: 14,  cb: 0,  img: '/browser-frames/pwa-standalone.webp' },
 ];
-
 const GRUPS = ['Escriptori', 'Portàtil', 'Tauleta apaïsada', 'Tauleta vertical', 'Mòbil', 'PWA'];
 const PER_ID = Object.fromEntries(FORMATS.map((f) => [f.id, f]));
-
-/** Els que obre la vista global: tots, de mes gran a mes petit. */
 const TOTS = FORMATS.map((f) => f.id).sort((a, b) => PER_ID[b].w - PER_ID[a].w);
 
-// ── ESTAT ──────────────────────────────────────────────────────────────────
-// Es desa a `localStorage` perque sobreviu als refrescos: qui te tres
-// pestanyes muntades no les vol tornar a muntar cada cop.
-const CLAU = 'hg-overlay-estat-v2';
-const MARGES = 40;          // aire que es deixa al voltant en ajustar
-const GAP = 28;             // separacio entre marcs
-const AMPLE_LLIURE = 1920;  // amplada a la qual fa el salt de linia el flux
-const DESPLACAMENT = 34;    // aire de dalt perque les etiquetes dels marcs no es tallin
+const MARGES = 34;       // aire al voltant del llenç
+const GAP = 26;          // separacio entre marcs
+const AMPLE_CELLA = 760; // amplada de referencia per escalar una vista nova
 
-function pestanyaNova(nom, formats, extra = {}) {
-  return {
-    id: 'p' + Math.random().toString(36).slice(2, 8),
-    nom: nom || 'Pestanya',
-    formats: formats || [],
-    ajust: 'tot',      // 'tot' | 'ample' | 'alt' | null (null = zoom manual)
-    zoom: 1,
-    ordre: 'lliure',
-    ruta: '/',
-    scroll: { x: 0, y: 0 },
-    ...extra,
-  };
-}
+// ── ESTAT ──────────────────────────────────────────────────────────────────
+// Es desa a `localStorage`: qui te sis formats oberts no els vol tornar a
+// obrir cada cop.
+const CLAU = 'hg-overlay-estat-v3';
+const pestanyaNova = (id, ruta) => ({ id, ruta: ruta || '/', zoom: null, ajust: null, scroll: { x: 0, y: 0 } });
 
 function estatInicial() {
-  const p = pestanyaNova('Escriptori', ['desktop', 'desktop-1440']);
-  return { pestanyes: [p], activa: p.id, sostre: 8 };
+  return {
+    // Les pestanyes SON els formats oberts, en ordre d'obertura.
+    pestanyes: [pestanyaNova('desktop-1440'), pestanyaNova('tablet-portrait'), pestanyaNova('mobile-portrait')],
+    activa: 'desktop-1440',
+    ordre: 'uniforme',
+    sostre: 8,
+    global: false,
+    panell: false,
+    grupsOberts: ['Portàtil'],
+  };
 }
 
 function carrega() {
@@ -317,20 +279,19 @@ function carrega() {
     const cru = localStorage.getItem(CLAU);
     if (!cru) return null;
     const e = JSON.parse(cru);
-    if (!e || !Array.isArray(e.pestanyes) || !e.pestanyes.length) return null;
-    // Una rutina de salvament: si un format ja no existeix, fora.
-    for (const p of e.pestanyes) p.formats = (p.formats || []).filter((id) => PER_ID[id]);
-    if (!e.pestanyes.some((p) => p.id === e.activa)) e.activa = e.pestanyes[0].id;
-    if (!e.sostre) e.sostre = 8;
+    if (!e || !Array.isArray(e.pestanyes)) return null;
+    e.pestanyes = e.pestanyes.filter((p) => PER_ID[p.id]);
+    if (!e.pestanyes.some((p) => p.id === e.activa)) e.activa = e.pestanyes[0] ? e.pestanyes[0].id : null;
+    if (!e.ordre || e.ordre === 'graella') e.ordre = 'uniforme';
+    e.global = false;
     return e;
   } catch { return null; }
 }
 
 let estat = carrega() || estatInicial();
 
-// `?ruta=/nova/inici` posa aquesta ruta a TOTES les pestanyes. Es com s'obria
-// l'eina abans de tenir pestanyes, i continua sent la manera rapida de dir-li
-// quina pagina vols mirar.
+// `?ruta=/nova/inici` posa aquesta ruta a totes les pestanyes: es com s'obria
+// l'eina abans de tenir pestanyes, i es la manera rapida de dir-li quina pagina.
 const RUTA_URL = (() => {
   try {
     const r = (new URLSearchParams(location.search).get('ruta') || '').trim();
@@ -338,49 +299,48 @@ const RUTA_URL = (() => {
   } catch { return null; }
 })();
 if (RUTA_URL) for (const p of estat.pestanyes) p.ruta = RUTA_URL;
+
 let desaPendent = null;
 function desa() {
   clearTimeout(desaPendent);
-  desaPendent = setTimeout(() => {
-    try { localStorage.setItem(CLAU, JSON.stringify(estat)); } catch { /* ignore */ }
-  }, 250);
+  desaPendent = setTimeout(() => { try { localStorage.setItem(CLAU, JSON.stringify(estat)); } catch { /* ignore */ } }, 250);
 }
 
-const activa = () => estat.pestanyes.find((p) => p.id === estat.activa) || estat.pestanyes[0];
-const esGlobal = (p) => !!p.global;
+const tabDe = (id) => estat.pestanyes.find((p) => p.id === id);
+const tabActiva = () => tabDe(estat.activa) || estat.pestanyes[0] || null;
+const oberts = () => estat.pestanyes.map((p) => p.id);
+const visibles = () => (estat.global ? TOTS : oberts());
 
 // ── ELS MARCS ──────────────────────────────────────────────────────────────
-/**
- * Un marc per (pestanya, format). Es guarda al mapa `marCs` i NOMES es destrueix
- * quan el format surt de la pestanya: aixi canviar de pestanya no recarrega res
- * i cada pestanya conserva el seu scroll de dins dels iframes.
- */
-const marcs = new Map();          // "pestanyaId|formatId" -> objecte marc
-const clau = (p, f) => p + '|' + f;
-let ullObert = true;              // mostrar el dibuix del navegador
+const tauler = document.getElementById('tauler');
+const llenç = document.getElementById('llenç');
+const marcs = new Map();   // formatId -> marc (un per format, com les pestanyes)
+let ullObert = true;
+let mides = [];            // les mides JA ESCALADES de l'ultim repartiment
 
-function creaMarc(pestanya, fmt) {
-  const k = clau(pestanya.id, fmt.id);
-  if (marcs.has(k)) return marcs.get(k);
+function zoomDe(id) {
+  const f = PER_ID[id];
+  if (estat.global) return estat.zoomGlobal || 0.2;
+  const p = tabDe(id);
+  if (!p) return 1;
+  if (p.ajust === 'ample') return Math.max(0.05, (tauler.clientWidth - MARGES * 2) / f.w);
+  if (p.ajust === 'alt') return Math.max(0.05, (tauler.clientHeight - MARGES * 2) / f.h);
+  if (p.zoom) return p.zoom;
+  // Una vista nova s'escala per caber en una cella de referencia, i MAI per
+  // sobre de 1:1: els mobils es veuen a mida real i els escriptoris encongits.
+  return Math.min(1, AMPLE_CELLA / f.w);
+}
+
+function creaMarc(id) {
+  if (marcs.has(id)) return marcs.get(id);
+  const fmt = PER_ID[id];
 
   const el = document.createElement('div');
   el.className = 'marc';
-  el.dataset.format = fmt.id;
-  el.dataset.pestanya = pestanya.id;
+  el.dataset.format = id;
 
-  const etiqueta = document.createElement('div');
-  etiqueta.className = 'etiqueta';
-  etiqueta.innerHTML = `<span class="nom"></span><span class="mida"></span><span class="estat"></span>`;
-  etiqueta.querySelector('.nom').textContent = fmt.nom;
-  etiqueta.querySelector('.mida').textContent = `${fmt.w}×${fmt.h}`;
-
-  const recarrega = document.createElement('button');
-  recarrega.textContent = '⟳';
-  recarrega.title = 'Recarregar aquest marc';
-  const treu = document.createElement('button');
-  treu.textContent = '✕';
-  treu.title = 'Treure aquest format de la pestanya';
-  etiqueta.append(recarrega, treu);
+  const escala = document.createElement('div');
+  escala.className = 'escala';
 
   const caixa = document.createElement('div');
   caixa.className = 'caixa';
@@ -390,39 +350,33 @@ function creaMarc(pestanya, fmt) {
   const iframe = document.createElement('iframe');
   iframe.className = 'finestra';
   iframe.title = fmt.nom;
-  iframe.width = fmt.w;
-  iframe.height = fmt.h - fmt.ct - fmt.cb;
   iframe.style.width = fmt.w + 'px';
   iframe.style.height = (fmt.h - fmt.ct - fmt.cb) + 'px';
   iframe.style.marginTop = fmt.ct + 'px';
-  iframe.loading = 'lazy';
 
+  const parts = [];
   if (fmt.img) {
     const img = document.createElement('img');
     img.className = 'barra-navegador';
+    img.src = fmt.img; img.alt = '';
+    img.style.width = fmt.w + 'px'; img.style.height = fmt.h + 'px';
     img.style.display = ullObert ? '' : 'none';
-    img.src = fmt.img;
-    img.alt = '';
-    img.style.width = fmt.w + 'px';
-    img.style.height = fmt.h + 'px';
-    caixa.append(img);
+    parts.push(img);
   } else {
     const barra = document.createElement('div');
     barra.className = 'falsa-barra';
-    barra.style.display = ullObert ? '' : 'none';
     barra.style.height = fmt.ct + 'px';
+    barra.style.display = ullObert ? '' : 'none';
     barra.textContent = `navegador ${fmt.ct} px`;
-    caixa.append(barra);
+    parts.push(barra);
   }
   if (fmt.cb > 0) {
     const baix = document.createElement('div');
     baix.className = 'falsa-barra';
+    baix.style.height = fmt.cb + 'px'; baix.style.top = 'auto'; baix.style.bottom = '0';
     baix.style.display = ullObert ? '' : 'none';
-    baix.style.height = fmt.cb + 'px';
-    baix.style.top = 'auto';
-    baix.style.bottom = '0';
     baix.textContent = `barra ${fmt.cb} px`;
-    caixa.append(baix);
+    parts.push(baix);
   }
 
   const carregant = document.createElement('div');
@@ -439,28 +393,31 @@ function creaMarc(pestanya, fmt) {
   contingut.append(botoVeure);
   sensVisita.append(contingut);
 
-  caixa.append(iframe, carregant, sensVisita);
-  el.append(etiqueta, caixa);
+  caixa.append(...parts, iframe, carregant, sensVisita);
+  escala.append(caixa);
 
-  const marc = { el, caixa, iframe, etiqueta, carregant, sensVisita, botoVeure, fmt, pestanya: pestanya.id, viu: false, carregat: false, fixat: false };
+  const etiqueta = document.createElement('div');
+  etiqueta.className = 'etiqueta';
+  etiqueta.innerHTML = `<span class="nom"></span><span class="mida">${fmt.w}×${fmt.h}</span><span class="estat"></span>`;
+  etiqueta.querySelector('.nom').textContent = fmt.nom;
+  const recarrega = document.createElement('button');
+  recarrega.textContent = '⟳'; recarrega.title = 'Recarregar aquesta vista';
+  const tanca = document.createElement('button');
+  tanca.textContent = '✕'; tanca.title = 'Tancar aquesta pestanya';
+  etiqueta.append(recarrega, tanca);
 
+  el.append(escala, etiqueta);
+
+  const marc = { el, escala, caixa, iframe, etiqueta, carregant, sensVisita, botoVeure, fmt, viu: false, carregat: false, fixat: false };
   iframe.addEventListener('load', () => { marc.carregat = true; el.classList.add('carregat'); });
   recarrega.addEventListener('click', (e) => { e.stopPropagation(); recarregaMarc(marc); });
-  treu.addEventListener('click', (e) => {
-    e.stopPropagation();
-    const p = estat.pestanyes.find((x) => x.id === marc.pestanya);
-    if (p) { p.formats = p.formats.filter((id) => id !== fmt.id); desmuntaMarc(marc); desa(); pintaTot(); }
-  });
+  tanca.addEventListener('click', (e) => { e.stopPropagation(); tancaPestanya(id); });
   botoVeure.addEventListener('click', (e) => { e.stopPropagation(); muntaMarc(marc, true); });
+  el.addEventListener('click', () => activaPestanya(id));
   el.addEventListener('dblclick', () => muntaMarc(marc, true));
 
-  marcs.set(k, marc);
+  marcs.set(id, marc);
   return marc;
-}
-
-function rutaDe(marc) {
-  const p = estat.pestanyes.find((x) => x.id === marc.pestanya);
-  return (p && p.ruta) || '/';
 }
 
 function muntaMarc(marc, fixa = false) {
@@ -469,16 +426,14 @@ function muntaMarc(marc, fixa = false) {
   if (fixa) marc.fixat = true;
   marc.el.classList.remove('carregat');
   marc.carregat = false;
-  marc.iframe.src = rutaDe(marc);
+  marc.iframe.src = (tabDe(marc.fmt.id) || {}).ruta || '/';
   marc.sensVisita.style.display = 'none';
   actualitzaEtiqueta(marc);
 }
 
 function desmuntaMarc(marc) {
   if (!marc.viu) return;
-  marc.viu = false;
-  marc.fixat = false;
-  marc.carregat = false;
+  marc.viu = false; marc.fixat = false; marc.carregat = false;
   marc.el.classList.remove('carregat');
   marc.iframe.src = 'about:blank';
   marc.sensVisita.style.display = '';
@@ -493,40 +448,60 @@ function recarregaMarc(marc) {
 }
 
 function actualitzaEtiqueta(marc) {
-  // "aturat" vol dir que l'iframe no esta muntat: es veu la silueta i el boto
-  // per carregar-lo. Un marc viu no porta etiqueta d'estat.
   marc.etiqueta.querySelector('.estat').textContent = marc.viu ? '' : 'aturat';
 }
 
+function tancaPestanya(id) {
+  const i = estat.pestanyes.findIndex((p) => p.id === id);
+  if (i < 0) return;
+  const m = marcs.get(id);
+  if (m) { desmuntaMarc(m); m.el.remove(); marcs.delete(id); }
+  estat.pestanyes.splice(i, 1);
+  if (estat.activa === id) {
+    estat.activa = estat.pestanyes[Math.min(i, estat.pestanyes.length - 1)]?.id || null;
+  }
+  pintaTot();
+  desa();
+}
+
+function obrePestanya(id) {
+  if (!tabDe(id)) {
+    const ruta = RUTA_URL || (tabActiva() ? tabActiva().ruta : '/');
+    estat.pestanyes.push(pestanyaNova(id, ruta));
+  }
+  activaPestanya(id);
+}
+
+function activaPestanya(id) {
+  estat.global = false;
+  estat.activa = id;
+  pintaTot();
+  marcs.get(id)?.el.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+  desa();
+}
+
 // ── QUANTES VISTES VIUES ───────────────────────────────────────────────────
-/**
- * Cada iframe es una aplicacio sencera carregada al navegador. Amb 15 formats
- * alhora aixo son 15 aplicacions: es menja la memoria i el processador, i el
- * servidor de desenvolupament ha de servir 15 pagines. Per aixo les vistes es
- * munten NOMES quan son grans a la pantalla (zoom alt) o quan les demanes
- * (doble clic o el boto), i hi ha un sostre de vistes vives alhora.
- */
+// Cada vista viva es una aplicacio sencera carregada al navegador. Es munten
+// les que es veuen, de la mes gran a la mes petita, fins al sostre; la resta
+// surten com a silueta amb un boto. Les que demanes tu (boto o doble clic) no
+// es desmunten mai soles.
 const sostreVius = () => Number(estat.sostre) || 8;
 
+function areaVisible(m) {
+  const b = m.el.getBoundingClientRect();
+  const x = Math.max(0, Math.min(b.right, window.innerWidth) - Math.max(b.left, 0));
+  const y = Math.max(0, Math.min(b.bottom, window.innerHeight) - Math.max(b.top, 0));
+  return x * y;
+}
+
 function muntaLesQueToca() {
-  const p = activa();
-  const ids = esGlobal(p) ? TOTS : p.formats;
-  const llista = ids.map((id) => marcs.get(clau(p.id, id))).filter(Boolean);
+  const llista = visibles().map((id) => marcs.get(id)).filter(Boolean);
   const vius = llista.filter((m) => m.viu);
-  const aLaVista = (m) => {
-    const b = m.el.getBoundingClientRect();
-    return b.width > 0 && b.bottom > 0 && b.top < window.innerHeight && b.right > 0 && b.left < window.innerWidth;
-  };
-  // Es munten les que ES VEUEN, de la mes gran a la mes petita, fins al sostre.
-  // El sostre es el que mana: cada vista viva es una aplicacio sencera carregada
-  // al navegador, i amb quinze alhora el que peta es la maquina, no l'eina.
-  const candidates = llista.filter((m) => !m.viu && aLaVista(m)).sort((a, b) => areaVisible(b) - areaVisible(a));
+  const candidates = llista.filter((m) => !m.viu && areaVisible(m) > 0).sort((a, b) => areaVisible(b) - areaVisible(a));
   for (const m of candidates) {
     if (m.viu) continue;
     if (m.fixat || vius.length < sostreVius()) { muntaMarc(m); vius.push(m); }
   }
-  // Si ens passem del sostre, es desmunten les que menys es veuen (i mai les
-  // que has demanat tu, que van fixades).
   const sobrants = vius.filter((m) => !m.fixat).sort((a, b) => areaVisible(a) - areaVisible(b));
   for (let i = 0; i < sobrants.length && vius.length > sostreVius(); i++) {
     const m = sobrants[i];
@@ -536,74 +511,114 @@ function muntaLesQueToca() {
   }
 }
 
-function areaVisible(m) {
-  const b = m.el.getBoundingClientRect();
-  const x = Math.max(0, Math.min(b.right, window.innerWidth) - Math.max(b.left, 0));
-  const y = Math.max(0, Math.min(b.bottom, window.innerHeight) - Math.max(b.top, 0));
-  return x * y;
-}
-
-// ── EL REPARTIMENT (com s'organitzen els formats) ─────────────────────────
+// ── EL REPARTIMENT ─────────────────────────────────────────────────────────
 /**
- * Retorna les posicions de tots els marcs dins del llenç, en pixels REALS del
- * dispositiu. El llenç despres s'escala sencer amb el zoom.
+ * Reparteix les mides JA ESCALADES de cada vista i torna posicions en pixels de
+ * pantalla: com que cada marc te el seu propi zoom, el llenç no s'escala sencer.
+ *
+ * `columnes`:
+ *   - 'pantalla'  la graella fa tantes columnes com caben de ample
+ *   - 'quadrat'   la graella es fa mes o menys quadrada (per ajustar-ho tot)
  */
-function reparteix(ids, mode) {
-  const fs = ids.map((id) => PER_ID[id]).filter(Boolean);
+function reparteix(mides_, mode) {
   const pos = new Map();
   const etiquetes = [];
-  if (!fs.length) return { pos, etiquetes, ample: 0, alt: 0 };
-
+  if (!mides_.length) return { pos, etiquetes, ample: 0, alt: 0 };
   const perGrup = (llista) => {
     const g = new Map();
-    for (const f of llista) { if (!g.has(f.grup)) g.set(f.grup, []); g.get(f.grup).push(f); }
+    for (const m of llista) {
+      const gr = PER_ID[m.id].grup;
+      if (!g.has(gr)) g.set(gr, []);
+      g.get(gr).push(m);
+    }
     return g;
   };
-  const perAmplada = [...fs].sort((a, b) => b.w - a.w);
-
   let ample = 0, alt = 0;
 
-  if (mode === 'horitzontal' || mode === 'vertical') {
-    let x = 0, y = 0;
-    for (const f of perAmplada) {
-      pos.set(f.id, { x, y });
-      if (mode === 'horitzontal') x += f.w + GAP; else y += f.h + GAP;
+  const av = tauler.clientWidth - MARGES * 2;
+  const cw = Math.max(...mides_.map((m) => m.w));
+  const ch = Math.max(...mides_.map((m) => m.h));
+  const columnesQueHiCaben = () => Math.max(1, Math.floor((av + GAP) / (cw + GAP)));
+
+  if (mode === 'mosaic') {
+    // Mosaic: columnes que s'omplen. Cada marc va a la columna mes curta, i la
+    // columna es tan ampla com el marc mes ampla. Es el que aprofita millor
+    // l'espai quan les mides son molt diferents.
+    const n = columnesQueHiCaben();
+    const altures = new Array(n).fill(0);
+    for (const m of [...mides_].sort((a, b) => b.w * b.h - a.w * a.h)) {
+      let k = 0;
+      for (let i = 1; i < n; i++) if (altures[i] < altures[k]) k = i;
+      pos.set(m.id, { x: k * (cw + GAP), y: altures[k] });
+      altures[k] += m.h + GAP;
     }
-    ample = mode === 'horitzontal' ? x - GAP : Math.max(...fs.map((f) => f.w));
-    alt = mode === 'horitzontal' ? Math.max(...fs.map((f) => f.h)) : y - GAP;
-  } else if (mode === 'graella') {
-    const cw = Math.max(...fs.map((f) => f.w));
-    const ch = Math.max(...fs.map((f) => f.h));
-    const n = Math.ceil(Math.sqrt(fs.length));
-    fs.forEach((f, i) => {
-      const cx = i % n, cy = Math.floor(i / n);
-      pos.set(f.id, { x: cx * (cw + GAP), y: cy * (ch + GAP) });
-    });
     ample = n * (cw + GAP) - GAP;
-    alt = Math.ceil(fs.length / n) * (ch + GAP) - GAP;
-  } else if (mode === 'mida') {
-    // Esglaons: files de mes gran a mes petit, alineades a l'esquerra.
+    alt = Math.max(...altures) - GAP;
+  } else if (mode === 'prestatge') {
+    // Prestatge: files que s'omplen d'esquerra a dreta fins que no hi cap mes.
     let x = 0, y = 0, altFila = 0;
-    for (const f of perAmplada) {
-      if (x > 0 && x + f.w > Math.max(1920, f.w * 2)) { x = 0; y += altFila + GAP; altFila = 0; }
-      pos.set(f.id, { x, y });
-      x += f.w + GAP;
-      altFila = Math.max(altFila, f.h);
+    const ampleRef = Math.max(av, cw);
+    for (const m of mides_) {
+      if (x > 0 && x + m.w > ampleRef) { x = 0; y += altFila + GAP; altFila = 0; }
+      pos.set(m.id, { x, y });
+      x += m.w + GAP;
+      altFila = Math.max(altFila, m.h);
       ample = Math.max(ample, x - GAP);
     }
     alt = y + altFila;
-  } else if (mode === 'files' || mode === 'columnes') {
-    const g = perGrup(fs);
+  } else if (mode === 'iguales') {
+    // Columnes iguals: la mateixa amplada per a tothom, omplint per columnes.
+    const n = columnesQueHiCaben();
+    const compte = new Array(n).fill(0);
+    mides_.forEach((m, i) => {
+      const k = i % n;
+      pos.set(m.id, { x: k * (cw + GAP) + (cw - m.w) / 2, y: compte[k] });
+      compte[k] += m.h + GAP;
+    });
+    ample = n * (cw + GAP) - GAP;
+    alt = Math.max(...compte) - GAP;
+  } else if (mode === 'horitzontal' || mode === 'vertical') {
+    let x = 0, y = 0;
+    for (const m of mides_) {
+      pos.set(m.id, { x, y });
+      if (mode === 'horitzontal') x += m.w + GAP; else y += m.h + GAP;
+    }
+    ample = mode === 'horitzontal' ? x - GAP : Math.max(...mides_.map((m) => m.w));
+    alt = mode === 'horitzontal' ? Math.max(...mides_.map((m) => m.h)) : y - GAP;
+  } else if (mode === 'uniforme' || mode === 'quadrada') {
+    const n = mode === 'uniforme'
+      ? columnesQueHiCaben()
+      : Math.max(1, Math.round(Math.sqrt(mides_.length * ch / Math.max(cw, 1))));
+    mides_.forEach((m, i) => {
+      const cx = i % n, cy = Math.floor(i / n);
+      // Dins la seva cel·la, centrat.
+      pos.set(m.id, { x: cx * (cw + GAP) + (cw - m.w) / 2, y: cy * (ch + GAP) + (ch - m.h) / 2 });
+    });
+    ample = n * (cw + GAP) - GAP;
+    alt = Math.ceil(mides_.length / n) * (ch + GAP) - GAP;
+  } else if (mode === 'mida') {
+    let x = 0, y = 0, altFila = 0;
+    const ampleRef = Math.max(1600, ...mides_.map((m) => m.w));
+    for (const m of mides_) {
+      if (x > 0 && x + m.w > ampleRef) { x = 0; y += altFila + GAP; altFila = 0; }
+      pos.set(m.id, { x, y });
+      x += m.w + GAP;
+      altFila = Math.max(altFila, m.h);
+      ample = Math.max(ample, x - GAP);
+    }
+    alt = y + altFila;
+  } else {
+    // Files / columnes per grup, amb l'etiqueta del grup dins del primer marc.
+    const g = perGrup(mides_);
     if (mode === 'files') {
       let y = 0;
       for (const [nom, llista] of g) {
         let x = 0, altFila = 0;
-        llista.forEach((f, i) => {
-          pos.set(f.id, { x, y });
-          // L'etiqueta del grup va dins del primer marc del grup.
+        llista.forEach((m, i) => {
+          pos.set(m.id, { x, y });
           if (i === 0) etiquetes.push({ text: nom, x: x + 8, y: y + 8 });
-          x += f.w + GAP;
-          altFila = Math.max(altFila, f.h);
+          x += m.w + GAP;
+          altFila = Math.max(altFila, m.h);
         });
         ample = Math.max(ample, x - GAP);
         y += altFila + GAP * 2;
@@ -613,321 +628,254 @@ function reparteix(ids, mode) {
       let x = 0;
       for (const [nom, llista] of g) {
         let y = 0, ampleCol = 0;
-        llista.forEach((f, i) => {
-          pos.set(f.id, { x, y });
+        llista.forEach((m, i) => {
+          pos.set(m.id, { x, y });
           if (i === 0) etiquetes.push({ text: nom, x: x + 8, y: y + 8 });
-          y += f.h + GAP;
-          ampleCol = Math.max(ampleCol, f.w);
+          y += m.h + GAP;
+          ampleCol = Math.max(ampleCol, m.w);
         });
         x += ampleCol + GAP * 2;
         alt = Math.max(alt, y - GAP);
       }
       ample = x - GAP * 2;
     }
-  } else {
-    // Lliure: el flux natural, saltant de linia a l'amplada de referencia.
-    let x = 0, y = 0, altFila = 0;
-    for (const f of fs) {
-      if (x > 0 && x + f.w > AMPLE_LLIURE) { x = 0; y += altFila + GAP; altFila = 0; }
-      pos.set(f.id, { x, y });
-      x += f.w + GAP;
-      altFila = Math.max(altFila, f.h);
-      ample = Math.max(ample, x - GAP);
-    }
-    alt = y + altFila;
   }
   return { pos, etiquetes, ample, alt };
 }
 
-// ── PINTAR EL TAULER ──────────────────────────────────────────────────────
-const tauler = document.getElementById('tauler');
-const full = document.getElementById('full');
-const llenç = document.getElementById('llenç');
-let midesLlenç = { ample: 0, alt: 0 };
-
-function zoomActual() {
-  const p = activa();
-  return p.ajust ? zoomAjustat(p) : (p.zoom || 1);
-}
-
-function zoomAjustat(p) {
+/**
+ * El zoom que fa que un conjunt de formats hi capigui alhora.
+ *
+ * Es un PUNT FIX, i no es pot fer d'una passada: la disposicio depen del zoom
+ * (a mes zoom, menys columnes) i el zoom depen de la disposicio. Amb una sola
+ * passada, la graella que s'ajusta i la que es pinta no coincideixen i el
+ * resultat no hi acaba de caber. S'itera fins que el zoom no es mou.
+ */
+function zQueEncabeix(mides1, mode) {
   const av = tauler.clientWidth - MARGES * 2;
   const aa = tauler.clientHeight - MARGES * 2;
-  if (!midesLlenç.ample || !midesLlenç.alt) return 1;
-  const zx = av / midesLlenç.ample;
-  const zy = aa / midesLlenç.alt;
-  if (p.ajust === 'ample') return Math.min(zx, 4);
-  if (p.ajust === 'alt') return Math.min(zy, 4);
-  return Math.min(zx, zy, 4);
+  const hiCap = (z) => {
+    const m = mides1.map((x) => ({ id: x.id, w: x.w * z, h: x.h * z }));
+    const { ample, alt } = reparteix(m, mode);
+    return ample <= av && alt <= aa;
+  };
+  if (hiCap(1)) return 1;
+  // BISECCIO, no punt fix. Amb punt fix el calcul oscil·lava: la disposicio canvia
+  // a salts (una columna mes o menys) i la formula saltava entre dos valors, un
+  // dels quals no hi cabia. La biseccio busca el mes gran que hi cap.
+  let baix = 0.02, dalt = 1;
+  for (let i = 0; i < 24; i++) {
+    const mig = (baix + dalt) / 2;
+    if (hiCap(mig)) baix = mig; else dalt = mig;
+  }
+  // `hiCap` no es estrictament monotona (la graella fa salts), aixi que es
+  // comprova el resultat i, si cal, s'abaixa una mica.
+  let z = baix;
+  for (let i = 0; i < 12 && !hiCap(z); i++) z *= 0.94;
+  return Math.max(0.02, z);
 }
 
+/** El zoom de la vista global: tots els formats, a la mateixa escala, encabits. */
+function zoomGlobalAjustat() {
+  return zQueEncabeix(TOTS.map((id) => ({ id, w: PER_ID[id].w, h: PER_ID[id].h })), estat.ordre);
+}
+
+// ── PINTAR ─────────────────────────────────────────────────────────────────
 function pintaTauler({ guardaScroll = false } = {}) {
-  const p = activa();
-  if (guardaScroll) p.scroll = { x: tauler.scrollLeft, y: tauler.scrollTop };
+  const act = tabActiva();
+  if (guardaScroll && act && !estat.global) act.scroll = { x: tauler.scrollLeft, y: tauler.scrollTop };
+  if (estat.global && !estat.zoomGlobal) estat.zoomGlobal = zoomGlobalAjustat();
 
-  const ids = esGlobal(p) ? TOTS : p.formats;
-  const { pos, etiquetes, ample, alt } = reparteix(ids, p.ordre);
-  midesLlenç = { ample, alt: alt + DESPLACAMENT };
+  const ids = visibles();
+  mides = ids.map((id) => {
+    const f = PER_ID[id];
+    const z = zoomDe(id);
+    return { id, w: Math.round(f.w * z), h: Math.round(f.h * z), z };
+  });
+  const { pos, etiquetes, ample, alt } = reparteix(mides, estat.ordre);
 
-  // Cada pestanya te el seu propi DOM de llenç: aixi els marcs d'una no es
-  // toquen quan es repinta una altra.
-  let capa = llenç.querySelector(`.capa[data-pestanya="${p.id}"]`);
-  if (!capa) {
-    capa = document.createElement('div');
-    capa.className = 'capa';
-    capa.dataset.pestanya = p.id;
-    capa.style.position = 'absolute';
-    capa.style.top = '0';
-    capa.style.left = '0';
-    llenç.append(capa);
-  }
-  for (const altra of llenç.querySelectorAll('.capa')) altra.style.display = altra === capa ? '' : 'none';
-
-  // Els marcs que ja no hi son es treuen del DOM pero no es destrueixen si son
-  // d'una altra pestanya (cada pestanya te els seus).
+  // Els marcs que ja no son es treuen (i s'aturen: un iframe viu tret del DOM
+  // es una aplicacio sencera corrent per res).
   const volguts = new Set(ids);
-  for (const m of marcs.values()) {
-    if (m.pestanya !== p.id) continue;
-    if (!volguts.has(m.fmt.id)) {
-      // Desmuntar-lo tambe: un iframe tret del DOM pero viu es una aplicacio
-      // sencera corrent per res.
-      desmuntaMarc(m);
-      m.el.remove();
-      marcs.delete(clau(p.id, m.fmt.id));
-    }
+  for (const [id, m] of marcs) {
+    if (!volguts.has(id)) { desmuntaMarc(m); m.el.remove(); marcs.delete(id); }
   }
-  for (const id of ids) {
-    const fmt = PER_ID[id];
-    const marc = creaMarc(p, fmt);
-    const q = pos.get(id) || { x: 0, y: 0 };
-    marc.el.style.left = q.x + 'px';
-    marc.el.style.top = (q.y + DESPLACAMENT) + 'px';
-    if (marc.el.parentElement !== capa) capa.append(marc.el);
-    marc.el.style.display = '';
+  for (const m of mides) {
+    const marc = creaMarc(m.id);
+    const q = pos.get(m.id) || { x: 0, y: 0 };
+    marc.el.style.left = (q.x + MARGES) + 'px';
+    marc.el.style.top = (q.y + MARGES) + 'px';
+    marc.el.style.width = m.w + 'px';
+    marc.el.style.height = m.h + 'px';
+    marc.escala.style.transform = `scale(${m.z})`;
+    marc.el.classList.toggle('actiu', !estat.global && m.id === estat.activa);
+    if (marc.el.parentElement !== llenç) llenç.append(marc.el);
   }
-  for (const e of capa.querySelectorAll('.etiqueta-grup')) e.remove();
+  for (const e of llenç.querySelectorAll('.etiqueta-grup')) e.remove();
   for (const e of etiquetes) {
     const d = document.createElement('div');
     d.className = 'etiqueta-grup';
     d.textContent = e.text;
-    d.style.left = e.x + 'px';
-    d.style.top = (e.y + DESPLACAMENT) + 'px';
-    capa.append(d);
+    d.style.left = (e.x + MARGES) + 'px';
+    d.style.top = (e.y + MARGES) + 'px';
+    llenç.append(d);
   }
+  llenç.style.width = (ample + MARGES * 2) + 'px';
+  llenç.style.height = (alt + MARGES * 2) + 'px';
 
-  capa.style.width = ample + 'px';
-  capa.style.height = (alt + DESPLACAMENT) + 'px';
-  aplicaZoom();
+  const avís = llenç.querySelector('.sense-res');
+  if (!ids.length && !avís) {
+    const d = document.createElement('div');
+    d.className = 'sense-res';
+    d.textContent = 'Cap format obert. Obre\'n un des de la llista de l\'esquerra (☰): cada format que marquis tindrà la seva pestanya i sortirà aquí.';
+    llenç.append(d);
+  } else if (ids.length && avís) avís.remove();
+
+  if (guardaScroll && act && !estat.global) tauler.scrollTo(act.scroll.x, act.scroll.y);
   muntaLesQueToca();
-  if (guardaScroll) tauler.scrollTo(p.scroll.x, p.scroll.y);
   actualitzaBarra();
   desa();
 }
 
-function aplicaZoom() {
-  const z = zoomActual();
-  // Centrat horitzontal quan el llenç escalat es mes estret que la finestra.
-  const marge = Math.max(0, (tauler.clientWidth - midesLlenç.ample * z) / 2);
-  llenç.style.transform = `scale(${z})`;
-  llenç.style.setProperty('--inv', String(1 / z));
-  // El xip de cada marc es de mida constant a la pantalla, aixi que a zoom baix
-  // pot ser mes ample que el marc: se li posa el topall de l'amplada del marc.
-  const p = activa();
-  for (const id of (esGlobal(p) ? TOTS : p.formats)) {
-    const m = marcs.get(clau(p.id, id));
-    if (m) m.etiqueta.style.maxWidth = Math.max(200, PER_ID[id].w * z) + 'px';
-  }
-  llenç.style.left = marge + 'px';
-  full.style.width = (midesLlenç.ample * z + marge * 2) + 'px';
-  full.style.height = (midesLlenç.alt * z) + 'px';
-}
-
-// ── BARRA I PESTANYES ─────────────────────────────────────────────────────
-const barraNom = document.getElementById('nom-pestanya');
+// ── BARRA, PESTANYES I ACORDIÓ ─────────────────────────────────────────────
 const barraRuta = document.getElementById('ruta');
 const barraZoom = document.getElementById('zoom-num');
 const barraOrdre = document.getElementById('ordre');
 const ajuda = document.getElementById('ajuda');
 
 function actualitzaBarra() {
-  const p = activa();
-  barraNom.value = p.nom;
-  barraRuta.value = p.ruta;
-  barraOrdre.value = p.ordre;
-  const z = zoomActual();
+  const act = tabActiva();
+  barraRuta.value = act ? act.ruta : '/';
+  barraRuta.disabled = estat.global || !act;
+  barraOrdre.value = estat.ordre;
+  const z = estat.global ? (estat.zoomGlobal || 0.2) : (act ? zoomDe(act.id) : 1);
   barraZoom.textContent = Math.round(z * 100) + '%';
-  document.getElementById('ajusta-ample').classList.toggle('actiu', p.ajust === 'ample');
-  document.getElementById('ajusta-alt').classList.toggle('actiu', p.ajust === 'alt');
-  document.getElementById('ajusta-tot').classList.toggle('actiu', p.ajust === 'tot');
-  document.getElementById('zoom-1').classList.toggle('actiu', !p.ajust && Math.abs(p.zoom - 1) < 0.001);
-  document.getElementById('global').classList.toggle('actiu', esGlobal(p));
+  document.getElementById('ajusta-ample').classList.toggle('actiu', !estat.global && act?.ajust === 'ample');
+  document.getElementById('ajusta-alt').classList.toggle('actiu', !estat.global && act?.ajust === 'alt');
+  document.getElementById('zoom-1').classList.toggle('actiu', !estat.global && act && !act.ajust && Math.abs((act.zoom || 0) - 1) < 0.001);
+  document.getElementById('global').classList.toggle('actiu', estat.global);
   document.getElementById('sostre').value = String(estat.sostre || 8);
-  const vius = [...marcs.values()].filter((m) => m.pestanya === p.id && m.viu).length;
-  const total = esGlobal(p) ? TOTS.length : p.formats.length;
-  ajuda.textContent = `${total} formats · ${vius} vives (sostre ${sostreVius()}) · les vistes són a escala real`;
+  const vius = [...marcs.values()].filter((m) => m.viu).length;
+  ajuda.textContent = estat.global
+    ? `${TOTS.length} formats · ${vius} vives · vista global`
+    : `${estat.pestanyes.length} formats oberts · ${vius} vives (sostre ${sostreVius()}) · les vistes són a escala real`;
 }
 
 function pintaPestanyes() {
   const cont = document.getElementById('pestanyes');
   cont.innerHTML = '';
-  for (const p of estat.pestanyes) {
-    const b = document.createElement('button');
-    b.className = 'pestanya' + (p.id === estat.activa ? ' activa' : '');
-    b.dataset.pestanya = p.id;
-    const n = esGlobal(p) ? TOTS.length : p.formats.length;
-    b.innerHTML = `<span>${p.nom}</span><span class="compta">${n}</span>`;
-    if (!p.global && estat.pestanyes.length > 1) {
-      const x = document.createElement('span');
-      x.className = 'tanca';
-      x.textContent = '✕';
-      x.title = 'Tancar la pestanya';
-      x.addEventListener('click', (e) => { e.stopPropagation(); tancaPestanya(p.id); });
-      b.append(x);
-    }
-    b.addEventListener('click', () => canviaPestanya(p.id));
+  if (!estat.pestanyes.length) {
+    const b = document.createElement('span');
+    b.className = 'buit';
+    b.textContent = 'Cap format obert. Obre\'n un des de la llista (☰).';
     cont.append(b);
-  }
-  const nova = document.createElement('button');
-  nova.className = 'nova';
-  nova.textContent = '+';
-  nova.title = 'Pestanya nova';
-  nova.addEventListener('click', () => {
-    const p = pestanyaNova('Pestanya ' + (estat.pestanyes.length + 1), []);
-    estat.pestanyes.push(p);
-    canviaPestanya(p.id);
-  });
-  cont.append(nova);
-}
-
-function canviaPestanya(id) {
-  activa().scroll = { x: tauler.scrollLeft, y: tauler.scrollTop };
-  estat.activa = id;
-  pintaPestanyes();
-  pintaAcordio();
-  pintaTauler();
-  tauler.scrollTo(activa().scroll.x, activa().scroll.y);
-}
-
-function tancaPestanya(id) {
-  const i = estat.pestanyes.findIndex((p) => p.id === id);
-  if (i < 0) return;
-  for (const [k, m] of [...marcs]) if (m.pestanya === id) { desmuntaMarc(m); m.el.remove(); marcs.delete(k); }
-  estat.pestanyes.splice(i, 1);
-  if (!estat.pestanyes.length) estat.pestanyes.push(pestanyaNova('Escriptori', ['desktop']));
-  if (estat.activa === id) estat.activa = estat.pestanyes[Math.max(0, i - 1)].id;
-  llenç.querySelector(`.capa[data-pestanya="${id}"]`)?.remove();
-  pintaPestanyes(); pintaAcordio(); pintaTauler(); desa();
-}
-
-// ── L'ACORDIÓ ─────────────────────────────────────────────────────────────
-const oberts = new Set(GRUPS);
-
-function pintaAcordio() {
-  const p = activa();
-  const cont = document.getElementById('panell');
-  cont.innerHTML = '';
-  if (esGlobal(p)) {
-    const avis = document.createElement('div');
-    avis.style.padding = '12px';
-    avis.style.color = 'var(--text2)';
-    avis.innerHTML = 'Aquesta és la <b>vista global</b>: hi surten tots els formats. Per triar formats, ves a una pestanya normal.';
-    cont.append(avis);
     return;
   }
+  for (const p of estat.pestanyes) {
+    const f = PER_ID[p.id];
+    const b = document.createElement('button');
+    b.className = 'pestanya' + (!estat.global && p.id === estat.activa ? ' activa' : '');
+    b.innerHTML = `<span>${f.nom}</span><span class="mida">${f.w}×${f.h}</span>`;
+    const x = document.createElement('span');
+    x.className = 'tanca'; x.textContent = '✕'; x.title = 'Tancar aquesta pestanya';
+    x.addEventListener('click', (e) => { e.stopPropagation(); tancaPestanya(p.id); });
+    b.append(x);
+    b.addEventListener('click', () => activaPestanya(p.id));
+    cont.append(b);
+  }
+}
+
+function pintaAcordio() {
+  const cont = document.getElementById('grups');
+  cont.innerHTML = '';
   for (const g of GRUPS) {
     const fs = FORMATS.filter((f) => f.grup === g);
-    if (!fs.length) continue;
-    const obert = oberts.has(g);
-    const sel = fs.filter((f) => p.formats.includes(f.id)).length;
-
+    const obert = (estat.grupsOberts || []).includes(g);
     const bloc = document.createElement('div');
     bloc.className = 'grup' + (obert ? ' obert' : '');
     const cap = document.createElement('button');
     cap.className = 'capçalera';
-    cap.innerHTML = `<span class="fletxa">▶</span><span>${g}</span><span class="compta">${sel}/${fs.length}</span>`;
-    cap.addEventListener('click', () => { obert ? oberts.delete(g) : oberts.add(g); pintaAcordio(); });
-
+    const quants = fs.filter((f) => tabDe(f.id)).length;
+    cap.innerHTML = `<span class="fletxa">▶</span><span>${g}</span><span class="compta">${quants}/${fs.length}</span>`;
+    cap.addEventListener('click', () => {
+      const i = estat.grupsOberts.indexOf(g);
+      if (i >= 0) estat.grupsOberts.splice(i, 1); else estat.grupsOberts.push(g);
+      pintaAcordio(); desa();
+    });
     const llista = document.createElement('div');
     llista.className = 'llista';
     for (const f of fs) {
-      const marca = p.formats.includes(f.id);
       const fila = document.createElement('label');
       fila.className = 'opcio';
       const cb = document.createElement('input');
       cb.type = 'checkbox';
-      cb.checked = marca;
+      cb.checked = !!tabDe(f.id);
       cb.addEventListener('change', () => {
-        if (cb.checked) { if (!p.formats.includes(f.id)) p.formats.push(f.id); }
-        else p.formats = p.formats.filter((x) => x !== f.id);
-        pintaTauler(); pintaAcordio(); pintaPestanyes(); desa();
+        if (cb.checked) obrePestanya(f.id); else tancaPestanya(f.id);
+        pintaAcordio();
       });
       const nom = document.createElement('span');
-      nom.className = 'nom';
-      nom.textContent = f.nom;
+      nom.className = 'nom'; nom.textContent = f.nom;
       const mida = document.createElement('span');
-      mida.className = 'mida';
-      mida.textContent = `${f.w}×${f.h}`;
+      mida.className = 'mida'; mida.textContent = `${f.w}×${f.h}`;
       fila.append(cb, nom, mida);
       llista.append(fila);
     }
-    const accions = document.createElement('div');
-    accions.className = 'accions-grup';
-    const tots = document.createElement('button');
-    tots.textContent = 'tots';
-    tots.addEventListener('click', () => {
-      for (const f of fs) if (!p.formats.includes(f.id)) p.formats.push(f.id);
-      pintaTauler(); pintaAcordio(); pintaPestanyes(); desa();
-    });
-    const cap2 = document.createElement('button');
-    cap2.textContent = 'cap';
-    cap2.addEventListener('click', () => {
-      p.formats = p.formats.filter((id) => PER_ID[id].grup !== g);
-      pintaTauler(); pintaAcordio(); pintaPestanyes(); desa();
-    });
-    accions.append(tots, cap2);
-    llista.append(accions);
-
     bloc.append(cap, llista);
     cont.append(bloc);
   }
 }
 
-// ── LA BARRA: CONTROLS ────────────────────────────────────────────────────
-function posaZoom(z, ajust = null) {
-  const p = activa();
-  p.ajust = ajust;
-  p.zoom = Math.min(4, Math.max(0.05, z));
-  aplicaZoom();
-  actualitzaBarra();
-  muntaLesQueToca();
-  desa();
+function pintaTot() {
+  document.body.classList.toggle('panell-obert', !!estat.panell);
+  pintaAcordio();
+  pintaPestanyes();
+  pintaTauler();
 }
 
+// ── CONTROLS ──────────────────────────────────────────────────────────────
+const zoomActual = () => (estat.global ? (estat.zoomGlobal || 0.2) : (tabActiva() ? zoomDe(estat.activa) : 1));
+
+function posaZoom(z) {
+  if (estat.global) estat.zoomGlobal = Math.min(4, Math.max(0.02, z));
+  else {
+    const act = tabActiva();
+    if (!act) return;
+    act.ajust = null;
+    act.zoom = Math.min(4, Math.max(0.05, z));
+  }
+  pintaTauler();
+}
+
+document.getElementById('plega').addEventListener('click', () => { estat.panell = !estat.panell; pintaTot(); desa(); });
 document.getElementById('zoom-mes').addEventListener('click', () => posaZoom(zoomActual() * 1.25));
 document.getElementById('zoom-menys').addEventListener('click', () => posaZoom(zoomActual() / 1.25));
 document.getElementById('zoom-1').addEventListener('click', () => posaZoom(1));
-document.getElementById('ajusta-ample').addEventListener('click', () => { activa().ajust = 'ample'; pintaTauler(); });
-document.getElementById('ajusta-alt').addEventListener('click', () => { activa().ajust = 'alt'; pintaTauler(); });
-document.getElementById('ajusta-tot').addEventListener('click', () => { activa().ajust = 'tot'; pintaTauler(); });
-barraOrdre.addEventListener('change', () => { activa().ordre = barraOrdre.value; pintaTauler(); desa(); });
-barraNom.addEventListener('input', () => { activa().nom = barraNom.value; pintaPestanyes(); desa(); });
+document.getElementById('ajusta-ample').addEventListener('click', () => { const a = tabActiva(); if (a && !estat.global) { a.ajust = 'ample'; pintaTauler(); } });
+document.getElementById('ajusta-alt').addEventListener('click', () => { const a = tabActiva(); if (a && !estat.global) { a.ajust = 'alt'; pintaTauler(); } });
+document.getElementById('ajusta-tot').addEventListener('click', () => {
+  // Totes les vistes obertes a la MATEIXA escala i encabides: es la manera de
+  // comparar-les mantenint la proporcio entre elles.
+  if (estat.global) { estat.zoomGlobal = zoomGlobalAjustat(); pintaTauler(); return; }
+  const ids = oberts();
+  if (!ids.length) return;
+  const z = zQueEncabeix(ids.map((id) => ({ id, w: PER_ID[id].w, h: PER_ID[id].h })), estat.ordre);
+  for (const p of estat.pestanyes) { p.ajust = null; p.zoom = z; }
+  pintaTauler();
+});
+barraOrdre.addEventListener('change', () => { estat.ordre = barraOrdre.value; estat.zoomGlobal = null; pintaTauler(); desa(); });
 barraRuta.addEventListener('change', () => {
-  const p = activa();
+  const act = tabActiva();
+  if (!act) return;
   let r = barraRuta.value.trim() || '/';
   if (!r.startsWith('/')) r = '/' + r;
-  p.ruta = r;
-  for (const id of (esGlobal(p) ? TOTS : p.formats)) {
-    const m = marcs.get(clau(p.id, id));
-    if (m && m.viu) { m.el.classList.remove('carregat'); m.carregat = false; m.iframe.src = r; }
-  }
+  act.ruta = r;
+  const m = marcs.get(act.id);
+  if (m && m.viu) { m.el.classList.remove('carregat'); m.carregat = false; m.iframe.src = r; }
   desa();
 });
 document.getElementById('recarrega').addEventListener('click', () => {
-  const p = activa();
-  for (const id of (esGlobal(p) ? TOTS : p.formats)) {
-    const m = marcs.get(clau(p.id, id));
-    if (m && m.viu) recarregaMarc(m);
-  }
+  for (const id of visibles()) { const m = marcs.get(id); if (m && m.viu) recarregaMarc(m); }
 });
 document.getElementById('navegador').addEventListener('click', (e) => {
   ullObert = !ullObert;
@@ -936,19 +884,12 @@ document.getElementById('navegador').addEventListener('click', (e) => {
     m.caixa.querySelectorAll('.barra-navegador, .falsa-barra').forEach((b) => { b.style.display = ullObert ? '' : 'none'; });
   }
 });
-document.getElementById('sostre').addEventListener('change', (e) => {
-  estat.sostre = Number(e.target.value);
-  desa();
-  muntaLesQueToca();
-  actualitzaBarra();
-});
+document.getElementById('sostre').addEventListener('change', (e) => { estat.sostre = Number(e.target.value); desa(); muntaLesQueToca(); actualitzaBarra(); });
 document.getElementById('global').addEventListener('click', () => {
-  let g = estat.pestanyes.find((p) => p.global);
-  if (!g) {
-    g = pestanyaNova('Vista global', TOTS, { global: true, ajust: 'tot', ordre: 'graella' });
-    estat.pestanyes.push(g);
-  }
-  canviaPestanya(g.id);
+  estat.global = !estat.global;
+  estat.zoomGlobal = null;
+  pintaTot();
+  desa();
 });
 
 // Zoom amb la roda i la tecla de comandament, com als editors.
@@ -958,30 +899,20 @@ tauler.addEventListener('wheel', (e) => {
   posaZoom(zoomActual() * (e.deltaY < 0 ? 1.1 : 1 / 1.1));
 }, { passive: false });
 
-// Guardar la posicio de scroll de la pestanya activa
 tauler.addEventListener('scroll', () => {
-  const p = activa();
-  if (!p) return;
-  p.scroll = { x: tauler.scrollLeft, y: tauler.scrollTop };
-  desa();
+  const act = tabActiva();
+  if (act && !estat.global) { act.scroll = { x: tauler.scrollLeft, y: tauler.scrollTop }; desa(); }
   muntaLesQueToca();
 }, { passive: true });
 
-let tempsMida = null;
+let temps = null;
 window.addEventListener('resize', () => {
-  clearTimeout(tempsMida);
-  tempsMida = setTimeout(() => {
-    const p = activa();
-    if (p.ajust) pintaTauler();
-    else { aplicaZoom(); muntaLesQueToca(); actualitzaBarra(); }
-  }, 120);
+  clearTimeout(temps);
+  temps = setTimeout(() => { estat.zoomGlobal = null; pintaTauler(); }, 140);
 });
 
 // ── ENGEGAR ───────────────────────────────────────────────────────────────
-document.getElementById('navegador').classList.toggle('actiu', !ullObert);
-pintaPestanyes();
-pintaAcordio();
-pintaTauler();
+pintaTot();
 </script>
 </body>
 </html>
