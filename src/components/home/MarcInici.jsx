@@ -46,7 +46,7 @@
 import { useEffect, useRef, useState } from 'react';
 
 /** El repartiment inicial, abans del primer mesurament. */
-const REPARTIMENT_INICIAL = { blocMega: 0, blocPagina: 0, alcada: null, alFons: false };
+const REPARTIMENT_INICIAL = { blocMega: 0, blocPagina: 0, alcada: null };
 /** El que penja el cadenat del megaslide sota la seva linia. */
 const CADE_BAIXADA = 56;
 /** Files, com a molt i com a minim, quan es busquen les divisions. */
@@ -208,36 +208,16 @@ function MarcInici({ seccions }) {
       // quan la seva alcada escala amb la finestra; a 1024 i 1366 el panell
       // acaba una mica mes avall, i el bloc l'ha de cobrir.
       const blocMega = Math.max(megaFiles * fila, linia - capcalera);
-      // LA PAGINA DE SOTA.
-      //
-      // El cas normal es que la hero hi cap, amb el cadenat al davant, i el
-      // bloc es la resta de la finestra: la hero queda centrada i la pagina
-      // acaba just al fons del viewport.
-      //
-      // A 1024, 1280 i 1366 la hero NO hi cap. Alla hi ha dues maneres de no
-      // encabir-la, i no son igual de dolentes:
-      //
-      //   - el bloc es queda el que queda de finestra i la hero s'hi alinea
-      //     pel darrere: arriba al fons del viewport, i el que sobra marxa cap
-      //     a dalt;
-      //   - el bloc creix mes enlla de la finestra: la pagina guanya scroll i
-      //     la hero acaba PER SOTA del viewport.
-      //
-      // La primera es la que es vol, i es la que es fa SEMPRE que la hero no
-      // hi cap: el bloc es queda exactament el que queda de finestra i la hero
-      // s'hi alinea pel darrere. A 1280 aixo vol dir que el seu cap queda
-      // darrere la vora del megaslide, i es el preu que s'ha triat conscientment
-      // perque la hero arribi al fons del viewport tambe alla.
-      const disponible = Math.max(0, (window.innerHeight - capcalera) - blocMega);
-      const encaixa = CADE_BAIXADA + natural <= disponible;
-      const alFons = !encaixa;
-      const blocPagina = disponible;
+      // LA PAGINA DE SOTA es la resta. El CADENAT, pero, penja 56 px dins seu i
+      // per tant no es pot fer servir per centrar-hi la hero: el seu bloc es el
+      // que queda DESPRES del cadenat.
+      const blocPagina = Math.max((window.innerHeight - capcalera) - blocMega, CADE_BAIXADA + natural);
       const alcada = natural;
       // El numero que decideix si ja hi som: si no s'ha mogut, s'atura.
-      const ara = `${Math.round(blocMega * 4) / 4}|${Math.round(blocPagina * 4) / 4}|${Math.round(alcada * 4) / 4}|${alFons ? 1 : 0}`;
+      const ara = `${Math.round(blocMega * 4) / 4}|${Math.round(blocPagina * 4) / 4}|${Math.round(alcada * 4) / 4}`;
       if (ara === anterior) return;
       anterior = ara;
-        setRepartiment({ blocMega, blocPagina, alcada, finsLinia, linia, alFons });
+        setRepartiment({ blocMega, blocPagina, alcada, finsLinia, linia });
       raf = requestAnimationFrame(reparteix);
     };
 
@@ -325,11 +305,7 @@ function MarcInici({ seccions }) {
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
-            // SI LA HERO NO HI CAP I POT ARRIBAR AL FONS, S'HI ALINEA. El bloc
-            // ja acaba al fons del viewport, aixi que la hero hi acaba tambe i
-            // el que sobra marxa cap a dalt, dins l'aire del cadenat. La seva
-            // alcada no es toca: `flexShrink: 0` al bloc de la hero ho garanteix.
-            justifyContent: repartiment.alFons ? 'flex-end' : 'center',
+            justifyContent: 'center',
           }}
         >
           {segona.node}
