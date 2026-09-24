@@ -207,6 +207,13 @@ export function FirstContactDibuix09Buttons({
   onPrev,
   onNext,
   tileSize,
+  // UNA FLETXA A DALT I L'ALTRA A BAIX (24/09/2026, ho va demanar l'amo).
+  // Amb `vertical` la botonera deixa de ser quadrada i passa a tenir la MATEIXA
+  // forma que el selector Blanc/Color/Negre (`aspect-[1/2]`: meitat d'amplada i
+  // el doble d'alçada) i les dues fletxes s'apilen en comptes d'anar costat a
+  // costat. Els chevrons segueixen apuntant a esquerra i dreta: el carrusel
+  // segueix movent-se en horitzontal, el que canvia es on son els botons.
+  vertical = false,
   onPrevPointerDown,
   onPrevPointerUp,
   onNextPointerDown,
@@ -216,7 +223,7 @@ export function FirstContactDibuix09Buttons({
   const hasNextPointerHandlers = typeof onNextPointerDown === 'function' || typeof onNextPointerUp === 'function';
 
   return (
-    <div className="relative mt-2 aspect-square w-full">
+    <div className={`relative mt-2 w-full ${vertical ? 'aspect-[1/2]' : 'aspect-square'}`}>
       <div className="absolute inset-0 overflow-hidden rounded-md bg-muted" id="stripe-guide-right-anchor">
         <button
           type="button"
@@ -226,7 +233,9 @@ export function FirstContactDibuix09Buttons({
           onPointerUp={onPrevPointerUp}
           onPointerCancel={onPrevPointerUp}
           onPointerLeave={onPrevPointerUp}
-          className="absolute left-0 top-0 h-full w-1/2 bg-transparent hover:bg-muted focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          className={`absolute bg-transparent hover:bg-muted focus:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
+            vertical ? 'left-0 top-0 h-1/2 w-full' : 'left-0 top-0 h-full w-1/2'
+          }`}
         >
           <ChevronLeft
             className="pointer-events-none absolute left-1/2 top-1/2 h-5 w-5 -translate-x-1/2 -translate-y-1/2 text-foreground/80"
@@ -243,7 +252,9 @@ export function FirstContactDibuix09Buttons({
           onPointerUp={onNextPointerUp}
           onPointerCancel={onNextPointerUp}
           onPointerLeave={onNextPointerUp}
-          className="absolute right-0 top-0 h-full w-1/2 bg-transparent hover:bg-muted focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          className={`absolute bg-transparent hover:bg-muted focus:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
+            vertical ? 'bottom-0 left-0 h-1/2 w-full' : 'right-0 top-0 h-full w-1/2'
+          }`}
         >
           <ChevronRight
             className="pointer-events-none absolute left-1/2 top-1/2 h-5 w-5 -translate-x-1/2 -translate-y-1/2 text-foreground/80"
