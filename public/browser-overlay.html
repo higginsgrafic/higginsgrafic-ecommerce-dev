@@ -131,10 +131,16 @@
     background: #f4f4f7; color: #55555f; text-align: center;
   }
   .marc .sens-visita .contingut { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+  /* L'ETIQUETA, FORA DE LA FINESTRA.
+     Abans era `bottom: 0` dins la caixa del marc, o sigui que tapava la part de
+     baix de la pagina que s'hi mesura (justament on hi ha el carril i la hero).
+     Ara va a sota del marc, a l'aire que hi ha entre marcs (`GAP` = 26 px), i la
+     seva alcada ha de cabre-hi: per aixo te la mida de lletra fixada. */
   .marc .etiqueta {
-    position: absolute; left: 0; bottom: 0; z-index: 14;
+    position: absolute; left: 0; top: 100%; margin-top: 3px; z-index: 14;
     display: flex; align-items: center; gap: 8px; white-space: nowrap; max-width: 100%;
-    background: rgba(12, 12, 20, .84); color: #fff; padding: 3px 8px; border-radius: 0 5px 0 0;
+    font-size: 12px; line-height: 1.25;
+    background: rgba(12, 12, 20, .84); color: #fff; padding: 2px 8px; border-radius: 5px;
   }
   .marc .etiqueta .nom { font-weight: 600; overflow: hidden; text-overflow: ellipsis; }
   .marc .etiqueta .mida { color: #b9b9cc; font-variant-numeric: tabular-nums; }
@@ -724,7 +730,8 @@ function reparteix(mides_, mode) {
     }
     alt = y + altFila;
   } else {
-    // Files / columnes per grup, amb l'etiqueta del grup dins del primer marc.
+    // Files / columnes per grup. L'etiqueta del grup va A SOBRE del primer marc
+    // del grup, no a dins: a dins tapava la pagina que s'hi mesura.
     const g = perGrup(mides_);
     if (mode === 'files') {
       let y = 0;
@@ -732,7 +739,7 @@ function reparteix(mides_, mode) {
         let x = 0, altFila = 0;
         llista.forEach((m, i) => {
           pos.set(m.id, { x, y });
-          if (i === 0) etiquetes.push({ text: nom, x: x + 8, y: y + 8 });
+          if (i === 0) etiquetes.push({ text: nom, x: x + 8, y: y - 21 });
           x += m.w + GAP;
           altFila = Math.max(altFila, m.h);
         });
@@ -746,7 +753,7 @@ function reparteix(mides_, mode) {
         let y = 0, ampleCol = 0;
         llista.forEach((m, i) => {
           pos.set(m.id, { x, y });
-          if (i === 0) etiquetes.push({ text: nom, x: x + 8, y: y + 8 });
+          if (i === 0) etiquetes.push({ text: nom, x: x + 8, y: y - 21 });
           y += m.h + GAP;
           ampleCol = Math.max(ampleCol, m.w);
         });
