@@ -393,6 +393,39 @@ export function CercadorDibuixosGraella({
   const arrossegant = useRef(null);
   const haArrossegat = useRef(false);
   const ambFletxes = carrusel && !isPortraitTablet && !isLandscapeTablet;
+
+  // EL BAIX DEL BLOC DE FLETXES, MESURAT CONTRA EL DEL SELECTOR.
+  //
+  // El selector es col·loca amb les seves variables (`--hg-cercador-bar-top` i
+  // el coixi de 40 de la composicio) i el bloc de fletxes va penjat del retall
+  // dels dibuixos. La diferencia entre els dos baixos NO es constant: el
+  // selector ha arribat a sortir 5 px mes amunt segons com queda la composicio,
+  // i donar-la per sabuda deixava el bloc desalineat. Es mesura i s'aplica, amb
+  // el valor de la formula com a punt de partida (aixi no hi ha salt).
+  const [margeBaixFletxes, setMargeBaixFletxes] = useState(null);
+  useLayoutEffect(() => {
+    if (!ambFletxes) return undefined;
+    const el = graellaRef.current;
+    if (!el) return undefined;
+    const pagina = el.closest('[data-mega-page-viewport="2"]') || document;
+    const calcula = () => {
+      const selector = pagina.querySelector('[data-p2-color-selector] [data-stripe-buttonbar="bn"]');
+      if (!selector) return;
+      const marge = selector.getBoundingClientRect().bottom - el.getBoundingClientRect().bottom;
+      setMargeBaixFletxes((previ) => (previ !== null && Math.abs(previ - marge) < 0.5 ? previ : marge));
+    };
+    calcula();
+    // La composicio acaba d'encaixar despres del primer pintat (la fila es
+    // mesura sola): es torna a mirar un parell de cops.
+    const t1 = window.setTimeout(calcula, 250);
+    const t2 = window.setTimeout(calcula, 900);
+    window.addEventListener('resize', calcula);
+    return () => {
+      window.clearTimeout(t1);
+      window.clearTimeout(t2);
+      window.removeEventListener('resize', calcula);
+    };
+  }, [ambFletxes, graellaRef]);
   const desplacEf = Math.max(0, Math.min(maxDesplac, desplac));
   const caixaCarrusel = () => graellaRef?.current || null;
 
@@ -583,7 +616,7 @@ export function CercadorDibuixosGraella({
           <div style={{
             position: 'absolute',
             right: 0,
-            bottom: `calc(-1 * ${carrilLane(40)})`,
+            bottom: margeBaixFletxes === null ? `calc(-1 * ${carrilLane(40)})` : `${-margeBaixFletxes}px`,
             width: carrilPx(midaSelector / 2),
             height: carrilPx(midaSelector),
             zIndex: 5,
@@ -625,11 +658,19 @@ export function CercadorColorsGrid({
   isPortraitTablet = false,
   isLandscapeTablet = false,
 }) {
+  // ELS CERCLES, UN 10% MES PETITS (24/09/2026, ho va demanar l'amo). Nomes el
+  // cercle: l'INDICADOR (l'anell de la mostra triada) ha de quedar de la mida
+  // que tenia. Com que l'anell es dibuixa amb `outlineOffset` a partir de la
+  // caixa, si el cercle s'encongeix l'anell tambe ho faria: per aixo el
+  // desplacament creix el que s'ha encongit la caixa, i el diametre de l'anell
+  // queda igual (cercle + 2 x 3 px, abans i ara).
+  const costat = cerclePx * 0.9;
+  const desplacAnell = 3 + (cerclePx - costat) / 2;
   return (
     <div data-p2-color-grid style={{
       display: 'grid',
-      gridTemplateColumns: `repeat(4, ${cerclePx}px)`,
-      gridAutoRows: `${cerclePx}px`,
+      gridTemplateColumns: `repeat(4, ${costat}px)`,
+      gridAutoRows: `${costat}px`,
       gap: `${colorGapPx}px`,
       transform,
       marginTop,
@@ -643,13 +684,13 @@ export function CercadorColorsGrid({
             aria-label={slug}
             onClick={() => onSelectColor?.(slug)}
             style={{
-              width: `${cerclePx}px`,
-              height: `${cerclePx}px`,
+              width: `${costat}px`,
+              height: `${costat}px`,
               padding: 0,
               borderRadius: '50%',
               border: selected ? '0.5px solid rgba(0,0,0,0.22)' : '0.5px solid rgba(0,0,0,0.22)',
               outline: selected ? '1px solid #111827' : 'none',
-              outlineOffset: '3px',
+              outlineOffset: `${desplacAnell}px`,
               backgroundColor: hex,
               boxSizing: 'border-box',
               cursor: 'pointer',
