@@ -345,7 +345,7 @@ function MegaStripePanel({
             transform: (compactLandscape || esFranjaEstenya) ? 'none' : 'translateY(-15px)',
           }}
         >
-          <div className="w-full flex justify-center bg-transparent">
+          <div className="w-full bg-transparent">
             <div
               id="stripe-guide-stripe-row"
               ref={filaFranjaRef}
@@ -353,6 +353,20 @@ function MegaStripePanel({
               style={{
                 height: carrilPx(stripePreviewHPx),
                 width: 'auto',
+                // CENTRADA SOBRE EL CARRIL, A MA, NO PEL `justify-content`.
+                //
+                // La filera es mes ampla que el carril (les manigues hi surten)
+                // i amb `w-full flex justify-center` el centratge depenia del
+                // navegador: quan l'element desborda el contenidor, Chromium el
+                // centra pero FIREFOX L'ALINEA A L'INICI. Amb la franja
+                // desbordant, allo la desplaçava a la dreta (mesurat a la
+                // captura de l'amo del 24/09 a les 23:47: els cossos començaven
+                // a 459,5 en comptes de 381). Amb `left: 50%` i
+                // `translateX(-50%)` el centre es el del contenidor de
+                // maquetacio (el carril menys els coixins, que son iguals), a
+                // tots els navegadors.
+                left: '50%',
+                transform: 'translateX(-50%)',
               }}
             >
               {stripeOverlayDebug && stripeOverlayLoadState !== 'ok' ? (
