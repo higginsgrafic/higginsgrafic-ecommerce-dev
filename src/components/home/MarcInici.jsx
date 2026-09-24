@@ -215,10 +215,16 @@ function MarcInici({ seccions }) {
       const ambCadenat = CADE_BAIXADA + natural;
       const encaixa = ambCadenat <= disponible;
       // A 1366 I 1280 (les dues mides de portatil) la hero s'ALINEA AL FONS DEL
-      // VIEWPORT: el bloc es queda exactament el que queda de finestra i la hero
-      // hi acaba, de manera que no queda res per sota. A la resta de formats no
-      // es toca res.
-      const alFons = !encaixa && (window.innerWidth === 1366 || window.innerWidth === 1280);
+      // VIEWPORT, tant si hi cap com si no:
+      //
+      //   - si hi cap (finestra alta), baixa fins al fons en comptes de quedar
+      //     centrada amb aire a sota;
+      //   - si no hi cap (finestra amb navegador), la cel·la es queda el que
+      //     queda de finestra i la hero hi acaba igualment, i el que sobra
+      //     marxa cap a dalt.
+      //
+      // A la resta de formats no es toca res.
+      const alFons = window.innerWidth === 1366 || window.innerWidth === 1280;
       const blocPagina = alFons ? disponible : Math.max(disponible, ambCadenat);
       const alcada = natural;
       // El numero que decideix si ja hi som: si no s'ha mogut, s'atura.
