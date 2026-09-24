@@ -25,20 +25,28 @@ export default function useEscalaFranjaCarril(filaRef, actiu) {
   const [factor, setFactor] = useState(1);
 
   useLayoutEffect(() => {
-    if (!actiu) {
-      setFactor(1);
-      return undefined;
-    }
+    if (!actiu) return undefined;
     const el = filaRef.current;
     if (!el) return undefined;
 
     const mesura = () => {
       const ampleDibuix = el.offsetWidth;
       if (!ampleDibuix) return;
-      const carril = Number.parseFloat(
-        getComputedStyle(document.documentElement).getPropertyValue('--hg-mega-w'),
-      );
-      const nou = factorFranjaCarril(carril, ampleDibuix);
+      const estil = getComputedStyle(document.documentElement);
+      const carril = Number.parseFloat(estil.getPropertyValue('--hg-mega-w'));
+      // L'ESCALA CALIBRADA, LLEGIDA DEL DOM I NO LA NOMINAL.
+      //
+      // El factor es calcula contra l'escala que la franja porta posada
+      // (`--megaStripeScale`, que surt del calibratge de l'HUD i es desa al
+      // navegador). Si es dividis sempre pel valor nominal (1,2125) i el
+      // navegador en tingués un altre de desat, el resultat quedaria multiplicat
+      // per la diferència: amb un 0,97 desat, la franja sortia un 20% més
+      // estreta del carril (cintures a 495,9..1410,4 en comptes de
+      // 381,7..1524,9) i cap arranjament no es veia. La regla es que la franja
+      // faci el carril: el calibratge desat no hi pot manar.
+      const escalaViva = Number.parseFloat(estil.getPropertyValue('--megaStripeScale'));
+      const escala = Number.isFinite(escalaViva) && escalaViva > 0 ? escalaViva : ESCALA_CALIBRADA_FRANJA;
+      const nou = factorFranjaCarril(carril, ampleDibuix, escala);
       // Sense el marge, cada mesura tornaria a pintar i el ResizeObserver no
       // pararia.
       setFactor((actual) => (Math.abs(actual - nou) < 0.0005 ? actual : nou));
@@ -68,5 +76,7 @@ export default function useEscalaFranjaCarril(filaRef, actiu) {
     };
   }, [filaRef, actiu]);
 
-  return factor;
+  // Quan no s'hi aplica (la vista vertical), el factor es 1 i no cal tocar cap
+  // estat: es fa aqui i no dins de l'efecte, que no ha de cridar `setState`.
+  return actiu ? factor : 1;
 }
