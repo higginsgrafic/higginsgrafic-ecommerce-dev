@@ -115,12 +115,20 @@ describe("l'escala d'espaiat de la fonamenta", () => {
     expect(carril).toMatch(/1264\.5px/);
   });
 
-  it('el carril GLOBAL no es toca: la pagina nova te el seu', () => {
+  it('el carril GLOBAL es el CARRIL DECLARAT, amb la formula de sempre de reserva', () => {
     // `--contingut-max` el fan servir totes les pagines, i canviar-lo mou el
-    // carril de tot el lloc. Va passar dues vegades, i la segona es va emportar
+    // carril de tot el lloc: va passar dues vegades i la segona es va emportar
     // la pagina vella sencera (alcada de 6932 a 6778, fitxes de 321x505 a
-    // 301x485). El carril de l'inici ha de viure en una variable propia.
-    expect(declaracio('--contingut-max')).toBe('min(70.3125vw, 1350px)');
+    // 301x485).
+    //
+    // DES DEL 24/09/2026 llegeix `--carril`, que es el carril declarat (3/5 de
+    // la finestra, 1/5 de marge per banda) i el publica la capçalera. La formula
+    // de sempre queda NOMES de reserva: per a les classes que encara no reben el
+    // carril declarat (la tauleta vertical i el mobil, que tenen disseny propi)
+    // i per al primer pintat, abans que la capçalera el publiqui.
+    expect(declaracio('--contingut-max')).toBe('var(--carril, min(70.3125vw, 1350px))');
+    // I la pagina nova continua tenint el SEU carril: la franja del logo a la
+    // icona d'usuari.
     expect(FONAMENTA).toMatch(/\[data-inici-nou="1"\] \{\s*--contingut-max: var\(--inici-nou-carril\);/);
   });
 

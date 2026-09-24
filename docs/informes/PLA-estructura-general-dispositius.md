@@ -220,8 +220,53 @@ que es mou de les 834** que mesura `mesura-megaslide` a les seves 7 vistes, i
 s'ha comprovat invertint la comparació: capturada la base amb el canvi posat, el
 codi de sempre se'n desvia exactament en aquesta.
 
+### 2.6 El carril declarat, fet (24/09/2026): un sol número per a tothom
+
+L'amo va triar **3/5** (1/5 de marge per banda). Implementat com una sola
+declaració: la capçalera publica **`--carril`** i tot el que era un regle propi el
+llegeix.
+
+| qui | abans | ara |
+|---|---|---|
+| el carril del lloc (`--contingut-max`) | `min(70,3125vw, 1350px)` | **`var(--carril, …)`** |
+| el marc del lloc (`--site-w`) | `min(1350, w − 32)` | **el carril** |
+| el megaslide (`--hg-mega-w`) | la belt (`getSafeBelt`) | **el carril** |
+| la fila de la capçalera | la belt | **el carril** |
+| la franja (logo→icones) | mesurada del DOM | **mesurada, i ara fa el carril − 40/1350 per banda** |
+| la pàgina nova | la franja | igual (la franja ja segueix el carril) |
+
+**Mesurat — i això és el «mateix carril per a tothom» de debò:** a 1024, 1366 i
+1920 el carril, el carril del lloc, el marc, el megaslide i la fila de la
+capçalera fan **614, 820 i 1152 px**, tots cinc el mateix número. La hero fa
+462×195, 617×260 i 867×365.
+
+**I l'objectiu de l'amo, complert:** amb el megaslide obert, **les hero hi caben a
+totes les mides menys una** — 1024×538 (la finestra més curta de totes, el Tab S9
+Ultra apaïssat), que en falla 21,8 i abans en fallava 183,4. A 1024×690, 1280×586
+i 1366×634 (les tres que fallaven) ara hi caben amb 120,6, 15,4 i 41,2 px d'aire.
+
+**Qui NO rep el carril declarat, i per què està escrit al codi:** la **tauleta
+vertical** (el seu tauler fa 992 px, més ample que la finestra de 768: és un
+disseny a part) i el **mòbil** (que va gairebé a tota l'amplada). Canviar-los-el
+demana refer-ne la densitat (peça 3), i per això `carrilDeclarat()` torna `null`
+i tot queda com estava.
+
+**Verificat:** 505 proves (dues de noves per al carril i una d'actualitzada, que
+fixava el regle vell), `vite build` net, eslint **idèntic a l'original** (26
+problemes: 15 errors i 11 warnings a la capçalera) i **`compara-vistes` OK amb les
+mateixes xifres** (a tauleta les peces continuen clavades, i per això les seves
+mides no es mouen).
+
+**El que queda d'aquesta peça:** (1) les peces del megaslide segueixen **clavades**
+a la tauleta (`--hg-escala-mega` = 1) i els terres de 10 i 12 px hi són; (2) la
+taula de la tauleta vertical i el full de mòbil, que són la densitat; (3) el text
+de les col·leccions va en `rem` i amb el carril més estret s'ha de mirar; (4) la
+base de `mesura:megaslide` s'ha de tornar a capturar.
+
 ---
 
+| classe | disposició |
+|---|---|
 ## 3. Peça 3 — Una densitat per classe
 
 | classe | disposició |

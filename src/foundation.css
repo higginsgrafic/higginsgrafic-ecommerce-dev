@@ -51,8 +51,15 @@
 
      Aquesta es la formula que fins ara calculava `getSafeBelt()` des de
      JavaScript, amb el seu `useReactiveBelt`, el seu `MutationObserver` i la
-     seva publicacio primerenca: una regla de tres de 1.350/1.920. */
-  --contingut-max: min(70.3125vw, 1350px);
+     seva publicacio primerenca: una regla de tres de 1.350/1.920.
+
+     DES DEL 24/09/2026, SI LA CAPÇALERA PUBLICA `--carril`, MANA ELL. El carril
+     declarat es `3/5` de la finestra amb `1/5` de marge per banda, i val per a
+     l'escriptori i la tauleta apaissada (la vertical i el mobil tenen disseny
+     propi i no el reben): tot el lloc llegeix la mateixa mesura. La formula de
+     sota queda com a reserva per a les classes que encara no el reben i per al
+     primer pintat, abans que la capçalera el publiqui. */
+  --contingut-max: var(--carril, min(70.3125vw, 1350px));
 
   /* EL CARRIL DE LA PAGINA NOVA: EL TRAM DEL LOGO A LA ICONA D'USUARI.
      La capçalera el publica com a `--hg-band-w` (1270 a 1920, 953 a 1440, 933 a

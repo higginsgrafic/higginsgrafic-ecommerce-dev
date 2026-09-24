@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { deviceLayoutFromViewport } from '@/utils/layoutModel.js';
+import { deviceLayoutFromViewport, carrilDeclarat } from '@/utils/layoutModel.js';
 
 /**
  * LA CLASSIFICACIO DE DISPOSITIU, FIXADA.
@@ -140,5 +140,28 @@ describe('la classificació de dispositiu', () => {
       expect(d.isLandscapeTablet).toBe(false);
       expect(d.isDesktop).toBe(true);
     }
+  });
+});
+
+describe('el carril declarat (3/5, 1/5 de marge per banda)', () => {
+  it("a l'escriptori i a la tauleta apaissada es 3/5 de la finestra", () => {
+    // 1/5 de marge per banda, o sigui 3/5 de contingut. No te sostre: per sobre
+    // de 1920 el disseny continua creixent en comptes de congelar-se.
+    expect(carrilDeclarat({ ample: 1920, alt: 946 })).toBe(1152);
+    expect(carrilDeclarat({ ample: 2560, alt: 1306 })).toBe(1536);
+    expect(carrilDeclarat({ ample: 1440, alt: 766 })).toBe(864);
+    // La tauleta apaissada tambe: es on la hero no hi cabia.
+    expect(carrilDeclarat({ ample: 1366, alt: 634 })).toBe(820);
+    expect(carrilDeclarat({ ample: 1024, alt: 690 })).toBe(614);
+  });
+
+  it('la tauleta vertical i el mobil NO el reben (tenen disseny propi)', () => {
+    // La vertical te el tauler de 992 (mes ample que la finestra) i el mobil va
+    // gairebe a tota l'amplada: canviar-los el carril demana refer-ne la
+    // densitat. Vegeu PLA-estructura-general-dispositius.md §2 i §3.
+    expect(carrilDeclarat({ ample: 768, alt: 1024 })).toBeNull();
+    expect(carrilDeclarat({ ample: 1024, alt: 1366 })).toBeNull();
+    expect(carrilDeclarat({ ample: 360, alt: 508 })).toBeNull();
+    expect(carrilDeclarat({ ample: 440, alt: 824 })).toBeNull();
   });
 });
