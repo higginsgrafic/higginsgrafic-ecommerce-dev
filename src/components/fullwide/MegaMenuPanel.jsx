@@ -376,7 +376,18 @@ export default function MegaMenuPanel({
               // lloc, amb barra i sense.
               left: '50%',
               transform: 'translateX(-50%)',
-              width: '100%',
+              // LES PAGINES, UNA AMPLADA DE MAQUETACIO CADA UNA.
+              //
+              // Aquesta capa es la que conti els quatre fulls (`width: 400%`) i
+              // el megaslide avança `translateX(-25%)`, o sigui una amplada
+              // d'aquesta capa. Amb `100%` l'amplada era la del contenidor de
+              // 1350 (1270 amb els coixins), MES PETITA QUE LA FINESTRA
+              // (1905): el full del costat no quedava fora i se'n veia un tros
+              // a l'esquerra del carril —el bloc de fletxes i la samarreta del
+              // `MegaColumn` de la pagina 1— a QUALSEVOL pagina (ho va veure
+              // l'amo). Amb l'amplada de maquetacio, cada full avança
+              // exactament el que es veu i el del costat queda fora.
+              width: 'var(--layout-w, 100vw)',
               height: '100%',
               overflow: 'visible',
             }}>
