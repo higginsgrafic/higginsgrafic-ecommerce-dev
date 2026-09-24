@@ -482,15 +482,12 @@ export default function MegaslidePagina2({
             style={{
             position: 'absolute',
             top: `calc(var(--hg-cercador-bar-top, 0px) + ${40 + ((typeof window !== 'undefined' && window.innerWidth >= 768 && window.innerWidth <= 1366 && window.innerWidth >= window.innerHeight) ? 5 : 0)}px)`,
-            // El selector arrenca on arrenca el logo del header: la franja
-            // central es [left del logo, right de la icona d'usuari] i el seu
-            // marge es el coixi de la fila del header (40 px de disseny, el
-            // mateix `carrilPx(40)` que fa servir alla).
-            // El coixí es el MATEIX 3% del carril que el del header
-            // (`carrilLane(40)`): aixi el selector arrenca on arrenca el logo i
-            // la fila 1 fa exactament l'amplada de la franja del header, tambe
-            // a tauleta (alla `carrilPx(40)` son 40 i el 3% en son 29,4).
-            left: carrilLane(40),
+            // EL SELECTOR, AL LEFT DEL CARRIL (24/09/2026, ho va demanar l'amo).
+            // Abans arrencava amb el coixí de la fila del header
+            // (`carrilLane(40)`, el left del logo). Ara arrenca a la VORA del
+            // carril, o sigui a 0: el mateix lloc on arrenquen el marc del lloc i
+            // la filera.
+            left: 0,
             width: carrilPx(bnSliderSize),
             height: carrilPx(bnSliderSize),
             zIndex: 4,
