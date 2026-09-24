@@ -140,6 +140,7 @@
   .marc .etiqueta .mida { color: #b9b9cc; font-variant-numeric: tabular-nums; }
   .marc .etiqueta .estat { color: #b9b9cc; }
   .marc .etiqueta .hora { color: #8a8a9c; font-variant-numeric: tabular-nums; }
+  .marc .etiqueta .vw { color: #7f7f93; font-variant-numeric: tabular-nums; }
   .marc .etiqueta button { padding: 1px 6px; font-size: 11px; background: rgba(255,255,255,.14); border-color: transparent; color: #fff; }
   .marc .etiqueta button:hover { background: var(--accent); }
   .marc.actiu .caixa { outline: 2px solid var(--accent); }
@@ -490,7 +491,7 @@ function creaMarc(id) {
 
   const etiqueta = document.createElement('div');
   etiqueta.className = 'etiqueta';
-  etiqueta.innerHTML = `<span class="nom"></span><span class="mida">${mm.w}×${mm.h}</span><span class="estat"></span><span class="hora"></span>`;
+  etiqueta.innerHTML = `<span class="nom"></span><span class="mida">${mm.w}×${mm.h}</span><span class="estat"></span><span class="hora"></span><span class="vw"></span>`;
   etiqueta.querySelector('.nom').textContent = fmt.nom;
   const recarrega = document.createElement('button');
   recarrega.textContent = '⟳'; recarrega.title = 'Recarregar aquesta vista';
@@ -508,6 +509,13 @@ function creaMarc(id) {
     el.classList.add('carregat');
     // L'hora de carrega, per saber si el marc es la pagina d'ara o una de vella.
     marc.etiqueta.querySelector('.hora').textContent = new Date().toLocaleTimeString('ca-ES');
+    // I L'AMPLADA QUE VEIT LA PAGINA DE DINS, que es la que decideix els
+    // breakpoints (no la de la finestra del navegador). Amb aixo, quan una
+    // mesura no quadra, es veu a l'etiqueta en comptes d'endevinar-la.
+    try {
+      const w = marc.iframe.contentWindow;
+      marc.etiqueta.querySelector('.vw').textContent = w ? `${w.innerWidth}×${w.innerHeight}` : '';
+    } catch { /* ignore */ }
   });
   recarrega.addEventListener('click', (e) => { e.stopPropagation(); recarregaMarc(marc); });
   tanca.addEventListener('click', (e) => { e.stopPropagation(); tancaPestanya(id); });

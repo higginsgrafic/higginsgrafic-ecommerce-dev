@@ -214,7 +214,7 @@ function MarcInici({ seccions }) {
       const disponible = Math.max(0, (window.innerHeight - capcalera) - blocMega);
       const ambCadenat = CADE_BAIXADA + natural;
       const encaixa = ambCadenat <= disponible;
-      // A 1366 I 1280 (les dues mides de portatil) la hero s'ALINEA AL FONS DEL
+      // A LES DUES MIDES DE PORTATIL (1280 i 1366) la hero s'ALINEA AL FONS DEL
       // VIEWPORT, tant si hi cap com si no:
       //
       //   - si hi cap (finestra alta), baixa fins al fons en comptes de quedar
@@ -224,7 +224,15 @@ function MarcInici({ seccions }) {
       //     marxa cap a dalt.
       //
       // A la resta de formats no es toca res.
-      const alFons = window.innerWidth === 1366 || window.innerWidth === 1280;
+      //
+      // LA FRANJA, I NO DUES XIFRES EXACTES. Amb `=== 1366` allo no s'aplicava
+      // gairebe mai: en un Mac les finestres per defecte fan 1512, 1728 o 1440,
+      // i amb el DevTools acoblat al costat o amb la barra de desplaçament el
+      // viewport no fa la xifra rodona ni de bon tros. Amb la franja 1200-1366
+      // hi entren els dos portatils i tot el que hi ha al mig, i en queden fora
+      // la tauleta de 1024 (que no es toca) i l'escriptori de 1440 en amunt.
+      const ampleFinestra = window.innerWidth;
+      const alFons = ampleFinestra >= 1200 && ampleFinestra <= 1366;
       const blocPagina = alFons ? disponible : Math.max(disponible, ambCadenat);
       const alcada = natural;
       // El numero que decideix si ja hi som: si no s'ha mogut, s'atura.
