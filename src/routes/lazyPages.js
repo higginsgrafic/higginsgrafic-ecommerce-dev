@@ -66,6 +66,7 @@ export const AdminWipPage = lazy(() => import('@/pages/AdminWipPage.jsx'));
 export const FullWideSlideHeader = lazy(() => import('@/components/FullWideSlideHeader'));
 export const DevGuidesOverlay = lazy(() => import('@/components/DevGuidesOverlay.jsx'));
 export const BeltReferenceOverlay = lazy(() => import('@/components/dev/BeltReferenceOverlay.jsx'));
+export const CarrilGuidesOverlay = lazy(() => import('@/components/dev/CarrilGuidesOverlay.jsx'));
 export const Pauta4ColsOverlay = lazy(() => import('@/components/pauta/Pauta4ColsOverlay'));
 export const MegaStripeHud = lazy(() => import('@/components/MegaStripeHud'));
 export const LoginPage = lazy(() => import('@/pages/LoginPage'));

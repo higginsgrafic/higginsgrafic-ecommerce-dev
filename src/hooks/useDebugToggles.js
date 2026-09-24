@@ -46,6 +46,28 @@ export default function useDebugToggles({ locationSearch }) {
     }
   });
 
+  // LES DUES GUIDES DEL CARRIL (les blaves). Tenen el seu propi commutador
+  // perque no arrosseguin les linies del "Belt 2" (les verdes i les
+  // horitzontals de calibratge), que no tenen res a veure amb el carril.
+  // `?carril=1` mana nome's en aquesta obertura i no es desa (vegeu l'efecte).
+  const carrilFromUrl = (() => {
+    try {
+      const sp = new URLSearchParams(window.location.search);
+      return sp.has('carril') ? sp.get('carril') !== '0' : null;
+    } catch {
+      return null;
+    }
+  })();
+
+  const [carrilGuidesEnabled, setCarrilGuidesEnabled] = useState(() => {
+    if (carrilFromUrl !== null) return carrilFromUrl;
+    try {
+      return window.localStorage.getItem('HG_CARRIL_GUIDES_ENABLED_V1') === '1';
+    } catch {
+      return false;
+    }
+  });
+
   const [megaAccordionLocked, setMegaAccordionLocked] = useState(() => {
     try {
       return window.localStorage.getItem('HG_MEGA_ACCORDION_LOCKED_V1') === '1';
@@ -63,6 +85,16 @@ export default function useDebugToggles({ locationSearch }) {
       // ignore
     }
   }, [belt2GuidesEnabled, belt2FromUrl]);
+
+  useEffect(() => {
+    // Una decisio que ve de la URL es d'aquesta obertura, no de l'amo.
+    if (carrilFromUrl !== null) return;
+    try {
+      window.localStorage.setItem('HG_CARRIL_GUIDES_ENABLED_V1', carrilGuidesEnabled ? '1' : '0');
+    } catch {
+      // ignore
+    }
+  }, [carrilGuidesEnabled, carrilFromUrl]);
 
   useEffect(() => {
     try {
@@ -99,6 +131,8 @@ export default function useDebugToggles({ locationSearch }) {
     setCopiedDesign,
     belt2GuidesEnabled,
     setBelt2GuidesEnabled,
+    carrilGuidesEnabled,
+    setCarrilGuidesEnabled,
     megaAccordionLocked,
     setMegaAccordionLocked,
   };

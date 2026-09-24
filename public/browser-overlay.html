@@ -372,20 +372,26 @@ if (RUTA_URL) for (const p of estat.pestanyes) p.ruta = RUTA_URL;
 // ── LES GUIES DEL CARRIL ───────────────────────────────────────────────────
 //
 // Les dues verticals blaves que marquen les vores del carril les pinta l'app
-// amb el commutador "Belt 2" (`HG_BELT2_GUIDES_ENABLED_V1`), que ve apagat. En
-// aquesta eina, pero, son la referencia per mesurar: sense guies no es pot
-// veure si una peca cau dins del carril, i s'ha arribat a jutjar una franja que
-// en sortia 50 px per banda sense tenir-hi res per comparar.
+// amb el commutador "Carril" (`?carril=1`, o `HG_CARRIL_GUIDES_ENABLED_V1`),
+// que ve apagat. En aquesta eina, pero, son la referencia per mesurar: sense
+// guies no es pot veure si una peca cau dins del carril, i s'ha arribat a
+// jutjar una franja que en sortia 50 px per banda sense tenir-hi res per
+// comparar.
 //
-// S'encenen amb el parametre `belt2=1` a la URL de cada finestra, que mana per
+// S'encenen amb el parametre `carril=1` a la URL de cada finestra, que mana per
 // damunt del que hi hagi desat: l'eina no toca la decisio de l'app, i el boto
 // "guies del carril" les treu quan molestin.
+//
+// NO es fa servir `belt2=1`: allo encen tambe les linies verdes del marc del
+// lloc i dues horitzontals de calibratge desades, que no tenen res a veure amb
+// el carril i que van fer preguntar a l'amo que era una linia horitzontal a
+// mitja pantalla.
 const ambGuies = (ruta) => {
   if (!estat.guiesCarril) return ruta;
   const [senseAncla, ancla] = String(ruta).split('#');
   const [cami, consulta] = senseAncla.split('?');
   const p = new URLSearchParams(consulta || '');
-  p.set('belt2', '1');
+  p.set('carril', '1');
   return cami + '?' + p.toString() + (ancla ? '#' + ancla : '');
 };
 
