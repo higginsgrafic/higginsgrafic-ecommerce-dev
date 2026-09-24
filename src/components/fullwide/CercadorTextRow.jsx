@@ -340,6 +340,7 @@ export function CercadorDibuixosGraella({
   gapH,
   gapV,
   numColumns,
+  carrusel = false,
   activeCollection,
   activeSubcollection,
   onSelectGroup,
@@ -356,6 +357,116 @@ export function CercadorDibuixosGraella({
   const omple = !(dibuixPx > 0);
   const files = Math.max(1, Math.ceil((items?.length || 0) / (numColumns || 1)));
   const costat = omple ? '100%' : `${dibuixPx}px`;
+
+  // EL CARRUSEL DE DUES FILES INTERCALADES (24/09/2026).
+  //
+  // L'amo el va dibuixar: dues files de peces grans i la de baix DESPLACADA
+  // MITJA PECA (com una paret de mao), amb les peces consecutives en ziga-zaga
+  // (1 a dalt, 2 a baix, 3 a dalt...). Les dues files ocupen el que abans
+  // ocupaven TRES files, i per aixo la peca fa 1,5 cops la d'abans.
+  //
+  // La tira avança MIG PAS per peca (`i * pas / 2`), i aixo es el que les
+  // intercala: la fila de baix cau just al mig de dues de la de dalt. La tira
+  // fa `n * pas / 2 + pas`, o sigui que es mes llarga que el carril i el
+  // carrusel te sentit.
+  const pas = dibuixPx > 0 ? dibuixPx + gapH : 0;
+  const alcadaFila = dibuixPx > 0 ? dibuixPx + gapV : 0;
+  const ampleTira = carrusel ? (items.length * pas) / 2 + pas : 0;
+  const alcadaCarrusel = carrusel ? alcadaFila * 2 - gapV : 0;
+
+  const pintaItem = ({ label, collection, subcollection, stripeItem }, i) => {
+    const dimmed = activeCollection && collection !== activeCollection
+      ? true
+      : activeCollection === 'austen' && collection === 'austen' && activeSubcollection && subcollection !== activeSubcollection;
+    const dibuix = dibuixDelNom(label);
+    // A la vista vertical, alguns dibuixos es pinten mes grans o mes petits
+    // dins la seva casella (GRAELLA_DIBUIXOS_ESCALA_VERTICAL).
+    const factorGraella = isPortraitTablet ? (GRAELLA_DIBUIXOS_ESCALA_VERTICAL[label] ?? 1) : 1;
+    return (
+      <button
+        key={label}
+        type="button"
+        title={label}
+        aria-label={label}
+        onClick={() => onSelectGroup?.(collection, subcollection, stripeItem)}
+        onMouseEnter={() => stripeItem && onHoverItem?.(stripeItem, collection)}
+        onMouseLeave={onHoverLeave}
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          width: costat,
+          height: costat,
+          // Al carrusel cada peca es col·loca a mà: mig pas a la dreta de
+          // l'anterior i, les senars, una fila mes avall.
+          ...(carrusel ? {
+            position: 'absolute',
+            left: `${(i * pas) / 2}px`,
+            top: `${(i % 2) * alcadaFila}px`,
+          } : null),
+          // Amb `tilesPercent` la tile s'encongeix dins la seva casella
+          // (el centre no es mou).
+          ...(tilesPercent && omple
+            ? { width: `${tilesPercent}%`, height: `${tilesPercent}%`, justifySelf: 'center', alignSelf: 'center' }
+            : null),
+          minWidth: 0,
+          minHeight: 0,
+          padding: 0,
+          border: 0,
+          background: 'transparent',
+          opacity: dimmed ? 0.24 : 1,
+          cursor: 'pointer',
+        }}
+      >
+        {dibuix ? (
+          <img
+            src={dibuix}
+            alt={label}
+            loading="lazy"
+            style={{
+              // En manera d'omplir, el dibuix va un 20% mes petit que la
+              // seva casella (la retícula queda igual), amb el factor propi
+              // del dibuix si en te.
+              height: omple ? `${80 * factorGraella}%` : costat,
+              width: omple ? `${80 * factorGraella}%` : costat,
+              objectFit: 'contain',
+              display: 'block',
+            }}
+          />
+        ) : (
+          <span style={{ color: '#2B2B2B', fontSize: (isPortraitTablet || isLandscapeTablet) ? `max(12px, ${8 + fontBoost}px)` : `max(12px, ${carrilPx(11 + fontBoost)})`, whiteSpace: 'nowrap' }}>
+            {label.replace(/^Looking For My Darcy/, 'LFMD')}
+          </span>
+        )}
+      </button>
+    );
+  };
+
+  if (carrusel) {
+    return (
+      <div
+        ref={graellaRef}
+        data-carrusel="1"
+        style={{
+          position: 'relative',
+          width: '100%',
+          height: `${alcadaCarrusel}px`,
+          // Es pot desplacar. El gest i les fletxes (nomes al desktop) hi van a
+          // sobre; mentrestant la barra del navegador ja dona acces a totes les
+          // peces, o sigui que cap dibuix queda fora de l'abast.
+          overflowX: 'auto',
+          overflowY: 'hidden',
+          scrollbarWidth: 'thin',
+          minWidth: 0,
+        }}
+      >
+        <div style={{ position: 'relative', width: `${ampleTira}px`, height: '100%' }}>
+          {items.map(pintaItem)}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div ref={graellaRef} style={{
       display: 'grid',
@@ -366,66 +477,7 @@ export function CercadorDibuixosGraella({
       height: omple ? '100%' : undefined,
       minWidth: 0,
     }}>
-      {items.map(({ label, collection, subcollection, stripeItem }) => {
-        const dimmed = activeCollection && collection !== activeCollection
-          ? true
-          : activeCollection === 'austen' && collection === 'austen' && activeSubcollection && subcollection !== activeSubcollection;
-        const dibuix = dibuixDelNom(label);
-        // A la vista vertical, alguns dibuixos es pinten mes grans o mes
-        // petits dins la seva casella (GRAELLA_DIBUIXOS_ESCALA_VERTICAL).
-        const factorGraella = isPortraitTablet ? (GRAELLA_DIBUIXOS_ESCALA_VERTICAL[label] ?? 1) : 1;
-        return (
-          <button
-            key={label}
-            type="button"
-            title={label}
-            aria-label={label}
-            onClick={() => onSelectGroup?.(collection, subcollection, stripeItem)}
-            onMouseEnter={() => stripeItem && onHoverItem?.(stripeItem, collection)}
-            onMouseLeave={onHoverLeave}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              width: costat,
-              height: costat,
-              // Amb `tilesPercent` la tile s'encongeix dins la seva casella
-              // (el centre no es mou).
-              ...(tilesPercent && omple
-                ? { width: `${tilesPercent}%`, height: `${tilesPercent}%`, justifySelf: 'center', alignSelf: 'center' }
-                : null),
-              minWidth: 0,
-              minHeight: 0,
-              padding: 0,
-              border: 0,
-              background: 'transparent',
-              opacity: dimmed ? 0.24 : 1,
-              cursor: 'pointer',
-            }}
-          >
-            {dibuix ? (
-              <img
-                src={dibuix}
-                alt={label}
-                loading="lazy"
-                style={{
-                  // En manera d'omplir, el dibuix va un 20% mes petit que la
-                  // seva casella (la retícula queda igual), amb el factor propi
-                  // del dibuix si en te.
-                  height: omple ? `${80 * factorGraella}%` : costat,
-                  width: omple ? `${80 * factorGraella}%` : costat,
-                  objectFit: 'contain',
-                  display: 'block',
-                }}
-              />
-            ) : (
-              <span style={{ color: '#2B2B2B', fontSize: (isPortraitTablet || isLandscapeTablet) ? `max(12px, ${8 + fontBoost}px)` : `max(12px, ${carrilPx(11 + fontBoost)})`, whiteSpace: 'nowrap' }}>
-                {label.replace(/^Looking For My Darcy/, 'LFMD')}
-              </span>
-            )}
-          </button>
-        );
-      })}
+      {items.map(pintaItem)}
     </div>
   );
 }
@@ -699,12 +751,23 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
     const numColumns = GRAELLA_COLUMNES;
     // Mides efectives: les mesurades perquè la graella capigui a l'espai
     // disponible (només desktop) o les base de la pantalla.
-    const dibuixPx = midesGraella?.dibuix ?? midaDibuix(isPortraitTablet, isLandscapeTablet);
+    const dibuixBasePx = midesGraella?.dibuix ?? midaDibuix(isPortraitTablet, isLandscapeTablet);
+    // LA PECA DEL CARRUSEL FA 1,5 COPS LA D'ABANS (24/09/2026).
+    //
+    // Es la mesura que surt de la regla de l'amo: les DUES files intercalades
+    // noves ocupen el que abans ocupaven TRES files de la graella. Com que la
+    // peca es quadrada, tambe es 1,5 cops mes ampla, i per aixo se'n veuen
+    // menys i el conjunt es una tira que es desplac,a.
+    const dibuixPx = dibuixBasePx * 1.5;
     // Els cercles de color es calibren amb el mateix factor que els dibuixos:
     // si la graella s'encongeix (mobil, desktop estret), els cercles
     // l'acompanyen i les files continuen caient les unes sobre les altres.
+    //
+    // AMB LA MIDA BASE, NO AMB LA DEL CARRUSEL: la graella de colors 4x4 es
+    // queda com estava (l'amo ho va dir), i si el factor prengues la mida nova
+    // els cercles creixerien un 50 % de regal.
     const factorDibuix = (midesGraella && midesGraella.dibuix != null)
-      ? midesGraella.dibuix / midaDibuix(isPortraitTablet, isLandscapeTablet)
+      ? dibuixBasePx / midaDibuix(isPortraitTablet, isLandscapeTablet)
       : 1;
     const cerclePx = colorMida(isPortraitTablet, isLandscapeTablet) * factorDibuix;
     const colorGapPx = colorGap(isPortraitTablet, isLandscapeTablet) * factorDibuix;
@@ -765,6 +828,7 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
           gapH={gapH}
           gapV={gapV}
           numColumns={numColumns}
+          carrusel
           activeCollection={activeCollection}
           activeSubcollection={activeSubcollection}
           onSelectGroup={onSelectGroup}

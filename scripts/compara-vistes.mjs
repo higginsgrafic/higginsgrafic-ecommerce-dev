@@ -56,16 +56,33 @@ const mesura = () => {
 
   const filesColors = files(cg);
   const grid = nx.parentElement;
+  // EL CARRUSEL DE DUES FILES INTERCALADES (24/09/2026).
+  //
+  // La graella de dibuixos ja no es 16x4: son DUES files i la de baix va
+  // desplac,ada MIG PAS. Per aixo el `gap` util es el de DINS d'una fila (dues
+  // peces veines de la mateixa fila) i el desplac,ament de la segona fila es
+  // una mesura propia: amb el criteri vell (dues peces consecutives) el gap
+  // sortia NEGATIU, perque les consecutives son de files diferents.
+  const caixes = [...grid.querySelectorAll('button')].map((b) => b.getBoundingClientRect());
+  const filesDibuixos = [...new Set(caixes.map((b) => +b.top.toFixed(1)))].sort((a, b) => a - b);
+  const esquerres = (i) => caixes
+    .filter((b) => +b.top.toFixed(1) === filesDibuixos[i])
+    .map((b) => +b.left.toFixed(1))
+    .sort((a, b) => a - b);
+  const fila0 = esquerres(0);
+  const fila1 = filesDibuixos.length > 1 ? esquerres(1) : [];
+  const ample = +mz.getBoundingClientRect().width.toFixed(2);
   return {
-    dibuix: +mz.getBoundingClientRect().width.toFixed(2),
-    gapH: +((ncc.getBoundingClientRect().left - nx.getBoundingClientRect().left)
-      - mz.getBoundingClientRect().width).toFixed(2),
+    dibuix: ample,
+    gapH: fila0.length > 1 ? +(fila0[1] - fila0[0] - ample).toFixed(2) : null,
+    intercalat: (fila0.length && fila1.length) ? +(fila1[0] - fila0[0]).toFixed(2) : null,
+    filesCarrusel: filesDibuixos.length,
     cercle: +cg.querySelector('button').getBoundingClientRect().width.toFixed(2),
     pasColors: filesColors.length > 1 ? +(filesColors[1] - filesColors[0]).toFixed(2) : null,
     selectorDelta: +(cy(sel) - cy(cg)).toFixed(2),
     dibuixosDelta: +(cy(grid) - cy(cg)).toFixed(2),
     samarretesH: samarretes ? +samarretes.getBoundingClientRect().height.toFixed(1) : null,
-    filesDibuixos: files(grid).slice(0, 4),
+    filesDibuixos: filesDibuixos.slice(0, 4),
     filesColors: filesColors.slice(0, 4),
   };
 };
@@ -126,32 +143,35 @@ for (const c of CASES) {
     files.push(`${c.nom.padEnd(18)}  sense dades`);
     continue;
   }
-  files.push(`${c.nom.padEnd(18)}  dibuix ${String(r.dibuix).padStart(6)}  gap ${String(r.gapH).padStart(6)}  cercle ${String(r.cercle).padStart(5)}  pas ${String(r.pasColors).padStart(5)}  selector ${String(r.selectorDelta).padStart(6)}  files ${String(r.dibuixosDelta).padStart(5)}  samarretes ${String(r.samarretesH).padStart(6)}`);
+  files.push(`${c.nom.padEnd(18)}  dibuix ${String(r.dibuix).padStart(6)}  gap ${String(r.gapH).padStart(6)}  intercalat ${String(r.intercalat).padStart(6)}  cercle ${String(r.cercle).padStart(5)}  pas ${String(r.pasColors).padStart(5)}  selector ${String(r.selectorDelta).padStart(6)}  files ${String(r.dibuixosDelta).padStart(5)}  samarretes ${String(r.samarretesH).padStart(6)}`);
 }
 
 const tauletes = CASES.filter((c) => c.tauleta).map((c) => c.nom);
 const referencia = tauletes[0];
 
-// (a) Dins de cada pantalla: les files de dibuixos han de caure a les mateixes
-// alcades que les de colors, i el selector ha d'estar centrat amb la graella.
+// (a) Dins de cada pantalla, les regles del CARRUSEL:
+//   - DUES files de dibuixos;
+//   - la de baix desplac,ada MIG PAS (es el que les intercala);
+//   - el selector centrat amb la graella de colors.
+//
+// ABANS tambe s'exigia que les files de dibuixos caiguessin sobre les de colors.
+// Aixo era la regla del disseny vell (una graella de 16x4 alineada amb el 4x4 de
+// colors) i amb el carrusel de dues files grans ja no es certa ni es el que es
+// vol: la peca fa 1,5 cops i les files dels dibuixos i dels colors son
+// deliberadament diferents.
 for (const c of CASES) {
   const r = resultats[c.nom];
   if (!r) continue;
-  const base = r.filesColors[0];
-  const desviament = (arr) => arr.map((y) => +(y - base).toFixed(1));
-  const a = desviament(r.filesDibuixos);
-  const b = desviament(r.filesColors);
-  // Tolerància per fila (px): les files de dibuixos i de colors surten de
-  // fórmules distintes (dibuix + pas contra cercle + separació) i, quan les
-  // mides s'escalen amb el carril, l'arrodoniment del navegador les separa
-  // dècimes. Abans es comparaven amb igualtat exacta i una dècima les feia
-  // fallar.
-  const TOL_FILES = 0.5;
-  const maxDesv = a.length === b.length
-    ? a.reduce((m, y, i) => Math.max(m, Math.abs(y - b[i])), 0)
-    : Infinity;
-  if (maxDesv > TOL_FILES) {
-    fallades.push(`${c.nom}: les files de dibuixos ${JSON.stringify(a)} no cauen a les de colors ${JSON.stringify(b)} (${maxDesv.toFixed(2)} px)`);
+  if (r.filesCarrusel !== 2) {
+    fallades.push(`${c.nom}: el carrusel ha de tenir DUES files de dibuixos i en te ${r.filesCarrusel}`);
+  }
+  if (r.intercalat == null || r.gapH == null) {
+    fallades.push(`${c.nom}: no s'ha pogut mesurar el carrusel (intercalat o gap)`);
+  } else {
+    const migPas = (r.dibuix + r.gapH) / 2;
+    if (Math.abs(r.intercalat - migPas) > TOL_ALINEACIO) {
+      fallades.push(`${c.nom}: la segona fila va ${r.intercalat} px desplac,ada i el mig pas es ${migPas.toFixed(2)} px`);
+    }
   }
   if (Math.abs(r.selectorDelta) > TOL_ALINEACIO) {
     fallades.push(`${c.nom}: el selector no esta centrat amb la graella de colors (${r.selectorDelta} px)`);
