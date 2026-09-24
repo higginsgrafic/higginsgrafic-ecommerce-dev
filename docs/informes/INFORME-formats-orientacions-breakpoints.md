@@ -282,7 +282,7 @@ amplada CSS i passats per les regles del projecte:
 |---|---|---|---|
 | Galaxy Note 9 | 414 (girat 846) | mòbil / tauleta apaïsada | ✓ |
 | Galaxy S9/S9+ | 320 (girat **658**) | mòbil / **cap** | ✗ girat |
-| Galaxy S10/S10+ | 360 (girat **760**) | mòbil / **cap** | ✗ girat |
+| Galaxy S10/S10+ | 360×760 (girat 760×360) | mòbil / **cap** | ✗ girat |
 | Galaxy S20 | 360 (girat 800) | mòbil / tauleta apaïsada | ✓ |
 | Galaxy S20+ | 384 (girat 854) | mòbil / tauleta apaïsada | ✓ |
 | Galaxy S25 | 360 (girat 780) | mòbil / tauleta apaïsada | ✓ |
@@ -300,7 +300,7 @@ amplada CSS i passats per les regles del projecte:
 | iPhone Air | 420 (girat 912) | mòbil / tauleta apaïsada | ✓ |
 | Pixel 5 | 393 (girat 851) | mòbil / tauleta apaïsada | ✓ |
 | Pixel 8/9 | 412 (girat 915) | mòbil / tauleta apaïsada | ✓ |
-| **Galaxy Tab S9** | **640×1024** | tauleta vertical | **✗** |
+| **Galaxy Tab S9** | **712×1138** | tauleta vertical | **✗** |
 | Galaxy Tab S9+ | **1200×800** (i 800×1200) | tauleta apaïsada / vertical | ✓ |
 | Galaxy Tab S9 Ultra | **1848×960** (i 960×1848) | escriptori / vertical | ✓ |
 | iPad | 768×1024 | tauleta vertical | ✓ |
@@ -325,10 +325,24 @@ llista: **un telèfon girat cau al forat si la seva alçada en vertical fa entre
 640 i 767 px** (640, 658, 667, 740, 760 hi cauen; 780 en amunt no). I **una
 tauleta vertical hi cau si fa entre 600 i 767 px d'amplada**.
 
-Queden per confirmar, de la llista del DevTools, les mides del **Galaxy Tab S9**
-a seques (les que tinc són 640×1024, de la mateixa font que les del DevTools) i
-del **Galaxy S10/S10+** (360×740 o 760): si el Tab S9 fos apaïsat com el S9+, el
-compte baixaria de cinc a quatre.
+### Els cinc, mesurats un per un
+
+| preset | mida | offset | capçalera | 2a fila | icones | resultat |
+|---|---|---|---|---|---|---|
+| Galaxy S9/S9+ girat | 658×320 | **64** | 81 | no | 0 | **sense cistell** |
+| Galaxy S10/S10+ girat | 760×360 | **64** | 81 | no | 0 | **sense cistell** |
+| iPhone SE girat | 667×375 | **64** | 81 | no | 0 | **sense cistell** |
+| Galaxy Tab S9 | 712×1138 | 123 | 123 | sí | 0 | **sense cistell** |
+| iPad Mini 6 | 744×1133 | 123 | 123 | sí | 0 | **sense cistell** |
+
+I els veïns de la vora, que sí que funcionen (la regla és exacta):
+
+| | mida | offset | icones | resultat |
+|---|---|---|---|---|
+| Galaxy S25 girat | 780×360 | 80 | 109 px | es pot comprar |
+| iPad i iPad Mini | 768×1024 | 123 | 109 px | es pot comprar |
+
+La llista queda tancada: **cinc presets**, cap pendent de confirmar.
 
 Les amplades dels presets són les de la llista de dispositius del DevTools
 (les mateixes que manté Playwright, que en comparteix la nissaga); les alcades
