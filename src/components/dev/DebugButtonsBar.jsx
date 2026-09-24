@@ -13,6 +13,8 @@ export default function DebugButtonsBar({
   guidesEnabled,
   setGuidesEnabled,
   belt2GuidesEnabled,
+  carrilGuidesEnabled,
+  setCarrilGuidesEnabled,
   setBelt2GuidesEnabled,
   megaAccordionLocked,
   setMegaAccordionLocked,
@@ -141,7 +143,26 @@ export default function DebugButtonsBar({
 
       <button
         type="button"
-        title="Activa/desactiva les guïes: les BLAVES son les vores del CARRIL (hi han de caure el logo, les icones, el selector i la 4x4) i les VERDES les del marc del lloc (Belt 2)"
+        title="Activa/desactiva les dues guies BLAVES del CARRIL (les seves vores: hi han de caure el logo, les icones, el selector, la 4x4 i les manigues de la franja)"
+        aria-label="Carril"
+        aria-pressed={carrilGuidesEnabled ? 'true' : 'false'}
+        className={`relative z-10 h-12 rounded-full border px-4 text-[12px] font-semibold shadow-lg active:bg-black/10 debug-exempt ${
+          carrilGuidesEnabled
+            ? 'border-[#2563EB]/40 bg-[#2563EB]/15 text-[#1E3A8A] hover:bg-[#2563EB]/20'
+            : 'border-black/15 bg-white text-black/80 hover:bg-black/5'
+        }`}
+        onClick={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          setCarrilGuidesEnabled((v) => !v);
+        }}
+      >
+        Carril
+      </button>
+
+      <button
+        type="button"
+        title="Activa/desactiva les guïes del Belt 2: les VERDES son les del marc del lloc i tambe surten les horitzontals de calibratge (no tenen res a veure amb el carril)"
         aria-label="Belt 2"
         aria-pressed={belt2GuidesEnabled ? 'true' : 'false'}
         className={`relative z-10 h-12 rounded-full border px-4 text-[12px] font-semibold shadow-lg active:bg-black/10 debug-exempt ${

@@ -50,7 +50,7 @@ export default function DebugLayer({
   })();
 
   const megaStripeState = useMegaStripeDebugState({ beltEnabledFromUrl, locationPathname: location.pathname });
-  const { layoutInspectorEnabled, setLayoutInspectorEnabled, guidesEnabled, setGuidesEnabled, copiedDesign, setCopiedDesign, belt2GuidesEnabled, setBelt2GuidesEnabled, megaAccordionLocked, setMegaAccordionLocked } = useDebugToggles({ locationSearch: location.search });
+  const { layoutInspectorEnabled, setLayoutInspectorEnabled, guidesEnabled, setGuidesEnabled, copiedDesign, setCopiedDesign, belt2GuidesEnabled, setBelt2GuidesEnabled, carrilGuidesEnabled, setCarrilGuidesEnabled, megaAccordionLocked, setMegaAccordionLocked } = useDebugToggles({ locationSearch: location.search });
   const { debugsEnabled: debugOverlaysEnabled, rulersEnabled: rulersOverlayEnabled, pdpControlsEnabled, pautaEnabled, setPautaEnabled, tableEnabled, setTableEnabled, pautaOpacity, setPautaOpacity, tableOpacity, setTableOpacity } = useDebugOverlays();
   const { snapshot: stripeOverlayDebugSnapshot, debugOn: stripeOverlayDebugOn } = useStripeOverlayDebug(location.search);
   const { exportCopyStatus, setExportCopyStatus, exportTab, setExportTab, exportModalOpen, setExportModalOpen, exportModalTitle, setExportModalTitle, exportModalText, setExportModalText } = useExportModal();
@@ -146,6 +146,8 @@ export default function DebugLayer({
         setExportModalText={setExportModalText}
         belt2GuidesEnabled={belt2GuidesEnabled}
         setBelt2GuidesEnabled={setBelt2GuidesEnabled}
+        carrilGuidesEnabled={carrilGuidesEnabled}
+        setCarrilGuidesEnabled={setCarrilGuidesEnabled}
         megaAccordionLocked={megaAccordionLocked}
         setMegaAccordionLocked={setMegaAccordionLocked}
         debugOverlaysEnabled={debugOverlaysEnabled}
@@ -184,6 +186,8 @@ export default function DebugLayer({
           zIndex={1300000}
         />
       )}
+
+      {import.meta.env.DEV && <P.CarrilGuidesOverlay enabled={carrilGuidesEnabled} />}
 
       {import.meta.env.DEV && <P.BeltReferenceOverlay enabled={belt2GuidesEnabled} />}
 
