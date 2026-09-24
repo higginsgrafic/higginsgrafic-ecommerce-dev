@@ -317,6 +317,9 @@ export default function MegaMenuPanel({
     onShirtClick: onShirtClick,
     selectedItem: page1SelectedItem,
     isPortraitTablet: isPortraitTablet,
+    // La franja s'ajusta a l'amplada del carril sempre que no siguem a la
+    // vista vertical, on va dins d'una filera escalada i te el seu calibratge.
+    ajustFranjaCarril: !isPortraitTablet,
   };
   return (
     <div className="relative">

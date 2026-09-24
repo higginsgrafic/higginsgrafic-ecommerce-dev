@@ -16,6 +16,7 @@ import {
 import { VECTOR_FRANJA_SAMARRETES, VECTOR_FRANJA_SAMARRETES_01, VECTOR_FRANJA_VIEWBOX, VECTOR_FRANJA_VIEWBOX_OBERT, VECTOR_FRANJA_CONTINGUT } from '../../config/vectorFranja.js';
 import { deltaObjectiuPageLift, desplacamentFranjaEscriptori } from '../../utils/mesuraMegaslide.js';
 import { carrilPx } from '../../utils/layoutMetrics.js';
+import useEscalaFranjaCarril from '../../hooks/useEscalaFranjaCarril.js';
 
 // La franja de samarretes de la pàgina 1 tendeix a quedar-se uns 10 px més avall
 // del que toca: l'alçada del contenidor de la pàgina es calcula a partir del
@@ -156,6 +157,10 @@ function MegaStripePanelP1({
   onP1ContentBottomChange,
   onPageLiftChange,
   isPortraitTablet = false,
+  // Si la franja s'ha d'ajustar a l'amplada del carril (les manigues a fora).
+  // Ho decideix qui el posa: a la vista vertical, la franja viu dins d'una
+  // filera escalada i no hi ha carril.
+  ajustFranjaCarril = false,
   isLandscapeTablet = false,
 }) {
   // Id unic per al retall dels dibuixos: els dos panells conviuen al DOM i
@@ -182,6 +187,10 @@ function MegaStripePanelP1({
   const emptyShirtMaskUrl = useEmptyShirtMask(emptyTileIndices, shirtColor);
   const pageRootRef = useRef(null);
   const pageLiftRef = useRef(0);
+  // La franja s'ha de quedar dins del carril amb les manigues a fora (com a la
+  // pagina 2: les dues pagines han de quadrar). Vegeu l'hook.
+  const filaFranjaRef = useRef(null);
+  const factorCarrilFranja = useEscalaFranjaCarril(filaFranjaRef, ajustFranjaCarril);
   const [pageLift, setPageLift] = useState(0);
   // Franja estreta (768-1366 en horitzontal): hi ha ajustos propis de 10 px i
   // l'ajust general de la franja no s'hi aplica.
@@ -363,6 +372,7 @@ function MegaStripePanelP1({
           <div className="w-full flex justify-center bg-transparent">
             <div
               id="stripe-guide-stripe-row-p1"
+              ref={filaFranjaRef}
               className="relative inline-block"
               style={{
                 height: carrilPx(stripePreviewHPx),
@@ -417,8 +427,10 @@ function MegaStripePanelP1({
                   // El desplaçament (i la resta de la posició) ve de les
                   // variables de calibracio i NO s'escala: el `translate` va
                   // abans de l'`scale`, o sigui en px del pare. El que s'escala
-                  // es la mida de la filera (`stripePreviewHPx`).
-                  transform: `translate(var(--megaStripeDx, 0px), calc(var(--megaStripeDy, 0px) + ${(typeof window !== 'undefined' && window.innerWidth >= 768 && window.innerWidth <= 1366 && window.innerWidth >= window.innerHeight) ? -10 : 0}px + ${desplacamentFranjaEscriptori({ ample: typeof window !== 'undefined' ? window.innerWidth : 0, alt: typeof window !== 'undefined' ? window.innerHeight : 0, esTauleta: isPortraitTablet || isLandscapeTablet })}px)) scale(calc(var(--megaStripeScale, 1.2125) * ${fitAlcada}))`,
+                  // es la mida de la filera (`stripePreviewHPx`), i l'escala que
+                  // la porta al carril la calcula `useEscalaFranjaCarril` (les
+                  // manigues hi queden a fora, a la mida del dibuix).
+                  transform: `translate(var(--megaStripeDx, 0px), calc(var(--megaStripeDy, 0px) + ${(typeof window !== 'undefined' && window.innerWidth >= 768 && window.innerWidth <= 1366 && window.innerWidth >= window.innerHeight) ? -10 : 0}px + ${desplacamentFranjaEscriptori({ ample: typeof window !== 'undefined' ? window.innerWidth : 0, alt: typeof window !== 'undefined' ? window.innerHeight : 0, esTauleta: isPortraitTablet || isLandscapeTablet })}px)) scale(calc(var(--megaStripeScale, 1.2125) * ${factorCarrilFranja} * ${fitAlcada}))`,
                   isolation: 'isolate',
                 }}
               >

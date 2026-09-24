@@ -1,4 +1,4 @@
-import React, { useEffect, useId, useMemo, useState } from 'react';
+import React, { useEffect, useId, useMemo, useRef, useState } from 'react';
 import MegaColumn, { GAP_X_PX } from './MegaColumn.jsx';
 import ClicAreaOverlay from './ClicAreaOverlay.jsx';
 import { CERCADOR_COLORS } from './CercadorTopBar.jsx';
@@ -15,6 +15,7 @@ import {
   VEL_SAMARRETA_BUIDA_ALFA_BLANCA,
 } from '../../config/stripeCalibrationsVertical';
 import { carrilPx } from '../../utils/layoutMetrics.js';
+import useEscalaFranjaCarril from '../../hooks/useEscalaFranjaCarril.js';
 import {
   areesClicAmpla,
   areesClicEstreta,
@@ -171,6 +172,10 @@ function MegaStripePanel({
   drawingOverlaySrcEffective,
   stripeMaskTileRectsRawPct,
   isPortraitTablet = false,
+  // Si la franja s'ha d'ajustar a l'amplada del carril (les manigues a fora).
+  // Ho decideix qui el posa: a la vista vertical, la franja viu dins d'una
+  // filera escalada i no hi ha carril.
+  ajustFranjaCarril = false,
   // A la vista vertical la franja son dues fileres i la mascara de la
   // samarreta (pensada per a una) les retalla: amb aixo no s'hi posa.
   senseMascaraSamarreta = false,
@@ -211,6 +216,11 @@ function MegaStripePanel({
   // Id unic per al retall dels dibuixos: els dos panells conviuen al DOM i
   // amb un id repetit la referencia url(#...) no resolia.
   const idRetall = `hgRetallSamarretes-${useId().replace(/:/g, '')}`;
+  // La franja s'ha de quedar dins del carril amb les manigues a fora: el factor
+  // surt de l'amplada del carril, no d'un numero calibrat (vegeu l'hook). A la
+  // vista vertical no s'hi aplica: alla la franja te el seu propi calibratge.
+  const filaFranjaRef = useRef(null);
+  const factorCarrilFranja = useEscalaFranjaCarril(filaFranjaRef, ajustFranjaCarril);
   // A la vista vertical la franja son DUES fileres de 7: les 14 posicions de
   // la mascara es reparteixen 7 a dalt i 7 a baix (a l'apaisada van en una
   // sola filera).
@@ -338,6 +348,7 @@ function MegaStripePanel({
           <div className="w-full flex justify-center bg-transparent">
             <div
               id="stripe-guide-stripe-row"
+              ref={filaFranjaRef}
               className="relative inline-block"
               style={{
                 height: carrilPx(stripePreviewHPx),
@@ -382,8 +393,10 @@ function MegaStripePanel({
                   // amb el mateix factor, perque les dues franges quedin igual.
                   // El desplaçament ve de les variables de calibracio i NO
                   // s'escala (el `translate` va abans de l'`scale`: és en px del
-                  // pare). El que s'escala és la mida de la filera.
-                  transform: `translate(var(--megaStripeDx, 0px), calc(var(--megaStripeDy, 0px) + ${visualOffsetY}px)) scale(calc(var(--megaStripeScale, 1.2125) * ${fitAlcada}))`,
+                  // pare). El que s'escala és la mida de la filera, i l'escala
+                  // que la porta al carril la calcula `useEscalaFranjaCarril`
+                  // (les manigues hi queden a fora, a la mida del dibuix).
+                  transform: `translate(var(--megaStripeDx, 0px), calc(var(--megaStripeDy, 0px) + ${visualOffsetY}px)) scale(calc(var(--megaStripeScale, 1.2125) * ${factorCarrilFranja} * ${fitAlcada}))`,
                   isolation: 'isolate',
                 }}
               >

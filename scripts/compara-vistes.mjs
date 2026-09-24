@@ -17,6 +17,8 @@
 import { chromium } from '@playwright/test';
 import { spawn } from 'node:child_process';
 
+import { FRACCIO_COSSOS_FRANJA } from '../src/config/stripeCalibrations.js';
+
 const BASE = process.env.HG_URL || 'http://127.0.0.1:3003';
 // Diferencies tolerades (px): el soroll de mesura i la diferencia de caixa
 // entre el dibuix i el cercle.
@@ -82,6 +84,8 @@ const mesura = () => {
     selectorDelta: +(cy(sel) - cy(cg)).toFixed(2),
     dibuixosDelta: +(cy(grid) - cy(cg)).toFixed(2),
     samarretesH: samarretes ? +samarretes.getBoundingClientRect().height.toFixed(1) : null,
+    samarretesW: samarretes ? +samarretes.getBoundingClientRect().width.toFixed(1) : null,
+    carril: Number.parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--hg-mega-w')) || null,
     filesDibuixos: filesDibuixos.slice(0, 4),
     filesColors: filesColors.slice(0, 4),
   };
@@ -193,22 +197,35 @@ for (const nom of tauletes.slice(1)) {
     const dif = Math.abs(a[p] - b[p]);
     if (dif > TOL_ALINEACIO) fallades.push(`${p}: ${referencia} ${a[p]} vs ${nom} ${b[p]} (${dif.toFixed(2)} px)`);
   }
-  // L'alcada de la stripe de samarretes ([data-stripe-visual-content="2"])
-  // nomes es compara amb la referencia del mateix amplada (1024), que es la
-  // pagina que el vertical ha de reproduir: a 1366 creix amb el viewport,
-  // mentre que la graella de dibuixos i els colors es queden igual.
-  const difFranja = Math.abs((a.samarretesH ?? 0) - (b.samarretesH ?? 0));
-  if (nom === 'horitzontal 1024') {
-    if (difFranja > TOL_FRANJA) fallades.push(`alcada de la stripe de samarretes: ${referencia} ${a.samarretesH} vs ${nom} ${b.samarretesH} (${difFranja.toFixed(1)} px)`);
-  } else if (difFranja > TOL_FRANJA) {
-    notes.push(`la stripe de samarretes fa ${b.samarretesH} px a ${nom} i ${a.samarretesH} a ${referencia}: creix amb el viewport, la resta de peces no`);
-  }
+  // L'alcada de la franja de samarretes NO es compara entre tauletes (24/09):
+  // la franja s'ajusta a l'amplada del carril i el carril no fa el mateix a
+  // 768 de peu que a 1024 estirat. El que s'ha de complir es la regla del
+  // carril, i es comprova mes avall amb samarretesW.
   // El patro de files es compara amb marge: els decimals ballen una decima.
   const patro = (r) => r.filesColors.map((y) => +(y - r.filesColors[0]).toFixed(1));
   const pa = patro(a);
   const pb = patro(b);
   const patroDiferent = pa.length !== pb.length || pa.some((y, i) => Math.abs(y - pb[i]) > TOL_MIDES);
   if (patroDiferent) fallades.push(`patro de files: ${referencia} ${JSON.stringify(pa)} vs ${nom} ${JSON.stringify(pb)}`);
+}
+
+// (c) LA FRANJA DE SAMARRETES: la filera de cossos de les catorze samarretes
+// ha de fer exactament l'amplada del carril. Aixi les manigues, que son el que
+// queda del dibuix, surten a fora. Ho calcula `useEscalaFranjaCarril`.
+//
+// A la vista vertical no s'hi aplica: alla la franja no va dins del carril,
+// va dins d'una casella de la taula i amb una escala propia.
+for (const c of CASES) {
+  const r = resultats[c.nom];
+  if (!r || r.samarretesW == null || !r.carril) continue;
+  if (c.ample < c.alt) continue;
+  const cossos = r.samarretesW * FRACCIO_COSSOS_FRANJA;
+  const dif = Math.abs(cossos - r.carril);
+  if (dif > TOL_FRANJA) {
+    fallades.push(`franja: a ${c.nom} els cossos fan ${cossos.toFixed(1)} px i el carril ${r.carril} (${dif.toFixed(1)} px)`);
+  } else {
+    notes.push(`franja a ${c.nom}: cossos ${cossos.toFixed(1)} px = carril ${r.carril} px`);
+  }
 }
 
 if (!process.env.HG_BREU) {

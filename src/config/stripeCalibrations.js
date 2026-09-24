@@ -277,6 +277,21 @@ export const SHIRT_DRAWING_OVERLAY_DEFAULTS = { dx: 0.5, dy: 22.5, scale: 0.38 }
 export const STRIPE_DRAWING_OVERLAY_DEFAULTS = { dx: 0.5, dy: 28.75, scale: 0.31 };
 
 /**
+ * La filera de cossos de les 14 samarretes de la franja, dins de la seva
+ * imatge. Mesurat amb la tinta sobre
+ * `/placeholders/cercador/full-white-stripe.webp` (2866x307): a la filera del
+ * baix (y=246) el primer cos comenca al px 65 i l'ultim acaba al 2804, o sigui
+ * 2740 px dels 2866 de la imatge. La filera mes ampla es la de les manigues
+ * (y~76), que hi arriba del 4 al 2861: cada maniga surt 59 px naturals mes
+ * enlla del seu cos.
+ *
+ * Serveix per escalar la franja: si la filera de cossos fa exactament
+ * l'amplada del carril, les manigues hi surten a fora tot just el que han de
+ * sortir. Ho aplica `useEscalaFranjaCarril`.
+ */
+export const FRACCIO_COSSOS_FRANJA = 2740 / 2866;
+
+/**
  * Defaults globals del layout del stripe (mega-slide). Calibrats a Firefox.
  * Apliquen com a useState inicial; el localStorage continua sobreescrivint.
  *
@@ -287,6 +302,13 @@ export const STRIPE_DRAWING_OVERLAY_DEFAULTS = { dx: 0.5, dy: 28.75, scale: 0.31
  *   - tileGapPx: gap entre tiles del stripe
  */
 export const STRIPE_LAYOUT_DEFAULTS = {
+  /**
+   * `scale` continua essent el calibratge de la franja (la mida amb que es va
+   * deixar a lloc) i el retoc fi de l'HUD. El que hi ha a mes és l'ajust al
+   * carril: `useEscalaFranjaCarril` el multiplica per aquest valor, de manera
+   * que, amb el calibratge intacte, la filera de cossos fa exactament
+   * l'amplada del carril i les manigues hi surten a fora.
+   */
   stripe: { dx: 0, dy: 0, scale: 1.2125 },
   overlayScale: 0.97,
   ref2: { dx: 1018, dy: -3, scale: 1.075 },
