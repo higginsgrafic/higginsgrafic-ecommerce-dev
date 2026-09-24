@@ -369,7 +369,19 @@ function MegaStripePanelP1({
             transform: (compactLandscape || esEstenyFins1366) ? 'none' : 'translateY(-15px)',
           }}
         >
-          <div className="w-full bg-transparent">
+          <div
+            className="w-full bg-transparent"
+            // EL CENTRE ES EL DEL CARRIL, NO EL DEL CONTINGUT.
+            //
+            // El panell porta un coixi lateral (`stripeRowPadXPx`) i el
+            // centratge es feia sobre el CONTINGUT (el carril menys els
+            // coixins): si els dos coixins no son iguals —o si un navegador els
+            // aplica diferent— el centre se'n va. Aqui el coixi es descompta
+            // NEGATIU a l'embolcall, de manera que l'embolcall fa exactament el
+            // carril i el 50% de la filera es el centre del carril, a tothom.
+            style={{ width: 'auto', marginLeft: `-${stripeRowPadXPx?.left || 0}px`, marginRight: `-${stripeRowPadXPx?.right || 0}px` }}
+          >
+
             <div
               id="stripe-guide-stripe-row-p1"
               ref={filaFranjaRef}
