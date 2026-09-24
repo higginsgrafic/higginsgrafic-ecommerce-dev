@@ -24,23 +24,26 @@ const MIDA_TAULETA_VERTICAL_MAX = 1024;
 const MIDA_TAULETA_APAISADA_MIN = 768;
 const MIDA_TAULETA_APAISADA_MAX = 1366;
 const ALCADA_TAULETA_APAISADA_MAX = 1100;
-const ALCADA_CAPCALERA_ESCRIPTORI = 80;
-const ALCADA_CAPCALERA_MOBIL = 80;
 /**
- * La capçalera de DUES FILES de la tauleta vertical: 61 px la fila del logo i
- * les icones + 62 px la fila del menu de colleccions.
+ * L'ALÇADA DE LA CAPÇALERA: EL LOGO MÉS 10 px D'AIRE A DALT I A BAIX (24/09/2026).
  *
- * SON 123, NO 116. Amb 116 el layout reservava 7 px menys del que la capçalera
- * ocupa de veritat, i els primers 7 px de la pagina queien sota seu (invisible
- * mentre allo es buit, pero es una trampa: qualsevol cosa que s'hi posi
- * desapareix). El megaslide ja hi penjava dels 123 —el panell arrenca on acaba
- * la capçalera—, aixi que ara la pagina i el panell comencen al mateix lloc.
- *
- * Es la xifra MES DESFAVORABLE de les dues que quadraven els comptes: l'altra
- * era deixar la fila 2 en 55 px perque 61 + 55 fessin 116, i allo li treia 7 px
- * al menu (que ja va just a les mides petites) per no moure la pagina.
+ * L'amo ho va demanar així. El logo fa 32 px, o sigui que la fila fa **52**:
+ * abans en feia 80 i el logo hi nedava amb 24 px d'aire per banda.
  */
-const ALCADA_CAPCALERA_TAULETA_VERTICAL = 123;
+const ALCADA_CAPCALERA_ESCRIPTORI = 52;
+const ALCADA_CAPCALERA_MOBIL = 52;
+/**
+ * La capçalera de DUES FILES de la tauleta vertical: els 52 px de la fila del
+ * logo i les icones + 62 px la fila del menu de colleccions. Son **114**.
+ *
+ * PER QUE ES UNA CONSTANT I NO ES MESURA. Amb 116 (una versio anterior) el
+ * layout reservava 7 px menys del que la capçalera ocupa de veritat, i els
+ * primers 7 px de la pagina queien sota seu (invisible mentre allo es buit, pero
+ * es una trampa: qualsevol cosa que s'hi posi desapareix). El megaslide hi penja
+ * —el panell arrenca on acaba la capçalera—, així que la pagina i el panell han
+ * de començar al mateix lloc.
+ */
+const ALCADA_CAPCALERA_TAULETA_VERTICAL = 114;
 
 /**
  * Classificació del dispositiu a partir de les mides de la finestra.
@@ -103,19 +106,20 @@ export function deviceLayoutFromViewport(vw, vh) {
  * Alçada de la capçalera per tipus de dispositiu.
  *
  * LES DUES RESERVES SON EL QUE LA CAPÇALERA OCUPA DE VERITAT, no una xifra
- * rodona: 123 px a la tauleta vertical (les dues files) i 80 px a tota la
- * resta, perque la capçalera d'una fila fa 80 px a tot arreu (el que canvia
- * entre mobils, tauletes apaisades i escriptori es el contingut, no l'alçada).
+ * rodona: 114 px a la tauleta vertical (les dues files) i 52 px a tota la
+ * resta (el logo i 10 px d'aire a dalt i a baix; vegeu les constants). El que
+ * canvia entre mobils, tauletes apaisades i escriptori es el contingut, no
+ * l'alçada.
  *
  * LA CAPÇALERA DE DUES FILES ES NOMES DE LA TAULETA VERTICAL: el logo i les
- * icones (61 px) i el menu de colleccions a sota (62). L'apaisada la va portar
+ * icones (52 px) i el menu de colleccions a sota (62). L'apaisada la va portar
  * un temps (commit `17291eb`) i s'ha tornat enrere.
  *
  * AQUI HI HAVIA UNA `ESTRETA` DE 64 px que s'enduia la franja de 600 a 767 px
  * d'amplada en apaisat (els telefons girats: Galaxy S9/S9+, S10/S10+, iPhone
  * SE). Estava documentada com «avui no es dona enlloc» i sí que es donava: la
- * capçalera hi fa 81 px i la pagina en reservava 64, o sigui 17 px de contingut
- * sota la capçalera.
+ * capçalera hi feia 81 px i la pagina en reservava 64, o sigui 17 px de
+ * contingut sota la capçalera.
  */
 export function headerHeightFor(deviceLayout) {
   if (deviceLayout.isPortraitTablet) return ALCADA_CAPCALERA_TAULETA_VERTICAL;

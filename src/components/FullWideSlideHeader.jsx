@@ -56,7 +56,7 @@ function FullWideSlideHeader({
   // Va arribar a portar la de dues files (commit `17291eb`) i s'ha tornat
   // enrere. EL QUE ES MOU: a les mides de l'apaisada (1024x768, 1280x720,
   // 1366x768...) l'offset de capçalera passa a 80 px i les pagines guanyen
-  // 36 px d'alcada util (abans era el de la vertical, que ara en fa 123). Si
+  // 36 px d'alcada util (abans era el de la vertical, que ara en fa 114). Si
   // algú les torna a unificar, ha de refer el repartiment de dalt de
   // `/nova/inici`, que es calcula amb aquest offset.
   //
@@ -2268,7 +2268,12 @@ function FullWideSlideHeader({
           let franja = 0;
           const headerEl = document.querySelector('header');
           const logoEl = headerEl ? headerEl.querySelector('#stripe-guide-header-logo-anchor') : null;
-          const fila = logoEl ? logoEl.closest('div.flex.h-20') : null;
+          // LA FILA, PER UN ANCORATGE PROPI. Abans es buscava
+          // `div.flex.h-20` i el selector depenia de l'alçada: el dia que la
+          // fila va passar a 52 px, la mesura de la franja va caure a 140 px i
+          // la hero amb ella (mesurat). Amb `data-capcalera-fila` no depèn de
+          // cap classe.
+          const fila = logoEl ? logoEl.closest('[data-capcalera-fila="1"]') : null;
           const fills = fila ? [...fila.children].filter((c) => c.getBoundingClientRect().width > 0) : [];
           const iconesEl = fills.length ? fills[fills.length - 1] : null;
           if (logoEl && iconesEl) {
@@ -2798,12 +2803,14 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
         style={{ zIndex: isPortraitTablet ? 10001 : undefined, ...(isPortraitTablet ? {} : { borderBottomColor: '#E6E8EC' }) }}
       >
         <div
-          className="flex h-20 items-center gap-3 px-4 sm:px-6 lg:h-20 lg:px-10"
+          data-capcalera-fila="1"
+          className="flex h-[52px] items-center gap-3 px-4 sm:px-6 lg:px-10"
           style={{
+            // LA FILA FA EL LOGO (32 px) MÉS 10 px D'AIRE A DALT I A BAIX = 52.
+            // Abans en feia 80 i el logo hi nedava amb 24 px per banda.
             // A la vertical el separador ha de quedar AL MIG de l'espai que
-            // ocupen les dues capçaleres (123 px): 61 px a dalt i 62 a baix.
-            // El contingut es centra dins el seu tros amb `items-center`.
-            height: isPortraitTablet ? '61px' : undefined,
+            // ocupen les dues capçaleres (114 px): 52 px a dalt i 62 a baix.
+            height: isPortraitTablet ? '52px' : undefined,
             // La capçalera viu al MATEIX carril que el megaslide i les bandes
             // (70,3vw, centrat): a 1440 el marc del lloc feia 1350 px i el
             // carril 1013, i el logo quedava 128 px a l'esquerra del contingut
@@ -3127,7 +3134,7 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
             width: 'var(--site-w, 100%)',
             marginLeft: 'calc(var(--site-xL, 0px) - var(--rulerInset, 0px))',
             borderTop: '1px solid #E6E8EC',
-            // Els 62 px que queden dels 123, amb el contingut centrat.
+            // Els 62 px que queden dels 114, amb el contingut centrat.
             height: '62px',
           }}
         >
