@@ -190,7 +190,7 @@
     </select>
   </label>
   <button id="global" title="Al mosaic, ensenyar també els formats que no tenen pestanya">Tots al mosaic</button>
-  <button id="recarrega" title="Recarregar les vistes">Recarregar</button>
+  <button id="recarrega" title="Recarregar TOTES les vistes obertes, tambe les de les altres pestanyes">Recarregar tot</button>
   <button id="navegador" title="Mostrar o amagar el dibuix del navegador">Navegador</button>
   <label class="amb-select">vives
     <select id="sostre" title="Quantes vistes vives alhora. Cada vista és una aplicació sencera: més vistes, més memòria.">
@@ -1071,7 +1071,11 @@ barraRuta.addEventListener('change', () => {
   desa();
 });
 document.getElementById('recarrega').addEventListener('click', () => {
-  for (const id of visibles()) { const m = marcs.get(id); if (m && m.viu) recarregaMarc(m); }
+  // TOTES les vistes obertes, tambe les de les altres pestanyes. Els marcs es
+  // queden muntats a posta (canviar de pestanya no ha de recarregar res), i
+  // allo vol dir que tampoc no agafen sols el codi nou de l'aplicacio: aquest
+  // boto es la manera de dir-ho de cop. Un marc concret te el seu propia ⟳.
+  for (const id of candidats()) { const m = marcs.get(id); if (m && m.viu) recarregaMarc(m); }
 });
 document.getElementById('navegador').addEventListener('click', (e) => {
   ullObert = !ullObert;
