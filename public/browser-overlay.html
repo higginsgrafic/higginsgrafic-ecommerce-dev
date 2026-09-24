@@ -271,6 +271,11 @@ const TOTS = FORMATS.map((f) => f.id).sort((a, b) => PER_ID[b].w - PER_ID[a].w);
 
 const MARGES = 34;       // aire al voltant del llenç
 const GAP = 26;          // separacio entre marcs
+// L'ALÇADA DE L'ETIQUETA, QUE VA A SOTA DEL MARC I FORA DE LA FINESTRA.
+// El repartiment l'ha de reservar: si no, en els modes amb files de diferent
+// alcada (prestatge, per mida) l'etiqueta d'un marc baix cau damunt de la fila
+// de sota. Es el que ocupa de debò: 23 px d'etiqueta + 3 de marge.
+const ETIQUETA = 26;
 const AMPLE_CELLA = 760; // amplada de referencia per escalar una vista nova
 
 // ── ESTAT ──────────────────────────────────────────────────────────────────
@@ -660,6 +665,9 @@ function reparteix(mides_, mode) {
   const av = tauler.clientWidth - MARGES * 2;
   const cw = Math.max(...mides_.map((m) => m.w));
   const ch = Math.max(...mides_.map((m) => m.h));
+  // L'alçada que ocupa un marc: la finestra I la seva etiqueta.
+  const hAmb = (m) => m.h + ETIQUETA;
+  const chAmb = ch + ETIQUETA;
   const columnesQueHiCaben = () => Math.max(1, Math.floor((av + GAP) / (cw + GAP)));
 
   if (mode === 'mosaic') {
@@ -672,7 +680,7 @@ function reparteix(mides_, mode) {
       let k = 0;
       for (let i = 1; i < n; i++) if (altures[i] < altures[k]) k = i;
       pos.set(m.id, { x: k * (cw + GAP), y: altures[k] });
-      altures[k] += m.h + GAP;
+      altures[k] += hAmb(m) + GAP;
     }
     ample = n * (cw + GAP) - GAP;
     alt = Math.max(...altures) - GAP;
@@ -684,7 +692,7 @@ function reparteix(mides_, mode) {
       if (x > 0 && x + m.w > ampleRef) { x = 0; y += altFila + GAP; altFila = 0; }
       pos.set(m.id, { x, y });
       x += m.w + GAP;
-      altFila = Math.max(altFila, m.h);
+      altFila = Math.max(altFila, hAmb(m));
       ample = Math.max(ample, x - GAP);
     }
     alt = y + altFila;
@@ -695,7 +703,7 @@ function reparteix(mides_, mode) {
     mides_.forEach((m, i) => {
       const k = i % n;
       pos.set(m.id, { x: k * (cw + GAP) + (cw - m.w) / 2, y: compte[k] });
-      compte[k] += m.h + GAP;
+      compte[k] += hAmb(m) + GAP;
     });
     ample = n * (cw + GAP) - GAP;
     alt = Math.max(...compte) - GAP;
@@ -703,10 +711,10 @@ function reparteix(mides_, mode) {
     let x = 0, y = 0;
     for (const m of mides_) {
       pos.set(m.id, { x, y });
-      if (mode === 'horitzontal') x += m.w + GAP; else y += m.h + GAP;
+      if (mode === 'horitzontal') x += m.w + GAP; else y += hAmb(m) + GAP;
     }
     ample = mode === 'horitzontal' ? x - GAP : Math.max(...mides_.map((m) => m.w));
-    alt = mode === 'horitzontal' ? Math.max(...mides_.map((m) => m.h)) : y - GAP;
+    alt = mode === 'horitzontal' ? Math.max(...mides_.map((m) => hAmb(m))) : y - GAP;
   } else if (mode === 'uniforme' || mode === 'quadrada') {
     const n = mode === 'uniforme'
       ? columnesQueHiCaben()
@@ -714,10 +722,10 @@ function reparteix(mides_, mode) {
     mides_.forEach((m, i) => {
       const cx = i % n, cy = Math.floor(i / n);
       // Dins la seva cel·la, centrat.
-      pos.set(m.id, { x: cx * (cw + GAP) + (cw - m.w) / 2, y: cy * (ch + GAP) + (ch - m.h) / 2 });
+      pos.set(m.id, { x: cx * (cw + GAP) + (cw - m.w) / 2, y: cy * (chAmb + GAP) + (ch - m.h) / 2 });
     });
     ample = n * (cw + GAP) - GAP;
-    alt = Math.ceil(mides_.length / n) * (ch + GAP) - GAP;
+    alt = Math.ceil(mides_.length / n) * (chAmb + GAP) - GAP;
   } else if (mode === 'mida') {
     let x = 0, y = 0, altFila = 0;
     const ampleRef = Math.max(1600, ...mides_.map((m) => m.w));
@@ -725,7 +733,7 @@ function reparteix(mides_, mode) {
       if (x > 0 && x + m.w > ampleRef) { x = 0; y += altFila + GAP; altFila = 0; }
       pos.set(m.id, { x, y });
       x += m.w + GAP;
-      altFila = Math.max(altFila, m.h);
+      altFila = Math.max(altFila, hAmb(m));
       ample = Math.max(ample, x - GAP);
     }
     alt = y + altFila;
@@ -741,7 +749,7 @@ function reparteix(mides_, mode) {
           pos.set(m.id, { x, y });
           if (i === 0) etiquetes.push({ text: nom, x: x + 8, y: y - 21 });
           x += m.w + GAP;
-          altFila = Math.max(altFila, m.h);
+          altFila = Math.max(altFila, hAmb(m));
         });
         ample = Math.max(ample, x - GAP);
         y += altFila + GAP * 2;
@@ -754,7 +762,7 @@ function reparteix(mides_, mode) {
         llista.forEach((m, i) => {
           pos.set(m.id, { x, y });
           if (i === 0) etiquetes.push({ text: nom, x: x + 8, y: y - 21 });
-          y += m.h + GAP;
+          y += hAmb(m) + GAP;
           ampleCol = Math.max(ampleCol, m.w);
         });
         x += ampleCol + GAP * 2;
