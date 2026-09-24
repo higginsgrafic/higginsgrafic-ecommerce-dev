@@ -254,3 +254,58 @@ apaïsat), que és el que decideix si el contingut hi cap.
 6. **El menú de col·leccions de la tauleta vertical** talla per sota de 698 px
    d'amplada (49 px per banda a 600): va centrat dins un contenidor més estret
    que el contingut.
+
+---
+
+## 8. La llista del DevTools, que és la matriu de proves de debò
+
+Els dispositius que Chrome DevTools porta de sèrie són els que qualsevol que
+provi el lloc farà servir, així que són la llista de referència. Traduïts a
+amplada CSS i passats per les regles del projecte:
+
+| preset del DevTools | amplada CSS | classificació | cistell |
+|---|---|---|---|
+| Galaxy Note 9 | 414 (girat 846) | mòbil / tauleta apaïsada | ✓ |
+| Galaxy S9/S9+ | 320 (girat **658**) | mòbil / **cap** | ✗ girat |
+| Galaxy S10/S10+ | 360 (girat **760**) | mòbil / **cap** | ✗ girat |
+| Galaxy S20 | 360 (girat 800) | mòbil / tauleta apaïsada | ✓ |
+| Galaxy S20+ | 384 (girat 854) | mòbil / tauleta apaïsada | ✓ |
+| Galaxy S25 | 360 (girat 780) | mòbil / tauleta apaïsada | ✓ |
+| Galaxy S25+ | 384 (girat 832) | mòbil / tauleta apaïsada | ✓ |
+| Galaxy S25 Ultra | 384 (girat 832) | mòbil / tauleta apaïsada | ✓ |
+| iPhone SE | 375 (girat **667**) | mòbil / **cap** | ✗ girat |
+| iPhone X/XS, 11 Pro, 12/13 mini | 375 (girat 812) | mòbil / tauleta apaïsada | ✓ |
+| iPhone XR/11, XS Max, 11 Pro Max | 414 (girat 896) | mòbil / tauleta apaïsada | ✓ |
+| iPhone 12/13 + Pro | 390 (girat 844) | mòbil / tauleta apaïsada | ✓ |
+| iPhone 12/13 Pro Max | 428 (girat 926) | mòbil / tauleta apaïsada | ✓ |
+| iPhone 14/15/16 (+ Pro) | 393 (girat 852) | mòbil / tauleta apaïsada | ✓ |
+| iPhone 14/15/16 Plus | 430 (girat 932) | mòbil / tauleta apaïsada | ✓ |
+| iPhone 16 Pro Max, 17 Pro Max | 440 (girat 956) | mòbil / tauleta apaïsada | ✓ |
+| iPhone 17 / 17 Pro | 402 (girat 874) | mòbil / tauleta apaïsada | ✓ |
+| iPhone Air | 420 (girat 912) | mòbil / tauleta apaïsada | ✓ |
+| Pixel 5 | 393 (girat 851) | mòbil / tauleta apaïsada | ✓ |
+| Pixel 8/9 | 412 (girat 915) | mòbil / tauleta apaïsada | ✓ |
+| **Galaxy Tab S9** | **640×1024** | tauleta vertical | **✗** |
+| Galaxy Tab S9+ | 720? | tauleta vertical | **✗** (per confirmar) |
+| Galaxy Tab S9 Ultra | 800? | ? | per confirmar |
+| iPad | 768×1024 | tauleta vertical | ✓ |
+| iPad (10th/11th gen) | **656×944**? | tauleta vertical | **✗** (per confirmar) |
+| iPad Air | 820×1180 | tauleta vertical | ✓ |
+| iPad Mini | 768×1024 | tauleta vertical | ✓ |
+| **iPad Mini (6th gen)** | **744×1133** | tauleta vertical | **✗** |
+| iPad Pro 11" (M4 i antic) | 834×1194 | tauleta vertical | ✓ |
+| iPad Pro 12.9" (antic) | 1024×1366 | tauleta vertical | ✓ |
+| iPad Pro 13" (M4) | 1032×1376 | escriptori | ✓ |
+| Portàtils i televisors | 1280 en amunt | escriptori | ✓ |
+
+**El resultat: de la pròpia llista del DevTools, cinc presets no poden obrir el
+cistell amb certesa** (Galaxy S9/S9+ i Galaxy S10/S10+ girats, iPhone SE girat,
+Galaxy Tab S9 i iPad Mini 6), **i fins a vuit** si es confirmen els tres que
+queden pendents (Galaxy Tab S9+, Tab S9 Ultra i iPad 10/11a generació, que
+depenent de la mida que el DevTools els doni cauen dins o fora).
+
+Les amplades dels presets són les de la llista de dispositius del DevTools
+(les mateixes que manté Playwright, que en comparteix la nissaga); les alcades
+de pantalla són les del dispositiu, i el que el navegador s'hi menja va a part
+(vegeu el punt 1). **Pendent de confirmar al DevTools**: les tres mides
+marcades, que es llegeixen a la fitxa del dispositiu.
