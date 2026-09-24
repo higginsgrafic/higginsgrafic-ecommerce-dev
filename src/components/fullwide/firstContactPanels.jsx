@@ -208,11 +208,21 @@ export function FirstContactDibuix09Buttons({
   onNext,
   tileSize,
   // UNA FLETXA A DALT I L'ALTRA A BAIX (24/09/2026, ho va demanar l'amo).
-  // Amb `vertical` la botonera deixa de ser quadrada i passa a tenir la MATEIXA
-  // forma que el selector Blanc/Color/Negre (`aspect-[1/2]`: meitat d'amplada i
-  // el doble d'alçada) i les dues fletxes s'apilen en comptes d'anar costat a
-  // costat. Els chevrons segueixen apuntant a esquerra i dreta: el carrusel
-  // segueix movent-se en horitzontal, el que canvia es on son els botons.
+  //
+  // Amb `vertical` la botonera deixa de ser quadrada i fa la MATEIXA forma que
+  // el selector Blanc/Color/Negre (`aspect-[1/2]`: meitat d'amplada i el doble
+  // d'alçada). Dins seu, el selector te TRES cel·les (BLANC / COLOR / NEGRE) i
+  // el bloc de fletxes tambe: la primera i l'ultima porten les fletxes, i la
+  // del mig fa 0 px, o sigui que els dos botons son contigus i el bloc queda
+  // sencer clicable.
+  //
+  // Els chevrons van a 1/3 de la seva cel·la, que es el centre de la primera i
+  // de l'ultima cel·la: es a dir, a la mateixa alçada que BLANC i que NEGRE.
+  // Centrats a la meitat (el que hi havia abans) queien a 1/4 i 3/4 i no
+  // lligaven amb cap etiqueta.
+  //
+  // Els chevrons segueixen apuntant a esquerra i dreta: el carrusel es mou en
+  // horitzontal, el que canvia es on son els botons.
   vertical = false,
   onPrevPointerDown,
   onPrevPointerUp,
@@ -226,7 +236,11 @@ export function FirstContactDibuix09Buttons({
     // Amb `vertical` la caixa fa la MATEIXA forma que el selector
     // (`aspect-[1/2]`: meitat d'amplada i el doble d'alçada) i les dues fletxes
     // s'apilen dins seu, una a dalt i l'altra a baix.
-    <div className={`relative mt-2 w-full ${vertical ? 'aspect-[1/2]' : 'aspect-square'}`}>
+    // Sense `mt-2` a la variant vertical: a la horitzontal aquell marge es el
+    // que separa el bloc del seu contenidor, pero aqui el bloc ha de caure
+    // exactament on el posa el seu embolcall (que es qui s'alinea amb el
+    // selector). Amb el marge, el bloc visible quedava 8 px mes avall.
+    <div className={`relative w-full ${vertical ? 'aspect-[1/2]' : 'mt-2 aspect-square'}`}>
       <div className="absolute inset-0 overflow-hidden rounded-md bg-muted" id="stripe-guide-right-anchor">
         <button
           type="button"
@@ -241,7 +255,7 @@ export function FirstContactDibuix09Buttons({
           }`}
         >
           <ChevronLeft
-            className="pointer-events-none absolute left-1/2 top-1/2 h-5 w-5 -translate-x-1/2 -translate-y-1/2 text-foreground/80"
+            className={`pointer-events-none absolute left-1/2 h-5 w-5 -translate-x-1/2 -translate-y-1/2 text-foreground/80 ${vertical ? 'top-1/3' : 'top-1/2'}`}
             strokeWidth={1.75}
             aria-hidden="true"
           />
@@ -260,7 +274,7 @@ export function FirstContactDibuix09Buttons({
           }`}
         >
           <ChevronRight
-            className="pointer-events-none absolute left-1/2 top-1/2 h-5 w-5 -translate-x-1/2 -translate-y-1/2 text-foreground/80"
+            className={`pointer-events-none absolute left-1/2 h-5 w-5 -translate-x-1/2 -translate-y-1/2 text-foreground/80 ${vertical ? 'top-2/3' : 'top-1/2'}`}
             strokeWidth={1.75}
             aria-hidden="true"
           />
