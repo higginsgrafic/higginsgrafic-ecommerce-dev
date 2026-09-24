@@ -93,6 +93,8 @@
   }
   .pestanyes button.pestanya:hover { background: var(--fons3); color: var(--text); }
   .pestanyes button.pestanya.activa { color: #fff; border-bottom-color: var(--accent); }
+  .pestanyes button.pestanya.principal { font-weight: 600; }
+  .pestanyes button.pestanya.principal .mida { background: var(--fons3); border-radius: 9px; padding: 0 6px; }
   .pestanyes .pestanya .mida { font-size: 11px; color: var(--text2); font-variant-numeric: tabular-nums; }
   .pestanyes .pestanya .tanca { padding: 0 3px; border-radius: 3px; }
   .pestanyes .pestanya .tanca:hover { background: var(--accent); color: #fff; }
@@ -181,7 +183,7 @@
       </optgroup>
     </select>
   </label>
-  <button id="global" title="Veure TOTS els formats, tinguin pestanya o no">Vista global</button>
+  <button id="global" title="Al mosaic, ensenyar també els formats que no tenen pestanya">Tots al mosaic</button>
   <button id="recarrega" title="Recarregar les vistes">Recarregar</button>
   <button id="navegador" title="Mostrar o amagar el dibuix del navegador">Navegador</button>
   <label class="amb-select">vives
@@ -258,17 +260,23 @@ const AMPLE_CELLA = 760; // amplada de referencia per escalar una vista nova
 // ── ESTAT ──────────────────────────────────────────────────────────────────
 // Es desa a `localStorage`: qui te sis formats oberts no els vol tornar a
 // obrir cada cop.
-const CLAU = 'hg-overlay-estat-v3';
+const CLAU = 'hg-overlay-estat-v4';
+
+// LA PESTANYA PRINCIPAL es el mosaic: hi surten totes les pantalles obertes,
+// proporcionals i a la mateixa escala. La resta de pestanyes son d'UN format
+// cada una, i alla nomes hi ha el seu format.
+const PRINCIPAL = 'principal';
 const pestanyaNova = (id, ruta) => ({ id, ruta: ruta || '/', zoom: null, ajust: null, scroll: { x: 0, y: 0 } });
+const tabPrincipal = () => ({ id: PRINCIPAL, ruta: '/', zoom: null, ajust: 'tot', scroll: { x: 0, y: 0 } });
 
 function estatInicial() {
   return {
-    // Les pestanyes SON els formats oberts, en ordre d'obertura.
-    pestanyes: [pestanyaNova('desktop-1440'), pestanyaNova('tablet-portrait'), pestanyaNova('mobile-portrait')],
-    activa: 'desktop-1440',
-    ordre: 'uniforme',
+    // La primera sempre es la principal; despres, una entrada per format obert.
+    pestanyes: [tabPrincipal(), pestanyaNova('desktop-1440'), pestanyaNova('mobile-portrait')],
+    activa: PRINCIPAL,
+    ordre: 'mosaic',
     sostre: 8,
-    global: false,
+    tots: false,
     panell: false,
     grupsOberts: ['Portàtil'],
   };
@@ -280,10 +288,13 @@ function carrega() {
     if (!cru) return null;
     const e = JSON.parse(cru);
     if (!e || !Array.isArray(e.pestanyes)) return null;
-    e.pestanyes = e.pestanyes.filter((p) => PER_ID[p.id]);
-    if (!e.pestanyes.some((p) => p.id === e.activa)) e.activa = e.pestanyes[0] ? e.pestanyes[0].id : null;
-    if (!e.ordre || e.ordre === 'graella') e.ordre = 'uniforme';
-    e.global = false;
+    // Les pestanyes de format han de ser formats que existeixin; la principal
+    // sempre hi ha de ser i ha d'anar primera.
+    const formats = e.pestanyes.filter((p) => p.id !== PRINCIPAL && PER_ID[p.id]);
+    e.pestanyes = [tabPrincipal(), ...formats];
+    if (!e.pestanyes.some((p) => p.id === e.activa)) e.activa = PRINCIPAL;
+    if (!e.ordre || e.ordre === 'graella') e.ordre = 'mosaic';
+    e.tots = false;
     return e;
   } catch { return null; }
 }
@@ -308,8 +319,22 @@ function desa() {
 
 const tabDe = (id) => estat.pestanyes.find((p) => p.id === id);
 const tabActiva = () => tabDe(estat.activa) || estat.pestanyes[0] || null;
-const oberts = () => estat.pestanyes.map((p) => p.id);
-const visibles = () => (estat.global ? TOTS : oberts());
+const esPrincipal = (p) => !!p && p.id === PRINCIPAL;
+/** Els formats que tenen pestanya (sense comptar la principal). */
+const oberts = () => estat.pestanyes.filter((p) => p.id !== PRINCIPAL).map((p) => p.id);
+/**
+ * Que s'ensenya a la pestanya activa:
+ *   - a la principal, el MOSAIC (els formats oberts, o tots si hi ha `tots`)
+ *   - a una de format, NOMES el seu format
+ */
+function visibles() {
+  const p = tabActiva();
+  if (!p) return [];
+  if (esPrincipal(p)) return estat.tots ? TOTS : oberts();
+  return [p.id];
+}
+/** Els formats que poden tenir un marc viu (per comptar el sostre). */
+const candidats = () => (estat.tots && esPrincipal(tabActiva()) ? TOTS : oberts());
 
 // ── ELS MARCS ──────────────────────────────────────────────────────────────
 const tauler = document.getElementById('tauler');
@@ -318,16 +343,26 @@ const marcs = new Map();   // formatId -> marc (un per format, com les pestanyes
 let ullObert = true;
 let mides = [];            // les mides JA ESCALADES de l'ultim repartiment
 
+const ampleUtil = () => tauler.clientWidth - MARGES * 2;
+const altUtil = () => tauler.clientHeight - MARGES * 2;
+
 function zoomDe(id) {
-  const f = PER_ID[id];
-  if (estat.global) return estat.zoomGlobal || 0.2;
-  const p = tabDe(id);
+  const p = tabActiva();
   if (!p) return 1;
-  if (p.ajust === 'ample') return Math.max(0.05, (tauler.clientWidth - MARGES * 2) / f.w);
-  if (p.ajust === 'alt') return Math.max(0.05, (tauler.clientHeight - MARGES * 2) / f.h);
+  // Al mosaic, TOTES les pantalles a la mateixa escala: es el que les fa
+  // comparables i proporcionals entre elles.
+  if (esPrincipal(p)) {
+    if (p.ajust) return zoomMosaicAjustat(p.ajust === 'ample' ? 'ample' : p.ajust === 'alt' ? 'alt' : 'tot');
+    return estat.zoomMosaic || 0.15;
+  }
+  // A la pestanya d'un format, el seu propi zoom.
+  const f = PER_ID[id];
+  if (p.ajust === 'ample') return Math.max(0.05, ampleUtil() / f.w);
+  if (p.ajust === 'alt') return Math.max(0.05, altUtil() / f.h);
+  if (p.ajust === 'tot') return Math.max(0.05, Math.min(ampleUtil() / f.w, altUtil() / f.h));
   if (p.zoom) return p.zoom;
-  // Una vista nova s'escala per caber en una cella de referencia, i MAI per
-  // sobre de 1:1: els mobils es veuen a mida real i els escriptoris encongits.
+  // Una pestanya nova s'obre a una escala raonable, i MAI per sobre de 1:1: els
+  // mobils es veuen a mida real i els escriptoris encongits.
   return Math.min(1, AMPLE_CELLA / f.w);
 }
 
@@ -452,6 +487,7 @@ function actualitzaEtiqueta(marc) {
 }
 
 function tancaPestanya(id) {
+  if (id === PRINCIPAL) return;   // la principal no es tanca
   const i = estat.pestanyes.findIndex((p) => p.id === id);
   if (i < 0) return;
   const m = marcs.get(id);
@@ -473,10 +509,9 @@ function obrePestanya(id) {
 }
 
 function activaPestanya(id) {
-  estat.global = false;
   estat.activa = id;
   pintaTot();
-  marcs.get(id)?.el.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+  if (id !== PRINCIPAL) marcs.get(id)?.el.scrollIntoView({ block: 'nearest', inline: 'nearest' });
   desa();
 }
 
@@ -495,7 +530,7 @@ function areaVisible(m) {
 }
 
 function muntaLesQueToca() {
-  const llista = visibles().map((id) => marcs.get(id)).filter(Boolean);
+  const llista = candidats().map((id) => marcs.get(id)).filter(Boolean);
   const vius = llista.filter((m) => m.viu);
   const candidates = llista.filter((m) => !m.viu && areaVisible(m) > 0).sort((a, b) => areaVisible(b) - areaVisible(a));
   for (const m of candidates) {
@@ -651,12 +686,14 @@ function reparteix(mides_, mode) {
  * passada, la graella que s'ajusta i la que es pinta no coincideixen i el
  * resultat no hi acaba de caber. S'itera fins que el zoom no es mou.
  */
-function zQueEncabeix(mides1, mode) {
+function zQueEncabeix(mides1, mode, eix = 'tot') {
   const av = tauler.clientWidth - MARGES * 2;
   const aa = tauler.clientHeight - MARGES * 2;
   const hiCap = (z) => {
     const m = mides1.map((x) => ({ id: x.id, w: x.w * z, h: x.h * z }));
     const { ample, alt } = reparteix(m, mode);
+    if (eix === 'ample') return ample <= av;
+    if (eix === 'alt') return alt <= aa;
     return ample <= av && alt <= aa;
   };
   if (hiCap(1)) return 1;
@@ -675,30 +712,31 @@ function zQueEncabeix(mides1, mode) {
   return Math.max(0.02, z);
 }
 
-/** El zoom de la vista global: tots els formats, a la mateixa escala, encabits. */
-function zoomGlobalAjustat() {
-  return zQueEncabeix(TOTS.map((id) => ({ id, w: PER_ID[id].w, h: PER_ID[id].h })), estat.ordre);
+/** El zoom del mosaic: totes les pantalles que hi surten, encabides i iguals. */
+function zoomMosaicAjustat(eix = 'tot') {
+  const ids = visibles();
+  if (!ids.length) return 0.15;
+  return zQueEncabeix(ids.map((id) => ({ id, w: PER_ID[id].w, h: PER_ID[id].h })), estat.ordre, eix);
 }
 
 // ── PINTAR ─────────────────────────────────────────────────────────────────
 function pintaTauler({ guardaScroll = false } = {}) {
   const act = tabActiva();
-  if (guardaScroll && act && !estat.global) act.scroll = { x: tauler.scrollLeft, y: tauler.scrollTop };
-  if (estat.global && !estat.zoomGlobal) estat.zoomGlobal = zoomGlobalAjustat();
-
+  const principal = esPrincipal(act);
+  if (guardaScroll && act) act.scroll = { x: tauler.scrollLeft, y: tauler.scrollTop };
   const ids = visibles();
   mides = ids.map((id) => {
     const f = PER_ID[id];
     const z = zoomDe(id);
     return { id, w: Math.round(f.w * z), h: Math.round(f.h * z), z };
   });
+  // A una pestanya de format tambe hi ha d'haver la resta de marcs muntats (son
+  // les altres pestanyes): nomes s'amaguen. Destruir-los voldria dir que anar a
+  // veure un format i tornar recarregues el mosaic sencer.
   const { pos, etiquetes, ample, alt } = reparteix(mides, estat.ordre);
-
-  // Els marcs que ja no son es treuen (i s'aturen: un iframe viu tret del DOM
-  // es una aplicacio sencera corrent per res).
   const volguts = new Set(ids);
   for (const [id, m] of marcs) {
-    if (!volguts.has(id)) { desmuntaMarc(m); m.el.remove(); marcs.delete(id); }
+    if (!volguts.has(id)) m.el.style.display = 'none';
   }
   for (const m of mides) {
     const marc = creaMarc(m.id);
@@ -708,7 +746,8 @@ function pintaTauler({ guardaScroll = false } = {}) {
     marc.el.style.width = m.w + 'px';
     marc.el.style.height = m.h + 'px';
     marc.escala.style.transform = `scale(${m.z})`;
-    marc.el.classList.toggle('actiu', !estat.global && m.id === estat.activa);
+    marc.el.style.display = '';
+    marc.el.classList.toggle('actiu', !principal && m.id === estat.activa);
     if (marc.el.parentElement !== llenç) llenç.append(marc.el);
   }
   for (const e of llenç.querySelectorAll('.etiqueta-grup')) e.remove();
@@ -727,11 +766,11 @@ function pintaTauler({ guardaScroll = false } = {}) {
   if (!ids.length && !avís) {
     const d = document.createElement('div');
     d.className = 'sense-res';
-    d.textContent = 'Cap format obert. Obre\'n un des de la llista de l\'esquerra (☰): cada format que marquis tindrà la seva pestanya i sortirà aquí.';
+    d.textContent = 'Cap format obert. Obre\'n un des de la llista de l\'esquerra (☰): cada format que marquis tindrà la seva pestanya, i aquí en veuràs el mosaic.';
     llenç.append(d);
   } else if (ids.length && avís) avís.remove();
 
-  if (guardaScroll && act && !estat.global) tauler.scrollTo(act.scroll.x, act.scroll.y);
+  if (guardaScroll && act) tauler.scrollTo(act.scroll.x, act.scroll.y);
   muntaLesQueToca();
   actualitzaBarra();
   desa();
@@ -745,20 +784,24 @@ const ajuda = document.getElementById('ajuda');
 
 function actualitzaBarra() {
   const act = tabActiva();
-  barraRuta.value = act ? act.ruta : '/';
-  barraRuta.disabled = estat.global || !act;
+  const principal = esPrincipal(act);
+  barraRuta.value = principal ? '' : (act ? act.ruta : '/');
+  barraRuta.disabled = principal || !act;
+  barraRuta.placeholder = principal ? 'cada format té la seva' : '/';
   barraOrdre.value = estat.ordre;
-  const z = estat.global ? (estat.zoomGlobal || 0.2) : (act ? zoomDe(act.id) : 1);
+  barraOrdre.disabled = !principal;   // l'ordre només mana al mosaic
+  const z = zoomActual();
   barraZoom.textContent = Math.round(z * 100) + '%';
-  document.getElementById('ajusta-ample').classList.toggle('actiu', !estat.global && act?.ajust === 'ample');
-  document.getElementById('ajusta-alt').classList.toggle('actiu', !estat.global && act?.ajust === 'alt');
-  document.getElementById('zoom-1').classList.toggle('actiu', !estat.global && act && !act.ajust && Math.abs((act.zoom || 0) - 1) < 0.001);
-  document.getElementById('global').classList.toggle('actiu', estat.global);
+  document.getElementById('ajusta-ample').classList.toggle('actiu', act?.ajust === 'ample');
+  document.getElementById('ajusta-alt').classList.toggle('actiu', act?.ajust === 'alt');
+  document.getElementById('zoom-1').classList.toggle('actiu', act && !act.ajust && Math.abs((act.zoom || 0) - 1) < 0.001);
+  document.getElementById('global').classList.toggle('actiu', !!estat.tots);
+  document.getElementById('global').disabled = !principal;
   document.getElementById('sostre').value = String(estat.sostre || 8);
   const vius = [...marcs.values()].filter((m) => m.viu).length;
-  ajuda.textContent = estat.global
-    ? `${TOTS.length} formats · ${vius} vives · vista global`
-    : `${estat.pestanyes.length} formats oberts · ${vius} vives (sostre ${sostreVius()}) · les vistes són a escala real`;
+  ajuda.textContent = principal
+    ? `${visibles().length} pantalles al mosaic · ${vius} vives (sostre ${sostreVius()})`
+    : `${act ? PER_ID[act.id].nom : ''} · ${vius} vives · el mosaic és a la pestanya Principal`;
 }
 
 function pintaPestanyes() {
@@ -772,14 +815,19 @@ function pintaPestanyes() {
     return;
   }
   for (const p of estat.pestanyes) {
+    const principal = esPrincipal(p);
     const f = PER_ID[p.id];
     const b = document.createElement('button');
-    b.className = 'pestanya' + (!estat.global && p.id === estat.activa ? ' activa' : '');
-    b.innerHTML = `<span>${f.nom}</span><span class="mida">${f.w}×${f.h}</span>`;
-    const x = document.createElement('span');
-    x.className = 'tanca'; x.textContent = '✕'; x.title = 'Tancar aquesta pestanya';
-    x.addEventListener('click', (e) => { e.stopPropagation(); tancaPestanya(p.id); });
-    b.append(x);
+    b.className = 'pestanya' + (p.id === estat.activa ? ' activa' : '') + (principal ? ' principal' : '');
+    b.innerHTML = principal
+      ? `<span>▦ Principal</span><span class="mida">${estat.tots ? TOTS.length : oberts().length}</span>`
+      : `<span>${f.nom}</span><span class="mida">${f.w}×${f.h}</span>`;
+    if (!principal) {
+      const x = document.createElement('span');
+      x.className = 'tanca'; x.textContent = '✕'; x.title = 'Tancar aquesta pestanya';
+      x.addEventListener('click', (e) => { e.stopPropagation(); tancaPestanya(p.id); });
+      b.append(x);
+    }
     b.addEventListener('click', () => activaPestanya(p.id));
     cont.append(b);
   }
@@ -834,16 +882,17 @@ function pintaTot() {
 }
 
 // ── CONTROLS ──────────────────────────────────────────────────────────────
-const zoomActual = () => (estat.global ? (estat.zoomGlobal || 0.2) : (tabActiva() ? zoomDe(estat.activa) : 1));
+function zoomActual() {
+  const act = tabActiva();
+  if (!act) return 1;
+  return zoomDe(act.id);
+}
 
 function posaZoom(z) {
-  if (estat.global) estat.zoomGlobal = Math.min(4, Math.max(0.02, z));
-  else {
-    const act = tabActiva();
-    if (!act) return;
-    act.ajust = null;
-    act.zoom = Math.min(4, Math.max(0.05, z));
-  }
+  const act = tabActiva();
+  if (!act) return;
+  if (esPrincipal(act)) { act.ajust = null; estat.zoomMosaic = Math.min(4, Math.max(0.02, z)); }
+  else { act.ajust = null; act.zoom = Math.min(4, Math.max(0.05, z)); }
   pintaTauler();
 }
 
@@ -851,22 +900,33 @@ document.getElementById('plega').addEventListener('click', () => { estat.panell 
 document.getElementById('zoom-mes').addEventListener('click', () => posaZoom(zoomActual() * 1.25));
 document.getElementById('zoom-menys').addEventListener('click', () => posaZoom(zoomActual() / 1.25));
 document.getElementById('zoom-1').addEventListener('click', () => posaZoom(1));
-document.getElementById('ajusta-ample').addEventListener('click', () => { const a = tabActiva(); if (a && !estat.global) { a.ajust = 'ample'; pintaTauler(); } });
-document.getElementById('ajusta-alt').addEventListener('click', () => { const a = tabActiva(); if (a && !estat.global) { a.ajust = 'alt'; pintaTauler(); } });
-document.getElementById('ajusta-tot').addEventListener('click', () => {
-  // Totes les vistes obertes a la MATEIXA escala i encabides: es la manera de
-  // comparar-les mantenint la proporcio entre elles.
-  if (estat.global) { estat.zoomGlobal = zoomGlobalAjustat(); pintaTauler(); return; }
-  const ids = oberts();
-  if (!ids.length) return;
-  const z = zQueEncabeix(ids.map((id) => ({ id, w: PER_ID[id].w, h: PER_ID[id].h })), estat.ordre);
-  for (const p of estat.pestanyes) { p.ajust = null; p.zoom = z; }
+document.getElementById('ajusta-ample').addEventListener('click', () => {
+  const a = tabActiva();
+  if (!a) return;
+  if (esPrincipal(a)) { a.ajust = 'ample'; estat.zoomMosaic = null; }
+  else a.ajust = 'ample';
   pintaTauler();
 });
-barraOrdre.addEventListener('change', () => { estat.ordre = barraOrdre.value; estat.zoomGlobal = null; pintaTauler(); desa(); });
+document.getElementById('ajusta-alt').addEventListener('click', () => {
+  const a = tabActiva();
+  if (!a) return;
+  if (esPrincipal(a)) { a.ajust = 'alt'; estat.zoomMosaic = null; }
+  else a.ajust = 'alt';
+  pintaTauler();
+});
+document.getElementById('ajusta-tot').addEventListener('click', () => {
+  // Encabir-ho tot: al mosaic, totes les pantalles; en una pestanya de format,
+  // el seu format. Es la manera de veure-ho sencer d'una ullada.
+  const a = tabActiva();
+  if (!a) return;
+  if (esPrincipal(a)) { a.ajust = 'tot'; estat.zoomMosaic = null; }
+  else a.ajust = 'tot';
+  pintaTauler();
+});
+barraOrdre.addEventListener('change', () => { estat.ordre = barraOrdre.value; pintaTauler(); desa(); });
 barraRuta.addEventListener('change', () => {
   const act = tabActiva();
-  if (!act) return;
+  if (!act || esPrincipal(act)) return;
   let r = barraRuta.value.trim() || '/';
   if (!r.startsWith('/')) r = '/' + r;
   act.ruta = r;
@@ -886,8 +946,8 @@ document.getElementById('navegador').addEventListener('click', (e) => {
 });
 document.getElementById('sostre').addEventListener('change', (e) => { estat.sostre = Number(e.target.value); desa(); muntaLesQueToca(); actualitzaBarra(); });
 document.getElementById('global').addEventListener('click', () => {
-  estat.global = !estat.global;
-  estat.zoomGlobal = null;
+  estat.tots = !estat.tots;
+  estat.activa = PRINCIPAL;   // es una propietat del mosaic
   pintaTot();
   desa();
 });
@@ -901,14 +961,14 @@ tauler.addEventListener('wheel', (e) => {
 
 tauler.addEventListener('scroll', () => {
   const act = tabActiva();
-  if (act && !estat.global) { act.scroll = { x: tauler.scrollLeft, y: tauler.scrollTop }; desa(); }
+  if (act) { act.scroll = { x: tauler.scrollLeft, y: tauler.scrollTop }; desa(); }
   muntaLesQueToca();
 }, { passive: true });
 
 let temps = null;
 window.addEventListener('resize', () => {
   clearTimeout(temps);
-  temps = setTimeout(() => { estat.zoomGlobal = null; pintaTauler(); }, 140);
+  temps = setTimeout(() => pintaTauler(), 140);
 });
 
 // ── ENGEGAR ───────────────────────────────────────────────────────────────
