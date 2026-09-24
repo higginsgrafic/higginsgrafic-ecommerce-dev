@@ -46,7 +46,7 @@
 import { useEffect, useRef, useState } from 'react';
 
 /** El repartiment inicial, abans del primer mesurament. */
-const REPARTIMENT_INICIAL = { blocMega: 0, blocPagina: 0, alcada: null };
+const REPARTIMENT_INICIAL = { blocMega: 0, blocPagina: 0, alcada: null, alFons: false };
 /** El que penja el cadenat del megaslide sota la seva linia. */
 const CADE_BAIXADA = 56;
 /** Files, com a molt i com a minim, quan es busquen les divisions. */
@@ -211,13 +211,21 @@ function MarcInici({ seccions }) {
       // LA PAGINA DE SOTA es la resta. El CADENAT, pero, penja 56 px dins seu i
       // per tant no es pot fer servir per centrar-hi la hero: el seu bloc es el
       // que queda DESPRES del cadenat.
-      const blocPagina = Math.max((window.innerHeight - capcalera) - blocMega, CADE_BAIXADA + natural);
+      const disponible = Math.max(0, (window.innerHeight - capcalera) - blocMega);
+      const ambCadenat = CADE_BAIXADA + natural;
+      const encaixa = ambCadenat <= disponible;
+      // A 1366 I 1280 (les dues mides de portatil) la hero s'ALINEA AL FONS DEL
+      // VIEWPORT: el bloc es queda exactament el que queda de finestra i la hero
+      // hi acaba, de manera que no queda res per sota. A la resta de formats no
+      // es toca res.
+      const alFons = !encaixa && (window.innerWidth === 1366 || window.innerWidth === 1280);
+      const blocPagina = alFons ? disponible : Math.max(disponible, ambCadenat);
       const alcada = natural;
       // El numero que decideix si ja hi som: si no s'ha mogut, s'atura.
-      const ara = `${Math.round(blocMega * 4) / 4}|${Math.round(blocPagina * 4) / 4}|${Math.round(alcada * 4) / 4}`;
+      const ara = `${Math.round(blocMega * 4) / 4}|${Math.round(blocPagina * 4) / 4}|${Math.round(alcada * 4) / 4}|${alFons ? 1 : 0}`;
       if (ara === anterior) return;
       anterior = ara;
-        setRepartiment({ blocMega, blocPagina, alcada, finsLinia, linia });
+        setRepartiment({ blocMega, blocPagina, alcada, finsLinia, linia, alFons });
       raf = requestAnimationFrame(reparteix);
     };
 
@@ -305,7 +313,8 @@ function MarcInici({ seccions }) {
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
-            justifyContent: 'center',
+            // A 1366 i 1280, alineada al fons del viewport; a la resta, centrada.
+            justifyContent: repartiment.alFons ? 'flex-end' : 'center',
           }}
         >
           {segona.node}
