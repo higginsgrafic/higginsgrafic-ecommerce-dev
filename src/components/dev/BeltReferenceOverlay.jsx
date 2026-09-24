@@ -572,6 +572,18 @@ export default function BeltReferenceOverlay({ enabled }) {
 
   if (!enabled) return null;
   const color = 'rgba(22, 163, 74, 0.85)';
+  // LES DUES GUIDES DEL CARRIL, EN UN ALTRE COLOR (24/09/2026, ho va demanar
+  // l'amo). Son les vores del carril de debò (`--hg-mega-w` i la seva x), no les
+  // del marc del lloc (les verdes de `belt2`): amb el carril a 3/5 les dues
+  // coses ja no coincideixen, i aquestes guies son les que diuen on han de
+  // caure el logo, les icones, el selector i la graella 4x4.
+  //
+  // Es dibuixen amb `calc` sobre les variables publicades i no amb una mesura:
+  // la capçalera va `fixed` amb `marginLeft: calc(var(--hg-mega-x) -
+  // var(--rulerInset))` i el seu pare arrenca a `--rulerInset`, o sigui que la
+  // seva vora esquerra cau exactament a `--hg-mega-x` en coordenades de
+  // finestra, que son les mateixes que fa servir `position: fixed`.
+  const colorCarril = 'rgba(37, 99, 235, 0.85)';
 
   return (
     <DevPortal
@@ -581,6 +593,8 @@ export default function BeltReferenceOverlay({ enabled }) {
       aria-hidden="true"
       data-dev-overlay="true"
     >
+      <div data-guia-carril="esq" style={{ position: 'fixed', left: 'var(--hg-mega-x, 0px)', top: 0, height: '100vh', width: 0, borderLeft: `1px solid ${colorCarril}` }} />
+      <div data-guia-carril="dret" style={{ position: 'fixed', left: 'calc(var(--hg-mega-x, 0px) + var(--hg-mega-w, 0px))', top: 0, height: '100vh', width: 0, borderLeft: `1px solid ${colorCarril}` }} />
       {Number.isFinite(state.xL) ? (
         <div style={{ position: 'fixed', left: state.xL, top: 0, height: '100vh', width: 0, borderLeft: `1px solid ${color}` }} />
       ) : null}

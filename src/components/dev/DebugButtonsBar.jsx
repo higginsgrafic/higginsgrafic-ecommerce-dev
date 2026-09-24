@@ -141,7 +141,7 @@ export default function DebugButtonsBar({
 
       <button
         type="button"
-        title="Activa/desactiva les guïes Belt 2"
+        title="Activa/desactiva les guïes: les BLAVES son les vores del CARRIL (hi han de caure el logo, les icones, el selector i la 4x4) i les VERDES les del marc del lloc (Belt 2)"
         aria-label="Belt 2"
         aria-pressed={belt2GuidesEnabled ? 'true' : 'false'}
         className={`relative z-10 h-12 rounded-full border px-4 text-[12px] font-semibold shadow-lg active:bg-black/10 debug-exempt ${
