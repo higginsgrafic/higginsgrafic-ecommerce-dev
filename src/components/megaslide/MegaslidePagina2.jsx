@@ -435,6 +435,10 @@ export default function MegaslidePagina2({
     neckDotIndices: neckDotIndices,
     emptyTileIndices: emptyTileIndices,
     stripeEmptyMaskSrc: stripeEmptyMaskSrc,
+    // La franja de la pagina 2 s'ajusta al carril sempre que no siguem a la
+    // vista vertical, on la franja va dins d'una filera escalada i te el seu
+    // propi calibratge.
+    ajustFranjaCarril: !isPortraitTablet,
   };
   return (
     <div style={{ width: '25%', flexShrink: 0, display: isPortraitTablet ? 'block' : 'flex', height: '100%', position: 'relative', justifyContent: 'center', overflow: 'visible' }}>
