@@ -34,11 +34,33 @@ function readRulerInset() {
   }
 }
 
+/**
+ * El carril declarat, si la capçalera l'ha publicat.
+ *
+ * El marc del lloc i el carril son la mateixa cosa: si el carril es declara
+ * (3/5 de la finestra a l'escriptori i a la tauleta apaïssada), el marc l'ha de
+ * seguir. Si no hi es (la vertical i el mobil tenen disseny propi), es queda
+ * amb el topall de 1350 de sempre.
+ */
+function readCarril() {
+  try {
+    const raw = getComputedStyle(document.documentElement).getPropertyValue('--carril');
+    const n = parseFloat(raw);
+    return Number.isFinite(n) && n > 0 ? n : null;
+  } catch {
+    return null;
+  }
+}
+
 export function computeSiteFrame() {
   if (typeof window === 'undefined' || typeof document === 'undefined') return null;
   const vw = getLayoutViewportWidth();
   if (!Number.isFinite(vw) || vw <= 0) return null;
-  const marc = siteFrameForViewport({ vw, rulerInset: readRulerInset() });
+  const marc = siteFrameForViewport({
+    vw,
+    rulerInset: readRulerInset(),
+    maxAmple: readCarril() ?? SITE_FRAME_MAX_WIDTH,
+  });
   if (!marc) return null;
   // Mitja reserva de la barra de desplaçament (o del seu lloc): el marc es
   // centra sobre la FINESTRA, pero el cos es `gutter` px mes estret. Les capes

@@ -10,7 +10,7 @@ import { useOrders } from '@/hooks/useOrders';
 import { getGildan64000Catalog } from '../utils/placeholders.js';
 import { AUSTEN_QUOTES_ASSETS, resolveAustenQuoteAssetId, resolveAustenQuoteOriginalFromPath } from '../utils/austenQuotesAssets.js';
 import { clampNumber, escalaMegaslide, MEGASLIDE_REFERENCIA_PX, carrilPx, carrilLane } from '@/utils/layoutMetrics';
-import { laneForViewport } from '@/utils/layoutModel';
+import { laneForViewport, carrilDeclarat } from '@/utils/layoutModel';
 import {
   FIRST_CONTACT_MEDIA,
   FIRST_CONTACT_MEDIA_WHITE,
@@ -2231,8 +2231,17 @@ function FullWideSlideHeader({
         // cistell. Amb el carril limitat a la finestra, la fila hi cap i les
         // peces s'encongeixen amb ell (`carrilLane`).
         const vp = Math.max(0, (document.documentElement.clientWidth || window.innerWidth || 0));
+        // EL CARRIL DECLARAT (3/5 de la finestra, amb 1/5 de marge per banda) mana
+        // sobre la belt a l'escriptori i a la tauleta apaissada. Es publica com a
+        // `--carril` perque el lloc i el marc del lloc el puguin llegir: es la
+        // mateixa mesura per a tothom. A la vertical i al mobil torna `null` i
+        // tot queda com estava (tenen disseny propi).
+        const carril = carrilDeclarat({ ample: vp, alt: window.innerHeight || 0 });
+        if (carril) root.style.setProperty('--carril', `${carril}px`);
+        else root.style.removeProperty('--carril');
         const beltTauleta = Math.min(992, Math.max(320, vp - 32));
-        const beltFinal = isPortraitTablet ? 992 : (isLandscapeTablet ? beltTauleta : beltWidth);
+        const beltFinal = carril
+          ?? (isPortraitTablet ? 992 : (isLandscapeTablet ? beltTauleta : beltWidth));
         root.style.setProperty('--hg-mega-w', `${beltFinal}px`);
         // Quan el carril te una amplada propia (tauleta: 992) la seva posicio
         // tambe: CENTRAT a l'espai de maquetacio. Abans aixo ho deia `belt.left`

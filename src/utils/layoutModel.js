@@ -128,14 +128,43 @@ export function headerHeightFor(deviceLayout) {
 }
 
 /**
+ * EL CARRIL DECLARAT: 3/5 DE LA FINESTRA, AMB 1/5 DE MARGE PER BANDA.
+ *
+ * Es la decisio de l'amo (24/09/2026) i substitueix la belt com a regle: en
+ * comptes de `min(70,3125vw, 1350px)` (que es 1350/1920), el carril es una
+ * fraccio de la finestra i no te sostre. El que guanya: el regle es un de sol
+ * —el lloc, la capçalera, la pagina nova i el megaslide— i per sobre de 1920
+ * el disseny continua creixent en comptes de congelar-se.
+ *
+ * Nomes val per a l'ESCRIPTORI i la TAULETA APAISSADA, que son les classes que
+ * avui comparteixen el regle. La TAUETA VERTICAL i el MOBIL tornen `null`: tenen
+ * el seu propi disseny calibrat (el tauler de 992 de la tauleta vertical, que es
+ * mes ample que la finestra; i el mobil, que fa gairebe tota l'amplada) i el seu
+ * carril no es pot canviar sense refer-ne la densitat. Vegeu
+ * `docs/informes/PLA-estructura-general-dispositius.md` §2 i §3.
+ *
+ * @returns {number|null} amplada del carril en px, o null si la classe te regle propi
+ */
+export function carrilDeclarat({ ample, alt } = {}) {
+  const d = deviceLayoutFromViewport(ample, alt);
+  if (d.isMobile || d.isPortraitTablet) return null;
+  if (d.viewportWidth <= 0) return null;
+  return Math.round((d.viewportWidth * 3) / 5);
+}
+
+/**
  * Marc horitzontal del lloc: el mateix càlcul que SiteFrame publica com a
  * `--site-xL/xR/w`. És la font de veritat horitzontal de tot el projecte.
+ *
+ * `maxAmple` es el carril declarat quan n'hi ha: el marc del lloc i el carril
+ * son la mateixa cosa, i per això el marc tambe ha de poder seguir el 3/5.
  */
-export function siteFrameForViewport({ vw, vh, rulerInset = 0 } = {}) {
+export function siteFrameForViewport({ vw, vh, rulerInset = 0, maxAmple = 1350 } = {}) {
   const ample = Number.isFinite(vw) && vw > 0 ? vw : getLayoutViewportWidth();
   if (!Number.isFinite(ample) || ample <= 0) return null;
   const disponible = Math.max(0, ample - rulerInset);
-  const ampleMarc = Math.max(0, Math.min(1350, disponible - 16 * 2));
+  const topall = Number.isFinite(maxAmple) && maxAmple > 0 ? maxAmple : 1350;
+  const ampleMarc = Math.max(0, Math.min(topall, disponible - 16 * 2));
   const xL = Math.round(rulerInset + (disponible - ampleMarc) / 2);
   return { xL, xR: xL + ampleMarc, width: ampleMarc };
 }
