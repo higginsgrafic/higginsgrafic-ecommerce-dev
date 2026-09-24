@@ -301,10 +301,10 @@ amplada CSS i passats per les regles del projecte:
 | Pixel 5 | 393 (girat 851) | mòbil / tauleta apaïsada | ✓ |
 | Pixel 8/9 | 412 (girat 915) | mòbil / tauleta apaïsada | ✓ |
 | **Galaxy Tab S9** | **640×1024** | tauleta vertical | **✗** |
-| Galaxy Tab S9+ | 720? | tauleta vertical | **✗** (per confirmar) |
-| Galaxy Tab S9 Ultra | 800? | ? | per confirmar |
+| Galaxy Tab S9+ | **1200×800** (i 800×1200) | tauleta apaïsada / vertical | ✓ |
+| Galaxy Tab S9 Ultra | **1848×960** (i 960×1848) | escriptori / vertical | ✓ |
 | iPad | 768×1024 | tauleta vertical | ✓ |
-| iPad (10th/11th gen) | **656×944**? | tauleta vertical | **✗** (per confirmar) |
+| iPad (10th/11th gen) | **1180×820** (i 820×1180) | tauleta apaïsada / vertical | ✓ |
 | iPad Air | 820×1180 | tauleta vertical | ✓ |
 | iPad Mini | 768×1024 | tauleta vertical | ✓ |
 | **iPad Mini (6th gen)** | **744×1133** | tauleta vertical | **✗** |
@@ -313,11 +313,22 @@ amplada CSS i passats per les regles del projecte:
 | iPad Pro 13" (M4) | 1032×1376 | escriptori | ✓ |
 | Portàtils i televisors | 1280 en amunt | escriptori | ✓ |
 
-**El resultat: de la pròpia llista del DevTools, cinc presets no poden obrir el
-cistell amb certesa** (Galaxy S9/S9+ i Galaxy S10/S10+ girats, iPhone SE girat,
-Galaxy Tab S9 i iPad Mini 6), **i fins a vuit** si es confirmen els tres que
-queden pendents (Galaxy Tab S9+, Tab S9 Ultra i iPad 10/11a generació, que
-depenent de la mida que el DevTools els doni cauen dins o fora).
+**El resultat: de la pròpia llista del DevTools, CINC presets no poden obrir el
+cistell** — el Galaxy S9/S9+ i el Galaxy S10/S10+ girats, l'iPhone SE girat, el
+Galaxy Tab S9 i l'iPad Mini (6th gen). Els tres que quedaven pendents (Tab S9+,
+Tab S9 Ultra i iPad 10/11a generació) **s'han comprovat i estan bé en les dues
+orientacions**: 1200×800 i 800×1200, 1848×960 i 960×1848, 1180×820 i 820×1180,
+tots amb el cistell a la capçalera.
+
+LA REGLA QUE EN SURT, i que val per a qualsevol aparell que no sigui a la
+llista: **un telèfon girat cau al forat si la seva alçada en vertical fa entre
+640 i 767 px** (640, 658, 667, 740, 760 hi cauen; 780 en amunt no). I **una
+tauleta vertical hi cau si fa entre 600 i 767 px d'amplada**.
+
+Queden per confirmar, de la llista del DevTools, les mides del **Galaxy Tab S9**
+a seques (les que tinc són 640×1024, de la mateixa font que les del DevTools) i
+del **Galaxy S10/S10+** (360×740 o 760): si el Tab S9 fos apaïsat com el S9+, el
+compte baixaria de cinc a quatre.
 
 Les amplades dels presets són les de la llista de dispositius del DevTools
 (les mateixes que manté Playwright, que en comparteix la nissaga); les alcades
