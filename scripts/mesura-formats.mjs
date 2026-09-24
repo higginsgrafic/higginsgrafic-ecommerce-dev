@@ -116,8 +116,12 @@ const mesura = () => {
 // LA CLASSE DE DISPOSITIU, LLEGIDA DEL MODUL DE PRODUCCIO.
 //
 // No es una copia de les regles: el navegador importa `/src/utils/layoutModel.js`
-// tal com el fa servir l'aplicacio, i li demana la classe d'aquesta finestra. Es
-// l'unica manera que l'eina digui el que el codi fa i no el que creiem que fa.
+// tal com el fa servir l'aplicacio, i li demana la classe d'aquesta finestra I
+// L'ALCADA DE CAPÇALERA que li toca. Es l'unica manera que l'eina digui el que
+// el codi fa i no el que creiem que fa; i com que l'alcada ve del model, la
+// comprovacio de mes avall no te cap numero escrit a ma que pugui caducar (en
+// tenia un, el 123, i el dia que la capçalera va passar a 114 va cantar vuit
+// formats sense cap motiu).
 //
 // Si el 3003 no serveix `src/` (un `preview` de `dist/`), la importacio falla i
 // la classe surt com a `?`: la resta de la mesura continua valent.
@@ -130,9 +134,9 @@ const CLASSE_JS = `(async () => {
       : d.isLandscapeTablet ? 'tauleta apaissada'
       : d.isDesktop ? 'escriptori'
       : 'SENSE CLASSE';
-    return { classe };
+    return { classe, offsetEsperat: m.headerHeightFor(d) };
   } catch (e) {
-    return { classe: '?' };
+    return { classe: '?', offsetEsperat: null };
   }
 })()`;
 
@@ -166,10 +170,10 @@ for (const f of FORMATS) {
   const n = rutes['/nova/inici'];
   // La classe no depen de la ruta: es llegeix una vegada per format, amb la
   // finestra ja muntada i el React pintat.
-  const { classe } = await page.evaluate(CLASSE_JS);
+  const { classe, offsetEsperat } = await page.evaluate(CLASSE_JS);
   const senseCistell = a.cistellCapcalera === 0 && a.barraInferior === 0;
   files.push({
-    ...f, alcadaFinestra, classe,
+    ...f, alcadaFinestra, classe, offsetEsperat,
     offset: a.offset, capcalera: a.capcalera, segona: a.segona,
     icones: a.iconesCapcalera, cistellCap: a.cistellCapcalera, barra: a.barraInferior,
     zonaNova: n.zona, desborda: a.desborda || n.desborda,
@@ -210,12 +214,17 @@ const senseClasse = files.filter((f) => f.classe === 'SENSE CLASSE');
 console.log(`\nSENSE CLASSE DE DISPOSITIU (${senseClasse.length} formats):`);
 for (const f of senseClasse) console.log(`  - ${f.nom}  (${f.w}x${f.alcadaFinestra})`);
 
-// La classe i l'offset de capcalera han de dir el mateix: nomes la tauleta
-// vertical en fa 123. Si divergissim, hi hauria dues classificacions al codi.
-const incoherents = files.filter((f) => f.classe !== '?' && (f.classe === 'tauleta vertical') !== (f.offset === 123));
+// La classe i l'offset de capcalera han de dir el mateix, I L'OFFSET ESPERAT
+// SURT DEL MODEL (no d'un numero escrit aqui, que caduca). Si divergissin, hi
+// hauria dues classificacions al codi.
+const incoherents = files.filter((f) => (
+  f.classe !== '?'
+  && Number.isFinite(f.offsetEsperat)
+  && f.offset !== f.offsetEsperat
+));
 if (incoherents.length) {
   console.log(`\nLA CLASSE I L'OFFSET NO DIUEN EL MATEIX (${incoherents.length}):`);
-  for (const f of incoherents) console.log(`  - ${f.nom}: classe ${f.classe}, offset ${f.offset}`);
+  for (const f of incoherents) console.log(`  - ${f.nom}: classe ${f.classe}, offset ${f.offset}, el model en diu ${f.offsetEsperat}`);
 }
 
 const desborden = files.filter((f) => f.desborda);
