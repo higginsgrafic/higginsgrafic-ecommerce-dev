@@ -153,7 +153,6 @@ function MegaStripePanelP1({
   stripeEmptyMaskSrc,
   calibrationOverrides,
   compactLandscape = false,
-  fitAlcada = 1,
   onP1ContentBottomChange,
   onPageLiftChange,
   isPortraitTablet = false,
@@ -222,7 +221,7 @@ function MegaStripePanelP1({
         }
         onPageLiftChange?.(0);
       } else if (selector) {
-        // L'objectiu del pageLift és una funció pura (midesMegaslide.js): el
+        // L'objectiu del pageLift és una funció pura (utils/mesuraMegaslide.js): el
         // càlcul vivia aquí dins de l'efecte i no es podia comprovar sense
         // navegador. La fórmula és la mateixa.
         const selectorTop = selector.getBoundingClientRect().top;
@@ -355,10 +354,7 @@ function MegaStripePanelP1({
             // A la franja estreta (768-1366) la pàgina ja té els seus propis
             // ajustos de 10 px i l'ajust general no s'hi ha d'aplicar.
             marginTop: compactLandscape ? '16px' : `${stripeRowPadPx}px`,
-            // El coixí de sota tambe s'ajusta a l'alcada de la finestra (vegeu
-            // fitAlcada a MegaMenuPanel): si no, la franja s'encongiria pero el
-            // panell no. Ha de coincidir amb MegaStripePanel (pàgina 2).
-            paddingBottom: compactLandscape ? '8px' : `${stripeRowPadPx * fitAlcada}px`,
+            paddingBottom: compactLandscape ? '8px' : `${stripeRowPadPx}px`,
             paddingLeft: `${stripeRowPadXPx?.left || 0}px`,
             paddingRight: `${stripeRowPadXPx?.right || 0}px`,
             // La franja estreta (768-1366) no ha de pujar: el belt s'ha
@@ -447,16 +443,16 @@ function MegaStripePanelP1({
                   // A l'apaisada pugem la stripe 10px (les samarretes). El
                   // desplaçament va amb la resta de la seva posicio, que ve de
                   // les variables de calibracio.
-                  // La franja s'ajusta tambe a l'alcada de la finestra (fitAlcada):
-                  // en una finestra curta, la seva mida de disseny no hi cap i es
-                  // menja el panell. MegaStripePanel (pagina 2) fa el mateix.
+                  // La franja NO s'ajusta a l'alcada de la finestra: fa el carril
+                  // SEMPRE (vegeu MegaMenuPanel). Ha de coincidir amb
+                  // MegaStripePanel (pagina 2).
                   // El desplaçament (i la resta de la posició) ve de les
                   // variables de calibracio i NO s'escala: el `translate` va
                   // abans de l'`scale`, o sigui en px del pare. El que s'escala
                   // es la mida de la filera (`stripePreviewHPx`), i l'escala que
                   // la porta al carril la calcula `useEscalaFranjaCarril` (les
                   // manigues hi queden a fora, a la mida del dibuix).
-                  transform: `translate(var(--megaStripeDx, 0px), calc(var(--megaStripeDy, 0px) + ${(typeof window !== 'undefined' && window.innerWidth >= 768 && window.innerWidth <= 1366 && window.innerWidth >= window.innerHeight) ? -10 : 0}px + ${desplacamentFranjaEscriptori({ ample: typeof window !== 'undefined' ? window.innerWidth : 0, alt: typeof window !== 'undefined' ? window.innerHeight : 0, esTauleta: isPortraitTablet || isLandscapeTablet })}px)) scale(calc(var(--megaStripeScale, 1.2125) * ${factorCarrilFranja} * ${fitAlcada}))`,
+                  transform: `translate(var(--megaStripeDx, 0px), calc(var(--megaStripeDy, 0px) + ${(typeof window !== 'undefined' && window.innerWidth >= 768 && window.innerWidth <= 1366 && window.innerWidth >= window.innerHeight) ? -10 : 0}px + ${desplacamentFranjaEscriptori({ ample: typeof window !== 'undefined' ? window.innerWidth : 0, alt: typeof window !== 'undefined' ? window.innerHeight : 0, esTauleta: isPortraitTablet || isLandscapeTablet })}px)) scale(calc(var(--megaStripeScale, 1.2125) * ${factorCarrilFranja}))`,
                   isolation: 'isolate',
                 }}
               >

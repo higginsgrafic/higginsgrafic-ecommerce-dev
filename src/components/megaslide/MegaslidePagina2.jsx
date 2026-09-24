@@ -51,7 +51,6 @@ export default function MegaslidePagina2({
   page1MegaTileSize,
   page1StripePreviewHPx,
   page1PageLift = 0,
-  fitAlcada = 1,
   resolvedMegaFiltered,
   showStripe,
   stripeOverlayLoadState,
@@ -129,7 +128,7 @@ export default function MegaslidePagina2({
     && window.innerWidth >= window.innerHeight;
   const topGraellaColors = 40 - (esBandaEstreta ? 38 : 0);
   // Desplaçament de la franja a l'escriptori, per repartir el marge afegit a
-  // l'alçada de la pestanya (vegeu midesMegaslide.js). Va tambe a la franja de
+  // l'alçada de la pestanya (vegeu utils/mesuraMegaslide.js). Va tambe a la franja de
   // la pagina 1, amb el mateix valor, perque han de quedar a la mateixa alçada.
   const desplacamentFranja = desplacamentFranjaEscriptori({
     ample: typeof window !== 'undefined' ? window.innerWidth : 0,
@@ -391,7 +390,6 @@ export default function MegaslidePagina2({
     stripeRowPadPx: stripeRowPadPx,
     stripeRowPadXPx: stripeRowPadXPx,
     stripePreviewHPx: compactStripePreviewHPx,
-    fitAlcada: fitAlcada,
     stripeOverlayLoadState: stripeOverlayLoadState,
     resolvedOverlaySrc: resolvedOverlaySrc,
     stripeOverlayDebug: stripeOverlayDebug,
