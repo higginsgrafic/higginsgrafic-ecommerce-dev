@@ -529,6 +529,7 @@ export default function MegaslidePagina2({
         }}>
           <CercadorTextRow
             compact
+            midaSelector={bnSliderSize}
             // La filera arrenca 10 px a la dreta del selector: els blocs de la
             // composicio son [selector] 10 [graella de dibuixos i colors] 10
             // [columna de colleccions]. I com que el selector ara fa la MEITAT

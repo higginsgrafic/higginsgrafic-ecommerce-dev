@@ -350,6 +350,9 @@ export function CercadorDibuixosGraella({
   isPortraitTablet = false,
   isLandscapeTablet = false,
   fontBoost = 0,
+  // L'amplada de la columna del selector Blanc/Color/Negre, en unitats del
+  // carril: les fletxes del carrusel fan el mateix bloc que el selector.
+  midaSelector = 56,
 }) {
   // Amb `dibuixPx` les caselles tenen mida fixa (la filera de la pagina 2);
   // sense (`dibuixPx` nul) la graella S'EXPANDEIX per omplir tota la superficie
@@ -540,8 +543,22 @@ export function CercadorDibuixosGraella({
           {items.map(pintaItem)}
         </div>
         {ambFletxes ? (
-          <div style={{ position: 'absolute', right: 0, top: '50%', transform: 'translateY(-50%)', width: carrilPx(56), zIndex: 5 }}>
+          // LES FLETXES, DE LA MIDA DEL SELECTOR (24/09/2026). El selector
+          // Blanc/Color/Negre fa `carrilPx(midaSelector / 2)` d'amplada i el
+          // doble d'alçada (`aspect-[1/2]`), o sigui `carrilPx(midaSelector)`
+          // de alt. La botonera de fletxes fa exactament el mateix bloc, amb
+          // una fletxa a dalt i l'altra a baix (`vertical`).
+          <div style={{
+            position: 'absolute',
+            right: 0,
+            top: '50%',
+            transform: 'translateY(-50%)',
+            width: carrilPx(midaSelector / 2),
+            height: carrilPx(midaSelector),
+            zIndex: 5,
+          }}>
             <FirstContactDibuix09Buttons
+              vertical
               onPrev={() => setDesplac((v) => frena(v - unaPagina()))}
               onNext={() => setDesplac((v) => frena(v + unaPagina()))}
             />
@@ -792,7 +809,7 @@ export function CercadorColleccionsColumna({
   );
 }
 
-function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripeItem, hoveredStripeItem, onSelectGroup, onHoverItem, onHoverLeave, compact = false, selectedColor = 'white', onSelectColor, onSelectCollection, isPortraitTablet = false, isLandscapeTablet = false, fontBoost = 0, desplacamentVertical = 0, esquerra }) {
+function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripeItem, hoveredStripeItem, onSelectGroup, onHoverItem, onHoverLeave, compact = false, selectedColor = 'white', onSelectColor, onSelectCollection, isPortraitTablet = false, isLandscapeTablet = false, fontBoost = 0, desplacamentVertical = 0, esquerra, midaSelector = 56 }) {
   // Ajust de la graella compacta a l'espai disponible (només desktop: les
   // tauletes mantenen la mida fixa de moment). Mesurem l'amplada de la columna
   // i el capdamunt de la franja de samarretes, i guardem la mida de dibuix i
@@ -977,6 +994,7 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
           gapH={gapH}
           gapV={gapV}
           numColumns={numColumns}
+          midaSelector={midaSelector}
           carrusel
           activeCollection={activeCollection}
           activeSubcollection={activeSubcollection}
