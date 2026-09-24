@@ -203,6 +203,11 @@ export function computeLayoutModel({
   return {
     ...layout,
     headerHeight: alcadaCapcalera,
+    // L'ALÇADA DE LA FILA DEL LOGO (la primera de les dues de la vertical). La
+    // fa servir l'overlay de l'administració, que va ancorat a la punta esquerra
+    // del header i s'ha de centrar amb AQUESTA fila, no amb el header sencer
+    // (a la vertical el header tambe conte el megaslide).
+    filaCapcaleraPx: ALCADA_CAPCALERA_ESCRIPTORI,
     appHeaderOffset: `${offsetCapcalera}px`,
     globalHeaderTopOffset: `${offsetGlobal}px`,
     rulerInset: `${rulerInsetPx}px`,
@@ -222,6 +227,7 @@ export function publishLayoutModel(model) {
     root.style.setProperty('--appHeaderOffset', model.appHeaderOffset);
     root.style.setProperty('--globalHeaderTopOffset', model.globalHeaderTopOffset);
     root.style.setProperty('--rulerInset', model.rulerInset);
+    if (model.filaCapcaleraPx) root.style.setProperty('--capcalera-fila', `${model.filaCapcaleraPx}px`);
   } catch {
     // ignore
   }

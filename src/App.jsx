@@ -246,8 +246,12 @@ function App() {
       document.documentElement.style.setProperty('--appHeaderOffset', nextOffset);
       document.documentElement.style.setProperty('--globalHeaderTopOffset', globalHeaderTopOffset);
       document.documentElement.style.setProperty('--rulerInset', `${rulerInset}px`);
+      // L'alcada de la FILA del logo: la fa servir l'overlay de l'administracio,
+      // que va a la punta esquerra del header i s'ha de centrar amb la fila (no
+      // amb el header sencer: a la vertical tambe conte el megaslide).
+      document.documentElement.style.setProperty('--capcalera-fila', `${layoutModel.filaCapcaleraPx}px`);
     } catch { /* ignore */ }
-  }, [adminBannerHeight, adminRouteOffset, appHeaderOffset, baseHeaderHeight, demoHeaderOffset, globalHeaderTopOffset, isAdminRoute, isDemoStyleLayoutRoute, isFullScreenRoute, isLargeScreen, rulerInset]);
+  }, [adminBannerHeight, adminRouteOffset, appHeaderOffset, baseHeaderHeight, demoHeaderOffset, globalHeaderTopOffset, isAdminRoute, isDemoStyleLayoutRoute, isFullScreenRoute, isLargeScreen, layoutModel.filaCapcaleraPx, rulerInset]);
 
   return (
     <ErrorBoundary>
