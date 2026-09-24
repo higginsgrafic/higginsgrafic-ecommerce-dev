@@ -277,17 +277,22 @@ export const SHIRT_DRAWING_OVERLAY_DEFAULTS = { dx: 0.5, dy: 22.5, scale: 0.38 }
 export const STRIPE_DRAWING_OVERLAY_DEFAULTS = { dx: 0.5, dy: 28.75, scale: 0.31 };
 
 /**
- * La filera de cossos de les 14 samarretes de la franja, dins de la seva
- * imatge. Mesurat amb la tinta sobre
- * `/placeholders/cercador/full-white-stripe.webp` (2866x307): a la filera del
- * baix (y=246) el primer cos comenca al px 65 i l'ultim acaba al 2804, o sigui
- * 2740 px dels 2866 de la imatge. La filera mes ampla es la de les manigues
- * (y~76), que hi arriba del 4 al 2861: cada maniga surt 59 px naturals mes
- * enlla del seu cos.
+ * La CINTURA de les 14 samarretes de la franja, dins de la seva imatge:
+ * la filera que ha de coincidir amb les vores del carril.
  *
- * Serveix per escalar la franja: si la filera de cossos fa exactament
- * l'amplada del carril, les manigues hi surten a fora tot just el que han de
- * sortir. Ho aplica `useEscalaFranjaCarril`.
+ * Mesurat amb la tinta sobre `/placeholders/cercador/full-white-stripe.webp`
+ * (2866x307). Les vores dels cossos son VERTICALS del 44% de l'alçada cap
+ * avall: la filera del baix (y=246) dona 65..2804 i la de la cintura (y=150)
+ * dona 64..2804, o sigui el mateix (2740 dels 2866). Per aixo cintura i baix
+ * son la mateixa mesura, i la franja s'encaixa per les cintures de les
+ * samarretes dels extrems: la cintura de la primera cau a la vora esquerra del
+ * carril i la de l'ultima a la dreta.
+ *
+ * La filera mes ampla es la de les manigues (y~76), que hi arriba del 4 al
+ * 2861: les manigues surten 59 px naturals (24,7 a 1920) mes enlla de la vora
+ * del carril, que es el que es vol: travessen la frontera.
+ *
+ * Ho aplica `useEscalaFranjaCarril`.
  */
 export const FRACCIO_COSSOS_FRANJA = 2740 / 2866;
 
