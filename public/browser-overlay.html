@@ -6,401 +6,982 @@
 <title>Overlay Navegador - Higgins</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --fons: #12121c;
+    --fons2: #1a1a28;
+    --fons3: #24243a;
+    --vora: #33334d;
+    --text: #e8e8f0;
+    --text2: #9a9ab0;
+    --accent: #ff0040;
+    --marc: 260px;
+  }
   body {
-    background: #1a1a2e;
-    color: #fff;
+    background: var(--fons);
+    color: var(--text);
     font-family: -apple-system, system-ui, sans-serif;
-    overflow: hidden;
+    font-size: 13px;
     height: 100vh;
-  }
-  .toolbar {
-    position: fixed;
-    top: 0; left: 0; right: 0;
-    background: #0f0f1e;
-    padding: 10px 16px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    z-index: 1000;
-    border-bottom: 1px solid #333;
-  }
-  .toolbar h1 { font-size: 14px; margin-right: 8px; white-space: nowrap; }
-  .toolbar button {
-    background: #1a1a3e;
-    color: #fff;
-    border: 1px solid #444;
-    border-radius: 6px;
-    padding: 6px 12px;
-    font-size: 13px;
-    cursor: pointer;
-  }
-  .toolbar button:hover { background: #2a2a5e; }
-  .toolbar .escala {
-    display: flex; align-items: center; gap: 6px; font-size: 13px;
-    background: #1a1a3e; border: 1px solid #444; border-radius: 6px; padding: 6px 10px;
-    cursor: pointer; user-select: none;
-  }
-  .toolbar .escala input { cursor: pointer; }
-  .toolbar .info {
-    font-size: 11px;
-    color: #888;
-    margin-left: auto;
-    text-align: right;
-    line-height: 1.4;
+    overflow: hidden;
+    display: grid;
+    grid-template-columns: var(--marc) 1fr;
+    grid-template-rows: auto auto 1fr;
+    grid-template-areas:
+      "marca    barra"
+      "marca    pestanyes"
+      "panell   tauler";
   }
 
-  /* LES PESTANYES. Una per format, i totes les que s'han obert es queden
-     carregades: canviar de pestanya no torna a carregar res. */
-  .tabs {
-    position: fixed;
-    top: 48px; left: 0; right: 0;
-    background: #12122a;
-    display: flex;
-    align-items: stretch;
-    gap: 2px;
-    padding: 0 8px;
-    z-index: 999;
-    border-bottom: 1px solid #333;
-    overflow-x: auto;
-    overflow-y: hidden;
+  /* ── BARRA DE DALT ─────────────────────────────────────────────── */
+  .barra {
+    grid-area: barra;
+    display: flex; align-items: center; gap: 8px;
+    padding: 8px 12px;
+    background: var(--fons2);
+    border-bottom: 1px solid var(--vora);
+    flex-wrap: wrap;
   }
-  .tabs button {
-    background: transparent;
-    color: #99a;
-    border: none;
-    border-bottom: 2px solid transparent;
-    padding: 9px 12px;
-    font-size: 12.5px;
-    font-family: inherit;
-    cursor: pointer;
-    white-space: nowrap;
+  .barra .titol { font-weight: 700; letter-spacing: .02em; margin-right: 4px; }
+  button, select, input[type="text"] {
+    font-family: inherit; font-size: 12.5px; color: var(--text);
+    background: var(--fons3); border: 1px solid var(--vora);
+    border-radius: 6px; padding: 6px 10px; cursor: pointer;
   }
-  .tabs button:hover { color: #dde; background: #1a1a3e; }
-  .tabs button.actiu { color: #fff; border-bottom-color: #ff0040; }
-  .tabs button .mida { color: #667; font-size: 11px; margin-left: 6px; }
-  .tabs button.actiu .mida { color: #99a; }
+  button:hover { background: #2f2f4a; }
+  button:disabled { opacity: .4; cursor: default; }
+  button.actiu { background: var(--accent); border-color: var(--accent); color: #fff; }
+  input[type="text"] { cursor: text; width: 150px; }
+  .grup-control { display: flex; align-items: center; gap: 0; }
+  .grup-control button { border-radius: 0; }
+  .grup-control button:first-child { border-radius: 6px 0 0 6px; }
+  .grup-control button:last-child { border-radius: 0 6px 6px 0; }
+  .zoom-num { min-width: 62px; text-align: center; background: var(--fons3); border: 1px solid var(--vora); border-left: none; border-right: none; padding: 6px 4px; }
+  .ajuda { color: var(--text2); font-size: 11.5px; margin-left: auto; text-align: right; }
+  .sostre { display: flex; align-items: center; gap: 6px; color: var(--text2); font-size: 12px; }
+  .sostre select { padding: 5px 6px; }
 
-  .stage {
-    position: fixed;
-    top: 84px; left: 0; right: 0; bottom: 0;
-    display: flex;
-    align-items: flex-start;
-    justify-content: center;
-    overflow: auto;
-    background: #111;
-    padding: 20px;
+  /* ── PESTANYES ─────────────────────────────────────────────────── */
+  .pestanyes {
+    grid-area: pestanyes;
+    display: flex; align-items: stretch; gap: 2px;
+    padding: 0 8px; background: #10101a;
+    border-bottom: 1px solid var(--vora);
+    overflow-x: auto; overflow-y: hidden;
   }
-  .device-frame {
-    position: relative;
-    box-shadow: 0 8px 40px rgba(0,0,0,0.5);
-    flex: 0 0 auto;
+  .pestanyes .pestanya {
+    display: flex; align-items: center; gap: 6px;
+    background: transparent; border: none; border-bottom: 2px solid transparent;
+    border-radius: 0; padding: 8px 10px; color: var(--text2); white-space: nowrap;
   }
-  .device-frame iframe {
-    position: absolute;
-    border: none;
-    background: #fff;
+  .pestanyes .pestanya:hover { color: var(--text); background: var(--fons3); }
+  .pestanyes .pestanya.activa { color: #fff; border-bottom-color: var(--accent); }
+  .pestanyes .pestanya .compta { font-size: 11px; color: var(--text2); }
+  .pestanyes .pestanya .tanca { color: var(--text2); padding: 0 2px; border-radius: 3px; }
+  .pestanyes .pestanya .tanca:hover { background: var(--accent); color: #fff; }
+  .pestanyes .nova { color: var(--text2); font-size: 16px; padding: 4px 12px; }
+
+  /* ── MARCA (esquerra) ──────────────────────────────────────────── */
+  .marca {
+    grid-area: marca;
+    background: var(--fons2);
+    border-right: 1px solid var(--vora);
+    padding: 10px 12px;
+    display: flex; flex-direction: column; gap: 2px;
+    overflow: hidden;
   }
-  .device-frame .browser-overlay {
-    position: absolute;
-    top: 0; left: 0;
-    pointer-events: none;
-    z-index: 10;
+  .marca h1 { font-size: 13px; font-weight: 700; letter-spacing: .02em; }
+  .marca .sub { color: var(--text2); font-size: 11px; margin-bottom: 6px; }
+
+  /* ── PANELL: L'ACORDIÓ ─────────────────────────────────────────── */
+  .panell { grid-area: panell; overflow-y: auto; padding: 6px 0 40px; background: var(--fons2); border-right: 1px solid var(--vora); }
+  .grup { border-bottom: 1px solid var(--vora); }
+  .grup > .capçalera {
+    display: flex; align-items: center; gap: 8px; width: 100%;
+    background: transparent; border: none; border-radius: 0;
+    padding: 9px 12px; text-align: left; color: var(--text);
   }
-  .device-frame .viewport-marker {
-    position: absolute;
-    left: 0; right: 0;
-    height: 2px;
-    background: #ff0040;
-    z-index: 11;
-    pointer-events: none;
+  .grup > .capçalera:hover { background: var(--fons3); }
+  .grup > .capçalera .fletxa { transition: transform .15s; color: var(--text2); }
+  .grup.obert > .capçalera .fletxa { transform: rotate(90deg); }
+  .grup > .capçalera .compta { margin-left: auto; color: var(--text2); font-size: 11px; }
+  .grup .llista { display: none; padding: 2px 8px 8px 8px; }
+  .grup.obert .llista { display: block; }
+  .opcio {
+    display: flex; align-items: center; gap: 8px;
+    padding: 5px 6px; border-radius: 5px; cursor: pointer;
   }
-  .device-frame .viewport-marker.bottom { bottom: 0; }
-  .red-line { background: #ff0040; }
-  /* El vel de carrega. La pagina triga uns segons a pintar i, sense aixo,
-     el marc surt blanc i sembla que estigui espatllat. */
-  .device-frame .carregant {
-    position: absolute;
-    inset: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: #fff;
-    color: #888;
-    font-size: 13px;
-    z-index: 12;
+  .opcio:hover { background: var(--fons3); }
+  .opcio input { accent-color: var(--accent); cursor: pointer; }
+  .opcio .nom { flex: 1; }
+  .opcio .mida { color: var(--text2); font-size: 11px; font-variant-numeric: tabular-nums; }
+  .opcio .ulls { color: var(--text2); font-size: 12px; padding: 0 2px; border-radius: 3px; }
+  .opcio .ulls:hover { background: var(--accent); color: #fff; }
+  .accions-grup { display: flex; gap: 6px; padding: 4px 6px 2px; }
+  .accions-grup button { padding: 3px 7px; font-size: 11px; }
+
+  /* ── TAULER ────────────────────────────────────────────────────── */
+  .tauler { grid-area: tauler; overflow: auto; position: relative; background: #0d0d14; }
+  .full { position: relative; }
+  .llenç { position: absolute; top: 0; left: 0; transform-origin: 0 0; }
+
+  .marc { position: absolute; }
+  /* L'etiqueta va DINS del marc, a la cantonada de baix a l'esquerra. Fora (a
+     sobre) no hi cap quan el zoom es baix: la separacio entre fileres es en
+     pixels de dispositiu i s'encongeix amb el zoom, i l'etiqueta no. */
+  .marc .etiqueta {
+    position: absolute; left: 0; bottom: 0; z-index: 14;
+    display: flex; align-items: center; gap: 8px; white-space: nowrap;
+    background: rgba(12, 12, 20, .84); color: #fff;
+    padding: 3px 8px; border-radius: 0 5px 0 0;
+    /* Contra-escalat: el llenç va escalat amb el zoom, i l'etiqueta no ha de
+       quedar de 3 px quan mires tots els formats alhora. */
+    transform: scale(var(--inv, 1));
+    transform-origin: left bottom;
   }
-  .device-frame.carregat .carregant { display: none; }
+  .marc .etiqueta { overflow: hidden; }
+  .marc .etiqueta .nom { font-weight: 600; overflow: hidden; text-overflow: ellipsis; }
+  .marc .etiqueta .mida { color: #b9b9cc; font-variant-numeric: tabular-nums; }
+  .marc .etiqueta .estat { color: #b9b9cc; }
+  .marc .etiqueta button {
+    padding: 1px 6px; font-size: 11px;
+    background: rgba(255,255,255,.14); border-color: transparent; color: #fff;
+  }
+  .marc .etiqueta button:hover { background: var(--accent); }
+  .marc .caixa { position: relative; background: #fff; box-shadow: 0 6px 30px rgba(0,0,0,.55); }
+  .marc .finestra { position: absolute; top: 0; left: 0; border: none; background: #fff; }
+  .marc .barra-navegador { position: absolute; top: 0; left: 0; pointer-events: none; z-index: 10; }
+  .marc .falsa-barra {
+    position: absolute; top: 0; left: 0; right: 0; z-index: 10; pointer-events: none;
+    background: repeating-linear-gradient(135deg, #dcdce4, #dcdce4 6px, #cfcfda 6px, #cfcfda 12px);
+    border-bottom: 1px solid #b9b9c6;
+    display: flex; align-items: center; justify-content: center;
+    color: #55555f; font-size: 10px; letter-spacing: .04em;
+  }
+  .marc .carregant {
+    position: absolute; inset: 0; z-index: 12;
+    display: flex; align-items: center; justify-content: center;
+    background: #fff; color: #888; font-size: 13px;
+  }
+  .marc.carregat .carregant { display: none; }
+  .marc .sens-visita {
+    position: absolute; inset: 0; z-index: 12;
+    display: flex; align-items: center; justify-content: center;
+    background: #f4f4f7; color: #55555f; text-align: center;
+  }
+  .marc .sens-visita .contingut {
+    display: flex; flex-direction: column; align-items: center; gap: 10px;
+    transform: scale(var(--inv, 1));
+  }
+  .marc .sens-visita button { font-size: 12px; }
+  .etiqueta-grup {
+    position: absolute; z-index: 14; color: #d8d8e8; font-size: 12px; letter-spacing: .08em; text-transform: uppercase;
+    background: rgba(12, 12, 20, .88); padding: 2px 9px; border-radius: 5px;
+    transform: scale(var(--inv, 1)); transform-origin: left top;
+  }
 </style>
 </head>
 <body>
 
-<div class="toolbar">
+<div class="marca">
   <h1>Overlay Navegador</h1>
-  <button id="reload">Recarregar</button>
-  <button id="toggle-overlay">Amaga/Mostra navegador</button>
-  <label class="escala" title="Veure el dispositiu a mida real, sense escalar">
-    <input type="checkbox" id="escala1" /> 1:1
-  </label>
-  <span class="info" id="info"></span>
+  <div class="sub">Marca formats a l'acordió per obrir-los a la pestanya activa. Doble clic en un marc per carregar-lo. Les vistes són a escala real: el zoom només mira.</div>
 </div>
 
-<div class="tabs" id="tabs"></div>
-<div class="stage" id="stage"></div>
+<div class="barra">
+  <span class="titol">Pestanya:</span>
+  <input type="text" id="nom-pestanya" title="Nom de la pestanya">
+  <span class="titol">Ruta:</span>
+  <input type="text" id="ruta" title="Ruta que es carrega a tots els marcs">
+  <div class="grup-control">
+    <button id="zoom-menys" title="Allunyar">−</button>
+    <span class="zoom-num" id="zoom-num">100%</span>
+    <button id="zoom-mes" title="Apropar">+</button>
+  </div>
+  <button id="zoom-1" title="Escala real (100%)">1:1</button>
+  <button id="ajusta-ample" title="Ajustar a l'amplada de la finestra">↔ ample</button>
+  <button id="ajusta-alt" title="Ajustar a l'alçada de la finestra">↕ alt</button>
+  <button id="ajusta-tot" title="Ajustar-ho tot">⤢ tot</button>
+  <select id="ordre" title="Com s'organitzen els formats">
+    <option value="lliure">Lliure (flux)</option>
+    <option value="graella">Graella</option>
+    <option value="mida">Per mida</option>
+    <option value="files">Files per grup</option>
+    <option value="columnes">Columnes per grup</option>
+    <option value="horitzontal">Una filera</option>
+    <option value="vertical">Una columna</option>
+  </select>
+  <button id="global" title="Veure tots els formats alhora">Vista global</button>
+  <button id="recarrega" title="Recarregar els marcs vius">Recarregar</button>
+  <button id="navegador" title="Mostrar o amagar el dibuix del navegador">Navegador</button>
+  <label class="sostre" title="Quantes vistes vives alhora. Cada vista es una aplicació sencera carregada: més vistes, més memoria.">vives
+    <select id="sostre">
+      <option value="4">4</option>
+      <option value="8">8</option>
+      <option value="12">12</option>
+      <option value="15">15</option>
+      <option value="99">totes</option>
+    </select>
+  </label>
+  <span class="ajuda" id="ajuda"></span>
+</div>
+
+<div class="pestanyes" id="pestanyes"></div>
+<div class="panell" id="panell"></div>
+<div class="tauler" id="tauler"><div class="full" id="full"><div class="llenç" id="llenç"></div></div></div>
 
 <script>
-/**
- * ELS FORMATS.
- *
- * `chromeTop`/`chromeBottom` son els pixels que el navegador es menja de la
- * pantalla, i son el que governa la finestra que rep la pagina:
- *
- *     finestra = alcada de la pantalla - chromeTop - chromeBottom
- *
- * La `img` es nomes el dibuix del navegador, i per aixo cada format te la seva:
- * la barra d'un navegador no s'encongeix amb la finestra, i estirar la captura
- * d'una altra mida la deformaria.
- *
- * `scale` es com es veu per defecte; la casella `1:1` el posa a 1.
- */
-const FORMATS = {
-  'desktop': {
-    img: '/browser-frames/desktop-chrome.webp',
-    w: 1920, h: 1080,
-    chromeTop: 134, chromeBottom: 0,
-    scale: 0.5,
-    label: 'Chrome · finestra 1920x946'
-  },
-  'desktop-1440': {
-    img: '/browser-frames/desktop-chrome-1440x900.webp',
-    w: 1440, h: 900,
-    chromeTop: 134, chromeBottom: 0,
-    scale: 0.75,
-    label: 'Chrome · finestra 1440x766'
-  },
-  'desktop-1366': {
-    img: '/browser-frames/desktop-chrome-1366x768.webp',
-    w: 1366, h: 768,
-    chromeTop: 134, chromeBottom: 0,
-    scale: 0.8,
-    label: 'Chrome · finestra 1366x634'
-  },
-  'desktop-1280': {
-    img: '/browser-frames/desktop-chrome-1280x720.webp',
-    w: 1280, h: 720,
-    chromeTop: 134, chromeBottom: 0,
-    scale: 0.85,
-    label: 'Chrome · finestra 1280x586'
-  },
-  'tablet-landscape': {
-    img: '/browser-frames/tablet-landscape-safari.webp',
-    w: 1024, h: 768,
-    chromeTop: 78, chromeBottom: 0,
-    scale: 0.75,
-    label: 'Safari · finestra 1024x690'
-  },
-  'tablet-portrait': {
-    img: '/browser-frames/tablet-portrait-safari.webp',
-    w: 768, h: 1024,
-    chromeTop: 72, chromeBottom: 0,
-    scale: 0.65,
-    label: 'Safari · finestra 768x952'
-  },
-  'mobile-portrait': {
-    img: '/browser-frames/mobile-portrait-safari.webp',
-    w: 390, h: 844,
-    chromeTop: 88, chromeBottom: 44,
-    scale: 0.85,
-    label: 'Safari · finestra 390x712'
-  },
-  'mobile-landscape': {
-    img: '/browser-frames/mobile-landscape-safari.webp',
-    w: 844, h: 390,
-    chromeTop: 50, chromeBottom: 0,
-    scale: 0.75,
-    label: 'Safari · finestra 844x340'
-  },
-  'pwa': {
-    img: '/browser-frames/pwa-standalone.webp',
-    w: 390, h: 844,
-    chromeTop: 14, chromeBottom: 0,
-    scale: 0.85,
-    label: 'PWA · finestra 390x830'
-  },
-};
+/* ═══════════════════════════════════════════════════════════════════════════
+   OVERLAY DE FORMATS
 
-// La pagina que es carrega a dins. Es pot canviar amb `?ruta=/nova/inici`.
-const RUTA = (() => {
-  const sp = new URLSearchParams(window.location.search);
-  const r = (sp.get('ruta') || '/').trim();
-  return r.startsWith('/') ? r : '/' + r;
-})();
+   Que es aixo
+   -----------
+   Una eina per mirar la web en tots els formats alhora, amb iframes de debò.
 
-const ELS_NOMS = {
-  'desktop': 'Escriptori',
-  'desktop-1440': 'Portàtil 1440',
-  'desktop-1366': 'Portàtil 1366',
-  'desktop-1280': 'Portàtil 1280',
-  'tablet-landscape': 'Tauleta apaïsada',
-  'tablet-portrait': 'Tauleta vertical',
-  'mobile-portrait': 'Mòbil vertical',
-  'mobile-landscape': 'Mòbil apaïsat',
-  'pwa': 'PWA',
-};
+   LES VISTES SON A ESCALA REAL. Cada marc es un iframe de la mida exacta del
+   dispositiu (1920x1080, 744x1133...), i no s'encongeix mai per si sol. El
+   `zoom` es un transform sobre el LLENÇ sencer: mira de mes lluny o de mes a
+   prop, pero la pagina de dins sempre rep la seva mida de veritat. Aixo vol
+   dir que les media queries, `100vh` i el que el navegador calcula son reals.
 
-const stage = document.getElementById('stage');
-const tabs = document.getElementById('tabs');
-const info = document.getElementById('info');
-const escala1 = document.getElementById('escala1');
+   LES PESTANYES SON INDEPENDENTS. Cada una te els seus formats, el seu zoom, el
+   seu ajust, la seva ordenacio, la seva ruta i la seva posicio de scroll. Els
+   marcs d'una pestanya es QUEDEN MUNTATS quan canvies a una altra (per allo
+   cada pestanya te el seu selector de ruta i no es recarrega res en tornar).
 
-let overlayVisible = true;
-/**
- * L'ESCALA ES RECORDA ENTRE REFRESCOS.
- *
- * Es una preferencia de treball, no un estat de la sessio: qui treballa a mida
- * real hi treballa tota l'estona, i haver-la de tornar a marcar a cada
- * recarrega es una molestia. Es desa al `localStorage` del propi overlay (es
- * una pagina de `/public`, no te res a veure amb l'aplicacio).
- */
-const CLAU_ESCALA = 'hg-overlay-escala-1a1';
-const escalaDesada = (() => {
-  try { return localStorage.getItem(CLAU_ESCALA) === '1'; } catch { return false; }
-})();
-let escalaUn = escalaDesada;
-escala1.checked = escalaDesada;
+   L'ACORDIO es d'on es trien els formats: marcar-ne un l'obre a la pestanya
+   activa; desmarcar-lo el treu.
+   ═══════════════════════════════════════════════════════════════════════════ */
 
-let actiu = 'desktop';
-/** Els marcs ja muntats: `clau -> { el, iframe, overlay, top, bottom }`. */
-const muntats = new Map();
+// ── ELS FORMATS ────────────────────────────────────────────────────────────
+// `ct`/`cb` son els pixels que el navegador es menja de dalt i de baix, i el
+// que governa la finestra que rep la pagina: finestra = h - ct - cb.
+//
+// `img` es el dibuix del navegador, i nomes el tenen els formats dels quals hi
+// ha captura. Els que no en tenen porten una barra ratllada de la mateixa
+// alcada: val mes una barra honesta que una captura estirada, que deformaria
+// la barra del navegador.
+const FORMATS = [
+  { id: 'desktop',         nom: 'Escriptori 1920',            grup: 'Escriptori',       w: 1920, h: 1080, ct: 134, cb: 0,  img: '/browser-frames/desktop-chrome.webp' },
+  { id: 'desktop-1440',    nom: 'Portàtil 1440',              grup: 'Portàtil',         w: 1440, h: 900,  ct: 134, cb: 0,  img: '/browser-frames/desktop-chrome-1440x900.webp' },
+  { id: 'desktop-1366',    nom: 'Portàtil 1366',              grup: 'Portàtil',         w: 1366, h: 768,  ct: 134, cb: 0,  img: '/browser-frames/desktop-chrome-1366x768.webp' },
+  { id: 'desktop-1280',    nom: 'Portàtil 1280',              grup: 'Portàtil',         w: 1280, h: 720,  ct: 134, cb: 0,  img: '/browser-frames/desktop-chrome-1280x720.webp' },
+  { id: 'ipad-1180',       nom: 'iPad 10/11a',     grup: 'Tauleta apaïsada', w: 1180, h: 820,  ct: 78,  cb: 0,  img: null },
+  { id: 'tabs9-plus',      nom: 'Galaxy Tab S9+',  grup: 'Tauleta apaïsada', w: 1200, h: 800,  ct: 78,  cb: 0,  img: null },
+  { id: 'tablet-landscape', nom: 'Tauleta apaïsada 1024',     grup: 'Tauleta apaïsada', w: 1024, h: 768,  ct: 78,  cb: 0,  img: '/browser-frames/tablet-landscape-safari.webp' },
+  { id: 'tablet-portrait',  nom: 'Tauleta vertical 768',      grup: 'Tauleta vertical', w: 768,  h: 1024, ct: 72,  cb: 0,  img: '/browser-frames/tablet-portrait-safari.webp' },
+  { id: 'ipad-mini',       nom: 'iPad mini 6',     grup: 'Tauleta vertical', w: 744,  h: 1133, ct: 72,  cb: 0,  img: null },
+  { id: 'tabs9',           nom: 'Galaxy Tab S9',   grup: 'Tauleta vertical', w: 712,  h: 1138, ct: 72,  cb: 0,  img: null },
+  { id: 'mobile-portrait', nom: 'Mòbil vertical 390',         grup: 'Mòbil',            w: 390,  h: 844,  ct: 88,  cb: 44, img: '/browser-frames/mobile-portrait-safari.webp' },
+  { id: 'mobile-landscape', nom: 'Mòbil apaïsat 844',         grup: 'Mòbil',            w: 844,  h: 390,  ct: 50,  cb: 0,  img: '/browser-frames/mobile-landscape-safari.webp' },
+  { id: 'se-landscape',    nom: 'iPhone SE apaïsat', grup: 'Mòbil',           w: 667,  h: 375,  ct: 50,  cb: 0,  img: null },
+  { id: 'android-landscape', nom: 'Android 16:9 apaïsat', grup: 'Mòbil',      w: 640,  h: 360,  ct: 50,  cb: 0,  img: null },
+  { id: 'pwa',             nom: 'PWA 390',  grup: 'PWA',              w: 390,  h: 844,  ct: 14,  cb: 0,  img: '/browser-frames/pwa-standalone.webp' },
+];
 
-/** Posa el marc d'un format a la mida que toca, amb l'escala d'ara. */
-function aplicaMida(clau) {
-  const fmt = FORMATS[clau];
-  const m = muntats.get(clau);
-  if (!m) return;
-  const s = escalaUn ? 1 : fmt.scale;
-  const dw = fmt.w * s;
-  const dh = fmt.h * s;
-  const ct = fmt.chromeTop * s;
-  const cb = fmt.chromeBottom * s;
-  const vpH = fmt.h - fmt.chromeTop - fmt.chromeBottom;
+const GRUPS = ['Escriptori', 'Portàtil', 'Tauleta apaïsada', 'Tauleta vertical', 'Mòbil', 'PWA'];
+const PER_ID = Object.fromEntries(FORMATS.map((f) => [f.id, f]));
 
-  m.el.style.width = dw + 'px';
-  m.el.style.height = dh + 'px';
+/** Els que obre la vista global: tots, de mes gran a mes petit. */
+const TOTS = FORMATS.map((f) => f.id).sort((a, b) => PER_ID[b].w - PER_ID[a].w);
 
-  // L'iframe es renderitza a la mida REAL del dispositiu i s'escala amb un
-  // `transform`, amb l'origen a dalt a l'esquerra, i se'l desplaça cap avall
-  // els pixels de la barra perque quedi just sota seu.
-  m.iframe.style.position = 'absolute';
-  m.iframe.style.top = '0';
-  m.iframe.style.left = '0';
-  m.iframe.style.width = fmt.w + 'px';
-  m.iframe.style.height = vpH + 'px';
-  m.iframe.style.transformOrigin = '0 0';
-  m.iframe.style.transform = `scale(${s})`;
-  m.iframe.style.marginTop = ct + 'px';
+// ── ESTAT ──────────────────────────────────────────────────────────────────
+// Es desa a `localStorage` perque sobreviu als refrescos: qui te tres
+// pestanyes muntades no les vol tornar a muntar cada cop.
+const CLAU = 'hg-overlay-estat-v2';
+const MARGES = 40;          // aire que es deixa al voltant en ajustar
+const GAP = 28;             // separacio entre marcs
+const AMPLE_LLIURE = 1920;  // amplada a la qual fa el salt de linia el flux
+const DESPLACAMENT = 34;    // aire de dalt perque les etiquetes dels marcs no es tallin
 
-  m.overlay.style.width = dw + 'px';
-  m.overlay.style.height = dh + 'px';
-  m.overlay.style.display = overlayVisible ? 'block' : 'none';
-
-  m.top.style.top = ct + 'px';
-  m.top.style.display = overlayVisible ? 'block' : 'none';
-  m.bottom.style.bottom = cb + 'px';
-  m.bottom.style.display = (overlayVisible && cb > 0) ? 'block' : 'none';
+function pestanyaNova(nom, formats, extra = {}) {
+  return {
+    id: 'p' + Math.random().toString(36).slice(2, 8),
+    nom: nom || 'Pestanya',
+    formats: formats || [],
+    ajust: 'tot',      // 'tot' | 'ample' | 'alt' | null (null = zoom manual)
+    zoom: 1,
+    ordre: 'lliure',
+    ruta: '/',
+    scroll: { x: 0, y: 0 },
+    ...extra,
+  };
 }
 
-/** Munta el marc d'un format, si no ho era ja. */
-function muntat(clau) {
-  if (muntats.has(clau)) return muntats.get(clau);
-  const fmt = FORMATS[clau];
+function estatInicial() {
+  const p = pestanyaNova('Escriptori', ['desktop', 'desktop-1440']);
+  return { pestanyes: [p], activa: p.id, sostre: 8 };
+}
+
+function carrega() {
+  try {
+    const cru = localStorage.getItem(CLAU);
+    if (!cru) return null;
+    const e = JSON.parse(cru);
+    if (!e || !Array.isArray(e.pestanyes) || !e.pestanyes.length) return null;
+    // Una rutina de salvament: si un format ja no existeix, fora.
+    for (const p of e.pestanyes) p.formats = (p.formats || []).filter((id) => PER_ID[id]);
+    if (!e.pestanyes.some((p) => p.id === e.activa)) e.activa = e.pestanyes[0].id;
+    if (!e.sostre) e.sostre = 8;
+    return e;
+  } catch { return null; }
+}
+
+let estat = carrega() || estatInicial();
+
+// `?ruta=/nova/inici` posa aquesta ruta a TOTES les pestanyes. Es com s'obria
+// l'eina abans de tenir pestanyes, i continua sent la manera rapida de dir-li
+// quina pagina vols mirar.
+const RUTA_URL = (() => {
+  try {
+    const r = (new URLSearchParams(location.search).get('ruta') || '').trim();
+    return r ? (r.startsWith('/') ? r : '/' + r) : null;
+  } catch { return null; }
+})();
+if (RUTA_URL) for (const p of estat.pestanyes) p.ruta = RUTA_URL;
+let desaPendent = null;
+function desa() {
+  clearTimeout(desaPendent);
+  desaPendent = setTimeout(() => {
+    try { localStorage.setItem(CLAU, JSON.stringify(estat)); } catch { /* ignore */ }
+  }, 250);
+}
+
+const activa = () => estat.pestanyes.find((p) => p.id === estat.activa) || estat.pestanyes[0];
+const esGlobal = (p) => !!p.global;
+
+// ── ELS MARCS ──────────────────────────────────────────────────────────────
+/**
+ * Un marc per (pestanya, format). Es guarda al mapa `marCs` i NOMES es destrueix
+ * quan el format surt de la pestanya: aixi canviar de pestanya no recarrega res
+ * i cada pestanya conserva el seu scroll de dins dels iframes.
+ */
+const marcs = new Map();          // "pestanyaId|formatId" -> objecte marc
+const clau = (p, f) => p + '|' + f;
+let ullObert = true;              // mostrar el dibuix del navegador
+
+function creaMarc(pestanya, fmt) {
+  const k = clau(pestanya.id, fmt.id);
+  if (marcs.has(k)) return marcs.get(k);
 
   const el = document.createElement('div');
-  el.className = 'device-frame';
-  el.dataset.format = clau;
+  el.className = 'marc';
+  el.dataset.format = fmt.id;
+  el.dataset.pestanya = pestanya.id;
+
+  const etiqueta = document.createElement('div');
+  etiqueta.className = 'etiqueta';
+  etiqueta.innerHTML = `<span class="nom"></span><span class="mida"></span><span class="estat"></span>`;
+  etiqueta.querySelector('.nom').textContent = fmt.nom;
+  etiqueta.querySelector('.mida').textContent = `${fmt.w}×${fmt.h}`;
+
+  const recarrega = document.createElement('button');
+  recarrega.textContent = '⟳';
+  recarrega.title = 'Recarregar aquest marc';
+  const treu = document.createElement('button');
+  treu.textContent = '✕';
+  treu.title = 'Treure aquest format de la pestanya';
+  etiqueta.append(recarrega, treu);
+
+  const caixa = document.createElement('div');
+  caixa.className = 'caixa';
+  caixa.style.width = fmt.w + 'px';
+  caixa.style.height = fmt.h + 'px';
 
   const iframe = document.createElement('iframe');
-  iframe.src = RUTA;
-  iframe.title = ELS_NOMS[clau] || clau;
+  iframe.className = 'finestra';
+  iframe.title = fmt.nom;
+  iframe.width = fmt.w;
+  iframe.height = fmt.h - fmt.ct - fmt.cb;
+  iframe.style.width = fmt.w + 'px';
+  iframe.style.height = (fmt.h - fmt.ct - fmt.cb) + 'px';
+  iframe.style.marginTop = fmt.ct + 'px';
+  iframe.loading = 'lazy';
 
-  const overlay = document.createElement('img');
-  overlay.className = 'browser-overlay';
-  overlay.src = fmt.img;
-  overlay.alt = '';
-
-  const top = document.createElement('div');
-  top.className = 'viewport-marker red-line';
-  const bottom = document.createElement('div');
-  bottom.className = 'viewport-marker bottom red-line';
+  if (fmt.img) {
+    const img = document.createElement('img');
+    img.className = 'barra-navegador';
+    img.style.display = ullObert ? '' : 'none';
+    img.src = fmt.img;
+    img.alt = '';
+    img.style.width = fmt.w + 'px';
+    img.style.height = fmt.h + 'px';
+    caixa.append(img);
+  } else {
+    const barra = document.createElement('div');
+    barra.className = 'falsa-barra';
+    barra.style.display = ullObert ? '' : 'none';
+    barra.style.height = fmt.ct + 'px';
+    barra.textContent = `navegador ${fmt.ct} px`;
+    caixa.append(barra);
+  }
+  if (fmt.cb > 0) {
+    const baix = document.createElement('div');
+    baix.className = 'falsa-barra';
+    baix.style.display = ullObert ? '' : 'none';
+    baix.style.height = fmt.cb + 'px';
+    baix.style.top = 'auto';
+    baix.style.bottom = '0';
+    baix.textContent = `barra ${fmt.cb} px`;
+    caixa.append(baix);
+  }
 
   const carregant = document.createElement('div');
   carregant.className = 'carregant';
-  carregant.textContent = `Carregant ${ELS_NOMS[clau] || clau}…`;
+  carregant.textContent = `Carregant ${fmt.nom}…`;
 
-  el.append(iframe, overlay, top, bottom, carregant);
-  stage.append(el);
+  const sensVisita = document.createElement('div');
+  sensVisita.className = 'sens-visita';
+  const contingut = document.createElement('div');
+  contingut.className = 'contingut';
+  contingut.innerHTML = `<div>${fmt.nom}<br><span style="opacity:.7">${fmt.w}×${fmt.h}</span></div>`;
+  const botoVeure = document.createElement('button');
+  botoVeure.textContent = '▶ Carregar aquesta vista';
+  contingut.append(botoVeure);
+  sensVisita.append(contingut);
 
-  // `load` s'ha de tornar a armar a cada recarrega, i per aixo no el posem
-  // nomes un cop: el recarregar del toolbar torna a deixar el marc en blanc.
-  iframe.addEventListener('load', () => el.classList.add('carregat'));
-  el.classList.remove('carregat');
+  caixa.append(iframe, carregant, sensVisita);
+  el.append(etiqueta, caixa);
 
-  const m = { el, iframe, overlay, top, bottom };
-  muntats.set(clau, m);
-  aplicaMida(clau);
-  return m;
+  const marc = { el, caixa, iframe, etiqueta, carregant, sensVisita, botoVeure, fmt, pestanya: pestanya.id, viu: false, carregat: false, fixat: false };
+
+  iframe.addEventListener('load', () => { marc.carregat = true; el.classList.add('carregat'); });
+  recarrega.addEventListener('click', (e) => { e.stopPropagation(); recarregaMarc(marc); });
+  treu.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const p = estat.pestanyes.find((x) => x.id === marc.pestanya);
+    if (p) { p.formats = p.formats.filter((id) => id !== fmt.id); desmuntaMarc(marc); desa(); pintaTot(); }
+  });
+  botoVeure.addEventListener('click', (e) => { e.stopPropagation(); muntaMarc(marc, true); });
+  el.addEventListener('dblclick', () => muntaMarc(marc, true));
+
+  marcs.set(k, marc);
+  return marc;
 }
 
-/** Amaga el marc d'un format sense desmuntar-lo (es queda carregat). */
-function amaga(clau) {
-  const m = muntats.get(clau);
-  if (m) m.el.style.display = 'none';
+function rutaDe(marc) {
+  const p = estat.pestanyes.find((x) => x.id === marc.pestanya);
+  return (p && p.ruta) || '/';
 }
 
-/** Ensenya un format, muntant-lo si cal. Els altres es queden carregats. */
-function mostra(clau) {
-  for (const k of muntats.keys()) if (k !== clau) amaga(k);
-  const m = muntat(clau);
-  m.el.style.display = 'block';
-  actiu = clau;
-  for (const b of tabs.querySelectorAll('button')) b.classList.toggle('actiu', b.dataset.format === clau);
-  const fmt = FORMATS[clau];
-  const s = escalaUn ? 1 : fmt.scale;
-  info.textContent = `${fmt.label} · ${escalaUn ? 'a mida real (1:1)' : `escalat ×${s}`} · ${RUTA}`;
-  stage.scrollTo(0, 0);
+function muntaMarc(marc, fixa = false) {
+  if (marc.viu) return;
+  marc.viu = true;
+  if (fixa) marc.fixat = true;
+  marc.el.classList.remove('carregat');
+  marc.carregat = false;
+  marc.iframe.src = rutaDe(marc);
+  marc.sensVisita.style.display = 'none';
+  actualitzaEtiqueta(marc);
 }
 
-// LES PESTANYES, una per format.
-for (const clau of Object.keys(FORMATS)) {
-  const b = document.createElement('button');
-  b.dataset.format = clau;
-  b.innerHTML = `${ELS_NOMS[clau] || clau}<span class="mida">${FORMATS[clau].w}×${FORMATS[clau].h}</span>`;
-  b.addEventListener('click', () => mostra(clau));
-  tabs.append(b);
+function desmuntaMarc(marc) {
+  if (!marc.viu) return;
+  marc.viu = false;
+  marc.fixat = false;
+  marc.carregat = false;
+  marc.el.classList.remove('carregat');
+  marc.iframe.src = 'about:blank';
+  marc.sensVisita.style.display = '';
+  actualitzaEtiqueta(marc);
 }
 
-// ELS BOTONS.
-document.getElementById('reload').addEventListener('click', () => {
-  const m = muntats.get(actiu);
-  // Recarrega NOMES la pestanya activa: les altres es queden com estan.
-  if (!m) return;
-  m.el.classList.remove('carregat');
-  m.iframe.src = m.iframe.src;
+function recarregaMarc(marc) {
+  if (!marc.viu) { muntaMarc(marc, true); return; }
+  marc.el.classList.remove('carregat');
+  marc.carregat = false;
+  marc.iframe.src = marc.iframe.src;
+}
+
+function actualitzaEtiqueta(marc) {
+  // "aturat" vol dir que l'iframe no esta muntat: es veu la silueta i el boto
+  // per carregar-lo. Un marc viu no porta etiqueta d'estat.
+  marc.etiqueta.querySelector('.estat').textContent = marc.viu ? '' : 'aturat';
+}
+
+// ── QUANTES VISTES VIUES ───────────────────────────────────────────────────
+/**
+ * Cada iframe es una aplicacio sencera carregada al navegador. Amb 15 formats
+ * alhora aixo son 15 aplicacions: es menja la memoria i el processador, i el
+ * servidor de desenvolupament ha de servir 15 pagines. Per aixo les vistes es
+ * munten NOMES quan son grans a la pantalla (zoom alt) o quan les demanes
+ * (doble clic o el boto), i hi ha un sostre de vistes vives alhora.
+ */
+const sostreVius = () => Number(estat.sostre) || 8;
+
+function muntaLesQueToca() {
+  const p = activa();
+  const ids = esGlobal(p) ? TOTS : p.formats;
+  const llista = ids.map((id) => marcs.get(clau(p.id, id))).filter(Boolean);
+  const vius = llista.filter((m) => m.viu);
+  const aLaVista = (m) => {
+    const b = m.el.getBoundingClientRect();
+    return b.width > 0 && b.bottom > 0 && b.top < window.innerHeight && b.right > 0 && b.left < window.innerWidth;
+  };
+  // Es munten les que ES VEUEN, de la mes gran a la mes petita, fins al sostre.
+  // El sostre es el que mana: cada vista viva es una aplicacio sencera carregada
+  // al navegador, i amb quinze alhora el que peta es la maquina, no l'eina.
+  const candidates = llista.filter((m) => !m.viu && aLaVista(m)).sort((a, b) => areaVisible(b) - areaVisible(a));
+  for (const m of candidates) {
+    if (m.viu) continue;
+    if (m.fixat || vius.length < sostreVius()) { muntaMarc(m); vius.push(m); }
+  }
+  // Si ens passem del sostre, es desmunten les que menys es veuen (i mai les
+  // que has demanat tu, que van fixades).
+  const sobrants = vius.filter((m) => !m.fixat).sort((a, b) => areaVisible(a) - areaVisible(b));
+  for (let i = 0; i < sobrants.length && vius.length > sostreVius(); i++) {
+    const m = sobrants[i];
+    desmuntaMarc(m);
+    const k = vius.indexOf(m);
+    if (k >= 0) vius.splice(k, 1);
+  }
+}
+
+function areaVisible(m) {
+  const b = m.el.getBoundingClientRect();
+  const x = Math.max(0, Math.min(b.right, window.innerWidth) - Math.max(b.left, 0));
+  const y = Math.max(0, Math.min(b.bottom, window.innerHeight) - Math.max(b.top, 0));
+  return x * y;
+}
+
+// ── EL REPARTIMENT (com s'organitzen els formats) ─────────────────────────
+/**
+ * Retorna les posicions de tots els marcs dins del llenç, en pixels REALS del
+ * dispositiu. El llenç despres s'escala sencer amb el zoom.
+ */
+function reparteix(ids, mode) {
+  const fs = ids.map((id) => PER_ID[id]).filter(Boolean);
+  const pos = new Map();
+  const etiquetes = [];
+  if (!fs.length) return { pos, etiquetes, ample: 0, alt: 0 };
+
+  const perGrup = (llista) => {
+    const g = new Map();
+    for (const f of llista) { if (!g.has(f.grup)) g.set(f.grup, []); g.get(f.grup).push(f); }
+    return g;
+  };
+  const perAmplada = [...fs].sort((a, b) => b.w - a.w);
+
+  let ample = 0, alt = 0;
+
+  if (mode === 'horitzontal' || mode === 'vertical') {
+    let x = 0, y = 0;
+    for (const f of perAmplada) {
+      pos.set(f.id, { x, y });
+      if (mode === 'horitzontal') x += f.w + GAP; else y += f.h + GAP;
+    }
+    ample = mode === 'horitzontal' ? x - GAP : Math.max(...fs.map((f) => f.w));
+    alt = mode === 'horitzontal' ? Math.max(...fs.map((f) => f.h)) : y - GAP;
+  } else if (mode === 'graella') {
+    const cw = Math.max(...fs.map((f) => f.w));
+    const ch = Math.max(...fs.map((f) => f.h));
+    const n = Math.ceil(Math.sqrt(fs.length));
+    fs.forEach((f, i) => {
+      const cx = i % n, cy = Math.floor(i / n);
+      pos.set(f.id, { x: cx * (cw + GAP), y: cy * (ch + GAP) });
+    });
+    ample = n * (cw + GAP) - GAP;
+    alt = Math.ceil(fs.length / n) * (ch + GAP) - GAP;
+  } else if (mode === 'mida') {
+    // Esglaons: files de mes gran a mes petit, alineades a l'esquerra.
+    let x = 0, y = 0, altFila = 0;
+    for (const f of perAmplada) {
+      if (x > 0 && x + f.w > Math.max(1920, f.w * 2)) { x = 0; y += altFila + GAP; altFila = 0; }
+      pos.set(f.id, { x, y });
+      x += f.w + GAP;
+      altFila = Math.max(altFila, f.h);
+      ample = Math.max(ample, x - GAP);
+    }
+    alt = y + altFila;
+  } else if (mode === 'files' || mode === 'columnes') {
+    const g = perGrup(fs);
+    if (mode === 'files') {
+      let y = 0;
+      for (const [nom, llista] of g) {
+        let x = 0, altFila = 0;
+        llista.forEach((f, i) => {
+          pos.set(f.id, { x, y });
+          // L'etiqueta del grup va dins del primer marc del grup.
+          if (i === 0) etiquetes.push({ text: nom, x: x + 8, y: y + 8 });
+          x += f.w + GAP;
+          altFila = Math.max(altFila, f.h);
+        });
+        ample = Math.max(ample, x - GAP);
+        y += altFila + GAP * 2;
+      }
+      alt = y - GAP * 2;
+    } else {
+      let x = 0;
+      for (const [nom, llista] of g) {
+        let y = 0, ampleCol = 0;
+        llista.forEach((f, i) => {
+          pos.set(f.id, { x, y });
+          if (i === 0) etiquetes.push({ text: nom, x: x + 8, y: y + 8 });
+          y += f.h + GAP;
+          ampleCol = Math.max(ampleCol, f.w);
+        });
+        x += ampleCol + GAP * 2;
+        alt = Math.max(alt, y - GAP);
+      }
+      ample = x - GAP * 2;
+    }
+  } else {
+    // Lliure: el flux natural, saltant de linia a l'amplada de referencia.
+    let x = 0, y = 0, altFila = 0;
+    for (const f of fs) {
+      if (x > 0 && x + f.w > AMPLE_LLIURE) { x = 0; y += altFila + GAP; altFila = 0; }
+      pos.set(f.id, { x, y });
+      x += f.w + GAP;
+      altFila = Math.max(altFila, f.h);
+      ample = Math.max(ample, x - GAP);
+    }
+    alt = y + altFila;
+  }
+  return { pos, etiquetes, ample, alt };
+}
+
+// ── PINTAR EL TAULER ──────────────────────────────────────────────────────
+const tauler = document.getElementById('tauler');
+const full = document.getElementById('full');
+const llenç = document.getElementById('llenç');
+let midesLlenç = { ample: 0, alt: 0 };
+
+function zoomActual() {
+  const p = activa();
+  return p.ajust ? zoomAjustat(p) : (p.zoom || 1);
+}
+
+function zoomAjustat(p) {
+  const av = tauler.clientWidth - MARGES * 2;
+  const aa = tauler.clientHeight - MARGES * 2;
+  if (!midesLlenç.ample || !midesLlenç.alt) return 1;
+  const zx = av / midesLlenç.ample;
+  const zy = aa / midesLlenç.alt;
+  if (p.ajust === 'ample') return Math.min(zx, 4);
+  if (p.ajust === 'alt') return Math.min(zy, 4);
+  return Math.min(zx, zy, 4);
+}
+
+function pintaTauler({ guardaScroll = false } = {}) {
+  const p = activa();
+  if (guardaScroll) p.scroll = { x: tauler.scrollLeft, y: tauler.scrollTop };
+
+  const ids = esGlobal(p) ? TOTS : p.formats;
+  const { pos, etiquetes, ample, alt } = reparteix(ids, p.ordre);
+  midesLlenç = { ample, alt: alt + DESPLACAMENT };
+
+  // Cada pestanya te el seu propi DOM de llenç: aixi els marcs d'una no es
+  // toquen quan es repinta una altra.
+  let capa = llenç.querySelector(`.capa[data-pestanya="${p.id}"]`);
+  if (!capa) {
+    capa = document.createElement('div');
+    capa.className = 'capa';
+    capa.dataset.pestanya = p.id;
+    capa.style.position = 'absolute';
+    capa.style.top = '0';
+    capa.style.left = '0';
+    llenç.append(capa);
+  }
+  for (const altra of llenç.querySelectorAll('.capa')) altra.style.display = altra === capa ? '' : 'none';
+
+  // Els marcs que ja no hi son es treuen del DOM pero no es destrueixen si son
+  // d'una altra pestanya (cada pestanya te els seus).
+  const volguts = new Set(ids);
+  for (const m of marcs.values()) {
+    if (m.pestanya !== p.id) continue;
+    if (!volguts.has(m.fmt.id)) {
+      // Desmuntar-lo tambe: un iframe tret del DOM pero viu es una aplicacio
+      // sencera corrent per res.
+      desmuntaMarc(m);
+      m.el.remove();
+      marcs.delete(clau(p.id, m.fmt.id));
+    }
+  }
+  for (const id of ids) {
+    const fmt = PER_ID[id];
+    const marc = creaMarc(p, fmt);
+    const q = pos.get(id) || { x: 0, y: 0 };
+    marc.el.style.left = q.x + 'px';
+    marc.el.style.top = (q.y + DESPLACAMENT) + 'px';
+    if (marc.el.parentElement !== capa) capa.append(marc.el);
+    marc.el.style.display = '';
+  }
+  for (const e of capa.querySelectorAll('.etiqueta-grup')) e.remove();
+  for (const e of etiquetes) {
+    const d = document.createElement('div');
+    d.className = 'etiqueta-grup';
+    d.textContent = e.text;
+    d.style.left = e.x + 'px';
+    d.style.top = (e.y + DESPLACAMENT) + 'px';
+    capa.append(d);
+  }
+
+  capa.style.width = ample + 'px';
+  capa.style.height = (alt + DESPLACAMENT) + 'px';
+  aplicaZoom();
+  muntaLesQueToca();
+  if (guardaScroll) tauler.scrollTo(p.scroll.x, p.scroll.y);
+  actualitzaBarra();
+  desa();
+}
+
+function aplicaZoom() {
+  const z = zoomActual();
+  // Centrat horitzontal quan el llenç escalat es mes estret que la finestra.
+  const marge = Math.max(0, (tauler.clientWidth - midesLlenç.ample * z) / 2);
+  llenç.style.transform = `scale(${z})`;
+  llenç.style.setProperty('--inv', String(1 / z));
+  // El xip de cada marc es de mida constant a la pantalla, aixi que a zoom baix
+  // pot ser mes ample que el marc: se li posa el topall de l'amplada del marc.
+  const p = activa();
+  for (const id of (esGlobal(p) ? TOTS : p.formats)) {
+    const m = marcs.get(clau(p.id, id));
+    if (m) m.etiqueta.style.maxWidth = Math.max(200, PER_ID[id].w * z) + 'px';
+  }
+  llenç.style.left = marge + 'px';
+  full.style.width = (midesLlenç.ample * z + marge * 2) + 'px';
+  full.style.height = (midesLlenç.alt * z) + 'px';
+}
+
+// ── BARRA I PESTANYES ─────────────────────────────────────────────────────
+const barraNom = document.getElementById('nom-pestanya');
+const barraRuta = document.getElementById('ruta');
+const barraZoom = document.getElementById('zoom-num');
+const barraOrdre = document.getElementById('ordre');
+const ajuda = document.getElementById('ajuda');
+
+function actualitzaBarra() {
+  const p = activa();
+  barraNom.value = p.nom;
+  barraRuta.value = p.ruta;
+  barraOrdre.value = p.ordre;
+  const z = zoomActual();
+  barraZoom.textContent = Math.round(z * 100) + '%';
+  document.getElementById('ajusta-ample').classList.toggle('actiu', p.ajust === 'ample');
+  document.getElementById('ajusta-alt').classList.toggle('actiu', p.ajust === 'alt');
+  document.getElementById('ajusta-tot').classList.toggle('actiu', p.ajust === 'tot');
+  document.getElementById('zoom-1').classList.toggle('actiu', !p.ajust && Math.abs(p.zoom - 1) < 0.001);
+  document.getElementById('global').classList.toggle('actiu', esGlobal(p));
+  document.getElementById('sostre').value = String(estat.sostre || 8);
+  const vius = [...marcs.values()].filter((m) => m.pestanya === p.id && m.viu).length;
+  const total = esGlobal(p) ? TOTS.length : p.formats.length;
+  ajuda.textContent = `${total} formats · ${vius} vives (sostre ${sostreVius()}) · les vistes són a escala real`;
+}
+
+function pintaPestanyes() {
+  const cont = document.getElementById('pestanyes');
+  cont.innerHTML = '';
+  for (const p of estat.pestanyes) {
+    const b = document.createElement('button');
+    b.className = 'pestanya' + (p.id === estat.activa ? ' activa' : '');
+    b.dataset.pestanya = p.id;
+    const n = esGlobal(p) ? TOTS.length : p.formats.length;
+    b.innerHTML = `<span>${p.nom}</span><span class="compta">${n}</span>`;
+    if (!p.global && estat.pestanyes.length > 1) {
+      const x = document.createElement('span');
+      x.className = 'tanca';
+      x.textContent = '✕';
+      x.title = 'Tancar la pestanya';
+      x.addEventListener('click', (e) => { e.stopPropagation(); tancaPestanya(p.id); });
+      b.append(x);
+    }
+    b.addEventListener('click', () => canviaPestanya(p.id));
+    cont.append(b);
+  }
+  const nova = document.createElement('button');
+  nova.className = 'nova';
+  nova.textContent = '+';
+  nova.title = 'Pestanya nova';
+  nova.addEventListener('click', () => {
+    const p = pestanyaNova('Pestanya ' + (estat.pestanyes.length + 1), []);
+    estat.pestanyes.push(p);
+    canviaPestanya(p.id);
+  });
+  cont.append(nova);
+}
+
+function canviaPestanya(id) {
+  activa().scroll = { x: tauler.scrollLeft, y: tauler.scrollTop };
+  estat.activa = id;
+  pintaPestanyes();
+  pintaAcordio();
+  pintaTauler();
+  tauler.scrollTo(activa().scroll.x, activa().scroll.y);
+}
+
+function tancaPestanya(id) {
+  const i = estat.pestanyes.findIndex((p) => p.id === id);
+  if (i < 0) return;
+  for (const [k, m] of [...marcs]) if (m.pestanya === id) { desmuntaMarc(m); m.el.remove(); marcs.delete(k); }
+  estat.pestanyes.splice(i, 1);
+  if (!estat.pestanyes.length) estat.pestanyes.push(pestanyaNova('Escriptori', ['desktop']));
+  if (estat.activa === id) estat.activa = estat.pestanyes[Math.max(0, i - 1)].id;
+  llenç.querySelector(`.capa[data-pestanya="${id}"]`)?.remove();
+  pintaPestanyes(); pintaAcordio(); pintaTauler(); desa();
+}
+
+// ── L'ACORDIÓ ─────────────────────────────────────────────────────────────
+const oberts = new Set(GRUPS);
+
+function pintaAcordio() {
+  const p = activa();
+  const cont = document.getElementById('panell');
+  cont.innerHTML = '';
+  if (esGlobal(p)) {
+    const avis = document.createElement('div');
+    avis.style.padding = '12px';
+    avis.style.color = 'var(--text2)';
+    avis.innerHTML = 'Aquesta és la <b>vista global</b>: hi surten tots els formats. Per triar formats, ves a una pestanya normal.';
+    cont.append(avis);
+    return;
+  }
+  for (const g of GRUPS) {
+    const fs = FORMATS.filter((f) => f.grup === g);
+    if (!fs.length) continue;
+    const obert = oberts.has(g);
+    const sel = fs.filter((f) => p.formats.includes(f.id)).length;
+
+    const bloc = document.createElement('div');
+    bloc.className = 'grup' + (obert ? ' obert' : '');
+    const cap = document.createElement('button');
+    cap.className = 'capçalera';
+    cap.innerHTML = `<span class="fletxa">▶</span><span>${g}</span><span class="compta">${sel}/${fs.length}</span>`;
+    cap.addEventListener('click', () => { obert ? oberts.delete(g) : oberts.add(g); pintaAcordio(); });
+
+    const llista = document.createElement('div');
+    llista.className = 'llista';
+    for (const f of fs) {
+      const marca = p.formats.includes(f.id);
+      const fila = document.createElement('label');
+      fila.className = 'opcio';
+      const cb = document.createElement('input');
+      cb.type = 'checkbox';
+      cb.checked = marca;
+      cb.addEventListener('change', () => {
+        if (cb.checked) { if (!p.formats.includes(f.id)) p.formats.push(f.id); }
+        else p.formats = p.formats.filter((x) => x !== f.id);
+        pintaTauler(); pintaAcordio(); pintaPestanyes(); desa();
+      });
+      const nom = document.createElement('span');
+      nom.className = 'nom';
+      nom.textContent = f.nom;
+      const mida = document.createElement('span');
+      mida.className = 'mida';
+      mida.textContent = `${f.w}×${f.h}`;
+      fila.append(cb, nom, mida);
+      llista.append(fila);
+    }
+    const accions = document.createElement('div');
+    accions.className = 'accions-grup';
+    const tots = document.createElement('button');
+    tots.textContent = 'tots';
+    tots.addEventListener('click', () => {
+      for (const f of fs) if (!p.formats.includes(f.id)) p.formats.push(f.id);
+      pintaTauler(); pintaAcordio(); pintaPestanyes(); desa();
+    });
+    const cap2 = document.createElement('button');
+    cap2.textContent = 'cap';
+    cap2.addEventListener('click', () => {
+      p.formats = p.formats.filter((id) => PER_ID[id].grup !== g);
+      pintaTauler(); pintaAcordio(); pintaPestanyes(); desa();
+    });
+    accions.append(tots, cap2);
+    llista.append(accions);
+
+    bloc.append(cap, llista);
+    cont.append(bloc);
+  }
+}
+
+// ── LA BARRA: CONTROLS ────────────────────────────────────────────────────
+function posaZoom(z, ajust = null) {
+  const p = activa();
+  p.ajust = ajust;
+  p.zoom = Math.min(4, Math.max(0.05, z));
+  aplicaZoom();
+  actualitzaBarra();
+  muntaLesQueToca();
+  desa();
+}
+
+document.getElementById('zoom-mes').addEventListener('click', () => posaZoom(zoomActual() * 1.25));
+document.getElementById('zoom-menys').addEventListener('click', () => posaZoom(zoomActual() / 1.25));
+document.getElementById('zoom-1').addEventListener('click', () => posaZoom(1));
+document.getElementById('ajusta-ample').addEventListener('click', () => { activa().ajust = 'ample'; pintaTauler(); });
+document.getElementById('ajusta-alt').addEventListener('click', () => { activa().ajust = 'alt'; pintaTauler(); });
+document.getElementById('ajusta-tot').addEventListener('click', () => { activa().ajust = 'tot'; pintaTauler(); });
+barraOrdre.addEventListener('change', () => { activa().ordre = barraOrdre.value; pintaTauler(); desa(); });
+barraNom.addEventListener('input', () => { activa().nom = barraNom.value; pintaPestanyes(); desa(); });
+barraRuta.addEventListener('change', () => {
+  const p = activa();
+  let r = barraRuta.value.trim() || '/';
+  if (!r.startsWith('/')) r = '/' + r;
+  p.ruta = r;
+  for (const id of (esGlobal(p) ? TOTS : p.formats)) {
+    const m = marcs.get(clau(p.id, id));
+    if (m && m.viu) { m.el.classList.remove('carregat'); m.carregat = false; m.iframe.src = r; }
+  }
+  desa();
 });
-document.getElementById('toggle-overlay').addEventListener('click', () => {
-  overlayVisible = !overlayVisible;
-  for (const clau of muntats.keys()) aplicaMida(clau);
+document.getElementById('recarrega').addEventListener('click', () => {
+  const p = activa();
+  for (const id of (esGlobal(p) ? TOTS : p.formats)) {
+    const m = marcs.get(clau(p.id, id));
+    if (m && m.viu) recarregaMarc(m);
+  }
 });
-escala1.addEventListener('change', (e) => {
-  escalaUn = e.target.checked;
-  try { localStorage.setItem(CLAU_ESCALA, escalaUn ? '1' : '0'); } catch { /* ignore */ }
-  // L'escala val per a TOTES les pestanyes: canviar-la no ha de fer que unes
-  // quantes quedin a una mida i les altres a una altra.
-  for (const clau of muntats.keys()) aplicaMida(clau);
-  mostra(actiu);
+document.getElementById('navegador').addEventListener('click', (e) => {
+  ullObert = !ullObert;
+  e.target.classList.toggle('actiu', !ullObert);
+  for (const m of marcs.values()) {
+    m.caixa.querySelectorAll('.barra-navegador, .falsa-barra').forEach((b) => { b.style.display = ullObert ? '' : 'none'; });
+  }
+});
+document.getElementById('sostre').addEventListener('change', (e) => {
+  estat.sostre = Number(e.target.value);
+  desa();
+  muntaLesQueToca();
+  actualitzaBarra();
+});
+document.getElementById('global').addEventListener('click', () => {
+  let g = estat.pestanyes.find((p) => p.global);
+  if (!g) {
+    g = pestanyaNova('Vista global', TOTS, { global: true, ajust: 'tot', ordre: 'graella' });
+    estat.pestanyes.push(g);
+  }
+  canviaPestanya(g.id);
 });
 
-mostra(actiu);
+// Zoom amb la roda i la tecla de comandament, com als editors.
+tauler.addEventListener('wheel', (e) => {
+  if (!e.ctrlKey && !e.metaKey) return;
+  e.preventDefault();
+  posaZoom(zoomActual() * (e.deltaY < 0 ? 1.1 : 1 / 1.1));
+}, { passive: false });
+
+// Guardar la posicio de scroll de la pestanya activa
+tauler.addEventListener('scroll', () => {
+  const p = activa();
+  if (!p) return;
+  p.scroll = { x: tauler.scrollLeft, y: tauler.scrollTop };
+  desa();
+  muntaLesQueToca();
+}, { passive: true });
+
+let tempsMida = null;
+window.addEventListener('resize', () => {
+  clearTimeout(tempsMida);
+  tempsMida = setTimeout(() => {
+    const p = activa();
+    if (p.ajust) pintaTauler();
+    else { aplicaZoom(); muntaLesQueToca(); actualitzaBarra(); }
+  }, 120);
+});
+
+// ── ENGEGAR ───────────────────────────────────────────────────────────────
+document.getElementById('navegador').classList.toggle('actiu', !ullObert);
+pintaPestanyes();
+pintaAcordio();
+pintaTauler();
 </script>
-
 </body>
 </html>
