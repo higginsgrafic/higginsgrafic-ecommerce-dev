@@ -55,6 +55,12 @@
   .opcio input { accent-color: var(--accent); cursor: pointer; }
   .opcio .nom { flex: 1; }
   .opcio .mida { color: var(--text2); font-size: 11px; font-variant-numeric: tabular-nums; }
+  .filtre { padding: 8px 10px; border-bottom: 1px solid var(--vora); display: flex; flex-direction: column; gap: 6px; }
+  .filtre .fila { display: flex; align-items: center; gap: 4px; flex-wrap: wrap; }
+  .filtre .titol { color: var(--text2); font-size: 11px; letter-spacing: .06em; text-transform: uppercase; width: 100%; }
+  .filtre button { padding: 4px 8px; font-size: 11.5px; }
+  .filtre .obre { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .filtre .obre:hover { background: #d4003a; }
 
   /* ── BARRA ─────────────────────────────────────────────────────── */
   .barra {
@@ -250,6 +256,8 @@ const FORMATS = [
   { id: 'pwa',               nom: 'PWA 390',                grup: 'PWA',              w: 390,  h: 844,  ct: 14,  cb: 0,  img: '/browser-frames/pwa-standalone.webp' },
 ];
 const GRUPS = ['Escriptori', 'Portàtil', 'Tauleta apaïsada', 'Tauleta vertical', 'Mòbil', 'PWA'];
+/** Vertical = mes alt que ample; horitzontal = mes ample que alt. */
+const orientacio = (f) => (f.h > f.w ? 'vertical' : 'horitzontal');
 const PER_ID = Object.fromEntries(FORMATS.map((f) => [f.id, f]));
 const TOTS = FORMATS.map((f) => f.id).sort((a, b) => PER_ID[b].w - PER_ID[a].w);
 
@@ -277,6 +285,7 @@ function estatInicial() {
     ordre: 'mosaic',
     sostre: 8,
     tots: false,
+    filtre: 'tots',          // 'tots' | 'vertical' | 'horitzontal'
     panell: false,
     grupsOberts: ['Portàtil'],
   };
@@ -833,11 +842,53 @@ function pintaPestanyes() {
   }
 }
 
+const NOMS_FILTRE = { tots: 'Tots', vertical: 'Verticals', horitzontal: 'Horitzontals' };
+/** Els formats que passen el filtre d'orientacio. */
+const filtrats = () => FORMATS.filter((f) => estat.filtre === 'tots' || orientacio(f) === estat.filtre);
+
 function pintaAcordio() {
   const cont = document.getElementById('grups');
   cont.innerHTML = '';
+
+  // EL FILTRE: per veure i obrir nomes els verticals o nomes els horitzontals.
+  // "Obrir" fa una pestanya per a cada format del filtre i ensenya el mosaic.
+  const filtre = document.createElement('div');
+  filtre.className = 'filtre';
+  const fila1 = document.createElement('div');
+  fila1.className = 'fila';
+  const titol = document.createElement('span');
+  titol.className = 'titol';
+  titol.textContent = 'Orientació';
+  fila1.append(titol);
+  for (const clau of ['tots', 'vertical', 'horitzontal']) {
+    const b = document.createElement('button');
+    b.textContent = NOMS_FILTRE[clau];
+    b.classList.toggle('actiu', estat.filtre === clau);
+    b.title = clau === 'tots' ? 'Tots els formats' : `Només els formats ${NOMS_FILTRE[clau].toLowerCase()}`;
+    b.addEventListener('click', () => { estat.filtre = clau; pintaAcordio(); desa(); });
+    fila1.append(b);
+  }
+  const fila2 = document.createElement('div');
+  fila2.className = 'fila';
+  const perObrir = filtrats().filter((f) => !tabDe(f.id)).length;
+  const bObre = document.createElement('button');
+  bObre.className = 'obre';
+  bObre.textContent = estat.filtre === 'tots' ? 'Obrir tots' : `Obrir els ${NOMS_FILTRE[estat.filtre].toLowerCase()}`;
+  bObre.title = 'Obrir una pestanya per a cada format del filtre';
+  bObre.disabled = perObrir === 0;
+  bObre.addEventListener('click', obreFiltrats);
+  const bTanca = document.createElement('button');
+  bTanca.textContent = 'Tancar';
+  bTanca.title = 'Tancar les pestanyes dels formats del filtre';
+  bTanca.disabled = filtrats().every((f) => !tabDe(f.id));
+  bTanca.addEventListener('click', tancaFiltrats);
+  fila2.append(bObre, bTanca);
+  filtre.append(fila1, fila2);
+  cont.append(filtre);
+
   for (const g of GRUPS) {
-    const fs = FORMATS.filter((f) => f.grup === g);
+    const fs = filtrats().filter((f) => f.grup === g);
+    if (!fs.length) continue;
     const obert = (estat.grupsOberts || []).includes(g);
     const bloc = document.createElement('div');
     bloc.className = 'grup' + (obert ? ' obert' : '');
@@ -872,6 +923,28 @@ function pintaAcordio() {
     bloc.append(cap, llista);
     cont.append(bloc);
   }
+}
+
+/** Obra una pestanya per a cada format del filtre, d'una tacada. */
+function obreFiltrats() {
+  const ruta = RUTA_URL || (tabActiva() ? tabActiva().ruta : '/');
+  for (const f of filtrats()) if (!tabDe(f.id)) estat.pestanyes.push(pestanyaNova(f.id, ruta));
+  estat.activa = PRINCIPAL;   // i ensenya el mosaic, que es el que vols veure
+  pintaTot();
+  desa();
+}
+
+/** Tanca les pestanyes dels formats del filtre. */
+function tancaFiltrats() {
+  for (const f of filtrats()) {
+    const m = marcs.get(f.id);
+    if (m) { desmuntaMarc(m); m.el.remove(); marcs.delete(f.id); }
+  }
+  const fora = new Set(filtrats().map((f) => f.id));
+  estat.pestanyes = estat.pestanyes.filter((p) => p.id === PRINCIPAL || !fora.has(p.id));
+  if (!estat.pestanyes.some((p) => p.id === estat.activa)) estat.activa = PRINCIPAL;
+  pintaTot();
+  desa();
 }
 
 function pintaTot() {
