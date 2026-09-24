@@ -2791,6 +2791,29 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
       }
     >
 
+      {/* L'ACCES A L'ADMINISTRACIO, UN OVERLAY A LA PUNTA ESQUERRA DEL HEADER.
+          Abans anava dins la filera, a l'esquerra del logo, i depenia del coixí
+          de la filera (`carrilLane(40)`): quan el carril va baixar a 3/5, el
+          coixí va quedar mes curt que la petjada de la icona (21 px) i la icona
+          sortia del carril (mesurat: -3 px a 1024 i -6 a 853). Ara es un overlay
+          ancorat a la VORA del header, que es la de la finestra: no depen de cap
+          carril i no pot quedar fora de lloc.
+          Va centrat amb la FILA DEL LOGO (`--capcalera-fila`), no amb el header
+          sencer: a la vertical el header tambe conte el megaslide.
+          Nomes per a l'administrador, com ho era la barra. */}
+      {isAdmin && (
+        <Link
+          to="/admin"
+          data-admin-icona="1"
+          aria-label="Administració"
+          title="Administració"
+          className="absolute inline-flex items-center justify-center rounded text-foreground transition-colors hover:bg-black/5 hover:text-muted-foreground focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          style={{ left: 0, top: 0, width: '28px', height: 'var(--capcalera-fila, 52px)', zIndex: 10002 }}
+        >
+          <LayoutDashboard className="h-[18px] w-[18px]" strokeWidth={2} aria-hidden="true" />
+        </Link>
+      )}
+
       {/* La linia de sota la capcalera: a la vertical ve del nav que hi ha a
           sota, pero a l'escriptori i a l'apaisada el nav va dins la barra i el
           border-b era transparent, aixi que no es veia. Li posem el mateix
@@ -2842,37 +2865,6 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
           }}
         >
           <div className="relative flex items-center gap-2 lg:gap-2">
-            {/* L'ACCES A L'ADMINISTRACIO, DINS LA CAPÇALERA.
-                Abans hi havia la barra de desenvolupament (la franja vermella
-                de 40 px) i era alla on hi havia el boto d'Administracio. La
-                barra desplaçava tota la pagina, aixi que s'ha tret de les
-                pagines del lloc; aquesta icona fa la mateixa feina.
-
-                VA POSICIONADA A SOBRE, no es un element de la filera: `right:
-                100%` la deixa a l'esquerra del logo i, com que es absoluta, no
-                entra ni al `gap` de la filera ni al calcul de l'amplada. Per
-                aixo la filera es `relative`: es el seu unic fill posicionat, i
-                aixi la icona no mou ni el logo ni el nav ni les icones (que es
-                el que mesura `--hg-band-w`).
-
-                Només per a l'administrador, com ho era la barra: un visitant no
-                hi ha de veure cap entrada a /admin.
-
-                Cap a l'esquerra hi te el coixi de la filera (`carrilLane(40)`,
-                40 px a 1920 i 29 a 1024): 18 px d'icona + 3 de marge hi caben
-                sense sortir de la capçalera. */}
-            {isAdmin && (
-              <Link
-                to="/admin"
-                data-admin-icona="1"
-                aria-label="Administració"
-                title="Administració"
-                className="absolute top-1/2 inline-flex -translate-y-1/2 items-center justify-center rounded text-foreground transition-colors hover:bg-black/5 hover:text-muted-foreground focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                style={{ right: '100%', marginRight: '3px', width: '18px', height: '18px', zIndex: 30 }}
-              >
-                <LayoutDashboard className="h-[18px] w-[18px]" strokeWidth={2} aria-hidden="true" />
-              </Link>
-            )}
             {/* Logo a l'esquerra (desktop + tablet vertical) */}
             <Link id="stripe-guide-header-logo-anchor" to="/" aria-label="Higgins GRÀFIC - Pàgina d'inici" onClick={() => { if (active) closeMegaExplicitly(); }} className="relative z-10 pointer-events-auto hidden min-[600px]:flex items-center gap-2 font-black tracking-tight text-foreground">
               <span
