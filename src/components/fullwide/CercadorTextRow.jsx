@@ -510,9 +510,18 @@ export function CercadorDibuixosGraella({
   };
 
   if (carrusel) {
+    // ELS DIBUIXOS, ENTRE EL SELECTOR I LES FLETXES (24/09/2026).
+    //
+    // El carrusel tenia UNA caixa (`overflow: hidden`) amb les fletxes a dins,
+    // a la dreta: els dibuixos hi passaven per sota i la seva amplada era la de
+    // tota la columna. Ara hi ha dues capes: el retall dels dibuixos (amb
+    // `ref`, que es qui es mesura per ajustar-los) i, a fora, la botonera, que
+    // queda a la dreta del retall. El retall deixa l'ample de les fletxes mes
+    // 10 px, o sigui que la graella viu exactament entre el selector i les
+    // fletxes.
+    const ampleFletxes = ambFletxes ? carrilPx(midaSelector / 2) : '0px';
     return (
       <div
-        ref={graellaRef}
         data-carrusel="1"
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
@@ -523,36 +532,56 @@ export function CercadorDibuixosGraella({
           position: 'relative',
           width: '100%',
           height: `${alcadaCarrusel}px`,
-          // SENSE BARRA DE DESPLAÇAMENT: el moviment el fa el gest (i les
-          // fletxes al desktop). `pan-y` deixa el desplac,ament vertical de la
-          // pagina al navegador i es queda l'horitzontal per al carrusel.
-          overflow: 'hidden',
-          touchAction: 'pan-y',
-          cursor: 'grab',
-          userSelect: 'none',
           minWidth: 0,
         }}
       >
-        <div style={{
-          position: 'relative',
-          width: `${ampleTira}px`,
-          height: '100%',
-          transform: `translateX(${-desplacEf}px)`,
-          willChange: 'transform',
-        }}>
-          {items.map(pintaItem)}
+        <div
+          ref={graellaRef}
+          style={{
+            position: 'relative',
+            // `width: auto` (i no `100%`) perque el coixi de la dreta descompti
+            // de l'amplada: amb `100%` la caixa es quedava sencera i el retall
+            // no servia de res.
+            width: 'auto',
+            height: '100%',
+            marginRight: ambFletxes ? `calc(${ampleFletxes} + ${carrilPx(10)})` : 0,
+            // SENSE BARRA DE DESPLAÇAMENT: el moviment el fa el gest (i les
+            // fletxes al desktop). `pan-y` deixa el desplac,ament vertical de la
+            // pagina al navegador i es queda l'horitzontal per al carrusel.
+            overflow: 'hidden',
+            touchAction: 'pan-y',
+            cursor: 'grab',
+            userSelect: 'none',
+            minWidth: 0,
+          }}
+        >
+          <div style={{
+            position: 'relative',
+            width: `${ampleTira}px`,
+            height: '100%',
+            transform: `translateX(${-desplacEf}px)`,
+            willChange: 'transform',
+          }}>
+            {items.map(pintaItem)}
+          </div>
         </div>
         {ambFletxes ? (
-          // LES FLETXES, DE LA MIDA DEL SELECTOR (24/09/2026). El selector
-          // Blanc/Color/Negre fa `carrilPx(midaSelector / 2)` d'amplada i el
-          // doble d'alçada (`aspect-[1/2]`), o sigui `carrilPx(midaSelector)`
-          // de alt. La botonera de fletxes fa exactament el mateix bloc, amb
-          // una fletxa a dalt i l'altra a baix (`vertical`).
+          // EL BLOC DE FLETXES, DE LA MIDA DEL SELECTOR (24/09/2026). El
+          // selector Blanc/Color/Negre va neixer quadrat i el vam deixar a la
+          // meitat: `carrilPx(midaSelector / 2)` d'amplada i
+          // `carrilPx(midaSelector)` d'alçada (es `w-1/2` amb `aspect-[1/2]`).
+          // El bloc de les dues fletxes fa exactament aixo, amb una fletxa a
+          // dalt i l'altra a baix.
+          // I EL SEU BAIX, AMB EL DEL SELECTOR (24/09/2026). El selector va a
+          // `carrilLane(40)` per sota del final de la filera (es el coixi de 40
+          // de la composicio, el mateix que porta el seu `top`): mesurat a
+          // 1440, 1920 i 2560, la diferencia entre els dos baixos es
+          // exactament aixo. Com que el bloc i el selector fan la mateixa
+          // alcada, alinear-ne els baixos es alinear-ne els tops.
           <div style={{
             position: 'absolute',
             right: 0,
-            top: '50%',
-            transform: 'translateY(-50%)',
+            bottom: `calc(-1 * ${carrilLane(40)})`,
             width: carrilPx(midaSelector / 2),
             height: carrilPx(midaSelector),
             zIndex: 5,
