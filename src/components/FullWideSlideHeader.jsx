@@ -9,7 +9,7 @@ import { useCart } from '@/contexts/CartContext';
 import { useOrders } from '@/hooks/useOrders';
 import { getGildan64000Catalog } from '../utils/placeholders.js';
 import { AUSTEN_QUOTES_ASSETS, resolveAustenQuoteAssetId, resolveAustenQuoteOriginalFromPath } from '../utils/austenQuotesAssets.js';
-import { clampNumber, escalaMegaslide, MEGASLIDE_REFERENCIA_PX, carrilPx, carrilLane } from '@/utils/layoutMetrics';
+import { clampNumber, escalaMegaslide, MEGASLIDE_REFERENCIA_PX, carrilPx } from '@/utils/layoutMetrics';
 import { laneForViewport, carrilDeclarat } from '@/utils/layoutModel';
 import {
   FIRST_CONTACT_MEDIA,
@@ -2284,11 +2284,17 @@ function FullWideSlideHeader({
             if (l.left >= -1 && r.right <= vpLayout + 1 && mesura > 0 && mesura <= vpLayout) franja = mesura;
           }
           if (!franja) {
+            // LA RESERVA TAMBÉ ÉS EL CARRIL SENCER (24/09/2026). Abans restava
+            // els coixins de la fila (80/1350 del carril, o 48 px a la vertical)
+            // perque la fila els portava; ara no n'hi ha, o sigui que el tram del
+            // logo a la icona d'usuari es el carril. Si no es fes, la pagina nova
+            // es pintaria amb un carril 68 px mes estret a 1920 fins que la
+            // mesura del DOM arribes.
             if (isPortraitTablet) {
               const siteW = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--site-w')) || 0;
-              franja = Math.max(0, (siteW > 0 ? siteW : Math.min(736, vpLayout)) - 48);
+              franja = Math.max(0, siteW > 0 ? siteW : Math.min(736, vpLayout));
             } else {
-              franja = beltFinal * (1 - 80 / 1350);
+              franja = beltFinal;
             }
           }
           if (franja > 0) root.style.setProperty('--hg-band-w', `${Math.round(franja)}px`);
@@ -2827,7 +2833,7 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
       >
         <div
           data-capcalera-fila="1"
-          className="flex h-[52px] items-center gap-3 px-4 sm:px-6 lg:px-10"
+          className="flex h-[52px] items-center gap-3"
           style={{
             // LA FILA FA EL LOGO (32 px) MÉS 10 px D'AIRE A DALT I A BAIX = 52.
             // Abans en feia 80 i el logo hi nedava amb 24 px per banda.
@@ -2848,14 +2854,20 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
             marginLeft: isPortraitTablet
               ? 'calc(var(--site-xL, 0px) - var(--rulerInset, 0px))'
               : 'calc(var(--hg-mega-x, 0px) - var(--rulerInset, 0px))',
-            // El coixí i la separació de la fila tambe son mides del carril
-            // (40 i 12 px de 1350): amb el coixí fix, a 1280 el nav no hi
-            // cabia dins el carril (li faltaven 31 px) i s'amagava sota el
-            // logo. Amb `carrilLane` el coixí es el MATEIX 3% del carril que
-            // deixen les graelles del megaslide, aixi la fila 1 hi encaixa
-            // exactament. A la vertical es queden les classes.
-            paddingLeft: isPortraitTablet ? undefined : carrilLane(40),
-            paddingRight: isPortraitTablet ? undefined : carrilLane(40),
+            // SENSE COIXÍ: EL LOGO A LA VORA ESQUERRA DEL CARRIL I LES ICONES A
+            // LA DRETA (24/09/2026, ho va demanar l'amo).
+            //
+            // Abans la fila portava `carrilLane(40)` de coixí a cada banda (i les
+            // classes a la vertical: 24 px), o sigui que el logo arrencava 34 px
+            // endins a 1920. Ara el contingut de la fila fa el carril SENCER.
+            //
+            // CONSEQUENCIA MESURADA, i es volguda: la franja del header
+            // (`--hg-band-w`, el tram del logo a la icona d'usuari) era el carril
+            // menys els dos coixins i ara es el carril sencer; la pagina nova hi
+            // penja el seu carril, o sigui que tambe s'eixampla aquests 68 px a
+            // 1920.
+            paddingLeft: 0,
+            paddingRight: 0,
             // El gap es tambe una mida del carril, i es el que fa que el nav hi
             // cabi: a 1280 el seu contingut demanava 5,5 px mes del que li
             // deixaven logo i icones, i la icona d'usuari queia 5,5 px mes
