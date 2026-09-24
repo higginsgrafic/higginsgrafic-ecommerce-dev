@@ -285,10 +285,13 @@ function estatInicial() {
     ordre: 'mosaic',
     sostre: 8,
     tots: false,
+    // El filtre es TRANSIENT: no es desa, perque al cap d'un refresc una llista
+    // a mitges sembla que hagi perdut formats. Pero HA D'EXISTIR SEMPRE: si
+    // falta, `pintaAcordio` no sap quin boto marcar i l'acordio peta.
     filtre: 'tots',          // 'tots' | 'vertical' | 'horitzontal'
     ambNavegador: true,      // ensenyar el dibuix del navegador o tallar a la finestra
     panell: false,
-    grupsOberts: ['Portàtil'],
+    grupsOberts: [...GRUPS],
   };
 }
 
@@ -305,11 +308,37 @@ function carrega() {
     if (!e.pestanyes.some((p) => p.id === e.activa)) e.activa = PRINCIPAL;
     if (!e.ordre || e.ordre === 'graella') e.ordre = 'mosaic';
     e.tots = false;
+    e.filtre = 'tots';
+    // Estats desats quan el defecte era tenir nomes un grup obert: s'obren tots.
+    if (!Array.isArray(e.grupsOberts) || !e.grupsOberts.length || (e.grupsOberts.length === 1 && e.grupsOberts[0] === 'Portàtil')) {
+      e.grupsOberts = [...GRUPS];
+    }
     return e;
   } catch { return null; }
 }
 
-let estat = carrega() || estatInicial();
+/**
+ * Migracio de l'estat antic (`v3`): alla les pestanyes eren els formats oberts
+ * i prou. Es recuperen tal qual, amb la principal al davant. Buidar la feina de
+ * qui te vuit formats oberts perque he canviat la forma de l'estat no es acceptable.
+ */
+function carregaV3() {
+  try {
+    const cru = localStorage.getItem('hg-overlay-estat-v3');
+    if (!cru) return null;
+    const vell = JSON.parse(cru);
+    if (!vell || !Array.isArray(vell.pestanyes)) return null;
+    const formats = vell.pestanyes.map((p) => p.id).filter((id) => PER_ID[id]);
+    if (!formats.length) return null;
+    return {
+      ...estatInicial(),
+      pestanyes: [tabPrincipal(), ...formats.map((id) => pestanyaNova(id, (vell.pestanyes.find((p) => p.id === id) || {}).ruta || '/'))],
+      activa: formats.includes(vell.activa) ? vell.activa : PRINCIPAL,
+    };
+  } catch { return null; }
+}
+
+let estat = carrega() || carregaV3() || estatInicial();
 
 // `?ruta=/nova/inici` posa aquesta ruta a totes les pestanyes: es com s'obria
 // l'eina abans de tenir pestanyes, i es la manera rapida de dir-li quina pagina.
@@ -894,7 +923,12 @@ function pintaAcordio() {
     b.textContent = NOMS_FILTRE[clau];
     b.classList.toggle('actiu', estat.filtre === clau);
     b.title = clau === 'tots' ? 'Tots els formats' : `Només els formats ${NOMS_FILTRE[clau].toLowerCase()}`;
-    b.addEventListener('click', () => { estat.filtre = clau; pintaAcordio(); desa(); });
+    b.addEventListener('click', () => {
+      estat.filtre = clau;
+      estat.grupsOberts = [...GRUPS];   // que es vegin els formats del filtre
+      pintaAcordio();
+      desa();
+    });
     fila1.append(b);
   }
   const fila2 = document.createElement('div');
