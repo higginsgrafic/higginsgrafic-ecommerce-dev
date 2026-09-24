@@ -117,7 +117,17 @@ export function FirstContactDibuix00Buttons({
 
   return (
     <div
-      className="relative mt-2 aspect-square w-full"
+      // LA MEITAT D'AMPLADA, LA MATEIXA ALCADA (24/09/2026).
+      //
+      // L'amo ho ha demanat aixi: el selector, la meitat en x. El bloc era
+      // `aspect-square w-full`, o sigui que l'amplada la manava el pare i
+      // l'alçada era la MATEIXA que l'amplada. Per halvar nomes la x, la relacio
+      // passa a 1:2: `w-1/2` dona mitja amplada i `aspect-[1/2]` en fa el doble
+      // d'alçada, que es exactament l'amplada que tenia abans.
+      //
+      // Va alineat a l'ESQUERRA a posta (sense `mx-auto`): a la pagina 2 el
+      // selector arrenca on arrenca el logo del header, i aixo no ha de canviar.
+      className="relative mt-2 aspect-[1/2] w-1/2"
       data-stripe-buttonbar="bn"
       style={{
         border: 'none',
