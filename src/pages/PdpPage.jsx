@@ -210,9 +210,20 @@ function PdpDesktop({ product }) {
     if (typeof window === 'undefined') return undefined;
     let frame = 0;
     const measure = () => {
+      // Només les targetes DINS del visor del rail (`overflow: hidden`). El
+      // carrusel deixa clons a ambdues bandes de la tira i, tot i retallats,
+      // un en quedava dins la finestra (a 1920, a 89,6): el filtre antic
+      // (`left >= -1`) l'agafava com a primera targeta i el bloc de la TDP
+      // queia una passa de carrusel a l'esquerra del carril (89,6 en comptes
+      // de 381). El visor es busca dins el contenidor de la pagina perquè
+      // només hi ha aquest rail.
+      const visor = containerRef.current?.querySelector('[data-container="rail-estatic"]');
+      const vr = visor ? visor.getBoundingClientRect() : null;
       const rects = [...document.querySelectorAll('[data-component="product-card"]')]
         .map((c) => c.getBoundingClientRect())
-        .filter((r) => r.width > 0 && r.right > 0 && r.left >= -1 && r.left < window.innerWidth)
+        .filter((r) => r.width > 0 && vr
+          && r.right > vr.left + 0.5
+          && r.left < vr.right - 0.5)
         .sort((a, b) => a.left - b.left);
       const visibles = rects.slice(0, isPortraitTablet ? 3 : 4);
       if (visibles.length < 2) {
@@ -534,7 +545,13 @@ function PdpDesktop({ product }) {
             overflow: isLandscapeTablet && Number.isFinite(tdpAvailableHeight) ? 'hidden' : undefined,
             // A la tauleta vertical, el bloc de les tres columnes va 150 px
             // mes avall del marge de sempre (100 px).
-            marginTop: isPortraitTablet ? `${100 + BAIXADA_BLOC_PDP_VERTICAL_PX}px` : (esApaissadaAmpla ? '18px' : (isLandscapeTablet ? '68px' : (esEscriptoriEstret ? '-12px' : '-32px'))),
+            //
+            // A l'escriptori ample el numero ve del baix del bloc: l'amo el
+            // vol a 50 px del bottom del viewport (25/09/2026). Mesurat a
+            // 1920x946: la banda related acaba a 469, el bloc fa 360 d'alcada
+            // i el seu baix hi ha de caure a 946 - 50 = 896, o sigui top 536:
+            // 536 - 469 = 67.
+            marginTop: isPortraitTablet ? `${100 + BAIXADA_BLOC_PDP_VERTICAL_PX}px` : (esApaissadaAmpla ? '18px' : (isLandscapeTablet ? '68px' : (esEscriptoriEstret ? '-12px' : '67px'))),
             marginBottom: '32px',
           }}
         >
