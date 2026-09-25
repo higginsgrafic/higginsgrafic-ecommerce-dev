@@ -690,49 +690,26 @@ function FullWideSlideHeader({
     }
   }, [active, selectedItemByCollection, austenSubcollection]);
 
-  // TANCAR EL MEGASLIDE I NAVEGAR, EN AQUEST ORDRE I NO EN EL MATEIX TIC
-  // (25/09/2026, arran del que va veure l'amo: «continua sortint la colleccio que
-  // li dona la gana» i «es bloca el clic»).
-  //
-  // React agrupa les actualitzacions d'estat i, si es navega en el mateix tic, la
-  // ruta canvia i el megaslide es desmunta ABANS que el tancament s'apliqui: les
-  // actualitzacions es llencen. Llavors el navegador, en tornar de la PDP, el
-  // restaura del bfcache amb l'estat vell (obert i amb la colleccio antiga) i allo
-  // que es veu no es allo que s'ha triat. Amb la navegacio un tic mes tard, el
-  // tancament i el canvi de colleccio s'apliquen de debò abans de marxar.
-  const navegarRef = useRef(null);
-  const tancaINavega = useCallback((url, colorSlug, selectedVariant) => {
-    setManualOverrideClosed(true);
-    setMegaPage(1);
-    setMegaFullScreen(false);
-    const desti = `${url}?color=${colorSlug}&variant=${selectedVariant}`;
-    window.clearTimeout(navegarRef.current);
-    navegarRef.current = window.setTimeout(() => {
-      navegarRef.current = null;
-      navigate(desti);
-    }, 300);
-  }, [navigate, setMegaPage]);
-
-  useEffect(() => () => window.clearTimeout(navegarRef.current), []);
-
   const onShirtClick = useCallback((collection, item, color) => {
     const url = resolvePdpUrl(collection, item);
-    if (!url) return;
     const selectedVariant = collection === 'the_human_inside' ? humanInsideVariant : firstContactVariant;
-    const matched = CERCADOR_COLORS.find((c) => c.overlayHex === color);
-    const colorSlug = matched?.slug || displayedShirtColor || 'white';
-    tancaINavega(url, colorSlug, selectedVariant);
-  }, [tancaINavega, resolvePdpUrl, displayedShirtColor, firstContactVariant, humanInsideVariant]);
+    if (url) {
+      const matched = CERCADOR_COLORS.find((c) => c.overlayHex === color);
+      const colorSlug = matched?.slug || displayedShirtColor || 'white';
+      navigate(`${url}?color=${colorSlug}&variant=${selectedVariant}`);
+    }
+  }, [navigate, resolvePdpUrl, displayedShirtColor, firstContactVariant, humanInsideVariant]);
 
   // Pàgina 2: onShirtClick propi amb variants P2
   const onShirtClickP2 = useCallback((collection, item, color) => {
     const url = resolvePdpUrl(collection, item);
-    if (!url) return;
-    const matched = CERCADOR_COLORS.find((c) => c.overlayHex === color);
-    const colorSlug = matched?.slug || displayedShirtColorP2 || 'white';
-    const selectedVariant = collection === 'the_human_inside' ? humanInsideVariantP2 : firstContactVariantP2;
-    tancaINavega(url, colorSlug, selectedVariant);
-  }, [tancaINavega, resolvePdpUrl, displayedShirtColorP2, firstContactVariantP2, humanInsideVariantP2]);
+    if (url) {
+      const matched = CERCADOR_COLORS.find((c) => c.overlayHex === color);
+      const colorSlug = matched?.slug || displayedShirtColorP2 || 'white';
+      const selectedVariant = collection === 'the_human_inside' ? humanInsideVariantP2 : firstContactVariantP2;
+      navigate(`${url}?color=${colorSlug}&variant=${selectedVariant}`);
+    }
+  }, [navigate, resolvePdpUrl, displayedShirtColorP2, firstContactVariantP2, humanInsideVariantP2]);
 
   const [thinStartIndex, setThinStartIndex] = useState(0);
   const [gildan64000Catalog, setGildan64000Catalog] = useState(null);
