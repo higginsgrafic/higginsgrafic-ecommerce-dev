@@ -776,6 +776,25 @@ export function CercadorColorsGrid({
   // que hi ha sota. La tira no porta barra de desplac,ament (constitucio, regla
   // 16): el gest son pointer events, com al carrusel.
   const arrossegant = useRef(false);
+  const gridRef = useRef(null);
+  // LA RODETA SOBRE LA TIRA (24/09/2026, ho va demanar l'amo): mou la tria una
+  // barra endavant o enrere, com el carrusel de dibuixos. Amb `passive: false`
+  // perque tambe ha d'aturar el desplac,ament vertical de la pagina.
+  useLayoutEffect(() => {
+    const el = gridRef.current;
+    if (!el) return undefined;
+    const rodeta = (e) => {
+      e.preventDefault();
+      const d = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
+      if (!d) return;
+      const i = CERCADOR_COLORS.findIndex((c) => c.slug === selectedColor);
+      const j = Math.max(0, Math.min(CERCADOR_COLORS.length - 1, (i < 0 ? 0 : i) + (d > 0 ? 1 : -1)));
+      const nou = CERCADOR_COLORS[j]?.slug;
+      if (nou && nou !== selectedColor) onSelectColor?.(nou);
+    };
+    el.addEventListener('wheel', rodeta, { passive: false });
+    return () => el.removeEventListener('wheel', rodeta);
+  }, [selectedColor, onSelectColor]);
   const triaAmbElDit = (e) => {
     const sota = document.elementFromPoint(e.clientX, e.clientY);
     const barra = sota && sota.closest ? sota.closest('[data-color-barra]') : null;
@@ -784,6 +803,7 @@ export function CercadorColorsGrid({
   };
   return (
     <div
+      ref={gridRef}
       data-p2-color-grid
       onPointerDown={(e) => {
         arrossegant.current = true;
