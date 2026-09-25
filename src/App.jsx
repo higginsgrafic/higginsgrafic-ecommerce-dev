@@ -291,7 +291,13 @@ function App() {
       ) : (
         <>
           <SkipLink />
-          {isNavigating && !isAdminRoute && !isFullScreenRoute && !shouldRedirect && <LoadingScreen />}
+          {/* EL CANVI DE RUTA TAMBé VA AMB LA PEÇA DE DINS (25/09/2026).
+              Aquest overlay s'encenia 300 ms a cada canvi de ruta
+              (`useGlobalEffects`), i amb la peça de la PDP trigant una mica mes
+              que allo, la pantalla sencera es posava blanca i allo semblava una
+              recarrega. Es la MATEIXA causa que el fallback del Suspense: es la
+              mateixa peça i el mateix arranjament. */}
+          {isNavigating && !isAdminRoute && !isFullScreenRoute && !shouldRedirect && <LoadingScreen variant="inpage" />}
 
           {adminBannerVisible && <AdminBanner rulerInset={rulerInset} />}
 
