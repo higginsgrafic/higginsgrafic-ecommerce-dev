@@ -14,7 +14,8 @@ import { buildOtherCollectionsImages } from '@/components/home/homeDrawings';
 import useIsMobile from '@/hooks/useIsMobile';
 import PdpMobile from '@/pages/PdpMobile';
 import PageBand from '@/components/layout/PageBand';
-import { getSafeBelt, esTauletaApaisada, readRootCssNumber } from '@/utils/layoutMetrics';
+import { getSafeBelt, esTauletaApaisada, readRootCssNumber, getLayoutViewportWidth } from '@/utils/layoutMetrics';
+import { carrilDeclarat } from '@/utils/layoutModel';
 import { SELLING_PRICE_LABEL } from '@/config/pricing';
 
 const PDP_PRESET_VERSION = 'pdp-layout-2026-06-06-1953';
@@ -249,6 +250,13 @@ function PdpDesktop({ product }) {
       ));
     };
     const schedule = () => { cancelAnimationFrame(frame); frame = requestAnimationFrame(measure); };
+    // La mesura va al frame següent, NO sincrona. Al primer commit (App i el
+    // chunk de la PDP entren alhora, mesurat el 25/09) el header publica
+    // `--hg-mega-w` al SEU pass de maquetacio, i en el moment d'aquest efecte
+    // el rail encara va amb la reserva del belt: una lectura sincrona mesuraria
+    // les targetes pre-ancla (318 en comptes de 269) i la pintaria. La reserva
+    // del bloc, mentrestant, es el carril declarat (vegeu `carrilAmplePx`), que
+    // ja quadra: la mesura nomes ha de refinar el 0,1 px del globus rodó.
     schedule();
     const t1 = window.setTimeout(schedule, 250);
     const t2 = window.setTimeout(schedule, 900);
@@ -408,6 +416,21 @@ function PdpDesktop({ product }) {
     ? Math.max(80, (beltWidth - 3 * PAUTA_GUTTER_X) / 4 * (isPortraitTablet ? 1 : 0.94))
     : null;
   const railGridW = railCardW != null ? 4 * railCardW + 3 * PAUTA_GUTTER_X : null;
+  // La RESERVA sense mesurament és el CARRIL declarat, no el càlcul de sempre.
+  // `--hg-mega-w` el publica el header des del primer pass (el mateix ample que
+  // fa servir el rail amb `beltWidthOverride`). La reserva vella (getSafeBelt,
+  // min(70,3% del viewport, 1350) amb el monió del 94%) no hi encaixava mai:
+  // mesurat el 25/09, pintava quadrats de 298,8 a 313,5 mentre el carril és
+  // 269 a 381 — el fart de tota la columna en obrir la pàgina. A la vertical no
+  // mana el carril del megaslide (mana la seva estabilització).
+  const carrilAmplePx = isPortraitTablet
+    ? null
+    : (readRootCssNumber('--hg-mega-w', 0)
+      || carrilDeclarat({
+        ample: getLayoutViewportWidth(),
+        alt: typeof window !== 'undefined' ? window.innerHeight || 0 : 0,
+      })
+      || null);
   const railLeftOffset = isPortraitTablet ? 0 : 20;
   const tdpBaseHeight = isCompactTablet ? 280 : 360;
   const tdpFitScale = isLandscapeTablet && Number.isFinite(tdpAvailableHeight)
@@ -568,13 +591,17 @@ function PdpDesktop({ product }) {
               alignItems: 'stretch',
               width: railGeo
                 ? `${railGeo.grid / tdpFitScale}px`
-                : (tdpFitScale < 1 ? `${100 / tdpFitScale}%` : (isPortraitTablet && portraitRailViewportWidth ? `${portraitRailViewportWidth}px` : (railGridW ? `${railGridW}px` : (beltWidth ? `${beltWidth}px` : '100%')))),
+                : (carrilAmplePx != null
+                  ? `${carrilAmplePx / (tdpFitScale < 1 ? tdpFitScale : 1)}px`
+                  : (tdpFitScale < 1 ? `${100 / tdpFitScale}%` : (isPortraitTablet && portraitRailViewportWidth ? `${portraitRailViewportWidth}px` : (railGridW ? `${railGridW}px` : (beltWidth ? `${beltWidth}px` : '100%'))))),
               height: `${tdpBaseHeight}px`,
               // El marge esquerre es el que calgui perque la primera columna
               // caigui sobre la primera targeta visibles del rail.
               margin: railGeo
                 ? `0 0 0 ${railGeo.marge}px`
-                : (railGridW ? `0 0 0 ${railLeftOffset}px` : (beltWidth ? '0 auto' : undefined)),
+                : (carrilAmplePx != null
+                  ? '0 auto'
+                  : (railGridW ? `0 0 0 ${railLeftOffset}px` : (beltWidth ? '0 auto' : undefined))),
               transform: tdpFitScale < 1 ? `scale(${tdpFitScale})` : undefined,
               transformOrigin: 'top left',
             }}
