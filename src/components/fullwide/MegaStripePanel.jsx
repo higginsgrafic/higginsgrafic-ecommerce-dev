@@ -280,7 +280,10 @@ function MegaStripePanel({
     };
     window.addEventListener('mega-stripe-full-hit-p2', handler);
     return () => window.removeEventListener('mega-stripe-full-hit-p2', handler);
-  }, [onShirtClick, selectedItem, stripeTileItems, active, shirtColor]);
+    // `stripeStrip` i `onStripeStripSelect` tambe hi son: el gestor en llegeix la
+    // colleccio i la subcolleccio de la casa clicada, i amb una llista de
+    // dependencies curta es quedava amb les primeres (mai no hi eren).
+  }, [onShirtClick, selectedItem, stripeTileItems, active, shirtColor, stripeStrip, onStripeStripSelect]);
 
   // LA RODETA SOBRE LA FRANJA (25/09/2026, ho va demanar l'amo): fa passar els
   // dibuixos d'un en un, com la graella i com la tira de colors. Amb

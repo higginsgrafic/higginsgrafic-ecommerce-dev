@@ -363,11 +363,17 @@ function FullWideSlideHeader({
   // 8 px per sota de la linia del megaslide.
   const CADE_BAIXADA_PX = 8;
   const { user } = useAuth();
+  // LES CLAUS DE LA URL VAN AMB GUIO I LES DE L'ESTAT AMB GUIO BAIX (25/09/2026):
+  // `the-human-inside` a la URL, `the_human_inside` a l'estat. Sense normalitzar,
+  // la colleccio de la URL no es reconeixia mai i sempre queia al valor per
+  // defecte, FIRST CONTACT. Era el «continua sortint la colleccio que li dona la
+  // gana» de l'amo.
+  const clauColleccioDeUrl = (valor) => String(valor || '').trim().replace(/-/g, '_');
   const [active, setActive] = useState(() => {
     try {
       const p = new URLSearchParams(location.search);
       const fromUrl = p.get('active') || p.get('collection') || '';
-      const next = typeof fromUrl === 'string' ? fromUrl.trim() : '';
+      const next = clauColleccioDeUrl(fromUrl);
       const allowed = new Set(['first_contact', 'the_human_inside', 'austen', 'cube', 'miscellania']);
       if (next && allowed.has(next)) return next;
 
@@ -408,34 +414,95 @@ function FullWideSlideHeader({
   useUrlActiveCollection(location.search, setActive);
 
   // LA COLLECCIO TORNA DE LA URL QUAN EL NAVEGADOR RESTAURA LA PAGINA
-  // (25/09/2026, arran del que va veure l'amo: «després es bloca el clic»).
+  // (25/09/2026, arran del que va veure l'amo: «després es bloca el clic» i
+  // «continua sortint la colleccio que li dona la gana»).
   //
-  // `useUrlActiveCollection` nome's mira quan canvia `location.search`. Quan
-  // tornes de la PDP amb el boto del navegador, el navegador restaura la pagina
-  // del seu magatzem (bfcache) amb l'ESTAT DE REACT intacte i sense tornar a
-  // muntar res: `search` es el mateix i l'efecte no es torna a executar. Si
-  // `active` s'havia quedat a `null`, el megaslide es muntava amb `megaPage` 2 i
-  // la pagina 2 BUIDA (ni franja ni graella), i el boto del cercador no el podia
-  // tancar perque el seu commutador demana `megaPage === 2 && active`. Allo era
-  // el «bloqueig».
+  // `useUrlActiveCollection` nome's mira quan canvia `location.search` de React.
+  // Quan tornes de la PDP amb el boto del navegador, el navegador restaura la
+  // pagina del seu magatzem (bfcache) amb l'ESTAT DE REACT intacte i sense
+  // tornar a muntar res: `search` es el mateix i aquell efecte no s'executa.
+  // Llavors la graella, la franja i la colleccio activa es queden com estaven
+  // mentre la URL diu una altra cosa, i allo que es veu no es allo que s'ha
+  // triat.
   //
-  // `pageshow` es dispara tambe en restaurar del bfcache, i per aixo torna a
-  // llegir la URL. L'estat no mana: mana la URL.
+  // `pageshow` (restaurar del bfcache) i `popstate` (boto d'enrere/endavant) ho
+  // tornen a llegir tot de la URL. L'estat no mana: mana la URL.
   useEffect(() => {
     if (typeof window === 'undefined') return undefined;
     const PERMESOS = new Set(['first_contact', 'the_human_inside', 'austen', 'cube', 'miscellania']);
-    const sincronitza = () => {
+    const sincronitza = (ev) => {
+      // NOME'S EN RESTAURAR DEL BFCACHE: `pageshow` tambe es dispara en la
+      // carrega normal, i alla no s'ha de tancar res.
+      const restaurat = Boolean(ev && ev.persisted);
       try {
         const p = new URLSearchParams(window.location.search);
-        const des = (p.get('active') || p.get('collection') || '').trim();
+        // Tambe s'accepta la clau amb guio baix, per les URLs ja desades.
+        const des = clauColleccioDeUrl(p.get('active') || p.get('collection') || '');
+        if (des && PERMESOS.has(des)) setActive(des);
+        // I EL MEGASLIDE ES TANCA. El navegador restaura una foto del DOM amb
+        // l'estat de React d'abans de marxar: si s'hi havia quedat obert amb la
+        // graella desplaçada, allo es el que es veu, i sembla que l'app hagi
+        // perdut el cap (l'amo en deia «es bloca el clic»). Tancat, la propera
+        // obertura arrenca neta i llegeix la colleccio de la URL.
+        if (restaurat) {
+          setManualOverrideClosed(true);
+          setMegaPage(1);
+          setMegaFullScreen(false);
+        }
+      } catch {
+        // s'ignora a posta
+      }
+    };
+    const enPopState = () => {
+      try {
+        const p = new URLSearchParams(window.location.search);
+        const des = clauColleccioDeUrl(p.get('active') || p.get('collection') || '');
         if (des && PERMESOS.has(des)) setActive(des);
       } catch {
         // s'ignora a posta
       }
     };
     window.addEventListener('pageshow', sincronitza);
-    return () => window.removeEventListener('pageshow', sincronitza);
+    window.addEventListener('popstate', enPopState);
+    return () => {
+      window.removeEventListener('pageshow', sincronitza);
+      window.removeEventListener('popstate', enPopState);
+    };
   }, []);
+
+  // LA COLLECCIO TAMBE VA A LA URL (25/09/2026).
+  //
+  // A l'inici nou, la colleccio activa del megaslide nome's viu a l'estat de
+  // React. Quan es navega a una PDP amb una samarreta d'una altra colleccio, en
+  // tornar el megaslide llegeix la colleccio de la URL: si alla hi ha una
+  // colleccio vella, torna a ensenyar aquella i sembla que el clic «no faci cas»
+  // (es el que va veure l'amo: «continua sortint la colleccio que li dona la
+  // gana»).
+  //
+  // LA CLAU VA AMB GUIONS, COM LA URL: l'estat intern fa servir
+  // `the_human_inside` (guio baix) i la URL ha de portar `the-human-inside`, que
+  // es la forma que llegeixen `useUrlActiveCollection` i el lector de `pageshow`.
+  // Amb la clau amb guio baix a la URL, en tornar de la PDP la colleccio no es
+  // reconeixia i el megaslide queia al valor per defecte: FIRST CONTACT.
+  //
+  // Es NOMES a `/nova/inici` (les altres rutes tenen els seus parametres) i amb
+  // `replace`, perque canviar de colleccio no ha de deixar un pas a l'historial.
+  const apuntaColleccio = useCallback((col) => {
+    if (!col) return;
+    if (location.pathname !== '/nova/inici') return;
+    try {
+      const clau = String(col).replace(/_/g, '-');
+      const params = new URLSearchParams(location.search || '');
+      if (params.get('active') === clau) return;
+      params.set('active', clau);
+      params.delete('collection');
+      const q = params.toString();
+      navigate(`${location.pathname}${q ? `?${q}` : ''}${location.hash || ''}`, { replace: true });
+    } catch {
+      // s'ignora a posta
+    }
+  }, [location.pathname, location.search, location.hash, navigate]);
+
 
   useEffect(() => {
     const handleEsc = (e) => {
@@ -623,26 +690,49 @@ function FullWideSlideHeader({
     }
   }, [active, selectedItemByCollection, austenSubcollection]);
 
+  // TANCAR EL MEGASLIDE I NAVEGAR, EN AQUEST ORDRE I NO EN EL MATEIX TIC
+  // (25/09/2026, arran del que va veure l'amo: «continua sortint la colleccio que
+  // li dona la gana» i «es bloca el clic»).
+  //
+  // React agrupa les actualitzacions d'estat i, si es navega en el mateix tic, la
+  // ruta canvia i el megaslide es desmunta ABANS que el tancament s'apliqui: les
+  // actualitzacions es llencen. Llavors el navegador, en tornar de la PDP, el
+  // restaura del bfcache amb l'estat vell (obert i amb la colleccio antiga) i allo
+  // que es veu no es allo que s'ha triat. Amb la navegacio un tic mes tard, el
+  // tancament i el canvi de colleccio s'apliquen de debò abans de marxar.
+  const navegarRef = useRef(null);
+  const tancaINavega = useCallback((url, colorSlug, selectedVariant) => {
+    setManualOverrideClosed(true);
+    setMegaPage(1);
+    setMegaFullScreen(false);
+    const desti = `${url}?color=${colorSlug}&variant=${selectedVariant}`;
+    window.clearTimeout(navegarRef.current);
+    navegarRef.current = window.setTimeout(() => {
+      navegarRef.current = null;
+      navigate(desti);
+    }, 300);
+  }, [navigate, setMegaPage]);
+
+  useEffect(() => () => window.clearTimeout(navegarRef.current), []);
+
   const onShirtClick = useCallback((collection, item, color) => {
     const url = resolvePdpUrl(collection, item);
+    if (!url) return;
     const selectedVariant = collection === 'the_human_inside' ? humanInsideVariant : firstContactVariant;
-    if (url) {
-      const matched = CERCADOR_COLORS.find((c) => c.overlayHex === color);
-      const colorSlug = matched?.slug || displayedShirtColor || 'white';
-      navigate(`${url}?color=${colorSlug}&variant=${selectedVariant}`);
-    }
-  }, [navigate, resolvePdpUrl, displayedShirtColor, firstContactVariant, humanInsideVariant]);
+    const matched = CERCADOR_COLORS.find((c) => c.overlayHex === color);
+    const colorSlug = matched?.slug || displayedShirtColor || 'white';
+    tancaINavega(url, colorSlug, selectedVariant);
+  }, [tancaINavega, resolvePdpUrl, displayedShirtColor, firstContactVariant, humanInsideVariant]);
 
   // Pàgina 2: onShirtClick propi amb variants P2
   const onShirtClickP2 = useCallback((collection, item, color) => {
     const url = resolvePdpUrl(collection, item);
-    if (url) {
-      const matched = CERCADOR_COLORS.find((c) => c.overlayHex === color);
-      const colorSlug = matched?.slug || displayedShirtColorP2 || 'white';
-      const selectedVariant = collection === 'the_human_inside' ? humanInsideVariantP2 : firstContactVariantP2;
-      navigate(`${url}?color=${colorSlug}&variant=${selectedVariant}`);
-    }
-  }, [navigate, resolvePdpUrl, displayedShirtColorP2, firstContactVariantP2, humanInsideVariantP2]);
+    if (!url) return;
+    const matched = CERCADOR_COLORS.find((c) => c.overlayHex === color);
+    const colorSlug = matched?.slug || displayedShirtColorP2 || 'white';
+    const selectedVariant = collection === 'the_human_inside' ? humanInsideVariantP2 : firstContactVariantP2;
+    tancaINavega(url, colorSlug, selectedVariant);
+  }, [tancaINavega, resolvePdpUrl, displayedShirtColorP2, firstContactVariantP2, humanInsideVariantP2]);
 
   const [thinStartIndex, setThinStartIndex] = useState(0);
   const [gildan64000Catalog, setGildan64000Catalog] = useState(null);
@@ -2160,9 +2250,31 @@ function FullWideSlideHeader({
   const bleedGuardExpandPx = { left: expansioBleed, right: expansioBleed };
   const [accordionPautaScale, setAccordionPautaScale] = useState(1);
 
+  // Cada cop que s'obre el megaslide, la graella de la pagina 2 es torn a
+  // muntar (vegeu `resetKey`): el navegador pot restaurar la pagina del bfcache
+  // amb el desplaçament vell i, si la colleccio no ha canviat, el centratge no
+  // s'executa i la graella es queda fora de la finestra.
+  const [oberturaMega, setOberturaMega] = useState(0);
+
   const ensureMegaOpen = () => {
     setManualOverrideClosed(false);
-    setActive((prev) => prev || 'first_contact');
+    setOberturaMega((v) => v + 1);
+    // LA COLLECCIO DE LA URL MANA (25/09/2026). Abans aixo era
+    // `setActive((prev) => prev || 'first_contact')`, i quan el megaslide es
+    // tancava en navegar a una PDP, en tornar `active` era `null` i allo posava
+    // FIRST CONTACT passant per sobre de la colleccio que la URL ja deia. Era
+    // exactament el que va veure l'amo: «continua sortint la colleccio que li
+    // dona la gana». L'ordre bo es: la URL, l'estat que ja hi hagi, i el valor
+    // per defecte nome's com a ultim recurs.
+    let deLaUrl = '';
+    try {
+      const p = new URLSearchParams(window.location.search);
+      deLaUrl = (p.get('active') || p.get('collection') || '').trim().replace(/_/g, '-');
+    } catch {
+      // s'ignora a posta
+    }
+    const PERMESOS = new Set(['first_contact', 'the_human_inside', 'austen', 'cube', 'miscellania']);
+    setActive((prev) => prev || (PERMESOS.has(deLaUrl) ? deLaUrl : 'first_contact'));
   };
 
   const closeMegaExplicitly = () => {
@@ -2771,7 +2883,7 @@ function FullWideSlideHeader({
     try {
       const p = new URLSearchParams(location.search);
       const fromUrl = p.get('active') || p.get('collection') || '';
-      const next = typeof fromUrl === 'string' ? fromUrl.trim() : '';
+      const next = clauColleccioDeUrl(fromUrl);
       const allowed = new Set(['first_contact', 'the_human_inside', 'austen', 'cube', 'miscellania']);
       if (next && allowed.has(next)) {
         setActive(next);
@@ -3340,6 +3452,8 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
         displayedShirtColorP2={displayedShirtColorP2}
         onShirtClick={onShirtClick}
         onShirtClickP2={onShirtClickP2}
+        onApuntaColleccio={apuntaColleccio}
+        resetKey={oberturaMega}
         cercadorSelectedColorP2={cercadorSelectedColorP2}
         setCercadorSelectedColorP2={setCercadorSelectedColorP2}
         thinDrawings={thinDrawings}
