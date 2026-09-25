@@ -438,7 +438,9 @@ export function CercadorDibuixosGraella({
     // La composicio acaba d'encaixar despres del primer pintat (la fila es
     // mesura sola): es torna a mirar un parell de cops.
     const t1 = window.setTimeout(calcula, 250);
-    const t2 = window.setTimeout(calcula, 900);
+    // A 400 ms i no a 900: es just despres de l'animacio d'obertura (340 ms).
+    // El repas tarda corregia despres que el panell sembles fet (25/09/2026).
+    const t2 = window.setTimeout(calcula, 400);
     window.addEventListener('resize', calcula);
     return () => {
       window.clearTimeout(t1);
@@ -488,7 +490,9 @@ export function CercadorDibuixosGraella({
     };
     calcula();
     const t1 = window.setTimeout(calcula, 250);
-    const t2 = window.setTimeout(calcula, 900);
+    // A 400 ms i no a 900: es just despres de l'animacio d'obertura (340 ms).
+    // El repas tarda corregia despres que el panell sembles fet (25/09/2026).
+    const t2 = window.setTimeout(calcula, 400);
     window.addEventListener('resize', calcula);
     return () => {
       window.clearTimeout(t1);
@@ -1207,7 +1211,9 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
     };
     calcula();
     const t1 = window.setTimeout(calcula, 250);
-    const t2 = window.setTimeout(calcula, 900);
+    // A 400 ms i no a 900: es just despres de l'animacio d'obertura (340 ms).
+    // El repas tarda corregia despres que el panell sembles fet (25/09/2026).
+    const t2 = window.setTimeout(calcula, 400);
     window.addEventListener('resize', calcula);
     // La franja s'ajusta al carril i la seva alçada acaba de quadrar després del
     // primer pintat: sense observar-la, la mesura es quedava curta.
@@ -1252,7 +1258,9 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
     };
     calcula();
     const t1 = window.setTimeout(calcula, 250);
-    const t2 = window.setTimeout(calcula, 900);
+    // A 400 ms i no a 900: es just despres de l'animacio d'obertura (340 ms).
+    // El repas tarda corregia despres que el panell sembles fet (25/09/2026).
+    const t2 = window.setTimeout(calcula, 400);
     window.addEventListener('resize', calcula);
     return () => {
       window.clearTimeout(t1);

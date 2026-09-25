@@ -47,6 +47,26 @@ function App() {
       setDeferredLocation(location);
     });
   }, [location, startTransition]);
+
+  // ESCALFAR LES FONTS DEL MEGASLIDE A L'ARRENCADA.
+  //
+  // Les cares Roboto Condensed 300/700 i Roboto 300 nomes les fa servir el
+  // contingut del megaslide: amb `display=swap` no es baixen fins que el
+  // panell no pinta, i en obrir-se el text canviava de mida (mesurat el
+  // 25/09/2026 a 1920: la filera del cercador anava de 105 a 126 px d'alcada
+  // quan la cara arribava, i el reflow arrossegava la graella de dibuixos i
+  // el calibratge: el fart de l'obertura). Pre-carregades aqui, a l'obertura
+  // ja hi son i el contingut neix amb les mides bones.
+  useEffect(() => {
+    if (typeof document === 'undefined' || !document.fonts) return undefined;
+    const cares = [
+      '300 16px "Roboto Condensed"',
+      '700 16px "Roboto Condensed"',
+      '300 16px "Roboto"',
+    ];
+    cares.forEach((cara) => { document.fonts.load(cara).catch(() => {}); });
+    return undefined;
+  }, []);
   const {
     isLargeScreen,
     isPortraitTablet,

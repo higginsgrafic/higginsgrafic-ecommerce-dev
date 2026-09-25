@@ -290,8 +290,13 @@ export default function MegaslidePagina2({
     // Dues passades de repas: la segona torna a mesurar amb el DOM ja pintat.
     // Amb una de sola, si el fila es pinta despres del timer, el bucle es quedava
     // amb un residu d'1,8 px que canviava d'una execucio a l'altra.
+    //
+    // La segona cau a 340 ms i no mes tard: es quan acaba l'animacio d'obertura
+    // del panell (`mega-panel-desplega`). El repas antic a 600 ms corregia
+    // DESPRES que el panell sembles fet, i l'amo ho veia com que el contingut
+    // es continuava reajustant (25/09/2026).
     settleTimer = window.setTimeout(schedule, 180);
-    settleTimer2 = window.setTimeout(schedule, 600);
+    settleTimer2 = window.setTimeout(schedule, 340);
     window.addEventListener('resize', schedule);
     return () => {
       cancelAnimationFrame(frame);
