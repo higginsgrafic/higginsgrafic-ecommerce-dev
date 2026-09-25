@@ -126,7 +126,7 @@ export const DismissPreloaderOnMount = () => {
   return null;
 };
 
-const LoadingScreen = ({ spinnerId: propSpinnerId }) => {
+const LoadingScreen = ({ spinnerId: propSpinnerId, variant = 'screen' }) => {
   // Evitar duplicar l'spinner si l'overlay HTML inicial encara està present
   if (typeof document !== 'undefined' && document.getElementById('app-preloader')) {
     return null;
@@ -135,18 +135,40 @@ const LoadingScreen = ({ spinnerId: propSpinnerId }) => {
   const id = propSpinnerId || getSpinnerId();
   const Spinner = SPINNERS[id] || LogoSpinner;
 
+  // DUES MESURES, NO UNA (25/09/2026).
+  //
+  // Aquesta peça va néixer per a la CARREGA de la pagina (i per al `isNavigating`
+  // de dalt): un overlay fix que cobreix tota la pantalla, amb portal a
+  // `document.body`. Com que tambe s'usava com a `fallback` del `<Suspense>` que
+  // envolta TOTES les rutes, cada vegada que una ruta trigava un instant a
+  // carregar (per exemple la PDP, que va amb `lazy`) la pantalla sencera es
+  // posava blanca: nome's hi quedava el «Carregant...», i allo es
+  // indistingible d'una recarrega del navegador. Ho va veure l'amo en un video:
+  // mesurat, el document NO es recarrega i l'estat de React hi es; el que
+  // passava es allo.
+  //
+  // Amb `variant="inpage"` la peça es queda DINS del seu contenidor (el `main`):
+  // la capçalera i el megaslide no es toquen i el canvi de ruta es llegeix com
+  // el que es.
+  const enLinia = variant === 'inpage';
   const content = (
     <div
       style={{
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        width: '100vw',
-        height: '100vh',
-        zIndex: 99999,
-        background: '#ffffff',
+        ...(enLinia ? {
+          width: '100%',
+          minHeight: '100vh',
+          background: '#ffffff',
+        } : {
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          width: '100vw',
+          height: '100vh',
+          zIndex: 99999,
+          background: '#ffffff',
+        }),
         color: '#141414',
         display: 'flex',
         flexDirection: 'column',
@@ -164,7 +186,7 @@ const LoadingScreen = ({ spinnerId: propSpinnerId }) => {
     </div>
   );
 
-  if (typeof document !== 'undefined' && document.body) {
+  if (!enLinia && typeof document !== 'undefined' && document.body) {
     return ReactDOM.createPortal(content, document.body);
   }
 

@@ -343,7 +343,7 @@ function App() {
           ) : {}}
           tabIndex={-1}
         >
-          <Suspense fallback={<LoadingScreen />}>
+          <Suspense fallback={<LoadingScreen variant="inpage" />}>
             <DismissPreloaderOnMount />
             <AppRoutes
               location={deferredLocation}
