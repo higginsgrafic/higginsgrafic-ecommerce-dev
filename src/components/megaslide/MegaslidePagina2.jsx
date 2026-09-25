@@ -510,17 +510,34 @@ export default function MegaslidePagina2({
   // son de la colleccio activa, i el panell hi posa el vel de la silueta (el
   // mateix mecanisme que les samarretes buides).
   //
+  // EL VEL VA AMB EL DIBUIX, NO AMB LA CASA (25/09/2026, segona volta).
+  //
+  // Les catorze cases son FIXES i el que circula es la llista de dibuixos: cada
+  // casa ensenya el dibuix que li toca segons `stripeStripOffset`. Si el vel es
+  // calcula nome's amb la colleccio activa, en fer scroll es queda a les cases
+  // d'abans: les que ja no duen cap dibuix d'aquella colleccio continuen
+  // atenuades i les que n'hi duen de nous es queden sense vel. Ho va veure
+  // l'amo: «les samarretes que eren actives, quan fas scroll, queden actives i
+  // les altres atenuades encara que vagin corrent els dibuixos».
+  //
+  // Per aixo el mapa surt de la MATEIXA rotacio que pinta les cases
+  // (`stripeStripOffset` sobre la tira de dalt): el vel i el dibuix de cada casa
+  // sempre son el mateix dibuix.
+  //
   // En blanc pla, com el vel de les buides: la samarreta s'aclareix cap al fons
   // conservant el seu to.
   const VEL_SAMARRETA_INACTIVA = 0.6;
   const indicesSamarretesInactivesFranja = useMemo(() => {
-    if (!Array.isArray(stripeStrip) || !active) return [];
+    const n = tiraFranja.srcs.length;
+    if (!n || !active) return [];
     const out = [];
-    stripeStrip.forEach((casa, i) => {
-      if (i < 14 && casa && casa.collection && casa.collection !== active) out.push(i);
-    });
+    for (let i = 0; i < 14; i++) {
+      const j = ((((i + stripeStripOffset) % n) + n) % n);
+      const coll = tiraFranja.collections[j];
+      if (coll && coll !== active) out.push(i);
+    }
     return out;
-  }, [stripeStrip, active]);
+  }, [tiraFranja, stripeStripOffset, active]);
 
   const emptyTileIndices = useMemo(() => {
     if (!Array.isArray(stripeTileItems)) return [];
