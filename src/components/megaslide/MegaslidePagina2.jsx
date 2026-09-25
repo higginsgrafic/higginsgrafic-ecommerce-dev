@@ -318,21 +318,53 @@ export default function MegaslidePagina2({
     return Array.isArray(d) ? d : [];
   }, [resolvedMegaFiltered, active, thinDrawings]);
 
-  const stripeTileOverlaySrcs = useMemo(() => {
-    if (drawable.length === 0) return null;
-    return computeStripeTileOverlaySrcs({
-      drawable,
-      variant,
-      active,
-      displayedShirtColor,
-      resolvedOverlaySrc,
-    });
-  }, [drawable, variant, active, displayedShirtColor, resolvedOverlaySrc]);
+  // LA TIRA DE LA FRANJA, DE TOTES LES COLLECCIONS SEGUIDES (24/09/2026, ho va
+  // demanar l'amo): les caselles que abans quedaven buides (les samarretes
+  // atenuades) porten els dibuixos de la colleccio seguent, en l'ordre de la
+  // graella (`dibuixosGraella16x4`, que es qui la fa).
+  //
+  // ES CONSTRUEIX COLLECCIO A COLLECCIO, i aixo es el que fa que funcioni:
+  // `computeStripeTileOverlaySrcs` resol cada dibuix amb el context de la seva
+  // colleccio (`active`), i amb una llista barrejada retornava `null` a tot el
+  // que no fos l'activa (mesurat: 7 dibuixos dels 14 que tocaven).
+  const tiraFranja = useMemo(() => {
+    if (!Array.isArray(drawable) || drawable.length === 0) return { items: null, srcs: null };
+    const items = [];
+    const srcs = [];
+    const afegeix = (llista, ctxActive, ctxVariant) => {
+      if (!llista.length || items.length >= 14) return;
+      const s = computeStripeTileOverlaySrcs({
+        drawable: llista,
+        variant: ctxVariant,
+        active: ctxActive,
+        displayedShirtColor,
+        resolvedOverlaySrc,
+      });
+      if (!s) return;
+      for (let i = 0; i < llista.length && items.length < 14; i++) {
+        if (!s[i]) continue;
+        items.push(llista[i]);
+        srcs.push(s[i]);
+      }
+    };
+    // Primer la colleccio activa, tal com estava; despres les altres, en
+    // l'ordre de la graella, fins a omplir les catorze caselles.
+    afegeix(drawable, active, variant);
+    for (const it of dibuixosGraella16x4()) {
+      if (items.length >= 14) break;
+      if (!it.stripeItem || it.collection === active) continue;
+      afegeix([it.stripeItem], it.collection, it.collection === 'the_human_inside' ? humanInsideVariant : firstContactVariant);
+    }
+    while (items.length < 14) { items.push(null); srcs.push(null); }
+    return { items, srcs };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [drawable, variant, active, displayedShirtColor, resolvedOverlaySrc, humanInsideVariant, firstContactVariant]);
 
-  const stripeTileItems = useMemo(() => {
-    if (drawable.length === 0) return null;
-    return computeStripeTileItems(drawable);
-  }, [drawable]);
+  const stripeTileOverlaySrcs = tiraFranja.srcs;
+  const stripeTileItems = useMemo(
+    () => (Array.isArray(tiraFranja.items) ? computeStripeTileItems(tiraFranja.items.filter(Boolean)) : null),
+    [tiraFranja],
+  );
 
   // Quantes caselles porten dibuix: les altres son samarretes buides i a la
   // vista vertical s'atenuen amb un vel blanc.
