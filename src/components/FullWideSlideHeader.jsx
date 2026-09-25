@@ -407,6 +407,36 @@ function FullWideSlideHeader({
   useMegaPublicIdleReset();
   useUrlActiveCollection(location.search, setActive);
 
+  // LA COLLECCIO TORNA DE LA URL QUAN EL NAVEGADOR RESTAURA LA PAGINA
+  // (25/09/2026, arran del que va veure l'amo: «després es bloca el clic»).
+  //
+  // `useUrlActiveCollection` nome's mira quan canvia `location.search`. Quan
+  // tornes de la PDP amb el boto del navegador, el navegador restaura la pagina
+  // del seu magatzem (bfcache) amb l'ESTAT DE REACT intacte i sense tornar a
+  // muntar res: `search` es el mateix i l'efecte no es torna a executar. Si
+  // `active` s'havia quedat a `null`, el megaslide es muntava amb `megaPage` 2 i
+  // la pagina 2 BUIDA (ni franja ni graella), i el boto del cercador no el podia
+  // tancar perque el seu commutador demana `megaPage === 2 && active`. Allo era
+  // el «bloqueig».
+  //
+  // `pageshow` es dispara tambe en restaurar del bfcache, i per aixo torna a
+  // llegir la URL. L'estat no mana: mana la URL.
+  useEffect(() => {
+    if (typeof window === 'undefined') return undefined;
+    const PERMESOS = new Set(['first_contact', 'the_human_inside', 'austen', 'cube', 'miscellania']);
+    const sincronitza = () => {
+      try {
+        const p = new URLSearchParams(window.location.search);
+        const des = (p.get('active') || p.get('collection') || '').trim();
+        if (des && PERMESOS.has(des)) setActive(des);
+      } catch {
+        // s'ignora a posta
+      }
+    };
+    window.addEventListener('pageshow', sincronitza);
+    return () => window.removeEventListener('pageshow', sincronitza);
+  }, []);
+
   useEffect(() => {
     const handleEsc = (e) => {
       if (e.key === 'Escape' && megaFullScreen) {

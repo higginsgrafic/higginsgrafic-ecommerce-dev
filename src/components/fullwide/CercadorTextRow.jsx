@@ -618,7 +618,10 @@ export function CercadorDibuixosGraella({
           padding: 0,
           border: 0,
           background: 'transparent',
-          opacity: dimmed ? 0.24 : 1,
+          // ELS DIBUIXOS QUE NO SON DE LA COLLECCIO ACTIVA (25/09/2026). Aqui hi
+          // havia 0,24; ho va demanar l'amo: «I a la graella de dibuixos, també,
+          // més atenuats.» Ara es 0,12, el mateix que la franja.
+          opacity: dimmed ? 0.12 : 1,
           cursor: 'pointer',
         }}
       >
