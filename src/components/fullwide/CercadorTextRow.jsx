@@ -1077,7 +1077,12 @@ export function CercadorColleccionsColumna({
             padding: '0 6px',
             border: 0,
             borderRadius: '3px',
-            backgroundColor: '#F1F3F5',
+            // LA PASTILLA GRISA NOMES LA PORTA LA COLLECCIO ACTIVA
+            // (25/09/2026, ho va demanar l'amo: «Treu les pastilles grises
+            // excepte a la colleccio activa»). Abans la portaven totes nou, i
+            // allo feia que la columna semblés una graella de caixes en comptes
+            // d'una llista on se'n destaca una.
+            backgroundColor: key === activeKey ? '#F1F3F5' : 'transparent',
             color: '#2B2B2B',
             overflow: 'hidden',
             fontSize: (isPortraitTablet || isLandscapeTablet) ? 'max(10px, 8px)' : `max(10px, ${carrilPx(11)})`,
