@@ -398,7 +398,14 @@ export function CercadorDibuixosGraella({
   // mateix; el residu torna a començar i no es nota el salt.
   const periode = carrusel ? (items.length * pas) / 2 : 0;
   const ampleTira = carrusel ? periode * 2 + pas : 0;
-  const alcadaCarrusel = carrusel ? alcadaFila * 2 - gapV : 0;
+  // LA FINESTRA CONTÉ LES DUES FILES SENCERES (25/09/2026).
+  //
+  // Mesurat: la fila de dalt comença a 75,97 i el retall a 78,33, o sigui que
+  // el dibuix hi quedava tallat 2,36 px per dalt (i les imatges tenen tinta a
+  // la primera fila de pixels: es perdia de debò). Amb la finestra de
+  // `alcadaFila * 2` hi caben les dues files i el seu buit, i la fila de dalt
+  // no hi toca la vora.
+  const alcadaCarrusel = carrusel ? alcadaFila * 2 : 0;
   // Una peça per clic de fletxa (mig pas: les peces van mig pas una de l'altra).
   const unPas = pas / 2;
 
@@ -465,6 +472,13 @@ export function CercadorDibuixosGraella({
   // absoluta i, un cop aplicada, el que queda es el residu. L'alçada del retall
   // NO en depèn (les peces van absolutes a dins), i per això el centre de la
   // filera no es mou i el bucle no balla.
+  // LES DUES LINIES DE DIBUIXOS, CADA UNA CENTRADA AMB LA SEVA CEL·LA.
+  //
+  // Aixo es MESURA i s'acumula: la mesura fa que les dues linies caiguin sobre
+  // la cel·la BLANC (la primera) i la COLOR (la segona) del selector, i es el
+  // que fa que les vistes vertical i horitzontal quadrin entre elles (ho vigila
+  // `compara-vistes`). No es pot declarar amb una constant: l'alçada de cel·la
+  // del selector canvia amb la vista.
   const [desnivellsLinies, setDesnivellsLinies] = useState({ primera: 0, segona: 0 });
   const desnivellsRef = useRef({ primera: 0, segona: 0 });
   useLayoutEffect(() => {
@@ -478,7 +492,6 @@ export function CercadorDibuixosGraella({
       if (!selector || !linies || linies.length < 2) return;
       const s = selector.getBoundingClientRect();
       const cella = s.height / 3;
-      // BLANC es la primera cel·la i COLOR la del mig.
       const objectius = [s.top + cella / 2, s.top + cella * 1.5];
       const delta = [linies[0].centre - objectius[0], linies[1].centre - objectius[1]];
       if (Math.abs(delta[0]) < 0.5 && Math.abs(delta[1]) < 0.5) return;
@@ -490,8 +503,6 @@ export function CercadorDibuixosGraella({
     };
     calcula();
     const t1 = window.setTimeout(calcula, 250);
-    // A 400 ms i no a 900: es just despres de l'animacio d'obertura (340 ms).
-    // El repas tarda corregia despres que el panell sembles fet (25/09/2026).
     const t2 = window.setTimeout(calcula, 400);
     window.addEventListener('resize', calcula);
     return () => {

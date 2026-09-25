@@ -326,28 +326,49 @@ function MegaStripePanel({
       const x = ev.detail?.x;
       const y = ev.detail?.y;
       if (typeof x !== 'number') return;
-      // A la vertical la franja son DUES fileres de 7: la casella surt de la
-      // columna (x) I de la filera (y). A l'apaisada van totes en una filera.
-      const tileIdx = (isPortraitTablet && typeof y === 'number')
-        ? Math.min(13, Math.max(0, (y < 0.5 ? 0 : 7) + Math.min(6, Math.max(0, Math.floor(x * 7)))))
-        : Math.min(13, Math.max(0, Math.floor(x * 14)));
-      const item = stripeTileItems?.[tileIdx] || selectedItem || stripeTileItems?.[0];
-      if (!item) return;
-      // LA COLLECCIO ES LA DEL DIBUIX, NO LA QUE ESTA ACTIVA (25/09/2026).
+      // LA IDENTITAT DEL DIBUIX SURT DE LA CASA CLICADA (25/09/2026).
       //
-      // La tira fa circular els 64 dibuixos de totes les colleccions per les
-      // catorze cases, i cada casa en pot ensenyar un d'una altra: amb
-      // `onShirtClick(active, item)` el clic a una samarreta atenuada obria el
-      // producte a la colleccio ACTIVA (mesurat: clicar l'Afrodita de THE HUMAN
-      // INSIDE amb FIRST CONTACT actiu anava a `/first-contact/afrodita`, que no
-      // existeix: «Producte no trobat»). La colleccio bona es la que porta la
-      // tira, i per aixo acompanya cada dibuix.
-      const collection = stripeStrip?.collections?.[tileIdx] || active;
+      // Les catorze cases son fixes i el que circula es la tira de 64 dibuixos:
+      // cada casa ensenya el dibuix que li toca segons `stripeStripOffset`. El
+      // gestor tornava a calcular aquesta rotacio pel seu compte, i amb dues
+      // rotacions calculades a llocs diferents el clic s'anava desincronitzant
+      // (mesurat: la casa 0 ensenyava `dj-vader` i obria el producte de
+      // `nx-01`, tres cases enrere).
+      //
+      // Ara qui pinta deixa la identitat del dibuix a la propia casa
+      // (`data-stripe-item`, `data-stripe-collection`): el gestor nome's
+      // l'ha de llegir i no hi pot haver desincronitzacio.
+      const casa = (() => {
+        try {
+          const capa = filaFranjaRef.current;
+          if (!capa) return null;
+          const idx = (isPortraitTablet && typeof y === 'number')
+            ? Math.min(13, Math.max(0, (y < 0.5 ? 0 : 7) + Math.min(6, Math.max(0, Math.floor(x * 7)))))
+            : Math.min(13, Math.max(0, Math.floor(x * 14)));
+          return capa.querySelector(`[data-stripe-tile="${idx}"]`);
+        } catch {
+          return null;
+        }
+      })();
+      let item = casa?.getAttribute?.('data-stripe-item') || null;
+      let collection = casa?.getAttribute?.('data-stripe-collection') || null;
+      let subcollection = casa?.getAttribute?.('data-stripe-subcollection') || null;
+      if (!item) {
+        // Reserva (si el DOM no hi es): la rotacio, comptada una sola vegada.
+        const tileIdx = (isPortraitTablet && typeof y === 'number')
+          ? Math.min(13, Math.max(0, (y < 0.5 ? 0 : 7) + Math.min(6, Math.max(0, Math.floor(x * 7)))))
+          : Math.min(13, Math.max(0, Math.floor(x * 14)));
+        item = stripeTileItems?.[tileIdx] || selectedItem || stripeTileItems?.[0] || null;
+        collection = stripeStrip?.collections?.[tileIdx] || active;
+        subcollection = stripeStrip?.subcollections?.[tileIdx] || null;
+      }
+      if (!item) return;
+      if (!collection) collection = active;
       // I la samarreta clicada tambe ACTIVA la seva colleccio (25/09/2026, ho va
       // demanar l'amo): es el mateix cami que el clic d'una icona atenuada de la
       // graella, i deixa la colleccio centrada a la finestra de la graella.
       if (typeof onStripeStripSelect === 'function') {
-        onStripeStripSelect(collection, stripeStrip?.subcollections?.[tileIdx] || null);
+        onStripeStripSelect(collection, subcollection);
       }
       onShirtClick(collection, item, shirtColor);
     };
@@ -999,10 +1020,22 @@ function MegaStripePanel({
                         ? rectsMascara.map((r, idx) => {
                           // El dibuix d'aquesta casa surt de la TIRA sencera
                           // (64 dibuixos) desplaçada pel `stripeStripOffset`.
-                          const deLaTira = Array.isArray(stripeStrip?.srcs) && stripeStrip.srcs.length > 0
+                          // LA CASA DE LA TIRA, AMB EL MODUL DE LA TIRA SENZERA
+                          // (25/09/2026). Les catorze cases son fixes i el que
+                          // circula es la llista dels 64 dibuixos: la casa `i`
+                          // ensenya el dibuix `i + stripeStripOffset` de la TIRA.
+                          // El modul ha de ser la llargada de la TIRA (64), no la
+                          // de `stripeStrip` (14), que es una llista retallada.
+                          const nTira = Array.isArray(stripeStrip?.srcs) ? stripeStrip.srcs.length : 0;
+                          const iTira = nTira > 0
+                            ? ((((idx + stripeStripOffset) % nTira) + nTira) % nTira)
+                            : idx;
+                          const deLaTira = nTira > 0
                             ? {
-                              src: stripeStrip.srcs[((idx + stripeStripOffset) % stripeStrip.srcs.length + stripeStrip.srcs.length) % stripeStrip.srcs.length],
-                              collection: stripeStrip.collections[((idx + stripeStripOffset) % stripeStrip.collections.length + stripeStrip.collections.length) % stripeStrip.collections.length],
+                              src: stripeStrip.srcs[iTira],
+                              collection: stripeStrip.collections[iTira],
+                              item: stripeStrip.items?.[iTira] ?? null,
+                              subcollection: stripeStrip.subcollections?.[iTira] ?? null,
                             }
                             : null;
                           // Tile buit (samarreta sense dibuix): no renderitzem res
@@ -1168,6 +1201,16 @@ function MegaStripePanel({
                           return (
                             <div
                               data-stripe-tile={idx}
+                              // LA IDENTITAT DEL DIBUIX, escrita per qui el
+                              // pinta (25/09/2026). El gestor del clic la
+                              // llegeix d'aqui en lloc de tornar a calcular la
+                              // rotacio de la tira: amb dues rotacions
+                              // calculades a llocs diferents, el clic anava tres
+                              // cases enrere (mesurat: la casa 0 ensenyava
+                              // `dj-vader` i obria el producte de `nx-01`).
+                              data-stripe-item={deLaTira?.item || undefined}
+                              data-stripe-collection={deLaTira?.collection || undefined}
+                              data-stripe-subcollection={deLaTira?.subcollection || undefined}
                               key={`stripe-tile-drawing-${idx}`}
                               style={{
                                 position: 'absolute',
