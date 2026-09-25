@@ -224,3 +224,28 @@ desenvolupament pot estar buit o portar noms compostos («Samarreta NX-01»). El
 següent pas es **veure com s'anomenen els productes del cataleg** (la cerca de la
 capcalera, o la taula de productes) i fer la comparacio amb allo; despres, la
 mateixa cerca serveix per a les altres colleccions.
+
+
+### La cadena dibuix -> producte (25/09, trobada)
+
+Els productes del cataleg son les peces de roba (tenen `slug`, i
+`getProductById` els troba per id o slug). Els **dibuixos** no hi son: viuen a
+`product_mockups`, amb `design_name` com a identificador («NX-01», «Persuasion»,
+...). La taula te `collection`, `subcategory`, `base_color`, `drawing_color`,
+`product_type` i **`variant_id`**, i **no te cap `product_id`**.
+
+Per tant la cadena per obrir la PDP d'un dibuix es:
+
+1. `design_name` (el que porta el megaslide) ->
+2. la fila de `product_mockups` (hi ha `mockupsAPI` a `src/api/mockups.js`, que ja
+   sap filtrar per `design_name`, i tambe accepta la forma antiga
+   `design_name-color`) ->
+3. el seu `variant_id` ->
+4. el producte del cataleg que te aquella variant (`contextProducts`, amb
+   `getProductsByCollection`/les variants) ->
+5. `/product/<slug>` (la ruta que ja existia i que `getProductById` enten).
+
+Aixo vol una cerca **asincrona** al gestor del clic (mockupsAPI -> Supabase) i
+navegar quan arribi el producte; avui `resolvePdpUrl` es sincrona i nome's te els
+mapes de noms de dibuix. Es el que queda del clic, juntament amb comprovar que
+els productes de debò portin la variant del mockup.
