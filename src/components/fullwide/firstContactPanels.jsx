@@ -91,10 +91,19 @@ export function FirstContactDibuix00Buttons({
 }) {
   // Els noms dels acabats són els catalans (Blanc/Color/Negre) i es mostren en
   // majúscules; la resta de la botiga també els anomena així.
-  const buttons = [];
-  if (showWhite) buttons.push({ key: 'white', label: 'Blanc', onClick: onWhite });
-  if (showMulti) buttons.push({ key: 'color', label: 'Color', onClick: onMulti });
-  if (showBlack) buttons.push({ key: 'black', label: 'Negre', onClick: onBlack });
+  // ELS TRES ACABATS SURTEN SEMPRE, I ELS QUE NO TOCA ES MOSTREN DESACTIVATS
+  // (25/09/2026, ho va demanar l'amo: «No amaguis l'opció que sobra, només
+  // desactiva-la»).
+  //
+  // Abans, un acabat que la colleccio no te s'esborrava del bloc. Amb la
+  // graella de tres caselles fixes aixo ja no movia res, pero el nom hi faltava
+  // i l'amo vol veure'l: BLANC, COLOR i NEGRE sempre al mateix lloc, i el que
+  // no es pot triar es queda apagat, sense respondre al clic.
+  const buttons = [
+    { key: 'white', label: 'Blanc', onClick: onWhite, disabled: !showWhite },
+    { key: 'color', label: 'Color', onClick: onMulti, disabled: !showMulti },
+    { key: 'black', label: 'Negre', onClick: onBlack, disabled: !showBlack },
+  ];
 
   if (!buttons.length) return null;
 
@@ -170,19 +179,24 @@ export function FirstContactDibuix00Buttons({
     >
       {buttons.map((btn) => {
         const topPct = getTopPct(btn.key);
+        const desactivat = !!btn.disabled;
         return (
           <button
             key={btn.key}
             type="button"
             aria-label={btn.label}
-            onClick={btn.onClick}
+            // Un acabat desactivat no respon al clic: la pastilla no s'hi mou i
+            // el dibuix de la franja no canvia d'acabat.
+            onClick={desactivat ? undefined : btn.onClick}
+            disabled={desactivat}
+            aria-disabled={desactivat ? 'true' : undefined}
             className="absolute left-0 w-full focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             style={{
               top: `${topPct}%`,
               height: `${btnH}%`,
               border: 'none',
               background: 'transparent',
-              cursor: 'pointer',
+              cursor: desactivat ? 'not-allowed' : 'pointer',
               padding: 0,
               display: 'flex',
               alignItems: 'center',
@@ -196,7 +210,9 @@ export function FirstContactDibuix00Buttons({
                 fontSize: `max(10px, ${carrilPx(14)})`,
                 fontWeight: 400,
                 textTransform: 'uppercase',
-                color: selectedKey === btn.key ? '#1A1A1A' : '#6B7280',
+                // El desactivat s'apaga (seguint la convencio de la casa: el
+                // gris fluix i el cursor de prohibida), pero el nom s'hi veu.
+                color: desactivat ? '#C4C8CE' : (selectedKey === btn.key ? '#1A1A1A' : '#6B7280'),
                 pointerEvents: 'none',
                 lineHeight: 1,
                 transition: 'color 200ms ease',
