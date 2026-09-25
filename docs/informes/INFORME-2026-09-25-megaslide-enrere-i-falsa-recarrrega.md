@@ -427,10 +427,29 @@ de `eslint`.
 
 ## 9. El que queda obert
 
-1. **El producte del marc groc de «Looking For My Darcy».** Al registre
-   (`src/data/pdpRegistry.js`) no hi ha cap producte de marc groc sol: hi ha
-   `looking-for-my-darcy-pink-yellow-frame`, i el dibuix «Looking For My Darcy
-   Yellow Frame» hi apunta. **És cosa de l'amo.**
+1. **El producte del marc groc de «Looking For My Darcy».** El registre
+   (`src/data/pdpRegistry.js`) i els dibuixos de la graella **no quadren**, i el
+   que falla és un producte que no hi és:
+
+   | dibuix a la graella | producte al registre |
+   |---|---|
+   | blue solid | `looking-for-my-darcy-blue-solid` ✔ |
+   | fuchsia solid | `looking-for-my-darcy-pink-solid` ✔ |
+   | red solid | `looking-for-my-darcy-red-solid` ✔ |
+   | yellow solid | `looking-for-my-darcy-yellow-solid` ✔ |
+   | yellow + blue frame | `looking-for-my-darcy-yellow-blue-frame` ✔ |
+   | yellow + fuchsia frame | `looking-for-my-darcy-yellow-pink-frame` ✔ |
+   | red + yellow frame | `looking-for-my-darcy-red-yellow-frame` ✔ |
+   | **yellow frame** (sol) | **NO HI ÉS** |
+   | — | `looking-for-my-darcy-pink-yellow-frame` (producte sense dibuix) |
+
+   O sigui: el dibuix del marc groc existeix (l'arxiu
+   `yellow-frame-grid.webp` hi és) i **no té producte**, i hi ha **un producte
+   sense dibuix**. La decisió és de l'amo: o s'afegeix el producte
+   `looking-for-my-darcy-yellow-frame` al registre, o es treu el dibuix. I de
+   passada, decidir si `pink-yellow-frame` és el mateix que
+   `yellow-pink-frame` (el nom del producte diu una cosa i el dibuix una
+   altra).
 2. **L'opacitat del vel (0,6).** És un número triat perquè és el mateix
    tractament que la samarreta buida blanca. Si l'amo el vol més fluix o més
    fort, és un sol número.
