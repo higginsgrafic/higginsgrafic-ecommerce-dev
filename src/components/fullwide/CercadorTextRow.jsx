@@ -671,12 +671,12 @@ export function CercadorDibuixosGraella({
             position: 'absolute',
             right: 0,
             bottom: margeBaixFletxes === null ? `calc(-1 * ${carrilLane(40)})` : `${-margeBaixFletxes}px`,
-            // LA BOTONERA DE LES FLETXES ES DE DUES CASELLES (24/09/2026, ho va
-            // demanar l'amo): dues fletxes, i cada una fa la mida d'una casella
-            // del selector (que en te tres). El bloc, doncs, fa dos terços de
-            // l'alcada del selector, amb el bottom quadrat amb el seu.
+            // LA BOTONERA DE LES FLETXES: DUES FLETXES I L'ALCADA DEL SELECTOR
+            // (24/09/2026, ho va demanar l'amo). Dues meitats (una fletxa a
+            // dalt i l'altra a baix) i el bloc de la mida del selector, amb el
+            // bottom quadrat amb el seu.
             width: carrilPx(midaSelector / 2),
-            height: carrilPx((midaSelector * 2) / 3),
+            height: carrilPx(midaSelector),
             zIndex: 5,
           }}>
             <FirstContactDibuix09Buttons
