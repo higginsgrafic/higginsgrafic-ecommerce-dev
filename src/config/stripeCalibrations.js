@@ -99,6 +99,25 @@ export const STRIPE_DRAWING_CALIBRATIONS = {
   '/custom_logos/drawings/images_stripe/austen/looking_for_my_darcy/color/frame/orange-frame-stripe.webp': { dx: 0.75, dy: 22.75, scale: 0.32 },
   '/custom_logos/drawings/images_stripe/austen/looking_for_my_darcy/color/frame/red-frame-stripe.webp': { dx: 0.75, dy: 22.75, scale: 0.32 },
   '/custom_logos/drawings/images_stripe/austen/looking_for_my_darcy/color/frame/yellow-frame-stripe.webp': { dx: 0.75, dy: 22.75, scale: 0.32 },
+  // ELS NOMS NOUS DELS QUATRE MARCS (25/09/2026).
+  //
+  // L'amo va reanomenar els originals de la franja perque diguin els DOS colors
+  // («blue-yellow-frame-stripe.webp»...), i el calibratge va per NOM DE FITXER:
+  // els noms nous no tenien entrada i queien al valor per defecte, que es
+  // `scale: 1`. Mesurat a la franja amb AUSTEN: el dibuix d'un marc es pintava
+  // 112x112 px en comptes de 31x31, o sigui unes tres vegades mes gran que el
+  // seu solid. Ho va veure l'amo: «Com es que les imatges frame de LFMD son tan
+  // grosses?»
+  //
+  // Els valors son els MATEIXOS que els dels noms vells: els fitxers nous son el
+  // mateix dibuix (comprovat amb el md5: `blue-yellow` i `fuchsia-yellow` son
+  // identiques a les velles, i `yellow-pink` i `yellow-red` son les dues que han
+  // canviat de contingut, amb la mateixa mida). Les entrades velles es queden
+  // perque els fitxers vells encara son al disc.
+  '/custom_logos/drawings/images_stripe/austen/looking_for_my_darcy/color/frame/blue-yellow-frame-stripe.webp': { dx: 0.75, dy: 22.75, scale: 0.32 },
+  '/custom_logos/drawings/images_stripe/austen/looking_for_my_darcy/color/frame/fuchsia-yellow-frame-stripe.webp': { dx: 0.75, dy: 22.75, scale: 0.32 },
+  '/custom_logos/drawings/images_stripe/austen/looking_for_my_darcy/color/frame/yellow-pink-frame-stripe.webp': { dx: 0.75, dy: 22.75, scale: 0.32 },
+  '/custom_logos/drawings/images_stripe/austen/looking_for_my_darcy/color/frame/yellow-red-frame-stripe.webp': { dx: 0.75, dy: 22.75, scale: 0.32 },
   '/custom_logos/drawings/images_stripe/austen/quotes/black/it-is-a-truth-b-stripe.webp': { dx: 3.75, dy: 23.5, scale: 0.23 },
   '/custom_logos/drawings/images_stripe/austen/quotes/black/you-must-allow-me-b-stripe.webp': { dx: 3.25, dy: 25.25, scale: 0.2 },
   '/custom_logos/drawings/images_stripe/austen/quotes/black/body-and-soul-b-stripe.webp': { dx: 3.75, dy: 16.75, scale: 0.351 },
