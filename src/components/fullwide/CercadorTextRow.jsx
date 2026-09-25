@@ -780,6 +780,11 @@ export function CercadorColorsGrid({
   // LA RODETA SOBRE LA TIRA (24/09/2026, ho va demanar l'amo): mou la tria una
   // barra endavant o enrere, com el carrusel de dibuixos. Amb `passive: false`
   // perque tambe ha d'aturar el desplac,ament vertical de la pagina.
+  //
+  // EL SENTIT ES L'INVERS DEL CARRUSEL (24/09/2026, ho va demanar l'amo): rodeta
+  // avall, barra enrere. El carrusel es mou amb la rodeta en el sentit natural
+  // (avall = cap al final de la tira); aqui la tira es la paleta, i girar-la cap
+  // enrere es el que demana el gest.
   useLayoutEffect(() => {
     const el = gridRef.current;
     if (!el) return undefined;
@@ -788,7 +793,7 @@ export function CercadorColorsGrid({
       const d = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
       if (!d) return;
       const i = CERCADOR_COLORS.findIndex((c) => c.slug === selectedColor);
-      const j = Math.max(0, Math.min(CERCADOR_COLORS.length - 1, (i < 0 ? 0 : i) + (d > 0 ? 1 : -1)));
+      const j = Math.max(0, Math.min(CERCADOR_COLORS.length - 1, (i < 0 ? 0 : i) + (d > 0 ? -1 : 1)));
       const nou = CERCADOR_COLORS[j]?.slug;
       if (nou && nou !== selectedColor) onSelectColor?.(nou);
     };
