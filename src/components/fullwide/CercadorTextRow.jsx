@@ -1075,7 +1075,18 @@ export function CercadorColleccionsColumna({
             minHeight: 0,
             boxSizing: 'border-box',
             padding: '0 6px',
+            // EL FONS DE LA PASTILLA VA 20 px MES A LA DRETA (25/09/2026, ho va
+            // demanar l'amo: «Retalla la pastilla grisa de la columna 10 px per
+            // l'esquerra» i, tot seguit, «retalla 10 px més»).
+            //
+            // Es retalla NOME'S EL FONS: una vora esquerra transparent i
+            // `background-clip: padding-box`, que fa que el color només es pinti
+            // de la vora cap endins. La CAIXA no es toca, o sigui que ni el text
+            // ni l'area de clic no es mouen ni s'encongeixen (amb un `marginLeft`
+            // el text se n'anava i la zona de clic minvava).
             border: 0,
+            borderLeft: key === activeKey ? '20px solid transparent' : 0,
+            backgroundClip: key === activeKey ? 'padding-box' : undefined,
             borderRadius: '3px',
             // LA PASTILLA GRISA NOMES LA PORTA LA COLLECCIO ACTIVA
             // (25/09/2026, ho va demanar l'amo: «Treu les pastilles grises
