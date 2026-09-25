@@ -506,6 +506,38 @@ export function CercadorDibuixosGraella({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [carrusel]);
 
+  // LA COLLECCIO CLICADA, CENTRADA A LA FINESTRA (24/09/2026, ho va demanar
+  // l'amo): tant si es clica un enllac de la columna de colleccions com una
+  // icona atenuada d'una altra colleccio, el grup de dibuixos d'aquella
+  // colleccio ha de quedar al mig de la finestra de la graella.
+  //
+  // No es mou res al primer pintat (la graella arrenca on arrenca) ni quan el
+  // canvi ve d'un desplaçament: nome's quan canvia la colleccio activa, que es
+  // el que fan els dos clics.
+  const clauColleccioRef = useRef(undefined);
+  useLayoutEffect(() => {
+    if (!carrusel || periode <= 0) return;
+    const clau = `${activeCollection || ''}|${activeSubcollection || ''}`;
+    const anterior = clauColleccioRef.current;
+    clauColleccioRef.current = clau;
+    if (anterior === undefined || anterior === clau) return;
+    const centra = () => {
+      const indexos = items
+        .map((it, i) => (it.collection === activeCollection
+          && (!activeSubcollection || it.subcollection === activeSubcollection) ? i : -1))
+        .filter((i) => i >= 0);
+      if (!indexos.length) return;
+      const centre = ((indexos[0] + indexos[indexos.length - 1]) / 2) * unPas + dibuixPx / 2;
+      const finestra = caixaCarrusel()?.clientWidth || 0;
+      if (!finestra) return;
+      const objectiu = centre - finestra / 2;
+      // La volta mes curta: la mateixa posicio nome's que amb la volta que toca.
+      setDesplac((v) => objectiu + Math.round((v - objectiu) / periode) * periode);
+    };
+    centra();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeCollection, activeSubcollection, carrusel, periode, unPas, dibuixPx]);
+
   const onPointerDown = (e) => {
     if (!carrusel) return;
     // NO es captura el punter aqui. Capturar-lo en tocar fa que el CLIC
