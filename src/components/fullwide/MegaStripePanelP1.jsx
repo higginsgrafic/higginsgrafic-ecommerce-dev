@@ -189,7 +189,7 @@ function MegaStripePanelP1({
   // La franja s'ha de quedar dins del carril amb les manigues a fora (com a la
   // pagina 2: les dues pagines han de quadrar). Vegeu l'hook.
   const filaFranjaRef = useRef(null);
-  const factorCarrilFranja = useEscalaFranjaCarril(filaFranjaRef, ajustFranjaCarril);
+  const { factor: factorCarrilFranja, centre: centreCarrilFranja } = useEscalaFranjaCarril(filaFranjaRef, ajustFranjaCarril);
   const [pageLift, setPageLift] = useState(0);
   // Franja estreta (768-1366 en horitzontal): hi ha ajustos propis de 10 px i
   // l'ajust general de la franja no s'hi aplica.
@@ -397,7 +397,12 @@ function MegaStripePanelP1({
                 // `translateX(-50%)` el centre es el del contenidor de
                 // maquetacio (el carril menys els coixins, que son iguals), a
                 // tots els navegadors.
-                left: '50%',
+                // El centre, a mig cami entre la vora esquerra del carril i la
+                // dreta de les fletxes: aixi la cintura de la primera samarreta
+                // cau a la vora esquerra del carril i la de l'ultima a la guia
+                // de les fletxes. Sense fletxes (tauletes) el centre es el del
+                // carril, que es com estava.
+                left: centreCarrilFranja === null ? '50%' : `${centreCarrilFranja}px`,
                 transform: 'translateX(-50%)',
                 // La filera NO s'ha d'encongir per encabir-se al contenidor: la
                 // franja te una mida de disseny i es escala amb `transform`

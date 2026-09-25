@@ -1,5 +1,5 @@
 import { useLayoutEffect, useState } from 'react';
-import { factorFranjaCarril } from '../utils/franjaCarril';
+import { factorFranjaCarril, ESCALA_CALIBRADA_FRANJA } from '../utils/franjaCarril';
 
 /**
  * useEscalaFranjaCarril — el factor que fa que la filera de cossos de la franja
@@ -21,8 +21,33 @@ import { factorFranjaCarril } from '../utils/franjaCarril';
  * @param {boolean} actiu - si la franja s'ha d'ajustar al carril.
  * @returns {number} factor que multiplica el calibratge (1 quan no s'hi aplica).
  */
+/**
+ * L'amplada que ha de fer la filera de cossos: de la VORA ESQUERRA DEL CARRIL a
+ * la DRETA DEL BLOC DE FLETXES. Quan no hi ha fletxes (tauletes) es el carril
+ * sencer, que es com estava.
+ *
+ * @returns {number} amplada en px (0 si no es pot mesurar).
+ */
+function ampladaObjectiu() {
+  if (typeof document === 'undefined') return 0;
+  const carril = Number.parseFloat(
+    getComputedStyle(document.documentElement).getPropertyValue('--hg-mega-w'),
+  );
+  const xCarril = Number.parseFloat(
+    getComputedStyle(document.documentElement).getPropertyValue('--hg-mega-x'),
+  );
+  const fletxes = [...document.querySelectorAll('[data-carrusel="1"] #stripe-guide-right-arrow')]
+    .filter((el) => el.getBoundingClientRect().width > 0);
+  const fletxa = fletxes[fletxes.length - 1];
+  if (fletxa && Number.isFinite(xCarril)) {
+    const dreta = fletxa.getBoundingClientRect().right;
+    if (dreta - xCarril > 0) return dreta - xCarril;
+  }
+  return Number.isFinite(carril) && carril > 0 ? carril : 0;
+}
+
 export default function useEscalaFranjaCarril(filaRef, actiu) {
-  const [factor, setFactor] = useState(1);
+  const [estat, setEstat] = useState({ factor: 1, centre: 0 });
 
   useLayoutEffect(() => {
     if (!actiu) return undefined;
@@ -33,7 +58,8 @@ export default function useEscalaFranjaCarril(filaRef, actiu) {
       const ampleDibuix = el.offsetWidth;
       if (!ampleDibuix) return;
       const estil = getComputedStyle(document.documentElement);
-      const carril = Number.parseFloat(estil.getPropertyValue('--hg-mega-w'));
+      const objectiu = ampladaObjectiu();
+      if (!objectiu) return;
       // L'ESCALA CALIBRADA, LLEGIDA DEL DOM I NO LA NOMINAL.
       //
       // El factor es calcula contra l'escala que la franja porta posada
@@ -46,10 +72,17 @@ export default function useEscalaFranjaCarril(filaRef, actiu) {
       // faci el carril: el calibratge desat no hi pot manar.
       const escalaViva = Number.parseFloat(estil.getPropertyValue('--megaStripeScale'));
       const escala = Number.isFinite(escalaViva) && escalaViva > 0 ? escalaViva : ESCALA_CALIBRADA_FRANJA;
-      const nou = factorFranjaCarril(carril, ampleDibuix, escala);
+      const nou = factorFranjaCarril(objectiu, ampleDibuix, escala);
+      // El centre de la filera: a mig cami entre la vora esquerra del carril i
+      // la dreta de les fletxes, que es on ha de caure el centre del dibuix.
+      const centre = objectiu / 2;
       // Sense el marge, cada mesura tornaria a pintar i el ResizeObserver no
       // pararia.
-      setFactor((actual) => (Math.abs(actual - nou) < 0.0005 ? actual : nou));
+      setEstat((actual) => (
+        Math.abs(actual.factor - nou) < 0.0005 && Math.abs(actual.centre - centre) < 0.5
+          ? actual
+          : { factor: nou, centre }
+      ));
     };
 
     // La primera mesura no espera cap frame: useLayoutEffect ja es abans del
@@ -76,7 +109,7 @@ export default function useEscalaFranjaCarril(filaRef, actiu) {
     };
   }, [filaRef, actiu]);
 
-  // Quan no s'hi aplica (la vista vertical), el factor es 1 i no cal tocar cap
-  // estat: es fa aqui i no dins de l'efecte, que no ha de cridar `setState`.
-  return actiu ? factor : 1;
+  // Quan no s'hi aplica (la vista vertical), no es toca res: es fa aqui i no
+  // dins de l'efecte, que no ha de cridar `setState`.
+  return actiu ? estat : { factor: 1, centre: null };
 }

@@ -314,8 +314,13 @@ export default function MegaMenuPanel({
     onShirtClick: onShirtClick,
     selectedItem: page1SelectedItem,
     isPortraitTablet: isPortraitTablet,
-    // La franja s'ajusta a l'amplada del carril sempre que no siguem a la
-    // vista vertical, on va dins d'una filera escalada i te el seu calibratge.
+    // LA FRANJA DE LA PAGINA 1 ENCAIXA AL CARRIL, PERO NO S'ESCALA
+    // (24/09/2026, ho va demanar l'amo: «no s'ha d'escalar», i tot seguit «sí
+    // que ha d'encaixar al carril, això sí»). Les dues coses son el mateix
+    // ajust: el factor es calcula contra el carril i divideix per l'escala que
+    // la franja porta posada, de manera que el calibratge desat (el de l'HUD)
+    // no mana i la franja fa exactament el carril. Es la regla de la pagina 2,
+    // i les dues pagines han de quadrar.
     ajustFranjaCarril: !isPortraitTablet,
   };
   return (

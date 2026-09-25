@@ -12,7 +12,7 @@ import {
   CercadorDibuixosGraella,
   dibuixosGraella16x4,
 } from '../fullwide/CercadorTextRow.jsx';
-import { colorGap, colorMida } from '../fullwide/midesGraella.js';
+import { colorGap } from '../fullwide/midesGraella.js';
 import { ampladaCarril } from './TaulaVertical.jsx';
 import MegaHeroSlider from '../MegaHeroSlider.jsx';
 import Pauta4ColsOverlay from '../pauta/Pauta4ColsOverlay';
@@ -247,17 +247,28 @@ export default function MegaslidePagina2({
       const deltaAlign = (p1Top + offset) - (p2Top - centraAplicat);
 
       // 2) CENTRATGE (fórmula original): el centre del selector ha de coincidir
-      //    amb el de la graella. Es treballa sobre la posició que tindrà DESPRÉS
-      //    de l'alineació, que és el que fa el bucle original quan corre tot
-      //    seguit de l'altre.
-      const graella = document.querySelector('[data-p2-color-grid]');
+      //    amb el de la filera que flanquegen el selector i les fletxes: la
+      //    graella de dibuixos mes la fila de colors. Es treballa sobre la
+      //    posició que tindrà DESPRÉS de l'alineació, que és el que fa el bucle
+      //    original quan corre tot seguit de l'altre.
+      //
+      //    AQUESTA ÉS LA REFERÈNCIA DEL SELECTOR, i no es mou (24/09/2026, ho va
+      //    demanar l'amo: «mou la fila, no el selector»). El que s'hi alinea és
+      //    la SEGONA LÍNIA de la graella de dibuixos, i ho fa la filera
+      //    (`CercadorTextRow`), que es qui sap on cau cada línia.
+      //
+      //    ABANS MESURAVA LA GRAELLA DE COLORS 4x4: quan les catorze mostres van
+      //    passar a ser una fila prima sota el carrusel, el seu centre va baixar
+      //    57 px i s'enduia el selector i les fletxes cap avall (mesurat a 1920:
+      //    el bloc de fletxes passava de 70,2 a 127,1 px).
+      const filera = viewportRef.current?.querySelector('[data-p2-cercador-row]');
       let deltaCentra = 0;
-      if (graella) {
-        const g = graella.getBoundingClientRect();
+      if (filera) {
+        const g = filera.getBoundingClientRect();
         const s = page2Selector.getBoundingClientRect();
-        const centreGraella = g.top + g.height / 2;
+        const centreFilera = g.top + g.height / 2;
         const centreSelector = (s.top + deltaAlign) + s.height / 2;
-        deltaCentra = centreGraella - centreSelector;
+        deltaCentra = centreFilera - centreSelector;
       }
 
       if (Math.abs(deltaAlign) >= 0.5) {
@@ -595,7 +606,11 @@ export default function MegaslidePagina2({
           position: 'relative',
           zIndex: 1,
           width: '100%',
-          left: (isPortraitTablet || isLandscapeTablet) ? '-3.5px' : undefined,
+          // SENSE el `left: -3,5px` DE TAU LETA (24/09/2026). Era una
+          // compensacio del belt vell: amb el carril de 3/5 desplaçava tota la
+          // franja 3,5 px a l'esquerra i les cintures no queien a la vora del
+          // carril (mesurat: 198,8..802,8 amb el carril a 202..807 a 1024).
+          left: undefined,
           // A tauleta, la franja va un 0,2% mes petita amb una escala uniforme
           // (ample i alt alhora), perque no es deformin els dibuixos. L'origen
           // es la cantonada esquerra: la reduccio entra per la dreta.
@@ -719,15 +734,13 @@ export default function MegaslidePagina2({
               />
             )}
             colors={(
-              /* Els cercles, 1 px mes petits, amb el TOP de la graella quiet
-                 (per aixo va enganxada a dalt amb el mateix marge de sempre). */
+              /* Les catorze barres de color (8x1), enganxades a dalt amb el
+                 mateix marge de sempre. */
               <div style={{ marginTop: '21px' }}>
                 <CercadorColorsGrid
                   selectedColor={cercadorSelectedColor}
                   onSelectColor={setCercadorSelectedColor}
-                  cerclePx={colorMida(true, false) - 1}
                   colorGapPx={colorGap(true, false)}
-                  isPortraitTablet={isPortraitTablet}
                 />
               </div>
             )}

@@ -1,14 +1,15 @@
 import React, { useLayoutEffect, useRef, useState } from 'react';
-import { CERCADOR_COLLECTIONS, CERCADOR_COLORS } from './CercadorTopBar.jsx';
+import { CERCADOR_COLLECTIONS, CERCADOR_COLORS, etiquetaColleccio } from './CercadorTopBar.jsx';
 // La geometria de la graella viu a midesGraella.js perquè també la fa servir
 // el mòdul de mesura única. Aquí només es consumeix.
 import {
-  GRAELLA_COLUMNES, GRAELLA_FILES, GRAELLA_ESQUERRA_LANDSCAPE,
-  midaDibuix, gapHorizontal, gapVertical, colorMida, colorGap,
+  GRAELLA_COLUMNES, GRAELLA_ESQUERRA_LANDSCAPE,
+  midaDibuix, gapHorizontal, gapVertical, colorGap,
   midesGraellaCompacta,
   MARGE_ESQUERRA_DIBUIXOS_ESCRIPTORI_PX,
 } from './midesGraella.js';
 import { carrilPct, carrilLane, carrilPx, readRootCssNumber } from '../../utils/layoutMetrics.js';
+import { liniesDibuixos } from '../../utils/mesuraMegaslide.js';
 import { GRAELLA_DIBUIXOS_ESCALA_VERTICAL } from '../../config/stripeCalibrationsVertical.js';
 import { FirstContactDibuix09Buttons } from './firstContactPanels.jsx';
 
@@ -311,7 +312,7 @@ function Group({ group, isFirst, dimmed, clickable, selectedStripeItem, hoveredS
               pointerEvents: hasMapping && canHover ? 'auto' : 'none',
             }}
           >
-            {label}
+            {etiquetaColleccio(label)}
           </div>
         );
       })}
@@ -426,6 +427,57 @@ export function CercadorDibuixosGraella({
       window.removeEventListener('resize', calcula);
     };
   }, [ambFletxes, graellaRef]);
+
+  // LES DUES LINIES DE DIBUIXOS, CADA UNA CENTRADA AMB LA SEVA CEL·LA.
+  //
+  // L'amo ho va demanar el 24/09/2026: «alinea la segona línia de la graella de
+  // dibuixos al centre del selector» i, quan el selector es va moure per fer-ho,
+  // «mou la fila, no el selector». Després, «alinea la graella 14x1 amb el nom
+  // NEGRE del selector i la primera fila de la graella de dibuixos amb el nom
+  // BLANC». El selector NO es toca: la seva referencia es el centre de la filera
+  // (`MegaslidePagina2`), i el que pugen son les dues linies de dibuixos, els px
+  // que els falten per caure sobre BLANC (la primera) i COLOR (la segona). Les
+  // tres cel·les del selector fan la mateixa alcada, i per aixo el seu centre
+  // surt de dividir-lo per tres.
+  //
+  // Es mesura i s'acumula (com el `pageLift` de la pàgina 1): la mesura es
+  // absoluta i, un cop aplicada, el que queda es el residu. L'alçada del retall
+  // NO en depèn (les peces van absolutes a dins), i per això el centre de la
+  // filera no es mou i el bucle no balla.
+  const [desnivellsLinies, setDesnivellsLinies] = useState({ primera: 0, segona: 0 });
+  const desnivellsRef = useRef({ primera: 0, segona: 0 });
+  useLayoutEffect(() => {
+    if (!carrusel) return undefined;
+    const el = graellaRef.current;
+    if (!el) return undefined;
+    const calcula = () => {
+      const pagina = el.closest('[data-mega-page-viewport="2"]');
+      const selector = pagina?.querySelector('[data-p2-color-selector] [data-stripe-buttonbar="bn"]');
+      const linies = liniesDibuixos(el.closest('[data-carrusel="1"]'));
+      if (!selector || !linies || linies.length < 2) return;
+      const s = selector.getBoundingClientRect();
+      const cella = s.height / 3;
+      // BLANC es la primera cel·la i COLOR la del mig.
+      const objectius = [s.top + cella / 2, s.top + cella * 1.5];
+      const delta = [linies[0].centre - objectius[0], linies[1].centre - objectius[1]];
+      if (Math.abs(delta[0]) < 0.5 && Math.abs(delta[1]) < 0.5) return;
+      desnivellsRef.current = {
+        primera: desnivellsRef.current.primera + delta[0],
+        segona: desnivellsRef.current.segona + delta[1],
+      };
+      setDesnivellsLinies(desnivellsRef.current);
+    };
+    calcula();
+    const t1 = window.setTimeout(calcula, 250);
+    const t2 = window.setTimeout(calcula, 900);
+    window.addEventListener('resize', calcula);
+    return () => {
+      window.clearTimeout(t1);
+      window.clearTimeout(t2);
+      window.removeEventListener('resize', calcula);
+    };
+  }, [carrusel, graellaRef]);
+
   const desplacEf = Math.max(0, Math.min(maxDesplac, desplac));
   const caixaCarrusel = () => graellaRef?.current || null;
 
@@ -501,11 +553,13 @@ export function CercadorDibuixosGraella({
           width: costat,
           height: costat,
           // Al carrusel cada peca es col·loca a mà: mig pas a la dreta de
-          // l'anterior i, les senars, una fila mes avall.
+          // l'anterior i, les senars, una fila mes avall. Cada fila puja el que
+          // li falta per caure sobre la seva cel·la del selector (BLANC la
+          // primera, COLOR la segona), que es el que mesura la graella.
           ...(carrusel ? {
             position: 'absolute',
             left: `${(i * pas) / 2}px`,
-            top: `${(i % 2) * alcadaFila}px`,
+            top: `${(i % 2) ? alcadaFila - desnivellsLinies.segona : -desnivellsLinies.primera}px`,
           } : null),
           // Amb `tilesPercent` la tile s'encongeix dins la seva casella
           // (el centre no es mou).
@@ -647,31 +701,40 @@ export function CercadorDibuixosGraella({
   );
 }
 
-/** La GRAELLA DE COLORS (4x4) de la pagina 2, amb la pastilla COLOR. */
+/**
+ * La GRAELLA DE COLORS (14x1) de la pagina 2.
+ *
+ * ELS CERCLES SON RECTANGLES DE 7x2 (24/09/2026, ho va demanar l'amo): catorze
+ * barres de 7 d'ample per 2 d'alcada que ocupen el MATEIX espai que la graella
+ * de dibuixos, o sigui el retall del carrusel (`reservaDreta` es el marge que
+ * deixa a la dreta el coixi de les fletxes, el mateix que fa servir el retall).
+ * Cap mida no s'escriu a ma: el nombre de barres surt de la llista
+ * (`CERCADOR_COLORS`), l'amplada de cada barra del contenidor (les catorze
+ * columnes se'l reparteixen amb `1fr`) i l'alcada de la proporcio
+ * (`aspect-ratio`). A 1920 cada barra fa 53,6 x 15,3 px.
+ *
+ * L'INDICADOR (l'anell de la mostra triada) es un `outline` amb 3 px de
+ * desplacament, com abans.
+ */
 export function CercadorColorsGrid({
   selectedColor,
   onSelectColor,
-  cerclePx,
   colorGapPx,
   transform,
   marginTop,
-  isPortraitTablet = false,
-  isLandscapeTablet = false,
+  reservaDreta = 0,
 }) {
-  // ELS CERCLES, UN 10% MES PETITS (24/09/2026, ho va demanar l'amo). Nomes el
-  // cercle: l'INDICADOR (l'anell de la mostra triada) ha de quedar de la mida
-  // que tenia. Com que l'anell es dibuixa amb `outlineOffset` a partir de la
-  // caixa, si el cercle s'encongeix l'anell tambe ho faria: per aixo el
-  // desplacament creix el que s'ha encongit la caixa, i el diametre de l'anell
-  // queda igual (cercle + 2 x 3 px, abans i ara).
-  const costat = cerclePx * 0.9;
-  const desplacAnell = 3 + (cerclePx - costat) / 2;
   return (
     <div data-p2-color-grid style={{
       display: 'grid',
-      gridTemplateColumns: `repeat(4, ${costat}px)`,
-      gridAutoRows: `${costat}px`,
+      gridTemplateColumns: `repeat(${CERCADOR_COLORS.length}, 1fr)`,
+      alignItems: 'start',
       gap: `${colorGapPx}px`,
+      // `width: auto` (i no `100%`) perque el coixi de la dreta descompti de
+      // l'amplada: amb `100%` la linia es quedava sencera i la vora dreta no
+      // encaixava amb la del retall dels dibuixos (es el mateix motiu que al
+      // retall del carrusel).
+      marginRight: reservaDreta || 0,
       transform,
       marginTop,
     }}>
@@ -684,13 +747,13 @@ export function CercadorColorsGrid({
             aria-label={slug}
             onClick={() => onSelectColor?.(slug)}
             style={{
-              width: `${costat}px`,
-              height: `${costat}px`,
+              width: '100%',
+              aspectRatio: '7 / 2',
               padding: 0,
-              borderRadius: '50%',
-              border: selected ? '0.5px solid rgba(0,0,0,0.22)' : '0.5px solid rgba(0,0,0,0.22)',
+              borderRadius: '1px',
+              border: '0.5px solid rgba(0,0,0,0.22)',
               outline: selected ? '1px solid #111827' : 'none',
-              outlineOffset: `${desplacAnell}px`,
+              outlineOffset: '3px',
               backgroundColor: hex,
               boxSizing: 'border-box',
               cursor: 'pointer',
@@ -698,36 +761,6 @@ export function CercadorColorsGrid({
           />
         );
       })}
-      <div
-        style={{
-          gridColumn: 'span 2',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          height: isPortraitTablet ? '18px' : (isLandscapeTablet ? '21px' : '28px'),
-          padding: isPortraitTablet ? '0 5px' : (isLandscapeTablet ? '0 6px' : '0 8px'),
-          borderRadius: isPortraitTablet ? '9px' : (isLandscapeTablet ? '10.5px' : '14px'),
-          backgroundColor: '#FFFFFF',
-          border: '0.5px solid rgba(0,0,0,0.22)',
-          boxSizing: 'border-box',
-        }}
-      >
-        <span
-          className="font-oswald"
-          style={{
-            fontWeight: 700,
-            // Una mica mes petit a l'escriptori (11 px) i amb aire entre
-            // linies: amb `lineHeight: 1` les linies quedaven juntes.
-            fontSize: (isPortraitTablet || isLandscapeTablet) ? 'max(10px, 8px)' : `max(10px, ${carrilPx(11)})`,
-            lineHeight: 1.5,
-            letterSpacing: '0.04em',
-            color: '#2B2B2B',
-            whiteSpace: 'nowrap',
-          }}
-        >
-          COLOR
-        </span>
-      </div>
     </div>
   );
 }
@@ -736,13 +769,21 @@ export function CercadorColorsGrid({
 export function CercadorColleccionsColumna({
   activeKey,
   onSelect,
-  alcadaFilaLlista,
   paddingLeft,
   transform,
   isPortraitTablet = false,
   isLandscapeTablet = false,
   caixes = false,
   linia = false,
+  // La columna va en una capa propia: no ha d'estirar la fila on viu (les nou
+  // linies son mes altes que el carrusel). El seu top cau al top del selector i
+  // el seu bottom al bottom de la slide (`margeDalt` i `margeBaix`, que calcula
+  // la filera).
+  absolut = false,
+  // Els px que hi ha del top de la filera al top del selector (la columna hi
+  // arrenca) i del bottom de la filera al bottom de la slide (hi acaba).
+  margeDalt = 0,
+  margeBaix = 0,
   // El marge dret que ha de deixar la linia per acabar on acaba la graella de
   // dibuixos (les fletxes i el seu coixi). El calcula la filera, que es qui sap
   // si hi ha fletxes.
@@ -806,7 +847,7 @@ export function CercadorColleccionsColumna({
               cursor: 'pointer',
             }}
           >
-            {label}
+            {etiquetaColleccio(label)}
           </button>
         ))}
       </div>
@@ -866,38 +907,70 @@ export function CercadorColleccionsColumna({
               cursor: 'pointer',
             }}
           >
-            {label}
+            {etiquetaColleccio(label)}
           </button>
         ))}
       </div>
     );
   }
+
+
   return (
-    <div style={{ width: '100%', transform, paddingLeft }}>
+    <div style={{
+      width: '100%',
+      transform,
+      paddingLeft,
+      // DEL TOP DEL SELECTOR AL BOTTOM DE LA SLIDE (24/09/2026, ho va demanar
+      // l'amo): la llista s'estira entre les dues vores. Amb `top: 0` arrencava
+      // amb el carrusel i acabava on acabava el seu contingut.
+      // I ELS ENLLACOS SON TARGETES (mateix dia): una graella de nou caselles
+      // iguals, amb la separacio de 3 px de la taula vertical, i cada enllac
+      // dins la seva targeta.
+      ...(absolut ? {
+        position: 'absolute',
+        left: 0,
+        right: 0,
+        top: -margeDalt,
+        bottom: -margeBaix,
+        display: 'grid',
+        gridTemplateRows: `repeat(${CERCADOR_COLLECTIONS.length}, 1fr)`,
+        rowGap: '3px',
+      } : null),
+    }}>
       {CERCADOR_COLLECTIONS.map(({ key, label }) => (
         <button
           key={key}
           type="button"
+          // La marca que fa servir `scripts/compara-vistes.mjs` per mesurar la
+          // columna (del top del selector al bottom de la franja).
+          data-colleccions-targeta="1"
           onClick={() => onSelect?.(key)}
           className="font-roboto-condensed"
           style={{
-            display: 'block',
+            // LA TARGETA: la caixa grisa de la taula vertical (radi 3 i el
+            // coixi de 6 px), amb el nom enrasat a la dreta i centrat a dalt i
+            // a baix. El text no es pot escapar de la caixa.
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'flex-end',
             width: '100%',
+            minHeight: 0,
             boxSizing: 'border-box',
-            height: (isPortraitTablet || isLandscapeTablet) ? '11px' : `${alcadaFilaLlista}px`,
-            padding: 0,
+            padding: '0 6px',
             border: 0,
-            background: 'transparent',
+            borderRadius: '3px',
+            backgroundColor: '#F1F3F5',
             color: '#2B2B2B',
+            overflow: 'hidden',
             fontSize: (isPortraitTablet || isLandscapeTablet) ? 'max(10px, 8px)' : `max(10px, ${carrilPx(11)})`,
             fontWeight: key === activeKey ? 700 : 300,
-            lineHeight: (isPortraitTablet || isLandscapeTablet) ? '11px' : `${alcadaFilaLlista}px`,
+            lineHeight: 1.2,
             textAlign: 'right',
             whiteSpace: 'nowrap',
             cursor: 'pointer',
           }}
         >
-          {label}
+          {etiquetaColleccio(label)}
         </button>
       ))}
     </div>
@@ -970,6 +1043,90 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
     };
   }, [compact, isPortraitTablet, isLandscapeTablet]);
 
+  // LA COLUMNA DE COLLECCIONS, DEL TOP DEL SELECTOR AL BOTTOM DE LA STRIPE.
+  //
+  // L'amo ho va demanar el 24/09/2026 (primer va dir "el bottom de la slide" i
+  // despres ho va corregir: "el bottom de la stripe"). La columna viu en una
+  // capa propia dins la filera (les nou linies son mes altes que el carrusel), i
+  // ha d'anar del top del selector Blanc/Color/Negre al bottom de la tinta de la
+  // franja de samarretes. Cap de les dues distancies no es constant: es mesuren
+  // i s'apliquen, i es tornen a mirar quan la composicio acaba d'encaixar.
+  const [margesEnllacos, setMargesEnllacos] = useState({ dalt: 0, baix: 0 });
+  useLayoutEffect(() => {
+    if (!compact) return undefined;
+    const el = graellaRef.current;
+    if (!el) return undefined;
+    const calcula = () => {
+      const filera = el.closest('[data-p2-cercador-row]');
+      const pagina = el.closest('[data-mega-page-viewport="2"]');
+      const selector = pagina?.querySelector('[data-p2-color-selector] [data-stripe-buttonbar="bn"]');
+      const franja = pagina?.querySelector('[data-stripe-visual-content="2"]');
+      if (!filera || !selector || !franja) return;
+      const f = filera.getBoundingClientRect();
+      const dalt = f.top - selector.getBoundingClientRect().top;
+      const baix = franja.getBoundingClientRect().bottom - f.bottom;
+      setMargesEnllacos((previ) => (
+        Math.abs(previ.dalt - dalt) < 0.5 && Math.abs(previ.baix - baix) < 0.5
+          ? previ
+          : { dalt, baix }
+      ));
+    };
+    calcula();
+    const t1 = window.setTimeout(calcula, 250);
+    const t2 = window.setTimeout(calcula, 900);
+    window.addEventListener('resize', calcula);
+    // La franja s'ajusta al carril i la seva alçada acaba de quadrar després del
+    // primer pintat: sense observar-la, la mesura es quedava curta.
+    const observer = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(calcula) : null;
+    const franjaEl = el.closest('[data-mega-page-viewport="2"]')?.querySelector('[data-stripe-visual-content="2"]');
+    if (franjaEl) observer?.observe(franjaEl);
+    return () => {
+      window.clearTimeout(t1);
+      window.clearTimeout(t2);
+      window.removeEventListener('resize', calcula);
+      observer?.disconnect();
+    };
+  }, [compact, graellaRef]);
+
+  // LA GRAELLA DE COLORS (14x1), CENTRADA AMB LA CEL·LA NEGRE DEL SELECTOR.
+  //
+  // L'amo ho va demanar el 24/09/2026, juntament amb la primera línia de
+  // dibuixos: cada peça cau sobre la cel·la del selector que li toca (les
+  // barres de color, sobre NEGRE). El selector no es mou: el que puja son les
+  // barres, els px que els falten. Com la resta de mesures, s'acumula i es
+  // torna a mirar quan la composicio acaba d'encaixar.
+  const [desnivellColors, setDesnivellColors] = useState(0);
+  const desnivellColorsRef = useRef(0);
+  useLayoutEffect(() => {
+    if (!compact) return undefined;
+    const el = graellaRef.current;
+    if (!el) return undefined;
+    const calcula = () => {
+      const filera = el.closest('[data-p2-cercador-row]');
+      const pagina = el.closest('[data-mega-page-viewport="2"]');
+      const selector = pagina?.querySelector('[data-p2-color-selector] [data-stripe-buttonbar="bn"]');
+      const colors = filera?.querySelector('[data-p2-color-grid]');
+      if (!selector || !colors) return;
+      const s = selector.getBoundingClientRect();
+      const c = colors.getBoundingClientRect();
+      // NEGRE es la tercera cel·la de les tres iguals del selector.
+      const objectiu = s.top + (s.height / 3) * 2.5;
+      const delta = (c.top + c.height / 2) - objectiu;
+      if (Math.abs(delta) < 0.5) return;
+      desnivellColorsRef.current += delta;
+      setDesnivellColors(desnivellColorsRef.current);
+    };
+    calcula();
+    const t1 = window.setTimeout(calcula, 250);
+    const t2 = window.setTimeout(calcula, 900);
+    window.addEventListener('resize', calcula);
+    return () => {
+      window.clearTimeout(t1);
+      window.clearTimeout(t2);
+      window.removeEventListener('resize', calcula);
+    };
+  }, [compact, graellaRef]);
+
   if (compact) {
     // Dins el carril, tot el que es pinta son proporcions seves; les tauletes
     // (un disseny a part) i la banda estreta tenen les seves excepcions.
@@ -997,25 +1154,18 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
     // peca es quadrada, tambe es 1,5 cops mes ampla, i per aixo se'n veuen
     // menys i el conjunt es una tira que es desplac,a.
     const dibuixPx = dibuixBasePx * 1.5;
-    // Els cercles de color es calibren amb el mateix factor que els dibuixos:
-    // si la graella s'encongeix (mobil, desktop estret), els cercles
-    // l'acompanyen i les files continuen caient les unes sobre les altres.
+    // La separacio entre barres de color es calibra amb el mateix factor que
+    // els dibuixos: si la graella s'encongeix (mobil, desktop estret), les
+    // barres l'acompanyen.
     //
-    // AMB LA MIDA BASE, NO AMB LA DEL CARRUSEL: la graella de colors 4x4 es
-    // queda com estava (l'amo ho va dir), i si el factor prengues la mida nova
-    // els cercles creixerien un 50 % de regal.
+    // AMB LA MIDA BASE, NO AMB LA DEL CARRUSEL: si el factor prengues la mida
+    // nova, la separacio creixeria un 50 % de regal.
     const factorDibuix = (midesGraella && midesGraella.dibuix != null)
       ? dibuixBasePx / midaDibuix(isPortraitTablet, isLandscapeTablet)
       : 1;
-    const cerclePx = colorMida(isPortraitTablet, isLandscapeTablet) * factorDibuix;
     const colorGapPx = colorGap(isPortraitTablet, isLandscapeTablet) * factorDibuix;
     const gapH = midesGraella?.gapH ?? gapHorizontal(isPortraitTablet, isLandscapeTablet);
     const gapV = midesGraella?.gapV ?? gapVertical(isPortraitTablet, isLandscapeTablet);
-    // La columna de col·leccions (la de la dreta de la graella de colors)
-    // reparteix les seves línies al llarg de tota l'alçada de la graella, de
-    // manera que acaba exactament al mateix bottom que els dibuixos.
-    const alcadaGraella = GRAELLA_FILES * dibuixPx + (GRAELLA_FILES - 1) * gapV;
-    const alcadaFilaLlista = alcadaGraella / (CERCADOR_COLLECTIONS.length || 1);
     const activeKey = activeCollection === 'austen' ? `austen:${activeSubcollection || ''}` : activeCollection;
     // L'amplada de les fletxes mes el seu coixi: el marge dret que han de
     // deixar tant el retall dels dibuixos com la linia de colleccions, perque
@@ -1028,6 +1178,10 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
 
     return (
       <div
+        // La filera sencera (les dues files): es el bloc que flanquegen el
+        // selector Blanc/Color/Negre i el bloc de fletxes, i el que es mesura
+        // per centrar-los-hi (vegeu `MegaslidePagina2`).
+        data-p2-cercador-row
         style={{
           position: 'absolute',
           // `desplacamentVertical` el fa servir la pàgina 2 per quadrar aquesta
@@ -1078,7 +1232,12 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
           // `max-content` la columna fa exactament el que ocupa la graella, i
           // com que la filera acaba a la vora dreta del carril, la graella
           // tambe: la seva vora dreta es la del carril.
-          gridTemplateColumns: 'minmax(0, 1fr) max-content',
+          // LA COLUMNA DE LA DRETA ES LA DEL DISSENY (142 de 1350), no el que
+          // ocupi el que hi hagi a dins. Es el que fa que res no es mogui: amb
+          // `max-content`, canviar el contingut d'aquella columna (la graella de
+          // colors abans, els enllacos ara) n'amplava o estrenyia l'amplada i,
+          // amb ella, la del carrusel, la de les fletxes i la de la franja.
+          gridTemplateColumns: `minmax(0, 1fr) ${carrilLane(142)}`,
           // LA FILA 2 ARRIBA AL BAIX DEL SELECTOR (24/09/2026, ho va demanar
           // l'amo). El baix del selector cau `carrilLane(40)` per sota del
           // baix de la graella de dibuixos (es el coixi de 40 de la
@@ -1087,7 +1246,11 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
           // `carrilLane(40) - 10px`, i els enllacos hi van enrasats a baix
           // (`alignSelf: 'end'`). Amb `minmax(..., auto)` la fila creix si els
           // enllacos hi van en dues linies (tauleta) en comptes de sortir-se'n.
-          gridTemplateRows: `auto minmax(calc(${carrilLane(40)} - 10px), auto)`,
+          // ALCADA FIXA (24/09/2026). Amb `auto`, el que hi hagi a la fila 2
+          // (la graella de colors) canviava l'alçada de tota la filera i, amb
+          // ella, la mida dels dibuixos i el lloc de les fletxes i del selector.
+          // Fixa, el que hi posem no mou res.
+          gridTemplateRows: `auto calc(${carrilLane(40)} - 10px)`,
           // 10 px FIXES entre blocs (no escalats): es el que fa que totes les
           // mides quadrin, perque el que cedeix es el gap intern dels dibuixos.
           columnGap: '20px',
@@ -1118,30 +1281,36 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
           fontBoost={fontBoost}
         />
 
-        {/* LA GRAELLA 4x4, A LA DRETA DEL CARRIL: columna 2, les dues files.
-            Ja no porta cap desplac,ament: el seu lloc es la vora dreta. */}
-        <div style={{ gridColumn: '2', gridRow: '1 / span 2', minWidth: 0 }}>
+        {/* LA GRAELLA DE COLORS 14x1, AL LLOC ON ERA EL TEXT (24/09/2026, ho va
+            demanar l'amo): fila 2 de la primera columna, entre el selector i les
+            fletxes, com feia la linia d'enllacos. */}
+        <div style={{ gridColumn: '1', gridRow: '2', minWidth: 0 }}>
           <CercadorColorsGrid
             selectedColor={selectedColor}
             onSelectColor={onSelectColor}
-            cerclePx={cerclePx}
             colorGapPx={colorGapPx}
-            isPortraitTablet={isPortraitTablet}
-            isLandscapeTablet={isLandscapeTablet}
+            reservaDreta={reservaDreta}
+            marginTop={-desnivellColors}
           />
         </div>
 
-        {/* LA LINIA DE COLLECCIONS, A SOTA DEL CARRUSEL (fila 2 de la primera
-            columna): entre el selector i la graella 4x4. Ja no es una columna a
-            la dreta de tot, i per aixo no porta ni transform ni el coixi que
-            compensava la graella de colors. */}
-        <div style={{ gridColumn: '1', gridRow: '2', minWidth: 0, alignSelf: 'end' }}>
+        {/* ELS ENLLACOS DE COLLECCIONS, UNA COLUMNA A LA DRETA. Va en una capa
+            propia (`position: absolute`) perque les nou linies son mes altes que
+            el carrusel i, dins del flux, estirarien la fila 1 i farien marxar
+            les fletxes i el selector. Fora del flux no estira res. */}
+        {/* EL MARGES DE LA COLUMNA ES MESUREN DES D'AQUESTA CAPA: es qui la
+            conté, i per aixo s'estira a les dues files (`alignSelf: stretch`).
+            Amb la capa de 0 px d'alçada (el seu únic fill és absolut), el
+            `bottom` de la columna es comptava des d'un zero i la llista no
+            arribava mai al bottom de la slide. */}
+        <div style={{ gridColumn: '2', gridRow: '1 / span 2', minWidth: 0, position: 'relative', alignSelf: 'stretch' }}>
           <CercadorColleccionsColumna
-            linia
+            absolut
             reservaDreta={reservaDreta}
+            margeDalt={margesEnllacos.dalt}
+            margeBaix={margesEnllacos.baix}
             activeKey={activeKey}
             onSelect={onSelectCollection}
-            alcadaFilaLlista={alcadaFilaLlista}
             isPortraitTablet={isPortraitTablet}
             isLandscapeTablet={isLandscapeTablet}
           />

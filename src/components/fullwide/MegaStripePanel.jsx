@@ -219,7 +219,7 @@ function MegaStripePanel({
   // surt de l'amplada del carril, no d'un numero calibrat (vegeu l'hook). A la
   // vista vertical no s'hi aplica: alla la franja te el seu propi calibratge.
   const filaFranjaRef = useRef(null);
-  const factorCarrilFranja = useEscalaFranjaCarril(filaFranjaRef, ajustFranjaCarril);
+  const { factor: factorCarrilFranja, centre: centreCarrilFranja } = useEscalaFranjaCarril(filaFranjaRef, ajustFranjaCarril);
   // A la vista vertical la franja son DUES fileres de 7: les 14 posicions de
   // la mascara es reparteixen 7 a dalt i 7 a baix (a l'apaisada van en una
   // sola filera).
@@ -374,7 +374,12 @@ function MegaStripePanel({
                 // `translateX(-50%)` el centre es el del contenidor de
                 // maquetacio (el carril menys els coixins, que son iguals), a
                 // tots els navegadors.
-                left: '50%',
+                // El centre, a mig cami entre la vora esquerra del carril i la
+                // dreta de les fletxes: aixi la cintura de la primera samarreta
+                // cau a la vora esquerra del carril i la de l'ultima a la guia
+                // de les fletxes. Sense fletxes (tauletes) el centre es el del
+                // carril, que es com estava.
+                left: centreCarrilFranja === null ? '50%' : `${centreCarrilFranja}px`,
                 transform: 'translateX(-50%)',
               }}
             >

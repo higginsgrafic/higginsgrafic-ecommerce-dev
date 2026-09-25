@@ -297,6 +297,13 @@ export const STRIPE_DRAWING_OVERLAY_DEFAULTS = { dx: 0.5, dy: 28.75, scale: 0.31
 export const FRACCIO_COSSOS_FRANJA = 2740 / 2866;
 
 /**
+ * On comenca la cintura dins de la imatge: el primer cos arrenca al px 65 dels
+ * 2866. Serveix per comprovar que la cintura esquerra cau on toca (a la vora
+ * esquerra del carril). La dreta es `FRACCIO_COSSOS_FRANJA` mes aixo.
+ */
+export const FRACCIO_MARGE_ESQUERRE_FRANJA = 65 / 2866;
+
+/**
  * Defaults globals del layout del stripe (mega-slide). Calibrats a Firefox.
  * Apliquen com a useState inicial; el localStorage continua sobreescrivint.
  *
