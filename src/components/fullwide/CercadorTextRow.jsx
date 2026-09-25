@@ -119,9 +119,13 @@ const STRIPE_MAP = {
   'Looking For My Darcy Fuchsia Solid': '/custom_logos/drawings/images_grid/austen/looking_for_my_darcy/fuchsia-solid-grid.webp',
   'Looking For My Darcy Red Solid': '/custom_logos/drawings/images_grid/austen/looking_for_my_darcy/red-solid-grid.webp',
   'Looking For My Darcy Yellow Solid': '/custom_logos/drawings/images_grid/austen/looking_for_my_darcy/yellow-solid-grid.webp',
-  'Looking For My Darcy Yellow Blue Frame': '/custom_logos/drawings/images_grid/austen/looking_for_my_darcy/blue-frame-grid.webp',
-  'Looking For My Darcy Yellow Fuchsia Frame': '/custom_logos/drawings/images_grid/austen/looking_for_my_darcy/fuchsia-frame-grid.webp',
-  'Looking For My Darcy Red Yellow Frame': '/custom_logos/drawings/images_grid/austen/looking_for_my_darcy/red-frame-grid.webp',
+  // Els quatre marcs, amb el nom del COLOR DEL MARC (25/09/2026). Abans es
+  // deien amb els dos colors i el groc al davant («Yellow Blue Frame»...), i
+  // allo feia que el color principal no es llegís. El fitxer de la graella es
+  // el mateix que abans.
+  'Looking For My Darcy Blue Frame': '/custom_logos/drawings/images_grid/austen/looking_for_my_darcy/blue-frame-grid.webp',
+  'Looking For My Darcy Fuchsia Frame': '/custom_logos/drawings/images_grid/austen/looking_for_my_darcy/fuchsia-frame-grid.webp',
+  'Looking For My Darcy Red Frame': '/custom_logos/drawings/images_grid/austen/looking_for_my_darcy/red-frame-grid.webp',
   'Looking For My Darcy Yellow Frame': '/custom_logos/drawings/images_grid/austen/looking_for_my_darcy/yellow-frame-grid.webp',
   // CUBE
   'Afrodita-C': 'Afrodita C',
@@ -222,7 +226,21 @@ const COLUMNS = [
   // 5 · AUSTEN (Pride And Prejudice + Sense And Sensibility)
   [{ bullet: false, collection: 'austen', subcollection: 'crosswords', items: ['Pride And Prejudice 1', 'Pride And Prejudice 2', 'Pride And Prejudice 3', 'Pride And Prejudice 4', 'Sense And Sensibility 1', 'Sense And Sensibility 2', 'Sense And Sensibility 3', 'Sense And Sensibility 4'] }],
   // 6 · AUSTEN (Looking For My Darcy)
-  [{ bullet: true, collection: 'austen', subcollection: 'looking_for_my_darcy', items: ['Looking For My Darcy Blue Solid', 'Looking For My Darcy Fuchsia Solid', 'Looking For My Darcy Red Solid', 'Looking For My Darcy Yellow Solid', 'Looking For My Darcy Yellow Blue Frame', 'Looking For My Darcy Yellow Fuchsia Frame', 'Looking For My Darcy Red Yellow Frame', 'Looking For My Darcy Yellow Frame'] }],
+  //
+  // ELS SÒLIDS A DALT I ELS MARCS A BAIX (25/09/2026, ho va demanar l'amo).
+  //
+  // La graella del carrusel es una LLISTA PLANA que es reparteix en dues files
+  // intercalades (com una paret de mao): els indexos SENARS van a la fila de
+  // baix. O sigui que, per tenir els quatre sòlids en una fila i els quatre
+  // marcs a l'altra, la llista ha d'anar INTERCALADA de dos en dos; amb els
+  // quatre sòlids seguits i els quatre marcs darrere, la graella els repartiria
+  // de dos en dos i quedarien barrejats.
+  //
+  // L'ordre dels colors es conserva —blau, fúcsia, vermell, groc— i la parella
+  // va amb el MARC PRIMER: a la graella, l'index parell cau a la fila de dalt, i
+  // amb el marc davant els quatre marcs cauen a dalt i els quatre solids a baix,
+  // que es el que demana l'amo.
+  [{ bullet: true, collection: 'austen', subcollection: 'looking_for_my_darcy', items: ['Looking For My Darcy Blue Frame', 'Looking For My Darcy Blue Solid', 'Looking For My Darcy Fuchsia Frame', 'Looking For My Darcy Fuchsia Solid', 'Looking For My Darcy Red Frame', 'Looking For My Darcy Red Solid', 'Looking For My Darcy Yellow Frame', 'Looking For My Darcy Yellow Solid'] }],
   // 7 · CUBE
   [{ bullet: true, collection: 'cube', subcollection: null, items: ['Afrodita-C', '3cube-P0', 'Cyber Cube', "Cylon Cube '03", 'Darth Cube', "Iron Cube '08", "Iron Cube '68", 'Maschinencube', 'Mazinger-C', 'Robocube'] }],
   // 8 · MISCEL·LÀNIA

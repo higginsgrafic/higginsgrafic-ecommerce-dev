@@ -130,7 +130,32 @@ export function resolveForItem(it, tileVariant, ctx) {
           return `/custom_logos/drawings/images_stripe/austen/looking_for_my_darcy/color/solid/${c}-solid-stripe.webp`;
         }
         if (m[2] === 'frame') {
-          return `/custom_logos/drawings/images_stripe/austen/looking_for_my_darcy/color/frame/${c}-frame-stripe.webp`;
+          // ELS NOMS DELS MARC PORTEN ELS DOS COLORS (25/09/2026).
+          //
+          // L'amo va reanomenar els originals: ara son `blue-yellow`, `fuchsia-
+          // yellow`, `yellow-pink` i `yellow-red`, amb el color de la tela del
+          // marc PRIMER. El nom de la graella nome's en porta un (el del marc), o
+          // sigui que no es pot derivar: cal el mapa.
+          //
+          // El mapa surt de MESURAR els pixels de cada dibuix i de cada original
+          // (el color mes frequent i el segon):
+          //
+          //   blue-frame-grid     blau 16% + groc   -> blue-yellow
+          //   fuchsia-frame-grid  fucsia 17% + groc -> fuchsia-yellow
+          //   red-frame-grid      groc 26% + vermell-> yellow-red
+          //   yellow-frame-grid   groc 24% + rosa  -> yellow-pink
+          //
+          // I aixo tambe arregla una errada de debò: el dibuix `yellow-frame`
+          // (groc + rosa) apuntava al fitxer del Fucsia. Ho va veure l'amo a la
+          // seva captura dels quatre fitxers.
+          const MARC_A_FITXER = {
+            blue: 'blue-yellow',
+            fuchsia: 'fuchsia-yellow',
+            red: 'yellow-red',
+            yellow: 'yellow-pink',
+          };
+          const fitxer = MARC_A_FITXER[c] || c;
+          return `/custom_logos/drawings/images_stripe/austen/looking_for_my_darcy/color/frame/${fitxer}-frame-stripe.webp`;
         }
       }
     }
@@ -151,15 +176,32 @@ export function resolveForItem(it, tileVariant, ctx) {
  * @param {string} [opts.resolvedOverlaySrc] - overlay src per detectar subcol·lecció
  * @returns {(string|null)[]} array de 14 elements
  */
-export function computeStripeTileOverlaySrcs({ drawable, variant, active, displayedShirtColor, resolvedOverlaySrc }) {
+export function computeStripeTileOverlaySrcs({ drawable, variant, active, displayedShirtColor, resolvedOverlaySrc, limit }) {
   if (!Array.isArray(drawable) || drawable.length === 0) return null;
   const multiTone = displayedShirtColor === 'white' ? 'dark' : 'light';
   const isKeepCalm = active === 'austen' && typeof resolvedOverlaySrc === 'string' && /\/austen\/keep_calm\//i.test(resolvedOverlaySrc);
   const isPemberley = active === 'austen' && typeof resolvedOverlaySrc === 'string' && /\/austen\/pemberley_house\//i.test(resolvedOverlaySrc);
   const ctx = { active, displayedShirtColor, resolvedOverlaySrc };
 
+  // QUANTES CASELLES ES RESOLEN (25/09/2026).
+  //
+  // Aquesta funcio va neixer per a UNA franja de catorze cases, i per aixo
+  // recorria nome's catorze items. Qui la fa servir tambe per construir la TIRA
+  // SENcera (les 64 posicions de `tiraFranja`) hi passava la llista de la
+  // colleccio activa, que en pot tenir mes: AUSTEN en te 27. Amb el topall de
+  // catorze, la tira es quedava amb els catorze primers i la resta NO ARRIBAVA
+  // MAI a la franja: mesurat, cap dels catorze dibuixos de LOOKING FOR MY DARCY
+  // (ni els solids ni els marcs) no hi era. Ho va veure l'amo.
+  //
+  // Per defecte es queda a catorze (la franja de sempre, sense canviar res mes);
+  // qui munta la tira sencera demana `drawable.length`.
+  const total = Math.min(
+    Number.isFinite(limit) && limit > 0 ? limit : 14,
+    Math.max(drawable.length, 14)
+  );
+
   const tileSrcs = [];
-  for (let i = 0; i < 14; i++) {
+  for (let i = 0; i < total; i++) {
     const isKeepCalmColor = isKeepCalm && variant === 'color';
     const tileVariant = variant;
     let src = i < drawable.length ? resolveForItem(drawable[i], tileVariant, ctx) : null;
