@@ -14,7 +14,7 @@ import { buildOtherCollectionsImages } from '@/components/home/homeDrawings';
 import useIsMobile from '@/hooks/useIsMobile';
 import PdpMobile from '@/pages/PdpMobile';
 import PageBand from '@/components/layout/PageBand';
-import { getSafeBelt, carrilPx, esTauletaApaisada , readRootCssNumber } from '@/utils/layoutMetrics';
+import { getSafeBelt, esTauletaApaisada, readRootCssNumber } from '@/utils/layoutMetrics';
 import { SELLING_PRICE_LABEL } from '@/config/pricing';
 
 const PDP_PRESET_VERSION = 'pdp-layout-2026-06-06-1953';
@@ -455,10 +455,22 @@ function PdpDesktop({ product }) {
         {!isTablet && (
           <div
             style={{
-              // Els breadcrumbs s'alineen amb el logo del header: el carril
-              // central, centrat, amb el mateix coixi que la seva fila.
+              // ELS ENLLACOS, ALINEATS AMB EL LOGO (25/09/2026, ho va demanar
+              // l'amo: «Alineats amb el logo per l'esquerra i a una distancia
+              // simetrica com l'aire de sota el logo en Y»).
+              //
+              // El logo del header comença a la vora del carril (mesurat a 1920:
+              // 381) i la filera d'enllacos hi ha de començar tambe. Abans
+              // portava el coixi de 40 px de la fila del header i arrencava a
+              // 421. En Y, el logo acaba a 42 i el seu aire fins al final del
+              // header es de 17 px: doncs la filera hi ha d'anar aquests 17 px
+              // mes avall, que es la MATEIXA distancia.
               position: 'absolute',
-              top: 0,
+              // En Y, la MATEIXA distancia que l'aire de sota el logo. El logo
+              // acaba a 42 i la filera hi ha de caure 17 px avall, o sigui a 59
+              // (mesurat). Amb `top: 6` hi cau: el contenidor ja hi aporta la
+              // resta.
+              top: 6,
               // El contenidor de la pagina esta centrat a l'espai de
               // MAQUETACIO (`margin: 0 auto`), que es la mateixa referencia que
               // fa servir el carril (vegeu getLayoutViewportWidth): no cal cap
@@ -466,7 +478,6 @@ function PdpDesktop({ product }) {
               left: '50%',
               transform: 'translateX(-50%)',
               width: 'var(--hg-mega-w, 100%)',
-              paddingLeft: carrilPx(40),
               boxSizing: 'border-box',
               zIndex: 10,
               pointerEvents: 'none',
@@ -496,6 +507,8 @@ function PdpDesktop({ product }) {
               showTitle={false}
               showInternalArrows={false}
               visibleCards={isPortraitTablet ? 3 : 4}
+              // Les quatre targetes omplen el carril (el gap es el de sempre).
+              ompleCarril={!isPortraitTablet}
               // A la vertical, els textos de les targetes 10 px mes amunt.
               textBottomPx={isPortraitTablet ? 18 : 8}
               stabilizeInitialLayout={isPortraitTablet}
