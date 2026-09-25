@@ -443,13 +443,11 @@ de `eslint`.
    | **yellow frame** (sol) | **NO HI ÉS** |
    | — | `looking-for-my-darcy-pink-yellow-frame` (producte sense dibuix) |
 
-   O sigui: el dibuix del marc groc existeix (l'arxiu
-   `yellow-frame-grid.webp` hi és) i **no té producte**, i hi ha **un producte
-   sense dibuix**. La decisió és de l'amo: o s'afegeix el producte
-   `looking-for-my-darcy-yellow-frame` al registre, o es treu el dibuix. I de
-   passada, decidir si `pink-yellow-frame` és el mateix que
-   `yellow-pink-frame` (el nom del producte diu una cosa i el dibuix una
-   altra).
+   **RESOLT el 25/09/2026** amb el reanomenament dels fitxers de la franja i el
+   mapa de colors (vegeu §10). El dibuix del marc groc (groc + rosa) ja apunta
+   al fitxer `yellow-pink-frame-stripe.webp`, que és el seu, i no al del fúcsia.
+   El producte `pink-yellow-frame` (el que no té dibuix) queda pendent de
+   decisió de l'amo: o es retira, o passa a ser el del marc groc.
 2. **L'opacitat del vel (0,6).** És un número triat perquè és el mateix
    tractament que la samarreta buida blanca. Si l'amo el vol més fluix o més
    fort, és un sol número.
@@ -469,7 +467,96 @@ de `eslint`.
 
 ---
 
-## 10. Números de referència (1920×946)
+## 10. Les imatges de la franja, el reanomenament i l'ordre (25/09/2026)
+
+### 10.1 El que va fer l'amo
+
+Va reanomenar els originals dels marcs de LOOKING FOR MY DARCY perquè diguin
+**els dos colors**, amb el de la tela primer:
+
+```
+blue-yellow-frame-stripe.webp
+fuchsia-yellow-frame-stripe.webp
+yellow-pink-frame-stripe.webp
+yellow-red-frame-stripe.webp
+```
+
+### 10.2 Què he regenerat, i què no
+
+De les quatre, **dues són noves de nom i prou**: `blue-yellow` i
+`fuchsia-yellow` són **byte a byte idèntiques** a les que ja hi havia (md5
+comprovat: `b4d2a4f1…` i `d9805b40…`). Les que **han canviat de contingut** són
+`yellow-pink` (groc + rosa) i `yellow-red` (groc + vermell): md5 diferent i to
+diferent. Només aquestes dues s'han generat.
+
+**El parany del guió:** `generate-grid-thumbs.mjs` **salta la feina si la imatge
+generada és més nova que l'original**. Com que els originals són del 8/09 i les
+generades del 25/09, la primera passada va escriure còpies que després el guió
+considerava al dia. Cal esborrar les generades que es volen refer.
+
+### 10.3 El mapa de colors, mesurat
+
+El nom de la graella només porta **un** color i el de la franja en porta **dos**,
+o sigui que no es pot derivar: cal un mapa. I el mapa surt de **mesurar els
+píxels**, no de llegir el nom:
+
+| dibuix de la graella | colors (píxels) | fitxer de la franja |
+|---|---|---|
+| `blue-frame-grid` | blau 16 % + groc | `blue-yellow-frame-stripe` |
+| `fuchsia-frame-grid` | fúcsia 17 % + groc | `fuchsia-yellow-frame-stripe` |
+| `red-frame-grid` | groc 26 % + vermell | `yellow-red-frame-stripe` |
+| `yellow-frame-grid` | groc 24 % + rosa | `yellow-pink-frame-stripe` |
+
+**Això arregla una errada de debò:** el dibuix `yellow-frame` (groc + rosa)
+apuntava al fitxer del **fúcsia**.
+
+### 10.4 El topall de catorze, que amagava mitja col·lecció
+
+`computeStripeTileOverlaySrcs` va néixer per a **una franja de catorze cases** i
+feia `for (i = 0; i < 14; i++)`. Qui la fa servir per construir la **tira
+sencera** (les 64 posicions) hi passava la llista de la col·lecció activa, i
+AUSTEN en té **27**: els catorze primers entraven a la tira i la resta **no
+arribava mai a la franja**.
+
+Mesurat amb una sonda a `tiraFranja`: la tira tenia **51** posicions en comptes
+de 64, el bloc d'AUSTEN s'acabava a `pride-and-prejudice-3`, i cap dels vuit
+dibuixos de LOOKING FOR MY DARCY (ni els sòlids ni els marcs) no hi era. Ho va
+veure l'amo: «A la stripe posa'ls pel mateix ordre que a la graella dels
+dibuixos.»
+
+Ara la funció accepta quantes caselles s'han de resoldre (per defecte catorze,
+com sempre), i la tira en demana `llista.length`. La tira té **64** posicions.
+
+### 10.5 L'ordre: la franja va AGRUPADA (decisió final de l'amo)
+
+Hi va haver un anada i tornada, i el resultat final és el d'abans:
+
+1. Primer es va provar d'ordenar la col·lecció activa pel **rang de
+   `dibuixosGraella16x4`**, perquè la franja anés exactament com la graella.
+   Allò **intercalava** els quatre sòlids i els quatre marcs.
+2. L'amo ho va aturar: «Prefereixo que es vegin **agrupats** a la stripe. Torna
+   a deixar les imatges com estaven ordenades abans.» O sigui: els quatre sòlids
+   seguits i els quatre marcs darrere, a la franja **i** a la graella.
+
+Per això la col·lecció activa entra a la tira amb el **seu** ordre (la llista del
+mega configurat), i la graella va amb la llista **plana** de sempre: els índexos
+parells cauen a la fila de dalt, i amb els quatre sòlids davant i els quatre
+marcs darrere la graella els reparteix de dos en dos —que és com es veia
+sempre.
+
+Mesurat: la franja surt `blue-solid, fuchsia-solid, red-solid, yellow-solid,
+blue-frame, fuchsia-frame, red-frame, yellow-frame` (agrupats), **64 posicions**
+i **cap 404**. Els noms nous dels fitxers s'hi queden.
+
+### 10.6 El que sí que s'ha quedat del canvi d'ordre
+
+El que no s'ha desfet és el **mapa de colors** ni el **topall de catorze**: les
+dues coses són errors de debò que feien que mitja col·lecció no arribés a la
+franja.
+
+---
+
+## 11. Números de referència (1920×946)
 
 - franja: **357,8 · 222,9 · 1049,1 × 112,4**; les catorze cases, 111,8 d'amplada
 - finestra de la graella: **455,6..1309,2** (centre 882,4)
