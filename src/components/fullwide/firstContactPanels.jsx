@@ -128,6 +128,12 @@ export function FirstContactDibuix00Buttons({
       // Va alineat a l'ESQUERRA a posta (sense `mx-auto`): a la pagina 2 el
       // selector arrenca on arrenca el logo del header, i aixo no ha de canviar.
       className="relative mt-2 aspect-[1/2] w-1/2"
+      // La pastilla del selector es qui rep els clics: el seu contenidor es el
+      // doble d'ample (el `carrilPx(bnSliderSize)` de MegaSlidePagina2) i
+      // trepitjava les primeres caselles del carrusel (24/09/2026; Playwright:
+      // «intercepts pointer events»). Alla el contenidor va amb
+      // `pointerEvents: none` i els clics els torna a rebre aquesta pastilla.
+      style={{ pointerEvents: 'auto' }}
       data-stripe-buttonbar="bn"
       style={{
         // LE REQUADRE DE FONS ORIGINAL (24/09/2026). El selector va néixer amb
