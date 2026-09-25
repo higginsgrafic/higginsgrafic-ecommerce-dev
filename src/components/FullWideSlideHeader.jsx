@@ -21,6 +21,7 @@ import {
 } from './fullwide/megaSlideMedia.js';
 import { touchMegaPublicActivity, getMegaPublicSelectorFor, setMegaPublicSelectorFor } from './fullwide/megaPublicSelectorState.js';
 import IconButton from './fullwide/MegaIconButton.jsx';
+import { dibuixosGraella16x4 } from './fullwide/CercadorTextRow.jsx';
 import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
 import RegisterOverlay from './fullwide/RegisterOverlay.jsx';
 import usePersistentState from '@/hooks/usePersistentState';
@@ -2545,41 +2546,26 @@ function FullWideSlideHeader({
   }, [defaultNav, navItems]);
 
 
-  // LA LLISTA DELS DIBUIXOS DE THE HUMAN INSIDE, ESCRITA A MA (25/09/2026).
+  // LA LLISTA DELS DIBUIXOS DE THE HUMAN INSIDE SURT DEL REGISTRE (25/09/2026).
   //
-  // Aquesta es la unica colleccio que te la llista duplicada: la graella la treu
-  // del registre (`dibuixosGraella16x4`), pero la finestra fina i la tira de la
-  // franja la llegeixen d'aqui. I aqui HI FALTAVA EL TERMINATOR, que si que es a
-  // la graella: la franja ensenyava catorze dibuixos en comptes de quinze i el
-  // Terminator no hi sortia mai, ni fent scroll. Ho va veure l'amo: «A The Human
-  // Inside, Terminator, no apareix a la stripe».
+  // Aquesta llista era escrita A MA, i era l'unica colleccio amb la llista
+  // duplicada: la graella la treu del registre (`dibuixosGraella16x4`), pero la
+  // finestra fina i la tira de la franja la llegien d'aqui. I aqui HI FALTAVA EL
+  // TERMINATOR: la franja ensenyava catorze dibuixos en comptes de quinze i el
+  // Terminator no hi sortia mai. Ho va veure l'amo: «A The Human Inside,
+  // Terminator, no apareix a la stripe».
   //
-  // Mesurat: el resolver (`resolveForItem`) JA te la clau del Terminator i la
-  // seva imatge hi es (`the_human_inside/black/terminator-b-stripe.webp`, 256x236
-  // i descodifica be). El que fallava era nome's la llista.
+  // Ara surt de la MATEIXA llista que la graella (els 64 dibuixos de les cinc
+  // colleccions), i del CAMP `stripeItem`, que es la clau que enten el resolver
+  // de la stripe. D'aquesta manera, un dibuix nou al registre hi es a tot arreu
+  // el mateix dia, sense haver-lo d'apuntar a tres llocs.
   //
-  // L'ordre es el de la graella, i el Terminator va entre Robocop i The Dalek,
-  // que es on es al registre.
+  // L'ordre es el del registre i el Terminator cau entre Robocop i The Dalek,
+  // que es on ja era a la graella.
   const thinDrawings = useMemo(
-    () => [
-      // Columna 2 (en ordre)
-      'Afrodita',
-      'C3P0',
-      'Cyberman',
-      'Cylon 03',
-      'Cylon 78',
-      'Iron Man 08',
-      'Iron Man 68',
-      'Maschinenmensch',
-      'Mazinger',
-      'R2-D2',
-      // Columna 3 (en ordre)
-      'Robbie the Robot',
-      'Robocop',
-      'Terminator',
-      'The Dalek',
-      'Vader',
-    ],
+    () => dibuixosGraella16x4()
+      .filter((it) => it.collection === 'the_human_inside' && it.stripeItem)
+      .map((it) => it.stripeItem),
     []
   );
 
