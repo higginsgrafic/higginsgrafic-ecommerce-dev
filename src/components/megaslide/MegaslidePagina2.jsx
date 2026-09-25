@@ -23,7 +23,7 @@ import {
 } from '../fullwide/MegaColumn.jsx';
 import { FirstContactDibuix00Buttons } from '../fullwide/firstContactPanels.jsx';
 import { VEL_SAMARRETA_BUIDA_ALFA } from '../../config/stripeCalibrationsVertical.js';
-import { computeStripeTileOverlaySrcs, computeStripeTileItems } from '@/utils/resolveStripeTile.js';
+import { computeStripeTileOverlaySrcs } from '@/utils/resolveStripeTile.js';
 
 export default function MegaslidePagina2({
   active,
@@ -327,12 +327,20 @@ export default function MegaslidePagina2({
   // `computeStripeTileOverlaySrcs` resol cada dibuix amb el context de la seva
   // colleccio (`active`), i amb una llista barrejada retornava `null` a tot el
   // que no fos l'activa (mesurat: 7 dibuixos dels 14 que tocaven).
+  //
+  // DES DEL 25/09/2026 LA TIRA ES SENZERA (64 dibuixos, no 14). La franja te 14
+  // CASES fixes —les catorze samarretes, que no es mouen— i per sobre seu hi
+  // circula aquesta llista: una fletxa, la rodeta o l'arrossegament la fan
+  // avançar d'un dibuix, i cada casa ensenya el dibuix que li toca. Es pot fer
+  // perque el pas entre cases (6,8701 % de l'amplada, mesurat: 6,8691 / 6,8705 /
+  // 6,8706) es constant, o sigui que el dibuix de la casa seguent cau
+  // exactament on cau el dibuix d'aquesta.
   const tiraFranja = useMemo(() => {
-    if (!Array.isArray(drawable) || drawable.length === 0) return { items: null, srcs: null };
     const items = [];
     const srcs = [];
-    const afegeix = (llista, ctxActive, ctxVariant) => {
-      if (!llista.length || items.length >= 14) return;
+    const collections = [];
+    const afegeix = (llista, ctxActive, ctxVariant, ctxCollection) => {
+      if (!llista.length) return;
       const s = computeStripeTileOverlaySrcs({
         drawable: llista,
         variant: ctxVariant,
@@ -341,30 +349,88 @@ export default function MegaslidePagina2({
         resolvedOverlaySrc,
       });
       if (!s) return;
-      for (let i = 0; i < llista.length && items.length < 14; i++) {
+      for (let i = 0; i < llista.length; i++) {
+        // Els dibuixos que la seva colleccio no sap resoldre es queden fora de
+        // la tira: amb una casella buida al mig, el bucle tindria un forat.
         if (!s[i]) continue;
         items.push(llista[i]);
         srcs.push(s[i]);
+        collections.push(ctxCollection);
       }
     };
     // Primer la colleccio activa, tal com estava; despres les altres, en
-    // l'ordre de la graella, fins a omplir les catorze caselles.
-    afegeix(drawable, active, variant);
+    // l'ordre de la graella.
+    afegeix(drawable, active, variant, active);
     for (const it of dibuixosGraella16x4()) {
-      if (items.length >= 14) break;
       if (!it.stripeItem || it.collection === active) continue;
-      afegeix([it.stripeItem], it.collection, it.collection === 'the_human_inside' ? humanInsideVariant : firstContactVariant);
+      afegeix([it.stripeItem], it.collection, it.collection === 'the_human_inside' ? humanInsideVariant : firstContactVariant, it.collection);
     }
-    while (items.length < 14) { items.push(null); srcs.push(null); }
-    return { items, srcs };
+    return { items, srcs, collections };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [drawable, variant, active, displayedShirtColor, resolvedOverlaySrc, humanInsideVariant, firstContactVariant]);
 
-  const stripeTileOverlaySrcs = tiraFranja.srcs;
+  // Les 14 cases de la franja. Amb la tira sencera, cada casa ensenya el dibuix
+  // que li toca segons el desplac,ament (`stripeStripOffset`, que governa el
+  // panell); sense tira, es queda com estava.
+  const stripeStrip = useMemo(() => {
+    const n = tiraFranja.srcs.length;
+    if (n === 0) return null;
+    return Array.from({ length: 14 }, (_, i) => ({
+      src: tiraFranja.srcs[i % n],
+      item: tiraFranja.items[i % n],
+      collection: tiraFranja.collections[i % n],
+    }));
+  }, [tiraFranja]);
+
+  const stripeTileOverlaySrcs = useMemo(() => {
+    if (stripeStrip) return stripeStrip.map((x) => x.src);
+    return null;
+  }, [stripeStrip]);
   const stripeTileItems = useMemo(
-    () => (Array.isArray(tiraFranja.items) ? computeStripeTileItems(tiraFranja.items.filter(Boolean)) : null),
-    [tiraFranja],
+    () => (stripeStrip ? stripeStrip.map((x) => x.item) : null),
+    [stripeStrip],
   );
+
+  // EL DESPLAÇAMENT DE LA TIRA DE LA FRANJA (25/09/2026, ho va demanar l'amo:
+  // «pots fer lliscar les samarretes en un bucle infinit?» i, quan li vaig dir
+  // que el dibuix de fons no es repeteix, «fes-ho sense animacio o amb una
+  // animacio molt curta perque no es vegi el retall»).
+  //
+  // Les catorze samarretes NO es mouen (el dibuix de fons no es repeteix
+  // exactament: mesurat, desplaçat 1/14 coincideix nome's al 49 % en blanc i al
+  // 0,75 % en colors). El que circula es la LLISTA de dibuixos: una fletxa, un
+  // pas de rodeta o un arrossegament l'avença d'un dibuix, i cada casa ensenya
+  // el que li toca. La volta es infinita i exacta perque el periode es la
+  // llargada de la llista (64 dibuixos) i el residu es modular.
+  const [stripeStripOffset, setStripeStripOffset] = useState(0);
+  const stripeStripOffsetRef = useRef(0);
+  const aplicaStripOffset = useCallback((f) => {
+    const n = tiraFranja.srcs.length;
+    if (!n) return;
+    const seguent = typeof f === 'function' ? f(stripeStripOffsetRef.current) : f;
+    const arrodonit = Math.round(seguent);
+    if (arrodonit === stripeStripOffsetRef.current) return;
+    stripeStripOffsetRef.current = arrodonit;
+    setStripeStripOffset(arrodonit);
+  }, [tiraFranja]);
+  const moureStrip = useCallback((passos) => {
+    aplicaStripOffset((v) => v + passos);
+  }, [aplicaStripOffset]);
+  // La rodeta, com al carrusel de la graella: `passive: false` perque tambe ha
+  // d'aturar el desplaçament vertical de la pagina mentre es passa per sobre.
+  const bandaFranjaRef = useRef(null);
+  const rodetaFranja = useCallback((e) => {
+    const d = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
+    if (!d) return;
+    e.preventDefault();
+    moureStrip(d > 0 ? 1 : -1);
+  }, [moureStrip]);
+  useEffect(() => {
+    const el = bandaFranjaRef.current;
+    if (!el) return undefined;
+    el.addEventListener('wheel', rodetaFranja, { passive: false });
+    return () => el.removeEventListener('wheel', rodetaFranja);
+  }, [rodetaFranja]);
 
   // Quantes caselles porten dibuix: les altres son samarretes buides i a la
   // vista vertical s'atenuen amb un vel blanc.
@@ -472,6 +538,11 @@ export default function MegaslidePagina2({
             ,
     stripeTileOverlaySrcs: stripeTileOverlaySrcs,
     stripeTileItems: stripeTileItems,
+    // La tira sencera (64 dibuixos amb la seva colleccio) i el seu desplaçament:
+    // es el que fa circular els dibuixos per les catorze cases fixes.
+    stripeStrip: tiraFranja.srcs.length ? { srcs: tiraFranja.srcs, items: tiraFranja.items, collections: tiraFranja.collections } : null,
+    stripeStripOffset: stripeStripOffset,
+    onStripeStripWheel: rodetaFranja,
     clicAreaHighlightIndices: clicAreaHighlightIndices,
     neckDotIndices: neckDotIndices,
     emptyTileIndices: emptyTileIndices,
@@ -646,11 +717,14 @@ export default function MegaslidePagina2({
               setHoveredStripeItem(null);
               setHoveredStripeItemCollection(null);
             }}
+            // Les fletxes fan passar els DIBUIXOS de la franja d'un en un
+            // (25/09/2026, ho va demanar l'amo: «una peça per fletxa»).
+            onCarouselStep={moureStrip}
           />
         </div>
 
         {/* MegaStripePanel */}
-        <div style={{
+        <div ref={bandaFranjaRef} style={{
           position: 'relative',
           zIndex: 1,
           width: '100%',

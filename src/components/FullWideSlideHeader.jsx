@@ -28,6 +28,7 @@ import { CONTROL_TILE_BN, CONTROL_TILE_ARROWS } from './fullwide/MegaColumn.jsx'
 import MegaMenuPanel from './fullwide/MegaMenuPanel.jsx';
 import { CERCADOR_COLORS } from './fullwide/CercadorTopBar.jsx';
 import useMegaPublicIdleReset from '@/hooks/useMegaPublicIdleReset';
+import { findPdpSlug } from '@/config/pdpRoutes.js';
 import useUrlActiveCollection from '@/hooks/useUrlActiveCollection';
 import useMegaStripeDebugVars from '@/hooks/useMegaStripeDebugVars';
 import useMegaTileSelectorDrag from '@/hooks/useMegaTileSelectorDrag';
@@ -251,6 +252,15 @@ function FullWideSlideHeader({
   const resolvePdpUrl = useCallback((collection, item) => {
     if (typeof item !== 'string') return null;
     const s = item.toLowerCase().replace(/[\u2010\u2011\u2012\u2013\u2014\u2212]/g, '-').replace(/\s+/g, '-');
+
+    // PRIMER EL CATALEG (`config/pdpRoutes.js`). El megaslide clica amb el nom
+    // del dibuix («NX-01»), i la PDP el que llegeix es un producte de debò:
+    // `/product/<slug>` es la ruta que `getProductById` enten des de sempre.
+    // Els mapes de sota son el cami vell (`/colleccio/<slug>`), que nome's te
+    // sentit per a les colleccions que tenen ruta propia i que es queda com a
+    // xarxa per als noms que el cataleg no reconeix.
+    const slugCataleg = findPdpSlug(collection, item);
+    if (slugCataleg) return `/product/${slugCataleg}`;
 
     if (collection === 'first_contact') {
       const map = {

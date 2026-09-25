@@ -202,6 +202,12 @@ function MegaStripePanel({
   selectedItem,
   stripeTileOverlaySrcs,
   stripeTileItems,
+  // LA TIRA DE DIBUIXOS QUE CIRCULA (25/09/2026): la llista sencera (64
+  // dibuixos, amb la seva colleccio) i el desplaçament actual. Vegeu
+  // `MegaslidePagina2`.
+  stripeStrip = null,
+  stripeStripOffset = 0,
+  onStripeStripWheel,
   clicAreaHighlight,
   clicAreaHighlightIndices,
   neckDotIndices,
@@ -258,6 +264,17 @@ function MegaStripePanel({
     window.addEventListener('mega-stripe-full-hit-p2', handler);
     return () => window.removeEventListener('mega-stripe-full-hit-p2', handler);
   }, [onShirtClick, selectedItem, stripeTileItems, active, shirtColor]);
+
+  // LA RODETA SOBRE LA FRANJA (25/09/2026, ho va demanar l'amo): fa passar els
+  // dibuixos d'un en un, com la graella i com la tira de colors. Amb
+  // `passive: false` perque el gest tambe ha d'aturar el desplaçament vertical
+  // de la pagina mentre el punter es a sobre la franja.
+  useEffect(() => {
+    const el = filaFranjaRef.current;
+    if (!el || typeof onStripeStripWheel !== 'function' || !stripeStrip) return undefined;
+    el.addEventListener('wheel', onStripeStripWheel, { passive: false });
+    return () => el.removeEventListener('wheel', onStripeStripWheel);
+  }, [onStripeStripWheel, stripeStrip]);
 
   return (
     <div className="w-full shrink-0">
@@ -813,6 +830,7 @@ function MegaStripePanel({
 
                   {megaShirtDrawingEnabledLocal && drawingOverlaySrcEffective ? (
                     <div
+                      data-stripe-drawing-layer
                       className="absolute inset-0"
                       style={{
                         pointerEvents: 'none',
@@ -831,13 +849,22 @@ function MegaStripePanel({
                     >
                       {Array.isArray(rectsMascara) && rectsMascara.length === 14
                         ? rectsMascara.map((r, idx) => {
+                          // El dibuix d'aquesta casa surt de la TIRA sencera
+                          // (64 dibuixos) desplaçada pel `stripeStripOffset`.
+                          const deLaTira = Array.isArray(stripeStrip?.srcs) && stripeStrip.srcs.length > 0
+                            ? {
+                              src: stripeStrip.srcs[((idx + stripeStripOffset) % stripeStrip.srcs.length + stripeStrip.srcs.length) % stripeStrip.srcs.length],
+                              collection: stripeStrip.collections[((idx + stripeStripOffset) % stripeStrip.collections.length + stripeStrip.collections.length) % stripeStrip.collections.length],
+                            }
+                            : null;
                           // Tile buit (samarreta sense dibuix): no renderitzem res
                           // (no repetim ni fem fallback al dibuix per defecte).
-                          if (Array.isArray(stripeTileOverlaySrcs) && !stripeTileOverlaySrcs[idx]) {
+                          if (!deLaTira && Array.isArray(stripeTileOverlaySrcs) && !stripeTileOverlaySrcs[idx]) {
                             return null;
                           }
                           const base = (() => {
                             try {
+                              if (deLaTira) return normalizeOverlaySrc(deLaTira.src);
                               if (Array.isArray(stripeTileOverlaySrcs) && stripeTileOverlaySrcs[idx]) {
                                 return normalizeOverlaySrc(stripeTileOverlaySrcs[idx]);
                               }
@@ -992,7 +1019,8 @@ function MegaStripePanel({
 
                           return (
                             <div
-                              key={`stripe-tile-drawing-${idx}-${imgUrl || ''}`}
+                              data-stripe-tile={idx}
+                              key={`stripe-tile-drawing-${idx}`}
                               style={{
                                 position: 'absolute',
                                 left: `${safeL}%`,
@@ -1003,6 +1031,18 @@ function MegaStripePanel({
                                 boxSizing: 'border-box',
                                 background: drawingOverlayDebug ? 'rgba(217,70,239,0.06)' : 'transparent',
                                 border: drawingOverlayDebug ? '1px solid rgba(217,70,239,0.35)' : '0px solid transparent',
+                                // L'ATENUACIO DELS DIBUIXOS QUE NO SON DE LA COLLECCIO
+                                // ACTIVA (25/09/2026, ho va demanar l'amo): 0,24, la
+                                // mateixa que fa servir la graella (`pintaItem`). Abans
+                                // sortien a ple i es confonien amb els actius.
+                                opacity: deLaTira && deLaTira.collection && deLaTira.collection !== active ? 0.24 : 1,
+                                // UN PAS DE TIRA, UNA TRANSICIO CURTA (25/09/2026): la
+                                // tira no llisca de debò —les catorze cases son fixes i
+                                // el dibuix de fons no es repeteix—, o sigui que el que
+                                // es veu es el canvi de dibuix. Amb 160 ms el canvi es
+                                // llegeix com un moviment i no com un salt, i es prou
+                                // curt perque el retall de la casella no es vegi.
+                                transition: stripeStrip ? 'opacity 160ms ease' : undefined,
                                 // El desplacament del gap va DINS de cada filera: a la vista vertical
                                 // (dues fileres de 7) la posicio dins la filera es idx % 7.
                                 transform: tileGapPxLocal ? `translateX(${(isPortraitTablet ? (idx % 7) : idx) * tileGapPxLocal}px)` : 'none',
