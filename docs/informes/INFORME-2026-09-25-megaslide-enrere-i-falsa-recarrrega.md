@@ -26,6 +26,8 @@ tenen, ho diuen.
 | `eb9c4ff` | la col·lecció activa també va a la URL, i el botó d'enrere ja no trenca el megaslide |
 | `cf8fcd6` | el clic d'una col·lecció també centra la franja, i les samarretes inactives s'atenen |
 | `c3b6f4d` | el «Carregant…» de les rutes ja no posa la pàgina en blanc |
+| `9311bc5` | aquest informe |
+| `f80707c` | la graella també queda centrada quan es remunta, no només quan canvia la clau |
 
 Cap `push` fet: ho ha de dir l'amo (regla de la casa).
 
@@ -178,7 +180,39 @@ Ja no sembla una recàrrega.
 
 ---
 
-## 4. El centratge de la franja
+## 4. El centratge de la franja I de la graella
+
+### 4.0 La segona meitat del problema: la graella no centrava en remuntar-se
+
+El centratge de la graella (`CercadorTextRow`) tenia un guarda que el saltava
+**al primer pintat**: «la graella arrenca on arrenca». Amb la franja centrada i la
+graella no, les dues peces no deien el mateix.
+
+El megaslide **es remunta en navegar** (mesurat amb la sonda de vida:
+`desmuntat` i `muntat/actiu` al mateix instant). El guarda, doncs, es menjava la
+passada del retorn. Mesurat a FIRST CONTACT abans de l'arranjament:
+
+| què | valor |
+|---|---|
+| peces actives de la graella | **0..6** |
+| dibuix més proper al centre de la finestra | **Iron Man '08, atenuat (0,12)** |
+| dibuix més proper al centre de la franja | casa 6, activa |
+
+L'arranjament és treure el guarda del primer pintat: el centratge va amb la clau
+de la col·lecció **i** amb el muntatge. Els desplaçaments manuals (rodeta,
+fletxes) no el disparen mai, perquè la clau no canvia.
+
+Mesurat després, passant per les cinc col·leccions i tornant:
+
+| col·lecció | dibuix al mig de la graella | casa al mig de la franja |
+|---|---|---|
+| FIRST CONTACT | **NX-01** (1) | 6 (1) |
+| THE HUMAN INSIDE | **Maschinenmensch** (1) | 6 (1) |
+| CUBE | **Darth Cube** (1) | 6 (1) |
+| MISCEL·LÀNIA | **DJ Vader** (1) | 6 (1) |
+| FIRST CONTACT (2a volta) | **Wormhole** (1) | 6 (1) |
+
+En tots cinc casos, el dibuix del mig és **actiu** a totes dues peces.
 
 ### 4.1 El que va demanar l'amo
 
@@ -288,6 +322,13 @@ del projecte:
    s'han fet amb sondes escrites al codi i **tretes abans de comitejar** (ho
    confirma `grep`). Els guions temporals (`scripts/_tmp-*.mjs`) no es comitegen
    mai.
+6. **`find` sobre el punt, no sobre el centre.** El meu guió deia que el dibuix
+   del mig de la graella era `Wormhole` quan en realitat era `NX-01`. Buscava el
+   **primer** element de la llista que contenia el punt del mig, i la tira està
+   pintada **dues vegades** (el bucle infinit): el primer que hi queia era el de
+   la segona còpia. Cal mesurar **quin centre és més a prop**, no quin conté el
+   punt. És el mateix error de fons que el punt 2: una mesura dolenta que semblava
+   bona.
 
 ---
 
