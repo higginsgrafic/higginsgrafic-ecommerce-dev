@@ -379,8 +379,15 @@ export function CercadorDibuixosGraella({
   // carrusel te sentit.
   const pas = dibuixPx > 0 ? dibuixPx + gapH : 0;
   const alcadaFila = dibuixPx > 0 ? dibuixPx + gapV : 0;
-  const ampleTira = carrusel ? (items.length * pas) / 2 + pas : 0;
+  // EL BUCLE INFINIT (24/09/2026, ho va demanar l'amo): la tira es pinta DUES
+  // vegades i el desplaçament es modular sobre el periode (una volta). Quan
+  // s'arriba al final, el que es veu es la segona copia, que es exactament el
+  // mateix; el residu torna a començar i no es nota el salt.
+  const periode = carrusel ? (items.length * pas) / 2 : 0;
+  const ampleTira = carrusel ? periode * 2 + pas : 0;
   const alcadaCarrusel = carrusel ? alcadaFila * 2 - gapV : 0;
+  // Una peça per clic de fletxa (mig pas: les peces van mig pas una de l'altra).
+  const unPas = pas / 2;
 
   // EL CARRUSEL ES MOU ARROSSEGANT, I AL DESKTOP TAMBE AMB FLETXES.
   //
@@ -390,7 +397,6 @@ export function CercadorDibuixosGraella({
   // events, que tambe son els del dit) i, al desktop, dos botons de fletxa
   // junts en un costat; a les tauletes no hi son (ho va dir l'amo).
   const [desplac, setDesplac] = useState(0);
-  const [maxDesplac, setMaxDesplac] = useState(0);
   const arrossegant = useRef(null);
   const haArrossegat = useRef(false);
   const ambFletxes = carrusel && !isPortraitTablet && !isLandscapeTablet;
@@ -478,24 +484,27 @@ export function CercadorDibuixosGraella({
     };
   }, [carrusel, graellaRef]);
 
-  const desplacEf = Math.max(0, Math.min(maxDesplac, desplac));
+  // El desplaçament efectiu es el residu dins una volta: aixi la tira pot
+  // avançar (o retrocedir) sense fi i sempre cau dins de les dues copies.
+  const desplacEf = periode > 0 ? ((desplac % periode) + periode) % periode : 0;
   const caixaCarrusel = () => graellaRef?.current || null;
 
+  // LA RODETA DEL RATOLI (24/09/2026, ho va demanar l'amo): scroll lliure. Va
+  // amb `passive: false` perque ha de poder aturar el desplaçament vertical de
+  // la pagina quan el punter es a sobre la tira.
   useLayoutEffect(() => {
     if (!carrusel) return undefined;
-    const mesura = () => {
-      const el = caixaCarrusel();
-      if (!el) return;
-      setMaxDesplac(Math.max(0, ampleTira - el.clientWidth));
+    const el = caixaCarrusel();
+    if (!el) return undefined;
+    const rodeta = (e) => {
+      e.preventDefault();
+      const d = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
+      setDesplac((v) => v + d);
     };
-    mesura();
-    window.addEventListener('resize', mesura);
-    return () => window.removeEventListener('resize', mesura);
+    el.addEventListener('wheel', rodeta, { passive: false });
+    return () => el.removeEventListener('wheel', rodeta);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [carrusel, ampleTira]);
-
-  const frena = (v) => Math.max(0, Math.min(maxDesplac, v));
-  const unaPagina = () => Math.max(1, Math.round((caixaCarrusel()?.clientWidth || 0) * 0.8));
+  }, [carrusel]);
 
   const onPointerDown = (e) => {
     if (!carrusel) return;
@@ -517,7 +526,7 @@ export function CercadorDibuixosGraella({
         a.capturat = true;
       }
     }
-    setDesplac(frena(a.inici - dx));
+    setDesplac(a.inici - dx);
   };
   const onPointerUp = () => { arrossegant.current = null; };
   // Un arrossegament NO es un clic: si el dit o el ratoli s'ha mogut, la peça
@@ -539,7 +548,9 @@ export function CercadorDibuixosGraella({
     const factorGraella = isPortraitTablet ? (GRAELLA_DIBUIXOS_ESCALA_VERTICAL[label] ?? 1) : 1;
     return (
       <button
-        key={label}
+        // La tira es pinta dues vegades (bucle infinit): la clau ha de ser
+        // unica, i l'index ho es.
+        key={`${i}-${label}`}
         type="button"
         title={label}
         aria-label={label}
@@ -651,7 +662,7 @@ export function CercadorDibuixosGraella({
             transform: `translateX(${-desplacEf}px)`,
             willChange: 'transform',
           }}>
-            {items.map(pintaItem)}
+            {[...items, ...items].map(pintaItem)}
           </div>
         </div>
         {ambFletxes ? (
@@ -681,8 +692,8 @@ export function CercadorDibuixosGraella({
           }}>
             <FirstContactDibuix09Buttons
               vertical
-              onPrev={() => setDesplac((v) => frena(v - unaPagina()))}
-              onNext={() => setDesplac((v) => frena(v + unaPagina()))}
+              onPrev={() => setDesplac((v) => v - unPas)}
+              onNext={() => setDesplac((v) => v + unPas)}
             />
           </div>
         ) : null}
