@@ -503,6 +503,24 @@ function FullWideSlideHeader({
     }
   }, [location.pathname, location.search, location.hash, navigate]);
 
+  // I S'HI APUNTA SEMPRE QUE CANVIA (25/09/2026).
+  //
+  // `apuntaColleccio` existia des del 25/09 pero nome's la cridava un fil
+  // d'`ensureMegaOpen`: aleshores nome's hi havia la colleccio que ja hi era. El
+  // clic d'una icona atenuada o d'una samarreta de la franja CANVIAVA l'estat
+  // pero no la URL, i la URL es queda dient la colleccio vella. Com que en
+  // restaurar la pagina mana la URL (`pageshow` i `useUrlActiveCollection`),
+  // allo tornava a `first_contact` i el centratge de la graella hi tornava a
+  // anar darrere: el megaslide obert, la franja a FIRST CONTACT i la graella
+  // sense cap peca a la finestra. Mesurat: `translateX` -1.934,53 px amb una
+  // finestra de 853,59.
+  //
+  // L'estat i la URL son el MATEIX fet, i per aixo s'apunta aqui i no a cada
+  // lloc que el canvia. Amb aixo la restauracio ja no te res a desfer.
+  useEffect(() => {
+    apuntaColleccio(active);
+  }, [active, apuntaColleccio]);
+
 
   useEffect(() => {
     const handleEsc = (e) => {
