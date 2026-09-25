@@ -631,6 +631,11 @@ export default function MegaslidePagina2({
                 } else {
                   setSelectedItemByCollection((prev) => ({ ...prev, [collection]: firstStripeItem }));
                 }
+                // I LA PDP (24/09/2026, ho va demanar l'amo): el clic a una
+                // icona tambe ha d'obrir el producte, sigui de la colleccio
+                // activa o no. Es el mateix cami que fa el clic de la
+                // samarreta de la franja (`onShirtClick`).
+                onShirtClick?.(collection, firstStripeItem, CERCADOR_COLORS.find((c) => c.slug === displayedShirtColor)?.overlayHex);
               }
             }}
             onHoverItem={(stripeItem, collection) => {
@@ -750,6 +755,9 @@ export default function MegaslidePagina2({
                     } else {
                       setSelectedItemByCollection((prev) => ({ ...prev, [collection]: firstStripeItem }));
                     }
+                    // La PDP, com a la filera: el clic a una icona obre el
+                    // producte, sigui de la colleccio activa o no.
+                    onShirtClick?.(collection, firstStripeItem, CERCADOR_COLORS.find((c) => c.slug === displayedShirtColor)?.overlayHex);
                   }
                 }}
               />
