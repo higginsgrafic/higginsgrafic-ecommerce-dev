@@ -28,7 +28,7 @@ import { CONTROL_TILE_BN, CONTROL_TILE_ARROWS } from './fullwide/MegaColumn.jsx'
 import MegaMenuPanel from './fullwide/MegaMenuPanel.jsx';
 import { CERCADOR_COLORS } from './fullwide/CercadorTopBar.jsx';
 import useMegaPublicIdleReset from '@/hooks/useMegaPublicIdleReset';
-import { findPdpSlug } from '@/config/pdpRoutes.js';
+import { findPdpUrl } from '@/config/pdpRoutes.js';
 import useUrlActiveCollection from '@/hooks/useUrlActiveCollection';
 import useMegaStripeDebugVars from '@/hooks/useMegaStripeDebugVars';
 import useMegaTileSelectorDrag from '@/hooks/useMegaTileSelectorDrag';
@@ -253,14 +253,15 @@ function FullWideSlideHeader({
     if (typeof item !== 'string') return null;
     const s = item.toLowerCase().replace(/[\u2010\u2011\u2012\u2013\u2014\u2212]/g, '-').replace(/\s+/g, '-');
 
-    // PRIMER EL CATALEG (`config/pdpRoutes.js`). El megaslide clica amb el nom
-    // del dibuix («NX-01»), i la PDP el que llegeix es un producte de debò:
-    // `/product/<slug>` es la ruta que `getProductById` enten des de sempre.
-    // Els mapes de sota son el cami vell (`/colleccio/<slug>`), que nome's te
-    // sentit per a les colleccions que tenen ruta propia i que es queda com a
-    // xarxa per als noms que el cataleg no reconeix.
-    const slugCataleg = findPdpSlug(collection, item);
-    if (slugCataleg) return `/product/${slugCataleg}`;
+    // PRIMER LA PDP DE DEBO (`config/pdpRoutes.js`). El megaslide clica amb el
+    // nom del dibuix («NX-01») i la PDP el que sap llegir es una RUTA del
+    // registre (`data/pdpRegistry.js`), que es la que el router munta sobre
+    // `PdpPage`: `/<colleccio>/<ruta>`. Amb `/product/<slug>` s'anava a un
+    // ALTRE component (`ProductDetailPage`), no a la PDP d'aquesta casa.
+    // Els mapes de sota son el cami vell, que es queda com a xarxa per als
+    // noms que el registre no reconeix.
+    const urlCataleg = findPdpUrl(collection, item);
+    if (urlCataleg) return urlCataleg;
 
     if (collection === 'first_contact') {
       const map = {
