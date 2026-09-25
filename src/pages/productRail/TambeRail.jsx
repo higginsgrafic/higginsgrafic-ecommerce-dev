@@ -62,6 +62,8 @@ export default function TambeRail({
   // poster i les targetes). El calcula el pare, que sap on acaba el poster.
   desplacamentTitolPx = 0,
   visibleCards = 4,
+  // Si es cert, les targetes omplen el carril (sense el 94% de la pauta).
+  ompleCarril = false,
   beltWidthOverride = null,
   showTitle = true,
   stabilizeInitialLayout = false,
@@ -268,9 +270,15 @@ export default function TambeRail({
   // Amb `beltWidthOverride` el rail viu DINS un contenidor que ja fa el carril
   // (vegeu la PDP), aixi que el marge esquerre es el de disseny (20 px) i no
   // cal sumar-hi la posicio del marc del lloc.
+  // EL MARGE INTERN DEL RAIL (25/09/2026). Amb `beltWidthOverride` el rail viu
+  // DINS d'un contenidor que ja fa el carril, i aixo vol dir que aquests 20 px
+  // no son marge del marc sino un marge DINS del carril. Amb `ompleCarril` les
+  // targetes fan el carril sencer i el marge les desplaçaria: mesurat, el visor
+  // anava de 401 a 1544 i el carril de 381 a 1524.
+  const margeIntern = ompleCarril ? 0 : 20;
   const left1 = stabilizeInitialLayout
     ? 0
-    : (beltWidthOverride != null ? 20 : (bgMetrics ? bgMetrics.devLeft + 20 : 20));
+    : (beltWidthOverride != null ? margeIntern : (bgMetrics ? bgMetrics.devLeft + margeIntern : margeIntern));
   // Les guies `--belt2-xL/xR` només les publica BeltReferenceOverlay, que va
   // dins de `import.meta.env.DEV`: al lloc publicat no hi són i bgMetrics queda
   // a null. Abans es queia a `CARD_W * visibleCards` (una filera enorme que
@@ -293,7 +301,16 @@ export default function TambeRail({
   // La mida de la targeta es CONSERVA la que tenia el carrousel: es reparteix
   // l'amplada del carril entre les columnes visibles. En mode estatic tambe,
   // perque el bloc ha de mantenir exactament la mateixa mida de targeta.
-  const cardW = Math.max(80, (beltWidth - (visibleCards - 1) * PAUTA_GUTTER_X) / visibleCards * (stabilizeInitialLayout ? 1 : 0.94));
+  // OMPLIR EL CARRIL O NO (25/09/2026, ho va demanar l'amo: «Sense tocar el gap
+  // intermedi, amplia tot el bloc perquè encaixi al carril»).
+  //
+  // El 0,94 es el monyó de la pauta del lloc (les targetes de l'inici fan el
+  // 94% de la seva columna, i el 6% que sobra es el seu aire). Amb el rail de la
+  // PDP aixo deixava 64 px de carril sense fer servir, i l'amo el vol aprofitar.
+  // Amb `ompleCarril` les targetes fan la columna sencera i el bloc encaixa
+  // exactament al carril, amb el gap de sempre.
+  const factorAmplada = stabilizeInitialLayout ? 1 : (ompleCarril ? 1 : 0.94);
+  const cardW = Math.max(80, (beltWidth - (visibleCards - 1) * PAUTA_GUTTER_X) / visibleCards * factorAmplada);
   // Quantes targetes es mostren (en estatic, les primeres `estaticCards`).
   const filesEstatic = estatic ? Math.min(estaticCards, totalCards) : visibleCards;
   const stepPx = cardW + PAUTA_GUTTER_X;
