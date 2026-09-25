@@ -259,7 +259,17 @@ function MegaStripePanel({
         : Math.min(13, Math.max(0, Math.floor(x * 14)));
       const item = stripeTileItems?.[tileIdx] || selectedItem || stripeTileItems?.[0];
       if (!item) return;
-      onShirtClick(active, item, shirtColor);
+      // LA COLLECCIO ES LA DEL DIBUIX, NO LA QUE ESTA ACTIVA (25/09/2026).
+      //
+      // La tira fa circular els 64 dibuixos de totes les colleccions per les
+      // catorze cases, i cada casa en pot ensenyar un d'una altra: amb
+      // `onShirtClick(active, item)` el clic a una samarreta atenuada obria el
+      // producte a la colleccio ACTIVA (mesurat: clicar l'Afrodita de THE HUMAN
+      // INSIDE amb FIRST CONTACT actiu anava a `/first-contact/afrodita`, que no
+      // existeix: «Producte no trobat»). La colleccio bona es la que porta la
+      // tira, i per aixo acompanya cada dibuix.
+      const collection = stripeStrip?.collections?.[tileIdx] || active;
+      onShirtClick(collection, item, shirtColor);
     };
     window.addEventListener('mega-stripe-full-hit-p2', handler);
     return () => window.removeEventListener('mega-stripe-full-hit-p2', handler);
