@@ -162,3 +162,38 @@ Amb el punt 1 de la graella (`52f223d`) la graella es centrarà tota sola.
 - Res de `push` sense demanar-ho; `compara-vistes` mesura `/nova/inici` (la ruta
   que mira l'amo).
 - Es mesura abans i després, i cada número ha de tenir un origen llegible.
+
+
+## El contingut es mou en muntar-se i en canviar de colleccio (25/09)
+
+Ho va veure l'amo: «El contingut que estem posant al megaslide es mou quan es
+munta. Tambe es mou quan clico la colleccio Cube. Penso que es perque hi ha
+alguns dibuixos tallats.»
+
+**Mesurat a 1920, clicant CUBE** (abans -> despres):
+
+| peca | abans | despres | delta |
+|---|---|---|---|
+| panell | 53 · 405 | 53 · 405 | 0 |
+| franja | 222,9 · 357,8 · 1049,1 x 112,4 | igual | **0** |
+| selector | 76,7 | 83,3 | **+6,6** |
+| filera (cercador) | 78,3 | 85,0 | **+6,7** |
+| barres de color | 176,9 | 183,5 | **+6,6** |
+
+O sigui: **tot el bloc del cercador** (selector, filera i colors, que viuen dins
+el mateix embolcall) baixa **6,7 px**, i en canvi la franja i el panell no es
+mouen gens. El que governa aquest embolcall es `topVisualAlignmentY`, que el
+calcula el bucle d'alineacio de `MegaslidePagina2` (mira el selector de la
+pagina 1 i el centratge de la filera). Les mides de la filera i de la franja no
+canvien (126,1 i 112,4 px abans i despres), aixi que el que canvia es la mesura
+que alimenta aquell bucle, no el bloc en si.
+
+**Hipotesi a comprovar (la de l'amo te bona pinta):** la franja es mesura en
+muntar-se i els dibuixos retallats (uns son mes alts que altres) en canvien
+l'alcada; el bucle ho torna a llegir i el bloc del cercador s'hi torna a
+col·locar. La solucio es **fixar** les mides que no han de dependre de la
+colleccio triada (l'alcada de la previsualitzacio de la franja i el `fit` de la
+graella) en comptes de tornar-les a mesurar a cada canvi.
+
+Tambe passa en muntar-se, que es el mateix: els bucles del megaslide es mesuren
+despres del primer pintat i la composicio s'assenta uns px mes tard.
