@@ -1,7 +1,8 @@
 # PROMPT PER CONTINUAR LA SESSIÓ
 
 > Copia i enganxa això tal qual com a primer missatge de la sessió nova.
-> **Data de redacció:** 25/09/2026 · **Últim commit:** `8c08d74` · **Arbre net.**
+> **Data de redacció:** 25/09/2026 · **Últim commit de feina:** `8c08d74` ·
+> **Aquest prompt:** `61c1b3b` · **Arbre net.**
 
 ---
 
