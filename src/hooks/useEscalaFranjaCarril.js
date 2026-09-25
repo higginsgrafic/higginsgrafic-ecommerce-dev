@@ -40,7 +40,16 @@ function ampladaObjectiu() {
     .filter((el) => el.getBoundingClientRect().width > 0);
   const fletxa = fletxes[fletxes.length - 1];
   if (fletxa && Number.isFinite(xCarril)) {
-    const dreta = fletxa.getBoundingClientRect().right;
+    // LA FLETXA, DINS LA SEVA PAGINA. El megaslide te totes les pagines al DOM,
+    // desplacades amb `translateX`: quan se'n veu una altra, la `right` de les
+    // fletxes del carrusel va desplaçada amb la pagina (1905 px) i l'objectiu
+    // sortia 2,7 cops mes gran (mesurat: la franja feia 3042 px en comptes de
+    // 1049). Descomptant-hi el desplaçament de la pagina, la franja de la
+    // pagina 1 i la de la pagina 2 surten de la MATEIXA mida, que es el que es
+    // vol (24/09/2026, ho va demanar l'amo).
+    const pagina = fletxa.closest('[data-mega-page-viewport]');
+    const desplac = pagina ? pagina.getBoundingClientRect().left : 0;
+    const dreta = fletxa.getBoundingClientRect().right - desplac;
     if (dreta - xCarril > 0) return dreta - xCarril;
   }
   return Number.isFinite(carril) && carril > 0 ? carril : 0;
