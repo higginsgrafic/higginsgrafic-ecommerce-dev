@@ -515,16 +515,24 @@ export function CercadorDibuixosGraella({
   // icona atenuada d'una altra colleccio, el grup de dibuixos d'aquella
   // colleccio ha de quedar al mig de la finestra de la graella.
   //
-  // No es mou res al primer pintat (la graella arrenca on arrenca) ni quan el
-  // canvi ve d'un desplaçament: nome's quan canvia la colleccio activa, que es
-  // el que fan els dos clics.
+  // I TAMBE QUAN LA GRAELLA ES MONTA (25/09/2026). Abans hi havia un guarda que
+  // no deixava centrar al primer pintat («la graella arrenca on arrenca»), i amb
+  // allo la graella i la franja no deien el mateix: el megaslide es remunta en
+  // navegar (mesurat: `desmuntat` i `muntat/actiu` al mateix instant), i en
+  // tornar la graella començava a la casa 0 mentre la franja ja anava centrada.
+  // Mesurat a FIRST CONTACT: el grup actiu era a les peces 0..6 i la finestra
+  // (455,6..1309,2) mirava un dibuix atenuat de THE HUMAN INSIDE.
+  //
+  // L'amo ho va demanar exactament aixi: «centrar la colleccio a la graella i a
+  // la franja alhora». Per aixo el centratge va amb la clau de la colleccio i
+  // tambe amb el muntatge, i mai amb un desplaçament manual.
   const clauColleccioRef = useRef(undefined);
   useLayoutEffect(() => {
     if (!carrusel || periode <= 0) return;
     const clau = `${activeCollection || ''}|${activeSubcollection || ''}`;
     const anterior = clauColleccioRef.current;
     clauColleccioRef.current = clau;
-    if (anterior === undefined || anterior === clau) return;
+    if (anterior === clau) return;
     const centra = () => {
       const indexos = items
         .map((it, i) => (it.collection === activeCollection
