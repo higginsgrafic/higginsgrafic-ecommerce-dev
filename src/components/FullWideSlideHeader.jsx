@@ -2545,6 +2545,21 @@ function FullWideSlideHeader({
   }, [defaultNav, navItems]);
 
 
+  // LA LLISTA DELS DIBUIXOS DE THE HUMAN INSIDE, ESCRITA A MA (25/09/2026).
+  //
+  // Aquesta es la unica colleccio que te la llista duplicada: la graella la treu
+  // del registre (`dibuixosGraella16x4`), pero la finestra fina i la tira de la
+  // franja la llegeixen d'aqui. I aqui HI FALTAVA EL TERMINATOR, que si que es a
+  // la graella: la franja ensenyava catorze dibuixos en comptes de quinze i el
+  // Terminator no hi sortia mai, ni fent scroll. Ho va veure l'amo: «A The Human
+  // Inside, Terminator, no apareix a la stripe».
+  //
+  // Mesurat: el resolver (`resolveForItem`) JA te la clau del Terminator i la
+  // seva imatge hi es (`the_human_inside/black/terminator-b-stripe.webp`, 256x236
+  // i descodifica be). El que fallava era nome's la llista.
+  //
+  // L'ordre es el de la graella, i el Terminator va entre Robocop i The Dalek,
+  // que es on es al registre.
   const thinDrawings = useMemo(
     () => [
       // Columna 2 (en ordre)
@@ -2561,6 +2576,7 @@ function FullWideSlideHeader({
       // Columna 3 (en ordre)
       'Robbie the Robot',
       'Robocop',
+      'Terminator',
       'The Dalek',
       'Vader',
     ],
