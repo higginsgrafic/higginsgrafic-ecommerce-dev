@@ -267,7 +267,6 @@ function MegaStripePanel({
   onStripeStripSelect,
   clicAreaHighlight,
   clicAreaHighlightIndices,
-  neckDotIndices,
   emptyTileIndices,
   stripeEmptyMaskSrc,
   indicesSamarretesBuides,
@@ -1582,37 +1581,6 @@ function MegaStripePanel({
 
                 </div>
 
-
-                {/* Cercle fosc sobre el coll de cada samarreta, situat al gap
-                    superior (fora de la imatge), alineat amb el centre de cada
-                    casella. Configurable amb CSS vars: --hgStripeNeckDotSize,
-                    --hgStripeNeckDotColor, --hgStripeNeckDotDy. */}
-                <div className="absolute inset-0" aria-hidden="true" style={{ pointerEvents: 'none', zIndex: 40 }}>
-                  {(Array.isArray(rectsMascara) && rectsMascara.length === 14
-                    ? rectsMascara.map((r, idx) => ({
-                      idx,
-                      cx: (Number(r?.left) || 0) + (Number(r?.width) || 0) / 2,
-                    }))
-                    : Array.from({ length: 14 }).map((_, idx) => ({
-                      idx,
-                      cx: ((idx + 0.5) / 14) * 100,
-                    }))
-                  ).filter(({ idx }) => Array.isArray(neckDotIndices) && neckDotIndices.includes(idx)).map(({ idx, cx }) => (
-                    <span
-                      key={`neck-dot-${idx}`}
-                      style={{
-                        position: 'absolute',
-                        left: `${cx}%`,
-                        top: 0,
-                        width: 'var(--hgStripeNeckDotSize, 5.625px)',
-                        height: 'var(--hgStripeNeckDotSize, 5.625px)',
-                        borderRadius: '50%',
-                        backgroundColor: 'var(--hgStripeNeckDotColor, #1a1a1a)',
-                        transform: 'translate(-50%, calc(-100% + var(--hgStripeNeckDotDy, -2px)))',
-                      }}
-                    />
-                  ))}
-                </div>
 
                 {/* Contorn de l'àrea de clic (samarretes), alineat amb la
                     màscara de la imatge (103% × 100%, centrat). Cada samarreta

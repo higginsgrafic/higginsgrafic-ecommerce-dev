@@ -148,7 +148,6 @@ function MegaStripePanelP1({
   stripeTileItems,
   clicAreaHighlight,
   clicAreaHighlightIndices,
-  neckDotIndices,
   emptyTileIndices,
   stripeEmptyMaskSrc,
   calibrationOverrides,
@@ -1301,33 +1300,6 @@ function MegaStripePanelP1({
                     </div>
                   ) : null}
 
-                </div>
-
-                <div className="absolute inset-0" aria-hidden="true" style={{ pointerEvents: 'none', zIndex: 40 }}>
-                  {(Array.isArray(rectsMascara) && rectsMascara.length === 14
-                    ? rectsMascara.map((r, idx) => ({
-                      idx,
-                      cx: (Number(r?.left) || 0) + (Number(r?.width) || 0) / 2,
-                    }))
-                    : Array.from({ length: 14 }).map((_, idx) => ({
-                      idx,
-                      cx: ((idx + 0.5) / 14) * 100,
-                    }))
-                  ).filter(({ idx }) => Array.isArray(neckDotIndices) && neckDotIndices.includes(idx)).map(({ idx, cx }) => (
-                    <span
-                      key={`neck-dot-p1-${idx}`}
-                      style={{
-                        position: 'absolute',
-                        left: `${cx}%`,
-                        top: 0,
-                        width: 'var(--hgStripeNeckDotSize, 5.625px)',
-                        height: 'var(--hgStripeNeckDotSize, 5.625px)',
-                        borderRadius: '50%',
-                        backgroundColor: 'var(--hgStripeNeckDotColor, #1a1a1a)',
-                        transform: 'translate(-50%, calc(-100% + var(--hgStripeNeckDotDy, -2px)))',
-                      }}
-                    />
-                  ))}
                 </div>
 
                 <ClicAreaOverlayP1
