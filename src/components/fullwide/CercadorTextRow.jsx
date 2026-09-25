@@ -771,8 +771,29 @@ export function CercadorColorsGrid({
   marginTop,
   reservaDreta = 0,
 }) {
+  // EL SELECTOR DE LA TIRA DE COLORS S'ARROSSEGA (24/09/2026, ho va demanar
+  // l'amo): passar per sobre les barres, amb el dit o amb el ratoli, tria la
+  // que hi ha sota. La tira no porta barra de desplac,ament (constitucio, regla
+  // 16): el gest son pointer events, com al carrusel.
+  const arrossegant = useRef(false);
+  const triaAmbElDit = (e) => {
+    const sota = document.elementFromPoint(e.clientX, e.clientY);
+    const barra = sota && sota.closest ? sota.closest('[data-color-barra]') : null;
+    const slug = barra && barra.getAttribute('data-color-barra');
+    if (slug && slug !== selectedColor) onSelectColor?.(slug);
+  };
   return (
-    <div data-p2-color-grid style={{
+    <div
+      data-p2-color-grid
+      onPointerDown={(e) => {
+        arrossegant.current = true;
+        try { e.currentTarget.setPointerCapture(e.pointerId); } catch { /* ignore */ }
+        triaAmbElDit(e);
+      }}
+      onPointerMove={(e) => { if (arrossegant.current) triaAmbElDit(e); }}
+      onPointerUp={() => { arrossegant.current = false; }}
+      onPointerCancel={() => { arrossegant.current = false; }}
+      style={{
       display: 'grid',
       gridTemplateColumns: `repeat(${CERCADOR_COLORS.length}, 1fr)`,
       alignItems: 'start',
@@ -792,6 +813,7 @@ export function CercadorColorsGrid({
             key={slug}
             type="button"
             aria-label={slug}
+            data-color-barra={slug}
             onClick={() => onSelectColor?.(slug)}
             style={{
               width: '100%',
