@@ -539,6 +539,11 @@ export default function MegaslidePagina2({
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
+            // El contenidor fa el DOBLE d'ample que la pastilla del selector
+            // (129,4 contra 64,7 a 1920) i la part que sobra trepitja les
+            // primeres caselles del carrusel: els seus clics no hi han
+            // d'arribar. Els rep la pastilla (`FirstContactDibuix00Buttons`).
+            pointerEvents: 'none',
           }}>
             <div style={{ width: '100%', height: '100%', transform: `translateY(${topVisualAlignmentY + selectorCentratgeY}px)` }}>
               <FirstContactDibuix00Buttons
