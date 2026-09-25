@@ -348,6 +348,10 @@ export function CercadorDibuixosGraella({
   onSelectGroup,
   onHoverItem,
   onHoverLeave,
+  /** Un pas de la tira de la franja (vegeu `MegaslidePagina2`). Si arriba, les
+   *  fletxes governen els dibuixos de la FRANJA en comptes del carrusel de la
+   *  graella. */
+  onCarouselStep,
   isPortraitTablet = false,
   isLandscapeTablet = false,
   fontBoost = 0,
@@ -724,8 +728,8 @@ export function CercadorDibuixosGraella({
           }}>
             <FirstContactDibuix09Buttons
               vertical
-              onPrev={() => setDesplac((v) => v - unPas)}
-              onNext={() => setDesplac((v) => v + unPas)}
+              onPrev={() => (onCarouselStep ? onCarouselStep(-1) : setDesplac((v) => v - unPas))}
+              onNext={() => (onCarouselStep ? onCarouselStep(1) : setDesplac((v) => v + unPas))}
             />
           </div>
         ) : null}
@@ -1071,7 +1075,7 @@ export function CercadorColleccionsColumna({
   );
 }
 
-function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripeItem, hoveredStripeItem, onSelectGroup, onHoverItem, onHoverLeave, compact = false, selectedColor = 'white', onSelectColor, onSelectCollection, isPortraitTablet = false, isLandscapeTablet = false, fontBoost = 0, desplacamentVertical = 0, esquerra, midaSelector = 56 }) {
+function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripeItem, hoveredStripeItem, onSelectGroup, onHoverItem, onHoverLeave, onCarouselStep, compact = false, selectedColor = 'white', onSelectColor, onSelectCollection, isPortraitTablet = false, isLandscapeTablet = false, fontBoost = 0, desplacamentVertical = 0, esquerra, midaSelector = 56 }) {
   // Ajust de la graella compacta a l'espai disponible (només desktop: les
   // tauletes mantenen la mida fixa de moment). Mesurem l'amplada de la columna
   // i el capdamunt de la franja de samarretes, i guardem la mida de dibuix i
@@ -1373,6 +1377,7 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
           isPortraitTablet={isPortraitTablet}
           isLandscapeTablet={isLandscapeTablet}
           fontBoost={fontBoost}
+          onCarouselStep={onCarouselStep}
         />
 
         {/* LA GRAELLA DE COLORS 14x1, AL LLOC ON ERA EL TEXT (24/09/2026, ho va

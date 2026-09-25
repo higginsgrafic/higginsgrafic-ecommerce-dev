@@ -98,21 +98,41 @@ export function FirstContactDibuix00Buttons({
 
   if (!buttons.length) return null;
 
-  const selectedIndex = Math.max(0, buttons.findIndex((b) => b.key === selectedVariant));
-  const slotPct = 100 / buttons.length;
+  // LES TRES CASELLES SURTEN SEMPRE AL MATEIX LLOC (25/09/2026).
+  //
+  // Aixo era la causa dels 6,7 px que ballaven en clicar CUBE. Quan el pare
+  // amaga acabats (`stripeVariantVisibility`, que a CUBE deixa NOMES Color), el
+  // bloc es repartia entre els botons que quedaven: amb un de sol, el seu
+  // `height: 33,33%` passava a ser el 100% i el boto creixia de 35,84 a 107,54
+  // px (mesurat a 1920). El bucle `alignTopRowToPage1` (MegaslidePagina2) llegeix
+  // el selector de la pagina 1 per alinear-hi la filera de la pagina 2, i
+  // arrossegava TOT el bloc del cercador —selector, filera i barres de color—
+  // 6,7 px avall (76,7 -> 83,3 · 78,3 -> 85,0 · 176,9 -> 183,5). Tambe es veia
+  // malament: la pastilla marcava BLANC en una colleccio que nome's te Color.
+  //
+  // El bloc te TRES caselles sempre, tamany `100/3` cadascuna, i cada acabat viu
+  // a la SEVA (BLANC a dalt, COLOR al mig, NEGRE a baix). Amagar un acabat
+  // n'esborra el boto, no en mou els altres. Aixi el bloc fa sempre la mateixa
+  // alcada i el bucle d'alineacio no es mou.
+  const ORDRE = ['white', 'color', 'black'];
+  const slotPct = 100 / ORDRE.length;
+  const getTopPct = (key) => ORDRE.indexOf(key) * slotPct;
+  // Si la variant rebuda esta amagada, la pastilla es queda al mig (Color), que
+  // es l'acabat que sempre hi es.
+  const selectedKey = buttons.some((b) => b.key === selectedVariant) ? selectedVariant : 'color';
+  const selectedIndex = Math.max(0, ORDRE.indexOf(selectedKey));
 
   // Mode compacte: redueix l'espai entre textos, manté l'últim (Negre) fixat
   const btnH = compact ? 24 : slotPct;
-  const getTopPct = (i) => {
-    if (!compact) return i * slotPct;
-    const last = buttons.length - 1;
-    // Ancorar l'últim botó al seu centre original
-    const lastCenter = last * slotPct + slotPct / 2;
-    const lastTop = lastCenter - btnH / 2;
-    return lastTop - (last - i) * btnH;
-  };
 
-  const sliderTopPct = compact ? getTopPct(selectedIndex) : selectedIndex * slotPct;
+  const sliderTopPct = compact
+    ? (() => {
+      const last = ORDRE.indexOf('black');
+      const lastCenter = last * slotPct + slotPct / 2;
+      const lastTop = lastCenter - btnH / 2;
+      return lastTop - (last - ORDRE.indexOf(selectedKey)) * btnH;
+    })()
+    : getTopPct(selectedKey);
   const sliderHeightPct = btnH;
 
   return (
@@ -148,8 +168,8 @@ export function FirstContactDibuix00Buttons({
         pointerEvents: 'auto',
       }}
     >
-      {buttons.map((btn, i) => {
-        const topPct = getTopPct(i);
+      {buttons.map((btn) => {
+        const topPct = getTopPct(btn.key);
         return (
           <button
             key={btn.key}
@@ -176,7 +196,7 @@ export function FirstContactDibuix00Buttons({
                 fontSize: `max(10px, ${carrilPx(14)})`,
                 fontWeight: 400,
                 textTransform: 'uppercase',
-                color: selectedIndex === i ? '#1A1A1A' : '#6B7280',
+                color: selectedKey === btn.key ? '#1A1A1A' : '#6B7280',
                 pointerEvents: 'none',
                 lineHeight: 1,
                 transition: 'color 200ms ease',
