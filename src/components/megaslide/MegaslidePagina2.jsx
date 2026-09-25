@@ -438,6 +438,54 @@ export default function MegaslidePagina2({
     return () => el.removeEventListener('wheel', rodetaFranja);
   }, [rodetaFranja]);
 
+  // LA COLLECCIO CLICADA QUEDA CENTRADA A LA FRANJA (25/09/2026).
+  //
+  // Ho va demanar l'amo: «Quan cliquis una colleccio a la graella o a la stripe
+  // s'ha de centrar la colleccio a dalt i a baix. A stripe i graella alhora.»
+  // Fins ara, en canviar de colleccio, la tira es tornava a construir amb la
+  // colleccio activa AL PRINCIPI (`tiraFranja`), i les catorze cases
+  // començaven per la casa 0: la colleccio nova sortia enganxada a l'esquerra,
+  // mentre que a la graella (a sota) quedava centrada a la finestra.
+  //
+  // El que circula es la LLISTA de 64 dibuixos per les 14 cases fixes, i el
+  // desplaçament el governa `stripeStripOffset` (la rodeta, les fletxes i
+  // l'arrossegament el mouen). Aqui nome's se li dona el valor que centra el
+  // grup actiu, i nome's quan canvia el grup: el desplaçament manual de l'amo
+  // no es trepitja mai.
+  //
+  // Mesurat: amb 7 dibuixos actius (FIRST CONTACT) el centre del grup cau a la
+  // casa 6,5, que es la meitat de les catorze; amb 15 (THE HUMAN INSIDE) i 9
+  // (CUBE) tambe.
+  const grupActiuRef = useRef(undefined);
+  useEffect(() => {
+    if (!stripeStrip) return;
+    // `stripeStrip` son les CATORZE CASES (una llista), no l'objecte amb `srcs`:
+    // la llista sencera de dibuixos es `tiraFranja`.
+    const n = tiraFranja.srcs.length;
+    if (!n) return;
+    // El grup actiu es contigu i comença a la casa 0 (aixi es construeix
+    // `tiraFranja`): el que cal saber-ne es quants dibuixos te.
+    let quants = 0;
+    for (const c of (tiraFranja.collections || [])) {
+      if (c !== active) break;
+      quants += 1;
+    }
+    if (!quants) return;
+    const clau = `${active}|${quants}|${n}`;
+    if (grupActiuRef.current === clau) return;
+    grupActiuRef.current = clau;
+    // El centre del grup cau a la casa `(quants - 1) / 2` i el mig de la franja
+    // es la casa 6,5 (catorze cases): el desplaçament que els fa coincidir es la
+    // diferencia. Com que la tira es circular, es tria la volta mes propera al
+    // desplaçament que ja hi hagi, perque no faci cap salt (mateix criteri que
+    // el centratge de la graella, a `CercadorTextRow`).
+    const objectiuBase = (quants - 1) / 2 - 6.5;
+    const actual = stripeStripOffsetRef.current;
+    const objectiu = objectiuBase + Math.round((actual - objectiuBase) / n) * n;
+    if (objectiu === actual) return;
+    aplicaStripOffset(objectiu);
+  }, [stripeStrip, tiraFranja, active, aplicaStripOffset]);
+
   // Quantes caselles porten dibuix: les altres son samarretes buides i a la
   // vista vertical s'atenuen amb un vel blanc.
   const quantsDibuixosFranja = useMemo(() => (
@@ -451,6 +499,28 @@ export default function MegaslidePagina2({
       ? Array.from({ length: 14 }, (_, i) => i).filter((i) => i >= quantsDibuixosFranja)
       : []
   ), [quantsDibuixosFranja]);
+
+  // LES SAMARRETES QUE NO SON DE LA COLLECCIO ACTIVA (25/09/2026).
+  //
+  // Ho va demanar l'amo: «Les samarretes, quan no son actives, tambe s'han
+  // d'atenuar, no nome's el dibuix.» La franja horitzontal es UNA sola imatge
+  // amb les catorze samarretes, i fins ara nome's s'atenuava la capa del DIBUIX
+  // (0,12): la samarreta blanca de sota quedava igual, i la casa inactiva
+  // nome's es distingia pel dibuix mes fluix. Aqui es marquen les cases que no
+  // son de la colleccio activa, i el panell hi posa el vel de la silueta (el
+  // mateix mecanisme que les samarretes buides).
+  //
+  // En blanc pla, com el vel de les buides: la samarreta s'aclareix cap al fons
+  // conservant el seu to.
+  const VEL_SAMARRETA_INACTIVA = 0.6;
+  const indicesSamarretesInactivesFranja = useMemo(() => {
+    if (!Array.isArray(stripeStrip) || !active) return [];
+    const out = [];
+    stripeStrip.forEach((casa, i) => {
+      if (i < 14 && casa && casa.collection && casa.collection !== active) out.push(i);
+    });
+    return out;
+  }, [stripeStrip, active]);
 
   const emptyTileIndices = useMemo(() => {
     if (!Array.isArray(stripeTileItems)) return [];
@@ -548,6 +618,11 @@ export default function MegaslidePagina2({
     // es el que fa circular els dibuixos per les catorze cases fixes.
     stripeStrip: tiraFranja.srcs.length ? { srcs: tiraFranja.srcs, items: tiraFranja.items, collections: tiraFranja.collections, subcollections: tiraFranja.subcollections } : null,
     stripeStripOffset: stripeStripOffset,
+    // Les casa de la franja que no son de la colleccio activa: el panell hi posa
+    // el vel de la samarreta (a l'apaisat; a la vertical ja hi ha els `path` de
+    // la silueta dins l'SVG). Vegeu `indicesSamarretesInactivesFranja`.
+    indicesSamarretesInactives: indicesSamarretesInactivesFranja,
+    alfaVelSamarretaInactiva: VEL_SAMARRETA_INACTIVA,
     onStripeStripWheel: rodetaFranja,
     // El clic d'una samarreta tambe ha d'ACTIVAR la seva colleccio i deixar-la
     // centrada a la graella (25/09/2026, ho va demanar l'amo): el cami es el
