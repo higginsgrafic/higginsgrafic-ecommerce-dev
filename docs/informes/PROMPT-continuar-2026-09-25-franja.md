@@ -91,7 +91,19 @@ gestors `onSelectGroup` de `MegaslidePagina2.jsx` (la filera i la taula) criden
 samarreta de la franja. Provat: clicar NX-01 porta a
 `/first-contact/nx-01?color=white&variant=black`, sense cap error HTTP.
 
-**El 404, hipotesi forta:** `resolvePdpUrl(collection, item)` (`FullWideSlideHeader.jsx`)
+**EL 404, TROBAT (25/09):** el router (`src/routes/AppRoutes.jsx`) **no te cap
+ruta `/<colleccio>/<producte>`**. Les rutes que hi ha son les pagines de
+colleccio (`/first-contact`, `/the-human-inside`, `/austen`, `/cube`,
+`/miscellania`) i la PDP (`/product/:id`, `/proves/product/:id`), mes el
+`path="*"` que pinta `NotFoundPage`. I `resolvePdpUrl` (`FullWideSlideHeader.jsx`)
+construeix precisament `/<colleccio>/<slug>` (`/first-contact/nx-01`,
+`/the-human-inside/afrodita`, ...), o sigui que **cau al comodi i surt el 404**.
+Arreglar-ho vol una decisio: o `resolvePdpUrl` passa a construir `/product/<id>`
+(caldra un mapatge dibuix -> id de producte, que avui no hi es) o s'afegeixen les
+rutes `/<colleccio>/<slug>`. Nota: el meu estri no ho veia perque un 404 de
+client no dona cap error HTTP; nome's canvia la pagina.
+
+**Hipotesi anterior (quan encara no ho sabia):** `resolvePdpUrl(collection, item)` (`FullWideSlideHeader.jsx`)
 construeix la URL amb la colleccio i l'item. Si la ruta d'aquella colleccio no
 existeix a l'app, el `navigate` hi va i peta el 404 — i encaixa amb el que diu
 l'amo: «el que dona 404 es la colleccio atenuada quan la cliques». Cal comprovar
