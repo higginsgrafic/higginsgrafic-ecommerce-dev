@@ -197,3 +197,30 @@ graella) en comptes de tornar-les a mesurar a cada canvi.
 
 Tambe passa en muntar-se, que es el mateix: els bucles del megaslide es mesuren
 despres del primer pintat i la composicio s'assenta uns px mes tard.
+
+
+## El mapatge de la PDP (25/09, a mig fer)
+
+**Fet:** la ruta `/<colleccio>/<producte>` (`18ce157`) — el 404 ha desaparegut
+(l'amo ho ha confirmat amb una captura: ara surt «Producte no trobat», que es la
+mateixa pagina de producte dient que no el troba).
+
+**Trobat:**
+
+- `ProductDetailPage` resol el producte amb `getProductById(id)`
+  (`ProductContext.jsx`, cap a la linia 434), que ja accepta **id o slug**:
+  `products.find(p => p.id === id || p.id === numId || p.slug === id)`.
+- Els slugs del cataleg **no son** els noms dels dibuixos del megaslide: fins i
+  tot `/product/nx-01` (la ruta de sempre) diu «Producte no trobat». O sigui que
+  el problema es l'identificador, no la ruta.
+- `resolvePdpUrl` (`FullWideSlideHeader.jsx`, cap a la linia 251) construeix
+  `/<colleccio>/<slug>` amb els mapes de noms de dibuix, i retorna `/product/...`
+  nome's per a les colleccions que tenen mapa.
+
+**Provat i desfet:** vaig afegir a `resolvePdpUrl` una cerca al cataleg
+(`contextProducts`) pel nom/slug normalitzat i, si hi era, `/product/<slug>`. No
+va empalmar (el clic seguia anant a `/first-contact/nx-01`), i el cataleg de
+desenvolupament pot estar buit o portar noms compostos («Samarreta NX-01»). El
+següent pas es **veure com s'anomenen els productes del cataleg** (la cerca de la
+capcalera, o la taula de productes) i fer la comparacio amb allo; despres, la
+mateixa cerca serveix per a les altres colleccions.
