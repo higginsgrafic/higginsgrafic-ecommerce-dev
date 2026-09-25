@@ -28,6 +28,9 @@ tenen, ho diuen.
 | `c3b6f4d` | el «Carregant…» de les rutes ja no posa la pàgina en blanc |
 | `9311bc5` | aquest informe |
 | `f80707c` | la graella també queda centrada quan es remunta, no només quan canvia la clau |
+| `d351393` | l'informe recull el centratge de la graella i la trampa del `find` |
+| `b6a5fe4` | el vel també va amb el dibuix, no amb la casa |
+| `20da21e` | el Terminator també surt a la franja de THE HUMAN INSIDE |
 
 Cap `push` fet: ho ha de dir l'amo (regla de la casa).
 
@@ -293,9 +296,81 @@ la vista vertical, el vel es posa per casella dins l'SVG, com les buides.
 | `z-index` | 6 (per sobre de la imatge i el tint; per sota dels dibuixos) |
 | opacitat | **0,6** (el mateix tractament que la samarreta buida blanca) |
 
+### 5.5 El vel ha d'anar amb el DIBUIX, no amb la casa
+
+El primer intent el vaig penjar de la **casa** (la posició 0..13 de la franja).
+És un error, i l'amo el va veure de seguida:
+
+> «El que sí que s'hauria de moure és el vel. Si no, les samarretes que eren
+> actives, quan fas scroll, queden actives i les altres atenuades encara que
+> vagin corrent els dibuixos.»
+
+Les catorze cases són **fixes** i el que circula és la llista de dibuixos: cada
+casa ensenya el dibuix que li toca segons `stripeStripOffset`. Amb el vel penjat
+de la casa, en fer scroll quedava a les cases d'abans.
+
+Ara el mapa de cases surt de la **mateixa rotació** que pinta les cases
+(`stripeStripOffset` sobre `tiraFranja`), o sigui que el vel i el dibuix de cada
+casa sempre són el mateix dibuix.
+
+Mesurat, fent rodar la franja pas a pas: **les cases amb opacitat 1 més les
+siluetes del vel sempre sumen 14.**
+
+| estat | cases actives | siluetes al vel | suma |
+|---|---|---|---|
+| inici | 7 | 7 | 14 ✔ |
+| scroll 1 | 7 | 7 | 14 ✔ |
+| scroll 2 | 6 | 8 | 14 ✔ |
+| scroll 3 | 4 | 10 | 14 ✔ |
+| scroll 4 | 2 | 12 | 14 ✔ |
+| scroll 5 | 0 | 14 | 14 ✔ |
+
 ---
 
-## 6. Les trampes d'aquesta sessió (per no repetir-les)
+## 6. El Terminator no sortia a la franja
+
+### 6.1 El símptoma
+
+> «A The Human Inside, Terminator, no apareix a la stripe.»
+
+### 6.2 El que NO era
+
+Es va descartar, una per una, totes les sospites raonables:
+
+| sospita | comprovació |
+|---|---|
+| falta la imatge | hi és: `the_human_inside/black/terminator-b-stripe.webp`, 200, 15.708 bytes, webp |
+| el navegador no la descodifica | **sí**: `256 × 236` |
+| falta la clau al resolver | hi és: `terminator: 'terminator-b-stripe.webp'` |
+| peta en pintar-se | **0 errors de consola** i l'arbre de la graella el té (202 × 186) |
+
+### 6.3 La causa
+
+**THE HUMAN INSIDE és l'única col·lecció que té els dibuixos escrits a mà**, a
+`thinDrawings` (`FullWideSlideHeader.jsx`): catorze noms en una llista. La
+graella els treu del registre (`dibuixosGraella16x4`) i el Terminator hi és; la
+finestra fina i la **tira de la franja** llegeixen la llista a mà, i allà hi
+faltava. Per això la franja ensenyava **catorze** dibuixos en comptes de quinze,
+i el Terminator no hi sortia mai, ni fent scroll.
+
+### 6.4 L'arranjament
+
+Afegit a la llista, **entre Robocop i The Dalek**, que és l'ordre del registre —
+no al final, que hauria canviat l'ordre de tota la tira.
+
+Mesurat: fent rodar la franja, el Terminator hi apareix (al scroll 6 dels 21
+estats mostrejats), i els dibuixos diferents vistos passen de **53 a 54**.
+
+### 6.5 Nota per al proper
+
+Aquesta és la **tercera vegada** en aquest projecte que una llista duplicada a mà
+causa una peça que falta. La deute de debò és que `thinDrawings` surti del
+registre, com la graella. No s'ha fet ara perquè toca l'ordre de la finestra fina
+i de la tira sencera, i això és una decisió de l'amo.
+
+---
+
+## 7. Les trampes d'aquesta sessió (per no repetir-les)
 
 Aquestes són les que m'han costat temps de debò, i totes són **errors meus**, no
 del projecte:
@@ -332,7 +407,7 @@ del projecte:
 
 ---
 
-## 7. Línies base d'`eslint` (per a la propera sessió)
+## 8. Línies base d'`eslint` (per a la propera sessió)
 
 | fitxer | errors | avisos |
 |---|---|---|
@@ -349,7 +424,7 @@ de `eslint`.
 
 ---
 
-## 8. El que queda obert
+## 9. El que queda obert
 
 1. **El producte del marc groc de «Looking For My Darcy».** Al registre
    (`src/data/pdpRegistry.js`) no hi ha cap producte de marc groc sol: hi ha
@@ -370,7 +445,7 @@ de `eslint`.
 
 ---
 
-## 9. Números de referència (1920×946)
+## 10. Números de referència (1920×946)
 
 - franja: **357,8 · 222,9 · 1049,1 × 112,4**; les catorze cases, 111,8 d'amplada
 - finestra de la graella: **455,6..1309,2** (centre 882,4)
