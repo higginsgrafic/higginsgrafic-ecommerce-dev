@@ -1,6 +1,6 @@
 import VerticalParadigmaPreview from '@/pages/VerticalParadigmaPreview';
 import React from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate, useParams } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import { PDP_REGISTRY } from '@/data/pdpRegistry';
 import ProtectedRoute from '@/components/ProtectedRoute';
@@ -107,6 +107,21 @@ function MotionDiv({ children }) {
   return <motion.div {...pageTransition}>{children}</motion.div>;
 }
 
+/**
+ * La PDP d'una colleccio: `/colleccio/producte`.
+ *
+ * El megaslide hi porta (`resolvePdpUrl`), i fins ara aquesta URL queia al
+ * comodi i pintava el 404. El segon parametre es diu `id` perque es qui llegeix
+ * `ProductDetailPage`; el guardia nome's deixa passar les colleccions de debò.
+ */
+const COLLECCIONS_PDP = ['first-contact', 'the-human-inside', 'austen', 'cube', 'miscellania'];
+
+function PdpDeColleccio(props) {
+  const { collection } = useParams();
+  if (!COLLECCIONS_PDP.includes(collection)) return <NotFoundPage />;
+  return <MotionDiv><ProductDetailPage {...props} /></MotionDiv>;
+}
+
 export default function AppRoutes({ location, pageProps, pautaEnabled, tableEnabled, clearCart, demoHeaderOffset }) {
   return (
     <AnimatePresence mode="wait">
@@ -141,6 +156,15 @@ export default function AppRoutes({ location, pageProps, pautaEnabled, tableEnab
         <Route path="/proves/dev-components" element={<ProtectedRoute><DevComponentsCatalogPage /></ProtectedRoute>} />
         <Route path="/proves/layout-builder" element={<ProtectedRoute><DevLayoutBuilderPage /></ProtectedRoute>} />
 
+        {/* LA PDP DE LES COL·LECCIONS (24/09/2026, ho va decidir l'amo): el
+            megaslide construeix `/colleccio/producte` (`resolvePdpUrl`, a
+            FullWideSlideHeader), i aquesta ruta no existia: queia al comodi i
+            sortia el 404. El segon parametre es diu `id` a posta, perque
+            `ProductDetailPage` el llegeix d'aqui i no cal tocar-lo. Nomes
+            s'accepten les colleccions de debò: qualsevol altra cosa, 404. */}
+        <Route path="/:collection/:id" element={(
+          <PdpDeColleccio {...pageProps} />
+        )} />
         <Route path="/proves/product/:id" element={<MotionDiv><ProductDetailPage {...pageProps} /></MotionDiv>} />
         <Route path="/product/:id" element={<MotionDiv><ProductDetailPage {...pageProps} /></MotionDiv>} />
         <Route path="/product-gelato/:id" element={<MotionDiv><ProductDetailPage {...pageProps} /></MotionDiv>} />
