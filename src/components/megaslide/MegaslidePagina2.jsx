@@ -339,7 +339,11 @@ export default function MegaslidePagina2({
     const items = [];
     const srcs = [];
     const collections = [];
-    const afegeix = (llista, ctxActive, ctxVariant, ctxCollection) => {
+    // La SUBCAPçALERA tambe acompanya cada dibuix: a AUSTEN el clic d'una
+    // samarreta ha de deixar activa la seva (PEMBERLEY, QUOTES, CROSSWORDS...),
+    // i nome's amb la colleccio no n'hi ha prou.
+    const subcollections = [];
+    const afegeix = (llista, ctxActive, ctxVariant, ctxCollection, ctxSubcollection) => {
       if (!llista.length) return;
       const s = computeStripeTileOverlaySrcs({
         drawable: llista,
@@ -356,18 +360,19 @@ export default function MegaslidePagina2({
         items.push(llista[i]);
         srcs.push(s[i]);
         collections.push(ctxCollection);
+        subcollections.push(ctxSubcollection || null);
       }
     };
     // Primer la colleccio activa, tal com estava; despres les altres, en
     // l'ordre de la graella.
-    afegeix(drawable, active, variant, active);
+    afegeix(drawable, active, variant, active, austenSubcollection);
     for (const it of dibuixosGraella16x4()) {
       if (!it.stripeItem || it.collection === active) continue;
-      afegeix([it.stripeItem], it.collection, it.collection === 'the_human_inside' ? humanInsideVariant : firstContactVariant, it.collection);
+      afegeix([it.stripeItem], it.collection, it.collection === 'the_human_inside' ? humanInsideVariant : firstContactVariant, it.collection, it.subcollection);
     }
-    return { items, srcs, collections };
+    return { items, srcs, collections, subcollections };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [drawable, variant, active, displayedShirtColor, resolvedOverlaySrc, humanInsideVariant, firstContactVariant]);
+  }, [drawable, variant, active, displayedShirtColor, resolvedOverlaySrc, humanInsideVariant, firstContactVariant, austenSubcollection]);
 
   // Les 14 cases de la franja. Amb la tira sencera, cada casa ensenya el dibuix
   // que li toca segons el desplac,ament (`stripeStripOffset`, que governa el
@@ -379,6 +384,7 @@ export default function MegaslidePagina2({
       src: tiraFranja.srcs[i % n],
       item: tiraFranja.items[i % n],
       collection: tiraFranja.collections[i % n],
+      subcollection: tiraFranja.subcollections[i % n],
     }));
   }, [tiraFranja]);
 
@@ -540,9 +546,18 @@ export default function MegaslidePagina2({
     stripeTileItems: stripeTileItems,
     // La tira sencera (64 dibuixos amb la seva colleccio) i el seu desplaçament:
     // es el que fa circular els dibuixos per les catorze cases fixes.
-    stripeStrip: tiraFranja.srcs.length ? { srcs: tiraFranja.srcs, items: tiraFranja.items, collections: tiraFranja.collections } : null,
+    stripeStrip: tiraFranja.srcs.length ? { srcs: tiraFranja.srcs, items: tiraFranja.items, collections: tiraFranja.collections, subcollections: tiraFranja.subcollections } : null,
     stripeStripOffset: stripeStripOffset,
     onStripeStripWheel: rodetaFranja,
+    // El clic d'una samarreta tambe ha d'ACTIVAR la seva colleccio i deixar-la
+    // centrada a la graella (25/09/2026, ho va demanar l'amo): el cami es el
+    // mateix que el de la icona atenuada de la graella, i el centratge el fa
+    // `CercadorTextRow` tot sol quan veu que la colleccio activa ha canviat.
+    onStripeStripSelect: (collection, subcollection) => {
+      if (collection && collection !== active) setActive(collection);
+      if (collection === 'austen') setAustenSubcollection(subcollection || null);
+      else setAustenSubcollection(null);
+    },
     clicAreaHighlightIndices: clicAreaHighlightIndices,
     neckDotIndices: neckDotIndices,
     emptyTileIndices: emptyTileIndices,

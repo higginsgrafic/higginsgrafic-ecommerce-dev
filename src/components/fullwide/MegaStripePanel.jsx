@@ -208,6 +208,7 @@ function MegaStripePanel({
   stripeStrip = null,
   stripeStripOffset = 0,
   onStripeStripWheel,
+  onStripeStripSelect,
   clicAreaHighlight,
   clicAreaHighlightIndices,
   neckDotIndices,
@@ -269,6 +270,12 @@ function MegaStripePanel({
       // existeix: «Producte no trobat»). La colleccio bona es la que porta la
       // tira, i per aixo acompanya cada dibuix.
       const collection = stripeStrip?.collections?.[tileIdx] || active;
+      // I la samarreta clicada tambe ACTIVA la seva colleccio (25/09/2026, ho va
+      // demanar l'amo): es el mateix cami que el clic d'una icona atenuada de la
+      // graella, i deixa la colleccio centrada a la finestra de la graella.
+      if (typeof onStripeStripSelect === 'function') {
+        onStripeStripSelect(collection, stripeStrip?.subcollections?.[tileIdx] || null);
+      }
       onShirtClick(collection, item, shirtColor);
     };
     window.addEventListener('mega-stripe-full-hit-p2', handler);
