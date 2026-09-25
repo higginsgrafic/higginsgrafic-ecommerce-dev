@@ -12,6 +12,16 @@ import { colorGap, colorMida } from './midesGraella.js';
  *     negre de 3px de gruix, concèntric i lleugerament separat del color.
  */
 
+/**
+ * L'etiqueta curta d'una colleccio per als ENLLACOS del cercador: el nom sencer
+ * no hi cap i l'amo el vol abreviat. Primer el va voler "LFMD" i despres
+ * "LOOKING FOR MY D" (24/09/2026, les dues coses el mateix dia). Serveix tambe
+ * per a les aules i els titols, que fan servir la mateixa llista.
+ */
+export const etiquetaColleccio = (label) => (
+  label === 'LOOKING FOR MY DARCY' ? 'LOOKING FOR MY D' : label
+);
+
 export const CERCADOR_COLLECTIONS = [
   { key: 'first_contact', label: 'FIRST CONTACT' },
   { key: 'the_human_inside', label: 'THE HUMAN INSIDE' },

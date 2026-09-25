@@ -17,11 +17,11 @@
 import { chromium } from '@playwright/test';
 import { spawn } from 'node:child_process';
 
-import { FRACCIO_COSSOS_FRANJA } from '../src/config/stripeCalibrations.js';
+import { FRACCIO_COSSOS_FRANJA, FRACCIO_MARGE_ESQUERRE_FRANJA } from '../src/config/stripeCalibrations.js';
 
 const BASE = process.env.HG_URL || 'http://127.0.0.1:3003';
 // Diferencies tolerades (px): el soroll de mesura i la diferencia de caixa
-// entre el dibuix i el cercle.
+// entre el dibuix i la barra de color.
 const TOL_MIDES = 0.5;
 const TOL_ALINEACIO = 1.5;
 const TOL_FRANJA = 3;
@@ -48,9 +48,17 @@ const mesura = () => {
   const mz = pel('Mazinger-Z');
   const ncc = pel('NCC-1701');
   const cg = cg0;
-  const sel = ambMida('[data-p2-color-selector] [data-stripe-buttonbar="bn"]');
-  const samarretes = document.querySelector('[data-stripe-visual-content="2"]');
-  if (!nx || !mz || !ncc || !cg || !sel) return null;
+  const sel = arrel.querySelector('[data-p2-color-selector] [data-stripe-buttonbar="bn"]');
+  const carrusel = arrel.querySelector('[data-carrusel="1"]');
+  const retall = carrusel ? carrusel.firstElementChild : null;
+  const tira = retall ? retall.firstElementChild : null;
+  // La franja de la PAGINA 2: al document n'hi ha mes d'una (la de la taula
+  // vertical, que va escalada dins una casella, i la de la pagina 1). La de la
+  // filera es la que viu dins la vista de la pagina 2, que es `arrel`.
+  const samarretes = arrel.querySelector('[data-stripe-visual-content="2"]');
+  // LA COLUMNA DE COLLECCIONS: les targetes, de la primera a l'ultima.
+  const targetes = [...arrel.querySelectorAll('[data-colleccions-targeta]')];
+  if (!nx || !mz || !ncc || !cg || !sel || !tira) return null;
 
   const cy = (e) => { const b = e.getBoundingClientRect(); return (b.top + b.bottom) / 2; };
   const files = (root) => [...new Set([...root.querySelectorAll('button')]
@@ -65,7 +73,10 @@ const mesura = () => {
   // peces veines de la mateixa fila) i el desplac,ament de la segona fila es
   // una mesura propia: amb el criteri vell (dues peces consecutives) el gap
   // sortia NEGATIU, perque les consecutives son de files diferents.
-  const caixes = [...grid.querySelectorAll('button')].map((b) => b.getBoundingClientRect());
+  //
+  // Les peces surten de la TIRA (retall > tira): dins del carrusel tambe hi ha
+  // els botons de les fletxes, i el seu `top` no es cap fila de dibuixos.
+  const caixes = [...tira.querySelectorAll('button')].map((b) => b.getBoundingClientRect());
   const filesDibuixos = [...new Set(caixes.map((b) => +b.top.toFixed(1)))].sort((a, b) => a - b);
   const esquerres = (i) => caixes
     .filter((b) => +b.top.toFixed(1) === filesDibuixos[i])
@@ -73,19 +84,45 @@ const mesura = () => {
     .sort((a, b) => a - b);
   const fila0 = esquerres(0);
   const fila1 = filesDibuixos.length > 1 ? esquerres(1) : [];
+  // LA SEGONA LINIA DE DIBUIXOS: es amb qui es centra el selector, i qui puja
+  // per caure-hi (24/09/2026, ho va demanar l'amo).
+  const segona = filesDibuixos.length > 1
+    ? (() => {
+      const f = caixes.filter((b) => +b.top.toFixed(1) === filesDibuixos[1]);
+      return { top: Math.min(...f.map((b) => b.top)), bottom: Math.max(...f.map((b) => b.bottom)) };
+    })()
+    : null;
   const ample = +mz.getBoundingClientRect().width.toFixed(2);
+  const barraB = cg.querySelector('button').getBoundingClientRect();
+  const cgB = cg.getBoundingClientRect();
+  const retallB = retall.getBoundingClientRect();
+  const samB = samarretes ? samarretes.getBoundingClientRect() : null;
+  const selB = sel.getBoundingClientRect();
+  const primerEnllac = targetes.length ? targetes[0].getBoundingClientRect() : null;
+  const darrerEnllac = targetes.length ? targetes[targetes.length - 1].getBoundingClientRect() : null;
   return {
     dibuix: ample,
     gapH: fila0.length > 1 ? +(fila0[1] - fila0[0] - ample).toFixed(2) : null,
     intercalat: (fila0.length && fila1.length) ? +(fila1[0] - fila0[0]).toFixed(2) : null,
     filesCarrusel: filesDibuixos.length,
-    cercle: +cg.querySelector('button').getBoundingClientRect().width.toFixed(2),
-    pasColors: filesColors.length > 1 ? +(filesColors[1] - filesColors[0]).toFixed(2) : null,
-    selectorDelta: +(cy(sel) - cy(cg)).toFixed(2),
-    dibuixosDelta: +(cy(grid) - cy(cg)).toFixed(2),
-    samarretesH: samarretes ? +samarretes.getBoundingClientRect().height.toFixed(1) : null,
-    samarretesW: samarretes ? +samarretes.getBoundingClientRect().width.toFixed(1) : null,
+    // LES BARRES DE COLOR: catorze, de 7x2, que ocupen el mateix que la graella
+    // de dibuixos (el retall del carrusel).
+    barra: +(barraB.width / barraB.height).toFixed(2),
+    barres: cg.children.length,
+    colorsAmple: +cgB.width.toFixed(2),
+    retallAmple: +retallB.width.toFixed(2),
+    // El selector es centra amb la SEGONA LINIA de dibuixos.
+    selectorDelta: segona ? +(cy(sel) - (segona.top + segona.bottom) / 2).toFixed(2) : null,
+    // La columna de colleccions: del top del selector al bottom de la franja.
+    enllacDalt: +(primerEnllac.top - selB.top).toFixed(2),
+    enllacBaix: +((darrerEnllac.bottom - samB.bottom)).toFixed(2),
+    samarretesH: samB ? +samB.height.toFixed(1) : null,
+    samarretesW: samB ? +samB.width.toFixed(1) : null,
+    samarretesL: samB ? +samB.left.toFixed(1) : null,
     carril: Number.parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--hg-mega-w')) || null,
+    carrilL: (() => { const f = document.querySelector('[data-capcalera-fila="1"]'); return f ? +f.getBoundingClientRect().left.toFixed(1) : null; })(),
+    carrilR: (() => { const f = document.querySelector('[data-capcalera-fila="1"]'); return f ? +f.getBoundingClientRect().right.toFixed(1) : null; })(),
+    fletxesR: (() => { const a = [...document.querySelectorAll('[data-carrusel="1"] #stripe-guide-right-arrow')].filter((el) => el.getBoundingClientRect().width > 0); return a.length ? +a[a.length - 1].getBoundingClientRect().right.toFixed(1) : null; })(),
     filesDibuixos: filesDibuixos.slice(0, 4),
     filesColors: filesColors.slice(0, 4),
   };
@@ -127,7 +164,12 @@ for (const c of CASES) {
     deviceScaleFactor: 1,
   });
   const page = await ctx.newPage();
-  await page.goto(`${BASE}/?active=first_contact`, { waitUntil: 'load', timeout: 45000 });
+  // LA RUTA QUE MIRA L'AMO (24/09/2026), i SENSE parametres: amb
+  // `?active=first_contact` la franja de la pagina 2 es quedava sense ajustar a
+  // 1440 i 1920 (mesurada a 2268x243 en comptes de fer el carril) i la
+  // comparacio donava una falsa fallada. El megaslide s'obre amb el clic al
+  // cercador, com a la resta d'estris.
+  await page.goto(`${BASE}/nova/inici`, { waitUntil: 'load', timeout: 45000 });
   await page.waitForTimeout(2500);
   await page.click('button:has(svg.lucide-search)').catch(() => {});
   await page.waitForTimeout(4000);
@@ -147,7 +189,7 @@ for (const c of CASES) {
     files.push(`${c.nom.padEnd(18)}  sense dades`);
     continue;
   }
-  files.push(`${c.nom.padEnd(18)}  dibuix ${String(r.dibuix).padStart(6)}  gap ${String(r.gapH).padStart(6)}  intercalat ${String(r.intercalat).padStart(6)}  cercle ${String(r.cercle).padStart(5)}  pas ${String(r.pasColors).padStart(5)}  selector ${String(r.selectorDelta).padStart(6)}  files ${String(r.dibuixosDelta).padStart(5)}  samarretes ${String(r.samarretesH).padStart(6)}`);
+  files.push(`${c.nom.padEnd(18)}  dibuix ${String(r.dibuix).padStart(6)}  gap ${String(r.gapH).padStart(6)}  intercalat ${String(r.intercalat).padStart(6)}  barra ${String(r.barra).padStart(5)}  barres ${String(r.barres).padStart(2)}  selector ${String(r.selectorDelta).padStart(6)}  enllacs ${String(r.enllacDalt).padStart(6)}/${String(r.enllacBaix).padStart(6)}  samarretes ${String(r.samarretesH).padStart(6)}`);
 }
 
 const tauletes = CASES.filter((c) => c.tauleta).map((c) => c.nom);
@@ -177,8 +219,28 @@ for (const c of CASES) {
       fallades.push(`${c.nom}: la segona fila va ${r.intercalat} px desplac,ada i el mig pas es ${migPas.toFixed(2)} px`);
     }
   }
-  if (Math.abs(r.selectorDelta) > TOL_ALINEACIO) {
-    fallades.push(`${c.nom}: el selector no esta centrat amb la graella de colors (${r.selectorDelta} px)`);
+  // El selector Blanc/Color/Negre es centra amb la SEGONA LINIA de dibuixos.
+  if (r.selectorDelta == null || Math.abs(r.selectorDelta) > TOL_ALINEACIO) {
+    fallades.push(`${c.nom}: el selector no esta centrat amb la segona linia de dibuixos (${r.selectorDelta} px)`);
+  }
+  // Les barres de color: catorze, de 7x2 (3,50), i la fila ocupa el mateix que
+  // la graella de dibuixos (el retall del carrusel).
+  if (Math.abs(r.barra - 3.5) > 0.05) {
+    fallades.push(`${c.nom}: les barres de color fan ${r.barra} i han de fer 7x2 (3,50)`);
+  }
+  if (r.barres !== 14) {
+    fallades.push(`${c.nom}: la fila de colors ha de tenir 14 barres i en te ${r.barres}`);
+  }
+  if (Math.abs(r.colorsAmple - r.retallAmple) > TOL_MIDES) {
+    fallades.push(`${c.nom}: la fila de colors fa ${r.colorsAmple} px i la graella de dibuixos ${r.retallAmple} px`);
+  }
+  // La columna de colleccions: les targetes, del top del selector al bottom de
+  // la franja.
+  if (Math.abs(r.enllacDalt) > TOL_ALINEACIO) {
+    fallades.push(`${c.nom}: la primera targeta de colleccions cau ${r.enllacDalt} px del top del selector`);
+  }
+  if (Math.abs(r.enllacBaix) > TOL_ALINEACIO) {
+    fallades.push(`${c.nom}: l'ultima targeta de colleccions cau ${r.enllacBaix} px del bottom de la franja`);
   }
 }
 
@@ -188,12 +250,12 @@ for (const nom of tauletes.slice(1)) {
   const a = resultats[referencia];
   const b = resultats[nom];
   if (!a || !b) continue;
-  for (const p of ['dibuix', 'gapH', 'cercle', 'pasColors']) {
+  for (const p of ['dibuix', 'gapH', 'barra']) {
     if (a[p] == null || b[p] == null) continue;
     const dif = Math.abs(a[p] - b[p]);
     if (dif > TOL_MIDES) fallades.push(`${p}: ${referencia} ${a[p]} vs ${nom} ${b[p]} (${dif.toFixed(2)} px)`);
   }
-  for (const p of ['selectorDelta', 'dibuixosDelta']) {
+  for (const p of ['selectorDelta', 'enllacDalt', 'enllacBaix']) {
     const dif = Math.abs(a[p] - b[p]);
     if (dif > TOL_ALINEACIO) fallades.push(`${p}: ${referencia} ${a[p]} vs ${nom} ${b[p]} (${dif.toFixed(2)} px)`);
   }
@@ -209,22 +271,27 @@ for (const nom of tauletes.slice(1)) {
   if (patroDiferent) fallades.push(`patro de files: ${referencia} ${JSON.stringify(pa)} vs ${nom} ${JSON.stringify(pb)}`);
 }
 
-// (c) LA FRANJA DE SAMARRETES: la filera de cossos de les catorze samarretes
-// ha de fer exactament l'amplada del carril. Aixi les manigues, que son el que
-// queda del dibuix, surten a fora. Ho calcula `useEscalaFranjaCarril`.
+// (c) LA FRANJA DE SAMARRETES: les cintures de la primera i de l'ultima
+// samarreta han de caure a la vora ESQUERRA DEL CARRIL i a la DRETA DEL BLOC DE
+// FLETXES (o a la vora dreta del carril si no hi ha fletxes, com a les
+// tauletes). Aixi les manigues, que son el que queda del dibuix, surten a fora.
+// Ho calcula `useEscalaFranjaCarril`.
 //
 // A la vista vertical no s'hi aplica: alla la franja no va dins del carril,
 // va dins d'una casella de la taula i amb una escala propia.
 for (const c of CASES) {
   const r = resultats[c.nom];
-  if (!r || r.samarretesW == null || !r.carril) continue;
+  if (!r || r.samarretesW == null || r.samarretesL == null || r.carrilL == null) continue;
   if (c.ample < c.alt) continue;
-  const cossos = r.samarretesW * FRACCIO_COSSOS_FRANJA;
-  const dif = Math.abs(cossos - r.carril);
-  if (dif > TOL_FRANJA) {
-    fallades.push(`franja: a ${c.nom} els cossos fan ${cossos.toFixed(1)} px i el carril ${r.carril} (${dif.toFixed(1)} px)`);
+  const esq = r.samarretesL + r.samarretesW * FRACCIO_MARGE_ESQUERRE_FRANJA;
+  const dret = esq + r.samarretesW * FRACCIO_COSSOS_FRANJA;
+  const objectiuDret = r.fletxesR ?? r.carrilR;
+  const difEsq = Math.abs(esq - r.carrilL);
+  const difDret = Math.abs(dret - objectiuDret);
+  if (difEsq > TOL_FRANJA || difDret > TOL_FRANJA) {
+    fallades.push(`franja: a ${c.nom} les cintures cauen a ${esq.toFixed(1)}..${dret.toFixed(1)} i han de caurre a ${r.carrilL}..${objectiuDret} (${difEsq.toFixed(1)} i ${difDret.toFixed(1)} px)`);
   } else {
-    notes.push(`franja a ${c.nom}: cossos ${cossos.toFixed(1)} px = carril ${r.carril} px`);
+    notes.push(`franja a ${c.nom}: cintures ${esq.toFixed(1)}..${dret.toFixed(1)} = carril ${r.carrilL}..${objectiuDret}`);
   }
 }
 

@@ -164,6 +164,43 @@ export function mesuraMegaslide(doc = typeof document !== 'undefined' ? document
 export default mesuraMegaslide;
 
 /**
+ * Les línies de la graella de dibuixos del carrusel, de dalt a baix.
+ *
+ * Cada línia de dibuixos es posa centrada amb la seva cel·la del selector
+ * Blanc/Color/Negre (24/09/2026, ho va demanar l'amo): la primera amb BLANC i la
+ * segona amb COLOR. El selector no es mou (el seu centre és el de la filera); el
+ * que pugen són les línies, i aquesta mesura és el que la graella necessita
+ * saber. Les dues files estan intercalades (la segona va desplaçada mig pas), i
+ * per això es distingeixen pel `top`. De cada línia es mesura la caixa sencera
+ * (del `top` més petit al `bottom` més gran de les seves peces) i se'n torna el
+ * centre.
+ *
+ * @param {Element|null} carrusel - el contenidor del carrusel (`[data-carrusel="1"]`).
+ * @returns {Array<{top:number,bottom:number,centre:number}>|null} null si no es pot mesurar.
+ */
+export function liniesDibuixos(carrusel) {
+  // Les peces surten de la TIRA de dibuixos (`retall > tira`): dins del
+  // carrusel tambe hi ha els botons de les fletxes, i el seu `top` no es cap
+  // fila de dibuixos.
+  const tira = carrusel?.firstElementChild?.firstElementChild;
+  if (!tira) return null;
+  const caixes = [...tira.querySelectorAll('button')]
+    .map((b) => b.getBoundingClientRect())
+    .filter((b) => b.width > 0 && b.height > 0);
+  if (!caixes.length) return null;
+  // Les files es distingeixen pel `top`, arrodonit a la decima (les peces d'una
+  // mateixa fila cauen exactament al mateix lloc, pero els subpixels ballen).
+  const tops = [...new Set(caixes.map((b) => rodona(b.top)))].sort((a, b) => a - b);
+  return tops.map((t) => {
+    const fila = caixes.filter((b) => rodona(b.top) === t);
+    const top = Math.min(...fila.map((b) => b.top));
+    const bottom = Math.max(...fila.map((b) => b.bottom));
+    return { top: rodona(top), bottom: rodona(bottom), centre: rodona((top + bottom) / 2) };
+  });
+}
+
+
+/**
  * Objectiu del `pageLift` de la pàgina 1.
  *
  * La pàgina 1 apuja tota la seva filera perquè el selector Blanc/Color/Negre
