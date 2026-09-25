@@ -240,7 +240,12 @@ export function FirstContactDibuix09Buttons({
     // que separa el bloc del seu contenidor, pero aqui el bloc ha de caure
     // exactament on el posa el seu embolcall (que es qui s'alinea amb el
     // selector). Amb el marge, el bloc visible quedava 8 px mes avall.
-    <div className={`relative w-full ${vertical ? 'aspect-[1/2]' : 'mt-2 aspect-square'}`}>
+    // LA BOTONERA VERTICAL ES DE DUES CASELLES, COM LES DUES FLETXES (24/09/2026,
+    // ho va demanar l'amo). La casella fa la mateixa mida que una del selector
+    // B/C/N (`midaSelector / 3` d'alcada, mitja amplada): el bloc de dues
+    // caselles fa 3 d'ample per 4 d'alcada, i les fletxes cauen al centre de la
+    // seva casella.
+    <div className={`relative w-full ${vertical ? 'aspect-[3/4]' : 'mt-2 aspect-square'}`}>
       <div className="absolute inset-0 overflow-hidden rounded-md bg-muted" id="stripe-guide-right-anchor">
         <button
           type="button"
@@ -255,7 +260,7 @@ export function FirstContactDibuix09Buttons({
           }`}
         >
           <ChevronLeft
-            className={`pointer-events-none absolute left-1/2 h-5 w-5 -translate-x-1/2 -translate-y-1/2 text-foreground/80 ${vertical ? 'top-1/3' : 'top-1/2'}`}
+            className={`pointer-events-none absolute left-1/2 h-5 w-5 -translate-x-1/2 -translate-y-1/2 text-foreground/80 ${vertical ? 'top-1/2' : 'top-1/2'}`}
             strokeWidth={1.75}
             aria-hidden="true"
           />
@@ -274,7 +279,7 @@ export function FirstContactDibuix09Buttons({
           }`}
         >
           <ChevronRight
-            className={`pointer-events-none absolute left-1/2 h-5 w-5 -translate-x-1/2 -translate-y-1/2 text-foreground/80 ${vertical ? 'top-2/3' : 'top-1/2'}`}
+            className={`pointer-events-none absolute left-1/2 h-5 w-5 -translate-x-1/2 -translate-y-1/2 text-foreground/80 ${vertical ? 'top-1/2' : 'top-1/2'}`}
             strokeWidth={1.75}
             aria-hidden="true"
           />
