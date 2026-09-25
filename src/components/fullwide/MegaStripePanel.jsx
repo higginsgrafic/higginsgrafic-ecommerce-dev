@@ -114,39 +114,95 @@ function getTileCalibration(src, overrides) {
   return { dx: 0, dy: 0, scale: 1 };
 }
 
-function useEmptyShirtMask(emptyTileIndices, shirtColor) {
+// El full de les catorze siluetes de samarreta es demana una sola vegada per
+// sessio: els dos panells (pagina 1 i pagina 2) i les dues mascares (les
+// samarretes buides i les inactives) el fan servir, i el fitxer no canvia.
+let cacheSiluetesSamarreta = null;
+function carregaSiluetesSamarreta() {
+  if (!cacheSiluetesSamarreta) {
+    cacheSiluetesSamarreta = fetch('/placeholders/cercador/full-clic-area-5.svg')
+      .then((r) => r.text())
+      .catch(() => null);
+  }
+  return cacheSiluetesSamarreta;
+}
+
+/**
+ * El VEL de les samarretes: una capa amb la silueta de cada casella pintada de
+ * blanc, amb la opacitat que toqui.
+ *
+ * El full (`full-clic-area-5.svg`) porta un `path` per samarreta, en l'ordre de
+ * les catorze cases de la franja. Aqui nome's se n'ajusta el color i
+ * l'opacitat: els `paths` que no son al mapa es treuen (queden transparents), i
+ * la resta es pinten amb l'opacitat demanada. Serveix per a dues coses, i totes
+ * dues son el mateix gest:
+ *
+ *   - LES SAMARRETES BUIDES (ja hi era): es queden a 0,3 de blanc (o 0,1 si la
+ *     samarreta es de color).
+ *   - LES SAMARRETES QUE NO SON DE LA COLLECCIO ACTIVA (25/09/2026, ho va
+ *     demanar l'amo: «Les samarretes, quan no son actives, tambe s'han
+ *     d'atenuar, no nome's el dibuix»). Fins ara nome's s'atenuava la capa del
+ *     DIBUIX (0,12) i la samarreta blanca quedava igual: a la franja, que es una
+ *     sola imatge amb les catorze samarretes, la inactiva es distingia nome's
+ *     pel dibuix. Amb el vel, la casella sencera queda mes fluixa.
+ *
+ * @param {Record<number, number>} opacitats - casella -> opacitat del vel.
+ * @param {string} key - qualsevol valor que canvii quan canvia el mapa.
+ * @param {string} color - el color del vel (blanc per defecte).
+ */
+function useVelSamarretes(opacitats, key, color = 'white') {
   const [dataUrl, setDataUrl] = useState(null);
-  const emptyKey = Array.isArray(emptyTileIndices) ? emptyTileIndices.join(',') : '';
   useEffect(() => {
     let cancelled = false;
-    fetch('/placeholders/cercador/full-clic-area-5.svg')
-      .then((r) => r.text())
+    const mapa = opacitats && typeof opacitats === 'object' ? opacitats : {};
+    carregaSiluetesSamarreta()
       .then((text) => {
         if (cancelled) return;
+        // Sense cap casella a velar no hi ha res a pintar. El `setState` va
+        // DINS del `then`, que es asincron: cridar-lo al cos de l'efecte es un
+        // render en cascada i el lint ho atura.
+        if (!text || !Object.keys(mapa).length) {
+          setDataUrl(null);
+          return;
+        }
         try {
           const doc = new DOMParser().parseFromString(text, 'image/svg+xml');
-          const emptySet = new Set(Array.isArray(emptyTileIndices) ? emptyTileIndices : []);
           const paths = doc.querySelectorAll('.tshirt-outline');
-          const isWhite = !shirtColor || shirtColor === '#FFFFFF';
-          const emptyOpacity = isWhite ? '0.3' : '0.1';
           paths.forEach((p, i) => {
-            p.setAttribute('fill', 'white');
-            p.setAttribute('fill-opacity', emptySet.has(i) ? emptyOpacity : '1');
+            const op = mapa[i];
+            if (typeof op !== 'number') {
+              p.remove();
+              return;
+            }
+            p.setAttribute('fill', color);
+            p.setAttribute('fill-opacity', String(op));
             p.removeAttribute('stroke');
             p.removeAttribute('class');
           });
           const svgEl = doc.documentElement;
           const serialized = new XMLSerializer().serializeToString(svgEl);
-          const encoded = encodeURIComponent(serialized);
-          setDataUrl(`data:image/svg+xml,${encoded}`);
+          setDataUrl(`data:image/svg+xml,${encodeURIComponent(serialized)}`);
         } catch {
           setDataUrl(null);
         }
       })
       .catch(() => setDataUrl(null));
     return () => { cancelled = true; };
-  }, [emptyKey, shirtColor]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [key, color]);
   return dataUrl;
+}
+
+/** Les catorze siluetes a 0,3 de blanc: el vel de les samarretes buides. */
+function useEmptyShirtMask(emptyTileIndices, shirtColor) {
+  const emptyKey = Array.isArray(emptyTileIndices) ? emptyTileIndices.join(',') : '';
+  const isWhite = !shirtColor || shirtColor === '#FFFFFF';
+  const opacitat = isWhite ? 0.3 : 0.1;
+  const mapa = {};
+  for (const i of (Array.isArray(emptyTileIndices) ? emptyTileIndices : [])) {
+    if (Number.isInteger(i) && i >= 0 && i < 14) mapa[i] = opacitat;
+  }
+  return useVelSamarretes(mapa, `${emptyKey}|${opacitat}`);
 }
 
 function MegaStripePanel({
@@ -215,6 +271,11 @@ function MegaStripePanel({
   emptyTileIndices,
   stripeEmptyMaskSrc,
   indicesSamarretesBuides,
+  // LES SAMARRETES QUE NO SON DE LA COLLECCIO ACTIVA (25/09/2026): les cases on
+  // s'ha de posar el vel, perque la samarreta tambe s'atenui i no nome's el
+  // dibuix. Vegeu `MegaslidePagina2`.
+  indicesSamarretesInactives = [],
+  alfaVelSamarretaInactiva = 0.6,
   calibrationOverrides,
   visualOffsetY = 0,
   compactLandscape = false,
@@ -246,6 +307,19 @@ function MegaStripePanel({
   let gapDibuixAcumulat = 0;
   let gapDibuixEscalaAnterior = null;
   const emptyShirtMaskUrl = useEmptyShirtMask(emptyTileIndices, shirtColor);
+
+  // El vel de les samarretes inactives (vegeu la prop). Nomes a l'apaisat: alla
+  // la franja es UNA sola imatge amb les catorze samarretes i no hi ha cap
+  // silueta per casella on posar-lo. A la vista vertical ja hi ha els `path` de
+  // la silueta dins l'SVG, i alla el vel s'hi posa per casella (`indices`).
+  const clauVelInactives = Array.isArray(indicesSamarretesInactives) ? indicesSamarretesInactives.join(',') : '';
+  const mapaVelInactives = {};
+  if (!isPortraitTablet) {
+    for (const i of (Array.isArray(indicesSamarretesInactives) ? indicesSamarretesInactives : [])) {
+      if (Number.isInteger(i) && i >= 0 && i < 14) mapaVelInactives[i] = alfaVelSamarretaInactiva;
+    }
+  }
+  const velSamarretesInactivesUrl = useVelSamarretes(mapaVelInactives, `${clauVelInactives}|${alfaVelSamarretaInactiva}`);
 
   useEffect(() => {
     const handler = (ev) => {
@@ -577,6 +651,36 @@ function MegaStripePanel({
                     />
                   ) : null}
 
+                  {/* EL VEL DE LES SAMARRETES QUE NO SON DE LA COLLECCIO ACTIVA
+                      (25/09/2026, ho va demanar l'amo: «Les samarretes, quan no
+                      son actives, tambe s'han d'atenuar, no nome's el dibuix»).
+
+                      Mateixa caixa i mateix aspecte que la imatge de la franja
+                      (es desplacen de la mateixa manera: les dues van amb
+                      `height: 100%`), i la silueta nomes cau damunt de la
+                      samarreta. Es queda per sota de la capa dels DIBUIXOS: alla
+                      el dibuix tambe s'atenua (0,12) i ha de conservar el seu
+                      to. */}
+                  {velSamarretesInactivesUrl ? (
+                    <img
+                      src={velSamarretesInactivesUrl}
+                      alt=""
+                      aria-hidden="true"
+                      className="block absolute"
+                      style={{
+                        top: 0,
+                        left: 0,
+                        height: '100%',
+                        width: 'auto',
+                        maxWidth: 'none',
+                        pointerEvents: 'none',
+                        zIndex: 6,
+                      }}
+                      loading="eager"
+                      decoding="async"
+                    />
+                  ) : null}
+
                   {/* EL VECTOR DE LES DUES FRANGES. Mateixa caixa i mateix aspecte
                       que la imatge (viewBox 0 0 1487 694,05): les 14 siluetes de
                       les dues fileres. Cada path porta un id perque els sandboxos
@@ -701,6 +805,31 @@ function MegaStripePanel({
                           stroke="none"
                         />
                       ))}
+                      {/* I les QUE NO SON DE LA COLLECCIO ACTIVA (25/09/2026):
+                          a la vista vertical la silueta ve donada per l'`area de
+                          clic` de cada casella, que es la que fa servir el mateix
+                          vel de les buides. Ho va demanar l'amo: «Les samarretes,
+                          quan no son actives, tambe s'han d'atenuar, no nome's el
+                          dibuix.» */}
+                      {(indicesSamarretesInactives || []).map((idx) => {
+                        if (!Number.isInteger(idx) || idx < 0 || idx >= 14) return null;
+                        const extrem = idx === 0 || idx === 13;
+                        const a = extrem ? areesClicAmpla()[idx] : areesClicEstreta()[idx];
+                        if (!a) return null;
+                        const girar = idx >= 7;
+                        const ajustGir = extrem ? 302.2 : 65.3;
+                        const AJUST_VEL_Y = 1.6767;
+                        return (
+                          <path
+                            key={`hg-vel-inactiva-${idx}`}
+                            d={a.d}
+                            transform={`translate(${a.tx}, ${a.ty - AJUST_VEL_Y})${girar ? ` translate(${ajustGir}, 0) scale(-1, 1)` : ''} ${a.transform}`}
+                            fill="#FFFFFF"
+                            fillOpacity={alfaVelSamarretaInactiva}
+                            clipRule="evenodd"
+                          />
+                        );
+                      })}
                     </svg>
                   ) : null}
 
