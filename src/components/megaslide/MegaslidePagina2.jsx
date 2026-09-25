@@ -369,24 +369,16 @@ export default function MegaslidePagina2({
         subcollections.push(ctxSubcollection || null);
       }
     };
-    // Primer la colleccio activa; despres les altres, en l'ordre de la graella.
+    // Primer la colleccio activa, amb el SEU ordre; despres les altres, en
+    // l'ordre de la graella.
     //
-    // LA COLLECCIO ACTIVA TAMBé VA EN L'ORDRE DE LA GRAELLA (25/09/2026). La
-    // seva llista ve del mega configurat i te el seu ordre, que NO sempre es el
-    // de la graella: a AUSTEN hi havia els quatre sòlids de LOOKING FOR MY DARCY
-    // i despres els quatre marcs, mentre que la graella (des del 25/09) porta
-    // marc i sòlid intercalats. Ho va demanar l'amo: «A la stripe posa'ls pel
-    // mateix ordre que a la graella dels dibuixos.»
-    //
-    // S'ordena pel RANG de `dibuixosGraella16x4`, que es la font unica: aixi
-    // l'ordre no es pot tornar a separar, perque nome's esta escrit en un lloc.
-    const ordreGraella = new Map();
-    for (const it of dibuixosGraella16x4()) {
-      if (it.stripeItem) ordreGraella.set(it.stripeItem, ordreGraella.size);
-    }
-    const rank = (x) => (ordreGraella.has(x) ? ordreGraella.get(x) : Number.MAX_SAFE_INTEGER);
-    const drawableOrdenat = [...drawable].sort((a, b) => rank(a) - rank(b));
-    afegeix(drawableOrdenat, active, variant, active, austenSubcollection);
+    // LA COLLECCIO ACTIVA ES QUEDA AGRUPADA (25/09/2026, ho ha demanat l'amo:
+    // «Prefereixo que es veguin agrupats a la stripe. Torna a deixar les imatges
+    // com estaven ordenades abans»). La llista ve del mega configurat, i alla
+    // els quatre solids de LOOKING FOR MY DARCY hi son seguits i els quatre
+    // marcs darrere: agrupats. Ordenar-la pel rang de la graella els
+    // intercalava, i allo es el que no vol.
+    afegeix(drawable, active, variant, active, austenSubcollection);
     for (const it of dibuixosGraella16x4()) {
       if (!it.stripeItem || it.collection === active) continue;
       afegeix([it.stripeItem], it.collection, it.collection === 'the_human_inside' ? humanInsideVariant : firstContactVariant, it.collection, it.subcollection);
@@ -576,13 +568,6 @@ export default function MegaslidePagina2({
     return out;
   }, [hoveredStripeItem, stripeTileItems]);
 
-  const neckDotIndices = useMemo(() => {
-    if (!Array.isArray(stripeTileItems)) return [];
-    const out = [];
-    stripeTileItems.forEach((it, i) => { if (it && it === hoveredStripeItem) out.push(i); });
-    return out;
-  }, [stripeTileItems, hoveredStripeItem]);
-
   const stripeEmptyMaskSrc = null;
 
   // Les mides de la taula de la vista vertical: el carril i les seves caselles.
@@ -672,7 +657,6 @@ export default function MegaslidePagina2({
       else setAustenSubcollection(null);
     },
     clicAreaHighlightIndices: clicAreaHighlightIndices,
-    neckDotIndices: neckDotIndices,
     emptyTileIndices: emptyTileIndices,
     stripeEmptyMaskSrc: stripeEmptyMaskSrc,
     // La franja de la pagina 2 s'ajusta al carril sempre que no siguem a la
