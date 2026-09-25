@@ -1049,10 +1049,15 @@ function MegaStripePanel({
                                 background: drawingOverlayDebug ? 'rgba(217,70,239,0.06)' : 'transparent',
                                 border: drawingOverlayDebug ? '1px solid rgba(217,70,239,0.35)' : '0px solid transparent',
                                 // L'ATENUACIO DELS DIBUIXOS QUE NO SON DE LA COLLECCIO
-                                // ACTIVA (25/09/2026, ho va demanar l'amo): 0,24, la
-                                // mateixa que fa servir la graella (`pintaItem`). Abans
-                                // sortien a ple i es confonien amb els actius.
-                                opacity: deLaTira && deLaTira.collection && deLaTira.collection !== active ? 0.24 : 1,
+                                // ACTIVA (25/09/2026). Primer va anar a 0,24, la
+                                // mateixa que fa servir la graella (`pintaItem`),
+                                // pero a la FRANJA no n'hi ha prou: el dibuix hi va
+                                // sobre una samarreta blanca i un traç negre prim, i a
+                                // 0,24 encara es llegeix. Ho va demanar l'amo: «A la
+                                // stripe, els atenuats ho han de ser més.» Ara es 0,12,
+                                // la meitat. La graella es queda a 0,24: alla els
+                                // dibuixos son mes grans i el gris ja es veu.
+                                opacity: deLaTira && deLaTira.collection && deLaTira.collection !== active ? 0.12 : 1,
                                 // UN PAS DE TIRA, UNA TRANSICIO CURTA (25/09/2026): la
                                 // tira no llisca de debò —les catorze cases son fixes i
                                 // el dibuix de fons no es repeteix—, o sigui que el que
