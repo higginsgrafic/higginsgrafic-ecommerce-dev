@@ -31,6 +31,7 @@ tenen, ho diuen.
 | `d351393` | l'informe recull el centratge de la graella i la trampa del `find` |
 | `b6a5fe4` | el vel també va amb el dibuix, no amb la casa |
 | `20da21e` | el Terminator també surt a la franja de THE HUMAN INSIDE |
+| `a695071` | el canvi de ruta també va amb la peça de dins, no amb la pantalla sencera |
 
 Cap `push` fet: ho ha de dir l'amo (regla de la casa).
 
@@ -433,10 +434,14 @@ de `eslint`.
 2. **L'opacitat del vel (0,6).** És un número triat perquè és el mateix
    tractament que la samarreta buida blanca. Si l'amo el vol més fluix o més
    fort, és un sol número.
-3. **El `LoadingScreen` de `isNavigating`** (`App.jsx:294`) continua sent
-   l'overlay de pantalla sencera. No s'ha tocat perquè allà és una navegació
-   declarada, no un Suspense que es dispara sol. Si l'amo el veu com una
-   recàrrega, és el mateix arranjament.
+3. ~~El `LoadingScreen` de `isNavigating` continua sent l'overlay de pantalla
+   sencera.~~ **FET** (`a695071`): era la segona meitat del mateix problema.
+   `useGlobalEffects` encenia l'overlay 300 ms a **cada** canvi de ruta, i com
+   que la peça de la PDP triga una mica més, la pantalla es posava blanca. Al
+   vídeo de l'amo es veu al fotograma de **7,0 s**, amb el megaslide mig esvaït.
+   Ara també va amb `variant="inpage"`. Mesurat forçant 1,8 s de retard a la
+   peça de la PDP: el «Carregant…» surt 20 mostres de 100 ms i **durant totes**
+   la capçalera hi és, el megaslide hi és i les catorze cases també.
 4. **La PDP amb `?color=` i `?variant=`** (el punt 2 del prompt del vespre):
    **verificat en aquesta sessió**. `?color=red&variant=white` → vermell + BLANC;
    `?color=navy&variant=color` → navy + COLOR; `?variant=INVENTAT` i
