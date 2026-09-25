@@ -533,19 +533,25 @@ export default function MegaslidePagina2({
             // carril, o sigui a 0: el mateix lloc on arrenquen el marc del lloc i
             // la filera.
             left: 0,
+            // L'AMPLE ES EL DE DISSENY (24/09/2026): la pastilla que s'hi veu
+            // fa la MEITAT (`w-1/2`), i per aixo el contenidor en fa el doble.
+            // La meitat que sobra trepitjava les primeres caselles del carrusel
+            // (Playwright: «intercepts pointer events»), i per aixo el
+            // contenidor no rep clics: els rep la pastilla.
             width: carrilPx(bnSliderSize),
             height: carrilPx(bnSliderSize),
             zIndex: 4,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            // El contenidor fa el DOBLE d'ample que la pastilla del selector
-            // (129,4 contra 64,7 a 1920) i la part que sobra trepitja les
-            // primeres caselles del carrusel: els seus clics no hi han
-            // d'arribar. Els rep la pastilla (`FirstContactDibuix00Buttons`).
+            // Els clics no els rep el contenidor (fa el doble d'ample que la
+            // pastilla i tapava les primeres caselles del carrusel): els rep la
+            // pastilla, que des de dins torna a dir `pointerEvents: auto`.
             pointerEvents: 'none',
           }}>
-            <div style={{ width: '100%', height: '100%', transform: `translateY(${topVisualAlignmentY + selectorCentratgeY}px)` }}>
+            {/* AQUEST EMBOLCALL TAMBE ES PLE (129,4 x 129,4) i taparia el
+                carrusel: no rep clics. Els rep la pastilla, que es qui es veu. */}
+            <div style={{ width: '100%', height: '100%', pointerEvents: 'none', transform: `translateY(${topVisualAlignmentY + selectorCentratgeY}px)` }}>
               <FirstContactDibuix00Buttons
                 onWhite={() => { setStripeOverlayOverrideActive(false); active === 'the_human_inside' ? setHumanInsideVariant('white') : setFirstContactVariant('white'); }}
                 onBlack={() => { setStripeOverlayOverrideActive(false); active === 'the_human_inside' ? setHumanInsideVariant('black') : setFirstContactVariant('black'); }}
