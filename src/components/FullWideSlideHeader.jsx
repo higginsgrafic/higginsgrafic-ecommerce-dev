@@ -1290,7 +1290,14 @@ function FullWideSlideHeader({
           const base = lower.replace(/\.(webp|png|jpe?g)$/i, '').replace(/-grid$/i, '');
           if (base.endsWith('-frame') || lower.includes('-frame')) {
             const c = base.replace(/-frame$/i, '');
-            return `/custom_logos/drawings/images_stripe/austen/looking_for_my_darcy/color/frame/${c}-frame-stripe.webp`;
+            // ELS NOMS DELS MARC PORTEN ELS DOS COLORS (25/09/2026): el nom de la
+            // graella nome's en porta un i no es pot derivar. El mapa surt de
+            // mesurar els pixels de cada dibuix i de cada original; el dibuix del
+            // groc (groc + rosa) apuntava al fitxer del fucsia. El mateix mapa es
+            // a `resolveStripeTile.js`.
+            const MARC_A_FITXER = { blue: 'blue-yellow', fuchsia: 'fuchsia-yellow', red: 'yellow-red', yellow: 'yellow-pink' };
+            const fitxer = MARC_A_FITXER[c] || c;
+            return `/custom_logos/drawings/images_stripe/austen/looking_for_my_darcy/color/frame/${fitxer}-frame-stripe.webp`;
           }
           if (base.endsWith('-solid') || lower.includes('-solid')) {
             const c = base.replace(/-solid$/i, '');
