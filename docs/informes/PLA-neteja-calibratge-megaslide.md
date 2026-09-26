@@ -233,32 +233,29 @@ D'on surt:
 
 - El contenidor de la filera és `bar-top + topVisualAlignmentY + 20`; a 1920 val
   −43,21, o sigui **`topVisualAlignmentY` = −63,21**.
-- La pastilla del selector cau **38,14 px** per sobre del seu contenidor, i com
-  que la mouen `topVisualAlignmentY` i `selectorCentratgeY` alhora, la suma ha de
-  ser −38,14 (**`selectorCentratgeY` = 25,06**).
+- La pastilla del selector cau **38,14 px** per sobre del seu contenidor (el
+  `topVisualAlignmentY + selectorCentratgeY`); `selectorCentratgeY` = **17,03** a
+  1920 (la diferència amb els 38,14 és el `mt-2` de 8 px de la pastilla).
 - La referència de tot plegat és el **selector de la pàgina 1** (56,78), que
-  `MegaslidePagina2` mesura i converteix en els dos desplaçaments amb un bucle de
-  dues fórmules i repassos a 180 i 340 ms.
+  `MegaslidePagina2` mesura i converteix en `topVisualAlignmentY` amb el bucle.
 - I la franja depèn de `page1PageLift` i de `visualOffsetY`.
 
-**El pas següent, doncs, no és declarar les files: és declarar el selector de la
-pàgina 1.** La seva posició surt de `--hg-cercador-bar-top` i de la geometria de
-la pàgina 1; amb `p1` declarat, `topVisualAlignmentY` és una resta, i darrere seu
-cauen les dues files, la tira de colors, els marges i `sostre − dalt`.
+**El que queda mesurat és, doncs, la referència de la pàgina 1
+(`topVisualAlignmentY`) i la cadena de la franja (`page1PageLift`,
+`visualOffsetY`, `margesEnllacos.baix` i `sostre − dalt`).**
 
-Ja declarat:
+Declarat fins ara (26/09/2026):
 
-- **L'amplada del retall** (`5b51495`).
-- **L'alçada del selector i de les seves tres cel·les** (`3c4a639`).
-- **El centratge del selector** (`selectorCentratgeY`): el bucle ja no mesura els
-  dos centres; la fórmula és
-  `desplacTop + (alçadaCarrusel + carrilLane(40) − alçadaSelector) / 2`, amb
-  `desplacTop = 12` a l'escriptori (el `top` extra de la filera, més el seu
-  `top` dins el contenidor, menys el `top` del selector i el `mt-2` de la
-  pastilla). **No depèn de l'alineació amb la pàgina 1**, perquè les dues peces
-  es mouen juntes. Comprovat: el centre de la filera i el del selector
-  coincideixen a 0,00-0,02 px a 1920, 1440, 1512, 1680, 2000, 2560, 1024×768,
-  768×1024, 1366×768 i 1280×720.
+| valor | commit |
+|---|---|
+| l'amplada del retall de la graella | `5b51495` |
+| l'alçada del selector i de les seves tres cel·les | `3c4a639` |
+| el centratge del selector i `desplacTopSelector` | `bf5cb9d` |
+| el desnivell de les dues files (`desnivellsLiniesGraella`) | `d476357` |
+| la tira de colors (`desnivellColorsGraella`, `ampladaColumnaGraella`) | `2afe067` |
+| el marge del bloc de fletxes (`margeBaixFletxesGraella`) | `ced00d6` |
+| el `margeDalt` de la columna (`desplacTop − selectorCentratgeY`) | aquest pas |
 
-De la cadena vertical, doncs, l'únic que queda mesurat és
-**`topVisualAlignmentY`** (la referència de la pàgina 1).
+Tots amb la prova unitària a `tests/unit/geometria-megaslide.test.js` i la
+comprovació al navegador: el valor declarat coincideix amb el que s'aplicava,
+amb diferències de 0,00-0,04 px.

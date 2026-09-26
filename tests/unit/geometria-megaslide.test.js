@@ -7,6 +7,7 @@ import {
   alcadaCellaSelector,
   alcadaCarruselGraella,
   centratgeSelectorY,
+  desplacTopSelector,
   desnivellsLiniesGraella,
   desnivellColorsGraella,
   margeBaixFletxesGraella,
@@ -170,6 +171,22 @@ describe('desnivellColorsGraella', () => {
 
   it("a 1366x768 (tauleta) dona 1,44 (el DOM, 1,45)", () => {
     expect(colorsA(811, 112.8, 1, 31.343 / 1.5, 3.98, false, 6 * 0.995)).toBeCloseTo(1.44, 1);
+  });
+});
+
+describe('desplacTopSelector', () => {
+  it("a l'escriptori val 12, a la banda -6 i a la tauleta apaissada -8", () => {
+    expect(desplacTopSelector({ ample: 1920, alt: 946 })).toBe(12);
+    expect(desplacTopSelector({ ample: 1024, alt: 600 })).toBe(-6);
+    expect(desplacTopSelector({ ample: 1366, alt: 768, isLandscapeTablet: true })).toBe(-8);
+  });
+
+  it("el margeDalt de la columna a 1920 es -5,03", () => {
+    const desplacTop = desplacTopSelector({ ample: 1920, alt: 946 });
+    const scy = centratgeSelectorY({
+      midaSelector: 120, escala: 1339 / 1350, dibuix: 29.7556, gapV: 2.9756, carril: 1143, desplacTop,
+    });
+    expect(desplacTop - scy).toBeCloseTo(-5.03, 2);
   });
 });
 
