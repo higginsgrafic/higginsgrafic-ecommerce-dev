@@ -17,6 +17,7 @@ import {
 import { carrilPx } from '../../utils/layoutMetrics.js';
 import { precarregaSiluetesSamarreta, textSiluetesSamarreta } from './siluetesSamarreta.js';
 import useEscalaFranjaCarril from '../../hooks/useEscalaFranjaCarril.js';
+import useArrossegamentPas from '../../hooks/useArrossegamentPas.js';
 import {
   DIBUIXOS_FRANJA_DX,
   DIBUIXOS_FRANJA_DY,
@@ -393,6 +394,9 @@ function MegaStripePanel({
   stripeStrip = null,
   stripeStripOffset = 0,
   onStripeStripWheel,
+  // ARROSSEGAR AMB EL DIT LA FRANJA (26/09/2026): un pas per cada pas de dit,
+  // la mateixa unitat que la rodeta. Ho va demanar l'amo.
+  onStripeStripPas,
   onStripeStripSelect,
   clicAreaHighlight,
   clicAreaHighlightIndices,
@@ -566,6 +570,11 @@ function MegaStripePanel({
     el.addEventListener('wheel', onStripeStripWheel, { passive: false });
     return () => el.removeEventListener('wheel', onStripeStripWheel);
   }, [onStripeStripWheel, stripeStrip]);
+  // El mateix pas, amb el dit.
+  useArrossegamentPas(filaFranjaRef, {
+    onPas: onStripeStripPas,
+    actiu: Boolean(stripeStrip) && typeof onStripeStripPas === 'function',
+  });
 
   return (
     <div className="w-full shrink-0">
@@ -670,6 +679,9 @@ function MegaStripePanel({
               style={{
                 height: carrilPx(stripePreviewHPx),
                 width: 'auto',
+                // El dit horitzontal es nostre (el ganxo del pas); el vertical
+                // segueix sent el desplacament de la pagina.
+                touchAction: 'pan-y',
                 // CENTRADA SOBRE EL CARRIL, A MA, NO PEL `justify-content`.
                 //
                 // La filera es mes ampla que el carril (les manigues hi surten)

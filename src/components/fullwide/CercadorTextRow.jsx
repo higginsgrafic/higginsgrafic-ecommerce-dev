@@ -914,6 +914,11 @@ export function CercadorColorsGrid({
       display: 'grid',
       gridTemplateColumns: `repeat(${CERCADOR_COLORS.length}, 1fr)`,
       alignItems: 'start',
+      // AMB EL DIT TAMBÉ ES POT MOURE (26/09/2026): el gest horitzontal es
+      // nostre (la barra que hi ha sota el dit es tria) i el vertical segueix
+      // fent el desplacament de la pagina. Sense aixo, al mobil i a la tauleta
+      // el navegador s'enduia el gest i la tira no es movia.
+      touchAction: 'pan-y',
       gap: `${colorGapPx}px`,
       // `width: auto` (i no `100%`) perque el coixi de la dreta descompti de
       // l'amplada: amb `100%` la linia es quedava sencera i la vora dreta no
