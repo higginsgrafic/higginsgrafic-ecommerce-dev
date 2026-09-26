@@ -17,6 +17,12 @@ import { VECTOR_FRANJA_SAMARRETES, VECTOR_FRANJA_SAMARRETES_01, VECTOR_FRANJA_VI
 import { deltaObjectiuPageLift, desplacamentFranjaEscriptori } from '../../utils/mesuraMegaslide.js';
 import { carrilPx } from '../../utils/layoutMetrics.js';
 import useEscalaFranjaCarril from '../../hooks/useEscalaFranjaCarril.js';
+import {
+  DIBUIXOS_FRANJA_DX,
+  DIBUIXOS_FRANJA_DY,
+  DIBUIXOS_FRANJA_AMPLADA_NATURAL,
+  escalaDibuixFranja,
+} from '../megaslide/geometriaMegaslide.js';
 
 // La franja de samarretes de la pàgina 1 tendeix a quedar-se uns 10 px més avall
 // del que toca: l'alçada del contenidor de la pàgina es calcula a partir del
@@ -60,6 +66,16 @@ function getTileCalibration(src, overrides) {
   }
   const fromDefaults = (cKey && STRIPE_DRAWING_CALIBRATIONS[cKey]) || STRIPE_DRAWING_CALIBRATIONS[src];
   if (fromDefaults && typeof fromDefaults === 'object') return fromDefaults;
+  // LA REGLA DECLARADA (26/09/2026): les entrades que no son al mapa son
+  // dibuixos de la franja i van a l'amplada base (80 unitats, el 41 % del cos),
+  // centrats al cos de la seva samarreta. Vegeu `geometriaMegaslide.js`.
+  if (typeof src === 'string' && src.includes('images_stripe')) {
+    return {
+      dx: DIBUIXOS_FRANJA_DX,
+      dy: DIBUIXOS_FRANJA_DY,
+      scale: escalaDibuixFranja(DIBUIXOS_FRANJA_AMPLADA_NATURAL),
+    };
+  }
   return { dx: 0, dy: 0, scale: 1 };
 }
 
