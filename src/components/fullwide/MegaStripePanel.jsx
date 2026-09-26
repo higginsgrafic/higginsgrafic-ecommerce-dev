@@ -15,6 +15,7 @@ import {
   VEL_SAMARRETA_BUIDA_ALFA_BLANCA,
 } from '../../config/stripeCalibrationsVertical';
 import { carrilPx } from '../../utils/layoutMetrics.js';
+import { precarregaSiluetesSamarreta, textSiluetesSamarreta } from './siluetesSamarreta.js';
 import useEscalaFranjaCarril from '../../hooks/useEscalaFranjaCarril.js';
 import {
   DIBUIXOS_FRANJA_DX,
@@ -139,19 +140,6 @@ function getTileCalibration(src, overrides) {
   return { dx: 0, dy: 0, scale: 1 };
 }
 
-// El full de les catorze siluetes de samarreta es demana una sola vegada per
-// sessio: els dos panells (pagina 1 i pagina 2) i les dues mascares (les
-// samarretes buides i les inactives) el fan servir, i el fitxer no canvia.
-let cacheSiluetesSamarreta = null;
-function carregaSiluetesSamarreta() {
-  if (!cacheSiluetesSamarreta) {
-    cacheSiluetesSamarreta = fetch('/placeholders/cercador/full-clic-area-5.svg')
-      .then((r) => r.text())
-      .catch(() => null);
-  }
-  return cacheSiluetesSamarreta;
-}
-
 /**
  * El VEL de les samarretes: una capa amb la silueta de cada casella pintada de
  * blanc, amb la opacitat que toqui.
@@ -171,47 +159,61 @@ function carregaSiluetesSamarreta() {
  *     sola imatge amb les catorze samarretes, la inactiva es distingia nome's
  *     pel dibuix. Amb el vel, la casella sencera queda mes fluixa.
  *
+ * @param {string} text - el text del full de siluetes.
+ * @param {Record<number, number>} opacitats - casella -> opacitat del vel.
+ * @param {string} color - el color del vel (blanc per defecte).
+ * @returns {string|null} el `data:` URL del vel, o null si no n'hi ha.
+ */
+function generaVelDataUrl(text, opacitats, color = 'white') {
+  const mapa = opacitats && typeof opacitats === 'object' ? opacitats : {};
+  if (!text || !Object.keys(mapa).length) return null;
+  try {
+    const doc = new DOMParser().parseFromString(text, 'image/svg+xml');
+    const paths = doc.querySelectorAll('.tshirt-outline');
+    paths.forEach((p, i) => {
+      const op = mapa[i];
+      if (typeof op !== 'number') {
+        p.remove();
+        return;
+      }
+      p.setAttribute('fill', color);
+      p.setAttribute('fill-opacity', String(op));
+      p.removeAttribute('stroke');
+      p.removeAttribute('class');
+    });
+    const serialized = new XMLSerializer().serializeToString(doc.documentElement);
+    return `data:image/svg+xml,${encodeURIComponent(serialized)}`;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * El vel, calculat de manera SINCRONA si el full ja es a memoria.
+ *
+ * La porta d'obertura del megaslide precarrega el full abans de muntar el
+ * panell: llavors l'inicialitzador del `useState` ja el troba i el vel neix en
+ * el MATEIX primer render (abans, l'efecte el demanava i el vel apareixia a mig
+ * obrir: mesurat amb la CPU alentida, a opacitat 1,00).
+ *
  * @param {Record<number, number>} opacitats - casella -> opacitat del vel.
  * @param {string} key - qualsevol valor que canvii quan canvia el mapa.
  * @param {string} color - el color del vel (blanc per defecte).
  */
 function useVelSamarretes(opacitats, key, color = 'white') {
-  const [dataUrl, setDataUrl] = useState(null);
+  const [dataUrl, setDataUrl] = useState(() => generaVelDataUrl(textSiluetesSamarreta(), opacitats, color));
   useEffect(() => {
     let cancelled = false;
-    const mapa = opacitats && typeof opacitats === 'object' ? opacitats : {};
-    carregaSiluetesSamarreta()
+    // El `setState` va DINS del `then`, que es asincron: cridar-lo al cos de
+    // l'efecte es un render en cascada i el lint ho atura. Si el text ja hi
+    // era, el `.then` corre de seguida i el valor es el mateix que ha posat
+    // l'inicialitzador, o sigui que React no torna a renderitzar.
+    precarregaSiluetesSamarreta()
       .then((text) => {
         if (cancelled) return;
-        // Sense cap casella a velar no hi ha res a pintar. El `setState` va
-        // DINS del `then`, que es asincron: cridar-lo al cos de l'efecte es un
-        // render en cascada i el lint ho atura.
-        if (!text || !Object.keys(mapa).length) {
-          setDataUrl(null);
-          return;
-        }
-        try {
-          const doc = new DOMParser().parseFromString(text, 'image/svg+xml');
-          const paths = doc.querySelectorAll('.tshirt-outline');
-          paths.forEach((p, i) => {
-            const op = mapa[i];
-            if (typeof op !== 'number') {
-              p.remove();
-              return;
-            }
-            p.setAttribute('fill', color);
-            p.setAttribute('fill-opacity', String(op));
-            p.removeAttribute('stroke');
-            p.removeAttribute('class');
-          });
-          const svgEl = doc.documentElement;
-          const serialized = new XMLSerializer().serializeToString(svgEl);
-          setDataUrl(`data:image/svg+xml,${encodeURIComponent(serialized)}`);
-        } catch {
-          setDataUrl(null);
-        }
+        setDataUrl(generaVelDataUrl(text, opacitats, color));
       })
-      .catch(() => setDataUrl(null));
+      .catch(() => { if (!cancelled) setDataUrl(null); });
     return () => { cancelled = true; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [key, color]);

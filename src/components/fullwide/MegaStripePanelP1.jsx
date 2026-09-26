@@ -16,6 +16,7 @@ import {
 import { VECTOR_FRANJA_SAMARRETES, VECTOR_FRANJA_SAMARRETES_01, VECTOR_FRANJA_VIEWBOX, VECTOR_FRANJA_VIEWBOX_OBERT, VECTOR_FRANJA_CONTINGUT } from '../../config/vectorFranja.js';
 import { deltaObjectiuPageLift, desplacamentFranjaEscriptori } from '../../utils/mesuraMegaslide.js';
 import { carrilPx } from '../../utils/layoutMetrics.js';
+import { precarregaSiluetesSamarreta, textSiluetesSamarreta } from './siluetesSamarreta.js';
 import useEscalaFranjaCarril from '../../hooks/useEscalaFranjaCarril.js';
 import {
   AJUST_FRANJA_ESCRIPTORI_PX,
@@ -90,37 +91,43 @@ function getTileCalibration(src, overrides) {
   return { dx: 0, dy: 0, scale: 1 };
 }
 
+/** La mascara de les samarretes BUIDES, a partir del full de siluetes. */
+function generaMascaraBuidesDataUrl(text, emptyTileIndices, shirtColor) {
+  if (!text) return null;
+  try {
+    const doc = new DOMParser().parseFromString(text, 'image/svg+xml');
+    const emptySet = new Set(Array.isArray(emptyTileIndices) ? emptyTileIndices : []);
+    const paths = doc.querySelectorAll('.tshirt-outline');
+    const isWhite = !shirtColor || shirtColor === '#FFFFFF';
+    const emptyOpacity = isWhite ? '0.3' : '0.1';
+    paths.forEach((p, i) => {
+      p.setAttribute('fill', 'white');
+      p.setAttribute('fill-opacity', emptySet.has(i) ? emptyOpacity : '1');
+      p.removeAttribute('stroke');
+      p.removeAttribute('class');
+    });
+    const serialized = new XMLSerializer().serializeToString(doc.documentElement);
+    return `data:image/svg+xml,${encodeURIComponent(serialized)}`;
+  } catch {
+    return null;
+  }
+}
+
 function useEmptyShirtMask(emptyTileIndices, shirtColor) {
-  const [dataUrl, setDataUrl] = useState(null);
   const emptyKey = Array.isArray(emptyTileIndices) ? emptyTileIndices.join(',') : '';
+  // Si la porta d'obertura ja ha precarregat el full, la mascara neix en el
+  // MATEIX primer render (vegeu `siluetesSamarreta.js`).
+  const [dataUrl, setDataUrl] = useState(() => generaMascaraBuidesDataUrl(textSiluetesSamarreta(), emptyTileIndices, shirtColor));
   useEffect(() => {
     let cancelled = false;
-    fetch('/placeholders/cercador/full-clic-area-5.svg')
-      .then((r) => r.text())
+    precarregaSiluetesSamarreta()
       .then((text) => {
         if (cancelled) return;
-        try {
-          const doc = new DOMParser().parseFromString(text, 'image/svg+xml');
-          const emptySet = new Set(Array.isArray(emptyTileIndices) ? emptyTileIndices : []);
-          const paths = doc.querySelectorAll('.tshirt-outline');
-          const isWhite = !shirtColor || shirtColor === '#FFFFFF';
-          const emptyOpacity = isWhite ? '0.3' : '0.1';
-          paths.forEach((p, i) => {
-            p.setAttribute('fill', 'white');
-            p.setAttribute('fill-opacity', emptySet.has(i) ? emptyOpacity : '1');
-            p.removeAttribute('stroke');
-            p.removeAttribute('class');
-          });
-          const svgEl = doc.documentElement;
-          const serialized = new XMLSerializer().serializeToString(svgEl);
-          const encoded = encodeURIComponent(serialized);
-          setDataUrl(`data:image/svg+xml,${encoded}`);
-        } catch {
-          setDataUrl(null);
-        }
+        setDataUrl(generaMascaraBuidesDataUrl(text, emptyTileIndices, shirtColor));
       })
-      .catch(() => setDataUrl(null));
+      .catch(() => { if (!cancelled) setDataUrl(null); });
     return () => { cancelled = true; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [emptyKey, shirtColor]);
   return dataUrl;
 }
