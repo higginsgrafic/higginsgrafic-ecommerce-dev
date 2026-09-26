@@ -278,3 +278,67 @@ Tots amb la prova unitària a `tests/unit/geometria-megaslide.test.js` i la
 comprovació al navegador: el valor declarat coincideix amb el que s'aplicava,
 amb diferències de 0,00-0,04 px (0,3 px a les tauletes, on l'escala del belt que
 publica el CSS és 1 i la real és 0,998).
+
+## 7. Què queda mesurat, amb xifres (26/09/2026)
+
+Després dels passos 6 i 7 de la secció anterior, a la cadena vertical de la
+pàgina 2 hi queden **dues mesures**, i cap de les dues és geometria de la
+pàgina 2:
+
+**1. `topVisualAlignmentY`: la referència de la pàgina 1.** És l'únic que el
+bucle d'alineació segueix mesurant. El seu punt fix està comprovat i és exacte:
+
+    top del selector de la pàgina 2 = top del selector de la pàgina 1
+                                     + offset (10 a la banda estreta, 0 si no)
+                                     + selectorCentratgeY (declarat)
+
+Mesurat (el `selectorCentratgeY` aplicat, llegit del `translateY` de
+l'embolcall del selector menys `topVisualAlignmentY`, contra el declarat):
+
+| finestra | `selectorCentratgeY` aplicat = declarat |
+|---|---|
+| 1920×946 | 17,03 |
+| 1440×800 | 15,76 |
+| 1366×768 | −17,06 |
+| 1280×720 | −17,83 |
+| 1024×768 | −20,12 |
+| 768×1024 | 5,62 |
+
+(`midaSelector` és 120 als escriptoris i **112,8 a les tauletes**: la pastilla
+també va escalada pel `scale(0,94)` del contenidor. Amb aquest valor, la
+fórmula declarada dona exactament el número aplicat a totes sis finestres.)
+
+El que falta per declarar `topVisualAlignmentY` és el **top del botó del
+selector de la pàgina 1** (no el del seu contenidor, que ja és declarat):
+
+- El contenidor del selector de la pàgina 1 cau a **39,52 px** del capdamunt
+  del panell a TOTES les finestres: comprovat a 768×1024 (on `pageLift` = 0, i
+  per tant es veu el valor natural): el contenidor hi és a 39,52 px =
+  els 32 del `py-8` + els 8 del `mt-2` escalats pel `scale(0,94)` del
+  contenidor de la graella (8 × 0,94 = 7,52).
+- El botó («Color») cau **~1/3 de l'alçada de la pastilla** més avall del
+  contenidor: 36,78 px amb una pastilla de 109,42 a 1920 (o sigui `h/3` + 0,31),
+  27,58 de 81,84 a 1440, 25,20 de 74,67 a 1366×768 i 31,49 de 93,56 a
+  768×1024 (i la pastilla és `aspect-[1/2] w-1/2`, o sigui geometria del
+  MegaColumn de la pàgina 1: el que la secció 5 diu que no es toca).
+- Amb això, `topVisualAlignmentY` val −63,21 / −62,43 / −64,29 / −62,57 /
+  −62,84 / −62,37 a 1920×946 / 1440×800 / 2560×1306 / 1512×900 / 1680×900 /
+  1400×900, −77,72 / −79,54 / −84,90 a 1366×768 / 1280×720 / 1024×768 i
+  −46,91 a 768×1024.
+
+**2. L'alçada de la franja.** El top de la franja és declarat (§6), però el seu
+`bottom` no: la tira s'escala per encabir-se al carril
+(`useEscalaFranjaCarril` mesura l'amplada natural de la filera) i aquesta
+amplada depèn de les imatges. És exactament el que assegura el preescalfat
+abans d'obrir el panell (les 128 imatges a memòria: mesurat amb
+`scripts/_tmp-carrega-obert2.mjs`, opacitat 0 → 1 en una sola animació).
+`margesEnllacos.baix` i `midesGraellaCompacta` (la deducció de l'alçada del
+dibuix i de la seva separació, que depèn de `sostre − daltGraella`) en depenen
+tots dos: el `sostre` ja és declarat, i `daltGraella` (el top del retall) penja
+de `topVisualAlignmentY`, o sigui del punt 1.
+
+La resta de mesures que queden al voltant del megaslide són fora de la cadena
+vertical: `stripeRowPadXPx` (el coixi horitzontal del panell, que sí que és
+responsiu: 40 px a l'escriptori i 24 a la tauleta vertical) i les mides
+declarades que encara es confirmen al DOM amb un avís de desenvolupament
+(`ampladaRetallGraella`).
