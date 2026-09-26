@@ -27,8 +27,8 @@
  * desquadrar mai mes.
  */
 
-import { carrilDeclarat } from '../../utils/layoutModel';
-import { MEGASLIDE_REFERENCIA_PX } from '../../utils/layoutMetrics';
+import { carrilDeclarat, laneForViewport } from '../../utils/layoutModel';
+import { MEGASLIDE_REFERENCIA_PX, escalaMegaslide } from '../../utils/layoutMetrics';
 
 /**
  * Les mides del fitxer de la franja (la matriu de samarretes).
@@ -143,3 +143,54 @@ export const AJUST_FRANJA_TAULETA_APAISSADA_PX = -10;
 /** Els 20 px de marge extra de la pestanya a l'escriptori ample (abans
  *  `MARGE_EXTRA_DESKTOP_PX` a MegaMenuPanel). */
 export const MARGE_EXTRA_ESCRIPTORI_PX = 20;
+
+/**
+ * L'AMPLADA DEL RETALL DE LA GRAELLA, DECLARADA (26/09/2026)
+ * -----------------------------------------------------------------------------
+ * El retall (la finestra del carrusel de dibuixos) era l'ULTIM input mesurat de
+ * les mides de la graella: es llegia del DOM (`el.clientWidth`). La resta
+ * (`midesGraellaCompacta`) ja son proporcions del carril. Aqui es declara.
+ *
+ * La filera de la pagina 2 (`CercadorTextRow`) es construeix aixi:
+ *   - va enrasada a la DRETA del carril i arrenca on acaba el selector mes
+ *     10 px: `carrilPx(midaSelector / 2 + 10)`. Amb el selector de 120, son
+ *     `carrilPx(70)` = `70 x escala`;
+ *   - te dues columnes separades per un `columnGap` de 20 px FIXES: la de la
+ *     graella (`minmax(0, 1fr)`) i la de la dreta, que es del disseny
+ *     (`carrilLane(142)` = 142/1350 del carril);
+ *   - dins la columna de la graella, el retall deixa el bloc de fletxes
+ *     (`carrilPx(60)`) mes `carrilPx(10)`, o sigui `70 x escala`.
+ *
+ * L'escala es la del megaslide (`--hg-escala-mega`): `laneForViewport` sobre la
+ * referencia de 1350 (vegeu `FullWideSlideHeader`).
+ *
+ * Comprovat contra el `getBoundingClientRect()` del retall: 1920 -> 864
+ * (mesurat 863,94), 1512 -> 674 (674,36), 1440 -> 641 (641,17) i
+ * 2560 -> 1161 (1160,89).
+ */
+export const GRAELLA_COLUMNA_DRETA_CARRIL_PX = 142;
+export const GRAELLA_GAP_COLUMNES_PX = 20;
+export const GRAELLA_ESQUERRA_SELECTOR_CARRIL_PX = 70; // selector/2 (60) + 10
+export const GRAELLA_DRETA_FLETXES_CARRIL_PX = 70; // fletxes (60) + 10
+
+/**
+ * L'amplada del retall de la graella a partir de la finestra.
+ *
+ * @param {number} ampleLayout amplada de layout en px (`getLayoutViewportWidth`, que
+ *   es `document.body.clientWidth`: exclou la barra de desplac,ament)
+ * @param {number} alcadaLayout alcada de la finestra en px (window.innerHeight)
+ * @returns {number|null} amplada en px, o null si la classe te regle propi
+ */
+export function ampladaRetallGraella(ampleLayout, alcadaLayout) {
+  const carril = carrilDeclarat({ ample: ampleLayout, alt: alcadaLayout });
+  if (!carril) return null;
+  const escala = escalaMegaslide(laneForViewport(ampleLayout));
+  const columnaDreta = (carril * GRAELLA_COLUMNA_DRETA_CARRIL_PX) / MEGASLIDE_REFERENCIA_PX;
+  return Math.round(
+    carril
+    - GRAELLA_ESQUERRA_SELECTOR_CARRIL_PX * escala
+    - GRAELLA_GAP_COLUMNES_PX
+    - columnaDreta
+    - GRAELLA_DRETA_FLETXES_CARRIL_PX * escala
+  );
+}

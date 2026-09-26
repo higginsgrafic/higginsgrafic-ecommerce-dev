@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest';
 import {
   carrilDeFinestra,
   ampladaFilaFranja,
+  ampladaRetallGraella,
   FRANJA_FITXER_AMPLADA,
   FRANJA_FITXER_ALCADA,
   FRANJA_FITXER_ASPECTE,
@@ -55,5 +56,21 @@ describe('ampladaFilaFranja', () => {
   it("sense alcada valida torna 0 (i qui el fa servir no pinta res)", () => {
     expect(ampladaFilaFranja(0)).toBe(0);
     expect(ampladaFilaFranja(NaN)).toBe(0);
+  });
+});
+
+describe('ampladaRetallGraella', () => {
+  it('quadra amb el retall mesurat a les quatre finestres d\'escriptori', () => {
+    // Mesurat al navegador (`getBoundingClientRect` del retall): 863,94 /
+    // 674,36 / 641,17 / 1160,89. El component en consumeix el `clientWidth`
+    // (enter), que es el que ha de coincidir exactament.
+    expect(ampladaRetallGraella(1905, 946)).toBe(864);
+    expect(ampladaRetallGraella(1497, 900)).toBe(674);
+    expect(ampladaRetallGraella(1425, 800)).toBe(641);
+    expect(ampladaRetallGraella(2545, 1306)).toBe(1161);
+  });
+
+  it('a les classes amb regle propi (movil i tauleta vertical) torna null', () => {
+    expect(ampladaRetallGraella(390, 844)).toBeNull();
   });
 });
