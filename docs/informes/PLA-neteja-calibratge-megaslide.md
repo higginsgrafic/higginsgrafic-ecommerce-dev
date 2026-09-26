@@ -210,3 +210,43 @@ canvia el que es veu avui** (en el cas de la franja, un 4,6 % de mida).
 - Les regles de la bateria (constitució).
 - Els calibratges que l'amo ha validat (HUD, `stripeCalibrations`).
 - El servidor de desenvolupament del port 3003.
+
+## 6. La cadena vertical de la pàgina 2, mesurada (26/09/2026)
+
+El que queda per declarar (les dues files, el centratge del selector, la tira de
+colors, els marges i l'espai fins a la franja) depèn de la **mateixa referència
+vertical**, i aquesta **creua les dues pàgines**. Mesurat relatiu al viewport de
+la pàgina 2; l'alçada de la finestra no hi influeix (800, 946 i 1300 donen el
+mateix):
+
+| peça | 1920×946 | 1440×800 | 1512×900 | 2560×1306 | 1680×900 |
+|---|---|---|---|---|---|
+| contenidor de la filera (`top`) | −43,21 | −42,43 | −42,57 | −44,29 | −42,84 |
+| filera (`data-p2-cercador-row`) | −3,20 | −2,42 | −2,56 | −4,28 | −2,83 |
+| retall de la graella | −3,70 | −2,92 | −3,06 | −4,78 | −3,33 |
+| contenidor del selector | 40,00 | 40,00 | 40,00 | 40,00 | 40,00 |
+| pastilla del selector | 1,86 (119) | 1,34 (89,06) | 1,37 (93,59) | 2,44 (159) | 1,57 (104,06) |
+| franja (`visual-content`) | 137,86 | 108,51 | 112,89 | 176,96 | 123,18 |
+| **selector de la PÀGINA 1** | 56,78 | 47,58 | 48,96 | 69,04 | 52,18 |
+
+D'on surt:
+
+- El contenidor de la filera és `bar-top + topVisualAlignmentY + 20`; a 1920 val
+  −43,21, o sigui **`topVisualAlignmentY` = −63,21**.
+- La pastilla del selector cau **38,14 px** per sobre del seu contenidor, i com
+  que la mouen `topVisualAlignmentY` i `selectorCentratgeY` alhora, la suma ha de
+  ser −38,14 (**`selectorCentratgeY` = 25,06**).
+- La referència de tot plegat és el **selector de la pàgina 1** (56,78), que
+  `MegaslidePagina2` mesura i converteix en els dos desplaçaments amb un bucle de
+  dues fórmules i repassos a 180 i 340 ms.
+- I la franja depèn de `page1PageLift` i de `visualOffsetY`.
+
+**El pas següent, doncs, no és declarar les files: és declarar el selector de la
+pàgina 1.** La seva posició surt de `--hg-cercador-bar-top` i de la geometria de
+la pàgina 1; amb `p1` declarat, `topVisualAlignmentY` i `selectorCentratgeY` són
+una resta, i darrere seu cauen les dues files, la tira de colors, els marges i
+`sostre − dalt`.
+
+Mentrestant, ja declarat: **l'amplada del retall** (`5b51495`) i **l'alçada del
+selector i de les seves tres cel·les** (aquest pas), que és la referència que el
+bucle de les dues files ja no ha de mesurar del DOM.
