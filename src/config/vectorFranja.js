@@ -130,3 +130,41 @@ export function areesClicEstreta() {
     ty: c.y - (CLIC_AREA_ESTRETA.y0 || 0),
   }));
 }
+
+/**
+ * LES CAIXES DE LES SILUETES DEL FULL DEL VEL, DECLARADES (26/09/2026)
+ * -----------------------------------------------------------------------------
+ * `full-clic-area-5.svg` es el full que fa servir el vel de les samarretes (una
+ * silueta per casa, `class="tshirt-outline"`). Mesurades amb `getBBox()`:
+ *
+ *   - la casa 0 es la SAMARRETA SENCERA (305,56 x 306,03): es la que s'ha de
+ *     fer servir per a totes les cases, perque el vel ha de cobrir tota la
+ *     samarreta (manigues incloses), no nome's l'area d'impressio;
+ *   - les cases 1 a 13 son l'AREA D'IMPRESSIO (241,71 x 306,03);
+ *   - i son a les posicions de la franja de DUES FILERES (0, 260,76, 457,66...),
+ *     no a les de la franja d'una filera (0, 196,7, 393,4...): les siluetes 1 a
+ *     13 cauen 33 unitats (12 px a 1920) a la dreta de la seva casa.
+ *
+ * Per aixo el vel es col·loca amb les CASELLES de la franja (`rectsMascara`,
+ * les mateixes que fan servir els dibuixos i les arees de clic) i no amb les
+ * posicions del full. Aquestes caixes nome's son el fallback quan no hi ha
+ * caselles.
+ */
+export const VEL_SAMARETA_CAIXA = { x: 0, y: 0.8, width: 305.56, height: 306.03 };
+
+export const VEL_SILUETA_CAIXES = [
+  { x: 0, y: 0.8, width: 305.56, height: 306.03 },
+  { x: 260.76, y: 0.8, width: 241.71, height: 306.03 },
+  { x: 457.66, y: 0.8, width: 241.71, height: 306.03 },
+  { x: 654.56, y: 0.8, width: 241.71, height: 306.03 },
+  { x: 851.46, y: 0.8, width: 241.71, height: 306.03 },
+  { x: 1048.35, y: 0.8, width: 241.71, height: 306.03 },
+  { x: 1245.26, y: 0.8, width: 241.71, height: 306.03 },
+  { x: 1442.15, y: 0.8, width: 241.71, height: 306.03 },
+  { x: 1639.05, y: 0.8, width: 241.71, height: 306.03 },
+  { x: 1835.96, y: 0.8, width: 241.7, height: 306.03 },
+  { x: 2032.85, y: 0.8, width: 241.71, height: 306.03 },
+  { x: 2229.75, y: 0.8, width: 241.71, height: 306.03 },
+  { x: 2426.65, y: 0.8, width: 241.71, height: 306.03 },
+  { x: 2623.55, y: 0.8, width: 241.71, height: 306.03 },
+];
