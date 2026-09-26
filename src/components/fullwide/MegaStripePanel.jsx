@@ -338,21 +338,38 @@ function MegaStripePanel({
       // Ara qui pinta deixa la identitat del dibuix a la propia casa
       // (`data-stripe-item`, `data-stripe-collection`): el gestor nome's
       // l'ha de llegir i no hi pot haver desincronitzacio.
-      const casa = (() => {
-        try {
-          const capa = filaFranjaRef.current;
-          if (!capa) return null;
+      // El `src` que el pintor ha deixat a la casa es la font de veritat: es
+      // exactament el que es veu, i amb ell es pot trobar l'item i la colleccio
+      // a la tira (les tres llistes van en paral·lel, es construeixen juntes).
+      let item = null;
+      let collection = null;
+      let subcollection = null;
+      let srcDeLaCasa = null;
+      try {
+        const capa = filaFranjaRef.current;
+        if (capa) {
           const idx = (isPortraitTablet && typeof y === 'number')
             ? Math.min(13, Math.max(0, (y < 0.5 ? 0 : 7) + Math.min(6, Math.max(0, Math.floor(x * 7)))))
             : Math.min(13, Math.max(0, Math.floor(x * 14)));
-          return capa.querySelector(`[data-stripe-tile="${idx}"]`);
-        } catch {
-          return null;
+          const casa = capa.querySelector(`[data-stripe-tile="${idx}"]`);
+          srcDeLaCasa = casa?.getAttribute?.('data-stripe-src') || null;
+          if (srcDeLaCasa && Array.isArray(stripeStrip?.srcs)) {
+            const i = stripeStrip.srcs.indexOf(srcDeLaCasa);
+            if (i >= 0) {
+              item = stripeStrip.items?.[i] ?? null;
+              collection = stripeStrip.collections?.[i] ?? null;
+              subcollection = stripeStrip.subcollections?.[i] ?? null;
+            }
+          }
+          // Si el src no es a la llista (o no hi ha tira), es cau als atributs
+          // que tambe ha deixat el pintor.
+          if (!item) item = casa?.getAttribute?.('data-stripe-item') || null;
+          if (!collection) collection = casa?.getAttribute?.('data-stripe-collection') || null;
+          if (!subcollection) subcollection = casa?.getAttribute?.('data-stripe-subcollection') || null;
         }
-      })();
-      let item = casa?.getAttribute?.('data-stripe-item') || null;
-      let collection = casa?.getAttribute?.('data-stripe-collection') || null;
-      let subcollection = casa?.getAttribute?.('data-stripe-subcollection') || null;
+      } catch {
+        // s'ignora a posta: es cau al calcul de reserva
+      }
       if (!item) {
         // Reserva (si el DOM no hi es): la rotacio, comptada una sola vegada.
         const tileIdx = (isPortraitTablet && typeof y === 'number')
@@ -1208,6 +1225,7 @@ function MegaStripePanel({
                               // calculades a llocs diferents, el clic anava tres
                               // cases enrere (mesurat: la casa 0 ensenyava
                               // `dj-vader` i obria el producte de `nx-01`).
+                              data-stripe-src={deLaTira?.src || undefined}
                               data-stripe-item={deLaTira?.item || undefined}
                               data-stripe-collection={deLaTira?.collection || undefined}
                               data-stripe-subcollection={deLaTira?.subcollection || undefined}
