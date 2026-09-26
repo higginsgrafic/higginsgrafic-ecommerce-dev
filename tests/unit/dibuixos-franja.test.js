@@ -34,6 +34,25 @@ describe('els dibuixos de la franja', () => {
     expect(DIBUIXOS_FRANJA_FRACCIO_COS).toBeCloseTo(0.409, 2);
   });
 
+  it('diu quant canviaria cada entrada si s\'aplica la regla', () => {
+    // Aixo es el que l'amo ha de veure abans d'esborrar el mapa: la regla no
+    // reprodueix exactament les calibracions, nome's la banda. Aqui es compta
+    // quant canvia la mida de cada dibuix, en percentatge.
+    const regla = escalaDibuixFranja(256) * DIBUIXOS_FRANJA_AMPLADA_NATURAL; // 80
+    const deltes = entrades.map((e) => ((regla - e.renderitzada) / e.renderitzada) * 100);
+    const abs = deltes.map(Math.abs);
+    const trams = { 'exacte (0 %)': 0, 'fins a 2 %': 0, 'fins a 5 %': 0, 'fins a 10 %': 0, 'mes de 10 %': 0 };
+    for (const d of abs) {
+      if (d < 0.01) trams['exacte (0 %)'] += 1;
+      else if (d <= 2) trams['fins a 2 %'] += 1;
+      else if (d <= 5) trams['fins a 5 %'] += 1;
+      else if (d <= 10) trams['fins a 10 %'] += 1;
+      else trams['mes de 10 %'] += 1;
+    }
+    console.log('canvi de mida si s\'aplica la regla:', JSON.stringify(trams));
+    console.log(`desviacio maxima: ${Math.max(...abs).toFixed(1)} % (${entrades[abs.indexOf(Math.max(...abs))].url})`);
+  });
+
   it("l'escala declarada reprodueix les calibracions d'amplada de la majoria", () => {
     // Un dibuix de 256 px amb la regla: 80/256 = 0,3125, que es el que porten
     // les entrades mes comunes (0,31 i 0,32).
