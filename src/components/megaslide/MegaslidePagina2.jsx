@@ -2,7 +2,13 @@ import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useSta
 import { CERCADOR_COLORS } from '../fullwide/CercadorTopBar.jsx';
 import CercadorTextRow from '../fullwide/CercadorTextRow.jsx';
 import MegaStripePanel from '../fullwide/MegaStripePanel.jsx';
-import { centratgeSelectorY, desplacTopSelector, visualOffsetYFranjaPagina2 } from './geometriaMegaslide.js';
+import {
+  centratgeSelectorY,
+  desplacTopSelector,
+  visualOffsetYFranjaPagina2,
+  desplacamentCentratgeFranja,
+  quantsGrupActiuFranja,
+} from './geometriaMegaslide.js';
 import { carrilPx, readRootCssNumber, MEGASLIDE_REFERENCIA_PX } from '../../utils/layoutMetrics.js';
 import { CapaTaulaVertical, TaulaVerticalP2 } from './TaulaVertical.jsx';
 import {
@@ -440,8 +446,16 @@ export default function MegaslidePagina2({
   // pas de rodeta o un arrossegament l'avença d'un dibuix, i cada casa ensenya
   // el que li toca. La volta es infinita i exacta perque el periode es la
   // llargada de la llista (64 dibuixos) i el residu es modular.
-  const [stripeStripOffset, setStripeStripOffset] = useState(0);
-  const stripeStripOffsetRef = useRef(0);
+  // EL DESPLACAMENT ARRENCA JA CENTRAT (26/09/2026): el valor es declarat
+  // (`desplacamentCentratgeFranja`) i es calcula al PRIMER render, no en un
+  // efecte. Abans naixia a 0 i mig segon despres girava tres cases, amb la
+  // creueta dels dibuixos: es el moviment que va veure l'amo.
+  const stripeStripOffsetInicial = desplacamentCentratgeFranja({
+    quants: quantsGrupActiuFranja({ collections: tiraFranja.collections, active }),
+    n: tiraFranja.srcs.length,
+  });
+  const [stripeStripOffset, setStripeStripOffset] = useState(stripeStripOffsetInicial);
+  const stripeStripOffsetRef = useRef(stripeStripOffsetInicial);
   // El dibuix que s'ha clicat en una samarreta VELADA, amb la casa on era: el
   // fa servir l'ancoratge de sota perque no es mogui de sota el cursor.
   const ancoratgeVelRef = useRef(null);
@@ -457,6 +471,7 @@ export default function MegaslidePagina2({
   const moureStrip = useCallback((passos) => {
     aplicaStripOffset((v) => v + passos);
   }, [aplicaStripOffset]);
+
   // La rodeta, com al carrusel de la graella: `passive: false` perque tambe ha
   // d'aturar el desplaçament vertical de la pagina mentre es passa per sobre.
   const bandaFranjaRef = useRef(null);
@@ -514,9 +529,8 @@ export default function MegaslidePagina2({
     // diferencia. Com que la tira es circular, es tria la volta mes propera al
     // desplaçament que ja hi hagi, perque no faci cap salt (mateix criteri que
     // el centratge de la graella, a `CercadorTextRow`).
-    const objectiuBase = (quants - 1) / 2 - 6.5;
     const actual = stripeStripOffsetRef.current;
-    const objectiu = objectiuBase + Math.round((actual - objectiuBase) / n) * n;
+    const objectiu = desplacamentCentratgeFranja({ quants, n, actual });
     if (objectiu === actual) return;
     aplicaStripOffset(objectiu);
   }, [stripeStrip, tiraFranja, active, aplicaStripOffset]);
