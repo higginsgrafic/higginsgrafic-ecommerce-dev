@@ -14,7 +14,7 @@ import {
   STRIPE_DRAWING_DX_VERTICAL,
 } from '../../config/stripeCalibrationsVertical';
 import { VECTOR_FRANJA_SAMARRETES, VECTOR_FRANJA_SAMARRETES_01, VECTOR_FRANJA_VIEWBOX, VECTOR_FRANJA_VIEWBOX_OBERT, VECTOR_FRANJA_CONTINGUT } from '../../config/vectorFranja.js';
-import { deltaObjectiuPageLift, desplacamentFranjaEscriptori } from '../../utils/mesuraMegaslide.js';
+import { desplacamentFranjaEscriptori } from '../../utils/mesuraMegaslide.js';
 import { carrilPx } from '../../utils/layoutMetrics.js';
 import { precarregaSiluetesSamarreta, textSiluetesSamarreta } from './siluetesSamarreta.js';
 import useEscalaFranjaCarril from '../../hooks/useEscalaFranjaCarril.js';
@@ -24,6 +24,7 @@ import {
   DIBUIXOS_FRANJA_DY,
   DIBUIXOS_FRANJA_AMPLADA_NATURAL,
   escalaDibuixFranja,
+  pageLiftPagina1,
 } from '../megaslide/geometriaMegaslide.js';
 
 // La franja de samarretes de la pàgina 1 tendeix a quedar-se uns 10 px més avall
@@ -246,32 +247,15 @@ function MegaStripePanelP1({
 
     let frame = 0;
     const applyMeasurement = () => {
-      const selector = root.querySelector('[data-stripe-buttonbar="bn"]');
-      if (isPortraitTablet) {
-        if (pageLiftRef.current !== 0) {
-          pageLiftRef.current = 0;
-          setPageLift(0);
-        }
-        onPageLiftChange?.(0);
-      } else if (selector) {
-        // L'objectiu del pageLift és una funció pura (utils/mesuraMegaslide.js): el
-        // càlcul vivia aquí dins de l'efecte i no es podia comprovar sense
-        // navegador. La fórmula és la mateixa.
-        const selectorTop = selector.getBoundingClientRect().top;
-        const panelTop = panel.getBoundingClientRect().top;
-        const delta = deltaObjectiuPageLift({
-          selectorTop,
-          panelTop,
-          ample: window.innerWidth,
-          alt: window.innerHeight,
-          esTauleta: isPortraitTablet || isLandscapeTablet,
-        });
-        const next = Math.max(0, pageLiftRef.current + delta);
-        if (Math.abs(next - pageLiftRef.current) >= 0.5) {
-          pageLiftRef.current = next;
-          setPageLift(next);
-          onPageLiftChange?.(next);
-        }
+      // EL PAGELIFT ES DECLARA (26/09/2026): el punt fix del bucle era el top
+      // natural del selector de la pagina 1 menys el desplacament de disseny
+      // (vegeu `pageLiftPagina1`). El bucle que mesurava el selector i el
+      // panell va desaparèixer.
+      const next = pageLiftPagina1({ isPortraitTablet, isLandscapeTablet });
+      if (Math.abs(next - pageLiftRef.current) >= 0.5) {
+        pageLiftRef.current = next;
+        setPageLift(next);
+        onPageLiftChange?.(next);
       }
       // Bottom visual de les samarretes (ja inclou l'escala interna de la
       // franja i el pageLift) mesurat des del capdamunt del panell: el pare

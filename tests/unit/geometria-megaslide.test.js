@@ -1,6 +1,8 @@
 import { describe, it, expect } from 'vitest';
 import {
   carrilDeFinestra,
+  pageLiftPagina1,
+  TOP_SELECTOR_PAGINA1_PX,
   ampladaFilaFranja,
   ampladaRetallGraella,
   alcadaSelector,
@@ -47,6 +49,24 @@ describe('carrilDeFinestra', () => {
 
   it('a les classes amb regle propi (movil i tauleta vertical) torna null', () => {
     expect(carrilDeFinestra(390, 844)).toBeNull();
+  });
+});
+
+describe('pageLiftPagina1', () => {
+  it("a l'escriptori deixa el selector de la pagina 1 a 20 px del panell", () => {
+    const lift = pageLiftPagina1({});
+    expect(lift).toBeCloseTo(19.52, 2);
+    expect(TOP_SELECTOR_PAGINA1_PX - lift).toBeCloseTo(20, 2);
+  });
+
+  it('a la tauleta apaissada el deixa a 10 px', () => {
+    const lift = pageLiftPagina1({ isLandscapeTablet: true });
+    expect(lift).toBeCloseTo(29.52, 2);
+    expect(TOP_SELECTOR_PAGINA1_PX - lift).toBeCloseTo(10, 2);
+  });
+
+  it("a la vertical no s'aplica", () => {
+    expect(pageLiftPagina1({ isPortraitTablet: true })).toBe(0);
   });
 });
 

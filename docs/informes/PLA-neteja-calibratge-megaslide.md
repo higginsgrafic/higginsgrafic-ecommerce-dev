@@ -241,8 +241,9 @@ D'on surt:
 - I la franja depèn de `page1PageLift` i de `visualOffsetY`.
 
 **El que queda mesurat és, doncs, la referència de la pàgina 1
-(`topVisualAlignmentY`) i la cadena de la franja (`page1PageLift`,
-`visualOffsetY`, `margesEnllacos.baix` i `sostre − dalt`).**
+(`topVisualAlignmentY`) i el top de LAYOUT de la franja (que és el que falta per
+declarar `margesEnllacos.baix` i `sostre − dalt`).** El `pageLift` i el
+`visualOffsetY` ja surten de funcions pures.
 
 Declarat fins ara (26/09/2026):
 
@@ -254,7 +255,8 @@ Declarat fins ara (26/09/2026):
 | el desnivell de les dues files (`desnivellsLiniesGraella`) | `d476357` |
 | la tira de colors (`desnivellColorsGraella`, `ampladaColumnaGraella`) | `2afe067` |
 | el marge del bloc de fletxes (`margeBaixFletxesGraella`) | `ced00d6` |
-| el `margeDalt` de la columna (`desplacTop − selectorCentratgeY`) | aquest pas |
+| el `margeDalt` de la columna (`desplacTop − selectorCentratgeY`) | `0f153f1` |
+| el `pageLift` de la pàgina 1 (`pageLiftPagina1`) | aquest pas |
 
 Tots amb la prova unitària a `tests/unit/geometria-megaslide.test.js` i la
 comprovació al navegador: el valor declarat coincideix amb el que s'aplicava,
