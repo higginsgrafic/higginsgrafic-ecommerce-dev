@@ -354,3 +354,23 @@ export function desnivellColorsGraella({
   const alcadaBarra = (ampladaBarra * 2) / 7;
   return alcadaCarrusel + GRAELLA_FILA_GAP_PX + alcadaBarra / 2 - alcadaFilera / 2 - alcadaSel / 3;
 }
+
+/**
+ * EL MARGE DE BAIX DEL BLOC DE FLETXES, DECLARAT (26/09/2026)
+ * -----------------------------------------------------------------------------
+ * El bloc de fletxes va penjat del retall dels dibuixos, i el seu marge de baix
+ * era la diferencia entre el baix del selector i el baix del retall; es mesurava
+ * perque «no es constant» (el selector arribava a sortir 5 px mes amunt). Pero
+ * els dos baixos surten de les mateixes mides declarades:
+ *
+ *   margeBaixFletxes = alcadaFilera/2 + alcadaSelector/2 - alcadaCarrusel
+ *
+ * Comprovat contra el valor que s'aplicava a 1920, 1440, 1512, 1680, 2000,
+ * 2560 i 1400: la diferencia maxima es 0,02 px. Nome's s'aplica als escriptoris
+ * (a les tauletes no hi ha bloc de fletxes).
+ */
+export function margeBaixFletxesGraella({ dibuix, gapV, carril, midaSelector, escala }) {
+  const alcadaCarrusel = alcadaCarruselGraella(dibuix, gapV);
+  const alcadaFilera = alcadaCarrusel + (carril * GRAELLA_FILA_COLORS_CARRIL_PX) / MEGASLIDE_REFERENCIA_PX;
+  return alcadaFilera / 2 + alcadaSelector(midaSelector, escala) / 2 - alcadaCarrusel;
+}

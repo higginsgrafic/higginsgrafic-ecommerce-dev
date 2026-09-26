@@ -9,6 +9,7 @@ import {
   centratgeSelectorY,
   desnivellsLiniesGraella,
   desnivellColorsGraella,
+  margeBaixFletxesGraella,
   ampladaColumnaGraella,
   GRAELLA_DRETA_FLETXES_CARRIL_PX,
   FRANJA_FITXER_AMPLADA,
@@ -169,5 +170,25 @@ describe('desnivellColorsGraella', () => {
 
   it("a 1366x768 (tauleta) dona 1,44 (el DOM, 1,45)", () => {
     expect(colorsA(811, 112.8, 1, 31.343 / 1.5, 3.98, false, 6 * 0.995)).toBeCloseTo(1.44, 1);
+  });
+});
+
+describe('margeBaixFletxesGraella', () => {
+  it('a 1920 dona 28,84 (el bucle, 28,82)', () => {
+    expect(margeBaixFletxesGraella({
+      dibuix: 29.7556, gapV: 2.9756, carril: 1143, midaSelector: 120, escala: 1339 / 1350,
+    })).toBeCloseTo(28.84, 1);
+  });
+
+  it('a 1440 dona 21,57 (el bucle, 21,56)', () => {
+    expect(margeBaixFletxesGraella({
+      dibuix: 22.2667, gapV: 2.2267, carril: 855, midaSelector: 120, escala: 1002 / 1350,
+    })).toBeCloseTo(21.57, 1);
+  });
+
+  it('a 2560 dona 38,52 (el bucle, 38,51)', () => {
+    expect(margeBaixFletxesGraella({
+      dibuix: 39.7556, gapV: 3.9756, carril: 1527, midaSelector: 120, escala: 1789 / 1350,
+    })).toBeCloseTo(38.52, 1);
   });
 });

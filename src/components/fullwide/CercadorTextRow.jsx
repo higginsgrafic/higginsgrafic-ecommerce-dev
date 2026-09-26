@@ -10,7 +10,7 @@ import {
 } from './midesGraella.js';
 // L'amplada del retall (l'últim input mesurat de la graella) viu amb la resta
 // de geometria declarada del megaslide.
-import { ampladaRetallGraella, ampladaColumnaGraella, desnivellsLiniesGraella, desnivellColorsGraella, GRAELLA_DRETA_FLETXES_CARRIL_PX } from '../megaslide/geometriaMegaslide.js';
+import { ampladaRetallGraella, ampladaColumnaGraella, desnivellsLiniesGraella, desnivellColorsGraella, margeBaixFletxesGraella, GRAELLA_DRETA_FLETXES_CARRIL_PX } from '../megaslide/geometriaMegaslide.js';
 import { carrilPct, carrilLane, carrilPx, readRootCssNumber, getLayoutViewportWidth, MEGASLIDE_REFERENCIA_PX } from '../../utils/layoutMetrics.js';
 import { GRAELLA_DIBUIXOS_ESCALA_VERTICAL } from '../../config/stripeCalibrationsVertical.js';
 import { FirstContactDibuix09Buttons } from './firstContactPanels.jsx';
@@ -437,28 +437,23 @@ export function CercadorDibuixosGraella({
   const [margeBaixFletxes, setMargeBaixFletxes] = useState(null);
   useLayoutEffect(() => {
     if (!ambFletxes) return undefined;
-    const el = graellaRef.current;
-    if (!el) return undefined;
-    const pagina = el.closest('[data-mega-page-viewport="2"]') || document;
+    // EL MARGE, DECLARAT (26/09/2026). Abans es mesurava la diferencia entre el
+    // baix del selector i el baix del retall; ara surt de
+    // `margeBaixFletxesGraella`. Es queden el rAF i els repassos de 250/400 ms
+    // perque tambe refresquen el valor quan canvia la finestra (les variables
+    // del carril no provoquen cap re-render).
     const calcula = () => {
-      const selector = pagina.querySelector('[data-p2-color-selector] [data-stripe-buttonbar="bn"]');
-      if (!selector) return;
-      const marge = selector.getBoundingClientRect().bottom - el.getBoundingClientRect().bottom;
-      setMargeBaixFletxes((previ) => (previ !== null && Math.abs(previ - marge) < 0.5 ? previ : marge));
+      const d = margeBaixFletxesGraella({
+        dibuix: dibuixPx / 1.5,
+        gapV,
+        carril: readRootCssNumber('--hg-mega-w', MEGASLIDE_REFERENCIA_PX),
+        midaSelector,
+        escala: readRootCssNumber('--hg-escala-mega', 1),
+      });
+      setMargeBaixFletxes((previ) => (previ !== null && Math.abs(previ - d) < 0.01 ? previ : d));
     };
-    // LA PRIMERA PASSADA VA EN UN rAF (25/09/2026). A l'efecte de layout aquest
-    // fill corre ABANS que el bucle que centra el selector amb la filera, o
-    // sigui que mesurava el selector 20-42 px mes amunt i el bloc de fletxes hi
-    // queia a sobre; el repas de 250 ms ho desfeia i el bloc feia un salt de
-    // 20,6 px (1920), 38,7 (1512), 42 (1440) i 8 (2560) amb el panell ja
-    // obrint-se. El rAF arriba abans del primer pintat pero DESPRES dels efectes
-    // de layout: la mesura ja es la bona i el bloc neix a lloc.
     const frame = requestAnimationFrame(calcula);
-    // La composicio acaba d'encaixar despres del primer pintat (la fila es
-    // mesura sola): es torna a mirar un parell de cops.
     const t1 = window.setTimeout(calcula, 250);
-    // A 400 ms i no a 900: es just despres de l'animacio d'obertura (340 ms).
-    // El repas tarda corregia despres que el panell sembles fet (25/09/2026).
     const t2 = window.setTimeout(calcula, 400);
     window.addEventListener('resize', calcula);
     return () => {
@@ -467,7 +462,7 @@ export function CercadorDibuixosGraella({
       window.clearTimeout(t2);
       window.removeEventListener('resize', calcula);
     };
-  }, [ambFletxes, graellaRef]);
+  }, [ambFletxes, graellaRef, dibuixPx, gapV, midaSelector]);
 
   // LES DUES LINIES DE DIBUIXOS, CADA UNA CENTRADA AMB LA SEVA CEL·LA.
   //
