@@ -85,3 +85,40 @@ export function ampladaFilaFranja(alcadaFila) {
   if (!Number.isFinite(alcadaFila) || alcadaFila <= 0) return 0;
   return alcadaFila * FRANJA_FITXER_ASPECTE;
 }
+
+/**
+ * L'AMPLADA DELS DIBUIXOS DE LA FRANJA, DECLARADA (26/09/2026)
+ * -----------------------------------------------------------------------------
+ * Les 244 entrades de `STRIPE_DRAWING_CALIBRATIONS` (una per dibuix) no son 244
+ * decisions: son una BASE i mitja dotzena d'excepcions. Mesurat sobre les 224
+ * entrades de la franja (`scripts/_tmp-regla-dibuixos.mjs`, temporal):
+ *
+ *   - TOTS els fitxers de dibuix fan 256 px d'amplada; el que varia es l'alcada
+ *     (24 … 615 px).
+ *   - Multiplicant l'escala calibrada per l'amplada natural, l'amplada
+ *     renderitzada de la gran majoria cau entre 74 i 88 unitats (mitjana 79,4).
+ *   - Les desviacions son decisions de disseny: `nx-01` 56, els cubics 60-64 i
+ *     `the-phoenix` 143.
+ *
+ * Unitats: les de la franja, que fa 2866 px en el seu fitxer i te 14 cossos de
+ * 2740/14 = 195,7 unitats. O sigui que el dibuix fa el 41 % del cos.
+ */
+export const DIBUIXOS_FRANJA_AMPLADA_NATURAL = 256;
+export const DIBUIXOS_FRANJA_AMPLADA = 80;
+export const DIBUIXOS_FRANJA_FRACCIO_COS = DIBUIXOS_FRANJA_AMPLADA / (2740 / 14);
+export const DIBUIXOS_FRANJA_DY = 28.75;
+export const DIBUIXOS_FRANJA_DX = 0;
+
+/**
+ * L'escala declarada per a un dibuix de la franja: la que fa que ocupi
+ * `DIBUIXOS_FRANJA_AMPLADA` unitats, sigui quina sigui la mida del fitxer.
+ *
+ * Es el que substitueix el camp `scale` de cada entrada del mapa.
+ *
+ * @param {number} ampladaNatural amplada del fitxer del dibuix, en px
+ * @returns {number} escala (1 quan no es pot calcular)
+ */
+export function escalaDibuixFranja(ampladaNatural) {
+  if (!Number.isFinite(ampladaNatural) || ampladaNatural <= 0) return 1;
+  return DIBUIXOS_FRANJA_AMPLADA / ampladaNatural;
+}
