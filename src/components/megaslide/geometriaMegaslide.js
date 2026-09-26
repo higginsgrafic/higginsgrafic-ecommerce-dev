@@ -122,3 +122,24 @@ export function escalaDibuixFranja(ampladaNatural) {
   if (!Number.isFinite(ampladaNatural) || ampladaNatural <= 0) return 1;
   return DIBUIXOS_FRANJA_AMPLADA / ampladaNatural;
 }
+
+/**
+ * ELS AJUSTOS DE LA COMPOSICIO, DECLARATS (26/09/2026)
+ * -----------------------------------------------------------------------------
+ * Aquests numeros son de DISSENY: no es mesuren, es declaren. Vivien escampats
+ * pels components (un `export` a la franja de la pagina 1 i un `-10` en línia a
+ * la pagina 2). Son aqui perque tots els numeros de la composicio siguin al
+ * mateix lloc i es puguin llegir junts.
+ */
+
+/** Els 10 px que la franja de la pagina 1 i la de la pagina 2 baixen a
+ *  l'escriptori (abans `FRANJA_AJUST_PX` a MegaStripePanelP1). */
+export const AJUST_FRANJA_ESCRIPTORI_PX = 10;
+
+/** La tauleta apaissada tambe baixa 10 px, i en fa la compensacio propia: es
+ *  el `-10` que hi havia en línia al `visualOffsetY` de la pagina 2. */
+export const AJUST_FRANJA_TAULETA_APAISSADA_PX = -10;
+
+/** Els 20 px de marge extra de la pestanya a l'escriptori ample (abans
+ *  `MARGE_EXTRA_DESKTOP_PX` a MegaMenuPanel). */
+export const MARGE_EXTRA_ESCRIPTORI_PX = 20;

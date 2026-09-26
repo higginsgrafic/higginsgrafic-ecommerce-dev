@@ -9,6 +9,7 @@ import MegaStripeBleedGuard from './MegaStripeBleedGuard.jsx';
 import MegaStripePanelP1 from './MegaStripePanelP1.jsx';
 import { alcadaPanellMegaslide } from '../../utils/mesuraMegaslide.js';
 import MegaslidePagina2 from '../megaslide/MegaslidePagina2.jsx';
+import { MARGE_EXTRA_ESCRIPTORI_PX } from '../megaslide/geometriaMegaslide.js';
 import { alturaTaulaVertical, CapaTaulaVertical, TaulaVerticalP1 } from '../megaslide/TaulaVertical.jsx';
 import { CercadorDibuixosGraella, dibuixosGraella16x4 } from './CercadorTextRow.jsx';
 import { FirstContactDibuix00Buttons, FirstContactDibuix09Buttons } from './firstContactPanels.jsx';
@@ -24,7 +25,8 @@ const P1_STRIPE_BOTTOM_GAP = 30;
 // banda estreta s'han menjat el coixí que quedava sota les samarretes i cal
 // deixar-hi 20 px més d'aire. NO s'aplica a la tauleta apaisada (768-1366, que
 // té la seva pròpia alçada de guarda) ni al mòbil.
-const MARGE_EXTRA_DESKTOP_PX = 20;
+/** Vegeu `MARGE_EXTRA_ESCRIPTORI_PX` a geometriaMegaslide.js. */
+const MARGE_EXTRA_DESKTOP_PX = MARGE_EXTRA_ESCRIPTORI_PX;
 
 
 // Memoria de l'alcada bona del panell. El mega-slide es munta i es desmunta cada

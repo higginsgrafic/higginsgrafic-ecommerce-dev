@@ -18,6 +18,7 @@ import { deltaObjectiuPageLift, desplacamentFranjaEscriptori } from '../../utils
 import { carrilPx } from '../../utils/layoutMetrics.js';
 import useEscalaFranjaCarril from '../../hooks/useEscalaFranjaCarril.js';
 import {
+  AJUST_FRANJA_ESCRIPTORI_PX,
   DIBUIXOS_FRANJA_DX,
   DIBUIXOS_FRANJA_DY,
   DIBUIXOS_FRANJA_AMPLADA_NATURAL,
@@ -30,7 +31,8 @@ import {
 // manera que el resultat depèn de l'ordre de les mesures. Amb aquest ajust la
 // franja torna a la seva posició, i la pàgina 2 el fa servir perquè les dues
 // franges quedin a la mateixa alçada.
-export const FRANJA_AJUST_PX = 10;
+/** Vegeu `AJUST_FRANJA_ESCRIPTORI_PX` a geometriaMegaslide.js. */
+export const FRANJA_AJUST_PX = AJUST_FRANJA_ESCRIPTORI_PX;
 
 function canonicalKey(rawSrc) {
   try {
