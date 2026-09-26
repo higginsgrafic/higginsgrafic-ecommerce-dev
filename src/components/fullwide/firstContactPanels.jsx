@@ -146,17 +146,16 @@ export function FirstContactDibuix00Buttons({
 
   return (
     <div
-      // LA MEITAT D'AMPLADA, LA MATEIXA ALCADA (24/09/2026).
+      // QUADRAT (26/09/2026).
       //
-      // L'amo ho ha demanat aixi: el selector, la meitat en x. El bloc era
-      // `aspect-square w-full`, o sigui que l'amplada la manava el pare i
-      // l'alçada era la MATEIXA que l'amplada. Per halvar nomes la x, la relacio
-      // passa a 1:2: `w-1/2` dona mitja amplada i `aspect-[1/2]` en fa el doble
-      // d'alçada, que es exactament l'amplada que tenia abans.
+      // El 24/09 es va fer la meitat d'amplada i el doble d'alçada
+      // (`w-1/2` + `aspect-[1/2]`); l'amo ha demanat de tornar-lo quadrat
+      // («torna'l quadrat»), o sigui que el bloc torna a ser `aspect-square
+      // w-full`: l'amplada la mana el pare i l'alçada es la mateixa.
       //
       // Va alineat a l'ESQUERRA a posta (sense `mx-auto`): a la pagina 2 el
       // selector arrenca on arrenca el logo del header, i aixo no ha de canviar.
-      className="relative mt-2 aspect-[1/2] w-1/2"
+      className="relative mt-2 aspect-square w-full"
       data-stripe-buttonbar="bn"
       style={{
         // LE REQUADRE DE FONS ORIGINAL (24/09/2026). El selector va néixer amb
