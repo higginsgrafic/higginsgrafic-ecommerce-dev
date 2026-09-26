@@ -1,5 +1,7 @@
 import { useLayoutEffect, useState } from 'react';
 import { factorFranjaCarril, ESCALA_CALIBRADA_FRANJA } from '../utils/franjaCarril';
+import { carrilDeclarat } from '../utils/layoutModel';
+import { getLayoutViewportWidth } from '../utils/layoutMetrics';
 
 /**
  * useEscalaFranjaCarril — el factor que fa que la filera de cossos de la franja
@@ -30,12 +32,28 @@ import { factorFranjaCarril, ESCALA_CALIBRADA_FRANJA } from '../utils/franjaCarr
  */
 function ampladaObjectiu() {
   if (typeof document === 'undefined') return 0;
-  const carril = Number.parseFloat(
-    getComputedStyle(document.documentElement).getPropertyValue('--hg-mega-w'),
-  );
-  const xCarril = Number.parseFloat(
-    getComputedStyle(document.documentElement).getPropertyValue('--hg-mega-x'),
-  );
+  const estil = getComputedStyle(document.documentElement);
+  // EL CARRIL DECLARAT, MENTRE EL HEADER NO HA PUBLICAT LES VARS (25/09/2026).
+  //
+  // `--hg-mega-w` i `--hg-mega-x` les publica un efecte del header, que corre
+  // DESPRES d'aquest: la primera mesura de la franja no trobava ni el carril ni
+  // la seva x, tornava 0 i l'escala no es tornava a mirar fins que arribava una
+  // mutacio d'estil (mesurat: 225-320 ms). Fins llavors la franja es pintava amb
+  // l'escala de disseny (1,58 cops massa gran, mesurat) i feia un salt amb el
+  // panell ja obrint-se. El valor declarat es EXACTAMENT el que publicara el
+  // header (3/5 de la finestra de layout, i la x centrada), o sigui que la
+  // franja neix a la mida bona i la mesura de debò nome's confirma el mateix.
+  let carril = Number.parseFloat(estil.getPropertyValue('--hg-mega-w'));
+  let xCarril = Number.parseFloat(estil.getPropertyValue('--hg-mega-x'));
+  if (!Number.isFinite(carril) || carril <= 0) {
+    carril = carrilDeclarat({
+      ample: getLayoutViewportWidth(),
+      alt: typeof window !== 'undefined' ? window.innerHeight || 0 : 0,
+    }) || 0;
+  }
+  if (!Number.isFinite(xCarril) && carril > 0) {
+    xCarril = Math.round((getLayoutViewportWidth() - carril) / 2);
+  }
   const fletxes = [...document.querySelectorAll('[data-carrusel="1"] #stripe-guide-right-arrow')]
     .filter((el) => el.getBoundingClientRect().width > 0);
   const fletxa = fletxes[fletxes.length - 1];
@@ -65,10 +83,9 @@ export default function useEscalaFranjaCarril(filaRef, actiu) {
 
     const mesura = () => {
       const ampleDibuix = el.offsetWidth;
-      if (!ampleDibuix) return;
       const estil = getComputedStyle(document.documentElement);
       const objectiu = ampladaObjectiu();
-      if (!objectiu) return;
+      if (!ampleDibuix || !objectiu) return;
       // L'ESCALA CALIBRADA, LLEGIDA DEL DOM I NO LA NOMINAL.
       //
       // El factor es calcula contra l'escala que la franja porta posada

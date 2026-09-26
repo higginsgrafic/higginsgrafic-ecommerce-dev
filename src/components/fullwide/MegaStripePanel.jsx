@@ -681,12 +681,31 @@ function MegaStripePanel({
                       src={stripeImageSrc || '/placeholders/t-shirt_buttons/v5/full-color-stripe-5.webp?v=2866'}
                       alt=""
                       className="block"
+                      // LES MIDES DEL FITXER, PER ATRIBUT (25/09/2026).
+                      //
+                      // Amb `height: 100%` i `width: auto`, la filera de la franja
+                      // fa l'amplada de la imatge... i sense les mides del fitxer
+                      // aquesta amplada es ZERO fins que la imatge arriba
+                      // (mesurat: 300 ms, es a dir tota l'obertura). Sense
+                      // amplada, `useEscalaFranjaCarril` no pot calcular l'escala:
+                      // la franja es pintava amb l'escala de disseny i, quan
+                      // arribava la imatge (2866x307, la matriu de samarretes),
+                      // encongia i s'enduia el seu baix i el marge de la columna
+                      // de colleccions (ho va veure l'amo: «es mou la tira de
+                      // colors», «i la columna de colleccions»).
+                      //
+                      // Amb `width` i `height` per atribut el navegador coneix la
+                      // proporcio ABANS de tenir la imatge: la filera neix a la
+                      // mida bona i l'escala es calcula a la primera mesura, que
+                      // ja es abans de pintar.
+                      width={2866}
+                      height={307}
                       style={{
                         height: '100%',
                         width: 'auto',
                         maxWidth: 'none',
                       }}
-                      loading="lazy"
+                      loading="eager"
                       decoding="async"
                     />
                   ) : null}
