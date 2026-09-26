@@ -1256,7 +1256,22 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
           });
         }
         const daltGraella = el.getBoundingClientRect().top;
-        const sostre = franja ? franja.getBoundingClientRect().top : null;
+        // EL SOSTRE DE LA FRANJA ES DECLARAT (26/09/2026). Era l'unic input
+        // d'aquesta deduccio que depenia de si la imatge de la franja ja era a
+        // memoria (la seva alçada i la seva escala s'assenten uns quants
+        // fotogrames): ara surt de `topFranjaPagina2`, que nome's depen de la
+        // finestra. `daltGraella` (el top del retall) encara es mesura perque
+        // penja de l'alineacio amb la pagina 1.
+        const sostre = franja
+          ? pagina.getBoundingClientRect().top + topFranjaPagina2({
+            carril: readRootCssNumber('--hg-mega-w', MEGASLIDE_REFERENCIA_PX),
+            escala: readRootCssNumber('--hg-escala-mega', 1),
+            ample: typeof window !== 'undefined' ? window.innerWidth : 0,
+            alt: typeof window !== 'undefined' ? window.innerHeight : 0,
+            isPortraitTablet,
+            isLandscapeTablet,
+          })
+          : null;
         // L'ESPAI FINS A LA FRANJA NOME'S QUAN ES REPETEIX (25/09/2026).
         //
         // La franja triga uns quants fotogrames a assentar-se (la seva escala i
