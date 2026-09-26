@@ -3,6 +3,7 @@ import { CERCADOR_COLORS } from '../fullwide/CercadorTopBar.jsx';
 import CercadorTextRow from '../fullwide/CercadorTextRow.jsx';
 import MegaStripePanel from '../fullwide/MegaStripePanel.jsx';
 import { FRANJA_AJUST_PX } from '../fullwide/MegaStripePanelP1.jsx';
+import { AJUST_FRANJA_TAULETA_APAISSADA_PX } from './geometriaMegaslide.js';
 import { desplacamentFranjaEscriptori } from '../../utils/mesuraMegaslide.js';
 import { carrilPx } from '../../utils/layoutMetrics.js';
 import { CapaTaulaVertical, TaulaVerticalP2 } from './TaulaVertical.jsx';
@@ -892,7 +893,7 @@ export default function MegaslidePagina2({
             {...propsFranjaP2}
             stripeImageSrc={isPortraitTablet ? '/placeholders/tablet vertical/full-white-stripe-doble.png' : stripeBaseImageSrc}
             // La franja ha de quedar a la mateixa alcada que la de la pagina 1.
-            visualOffsetY={-page1PageLift + (isLandscapeTablet ? -10 : 0) - ((isPortraitTablet || isLandscapeTablet) ? 0 : FRANJA_AJUST_PX) + desplacamentFranja}
+            visualOffsetY={-page1PageLift + (isLandscapeTablet ? AJUST_FRANJA_TAULETA_APAISSADA_PX : 0) - ((isPortraitTablet || isLandscapeTablet) ? 0 : FRANJA_AJUST_PX) + desplacamentFranja}
           />
         </div>
 
