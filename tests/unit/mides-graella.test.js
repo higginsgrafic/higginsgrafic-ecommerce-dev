@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import {
-  midesGraellaCompacta, midaDibuix, gapHorizontal, gapVertical, colorPas,
+  midesGraellaCompacta, midaDibuix, gapHorizontal, colorPas,
   GRAELLA_COLUMNES, GRAELLA_FILES, GRAELLA_MARGE_FRANJA,
   BLOC_DRETA_DIBUIXOS_ESCRIPTORI_PX, MARGE_ESQUERRA_DIBUIXOS_ESCRIPTORI_PX,
   MARGE_DRET_FILERA_ESCRIPTORI_PX,
@@ -67,12 +67,16 @@ describe('midesGraellaCompacta', () => {
     expect(alçadaGraella(m)).toBeLessThanOrEqual(150 - 100 - GRAELLA_MARGE_FRANJA + 0.001);
   });
 
-  it('sense sostre (franja no mesurada) no toca res: deixa les mides de la pantalla', () => {
-    // Sense sostre no s'aplica ni el pas dels cercles: queden les mides de
-    // reserva (el pas base escalat amb el carril), que és el que fa que la
-    // graella neixi raonable abans que la franja estigui mesurada.
+  it('sense sostre (franja no mesurada) el pas vertical ja és el dels cercles', () => {
+    // El pas alineat (`dibuix + gapV` = el pas dels cercles) NO depèn de cap
+    // mesura de la pantalla, o sigui que es pot declarar des del primer pintat.
+    // Abans, sense sostre, queia al pas de reserva (3 × 30/50 = 1,8): la graella
+    // naixia amb el retall 23 px curt i la segona filera de dibuixos i la tira de
+    // colors feien un salt en obrir el megaslide (mesurat a 1920 el 25/09/2026).
+    // El que SÍ que necessita la franja és la DEDUCCIÓ (les proves de dalt).
     const m = midesGraellaCompacta({ ampleAmple: 798, sostre: null, daltGraella: 100 });
-    expect(m.gapV).toBeCloseTo(gapVertical(false, false), 5);
+    expect(m.dibuix).toBeCloseTo(30, 5);
+    expect(m.gapV).toBeCloseTo(colorPas(false, false) - m.dibuix, 5);
   });
 
   it('a tauleta fa servir les mides de tauleta, no les de desktop', () => {
