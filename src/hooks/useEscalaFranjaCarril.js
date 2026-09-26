@@ -51,8 +51,27 @@ function ampladaObjectiu() {
   let xCarril = Number.parseFloat(estil.getPropertyValue('--hg-mega-x'));
   if ((!Number.isFinite(carril) || carril <= 0) && declarat) carril = declarat.carril;
   if (!Number.isFinite(xCarril) && declarat) xCarril = declarat.x;
+  // LES FLETXES DEL CARRUSEL S'HAN DE LLEGIR DE LA PAGINA VISIBLE
+  // (26/09/2026). El megaslide te totes les pagines al DOM i mes d'una te
+  // carrusel amb fletxes: `document.querySelectorAll` en trobava de la pagina 1
+  // i de la 2, i la "darrera" podia ser la de la 1. Com que la pagina 1 viu
+  // desplaçada una amplada de maquetacio (a 1024, x-1009), el seu `right` es
+  // negatiu i l'objectiu de la franja sortia -1008: la franja de la pagina 2 es
+  // pintava a x-59 amb 1006 px d'amplada en comptes de 202..807 (mesurat).
+  //
+  // La fletxa de la pagina VISIBLE es la que te la seva vista a la finestra (el
+  // `left` de la vista entre 0 i l'amplada). L'amplada de la finestra tambe
+  // inclou les fletxes ocultes (`getBoundingClientRect` dona mides amb
+  // `visibility: hidden`), o sigui que nome's el desplaçament les distingeix.
+  const ampladaVista = typeof window !== 'undefined' ? window.innerWidth : 0;
   const fletxes = [...document.querySelectorAll('[data-carrusel="1"] #stripe-guide-right-arrow')]
-    .filter((el) => el.getBoundingClientRect().width > 0);
+    .filter((el) => el.getBoundingClientRect().width > 0)
+    .filter((el) => {
+      const vista = el.closest('[data-mega-page-viewport]');
+      if (!vista || !ampladaVista) return true;
+      const x = vista.getBoundingClientRect().left;
+      return x > -1 && x < ampladaVista;
+    });
   const fletxa = fletxes[fletxes.length - 1];
   if (fletxa && Number.isFinite(xCarril)) {
     // LA FLETXA, DINS LA SEVA PAGINA. El megaslide te totes les pagines al DOM,

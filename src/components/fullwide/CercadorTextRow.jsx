@@ -366,6 +366,14 @@ export function CercadorDibuixosGraella({
    *  fletxes governen els dibuixos de la FRANJA en comptes del carrusel de la
    *  graella. */
   onCarouselStep,
+  /** El desplaçament del carrusel en PASSOS, governat de fora (les fletxes del
+   *  bloc de la dreta de la PAGINA 1, que viu fora d'aquesta graella). Cada pas
+   *  es mig periode d'una peça (`unPas`), la mateixa unitat que el gest. */
+  desplacamentPassos = 0,
+  /** L'alcada de la finestra del carrusel, en px. Si arriba, mana sobre el
+   *  calcul de les dues files: es el cas de la pagina 1, on la graella ha de
+   *  fer exactament l'alcada del bloc de la dreta (selector + fletxes). */
+  alcadaCarruselPx = null,
   isPortraitTablet = false,
   isLandscapeTablet = false,
   fontBoost = 0,
@@ -410,7 +418,9 @@ export function CercadorDibuixosGraella({
   // la primera fila de pixels: es perdia de debò). Amb la finestra de
   // `alcadaFila * 2` hi caben les dues files i el seu buit, i la fila de dalt
   // no hi toca la vora.
-  const alcadaCarrusel = carrusel ? alcadaFila * 2 : 0;
+  const alcadaCarrusel = carrusel
+    ? (Number.isFinite(alcadaCarruselPx) && alcadaCarruselPx > 0 ? alcadaCarruselPx : alcadaFila * 2)
+    : 0;
   // Una peça per clic de fletxa (mig pas: les peces van mig pas una de l'altra).
   const unPas = pas / 2;
 
@@ -421,7 +431,27 @@ export function CercadorDibuixosGraella({
   // desplac,ament el governa aquest estat. El gest es d'ARROSSEGAR (pointer
   // events, que tambe son els del dit) i, al desktop, dos botons de fletxa
   // junts en un costat; a les tauletes no hi son (ho va dir l'amo).
-  const [desplac, setDesplac] = useState(0);
+  // EL DESPLAÇAMENT, EN DUES PARTS: LA BASE I EL GEST (26/09/2026, pagina 1).
+  //
+  // La base la governa qui mana del carrusel: la colleccio activa (que el
+  // centra, vegeu mes avall) o, a la pagina 1, el comptador de passos de les
+  // fletxes del bloc de la dreta (`desplacamentPassos`). El GEST (arrossegar,
+  // rodeta i les fletxes de la pagina 2) suma el seu propi desplaçament a
+  // sobre. Aixi les dues coses no es trepitgen i no cal posar la base a cap
+  // efecte (que era el que provocava un `setState` dins d'un efecte).
+  const [desplacBase, setDesplacBase] = useState(0);
+  const [desplacGest, setDesplacGest] = useState(0);
+  const [baseExternaVista, setBaseExternaVista] = useState(0);
+  // Quan la base canvia (els passos de les fletxes de la pagina 1), el gest es
+  // refa a partir d'on era la posicio de debò, perque el salt no es vegi. Va al
+  // cos del render (patro de React per a l'estat derivat de les props) i no a
+  // cap efecte.
+  const baseExterna = desplacamentPassos * unPas;
+  if (baseExternaVista !== baseExterna) {
+    setBaseExternaVista(baseExterna);
+    setDesplacBase(baseExterna);
+    setDesplacGest((v) => v + (desplacBase - baseExterna));
+  }
   const arrossegant = useRef(null);
   const haArrossegat = useRef(false);
   const ambFletxes = carrusel && !isPortraitTablet && !isLandscapeTablet;
@@ -543,6 +573,7 @@ export function CercadorDibuixosGraella({
 
   // El desplaçament efectiu es el residu dins una volta: aixi la tira pot
   // avançar (o retrocedir) sense fi i sempre cau dins de les dues copies.
+  const desplac = desplacBase + desplacGest;
   const desplacEf = periode > 0 ? ((desplac % periode) + periode) % periode : 0;
   const caixaCarrusel = () => graellaRef?.current || null;
 
@@ -556,7 +587,7 @@ export function CercadorDibuixosGraella({
     const rodeta = (e) => {
       e.preventDefault();
       const d = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
-      setDesplac((v) => v + d);
+      setDesplacGest((v) => v + d);
     };
     el.addEventListener('wheel', rodeta, { passive: false });
     return () => el.removeEventListener('wheel', rodeta);
@@ -597,12 +628,22 @@ export function CercadorDibuixosGraella({
       if (!finestra) return;
       const objectiu = centre - finestra / 2;
       // La volta mes curta: la mateixa posicio nome's que amb la volta que toca.
-      setDesplac((v) => objectiu + Math.round((v - objectiu) / periode) * periode);
+      setDesplacBase(objectiu);
     };
     centra();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeCollection, activeSubcollection, carrusel, periode, unPas, dibuixPx]);
 
+  // EL DESPLAÇAMENT DEL CARRUSEL, GOVERNAT DE FORA (26/09/2026, pagina 1).
+  //
+  // A la pagina 1 les fletxes no viuen dins d'aquesta graella: son al bloc de la
+  // dreta (`BlocDretaPagina1`), a l'altra banda de la filera. El pare porta el
+  // comptador de passos i aqui se sincronitza el desplaçament amb ell. Cada pas
+  // es `unPas` (mig periode d'una peça), la mateixa unitat que el gest i les
+  // fletxes de la pagina 2.
+  //
+  // Nomes quan canvia el nombre de passos: el gest i la rodeta segueixen manant
+  // i no es trepitgen.
   const onPointerDown = (e) => {
     if (!carrusel) return;
     // NO es captura el punter aqui. Capturar-lo en tocar fa que el CLIC
@@ -623,7 +664,7 @@ export function CercadorDibuixosGraella({
         a.capturat = true;
       }
     }
-    setDesplac(a.inici - dx);
+    setDesplacGest(a.inici - dx - desplacBase);
   };
   const onPointerUp = () => { arrossegant.current = null; };
   // Un arrossegament NO es un clic: si el dit o el ratoli s'ha mogut, la peça
@@ -816,8 +857,8 @@ export function CercadorDibuixosGraella({
           }}>
             <FirstContactDibuix09Buttons
               vertical
-              onPrev={() => (onCarouselStep ? onCarouselStep(-1) : setDesplac((v) => v - unPas))}
-              onNext={() => (onCarouselStep ? onCarouselStep(1) : setDesplac((v) => v + unPas))}
+              onPrev={() => (onCarouselStep ? onCarouselStep(-1) : setDesplacGest((v) => v - unPas))}
+              onNext={() => (onCarouselStep ? onCarouselStep(1) : setDesplacGest((v) => v + unPas))}
             />
           </div>
         ) : null}

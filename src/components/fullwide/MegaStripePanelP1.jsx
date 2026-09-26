@@ -1,7 +1,10 @@
-import { useEffect, useId, useLayoutEffect, useRef, useState } from 'react';
+import { useEffect, useId, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import MegaColumn from './MegaColumn.jsx';
 import ClicAreaOverlayP1 from './ClicAreaOverlayP1.jsx';
 import { CERCADOR_COLORS } from './CercadorTopBar.jsx';
+import { dibuixosGraella16x4 } from './CercadorTextRow.jsx';
+import GraellaDuesFileresPagina1 from './GraellaDuesFileresPagina1.jsx';
+import { SelectorQuadratPagina1, FletxesQuadratPagina1, MIDA_BLOC_DRETA_PAGINA1_PX } from './BlocDretaPagina1.jsx';
 import {
   STRIPE_DRAWING_CALIBRATIONS,
   PASSOS_ESCALA_GAP_DIBUIX_VERTICAL,
@@ -15,7 +18,7 @@ import {
 } from '../../config/stripeCalibrationsVertical';
 import { VECTOR_FRANJA_SAMARRETES, VECTOR_FRANJA_SAMARRETES_01, VECTOR_FRANJA_VIEWBOX, VECTOR_FRANJA_VIEWBOX_OBERT, VECTOR_FRANJA_CONTINGUT } from '../../config/vectorFranja.js';
 import { desplacamentFranjaEscriptori } from '../../utils/mesuraMegaslide.js';
-import { carrilPx } from '../../utils/layoutMetrics.js';
+import { carrilLane, carrilPx, getBeltWidth, escalaMegaslide } from '../../utils/layoutMetrics.js';
 import { precarregaSiluetesSamarreta, textSiluetesSamarreta } from './siluetesSamarreta.js';
 import useEscalaFranjaCarril from '../../hooks/useEscalaFranjaCarril.js';
 import {
@@ -137,6 +140,9 @@ function useEmptyShirtMask(emptyTileIndices, shirtColor) {
 function MegaStripePanelP1({
   hideGrid,
   reserveGridSpace,
+  // Per canviar de colleccio des de la graella de la pagina 1 (el clic en un
+  // dibuix atenuat activa la seva colleccio, com a la pagina 2).
+  setActive,
   stripeImageSrc,
   active,
   resolvedMega,
@@ -232,6 +238,70 @@ function MegaStripePanelP1({
   const esEstenyFins1366 = typeof window !== 'undefined'
     && esBandaEstretaFranja({ ample: window.innerWidth, alt: window.innerHeight });
 
+  // LA COMPOSICIO DE LA PAGINA 1 A L'ESCRIPTORI (26/09/2026, B2 del bucle): la
+  // graella de DUES FILERES intercalades (la MATEIXA peça que la pagina 2,
+  // `GraellaDuesFileresPagina1`) a l'esquerra del carril i el bloc de la dreta
+  // (selector quadrat a dalt, fletxes quadrades a sota) a la vora dreta.
+  //
+  // L'amo ho va dir amb totes les xifres: «la graella intercalada ja la tens
+  // feta, nome's l'has de duplicar» i «les files han de ser identiques». O
+  // sigui que les peces son les de la pagina 2 (`dibuixosGraella16x4`), amb la
+  // mida de 45 unitats (`COSTAT_PECA_PAGINA1_PX`) i el carrusel que centra la
+  // colleccio activa. Les fletxes paginen aquest carrusel, com a la pagina 2.
+  //
+  // La malla de nou columnes (`MegaColumn`) NOME'S es queda per a la vista
+  // vertical (tauleta), on la graella viu a la taula i el panell va amb
+  // `hideGrid`.
+  const itemsGraella = useMemo(() => dibuixosGraella16x4(), []);
+  const [pageStart, setPageStart] = useState(0);
+  const totalGrupsPagina1 = itemsGraella.length;
+  const passaPagina1 = (pas) => {
+    if (!totalGrupsPagina1) return;
+    setPageStart((v) => (((v + pas) % totalGrupsPagina1) + totalGrupsPagina1) % totalGrupsPagina1);
+  };
+  // L'ESCALA DEL CARRIL, EN NUMERO. La graella nova la necessita per calcular
+  // el pas i l'alcada del carrusel (operacions matematiques: amb la cadena
+  // `calc(...)` que torna `carrilPx` el carrusel naixia amb alcada 0). A la
+  // vista vertical l'escala es 1, com el senyal de la casa.
+  const escalaCarril = (isPortraitTablet || isLandscapeTablet)
+    ? 1
+    : escalaMegaslide(getBeltWidth(typeof window !== 'undefined' ? window.innerWidth : 1920));
+  // L'ALCADA DE LA FILERA DE LA DRETA I EL SEU TOP, DECLARATS.
+  //
+  // La graella i el bloc de la dreta comparteixen la mateixa alcada
+  // (`carrilPx(110)`): la fila de dalt de la graella ha de caure al centre de
+  // la cel·la BLANC del selector i la de baix al de la COLOR, i a la pagina 2
+  // aixo vol dir dues files de 55 unitats.
+  //
+  // El top surt de la mateixa referencia que la resta de la composicio: el
+  // coixi de 40 del carril (`carrilLane(40)`) mes el desplaçament que ja
+  // aplica el `pageLift` del pare. Amb el `pageLift` de l'escriptori, la filera
+  // de dalt cau a 125,8 (la pagina 2 en fa 125,3). MESURAT AL CARRIL: 20 unitats
+  // de 1350 (`carrilLane(20)` = 16,9 px a 1920).
+  const topBlocDreta = carrilLane(20);
+  // EL GAP ENTRE LA GRAELLA I EL BLOC DE LA DRETA: 10 px de disseny (el
+  // mateix que la pagina 2 entre el retall dels dibuixos i les fletxes).
+  const GAP_PAGINA1_PX = 10;
+  // L'ALCADA DE LA FILERA: la del bloc de la dreta (selector quadrat de 110 +
+  // fletxes quadrades de 110, apilats). La graella fa exactament el mateix, i
+  // aixi la filera de dalt cau al centre de la cel·la BLANC i la de baix al de
+  // la COLOR, com a la pagina 2.
+  const ALCADA_FILERA_PAGINA1_PX = 110;
+
+  const alcadaFileraPx = ALCADA_FILERA_PAGINA1_PX * escalaCarril;
+  const gapDretaPx = GAP_PAGINA1_PX * escalaCarril;
+  const blocDretaPx = MIDA_BLOC_DRETA_PAGINA1_PX * escalaCarril;
+  // EL TOP DE LA FILERA, EN PX. 30,6 unitats de 1350 posen la filera de dalt
+  // de la graella al centre de la cel·la BLANC del selector (mesurat: abans
+  // queia 3,8 px per sota i el numero hi afegeix la diferencia).
+  const topFileraPx = 13.8 * escalaCarril;
+  // LA FRANJA PUJA EL QUE LA FILERA NO OCUPA. La seva posicio ve del flux (el
+  // coixi de la filera del panell), que estava calibrat per a la malla vella de
+  // nou columnes: mesurat, la franja de la p1 cau a y358 i la de la p2 a
+  // y241,5, o sigui 116,5 px massa avall. Amb aquest descompte les dues
+  // franges tornen a la mateixa alcada.
+  const ajustFranjaPx = 112.8 * escalaCarril;
+
   // En portrait tablet, la stripe està dins d'un viewport scrollable amb
   // overflowY hidden. Reduïm l'escala de la stripe perquè no es talli.
   useLayoutEffect(() => {
@@ -320,20 +390,29 @@ function MegaStripePanelP1({
         <div
           className="relative z-10 grid grid-cols-1 gap-10"
           style={{
-            // La graella fa el 100% del carril i es pinta al 94% (centrada): el
-            // bloc de dibuixos arrenca a la segona columna, o sigui al 13% del
-            // carril, que es on arrenca tambe la filera de la pagina 2.
-            // Sense desplaçaments: quan se li afegia un `translateX` per
-            // quadrar-lo amb la pagina 2, tota la filera (dibuixos, colors i
-            // colleccions) marxava cap a la dreta.
-            transform: 'scale(var(--hgGridFitScale, 0.94))',
+            // LA GRAELLA DE DUES FILERES I EL BLOC DE LA DRETA (26/09/2026,
+            // B2). A l'escriptori i a la tauleta apaisada la composicio es:
+            //
+            //   [ graella ................. ] 10 [ selector ]
+            //                                     [ fletxes  ]
+            //   [ franja de samarretes (amplada del carril) ]
+            //
+            // La graella arrenca a la vora esquerra del carril (x381) i el bloc
+            // de la dreta acaba a la dreta (x1524). La feina la fan
+            // `GraellaDuesFileresPagina1` (la MATEIXA graella de la pagina 2,
+            // amb la peça de 45 unitats) i `BlocDretaPagina1` (selector
+            // quadrat + fletxes quadrades).
+            //
+            // A la vista VERTICAL (tauleta vertical) es queda la malla de nou
+            // columnes de sempre: alla la graella viu a la taula.
+            transform: isPortraitTablet ? 'scale(var(--hgGridFitScale, 0.94))' : undefined,
             transformOrigin: 'top center',
             visibility: reserveGridSpace ? 'hidden' : undefined,
             pointerEvents: reserveGridSpace ? 'none' : undefined,
           }}
           aria-hidden={reserveGridSpace ? true : undefined}
         >
-          {(resolvedMega[active] || []).map((col, idx) => (
+          {isPortraitTablet ? (resolvedMega[active] || []).map((col, idx) => (
             <MegaColumn
               key={`${active}-${idx}`}
               title={col.title}
@@ -368,7 +447,60 @@ function MegaStripePanelP1({
                 if (typeof onShirtClick === 'function') onShirtClick(active, it);
               }}
             />
-          ))}
+          )) : (
+            <div
+              data-filera-p1="1"
+              style={{
+                display: 'flex',
+                alignItems: 'flex-start',
+                width: '100%',
+                marginTop: `${topFileraPx}px`,
+              }}
+            >
+              <div style={{ flex: '1 1 0%', minWidth: 0, marginRight: `${gapDretaPx}px` }}>
+                <GraellaDuesFileresPagina1
+                  items={itemsGraella}
+                  desplacamentPassos={pageStart}
+                  activeCollection={active}
+                  escala={escalaCarril}
+                  alcadaCarruselPx={alcadaFileraPx}
+                  midaSelector={MIDA_BLOC_DRETA_PAGINA1_PX}
+                  onSelectGroup={(collection, subcollection, firstStripeItem) => {
+                    if (collection !== active) setActive?.(collection);
+                    setStripeOverlayOverrideActive(false);
+                    if (firstStripeItem) {
+                      if (collection === 'first_contact') setFirstContactSelectedItem(firstStripeItem);
+                      else if (collection === 'the_human_inside') setHumanInsideSelectedItem(firstStripeItem);
+                      else setSelectedItemByCollection((prev) => ({ ...prev, [collection]: firstStripeItem }));
+                      if (typeof onShirtClick === 'function') onShirtClick(collection, firstStripeItem);
+                    }
+                  }}
+                />
+              </div>
+              <div
+                data-bloc-dreta-p1="1"
+                style={{
+                  flex: '0 0 auto',
+                  width: `${blocDretaPx}px`,
+                  minWidth: 0,
+                }}
+              >
+                <SelectorQuadratPagina1
+                  showWhite={stripeVariantVisibility?.white !== false}
+                  showBlack={stripeVariantVisibility?.black !== false}
+                  showMulti={stripeVariantVisibility?.color !== false}
+                  selectedVariant={active === 'the_human_inside' ? humanInsideVariant : firstContactVariant}
+                  onWhite={() => { setStripeOverlayOverrideActive(false); setFirstContactVariant('white'); }}
+                  onBlack={() => { setStripeOverlayOverrideActive(false); setFirstContactVariant('black'); }}
+                  onMulti={() => { setStripeOverlayOverrideActive(false); setFirstContactVariant('color'); }}
+                />
+                <FletxesQuadratPagina1
+                  onPrev={() => passaPagina1(-1)}
+                  onNext={() => passaPagina1(1)}
+                />
+              </div>
+            </div>
+          )}
         </div>
       ) : null}
 
@@ -378,7 +510,7 @@ function MegaStripePanelP1({
           style={{
             // A la franja estreta (768-1366) la pàgina ja té els seus propis
             // ajustos de 10 px i l'ajust general no s'hi ha d'aplicar.
-            marginTop: compactLandscape ? '16px' : `${stripeRowPadPx}px`,
+            marginTop: compactLandscape ? '16px' : `calc(${stripeRowPadPx}px - ${ajustFranjaPx}px)`,
             paddingBottom: compactLandscape ? '8px' : `${stripeRowPadPx}px`,
             paddingLeft: `${stripeRowPadXPx?.left || 0}px`,
             paddingRight: `${stripeRowPadXPx?.right || 0}px`,

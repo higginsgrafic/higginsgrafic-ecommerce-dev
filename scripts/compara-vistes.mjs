@@ -122,7 +122,23 @@ const mesura = () => {
     carril: Number.parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--hg-mega-w')) || null,
     carrilL: (() => { const f = document.querySelector('[data-capcalera-fila="1"]'); return f ? +f.getBoundingClientRect().left.toFixed(1) : null; })(),
     carrilR: (() => { const f = document.querySelector('[data-capcalera-fila="1"]'); return f ? +f.getBoundingClientRect().right.toFixed(1) : null; })(),
-    fletxesR: (() => { const a = [...document.querySelectorAll('[data-carrusel="1"] #stripe-guide-right-arrow')].filter((el) => el.getBoundingClientRect().width > 0); return a.length ? +a[a.length - 1].getBoundingClientRect().right.toFixed(1) : null; })(),
+    // LA FLETXA DE LA PAGINA VISIBLE (26/09/2026). Des que la pagina 1 te el
+    // seu bloc de fletxes nou dins d'un carrusel, `document.querySelectorAll`
+    // en troba de la pagina 1 i de la 2: la de la 1 viu desplaçada una amplada
+    // de maquetacio i el seu `right` es negatiu (a 1024, -322). Nomes val la
+    // fletxa de la pagina que es veu: la seva VISTA cau dins la finestra.
+    fletxesR: (() => {
+      const amplada = window.innerWidth;
+      const a = [...document.querySelectorAll('[data-carrusel="1"] #stripe-guide-right-arrow')]
+        .filter((el) => el.getBoundingClientRect().width > 0)
+        .filter((el) => {
+          const vista = el.closest('[data-mega-page-viewport]');
+          if (!vista) return true;
+          const x = vista.getBoundingClientRect().left;
+          return x > -1 && x < amplada;
+        });
+      return a.length ? +a[a.length - 1].getBoundingClientRect().right.toFixed(1) : null;
+    })(),
     filesDibuixos: filesDibuixos.slice(0, 4),
     filesColors: filesColors.slice(0, 4),
   };

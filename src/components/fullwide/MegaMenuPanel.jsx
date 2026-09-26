@@ -278,6 +278,8 @@ export default function MegaMenuPanel({
   const propsFranjaP1 = {
     active: active,
     resolvedMega: resolvedMega,
+    // La graella de la pagina 1 tambe pot canviar de colleccio (B2).
+    setActive: setActive,
     showStripe: showStripe,
     isLandscapeTablet: isLandscapeTablet,
     stripeRowPadPx: stripeRowPadPx,
