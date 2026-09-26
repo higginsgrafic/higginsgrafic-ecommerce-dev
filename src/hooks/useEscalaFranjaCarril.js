@@ -1,6 +1,6 @@
 import { useLayoutEffect, useState } from 'react';
 import { factorFranjaCarril, ESCALA_CALIBRADA_FRANJA } from '../utils/franjaCarril';
-import { carrilDeclarat } from '../utils/layoutModel';
+import { carrilDeFinestra } from '../components/megaslide/geometriaMegaslide';
 import { getLayoutViewportWidth } from '../utils/layoutMetrics';
 
 /**
@@ -43,17 +43,14 @@ function ampladaObjectiu() {
   // panell ja obrint-se. El valor declarat es EXACTAMENT el que publicara el
   // header (3/5 de la finestra de layout, i la x centrada), o sigui que la
   // franja neix a la mida bona i la mesura de debò nome's confirma el mateix.
+  // El carril declarat (3/5 de la finestra de layout i la seva x) es el mateix
+  // que publicara el header: el calcul viu a `geometriaMegaslide.js`, amb la
+  // seva prova unitaria contra les xifres mesurades.
+  const declarat = carrilDeFinestra(getLayoutViewportWidth(), typeof window !== 'undefined' ? window.innerHeight || 0 : 0);
   let carril = Number.parseFloat(estil.getPropertyValue('--hg-mega-w'));
   let xCarril = Number.parseFloat(estil.getPropertyValue('--hg-mega-x'));
-  if (!Number.isFinite(carril) || carril <= 0) {
-    carril = carrilDeclarat({
-      ample: getLayoutViewportWidth(),
-      alt: typeof window !== 'undefined' ? window.innerHeight || 0 : 0,
-    }) || 0;
-  }
-  if (!Number.isFinite(xCarril) && carril > 0) {
-    xCarril = Math.round((getLayoutViewportWidth() - carril) / 2);
-  }
+  if ((!Number.isFinite(carril) || carril <= 0) && declarat) carril = declarat.carril;
+  if (!Number.isFinite(xCarril) && declarat) xCarril = declarat.x;
   const fletxes = [...document.querySelectorAll('[data-carrusel="1"] #stripe-guide-right-arrow')]
     .filter((el) => el.getBoundingClientRect().width > 0);
   const fletxa = fletxes[fletxes.length - 1];
