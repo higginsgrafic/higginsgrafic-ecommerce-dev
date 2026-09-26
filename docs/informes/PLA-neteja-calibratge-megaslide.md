@@ -549,6 +549,51 @@ torna a quedar on era: els dos sostres (232,9 i 222,9) no es mouen. Les proves
 de `visualOffsetYFranjaPagina2` i `topFranjaPagina2` nome's canvien a
 l'escriptori.
 
+
+### 10.5 La graella de la pagina 1, com la de la 2 (26/09/2026, pas seguent)
+
+**Fet i pujat:**
+
+- `3885df4` — el selector de la pagina 1 es quadrat i el de la 2 rectangle. El
+  bloc de BLANC/COLOR/NEGRE es compartit (`FirstContactDibuix00Buttons`) i el
+  `97e2bd7` li havia canviat la forma a tot arreu; ara la tria qui el posa amb
+  `format` (`quadrat` per defecte, `rectangle` a `MegaslidePagina2`).
+
+**Mesurat a 1920x946** (amb `node scripts/_tmp-files-2p.mjs`, temporal):
+
+| què (centre y) | pagina 1 | pagina 2 |
+|---|---|---|
+| fila de dibuixos de dalt | 146,3 (una sola fila) | **125,3** (peca 44,6) |
+| fila de dibuixos de baix | — | **164,9** (peca 44,6) |
+| cel·la BLANC | 110,5 | 125,9 |
+| cel·la COLOR | 146,3 | 164,9 |
+| cel·la NEGRE | 182,1 | 203,9 |
+
+O sigui: la graella de la p1 ha de passar a **dues fileres intercalades amb la
+peca de 44,6 px i els centres a 125,3 i 164,9**, i el selector de la p1 ja hi
+cau (146,3).
+
+**La recepta (una cosa per commit):**
+
+1. **La graella de dues fileres.** Reutilitzar el que ja fa
+   `CercadorDibuixosGraella` amb `carrusel` (la tira amb `left = i * pas / 2` i
+   les peces senars una fila avall), pero amb la mida de la peca FIXA (44,6 a
+   1920 = `carrilPx(45)`), no deduida de l'amplada del retall: a la p1 el
+   carril es 1143 i a la p2 la columna es 933, i amb la mida deduida les peces
+   de la p1 sortirien un 20 % mes grosses. El `top` de la finestra surt de
+   `carrilLane(40)` + `alcadaCarrusel/2 - peca/2`.
+2. **La graella de x381 fins al bloc de la dreta** (punt 1 de la seccio 10.3) i
+   **el selector fora de la malla**: avui el selector es la primera columna
+   (`CONTROL_TILE_BN`) i les fletxes l'ultima (`CONTROL_TILE_ARROWS`) de la
+   malla de nou columnes (`MegaColumn`); han de sortir-ne i anar a la vora dreta
+   del carril, un a sota de l'altre (seccio 10.2).
+3. L'alcada de la graella ha de ser la del bloc de fletxes (punt 5 de la
+   seccio 10.3), que amb el selector quadrat de 109,4 vol dir dues files de
+   ~54,7; aixo i el punt 1 s'han de quadrar junts.
+
+**Criteris:** el guio temporal de dalt per a les xifres i la bateria sencera
+(seccio 10.3). La pagina 2 no s'hi ha de moure.
+
 #### 10.3.1 Recepta per fer-ho (pels llocs exactes)
 
 1. **Treure el selector de la malla.** A `src/components/fullwide/MegaColumn.jsx`
