@@ -1,6 +1,6 @@
 # INFORME — la pàgina 2 del megaslide neix a la mida bona (graella i selector)
 
-**Data:** 25/09/2026 (nit) · **Branca:** `main` · **Commits:** `cfb635e`, `97a3656`, `3e24b43`, `aec0074`
+**Data:** 25/09/2026 (nit) · **Branca:** `main` · **Commits:** `cfb635e`, `97a3656`, `3e24b43`, `aec0074`, `0ea261d`
 
 Cinquena i sisena iteració del bucle d'estabilització de la pàgina 2. Són **dos
 problemes**, tots dos de la mateixa família (una mesura que arriba tard a qui
@@ -257,6 +257,59 @@ la filera no es mouen gens després del primer fotograma.
 col·leccions té la mateixa forma (primera passada a l'efecte de layout) però no
 mou res en obrir. Es deixa com està.
 
+## 4 quater. El que es pintava durant els primers 400 ms (`0ea261d`)
+
+L'amo: «Encara es mou la tira de colors i la segona fila de la graella», en
+obrir (amb la icona de cerca, recarregat amb F5).
+
+### Per què els meus probes no ho veien
+
+Els probes de posicions són **cecs durant els primers ~400 ms**: el fil principal
+està muntant el panell (React + 143 imatges) i les meves mostres no arriben a
+córrer. La primera mostra arriba quan ja està tot assentat, i per això deien «un
+sol estat pintat». La solució va ser una **sonda dins dels bucles**, que registra
+cada valor amb el seu instant (t0 = muntatge del panell):
+
+```
++  0 ms  midesGraella  dibuix 23,969  gapH 20,831  gapV 0      ← transitori
++ 31 ms  midesGraella  dibuix 29,756  gapH 25,194  gapV 0,335
++ 40 ms  midesGraella  dibuix 29,756  gapH 25,194  gapV 2,976  ← final
+```
+
+El primer valor surt de mesurar amb la filera encara sense alinear i la franja
+sense assentar: el **retall naixia a 71,9 px en comptes de 95,2** i, amb ell, la
+segona filera de dibuixos saltava **11 px** i la tira de colors i la resta de la
+filera, **23 px**. En el meu ordinador tot això es corregeix dins el mateix
+commit i no s'arriba a pintar; en el seu es pinta.
+
+### La correcció
+
+1. A `midesGraella.js`, el **pas vertical alineat** (`dibuix + gapV` = el pas
+   dels cercles) es declara **sempre**: no depèn de cap mesura de la pantalla.
+   El que depèn de la franja és només la **deducció** (si no hi cap, s'encongeix
+   el pas i després el dibuix).
+2. A `CercadorTextRow`, la **primera mesura no fa la deducció**, i la deducció
+   només s'aplica quan l'espai fins a la franja s'ha mesurat **dues vegades
+   igual** (la franja triga uns fotogrames a assentar-se), amb un **repàs
+   garantit als 400 ms** perquè una finestra baixa de debò s'encongeixi igualment.
+
+### Mesurat després
+
+| comprovació | resultat |
+|---|---|
+| primera mesura de la graella | **ja és la final** (retall 95,2) |
+| composició pintada en obrir (1920×946, 1512×900 DPR 2, 1440×800, 2560×1306) | **un sol estat** |
+| obertures en fred amb les files a lloc | **6 de 6**, a 0,02 px de les seves cel·les |
+| primer fotograma pintat a 8 finestres | files a 0,00–0,02 px de les seves cel·les, **un sol estat** |
+| tinta tallada | **0,00 px** (amb 0,5 px de marge) |
+| `vitest` / `compara-vistes` / `vite build` / `mesura-formats` | 514 ✓ / OK / OK / 0 i 0 |
+| clics de les 14 samarretes | 10/10 comparables |
+
+**L'únic canvi posterior al primer pintat que queda mesurat** és el marge de baix
+de la columna de col·leccions (156,15 → 127,84 px als 287 ms), que segueix la
+franja quan la seva escala acaba d'encaixar; no mou la llista (mesurat). No s'hi
+ha tocat perquè no hi ha repro de moviment visible.
+
 ## 5. El bucle de centratge
 
 - **El bucle de centratge continua sent un bucle** (dues fórmules que es miren
@@ -283,5 +336,9 @@ node scripts/_tmp-naixement-p2.mjs     # el primer fotograma PINTAT ja te les fi
 node scripts/_tmp-bimodal.mjs          # 6 obertures en fred: el bucle cau sempre al mateix lloc?
 node scripts/_tmp-obrir-tot.mjs        # en OBRIR: que es mou entre el primer fotograma pintat i el final
 ```
+
+Atenció: els probes de posicions són **cecs els primers ~400 ms** (el fil
+principal està muntant el panell). Per veure què passa allà cal una sonda dins
+dels bucles (es va fer i es va retirar) o mirar el valor de la PRIMERA mesura.
 
 Els tres són temporals i **no es comitegen**.
