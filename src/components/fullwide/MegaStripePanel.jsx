@@ -168,18 +168,69 @@ function generaVelDataUrl(text, opacitats, color = 'white') {
   if (!text || !Object.keys(mapa).length) return null;
   try {
     const doc = new DOMParser().parseFromString(text, 'image/svg+xml');
-    const paths = doc.querySelectorAll('.tshirt-outline');
-    paths.forEach((p, i) => {
+    const svg = doc.documentElement;
+    const paths = [...doc.querySelectorAll('.tshirt-outline')];
+    // EL VEL NO POT TACAR CAP SAMARRETA ACTIVA (26/09/2026).
+    //
+    // Les siluetes del full son mes amples que el pas de les cases (la maniga
+    // de la casa i arriba a la casa i+1: 241 de 204,7 unitats), i el vel d'una
+    // casa inactiva hi queia a sobre. Sobre una samarreta blanca no es veu,
+    // pero sobre el TINT d'una samarreta de color si: l'amo veia la maniga
+    // esquerra de la primera samarreta ACTIVA amb una taca blanca («el cantó
+    // esquerre»). Aqui el vel de cada casa inactiva es MASCARA amb les
+    // siluetes de les cases actives: on mana una samarreta activa, no hi ha
+    // vel. Els `paths` que no son al mapa son les actives.
+    const NS = 'http://www.w3.org/2000/svg';
+    const actives = paths.filter((_, i) => typeof mapa[i] !== 'number');
+    const vb = (svg.getAttribute('viewBox') || '').trim().split(/[\s,]+/).map(Number);
+    const vbW = Number.isFinite(vb[2]) ? vb[2] : Number(svg.getAttribute('width')) || 2866;
+    const vbH = Number.isFinite(vb[3]) ? vb[3] : Number(svg.getAttribute('height')) || 307;
+    let idMascara = null;
+    if (actives.length) {
+      idMascara = 'hgVelForaActives';
+      const defs = doc.createElementNS(NS, 'defs');
+      const mask = doc.createElementNS(NS, 'mask');
+      mask.setAttribute('id', idMascara);
+      mask.setAttribute('maskUnits', 'userSpaceOnUse');
+      mask.setAttribute('x', '0');
+      mask.setAttribute('y', '0');
+      mask.setAttribute('width', String(vbW));
+      mask.setAttribute('height', String(vbH));
+      const fons = doc.createElementNS(NS, 'rect');
+      fons.setAttribute('x', '0');
+      fons.setAttribute('y', '0');
+      fons.setAttribute('width', String(vbW));
+      fons.setAttribute('height', String(vbH));
+      fons.setAttribute('fill', '#FFFFFF');
+      mask.appendChild(fons);
+      for (const a of actives) {
+        const fora = a.cloneNode(true);
+        fora.setAttribute('fill', '#000000');
+        fora.setAttribute('fill-opacity', '1');
+        fora.removeAttribute('stroke');
+        fora.removeAttribute('class');
+        mask.appendChild(fora);
+      }
+      defs.appendChild(mask);
+      svg.insertBefore(defs, svg.firstChild);
+    }
+    for (const [i, p] of paths.entries()) {
       const op = mapa[i];
       if (typeof op !== 'number') {
         p.remove();
-        return;
+        continue;
       }
       p.setAttribute('fill', color);
       p.setAttribute('fill-opacity', String(op));
       p.removeAttribute('stroke');
       p.removeAttribute('class');
-    });
+      if (idMascara) {
+        const g = doc.createElementNS(NS, 'g');
+        g.setAttribute('mask', `url(#${idMascara})`);
+        p.parentNode.insertBefore(g, p);
+        g.appendChild(p);
+      }
+    }
     const serialized = new XMLSerializer().serializeToString(doc.documentElement);
     return `data:image/svg+xml,${encodeURIComponent(serialized)}`;
   } catch {
@@ -347,13 +398,21 @@ function MegaStripePanel({
   // silueta per casella on posar-lo. A la vista vertical ja hi ha els `path` de
   // la silueta dins l'SVG, i alla el vel s'hi posa per casella (`indices`).
   const clauVelInactives = Array.isArray(indicesSamarretesInactives) ? indicesSamarretesInactives.join(',') : '';
+  // Les cases amb vel (les que NO son de la colleccio activa) i les ACTIVES (la
+  // resta): el vel de les primeres es mascara amb les segones, perque la maniga
+  // d'una silueta arriba a la casa del costat (vegeu `generaVelDataUrl`).
+  const inactivesVel = new Set(
+    (Array.isArray(indicesSamarretesInactives) ? indicesSamarretesInactives : [])
+      .filter((i) => Number.isInteger(i) && i >= 0 && i < 14),
+  );
+  const activesVel = [];
+  for (let i = 0; i < 14; i++) { if (!inactivesVel.has(i)) activesVel.push(i); }
   const mapaVelInactives = {};
   if (!isPortraitTablet) {
-    for (const i of (Array.isArray(indicesSamarretesInactives) ? indicesSamarretesInactives : [])) {
-      if (Number.isInteger(i) && i >= 0 && i < 14) mapaVelInactives[i] = alfaVelSamarretaInactiva;
-    }
+    for (const i of inactivesVel) mapaVelInactives[i] = alfaVelSamarretaInactiva;
   }
   const velSamarretesInactivesUrl = useVelSamarretes(mapaVelInactives, `${clauVelInactives}|${alfaVelSamarretaInactiva}`);
+  const idMascaraVelActives = `hgVelForaActives-${idRetall}`;
 
   useEffect(() => {
     const handler = (ev) => {
@@ -814,6 +873,29 @@ function MegaStripePanel({
                             <path key={`hg-clip-${k}`} d={d} />
                           ))}
                         </clipPath>
+                        {/* EL VEL NO TACA LES SAMARRETES ACTIVES (26/09/2026):
+                            les siluetes de les cases actives, en negre, sobre un
+                            fons blanc. La silueta d'una casa es mes ampla que el
+                            pas de les cases (la maniga arriba a la del costat), i
+                            sense aixo el vel d'una casa inactiva tacava la
+                            samarreta activa del costat. Vegeu
+                            `generaVelDataUrl`, que fa el mateix amb la imatge. */}
+                        {inactivesVel.size > 0 ? (
+                          <mask
+                            id={idMascaraVelActives}
+                            style={{ maskType: 'luminance' }}
+                            maskUnits="userSpaceOnUse"
+                            x={0}
+                            y={0}
+                            width={VECTOR_FRANJA_VIEWBOX_OBERT.width}
+                            height={VECTOR_FRANJA_CONTINGUT}
+                          >
+                            <rect x={0} y={0} width={VECTOR_FRANJA_VIEWBOX_OBERT.width} height={VECTOR_FRANJA_CONTINGUT} fill="#FFFFFF" />
+                            {activesVel.map((k) => (
+                              <path key={`hg-vel-fora-${k}`} d={VECTOR_FRANJA_SAMARRETES[k]} fill="#000000" />
+                            ))}
+                          </mask>
+                        ) : null}
                       </defs>
                       {stripeImageSrc ? (
                         <image
@@ -920,14 +1002,15 @@ function MegaStripePanel({
                         const ajustGir = extrem ? 302.2 : 65.3;
                         const AJUST_VEL_Y = 1.6767;
                         return (
-                          <path
-                            key={`hg-vel-inactiva-${idx}`}
-                            d={a.d}
-                            transform={`translate(${a.tx}, ${a.ty - AJUST_VEL_Y})${girar ? ` translate(${ajustGir}, 0) scale(-1, 1)` : ''} ${a.transform}`}
-                            fill="#FFFFFF"
-                            fillOpacity={alfaVelSamarretaInactiva}
-                            clipRule="evenodd"
-                          />
+                          <g key={`hg-vel-inactiva-${idx}`} mask={`url(#${idMascaraVelActives})`}>
+                            <path
+                              d={a.d}
+                              transform={`translate(${a.tx}, ${a.ty - AJUST_VEL_Y})${girar ? ` translate(${ajustGir}, 0) scale(-1, 1)` : ''} ${a.transform}`}
+                              fill="#FFFFFF"
+                              fillOpacity={alfaVelSamarretaInactiva}
+                              clipRule="evenodd"
+                            />
+                          </g>
                         );
                       })}
                     </svg>
