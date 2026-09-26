@@ -113,6 +113,70 @@ xifra exacta de l'encallament i es passa a l'informe. **La sessio no s'atura.**
 *(Les voltes seguents s'apunta aqui: que s'ha fet, la mesura abans/despres, la
 bateria i el commit.)*
 
+### VOLTA 1 — A1 (feta, `731cf3d`)
+
+La columna de colleccions de la p2 es **un sol selector**.
+
+| què | abans | despres |
+|---|---|---|
+| columna | 120,2 x 248,4 a x1403,8 | igual (la caixa no es mou) |
+| pastilla | 120,2 x 24,9 (nome's la fila activa) | 120,2 x **248,4** (tota la columna) |
+| nom actiu | dins la fila 1 (y105,4) | **centrat** a la columna (y229,6) |
+| clics | 9 botons | 9 franges clicables (franja 9 -> MISCEL·LÀNIA, franja 3 -> PEMBERLEY) |
+
+Bateria: 576 proves, eslint 0 errors i 6 avisos (els de HEAD), build OK,
+`compara-vistes` OK (enllacs 0,01/0,32 a la vertical, 0/0 a 1440),
+`mesura-formats` 0 i 0, `_tmp-errors2` cap error.
+
+**DECISIO A1:** no es canvia la taula de `caixes` (la vista vertical): l'amo
+parla de la captura d'escriptori, i alla la columna es la de la filera
+(`CercadorColleccionsColumna` sense `caixes`). Es conserven les nou franges
+clicables perque `compara-vistes.mjs` segueix mesurant la columna del top del
+selector al bottom de la franja (les marques `data-colleccions-targeta`).
+
+### VOLTA 2 — A2 (feta, `8801ef2`)
+
+El bloc de fletxes perd el fons i els chevrons cauen al centre de la seva meitat.
+
+| què (bloc de la p2, 59,5x119) | abans | despres |
+|---|---|---|
+| fons del bloc | `rgb(249,250,251)` | `rgba(0,0,0,0)` |
+| chevron de dalt (cy) | 145,1 (meitat 135,2) | **135,2** (desviament 9,9 -> 0) |
+| chevron de baix (cy) | 184,8 (meitat 194,7) | **194,7** (desviament -9,9 -> 0) |
+| icona | 20x20 | 20x20 |
+
+Tambe s'ha tret el fons de `FletxesQuadratPagina1` (la peça nova de la p1, que el
+duplicava). Bateria: 576 proves, eslint 0 errors i 3 avisos a
+`firstContactPanels.jsx` (els mateixos que a HEAD) i net a
+`BlocDretaPagina1.jsx`, build OK, `compara-vistes` OK, `mesura-formats` 0 i 0,
+`_tmp-errors2` cap error.
+
+**DECISIO A2:** el canvi es fa al component COMPARTIT perque l'amo ha dit «el
+fons de les fletxes desapareix» sense distingir pagines, i la posicio 1/3-2/3 ja
+era incorrecta tambe a la p1 (alla el bloc es quadrat i 1/3 i 2/3 tambe queden
+desviats 9 px cap al mig). La peça nova de la p1 s'hi ha quadrat.
+
+### VOLTA 3 — A3 (feta, `dc59f7d`)
+
+La maniga de la franja passa per sobre del selector i una ombra els separa.
+
+| què (1920x946) | abans | despres |
+|---|---|---|
+| z de la capa de la franja | 1 | **4** |
+| banda de l'ombra | no hi era | x1401,8 y105,4 **5x248,4** |
+| costura (x1402..1403, y250) | 255,255,255 | **247 / 239** (degradat) |
+| vora dreta del contingut de franja | 1406,8 | 1406,8 (no es mou) |
+| esquerra de la columna | 1403,8 | 1403,8 (no es mou) |
+
+Bateria: 576 proves, eslint 0 errors i 13 avisos (els de HEAD: 6 + 7), build OK,
+`compara-vistes` OK, `mesura-formats` 0 i 0, `_tmp-errors2` cap error.
+
+**Nota (trampa apuntada):** la capa de la franja fa TOT el carril (1143) i el
+que es pinta (la tira) nome's 1048,8: la primera mesura de l'ombra va sortir a
+x376 (la vora de la capa) i amb `top: 0` al capdamunt de la pagina. S'ha de
+mesurar sobre `[data-stripe-visual-content="2"]` i sobre el top de la columna.
+
+
 ---
 
 # PLA — neteja de l'estructura de calibratge del megaslide
