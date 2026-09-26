@@ -3,6 +3,8 @@ import {
   carrilDeFinestra,
   ampladaFilaFranja,
   ampladaRetallGraella,
+  alcadaSelector,
+  alcadaCellaSelector,
   FRANJA_FITXER_AMPLADA,
   FRANJA_FITXER_ALCADA,
   FRANJA_FITXER_ASPECTE,
@@ -72,5 +74,21 @@ describe('ampladaRetallGraella', () => {
 
   it('a les classes amb regle propi (movil i tauleta vertical) torna null', () => {
     expect(ampladaRetallGraella(390, 844)).toBeNull();
+  });
+});
+
+describe('alcadaSelector', () => {
+  it('quadra amb el selector mesurat (120 x escala)', () => {
+    // Mesurat al navegador (alcada de `[data-stripe-buttonsbar="bn"]`): 119 /
+    // 89,06 / 93,59 / 159 a 1920 / 1440 / 1512 / 2560.
+    expect(alcadaSelector(120, 1339 / 1350)).toBeCloseTo(119.02, 2);
+    expect(alcadaSelector(120, 1002 / 1350)).toBeCloseTo(89.07, 2);
+    expect(alcadaSelector(120, 1053 / 1350)).toBeCloseTo(93.6, 2);
+    expect(alcadaSelector(120, 1789 / 1350)).toBeCloseTo(159.02, 2);
+  });
+
+  it('la cella es un terc de la pastilla', () => {
+    // El DOM mesura 119 px d'alcada: la cella, 39,67.
+    expect(alcadaCellaSelector(120, 1339 / 1350)).toBeCloseTo(119 / 3, 1);
   });
 });

@@ -10,7 +10,7 @@ import {
 } from './midesGraella.js';
 // L'amplada del retall (l'últim input mesurat de la graella) viu amb la resta
 // de geometria declarada del megaslide.
-import { ampladaRetallGraella } from '../megaslide/geometriaMegaslide.js';
+import { ampladaRetallGraella, alcadaCellaSelector } from '../megaslide/geometriaMegaslide.js';
 import { carrilPct, carrilLane, carrilPx, readRootCssNumber, getLayoutViewportWidth } from '../../utils/layoutMetrics.js';
 import { liniesDibuixos } from '../../utils/mesuraMegaslide.js';
 import { GRAELLA_DIBUIXOS_ESCALA_VERTICAL } from '../../config/stripeCalibrationsVertical.js';
@@ -539,7 +539,10 @@ export function CercadorDibuixosGraella({
       const linies = liniesDibuixos(el.closest('[data-carrusel="1"]'));
       if (!selector || !linies || linies.length < 2) return;
       const s = selector.getBoundingClientRect();
-      const cella = s.height / 3;
+      // LA CELLETA DEL SELECTOR, DECLARADA (26/09/2026): era l'ultima mesura
+      // d'aquest bucle (l'alcada del DOM partit per tres). La pastilla fa
+      // `carrilPx(midaSelector)` i les tres celes son iguals.
+      const cella = alcadaCellaSelector(midaSelector, readRootCssNumber('--hg-escala-mega', 1));
       const objectius = [s.top + cella / 2, s.top + cella * 1.5];
       const delta = [linies[0].centre - objectius[0], linies[1].centre - objectius[1]];
       if (Math.abs(delta[0]) < 0.5 && Math.abs(delta[1]) < 0.5) return;
@@ -573,7 +576,7 @@ export function CercadorDibuixosGraella({
       window.clearTimeout(t2);
       window.removeEventListener('resize', calcula);
     };
-  }, [carrusel, graellaRef]);
+  }, [carrusel, graellaRef, midaSelector]);
 
   // El desplaçament efectiu es el residu dins una volta: aixi la tira pot
   // avançar (o retrocedir) sense fi i sempre cau dins de les dues copies.

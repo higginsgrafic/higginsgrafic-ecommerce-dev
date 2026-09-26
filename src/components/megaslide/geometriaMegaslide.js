@@ -194,3 +194,25 @@ export function ampladaRetallGraella(ampleLayout, alcadaLayout) {
     - GRAELLA_DRETA_FLETXES_CARRIL_PX * escala
   );
 }
+
+/**
+ * L'ALCADA DEL SELECTOR I DE LES SEVES TRES CEL·LES, DECLARADA (26/09/2026)
+ * -----------------------------------------------------------------------------
+ * El contenidor del selector fa `carrilPx(midaSelector)` = `midaSelector x
+ * escala` (MegaslidePagina2), i les tres cel·les (BLANC, COLOR i NEGRE) fan la
+ * mateixa alcada. El bucle de les dues files de dibuixos ho MESURAVA del DOM
+ * (`selector.getBoundingClientRect().height`); aqui es declara.
+ *
+ * Comprovat: `120 x escala` dona 119,02 / 89,07 / 93,60 / 159,02 a 1920 / 1440
+ * / 1512 / 2560, i el DOM mesura 119 / 89,06 / 93,59 / 159.
+ */
+export function alcadaSelector(midaSelector, escala) {
+  if (!Number.isFinite(midaSelector) || midaSelector <= 0) return 0;
+  const e = Number.isFinite(escala) && escala > 0 ? escala : 1;
+  return midaSelector * e;
+}
+
+/** La cella del selector (BLANC, COLOR o NEGRE): un terc de la pastilla. */
+export function alcadaCellaSelector(midaSelector, escala) {
+  return alcadaSelector(midaSelector, escala) / 3;
+}
