@@ -88,6 +88,21 @@ export function FirstContactDibuix00Buttons({
   sliderInset = 3,
   sliderSideInset = null,
   compact = false,
+  // LA FORMA ES D'EN QUI EL POSA, I LES DUES PAGINES NO LA VOLEN IGUAL
+  // (26/09/2026, ho ha dit l'amo: «És el mateix selector? Han de ser diferents
+  // perquè un serà quadrat i l'altre rectangular»).
+  //
+  // El bloc es compartit, i el commit `97e2bd7` el va fer QUADRAT a tot arreu
+  // quan nome's tocava el de la pagina 1: la pagina 2, que es el punt estable,
+  // es va quedar amb el selector quadrat i havia de ser rectangle.
+  //
+  //   - `quadrat` (per defecte): `aspect-square w-full`, l'amplada la mana el
+  //     pare i l'alçada es la mateixa. Es el de la PAGINA 1 (109,4x109,4 a
+  //     1920x946).
+  //   - `rectangle`: `w-1/2 aspect-[1/2]`, la meitat d'amplada i el doble
+  //     d'alçada, que es la forma que la pagina 2 tenia abans de `97e2bd7`
+  //     (59,5x119 a 1920x946).
+  format = 'quadrat',
 }) {
   // Els noms dels acabats són els catalans (Blanc/Color/Negre) i es mostren en
   // majúscules; la resta de la botiga també els anomena així.
@@ -146,17 +161,19 @@ export function FirstContactDibuix00Buttons({
 
   return (
     <div
-      // QUADRAT (26/09/2026).
+      // LA FORMA, PER PARAMETRE (26/09/2026).
       //
       // El 24/09 es va fer la meitat d'amplada i el doble d'alçada
-      // (`w-1/2` + `aspect-[1/2]`); l'amo ha demanat de tornar-lo quadrat
-      // («torna'l quadrat»), o sigui que el bloc torna a ser `aspect-square
-      // w-full`: l'amplada la mana el pare i l'alçada es la mateixa.
+      // (`w-1/2` + `aspect-[1/2]`); el 26/09 (`97e2bd7`) l'amo va demanar de
+      // tornar-lo quadrat, pero allo era per a la PAGINA 1 i el bloc es
+      // compartit: la pagina 2 s'hi va quedar. Ara la forma la tria qui el posa
+      // (`format`), i per defecte es el quadrat de la pagina 1.
       //
       // Va alineat a l'ESQUERRA a posta (sense `mx-auto`): a la pagina 2 el
       // selector arrenca on arrenca el logo del header, i aixo no ha de canviar.
-      className="relative mt-2 aspect-square w-full"
+      className={`relative mt-2 ${format === 'rectangle' ? 'aspect-[1/2] w-1/2' : 'aspect-square w-full'}`}
       data-stripe-buttonbar="bn"
+      data-stripe-buttonbar-format={format}
       style={{
         // LE REQUADRE DE FONS ORIGINAL (24/09/2026). El selector va néixer amb
         // fons gris i contorn, i el commit `3f68cf2` (7/09) els va treure

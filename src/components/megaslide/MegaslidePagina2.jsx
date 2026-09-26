@@ -817,6 +817,12 @@ export default function MegaslidePagina2({
                 carrusel: no rep clics. Els rep la pastilla, que es qui es veu. */}
             <div style={{ width: '100%', height: '100%', pointerEvents: 'none', transform: `translateY(${topVisualAlignmentY + selectorCentratgeY}px)` }}>
               <FirstContactDibuix00Buttons
+                // EL SELECTOR DE LA PAGINA 2 ES RECTANGLE (26/09/2026): el bloc
+                // de BLANC/COLOR/NEGRE es compartit amb la pagina 1, que el vol
+                // quadrat, i per aixo la forma s'hi passa (vegeu
+                // `FirstContactDibuix00Buttons`). Aqui torna a ser el de sempre:
+                // la meitat d'amplada i el doble d'alçada.
+                format="rectangle"
                 onWhite={() => { setStripeOverlayOverrideActive(false); active === 'the_human_inside' ? setHumanInsideVariant('white') : setFirstContactVariant('white'); }}
                 onBlack={() => { setStripeOverlayOverrideActive(false); active === 'the_human_inside' ? setHumanInsideVariant('black') : setFirstContactVariant('black'); }}
                 onMulti={() => { setStripeOverlayOverrideActive(false); active === 'the_human_inside' ? setHumanInsideVariant('color') : setFirstContactVariant('color'); }}
