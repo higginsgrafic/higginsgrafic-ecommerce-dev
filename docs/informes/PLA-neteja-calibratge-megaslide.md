@@ -136,7 +136,7 @@ L'amo ho va dir: «Eliminar les mides manuals, també.» Inventari del que hi ha
 
 | què | quantes | on |
 |---|---|---|
-| desplaçament i escala de cada dibuix sobre la seva samarreta | **244 entrades** | `STRIPE_DRAWING_CALIBRATIONS` (`stripeCalibrations.js`) |
+| desplaçament i escala de cada dibuix sobre la seva samarreta | **238 → 35 entrades** (fet el 26/09) | `STRIPE_DRAWING_CALIBRATIONS` (`stripeCalibrations.js`) |
 | calibratge de la franja (dx, dy, escala) | 3 | `STRIPE_LAYOUT_DEFAULTS.stripe` |
 | overlay de la samarreta (hero, fitxes) | 3 + 3 | `SHIRT_DRAWING_OVERLAY_DEFAULTS`, `STRIPE_DRAWING_OVERLAY_DEFAULTS` |
 | passos de gap i marge de la vista vertical | 3 | `PASSOS_ESCALA_GAP_DIBUIX_VERTICAL`, `GAP_MOVIMENT_DIBUIX_VERTICAL` |
@@ -200,7 +200,7 @@ canvia el que es veu avui** (en el cas de la franja, un 4,6 % de mida).
 1. `geometriaMegaslide.js` amb els números declarats que ja quadren (carril, x,
    mides de la graella, amplada de la filera de la franja) + proves unitàries.
 2. L'escala de la franja declarada (fora el factor manual).
-3. Les 244 entrades per dibuix → la regla de les fraccions.
+3. ~~Les 244 entrades per dibuix → la regla de les fraccions.~~ **FET** (`0990d91`): 189 entrades de la banda fora del mapa, la regla declarada (`escalaDibuixFranja`, 80 unitats = 41 % del cos) i una prova que vigila que no hi tornin. Comprovat al navegador: `ncc-1701` 35,0 px (la regla) i `nx-01` 24,6 px (l'excepció, conservada).
 4. Els ajustos de 10/20 px i `FRANJA_AJUST_PX`.
 5. El HUD fora del camí de la geometria.
 
