@@ -342,3 +342,38 @@ vertical: `stripeRowPadXPx` (el coixi horitzontal del panell, que sí que és
 responsiu: 40 px a l'escriptori i 24 a la tauleta vertical) i les mides
 declarades que encara es confirmen al DOM amb un avís de desenvolupament
 (`ampladaRetallGraella`).
+
+## 8. Feina pendent (26/09/2026)
+
+### 8.1 Arrossegar amb el dit la tira de colors i la franja — PENDENT
+
+**Què demana l'amo (26/09/2026):** «que tant la tira de colors 14x1 (selector de
+colors) com la stripe es puguin moure amb el dit». Queda anotat aquí i **no
+s'ha començat**: primer s'ha d'acabar i donar per bona la pàgina 2.
+
+**Com està ara:**
+
+- **La franja** (`MegaStripePanel`) només té la **rodeta**: el panell escolta
+  `wheel` sobre la filera i en fa el pas (`onStripeStripWheel`, que ve de
+  `MegaslidePagina2` i mou `stripeStripOffset`, el desplaçament de la tira de 64
+  dibuixos). Amb el dit (touch) no fa res.
+- **La tira de colors** (`CercadorColorsGrid`, dins `CercadorTextRow`) té la
+  rodeta (`rodeta`, que passa a la barra del costat) i, a més, un **arrossegament
+  que tria el color que hi ha sota el dit** (`onPointerDown/onPointerMove` →
+  `triaAmbElDit`). O sigui que amb el dit canvia el color triat, però no
+  «llisca» la tira.
+
+**Què caldrà fer:** un gest d'arrossegar compartit (pointer events, que cobreixen
+ratolí i touch) que faci el mateix que la rodeta: un pas per cada pas de dit, amb
+un llindar per no confondre's amb un toc (que ha de seguir triant el color o el
+dibuix) ni amb el desplaçament vertical de la pàgina; i, si l'amo vol que
+«llisqui», el desplaçament continu de la tira de colors amb el dit. Caldrà
+comprovar-ho amb `deviceScaleFactor` i `hasTouch` al Playwright (i amb
+`_tmp-errors2.mjs`, que ja comprova que el clic segueix funcionant).
+
+### 8.2 El que encara espera confirmació de l'amo
+
+Els dos commits del vel (`3298b36`, el vel no taca mai una samarreta activa, i
+`7c189ca`, el vel cau a sobre de les samarretes) van sortir de mesures, però
+l'amo encara no els ha vist: si el vel continua fallant, cal saber **on** (quina
+casa, quina vista) i **què** s'hi veu.
