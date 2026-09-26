@@ -441,7 +441,14 @@ export function CercadorDibuixosGraella({
       const marge = selector.getBoundingClientRect().bottom - el.getBoundingClientRect().bottom;
       setMargeBaixFletxes((previ) => (previ !== null && Math.abs(previ - marge) < 0.5 ? previ : marge));
     };
-    calcula();
+    // LA PRIMERA PASSADA VA EN UN rAF (25/09/2026). A l'efecte de layout aquest
+    // fill corre ABANS que el bucle que centra el selector amb la filera, o
+    // sigui que mesurava el selector 20-42 px mes amunt i el bloc de fletxes hi
+    // queia a sobre; el repas de 250 ms ho desfeia i el bloc feia un salt de
+    // 20,6 px (1920), 38,7 (1512), 42 (1440) i 8 (2560) amb el panell ja
+    // obrint-se. El rAF arriba abans del primer pintat pero DESPRES dels efectes
+    // de layout: la mesura ja es la bona i el bloc neix a lloc.
+    const frame = requestAnimationFrame(calcula);
     // La composicio acaba d'encaixar despres del primer pintat (la fila es
     // mesura sola): es torna a mirar un parell de cops.
     const t1 = window.setTimeout(calcula, 250);
@@ -450,6 +457,7 @@ export function CercadorDibuixosGraella({
     const t2 = window.setTimeout(calcula, 400);
     window.addEventListener('resize', calcula);
     return () => {
+      cancelAnimationFrame(frame);
       window.clearTimeout(t1);
       window.clearTimeout(t2);
       window.removeEventListener('resize', calcula);
@@ -1335,7 +1343,14 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
   // barres, els px que els falten. Com la resta de mesures, s'acumula i es
   // torna a mirar quan la composicio acaba d'encaixar.
   const [desnivellColors, setDesnivellColors] = useState(0);
+  // El valor PINTAT, no el que s'ha decidit (vegeu el bucle de les dues files):
+  // s'actualitza DESPRES de pintar, i el bucle hi arrenca. Aixi dues passades
+  // que mesuren el mateix DOM donen el mateix objectiu i no se suma dues
+  // vegades.
   const desnivellColorsRef = useRef(0);
+  useEffect(() => {
+    desnivellColorsRef.current = desnivellColors;
+  }, [desnivellColors]);
   useLayoutEffect(() => {
     if (!compact) return undefined;
     const el = graellaRef.current;
@@ -1352,16 +1367,23 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
       const objectiu = s.top + (s.height / 3) * 2.5;
       const delta = (c.top + c.height / 2) - objectiu;
       if (Math.abs(delta) < 0.5) return;
-      desnivellColorsRef.current += delta;
-      setDesnivellColors(desnivellColorsRef.current);
+      setDesnivellColors(desnivellColorsRef.current + delta);
     };
-    calcula();
+    // LA PRIMERA PASSADA VA EN UN rAF (25/09/2026, ho va veure l'amo: «es mou la
+    // tira de colors»). A l'efecte de layout aquest fill corre ABANS que el bucle
+    // que centra el selector amb la filera, o sigui que l'objectiu encara era
+    // 19 px mes amunt (1920) i la tira hi queia a sobre; el repas de 250 ms ho
+    // desfeia i la tira feia un salt de 19 px (i de 37 px a 1512x900) amb el
+    // panell ja obrint-se. El rAF arriba abans del primer pintat pero DESPRES
+    // dels efectes de layout: la mesura ja es la bona i la tira neix a lloc.
+    const frame = requestAnimationFrame(calcula);
     const t1 = window.setTimeout(calcula, 250);
     // A 400 ms i no a 900: es just despres de l'animacio d'obertura (340 ms).
     // El repas tarda corregia despres que el panell sembles fet (25/09/2026).
     const t2 = window.setTimeout(calcula, 400);
     window.addEventListener('resize', calcula);
     return () => {
+      cancelAnimationFrame(frame);
       window.clearTimeout(t1);
       window.clearTimeout(t2);
       window.removeEventListener('resize', calcula);
