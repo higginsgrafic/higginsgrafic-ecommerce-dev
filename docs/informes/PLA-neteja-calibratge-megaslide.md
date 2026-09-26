@@ -130,6 +130,67 @@ cap xifra, es descarta (com es va fer amb la convergència amb `flushSync`).
 
 ---
 
+## 4 bis. Les mides manuals, i com treure-les (26/09/2026)
+
+L'amo ho va dir: «Eliminar les mides manuals, també.» Inventari del que hi ha:
+
+| què | quantes | on |
+|---|---|---|
+| desplaçament i escala de cada dibuix sobre la seva samarreta | **244 entrades** | `STRIPE_DRAWING_CALIBRATIONS` (`stripeCalibrations.js`) |
+| calibratge de la franja (dx, dy, escala) | 3 | `STRIPE_LAYOUT_DEFAULTS.stripe` |
+| overlay de la samarreta (hero, fitxes) | 3 + 3 | `SHIRT_DRAWING_OVERLAY_DEFAULTS`, `STRIPE_DRAWING_OVERLAY_DEFAULTS` |
+| passos de gap i marge de la vista vertical | 3 | `PASSOS_ESCALA_GAP_DIBUIX_VERTICAL`, `GAP_MOVIMENT_DIBUIX_VERTICAL` |
+| ajustos als components | 1+ | `FRANJA_AJUST_PX`, marges de 10/20 px |
+| valors desats al navegador (HUD) | ~30 claus | `useMegaStripeDebugState` → variables CSS |
+
+### La prova que es poden declarar
+
+Verificat avui contra les xifres mesurades a 1512×900 (DPR 2):
+
+```
+amplada de la filera de la franja, DECLARADA (altura × mides del fitxer): 852,05
+amplada de la filera, MESURADA al DOM:                                    852
+factor declarat (carril / amplada):                                       0,7580
+factor que s'aplica de debò:                                              0,7929
+```
+
+Els dos darrers difereixen **només** pel calibratge manual desat al navegador
+(`--megaStripeScale` = 1,159 en comptes del nominal 1,2125): 1,2125/1,159 =
+1,046. O sigui que la geometria declarada ja quadra al centèsim i el que hi
+sobra és el número calibrat a mà.
+
+### Les substitucions concretes
+
+1. **Les 244 entrades per dibuix → una regla**: el fitxer de la franja JA
+   declara la seva graella de samarretes (`FRACCIO_COSSOS_FRANJA = 2740/2866` i
+   `FRACCIO_MARGE_ESQUERRE_FRANJA = 65/2866`). La casa `i` de 14 comença a
+   `marge + i × cos`, i el dibuix s'hi centra. És una funció de `i` i del carril,
+   no 244 números.
+2. **L'escala de la franja → `carril / amplada declarada`** (l'amplada
+   declarada = altura declarada × les mides del fitxer, que ja són als atributs
+   de la imatge). Fora el factor manual.
+3. **L'overlay de la samarreta → les mateixes fraccions del fitxer** (el pit de
+   la samarreta és una zona coneguda de la imatge).
+4. **Els ajustos de 10/20 px i `FRANJA_AJUST_PX` → a la taula declarada** de
+   `geometriaMegaslide`, amb la prova unitària que els fixa.
+5. **El HUD i les seves ~30 claus desades → fora del camí de la geometria**
+   (pot quedar com a eina de diagnòstic, però que no publiqui variables que la
+   composició consumeixi).
+
+### Ordre
+
+Cada substitució es fa **sola**, amb la mesura abans/després (`compara-vistes`,
+els probes d'obertura i de càrrega, el comptador de textos/imatges) i amb el
+vist-i-plau de l'amo sobre el resultat visual, perquè **treure un calibratge
+canvia el que es veu avui** (en el cas de la franja, un 4,6 % de mida).
+
+1. `geometriaMegaslide.js` amb els números declarats que ja quadren (carril, x,
+   mides de la graella, amplada de la filera de la franja) + proves unitàries.
+2. L'escala de la franja declarada (fora el factor manual).
+3. Les 244 entrades per dibuix → la regla de les fraccions.
+4. Els ajustos de 10/20 px i `FRANJA_AJUST_PX`.
+5. El HUD fora del camí de la geometria.
+
 ## 5. Què NO es toca
 
 - `--hg-mega-w` i `--hg-mega-x`: tocar-los desquadra la franja (mesurat).
