@@ -43,11 +43,30 @@ Cada volta:
   encallar), i es passa al seguent punt de la llista. **No es comiteja mai** un
   canvi a mitges ni res que no hagis vist funcionar.
 - **Si un cami falla dues vegades, canvia de cami**: no insisteixis en la
-  mateixa estructura. Per a la pagina 1 hi ha **dos camins** i has de provar
-  els dos (seccio 2.B): (a) adaptar la malla de `MegaColumn`, i (b) **una filera
-  nova de trinca** a `MegaStripePanelP1` que no faci servir `MegaColumn` en
-  absolut (la graella duplicada de la p2 + el bloc de la dreta). El (b) es el
-  que l'amo ha demanat implicitament («l'has de substituir»).
+  mateixa estructura. Per a la pagina 1 hi ha **tres camins** i has de provar
+  els tres, en aquest ordre:
+  - **(a) Adaptar la malla** de `MegaColumn` (el que es va provar i es va
+    encallar: `carrilPx` no hi resol).
+  - **(b) Una filera nova de trinca** a `MegaStripePanelP1` que no faci servir
+    `MegaColumn` en absolut: la graella duplicada de la p2 + el bloc de la dreta.
+  - **(c) DUPLICAR LA PAGINA 2 SENCERA i substituir-hi nome's el que interessi.**
+    Es l'opcio que ha donat l'amo, i es la mes segura: la composicio de la
+    pagina 2 **ja te les files a les posicions bones** (les que l'amo vol
+    identiques), i per tant es pot clonar tal qual i canviar-hi nome's:
+    - el **selector** de l'esquerra (rectangle) → el **quadrat** de la dreta
+      (`SelectorQuadratPagina1`);
+    - les **fletxes** de l'esquerra → el **bloc quadrat** de la dreta
+      (`FletxesQuadratPagina1`);
+    - les **colleccions** i la **tira de colors** de la dreta (que a la pagina 1
+      no hi son) → fora;
+    - la **franja** (que la pagina 1 ja te muntada) → la seva;
+    - la **columna de l'esquerra** (el selector) → la vora esquerra del carril,
+      on hi va la graella.
+    Es pot fer amb una copia del bloc de `MegaslidePagina2` dins del panell de la
+    pagina 1 (`MegaStripePanelP1`), o extraient-lo a una peca compartida que
+    totes dues pagines facin servir. **Si tries aquest cami, mesura primer** el
+    `MegaStripePanelP1` i el `MegaslidePagina2` per saber exactament que cal
+    treure i que cal deixar.
 - **Si una mesura no dona el que toca, mesura el contenidor abans de culpar el
   calcul**: `getComputedStyle(el).getPropertyValue('--hg-mega-w')`,
   `getBoundingClientRect()` dels dos o tres ancestres, i `transform` de cadascun.
@@ -145,6 +164,13 @@ I despres, perque l'agent anterior ho va complicar:
 **El que falta es MUNTAR-HO** a `MegaStripePanelP1.jsx`: substituir la malla de
 nou columnes (`MegaColumn`, nome's per a la vista vertical) per la graella
 duplicada a l'esquerra i el bloc de la dreta a la vora dreta del carril.
+
+**Tens tres camins** (vegeu la seccio 0), i el tercer es el que ha donat l'amo:
+**duplicar la pagina 2 sencera** (`MegaslidePagina2` + `MegaStripePanel`) i
+substituir-hi nome's el selector i les fletxes (pels quadrats nous), treure'n
+les colleccions i la tira de colors, i deixar-hi la franja de la pagina 1. Es el
+mes segur perque les files de la p2 ja son a les posicions que l'amo vol
+identiques.
 
 **On es va encallar l'intent anterior, i la pista bona** (al pla, seccio 10.5):
 en muntar-ho, el carrusel es pintava amb **amplada i alçada ZERO**
