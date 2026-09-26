@@ -477,3 +477,42 @@ amb el selector i el bloc de fletxes a la dreta del carril i alineats entre
 ells, i la graella estesa des de la vora esquerra del carril fins a ells (amb el
 seu gap). El selector ja es quadrat (108x108, `97e2bd7`) i el bloc de fletxes
 tambe (109x109), de manera que ja hi quadren.
+
+### 10.3 Estat de la feina de la pagina 1 (26/09/2026, per continuar)
+
+**Fet i pujat:**
+
+- `97e2bd7` — el selector de la pagina 1 torna a ser quadrat (pastilla 108x108 a
+  1920x946; abans 53x108).
+
+**Objectiu d'aquesta feina (paraules de l'amo, seccio 10.2):** el selector i les
+fletxes alineats a la **vora dreta del carril** (x1524 a 1920x946), la graella
+estesa des de la vora esquerra (x381) fins a ells amb el seu gap, el selector al
+costat de la franja inferior, i la graella convertida en **dues fileres
+intercalades** (com la de la pagina 2) que ocupin tota l'alçada del bloc de
+fletxes.
+
+**Pendent (en ordre):**
+
+1. Selector i bloc de fletxes a la vora dreta del carril, un a sota de l'altre;
+   la graella de x381 fins a ells amb el gap de la pagina 2
+   (`carrilPx(midaSelector/2)` + `carrilPx(10)`, vegeu `reservaDreta` a
+   `CercadorTextRow.jsx`). El selector surt de la malla de nou columnes
+   (`MegaColumn`, on es `CONTROL_TILE_BN`) i va al costat de la franja.
+2. La graella de nou columnes passa a dues fileres intercalades com
+   `CercadorDibuixosGraella` (pagina 2), ocupant tota l'alçada del bloc de
+   fletxes.
+
+**Xifres d'abans** (1920x946, carril 1143 px, x381..1524), amb
+`node scripts/_tmp-p1-composicio.mjs`:
+
+    selector  pastilla 108x108 a x416   (dins la primera columna)
+    graella   x415 y65 1074x123         (nou columnes)
+    fletxes   bloc 109x109 a x1435..1544
+    franja    x358 y233 1049x112
+
+**Criteris de verificacio:** el guio temporal de dalt per a les xifres, la
+bateria sencera (`npx vitest run`, `npx eslint` als fitxers tocats,
+`npx vite build`, `npm run compara-vistes` OK, `node scripts/mesura-formats.mjs`
+0 i 0, `node scripts/_tmp-errors2.mjs` "cap error"), i la pagina 2 intacta
+(punt de recuperacio `26442f5`).
