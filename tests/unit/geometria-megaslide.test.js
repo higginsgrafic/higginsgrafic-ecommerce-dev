@@ -7,6 +7,7 @@ import {
   alcadaCellaSelector,
   alcadaCarruselGraella,
   centratgeSelectorY,
+  desnivellsLiniesGraella,
   FRANJA_FITXER_AMPLADA,
   FRANJA_FITXER_ALCADA,
   FRANJA_FITXER_ASPECTE,
@@ -113,5 +114,31 @@ describe('centratgeSelectorY', () => {
   it("l'alcada del carrusel es dues vegades la filera (peca 1,5x + gap)", () => {
     expect(alcadaCarruselGraella(29.7556, 2.9756)).toBeCloseTo(2 * (1.5 * 29.7556 + 2.9756), 6);
     expect(alcadaCarruselGraella(0, 0)).toBe(0);
+  });
+});
+
+describe('desnivellsLiniesGraella', () => {
+  it('a 1920 dona -2,55 i 5,38 (el bucle n\'aplicava -2,55 i 5,37)', () => {
+    const d = desnivellsLiniesGraella({
+      dibuix: 29.7556, gapV: 2.9756, carril: 1143, midaSelector: 120, escala: 1339 / 1350,
+    });
+    expect(d.primera).toBeCloseTo(-2.551, 2);
+    expect(d.segona).toBeCloseTo(5.383, 2);
+  });
+
+  it('a 1440 dona -1,90 i 4,03 (el bucle, -1,90 i 4,04)', () => {
+    const d = desnivellsLiniesGraella({
+      dibuix: 22.2667, gapV: 2.2267, carril: 855, midaSelector: 120, escala: 1002 / 1350,
+    });
+    expect(d.primera).toBeCloseTo(-1.904, 2);
+    expect(d.segona).toBeCloseTo(4.033, 2);
+  });
+
+  it('a 1366x768 (tauleta apaisada) dona 5,93 i 3,66', () => {
+    const d = desnivellsLiniesGraella({
+      dibuix: 31.343 / 1.5, gapV: 3.98, carril: 811, midaSelector: 112.8, escala: 1,
+    });
+    expect(d.primera).toBeCloseTo(5.934, 2);
+    expect(d.segona).toBeCloseTo(3.656, 2);
   });
 });

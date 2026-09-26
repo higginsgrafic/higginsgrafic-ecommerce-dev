@@ -10,9 +10,8 @@ import {
 } from './midesGraella.js';
 // L'amplada del retall (l'últim input mesurat de la graella) viu amb la resta
 // de geometria declarada del megaslide.
-import { ampladaRetallGraella, alcadaCellaSelector } from '../megaslide/geometriaMegaslide.js';
-import { carrilPct, carrilLane, carrilPx, readRootCssNumber, getLayoutViewportWidth } from '../../utils/layoutMetrics.js';
-import { liniesDibuixos } from '../../utils/mesuraMegaslide.js';
+import { ampladaRetallGraella, desnivellsLiniesGraella } from '../megaslide/geometriaMegaslide.js';
+import { carrilPct, carrilLane, carrilPx, readRootCssNumber, getLayoutViewportWidth, MEGASLIDE_REFERENCIA_PX } from '../../utils/layoutMetrics.js';
 import { GRAELLA_DIBUIXOS_ESCALA_VERTICAL } from '../../config/stripeCalibrationsVertical.js';
 import { FirstContactDibuix09Buttons } from './firstContactPanels.jsx';
 
@@ -488,84 +487,53 @@ export function CercadorDibuixosGraella({
   // filera no es mou i el bucle no balla.
   // LES DUES LINIES DE DIBUIXOS, CADA UNA CENTRADA AMB LA SEVA CEL·LA.
   //
-  // Aixo es MESURA i s'acumula: la mesura fa que les dues linies caiguin sobre
-  // la cel·la BLANC (la primera) i la COLOR (la segona) del selector, i es el
-  // que fa que les vistes vertical i horitzontal quadrin entre elles (ho vigila
-  // `compara-vistes`). No es pot declarar amb una constant: l'alçada de cel·la
-  // del selector canvia amb la vista.
+  // El desnivell fa que les dues linies caiguin sobre la cel·la BLANC (la
+  // primera) i la COLOR (la segona) del selector, i es el que fa que les vistes
+  // vertical i horitzontal quadrin entre elles (ho vigila `compara-vistes`).
+  // Es DECLARA (`desnivellsLiniesGraella`): els dos costats son mides del
+  // carril i del selector, i el bucle que les mesurava va desaparèixer el
+  // 26/09/2026.
   const [desnivellsLinies, setDesnivellsLinies] = useState({ primera: 0, segona: 0 });
-  // EL VALOR QUE EL DOM TÉ APLICAT, NO EL QUE S'HA DECIDIT (25/09/2026).
+  // LA FINESTRA TAMBE COBRA EL DESNIVELL (25/09/2026).
   //
-  // La ref s'actualitza DESPRÉS de pintar. Abans s'escrivia dins del mateix
-  // bucle, i això feia que dues passades que mesuraven el MATEIX DOM sumessin el
-  // mateix delta dues vegades: els temporitzadors de 250 i 400 ms, quan el fil
-  // principal va ocupat (obertura en fred), expiren junts i el navegador els
-  // executa a la mateixa tasca, o sigui que la segona passada mesura abans que
-  // React hagi pintat la primera. Mesurat: 3 de 6 obertures en fred acabaven amb
-  // les dues files 13,6 i 15,9 px per sota de les seves cel·les (el bucle
-  // arrencava de 0,9 i hi tornava a sumar el mateix −13,6).
-  //
-  // Partint del que està PINTAT, dues passades amb la mateixa mesura donen el
-  // mateix objectiu i la correcció és idempotent.
-  const desnivellsRef = useRef({ primera: 0, segona: 0 });
-  useEffect(() => {
-    desnivellsRef.current = desnivellsLinies;
-  }, [desnivellsLinies]);
-  // LA FINESTRA TAMBE COBRA EL DESNIVELL MESURAT (25/09/2026).
-  //
-  // Les dues files es col·loquen MESURADES (aquest bucle les centra a les
-  // cel·les BLANC i COLOR del selector) i la finestra es DECLARA
-  // (`alcadaFila * 2`). Quan la fila de dalt puja (`top: -primera`), el seu
-  // capdamunt queda per sobre de la vora de la finestra i el retall
-  // (`overflow: hidden`) se'n menja la primera fila de pixels: mesurat a 1920, la
-  // fila puja 0,89 px i els dibuixos tenen tinta al primer pixel natural, o
-  // sigui que es tallava tinta de debò.
+  // Les dues files es col·loquen amb el desnivell DECLARAT
+  // (`desnivellsLiniesGraella`, que les centra a les cel·les BLANC i COLOR del
+  // selector) i la finestra es DECLARA (`alcadaFila * 2`). Quan la fila de dalt
+  // puja (`top: -primera`), el seu capdamunt queda per sobre de la vora de la
+  // finestra i el retall (`overflow: hidden`) se'n menja la primera fila de
+  // pixels: mesurat a 1920, la fila puja 0,89 px i els dibuixos tenen tinta al
+  // primer pixel natural, o sigui que es tallava tinta de debò.
   //
   // El que es fa es pujar la CAIXA del retall el que la fila s'ha enfilat i
   // baixar-ne el contingut el mateix (el marge de la tira): les peces no es mouen
   // gens, nome's la vora de dalt de la finestra.
   //
-  // I s'hi afegeix la TOLERANCIA DEL BUCLE (0,5 px, la que el fa parar): el bucle
-  // pot deixar la fila mig pixel mes amunt del seu punt fix, i amb la vora a ras
-  // (`0,00 px`) un arrodoniment de pixel de pantalla encara podria pelar-ne un.
+  // I s'hi afegeix la TOLERANCIA (0,5 px): el desnivell pot deixar la fila mig
+  // pixel mes amunt del seu punt fix, i amb la vora a ras (`0,00 px`) un
+  // arrodoniment de pixel de pantalla encara podria pelar-ne un.
   const sobreixDalt = carrusel ? Math.max(0, desnivellsLinies.primera) + 0.5 : 0;
   useLayoutEffect(() => {
     if (!carrusel) return undefined;
-    const el = graellaRef.current;
-    if (!el) return undefined;
+    // EL DESNIVELL DE LES DUES FILES, DECLARAT (26/09/2026). Abans es mesuraven
+    // els centres de les files i els de les cel·les BLANC i COLOR del selector i
+    // s'anaven igualant (amb `liniesDibuixos`); ara surt de
+    // `desnivellsLiniesGraella`. Es queden el rAF i els repassos de 250/400 ms
+    // perque tambe refresquen el valor quan canvia la finestra (les variables
+    // del carril no provoquen cap re-render).
     const calcula = () => {
-      const pagina = el.closest('[data-mega-page-viewport="2"]');
-      const selector = pagina?.querySelector('[data-p2-color-selector] [data-stripe-buttonbar="bn"]');
-      const linies = liniesDibuixos(el.closest('[data-carrusel="1"]'));
-      if (!selector || !linies || linies.length < 2) return;
-      const s = selector.getBoundingClientRect();
-      // LA CELLETA DEL SELECTOR, DECLARADA (26/09/2026): era l'ultima mesura
-      // d'aquest bucle (l'alcada del DOM partit per tres). La pastilla fa
-      // `carrilPx(midaSelector)` i les tres celes son iguals.
-      const cella = alcadaCellaSelector(midaSelector, readRootCssNumber('--hg-escala-mega', 1));
-      const objectius = [s.top + cella / 2, s.top + cella * 1.5];
-      const delta = [linies[0].centre - objectius[0], linies[1].centre - objectius[1]];
-      if (Math.abs(delta[0]) < 0.5 && Math.abs(delta[1]) < 0.5) return;
-      // L'objectiu es calcula des del valor PINTAT (`desnivellsRef`, que
-      // s'actualitza despres de pintar): dues passades que mesuren el mateix DOM
-      // donen el mateix objectiu, i no se suma dues vegades.
-      const pintat = desnivellsRef.current;
-      setDesnivellsLinies({
-        primera: pintat.primera + delta[0],
-        segona: pintat.segona + delta[1],
+      const d = desnivellsLiniesGraella({
+        dibuix: dibuixPx / 1.5,
+        gapV,
+        carril: readRootCssNumber('--hg-mega-w', MEGASLIDE_REFERENCIA_PX),
+        midaSelector,
+        escala: readRootCssNumber('--hg-escala-mega', 1),
       });
+      setDesnivellsLinies((previ) => (
+        Math.abs(previ.primera - d.primera) < 0.01 && Math.abs(previ.segona - d.segona) < 0.01
+          ? previ
+          : d
+      ));
     };
-    // LA PRIMERA PASSADA VA EN UN rAF, NO A L'EFECTE DE LAYOUT (25/09/2026).
-    //
-    // Les dues files neixen a lloc i el que les acaba de quadrar és aquesta
-    // primera passada. A l'efecte de layout la mesura era falsa: aquest efecte és
-    // d'un fill i corre ABANS que el bucle que centra el selector amb la filera
-    // (`selectorCentratgeY`), o sigui que el selector encara era 13,6 px més amunt
-    // i el bucle hi aplicava una correcció de +14,5 px que després havia de desfer
-    // (i que aixecava la fila de dalt 14,5 px, amb la tinta tallada, gairebé un
-    // segon en una obertura en fred). El rAF arriba abans del primer pintat però
-    // DESPRÉS dels efectes de layout: el selector ja hi és centrat, la mesura és
-    // la bona, i el bucle neix quadrat sense cap salt als 250 ms.
     const frame = requestAnimationFrame(calcula);
     const t1 = window.setTimeout(calcula, 250);
     const t2 = window.setTimeout(calcula, 400);
@@ -576,7 +544,7 @@ export function CercadorDibuixosGraella({
       window.clearTimeout(t2);
       window.removeEventListener('resize', calcula);
     };
-  }, [carrusel, graellaRef, midaSelector]);
+  }, [carrusel, graellaRef, dibuixPx, gapV, midaSelector]);
 
   // El desplaçament efectiu es el residu dins una volta: aixi la tira pot
   // avançar (o retrocedir) sense fi i sempre cau dins de les dues copies.
