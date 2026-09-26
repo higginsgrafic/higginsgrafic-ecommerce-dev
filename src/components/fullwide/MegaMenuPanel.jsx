@@ -132,44 +132,6 @@ export default function MegaMenuPanel({
   isPortraitTablet = false,
   isLandscapeTablet = false,
 }) {
-  // LA PORTA D'ENTRADA (26/09/2026).
-  //
-  // L'amo ho va veure en uns fotogrames: el megaslide s'ensenyava ABANS que els
-  // seus dibuixos existissin (els textos del seu lloc, les samarretes buides) i
-  // es completava davant seu. Mesurat: al primer fotograma pintat hi havia 0 de
-  // 128 dibuixos decodificats, i a l'animacio d'obertura (340 ms) aixo ho
-  // amagava nome's a les maquines rapides.
-  //
-  // Aqui el CONTINGUT del panell queda invisible (la caixa es queda, perque no
-  // es mogui res de lloc) fins que les peces que cauen dins el retall del
-  // carrusel tenen la seva imatge decodificada, amb un topall de 700 ms perque
-  // cap xarxa lenta no pugui deixar la pagina penjada.
-  const [aPunt, setAPunt] = useState(false);
-  useEffect(() => {
-    if (!active) return undefined;
-    let frame = 0;
-    const t0 = performance.now();
-    const comprova = () => {
-      const arrel = megaMenuRef?.current;
-      const clip = arrel ? arrel.querySelector('[data-carrusel="1"]') : null;
-      if (!arrel || !clip) { frame = requestAnimationFrame(comprova); return; }
-      const c = clip.getBoundingClientRect();
-      const peces = [...clip.querySelectorAll('button')].filter((b) => {
-        const r = b.getBoundingClientRect();
-        return r.width > 0 && r.right > c.left && r.left < c.right;
-      });
-      const fetes = peces.filter((b) => {
-        const im = b.querySelector('img');
-        return im && im.complete && im.naturalWidth > 0;
-      }).length;
-      const suficient = !peces.length || fetes >= Math.ceil(peces.length * 0.9);
-      if (suficient || performance.now() - t0 > 700) { setAPunt(true); return; }
-      frame = requestAnimationFrame(comprova);
-    };
-    frame = requestAnimationFrame(comprova);
-    return () => cancelAnimationFrame(frame);
-  }, [active, megaMenuRef]);
-
   if (!active) return null;
 
   // Dimensions i format de la finestra. Es calculen aquí dalt perquè els fan
@@ -385,9 +347,6 @@ export default function MegaMenuPanel({
           className="mx-auto max-w-[1350px] px-4 sm:px-6 lg:px-10 py-8"
           style={{
             overflow: 'visible',
-            // La caixa es queda (visibility conserva la maquetacio), o sigui
-            // que res no es mou de lloc: nome's no es veu fins que hi es tot.
-            visibility: aPunt ? undefined : 'hidden',
             marginTop: isPortraitTablet ? '-32px' : undefined,
             ...(megaFullScreen ? {
               minHeight: 'calc(100vh - 16px)',
