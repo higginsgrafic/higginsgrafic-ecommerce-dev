@@ -51,12 +51,21 @@ function canonicalKey(rawSrc) {
 function getTileCalibration(src, overrides) {
   if (!src) return { dx: 0, dy: 0, scale: 1 };
   const cKey = canonicalKey(src);
+  // L'OVERRIDE DEL HUD NOME'S EN DESENVOLUPAMENT (26/09/2026).
+  //
+  // El HUD desa les recalibracions al `localStorage` i aqui tenien prioritat
+  // sobre el que diu el projecte: en producció, un valor vell del navegador
+  // d'algú podia moure la composicio. El que es veu ha de ser sempre el que
+  // diu el modul de geometria; el HUD es una eina de taller i, per tant,
+  // nome's mana en desenvolupament.
   let lsMap = null;
-  try {
-    const raw = window.localStorage.getItem('MEGA_STRIPE_DRAWING_OVERLAY_TRANSFORMS_BY_SRC');
-    lsMap = raw ? JSON.parse(String(raw)) : null;
-  } catch {
-    lsMap = null;
+  if (import.meta.env.DEV) {
+    try {
+      const raw = window.localStorage.getItem('MEGA_STRIPE_DRAWING_OVERLAY_TRANSFORMS_BY_SRC');
+      lsMap = raw ? JSON.parse(String(raw)) : null;
+    } catch {
+      lsMap = null;
+    }
   }
   if (overrides && typeof overrides === 'object') {
     const fromOv = (cKey && overrides[cKey]) || overrides[src];

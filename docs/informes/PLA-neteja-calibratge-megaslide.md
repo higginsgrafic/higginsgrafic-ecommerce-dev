@@ -202,7 +202,7 @@ canvia el que es veu avui** (en el cas de la franja, un 4,6 % de mida).
 2. L'escala de la franja declarada (fora el factor manual).
 3. ~~Les 244 entrades per dibuix → la regla de les fraccions.~~ **FET** (`0990d91`): 189 entrades de la banda fora del mapa, la regla declarada (`escalaDibuixFranja`, 80 unitats = 41 % del cos) i una prova que vigila que no hi tornin. Comprovat al navegador: `ncc-1701` 35,0 px (la regla) i `nx-01` 24,6 px (l'excepció, conservada).
 4. Els ajustos de 10/20 px i `FRANJA_AJUST_PX`.
-5. El HUD fora del camí de la geometria.
+5. ~~El HUD fora del camí de la geometria.~~ **FET el 26/09** (la part que toca la composicio): l'override del HUD al `localStorage` (`MEGA_STRIPE_DRAWING_OVERLAY_TRANSFORMS_BY_SRC`) **nome's mana en desenvolupament**; en producció la composicio es sempre la del modul. El HUD es queda com a eina de taller.
 
 ## 5. Què NO es toca
 
