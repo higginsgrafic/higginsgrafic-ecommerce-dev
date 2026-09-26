@@ -1,4 +1,3 @@
-import { carrilPx } from '../../utils/layoutMetrics.js';
 import { CercadorDibuixosGraella } from './CercadorTextRow.jsx';
 
 /**

@@ -28,6 +28,15 @@ import {
   alcadaReservaGraellaPanell,
   alcadaReservaGraellaPanellCss,
   visualOffsetYFranjaPagina2,
+  PAGINA1_COSTAT_PECA_PX,
+  PAGINA1_GAP_DRETA_PX,
+  PAGINA1_MIDA_BLOC_DRETA_PX,
+  PAGINA1_ALCADA_FILERA_PX,
+  PAGINA1_TOP_FILERA_PX,
+  PAGINA1_AJUST_FRANJA_PX,
+  pagina1BlocDretaPx,
+  pagina1AmpladaGraellaPx,
+  pagina1AlcadaFileraPx,
   topFranjaPagina2,
   AJUST_BAIX_BLOC_FRANJA_PX,
   finestraCosVel,
@@ -426,5 +435,43 @@ describe('finestraCosVel', () => {
     expect(finestraCosVel(null)).toBeNull();
     expect(finestraCosVel({ x: 0, y: 0, w: 0, h: 306 })).toBeNull();
     expect(finestraCosVel({ x: 0, y: 0, w: NaN, h: 306 })).toBeNull();
+  });
+});
+
+describe('la composicio de la pagina 1 (B2, 26/09/2026)', () => {
+  it('la peca de la graella es la de la pagina 2 (45 unitats -> 44,63 px a 1920)', () => {
+    // L'escala del carril a 1920 mesurada es 0,99185.
+    expect(PAGINA1_COSTAT_PECA_PX * 0.99185).toBeCloseTo(44.63, 2);
+  });
+
+  it('la filera fa la suma del bloc de la dreta i les seves meitats (selector i fletxes)', () => {
+    expect(PAGINA1_ALCADA_FILERA_PX).toBe(PAGINA1_MIDA_BLOC_DRETA_PX);
+    // Dues fileres de dibuixos: la meitat de l'alcada, i el desnivell de la
+    // segona es mig pas (22,5 unitats).
+    expect(PAGINA1_ALCADA_FILERA_PX / 2).toBe(55);
+  });
+
+  it('l amplada del bloc de la dreta i la de la graella quadren amb el carril', () => {
+    const escala = 0.99185;
+    const carril = 1143; // mesurat a 1920
+    const bloc = pagina1BlocDretaPx(escala);
+    const graella = pagina1AmpladaGraellaPx(carril, escala);
+    expect(bloc).toBeCloseTo(109.1, 1);
+    // graella + gap de disseny + bloc = carril
+    expect(graella + PAGINA1_GAP_DRETA_PX * escala + bloc).toBeCloseTo(carril, 6);
+    // I la vora dreta del bloc cau a la del carril.
+    expect(graella + PAGINA1_GAP_DRETA_PX * escala + bloc).toBeCloseTo(1143, 6);
+  });
+
+  it('l alcada de la filera en px es la del bloc (mesurat: 97,9..317,9 a 1920)', () => {
+    expect(pagina1AlcadaFileraPx(0.99185)).toBeCloseTo(109.1, 1);
+  });
+
+  it('amb valors que no valen, no peta', () => {
+    expect(pagina1BlocDretaPx(null)).toBe(PAGINA1_MIDA_BLOC_DRETA_PX);
+    expect(pagina1BlocDretaPx(0)).toBe(PAGINA1_MIDA_BLOC_DRETA_PX);
+    expect(pagina1AmpladaGraellaPx(0)).toBe(0);
+    expect(pagina1AmpladaGraellaPx(null)).toBe(0);
+    expect(pagina1AlcadaFileraPx(NaN)).toBe(PAGINA1_ALCADA_FILERA_PX);
   });
 });

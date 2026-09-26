@@ -18,11 +18,16 @@ import {
 } from '../../config/stripeCalibrationsVertical';
 import { VECTOR_FRANJA_SAMARRETES, VECTOR_FRANJA_SAMARRETES_01, VECTOR_FRANJA_VIEWBOX, VECTOR_FRANJA_VIEWBOX_OBERT, VECTOR_FRANJA_CONTINGUT } from '../../config/vectorFranja.js';
 import { desplacamentFranjaEscriptori } from '../../utils/mesuraMegaslide.js';
-import { carrilLane, carrilPx, getBeltWidth, escalaMegaslide } from '../../utils/layoutMetrics.js';
+import { carrilPx, getBeltWidth, escalaMegaslide } from '../../utils/layoutMetrics.js';
 import { precarregaSiluetesSamarreta, textSiluetesSamarreta } from './siluetesSamarreta.js';
 import useEscalaFranjaCarril from '../../hooks/useEscalaFranjaCarril.js';
 import {
   AJUST_FRANJA_ESCRIPTORI_PX,
+  PAGINA1_AJUST_FRANJA_PX,
+  PAGINA1_GAP_DRETA_PX,
+  PAGINA1_TOP_FILERA_PX,
+  pagina1AlcadaFileraPx,
+  pagina1BlocDretaPx,
   DIBUIXOS_FRANJA_DX,
   DIBUIXOS_FRANJA_DY,
   DIBUIXOS_FRANJA_AMPLADA_NATURAL,
@@ -266,41 +271,19 @@ function MegaStripePanelP1({
   const escalaCarril = (isPortraitTablet || isLandscapeTablet)
     ? 1
     : escalaMegaslide(getBeltWidth(typeof window !== 'undefined' ? window.innerWidth : 1920));
-  // L'ALCADA DE LA FILERA DE LA DRETA I EL SEU TOP, DECLARATS.
-  //
-  // La graella i el bloc de la dreta comparteixen la mateixa alcada
-  // (`carrilPx(110)`): la fila de dalt de la graella ha de caure al centre de
-  // la cel·la BLANC del selector i la de baix al de la COLOR, i a la pagina 2
-  // aixo vol dir dues files de 55 unitats.
-  //
-  // El top surt de la mateixa referencia que la resta de la composicio: el
-  // coixi de 40 del carril (`carrilLane(40)`) mes el desplaçament que ja
-  // aplica el `pageLift` del pare. Amb el `pageLift` de l'escriptori, la filera
-  // de dalt cau a 125,8 (la pagina 2 en fa 125,3). MESURAT AL CARRIL: 20 unitats
-  // de 1350 (`carrilLane(20)` = 16,9 px a 1920).
-  const topBlocDreta = carrilLane(20);
-  // EL GAP ENTRE LA GRAELLA I EL BLOC DE LA DRETA: 10 px de disseny (el
-  // mateix que la pagina 2 entre el retall dels dibuixos i les fletxes).
-  const GAP_PAGINA1_PX = 10;
-  // L'ALCADA DE LA FILERA: la del bloc de la dreta (selector quadrat de 110 +
-  // fletxes quadrades de 110, apilats). La graella fa exactament el mateix, i
-  // aixi la filera de dalt cau al centre de la cel·la BLANC i la de baix al de
-  // la COLOR, com a la pagina 2.
-  const ALCADA_FILERA_PAGINA1_PX = 110;
-
-  const alcadaFileraPx = ALCADA_FILERA_PAGINA1_PX * escalaCarril;
-  const gapDretaPx = GAP_PAGINA1_PX * escalaCarril;
-  const blocDretaPx = MIDA_BLOC_DRETA_PAGINA1_PX * escalaCarril;
-  // EL TOP DE LA FILERA, EN PX. 30,6 unitats de 1350 posen la filera de dalt
-  // de la graella al centre de la cel·la BLANC del selector (mesurat: abans
-  // queia 3,8 px per sota i el numero hi afegeix la diferencia).
-  const topFileraPx = 13.8 * escalaCarril;
+  // ELS NUMEROS DE LA COMPOSICIO VIUEN A `geometriaMegaslide.js` (B4): aqui
+  // nome's es passen a px amb l'escala del carril.
+  const alcadaFileraPx = pagina1AlcadaFileraPx(escalaCarril);
+  const gapDretaPx = PAGINA1_GAP_DRETA_PX * escalaCarril;
+  const blocDretaPx = pagina1BlocDretaPx(escalaCarril);
+  // EL TOP DE LA FILERA, EN PX (mesurat: posa la filera de dalt de la graella
+  // al centre de la cel·la BLANC del selector).
+  const topFileraPx = PAGINA1_TOP_FILERA_PX * escalaCarril;
   // LA FRANJA PUJA EL QUE LA FILERA NO OCUPA. La seva posicio ve del flux (el
   // coixi de la filera del panell), que estava calibrat per a la malla vella de
-  // nou columnes: mesurat, la franja de la p1 cau a y358 i la de la p2 a
-  // y241,5, o sigui 116,5 px massa avall. Amb aquest descompte les dues
-  // franges tornen a la mateixa alcada.
-  const ajustFranjaPx = 112.8 * escalaCarril;
+  // nou columnes: amb aquest descompte la franja de la p1 cau a la mateixa
+  // alcada que la de la p2 (mesurat a 1920: 242,1 contra 241,5).
+  const ajustFranjaPx = PAGINA1_AJUST_FRANJA_PX * escalaCarril;
 
   // En portrait tablet, la stripe està dins d'un viewport scrollable amb
   // overflowY hidden. Reduïm l'escala de la stripe perquè no es talli.

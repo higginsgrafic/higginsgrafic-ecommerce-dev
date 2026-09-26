@@ -724,3 +724,94 @@ export function desplacamentCentratgeFranja({ quants, n, actual = 0, cases = FRA
   const objectiu = objectiuBase + Math.round((actual - objectiuBase) / n) * n;
   return Math.round(objectiu);
 }
+
+/**
+ * LA COMPOSICIO DE LA PAGINA 1, DECLARADA (26/09/2026)
+ * -----------------------------------------------------------------------------
+ * L'amo la va demanar amb totes les xifres: el selector (quadrat) a la vora
+ * DRETA del carril, la graella de dues fileres a l'ESQUERRA estirada fins a ell
+ * amb un gap de 10 px, i la graella i el bloc de la dreta de la mateixa alcada
+ * perque la filera de dalt caigui al centre de la cel·la BLANC i la de baix al
+ * de la COLOR (com a la pagina 2).
+ *
+ *   [ graella ............................. ] 10 [ selector ]
+ *                                                 [ fletxes  ]
+ *   [ franja de samarretes (amplada del carril) ]
+ *
+ * Tots els numeros son unitats de 1350 (la referencia del carril), com la resta
+ * de la casa.
+ *
+ * ABANS (mesurat a 1920x946 amb `_tmp-p1-composicio.mjs`): la graella era una
+ * malla de nou columnes de x415,3 a x1489,7 amb una sola filera de dibuixos, i
+ * el selector (109,4) i les fletxes (109,5) eren la primera i l'ultima columna
+ * d'aquella malla.
+ *
+ * DESPRES (mesurat amb `_tmp-b2-final.mjs`): la graella arrenca a x381 (la vora
+ * del carril), el bloc de la dreta acaba a x1524 (l'altra vora) amb 10 px de
+ * gap, i les peces fan 44,63 px, com les de la pagina 2.
+ */
+
+/** El costat de la peca de la graella, en unitats (45 = 44,63 px a 1920). Es
+ *  el MATEIX que el de la pagina 2: les files han de ser identiques. */
+export const PAGINA1_COSTAT_PECA_PX = 45;
+
+/** El gap entre peces dins d'una filera (la pagina 2 tambe va a 0). */
+export const PAGINA1_GAP_PECA_PX = 0;
+
+/** El gap entre la graella i el bloc de la dreta (10 px de disseny). */
+export const PAGINA1_GAP_DRETA_PX = 10;
+
+/** El costat del selector i del bloc de fletxes de la dreta. */
+export const PAGINA1_MIDA_BLOC_DRETA_PX = 110;
+
+/**
+ * L'alcada de la filera: la del bloc de la dreta (selector de 110 + fletxes de
+ * 110, apilats). Amb DUES fileres de dibuixos de 55 unitats, la de dalt cau al
+ * centre de la cel·la BLANC i la de baix al de la COLOR.
+ */
+export const PAGINA1_ALCADA_FILERA_PX = 110;
+
+/** El top de la filera dins el panell, en unitats (mesurat: 13,8 unitats a
+ *  1920 posen la filera de dalt al centre de la cel·la BLANC). */
+export const PAGINA1_TOP_FILERA_PX = 13.8;
+
+/** El descompte que s'aplica al coixi de la franja perque caigui a la mateixa
+ *  alcada que la de la pagina 2 (mesurat a 1920: 112,8 unitats). */
+export const PAGINA1_AJUST_FRANJA_PX = 112.8;
+
+/**
+ * L'amplada del bloc de la dreta, en px reals, a partir de l'escala del carril.
+ *
+ * @param {number} escala l'escala del carril (`--hg-escala-mega`)
+ * @returns {number} px
+ */
+export function pagina1BlocDretaPx(escala = 1) {
+  const e = Number.isFinite(escala) && escala > 0 ? escala : 1;
+  return PAGINA1_MIDA_BLOC_DRETA_PX * e;
+}
+
+/**
+ * L'amplada de la finestra del carrusel de la graella de la pagina 1: el carril
+ * menys el bloc de la dreta i el seu gap.
+ *
+ * @param {number} carril l'amplada del carril, en px
+ * @param {number} escala l'escala del carril
+ * @returns {number} px (0 si el carril no val)
+ */
+export function pagina1AmpladaGraellaPx(carril, escala = 1) {
+  const c = Number(carril);
+  if (!Number.isFinite(c) || c <= 0) return 0;
+  const e = Number.isFinite(escala) && escala > 0 ? escala : 1;
+  return c - (PAGINA1_MIDA_BLOC_DRETA_PX + PAGINA1_GAP_DRETA_PX) * e;
+}
+
+/**
+ * L'alcada de la filera de la pagina 1, en px reals.
+ *
+ * @param {number} escala l'escala del carril
+ * @returns {number} px
+ */
+export function pagina1AlcadaFileraPx(escala = 1) {
+  const e = Number.isFinite(escala) && escala > 0 ? escala : 1;
+  return PAGINA1_ALCADA_FILERA_PX * e;
+}
