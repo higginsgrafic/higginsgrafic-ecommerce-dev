@@ -20,6 +20,13 @@ cap altre. Els guions de Playwright el fan servir.
 
 ## 0. El bucle (aixo es el que has de fer, torn rere torn)
 
+**VOLTA 0 (nome's la primera, abans de tocar res):** llegeix el pla sencer i
+`COM-TREBALLO.md`, i escriu a `docs/informes/PLA-neteja-calibratge-megaslide.md`
+una **llista de treball numerada** amb els passos concrets d'aquesta feina: per
+a cada pas, el fitxer, la xifra d'abans i la xifra que hi ha d'anar. Comiteja-la.
+Aquesta llista es el teu quadern: cada volta hi marques el que has fet, i si et
+talla el context, la sessio seguent la troba allà.
+
 Cada volta:
 
 1. **Llegeix l'estat**: `git log --oneline -6` i `git status --short`. Si hi ha
@@ -74,6 +81,17 @@ Cada volta:
   resolen on es creu.
 - **Cada 4-5 commits**, torna a passar la bateria sencera i `compara-vistes`
   encara que no hagis tocat la p2.
+- **Escriu-ho gros i sovint**: cada mesura nova i cada decisio, al pla, **abans**
+  de passar al seguent pas (no al final). Si el context et talla, el pla es
+  l'unic que queda. No deixis mai una mesura nome's a la conversa.
+- **Commits petits**: un canvi, un commit, `git push`. Es la teva xarxa: si una
+  volta surt malament, `git log` et diu on eres.
+
+**TENS DUES O TRES HORES I NINGU NO RESPON.** No hi ha cap persona mirant: si
+arribes a un punt on normalment preguntaries, **decideix** (la pagina 2 mana),
+fes-ho, anota la decisio al pla amb la paraula DECISIO i segueix. Nomes pots
+parar quan es compleixi la condicio de sota; si el context se't trenca abans,
+deixa el pla i els commits al dia, que aixo es el que permetra continuar.
 
 **L'UNICA CONDICIO PER PARAR** (no n'hi ha cap altra):
 
