@@ -453,6 +453,9 @@ export default function MegaslidePagina2({
   // llargada de la llista (64 dibuixos) i el residu es modular.
   const [stripeStripOffset, setStripeStripOffset] = useState(0);
   const stripeStripOffsetRef = useRef(0);
+  // El dibuix que s'ha clicat en una samarreta VELADA, amb la casa on era: el
+  // fa servir l'ancoratge de sota perque no es mogui de sota el cursor.
+  const ancoratgeVelRef = useRef(null);
   const aplicaStripOffset = useCallback((f) => {
     const n = tiraFranja.srcs.length;
     if (!n) return;
@@ -528,6 +531,39 @@ export default function MegaslidePagina2({
     if (objectiu === actual) return;
     aplicaStripOffset(objectiu);
   }, [stripeStrip, tiraFranja, active, aplicaStripOffset]);
+
+  // EL DIBUIX CLICAT D'UNA SAMARRETA VELADA ES QUEDA A LA SEVA CASA
+  // (26/09/2026).
+  //
+  // Clicar una samarreta d'una altra colleccio fa que aquella colleccio passi a
+  // activa i que la tira es reconstrueixi amb el seu grup al principi. Si a
+  // sobre el grup es centra (l'efecte de dalt), el dibuix que el client te sota
+  // el cursor o el dit se li'n va unes cases i l'ha de tornar a buscar. Mesurat
+  // a 1920: la casa 1 passava a la 7 (sis cases).
+  //
+  // Aqui es dona el desplac,ament que deixa el `src` clicat EXACTAMENT a la
+  // casa on era. Va DESPRES de l'efecte de centratge, o sigui que mana; i deixa
+  // la clau del grup marcada perque el centratge no ho desfaci al render
+  // seguent.
+  useEffect(() => {
+    const anc = ancoratgeVelRef.current;
+    if (!anc) return;
+    ancoratgeVelRef.current = null;
+    const n = tiraFranja.srcs.length;
+    if (!n) return;
+    const k = tiraFranja.srcs.indexOf(anc.src);
+    if (k < 0) return;
+    let quants = 0;
+    for (const c of (tiraFranja.collections || [])) {
+      if (c !== active) break;
+      quants += 1;
+    }
+    grupActiuRef.current = `${active}|${quants}|${n}`;
+    const objectiuBase = k - anc.cell;
+    const actual = stripeStripOffsetRef.current;
+    const objectiu = objectiuBase + Math.round((actual - objectiuBase) / n) * n;
+    aplicaStripOffset(objectiu);
+  }, [tiraFranja, active, aplicaStripOffset]);
 
   // Quantes caselles porten dibuix: les altres son samarretes buides i a la
   // vista vertical s'atenuen amb un vel blanc.
@@ -677,12 +713,23 @@ export default function MegaslidePagina2({
     indicesSamarretesInactives: indicesSamarretesInactivesFranja,
     alfaVelSamarretaInactiva: VEL_SAMARRETA_INACTIVA,
     onStripeStripWheel: rodetaFranja,
-    // El clic d'una samarreta tambe ha d'ACTIVAR la seva colleccio i deixar-la
-    // centrada a la graella (25/09/2026, ho va demanar l'amo): el cami es el
-    // mateix que el de la icona atenuada de la graella, i el centratge el fa
-    // `CercadorTextRow` tot sol quan veu que la colleccio activa ha canviat.
-    onStripeStripSelect: (collection, subcollection) => {
-      if (collection && collection !== active) setActive(collection);
+    // El clic d'una samarreta ACTIVA la seva colleccio (25/09/2026, ho va
+    // demanar l'amo): el cami es el mateix que el de la icona atenuada de la
+    // graella.
+    //
+    // PERO SI LA SAMARRETA ES VELADA, LA FRANJA NO ES TORNA A CENTRAR
+    // (26/09/2026): el dibuix que el client te sota el cursor o el dit s'ha de
+    // quedar a la seva casa. El centratge automatic (l'efecte de
+    // `stripeStripOffset`) el desplac,ava sis cases (mesurat: la casa 1 passava
+    // a la 7) i el client l'havia de tornar a buscar. Amb l'ancoratge, la
+    // colleccio tambe queda activa pero el dibuix no es mou.
+    onStripeStripSelect: (collection, subcollection, info) => {
+      if (collection && collection !== active) {
+        if (info && typeof info.cell === 'number' && info.src) {
+          ancoratgeVelRef.current = { cell: info.cell, src: info.src };
+        }
+        setActive(collection);
+      }
       if (collection === 'austen') setAustenSubcollection(subcollection || null);
       else setAustenSubcollection(null);
     },
