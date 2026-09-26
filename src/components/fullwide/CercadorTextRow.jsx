@@ -1106,80 +1106,107 @@ export function CercadorColleccionsColumna({
   }
 
 
+  // LA COLUMNA ES **UN SOL SELECTOR** (26/09/2026, ho va demanar l'amo sobre la
+  // captura del 26/09 a les 22:16: «la columna de colleccions te una pastilla
+  // grisa nome's a la fila activa; la vull com UN SOL SELECTOR, una pastilla que
+  // ocupa tota la columna, amb el nom actiu dins»).
+  //
+  // La columna fa 120,2 x 248,4 px a 1920x946 i la pastilla activa en feia
+  // 120,2 x 24,9: el que canvia es que ara la pastilla ES la columna sencera.
+  //
+  // DECISIO: la columna es UN sol contenidor gris (la pastilla) i els nou noms
+  // continuen essent nou franges clicables (una per franja d'alçada, totes
+  // `data-colleccions-targeta` perque `compara-vistes.mjs` segueixi mesurant la
+  // columna del top del selector al bottom de la franja). El nom de la
+  // colleccio activa es pinta en una capa propia, CENTRAT dins la pastilla (no
+  // dins la seva franja: si no, amb la primera activa el nom cauria a dalt de
+  // tot). Aixi no es perd ni una area de clic i el nom actiu es el que es veu.
   return (
-    <div style={{
-      width: '100%',
-      transform,
-      paddingLeft,
-      // DEL TOP DEL SELECTOR AL BOTTOM DE LA SLIDE (24/09/2026, ho va demanar
-      // l'amo): la llista s'estira entre les dues vores. Amb `top: 0` arrencava
-      // amb el carrusel i acabava on acabava el seu contingut.
-      // I ELS ENLLACOS SON TARGETES (mateix dia): una graella de nou caselles
-      // iguals, amb la separacio de 3 px de la taula vertical, i cada enllac
-      // dins la seva targeta.
-      ...(absolut ? {
-        position: 'absolute',
-        left: 0,
-        right: 0,
-        top: -margeDalt,
-        bottom: -margeBaix,
-        display: 'grid',
-        gridTemplateRows: `repeat(${CERCADOR_COLLECTIONS.length}, 1fr)`,
-        rowGap: '3px',
-      } : null),
-    }}>
+    <div
+      style={{
+        width: '100%',
+        transform,
+        paddingLeft,
+        // DEL TOP DEL SELECTOR AL BOTTOM DE LA SLIDE (24/09/2026, ho va demanar
+        // l'amo): la llista s'estira entre les dues vores. Amb `top: 0` arrencava
+        // amb el carrusel i acabava on acabava el seu contingut.
+        ...(absolut ? {
+          position: 'absolute',
+          left: 0,
+          right: 0,
+          top: -margeDalt,
+          bottom: -margeBaix,
+        } : null),
+        // `position` el decideix `absolut` (i el pare, que porta
+        // `position: relative`, es qui fa de referència a la capa del nom).
+        display: 'flex',
+        flexDirection: 'column',
+        boxSizing: 'border-box',
+        // LA PASTILLA UNICA: el gris de sempre (#F1F3F5, el de la taula
+        // vertical), el radi de 3 i el coixi de 6 px de la dreta.
+        backgroundColor: '#F1F3F5',
+        borderRadius: '3px',
+        overflow: 'hidden',
+      }}
+    >
       {CERCADOR_COLLECTIONS.map(({ key, label }) => (
         <button
           key={key}
           type="button"
           // La marca que fa servir `scripts/compara-vistes.mjs` per mesurar la
-          // columna (del top del selector al bottom de la franja).
+          // columna (del top del selector al bottom de la franja): la primera
+          // franja dona el top i l'ultima el bottom, o sigui que la mesura es la
+          // de sempre.
           data-colleccions-targeta="1"
           onClick={() => onSelect?.(key)}
+          aria-current={key === activeKey ? 'true' : undefined}
           className="font-roboto-condensed"
           style={{
-            // LA TARGETA: la caixa grisa de la taula vertical (radi 3 i el
-            // coixi de 6 px), amb el nom enrasat a la dreta i centrat a dalt i
-            // a baix. El text no es pot escapar de la caixa.
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'flex-end',
-            width: '100%',
+            // Cada franja es clicable (l'area de clic de sempre) pero el nom
+            // nome's el pinta la capa de sota, centrat.
+            flex: '1 1 0%',
             minHeight: 0,
-            boxSizing: 'border-box',
+            display: 'block',
+            width: '100%',
             padding: '0 6px',
-            // EL FONS DE LA PASTILLA VA 20 px MES A LA DRETA (25/09/2026, ho va
-            // demanar l'amo: «Retalla la pastilla grisa de la columna 10 px per
-            // l'esquerra» i, tot seguit, «retalla 10 px més»).
-            //
-            // Es retalla NOME'S EL FONS: una vora esquerra transparent i
-            // `background-clip: padding-box`, que fa que el color només es pinti
-            // de la vora cap endins. La CAIXA no es toca, o sigui que ni el text
-            // ni l'area de clic no es mouen ni s'encongeixen (amb un `marginLeft`
-            // el text se n'anava i la zona de clic minvava).
             border: 0,
-            borderLeft: key === activeKey ? '20px solid transparent' : 0,
-            backgroundClip: key === activeKey ? 'padding-box' : undefined,
-            borderRadius: '3px',
-            // LA PASTILLA GRISA NOMES LA PORTA LA COLLECCIO ACTIVA
-            // (25/09/2026, ho va demanar l'amo: «Treu les pastilles grises
-            // excepte a la colleccio activa»). Abans la portaven totes nou, i
-            // allo feia que la columna semblés una graella de caixes en comptes
-            // d'una llista on se'n destaca una.
-            backgroundColor: key === activeKey ? '#F1F3F5' : 'transparent',
-            color: '#2B2B2B',
+            background: 'transparent',
             overflow: 'hidden',
-            fontSize: (isPortraitTablet || isLandscapeTablet) ? 'max(10px, 8px)' : `max(10px, ${carrilPx(11)})`,
-            fontWeight: key === activeKey ? 700 : 300,
-            lineHeight: 1.2,
-            textAlign: 'right',
-            whiteSpace: 'nowrap',
             cursor: 'pointer',
+            fontSize: (isPortraitTablet || isLandscapeTablet) ? 'max(10px, 8px)' : `max(10px, ${carrilPx(11)})`,
+            // LA SEPARACIO ENTRE FRANQUES: una línia fina que fa veure que la
+            // pastilla te nou zones clicables. Fora del requadre (inset) no es
+            // pinta.
+            boxShadow: 'inset 0 -1px 0 rgba(0, 0, 0, 0.08)',
           }}
         >
-          {etiquetaColleccio(label)}
+          <span style={{ visibility: 'hidden' }}>{etiquetaColleccio(label)}</span>
         </button>
       ))}
+      {/* EL NOM ACTIU, CENTRAT DINS LA PASTILLA. Va per sobre de les franges i
+          no rep clics (`pointerEvents: none`): el clic el rep la franja de
+          sota, que es qui te el `onClick`. */}
+      <div
+        aria-hidden="true"
+        className="font-roboto-condensed"
+        style={{
+          position: 'absolute',
+          inset: 0,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: '0 6px',
+          pointerEvents: 'none',
+          color: '#2B2B2B',
+          fontSize: (isPortraitTablet || isLandscapeTablet) ? 'max(10px, 8px)' : `max(10px, ${carrilPx(11)})`,
+          fontWeight: 700,
+          lineHeight: 1.2,
+          textAlign: 'center',
+          whiteSpace: 'nowrap',
+        }}
+      >
+        {etiquetaColleccio((CERCADOR_COLLECTIONS.find(({ key }) => key === activeKey) || CERCADOR_COLLECTIONS[0]).label)}
+      </div>
     </div>
   );
 }
