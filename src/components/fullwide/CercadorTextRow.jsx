@@ -1126,7 +1126,7 @@ export function CercadorColleccionsColumna({
   );
 }
 
-function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripeItem, hoveredStripeItem, onSelectGroup, onHoverItem, onHoverLeave, onCarouselStep, compact = false, selectedColor = 'white', onSelectColor, onSelectCollection, isPortraitTablet = false, isLandscapeTablet = false, fontBoost = 0, desplacamentVertical = 0, esquerra, midaSelector = 56 }) {
+function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripeItem, hoveredStripeItem, onSelectGroup, onHoverItem, onHoverLeave, onCarouselStep, compact = false, selectedColor = 'white', onSelectColor, onSelectCollection, isPortraitTablet = false, isLandscapeTablet = false, fontBoost = 0, desplacamentVertical = 0, esquerra, midaSelector = 56, alineacioY = 0 }) {
   // Ajust de la graella compacta a l'espai disponible (només desktop: les
   // tauletes mantenen la mida fixa de moment). Mesurem l'amplada de la columna
   // i el capdamunt de la franja de samarretes, i guardem la mida de dibuix i
@@ -1190,7 +1190,22 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
       observer?.disconnect();
       window.removeEventListener('resize', mesura);
     };
-  }, [compact, isPortraitTablet, isLandscapeTablet]);
+    // `alineacioY` ES UNA DEPENDENCIA DE DEBÒ (25/09/2026).
+    //
+    // El bucle d'alineació de la pagina 2 (`alignTopRowToPage1`, a
+    // MegaslidePagina2) mou aquesta filera amb `top`, i el desplaçament no es
+    // conegut fins que el bucle ha mesurat: al muntatge val 0 i tot seguit passa
+    // a -66,67 px (a 1920). Els efectes de layout dels fills van ABANS que els
+    // del pare, o sigui que la graella mesurava amb la filera encara a baix: la
+    // franja li quedava 47 px mes a prop, la branca d'alçada li encongia el
+    // dibuix un 20 % i la graella naixia petita (mesurat: la cella 35,77 i el
+    // retall 71,53) per corregir-se tot seguit (44,63 i 95,2). El
+    // ResizeObserver no ho salvava perque moure amb `top` no canvia cap mida.
+    //
+    // Amb l'alineacio a les dependències, quan el pare aplica el desplaçament la
+    // graella es torna a mesurar DINS el mateix commit (abans de pintar): el
+    // primer fotograma ja surt a la mida bona i no hi ha salt.
+  }, [compact, isPortraitTablet, isLandscapeTablet, alineacioY]);
 
   // LA COLUMNA DE COLLECCIONS, DEL TOP DEL SELECTOR AL BOTTOM DE LA STRIPE.
   //
