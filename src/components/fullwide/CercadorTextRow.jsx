@@ -8,7 +8,10 @@ import {
   midesGraellaCompacta,
   MARGE_ESQUERRA_DIBUIXOS_ESCRIPTORI_PX,
 } from './midesGraella.js';
-import { carrilPct, carrilLane, carrilPx, readRootCssNumber } from '../../utils/layoutMetrics.js';
+// L'amplada del retall (l'últim input mesurat de la graella) viu amb la resta
+// de geometria declarada del megaslide.
+import { ampladaRetallGraella } from '../megaslide/geometriaMegaslide.js';
+import { carrilPct, carrilLane, carrilPx, readRootCssNumber, getLayoutViewportWidth } from '../../utils/layoutMetrics.js';
 import { liniesDibuixos } from '../../utils/mesuraMegaslide.js';
 import { GRAELLA_DIBUIXOS_ESCALA_VERTICAL } from '../../config/stripeCalibrationsVertical.js';
 import { FirstContactDibuix09Buttons } from './firstContactPanels.jsx';
@@ -1270,7 +1273,23 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
           canvia = true;
         }
       } else {
-        const ampleAmple = el.clientWidth;
+        // L'AMPLADA DEL RETALL, DECLARADA (26/09/2026).
+        //
+        // Era l'ULTIM input mesurat de les mides de la graella (`el.clientWidth`):
+        // la resta ja son proporcions del carril. Ara surt de la finestra
+        // (`ampladaRetallGraella`) i el DOM nome's la confirma, amb un avis que
+        // nome's passa en desenvolupament.
+        const ampleDeclarat = ampladaRetallGraella(
+          getLayoutViewportWidth(),
+          window.innerHeight,
+        );
+        const ampleAmple = ampleDeclarat != null ? ampleDeclarat : el.clientWidth;
+        if (import.meta.env.DEV && ampleDeclarat != null && Math.abs(ampleDeclarat - el.clientWidth) > 0.5) {
+          console.warn('[megaslide] el retall declarat no quadra amb el DOM', {
+            declarat: ampleDeclarat,
+            dom: el.clientWidth,
+          });
+        }
         const daltGraella = el.getBoundingClientRect().top;
         const sostre = franja ? franja.getBoundingClientRect().top : null;
         // L'ESPAI FINS A LA FRANJA NOME'S QUAN ES REPETEIX (25/09/2026).
