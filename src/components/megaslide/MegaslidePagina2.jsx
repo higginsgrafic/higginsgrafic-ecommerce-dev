@@ -781,6 +781,13 @@ export default function MegaslidePagina2({
             // arrencaven on acaba el selector.
             esquerra={bnSliderSize ? `calc(${carrilPx(bnSliderSize / 2)} + ${carrilPx(10)})` : undefined}
             desplacamentVertical={40 - topGraellaColors}
+            // El desplaçament vertical d'aquesta filera, el que aplica el bucle
+            // d'alineació de sota. La graella el necessita com a dependència: la
+            // seva mesura (l'espai que li queda fins a la franja) en depèn i els
+            // efectes dels fills van ABANS que aquest bucle, o sigui que sense
+            // això mesurava amb la filera encara a baix i naixia un 20 % petita
+            // (vegeu CercadorTextRow).
+            alineacioY={topVisualAlignmentY}
             isPortraitTablet={isPortraitTablet}
             isLandscapeTablet={isLandscapeTablet}
             activeCollection={active}
