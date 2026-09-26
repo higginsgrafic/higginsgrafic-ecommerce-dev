@@ -129,11 +129,57 @@ tard.
 
 ---
 
-## 4. Què NO s'ha tocat (i per què)
+## 4. Els passos verticals, mesurats (l'amo va preguntar per què «no poden coincidir»)
 
-- **El pas de fila de la graella (47,59 px) i el de la cel·la del selector
-  (43,13 px) no poden coincidir tots dos** amb les mides declarades: 4,48 px de
-  diferència estructural. Ja estava detectat; espera decisió de disseny.
+La frase «el pas de fila de la graella (47,59) i el de la cel·la del selector
+(43,13) no poden coincidir» era **dolenta**. Les xifres de debò, mesurades a
+1920×946 i a 1440×800:
+
+| què | 1920×946 | 1440×800 |
+|---|---|---|
+| cel·la del selector Blanc/Color/Negre (`alçada / 3`) | 43,13 | 32,27 |
+| separació **pintada** entre les dues files de dibuixos | 43,12 | 32,27 |
+| `alcadaFila` **declarada** (peça 1,5× + `gapV`) = meitat del retall | 47,60 | 35,63 |
+| retall (la finestra) | 95,20 | 71,25 |
+| desviament de cada fila respecte de la seva cel·la | 0,01 i 0,01 px | 0,00 i 0,00 px |
+
+O sigui:
+
+1. **La separació de debò entre les dues files és exactament el pas de la cel·la
+   del selector** (43,12 contra 43,13 a 1920; 32,27 contra 32,27 a 1440), i cada
+   fila queda centrada a la seva cel·la amb 0,01 px de marge. Allà no hi ha res a
+   decidir: qui ho decideix és el bucle mesurat (`desnivellsLinies`), que centra
+   cada fila a la cel·la BLANC i a la COLOR.
+2. **`alcadaFila` (47,60) és un número que no fa servir ningú.** Va néixer com
+   «dibuix de la graella + separació de la graella» (29,76 + 2,98 = 32,73... i la
+   peça del carrusel fa 1,5 cops: 44,63 + 2,98 = 47,60). Avui només serveix per
+   dimensionar la finestra: `2 × 47,60 = 95,20`. La diferència de 4,48 px és
+   això, declarat contra pintat, **no** dues mides que es contradiguin.
+
+### El que sí que és real (i que aquesta mesura va destapar)
+
+Com que la finestra es declara (95,20) i les files es col·loquen mesurades, la
+vora de dalt de la finestra pot quedar per sota del capdamunt de la fila de
+dalt. Mesurat amb la tinta de cada fitxer (quin pixel natural té tinta a dalt i a
+baix):
+
+| | fila de dalt | fila de baix |
+|---|---|---|
+| **abans** (`e37c6ff`) | 25,66 → 70,28 (sobrava espai) | 68,80 → **113,42** dins una finestra de 95,2 → **5 px de tinta tallats a baix** |
+| **ara** | −0,89 → 43,73 → **0,89 px de tinta tallats a dalt** | 42,23 → 86,86 (dins, amb 8,3 px de marge) |
+
+És a dir: la correcció del §2 no només va fer néixer la graella a la mida bona,
+sinó que va **treure un tall de 5 px de tinta a la fila de baix** que no estava
+mesurat (el bucle de centratge arrossegava les dues files cap avall perquè
+mesurava amb l'alçada de graella equivocada). El que queda és 0,89 px de tinta
+tallada a la fila de dalt, perquè la fila puja `primera` (0,89 px) per caure a la
+cel·la BLANC i la vora de la finestra es queda on és. Els dibuixos tenen tinta al
+primer pixel natural (mesurat), o sigui que es talla tinta de debò, no marge.
+
+**Pendent de decisió de l'amo**: tancar aquests 0,89 px fent que la finestra
+contingui les files tal com les col·loca el bucle mesurat (avui la vora de dalt de
+la finestra és declarada i la fila és mesurada).
+
 - **El bucle de centratge continua sent un bucle** (dues fórmules que es miren
   l'una a l'altra, amb repassos a 180 i 340 ms). S'ha provat de substituir-lo per
   una convergència síncrona dins del primer `rAF` (`flushSync`) i **s'ha
@@ -153,6 +199,7 @@ tard.
 node scripts/_tmp-obrir-zero2.mjs      # mides pintades del primer fotograma al definitiu (6 finestres)
 node scripts/_tmp-estabilitat-p2.mjs   # posicions relatives de filera, selector i franja
 node scripts/_tmp-canvis-p2.mjs        # canvi de colleccio, redimensionar i tauletes
+node scripts/_tmp-retall-illes.mjs     # on cauen les dues files dins del retall i quina tinta es talla
 ```
 
 Els tres són temporals i **no es comitegen**.
