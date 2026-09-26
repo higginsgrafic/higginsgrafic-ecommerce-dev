@@ -1,5 +1,5 @@
 import React, { useEffect, useId, useMemo, useRef, useState } from 'react';
-import MegaColumn, { GAP_X_PX } from './MegaColumn.jsx';
+import MegaColumn from './MegaColumn.jsx';
 import ClicAreaOverlay from './ClicAreaOverlay.jsx';
 import { CERCADOR_COLORS } from './CercadorTopBar.jsx';
 import {
@@ -22,6 +22,9 @@ import {
   DIBUIXOS_FRANJA_DY,
   DIBUIXOS_FRANJA_AMPLADA_NATURAL,
   escalaDibuixFranja,
+  alcadaReservaGraellaPanellCss,
+  esBandaEstretaFranja,
+  AJUST_BAIX_BLOC_FRANJA_PX,
 } from '../megaslide/geometriaMegaslide.js';
 import {
   areesClicAmpla,
@@ -46,11 +49,10 @@ import {
  * a CercadorTextRow. Però el lloc que ocupava el MegaColumn encara s'ha de
  * reservar, perquè la franja de samarretes no pugi.
  *
- * El buit és un fill únic amb `aspect-ratio`, que reprodueix la mida de la
- * graella vella a partir de l'amplada del belt (no pas una alçada fixa: a
- * desktop el belt s'encongeix per sota de 1382 i l'alçada l'ha de seguir).
- * Calibrat contra el MegaColumn de debò: 8,77 dona la mateixa alçada a
- * 768/1024/1280/1366/1440/1920 amb una desviació de dècimes de px.
+ * L'alçada es DECLARADA (26/09/2026): `alcadaReservaGraellaPanellCss` reprodueix
+ * la fórmula del MegaColumn (el tile és `(belt − 8 separacions) / 9`, i a sobre
+ * hi van el marge de dalt del botó i el descendent de la seva línia). Abans
+ * aquests números eren en línia aquí.
  *
  * El transform `scale(0.94)` del contenidor no canvia la geometria del flux;
  * per això la reserva es mesura amb la mida escalada del contenidor.
@@ -60,7 +62,7 @@ import {
 // `(belt − 8 separacions) / 9`, i a sobre hi van el marge de dalt del botó
 // (8 px) i el descendent de la seva línia (~5,96 px). Tot en px de LAYOUT (el
 // contenidor els escala al 0,94 en pintar-los).
-const RESERVA_ALCADA = `calc((var(--hg-mega-w, 1350px) - ${8 * GAP_X_PX}px * var(--hg-escala-mega, 1)) / 9 + 13.96px)`;
+const RESERVA_ALCADA = alcadaReservaGraellaPanellCss();
 
 /**
  * Banda estreta del megaslide: el desktop que no arriba al belt de 1350.
@@ -76,13 +78,10 @@ const RESERVA_ALCADA = `calc((var(--hg-mega-w, 1350px) - ${8 * GAP_X_PX}px * var
  * S'ha de mantenir idèntic a MegaStripePanelP1 (`esEstenyFins1366`): si una
  * pàgina el baixa i l'altra no, les dues franges es desquadren.
  */
-// Mateixa condicio que `esEstenyFins1366` de MegaStripePanelP1 (inclou el
-// 1024): si una pagina el baixa i l'altra no, les dues franges es desquadren.
-// Abans aixo deia `> 1024`, i a la tauleta apaisada de 1024 la franja de la
-// pagina 2 queia 15 px mes amunt que la de la pagina 1.
-const esFranjaEstenya = typeof window !== 'undefined'
-  && window.innerWidth >= 768 && window.innerWidth <= 1366
-  && window.innerWidth >= window.innerHeight;
+// Mateixa condicio que `esEstenyFins1366` de MegaStripePanelP1: la porta
+// declarada `esBandaEstretaFranja` (vegeu geometriaMegaslide.js), que es on ha
+// de viure perque les dues pagines no es poden desquadrar. Es llegeix dins del
+// component (vegeu `esFranjaEstenya` mes avall).
 
 function canonicalKey(rawSrc) {
   try {
@@ -309,6 +308,15 @@ function MegaStripePanel({
   // Id unic per al retall dels dibuixos: els dos panells conviuen al DOM i
   // amb un id repetit la referencia url(#...) no resolia.
   const idRetall = `hgRetallSamarretes-${useId().replace(/:/g, '')}`;
+  // LA BANDA ESTRETA, DECLARADA I LLEGIDA A CADA RENDER (26/09/2026).
+  //
+  // Abans era una constant del modul, calculada una sola vegada en carregar: si
+  // la finestra canviava de banda, el bloc es quedava amb la condicio vella i el
+  // sostre de la franja es desquadrava 15 px respecte del que calcula la pagina 2
+  // (`topFranjaPagina2`, que la llegeix fresca). La condicio viu a
+  // `geometriaMegaslide.js` perque les dues pagines no es poden desquadrar.
+  const esFranjaEstenya = typeof window !== 'undefined'
+    && esBandaEstretaFranja({ ample: window.innerWidth, alt: window.innerHeight });
   // La franja s'ha de quedar dins del carril amb les manigues a fora: el factor
   // surt de l'amplada del carril, no d'un numero calibrat (vegeu l'hook). A la
   // vista vertical no s'hi aplica: alla la franja te el seu propi calibratge.
@@ -523,7 +531,7 @@ function MegaStripePanel({
             // meitats (els cercles a dalt i el COLOR/NEGRE dins les samarretes).
             // El mateix ajust va a MegaStripePanelP1 perquè les dues pàgines
             // quedin a la mateixa alçada.
-            transform: (compactLandscape || esFranjaEstenya) ? 'none' : 'translateY(-15px)',
+            transform: (compactLandscape || esFranjaEstenya) ? 'none' : `translateY(${AJUST_BAIX_BLOC_FRANJA_PX}px)`,
           }}
         >
           <div

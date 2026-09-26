@@ -35,6 +35,7 @@ import { findPdpUrl } from '@/config/pdpRoutes.js';
 import useUrlActiveCollection from '@/hooks/useUrlActiveCollection';
 import useMegaStripeDebugVars from '@/hooks/useMegaStripeDebugVars';
 import useMegaTileSelectorDrag from '@/hooks/useMegaTileSelectorDrag';
+import { MARGE_DALT_BLOC_FRANJA_PX } from './megaslide/geometriaMegaslide.js';
 
 
 // Plantilla independent de l'acordió del CISTELL — taula pròpia sobre la pauta
@@ -1878,7 +1879,6 @@ function FullWideSlideHeader({
   });
   const headerRef = useRef(null);
   const megaMenuRef = useRef(null);
-  const [stripeRowPadPx, setStripeRowPadPx] = useState(32);
   const [stripeRowPadXPx, setStripeRowPadXPx] = useState({ left: 0, right: 0 });
 
   useEffect(() => {
@@ -2012,14 +2012,19 @@ function FullWideSlideHeader({
   // MegaStripePanel i MegaStripePanelP1) i no abans.
   const stripePreviewHPx = Math.round((effectiveMegaTileSize || 240) * 0.9);
 
-  // AQUESTA MESURA ES QUEDA, i es fa abans del pintat.
+  // EL COIXI DEL BLOC DE LA FRANJA ES DECLARAT (26/09/2026).
   //
-  // El pla la proposava convertir al model, pero el valor es el `padding` del
-  // panell del megaslide, que depen de les seves classes responsives: mesurat a
-  // 768/1024/1280/1366/1440/1920 dona 32/32/38/38/32/32, o sigui que no es cap
-  // funcio neta de l'amplada. Com que depen del contingut real, es queda
-  // mesurat amb `useLayoutEffect` (ABANS del pintat), que es exactament el que
-  // demanava la revisio externa per a les mesures de classe (b).
+  // Era una mesura amb `useLayoutEffect` perque «depen de les classes
+  // responsives del panell»: `px-4 sm:px-6 lg:px-10 py-8`. Pero el `py-8` NO es
+  // responsiu: son 32 px a totes les finestres (comprovat a 768, 1024, 1280,
+  // 1366, 1400, 1440, 1512, 1680, 1920, 2000 i 2560). El marge vertical del
+  // bloc de la franja i el seu coixi de baix son aquests 32 px, i el marge
+  // horitzontal (`stripeRowPadXPx`, que si que es responsiu) es queda mesurat.
+  //
+  // El vertical ja no es mesura: ve declarat de `geometriaMegaslide.js`, que es
+  // qui calcula el sostre de la franja de la pagina 2.
+  const stripeRowPadPx = MARGE_DALT_BLOC_FRANJA_PX;
+
   useLayoutEffect(() => {
     try {
       if (!active) return undefined;
@@ -2029,12 +2034,8 @@ function FullWideSlideHeader({
       const update = () => {
         try {
           const cs = window.getComputedStyle(el);
-          const pt = Number.parseFloat(cs?.paddingTop || '0');
           const pl = Number.parseFloat(cs?.paddingLeft || '0');
           const pr = Number.parseFloat(cs?.paddingRight || '0');
-          if (Number.isFinite(pt) && pt >= 0) {
-            setStripeRowPadPx((prev) => (prev === pt ? prev : pt));
-          }
           if (Number.isFinite(pl) && pl >= 0 && Number.isFinite(pr) && pr >= 0) {
             setStripeRowPadXPx((prev) => {
               if (!prev) return { left: pl, right: pr };

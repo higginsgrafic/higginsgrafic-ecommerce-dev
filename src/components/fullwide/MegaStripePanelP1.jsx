@@ -24,6 +24,7 @@ import {
   DIBUIXOS_FRANJA_DY,
   DIBUIXOS_FRANJA_AMPLADA_NATURAL,
   escalaDibuixFranja,
+  esBandaEstretaFranja,
   pageLiftPagina1,
 } from '../megaslide/geometriaMegaslide.js';
 
@@ -226,9 +227,10 @@ function MegaStripePanelP1({
   const { factor: factorCarrilFranja, centre: centreCarrilFranja } = useEscalaFranjaCarril(filaFranjaRef, ajustFranjaCarril);
   const [pageLift, setPageLift] = useState(0);
   // Franja estreta (768-1366 en horitzontal): hi ha ajustos propis de 10 px i
-  // l'ajust general de la franja no s'hi aplica.
+  // l'ajust general de la franja no s'hi aplica. La condicio es declarada
+  // (`esBandaEstretaFranja`): es la MATEIXA que fa servir la pagina 2.
   const esEstenyFins1366 = typeof window !== 'undefined'
-    && window.innerWidth >= 768 && window.innerWidth <= 1366 && window.innerWidth >= window.innerHeight;
+    && esBandaEstretaFranja({ ample: window.innerWidth, alt: window.innerHeight });
 
   // En portrait tablet, la stripe està dins d'un viewport scrollable amb
   // overflowY hidden. Reduïm l'escala de la stripe perquè no es talli.
