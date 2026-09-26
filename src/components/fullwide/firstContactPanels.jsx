@@ -274,10 +274,11 @@ export function FirstContactDibuix09Buttons({
   // del mig fa 0 px, o sigui que els dos botons son contigus i el bloc queda
   // sencer clicable.
   //
-  // Els chevrons van a 1/3 de la seva cel·la, que es el centre de la primera i
-  // de l'ultima cel·la: es a dir, a la mateixa alçada que BLANC i que NEGRE.
-  // Centrats a la meitat (el que hi havia abans) queien a 1/4 i 3/4 i no
-  // lligaven amb cap etiqueta.
+  // Els chevrons van al CENTRE DE LA SEVA MEITAT: a la vista vertical, el de
+  // dalt a 1/4 del bloc i el de baix a 3/4 (vegeu el JSX). Abans anaven a 1/3 i
+  // 2/3, que era el centre de la primera i de l'ultima cel·la d'un selector de
+  // TRES caselles: amb dues meitats, allo els deixava 9,9 px desviats cap al mig
+  // i l'amo els veia descol·locats (26/09/2026).
   //
   // Els chevrons segueixen apuntant a esquerra i dreta: el carrusel es mou en
   // horitzontal, el que canvia es on son els botons.
@@ -308,7 +309,11 @@ export function FirstContactDibuix09Buttons({
     // dibuix de la fletxa viu a l'embolcall (el bloc) i no dins del boto: dins
     // del boto, el 1/3 i el 2/3 serien els de la meitat, i quedaven a 86 px.
     <div className={`relative w-full ${vertical ? 'aspect-[1/2]' : 'mt-2 aspect-square'}`}>
-      <div className="absolute inset-0 overflow-hidden rounded-md bg-muted" id="stripe-guide-right-anchor">
+      {/* SENSE FONS (26/09/2026, ho va demanar l'amo): el bloc portava un
+          `bg-muted` (rgb(249,250,251) a 1920) que ara desapareix. L'ancora
+          `#stripe-guide-right-anchor` es queda (els guions la fan servir) pero
+          sense pintar-hi res. */}
+      <div className="absolute inset-0 overflow-hidden" id="stripe-guide-right-anchor">
         <button
           type="button"
           aria-label="Anterior"
@@ -317,7 +322,7 @@ export function FirstContactDibuix09Buttons({
           onPointerUp={onPrevPointerUp}
           onPointerCancel={onPrevPointerUp}
           onPointerLeave={onPrevPointerUp}
-          className={`absolute bg-transparent hover:bg-muted focus:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
+          className={`absolute bg-transparent focus:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
             vertical ? 'left-0 top-0 h-1/2 w-full' : 'left-0 top-0 h-full w-1/2'
           }`}
         >
@@ -331,18 +336,25 @@ export function FirstContactDibuix09Buttons({
           onPointerUp={onNextPointerUp}
           onPointerCancel={onNextPointerUp}
           onPointerLeave={onNextPointerUp}
-          className={`absolute bg-transparent hover:bg-muted focus:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
+          className={`absolute bg-transparent focus:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
             vertical ? 'bottom-0 left-0 h-1/2 w-full' : 'right-0 top-0 h-full w-1/2'
           }`}
         >
         </button>
+        {/* ELS CHEVRONS, AL CENTRE DE LA SEVA MEITAT (26/09/2026, ho va
+            demanar l'amo: «l'amo els veu descol·locats»). Eren a 1/3 i 2/3 del
+            bloc, i a la vista vertical cada boto es mitja alcada: amb el bloc de
+            119 px, el bloc de dalt va de 0 a 59,5 i el seu centre es a 29,75
+            (25 %), i el de baix a 89,25 (75 %). Mesurat abans: 145,1 i 184,8
+            contra els centres de les meitats (135,2 i 194,7), o sigui 9,9 px
+            desviats cap al mig. Amb 1/4 i 3/4 la desviacio es 0. */}
         <ChevronLeft
-          className={`pointer-events-none absolute left-1/2 h-5 w-5 -translate-x-1/2 -translate-y-1/2 text-foreground/80 ${vertical ? 'top-1/3' : 'top-1/2'}`}
+          className={`pointer-events-none absolute left-1/2 h-5 w-5 -translate-x-1/2 -translate-y-1/2 text-foreground/80 ${vertical ? 'top-1/4' : 'top-1/2'}`}
           strokeWidth={1.75}
           aria-hidden="true"
         />
         <ChevronRight
-          className={`pointer-events-none absolute left-1/2 h-5 w-5 -translate-x-1/2 -translate-y-1/2 text-foreground/80 ${vertical ? 'top-2/3' : 'top-1/2'}`}
+          className={`pointer-events-none absolute left-1/2 h-5 w-5 -translate-x-1/2 -translate-y-1/2 text-foreground/80 ${vertical ? 'top-3/4' : 'top-1/2'}`}
           strokeWidth={1.75}
           aria-hidden="true"
         />

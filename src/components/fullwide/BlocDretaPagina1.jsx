@@ -148,12 +148,15 @@ export function SelectorQuadratPagina1({
 export function FletxesQuadratPagina1({ onPrev, onNext }) {
   return (
     <div className="relative aspect-square w-full" data-fletxes-p1="1">
-      <div className="absolute inset-0 overflow-hidden rounded-md bg-muted">
+      {/* SENSE FONS (26/09/2026, ho va demanar l'amo): el bloc portava un
+          `bg-muted` i ara desapareix, com al bloc compartit
+          (`FirstContactDibuix09Buttons`). */}
+      <div className="absolute inset-0 overflow-hidden">
         <button
           type="button"
           aria-label="Anterior"
           onClick={onPrev}
-          className="absolute left-0 top-0 h-1/2 w-full bg-transparent hover:bg-muted focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          className="absolute left-0 top-0 h-1/2 w-full bg-transparent focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         >
           <ChevronLeft
             className="pointer-events-none absolute left-1/2 top-1/2 h-5 w-5 -translate-x-1/2 -translate-y-1/2 text-foreground/80"
@@ -166,7 +169,7 @@ export function FletxesQuadratPagina1({ onPrev, onNext }) {
           aria-label="Següent"
           id="stripe-guide-right-arrow"
           onClick={onNext}
-          className="absolute bottom-0 left-0 h-1/2 w-full bg-transparent hover:bg-muted focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          className="absolute bottom-0 left-0 h-1/2 w-full bg-transparent focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         >
           <ChevronRight
             className="pointer-events-none absolute left-1/2 top-1/2 h-5 w-5 -translate-x-1/2 -translate-y-1/2 text-foreground/80"
