@@ -631,6 +631,33 @@ caure:
    del carril; la graella arrenca a x381 i acaba on comença el bloc.
 3. Les fletxes, dins del bloc, quadrades (109x109) i a sota del selector.
 
+**Canvi de cami (26/09/2026, 22:30).** L'amo ho ha aclarit: «No has de convertir
+la graella de 9 en una altra graella. L'has de substituir. Si fa falta fes un
+selector nou» i «la graella intercalada ja la tens feta. Nome's l'has de
+duplicar», i encara «si a la pagina 2 hi cap, tambe hi ha de cabre a la pagina
+1, ja que les files han de ser identiques». O sigui: **les files de la p1 son
+les de la p2, tal qual** (mateixa peca, 44,63 px, i mateixa relacio amb el
+selector: la fila de dalt al centre de la cel·la BLANC i la de baix al de la
+COLOR, mesurat a la p2: 0,6 i 0,0 px).
+
+Peçes noves ja fetes i pujades (`82c81b3`), d'us nome's de la p1:
+
+- `BlocDretaPagina1.jsx` — `SelectorQuadratPagina1` i `FletxesQuadratPagina1`.
+- `GraellaDuesFileresPagina1.jsx` — l'adaptador que duplica
+  `CercadorDibuixosGraella` (la de la p2) amb `reservaDreta: 0`.
+
+**On es va encallar el muntatge (i la pista bona).** En posar-ho a
+`MegaStripePanelP1` (una filera `flex` amb la graella a l'esquerra i el bloc a
+la dreta, i `MegaColumn` nome's a la vista vertical), el carrusel es pinta amb
+**amplada i alcada ZERO** (`graella y84 1072x0`, i el bloc de la dreta 1,9x3,8
+px). La mesura dels estils ho diu: `carrilPx()` dins d'aquesta filera torna
+**1,89 px** per `MIDA_BLOC_DRETA_PAGINA1_PX = 110`, o sigui que la variable
+`--hg-mega-w` NO resol en aquest punt de l'arbre (el contenidor de la filera
+porta `scale(var(--hgGridFitScale))` i les mides de la casa viuen a
+`layoutMetrics`). **El proper intent ha de mesurar `--hg-mega-w` en aquest node
+abans de calcular-hi res**, i si no hi es, passar l'escala del carril com a prop
+(o fer servir les mateixes proporcions que la p2, que alla si que resolen).
+
 #### 10.3.1 Recepta per fer-ho (pels llocs exactes)
 
 1. **Treure el selector de la malla.** A `src/components/fullwide/MegaColumn.jsx`
