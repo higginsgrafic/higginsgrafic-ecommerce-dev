@@ -166,9 +166,22 @@ sobra és el número calibrat a mà.
    `FRACCIO_MARGE_ESQUERRE_FRANJA = 65/2866`). La casa `i` de 14 comença a
    `marge + i × cos`, i el dibuix s'hi centra. És una funció de `i` i del carril,
    no 244 números.
-2. **L'escala de la franja → `carril / amplada declarada`** (l'amplada
-   declarada = altura declarada × les mides del fitxer, que ja són als atributs
-   de la imatge). Fora el factor manual.
+2. ~~**L'escala de la franja → `carril / amplada declarada`**. Fora el factor
+   manual.~~ **Fet a la pràctica, i no cal res**: mesurat el 26/09/2026 canviant
+   `--megaStripeScale` a 0,9 (i al nominal):
+
+   | valor de la variable | amplada de la franja | transform efectiva |
+   |---|---|---|
+   | el desat (1,2125) | 818,92 | 0,961333 |
+   | el nominal (1,2125) | 818,92 | 0,961333 |
+   | 0,9 | 818,92 | 0,961333 |
+
+   El hook calcula el factor **contra** l'escala que la franja porta posada, o
+   sigui que el producte és sempre `objectiu / amplada` i el valor manual es
+   cancel·la exactament. La franja no en depèn. (Jo havia dit que hi havia un
+   4,6 % de diferència: era una deducció meva, i la mesura la desmenteix.)
+   La variable es queda perquè la vista vertical la fa servir per encongir la
+   franja dues files (`1,17`), i allà el hook no hi actua.
 3. **L'overlay de la samarreta → les mateixes fraccions del fitxer** (el pit de
    la samarreta és una zona coneguda de la imatge).
 4. **Els ajustos de 10/20 px i `FRANJA_AJUST_PX` → a la taula declarada** de
