@@ -716,6 +716,7 @@ export default function MegaslidePagina2({
     indicesSamarretesInactives: indicesSamarretesInactivesFranja,
     alfaVelSamarretaInactiva: VEL_SAMARRETA_INACTIVA,
     onStripeStripWheel: rodetaFranja,
+    onStripeStripPas: moureStrip,
     // El clic d'una samarreta ACTIVA la seva colleccio (25/09/2026, ho va
     // demanar l'amo): el cami es el mateix que el de la icona atenuada de la
     // graella.
