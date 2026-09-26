@@ -20,13 +20,14 @@ const entrades = Object.entries(STRIPE_DRAWING_CALIBRATIONS)
   .map(([url, c]) => ({ url: url.split('/').pop(), ...c, renderitzada: c.scale * DIBUIXOS_FRANJA_AMPLADA_NATURAL }));
 
 describe('els dibuixos de la franja', () => {
-  it('la majoria de calibracions posen la mateixa amplada renderitzada', () => {
+  it('al mapa NOME\'S hi queden les excepcions: cap entrada dins la banda base', () => {
+    // Des del 26/09/2026 les entrades de la banda (189 de 224) ja no son al
+    // mapa: les serveix la regla declarada. Si algu n'hi torna a posar una,
+    // aquesta prova ho diu.
     const dins = entrades.filter((e) => e.renderitzada >= 70 && e.renderitzada <= 90);
-    const fora = entrades.filter((e) => e.renderitzada < 70 || e.renderitzada > 90);
-    console.log(`entrades: ${entrades.length}; dins de 70..90: ${dins.length}; excepcions: ${fora.length}`);
-    for (const e of fora) console.log(`  EXCEPCIO ${e.url.padEnd(44)} scale ${e.scale} -> ${e.renderitzada.toFixed(1)}`);
-    // La regla hi es si la gran majoria hi cauen: les altres son disseny.
-    expect(dins.length / entrades.length).toBeGreaterThan(0.8);
+    console.log(`entrades al mapa: ${entrades.length}; de la banda base: ${dins.length}`);
+    for (const e of dins) console.log(`  TORNA A LA BANDA ${e.url} scale ${e.scale} -> ${e.renderitzada.toFixed(1)}`);
+    expect(dins.length).toBe(0);
   });
 
   it("l'amplada base es el 41 % del cos de la samarreta", () => {
