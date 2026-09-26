@@ -310,6 +310,56 @@ de la columna de col·leccions (156,15 → 127,84 px als 287 ms), que segueix la
 franja quan la seva escala acaba d'encaixar; no mou la llista (mesurat). No s'hi
 ha tocat perquè no hi ha repro de moviment visible.
 
+## 4 quinquies. El megaslide es veu ABANS d'estar a punt (26/09/2026)
+
+L'amo va enviar fotogrames: el megaslide obert amb els dibuixos **com a text** i
+la **franja absent**. Cap dels meus probes ho deia, perquè tots mesuraven
+*posicions*, no *contingut*.
+
+Mesurat en CARREGAR amb `?active=` (1920×946), mostreig després de pintar:
+
+```
+t=1593  opacitat=0,00  imgs=  0/128  franja=1049 (img 2866)
+t=1800  opacitat=0,21  imgs=128/128  franja=1049 (img 2866)
+t=1984  opacitat=1,00  imgs=128/128  franja=1049 (img 2866)
+```
+
+O sigui: en aquesta màquina l'animació d'obertura (0→1 en 340 ms) **amaga** la
+decodificació de les imatges. Quan la baixada és més lenta que l'animació (una
+màquina més carregada, memòria freda), els textos i la franja buida es veuen.
+
+### S'ha provat i **s'ha descartat** l'escalfament
+
+Es va reimplantar l'experiment `feat/mega-escalfament` (de l'equip): muntar el
+panell amagat uns segons després de carregar, amb la col·lecció de la URL.
+Mesurat:
+
+- el flux de **clic** (obrir des d'una pàgina ja carregada) **ja sortia complet**
+  sense escalfament: 0 textos i la franja a lloc al primer fotograma;
+- el flux de **càrrega** (el dels fotogrames de l'amo) **no el toca**, perquè
+  allà el megaslide ja està obert (no hi ha res a escalfar);
+- i a sobre **introduïa un salt**: quan el panell passa de dormint (fora del
+  flux) a obert, apareix la barra de desplaçament, la finestra de layout
+  s'estreny 15 px i tota la composició es remesura (mesurat: 6,7 px a 1512 i
+  11,5 px a 2560 al primer fotograma pintat).
+
+Per tant s'ha revertit: no es deixa una regressió mesurada per una millora que
+no es dona.
+
+### El que cal fer (pendent de decisió)
+
+1. **Porta d'entrada («a punt»)**: amagar el CONTINGUT del panell (no la seva
+   caixa, per no moure res) fins que les imatges que el panell ensenya estiguin
+   decodificades, amb un topall (600-800 ms). El criteri no pot ser «totes les
+   imatges»: les dels dibuixos porten `loading="lazy"` i les que queden fora del
+   retall no es baixen mai mentre el panell està tancat; el criteri bo és **les
+   peces que cauen dins el retall del carrusel** (es pot calcular amb el rect del
+   retall i els de les peces).
+2. **`scrollbar-gutter: stable` a l'arrel**: treu d'arrel la família de salts
+   per aparició de la barra de desplaçament (també quan s'obre el megaslide).
+   És un canvi de tot el lloc (15 px de reserva sempre), o sigui que necessita
+   el vist-i-plau de l'amo.
+
 ## 5. El bucle de centratge
 
 - **El bucle de centratge continua sent un bucle** (dues fórmules que es miren
