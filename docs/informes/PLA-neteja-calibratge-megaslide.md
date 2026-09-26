@@ -120,8 +120,8 @@ Cinc regles, i res més:
 |---|---|---|
 | 1 | **Fet** (`3e24b43`, `aec0074`, `0ea261d`): idempotència dels acumuladors i primera passada en `rAF` | les obertures donen un sol estat pintat |
 | 2 | **Fet** (`262f79b`): mides dels actius per atribut i carril declarat a l'escala de la franja | la franja neix a la mida a les dues finestres |
-| 3 | **Unificar els quatre bucles de `CercadorTextRow`** (files, tira de colors, fletxes, enllaços) en una sola passada amb una taula de valors: una instantània, un `rAF`, una confirmació | `compara-vistes` + els probes d'obertura i de càrrega + 514 proves |
-| 4 | **Passar la mesura del pare a la mateixa passada**: `MegaslidePagina2` llegeix la seva instantània i reparteix els valors per props (avui el fill mesura i el pare torna a mesurar) | ídem + les 14 clics |
+| 3 | **Fet**: els tres bucles del **pare** (mides de la graella, marges de la columna, tira de colors) són una sola passada: un estat, una instantània, un `rAF`, una confirmació, un observador. Queden els **dos del fill** (les dues files i el bloc de fletxes) per al pas 4 | `compara-vistes` OK, 514 proves, un sol estat pintat a 4 finestres, 0,00 px de tinta |
+| 4 | **Passar els dos bucles del fill a la mateixa passada**: `CercadorDibuixosGraella` deixa de mesurar (les dues files i el bloc de fletxes) i els valors li arriben per props; `MegaslidePagina2` reparteix la seva instantània | ídem + les 14 clics |
 | 5 | **`pageLift` i l'escala de la franja**: declarar el que es pugui i deixar una sola mesura de confirmació | ídem + la franja a la vista vertical i apaïsada |
 | 6 | **Esborrar els temporitzadors que quedin sense feina** i deixar documentat el sol repàs | bateria sencera |
 
