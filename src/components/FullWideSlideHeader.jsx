@@ -22,6 +22,7 @@ import {
 import { touchMegaPublicActivity, getMegaPublicSelectorFor, setMegaPublicSelectorFor } from './fullwide/megaPublicSelectorState.js';
 import IconButton from './fullwide/MegaIconButton.jsx';
 import { dibuixosGraella16x4 } from './fullwide/CercadorTextRow.jsx';
+import { precarregaSiluetesSamarreta } from './fullwide/siluetesSamarreta.js';
 import { computeStripeTileOverlaySrcs } from '@/utils/resolveStripeTile.js';
 import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
 import RegisterOverlay from './fullwide/RegisterOverlay.jsx';
@@ -2858,9 +2859,13 @@ function FullWideSlideHeader({
     const temporitzador = setTimeout(obrirQuanEstigui, TOPALL_PRECARREGA_MS);
     // `decode()` diu quan la imatge ja es pot pintar (no nome's quan ha
     // arribat). Si alguna falla, `allSettled` deixa passar igualment.
-    Promise.allSettled(
-      imatges.map((im) => (typeof im.decode === 'function' ? im.decode() : Promise.resolve()))
-    ).then(() => {
+    Promise.allSettled([
+      ...imatges.map((im) => (typeof im.decode === 'function' ? im.decode() : Promise.resolve())),
+      // El full de les siluetes del VEL: es demana abans de muntar el panell
+      // perque el vel neixi en el primer render i no aparegui a mig obrir
+      // (mesurat amb la CPU alentida: apareixia a opacitat 1,00).
+      precarregaSiluetesSamarreta(),
+    ]).then(() => {
       clearTimeout(temporitzador);
       obrirQuanEstigui();
     });
