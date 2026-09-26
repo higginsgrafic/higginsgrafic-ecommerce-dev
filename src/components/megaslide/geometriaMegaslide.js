@@ -212,19 +212,35 @@ export const MARGE_EXTRA_ESCRIPTORI_PX = 20;
 /**
  * EL PAGELIFT DE LA PÀGINA 1, DECLARAT (26/09/2026)
  * -----------------------------------------------------------------------------
- * La pàgina 1 es puja (`transform: translateY(-pageLift)`) perquè el seu
- * selector quedi a la mateixa alçada que el de la pàgina 2. El valor es
- * convergia amb un bucle que mesurava el selector de la pàgina 1 i el del
- * panell (`deltaObjectiuPageLift`), però el punt fix és una resta:
+ * La pàgina 1 es puja (`transform: translateY(-pageLift)`) perquè el seu bloc
+ * (el selector i les files) quedi a la mateixa alçada que el de la pàgina 2. El
+ * valor es convergia amb un bucle que mesurava el selector de la pàgina 1 i el
+ * del panell (`deltaObjectiuPageLift`), però el punt fix és una resta:
  *
  *   pageLift = top natural del selector de la pàgina 1 - desplaçament
  *
  * `desplaçament` és 20 px a l'escriptori i 10 px a les tauletes
- * (`deltaObjectiuPageLift`), i el top natural del selector dins el panell és
- * **39,52 px** a TOTES les finestres i classes (mesurat a 1920, 1440, 1512,
- * 1680, 2000, 2560, 1400, 1366x768, 1280x720, 1024x768 i 768x1024): són els
- * 32 px del `py-8` del panell més el `mt-2` del selector, que el navegador hi
- * deixa a 7,52.
+ * (`deltaObjectiuPageLift`).
+ *
+ * EL BLOQUEIG DE LA PÀGINA 1 AMB LA 2 (26/09/2026)
+ * -----------------------------------------------------------------------------
+ * L'amo va demanar que les files de la pàgina 1 caiguessin a les mateixes
+ * posicions que les de la pàgina 2, i va triar que baixés TOT el bloc (selector
+ * i files junts). Mesurat a 1920x946 abans del canvi:
+ *
+ *   selector p1    top  73,0   centre 127,7   | p2 top  86,8   centre 146,3
+ *   retall dibuixos p1 top 73,0 (el botó)     | p2 top  81,8 (les dues files)
+ *   franja         p1 top 232,9               | p2 top 222,9
+ *
+ * o sigui que el bloc de la pàgina 1 anava **18,6 px per sobre** del de la
+ * pàgina 2 a totes les classes de dispositiu (el `desplaçament` de 20 ja hi
+ * era). El top natural del selector dins el panell és el que es declara aqui:
+ *
+ *   TOP_SELECTOR = 39,52 - 18,6 = 20,92 px
+ *
+ * (els 39,52 eren els 32 px del `py-8` del panell més el `mt-2` del selector,
+ * que el navegador hi deixa a 7,52; mesurat a 1920, 1440, 1512, 1680, 2000,
+ * 2560, 1400, 1366x768, 1280x720, 1024x768 i 768x1024).
  *
  * A la vista vertical no s'hi aplica (el valor és 0).
  *
@@ -233,12 +249,36 @@ export const MARGE_EXTRA_ESCRIPTORI_PX = 20;
  * @param {boolean} [o.isLandscapeTablet]
  * @returns {number} px
  */
+export const AJUST_FILES_PAGINA1_PX = 18.6;
 export const TOP_SELECTOR_PAGINA1_PX = 39.52;
+/** El top natural del selector a l'escriptori, ja amb l'ajust de les files:
+ *  `TOP_SELECTOR_PAGINA1_PX - AJUST_FILES_PAGINA1_PX` = 20,92 px. */
+export const TOP_SELECTOR_ESCRIPTORI_PAGINA1_PX = TOP_SELECTOR_PAGINA1_PX - AJUST_FILES_PAGINA1_PX;
 
-export function pageLiftPagina1({ isPortraitTablet = false, isLandscapeTablet = false } = {}) {
+export function pageLiftPagina1({
+  ample = 0, alt = 0, isPortraitTablet = false, isLandscapeTablet = false,
+} = {}) {
   if (isPortraitTablet) return 0;
   const desplacament = isLandscapeTablet ? 10 : 20;
-  return Math.max(0, TOP_SELECTOR_PAGINA1_PX - desplacament);
+  // A l'escriptori el bloc de la pagina 1 va 18,6 px per sobre del de la
+  // pagina 2 (mesurat a 1920, 1440 i 2560); a la banda estreta i a les
+  // tauletes els dos blocs JA cauen al mateix lloc (mesurat a 1366x768 i
+  // 1024x768: 118,9 contra 118,2 i 108,2 contra 108,0).
+  const ajust = esEscriptoriPagina1({ ample, alt, isLandscapeTablet }) ? AJUST_FILES_PAGINA1_PX : 0;
+  return Math.max(0, TOP_SELECTOR_PAGINA1_PX - ajust - desplacament);
+}
+
+/**
+ * Si el bloc de la pagina 1 s'ha de baixar per quadrar-lo amb el de la p2.
+ *
+ * Nomes a l'escriptori: la banda estreta (768-1366 apaisada) i les tauletes ja
+ * hi cauen soles. La finestra de referencia es la d'`desplacTopSelector`
+ * (768-1366 apaisada = banda estreta).
+ */
+export function esEscriptoriPagina1({ ample = 0, alt = 0, isLandscapeTablet = false } = {}) {
+  const banda = Number.isFinite(ample) && Number.isFinite(alt)
+    && ample >= 768 && ample <= 1366 && ample >= alt;
+  return !isLandscapeTablet && !banda;
 }
 
 /**

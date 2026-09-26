@@ -3,6 +3,9 @@ import {
   carrilDeFinestra,
   pageLiftPagina1,
   TOP_SELECTOR_PAGINA1_PX,
+  AJUST_FILES_PAGINA1_PX,
+  TOP_SELECTOR_ESCRIPTORI_PAGINA1_PX,
+  esEscriptoriPagina1,
   ampladaFilaFranja,
   ampladaRetallGraella,
   alcadaSelector,
@@ -64,16 +67,33 @@ describe('carrilDeFinestra', () => {
 });
 
 describe('pageLiftPagina1', () => {
-  it("a l'escriptori deixa el selector de la pagina 1 a 20 px del panell", () => {
-    const lift = pageLiftPagina1({});
+  it("a l'escriptori baixa el bloc els 18,6 px de l'ajust de les files", () => {
+    const lift = pageLiftPagina1({ ample: 1920, alt: 946 });
+    expect(lift).toBeCloseTo(0.92, 2);
+    expect(TOP_SELECTOR_ESCRIPTORI_PAGINA1_PX - lift).toBeCloseTo(20, 2);
+  });
+
+  it("a la banda estreta (768-1366 apaisada) no hi aplica l'ajust", () => {
+    // Mesurat a 1366x768 i 1024x768: alla els dos blocs ja hi cauen sols.
+    const lift = pageLiftPagina1({ ample: 1366, alt: 768 });
+    expect(esEscriptoriPagina1({ ample: 1366, alt: 768 })).toBe(false);
     expect(lift).toBeCloseTo(19.52, 2);
     expect(TOP_SELECTOR_PAGINA1_PX - lift).toBeCloseTo(20, 2);
   });
 
   it('a la tauleta apaissada el deixa a 10 px', () => {
-    const lift = pageLiftPagina1({ isLandscapeTablet: true });
+    const lift = pageLiftPagina1({ ample: 1366, alt: 768, isLandscapeTablet: true });
     expect(lift).toBeCloseTo(29.52, 2);
     expect(TOP_SELECTOR_PAGINA1_PX - lift).toBeCloseTo(10, 2);
+  });
+
+  it('la pagina 1 baixa el bloc per quadrar-lo amb la 2 (26/09/2026)', () => {
+    // El top natural del selector es 39,52 i l'amo va demanar que el bloc de la
+    // pagina 1 caigues a les mateixes posicions que el de la pagina 2:
+    // mesurat a 1920, 1440 i 2560, anava 18,6 px per sobre.
+    expect(AJUST_FILES_PAGINA1_PX).toBeCloseTo(18.6, 2);
+    expect(TOP_SELECTOR_PAGINA1_PX).toBeCloseTo(39.52, 2);
+    expect(TOP_SELECTOR_ESCRIPTORI_PAGINA1_PX).toBeCloseTo(20.92, 2);
   });
 
   it("a la vertical no s'aplica", () => {
@@ -280,12 +300,19 @@ describe('alcadaReservaGraellaPanell', () => {
 });
 
 describe('visualOffsetYFranjaPagina2', () => {
-  it("a l'escriptori (1920) val -9,52 (el DOM, -9,52)", () => {
-    expect(visualOffsetYFranjaPagina2({ ample: 1920, alt: 946 })).toBeCloseTo(-9.52, 2);
-  });
-
+  // LA FRANJA DE LA PAGINA 2 SEGUEIX EL BLOC DE LA PAGINA 1 (26/09/2026).
+  //
+  // L'offset es `-pageLift + ...`: a l'escriptori, quan l'amo va demanar que el
+  // bloc de la pagina 1 baixes 18,6 px per quadrar-lo amb el de la pagina 2, el
+  // sostre de la franja de la pagina 2 va baixar amb ell (i la de la pagina 1
+  // tambe, que viu dins el mateix bloc mogut). A la banda estreta i a les
+  // tauletes el pageLift no canvia i els dos sostres es queden on eren.
   it('a la tauleta apaissada (1366x768) val -39,52 (el DOM, -39,52)', () => {
     expect(visualOffsetYFranjaPagina2({ ample: 1366, alt: 768, isLandscapeTablet: true })).toBeCloseTo(-39.52, 2);
+  });
+
+  it("a l'escriptori (1920) val 9,08 (abans -9,52: el bloc ha baixat 18,6)", () => {
+    expect(visualOffsetYFranjaPagina2({ ample: 1920, alt: 946 })).toBeCloseTo(9.08, 2);
   });
 
   it('a la tauleta vertical val 0', () => {
@@ -294,16 +321,16 @@ describe('visualOffsetYFranjaPagina2', () => {
 });
 
 describe('topFranjaPagina2', () => {
-  it('a 1920 dona 137,86 (el DOM, 137,85)', () => {
-    expect(topFranjaPagina2({ carril: 1143, escala: 1339 / 1350, ample: 1920, alt: 946 })).toBeCloseTo(137.86, 1);
+  it('a 1920 dona 156,46 (abans 137,86: el bloc ha baixat 18,6)', () => {
+    expect(topFranjaPagina2({ carril: 1143, escala: 1339 / 1350, ample: 1920, alt: 946 })).toBeCloseTo(156.46, 1);
   });
 
-  it('a 1440 dona 108,52 (el DOM, 108,51)', () => {
-    expect(topFranjaPagina2({ carril: 855, escala: 1002 / 1350, ample: 1440, alt: 800 })).toBeCloseTo(108.52, 1);
+  it('a 1440 dona 127,12 (abans 108,52)', () => {
+    expect(topFranjaPagina2({ carril: 855, escala: 1002 / 1350, ample: 1440, alt: 800 })).toBeCloseTo(127.12, 1);
   });
 
-  it('a 2560 dona 176,97 (el DOM, 176,96)', () => {
-    expect(topFranjaPagina2({ carril: 1527, escala: 1789 / 1350, ample: 2560, alt: 1306 })).toBeCloseTo(176.97, 1);
+  it('a 2560 dona 195,57 (abans 176,97)', () => {
+    expect(topFranjaPagina2({ carril: 1527, escala: 1789 / 1350, ample: 2560, alt: 1306 })).toBeCloseTo(195.57, 1);
   });
 
   it('a 1366x768 dona 85,88 (el DOM, 85,70: 0,18 px)', () => {

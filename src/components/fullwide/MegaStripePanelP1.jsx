@@ -252,8 +252,14 @@ function MegaStripePanelP1({
       // EL PAGELIFT ES DECLARA (26/09/2026): el punt fix del bucle era el top
       // natural del selector de la pagina 1 menys el desplacament de disseny
       // (vegeu `pageLiftPagina1`). El bucle que mesurava el selector i el
-      // panell va desaparèixer.
-      const next = pageLiftPagina1({ isPortraitTablet, isLandscapeTablet });
+      // panell va desaparèixer. La finestra hi entra perque l'ajust de les
+      // files nome's va a l'escriptori (`esEscriptoriPagina1`).
+      const next = pageLiftPagina1({
+        ample: typeof window !== 'undefined' ? window.innerWidth : 0,
+        alt: typeof window !== 'undefined' ? window.innerHeight : 0,
+        isPortraitTablet,
+        isLandscapeTablet,
+      });
       if (Math.abs(next - pageLiftRef.current) >= 0.5) {
         pageLiftRef.current = next;
         setPageLift(next);
