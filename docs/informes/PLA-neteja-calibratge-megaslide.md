@@ -516,3 +516,31 @@ bateria sencera (`npx vitest run`, `npx eslint` als fitxers tocats,
 `npx vite build`, `npm run compara-vistes` OK, `node scripts/mesura-formats.mjs`
 0 i 0, `node scripts/_tmp-errors2.mjs` "cap error"), i la pagina 2 intacta
 (punt de recuperacio `26442f5`).
+
+#### 10.3.1 Recepta per fer-ho (pels llocs exactes)
+
+1. **Treure el selector de la malla.** A `src/components/fullwide/MegaColumn.jsx`
+   la filera es construeix amb `columnItems` / el `grid-cols-9` del JSX, i el
+   selector hi entra com `CONTROL_TILE_BN` (la primera columna) i les fletxes com
+   `CONTROL_TILE_ARROWS` (l'ultima). Cal deixar la malla nome's per als dibuixos
+   i treure'n el selector.
+2. **Posar el selector a la dreta del carril**, al costat de la franja. El lloc
+   natural es `src/components/fullwide/MegaStripePanelP1.jsx` (que es qui te la
+   franja i el bloc del panell de la pagina 1), dins el mateix contenidor de
+   l'amplada del carril. La pastilla es `data-stripe-buttonbar="bn"` de
+   `src/components/fullwide/firstContactPanels.jsx` (ja quadrada des de
+   `97e2bd7`, 108x108 a 1920x946) i es qui rep els clics.
+3. **Alinear-hi les fletxes**: el bloc de fletxes (`CONTROL_TILE_ARROWS`, que es
+   pinta amb la botonera) ha de quedar sota el selector, amb la vora dreta a
+   x1524 a 1920x946 i la mateixa amplada (109x109 ara).
+4. **Estirar la graella**: de la vora esquerra del carril (x381) fins al bloc de
+   la dreta, amb el gap de la pagina 2: `carrilPx(midaSelector/2) + carrilPx(10)`
+   (vegeu `reservaDreta` a `src/components/fullwide/CercadorTextRow.jsx`).
+5. **Dues fileres intercalades** (el pas seguent): la graella de nou columnes
+   passa a la de `CercadorDibuixosGraella` de la pagina 2 — dues files de peces
+   grans amb la de baix desplacada, la finestra `alcadaCarrusel` i el desnivell
+   declarat a `desnivellsLiniesGraella`; l'alcada ha de ser la del bloc de
+   fletxes.
+6. **Numeros nous**: tots a `src/components/megaslide/geometriaMegaslide.js` com
+   a funcions pures amb prova a `tests/unit/geometria-megaslide.test.js` i la
+   mesura abans/despres al comentari, com la resta d'aquesta feina.
