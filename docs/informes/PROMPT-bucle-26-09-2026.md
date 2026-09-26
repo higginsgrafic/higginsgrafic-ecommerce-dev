@@ -3,8 +3,15 @@
 Ets un agent que continua la feina d'un altre al projecte
 **higginsgrafic-ecommerce-dev** (React 19 + Vite). Aquest prompt es un **bucle**:
 no aturis fins que tot el que hi ha a baix estigui **fet, mesurat, comitejat i
-pujat**, o fins que topis amb una decisio que nome's pugui prendre l'amo (llavors
-pregunta i para nome's aquell punt, no la feina).
+pujat**.
+
+**NO DEMANIS RES A NINGU.** L'amo no hi es: treballa sol, decideix tu i **deixa
+escrit el que has decidit i per que**. Si dubtes entre dues interpretacions,
+tria la que mes s'assembli a la pagina 2 (que es el punt estable i el model que
+l'amo assenyala sempre), fes-la, i anota la decisio a l'informe. Nomes has de
+parar quan la llista de la seccio 2 estigui tota feta i verificada, o quan hagis
+esgotat els camins d'un punt (llavors el desfes, l'escrius i passes al seguent:
+**no paris la feina sencera per un punt encallat**).
 
 El servidor del 3003 **ja corre** i es el de l'amo: no l'aturis ni n'aixeques
 cap altre. Els guions de Playwright el fan servir.
@@ -26,16 +33,42 @@ Cada volta:
 6. **Comiteja** nome's allo que estigui quadrat i verificat, amb el missatge en
    catala, la causa i les xifres abans/despres. **`git push`** (hi ha permis
    permanent).
-7. **Torna al punt 1.** No demanis permis per continuar.
+7. **Torna al punt 1.** No demanis permis per continuar. No paris a explicar res:
+   tu mateix ets l'unic que llegeix aquest bucle. Escriu-ho tot a l'informe.
 
-Si una cosa no es pot deixar quadrada i verificada: **es desfа** (`git checkout
--- fitxer`), s'escriu al pla **que s'ha trobat** (la mesura exacta i on es va
-encallar), i es passa al seguent punt de la llista. **No es comiteja mai** un
-canvi a mitges ni res que no hagis vist funcionar.
+**Regles de desempat i de no encallar-se:**
 
-**Quan la llista sigui buida:** torna a llegir la seccio 2 i comprova que totes
-les xifres son les que l'amo va demanar (les taules de la seccio 4). Si alguna no
-hi es, torna-hi. Si tot hi es, escriu l'informe de sessio (seccio 5) i para.
+- Si una cosa no es pot deixar quadrada i verificada: **es desfa** (`git checkout
+  -- fitxer`), s'escriu al pla **que s'ha trobat** (la mesura exacta i on es va
+  encallar), i es passa al seguent punt de la llista. **No es comiteja mai** un
+  canvi a mitges ni res que no hagis vist funcionar.
+- **Si un cami falla dues vegades, canvia de cami**: no insisteixis en la
+  mateixa estructura. Per a la pagina 1 hi ha **dos camins** i has de provar
+  els dos (seccio 2.B): (a) adaptar la malla de `MegaColumn`, i (b) **una filera
+  nova de trinca** a `MegaStripePanelP1` que no faci servir `MegaColumn` en
+  absolut (la graella duplicada de la p2 + el bloc de la dreta). El (b) es el
+  que l'amo ha demanat implicitament («l'has de substituir»).
+- **Si una mesura no dona el que toca, mesura el contenidor abans de culpar el
+  calcul**: `getComputedStyle(el).getPropertyValue('--hg-mega-w')`,
+  `getBoundingClientRect()` dels dos o tres ancestres, i `transform` de cadascun.
+  La meitat dels errors d'aquesta feina han estat variables de carril que no
+  resolen on es creu.
+- **Cada 4-5 commits**, torna a passar la bateria sencera i `compara-vistes`
+  encara que no hagis tocat la p2.
+
+**L'UNICA CONDICIO PER PARAR** (no n'hi ha cap altra):
+
+1. Tots els punts de la seccio 2 son fets **i verificats amb la mesura a la ma**
+   (les taules de la seccio 4), i
+2. la bateria sencera passa amb l'arbre net, i
+3. l'informe de la seccio 5 es comitejat i pujat.
+
+Si aquestes tres coses no es compleixen, **torna a començar el bucle pel punt 1**
+encara que hagis de desfer i refer. El pitjor que pots fer es parar amb una cosa
+a mitges o amb una mesura que no has comprovat: l'amo obre el navegador i ho veu
+en dos segons. I si et quedes sense camins per a un punt concret, **no paris la
+sessio**: desfes aquell punt, escriu-lo a l'informe amb la mesura exacta on
+s'encalla, i continua amb el seguent.
 
 ---
 
@@ -65,8 +98,9 @@ Sobre la captura del 26/09 a les 22:16. S'han de fer **un per commit**.
    pastilla grisa nome's a la fila activa. L'amo la vol com **un sol selector**
    (una pastilla que ocupa tota la columna, amb el nom actiu dins). Es a
    `CercadorColleccionsColumna` (`caixes`, la taula de la vista vertical, i
-   `linia`, la filera) i a `CercadorTextRow.jsx`. **Pregunta-li nome's si dubtes
-   de quina de les dues vistes vol dir**; mira la captura abans.
+   `linia`, la filera) i a `CercadorTextRow.jsx`. **Decideix tu**: la captura de
+   l'amo es la vista d'escriptori, i alla la columna es la de `caixes`; fes-la
+   alla i mira que la de la filera no es desquadri.
 2. **El fons de les fletxes desapareix i les fletxes es centren en el seu
    quadrat.** El bloc de fletxes (`#stripe-guide-right-anchor`,
    `FirstContactDibuix09Buttons` a `firstContactPanels.jsx`) porta un
