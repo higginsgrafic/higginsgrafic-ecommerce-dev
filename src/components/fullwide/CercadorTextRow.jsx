@@ -1207,6 +1207,8 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
   const graellaRef = useRef(null);
   const midesRef = useRef(null);
   const [midesGraella, setMidesGraella] = useState(null);
+  // L'espai fins a la franja de la mesura anterior (vegeu `sostre`).
+  const espaiAnteriorRef = useRef(null);
 
   useLayoutEffect(() => {
     if (!compact || isPortraitTablet || isLandscapeTablet) {
@@ -1227,11 +1229,41 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
       const pagina = el.closest('[data-mega-page-viewport="2"]') || document;
       const franja = pagina.querySelector('[data-stripe-visual-content="2"]');
       const sostre = franja ? franja.getBoundingClientRect().top : null;
+      // L'ESPAI FINS A LA FRANJA NOME'S QUAN ES REPETEIX (25/09/2026).
+      //
+      // La franja triga uns quants fotogrames a assentar-se (la seva escala i la
+      // seva alcada) i la filera tambe (el bucle del pare li aplica l'alineacio).
+      // Amb una sola mesura, la deduccio d'alçada encongia la graella per un
+      // espai que encara no era el de debò: mesurat a 1920, el retall passava de
+      // 95,2 a 89,9 px i tornava, i aixo movia la segona filera de dibuixos i la
+      // tira de colors. Amb la mesura repetida (dues passades amb el mateix
+      // espai), la deduccio nome's s'aplica quan la geometria ja es la bona; i si
+      // de debò no hi cap, s'aplica igualment (el repas de 400 ms ho garanteix).
+      const espai = sostre != null && daltGraella != null ? sostre - daltGraella : null;
+      const espaiConfirmat = espai != null
+        && espaiAnteriorRef.current != null
+        && Math.abs(espai - espaiAnteriorRef.current) < 0.5;
+      espaiAnteriorRef.current = espai;
 
       // El càlcul viu a midesGraella.js (funció pura, comprovable sense
       // navegador). Aquí només se li passen les mesures de la pantalla.
       const next = midesGraellaCompacta({
-        ampleAmple, sostre, daltGraella, isPortraitTablet, isLandscapeTablet,
+        ampleAmple,
+        // LA PRIMERA MESURA NO FA LA DEDUCCIO D'ALCADA (25/09/2026).
+        //
+        // En aquest instant la filera encara no te l'alineacio aplicada (aquest
+        // efecte es d'un fill i corre abans que el bucle del pare) i la franja
+        // encara s'esta assentant, o sigui que `sostre - daltGraella` es fals.
+        // Amb aquell espai la branca d'alçada encongia el dibuix un 20 % i el
+        // retall naixia a 71,9 px en comptes de 95,2: la segona filera de
+        // dibuixos saltava 11 px i la tira de colors i la segona filera de la
+        // filera, 23 px. Ho va veure l'amo.
+        //
+        // Les mides DECLARADES (amplada i pas dels cercles) ja son les
+        // definitives, i la deduccio s'aplica a la passada seguent (el rAF de
+        // sota), quan la geometria ja es la bona.
+        sostre: espaiConfirmat ? sostre : null,
+        daltGraella, isPortraitTablet, isLandscapeTablet,
         escala: readRootCssNumber('--hg-escala-mega', 1),
       });
 
@@ -1266,8 +1298,12 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
     const pagina = el.closest('[data-mega-page-viewport="2"]');
     if (pagina) observer?.observe(pagina);
     window.addEventListener('resize', mesura);
+    // El repas que garanteix que la deduccio s'aplica: es just despres de
+    // l'animacio d'obertura del panell (340 ms), quan la geometria ja no es mou.
+    const repas = window.setTimeout(mesura, 400);
     return () => {
       cancelAnimationFrame(frame);
+      window.clearTimeout(repas);
       observer?.disconnect();
       window.removeEventListener('resize', mesura);
     };

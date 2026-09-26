@@ -181,15 +181,25 @@ export function midesGraellaCompacta({ ampleAmple, sostre, daltGraella, isPortra
   }
   const factorDibuixEff = base > 0 ? dibuix / base : 1;
 
-  // 2) Alçada: les files de dibuixos han de quedar alineades amb les files de
-  //    la graella de colors (mateix pas vertical). Si amb aquest pas la graella
-  //    no hi cap fins a la franja de samarretes, es redueix la separació
-  //    vertical i, si encara no hi cap, el dibuix (mantenint la proporció amb
-  //    la separació horitzontal).
+  // 2) EL PAS VERTICAL ALINEAT ES DECLARA SEMPRE (25/09/2026).
+  //
+  //    Les files de dibuixos han de quedar alineades amb les files de la
+  //    graella de colors: `dibuix + gapV` ha de fer el pas dels cercles. Aixo
+  //    NO depèn de cap mesura de la pantalla, i per tant es pot aplicar des del
+  //    primer pintat. Abans es calculava nome's quan hi havia `sostre`, o sigui
+  //    que la primera mesura (amb la franja encara sense assentar) pintava el
+  //    pas de reserva i la graella feia un salt: mesurat a 1920, el retall
+  //    naixia a 71,9 px i passava a 95,2 px, i amb ell la segona filera de
+  //    dibuixos i la tira de colors.
+  //
+  //    El que SÍ que depèn de la franja és la DEDUCCIÓ: si amb aquest pas la
+  //    graella no hi cap fins a la franja de samarretes, es redueix la
+  //    separació vertical i, si encara no hi cap, el dibuix (mantenint la
+  //    proporció amb la separació horitzontal).
+  gapV = Math.max(0, colorPas(isPortraitTablet, isLandscapeTablet) * factorDibuixEff - dibuix);
   if (sostre != null && daltGraella != null) {
     const altDisp = sostre - daltGraella - GRAELLA_MARGE_FRANJA;
     if (altDisp > 0) {
-      gapV = Math.max(0, colorPas(isPortraitTablet, isLandscapeTablet) * factorDibuixEff - dibuix);
       const altNecessaria = GRAELLA_FILES * dibuix + (GRAELLA_FILES - 1) * gapV;
       if (altNecessaria > altDisp) {
         const altDibuixos = GRAELLA_FILES * dibuix;
