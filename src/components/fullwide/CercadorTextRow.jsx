@@ -1126,7 +1126,7 @@ export function CercadorColleccionsColumna({
   );
 }
 
-function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripeItem, hoveredStripeItem, onSelectGroup, onHoverItem, onHoverLeave, onCarouselStep, compact = false, selectedColor = 'white', onSelectColor, onSelectCollection, isPortraitTablet = false, isLandscapeTablet = false, fontBoost = 0, desplacamentVertical = 0, esquerra, midaSelector = 56, alineacioY = 0 }) {
+function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripeItem, hoveredStripeItem, onSelectGroup, onHoverItem, onHoverLeave, onCarouselStep, compact = false, selectedColor = 'white', onSelectColor, onSelectCollection, isPortraitTablet = false, isLandscapeTablet = false, fontBoost = 0, desplacamentVertical = 0, esquerra, midaSelector = 56, alineacioY = 0, onMides = null }) {
   // Ajust de la graella compacta a l'espai disponible (només desktop: les
   // tauletes mantenen la mida fixa de moment). Mesurem l'amplada de la columna
   // i el capdamunt de la franja de samarretes, i guardem la mida de dibuix i
@@ -1170,6 +1170,14 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
       if (!igual) {
         midesRef.current = next;
         setMidesGraella(next);
+        // I s'ho diem a qui ens ha de quadrar amb nosaltres (25/09/2026): la
+        // filera d'aquesta graella es la referencia amb que el selector
+        // Blanc/Color/Negre es centra, i la seva alçada es la de la graella. Si
+        // el pare no ho sap, centra el selector amb una alçada vella i l'ha de
+        // corregir al cap de 180 ms (mesurat a 1920: 11,16 px de salt amb el
+        // panell ja obrint-se). Amb l'avís, el bucle del pare torna a mesurar
+        // dins el mateix commit, abans de pintar.
+        onMides?.(next);
       }
     };
     const mesura = () => {
@@ -1205,7 +1213,7 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
     // Amb l'alineacio a les dependències, quan el pare aplica el desplaçament la
     // graella es torna a mesurar DINS el mateix commit (abans de pintar): el
     // primer fotograma ja surt a la mida bona i no hi ha salt.
-  }, [compact, isPortraitTablet, isLandscapeTablet, alineacioY]);
+  }, [compact, isPortraitTablet, isLandscapeTablet, alineacioY, onMides]);
 
   // LA COLUMNA DE COLLECCIONS, DEL TOP DEL SELECTOR AL BOTTOM DE LA STRIPE.
   //

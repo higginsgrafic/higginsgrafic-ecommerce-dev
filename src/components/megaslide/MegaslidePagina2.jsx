@@ -140,6 +140,15 @@ export default function MegaslidePagina2({
   // la graella de colors. Va a part de topVisualAlignmentY (que alinea el
   // selector amb el de la pàgina 1): així els dos ajustos no es trepitgen.
   const [selectorCentratgeY, setSelectorCentratgeY] = useState(0);
+  // LA MIDA MESURADA DE LA GRAELLA DE DIBUIXOS (25/09/2026).
+  //
+  // El centratge del selector depèn de l'alçada de la filera, i l'alçada de la
+  // filera és la de la graella. La graella la mesura `CercadorTextRow` (que és
+  // qui té la columna) i ens ho diu: així el bucle de sota torna a mesurar dins
+  // el mateix commit, quan la mida ja és al DOM. Sense això, la passada que veia
+  // la mida vella centrava el selector 11,16 px més avall del compte i el salt
+  // arribava amb el panell ja obrint-se (mesurat a 1920: 47,8 -> 36,63).
+  const [mesuraGraellaP2, setMesuraGraellaP2] = useState(null);
   // Els mateixos valors en refs: l'efecte de calibratge els necessita per
   // arrencar del que ja hi ha aplicat sense dependre de l'estat (que el faria
   // realimentar-se).
@@ -266,8 +275,18 @@ export default function MegaslidePagina2({
       if (filera) {
         const g = filera.getBoundingClientRect();
         const s = page2Selector.getBoundingClientRect();
+        // LES DUES PECES ES MOUEN AMB L'ALINEACIO (25/09/2026).
+        //
+        // `topVisualAlignmentY` el porta el contenidor de la filera I el
+        // selector: el desplaçament que encara no esta aplicat els mou tots dos
+        // igual, o sigui que el que es compara (la distancia entre els dos
+        // centres) no en depen. Sumar-lo nome's al selector, com es feia abans,
+        // deixava el centratge amb l'error del desplaçament pendent i calien
+        // passades de mes: mesurat a 1366x768, la passada de 180 ms encara
+        // corregia 21,27 px, que eren exactament el desplaçament d'alineacio
+        // que acabava d'aplicar la passada anterior.
         const centreFilera = g.top + g.height / 2;
-        const centreSelector = (s.top + deltaAlign) + s.height / 2;
+        const centreSelector = s.top + s.height / 2;
         deltaCentra = centreFilera - centreSelector;
       }
 
@@ -304,7 +323,12 @@ export default function MegaslidePagina2({
       window.clearTimeout(settleTimer2);
       window.removeEventListener('resize', schedule);
     };
-  }, [active, bnSliderSize, isPortraitTablet, isLandscapeTablet, page1PageLift, esBandaEstreta]);
+    // `mesuraGraellaP2` és una dependència de debò: quan la graella canvia de
+    // mida, l'alçada de la filera canvia amb ella i el centratge del selector
+    // s'ha de tornar a calcular. Com que l'avís arriba des d'un efecte de
+    // layout del fill (abans que aquest), la passada nova ja mesura el DOM amb
+    // la mida bona: el selector neix centrat i no s'ha de corregir després.
+  }, [active, bnSliderSize, isPortraitTablet, isLandscapeTablet, page1PageLift, esBandaEstreta, mesuraGraellaP2]);
 
   // (El centratge del selector amb la graella de colors s'ha fusionat amb
   // l'efecte de dalt. Era un segon bucle que reescrivia el valor que el primer
@@ -788,6 +812,7 @@ export default function MegaslidePagina2({
             // això mesurava amb la filera encara a baix i naixia un 20 % petita
             // (vegeu CercadorTextRow).
             alineacioY={topVisualAlignmentY}
+            onMides={setMesuraGraellaP2}
             isPortraitTablet={isPortraitTablet}
             isLandscapeTablet={isLandscapeTablet}
             activeCollection={active}
