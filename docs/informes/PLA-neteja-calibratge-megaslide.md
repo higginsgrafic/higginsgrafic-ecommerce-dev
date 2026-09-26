@@ -176,6 +176,97 @@ que es pinta (la tira) nome's 1048,8: la primera mesura de l'ombra va sortir a
 x376 (la vora de la capa) i amb `top: 0` al capdamunt de la pagina. S'ha de
 mesurar sobre `[data-stripe-visual-content="2"]` i sobre el top de la columna.
 
+### VOLTA 4 — B1 (feta)
+
+Mapa de les dues composicions, amb els numeros del prompt verificats a 1920x946
+(carril 1143, x381..1524):
+
+| què | pagina 1 (abans) | pagina 2 (referencia) |
+|---|---|---|
+| graella | x415,3 y84,1 1074,4x122,6 (malla de 9) | carrusel x450,4 y109,7 933,4x95,2 |
+| selector | 109,4x109,4 a x415,3 | 59,5x119 a x381 (rectangle) |
+| fletxes | bloc 109,5x109,5 a x1380,3 | 59,5x119 a x1324,3 |
+| franja | x358 y251,5 1048,8x112,3 | x358 y241,5 1048,8x112,3 |
+
+**`--hg-mega-w` SI QUE RESOL** a tots els nodes provats (html, panell, filera,
+graella, carrusel, selector): 1143 px. Tambe `--hg-escala-mega` (0,99185). O
+sigui que el 1,89 px de l'intent anterior NO era la variable: era el valor que
+es passava a la graella (vegeu la volta seguent).
+
+**Trampa de mesura apuntada:** la pagina 1 viu a `x = -1905` quan el megaslide es
+a la 2 (la tira de pagines fa `translateX(-25%)` amb `width: 400%`). Totes les
+`getBoundingClientRect` de la p1 surten desplaçades una amplada de maquetacio i
+s'han de normalitzar sumant-hi el `-left` de la seva vista.
+
+### VOLTA 5 — B2 (feta, `adda4c6`)
+
+La composicio de la pagina 1 muntada amb el cami (c). La filera ja no fa servir
+`MegaColumn` (nome's queda per a la vista vertical): `GraellaDuesFileresPagina1`
+(a l'esquerra) i `BlocDretaPagina1` (a la dreta).
+
+**La causa de l'encallament anterior, trobada:** a `GraellaDuesFileresPagina1`
+`dibuixPx` era `carrilPx(45)`, que torna la CADENA `calc(45px *
+var(--hg-escala-mega, 1))`. `CercadorDibuixosGraella` calcula el pas i l'alcada
+amb aquest valor (`dibuixPx > 0`, `dibuixPx + gapH`), i amb una cadena `omple`
+era cert: el carrusel naixia amb amplada i alcada ZERO (`carrusel 1025,5x0`), i
+el retall i la tira tambe. **El que cal passar es un NUMERO.**
+
+**Segona causa, tambe resolta:** `useEscalaFranjaCarril` triava la fletxa del
+carrusel amb `document.querySelectorAll` sobre TOT el document. Amb el bloc de
+fletxes nou, la pagina 1 tambe te `#stripe-guide-right-arrow` i quedava l'ultima
+de la llista: la franja de la PAGINA 2 es pintava amb l'objectiu de la 1 (x
+negativa) i la seva filera queia a x-59 amb 1006 px en comptes de 202..807 a
+1024. Ara es tria la fletxa de la pagina VISIBLE (la que te la vista dins la
+finestra) i `compara-vistes.mjs` fa el mateix per mesurar-la.
+
+Xifres (1920x946):
+
+| què | abans | despres | objectiu |
+|---|---|---|---|
+| graella esquerra | 415,3 | **381** | 381 (vora del carril) |
+| bloc de la dreta vora dreta | 1489,7 | **1524** | 1524 (vora del carril) |
+| gap graella-bloc | — | **10** | 10 |
+| alcada de la filera | (una fila) | **110 + 110** | selector + fletxes |
+| peca de la graella | (malla de 9) | **44,63** | 44,63 (com la p2) |
+| franja (top) | 251,5 | **242,1** | 241,5 (p2) |
+
+A 1440x800 i 2560x1306 l'esquema tambe quadra (gap de 7,5 i 13,3 px de disseny, i
+la franja a 0,3 px de la de la p2).
+
+Bateria: 576 proves, eslint 0 errors nous, build OK, `compara-vistes` OK,
+`mesura-formats` 0 i 0, `_tmp-errors2` cap error.
+
+### VOLTA 6 — B4 (feta, `bd992cd`)
+
+Els numeros de la composicio, declarats a `geometriaMegaslide.js` amb cinc
+proves noves (581 al total): `PAGINA1_COSTAT_PECA_PX` (45),
+`PAGINA1_GAP_DRETA_PX` (10), `PAGINA1_MIDA_BLOC_DRETA_PX` (110),
+`PAGINA1_ALCADA_FILERA_PX` (110), `PAGINA1_TOP_FILERA_PX` (13,8),
+`PAGINA1_AJUST_FRANJA_PX` (112,8), i les funcions `pagina1BlocDretaPx`,
+`pagina1AmpladaGraellaPx` i `pagina1AlcadaFileraPx`.
+
+### VOLTA 7 — B3 i B5 (fetes)
+
+- **B3:** les files de la p1 son les de la p2 perque **son la mateixa peça**
+  (`CercadorDibuixosGraella` amb `carrilPx(45)`): mateixa mida (44,63 px a
+  1920), mateix ziga-zaga i mateixa relacio amb el selector. El selector de la
+  p1 es quadrat i cau centrat al mig de la filera de dalt i la de baix.
+- **B5:** la pagina 2 no s'ha mogut: franja 241,5 / 353,8 i els centres de les
+  files de dibuixos i de les cel·les del selector, els mateixos que a `HEAD`
+  (`compara-vistes` OK amb les tolerancies de sempre).
+
+**Decisio de muntatge (i el seu limit mesurat):** el bloc de la dreta fa
+`110 + 110` d'alcada (selector quadrat a dalt i fletxes quadrades a sota) i
+acaba a y317,9; la franja comenca a y241,5. Les caixes es trepitgen 76 px en
+vertical, **pero nome's en la seva cantonada inferior esquerra**: la tira de
+samarretes nome's arriba a x1406,8 i el bloc comenca a x1414 (la seva vora dreta
+es la del carril), o sigui que el bloc VISIBLE del bloc queda lliure (ho
+comprova `_tmp-b2-marca.mjs`: la cantonada de la franja i la del bloc no es
+toquen). Es la consequencia de les xifres que ha demanat l'amo (bloc quadrat de
+110+110 a la vora dreta i franja a l'alcada de la de la p2) i s'apunta a
+l'informe.
+
+
 
 ---
 
