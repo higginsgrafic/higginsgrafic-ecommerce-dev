@@ -457,3 +457,23 @@ Amb el selector ja quadrat (108x108, commit `97e2bd7`), el bloc de fletxes de la
 pagina 1 (109x109) ja te la mateixa mida: el que queda del punt 3 es posar-lo on
 toca (alineat amb el selector, a la vora dreta del carril) i, si l'amo ho vol,
 apilar-hi les dues fletxes com a la pagina 2.
+
+### 10.2 El lloc de la pagina 1, aclarit per l'amo (26/09/2026)
+
+> «El selector i les fletxes han d'estar alineats a la dreta del carril.»
+
+Correccio important del que jo havia suposat: a la pagina 2 el selector va a la
+vora ESQUERRA del carril; a la pagina 1, l'amo el vol **a la dreta**, i les
+fletxes tambe, alineades totes dues amb la vora dreta del carril (x1524 a
+1920x946).
+
+O sigui que la composicio de la pagina 1 queda:
+
+    [ graella ............................................. ] [ selector ]
+                                                              [ fletxes  ]
+                        franja de samarretes (a sota, amplada del carril)
+
+amb el selector i el bloc de fletxes a la dreta del carril i alineats entre
+ells, i la graella estesa des de la vora esquerra del carril fins a ells (amb el
+seu gap). El selector ja es quadrat (108x108, `97e2bd7`) i el bloc de fletxes
+tambe (109x109), de manera que ja hi quadren.
