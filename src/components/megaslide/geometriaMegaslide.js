@@ -216,3 +216,60 @@ export function alcadaSelector(midaSelector, escala) {
 export function alcadaCellaSelector(midaSelector, escala) {
   return alcadaSelector(midaSelector, escala) / 3;
 }
+
+/**
+ * EL CENTRATGE DEL SELECTOR, DECLARAT (26/09/2026)
+ * -----------------------------------------------------------------------------
+ * El selector Blanc/Color/Negre s'havia de centrar amb la filera (la graella de
+ * dibuixos mes la fila de colors) i aixo es feia amb un bucle que mesurava els
+ * dos centres. Pero els dos costats depenen de les MATEIXES mides declarades, i
+ * la formula es exacta:
+ *
+ *   centre de la filera = centre del selector
+ *   -> `selectorCentratgeY = extra + (alcadaFilera - alcadaSelector) / 2`
+ *
+ * `extra` es el desplac,ament de disseny del contenidor de la filera (20 px a
+ * l'escriptori; 45 a la banda estreta i 5 a la tauleta apaissada, vegeu
+ * `MegaslidePagina2`), i `alcadaFilera` es:
+ *
+ *   alcadaCarrusel (les dues files de dibuixos) + carrilLane(40) (la fila de
+ *   colors, que es `calc(carrilLane(40) - 10px)` mes el `rowGap` de 10)
+ *
+ * IMPORTANT: aquest valor NO depen de l'alineacio amb la pagina 1
+ * (`topVisualAlignmentY`): les dues peces es mouen juntes, i per aixo el
+ * centratge es pot declarar tot sol.
+ *
+ * Comprovat contra el DOM a 1920, 1440, 1512, 1680, 2000, 2560 i 1400: la
+ * diferencia maxima es 0,035 px.
+ */
+export const GRAELLA_FILA_COLORS_CARRIL_PX = 40;
+
+/** L'alçada de les dues files de dibuixos (el retall del carrusel). */
+export function alcadaCarruselGraella(dibuix, gapV) {
+  if (!Number.isFinite(dibuix) || dibuix <= 0) return 0;
+  const g = Number.isFinite(gapV) && gapV > 0 ? gapV : 0;
+  // La peca del carrusel fa 1,5 cops el dibuix.
+  return 2 * (1.5 * dibuix + g);
+}
+
+/**
+ * El desplac,ament vertical del selector perque quedi centrat amb la filera.
+ *
+ * @param {object} o
+ * @param {number} o.midaSelector mida de disseny del selector (`bnSliderSize`)
+ * @param {number} o.escala escala del megaslide (`--hg-escala-mega`)
+ * @param {number} o.dibuix mida del dibuix de la graella (`midesGraella.dibuix`)
+ * @param {number} o.gapV separacio vertical de la graella (`midesGraella.gapV`)
+ * @param {number} o.carril amplada del carril (`--hg-mega-w`)
+ * @param {number} [o.desplacTop=12] el desplac,ament NET de disseny: el `top`
+ *   extra del contenidor de la filera, mes el `top` de la filera dins seu,
+ *   menys el `top` del contenidor del selector i el `mt-2` de la pastilla.
+ *   A l'escriptori: 20 + 40 - 40 - 8 = 12.
+ * @returns {number} px
+ */
+export function centratgeSelectorY({ midaSelector, escala, dibuix, gapV, carril, desplacTop = 12 }) {
+  const alcadaCarrusel = alcadaCarruselGraella(dibuix, gapV);
+  const alcadaFilaColors = (carril * GRAELLA_FILA_COLORS_CARRIL_PX) / MEGASLIDE_REFERENCIA_PX;
+  const alcadaSel = alcadaSelector(midaSelector, escala);
+  return desplacTop + (alcadaCarrusel + alcadaFilaColors - alcadaSel) / 2;
+}

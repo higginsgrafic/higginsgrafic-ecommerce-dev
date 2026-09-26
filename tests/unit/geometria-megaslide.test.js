@@ -5,6 +5,8 @@ import {
   ampladaRetallGraella,
   alcadaSelector,
   alcadaCellaSelector,
+  alcadaCarruselGraella,
+  centratgeSelectorY,
   FRANJA_FITXER_AMPLADA,
   FRANJA_FITXER_ALCADA,
   FRANJA_FITXER_ASPECTE,
@@ -90,5 +92,26 @@ describe('alcadaSelector', () => {
   it('la cella es un terc de la pastilla', () => {
     // El DOM mesura 119 px d'alcada: la cella, 39,67.
     expect(alcadaCellaSelector(120, 1339 / 1350)).toBeCloseTo(119 / 3, 1);
+  });
+});
+
+describe('centratgeSelectorY', () => {
+  it('a 1920 dona 17,03 (el bucle en mesurava 17,07)', () => {
+    const scy = centratgeSelectorY({
+      midaSelector: 120, escala: 1339 / 1350, dibuix: 29.7556, gapV: 2.9756, carril: 1143,
+    });
+    expect(scy).toBeCloseTo(17.03, 2);
+  });
+
+  it('a 1440 dona 15,76 (el bucle, 15,76)', () => {
+    const scy = centratgeSelectorY({
+      midaSelector: 120, escala: 1002 / 1350, dibuix: 22.2667, gapV: 2.2267, carril: 855,
+    });
+    expect(scy).toBeCloseTo(15.76, 2);
+  });
+
+  it("l'alcada del carrusel es dues vegades la filera (peca 1,5x + gap)", () => {
+    expect(alcadaCarruselGraella(29.7556, 2.9756)).toBeCloseTo(2 * (1.5 * 29.7556 + 2.9756), 6);
+    expect(alcadaCarruselGraella(0, 0)).toBe(0);
   });
 });

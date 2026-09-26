@@ -3,9 +3,9 @@ import { CERCADOR_COLORS } from '../fullwide/CercadorTopBar.jsx';
 import CercadorTextRow from '../fullwide/CercadorTextRow.jsx';
 import MegaStripePanel from '../fullwide/MegaStripePanel.jsx';
 import { FRANJA_AJUST_PX } from '../fullwide/MegaStripePanelP1.jsx';
-import { AJUST_FRANJA_TAULETA_APAISSADA_PX } from './geometriaMegaslide.js';
+import { AJUST_FRANJA_TAULETA_APAISSADA_PX, centratgeSelectorY } from './geometriaMegaslide.js';
 import { desplacamentFranjaEscriptori } from '../../utils/mesuraMegaslide.js';
-import { carrilPx } from '../../utils/layoutMetrics.js';
+import { carrilPx, readRootCssNumber, MEGASLIDE_REFERENCIA_PX } from '../../utils/layoutMetrics.js';
 import { CapaTaulaVertical, TaulaVerticalP2 } from './TaulaVertical.jsx';
 import {
   CercadorColleccionsColumna,
@@ -13,7 +13,7 @@ import {
   CercadorDibuixosGraella,
   dibuixosGraella16x4,
 } from '../fullwide/CercadorTextRow.jsx';
-import { colorGap } from '../fullwide/midesGraella.js';
+import { colorGap, midaDibuix, gapVertical } from '../fullwide/midesGraella.js';
 import { ampladaCarril } from './TaulaVertical.jsx';
 import MegaHeroSlider from '../MegaHeroSlider.jsx';
 import Pauta4ColsOverlay from '../pauta/Pauta4ColsOverlay';
@@ -256,48 +256,46 @@ export default function MegaslidePagina2({
       const offset = (typeof window !== 'undefined' && window.innerWidth >= 768 && window.innerWidth <= 1366 && window.innerWidth >= window.innerHeight) ? 10 : 0;
       const deltaAlign = (p1Top + offset) - (p2Top - centraAplicat);
 
-      // 2) CENTRATGE (fórmula original): el centre del selector ha de coincidir
-      //    amb el de la filera que flanquegen el selector i les fletxes: la
-      //    graella de dibuixos mes la fila de colors. Es treballa sobre la
-      //    posició que tindrà DESPRÉS de l'alineació, que és el que fa el bucle
-      //    original quan corre tot seguit de l'altre.
+      // 2) CENTRATGE (DECLARAT, 26/09/2026): el centre del selector ha de
+      //    coincidir amb el de la filera que flanquegen el selector i les
+      //    fletxes: la graella de dibuixos mes la fila de colors.
+      //
+      //    JA NO ES MESURA. Els dos costats surten de les mateixes mides
+      //    declarades (`centratgeSelectorY`: l'alcada del carrusel mes la fila
+      //    de colors, menys l'alcada del selector), i la formula NO depen de
+      //    l'alineacio amb la pagina 1 perque les dues peces es mouen juntes.
+      //    El bucle nome's l'aplica, i el repas de 180/340 ms el refresca si la
+      //    finestra ha canviat.
       //
       //    AQUESTA ÉS LA REFERÈNCIA DEL SELECTOR, i no es mou (24/09/2026, ho va
       //    demanar l'amo: «mou la fila, no el selector»). El que s'hi alinea és
       //    la SEGONA LÍNIA de la graella de dibuixos, i ho fa la filera
       //    (`CercadorTextRow`), que es qui sap on cau cada línia.
-      //
-      //    ABANS MESURAVA LA GRAELLA DE COLORS 4x4: quan les catorze mostres van
-      //    passar a ser una fila prima sota el carrusel, el seu centre va baixar
-      //    57 px i s'enduia el selector i les fletxes cap avall (mesurat a 1920:
-      //    el bloc de fletxes passava de 70,2 a 127,1 px).
-      const filera = viewportRef.current?.querySelector('[data-p2-cercador-row]');
-      let deltaCentra = 0;
-      if (filera) {
-        const g = filera.getBoundingClientRect();
-        const s = page2Selector.getBoundingClientRect();
-        // LES DUES PECES ES MOUEN AMB L'ALINEACIO (25/09/2026).
-        //
-        // `topVisualAlignmentY` el porta el contenidor de la filera I el
-        // selector: el desplaçament que encara no esta aplicat els mou tots dos
-        // igual, o sigui que el que es compara (la distancia entre els dos
-        // centres) no en depen. Sumar-lo nome's al selector, com es feia abans,
-        // deixava el centratge amb l'error del desplaçament pendent i calien
-        // passades de mes: mesurat a 1366x768, la passada de 180 ms encara
-        // corregia 21,27 px, que eren exactament el desplaçament d'alineacio
-        // que acabava d'aplicar la passada anterior.
-        const centreFilera = g.top + g.height / 2;
-        const centreSelector = s.top + s.height / 2;
-        deltaCentra = centreFilera - centreSelector;
-      }
+      // El desplac,ament NET de disseny (vegeu `centratgeSelectorY`): el `top`
+      // extra del contenidor de la filera, mes el `top` de la filera dins seu
+      // (`topGraellaColors`), menys el `top` del contenidor del selector i el
+      // `mt-2` de la pastilla (`firstContactPanels`).
+      const bandaSeleccio = typeof window !== 'undefined'
+        && window.innerWidth >= 768 && window.innerWidth <= 1366 && window.innerWidth >= window.innerHeight;
+      const desplacTopSelector = (isLandscapeTablet ? 5 : (bandaSeleccio ? 45 : 20))
+        + topGraellaColors - (40 + (bandaSeleccio ? 5 : 0)) - 8;
+
+      const scyDeclarat = centratgeSelectorY({
+        midaSelector: bnSliderSize,
+        escala: readRootCssNumber('--hg-escala-mega', 1),
+        dibuix: mesuraGraellaP2?.dibuix ?? midaDibuix(isPortraitTablet, isLandscapeTablet),
+        gapV: mesuraGraellaP2?.gapV ?? gapVertical(isPortraitTablet, isLandscapeTablet),
+        carril: readRootCssNumber('--hg-mega-w', MEGASLIDE_REFERENCIA_PX),
+        desplacTop: desplacTopSelector,
+      });
 
       if (Math.abs(deltaAlign) >= 0.5) {
         alignRefY.current = alignAplicat + deltaAlign;
         setTopVisualAlignmentY(alignRefY.current);
       }
-      if (Math.abs(deltaCentra) >= 0.5) {
-        centraRefY.current = centraAplicat + deltaCentra;
-        setSelectorCentratgeY(centraRefY.current);
+      if (Math.abs(scyDeclarat - centraAplicat) >= 0.5) {
+        centraRefY.current = scyDeclarat;
+        setSelectorCentratgeY(scyDeclarat);
       }
     };
 
@@ -329,7 +327,7 @@ export default function MegaslidePagina2({
     // s'ha de tornar a calcular. Com que l'avís arriba des d'un efecte de
     // layout del fill (abans que aquest), la passada nova ja mesura el DOM amb
     // la mida bona: el selector neix centrat i no s'ha de corregir després.
-  }, [active, bnSliderSize, isPortraitTablet, isLandscapeTablet, page1PageLift, esBandaEstreta, mesuraGraellaP2]);
+  }, [active, bnSliderSize, isPortraitTablet, isLandscapeTablet, page1PageLift, esBandaEstreta, topGraellaColors, mesuraGraellaP2]);
 
   // (El centratge del selector amb la graella de colors s'ha fusionat amb
   // l'efecte de dalt. Era un segon bucle que reescrivia el valor que el primer
