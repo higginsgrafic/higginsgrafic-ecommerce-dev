@@ -132,48 +132,6 @@ export default function MegaMenuPanel({
   isPortraitTablet = false,
   isLandscapeTablet = false,
 }) {
-  // LA PORTA D'ENTRADA (26/09/2026).
-  //
-  // L'amo ho veia en uns fotogrames: el panell s'ensenyava amb els dibuixos com
-  // a text i les samarretes buides. Mesurat al flux de carrega: al primer
-  // fotograma pintat hi havia 0 de 128 dibuixos decodificats.
-  //
-  // Aquest efecte amaga el CONTINGUT (una classe, que React no toca; no un
-  // estat, per no moure l'ordre dels hooks) fins que les peces que cauen dins
-  // el retall del carrusel tenen la imatge decodificada, amb un topall de
-  // 700 ms. El criteri son NOME'S les peces del retall: les altres porten
-  // `loading="lazy"` i no es baixen mai mentre el panell es tancat.
-  useEffect(() => {
-    const arrel = megaMenuRef?.current;
-    if (!arrel) return undefined;
-    let frame = 0;
-    const t0 = performance.now();
-    arrel.classList.add('hg-mega-amagat');
-    const comprova = () => {
-      const clip = arrel.querySelector('[data-carrusel="1"]');
-      const c = clip ? clip.getBoundingClientRect() : null;
-      const peces = (clip && c) ? [...clip.querySelectorAll('button')].filter((b) => {
-        const r = b.getBoundingClientRect();
-        return r.width > 0 && r.right > c.left && r.left < c.right;
-      }) : [];
-      const fetes = peces.filter((b) => {
-        const im = b.querySelector('img');
-        return im && im.complete && im.naturalWidth > 0;
-      }).length;
-      const suficient = !peces.length || fetes >= Math.ceil(peces.length * 0.9);
-      if (suficient || performance.now() - t0 > 700) {
-        arrel.classList.remove('hg-mega-amagat');
-        return;
-      }
-      frame = requestAnimationFrame(comprova);
-    };
-    frame = requestAnimationFrame(comprova);
-    return () => {
-      cancelAnimationFrame(frame);
-      arrel.classList.remove('hg-mega-amagat');
-    };
-  }, [active, megaMenuRef]);
-
   if (!active) return null;
 
   // Dimensions i format de la finestra. Es calculen aquí dalt perquè els fan
