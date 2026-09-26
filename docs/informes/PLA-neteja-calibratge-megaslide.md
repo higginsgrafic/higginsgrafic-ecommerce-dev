@@ -594,6 +594,43 @@ cau (146,3).
 **Criteris:** el guio temporal de dalt per a les xifres i la bateria sencera
 (seccio 10.3). La pagina 2 no s'hi ha de moure.
 
+**Intent del 26/09/2026 al vespre (desfet, i per que).** Vaig provar de fer els
+punts 1, 2 i 3 de cop: treure el selector i les fletxes de la malla (una prop
+`selectorDreta` a `MegaColumn`, amb el bloc del selector i el de les fletxes com
+a variables per pintar-los a la columna de la dreta) i moure la graella. La
+peca de dalt es pot reaprofitar (les dues variables i la prop), pero el
+POSICIONAMENT no va quadrar i ho vaig desfer (`git checkout`): el bloc de la
+dreta sortia 33-49 px mes a la dreta del carril (x1557 en comptes de x1524) i la
+graella tornava a x415 en comptes de x381.
+
+El que hi ha darrere, mesurat, perque el seguent que ho provi no hi torni a
+caure:
+
+- **La graella va escalada al 94 % amb l'origen al centre** (`MegaStripePanelP1`,
+  `scale(var(--hgGridFitScale))`): el contingut fa el carril (1143 unitats) i es
+  pinta de x381 a x1455. El bloc de la dreta (103 px) **no hi cap** a x1524 si
+  primer no s'estreny la graella: perque la seva vora dreta hi caigui, la malla
+  ha d'acabar a `1455` i el bloc anar-hi a sobre, o be la malla ha de fer
+  `carril - (bloc + gap)` amb l'origen a l'esquerra (i alla l'esquerra se'n va a
+  x381 nome's si l'origen es `top left`).
+- **`tileSizeRef`** (la mesura del tile) va lligada a la SEGONA cel·la de la
+  malla (`ref={idx === 1 ? tileSizeRef : undefined}`): si el selector surt de la
+  malla, la mesura del tile canvia de significat i totes les mides que en pengen
+  (les fletxes, el selector, la reserva de la franja) es mouen.
+- **Les fletxes** (`FirstContactDibuix09Buttons`) fan la mida de la seva columna
+  (`aspect-square w-full`): per tenir-les quadrades (109x109) nome's cal que la
+  columna faci 109, i aixo ho ha de decidir la filera, no la malla.
+
+**Recepta que hi encaixa** (per al proper intent, i es pot fer per commit):
+
+1. La filera es un contenidor `relative` que fa el carril dins la pantalla, amb
+   `transform: scale(0.94)` i `transformOrigin: 'top left'` (perque l'esquerra
+   caigui a x381). Dins seu: una malla de VUIT columnes de dibuixos que ocupa
+   `carril - (MIDA_BLOC_DRETA + GAP)` i el bloc de la dreta a l'extrem.
+2. Amb aixo el bloc de la dreta surt quadrat (109) i la seva vora dreta es la
+   del carril; la graella arrenca a x381 i acaba on comença el bloc.
+3. Les fletxes, dins del bloc, quadrades (109x109) i a sota del selector.
+
 #### 10.3.1 Recepta per fer-ho (pels llocs exactes)
 
 1. **Treure el selector de la malla.** A `src/components/fullwide/MegaColumn.jsx`
