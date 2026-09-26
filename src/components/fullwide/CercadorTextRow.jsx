@@ -1,4 +1,4 @@
-import React, { useLayoutEffect, useRef, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { CERCADOR_COLLECTIONS, CERCADOR_COLORS, etiquetaColleccio } from './CercadorTopBar.jsx';
 // La geometria de la graella viu a midesGraella.js perquè també la fa servir
 // el mòdul de mesura única. Aquí només es consumeix.
@@ -480,7 +480,41 @@ export function CercadorDibuixosGraella({
   // `compara-vistes`). No es pot declarar amb una constant: l'alçada de cel·la
   // del selector canvia amb la vista.
   const [desnivellsLinies, setDesnivellsLinies] = useState({ primera: 0, segona: 0 });
+  // EL VALOR QUE EL DOM TÉ APLICAT, NO EL QUE S'HA DECIDIT (25/09/2026).
+  //
+  // La ref s'actualitza DESPRÉS de pintar. Abans s'escrivia dins del mateix
+  // bucle, i això feia que dues passades que mesuraven el MATEIX DOM sumessin el
+  // mateix delta dues vegades: els temporitzadors de 250 i 400 ms, quan el fil
+  // principal va ocupat (obertura en fred), expiren junts i el navegador els
+  // executa a la mateixa tasca, o sigui que la segona passada mesura abans que
+  // React hagi pintat la primera. Mesurat: 3 de 6 obertures en fred acabaven amb
+  // les dues files 13,6 i 15,9 px per sota de les seves cel·les (el bucle
+  // arrencava de 0,9 i hi tornava a sumar el mateix −13,6).
+  //
+  // Partint del que està PINTAT, dues passades amb la mateixa mesura donen el
+  // mateix objectiu i la correcció és idempotent.
   const desnivellsRef = useRef({ primera: 0, segona: 0 });
+  useEffect(() => {
+    desnivellsRef.current = desnivellsLinies;
+  }, [desnivellsLinies]);
+  // LA FINESTRA TAMBE COBRA EL DESNIVELL MESURAT (25/09/2026).
+  //
+  // Les dues files es col·loquen MESURADES (aquest bucle les centra a les
+  // cel·les BLANC i COLOR del selector) i la finestra es DECLARA
+  // (`alcadaFila * 2`). Quan la fila de dalt puja (`top: -primera`), el seu
+  // capdamunt queda per sobre de la vora de la finestra i el retall
+  // (`overflow: hidden`) se'n menja la primera fila de pixels: mesurat a 1920, la
+  // fila puja 0,89 px i els dibuixos tenen tinta al primer pixel natural, o
+  // sigui que es tallava tinta de debò.
+  //
+  // El que es fa es pujar la CAIXA del retall el que la fila s'ha enfilat i
+  // baixar-ne el contingut el mateix (el marge de la tira): les peces no es mouen
+  // gens, nome's la vora de dalt de la finestra.
+  //
+  // I s'hi afegeix la TOLERANCIA DEL BUCLE (0,5 px, la que el fa parar): el bucle
+  // pot deixar la fila mig pixel mes amunt del seu punt fix, i amb la vora a ras
+  // (`0,00 px`) un arrodoniment de pixel de pantalla encara podria pelar-ne un.
+  const sobreixDalt = carrusel ? Math.max(0, desnivellsLinies.primera) + 0.5 : 0;
   useLayoutEffect(() => {
     if (!carrusel) return undefined;
     const el = graellaRef.current;
@@ -495,17 +529,32 @@ export function CercadorDibuixosGraella({
       const objectius = [s.top + cella / 2, s.top + cella * 1.5];
       const delta = [linies[0].centre - objectius[0], linies[1].centre - objectius[1]];
       if (Math.abs(delta[0]) < 0.5 && Math.abs(delta[1]) < 0.5) return;
-      desnivellsRef.current = {
-        primera: desnivellsRef.current.primera + delta[0],
-        segona: desnivellsRef.current.segona + delta[1],
-      };
-      setDesnivellsLinies(desnivellsRef.current);
+      // L'objectiu es calcula des del valor PINTAT (`desnivellsRef`, que
+      // s'actualitza despres de pintar): dues passades que mesuren el mateix DOM
+      // donen el mateix objectiu, i no se suma dues vegades.
+      const pintat = desnivellsRef.current;
+      setDesnivellsLinies({
+        primera: pintat.primera + delta[0],
+        segona: pintat.segona + delta[1],
+      });
     };
-    calcula();
+    // LA PRIMERA PASSADA VA EN UN rAF, NO A L'EFECTE DE LAYOUT (25/09/2026).
+    //
+    // Les dues files neixen a lloc i el que les acaba de quadrar és aquesta
+    // primera passada. A l'efecte de layout la mesura era falsa: aquest efecte és
+    // d'un fill i corre ABANS que el bucle que centra el selector amb la filera
+    // (`selectorCentratgeY`), o sigui que el selector encara era 13,6 px més amunt
+    // i el bucle hi aplicava una correcció de +14,5 px que després havia de desfer
+    // (i que aixecava la fila de dalt 14,5 px, amb la tinta tallada, gairebé un
+    // segon en una obertura en fred). El rAF arriba abans del primer pintat però
+    // DESPRÉS dels efectes de layout: el selector ja hi és centrat, la mesura és
+    // la bona, i el bucle neix quadrat sense cap salt als 250 ms.
+    const frame = requestAnimationFrame(calcula);
     const t1 = window.setTimeout(calcula, 250);
     const t2 = window.setTimeout(calcula, 400);
     window.addEventListener('resize', calcula);
     return () => {
+      cancelAnimationFrame(frame);
       window.clearTimeout(t1);
       window.clearTimeout(t2);
       window.removeEventListener('resize', calcula);
@@ -709,12 +758,25 @@ export function CercadorDibuixosGraella({
         <div
           ref={graellaRef}
           style={{
-            position: 'relative',
+            // LA CAIXA DEL RETALL, FORA DEL FLUX (25/09/2026).
+            //
+            // La finestra s'ha de poder pujar el que la fila de dalt s'enfila
+            // (`sobreixDalt`) sense que es mogui res mes. Amb marges no es pot
+            // fer: el marge de dalt del fill es col·lapsa amb el del pare i el
+            // que acaba movent-se es la fila (mesurat: les peces baixaven 13 px
+            // i la fila de baix quedava tallada). Fora del flux, en canvi, la
+            // caixa del retall no participa en cap layout: el contenidor segueix
+            // fent `alcadaCarrusel` d'alçada (i la filera del grid no es mou), i
+            // aqui nome's puja la vora que retalla.
+            position: 'absolute',
+            top: sobreixDalt ? -sobreixDalt : 0,
+            left: 0,
+            right: 0,
             // `width: auto` (i no `100%`) perque el coixi de la dreta descompti
             // de l'amplada: amb `100%` la caixa es quedava sencera i el retall
             // no servia de res.
             width: 'auto',
-            height: '100%',
+            height: sobreixDalt ? `calc(100% + ${sobreixDalt}px)` : '100%',
             marginRight: reservaDreta,
             // SENSE BARRA DE DESPLAÇAMENT: el moviment el fa el gest (i les
             // fletxes al desktop). `pan-y` deixa el desplac,ament vertical de la
@@ -730,6 +792,9 @@ export function CercadorDibuixosGraella({
             position: 'relative',
             width: `${ampleTira}px`,
             height: '100%',
+            // El contingut torna a baixar el que la caixa del retall ha pujat:
+            // les peces queden exactament on eren.
+            marginTop: sobreixDalt,
             transform: `translateX(${-desplacEf}px)`,
             willChange: 'transform',
           }}>
