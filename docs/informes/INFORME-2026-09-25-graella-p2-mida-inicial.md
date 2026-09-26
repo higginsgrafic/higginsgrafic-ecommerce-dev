@@ -1,6 +1,6 @@
 # INFORME — la pàgina 2 del megaslide neix a la mida bona (graella i selector)
 
-**Data:** 25/09/2026 (nit) · **Branca:** `main` · **Commits:** `cfb635e`, `97a3656`
+**Data:** 25/09/2026 (nit) · **Branca:** `main` · **Commits:** `cfb635e`, `97a3656`, `3e24b43`
 
 Cinquena i sisena iteració del bucle d'estabilització de la pàgina 2. Són **dos
 problemes**, tots dos de la mateixa família (una mesura que arriba tard a qui
@@ -160,25 +160,70 @@ O sigui:
 
 Com que la finestra es declara (95,20) i les files es col·loquen mesurades, la
 vora de dalt de la finestra pot quedar per sota del capdamunt de la fila de
-dalt. Mesurat amb la tinta de cada fitxer (quin pixel natural té tinta a dalt i a
+dalt. Mesurat amb la tinta de cada fitxer (quin píxel natural té tinta a dalt i a
 baix):
 
 | | fila de dalt | fila de baix |
 |---|---|---|
 | **abans** (`e37c6ff`) | 25,66 → 70,28 (sobrava espai) | 68,80 → **113,42** dins una finestra de 95,2 → **5 px de tinta tallats a baix** |
-| **ara** | −0,89 → 43,73 → **0,89 px de tinta tallats a dalt** | 42,23 → 86,86 (dins, amb 8,3 px de marge) |
+| **ara** | 0,50 → 45,13 (dins, amb 0,5 px de marge) | 43,63 → 88,25 (dins, amb 8,3 px de marge) |
 
 És a dir: la correcció del §2 no només va fer néixer la graella a la mida bona,
 sinó que va **treure un tall de 5 px de tinta a la fila de baix** que no estava
 mesurat (el bucle de centratge arrossegava les dues files cap avall perquè
-mesurava amb l'alçada de graella equivocada). El que queda és 0,89 px de tinta
-tallada a la fila de dalt, perquè la fila puja `primera` (0,89 px) per caure a la
-cel·la BLANC i la vora de la finestra es queda on és. Els dibuixos tenen tinta al
-primer pixel natural (mesurat), o sigui que es talla tinta de debò, no marge.
+mesurava amb l'alçada de graella equivocada).
 
-**Pendent de decisió de l'amo**: tancar aquests 0,89 px fent que la finestra
-contingui les files tal com les col·loca el bucle mesurat (avui la vora de dalt de
-la finestra és declarada i la fila és mesurada).
+## 4 bis. El bucle de les dues files comptava la mateixa correcció dues vegades (25/09/2026, nit)
+
+Perseguint aquell 0,89 px va sortir un peix molt més gros: **3 de 6 obertures en
+fred acabaven amb les dues files 13,6 i 15,9 px per sota de les seves cel·les**
+(mesurat a 1920, amb context nou a cada obertura; les bones donaven 0,01 px).
+
+### La causa, mesurada
+
+El bucle de `desnivellsLinies` sumava el delta al `ref`, i el `ref` s'escrivia
+**dins del mateix bucle**. Quan el fil principal va ocupat (obertura en fred), els
+temporitzadors de 250 i 400 ms expiren junts i el navegador els executa a la
+**mateixa tasca**: la segona passada mesura abans que React hagi pintat la
+primera, troba el mateix delta i el torna a sumar. Traça de dues obertures (el
+`ref` i el valor pintat a cada passada):
+
+```
+(bona)  t=1619 ref=0,00/0,00   t=2091 ref=14,50/21,30   t=2214 -> 0,90/5,37   (0,01 px de desviament)
+(dolenta) t=1917 ref=0,00/0,00  t=2819 ref=14,50/21,30  t=2823 ref=14,50/21,30 -> -12,70/-10,55
+```
+
+Els dos passos de la dolenta són a 4 ms l'un de l'altre: són els dos
+temporitzadors a la mateixa tasca.
+
+### La correcció (`3e24b43`)
+
+1. El `ref` passa a ser **el valor pintat** (s'actualitza després de pintar, amb
+   un `useEffect`), i l'objectiu es calcula des d'ell: dues passades amb la
+   mateixa mesura donen el mateix objectiu i la correcció és **idempotent**.
+2. La primera passada va en un **`rAF`** i no a l'efecte de layout: aquell efecte
+   és d'un fill i corre **abans** que el bucle que centra el selector amb la
+   filera, o sigui que mesurava amb el selector 13,6 px més amunt i hi aplicava
+   una correcció de +14,5 px que després havia de desfer (i que aixecava la fila
+   de dalt 14,5 px, amb la tinta tallada, gairebé un segon en una obertura en
+   fred). El `rAF` arriba abans del primer pintat però **després** dels efectes
+   de layout.
+3. La **caixa del retall** conté la fila de dalt sencera: puja el que la fila
+   s'enfila (`primera`) més la tolerància del bucle (0,5 px) i la tira baixa el
+   mateix, de manera que les peces no es mouen gens. La caixa va **fora del
+   flux**: amb marges, el marge de dalt del fill es col·lapsa amb el del pare i
+   les peces baixaven 13 px amb la fila de baix tallada (mesurat).
+
+### Com queda, mesurat
+
+| comprovació | abans | ara |
+|---|---|---|
+| obertures en fred amb les files desalineades (>1 px) | **3 de 6** | **0 de 6** |
+| desviament de cada fila respecte de la seva cel·la, al primer fotograma pintat (8 finestres: 1920, 1680, 1440, 1366, 1280, 2560, 1024×768, 768×1024) | — | **0,00 a 0,02 px, i un sol estat pintat** |
+| tinta tallada a la fila de dalt (1920) | 0,89 px (i 14,5 px transitòriament) | **0,00 px, amb 0,5 px de marge** |
+| tinta tallada a la fila de baix | 5 px (abans del §2) | **0,00 px, amb 8,3 px de marge** |
+| canvi de col·lecció amb el megaslide obert | — | res no es mou |
+| `compara-vistes`, `vitest` (514), `vite build`, `mesura-formats` (0 i 0) | — | **tot OK** |
 
 - **El bucle de centratge continua sent un bucle** (dues fórmules que es miren
   l'una a l'altra, amb repassos a 180 i 340 ms). S'ha provat de substituir-lo per
@@ -200,6 +245,8 @@ node scripts/_tmp-obrir-zero2.mjs      # mides pintades del primer fotograma al 
 node scripts/_tmp-estabilitat-p2.mjs   # posicions relatives de filera, selector i franja
 node scripts/_tmp-canvis-p2.mjs        # canvi de colleccio, redimensionar i tauletes
 node scripts/_tmp-retall-illes.mjs     # on cauen les dues files dins del retall i quina tinta es talla
+node scripts/_tmp-naixement-p2.mjs     # el primer fotograma PINTAT ja te les files a lloc? (8 finestres)
+node scripts/_tmp-bimodal.mjs          # 6 obertures en fred: el bucle cau sempre al mateix lloc?
 ```
 
 Els tres són temporals i **no es comitegen**.
