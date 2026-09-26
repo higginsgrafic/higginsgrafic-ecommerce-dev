@@ -1,6 +1,6 @@
 # INFORME — la pàgina 2 del megaslide neix a la mida bona (graella i selector)
 
-**Data:** 25/09/2026 (nit) · **Branca:** `main` · **Commits:** `cfb635e`, `97a3656`, `3e24b43`
+**Data:** 25/09/2026 (nit) · **Branca:** `main` · **Commits:** `cfb635e`, `97a3656`, `3e24b43`, `aec0074`
 
 Cinquena i sisena iteració del bucle d'estabilització de la pàgina 2. Són **dos
 problemes**, tots dos de la mateixa família (una mesura que arriba tard a qui
@@ -8,7 +8,7 @@ l'ha de fer servir), amb la causa mesurada de cadascun.
 
 ---
 
-## 1. Estat de sortida (mesurat després dels dos commits)
+## 1. Estat de sortida (mesurat després de tots els commits)
 
 | comprovació | resultat |
 |---|---|
@@ -20,7 +20,8 @@ l'ha de fer servir), amb la causa mesurada de cadascun.
 | errors de consola a l'obertura | **0** |
 | clics de les 14 samarretes de la franja | **10/10 casos comparables correctes** (les 4 excepcions són les del registre de rutes: `3cube-p0`, `iron-kong`, `ironman-68` i el `nx-01` de color) |
 | botó d'enrere després d'una PDP | franja oberta, 14 cases, `?active=first-contact`, 0 errors |
-| canvi de col·lecció amb el megaslide obert | res no es mou (selector 36,63 / retall 95,2 / cella 44,6333 abans i després) |
+| canvi de col·lecció amb el megaslide obert | res no es mou (selector 36,63 / retall 96,59 / cella 44,6333 abans i després) |
+| en OBRIR (primer fotograma pintat → definitiu, a 1920, 1512×900 DPR 2, 1440 i 2560) | **un sol estat pintat**: no es mou ni la tira de colors, ni el bloc de fletxes, ni la segona filera, ni la franja |
 | redimensionar amb el megaslide obert | la geometria s'assenta de seguida i no deriva (1700×900: 32,45 / 84,27 / 39,5 als 1,5 s i als 2,1 s) |
 
 Cap `push` fet: ho ha de dir l'amo (regla de la casa).
@@ -225,6 +226,39 @@ temporitzadors a la mateixa tasca.
 | canvi de col·lecció amb el megaslide obert | — | res no es mou |
 | `compara-vistes`, `vitest` (514), `vite build`, `mesura-formats` (0 i 0) | — | **tot OK** |
 
+## 4 ter. La tira de colors i el bloc de fletxes (`aec0074`)
+
+L'amo ho va veure i ho va dir exacte: «es mou la tira de colors, es reajusta la
+segona fila de la graella i tot el bloc de la graella es mou, excepte el
+selector», tot dins el primer segon d'obrir.
+
+Mesurat amb mostreig **després de pintar** (primer fotograma pintat → definitiu):
+
+| peça | 1920×946 | 1512×900 | 1440×800 | 2560×1306 |
+|---|---|---|---|---|
+| tira de colors (`[data-p2-color-grid]`) | 74,36 → **93,34** (19 px) | 36,20 → **73,41** (37 px) | — | — |
+| bloc de fletxes | −27,44 → **−6,83** (20,6 px) | −44,13 → **−5,41** (38,7 px) | −47,09 → **−5,11** (42 px) | −1,14 → **−9,11** (8 px) |
+
+Mateixa causa: els dos bucles són efectes de **layout**, i els efectes dels fills
+van **abans** que el bucle del pare que centra el selector amb la filera.
+Mesuraven amb el selector 19–42 px més amunt, hi aplicaven la correcció, i el
+repàs de 250 ms la desfeia.
+
+Arreglat igual que el bucle de les files: la primera passada en un `rAF` (abans
+del primer pintat, després dels efectes de layout) i, al de la tira de colors,
+arrencar del valor **pintat** en comptes d'una `ref` escrita dins del bucle.
+
+Mesurat després: **un sol estat pintat** a 1920×946, 1512×900 (DPR 2), 1440×800 i
+2560×1306 — selector, les dues files de dibuixos, la tira de colors, la segona
+filera, la columna de col·leccions, el bloc de fletxes, la franja i l'alçada de
+la filera no es mouen gens després del primer fotograma.
+
+**Pendent** (mesurat i sense repro avui): el bucle dels marges de la columna de
+col·leccions té la mateixa forma (primera passada a l'efecte de layout) però no
+mou res en obrir. Es deixa com està.
+
+## 5. El bucle de centratge
+
 - **El bucle de centratge continua sent un bucle** (dues fórmules que es miren
   l'una a l'altra, amb repassos a 180 i 340 ms). S'ha provat de substituir-lo per
   una convergència síncrona dins del primer `rAF` (`flushSync`) i **s'ha
@@ -238,7 +272,7 @@ temporitzadors a la mateixa tasca.
 
 ---
 
-## 5. Com es torna a comprovar
+## 6. Com es torna a comprovar
 
 ```
 node scripts/_tmp-obrir-zero2.mjs      # mides pintades del primer fotograma al definitiu (6 finestres)
@@ -247,6 +281,7 @@ node scripts/_tmp-canvis-p2.mjs        # canvi de colleccio, redimensionar i tau
 node scripts/_tmp-retall-illes.mjs     # on cauen les dues files dins del retall i quina tinta es talla
 node scripts/_tmp-naixement-p2.mjs     # el primer fotograma PINTAT ja te les files a lloc? (8 finestres)
 node scripts/_tmp-bimodal.mjs          # 6 obertures en fred: el bucle cau sempre al mateix lloc?
+node scripts/_tmp-obrir-tot.mjs        # en OBRIR: que es mou entre el primer fotograma pintat i el final
 ```
 
 Els tres són temporals i **no es comitegen**.
