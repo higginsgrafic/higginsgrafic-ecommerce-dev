@@ -373,12 +373,15 @@ function MegaStripePanel({
       let collection = null;
       let subcollection = null;
       let srcDeLaCasa = null;
+      // LA CASA CLICADA surt nome's de les coordenades del clic (les catorze
+      // cases son fixes): es calcula un sol cop i la fan servir el pintor i el
+      // gestor.
+      const idx = (isPortraitTablet && typeof y === 'number')
+        ? Math.min(13, Math.max(0, (y < 0.5 ? 0 : 7) + Math.min(6, Math.max(0, Math.floor(x * 7)))))
+        : Math.min(13, Math.max(0, Math.floor(x * 14)));
       try {
         const capa = filaFranjaRef.current;
         if (capa) {
-          const idx = (isPortraitTablet && typeof y === 'number')
-            ? Math.min(13, Math.max(0, (y < 0.5 ? 0 : 7) + Math.min(6, Math.max(0, Math.floor(x * 7)))))
-            : Math.min(13, Math.max(0, Math.floor(x * 14)));
           const casa = capa.querySelector(`[data-stripe-tile="${idx}"]`);
           srcDeLaCasa = casa?.getAttribute?.('data-stripe-src') || null;
           if (srcDeLaCasa && Array.isArray(stripeStrip?.srcs)) {
@@ -400,20 +403,23 @@ function MegaStripePanel({
       }
       if (!item) {
         // Reserva (si el DOM no hi es): la rotacio, comptada una sola vegada.
-        const tileIdx = (isPortraitTablet && typeof y === 'number')
-          ? Math.min(13, Math.max(0, (y < 0.5 ? 0 : 7) + Math.min(6, Math.max(0, Math.floor(x * 7)))))
-          : Math.min(13, Math.max(0, Math.floor(x * 14)));
-        item = stripeTileItems?.[tileIdx] || selectedItem || stripeTileItems?.[0] || null;
-        collection = stripeStrip?.collections?.[tileIdx] || active;
-        subcollection = stripeStrip?.subcollections?.[tileIdx] || null;
+        item = stripeTileItems?.[idx] || selectedItem || stripeTileItems?.[0] || null;
+        collection = stripeStrip?.collections?.[idx] || active;
+        subcollection = stripeStrip?.subcollections?.[idx] || null;
       }
       if (!item) return;
       if (!collection) collection = active;
       // I la samarreta clicada tambe ACTIVA la seva colleccio (25/09/2026, ho va
       // demanar l'amo): es el mateix cami que el clic d'una icona atenuada de la
-      // graella, i deixa la colleccio centrada a la finestra de la graella.
+      // graella.
+      //
+      // LA CASA I EL `src` VAN AL GESTOR (26/09/2026): si la samarreta es
+      // velada (d'una altra colleccio), la franja NO s'ha de tornar a centrar;
+      // el dibuix clicat s'ha de quedar exactament a la casa on era, o el
+      // client el perd de sota el cursor o el dit. Vegeu l'ancoratge a
+      // `MegaslidePagina2`.
       if (typeof onStripeStripSelect === 'function') {
-        onStripeStripSelect(collection, subcollection);
+        onStripeStripSelect(collection, subcollection, { cell: idx, src: srcDeLaCasa, item });
       }
       onShirtClick(collection, item, shirtColor);
     };
