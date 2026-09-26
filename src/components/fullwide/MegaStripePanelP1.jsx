@@ -616,11 +616,16 @@ function MegaStripePanelP1({
                       src={stripeImageSrc || '/placeholders/t-shirt_buttons/v5/full-color-stripe-5.webp'}
                       alt=""
                       className="block"
+                      // Les mides del fitxer per atribut: vegeu MegaStripePanel
+                      // (la filera de la franja no pot fer zero d'amplada mentre
+                      // la imatge arriba, perque l'escala de la franja se'n val).
+                      width={2866}
+                      height={307}
                       style={{
                         height: '100%',
                         width: 'auto',
                       }}
-                      loading="lazy"
+                      loading="eager"
                       decoding="async"
                     />
                   ) : null}
