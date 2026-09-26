@@ -10,7 +10,7 @@ import {
 } from './midesGraella.js';
 // L'amplada del retall (l'últim input mesurat de la graella) viu amb la resta
 // de geometria declarada del megaslide.
-import { ampladaRetallGraella, ampladaColumnaGraella, desnivellsLiniesGraella, desnivellColorsGraella, margeBaixFletxesGraella, GRAELLA_DRETA_FLETXES_CARRIL_PX } from '../megaslide/geometriaMegaslide.js';
+import { ampladaRetallGraella, ampladaColumnaGraella, desnivellsLiniesGraella, desnivellColorsGraella, margeBaixFletxesGraella, centratgeSelectorY, desplacTopSelector, GRAELLA_DRETA_FLETXES_CARRIL_PX } from '../megaslide/geometriaMegaslide.js';
 import { carrilPct, carrilLane, carrilPx, readRootCssNumber, getLayoutViewportWidth, MEGASLIDE_REFERENCIA_PX } from '../../utils/layoutMetrics.js';
 import { GRAELLA_DIBUIXOS_ESCALA_VERTICAL } from '../../config/stripeCalibrationsVertical.js';
 import { FirstContactDibuix09Buttons } from './firstContactPanels.jsx';
@@ -1226,7 +1226,6 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
     const aplicar = () => {
       const pintat = mesuresRef.current;
       const filera = el.closest('[data-p2-cercador-row]');
-      const selector = pagina?.querySelector('[data-p2-color-selector] [data-stripe-buttonbar="bn"]');
       const nou = { ...pintat };
       let canvia = false;
 
@@ -1301,6 +1300,17 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
         }
       }
 
+      // Valors efectius de la graella i del carril: els fan servir els blocs 2 i 3.
+      const carrilEf = readRootCssNumber('--hg-mega-w', MEGASLIDE_REFERENCIA_PX);
+      const escalaEf = readRootCssNumber('--hg-escala-mega', 1);
+      const dibuixEf = nou.midesGraella?.dibuix ?? pintat.midesGraella?.dibuix ?? midaDibuix(isPortraitTablet, isLandscapeTablet);
+      const gapVEf = nou.midesGraella?.gapV ?? pintat.midesGraella?.gapV ?? gapVertical(isPortraitTablet, isLandscapeTablet);
+      const desplacTopEf = desplacTopSelector({
+        ample: typeof window !== 'undefined' ? window.innerWidth : 0,
+        alt: typeof window !== 'undefined' ? window.innerHeight : 0,
+        isLandscapeTablet,
+      });
+
       // 2) LA TIRA DE COLORS (14x1), CENTRADA AMB LA CEL·LA NEGRE DEL SELECTOR.
       //    L'amo ho va demanar el 24/09/2026: cada peca cau sobre la cel·la del
       //    selector que li toca. El selector no es mou: el que puja son les
@@ -1310,10 +1320,6 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
       //    la cel·la NEGRE i s'anaven igualant. Ara surt de
       //    `desnivellColorsGraella`, amb les mides del carril i del selector.
       {
-        const carrilEf = readRootCssNumber('--hg-mega-w', MEGASLIDE_REFERENCIA_PX);
-        const escalaEf = readRootCssNumber('--hg-escala-mega', 1);
-        const dibuixEf = nou.midesGraella?.dibuix ?? pintat.midesGraella?.dibuix ?? midaDibuix(isPortraitTablet, isLandscapeTablet);
-        const gapVEf = nou.midesGraella?.gapV ?? pintat.midesGraella?.gapV ?? gapVertical(isPortraitTablet, isLandscapeTablet);
         // La separacio entre barres va amb el mateix factor que el dibuix (vegeu
         // el render): amb la mida base, no amb la del carrusel.
         const factorDibuixEf = (nou.midesGraella && nou.midesGraella.dibuix != null)
@@ -1346,11 +1352,18 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
       // 3) ELS MARGES DE LA COLUMNA DE COLLECCIONS. L'amo ho va demanar el
       //    24/09/2026 («el bottom de la stripe»): la columna va del top del
       //    selector al bottom de la tinta de la franja de samarretes.
-      if (filera && selector && franja) {
+      if (filera && franja) {
         const f = filera.getBoundingClientRect();
-        const dalt = f.top - selector.getBoundingClientRect().top;
+        // EL MARGEDALT ES DECLARA (26/09/2026): es el `desplacTop` menys el
+        // centratge del selector; abans es mesurava el top del selector.
+        const scyEf = centratgeSelectorY({
+          midaSelector, escala: escalaEf, dibuix: dibuixEf, gapV: gapVEf, carril: carrilEf, desplacTop: desplacTopEf,
+        });
+        const dalt = desplacTopEf - scyEf;
+        // El marge de BAIX encara depèn de la franja (la cadena vertical de la
+        // pagina 1): es mesura.
         const baix = franja.getBoundingClientRect().bottom - f.bottom;
-        if (Math.abs(pintat.margesEnllacos.dalt - dalt) >= 0.5
+        if (Math.abs(pintat.margesEnllacos.dalt - dalt) >= 0.01
           || Math.abs(pintat.margesEnllacos.baix - baix) >= 0.5) {
           nou.margesEnllacos = { dalt, baix };
           canvia = true;

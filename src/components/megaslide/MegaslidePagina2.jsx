@@ -3,7 +3,7 @@ import { CERCADOR_COLORS } from '../fullwide/CercadorTopBar.jsx';
 import CercadorTextRow from '../fullwide/CercadorTextRow.jsx';
 import MegaStripePanel from '../fullwide/MegaStripePanel.jsx';
 import { FRANJA_AJUST_PX } from '../fullwide/MegaStripePanelP1.jsx';
-import { AJUST_FRANJA_TAULETA_APAISSADA_PX, centratgeSelectorY } from './geometriaMegaslide.js';
+import { AJUST_FRANJA_TAULETA_APAISSADA_PX, centratgeSelectorY, desplacTopSelector } from './geometriaMegaslide.js';
 import { desplacamentFranjaEscriptori } from '../../utils/mesuraMegaslide.js';
 import { carrilPx, readRootCssNumber, MEGASLIDE_REFERENCIA_PX } from '../../utils/layoutMetrics.js';
 import { CapaTaulaVertical, TaulaVerticalP2 } from './TaulaVertical.jsx';
@@ -271,14 +271,15 @@ export default function MegaslidePagina2({
       //    demanar l'amo: «mou la fila, no el selector»). El que s'hi alinea és
       //    la SEGONA LÍNIA de la graella de dibuixos, i ho fa la filera
       //    (`CercadorTextRow`), que es qui sap on cau cada línia.
-      // El desplac,ament NET de disseny (vegeu `centratgeSelectorY`): el `top`
+      // El desplac,ament NET de disseny (vegeu `desplacTopSelector`): el `top`
       // extra del contenidor de la filera, mes el `top` de la filera dins seu
       // (`topGraellaColors`), menys el `top` del contenidor del selector i el
       // `mt-2` de la pastilla (`firstContactPanels`).
-      const bandaSeleccio = typeof window !== 'undefined'
-        && window.innerWidth >= 768 && window.innerWidth <= 1366 && window.innerWidth >= window.innerHeight;
-      const desplacTopSelector = (isLandscapeTablet ? 5 : (bandaSeleccio ? 45 : 20))
-        + topGraellaColors - (40 + (bandaSeleccio ? 5 : 0)) - 8;
+      const desplacTopEf = desplacTopSelector({
+        ample: typeof window !== 'undefined' ? window.innerWidth : 0,
+        alt: typeof window !== 'undefined' ? window.innerHeight : 0,
+        isLandscapeTablet,
+      });
 
       const scyDeclarat = centratgeSelectorY({
         midaSelector: bnSliderSize,
@@ -286,7 +287,7 @@ export default function MegaslidePagina2({
         dibuix: mesuraGraellaP2?.dibuix ?? midaDibuix(isPortraitTablet, isLandscapeTablet),
         gapV: mesuraGraellaP2?.gapV ?? gapVertical(isPortraitTablet, isLandscapeTablet),
         carril: readRootCssNumber('--hg-mega-w', MEGASLIDE_REFERENCIA_PX),
-        desplacTop: desplacTopSelector,
+        desplacTop: desplacTopEf,
       });
 
       if (Math.abs(deltaAlign) >= 0.5) {

@@ -237,6 +237,36 @@ export function alcadaCellaSelector(midaSelector, escala) {
 }
 
 /**
+ * EL DESPLAÇAMENT NET DE DISSENY DEL SELECTOR (`desplacTop`), DECLARAT
+ * -----------------------------------------------------------------------------
+ * Es el numero que lliga la filera i el selector: entra a `centratgeSelectorY`
+ * i es, tambe, el `margeDalt` de la columna de colleccions (el top de la filera
+ * menys el top de la pastilla). Es declara de la mateixa manera que ho fa
+ * `MegaslidePagina2`:
+ *
+ *   desplacTop = top extra de la filera + top de la filera dins el contenidor
+ *                - top del contenidor del selector - `mt-2` de la pastilla
+ *
+ * A l'escriptori val 12 (20 + 40 - 40 - 8); a la banda estreta, -6, i a la
+ * tauleta apaissada, -8.
+ *
+ * @param {object} o
+ * @param {number} o.ample amplada de la finestra (window.innerWidth)
+ * @param {number} o.alt alcada de la finestra (window.innerHeight)
+ * @param {boolean} [o.isLandscapeTablet]
+ * @param {number} [o.mtPill=8] el `mt-2` de la pastilla dins l'embolcall
+ * @returns {number} px
+ */
+export function desplacTopSelector({ ample, alt, isLandscapeTablet = false, mtPill = 8 }) {
+  const banda = Number.isFinite(ample) && Number.isFinite(alt) && ample >= 768 && ample <= 1366 && ample >= alt;
+  const esBandaEstreta = !isLandscapeTablet && banda;
+  const topFileraDins = 40 - (esBandaEstreta ? 38 : 0);
+  const extraTop = isLandscapeTablet ? 5 : (banda ? 45 : 20);
+  const topSelector = 40 + (banda ? 5 : 0);
+  return extraTop + topFileraDins - topSelector - mtPill;
+}
+
+/**
  * EL CENTRATGE DEL SELECTOR, DECLARAT (26/09/2026)
  * -----------------------------------------------------------------------------
  * El selector Blanc/Color/Negre s'havia de centrar amb la filera (la graella de
