@@ -355,10 +355,20 @@ no es dona.
    retall no es baixen mai mentre el panell està tancat; el criteri bo és **les
    peces que cauen dins el retall del carrusel** (es pot calcular amb el rect del
    retall i els de les peces).
-2. **`scrollbar-gutter: stable` a l'arrel**: treu d'arrel la família de salts
-   per aparició de la barra de desplaçament (també quan s'obre el megaslide).
-   És un canvi de tot el lloc (15 px de reserva sempre), o sigui que necessita
-   el vist-i-plau de l'amo.
+2. **`scrollbar-gutter: stable` a l'arrel**: **ja hi és** (`src/index.css:50`) i
+   fa la feina. Mesurat a 2560×1306 (on la pàgina passa de no tenir barra de
+   desplaçament a tenir-ne en obrir el megaslide) i a 1920×946:
+
+   | | clientWidth tancat | clientWidth obert | carril tancat | carril obert | diferència |
+   |---|---|---|---|---|---|
+   | 2560×1306 | 2560 | 2560 | (sense megaslide) | 1527 px | **0 px** |
+   | 1920×946 | 1920 | 1920 | 1143 px | 1143 px | **0 px** |
+
+   O sigui que la família de salts per aparició de la barra ja està coberta, i
+   **la meva atribució anterior del salt de l'escalfament a la barra era
+   incorrecta**: aquell salt (6,7 px a 1512 i 11,5 px a 2560) venia de la
+   geometria de la pàgina 1, que s'assenta quan el panell passa d'anar fora del
+   flux a anar-hi (l'alineació es mesura contra el selector de la pàgina 1).
 
 ## 5. El bucle de centratge
 
