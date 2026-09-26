@@ -339,6 +339,9 @@ export function dibuixosGraella16x4() {
     collection: group.collection,
     subcollection: group.subcollection,
     stripeItem: STRIPE_MAP[label],
+    // El fitxer de graella que es veu al retall. El fa servir la porta
+    // d'obertura del megaslide per precarregar-lo abans de muntar el panell.
+    dibuix: dibuixDelNom(label),
   }))));
 }
 
@@ -718,7 +721,15 @@ export function CercadorDibuixosGraella({
           <img
             src={dibuix}
             alt={label}
-            loading="lazy"
+            // EAGER, NO LAZY (26/09/2026). El megaslide ja no es munta fins que
+            // aquests dibuixos son a la memoria (vegeu la porta d'obertura de
+            // `FullWideSlideHeader`). Amb `lazy`, el navegador encara esperava
+            // el seu propi fotograma per aplicar-los i el primer pintat del
+            // panell en podia tenir uns quants sense imatge; amb `eager`, la
+            // imatge de la memoria s'aplica de seguida. Com que el panell
+            // nome's es munta amb el megaslide obert, aixo no demana cap
+            // imatge de mes.
+            loading="eager"
             style={{
               // En manera d'omplir, el dibuix va un 20% mes petit que la
               // seva casella (la retícula queda igual), amb el factor propi
