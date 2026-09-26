@@ -2780,10 +2780,18 @@ function FullWideSlideHeader({
   // URL amb `?active=` (a l'inici, amb `pageshow` i amb `popstate`), el clic a
   // la icona de cerca i els enllacos de colleccio. En comptes d'amagar el
   // contingut (que ja s'ha provat i trenca el clic), es RETARDA EL MUNTATGE:
-  // primer es demanen TOTES les imatges, i nome's quan ja hi son (o quan
-  // passen 400 ms, perque cap xarxa lenta no bloquegi l'obertura) es munta el
+  // primer es demanen TOTES les imatges i nome's quan ja hi son es munta el
   // panell. Com que la peticio surt ABANS del muntatge, el panell neix amb les
   // imatges a la memoria i no es veu cap forat.
+  //
+  // EL TOPALL HA DE SER LLARG (26/09/2026). Amb els 400 ms de abans, una
+  // carrega una mica lenta feia obrir el panell amb les imatges a mig
+  // decodificar i els dibuixos arribaven a tongades: mesurat frenant les
+  // imatges de la graella 1,2 s, el panell s'obria al cap de 400 ms amb 0 de
+  // 128 decodificades i la fila de baix apareixia abans que la de dalt. Ho va
+  // veure l'amo. Ara el topall nome's es una xarxa de seguretat per si alguna
+  // peticio es queda penjada: el cami normal es obrir quan TOTES han
+  // decodificat (`allSettled`, que tambe deixa passar les que fallin).
   //
   // El que es desa es un boolea, i NOME'S es torna a passar la porta en OBRIR:
   // canviar de colleccio o de variant amb el panell obert no el tanca (seria un
@@ -2793,7 +2801,7 @@ function FullWideSlideHeader({
   // Les imatges precarregades s'han de quedar referenciades: si el navegador
   // les pot recollir abans que el panell les demani, es tornarien a baixar.
   const imatgesOberturaRef = useRef([]);
-  const TOPALL_PRECARREGA_MS = 400;
+  const TOPALL_PRECARREGA_MS = 4000;
 
   useEffect(() => {
     if (!active) {
