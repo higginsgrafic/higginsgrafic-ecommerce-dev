@@ -145,6 +145,38 @@ export const AJUST_FRANJA_TAULETA_APAISSADA_PX = -10;
 export const MARGE_EXTRA_ESCRIPTORI_PX = 20;
 
 /**
+ * EL PAGELIFT DE LA PÀGINA 1, DECLARAT (26/09/2026)
+ * -----------------------------------------------------------------------------
+ * La pàgina 1 es puja (`transform: translateY(-pageLift)`) perquè el seu
+ * selector quedi a la mateixa alçada que el de la pàgina 2. El valor es
+ * convergia amb un bucle que mesurava el selector de la pàgina 1 i el del
+ * panell (`deltaObjectiuPageLift`), però el punt fix és una resta:
+ *
+ *   pageLift = top natural del selector de la pàgina 1 - desplaçament
+ *
+ * `desplaçament` és 20 px a l'escriptori i 10 px a les tauletes
+ * (`deltaObjectiuPageLift`), i el top natural del selector dins el panell és
+ * **39,52 px** a TOTES les finestres i classes (mesurat a 1920, 1440, 1512,
+ * 1680, 2000, 2560, 1400, 1366x768, 1280x720, 1024x768 i 768x1024): són els
+ * 32 px del `py-8` del panell més el `mt-2` del selector, que el navegador hi
+ * deixa a 7,52.
+ *
+ * A la vista vertical no s'hi aplica (el valor és 0).
+ *
+ * @param {object} o
+ * @param {boolean} [o.isPortraitTablet]
+ * @param {boolean} [o.isLandscapeTablet]
+ * @returns {number} px
+ */
+export const TOP_SELECTOR_PAGINA1_PX = 39.52;
+
+export function pageLiftPagina1({ isPortraitTablet = false, isLandscapeTablet = false } = {}) {
+  if (isPortraitTablet) return 0;
+  const desplacament = isLandscapeTablet ? 10 : 20;
+  return Math.max(0, TOP_SELECTOR_PAGINA1_PX - desplacament);
+}
+
+/**
  * L'AMPLADA DEL RETALL DE LA GRAELLA, DECLARADA (26/09/2026)
  * -----------------------------------------------------------------------------
  * El retall (la finestra del carrusel de dibuixos) era l'ULTIM input mesurat de
