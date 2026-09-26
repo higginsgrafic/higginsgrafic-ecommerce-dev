@@ -336,7 +336,19 @@ export default function MegaMenuPanel({
           // El megaslide apareixia de cop i es veia com s'anava muntant el
           // contingut. Amb aquesta animacio es desplega suaument (baixa i es
           // fon alhora), i l'ull ja no percep que les imatges arriben.
-          animation: 'mega-panel-desplega 340ms cubic-bezier(0.22, 1, 0.36, 1)',
+          //
+          // MIG SEGON INVISIBLE ABANS DE DESPLEGAR-SE (26/09/2026), i aixo es el
+          // que fa que nome's es vegi UN estat: la composicio de la pagina 2
+          // acaba de quadrar-se DESPRES del primer pintat (l'alineacio amb la
+          // pagina 1 corre despres dels efectes de la filera, la mida de la
+          // graella s'hi dedueix, i hi ha els repasos de 180/340/400 ms). Sense
+          // aquest marge es veia com la fila de baix de la graella hi era abans
+          // que la de dalt —ho va veure l'amo— i com la resta s'hi afegia
+          // despres. Amb `backwards` el panell es queda amb el fotograma inicial
+          // (opacitat 0, 26 px mes amunt) durant l'espera, i els repasos que
+          // queden es fan amb el panell invisible. Els clics no s'hi perden:
+          // l'opacitat no treu els events, nome's la visibilitat.
+          animation: 'mega-panel-desplega 340ms cubic-bezier(0.22, 1, 0.36, 1) 500ms backwards',
           ...(megaFullScreen ? {
             minHeight: '100vh',
           } : {})
