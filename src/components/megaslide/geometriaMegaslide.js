@@ -125,6 +125,70 @@ export function escalaDibuixFranja(ampladaNatural) {
 }
 
 /**
+ * LA SILUETA NEGRA DE LA MASCARA DEL VEL, RETALLADA AL COS (26/09/2026)
+ * -----------------------------------------------------------------------------
+ * El vel de les samarretes que no son de la colleccio activa es pinta amb la
+ * SILUETA SENCERA (la casa 0 del full: 305,56 x 306,03 unitats, manigues
+ * incloses) escalada a la CASELLA de la seva casa (241,71 d'amplada a la
+ * franja d'una filera). Com que la silueta es mes ampla que la casella, en
+ * surt 31,93 unitats per cada costat.
+ *
+ * La MASCARA del vel (`hgVelSamarretaVisible`) pinta casa per casa, en ordre,
+ * la silueta BLANCA si la casa demana vel i NEGRA si es activa: on mana una
+ * samarreta activa, no hi ha vel (aixo evita que el vel taqui el tint d'una
+ * samarreta de color, ho va veure l'amo: «el canto esquerre» de la primera
+ * samarreta activa). Pero com que la silueta NEGRA d'una casa activa tambe
+ * surt de la seva casella, la seva MANIGA cau a sobre del cos de la casa
+ * velada del costat i li esborra el vel: queda un forat amb forma de rombe a
+ * l'intersseccio de les dues siluetes.
+ *
+ * Mesurat amb la sonda del vel pintat de vermell i l'SVG aillat
+ * (`_tmp-vel-aïlla.mjs`, temporal): la mascara, sola, deixava el vel tallat a
+ * 23-47 px de cada costat de la casa activa (31,93 unitats = 23 px a 1920),
+ * que son exactament les manigues de les cases del costat.
+ *
+ * La cura es retallar NOME'S les siluetes NEGRES de la mascara a la finestra
+ * del COS de la seva casa: aixi la casa activa segueix protegint el seu propi
+ * cos (que es on hi ha el tint) i la seva maniga ja no pot esborrar el vel de
+ * la veina. El vel (les siluetes blanques) NO es retalla: ha de cobrir tota la
+ * samarreta, manigues incloses, que es el que l'amo va demanar el 25/09.
+ *
+ * Comprovat amb `_tmp-vel-aïlla.mjs`: amb la mascara retallada el vel de les
+ * catorze cases te una cobertura continua (0..850 i 1772..2864 amb la
+ * MISCEL·LANIA activa) en comptes dels trams de 182 unitats amb forats de 16.
+ *
+ * D'on surten els numeros (tots dos del full de l'amo, `vectorFranja.js`):
+ *   - la silueta sencera (la casa 0 del full): x de 0 a 305,56;
+ *   - el cos (el cami de l'area d'impressio, `CLIC_AREA_ESTRETA`): x de 64,21 a
+ *     245,38, o sigui 181,17 d'amplada i el centre a 154,79.
+ */
+
+/** L'amplada de la finestra del cos, en fraccio de l'amplada de la silueta sencera. */
+export const VEL_AMPLADA_COS_FRACCIO = 181.17 / 305.56;
+
+/**
+ * La finestra (en el sistema de la silueta escalada) que limita el cos d'una
+ * casa: el rectangle on la seva silueta NEGRA pot esborrar el vel.
+ *
+ * Centrada a la caixa de la silueta i amb la seva alcada: el cos i la
+ * samarreta sencera tenen el mateix abast vertical (de 14,2 a 317,9 unitats).
+ *
+ * @param {{x:number,y:number,w:number,h:number}} caixa la caixa on s'ha escalat
+ *   la silueta (la casella de la casa, en unitats de la imatge del vel)
+ * @returns {{x:number,y:number,w:number,h:number}|null} la finestra, o null si
+ *   la caixa no es valida
+ */
+export function finestraCosVel(caixa) {
+  const x = Number(caixa?.x);
+  const y = Number(caixa?.y);
+  const w = Number(caixa?.w);
+  const h = Number(caixa?.h);
+  if (![x, y, w, h].every((v) => Number.isFinite(v)) || w <= 0 || h <= 0) return null;
+  const ample = w * VEL_AMPLADA_COS_FRACCIO;
+  return { x: x + (w - ample) / 2, y, w: ample, h };
+}
+
+/**
  * ELS AJUSTOS DE LA COMPOSICIO, DECLARATS (26/09/2026)
  * -----------------------------------------------------------------------------
  * Aquests numeros son de DISSENY: no es mesuren, es declaren. Vivien escampats

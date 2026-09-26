@@ -26,6 +26,7 @@ import {
   alcadaReservaGraellaPanellCss,
   esBandaEstretaFranja,
   AJUST_BAIX_BLOC_FRANJA_PX,
+  finestraCosVel,
 } from '../megaslide/geometriaMegaslide.js';
 import {
   areesClicAmpla,
@@ -236,17 +237,16 @@ function generaVelDataUrl(text, opacitats, color = 'white', celles = null) {
     // color si (l'amo veia una taca blanca a la primera samarreta ACTIVA, «el
     // canto esquerre»). La mascara porta les siluetes de les cases actives en
     // negre sobre fons blanc: on mana una samarreta activa, no hi ha vel.
-    // EL VEL NOME'S A LA SAMARRETA QUE ES VEU (26/09/2026).
+    // EL VEL NOME'S A LA SAMARRETA QUE ES VEU, I LA MASCARA NOME'S AL COS
+    // (26/09/2026).
     //
     // Les samarretes es trepitgen (les manigues) i, en una interseccio, la que
-    // es veu es la ULTIMA pintada (la de mes a la dreta). Abans la mascara
-    // nome's tapava les siluetes ACTIVES, i aixo tallava la maniga de la
-    // samarreta velada on la seva veina activa hi passava per sobre: la
-    // interseccio de les dues siluetes hi quedava sense vel i es veia un rombe
-    // (ho va veure l'amo). Ara la mascara es pinta casa per casa, en ordre, amb
-    // la silueta blanca si la casa demana vel i negra si es activa: com que
-    // l'ultima que es pinta es la que queda, la mascara val el que val la
-    // samarreta que es veu a cada pixel.
+    // es veu es la ULTIMA pintada (la de mes a la dreta). La mascara es pinta
+    // casa per casa, en ordre, amb la silueta blanca si la casa demana vel i
+    // negra si es activa: com que l'ultima que es pinta es la que queda, la
+    // mascara val el que val la samarreta que es veu a cada pixel. Pero les
+    // siluetes NEGRES van retallades al cos de casa seva (vegeu mes avall),
+    // perque la maniga de la casa activa no esborri el vel de la veina.
     const inactives = [];
     for (let i = 0; i < 14; i++) { if (typeof mapa[i] === 'number') inactives.push(i); }
     let idMascara = null;
@@ -267,10 +267,50 @@ function generaVelDataUrl(text, opacitats, color = 'white', celles = null) {
       fons.setAttribute('height', String(vbH));
       fons.setAttribute('fill', '#FFFFFF');
       mask.appendChild(fons);
+      // LA SILUETA NEGRA, NOME'S EL COS DE LA SEVA CASA (26/09/2026).
+      //
+      // La mascara es pinta casa per casa, en ordre, amb la silueta BLANCA si
+      // la casa demana vel i NEGRA si es activa: com que l'ultima pintada es la
+      // que queda, la mascara val el que val la samarreta que es veu a cada
+      // pixel (aixo va treure la taca blanca sobre el tint d'una samarreta
+      // activa). Pero la silueta NEGRA d'una casa activa tambe fa 305,56
+      // unitats dins d'una casella de 241,71: la seva MANIGA surt de casa i
+      // esborrava el vel de la casa velada del costat. Com que el forat cau a
+      // l'intersseccio de les dues siluetes, hi quedava un rombe sense vel (ho
+      // ha vist l'amo, i nome's a les samarretes velades).
+      //
+      // Ara les siluetes NEGRES es retallen a la finestra del COS de la seva
+      // casa (`finestraCosVel`): la casa activa segueix protegint el seu cos,
+      // que es on hi ha el tint, i la seva maniga ja no toca el vel de la
+      // veina. El vel (les siluetes blanques) NO es retalla: ha de cobrir tota
+      // la samarreta, manigues incloses.
+      const idRetallCos = `${idMascara}Cos`;
+      const defsRetall = doc.createElementNS(NS, 'clipPath');
+      defsRetall.setAttribute('id', idRetallCos);
+      defsRetall.setAttribute('clipPathUnits', 'userSpaceOnUse');
+      for (let i = 0; i < 14; i++) {
+        const f = finestraCosVel(caixaDe(i));
+        if (!f) continue;
+        const r = doc.createElementNS(NS, 'rect');
+        r.setAttribute('x', f.x.toFixed(3));
+        r.setAttribute('y', f.y.toFixed(3));
+        r.setAttribute('width', f.w.toFixed(3));
+        r.setAttribute('height', f.h.toFixed(3));
+        defsRetall.appendChild(r);
+      }
+      defs.appendChild(defsRetall);
       for (let i = 0; i < 14; i++) {
         const casa = nouCami(i);
-        casa.setAttribute('fill', typeof mapa[i] === 'number' ? '#FFFFFF' : '#000000');
-        mask.appendChild(casa);
+        const esVelada = typeof mapa[i] === 'number';
+        casa.setAttribute('fill', esVelada ? '#FFFFFF' : '#000000');
+        if (esVelada) {
+          mask.appendChild(casa);
+        } else {
+          const g = doc.createElementNS(NS, 'g');
+          g.setAttribute('clip-path', `url(#${idRetallCos})`);
+          g.appendChild(casa);
+          mask.appendChild(g);
+        }
       }
       defs.appendChild(mask);
       svg.insertBefore(defs, svg.firstChild);

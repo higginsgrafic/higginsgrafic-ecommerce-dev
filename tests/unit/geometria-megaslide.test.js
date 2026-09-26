@@ -27,6 +27,8 @@ import {
   visualOffsetYFranjaPagina2,
   topFranjaPagina2,
   AJUST_BAIX_BLOC_FRANJA_PX,
+  finestraCosVel,
+  VEL_AMPLADA_COS_FRACCIO,
 } from '../../src/components/megaslide/geometriaMegaslide.js';
 
 // Aquesta prova fixa els numeros DECLARATS del megaslide contra el que es va
@@ -362,5 +364,40 @@ describe('desplacamentCentratgeFranja', () => {
   it('sense grup, es queda on era', () => {
     expect(desplacamentCentratgeFranja({ quants: 0, n: 64, actual: 5 })).toBe(5);
     expect(desplacamentCentratgeFranja({ quants: 7, n: 0, actual: 5 })).toBe(5);
+  });
+});
+
+describe('finestraCosVel', () => {
+  // La finestra on la silueta NEGRA de la mascara del vel pot esborrar vel: el
+  // cos de la casa. La silueta sencera fa 305,56 unitats i el cos 181,17, i la
+  // casella de la franja d'una filera fa 241,71.
+  it('la finestra es el cos (181,17) centrat a la casella de 241,71', () => {
+    expect(VEL_AMPLADA_COS_FRACCIO).toBeCloseTo(0.5929, 4);
+    const f = finestraCosVel({ x: 0, y: 0.8, w: 241.71, h: 306.03 });
+    expect(f.w).toBeCloseTo(143.3, 1);
+    expect(f.x).toBeCloseTo(49.2, 1);
+    expect(f.y).toBe(0.8);
+    expect(f.h).toBe(306.03);
+  });
+
+  it('la casa 0 del full (305,56: la silueta sencera) tambe queda centrada', () => {
+    const f = finestraCosVel({ x: 0, y: 0.8, w: 305.56, h: 306.03 });
+    expect(f.w).toBeCloseTo(181.17, 1);
+    expect(f.x).toBeCloseTo(62.2, 1);
+  });
+
+  it('la finestra no surt mai de la casella', () => {
+    for (let i = 0; i < 14; i++) {
+      const x = i * 196.9;
+      const f = finestraCosVel({ x, y: 0.8, w: 241.71, h: 306.03 });
+      expect(f.x).toBeGreaterThanOrEqual(x);
+      expect(f.x + f.w).toBeLessThanOrEqual(x + 241.71);
+    }
+  });
+
+  it('amb una caixa que no val, null', () => {
+    expect(finestraCosVel(null)).toBeNull();
+    expect(finestraCosVel({ x: 0, y: 0, w: 0, h: 306 })).toBeNull();
+    expect(finestraCosVel({ x: 0, y: 0, w: NaN, h: 306 })).toBeNull();
   });
 });
