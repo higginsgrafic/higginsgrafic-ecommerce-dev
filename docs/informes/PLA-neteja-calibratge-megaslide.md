@@ -243,10 +243,22 @@ D'on surt:
 
 **El pas següent, doncs, no és declarar les files: és declarar el selector de la
 pàgina 1.** La seva posició surt de `--hg-cercador-bar-top` i de la geometria de
-la pàgina 1; amb `p1` declarat, `topVisualAlignmentY` i `selectorCentratgeY` són
-una resta, i darrere seu cauen les dues files, la tira de colors, els marges i
-`sostre − dalt`.
+la pàgina 1; amb `p1` declarat, `topVisualAlignmentY` és una resta, i darrere seu
+cauen les dues files, la tira de colors, els marges i `sostre − dalt`.
 
-Mentrestant, ja declarat: **l'amplada del retall** (`5b51495`) i **l'alçada del
-selector i de les seves tres cel·les** (aquest pas), que és la referència que el
-bucle de les dues files ja no ha de mesurar del DOM.
+Ja declarat:
+
+- **L'amplada del retall** (`5b51495`).
+- **L'alçada del selector i de les seves tres cel·les** (`3c4a639`).
+- **El centratge del selector** (`selectorCentratgeY`): el bucle ja no mesura els
+  dos centres; la fórmula és
+  `desplacTop + (alçadaCarrusel + carrilLane(40) − alçadaSelector) / 2`, amb
+  `desplacTop = 12` a l'escriptori (el `top` extra de la filera, més el seu
+  `top` dins el contenidor, menys el `top` del selector i el `mt-2` de la
+  pastilla). **No depèn de l'alineació amb la pàgina 1**, perquè les dues peces
+  es mouen juntes. Comprovat: el centre de la filera i el del selector
+  coincideixen a 0,00-0,02 px a 1920, 1440, 1512, 1680, 2000, 2560, 1024×768,
+  768×1024, 1366×768 i 1280×720.
+
+De la cadena vertical, doncs, l'únic que queda mesurat és
+**`topVisualAlignmentY`** (la referència de la pàgina 1).
