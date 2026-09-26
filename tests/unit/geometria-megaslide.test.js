@@ -19,6 +19,9 @@ import {
   FRANJA_FITXER_ALCADA,
   FRANJA_FITXER_ASPECTE,
   esBandaEstretaFranja,
+  FRANJA_CASES,
+  quantsGrupActiuFranja,
+  desplacamentCentratgeFranja,
   alcadaReservaGraellaPanell,
   alcadaReservaGraellaPanellCss,
   visualOffsetYFranjaPagina2,
@@ -324,5 +327,40 @@ describe('topFranjaPagina2', () => {
     const ample = topFranjaPagina2({ ...base, ample: 1920, alt: 946 });
     const estreta = topFranjaPagina2({ ...base, ample: 1300, alt: 900 });
     expect(estreta - ample).toBeCloseTo(-AJUST_BAIX_BLOC_FRANJA_PX, 2);
+  });
+});
+
+describe('quantsGrupActiuFranja', () => {
+  it('compta el grup del principi de la tira (el de la colleccio activa)', () => {
+    expect(quantsGrupActiuFranja({ collections: ['cube', 'cube', 'miscellania', 'cube'], active: 'cube' })).toBe(2);
+    expect(quantsGrupActiuFranja({ collections: ['first_contact', 'first_contact', 'cube'], active: 'cube' })).toBe(0);
+  });
+
+  it('sense colleccio o sense tira, zero', () => {
+    expect(quantsGrupActiuFranja({ collections: null, active: 'cube' })).toBe(0);
+    expect(quantsGrupActiuFranja({ collections: ['cube'], active: '' })).toBe(0);
+  });
+});
+
+describe('desplacamentCentratgeFranja', () => {
+  it('amb 7 dibuixos actius (FIRST CONTACT) dona -3: abans la franja hi arribava girant des de 0', () => {
+    expect(FRANJA_CASES).toBe(14);
+    expect(desplacamentCentratgeFranja({ quants: 7, n: 64 })).toBe(-3);
+  });
+
+  it('amb 5 (MISCEL·LANIA) dona -4, amb 10 (CUBE) -2 i amb 15 (THE HUMAN INSIDE) 1', () => {
+    expect(desplacamentCentratgeFranja({ quants: 5, n: 64 })).toBe(-4);
+    expect(desplacamentCentratgeFranja({ quants: 10, n: 64 })).toBe(-2);
+    expect(desplacamentCentratgeFranja({ quants: 15, n: 64 })).toBe(1);
+  });
+
+  it('trià la volta mes propera al desplaçament que ja hi ha (no fa cap salt)', () => {
+    expect(desplacamentCentratgeFranja({ quants: 7, n: 64, actual: 61 })).toBe(61);
+    expect(desplacamentCentratgeFranja({ quants: 7, n: 64, actual: 60 })).toBe(61);
+  });
+
+  it('sense grup, es queda on era', () => {
+    expect(desplacamentCentratgeFranja({ quants: 0, n: 64, actual: 5 })).toBe(5);
+    expect(desplacamentCentratgeFranja({ quants: 7, n: 0, actual: 5 })).toBe(5);
   });
 });

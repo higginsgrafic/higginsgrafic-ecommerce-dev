@@ -566,3 +566,57 @@ export function topFranjaPagina2({
     + visualOffsetYFranjaPagina2({ ample, alt, isPortraitTablet, isLandscapeTablet })
   );
 }
+
+/**
+ * EL CENTRATGE DE LA FRANJA, DECLARAT (26/09/2026)
+ * -----------------------------------------------------------------------------
+ * La tira de dibuixos (64) circula per les catorze cases fixes amb
+ * `stripeStripOffset`, i quan canvia la colleccio activa se li dona el valor que
+ * CENTRA el seu grup. Aixo es feia nome's amb un efecte, i a l'obertura de la
+ * pagina 2 el desplacament encara valia 0: la franja naixia amb el grup a
+ * l'esquerra i, mig segon despres, GIRAVA tres cases (mesurat: 0 -> -3 amb
+ * FIRST CONTACT), amb la creueta de 160 ms dels dibuixos. Ho va veure l'amo
+ * («els dibuixos de la stripe es mouen») en onze fotogrames.
+ *
+ * La formula ja hi era a l'efecte; aqui es declara perque el valor INICIAL
+ * tambe es pugui calcular (i no calgui cap gir):
+ *
+ *   centre del grup = (quants - 1) / 2     (la casa del mig del grup)
+ *   mig de la franja = (cases - 1) / 2     (6,5 amb catorze cases)
+ *   objectiu = centre del grup - mig de la franja
+ *
+ * i, com que la tira es circular, es tria la volta mes propera al desplacament
+ * que ja hi hagi (perque no faci cap salt).
+ */
+
+/** Les cases de la franja (una filera). */
+export const FRANJA_CASES = 14;
+
+/** Quants dibuixos te el grup de la colleccio activa (son al principi de la tira). */
+export function quantsGrupActiuFranja({ collections, active } = {}) {
+  if (!Array.isArray(collections) || !active) return 0;
+  let quants = 0;
+  for (const c of collections) {
+    if (c !== active) break;
+    quants += 1;
+  }
+  return quants;
+}
+
+/**
+ * El desplacament de la tira que centra el grup actiu, arrodonit a una casa.
+ *
+ * @param {object} o
+ * @param {number} o.quants dibuixos del grup actiu
+ * @param {number} o.n llargada de la tira (64)
+ * @param {number} [o.actual=0] desplacament que ja hi ha (per triar la volta)
+ * @param {number} [o.cases=14] cases de la franja
+ * @returns {number} el desplacament, arrodonit
+ */
+export function desplacamentCentratgeFranja({ quants, n, actual = 0, cases = FRANJA_CASES } = {}) {
+  if (!Number.isFinite(quants) || quants <= 0) return Math.round(actual) || 0;
+  if (!Number.isFinite(n) || n <= 0) return Math.round(actual) || 0;
+  const objectiuBase = (quants - 1) / 2 - (cases - 1) / 2;
+  const objectiu = objectiuBase + Math.round((actual - objectiuBase) / n) * n;
+  return Math.round(objectiu);
+}
