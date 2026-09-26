@@ -345,11 +345,20 @@ declarades que encara es confirmen al DOM amb un avís de desenvolupament
 
 ## 8. Feina pendent (26/09/2026)
 
-### 8.1 Arrossegar amb el dit la tira de colors i la franja — PENDENT
+### 8.1 Arrossegar amb el dit la tira de colors i la franja — FET (`7e0a696`)
 
-**Què demana l'amo (26/09/2026):** «que tant la tira de colors 14x1 (selector de
-colors) com la stripe es puguin moure amb el dit». Queda anotat aquí i **no
-s'ha començat**: primer s'ha d'acabar i donar per bona la pàgina 2.
+**Què demanava l'amo (26/09/2026):** «que tant la tira de colors 14x1 (selector
+de colors) com la stripe es puguin moure amb el dit». Fet al commit `7e0a696`,
+després de donar la pàgina 2 per bona:
+
+- `src/hooks/useArrossegamentPas.js` (nou): un arrossegament horitzontal fa el
+  mateix que la rodeta (un pas cada 30 px, cap a l'esquerra avança) i un toc
+  segueix sent un clic (el punter només es captura passats 6 px).
+- La franja (`MegaStripePanel`) i la tira de colors (`CercadorTextRow`) porten
+  `touch-action: pan-y`: el gest horitzontal és nostre i el vertical segueix
+  fent el desplaçament de la pàgina.
+- Comprovat amb events de punter sintètics: 96 px de dit sobre la franja avancen
+  la tira (la casa 0 passa de `dj-vader` a `nx-01`).
 
 **Com està ara:**
 
@@ -377,3 +386,20 @@ Els dos commits del vel (`3298b36`, el vel no taca mai una samarreta activa, i
 `7c189ca`, el vel cau a sobre de les samarretes) van sortir de mesures, però
 l'amo encara no els ha vist: si el vel continua fallant, cal saber **on** (quina
 casa, quina vista) i **què** s'hi veu.
+
+## 9. Punt de recuperacio: la pagina 2 es estable (26/09/2026)
+
+L'amo ho va donar per bo («Punt de recuperació: Pàgina dos estable»). Aquest es
+el punt on tornar si alguna cosa es desquadra:
+
+- **`26442f5`** — la pagina 2 estable: el vel cau a sobre de les samarretes
+  (`7c189ca`), no taca mai una samarreta activa (`3298b36`), la franja arrenca ja
+  centrada i no gira en obrir (`e6c9806`), la porta d'obertura espera les
+  imatges (`2c586cb`) i el megaslide es queda invisible fins que la composicio
+  esta quadrada (`26442f5`).
+- **`7e0a696`** — a sobre, el gest del dit (seccio 8.1). No toca cap geometria:
+  nome's afegeix el gest i el `touch-action`.
+
+Bateria del punt de recuperacio: 570 proves (45 fitxers), eslint amb els
+mateixos comptes que la linia base a cada fitxer tocat, `vite build`,
+`compara-vistes` OK, `mesura-formats` 0 i 0 i `_tmp-errors2` sense errors.
