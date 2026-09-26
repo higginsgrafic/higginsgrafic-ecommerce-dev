@@ -273,3 +273,35 @@ export function centratgeSelectorY({ midaSelector, escala, dibuix, gapV, carril,
   const alcadaSel = alcadaSelector(midaSelector, escala);
   return desplacTop + (alcadaCarrusel + alcadaFilaColors - alcadaSel) / 2;
 }
+
+/**
+ * ELS DESNIVELLS DE LES DUES FILES DE DIBUIXOS, DECLARATS (26/09/2026)
+ * -----------------------------------------------------------------------------
+ * Les dues files de la graella es col·loquen amb `top: -primera` (la de dalt) i
+ * `top: alcadaFila - segona` (la de baix), i aquests desnivells feien que cada
+ * fila caigues al centre de la seva cella del selector (BLANC la primera, COLOR
+ * la segona). Es MESURAVEN del DOM (`liniesDibuixos` mes el rect del selector) i
+ * s'hi anava acumulant la diferencia. Pero tot son mides declarades:
+ *
+ *   primera = dibuixPx/2 - alcadaFilera/2 + alcadaSelector/3
+ *   segona  = alcadaFila + dibuixPx/2 - alcadaFilera/2
+ *
+ * amb `dibuixPx = 1,5 x dibuix`, `alcadaFila = dibuixPx + gapV` i
+ * `alcadaFilera = 2 x alcadaFila + carrilLane(40)` (la fila de colors).
+ *
+ * Comprovat contra el valor que aplicava el bucle a 1920, 1440, 1512, 1680,
+ * 2000, 2560, 1400, 1366x768 i 1280x720: la diferencia maxima es 0,02 px.
+ *
+ * @returns {{primera:number, segona:number}}
+ */
+export function desnivellsLiniesGraella({ dibuix, gapV, carril, midaSelector, escala }) {
+  const dibuixPx = 1.5 * dibuix;
+  const alcadaFila = dibuixPx + gapV;
+  const alcadaFilera = alcadaCarruselGraella(dibuix, gapV)
+    + (carril * GRAELLA_FILA_COLORS_CARRIL_PX) / MEGASLIDE_REFERENCIA_PX;
+  const alcadaSel = alcadaSelector(midaSelector, escala);
+  return {
+    primera: dibuixPx / 2 - alcadaFilera / 2 + alcadaSel / 3,
+    segona: alcadaFila + dibuixPx / 2 - alcadaFilera / 2,
+  };
+}
