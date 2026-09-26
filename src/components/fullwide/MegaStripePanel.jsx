@@ -236,11 +236,22 @@ function generaVelDataUrl(text, opacitats, color = 'white', celles = null) {
     // color si (l'amo veia una taca blanca a la primera samarreta ACTIVA, «el
     // canto esquerre»). La mascara porta les siluetes de les cases actives en
     // negre sobre fons blanc: on mana una samarreta activa, no hi ha vel.
-    const actives = [];
-    for (let i = 0; i < 14; i++) { if (typeof mapa[i] !== 'number') actives.push(i); }
+    // EL VEL NOME'S A LA SAMARRETA QUE ES VEU (26/09/2026).
+    //
+    // Les samarretes es trepitgen (les manigues) i, en una interseccio, la que
+    // es veu es la ULTIMA pintada (la de mes a la dreta). Abans la mascara
+    // nome's tapava les siluetes ACTIVES, i aixo tallava la maniga de la
+    // samarreta velada on la seva veina activa hi passava per sobre: la
+    // interseccio de les dues siluetes hi quedava sense vel i es veia un rombe
+    // (ho va veure l'amo). Ara la mascara es pinta casa per casa, en ordre, amb
+    // la silueta blanca si la casa demana vel i negra si es activa: com que
+    // l'ultima que es pinta es la que queda, la mascara val el que val la
+    // samarreta que es veu a cada pixel.
+    const inactives = [];
+    for (let i = 0; i < 14; i++) { if (typeof mapa[i] === 'number') inactives.push(i); }
     let idMascara = null;
-    if (actives.length) {
-      idMascara = 'hgVelForaActives';
+    if (inactives.length) {
+      idMascara = 'hgVelSamarretaVisible';
       const defs = doc.createElementNS(NS, 'defs');
       const mask = doc.createElementNS(NS, 'mask');
       mask.setAttribute('id', idMascara);
@@ -256,10 +267,10 @@ function generaVelDataUrl(text, opacitats, color = 'white', celles = null) {
       fons.setAttribute('height', String(vbH));
       fons.setAttribute('fill', '#FFFFFF');
       mask.appendChild(fons);
-      for (const i of actives) {
-        const fora = nouCami(i);
-        fora.setAttribute('fill', '#000000');
-        mask.appendChild(fora);
+      for (let i = 0; i < 14; i++) {
+        const casa = nouCami(i);
+        casa.setAttribute('fill', typeof mapa[i] === 'number' ? '#FFFFFF' : '#000000');
+        mask.appendChild(casa);
       }
       defs.appendChild(mask);
       svg.insertBefore(defs, svg.firstChild);
@@ -466,8 +477,6 @@ function MegaStripePanel({
     (Array.isArray(indicesSamarretesInactives) ? indicesSamarretesInactives : [])
       .filter((i) => Number.isInteger(i) && i >= 0 && i < 14),
   );
-  const activesVel = [];
-  for (let i = 0; i < 14; i++) { if (!inactivesVel.has(i)) activesVel.push(i); }
   const mapaVelInactives = {};
   if (!isPortraitTablet) {
     for (const i of inactivesVel) mapaVelInactives[i] = alfaVelSamarretaInactiva;
@@ -960,8 +969,11 @@ function MegaStripePanel({
                             height={VECTOR_FRANJA_CONTINGUT}
                           >
                             <rect x={0} y={0} width={VECTOR_FRANJA_VIEWBOX_OBERT.width} height={VECTOR_FRANJA_CONTINGUT} fill="#FFFFFF" />
-                            {activesVel.map((k) => (
-                              <path key={`hg-vel-fora-${k}`} d={VECTOR_FRANJA_SAMARRETES[k]} fill="#000000" />
+                            {/* Casa per casa, en ordre, com a la imatge del vel: la
+                                silueta blanca on la casa demana vel i negra on es
+                                activa, perque l'ultima pintada es la que es veu. */}
+                            {Array.from({ length: 14 }, (_, k) => k).map((k) => (
+                              <path key={`hg-vel-casa-${k}`} d={VECTOR_FRANJA_SAMARRETES[k]} fill={inactivesVel.has(k) ? '#FFFFFF' : '#000000'} />
                             ))}
                           </mask>
                         ) : null}
