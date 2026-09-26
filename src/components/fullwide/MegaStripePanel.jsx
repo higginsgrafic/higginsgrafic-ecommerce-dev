@@ -40,6 +40,8 @@ import {
   VECTOR_FRANJA_IMPRESSIO_01,
   VECTOR_FRANJA_MIDA_SENCERA,
   VECTOR_FRANJA_MIDA_IMPRESSIO,
+  VEL_SAMARETA_CAIXA,
+  VEL_SILUETA_CAIXES,
 } from '../../config/vectorFranja.js';
 
 /**
@@ -158,33 +160,83 @@ function getTileCalibration(src, overrides) {
  *     sola imatge amb les catorze samarretes, la inactiva es distingia nome's
  *     pel dibuix. Amb el vel, la casella sencera queda mes fluixa.
  *
+ * LES SILUETES DEL FULL NO CAUEN A SOBRE LES SAMARRETES (26/09/2026).
+ *
+ * El full (`full-clic-area-5.svg`) porta les catorze siluetes a les posicions de
+ * la franja de DUES FILERES (la primera a 0 i la resta a 260,76 + 196,9), pero
+ * la franja d'una filera te les catorze cases a 196,7: mesurat, les siluetes 1
+ * a 13 cauen **33 unitats (12 px a 1920) a la dreta** de la seva casa. El vel
+ * quedava descol·locat respecte de les samarretes (i dels dibuixos, que si que
+ * hi son) i, com que les siluetes 1-13 son l'AREA D'IMPRESSIO (241,7) i no la
+ * samarreta sencera (305,6), les manigues quedaven sense vel.
+ *
+ * Aqui cada silueta es posa a la CASELLA de la seva casa (les mateixes que fan
+ * servir els dibuixos i les arees de clic, `rectsMascara`), amb el cami de la
+ * samarreta sencera (el de la casa 0 del full) escalat a la casella.
+ *
  * @param {string} text - el text del full de siluetes.
  * @param {Record<number, number>} opacitats - casella -> opacitat del vel.
  * @param {string} color - el color del vel (blanc per defecte).
+ * @param {Array<{left:number,top:number,width:number,height:number}>|null} celles
+ *   les catorze caselles en % de la imatge de la franja (les dels dibuixos).
  * @returns {string|null} el `data:` URL del vel, o null si no n'hi ha.
  */
-function generaVelDataUrl(text, opacitats, color = 'white') {
+function generaVelDataUrl(text, opacitats, color = 'white', celles = null) {
   const mapa = opacitats && typeof opacitats === 'object' ? opacitats : {};
   if (!text || !Object.keys(mapa).length) return null;
   try {
     const doc = new DOMParser().parseFromString(text, 'image/svg+xml');
     const svg = doc.documentElement;
-    const paths = [...doc.querySelectorAll('.tshirt-outline')];
-    // EL VEL NO POT TACAR CAP SAMARRETA ACTIVA (26/09/2026).
-    //
-    // Les siluetes del full son mes amples que el pas de les cases (la maniga
-    // de la casa i arriba a la casa i+1: 241 de 204,7 unitats), i el vel d'una
-    // casa inactiva hi queia a sobre. Sobre una samarreta blanca no es veu,
-    // pero sobre el TINT d'una samarreta de color si: l'amo veia la maniga
-    // esquerra de la primera samarreta ACTIVA amb una taca blanca («el cantó
-    // esquerre»). Aqui el vel de cada casa inactiva es MASCARA amb les
-    // siluetes de les cases actives: on mana una samarreta activa, no hi ha
-    // vel. Els `paths` que no son al mapa son les actives.
     const NS = 'http://www.w3.org/2000/svg';
-    const actives = paths.filter((_, i) => typeof mapa[i] !== 'number');
+    const paths = [...doc.querySelectorAll('.tshirt-outline')];
+    if (!paths.length) return null;
     const vb = (svg.getAttribute('viewBox') || '').trim().split(/[\s,]+/).map(Number);
     const vbW = Number.isFinite(vb[2]) ? vb[2] : Number(svg.getAttribute('width')) || 2866;
     const vbH = Number.isFinite(vb[3]) ? vb[3] : Number(svg.getAttribute('height')) || 307;
+    const capses = Array.isArray(celles) && celles.length === 14 ? celles : null;
+    // El cami de la SAMARRETA SENCERA (amb manigues): el de la primera casa.
+    const cami = paths[0].getAttribute('d');
+    // On va la silueta de cada casa: a la seva casella (si ens la passen) o a on
+    // era al full.
+    const caixaDe = (i) => {
+      const c = capses ? capses[i] : null;
+      if (c) {
+        const w = (Number(c.width) || 0) / 100 * vbW;
+        const h = (Number(c.height) || 0) / 100 * vbH;
+        const x = (Number(c.left) || 0) / 100 * vbW;
+        const y = (Number(c.top) || 0) / 100 * vbH;
+        if (w > 0 && h > 0) return { x, y, w, h };
+      }
+      const el = VEL_SILUETA_CAIXES[i];
+      if (!el) return null;
+      return { x: el.x, y: el.y, w: el.width, h: el.height };
+    };
+    const transformDe = (i) => {
+      const c = caixaDe(i);
+      if (!c || !(c.w > 0) || !(c.h > 0)) return null;
+      const sx = c.w / VEL_SAMARETA_CAIXA.width;
+      const sy = c.h / VEL_SAMARETA_CAIXA.height;
+      const tx = c.x + c.w / 2;
+      const ty = c.y + c.h / 2;
+      const cx = VEL_SAMARETA_CAIXA.x + VEL_SAMARETA_CAIXA.width / 2;
+      const cy = VEL_SAMARETA_CAIXA.y + VEL_SAMARETA_CAIXA.height / 2;
+      return `translate(${tx.toFixed(3)} ${ty.toFixed(3)}) scale(${sx.toFixed(4)} ${sy.toFixed(4)}) translate(${(-cx).toFixed(3)} ${(-cy).toFixed(3)})`;
+    };
+    const nouCami = (i) => {
+      const p = doc.createElementNS(NS, 'path');
+      p.setAttribute('d', cami);
+      const t = transformDe(i);
+      if (t) p.setAttribute('transform', t);
+      return p;
+    };
+    // EL VEL NO POT TACAR CAP SAMARRETA ACTIVA (26/09/2026): la silueta d'una
+    // casa arriba a la del costat, i el vel d'una casa inactiva hi queia a
+    // sobre. Sobre una samarreta blanca no es veu, pero sobre el tint d'una de
+    // color si (l'amo veia una taca blanca a la primera samarreta ACTIVA, «el
+    // canto esquerre»). La mascara porta les siluetes de les cases actives en
+    // negre sobre fons blanc: on mana una samarreta activa, no hi ha vel.
+    const actives = [];
+    for (let i = 0; i < 14; i++) { if (typeof mapa[i] !== 'number') actives.push(i); }
     let idMascara = null;
     if (actives.length) {
       idMascara = 'hgVelForaActives';
@@ -203,32 +255,30 @@ function generaVelDataUrl(text, opacitats, color = 'white') {
       fons.setAttribute('height', String(vbH));
       fons.setAttribute('fill', '#FFFFFF');
       mask.appendChild(fons);
-      for (const a of actives) {
-        const fora = a.cloneNode(true);
+      for (const i of actives) {
+        const fora = nouCami(i);
         fora.setAttribute('fill', '#000000');
-        fora.setAttribute('fill-opacity', '1');
-        fora.removeAttribute('stroke');
-        fora.removeAttribute('class');
         mask.appendChild(fora);
       }
       defs.appendChild(mask);
       svg.insertBefore(defs, svg.firstChild);
     }
-    for (const [i, p] of paths.entries()) {
+    // El full original se'n va: les siluetes les tornem a posar nosaltres.
+    const pareOriginal = paths[0].parentNode;
+    for (const p of paths) p.remove();
+    for (let i = 0; i < 14; i++) {
       const op = mapa[i];
-      if (typeof op !== 'number') {
-        p.remove();
-        continue;
-      }
+      if (typeof op !== 'number') continue;
+      const p = nouCami(i);
       p.setAttribute('fill', color);
       p.setAttribute('fill-opacity', String(op));
-      p.removeAttribute('stroke');
-      p.removeAttribute('class');
       if (idMascara) {
         const g = doc.createElementNS(NS, 'g');
         g.setAttribute('mask', `url(#${idMascara})`);
-        p.parentNode.insertBefore(g, p);
         g.appendChild(p);
+        pareOriginal.appendChild(g);
+      } else {
+        pareOriginal.appendChild(p);
       }
     }
     const serialized = new XMLSerializer().serializeToString(doc.documentElement);
@@ -249,9 +299,11 @@ function generaVelDataUrl(text, opacitats, color = 'white') {
  * @param {Record<number, number>} opacitats - casella -> opacitat del vel.
  * @param {string} key - qualsevol valor que canvii quan canvia el mapa.
  * @param {string} color - el color del vel (blanc per defecte).
+ * @param {Array<object>|null} celles - les catorze caselles en % (vegeu
+ *   `generaVelDataUrl`): on va la silueta de cada casa.
  */
-function useVelSamarretes(opacitats, key, color = 'white') {
-  const [dataUrl, setDataUrl] = useState(() => generaVelDataUrl(textSiluetesSamarreta(), opacitats, color));
+function useVelSamarretes(opacitats, key, color = 'white', celles = null) {
+  const [dataUrl, setDataUrl] = useState(() => generaVelDataUrl(textSiluetesSamarreta(), opacitats, color, celles));
   useEffect(() => {
     let cancelled = false;
     // El `setState` va DINS del `then`, que es asincron: cridar-lo al cos de
@@ -261,7 +313,7 @@ function useVelSamarretes(opacitats, key, color = 'white') {
     precarregaSiluetesSamarreta()
       .then((text) => {
         if (cancelled) return;
-        setDataUrl(generaVelDataUrl(text, opacitats, color));
+        setDataUrl(generaVelDataUrl(text, opacitats, color, celles));
       })
       .catch(() => { if (!cancelled) setDataUrl(null); });
     return () => { cancelled = true; };
@@ -271,7 +323,7 @@ function useVelSamarretes(opacitats, key, color = 'white') {
 }
 
 /** Les catorze siluetes a 0,3 de blanc: el vel de les samarretes buides. */
-function useEmptyShirtMask(emptyTileIndices, shirtColor) {
+function useEmptyShirtMask(emptyTileIndices, shirtColor, celles = null) {
   const emptyKey = Array.isArray(emptyTileIndices) ? emptyTileIndices.join(',') : '';
   const isWhite = !shirtColor || shirtColor === '#FFFFFF';
   const opacitat = isWhite ? 0.3 : 0.1;
@@ -279,7 +331,7 @@ function useEmptyShirtMask(emptyTileIndices, shirtColor) {
   for (const i of (Array.isArray(emptyTileIndices) ? emptyTileIndices : [])) {
     if (Number.isInteger(i) && i >= 0 && i < 14) mapa[i] = opacitat;
   }
-  return useVelSamarretes(mapa, `${emptyKey}|${opacitat}`);
+  return useVelSamarretes(mapa, `${emptyKey}|${opacitat}`, 'white', celles);
 }
 
 function MegaStripePanel({
@@ -391,7 +443,12 @@ function MegaStripePanel({
   // variables de render, no d'estat.
   let gapDibuixAcumulat = 0;
   let gapDibuixEscalaAnterior = null;
-  const emptyShirtMaskUrl = useEmptyShirtMask(emptyTileIndices, shirtColor);
+  // La signatura de les caselles: el vel s'hi ha de refer si canvien (el vel es
+  // col·loca amb elles, vegeu `generaVelDataUrl`).
+  const clauCelles = Array.isArray(rectsMascara) && rectsMascara.length === 14
+    ? rectsMascara.map((r) => `${r.left},${r.top},${r.width},${r.height}`).join('|')
+    : '';
+  const emptyShirtMaskUrl = useEmptyShirtMask(emptyTileIndices, shirtColor, rectsMascara);
 
   // El vel de les samarretes inactives (vegeu la prop). Nomes a l'apaisat: alla
   // la franja es UNA sola imatge amb les catorze samarretes i no hi ha cap
@@ -411,7 +468,7 @@ function MegaStripePanel({
   if (!isPortraitTablet) {
     for (const i of inactivesVel) mapaVelInactives[i] = alfaVelSamarretaInactiva;
   }
-  const velSamarretesInactivesUrl = useVelSamarretes(mapaVelInactives, `${clauVelInactives}|${alfaVelSamarretaInactiva}`);
+  const velSamarretesInactivesUrl = useVelSamarretes(mapaVelInactives, `${clauVelInactives}|${alfaVelSamarretaInactiva}|${clauCelles}`, 'white', rectsMascara);
   const idMascaraVelActives = `hgVelForaActives-${idRetall}`;
 
   useEffect(() => {
