@@ -1200,231 +1200,175 @@ export function CercadorColleccionsColumna({
 }
 
 function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripeItem, hoveredStripeItem, onSelectGroup, onHoverItem, onHoverLeave, onCarouselStep, compact = false, selectedColor = 'white', onSelectColor, onSelectCollection, isPortraitTablet = false, isLandscapeTablet = false, fontBoost = 0, desplacamentVertical = 0, esquerra, midaSelector = 56, alineacioY = 0, onMides = null }) {
-  // Ajust de la graella compacta a l'espai disponible (només desktop: les
-  // tauletes mantenen la mida fixa de moment). Mesurem l'amplada de la columna
-  // i el capdamunt de la franja de samarretes, i guardem la mida de dibuix i
-  // les separacions que fan que la graella hi càpiga.
+  // UNA SOLA PASSADA PER A TOT EL QUE ES MESURA DE LA FILERA (26/09/2026).
+  //
+  // Abans aixo eren TRES bucles independents en aquest mateix component (les
+  // mides de la graella, els marges de la columna de colleccions i la tira de
+  // colors), cada un amb el seu efecte, el seu joc de temporitzadors (250 i
+  // 400 ms) i els seus observadors. Els tres llegeixen el MATEIX DOM i el
+  // MATEIX selector, o sigui que es poden calcular d'una sola instantania; i
+  // com que es disposen junts, no pot passar que un valori amb la geometria
+  // d'abans que l'altre l'hagi moguda. Ho demana el PLA de neteja del
+  // calibratge del megaslide.
+  //
+  // Les regles:
+  //   - la mesura del muntatge es sincrona (abans de pintar) perque la graella
+  //     neixi a la mida bona, i hi ha una confirmacio en rAF i una als 400 ms
+  //     (just despres de l'animacio d'obertura), quan la geometria ja no es mou;
+  //   - l'acumulador de la tira de colors parteix del valor PINTAT, no del que
+  //     s'ha decidit: la correccio es idempotent;
+  //   - un sol ResizeObserver i un sol listener de `resize`.
   const graellaRef = useRef(null);
-  const midesRef = useRef(null);
-  const [midesGraella, setMidesGraella] = useState(null);
+  const [mesures, setMesures] = useState({
+    midesGraella: null,
+    margesEnllacos: { dalt: 0, baix: 0 },
+    desnivellColors: 0,
+  });
+  // El valor PINTAT (s'actualitza DESPRES de pintar): els acumuladors hi
+  // arrenquen i la correccio es idempotent encara que dos passos caiguin a la
+  // mateixa tasca (vegeu el bucle de les dues files, 25/09/2026).
+  const mesuresRef = useRef(mesures);
+  useEffect(() => {
+    mesuresRef.current = mesures;
+  }, [mesures]);
   // L'espai fins a la franja de la mesura anterior (vegeu `sostre`).
   const espaiAnteriorRef = useRef(null);
 
   useLayoutEffect(() => {
-    if (!compact || isPortraitTablet || isLandscapeTablet) {
-      if (midesRef.current !== null) {
-        midesRef.current = null;
-        setMidesGraella(null);
-      }
-      return undefined;
-    }
-
+    if (!compact) return undefined;
     const el = graellaRef.current;
     if (!el) return undefined;
 
+    const pagina = el.closest('[data-mega-page-viewport="2"]');
+    const franja = pagina?.querySelector('[data-stripe-visual-content="2"]');
+
     let frame = 0;
     const aplicar = () => {
-      const ampleAmple = el.clientWidth;
-      const daltGraella = el.getBoundingClientRect().top;
-      const pagina = el.closest('[data-mega-page-viewport="2"]') || document;
-      const franja = pagina.querySelector('[data-stripe-visual-content="2"]');
-      const sostre = franja ? franja.getBoundingClientRect().top : null;
-      // L'ESPAI FINS A LA FRANJA NOME'S QUAN ES REPETEIX (25/09/2026).
-      //
-      // La franja triga uns quants fotogrames a assentar-se (la seva escala i la
-      // seva alcada) i la filera tambe (el bucle del pare li aplica l'alineacio).
-      // Amb una sola mesura, la deduccio d'alçada encongia la graella per un
-      // espai que encara no era el de debò: mesurat a 1920, el retall passava de
-      // 95,2 a 89,9 px i tornava, i aixo movia la segona filera de dibuixos i la
-      // tira de colors. Amb la mesura repetida (dues passades amb el mateix
-      // espai), la deduccio nome's s'aplica quan la geometria ja es la bona; i si
-      // de debò no hi cap, s'aplica igualment (el repas de 400 ms ho garanteix).
-      const espai = sostre != null && daltGraella != null ? sostre - daltGraella : null;
-      const espaiConfirmat = espai != null
-        && espaiAnteriorRef.current != null
-        && Math.abs(espai - espaiAnteriorRef.current) < 0.5;
-      espaiAnteriorRef.current = espai;
+      const pintat = mesuresRef.current;
+      const filera = el.closest('[data-p2-cercador-row]');
+      const selector = pagina?.querySelector('[data-p2-color-selector] [data-stripe-buttonbar="bn"]');
+      const nou = { ...pintat };
+      let canvia = false;
 
-      // El càlcul viu a midesGraella.js (funció pura, comprovable sense
-      // navegador). Aquí només se li passen les mesures de la pantalla.
-      const next = midesGraellaCompacta({
-        ampleAmple,
-        // LA PRIMERA MESURA NO FA LA DEDUCCIO D'ALCADA (25/09/2026).
+      // 1) LES MIDES DE LA GRAELLA (nomes a l'escriptori: les tauletes tenen la
+      //    seva mida fixa). El calcul viu a midesGraella.js, que es una funcio
+      //    pura i comprovable sense navegador.
+      if (isPortraitTablet || isLandscapeTablet) {
+        if (pintat.midesGraella !== null) {
+          nou.midesGraella = null;
+          canvia = true;
+        }
+      } else {
+        const ampleAmple = el.clientWidth;
+        const daltGraella = el.getBoundingClientRect().top;
+        const sostre = franja ? franja.getBoundingClientRect().top : null;
+        // L'ESPAI FINS A LA FRANJA NOME'S QUAN ES REPETEIX (25/09/2026).
         //
-        // En aquest instant la filera encara no te l'alineacio aplicada (aquest
-        // efecte es d'un fill i corre abans que el bucle del pare) i la franja
-        // encara s'esta assentant, o sigui que `sostre - daltGraella` es fals.
-        // Amb aquell espai la branca d'alçada encongia el dibuix un 20 % i el
-        // retall naixia a 71,9 px en comptes de 95,2: la segona filera de
-        // dibuixos saltava 11 px i la tira de colors i la segona filera de la
-        // filera, 23 px. Ho va veure l'amo.
-        //
-        // Les mides DECLARADES (amplada i pas dels cercles) ja son les
-        // definitives, i la deduccio s'aplica a la passada seguent (el rAF de
-        // sota), quan la geometria ja es la bona.
-        sostre: espaiConfirmat ? sostre : null,
-        daltGraella, isPortraitTablet, isLandscapeTablet,
-        escala: readRootCssNumber('--hg-escala-mega', 1),
-      });
-
-      const previ = midesRef.current;
-      const igual = previ
-        && Math.abs(previ.dibuix - next.dibuix) < 0.01
-        && Math.abs(previ.gapH - next.gapH) < 0.01
-        && Math.abs(previ.gapV - next.gapV) < 0.01;
-      if (!igual) {
-        midesRef.current = next;
-        setMidesGraella(next);
-        // I s'ho diem a qui ens ha de quadrar amb nosaltres (25/09/2026): la
-        // filera d'aquesta graella es la referencia amb que el selector
-        // Blanc/Color/Negre es centra, i la seva alçada es la de la graella. Si
-        // el pare no ho sap, centra el selector amb una alçada vella i l'ha de
-        // corregir al cap de 180 ms (mesurat a 1920: 11,16 px de salt amb el
-        // panell ja obrint-se). Amb l'avís, el bucle del pare torna a mesurar
-        // dins el mateix commit, abans de pintar.
-        onMides?.(next);
+        // La franja triga uns quants fotogrames a assentar-se (la seva escala i
+        // la seva alcada) i la filera tambe (el bucle del pare li aplica
+        // l'alineacio). Amb una sola mesura, la deduccio d'alçada encongia la
+        // graella per un espai que encara no era el de debò: mesurat a 1920, el
+        // retall passava de 95,2 a 89,9 px i tornava, i aixo movia la segona
+        // filera de dibuixos i la tira de colors. Amb la mesura repetida (dues
+        // passades amb el mateix espai), la deduccio nome's s'aplica quan la
+        // geometria ja es la bona; i si de debò no hi cap, s'aplica igualment
+        // (el repas de 400 ms ho garanteix).
+        const espai = sostre != null && daltGraella != null ? sostre - daltGraella : null;
+        const espaiConfirmat = espai != null
+          && espaiAnteriorRef.current != null
+          && Math.abs(espai - espaiAnteriorRef.current) < 0.5;
+        espaiAnteriorRef.current = espai;
+        const next = midesGraellaCompacta({
+          ampleAmple,
+          // LA PRIMERA MESURA NO FA LA DEDUCCIO D'ALCADA (25/09/2026): en aquest
+          // instant la filera encara no te l'alineacio aplicada i la franja
+          // encara s'esta assentant, o sigui que `sostre - daltGraella` es fals.
+          // Les mides DECLARADES (amplada i pas dels cercles) ja son les
+          // definitives, i la deduccio s'aplica a la passada seguent.
+          sostre: espaiConfirmat ? sostre : null,
+          daltGraella, isPortraitTablet, isLandscapeTablet,
+          escala: readRootCssNumber('--hg-escala-mega', 1),
+        });
+        const previ = pintat.midesGraella;
+        const igual = previ
+          && Math.abs(previ.dibuix - next.dibuix) < 0.01
+          && Math.abs(previ.gapH - next.gapH) < 0.01
+          && Math.abs(previ.gapV - next.gapV) < 0.01;
+        if (!igual) {
+          nou.midesGraella = next;
+          canvia = true;
+          // I s'ho diem a qui ens ha de quadrar amb nosaltres (25/09/2026): la
+          // filera d'aquesta graella es la referencia amb que el selector
+          // Blanc/Color/Negre es centra, i la seva alçada es la de la graella.
+          // Amb l'avis, el bucle del pare torna a mesurar dins el mateix commit.
+          onMides?.(next);
+        }
       }
+
+      // 2) LA TIRA DE COLORS (14x1), CENTRADA AMB LA CEL·LA NEGRE DEL SELECTOR.
+      //    L'amo ho va demanar el 24/09/2026: cada peca cau sobre la cel·la del
+      //    selector que li toca. El selector no es mou: el que puja son les
+      //    barres, els px que els falten.
+      if (selector) {
+        const colors = filera?.querySelector('[data-p2-color-grid]');
+        if (colors) {
+          const s = selector.getBoundingClientRect();
+          const c = colors.getBoundingClientRect();
+          // NEGRE es la tercera cel·la de les tres iguals del selector.
+          const delta = (c.top + c.height / 2) - (s.top + (s.height / 3) * 2.5);
+          if (Math.abs(delta) >= 0.5) {
+            nou.desnivellColors = pintat.desnivellColors + delta;
+            canvia = true;
+          }
+        }
+      }
+
+      // 3) ELS MARGES DE LA COLUMNA DE COLLECCIONS. L'amo ho va demanar el
+      //    24/09/2026 («el bottom de la stripe»): la columna va del top del
+      //    selector al bottom de la tinta de la franja de samarretes.
+      if (filera && selector && franja) {
+        const f = filera.getBoundingClientRect();
+        const dalt = f.top - selector.getBoundingClientRect().top;
+        const baix = franja.getBoundingClientRect().bottom - f.bottom;
+        if (Math.abs(pintat.margesEnllacos.dalt - dalt) >= 0.5
+          || Math.abs(pintat.margesEnllacos.baix - baix) >= 0.5) {
+          nou.margesEnllacos = { dalt, baix };
+          canvia = true;
+        }
+      }
+
+      if (canvia) setMesures(nou);
     };
     const mesura = () => {
       cancelAnimationFrame(frame);
       frame = requestAnimationFrame(aplicar);
     };
 
-    // La primera mesura és immediata (useLayoutEffect encara és abans de
-    // pintar): així la graella neix ja a la mida bona i no fa cap salt.
+    // La primera mesura es sincrona (useLayoutEffect encara es abans de pintar):
+    // aixi la graella neix a la mida bona i el pare rep l'avis dins el mateix
+    // commit. La confirmacio va en rAF (abans del primer pintat, despres dels
+    // efectes de layout) i als 400 ms.
     aplicar();
+    mesura();
+    const repas = window.setTimeout(mesura, 400);
     const observer = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(mesura) : null;
     observer?.observe(el);
-    const pagina = el.closest('[data-mega-page-viewport="2"]');
     if (pagina) observer?.observe(pagina);
+    if (franja) observer?.observe(franja);
     window.addEventListener('resize', mesura);
-    // El repas que garanteix que la deduccio s'aplica: es just despres de
-    // l'animacio d'obertura del panell (340 ms), quan la geometria ja no es mou.
-    const repas = window.setTimeout(mesura, 400);
     return () => {
       cancelAnimationFrame(frame);
       window.clearTimeout(repas);
       observer?.disconnect();
       window.removeEventListener('resize', mesura);
     };
-    // `alineacioY` ES UNA DEPENDENCIA DE DEBÒ (25/09/2026).
-    //
-    // El bucle d'alineació de la pagina 2 (`alignTopRowToPage1`, a
-    // MegaslidePagina2) mou aquesta filera amb `top`, i el desplaçament no es
-    // conegut fins que el bucle ha mesurat: al muntatge val 0 i tot seguit passa
-    // a -66,67 px (a 1920). Els efectes de layout dels fills van ABANS que els
-    // del pare, o sigui que la graella mesurava amb la filera encara a baix: la
-    // franja li quedava 47 px mes a prop, la branca d'alçada li encongia el
-    // dibuix un 20 % i la graella naixia petita (mesurat: la cella 35,77 i el
-    // retall 71,53) per corregir-se tot seguit (44,63 i 95,2). El
-    // ResizeObserver no ho salvava perque moure amb `top` no canvia cap mida.
-    //
-    // Amb l'alineacio a les dependències, quan el pare aplica el desplaçament la
-    // graella es torna a mesurar DINS el mateix commit (abans de pintar): el
-    // primer fotograma ja surt a la mida bona i no hi ha salt.
+    // `alineacioY` ES UNA DEPENDENCIA DE DEBÒ (25/09/2026): el bucle del pare
+    // mou aquesta filera amb `top` i els efectes de layout dels fills van ABANS
+    // que els del pare, o sigui que la primera mesura el veu a baix. Quan el
+    // pare aplica el desplaçament, aquesta passada es torna a fer DINS el mateix
+    // commit (abans de pintar) i el primer fotograma ja surt bé.
   }, [compact, isPortraitTablet, isLandscapeTablet, alineacioY, onMides]);
 
-  // LA COLUMNA DE COLLECCIONS, DEL TOP DEL SELECTOR AL BOTTOM DE LA STRIPE.
-  //
-  // L'amo ho va demanar el 24/09/2026 (primer va dir "el bottom de la slide" i
-  // despres ho va corregir: "el bottom de la stripe"). La columna viu en una
-  // capa propia dins la filera (les nou linies son mes altes que el carrusel), i
-  // ha d'anar del top del selector Blanc/Color/Negre al bottom de la tinta de la
-  // franja de samarretes. Cap de les dues distancies no es constant: es mesuren
-  // i s'apliquen, i es tornen a mirar quan la composicio acaba d'encaixar.
-  const [margesEnllacos, setMargesEnllacos] = useState({ dalt: 0, baix: 0 });
-  useLayoutEffect(() => {
-    if (!compact) return undefined;
-    const el = graellaRef.current;
-    if (!el) return undefined;
-    const calcula = () => {
-      const filera = el.closest('[data-p2-cercador-row]');
-      const pagina = el.closest('[data-mega-page-viewport="2"]');
-      const selector = pagina?.querySelector('[data-p2-color-selector] [data-stripe-buttonbar="bn"]');
-      const franja = pagina?.querySelector('[data-stripe-visual-content="2"]');
-      if (!filera || !selector || !franja) return;
-      const f = filera.getBoundingClientRect();
-      const dalt = f.top - selector.getBoundingClientRect().top;
-      const baix = franja.getBoundingClientRect().bottom - f.bottom;
-      setMargesEnllacos((previ) => (
-        Math.abs(previ.dalt - dalt) < 0.5 && Math.abs(previ.baix - baix) < 0.5
-          ? previ
-          : { dalt, baix }
-      ));
-    };
-    calcula();
-    const t1 = window.setTimeout(calcula, 250);
-    // A 400 ms i no a 900: es just despres de l'animacio d'obertura (340 ms).
-    // El repas tarda corregia despres que el panell sembles fet (25/09/2026).
-    const t2 = window.setTimeout(calcula, 400);
-    window.addEventListener('resize', calcula);
-    // La franja s'ajusta al carril i la seva alçada acaba de quadrar després del
-    // primer pintat: sense observar-la, la mesura es quedava curta.
-    const observer = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(calcula) : null;
-    const franjaEl = el.closest('[data-mega-page-viewport="2"]')?.querySelector('[data-stripe-visual-content="2"]');
-    if (franjaEl) observer?.observe(franjaEl);
-    return () => {
-      window.clearTimeout(t1);
-      window.clearTimeout(t2);
-      window.removeEventListener('resize', calcula);
-      observer?.disconnect();
-    };
-  }, [compact, graellaRef]);
-
-  // LA GRAELLA DE COLORS (14x1), CENTRADA AMB LA CEL·LA NEGRE DEL SELECTOR.
-  //
-  // L'amo ho va demanar el 24/09/2026, juntament amb la primera línia de
-  // dibuixos: cada peça cau sobre la cel·la del selector que li toca (les
-  // barres de color, sobre NEGRE). El selector no es mou: el que puja son les
-  // barres, els px que els falten. Com la resta de mesures, s'acumula i es
-  // torna a mirar quan la composicio acaba d'encaixar.
-  const [desnivellColors, setDesnivellColors] = useState(0);
-  // El valor PINTAT, no el que s'ha decidit (vegeu el bucle de les dues files):
-  // s'actualitza DESPRES de pintar, i el bucle hi arrenca. Aixi dues passades
-  // que mesuren el mateix DOM donen el mateix objectiu i no se suma dues
-  // vegades.
-  const desnivellColorsRef = useRef(0);
-  useEffect(() => {
-    desnivellColorsRef.current = desnivellColors;
-  }, [desnivellColors]);
-  useLayoutEffect(() => {
-    if (!compact) return undefined;
-    const el = graellaRef.current;
-    if (!el) return undefined;
-    const calcula = () => {
-      const filera = el.closest('[data-p2-cercador-row]');
-      const pagina = el.closest('[data-mega-page-viewport="2"]');
-      const selector = pagina?.querySelector('[data-p2-color-selector] [data-stripe-buttonbar="bn"]');
-      const colors = filera?.querySelector('[data-p2-color-grid]');
-      if (!selector || !colors) return;
-      const s = selector.getBoundingClientRect();
-      const c = colors.getBoundingClientRect();
-      // NEGRE es la tercera cel·la de les tres iguals del selector.
-      const objectiu = s.top + (s.height / 3) * 2.5;
-      const delta = (c.top + c.height / 2) - objectiu;
-      if (Math.abs(delta) < 0.5) return;
-      setDesnivellColors(desnivellColorsRef.current + delta);
-    };
-    // LA PRIMERA PASSADA VA EN UN rAF (25/09/2026, ho va veure l'amo: «es mou la
-    // tira de colors»). A l'efecte de layout aquest fill corre ABANS que el bucle
-    // que centra el selector amb la filera, o sigui que l'objectiu encara era
-    // 19 px mes amunt (1920) i la tira hi queia a sobre; el repas de 250 ms ho
-    // desfeia i la tira feia un salt de 19 px (i de 37 px a 1512x900) amb el
-    // panell ja obrint-se. El rAF arriba abans del primer pintat pero DESPRES
-    // dels efectes de layout: la mesura ja es la bona i la tira neix a lloc.
-    const frame = requestAnimationFrame(calcula);
-    const t1 = window.setTimeout(calcula, 250);
-    // A 400 ms i no a 900: es just despres de l'animacio d'obertura (340 ms).
-    // El repas tarda corregia despres que el panell sembles fet (25/09/2026).
-    const t2 = window.setTimeout(calcula, 400);
-    window.addEventListener('resize', calcula);
-    return () => {
-      cancelAnimationFrame(frame);
-      window.clearTimeout(t1);
-      window.clearTimeout(t2);
-      window.removeEventListener('resize', calcula);
-    };
-  }, [compact, graellaRef]);
 
   if (compact) {
     // Dins el carril, tot el que es pinta son proporcions seves; les tauletes
@@ -1445,7 +1389,7 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
     const numColumns = GRAELLA_COLUMNES;
     // Mides efectives: les mesurades perquè la graella capigui a l'espai
     // disponible (només desktop) o les base de la pantalla.
-    const dibuixBasePx = midesGraella?.dibuix ?? midaDibuix(isPortraitTablet, isLandscapeTablet);
+    const dibuixBasePx = mesures.midesGraella?.dibuix ?? midaDibuix(isPortraitTablet, isLandscapeTablet);
     // LA PECA DEL CARRUSEL FA 1,5 COPS LA D'ABANS (24/09/2026).
     //
     // Es la mesura que surt de la regla de l'amo: les DUES files intercalades
@@ -1459,12 +1403,12 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
     //
     // AMB LA MIDA BASE, NO AMB LA DEL CARRUSEL: si el factor prengues la mida
     // nova, la separacio creixeria un 50 % de regal.
-    const factorDibuix = (midesGraella && midesGraella.dibuix != null)
+    const factorDibuix = (mesures.midesGraella && mesures.midesGraella.dibuix != null)
       ? dibuixBasePx / midaDibuix(isPortraitTablet, isLandscapeTablet)
       : 1;
     const colorGapPx = colorGap(isPortraitTablet, isLandscapeTablet) * factorDibuix;
-    const gapH = midesGraella?.gapH ?? gapHorizontal(isPortraitTablet, isLandscapeTablet);
-    const gapV = midesGraella?.gapV ?? gapVertical(isPortraitTablet, isLandscapeTablet);
+    const gapH = mesures.midesGraella?.gapH ?? gapHorizontal(isPortraitTablet, isLandscapeTablet);
+    const gapV = mesures.midesGraella?.gapV ?? gapVertical(isPortraitTablet, isLandscapeTablet);
     const activeKey = activeCollection === 'austen' ? `austen:${activeSubcollection || ''}` : activeCollection;
     // L'amplada de les fletxes mes el seu coixi: el marge dret que han de
     // deixar tant el retall dels dibuixos com la linia de colleccions, perque
@@ -1590,7 +1534,7 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
             onSelectColor={onSelectColor}
             colorGapPx={colorGapPx}
             reservaDreta={reservaDreta}
-            marginTop={-desnivellColors}
+            marginTop={-mesures.desnivellColors}
           />
         </div>
 
@@ -1607,8 +1551,8 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
           <CercadorColleccionsColumna
             absolut
             reservaDreta={reservaDreta}
-            margeDalt={margesEnllacos.dalt}
-            margeBaix={margesEnllacos.baix}
+            margeDalt={mesures.margesEnllacos.dalt}
+            margeBaix={mesures.margesEnllacos.baix}
             activeKey={activeKey}
             onSelect={onSelectCollection}
             isPortraitTablet={isPortraitTablet}
