@@ -1,3 +1,120 @@
+# LLISTA DE TREBALL DEL BUCLE (26/09/2026, vespre)
+
+Aixo es el **quadern de la feina** del bucle de la pagina 1 i dels tres canvis de
+la pagina 2. Cada volta: es llegeix l'estat, es mesura, es fa UNA cosa, es torna
+a mesurar, es passa la bateria i es comiteja amb el `git push`. Si el context es
+talla, aquesta llista es el que queda.
+
+**Numeros de referencia fixos** (1920x946, carril 1143 px, x381..1524):
+graella de la p2: peca 44,63 px, fila de dalt al centre 125,3, fila de baix al
+centre 164,9; selector p1 quadrat 108x108; bloc de fletxes p1 109x109.
+
+---
+
+## A. Pagina 2 (tres canvis de l'amo, un per commit)
+
+| # | pas | fitxer | abans | despres |
+|---|---|---|---|---|
+| A1 | **La columna de colleccions es UN SOL selector**: una pastilla que ocupa tota la columna, amb el nom actiu a dins. Nomes a la vista d'escriptori (`caixes`), i mirar que la de la filera (`linia`) no es desquadri | `src/components/fullwide/CercadorTextRow.jsx` (`CercadorColleccionsColumna`, branca `caixes`, linies 986-1046) i us a `src/components/megaslide/MegaslidePagina2.jsx:1055` | 9 botons; pastilla grisa `#F1F3F5` NOMES a la fila activa; radi 3; `8.5pt`; `rowGap: 3px` | pastilla UNICA que ocupa tota la columna i el nom actiu dins; els altres noms sense pastilla propia |
+| A2 | **El fons de les fletxes desapareix i les fletxes es centren al seu quadrat**: treure `bg-muted` del bloc i posar cada chevron al centre de la meitat que li toca (ara `top-1/3` i `top-2/3`) | `src/components/fullwide/firstContactPanels.jsx` (`FirstContactDibuix09Buttons`), bloc `#stripe-guide-right-anchor` | bloc amb `bg-muted`; chevrons a `left-1/2 top-1/3` i `top-2/3` (descol·locats) | bloc sense fons; chevron de dalt al centre de la meitat de dalt i el de baix al de la meitat de baix. **Compte: el mateix component el fa servir la p1 a la malla vella** (si es toca, les dues pagines han de quedar be; si cal, peça nova com `BlocDretaPagina1.jsx`) |
+| A3 | **La maniga de la franja surt per sobre del selector amb una ombra**: el selector nou de la columna trepitja la maniga de la stripe; la maniga ha de quedar per sobre i una ombra ha de separar | `CercadorTextRow.jsx` (`CercadorColleccionsColumna`, ordre de capes) i la franja (`src/components/fullwide/MegaStripePanel.jsx`) | la maniga queda sota el selector; sense ombra | maniga per sobre; ombra entre les dues peces |
+
+**Nota:** A1 i A3 toquen el MATEIX component (la columna); es fan en dos commits:
+primer la pastilla unica (A1), despres les capes i l'ombra (A3).
+
+## B. Pagina 1 (la composicio, com la de la pagina 2)
+
+L'amo mana (26/09, 22:30): selector a la franja i a la dreta del carril; graella a
+l'esquerra del carril; fletxes a la dreta; graella allargada fins a les fletxes
+amb gap 10 px; graella intercalada de dues fileres que ocupi tota l'alcada de les
+fletxes. I: «la graella intercalada ja la tens feta, nome's l'has de duplicar»,
+«les files han de ser identiques».
+
+Peçes noves ja fetes i pujades (`82c81b3`): `BlocDretaPagina1.jsx`
+(`SelectorQuadratPagina1`, `FletxesQuadratPagina1`) i
+`GraellaDuesFileresPagina1.jsx` (adaptador de `CercadorDibuixosGraella` amb
+`reservaDreta: 0`). **Falta MUNTAR-HO** a `MegaStripePanelP1.jsx`.
+
+**Xifres que han de quedar** (1920x946, carril x381..1524, 1143 px):
+
+| peça | valor |
+|---|---|
+| graella: esquerra | x381 (la vora del carril) |
+| bloc de la dreta: vora dreta | x1524 (la vora del carril) |
+| gap graella-fletxes | 10 px |
+| les files | **identiques a la p2**: peca 44,63 px; fila de dalt al centre de la cel·la BLANC (p2: 125,3) i fila de baix al de la COLOR (p2: 164,9); diferencia 0,6 / 0,0 px |
+| bloc de la dreta | selector quadrat a dalt i fletxes quadrades a sota, tots dos de la mateixa amplada |
+
+**Xifres d'abans** (1920x946, `node scripts/_tmp-p1-composicio.mjs`):
+
+    selector  pastilla 108x108 a x416   (dins la primera columna)
+    graella   x415 y65 1074x123         (nou columnes)
+    fletxes   bloc 109x109 a x1435..1544
+    franja    x358 y233 1049x112
+
+### Els tres camins, per ordre
+
+- **(a) Adaptar la malla de `MegaColumn`.** PROVAT I ENCALLAT (26/09 vespre): el
+  bloc de la dreta sortia a x1557 en comptes de x1524 i la graella tornava a
+  x415. Desfet.
+- **(b) Una filera nova de trinca** a `MegaStripePanelP1` que no faci servir
+  `MegaColumn` en absolut. PROVAT I ENCALLAT: `carrilPx(110)` dins d'aquella
+  filera tornava **1,89 px** (`--hg-mega-w` no resol en aquell node de l'arbre) i
+  el carrusel es pintava amb amplada i alcada ZERO (`graella y84 1072x0`, bloc
+  1,9x3,8).
+- **(c) DUPLICAR LA PAGINA 2 SENCERA** i substituir-hi nome's el que interessi.
+  **Es el cami que ha donat l'amo i el mes segur** (la composicio de la p2 ja te
+  les files a les posicions bones).
+
+| # | pas | fitxer | que s'hi fa |
+|---|---|---|---|
+| B1 | **Mesurar primer** (abans de tocar res del cami c) `MegaStripePanelP1` i `MegaslidePagina2`: que cal treure i que cal deixar, i **si `--hg-mega-w` resol** a cada node | `scripts/_tmp-p1-composicio.mjs`, `_tmp-franja-2p.mjs`, `_tmp-files-2p.mjs` | taula de mesures: `getComputedStyle(el).getPropertyValue('--hg-mega-w')`, `getBoundingClientRect()` de dos o tres ancestres i `transform` de cadascun |
+| B2 | **Muntar el cami (c)**: copiar el bloc de `MegaslidePagina2` dins de `MegaStripePanelP1` (o extreure'l a una peça compartida) i canviar-hi NOME'S: el selector de l'esquerra (rectangle) → el quadrat de la dreta (`SelectorQuadratPagina1`); les fletxes de l'esquerra → el bloc quadrat (`FletxesQuadratPagina1`); fora les colleccions i la tira de colors; la franja de la p1 (que ja esta muntada) → la seva; la columna de l'esquerra (el selector) → la vora esquerra del carril, on hi va la graella | `src/components/fullwide/MegaStripePanelP1.jsx` (+ `BlocDretaPagina1.jsx`, `GraellaDuesFileresPagina1.jsx`) | graella a x381, bloc de la dreta amb vora dreta a x1524, gap 10 px, files identiques a la p2 |
+| B3 | **Comprovar les files**: peça 44,63; centres 125,3 i 164,9 (0,6/0,0 px de diferencia amb les cel·les BLANC/COLOR) | `scripts/_tmp-files-2p.mjs`, `_tmp-relacio-files.mjs` | taula p1 vs p2 |
+| B4 | **Numeros nous com a funcions pures** amb prova i la mesura abans/despres al comentari | `src/components/megaslide/geometriaMegaslide.js` + `tests/unit/geometria-megaslide.test.js` | — |
+| B5 | **Comprovar que la pagina 2 no s'ha mogut** | `npm run compara-vistes`, `scripts/_tmp-franja-2p.mjs` | p2 intacta (`26442f5`, `7e0a696`, `768fb0e`, `3885df4`) |
+
+**Regla de desempat:** si una mesura no dona el que toca, es mesura el
+contenidor ABANS de culpar el calcul: `--hg-mega-w`, `getBoundingClientRect()`
+dels ancestres i `transform`. La meitat dels errors d'aquesta feina han estat
+variables de carril que no resolen on es creu.
+
+**Si (c) tambe s'encalla:** es desfa tot (`git checkout --`), s'apunta aqui la
+xifra exacta de l'encallament i es passa a l'informe. **La sessio no s'atura.**
+
+## C. Tancament
+
+| # | pas | fitxer |
+|---|---|---|
+| C1 | Bateria sencera amb l'arbre net | `npx vitest run`, `npx eslint <tocats>`, `npx vite build`, `npm run compara-vistes` (OK), `node scripts/mesura-formats.mjs` (0 i 0), `node scripts/_tmp-errors2.mjs` (cap error) |
+| C2 | Informe final | `docs/informes/INFORME-26-09-2026-pagina1.md` |
+| C3 | `git push` | — |
+
+## Linies base d'`eslint` (26/09/2026)
+
+`MegaStripePanel.jsx` 4/11 · `FullWideSlideHeader.jsx` 15/12 · `TambeRail.jsx`
+5/2 · `PdpPage.jsx` 3/7 · `MegaStripePanelP1.jsx` 3/0 ·
+`firstContactPanels.jsx` 0/0. **Els fitxers nous han de quedar nets.**
+
+## Diari del bucle
+
+### VOLTA 0 — Llista de treball (feta)
+
+- Llegits `COM-TREBALLO.md`, el pla sencer i `PROMPT-bucle-26-09-2026.md`.
+- Estat: arbre net (nome's `_tmp-*` i `.freebuff/`, que no es comitegen).
+- Escrita aquesta llista amb les xifres d'abans i les que hi han d'anar.
+- **DECISIO:** el cami de la pagina 1 sera el **(c)** (duplicar la pagina 2
+  sencera). No es tornara a provar (a) ni (b): tots dos estan provats i
+  encallats, amb la xifra exacta apuntada.
+- **DECISIO:** ordre: primer la pagina 2 (A1, A2, A3, canvis petits i
+  independents) i despres la pagina 1 (B1-B5), perque la p2 es el punt estable i
+  cada canvi seu es pot verificar sol amb `compara-vistes`.
+
+*(Les voltes seguents s'apunta aqui: que s'ha fet, la mesura abans/despres, la
+bateria i el commit.)*
+
+---
+
 # PLA — neteja de l'estructura de calibratge del megaslide
 
 **Data:** 26/09/2026 · **Branca:** `main` · **Pendent de pujar:** 17 commits
