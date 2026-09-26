@@ -323,6 +323,9 @@ function MegaStripePanel({
   useEffect(() => {
     const handler = (ev) => {
       if (typeof onShirtClick !== 'function') return;
+      // NOME'S ELS CLICS D'AQUEST PANELL: hi ha dos panells muntats i tots dos
+      // escolten el mateix esdeveniment (vegeu `ClicAreaOverlay`).
+      if (ev.detail?.panellId != null && ev.detail.panellId !== idRetall) return;
       const x = ev.detail?.x;
       const y = ev.detail?.y;
       if (typeof x !== 'number') return;
@@ -1648,6 +1651,7 @@ function MegaStripePanel({
                     es ressalta en passar-hi el ratolí; si `clicAreaHighlight`
                     (hover sobre el nom del dibuix) és cert, es ressalten totes. */}
                 <ClicAreaOverlay
+                  panellId={idRetall}
                   src="/placeholders/cercador/full-clic-area-5.svg"
                   highlightAll={!!clicAreaHighlight}
                   highlightIndices={clicAreaHighlightIndices}

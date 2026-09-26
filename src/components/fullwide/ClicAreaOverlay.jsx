@@ -25,7 +25,12 @@ function invertHex(hex) {
   return '#' + [r, g, b].map((v) => v.toString(16).padStart(2, '0')).join('');
 }
 
-function ClicAreaOverlay({ src, highlightAll, highlightIndices, tshirtColor, disabledIndices }) {
+// `panellId`: aquest overlay el fan servir ELS DOS panells de la franja
+// (l'apaisat i el vertical) i tots dos escolten el mateix esdeveniment. Sense
+// identificar de quin panell surt el clic, el gestor d'un llegia les
+// coordenades de l'altre i obria una altra casa (mesurat: la casa 5 ensenyava
+// `ncc-1701-d` i obria `death-star2d2`).
+function ClicAreaOverlay({ src, highlightAll, highlightIndices, tshirtColor, disabledIndices, panellId = null }) {
   const [markup, setMarkup] = useState('');
   const containerRef = useRef(null);
   const fallbackRef = useRef(null);
@@ -70,7 +75,7 @@ function ClicAreaOverlay({ src, highlightAll, highlightIndices, tshirtColor, dis
       if (!r) return;
       const x = (ev.clientX - r.left) / (r.width || 1);
       const y = (ev.clientY - r.top) / (r.height || 1);
-      window.dispatchEvent(new CustomEvent('mega-stripe-full-hit-p2', { detail: { x, y } }));
+      window.dispatchEvent(new CustomEvent('mega-stripe-full-hit-p2', { detail: { x, y, panellId } }));
     } catch {
       // ignore
     }
