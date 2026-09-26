@@ -22,6 +22,7 @@ import {
 import { touchMegaPublicActivity, getMegaPublicSelectorFor, setMegaPublicSelectorFor } from './fullwide/megaPublicSelectorState.js';
 import IconButton from './fullwide/MegaIconButton.jsx';
 import { dibuixosGraella16x4 } from './fullwide/CercadorTextRow.jsx';
+import { computeStripeTileOverlaySrcs } from '@/utils/resolveStripeTile.js';
 import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
 import RegisterOverlay from './fullwide/RegisterOverlay.jsx';
 import usePersistentState from '@/hooks/usePersistentState';
@@ -2759,8 +2760,122 @@ function FullWideSlideHeader({
     };
   }, [resolvedMega, active, austenSubcollection, AUSTEN_SUB_PREFIXES]);
 
-  // Imatge base de la franja per a la pàgina 2.
+  // Imatge base de la franja per a la pàgina 2 (i la de la pàgina 1: és la
+  // mateixa). Es declara AQUI perquè la porta d'obertura també l'ha de
+  // precarregar: sense ella la franja neix buida.
   const stripeBaseImageSrc = '/placeholders/cercador/full-white-stripe.webp?v=2866';
+
+  // LA PORTA D'OBERTURA: NO ES MONTA EL PANELL FINS QUE EL CONTINGUT HI ES
+  // (26/09/2026).
+  //
+  // El megaslide s'obria abans d'estar a punt i es veia arribar el contingut:
+  // els dibuixos de la graella (les imatges `images_grid_trim` del retall) i
+  // els de la franja (`images_stripe`) encara viatjaven. Mesurat en carregar
+  // amb `?active=`, al primer fotograma pintat n'hi havia 94 de 128 de
+  // decodificades; a la maquina de l'amo, cap.
+  //
+  // La porta es AQUI perque tots els camins passen per l'estat `active`: la
+  // URL amb `?active=` (a l'inici, amb `pageshow` i amb `popstate`), el clic a
+  // la icona de cerca i els enllacos de colleccio. En comptes d'amagar el
+  // contingut (que ja s'ha provat i trenca el clic), es RETARDA EL MUNTATGE:
+  // primer es demanen TOTES les imatges, i nome's quan ja hi son (o quan
+  // passen 400 ms, perque cap xarxa lenta no bloquegi l'obertura) es munta el
+  // panell. Com que la peticio surt ABANS del muntatge, el panell neix amb les
+  // imatges a la memoria i no es veu cap forat.
+  //
+  // El que es desa es un boolea, i NOME'S es torna a passar la porta en OBRIR:
+  // canviar de colleccio o de variant amb el panell obert no el tanca (seria un
+  // parpelleig de 200 ms, mesurat). Per aixo, en tancar, la porta es torna a
+  // baixar a fals.
+  const [oberturaAPunt, setOberturaAPunt] = useState(false);
+  // Les imatges precarregades s'han de quedar referenciades: si el navegador
+  // les pot recollir abans que el panell les demani, es tornarien a baixar.
+  const imatgesOberturaRef = useRef([]);
+  const TOPALL_PRECARREGA_MS = 400;
+
+  useEffect(() => {
+    if (!active) {
+      // Tancar el megaslide ha de deixar la porta a punt per a la propera
+      // obertura. Es una baixada a fals DINS de l'efecte, que el compilador de
+      // React marca com a error; aqui es vol i es controlada: nome's passa en
+      // tancar, i el panell ja es desmuntat perque `active` es fals.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setOberturaAPunt(false);
+      return undefined;
+    }
+
+    const srcs = new Set();
+    // 1. Els dibuixos de la graella (el retall del carrusel): el panell en
+    //    pinta els 64 i, com que la tira es pinta dues vegades, 128 elements.
+    try {
+      for (const it of dibuixosGraella16x4()) {
+        if (it.dibuix) srcs.add(it.dibuix);
+      }
+    } catch {
+      /* s'ignora a posta */
+    }
+    // 2. Els dibuixos de la franja de la colleccio activa, amb la mateixa
+    //    regla que `MegaslidePagina2` (mateix `drawable`, mateixa variant de la
+    //    pagina 2 i mateix color mostrat).
+    try {
+      const cols = resolvedMegaFiltered?.[active];
+      const items = Array.isArray(cols) && cols.length > 0 ? (cols[0]?.items || []) : [];
+      const drawable = active === 'the_human_inside'
+        ? (Array.isArray(thinDrawings) ? thinDrawings : [])
+        : items.filter((it) => it && it !== CONTROL_TILE_BN && it !== CONTROL_TILE_ARROWS);
+      const variant = active === 'the_human_inside' ? humanInsideVariantP2 : firstContactVariantP2;
+      const stripeSrcs = computeStripeTileOverlaySrcs({
+        drawable,
+        variant,
+        active,
+        displayedShirtColor: displayedShirtColorP2,
+        resolvedOverlaySrc,
+        limit: drawable.length,
+      });
+      for (const s of (stripeSrcs || [])) {
+        if (s) srcs.add(s);
+      }
+    } catch {
+      /* s'ignora a posta */
+    }
+
+    // 3. La imatge base de la franja (la que tenen les catorze samarretes a
+    //    sota del dibuix): sense ella la franja neix blanca.
+    srcs.add(isPortraitTablet ? '/placeholders/tablet vertical/full-white-stripe-doble.png' : stripeBaseImageSrc);
+
+    const imatges = [...srcs].map((src) => {
+      const im = new Image();
+      im.decoding = 'async';
+      im.src = src;
+      return im;
+    });
+    imatgesOberturaRef.current = imatges;
+
+    let cancelled = false;
+    const obrirQuanEstigui = () => {
+      if (!cancelled) setOberturaAPunt(true);
+    };
+    const temporitzador = setTimeout(obrirQuanEstigui, TOPALL_PRECARREGA_MS);
+    // `decode()` diu quan la imatge ja es pot pintar (no nome's quan ha
+    // arribat). Si alguna falla, `allSettled` deixa passar igualment.
+    Promise.allSettled(
+      imatges.map((im) => (typeof im.decode === 'function' ? im.decode() : Promise.resolve()))
+    ).then(() => {
+      clearTimeout(temporitzador);
+      obrirQuanEstigui();
+    });
+
+    return () => {
+      cancelled = true;
+      clearTimeout(temporitzador);
+    };
+    // Nomes `active`: canviar la variant amb el panell obert NO l'ha de tancar.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [active]);
+
+  // El panell nome's es munta quan hi ha colleccio i la seva composicio ja te
+  // les imatges a la memoria (o quan el topall de 400 ms ha passat).
+  const potMuntarElPanell = Boolean(active) && oberturaAPunt;
 
   useEffect(() => {
     if (!active) return;
@@ -3391,6 +3506,7 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
         document.body
       )}
 
+      {potMuntarElPanell ? (
       <MegaMenuPanel
         active={active}
         megaPage={megaPage}
@@ -3476,6 +3592,7 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
         isPortraitTablet={isPortraitTablet}
         isLandscapeTablet={isLandscapeTablet}
       />
+      ) : null}
 
       {canUseDom && showRegisterOverlay &&
         ReactDOM.createPortal(
