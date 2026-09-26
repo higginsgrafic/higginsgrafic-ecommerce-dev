@@ -260,11 +260,20 @@ proves noves (581 al total): `PAGINA1_COSTAT_PECA_PX` (45),
 acaba a y317,9; la franja comenca a y241,5. Les caixes es trepitgen 76 px en
 vertical, **pero nome's en la seva cantonada inferior esquerra**: la tira de
 samarretes nome's arriba a x1406,8 i el bloc comenca a x1414 (la seva vora dreta
-es la del carril), o sigui que el bloc VISIBLE del bloc queda lliure (ho
-comprova `_tmp-b2-marca.mjs`: la cantonada de la franja i la del bloc no es
-toquen). Es la consequencia de les xifres que ha demanat l'amo (bloc quadrat de
-110+110 a la vora dreta i franja a l'alcada de la de la p2) i s'apunta a
-l'informe.
+es la del carril), o sigui que el contingut del bloc queda lliure. Comprovat
+amb `_tmp-b2-clic4.mjs`: el clic a la fletxa dreta mou el carrusel de la p1 un
+pas (−22,5 px). Es la consequencia de les xifres que ha demanat l'amo (bloc
+quadrat de 110+110 a la vora dreta i franja a l'alcada de la de la p2) i s'apunta
+a l'informe.
+
+### VOLTA 8 — C (feta)
+
+- Informe: `docs/informes/INFORME-26-09-2026-pagina1.md`.
+- Bateria final amb l'arbre net: 581 proves (45 fitxers), eslint amb els
+  MATEIXOS comptes que a HEAD als vuit fitxers tocats (5 errors i 16 avisos),
+  `vite build` OK, `compara-vistes` OK, `mesura-formats` 0 i 0 i
+  `_tmp-errors2` cap error.
+- **Condicio de parada del bucle complerta.**
 
 
 
