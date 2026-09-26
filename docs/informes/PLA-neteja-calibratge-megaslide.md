@@ -484,6 +484,10 @@ tambe (109x109), de manera que ja hi quadren.
 
 - `97e2bd7` — el selector de la pagina 1 torna a ser quadrat (pastilla 108x108 a
   1920x946; abans 53x108).
+- `6341498` — **les files de la pagina 1 cauen a les posicions de la pagina 2**
+  (ho va demanar l'amo despres del rombe del vel). El bloc sencer de la pagina 1
+  baixa 18,6 px a l'escriptori; a la banda estreta i a les tauletes ja hi cau
+  sol. Vegeu la seccio 10.4.
 
 **Objectiu d'aquesta feina (paraules de l'amo, seccio 10.2):** el selector i les
 fletxes alineats a la **vora dreta del carril** (x1524 a 1920x946), la graella
@@ -516,6 +520,34 @@ bateria sencera (`npx vitest run`, `npx eslint` als fitxers tocats,
 `npx vite build`, `npm run compara-vistes` OK, `node scripts/mesura-formats.mjs`
 0 i 0, `node scripts/_tmp-errors2.mjs` "cap error"), i la pagina 2 intacta
 (punt de recuperacio `26442f5`).
+
+### 10.4 El bloc de la pagina 1, quadrat amb el de la pagina 2 (26/09/2026)
+
+Ho va demanar l'amo despres de veure el rombe del vel: «alinea les files de la
+pagina 1 a les mateixes posicions que la pagina 2». Entre les opcions que li
+vaig donar (amb xifres) va triar **baixar tot el bloc** (selector i files junts).
+
+`6341498`. Mesurat a 1920x946:
+
+| peça (centre) | abans | despres | pagina 2 |
+|---|---|---|---|
+| selector | 127,7 | **146,3** | 146,3 (p1 x416 · p2 x2287; la regla propia de la p2 hi afegeix 5 px) |
+| primera fila de dibuixos | 127,7 | **146,3** | 146,3 |
+| bloc de fletxes | 127,7 | **146,3** | 164,9 |
+| franja (top) | 232,9 | 251,5 | 241,5 (els 10 px de sempre) |
+
+Als escriptoris (1920, 1440 i 2560) el bloc de la p1 anava **18,6 px per
+sobre**; a la banda estreta i a les tauletes ja hi cau sol (1366x768: 118,9
+contra 118,2; 1024x768: 108,2 contra 108,0). Per aixo l'ajust nome's s'aplica a
+l'escriptori: `AJUST_FILES_PAGINA1_PX` i `esEscriptoriPagina1`
+(`geometriaMegaslide.js`, amb prova). El bloc el mou el `pageLift` de sempre,
+que ara rep la finestra (`MegaStripePanelP1`).
+
+La franja de la pagina 1 baixa amb el bloc, pero el panell tambe es fa 18,6 px
+mes curt (la seva alcada surt del bottom de la franja), i per aixo la franja
+torna a quedar on era: els dos sostres (232,9 i 222,9) no es mouen. Les proves
+de `visualOffsetYFranjaPagina2` i `topFranjaPagina2` nome's canvien a
+l'escriptori.
 
 #### 10.3.1 Recepta per fer-ho (pels llocs exactes)
 
