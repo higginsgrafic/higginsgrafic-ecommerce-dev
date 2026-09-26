@@ -8,6 +8,9 @@ import {
   alcadaCarruselGraella,
   centratgeSelectorY,
   desnivellsLiniesGraella,
+  desnivellColorsGraella,
+  ampladaColumnaGraella,
+  GRAELLA_DRETA_FLETXES_CARRIL_PX,
   FRANJA_FITXER_AMPLADA,
   FRANJA_FITXER_ALCADA,
   FRANJA_FITXER_ASPECTE,
@@ -140,5 +143,31 @@ describe('desnivellsLiniesGraella', () => {
     });
     expect(d.primera).toBeCloseTo(5.934, 2);
     expect(d.segona).toBeCloseTo(3.656, 2);
+  });
+});
+
+describe('desnivellColorsGraella', () => {
+  const colorsA = (carril, midaSelector, escala, dibuix, gapV, reservaFletxes, colorGapPx) => {
+    const ampleRetall = ampladaColumnaGraella({ carril, midaSelector, escala })
+      - (reservaFletxes ? GRAELLA_DRETA_FLETXES_CARRIL_PX * escala : 0);
+    return desnivellColorsGraella({
+      ampleRetall, dibuix, gapV, carril, midaSelector, escala, colorGapPx,
+    });
+  };
+
+  it("a 1920 dona 8,76 (el DOM n'aplicava 8,78)", () => {
+    expect(colorsA(1143, 120, 1339 / 1350, 29.7556, 2.9756, true, 8 * (29.7556 / 30))).toBeCloseTo(8.76, 1);
+  });
+
+  it("a 1440 dona 9,03 (el DOM, 9,02)", () => {
+    expect(colorsA(855, 120, 1002 / 1350, 22.2667, 2.2267, true, 8 * (22.2667 / 30))).toBeCloseTo(9.03, 1);
+  });
+
+  it("a 2560 dona 8,42 (el DOM, 8,44)", () => {
+    expect(colorsA(1527, 120, 1789 / 1350, 39.7556, 3.9756, true, 8 * (39.7556 / 30))).toBeCloseTo(8.42, 1);
+  });
+
+  it("a 1366x768 (tauleta) dona 1,44 (el DOM, 1,45)", () => {
+    expect(colorsA(811, 112.8, 1, 31.343 / 1.5, 3.98, false, 6 * 0.995)).toBeCloseTo(1.44, 1);
   });
 });

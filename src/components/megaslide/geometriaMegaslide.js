@@ -172,6 +172,25 @@ export const GRAELLA_COLUMNA_DRETA_CARRIL_PX = 142;
 export const GRAELLA_GAP_COLUMNES_PX = 20;
 export const GRAELLA_ESQUERRA_SELECTOR_CARRIL_PX = 70; // selector/2 (60) + 10
 export const GRAELLA_DRETA_FLETXES_CARRIL_PX = 70; // fletxes (60) + 10
+export const GRAELLA_BARRES_COLORS = 14;
+export const GRAELLA_FILA_GAP_PX = 10;
+
+/**
+ * L'amplada de la columna de la graella (la que conte el retall dels dibuixos i
+ * la tira de colors): la filera menys l'aresta del selector, el `columnGap` de
+ * 20 px i la columna de la dreta (`carrilLane(142)`).
+ *
+ * El RETALL encara hi resta el bloc de fletxes (`70 x escala`) als escriptoris;
+ * a les tauletes el `reservaDreta` es 0 i la tira fa tota la columna.
+ */
+export function ampladaColumnaGraella({ carril, midaSelector, escala }) {
+  const e = Number.isFinite(escala) && escala > 0 ? escala : 1;
+  const esquerra = (midaSelector / 2 + 10) * e;
+  return carril
+    - esquerra
+    - GRAELLA_GAP_COLUMNES_PX
+    - (carril * GRAELLA_COLUMNA_DRETA_CARRIL_PX) / MEGASLIDE_REFERENCIA_PX;
+}
 
 /**
  * L'amplada del retall de la graella a partir de la finestra.
@@ -304,4 +323,34 @@ export function desnivellsLiniesGraella({ dibuix, gapV, carril, midaSelector, es
     primera: dibuixPx / 2 - alcadaFilera / 2 + alcadaSel / 3,
     segona: alcadaFila + dibuixPx / 2 - alcadaFilera / 2,
   };
+}
+
+/**
+ * EL DESNIVELL DE LA TIRA DE COLORS, DECLARAT (26/09/2026)
+ * -----------------------------------------------------------------------------
+ * La tira de catorze barres de color s'havia de centrar amb la cella NEGRE del
+ * selector (la tercera), i aixo es feia amb un bucle que mesurava el centre de
+ * la tira i el de la cella. Pero tot son mides declarades:
+ *
+ *   desnivellColors = alcadaCarrusel + GAP(fila 2) + alcadaBarra/2
+ *                     - alcadaFilera/2 - alcadaSelector/3
+ *
+ * (la cella NEGRE cau a `alcadaSelector x 2,5/3` del capdamunt de la pastilla,
+ * i la pastilla esta centrada amb la filera). `alcadaBarra` surt de l'amplada
+ * de la tira (l'amplada de la columna de la graella menys la reserva de les
+ * fletxes), el `colorGapPx` i l'aspecte 7/2 de cada barra.
+ *
+ * Comprovat contra el `marginTop` que s'aplicava a 1920, 1440, 1512, 1680,
+ * 2000, 2560, 1400, 1366x768, 1280x720, 1024x768 i 768x1024: la diferencia
+ * maxima es 0,02 px.
+ */
+export function desnivellColorsGraella({
+  ampleRetall, dibuix, gapV, carril, midaSelector, escala, colorGapPx, barres = GRAELLA_BARRES_COLORS,
+}) {
+  const alcadaCarrusel = alcadaCarruselGraella(dibuix, gapV);
+  const alcadaFilera = alcadaCarrusel + (carril * GRAELLA_FILA_COLORS_CARRIL_PX) / MEGASLIDE_REFERENCIA_PX;
+  const alcadaSel = alcadaSelector(midaSelector, escala);
+  const ampladaBarra = (ampleRetall - (barres - 1) * colorGapPx) / barres;
+  const alcadaBarra = (ampladaBarra * 2) / 7;
+  return alcadaCarrusel + GRAELLA_FILA_GAP_PX + alcadaBarra / 2 - alcadaFilera / 2 - alcadaSel / 3;
 }

@@ -10,7 +10,7 @@ import {
 } from './midesGraella.js';
 // L'amplada del retall (l'últim input mesurat de la graella) viu amb la resta
 // de geometria declarada del megaslide.
-import { ampladaRetallGraella, desnivellsLiniesGraella } from '../megaslide/geometriaMegaslide.js';
+import { ampladaRetallGraella, ampladaColumnaGraella, desnivellsLiniesGraella, desnivellColorsGraella, GRAELLA_DRETA_FLETXES_CARRIL_PX } from '../megaslide/geometriaMegaslide.js';
 import { carrilPct, carrilLane, carrilPx, readRootCssNumber, getLayoutViewportWidth, MEGASLIDE_REFERENCIA_PX } from '../../utils/layoutMetrics.js';
 import { GRAELLA_DIBUIXOS_ESCALA_VERTICAL } from '../../config/stripeCalibrationsVertical.js';
 import { FirstContactDibuix09Buttons } from './firstContactPanels.jsx';
@@ -1310,29 +1310,41 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
       //    L'amo ho va demanar el 24/09/2026: cada peca cau sobre la cel·la del
       //    selector que li toca. El selector no es mou: el que puja son les
       //    barres, els px que els falten.
-      if (selector) {
-        const colors = filera?.querySelector('[data-p2-color-grid]');
-        if (colors) {
-          const s = selector.getBoundingClientRect();
-          const c = colors.getBoundingClientRect();
-          // NEGRE es la tercera cel·la de les tres iguals del selector.
-          const delta = (c.top + c.height / 2) - (s.top + (s.height / 3) * 2.5);
-          if (Math.abs(delta) >= 0.5) {
-            // EL VALOR APLICAT AL DOM, NO EL DE LA REF (26/09/2026).
-            //
-            // La ref de `mesures` s'actualitza DESPRES de pintar, o sigui que
-            // pot anar per davant del que el DOM te posat: quan dos passos cauen
-            // abans d'un pintat (l'efecte de layout i el rAF, o el repas de
-            // 400 ms), `pintat + delta` comptava la correccio dues vegades i la
-            // tira de colors pintava un valor fals. Mesurat amb una sonda al
-            // bucle: 47,51 px pintats en comptes de 8,74 (38,76 px de salt).
-            // El que la tira porta posat es el seu `marginTop`, i `delta` ja hi
-            // es relatiu: `aplicat + delta` es l'objectiu absolut i la correccio
-            // es idempotent encara que els passos es trepitgin.
-            const aplicat = -Number.parseFloat(getComputedStyle(colors).marginTop || '0') || 0;
-            nou.desnivellColors = aplicat + delta;
-            canvia = true;
-          }
+      //
+      //    DECLARAT (26/09/2026): abans es mesurava el centre de la tira i el de
+      //    la cel·la NEGRE i s'anaven igualant. Ara surt de
+      //    `desnivellColorsGraella`, amb les mides del carril i del selector.
+      {
+        const carrilEf = readRootCssNumber('--hg-mega-w', MEGASLIDE_REFERENCIA_PX);
+        const escalaEf = readRootCssNumber('--hg-escala-mega', 1);
+        const dibuixEf = nou.midesGraella?.dibuix ?? pintat.midesGraella?.dibuix ?? midaDibuix(isPortraitTablet, isLandscapeTablet);
+        const gapVEf = nou.midesGraella?.gapV ?? pintat.midesGraella?.gapV ?? gapVertical(isPortraitTablet, isLandscapeTablet);
+        // La separacio entre barres va amb el mateix factor que el dibuix (vegeu
+        // el render): amb la mida base, no amb la del carrusel.
+        const factorDibuixEf = (nou.midesGraella && nou.midesGraella.dibuix != null)
+          ? dibuixEf / midaDibuix(isPortraitTablet, isLandscapeTablet)
+          : 1;
+        const colorGapEf = colorGap(isPortraitTablet, isLandscapeTablet) * factorDibuixEf;
+        // L'amplada de la tira es la de la columna de la graella menys la
+        // reserva de les fletxes (que nome's hi es a l'escriptori).
+        const reservaFletxes = (!isPortraitTablet && !isLandscapeTablet)
+          ? GRAELLA_DRETA_FLETXES_CARRIL_PX * escalaEf
+          : 0;
+        const ampleRetallColors = ampladaColumnaGraella({
+          carril: carrilEf, midaSelector, escala: escalaEf,
+        }) - reservaFletxes;
+        const declarat = desnivellColorsGraella({
+          ampleRetall: ampleRetallColors,
+          dibuix: dibuixEf,
+          gapV: gapVEf,
+          carril: carrilEf,
+          midaSelector,
+          escala: escalaEf,
+          colorGapPx: colorGapEf,
+        });
+        if (Math.abs(declarat - pintat.desnivellColors) >= 0.01) {
+          nou.desnivellColors = declarat;
+          canvia = true;
         }
       }
 
@@ -1380,7 +1392,7 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
     // que els del pare, o sigui que la primera mesura el veu a baix. Quan el
     // pare aplica el desplaçament, aquesta passada es torna a fer DINS el mateix
     // commit (abans de pintar) i el primer fotograma ja surt bé.
-  }, [compact, isPortraitTablet, isLandscapeTablet, alineacioY, onMides]);
+  }, [compact, isPortraitTablet, isLandscapeTablet, alineacioY, midaSelector, onMides]);
 
 
   if (compact) {
