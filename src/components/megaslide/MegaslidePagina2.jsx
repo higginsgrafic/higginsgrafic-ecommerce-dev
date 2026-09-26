@@ -2,9 +2,7 @@ import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useSta
 import { CERCADOR_COLORS } from '../fullwide/CercadorTopBar.jsx';
 import CercadorTextRow from '../fullwide/CercadorTextRow.jsx';
 import MegaStripePanel from '../fullwide/MegaStripePanel.jsx';
-import { FRANJA_AJUST_PX } from '../fullwide/MegaStripePanelP1.jsx';
-import { AJUST_FRANJA_TAULETA_APAISSADA_PX, centratgeSelectorY, desplacTopSelector } from './geometriaMegaslide.js';
-import { desplacamentFranjaEscriptori } from '../../utils/mesuraMegaslide.js';
+import { centratgeSelectorY, desplacTopSelector, visualOffsetYFranjaPagina2 } from './geometriaMegaslide.js';
 import { carrilPx, readRootCssNumber, MEGASLIDE_REFERENCIA_PX } from '../../utils/layoutMetrics.js';
 import { CapaTaulaVertical, TaulaVerticalP2 } from './TaulaVertical.jsx';
 import {
@@ -128,14 +126,6 @@ export default function MegaslidePagina2({
     && window.innerWidth >= 768 && window.innerWidth <= 1366
     && window.innerWidth >= window.innerHeight;
   const topGraellaColors = 40 - (esBandaEstreta ? 38 : 0);
-  // Desplaçament de la franja a l'escriptori, per repartir el marge afegit a
-  // l'alçada de la pestanya (vegeu utils/mesuraMegaslide.js). Va tambe a la franja de
-  // la pagina 1, amb el mateix valor, perque han de quedar a la mateixa alçada.
-  const desplacamentFranja = desplacamentFranjaEscriptori({
-    ample: typeof window !== 'undefined' ? window.innerWidth : 0,
-    alt: typeof window !== 'undefined' ? window.innerHeight : 0,
-    esTauleta: isPortraitTablet || isLandscapeTablet,
-  });
   const [topVisualAlignmentY, setTopVisualAlignmentY] = useState(0);
   // Desplaçament propi del selector Blanc/Color/Negre perquè quedi centrat amb
   // la graella de colors. Va a part de topVisualAlignmentY (que alinea el
@@ -939,7 +929,15 @@ export default function MegaslidePagina2({
             {...propsFranjaP2}
             stripeImageSrc={isPortraitTablet ? '/placeholders/tablet vertical/full-white-stripe-doble.png' : stripeBaseImageSrc}
             // La franja ha de quedar a la mateixa alcada que la de la pagina 1.
-            visualOffsetY={-page1PageLift + (isLandscapeTablet ? AJUST_FRANJA_TAULETA_APAISSADA_PX : 0) - ((isPortraitTablet || isLandscapeTablet) ? 0 : FRANJA_AJUST_PX) + desplacamentFranja}
+            // El desplacament es DECLARAT (`visualOffsetYFranjaPagina2`): era
+            // una composicio en línia aquí i el calcul del sostre de la franja
+            // tambe el necessita.
+            visualOffsetY={visualOffsetYFranjaPagina2({
+              ample: typeof window !== 'undefined' ? window.innerWidth : 0,
+              alt: typeof window !== 'undefined' ? window.innerHeight : 0,
+              isPortraitTablet,
+              isLandscapeTablet,
+            })}
           />
         </div>
 

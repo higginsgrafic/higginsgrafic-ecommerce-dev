@@ -29,6 +29,7 @@
 
 import { carrilDeclarat, laneForViewport } from '../../utils/layoutModel';
 import { MEGASLIDE_REFERENCIA_PX, escalaMegaslide } from '../../utils/layoutMetrics';
+import { desplacamentFranjaEscriptori } from '../../utils/mesuraMegaslide';
 
 /**
  * Les mides del fitxer de la franja (la matriu de samarretes).
@@ -435,4 +436,133 @@ export function margeBaixFletxesGraella({ dibuix, gapV, carril, midaSelector, es
   const alcadaCarrusel = alcadaCarruselGraella(dibuix, gapV);
   const alcadaFilera = alcadaCarrusel + (carril * GRAELLA_FILA_COLORS_CARRIL_PX) / MEGASLIDE_REFERENCIA_PX;
   return alcadaFilera / 2 + alcadaSelector(midaSelector, escala) / 2 - alcadaCarrusel;
+}
+
+/**
+ * LA BANDA ESTRETA (768-1366 en horitzontal), DECLARADA (26/09/2026)
+ * -----------------------------------------------------------------------------
+ * Es la condicio que fa que la franja NO baixi els 15 px de disseny: en aquesta
+ * banda el belt ja s'ha encongit i el desplaçament deixava el top de la franja
+ * per damunt del bottom de la graella de colors (que quedava partida en dues
+ * meitats). La portaven DuES copies (MegaStripePanel i MegaStripePanelP1) i
+ * havien de coincidir: si una pagina la baixa i l'altra no, les dues franges es
+ * desquadren.
+ *
+ * @param {object} o
+ * @param {number} o.ample amplada de la finestra (window.innerWidth)
+ * @param {number} o.alt alcada de la finestra (window.innerHeight)
+ * @returns {boolean}
+ */
+export function esBandaEstretaFranja({ ample, alt } = {}) {
+  return Number.isFinite(ample) && Number.isFinite(alt)
+    && ample >= 768 && ample <= 1366 && ample >= alt;
+}
+
+/**
+ * LA RESERVA DE LA GRAELLA VELLA I EL SOSTRE DE LA FRANJA, DECLARATS (26/09/2026)
+ * -----------------------------------------------------------------------------
+ * La franja de samarretes de la pagina 2 no te `top`: cau on cau perque al
+ * damunt seu, dins el panell, hi ha la RESERVA de la graella de la pagina 1
+ * (les nou columnes de text, que la pagina 2 ja no dibuixa pero ha de reservar
+ * perque la franja no pugi) mes el marge del bloc de la franja. La reserva es
+ * la formula del MegaColumn:
+ *
+ *   alcadaReserva = (carril - 8 separacions x escala) / 9 + 13,96
+ *
+ * on les 8 separacions son el `GAP_X_PX` del MegaColumn, el 9 son les columnes
+ * i els 13,96 px son el marge de dalt del boto (8) mes el descendent de la seva
+ * linia (~5,96), que NO s'escalen. El sostre de LAYOUT de la franja respecte al
+ * viewport de la pagina 2 es, doncs:
+ *
+ *   top = 32 (el `py-8` del panell) + alcadaReserva
+ *
+ * i el sostre VISUAL hi afegeix els dos desplaçaments de disseny de la franja:
+ * el `translateY(-15px)` del bloc (que a la banda estreta no s'aplica) i el
+ * `visualOffsetY` que li passa la pagina 2 per quadrar-la amb la de la pagina 1.
+ *
+ * Comprovat contra el `getBoundingClientRect()` de la franja, restant els
+ * transformats, a 1920, 2000, 1680, 1512, 1440, 1400, 2560, 1366x768,
+ * 1280x720, 1024x768 i 768x1024: la diferencia maxima es 0,3 px (0,01 px als
+ * escriptoris).
+ */
+export const MARGE_DALT_BLOC_FRANJA_PX = 32;
+export const AJUST_BAIX_BLOC_FRANJA_PX = -15;
+export const GRAELLA_RESERVA_SEPARACIONS = 8;
+export const GRAELLA_RESERVA_SEPARACIO_PX = 12;
+export const GRAELLA_RESERVA_TILES = 9;
+export const GRAELLA_RESERVA_MARGE_PX = 13.96;
+
+/** L'alçada de la reserva de la graella vella (la que fa de sostre de la franja). */
+export function alcadaReservaGraellaPanell({ carril, escala = 1 } = {}) {
+  const c = Number.isFinite(carril) && carril > 0 ? carril : MEGASLIDE_REFERENCIA_PX;
+  const e = Number.isFinite(escala) && escala > 0 ? escala : 1;
+  return (
+    (c - GRAELLA_RESERVA_SEPARACIONS * GRAELLA_RESERVA_SEPARACIO_PX * e) / GRAELLA_RESERVA_TILES
+    + GRAELLA_RESERVA_MARGE_PX
+  );
+}
+
+/**
+ * La mateixa reserva, com a `calc()` de CSS: la fa servir el panell, que
+ * l'aplica com a `height` (les variables son les del carril, que el panell ja
+ * publica).
+ */
+export function alcadaReservaGraellaPanellCss({
+  carril = 'var(--hg-mega-w, 1350px)',
+  escala = 'var(--hg-escala-mega, 1)',
+} = {}) {
+  const separacions = GRAELLA_RESERVA_SEPARACIONS * GRAELLA_RESERVA_SEPARACIO_PX;
+  return `calc((${carril} - ${separacions}px * ${escala}) / ${GRAELLA_RESERVA_TILES} + ${GRAELLA_RESERVA_MARGE_PX}px)`;
+}
+
+/**
+ * El `visualOffsetY` que la pagina 2 passa a la franja: el que la baixa (o la
+ * puja) perque quedi a la mateixa alçada que la de la pagina 1. Es la
+ * composicio que tenia en línia `MegaslidePagina2`, declarada perque tambe la
+ * necessita el calcul del sostre de la franja.
+ *
+ * @param {object} o
+ * @param {number} o.ample amplada de la finestra (window.innerWidth)
+ * @param {number} o.alt alcada de la finestra (window.innerHeight)
+ * @param {boolean} [o.isPortraitTablet]
+ * @param {boolean} [o.isLandscapeTablet]
+ * @returns {number} px
+ */
+export function visualOffsetYFranjaPagina2({
+  ample, alt, isPortraitTablet = false, isLandscapeTablet = false,
+} = {}) {
+  const tauleta = isPortraitTablet || isLandscapeTablet;
+  const pageLift = pageLiftPagina1({ isPortraitTablet, isLandscapeTablet });
+  const desplacament = desplacamentFranjaEscriptori({ ample, alt, esTauleta: tauleta });
+  return (
+    -pageLift
+    + (isLandscapeTablet ? AJUST_FRANJA_TAULETA_APAISSADA_PX : 0)
+    - (tauleta ? 0 : AJUST_FRANJA_ESCRIPTORI_PX)
+    + desplacament
+  );
+}
+
+/**
+ * El sostre de la franja de la pagina 2, en px des del capdamunt del viewport
+ * de la pagina 2 (`[data-mega-page-viewport="2"]`).
+ *
+ * @param {object} o
+ * @param {number} o.carril amplada del carril (`--hg-mega-w`)
+ * @param {number} o.escala escala del megaslide (`--hg-escala-mega`)
+ * @param {number} [o.ample] amplada de la finestra (window.innerWidth)
+ * @param {number} [o.alt] alcada de la finestra (window.innerHeight)
+ * @param {boolean} [o.isPortraitTablet]
+ * @param {boolean} [o.isLandscapeTablet]
+ * @returns {number} px
+ */
+export function topFranjaPagina2({
+  carril, escala = 1, ample, alt, isPortraitTablet = false, isLandscapeTablet = false,
+} = {}) {
+  const ajustBloc = esBandaEstretaFranja({ ample, alt }) ? 0 : AJUST_BAIX_BLOC_FRANJA_PX;
+  return (
+    MARGE_DALT_BLOC_FRANJA_PX
+    + alcadaReservaGraellaPanell({ carril, escala })
+    + ajustBloc
+    + visualOffsetYFranjaPagina2({ ample, alt, isPortraitTablet, isLandscapeTablet })
+  );
 }

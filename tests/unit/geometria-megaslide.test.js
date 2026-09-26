@@ -18,6 +18,12 @@ import {
   FRANJA_FITXER_AMPLADA,
   FRANJA_FITXER_ALCADA,
   FRANJA_FITXER_ASPECTE,
+  esBandaEstretaFranja,
+  alcadaReservaGraellaPanell,
+  alcadaReservaGraellaPanellCss,
+  visualOffsetYFranjaPagina2,
+  topFranjaPagina2,
+  AJUST_BAIX_BLOC_FRANJA_PX,
 } from '../../src/components/megaslide/geometriaMegaslide.js';
 
 // Aquesta prova fixa els numeros DECLARATS del megaslide contra el que es va
@@ -227,5 +233,96 @@ describe('margeBaixFletxesGraella', () => {
     expect(margeBaixFletxesGraella({
       dibuix: 39.7556, gapV: 3.9756, carril: 1527, midaSelector: 120, escala: 1789 / 1350,
     })).toBeCloseTo(38.52, 1);
+  });
+});
+
+describe('esBandaEstretaFranja', () => {
+  it('es la banda de 768 a 1366 en horitzontal', () => {
+    expect(esBandaEstretaFranja({ ample: 1280, alt: 720 })).toBe(true);
+    expect(esBandaEstretaFranja({ ample: 1366, alt: 768 })).toBe(true);
+    expect(esBandaEstretaFranja({ ample: 1024, alt: 768 })).toBe(true);
+  });
+
+  it('no ho es a l\'escriptori ample ni a la tauleta vertical', () => {
+    expect(esBandaEstretaFranja({ ample: 1920, alt: 946 })).toBe(false);
+    expect(esBandaEstretaFranja({ ample: 1440, alt: 800 })).toBe(false);
+    expect(esBandaEstretaFranja({ ample: 768, alt: 1024 })).toBe(false);
+  });
+});
+
+describe('alcadaReservaGraellaPanell', () => {
+  it('a 1920 dona 130,38 (el DOM, 130,38)', () => {
+    expect(alcadaReservaGraellaPanell({ carril: 1143, escala: 1339 / 1350 })).toBeCloseTo(130.38, 2);
+  });
+
+  it('a 1440 dona 101,04 (el DOM, 101,03)', () => {
+    expect(alcadaReservaGraellaPanell({ carril: 855, escala: 1002 / 1350 })).toBeCloseTo(101.04, 2);
+  });
+
+  it('a 2560 dona 169,49 (el DOM, 169,49)', () => {
+    expect(alcadaReservaGraellaPanell({ carril: 1527, escala: 1789 / 1350 })).toBeCloseTo(169.49, 2);
+  });
+
+  it('a 1366x768 dona 93,40 (el DOM, 93,14: 0,26 px)', () => {
+    expect(alcadaReservaGraellaPanell({ carril: 811, escala: 1 })).toBeCloseTo(93.4, 1);
+  });
+
+  it('el `calc()` del panell porta els mateixos numeros', () => {
+    expect(alcadaReservaGraellaPanellCss()).toBe(
+      'calc((var(--hg-mega-w, 1350px) - 96px * var(--hg-escala-mega, 1)) / 9 + 13.96px)',
+    );
+  });
+});
+
+describe('visualOffsetYFranjaPagina2', () => {
+  it("a l'escriptori (1920) val -9,52 (el DOM, -9,52)", () => {
+    expect(visualOffsetYFranjaPagina2({ ample: 1920, alt: 946 })).toBeCloseTo(-9.52, 2);
+  });
+
+  it('a la tauleta apaissada (1366x768) val -39,52 (el DOM, -39,52)', () => {
+    expect(visualOffsetYFranjaPagina2({ ample: 1366, alt: 768, isLandscapeTablet: true })).toBeCloseTo(-39.52, 2);
+  });
+
+  it('a la tauleta vertical val 0', () => {
+    expect(visualOffsetYFranjaPagina2({ ample: 768, alt: 1024, isPortraitTablet: true })).toBe(0);
+  });
+});
+
+describe('topFranjaPagina2', () => {
+  it('a 1920 dona 137,86 (el DOM, 137,85)', () => {
+    expect(topFranjaPagina2({ carril: 1143, escala: 1339 / 1350, ample: 1920, alt: 946 })).toBeCloseTo(137.86, 1);
+  });
+
+  it('a 1440 dona 108,52 (el DOM, 108,51)', () => {
+    expect(topFranjaPagina2({ carril: 855, escala: 1002 / 1350, ample: 1440, alt: 800 })).toBeCloseTo(108.52, 1);
+  });
+
+  it('a 2560 dona 176,97 (el DOM, 176,96)', () => {
+    expect(topFranjaPagina2({ carril: 1527, escala: 1789 / 1350, ample: 2560, alt: 1306 })).toBeCloseTo(176.97, 1);
+  });
+
+  it('a 1366x768 dona 85,88 (el DOM, 85,70: 0,18 px)', () => {
+    expect(topFranjaPagina2({
+      carril: 811, escala: 1, ample: 1366, alt: 768, isLandscapeTablet: true,
+    })).toBeCloseTo(85.88, 1);
+  });
+
+  it('a 1024x768 dona 63,00 (el DOM, 62,85: 0,15 px)', () => {
+    expect(topFranjaPagina2({
+      carril: 605, escala: 1, ample: 1024, alt: 768, isLandscapeTablet: true,
+    })).toBeCloseTo(63.0, 1);
+  });
+
+  it('a 768x1024 (vertical) dona 130,52 (el DOM, 130,24: 0,28 px)', () => {
+    expect(topFranjaPagina2({
+      carril: 992, escala: 1, ample: 768, alt: 1024, isPortraitTablet: true,
+    })).toBeCloseTo(130.52, 1);
+  });
+
+  it('la banda estreta no hi aplica el desplaçament de -15', () => {
+    const base = { carril: 1143, escala: 1339 / 1350 };
+    const ample = topFranjaPagina2({ ...base, ample: 1920, alt: 946 });
+    const estreta = topFranjaPagina2({ ...base, ample: 1300, alt: 900 });
+    expect(estreta - ample).toBeCloseTo(-AJUST_BAIX_BLOC_FRANJA_PX, 2);
   });
 });

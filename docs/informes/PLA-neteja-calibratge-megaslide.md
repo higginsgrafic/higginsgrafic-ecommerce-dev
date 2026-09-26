@@ -240,10 +240,24 @@ D'on surt:
   `MegaslidePagina2` mesura i converteix en `topVisualAlignmentY` amb el bucle.
 - I la franja depèn de `page1PageLift` i de `visualOffsetY`.
 
-**El que queda mesurat és, doncs, la referència de la pàgina 1
-(`topVisualAlignmentY`) i el top de LAYOUT de la franja (que és el que falta per
-declarar `margesEnllacos.baix` i `sostre − dalt`).** El `pageLift` i el
-`visualOffsetY` ja surten de funcions pures.
+**El top de LAYOUT de la franja JA NO ES MESURA (26/09/2026).** No era una
+alçada emergent del panell: és la reserva de la graella vella més el marge del
+seu bloc. El que queda mesurat de la cadena vertical és **només la referència de
+la pàgina 1 (`topVisualAlignmentY`)**, i de la franja se'n mesura només la seva
+pròpia alçada (la tira escalada al carril: el que assegura el preescalfat abans
+d'obrir el panell).
+
+El sostre de la franja, declarat:
+
+    top = 32 (el `py-8` del panell) + (carril − 8 × 12 × escala) / 9 + 13,96
+          + translateY(−15 si no és banda estreta)
+          + visualOffsetY
+
+amb `alcadaReservaGraellaPanell`, `esBandaEstretaFranja` i
+`visualOffsetYFranjaPagina2` a `geometriaMegaslide.js`. Comprovat contra el
+`getBoundingClientRect()` de la franja a 1920, 2000, 1680, 1512, 1440, 1400,
+2560, 1366×768, 1280×720, 1024×768 i 768×1024: 0,01 px als escriptoris i 0,3 px
+a les tauletes.
 
 Declarat fins ara (26/09/2026):
 
@@ -256,8 +270,11 @@ Declarat fins ara (26/09/2026):
 | la tira de colors (`desnivellColorsGraella`, `ampladaColumnaGraella`) | `2afe067` |
 | el marge del bloc de fletxes (`margeBaixFletxesGraella`) | `ced00d6` |
 | el `margeDalt` de la columna (`desplacTop − selectorCentratgeY`) | `0f153f1` |
-| el `pageLift` de la pàgina 1 (`pageLiftPagina1`) | aquest pas |
+| el `pageLift` de la pàgina 1 (`pageLiftPagina1`) | `f443066` |
+| el coixi vertical del panell (`MARGE_DALT_BLOC_FRANJA_PX`) | aquest pas |
+| el sostre de la franja (`topFranjaPagina2`, `alcadaReservaGraellaPanell`, `visualOffsetYFranjaPagina2`) | aquest pas |
 
 Tots amb la prova unitària a `tests/unit/geometria-megaslide.test.js` i la
 comprovació al navegador: el valor declarat coincideix amb el que s'aplicava,
-amb diferències de 0,00-0,04 px.
+amb diferències de 0,00-0,04 px (0,3 px a les tauletes, on l'escala del belt que
+publica el CSS és 1 i la real és 0,998).

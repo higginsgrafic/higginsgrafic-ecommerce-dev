@@ -10,7 +10,7 @@ import {
 } from './midesGraella.js';
 // L'amplada del retall (l'últim input mesurat de la graella) viu amb la resta
 // de geometria declarada del megaslide.
-import { ampladaRetallGraella, ampladaColumnaGraella, desnivellsLiniesGraella, desnivellColorsGraella, margeBaixFletxesGraella, centratgeSelectorY, desplacTopSelector, GRAELLA_DRETA_FLETXES_CARRIL_PX } from '../megaslide/geometriaMegaslide.js';
+import { ampladaRetallGraella, ampladaColumnaGraella, desnivellsLiniesGraella, desnivellColorsGraella, margeBaixFletxesGraella, centratgeSelectorY, desplacTopSelector, topFranjaPagina2, GRAELLA_DRETA_FLETXES_CARRIL_PX } from '../megaslide/geometriaMegaslide.js';
 import { carrilPct, carrilLane, carrilPx, readRootCssNumber, getLayoutViewportWidth, MEGASLIDE_REFERENCIA_PX } from '../../utils/layoutMetrics.js';
 import { GRAELLA_DIBUIXOS_ESCALA_VERTICAL } from '../../config/stripeCalibrationsVertical.js';
 import { FirstContactDibuix09Buttons } from './firstContactPanels.jsx';
@@ -1360,9 +1360,21 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
           midaSelector, escala: escalaEf, dibuix: dibuixEf, gapV: gapVEf, carril: carrilEf, desplacTop: desplacTopEf,
         });
         const dalt = desplacTopEf - scyEf;
-        // El marge de BAIX encara depèn de la franja (la cadena vertical de la
-        // pagina 1): es mesura.
-        const baix = franja.getBoundingClientRect().bottom - f.bottom;
+        // EL SOSTRE DE LA FRANJA TAMBE ES DECLARAT (26/09/2026): el seu top ja
+        // no es llegeix del DOM (`topFranjaPagina2`: el coixi del panell mes la
+        // reserva de la graella vella mes els desplaçaments de disseny). De la
+        // franja nome's es mesura la SEVA alcada, que es la de la tira escalada
+        // al carril: aixo es el que el preescalfat assegura abans d'obrir el
+        // panell (vegeu `FullWideSlideHeader`).
+        const topDeclarat = topFranjaPagina2({
+          carril: carrilEf,
+          escala: escalaEf,
+          ample: typeof window !== 'undefined' ? window.innerWidth : 0,
+          alt: typeof window !== 'undefined' ? window.innerHeight : 0,
+          isPortraitTablet,
+          isLandscapeTablet,
+        });
+        const baix = (pagina.getBoundingClientRect().top + topDeclarat + franja.getBoundingClientRect().height) - f.bottom;
         if (Math.abs(pintat.margesEnllacos.dalt - dalt) >= 0.01
           || Math.abs(pintat.margesEnllacos.baix - baix) >= 0.5) {
           nou.margesEnllacos = { dalt, baix };
