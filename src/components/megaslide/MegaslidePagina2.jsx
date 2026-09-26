@@ -133,6 +133,11 @@ export default function MegaslidePagina2({
     && window.innerWidth >= window.innerHeight;
   const topGraellaColors = 40 - (esBandaEstreta ? 38 : 0);
   const [topVisualAlignmentY, setTopVisualAlignmentY] = useState(0);
+  // L'OMBRA DE LA MANIGA (26/09/2026, A3): la banda que separa la maniga de la
+  // franja de la pastilla del selector de colleccions. Es mesura la capa de la
+  // franja i es pinta just a la seva esquerra, del top de la columna al bottom
+  // de la franja.
+  const [ombraManiga, setOmbraManiga] = useState(null);
   // Desplaçament propi del selector Blanc/Color/Negre perquè quedi centrat amb
   // la graella de colors. Va a part de topVisualAlignmentY (que alinea el
   // selector amb el de la pàgina 1): així els dos ajustos no es trepitgen.
@@ -745,9 +750,48 @@ export default function MegaslidePagina2({
     // propi calibratge.
     ajustFranjaCarril: !isPortraitTablet,
   };
+  // L'OMBRA DE LA MANIGA: mesura on cau la capa de la franja (la cantonada
+  // inferior esquerra) per pintar-hi la banda de separacio. Es recalcula amb
+  // els canvis de mida (ResizeObserver) i amb la finestra.
+  useLayoutEffect(() => {
+    const capa = bandaFranjaRef.current;
+    // El contenidor de referencia es el PARE de la capa de la franja: es qui fa
+    // `position: relative` i qui conte la columna de colleccions. La capa fa
+    // TOT el carril (1143) i el que es pinta (la tira de samarretes) es mes
+    // estret: per aixo la costura es mesura sobre el contingut visual.
+    const arrel = capa?.parentElement;
+    const visual = capa?.querySelector('[data-stripe-visual-content="2"]');
+    const columna = arrel?.querySelector('[data-colleccions-targeta]')?.parentElement;
+    if (!arrel || !capa || !visual || !columna) return undefined;
+    let frame = 0;
+    const mesura = () => {
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(() => {
+        const a = arrel.getBoundingClientRect();
+        const c = visual.getBoundingClientRect();
+        const k = columna.getBoundingClientRect();
+        if (!a.width || !c.width) return;
+        setOmbraManiga({
+          top: Math.round((k.top - a.top) * 10) / 10,
+          left: Math.round((c.right - a.left) * 10) / 10,
+          bottom: Math.round((a.bottom - c.bottom) * 10) / 10,
+        });
+      });
+    };
+    mesura();
+    const observer = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(mesura) : null;
+    observer?.observe(arrel);
+    observer?.observe(capa);
+    window.addEventListener('resize', mesura);
+    return () => {
+      cancelAnimationFrame(frame);
+      observer?.disconnect();
+      window.removeEventListener('resize', mesura);
+    };
+  }, [isPortraitTablet, isLandscapeTablet]);
+
   return (
-    <div style={{ width: '25%', flexShrink: 0, display: isPortraitTablet ? 'block' : 'flex', height: '100%', position: 'relative', justifyContent: 'center', overflow: 'visible' }}>
-      <div
+    <div style={{ width: '25%', flexShrink: 0, display: isPortraitTablet ? 'block' : 'flex', height: '100%', position: 'relative', justifyContent: 'center', overflow: 'visible' }}>      <div
         ref={viewportRef}
         data-mega-page-viewport="2"
         style={{
@@ -933,7 +977,15 @@ export default function MegaslidePagina2({
         {/* MegaStripePanel */}
         <div ref={bandaFranjaRef} style={{
           position: 'relative',
-          zIndex: 1,
+          // LA MANIGA PER SOBRE DEL SELECTOR, AMB OMBRA (26/09/2026, ho va
+          // demanar l'amo): «la maniga de la franja ha de sortir per sobre del
+          // selector amb una ombra». La columna de colleccions es ara una
+          // pastilla que ocupa tota la columna i la seva vora esquerra cau a
+          // x1404; l'ultima columna amb tinta de la franja es a x1405, o sigui
+          // que la trepitja 2 px. La columna viu a zIndex 3 (la filera del
+          // cercador) i la franja a 1: pugem la franja a 4 perque la maniga
+          // quedi per sobre.
+          zIndex: 4,
           width: '100%',
           // SENSE el `left: -3,5px` DE TAU LETA (24/09/2026). Era una
           // compensacio del belt vell: amb el carril de 3/5 desplaçava tota la
@@ -961,6 +1013,30 @@ export default function MegaslidePagina2({
             })}
           />
         </div>
+
+        {/* L'OMBRA DE LA MANIGA (A3). Una banda prima just a l'esquerra de la
+            capa de la franja, del top de la columna de colleccions al bottom de
+            la franja: es el que separa la maniga (que ara va per sobre) de la
+            pastilla del selector. Va DINS d'aquest contenidor (zIndex 1) i no
+            rep cap clic. */}
+        {ombraManiga ? (
+          <div
+            aria-hidden="true"
+            data-maniga-ombra="1"
+            style={{
+              position: 'absolute',
+              top: `${ombraManiga.top}px`,
+              bottom: `${ombraManiga.bottom}px`,
+              left: `${ombraManiga.left}px`,
+              width: '5px',
+              transform: 'translateX(-100%)',
+              pointerEvents: 'none',
+              // L'ombra neix a la costura (la vora esquerra de la maniga) i
+              // s'obre cap a l'esquerra, sobre la vora de la pastilla.
+              background: 'linear-gradient(270deg, rgba(0,0,0,0.16) 0%, rgba(0,0,0,0) 100%)',
+            }}
+          />
+        ) : null}
 
         {/* MegaHeroSlider — amagat temporalment
         <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, zIndex: 1, pointerEvents: 'none' }}>
