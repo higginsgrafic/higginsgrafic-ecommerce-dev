@@ -436,3 +436,24 @@ D'on surt el que cal moure:
 El primer pas sera treure el selector de la malla i declarar la resta de la
 geometria (amplada de la graella, gap i alcada de les dues fileres) amb les
 mesures de la pagina 2 com a referencia.
+
+### 10.1 Les fletxes, amidades (26/09/2026)
+
+Mesurat amb `scripts/_tmp-fletxes.mjs` (temporal) a 1920x946:
+
+| | pagina 1 | pagina 2 |
+|---|---|---|
+| bloc de fletxes | 109x109 (quadrat) | 60x119 (1:2) |
+| cada fletxa | 55x109 (les dues **de costat**) | 60x60 (les dues **de dalt a baix**) |
+| la icona (svg) | 19x19 | 20x20 |
+
+O sigui que les fletxes de la pagina 1 no son «minúscules» de mida: la icona fa
+19 px contra 20 px de la pagina 2. El que passa es que el bloc de la pagina 1 es
+**quadrat i les fletxes hi van de costat** (55 px d'ample cadascuna), i el de la
+pagina 2 es **1:2 i les fletxes hi van apilades** (60 px d'ample cadascuna), que
+es com es veuen mes grans.
+
+Amb el selector ja quadrat (108x108, commit `97e2bd7`), el bloc de fletxes de la
+pagina 1 (109x109) ja te la mateixa mida: el que queda del punt 3 es posar-lo on
+toca (alineat amb el selector, a la vora dreta del carril) i, si l'amo ho vol,
+apilar-hi les dues fletxes com a la pagina 2.
