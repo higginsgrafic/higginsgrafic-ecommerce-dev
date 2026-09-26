@@ -1328,7 +1328,19 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
           // NEGRE es la tercera cel·la de les tres iguals del selector.
           const delta = (c.top + c.height / 2) - (s.top + (s.height / 3) * 2.5);
           if (Math.abs(delta) >= 0.5) {
-            nou.desnivellColors = pintat.desnivellColors + delta;
+            // EL VALOR APLICAT AL DOM, NO EL DE LA REF (26/09/2026).
+            //
+            // La ref de `mesures` s'actualitza DESPRES de pintar, o sigui que
+            // pot anar per davant del que el DOM te posat: quan dos passos cauen
+            // abans d'un pintat (l'efecte de layout i el rAF, o el repas de
+            // 400 ms), `pintat + delta` comptava la correccio dues vegades i la
+            // tira de colors pintava un valor fals. Mesurat amb una sonda al
+            // bucle: 47,51 px pintats en comptes de 8,74 (38,76 px de salt).
+            // El que la tira porta posat es el seu `marginTop`, i `delta` ja hi
+            // es relatiu: `aplicat + delta` es l'objectiu absolut i la correccio
+            // es idempotent encara que els passos es trepitgin.
+            const aplicat = -Number.parseFloat(getComputedStyle(colors).marginTop || '0') || 0;
+            nou.desnivellColors = aplicat + delta;
             canvia = true;
           }
         }
