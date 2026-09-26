@@ -403,3 +403,36 @@ el punt on tornar si alguna cosa es desquadra:
 Bateria del punt de recuperacio: 570 proves (45 fitxers), eslint amb els
 mateixos comptes que la linia base a cada fitxer tocat, `vite build`,
 `compara-vistes` OK, `mesura-formats` 0 i 0 i `_tmp-errors2` sense errors.
+
+## 10. La composicio de la pagina 1, amb xifres (26/09/2026)
+
+L'amo vol la pagina 1 com la pagina 2 (punt estable `26442f5`): el selector al
+costat de la franja i quadrat, la graella enganxada a l'esquerra del carril i
+estesa fins a les fletxes (amb el seu gap), les fletxes alineades amb el
+selector, i la graella intercalada de dues fileres que ocupi tota l'alçada de
+les fletxes.
+
+Mesurat amb `scripts/_tmp-p1-composicio.mjs` (temporal) a 1920x946, carril
+1143 px (x381..1524):
+
+| peca | pagina 1 (ABANS) | pagina 2 (referencia) |
+|---|---|---|
+| selector | x416 y110 **53x36** (dins la primera columna de la graella) | x2287 y127 58x39 (a la vora esquerra del carril) |
+| graella | x415 y65 **1074x123** (nou columnes) | x2355 y82 933x95 (dues fileres intercalades) |
+| fletxes | x1435 y73 55x109 | x3229 y146 60x60 (una fletxa; el bloc en fa dues) |
+| franja | x358 y233 1049x112 | x2263 y223 1049x112 |
+
+D'on surt el que cal moure:
+
+- la graella arrenca a **x415**, o sigui 34 px a la dreta de la vora del carril
+  (x381): es el coixi de la capcalera (`carrilLane(40)`), i l'amo la vol
+  enganxada a l'esquerra del carril;
+- el selector es **la primera columna** de la malla de nou columnes
+  (`[CONTROL_TILE_BN, ...dibuixos, ...coixins, CONTROL_TILE_ARROWS]`, a
+  `MegaColumn`) i ha de sortir-ne cap a la franja;
+- les fletxes son l'ultima columna de la mateixa malla, i per aixo la seva mida
+  va lligada a la columna on cauen (55x109) en comptes de ser la del selector.
+
+El primer pas sera treure el selector de la malla i declarar la resta de la
+geometria (amplada de la graella, gap i alcada de les dues fileres) amb les
+mesures de la pagina 2 com a referencia.
