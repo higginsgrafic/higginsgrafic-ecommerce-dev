@@ -299,3 +299,52 @@ pastilla queda a 6 px de cada costat del contenidor.
 
 Els noms de la columna van 6 px mes a l'esquerra perque la caixa de l'actiu es
 vegi **sencera**, amb el seu offset de 5 px i el radi de la dreta.
+
+---
+
+## 8. Tercera tongada: les xifres de l'amo i els clics tapats (`fe0fb5d`)
+
+### 8.1 La columna de colleccions, amb les seves xifres
+
+| què | ell ha mesurat | ara (a 1920) |
+|---|---|---|
+| columna | 128 × 247 | 128,7 × 246,6 |
+| caixa blanca | 122 × 22,59 | 122,7 × 22,58 |
+| radis | 6 exterior / 3 interior | 6 / 3 |
+| contorns | 1 px interior a les dues | 1 px a les dues |
+| offset | 3 px | 3 px (2,35 + 1 de vora) |
+| col·lecció activa | Oswald 13,5 Regular | Oswald 13,39 px, pes 400 |
+| en espera | Oswald 13,5 Extra Light | Oswald 13,39 px, pes **200** |
+
+Calia **carregar el pes 200 de l'Oswald** (`index.html`), que no hi era.
+
+**Els nou noms omplen tota la columna** (ho va demanar l'amo). Amb un `maxHeight`
+a les caixes, les nou franges s'aplegaven a dalt i deixaven 50 px buits a baix
+(mesurat a 768×1024). Sense el topall, cada franja es `flex: 1` i la columna
+queda plena.
+
+El text va **compensat 3 px a l'esquerra**: la caixa ha entrat 2 px per
+l'offset i n'ha guanyat 1 del contorn interior.
+
+### 8.2 Els clics i l'scroll tapats (causa trobada)
+
+Quan es va pujar la capa de la franja a `zIndex: 4` (per la maniga de la p2),
+aquella capa —que fa **tot el carril** i arriba fins al fons del panell— va
+passar per sobre de la **tira de colors** i del **carrusel** (que viuen a
+`zIndex: 1`): s'empassava els clics i la rodeta. Es el que l'amo va veure
+(«nomes funciona l'scroll de la stripe» i «els clics estan tapats»).
+
+Arreglat traient-li el `pointer-events`: la capa no pinta res (el que es veu son
+les imatges de dins, que si que reben el que els toca), i ara els clics i la
+rodeta hi travessen.
+
+Comprovat amb el ratoli de debò: la rodeta mou la tira de colors (white →
+light-blue) i el carrusel (−1958,57 → −2158,57 → −94,5), i el clic en un dibuix
+canvia la colleccio activa (R2D2 Quote → MISCEL·LÀNIA).
+
+### 8.3 L'eina d'ancoratge
+
+`scripts/_tmp-ancoratge.mjs` mesura les nou peces clau de les dues pagines a
+1920×946 i diu si alguna s'ha mogut mes d'1 px respecte dels valors de
+referencia. **S'ha de passar abans i despres de cada canvi**: es la manera de
+tocar una cosa sense moure'n una altra.
