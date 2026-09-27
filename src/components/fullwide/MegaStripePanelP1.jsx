@@ -690,11 +690,11 @@ function MegaStripePanelP1({
           // «L'ombra de la maniga ha d'estar sota la maniga, no a sobre». El bloc
           // porta dins l'ombra (la silueta de l'ultima casa, difosa) i, si el
           // bloc va per damunt de la franja, l'ombra cau SOBRE la samarreta. Amb
-          // la franja a zIndex 1, la samarreta tapa l'ombra i nome's se'n veu la
-          // part que cau dins del bloc, com a la pagina 2 (alla la franja es a
+          // la franja a zIndex 4 (el MATEIX que a la p2), la samarreta tapa l'ombra i
+          // nome's se'n veu la part que cau dins del bloc, com a la pagina 2 (alla la franja es a
           // zIndex 4 i la columna a 3).
           className="relative"
-          style={{ zIndex: 1 }}
+          style={{ zIndex: 4 }}
           style={{
             // A la franja estreta (768-1366) la pàgina ja té els seus propis
             // ajustos de 10 px i l'ajust general no s'hi ha d'aplicar.

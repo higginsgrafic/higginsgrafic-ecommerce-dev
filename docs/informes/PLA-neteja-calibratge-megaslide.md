@@ -1497,3 +1497,8 @@ els dos de les fletxes a sota, tots en vertical i omplint el seu quadrat.
 així la samarreta tapa l'ombra i només se'n veu la part que cau dins del bloc, com
 a la p2 (allà la franja és a zIndex 4 i la columna a 3). Abans el bloc anava per
 damunt i l'ombra queia SOBRE la màniga.
+
+**I la capa.** En Marc: «La caixa ha d'estar per sota la imatge de la màniga». El
+contenidor de la franja de la p1 passa a `zIndex: 4`, el MATEIX que la capa de la
+franja de la p2 (alla la franja és a 4 i la columna a 3): la imatge de la samarreta
+ha de quedar per damunt de la caixa del bloc (i de l'ombra que hi ha a dins).
