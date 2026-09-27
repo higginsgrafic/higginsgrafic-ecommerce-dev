@@ -864,12 +864,22 @@ export const PAGINA1_GAP_DRETA_PX = 10;
  * quedarà per haver redimensionat el selector» i, tot seguit, «i les fletxes
  * sota del selector, no al costat».
  *
- * O sigui: el bloc fa 59,5 d'ample; a dalt hi va el selector (59,5 x 119, la
- * forma `rectangle` de la p2) i a sota el quadrat de les fletxes (59,5 x 59,5,
- * centrades). L'alcada total es 178,5. Abans feia 110 d'ample i el bloc era una
- * columna de dues peces quadrades de 110 (220 d'alcada).
+ * MES TARD, EL MATEIX DIA, el bloc s'eixamplA fins a 130 (128,9 px a 1920) perque
+ * la maniga de l'ultima samarreta de la franja hi arribi i hi faci l'ombra, com a
+ * la columna de colleccions de la p2 (alla la columna encavalca la franja 18 px:
+ * 1395,3 contra 1413). Amb 130 el bloc arrenca a 1395 i la franja acaba a 1413:
+ * els mateixos 18 px. El selector (59,5) i les fletxes (59,5) queden a la DRETA
+ * del bloc i el buit de l'esquerra es on passa la maniga.
  */
+/** L'amplada de la COLUMNA del selector i les fletxes (60 de disseny = 59,5 px a
+ *  1920, la meitat del contenidor del selector de la p2). */
 export const PAGINA1_MIDA_BLOC_DRETA_PX = 60;
+
+/** L'amplada de la CAIXA del bloc de la dreta (130 de disseny = 128,9 px a 1920,
+ *  el mateix ample que la columna de colleccions de la p2): la caixa encavalca la
+ *  franja 18 px perque la maniga de l'ultima samarreta hi faci l'ombra, i el
+ *  selector i les fletxes (60) queden a la DRETA. */
+export const PAGINA1_AMPLADA_BLOC_DRETA_PX = 130;
 
 /**
  * L'alcada de la filera: la del bloc de la dreta (selector de 110 + fletxes de
@@ -907,6 +917,12 @@ export const PAGINA1_AJUST_FRANJA_PX = 73.4;
  */
 export function pagina1BlocDretaPx(escala = 1) {
   const e = Number.isFinite(escala) && escala > 0 ? escala : 1;
+  return PAGINA1_AMPLADA_BLOC_DRETA_PX * e;
+}
+
+/** L'amplada de la columna del selector i les fletxes (60 de disseny). */
+export function pagina1ColumnaDretaPx(escala = 1) {
+  const e = Number.isFinite(escala) && escala > 0 ? escala : 1;
   return PAGINA1_MIDA_BLOC_DRETA_PX * e;
 }
 
@@ -922,7 +938,7 @@ export function pagina1AmpladaGraellaPx(carril, escala = 1) {
   const c = Number(carril);
   if (!Number.isFinite(c) || c <= 0) return 0;
   const e = Number.isFinite(escala) && escala > 0 ? escala : 1;
-  return c - (PAGINA1_MIDA_BLOC_DRETA_PX + PAGINA1_GAP_DRETA_PX) * e;
+  return c - (PAGINA1_AMPLADA_BLOC_DRETA_PX + PAGINA1_GAP_DRETA_PX) * e;
 }
 
 /**

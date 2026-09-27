@@ -29,6 +29,7 @@ import {
   PAGINA1_TOP_FILERA_PX,
   pagina1AlcadaFileraPx,
   pagina1BlocDretaPx,
+  pagina1ColumnaDretaPx,
   DIBUIXOS_FRANJA_DX,
   DIBUIXOS_FRANJA_DY,
   DIBUIXOS_FRANJA_AMPLADA_NATURAL,
@@ -316,6 +317,60 @@ function MegaStripePanelP1({
   // dels botons l'han de veure fresca; nome's canvia quan canvia el pas de la
   // graella, o sigui que no provoca renders de mes.
   const [stepperP1, setStepperP1] = useState(null);
+  // L'OMBRA DE LA MANIGA DINS DEL BLOC (28/09/2026). En Marc: «Cal posar l'ombra
+  // sota la màniga (dins del bloc, com a la p2)». Es el mateix mecanisme que la
+  // columna de colleccions de la p2: la silueta de l'ultima casa de la franja
+  // (difosa i negra al 25 %) pintada a la caixa de la franja, que queda a dins
+  // del bloc perque el bloc encavalca la franja 18 px. El bloc la retalla
+  // (`overflow: hidden`).
+  const blocDretaRef = useRef(null);
+  const [mascaraManigaP1, setMascaraManigaP1] = useState(null);
+  const [ombraManigaP1, setOmbraManigaP1] = useState(null);
+  useEffect(() => {
+    let viu = true;
+    precarregaSiluetesSamarreta()
+      .then((text) => {
+        if (!viu || !text) return;
+        const doc = new DOMParser().parseFromString(text, 'image/svg+xml');
+        const camins = caminsSiluetes(doc);
+        const ultima = camins[13];
+        if (!ultima) return;
+        const vb = (doc.documentElement.getAttribute('viewBox') || '0 0 2866 307').trim().split(/[\s,]+/);
+        const w = Number(vb[2]) || 2866;
+        const h = Number(vb[3]) || 307;
+        const tr = ultima.getAttribute('transform') || '';
+        const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">`
+          + `<path d="${ultima.getAttribute('d')}"${tr ? ` transform="${tr}"` : ''} fill="#FFFFFF"/></svg>`;
+        setMascaraManigaP1(`data:image/svg+xml,${encodeURIComponent(svg)}`);
+      })
+      .catch(() => {});
+    return () => { viu = false; };
+  }, []);
+  useLayoutEffect(() => {
+    const bloc = blocDretaRef.current;
+    if (!bloc) return undefined;
+    const mesura = () => {
+      const franja = document.querySelector('[data-mega-page-viewport="1"] [data-stripe-visual-content="1"]');
+      if (!franja) return;
+      const b = bloc.getBoundingClientRect();
+      const f = franja.getBoundingClientRect();
+      setOmbraManigaP1((prev) => {
+        const nou = {
+          left: +(f.left - b.left).toFixed(1),
+          top: +(f.top - b.top).toFixed(1),
+          width: +f.width.toFixed(1),
+          height: +f.height.toFixed(1),
+        };
+        if (prev && Math.abs(prev.left - nou.left) < 0.5 && Math.abs(prev.top - nou.top) < 0.5
+          && Math.abs(prev.width - nou.width) < 0.5 && Math.abs(prev.height - nou.height) < 0.5) return prev;
+        return nou;
+      });
+    };
+    mesura();
+    const t1 = window.setTimeout(mesura, 400);
+    window.addEventListener('resize', mesura);
+    return () => { window.clearTimeout(t1); window.removeEventListener('resize', mesura); };
+  }, [active]);
   // L'ESCALA DEL CARRIL, EN NUMERO. La graella nova la necessita per calcular
   // el pas i l'alcada del carrusel (operacions matematiques: amb la cadena
   // `calc(...)` que torna `carrilPx` el carrusel naixia amb alcada 0). A la
@@ -328,6 +383,7 @@ function MegaStripePanelP1({
   const alcadaFileraPx = pagina1AlcadaFileraPx(escalaCarril);
   const gapDretaPx = PAGINA1_GAP_DRETA_PX * escalaCarril;
   const blocDretaPx = pagina1BlocDretaPx(escalaCarril);
+  const columnaDretaPx = pagina1ColumnaDretaPx(escalaCarril);
   // EL TOP DE LA FILERA, EN PX (mesurat: posa la filera de dalt de la graella
   // al centre de la cel·la BLANC del selector).
   const topFileraPx = PAGINA1_TOP_FILERA_PX * escalaCarril;
@@ -525,22 +581,63 @@ function MegaStripePanelP1({
                   de les fletxes (59,5 x 59,5). La caixa i l'ombra les duu el bloc
                   sencer (vegeu `ESTIL_CAIXA_BLOC_ALCADA_AUTO`). */}
               <div
+                ref={blocDretaRef}
                 data-bloc-dreta-p1="1"
                 style={{
                   flex: '0 0 auto',
                   width: `${blocDretaPx}px`,
                   minWidth: 0,
-                  // EL SELECTOR A DALT I LES FLETXES A SOTA (28/09/2026). En Marc:
-                  // «el bloc de la mateixa mida que el p2 [...] i les fletxes sota
-                  // del selector, no al costat». El selector es la forma
-                  // `rectangle` de la p2 (59,5 x 119) i les fletxes, el seu
-                  // quadrat (59,5), centrat.
+                  position: 'relative',
+                  // EL SELECTOR A DALT I LES FLETXES A SOTA, A LA DRETA (28/09/2026).
+                  // El bloc es ample com la columna de la p2 (130 de disseny) perque
+                  // la maniga de l'ultima samarreta hi arribi; el selector i les
+                  // fletxes van a la dreta i el buit de l'esquerra es on cau l'ombra.
                   display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
+                  flexDirection: 'row',
+                  alignItems: 'flex-start',
+                  justifyContent: 'flex-end',
                   ...ESTIL_CAIXA_BLOC_ALCADA_AUTO,
                 }}
               >
+                {ombraManigaP1 && mascaraManigaP1 ? (
+                  <div
+                    aria-hidden="true"
+                    data-maniga-ombra-p1="1"
+                    style={{
+                      position: 'absolute',
+                      left: `${ombraManigaP1.left}px`,
+                      top: `${ombraManigaP1.top}px`,
+                      width: `${ombraManigaP1.width}px`,
+                      height: `${ombraManigaP1.height}px`,
+                      pointerEvents: 'none',
+                      zIndex: 0,
+                      filter: 'blur(3px)',
+                      transform: 'translate(1px, 3px)',
+                    }}
+                  >
+                    <div style={{
+                      width: '100%',
+                      height: '100%',
+                      backgroundColor: 'rgba(0, 0, 0, 0.25)',
+                      WebkitMaskImage: `url("${mascaraManigaP1}")`,
+                      maskImage: `url("${mascaraManigaP1}")`,
+                      WebkitMaskRepeat: 'no-repeat',
+                      maskRepeat: 'no-repeat',
+                      WebkitMaskSize: '103% 100%',
+                      maskSize: '103% 100%',
+                      WebkitMaskPosition: '50% 0',
+                      maskPosition: '50% 0',
+                    }} />
+                  </div>
+                ) : null}
+                <div style={{
+                  position: 'relative',
+                  zIndex: 1,
+                  width: `${columnaDretaPx}px`,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                }}>
                 <SelectorQuadratPagina1
                   dinsBloc
                   format="rectangle"
@@ -556,6 +653,7 @@ function MegaStripePanelP1({
                   onPrev={() => stepperP1?.(-1)}
                   onNext={() => stepperP1?.(1)}
                 />
+                </div>
               </div>
             </div>
           )}

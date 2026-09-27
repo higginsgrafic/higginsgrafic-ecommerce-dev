@@ -1814,3 +1814,16 @@ una sola caixa amb ombra (`ESTIL_CAIXA_BLOC_ALCADA_AUTO`).
 
 La graella de la p1 s'allarga de 1013 a 1073 px i `PAGINA1_AJUST_FRANJA_PX` passa
 a 73,4 perque la franja de la p1 segueixi caient a 226,6 (la de la p2, a 226,5).
+
+### L'ombra de la màniga dins del bloc de la p1 (38) — FET (28/09/2026)
+
+El bloc de la dreta de la p1 s'eixampla de 60 a **130** de disseny (128,9 px a
+1920, el mateix ample que la columna de col·leccions de la p2) perquè la màniga
+de l'última samarreta de la franja hi arribi (encavalcament de 18 px, com a la
+p2) i hi faci l'ombra: el selector (59,5 × 119) i les fletxes (59,5) a la dreta,
+i la silueta de l'última casa (negre al 25 %, difosa 3 px) pintada a la caixa de
+la franja relativa al bloc i retallada pel bloc.
+
+La graella de la p1 queda a 1003 px i la franja no es mou (226,6). I el bloc de
+fletxes de la p2 torna a anar **sense fons** (en Marc el va retirar el mateix
+dia).

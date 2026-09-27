@@ -37,6 +37,7 @@ import {
   PAGINA1_COSTAT_PECA_PX,
   PAGINA1_GAP_DRETA_PX,
   PAGINA1_MIDA_BLOC_DRETA_PX,
+  PAGINA1_AMPLADA_BLOC_DRETA_PX,
   PAGINA1_ALCADA_FILERA_PX,
   PAGINA1_TOP_FILERA_PX,
   PAGINA1_AJUST_FRANJA_PX,
@@ -462,12 +463,17 @@ describe('la composicio de la pagina 1 (B2, 26/09/2026)', () => {
   });
 
   it('la filera fa la suma del bloc de la dreta i les seves meitats (selector i fletxes)', () => {
-    // DES DEL 28/09/2026 el bloc de la dreta fa 60 de disseny d'ample (59,5 px a
-    // 1920: el mateix ample que el selector de la p2) i dins seu hi ha el
-    // selector de la p2 (59,5 x 119) a dalt i el quadrat de les fletxes (59,5) a
-    // sota. La graella (la filera de dibuixos) queda amb les DUES fileres de 55
-    // unitats de sempre: el bloc ja no mana la seva alcada.
+    // DES DEL 28/09/2026 el bloc de la dreta fa 130 de disseny d'ample (128,9 px a
+    // 1920: el mateix ample que la columna de colleccions de la p2, perque la
+    // maniga de l'ultima samarreta de la franja hi arribi i hi faci l'ombra). A
+    // dins hi ha el selector de la p2 (59,5 x 119) a dalt i el quadrat de les
+    // fletxes (59,5) a sota, tots dos a la DRETA. La graella (la filera de
+    // dibuixos) queda amb les DUES fileres de 55 unitats de sempre: el bloc ja no
+    // mana la seva alcada.
     expect(PAGINA1_MIDA_BLOC_DRETA_PX).toBe(60);
+    // I la caixa del bloc es mes ampla (130): encavalca la franja 18 px perque la
+    // maniga de l'ultima samarreta hi faci l'ombra, com a la columna de la p2.
+    expect(PAGINA1_AMPLADA_BLOC_DRETA_PX).toBe(130);
     expect(PAGINA1_ALCADA_FILERA_PX).toBe(110);
     // Dues fileres de dibuixos: la meitat de l'alcada, i el desnivell de la
     // segona es mig pas (22,5 unitats).
@@ -479,7 +485,7 @@ describe('la composicio de la pagina 1 (B2, 26/09/2026)', () => {
     const carril = 1143; // mesurat a 1920
     const bloc = pagina1BlocDretaPx(escala);
     const graella = pagina1AmpladaGraellaPx(carril, escala);
-    expect(bloc).toBeCloseTo(59.5, 1);
+    expect(bloc).toBeCloseTo(128.9, 1);
     // graella + gap de disseny + bloc = carril
     expect(graella + PAGINA1_GAP_DRETA_PX * escala + bloc).toBeCloseTo(carril, 6);
     // I la vora dreta del bloc cau a la del carril.
@@ -491,8 +497,8 @@ describe('la composicio de la pagina 1 (B2, 26/09/2026)', () => {
   });
 
   it('amb valors que no valen, no peta', () => {
-    expect(pagina1BlocDretaPx(null)).toBe(PAGINA1_MIDA_BLOC_DRETA_PX);
-    expect(pagina1BlocDretaPx(0)).toBe(PAGINA1_MIDA_BLOC_DRETA_PX);
+    expect(pagina1BlocDretaPx(null)).toBe(PAGINA1_AMPLADA_BLOC_DRETA_PX);
+    expect(pagina1BlocDretaPx(0)).toBe(PAGINA1_AMPLADA_BLOC_DRETA_PX);
     expect(pagina1AmpladaGraellaPx(0)).toBe(0);
     expect(pagina1AmpladaGraellaPx(null)).toBe(0);
     expect(pagina1AlcadaFileraPx(NaN)).toBe(PAGINA1_ALCADA_FILERA_PX);

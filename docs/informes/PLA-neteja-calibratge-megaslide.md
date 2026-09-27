@@ -1413,3 +1413,44 @@ fletxes 59,5).
 Bateria del tancament: 595 proves (46 fitxers), eslint amb els comptes de `HEAD`,
 `vite build` OK, `compara-vistes` OK, `mesura-formats` 0 i 0, `_tmp-errors2` cap
 error i `_tmp-ancoratge` TOT AL SEU LLOC.
+
+### VOLTA 21 — L'ombra de la màniga dins del bloc de la p1 (28/09/2026)
+
+En Marc va retocar la captura per ensenyar-ho: «Cal posar l'ombra sota la màniga
+(dins del bloc, com a la p2). Treu el fons de les fletxes de la p2».
+
+**FET 1: fora el fons de les fletxes de la p2.** El bloc de fletxes de la p2 torna
+a anar sense caixa (fons transparent, sense vora ni ombra). Mida i posició no
+canvien: 59,5 × 119 a x1330.
+
+**FET 2: l'ombra de la màniga, dins del bloc de la p1.** El bloc s'eixampla de 60
+a **130** de disseny (128,9 px a 1920, el mateix ample que la columna de
+col·leccions de la p2) perquè la màniga de l'última samarreta de la franja hi
+arribi:
+
+| | franja (final) | bloc | encavalcament |
+|---|---|---|---|
+| p2 (columna) | 1413 | 1395,3 .. 1524 | 18 px |
+| p1 (bloc) | 1412,9 | **1394 .. 1524** | **18 px** |
+
+El selector (59,5 × 119) i el quadrat de les fletxes (59,5) queden a la DRETA del
+bloc i el buit de l'esquerra és on passa la màniga. L'ombra és el mateix
+mecanisme de la p2 (`CercadorColleccionsColumna`): la silueta de l'última casa de
+la franja (`caminsSiluetes[13]`), negre al 25 %, difosa 3 px i desplaçada
+(1, 3), pintada a la caixa de la franja **relativa al bloc** i retallada pel
+bloc (`overflow: hidden`). Mesurat: la capa de l'ombra cau a 358,9..1414 · 229,6..
+342,6 (les coordenades de la franja, amb el desplaçament de l'ombra), o sigui que
+dins del bloc se'n veuen els últims 18 px.
+
+**XIFRES (1920x946, `_tmp-ancoratge.mjs`).** Bloc: 1394,83 de 130 × 180 (abans
+1464,83 de 60 × 180); selector: 1524−59,5 (la columna de 60 a la dreta); fletxes:
+1464,203 de 60 × 60 (no es mouen); graella de la p1: 381..1384, **1003** px (abans
+1073: el bloc li deixa 70 px menys); franja de la p1: **226,6** (no es mou).
+
+`PAGINA1_MIDA_BLOC_DRETA_PX` torna a ser 60 (la columna del selector) i neix
+`PAGINA1_AMPLADA_BLOC_DRETA_PX` = 130 (la caixa); `pagina1BlocDretaPx` (la caixa,
+que és el que descompta la graella) i `pagina1ColumnaDretaPx` (60).
+
+Bateria del tancament: 595 proves (46 fitxers), eslint amb els comptes de `HEAD`,
+`vite build` OK, `compara-vistes` OK, `mesura-formats` 0 i 0, `_tmp-errors2` cap
+error i `_tmp-ancoratge` TOT AL SEU LLOC.
