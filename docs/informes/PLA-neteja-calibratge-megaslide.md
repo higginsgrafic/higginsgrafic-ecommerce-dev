@@ -1376,3 +1376,40 @@ les dues pàgines vagin en el mateix sentit, és canviar el signe d'`stepperP1`.
 Bateria del tancament: 595 proves (46 fitxers), eslint amb els comptes de `HEAD`,
 `vite build` OK, `compara-vistes` OK, `_tmp-errors2` cap error i
 `_tmp-ancoratge` TOT AL SEU LLOC.
+
+### VOLTA 20 — El bloc de la dreta de la p1, com el de la p2 (28/09/2026)
+
+En Marc, en tres missatges: «Fes un bloc com el de la columna del selector de la
+p1, a la p2. Amb l'ombra i tot», «Al bloc nou de la p1 hi ha d'anar el selector i
+les fletxes», «Fes el bloc de la mateixa mida del bloc de la p2» i, finalment,
+«amb el selector a la mateixa escala que el de la p2 i les fletxes sota el
+selector, en el quadrat que queda a sota».
+
+**FET.** El bloc de la dreta de la p1 (`data-bloc-dreta-p1`) passa de 110 × 220
+(dues peces quadrades) a **59,5 × 178,5**:
+- el **selector**, amb la forma i la mida del de la p2: 59,5 × 119
+  (`format="rectangle"`, `PAGINA1_MIDA_BLOC_DRETA_PX` = 60 de disseny);
+- a sota, el **quadrat de les fletxes**: 59,5 × 59,5, centrades;
+- tot dins **una sola caixa** (fons gris, vora, cantonades i ombra,
+  `ESTIL_CAIXA_BLOC_ALCADA_AUTO` a `estilsBlocs.js`), que es tambe la que duu el
+  bloc de fletxes de la p2 (`ESTIL_CAIXA_BLOC`).
+
+Perque la filera no s'allargui amb el bloc, la caixa fa la vora **pintada** (un
+`box-shadow` de 1 px) en comptes d'una vora de debò: amb vora, el selector i les
+fletxes s'encongien 2 px.
+
+**XIFRES (1920x946, `_tmp-ancoratge.mjs`).** Bloc: 1464,83 de 60 × 180 (abans
+1414,83 de 110 × 220); selector: 59,5 × 119 (el mateix que el de la p2);
+fletxes: 1464,203 de 60 × 60 (abans 1414,193 de 110 × 110). La graella de la p1
+s'allarga de 1013 a **1073** px (el bloc es mes estret). I com que la filera es
+59 px mes curta, `PAGINA1_AJUST_FRANJA_PX` passa de 113,4 a **73,4** perque la
+franja de la p1 torni a caure a 226,6 (la de la p2, a 226,5).
+
+**El fons del selector de la p2 fa 59,5 × 119** (no 60 × 180): el seu contenidor
+fa 119 × 119 pero es transparent; el que es veu es la caixa del selector. El
+60 × 180 es la caixa del bloc de la p1 (selector 59,5 × 119 + quadrat de les
+fletxes 59,5).
+
+Bateria del tancament: 595 proves (46 fitxers), eslint amb els comptes de `HEAD`,
+`vite build` OK, `compara-vistes` OK, `mesura-formats` 0 i 0, `_tmp-errors2` cap
+error i `_tmp-ancoratge` TOT AL SEU LLOC.

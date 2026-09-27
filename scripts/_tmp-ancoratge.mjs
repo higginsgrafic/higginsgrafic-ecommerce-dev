@@ -17,10 +17,10 @@ const REF = {
   'p2 columna': [1395.3, 88, 128.7, 251.6],
   'p2 graella': [450.4, 83, 939.4, 95.2],
   'p2 franja': [357.9, 226.5, 1055.1, 113],
-  'p1 graella': [381, 83, 1023, 110],
-  'p1 bloc dreta': [1414, 83, 110, 220],
+  'p1 graella': [381, 83, 1073, 110],
+  'p1 bloc dreta': [1464, 83, 60, 180],
   'p1 franja': [357.9, 226.6, 1055.1, 113],
-  'p1 fletxes': [1414, 193, 110, 110],
+  'p1 fletxes': [1464, 203, 60, 60],
 };
 const b = await chromium.launch();
 const ctx = await b.newContext({ viewport: { width: 1920, height: 946 }, deviceScaleFactor: 1 });

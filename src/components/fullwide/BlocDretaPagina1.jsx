@@ -48,6 +48,14 @@ export function SelectorQuadratPagina1({
   showMulti = true,
   selectedVariant,
   sliderInset = 5,
+  // LA CAIXA LA PORTA EL BLOC (28/09/2026): amb `dinsBloc` el selector nome's
+  // pinta les seves tres caselles i la pastilla, i el fons, la vora i les
+  // cantonades els posa el bloc sencer (selector + fletxes).
+  dinsBloc = false,
+  // LA FORMA (28/09/2026): `rectangle` es la meitat d'amplada i el doble
+  // d'alçada, que es la forma del selector de la pagina 2. En Marc: «amb el
+  // selector (també de la mateixa mida que el p2)».
+  format = 'square',
 }) {
   const buttons = [
     { key: 'white', label: 'Blanc', onClick: onWhite, disabled: !showWhite },
@@ -63,14 +71,16 @@ export function SelectorQuadratPagina1({
 
   return (
     <div
-      className="relative aspect-square w-full"
+      className={`relative ${format === 'rectangle' ? (dinsBloc ? 'aspect-[1/2] w-full' : 'aspect-[1/2] w-1/2') : 'aspect-square w-full'}`}
       data-stripe-buttonbar="bn-p1"
       style={{
-        border: '1px solid #D1D5DB',
-        borderRadius: '5.3px',
-        backgroundColor: '#F3F4F6',
-        boxSizing: 'border-box',
-        overflow: 'hidden',
+        ...(dinsBloc ? null : {
+          border: '1px solid #D1D5DB',
+          borderRadius: '5.3px',
+          backgroundColor: '#F3F4F6',
+          boxSizing: 'border-box',
+          overflow: 'hidden',
+        }),
         pointerEvents: 'auto',
       }}
     >

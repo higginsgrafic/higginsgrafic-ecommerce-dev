@@ -2,6 +2,7 @@ import { carrilPx } from '../../utils/layoutMetrics.js';
 import React from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import OptimizedImg from './OptimizedImg.jsx';
+import { ESTIL_CAIXA_BLOC } from './estilsBlocs.js';
 
 /**
  * firstContactPanels
@@ -180,11 +181,11 @@ export function FirstContactDibuix00Buttons({
         // («treu fons gris, contorn selector»): va quedar el slider blanc sol,
         // que sobre fons blanc no es veu. L'amo els ha demanat de tornada, amb
         // les proporcions noves (la meitat d'amplada, el doble d'alçada).
-        border: '1px solid #D1D5DB',
-        borderRadius: '5.3px',
-        backgroundColor: '#F3F4F6',
-        boxSizing: 'border-box',
-        overflow: 'hidden',
+        //
+        // DES DEL 28/09/2026 la caixa es compartida i porta ombra
+        // (`ESTIL_CAIXA_BLOC_SELECTOR`): el bloc de fletxes de la pagina 2 fa
+        // servir la mateixa.
+        ...ESTIL_CAIXA_BLOC,
         // LA PASTILLA ES QUI REP ELS CLICS (24/09/2026): el contenidor del
         // selector (a MegaSlidePagina2) fa el DOBLE d'ample que la pastilla, i
         // la meitat que sobra trepitja les primeres caselles del carrusel. El

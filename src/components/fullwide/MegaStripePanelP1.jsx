@@ -5,6 +5,7 @@ import { CERCADOR_COLORS } from './CercadorTopBar.jsx';
 import { dibuixosGraella16x4 } from './CercadorTextRow.jsx';
 import GraellaDuesFileresPagina1 from './GraellaDuesFileresPagina1.jsx';
 import { SelectorQuadratPagina1, FletxesQuadratPagina1, MIDA_BLOC_DRETA_PAGINA1_PX } from './BlocDretaPagina1.jsx';
+import { ESTIL_CAIXA_BLOC_ALCADA_AUTO } from './estilsBlocs.js';
 import {
   STRIPE_DRAWING_CALIBRATIONS,
   PASSOS_ESCALA_GAP_DIBUIX_VERTICAL,
@@ -511,15 +512,38 @@ function MegaStripePanelP1({
                   }}
                 />
               </div>
+              {/* EL BLOC DE LA DRETA, COM EL DE LA PAGINA 2 (28/09/2026).
+
+                  En Marc: «Fes el bloc de la mateixa mida del bloc de la p2 i amb
+                  el selector (tambe de la mateixa mida que el p2) i les fletxes
+                  centrades al quadrat que et quedarà per haver redimensionat el
+                  selector» i «i les fletxes sota del selector, no al costat».
+
+                  El bloc fa `blocDretaPx` d'ample (59,5 px a 1920, la meitat del
+                  contenidor del selector de la p2): a dalt hi va el selector
+                  (59,5 x 119, la forma `rectangle` de la p2) i a sota el quadrat
+                  de les fletxes (59,5 x 59,5). La caixa i l'ombra les duu el bloc
+                  sencer (vegeu `ESTIL_CAIXA_BLOC_ALCADA_AUTO`). */}
               <div
                 data-bloc-dreta-p1="1"
                 style={{
                   flex: '0 0 auto',
                   width: `${blocDretaPx}px`,
                   minWidth: 0,
+                  // EL SELECTOR A DALT I LES FLETXES A SOTA (28/09/2026). En Marc:
+                  // «el bloc de la mateixa mida que el p2 [...] i les fletxes sota
+                  // del selector, no al costat». El selector es la forma
+                  // `rectangle` de la p2 (59,5 x 119) i les fletxes, el seu
+                  // quadrat (59,5), centrat.
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  ...ESTIL_CAIXA_BLOC_ALCADA_AUTO,
                 }}
               >
                 <SelectorQuadratPagina1
+                  dinsBloc
+                  format="rectangle"
                   showWhite={stripeVariantVisibility?.white !== false}
                   showBlack={stripeVariantVisibility?.black !== false}
                   showMulti={stripeVariantVisibility?.color !== false}

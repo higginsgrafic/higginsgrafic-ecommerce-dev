@@ -854,8 +854,22 @@ export const PAGINA1_GAP_PECA_PX = 0;
 /** El gap entre la graella i el bloc de la dreta (10 px de disseny). */
 export const PAGINA1_GAP_DRETA_PX = 10;
 
-/** El costat del selector i del bloc de fletxes de la dreta. */
-export const PAGINA1_MIDA_BLOC_DRETA_PX = 110;
+/**
+ * L'AMPLADA del bloc de la dreta (el selector i, a sota, les fletxes).
+ *
+ * DES DEL 28/09/2026 es la MIDA DEL SELECTOR DE LA PAGINA 2 (60 de disseny,
+ * 59,5 px a 1920: `bnSliderSize / 2`, la meitat del contenidor de la p2). En
+ * Marc: «Fes el bloc de la mateixa mida del bloc de la p2 i amb el selector
+ * (també de la mateixa mida que el p2) i les fletxes centrades al quadrat que et
+ * quedarà per haver redimensionat el selector» i, tot seguit, «i les fletxes
+ * sota del selector, no al costat».
+ *
+ * O sigui: el bloc fa 59,5 d'ample; a dalt hi va el selector (59,5 x 119, la
+ * forma `rectangle` de la p2) i a sota el quadrat de les fletxes (59,5 x 59,5,
+ * centrades). L'alcada total es 178,5. Abans feia 110 d'ample i el bloc era una
+ * columna de dues peces quadrades de 110 (220 d'alcada).
+ */
+export const PAGINA1_MIDA_BLOC_DRETA_PX = 60;
 
 /**
  * L'alcada de la filera: la del bloc de la dreta (selector de 110 + fletxes de
@@ -875,9 +889,15 @@ export const PAGINA1_TOP_FILERA_PX = 13.8;
  * Mesurat a 1920 el 26/09/2026: 112,8 unitats. El 28/09/2026, amb les tires de
  * samarretes ja alineades pel top, la franja de la p1 queia 0,6 px per sota de
  * la de la p2 (la de la p2 clava la seva formula declarada: 156,46 px sobre el
- * seu viewport, mesurat 156,5). Amb 113,4 les dues queden a la mateixa alcada.
+ * seu viewport, mesurat 156,5): amb 113,4 les dues quedaven a la mateixa alcada.
+ *
+ * MES TARD, EL MATEIX DIA, el bloc de la dreta va passar de 110x220 (dues peces
+ * quadrades) a 59,5x178,5: el selector de la p2 (59,5 x 119) a dalt i el quadrat
+ * de les fletxes (59,5) a sota, tal com va demanar en Marc. Amb aixo la filera es
+ * va fer 59 px mes curta i la franja, que va al flux al darrere, pujava aquells
+ * 59 px: amb el descompte a 71,4 torna a caure a 226,6, exactament on era.
  */
-export const PAGINA1_AJUST_FRANJA_PX = 113.4;
+export const PAGINA1_AJUST_FRANJA_PX = 73.4;
 
 /**
  * L'amplada del bloc de la dreta, en px reals, a partir de l'escala del carril.

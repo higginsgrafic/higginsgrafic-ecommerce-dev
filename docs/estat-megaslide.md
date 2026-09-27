@@ -1804,3 +1804,13 @@ Ara les fletxes tornen a la graella (`setDesplacGest`, el pas de la rodeta i del
 gest) i la **direcció va invertida**: la fletxa de dalt (‹, «Anterior») avança la
 graella (−35,4 px a 1920) i la de baix recula. La franja conserva el seu pas per a
 la rodeta i l'arrossegament (`onStripeStripPas`).
+
+### El bloc de la dreta de la p1, com el de la p2 (37) — FET (28/09/2026)
+
+El bloc de la dreta de la p1 passa de 110 × 220 (dues peces quadrades) a
+**59,5 × 178,5**, com el de la p2: el selector amb la forma i la mida del de la
+p2 (59,5 × 119) a dalt i el quadrat de les fletxes (59,5 × 59,5) a sota, tot dins
+una sola caixa amb ombra (`ESTIL_CAIXA_BLOC_ALCADA_AUTO`).
+
+La graella de la p1 s'allarga de 1013 a 1073 px i `PAGINA1_AJUST_FRANJA_PX` passa
+a 73,4 perque la franja de la p1 segueixi caient a 226,6 (la de la p2, a 226,5).

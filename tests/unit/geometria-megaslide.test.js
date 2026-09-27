@@ -462,7 +462,13 @@ describe('la composicio de la pagina 1 (B2, 26/09/2026)', () => {
   });
 
   it('la filera fa la suma del bloc de la dreta i les seves meitats (selector i fletxes)', () => {
-    expect(PAGINA1_ALCADA_FILERA_PX).toBe(PAGINA1_MIDA_BLOC_DRETA_PX);
+    // DES DEL 28/09/2026 el bloc de la dreta fa 60 de disseny d'ample (59,5 px a
+    // 1920: el mateix ample que el selector de la p2) i dins seu hi ha el
+    // selector de la p2 (59,5 x 119) a dalt i el quadrat de les fletxes (59,5) a
+    // sota. La graella (la filera de dibuixos) queda amb les DUES fileres de 55
+    // unitats de sempre: el bloc ja no mana la seva alcada.
+    expect(PAGINA1_MIDA_BLOC_DRETA_PX).toBe(60);
+    expect(PAGINA1_ALCADA_FILERA_PX).toBe(110);
     // Dues fileres de dibuixos: la meitat de l'alcada, i el desnivell de la
     // segona es mig pas (22,5 unitats).
     expect(PAGINA1_ALCADA_FILERA_PX / 2).toBe(55);
@@ -473,7 +479,7 @@ describe('la composicio de la pagina 1 (B2, 26/09/2026)', () => {
     const carril = 1143; // mesurat a 1920
     const bloc = pagina1BlocDretaPx(escala);
     const graella = pagina1AmpladaGraellaPx(carril, escala);
-    expect(bloc).toBeCloseTo(109.1, 1);
+    expect(bloc).toBeCloseTo(59.5, 1);
     // graella + gap de disseny + bloc = carril
     expect(graella + PAGINA1_GAP_DRETA_PX * escala + bloc).toBeCloseTo(carril, 6);
     // I la vora dreta del bloc cau a la del carril.
@@ -540,9 +546,14 @@ describe("l'aire de 30 px de les dues pagines (28/09/2026)", () => {
     expect(graellaTop - headerBaix).toBeCloseTo(30, 1);
   });
 
-  it('el descompte de la franja de la p1 es 113,4 (les dues franges, a la mateixa alcada)', () => {
+  it('el descompte de la franja de la p1 es 73,4 (les dues franges, a la mateixa alcada)', () => {
     // Amb 112,8 la franja de la p1 queia 0,6 px per sota de la de la p2 (que
-    // clava la seva formula declarada). Amb 113,4 queden a 226,6 i 226,5.
-    expect(PAGINA1_AJUST_FRANJA_PX).toBeCloseTo(113.4, 2);
+    // clava la seva formula declarada) i amb 113,4 quedaven a 226,6 i 226,5.
+    // Despres, el mateix dia, el bloc de la dreta va passar de 110x220 a
+    // 59,5x178,5 (el selector de la p2 a dalt i el quadrat de les fletxes a
+    // sota) i la filera es va fer 59 px mes curta: la franja, que va al flux al
+    // darrere, pujava aquells 59 px. Amb 73,4 torna a caure a 226,6
+    // (`_tmp-ancoratge.mjs`: 226,6 contra 226,5 de la p2).
+    expect(PAGINA1_AJUST_FRANJA_PX).toBeCloseTo(73.4, 2);
   });
 });
