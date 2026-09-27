@@ -966,3 +966,30 @@ abans de calcular-hi res**, i si no hi es, passar l'escala del carril com a prop
 6. **Numeros nous**: tots a `src/components/megaslide/geometriaMegaslide.js` com
    a funcions pures amb prova a `tests/unit/geometria-megaslide.test.js` i la
    mesura abans/despres al comentari, com la resta d'aquesta feina.
+
+### VOLTA 9 — Les correccions de l'amo despres de veure-ho (feta, `11ba303`)
+
+1. **La columna de colleccions, com la captura de les 22:16.** La primera
+   versio d'A1 entenia «un sol selector» com una sola pastilla amb nome's el nom
+   actiu; la captura diu que la llista sencera es veu i que l'actiu es destaca
+   amb una caixa blanca. Ara es aixi, amb l'estil EXACTE del selector: radi
+   exterior 11, caixa interior amb radi 6 (11 - 5 d'offset) i 5 px de coixi per
+   cada costat, text `font-oswald` de 13,89 px (el mateix que BLANC/COLOR/NEGRE)
+   enrasat a la dreta.
+2. **Gap de 10 px amb les fletxes:** 20 -> 10 px. La columna passa de 120,2 a
+   128,7 px i la seva vora esquerra de x1403,8 a x1395,3
+   (`GRAELLA_COLUMNA_DRETA_CARRIL_PX` 142 -> 152, `GRAELLA_GAP_COLUMNES_PX`
+   20 -> 6,5). El retall de la graella creix els mateixos px (933,4 -> 939,4) i
+   les proves d'`ampladaRetallGraella` i `desnivellColorsGraella` s'han
+   actualitzat amb les mides noves.
+3. **La rodeta de la graella de la p1:** no funcionava perque
+   `CercadorDibuixosGraella` enganxava el gest al `graellaRef` de la filera de
+   la p2, i la graella de la p1 no en tenia cap. Ara se'n fa un de propi.
+4. **El cadenat:** no apareixia mai als tres bucles de `FullWideSlideHeader` que
+   pengen del panell, perque el panell es munta DESPRES del clic (precarrega
+   d'imatges) i els bucles nome's depenien d'`active`. Ara el `ref` del panell
+   es un callback que marca l'estat `panellMuntat`. Mesurat: surt als 507 ms.
+
+Bateria: 581 proves (45 fitxers), eslint amb els comptes de HEAD,
+`vite build` OK, `compara-vistes` OK, `mesura-formats` 0 i 0, `_tmp-errors2`
+cap error.
