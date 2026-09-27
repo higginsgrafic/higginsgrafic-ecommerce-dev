@@ -282,3 +282,20 @@ La pastilla interior ja tenia 6 px de radi a tot arreu: 11 - 5 = 6, o sigui que
 **quadra** amb l'exterior. Mesurat a 1920 als dos selectors (p1 i p2): offset de
 6 px per cada costat (5 px de `sliderInset` mes 1 px de la vora del contenidor),
 i la pastilla queda DINS del contenidor.
+
+### 7.6 Els radis a la meitat i els noms separats a l'esquerra (`023faff`)
+
+| què | abans | ara |
+|---|---|---|
+| radi exterior del selector (contenidor) | 11 px | **5,5 px** |
+| radi de la pastilla interior | 6 px | **3 px** |
+| offset | 5 px (6 px comptant la vora) | igual |
+| text de la columna | a 1 px de la caixa | **6 px mes a l'esquerra** |
+
+Els radis son exactament la meitat (5,5 + 5,5 = 11 i 3 + 3 = 6) i s'apliquen a
+**tots** els selectors: el bloc compartit `FirstContactDibuix00Buttons`, el
+`SelectorQuadratPagina1` i la columna de colleccions. L'offset no s'ha tocat: la
+pastilla queda a 6 px de cada costat del contenidor.
+
+Els noms de la columna van 6 px mes a l'esquerra perque la caixa de l'actiu es
+vegi **sencera**, amb el seu offset de 5 px i el radi de la dreta.
