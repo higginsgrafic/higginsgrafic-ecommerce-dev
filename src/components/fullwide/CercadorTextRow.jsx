@@ -1214,7 +1214,7 @@ export function CercadorColleccionsColumna({
         boxSizing: 'border-box',
         // EL CONTENIDOR, COM EL DEL SELECTOR (radi exterior d'11 px).
         border: '1px solid #D1D5DB',
-        borderRadius: '11px',
+        borderRadius: '5.5px',
         backgroundColor: '#F3F4F6',
         overflow: 'hidden',
       }}
@@ -1242,13 +1242,18 @@ export function CercadorColleccionsColumna({
               // «Linea el text a la dreta»), com la columna de sempre.
               justifyContent: 'flex-end',
               width: '100%',
-              // El coixi de la dreta es el de la caixa (5 px) mes el de dins.
-              padding: `0 ${coixInset + 1}px`,
+              // ELS NOMS, SEPARATS CAP A L'ESQUERRA (26/09/2026, ho ha demanat
+              // l'amo: «Separa els noms de collecció cap a l'esquerra perque el
+              // selector pugui tenir el seu offset i els seus radis a la
+              // dreta»). La caixa de l'actiu te 5 px d'offset i el radi de la
+              // dreta; el text va 6 px mes a l'esquerra perque la caixa es vegi
+              // SENCERA (si el text arribes a la vora, taparia el radi).
+              padding: `0 ${coixInset + 1}px 0 6px`,
               // LA CAIXA DE L'ACTIU, EXACTAMENT LA DEL SELECTOR (el `span` blanc
               // del slider): fons, vora, radi 4, ombra i el coixi de 3 px.
               backgroundColor: activa ? '#FFFFFF' : 'transparent',
               border: 'none',
-              borderRadius: '6px',
+              borderRadius: '3px',
               ...(activa ? { boxShadow: '0 1px 3px rgba(0,0,0,0.12)' } : null),
               // EL MATEIX COIXI QUE LA PASTILLA DEL SELECTOR (26/09/2026, ho ha
               // dit l'amo: «la pastilla del selector te un offset amb el seu
