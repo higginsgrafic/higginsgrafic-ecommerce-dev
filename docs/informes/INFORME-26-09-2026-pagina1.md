@@ -264,3 +264,21 @@ quedava buit). **Ara** el `ref` del panell es un callback que marca l'estat
 
 Mesurat: el cadenat apareix **als 507 ms** de clicar, a y392,5, amb
 `--hg-mega-bottom: 385px`.
+
+### 7.5 L'estil per defecte dels selectors, unificat (`0e25a5c`)
+
+L'amo ho ha aclarit: «Als selectors els has de posar l'estil dels selectors que
+tenia fins ara. L'estil per defecte, suposo». O sigui que les xifres que va
+demanar (11 px de radi exterior, 5 px d'offset i 6 px interiors) son l'estil per
+**defecte** del selector BLANC/COLOR/NEGRE, i l'han de fer servir **tots**:
+
+| peça | abans | ara |
+|---|---|---|
+| `FirstContactDibuix00Buttons` (bloc compartit) | radi 6 i `sliderInset` 3 | **radi 11 i `sliderInset` 5** |
+| `SelectorQuadratPagina1` (la p1) | radi 6 i `sliderInset` 3 | **radi 11 i `sliderInset` 5** |
+| columna de colleccions | ja ho tenia (11 / 5) | igual |
+
+La pastilla interior ja tenia 6 px de radi a tot arreu: 11 - 5 = 6, o sigui que
+**quadra** amb l'exterior. Mesurat a 1920 als dos selectors (p1 i p2): offset de
+6 px per cada costat (5 px de `sliderInset` mes 1 px de la vora del contenidor),
+i la pastilla queda DINS del contenidor.
