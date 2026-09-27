@@ -887,8 +887,19 @@ export function CercadorDibuixosGraella({
           }}>
             <FirstContactDibuix09Buttons
               vertical
-              onPrev={() => (onCarouselStep ? onCarouselStep(-1) : setDesplacGest((v) => v - unPas))}
-              onNext={() => (onCarouselStep ? onCarouselStep(1) : setDesplacGest((v) => v + unPas))}
+              // LA DIRECCIO DE LES FLETXES DE LA GRAELLA, INVERTIDA (28/09/2026).
+              //
+              // En Marc: «Inverteix la direcció del moviment de les fletxes a la
+              // graella [...] era a la graella intercalada». El desplaçament del
+              // carrusel es pinta amb `translateX(-desplacEf)`, o sigui que
+              // SUMAR a `desplacGest` mou les peces cap a l'ESQUERRA: la fletxa
+              // de dalt (‹, «Anterior») avança la graella i la de baix recula,
+              // que es la direcció que volia. Abans era al revés (restar amb
+              // «Anterior»), i cap a la pàgina 2 aquesta botonera a mes ni tan
+              // sol movia la graella: `MegaslidePagina2` hi passava
+              // `onCarouselStep` i movia la stripe.
+              onPrev={() => (onCarouselStep ? onCarouselStep(-1) : setDesplacGest((v) => v + unPas))}
+              onNext={() => (onCarouselStep ? onCarouselStep(1) : setDesplacGest((v) => v - unPas))}
             />
           </div>
         ) : null}

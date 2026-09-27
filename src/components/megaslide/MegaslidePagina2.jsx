@@ -1029,9 +1029,25 @@ export default function MegaslidePagina2({
               setHoveredStripeItem(null);
               setHoveredStripeItemCollection(null);
             }}
-            // Les fletxes fan passar els DIBUIXOS de la franja d'un en un
-            // (25/09/2026, ho va demanar l'amo: «una peça per fletxa»).
-            onCarouselStep={moureStrip}
+            // LES FLETXES MOUEN LA GRAELLA INTERCALADA (28/09/2026).
+            //
+            // En Marc: «Inverteix la direcció del moviment de les fletxes a la
+            // graella», i tot seguit «Li has donat el moviment a la stripe...?
+            // [...] Era a la graella intercalada»: el bloc de fletxes del costat
+            // de la fila de colors es de la GRAELLA, i ha de moure-la a ella.
+            //
+            // Aqui hi havia `onCarouselStep={moureStrip}` (25/09/2026): les
+            // fletxes feien passar els DIBUIXOS de la franja d'un en un, i la
+            // graella no es movia gens. Sense aquesta prop, les fletxes fan
+            // servir el pas propi de la graella (`setDesplacGest`), que es el
+            // mateix mecanisme de la rodeta i de l'arrossegament. La franja
+            // continua tenint el seu pas (`onStripeStripPas`, mes amunt) per a
+            // la rodeta i el gest.
+            //
+            // La DIRECCIO va invertida respecte de com anava (vegeu
+            // `CercadorTextRow`, a la botonera): prement la fletxa de dalt
+            // (‹, «Anterior») la graella avança, que es el que va demanar. Si
+            // ho vol a l'inrevés, nome's cal canviar el signe.
             // L'OMBRA DE LA MANIGA: la caixa del contingut de la franja dins de
             // la columna de colleccions (la pinta la columna, que la retalla).
             ombraManiga={ombraManiga}

@@ -1792,3 +1792,15 @@ sempre.
 El coixí de dalt del panell passa a 17,1 px, `PAGINA1_AJUST_FRANJA_PX` a 113,4 i
 `P1_STRIPE_BOTTOM_GAP` a 29,5 (l'aire de baix mesurat és 30,5 a les dues).
 **Cost acceptat**: el botó Color de les dues pàgines queda 8,5 px desquadrat.
+
+### Les fletxes de la graella intercalada (36) — FET (28/09/2026)
+
+El bloc de fletxes del costat de la fila de colors és el de la graella, però a la
+pàgina 2 portava `onCarouselStep={moureStrip}` i movia **la stripe** (un dibuix
+per clic); la graella no es movia gens (en Marc: «Li has donat el moviment a la
+stripe...? [...] Era a la graella intercalada»).
+
+Ara les fletxes tornen a la graella (`setDesplacGest`, el pas de la rodeta i del
+gest) i la **direcció va invertida**: la fletxa de dalt (‹, «Anterior») avança la
+graella (−35,4 px a 1920) i la de baix recula. La franja conserva el seu pas per a
+la rodeta i l'arrossegament (`onStripeStripPas`).

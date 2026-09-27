@@ -1344,3 +1344,35 @@ Bateria del tancament: 595 proves (46 fitxers), eslint amb els comptes de `HEAD`
 `vite build` OK, `compara-vistes` OK (les mateixes xifres que abans del canvi),
 `mesura-formats` 0 i 0, `_tmp-errors2` cap error i `_tmp-ancoratge` TOT AL SEU
 LLOC (referències actualitzades).
+
+### VOLTA 19 — Les fletxes de la graella intercalada (28/09/2026)
+
+En Marc, en tres missatges: «Inverteix la direcció del moviment de les fletxes a
+la graella», «Li has donat el moviment a la stripe...?» i «Era a la graella
+intercalada» (el seu vocabulari: «la graella intercalada de la pagina 2 JA ESTA
+FETA», a `GraellaDuesFileresPagina1`).
+
+**QUÈ PASSAVA.** El bloc de fletxes del costat de la fila de colors és el de la
+GRAELLA, però a la pàgina 2 portava `onCarouselStep={moureStrip}`
+(25/09/2026): les fletxes feien passar els DIBUIXOS de la franja d'un en un i la
+graella no es movia gens. Mesurat amb `_tmp-qui-es-mou.mjs`: prement «Anterior»,
+les cases de la franja passaven de `[dj-vader, pont, r2d2]` a
+`[death-star2d2, dj-vader, pont]` i la posició de la graella no canviava.
+
+**FET.** S'ha tret aquesta prop: ara les fletxes fan servir el pas propi de la
+graella (`setDesplacGest`, el mateix de la rodeta i de l'arrossegament) i la
+franja conserva el seu (`onStripeStripPas`, per a la rodeta i el gest). I la
+DIRECCIÓ va invertida: el desplaçament es pinta amb `translateX(-desplacEf)`, així
+que **sumar** mou les peces cap a l'esquerra; la fletxa de dalt (‹, «Anterior»)
+avança la graella i la de baix recula.
+
+**XIFRES (`_tmp-qui-es-mou.mjs`, 1920x946).** «Anterior» a la pàgina 2: la
+graella es mou **−35,4 px** i les cases de la franja no es mouen (abans: la
+graella quieta i la franja un dibuix enrere). A la pàgina 1 les fletxes del bloc
+segueixen movent la seva graella com abans (+22,5 px amb «Anterior»), que és el
+que ja funcionava des de la volta dels rombes i les fletxes; si en Marc vol que
+les dues pàgines vagin en el mateix sentit, és canviar el signe d'`stepperP1`.
+
+Bateria del tancament: 595 proves (46 fitxers), eslint amb els comptes de `HEAD`,
+`vite build` OK, `compara-vistes` OK, `_tmp-errors2` cap error i
+`_tmp-ancoratge` TOT AL SEU LLOC.
