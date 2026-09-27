@@ -24,10 +24,13 @@ import { CercadorDibuixosGraella } from './CercadorTextRow.jsx';
 
 /** El costat de la peca, en unitats de disseny del carril (45 = 44,6 px a
  *  1920x946, el mateix que les peces de la pagina 2). */
-// LA MIDA DEL SELECTOR (28/09/2026): en Marc, «el seguent pas es escalar la
-// graella. Escalar-la a la mida del selector. 60 has dit, oi?». Abans feia 45,
-// com les peces de la pagina 2.
-export const COSTAT_PECA_PAGINA1_PX = 60;
+// LA MIDA DEL SELECTOR, UNA MICA MENYS PER PODER SEPARAR LES FILES (28/09/2026).
+// En Marc: «escalar la graella a la mida del selector» (60, que es l'amplada del
+// selector) i, tot seguit, «separa la fila 2 de la fila 1 de la graella, sense
+// que es mogui res mes». Les caselles de la graella fan 59,5 d'alcada (dues, 119:
+// l'alcada del selector, que no es toca), i amb la peca a 54 queden 5,5 px de
+// separacio entre les dues fileres.
+export const COSTAT_PECA_PAGINA1_PX = 54;
 
 /** El gap entre peces, en unitats de disseny (el mateix que la pagina 2). */
 // EL MATEIX GAP QUE LA PAGINA 2 (28/09/2026). En Marc, mirant la graella de la
