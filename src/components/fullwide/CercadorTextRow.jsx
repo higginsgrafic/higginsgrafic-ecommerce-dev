@@ -14,7 +14,6 @@ import { ampladaRetallGraella, ampladaColumnaGraella, desnivellsLiniesGraella, d
 import { carrilPct, carrilLane, carrilPx, readRootCssNumber, getLayoutViewportWidth, MEGASLIDE_REFERENCIA_PX } from '../../utils/layoutMetrics.js';
 import { GRAELLA_DIBUIXOS_ESCALA_VERTICAL } from '../../config/stripeCalibrationsVertical.js';
 import { FirstContactDibuix09Buttons } from './firstContactPanels.jsx';
-import { ESTIL_CAIXA_BLOC } from './estilsBlocs.js';
 import { caminsSiluetes, precarregaSiluetesSamarreta } from './siluetesSamarreta.js';
 
 /**
@@ -885,11 +884,11 @@ export function CercadorDibuixosGraella({
             width: carrilPx(midaSelector / 2),
             height: carrilPx(midaSelector),
             zIndex: 5,
-            // LA MATEIXA CAIXA QUE EL SELECTOR (28/09/2026): en Marc va demanar
-            // «un bloc com el de la columna del selector de la p1, a la p2, amb
-            // l'ombra i tot». Aquest bloc es a l'altre extrem de la fila de
-            // colors i fa el mateix paper, aixi que duu la mateixa caixa.
-            ...ESTIL_CAIXA_BLOC,
+            // SENSE FONS (28/09/2026): en Marc va demanar la caixa el mateix
+            // dia («un bloc com el de la columna del selector de la p1, a la p2,
+            // amb l'ombra i tot») i tot seguit la va retirar: «Treu el fons de
+            // les fletxes de la p2». Les fletxes van soles, com el bloc de
+            // fletxes de la pagina 1.
           }}>
             <FirstContactDibuix09Buttons
               vertical
