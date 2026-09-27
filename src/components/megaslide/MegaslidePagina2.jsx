@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useSta
 import { CERCADOR_COLORS } from '../fullwide/CercadorTopBar.jsx';
 import CercadorTextRow from '../fullwide/CercadorTextRow.jsx';
 import MegaStripePanel from '../fullwide/MegaStripePanel.jsx';
+import { caminsSiluetes, precarregaSiluetesSamarreta } from '../fullwide/siluetesSamarreta.js';
 import {
   centratgeSelectorY,
   desplacTopSelector,
@@ -152,6 +153,31 @@ export default function MegaslidePagina2({
   // panell, amb `zIndex: -1`: es pinta abans de tot el contingut del panell
   // (que es posicionat) i, per tant, la samarreta la tapa on li toca.
   const [ombraManiga, setOmbraManiga] = useState(null);
+  // LA SILUETA DE LA MANIGA (27/09/2026). L'ombra que ha de fer la maniga sobre
+  // la columna de colleccions ha de resseguir el SEU contorn, i el contorn es la
+  // silueta de l'ultima casa del full (`caminsSiluetes`, la catorzena). Aqui se
+  // n'hi ha prou amb aquesta: la columna nomes la trepitja ella.
+  const [mascaraManiga, setMascaraManiga] = useState(null);
+  useEffect(() => {
+    let viu = true;
+    precarregaSiluetesSamarreta()
+      .then((text) => {
+        if (!viu || !text) return;
+        const doc = new DOMParser().parseFromString(text, 'image/svg+xml');
+        const camins = caminsSiluetes(doc);
+        const ultima = camins[13];
+        if (!ultima) return;
+        const vb = (doc.documentElement.getAttribute('viewBox') || '0 0 2866 307').trim().split(/[\s,]+/);
+        const w = Number(vb[2]) || 2866;
+        const h = Number(vb[3]) || 307;
+        const tr = ultima.getAttribute('transform') || '';
+        const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">`
+          + `<path d="${ultima.getAttribute('d')}"${tr ? ` transform="${tr}"` : ''} fill="#FFFFFF"/></svg>`;
+        setMascaraManiga(`data:image/svg+xml,${encodeURIComponent(svg)}`);
+      })
+      .catch(() => {});
+    return () => { viu = false; };
+  }, []);
   // Desplaçament propi del selector Blanc/Color/Negre perquè quedi centrat amb
   // la graella de colors. Va a part de topVisualAlignmentY (que alinea el
   // selector amb el de la pàgina 1): així els dos ajustos no es trepitgen.
@@ -781,13 +807,16 @@ export default function MegaslidePagina2({
         const c = visual.getBoundingClientRect();
         if (!a.width || !c.width) return;
         const k = columna ? columna.getBoundingClientRect() : null;
-        const top = k ? k.top : c.top;
         setOmbraManiga({
-          // La costura: la vora DRETA del contingut de la franja.
-          left: Math.round((c.right - a.left) * 10) / 10,
-          // Del top de la columna de colleccions al baix de la franja.
-          top: Math.round((top - a.top) * 10) / 10,
-          height: Math.round((c.bottom - top) * 10) / 10,
+          // La caixa del contingut de la franja, dins de la capa.
+          left: Math.round((c.left - a.left) * 10) / 10,
+          top: Math.round((c.top - a.top) * 10) / 10,
+          width: Math.round(c.width * 10) / 10,
+          height: Math.round(c.height * 10) / 10,
+          // On comenca la columna de colleccions, dins d'aquesta caixa: a
+          // l'esquerra seu no hi ha d'anar cap ombra (alla la samarreta no
+          // trepitja res).
+          retallEsq: k ? Math.max(0, Math.round((k.left - c.left) * 10) / 10) : c.width,
         });
       });
     };
@@ -1022,18 +1051,21 @@ export default function MegaslidePagina2({
           transform: (isPortraitTablet || isLandscapeTablet) ? 'scale(0.998)' : undefined,
           transformOrigin: 'left top',
         }}>
-          {/* L'OMBRA DE LA MANIGA (27/09/2026). Una banda SUAU de 6 px a
-              sobre de la costura (la vora dreta del contingut de la franja),
-              del top de la columna de colleccions al baix de la franja: es el
-              que fa que es vegi que la maniga passa per sobre del selector.
-              Va DINS d'aquesta capa (`zIndex: 4`) i ABANS del panell, amb
-              `zIndex: -1`: es pinta abans de tot el contingut del panell (que
-              es posicionat) i per tant la samarreta la tapa. La versio
-              anterior vivia a la capa del costat (zIndex 1, per sota de la
-              columna, que es a zIndex 3): no es veia mai. Amb la silueta de
-              les samarretes tambe s'hi va provar, i es veia la silueta (una
-              taca), no una ombra. */}
-          {ombraManiga && !isPortraitTablet ? (
+          {/* L'OMBRA DE LA MANIGA (27/09/2026). La maniga (la màniga de
+              l'última samarreta de la franja) passa per sobre de la columna de
+              col·leccions i hi ha de fer una ombra petita que segueixi el SEU
+              contorn.
+
+              Es la silueta de l'última casa del full (`mascaraManiga`), amb la
+              MATEIXA mida i posicio que la mascara del contingut de la franja
+              (103 % x 100 %, centrada a dalt), pintada de negre i amb un
+              `drop-shadow` suau. Va DINS d'aquesta capa (`zIndex: 4`) i ABANS
+              del panell, amb `zIndex: -1`: es pinta abans del contingut del
+              panell i la samarreta la tapa. Com que la silueta es exactament la
+              vora que es veu de la samarreta, del negre nome's en queda la
+              difusio que en surt: l'ombra. I es retalla a la columna
+              (`retallEsq`): a la resta del panell no s'hi veu res. */}
+          {ombraManiga && mascaraManiga && !isPortraitTablet ? (
             <div
               aria-hidden="true"
               data-maniga-ombra="1"
@@ -1041,15 +1073,40 @@ export default function MegaslidePagina2({
                 position: 'absolute',
                 left: `${ombraManiga.left}px`,
                 top: `${ombraManiga.top}px`,
+                width: `${ombraManiga.width}px`,
                 height: `${ombraManiga.height}px`,
-                width: '6px',
                 pointerEvents: 'none',
                 zIndex: -1,
-                // Neix a la costura i s'obre cap a la dreta, sobre la
-                // columna: suau, sense tocar res de dalt.
-                background: 'linear-gradient(90deg, rgba(0, 0, 0, 0.13) 0%, rgba(0, 0, 0, 0) 100%)',
+                clipPath: `inset(0px 0px 0px ${ombraManiga.retallEsq}px)`,
+                // UNA COPIA DIFOSA, NO UN `drop-shadow` (27/09/2026). El
+                // `drop-shadow` tambe pinta la silueta original, i on la
+                // samarreta no la tapa (a la costura) s'hi veia una línia
+                // negra. Aqui nome's es pinta la copia: el seu nucli queda sota
+                // la samarreta i el que en surt es la difusio.
+                filter: 'blur(3px)',
+                transform: 'translate(1px, 3px)',
               }}
-            />
+            >
+              <div
+                style={{
+                  width: '100%',
+                  height: '100%',
+                  backgroundColor: 'rgba(0, 0, 0, 0.25)',
+                  WebkitMaskImage: `url("${mascaraManiga}")`,
+                  maskImage: `url("${mascaraManiga}")`,
+                  WebkitMaskRepeat: 'no-repeat',
+                  maskRepeat: 'no-repeat',
+                  // Un 102 % i no el 103 % del contenidor: aixi la silueta
+                  // queda un parell de px ENDINS de la vora que es veu de la
+                  // samarreta i no hi ha cap pixel de negre a la costura (amb
+                  // el 103 % hi queia just a sobre i s'hi veia una línia).
+                  WebkitMaskSize: '102% 100%',
+                  maskSize: '102% 100%',
+                  WebkitMaskPosition: '50% 0',
+                  maskPosition: '50% 0',
+                }}
+              />
+            </div>
           ) : null}
           <MegaStripePanel
             {...propsFranjaP2}
