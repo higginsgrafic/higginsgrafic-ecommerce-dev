@@ -19,16 +19,18 @@ els agents, les tècniques. Però **sap el que veu**: quan diu «això balla» o
 col·loquial. La frase és curta; el diagnòstic és teu.
 
 **Parla en català i en to ras i curt.** Alguns exemples reals, per calibrar el
-to:
+to (les glosses en anglès són seves, del 27/09/2026):
 
 | diu | vol dir |
 |---|---|
-| «Fot-li» | endavant, fes-ho |
-| «Espavila que he de reiniciar el Mac» | vaig amb pressa: acaba o desfés, però no em deixis coses a mitges |
-| «No pas» | això no és el que et demanava; atura't |
-| «El puto scroll» | la barra de desplaçament és la causa |
-| «...» (un «+» sol) | «sí, continua» o «una mica més», segons el context |
+| «Fot-li» | endavant, fes-ho (*go for it*) |
+| «Espavila que he de reiniciar el Mac» | **literal, no és cap frase feta**: ha de reiniciar de debò i va amb pressa. Acaba o desfés, però no li deixis coses a mitges |
+| «No pas» | això no és el que et demanava; atura't. És **argot** (equival a *nope*) |
+| «El puto scroll» | la barra de desplaçament és la causa, una altra vegada (*the fucking scroll*) |
 | «Els fills de sa mare es mouen més que la compresa d'una coixa» | la botiga es desmunta, no moguis la base |
+
+*(S'ha tret una fila que deia que un «+» sol vol dir «continua»: no està
+confirmada i en Marc no la reconeix. Si mai arriba un «+» sol, es pregunta.)*
 
 **Quan diu «una mica més», «un pèl», «+1 px»**, vol exactament això:
 **una passa petita**, i la comproves. No reinterpretis la comanda.
