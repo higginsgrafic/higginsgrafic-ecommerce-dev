@@ -18,9 +18,9 @@ const REF = {
   'p2 graella': [450.4, 83, 939.4, 95.2],
   'p2 franja': [357.9, 226.5, 1055.1, 113],
   'p1 graella': [381, 83, 1003, 110],
-  'p1 bloc dreta': [1394, 83, 130, 260],
+  'p1 bloc dreta': [1395.3, 83, 128.7, 256.6],
   'p1 franja': [357.9, 226.6, 1055.1, 113],
-  'p1 fletxes': [1394, 213, 130, 130],
+  'p1 fletxes': [1395.3, 210.6, 128.7, 128.3],
 };
 const b = await chromium.launch();
 const ctx = await b.newContext({ viewport: { width: 1920, height: 946 }, deviceScaleFactor: 1 });

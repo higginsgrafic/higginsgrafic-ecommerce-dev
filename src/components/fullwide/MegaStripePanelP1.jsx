@@ -596,8 +596,10 @@ function MegaStripePanelP1({
                   // apilades l'una sobre l'altra». Cada quadrat fa el costat del bloc
                   // (128,9 a 1920) i el `marginBottom` negatiu compensa el que
                   // creix, perque la filera no s'allargui i la franja no es mogui.
-                  height: `${blocDretaPx * 2}px`,
-                  marginBottom: `${-(blocDretaPx * 2 - columnaDretaPx * 3)}px`,
+                  ...(alcadaBlocP1 != null ? {
+                    height: `${alcadaBlocP1}px`,
+                    marginBottom: `${-(alcadaBlocP1 - columnaDretaPx * 3)}px`,
+                  } : null),
                   // EL SELECTOR A DALT I LES FLETXES A SOTA, A LA DRETA (28/09/2026).
                   // El bloc es ample com la columna de la p2 (130 de disseny) perque
                   // la maniga de l'ultima samarreta hi arribi; el selector i les
@@ -653,8 +655,10 @@ function MegaStripePanelP1({
                   flexDirection: 'column',
                 }}>
                 {/* EL QUADRAT DE DALT: els tres botons del selector. */}
+                <div style={{ flex: '1 1 50%', minHeight: 0, width: '100%' }}>
                 <SelectorQuadratPagina1
                   dinsBloc
+                  omple
                   format="square"
                   showWhite={stripeVariantVisibility?.white !== false}
                   showBlack={stripeVariantVisibility?.black !== false}
@@ -664,11 +668,15 @@ function MegaStripePanelP1({
                   onBlack={() => { setStripeOverlayOverrideActive(false); setFirstContactVariant('black'); }}
                   onMulti={() => { setStripeOverlayOverrideActive(false); setFirstContactVariant('color'); }}
                 />
+                </div>
                 {/* EL QUADRAT DE SOTA: els dos botons de les fletxes. */}
+                <div style={{ flex: '1 1 50%', minHeight: 0, width: '100%' }}>
                 <FletxesQuadratPagina1
+                  omple
                   onPrev={() => stepperP1?.(-1)}
                   onNext={() => stepperP1?.(1)}
                 />
+                </div>
                 </div>
               </div>
             </div>
@@ -678,7 +686,15 @@ function MegaStripePanelP1({
 
       {showStripe ? (
         <div
-          className="relative z-0"
+          // LA FRANJA PER DAMUNT DEL BLOC DE LA DRETA (28/09/2026). En Marc:
+          // «L'ombra de la maniga ha d'estar sota la maniga, no a sobre». El bloc
+          // porta dins l'ombra (la silueta de l'ultima casa, difosa) i, si el
+          // bloc va per damunt de la franja, l'ombra cau SOBRE la samarreta. Amb
+          // la franja a zIndex 1, la samarreta tapa l'ombra i nome's se'n veu la
+          // part que cau dins del bloc, com a la pagina 2 (alla la franja es a
+          // zIndex 4 i la columna a 3).
+          className="relative"
+          style={{ zIndex: 1 }}
           style={{
             // A la franja estreta (768-1366) la pàgina ja té els seus propis
             // ajustos de 10 px i l'ajust general no s'hi ha d'aplicar.

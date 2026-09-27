@@ -1480,3 +1480,20 @@ de les fletxes. El bloc fa 1394,83 de 130 × 260 i la franja no es mou (226,6).
 **El gap de la graella.** `GAP_PECA_PAGINA1_PX` passa de 0 a **26**: mesurat a
 1920, la p2 fa 44,63 px de peça i **26,07** de gap i la p1 en feia 0 (les peces
 tocant-se). Ara la p1 fa 45 de peça i 26 de gap.
+
+#### Volta 21 quater — el bloc, a la posició de la columna de la p2, i l'ombra sota la màniga
+
+En Marc: «Ni el lateral esquerre ni el bottom no són a la mateixa posició que el
+p2» i «L'ombra de la màniga ha d'estar sota la màniga, no a sobre».
+
+**FET.** La caixa del bloc fa **128,7 px d'ample** (`PAGINA1_AMPLADA_BLOC_DRETA_PX`,
+exactament l'amplada de la columna de col·leccions de la p2): amb la vora dreta del
+carril a 1524, arrenca a **1395,3**, com la columna. I l'alçada és la MESURADA fins
+al bottom de la franja (**256,6** → acaba a 339,6, com la columna i la franja).
+Dins seu, dues botoneres de 128,7 × 128,3: els tres botons del selector a dalt i
+els dos de les fletxes a sota, tots en vertical i omplint el seu quadrat.
+
+**L'ombra, sota la màniga.** La franja de la p1 passa a `zIndex: 1` (abans `z-0`):
+així la samarreta tapa l'ombra i només se'n veu la part que cau dins del bloc, com
+a la p2 (allà la franja és a zIndex 4 i la columna a 3). Abans el bloc anava per
+damunt i l'ombra queia SOBRE la màniga.

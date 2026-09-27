@@ -56,6 +56,10 @@ export function SelectorQuadratPagina1({
   // d'alçada, que es la forma del selector de la pagina 2. En Marc: «amb el
   // selector (també de la mateixa mida que el p2)».
   format = 'square',
+  // OMPLE EL SEU QUADRAT (28/09/2026): amb `omple` la peca no imposa el seu
+  // aspecte, sino que fa el 100% del que li dona el pare (dues botoneres
+  // quadrades apilades dins del bloc).
+  omple = false,
 }) {
   const buttons = [
     { key: 'white', label: 'Blanc', onClick: onWhite, disabled: !showWhite },
@@ -71,7 +75,7 @@ export function SelectorQuadratPagina1({
 
   return (
     <div
-      className={`relative ${format === 'rectangle' ? (dinsBloc ? 'aspect-[1/2] w-full' : 'aspect-[1/2] w-1/2') : 'aspect-square w-full'}`}
+      className={`relative ${omple ? 'h-full w-full' : (format === 'rectangle' ? (dinsBloc ? 'aspect-[1/2] w-full' : 'aspect-[1/2] w-1/2') : 'aspect-square w-full')}`}
       data-stripe-buttonbar="bn-p1"
       style={{
         ...(dinsBloc ? null : {
@@ -155,9 +159,9 @@ export function SelectorQuadratPagina1({
  * petita; aqui el bloc fa el mateix que el selector (quadrat) i les dues
  * fletxes se'l reparteixen a mitges.
  */
-export function FletxesQuadratPagina1({ onPrev, onNext }) {
+export function FletxesQuadratPagina1({ onPrev, onNext, omple = false }) {
   return (
-    <div className="relative aspect-square w-full" data-fletxes-p1="1">
+    <div className={`relative ${omple ? 'h-full w-full' : 'aspect-square w-full'}`} data-fletxes-p1="1">
       {/* SENSE FONS (26/09/2026, ho va demanar l'amo): el bloc portava un
           `bg-muted` i ara desapareix, com al bloc compartit
           (`FirstContactDibuix09Buttons`). */}

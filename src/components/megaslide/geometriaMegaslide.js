@@ -882,11 +882,13 @@ export const PAGINA1_GAP_DRETA_PX = 10;
  *  1920, la meitat del contenidor del selector de la p2). */
 export const PAGINA1_MIDA_BLOC_DRETA_PX = 60;
 
-/** L'amplada de la CAIXA del bloc de la dreta (130 de disseny = 128,9 px a 1920,
- *  el mateix ample que la columna de colleccions de la p2): la caixa encavalca la
- *  franja 18 px perque la maniga de l'ultima samarreta hi faci l'ombra, i el
- *  selector i les fletxes (60) queden a la DRETA. */
-export const PAGINA1_AMPLADA_BLOC_DRETA_PX = 130;
+/** L'amplada de la CAIXA del bloc de la dreta: 128,7 px, EXACTAMENT el mateix
+ *  que la columna de colleccions de la p2 (en Marc: «ni el lateral esquerre ni el
+ *  bottom no son a la mateixa posicio que el p2»). Amb la vora dreta del carril a
+ *  1524, la caixa arrenca a 1395,3, com la columna, i encavalca la franja 18 px
+ *  perque la maniga de l'ultima samarreta hi faci l'ombra. L'alcada es mesurada
+ *  (arriba al bottom de la franja, 339,6). */
+export const PAGINA1_AMPLADA_BLOC_DRETA_PX = 128.7;
 
 /**
  * L'alcada de la filera: la del bloc de la dreta (selector de 110 + fletxes de
