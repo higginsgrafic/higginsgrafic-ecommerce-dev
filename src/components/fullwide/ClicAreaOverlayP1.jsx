@@ -35,7 +35,17 @@ function ClicAreaOverlayP1({ src, highlightAll, highlightIndices, tshirtColor, d
     if (!root) return;
     const set = new Set(Array.isArray(highlightIndices) ? highlightIndices : []);
     const disabledSet = new Set(Array.isArray(disabledIndices) ? disabledIndices : []);
-    const paths = root.querySelectorAll('.tshirt-outline');
+    // LES SILUETES ES PODEN DIR DE DUES MANERES (27/09/2026). El full nou de
+    // l'amo porta `id="_1".."_14"` i no la classe `tshirt-outline`: sense
+    // aixo el CSS no els tocava i les siluetes es pintaven amb el seu propi
+    // color (`rgb(0,145,255)`) damunt de tota la franja. Si no n'hi ha cap
+    // amb la classe, s'hi posa als camins del full.
+    let paths = root.querySelectorAll('.tshirt-outline');
+    if (!paths.length) {
+      const tots = [...root.querySelectorAll('path')].filter((x) => x.getAttribute('d'));
+      tots.forEach((x) => x.classList.add('tshirt-outline'));
+      paths = tots;
+    }
     paths.forEach((p, i) => {
       if (set.has(i)) p.classList.add('is-highlighted');
       else p.classList.remove('is-highlighted');

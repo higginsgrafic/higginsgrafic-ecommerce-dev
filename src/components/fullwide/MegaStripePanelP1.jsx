@@ -19,7 +19,7 @@ import {
 import { VECTOR_FRANJA_SAMARRETES, VECTOR_FRANJA_SAMARRETES_01, VECTOR_FRANJA_VIEWBOX, VECTOR_FRANJA_VIEWBOX_OBERT, VECTOR_FRANJA_CONTINGUT } from '../../config/vectorFranja.js';
 import { desplacamentFranjaEscriptori } from '../../utils/mesuraMegaslide.js';
 import { carrilPx, getBeltWidth, escalaMegaslide } from '../../utils/layoutMetrics.js';
-import { precarregaSiluetesSamarreta, textSiluetesSamarreta } from './siluetesSamarreta.js';
+import { caminsSiluetes, precarregaSiluetesSamarreta, textSiluetesSamarreta } from './siluetesSamarreta.js';
 import useEscalaFranjaCarril from '../../hooks/useEscalaFranjaCarril.js';
 import {
   AJUST_FRANJA_ESCRIPTORI_PX,
@@ -106,8 +106,18 @@ function generaMascaraBuidesDataUrl(text, emptyTileIndices, shirtColor) {
   if (!text) return null;
   try {
     const doc = new DOMParser().parseFromString(text, 'image/svg+xml');
+    // LA MIDA DEL FITXER, PER ATRIBUT (27/09/2026): el full nou porta
+    // `width="100%"` i, com a mascara CSS, un SVG sense mida intrinseca no te
+    // proporcio. Vegeu `generaVelDataUrl`.
+    const vbP1 = (doc.documentElement.getAttribute('viewBox') || '').trim().split(/[\s,]+/).map(Number);
+    if (Number.isFinite(vbP1[2]) && Number.isFinite(vbP1[3])) {
+      doc.documentElement.setAttribute('width', String(vbP1[2]));
+      doc.documentElement.setAttribute('height', String(vbP1[3]));
+    }
     const emptySet = new Set(Array.isArray(emptyTileIndices) ? emptyTileIndices : []);
-    const paths = [...doc.querySelectorAll('.tshirt-outline')];
+    // ELS CAMINS DEL FULL, AMB CLASSE O AMB `id="_1".."_14"` (27/09/2026):
+    // vegeu `caminsSiluetes`.
+    const paths = caminsSiluetes(doc);
     const isWhite = !shirtColor || shirtColor === '#FFFFFF';
     const emptyOpacity = isWhite ? '0.3' : '0.1';
     // UN SOL GRUP PER OPACITAT (27/09/2026): el ROMBE.

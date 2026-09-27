@@ -15,7 +15,7 @@ import {
   VEL_SAMARRETA_BUIDA_ALFA_BLANCA,
 } from '../../config/stripeCalibrationsVertical';
 import { carrilPx } from '../../utils/layoutMetrics.js';
-import { precarregaSiluetesSamarreta, textSiluetesSamarreta } from './siluetesSamarreta.js';
+import { caminsSiluetes, precarregaSiluetesSamarreta, textSiluetesSamarreta } from './siluetesSamarreta.js';
 import useEscalaFranjaCarril from '../../hooks/useEscalaFranjaCarril.js';
 import useArrossegamentPas from '../../hooks/useArrossegamentPas.js';
 import {
@@ -190,13 +190,48 @@ function generaVelDataUrl(text, opacitats, color = 'white', celles = null) {
     const doc = new DOMParser().parseFromString(text, 'image/svg+xml');
     const svg = doc.documentElement;
     const NS = 'http://www.w3.org/2000/svg';
-    const paths = [...doc.querySelectorAll('.tshirt-outline')];
-    if (!paths.length) return null;
+    // ELS CAMINS DEL FULL, AMB CLASSE O AMB `id="_1".."_14"` (27/09/2026):
+    // vegeu `caminsSiluetes`.
+    const paths = caminsSiluetes(doc);
+    if (paths.length < 14) return null;
     const vb = (svg.getAttribute('viewBox') || '').trim().split(/[\s,]+/).map(Number);
     const vbW = Number.isFinite(vb[2]) ? vb[2] : Number(svg.getAttribute('width')) || 2866;
     const vbH = Number.isFinite(vb[3]) ? vb[3] : Number(svg.getAttribute('height')) || 307;
+    // LA MIDA DEL FITXER, PER ATRIBUT (27/09/2026). El full nou de l'amo porta
+    // `width="100%" height="100%"` i un `viewBox`: un SVG aixi no te mida
+    // intrinseca, i el vel (que es pinta amb `height:100%; width:auto`) es
+    // podria quedar sense amplada. El `data:` URL ha de portar la mida del
+    // viewBox.
+    svg.setAttribute('width', String(vbW));
+    svg.setAttribute('height', String(vbH));
     const capses = Array.isArray(celles) && celles.length === 14 ? celles : null;
-    // El cami de la SAMARRETA SENCERA (amb manigues): el de la primera casa.
+    // LA SILUETA DE CADA CASA ES LA SEVA (27/09/2026): EL ROMBE.
+    //
+    // El full (`full-clic-area-5.svg`) porta les catorze siluetes JA col·locades
+    // com son a la imatge de la franja (2866x307, la mateixa mida que el full):
+    //
+    //   - la casa 0 es la SAMARRETA SENCERA (`clic-area-1.svg`), amb les dues
+    //     manigues: 305,56 x 306,03 unitats;
+    //   - les cases 1 a 13 son la forma ESTRETA (`clic-area-2-14.svg`), la que
+    //     es veu de debò a la imatge (mesurada amb el color de cada samarreta: el
+    //     97-99% de la tinta de cada casa cau dins de la SEVA silueta i el
+    //     99,4-99,9% de la silueta cau sobre la seva tinta).
+    //
+    // Abans es feia servir NOME'S el cami de la casa 0 i s'escalava a la CASella
+    // de cada casa. La casella fa 305,56 unitats d'amplada amb un pas de 196,9,
+    // o sigui que la silueta de la casa 0 escalada a la casella de la casa i
+    // queia 63,9 unitats a l'esquerra de la silueta de debò: el vel cobria el
+    // COS de la casa velada del costat i, com que la mascara hi pintava la
+    // silueta NEGRA de la casa activa (tambe escalada a la casella), hi deixava
+    // el ROMBE sense vel. El retall al cos (`finestraCosVel`) era el pedaç que
+    // el tapava a mitges.
+    //
+    // Ara, a la franja apaïsada (una filera) les siluetes es fan servir TAL COM
+    // SON al full (`celles` nul): cada casa cobreix exactament la seva tinta i
+    // no cal cap retall, perque les siluetes son les de la imatge i no es
+    // trepitgen. El cami de la casa 0 escalat a la casella NOME'S es fa servir a
+    // la vista vertical, on la imatge es de DUES fileres i les caselles son una
+    // graella de 7x2 (`celles`), que es on el full d'una filera no serveix.
     const cami = paths[0].getAttribute('d');
     // On va la silueta de cada casa: a la seva casella (si ens la passen) o a on
     // era al full.
@@ -226,6 +261,15 @@ function generaVelDataUrl(text, opacitats, color = 'white', celles = null) {
     };
     const nouCami = (i) => {
       const p = doc.createElementNS(NS, 'path');
+      if (!capses) {
+        // LA SEVA silueta, tal com es al full (ja es a lloc).
+        const orig = paths[i];
+        if (!orig) return null;
+        p.setAttribute('d', orig.getAttribute('d'));
+        const tr = orig.getAttribute('transform');
+        if (tr) p.setAttribute('transform', tr);
+        return p;
+      }
       p.setAttribute('d', cami);
       const t = transformDe(i);
       if (t) p.setAttribute('transform', t);
@@ -237,16 +281,14 @@ function generaVelDataUrl(text, opacitats, color = 'white', celles = null) {
     // color si (l'amo veia una taca blanca a la primera samarreta ACTIVA, «el
     // canto esquerre»). La mascara porta les siluetes de les cases actives en
     // negre sobre fons blanc: on mana una samarreta activa, no hi ha vel.
-    // EL VEL NOME'S A LA SAMARRETA QUE ES VEU, I LA MASCARA NOME'S AL COS
-    // (26/09/2026).
     //
-    // Les samarretes es trepitgen (les manigues) i, en una interseccio, la que
-    // es veu es la ULTIMA pintada (la de mes a la dreta). La mascara es pinta
-    // casa per casa, en ordre, amb la silueta blanca si la casa demana vel i
-    // negra si es activa: com que l'ultima que es pinta es la que queda, la
-    // mascara val el que val la samarreta que es veu a cada pixel. Pero les
-    // siluetes NEGRES van retallades al cos de casa seva (vegeu mes avall),
-    // perque la maniga de la casa activa no esborri el vel de la veina.
+    // DES DEL 27/09/2026 LES SILUETES SON LES DE LA IMATGE i la mascara es pinta
+    // casa per casa, en ordre, amb la silueta BLANCA si la casa demana vel i
+    // NEGRA si es activa. Com que cada silueta es la tinta que es veu de la seva
+    // casa (no es trepitgen, o gairebe), la mascara val el que val la samarreta
+    // que es veu a cada pixel i NOME'S cal el retall al cos (`finestraCosVel`)
+    // quan les siluetes son les de la casella (la vista vertical), que allà si
+    // que son mes amples que la tinta.
     const inactives = [];
     for (let i = 0; i < 14; i++) { if (typeof mapa[i] === 'number') inactives.push(i); }
     let idMascara = null;
@@ -269,41 +311,35 @@ function generaVelDataUrl(text, opacitats, color = 'white', celles = null) {
       mask.appendChild(fons);
       // LA SILUETA NEGRA, NOME'S EL COS DE LA SEVA CASA (26/09/2026).
       //
-      // La mascara es pinta casa per casa, en ordre, amb la silueta BLANCA si
-      // la casa demana vel i NEGRA si es activa: com que l'ultima pintada es la
-      // que queda, la mascara val el que val la samarreta que es veu a cada
-      // pixel (aixo va treure la taca blanca sobre el tint d'una samarreta
-      // activa). Pero la silueta NEGRA d'una casa activa tambe fa 305,56
-      // unitats dins d'una casella de 241,71: la seva MANIGA surt de casa i
-      // esborrava el vel de la casa velada del costat. Com que el forat cau a
-      // l'intersseccio de les dues siluetes, hi quedava un rombe sense vel (ho
-      // ha vist l'amo, i nome's a les samarretes velades).
-      //
-      // Ara les siluetes NEGRES es retallen a la finestra del COS de la seva
-      // casa (`finestraCosVel`): la casa activa segueix protegint el seu cos,
-      // que es on hi ha el tint, i la seva maniga ja no toca el vel de la
-      // veina. El vel (les siluetes blanques) NO es retalla: ha de cobrir tota
-      // la samarreta, manigues incloses.
+      // Nomes amb les caselles (la vista vertical): alla la silueta d'una casa
+      // es la samarreta sencera escalada a la casella, i la seva MANIGA surt de
+      // casa i esborrava el vel de la casa velada del costat. El retall a la
+      // finestra del COS de la seva casa ho evita. Amb les siluetes del full
+      // (la franja apaïsada) no cal: cada silueta ja es la tinta de la seva
+      // casa.
       const idRetallCos = `${idMascara}Cos`;
-      const defsRetall = doc.createElementNS(NS, 'clipPath');
-      defsRetall.setAttribute('id', idRetallCos);
-      defsRetall.setAttribute('clipPathUnits', 'userSpaceOnUse');
-      for (let i = 0; i < 14; i++) {
-        const f = finestraCosVel(caixaDe(i));
-        if (!f) continue;
-        const r = doc.createElementNS(NS, 'rect');
-        r.setAttribute('x', f.x.toFixed(3));
-        r.setAttribute('y', f.y.toFixed(3));
-        r.setAttribute('width', f.w.toFixed(3));
-        r.setAttribute('height', f.h.toFixed(3));
-        defsRetall.appendChild(r);
+      if (capses) {
+        const defsRetall = doc.createElementNS(NS, 'clipPath');
+        defsRetall.setAttribute('id', idRetallCos);
+        defsRetall.setAttribute('clipPathUnits', 'userSpaceOnUse');
+        for (let i = 0; i < 14; i++) {
+          const f = finestraCosVel(caixaDe(i));
+          if (!f) continue;
+          const r = doc.createElementNS(NS, 'rect');
+          r.setAttribute('x', f.x.toFixed(3));
+          r.setAttribute('y', f.y.toFixed(3));
+          r.setAttribute('width', f.w.toFixed(3));
+          r.setAttribute('height', f.h.toFixed(3));
+          defsRetall.appendChild(r);
+        }
+        defs.appendChild(defsRetall);
       }
-      defs.appendChild(defsRetall);
       for (let i = 0; i < 14; i++) {
         const casa = nouCami(i);
+        if (!casa) continue;
         const esVelada = typeof mapa[i] === 'number';
         casa.setAttribute('fill', esVelada ? '#FFFFFF' : '#000000');
-        if (esVelada) {
+        if (esVelada || !capses) {
           mask.appendChild(casa);
         } else {
           const g = doc.createElementNS(NS, 'g');
@@ -320,24 +356,20 @@ function generaVelDataUrl(text, opacitats, color = 'white', celles = null) {
     for (const p of paths) p.remove();
     // EL VEL ES COMPOSA UNA SOLA VEGADA (27/09/2026): el ROMBE.
     //
-    // Les siluetes de cases veines ES TREPITGEN: el cos de cada casa fa 305,56
-    // unitats i el pas entre cases nome's 196,9, o sigui que la maniga d'una
-    // casa arriba a la casa del costat (108,66 unitats de solapament). Amb una
-    // opacitat per CAMI, alla on es trepitgen el blanc es composava DOS cops
-    // (0,6 + 0,6 = 0,84) i hi quedava un ROMBE mes blanc a la cantonada de la
-    // samarreta. La forma del rombe es exactament la interseccio de les dues
-    // siluetes.
-    //
-    // Mesurat a 1920x946 amb un color de samarreta triat (captura a 3x, el
-    // solapament de les cases 0 i 1): 215 de lluminositat al rombe contra 136
-    // al cos de la mateixa samarreta; amb la samarreta blanca, 253 contra 251
-    // (per aixo nome's es veu amb el color triat).
+    // Amb una opacitat a CADA cami, alla on dues siluetes es trepitgen el blanc
+    // es composava DOS cops (0,6 + 0,6 = 0,84 en comptes de 0,6) i hi quedava un
+    // ROMBE mes clar, de la forma exacta de la interseccio. Mesurat a 1920x946
+    // amb un color de samarreta triat (captura a 3x): 215 de lluminositat al
+    // rombe contra 136 al cos de la mateixa samarreta; amb la samarreta blanca,
+    // 253 contra 251 (per aixo nome's es veu amb el color triat).
     //
     // La solucio es posar totes les siluetes del MATEIX gruix en UN sol grup
-    // amb `opacity` (opacitat de GRUP: el grup es composa sencer una vegada i
-    // el solapament de dins no compta), en comptes d'una opacitat per cami.
-    // El `mask` de sempre va al grup: la mascara diu, pixel a pixel, quina
-    // samarreta es veu, i aixo no canvia.
+    // amb `opacity` (opacitat de GRUP: el grup es composa sencer una vegada i el
+    // solapament de dins no compta), en comptes d'una opacitat per cami. El
+    // `mask` de sempre va al grup: la mascara diu, pixel a pixel, quina
+    // samarreta es veu, i aixo no canvia. Amb les siluetes de la casella (la
+    // vista vertical) el solapament es gran i aixo es imprescindible; amb les
+    // del full (la franja apaïsada) n'hi ha poc, pero la regla es la mateixa.
     const grups = new Map();
     for (let i = 0; i < 14; i++) {
       const op = mapa[i];
@@ -352,7 +384,8 @@ function generaVelDataUrl(text, opacitats, color = 'white', celles = null) {
         grups.set(clau, g);
         pareOriginal.appendChild(g);
       }
-      g.appendChild(nouCami(i));
+      const p = nouCami(i);
+      if (p) g.appendChild(p);
     }
     const serialized = new XMLSerializer().serializeToString(doc.documentElement);
     return `data:image/svg+xml,${encodeURIComponent(serialized)}`;
@@ -524,7 +557,12 @@ function MegaStripePanel({
   const clauCelles = Array.isArray(rectsMascara) && rectsMascara.length === 14
     ? rectsMascara.map((r) => `${r.left},${r.top},${r.width},${r.height}`).join('|')
     : '';
-  const emptyShirtMaskUrl = useEmptyShirtMask(emptyTileIndices, shirtColor, rectsMascara);
+  // LES CASELLES NOME'S MANEN A LA VISTA VERTICAL (27/09/2026). A la franja
+  // apaisada el full de siluetes ja te cada samarreta al seu lloc (la mateixa
+  // mida que la imatge) i escalar-la a la casella la desplaçava 63,9 unitats:
+  // era el rombe. Vegeu `generaVelDataUrl`.
+  const cellesVel = isPortraitTablet ? rectsMascara : null;
+  const emptyShirtMaskUrl = useEmptyShirtMask(emptyTileIndices, shirtColor, cellesVel);
 
   // El vel de les samarretes inactives (vegeu la prop). Nomes a l'apaisat: alla
   // la franja es UNA sola imatge amb les catorze samarretes i no hi ha cap
@@ -542,7 +580,7 @@ function MegaStripePanel({
   if (!isPortraitTablet) {
     for (const i of inactivesVel) mapaVelInactives[i] = alfaVelSamarretaInactiva;
   }
-  const velSamarretesInactivesUrl = useVelSamarretes(mapaVelInactives, `${clauVelInactives}|${alfaVelSamarretaInactiva}|${clauCelles}`, 'white', rectsMascara);
+  const velSamarretesInactivesUrl = useVelSamarretes(mapaVelInactives, `${clauVelInactives}|${alfaVelSamarretaInactiva}|${clauCelles}`, 'white', cellesVel);
   const idMascaraVelActives = `hgVelForaActives-${idRetall}`;
 
   useEffect(() => {
