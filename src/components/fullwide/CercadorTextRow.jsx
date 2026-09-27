@@ -1214,7 +1214,7 @@ export function CercadorColleccionsColumna({
         boxSizing: 'border-box',
         // EL CONTENIDOR, COM EL DEL SELECTOR (radi exterior d'11 px).
         border: '1px solid #D1D5DB',
-        borderRadius: '5.5px',
+        borderRadius: '5.3px',
         backgroundColor: '#F3F4F6',
         overflow: 'hidden',
       }}

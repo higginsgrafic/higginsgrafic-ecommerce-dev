@@ -181,7 +181,7 @@ export function FirstContactDibuix00Buttons({
         // que sobre fons blanc no es veu. L'amo els ha demanat de tornada, amb
         // les proporcions noves (la meitat d'amplada, el doble d'alçada).
         border: '1px solid #D1D5DB',
-        borderRadius: '5.5px',
+        borderRadius: '5.3px',
         backgroundColor: '#F3F4F6',
         boxSizing: 'border-box',
         overflow: 'hidden',

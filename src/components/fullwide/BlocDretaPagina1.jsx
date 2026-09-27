@@ -67,7 +67,7 @@ export function SelectorQuadratPagina1({
       data-stripe-buttonbar="bn-p1"
       style={{
         border: '1px solid #D1D5DB',
-        borderRadius: '5.5px',
+        borderRadius: '5.3px',
         backgroundColor: '#F3F4F6',
         boxSizing: 'border-box',
         overflow: 'hidden',
