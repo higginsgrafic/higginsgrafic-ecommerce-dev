@@ -1177,3 +1177,37 @@ graella **22,5 px** (−1018,5 → −1041,0 → −1163,5); abans es quedava a 
 Bateria del tancament (arbre net): 581 proves (45 fitxers), eslint amb els
 comptes de `HEAD`, `vite build` OK, `compara-vistes` OK, `mesura-formats` 0 i 0,
 `_tmp-errors2` cap error i `_tmp-ancoratge` TOT AL SEU LLOC.
+
+### VOLTA 15 — El rombe que quedava: la silueta de cada casa (27/09/2026)
+
+L'amo ho va veure a la franja de la p2 amb CUBE actiu i el color light-blue:
+«Encara queden rombes». La VOLTA 14 n'havia tret un (el blanc composat dos cops)
+pero en quedava un altre, i la causa era una altra.
+
+**CAUSA.** El vel feia servir NOME'S el cami de la casa 0 (la samarreta sencera)
+i l'escalava a la CASELLA de cada casa. El full, pero, ja porta les catorze
+siluetes al seu lloc: la casa 0 es la samarreta sencera (`clic-area-1.svg`,
+305,56) i les cases 1 a 13 son la forma estreta (`clic-area-2-14.svg`, 241,71).
+La casella fa 305,56 amb un pas de 196,9, o sigui que la silueta escalada queia
+63,9 unitats a l'esquerra: tapava el COS de la casa velada del costat i la
+mascara hi deixava el rombe sense vel. El retall al cos (`finestraCosVel`) era el
+pedaç.
+
+**FET.** A la franja apaïsada es fan servir les catorze siluetes tal com son al
+full (sense escalat ni casella ni retall); el cami de la casa 0 escalat a la
+casella es queda nome's a la vista vertical (dues fileres, graella 7x2).
+
+**XIFRES.** Al rombe el vel no hi era (189/187 de lluminositat contra 228 a la
+resta de la samarreta velada); ara 228 a tot arreu. Prova automatica
+(`scripts/_tmp-vel-check.mjs`) amb cinc colleccions: totes les cases velades al
+100% i totes les actives al 0%.
+
+**TAMBE.** El full nou de l'amo (`id="_1".."_14"`, sense `class="tshirt-outline"`)
+deixava el vel sense siluetes i pintava les arees de clic de blau: ara es trien
+els camins de les dues maneres (`caminsSiluetes`), la classe s'hi afegeix a les
+arees de clic si falta i el `data:` URL del vel porta la mida del viewBox.
+I **DECISIO de l'amo**: la p1 no ha de tenir vel de colleccions inactives
+(quan es clica un dibuix s'omplen totes les samarretes).
+
+Commits `722d62e` (els fulls nous) i `9b51f31` (el vel amb la silueta de cada
+casa).
