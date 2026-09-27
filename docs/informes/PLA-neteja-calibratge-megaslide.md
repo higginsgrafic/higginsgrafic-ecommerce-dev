@@ -1254,6 +1254,9 @@ Bateria del tancament: 588 proves (45 fitxers), eslint amb els comptes de
 `_tmp-errors2` cap error i `_tmp-ancoratge` TOT AL SEU LLOC (referències
 actualitzades −23,4 px).
 
+> Aquesta volta va quedar a mitges: el mateix dia en Marc va demanar alinear la
+> p1 i el coixí va tornar a pujar. **Vegeu la VOLTA 18**, que és l'estat bo.
+
 ### VOLTA 17 — El dibuix de les samarretes velades, en negre (28/09/2026)
 
 En Marc: «Quan les samarretes velades tenen a sota un color blanc o un de color no
@@ -1287,3 +1290,57 @@ marcs de DARCY).
 Bateria del tancament: 594 proves (46 fitxers), eslint amb els comptes de `HEAD`,
 `vite build` OK, `compara-vistes` OK, `mesura-formats` 0 i 0, `_tmp-errors2` cap
 error i `_tmp-ancoratge` TOT AL SEU LLOC.
+
+### VOLTA 18 — Les dues tires de samarretes, alineades pel top (28/09/2026)
+
+En Marc, just després de la volta anterior: «quan tinguis la p2, alinea la p1», i
+quan li vaig preguntar què volia dir exactament (les xifres xocaven entre elles)
+va triar **les dues coses**: que la p1 també tingui 30 px d'aire a dalt i que les
+dues franges quedin exactament a la mateixa alçada.
+
+**EL QUE S'ALINIAVA.** Fins ara el bucle `alignTopRowToPage1` posava la filera de
+la p2 perquè el seu **botó Color** caigués on cau el de la p1. Com que la graella
+de la p1 fa 110 px d'alçada i la de la p2 95,2, amb els botons Color al mateix
+lloc els tops de les dues tires de samarretes queien **8,5 px desquadrats**
+(74,5 contra 83,0) i l'aire de dalt de la p1 no podia ser mai el de la p2.
+
+**FET.** A l'escriptori i al portàtil el bucle alinea les **dues graelles pel top**
+(`[data-carrusel="1"]` de cada pàgina, sense descomptar el centratge del selector,
+que no les mou); a la vista vertical mana el botó Color, com sempre. El coixí de
+dalt del panell passa de 8,6 a **17,1 px** (30 − 12,9, que és el top propi de la
+filera de la p1 dins el contingut del panell). I `PAGINA1_AJUST_FRANJA_PX` passa de
+112,8 a **113,4**: la franja de la p1 queia 0,6 px per sota de la de la p2 (que
+clava la seva fórmula declarada) i ara queden a la mateixa alçada.
+
+**XIFRES (1920x946).**
+
+| peça | abans | ara |
+|---|---|---|
+| graella de la p1 (top) | 97,9 | **83,0** |
+| graella de la p2 (top) | 106,9 | **83,0** |
+| aire de dalt (les dues) | 44,9 / 53,4 | **30,0 / 30,0** |
+| franja p1 / p2 | 241,5 | 226,6 / **226,5** |
+| selector de la p2 | 111,9 | 88,0 |
+| columna de la p2 | 111,9 .. 354,5 (242,6) | 88,0 .. 339,6 (**251,6**) |
+| fletxes de la p1 | 207,9 | 193,0 |
+| final del megaslide | 386 | **370,1** |
+| aire de baix (les dues) | 30,9 / 31,5 | **30,5 / 30,5** |
+
+`P1_STRIPE_BOTTOM_GAP` passa de 30 a **29,5**: la fórmula no comptava ni
+l'arrodoniment de l'alçada de la guarda (fins a 0,5 px) ni la vora inferior del
+panell (1 px), i amb 30 l'aire mesurat era 31,5.
+
+**El que es guanya**: el megaslide fa **15,9 px menys** (386 → 370,1) i les dues
+pàgines arrenquen al mateix lloc. **El que es perd**: el botó Color de les dues
+pàgines ja no cau exactament al mateix lloc (8,5 px de diferència, que és la
+meitat de la diferència d'alçada de les dues graelles); ho va acceptar
+explícitament en triar «les dues coses».
+
+**Efecte secundari, mesurat**: la columna de col·leccions de la p2 fa 9 px més
+(242,6 → 251,6) perquè va del top del selector al bottom de la franja i el
+selector ha pujat amb la graella.
+
+Bateria del tancament: 595 proves (46 fitxers), eslint amb els comptes de `HEAD`,
+`vite build` OK, `compara-vistes` OK (les mateixes xifres que abans del canvi),
+`mesura-formats` 0 i 0, `_tmp-errors2` cap error i `_tmp-ancoratge` TOT AL SEU
+LLOC (referències actualitzades).

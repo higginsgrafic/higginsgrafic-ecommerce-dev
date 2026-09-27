@@ -4,19 +4,23 @@
 // embolicar la troca: es passa abans i despres de cada canvi.
 import { chromium } from '@playwright/test';
 // valors de referencia (1920x946) del 26/09/2026
-// (28/09/2026: tot el contingut de les dues pagines puja 23,4 px pel retall del
-// coixi de dalt del panell —30 px d'aire a la pagina 2— i aixo es nota a la
-// segona xifra de cada peça.)
+// (28/09/2026: el coixi de dalt del panell va canviar dues vegades el mateix
+// dia. Primer es va retallar 23,4 px per deixar 30 px d'aire a la pagina 2, i
+// despres es va tornar a apujar 8,5 px perque la p1 tambe en tingués 30 (les
+// dues tires de samarretes alineades pel top, `alignTopRowToPage1`). El coixi
+// es ara 17,1 px i el contingut de les dues pagines arrenca a 83: 30,0 px
+// d'aire. La columna de la p2 fa 9 px mes perque el seu selector puja amb la
+// graella.)
 const REF = {
   'p2 carril': [381, 1524],
-  'p2 selector': [381, 88.5, 59.5, 119],
-  'p2 columna': [1395.3, 88.5, 128.7, 242.6],
-  'p2 graella': [450.4, 83.5, 939.4, 95.2],
-  'p2 franja': [357.9, 218.1, 1055.1, 113],
-  'p1 graella': [381, 74.5, 1023, 110],
-  'p1 bloc dreta': [1414, 74.5, 110, 220],
-  'p1 franja': [357.9, 218.1, 1055.1, 113],
-  'p1 fletxes': [1414, 184.5, 110, 110],
+  'p2 selector': [381, 88, 59.5, 119],
+  'p2 columna': [1395.3, 88, 128.7, 251.6],
+  'p2 graella': [450.4, 83, 939.4, 95.2],
+  'p2 franja': [357.9, 226.5, 1055.1, 113],
+  'p1 graella': [381, 83, 1023, 110],
+  'p1 bloc dreta': [1414, 83, 110, 220],
+  'p1 franja': [357.9, 226.6, 1055.1, 113],
+  'p1 fletxes': [1414, 193, 110, 110],
 };
 const b = await chromium.launch();
 const ctx = await b.newContext({ viewport: { width: 1920, height: 946 }, deviceScaleFactor: 1 });

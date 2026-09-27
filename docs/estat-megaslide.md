@@ -1768,3 +1768,27 @@ variant **negra** i la franja el pinta a opacitat plena; el vel es queda a la
 roba. Els dibuixos que **només existeixen en color** (els solids i els marcs de
 LOOKING FOR MY DARCY) no es toquen: la funció només canvia el camí si la versió
 negra és diferent de la de sempre.
+
+### Les dues tires de samarretes, alineades pel top (35) — FET (28/09/2026)
+
+Després de l'aire de 30 px de la p2, en Marc va demanar «alinea la p1» i va triar
+les dues coses: la p1 també amb 30 px d'aire i les dues franges exactament a la
+mateixa alçada.
+
+El que s'aliniava era el **botó Color** de les dues pàgines, i com que la graella
+de la p1 fa 110 px i la de la p2 95,2 els tops queien 8,5 px desquadrats. Ara, a
+l'escriptori i al portàtil, el bucle `alignTopRowToPage1` alinea les **dues
+graelles pel top** (`[data-carrusel="1"]`); a la vertical mana el botó Color, com
+sempre.
+
+| peça (1920x946) | abans | ara |
+|---|---|---|
+| graella p1 / p2 (top) | 97,9 / 106,9 | **83,0 / 83,0** |
+| aire de dalt (les dues) | 44,9 / 53,4 | **30,0 / 30,0** |
+| franja p1 / p2 | 241,5 | 226,6 / **226,5** |
+| columna de la p2 | 242,6 px | **251,6 px** |
+| final del megaslide | 386 | **370,1** |
+
+El coixí de dalt del panell passa a 17,1 px, `PAGINA1_AJUST_FRANJA_PX` a 113,4 i
+`P1_STRIPE_BOTTOM_GAP` a 29,5 (l'aire de baix mesurat és 30,5 a les dues).
+**Cost acceptat**: el botó Color de les dues pàgines queda 8,5 px desquadrat.

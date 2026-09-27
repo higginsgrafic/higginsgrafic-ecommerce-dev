@@ -511,27 +511,38 @@ describe('els ajustos de la columna de colleccions (27/09/2026)', () => {
   });
 });
 
-describe("l'aire de 30 px de la pagina 2 (28/09/2026)", () => {
-  it('el coixi de dalt del panell a l escriptori es 8,6 (els 30 px menys els 21,4 de la filera)', () => {
-    // Ho va demanar en Marc: 30 px del bottom del header al top de la pagina 2.
-    // L'aire es el coixi del panell mes el top propi de la filera de la pagina 2
-    // dins el contingut del panell (el retall començava a 106,4 i el contingut a
-    // 85: 21,4 px). El coixi era el `py-8` (32), i per deixar l'aire a 30 cal
-    // 30 - 21,4 = 8,6.
-    expect(PADDING_DALT_PANELL_ESCRIPTORI_PX).toBeCloseTo(8.6, 2);
+describe("l'aire de 30 px de les dues pagines (28/09/2026)", () => {
+  it('el coixi de dalt del panell a l escriptori es 17,1 (els 30 px menys els 12,9 de la filera de la p1)', () => {
+    // Ho va demanar en Marc en dos temps: primer 30 px d'aire a la p2 i, tot
+    // seguit, «quan tinguis la p2, alinea la p1» (les dues coses: la p1 tambe
+    // amb 30 px i les dues franges a la mateixa alcada).
+    //
+    // L'aire es el coixi del panell mes el top propi de la filera dins el
+    // contingut del panell. Amb les DUES tires de samarretes alineades pel top
+    // (`alignTopRowToPage1`), el top de la filera es el de la p1 (12,9 px
+    // mesurats a 1920: la graella arrencava a 74,5 amb el contingut a 61,6) i el
+    // coixi ha de ser 30 - 12,9 = 17,1.
+    expect(PADDING_DALT_PANELL_ESCRIPTORI_PX).toBeCloseTo(17.1, 2);
   });
 
-  it('el coixi vertical de l escriptori es 8,6 + 32 = 40,6 (el de sempre es 64)', () => {
+  it('el coixi vertical de l escriptori es 17,1 + 32 = 49,1 (el de sempre es 64)', () => {
     expect(PADDING_BAIX_PANELL_PX).toBe(32);
     expect(PADDING_VERTICAL_PANELL_PX).toBe(64);
-    expect(PADDING_VERTICAL_PANELL_ESCRIPTORI_PX).toBeCloseTo(40.6, 2);
+    expect(PADDING_VERTICAL_PANELL_ESCRIPTORI_PX).toBeCloseTo(49.1, 2);
   });
 
-  it('i amb aixo el contingut de les dues pagines puja 23,4 px (de 53,4 a 30)', () => {
-    const retall = 32 - PADDING_DALT_PANELL_ESCRIPTORI_PX;
-    expect(retall).toBeCloseTo(23.4, 2);
-    // L'aire de dalt de la pagina 2 al navegador: 106,4 - 53 = 53,4 abans,
-    // 83 - 53 = 30,0 despres (mesurat el 28/09/2026 amb `_tmp-aire-final.mjs`).
-    expect(53.4 - retall).toBeCloseTo(30, 1);
+  it('i amb aixo el contingut de les dues pagines arrenca a 83: 30,0 px d aire', () => {
+    // Mesurat el 28/09/2026 amb `_tmp-aire-final.mjs` i `_tmp-ancoratge.mjs`:
+    // la graella de la p1 i la de la p2 arrenquen totes dues a 83,0 (el header
+    // acaba a 53,0) i les franges queden a 226,6 i 226,5.
+    const headerBaix = 53;
+    const graellaTop = 83;
+    expect(graellaTop - headerBaix).toBeCloseTo(30, 1);
+  });
+
+  it('el descompte de la franja de la p1 es 113,4 (les dues franges, a la mateixa alcada)', () => {
+    // Amb 112,8 la franja de la p1 queia 0,6 px per sota de la de la p2 (que
+    // clava la seva formula declarada). Amb 113,4 queden a 226,6 i 226,5.
+    expect(PAGINA1_AJUST_FRANJA_PX).toBeCloseTo(113.4, 2);
   });
 });

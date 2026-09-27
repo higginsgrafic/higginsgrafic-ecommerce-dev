@@ -24,7 +24,14 @@ const MegaslidePagina4 = lazy(() => import('../megaslide/MegaslidePagina4.jsx'))
 
 // Pàgina 1: espai que queda entre la vora inferior de les samarretes i la vora
 // inferior del panell. Aquest és el número a retocar si en vol més o menys.
-const P1_STRIPE_BOTTOM_GAP = 30;
+//
+// 29,5 i no 30 (28/09/2026): el número és l'espai DECLARAT, pero el que es
+// mesura al navegador porta dos afegits que la formula no compta —l'arrodoniment
+// de l'alçada de la guarda (fins a 0,5 px) i la vora inferior del panell (1 px)
+// —, i amb 30 l'aire mesurat era 31,5. Amb 29,5 l'aire que es veu entre les
+// samarretes i el final del megaslide és 30,0 (a les dues pàgines, que des del
+// 28/09/2026 tenen les franges exactament a la mateixa alçada).
+const P1_STRIPE_BOTTOM_GAP = 29.5;
 
 // Marge extra de la pestanya del megaslide a l'escriptori: les graelles de la
 // banda estreta s'han menjat el coixí que quedava sota les samarretes i cal
@@ -152,12 +159,12 @@ export default function MegaMenuPanel({
   const esEscriptoriAqui = !esVerticalAqui && !esApaissadaAqui && !esMobilAqui;
   // EL COIXI DE DALT DEL PANELL, RETALLAT A L'ESCRIPTORI (28/09/2026).
   //
-  // L'amo va demanar 30 px d'aire entre el bottom del header i el top del
-  // contingut de la pagina 2, i 30 px mes entre el seu bottom i el final del
-  // megaslide, per alliberar espai per a la TDP i per a la hero. El coixi de
-  // dalt es compartit per les dues pagines (i la filera de la pagina 2 va
-  // lligada al selector de la pagina 1 pel bucle `alignTopRowToPage1`), aixi
-  // que el retall es fa aqui i mou les dues. Els numeros i el perque son a
+  // En Marc va demanar 30 px d'aire entre el bottom del header i el top de les
+  // tireS de samarretes de les DUES pagines, i 30 px mes entre el seu bottom i el
+  // final del megaslide, per alliberar espai per a la TDP i per a la hero. El
+  // coixi de dalt es compartit per les dues pagines (i la filera de la pagina 2
+  // va lligada a la graella de la 1 pel bucle `alignTopRowToPage1`), aixi que el
+  // retall es fa aqui i mou les dues. Els numeros i el perque son a
   // `PADDING_DALT_PANELL_ESCRIPTORI_PX` (geometriaMegaslide.js).
   const paddingVerticalPanellPx = esEscriptoriAqui
     ? PADDING_VERTICAL_PANELL_ESCRIPTORI_PX
@@ -230,7 +237,7 @@ export default function MegaMenuPanel({
   // Retall de la pàgina 1: el panell acaba P1_STRIPE_BOTTOM_GAP px sota el
   // bottom visible de les samarretes. La mesura ve de MegaStripePanelP1 (ja hi
   // inclou l'escala de la franja i el pageLift). El coixi vertical del
-  // contenidor del panell (el `py-8`: 64 px, o 40,6 a l'escriptori des del
+  // contenidor del panell (el `py-8`: 64 px, o 49,1 a l'escriptori des del
   // retall de dalt) el descompta `alcadaPanellMegaslide`. Mentre no hi ha
   // mesura, s'usa l'alçada de sempre.
   const [p1ContentBottomPx, setP1ContentBottomPx] = useState(null);
@@ -388,8 +395,8 @@ export default function MegaMenuPanel({
           className="mx-auto max-w-[1350px] px-4 sm:px-6 lg:px-10 py-8"
           style={{
             overflow: 'visible',
-            // El coixí de dalt, retallat a l'escriptori (l'aire de la pagina 2
-            // passa de 54,4 a 30 px). El de baix no es toca, i tampoc a les
+            // El coixí de dalt, retallat a l'escriptori (l'aire de les dues
+            // pagines passa a 30 px). El de baix no es toca, i tampoc a les
             // tauletes ni al mobil, on la vertical el cancel·la amb el
             // `marginTop` de sota.
             paddingTop: esEscriptoriAqui ? `${PADDING_DALT_PANELL_ESCRIPTORI_PX}px` : undefined,

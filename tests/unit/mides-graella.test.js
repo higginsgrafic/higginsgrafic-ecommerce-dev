@@ -175,13 +175,12 @@ describe('alcadaPanellMegaslide', () => {
     expect(alcadaPanellMegaslide({ p1ContentBottom: 400, gap: 30, margeExtra: 20 })).toBe(386);
   });
 
-  it("a l'escriptori descompta el coixi retallat (8,6 + 32 = 40,6), no els 64", () => {
+  it("a l'escriptori descompta el coixi retallat (17,1 + 32 = 49,1), no els 64", () => {
     // Des del 28/09/2026 el coixi de dalt del panell es retalla a l'escriptori
-    // per deixar 30 px d'aire sobre el contingut de la pagina 2: el que es
-    // descompta passa de 64 a 39,6 i el panell fa 24,4 px mes baix. Sense aixo,
-    // el panell acabaria 24 px massa avall i l'aire de baix no seria el de
-    // `gap`.
-    expect(alcadaPanellMegaslide({ p1ContentBottom: 400, gap: 30, paddingVertical: 40.6 })).toBe(389);
+    // per deixar 30 px d'aire sobre el contingut de les dues pagines: el que es
+    // descompta passa de 64 a 49,1 i el panell fa 14,9 px menys. Sense aixo, el
+    // panell acabaria massa avall i l'aire de baix no seria el de `gap`.
+    expect(alcadaPanellMegaslide({ p1ContentBottom: 400, gap: 30, paddingVertical: 49.1 })).toBe(381);
   });
 
   it('un coixi invalid cau al de sempre (64)', () => {

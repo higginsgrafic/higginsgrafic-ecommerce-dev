@@ -259,17 +259,42 @@ export default function MegaslidePagina2({
       const page1Viewport = document.querySelector('[data-mega-page-viewport="1"]');
       const page1Selector = page1Viewport?.querySelector('button[aria-label="Color"]');
       const page2Selector = viewportRef.current?.querySelector('[data-p2-color-selector] button[aria-label="Color"]');
-      if (!page1Selector || !page2Selector) return;
+      // LES DUES TIRES DE SAMARRETES, PEL TOP (28/09/2026).
+      //
+      // En Marc: «quan tinguis la p2, alinea la p1», i ho va concretar com «les
+      // dues coses»: que la p1 tambe tingui 30 px d'aire a dalt i que les dues
+      // franges quedin exactament a la mateixa alcada. Les dues tires de
+      // samarretes (la graella de la p1 i el retall de la p2) han d'arrencar a
+      // la mateixa alcada.
+      //
+      // Fins ara el que s'alineava era el boto Color de les dues, i per aixo la
+      // graella de la p1 queia 8,5 px mes amunt: fa 110 px d'alcada i la de la
+      // p2 95,2, i amb els botons Color al mateix lloc els tops no hi poden ser.
+      //
+      // Nomes s'aplica quan les dues graelles hi son i no es la vista vertical
+      // (alla mana el boto Color, com sempre).
+      const page1Graella = page1Viewport?.querySelector('[data-carrusel="1"]');
+      const page2Graella = viewportRef.current?.querySelector('[data-carrusel="1"]');
+      const perGraelles = !!page1Graella && !!page2Graella && !isPortraitTablet;
+      if (!perGraelles && (!page1Selector || !page2Selector)) return;
 
       const alignAplicat = alignRefY.current;
       const centraAplicat = centraRefY.current;
-      const p1Top = page1Selector.getBoundingClientRect().top;
-      const p2Top = page2Selector.getBoundingClientRect().top;
+      const p1Top = perGraelles
+        ? page1Graella.getBoundingClientRect().top
+        : page1Selector.getBoundingClientRect().top;
+      const p2Top = perGraelles
+        ? page2Graella.getBoundingClientRect().top
+        : page2Selector.getBoundingClientRect().top;
 
       // 1) ALINEACIÓ (fórmula original): l'objectiu és el selector de la pàgina 1
       //    més l'offset; el centratge no hi compta perquè va a sobre.
-      const offset = (typeof window !== 'undefined' && window.innerWidth >= 768 && window.innerWidth <= 1366 && window.innerWidth >= window.innerHeight) ? 10 : 0;
-      const deltaAlign = (p1Top + offset) - (p2Top - centraAplicat);
+      //    Amb les graelles l'objectiu es la graella de la p1 i no hi ha offset:
+      //    les dues tires han d'arrencar al mateix lloc.
+      const offset = (!perGraelles && typeof window !== 'undefined' && window.innerWidth >= 768 && window.innerWidth <= 1366 && window.innerWidth >= window.innerHeight) ? 10 : 0;
+      //    (Amb el selector, el centratge del selector tambe mou el seu top i
+      //    s'ha de descomptar; amb la graella, no.)
+      const deltaAlign = (p1Top + offset) - (p2Top - (perGraelles ? 0 : centraAplicat));
 
       // 2) CENTRATGE (DECLARAT, 26/09/2026): el centre del selector ha de
       //    coincidir amb el de la filera que flanquegen el selector i les
