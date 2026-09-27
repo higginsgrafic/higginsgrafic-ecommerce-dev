@@ -330,3 +330,59 @@ vertical (768×1024 i 1024×768) comprovades amb captura.
 
 **Commits:** `722d62e` (els fulls nous de l'amo) i `9b51f31` (el vel amb la
 silueta de cada casa).
+
+---
+
+## 7. Les tres coses del vespre (27/09/2026)
+
+### 7.1 La columna de colleccions, alineada (commit `49c9905`)
+
+En Marc: «La columna ha d'anar alineada pel top al selector b/c/n i per sota al
+bottom de la stripe.»
+
+| què (1920×946) | abans | després |
+|---|---|---|
+| top de la columna | 109,9 (el selector, 111,9) | **111,9** |
+| bottom de la columna | 356,5 (la franja, 354,5) | **354,5** |
+| alçada | 246,6 | **242,6** |
+
+Amb els dos ajustos declarats `COLUMNA_TOP_AJUST_PX` i `COLUMNA_BAIX_AJUST_PX`
+(2 i 2, amb prova unitària). Comprovat a sis finestres: 0,00-0,01 px del selector
+i 0,01-0,28 px de la franja.
+
+`compara-vistes` mesurava la primera i l'última **targeta** (les nou franges
+clicables), que van 3 px endins de la columna: ara mesura la **caixa** de la
+columna, que és la que es veu.
+
+### 7.2 La tira de colors, amb scroll infinit (commit `2a90203`)
+
+La rodeta movia la tria un color endavant o enrere amb un topall a 0 i 13. Ara el
+índex dona la volta (mòdul 14): després de l'últim ve el primer i abans del
+primer, l'últim. Comprovat amb la rodeta: amb el primer triat, una volta enrere
+dona el darrer; amb el darrer, una endavant dona el primer.
+
+### 7.3 «Totes les samarretes semblen velades» (commit `4094972`)
+
+**La causa:** el full nou de l'amo (`full-clic-area-5.svg`) porta
+`style="fill:#0091ff;fill-opacity:0.5"` a **cada camí**, i el projecte fa servir
+aquest full com a **màscara de contorn** de la franja. El `style` en línia guanya
+sobre l'atribut `fill`, i la màscara quedava al 50 %: tot el contingut de la
+franja es pintava mig transparent damunt del blanc del panell. Els dibuixos no
+s'hi veien afectats perquè van per sobre.
+
+| punt (px de la franja, p1) | abans | després | la imatge |
+|---|---|---|---|
+| 33, 50 | 251 | **247** | 247 |
+| 106, 50 | 207,219,232 | **159,184,210** | 159,184,210 |
+| 140, 50 | 205,218,230 | **156,182,205** | 156,182,205 |
+| 160, 80 | 204,216,227 | **154,178,200** | 154,178,200 |
+
+**Què s'ha fet:** la màscara de la p1 treu també el `style` dels camins; la de la
+p2 ja no és el fitxer tal qual, sinó una màscara generada amb les catorze
+siluetes a opacitat 1 (`siluetesMaskUrl`). Cap dels dos fallbacks apunta ja al
+full cru.
+
+**Trampa apuntada:** un `fill-opacity` (o un `style`) dins d'un full que es fa
+servir de **màscara** no és un detall d'estil: canvia l'opacitat de TOT el
+contingut emmascarat. Els fulls de siluetes s'han de generar (o netejar) abans de
+fer-los servir de màscara.
