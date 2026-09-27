@@ -590,6 +590,13 @@ function MegaStripePanelP1({
                   width: `${blocDretaPx}px`,
                   minWidth: 0,
                   position: 'relative',
+                  // LA MATEIXA CAPA QUE LA COLUMNA DE LA P2 (28/09/2026). En
+                  // Marc: «La franja p1 es a la mateixa z-index que la p2, pero
+                  // el bloc p1 es a la mateixa z-index que el p2?». No: la
+                  // columna de la p2 es a `zIndex: 3` i la franja a 4. El bloc de
+                  // la p1 no tenia capa propia i pintava per damunt de la franja
+                  // («la franja continua per sota del bloc»): ara tambe es a 3.
+                  zIndex: 3,
                   // EL BLOC SON DUES BOTONERES QUADRADES APILADES (28/09/2026).
                   // En Marc: «El bloc es un grup de tres botons + un grup de 2
                   // botons, tots en vertical [...] son dues botoneres quadrades
