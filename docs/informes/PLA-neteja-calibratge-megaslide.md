@@ -1022,8 +1022,7 @@ coeficient.
 | columna: cada franja (fila clicable) | 128,7 x 26,7 |
 | text (selector i columna) | 13,89 |
 
-### VOLTA 11 — Els rombes del vel: la pista de l'amo (26/09/2026, en curs)
-
+### VOLTA 11 — Els rombes del vel: la pista de l'amo (26/09/2026) · **RESOLT el 27/09/2026** (vegeu la VOLTA 14)
 L'amo va dir que els fitxers `clic-area-1.svg` / `clic-area-2.svg` podien ser la
 solucio dels rombes del vel. Comparat, amb el resultat a la ma:
 
@@ -1059,7 +1058,7 @@ ha mon per fer-ho i verificar-ho com cal.
 3. Aplicar el desplaçament NOME'S a la que toqui, i comprovar amb `_tmp-ancoratge.mjs`
    i una captura de la cantonada abans/despres.
 
-### VOLTA 12 — La pagina 1: els lligams amb la resta (26/09/2026)
+### VOLTA 12 — La pagina 1: els lligams amb la resta (26/09/2026) · **TANCAT el 27/09/2026** (vegeu la VOLTA 14)
 
 L'amo va preguntar si la p1 te els mateixos problemes de lligams. Mesurat amb el
 mateix metode que va trobar el problema de la p2 (`elementFromPoint` sobre tots
@@ -1100,7 +1099,7 @@ bloc hi arriba (una sonda dins del handler) i, si hi arriba, si
 `GraellaDuesFileresPagina1` rep el `desplacamentPassos` nou. Es una sola peça i
 es pot provar amb `_tmp-p1-fletxa2.mjs`.
 
-### VOLTA 13 — Les fletxes duplicades de la p1 (26/09/2026)
+### VOLTA 13 — Les fletxes duplicades de la p1 (26/09/2026) · **RESOLT el 27/09/2026** (vegeu la VOLTA 14)
 
 L'amo ho ha aclarit: a la p1 hi ha **DUES parelles de fletxes** i **les que no
 funcionen son les que s'han de treure**. Mesurat:
@@ -1135,3 +1134,46 @@ que el bloc cridi el MATEIX mecanisme que les fletxes del carrusel
 (`setDesplacGest`), o passar-li un `onCarouselStep` com fa la pagina 2 (alla les
 fletxes del carrusel governen la FRANJA i la graella queda quieta). La diferencia
 entre les dues pagines es nome's qui mana: a la p1 han de manar les del bloc.
+
+### VOLTA 14 — Tancament de les voltes 11, 12 i 13 (27/09/2026)
+
+Informe sencer: `docs/informes/INFORME-27-09-2026-rombes-i-fletxes.md`.
+Commits: `e2d30c3` (els rombes del vel) i `dc2973a` (les fletxes de la p1).
+
+**VOLTA 11 (els rombes del vel) — RESOLT.** La causa NO es cap desplaçament de
+cap silueta: es que el blanc es composava **dos cops** al solapament de dues
+siluetes veïnes. El cos de cada casa fa 305,56 unitats i el pas entre cases
+196,9, o sigui 108,66 unitats de trepitjada; amb una `fill-opacity` a cada camí,
+alla el blanc s'aplicava dues vegades (0,6 + 0,6 = 0,84). Mesurat a 1920x946
+amb un color de samarreta triat: **215 → 155** al rombe (el cos de la mateixa
+samarreta fa 136); amb la samarreta blanca, 253 → 251.
+
+Les tres caixes (la tinta de la imatge mesurada per lluminositat, la del vel i
+la del retall dels dibuixos) diuen que **la silueta desplaçada es la del retall**
+(13,4 unitats avall), no la del vel: desplaçar el vel hauria empitjorat el
+rombe, i per aixo no s'ha desplaçat res. El retall, a mes, no s'aplica a
+l'escriptori i els dibuixos no surten de la samarreta (22 px de 56.586).
+
+El que s'ha canviat: totes les siluetes del mateix gruix van en **un sol grup
+amb `opacity`** (opacitat de grup) a `generaVelDataUrl`, a les dues llistes de
+`path` de la vista vertical i a `generaMascaraBuidesDataUrl` (p1).
+
+Trampa apuntada: **`fill-opacity` al grup NO serveix** (es una propietat
+heretada: els camins la reben i cada camí es composa sol). Amb `opacity` sí.
+
+**VOLTA 12 (els lligams de la p1) — TANCAT.** Repassat amb el ratolí de debò:
+la graella i el selector de la p1 són clicables, la rodeta mou la tira i
+l'ancoratge no s'ha mogut. Cap error nou.
+
+**VOLTA 13 (les fletxes duplicades de la p1) — RESOLT.** El bloc de la dreta no
+movia la graella perque el seu comptador de passos (`desplacamentPassos`) es
+muntava al cos del render i **es cancel·lava a si mateix** (esborrava la base i
+la compensava al gest). Ara la graella publica la seva funcio de pas
+(`onStepper` → `setDesplacGest`, el mateix mecanisme que les fletxes del
+carrusel) i el bloc la crida; les fletxes del carrusel queden amagades amb
+`senseFletxes`. Mesurat: 4 fletxes → **2**, totes a x1414, i cada clic mou la
+graella **22,5 px** (−1018,5 → −1041,0 → −1163,5); abans es quedava a −1018,5.
+
+Bateria del tancament (arbre net): 581 proves (45 fitxers), eslint amb els
+comptes de `HEAD`, `vite build` OK, `compara-vistes` OK, `mesura-formats` 0 i 0,
+`_tmp-errors2` cap error i `_tmp-ancoratge` TOT AL SEU LLOC.
