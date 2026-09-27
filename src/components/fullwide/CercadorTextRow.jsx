@@ -14,6 +14,7 @@ import { ampladaRetallGraella, ampladaColumnaGraella, desnivellsLiniesGraella, d
 import { carrilPct, carrilLane, carrilPx, readRootCssNumber, getLayoutViewportWidth, MEGASLIDE_REFERENCIA_PX } from '../../utils/layoutMetrics.js';
 import { GRAELLA_DIBUIXOS_ESCALA_VERTICAL } from '../../config/stripeCalibrationsVertical.js';
 import { FirstContactDibuix09Buttons } from './firstContactPanels.jsx';
+import { caminsSiluetes, precarregaSiluetesSamarreta } from './siluetesSamarreta.js';
 
 /**
  * CercadorTextRow
@@ -1041,6 +1042,11 @@ export function CercadorColleccionsColumna({
   isLandscapeTablet = false,
   caixes = false,
   linia = false,
+  // L'OMBRA DE LA MANIGA (27/09/2026): la caixa del contingut de la franja
+  // dins d'aquesta columna (les distancies i la mida). La pinta la columna, que
+  // te `overflow: hidden` i radi: l'ombra queda dins del selector i SOTA la
+  // imatge de la franja (aquesta columna es a `zIndex: 3` i la franja a 4).
+  ombraManiga = null,
   // La columna va en una capa propia: no ha d'estirar la fila on viu (les nou
   // linies son mes altes que el carrusel). El seu top cau al top del selector i
   // el seu bottom al bottom de la slide (`margeDalt` i `margeBaix`, que calcula
@@ -1055,6 +1061,37 @@ export function CercadorColleccionsColumna({
   // si hi ha fletxes.
   reservaDreta = 0,
 }) {
+  // LA SILUETA DE LA MANIGA (27/09/2026). L'ombra que la maniga fa sobre
+  // aquesta columna ha de resseguir el SEU contorn, i el contorn es la silueta
+  // de l'ultima casa del full (`caminsSiluetes`, la catorzena): la columna
+  // nome's la trepitja ella.
+  const [mascaraManiga, setMascaraManiga] = useState(null);
+  // Nome's la PRESENCIA de l'ombra mana: `ombraManiga` es un objecte nou a cada
+  // mesura, i posar-lo a les dependencies faria regenerar la mascara a cada
+  // repàs (i el `setState` tornaria a mesurar).
+  const teOmbraManiga = ombraManiga !== null;
+  useEffect(() => {
+    if (!teOmbraManiga) return undefined;
+    let viu = true;
+    precarregaSiluetesSamarreta()
+      .then((text) => {
+        if (!viu || !text) return;
+        const doc = new DOMParser().parseFromString(text, 'image/svg+xml');
+        const camins = caminsSiluetes(doc);
+        const ultima = camins[13];
+        if (!ultima) return;
+        const vb = (doc.documentElement.getAttribute('viewBox') || '0 0 2866 307').trim().split(/[\s,]+/);
+        const w = Number(vb[2]) || 2866;
+        const h = Number(vb[3]) || 307;
+        const tr = ultima.getAttribute('transform') || '';
+        const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">`
+          + `<path d="${ultima.getAttribute('d')}"${tr ? ` transform="${tr}"` : ''} fill="#FFFFFF"/></svg>`;
+        setMascaraManiga(`data:image/svg+xml,${encodeURIComponent(svg)}`);
+      })
+      .catch(() => {});
+    return () => { viu = false; };
+  }, [teOmbraManiga]);
+
   // Amb `caixes` (la taula de la vista vertical) cada nom va dins la seva caixa
   // grisa, enrasat a la dreta i repartides per tota l'alcada; sense, es la
   // llista de sempre de la filera de la pagina 2.
@@ -1267,6 +1304,47 @@ export function CercadorColleccionsColumna({
         overflow: 'hidden',
       }}
     >
+      {/* L'OMBRA DE LA MANIGA, DINS DEL SELECTOR I SOTA LA IMATGE (27/09/2026).
+          Es una copia DIFOSA de la silueta de la maniga (`mascaraManiga`), amb
+          la MATEIXA mida i posicio que la mascara del contingut de la franja
+          (103 % x 100 %, centrada a dalt): el nucli queda sota la samarreta i el
+          que en surt es nome's la difusio. El `drop-shadow` no serveix perque
+          tambe pinta la silueta original, i a la costura s'hi veia una línia
+          negra. El retall el fa la propia columna (`overflow: hidden` i radi 6)
+          i la capa de la franja (zIndex 4) la tapa: la columna es a zIndex 3. */}
+      {ombraManiga && mascaraManiga ? (
+        <div
+          aria-hidden="true"
+          data-maniga-ombra="1"
+          style={{
+            position: 'absolute',
+            left: `${ombraManiga.left}px`,
+            top: `${ombraManiga.top}px`,
+            width: `${ombraManiga.width}px`,
+            height: `${ombraManiga.height}px`,
+            pointerEvents: 'none',
+            zIndex: 0,
+            filter: 'blur(3px)',
+            transform: 'translate(1px, 3px)',
+          }}
+        >
+          <div
+            style={{
+              width: '100%',
+              height: '100%',
+              backgroundColor: 'rgba(0, 0, 0, 0.25)',
+              WebkitMaskImage: `url("${mascaraManiga}")`,
+              maskImage: `url("${mascaraManiga}")`,
+              WebkitMaskRepeat: 'no-repeat',
+              maskRepeat: 'no-repeat',
+              WebkitMaskSize: '103% 100%',
+              maskSize: '103% 100%',
+              WebkitMaskPosition: '50% 0',
+              maskPosition: '50% 0',
+            }}
+          />
+        </div>
+      ) : null}
       {CERCADOR_COLLECTIONS.map(({ key, label }) => {
         const activa = key === activeKey;
         return (
@@ -1348,7 +1426,7 @@ export function CercadorColleccionsColumna({
   );
 }
 
-function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripeItem, hoveredStripeItem, onSelectGroup, onHoverItem, onHoverLeave, onCarouselStep, compact = false, selectedColor = 'white', onSelectColor, onSelectCollection, isPortraitTablet = false, isLandscapeTablet = false, fontBoost = 0, desplacamentVertical = 0, esquerra, midaSelector = 56, alineacioY = 0, onMides = null }) {
+function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripeItem, hoveredStripeItem, onSelectGroup, onHoverItem, onHoverLeave, onCarouselStep, compact = false, selectedColor = 'white', onSelectColor, onSelectCollection, isPortraitTablet = false, isLandscapeTablet = false, fontBoost = 0, desplacamentVertical = 0, esquerra, midaSelector = 56, alineacioY = 0, onMides = null, ombraManiga = null }) {
   // UNA SOLA PASSADA PER A TOT EL QUE ES MESURA DE LA FILERA (26/09/2026).
   //
   // Abans aixo eren TRES bucles independents en aquest mateix component (les
@@ -1791,6 +1869,7 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
             onSelect={onSelectCollection}
             isPortraitTablet={isPortraitTablet}
             isLandscapeTablet={isLandscapeTablet}
+            ombraManiga={ombraManiga}
           />
         </div>
       </div>
