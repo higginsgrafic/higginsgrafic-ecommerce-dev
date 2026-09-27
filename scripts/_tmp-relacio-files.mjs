@@ -1,0 +1,30 @@
+// TEMPORAL — no es comiteja. La relacio entre les files i el selector a la p2.
+import { chromium } from '@playwright/test';
+const b = await chromium.launch();
+const ctx = await b.newContext({ viewport: { width: 1920, height: 946 }, deviceScaleFactor: 1 });
+const p = await ctx.newPage();
+await p.goto('http://127.0.0.1:3003/nova/inici?active=first_contact', { waitUntil: 'load', timeout: 180000 });
+await p.waitForTimeout(4000);
+const r = await p.evaluate(() => {
+  const v2 = document.querySelector('[data-mega-page-viewport="2"]');
+  const c = (s) => { const el = v2.querySelector(s); if (!el) return null; const r2 = el.getBoundingClientRect(); return { top: +r2.top.toFixed(1), c: +(r2.top + r2.height / 2).toFixed(1), h: +r2.height.toFixed(1), w: +r2.width.toFixed(1), x: +r2.left.toFixed(1) }; };
+  const carr = c('[data-carrusel="1"]');
+  const peces = [...v2.querySelectorAll('[data-carrusel="1"] button')].slice(0, 2).map((el) => { const r2 = el.getBoundingClientRect(); return { top: +r2.top.toFixed(1), c: +(r2.top + r2.height / 2).toFixed(1), h: +r2.height.toFixed(1) }; });
+  const pastilla = c('[data-p2-color-selector] [data-stripe-buttonbar="bn"]');
+  const blanc = c('[data-p2-color-selector] button[aria-label="Blanc"]');
+  const color = c('[data-p2-color-selector] button[aria-label="Color"]');
+  const negre = c('[data-p2-color-selector] button[aria-label="Negre"]');
+  const fletxes = c('#stripe-guide-right-anchor');
+  const tira = c('[data-p2-color-grid]');
+  return { carr, peces, pastilla, blanc, color, negre, fletxes, tira };
+});
+console.log(JSON.stringify(r, null, 1));
+console.log('--- relacions');
+console.log('fila1 - pastilla.top =', (r.peces[0].top - r.pastilla.top).toFixed(1));
+console.log('fila1 - blanc.c      =', (r.peces[0].c - r.blanc.c).toFixed(1));
+console.log('fila2 - color.c      =', (r.peces[1].c - r.color.c).toFixed(1));
+console.log('fila2 - fila1        =', (r.peces[1].c - r.peces[0].c).toFixed(1));
+console.log('peca costat          =', r.peces[0].h);
+console.log('carrusel alcada      =', r.carr.h, '| fila1.top-carr.top =', (r.peces[0].top - r.carr.top).toFixed(1));
+await ctx.close();
+await b.close();

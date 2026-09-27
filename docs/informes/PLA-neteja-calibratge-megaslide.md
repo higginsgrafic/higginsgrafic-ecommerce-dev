@@ -1464,3 +1464,19 @@ px), mesurada amb la mateixa sonda de l'ombra (`ombraManigaP1.top + height`), i 
 franja no es mou (226,6) ni la graella (1003). El selector queda a dalt, les
 fletxes just a sota i la màniga de l'última samarreta hi entra per l'esquerra amb
 la seva ombra.
+
+#### Volta 21 ter — dues botoneres quadrades apilades i el gap de la p2
+
+En Marc: «El bloc és un grup de tres botons + un grup de 2 botons. Tots en
+vertical [...] Són dues botoneres quadrades apilades l'una sobre l'altra» i «la
+graella dels dibuixos hi estan tots enganxats l'un amb l'altre. Deixa-hi el mateix
+gap que a la p2».
+
+**FET.** El bloc de la dreta de la p1 és ara **dues botoneres quadrades apilades**,
+cada una del costat del bloc (128,9 × 128,9 a 1920): a dalt els tres botons del
+selector (BLANC/COLOR/NEGRE, caselles iguals, en vertical) i a sota els dos botons
+de les fletxes. El bloc fa 1394,83 de 130 × 260 i la franja no es mou (226,6).
+
+**El gap de la graella.** `GAP_PECA_PAGINA1_PX` passa de 0 a **26**: mesurat a
+1920, la p2 fa 44,63 px de peça i **26,07** de gap i la p1 en feia 0 (les peces
+tocant-se). Ara la p1 fa 45 de peça i 26 de gap.

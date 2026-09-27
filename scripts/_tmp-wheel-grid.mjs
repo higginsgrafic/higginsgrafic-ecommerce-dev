@@ -1,0 +1,31 @@
+import { chromium } from '@playwright/test';
+const b = await chromium.launch();
+const ctx = await b.newContext({ viewport: { width: 1920, height: 946 }, deviceScaleFactor: 1 });
+const p = await ctx.newPage();
+await p.goto('http://127.0.0.1:3003/nova/inici?active=first_contact', { waitUntil: 'load', timeout: 180000 });
+await p.waitForTimeout(4000);
+await p.click('button:has(svg.lucide-search)').catch(() => {});
+await p.waitForSelector('[data-mega-page-viewport="2"]', { timeout: 30000 });
+await p.waitForTimeout(10000);
+const tr = () => p.evaluate(() => {
+  const v2 = document.querySelector('[data-mega-page-viewport="2"]');
+  const t = v2.querySelector('[data-carrusel="1"]').firstElementChild.firstElementChild;
+  return getComputedStyle(t).transform;
+});
+const pos = await p.evaluate(() => {
+  const v2 = document.querySelector('[data-mega-page-viewport="2"]');
+  const tira = v2.querySelector('[data-carrusel="1"]').firstElementChild.firstElementChild;
+  const boto = [...tira.querySelectorAll('button')].find((x) => { const r = x.getBoundingClientRect(); return r.left > 700 && r.left < 1200; });
+  const r = boto.getBoundingClientRect();
+  return { x: Math.round(r.left + r.width / 2), y: Math.round(r.top + r.height / 2), label: boto.getAttribute('aria-label') };
+});
+console.log('punt', JSON.stringify(pos), 'abans', await tr());
+await p.mouse.move(pos.x, pos.y);
+await p.mouse.wheel(0, 200);
+await p.waitForTimeout(800);
+console.log('despres de la rodeta', await tr());
+await p.mouse.wheel(0, 200);
+await p.waitForTimeout(800);
+console.log('i una altra', await tr());
+await ctx.close();
+await b.close();

@@ -27,7 +27,11 @@ import { CercadorDibuixosGraella } from './CercadorTextRow.jsx';
 export const COSTAT_PECA_PAGINA1_PX = 45;
 
 /** El gap entre peces, en unitats de disseny (el mateix que la pagina 2). */
-export const GAP_PECA_PAGINA1_PX = 0;
+// EL MATEIX GAP QUE LA PAGINA 2 (28/09/2026). En Marc, mirant la graella de la
+// p1: «la graella dels dibuixos hi estan tots enganxats l'un amb l'altre. Deixa-hi
+// el mateix gap que a la p2». Mesurat a 1920: la p2 fa 26,07 px de gap entre
+// peces (44,63 de peca); la p1 en feia 0.
+export const GAP_PECA_PAGINA1_PX = 26;
 
 /**
  * @param {object} o

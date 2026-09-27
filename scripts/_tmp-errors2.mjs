@@ -1,0 +1,15 @@
+import { chromium } from '@playwright/test';
+const b = await chromium.launch();
+const ctx = await b.newContext({ viewport: { width: 1920, height: 946 }, deviceScaleFactor: 1 });
+const p = await ctx.newPage();
+const errs = [];
+p.on('pageerror', (e) => errs.push('PAGEERROR: ' + String(e).slice(0, 300)));
+p.on('console', (m) => { if (m.type() === 'error') errs.push('CONSOLE: ' + m.text().slice(0, 200)); });
+await p.goto('http://127.0.0.1:3003/nova/inici?active=first_contact', { waitUntil: 'load', timeout: 120000 });
+await p.waitForTimeout(2500);
+await p.click('button:has(svg.lucide-search)').catch(() => {});
+await p.waitForTimeout(4000);
+const q = await p.evaluate(() => ({ v2: !!document.querySelector('[data-mega-page-viewport="2"]'), bar: !!document.querySelector('[data-p2-color-selector] [data-stripe-buttonbar="bn"]'), peces: document.querySelectorAll('[data-carrusel="1"] button').length }));
+console.log(q);
+console.log(errs.slice(0, 6).join('\n') || 'cap error');
+await b.close();

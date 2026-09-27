@@ -1,0 +1,11 @@
+import { chromium } from '@playwright/test';
+const b = await chromium.launch();
+const p = await (await b.newContext()).newPage();
+await p.goto('http://127.0.0.1:3003/nova/inici', { waitUntil: 'domcontentloaded', timeout: 60000 });
+const txt = await p.evaluate(async () => (await (await fetch('/src/components/megaslide/MegaslidePagina2.jsx')).text()));
+const l = txt.split('\n');
+console.log('--- 310..345 ---');
+for (let n = 310; n <= 345; n++) console.log(n + ': ' + (l[n - 1] || '').trim().slice(0, 120));
+console.log('--- on es defineix stripeStrip al component ---');
+l.forEach((x, i) => { if (/stripeStrip\s*[,:=]|destructur|\}\s*=\s*props/.test(x) && i < 340) console.log((i + 1) + ': ' + x.trim().slice(0, 130)); });
+await b.close();

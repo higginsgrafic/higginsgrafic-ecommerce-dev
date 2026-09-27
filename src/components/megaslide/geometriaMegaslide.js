@@ -848,8 +848,15 @@ export function desplacamentCentratgeFranja({ quants, n, actual = 0, cases = FRA
  *  el MATEIX que el de la pagina 2: les files han de ser identiques. */
 export const PAGINA1_COSTAT_PECA_PX = 45;
 
-/** El gap entre peces dins d'una filera (la pagina 2 tambe va a 0). */
-export const PAGINA1_GAP_PECA_PX = 0;
+/**
+ * El gap entre peces dins d'una filera.
+ *
+ * DES DEL 28/09/2026 es el MATEIX QUE EL DE LA PAGINA 2: en Marc, mirant la
+ * graella de la p1, «la graella dels dibuixos hi estan tots enganxats l'un amb
+ * l'altre. Deixa-hi el mateix gap que a la p2». Mesurat a 1920: la p2 fa
+ * 44,63 px de peça i 26,07 de gap; la p1 feia 45 i 0.
+ */
+export const PAGINA1_GAP_PECA_PX = 26;
 
 /** El gap entre la graella i el bloc de la dreta (10 px de disseny). */
 export const PAGINA1_GAP_DRETA_PX = 10;

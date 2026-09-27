@@ -1,0 +1,12 @@
+import { chromium } from '@playwright/test';
+const b = await chromium.launch();
+const ctx = await b.newContext({ viewport: { width: 1920, height: 946 }, deviceScaleFactor: 1 });
+const p = await ctx.newPage();
+p.on('pageerror', (e) => console.log('PAGEERROR', String(e).slice(0, 200)));
+await p.goto('http://127.0.0.1:3003/nova/inici', { waitUntil: 'load', timeout: 180000 });
+await p.waitForTimeout(3000);
+await p.click('button:has(svg.lucide-search)').catch(() => {});
+await p.waitForTimeout(6000);
+console.log(JSON.stringify(await p.evaluate(() => window.__SONDA_CAD || 'sense sonda'), null, 1));
+await ctx.close();
+await b.close();

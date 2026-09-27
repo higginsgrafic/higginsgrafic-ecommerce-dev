@@ -1,0 +1,20 @@
+import { chromium } from '@playwright/test';
+const b = await chromium.launch();
+const ctx = await b.newContext({ viewport: { width: 1920, height: 946 }, deviceScaleFactor: 1 });
+const p = await ctx.newPage();
+await p.goto('http://127.0.0.1:3003/nova/inici', { waitUntil: 'load', timeout: 45000 });
+await p.waitForTimeout(2500);
+await p.click('button:has(svg.lucide-search)', { timeout: 8000 }).catch(() => {});
+await p.waitForTimeout(4500);
+const sel = () => p.evaluate(() => [...document.querySelectorAll('[data-p2-color-grid] button')]
+  .filter((x) => getComputedStyle(x).outlineStyle !== 'none').map((x) => x.getAttribute('data-color-barra')));
+console.log('abans', await sel());
+const bb = await (await p.$('[data-p2-color-grid]')).boundingBox();
+await p.mouse.move(bb.x + bb.width / 2, bb.y + bb.height / 2);
+await p.mouse.wheel(0, -120);
+await p.waitForTimeout(500);
+console.log('rodeta +', await sel());
+await p.mouse.wheel(0, -240);
+await p.waitForTimeout(500);
+console.log('rodeta ++', await sel());
+await b.close();

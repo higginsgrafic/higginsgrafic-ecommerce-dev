@@ -590,17 +590,14 @@ function MegaStripePanelP1({
                   width: `${blocDretaPx}px`,
                   minWidth: 0,
                   position: 'relative',
-                  // EL BLOC ARRIBA FINS AL BOTTOM DE LA FRANJA (28/09/2026). En
-                  // Marc: «El bloc del selector ha d'estar alineat amb el bottom
-                  // de la stripe», i a la captura retocada el bloc arriba fins a
-                  // la franja. L'alcada es MESURA (`ombraManigaP1.top + height`:
-                  // el bottom de la franja respecte del bloc) i el `marginBottom`
-                  // negatiu compensa el que creix, perque la filera no s'allargui
-                  // i la franja no es mogui.
-                  ...(alcadaBlocP1 != null ? {
-                    height: `${alcadaBlocP1}px`,
-                    marginBottom: `${-(alcadaBlocP1 - columnaDretaPx * 3)}px`,
-                  } : null),
+                  // EL BLOC SON DUES BOTONERES QUADRADES APILADES (28/09/2026).
+                  // En Marc: «El bloc es un grup de tres botons + un grup de 2
+                  // botons, tots en vertical [...] son dues botoneres quadrades
+                  // apilades l'una sobre l'altra». Cada quadrat fa el costat del bloc
+                  // (128,9 a 1920) i el `marginBottom` negatiu compensa el que
+                  // creix, perque la filera no s'allargui i la franja no es mogui.
+                  height: `${blocDretaPx * 2}px`,
+                  marginBottom: `${-(blocDretaPx * 2 - columnaDretaPx * 3)}px`,
                   // EL SELECTOR A DALT I LES FLETXES A SOTA, A LA DRETA (28/09/2026).
                   // El bloc es ample com la columna de la p2 (130 de disseny) perque
                   // la maniga de l'ultima samarreta hi arribi; el selector i les
@@ -643,17 +640,22 @@ function MegaStripePanelP1({
                     }} />
                   </div>
                 ) : null}
+                {/* DUES BOTONERES QUADRADES APILADES: els tres botons del
+                    selector a dalt (caselles iguals, en vertical) i els dos
+                    botons de les fletxes a sota. Cada botonera fa el quadrat
+                    sencer del bloc (128,9 x 128,9 a 1920). */}
                 <div style={{
                   position: 'relative',
                   zIndex: 1,
-                  width: `${columnaDretaPx}px`,
+                  height: '100%',
+                  width: '100%',
                   display: 'flex',
                   flexDirection: 'column',
-                  alignItems: 'center',
                 }}>
+                {/* EL QUADRAT DE DALT: els tres botons del selector. */}
                 <SelectorQuadratPagina1
                   dinsBloc
-                  format="rectangle"
+                  format="square"
                   showWhite={stripeVariantVisibility?.white !== false}
                   showBlack={stripeVariantVisibility?.black !== false}
                   showMulti={stripeVariantVisibility?.color !== false}
@@ -662,6 +664,7 @@ function MegaStripePanelP1({
                   onBlack={() => { setStripeOverlayOverrideActive(false); setFirstContactVariant('black'); }}
                   onMulti={() => { setStripeOverlayOverrideActive(false); setFirstContactVariant('color'); }}
                 />
+                {/* EL QUADRAT DE SOTA: els dos botons de les fletxes. */}
                 <FletxesQuadratPagina1
                   onPrev={() => stepperP1?.(-1)}
                   onNext={() => stepperP1?.(1)}

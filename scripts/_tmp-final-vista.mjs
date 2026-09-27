@@ -1,0 +1,13 @@
+import { chromium } from '@playwright/test';
+const b = await chromium.launch();
+const ctx = await b.newContext({ viewport: { width: 1920, height: 946 }, deviceScaleFactor: 2 });
+const p = await ctx.newPage();
+await p.goto('http://127.0.0.1:3003/nova/inici?active=first_contact', { waitUntil: 'load', timeout: 180000 });
+await p.waitForTimeout(4000);
+await p.click('button:has(svg.lucide-search)').catch(() => {});
+await p.waitForSelector('[data-mega-page-viewport="2"]', { timeout: 30000 });
+await p.waitForTimeout(10000);
+await p.screenshot({ path: '_tmp-final-p2.png', clip: { x: 1300, y: 60, width: 260, height: 330 } });
+console.log('desat');
+await ctx.close();
+await b.close();
