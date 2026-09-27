@@ -1058,3 +1058,44 @@ ha mon per fer-ho i verificar-ho com cal.
 2. Comparar-la amb les dues siluetes i triar quina esta desplaçada.
 3. Aplicar el desplaçament NOME'S a la que toqui, i comprovar amb `_tmp-ancoratge.mjs`
    i una captura de la cantonada abans/despres.
+
+### VOLTA 12 — La pagina 1: els lligams amb la resta (26/09/2026)
+
+L'amo va preguntar si la p1 te els mateixos problemes de lligams. Mesurat amb el
+mateix metode que va trobar el problema de la p2 (`elementFromPoint` sobre tots
+els elements clickables, dins del carril):
+
+| peça de la p1 | estat |
+|---|---|
+| graella (carrusel) | 51 botons visibles, 5 tapats a la vora dreta |
+| selector B/C/N | 3/3 clicables |
+| fletxes | 2/2 clicables |
+| capa de la franja | x385..1440 y222..329 (trepitja 1,5 px del carrusel per la dreta) |
+
+Els 5 tapats: **1** per l'area de clic de la franja i **4** pel bloc de la dreta
+(geometria esperada: el bloc es a sobre). Cap d'ells es un error nou.
+
+**Provat i DESFET:** pujar la capa de la franja de la p1 a `zIndex: 20` amb
+`pointerEvents: 'none'` (el mateix regim que la p2, perque la maniga hi surti per
+sobre del selector). **No canviava res de visible** (captures abans/despres
+identiques, `_tmp-p1-maniga-abans.png` i `_tmp-p1-maniga-despres.png`) i
+l'ancoratge seguia be, o sigui que **no val la pena el canvi**: la maniga de la p1
+no arriba on es veu. Desfet amb `git checkout`.
+
+**TROBAT (i es el que cal arreglar de la p1): LES FLETXES DEL BLOC DE LA DRETA
+NO MOUREN LA GRAELLA.** El clic hi arriba (comprovat: `elementFromPoint` diu que
+la fletxa es qui rep el clic, i amb clic sintetic tambe), pero el carrusel no es
+mou: la transformacio es queda a `-1018.5` sempre. La sonda diu que
+`desplacamentPassos` **no canvia mai de 0** (amb `unPas = 35,38` i
+`dibuixPx = 44,63`), o sigui que `passaPagina1(1)` no arriba a l'estat o no
+provoca el re-render.
+
+**Ja passava abans dels canvis d'aquest commit** (comprovat amb `git stash`: a
+HEAD tambe es queda a `-1018.5`), o sigui que **no es cap regressio**: es una
+peca que mai s'ha acabat de connectar.
+
+**Per on seguir:** `MegaStripePanelP1` te `passaPagina1` i el passa a
+`FletxesQuadratPagina1` (`onPrev`/`onNext`). Mirar si l'`onClick` del boto del
+bloc hi arriba (una sonda dins del handler) i, si hi arriba, si
+`GraellaDuesFileresPagina1` rep el `desplacamentPassos` nou. Es una sola peça i
+es pot provar amb `_tmp-p1-fletxa2.mjs`.
