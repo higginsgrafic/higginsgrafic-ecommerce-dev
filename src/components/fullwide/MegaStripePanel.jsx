@@ -318,20 +318,41 @@ function generaVelDataUrl(text, opacitats, color = 'white', celles = null) {
     // El full original se'n va: les siluetes les tornem a posar nosaltres.
     const pareOriginal = paths[0].parentNode;
     for (const p of paths) p.remove();
+    // EL VEL ES COMPOSA UNA SOLA VEGADA (27/09/2026): el ROMBE.
+    //
+    // Les siluetes de cases veines ES TREPITGEN: el cos de cada casa fa 305,56
+    // unitats i el pas entre cases nome's 196,9, o sigui que la maniga d'una
+    // casa arriba a la casa del costat (108,66 unitats de solapament). Amb una
+    // opacitat per CAMI, alla on es trepitgen el blanc es composava DOS cops
+    // (0,6 + 0,6 = 0,84) i hi quedava un ROMBE mes blanc a la cantonada de la
+    // samarreta. La forma del rombe es exactament la interseccio de les dues
+    // siluetes.
+    //
+    // Mesurat a 1920x946 amb un color de samarreta triat (captura a 3x, el
+    // solapament de les cases 0 i 1): 215 de lluminositat al rombe contra 136
+    // al cos de la mateixa samarreta; amb la samarreta blanca, 253 contra 251
+    // (per aixo nome's es veu amb el color triat).
+    //
+    // La solucio es posar totes les siluetes del MATEIX gruix en UN sol grup
+    // amb `opacity` (opacitat de GRUP: el grup es composa sencer una vegada i
+    // el solapament de dins no compta), en comptes d'una opacitat per cami.
+    // El `mask` de sempre va al grup: la mascara diu, pixel a pixel, quina
+    // samarreta es veu, i aixo no canvia.
+    const grups = new Map();
     for (let i = 0; i < 14; i++) {
       const op = mapa[i];
       if (typeof op !== 'number') continue;
-      const p = nouCami(i);
-      p.setAttribute('fill', color);
-      p.setAttribute('fill-opacity', String(op));
-      if (idMascara) {
-        const g = doc.createElementNS(NS, 'g');
-        g.setAttribute('mask', `url(#${idMascara})`);
-        g.appendChild(p);
+      const clau = String(op);
+      let g = grups.get(clau);
+      if (!g) {
+        g = doc.createElementNS(NS, 'g');
+        g.setAttribute('fill', color);
+        g.setAttribute('opacity', clau);
+        if (idMascara) g.setAttribute('mask', `url(#${idMascara})`);
+        grups.set(clau, g);
         pareOriginal.appendChild(g);
-      } else {
-        pareOriginal.appendChild(p);
       }
+      g.appendChild(nouCami(i));
     }
     const serialized = new XMLSerializer().serializeToString(doc.documentElement);
     return `data:image/svg+xml,${encodeURIComponent(serialized)}`;
@@ -1071,32 +1092,41 @@ function MegaStripePanel({
                           la imatge i abans de les siluetes, perque el contorn del
                           vector quedi sempre per damunt. */}
                       {isPortraitTablet && Array.isArray(indicesSamarretesBuides) && indicesSamarretesBuides.length > 0
-                        ? indicesSamarretesBuides.map((idx) => {
-                          // Els extrems son NOMES la primera de dalt de tot i
-                          // l'ultima de baix de tot; la resta son intermedies.
-                          const extrem = idx === 0 || idx === 13;
-                          const a = extrem ? areesClicAmpla()[idx] : areesClicEstreta()[idx];
-                          // La segona filera va girada, com les siluetes del
-                          // vector: mirall en X amb eix a Y.
-                          const girar = idx >= 7;
-                          const ajustGir = extrem ? 302.2 : 65.3;
-                          // El vel, 0,5 px mes amunt (en unitats del panell).
-                          const AJUST_VEL_Y = 1.6767;
-                          const esBlanca = shirtColor === '#FFFFFF';
-                          return (
-                            <path
-                              key={`hg-vel-${idx}`}
-                              id={`hg-vel-${idx}`}
-                              d={a.d}
-                              transform={`translate(${a.tx}, ${a.ty - AJUST_VEL_Y})${girar ? ` translate(${ajustGir}, 0) scale(-1, 1)` : ''} ${a.transform}`}
-                              // Blanc pla, sense cap efecte: la samarreta
-                              // s'aclareix cap al fons conservant el seu to.
-                              fill="#FFFFFF"
-                              fillOpacity={esBlanca ? VEL_SAMARRETA_BUIDA_ALFA_BLANCA : 'var(--hgStripeEmptyVeilAlpha, 0.85)'}
-                              clipRule="evenodd"
-                            />
-                          );
-                        })
+                        ? (
+                          // UN SOL GRUP I UNA SOLA OPACITAT (27/09/2026): les
+                          // siluetes de cases veines es trepitgen i, amb
+                          // `fillOpacity` a cada cami, el blanc es composava dos
+                          // cops al solapament i hi quedava el ROMBE. Amb
+                          // `opacity` al grup, el grup es composa una vegada.
+                          <g
+                            fill="#FFFFFF"
+                            opacity={shirtColor === '#FFFFFF' ? VEL_SAMARRETA_BUIDA_ALFA_BLANCA : 'var(--hgStripeEmptyVeilAlpha, 0.85)'}
+                          >
+                            {indicesSamarretesBuides.map((idx) => {
+                              // Els extrems son NOMES la primera de dalt de tot i
+                              // l'ultima de baix de tot; la resta son intermedies.
+                              const extrem = idx === 0 || idx === 13;
+                              const a = extrem ? areesClicAmpla()[idx] : areesClicEstreta()[idx];
+                              // La segona filera va girada, com les siluetes del
+                              // vector: mirall en X amb eix a Y.
+                              const girar = idx >= 7;
+                              const ajustGir = extrem ? 302.2 : 65.3;
+                              // El vel, 0,5 px mes amunt (en unitats del panell).
+                              const AJUST_VEL_Y = 1.6767;
+                              return (
+                                <path
+                                  key={`hg-vel-${idx}`}
+                                  id={`hg-vel-${idx}`}
+                                  d={a.d}
+                                  transform={`translate(${a.tx}, ${a.ty - AJUST_VEL_Y})${girar ? ` translate(${ajustGir}, 0) scale(-1, 1)` : ''} ${a.transform}`}
+                                  // Blanc pla, sense cap efecte: la samarreta
+                                  // s'aclareix cap al fons conservant el seu to.
+                                  clipRule="evenodd"
+                                />
+                              );
+                            })}
+                          </g>
+                        )
                         : null}
                       {VECTOR_FRANJA_SAMARRETES.map((d, k) => (
                         <path
@@ -1114,26 +1144,31 @@ function MegaStripePanel({
                           vel de les buides. Ho va demanar l'amo: «Les samarretes,
                           quan no son actives, tambe s'han d'atenuar, no nome's el
                           dibuix.» */}
-                      {(indicesSamarretesInactives || []).map((idx) => {
-                        if (!Number.isInteger(idx) || idx < 0 || idx >= 14) return null;
-                        const extrem = idx === 0 || idx === 13;
-                        const a = extrem ? areesClicAmpla()[idx] : areesClicEstreta()[idx];
-                        if (!a) return null;
-                        const girar = idx >= 7;
-                        const ajustGir = extrem ? 302.2 : 65.3;
-                        const AJUST_VEL_Y = 1.6767;
-                        return (
-                          <g key={`hg-vel-inactiva-${idx}`} mask={`url(#${idMascaraVelActives})`}>
-                            <path
-                              d={a.d}
-                              transform={`translate(${a.tx}, ${a.ty - AJUST_VEL_Y})${girar ? ` translate(${ajustGir}, 0) scale(-1, 1)` : ''} ${a.transform}`}
-                              fill="#FFFFFF"
-                              fillOpacity={alfaVelSamarretaInactiva}
-                              clipRule="evenodd"
-                            />
-                          </g>
-                        );
-                      })}
+                      {(indicesSamarretesInactives || []).length > 0 ? (
+                        // UN SOL GRUP I UNA SOLA OPACITAT (27/09/2026): el
+                        // mateix ROMBE que a la vista apaisada, aqui amb les
+                        // arees de clic de cada casella (que tambe es
+                        // trepitgen). Vegeu `generaVelDataUrl`.
+                        <g fill="#FFFFFF" opacity={alfaVelSamarretaInactiva} mask={`url(#${idMascaraVelActives})`}>
+                          {(indicesSamarretesInactives || []).map((idx) => {
+                            if (!Number.isInteger(idx) || idx < 0 || idx >= 14) return null;
+                            const extrem = idx === 0 || idx === 13;
+                            const a = extrem ? areesClicAmpla()[idx] : areesClicEstreta()[idx];
+                            if (!a) return null;
+                            const girar = idx >= 7;
+                            const ajustGir = extrem ? 302.2 : 65.3;
+                            const AJUST_VEL_Y = 1.6767;
+                            return (
+                              <path
+                                key={`hg-vel-inactiva-${idx}`}
+                                d={a.d}
+                                transform={`translate(${a.tx}, ${a.ty - AJUST_VEL_Y})${girar ? ` translate(${ajustGir}, 0) scale(-1, 1)` : ''} ${a.transform}`}
+                                clipRule="evenodd"
+                              />
+                            );
+                          })}
+                        </g>
+                      ) : null}
                     </svg>
                   ) : null}
 

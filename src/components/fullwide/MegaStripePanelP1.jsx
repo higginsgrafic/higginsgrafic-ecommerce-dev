@@ -107,15 +107,39 @@ function generaMascaraBuidesDataUrl(text, emptyTileIndices, shirtColor) {
   try {
     const doc = new DOMParser().parseFromString(text, 'image/svg+xml');
     const emptySet = new Set(Array.isArray(emptyTileIndices) ? emptyTileIndices : []);
-    const paths = doc.querySelectorAll('.tshirt-outline');
+    const paths = [...doc.querySelectorAll('.tshirt-outline')];
     const isWhite = !shirtColor || shirtColor === '#FFFFFF';
     const emptyOpacity = isWhite ? '0.3' : '0.1';
-    paths.forEach((p, i) => {
+    // UN SOL GRUP PER OPACITAT (27/09/2026): el ROMBE.
+    //
+    // Les siluetes de cases veines es TREPITGEN (la maniga d'una arriba a la
+    // casa del costat). Amb un `fill-opacity` a cada cami, alla on es
+    // trepitgen el blanc es composava dos cops i hi quedava un rombe mes clar
+    // a la cantonada de la samarreta: aquesta mascara tambe pinta, perque es
+    // una mascara CSS sobre el contenidor de la franja. Amb `opacity` al grup,
+    // el grup es composa una vegada i el solapament no compta. Es fa per
+    // tirades d'igual opacitat per no canviar l'ordre de pintat (l'ultima
+    // silueta pintada es la que mana, com als `path` originals).
+    const pare = paths.length ? paths[0].parentNode : null;
+    let grup = null;
+    let valor = null;
+    for (let i = 0; i < paths.length; i++) {
+      const p = paths[i];
+      const op = emptySet.has(i) ? emptyOpacity : '1';
       p.setAttribute('fill', 'white');
-      p.setAttribute('fill-opacity', emptySet.has(i) ? emptyOpacity : '1');
+      p.removeAttribute('fill-opacity');
       p.removeAttribute('stroke');
       p.removeAttribute('class');
-    });
+      if (!pare) continue;
+      if (!grup || op !== valor) {
+        grup = doc.createElementNS('http://www.w3.org/2000/svg', 'g');
+        grup.setAttribute('fill', 'white');
+        grup.setAttribute('opacity', op);
+        valor = op;
+        pare.appendChild(grup);
+      }
+      grup.appendChild(p);
+    }
     const serialized = new XMLSerializer().serializeToString(doc.documentElement);
     return `data:image/svg+xml,${encodeURIComponent(serialized)}`;
   } catch {
