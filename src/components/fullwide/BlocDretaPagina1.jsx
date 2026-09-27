@@ -101,7 +101,7 @@ export function SelectorQuadratPagina1({
             <span
               className="font-oswald"
               style={{
-                fontSize: `max(10px, ${carrilPx(14)})`,
+                fontSize: `max(10px, ${carrilPx(13.5)})`,
                 fontWeight: 400,
                 textTransform: 'uppercase',
                 color: desactivat ? '#C4C8CE' : (selectedKey === btn.key ? '#1A1A1A' : '#6B7280'),

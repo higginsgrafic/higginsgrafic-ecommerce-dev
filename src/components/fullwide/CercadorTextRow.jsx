@@ -1180,13 +1180,27 @@ export function CercadorColleccionsColumna({
   // va interpretar «un sol selector» com una sola pastilla amb nome's el nom
   // actiu centrat: la captura de l'amo diu que la llista sencera es veu i que
   // l'actiu es destaca amb la caixa del selector.
-  // El coixi de la caixa de l'actiu (i el de la columna): 5 px, com l'offset
-  // de la pastilla del selector.
-  const COIX_COLUMNA_PX = 5;
-  const coixInset = COIX_COLUMNA_PX;
+  // ELS COIXOS DE LA COLUMNA, amb les xifres de l'amo: la caixa blanca ha de
+  // fer 122 x 22,59 px i la columna 128 x 247. Amb 1 px de vora a la columna,
+  // el coixi lateral es 5,5 px i el vertical 2,8 px (247 - 2 = 245; 245 - 9 x
+  // 22,59 = 3,7; 3,7 / 2 = 1,85... i amb el vertical que dona 22,59 a cada
+  // franja). El `coixInset` es queda per al coixi del text.
+  // ELS COIXOS DE LA COLUMNA (26/09/2026, xifres de l'amo):
+  //   columna 128 x 247; caixa blanca 122 x 22,59.
+  //   amplada: 128,7 - 2 de vora - 2 x 3,35 = 122,0
+  //   alcada:  (247 - 2 - 2 x 2,8) / 9 - 2 x 2,8 = 22,6
+  const COIX_LATERAL_PX = 2;
+  const COIX_VERTICAL_PX = 2;
+  // L'alcada de la caixa blanca (22,59 px a 1920: la xifra que ha mesurat
+  // l'amo). La franja en fa 27 i el coixi vertical se'n menja 6.
+  const ALCADA_CAIXA_PX = 22.59;
+  // L'alcada de la caixa COMPTA la vora d'1 px interior: `border-box`.
+  const BORA_CAIXA_PX = 1;
+  const COIX_COLUMNA_PX = COIX_LATERAL_PX;
+  const coixInset = COIX_LATERAL_PX;
   const midaText = (isPortraitTablet || isLandscapeTablet)
-    ? 'max(10px, 14px)'
-    : `max(10px, ${carrilPx(14)})`;
+    ? 'max(10px, 13.5px)'
+    : `max(10px, ${carrilPx(13.5)})`;
   return (
     <div
       style={{
@@ -1212,10 +1226,19 @@ export function CercadorColleccionsColumna({
         display: 'flex',
         flexDirection: 'column',
         boxSizing: 'border-box',
-        // EL CONTENIDOR, COM EL DEL SELECTOR (radi exterior d'11 px).
+        // EL CONTENIDOR, AMB LES XIFRES MESURADES PER L'AMO (26/09/2026):
+        // radi exterior 6 px, caixa de 128 x 247 px i caixa blanca de 122 x
+        // 22,59. Amb 1 px de vora i 5,5 px de coixi lateral, la caixa blanca fa
+        // exactament 122,2 px d'ample (128 - 2 - 11).
         border: '1px solid #D1D5DB',
-        borderRadius: '5.3px',
+        borderRadius: '6px',
         backgroundColor: '#F3F4F6',
+        // EL COIXI DE LA COLUMNA (26/09/2026), amb les xifres de l'amo:
+        // l'offset entre la caixa blanca i la columna es de 3 px, i el contorn
+        // de les dues caixes es d'1 px interior (`border`).
+        //   amplada de la caixa = 128,7 - 2 (vora) - 2 x 2,35 = 122,0
+        //   alcada de la caixa  = franja - 2 x 3
+        padding: `${COIX_VERTICAL_PX}px ${COIX_LATERAL_PX}px`,
         overflow: 'hidden',
       }}
     >
@@ -1233,34 +1256,45 @@ export function CercadorColleccionsColumna({
             className="focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             style={{
               // Cada franja es clicable i es reparteix l'alcada de la columna,
-              // com les tres caselles del selector (BLANC/COLOR/NEGRE).
+              // com les tres caselles del selector (BLANC/COLOR/NEGRE). El
+              // `minHeight: 0` es imprescindible: sense, el text marca l'alcada
+              // minima de la seva franja i la caixa no pot ser mes baixa que el
+              // text (amb 9 noms, la caixa sortia de 26 px en comptes de 22,59).
+              // LES NOU FRANGES OMPLEN TOTA LA COLUMNA (26/09/2026, ho ha
+              // demanat l'amo: «el text de les colleccions han d'ocupar tota la
+              // columna»). Sense `maxHeight`: amb un topall, les nou franges
+              // s'aplegaven a dalt i deixaven 50 px buits a baix (mesurat a
+              // 768x1024: l'ultima caixa acabava 50 px abans que la franja).
               flex: '1 1 0%',
               minHeight: 0,
+              boxSizing: 'border-box',
+              lineHeight: 1,
               display: 'flex',
               alignItems: 'center',
               // EL TEXT, ENRASAT A LA DRETA (26/09/2026, ho ha dit l'amo:
               // «Linea el text a la dreta»), com la columna de sempre.
               justifyContent: 'flex-end',
               width: '100%',
-              // ELS NOMS, SEPARATS CAP A L'ESQUERRA (26/09/2026, ho ha demanat
-              // l'amo: «Separa els noms de collecció cap a l'esquerra perque el
-              // selector pugui tenir el seu offset i els seus radis a la
-              // dreta»). La caixa de l'actiu te 5 px d'offset i el radi de la
-              // dreta; el text va 6 px mes a l'esquerra perque la caixa es vegi
-              // SENCERA (si el text arribes a la vora, taparia el radi).
-              padding: `0 ${coixInset + 1}px 0 6px`,
-              // LA CAIXA DE L'ACTIU, EXACTAMENT LA DEL SELECTOR (el `span` blanc
-              // del slider): fons, vora, radi 4, ombra i el coixi de 3 px.
+              // EL TEXT, COMPENSAT (26/09/2026, ho ha demanat l'amo: «Compensa
+              // l'offset i el contorn interior del text de les colleccions»):
+              // la caixa ha entrat 2 px per l'offset i n'ha guanyat 1 del
+              // contorn interior, o sigui que el text va 3 px mes a l'esquerra
+              // del que anava. Amb 4 px de coixi dret, el text queda 5 px a
+              // dins de la caixa i el radi de la dreta es veu sencer.
+              padding: '0 4px 0 6px',
+              // LA CAIXA DE L'ACTIU, EXACTAMENT LA DEL SELECTOR: fons blanc,
+              // CONTORN D'1 PX interior (ho ha dit l'amo: «els contorns, tant de
+              // la caixa com del selector blanc, son 1 px interior»), radi 3 i
+              // l'ombra de la casa.
               backgroundColor: activa ? '#FFFFFF' : 'transparent',
-              border: 'none',
+              border: activa ? '1px solid #D1D5DB' : '1px solid transparent',
               borderRadius: '3px',
               ...(activa ? { boxShadow: '0 1px 3px rgba(0,0,0,0.12)' } : null),
-              // EL MATEIX COIXI QUE LA PASTILLA DEL SELECTOR (26/09/2026, ho ha
-              // dit l'amo: «la pastilla del selector te un offset amb el seu
-              // contenidor»): 4 px per cada costat. Amb `border: 1px solid
-              // transparent` la caixa quedaria 2 px mes estreta que la del
-              // selector, i per aixo el coixi va amb `margin`.
-              margin: `${coixInset}px`,
+              // LA CAIXA DE L'ACTIU: el coixi el fa el CONTENIDOR (5,5 px
+              // lateral i 2,8 px vertical), o sigui que la caixa fa 122,2 x
+              // 22,6 px, que son les xifres que ha mesurat l'amo. Sense
+              // `margin`: amb marge, l'amplada no quadra amb la de la columna.
+              margin: 0,
               cursor: 'pointer',
               overflow: 'hidden',
             }}
@@ -1268,9 +1302,10 @@ export function CercadorColleccionsColumna({
             <span
               className="font-oswald"
               style={{
-                // LA MATEIXA MIDA DE TEXT QUE EL SELECTOR.
+                // LA MIDA I ELS PESOS DE L'AMO: 13,5 px, l'activa en regular
+                // (400) i la resta en Extra Light (200).
                 fontSize: midaText,
-                fontWeight: activa ? 700 : 400,
+                fontWeight: activa ? 400 : 200,
                 textTransform: 'uppercase',
                 color: activa ? '#1A1A1A' : '#6B7280',
                 pointerEvents: 'none',

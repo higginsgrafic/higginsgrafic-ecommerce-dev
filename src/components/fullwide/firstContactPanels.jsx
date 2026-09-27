@@ -223,7 +223,7 @@ export function FirstContactDibuix00Buttons({
             <span
               className="font-oswald"
               style={{
-                fontSize: `max(10px, ${carrilPx(14)})`,
+                fontSize: `max(10px, ${carrilPx(13.5)})`,
                 fontWeight: 400,
                 textTransform: 'uppercase',
                 // El desactivat s'apaga (seguint la convencio de la casa: el

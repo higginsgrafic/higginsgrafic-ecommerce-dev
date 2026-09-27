@@ -985,7 +985,18 @@ export default function MegaslidePagina2({
           // que la trepitja 2 px. La columna viu a zIndex 3 (la filera del
           // cercador) i la franja a 1: pugem la franja a 4 perque la maniga
           // quedi per sobre.
+          //
+          // PERO LA CAPA NO HA DE TAPAR RES (26/09/2026). Aquesta capa fa TOT
+          // el carril d'amplada i la seva alcada arriba fins al fons del
+          // panell: amb `zIndex: 4` passava per sobre de la tira de colors i
+          // del carrusel (que viuen a zIndex 1) i s'empassava els clics i la
+          // rodeta («els clics estan tapats o capturats per alguna cosa»,
+          // «nomes funciona l'scroll de la stripe»). Com que la capa no pinta
+          // res (el que es veu son les imatges de dins, que si que rep els
+          // clics), se li treu el `pointer-events`: els clics i la rodeta
+          // travessen la capa i arriben a qui toca.
           zIndex: 4,
+          pointerEvents: 'none',
           width: '100%',
           // SENSE el `left: -3,5px` DE TAU LETA (24/09/2026). Era una
           // compensacio del belt vell: amb el carril de 3/5 desplaçava tota la
