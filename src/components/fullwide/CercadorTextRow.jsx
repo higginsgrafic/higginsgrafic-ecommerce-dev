@@ -10,7 +10,7 @@ import {
 } from './midesGraella.js';
 // L'amplada del retall (l'últim input mesurat de la graella) viu amb la resta
 // de geometria declarada del megaslide.
-import { ampladaRetallGraella, ampladaColumnaGraella, desnivellsLiniesGraella, desnivellColorsGraella, margeBaixFletxesGraella, centratgeSelectorY, desplacTopSelector, topFranjaPagina2, GRAELLA_DRETA_FLETXES_CARRIL_PX, GRAELLA_COLUMNA_DRETA_CARRIL_PX, GRAELLA_GAP_COLUMNES_PX } from '../megaslide/geometriaMegaslide.js';
+import { ampladaRetallGraella, ampladaColumnaGraella, desnivellsLiniesGraella, desnivellColorsGraella, margeBaixFletxesGraella, centratgeSelectorY, desplacTopSelector, topFranjaPagina2, GRAELLA_DRETA_FLETXES_CARRIL_PX, GRAELLA_COLUMNA_DRETA_CARRIL_PX, GRAELLA_GAP_COLUMNES_PX, COLUMNA_TOP_AJUST_PX, COLUMNA_BAIX_AJUST_PX } from '../megaslide/geometriaMegaslide.js';
 import { carrilPct, carrilLane, carrilPx, readRootCssNumber, getLayoutViewportWidth, MEGASLIDE_REFERENCIA_PX } from '../../utils/layoutMetrics.js';
 import { GRAELLA_DIBUIXOS_ESCALA_VERTICAL } from '../../config/stripeCalibrationsVertical.js';
 import { FirstContactDibuix09Buttons } from './firstContactPanels.jsx';
@@ -1538,7 +1538,10 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
         const scyEf = centratgeSelectorY({
           midaSelector, escala: escalaEf, dibuix: dibuixEf, gapV: gapVEf, carril: carrilEf, desplacTop: desplacTopEf,
         });
-        const dalt = desplacTopEf - scyEf;
+        // ELS DOS AJUSTOS DECLARATS (27/09/2026): la columna, alineada pel top
+        // amb el selector B/C/N i pel bottom amb la franja. Vegeu
+        // `COLUMNA_TOP_AJUST_PX`.
+        const dalt = desplacTopEf - scyEf - COLUMNA_TOP_AJUST_PX;
         // EL SOSTRE DE LA FRANJA TAMBE ES DECLARAT (26/09/2026): el seu top ja
         // no es llegeix del DOM (`topFranjaPagina2`: el coixi del panell mes la
         // reserva de la graella vella mes els desplaçaments de disseny). De la
@@ -1553,7 +1556,7 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
           isPortraitTablet,
           isLandscapeTablet,
         });
-        const baix = (pagina.getBoundingClientRect().top + topDeclarat + franja.getBoundingClientRect().height) - f.bottom;
+        const baix = (pagina.getBoundingClientRect().top + topDeclarat + franja.getBoundingClientRect().height) - f.bottom - COLUMNA_BAIX_AJUST_PX;
         if (Math.abs(pintat.margesEnllacos.dalt - dalt) >= 0.01
           || Math.abs(pintat.margesEnllacos.baix - baix) >= 0.5) {
           nou.margesEnllacos = { dalt, baix };

@@ -98,8 +98,14 @@ const mesura = () => {
   const retallB = retall.getBoundingClientRect();
   const samB = samarretes ? samarretes.getBoundingClientRect() : null;
   const selB = sel.getBoundingClientRect();
-  const primerEnllac = targetes.length ? targetes[0].getBoundingClientRect() : null;
-  const darrerEnllac = targetes.length ? targetes[targetes.length - 1].getBoundingClientRect() : null;
+  // LA COLUMNA DE COLLECCIONS, LA CAIXA (27/09/2026). Abans es mesurava la
+  // PRIMERA i l'ULTIMA targeta (les nou franges clicables), pero les franges van
+  // un coixi de 3 px endins de la columna (es el que fa que la caixa blanca de
+  // la colleccio activa quedi dins): amb la columna alineada exactament amb el
+  // selector i la franja (que es el que va demanar en Marc el 27/09), les
+  // franges cauen 3 px endins i el control fallava. El que s'ha de vigilar es la
+  // CAIXA de la columna, que es la que es veu.
+  const columna = targetes.length ? targetes[0].parentElement : null;
   return {
     dibuix: ample,
     gapH: fila0.length > 1 ? +(fila0[1] - fila0[0] - ample).toFixed(2) : null,
@@ -114,8 +120,8 @@ const mesura = () => {
     // El selector es centra amb la SEGONA LINIA de dibuixos.
     selectorDelta: segona ? +(cy(sel) - (segona.top + segona.bottom) / 2).toFixed(2) : null,
     // La columna de colleccions: del top del selector al bottom de la franja.
-    enllacDalt: +(primerEnllac.top - selB.top).toFixed(2),
-    enllacBaix: +((darrerEnllac.bottom - samB.bottom)).toFixed(2),
+    enllacDalt: columna ? +(columna.getBoundingClientRect().top - selB.top).toFixed(2) : null,
+    enllacBaix: (columna && samB) ? +(columna.getBoundingClientRect().bottom - samB.bottom).toFixed(2) : null,
     samarretesH: samB ? +samB.height.toFixed(1) : null,
     samarretesW: samB ? +samB.width.toFixed(1) : null,
     samarretesL: samB ? +samB.left.toFixed(1) : null,
@@ -253,10 +259,10 @@ for (const c of CASES) {
   // La columna de colleccions: les targetes, del top del selector al bottom de
   // la franja.
   if (Math.abs(r.enllacDalt) > TOL_ALINEACIO) {
-    fallades.push(`${c.nom}: la primera targeta de colleccions cau ${r.enllacDalt} px del top del selector`);
+    fallades.push(`${c.nom}: la columna de colleccions cau ${r.enllacDalt} px del top del selector`);
   }
   if (Math.abs(r.enllacBaix) > TOL_ALINEACIO) {
-    fallades.push(`${c.nom}: l'ultima targeta de colleccions cau ${r.enllacBaix} px del bottom de la franja`);
+    fallades.push(`${c.nom}: la columna de colleccions cau ${r.enllacBaix} px del bottom de la franja`);
   }
 }
 

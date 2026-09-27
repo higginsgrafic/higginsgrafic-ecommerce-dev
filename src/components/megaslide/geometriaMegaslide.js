@@ -404,6 +404,26 @@ export function alcadaCellaSelector(midaSelector, escala) {
  * @param {number} [o.mtPill=8] el `mt-2` de la pastilla dins l'embolcall
  * @returns {number} px
  */
+/**
+ * ELS DOS AJUSTOS DE LA COLUMNA DE COLLECCIONS (27/09/2026)
+ * -----------------------------------------------------------------------------
+ * La columna dels nou noms de colleccions ha d'anar **alineada pel top amb el
+ * selector Blanc/Color/Negre** i **pel bottom amb la franja de samarretes**: ho
+ * va demanar en Marc («la columna ha d'anar alineada pel top al selector b/c/n i
+ * per sota al bottom de la stripe»).
+ *
+ * La geometria de la columna es declarada (`desplacTopSelector` menys el
+ * `centratgeSelectorY`, i el sostre de la franja mes la seva alcada), pero la
+ * mesura al navegador donava 2 px de mes a cada banda: la columna començava a
+ * y109,9 (el selector, a y111,9) i acabava a y356,5 (la franja, a y354,5). Amb
+ * aquests dos ajustos (el top es RESTA i el baix tambe) cau exactament:
+ * y111,9 .. y354,5, o sigui **242,6 px** d'alcada en comptes de 246,6.
+ *
+ * Son DECLARATS i amb prova unitaria, com la resta d'aquesta feina.
+ */
+export const COLUMNA_TOP_AJUST_PX = 2;
+export const COLUMNA_BAIX_AJUST_PX = 2;
+
 export function desplacTopSelector({ ample, alt, isLandscapeTablet = false, mtPill = 8 }) {
   const banda = Number.isFinite(ample) && Number.isFinite(alt) && ample >= 768 && ample <= 1366 && ample >= alt;
   const esBandaEstreta = !isLandscapeTablet && banda;

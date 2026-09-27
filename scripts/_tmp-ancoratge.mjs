@@ -7,7 +7,7 @@ import { chromium } from '@playwright/test';
 const REF = {
   'p2 carril': [381, 1524],
   'p2 selector': [381, 111.9, 59.5, 119],
-  'p2 columna': [1395.3, 109.9, 128.7, 246.6],
+  'p2 columna': [1395.3, 111.9, 128.7, 242.6],
   'p2 graella': [450.4, 106.9, 939.4, 95.2],
   'p2 franja': [357.9, 241.5, 1055.1, 113],
   'p1 graella': [381, 97.9, 1023, 110],

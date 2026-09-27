@@ -13,6 +13,8 @@ import {
   alcadaCarruselGraella,
   centratgeSelectorY,
   desplacTopSelector,
+  COLUMNA_TOP_AJUST_PX,
+  COLUMNA_BAIX_AJUST_PX,
   desnivellsLiniesGraella,
   desnivellColorsGraella,
   margeBaixFletxesGraella,
@@ -484,5 +486,23 @@ describe('la composicio de la pagina 1 (B2, 26/09/2026)', () => {
     expect(pagina1AmpladaGraellaPx(0)).toBe(0);
     expect(pagina1AmpladaGraellaPx(null)).toBe(0);
     expect(pagina1AlcadaFileraPx(NaN)).toBe(PAGINA1_ALCADA_FILERA_PX);
+  });
+});
+
+describe('els ajustos de la columna de colleccions (27/09/2026)', () => {
+  it('son els 2 px mesurats a cada banda', () => {
+    // La columna ha d'anar alineada pel top amb el selector Blanc/Color/Negre i
+    // pel bottom amb la franja (ho va demanar en Marc). Amb la geometria
+    // declarada sola, la mesura al navegador donava 2 px de mes a cada banda
+    // (columna y109,9..356,5 contra selector y111,9 i franja y354,5): aquests
+    // son els dos ajustos que ho quadren.
+    expect(COLUMNA_TOP_AJUST_PX).toBe(2);
+    expect(COLUMNA_BAIX_AJUST_PX).toBe(2);
+  });
+
+  it("i porten la columna de 246,6 a 242,6 px d'alcada a 1920", () => {
+    const alcadaAbans = 246.6;
+    const alcadaDespres = alcadaAbans - COLUMNA_TOP_AJUST_PX - COLUMNA_BAIX_AJUST_PX;
+    expect(alcadaDespres).toBeCloseTo(242.6, 1);
   });
 });
