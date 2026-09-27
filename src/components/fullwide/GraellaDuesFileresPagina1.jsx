@@ -38,8 +38,10 @@ export const GAP_PECA_PAGINA1_PX = 0;
  * @param {(stripeItem:string)=>void} [o.onHoverItem]
  * @param {()=>void} [o.onHoverLeave]
  * @param {(pas:number)=>void} [o.onCarouselStep] el pas de les fletxes.
- * @param {number} [o.desplacamentPassos] el desplaçament del carrusel en passos
- *   (les fletxes del bloc de la dreta el mouen; vegeu `BlocDretaPagina1`).
+ * @param {(fn:(direccio:number)=>void)=>void} [o.onStepper] ON ES PUBLICA la
+ *   funcio de pas del carrusel. La pagina 1 te les fletxes al bloc de la dreta
+ *   (fora de la graella) i han de fer el MATEIX que les del carrusel: el bloc
+ *   crida aquesta funcio i no hi ha cap estat en paral·lel (27/09/2026).
  * @param {number} [o.midaSelector] l'amplada del bloc de la dreta, en unitats.
  * @param {number} [o.escala] l'escala del carril (`--hg-escala-mega`), que el
  *   pare passa perque aqui no es pot llegir el DOM. Les mides de
@@ -54,7 +56,7 @@ export default function GraellaDuesFileresPagina1({
   onHoverItem,
   onHoverLeave,
   onCarouselStep,
-  desplacamentPassos = 0,
+  onStepper = null,
   midaSelector = 120,
   /** L'alcada de la finestra del carrusel, en px. La mana el bloc de la dreta
    *  (selector + fletxes): la graella ha de fer exactament la seva alcada. */
@@ -89,7 +91,12 @@ export default function GraellaDuesFileresPagina1({
         midaSelector={midaSelector}
         reservaDreta={0}
         carrusel
-        desplacamentPassos={desplacamentPassos}
+        // LES FLETXES DEL CARRUSEL NO ES VEuen A LA PAGINA 1 (27/09/2026): les
+        // que manen son les del bloc de la dreta, que criden `stepperRef`. Amb
+        // les dues parelles visibles n'hi havia quatre i nome's dues feien
+        // feina (mesurat: les del carrusel a x1349 i les del bloc a x1414).
+        senseFletxes
+        onStepper={onStepper}
         activeCollection={activeCollection}
         onSelectGroup={onSelectGroup}
         onHoverItem={onHoverItem}

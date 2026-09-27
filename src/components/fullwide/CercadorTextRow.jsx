@@ -1,4 +1,4 @@
-import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { CERCADOR_COLLECTIONS, CERCADOR_COLORS, etiquetaColleccio } from './CercadorTopBar.jsx';
 // La geometria de la graella viu a midesGraella.js perquè també la fa servir
 // el mòdul de mesura única. Aquí només es consumeix.
@@ -371,10 +371,15 @@ export function CercadorDibuixosGraella({
    *  fletxes governen els dibuixos de la FRANJA en comptes del carrusel de la
    *  graella. */
   onCarouselStep,
-  /** El desplaçament del carrusel en PASSOS, governat de fora (les fletxes del
-   *  bloc de la dreta de la PAGINA 1, que viu fora d'aquesta graella). Cada pas
-   *  es mig periode d'una peça (`unPas`), la mateixa unitat que el gest. */
-  desplacamentPassos = 0,
+  /** LA FUNCIO DE PAS, CAP A FORA (27/09/2026). La pagina 1 te les fletxes FORA
+   *  d'aquesta graella (al bloc de la dreta) i han de fer el MATEIX que les
+   *  fletxes del carrusel: moure la tira amb `setDesplacGest`. Qui posa la
+   *  graella passa un `setState` i aqui s'hi publica la funcio de pas, de
+   *  manera que nome's hi ha UN mecanisme i un sol estat (el de dins). */
+  onStepper = null,
+  /** Amaga el bloc de fletxes de dins del carrusel (la pagina 1 en te un de
+   *  propi al bloc de la dreta; les del carrusel son les del disseny vell). */
+  senseFletxes = false,
   /** L'alcada de la finestra del carrusel, en px. Si arriba, mana sobre el
    *  calcul de les dues files: es el cas de la pagina 1, on la graella ha de
    *  fer exactament l'alcada del bloc de la dreta (selector + fletxes). */
@@ -438,28 +443,43 @@ export function CercadorDibuixosGraella({
   // junts en un costat; a les tauletes no hi son (ho va dir l'amo).
   // EL DESPLAÇAMENT, EN DUES PARTS: LA BASE I EL GEST (26/09/2026, pagina 1).
   //
-  // La base la governa qui mana del carrusel: la colleccio activa (que el
-  // centra, vegeu mes avall) o, a la pagina 1, el comptador de passos de les
-  // fletxes del bloc de la dreta (`desplacamentPassos`). El GEST (arrossegar,
-  // rodeta i les fletxes de la pagina 2) suma el seu propi desplaçament a
+  // La base la governa qui mana del carrusel: la colleccio activa, que el centra
+  // (vegeu mes avall). El GEST (arrossegar, rodeta, les fletxes de la pagina 2 i
+  // les del bloc de la dreta de la pagina 1) suma el seu propi desplaçament a
   // sobre. Aixi les dues coses no es trepitgen i no cal posar la base a cap
   // efecte (que era el que provocava un `setState` dins d'un efecte).
+  //
+  // EL BLOC DE FLETXES DE LA PAGINA 1 TAMBE ESCRIVIA AQUI, I ERA EL PROBLEMA
+  // (27/09/2026). Tenia un comptador de passos propi al pare
+  // (`desplacamentPassos`) que es muntava al cos del render: cada cop que
+  // canviava, allo esborrava la base i la compensava al gest perque la posicio
+  // no fes cap salt, o sigui que el pas del bloc es cancel·lava a si mateix
+  // (mesurat: la transformacio del carrusel no es movia mai de −1018,5, i el
+  // pare arribava a veure `passos: 1, base: 22,5`). Ara el bloc crida la funcio
+  // de pas de la graella (`stepperRef`, el mateix `setDesplacGest` que les
+  // fletxes del carrusel) i nome's hi ha un estat.
   const [desplacBase, setDesplacBase] = useState(0);
   const [desplacGest, setDesplacGest] = useState(0);
-  const [baseExternaVista, setBaseExternaVista] = useState(0);
-  // Quan la base canvia (els passos de les fletxes de la pagina 1), el gest es
-  // refa a partir d'on era la posicio de debò, perque el salt no es vegi. Va al
-  // cos del render (patro de React per a l'estat derivat de les props) i no a
-  // cap efecte.
-  const baseExterna = desplacamentPassos * unPas;
-  if (baseExternaVista !== baseExterna) {
-    setBaseExternaVista(baseExterna);
-    setDesplacBase(baseExterna);
-    setDesplacGest((v) => v + (desplacBase - baseExterna));
-  }
   const arrossegant = useRef(null);
   const haArrossegat = useRef(false);
-  const ambFletxes = carrusel && !isPortraitTablet && !isLandscapeTablet;
+  const ambFletxes = carrusel && !isPortraitTablet && !isLandscapeTablet && !senseFletxes;
+  // LA FUNCIO DE PAS, PUBLICADA (27/09/2026). Les fletxes del bloc de la dreta
+  // de la pagina 1 son FORA d'aquesta graella: en comptes de portar un estat
+  // propi, en reben aquesta i criden el MATEIX `setDesplacGest` que les fletxes
+  // del carrusel. `unPas` es mig periode d'una peca (la unitat del gest i de la
+  // rodeta).
+  const stepper = useCallback((direccio) => {
+    const d = Number(direccio) || 0;
+    if (!d) return;
+    setDesplacGest((v) => v + d * unPas);
+  }, [unPas]);
+  useEffect(() => {
+    // Amb `() => stepper` i no `stepper`: un `setState` amb una funcio la
+    // tracta com un actualitzador i la cridaria. Aixi el que es desa es la
+    // funcio, i com que la referencia nome's canvia quan canvia `unPas`, React
+    // no torna a renderitzar.
+    if (typeof onStepper === 'function') onStepper(() => stepper);
+  }, [onStepper, stepper]);
   // La caixa que es mou: el ref que arriba de fora (la filera) o el nostre.
   const refInterna = useRef(null);
   const refCarrusel = graellaRef || refInterna;

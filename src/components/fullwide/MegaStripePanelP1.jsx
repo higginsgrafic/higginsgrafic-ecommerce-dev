@@ -282,12 +282,23 @@ function MegaStripePanelP1({
   // vertical (tauleta), on la graella viu a la taula i el panell va amb
   // `hideGrid`.
   const itemsGraella = useMemo(() => dibuixosGraella16x4(), []);
-  const [pageStart, setPageStart] = useState(0);
-  const totalGrupsPagina1 = itemsGraella.length;
-  const passaPagina1 = (pas) => {
-    if (!totalGrupsPagina1) return;
-    setPageStart((v) => (((v + pas) % totalGrupsPagina1) + totalGrupsPagina1) % totalGrupsPagina1);
-  };
+  // LA FUNCIO DE PAS DEL CARRUSEL, PUBLICADA PER LA GRAELLA (27/09/2026).
+  //
+  // El bloc de la dreta es FORA de la graella, i fins ara portava un comptador
+  // de passos propi (`pageStart` -> `desplacamentPassos`) que la graella
+  // desfeia: cada cop que canviava, el muntatge de la base esborrava la base i
+  // compensava el gest perque la posicio no fes cap salt, i el pas es
+  // cancel·lava. Mesurat: la transformacio del carrusel es quedava sempre a
+  // −1018,5 i el clic a la fletxa no movia res.
+  //
+  // Ara la graella publica aqui el SEU pas (`setDesplacGest`, el mateix que fan
+  // servir les fletxes del carrusel i la rodeta) i el bloc el crida: un sol
+  // mecanisme i un sol estat.
+  // La funcio de pas que publica la graella (vegeu `onStepper`): les fletxes
+  // del bloc la criden. Es desa en ESTAT, no en un `ref`, perque els `onClick`
+  // dels botons l'han de veure fresca; nome's canvia quan canvia el pas de la
+  // graella, o sigui que no provoca renders de mes.
+  const [stepperP1, setStepperP1] = useState(null);
   // L'ESCALA DEL CARRIL, EN NUMERO. La graella nova la necessita per calcular
   // el pas i l'alcada del carrusel (operacions matematiques: amb la cadena
   // `calc(...)` que torna `carrilPx` el carrusel naixia amb alcada 0). A la
@@ -467,7 +478,7 @@ function MegaStripePanelP1({
               <div style={{ flex: '1 1 0%', minWidth: 0, marginRight: `${gapDretaPx}px` }}>
                 <GraellaDuesFileresPagina1
                   items={itemsGraella}
-                  desplacamentPassos={pageStart}
+                  onStepper={setStepperP1}
                   activeCollection={active}
                   escala={escalaCarril}
                   alcadaCarruselPx={alcadaFileraPx}
@@ -502,8 +513,8 @@ function MegaStripePanelP1({
                   onMulti={() => { setStripeOverlayOverrideActive(false); setFirstContactVariant('color'); }}
                 />
                 <FletxesQuadratPagina1
-                  onPrev={() => passaPagina1(-1)}
-                  onNext={() => passaPagina1(1)}
+                  onPrev={() => stepperP1?.(-1)}
+                  onNext={() => stepperP1?.(1)}
                 />
               </div>
             </div>
