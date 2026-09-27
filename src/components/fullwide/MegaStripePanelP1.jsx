@@ -481,7 +481,12 @@ function MegaStripePanelP1({
     >
       {!hideGrid || reserveGridSpace ? (
         <div
-          className="relative z-10 grid grid-cols-1 gap-10"
+          // SENSE `z-10` (28/09/2026). La filera (la graella i el bloc de la dreta) anava
+          // a zIndex 10 i per aixo la caixa del bloc tapava la maniga de la franja:
+          // tota la filera pintava per damunt. En Marc: «Es veu la caixa per sobre».
+          // Sense capa propia, la franja (que ve DESPRES al DOM) hi pinta per damunt,
+          // com a la p2.
+          className="relative grid grid-cols-1 gap-10"
           style={{
             // LA GRAELLA DE DUES FILERES I EL BLOC DE LA DRETA (26/09/2026,
             // B2). A l'escriptori i a la tauleta apaisada la composicio es:
