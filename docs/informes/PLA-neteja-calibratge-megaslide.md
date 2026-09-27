@@ -1502,3 +1502,16 @@ damunt i l'ombra queia SOBRE la màniga.
 contenidor de la franja de la p1 passa a `zIndex: 4`, el MATEIX que la capa de la
 franja de la p2 (alla la franja és a 4 i la columna a 3): la imatge de la samarreta
 ha de quedar per damunt de la caixa del bloc (i de l'ombra que hi ha a dins).
+
+#### Volta 21 sexies — el bloc, a la capa de la columna de la p2
+
+En Marc: «La franja p1 és a la mateixa z-index que la p2, però el bloc p1 és a la
+mateixa z-index que el p2?» i «Reverteix el darrer canvi».
+
+**La resposta era no.** A la p2 la columna de col·leccions és a `zIndex: 3` i la
+franja a 4. El bloc de la p1 tenia la franja a 4 però el bloc sense capa pròpia
+(`auto`), i per això hi pintava per damunt («la franja continua per sota del
+bloc»). Ara el bloc de la p1 també és a **`zIndex: 3`**.
+
+**Revertit** el bloc a 117,7 px: torna a **128,7** (el lateral esquerre, 1395,3,
+com la columna de la p2), amb la graella a 1003.
