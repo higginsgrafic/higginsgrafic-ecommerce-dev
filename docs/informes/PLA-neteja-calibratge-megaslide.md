@@ -993,3 +993,31 @@ abans de calcular-hi res**, i si no hi es, passar l'escala del carril com a prop
 Bateria: 581 proves (45 fitxers), eslint amb els comptes de HEAD,
 `vite build` OK, `compara-vistes` OK, `mesura-formats` 0 i 0, `_tmp-errors2`
 cap error.
+
+### VOLTA 10 — El calibratge amb l'editor de l'amo (en curs)
+
+L'amo ha mesurat les captures amb Affinity a 144 dpi: el selector de la casa li
+fa **35 px** i el de la captura que va pujar, **47 px**. Demana quin coeficient
+aplicar a les seves mides perque quadrin amb les nostres, i proposa una prova:
+un quadrat de 100x100 px.
+
+**Fet:** `scripts/_tmp-regle.mjs` genera `_tmp-regle.png`, un full de calibratge
+de 720x820 px CSS **a 1:1** (deviceScaleFactor 1, o sigui 1 px de pantalla = 1 px
+de la imatge) amb quadrats de **50, 100, 200 i 400 px** i una marca de 100 px.
+Amb el que faci el quadrat de 100 px a Affinity, el coeficient es
+
+    coeficient = (el que faci el quadrat de 100) / 100
+
+i, per passar les NOSTRES mides a les seves, es multiplica per aquest
+coeficient.
+
+**Les nostres mides a 1920x946** (les que s'han de poder convertir):
+
+| peça | px |
+|---|---|
+| selector BLANC/COLOR/NEGRE: contenidor | 59,5 x 119 |
+| selector: pastilla blanca (una cella) | 47,5 x 29 |
+| columna de colleccions | 128,7 x 252,6 |
+| columna: caixa blanca de l'actiu | 118,7 x 17,8 |
+| columna: cada franja (fila clicable) | 128,7 x 26,7 |
+| text (selector i columna) | 13,89 |
