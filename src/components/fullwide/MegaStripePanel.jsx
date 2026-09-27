@@ -563,6 +563,18 @@ function MegaStripePanel({
   // era el rombe. Vegeu `generaVelDataUrl`.
   const cellesVel = isPortraitTablet ? rectsMascara : null;
   const emptyShirtMaskUrl = useEmptyShirtMask(emptyTileIndices, shirtColor, cellesVel);
+  // LA MASCARA DE CONTORN, GENERADA PER NOSALTRES (27/09/2026). El full de
+  // l'amo (`full-clic-area-5.svg`) porta `style="fill:#0091ff;fill-opacity:0.5"`
+  // a cada cami i, fet servir TAL QUAL de mascara, deixava la franja sencera al
+  // 50 % d'opacitat (les samarretes es veien mig transparents; ho ha vist en
+  // Marc: «totes les samarretes semblen velades»). Amb les catorze siluetes a
+  // opacitat 1 la mascara es un retall net.
+  const mapaTotesSiluetes = useMemo(() => {
+    const m = {};
+    for (let i = 0; i < 14; i++) m[i] = 1;
+    return m;
+  }, []);
+  const siluetesMaskUrl = useVelSamarretes(mapaTotesSiluetes, `contorn|${clauCelles}`, 'white', cellesVel);
 
   // El vel de les samarretes inactives (vegeu la prop). Nomes a l'apaisat: alla
   // la franja es UNA sola imatge amb les catorze samarretes i no hi ha cap
@@ -949,12 +961,12 @@ function MegaStripePanel({
                       ? 'none'
                       : (emptyShirtMaskUrl
                         ? `url("${emptyShirtMaskUrl}")`
-                        : 'url(/placeholders/cercador/full-clic-area-5.svg)'),
+                        : `url("${siluetesMaskUrl}")`),
                     maskImage: senseMascaraSamarreta
                       ? 'none'
                       : (emptyShirtMaskUrl
                         ? `url("${emptyShirtMaskUrl}")`
-                        : 'url(/placeholders/cercador/full-clic-area-5.svg)'),
+                        : `url("${siluetesMaskUrl}")`),
                     WebkitMaskRepeat: 'no-repeat',
                     maskRepeat: 'no-repeat',
                     WebkitMaskSize: '103% 100%',

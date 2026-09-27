@@ -140,6 +140,12 @@ function generaMascaraBuidesDataUrl(text, emptyTileIndices, shirtColor) {
       p.removeAttribute('fill-opacity');
       p.removeAttribute('stroke');
       p.removeAttribute('class');
+      // EL `style` DEL FULL TAMBE SE'N VA (27/09/2026). El full nou de l'amo
+      // porta `style="fill:#0091ff;fill-opacity:0.5"` a cada cami, i el `style`
+      // en línia guanya sobre l'atribut `fill`: la mascara quedava al 50 % i la
+      // franja sencera es veia mig transparent (ho ha vist en Marc: «totes les
+      // samarretes semblen velades»). La mascara ha de ser opaca.
+      p.removeAttribute('style');
       if (!pare) continue;
       if (!grup || op !== valor) {
         grup = doc.createElementNS('http://www.w3.org/2000/svg', 'g');
@@ -732,12 +738,12 @@ function MegaStripePanelP1({
                       ? 'none'
                       : (emptyShirtMaskUrl
                         ? `url("${emptyShirtMaskUrl}")`
-                        : 'url(/placeholders/cercador/full-clic-area-5.svg)'),
+                        : 'none'),
                     maskImage: senseMascaraSamarreta
                       ? 'none'
                       : (emptyShirtMaskUrl
                         ? `url("${emptyShirtMaskUrl}")`
-                        : 'url(/placeholders/cercador/full-clic-area-5.svg)'),
+                        : 'none'),
                     WebkitMaskRepeat: 'no-repeat',
                     maskRepeat: 'no-repeat',
                     WebkitMaskSize: '103% 100%',
