@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import {
-  midesGraellaCompacta, midaDibuix, gapHorizontal, colorPas,
+  midesGraellaCompacta, midaDibuix, gapHorizontal, colorPas, DIBUIX_GAP_H,
   GRAELLA_COLUMNES, GRAELLA_FILES, GRAELLA_MARGE_FRANJA,
   BLOC_DRETA_DIBUIXOS_ESCRIPTORI_PX, MARGE_ESQUERRA_DIBUIXOS_ESCRIPTORI_PX,
   MARGE_DRET_FILERA_ESCRIPTORI_PX,
@@ -27,8 +27,8 @@ const alçadaGraella = (m) => GRAELLA_FILES * m.dibuix + (GRAELLA_FILES - 1) * m
 describe('midesGraellaCompacta', () => {
   it('amb espai de sobres fa servir les mides base de desktop', () => {
     const m = midesGraellaCompacta({ ampleAmple: 1200, sostre: 400, daltGraella: 100 });
-    expect(m.dibuix).toBeCloseTo(30, 5);
-    expect(m.gapH).toBeCloseTo((875 - 16 * 30) / 15, 5);
+    expect(m.dibuix).toBeCloseTo(28.5, 5);
+    expect(m.gapH).toBeCloseTo(DIBUIX_GAP_H, 5);
     // Amb espai de sobres el pas vertical NO és el de reserva: és el pas dels
     // cercles menys el dibuix (33 - 30 = 3), que és el que fa caure cada fila
     // de dibuixos a la seva fila de cercles.
@@ -41,8 +41,9 @@ describe('midesGraellaCompacta', () => {
     // comprimeix són els gaps: és el que evita que, a 1440/1280, la columna de
     // col·leccions caigui sobre la graella de colors.
     const m = midesGraellaCompacta({ ampleAmple: 798, sostre: 400, daltGraella: 100 });
-    expect(m.dibuix).toBeCloseTo(30, 5);
-    expect(m.gapH).toBeCloseTo((798 - GRAELLA_COLUMNES * 30) / (GRAELLA_COLUMNES - 1), 5);
+    expect(m.dibuix).toBeCloseTo(28.5, 5);
+    // Amb la columna estreta el gap s'encongeix (no arriba al declarat).
+    expect(m.gapH).toBeLessThanOrEqual(DIBUIX_GAP_H);
     // El pas vertical no pot ser més gran que la separació horitzontal.
     expect(m.gapV).toBeLessThanOrEqual(m.gapH);
   });
@@ -54,7 +55,7 @@ describe('midesGraellaCompacta', () => {
     // dibuix no s'ha de tocar.
     const m = midesGraellaCompacta({ ampleAmple: ample, sostre: 228, daltGraella: 100 });
     expect(m.gapV).toBeGreaterThanOrEqual(0);
-    expect(m.gapV).toBeLessThan(3);
+    expect(m.gapV).toBeLessThan(4.5);
     expect(alçadaGraella(m)).toBeLessThanOrEqual(228 - 100 - GRAELLA_MARGE_FRANJA + 0.001);
     // El dibuix no s'ha de tocar: és el mateix que sense límit d'alçada.
     const senseLimit = midesGraellaCompacta({ ampleAmple: ample, sostre: 400, daltGraella: 100 });
@@ -75,7 +76,7 @@ describe('midesGraellaCompacta', () => {
     // colors feien un salt en obrir el megaslide (mesurat a 1920 el 25/09/2026).
     // El que SÍ que necessita la franja és la DEDUCCIÓ (les proves de dalt).
     const m = midesGraellaCompacta({ ampleAmple: 798, sostre: null, daltGraella: 100 });
-    expect(m.dibuix).toBeCloseTo(30, 5);
+    expect(m.dibuix).toBeCloseTo(28.5, 5);
     expect(m.gapV).toBeCloseTo(colorPas(false, false) - m.dibuix, 5);
   });
 

@@ -709,8 +709,9 @@ function MegaStripePanelP1({
           // nome's se'n veu la part que cau dins del bloc, com a la pagina 2 (alla la franja es a
           // zIndex 4 i la columna a 3).
           className="relative"
-          style={{ zIndex: 4 }}
           style={{
+            // LA FRANJA, PER DAMUNT DEL BLOC (zIndex 4, com a la p2).
+            zIndex: 4,
             // A la franja estreta (768-1366) la pàgina ja té els seus propis
             // ajustos de 10 px i l'ajust general no s'hi ha d'aplicar.
             marginTop: compactLandscape ? '16px' : `calc(${stripeRowPadPx}px - ${ajustFranjaPx}px)`,

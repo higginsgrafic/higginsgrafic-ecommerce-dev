@@ -77,8 +77,12 @@ export default function useDebugToggles({ locationSearch }) {
   });
 
   useEffect(() => {
-    // Una decisio que ve de la URL es d'aquesta obertura, no de l'amo.
-    if (belt2FromUrl !== null) return;
+    // NOME'S NO ES DESA L'ENCENDRE DES DE LA URL (28/09/2026). En Marc: «No es
+    // desactiven»: amb `?belt2=0` les guies s'apagaven en aquella obertura, pero
+    // el valor desat seguia essent '1' i tornaven a sortir al recarregar. Apagar
+    // des de la URL SI que es desa; encendre-hi (que es el que fan les eines de
+    // mesura) no, perque no les deixin enceses per sempre.
+    if (belt2FromUrl === true) return;
     try {
       window.localStorage.setItem('HG_BELT2_GUIDES_ENABLED_V1', belt2GuidesEnabled ? '1' : '0');
     } catch {
@@ -87,8 +91,8 @@ export default function useDebugToggles({ locationSearch }) {
   }, [belt2GuidesEnabled, belt2FromUrl]);
 
   useEffect(() => {
-    // Una decisio que ve de la URL es d'aquesta obertura, no de l'amo.
-    if (carrilFromUrl !== null) return;
+    // El mateix que a `belt2`: apagar des de la URL es desa, encendre-hi no.
+    if (carrilFromUrl === true) return;
     try {
       window.localStorage.setItem('HG_CARRIL_GUIDES_ENABLED_V1', carrilGuidesEnabled ? '1' : '0');
     } catch {

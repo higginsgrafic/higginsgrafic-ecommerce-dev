@@ -71,9 +71,21 @@ export const MARGE_DRET_FILERA_ESCRIPTORI_PX = 40;
 // La separació vertical no és fixa: CercadorTextRow la calcula segons l'espai
 // que hi hagi fins a la franja de samarretes (DIBUIX_GAP_V és el valor de
 // reserva quan encara no s'ha pogut mesurar).
-export const DIBUIX_PX = 30;
-export const DIBUIX_GAP_H = (GRAELLA_AMPLADA - GRAELLA_COLUMNES * DIBUIX_PX) / (GRAELLA_COLUMNES - 1);
-export const DIBUIX_GAP_V = DIBUIX_GAP_V_BASE * (DIBUIX_PX / DIBUIX_BASE);
+// UN 5% MES PETITS (28/09/2026). En Marc: «Expandeix els dibuixos de la p2,
+// també» i, quan li vaig preguntar com, «com la p1». A la p1 les miniatures han
+// baixat un 5% i el gap s'ha obert sol (el carrusel reparteix l'espai que
+// sobra): aqui es el mateix, 30 -> 28,5. El gap horitzontal es calcula a partir
+// d'aquesta mida, o sigui que tambe s'obre.
+export const DIBUIX_PX = 28.5;
+// EL MATEIX GAP QUE LA P1 (28/09/2026). En Marc: «Fes la p2 amb el mateix gap que
+// la p1»: el gap es fixa a 36 (que, amb l'escala 1,5 del carrusel de la p2, dona
+// els 54 px que fa la p1) en comptes de repartir l'espai que sobra.
+export const DIBUIX_GAP_H = 36;
+// El pas VERTICAL es queda com era (28/09/2026): si s'encongia amb la mida del
+// dibuix, la segona filera de la p2 pujava i el selector deixava d'estar centrat
+// amb ella (mesurat: -4 px a 1024, 1366 i 1440). El dibuix es mes petit, pero el
+// pas vertical no.
+export const DIBUIX_GAP_V = DIBUIX_GAP_V_BASE;
 // Tauleta (horitzontal i vertical, de moment iguals): 42% de la base 1:1 (eren
 // el 40%: l'amo els vol "una mica" mes grossos; amb el 45% eren massa).
 export const ESCALA_TAULETA = 0.995; // 0,5% mes petit (ho demana el disseny)

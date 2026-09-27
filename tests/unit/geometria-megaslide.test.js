@@ -476,9 +476,9 @@ describe('la composicio de la pagina 1 (B2, 26/09/2026)', () => {
     // I la caixa del bloc es mes ampla: encavalca la franja perque la maniga de
     // l'ultima samarreta hi faci l'ombra, com a la columna de la p2.
     expect(PAGINA1_AMPLADA_BLOC_DRETA_PX).toBe(128.7);
-    expect(PAGINA1_ALCADA_FILERA_PX).toBe(119);
+    expect(PAGINA1_ALCADA_FILERA_PX).toBe(134);
     // Dues fileres de dibuixos, de la mida del selector (60 -> 59,5).
-    expect(PAGINA1_ALCADA_FILERA_PX / 2).toBe(59.5);
+    expect(PAGINA1_ALCADA_FILERA_PX / 2).toBe(67);
   });
 
   it('l amplada del bloc de la dreta i la de la graella quadren amb el carril', () => {
@@ -496,8 +496,10 @@ describe('la composicio de la pagina 1 (B2, 26/09/2026)', () => {
     expect(graella + PAGINA1_GAP_DRETA_PX * escala + bloc).toBeCloseTo(1143, 6);
   });
 
-  it('l alcada de la filera en px es la del selector (119 a 1920, la p1 va a escala 1)', () => {
-    expect(pagina1AlcadaFileraPx(1)).toBeCloseTo(119, 1);
+  it('l alcada de la filera en px es la del conjunt de les dues fileres (134 a 1920)', () => {
+    // 2 x 51,3 de pec a + 20 de separacio = 122,6; amb l'ajust de la centrada, la
+    // caixa fa 134.
+    expect(pagina1AlcadaFileraPx(1)).toBeCloseTo(134, 1);
   });
 
   it('amb valors que no valen, no peta', () => {

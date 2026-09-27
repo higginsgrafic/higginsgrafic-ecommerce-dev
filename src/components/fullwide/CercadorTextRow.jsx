@@ -736,9 +736,22 @@ export function CercadorDibuixosGraella({
           // li falta per caure sobre la seva cel·la del selector (BLANC la
           // primera, COLOR la segona), que es el que mesura la graella.
           ...(carrusel ? {
+            // LA SEGONA FILERA, `gapV` MES AVALL (28/09/2026). En Marc: «Es mouen
+            // totes dues juntes. Has de separar-les»: en mode carrusel les peces
+            // son ABSOLUTES i el `gap` de la graella no hi fa res, o sigui que la
+            // separacio entre les dues fileres s'ha d'aplicar aqui. Amb `gapV` la
+            // filera 1 no es mou i la 2 baixa.
             position: 'absolute',
             left: `${(i * pas) / 2}px`,
-            top: `${(i % 2) ? alcadaFila - desnivellsLinies.segona : -desnivellsLinies.primera}px`,
+            top: `${(i % 2)
+              // NOME'S LA GRAELLA DE LA P1 SEPARA LES FILES AMB `gapV` (28/09/2026).
+              // La seva graella va `senseFletxes` (les fletxes son al bloc de la
+              // dreta); a la p2 el `gapV` es el pas vertical de la seva propia
+              // composicio i sumar-l'hi movia la segona filera (i amb ella el
+              // centratge del selector i les caselles del vel: «els dibuixos es
+              // veuen per sobre el vel»).
+              ? alcadaFila - desnivellsLinies.segona + (senseFletxes ? gapV + DESPLACAMENT_FILES_P1_PX : 0)
+              : -desnivellsLinies.primera + (senseFletxes ? DESPLACAMENT_FILES_P1_PX : 0)}px`,
           } : null),
           // Amb `tilesPercent` la tile s'encongeix dins la seva casella
           // (el centre no es mou).
@@ -1442,6 +1455,13 @@ export function CercadorColleccionsColumna({
   );
 }
 
+// EL DESPLACAMENT DE LES DUES FILERES DE LA GRAELLA DE LA P1 (28/09/2026). El
+// centratge les mou 16 px avall, i ho ha de fer MOVENT LES PECES, no el
+// contenidor: la caixa de la graella ancorra el clic de la p1 i el bucle
+// d'alineacio de la p2, i moure-la ho desquadrava tot (el clic obria un altre
+// dibuix i la p2 pujava 16,7 px).
+const DESPLACAMENT_FILES_P1_PX = 16;
+
 function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripeItem, hoveredStripeItem, onSelectGroup, onHoverItem, onHoverLeave, onCarouselStep, compact = false, selectedColor = 'white', onSelectColor, onSelectCollection, isPortraitTablet = false, isLandscapeTablet = false, fontBoost = 0, desplacamentVertical = 0, esquerra, midaSelector = 56, alineacioY = 0, onMides = null, ombraManiga = null }) {
   // UNA SOLA PASSADA PER A TOT EL QUE ES MESURA DE LA FILERA (26/09/2026).
   //
@@ -1733,7 +1753,14 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
       ? dibuixBasePx / midaDibuix(isPortraitTablet, isLandscapeTablet)
       : 1;
     const colorGapPx = colorGap(isPortraitTablet, isLandscapeTablet) * factorDibuix;
-    const gapH = mesures.midesGraella?.gapH ?? gapHorizontal(isPortraitTablet, isLandscapeTablet);
+    // EL MATEIX GAP QUE LA P1, A L'ESCRIPTORI (28/09/2026). En Marc: «Fes la p2
+    // amb el mateix gap que la p1» (54 px). Aqui el gap de la p2 ve d'una MESURA
+    // (`mesures.midesGraella.gapH`), i per aixo canviar la constant no feia res:
+    // a l'escriptori es fixa a 54 i a les tauletes (vertical i apaissada) es
+    // respecta el que hi ha.
+    const gapH = (!isPortraitTablet && !isLandscapeTablet)
+      ? 54
+      : (mesures.midesGraella?.gapH ?? gapHorizontal(isPortraitTablet, isLandscapeTablet));
     const gapV = mesures.midesGraella?.gapV ?? gapVertical(isPortraitTablet, isLandscapeTablet);
     const activeKey = activeCollection === 'austen' ? `austen:${activeSubcollection || ''}` : activeCollection;
     // L'amplada de les fletxes mes el seu coixi: el marge dret que han de

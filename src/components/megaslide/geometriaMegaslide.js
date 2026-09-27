@@ -900,7 +900,7 @@ export const PAGINA1_AMPLADA_BLOC_DRETA_PX = 128.7;
  * 110, apilats). Amb DUES fileres de dibuixos de 55 unitats, la de dalt cau al
  * centre de la cel·la BLANC i la de baix al de la COLOR.
  */
-export const PAGINA1_ALCADA_FILERA_PX = 119;
+export const PAGINA1_ALCADA_FILERA_PX = 134;
 
 /** El top de la filera dins el panell, en unitats (mesurat: 13,8 unitats a
  *  1920 posen la filera de dalt al centre de la cel·la BLANC). */

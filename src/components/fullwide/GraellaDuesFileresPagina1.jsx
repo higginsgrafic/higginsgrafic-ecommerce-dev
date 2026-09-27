@@ -30,14 +30,30 @@ import { CercadorDibuixosGraella } from './CercadorTextRow.jsx';
 // que es mogui res mes». Les caselles de la graella fan 59,5 d'alcada (dues, 119:
 // l'alcada del selector, que no es toca), i amb la peca a 54 queden 5,5 px de
 // separacio entre les dues fileres.
-export const COSTAT_PECA_PAGINA1_PX = 54;
+export const COSTAT_PECA_PAGINA1_PX = 51.3;
+
+/**
+ * LA SEPARACIO VERTICAL ENTRE LES DUES FILERES (28/09/2026). En Marc: «Separa la
+ * fila 2 en Y» i «No les pots separar?». Es el `gapV` de la graella: les peces no
+ * es centren a la casella, sino que la segona filera cau a `peca + gapV`. Amb la
+ * peca a 54 i el gap a 30, la filera 2 arrenca 84 px mes avall.
+ */
+export const GAP_FILES_PAGINA1_PX = 20;
+
+/**
+ * Els px que la primera filera es puja (6 a 1920). En Marc: «Alinea la primera
+ * fila amb el top del selector» i, tot seguit, «mes val que la centris amb
+ * COLOR»: amb aquest desplacament el CENTRE de la primera filera cau al centre de
+ * la casella COLOR del selector.
+ */
+export const DESPLACAMENT_TOP_FILERA_PX = 16;
 
 /** El gap entre peces, en unitats de disseny (el mateix que la pagina 2). */
 // EL MATEIX GAP QUE LA PAGINA 2 (28/09/2026). En Marc, mirant la graella de la
 // p1: «la graella dels dibuixos hi estan tots enganxats l'un amb l'altre. Deixa-hi
 // el mateix gap que a la p2». Mesurat a 1920: la p2 fa 26,07 px de gap entre
 // peces (44,63 de peca); la p1 en feia 0.
-export const GAP_PECA_PAGINA1_PX = 26;
+export const GAP_PECA_PAGINA1_PX = 54;
 
 /**
  * @param {object} o
@@ -86,12 +102,32 @@ export default function GraellaDuesFileresPagina1({
   const dibuixPx = COSTAT_PECA_PAGINA1_PX * escalaNumerica;
 
   return (
-    <div data-graella-files-p1="1" style={{ width: '100%', minWidth: 0 }}>
+    <div
+      data-graella-files-p1="1"
+      style={{
+        width: '100%',
+        minWidth: 0,
+        boxSizing: 'border-box',
+        // LA LINIA DE L'ESQUERRA I ELS 10 px DE SEPARACIO (28/09/2026). En Marc:
+        // «A la part esquerra de la graella, hi pots posar una línia? I separes la
+        // graella 10 px de la línia». La ratlla es la vora esquerra del contenidor
+        // (1 px, el mateix gris que el selector) i el coixi de 10 px el separa de
+        // la primera peça.
+        borderLeft: '1px solid #D1D5DB',
+        paddingLeft: '10px',
+        // LA PRIMERA FILERA, AL TOP DEL SELECTOR (28/09/2026). En Marc: «mou-les
+        // juntes cap amunt. Alinea la primera fila amb el top del selector». Les
+        // peces del carrusel van absolutes i la primera filera cau
+        // `desnivellsLinies.primera` per sota del top de la caixa: amb aquest
+        // desplacament, el seu top coincideix amb el del selector (mesurat: 28 px
+        // a 1920) i les dues fileres pugen juntes.
+      }}
+    >
       <CercadorDibuixosGraella
         items={items}
         dibuixPx={dibuixPx}
         gapH={GAP_PECA_PAGINA1_PX * escalaNumerica}
-        gapV={0}
+        gapV={GAP_FILES_PAGINA1_PX * escalaNumerica}
         // L'ALCADA DE LA FINESTRA DEL CARRUSEL, EN NUMERO. Els dibuixos van
         // absoluts dins la tira i el contenidor no en treu cap alcada: el
         // calcul (dues files) la dona, pero aqui el que mana es l'alcada del
