@@ -149,6 +149,25 @@ es queda es `_tmp-ancoratge.mjs`, que ja esta comitejat.
 
 ---
 
+## 5.bis. SEGONA FEINA OBERTA: les fletxes del bloc de la dreta de la P1
+
+**Tambe s'ha d'arreglar.** El clic a les fletxes del bloc de la dreta de la
+pagina 1 **hi arriba** (comprovat amb `elementFromPoint`) pero **el carrusel no
+es mou**: la transformacio es queda a `-1018.5` i `desplacamentPassos` no canvia
+mai de 0 (`_tmp-p1-sonda.mjs`). Ja passava a `HEAD`: no es cap regressio.
+
+Per on seguir: `MegaStripePanelP1` te `passaPagina1` i el passa a
+`FletxesQuadratPagina1` (`onPrev`/`onNext`). Mirar si l'`onClick` del boto hi
+arriba i, si hi arriba, si `GraellaDuesFileresPagina1` rep el
+`desplacamentPassos` nou. Comprovar-ho amb `_tmp-p1-fletxa2.mjs`.
+
+**Tambe provat i DESFET:** pujar la capa de la franja de la p1 a `zIndex: 20`
+amb `pointerEvents: 'none'` (el regim de la p2). No canviava **res de visible**:
+la maniga de la p1 no arriba on es veu. No ho tornis a provar sense una captura
+que ho justifiqui.
+
+---
+
 ## 6. Quan acabis
 
 1. Escriu `docs/informes/INFORME-27-09-2026-rombes-vel.md` amb: estat, la causa
@@ -159,8 +178,8 @@ es queda es `_tmp-ancoratge.mjs`, que ja esta comitejat.
 4. Digues a l'amo, en quatre linies: que ha de mirar (F5) i que li toca decidir.
 
 **L'UNICA CONDICIO PER PARAR:** els rombes no surten **als dos panells** (p1 i
-p2, i tambe a les vistes de tauleta), la bateria passa amb l'arbre net i
-l'informe es pujat. Si no, **torna a comencar el bucle**.
+p2, i tambe a les vistes de tauleta), **les fletxes de la p1 mouen la graella**,
+la bateria passa amb l'arbre net i l'informe es pujat. Si no, **torna a comencar el bucle**.
 
 ---
 
