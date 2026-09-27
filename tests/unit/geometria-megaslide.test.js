@@ -457,9 +457,11 @@ describe('finestraCosVel', () => {
 });
 
 describe('la composicio de la pagina 1 (B2, 26/09/2026)', () => {
-  it('la peca de la graella es la de la pagina 2 (45 unitats -> 44,63 px a 1920)', () => {
-    // L'escala del carril a 1920 mesurada es 0,99185.
-    expect(PAGINA1_COSTAT_PECA_PX * 0.99185).toBeCloseTo(44.63, 2);
+  it('la peca de la graella es la MIDA DEL SELECTOR (60 unitats -> 59,5 px a 1920)', () => {
+    // Des del 28/09/2026 la graella de la p1 esta escalada a la mida del
+    // selector (60 de disseny). L'escala de la p1 a 1920 es 1.
+    expect(PAGINA1_COSTAT_PECA_PX).toBe(60);
+    expect(PAGINA1_COSTAT_PECA_PX * 1).toBeCloseTo(59.5 + 0.5, 2);
   });
 
   it('la filera fa la suma del bloc de la dreta i les seves meitats (selector i fletxes)', () => {
@@ -467,17 +469,16 @@ describe('la composicio de la pagina 1 (B2, 26/09/2026)', () => {
     // 1920: el mateix ample que la columna de colleccions de la p2, perque la
     // maniga de l'ultima samarreta de la franja hi arribi i hi faci l'ombra). A
     // dins hi ha el selector de la p2 (59,5 x 119) a dalt i el quadrat de les
-    // fletxes (59,5) a sota, tots dos a la DRETA. La graella (la filera de
-    // dibuixos) queda amb les DUES fileres de 55 unitats de sempre: el bloc ja no
-    // mana la seva alcada.
+    // fletxes (59,5) a sota, tots dos a la DRETA. I la graella de dibuixos esta
+    // escalada a la mida del selector (60 de disseny): les seves dues fileres fan
+    // 59,5 cadascuna, o sigui 119 en total, la mateixa alcada que el selector.
     expect(PAGINA1_MIDA_BLOC_DRETA_PX).toBe(60);
-    // I la caixa del bloc es mes ampla (130): encavalca la franja 18 px perque la
-    // maniga de l'ultima samarreta hi faci l'ombra, com a la columna de la p2.
+    // I la caixa del bloc es mes ampla: encavalca la franja perque la maniga de
+    // l'ultima samarreta hi faci l'ombra, com a la columna de la p2.
     expect(PAGINA1_AMPLADA_BLOC_DRETA_PX).toBe(128.7);
-    expect(PAGINA1_ALCADA_FILERA_PX).toBe(110);
-    // Dues fileres de dibuixos: la meitat de l'alcada, i el desnivell de la
-    // segona es mig pas (22,5 unitats).
-    expect(PAGINA1_ALCADA_FILERA_PX / 2).toBe(55);
+    expect(PAGINA1_ALCADA_FILERA_PX).toBe(119);
+    // Dues fileres de dibuixos, de la mida del selector (60 -> 59,5).
+    expect(PAGINA1_ALCADA_FILERA_PX / 2).toBe(59.5);
   });
 
   it('l amplada del bloc de la dreta i la de la graella quadren amb el carril', () => {
@@ -495,8 +496,8 @@ describe('la composicio de la pagina 1 (B2, 26/09/2026)', () => {
     expect(graella + PAGINA1_GAP_DRETA_PX * escala + bloc).toBeCloseTo(1143, 6);
   });
 
-  it('l alcada de la filera en px es la del bloc (mesurat: 97,9..317,9 a 1920)', () => {
-    expect(pagina1AlcadaFileraPx(0.99185)).toBeCloseTo(109.1, 1);
+  it('l alcada de la filera en px es la del selector (119 a 1920, la p1 va a escala 1)', () => {
+    expect(pagina1AlcadaFileraPx(1)).toBeCloseTo(119, 1);
   });
 
   it('amb valors que no valen, no peta', () => {

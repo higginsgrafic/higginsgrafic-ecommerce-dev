@@ -844,9 +844,14 @@ export function desplacamentCentratgeFranja({ quants, n, actual = 0, cases = FRA
  * gap, i les peces fan 44,63 px, com les de la pagina 2.
  */
 
-/** El costat de la peca de la graella, en unitats (45 = 44,63 px a 1920). Es
- *  el MATEIX que el de la pagina 2: les files han de ser identiques. */
-export const PAGINA1_COSTAT_PECA_PX = 45;
+/**
+ * El costat de la peca de la graella, en unitats.
+ *
+ * DES DEL 28/09/2026 es la MIDA DEL SELECTOR (60 de disseny = 59,5 px a 1920):
+ * en Marc, «el seguent pas es escalar la graella. Escalar-la a la mida del
+ * selector. 60 has dit, oi?». Abans feia 45, com les peces de la pagina 2.
+ */
+export const PAGINA1_COSTAT_PECA_PX = 60;
 
 /**
  * El gap entre peces dins d'una filera.
@@ -895,7 +900,7 @@ export const PAGINA1_AMPLADA_BLOC_DRETA_PX = 128.7;
  * 110, apilats). Amb DUES fileres de dibuixos de 55 unitats, la de dalt cau al
  * centre de la cel·la BLANC i la de baix al de la COLOR.
  */
-export const PAGINA1_ALCADA_FILERA_PX = 110;
+export const PAGINA1_ALCADA_FILERA_PX = 119;
 
 /** El top de la filera dins el panell, en unitats (mesurat: 13,8 unitats a
  *  1920 posen la filera de dalt al centre de la cel·la BLANC). */

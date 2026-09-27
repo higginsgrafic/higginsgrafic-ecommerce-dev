@@ -24,7 +24,10 @@ import { CercadorDibuixosGraella } from './CercadorTextRow.jsx';
 
 /** El costat de la peca, en unitats de disseny del carril (45 = 44,6 px a
  *  1920x946, el mateix que les peces de la pagina 2). */
-export const COSTAT_PECA_PAGINA1_PX = 45;
+// LA MIDA DEL SELECTOR (28/09/2026): en Marc, «el seguent pas es escalar la
+// graella. Escalar-la a la mida del selector. 60 has dit, oi?». Abans feia 45,
+// com les peces de la pagina 2.
+export const COSTAT_PECA_PAGINA1_PX = 60;
 
 /** El gap entre peces, en unitats de disseny (el mateix que la pagina 2). */
 // EL MATEIX GAP QUE LA PAGINA 2 (28/09/2026). En Marc, mirant la graella de la
