@@ -346,6 +346,8 @@ function MegaStripePanelP1({
       .catch(() => {});
     return () => { viu = false; };
   }, []);
+  // L'alcada del bloc: el bottom de la franja respecte del seu top.
+  const alcadaBlocP1 = ombraManigaP1 ? +(ombraManigaP1.top + ombraManigaP1.height).toFixed(1) : null;
   useLayoutEffect(() => {
     const bloc = blocDretaRef.current;
     if (!bloc) return undefined;
@@ -588,6 +590,17 @@ function MegaStripePanelP1({
                   width: `${blocDretaPx}px`,
                   minWidth: 0,
                   position: 'relative',
+                  // EL BLOC ARRIBA FINS AL BOTTOM DE LA FRANJA (28/09/2026). En
+                  // Marc: «El bloc del selector ha d'estar alineat amb el bottom
+                  // de la stripe», i a la captura retocada el bloc arriba fins a
+                  // la franja. L'alcada es MESURA (`ombraManigaP1.top + height`:
+                  // el bottom de la franja respecte del bloc) i el `marginBottom`
+                  // negatiu compensa el que creix, perque la filera no s'allargui
+                  // i la franja no es mogui.
+                  ...(alcadaBlocP1 != null ? {
+                    height: `${alcadaBlocP1}px`,
+                    marginBottom: `${-(alcadaBlocP1 - columnaDretaPx * 3)}px`,
+                  } : null),
                   // EL SELECTOR A DALT I LES FLETXES A SOTA, A LA DRETA (28/09/2026).
                   // El bloc es ample com la columna de la p2 (130 de disseny) perque
                   // la maniga de l'ultima samarreta hi arribi; el selector i les

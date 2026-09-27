@@ -1454,3 +1454,13 @@ que és el que descompta la graella) i `pagina1ColumnaDretaPx` (60).
 Bateria del tancament: 595 proves (46 fitxers), eslint amb els comptes de `HEAD`,
 `vite build` OK, `compara-vistes` OK, `mesura-formats` 0 i 0, `_tmp-errors2` cap
 error i `_tmp-ancoratge` TOT AL SEU LLOC.
+
+#### Volta 21 bis — el bloc arriba fins al bottom de la franja
+
+A la captura retocada, el bloc de la p1 arriba fins a la franja. Fet: l'alçada del
+bloc és la distància del seu top al **bottom de la franja** (339,6 a 1920: 256,6
+px), mesurada amb la mateixa sonda de l'ombra (`ombraManigaP1.top + height`), i el
+`marginBottom` negatiu compensa el que creix perquè la filera no s'allargui: la
+franja no es mou (226,6) ni la graella (1003). El selector queda a dalt, les
+fletxes just a sota i la màniga de l'última samarreta hi entra per l'esquerra amb
+la seva ombra.
