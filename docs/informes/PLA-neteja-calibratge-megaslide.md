@@ -1021,3 +1021,40 @@ coeficient.
 | columna: caixa blanca de l'actiu | 118,7 x 17,8 |
 | columna: cada franja (fila clicable) | 128,7 x 26,7 |
 | text (selector i columna) | 13,89 |
+
+### VOLTA 11 — Els rombes del vel: la pista de l'amo (26/09/2026, en curs)
+
+L'amo va dir que els fitxers `clic-area-1.svg` / `clic-area-2.svg` podien ser la
+solucio dels rombes del vel. Comparat, amb el resultat a la ma:
+
+**Els fitxers que ha passat JA SON al codi.** `clic-area-1.svg` es
+`CLIC_AREA_ESTRETA` i `clic-area-2.svg` es `CLIC_AREA_AMPLA`, amb el camí i el
+transform IDENTICS (comprovat): no canviarien res.
+
+**Pero hi ha DUES siluetes diferents al projecte** (mateixa graella de 306x307,
+origen diferent):
+
+| forma | caixa (x, y, ample, alt) | on es fa servir |
+|---|---|---|
+| `full-clic-area-5.svg`, casa 0 | 0, **0,8**, 305,6, 306 | el vel (la mascara) |
+| `VECTOR_FRANJA_SAMARRETA` | 0, **14,2**, 303,2, 303,6 | el retall dels dibuixos |
+| `clic-area-2.svg` (l'amo) | 0, **14,2**, 303,2, 303,6 | les arees de clic |
+
+O sigui: **la silueta del vel esta 13,4 unitats (uns 4,8 px a 1920) mes amunt i
+es 2,4 unitats mes ampla** que la del retall dels dibuixos. Son la mateixa
+samarreta en dos sistemes de coordenades.
+
+**Per que no s'ha tocat:** el canvi que quadra la mascara amb el dibuix es un
+desplaçament de 13,4 unitats, i aqui la referencia bona es la IMATGE de la
+franja (que es qui te la tinta). Si el desplaçament s'aplica al costat que no
+toca, el dibuix surt de la samarreta i el rombe empitjora en comptes de marxar.
+Cal mesurar la caixa de la TINTA de la samarreta a la imatge i comparar-la amb
+les dues siluetes ABANS de triar el sentit; amb la sessio a les acaballes no hi
+ha mon per fer-ho i verificar-ho com cal.
+
+**El que queda per fer, en tres passos concrets:**
+1. Mesurar la caixa de la tinta d una samarreta a `full-color-stripe-5.webp`
+   (amb llindar de lluminositat, que el canal alfa es pla).
+2. Comparar-la amb les dues siluetes i triar quina esta desplaçada.
+3. Aplicar el desplaçament NOME'S a la que toqui, i comprovar amb `_tmp-ancoratge.mjs`
+   i una captura de la cantonada abans/despres.
