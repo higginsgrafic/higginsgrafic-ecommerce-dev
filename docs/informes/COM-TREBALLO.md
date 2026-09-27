@@ -232,8 +232,10 @@ toquen fitxers que ja en tenien.
 
 ## 8. Els dispositius i els números de referència
 
-L'amo mira sobretot **1920×946** (l'Scriptori del navegador). Les mides de
-referència d'aquesta casa:
+La feina es mira sobretot a **1920×946** (l'Scriptori del navegador). **El
+navegador de treball és Firefox** i la màquina és un **iMac Retina 5K de 27"
+(2017, Intel Core i7 de 4 nuclis, 32 GB, macOS Ventura 13.7.8)**, amb pantalla
+Retina. Els guions de mesura, en canvi, van amb **Chromium** (Playwright).
 
 | què | valor |
 |---|---|
@@ -244,6 +246,14 @@ referència d'aquesta casa:
 | graella de dibuixos | pas 34,90625 · període 2234,477 |
 | atenuació dels dibuixos | 0,12 · vel de la samarreta 0,6 |
 | barra de desplaçament | **15 px** (i el carril es refereix a l'espai de maquetació, que l'exclou) |
+
+**Quan una mesura del guió no quadra amb el que es veu a la pantalla, el primer
+sospitós és el navegador.** Firefox i Chromium no resolen igual les màscares
+(`mask` i `-webkit-mask`, `mask-type`, els `clipPath` d'SVG), ni els
+`mix-blend-mode`, ni l'ordre de composició de capes amb opacitat. Els
+calibratges del projecte ja estan fets amb Firefox (vegeu
+`stripeCalibrations.js`): el guió serveix per **mesurar i comparar**, no per
+decidir com es veu. El que val és la pantalla d'en Marc, amb un F5.
 
 ---
 
