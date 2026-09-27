@@ -590,13 +590,16 @@ function MegaStripePanelP1({
                   width: `${blocDretaPx}px`,
                   minWidth: 0,
                   position: 'relative',
-                  // LA MATEIXA CAPA QUE LA COLUMNA DE LA P2 (28/09/2026). En
-                  // Marc: «La franja p1 es a la mateixa z-index que la p2, pero
-                  // el bloc p1 es a la mateixa z-index que el p2?». No: la
-                  // columna de la p2 es a `zIndex: 3` i la franja a 4. El bloc de
-                  // la p1 no tenia capa propia i pintava per damunt de la franja
-                  // («la franja continua per sota del bloc»): ara tambe es a 3.
-                  zIndex: 3,
+                  // EL BLOC, SENSE CAPA PROPRIA, PER SOTA DE LA FRANJA (28/09/2026).
+                  //
+                  // En Marc: «La franja continua per sota del bloc» i «Encara no.
+                  // Queda per sobre». El bloc i la franja son dins del MATEIX
+                  // contenidor, i el contingut de la franja es DESPRES del bloc al
+                  // DOM: sense capa propia (`zIndex: auto`) la franja hi pinta per
+                  // damunt i la samarreta tapa la caixa. Amb `zIndex: 3` (el de la
+                  // columna de la p2) el bloc guanyava i tapava la maniga: la
+                  // columna de la p2 pot anar a 3 perque alla la franja te una capa
+                  // propia (4) dins del seu propi apilat.
                   // EL BLOC SON DUES BOTONERES QUADRADES APILADES (28/09/2026).
                   // En Marc: «El bloc es un grup de tres botons + un grup de 2
                   // botons, tots en vertical [...] son dues botoneres quadrades
