@@ -954,8 +954,13 @@ export function CercadorColorsGrid({
       e.preventDefault();
       const d = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
       if (!d) return;
+      // SCROLL INFINIT (27/09/2026, ho ha demanat en Marc): la tira no s'acaba
+      // mai. Abans, arribat a l'ultim color, la rodeta ja no feia res (el index
+      // s'hi quedava clavat); ara dona la volta: despres de l'ultim ve el
+      // primer, i abans del primer, l'ultim.
+      const n = CERCADOR_COLORS.length;
       const i = CERCADOR_COLORS.findIndex((c) => c.slug === selectedColor);
-      const j = Math.max(0, Math.min(CERCADOR_COLORS.length - 1, (i < 0 ? 0 : i) + (d > 0 ? -1 : 1)));
+      const j = ((((i < 0 ? 0 : i) + (d > 0 ? -1 : 1)) % n) + n) % n;
       const nou = CERCADOR_COLORS[j]?.slug;
       if (nou && nou !== selectedColor) onSelectColor?.(nou);
     };
