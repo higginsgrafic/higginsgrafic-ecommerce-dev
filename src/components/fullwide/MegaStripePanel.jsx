@@ -935,16 +935,26 @@ function MegaStripePanel({
                     justifyContent: 'center',
                     position: 'relative',
                     zIndex: 1,
+                    // LA MASCARA DE CONTORN, DEL FULL BO (27/09/2026). Abans
+                    // queia aqui el full `t-shirt_buttons/v5/...`, que te les
+                    // siluetes en UNES ALTRES COORDENADES (les dels fitxers de
+                    // l'amo, amb `y` fins a 317,85 dins d'un viewBox de 307):
+                    // escalat al contenidor no cau sobre les samarretes, i
+                    // TALLAVA la maniga de l'ultima casa (ho ha vist en Marc:
+                    // «queda tallada»). El full del vel
+                    // (`cercador/full-clic-area-5.svg`) te cada silueta al seu
+                    // lloc (2866x307, la mateixa mida que la imatge) i per aixo
+                    // va al 100 %, sense el 103 % que compensava l'altre.
                     WebkitMaskImage: senseMascaraSamarreta
                       ? 'none'
                       : (emptyShirtMaskUrl
                         ? `url("${emptyShirtMaskUrl}")`
-                        : 'url(/placeholders/t-shirt_buttons/v5/full-clic-area-5.svg)'),
+                        : 'url(/placeholders/cercador/full-clic-area-5.svg)'),
                     maskImage: senseMascaraSamarreta
                       ? 'none'
                       : (emptyShirtMaskUrl
                         ? `url("${emptyShirtMaskUrl}")`
-                        : 'url(/placeholders/t-shirt_buttons/v5/full-clic-area-5.svg)'),
+                        : 'url(/placeholders/cercador/full-clic-area-5.svg)'),
                     WebkitMaskRepeat: 'no-repeat',
                     maskRepeat: 'no-repeat',
                     WebkitMaskSize: '103% 100%',

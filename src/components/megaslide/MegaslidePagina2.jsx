@@ -133,10 +133,24 @@ export default function MegaslidePagina2({
     && window.innerWidth >= window.innerHeight;
   const topGraellaColors = 40 - (esBandaEstreta ? 38 : 0);
   const [topVisualAlignmentY, setTopVisualAlignmentY] = useState(0);
-  // L'OMBRA DE LA MANIGA (26/09/2026, A3): la banda que separa la maniga de la
-  // franja de la pastilla del selector de colleccions. Es mesura la capa de la
-  // franja i es pinta just a la seva esquerra, del top de la columna al bottom
-  // de la franja.
+  // L'OMBRA DE LA MANIGA (26/09/2026, A3; refeta el 27/09/2026).
+  //
+  // Que la maniga (la màniga de l'última samarreta de la franja) passa per
+  // sobre de la columna de col·leccions s'ha de VEURE: hi ha de fer una ombra
+  // petita i suau.
+  //
+  // La primera versió era una banda recta de 5 px, pero vivia dins d'un
+  // contenidor amb `zIndex: 1`, PER SOTA de la columna (que es a `zIndex: 3`):
+  // no es veia mai. I amb la silueta de les samarretes (desplaçada i difosa)
+  // tambe s'hi va provar: com que la silueta del full arriba unes quantes
+  // unitats mes enlla de la tinta, el que es veia era la SILUETA (una taca
+  // grisa), no una ombra.
+  //
+  // El que hi ha ara: una banda de 6 px que NASC a la costura (la vora dreta
+  // del contingut de la franja) i s'obre cap a la dreta sobre la columna, amb
+  // un degradat suau. Va DINS de la capa de la franja (`zIndex: 4`) i ABANS del
+  // panell, amb `zIndex: -1`: es pinta abans de tot el contingut del panell
+  // (que es posicionat) i, per tant, la samarreta la tapa on li toca.
   const [ombraManiga, setOmbraManiga] = useState(null);
   // Desplaçament propi del selector Blanc/Color/Negre perquè quedi centrat amb
   // la graella de colors. Va a part de topVisualAlignmentY (que alinea el
@@ -750,38 +764,37 @@ export default function MegaslidePagina2({
     // propi calibratge.
     ajustFranjaCarril: !isPortraitTablet,
   };
-  // L'OMBRA DE LA MANIGA: mesura on cau la capa de la franja (la cantonada
-  // inferior esquerra) per pintar-hi la banda de separacio. Es recalcula amb
+  // L'OMBRA DE LA MANIGA: es mesura la caixa del contingut de la franja (on son
+  // les samarretes) relativa a la capa de la franja, i la vora esquerra de la
+  // columna de colleccions, que es on s'ha de veure l'ombra. Es recalcula amb
   // els canvis de mida (ResizeObserver) i amb la finestra.
   useLayoutEffect(() => {
     const capa = bandaFranjaRef.current;
-    // El contenidor de referencia es el PARE de la capa de la franja: es qui fa
-    // `position: relative` i qui conte la columna de colleccions. La capa fa
-    // TOT el carril (1143) i el que es pinta (la tira de samarretes) es mes
-    // estret: per aixo la costura es mesura sobre el contingut visual.
-    const arrel = capa?.parentElement;
     const visual = capa?.querySelector('[data-stripe-visual-content="2"]');
-    const columna = arrel?.querySelector('[data-colleccions-targeta]')?.parentElement;
-    if (!arrel || !capa || !visual || !columna) return undefined;
+    const columna = capa?.parentElement?.querySelector('[data-colleccions-targeta]')?.parentElement;
+    if (!capa || !visual) return undefined;
     let frame = 0;
     const mesura = () => {
       cancelAnimationFrame(frame);
       frame = requestAnimationFrame(() => {
-        const a = arrel.getBoundingClientRect();
+        const a = capa.getBoundingClientRect();
         const c = visual.getBoundingClientRect();
-        const k = columna.getBoundingClientRect();
         if (!a.width || !c.width) return;
+        const k = columna ? columna.getBoundingClientRect() : null;
+        const top = k ? k.top : c.top;
         setOmbraManiga({
-          top: Math.round((k.top - a.top) * 10) / 10,
+          // La costura: la vora DRETA del contingut de la franja.
           left: Math.round((c.right - a.left) * 10) / 10,
-          bottom: Math.round((a.bottom - c.bottom) * 10) / 10,
+          // Del top de la columna de colleccions al baix de la franja.
+          top: Math.round((top - a.top) * 10) / 10,
+          height: Math.round((c.bottom - top) * 10) / 10,
         });
       });
     };
     mesura();
     const observer = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(mesura) : null;
-    observer?.observe(arrel);
     observer?.observe(capa);
+    if (visual) observer?.observe(visual);
     window.addEventListener('resize', mesura);
     return () => {
       cancelAnimationFrame(frame);
@@ -1009,6 +1022,35 @@ export default function MegaslidePagina2({
           transform: (isPortraitTablet || isLandscapeTablet) ? 'scale(0.998)' : undefined,
           transformOrigin: 'left top',
         }}>
+          {/* L'OMBRA DE LA MANIGA (27/09/2026). Una banda SUAU de 6 px a
+              sobre de la costura (la vora dreta del contingut de la franja),
+              del top de la columna de colleccions al baix de la franja: es el
+              que fa que es vegi que la maniga passa per sobre del selector.
+              Va DINS d'aquesta capa (`zIndex: 4`) i ABANS del panell, amb
+              `zIndex: -1`: es pinta abans de tot el contingut del panell (que
+              es posicionat) i per tant la samarreta la tapa. La versio
+              anterior vivia a la capa del costat (zIndex 1, per sota de la
+              columna, que es a zIndex 3): no es veia mai. Amb la silueta de
+              les samarretes tambe s'hi va provar, i es veia la silueta (una
+              taca), no una ombra. */}
+          {ombraManiga && !isPortraitTablet ? (
+            <div
+              aria-hidden="true"
+              data-maniga-ombra="1"
+              style={{
+                position: 'absolute',
+                left: `${ombraManiga.left}px`,
+                top: `${ombraManiga.top}px`,
+                height: `${ombraManiga.height}px`,
+                width: '6px',
+                pointerEvents: 'none',
+                zIndex: -1,
+                // Neix a la costura i s'obre cap a la dreta, sobre la
+                // columna: suau, sense tocar res de dalt.
+                background: 'linear-gradient(90deg, rgba(0, 0, 0, 0.13) 0%, rgba(0, 0, 0, 0) 100%)',
+              }}
+            />
+          ) : null}
           <MegaStripePanel
             {...propsFranjaP2}
             stripeImageSrc={isPortraitTablet ? '/placeholders/tablet vertical/full-white-stripe-doble.png' : stripeBaseImageSrc}
@@ -1024,30 +1066,6 @@ export default function MegaslidePagina2({
             })}
           />
         </div>
-
-        {/* L'OMBRA DE LA MANIGA (A3). Una banda prima just a l'esquerra de la
-            capa de la franja, del top de la columna de colleccions al bottom de
-            la franja: es el que separa la maniga (que ara va per sobre) de la
-            pastilla del selector. Va DINS d'aquest contenidor (zIndex 1) i no
-            rep cap clic. */}
-        {ombraManiga ? (
-          <div
-            aria-hidden="true"
-            data-maniga-ombra="1"
-            style={{
-              position: 'absolute',
-              top: `${ombraManiga.top}px`,
-              bottom: `${ombraManiga.bottom}px`,
-              left: `${ombraManiga.left}px`,
-              width: '5px',
-              transform: 'translateX(-100%)',
-              pointerEvents: 'none',
-              // L'ombra neix a la costura (la vora esquerra de la maniga) i
-              // s'obre cap a l'esquerra, sobre la vora de la pastilla.
-              background: 'linear-gradient(270deg, rgba(0,0,0,0.16) 0%, rgba(0,0,0,0) 100%)',
-            }}
-          />
-        ) : null}
 
         {/* MegaHeroSlider — amagat temporalment
         <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, zIndex: 1, pointerEvents: 'none' }}>

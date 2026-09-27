@@ -725,16 +725,19 @@ function MegaStripePanelP1({
                     justifyContent: 'center',
                     position: 'relative',
                     zIndex: 1,
+                    // LA MASCARA, DEL FULL BO (27/09/2026): vegeu
+                    // `MegaStripePanel`. El full `v5` te les siluetes en unes
+                    // altres coordenades i tallava les manigues.
                     WebkitMaskImage: senseMascaraSamarreta
                       ? 'none'
                       : (emptyShirtMaskUrl
                         ? `url("${emptyShirtMaskUrl}")`
-                        : 'url(/placeholders/t-shirt_buttons/v5/full-clic-area-5.svg)'),
+                        : 'url(/placeholders/cercador/full-clic-area-5.svg)'),
                     maskImage: senseMascaraSamarreta
                       ? 'none'
                       : (emptyShirtMaskUrl
                         ? `url("${emptyShirtMaskUrl}")`
-                        : 'url(/placeholders/t-shirt_buttons/v5/full-clic-area-5.svg)'),
+                        : 'url(/placeholders/cercador/full-clic-area-5.svg)'),
                     WebkitMaskRepeat: 'no-repeat',
                     maskRepeat: 'no-repeat',
                     WebkitMaskSize: '103% 100%',
