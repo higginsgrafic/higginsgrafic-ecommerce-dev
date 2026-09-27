@@ -1099,3 +1099,39 @@ peca que mai s'ha acabat de connectar.
 bloc hi arriba (una sonda dins del handler) i, si hi arriba, si
 `GraellaDuesFileresPagina1` rep el `desplacamentPassos` nou. Es una sola peça i
 es pot provar amb `_tmp-p1-fletxa2.mjs`.
+
+### VOLTA 13 — Les fletxes duplicades de la p1 (26/09/2026)
+
+L'amo ho ha aclarit: a la p1 hi ha **DUES parelles de fletxes** i **les que no
+funcionen son les que s'han de treure**. Mesurat:
+
+| fletxa | on | funciona? |
+|---|---|---|
+| `Anterior` / `Següent` | **dins el carrusel**, x1349 | **SI** (mouen la graella: `setDesplacGest`) |
+| `Anterior` / `Següent` | **al bloc de la dreta**, x1414 | **NO** (criden `passaPagina1`, que no mou res) |
+
+O sigui: quatre fletxes visibles i nome's dues feien feina.
+
+**Provat:** amagar les del carrusel (una prop `senseFletxes` que la graella de la
+p1 passa) perque nome's en quedessin les del bloc. Comprovat que s'amaguen (el
+DOM passa de 4 fletxes a 2, les del bloc) i **que les del bloc segueixen sense
+moure res**. La sonda diu per que:
+
+- l'`onClick` del boto del bloc **si que corre** (`passaPagina1(1)` es crida,
+  amb `total = 64`);
+- `pageStart` es queda a **0**;
+- i el valor que arriba a la graella (`desplacamentPassos`) **si que canvia**
+  (la sonda de render veu `passos: 1, base: 22,5` i tambe `passos: 0, base: 0`
+  en instancies diferents), pero **la transformacio del carrusel no es mou mai
+  de `-1018.5`**.
+
+**Conclusio:** el muntatge de `desplacamentPassos` (estat derivat al cos del
+render) **es baralla amb el centratge de la colleccio** que fa
+`CercadorDibuixosGraella`: el centratge torna a escriure la base i deixa el
+desplacament a zero. **Desfet** (`git checkout`): no s'ha comitejat res d'aixo.
+
+**Per on seguir (una sola peça):** en comptes d'un estat derivat al render, fer
+que el bloc cridi el MATEIX mecanisme que les fletxes del carrusel
+(`setDesplacGest`), o passar-li un `onCarouselStep` com fa la pagina 2 (alla les
+fletxes del carrusel governen la FRANJA i la graella queda quieta). La diferencia
+entre les dues pagines es nome's qui mana: a la p1 han de manar les del bloc.
