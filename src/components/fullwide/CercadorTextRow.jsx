@@ -10,7 +10,7 @@ import {
 } from './midesGraella.js';
 // L'amplada del retall (l'últim input mesurat de la graella) viu amb la resta
 // de geometria declarada del megaslide.
-import { ampladaRetallGraella, ampladaColumnaGraella, desnivellsLiniesGraella, desnivellColorsGraella, margeBaixFletxesGraella, centratgeSelectorY, desplacTopSelector, topFranjaPagina2, GRAELLA_DRETA_FLETXES_CARRIL_PX } from '../megaslide/geometriaMegaslide.js';
+import { ampladaRetallGraella, ampladaColumnaGraella, desnivellsLiniesGraella, desnivellColorsGraella, margeBaixFletxesGraella, centratgeSelectorY, desplacTopSelector, topFranjaPagina2, GRAELLA_DRETA_FLETXES_CARRIL_PX, GRAELLA_COLUMNA_DRETA_CARRIL_PX, GRAELLA_GAP_COLUMNES_PX } from '../megaslide/geometriaMegaslide.js';
 import { carrilPct, carrilLane, carrilPx, readRootCssNumber, getLayoutViewportWidth, MEGASLIDE_REFERENCIA_PX } from '../../utils/layoutMetrics.js';
 import { GRAELLA_DIBUIXOS_ESCALA_VERTICAL } from '../../config/stripeCalibrationsVertical.js';
 import { FirstContactDibuix09Buttons } from './firstContactPanels.jsx';
@@ -349,6 +349,11 @@ export function dibuixosGraella16x4() {
 
 /** La GRAELLA DE DIBUIXOS 16x4 de la pagina 2 (una casella per dibuix). */
 export function CercadorDibuixosGraella({
+  // EL REF DE LA CAIXA QUE ES MOU (EL RETALL DEL CARRUSEL). Qui el posa el pot
+  // passar per mesurar-la de fora (la filera de la pagina 2 ho fa); si no
+  // arriba, la graella se'n fa un de propi, perque el gest i la rodeta hi han
+  // d'anar enganxats igualment (26/09/2026: a la pagina 1 la graella no en tenia
+  // cap i per aixo la rodeta no hi feia res).
   graellaRef = null,
   tilesPercent = null,
   items,
@@ -455,6 +460,10 @@ export function CercadorDibuixosGraella({
   const arrossegant = useRef(null);
   const haArrossegat = useRef(false);
   const ambFletxes = carrusel && !isPortraitTablet && !isLandscapeTablet;
+  // La caixa que es mou: el ref que arriba de fora (la filera) o el nostre.
+  const refInterna = useRef(null);
+  const refCarrusel = graellaRef || refInterna;
+  const caixaCarrusel = () => refCarrusel?.current || null;
 
   // EL BAIX DEL BLOC DE FLETXES, MESURAT CONTRA EL DEL SELECTOR.
   //
@@ -492,7 +501,7 @@ export function CercadorDibuixosGraella({
       window.clearTimeout(t2);
       window.removeEventListener('resize', calcula);
     };
-  }, [ambFletxes, graellaRef, dibuixPx, gapV, midaSelector]);
+  }, [ambFletxes, refCarrusel, dibuixPx, gapV, midaSelector]);
 
   // LES DUES LINIES DE DIBUIXOS, CADA UNA CENTRADA AMB LA SEVA CEL·LA.
   //
@@ -569,13 +578,13 @@ export function CercadorDibuixosGraella({
       window.clearTimeout(t2);
       window.removeEventListener('resize', calcula);
     };
-  }, [carrusel, graellaRef, dibuixPx, gapV, midaSelector]);
+  }, [carrusel, refCarrusel, dibuixPx, gapV, midaSelector]);
 
   // El desplaçament efectiu es el residu dins una volta: aixi la tira pot
   // avançar (o retrocedir) sense fi i sempre cau dins de les dues copies.
   const desplac = desplacBase + desplacGest;
   const desplacEf = periode > 0 ? ((desplac % periode) + periode) % periode : 0;
-  const caixaCarrusel = () => graellaRef?.current || null;
+
 
   // LA RODETA DEL RATOLI (24/09/2026, ho va demanar l'amo): scroll lliure. Va
   // amb `passive: false` perque ha de poder aturar el desplaçament vertical de
@@ -785,7 +794,7 @@ export function CercadorDibuixosGraella({
         }}
       >
         <div
-          ref={graellaRef}
+          ref={refCarrusel}
           style={{
             // LA CAIXA DEL RETALL, FORA DEL FLUX (25/09/2026).
             //
@@ -867,7 +876,7 @@ export function CercadorDibuixosGraella({
   }
 
   return (
-    <div ref={graellaRef} style={{
+    <div ref={refCarrusel} style={{
       display: 'grid',
       gridTemplateColumns: omple ? `repeat(${numColumns}, 1fr)` : `repeat(${numColumns}, ${dibuixPx}px)`,
       gridTemplateRows: omple ? `repeat(${files}, 1fr)` : undefined,
@@ -1147,21 +1156,37 @@ export function CercadorColleccionsColumna({
   }
 
 
-  // LA COLUMNA ES **UN SOL SELECTOR** (26/09/2026, ho va demanar l'amo sobre la
-  // captura del 26/09 a les 22:16: «la columna de colleccions te una pastilla
-  // grisa nome's a la fila activa; la vull com UN SOL SELECTOR, una pastilla que
-  // ocupa tota la columna, amb el nom actiu dins»).
+  // LA COLUMNA DE COLLECCIONS DE LA PAGINA 2, COM EL SELECTOR
+  // (26/09/2026, ho ha dit l'amo: «Has de fer servir el mateix estil, exacte,
+  // que el selector» i «El text de la columna, de la mateixa mida»).
   //
-  // La columna fa 120,2 x 248,4 px a 1920x946 i la pastilla activa en feia
-  // 120,2 x 24,9: el que canvia es que ara la pastilla ES la columna sencera.
+  // La referencia es el selector BLANC/COLOR/NEGRE (`FirstContactDibuix00Buttons`
+  // / `SelectorQuadratPagina1`), amb les seves xifres EXACTES:
   //
-  // DECISIO: la columna es UN sol contenidor gris (la pastilla) i els nou noms
-  // continuen essent nou franges clicables (una per franja d'alçada, totes
-  // `data-colleccions-targeta` perque `compara-vistes.mjs` segueixi mesurant la
-  // columna del top del selector al bottom de la franja). El nom de la
-  // colleccio activa es pinta en una capa propia, CENTRAT dins la pastilla (no
-  // dins la seva franja: si no, amb la primera activa el nom cauria a dalt de
-  // tot). Aixi no es perd ni una area de clic i el nom actiu es el que es veu.
+  //   - contenidor: `1px solid #D1D5DB`, radi 6, fons `#F3F4F6`;
+  //   - la caixa de l'actiu: fons `#FFFFFF`, `1px solid #D1D5DB`, radi 4 i
+  //     `box-shadow: 0 1px 3px rgba(0,0,0,0.12)`, amb 3 px de coixi lateral
+  //     (`sliderInset`);
+  //   - el text: `font-oswald`, `max(10px, carrilPx(14))`, majuscules, i el
+  //     color de l'actiu `#1A1A1A` (els altres, `#6B7280`).
+  //
+  // Amb nou noms en comptes de tres, les franges son nou i es reparteixen tota
+  // l'alcada (`flex: 1`), totes amb `data-colleccions-targeta` perque
+  // `scripts/compara-vistes.mjs` segueixi mesurant la columna del top del
+  // selector al bottom de la franja (la primera franja dona el top i l'ultima el
+  // bottom).
+  //
+  // Aixo substitueix la primera versio del canvi (`731cf3d` i `adda4c6`), que
+  // va interpretar «un sol selector» com una sola pastilla amb nome's el nom
+  // actiu centrat: la captura de l'amo diu que la llista sencera es veu i que
+  // l'actiu es destaca amb la caixa del selector.
+  // El coixi de la caixa de l'actiu (i el de la columna): 5 px, com l'offset
+  // de la pastilla del selector.
+  const COIX_COLUMNA_PX = 5;
+  const coixInset = COIX_COLUMNA_PX;
+  const midaText = (isPortraitTablet || isLandscapeTablet)
+    ? 'max(10px, 14px)'
+    : `max(10px, ${carrilPx(14)})`;
   return (
     <div
       style={{
@@ -1175,79 +1200,85 @@ export function CercadorColleccionsColumna({
           position: 'absolute',
           left: 0,
           right: 0,
-          top: -margeDalt,
-          bottom: -margeBaix,
+          // EL COIXI DE LA CAIXA NO HA DE FER CREIXER LA COLUMNA (26/09/2026):
+          // les marques de `compara-vistes` (del top del selector al bottom de
+          // la franja) les han de donar les VORES de la columna, i amb 5 px de
+          // coixi a dalt i a baix la columna creixia 12 px i se'n sortia (la
+          // primera caia 6,01 px del top del selector i l'ultima -5,79 del
+          // bottom de la franja). El coixi es descompta de l'ancoratge.
+          top: -margeDalt - COIX_COLUMNA_PX,
+          bottom: -margeBaix - COIX_COLUMNA_PX,
         } : null),
-        // `position` el decideix `absolut` (i el pare, que porta
-        // `position: relative`, es qui fa de referència a la capa del nom).
         display: 'flex',
         flexDirection: 'column',
         boxSizing: 'border-box',
-        // LA PASTILLA UNICA: el gris de sempre (#F1F3F5, el de la taula
-        // vertical), el radi de 3 i el coixi de 6 px de la dreta.
-        backgroundColor: '#F1F3F5',
-        borderRadius: '3px',
+        // EL CONTENIDOR, COM EL DEL SELECTOR (radi exterior d'11 px).
+        border: '1px solid #D1D5DB',
+        borderRadius: '11px',
+        backgroundColor: '#F3F4F6',
         overflow: 'hidden',
       }}
     >
-      {CERCADOR_COLLECTIONS.map(({ key, label }) => (
-        <button
-          key={key}
-          type="button"
-          // La marca que fa servir `scripts/compara-vistes.mjs` per mesurar la
-          // columna (del top del selector al bottom de la franja): la primera
-          // franja dona el top i l'ultima el bottom, o sigui que la mesura es la
-          // de sempre.
-          data-colleccions-targeta="1"
-          onClick={() => onSelect?.(key)}
-          aria-current={key === activeKey ? 'true' : undefined}
-          className="font-roboto-condensed"
-          style={{
-            // Cada franja es clicable (l'area de clic de sempre) pero el nom
-            // nome's el pinta la capa de sota, centrat.
-            flex: '1 1 0%',
-            minHeight: 0,
-            display: 'block',
-            width: '100%',
-            padding: '0 6px',
-            border: 0,
-            background: 'transparent',
-            overflow: 'hidden',
-            cursor: 'pointer',
-            fontSize: (isPortraitTablet || isLandscapeTablet) ? 'max(10px, 8px)' : `max(10px, ${carrilPx(11)})`,
-            // LA SEPARACIO ENTRE FRANQUES: una línia fina que fa veure que la
-            // pastilla te nou zones clicables. Fora del requadre (inset) no es
-            // pinta.
-            boxShadow: 'inset 0 -1px 0 rgba(0, 0, 0, 0.08)',
-          }}
-        >
-          <span style={{ visibility: 'hidden' }}>{etiquetaColleccio(label)}</span>
-        </button>
-      ))}
-      {/* EL NOM ACTIU, CENTRAT DINS LA PASTILLA. Va per sobre de les franges i
-          no rep clics (`pointerEvents: none`): el clic el rep la franja de
-          sota, que es qui te el `onClick`. */}
-      <div
-        aria-hidden="true"
-        className="font-roboto-condensed"
-        style={{
-          position: 'absolute',
-          inset: 0,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          padding: '0 6px',
-          pointerEvents: 'none',
-          color: '#2B2B2B',
-          fontSize: (isPortraitTablet || isLandscapeTablet) ? 'max(10px, 8px)' : `max(10px, ${carrilPx(11)})`,
-          fontWeight: 700,
-          lineHeight: 1.2,
-          textAlign: 'center',
-          whiteSpace: 'nowrap',
-        }}
-      >
-        {etiquetaColleccio((CERCADOR_COLLECTIONS.find(({ key }) => key === activeKey) || CERCADOR_COLLECTIONS[0]).label)}
-      </div>
+      {CERCADOR_COLLECTIONS.map(({ key, label }) => {
+        const activa = key === activeKey;
+        return (
+          <button
+            key={key}
+            type="button"
+            // La marca que fa servir `scripts/compara-vistes.mjs` per mesurar la
+            // columna (del top del selector al bottom de la franja).
+            data-colleccions-targeta="1"
+            onClick={() => onSelect?.(key)}
+            aria-current={activa ? 'true' : undefined}
+            className="focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            style={{
+              // Cada franja es clicable i es reparteix l'alcada de la columna,
+              // com les tres caselles del selector (BLANC/COLOR/NEGRE).
+              flex: '1 1 0%',
+              minHeight: 0,
+              display: 'flex',
+              alignItems: 'center',
+              // EL TEXT, ENRASAT A LA DRETA (26/09/2026, ho ha dit l'amo:
+              // «Linea el text a la dreta»), com la columna de sempre.
+              justifyContent: 'flex-end',
+              width: '100%',
+              // El coixi de la dreta es el de la caixa (5 px) mes el de dins.
+              padding: `0 ${coixInset + 1}px`,
+              // LA CAIXA DE L'ACTIU, EXACTAMENT LA DEL SELECTOR (el `span` blanc
+              // del slider): fons, vora, radi 4, ombra i el coixi de 3 px.
+              backgroundColor: activa ? '#FFFFFF' : 'transparent',
+              border: 'none',
+              borderRadius: '6px',
+              ...(activa ? { boxShadow: '0 1px 3px rgba(0,0,0,0.12)' } : null),
+              // EL MATEIX COIXI QUE LA PASTILLA DEL SELECTOR (26/09/2026, ho ha
+              // dit l'amo: «la pastilla del selector te un offset amb el seu
+              // contenidor»): 4 px per cada costat. Amb `border: 1px solid
+              // transparent` la caixa quedaria 2 px mes estreta que la del
+              // selector, i per aixo el coixi va amb `margin`.
+              margin: `${coixInset}px`,
+              cursor: 'pointer',
+              overflow: 'hidden',
+            }}
+          >
+            <span
+              className="font-oswald"
+              style={{
+                // LA MATEIXA MIDA DE TEXT QUE EL SELECTOR.
+                fontSize: midaText,
+                fontWeight: activa ? 700 : 400,
+                textTransform: 'uppercase',
+                color: activa ? '#1A1A1A' : '#6B7280',
+                pointerEvents: 'none',
+                lineHeight: 1,
+                whiteSpace: 'nowrap',
+                transition: 'color 200ms ease',
+              }}
+            >
+              {etiquetaColleccio(label)}
+            </span>
+          </button>
+        );
+      })}
     </div>
   );
 }
@@ -1613,7 +1644,7 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
           // `max-content`, canviar el contingut d'aquella columna (la graella de
           // colors abans, els enllacos ara) n'amplava o estrenyia l'amplada i,
           // amb ella, la del carrusel, la de les fletxes i la de la franja.
-          gridTemplateColumns: `minmax(0, 1fr) ${carrilLane(142)}`,
+          gridTemplateColumns: `minmax(0, 1fr) ${carrilLane(GRAELLA_COLUMNA_DRETA_CARRIL_PX)}`,
           // LA FILA 2 ARRIBA AL BAIX DEL SELECTOR (24/09/2026, ho va demanar
           // l'amo). El baix del selector cau `carrilLane(40)` per sota del
           // baix de la graella de dibuixos (es el coixi de 40 de la
@@ -1627,9 +1658,11 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
           // ella, la mida dels dibuixos i el lloc de les fletxes i del selector.
           // Fixa, el que hi posem no mou res.
           gridTemplateRows: `auto calc(${carrilLane(40)} - 10px)`,
-          // 10 px FIXES entre blocs (no escalats): es el que fa que totes les
-          // mides quadrin, perque el que cedeix es el gap intern dels dibuixos.
-          columnGap: '20px',
+          // EL GAP ENTRE LA GRAELLA I LA COLUMNA, DE 10 px (26/09/2026, ho va
+          // demanar l'amo: «Deixa 10 px de gap amb les fletxes»). Es una mida
+          // del carril (`GRAELLA_GAP_COLUMNES_PX`): amb `carrilLane` tambe
+          // s'encongeix a tauleta. Abans eren 20 px fixos.
+          columnGap: carrilLane(GRAELLA_GAP_COLUMNES_PX),
           rowGap: '10px',
           alignItems: 'start',
           pointerEvents: 'auto',

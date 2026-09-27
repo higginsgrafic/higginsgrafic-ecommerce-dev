@@ -1879,6 +1879,24 @@ function FullWideSlideHeader({
   });
   const headerRef = useRef(null);
   const megaMenuRef = useRef(null);
+  // EL PANELL MUNTAT, COM A ESTAT (26/09/2026).
+  //
+  // El megaslide no es munta amb el clic: primer es precarreguen les imatges i
+  // `oberturaAPunt` el deixa entrar DESPRES (fins a 4 s de topall). Els bucles
+  // d'aquest component que pengen del panell (`megaMenuRef.current`) tenen
+  // `[active]` de dependencies, i `active` ja es cert ABANS que el panell
+  // existeixi: la primera passada els trobava el ref buit, tornaven, i com que
+  // res mes no els tornava a disparar es quedaven sense fer res MAI. El
+  // cadenat no apareixia mai (ho ha vist l'amo: «el primer cop que cliques no
+  // apareix el cadenat») i `--hg-mega-bottom` es quedava buit.
+  //
+  // Amb aquest estat, el `ref` del panell avisa quan munta i els bucles es
+  // tornen a executar.
+  const [panellMuntat, setPanellMuntat] = useState(false);
+  const refPanellMega = useCallback((node) => {
+    megaMenuRef.current = node;
+    setPanellMuntat(Boolean(node));
+  }, []);
   const [stripeRowPadXPx, setStripeRowPadXPx] = useState({ left: 0, right: 0 });
 
   useEffect(() => {
@@ -2057,7 +2075,7 @@ function FullWideSlideHeader({
     } catch {
       return undefined;
     }
-  }, [active]);
+  }, [active, panellMuntat]);
 
   useLayoutEffect(() => {
     if (!active) return undefined;
@@ -2130,7 +2148,7 @@ function FullWideSlideHeader({
     };
     raf = requestAnimationFrame(seguiment);
     return () => cancelAnimationFrame(raf);
-  }, [active]);
+  }, [active, panellMuntat]);
 
   useLayoutEffect(() => {
     if (!active) return undefined;
@@ -2294,7 +2312,7 @@ function FullWideSlideHeader({
   // canvi de ruta...) la propera obertura ha d'arrencar desbloquejada.
   useEffect(() => {
     if (!active) setMegaLocked(false);
-  }, [active]);
+  }, [active, panellMuntat]);
 
   useEffect(() => {
     const openFullWideCart = (e) => {
@@ -3525,7 +3543,7 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
         active={active}
         megaPage={megaPage}
         megaFullScreen={megaFullScreen}
-        megaMenuRef={megaMenuRef}
+        megaMenuRef={refPanellMega}
         effectiveMegaTileSize={effectiveMegaTileSize}
         stripeRowPadPx={stripeRowPadPx}
         bleedGuardExpandPx={bleedGuardExpandPx}

@@ -305,8 +305,18 @@ export function esEscriptoriPagina1({ ample = 0, alt = 0, isLandscapeTablet = fa
  * (mesurat 863,94), 1512 -> 674 (674,36), 1440 -> 641 (641,17) i
  * 2560 -> 1161 (1160,89).
  */
-export const GRAELLA_COLUMNA_DRETA_CARRIL_PX = 142;
-export const GRAELLA_GAP_COLUMNES_PX = 20;
+// LA COLUMNA DE LA DRETA (2a columna de la filera): el gap ENTRE la graella i
+// la columna mes l'amplada de la columna. El que es veu a la captura de l'amo
+// (26/09/2026) es una COLUMNA mes ampla amb la vora esquerra 10 px mes a
+// l'esquerra, i el gap de 20 unitats.
+export const GRAELLA_COLUMNA_DRETA_CARRIL_PX = 152;
+// EL GAP ENTRE LA GRAELLA (LES FLETXES) I LA COLUMNA DE COLLECCIONS: 10 px
+// (26/09/2026, ho va demanar l'amo: «Deixa 10 px de gap amb les fletxes»).
+// L'amplada de la columna i el gap han de sumar 142 + 20 = 162 unitats: amb la
+// columna a 152 el gap son 10 unitats, que a 1920 fan 10,0 px (la unitat real
+// es `carril / 1350` = 1143/1350 = 0,8467). Aixi la vora dreta de la filera no
+// es mou i el carrusel queda exactament igual d'ample que abans.
+export const GRAELLA_GAP_COLUMNES_PX = 6.5;
 export const GRAELLA_ESQUERRA_SELECTOR_CARRIL_PX = 70; // selector/2 (60) + 10
 export const GRAELLA_DRETA_FLETXES_CARRIL_PX = 70; // fletxes (60) + 10
 export const GRAELLA_BARRES_COLORS = 14;

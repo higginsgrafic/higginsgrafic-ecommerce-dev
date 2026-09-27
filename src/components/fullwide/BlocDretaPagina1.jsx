@@ -124,7 +124,7 @@ export function SelectorQuadratPagina1({
           top: `calc(${sliderTopPct}% + ${sliderInset}px)`,
           height: `calc(${btnH}% - ${sliderInset * 2}px)`,
           backgroundColor: '#FFFFFF',
-          borderRadius: '4px',
+          borderRadius: '6px',
           border: '1px solid #D1D5DB',
           boxShadow: '0 1px 3px rgba(0,0,0,0.12)',
           boxSizing: 'border-box',
