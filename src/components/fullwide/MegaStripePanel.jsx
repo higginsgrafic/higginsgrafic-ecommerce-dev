@@ -158,9 +158,15 @@ function getTileCalibration(src, overrides) {
  *   - LES SAMARRETES QUE NO SON DE LA COLLECCIO ACTIVA (25/09/2026, ho va
  *     demanar l'amo: «Les samarretes, quan no son actives, tambe s'han
  *     d'atenuar, no nome's el dibuix»). Fins ara nome's s'atenuava la capa del
- *     DIBUIX (0,12) i la samarreta blanca quedava igual: a la franja, que es una
+ *     DIBUIX i la samarreta blanca quedava igual: a la franja, que es una
  *     sola imatge amb les catorze samarretes, la inactiva es distingia nome's
  *     pel dibuix. Amb el vel, la casella sencera queda mes fluixa.
+ *
+ *     DES DEL 28/09/2026 el dibuix de les velades NO s'atenua: es pinta en
+ *     NEGRE i a opacitat plena sobre el vel (ho va demanar en Marc: sobre una
+ *     samarreta blanca o de color el dibuix atenuat desapareixia i semblava una
+ *     samarreta buida). El vel nome's queda, doncs, a la roba: el dibuix es
+ *     llegeix sempre i la casa inactiva continua essent la mes fluixa.
  *
  * LES SILUETES DEL FULL NO CAUEN A SOBRE LES SAMARRETES (26/09/2026).
  *
@@ -1017,8 +1023,9 @@ function MegaStripePanel({
                       (es desplacen de la mateixa manera: les dues van amb
                       `height: 100%`), i la silueta nomes cau damunt de la
                       samarreta. Es queda per sota de la capa dels DIBUIXOS: alla
-                      el dibuix tambe s'atenua (0,12) i ha de conservar el seu
-                      to. */}
+                      el dibuix de les velades va a opacitat plena i en NEGRE
+                      (28/09/2026), de manera que el vel nome's afecta la roba i
+                      el dibuix es llegeix sobre qualsevol fons. */}
                   {velSamarretesInactivesUrl ? (
                     <img
                       src={velSamarretesInactivesUrl}
@@ -1602,16 +1609,29 @@ function MegaStripePanel({
                                 boxSizing: 'border-box',
                                 background: drawingOverlayDebug ? 'rgba(217,70,239,0.06)' : 'transparent',
                                 border: drawingOverlayDebug ? '1px solid rgba(217,70,239,0.35)' : '0px solid transparent',
-                                // L'ATENUACIO DELS DIBUIXOS QUE NO SON DE LA COLLECCIO
-                                // ACTIVA (25/09/2026). Primer va anar a 0,24, la
-                                // mateixa que fa servir la graella (`pintaItem`),
-                                // pero a la FRANJA no n'hi ha prou: el dibuix hi va
-                                // sobre una samarreta blanca i un traç negre prim, i a
-                                // 0,24 encara es llegeix. Ho va demanar l'amo: «A la
-                                // stripe, els atenuats ho han de ser més.» Ara es 0,12,
-                                // la meitat. La graella es queda a 0,24: alla els
-                                // dibuixos son mes grans i el gris ja es veu.
-                                opacity: deLaTira && deLaTira.collection && deLaTira.collection !== active ? 0.12 : 1,
+                                // EL DIBUIX DE LES VELADES, EN NEGRE (28/09/2026).
+                                //
+                                // Abans els dibuixos de les colleccions que no
+                                // son l'activa s'atenuaven a 0,12 i, a mes, la
+                                // samarreta porta el vel blanc (0,6): sobre una
+                                // samarreta blanca o de color el dibuix
+                                // desapareixia i semblava una samarreta buida.
+                                // Ho va veure en Marc: «les samarretes velades
+                                // hauran de tenir el dibuix en negre; quan se les
+                                // cliqui, el color passarà a ser el del
+                                // selector».
+                                //
+                                // Ara el dibuix de les velades va a opacitat
+                                // plena i en NEGRE: la tira el demana amb la
+                                // variant `black` (`MegaslidePagina2`, que nome's
+                                // ho fa quan el dibuix te versio negra: els que
+                                // nome's existeixen en color es queden en color).
+                                // El de la colleccio activa es queda com era (el
+                                // color del selector).
+                                //
+                                // La transicio es queda: en un pas de tira, el
+                                // dibuix que entra es llegeix com un moviment.
+                                opacity: 1,
                                 // UN PAS DE TIRA, UNA TRANSICIO CURTA (25/09/2026): la
                                 // tira no llisca de debò —les catorze cases son fixes i
                                 // el dibuix de fons no es repeteix—, o sigui que el que
@@ -1730,6 +1750,11 @@ function MegaStripePanel({
                                             && picked.toLowerCase().endsWith('keep-calm-w-stripe.webp')
                                           ? 'drop-shadow(0 0 2px rgba(0,0,0,0.75))'
                                         : 'none';
+                                    // (El dibuix de les cases velades ja ve en NEGRE
+                                    // de la tira: el tria `MegaslidePagina2` amb
+                                    // la variant `black`. Aqui no s'hi toca res:
+                                    // els dibuixos que nome's existeixen en color
+                                    // s'han de quedar en color.)
                                     return baseFx;
                                   })(),
                                 }}

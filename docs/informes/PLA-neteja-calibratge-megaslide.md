@@ -1253,3 +1253,37 @@ Bateria del tancament: 588 proves (45 fitxers), eslint amb els comptes de
 `HEAD`, `vite build` OK, `compara-vistes` OK, `mesura-formats` 0 i 0,
 `_tmp-errors2` cap error i `_tmp-ancoratge` TOT AL SEU LLOC (referències
 actualitzades −23,4 px).
+
+### VOLTA 17 — El dibuix de les samarretes velades, en negre (28/09/2026)
+
+En Marc: «Quan les samarretes velades tenen a sota un color blanc o un de color no
+es veuen i sembla que la samarreta estigui buida. Per tant, a partir d'ara hauran
+de tenir el dibuix en negre. Quan se les cliqui, el color passarà a ser el del
+selector» i, tot seguit, «les que només són en color no les toquis!».
+
+**QUE PASSAVA.** A la franja de la p2, les cases de les col·leccions que no són
+l'activa pintaven el seu dibuix a `opacity: 0.12` i, a sobre, la casa porta el vel
+blanc (0,6). Sobre una samarreta blanca el vel no es veu i el dibuix a 0,12 queda
+invisible: la casa sembla buida.
+
+**FET.** `srcDibuixVelatEnNegre` (a `resolveStripeTile.js`) demana el dibuix de la
+casa velada amb la variant `black`, i la franja el pinta **a opacitat plena**. El
+vel blanc es queda on era (la roba): el dibuix va a la capa de dibuixos
+(`zIndex: 12`), per damunt del vel (`zIndex: 6`), o sigui que es llegeix sempre i
+la casa continua essent la més fluixa.
+
+**LES QUE NOMÉS SÓN EN COLOR, INTACTES.** El canvi només s'aplica si el camí de la
+variant negra és **diferent** del de sempre. Els solids i els marcs de LOOKING FOR
+MY DARCY els resol igual qualsevol variant (`resolveForItem`), i per tant es queden
+en color, tal com demanava.
+
+**XIFRES.** Franja de la p2 a 1920x946 amb FIRST CONTACT actiu: les catorze cases
+passen de `opacity 0.12` a `1`; les sis que no són de la col·lecció activa
+(miscellania i the_human_inside) ja demanaven la variant negra i ara es veuen.
+
+Prova nova: `tests/unit/dibuix-velat.test.js` (6 casos, amb el dels solids i els
+marcs de DARCY).
+
+Bateria del tancament: 594 proves (46 fitxers), eslint amb els comptes de `HEAD`,
+`vite build` OK, `compara-vistes` OK, `mesura-formats` 0 i 0, `_tmp-errors2` cap
+error i `_tmp-ancoratge` TOT AL SEU LLOC.

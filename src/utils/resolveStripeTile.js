@@ -220,6 +220,41 @@ export function computeStripeTileOverlaySrcs({ drawable, variant, active, displa
 }
 
 /**
+ * El dibuix d'una casa VELADA (d'una collecció que no és l'activa), EN NEGRE.
+ *
+ * Ho va demanar en Marc (28/09/2026): «Quan les samarretes velades tenen a sota
+ * un color blanc o un de color no es veuen i sembla que la samarreta estigui
+ * buida. Per tant, a partir d'ara hauran de tenir el dibuix en negre. Quan se
+ * les cliqui, el color passarà a ser el del selector» i, tot seguit, «les que
+ * només són en color no les toquis!».
+ *
+ * Doncs: es demana el dibuix amb la variant `black`. NOMÉS es canvia si el
+ * resultat és diferent del de la variant de sempre, perquè hi ha dibuixos que
+ * només existeixen en color (els solids i els marcs de LOOKING FOR MY DARCY:
+ * `resolveForItem` retorna el mateix camí per a qualsevol variant) i aquests
+ * s'han de quedar tal com són, en color.
+ *
+ * @param {object} o
+ * @param {string} o.item el dibuix (l'ítem de la graella)
+ * @param {string} o.collection la seva col·lecció (que NO és l'activa)
+ * @param {string} o.variant la variant de sempre (la de la col·lecció)
+ * @param {string} o.displayedShirtColor el color de samarreta mostrat
+ * @param {string} [o.resolvedOverlaySrc]
+ * @returns {string|null} el camí del dibuix (o null si no es resol)
+ */
+export function srcDibuixVelatEnNegre({ item, collection, variant, displayedShirtColor, resolvedOverlaySrc }) {
+  const ctx = { active: collection, displayedShirtColor, resolvedOverlaySrc };
+  const deSempre = computeStripeTileOverlaySrcs({ drawable: [item], variant, limit: 1, ...ctx });
+  const base = Array.isArray(deSempre) ? deSempre[0] : null;
+  if (!base || variant === 'black') return base;
+  const negre = computeStripeTileOverlaySrcs({ drawable: [item], variant: 'black', limit: 1, ...ctx });
+  const b = Array.isArray(negre) ? negre[0] : null;
+  // NOMÉS si el dibuix té una versió negra de debò: si el camí és el mateix, és
+  // un dibuix que només existeix en color i no s'hi toca res.
+  return b && b !== base ? b : base;
+}
+
+/**
  * Calcula els tile items (identitat de cada samarreta a la franja).
  *
  * @param {string[]} drawable - ítems dibuixables

@@ -1756,3 +1756,15 @@ ell pugen les dues pàgines.
 `alcadaPanellMegaslide` descompta el coixí de debò (40,6 px a l'escriptori) i la
 memòria d'alçada del navegador passa a `hg.megaPanelHeight.v2`. A les tauletes i
 al mòbil no s'hi aplica (el `-32px` del vertical cancel·la el coixí).
+
+### El dibuix de les samarretes velades, en negre (34) — FET (28/09/2026)
+
+A la franja de la p2, les cases de les col·leccions que no són l'activa pintaven
+el dibuix a `opacity: 0.12` i la casa porta el vel blanc (0,6): sobre una
+samarreta blanca el dibuix desapareixia i la casa semblava buida (en Marc).
+
+Ara `srcDibuixVelatEnNegre` (`resolveStripeTile.js`) demana el dibuix amb la
+variant **negra** i la franja el pinta a opacitat plena; el vel es queda a la
+roba. Els dibuixos que **només existeixen en color** (els solids i els marcs de
+LOOKING FOR MY DARCY) no es toquen: la funció només canvia el camí si la versió
+negra és diferent de la de sempre.

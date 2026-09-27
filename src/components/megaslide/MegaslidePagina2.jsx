@@ -28,7 +28,7 @@ import {
 } from '../fullwide/MegaColumn.jsx';
 import { FirstContactDibuix00Buttons } from '../fullwide/firstContactPanels.jsx';
 import { VEL_SAMARRETA_BUIDA_ALFA } from '../../config/stripeCalibrationsVertical.js';
-import { computeStripeTileOverlaySrcs } from '@/utils/resolveStripeTile.js';
+import { computeStripeTileOverlaySrcs, srcDibuixVelatEnNegre } from '@/utils/resolveStripeTile.js';
 
 export default function MegaslidePagina2({
   active,
@@ -387,21 +387,34 @@ export default function MegaslidePagina2({
     // samarreta ha de deixar activa la seva (PEMBERLEY, QUOTES, CROSSWORDS...),
     // i nome's amb la colleccio no n'hi ha prou.
     const subcollections = [];
-    const afegeix = (llista, ctxActive, ctxVariant, ctxCollection, ctxSubcollection) => {
+    const afegeix = (llista, ctxActive, ctxVariant, ctxCollection, ctxSubcollection, velada = false) => {
       if (!llista.length) return;
-      const s = computeStripeTileOverlaySrcs({
-        drawable: llista,
-        variant: ctxVariant,
-        active: ctxActive,
-        displayedShirtColor,
-        resolvedOverlaySrc,
-        // LA TIRA ES DE TOTES LES COLLECCIONS, NO D'UNA FRANJA DE CATORZE
-        // (25/09/2026): sense aixo, la llista de la colleccio activa es retallava
-        // a catorze dibuixos i la resta no arribava MAI a la franja. AUSTEN en
-        // te 27, i per aixo cap dels de LOOKING FOR MY DARCY no hi era, ni els
-        // solids ni els marcs. Ho va veure l'amo.
-        limit: llista.length,
-      });
+      // EL DIBUIX DE LES VELADES, EN NEGRE (28/09/2026): en Marc ho va demanar
+      // («a partir d'ara hauran de tenir el dibuix en negre») i, tot seguit,
+      // «les que només són en color no les toquis!». La decisio viu a
+      // `srcDibuixVelatEnNegre`, que nome's canvia el dibuix si te versio negra
+      // de debò.
+      const s = velada
+        ? llista.map((it) => srcDibuixVelatEnNegre({
+          item: it,
+          collection: ctxActive,
+          variant: ctxVariant,
+          displayedShirtColor,
+          resolvedOverlaySrc,
+        }))
+        : computeStripeTileOverlaySrcs({
+          drawable: llista,
+          variant: ctxVariant,
+          active: ctxActive,
+          displayedShirtColor,
+          resolvedOverlaySrc,
+          // LA TIRA ES DE TOTES LES COLLECCIONS, NO D'UNA FRANJA DE CATORZE
+          // (25/09/2026): sense aixo, la llista de la colleccio activa es retallava
+          // a catorze dibuixos i la resta no arribava MAI a la franja. AUSTEN en
+          // te 27, i per aixo cap dels de LOOKING FOR MY DARCY no hi era, ni els
+          // solids ni els marcs. Ho va veure l'amo.
+          limit: llista.length,
+        });
       if (!s) return;
       for (let i = 0; i < llista.length; i++) {
         // Els dibuixos que la seva colleccio no sap resoldre es queden fora de
@@ -425,7 +438,9 @@ export default function MegaslidePagina2({
     afegeix(drawable, active, variant, active, austenSubcollection);
     for (const it of dibuixosGraella16x4()) {
       if (!it.stripeItem || it.collection === active) continue;
-      afegeix([it.stripeItem], it.collection, it.collection === 'the_human_inside' ? humanInsideVariant : firstContactVariant, it.collection, it.subcollection);
+      // L'ultim argument: aquesta casa es d'una altra colleccio, o sigui que va
+      // VELADA i el seu dibuix es demana en negre (vegeu `afegeix`).
+      afegeix([it.stripeItem], it.collection, it.collection === 'the_human_inside' ? humanInsideVariant : firstContactVariant, it.collection, it.subcollection, true);
     }
     return { items, srcs, collections, subcollections };
     // eslint-disable-next-line react-hooks/exhaustive-deps
