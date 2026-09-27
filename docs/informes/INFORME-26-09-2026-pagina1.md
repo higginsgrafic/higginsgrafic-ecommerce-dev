@@ -208,3 +208,59 @@ firstContactPanels 0/3, MegaslidePagina2 0/7; `GraellaDuesFileresPagina1.jsx`,
 `BlocDretaPagina1.jsx` i `geometriaMegaslide.js` nets), `npx vite build` OK,
 `npm run compara-vistes` OK, `node scripts/mesura-formats.mjs` 0 i 0,
 `node scripts/_tmp-errors2.mjs` cap error.
+
+---
+
+## 7. Segona tongada: el que ha demanat l'amo despres de veure-ho (`11ba303`)
+
+### 7.1 La columna de colleccions, com la captura
+
+La primera versio d'A1 (commits `731cf3d` i `adda4c6`) va interpretar «un sol
+selector» com **una sola pastilla amb nome's el nom actiu centrat**. La captura
+que ha donat l'amo diu que no: la **llista sencera** es veu, i l'actiu es
+destaca amb una caixa blanca. Ara es aixi, i amb **l'estil exacte del selector**
+(«Has de fer servir el mateix estil, exacte, que el selector» i «El text de la
+columna, de la mateixa mida»):
+
+| què | valor |
+|---|---|
+| contenidor | `1px solid #D1D5DB`, radi exterior **11 px**, fons `#F3F4F6` |
+| caixa de l'actiu | blanca, `0 1px 3px rgba(0,0,0,0.12)`, radi **6 px** i **5 px** d'offset per cada costat |
+| text | `font-oswald` `max(10px, carrilPx(14))` = **13,89 px** a 1920 (el MATEIX que BLANC/COLOR/NEGRE), majuscules, enrasat a la **dreta**, actiu en negreta i `#1A1A1A`, la resta `#6B7280` |
+
+### 7.2 El gap de 10 px amb les fletxes
+
+| què (1920) | abans | despres |
+|---|---|---|
+| gap fletxes-columna | 20 px | **9,8 ~ 10 px** |
+| vora esquerra de la columna | x1403,8 | **x1395,3** |
+| amplada de la columna | 120,2 | **128,7** |
+| retall de la graella | 933,4 | 939,4 (creix els mateixos px) |
+
+`GRAELLA_COLUMNA_DRETA_CARRIL_PX` 142 → 152 i `GRAELLA_GAP_COLUMNES_PX` 20 →
+6,5. El test d'`ampladaRetallGraella` i els de `desnivellColorsGraella` s'han
+actualitzat amb les mides noves (la formula i el navegador segueixen dient el
+mateix).
+
+### 7.3 La rodeta de la graella de la p1
+
+`CercadorDibuixosGraella` enganxava el gest i la rodeta al `graellaRef` que li
+passava la filera de la **pagina 2**; la graella de la **p1** no n'hi passava cap,
+o sigui que la caixa que s'ha de moure no existia i la rodeta no hi feia res. Ara
+la graella se'n fa **un de propi** si no n'hi arriba cap. Comprovat: la tira de la
+p1 es mou amb la rodeta (de −1018,5 a −1138,5) i amb esdeveniment, i la de la p2
+tambe.
+
+### 7.4 El cadenat que no apareixia mai
+
+L'amo ho va dir: «el primer cop que cliques no apareix el cadenat». **Causa:** el
+megaslide no es munta amb el clic (primer es precarreguen les imatges i
+`oberturaAPunt` el deixa entrar DESPRES, fins a 4 s), i els **tres bucles** de
+`FullWideSlideHeader` que pengen del panell tenen `[active]` de dependencies: la
+primera passada trobaven `megaMenuRef.current` buit i tornaven, i com que res no
+els tornava a disparar es quedaven sense fer res mai (`--hg-mega-bottom` tambe
+quedava buit). **Ara** el `ref` del panell es un callback que marca l'estat
+`panellMuntat`, i els tres bucles el tenen de dependencia.
+
+Mesurat: el cadenat apareix **als 507 ms** de clicar, a y392,5, amb
+`--hg-mega-bottom: 385px`.
