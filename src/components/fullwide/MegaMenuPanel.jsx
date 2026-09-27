@@ -9,7 +9,12 @@ import MegaStripeBleedGuard from './MegaStripeBleedGuard.jsx';
 import MegaStripePanelP1 from './MegaStripePanelP1.jsx';
 import { alcadaPanellMegaslide } from '../../utils/mesuraMegaslide.js';
 import MegaslidePagina2 from '../megaslide/MegaslidePagina2.jsx';
-import { MARGE_EXTRA_ESCRIPTORI_PX } from '../megaslide/geometriaMegaslide.js';
+import {
+  MARGE_EXTRA_ESCRIPTORI_PX,
+  PADDING_DALT_PANELL_ESCRIPTORI_PX,
+  PADDING_VERTICAL_PANELL_ESCRIPTORI_PX,
+  PADDING_VERTICAL_PANELL_PX,
+} from '../megaslide/geometriaMegaslide.js';
 import { alturaTaulaVertical, CapaTaulaVertical, TaulaVerticalP1 } from '../megaslide/TaulaVertical.jsx';
 import { CercadorDibuixosGraella, dibuixosGraella16x4 } from './CercadorTextRow.jsx';
 import { FirstContactDibuix00Buttons, FirstContactDibuix09Buttons } from './firstContactPanels.jsx';
@@ -35,7 +40,10 @@ const MARGE_EXTRA_DESKTOP_PX = MARGE_EXTRA_ESCRIPTORI_PX;
 // l'ultima alcada bona al navegador, el panell ja neix amb l'alcada correcta
 // tambe despres de recarregar la pagina. Es per mida de finestra, perque
 // l'alcada en depen.
-const KEY_ALCADA = 'hg.megaPanelHeight.v1';
+// v2 (28/09/2026): el coixi de dalt del panell va canviar (l'aire de la pagina 2
+// es va retallar 24,4 px), i l'alcada desada amb la clau vella deixava el panell
+// 24 px massa alt durant els primers fotogrames de cada obertura.
+const KEY_ALCADA = 'hg.megaPanelHeight.v2';
 function llegirAlcadaDesada() {
   try {
     const cru = window.localStorage.getItem(KEY_ALCADA);
@@ -141,6 +149,19 @@ export default function MegaMenuPanel({
   const esVerticalAqui = w >= 768 && w <= 1366 && h > w;
   const esApaissadaAqui = w >= 768 && w <= 1366 && w >= h;
   const esMobilAqui = w < 768;
+  const esEscriptoriAqui = !esVerticalAqui && !esApaissadaAqui && !esMobilAqui;
+  // EL COIXI DE DALT DEL PANELL, RETALLAT A L'ESCRIPTORI (28/09/2026).
+  //
+  // L'amo va demanar 30 px d'aire entre el bottom del header i el top del
+  // contingut de la pagina 2, i 30 px mes entre el seu bottom i el final del
+  // megaslide, per alliberar espai per a la TDP i per a la hero. El coixi de
+  // dalt es compartit per les dues pagines (i la filera de la pagina 2 va
+  // lligada al selector de la pagina 1 pel bucle `alignTopRowToPage1`), aixi
+  // que el retall es fa aqui i mou les dues. Els numeros i el perque son a
+  // `PADDING_DALT_PANELL_ESCRIPTORI_PX` (geometriaMegaslide.js).
+  const paddingVerticalPanellPx = esEscriptoriAqui
+    ? PADDING_VERTICAL_PANELL_ESCRIPTORI_PX
+    : PADDING_VERTICAL_PANELL_PX;
   // Marge extra de la pestanya a l'escriptori (vegeu MARGE_EXTRA_DESKTOP_PX).
   // S'aplica tant a la mesura com a la reserva, perquè el panell no faci cap
   // salt entre l'estat inicial i el calibrat.
@@ -152,7 +173,11 @@ export default function MegaMenuPanel({
   // contingut (que fa que la mesura de la pagina 1 sigui 20 px mes gran). Si
   // s'hi sumessin tambe aqui, es comptarien DUES vegades i el panell creixeria
   // 40 px en comptes de 20.
-  const alcadaGuard = (p1Bottom) => alcadaPanellMegaslide({ p1ContentBottom: p1Bottom, gap: P1_STRIPE_BOTTOM_GAP });
+  const alcadaGuard = useCallback((p1Bottom) => alcadaPanellMegaslide({
+    p1ContentBottom: p1Bottom,
+    gap: P1_STRIPE_BOTTOM_GAP,
+    paddingVertical: paddingVerticalPanellPx,
+  }), [paddingVerticalPanellPx]);
 
   const viewport1Ref = useRef(null);
   const handlePortraitScroll1 = useCallback(() => {
@@ -204,8 +229,10 @@ export default function MegaMenuPanel({
 
   // Retall de la pàgina 1: el panell acaba P1_STRIPE_BOTTOM_GAP px sota el
   // bottom visible de les samarretes. La mesura ve de MegaStripePanelP1 (ja hi
-  // inclou l'escala de la franja i el pageLift). 64 = py-8 (32+32) del
-  // contenidor del panell. Mentre no hi ha mesura, s'usa l'alçada de sempre.
+  // inclou l'escala de la franja i el pageLift). El coixi vertical del
+  // contenidor del panell (el `py-8`: 64 px, o 40,6 a l'escriptori des del
+  // retall de dalt) el descompta `alcadaPanellMegaslide`. Mentre no hi ha
+  // mesura, s'usa l'alçada de sempre.
   const [p1ContentBottomPx, setP1ContentBottomPx] = useState(null);
   const [p1PageLift, setP1PageLift] = useState(0);
   const handleP1ContentBottom = useCallback((px) => {
@@ -265,7 +292,7 @@ export default function MegaMenuPanel({
     if (isPortraitTablet || paymentFillsScreen) return;
     if (!mesuraEstable || p1ContentBottomPx == null) return;
     desarAlcada(`${alcadaGuard(p1ContentBottomPx)}px`);
-  }, [mesuraEstable, p1ContentBottomPx, isPortraitTablet, paymentFillsScreen, margeExtraDesktop]);
+  }, [mesuraEstable, p1ContentBottomPx, isPortraitTablet, paymentFillsScreen, margeExtraDesktop, paddingVerticalPanellPx, alcadaGuard]);
 
   // La graella de dibuixos de la taula ensenya 7 dibuixos alhora (com la
   // columna de l'horitzontal) i les fletxes passen de pagina.
@@ -361,6 +388,11 @@ export default function MegaMenuPanel({
           className="mx-auto max-w-[1350px] px-4 sm:px-6 lg:px-10 py-8"
           style={{
             overflow: 'visible',
+            // El coixí de dalt, retallat a l'escriptori (l'aire de la pagina 2
+            // passa de 54,4 a 30 px). El de baix no es toca, i tampoc a les
+            // tauletes ni al mobil, on la vertical el cancel·la amb el
+            // `marginTop` de sota.
+            paddingTop: esEscriptoriAqui ? `${PADDING_DALT_PANELL_ESCRIPTORI_PX}px` : undefined,
             marginTop: isPortraitTablet ? '-32px' : undefined,
             ...(megaFullScreen ? {
               minHeight: 'calc(100vh - 16px)',

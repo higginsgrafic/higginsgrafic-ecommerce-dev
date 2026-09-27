@@ -15,6 +15,10 @@ import {
   desplacTopSelector,
   COLUMNA_TOP_AJUST_PX,
   COLUMNA_BAIX_AJUST_PX,
+  PADDING_DALT_PANELL_ESCRIPTORI_PX,
+  PADDING_BAIX_PANELL_PX,
+  PADDING_VERTICAL_PANELL_PX,
+  PADDING_VERTICAL_PANELL_ESCRIPTORI_PX,
   desnivellsLiniesGraella,
   desnivellColorsGraella,
   margeBaixFletxesGraella,
@@ -504,5 +508,30 @@ describe('els ajustos de la columna de colleccions (27/09/2026)', () => {
     const alcadaAbans = 246.6;
     const alcadaDespres = alcadaAbans - COLUMNA_TOP_AJUST_PX - COLUMNA_BAIX_AJUST_PX;
     expect(alcadaDespres).toBeCloseTo(242.6, 1);
+  });
+});
+
+describe("l'aire de 30 px de la pagina 2 (28/09/2026)", () => {
+  it('el coixi de dalt del panell a l escriptori es 8,6 (els 30 px menys els 21,4 de la filera)', () => {
+    // Ho va demanar en Marc: 30 px del bottom del header al top de la pagina 2.
+    // L'aire es el coixi del panell mes el top propi de la filera de la pagina 2
+    // dins el contingut del panell (el retall començava a 106,4 i el contingut a
+    // 85: 21,4 px). El coixi era el `py-8` (32), i per deixar l'aire a 30 cal
+    // 30 - 21,4 = 8,6.
+    expect(PADDING_DALT_PANELL_ESCRIPTORI_PX).toBeCloseTo(8.6, 2);
+  });
+
+  it('el coixi vertical de l escriptori es 8,6 + 32 = 40,6 (el de sempre es 64)', () => {
+    expect(PADDING_BAIX_PANELL_PX).toBe(32);
+    expect(PADDING_VERTICAL_PANELL_PX).toBe(64);
+    expect(PADDING_VERTICAL_PANELL_ESCRIPTORI_PX).toBeCloseTo(40.6, 2);
+  });
+
+  it('i amb aixo el contingut de les dues pagines puja 23,4 px (de 53,4 a 30)', () => {
+    const retall = 32 - PADDING_DALT_PANELL_ESCRIPTORI_PX;
+    expect(retall).toBeCloseTo(23.4, 2);
+    // L'aire de dalt de la pagina 2 al navegador: 106,4 - 53 = 53,4 abans,
+    // 83 - 53 = 30,0 despres (mesurat el 28/09/2026 amb `_tmp-aire-final.mjs`).
+    expect(53.4 - retall).toBeCloseTo(30, 1);
   });
 });

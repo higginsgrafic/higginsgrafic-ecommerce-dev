@@ -175,6 +175,19 @@ describe('alcadaPanellMegaslide', () => {
     expect(alcadaPanellMegaslide({ p1ContentBottom: 400, gap: 30, margeExtra: 20 })).toBe(386);
   });
 
+  it("a l'escriptori descompta el coixi retallat (8,6 + 32 = 40,6), no els 64", () => {
+    // Des del 28/09/2026 el coixi de dalt del panell es retalla a l'escriptori
+    // per deixar 30 px d'aire sobre el contingut de la pagina 2: el que es
+    // descompta passa de 64 a 39,6 i el panell fa 24,4 px mes baix. Sense aixo,
+    // el panell acabaria 24 px massa avall i l'aire de baix no seria el de
+    // `gap`.
+    expect(alcadaPanellMegaslide({ p1ContentBottom: 400, gap: 30, paddingVertical: 40.6 })).toBe(389);
+  });
+
+  it('un coixi invalid cau al de sempre (64)', () => {
+    expect(alcadaPanellMegaslide({ p1ContentBottom: 400, gap: 30, paddingVertical: null })).toBe(366);
+  });
+
   it('mai no dona una alçada negativa', () => {
     expect(alcadaPanellMegaslide({ p1ContentBottom: 10, gap: 0 })).toBe(0);
     expect(alcadaPanellMegaslide({ p1ContentBottom: -100, gap: 0 })).toBe(0);

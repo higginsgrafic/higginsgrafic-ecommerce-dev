@@ -210,6 +210,62 @@ export const AJUST_FRANJA_TAULETA_APAISSADA_PX = -10;
 export const MARGE_EXTRA_ESCRIPTORI_PX = 20;
 
 /**
+ * EL COIXI DE DALT DEL PANELL, RETALLAT PER FER LLOC A LA TDP (28/09/2026)
+ * -----------------------------------------------------------------------------
+ * Ho va demanar l'amo: «Vull que li posis 30 px d'aire per sobre i per sota a
+ * la p2. 30 px del top de la p2 al bottom del header i 30 px des del bottom de
+ * la p2 al final del megaslide (l'hauràs de fer més baix)», i tot seguit va
+ * recordar per què: la reorganitzacio de proporcions era per fer la stripe mes
+ * petita i ALLIBERAR ESPAI per a la TDP i per a la hero.
+ *
+ * El coixi vertical del panell es el `py-8` (32 + 32) del contenidor
+ * `mx-auto max-w-[1350px] ... py-8` de `MegaMenuPanel`, i el comparteixen les
+ * DUES pagines. L'aire de dalt de la pagina 2 es aquest coixi mes el top propi
+ * de la seva filera dins el contingut del panell (`--hg-cercador-bar-top` +
+ * `topVisualAlignmentY` + 20), que a 1920x946 val 21,4 px (el retall comenca a
+ * 106,4 px i el contingut del panell a 85: 106,4 - 85). Amb els 32 px del
+ * `py-8`, l'aire era 53,4 px (106,4 menys el bottom del header, 53: el header
+ * fa 52 px mes 1 px de vora); per deixar-lo a 30 cal 8,6 px (30 - 21,4).
+ *
+ * PER QUE NOMES ES POT FER AIXÍ (i no movent només la pagina 2):
+ *
+ *  - La filera de la pagina 2 NO te posicio propia: el bucle
+ *    `alignTopRowToPage1` (a `MegaslidePagina2`) la posa cada cop perque el seu
+ *    boto Color caigui exactament on cau el de la pagina 1. Qualsevol
+ *    desplacament que nome's afectes la pagina 2 el desfaria el bucle en 180 ms
+ *    (i el tornaria a desfer als 340 ms). Les dues fileres son la mateixa peça.
+ *  - Per tant, l'unic que pot pujar el contingut de la pagina 2 es l'espai de
+ *    sobre, que es compartit: els 23,4 px que es retallen aqui tambe pugen el
+ *    contingut de la pagina 1.
+ *
+ * CONSEQÜENCIES MESURADES (1920x946):
+ *
+ *  - l'aire de dalt de la pagina 2 passa de 53,4 a 30,0 px  <- el que demanava
+ *  - el de la pagina 1 passa de 44,9 a 21,5 px (la seva graella es mes alta
+ *    —110 px— i el seu contingut comenca 8,5 px mes amunt que el retall de la
+ *    pagina 2)
+ *  - l'aire de baix NO es toca: el panell acaba `P1_STRIPE_BOTTOM_GAP` (30) px
+ *    sota la tinta de les samarretes, i com que tot el contingut puja igual,
+ *    el panell tambe acaba 23,4 px mes amunt (es a dir, el megaslide queda mes
+ *    baix, que es el que demanava: de 386 a 362,6 px)
+ *  - el megaslide fa 23,4 px menys: aquest es l'espai que queda lliure
+ *
+ * A les tauletes i al mobil NO s'aplica (alla el panell te les seves alcades
+ * declarades, i a la vertical el `-32px` de `marginTop` cancel·la el coixi).
+ */
+export const PADDING_DALT_PANELL_ESCRIPTORI_PX = 8.6;
+
+/** El coixi de baix del panell (la meitat baixa del `py-8`): no es toca. */
+export const PADDING_BAIX_PANELL_PX = 32;
+
+/** El coixi vertical del panell tal com era (i com es a tauletes i mobil). */
+export const PADDING_VERTICAL_PANELL_PX = 64;
+
+/** El coixi vertical del panell a l'escriptori, despres del retall. */
+export const PADDING_VERTICAL_PANELL_ESCRIPTORI_PX =
+  PADDING_DALT_PANELL_ESCRIPTORI_PX + PADDING_BAIX_PANELL_PX;
+
+/**
  * EL PAGELIFT DE LA PÀGINA 1, DECLARAT (26/09/2026)
  * -----------------------------------------------------------------------------
  * La pàgina 1 es puja (`transform: translateY(-pageLift)`) perquè el seu bloc

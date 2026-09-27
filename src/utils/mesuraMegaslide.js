@@ -237,9 +237,15 @@ export function deltaObjectiuPageLift({ selectorTop, panelTop, ample, alt, esTau
  * Alçada del panell del megaslide a partir de la mesura del contingut de la
  * pàgina 1.
  *
- * El panell acaba `gap` px sota el bottom visible de les samarretes. El `-64`
- * és el `py-8` del contenidor del panell (32 + 32), que la mesura ja inclou i
- * per tant s'ha de descomptar.
+ * El panell acaba `gap` px sota el bottom visible de les samarretes. El coixi
+ * vertical del contenidor del panell (el `py-8`: 32 + 32) s'ha de descomptar
+ * perquè la mesura ja l'inclou.
+ *
+ * El coixi ja no és sempre 64: a l'escriptori el de dalt va ser retallat a
+ * 7,6 px el 28/09/2026 per deixar 30 px d'aire sobre el contingut de la pàgina
+ * 2 (vegeu `PADDING_DALT_PANELL_ESCRIPTORI_PX`), i MegaMenuPanel passa el total
+ * que toca (`paddingVertical`). El valor per defecte és el de sempre, perquè
+ * les tauletes i el mòbil no es toquen.
  *
  * Vivia dins de MegaMenuPanel, dins d'una expressió de set línies amb tres
  * condicions enganxades (checkout, mesura estable, valor recordat).
@@ -248,11 +254,13 @@ export function deltaObjectiuPageLift({ selectorTop, panelTop, ample, alt, esTau
  * @param {number} e.p1ContentBottom  bottom de la franja de la pàgina 1, en px des del capdamunt del panell
  * @param {number} [e.gap]            espai que queda sota les samarretes (P1_STRIPE_BOTTOM_GAP)
  * @param {number} [e.margeExtra]     marge extra de l'escriptori
+ * @param {number} [e.paddingVertical] coixi vertical del contenidor del panell (64, o 40,6 a l'escriptori)
  * @returns {number} alçada del panell en px (mai negativa)
  */
-export function alcadaPanellMegaslide({ p1ContentBottom, gap = 30, margeExtra = 0 }) {
+export function alcadaPanellMegaslide({ p1ContentBottom, gap = 30, margeExtra = 0, paddingVertical = 64 }) {
   if (!Number.isFinite(p1ContentBottom)) return 0;
-  return Math.max(0, Math.round(p1ContentBottom + gap - 64 + margeExtra));
+  const padding = Number.isFinite(paddingVertical) ? paddingVertical : 64;
+  return Math.max(0, Math.round(p1ContentBottom + gap - padding + margeExtra));
 }
 
 /**

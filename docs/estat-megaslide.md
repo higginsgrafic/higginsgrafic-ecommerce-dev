@@ -1733,3 +1733,26 @@ contenidor de debò es va veure amb una sonda que puja la cadena d'ancestres.
 
 **Eines**: `npm run mesura:megaslide` (833 xifres de regressió a 7 mides),
 `npm run compara-vistes`, 462 proves, `npx vite build`.
+
+### L'aire de 30 px de la pàgina 2, i el megaslide 23,4 px més baix (33) — FET (28/09/2026)
+
+En Marc: «30 px d'aire per sobre i per sota a la p2», «l'hauràs de fer més
+baix», i el motiu: alliberar espai per a la TDP i per a la hero.
+
+La filera de la p2 es col·loca sola perquè el seu botó Color caigui on cau el de
+la p1 (`alignTopRowToPage1`, als 180 i 340 ms): no es pot moure la p2 tota sola.
+El que es toca és **el coixí de dalt del panell**, que és compartit
+(`py-8`: 32 → 8,6 px a l'escriptori, `PADDING_DALT_PANELL_ESCRIPTORI_PX`), i amb
+ell pugen les dues pàgines.
+
+| peça (1920x946) | abans | ara |
+|---|---|---|
+| aire de dalt de la p2 | 53,4 | **30,0** |
+| aire de dalt de la p1 | 44,9 | 21,5 |
+| franja p1 / p2 | 241,5 | 218,7 / 218,0 |
+| final del megaslide | 386 | **362,6** |
+| aire de baix (p1 / p2) | 30,9 / 31,5 | igual |
+
+`alcadaPanellMegaslide` descompta el coixí de debò (40,6 px a l'escriptori) i la
+memòria d'alçada del navegador passa a `hg.megaPanelHeight.v2`. A les tauletes i
+al mòbil no s'hi aplica (el `-32px` del vertical cancel·la el coixí).

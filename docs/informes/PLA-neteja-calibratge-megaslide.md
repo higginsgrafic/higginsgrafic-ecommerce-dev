@@ -1211,3 +1211,45 @@ I **DECISIO de l'amo**: la p1 no ha de tenir vel de colleccions inactives
 
 Commits `722d62e` (els fulls nous) i `9b51f31` (el vel amb la silueta de cada
 casa).
+
+### VOLTA 16 — L'aire de 30 px de la pàgina 2 (28/09/2026)
+
+En Marc ho va demanar amb la xifra i el motiu: «Vull que li posis 30 px d'aire per
+sobre i per sota a la p2. 30 px del top de la p2 al bottom del header i 30 px des
+del bottom de la p2 al final del megaslide (l'hauràs de fer més baix)», i tot
+seguit va recordar per què: «la reorganització de proporcions era per fer la
+stripe més petita i alliberar espai per a la TDP i per a la hero».
+
+**PER QUÈ NO ES POT MOURE NOMÉS LA PÀGINA 2.** La filera de la pàgina 2 no té
+posició pròpia: el bucle `alignTopRowToPage1` (a `MegaslidePagina2`) la col·loca
+a cada passada perquè el seu botó Color caigui exactament on cau el de la pàgina
+1, i ho repeteix als 180 i als 340 ms. Qualsevol desplaçament que només afectés
+la p2 el desfaria el bucle. L'únic que pot pujar el contingut de la p2 és
+l'espai de sobre, que és compartit amb la p1.
+
+**FET.** El coixí de dalt del panell (`py-8` del contenidor
+`mx-auto max-w-[1350px] ... py-8` de `MegaMenuPanel`) passa de 32 a **8,6 px a
+l'escriptori** (30 − 21,4, que és el top propi de la filera de la p2 dins el
+contingut del panell). El coixí de baix es queda a 32. `alcadaPanellMegaslide`
+descompta el coixi de debò (40,6 en comptes de 64) i la memòria d'alçada del
+navegador passa a la clau `hg.megaPanelHeight.v2` (la v1 desada deixava el
+panell 24 px massa alt als primers fotogrames).
+
+**XIFRES (1920x946, `_tmp-aire-final.mjs`).** Aire de dalt de la p2: 53,4 →
+**30,0** px. Aire de dalt de la p1: 44,9 → 21,5 (la seva graella fa 110 px i
+comença 8,5 px més amunt que el retall de la p2). Franja de la p1: 241,5 →
+218,7; la de la p2: 241,5 → 218,0 (les dues pugen 23,4 i es queden a 0,6 px
+l'una de l'altra, com abans). Final del megaslide: 386 → **362,6** px (23,4 px
+menys: aquest és l'espai que queda lliure per a la TDP i la hero). Aire de baix:
+30,9 a la p1 i 31,5 a la p2 (no es toca: el panell acaba
+`P1_STRIPE_BOTTOM_GAP` = 30 px sota la tinta de la p1, i el de la p2 és 0,6 px
+més alt).
+
+**DECISIÓ (28/09/2026).** El retall es fa al coixí compartit i no pas amb un
+desplaçament propi de la p2, perquè el bucle d'alineació el desfaria. La p1
+també puja 23,4 px (el seu aire de dalt queda a 21,5).
+
+Bateria del tancament: 588 proves (45 fitxers), eslint amb els comptes de
+`HEAD`, `vite build` OK, `compara-vistes` OK, `mesura-formats` 0 i 0,
+`_tmp-errors2` cap error i `_tmp-ancoratge` TOT AL SEU LLOC (referències
+actualitzades −23,4 px).
