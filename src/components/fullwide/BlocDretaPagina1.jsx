@@ -47,7 +47,7 @@ export function SelectorQuadratPagina1({
   showBlack = true,
   showMulti = true,
   selectedVariant,
-  sliderInset = 3,
+  sliderInset = 5,
 }) {
   const buttons = [
     { key: 'white', label: 'Blanc', onClick: onWhite, disabled: !showWhite },
@@ -67,7 +67,7 @@ export function SelectorQuadratPagina1({
       data-stripe-buttonbar="bn-p1"
       style={{
         border: '1px solid #D1D5DB',
-        borderRadius: '6px',
+        borderRadius: '11px',
         backgroundColor: '#F3F4F6',
         boxSizing: 'border-box',
         overflow: 'hidden',
