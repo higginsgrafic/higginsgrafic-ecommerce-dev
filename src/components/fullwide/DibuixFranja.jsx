@@ -10,6 +10,7 @@ import {
   STRIPE_DRAWING_ESCALA_VERTICAL,
   STRIPE_DRAWING_DX_VERTICAL,
   FILTRE_DIBUIX_DESACTIVAT,
+  FILTRE_DIBUIX_DESACTIVAT_COLOR,
 } from '../../config/stripeCalibrationsVertical';
 import {
   DIBUIXOS_FRANJA_DX,
@@ -387,6 +388,10 @@ export function DibuixFranja({
     ? (cal.dx + (STRIPE_DRAWING_DX_VERTICAL[canonicalKey(picked)] ?? STRIPE_DRAWING_DX_VERTICAL[picked] ?? 0)) * factorCalibratgeVertical
     : cal.dx;
   const transform = `translate(calc(${dxDibuix}px * ${fA} + ${desplacamentGap}% + var(--hgStripeDrawingExtraDx, 0px)${idx < 7 ? ' + var(--hgStripeDrawingExtraDxFilaDalt, 0px)' : ''}), calc(${dyDibuix}px + var(--hgStripeDrawingExtraDy, -5px)${idx < 7 ? ' + var(--hgStripeDrawingExtraDyFilaDalt, 0px)' : ''})) scale(calc(${escalaDibuix} * var(--hgStripeDrawingExtraScale, 1)))`;
+  // Els dibuixos que nome's existeixen en color (els solids i els marcs de
+  // LOOKING FOR MY DARCY) no porten la variant negra: a aquests se'ls ha de
+  // treure el color a part.
+  const esDibuixAmbVariantNegra = typeof picked === 'string' && /-b-stripe\.webp$/i.test(picked);
   const filter = drawingOverlayDebug
     ? 'drop-shadow(0 0 2px rgba(0,0,0,0.65))'
     : active === 'austen'
@@ -396,13 +401,11 @@ export function DibuixFranja({
       ? 'drop-shadow(0 0 2px rgba(0,0,0,0.75))'
       // EL DIBUIX D'UNA SAMARRETA ATENUADA, EN GRIS DE DESACTIVAT (28/09/2026,
       // ho ha demanat l'amo: «els facis tots d'un color gris desactivat»).
-      // `brightness(0)` el deixa pla i NEGRE (l'alfa es conserva, o sigui que la
-      // forma del dibuix no es toca) i `invert` el porta al gris. Aixi el dibuix
-      // queda d'un sol color passi el que passi amb la variant que s'hi hagi
-      // triat (el negre de `srcDibuixVelatEnNegre` o el color dels dibuixos que
-      // nome's existeixen en color).
+      // Els dibuixos de casa son imatges en escala de grisos: nome's se'ls
+      // rebaixa l'opacitat (vegeu `FILTRE_DIBUIX_DESACTIVAT`), que els deixa el
+      // detall intacte.
       : desactivat
-        ? FILTRE_DIBUIX_DESACTIVAT
+        ? (esDibuixAmbVariantNegra ? FILTRE_DIBUIX_DESACTIVAT : FILTRE_DIBUIX_DESACTIVAT_COLOR)
         : 'none';
 
   return (

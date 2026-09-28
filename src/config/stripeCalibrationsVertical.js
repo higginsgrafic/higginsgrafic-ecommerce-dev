@@ -288,16 +288,34 @@ export const VEL_SAMARRETA_BUIDA_ALFA_BLANCA = 0.6;
 /**
  * EL GRIS DE DESACTIVAT DELS DIBUIXOS DE LES SAMARRETES ATENUADES (28/09/2026).
  *
- * Ho ha demanat l'amo: «els facis tots d'un color gris desactivat». El dibuix
- * d'una casa que no es de la colleccio activa es pinta amb aquest filtre en lloc
- * del seu color (o del negre de `srcDibuixVelatEnNegre`).
+ * Ho ha demanat l'amo: «desactiva els dibuixos», «els facis tots d'un color gris
+ * desactivat». El dibuix d'una casa que no es de la colleccio activa es pinta
+ * amb aquest filtre en lloc del seu color (o del negre de
+ * `srcDibuixVelatEnNegre`).
  *
- * `brightness(0)` el deixa pla i negre conservant l'alfa (la forma del dibuix no
- * es toca) i `invert(0.77)` el porta al gris #C4C4C4, que es el gris de
- * desactivat de la casa (`#C4C8CE`, els dos punts de blau no es noten) que
- * porten els botons desactivats del selector.
+ * PER QUE OPACITAT I NO UN INVERT (28/09/2026). El primer intent va ser deixar el
+ * dibuix pla amb `brightness(0)` i invertir-lo, i l'amo el va aturar de seguida:
+ * «El negre es en escala de grisos. No funcionara» — els dibuixos de casa son
+ * IMATGES EN ESCALA DE GRISOS, i invertir-les els capgira els tons (les llums es
+ * tornen ombres i el dibuix surt en negatiu). I el segon intent, nome's invertir,
+ * encara hauria fet el mateix.
+ *
+ * Rebaixar-los l'opacitat es el que fa la casa per atenuar (les peces de la
+ * graella que no son de la colleccio activa van a 0,12) i deixa el dibuix amb el
+ * SEU detall, nome's que mes fluix. Com que el dibuix va PER DAMUNT del vel, allo
+ * que te al darrere ja es la samarreta esblanqueida, i el resultat es el mateix
+ * gris de desactivat (`#C4C4C4`, que es el de la casa `#C4C8CE`) tant si la
+ * samarreta es blanca com si es negra.
  */
-export const FILTRE_DIBUIX_DESACTIVAT = 'brightness(0) invert(0.77)';
+export const FILTRE_DIBUIX_DESACTIVAT = 'opacity(0.25)';
+
+/**
+ * El mateix, pero per als dibuixos que NOME'S existeixen en color (els solids i
+ * els marcs de LOOKING FOR MY DARCY, que `srcDibuixVelatEnNegre` deixa en color a
+ * posta): primer se'ls treu el color i despres se'ls rebaixa, que tambe queden
+ * grisos i amb el seu detall.
+ */
+export const FILTRE_DIBUIX_DESACTIVAT_COLOR = 'grayscale(1) opacity(0.25)';
 
 /**
  * CAP DIBUIX PORTA MIRALL, MAI, si no es demana de forma expressa.
