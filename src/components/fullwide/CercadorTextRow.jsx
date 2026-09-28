@@ -1229,10 +1229,10 @@ export function CercadorColleccionsColumna({
               boxShadow: key === activeKey ? '0 1px 3px rgba(0,0,0,0.12)' : 'none',
               // LA PASTILLA, AMB EL MATEIX COIXI QUE LA DEL SELECTOR (28/09/2026,
               // ho ha demanat l'amo): alla la pastilla va 5 px endinsada de la
-              // caixa (`sliderInset`) i aqui no n'hi havia cap. Nome's s'endinsa
-              // la de la colleccio activa; les altres omplen la filera.
+              // caixa (`sliderInset`), aqui tambe (5 px per costat, 10 en total),
+              // i nome's la de la colleccio activa; les altres omplen la filera.
               width: key === activeKey ? 'calc(100% - 10px)' : '100%',
-              height: key === activeKey ? 'calc(100% + 1px)' : '100%',
+              height: key === activeKey ? 'calc(100% - 10px)' : '100%',
               justifySelf: 'center',
               alignSelf: 'center',
               // LA FONT, AMB EL CRITERI DE LA COLUMNA DE LA P2 HORITZONTAL
