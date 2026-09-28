@@ -1193,7 +1193,11 @@ export function CercadorColleccionsColumna({
           // separacio entre files, la pastilla arriba al maxim. Abans les caixes
           // feien els 22,59 px de la columna de la p2h i el que sobrava eren
           // buits.
-          gridTemplateRows: `repeat(${llista.length}, 1fr)`,
+          // ELS ENLLAÇOS, MES JUNTS (28/09/2026, ho ha demanat l'amo per poder
+          // fer la pastilla mes alta): files de 22,59 px, les de la columna de
+          // la p2h, centrades a la casella.
+          gridTemplateRows: `repeat(${llista.length}, 22.59px)`,
+          alignContent: 'center',
           rowGap: 0,
           minHeight: 0,
         }}
@@ -1228,7 +1232,7 @@ export function CercadorColleccionsColumna({
               // caixa (`sliderInset`) i aqui no n'hi havia cap. Nome's s'endinsa
               // la de la colleccio activa; les altres omplen la filera.
               width: key === activeKey ? 'calc(100% - 10px)' : '100%',
-              height: key === activeKey ? 'calc(100% - 10px)' : '100%',
+              height: key === activeKey ? 'calc(100% + 2px)' : '100%',
               justifySelf: 'center',
               alignSelf: 'center',
               // LA FONT, AMB EL CRITERI DE LA COLUMNA DE LA P2 HORITZONTAL
