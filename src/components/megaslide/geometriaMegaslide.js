@@ -919,6 +919,18 @@ export const OMBRA_MANIGA_BLUR_PX = 4;
 export const OMBRA_MANIGA_OFFSET = { x: 1, y: 3 };
 
 /**
+ * EL DESPLAÇAMENT DE LA TINTA DAMUNT DE LA PASTILLA DEL SELECTOR, EN PX (P1).
+ *
+ * A la p1 la pastilla blanca del selector viu a la capa de la caixa, per sota de
+ * l'ombra, i els botons a la de dalt (si no, la franja se'ls menja els clics).
+ * L'ombra, pero, nome's arriba a x1418 (13 px de pastilla) i alla ja no s'hi veu:
+ * en Marc ho va dir tal qual, «No, no passa per sobre la pastilla». Aquest es el
+ * desplac,ament de la COPIA de l'ombra que es retalla al requadre de la pastilla
+ * i li passa per damunt. Es nome's de la p1.
+ */
+export const OMBRA_MANIGA_PASTILLA_DX_PX = 45;
+
+/**
  * L'alcada de la filera: la del bloc de la dreta (selector de 110 + fletxes de
  * 110, apilats). Amb DUES fileres de dibuixos de 55 unitats, la de dalt cau al
  * centre de la cel·la BLANC i la de baix al de la COLOR.

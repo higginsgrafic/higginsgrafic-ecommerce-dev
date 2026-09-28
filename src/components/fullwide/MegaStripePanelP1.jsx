@@ -6,7 +6,7 @@ import { computeStripeTileOverlaySrcs } from '../../utils/resolveStripeTile.js';
 import { dibuixosGraella16x4 } from './CercadorTextRow.jsx';
 import GraellaDuesFileresPagina1 from './GraellaDuesFileresPagina1.jsx';
 import { SelectorQuadratPagina1, FletxesQuadratPagina1, MIDA_BLOC_DRETA_PAGINA1_PX } from './BlocDretaPagina1.jsx';
-import { ESTIL_CAIXA_BLOC_ALCADA_AUTO } from './estilsBlocs.js';
+import { ESTIL_CAIXA_BLOC_ALCADA_AUTO, ESTIL_PASTILLA_SELECTOR, PASTILLA_INSET_PX } from './estilsBlocs.js';
 import {
   STRIPE_DRAWING_CALIBRATIONS,
   PASSOS_ESCALA_GAP_DIBUIX_VERTICAL,
@@ -40,6 +40,7 @@ import {
   OMBRA_MANIGA_ALFA,
   OMBRA_MANIGA_BLUR_PX,
   OMBRA_MANIGA_OFFSET,
+  OMBRA_MANIGA_PASTILLA_DX_PX,
 } from '../megaslide/geometriaMegaslide.js';
 
 // La franja de samarretes de la pàgina 1 tendeix a quedar-se uns 10 px més avall
@@ -806,6 +807,108 @@ function MegaStripePanelP1({
                     }} />
                   </div>
                 ) : null}
+                {/* LA TINTA DE L'OMBRA, DAMUNT DE LA PASTILLA (28/09/2026). En
+                    Marc: «A la p1, el rectangle blanc del selector ha de passar
+                    per sota l'ombra de la maniga» i, quan la capa ja era la bona,
+                    «No, no passa per sobre la pastilla».
+
+                    L'ombra de dalt nome's te el seu abast dins del bloc: mesurat a
+                    x1418 (13 px de pastilla) i amb una difusio que alla ja no es
+                    veu. Aqui hi ha la MATEIXA ombra UNA altra vegada, desplac,ada
+                    45 px cap a la dreta i RETALLADA al requadre de la pastilla
+                    (`clip-path`), de manera que la tinta hi passa per damunt i no
+                    toca ni la samarreta ni la resta del bloc. El requadre es el del
+                    selector: la meitat de baix del bloc, on son les tres caselles.
+                    Es purament decorativa (`pointerEvents: none`). */}
+                {ombraManigaP1 && mascaraManigaP1 ? (
+                  <div
+                    aria-hidden="true"
+                    data-maniga-ombra-pastilla-p1="1"
+                    style={{
+                      position: 'absolute',
+                      left: 0,
+                      right: 0,
+                      bottom: 0,
+                      height: '50%',
+                      pointerEvents: 'none',
+                      zIndex: 2,
+                      overflow: 'hidden',
+                      // El requadre de la pastilla (el mateix coixi de 5 px), amb
+                      // 8 px de fondària pel damunt perque la difusio no hi faci un
+                      // tall de cop.
+                      clipPath: `inset(${PASTILLA_INSET_PX}px ${PASTILLA_INSET_PX}px -8px)`,
+                    }}
+                  >
+                    <div
+                      style={{
+                        position: 'absolute',
+                        left: `${ombraManigaP1.left + OMBRA_MANIGA_PASTILLA_DX_PX}px`,
+                        top: `${ombraManigaP1.top - (alcadaBlocP1 ?? 0) / 2}px`,
+                        width: `${ombraManigaP1.width}px`,
+                        height: `${ombraManigaP1.height}px`,
+                        filter: `blur(${OMBRA_MANIGA_BLUR_PX}px)`,
+                        transform: `translate(${OMBRA_MANIGA_OFFSET.x}px, ${OMBRA_MANIGA_OFFSET.y}px)`,
+                      }}
+                    >
+                      <div style={{
+                        width: '100%',
+                        height: '100%',
+                        backgroundColor: `rgba(0, 0, 0, ${OMBRA_MANIGA_ALFA})`,
+                        WebkitMaskImage: `url("${mascaraManigaP1}")`,
+                        maskImage: `url("${mascaraManigaP1}")`,
+                        WebkitMaskRepeat: 'no-repeat',
+                        maskRepeat: 'no-repeat',
+                        WebkitMaskSize: '103% 100%',
+                        maskSize: '103% 100%',
+                        WebkitMaskPosition: '50% 0',
+                        maskPosition: '50% 0',
+                      }} />
+                    </div>
+                  </div>
+                ) : null}
+                {/* LA PASTILLA BLANCA DEL SELECTOR, EN AQUESTA CAPA (28/09/2026).
+                    En Marc: «A la p1, el rectangle blanc del selector ha de passar
+                    per sota l'ombra de la maniga». La pastilla viu a la capa de la
+                    caixa (zIndex 0), o sigui que l'ombra hi pinta per damunt, i
+                    els BOTONS es queden a la capa de dalt (zIndex 6) perque la
+                    franja no se'ls mengi els clics. Es la MATEIXA pastilla
+                    (`ESTIL_PASTILLA_SELECTOR`) i cau exactament on cau la de dins
+                    del selector: la meitat de baix del bloc, que es on son les
+                    tres caselles. */}
+                {(() => {
+                  const ORDRE = ['white', 'color', 'black'];
+                  const triat = ORDRE.includes(active === 'the_human_inside' ? humanInsideVariant : firstContactVariant)
+                    ? (active === 'the_human_inside' ? humanInsideVariant : firstContactVariant)
+                    : 'color';
+                  const slotPct = 100 / ORDRE.length;
+                  return (
+                    <div
+                      aria-hidden="true"
+                      data-selector-pastilla-p1="1"
+                      style={{
+                        position: 'absolute',
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        height: '50%',
+                        pointerEvents: 'none',
+                        zIndex: 1,
+                      }}
+                    >
+                      <div
+                        style={{
+                          position: 'absolute',
+                          left: `${PASTILLA_INSET_PX}px`,
+                          right: `${PASTILLA_INSET_PX}px`,
+                          top: `calc(${ORDRE.indexOf(triat) * slotPct}% + ${PASTILLA_INSET_PX}px)`,
+                          height: `calc(${slotPct}% - ${PASTILLA_INSET_PX * 2}px)`,
+                          transition: 'top 200ms cubic-bezier(0.32, 0.72, 0, 1)',
+                          ...ESTIL_PASTILLA_SELECTOR,
+                        }}
+                      />
+                    </div>
+                  );
+                })()}
                 </div>
                 {/* ELS BOTONS, EN UNA CAPA PROPIA PER DAMUNT DE LA FRANJA.
                     DUES BOTONERES QUADRADES APILADES: el quadrat de les fletxes a
@@ -862,6 +965,9 @@ function MegaStripePanelP1({
                   dinsBloc
                   omple
                   format="square"
+                  // LA PASTILLA LA PINTA LA CAPA DE LA CAIXA (28/09/2026), perque
+                  // ha de quedar per sota de l'ombra de la maniga.
+                  mostraPastilla={false}
                   showWhite={stripeVariantVisibility?.white !== false}
                   showBlack={stripeVariantVisibility?.black !== false}
                   showMulti={stripeVariantVisibility?.color !== false}

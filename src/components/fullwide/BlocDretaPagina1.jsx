@@ -1,4 +1,5 @@
 import { carrilPx } from '../../utils/layoutMetrics.js';
+import { ESTIL_PASTILLA_SELECTOR, PASTILLA_INSET_PX } from './estilsBlocs.js';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 /**
@@ -47,7 +48,13 @@ export function SelectorQuadratPagina1({
   showBlack = true,
   showMulti = true,
   selectedVariant,
-  sliderInset = 5,
+  sliderInset = PASTILLA_INSET_PX,
+  // LA PASTILLA, A UN ALTRE LLOC (28/09/2026). A la p1 la pastilla blanca ha
+  // d'anar per SOTA de l'ombra de la maniga i els botons per DAMUNT (si no, la
+  // franja se'ls menja els clics): son dues capes, i per aixo la pastilla es pot
+  // pintar des de fora. Amb `mostraPastilla` falsa, aqui nome's queden els
+  // botons.
+  mostraPastilla = true,
   // LA CAIXA LA PORTA EL BLOC (28/09/2026): amb `dinsBloc` el selector nome's
   // pinta les seves tres caselles i la pastilla, i el fons, la vora i les
   // cantonades els posa el bloc sencer (selector + fletxes).
@@ -129,24 +136,21 @@ export function SelectorQuadratPagina1({
           </button>
         );
       })}
-      <span
-        aria-hidden="true"
-        style={{
-          position: 'absolute',
-          left: `${sliderInset}px`,
-          right: `${sliderInset}px`,
-          top: `calc(${sliderTopPct}% + ${sliderInset}px)`,
-          height: `calc(${btnH}% - ${sliderInset * 2}px)`,
-          backgroundColor: '#FFFFFF',
-          borderRadius: '3px',
-          border: '1px solid #D1D5DB',
-          boxShadow: '0 1px 3px rgba(0,0,0,0.12)',
-          boxSizing: 'border-box',
-          pointerEvents: 'none',
-          transition: 'top 200ms cubic-bezier(0.32, 0.72, 0, 1)',
-          zIndex: 1,
-        }}
-      />
+      {mostraPastilla ? (
+        <span
+          aria-hidden="true"
+          style={{
+            position: 'absolute',
+            left: `${sliderInset}px`,
+            right: `${sliderInset}px`,
+            top: `calc(${sliderTopPct}% + ${sliderInset}px)`,
+            height: `calc(${btnH}% - ${sliderInset * 2}px)`,
+            transition: 'top 200ms cubic-bezier(0.32, 0.72, 0, 1)',
+            zIndex: 1,
+            ...ESTIL_PASTILLA_SELECTOR,
+          }}
+        />
+      ) : null}
     </div>
   );
 }
