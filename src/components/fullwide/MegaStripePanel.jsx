@@ -1594,21 +1594,33 @@ function MegaStripePanel({
                       mega-stripe-full-hit has been removed to avoid duplicate
                       events and coordinate mismatches. */}
 
+                  {/* Contorn de l'àrea de clic (samarretes), alineat amb la
+                      màscara de la imatge (103% × 100%, centrat). Cada samarreta
+                      es ressalta en passar-hi el ratolí; si `clicAreaHighlight`
+                      (hover sobre el nom del dibuix) és cert, es ressalten totes.
+
+                      EL FULL DEPEN DE LA VISTA (28/09/2026): el de la franja
+                      apaisada porta les catorze samarretes en UNA filera, i a la
+                      vertical (dues fileres de set) s'encongien totes en una
+                      filera i les arees de clic no queien sobre les samarretes
+                      (ho va veure l'amo: «els clics fan el burro i salten de
+                      colleccio»). El full vertical el fa
+                      `scripts/vector-clic-vertical.mjs` a partir del vector de
+                      la franja. */}
+                  <ClicAreaOverlay
+                    panellId={idRetall}
+                    src={isPortraitTablet
+                      ? '/placeholders/cercador/full-clic-area-vertical.svg'
+                      : '/placeholders/cercador/full-clic-area-5.svg'}
+                    highlightAll={!!clicAreaHighlight}
+                    highlightIndices={clicAreaHighlightIndices}
+                    tshirtColor={shirtColor}
+                    disabledIndices={emptyTileIndices}
+                  />
+
                 </div>
 
 
-                {/* Contorn de l'àrea de clic (samarretes), alineat amb la
-                    màscara de la imatge (103% × 100%, centrat). Cada samarreta
-                    es ressalta en passar-hi el ratolí; si `clicAreaHighlight`
-                    (hover sobre el nom del dibuix) és cert, es ressalten totes. */}
-                <ClicAreaOverlay
-                  panellId={idRetall}
-                  src="/placeholders/cercador/full-clic-area-5.svg"
-                  highlightAll={!!clicAreaHighlight}
-                  highlightIndices={clicAreaHighlightIndices}
-                  tshirtColor={shirtColor}
-                  disabledIndices={emptyTileIndices}
-                />
               </div>
             </div>
           </div>
