@@ -124,7 +124,7 @@ export const STRIPE_DRAWING_DY_VERTICAL = {
   '/custom_logos/drawings/images_stripe/miscellania/white/r2d2-quote-w-stripe.webp': 28.71,
   '/custom_logos/drawings/images_stripe/the_human_inside/black/afrodita-a-b-stripe.webp': 28.64,
   '/custom_logos/drawings/images_stripe/the_human_inside/black/c3-p0-b-stripe.webp': 28.53,
-  '/custom_logos/drawings/images_stripe/the_human_inside/black/cyberman-b-stripe.webp': 31.11,
+  '/custom_logos/drawings/images_stripe/the_human_inside/black/cyberman-b-stripe.webp': 26.87,
   '/custom_logos/drawings/images_stripe/the_human_inside/black/cylon-03-b-stripe.webp': 28.51,
   '/custom_logos/drawings/images_stripe/the_human_inside/black/cylon-78-b-stripe.webp': 28.42,
   '/custom_logos/drawings/images_stripe/the_human_inside/black/iron-man-08-b-stripe.webp': 28.33,
@@ -141,8 +141,8 @@ export const STRIPE_DRAWING_DY_VERTICAL = {
   '/custom_logos/drawings/images_stripe/the_human_inside/color/afrodita-a-multi-light-stripe.webp': 27.9,
   '/custom_logos/drawings/images_stripe/the_human_inside/color/c3-p0-multi-dark-stripe.webp': 28.17,
   '/custom_logos/drawings/images_stripe/the_human_inside/color/c3-p0-multi-light-stripe.webp': 28.17,
-  '/custom_logos/drawings/images_stripe/the_human_inside/color/cyberman-multi-dark-stripe.webp': 31.12,
-  '/custom_logos/drawings/images_stripe/the_human_inside/color/cyberman-multi-light-stripe.webp': 31.12,
+  '/custom_logos/drawings/images_stripe/the_human_inside/color/cyberman-multi-dark-stripe.webp': 26.88,
+  '/custom_logos/drawings/images_stripe/the_human_inside/color/cyberman-multi-light-stripe.webp': 26.88,
   '/custom_logos/drawings/images_stripe/the_human_inside/color/cylon-03-multi-dark-stripe.webp': 28.31,
   '/custom_logos/drawings/images_stripe/the_human_inside/color/cylon-03-multi-light-stripe.webp': 28.31,
   '/custom_logos/drawings/images_stripe/the_human_inside/color/cylon-78-multi-dark-stripe.webp': 28.46,
@@ -169,7 +169,7 @@ export const STRIPE_DRAWING_DY_VERTICAL = {
   '/custom_logos/drawings/images_stripe/the_human_inside/color/vader-multi-light-stripe.webp': 28.17,
   '/custom_logos/drawings/images_stripe/the_human_inside/white/afrodita-a-w-stripe.webp': 27.9,
   '/custom_logos/drawings/images_stripe/the_human_inside/white/c3-p0-w-stripe.webp': 28.17,
-  '/custom_logos/drawings/images_stripe/the_human_inside/white/cyberman-w-stripe.webp': 31.12,
+  '/custom_logos/drawings/images_stripe/the_human_inside/white/cyberman-w-stripe.webp': 26.88,
   '/custom_logos/drawings/images_stripe/the_human_inside/white/cylon-03-w-stripe.webp': 28.31,
   '/custom_logos/drawings/images_stripe/the_human_inside/white/cylon-78-w-stripe.webp': 28.46,
   '/custom_logos/drawings/images_stripe/the_human_inside/white/iron-man-08-w-stripe.webp': 28.16,
@@ -193,6 +193,11 @@ export const STRIPE_DRAWING_DY_VERTICAL = {
  * el centre: el dy d'aquests dos ja ho compensa.
  */
 export const STRIPE_DRAWING_ESCALA_VERTICAL = {
+  // EL CYBERMAN, UN 10% MES GRAN (28/09/2026).
+  '/custom_logos/drawings/images_stripe/the_human_inside/black/cyberman-b-stripe.webp': 1.1,
+  '/custom_logos/drawings/images_stripe/the_human_inside/color/cyberman-multi-dark-stripe.webp': 1.1,
+  '/custom_logos/drawings/images_stripe/the_human_inside/color/cyberman-multi-light-stripe.webp': 1.1,
+  '/custom_logos/drawings/images_stripe/the_human_inside/white/cyberman-w-stripe.webp': 1.1,
   // El Cybercube i el Mazinger-C (CUBE), un 10% mes grans.
   '/custom_logos/drawings/images_stripe/cube/cyber-cube-stripe.webp': 1.1,
   '/custom_logos/drawings/images_stripe/cube/cyber-cube-cut-stripe.webp': 1.1,
