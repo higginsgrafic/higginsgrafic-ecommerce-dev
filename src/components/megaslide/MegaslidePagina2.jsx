@@ -1172,9 +1172,7 @@ export default function MegaslidePagina2({
                    feia QUATRE files i 271 px, i no hi cabia — i fa l'alcada de
                    dues files. Sense fletxes: a la vertical son 0. */
                 dibuixPx={midaDibuix(isPortraitTablet, false) * 1.655}
-                /* MES SEPARACIO ENTRE DIBUIXOS (28/09/2026, ho ha demanat
-                   l'amo): el gap de la vertical (17,91 px) per 1,5. */
-                gapH={gapHorizontal(isPortraitTablet, false) * 1.5}
+                gapH={gapHorizontal(isPortraitTablet, false)}
                 /* SENSE GAP VERTICAL (28/09/2026): les dues files del carrusel
                    han d'anar amb el PAS DE LA PECA (34,6 px, l'alcada d'un boto
                    del selector), com a la horitzontal — alla les dues files
