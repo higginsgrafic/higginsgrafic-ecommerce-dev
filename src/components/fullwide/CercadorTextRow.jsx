@@ -1456,11 +1456,13 @@ export function CercadorColleccionsColumna({
 }
 
 // EL DESPLACAMENT DE LES DUES FILERES DE LA GRAELLA DE LA P1 (28/09/2026). El
-// centratge les mou 16 px avall, i ho ha de fer MOVENT LES PECES, no el
-// contenidor: la caixa de la graella ancorra el clic de la p1 i el bucle
-// d'alineacio de la p2, i moure-la ho desquadrava tot (el clic obria un altre
-// dibuix i la p2 pujava 16,7 px).
-const DESPLACAMENT_FILES_P1_PX = 16;
+// centratge les mou, i ho ha de fer MOVENT LES PECES, no el contenidor: la caixa
+// de la graella ancorra el clic de la p1 i el bucle d'alineacio de la p2, i
+// moure-la ho desquadrava tot (el clic obria un altre dibuix i la p2 pujava
+// 16,7 px). El signe es NEGATIU perque la caixa, sense el marge, ja cau 16 px
+// mes avall: amb -16 les files tornen a 93 i 150 (el centre del conjunt, 147, es
+// el de la casella COLOR) i la segona filera no toca la franja.
+const DESPLACAMENT_FILES_P1_PX = -16;
 
 function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripeItem, hoveredStripeItem, onSelectGroup, onHoverItem, onHoverLeave, onCarouselStep, compact = false, selectedColor = 'white', onSelectColor, onSelectCollection, isPortraitTablet = false, isLandscapeTablet = false, fontBoost = 0, desplacamentVertical = 0, esquerra, midaSelector = 56, alineacioY = 0, onMides = null, ombraManiga = null }) {
   // UNA SOLA PASSADA PER A TOT EL QUE ES MESURA DE LA FILERA (26/09/2026).
