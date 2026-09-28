@@ -25,16 +25,24 @@ let pricingLoaded = false;
  * que retornava la consulta, o sigui que res del que consumeix els productes se
  * n'adona. Amb aixo, navegar per la botiga passa de 3 MB per pagina a 0.
  *
- * PER QUE 5 MINUTS. La resposta porta estoc i preus, que son el que canvia. Cinc
- * minuts son el compromís: prou perque una sessio de navegacio no torni a baixar
- * el cataleg, i prou poc perque un canvi de preu es vegi de seguida.
+ * PER QUE UNA HORA (28/09/2026). La resposta porta estoc i preus, que son el que
+ * canvia. Amb cinc minuts ja s'estalviava el 80 % de l'egress, pero la botiga NO
+ * ESTA OBERTA AL PUBLIC i el que genera el trafic es el desenvolupament: cada
+ * recarrega de la pagina demanava els 3 MB del cataleg. Amb una hora, una jornada
+ * de feina fa una desena de consultes en comptes de centenars.
+ *
+ * PER QUE ES POT ALLARGAR SENSE POR. Cinc minuts eren el compromís perque un canvi
+ * de preu es veges de seguida, i allo val amb clients a dins. Sense publics,
+ * nome's cal que ho vegi qui administra, i per a aixo hi ha
+ * `VITE_PRODUCT_CACHE_MINUTES` i `getAllProductsIncludingInactive`, que no te
+ * cache a posta.
  *
  * Es pot escurçar o desactivar amb VITE_PRODUCT_CACHE_MINUTES (0 = sense cache).
  */
 const CACHE_PRODUCTES_CLAU = 'hg_products_cache_v1';
 const CACHE_PRODUCTES_MINUTS = (() => {
-  const n = Number.parseFloat(import.meta.env?.VITE_PRODUCT_CACHE_MINUTES ?? '5');
-  return Number.isFinite(n) && n >= 0 ? n : 5;
+  const n = Number.parseFloat(import.meta.env?.VITE_PRODUCT_CACHE_MINUTES ?? '60');
+  return Number.isFinite(n) && n >= 0 ? n : 60;
 })();
 
 function llegirCacheProductes() {
