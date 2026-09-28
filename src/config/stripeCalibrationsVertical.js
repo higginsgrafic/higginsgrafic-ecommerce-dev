@@ -311,10 +311,24 @@ export const VEL_SAMARRETA_BUIDA_ALFA_BLANCA = 0.6;
 export const FILTRE_DIBUIX_DESACTIVAT = 'opacity(0.1)';
 
 /**
- * El mateix per als dibuixos que NOME'S existeixen en color (els solids i els
- * marcs de LOOKING FOR MY DARCY, que `srcDibuixVelatEnNegre` deixa en color a
- * posta): se'ls treu el color abans de rebaixar-los, perque allo no pot entrar
- * al calcul del 10 % com a negre.
+ * ELS DIBUIXOS DE LOOKING FOR MY DARCY, UN 5 % MES CLARS QUE EL VEL (28/09/2026).
+ *
+ * Ho ha demanat l'amo, NOME'S per a LFMD: «LFMD, en lloc d'un 10% mes fosc,
+ * hauria de ser un 5% mes clar».
+ *
+ * Son els dibuixos que nome's existeixen en color i que, per tant, no poden
+ * entrar al calcul del 10 % de negre dels altres (vegeu
+ * `srcDibuixVelatEnNegre`). Com que han de quedar MES CLARS que el vel i no mes
+ * foscos, se'ls pinta de BLANC: `brightness(0)` els deixa plans (l'alfa es
+ * conserva, o sigui que la forma no es toca) i `invert(1)` els posa blancs, i amb
+ * un 5 % d'opacitat el resultat es `color del vel + 5 % cap al blanc`.
+ */
+export const FILTRE_DIBUIX_DESACTIVAT_LFMD = 'brightness(0) invert(1) opacity(0.05)';
+
+/**
+ * El filtre dels altres dibuixos que nome's existeixen en color (els de CUBE, que
+ * tambe van sense variant negra): se'ls treu el color i se'ls rebaixa igual que
+ * als altres, que allo ja estava demanat i NO es toca.
  */
 export const FILTRE_DIBUIX_DESACTIVAT_COLOR = 'grayscale(1) opacity(0.1)';
 
