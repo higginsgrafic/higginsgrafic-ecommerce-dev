@@ -479,7 +479,10 @@ function MegaStripePanel({
   // sola filera).
   const rectsMascara = (Array.isArray(stripeMaskTileRectsRawPct) && stripeMaskTileRectsRawPct.length === 14 && isPortraitTablet)
     ? stripeMaskTileRectsRawPct.map((r, idx) => ({
-      left: (idx % 7) * (100 / 7),
+      // PROVA: EL PAS OBERT UN 20% (28/09/2026, ho ha demanat l'amo per veure
+      // l'efecte). El pas de sempre es 100/7 = 14,29% i les caselles s'obren
+      // desde la primera, que no es mou.
+      left: (100 / 7) * 0.5 + (idx % 7) * (100 / 7) * 1.2 - (100 / 7) * 0.5,
       width: 100 / 7,
       top: idx < 7 ? 0 : 50,
       height: 50,
