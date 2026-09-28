@@ -1188,13 +1188,13 @@ export function CercadorColleccionsColumna({
           width: '100%',
           height: '100%',
           display: 'grid',
-          // LES PROPORCIONS DE LA COLUMNA DE LA P2 HORITZONTAL (28/09/2026, ho
-          // ha demanat l'amo): cada caixa fa 22,59 px d'alcada i les nou es
-          // reparteixen la columna. Alla la columna fa 128 x 247 amb caixes de
-          // 122 x 22,59; aqui l'amplada la mana la casella i l'alcada es la
-          // mateixa.
-          gridTemplateRows: `repeat(${llista.length}, 22.59px)`,
-          alignContent: 'space-between',
+          // LA PASTILLA, TAN ALTA COM CAPIGUI (28/09/2026, ho ha demanat l'amo):
+          // les nou files es reparteixen tota l'alcada de la columna i, sense
+          // separacio entre files, la pastilla arriba al maxim. Abans les caixes
+          // feien els 22,59 px de la columna de la p2h i el que sobrava eren
+          // buits.
+          gridTemplateRows: `repeat(${llista.length}, 1fr)`,
+          rowGap: 0,
           minHeight: 0,
         }}
       >
