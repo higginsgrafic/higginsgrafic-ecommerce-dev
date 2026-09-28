@@ -28,11 +28,7 @@ import {
   CONTROL_TILE_ARROWS,
 } from '../fullwide/MegaColumn.jsx';
 import { FirstContactDibuix00Buttons } from '../fullwide/firstContactPanels.jsx';
-import {
-  VEL_SAMARRETA_BUIDA_ALFA,
-  VEL_SAMARRETA_INACTIVA_NEGRE_CUBE,
-  VEL_SAMARRETA_INACTIVA_NEGRE_ALTRES,
-} from '../../config/stripeCalibrationsVertical.js';
+import { VEL_SAMARRETA_BUIDA_ALFA } from '../../config/stripeCalibrationsVertical.js';
 import { computeStripeTileOverlaySrcs, srcDibuixVelatEnNegre } from '@/utils/resolveStripeTile.js';
 
 export default function MegaslidePagina2({
@@ -680,33 +676,17 @@ export default function MegaslidePagina2({
   // En blanc pla, com el vel de les buides: la samarreta s'aclareix cap al fons
   // conservant el seu to.
   const VEL_SAMARRETA_INACTIVA = 0.6;
-  // AMB LA SAMARRETA NEGRA, EL VEL DEPEN DE LA COLLECCIO (28/09/2026, ho ha
-  // demanat l'amo: «Les samarretes negres atenuades tenen un problema amb el
-  // vel. Cube ha de tenir el vel més opac i la resta, no tant opac»). Amb la
-  // samarreta negra el vel blanc es el que mana, i les de CUBE (dibuixos de
-  // colors vius) encara criden: més vel per a elles i menys per a la resta.
-  const esSamarretaNegra = displayedShirtColor === 'black';
-  const alfaVelInactiva = (coll) => {
-    if (!esSamarretaNegra) return VEL_SAMARRETA_INACTIVA;
-    return coll === 'cube' ? VEL_SAMARRETA_INACTIVA_NEGRE_CUBE : VEL_SAMARRETA_INACTIVA_NEGRE_ALTRES;
-  };
-  // L'alfa de cada casa velada (el panell el necessita per casa, no un de sol).
-  const alfasVelSamarretesInactives = useMemo(() => {
+  const indicesSamarretesInactivesFranja = useMemo(() => {
     const n = tiraFranja.srcs.length;
-    if (!n || !active) return {};
-    const out = {};
+    if (!n || !active) return [];
+    const out = [];
     for (let i = 0; i < 14; i++) {
       const j = ((((i + stripeStripOffset) % n) + n) % n);
       const coll = tiraFranja.collections[j];
-      if (coll && coll !== active) out[i] = alfaVelInactiva(coll);
+      if (coll && coll !== active) out.push(i);
     }
     return out;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [tiraFranja, stripeStripOffset, active, esSamarretaNegra]);
-  const indicesSamarretesInactivesFranja = useMemo(
-    () => Object.keys(alfasVelSamarretesInactives).map(Number).sort((a, b) => a - b),
-    [alfasVelSamarretesInactives],
-  );
+  }, [tiraFranja, stripeStripOffset, active]);
 
   const emptyTileIndices = useMemo(() => {
     if (!Array.isArray(stripeTileItems)) return [];
@@ -802,9 +782,6 @@ export default function MegaslidePagina2({
     // la silueta dins l'SVG). Vegeu `indicesSamarretesInactivesFranja`.
     indicesSamarretesInactives: indicesSamarretesInactivesFranja,
     alfaVelSamarretaInactiva: VEL_SAMARRETA_INACTIVA,
-    // L'alfa de cada casa velada: amb la samarreta negra no es la mateixa per a
-    // totes les colleccions (vegeu `alfaVelInactiva`).
-    alfasVelSamarretesInactives: alfasVelSamarretesInactives,
     onStripeStripWheel: rodetaFranja,
     onStripeStripPas: moureStrip,
     // El clic d'una samarreta ACTIVA la seva colleccio (25/09/2026, ho va

@@ -453,10 +453,6 @@ function MegaStripePanel({
   // dibuix. Vegeu `MegaslidePagina2`.
   indicesSamarretesInactives = [],
   alfaVelSamarretaInactiva = 0.6,
-  // L'alfa de CADA casa velada (`{ [casa]: alfa }`), si no son totes iguals:
-  // amb la samarreta negra les de CUBE en porten més que les altres (vegeu
-  // `VEL_SAMARRETA_INACTIVA_NEGRE_*`). Sense mapa, mana `alfaVelSamarretaInactiva`.
-  alfasVelSamarretesInactives = null,
   calibrationOverrides,
   visualOffsetY = 0,
   compactLandscape = false,
@@ -585,6 +581,7 @@ function MegaStripePanel({
   // la franja es UNA sola imatge amb les catorze samarretes i no hi ha cap
   // silueta per casella on posar-lo. A la vista vertical ja hi ha els `path` de
   // la silueta dins l'SVG, i alla el vel s'hi posa per casella (`indices`).
+  const clauVelInactives = Array.isArray(indicesSamarretesInactives) ? indicesSamarretesInactives.join(',') : '';
   // Les cases amb vel (les que NO son de la colleccio activa) i les ACTIVES (la
   // resta): el vel de les primeres es mascara amb les segones, perque la maniga
   // d'una silueta arriba a la casa del costat (vegeu `generaVelDataUrl`).
@@ -592,24 +589,11 @@ function MegaStripePanel({
     (Array.isArray(indicesSamarretesInactives) ? indicesSamarretesInactives : [])
       .filter((i) => Number.isInteger(i) && i >= 0 && i < 14),
   );
-  // L'ALFA DEL VEL D'UNA CASA (28/09/2026): el seu, si el mapa en porta (amb la
-  // samarreta negra les de CUBE en porten més que les altres), i si no el de
-  // sempre. Vegeu `VEL_SAMARRETA_INACTIVA_NEGRE_*`.
-  const alfaDe = (idx) => {
-    const propi = alfasVelSamarretesInactives ? alfasVelSamarretesInactives[idx] : null;
-    return typeof propi === 'number' ? propi : alfaVelSamarretaInactiva;
-  };
-  // Les alfes distintes que hi ha entre les cases velades: una per pintar un
-  // grup (el `<g>` del vel nome's pot portar una opacitat).
-  const alfesVelDistintes = [...new Set([...inactivesVel].map((i) => alfaDe(i)))];
-  // La clau del vel inclou l'alfa de cada casa: si canvia el color de la
-  // samarreta (i amb ell les alfes) el vel s'ha de tornar a generar.
-  const clauAlfesVel = [...inactivesVel].map((i) => `${i}:${alfaDe(i)}`).join(',');
   const mapaVelInactives = {};
   if (!isPortraitTablet) {
-    for (const i of inactivesVel) mapaVelInactives[i] = alfaDe(i);
+    for (const i of inactivesVel) mapaVelInactives[i] = alfaVelSamarretaInactiva;
   }
-  const velSamarretesInactivesUrl = useVelSamarretes(mapaVelInactives, `${clauAlfesVel}|${clauCelles}`, 'white', cellesVel);
+  const velSamarretesInactivesUrl = useVelSamarretes(mapaVelInactives, `${clauVelInactives}|${alfaVelSamarretaInactiva}|${clauCelles}`, 'white', cellesVel);
   const idMascaraVelActives = `hgVelForaActives-${idRetall}`;
 
   useEffect(() => {
@@ -1619,35 +1603,29 @@ function MegaStripePanel({
                           ))}
                         </mask>
                       </defs>
-                      {/* UN GRUP PER CASA I UNA SOLA OPACITAT A DINS (27/09/2026):
-                          el mateix ROMBE que a la vista apaisada, aqui amb les
-                          arees de clic de cada casella (que tambe es trepitgen).
-                          Vegeu `generaVelDataUrl`.
-                          DES DEL 28/09/2026 HI POT HAVER MES D'UNA OPACITAT (amb
-                          la samarreta negra les cases de CUBE en porten més que
-                          les altres, vegeu `alfaDe`): un `<g>` per cada valor,
-                          amb totes les cases d'aquell valor a dins. */}
-                      {alfesVelDistintes.map((alfa) => (
-                        <g key={`hg-vel-alfa-${alfa}`} fill="#FFFFFF" opacity={alfa} mask={`url(#${idMascaraVelActives})`}>
-                          {(indicesSamarretesInactives || []).filter((idx) => alfaDe(idx) === alfa).map((idx) => {
-                            if (!Number.isInteger(idx) || idx < 0 || idx >= 14) return null;
-                            const extrem = idx === 0 || idx === 13;
-                            const a = extrem ? areesClicAmpla()[idx] : areesClicEstreta()[idx];
-                            if (!a) return null;
-                            const girar = idx >= 7;
-                            const ajustGir = extrem ? 302.2 : 65.3;
-                            const AJUST_VEL_Y = 1.6767;
-                            return (
-                              <path
-                                key={`hg-vel-inactiva-${idx}`}
-                                d={a.d}
-                                transform={`translate(${a.tx}, ${a.ty - AJUST_VEL_Y})${girar ? ` translate(${ajustGir}, 0) scale(-1, 1)` : ''} ${a.transform}`}
-                                clipRule="evenodd"
-                              />
-                            );
-                          })}
-                        </g>
-                      ))}
+                      {/* UN SOL GRUP I UNA SOLA OPACITAT (27/09/2026): el mateix
+                          ROMBE que a la vista apaisada, aqui amb les arees de
+                          clic de cada casella (que tambe es trepitgen). Vegeu
+                          `generaVelDataUrl`. */}
+                      <g fill="#FFFFFF" opacity={alfaVelSamarretaInactiva} mask={`url(#${idMascaraVelActives})`}>
+                        {(indicesSamarretesInactives || []).map((idx) => {
+                          if (!Number.isInteger(idx) || idx < 0 || idx >= 14) return null;
+                          const extrem = idx === 0 || idx === 13;
+                          const a = extrem ? areesClicAmpla()[idx] : areesClicEstreta()[idx];
+                          if (!a) return null;
+                          const girar = idx >= 7;
+                          const ajustGir = extrem ? 302.2 : 65.3;
+                          const AJUST_VEL_Y = 1.6767;
+                          return (
+                            <path
+                              key={`hg-vel-inactiva-${idx}`}
+                              d={a.d}
+                              transform={`translate(${a.tx}, ${a.ty - AJUST_VEL_Y})${girar ? ` translate(${ajustGir}, 0) scale(-1, 1)` : ''} ${a.transform}`}
+                              clipRule="evenodd"
+                            />
+                          );
+                        })}
+                      </g>
                     </svg>
                   ) : null}
 
