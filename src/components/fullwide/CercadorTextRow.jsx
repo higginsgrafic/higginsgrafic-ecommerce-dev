@@ -1202,7 +1202,12 @@ export function CercadorColleccionsColumna({
             aria-current={key === activeKey ? 'true' : undefined}
             style={{
               appearance: 'none',
-              border: 0,
+              boxSizing: 'border-box',
+              // LA PASTILLA BLANCA DE LA COLUMNA DE LA P2 HORITZONTAL
+              // (28/09/2026, ho ha demanat l'amo): fons blanc, vora #D1D5DB i
+              // ombra, i nome's a la colleccio activa. Abans l'activa es marcava
+              // amb un gris de fons.
+              border: key === activeKey ? '1px solid #D1D5DB' : '1px solid transparent',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'flex-end',
@@ -1212,7 +1217,8 @@ export function CercadorColleccionsColumna({
               borderRadius: '3px',
               // El SELECTOR es la pastilla de fons: nomes la porta la colleccio
               // activa. Cap negreta.
-              backgroundColor: key === activeKey ? '#F1F3F5' : 'transparent',
+              backgroundColor: key === activeKey ? '#FFFFFF' : 'transparent',
+              boxShadow: key === activeKey ? '0 1px 3px rgba(0,0,0,0.12)' : 'none',
               // LA FONT, AMB EL CRITERI DE LA COLUMNA DE LA P2 HORITZONTAL
               // (28/09/2026, ho ha demanat l'amo): Oswald, 13,5 px, l'activa en
               // regular (400) i la resta en Extra Light (200), en majuscules.
