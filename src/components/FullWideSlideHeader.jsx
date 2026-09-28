@@ -2208,7 +2208,22 @@ function FullWideSlideHeader({
       // (1400px max-content design ⇒ tile ≈ 136px). Cap a 144px.
       const MAX_TILE_PX = 144;
       const computedTile = Math.min(colW, MAX_TILE_PX);
-      setMegaTileSize(computedTile);
+      // NOME'S LA VISTA VERTICAL (28/09/2026).
+      //
+      // Aquest efecte publica el tile calibrat, i allo canvia la mida de tot el
+      // megaslide. Pero nome's la VISTA VERTICAL el necessita: a la resta la
+      // composicio esta validada per l'amo amb el valor que hi havia, i
+      // arreglar la vertical no ha de moure res mes.
+      //
+      // Mesurat a 1024x768: amb el tile calibrat tambe a l'apaisada, la franja
+      // passava de 113 a 88 px d'alcada i catorze impressions es movien 4,2 px.
+      // A 1920x946, amb el tile calibrat, el selector de la p2 creixia un 8,7 %.
+      // Cap de les dues coses es cosa d'aquest arranjament.
+      //
+      // Que l'escriptori (i l'apaisada de tauleta) vagin amb el valor de reserva
+      // es una decisio APART i pendent de parlar-ne: aqui nome's s'evita
+      // canviar-la sense demanar-ho.
+      if (isPortraitTablet) setMegaTileSize(computedTile);
       // En portrait tablet, el mega-slide usa scroll horitzontal amb el
       // contingut a escala landscape. El grid ha de mantenir l'escala 0.94.
       document.documentElement.style.setProperty('--hgGridFitScale', '0.94');
@@ -2236,7 +2251,24 @@ function FullWideSlideHeader({
         // ignore
       }
     };
-  }, [active, isPortraitTablet]);
+    // `panellMuntat` HI HA DE SER (28/09/2026). Aquest efecte mesura el panell
+    // per calibrar el tile de la graella (`megaTileSize`), i el panell es
+    // MUNTA MES TARD (nomes quan s'obre el megaslide): la primera passada el
+    // `ref` es buit, l'efecte torna, i sense aquesta dependencia res no el
+    // tornava a disparar MAI. Es el mateix parany que ja esta documentat mes
+    // amunt per als altres dos efectes que pengen del mateix `ref`, i que alla
+    // ja es va resoldre amb aquest estat.
+    //
+    // QUE ES TRENCAVA SENSE AIXO: `megaTileSize` es quedava a `null`, i
+    // `effectiveMegaTileSize` cau al seu valor de reserva (120) en comptes del
+    // tile calibrat de la tauleta (93,4). Com que la franja fa
+    // `round(megaTileSize * 0,9)` d'alcada, passava de 84 a 108 px: un 28,5 %
+    // mes, i TOTES les peces de la vista vertical (la franja, la graella de
+    // dibuixos, el selector) creixien amb ella.
+    //
+    // Comprovat a 768x1024: amb la dependencia, l'alcada de la franja torna a
+    // ser 84 px, que es la de la referencia bona del 23/09.
+  }, [active, isPortraitTablet, panellMuntat]);
 
   useEffect(() => {
     if (!import.meta.env.DEV) return;
@@ -3158,9 +3190,23 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
             // capcalera no s'hi pot desplacar. A l'escriptori I a l'apaisada
             // va amb el carril: a 1280 el marc del lloc fa 1248 i el carril
             // 992, i el logo (i la fila 1 del megaslide) no encaixaven.
-            width: isPortraitTablet ? 'var(--site-w, 100%)' : 'var(--hg-mega-w, 70.3vw)',
+            // A la VERTICAL la capçalera va amb el CARRIL DE LA TAULA VERTICAL
+            // (5x3), que es `ampladaCarril()`: la referencia de tauleta, mai mes
+            // ampla que la finestra menys 80 px, i centrada. Abans anava amb el
+            // marc del lloc (`--site-w`): a 768 el marc fa 721 i el carril 688,
+            // o sigui que el logo (i el nav i les icones) quedaven 16,5 px a
+            // l'esquerra del contingut de la taula i es veia el header mogut
+            // (28/09/2026).
+            // CENTRAT A LA FINESTRA, NO AL MARC (28/09/2026). El marc del lloc
+            // (`100%`) descompta la barra de desplaçament (15 px a 768): el
+            // contingut quedava centrat a 376,5 quan el centre de la finestra es
+            // 384, o sigui 7,5 px a l'esquerra. Amb `100vw` (que si que inclou
+            // la barra) el carril queda a 40..728 i es veu centrat de debò. Si
+            // la barra es una de sobreposició, `100vw` i `100%` coincideixen i
+            // no es mou res.
+            width: isPortraitTablet ? 'min(939.2px, calc(100vw - 80px))' : 'var(--hg-mega-w, 70.3vw)',
             marginLeft: isPortraitTablet
-              ? 'calc(var(--site-xL, 0px) - var(--rulerInset, 0px))'
+              ? 'calc((100vw - min(939.2px, 100vw - 80px)) / 2 - var(--rulerInset, 0px))'
               : 'calc(var(--hg-mega-x, 0px) - var(--rulerInset, 0px))',
             // SENSE COIXÍ: EL LOGO A LA VORA ESQUERRA DEL CARRIL I LES ICONES A
             // LA DRETA (24/09/2026, ho va demanar l'amo).
@@ -3443,8 +3489,10 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
             zIndex: 10001,
             // Aquest segon header només surt a la tauleta vertical: es queda
             // amb el marc del lloc (vegeu el primer).
-            width: 'var(--site-w, 100%)',
-            marginLeft: 'calc(var(--site-xL, 0px) - var(--rulerInset, 0px))',
+            // El MATEIX carril que el primer header i que la taula vertical
+            // (vegeu el comentari de la fila de dalt): el nav s'hi centra.
+            width: 'min(939.2px, calc(100vw - 80px))',
+            marginLeft: 'calc((100vw - min(939.2px, 100vw - 80px)) / 2 - var(--rulerInset, 0px))',
             borderTop: '1px solid #E6E8EC',
             // Els 62 px que queden dels 114, amb el contingut centrat.
             height: '62px',
