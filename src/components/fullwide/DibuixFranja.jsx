@@ -11,7 +11,6 @@ import {
   STRIPE_DRAWING_DX_VERTICAL,
   FILTRE_DIBUIX_DESACTIVAT,
   FILTRE_DIBUIX_DESACTIVAT_LFMD,
-  FILTRE_DIBUIX_DESACTIVAT_LFMD_MARC,
   FILTRE_DIBUIX_DESACTIVAT_COLOR,
 } from '../../config/stripeCalibrationsVertical';
 import {
@@ -396,10 +395,6 @@ export function DibuixFranja({
   // el vel, no un 10 % mes foscos).
   const esDibuixAmbVariantNegra = typeof picked === 'string' && /-b-stripe\.webp$/i.test(picked);
   const esDibuixDeLfmd = typeof picked === 'string' && picked.toLowerCase().includes('/looking_for_my_darcy/');
-  // Les versions `frame` porten una placa plena al darrere (el «fons»): es pinten
-  // per aclariment perque la placa desaparegui i nome's quedi el marc i el text.
-  const esDibuixDeMarc = esDibuixDeLfmd
-    && (picked.toLowerCase().includes('/frame/') || picked.toLowerCase().includes('-frame-'));
   const filter = drawingOverlayDebug
     ? 'drop-shadow(0 0 2px rgba(0,0,0,0.65))'
     : active === 'austen'
@@ -413,11 +408,9 @@ export function DibuixFranja({
       // rebaixa l'opacitat (vegeu `FILTRE_DIBUIX_DESACTIVAT`), que els deixa el
       // detall intacte. Els de LOOKING FOR MY DARCY en porten un de propi.
       : desactivat
-        ? (esDibuixDeMarc
-          ? FILTRE_DIBUIX_DESACTIVAT_LFMD_MARC
-          : (esDibuixDeLfmd
-            ? FILTRE_DIBUIX_DESACTIVAT_LFMD
-            : (esDibuixAmbVariantNegra ? FILTRE_DIBUIX_DESACTIVAT : FILTRE_DIBUIX_DESACTIVAT_COLOR)))
+        ? (esDibuixDeLfmd
+          ? FILTRE_DIBUIX_DESACTIVAT_LFMD
+          : (esDibuixAmbVariantNegra ? FILTRE_DIBUIX_DESACTIVAT : FILTRE_DIBUIX_DESACTIVAT_COLOR))
         : 'none';
 
   return (
