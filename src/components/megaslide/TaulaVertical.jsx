@@ -166,7 +166,10 @@ export function TaulaVerticalP2({ graella = null, colleccions = null, colors = n
           o sigui que arrencava 10,9 px endins del carril. Amb `flex-start`
           arrenca on arrenca el contingut de la taula (40 + la vora i el coixi de
           4 px) i, com la graella, toca la vora de dalt. */}
-      <div data-taula-cela="1" style={{ ...CELA, gridColumn: '1', gridRow: '1', marginRight: '10px', alignItems: 'flex-start', justifyContent: 'flex-start' }}>{selector || 'Selector b/c/n'}</div>
+      {/* LA FILA 1, 20 px MES AMUNT (28/09/2026, ho ha demanat l'amo): son les
+          DUES caselles de la fila, amb el seu contingut; les files de sota no es
+          mouen. */}
+      <div data-taula-cela="1" style={{ ...CELA, gridColumn: '1', gridRow: '1', transform: 'translateY(-20px)', marginRight: '10px', alignItems: 'flex-start', justifyContent: 'flex-start' }}>{selector || 'Selector b/c/n'}</div>
       {/* LES TRES BANDES, alineades amb els TRES BOTONS del selector
           (28/09/2026, ho va demanar l'amo): la fila de dalt amb BLANC, la de
           baix amb COLOR i la tira de colors amb NEGRE. Cada banda fa 34,6 px,
@@ -174,7 +177,7 @@ export function TaulaVerticalP2({ graella = null, colleccions = null, colors = n
           I el conjunt toca la vora de DALT de la casella, com el selector. */}
       <div
         data-taula-cela="2-5"
-        style={{ ...CELA, gridColumn: '2 / -1', gridRow: '1', position: 'relative', zIndex: 20, flexDirection: 'column', alignItems: 'stretch', justifyContent: 'flex-start' }}
+        style={{ ...CELA, gridColumn: '2 / -1', gridRow: '1', transform: 'translateY(-20px)', position: 'relative', zIndex: 20, flexDirection: 'column', alignItems: 'stretch', justifyContent: 'flex-start' }}
       >
         <div style={{ width: '100%', height: '69.2px' }}>{graella || 'Graella dibuixos 16x4'}</div>
         <div style={{ width: '100%', height: '34.6px', display: 'flex', alignItems: 'center' }}>{colors || 'Graella colors 4x4'}</div>
