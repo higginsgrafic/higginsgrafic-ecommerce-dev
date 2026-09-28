@@ -8,6 +8,7 @@ import {
   visualOffsetYFranjaPagina2,
   desplacamentCentratgeFranja,
   quantsGrupActiuFranja,
+  casaIniciGrupActiu,
 } from './geometriaMegaslide.js';
 import { carrilPx, readRootCssNumber, MEGASLIDE_REFERENCIA_PX } from '../../utils/layoutMetrics.js';
 import { CapaTaulaVertical, TaulaVerticalP2 } from './TaulaVertical.jsx';
@@ -509,11 +510,14 @@ export default function MegaslidePagina2({
   // (`desplacamentCentratgeFranja`) i es calcula al PRIMER render, no en un
   // efecte. Abans naixia a 0 i mig segon despres girava tres cases, amb la
   // creueta dels dibuixos: es el moviment que va veure l'amo.
+  const quantsGrupActiu = quantsGrupActiuFranja({ collections: tiraFranja.collections, active });
   const stripeStripOffsetInicial = desplacamentCentratgeFranja({
-    quants: quantsGrupActiuFranja({ collections: tiraFranja.collections, active }),
+    quants: quantsGrupActiu,
     n: tiraFranja.srcs.length,
-    // A la vertical, el grup arrenca a la primera casa (la filera de dalt).
-    casaInici: isPortraitTablet ? 0 : null,
+    // A la vertical, el grup arrenca a la primera casa (la filera de dalt), pero
+    // una colleccio d'UNA sola samarreta es queda centrada: a la punta sembla
+    // que es perdi (vegeu `casaIniciGrupActiu`).
+    casaInici: casaIniciGrupActiu(quantsGrupActiu, isPortraitTablet),
   });
   const [stripeStripOffset, setStripeStripOffset] = useState(stripeStripOffsetInicial);
   const stripeStripOffsetRef = useRef(stripeStripOffsetInicial);
@@ -591,10 +595,8 @@ export default function MegaslidePagina2({
     // desplaçament que ja hi hagi, perque no faci cap salt (mateix criteri que
     // el centratge de la graella, a `CercadorTextRow`).
     const actual = stripeStripOffsetRef.current;
-    // A la vertical, el grup arrenca a la primera casa de la filera de dalt; a
-    // l'apaisada es queda centrat (alla nome's hi ha una filera).
     const objectiu = desplacamentCentratgeFranja({
-      quants, n, actual, casaInici: isPortraitTablet ? 0 : null,
+      quants, n, actual, casaInici: casaIniciGrupActiu(quants, isPortraitTablet),
     });
     if (objectiu === actual) return;
     aplicaStripOffset(objectiu);

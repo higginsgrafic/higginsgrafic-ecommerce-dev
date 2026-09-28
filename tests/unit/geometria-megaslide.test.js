@@ -31,6 +31,7 @@ import {
   FRANJA_CASES,
   quantsGrupActiuFranja,
   desplacamentCentratgeFranja,
+  casaIniciGrupActiu,
   alcadaReservaGraellaPanell,
   alcadaReservaGraellaPanellCss,
   visualOffsetYFranjaPagina2,
@@ -437,6 +438,32 @@ describe('desplacamentCentratgeFranja', () => {
   it('sense grup, es queda on era', () => {
     expect(desplacamentCentratgeFranja({ quants: 0, n: 64, actual: 5 })).toBe(5);
     expect(desplacamentCentratgeFranja({ quants: 7, n: 0, actual: 5 })).toBe(5);
+  });
+});
+
+describe('casaIniciGrupActiu', () => {
+  it('a la vertical, el grup arrenca a la casa 0 (la primera de la filera de dalt)', () => {
+    expect(casaIniciGrupActiu(7, true)).toBe(0);
+    expect(casaIniciGrupActiu(5, true)).toBe(0);
+    expect(casaIniciGrupActiu(14, true)).toBe(0);
+  });
+
+  // «Pemberley i Keep Calm, sortiran sempre centrats. Nome's es una samarreta i a
+  // la punta sembla que es perdi» (28/09/2026): les colleccions d'un sol dibuix
+  // no s'arraconen a la casa 0, es queden centrades (casa 6).
+  it('una sola samarreta es queda centrada', () => {
+    expect(casaIniciGrupActiu(1, true)).toBeNull();
+    // I el centratge la deixa a la casa 6, la meitat de la filera de dalt.
+    expect(desplacamentCentratgeFranja({ quants: 1, n: 64, casaInici: casaIniciGrupActiu(1, true) })).toBe(-6);
+  });
+
+  it("a l'apaisada sempre va centrat: alla nome's hi ha una filera", () => {
+    expect(casaIniciGrupActiu(7, false)).toBeNull();
+    expect(casaIniciGrupActiu(1, false)).toBeNull();
+  });
+
+  it('sense grup, centrat (que vol dir quedar-se on era)', () => {
+    expect(casaIniciGrupActiu(0, true)).toBeNull();
   });
 });
 

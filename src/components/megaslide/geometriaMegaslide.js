@@ -789,6 +789,32 @@ export function topFranjaPagina2({
 /** Les cases de la franja (una filera). */
 export const FRANJA_CASES = 14;
 
+/**
+ * ON ARRENCA EL GRUP DE LA COLLECCIO ACTIVA A LA FRANJA (28/09/2026).
+ *
+ * Ho va demanar l'amo, en dos passos:
+ *
+ *   - «Quan cliques una colleccio a la p2 ha de sortir tota la colleccio junta a
+ *     la primera filera de la franja. No vull que surti a dalt i a baix partida
+ *     en dos» → a la vertical, el grup arrenca a la casa 0.
+ *   - «Pemberley i Keep Calm, sortiran sempre centrats. Nome's es una samarreta i
+ *     a la punta sembla que es perdi» → les colleccions d'UN sol dibuix es
+ *     queden centrades: cauen a la casa 6, que es la meitat de la filera de
+ *     dalt, i no arraconades a la cantonada.
+ *
+ * A l'apaisada la franja es UNA sola filera de catorze i el centratge no parteix
+ * res: es queda com sempre.
+ *
+ * @param {number} quants dibuixos del grup actiu
+ * @param {boolean} isPortraitTablet la vista vertical (dues fileres de set)
+ * @returns {number|null} la casa on ha d'anar el primer dibuix, o null = centrat
+ */
+export function casaIniciGrupActiu(quants, isPortraitTablet) {
+  if (!isPortraitTablet) return null;
+  if (!Number.isFinite(quants) || quants <= 1) return null;
+  return 0;
+}
+
 /** Quants dibuixos te el grup de la colleccio activa (son al principi de la tira). */
 export function quantsGrupActiuFranja({ collections, active } = {}) {
   if (!Array.isArray(collections) || !active) return 0;
