@@ -10,7 +10,7 @@ import {
 } from './midesGraella.js';
 // L'amplada del retall (l'últim input mesurat de la graella) viu amb la resta
 // de geometria declarada del megaslide.
-import { ampladaRetallGraella, ampladaColumnaGraella, desnivellsLiniesGraella, desnivellColorsGraella, margeBaixFletxesGraella, centratgeSelectorY, desplacTopSelector, topFranjaPagina2, GRAELLA_DRETA_FLETXES_CARRIL_PX, GRAELLA_COLUMNA_DRETA_CARRIL_PX, GRAELLA_GAP_COLUMNES_PX, COLUMNA_TOP_AJUST_PX, COLUMNA_BAIX_AJUST_PX } from '../megaslide/geometriaMegaslide.js';
+import { ampladaRetallGraella, ampladaColumnaGraella, desnivellsLiniesGraella, desnivellColorsGraella, margeBaixFletxesGraella, centratgeSelectorY, desplacTopSelector, topFranjaPagina2, GRAELLA_DRETA_FLETXES_CARRIL_PX, GRAELLA_COLUMNA_DRETA_CARRIL_PX, GRAELLA_GAP_COLUMNES_PX, COLUMNA_TOP_AJUST_PX, COLUMNA_BAIX_AJUST_PX, OMBRA_MANIGA_ALFA, OMBRA_MANIGA_BLUR_PX, OMBRA_MANIGA_OFFSET } from '../megaslide/geometriaMegaslide.js';
 import { carrilPct, carrilLane, carrilPx, readRootCssNumber, getLayoutViewportWidth, MEGASLIDE_REFERENCIA_PX } from '../../utils/layoutMetrics.js';
 import { GRAELLA_DIBUIXOS_ESCALA_VERTICAL } from '../../config/stripeCalibrationsVertical.js';
 import { FirstContactDibuix09Buttons } from './firstContactPanels.jsx';
@@ -1353,15 +1353,18 @@ export function CercadorColleccionsColumna({
             height: `${ombraManiga.height}px`,
             pointerEvents: 'none',
             zIndex: 0,
-            filter: 'blur(3px)',
-            transform: 'translate(1px, 3px)',
+            // ELS NUMEROS SON DECLARATS (28/09/2026): els MATEIXOS que el bloc
+            // de la dreta de la p1 (`OMBRA_MANIGA_*`, geometriaMegaslide.js).
+            // Abans estaven escrits a ma als dos llocs.
+            filter: `blur(${OMBRA_MANIGA_BLUR_PX}px)`,
+            transform: `translate(${OMBRA_MANIGA_OFFSET.x}px, ${OMBRA_MANIGA_OFFSET.y}px)`,
           }}
         >
           <div
             style={{
               width: '100%',
               height: '100%',
-              backgroundColor: 'rgba(0, 0, 0, 0.25)',
+              backgroundColor: `rgba(0, 0, 0, ${OMBRA_MANIGA_ALFA})`,
               WebkitMaskImage: `url("${mascaraManiga}")`,
               maskImage: `url("${mascaraManiga}")`,
               WebkitMaskRepeat: 'no-repeat',

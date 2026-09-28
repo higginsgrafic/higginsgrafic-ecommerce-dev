@@ -36,6 +36,9 @@ import {
   escalaDibuixFranja,
   esBandaEstretaFranja,
   pageLiftPagina1,
+  OMBRA_MANIGA_ALFA,
+  OMBRA_MANIGA_BLUR_PX,
+  OMBRA_MANIGA_OFFSET,
 } from '../megaslide/geometriaMegaslide.js';
 
 // La franja de samarretes de la pàgina 1 tendeix a quedar-se uns 10 px més avall
@@ -295,7 +298,7 @@ function MegaStripePanelP1({
   // LA COMPOSICIO DE LA PAGINA 1 A L'ESCRIPTORI (26/09/2026, B2 del bucle): la
   // graella de DUES FILERES intercalades (la MATEIXA peça que la pagina 2,
   // `GraellaDuesFileresPagina1`) a l'esquerra del carril i el bloc de la dreta
-  // (selector quadrat a dalt, fletxes quadrades a sota) a la vora dreta.
+  // (fletxes quadrades a dalt, selector quadrat a sota) a la vora dreta.
   //
   // L'amo ho va dir amb totes les xifres: «la graella intercalada ja la tens
   // feta, nome's l'has de duplicar» i «les files han de ser identiques». O
@@ -603,10 +606,11 @@ function MegaStripePanelP1({
                   selector» i «i les fletxes sota del selector, no al costat».
 
                   El bloc fa `blocDretaPx` d'ample (59,5 px a 1920, la meitat del
-                  contenidor del selector de la p2): a dalt hi va el selector
-                  (59,5 x 119, la forma `rectangle` de la p2) i a sota el quadrat
-                  de les fletxes (59,5 x 59,5). La caixa i l'ombra les duu el bloc
-                  sencer (vegeu `ESTIL_CAIXA_BLOC_ALCADA_AUTO`). */}
+                  contenidor del selector de la p2): a dalt hi va el quadrat de
+                  les fletxes (59,5 x 59,5) i a sota el selector (59,5 x 119, la
+                  forma `rectangle` de la p2), tots dos a la DRETA. La caixa i
+                  l'ombra les duu el bloc sencer (vegeu
+                  `ESTIL_CAIXA_BLOC_ALCADA_AUTO`). */}
               <div
                 ref={blocDretaRef}
                 data-bloc-dreta-p1="1"
@@ -635,7 +639,7 @@ function MegaStripePanelP1({
                     height: `${alcadaBlocP1}px`,
                     marginBottom: `${-(alcadaBlocP1 - columnaDretaPx * 3)}px`,
                   } : null),
-                  // EL SELECTOR A DALT I LES FLETXES A SOTA, A LA DRETA (28/09/2026).
+                  // LES FLETXES A DALT I EL SELECTOR A SOTA, A LA DRETA (28/09/2026).
                   // El bloc es ample com la columna de la p2 (130 de disseny) perque
                   // la maniga de l'ultima samarreta hi arribi; el selector i les
                   // fletxes van a la dreta i el buit de l'esquerra es on cau l'ombra.
@@ -658,14 +662,19 @@ function MegaStripePanelP1({
                       height: `${ombraManigaP1.height}px`,
                       pointerEvents: 'none',
                       zIndex: 0,
-                      filter: 'blur(3px)',
-                      transform: 'translate(1px, 3px)',
+                      // L'OMBRA DE LA MANIGA, REFORÇADA (28/09/2026). En Marc: «A
+                      // la maniga dreta de la p1, dona-li una miqueta mes de
+                      // forca». Els numeros son declarats
+                      // (`OMBRA_MANIGA_*`, geometriaMegaslide.js) i els MATEIXOS
+                      // que la columna de la p2.
+                      filter: `blur(${OMBRA_MANIGA_BLUR_PX}px)`,
+                      transform: `translate(${OMBRA_MANIGA_OFFSET.x}px, ${OMBRA_MANIGA_OFFSET.y}px)`,
                     }}
                   >
                     <div style={{
                       width: '100%',
                       height: '100%',
-                      backgroundColor: 'rgba(0, 0, 0, 0.25)',
+                      backgroundColor: `rgba(0, 0, 0, ${OMBRA_MANIGA_ALFA})`,
                       WebkitMaskImage: `url("${mascaraManigaP1}")`,
                       maskImage: `url("${mascaraManigaP1}")`,
                       WebkitMaskRepeat: 'no-repeat',
@@ -677,10 +686,14 @@ function MegaStripePanelP1({
                     }} />
                   </div>
                 ) : null}
-                {/* DUES BOTONERES QUADRADES APILADES: els tres botons del
-                    selector a dalt (caselles iguals, en vertical) i els dos
-                    botons de les fletxes a sota. Cada botonera fa el quadrat
-                    sencer del bloc (128,9 x 128,9 a 1920). */}
+                {/* DUES BOTONERES QUADRADES APILADES: el quadrat de les fletxes a
+                    DALT i els tres botons del selector a SOTA (28/09/2026, ho va
+                    demanar en Marc: «Intercanvia les posicions del selector i les
+                    fletxes»). Es van intercanviar les DUES PECES de debo, no
+                    nome's el que s'hi pinta: el quadrat de les fletxes passa de
+                    la meitat de baix a la de dalt. Els dos quadrats fan el
+                    MATEIX (128,7 x 128,3 a 1920), o sigui que l'alcada del bloc,
+                    la de la filera i la de la franja no es mouen. */}
                 <div style={{
                   position: 'relative',
                   zIndex: 1,
@@ -689,7 +702,15 @@ function MegaStripePanelP1({
                   display: 'flex',
                   flexDirection: 'column',
                 }}>
-                {/* EL QUADRAT DE DALT: els tres botons del selector. */}
+                {/* EL QUADRAT DE DALT: els dos botons de les fletxes. */}
+                <div style={{ flex: '1 1 50%', minHeight: 0, width: '100%' }}>
+                <FletxesQuadratPagina1
+                  omple
+                  onPrev={() => stepperP1?.(-1)}
+                  onNext={() => stepperP1?.(1)}
+                />
+                </div>
+                {/* EL QUADRAT DE SOTA: els tres botons del selector. */}
                 <div style={{ flex: '1 1 50%', minHeight: 0, width: '100%' }}>
                 <SelectorQuadratPagina1
                   dinsBloc
@@ -702,14 +723,6 @@ function MegaStripePanelP1({
                   onWhite={() => { setStripeOverlayOverrideActive(false); setFirstContactVariant('white'); }}
                   onBlack={() => { setStripeOverlayOverrideActive(false); setFirstContactVariant('black'); }}
                   onMulti={() => { setStripeOverlayOverrideActive(false); setFirstContactVariant('color'); }}
-                />
-                </div>
-                {/* EL QUADRAT DE SOTA: els dos botons de les fletxes. */}
-                <div style={{ flex: '1 1 50%', minHeight: 0, width: '100%' }}>
-                <FletxesQuadratPagina1
-                  omple
-                  onPrev={() => stepperP1?.(-1)}
-                  onNext={() => stepperP1?.(1)}
                 />
                 </div>
                 </div>

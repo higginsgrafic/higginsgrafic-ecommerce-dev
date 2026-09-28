@@ -114,12 +114,19 @@ export default function GraellaDuesFileresPagina1({
         width: '100%',
         minWidth: 0,
         boxSizing: 'border-box',
-        // LA LINIA DE L'ESQUERRA I ELS 10 px DE SEPARACIO (28/09/2026). En Marc:
-        // «A la part esquerra de la graella, hi pots posar una línia? I separes la
-        // graella 10 px de la línia». La ratlla es la vora esquerra del contenidor
-        // (1 px, el mateix gris que el selector) i el coixi de 10 px el separa de
-        // la primera peça.
-        borderLeft: '1px solid #D1D5DB',
+        // FORA LA RATLLA DE L'ESQUERRA (28/09/2026). En Marc: «Treu la línia de
+        // davant de la graella a la p1». Era la vora esquerra del contenidor
+        // (1 px, `#D1D5DB`), posada el mateix dia amb «A la part esquerra de la
+        // graella, hi pots posar una línia?».
+        //
+        // EL COIXI DE 10 px S'HI QUEDA, i es el que fa que NOMES marxi la ratlla:
+        // la caixa (vora inclosa) ancorra el clic de la p1 i el bucle
+        // d'alineacio de la p2, i el centratge de les files es fa MOVENT LES
+        // PECES. Sense la vora, el contingut guanya 1 px d'amplada i el
+        // carrusel arrenca 1 px mes a l'esquerra (392 -> 391): les dues fileres
+        // i el seu centre (147,0) es queden clavats a la casella COLOR. Traient
+        // tambe el coixi, tot el dibuix marxaria 10 px mes i el centre cauria
+        // 1 px fora de la casella.
         paddingLeft: '10px',
         // LA PRIMERA FILERA, AL TOP DEL SELECTOR (28/09/2026). En Marc: «mou-les
         // juntes cap amunt. Alinea la primera fila amb el top del selector». Les

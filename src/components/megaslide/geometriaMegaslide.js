@@ -895,6 +895,29 @@ export const PAGINA1_MIDA_BLOC_DRETA_PX = 60;
  *  (arriba al bottom de la franja, 339,6). */
 export const PAGINA1_AMPLADA_BLOC_DRETA_PX = 128.7;
 
+// ============================================================
+// L'OMBRA DE LA MANIGA (les dues pagines)
+// ============================================================
+// L'ombra que la maniga de l'ultima samarreta de la franja fa a la columna de
+// colleccions (p2) i al bloc de la dreta (p1). Es la silueta d'aquella casa
+// (`caminsSiluetes[13]`) pintada amb aquests numeros i retallada pel bloc.
+//
+// VIUEN AQUI PERQUE SON DUES COPIES DE LA MATEIXA COSA (28/09/2026): el bloc de
+// la p1 i la columna de la p2 portaven els tres numeros escrits a ma i
+// IDENTICS, que es la manera de qui se'n va un dia. En Marc: «A la maniga dreta
+// de la p1, dona-li una miqueta mes de forca»: amb una sola constant el canvi
+// val per a les dues pagines i no hi ha manera que divergeixin.
+//
+//   - `OMBRA_MANIGA_ALFA`: el negre, sobre la silueta. El valor de sempre era
+//     0,25; en Marc el va voler mes forta i, tot seguit, «Fes-la mes fosca»:
+//     0,45 (gairebe el doble).
+//   - `OMBRA_MANIGA_BLUR_PX`: la difusio (3 px; ara 4, perque la vora del bloc
+//     tambe se n'endu una mica).
+//   - `OMBRA_MANIGA_OFFSET`: el desplacament de la llum, en px.
+export const OMBRA_MANIGA_ALFA = 0.45;
+export const OMBRA_MANIGA_BLUR_PX = 4;
+export const OMBRA_MANIGA_OFFSET = { x: 1, y: 3 };
+
 /**
  * L'alcada de la filera: la del bloc de la dreta (selector de 110 + fletxes de
  * 110, apilats). Amb DUES fileres de dibuixos de 55 unitats, la de dalt cau al
@@ -916,8 +939,9 @@ export const PAGINA1_TOP_FILERA_PX = 13.8;
  * seu viewport, mesurat 156,5): amb 113,4 les dues quedaven a la mateixa alcada.
  *
  * MES TARD, EL MATEIX DIA, el bloc de la dreta va passar de 110x220 (dues peces
- * quadrades) a 59,5x178,5: el selector de la p2 (59,5 x 119) a dalt i el quadrat
- * de les fletxes (59,5) a sota, tal com va demanar en Marc. Amb aixo la filera es
+ * quadrades) a 59,5x178,5: les dues botoneres del bloc (avui amb el quadrat de
+ * les fletxes a dalt i el selector a sota, que en Marc els va fer intercanviar),
+ * tal com va demanar. Amb aixo la filera es
  * va fer 59 px mes curta i la franja, que va al flux al darrere, pujava aquells
  * 59 px: amb el descompte a 71,4 torna a caure a 226,6, exactament on era.
  */
