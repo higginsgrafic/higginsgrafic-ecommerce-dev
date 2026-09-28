@@ -1534,6 +1534,7 @@ function MegaStripePanel({
                                 picked={picked}
                                 idx={idx}
                                 desplacamentGap={gapsDibuixFranja[idx]}
+                                desactivat={inactivesVel.has(idx)}
                                 calibrationOverrides={calibrationOverrides}
                                 stripeMaskTileRectsRawPct={stripeMaskTileRectsRawPct}
                                 rectsMascara={rectsMascara}
@@ -1573,6 +1574,7 @@ function MegaStripePanel({
                                 picked={picked}
                                 idx={idx}
                                 desplacamentGap={gapsDibuixFranjaFallback[idx]}
+                                desactivat={inactivesVel.has(idx)}
                                 calibrationOverrides={calibrationOverrides}
                                 stripeMaskTileRectsRawPct={stripeMaskTileRectsRawPct}
                                 rectsMascara={rectsMascara}

@@ -286,6 +286,20 @@ export const VEL_SAMARRETA_BUIDA_ALFA = 0.85;
 export const VEL_SAMARRETA_BUIDA_ALFA_BLANCA = 0.6;
 
 /**
+ * EL GRIS DE DESACTIVAT DELS DIBUIXOS DE LES SAMARRETES ATENUADES (28/09/2026).
+ *
+ * Ho ha demanat l'amo: «els facis tots d'un color gris desactivat». El dibuix
+ * d'una casa que no es de la colleccio activa es pinta amb aquest filtre en lloc
+ * del seu color (o del negre de `srcDibuixVelatEnNegre`).
+ *
+ * `brightness(0)` el deixa pla i negre conservant l'alfa (la forma del dibuix no
+ * es toca) i `invert(0.77)` el porta al gris #C4C4C4, que es el gris de
+ * desactivat de la casa (`#C4C8CE`, els dos punts de blau no es noten) que
+ * porten els botons desactivats del selector.
+ */
+export const FILTRE_DIBUIX_DESACTIVAT = 'brightness(0) invert(0.77)';
+
+/**
  * CAP DIBUIX PORTA MIRALL, MAI, si no es demana de forma expressa.
  *
  * Gairebe tots els dibuixos trenquen la simetria a posta, i a mes la lectura

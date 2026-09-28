@@ -9,6 +9,7 @@ import {
   STRIPE_DRAWING_DY_VERTICAL,
   STRIPE_DRAWING_ESCALA_VERTICAL,
   STRIPE_DRAWING_DX_VERTICAL,
+  FILTRE_DIBUIX_DESACTIVAT,
 } from '../../config/stripeCalibrationsVertical';
 import {
   DIBUIXOS_FRANJA_DX,
@@ -347,6 +348,9 @@ export function desplacamentsGapFranja(picks, { isPortraitTablet, calibrationOve
  * @param {boolean} [props.isPortraitTablet]
  * @param {string} [props.active]
  * @param {boolean} [props.drawingOverlayDebug]
+ * @param {boolean} [props.desactivat]  el dibuix d'una samarreta atenuada: es
+ *   pinta pla amb el gris de desactivat de la casa (vegeu
+ *   `FILTRE_DIBUIX_DESACTIVAT`).
  */
 export function DibuixFranja({
   picked,
@@ -358,6 +362,7 @@ export function DibuixFranja({
   isPortraitTablet = false,
   active,
   drawingOverlayDebug,
+  desactivat = false,
   // Nome's la pagina 2 el porta (vegeu `FACTOR_ESCALA_CALIBRATGES_VERTICAL_P2`).
   factorCalibratgeVertical = 1,
 }) {
@@ -389,7 +394,16 @@ export function DibuixFranja({
         && picked.toLowerCase().includes('/austen/keep_calm/')
         && picked.toLowerCase().endsWith('keep-calm-w-stripe.webp')
       ? 'drop-shadow(0 0 2px rgba(0,0,0,0.75))'
-      : 'none';
+      // EL DIBUIX D'UNA SAMARRETA ATENUADA, EN GRIS DE DESACTIVAT (28/09/2026,
+      // ho ha demanat l'amo: «els facis tots d'un color gris desactivat»).
+      // `brightness(0)` el deixa pla i NEGRE (l'alfa es conserva, o sigui que la
+      // forma del dibuix no es toca) i `invert` el porta al gris. Aixi el dibuix
+      // queda d'un sol color passi el que passi amb la variant que s'hi hagi
+      // triat (el negre de `srcDibuixVelatEnNegre` o el color dels dibuixos que
+      // nome's existeixen en color).
+      : desactivat
+        ? FILTRE_DIBUIX_DESACTIVAT
+        : 'none';
 
   return (
     <img
