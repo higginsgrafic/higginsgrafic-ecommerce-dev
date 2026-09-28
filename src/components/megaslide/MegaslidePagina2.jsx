@@ -1266,7 +1266,16 @@ export default function MegaslidePagina2({
                  visibles a 768: 14 / 2,566 = 5,46, i -16,31 es el -5 de sempre
                  menys 11,31 (els 29 px de dalt). */
               <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <div style={{ height: '100%', transform: 'translate(130.25px, -145px) scale(2.484)', transformOrigin: 'right center', '--megaStripeDx': '0px', '--megaStripeDy': '0px', '--hgStripeDrawingExtraDx': '5.86px', '--hgStripeDrawingExtraDxFilaDalt': '0.39px', '--hgStripeDrawingExtraDy': '-22.05px', '--hgStripeDrawingExtraDyFilaDalt': '-0.31px', '--hgStripeDrawingExtraScale': '1.155', '--hgStripeEmptyVeilAlpha': String(VEL_SAMARRETA_BUIDA_ALFA) }}>
+                {/* AQUEST EMBOLCALL NO ES MENJA ELS CLICS (28/09/2026). Es el
+                    que escala i desplaça la franja vertical
+                    (`translate(130.25px,-145px) scale(2.484)`), i la seva caixa
+                    transformada cau a (63,-89) i fa 476x607: arriba fins a
+                    y=518 i trepitja la casella del selector (y=114..222), que
+                    viu a la casella del costat. Sense `pointer-events: none`
+                    s'empassava els seus tres clics (BLANC, COLOR i NEGRE). El
+                    panell de dins ja porta el seu, i el que s'ha de poder clicar
+                    (les arees de clic de les samarretes) el demana a part. */}
+                <div style={{ height: '100%', transform: 'translate(130.25px, -145px) scale(2.484)', transformOrigin: 'right center', pointerEvents: 'none', '--megaStripeDx': '0px', '--megaStripeDy': '0px', '--hgStripeDrawingExtraDx': '5.86px', '--hgStripeDrawingExtraDxFilaDalt': '0.39px', '--hgStripeDrawingExtraDy': '-22.05px', '--hgStripeDrawingExtraDyFilaDalt': '-0.31px', '--hgStripeDrawingExtraScale': '1.155', '--hgStripeEmptyVeilAlpha': String(VEL_SAMARRETA_BUIDA_ALFA) }}>
                   <MegaStripePanel
                     {...propsFranjaP2}
                     isPortraitTablet

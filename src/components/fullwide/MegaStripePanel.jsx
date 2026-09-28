@@ -698,7 +698,31 @@ function MegaStripePanel({
   });
 
   return (
-    <div className="w-full shrink-0">
+    /* LA CAIXA DEL PANELL NO ES MENJA ELS CLICS (28/09/2026).
+     *
+     * Ho va veure l'amo: «El cadenat te el clic tapat. i el selector tambe».
+     * L'arrel del panell es un embolcall que no pinta res, pero la seva caixa es
+     * grossa i va desplaçada amunt pel transform que porta la franja al carril:
+     * mesurada a 768, cau a (63,-89) i fa 476x661, o sigui que arriba fins a
+     * y=572 i trepitja la casella del selector (y=114..222) i el cadenat
+     * (y=524..572). Com que tenia `pointer-events: auto`, s'empassava els clics
+     * d'aquelles dues coses.
+     *
+     * El que es veu i el que s'ha de poder clicar son les fulles de dins, i ja
+     * porten el seu `pointer-events` propi: les arees de clic de les samarretes
+     * (`ClicAreaOverlay`, `pointer-events: all`) i els bloquejadors de les
+     * samarretes buides (`pointer-events: auto`). Per aixo l'arrel pot anar a
+     * `none` sense perdre cap clic.
+     *
+     * Es el MATEIX remei que es va fer el 26/09 amb la capa de la franja
+     * (`MegaslidePagina2`: «els clics estan tapats o capturats per alguna
+     * cosa»): alla tambe es va treure el `pointer-events` de la capa que no
+     * pinta res.
+     *
+     * L'arrossegament de la tira (`#stripe-guide-stripe-row`, mes avall) si que
+     * el torna a demanar: la seva caixa no arriba ni al selector ni al cadenat.
+     */
+    <div className="w-full shrink-0" style={{ pointerEvents: 'none' }}>
       {!hideGrid || reserveGridSpace ? (
         <div
           className="relative z-10 grid grid-cols-1 gap-10"
@@ -803,6 +827,14 @@ function MegaStripePanel({
                 // El dit horitzontal es nostre (el ganxo del pas); el vertical
                 // segueix sent el desplacament de la pagina.
                 touchAction: 'pan-y',
+                // L'ARROSSEGAMENT DE LA TIRA TORNA A DEMANAR EL CLIC
+                // (28/09/2026): l'arrel del panell va a `pointer-events: none`
+                // perque la seva caixa no tapi el selector ni el cadenat (vegeu
+                // l'inici del `return`). Aquest element es el que arrossega la
+                // tira, i la seva caixa (476x209, de y=236 a y=445 a 768) no
+                // arriba ni al selector (y=114..222) ni al cadenat (y=524..572),
+                // o sigui que pot tornar-lo a demanar sense tapar res.
+                pointerEvents: 'auto',
                 // CENTRADA SOBRE EL CARRIL, A MA, NO PEL `justify-content`.
                 //
                 // La filera es mes ampla que el carril (les manigues hi surten)
