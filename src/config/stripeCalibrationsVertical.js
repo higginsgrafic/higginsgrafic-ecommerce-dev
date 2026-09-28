@@ -193,6 +193,12 @@ export const STRIPE_DRAWING_DY_VERTICAL = {
  * el centre: el dy d'aquests dos ja ho compensa.
  */
 export const STRIPE_DRAWING_ESCALA_VERTICAL = {
+  // L'IRON MAN 08, UNA MIQUETA MES GRAN (28/09/2026, ho ha demanat l'amo).
+  // Nome's la mida: el seu desplacament no es toca.
+  '/custom_logos/drawings/images_stripe/the_human_inside/black/iron-man-08-b-stripe.webp': 1.1,
+  '/custom_logos/drawings/images_stripe/the_human_inside/color/iron-man-08-multi-dark-stripe.webp': 1.1,
+  '/custom_logos/drawings/images_stripe/the_human_inside/color/iron-man-08-multi-light-stripe.webp': 1.1,
+  '/custom_logos/drawings/images_stripe/the_human_inside/white/iron-man-08-w-stripe.webp': 1.1,
   // EL CYBERMAN, UN 10% MES GRAN (28/09/2026).
   '/custom_logos/drawings/images_stripe/the_human_inside/black/cyberman-b-stripe.webp': 1.1,
   '/custom_logos/drawings/images_stripe/the_human_inside/color/cyberman-multi-dark-stripe.webp': 1.1,
