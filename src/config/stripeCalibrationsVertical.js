@@ -314,16 +314,17 @@ export const FILTRE_DIBUIX_DESACTIVAT = 'opacity(0.1)';
  * ELS DIBUIXOS DE LOOKING FOR MY DARCY, UN 5 % MES CLARS QUE EL VEL (28/09/2026).
  *
  * Ho ha demanat l'amo, NOME'S per a LFMD: «LFMD, en lloc d'un 10% mes fosc,
- * hauria de ser un 5% mes clar».
+ * hauria de ser un 5% mes clar» i, mes tard, «fes els dibuixos un 20% mes clars»
+ * (confirmat que nome's son els de LFMD).
  *
  * Son els dibuixos que nome's existeixen en color i que, per tant, no poden
  * entrar al calcul del 10 % de negre dels altres (vegeu
  * `srcDibuixVelatEnNegre`). Com que han de quedar MES CLARS que el vel i no mes
  * foscos, se'ls pinta de BLANC: `brightness(0)` els deixa plans (l'alfa es
  * conserva, o sigui que la forma no es toca) i `invert(1)` els posa blancs, i amb
- * un 5 % d'opacitat el resultat es `color del vel + 5 % cap al blanc`.
+ * un 20 % d'opacitat el resultat es `color del vel + 20 % cap al blanc`.
  */
-export const FILTRE_DIBUIX_DESACTIVAT_LFMD = 'brightness(0) invert(1) opacity(0.05)';
+export const FILTRE_DIBUIX_DESACTIVAT_LFMD = 'brightness(0) invert(1) opacity(0.2)';
 
 /**
  * LES VERSIONS `frame` DE LFMD, SENSE EL SEU FONS (28/09/2026).
@@ -346,7 +347,7 @@ export const FILTRE_DIBUIX_DESACTIVAT_LFMD = 'brightness(0) invert(1) opacity(0.
  * no te el vel al darrere per fondre-s'hi.)
  */
 export const FILTRE_ID_MARC_LFMD = 'hgTreuFonsMarcLfmd';
-export const FILTRE_DIBUIX_DESACTIVAT_LFMD_MARC = `url(#${FILTRE_ID_MARC_LFMD}) opacity(0.05)`;
+export const FILTRE_DIBUIX_DESACTIVAT_LFMD_MARC = `url(#${FILTRE_ID_MARC_LFMD}) opacity(0.2)`;
 /**
  * El filtre dels altres dibuixos que nome's existeixen en color (els de CUBE, que
  * tambe van sense variant negra): se'ls treu el color i se'ls rebaixa igual que
