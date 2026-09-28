@@ -309,46 +309,49 @@ function MegaStripePanelP1({
   // TOTS ELS DIBUIXOS DE TOTES LES COLLECCIONS (28/09/2026). En Marc: «L'scroll
   // de la franja p1 funciona amb el criteri de colleccio activa i no ha de ser
   // aixi. A l'scroll hi han de sortir tots els dibuixos de totes les
-  // colleccions». Es la MATEIXA llista que munta la tira de la p2 (les 64
-  // posicions, amb la seva colleccio i subcolleccio), i per aixo passa per
-  // `computeStripeTileOverlaySrcs` amb el context de CADA item: els dibuixos que
-  // la seva colleccio no sap resoldre es queden fora, com a la tira de la p2.
+  // colleccions» i, quan en van sortir 56, «Nome's 56 dibuixos? N'hi ha d'haver
+  // 64».
+  //
+  // Eren 56 perque la clau amb que es demanava el dibuix era l'ETIQUETA de la
+  // casella («Cylon '03», «3cube-P0») i el que el resoledor enten es el
+  // `stripeItem` de la casella («Cylon 03», «Cube 3 P0»): vuit caselles (les
+  // quatre de THE HUMAN INSIDE amb xifra, `Vulcans End` i tres de CUBE) es
+  // quedaven pel cami. Ara es fan servir les MATEIXES 64 caselles de la graella
+  // (`dibuixosGraella16x4`), que ja porten la seva colleccio, la seva
+  // subcolleccio i el seu `stripeItem`, i la clau bona: 7 + 15 + 27 + 10 + 5 =
+  // 64, totes amb dibuix de franja.
+  //
+  // La llista NO depen de la colleccio activa, i per aixo tampoc no mira
+  // `resolvedMegaFiltered` (la subcolleccio d'Austen no hi filtra res).
   //
   // El dibuix NO es desa en un estat propi: es tria la PECA del seu lloc
   // (`setSelectedItem...`) i el cami de la imatge surt de `resolvedOverlaySrc`,
   // que es el MATEIX circuit que el clic a la graella. Amb un estat paral·lel hi
   // hauria dues veritats.
   const dibuixosFranja = useMemo(() => {
+    const perColleccio = dibuixosGraella16x4().reduce((acc, it) => {
+      acc[it.collection] = acc[it.collection] || [];
+      acc[it.collection].push(it);
+      return acc;
+    }, {});
     const tots = [];
-    const vistos = new Set();
-    for (const [colleccio, cols] of Object.entries(resolvedMega || {})) {
-      if (!Array.isArray(cols)) continue;
-      const llista = [];
-      for (const col of cols) {
-        if (!Array.isArray(col?.items)) continue;
-        for (const it of col.items) {
-          if (it && typeof it === 'string' && !it.startsWith('__') && !vistos.has(it)) {
-            vistos.add(it);
-            llista.push(it);
-          }
-        }
-      }
-      if (!llista.length) continue;
+    for (const [colleccio, items] of Object.entries(perColleccio)) {
       const variant = colleccio === 'the_human_inside' ? humanInsideVariant : firstContactVariant;
+      const claus = items.map((it) => it.stripeItem);
       const srcs = computeStripeTileOverlaySrcs({
-        drawable: llista,
+        drawable: claus,
         variant,
         active: colleccio,
         displayedShirtColor: shirtColor,
         resolvedOverlaySrc,
-        limit: llista.length,
+        limit: claus.length,
       });
-      llista.forEach((item, i) => {
-        if (srcs?.[i]) tots.push({ item, collection: colleccio });
+      items.forEach((it, i) => {
+        if (srcs?.[i]) tots.push(it);
       });
     }
     return tots;
-  }, [resolvedMega, humanInsideVariant, firstContactVariant, shirtColor, resolvedOverlaySrc]);
+  }, [humanInsideVariant, firstContactVariant, shirtColor, resolvedOverlaySrc]);
   // L'INDEX surt de la peca TRIADA de la colleccio de cada dibuix, no d'un
   // comptador propi: aixi, en canviar de colleccio no hi ha cap estat que valgui
   // per a una altra llista i no cal cap efecte de reinici.
@@ -358,16 +361,16 @@ function MegaStripePanelP1({
     const seleccionat = (colleccio) => (colleccio === 'first_contact' ? firstContactSelectedItem
       : colleccio === 'the_human_inside' ? humanInsideSelectedItem
         : (selectedItemByCollection?.[colleccio] ?? null));
-    let idx = dibuixosFranja.findIndex((d) => d.collection === active && d.item === seleccionat(active));
+    let idx = dibuixosFranja.findIndex((d) => d.collection === active && d.stripeItem === seleccionat(active));
     if (idx < 0) idx = 0;
     const seguent = dibuixosFranja[(((idx + passos) % n) + n) % n];
     if (!seguent) return;
     // Si el dibuix es d'una altra colleccio, tambe s'hi ha de passar: la franja
     // pinta el dibuix de la colleccio ACTIVA.
     if (seguent.collection !== active) setActive?.(seguent.collection);
-    if (seguent.collection === 'first_contact') setFirstContactSelectedItem?.(seguent.item);
-    else if (seguent.collection === 'the_human_inside') setHumanInsideSelectedItem?.(seguent.item);
-    else setSelectedItemByCollection?.((prev) => ({ ...prev, [seguent.collection]: seguent.item }));
+    if (seguent.collection === 'first_contact') setFirstContactSelectedItem?.(seguent.stripeItem);
+    else if (seguent.collection === 'the_human_inside') setHumanInsideSelectedItem?.(seguent.stripeItem);
+    else setSelectedItemByCollection?.((prev) => ({ ...prev, [seguent.collection]: seguent.stripeItem }));
   }, [dibuixosFranja, active, firstContactSelectedItem, humanInsideSelectedItem, selectedItemByCollection, setActive, setFirstContactSelectedItem, setHumanInsideSelectedItem, setSelectedItemByCollection]);
   // Els gestos llegeixen la funcio a traves d'un ref: la llista de dibuixos i la
   // peca triada canvien a cada clic, i amb la funcio capturada dins del listener
