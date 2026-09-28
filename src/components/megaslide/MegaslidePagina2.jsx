@@ -1237,7 +1237,13 @@ export default function MegaslidePagina2({
                  banda del boto NEGRE, i els 21 px de la composicio horitzontal
                  les deixaven 8,5 px mes avall (mesurat: y=236,2 amb el boto de
                  210,4 a 245). */
-              <div style={{ marginTop: isPortraitTablet ? 0 : '21px' }}>
+              /* DE L'AMPLADA DE LA CASELLA (28/09/2026, ho va demanar l'amo):
+                 el contenidor de la tira es una graella de 14 columnes `1fr` amb
+                 les barres a `width: 100%`, o sigui que la mida de cada barra la
+                 mana l'amplada d'aquest contenidor. Sense `width: 100%` es un
+                 element flex que s'encongia al seu minim (175,6 px) i les barres
+                 quedaven de 7 x 2 px. */
+              <div style={{ width: '100%', marginTop: isPortraitTablet ? 0 : '21px' }}>
                 <CercadorColorsGrid
                   selectedColor={cercadorSelectedColor}
                   onSelectColor={setCercadorSelectedColor}
