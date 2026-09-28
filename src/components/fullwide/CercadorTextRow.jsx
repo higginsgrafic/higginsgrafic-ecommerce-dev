@@ -798,7 +798,9 @@ export function CercadorDibuixosGraella({
               // BLANC. A la vertical les dues files van a pas de peça, que es el
               // que fa que coincideixin amb BLANC i COLOR del selector.
               ? alcadaFila - (isPortraitTablet ? 0 : desnivellsLinies.segona) + (senseFletxes ? gapV + DESPLACAMENT_FILES_P1_PX : 0)
-              : -(isPortraitTablet ? 0 : desnivellsLinies.primera) + (senseFletxes ? DESPLACAMENT_FILES_P1_PX : 0)}px`,
+              // LA PRIMERA FILA, 20 px MES AMUNT A LA VERTICAL (28/09/2026, ho
+              // ha demanat l'amo). La segona no es mou.
+              : -(isPortraitTablet ? 20 : desnivellsLinies.primera) + (senseFletxes ? DESPLACAMENT_FILES_P1_PX : 0)}px`,
           } : null),
           // Amb `tilesPercent` la tile s'encongeix dins la seva casella
           // (el centre no es mou).
