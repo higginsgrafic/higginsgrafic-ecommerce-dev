@@ -286,6 +286,24 @@ export const VEL_SAMARRETA_BUIDA_ALFA = 0.85;
 export const VEL_SAMARRETA_BUIDA_ALFA_BLANCA = 0.6;
 
 /**
+ * EL VEL DE LES SAMARRETES ATENUADES QUAN LA SAMARRETA ES NEGRA (28/09/2026).
+ *
+ * Ho va demanar l'amo: «Les samarretes negres atenuades tenen un problema amb
+ * el vel. Cube ha de tenir el vel més opac i la resta, no tant opac».
+ *
+ * Amb la samarreta negra el vel blanc es el que mana (sobre blanc el vel gairebe
+ * no es veu), i un unic valor per a totes les colleccions no hi va be: les
+ * samarretes de CUBE, que porten dibuixos de colors vius, encara criden quan
+ * estan atenuades i els cal més vel; les altres, en canvi, queden massa
+ * esborrades i els cal menys.
+ *
+ * S'apliquen nome's quan la samarreta es NEGRA (el color triat a la tira de
+ * colors); amb qualsevol altre color es queda el valor de sempre.
+ */
+export const VEL_SAMARRETA_INACTIVA_NEGRE_CUBE = 0.75;
+export const VEL_SAMARRETA_INACTIVA_NEGRE_ALTRES = 0.45;
+
+/**
  * CAP DIBUIX PORTA MIRALL, MAI, si no es demana de forma expressa.
  *
  * Gairebe tots els dibuixos trenquen la simetria a posta, i a mes la lectura
