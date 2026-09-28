@@ -1202,7 +1202,14 @@ export function CercadorColleccionsColumna({
           minHeight: 0,
         }}
       >
-        {llista.map(({ key, label }) => (
+        {llista.map(({ key, label }, idxFila) => {
+          // LA PRIMERA I L'ULTIMA FILERA (28/09/2026, ho ha demanat l'amo): amb
+          // nou files de 27,15 px, una pastilla de 24,6 px no pot tenir 5 px a
+          // dalt i 5 px a baix alhora (caldrien files de 36,6 px). Ancorant la
+          // pastilla a la vora que li toca, el coixi queda igual a dalt i a
+          // baix de la columna.
+          const ultima = idxFila === llista.length - 1;
+          return (
           <button
             key={key}
             type="button"
@@ -1234,14 +1241,18 @@ export function CercadorColleccionsColumna({
               // i nome's la de la colleccio activa; les altres omplen la filera.
               width: key === activeKey ? 'calc(100% - 10px)' : '100%',
               // LA PASTILLA NO ES MODIFICA (28/09/2026, ho ha demanat l'amo):
-              // conserva els 24,6 px i nome's PUJA, amb el mateix offset de 5 px
-              // a dalt que hi ha als costats.
+              // conserva els 24,6 px; nome's s'ancora a la vora, amb el mateix
+              // offset de 5 px que hi ha als costats.
               height: key === activeKey ? '24.6px' : '100%',
               justifySelf: 'center',
-              // Pujada: 5 px del top de la filera (6 amb la vora de la caixa),
-              // la mateixa mesura que l'offset dels costats.
-              alignSelf: 'flex-start',
-              marginTop: key === activeKey ? '5px' : 0,
+              // ANCORADA A LA VORA QUE LI TOCA (28/09/2026, ho ha demanat
+              // l'amo): a la primera filera, 5 px del top de la filera (6 amb la
+              // vora de la caixa); a l'ultima, 5 px del bottom. Aixi el coixi es
+              // el mateix als dos caps de la columna. Les files del mig, amb la
+              // pastilla centrada.
+              alignSelf: key === activeKey ? (ultima ? 'flex-end' : 'flex-start') : 'center',
+              marginTop: key === activeKey && !ultima ? '5px' : 0,
+              marginBottom: key === activeKey && ultima ? '5px' : 0,
               // LA FONT, AMB EL CRITERI DE LA COLUMNA DE LA P2 HORITZONTAL
               // (28/09/2026, ho ha demanat l'amo): Oswald, 13,5 px, l'activa en
               // regular (400) i la resta en Extra Light (200), en majuscules.
@@ -1261,7 +1272,8 @@ export function CercadorColleccionsColumna({
           >
             {etiquetaColleccio(label)}
           </button>
-        ))}
+          );
+        })}
       </div>
     );
   }
