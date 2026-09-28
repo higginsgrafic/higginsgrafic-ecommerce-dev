@@ -468,8 +468,8 @@ describe('la composicio de la pagina 1 (B2, 26/09/2026)', () => {
     // DES DEL 28/09/2026 el bloc de la dreta fa 130 de disseny d'ample (128,9 px a
     // 1920: el mateix ample que la columna de colleccions de la p2, perque la
     // maniga de l'ultima samarreta de la franja hi arribi i hi faci l'ombra). A
-    // dins hi ha el selector de la p2 (59,5 x 119) a dalt i el quadrat de les
-    // fletxes (59,5) a sota, tots dos a la DRETA. I la graella de dibuixos esta
+    // dins hi ha el quadrat de les fletxes (59,5) a dalt i el selector de la p2
+    // (59,5 x 119) a sota, tots dos a la DRETA. I la graella de dibuixos esta
     // escalada a la mida del selector (60 de disseny): les seves dues fileres fan
     // 59,5 cadascuna, o sigui 119 en total, la mateixa alcada que el selector.
     expect(PAGINA1_MIDA_BLOC_DRETA_PX).toBe(60);
@@ -562,8 +562,8 @@ describe("l'aire de 30 px de les dues pagines (28/09/2026)", () => {
     // Amb 112,8 la franja de la p1 queia 0,6 px per sota de la de la p2 (que
     // clava la seva formula declarada) i amb 113,4 quedaven a 226,6 i 226,5.
     // Despres, el mateix dia, el bloc de la dreta va passar de 110x220 a
-    // 59,5x178,5 (el selector de la p2 a dalt i el quadrat de les fletxes a
-    // sota) i la filera es va fer 59 px mes curta: la franja, que va al flux al
+    // 59,5x178,5 (les dues botoneres del bloc, avui amb les fletxes a dalt i el
+    // selector a sota) i la filera es va fer 59 px mes curta: la franja, que va al flux al
     // darrere, pujava aquells 59 px. Amb 73,4 torna a caure a 226,6
     // (`_tmp-ancoratge.mjs`: 226,6 contra 226,5 de la p2).
     expect(PAGINA1_AJUST_FRANJA_PX).toBeCloseTo(73.4, 2);

@@ -17,10 +17,21 @@ const REF = {
   'p2 columna': [1395.3, 88, 128.7, 251.6],
   'p2 graella': [450.4, 83, 939.4, 95.2],
   'p2 franja': [357.9, 226.5, 1055.1, 113],
-  'p1 graella': [392, 83, 993.3, 134],
+  // 28/09/2026: fora la ratlla de l'esquerra de la graella de la p1 (1 px). El
+  // coixi de 10 px s'hi queda, o sigui que el contingut guanya 1 px d'amplada i
+  // el carrusel arrenca 1 px mes a l'esquerra (392 -> 391); les dues fileres i
+  // el seu centre (147,0) no es mouen de la casella COLOR.
+  'p1 graella': [391, 83, 994.3, 134],
   'p1 bloc dreta': [1395.3, 83, 128.7, 256.6],
   'p1 franja': [357.9, 226.6, 1055.1, 113],
-  'p1 fletxes': [1395.3, 210.6, 128.7, 128.3],
+  // 28/09/2026: en Marc va fer intercanviar les DUES PECES del bloc de la dreta
+  // («Intercanvia les posicions del selector i les fletxes»): el quadrat de les
+  // fletxes passa a la meitat de dalt (83) i el selector a la de baix (211,3).
+  // Fan el mateix (128,7 x 128,3), o sigui que el bloc (256,6), la filera
+  // (134) i les franges no es mouen; nome's canvia aquesta referencia.
+  'p1 fletxes': [1395.3, 83, 128.7, 128.3],
+  // El selector Blanc/Color/Negre, ara a la meitat de baix del bloc (211,3).
+  'p1 selector': [1395.3, 211.3, 128.7, 128.3],
 };
 const b = await chromium.launch();
 const ctx = await b.newContext({ viewport: { width: 1920, height: 946 }, deviceScaleFactor: 1 });
@@ -45,6 +56,7 @@ const m = await p.evaluate(() => {
     'p1 graella': q(v1.querySelector('[data-carrusel="1"]'), d1),
     'p1 bloc dreta': q(v1.querySelector('[data-bloc-dreta-p1="1"]'), d1),
     'p1 fletxes': q(v1.querySelector('[data-fletxes-p1="1"]'), d1),
+    'p1 selector': q(v1.querySelector('[data-stripe-buttonbar="bn-p1"]'), d1),
     'p1 franja': q(v1.querySelector('[data-stripe-visual-content="1"]'), d1),
   };
 });
