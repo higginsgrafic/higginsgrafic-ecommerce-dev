@@ -5,7 +5,7 @@ import { CERCADOR_COLORS } from './CercadorTopBar.jsx';
 import { computeStripeTileOverlaySrcs } from '../../utils/resolveStripeTile.js';
 import { dibuixosGraella16x4 } from './CercadorTextRow.jsx';
 import GraellaDuesFileresPagina1 from './GraellaDuesFileresPagina1.jsx';
-import { SelectorQuadratPagina1, FletxesQuadratPagina1, MIDA_BLOC_DRETA_PAGINA1_PX } from './BlocDretaPagina1.jsx';
+import { SelectorQuadratPagina1, FletxesQuadratPagina1, PastillaBlancaPagina1, MIDA_BLOC_DRETA_PAGINA1_PX } from './BlocDretaPagina1.jsx';
 import { ESTIL_CAIXA_BLOC_ALCADA_AUTO } from './estilsBlocs.js';
 import {
   STRIPE_DRAWING_CALIBRATIONS,
@@ -541,6 +541,15 @@ function MegaStripePanelP1({
   // nou columnes: amb aquest descompte la franja de la p1 cau a la mateixa
   // alcada que la de la p2 (mesurat a 1920: 242,1 contra 241,5).
   const ajustFranjaPx = PAGINA1_AJUST_FRANJA_PX * escalaCarril;
+  // LA CASELLA DE LA PASTILLA DEL SELECTOR (28/09/2026). La pastilla blanca ja
+  // no viu dins del selector: viu a la CAPA DE LA CAIXA, per sota de l'ombra de
+  // la maniga (vegeu `PastillaBlancaPagina1` i el bloc de la dreta, aqui sota).
+  // Els numeros son els MATEIXOS que els del selector (`ORDRE`, `slotPct` i el
+  // coixi de 5 px de `sliderInset`), i tambe la caiguda per defecte a COLOR.
+  const ORDRE_PASTILLA_P1 = ['white', 'color', 'black'];
+  const variantPastillaP1 = active === 'the_human_inside' ? humanInsideVariant : firstContactVariant;
+  const clauPastillaP1 = ORDRE_PASTILLA_P1.includes(variantPastillaP1) ? variantPastillaP1 : 'color';
+  const topPastillaP1Pct = (ORDRE_PASTILLA_P1.indexOf(clauPastillaP1) * 100) / ORDRE_PASTILLA_P1.length;
 
   // En portrait tablet, la stripe està dins d'un viewport scrollable amb
   // overflowY hidden. Reduïm l'escala de la stripe perquè no es talli.
@@ -799,6 +808,43 @@ function MegaStripePanelP1({
                     ...ESTIL_CAIXA_BLOC_ALCADA_AUTO,
                   }}
                 >
+                {/* LA PASTILLA BLANCA DEL SELECTOR, PER SOTA DE L'OMBRA (28/09/2026).
+                    En Marc: «A la p2, la pastilla blanca passa per sota de
+                    l'ombra, no nome's de la samarreta. A la p1 has aconseguit
+                    posar la pastilla per sota de la samarreta, pero no per sota
+                    de l'ombra» i «Et puc suggerir que imitis el que has fet a la
+                    p2?».
+
+                    A la p2 la caixa blanca de la colleccio activa es `static` i
+                    el seu fons es pinta ABANS que l'ombra (que es `absolute` amb
+                    `z-index: 0`): l'ombra hi cau a sobre. Aqui es fa el mateix
+                    dins d'aquesta capa: la pastilla es posicionada i SENSE
+                    `z-index`, i va ABANS de l'ombra al DOM, o sigui que l'ombra
+                    guanya i li passa per damunt.
+
+                    L'embolcall reserva el REQUADRE DEL SELECTOR: la meitat de
+                    baix del bloc, que es exactament on cau el selector quadrat
+                    (les dues botoneres son `flex: 1 1 50%`). Amb els MATEIXOS
+                    numeros de dins del selector, la pastilla cau al mateix lloc
+                    de sempre (mesurat a 1920: x1400,3..1519 · y259..291,8).
+
+                    Els BOTONS no es toquen: son a la capa de dalt (`zIndex: 6`),
+                    que es la que impedeix que la franja se'ls mengi els clics.
+                    Purament decorativa (`pointerEvents: none`). */}
+                <div
+                  aria-hidden="true"
+                  data-pastilla-p1="1"
+                  style={{
+                    position: 'absolute',
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    height: '50%',
+                    pointerEvents: 'none',
+                  }}
+                >
+                  <PastillaBlancaPagina1 topPct={topPastillaP1Pct} />
+                </div>
                 {ombraManigaP1 && mascaraManigaP1 ? (
                   <div
                     data-maniga-ombra-p1="1"
@@ -890,6 +936,11 @@ function MegaStripePanelP1({
                   dinsBloc
                   omple
                   format="square"
+                  // LA PASTILLA LA PINTA LA CAPA DE LA CAIXA (28/09/2026), perque
+                  // ha de quedar per sota de l'ombra de la maniga. Aqui nome's
+                  // queden els tres botons i el seu text, que han de seguir per
+                  // damunt de la franja.
+                  mostraPastilla={false}
                   showWhite={stripeVariantVisibility?.white !== false}
                   showBlack={stripeVariantVisibility?.black !== false}
                   showMulti={stripeVariantVisibility?.color !== false}

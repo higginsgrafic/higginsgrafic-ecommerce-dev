@@ -33,6 +33,63 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 export const MIDA_BLOC_DRETA_PAGINA1_PX = 110;
 
 /**
+ * LA PASTILLA BLANCA DEL SELECTOR DE LA P1, A PART (28/09/2026)
+ * -----------------------------------------------------------------------------
+ * En Marc: «A la p2, la pastilla blanca passa per sota de l'ombra, no nome's de
+ * la samarreta. A la p1 has aconseguit posar la pastilla per sota de la
+ * samarreta, pero no per sota de l'ombra» i «Et puc suggerir que imitis el que
+ * has fet a la p2?».
+ *
+ * LA CAUSA ES L'ORDRE DE PINTAT, NO LA GEOMETRIA. A la p2 la caixa blanca de la
+ * colleccio activa es un element `position: static`: el seu fons es pinta a la
+ * fase 3 de l'ordre de pintat, ABANS que l'ombra de la maniga (que es
+ * `position: absolute` amb `z-index: 0`, fase 6), i per aixo l'ombra hi cau a
+ * sobre. A la p1 la pastilla vivia dins del selector, que va a la capa dels
+ * BOTONS (`zIndex: 6`, la que cal perque la franja no se'ls mengi els clics):
+ * la pastilla tapava l'ombra.
+ *
+ * PER AIXO LA PASTILLA SE SURT DEL SELECTOR. Amb aquesta peca a part es pot
+ * muntar a la CAPA DE LA CAIXA (`zIndex: 0`) i ABANS de l'ombra al DOM: dins
+ * d'una mateixa capa, amb els dos elements posicionats i sense `z-index` propi,
+ * guanya el que va MES TARD, o sigui que l'ombra queda per damunt de la
+ * pastilla, exactament com a la p2. Els BOTONS es queden a la capa de dalt: els
+ * clics i el text no es toquen.
+ *
+ * Es la MATEIXA pastilla que la del selector (un sol joc de numeros, aqui): el
+ * component nome's la pinta, amb el seu coixi i la seva transicio (llisca entre
+ * BLANC/COLOR/NEGRE). El lloc on viu el decideix el pare:
+ *
+ *   - dins del selector, que es el cami de sempre;
+ *   - dins d'un embolcall que ocupi el REQUADRE DEL SELECTOR, si ha de quedar
+ *     per sota de l'ombra (el bloc de la dreta de la p1).
+ *
+ * IMPORTANT: la pastilla NO porta `z-index`. Amb un `z-index` propi guanyaria a
+ * l'ombra (que va a `0`) i tornariem a tenir el problema de sempre. Sense, qui
+ * mana es l'ordre del DOM.
+ */
+export function PastillaBlancaPagina1({ topPct, alcadaPct = 100 / 3, inset = 5 }) {
+  return (
+    <span
+      aria-hidden="true"
+      style={{
+        position: 'absolute',
+        left: `${inset}px`,
+        right: `${inset}px`,
+        top: `calc(${topPct}% + ${inset}px)`,
+        height: `calc(${alcadaPct}% - ${inset * 2}px)`,
+        backgroundColor: '#FFFFFF',
+        borderRadius: '3px',
+        border: '1px solid #D1D5DB',
+        boxShadow: '0 1px 3px rgba(0,0,0,0.12)',
+        boxSizing: 'border-box',
+        pointerEvents: 'none',
+        transition: 'top 200ms cubic-bezier(0.32, 0.72, 0, 1)',
+      }}
+    />
+  );
+}
+
+/**
  * El selector quadrat de la pagina 1 (BLANC / COLOR / NEGRE).
  *
  * Es el mateix disseny que el de la casa (tres caselles iguals, la pastilla
@@ -48,6 +105,12 @@ export function SelectorQuadratPagina1({
   showMulti = true,
   selectedVariant,
   sliderInset = 5,
+  // LA PASTILLA, EN UN ALTRE LLOC (28/09/2026). A la p1 la pastilla ha d'anar
+  // per SOTA de l'ombra de la maniga i els botons per DAMUNT (si no, la franja
+  // se'ls menja els clics): son DUES CAPES, i per aixo la pastilla es pot pintar
+  // des de fora. Amb `mostraPastilla` falsa, aqui nome's queden els botons i el
+  // text; la pastilla la munta el bloc, a la capa de la caixa.
+  mostraPastilla = true,
   // LA CAIXA LA PORTA EL BLOC (28/09/2026): amb `dinsBloc` el selector nome's
   // pinta les seves tres caselles i la pastilla, i el fons, la vora i les
   // cantonades els posa el bloc sencer (selector + fletxes).
@@ -129,24 +192,9 @@ export function SelectorQuadratPagina1({
           </button>
         );
       })}
-      <span
-        aria-hidden="true"
-        style={{
-          position: 'absolute',
-          left: `${sliderInset}px`,
-          right: `${sliderInset}px`,
-          top: `calc(${sliderTopPct}% + ${sliderInset}px)`,
-          height: `calc(${btnH}% - ${sliderInset * 2}px)`,
-          backgroundColor: '#FFFFFF',
-          borderRadius: '3px',
-          border: '1px solid #D1D5DB',
-          boxShadow: '0 1px 3px rgba(0,0,0,0.12)',
-          boxSizing: 'border-box',
-          pointerEvents: 'none',
-          transition: 'top 200ms cubic-bezier(0.32, 0.72, 0, 1)',
-          zIndex: 1,
-        }}
-      />
+      {mostraPastilla ? (
+        <PastillaBlancaPagina1 topPct={sliderTopPct} alcadaPct={btnH} inset={sliderInset} />
+      ) : null}
     </div>
   );
 }
