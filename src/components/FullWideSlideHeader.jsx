@@ -747,12 +747,21 @@ function FullWideSlideHeader({
     }
   }, [location.search]);
 
+  // LES COLLECCIONS NOME'S-COLOR MANEN (28/09/2026).
+  //
+  // A «Looking for my Darcy» nome's hi ha la variant de COLOR, i l'efecte de
+  // sota (`isColorOnly`) es qui la força. Sense aquesta guarda els dos efectes es
+  // barallaven: aquest forçava `white`, el de sota forçava `color`, i com que
+  // tots dos porten guarda (`!== 'color'` / `=== 'color'`) s'alternaven UN COP
+  // PER FOTOGRAMA i no paraven mai. Ho va veure l'amo: «la pastilla blanca del
+  // selector balla», i nome's ho feia en clicar l'enllaç LOOKING FOR MY D.
   useEffect(() => {
     if (active !== 'austen') return;
+    if (austenSubcollection === 'looking_for_my_darcy') return;
     if (!austenSelectedDisableMulti) return;
     if (firstContactVariant !== 'color') return;
     setFirstContactVariant('white');
-  }, [active, austenSelectedDisableMulti, firstContactVariant]);
+  }, [active, austenSelectedDisableMulti, firstContactVariant, austenSubcollection]);
 
   useEffect(() => {
     try {
@@ -815,12 +824,15 @@ function FullWideSlideHeader({
   }, [isColorOnlyP2, firstContactVariantP2, stripeVariantVisibility]);
 
   // Pàgina 2: si austen deshabilita color (Crosswords, Pemberley, Quotes), forçar white
+  // Mateixa guarda que a la pagina 1: a «Looking for my Darcy» nome's hi ha
+  // color, i forçar-hi `white` feia ballar la pastilla del selector.
   useEffect(() => {
     if (active !== 'austen') return;
+    if (austenSubcollection === 'looking_for_my_darcy') return;
     if (!austenSelectedDisableMulti) return;
     if (firstContactVariantP2 !== 'color') return;
     setFirstContactVariantP2('white');
-  }, [active, austenSelectedDisableMulti, firstContactVariantP2]);
+  }, [active, austenSelectedDisableMulti, firstContactVariantP2, austenSubcollection]);
 
   // Pàgina 2: validar variant contra stripeVariantVisibility
   useEffect(() => {
