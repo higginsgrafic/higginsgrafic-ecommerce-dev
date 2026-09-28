@@ -10,6 +10,56 @@ if (!supabaseUrl || !supabaseKey) {
 let pricingCache = { global: null, collections: {} };
 let pricingLoaded = false;
 
+/**
+ * LA CACHE DEL CATALEG (28/09/2026)
+ * -----------------------------------------------------------------------------
+ * PER QUE. Supabase ens va avisar que estavem a 11,78 GB d'egress d'un limit de
+ * 5,5 GB i que el 30/09/2026 el projecte deixaria de funcionar. Mesurat amb
+ * Chromium: la consulta de `products` amb els seus variants pesa **3,02 MB** i es
+ * feia a **cada carrega de pagina** (portada, botiga, fitxa...): amb ~3.900
+ * carregues ja son els 11,78 GB. Dins d'aquella resposta, el 95 % son els 4.116
+ * `product_variants` i, sobretot, el seu `image_url` (433 B per fila).
+ *
+ * QUE FA. Desa la resposta a memoria i a `localStorage` amb una caducitat curta
+ * (5 minuts). La FORMA de les dades no canvia gens: la cache desa exactament el
+ * que retornava la consulta, o sigui que res del que consumeix els productes se
+ * n'adona. Amb aixo, navegar per la botiga passa de 3 MB per pagina a 0.
+ *
+ * PER QUE 5 MINUTS. La resposta porta estoc i preus, que son el que canvia. Cinc
+ * minuts son el compromís: prou perque una sessio de navegacio no torni a baixar
+ * el cataleg, i prou poc perque un canvi de preu es vegi de seguida.
+ *
+ * Es pot escurçar o desactivar amb VITE_PRODUCT_CACHE_MINUTES (0 = sense cache).
+ */
+const CACHE_PRODUCTES_CLAU = 'hg_products_cache_v1';
+const CACHE_PRODUCTES_MINUTS = (() => {
+  const n = Number.parseFloat(import.meta.env?.VITE_PRODUCT_CACHE_MINUTES ?? '5');
+  return Number.isFinite(n) && n >= 0 ? n : 5;
+})();
+
+function llegirCacheProductes() {
+  if (CACHE_PRODUCTES_MINUTS <= 0 || typeof localStorage === 'undefined') return null;
+  try {
+    const cru = localStorage.getItem(CACHE_PRODUCTES_CLAU);
+    if (!cru) return null;
+    const { quan, dades } = JSON.parse(cru);
+    if (!Array.isArray(dades) || !quan) return null;
+    if (Date.now() - quan > CACHE_PRODUCTES_MINUTS * 60000) return null;
+    return dades;
+  } catch {
+    return null;
+  }
+}
+
+function desarCacheProductes(dades) {
+  if (CACHE_PRODUCTES_MINUTS <= 0 || typeof localStorage === 'undefined') return;
+  try {
+    localStorage.setItem(CACHE_PRODUCTES_CLAU, JSON.stringify({ quan: Date.now(), dades }));
+  } catch {
+    // Si no hi cap (quota), la cache nome's es de memoria: no es cap error.
+  }
+}
+
 async function loadPricingConfig() {
   if (pricingLoaded) return;
   try {
@@ -197,6 +247,16 @@ export const productsService = {
 
   async getAllProducts() {
     try {
+      // LA CACHE, PRIMER (28/09/2026): vegeu `CACHE_PRODUCTES_CLAU`. Sense aixo,
+      // aquesta consulta pesa 3,02 MB i es feia a cada carrega de pagina.
+      const desats = llegirCacheProductes();
+      if (desats) {
+        await loadPricingConfig();
+        console.log('✅ Products from cache:', desats.length);
+        let deCache = desats.map(transformProduct);
+        deCache = await this.enrichMiscellaniaImages(deCache);
+        return deCache;
+      }
       console.log('🔍 Fetching products from Supabase...');
 
       const { data, error } = await requireSupabase()
@@ -232,6 +292,10 @@ export const productsService = {
       }
 
       await loadPricingConfig();
+
+      // La resposta crua, a la cache: la propera carrega de pagina no la torna a
+      // demanar (5 minuts, vegeu `CACHE_PRODUCTES_MINUTS`).
+      desarCacheProductes(data);
 
       console.log('✅ Products fetched:', data?.length);
       console.log('📦 Sample product:', data?.[0]);
