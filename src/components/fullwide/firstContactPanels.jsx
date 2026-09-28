@@ -104,6 +104,11 @@ export function FirstContactDibuix00Buttons({
   //     d'alçada, que es la forma que la pagina 2 tenia abans de `97e2bd7`
   //     (59,5x119 a 1920x946).
   format = 'quadrat',
+  // SENSE EL MARGE DE DALT (28/09/2026). El bloc porta `mt-2` (8 px) des de la
+  // composicio horitzontal; a la vertical la casella de la taula l'alinea amb la
+  // vora de dalt, com la graella, i aquests 8 px el deixaven mes avall que les
+  // dues files de dibuixos (mesurat: botons a 139 i graella a 130).
+  senseMargeDalt = false,
 }) {
   // Els noms dels acabats són els catalans (Blanc/Color/Negre) i es mostren en
   // majúscules; la resta de la botiga també els anomena així.
@@ -172,7 +177,7 @@ export function FirstContactDibuix00Buttons({
       //
       // Va alineat a l'ESQUERRA a posta (sense `mx-auto`): a la pagina 2 el
       // selector arrenca on arrenca el logo del header, i aixo no ha de canviar.
-      className={`relative mt-2 ${format === 'rectangle' ? 'aspect-[1/2] w-1/2' : 'aspect-square w-full'}`}
+      className={`relative ${senseMargeDalt ? '' : 'mt-2'} ${format === 'rectangle' ? 'aspect-[1/2] w-1/2' : 'aspect-square w-full'}`}
       data-stripe-buttonbar="bn"
       data-stripe-buttonbar-format={format}
       style={{

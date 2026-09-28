@@ -36,10 +36,21 @@ export function alturaTaulaVertical(ampleFinestra) {
   return Math.ceil((ampladaCarril(ampleFinestra) * 3) / 5) - 43.8;
 }
 
+/** (28/09/2026) Els CONTORNS de les caselles, a la vista: l'amo els va demanar
+ * per validar on cau cada casella. La casella ja porta un `border` d'1 px (era
+ * transparent justament perque la geometria no es mogues en amagar-lo): aqui
+ * nome's se li dona color, o sigui que les mides no canvien gens. */
+const MOSTRA_CONTORNS_TAULA = true;
+const COLOR_CONTORN_TAULA = 'rgba(0, 140, 255, 0.5)';
+
 /** L'estil d'una casella. El contorn es transparent (no `none`) perque la
- * geometria de les caselles no es mogui en amagar-lo. */
+ * geometria de les caselles no es mogui en amagar-lo.
+ *
+ * SENSE COIXI (28/09/2026, ho va demanar l'amo): era `0 4px` i el contingut de
+ * cada casella arrencava 4 px endins. Ara les peces van a la vora de la casella
+ * (queda la vora d'1 px del contorn). */
 const CELA = {
-  border: '1px solid transparent',
+  border: `1px solid ${MOSTRA_CONTORNS_TAULA ? COLOR_CONTORN_TAULA : 'transparent'}`,
   boxSizing: 'border-box',
   minWidth: 0,
   minHeight: 0,
@@ -47,7 +58,7 @@ const CELA = {
   alignItems: 'center',
   justifyContent: 'center',
   textAlign: 'center',
-  padding: '0 4px',
+  padding: 0,
   fontFamily: 'Oswald, Roboto Condensed, sans-serif',
   fontSize: '13px',
   letterSpacing: '0.06em',
@@ -111,12 +122,15 @@ export function TaulaVerticalP1({ grid = null, stripe = null, fletxes = null, se
  * TaulaVerticalP2 — la taula de la PAGINA 2: 5 columnes x 3 files amb les
  * caselles fusionades que ha demanat l'amo:
  *
- *   fila 1: [ Graella dibuixos 16x4 ]
- *   fila 2: [ Col·leccions ][ Graella colors 4x4 ][ Stripe ]
- *   fila 3: [      "       ][    Selector b/c/n   ][   "    ]
+ *   fila 1: [ Selector ][ Graella dibuixos 16x4 + barres de color ][ Col·leccions ]
+ *   files 2 i 3: [ Franja (cols 1-4) ][ Col·leccions (col 5) ]
  *
- * La 6 i l'11 son la MATEIXA casella, i els blocs 8-10 i 13-15 tambe (les dues
- * fusionades de dalt a baix). Cada casella porta escrit el nom del que hi anira.
+ * Es la MATEIXA distribucio que la PAGINA 2 HORITZONTAL (28/09/2026, ho va
+ * demanar l'amo): el selector a l'esquerra, la graella de dibuixos amb la tira
+ * de colors just a sota, la columna de colleccions a la DRETA i la franja a
+ * sota de tot. SENSE FLETXES: a la tauleta es tactic i no n'hi ha.
+ *
+ * Cada casella porta escrit el nom del que hi anira.
  */
 export function TaulaVerticalP2({ graella = null, colleccions = null, colors = null, selector = null, stripe = null }) {
   return (
@@ -125,8 +139,18 @@ export function TaulaVerticalP2({ graella = null, colleccions = null, colors = n
       style={{
         pointerEvents: 'auto',
         display: 'grid',
-        gridTemplateColumns: 'repeat(5, 1fr)',
-        gridTemplateRows: 'repeat(3, 1fr)',
+        // LA COLUMNA DEL SELECTOR, DE LA SEVA MIDA (28/09/2026, ho va demanar
+        // l'amo: ajustar la casella al maxim sense moure el selector). Els
+        // 117,8 px son el selector (105,8) mes les seves dues vores d'1 px mes
+        // els 10 px de la correguda que separa les caselles: la casella queda de
+        // 107,8 i el selector l'omple sense canviar de mida. Les altres quatre
+        // columnes es reparteixen la resta.
+        gridTemplateColumns: '117.8px repeat(4, 1fr)',
+        // LA FILA DEL SELECTOR FA LA SEVA MIDA (28/09/2026): amb `1fr` la
+        // casella feia 118,1 px i el selector 105,8, o sigui que li sobraven
+        // 12,3 px de buit a sota. Amb `auto` la fila s'ajusta al selector i les
+        // dues de baix es reparteixen la resta.
+        gridTemplateRows: 'auto 1fr 1fr',
         width: '100%',
         // La taula va 15 px mes avall que la banda de la seva pagina i fa
         // l'alcada de sempre (la banda es mes curta: ho fixa
@@ -136,24 +160,32 @@ export function TaulaVerticalP2({ graella = null, colleccions = null, colors = n
         minHeight: 0,
       }}
     >
-      <div data-taula-cela="1-5" style={{ ...CELA, gridColumn: '1 / -1', gridRow: '1', position: 'relative', zIndex: 20 }}>{graella || 'Graella dibuixos 16x4'}</div>
-      {/* Les caselles veïnes s'ajusten a la correguda de 10 px: la de
-          colleccions s'encongeix i la franja s'eixampla, perque les vores
-          tornin a tocar-se. */}
-      <div data-taula-cela="6-11" style={{ ...CELA, gridColumn: '1', gridRow: '2 / 4', marginRight: '10px' }}>
-        {/* La llista de colleccions va del TOP del selector (301,2) al BOTTOM
-            de la graella de colors (516). */}
-        <div style={{ width: '100%', height: '100%', boxSizing: 'border-box', paddingTop: '19.2px', paddingBottom: '0px' }}>
-          {colleccions || 'Col·leccions'}
-        </div>
+      {/* El selector, a l'ESQUERRA i A DALT de la casella (28/09/2026, ho va
+          demanar l'amo): el node fa el 90% d'ample (aixo es el que li dona la
+          mida als botons, i per aixo no es toca) i amb `center` quedava centrat,
+          o sigui que arrencava 10,9 px endins del carril. Amb `flex-start`
+          arrenca on arrenca el contingut de la taula (40 + la vora i el coixi de
+          4 px) i, com la graella, toca la vora de dalt. */}
+      <div data-taula-cela="1" style={{ ...CELA, gridColumn: '1', gridRow: '1', marginRight: '10px', alignItems: 'flex-start', justifyContent: 'flex-start' }}>{selector || 'Selector b/c/n'}</div>
+      {/* LES TRES BANDES, alineades amb els TRES BOTONS del selector
+          (28/09/2026, ho va demanar l'amo): la fila de dalt amb BLANC, la de
+          baix amb COLOR i la tira de colors amb NEGRE. Cada banda fa 34,6 px,
+          que es l'alcada de cada boto del selector (mesurada a 768x1024).
+          I el conjunt toca la vora de DALT de la casella, com el selector. */}
+      <div
+        data-taula-cela="2-5"
+        style={{ ...CELA, gridColumn: '2 / -1', gridRow: '1', position: 'relative', zIndex: 20, flexDirection: 'column', alignItems: 'stretch', justifyContent: 'flex-start' }}
+      >
+        <div style={{ width: '100%', height: '69.2px' }}>{graella || 'Graella dibuixos 16x4'}</div>
+        <div style={{ width: '100%', height: '34.6px', display: 'flex', alignItems: 'center' }}>{colors || 'Graella colors 4x4'}</div>
       </div>
-      {/* La graella de colors i el selector (i la seva casella, amb el
-          contorn) van 10 px a l'esquerra. */}
-      <div data-taula-cela="7" style={{ ...CELA, gridColumn: '2', gridRow: '2', transform: 'translateX(-10px)', marginRight: '20px', alignItems: 'flex-end' }}>{selector || 'Selector b/c/n'}</div>
-      {/* La franja: la imatge va enganxada a l'esquerra de la casella i s'eixampla
-          20 px cap a la dreta, mantenint la seva proporcio (alcada automatica). */}
-      <div data-taula-cela="8-10+13-15" style={{ ...CELA, gridColumn: '3 / 6', gridRow: '2 / 4', marginLeft: '-30px', justifyContent: 'flex-start', alignItems: 'flex-start' }}>{stripe || 'Stripe'}</div>
-      <div data-taula-cela="12" style={{ ...CELA, gridColumn: '2', gridRow: '3', transform: 'translateX(-10px)', marginRight: '20px', alignItems: 'flex-end' }}>{colors || 'Graella colors 4x4'}</div>
+      {/* La columna de colleccions, a la DRETA i nome's a les FILES 2 I 3 (col
+          5): la fila 1 d'aquella columna queda per a la graella. El marge de
+          10 px es la mateixa correguda que separa les caselles de dalt. */}
+      <div data-taula-cela="10+15" style={{ ...CELA, gridColumn: '5', gridRow: '2 / 4', marginLeft: '10px', flexDirection: 'column', alignItems: 'stretch', justifyContent: 'flex-start' }}>{colleccions || 'Col·leccions'}</div>
+      {/* La franja, sota de tot (cols 1-4, files 2-3) i enganxada a l'esquerra
+          de la casella, com a la pagina 2 horitzontal. */}
+      <div data-taula-cela="6-9+11-14" style={{ ...CELA, gridColumn: '1 / 5', gridRow: '2 / 4', justifyContent: 'flex-start', alignItems: 'flex-start' }}>{stripe || 'Stripe'}</div>
     </div>
   );
 }
@@ -179,7 +211,14 @@ export function CapaTaulaVertical({ pagina, children }) {
         position: 'absolute',
         top: 0,
         left: 0,
-        right: 0,
+        // La correcció de la BARRA DE DESPLAÇAMENT (28/09/2026): aquesta capa
+        // viu dins el marc del lloc, que descompta la barra (15 px a 768), i la
+        // taula hi quedava centrada a 376,5 en lloc de 384 — el mateix
+        // desviament de 7,5 px que la capçalera. La capa fa l'amplada de la
+        // FINESTRA (`100vw`, que inclou la barra) i la taula s'hi centra: 40 a
+        // cada banda, igual que el header. (Un `marginLeft` no hi serveix: amb
+        // `right: 0` tambe encongeix la capa i la centrada es reparteix.)
+        width: '100vw',
         bottom: 0,
         display: 'flex',
         justifyContent: 'center',

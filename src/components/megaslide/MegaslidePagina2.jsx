@@ -17,7 +17,7 @@ import {
   CercadorDibuixosGraella,
   dibuixosGraella16x4,
 } from '../fullwide/CercadorTextRow.jsx';
-import { colorGap, midaDibuix, gapVertical } from '../fullwide/midesGraella.js';
+import { colorGap, midaDibuix, gapVertical, gapHorizontal, GRAELLA_COLUMNES } from '../fullwide/midesGraella.js';
 import { ampladaCarril } from './TaulaVertical.jsx';
 import MegaHeroSlider from '../MegaHeroSlider.jsx';
 import Pauta4ColsOverlay from '../pauta/Pauta4ColsOverlay';
@@ -1163,10 +1163,25 @@ export default function MegaslidePagina2({
             graella={(
               <CercadorDibuixosGraella
                 items={dibuixosGraella16x4()}
-                dibuixPx={null}
-                gapH={0}
+                /* LA GRAELLA COM LA DE LA P2 HORITZONTAL (28/09/2026, ho va
+                   demanar l'amo): el carrusel de DUES files intercalades, amb
+                   la peca 1,5 cops la base (`midaDibuix x 1,5`), les
+                   separacions de sempre (`gapHorizontal`/`gapVertical`) i
+                   `GRAELLA_COLUMNES` columnes. Amb `dibuixPx` fix la graella
+                   deixa d'expandir-se per omplir la casella — que es el que en
+                   feia QUATRE files i 271 px, i no hi cabia — i fa l'alcada de
+                   dues files. Sense fletxes: a la vertical son 0. */
+                dibuixPx={midaDibuix(isPortraitTablet, false) * 1.655}
+                gapH={gapHorizontal(isPortraitTablet, false)}
+                /* SENSE GAP VERTICAL (28/09/2026): les dues files del carrusel
+                   han d'anar amb el PAS DE LA PECA (34,6 px, l'alcada d'un boto
+                   del selector), com a la horitzontal — alla les dues files
+                   noves ocupen el que abans ocupaven tres. Amb el `gapV` de la
+                   vertical (~7 px) el pas quedava en 18,6 i la fila de dalt no
+                   quadrava amb BLANC. */
                 gapV={0}
-                numColumns={16}
+                numColumns={GRAELLA_COLUMNES}
+                carrusel
                 activeCollection={active}
                 isPortraitTablet={isPortraitTablet}
                 /* El tap en un dibuix tambe tria la seva colleccio, com a la
@@ -1217,9 +1232,12 @@ export default function MegaslidePagina2({
               />
             )}
             colors={(
-              /* Les catorze barres de color (8x1), enganxades a dalt amb el
-                 mateix marge de sempre. */
-              <div style={{ marginTop: '21px' }}>
+              /* Les catorze barres de color (8x1). A la VERTICAL, SENSE MARGE DE
+                 DALT (28/09/2026): la casella de la taula ja les centra dins la
+                 banda del boto NEGRE, i els 21 px de la composicio horitzontal
+                 les deixaven 8,5 px mes avall (mesurat: y=236,2 amb el boto de
+                 210,4 a 245). */
+              <div style={{ marginTop: isPortraitTablet ? 0 : '21px' }}>
                 <CercadorColorsGrid
                   selectedColor={cercadorSelectedColor}
                   onSelectColor={setCercadorSelectedColor}
@@ -1240,7 +1258,7 @@ export default function MegaslidePagina2({
                  visibles a 768: 14 / 2,566 = 5,46, i -16,31 es el -5 de sempre
                  menys 11,31 (els 29 px de dalt). */
               <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <div style={{ height: '100%', transform: 'translate(130px, -119.3px) scale(2.059)', transformOrigin: 'right center', '--megaStripeDx': '0px', '--megaStripeDy': '0px', '--hgStripeDrawingExtraDx': '5.46px', '--hgStripeDrawingExtraDy': '-17.55px', '--hgStripeDrawingExtraDyFilaDalt': '-5.26px', '--hgStripeEmptyVeilAlpha': String(VEL_SAMARRETA_BUIDA_ALFA) }}>
+                <div style={{ height: '100%', transform: 'translate(45.2px, -119.3px) scale(2.059)', transformOrigin: 'right center', '--megaStripeDx': '0px', '--megaStripeDy': '0px', '--hgStripeDrawingExtraDx': '5.46px', '--hgStripeDrawingExtraDy': '-17.55px', '--hgStripeDrawingExtraDyFilaDalt': '-5.26px', '--hgStripeEmptyVeilAlpha': String(VEL_SAMARRETA_BUIDA_ALFA) }}>
                   <MegaStripePanel
                     {...propsFranjaP2}
                     isPortraitTablet
@@ -1256,8 +1274,14 @@ export default function MegaslidePagina2({
             selector={(
               /* El selector, un 10% mes petit (la peça agafa l'amplada del seu
                  contenidor). */
-              <div style={{ width: '90%' }}>
+              /* EL 100% DE LA SEVA COLUMNA (28/09/2026): la columna fa 117,8 px
+                 (el selector + les vores + la correguda), o sigui que la casella
+                 fa 107,8 i el selector l'omple sense canviar de mida (105,8). */
+              <div style={{ width: '100%' }}>
               <FirstContactDibuix00Buttons
+                /* A la vertical la casella l'alinea amb la vora de dalt: sense
+                   el `mt-2` del bloc (vegeu firstContactPanels.jsx). */
+                senseMargeDalt
                 onWhite={() => {
                   setFirstContactVariant?.('white');
                   setHumanInsideVariant?.('white');
