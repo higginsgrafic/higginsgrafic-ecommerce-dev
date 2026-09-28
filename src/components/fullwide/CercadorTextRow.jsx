@@ -1196,7 +1196,7 @@ export function CercadorColleccionsColumna({
           // ELS ENLLAÇOS, UNA MIQUETA MES JUNTS (28/09/2026, ho ha demanat
           // l'amo per poder fer la pastilla una mica mes alta): files de 25 px,
           // centrades a la casella, en lloc de repartir-se tota l'alcada.
-          gridTemplateRows: `repeat(${llista.length}, 25px)`,
+          gridTemplateRows: `repeat(${llista.length}, 1fr)`,
           alignContent: 'center',
           rowGap: 0,
           minHeight: 0,
@@ -1233,10 +1233,12 @@ export function CercadorColleccionsColumna({
               // caixa (`sliderInset`), aqui tambe (5 px per costat, 10 en total),
               // i nome's la de la colleccio activa; les altres omplen la filera.
               width: key === activeKey ? 'calc(100% - 10px)' : '100%',
-              // LA MATEIXA MIDA QUE EL SELECTOR (28/09/2026, ho ha demanat
-              // l'amo): 24,6 px, que es l'alcada de la pastilla del bloc
-              // BLANC/COLOR/NEGRE.
-              height: key === activeKey ? '24.6px' : '100%',
+              // L'OFFSET VERTICAL, COM L'HORITZONTAL (28/09/2026, ho ha demanat
+              // l'amo): la filera menys 12 px (5 d'inset a cada costat mes les
+              // dues vores), que es el maxim que deixa el mateix offset de 6 px
+              // a dalt i a baix que hi ha als costats. Una pastilla de 24,6 px
+              // com la del selector nomes hi cabria amb una filera de 36,6 px.
+              height: key === activeKey ? 'calc(100% - 12px)' : '100%',
               justifySelf: 'center',
               alignSelf: 'center',
               // LA FONT, AMB EL CRITERI DE LA COLUMNA DE LA P2 HORITZONTAL
