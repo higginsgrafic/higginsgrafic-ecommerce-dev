@@ -1216,7 +1216,6 @@ export function CercadorColleccionsColumna({
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'flex-end',
-              width: '100%',
               minHeight: 0,
               padding: '0 6px',
               borderRadius: '3px',
