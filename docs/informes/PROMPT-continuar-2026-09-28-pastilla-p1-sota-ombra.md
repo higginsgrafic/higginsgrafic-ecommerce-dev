@@ -283,5 +283,4 @@ En aquest ordre, i tot ha de sortir bé:
 | `scripts/_tmp-ancoratge.mjs` | les 10 mides de referència de les dues pàgines a 1920×946 |
 | `scripts/_tmp-franja-mesura.mjs`, `scripts/_tmp-mesura-centratge-franja.mjs` | mesures de la franja |
 
-**Regla d'or**: una cosa per commit, la bateria al final, i **no es commiteja ni
-es desplega res fins que en Marc confirmi que la modificació està acabada**.
+**Regla d'or**: una cosa per commit, la bateria al final. **Es pot committejar i fer push SEMPRE (28/09/2026, ho va aclarir l'amo; vegeu la constitucio, regla 1): el que no es fa mai es desplegar.**

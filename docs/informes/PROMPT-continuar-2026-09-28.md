@@ -7,7 +7,10 @@
 
 - **Una cosa per commit**, i **la bateria al final**: mentre s'itera un disseny,
   només canvis i una passada ràpida d'errors de consola; quan en Marc diu «ja
-  està», es llancen TOTES les bateries i es commiteja i es puja.
+  està», es llancen TOTES les bateries.
+- **Commit i push, sempre** (28/09/2026, ho va aclarir en Marc): es pot
+  committejar i pujar en qualsevol moment, sense esperar el «ja està» ni la
+  bateria. El que **no** es fa mai és desplegar (constitució, regla 1).
 - La bateria completa, en aquest ordre:
   1. `npx vitest run` → **595 proves / 46 fitxers**
   2. `npx eslint <fitxers tocats>` → els comptes han de ser els de `HEAD`

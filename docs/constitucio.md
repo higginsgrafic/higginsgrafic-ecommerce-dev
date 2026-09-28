@@ -12,6 +12,8 @@
 
 **La regla.** No es fa cap desplegament a Netlify ni a cap altre servei. Es fa `git commit` i `git push`, i prou.
 
+**Commit i push, sempre** (28/09/2026, ho va aclarir l'amo). Committejar i fer `push` es pot fer **sempre**, sense demanar permis: el que no es fa mai es **desplegar**. No cal esperar que l'amo digui que la feina esta acabada, ni que passi cap bateria, per desar-la: com abans quedi desada en un commit, millor. El desplegament el decideix ell.
+
 **Per què.** L'amo ho va demanar explícitament. El desplegament el decideix ell, quan li convé.
 
 **Com es comprova.** No hi ha d'haver cap `netlify deploy`, cap `--prod`, cap acció de publicació en cap guió.
