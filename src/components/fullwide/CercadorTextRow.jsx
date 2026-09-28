@@ -1219,7 +1219,8 @@ export function CercadorColleccionsColumna({
               border: key === activeKey ? '1px solid #D1D5DB' : '1px solid transparent',
               display: 'flex',
               alignItems: 'center',
-              justifyContent: 'flex-end',
+              // COM EL SELECTOR (28/09/2026, ho ha demanat l'amo): les paraules, centrades.
+              justifyContent: 'center',
               minHeight: 0,
               padding: '0 6px',
               borderRadius: '3px',
