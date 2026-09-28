@@ -1193,12 +1193,12 @@ export function CercadorColleccionsColumna({
           // separacio entre files, la pastilla arriba al maxim. Abans les caixes
           // feien els 22,59 px de la columna de la p2h i el que sobrava eren
           // buits.
-          // LES FILES, MES JUNTES, I LA PASTILLA DE 24,6 px COM LA DEL SELECTOR
-          // (28/09/2026, ho ha demanat l'amo). La pastilla marca el minim: 24,6
-          // px de pastilla mes l'offset volen una fila de 26,6 com a poc. Amb
-          // files de 25 px la llista queda mes compacta i la pastilla sobresurt
-          // mig px a cada costat, que cau dins del buit del text i no el toca.
-          gridTemplateRows: `repeat(${llista.length}, 25px)`,
+          // LA PASTILLA FA ELS MATEIXOS 24,6 px QUE LA DEL SELECTOR (28/09/2026,
+          // ho ha demanat l'amo). Amb nou files a la casella (244,4 px) no hi
+          // caben 24,6 mes un offset de 5+5 (caldrien 34,6 px per fila, 311 en
+          // total): la pastilla va a 24,6 i l'offset de 5 px es respecta als
+          // costats; a dalt i a baix en queden ~1,2, que es el que dona la filera.
+          gridTemplateRows: `repeat(${llista.length}, 1fr)`,
           alignContent: 'center',
           rowGap: 0,
           minHeight: 0,
