@@ -1229,9 +1229,9 @@ export function CercadorColleccionsColumna({
               // regular (400) i la resta en Extra Light (200), en majuscules.
               color: key === activeKey ? '#1A1A1A' : '#6B7280',
               fontFamily: 'inherit',
-              // 12 PT (28/09/2026, ho ha demanat l'amo): son 16 px. La resta del
-              // criteri (Oswald, 400/200, majuscules) no es toca.
-              fontSize: '12pt',
+              // 12 PX (28/09/2026, ho ha demanat l'amo). La resta del criteri
+              // (Oswald, 400/200, majuscules) no es toca.
+              fontSize: '12px',
               fontWeight: key === activeKey ? 400 : 200,
               textTransform: 'uppercase',
               lineHeight: 1,
