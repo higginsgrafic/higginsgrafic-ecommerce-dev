@@ -326,6 +326,28 @@ export const FILTRE_DIBUIX_DESACTIVAT = 'opacity(0.1)';
 export const FILTRE_DIBUIX_DESACTIVAT_LFMD = 'brightness(0) invert(1) opacity(0.05)';
 
 /**
+ * LES VERSIONS `frame` DE LFMD, SENSE EL SEU FONS (28/09/2026).
+ *
+ * Ho ha demanat l'amo: «Pots obviar el fons de les versions frame?».
+ *
+ * Les versions `frame` de LOOKING FOR MY DARCY no son nome's el text: son el
+ * mateix text groc sobre una PLACA BLAVA plena (`blue-frame-stripe.webp`). Amb el
+ * filtre pla de `FILTRE_DIBUIX_DESACTIVAT_LFMD`, la placa sencera es tornava
+ * blanca, o sigui que el que es veia era el fons.
+ *
+ * El fons s'ha de treure DE LA IMATGE, i aixo ho fa el filtre SVG
+ * `hgTreuFonsMarcLfmd` (vegeu `MegaStripePanel`): la seva `feColorMatrix` calcula
+ * l'alfa com `vermell - blau`, o sigui que el groc del marc i del text (R=240,
+ * B=0) es queda sencer i la placa blava (R=48, B=240) queda amb alfa negativa,
+ * que es zero. I de passada el pinta de blanc, que es el que ha de ser.
+ *
+ * (`mix-blend-mode: lighten` tambe ho hauria fet, pero NO funciona aqui: la capa
+ * dels dibuixos te `z-index` i es un context apilat propi, o sigui que el dibuix
+ * no te el vel al darrere per fondre-s'hi.)
+ */
+export const FILTRE_ID_MARC_LFMD = 'hgTreuFonsMarcLfmd';
+export const FILTRE_DIBUIX_DESACTIVAT_LFMD_MARC = `url(#${FILTRE_ID_MARC_LFMD}) opacity(0.05)`;
+/**
  * El filtre dels altres dibuixos que nome's existeixen en color (els de CUBE, que
  * tambe van sense variant negra): se'ls treu el color i se'ls rebaixa igual que
  * als altres, que allo ja estava demanat i NO es toca.

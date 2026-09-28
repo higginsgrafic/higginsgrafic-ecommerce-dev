@@ -3,7 +3,7 @@ import MegaColumn from './MegaColumn.jsx';
 import { DibuixFranja, resolDibuixDeCasella, desplacamentsGapFranja, FACTOR_ESCALA_CALIBRATGES_VERTICAL_P2 } from './DibuixFranja.jsx';
 import ClicAreaOverlay from './ClicAreaOverlay.jsx';
 import { CERCADOR_COLORS } from './CercadorTopBar.jsx';
-import { VEL_SAMARRETA_BUIDA_ALFA_BLANCA } from '../../config/stripeCalibrationsVertical';
+import { VEL_SAMARRETA_BUIDA_ALFA_BLANCA, FILTRE_ID_MARC_LFMD } from '../../config/stripeCalibrationsVertical';
 import { carrilPx } from '../../utils/layoutMetrics.js';
 import { caminsSiluetes, precarregaSiluetesSamarreta, textSiluetesSamarreta } from './siluetesSamarreta.js';
 import useEscalaFranjaCarril from '../../hooks/useEscalaFranjaCarril.js';
@@ -698,7 +698,21 @@ function MegaStripePanel({
   });
 
   return (
-    /* LA CAIXA DEL PANELL NO ES MENJA ELS CLICS (28/09/2026).
+    <>
+      {/* EL FILTRE QUE TREU EL FONS DE LES VERSIONS `frame` DE LFMD
+          (28/09/2026). L'alfa surt de `vermell - blau`: el groc del marc i del
+          text (R=240, B=0) es queda, la placa blava (R=48, B=240) desapareix, i
+          el que queda es pinta de blanc (vegeu
+          `FILTRE_DIBUIX_DESACTIVAT_LFMD_MARC`). Va aqui perque el panell de la
+          pagina 1 no atenua cap casa i nome's aquest panell el necessita. */}
+      <svg width="0" height="0" aria-hidden="true" style={{ position: 'absolute' }}>
+        <defs>
+          <filter id={FILTRE_ID_MARC_LFMD} colorInterpolationFilters="sRGB">
+            <feColorMatrix type="matrix" values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  1 0 -1 0 0" />
+          </filter>
+        </defs>
+      </svg>
+    {/* LA CAIXA DEL PANELL NO ES MENJA ELS CLICS (28/09/2026).
      *
      * Ho va veure l'amo: «El cadenat te el clic tapat. i el selector tambe».
      * L'arrel del panell es un embolcall que no pinta res, pero la seva caixa es
@@ -721,7 +735,7 @@ function MegaStripePanel({
      *
      * L'arrossegament de la tira (`#stripe-guide-stripe-row`, mes avall) si que
      * el torna a demanar: la seva caixa no arriba ni al selector ni al cadenat.
-     */
+     */}
     <div className="w-full shrink-0" style={{ pointerEvents: 'none' }}>
       {!hideGrid || reserveGridSpace ? (
         <div
@@ -1615,6 +1629,7 @@ function MegaStripePanel({
         </div>
       ) : null}
     </div>
+    </>
   );
 }
 
