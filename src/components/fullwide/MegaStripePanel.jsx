@@ -1,19 +1,9 @@
 import React, { useEffect, useId, useMemo, useRef, useState } from 'react';
 import MegaColumn from './MegaColumn.jsx';
+import { DibuixFranja, resolDibuixDeCasella, desplacamentsGapFranja, FACTOR_ESCALA_CALIBRATGES_VERTICAL_P2 } from './DibuixFranja.jsx';
 import ClicAreaOverlay from './ClicAreaOverlay.jsx';
 import { CERCADOR_COLORS } from './CercadorTopBar.jsx';
-import {
-  STRIPE_DRAWING_CALIBRATIONS,
-  PASSOS_ESCALA_GAP_DIBUIX_VERTICAL,
-  GAP_MOVIMENT_DIBUIX_VERTICAL,
-  ESCALA_DIBUIX_VERTICAL,
-} from '../../config/stripeCalibrations';
-import {
-  STRIPE_DRAWING_DY_VERTICAL,
-  STRIPE_DRAWING_ESCALA_VERTICAL,
-  STRIPE_DRAWING_DX_VERTICAL,
-  VEL_SAMARRETA_BUIDA_ALFA_BLANCA,
-} from '../../config/stripeCalibrationsVertical';
+import { VEL_SAMARRETA_BUIDA_ALFA_BLANCA } from '../../config/stripeCalibrationsVertical';
 import { carrilPx } from '../../utils/layoutMetrics.js';
 import { caminsSiluetes, precarregaSiluetesSamarreta, textSiluetesSamarreta } from './siluetesSamarreta.js';
 import useEscalaFranjaCarril from '../../hooks/useEscalaFranjaCarril.js';
@@ -86,62 +76,6 @@ const RESERVA_ALCADA = alcadaReservaGraellaPanellCss();
 // declarada `esBandaEstretaFranja` (vegeu geometriaMegaslide.js), que es on ha
 // de viure perque les dues pagines no es poden desquadrar. Es llegeix dins del
 // component (vegeu `esFranjaEstenya` mes avall).
-
-function canonicalKey(rawSrc) {
-  try {
-    const s = String(rawSrc || '').trim();
-    if (!s) return '';
-    const lower = s.toLowerCase();
-    if (lower.includes('/custom_logos/drawings/images_stripe/austen/keep_calm/')) {
-      return '__HG_CANONICAL_STRIPE_DRAWING_OVERLAY__::austen::keep_calm';
-    }
-    return s;
-  } catch {
-    return String(rawSrc || '').trim();
-  }
-}
-
-function getTileCalibration(src, overrides) {
-  if (!src) return { dx: 0, dy: 0, scale: 1 };
-  const cKey = canonicalKey(src);
-  // L'OVERRIDE DEL HUD NOME'S EN DESENVOLUPAMENT (26/09/2026).
-  //
-  // El HUD desa les recalibracions al `localStorage` i aqui tenien prioritat
-  // sobre el que diu el projecte: en producció, un valor vell del navegador
-  // d'algú podia moure la composicio. El que es veu ha de ser sempre el que
-  // diu el modul de geometria; el HUD es una eina de taller i, per tant,
-  // nome's mana en desenvolupament.
-  let lsMap = null;
-  if (import.meta.env.DEV) {
-    try {
-      const raw = window.localStorage.getItem('MEGA_STRIPE_DRAWING_OVERLAY_TRANSFORMS_BY_SRC');
-      lsMap = raw ? JSON.parse(String(raw)) : null;
-    } catch {
-      lsMap = null;
-    }
-  }
-  if (overrides && typeof overrides === 'object') {
-    const fromOv = (cKey && overrides[cKey]) || overrides[src];
-    if (fromOv && typeof fromOv === 'object') return fromOv;
-  }
-  if (lsMap && typeof lsMap === 'object') {
-    const fromLs = (cKey && lsMap[cKey]) || lsMap[src];
-    if (fromLs && typeof fromLs === 'object') return fromLs;
-  }
-  const fromDefaults = (cKey && STRIPE_DRAWING_CALIBRATIONS[cKey]) || STRIPE_DRAWING_CALIBRATIONS[src];
-  if (fromDefaults && typeof fromDefaults === 'object') return fromDefaults;
-  // LA REGLA DECLARADA (26/09/2026): les entrades que no son al mapa son
-  // dibuixos de la franja i van a l'amplada base (80 unitats, el 41 % del cos),
-  // centrats al cos de la seva samarreta. Vegeu `geometriaMegaslide.js`.
-  if (typeof src === 'string' && src.includes('images_stripe')) {
-    return {
-      dx: DIBUIXOS_FRANJA_DX,
-      dy: DIBUIXOS_FRANJA_DY,
-      scale: escalaDibuixFranja(DIBUIXOS_FRANJA_AMPLADA_NATURAL),
-    };
-  }
-  return { dx: 0, dy: 0, scale: 1 };
-}
 
 /**
  * El VEL de les samarretes: una capa amb la silueta de cada casella pintada de
@@ -554,10 +488,69 @@ function MegaStripePanel({
   // Estat de pas per al desplaçament dels dibuixos de la franja a la vista
   // vertical: el primer dibuix de cada filera de 7 no es mou i la resta es
   // desplacen cap a l'esquerra el 10% de l'espai buit que tenen a l'esquerra.
-  // S'acumula mentre es pinten les caselles (en ordre), o sigui que son
-  // variables de render, no d'estat.
-  let gapDibuixAcumulat = 0;
-  let gapDibuixEscalaAnterior = null;
+  // Els desplaçaments del gap, calculats TOTS DE COP (vegeu
+  // `desplacamentsGapFranja`): abans s'acumulaven en una variable mentre es
+  // pintaven les caselles, o sigui que el lloc d'un dibuix depenia de l'ordre
+  // de pintat. Cada casella rep ara el seu numero, calculat de la llista
+  // d'imatges. `false` marca una casella que no es pinta: no compta per al gap.
+  //
+  // La casa de la tira sencera que ensenya cada casella tambe viu aqui: abans
+  // es calculava dins del map i ara el calcul es unic, el fan servir la franja
+  // i la llista de desplaçaments.
+  const nTiraDibuixos = Array.isArray(stripeStrip?.srcs) ? stripeStrip.srcs.length : 0;
+  const deLaTiraDeCasella = (idx) => {
+    if (!(nTiraDibuixos > 0)) return null;
+    const iTira = ((((idx + stripeStripOffset) % nTiraDibuixos) + nTiraDibuixos) % nTiraDibuixos);
+    return {
+      src: stripeStrip.srcs[iTira],
+      collection: stripeStrip.collections[iTira],
+      item: stripeStrip.items?.[iTira] ?? null,
+      subcollection: stripeStrip.subcollections?.[iTira] ?? null,
+    };
+  };
+  const picksDibuixFranja = Array.from({ length: 14 }, (_, idx) => {
+    const deLaTira = deLaTiraDeCasella(idx);
+    if (!deLaTira && Array.isArray(stripeTileOverlaySrcs) && !stripeTileOverlaySrcs[idx]) return false;
+    const base = (() => {
+      try {
+        if (deLaTira) return normalizeOverlaySrc(deLaTira.src);
+        if (Array.isArray(stripeTileOverlaySrcs) && stripeTileOverlaySrcs[idx]) {
+          return normalizeOverlaySrc(stripeTileOverlaySrcs[idx]);
+        }
+        return normalizeOverlaySrc(drawingOverlaySrcEffective);
+      } catch {
+        return normalizeOverlaySrc(drawingOverlaySrcEffective);
+      }
+    })();
+    const hasPerTileSrc = Array.isArray(stripeTileOverlaySrcs) && !!stripeTileOverlaySrcs[idx];
+    return resolDibuixDeCasella({
+      base, idx, hasPerTileSrc, active, resolvedOverlaySrc,
+      humanInsideVariant, firstContactVariant, isPortraitTablet, shirtColor,
+    });
+  });
+  const gapsDibuixFranja = desplacamentsGapFranja(picksDibuixFranja, { isPortraitTablet, calibrationOverrides });
+  const picksDibuixFranjaFallback = Array.from({ length: 14 }, (_, idx) => {
+    if (Array.isArray(stripeTileOverlaySrcs) && !stripeTileOverlaySrcs[idx]) return false;
+    const base = (() => {
+      try {
+        if (Array.isArray(stripeTileOverlaySrcs) && stripeTileOverlaySrcs[idx]) {
+          return normalizeOverlaySrc(stripeTileOverlaySrcs[idx]);
+        }
+        return normalizeOverlaySrc(drawingOverlaySrcEffective);
+      } catch {
+        return normalizeOverlaySrc(drawingOverlaySrcEffective);
+      }
+    })();
+    // La clau es `hasPerTileSrcFallback`, com al codi original: el resolsedor
+    // llegeix `hasPerTileSrc`, o sigui que aqui no li arriba (es conserva tal
+    // com era per no canviar res; es pot decidir a part).
+    const hasPerTileSrcFallback = Array.isArray(stripeTileOverlaySrcs) && !!stripeTileOverlaySrcs[idx];
+    return resolDibuixDeCasella({
+      base, idx, hasPerTileSrcFallback, active, resolvedOverlaySrc,
+      humanInsideVariant, firstContactVariant, isPortraitTablet, shirtColor,
+    });
+  });
+  const gapsDibuixFranjaFallback = desplacamentsGapFranja(picksDibuixFranjaFallback, { isPortraitTablet, calibrationOverrides });
   // La signatura de les caselles: el vel s'hi ha de refer si canvien (el vel es
   // col·loca amb elles, vegeu `generaVelDataUrl`).
   const clauCelles = Array.isArray(rectsMascara) && rectsMascara.length === 14
@@ -1412,172 +1405,13 @@ function MegaStripePanel({
                           // ensenya el dibuix `i + stripeStripOffset` de la TIRA.
                           // El modul ha de ser la llargada de la TIRA (64), no la
                           // de `stripeStrip` (14), que es una llista retallada.
-                          const nTira = Array.isArray(stripeStrip?.srcs) ? stripeStrip.srcs.length : 0;
-                          const iTira = nTira > 0
-                            ? ((((idx + stripeStripOffset) % nTira) + nTira) % nTira)
-                            : idx;
-                          const deLaTira = nTira > 0
-                            ? {
-                              src: stripeStrip.srcs[iTira],
-                              collection: stripeStrip.collections[iTira],
-                              item: stripeStrip.items?.[iTira] ?? null,
-                              subcollection: stripeStrip.subcollections?.[iTira] ?? null,
-                            }
-                            : null;
+                          const deLaTira = deLaTiraDeCasella(idx);
                           // Tile buit (samarreta sense dibuix): no renderitzem res
                           // (no repetim ni fem fallback al dibuix per defecte).
-                          if (!deLaTira && Array.isArray(stripeTileOverlaySrcs) && !stripeTileOverlaySrcs[idx]) {
+                          const picked = picksDibuixFranja[idx];
+                          if (picked === false) {
                             return null;
                           }
-                          const base = (() => {
-                            try {
-                              if (deLaTira) return normalizeOverlaySrc(deLaTira.src);
-                              if (Array.isArray(stripeTileOverlaySrcs) && stripeTileOverlaySrcs[idx]) {
-                                return normalizeOverlaySrc(stripeTileOverlaySrcs[idx]);
-                              }
-                              return normalizeOverlaySrc(drawingOverlaySrcEffective);
-                            } catch {
-                              return normalizeOverlaySrc(drawingOverlaySrcEffective);
-                            }
-                          })();
-
-                          const resolvePerTileAssetSrc = (src) => {
-                            try {
-                              if (!src || typeof src !== 'string') return null;
-                              const tpl = String(src || '').trim();
-                              if (!tpl) return null;
-                              const i1 = idx + 1;
-                              const hasTpl = tpl.includes('{i}') || tpl.includes('{idx}') || tpl.includes('{n}');
-                              if (hasTpl) {
-                                return tpl
-                                  .replace(/\{i\}/g, String(i1))
-                                  .replace(/\{n\}/g, String(i1))
-                                  .replace(/\{idx\}/g, String(idx));
-                              }
-                              return null;
-                            } catch {
-                              return null;
-                            }
-                          };
-
-                          const isAustenKeepCalm = active === 'austen'
-                            && typeof resolvedOverlaySrc === 'string'
-                            && /\/austen\/keep_calm\//i.test(resolvedOverlaySrc);
-                          const isAustenTileSwapBW = active === 'austen'
-                            && typeof resolvedOverlaySrc === 'string'
-                            && /\/austen\/(pemberley_house|crosswords|quotes)\//i.test(resolvedOverlaySrc);
-                          const shouldApplyRules = active === 'first_contact' || active === 'the_human_inside' || active === 'cube' || active === 'miscellania' || isAustenKeepCalm || isAustenTileSwapBW;
-                          const baseMode = active === 'the_human_inside' ? humanInsideVariant : firstContactVariant;
-                          const isAustenPemberley = active === 'austen'
-                            && typeof resolvedOverlaySrc === 'string'
-                            && /\/austen\/pemberley_house\//i.test(resolvedOverlaySrc);
-
-                          const resolveDrawingOverlaySrcForTile = (src) => {
-                            try {
-                              if (!src || typeof src !== 'string') return src;
-                              const safeIdx = Number.isFinite(Number(idx)) ? Number(idx) : 0;
-                              // A la vista vertical la franja son DUES fileres de 7: la samarreta
-                              // sencera (i el seu dibuix) es la de l'extrem de CADA filera.
-                              const isFirst = isPortraitTablet ? safeIdx % 7 === 0 : safeIdx === 0;
-                              const isLast = isPortraitTablet ? safeIdx % 7 === 6 : safeIdx === 13;
-                              const useEdgeOverride = active === 'first_contact' || active === 'the_human_inside' || active === 'miscellania' || isAustenPemberley || isAustenKeepCalm;
-                              const mode = useEdgeOverride && isFirst
-                                ? (baseMode === 'color' ? 'color' : 'black')
-                                : useEdgeOverride && isLast
-                                  ? (baseMode === 'color' ? 'color' : 'white')
-                                  : baseMode;
-
-                              const toBlack = (s) => {
-                                let out = s;
-                                out = out.replace(/\/white\//i, '/black/');
-                                out = out.replace(/-w(?=[-.])/i, '-b');
-                                return out;
-                              };
-                              const toWhite = (s) => {
-                                let out = s;
-                                out = out.replace(/\/black\//i, '/white/');
-                                out = out.replace(/-b(?=[-.])/i, '-w');
-                                return out;
-                              };
-
-                              if (!shouldApplyRules) return src;
-
-                              if ((active === 'the_human_inside' || active === 'miscellania' || isAustenTileSwapBW) && (mode === 'white' || mode === 'black') && !isAustenPemberley) {
-                                return mode === 'white' ? toWhite(src) : toBlack(src);
-                              }
-
-                              if (mode === 'color') {
-                                const hasMultiLight = src.toLowerCase().includes('-multi-light-');
-                                const hasMultiDark = src.toLowerCase().includes('-multi-dark-');
-                                const hasThruLight = src.toLowerCase().includes('-multi-thru-light-');
-                                const hasThruDark = src.toLowerCase().includes('-multi-thru-dark-');
-                                const hasThruRed = src.toLowerCase().includes('-multi-thru-red-');
-                                const hasWRed = src.toLowerCase().includes('-multi-w-red-');
-                                if (useEdgeOverride && !isAustenKeepCalm && isFirst && hasMultiLight) return src.replace(/-multi-light-/i, '-multi-dark-');
-                                if (useEdgeOverride && !isAustenKeepCalm && isFirst && hasMultiDark) return src;
-                                if (useEdgeOverride && !isAustenKeepCalm && isLast && hasMultiDark) return src.replace(/-multi-dark-/i, '-multi-light-');
-                                if (useEdgeOverride && !isAustenKeepCalm && isLast && hasMultiLight) return src;
-                                if (isAustenPemberley) {
-                                  if (hasMultiDark) return src.replace(/-multi-dark-/i, '-multi-light-');
-                                  return src;
-                                }
-                                if (isAustenKeepCalm) {
-                                  const safeIdxKc = safeIdx;
-                                  if (safeIdxKc === 8) {
-                                    if (hasMultiDark) return src.replace(/-multi-dark-/i, '-multi-light-');
-                                    return src;
-                                  }
-                                  const isRedShirt = shirtColor === '#CB001D';
-                                  if (isRedShirt) {
-                                    if (hasMultiDark) return src.replace(/-multi-dark-/i, '-multi-light-');
-                                    return src;
-                                  }
-                                  if (hasMultiLight) return src.replace(/-multi-light-/i, '-multi-dark-');
-                                  return src;
-                                }
-                                if (hasMultiLight) return src;
-                                if (hasMultiDark) return src.replace(/-multi-dark-/i, '-multi-light-');
-                                if (hasThruLight) return src;
-                                if (hasThruDark) return src.replace(/-multi-thru-dark-/i, '-multi-thru-light-');
-                                if (hasWRed) return src;
-                                if (hasThruRed) return src.replace(/-multi-thru-red-/i, '-multi-w-red-');
-                                return src;
-                              }
-
-                              if (isAustenPemberley && (mode === 'white' || mode === 'black') && !(useEdgeOverride && (isFirst || isLast))) {
-                                return src;
-                              }
-
-                              if (mode === 'white') {
-                                const hasThruRed = src.toLowerCase().includes('-multi-thru-red-');
-                                const hasWRed = src.toLowerCase().includes('-multi-w-red-');
-                                if (hasThruRed || hasWRed) {
-                                  return hasWRed ? src : src.replace(/-multi-thru-red-/i, '-multi-w-red-');
-                                }
-                                return toWhite(src);
-                              }
-                              if (mode === 'black') {
-                                return toBlack(src);
-                              }
-
-                              return src;
-                            } catch {
-                              return src;
-                            }
-                          };
-
-                          const hasPerTileSrc = Array.isArray(stripeTileOverlaySrcs) && !!stripeTileOverlaySrcs[idx];
-                          const picked = (() => {
-                            try {
-                              if (!base) return null;
-                              const perTile = resolvePerTileAssetSrc(base);
-                              const candidate = perTile || base;
-                              if (hasPerTileSrc) return candidate;
-                              return resolveDrawingOverlaySrcForTile(candidate) || candidate;
-                            } catch {
-                              return base;
-                            }
-                          })();
                           const imgUrl = picked ? encodeURI(picked) : '';
                           const safeW = Number(r?.width) || 0;
                           const safeH = Number(r?.height) || 0;
@@ -1662,265 +1496,27 @@ function MegaStripePanel({
                                 </div>
                               ) : null}
 
-                              <img
-                                src={imgUrl ? imgUrl : undefined}
-                                alt=""
-                                className="block absolute inset-0"
-                                onError={(e) => {
-                                  try {
-                                    if (
-                                      import.meta.env.DEV
-                                      && active === 'austen'
-                                      && typeof resolvedOverlaySrc === 'string'
-                                      && /\/austen\/pemberley_house\//i.test(resolvedOverlaySrc)
-                                    ) {
-                                      // eslint-disable-next-line no-console
-                                      console.error('[MEGA stripe tile img error]', { idx, src: imgUrl, resolvedOverlaySrc });
-                                    }
-                                    e.currentTarget.style.display = 'none';
-                                  } catch {
-                                  }
-                                }}
-                                style={{
-                                  pointerEvents: 'none',
-                                  height: '100%',
-                                  width: '100%',
-                                  objectFit: 'contain',
-                                  opacity: 0.98,
-                                  transformOrigin: 'top center',
-                                  transform: (() => {
-                                    const cal = getTileCalibration(picked, calibrationOverrides);
-                                    // El calibratge es d'una filera: a la vista vertical
-                                    // la casella es 1/7 d'amplada (en comptes de la de la
-                                    // filera), i els desplacaments en px s'han d'escalar amb
-                                    // la casella perque el dibuix caigui al mateix lloc.
-                                    const fA = (() => {
-                                      const original = Array.isArray(stripeMaskTileRectsRawPct) ? stripeMaskTileRectsRawPct[idx] : null;
-                                      const w1 = Number(original?.width) || 0;
-                                      const w2 = Number(rectsMascara?.[idx]?.width) || 0;
-                                      return (w1 > 0 && w2 > 0) ? w1 / w2 : 1;
-                                    })();
-                                    // A la vista vertical el dibuix no canvia de mida
-                                    // (PASSOS_ESCALA_GAP_DIBUIX_VERTICAL es congelat) i el
-                                    // gap s'estreta MOVENT: el dibuix de l'esquerra de la
-                                    // filera no es mou i la resta es desplacen el 10% de
-                                    // l'espai buit que tenen a l'esquerra
-                                    // (GAP_MOVIMENT_DIBUIX_VERTICAL).
-                                    const factorGap = 0.9 ** PASSOS_ESCALA_GAP_DIBUIX_VERTICAL;
-                                    const escalaGap = isPortraitTablet ? 1 - factorGap * (1 - cal.scale) : cal.scale;
-                                    // La mida dels dibuixos a la vertical (un 20% menys).
-                                    const factorEscalaDibuix = isPortraitTablet
-                                      ? (STRIPE_DRAWING_ESCALA_VERTICAL[canonicalKey(picked)] ?? STRIPE_DRAWING_ESCALA_VERTICAL[picked] ?? 1)
-                                      : 1;
-                                    const escalaDibuix = isPortraitTablet ? escalaGap * ESCALA_DIBUIX_VERTICAL * factorEscalaDibuix : escalaGap;
-                                    // A la vista vertical el dy es el propi de la
-                                    // vertical (la base de la impressio, alineada amb
-                                    // THE HUMAN INSIDE); a la resta de vistes, el de sempre.
-                                    // Els calibratges es van fer amb la franja a escala 2,116
-                                    // i ara va a 2,059: compensem el factor perque els
-                                    // desplaçaments (en px, dins l'embolcall escalat) no
-                                    // s'encongeixin amb ella.
-                                    const factorEscalaFranja = 1.027683;
-                                    const dyDibuix = isPortraitTablet
-                                      ? (STRIPE_DRAWING_DY_VERTICAL[canonicalKey(picked)] ?? STRIPE_DRAWING_DY_VERTICAL[picked] ?? cal.dy) * factorEscalaFranja
-                                      : cal.dy;
-                                    if (idx % 7 === 0) {
-                                      gapDibuixAcumulat = 0;
-                                      gapDibuixEscalaAnterior = null;
-                                    }
-                                    if (isPortraitTablet) {
-                                      if (gapDibuixEscalaAnterior != null) {
-                                        const gapAmbAnterior = 1 - (gapDibuixEscalaAnterior + escalaDibuix) / 2;
-                                        gapDibuixAcumulat += (1 - GAP_MOVIMENT_DIBUIX_VERTICAL) * gapAmbAnterior;
-                                      }
-                                      gapDibuixEscalaAnterior = escalaDibuix;
-                                    }
-                                    const desplacamentGap = isPortraitTablet ? -100 * gapDibuixAcumulat : 0;
-                                    const dxDibuix = isPortraitTablet
-                                      ? (cal.dx + (STRIPE_DRAWING_DX_VERTICAL[canonicalKey(picked)] ?? STRIPE_DRAWING_DX_VERTICAL[picked] ?? 0)) * factorEscalaFranja
-                                      : cal.dx;
-                                    return `translate(calc(${dxDibuix}px * ${fA} + ${desplacamentGap}% + var(--hgStripeDrawingExtraDx, 0px)), calc(${dyDibuix}px + var(--hgStripeDrawingExtraDy, -5px)${idx < 7 ? ' + var(--hgStripeDrawingExtraDyFilaDalt, 0px)' : ''})) scale(calc(${escalaDibuix} * var(--hgStripeDrawingExtraScale, 1)))`;
-                                  })(),
-                                  filter: (() => {
-                                    const baseFx = drawingOverlayDebug
-                                      ? 'drop-shadow(0 0 2px rgba(0,0,0,0.65))'
-                                      : active === 'austen'
-                                            && typeof picked === 'string'
-                                            && picked.toLowerCase().includes('/austen/keep_calm/')
-                                            && picked.toLowerCase().endsWith('keep-calm-w-stripe.webp')
-                                          ? 'drop-shadow(0 0 2px rgba(0,0,0,0.75))'
-                                        : 'none';
-                                    // (El dibuix de les cases velades ja ve en NEGRE
-                                    // de la tira: el tria `MegaslidePagina2` amb
-                                    // la variant `black`. Aqui no s'hi toca res:
-                                    // els dibuixos que nome's existeixen en color
-                                    // s'han de quedar en color.)
-                                    return baseFx;
-                                  })(),
-                                }}
-                                loading={idx === 0 ? 'eager' : 'lazy'}
-                                decoding="async"
-                                fetchpriority={idx === 0 ? 'high' : undefined}
+                              <DibuixFranja
+                                picked={picked}
+                                idx={idx}
+                                desplacamentGap={gapsDibuixFranja[idx]}
+                                calibrationOverrides={calibrationOverrides}
+                                stripeMaskTileRectsRawPct={stripeMaskTileRectsRawPct}
+                                rectsMascara={rectsMascara}
+                                isPortraitTablet={isPortraitTablet}
+                                active={active}
+                                drawingOverlayDebug={drawingOverlayDebug}
+                                factorCalibratgeVertical={FACTOR_ESCALA_CALIBRATGES_VERTICAL_P2}
                               />
                             </div>
                           );
                         })
                         : Array.from({ length: 14 }).map((_, idx) => {
                           // Tile buit (samarreta sense dibuix): no renderitzem res.
-                          if (Array.isArray(stripeTileOverlaySrcs) && !stripeTileOverlaySrcs[idx]) {
+                          const picked = picksDibuixFranjaFallback[idx];
+                          if (picked === false) {
                             return null;
                           }
-                          const base = (() => {
-                            try {
-                              if (Array.isArray(stripeTileOverlaySrcs) && stripeTileOverlaySrcs[idx]) {
-                                return normalizeOverlaySrc(stripeTileOverlaySrcs[idx]);
-                              }
-                              return normalizeOverlaySrc(drawingOverlaySrcEffective);
-                            } catch {
-                              return normalizeOverlaySrc(drawingOverlaySrcEffective);
-                            }
-                          })();
-
-                          const resolvePerTileAssetSrc = (src) => {
-                            try {
-                              if (!src || typeof src !== 'string') return null;
-                              const tpl = String(src || '').trim();
-                              if (!tpl) return null;
-                              const i1 = idx + 1;
-                              const hasTpl = tpl.includes('{i}') || tpl.includes('{idx}') || tpl.includes('{n}');
-                              if (hasTpl) {
-                                return tpl
-                                  .replace(/\{i\}/g, String(i1))
-                                  .replace(/\{n\}/g, String(i1))
-                                  .replace(/\{idx\}/g, String(idx));
-                              }
-                              return null;
-                            } catch {
-                              return null;
-                            }
-                          };
-                          const isAustenKeepCalm = active === 'austen'
-                            && typeof resolvedOverlaySrc === 'string'
-                            && /\/austen\/keep_calm\//i.test(resolvedOverlaySrc);
-                          const isAustenTileSwapBW = active === 'austen'
-                            && typeof resolvedOverlaySrc === 'string'
-                            && /\/austen\/(pemberley_house|crosswords|quotes)\//i.test(resolvedOverlaySrc);
-                          const shouldApplyRules = active === 'first_contact' || active === 'the_human_inside' || active === 'cube' || active === 'miscellania' || isAustenKeepCalm || isAustenTileSwapBW;
-                          const baseMode = active === 'the_human_inside' ? humanInsideVariant : firstContactVariant;
-                          const isAustenPemberley = active === 'austen'
-                            && typeof resolvedOverlaySrc === 'string'
-                            && /\/austen\/pemberley_house\//i.test(resolvedOverlaySrc);
-
-                          const resolveDrawingOverlaySrcForTile = (src) => {
-                            try {
-                              if (!src || typeof src !== 'string') return src;
-                              const safeIdx = Number.isFinite(Number(idx)) ? Number(idx) : 0;
-                              // A la vista vertical la franja son DUES fileres de 7: la samarreta
-                              // sencera (i el seu dibuix) es la de l'extrem de CADA filera.
-                              const isFirst = isPortraitTablet ? safeIdx % 7 === 0 : safeIdx === 0;
-                              const isLast = isPortraitTablet ? safeIdx % 7 === 6 : safeIdx === 13;
-                              const useEdgeOverride = active === 'first_contact' || active === 'the_human_inside' || active === 'miscellania' || isAustenPemberley || isAustenKeepCalm;
-                              const mode = useEdgeOverride && isFirst
-                                ? (baseMode === 'color' ? 'color' : 'black')
-                                : useEdgeOverride && isLast
-                                  ? (baseMode === 'color' ? 'color' : 'white')
-                                  : baseMode;
-
-                              const toBlack = (s) => {
-                                let out = s;
-                                out = out.replace(/\/white\//i, '/black/');
-                                out = out.replace(/-w(?=[-.])/i, '-b');
-                                return out;
-                              };
-                              const toWhite = (s) => {
-                                let out = s;
-                                out = out.replace(/\/black\//i, '/white/');
-                                out = out.replace(/-b(?=[-.])/i, '-w');
-                                return out;
-                              };
-
-                              if (!shouldApplyRules) return src;
-
-                              if ((active === 'the_human_inside' || active === 'miscellania' || isAustenTileSwapBW) && (mode === 'white' || mode === 'black') && !isAustenPemberley) {
-                                return mode === 'white' ? toWhite(src) : toBlack(src);
-                              }
-
-                              if (mode === 'color') {
-                                const hasMultiLight = src.toLowerCase().includes('-multi-light-');
-                                const hasMultiDark = src.toLowerCase().includes('-multi-dark-');
-                                const hasThruLight = src.toLowerCase().includes('-multi-thru-light-');
-                                const hasThruDark = src.toLowerCase().includes('-multi-thru-dark-');
-                                const hasThruRed = src.toLowerCase().includes('-multi-thru-red-');
-                                const hasWRed = src.toLowerCase().includes('-multi-w-red-');
-                                if (useEdgeOverride && !isAustenKeepCalm && isFirst && hasMultiLight) return src.replace(/-multi-light-/i, '-multi-dark-');
-                                if (useEdgeOverride && !isAustenKeepCalm && isFirst && hasMultiDark) return src;
-                                if (useEdgeOverride && !isAustenKeepCalm && isLast && hasMultiDark) return src.replace(/-multi-dark-/i, '-multi-light-');
-                                if (useEdgeOverride && !isAustenKeepCalm && isLast && hasMultiLight) return src;
-                                if (isAustenPemberley) {
-                                  if (hasMultiDark) return src.replace(/-multi-dark-/i, '-multi-light-');
-                                  return src;
-                                }
-                                if (isAustenKeepCalm) {
-                                  const safeIdxKc = safeIdx;
-                                  if (safeIdxKc === 8) {
-                                    if (hasMultiDark) return src.replace(/-multi-dark-/i, '-multi-light-');
-                                    return src;
-                                  }
-                                  const isRedShirt = shirtColor === '#CB001D';
-                                  if (isRedShirt) {
-                                    if (hasMultiDark) return src.replace(/-multi-dark-/i, '-multi-light-');
-                                    return src;
-                                  }
-                                  if (hasMultiLight) return src.replace(/-multi-light-/i, '-multi-dark-');
-                                  return src;
-                                }
-                                if (hasMultiLight) return src;
-                                if (hasMultiDark) return src.replace(/-multi-dark-/i, '-multi-light-');
-                                if (hasThruLight) return src;
-                                if (hasThruDark) return src.replace(/-multi-thru-dark-/i, '-multi-thru-light-');
-                                if (hasWRed) return src;
-                                if (hasThruRed) return src.replace(/-multi-thru-red-/i, '-multi-w-red-');
-                                return src;
-                              }
-
-                              if (mode === 'white') {
-                                const hasThruRed = src.toLowerCase().includes('-multi-thru-red-');
-                                const hasWRed = src.toLowerCase().includes('-multi-w-red-');
-                                if (hasThruRed || hasWRed) {
-                                  return hasWRed ? src : src.replace(/-multi-thru-red-/i, '-multi-w-red-');
-                                }
-                                return toWhite(src);
-                              }
-                              if (mode === 'black') {
-                                return toBlack(src);
-                              }
-
-                              return src;
-                            } catch {
-                              return src;
-                            }
-                          };
-
-                          const perTileRaw = (() => {
-                            try {
-                              if (!base) return null;
-                              return resolvePerTileAssetSrc(base);
-                            } catch {
-                              return null;
-                            }
-                          })();
-
-                          const hasPerTileSrcFallback = Array.isArray(stripeTileOverlaySrcs) && !!stripeTileOverlaySrcs[idx];
-                          const picked = (() => {
-                            try {
-                              if (!base) return null;
-                              const candidate = perTileRaw || base;
-                              if (hasPerTileSrcFallback) return candidate;
-                              return resolveDrawingOverlaySrcForTile(candidate) || candidate;
-                            } catch {
-                              return base;
-                            }
-                          })();
 
                           const imgUrl = picked ? encodeURI(picked) : '';
                           return (
@@ -1939,82 +1535,17 @@ function MegaStripePanel({
                                 transform: tileGapPxLocal ? `translateX(${(isPortraitTablet ? (idx % 7) : idx) * tileGapPxLocal}px)` : 'none',
                               }}
                             >
-                              <img
-                                src={imgUrl ? imgUrl : undefined}
-                                alt=""
-                                className="block absolute inset-0"
-                                onError={(e) => {
-                                  try {
-                                    e.currentTarget.style.display = 'none';
-                                  } catch {
-                                  }
-                                }}
-                                style={{
-                                  pointerEvents: 'none',
-                                  height: '100%',
-                                  width: '100%',
-                                  objectFit: 'contain',
-                                  opacity: 0.98,
-                                  transformOrigin: 'top center',
-                                  transform: (() => {
-                                    const cal = getTileCalibration(picked, calibrationOverrides);
-                                    // El calibratge es d'una filera: a la vista vertical
-                                    // la casella es 1/7 d'amplada (en comptes de la de la
-                                    // filera), i els desplacaments en px s'han d'escalar amb
-                                    // la casella perque el dibuix caigui al mateix lloc.
-                                    const fA = (() => {
-                                      const original = Array.isArray(stripeMaskTileRectsRawPct) ? stripeMaskTileRectsRawPct[idx] : null;
-                                      const w1 = Number(original?.width) || 0;
-                                      const w2 = Number(rectsMascara?.[idx]?.width) || 0;
-                                      return (w1 > 0 && w2 > 0) ? w1 / w2 : 1;
-                                    })();
-                                    // A la vista vertical el dibuix no canvia de mida
-                                    // (PASSOS_ESCALA_GAP_DIBUIX_VERTICAL es congelat) i el
-                                    // gap s'estreta MOVENT: el dibuix de l'esquerra de la
-                                    // filera no es mou i la resta es desplacen el 10% de
-                                    // l'espai buit que tenen a l'esquerra
-                                    // (GAP_MOVIMENT_DIBUIX_VERTICAL).
-                                    const factorGap = 0.9 ** PASSOS_ESCALA_GAP_DIBUIX_VERTICAL;
-                                    const escalaGap = isPortraitTablet ? 1 - factorGap * (1 - cal.scale) : cal.scale;
-                                    // La mida dels dibuixos a la vertical (un 20% menys).
-                                    const factorEscalaDibuix = isPortraitTablet
-                                      ? (STRIPE_DRAWING_ESCALA_VERTICAL[canonicalKey(picked)] ?? STRIPE_DRAWING_ESCALA_VERTICAL[picked] ?? 1)
-                                      : 1;
-                                    const escalaDibuix = isPortraitTablet ? escalaGap * ESCALA_DIBUIX_VERTICAL * factorEscalaDibuix : escalaGap;
-                                    // A la vista vertical el dy es el propi de la
-                                    // vertical (la base de la impressio, alineada amb
-                                    // THE HUMAN INSIDE); a la resta de vistes, el de sempre.
-                                    // Els calibratges es van fer amb la franja a escala 2,116
-                                    // i ara va a 2,059: compensem el factor perque els
-                                    // desplaçaments (en px, dins l'embolcall escalat) no
-                                    // s'encongeixin amb ella.
-                                    const factorEscalaFranja = 1.027683;
-                                    const dyDibuix = isPortraitTablet
-                                      ? (STRIPE_DRAWING_DY_VERTICAL[canonicalKey(picked)] ?? STRIPE_DRAWING_DY_VERTICAL[picked] ?? cal.dy) * factorEscalaFranja
-                                      : cal.dy;
-                                    if (idx % 7 === 0) {
-                                      gapDibuixAcumulat = 0;
-                                      gapDibuixEscalaAnterior = null;
-                                    }
-                                    if (isPortraitTablet) {
-                                      if (gapDibuixEscalaAnterior != null) {
-                                        const gapAmbAnterior = 1 - (gapDibuixEscalaAnterior + escalaDibuix) / 2;
-                                        gapDibuixAcumulat += (1 - GAP_MOVIMENT_DIBUIX_VERTICAL) * gapAmbAnterior;
-                                      }
-                                      gapDibuixEscalaAnterior = escalaDibuix;
-                                    }
-                                    const desplacamentGap = isPortraitTablet ? -100 * gapDibuixAcumulat : 0;
-                                    const dxDibuix = isPortraitTablet
-                                      ? (cal.dx + (STRIPE_DRAWING_DX_VERTICAL[canonicalKey(picked)] ?? STRIPE_DRAWING_DX_VERTICAL[picked] ?? 0)) * factorEscalaFranja
-                                      : cal.dx;
-                                    return `translate(calc(${dxDibuix}px * ${fA} + ${desplacamentGap}% + var(--hgStripeDrawingExtraDx, 0px)), calc(${dyDibuix}px + var(--hgStripeDrawingExtraDy, -5px)${idx < 7 ? ' + var(--hgStripeDrawingExtraDyFilaDalt, 0px)' : ''})) scale(calc(${escalaDibuix} * var(--hgStripeDrawingExtraScale, 1)))`;
-                                  })(),
-                                  filter: (() => {
-                                    return 'none';
-                                  })(),
-                                }}
-                                loading={idx === 0 ? 'eager' : 'lazy'}
-                                decoding="async"
+                              <DibuixFranja
+                                picked={picked}
+                                idx={idx}
+                                desplacamentGap={gapsDibuixFranjaFallback[idx]}
+                                calibrationOverrides={calibrationOverrides}
+                                stripeMaskTileRectsRawPct={stripeMaskTileRectsRawPct}
+                                rectsMascara={rectsMascara}
+                                isPortraitTablet={isPortraitTablet}
+                                active={active}
+                                drawingOverlayDebug={drawingOverlayDebug}
+                                factorCalibratgeVertical={FACTOR_ESCALA_CALIBRATGES_VERTICAL_P2}
                               />
                             </div>
                           );

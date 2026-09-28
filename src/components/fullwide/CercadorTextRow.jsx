@@ -788,8 +788,16 @@ export function CercadorDibuixosGraella({
               // composicio i sumar-l'hi movia la segona filera (i amb ella el
               // centratge del selector i les caselles del vel: «els dibuixos es
               // veuen per sobre el vel»).
-              ? alcadaFila - desnivellsLinies.segona + (senseFletxes ? gapV + DESPLACAMENT_FILES_P1_PX : 0)
-              : -desnivellsLinies.primera + (senseFletxes ? DESPLACAMENT_FILES_P1_PX : 0)}px`,
+              //
+              // A LA VERTICAL, SENSE DESNIVELL (28/09/2026). Els `desnivellsLinies`
+              // son el escalonat de les dues linies de la composicio horitzontal
+              // (15,4 px a 768): alla la fila 2 baixa `alcadaFila − segona`, i a la
+              // vertical aixo deixava el pas entre files en 18,7 px en lloc de
+              // 34,1 — o sigui que la fila de dalt no podia quadrar amb el boto
+              // BLANC. A la vertical les dues files van a pas de peça, que es el
+              // que fa que coincideixin amb BLANC i COLOR del selector.
+              ? alcadaFila - (isPortraitTablet ? 0 : desnivellsLinies.segona) + (senseFletxes ? gapV + DESPLACAMENT_FILES_P1_PX : 0)
+              : -(isPortraitTablet ? 0 : desnivellsLinies.primera) + (senseFletxes ? DESPLACAMENT_FILES_P1_PX : 0)}px`,
           } : null),
           // Amb `tilesPercent` la tile s'encongeix dins la seva casella
           // (el centre no es mou).
