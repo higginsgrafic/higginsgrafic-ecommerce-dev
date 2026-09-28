@@ -237,7 +237,9 @@ export function FirstContactDibuix00Buttons({
                 textTransform: 'uppercase',
                 // El desactivat s'apaga (seguint la convencio de la casa: el
                 // gris fluix i el cursor de prohibida), pero el nom s'hi veu.
-                color: desactivat ? '#C4C8CE' : (selectedKey === btn.key ? '#1A1A1A' : '#6B7280'),
+                // LA PARAULA COLOR, TAMBE EN NEGRE (28/09/2026, ho ha demanat
+                // l'amo): es l'acabat de colors i es sempre fosca, triat o no.
+                color: desactivat ? '#C4C8CE' : ((selectedKey === btn.key || btn.key === 'color') ? '#1A1A1A' : '#6B7280'),
                 pointerEvents: 'none',
                 lineHeight: 1,
                 transition: 'color 200ms ease',
