@@ -479,10 +479,10 @@ function MegaStripePanel({
   // sola filera).
   const rectsMascara = (Array.isArray(stripeMaskTileRectsRawPct) && stripeMaskTileRectsRawPct.length === 14 && isPortraitTablet)
     ? stripeMaskTileRectsRawPct.map((r, idx) => ({
-      // EL PAS OBERT UN 2% (28/09/2026). El de sempre es 100/7 = 14,29% i les
+      // EL PAS OBERT UN 5% (28/09/2026). El de sempre es 100/7 = 14,29% i les
       // caselles s'obren desde la primera, que no es mou: el centre de la
-      // setena queda al 94,6%, dins del requadre.
-      left: (100 / 7) * 0.5 + (idx % 7) * (100 / 7) * 1.02 - (100 / 7) * 0.5,
+      // setena queda al 97,1%, dins del requadre.
+      left: (100 / 7) * 0.5 + (idx % 7) * (100 / 7) * 1.05 - (100 / 7) * 0.5,
       width: 100 / 7,
       top: idx < 7 ? 0 : 50,
       height: 50,
