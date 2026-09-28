@@ -1172,18 +1172,11 @@ export function CercadorColleccionsColumna({
   // grisa, enrasat a la dreta i repartides per tota l'alcada; sense, es la
   // llista de sempre de la filera de la pagina 2.
   if (caixes) {
-    // Els noms de la taula: els temes d'Austen hi son amb el prefix AUSTEN/.
-    const llista = [
-      { key: 'first_contact', label: 'FIRST CONTACT' },
-      { key: 'the_human_inside', label: 'THE HUMAN INSIDE' },
-      { key: 'austen:pemberley', label: 'AUSTEN/PEMBERLEY' },
-      { key: 'austen:keep_calm', label: 'AUSTEN/KEEP CALM' },
-      { key: 'austen:quotes', label: 'AUSTEN/QUOTES' },
-      { key: 'austen:crosswords', label: 'AUSTEN/CROSSWORDS' },
-      { key: 'austen:looking_for_my_darcy', label: 'AUSTEN/LFMD' },
-      { key: 'cube', label: 'CUBE' },
-      { key: 'miscellania', label: 'MISCEL·LÀNIA' },
-    ];
+    // ELS MATEIXOS NOMS QUE LA COLUMNA DE LA P2 HORITZONTAL (28/09/2026, ho ha
+    // demanat l'amo): la seva mateixa llista (`CERCADOR_COLLECTIONS`), amb les
+    // seves claus i les seves etiquetes. Abans aquesta branca portava una llista
+    // escrita a ma i els noms no coincidien.
+    const llista = CERCADOR_COLLECTIONS;
     return (
       <div
         data-colleccions-caixes="1"
