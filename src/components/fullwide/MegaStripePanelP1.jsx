@@ -564,7 +564,14 @@ function MegaStripePanelP1({
                   alcadaCarruselPx={alcadaFileraPx}
                   midaSelector={MIDA_BLOC_DRETA_PAGINA1_PX}
                   onSelectGroup={(collection, subcollection, firstStripeItem) => {
-                    if (collection !== active) setActive?.(collection);
+                    // NOME'S ES TRIa EL DIBUIX, NO ES CANVIA DE COLLECCIO
+                    // (28/09/2026). En Marc: «Quan cliques el dibuix surt
+                    // disparat. Recorda que a la p1 no ho veiem per colleccions
+                    // sino per dibuixos individuals»: la graella de la p1 ensenya
+                    // els 64 dibuixos de totes les colleccions, i clicar-ne un
+                    // nome's l'ha de triar (la franja passa a ensenyar els seus
+                    // catorze colors). Abans hi havia `setActive?.(collection)`,
+                    // que canviava la pagina sencera de colleccio.
                     setStripeOverlayOverrideActive(false);
                     if (firstStripeItem) {
                       if (collection === 'first_contact') setFirstContactSelectedItem(firstStripeItem);
