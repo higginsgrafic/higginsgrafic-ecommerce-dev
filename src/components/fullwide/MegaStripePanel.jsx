@@ -477,13 +477,26 @@ function MegaStripePanel({
   // A la vista vertical la franja son DUES fileres de 7: les 14 posicions de
   // la mascara es reparteixen 7 a dalt i 7 a baix (a l'apaisada van en una
   // sola filera).
+  // LES CASELLES: L'HORITZONTAL, DE LA MESURA (28/09/2026).
+  //
+  // Aqui es sobreescrivia TOT amb una graella uniforme d'1/7. Pero les
+  // samarretes de la imatge no estan a 1/7 — la primera i l'ultima hi entren
+  // senceres, amb manigues, i el seu centre cau mes endins — i el pas dels
+  // dibuixos quedava curt: mesurat dibuix a dibuix, el primer anava 18,8 px a
+  // la dreta del centre de la seva samarreta i l'ultim 19,7 a l'esquerra, 6,4 px
+  // per casella. Ara l'amplada i la posicio horitzontal son les mesurades
+  // (ordenades com les pinta el panell: filera de dalt 0-6 i de baix 7-13), i la
+  // vertical es queda a les meitats de sempre, que es la base que espera la
+  // col·locacio dels dibuixos.
   const rectsMascara = (Array.isArray(stripeMaskTileRectsRawPct) && stripeMaskTileRectsRawPct.length === 14 && isPortraitTablet)
-    ? stripeMaskTileRectsRawPct.map((r, idx) => ({
-      left: (idx % 7) * (100 / 7),
-      width: 100 / 7,
-      top: idx < 7 ? 0 : 50,
-      height: 50,
-    }))
+    ? [...stripeMaskTileRectsRawPct]
+      .sort((a, b) => ((a.top || 0) - (b.top || 0)) || ((a.left || 0) - (b.left || 0)))
+      .map((r, idx) => ({
+        left: r.left,
+        width: r.width,
+        top: idx < 7 ? 0 : 50,
+        height: 50,
+      }))
     : stripeMaskTileRectsRawPct;
   // Estat de pas per al desplaçament dels dibuixos de la franja a la vista
   // vertical: el primer dibuix de cada filera de 7 no es mou i la resta es
