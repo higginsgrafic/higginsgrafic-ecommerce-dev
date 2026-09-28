@@ -1196,7 +1196,18 @@ export function CercadorColleccionsColumna({
           // ELS ENLLAÇOS, UNA MIQUETA MES JUNTS (28/09/2026, ho ha demanat
           // l'amo per poder fer la pastilla una mica mes alta): files de 25 px,
           // centrades a la casella, en lloc de repartir-se tota l'alcada.
-          gridTemplateRows: `repeat(${llista.length}, 1fr)`,
+          // LES FILERES, CLAVADES (28/09/2026, ho ha demanat l'amo): `1fr` vol
+          // dir `minmax(auto, 1fr)`, i el minim d'una filera es el seu
+          // contingut. Com que la pastilla activa fa 5 px de marge mes 24,6 px
+          // = 29,6 px, la filera activa no podia quedar-se a 26,6 px i s'inflava
+          // a 29,59: les altres vuit es repartien la resta i queien a 26,59. La
+          // suma quadra exacta (29,6 + 8 x 26,6 = 242,4), i per aixo totes les
+          // fileres de sota l'activa baixaven 3 px en canviar de colleccio.
+          // Amb `minmax(0, 1fr)` el minim es 0: les nou fileres fan 26,93 px
+          // sempre i no es mou cap nom. La pastilla que queda a la vora de la
+          // caixa (primera i ultima filera) hi surt 2,67 px, pero el veinat es
+          // transparent i el seu text comenca 7,46 px endins: no s'hi toca.
+          gridTemplateRows: `repeat(${llista.length}, minmax(0, 1fr))`,
           alignContent: 'center',
           rowGap: 0,
           minHeight: 0,
@@ -1204,10 +1215,11 @@ export function CercadorColleccionsColumna({
       >
         {llista.map(({ key, label }, idxFila) => {
           // LA PRIMERA I L'ULTIMA FILERA (28/09/2026, ho ha demanat l'amo): amb
-          // nou files de 27,15 px, una pastilla de 24,6 px no pot tenir 5 px a
-          // dalt i 5 px a baix alhora (caldrien files de 36,6 px). Ancorant la
+          // nou files de 26,93 px, una pastilla de 24,6 px no pot tenir 5 px a
+          // dalt i 5 px a baix alhora (caldrien files de 34,6 px). Ancorant la
           // pastilla a la vora que li toca, el coixi queda igual a dalt i a
           // baix de la columna.
+          const primera = idxFila === 0;
           const ultima = idxFila === llista.length - 1;
           return (
           <button
@@ -1243,16 +1255,25 @@ export function CercadorColleccionsColumna({
               // LA PASTILLA NO ES MODIFICA (28/09/2026, ho ha demanat l'amo):
               // conserva els 24,6 px; nome's s'ancora a la vora, amb el mateix
               // offset de 5 px que hi ha als costats.
-              height: key === activeKey ? '24.6px' : '100%',
+              // LA PRIMERA I L'ULTIMA FILERA NO CANVIEN MAI DE CAIXA
+              // (28/09/2026, ho ha demanat l'amo): son sempre la pastilla de
+              // 24,6 px amb el seu coixi de 5 px, tambe quan no son actives.
+              // Nome's canvia el color de fons, la vora i l'ombra. Aixi el text
+              // cau exactament al mateix lloc en els dos estats i el nom no es
+              // mou gens. (Ancorant-la nome's quan era activa, el text passava
+              // de 13,95 a 17,80 px: 3,85 px de salt.)
+              // Les files del mig omplen la filera quan no son actives, i la
+              // pastilla hi va centrada: com que la filera i la pastilla tenen
+              // el mateix centre, el text tampoc no s'hi mou.
+              height: (primera || ultima || key === activeKey) ? '24.6px' : '100%',
               justifySelf: 'center',
               // ANCORADA A LA VORA QUE LI TOCA (28/09/2026, ho ha demanat
-              // l'amo): a la primera filera, 5 px del top de la filera (6 amb la
-              // vora de la caixa); a l'ultima, 5 px del bottom. Aixi el coixi es
-              // el mateix als dos caps de la columna. Les files del mig, amb la
-              // pastilla centrada.
-              alignSelf: key === activeKey ? (ultima ? 'flex-end' : 'flex-start') : 'center',
-              marginTop: key === activeKey && !ultima ? '5px' : 0,
-              marginBottom: key === activeKey && ultima ? '5px' : 0,
+              // l'amo): a la primera filera, 5 px del top (6 amb la vora de la
+              // caixa); a l'ultima, 5 px del bottom. Aixi el coixi es el mateix
+              // als dos caps de la columna.
+              alignSelf: primera ? 'flex-start' : (ultima ? 'flex-end' : 'center'),
+              marginTop: primera ? '5px' : 0,
+              marginBottom: ultima ? '5px' : 0,
               // LA FONT, AMB EL CRITERI DE LA COLUMNA DE LA P2 HORITZONTAL
               // (28/09/2026, ho ha demanat l'amo): Oswald, 13,5 px, l'activa en
               // regular (400) i la resta en Extra Light (200), en majuscules.
