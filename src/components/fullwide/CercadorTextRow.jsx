@@ -15,6 +15,7 @@ import { carrilPct, carrilLane, carrilPx, readRootCssNumber, getLayoutViewportWi
 import { GRAELLA_DIBUIXOS_ESCALA_VERTICAL } from '../../config/stripeCalibrationsVertical.js';
 import { FirstContactDibuix09Buttons } from './firstContactPanels.jsx';
 import { caminsSiluetes, precarregaSiluetesSamarreta } from './siluetesSamarreta.js';
+import { ESTIL_CAIXA_BLOC } from './estilsBlocs.js';
 
 /**
  * CercadorTextRow
@@ -1187,6 +1188,10 @@ export function CercadorColleccionsColumna({
       <div
         data-colleccions-caixes="1"
         style={{
+          // LA CAIXA DEL SELECTOR (28/09/2026, ho va demanar l'amo): la mateixa
+          // que el bloc BLANC/COLOR/NEGRE (`ESTIL_CAIXA_BLOC`), amb el seu fons i
+          // el seu contorn. Els marges propis de la graella hi van al damunt.
+          ...ESTIL_CAIXA_BLOC,
           width: '100%',
           height: '100%',
           display: 'grid',
@@ -1217,8 +1222,13 @@ export function CercadorColleccionsColumna({
               backgroundColor: key === activeKey ? '#F1F3F5' : 'transparent',
               color: '#2B2B2B',
               fontFamily: 'inherit',
-              fontSize: '8.5pt',
-              fontWeight: 400,
+              // LA FONT, COM LA DE LA COLUMNA DE LA P2 HORITZONTAL (28/09/2026,
+              // ho ha demanat l'amo): la mateixa mida de tauleta i el mateix
+              // gruix (700 el nom actiu, 300 els altres), que es el criteri de
+              // la filera de colleccions.
+              fontSize: (isPortraitTablet || isLandscapeTablet) ? '11px' : `max(10px, ${carrilPx(13)})`,
+              fontWeight: key === activeKey ? 700 : 300,
+              lineHeight: 1.2,
               whiteSpace: 'nowrap',
               overflow: 'hidden',
               textOverflow: 'ellipsis',
