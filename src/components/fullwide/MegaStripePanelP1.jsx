@@ -564,20 +564,18 @@ function MegaStripePanelP1({
                   alcadaCarruselPx={alcadaFileraPx}
                   midaSelector={MIDA_BLOC_DRETA_PAGINA1_PX}
                   onSelectGroup={(collection, subcollection, firstStripeItem) => {
-                    // NOME'S ES TRIa EL DIBUIX, NO ES CANVIA DE COLLECCIO
-                    // (28/09/2026). En Marc: «Quan cliques el dibuix surt
-                    // disparat. Recorda que a la p1 no ho veiem per colleccions
-                    // sino per dibuixos individuals»: la graella de la p1 ensenya
-                    // els 64 dibuixos de totes les colleccions, i clicar-ne un
-                    // nome's l'ha de triar (la franja passa a ensenyar els seus
-                    // catorze colors). Abans hi havia `setActive?.(collection)`,
-                    // que canviava la pagina sencera de colleccio.
+                    // EL CLIC TRIa EL DIBUIX I EL MOSTRA (28/09/2026). En Marc:
+                    // «El clic obre la pdp, pero no mostra el dibuix a la franja
+                    // ni a la graella»: el clic ha de deixar triat aquell dibuix
+                    // (amb la seva colleccio activa, perque la graella i la franja
+                    // l'ensenyin) i NO ha d'obrir la fitxa del producte. La PDP
+                    // s'obre des de les samarretes de la franja, com a la p2.
+                    if (collection !== active) setActive?.(collection);
                     setStripeOverlayOverrideActive(false);
                     if (firstStripeItem) {
                       if (collection === 'first_contact') setFirstContactSelectedItem(firstStripeItem);
                       else if (collection === 'the_human_inside') setHumanInsideSelectedItem(firstStripeItem);
                       else setSelectedItemByCollection((prev) => ({ ...prev, [collection]: firstStripeItem }));
-                      if (typeof onShirtClick === 'function') onShirtClick(collection, firstStripeItem);
                     }
                   }}
                 />
