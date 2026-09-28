@@ -229,8 +229,11 @@ export function FirstContactDibuix00Buttons({
             <span
               className="font-oswald"
               style={{
-                fontSize: `max(10px, ${carrilPx(13.5)})`,
-                fontWeight: 400,
+                // EL CRITERI TIPOGRAFIC DE LA COLUMNA DE COLLECCIONS
+                // (28/09/2026, ho ha demanat l'amo): 12 px, i el nom triat en
+                // regular (400) i la resta en Extra Light (200).
+                fontSize: '12px',
+                fontWeight: selectedKey === btn.key ? 400 : 200,
                 textTransform: 'uppercase',
                 // El desactivat s'apaga (seguint la convencio de la casa: el
                 // gris fluix i el cursor de prohibida), pero el nom s'hi veu.
