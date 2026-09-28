@@ -1264,7 +1264,7 @@ export default function MegaslidePagina2({
                  visibles a 768: 14 / 2,566 = 5,46, i -16,31 es el -5 de sempre
                  menys 11,31 (els 29 px de dalt). */
               <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <div style={{ height: '100%', transform: 'translate(137.45px, -146.7px) scale(2.6828)', transformOrigin: 'right center', '--megaStripeDx': '0px', '--megaStripeDy': '0px', '--hgStripeDrawingExtraDx': '5.46px', '--hgStripeDrawingExtraDxFilaDalt': '0.39px', '--hgStripeDrawingExtraDy': '-32.55px', '--hgStripeDrawingExtraDyFilaDalt': '9.74px', '--hgStripeEmptyVeilAlpha': String(VEL_SAMARRETA_BUIDA_ALFA) }}>
+                <div style={{ height: '100%', transform: 'translate(137.45px, -146.7px) scale(2.6828)', transformOrigin: 'right center', '--megaStripeDx': '0px', '--megaStripeDy': '0px', '--hgStripeDrawingExtraDx': '5.46px', '--hgStripeDrawingExtraDxFilaDalt': '0.39px', '--hgStripeDrawingExtraDy': '-25.05px', '--hgStripeDrawingExtraDyFilaDalt': '2.24px', '--hgStripeEmptyVeilAlpha': String(VEL_SAMARRETA_BUIDA_ALFA) }}>
                   <MegaStripePanel
                     {...propsFranjaP2}
                     isPortraitTablet
