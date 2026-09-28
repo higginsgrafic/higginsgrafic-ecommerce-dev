@@ -145,8 +145,25 @@ export default defineConfig({
     // `netlify dev` també vol aixecar server i poden coincidir un moment.
     port: 3003,
     strictPort: false,
+    // LA MEMORIA CAU DELS DIBUIXOS AL DESENVOLUPAMENT (28/09/2026)
+    // -------------------------------------------------------------------------
+    // Aixo era `no-store`, i amb `no-store` el navegador no pot guardar RES: a
+    // cada canvi de colleccio tornava a baixar les ~100 imatges dels dibuixos
+    // (mesurat: 99 peticions i 1.100 KB cada clic, tambe tornant a una
+    // colleccio ja vista). Es el que feia que cambiar de colleccio semblés
+    // travat.
+    //
+    // En produccio aixo ja esta be: `public/_headers` i `netlify.toml` donen
+    // `/custom_logos/*` un any de memoria cau. Nome's fallava el 3003.
+    //
+    // `no-cache` es el valor que Vite ja posa per defecte a `send()`
+    // (`isEtag ? "no-cache" : "no-store"`): el navegador GUARDA la resposta
+    // pero la revalida sempre. Amb l'ETag que tambe envia Vite, si el fitxer no
+    // ha canviat la resposta es un 304 sense cos, i si l'amo regenera un dibuix
+    // arriba el nou de seguida. O sigui: mai no es veu un dibuix vell, i no es
+    // torna a baixar el que ja es te.
     headers: {
-      'Cache-Control': 'no-store',
+      'Cache-Control': 'no-cache',
     },
     middlewareMode: false,
   },
