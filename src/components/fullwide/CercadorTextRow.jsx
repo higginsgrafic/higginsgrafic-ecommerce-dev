@@ -1233,14 +1233,15 @@ export function CercadorColleccionsColumna({
               // caixa (`sliderInset`), aqui tambe (5 px per costat, 10 en total),
               // i nome's la de la colleccio activa; les altres omplen la filera.
               width: key === activeKey ? 'calc(100% - 10px)' : '100%',
-              // L'OFFSET VERTICAL, COM L'HORITZONTAL (28/09/2026, ho ha demanat
-              // l'amo): la filera menys 12 px (5 d'inset a cada costat mes les
-              // dues vores), que es el maxim que deixa el mateix offset de 6 px
-              // a dalt i a baix que hi ha als costats. Una pastilla de 24,6 px
-              // com la del selector nomes hi cabria amb una filera de 36,6 px.
-              height: key === activeKey ? 'calc(100% - 12px)' : '100%',
+              // LA PASTILLA NO ES MODIFICA (28/09/2026, ho ha demanat l'amo):
+              // conserva els 24,6 px i nome's PUJA, amb el mateix offset de 5 px
+              // a dalt que hi ha als costats.
+              height: key === activeKey ? '24.6px' : '100%',
               justifySelf: 'center',
-              alignSelf: 'center',
+              // Pujada: 5 px del top de la filera (6 amb la vora de la caixa),
+              // la mateixa mesura que l'offset dels costats.
+              alignSelf: 'flex-start',
+              marginTop: key === activeKey ? '5px' : 0,
               // LA FONT, AMB EL CRITERI DE LA COLUMNA DE LA P2 HORITZONTAL
               // (28/09/2026, ho ha demanat l'amo): Oswald, 13,5 px, l'activa en
               // regular (400) i la resta en Extra Light (200), en majuscules.
