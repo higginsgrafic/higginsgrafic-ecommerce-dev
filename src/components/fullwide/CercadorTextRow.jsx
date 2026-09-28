@@ -1205,7 +1205,7 @@ export function CercadorColleccionsColumna({
             key={key}
             type="button"
             onClick={() => onSelect?.(key)}
-            className="font-roboto-condensed"
+            className="font-oswald"
             aria-current={key === activeKey ? 'true' : undefined}
             style={{
               appearance: 'none',
@@ -1220,15 +1220,15 @@ export function CercadorColleccionsColumna({
               // El SELECTOR es la pastilla de fons: nomes la porta la colleccio
               // activa. Cap negreta.
               backgroundColor: key === activeKey ? '#F1F3F5' : 'transparent',
-              color: '#2B2B2B',
+              // LA FONT, AMB EL CRITERI DE LA COLUMNA DE LA P2 HORITZONTAL
+              // (28/09/2026, ho ha demanat l'amo): Oswald, 13,5 px, l'activa en
+              // regular (400) i la resta en Extra Light (200), en majuscules.
+              color: key === activeKey ? '#1A1A1A' : '#6B7280',
               fontFamily: 'inherit',
-              // LA FONT, COM LA DE LA COLUMNA DE LA P2 HORITZONTAL (28/09/2026,
-              // ho ha demanat l'amo): la mateixa mida de tauleta i el mateix
-              // gruix (700 el nom actiu, 300 els altres), que es el criteri de
-              // la filera de colleccions.
-              fontSize: (isPortraitTablet || isLandscapeTablet) ? '11px' : `max(10px, ${carrilPx(13)})`,
-              fontWeight: key === activeKey ? 700 : 300,
-              lineHeight: 1.2,
+              fontSize: (isPortraitTablet || isLandscapeTablet) ? 'max(10px, 13.5px)' : `max(10px, ${carrilPx(13.5)})`,
+              fontWeight: key === activeKey ? 400 : 200,
+              textTransform: 'uppercase',
+              lineHeight: 1,
               whiteSpace: 'nowrap',
               overflow: 'hidden',
               textOverflow: 'ellipsis',
