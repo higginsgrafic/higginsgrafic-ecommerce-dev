@@ -40,7 +40,7 @@ export function alturaTaulaVertical(ampleFinestra) {
  * per validar on cau cada casella. La casella ja porta un `border` d'1 px (era
  * transparent justament perque la geometria no es mogues en amagar-lo): aqui
  * nome's se li dona color, o sigui que les mides no canvien gens. */
-const MOSTRA_CONTORNS_TAULA = true;
+const MOSTRA_CONTORNS_TAULA = false;
 const COLOR_CONTORN_TAULA = 'rgba(0, 140, 255, 0.5)';
 
 /** L'estil d'una casella. El contorn es transparent (no `none`) perque la
