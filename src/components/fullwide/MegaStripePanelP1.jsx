@@ -647,12 +647,23 @@ function MegaStripePanelP1({
                   flexDirection: 'row',
                   alignItems: 'flex-start',
                   justifyContent: 'flex-end',
-                  ...ESTIL_CAIXA_BLOC_ALCADA_AUTO,
                 }}
               >
+                {/* LA CAIXA (LA VORA I L'OMBRA DE LA MANIGA), PER SOTA DE LA
+                    FRANJA. Te una capa propia a zIndex 0: es la que ha de quedar
+                    sota la samarreta perque l'ombra no hi caigui a sobre. */}
+                <div
+                  aria-hidden="true"
+                  style={{
+                    position: 'absolute',
+                    inset: 0,
+                    zIndex: 0,
+                    pointerEvents: 'none',
+                    ...ESTIL_CAIXA_BLOC_ALCADA_AUTO,
+                  }}
+                >
                 {ombraManigaP1 && mascaraManigaP1 ? (
                   <div
-                    aria-hidden="true"
                     data-maniga-ombra-p1="1"
                     style={{
                       position: 'absolute',
@@ -686,32 +697,58 @@ function MegaStripePanelP1({
                     }} />
                   </div>
                 ) : null}
-                {/* DUES BOTONERES QUADRADES APILADES: el quadrat de les fletxes a
+                </div>
+                {/* ELS BOTONS, EN UNA CAPA PROPIA PER DAMUNT DE LA FRANJA.
+                    DUES BOTONERES QUADRADES APILADES: el quadrat de les fletxes a
                     DALT i els tres botons del selector a SOTA (28/09/2026, ho va
                     demanar en Marc: «Intercanvia les posicions del selector i les
                     fletxes»). Es van intercanviar les DUES PECES de debo, no
                     nome's el que s'hi pinta: el quadrat de les fletxes passa de
                     la meitat de baix a la de dalt. Els dos quadrats fan el
                     MATEIX (128,7 x 128,3 a 1920), o sigui que l'alcada del bloc,
-                    la de la filera i la de la franja no es mouen. */}
+                    la de la filera i la de la franja no es mouen.
+                    PER QUE UNA CAPA A PART (28/09/2026). En Marc: «Alguna cosa
+                    captura els clics del selector». La franja va a zIndex 4 i la
+                    SEVA capa (amb el coixi de -40 px) arriba fins a x1524, o sigui
+                    que cobreix tot el bloc; els seus fills (el vel a z10 i el
+                    dibuix a z12) apilen DINS seu i guanyen a qualsevol zIndex que
+                    es posi al bloc. Amb les fletxes a baix no es notava (queien
+                    per sota del top de la franja, 226,6), pero amb el selector a
+                    la meitat de baix la franja se li menjava els clics.
+                    Amb la caixa i els botons en DUES capes, cada cosa va on toca:
+                    la caixa (vora + ombra) per sota de la samarreta, com sempre, i
+                    els botons per damunt (zIndex 6, un punt mes que el 4 de la
+                    franja). */}
                 <div style={{
-                  position: 'relative',
-                  zIndex: 1,
+                  position: 'absolute',
+                  inset: 0,
+                  zIndex: 6,
                   height: '100%',
                   width: '100%',
                   display: 'flex',
                   flexDirection: 'column',
+                  justifyContent: 'flex-end',
+                  alignItems: 'flex-end',
                 }}>
                 {/* EL QUADRAT DE DALT: els dos botons de les fletxes. */}
-                <div style={{ flex: '1 1 50%', minHeight: 0, width: '100%' }}>
+                <div style={{ position: 'relative', flex: '1 1 50%', minHeight: 0, width: '100%' }}>
                 <FletxesQuadratPagina1
                   omple
-                  onPrev={() => stepperP1?.(-1)}
-                  onNext={() => stepperP1?.(1)}
+                  // LA DIRECCIO DE LES FLETXES, INVERTIDA (28/09/2026). En Marc: «El
+                  // moviment de la graella amb les fletxes ha de ser al reves». El
+                  // carrusel es pinta amb `translateX(-desplacEf)`, o sigui que
+                  // SUMAR a `desplacGest` mou les peces cap a l'ESQUERRA: amb la
+                  // fletxa de la DRETA («Següent») la graella ha d'AVANÇAR (cap a
+                  // l'esquerra) i amb la de l'ESQUERRA («Anterior») ha de RECULAR.
+                  // Es el MATEIX criteri que la botonera de la p2 (vegeu
+                  // CercadorTextRow), on la fletxa de dalt avança i la de baix
+                  // recula; alla tambe es va haver d'invertir.
+                  onPrev={() => stepperP1?.(1)}
+                  onNext={() => stepperP1?.(-1)}
                 />
                 </div>
                 {/* EL QUADRAT DE SOTA: els tres botons del selector. */}
-                <div style={{ flex: '1 1 50%', minHeight: 0, width: '100%' }}>
+                <div style={{ position: 'relative', flex: '1 1 50%', minHeight: 0, width: '100%' }}>
                 <SelectorQuadratPagina1
                   dinsBloc
                   omple
