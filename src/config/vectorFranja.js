@@ -99,7 +99,10 @@ export const VECTOR_FRANJA_IMPRESSIO_01 = 'M0.282413,0.116358C0.352079,0.086573 
 export const VECTOR_FRANJA_FRANJA_OBERTA = 10;
 export const VECTOR_FRANJA_VIEWBOX_OBERT = {
   width: 1487,
-  height: 694.05 + VECTOR_FRANJA_FRANJA_OBERTA,
+  // L'alcada del contingut del vector (642,02 des del 28/09/2026; era 694,05
+  // amb el vector vell). Si es queda el numero vell, tot el que en surt queda
+  // desviat un 7,5% i el retall talla els dibuixos on no toca.
+  height: VECTOR_FRANJA_CONTINGUT + VECTOR_FRANJA_FRANJA_OBERTA,
 };
 
 /**
