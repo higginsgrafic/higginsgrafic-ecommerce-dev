@@ -810,10 +810,23 @@ export function quantsGrupActiuFranja({ collections, active } = {}) {
  * @param {number} [o.cases=14] cases de la franja
  * @returns {number} el desplacament, arrodonit
  */
-export function desplacamentCentratgeFranja({ quants, n, actual = 0, cases = FRANJA_CASES } = {}) {
+export function desplacamentCentratgeFranja({
+  quants, n, actual = 0, cases = FRANJA_CASES, casaInici = null,
+} = {}) {
   if (!Number.isFinite(quants) || quants <= 0) return Math.round(actual) || 0;
   if (!Number.isFinite(n) || n <= 0) return Math.round(actual) || 0;
-  const objectiuBase = (quants - 1) / 2 - (cases - 1) / 2;
+  // LA CASA ON ARRENCA EL GRUP (28/09/2026, ho va demanat l'amo): «Quan cliques
+  // una colleccio a la p2 ha de sortir tota la colleccio junta a la primera
+  // filera de la franja. No vull que surti a dalt i a baix partida en dos».
+  // Amb les catorze cases repartides en DUES fileres de set, un grup CENTRAT
+  // cau a cavall de la frontera de les dues fileres i surt partit; posant el seu
+  // primer dibuix a la casa 0 surt sencer a la filera de dalt (i, si el grup es
+  // mes llarg de set, continua per la de baix en ordre). `null` = centrat, com
+  // fins ara: a la vista apaisada hi ha UNA sola filera de catorze i alla el
+  // centratge no parteix res.
+  const objectiuBase = casaInici == null
+    ? (quants - 1) / 2 - (cases - 1) / 2
+    : -casaInici;
   const objectiu = objectiuBase + Math.round((actual - objectiuBase) / n) * n;
   return Math.round(objectiu);
 }

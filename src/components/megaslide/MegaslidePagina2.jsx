@@ -512,6 +512,8 @@ export default function MegaslidePagina2({
   const stripeStripOffsetInicial = desplacamentCentratgeFranja({
     quants: quantsGrupActiuFranja({ collections: tiraFranja.collections, active }),
     n: tiraFranja.srcs.length,
+    // A la vertical, el grup arrenca a la primera casa (la filera de dalt).
+    casaInici: isPortraitTablet ? 0 : null,
   });
   const [stripeStripOffset, setStripeStripOffset] = useState(stripeStripOffsetInicial);
   const stripeStripOffsetRef = useRef(stripeStripOffsetInicial);
@@ -589,10 +591,14 @@ export default function MegaslidePagina2({
     // desplaçament que ja hi hagi, perque no faci cap salt (mateix criteri que
     // el centratge de la graella, a `CercadorTextRow`).
     const actual = stripeStripOffsetRef.current;
-    const objectiu = desplacamentCentratgeFranja({ quants, n, actual });
+    // A la vertical, el grup arrenca a la primera casa de la filera de dalt; a
+    // l'apaisada es queda centrat (alla nome's hi ha una filera).
+    const objectiu = desplacamentCentratgeFranja({
+      quants, n, actual, casaInici: isPortraitTablet ? 0 : null,
+    });
     if (objectiu === actual) return;
     aplicaStripOffset(objectiu);
-  }, [stripeStrip, tiraFranja, active, aplicaStripOffset]);
+  }, [stripeStrip, tiraFranja, active, aplicaStripOffset, isPortraitTablet]);
 
   // EL DIBUIX CLICAT D'UNA SAMARRETA VELADA ES QUEDA A LA SEVA CASA
   // (26/09/2026).

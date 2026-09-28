@@ -410,6 +410,25 @@ describe('desplacamentCentratgeFranja', () => {
     expect(desplacamentCentratgeFranja({ quants: 15, n: 64 })).toBe(1);
   });
 
+  // A LA VERTICAL EL GRUP ARRENCA A LA PRIMERA CASA (28/09/2026, ho va demanar
+  // l'amo): «Quan cliques una colleccio a la p2 ha de sortir tota la colleccio
+  // junta a la primera filera de la franja. No vull que surti a dalt i a baix
+  // partida en dos». Amb catorze cases en DUES fileres de set, el grup centrat
+  // cau a cavall de la frontera de les fileres i surt partit; amb `casaInici: 0`
+  // el primer dibuix va a la casa 0, que es la primera de la filera de dalt.
+  it('amb casaInici 0 el grup arrenca a la casa 0, que es la primera de la filera de dalt', () => {
+    // Amb 7 cases (FIRST CONTACT) el grup sencer cau a la filera de dalt.
+    expect(desplacamentCentratgeFranja({ quants: 7, n: 64, casaInici: 0 })).toBe(0);
+    // I amb qualsevol altre gruix: el primer dibuix, sempre a la casa 0.
+    expect(desplacamentCentratgeFranja({ quants: 5, n: 64, casaInici: 0 })).toBe(0);
+    expect(desplacamentCentratgeFranja({ quants: 1, n: 64, casaInici: 0 })).toBe(0);
+    // Segueix triant la volta mes propera al desplaçament que ja hi ha, i no
+    // dona cap salt: des de 61 li toca la volta de davant (64), i des de 2,
+    // enrere (0).
+    expect(desplacamentCentratgeFranja({ quants: 7, n: 64, actual: 61, casaInici: 0 })).toBe(64);
+    expect(desplacamentCentratgeFranja({ quants: 7, n: 64, actual: 2, casaInici: 0 })).toBe(0);
+  });
+
   it('trià la volta mes propera al desplaçament que ja hi ha (no fa cap salt)', () => {
     expect(desplacamentCentratgeFranja({ quants: 7, n: 64, actual: 61 })).toBe(61);
     expect(desplacamentCentratgeFranja({ quants: 7, n: 64, actual: 60 })).toBe(61);
