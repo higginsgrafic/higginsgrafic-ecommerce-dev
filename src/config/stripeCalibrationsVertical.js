@@ -286,36 +286,37 @@ export const VEL_SAMARRETA_BUIDA_ALFA = 0.85;
 export const VEL_SAMARRETA_BUIDA_ALFA_BLANCA = 0.6;
 
 /**
- * EL GRIS DE DESACTIVAT DELS DIBUIXOS DE LES SAMARRETES ATENUADES (28/09/2026).
+ * ELS DIBUIXOS DE LES SAMARRETES ATENUADES, UN 10 % MES FOSCOS QUE EL VEL
+ * (28/09/2026).
  *
- * Ho ha demanat l'amo: «desactiva els dibuixos», «els facis tots d'un color gris
- * desactivat». El dibuix d'una casa que no es de la colleccio activa es pinta
- * amb aquest filtre en lloc del seu color (o del negre de
- * `srcDibuixVelatEnNegre`).
+ * Ho ha demanat l'amo: «Fes els dibuixos del mateix color que el vel, pero un 10%
+ * mes fosc».
  *
- * PER QUE OPACITAT I NO UN INVERT (28/09/2026). El primer intent va ser deixar el
- * dibuix pla amb `brightness(0)` i invertir-lo, i l'amo el va aturar de seguida:
- * «El negre es en escala de grisos. No funcionara» — els dibuixos de casa son
- * IMATGES EN ESCALA DE GRISOS, i invertir-les els capgira els tons (les llums es
- * tornen ombres i el dibuix surt en negatiu). I el segon intent, nome's invertir,
- * encara hauria fet el mateix.
+ * SURT EXACTE, I PER QUe: el dibuix va PER DAMUNT del vel, o sigui que el que te
+ * al darrere es el color del vel (la samarreta esblanqueida). Pintar-hi el dibuix
+ * nome's amb un 10 % de negre el deixa a `0,9 x color del vel`, que es
+ * literalment «el mateix color, un 10 % mes fosc»: les parts d'ink del dibuix
+ * (que son negre) hi cauen just, i els tons intermedis es queden a un 10 % d'allo
+ * que son, que es el que fa que el dibuix segueixi tenint el seu detall.
  *
- * Rebaixar-los l'opacitat es el que fa la casa per atenuar (les peces de la
- * graella que no son de la colleccio activa van a 0,12) i deixa el dibuix amb el
- * SEU detall, nome's que mes fluix. Com que el dibuix va PER DAMUNT del vel, allo
- * que te al darrere ja es la samarreta esblanqueida, i el resultat es el mateix
- * gris de desactivat (`#C4C4C4`, que es el de la casa `#C4C8CE`) tant si la
- * samarreta es blanca com si es negra.
+ * I val per a qualsevol samarreta, perque qui mana es el vel: sobre samarreta
+ * blanca el vel queda blanc i el dibuix surt a #E5E5E5; sobre negra el vel queda
+ * #999999 i el dibuix a #8A8A8A.
+ *
+ * (Els dos intents d'abans no valien: `brightness(0)` aplanava el dibuix, i
+ * invertir-lo no funciona perque les variants negres son IMATGES EN ESCALA DE
+ * GRISOS i invertir-les capgira els tons. Ho va veure l'amo: «El negre es en
+ * escala de grisos. No funcionara».)
  */
-export const FILTRE_DIBUIX_DESACTIVAT = 'opacity(0.25)';
+export const FILTRE_DIBUIX_DESACTIVAT = 'opacity(0.1)';
 
 /**
- * El mateix, pero per als dibuixos que NOME'S existeixen en color (els solids i
- * els marcs de LOOKING FOR MY DARCY, que `srcDibuixVelatEnNegre` deixa en color a
- * posta): primer se'ls treu el color i despres se'ls rebaixa, que tambe queden
- * grisos i amb el seu detall.
+ * El mateix per als dibuixos que NOME'S existeixen en color (els solids i els
+ * marcs de LOOKING FOR MY DARCY, que `srcDibuixVelatEnNegre` deixa en color a
+ * posta): se'ls treu el color abans de rebaixar-los, perque allo no pot entrar
+ * al calcul del 10 % com a negre.
  */
-export const FILTRE_DIBUIX_DESACTIVAT_COLOR = 'grayscale(1) opacity(0.25)';
+export const FILTRE_DIBUIX_DESACTIVAT_COLOR = 'grayscale(1) opacity(0.1)';
 
 /**
  * CAP DIBUIX PORTA MIRALL, MAI, si no es demana de forma expressa.
