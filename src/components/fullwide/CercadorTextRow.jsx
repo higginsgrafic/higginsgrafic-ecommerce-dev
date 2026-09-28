@@ -388,6 +388,10 @@ export function CercadorDibuixosGraella({
   isPortraitTablet = false,
   isLandscapeTablet = false,
   fontBoost = 0,
+  /** SENSE ATENUACIO (28/09/2026). A la graella de la p1 els dibuixos de les
+   *  colleccions que no son l'activa NO s'atenuen (ho va demanar en Marc: «Treu
+   *  el vel de la p1»): es veuen tots al 100 %. A la p2 es queda el 0,12. */
+  senseAtenuacio = false,
   // L'amplada de la columna del selector Blanc/Color/Negre, en unitats del
   // carril: les fletxes del carrusel fan el mateix bloc que el selector.
   midaSelector = 56,
@@ -731,9 +735,10 @@ export function CercadorDibuixosGraella({
   };
 
   const pintaItem = ({ label, collection, subcollection, stripeItem }, i) => {
-    const dimmed = activeCollection && collection !== activeCollection
+    // SENSE ATENUACIO A LA P1 (28/09/2026): alla `dimmed` no s'aplica mai.
+    const dimmed = !senseAtenuacio && (activeCollection && collection !== activeCollection
       ? true
-      : activeCollection === 'austen' && collection === 'austen' && activeSubcollection && subcollection !== activeSubcollection;
+      : activeCollection === 'austen' && collection === 'austen' && activeSubcollection && subcollection !== activeSubcollection);
     const dibuix = dibuixDelNom(label);
     // A la vista vertical, alguns dibuixos es pinten mes grans o mes petits
     // dins la seva casella (GRAELLA_DIBUIXOS_ESCALA_VERTICAL).

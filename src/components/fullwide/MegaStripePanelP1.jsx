@@ -1,7 +1,8 @@
-import { useEffect, useId, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useId, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import MegaColumn from './MegaColumn.jsx';
 import ClicAreaOverlayP1 from './ClicAreaOverlayP1.jsx';
 import { CERCADOR_COLORS } from './CercadorTopBar.jsx';
+import { computeStripeTileOverlaySrcs } from '../../utils/resolveStripeTile.js';
 import { dibuixosGraella16x4 } from './CercadorTextRow.jsx';
 import GraellaDuesFileresPagina1 from './GraellaDuesFileresPagina1.jsx';
 import { SelectorQuadratPagina1, FletxesQuadratPagina1, MIDA_BLOC_DRETA_PAGINA1_PX } from './BlocDretaPagina1.jsx';
@@ -203,6 +204,9 @@ function MegaStripePanelP1({
   stripeImageSrc,
   active,
   resolvedMega,
+  // LA LLISTA DE DIBUIXOS DE LA COLLECCIO ACTIVA (28/09/2026), amb la
+  // subcolleccio d'Austen ja filtrada. La fa servir el SCROLL de la franja.
+  resolvedMegaFiltered,
   showStripe,
   stripeRowPadPx,
   stripeRowPadXPx,
@@ -236,6 +240,12 @@ function MegaStripePanelP1({
   setFirstContactVariant,
   setHumanInsideVariant,
   setThinStartIndex,
+  // LA PECA TRIADA DE CADA COLLECCIO (28/09/2026): les necessita el SCROLL de la
+  // franja per saber per on va (l'index surt de la peca triada, no d'un
+  // comptador propi).
+  firstContactSelectedItem,
+  humanInsideSelectedItem,
+  selectedItemByCollection,
   setFirstContactSelectedItem,
   setHumanInsideSelectedItem,
   setSelectedItemByCollection,
@@ -289,6 +299,105 @@ function MegaStripePanelP1({
   const filaFranjaRef = useRef(null);
   const { factor: factorCarrilFranja, centre: centreCarrilFranja } = useEscalaFranjaCarril(filaFranjaRef, ajustFranjaCarril);
   const [pageLift, setPageLift] = useState(0);
+  // EL SCROLL DE LA FRANJA DE LA P1 (28/09/2026). En Marc: «Aplica-li un scroll
+  // als dibuixos de la franja. Com que a la franja de p1 nome's es mostra un
+  // dibuix cada vegada, la franja canviara tota sencera cada cop».
+  //
+  // A la p1 cada samarreta ensenya el MATEIX dibuix (el de la peca triada), o
+  // sigui que el que ha de fer la rodeta es passar d'un dibuix a un altre: cada
+  // pas tria el dibuix seguent de la colleccio ACTIVA i les catorze samarretes
+  // canvien alhora. A la p2 el que circula es una llista de 64 posicions per les
+  // catorze cases (`stripeStripOffset`); alla, doncs, el pas es un gir.
+  //
+  // El dibuix NO es desa en un estat propi: es tria la PECA (`setSelectedItem...`)
+  // i el cami de la imatge surt de `resolvedOverlaySrc`, que es el MATEIX circuit
+  // que el clic a la graella. Amb un estat paral·lel hi hauria dues veritats.
+  const dibuixosFranja = useMemo(() => {
+    const cols = resolvedMegaFiltered?.[active];
+    const llista = Array.isArray(cols) && cols.length ? (cols[0]?.items || []) : [];
+    const drawable = llista.filter((it) => it && typeof it === 'string' && !it.startsWith('__'));
+    if (!drawable.length) return [];
+    const variant = active === 'the_human_inside' ? humanInsideVariant : firstContactVariant;
+    const srcs = computeStripeTileOverlaySrcs({
+      drawable,
+      variant,
+      active,
+      displayedShirtColor: shirtColor,
+      resolvedOverlaySrc,
+      limit: drawable.length,
+    });
+    return drawable.filter((_, i) => Boolean(srcs?.[i]));
+  }, [resolvedMegaFiltered, active, humanInsideVariant, firstContactVariant, shirtColor, resolvedOverlaySrc]);
+  // L'INDEX surt de la peca TRIADA, no d'un comptador propi: aixi, en canviar de
+  // colleccio no hi ha cap estat que valgui per a una altra llista i no cal cap
+  // efecte de reinici.
+  const triaDibuixFranja = useCallback((passos) => {
+    const n = dibuixosFranja.length;
+    if (!n) return;
+    const actual = (active === 'first_contact' ? firstContactSelectedItem
+      : active === 'the_human_inside' ? humanInsideSelectedItem
+        : (selectedItemByCollection?.[active] ?? null));
+    const idx = Math.max(0, dibuixosFranja.indexOf(actual));
+    const dibuix = dibuixosFranja[(((idx + passos) % n) + n) % n];
+    if (!dibuix) return;
+    if (active === 'first_contact') setFirstContactSelectedItem?.(dibuix);
+    else if (active === 'the_human_inside') setHumanInsideSelectedItem?.(dibuix);
+    else setSelectedItemByCollection?.((prev) => ({ ...prev, [active]: dibuix }));
+  }, [dibuixosFranja, active, firstContactSelectedItem, humanInsideSelectedItem, selectedItemByCollection, setFirstContactSelectedItem, setHumanInsideSelectedItem, setSelectedItemByCollection]);
+  // Els gestos llegeixen la funcio a traves d'un ref: la llista de dibuixos i la
+  // peca triada canvien a cada clic, i amb la funcio capturada dins del listener
+  // la rodeta es quedaria amb la primera.
+  const triaDibuixFranjaRef = useRef(triaDibuixFranja);
+  useEffect(() => { triaDibuixFranjaRef.current = triaDibuixFranja; }, [triaDibuixFranja]);
+  // EL SCROLL, LLIGAT A L'ELEMENT (28/09/2026). Amb un efecte que mira
+  // `filaFranjaRef.current` hi havia un forat: la franja nome's es munta quan
+  // `showStripe` es cert, i l'efecte podia haver corregut abans. Amb una funcio
+  // de ref, els gestos s'hi enganxen exactament quan l'element apareix.
+  const desaGestosFranjaRef = useRef({ el: null, net: null });
+  const refGestosFranja = useCallback((el) => {
+    const previ = desaGestosFranjaRef.current;
+    if (previ.net) previ.net();
+    if (!el) {
+      desaGestosFranjaRef.current = { el: null, net: null };
+      return;
+    }
+    let ultim = 0;
+    const rodeta = (e) => {
+      if (!dibuixosFranja.length) return;
+      const d = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
+      if (!d) return;
+      e.preventDefault();
+      if (e.timeStamp - ultim < 90) return;
+      ultim = e.timeStamp;
+      triaDibuixFranjaRef.current(d > 0 ? 1 : -1);
+    };
+    // El gest d'arrossegar, amb la mateixa forma que la p2.
+    let arrossegant = null;
+    const baix = (e) => { arrossegant = e.clientX; };
+    const mou = (e) => {
+      if (arrossegant == null) return;
+      const dx = e.clientX - arrossegant;
+      if (Math.abs(dx) < 18) return;
+      arrossegant = e.clientX;
+      triaDibuixFranjaRef.current(dx > 0 ? -1 : 1);
+    };
+    const aixeca = () => { arrossegant = null; };
+    el.addEventListener('wheel', rodeta, { passive: false });
+    el.addEventListener('pointerdown', baix);
+    el.addEventListener('pointermove', mou);
+    el.addEventListener('pointerup', aixeca);
+    el.addEventListener('pointercancel', aixeca);
+    desaGestosFranjaRef.current = {
+      el,
+      net: () => {
+        el.removeEventListener('wheel', rodeta);
+        el.removeEventListener('pointerdown', baix);
+        el.removeEventListener('pointermove', mou);
+        el.removeEventListener('pointerup', aixeca);
+        el.removeEventListener('pointercancel', aixeca);
+      },
+    };
+  }, [dibuixosFranja.length]);
   // Franja estreta (768-1366 en horitzontal): hi ha ajustos propis de 10 px i
   // l'ajust general de la franja no s'hi aplica. La condicio es declarada
   // (`esBandaEstretaFranja`): es la MATEIXA que fa servir la pagina 2.
@@ -811,7 +920,10 @@ function MegaStripePanelP1({
 
             <div
               id="stripe-guide-stripe-row-p1"
-              ref={filaFranjaRef}
+              ref={(el) => {
+                filaFranjaRef.current = el;
+                refGestosFranja(el);
+              }}
               className="relative inline-block"
               style={{
                 height: carrilPx(stripePreviewHPx),

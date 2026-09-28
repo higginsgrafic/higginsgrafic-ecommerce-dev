@@ -312,6 +312,11 @@ export default function MegaMenuPanel({
   const propsFranjaP1 = {
     active: active,
     resolvedMega: resolvedMega,
+    // LA LLISTA DE DIBUIXOS DE LA COLLECCIO ACTIVA (28/09/2026): la fa servir el
+    // SCROLL de la franja de la p1 («Aplica-li un scroll als dibuixos de la
+    // franja»). Es la MATEIXA llista que gasta la franja de la p2
+    // (`resolvedMegaFiltered`, amb la subcolleccio d'Austen ja aplicada).
+    resolvedMegaFiltered: resolvedMegaFiltered,
     // La graella de la pagina 1 tambe pot canviar de colleccio (B2).
     setActive: setActive,
     // I de SUBCALLECCIO (28/09/2026): les dues graelles de la p1 (la filera i la
@@ -350,6 +355,10 @@ export default function MegaMenuPanel({
     setFirstContactVariant: setFirstContactVariant,
     setHumanInsideVariant: setHumanInsideVariant,
     setThinStartIndex: setThinStartIndex,
+    // LES PECES TRIADES (28/09/2026): les llegeix el SCROLL de la franja de la p1.
+    firstContactSelectedItem: firstContactSelectedItem,
+    humanInsideSelectedItem: humanInsideSelectedItem,
+    selectedItemByCollection: selectedItemByCollection,
     setFirstContactSelectedItem: setFirstContactSelectedItem,
     setHumanInsideSelectedItem: setHumanInsideSelectedItem,
     setSelectedItemByCollection: setSelectedItemByCollection,
@@ -536,6 +545,9 @@ export default function MegaMenuPanel({
                               tilesPercent={85}
                               activeCollection={active}
                               activeSubcollection={austenSubcollection}
+                              /* LA P1 NO ATENUA LES ALTRES COLLECCIONS
+                                 (28/09/2026, «Treu el vel de la p1»). */
+                              senseAtenuacio
                               isPortraitTablet
                               /* El tap en un dibuix el tria, igual que a la
                                  filera de la pagina 2. */

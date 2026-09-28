@@ -158,6 +158,9 @@ export default function GraellaDuesFileresPagina1({
         onStepper={onStepper}
         activeCollection={activeCollection}
         activeSubcollection={activeSubcollection}
+        // LA P1 NO ATENUA LES ALTRES COLLECCIONS (28/09/2026, «Treu el vel de la
+        // p1»): a la p2 es queden al 0,12.
+        senseAtenuacio
         onSelectGroup={onSelectGroup}
         onHoverItem={onHoverItem}
         onHoverLeave={onHoverLeave}
