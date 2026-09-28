@@ -1196,7 +1196,12 @@ export function CercadorColleccionsColumna({
           // ELS ENLLAÇOS, UNA MIQUETA MES JUNTS (28/09/2026, ho ha demanat
           // l'amo per poder fer la pastilla una mica mes alta): files de 25 px,
           // centrades a la casella, en lloc de repartir-se tota l'alcada.
-          gridTemplateRows: `repeat(${llista.length}, 25px)`,
+          // LES FILES OMPLEN LA CAIXA (28/09/2026, ho ha demanat l'amo: que
+          // l'offset vertical sigui el mateix que l'horitzontal). Amb files de
+          // 25 px quedaven 19 px d'aire a dalt i a baix i la pastilla hi surt
+          // amb mes separacio que als costats; omplint la caixa, l'offset de
+          // 5 px (+1 de vora) es igual als quatre costats.
+          gridTemplateRows: `repeat(${llista.length}, 1fr)`,
           alignContent: 'center',
           rowGap: 0,
           minHeight: 0,
