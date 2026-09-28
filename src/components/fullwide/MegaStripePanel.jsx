@@ -1017,10 +1017,16 @@ function MegaStripePanel({
                       Mateixa caixa i mateix aspecte que la imatge de la franja
                       (es desplacen de la mateixa manera: les dues van amb
                       `height: 100%`), i la silueta nomes cau damunt de la
-                      samarreta. Es queda per sota de la capa dels DIBUIXOS: alla
-                      el dibuix de les velades va a opacitat plena i en NEGRE
-                      (28/09/2026), de manera que el vel nome's afecta la roba i
-                      el dibuix es llegeix sobre qualsevol fons. */}
+                      samarreta.
+
+                      PER DAMUNT DE LA CAPA DELS DIBUIXOS (28/09/2026, ho ha
+                      demanat l'amo: «A les samarretes atenuades, el dibuix ha
+                      d'anar per sota del vel i ara es per sobre»). Fins avui
+                      anava a `zIndex: 6` i els dibuixos a 12, o sigui que el
+                      dibuix de les cases velades quedava NEGRE i nítid per
+                      damunt del vel, i nome's s'atenuava la roba. Ara el vel va
+                      a `zIndex: 13`: cau damunt de la roba I del dibuix, i la
+                      casa inactiva s'atenua sencera. */}
                   {velSamarretesInactivesUrl ? (
                     <img
                       src={velSamarretesInactivesUrl}
@@ -1034,7 +1040,7 @@ function MegaStripePanel({
                         width: 'auto',
                         maxWidth: 'none',
                         pointerEvents: 'none',
-                        zIndex: 6,
+                        zIndex: 13,
                       }}
                       loading="eager"
                       decoding="async"
@@ -1074,32 +1080,9 @@ function MegaStripePanel({
                             <path key={`hg-clip-${k}`} d={d} />
                           ))}
                         </clipPath>
-                        {/* EL VEL NO TACA LES SAMARRETES ACTIVES (26/09/2026):
-                            les siluetes de les cases actives, en negre, sobre un
-                            fons blanc. La silueta d'una casa es mes ampla que el
-                            pas de les cases (la maniga arriba a la del costat), i
-                            sense aixo el vel d'una casa inactiva tacava la
-                            samarreta activa del costat. Vegeu
-                            `generaVelDataUrl`, que fa el mateix amb la imatge. */}
-                        {inactivesVel.size > 0 ? (
-                          <mask
-                            id={idMascaraVelActives}
-                            style={{ maskType: 'luminance' }}
-                            maskUnits="userSpaceOnUse"
-                            x={0}
-                            y={0}
-                            width={VECTOR_FRANJA_VIEWBOX_OBERT.width}
-                            height={VECTOR_FRANJA_CONTINGUT}
-                          >
-                            <rect x={0} y={0} width={VECTOR_FRANJA_VIEWBOX_OBERT.width} height={VECTOR_FRANJA_CONTINGUT} fill="#FFFFFF" />
-                            {/* Casa per casa, en ordre, com a la imatge del vel: la
-                                silueta blanca on la casa demana vel i negra on es
-                                activa, perque l'ultima pintada es la que es veu. */}
-                            {Array.from({ length: 14 }, (_, k) => k).map((k) => (
-                              <path key={`hg-vel-casa-${k}`} d={VECTOR_FRANJA_SAMARRETES[k]} fill={inactivesVel.has(k) ? '#FFFFFF' : '#000000'} />
-                            ))}
-                          </mask>
-                        ) : null}
+                        {/* EL VEL DE LES INACTIVES JA NO ES AQUI (28/09/2026): ha
+                            pujat a la seva propia capa (`zIndex: 13`), per damunt
+                            dels dibuixos. Vegeu el final d'aquest contenidor. */}
                       </defs>
                       {stripeImageSrc ? (
                         <image
@@ -1200,37 +1183,10 @@ function MegaStripePanel({
                           stroke="none"
                         />
                       ))}
-                      {/* I les QUE NO SON DE LA COLLECCIO ACTIVA (25/09/2026):
-                          a la vista vertical la silueta ve donada per l'`area de
-                          clic` de cada casella, que es la que fa servir el mateix
-                          vel de les buides. Ho va demanar l'amo: «Les samarretes,
-                          quan no son actives, tambe s'han d'atenuar, no nome's el
-                          dibuix.» */}
-                      {(indicesSamarretesInactives || []).length > 0 ? (
-                        // UN SOL GRUP I UNA SOLA OPACITAT (27/09/2026): el
-                        // mateix ROMBE que a la vista apaisada, aqui amb les
-                        // arees de clic de cada casella (que tambe es
-                        // trepitgen). Vegeu `generaVelDataUrl`.
-                        <g fill="#FFFFFF" opacity={alfaVelSamarretaInactiva} mask={`url(#${idMascaraVelActives})`}>
-                          {(indicesSamarretesInactives || []).map((idx) => {
-                            if (!Number.isInteger(idx) || idx < 0 || idx >= 14) return null;
-                            const extrem = idx === 0 || idx === 13;
-                            const a = extrem ? areesClicAmpla()[idx] : areesClicEstreta()[idx];
-                            if (!a) return null;
-                            const girar = idx >= 7;
-                            const ajustGir = extrem ? 302.2 : 65.3;
-                            const AJUST_VEL_Y = 1.6767;
-                            return (
-                              <path
-                                key={`hg-vel-inactiva-${idx}`}
-                                d={a.d}
-                                transform={`translate(${a.tx}, ${a.ty - AJUST_VEL_Y})${girar ? ` translate(${ajustGir}, 0) scale(-1, 1)` : ''} ${a.transform}`}
-                                clipRule="evenodd"
-                              />
-                            );
-                          })}
-                        </g>
-                      ) : null}
+                      {/* LES QUE NO SON DE LA COLLECCIO ACTIVA (25/09/2026) JA NO
+                          SON AQUI (28/09/2026): el seu vel ha pujat a una capa
+                          propia per damunt dels dibuixos. Vegeu el final
+                          d'aquest contenidor. */}
                     </svg>
                   ) : null}
 
@@ -1553,6 +1509,92 @@ function MegaStripePanel({
                           );
                         })}
                     </div>
+                  ) : null}
+
+                                    {/* EL VEL DE LES SAMARRETES QUE NO SON DE LA COLLECCIO ACTIVA,
+                      PER DAMUNT DELS DIBUIXOS (28/09/2026).
+
+                      Ho ha demanat l'amo: «A les samarretes atenuades, el dibuix
+                      ha d'anar per sota del vel i ara es per sobre». Fins avui
+                      aquest vel anava DINS de l'SVG de la franja (que va a
+                      `zIndex: 4`) i la capa dels dibuixos va a `zIndex: 12`, o
+                      sigui que el dibuix de les cases velades hi quedava NEGRE i
+                      nítid, i nome's s'atenuava la roba. Ara te la seva propia
+                      capa, a `zIndex: 13`: cobreix la roba I el dibuix, i la casa
+                      inactiva s'atenua sencera.
+
+                      Va MOLT IMPORTANT que aquesta capa faci exactament la
+                      mateixa caixa que l'SVG de la franja: la mateixa alcada del
+                      contenidor i l'amplada per l'aspecte del viewBox, amb el
+                      viewBox i el `preserveAspectRatio` de la franja. Amb
+                      aquestes mides, les arees de clic i les caselles
+                      (`areesClicAmpla`/`areesClicEstreta`) hi cauen al mateix
+                      lloc que a l'SVG i el vel queda sobre la seva samarreta.
+
+                      I la mascara hi va amb el vel: es la que deixa les cases
+                      ACTIVES sense vel, perque la silueta d'una casa es mes ampla
+                      que el pas de les cases i la maniga arriba a la del costat
+                      (vegeu `generaVelDataUrl`, que fa el mateix amb la imatge). */}
+                  {isPortraitTablet && inactivesVel.size > 0 ? (
+                    <svg
+                      viewBox={`0 0 ${VECTOR_FRANJA_VIEWBOX_OBERT.width} ${VECTOR_FRANJA_VIEWBOX_OBERT.height}`}
+                      preserveAspectRatio="none"
+                      aria-hidden="true"
+                      style={{
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
+                        height: '100%',
+                        width: 'auto',
+                        maxWidth: 'none',
+                        display: 'block',
+                        pointerEvents: 'none',
+                        zIndex: 13,
+                      }}
+                    >
+                      <defs>
+                        <mask
+                          id={idMascaraVelActives}
+                          style={{ maskType: 'luminance' }}
+                          maskUnits="userSpaceOnUse"
+                          x={0}
+                          y={0}
+                          width={VECTOR_FRANJA_VIEWBOX_OBERT.width}
+                          height={VECTOR_FRANJA_CONTINGUT}
+                        >
+                          <rect x={0} y={0} width={VECTOR_FRANJA_VIEWBOX_OBERT.width} height={VECTOR_FRANJA_CONTINGUT} fill="#FFFFFF" />
+                          {/* Casa per casa, en ordre, com a la imatge del vel: la
+                              silueta blanca on la casa demana vel i negra on es
+                              activa, perque l'ultima pintada es la que es veu. */}
+                          {Array.from({ length: 14 }, (_, k) => k).map((k) => (
+                            <path key={`hg-vel-casa-${k}`} d={VECTOR_FRANJA_SAMARRETES[k]} fill={inactivesVel.has(k) ? '#FFFFFF' : '#000000'} />
+                          ))}
+                        </mask>
+                      </defs>
+                      {/* UN SOL GRUP I UNA SOLA OPACITAT (27/09/2026): el mateix
+                          ROMBE que a la vista apaisada, aqui amb les arees de
+                          clic de cada casella (que tambe es trepitgen). Vegeu
+                          `generaVelDataUrl`. */}
+                      <g fill="#FFFFFF" opacity={alfaVelSamarretaInactiva} mask={`url(#${idMascaraVelActives})`}>
+                        {(indicesSamarretesInactives || []).map((idx) => {
+                          if (!Number.isInteger(idx) || idx < 0 || idx >= 14) return null;
+                          const extrem = idx === 0 || idx === 13;
+                          const a = extrem ? areesClicAmpla()[idx] : areesClicEstreta()[idx];
+                          if (!a) return null;
+                          const girar = idx >= 7;
+                          const ajustGir = extrem ? 302.2 : 65.3;
+                          const AJUST_VEL_Y = 1.6767;
+                          return (
+                            <path
+                              key={`hg-vel-inactiva-${idx}`}
+                              d={a.d}
+                              transform={`translate(${a.tx}, ${a.ty - AJUST_VEL_Y})${girar ? ` translate(${ajustGir}, 0) scale(-1, 1)` : ''} ${a.transform}`}
+                              clipRule="evenodd"
+                            />
+                          );
+                        })}
+                      </g>
+                    </svg>
                   ) : null}
 
                   {/* ClicAreaOverlay is the sole click target for shirts.
