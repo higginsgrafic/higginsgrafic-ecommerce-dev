@@ -205,9 +205,6 @@ function MegaStripePanelP1({
   stripeImageSrc,
   active,
   resolvedMega,
-  // LA LLISTA DE DIBUIXOS DE LA COLLECCIO ACTIVA (28/09/2026), amb la
-  // subcolleccio d'Austen ja filtrada. La fa servir el SCROLL de la franja.
-  resolvedMegaFiltered,
   showStripe,
   stripeRowPadPx,
   stripeRowPadXPx,
@@ -306,45 +303,73 @@ function MegaStripePanelP1({
   //
   // A la p1 cada samarreta ensenya el MATEIX dibuix (el de la peca triada), o
   // sigui que el que ha de fer la rodeta es passar d'un dibuix a un altre: cada
-  // pas tria el dibuix seguent de la colleccio ACTIVA i les catorze samarretes
-  // canvien alhora. A la p2 el que circula es una llista de 64 posicions per les
-  // catorze cases (`stripeStripOffset`); alla, doncs, el pas es un gir.
+  // pas tria el dibuix seguent i les catorze samarretes canvien alhora. A la p2
+  // el que circula es una llista de 64 posicions per les catorze cases
+  // (`stripeStripOffset`); alla, doncs, el pas es un gir.
   //
-  // El dibuix NO es desa en un estat propi: es tria la PECA (`setSelectedItem...`)
-  // i el cami de la imatge surt de `resolvedOverlaySrc`, que es el MATEIX circuit
-  // que el clic a la graella. Amb un estat paral·lel hi hauria dues veritats.
+  // TOTS ELS DIBUIXOS DE TOTES LES COLLECCIONS (28/09/2026). En Marc: «L'scroll
+  // de la franja p1 funciona amb el criteri de colleccio activa i no ha de ser
+  // aixi. A l'scroll hi han de sortir tots els dibuixos de totes les
+  // colleccions». Es la MATEIXA llista que munta la tira de la p2 (les 64
+  // posicions, amb la seva colleccio i subcolleccio), i per aixo passa per
+  // `computeStripeTileOverlaySrcs` amb el context de CADA item: els dibuixos que
+  // la seva colleccio no sap resoldre es queden fora, com a la tira de la p2.
+  //
+  // El dibuix NO es desa en un estat propi: es tria la PECA del seu lloc
+  // (`setSelectedItem...`) i el cami de la imatge surt de `resolvedOverlaySrc`,
+  // que es el MATEIX circuit que el clic a la graella. Amb un estat paral·lel hi
+  // hauria dues veritats.
   const dibuixosFranja = useMemo(() => {
-    const cols = resolvedMegaFiltered?.[active];
-    const llista = Array.isArray(cols) && cols.length ? (cols[0]?.items || []) : [];
-    const drawable = llista.filter((it) => it && typeof it === 'string' && !it.startsWith('__'));
-    if (!drawable.length) return [];
-    const variant = active === 'the_human_inside' ? humanInsideVariant : firstContactVariant;
-    const srcs = computeStripeTileOverlaySrcs({
-      drawable,
-      variant,
-      active,
-      displayedShirtColor: shirtColor,
-      resolvedOverlaySrc,
-      limit: drawable.length,
-    });
-    return drawable.filter((_, i) => Boolean(srcs?.[i]));
-  }, [resolvedMegaFiltered, active, humanInsideVariant, firstContactVariant, shirtColor, resolvedOverlaySrc]);
-  // L'INDEX surt de la peca TRIADA, no d'un comptador propi: aixi, en canviar de
-  // colleccio no hi ha cap estat que valgui per a una altra llista i no cal cap
-  // efecte de reinici.
+    const tots = [];
+    const vistos = new Set();
+    for (const [colleccio, cols] of Object.entries(resolvedMega || {})) {
+      if (!Array.isArray(cols)) continue;
+      const llista = [];
+      for (const col of cols) {
+        if (!Array.isArray(col?.items)) continue;
+        for (const it of col.items) {
+          if (it && typeof it === 'string' && !it.startsWith('__') && !vistos.has(it)) {
+            vistos.add(it);
+            llista.push(it);
+          }
+        }
+      }
+      if (!llista.length) continue;
+      const variant = colleccio === 'the_human_inside' ? humanInsideVariant : firstContactVariant;
+      const srcs = computeStripeTileOverlaySrcs({
+        drawable: llista,
+        variant,
+        active: colleccio,
+        displayedShirtColor: shirtColor,
+        resolvedOverlaySrc,
+        limit: llista.length,
+      });
+      llista.forEach((item, i) => {
+        if (srcs?.[i]) tots.push({ item, collection: colleccio });
+      });
+    }
+    return tots;
+  }, [resolvedMega, humanInsideVariant, firstContactVariant, shirtColor, resolvedOverlaySrc]);
+  // L'INDEX surt de la peca TRIADA de la colleccio de cada dibuix, no d'un
+  // comptador propi: aixi, en canviar de colleccio no hi ha cap estat que valgui
+  // per a una altra llista i no cal cap efecte de reinici.
   const triaDibuixFranja = useCallback((passos) => {
     const n = dibuixosFranja.length;
     if (!n) return;
-    const actual = (active === 'first_contact' ? firstContactSelectedItem
-      : active === 'the_human_inside' ? humanInsideSelectedItem
-        : (selectedItemByCollection?.[active] ?? null));
-    const idx = Math.max(0, dibuixosFranja.indexOf(actual));
-    const dibuix = dibuixosFranja[(((idx + passos) % n) + n) % n];
-    if (!dibuix) return;
-    if (active === 'first_contact') setFirstContactSelectedItem?.(dibuix);
-    else if (active === 'the_human_inside') setHumanInsideSelectedItem?.(dibuix);
-    else setSelectedItemByCollection?.((prev) => ({ ...prev, [active]: dibuix }));
-  }, [dibuixosFranja, active, firstContactSelectedItem, humanInsideSelectedItem, selectedItemByCollection, setFirstContactSelectedItem, setHumanInsideSelectedItem, setSelectedItemByCollection]);
+    const seleccionat = (colleccio) => (colleccio === 'first_contact' ? firstContactSelectedItem
+      : colleccio === 'the_human_inside' ? humanInsideSelectedItem
+        : (selectedItemByCollection?.[colleccio] ?? null));
+    let idx = dibuixosFranja.findIndex((d) => d.collection === active && d.item === seleccionat(active));
+    if (idx < 0) idx = 0;
+    const seguent = dibuixosFranja[(((idx + passos) % n) + n) % n];
+    if (!seguent) return;
+    // Si el dibuix es d'una altra colleccio, tambe s'hi ha de passar: la franja
+    // pinta el dibuix de la colleccio ACTIVA.
+    if (seguent.collection !== active) setActive?.(seguent.collection);
+    if (seguent.collection === 'first_contact') setFirstContactSelectedItem?.(seguent.item);
+    else if (seguent.collection === 'the_human_inside') setHumanInsideSelectedItem?.(seguent.item);
+    else setSelectedItemByCollection?.((prev) => ({ ...prev, [seguent.collection]: seguent.item }));
+  }, [dibuixosFranja, active, firstContactSelectedItem, humanInsideSelectedItem, selectedItemByCollection, setActive, setFirstContactSelectedItem, setHumanInsideSelectedItem, setSelectedItemByCollection]);
   // Els gestos llegeixen la funcio a traves d'un ref: la llista de dibuixos i la
   // peca triada canvien a cada clic, i amb la funcio capturada dins del listener
   // la rodeta es quedaria amb la primera.

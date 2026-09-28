@@ -312,11 +312,6 @@ export default function MegaMenuPanel({
   const propsFranjaP1 = {
     active: active,
     resolvedMega: resolvedMega,
-    // LA LLISTA DE DIBUIXOS DE LA COLLECCIO ACTIVA (28/09/2026): la fa servir el
-    // SCROLL de la franja de la p1 («Aplica-li un scroll als dibuixos de la
-    // franja»). Es la MATEIXA llista que gasta la franja de la p2
-    // (`resolvedMegaFiltered`, amb la subcolleccio d'Austen ja aplicada).
-    resolvedMegaFiltered: resolvedMegaFiltered,
     // La graella de la pagina 1 tambe pot canviar de colleccio (B2).
     setActive: setActive,
     // I de SUBCALLECCIO (28/09/2026): les dues graelles de la p1 (la filera i la
