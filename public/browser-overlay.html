@@ -83,6 +83,14 @@
   .zoom-num { min-width: 60px; text-align: center; background: var(--fons3); border: 1px solid var(--vora); border-left: none; border-right: none; padding: 6px 4px; }
   .etiqueta-barra { color: var(--text2); font-size: 12px; }
   .ajuda { color: var(--text2); font-size: 11.5px; margin-left: auto; text-align: right; }
+  /* LA VERSIO DEL FITXER, A LA BARRA. Aquest visor es un estatic de `public/`,
+     i Vite nome's recarrega sol el codi de `src/`: quan canvia aquest fitxer,
+     la pestanya oberta es queda amb el vell fins que algu la refresca. Amb
+     l'hora del fitxer a la vista, no cal endevinar quina versio s'esta mirant. */
+  .versio {
+    color: var(--text2); font-size: 11px; font-variant-numeric: tabular-nums;
+    background: rgba(255,255,255,.06); padding: 2px 7px; border-radius: 4px; white-space: nowrap;
+  }
   label.amb-select { display: flex; align-items: center; gap: 6px; color: var(--text2); font-size: 12px; }
   label.amb-select select { padding: 5px 6px; }
 
@@ -150,6 +158,32 @@
   .marc .etiqueta button { padding: 1px 6px; font-size: 11px; background: rgba(255,255,255,.14); border-color: transparent; color: #fff; }
   .marc .etiqueta button:hover { background: var(--accent); }
   .marc.actiu .caixa { outline: 2px solid var(--accent); }
+  /* LA FRANJA DE LA VORA ESQUERRA (28/09/2026).
+     En Marc: «Saps aquelles fletxes de carrusel que són ocultes i quan t'acostes
+     a la banda, apareix una franja que t'indica la zona on pots clicar per
+     passar la imatge? Doncs farem això, però en lloc de passar la imatge,
+     anirem a la pestanya» i «Banda esquerra».
+     Cada vista te una franja a la VORA ESQUERRA. Es INVISIBLE fins que hi passes
+     per sobre, i aleshores es veu: es la zona que es clica per obrir la pestanya
+     d'aquella vista. La resta de la vista queda LLIURE, o sigui que el clic hi
+     arriba a l'aplicacio de dins, que es el que cal per mesurar.
+     Va DINS de la caixa (la que fa la mida del dispositiu), o sigui que es
+     escala amb el zoom com la resta de la vista. */
+  .marc .franja {
+    position: absolute; top: 0; bottom: 0; left: 0; width: 48px; z-index: 30;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; opacity: 0; transition: opacity .15s ease;
+    color: #fff; font-size: 30px; line-height: 1; text-shadow: 0 1px 3px rgba(0,0,0,.55);
+    background: linear-gradient(to right, rgba(16, 20, 42, .82), rgba(16, 20, 42, 0));
+  }
+  /* Surt quan t'acostes a la vista, com les fletxes del carrusel. */
+  .marc:hover .franja { opacity: 1; }
+  /* I en passar-hi per sobre es veu que ALLO es la zona que es clica. */
+  .marc .franja:hover { background: rgba(90, 120, 255, .62); }
+  /* NOMES on toca: si la vista encara es una silueta, a sota hi ha el boto de
+     carregar-la i el clic ha d'arribar-hi; i a la SEVA pestanya, l'aplicacio de
+     dins ha de ser tocable tota. */
+  .marc:not(.carregat) .franja, .marc.actiu .franja { display: none; }
   .etiqueta-grup {
     position: absolute; z-index: 14; color: #d8d8e8; font-size: 12px; letter-spacing: .08em;
     text-transform: uppercase; background: rgba(12, 12, 20, .88); padding: 2px 9px; border-radius: 5px;
@@ -210,6 +244,7 @@
       <option value="99">totes</option>
     </select>
   </label>
+  <span class="versio" id="versio" title="Hora del fitxer que ha servit el servidor. Si no es la de l'últim canvi que has desat, recarrega la pàgina (⌘R).">versió…</span>
   <span class="ajuda" id="ajuda"></span>
 </div>
 
@@ -299,6 +334,12 @@ function estatInicial() {
     ordre: 'mosaic',
     sostre: 8,
     tots: false,
+    // LA RUTA DE TOTES LES VISTES (28/09/2026). En Marc: «Vull poder canviar el
+    // path per tots alhora». Es la ruta que fa servir qualsevol vista que no
+    // tingui pestanya propia (les del boto "Tots al mosaic"), i es el valor que
+    // la barra escriu quan mana la Principal: alla el camp no es d'una vista,
+    // es de TOTES.
+    rutaGlobal: '/',
     // El filtre es TRANSIENT: no es desa, perque al cap d'un refresc una llista
     // a mitges sembla que hagi perdut formats. Pero HA D'EXISTIR SEMPRE: si
     // falta, `pintaAcordio` no sap quin boto marcar i l'acordio peta.
@@ -328,6 +369,8 @@ function carrega() {
     e.filtre = 'tots';
     // Camp afegit despres: qui ja tenia estat desat no el porta.
     if (typeof e.guiesCarril !== 'boolean') e.guiesCarril = true;
+    // Camp afegit despres (28/09/2026): la ruta de les vistes sense pestanya.
+    if (typeof e.rutaGlobal !== 'string' || !e.rutaGlobal) e.rutaGlobal = '/';
     // Estats desats quan el defecte era tenir nomes un grup obert: s'obren tots.
     if (!Array.isArray(e.grupsOberts) || !e.grupsOberts.length || (e.grupsOberts.length === 1 && e.grupsOberts[0] === 'Portàtil')) {
       e.grupsOberts = [...GRUPS];
@@ -367,7 +410,10 @@ const RUTA_URL = (() => {
     return r ? (r.startsWith('/') ? r : '/' + r) : null;
   } catch { return null; }
 })();
-if (RUTA_URL) for (const p of estat.pestanyes) p.ruta = RUTA_URL;
+if (RUTA_URL) {
+  for (const p of estat.pestanyes) p.ruta = RUTA_URL;
+  estat.rutaGlobal = RUTA_URL;
+}
 
 // ── LES GUIES DEL CARRIL ───────────────────────────────────────────────────
 //
@@ -529,7 +575,17 @@ function creaMarc(id) {
   contingut.append(botoVeure);
   sensVisita.append(contingut);
 
-  caixa.append(...parts, iframe, carregant, sensVisita);
+  // LA FRANJA DE LA VORA ESQUERRA. Va DINS de la caixa (la que fa la mida del
+  // dispositiu), invisible fins que t'hi acostes. El clic obre la pestanya
+  // d'aquesta vista; si encara no en te, `obrePestanya` la crea i l'activa.
+  const franja = document.createElement('div');
+  franja.className = 'franja';
+  franja.textContent = '‹';
+  franja.title = `Obrir «${fmt.nom}» a la seva pestanya`;
+  franja.setAttribute('role', 'button');
+  franja.addEventListener('click', (e) => { e.stopPropagation(); obrePestanya(id); });
+
+  caixa.append(...parts, iframe, carregant, sensVisita, franja);
   escala.append(caixa);
 
   const etiqueta = document.createElement('div');
@@ -544,7 +600,7 @@ function creaMarc(id) {
 
   el.append(escala, etiqueta);
 
-  const marc = { el, escala, caixa, iframe, etiqueta, carregant, sensVisita, botoVeure, fmt, viu: false, carregat: false, fixat: false };
+  const marc = { el, escala, caixa, iframe, etiqueta, carregant, sensVisita, botoVeure, franja, fmt, viu: false, carregat: false, fixat: false };
   // El boto de dins de la silueta tambe diu la mida que es veura.
   contingut.firstElementChild.innerHTML = `${fmt.nom}<br><span style="opacity:.7">${mm.w}×${mm.h}</span>`;
   iframe.addEventListener('load', () => {
@@ -585,7 +641,9 @@ function muntaMarc(marc, fixa = false) {
   if (fixa) marc.fixat = true;
   marc.el.classList.remove('carregat');
   marc.carregat = false;
-  marc.iframe.src = ambGuies((tabDe(marc.fmt.id) || {}).ruta || '/');
+  // LA RUTA: la de la SEVA pestanya; si el format no en te (les vistes del boto
+  // "Tots al mosaic"), la de totes (`estat.rutaGlobal`).
+  marc.iframe.src = ambGuies((tabDe(marc.fmt.id) || {}).ruta || estat.rutaGlobal || '/');
   marc.sensVisita.style.display = 'none';
   actualitzaEtiqueta(marc);
 }
@@ -626,7 +684,10 @@ function tancaPestanya(id) {
 
 function obrePestanya(id) {
   if (!tabDe(id)) {
-    const ruta = RUTA_URL || (tabActiva() ? tabActiva().ruta : '/');
+    // LA RUTA DE LA PESTANYA NOVA: la GLOBAL (la que mana al mosaic, i que la
+    // barra canvia per a totes de cop). El que s'obre des del mosaic ha de
+    // mostrar el mateix que la vista d'on ve.
+    const ruta = RUTA_URL || estat.rutaGlobal || (tabActiva() ? tabActiva().ruta : '/');
     estat.pestanyes.push(pestanyaNova(id, ruta));
   }
   activaPestanya(id);
@@ -913,9 +974,18 @@ const ajuda = document.getElementById('ajuda');
 function actualitzaBarra() {
   const act = tabActiva();
   const principal = esPrincipal(act);
-  barraRuta.value = principal ? '' : (act ? act.ruta : '/');
-  barraRuta.disabled = principal || !act;
-  barraRuta.placeholder = principal ? 'cada format té la seva' : '/';
+  // A LA PRINCIPAL EL CAMP ES DE TOTES (28/09/2026). En Marc: «Vull poder canviar
+  // el path per tots alhora»: al mosaic, el camp no es d'una vista, es de totes,
+  // i el seu valor es `estat.rutaGlobal`. A una pestanya de format segueix sent
+  // el d'aquella vista, com sempre.
+  barraRuta.value = principal
+    ? (estat.rutaGlobal && estat.rutaGlobal !== '/' ? estat.rutaGlobal : '')
+    : (act ? act.ruta : '/');
+  barraRuta.disabled = !act;
+  barraRuta.placeholder = principal ? 'ruta per a TOTES les vistes' : '/';
+  barraRuta.title = principal
+    ? 'Escriu una ruta i prem Enter: s\'aplica a TOTES les vistes obertes'
+    : 'Ruta de la pestanya activa';
   barraOrdre.value = estat.ordre;
   barraOrdre.disabled = !principal;   // l'ordre només mana al mosaic
   const z = zoomActual();
@@ -1052,7 +1122,9 @@ function pintaAcordio() {
 
 /** Obra una pestanya per a cada format del filtre, d'una tacada. */
 function obreFiltrats() {
-  const ruta = RUTA_URL || (tabActiva() ? tabActiva().ruta : '/');
+  // Mateix criteri que `obrePestanya`: les pestanyes noves neixen amb la ruta
+  // GLOBAL, que es la que la barra canvia per a totes de cop.
+  const ruta = RUTA_URL || estat.rutaGlobal || (tabActiva() ? tabActiva().ruta : '/');
   for (const f of filtrats()) if (!tabDe(f.id)) estat.pestanyes.push(pestanyaNova(f.id, ruta));
   estat.activa = PRINCIPAL;   // i ensenya el mosaic, que es el que vols veure
   pintaTot();
@@ -1124,12 +1196,28 @@ document.getElementById('ajusta-tot').addEventListener('click', () => {
 barraOrdre.addEventListener('change', () => { estat.ordre = barraOrdre.value; pintaTauler(); desa(); });
 barraRuta.addEventListener('change', () => {
   const act = tabActiva();
-  if (!act || esPrincipal(act)) return;
+  if (!act) return;
   let r = barraRuta.value.trim() || '/';
   if (!r.startsWith('/')) r = '/' + r;
-  act.ruta = r;
-  const m = marcs.get(act.id);
-  if (m && m.viu) { m.el.classList.remove('carregat'); m.carregat = false; m.iframe.src = ambGuies(r); }
+  // A la Principal el canvi es de TOTES (28/09/2026): la ruta de cada pestanya
+  // de format i la de les vistes que no en tenen. A una pestanya de format,
+  // nome's la seva, com sempre.
+  const aTotes = esPrincipal(act);
+  if (aTotes) {
+    estat.rutaGlobal = r;
+    for (const p of estat.pestanyes) p.ruta = r;
+  } else {
+    act.ruta = r;
+  }
+  // Es recarreguen les vistes afectades, i nome's aquestes.
+  for (const [id, m] of marcs) {
+    if (!m.viu) continue;
+    if (!aTotes && id !== act.id) continue;
+    m.el.classList.remove('carregat');
+    m.carregat = false;
+    m.iframe.src = ambGuies((tabDe(id) || {}).ruta || estat.rutaGlobal || '/');
+  }
+  actualitzaBarra();
   desa();
 });
 document.getElementById('recarrega').addEventListener('click', () => {
@@ -1196,6 +1284,17 @@ window.addEventListener('resize', () => {
   b.textContent = ullObert ? 'Navegador' : 'Tallat a la finestra';
 }
 pintaTot();
+
+// LA VERSIO A LA BARRA. L'hora del fitxer que ha servit el servidor: es la
+// manera de saber, d'una ullada, si la pestanya te el visor d'ara o un de vell
+// (aquest fitxer es un estatic de `public/` i nome's es refresca a ma).
+fetch(location.href, { method: 'HEAD' })
+  .then((r) => {
+    const lm = r.headers.get('last-modified');
+    const el = document.getElementById('versio');
+    if (el && lm) el.textContent = 'fitxer: ' + new Date(lm).toLocaleTimeString('ca-ES');
+  })
+  .catch(() => { /* si no es pot, es queda el text de presentacio */ });
 </script>
 </body>
 </html>

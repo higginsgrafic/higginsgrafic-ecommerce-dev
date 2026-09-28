@@ -46,9 +46,11 @@
 import { useEffect, useRef, useState } from 'react';
 
 /** El repartiment inicial, abans del primer mesurament. */
-const REPARTIMENT_INICIAL = { blocMega: 0, blocPagina: 0, alcada: null, alFons: false };
+const REPARTIMENT_INICIAL = { blocMega: 0, blocPagina: 0, alcada: null, alFons: false, baixAlViewport: false };
 /** El que penja el cadenat del megaslide sota la seva linia. */
 const CADE_BAIXADA = 56;
+/** L'aire que ha de quedar sota la hero, fins al fons de la finestra (28/09/2026). */
+const AIRE_BAIX_VIEWPORT_PX = 50;
 /** Files, com a molt i com a minim, quan es busquen les divisions. */
 const FILES_MIN = 8;
 const FILES_MAX = 32;
@@ -212,6 +214,33 @@ function MarcInici({ seccions }) {
       // per tant no es pot fer servir per centrar-hi la hero: el seu bloc es el
       // que queda DESPRES del cadenat.
       const disponible = Math.max(0, (window.innerHeight - capcalera) - blocMega);
+      // L'AMPLE DE LA FINESTRA, que decideix dues coses: si el baix de la hero ha
+      // de caure a 50 px del fons de la finestra (l'escriptori) i si toca
+      // enganxar-la al fons (els dos portatils).
+      const ampleFinestra = window.innerWidth;
+      // EL BAIX DE LA HERO, A 50 px DEL FONS DE LA FINESTRA (28/09/2026).
+      //
+      // En Marc: «La pdp està situada a 50 px del bottom del viewport, si no
+      // recordo malament. Posa la hero a la mateixa posició». Es el MATEIX
+      // criteri que el bloc de la PDP a l'escriptori ample: alla, a 1920x946, el
+      // bloc acaba a 896 (946 − 50). Aqui qui deixa aquell aire es la cel·la de
+      // la pagina, i la hero s'hi alinea al fons.
+      //
+      // NOMES A L'ESCRIPTORI (mes de 1366), que es on la PDP tambe el fa servir:
+      // a la tauleta i a la vertical mana el centratge de sempre, i a 1280 i 1366
+      // la hero va enganxada al fons del viewport, que es una decisio a part i
+      // documentada mes avall.
+      const baixAlViewport = ampleFinestra > 1366
+        && disponible >= CADE_BAIXADA + natural + AIRE_BAIX_VIEWPORT_PX;
+      // LA MIDA DE LA CEL·LA NO CANVIA MAI PER AQUEST AIRE (28/09/2026).
+      //
+      // El primer intent va ser afegir l'aire a aquest minim, i era un error: quan
+      // la finestra es curta (o quan el megaslide encara no ha publicat la seva
+      // vora i la linia s'estima llarga) la cel·la creixia 50 px de mes i la
+      // taula s'escolava per sota del viewport —mesurat al mosaic a 1440x766: la
+      // hero acabava 23,2 px per sota del fons—. L'aire, doncs, surt de DINS de
+      // la cel·la (el coixi de sota), i nome's s'hi aplica si hi cap de sobres.
+      // Si no hi cap, tot queda exactament com estava.
       const ambCadenat = CADE_BAIXADA + natural;
       const encaixa = ambCadenat <= disponible;
       // A LES DUES MIDES DE PORTATIL (1280 i 1366) la hero s'ALINEA AL FONS DEL
@@ -233,15 +262,14 @@ function MarcInici({ seccions }) {
       // marge que cal perque en un Mac la finestra no cau mai exactament en
       // aquelles dues xifres). En queden fora la tauleta de 1200 i la de 1024,
       // que no es toquen, i l'escriptori de 1440 en amunt.
-      const ampleFinestra = window.innerWidth;
       const alFons = ampleFinestra >= 1280 && ampleFinestra <= 1366;
       const blocPagina = alFons ? disponible : Math.max(disponible, ambCadenat);
       const alcada = natural;
       // El numero que decideix si ja hi som: si no s'ha mogut, s'atura.
-      const ara = `${Math.round(blocMega * 4) / 4}|${Math.round(blocPagina * 4) / 4}|${Math.round(alcada * 4) / 4}|${alFons ? 1 : 0}`;
+      const ara = `${Math.round(blocMega * 4) / 4}|${Math.round(blocPagina * 4) / 4}|${Math.round(alcada * 4) / 4}|${alFons ? 1 : 0}|${baixAlViewport ? 1 : 0}`;
       if (ara === anterior) return;
       anterior = ara;
-        setRepartiment({ blocMega, blocPagina, alcada, finsLinia, linia, alFons });
+        setRepartiment({ blocMega, blocPagina, alcada, finsLinia, linia, alFons, baixAlViewport });
       raf = requestAnimationFrame(reparteix);
     };
 
@@ -329,8 +357,14 @@ function MarcInici({ seccions }) {
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
-            // A 1366 i 1280, alineada al fons del viewport; a la resta, centrada.
-            justifyContent: repartiment.alFons ? 'flex-end' : 'center',
+            // A 1366 i 1280, alineada al fons del viewport; a l'escriptori, al
+            // fons pero amb els 50 px d'aire de sota; a la resta, centrada.
+            justifyContent: (repartiment.alFons || repartiment.baixAlViewport) ? 'flex-end' : 'center',
+            // L'AIRE DE SOTA LA HERO (28/09/2026): nome's a l'escriptori, i es
+            // el que fa que el seu baix caigui a 50 px del fons de la finestra,
+            // com el bloc de la PDP. Amb `border-box` l'aire surt de l'alcada de
+            // la cel·la, o sigui que la hero no es mou de mida.
+            ...(repartiment.baixAlViewport ? { paddingBlockEnd: `${AIRE_BAIX_VIEWPORT_PX}px` } : null),
           }}
         >
           {segona.node}
