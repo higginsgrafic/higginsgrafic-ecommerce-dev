@@ -60,6 +60,11 @@ export const GAP_PECA_PAGINA1_PX = 54;
  * @param {Array<{label:string, collection:string, subcollection:string|null, stripeItem:(string|undefined)}>} o.items
  *   els mateixos dibuixos que fa servir la pagina 2 (`dibuixosGraella16x4()`).
  * @param {string} o.activeCollection la colleccio activa (les altres s'atenuen).
+ * @param {string|null} [o.activeSubcollection] la subcolleccio activa dins la
+ *   colleccio (nome's AUSTEN en te). Es el que fa que, en clicar un dibuix
+ *   d'AUSTEN, nome's s'encengui la seva subcolleccio i no totes quatre alhora
+ *   (28/09/2026, ho va veure l'amo: «Quan cliques un dibuix d'Austen, activa
+ *   totes les col·leccions d'Austen»).
  * @param {(collection:string, subcollection:string|null, stripeItem:string|undefined)=>void} o.onSelectGroup
  * @param {(stripeItem:string)=>void} [o.onHoverItem]
  * @param {()=>void} [o.onHoverLeave]
@@ -78,6 +83,7 @@ export const GAP_PECA_PAGINA1_PX = 54;
 export default function GraellaDuesFileresPagina1({
   items = [],
   activeCollection,
+  activeSubcollection = null,
   onSelectGroup,
   onHoverItem,
   onHoverLeave,
@@ -144,6 +150,7 @@ export default function GraellaDuesFileresPagina1({
         senseFletxes
         onStepper={onStepper}
         activeCollection={activeCollection}
+        activeSubcollection={activeSubcollection}
         onSelectGroup={onSelectGroup}
         onHoverItem={onHoverItem}
         onHoverLeave={onHoverLeave}

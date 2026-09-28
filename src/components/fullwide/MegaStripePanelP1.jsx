@@ -190,6 +190,13 @@ function MegaStripePanelP1({
   // Per canviar de colleccio des de la graella de la pagina 1 (el clic en un
   // dibuix atenuat activa la seva colleccio, com a la pagina 2).
   setActive,
+  // LA SUBCALLECCIO D'AUSTEN A LA PAGINA 1 (28/09/2026). Es el MATEIX estat que
+  // la pagina 2 (`FullWideSlideHeader`): el clic d'un dibuix hi desa la seva
+  // subcolleccio i amb aixo nome's s'encen aquella. Sense, Austen te quatre
+  // subcolleccions (Pemberley, Keep Calm, Quotes, Crosswords, Looking For My
+  // Darcy) i el clic n'engegava les cinc alhora.
+  austenSubcollection = null,
+  setAustenSubcollection,
   stripeImageSrc,
   active,
   resolvedMega,
@@ -560,6 +567,7 @@ function MegaStripePanelP1({
                   items={itemsGraella}
                   onStepper={setStepperP1}
                   activeCollection={active}
+                  activeSubcollection={austenSubcollection}
                   escala={escalaCarril}
                   alcadaCarruselPx={alcadaFileraPx}
                   midaSelector={MIDA_BLOC_DRETA_PAGINA1_PX}
@@ -571,6 +579,13 @@ function MegaStripePanelP1({
                     // l'ensenyin) i NO ha d'obrir la fitxa del producte. La PDP
                     // s'obre des de les samarretes de la franja, com a la p2.
                     if (collection !== active) setActive?.(collection);
+                    // LA SUBCALLECCIO, DESADA AL CLIC (28/09/2026). En Marc: «Quan
+                    // cliques un dibuix d'Austen, activa totes les col·leccions
+                    // d'Austen»: la graella passava `subcollection` i algu no el
+                    // desava enlloc. Es el MATEIX cami que la pagina 2 (vegeu
+                    // `onSelectGroup` de `MegaslidePagina2`).
+                    if (collection === 'austen') setAustenSubcollection?.(subcollection || null);
+                    else setAustenSubcollection?.(null);
                     setStripeOverlayOverrideActive(false);
                     if (firstStripeItem) {
                       if (collection === 'first_contact') setFirstContactSelectedItem(firstStripeItem);

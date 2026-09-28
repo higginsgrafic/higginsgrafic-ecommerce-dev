@@ -314,6 +314,11 @@ export default function MegaMenuPanel({
     resolvedMega: resolvedMega,
     // La graella de la pagina 1 tambe pot canviar de colleccio (B2).
     setActive: setActive,
+    // I de SUBCALLECCIO (28/09/2026): les dues graelles de la p1 (la filera i la
+    // de la tauleta vertical) desen aqui la subcolleccio del dibuix clicat, com
+    // fa la pagina 2. Es el mateix estat del header.
+    austenSubcollection: austenSubcollection,
+    setAustenSubcollection: setAustenSubcollection,
     showStripe: showStripe,
     isLandscapeTablet: isLandscapeTablet,
     stripeRowPadPx: stripeRowPadPx,
@@ -530,11 +535,17 @@ export default function MegaMenuPanel({
                               numColumns={n}
                               tilesPercent={85}
                               activeCollection={active}
+                              activeSubcollection={austenSubcollection}
                               isPortraitTablet
                               /* El tap en un dibuix el tria, igual que a la
                                  filera de la pagina 2. */
                               onSelectGroup={(collection, subcollection, firstStripeItem) => {
                                 if (collection !== active) setActive?.(collection);
+                                // La subcolleccio d'AUSTEN tambe es desa aqui:
+                                // es el que fa que nome's s'encengui la que s'ha
+                                // tocat (28/09/2026, com a la filera).
+                                if (collection === 'austen') setAustenSubcollection?.(subcollection || null);
+                                else setAustenSubcollection?.(null);
                                 setStripeOverlayOverrideActive?.(false);
                                 if (firstStripeItem) {
                                   if (collection === 'first_contact') setFirstContactSelectedItem?.(firstStripeItem);
