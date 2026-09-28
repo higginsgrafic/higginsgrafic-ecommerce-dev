@@ -1238,7 +1238,7 @@ export function CercadorColleccionsColumna({
               // caixa (`sliderInset`), aqui tambe (5 px per costat, 10 en total),
               // i nome's la de la colleccio activa; les altres omplen la filera.
               width: key === activeKey ? 'calc(100% - 10px)' : '100%',
-              height: key === activeKey ? '24.6px' : '100%',
+              height: key === activeKey ? 'calc(100% - 10px)' : '100%',
               justifySelf: 'center',
               alignSelf: 'center',
               // LA FONT, AMB EL CRITERI DE LA COLUMNA DE LA P2 HORITZONTAL
