@@ -479,9 +479,9 @@ function MegaStripePanel({
   // sola filera).
   const rectsMascara = (Array.isArray(stripeMaskTileRectsRawPct) && stripeMaskTileRectsRawPct.length === 14 && isPortraitTablet)
     ? stripeMaskTileRectsRawPct.map((r, idx) => ({
-      // OBERT UN 0,75% (28/09/2026): l'1% movia massa el setè dibuix. La
+      // OBERT UN 0,5% (28/09/2026): ajustat a ull amb l'amo. La
       // primera casella queda clavada a 0 i la resta s'obren cap a la dreta.
-      left: (idx % 7) * (100 / 7) * 1.0075,
+      left: (idx % 7) * (100 / 7) * 1.005,
       width: 100 / 7,
       top: idx < 7 ? 0 : 50,
       height: 50,
