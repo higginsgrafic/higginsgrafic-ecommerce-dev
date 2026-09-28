@@ -640,6 +640,32 @@ export function CercadorDibuixosGraella({
   // L'amo ho va demanar exactament aixi: «centrar la colleccio a la graella i a
   // la franja alhora». Per aixo el centratge va amb la clau de la colleccio i
   // tambe amb el muntatge, i mai amb un desplaçament manual.
+  //
+  // EL CENTRATGE, EN UNA FUNCIO A PART (28/09/2026). En Marc: «Quan cliques un
+  // dibuix la colleccio s'ha de centrar independentment dels clics que hi hagi
+  // hagut». L'efecte nome's salta quan canvia la CLAU de la colleccio, i clicar
+  // un dibuix de la colleccio que ja es activa no la canvia: per aixo el clic
+  // tambe crida `centraColleccio`.
+  //
+  // EL GEST COMPTA, I ES BUIDA (era el que feia el salt). La posicio de la tira
+  // es `translateX(-(base + gest))`. Amb les fletxes, el gest acumula posicions
+  // (una per clic); si en triar un dibuix es recalcula NOME'S la base, el gest
+  // que hi havia es queda alla i la tira salta el que s'havia clicat (mesurat a
+  // la p2: dos clics i un dibuix feien un salt de 440 px, vuit posicions). Amb el
+  // gest dins la formula i el gest a zero, el `-gest` es cancel·la i la tira cau
+  // exactament al centre de la finestra.
+  const centraColleccio = () => {
+    if (!carrusel || !(periode > 0)) return;
+    const indexos = items
+      .map((it, i) => (it.collection === activeCollection
+        && (!activeSubcollection || it.subcollection === activeSubcollection) ? i : -1))
+      .filter((i) => i >= 0);
+    if (!indexos.length) return;
+    const centre = ((indexos[0] + indexos[indexos.length - 1]) / 2) * unPas + dibuixPx / 2;
+    const finestra = refCarrusel?.current?.clientWidth || 0;
+    if (!finestra) return;
+    setDesplacBase(centre + desplacGest - finestra / 2);
+  };
   const clauColleccioRef = useRef(undefined);
   useLayoutEffect(() => {
     if (!carrusel || periode <= 0) return;
@@ -656,9 +682,7 @@ export function CercadorDibuixosGraella({
       const centre = ((indexos[0] + indexos[indexos.length - 1]) / 2) * unPas + dibuixPx / 2;
       const finestra = caixaCarrusel()?.clientWidth || 0;
       if (!finestra) return;
-      const objectiu = centre - finestra / 2;
-      // La volta mes curta: la mateixa posicio nome's que amb la volta que toca.
-      setDesplacBase(objectiu);
+      setDesplacBase(centre + desplacGest - finestra / 2);
     };
     centra();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -722,7 +746,16 @@ export function CercadorDibuixosGraella({
         type="button"
         title={label}
         aria-label={label}
-        onClick={() => onSelectGroup?.(collection, subcollection, stripeItem)}
+        onClick={() => {
+          // EN TRIAR UN DIBUIX, LA COLLECCIO TORNA AL CENTRE I LES FLETXES A
+          // ZERO (28/09/2026). En Marc: «Quan cliques un dibuix la colleccio
+          // s'ha de centrar independentment dels clics que hi hagi hagut». El
+          // `setDesplacGest(0)` es tambe el que fa que el `-gest` de la formula
+          // es cancel·li (vegeu `centraColleccio`).
+          setDesplacGest(0);
+          centraColleccio();
+          onSelectGroup?.(collection, subcollection, stripeItem);
+        }}
         onMouseEnter={() => stripeItem && onHoverItem?.(stripeItem, collection)}
         onMouseLeave={onHoverLeave}
         style={{
