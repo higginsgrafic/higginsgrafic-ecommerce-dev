@@ -47,24 +47,3 @@ export const ESTIL_CAIXA_BLOC_ALCADA_AUTO = {
   boxShadow: '0 0 0 1px #D1D5DB, 0 1px 3px rgba(0,0,0,0.12)',
   overflow: 'hidden',
 };
-
-/**
- * LA PASTILLA BLANCA DEL SELECTOR (28/09/2026).
- *
- * Viu a part perque la pastilla te DOS llocs on es pot pintar: dins del selector
- * (com sempre, a la capa de la caixa) o a la capa de la caixa del bloc de la p1,
- * per sota de l'ombra de la maniga («A la p1, el rectangle blanc del selector ha
- * de passar per sota l'ombra de la maniga»). Amb un sol joc de numeros, les dues
- * versions son exactament la mateixa pastilla.
- */
-export const ESTIL_PASTILLA_SELECTOR = {
-  backgroundColor: '#FFFFFF',
-  borderRadius: '3px',
-  border: '1px solid #D1D5DB',
-  boxShadow: '0 1px 3px rgba(0,0,0,0.12)',
-  boxSizing: 'border-box',
-  pointerEvents: 'none',
-};
-
-/** El coixi de la pastilla dins la seva casella, en px (a 1920). */
-export const PASTILLA_INSET_PX = 5;
