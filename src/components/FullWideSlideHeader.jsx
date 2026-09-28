@@ -40,6 +40,33 @@ import { MARGE_DALT_BLOC_FRANJA_PX } from './megaslide/geometriaMegaslide.js';
 
 // Plantilla independent de l'acordió del CISTELL — taula pròpia sobre la pauta
 
+/** Les subcolleccions d'AUSTEN que existeixen (les mateixes claus que el
+ *  filtre `AUSTEN_SUB_PREFIXES`, que viu dins del component). */
+const SUBS_AUSTEN = new Set(['pemberley', 'keep_calm', 'quotes', 'crosswords', 'looking_for_my_darcy']);
+
+/**
+ * LA SUBCOLLECCIO D'AUSTEN QUE PORTA LA URL (`?sub=`) (28/09/2026).
+ *
+ * Es el costat de llegir del que apunta `apuntaColleccio`. Sense aixo,
+ * recarregar amb `?active=austen&sub=pemberley` mantenia la colleccio pero
+ * perdia la subcolleccio, i AUSTEN queia a la llista SENcera amb les
+ * subcolleccions barrejades: la franja ensenyava els de CROSSWORDS al mig i al
+ * final i la pastilla de la columna desapareixia. Ho va veure l'amo com «quan
+ * cliques Pemberley o Keep Calm se centra crosswords».
+ *
+ * @returns {string|null} la subcolleccio, o null si no n'hi ha cap de valida
+ */
+function readAustenSubFromUrl() {
+  try {
+    if (typeof window === 'undefined') return null;
+    if (window.location.pathname !== '/nova/inici') return null;
+    const sub = new URLSearchParams(window.location.search || '').get('sub') || '';
+    return SUBS_AUSTEN.has(sub) ? sub : null;
+  } catch {
+    return null;
+  }
+}
+
 
 function FullWideSlideHeader({
   contained = false,
@@ -251,7 +278,9 @@ function FullWideSlideHeader({
   const [cercadorSelectedColor, setCercadorSelectedColor] = useState('white');
   const [hoveredStripeItem, setHoveredStripeItem] = useState(null);
   const [hoveredStripeItemCollection, setHoveredStripeItemCollection] = useState(null);
-  const [austenSubcollection, setAustenSubcollection] = useState(null);
+  // La subcolleccio d'AUSTEN arrenca de la URL (`?sub=`) perque no es perdi en
+  // recarregar: vegeu `readAustenSubFromUrl` i `apuntaColleccio`.
+  const [austenSubcollection, setAustenSubcollection] = useState(() => readAustenSubFromUrl());
 
   const resolvePdpUrl = useCallback((collection, item) => {
     if (typeof item !== 'string') return null;
@@ -491,14 +520,23 @@ function FullWideSlideHeader({
   //
   // Es NOMES a `/nova/inici` (les altres rutes tenen els seus parametres) i amb
   // `replace`, perque canviar de colleccio no ha de deixar un pas a l'historial.
-  const apuntaColleccio = useCallback((col) => {
+  const apuntaColleccio = useCallback((col, sub = null) => {
     if (!col) return;
     if (location.pathname !== '/nova/inici') return;
     try {
       const clau = String(col).replace(/_/g, '-');
+      const subClau = sub ? String(sub) : '';
       const params = new URLSearchParams(location.search || '');
-      if (params.get('active') === clau) return;
+      if (params.get('active') === clau && (params.get('sub') || '') === subClau) return;
       params.set('active', clau);
+      // LA SUBCOLLECCIO TAMBE HI VA (28/09/2026). Nome's amb la colleccio, en
+      // recarregar la pagina es perdia la subcolleccio (PEMBERLEY, KEEP CALM,
+      // QUOTES...) i AUSTEN queia a la llista sencera amb les subcolleccions
+      // barrejades: la franja ensenyava els de CROSSWORDS al mig i al final i la
+      // pastilla de la columna desapareixia. Ho va veure l'amo com «quan cliques
+      // Pemberley o Keep Calm se centra crosswords».
+      if (subClau) params.set('sub', subClau);
+      else params.delete('sub');
       params.delete('collection');
       const q = params.toString();
       navigate(`${location.pathname}${q ? `?${q}` : ''}${location.hash || ''}`, { replace: true });
@@ -522,8 +560,8 @@ function FullWideSlideHeader({
   // L'estat i la URL son el MATEIX fet, i per aixo s'apunta aqui i no a cada
   // lloc que el canvia. Amb aixo la restauracio ja no te res a desfer.
   useEffect(() => {
-    apuntaColleccio(active);
-  }, [active, apuntaColleccio]);
+    apuntaColleccio(active, active === 'austen' ? austenSubcollection : null);
+  }, [active, austenSubcollection, apuntaColleccio]);
 
 
   useEffect(() => {
