@@ -1188,8 +1188,13 @@ export function CercadorColleccionsColumna({
           width: '100%',
           height: '100%',
           display: 'grid',
-          gridTemplateRows: `repeat(${llista.length}, 1fr)`,
-          rowGap: '3px',
+          // LES PROPORCIONS DE LA COLUMNA DE LA P2 HORITZONTAL (28/09/2026, ho
+          // ha demanat l'amo): cada caixa fa 22,59 px d'alcada i les nou es
+          // reparteixen la columna. Alla la columna fa 128 x 247 amb caixes de
+          // 122 x 22,59; aqui l'amplada la mana la casella i l'alcada es la
+          // mateixa.
+          gridTemplateRows: `repeat(${llista.length}, 22.59px)`,
+          alignContent: 'space-between',
           minHeight: 0,
         }}
       >
