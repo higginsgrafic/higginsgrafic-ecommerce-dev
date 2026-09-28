@@ -85,7 +85,13 @@ export const uploadFile = async (file, folder = '') => {
     const { data, error } = await supabase.storage
       .from('media')
       .upload(filePath, file, {
-        cacheControl: '3600',
+        // UN ANY, NO UNA HORA (28/09/2026). Amb una hora, el navegador torna a
+        // validar cada imatge dins de la mateixa sessio. Nomes te efecte si el
+        // Storage ho fa servir: mesurat el 28/09/2026, Supabase serveix els
+        // objectes amb `no-cache` igualment (provat amb capcalera, amb el camp
+        // multipart i amb la clau de servei). El que de debò estalvia egress és
+        // no pujar PNG grossos.
+        cacheControl: '31536000',
         upsert: false
       });
 
@@ -134,7 +140,13 @@ export const uploadFileToPath = async (file, filePath, options = {}) => {
     const { data, error } = await supabase.storage
       .from('media')
       .upload(normalizedPath, file, {
-        cacheControl: '3600',
+        // UN ANY, NO UNA HORA (28/09/2026). Amb una hora, el navegador torna a
+        // validar cada imatge dins de la mateixa sessio. Nomes te efecte si el
+        // Storage ho fa servir: mesurat el 28/09/2026, Supabase serveix els
+        // objectes amb `no-cache` igualment (provat amb capcalera, amb el camp
+        // multipart i amb la clau de servei). El que de debò estalvia egress és
+        // no pujar PNG grossos.
+        cacheControl: '31536000',
         upsert: options.upsert === true
       });
 
@@ -240,7 +252,13 @@ export const createFolder = async (folderPath) => {
     const { error } = await supabase.storage
       .from('media')
       .upload(keepFilePath, keepFile, {
-        cacheControl: '3600',
+        // UN ANY, NO UNA HORA (28/09/2026). Amb una hora, el navegador torna a
+        // validar cada imatge dins de la mateixa sessio. Nomes te efecte si el
+        // Storage ho fa servir: mesurat el 28/09/2026, Supabase serveix els
+        // objectes amb `no-cache` igualment (provat amb capcalera, amb el camp
+        // multipart i amb la clau de servei). El que de debò estalvia egress és
+        // no pujar PNG grossos.
+        cacheControl: '31536000',
         upsert: false
       });
 

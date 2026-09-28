@@ -123,7 +123,8 @@ Deno.serve(async (req: Request) => {
       .upload(path, bytes, {
         contentType,
         upsert,
-        cacheControl: "3600",
+        // UN ANY, NO UNA HORA (28/09/2026): vegeu `src/api/storage.js`.
+        cacheControl: "31536000",
       });
 
     if (uploadError) {
