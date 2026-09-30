@@ -518,7 +518,12 @@ export default function MegaslidePagina2({
         isLandscapeTablet,
       });
 
-      const scyDeclarat = centratgeSelectorY({
+      // A 1024, EL BLOC AL TOP DEL SELECTOR (02/10/2026). En Marc: «Alinea el
+      // bloc graella+tira de colors, al top del selector»: alla no hi ha
+      // centratge (el selector i la filera comparteixen el `top`, o sigui que
+      // arrenquen al mateix lloc) i el que mana es el top del selector, que es
+      // qui deixa els 15 px d'aire amb el sostre del megaslide.
+      const scyDeclarat = esCarrilPagina1024 ? 0 : centratgeSelectorY({
         midaSelector: midaSelectorP2,
         escala: readRootCssNumber('--hg-escala-mega', 1),
         dibuix: mesuraGraellaP2?.dibuix ?? midaDibuix(isPortraitTablet, isLandscapeTablet),
