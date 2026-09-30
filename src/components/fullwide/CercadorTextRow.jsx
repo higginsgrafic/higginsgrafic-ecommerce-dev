@@ -2326,6 +2326,12 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
           midaSelector={midaSelector}
           reservaDreta={reservaDreta}
           carrusel
+          // LES DUES FILES DE LA GRAELLA, EN BLOC AMB LA TIRA DE COLORS
+          // (02/10/2026). En Marc: «Tracta la graella intercalada i la tira de
+          // colors com si fos un sol bloc de tres files»: a 1024 les dues files
+          // omplen la seva finestra (sense desnivells, que son la calibracio de
+          // la composicio ampla) i la tira de colors es la tercera.
+          centraFilesEnBloc={esColumna1024}
           activeCollection={activeCollection}
           activeSubcollection={activeSubcollection}
           onSelectGroup={onSelectGroup}

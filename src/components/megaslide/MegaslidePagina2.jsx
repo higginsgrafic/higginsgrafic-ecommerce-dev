@@ -439,15 +439,22 @@ export default function MegaslidePagina2({
       //    dins del bloc (`topBcn - topGraella`) no canvia quan el bloc es mou.
       const offset = (!perGraelles && typeof window !== 'undefined' && window.innerWidth >= 768 && window.innerWidth <= 1366 && window.innerWidth >= window.innerHeight) ? 10 : 0;
       let objectiuTop = null;
-      if (perGraelles && esComposicioFranja) {
+      //    I A 1024 SENSE FRANJA (02/10/2026): alla els enllacos son la columna
+      //    de la dreta i el bloc son nome's el selector, la graella i la tira de
+      //    colors. El sostre es el MATEIX (la franja de colleccions no hi compta,
+      //    `alcadaFranja` = 0), que es el que deixa els 15 px d'aire a dalt del
+      //    megaslide que ha demanat l'amo.
+      if (perGraelles && (esComposicioFranja || esCarrilPagina1024)) {
         const rGraella = page2Graella.getBoundingClientRect();
-        const bcnBox = viewportRef.current.querySelector('[data-p2-color-selector] [data-stripe-buttonbar="bn"]');
+        // El selector pot ser el de la p2 (`bn`, el rectangle) o el de la p1
+        // (`bn-p1`, el quadrat, que es el que es munta a 1024).
+        const bcnBox = viewportRef.current.querySelector('[data-p2-color-selector] [data-stripe-buttonbar="bn"], [data-p2-color-selector] [data-stripe-buttonbar="bn-p1"]');
         const bandaEl = viewportRef.current.querySelector('[data-colleccions-franja="1"]');
         const franjaEl = viewportRef.current.querySelector('[data-stripe-visual-content="2"]');
         const panelEl = document.querySelector('[data-mega-panel-surface]');
-        if (bcnBox && bandaEl && franjaEl && panelEl) {
+        if (bcnBox && franjaEl && panelEl && (bandaEl || esCarrilPagina1024)) {
           const rBcn = bcnBox.getBoundingClientRect();
-          const alcadaFranja = bandaEl.getBoundingClientRect().height;
+          const alcadaFranja = bandaEl ? bandaEl.getBoundingClientRect().height : 0;
           const rFranja = franjaEl.getBoundingClientRect();
           const panelTop = panelEl.getBoundingClientRect().top;
           const panelAlt = panelEl.getBoundingClientRect().height;
