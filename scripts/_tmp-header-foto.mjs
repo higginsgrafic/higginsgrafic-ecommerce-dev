@@ -1,0 +1,10 @@
+import { chromium } from '@playwright/test';
+const w = Number(process.argv[2]), h = Number(process.argv[3]);
+const b = await chromium.launch();
+const ctx = await b.newContext({ viewport: { width: w, height: h }, deviceScaleFactor: 2 });
+const p = await ctx.newPage();
+await p.goto('http://127.0.0.1:3003/nova/inici?active=first_contact', { waitUntil: 'load', timeout: 180000 });
+await p.waitForTimeout(7000);
+await p.screenshot({ path: `/tmp/header-${w}.png`, clip: { x: 0, y: 0, width: w, height: Math.min(h, 120) } });
+console.log(`/tmp/header-${w}.png`);
+await ctx.close(); await b.close();

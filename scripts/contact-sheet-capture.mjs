@@ -16,7 +16,7 @@
  * Requires the dev server to be running (default: http://localhost:3003).
  */
 
-import { firefox } from 'playwright';
+import { chromium, firefox } from 'playwright';
 import { mkdir, writeFile, rm } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
@@ -73,8 +73,17 @@ async function main() {
   }
   await mkdir(OUT_DIR, { recursive: true });
 
-  console.log(`▸ Launching Firefox`);
-  const browser = await firefox.launch();
+  // EL MOTOR (01/10/2026): per defecte CHROMIUM.
+  //
+  // Era Firefox fix. Amb Firefox, el `goto` d'aquestes pagines es queda
+  // encallat (mesurat: 5 minuts sense acabar ni una captura, amb el log aturat
+  // a «Launching Firefox»), i per tant el boto de captura del contact sheet no
+  // podia funcionar mai. Amb Chromium la mateixa pagina es captura en 4,9 s
+  // (llancament 0,65 s + xarxa en calma 3,5 s + captura 0,7 s). Es pot tornar a
+  // demanar Firefox amb `--browser=firefox`.
+  const MOTOR = String(args.browser || 'chromium').toLowerCase() === 'firefox' ? firefox : chromium;
+  console.log(`▸ Launching ${MOTOR === firefox ? 'Firefox' : 'Chromium'}`);
+  const browser = await MOTOR.launch();
   const context = await browser.newContext({
     viewport: { width: VIEWPORT_W, height: VIEWPORT_H },
     deviceScaleFactor: 1,

@@ -1,0 +1,13 @@
+import { chromium } from '@playwright/test';
+const b = await chromium.launch();
+const p = await b.newPage({ viewport: { width: Number(process.argv[2] || 1366), height: Number(process.argv[3] || 768) } });
+p.on('console', (m) => { if (m.type() === 'error') console.log('CONSOLE', m.text().slice(0, 400)); });
+p.on('pageerror', (e) => console.log('PAGEERROR', String(e.message).slice(0, 400)));
+await p.goto('http://127.0.0.1:3003/nova/inici?active=first_contact', { waitUntil: 'load', timeout: 120000 });
+await p.waitForTimeout(5000);
+console.log('boto search:', await p.locator('button:has(svg.lucide-search)').count());
+await p.click('button:has(svg.lucide-search)').catch((e) => console.log('CLIC ERR', e.message.slice(0, 120)));
+await p.waitForTimeout(6000);
+const n = await p.locator('[data-mega-page-viewport="2"]').count();
+console.log('viewports p2:', n);
+await b.close();

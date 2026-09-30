@@ -1,0 +1,12 @@
+import { chromium } from '@playwright/test';
+const b = await chromium.launch();
+const ctx = await b.newContext({ viewport: { width: 768, height: 1024 }, deviceScaleFactor: 3 });
+const p = await ctx.newPage();
+await p.goto('http://127.0.0.1:3003/nova/inici?active=first_contact', { waitUntil: 'load', timeout: 180000 });
+await p.waitForTimeout(6000);
+await p.click('button:has(svg.lucide-search)').catch(() => {});
+await p.waitForTimeout(9000);
+const el = await p.$('[data-taula-vertical="2"] [data-taula-cela="6-9+11-14"]');
+await el.screenshot({ path: '_tmp-zoom-franja.png' });
+console.log('desat _tmp-zoom-franja.png');
+await b.close();

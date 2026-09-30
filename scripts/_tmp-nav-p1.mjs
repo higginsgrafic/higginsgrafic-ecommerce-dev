@@ -1,0 +1,22 @@
+// TEMPORAL — com es navega a la pagina 1 del megaslide?
+import { chromium } from '@playwright/test';
+const b = await chromium.launch();
+const p = await b.newPage({ viewport: { width: 1366, height: 768 } });
+await p.goto('http://127.0.0.1:3003/nova/inici?active=first_contact', { waitUntil: 'load', timeout: 180000 });
+await p.waitForTimeout(4000);
+await p.click('button:has(svg.lucide-search)').catch(() => {});
+await p.waitForSelector('[data-mega-page-viewport="2"]', { timeout: 30000 });
+await p.waitForTimeout(6000);
+const pos = () => p.evaluate(() => [...document.querySelectorAll('[data-mega-page-viewport]')].map((e) => `${e.getAttribute('data-mega-page-viewport')}:${Math.round(e.getBoundingClientRect().left)}`).join(' '));
+console.log('abans ', await pos());
+await p.locator('button[aria-label="Anterior"]').click({ force: true }).catch((e) => console.log('clic anterior KO', e.message.slice(0, 60)));
+await p.waitForTimeout(4000);
+console.log('anterior', await pos());
+await p.locator('button[aria-label="Següent"]').click({ force: true }).catch((e) => console.log('clic seguent KO', e.message.slice(0, 60)));
+await p.waitForTimeout(4000);
+console.log('seguent ', await pos());
+await p.mouse.move(700, 400);
+await p.mouse.wheel(-1400, 0);
+await p.waitForTimeout(4000);
+console.log('roda    ', await pos());
+await b.close();

@@ -1,0 +1,24 @@
+import { chromium } from '@playwright/test';
+const w = Number(process.argv[2]), h = Number(process.argv[3]);
+const b = await chromium.launch();
+const ctx = await b.newContext({ viewport: { width: w, height: h }, deviceScaleFactor: 1 });
+const p = await ctx.newPage();
+await p.goto('http://127.0.0.1:3003/nova/inici?active=first_contact&carril=1', { waitUntil: 'load', timeout: 180000 });
+await p.waitForTimeout(4000);
+await p.click('button:has(svg.lucide-search)').catch(() => {});
+await p.waitForSelector('[data-mega-page-viewport="2"]', { timeout: 30000 });
+await p.waitForTimeout(9000);
+const r = await p.evaluate(() => {
+  const el = document.querySelector('[data-mega-page-viewport="1"]');
+  let pare = el.parentElement;
+  while (pare && getComputedStyle(pare).transform === 'none' && pare !== document.body) pare = pare.parentElement;
+  const v1 = el.getBoundingClientRect();
+  const m = getComputedStyle(pare).transform.match(/matrix\(([^)]+)\)/);
+  const tx = m ? Number(m[1].split(',')[4]) : 0;
+  pare.style.transform = `translateX(${tx - v1.left}px)`;
+  return { y: 40, h: 260 };
+});
+await p.waitForTimeout(400);
+await p.screenshot({ path: `/tmp/quadrats-${w}.png`, clip: { x: 0, y: 40, width: w, height: 260 } });
+console.log(`/tmp/quadrats-${w}.png`);
+await ctx.close(); await b.close();

@@ -1,0 +1,20 @@
+import { chromium } from '@playwright/test';
+const w = Number(process.argv[2]), h = Number(process.argv[3]);
+const b = await chromium.launch();
+const p = await b.newPage({ viewport: { width: w, height: h } });
+await p.goto('http://127.0.0.1:3003/nova/inici?active=first_contact', { waitUntil: 'load', timeout: 180000 });
+await p.waitForTimeout(4000);
+await p.click('button:has(svg.lucide-search)').catch(() => {});
+await p.waitForSelector('[data-mega-page-viewport="2"]', { timeout: 30000 });
+await p.waitForTimeout(9000);
+const r = await p.evaluate(() => {
+  const v2 = document.querySelector('[data-mega-page-viewport="2"]');
+  const panell = document.querySelector('[data-mega-panel-surface]');
+  const bcn = v2.querySelector('[data-p2-color-selector] [data-stripe-buttonbar="bn"]');
+  const fr = v2.querySelector('[data-stripe-visual-content="2"]');
+  const header = [...document.querySelectorAll('header div')].find((el) => { const x = el.getBoundingClientRect(); return x.top === 0 && x.height > 30 && x.height < 90 && x.width > 1000; });
+  const hb = header ? header.getBoundingClientRect().bottom : null;
+  return { headerBottom: hb == null ? null : +hb.toFixed(1), bcnTop: +bcn.getBoundingClientRect().top.toFixed(1), panellTop: +panell.getBoundingClientRect().top.toFixed(1), panellBottom: +(panell.getBoundingClientRect().top + panell.getBoundingClientRect().height).toFixed(1), franjaBottom: +(fr.getBoundingClientRect().top + fr.getBoundingClientRect().height).toFixed(1), delta: hb == null ? null : +(bcn.getBoundingClientRect().top - hb).toFixed(1) };
+});
+console.log(`${w}x${h}`, JSON.stringify(r));
+await b.close();
